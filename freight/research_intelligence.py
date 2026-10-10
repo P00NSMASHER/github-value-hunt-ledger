@@ -434,11 +434,18 @@ def main() -> None:
     parser.add_argument("--as-of-date", default=date.today().isoformat())
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--registry", type=Path, help="Optional manually curated versioned source registry")
+    parser.add_argument("--include-public-campaign", action="store_true",
+                        help="Add the dated, attributed October public-source campaign")
     args = parser.parse_args()
     today = iso(args.as_of_date, "as-of-date")
+    if args.registry and args.include_public_campaign:
+        parser.error("--registry and --include-public-campaign are mutually exclusive")
     if args.registry:
         registry = json.loads(args.registry.read_text(encoding="utf-8"))
         brief = compile_brief(registry, as_of=today)
+    elif args.include_public_campaign:
+        from freight.research_public_campaign import campaign_brief
+        brief = campaign_brief(as_of=today)
     else:
         brief = phase3_brief(as_of=today)
     args.out.mkdir(parents=True, exist_ok=True)

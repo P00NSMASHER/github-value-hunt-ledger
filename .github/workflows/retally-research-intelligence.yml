@@ -4,6 +4,12 @@ on:
     paths:
       - 'freight/research_intelligence.py'
       - 'freight/test_research_intelligence.py'
+      - 'freight/research_public_campaign.py'
+      - 'freight/test_research_public_campaign.py'
+      - 'freight/research_source_acquisition.py'
+      - 'freight/test_research_source_acquisition.py'
+      - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
+      - 'freight/RESEARCH_SOURCE_ACQUISITION.md'
       - 'freight/lab_phase4_director.py'
       - 'freight/lab_phase4_control_center.py'
       - 'freight/RESEARCH_INTELLIGENCE_LAB.md'
@@ -29,10 +35,10 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
-          PYTHONPATH=. python -m freight.research_intelligence --as-of-date 2026-10-10 --out /tmp/retally-research-intelligence
+          PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
           python - <<'PY'
           import json
           from pathlib import Path
@@ -40,13 +46,16 @@ jobs:
           r=json.loads((p/'research_intelligence.json').read_text())
           assert r['status']=='RESEARCH_ONLY_NO_AUTONOMOUS_FETCH'
           assert len(r['lanes'])==8
+          assert all(x['sourced_observations']>0 for x in r['lanes'])
+          assert 'retally:pricing:clarity' in r['contested_issues']
+          assert r['source_register_count']>=12
           assert r['opposition_findings']>=5
           assert r['no_independent_truth_certification'] is True
           assert r['customer_claims_or_payment_execution'] is False
           assert all(x['can_publish_as_verified'] is False for x in r['prioritized_findings'])
           assert 'No automated searches performed' in (p/'research.html').read_text()
           assert len(r['receipt_sha256'])==64
-          print('Eight research lanes; source-bound opposition findings; NO live research or production actions')
+          print('Eight sourced research lanes; unresolved pricing opposition; NO live fetch or production actions')
           PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
