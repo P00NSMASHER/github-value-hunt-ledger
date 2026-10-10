@@ -19,7 +19,7 @@ class PublicResearchCampaignTests(unittest.TestCase):
     def test_campaign_reuses_prior_comparison_and_sources_all_eight_lanes(self):
         registry = campaign_registry(as_of=date(2026, 10, 10))
         results = campaign_brief(as_of=date(2026, 10, 10))
-        self.assertEqual(len(SOURCE_META), 12)
+        self.assertEqual(len(SOURCE_META), 13)
         self.assertEqual(len(CLAIMS), 18)
         self.assertEqual(len(results["lanes"]), 8)
         self.assertTrue(all(x["sourced_observations"] > 0 for x in results["lanes"]))
@@ -52,11 +52,16 @@ class PublicResearchCampaignTests(unittest.TestCase):
         self.assertIn("covered motor-carrier", dispute["statement"])
         self.assertIn("counsel", dispute["next_test"].lower())
         response = next(x for x in registry["claims"] if x["id"] == "campaign.carrier.response")
-        self.assertIn("2018 published text", response["statement"])
+        self.assertIn("October 1, 2026 eCFR text", response["statement"])
         self.assertIn("contractual exceptions", response["next_test"])
         source = next(x for x in registry["sources"] if x["id"] == "20261010.govinfo.3788")
         self.assertIn("govinfo.gov", source["url"])
         self.assertEqual(source["published_at"], "2018-04-16")
+        current = next(x for x in registry["sources"] if x["id"] == "20261010.ecfr.current.3788")
+        self.assertIn("ecfr.gov", current["url"])
+        self.assertIn("20261010.ecfr.current.3788", response["source_ids"])
+        self.assertIn("20261010.govinfo.3788", response["source_ids"])
+        self.assertNotIn("real customer", response["statement"])
 
     def test_vendor_benchmarks_and_fees_are_not_market_facts(self):
         result = campaign_brief(as_of=date(2026, 10, 10))

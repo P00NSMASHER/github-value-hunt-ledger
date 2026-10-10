@@ -51,6 +51,12 @@
       "url": "https://www.govinfo.gov/content/pkg/FR-2018-04-16/html/2018-07749.htm"
     },
     {
+      "id": "ecfr.current.3788",
+      "publisher": "Electronic Code of Federal Regulations (eCFR)",
+      "lane": "carrier_regulatory",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-378/section-378.8"
+    },
+    {
       "id": "estes.tariff",
       "publisher": "Estes Express Lines",
       "lane": "carrier_regulatory",

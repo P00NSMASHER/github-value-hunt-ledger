@@ -30,11 +30,11 @@ def fake_get(url):
 
 
 class SourceAcquisitionTests(unittest.TestCase):
-    def test_approved_twelve_source_manifest(self):
+    def test_approved_thirteen_source_manifest(self):
         m = manifest()
         validate_manifest(m)
-        self.assertEqual(len(m["sources"]), 12)
-        self.assertEqual(len({x["id"] for x in m["sources"]}), 12)
+        self.assertEqual(len(m["sources"]), 13)
+        self.assertEqual(len({x["id"] for x in m["sources"]}), 13)
 
     def test_network_never_runs_without_explicit_opt_in(self):
         with self.assertRaisesRegex(CaptureError, "NETWORK_DISABLED"):

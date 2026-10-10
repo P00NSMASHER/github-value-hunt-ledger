@@ -55,7 +55,7 @@ jobs:
           assert len(r['lanes'])==8
           assert all(x['sourced_observations']>0 for x in r['lanes'])
           assert 'retally:pricing:clarity' in r['contested_issues']
-          assert r['source_register_count']>=12
+          assert r['source_register_count']>=13
           assert r['opposition_findings']>=5
           assert r['no_independent_truth_certification'] is True
           assert r['customer_claims_or_payment_execution'] is False
@@ -74,7 +74,7 @@ jobs:
           proof=json.loads((p/'evidence_fidelity.json').read_text())
           d=json.loads((p/'opposition_decisions.json').read_text())
           assert proof['scope']=='RESEARCH_ONLY_NO_VERIFICATION_PROMOTION'
-          assert proof['anchor_count']==13
+          assert proof['anchor_count']==14
           assert proof['anchored_claim_count']>=18
           assert len(d['decisions'])==6
           assert d['zero_automated_corporate_actions'] is True
@@ -82,6 +82,9 @@ jobs:
                      for row in proof['assessments'])
           assert all(row['external_actions_allowed'] is False
                      for row in d['decisions'])
+          assert any(a['review_status']=='CURRENT_ECFR_TEXT_OBSERVED_LEGAL_REVIEW_PENDING'
+                     and a['client_specific_legal_applicability_established'] is False
+                     for a in proof['assessments'])
           assert len(proof['receipt_sha256'])==64
           assert len(d['receipt_sha256'])==64
           html=(p/'opposition.html').read_text()
