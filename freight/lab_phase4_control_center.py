@@ -8,10 +8,12 @@ import argparse
 from html import escape
 import json
 from pathlib import Path
+from datetime import date
 import tempfile
 
 from freight.lab_phase4_director import execute_all_labs, priority_actions
 from freight.lab_phase4_experiments import conduct_experiments, load_findings
+from freight.research_intelligence import phase3_brief, render_html as render_research_html
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
 
@@ -29,6 +31,7 @@ def snapshot(max_labs: int=14) -> dict:
             record=rec,authority_book=book,store=store,assertions=a,fee_events=fees,
             verifier=verifier(),contingency=scenario())
         result["experiment_campaign"]=campaign
+        result["research_intelligence"]=phase3_brief(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -52,6 +55,12 @@ def render(data: dict) -> str:
         labs.append(f'<article class="lab {color}"><div class="labnum">{lab}</div><div><h3>{escape(item["title"])}</h3><p class="state">{escape(status)}</p><small>{escape(str(details))}</small></div></article>')
     actions="".join(f'<li>{escape(x["action"])} <span>{escape(x["basis"])}</span></li>' for x in data["recommended_next_actions"])
     experiments="".join(f'<tr><th>{escape(x["finding_id"])}</th><td>{escape(x["cluster"])}</td><td>{escape(x["verdict"])}</td></tr>' for x in data["experiment_campaign"]["recorded_experiments"])
+    research=data["research_intelligence"]
+    research_rows="".join(
+        f'<tr><th>{escape(row["lane"])}</th><td>{row["sourced_observations"]}</td>'
+        f'<td>{escape(row["state"])}</td></tr>'
+        for row in research["lanes"]
+    )
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -88,6 +97,10 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:22px;font-si
 <section class="panel"><h2>Three simulated founding customers</h2><p>USD amounts below are entirely fictional; modeled margin can be negative.</p>
 <table><thead><tr><th>Customer</th><th>Scenario</th><th>Simulated net recovery</th><th>Modeled margin</th></tr></thead><tbody>"""+rows+"""</tbody></table></section>
 <section class="panel"><h2>Actually executed research campaign</h2><p>Four experiments selected from the original 26 findings. INCONCLUSIVE is deliberate: no historical defect is closed merely by running a comparable negative probe.</p><table><thead><tr><th>Original ID</th><th>Root cause</th><th>Closure verdict</th></tr></thead><tbody>"""+experiments+"""</tbody></table></section>
+<section class="panel"><h2>Market and oppositional intelligence</h2>
+<p>Eight research disciplines, imported vendor claims, internal counterarguments and dated source records. Read-only, not an independent fact check.</p>
+<a href="research.html">Open Research Intelligence Workbench ↗</a>
+<table><thead><tr><th>Research discipline</th><th>Source-linked items</th><th>Evidence state</th></tr></thead><tbody>"""+research_rows+"""</tbody></table></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -101,6 +114,12 @@ def main():
     args.out.mkdir(parents=True,exist_ok=True)
     (args.out/"phase4_control.json").write_text(json.dumps(data,sort_keys=True,indent=2)+"\n")
     (args.out/"index.html").write_text(render(data))
+    (args.out/"research_intelligence.json").write_text(
+        json.dumps(data["research_intelligence"],sort_keys=True,indent=2)+"\n",encoding="utf-8"
+    )
+    (args.out/"research.html").write_text(
+        render_research_html(data["research_intelligence"]),encoding="utf-8"
+    )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
                       "receipt":data["receipt_sha256"]},sort_keys=True))
