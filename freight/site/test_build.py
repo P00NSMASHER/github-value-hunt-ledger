@@ -746,7 +746,7 @@ class RetallySocialFooterTests(unittest.TestCase):
                         self.assertIn('<path d="' + official_path + '"/>', social)
                         self.assertIn('>' + network + '</strong>', social)
                         self.assertIn('>' + detail + '</span>', social)
-                    self.assertIn('foundry.css?v=retally-social-gloss-20261010', page)
+                    self.assertIn('foundry.css?v=retally-all-buttons-3d-20261010', page)
                     self.assertEqual(social.count('<svg '), 3)
                     self.assertNotIn("linkedin.com/company/retally", page.lower())
 
@@ -772,6 +772,76 @@ class RetallySocialFooterTests(unittest.TestCase):
                 self.assertIn(needle, css)
             self.assertNotIn("RETALLY social footer v1", css)
             self.assertNotIn("backdrop-filter:", css[css.index("RETALLY SOCIAL | Signature Glass v2"):])
+
+
+
+class RetallyAllButtonFinishTests(unittest.TestCase):
+    """All public CTA classes share one polished, accessible presentation."""
+
+    def test_global_button_tokens_cover_real_button_types(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text(encoding="utf-8")
+            end = css[css.index("RETALLY | Unified 3D Interaction Finish v1"):]
+            for selector in (
+                ".button{",
+                ".button::before{",
+                ".button::after{",
+                ".button:hover:not(:disabled):not([aria-disabled=\"true\"]){",
+                ".button:active:not(:disabled):not([aria-disabled=\"true\"]){",
+                ".button:focus-visible{",
+                ".button:disabled,.button[aria-disabled=\"true\"]{",
+                ".button.button-small{",
+                ".button.button-signal,.button.button-cobalt{",
+                ".button.button-light,.button.button-quiet{",
+                ".button.button-ghost{",
+                ".site-header .navlinks>.button.button-light{",
+                ".text-button{",
+                ".text-button:focus-visible{",
+                ".site-header .menu-toggle{",
+                ".site-header .menu-toggle:focus-visible{",
+                ".mobile-cta b{",
+                ".mobile-cta:focus-visible{",
+                "@media(hover:none){",
+                "@media(prefers-reduced-motion:reduce){",
+                "@media print{",
+            ):
+                with self.subTest(selector=selector):
+                    self.assertIn(selector, end)
+            self.assertNotIn("@keyframes", end)
+            self.assertNotIn("backdrop-filter", end)
+            self.assertNotIn("!important", end.split("@media(prefers-reduced-motion:reduce){")[0])
+            # Existing dedicated social identity and chat interaction stay separate.
+            self.assertIn("RETALLY SOCIAL | Signature Glass v2", css)
+            self.assertIn(".retally-chat-launcher:focus-visible", css)
+            self.assertIn(".mobile-cta{display:none!important}", css)
+
+    def test_fresh_css_cache_tag_is_on_every_styled_public_html_page(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            expected = 'href="foundry.css?v=retally-all-buttons-3d-20261010"'
+            for name in builder.TEXT_SOURCE_FILES:
+                if not name.endswith(".html"):
+                    continue
+                source = (builder.SOURCE / name).read_text(encoding="utf-8")
+                page = (output / name).read_text(encoding="utf-8")
+                if 'foundry.css?v=' in source:
+                    with self.subTest(page=name):
+                        self.assertEqual(page.count(expected), 1)
+                        self.assertNotIn("foundry.css?v=retally-social-gloss-20261010", page)
+                else:
+                    self.assertNotIn(expected, page)
+
+    def test_primary_cta_geometry_and_inquiry_contract_remain_intact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            self.assertIn('class="button button-signal" href="#start-audit"', page)
+            self.assertIn('class="button button-small button-light" href="#start-audit"', page)
+            self.assertIn('type="submit">Open My Free Audit Request</button>', page)
+            self.assertIn('id="retallyChatLauncher"', page)
+            self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
+            self.assertNotIn("linkedin.com/company/retally", page)
 
 if __name__ == "__main__":
     unittest.main()
