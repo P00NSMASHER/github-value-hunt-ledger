@@ -16,6 +16,8 @@ from freight.lab_phase4_experiments import conduct_experiments, load_findings
 from freight.research_intelligence import render_html as render_research_html
 from freight.research_public_campaign import campaign_brief
 from freight.research_evidence_gate import run_mission, render_html as render_opposition_html
+from freight.research_change_impact import build_refresh_queue, render_html as render_refresh_html
+from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
 
@@ -37,6 +39,10 @@ def snapshot(max_labs: int=14) -> dict:
         proof, decisions=run_mission(as_of=date.today())
         result["research_evidence_fidelity"]=proof
         result["opposition_register"]=decisions
+        result["source_review_queue"]=build_refresh_queue(
+            registry=campaign_registry(as_of=date.today()),
+            proof=proof, decisions=decisions, as_of=date.today()
+        )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -73,6 +79,7 @@ def render(data: dict) -> str:
         f'<td>{escape(row["subject"])}</td><td>{row["priority_score_ordinal_not_forecast"]}</td></tr>'
         for row in opposition["decisions"]
     )
+    source_queue=data["source_review_queue"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -119,6 +126,12 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:22px;font-si
 <a href="opposition.html">Open Evidence &amp; Opposition War Room ↗</a>
 <table><thead><tr><th>Decision</th><th>Research question</th><th>Internal priority</th></tr></thead>
 <tbody>"""+decision_rows+"""</tbody></table></section>
+<section class="panel"><h2>Source freshness and change radar</h2>
+<p>Source review backlog only. Date freshness does not prove claim truth; manual capture comparisons are available from the separate read-only CLI.</p>
+<p>""" +str(source_queue["source_count"])+""" known source records ·
+""" +str(source_queue["due_within_30_days"])+""" due within 30 days ·
+""" +str(source_queue["expired_count"])+""" expired.</p>
+<a href="research_refresh.html">Open Source Change Radar ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -149,6 +162,13 @@ def main():
     (args.out/"opposition.html").write_text(
         render_opposition_html(data["research_evidence_fidelity"],data["opposition_register"]),
         encoding="utf-8"
+    )
+    (args.out/"research_refresh_queue.json").write_text(
+        json.dumps(data["source_review_queue"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"research_refresh.html").write_text(
+        render_refresh_html(data["source_review_queue"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
