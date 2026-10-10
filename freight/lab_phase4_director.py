@@ -170,6 +170,20 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
             pass
         else:
             raise ValueError("TAMPERED_PUBLIC_SOURCE_ACCEPTED")
+        from freight.research_evidence_gate import run_mission, validate_anchor_book
+        proof,opposition=run_mission(as_of=today)
+        _must(proof["anchor_count"]==13,"INCOMPLETE_SOURCE_ANCHOR_REVIEW")
+        _must(proof["anchored_claim_count"]>=18,"CLAIM_ANCHOR_COVERAGE_REGRESSION")
+        _must(len(opposition["decisions"])==6,"INCOMPLETE_OPPOSITION_DECISIONS")
+        _must(all(not x["public_marketing_permitted"] for x in proof["assessments"]),
+              "UNREVIEWED_RESEARCH_PROMOTED_TO_MARKETING")
+        if today<date(2026,12,12):
+            _must(any(x["review_status"]=="FUTURE_EFFECTIVE_RULE_HOLD"
+                      for x in proof["assessments"]),"FUTURE_CLASSIFICATION_ACCEPTED")
+        forged=_read("research/SOURCE_ANCHORS_20261010.json")
+        forged["anchors"][0]["quote"]+=" FORGED"
+        _must(bool(validate_anchor_book(forged,registry,as_of=today)),
+              "TAMPERED_EXTERNAL_SOURCE_QUOTE_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -177,7 +191,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "public_campaign_sources":12,
                 "opposition_findings":brief["opposition_findings"],
                 "research_receipt_sha256":brief["receipt_sha256"],
-                "source_refresh_automated":False},"STALE_VENDOR_AND_TAMPERED_RESEARCH_REJECTED"
+                "source_quote_anchors":proof["anchor_count"],
+                "anchored_claims":proof["anchored_claim_count"],
+                "evidence_receipt_sha256":proof["receipt_sha256"],
+                "strategic_decisions":len(opposition["decisions"]),
+                "opposition_receipt_sha256":opposition["receipt_sha256"],
+                "source_refresh_automated":False},"STALE_VENDOR_AND_TAMPERED_EXTERNAL_SOURCE_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
 
 
