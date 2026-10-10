@@ -492,7 +492,7 @@ class PublicBuildTests(unittest.TestCase):
         self.assertIn('hanken-grotesk-latin.woff2', page)
         self.assertIn('instrument-serif-italic-latin.woff2', page)
         self.assertIn('class="button button-signal" href="#start-audit"', page)
-        self.assertIn('foundry.css?v=retally-social-gloss-20261010', page)
+        self.assertIn('foundry.css?v=retally-type-20261008', page)
         # Approved type hierarchy: one italic mint hero phrase, serif accents
         # on dark and light sections, and legible light/dark body colors.
         self.assertIn('<span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
