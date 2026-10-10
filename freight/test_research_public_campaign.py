@@ -44,7 +44,7 @@ class PublicResearchCampaignTests(unittest.TestCase):
         row = next(x for x in registry["claims"] if x["id"] == "campaign.carrier.timeline")
         self.assertIn("scheduled", row["statement"])
         self.assertIn("December 12, 2026", row["statement"])
-        self.assertIn("correct", row["next_test"])
+        self.assertIn("effective date", row["next_test"])
 
     def test_limited_federal_claim_does_not_assert_universal_deadline(self):
         registry = campaign_registry(as_of=date(2026, 10, 10))
