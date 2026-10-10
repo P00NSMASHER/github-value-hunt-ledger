@@ -492,7 +492,7 @@ class PublicBuildTests(unittest.TestCase):
         self.assertIn('hanken-grotesk-latin.woff2', page)
         self.assertIn('instrument-serif-italic-latin.woff2', page)
         self.assertIn('class="button button-signal" href="#start-audit"', page)
-        self.assertIn('foundry.css?v=retally-type-20261008', page)
+        self.assertIn('foundry.css?v=retally-social-gloss-20261010', page)
         # Approved type hierarchy: one italic mint hero phrase, serif accents
         # on dark and light sections, and legible light/dark body colors.
         self.assertIn('<span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
@@ -738,6 +738,16 @@ class RetallySocialFooterTests(unittest.TestCase):
                     social = page.split('<nav class="wrap retally-social"', 1)[1].split("</nav>", 1)[0]
                     self.assertEqual(social.count('target="_blank" rel="noopener noreferrer"'), 3)
                     self.assertEqual(social.count('focusable="false"'), 3)
+                    self.assertEqual(social.count('class="retally-social__brandmark '), 3)
+                    self.assertEqual(social.count('class="retally-social__button '), 3)
+                    for slug, network, url, detail, official_path in builder.SOCIAL_CHANNELS:
+                        self.assertIn('retally-social__button--' + slug, social)
+                        self.assertIn('retally-social__brandmark--' + slug, social)
+                        self.assertIn('<path d="' + official_path + '"/>', social)
+                        self.assertIn('>' + network + '</strong>', social)
+                        self.assertIn('>' + detail + '</span>', social)
+                    self.assertIn('foundry.css?v=retally-social-gloss-20261010', page)
+                    self.assertEqual(social.count('<svg '), 3)
                     self.assertNotIn("linkedin.com/company/retally", page.lower())
 
     def test_mobile_and_keyboard_presentation_are_not_icon_only(self):
@@ -745,14 +755,23 @@ class RetallySocialFooterTests(unittest.TestCase):
             output = build(Path(temporary) / "public")
             css = (output / "foundry.css").read_text(encoding="utf-8")
             for needle in (
-                "RETALLY social footer v1",
-                ".site-footer .retally-social__links a:focus-visible",
-                "@media(max-width:620px)",
+                "RETALLY SOCIAL | Signature Glass v2",
+                ".site-footer .retally-social__button:focus-visible",
+                ".site-footer .retally-social__brandmark--facebook",
+                ".site-footer .retally-social__brandmark--instagram",
+                ".site-footer .retally-social__brandmark--youtube",
+                "fill:#0866ff",
+                "fill:#ff0033",
+                "fill:#fff",
+                "background:linear-gradient(38deg,#ffdc80",
                 "grid-template-columns:repeat(3,minmax(0,1fr))",
-                "min-height:44px;min-width:44px",
+                "min-height:105px",
+                "@media(max-width:340px)",
                 "@media(prefers-reduced-motion:reduce)",
             ):
                 self.assertIn(needle, css)
+            self.assertNotIn("RETALLY social footer v1", css)
+            self.assertNotIn("backdrop-filter:", css[css.index("RETALLY SOCIAL | Signature Glass v2"):])
 
 if __name__ == "__main__":
     unittest.main()
