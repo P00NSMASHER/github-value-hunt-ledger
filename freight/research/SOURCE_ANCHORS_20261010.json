@@ -179,6 +179,27 @@
       "customer_action_authorized": false
     },
     {
+      "id": "source.ecfr.3788.current",
+      "source_id": "20261010.ecfr.current.3788",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-378/section-378.8",
+      "quote": "The processing carrier shall pay, decline to pay, or settle each written claim within 60 days",
+      "quote_sha256": "81a29817976347b4c0c5a1720bd88203d84c14fe4466e895ebd5238b96c0d7d2",
+      "claim_ids": [
+        "campaign.carrier.response"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "DIRECT_SCOPE",
+      "observed_at": "2026-10-10",
+      "codification_as_of": "2026-10-01",
+      "regulatory_applicability_established": false,
+      "limitation": "Current eCFR text is observed as of October 1, 2026, but claim scope, contract terms, written extensions and client-specific legal applicability still require independent review.",
+      "literal_markers": [
+        "60 days"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
       "id": "source.estes.contract.exception",
       "source_id": "20261010.estes.tariff",
       "url": "https://www.estes-express.com/resources/fees-and-surcharges/rules-tariff",
