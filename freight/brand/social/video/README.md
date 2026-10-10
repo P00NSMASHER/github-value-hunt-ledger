@@ -1,20 +1,21 @@
-# RETALLY video production kit (October 10, 2026)
+# RETALLY | Presenter-led video production acceptance contract
 
-This project turns the owner-approved creative reference into a **testable production specification**, without falsely calling a draft video finished.
+This directory contains the source-controlled creative direction for RETALLY video production, established after reviewing the owner-supplied 27.1-second reference Reel.
 
-- `RETALLY_DIRECTOR_BRIEF.md`: scene-by-scene 29.5-second portrait production plan, pronunciation, exact hypothetical arithmetic, visual direction and acceptance gates.
-- `storyboard.json`: machine-readable locked script, timing and brand tokens.
-- `check_video.py`: video delivery QC — format, audio coverage, peak/RMS checks, timed video frames, and a JSON acceptance report. **Human visual, music rights, and actual pronunciation checks remain required.**
-- `test_check_video.py`: unit tests on math, audio coverage and release gates.
+- [RETALLY_DIRECTOR_BRIEF.md](RETALLY_DIRECTOR_BRIEF.md): production brief, screen-by-screen timing, narrative, source-media rules, exact brand language, spoken pronunciation, and fail-closed release gates.
+- [storyboard.json](storyboard.json): machine-readable editor storyboard, illustrative detention arithmetic and required human acceptance checks.
 
-## Validate an export
+## Companion offline QA package
+
+The owner-facing **RETALLY_VIDEO_PRODUCTION_KIT_2026-10-10.zip** produced in ChatGPT contains this brief plus `check_video.py`, `test_check_video.py`, and a matching local `storyboard.json`. Those scripts are part of the delivered downloadable package, **not** tracked in this repository directory. Extract the ZIP and run:
 
 ```bash
-python check_video.py RETALLY_candidate.mp4 --out qc_outputs/
+python -m unittest discover -v
+python check_video.py ACTUAL_FINISHED_VIDEO.mp4 --out qc_outputs/
 ```
 
-A `report.json`, `contact_sheet.jpg`, and audio samples are written to the output folder. A technical pass never claims that a generic or poor-looking video has passed creative QA. The report intentionally remains **HOLD** until the actual rendered file has been visually reviewed, the brand pronunciation heard, and rights cleared.
+The inspector checks the **rendered MP4**, audio continuity, dimensions, framerate, runtime and frame samples. Sound measured in an audio stream is not proof that narration is actually intelligible. A passing technical report never changes publication status to GO; a human must approve the actual video, correctly hear **re-tally**, inspect captions/evidence and verify rights.
 
-## Important
+## Hard limits
 
-No video rendering, publication, Meta/YouTube account change, paid ad, billing modification or schedule is performed by this kit. The original presenter/audio in the reference Reel are for editorial analysis only, not assets to copy or impersonate. This preproduction kit does not invent missing presenter footage or claim that a professionally synchronized on-camera speaker has been created.
+No paid generation, unrelated changes, new scheduled tasks or publication are authorized by this document. The original Facebook Reel is a **style reference only**; do not reuse the source presenter's face, footage, voice, music, brand or captions. No fictional buyer data or hypothetical discrepancy may be presented as a real recovered amount.
