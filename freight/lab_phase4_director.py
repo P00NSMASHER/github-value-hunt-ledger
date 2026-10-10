@@ -146,13 +146,34 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
     if lab == 14:
         from freight.competitive_matrix import validate_competitor_evidence
         evidence=_read("PHASE3_COMPETITOR_EVIDENCE_2026-10-07.json")
-        today=date(2026,10,8)
+        today=date.today()  # Old vendor snapshot must eventually expire, not become evergreen.
         issues=validate_competitor_evidence(evidence,as_of=today)
         _must(not issues,"COMPETITOR_BASELINE_INVALID:"+",".join(issues[:3]))
         bad=copy.deepcopy(evidence);bad["valid_until"]="2025-01-01"
         _must(bool(validate_competitor_evidence(bad,as_of=today)),"STALE_CLAIMS_ACCEPTED")
+        from freight.research_intelligence import (
+            compile_brief, phase3_brief, seed_from_phase3,
+        )
+        brief=phase3_brief(as_of=today)
+        _must(len(brief["lanes"])==8,"INCOMPLETE_RESEARCH_DISCIPLINES")
+        _must(brief["opposition_findings"]>=5,"NO_REAL_SELF_OPPOSITION")
+        _must(all(not x["can_publish_as_verified"] for x in brief["prioritized_findings"]),
+              "UNVERIFIED_VENDOR_RESEARCH_PROMOTED")
+        registry=seed_from_phase3(as_of=today,evidence=evidence,
+                                  matrix=_read("PHASE3_COMPETITIVE_MATRIX_2026-10-07.json"))
+        registry["sources"][0]["excerpt_sha256"]="0"*64
+        try:
+            compile_brief(registry,as_of=today)
+        except ValueError:
+            pass
+        else:
+            raise ValueError("TAMPERED_MARKET_SOURCE_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
-                "source_status":"VENDOR_PUBLIC_CLAIMS_NOT_INDEPENDENTLY_AUDITED"},"STALE_VENDOR_CLAIMS_REJECTED"
+                "source_status":"VENDOR_PUBLIC_CLAIMS_NOT_INDEPENDENTLY_AUDITED",
+                "research_lanes":len(brief["lanes"]),
+                "opposition_findings":brief["opposition_findings"],
+                "research_receipt_sha256":brief["receipt_sha256"],
+                "source_refresh_automated":False},"STALE_VENDOR_AND_TAMPERED_RESEARCH_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
 
 
