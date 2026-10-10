@@ -343,7 +343,7 @@ def build(
         if not name.endswith(".html") or "foundry.css?v=" not in text_bundle[name]:
             continue
         updated, count = re.subn(
-            r'foundry\\.css\\?v=[\\w-]+', button_css, text_bundle[name]
+            r'foundry\.css\?v=[\w-]+', button_css, text_bundle[name]
         )
         if count != 1:
             raise ValueError(f"Unexpected button stylesheet reference: {name}")
