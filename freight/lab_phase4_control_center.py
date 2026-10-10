@@ -13,7 +13,8 @@ import tempfile
 
 from freight.lab_phase4_director import execute_all_labs, priority_actions
 from freight.lab_phase4_experiments import conduct_experiments, load_findings
-from freight.research_intelligence import phase3_brief, render_html as render_research_html
+from freight.research_intelligence import render_html as render_research_html
+from freight.research_public_campaign import campaign_brief
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
 
@@ -31,7 +32,7 @@ def snapshot(max_labs: int=14) -> dict:
             record=rec,authority_book=book,store=store,assertions=a,fee_events=fees,
             verifier=verifier(),contingency=scenario())
         result["experiment_campaign"]=campaign
-        result["research_intelligence"]=phase3_brief(as_of=date.today())
+        result["research_intelligence"]=campaign_brief(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
