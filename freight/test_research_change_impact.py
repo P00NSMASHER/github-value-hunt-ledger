@@ -117,7 +117,7 @@ class SourceChangeTests(unittest.TestCase):
         self.assertTrue(report["no_claims_automatically_promoted"])
         self.assertFalse(report["any_publisher_authenticity_proven"])
         self.assertEqual(report["status_counts"]["RAW_BODY_UNCHANGED"], 2)
-        self.assertEqual(report["status_counts"]["NOT_CHECKED_THIS_RUN"], 10)
+        self.assertEqual(report["status_counts"]["NOT_CHECKED_THIS_RUN"], 11)
 
     def test_partial_sample_does_not_report_unselected_as_unavailable(self):
         prev = fake_capture(12, selected=["recoveraudit.pricing"])
