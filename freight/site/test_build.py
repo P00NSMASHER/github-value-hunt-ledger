@@ -735,11 +735,9 @@ class RetallySocialFooterTests(unittest.TestCase):
                             'aria-label="RETALLY on ' + network
                             + ' (opens in a new tab)"', page
                         )
-                    self.assertEqual(
-                        page.count('target="_blank" rel="noopener noreferrer"'),
-                        3,
-                    )
-                    self.assertEqual(page.count('focusable="false"'), 3)
+                    social = page.split('<nav class="wrap retally-social"', 1)[1].split("</nav>", 1)[0]
+                    self.assertEqual(social.count('target="_blank" rel="noopener noreferrer"'), 3)
+                    self.assertEqual(social.count('focusable="false"'), 3)
                     self.assertNotIn("linkedin.com/company/retally", page.lower())
 
     def test_mobile_and_keyboard_presentation_are_not_icon_only(self):
