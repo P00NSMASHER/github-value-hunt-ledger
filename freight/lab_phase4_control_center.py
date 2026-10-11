@@ -22,6 +22,7 @@ from freight.research_rehearsal import run_rehearsal, render_html as render_rehe
 from freight.research_data_readiness import build_readiness, render_html as render_freight_data_html
 from freight.research_ground_truth import run_ground_truth, render_html as render_truth_html
 from freight.research_pilot_preflight import build_preflight, render_html as render_pilot_html
+from freight.research_market_audit import build_market_audit, render_html as render_market_html
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -67,6 +68,9 @@ def snapshot(max_labs: int=14) -> dict:
             rehearsal=result["synthetic_rehearsals"],
             ground=result["invoice_ground_truth"],
         )
+        result["cfs_market_audit"]=build_market_audit(
+            as_of=date.today(), protocols=result["validation_protocols"]
+        )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -109,6 +113,7 @@ def render(data: dict) -> str:
     freight_data=data["freight_data_readiness"]
     truth=data["invoice_ground_truth"]
     pilot=data["pilot_preflight"]
+    market=data["cfs_market_audit"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -197,6 +202,13 @@ secure intake, independent reviewers, sample selection and cash controls are not
 """ +str(pilot["real_invoices_received"])+""" authentic invoices reviewed ·
 """ +str(pilot["studies_with_pilot_data"])+""" customer pilots executed.</p>
 <a href="pilot_preflight.html">Open Pilot Readiness Checklist ↗</a></section>
+<section class="panel"><h2>Published freight market statistics and source audit</h2>
+<p>Six table row excerpts from Census CFS 2022. No raw CSV downloaded, no LTL
+invoice fees, audited recoveries, verified buyer demand or market revenue estimated.</p>
+<p>""" +str(market["table_excerpt_rows"])+""" published source rows ·
+""" +str(len(market["press_release_reconciliation"]["regional_flagged_conflicts"]))+""" unresolved Census source contradictions ·
+""" +str(market["published_estimate_measurements"]["for_hire_truck_value_share_of_all_shipments_pct"])+"""% for-hire share of <b>goods value</b>, not invoice spend.</p>
+<a href="market_source_audit.html">Open CFS Source Integrity &amp; Buyer Research ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -269,6 +281,13 @@ def main():
     )
     (args.out/"pilot_preflight.html").write_text(
         render_pilot_html(data["pilot_preflight"]),encoding="utf-8"
+    )
+    (args.out/"market_source_audit.json").write_text(
+        json.dumps(data["cfs_market_audit"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"market_source_audit.html").write_text(
+        render_market_html(data["cfs_market_audit"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
