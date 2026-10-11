@@ -216,12 +216,14 @@ invoice fees, audited recoveries, verified buyer demand or market revenue estima
 """ +str(market["published_estimate_measurements"]["for_hire_truck_value_share_of_all_shipments_pct"])+"""% for-hire share of <b>goods value</b>, not invoice spend.</p>
 <a href="market_source_audit.html">Open CFS Source Integrity &amp; Buyer Research ↗</a></section>
 <section class="panel"><h2>Original Census archive verification gate</h2>
-<p>A bounded offline ZIP/CSV inspector is available for a locally supplied, separately reviewed
-official file. CI exercises only synthetic archives; source authenticity, original byte hash
-and the South-region press release dispute remain unverified.</p>
+<p>The original Census ZIP was inspected via a read-only remote browser; the observed hash,
+pipe-delimited DAT member, six raw rows, and footnote flags are recorded. CI never
+downloads the file, source publisher signatures are unverified, and the South press
+release contradiction remains unresolved by Census editorial action.</p>
 <p>""" +str(source_bytes["expected_row_count"])+""" target Census rows ·
-""" +str(source_bytes["independent_original_rows_reproduced"])+""" independently replicated source rows ·
-""" +("yes" if source_bytes["actual_official_zip_sha256"] else "no")+""" Census original SHA-256 recorded.</p>
+""" +str(source_bytes["browser_observed_six_source_rows"])+""" rows seen in original via read-only browser ·
+""" +("yes" if source_bytes["browser_observed_original_zip_sha256"] else "no")+""" original ZIP hash observed ·
+""" +str(source_bytes["independent_original_rows_reproduced_by_ci_zip_parser"])+""" rows independently replayed in CI.</p>
 <a href="cfs_source_bytes.html">Open Source Archive Verification Readiness ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
