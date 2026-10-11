@@ -40,7 +40,7 @@ Never divide or multiply CFS goods value by AIES establishment revenue to produc
 1. Source inventory: freight/research/AIES_LTL_CARRIER_REVENUE_20261011.json, nine exact annual revenue observations, FRED/Census source URLs, legacy SAS quarantine and explicit false commercial-evidence flags.
 2. Analysis and report: freight/research_ltl_revenue_bridge.py validates a frozen source Git blob, checks units/years/source identity/lineage and generates a read-only JSON/HTML report with Decimal calculations.
 3. Optional independent distributor check: the command line --verify-fred-csv downloads only three allowlisted FRED public CSV series when explicitly invoked, checks source values, duplicates, year coverage and recent changes, and records hashes. This is NOT an original Census API replay, publisher digital signature or independent freight audit.
-4. Adversarial tests: freight/test_research_ltl_revenue_bridge.py rejects fraudulent source substitutions, source-unit changes, fabricated invoice results, false rights/approval flags, future timestamps, legacy survey splicing, corrupt CSVs and HTML script injection.
+4. Adversarial tests: freight/test_research_ltl_revenue_bridge.py rejects fraudulent source substitutions, source-unit changes, fabricated invoice results, false rights/approval flags, future timestamps, legacy survey splicing, corrupt CSVs and HTML script injection. It also tests independent **blocked-network** and **mismatched-source** outcomes: a FRED network timeout is recorded as BLOCKED and cannot yield a verified source receipt; a successfully downloaded but altered Census-origin figure is a test FAIL.
 5. Existing Lab 14: validates new research in the existing lab director and links a separate report in the original operator Control Center. Laboratory count stays fourteen.
 6. CI: .github/workflows/retally-aies-ltl-revenue.yml runs offline falsification plus a separate optional FRED CSV source job for PRs and explicit manual dispatch only. There is no cron or background process.
 
@@ -61,3 +61,9 @@ Optional fixed-source verification (only when intentionally requested):
 **Still NOT independently evidenced:** Actual customer-paid LTL invoice population; carrier/shipper contract coverage; invoice overcharge prevalence; claim legality; refunds and cash collection; buyer intent; RETALLY addressable, serviceable, or recoverable markets. The eighteen genuine human/real-document pilot approvals in Mission 11 remain unverified.
 
 **DO NOT MERGE OR DEPLOY, CREATE SCHEDULES, IMPORT CUSTOMER DOCUMENTS, CONTACT BUYERS/CARRIERS, PUBLISH PERFORMANCE CLAIMS, OR TAKE ANY FINANCIAL ACTION.**
+
+## Source network status (Mission 18 execution)
+
+An initial GitHub Actions attempt to retrieve the allowlisted FRED graph CSV failed on an HTTPS response read timeout after 20 seconds. The offline source snapshot, tests and existing 14-lab operator build succeeded independently. The subsequent hardening commits ensure a transient unavailable FRED endpoint is **explicitly labeled BLOCKED_EXTERNAL_FRED_CSV_UNREACHABLE_NOT_VERIFIED** with no CSV download digests. The block does not promote external data freshness or override the observed Census/FRED figures. If the endpoint serves a parseable CSV that disagrees with the frozen series, the source QA still **fails** instead of silently accepting drift.
+
+The independent source-family limitation remains: a FRED CSV download, even if successful, verifies a publisher-distributed time-series rendering, not Census-original AIES API bytes or a legally authorized customer freight invoice.
