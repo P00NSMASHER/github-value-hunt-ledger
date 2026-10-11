@@ -39,7 +39,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "CFS_FAF_2022_INTERDEPENDENT"
     },
     {
       "id": "bts.faf6.regional",
@@ -70,7 +71,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "CFS_FAF_2022_INTERDEPENDENT"
     },
     {
       "id": "census.cfs2022.api",
@@ -101,7 +103,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "CFS_FAF_2022_INTERDEPENDENT"
     },
     {
       "id": "census.cfs2022.tables",
@@ -132,7 +135,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "CFS_FAF_2022_INTERDEPENDENT"
     },
     {
       "id": "edifabric.edi210.sample",
@@ -163,7 +167,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "EDIFABRIC_210_EXAMPLE_ORIGIN_UNCERTAIN"
     },
     {
       "id": "github.freighttrust.x12examples",
@@ -194,7 +199,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "EDIFABRIC_210_EXAMPLE_ORIGIN_UNCERTAIN"
     },
     {
       "id": "x12.210.definition",
@@ -225,7 +231,8 @@
       "independent_invoice_ground_truth_present": false,
       "independent_recovery_ground_truth_present": false,
       "may_support_customer_accuracy_claims": false,
-      "any_customer_case_ingested": false
+      "any_customer_case_ingested": false,
+      "lineage_family": "X12_STANDARDS_DESCRIPTION_REFERENCE"
     }
   ]
 }
