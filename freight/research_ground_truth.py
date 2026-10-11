@@ -446,11 +446,22 @@ def _assess_case(p: dict) -> dict:
     credits = sum(e["amount_cents"] for e in p["payment_events"]
                   if e["kind"] == "CARRIER_CREDIT")
     net_paid = payments - refunds
-    outstanding_paid_excess = max(0, net_paid - expected) if expected is not None else None
-    billed_difference = max(0, invoice - expected) if expected is not None else None
+    a = p["authority"]
+    # An invented numerical rate from a wrong carrier or future effective
+    # interval must not generate even a provisional measured difference.
+    authority_in_scope = (
+        a is not None and expected is not None and
+        a["carrier_code"] == p["carrier_code"] and
+        _day(a["effective_on"]) <= _day(p["shipment_on"]) <= _day(a["expires_on"])
+    )
+    outstanding_paid_excess = (
+        max(0, net_paid - expected) if authority_in_scope else None
+    )
+    billed_difference = (
+        max(0, invoice - expected) if authority_in_scope else None
+    )
     votes = [x["finding"] for x in p["reviewers"]]
     reason = ""
-    a = p["authority"]
     if a is None or expected is None:
         status, reason = "HOLD_NO_CONTROLLING_AUTHORITY", "Expected charge cannot be independently reconstructed."
     elif a["carrier_code"] != p["carrier_code"]:
