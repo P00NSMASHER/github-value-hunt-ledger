@@ -68,6 +68,10 @@ def _boolean(v: object) -> bool:
     return type(v) is bool
 
 
+def _enum(v: object, options: set[str]) -> bool:
+    return type(v) is str and v in options
+
+
 def _error(errors: list[str], ident: str, message: str) -> None:
     errors.append(f"{ident}: {message}")
 
@@ -137,13 +141,13 @@ def validate_fixture_book(book: dict, protocol_report: dict, *, as_of: date) -> 
             continue
         cohort[pid].append(row)
         if pid == "M7-01":
-            if not _boolean(row["alert"]) or row["adjudication"] not in {
-                "SUBSTANTIATED", "NOT_SUBSTANTIATED", "UNRESOLVED"}:
+            if not _boolean(row["alert"]) or not _enum(row["adjudication"], {
+                "SUBSTANTIATED", "NOT_SUBSTANTIATED", "UNRESOLVED"}):
                 _error(errors, cid, "invalid alert or independent adjudication")
         elif pid == "M7-02":
             if not _boolean(row["authority_available"]) or not _boolean(row["contract_override"]):
                 _error(errors, cid, "invalid availability or signed-contract scenario")
-            if row["engine_decision"] not in {"APPLY", "IGNORE", "HOLD"}:
+            if not _enum(row["engine_decision"], {"APPLY", "IGNORE", "HOLD"}):
                 _error(errors, cid, "invalid rule engine decision")
             try:
                 ship = _iso(row["shipment_on"])
@@ -153,24 +157,24 @@ def validate_fixture_book(book: dict, protocol_report: dict, *, as_of: date) -> 
             except ValueError:
                 _error(errors, cid, "malformed temporal fixture")
         elif pid == "M7-03":
-            if row["arm"] not in {"POSTED", "NEGOTIATED"} or row["response"] not in {
-                "CORRECT", "INCORRECT", "NONRESPONSE"}:
+            if not _enum(row["arm"], {"POSTED", "NEGOTIATED"}) or not _enum(
+                row["response"], {"CORRECT", "INCORRECT", "NONRESPONSE"}):
                 _error(errors, cid, "invalid randomization or survey response")
         elif pid == "M7-04":
-            if row["frame_status"] not in {"QUALIFIED", "INELIGIBLE", "NONRESPONSE", "UNKNOWN"}:
+            if not _enum(row["frame_status"], {"QUALIFIED", "INELIGIBLE", "NONRESPONSE", "UNKNOWN"}):
                 _error(errors, cid, "invalid sampled-frame state")
         elif pid == "M7-05":
-            if row["system"] not in {"RETALLY", "OTHER_LICENSED_VENDOR"}:
+            if not _enum(row["system"], {"RETALLY", "OTHER_LICENSED_VENDOR"}):
                 _error(errors, cid, "unknown or real competitor identity")
             if type(row["fixture_id"]) is not str or not re.fullmatch(r"SIM-C[0-9]{2}", row["fixture_id"]):
                 _error(errors, cid, "unapproved fixture identifier")
-            if row["access"] not in {"AUTHORIZED", "NOT_TESTED"} or row["resolution"] not in {
-                "SUPPORTED_CORRECT", "INCORRECT", "ABSTAIN", "NOT_TESTED"}:
+            if not _enum(row["access"], {"AUTHORIZED", "NOT_TESTED"}) or not _enum(
+                row["resolution"], {"SUPPORTED_CORRECT", "INCORRECT", "ABSTAIN", "NOT_TESTED"}):
                 _error(errors, cid, "invalid capability run state")
             elif (row["access"] == "NOT_TESTED") != (row["resolution"] == "NOT_TESTED"):
                 _error(errors, cid, "missing vendor access cannot become a zero-score test")
         elif pid == "M7-06":
-            if row["case_state"] not in {"RECOVERED", "ZERO_RECOVERY", "REVERSED", "PENDING"}:
+            if not _enum(row["case_state"], {"RECOVERED", "ZERO_RECOVERY", "REVERSED", "PENDING"}):
                 _error(errors, cid, "invalid financial case state")
             if any(type(row[k]) is not int or not 0 <= row[k] <= 100000000 for k in AMOUNT_FIELDS):
                 _error(errors, cid, "all cents require bounded nonnegative exact integers")
@@ -178,7 +182,7 @@ def validate_fixture_book(book: dict, protocol_report: dict, *, as_of: date) -> 
                 fee = row["cash_fee_collected_cents"]
                 refund = row["fee_refunds_cents"]
                 state = row["case_state"]
-                if (state in {"ZERO_RECOVERY", "PENDING"} and (fee or refund)) or (
+                if (_enum(state, {"ZERO_RECOVERY", "PENDING"}) and (fee or refund)) or (
                     state == "RECOVERED" and not fee) or (
                     state == "REVERSED" and (not fee or not refund)):
                     _error(errors, cid, "cash chronology inconsistent with fictional episode state")
@@ -186,13 +190,15 @@ def validate_fixture_book(book: dict, protocol_report: dict, *, as_of: date) -> 
                     _error(errors, cid, "fee refunds cannot exceed tracked collected fees")
     if set(cohort) != PROTOCOL_IDS or any(len(cohort.get(pid, [])) < 3 for pid in PROTOCOL_IDS):
         errors.append("all six synthetic cohorts require three or more distinct cases")
-    arms = Counter(r["arm"] for r in cohort["M7-03"])
+    arms = Counter(r["arm"] for r in cohort["M7-03"] if type(r.get("arm")) is str)
     if set(arms) != {"POSTED", "NEGOTIATED"} or any(n < 2 for n in arms.values()):
         errors.append("both fictional randomized survey arms required")
     systems: dict[str, set[str]] = defaultdict(set)
     for row in cohort["M7-05"]:
         fid = row["fixture_id"]
         sys = row["system"]
+        if type(fid) is not str or type(sys) is not str:
+            continue
         if sys in systems[fid]:
             errors.append(f"{fid}: duplicate comparison run for same system")
         systems[fid].add(sys)
