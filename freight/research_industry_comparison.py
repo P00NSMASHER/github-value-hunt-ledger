@@ -226,7 +226,10 @@ def build_comparison(*, as_of: date, plan: dict|None=None,
             source["cross_archive_direct_totals_match"] is not True):
             raise ValueError("CFS_INDUSTRY_TOTAL_HAS_UNRESOLVED_QUALITY_FLAG")
         comparison.append({
-            "id":entry["id"],"naics2017":k,"label":entry["source_label"],
+            "id":entry["id"],"naics2017":k,
+            "label":("CFS 4931/484 combined category (captive warehousing plus truck transportation)"
+                     if k=="4931" else entry["source_label"]),
+            "source_4931_484_tabulation_group_not_pure_warehouse":k=="4931",
             "survey_year":2022,
             "source_mode_code":"00",
             "source_mode_definition":"ALL_MODES_IN_SURVEY_NOT_LTL_ONLY",
@@ -301,7 +304,8 @@ def build_comparison(*, as_of: date, plan: dict|None=None,
         ),
         "industry_comparisons":comparison,
         "global_table_quality_flags":risk,
-        "quality_statistical_caveat":"Table-wide S/Z proportions describe cross-tabular cells, not rates among manufacturers/wholesalers/warehouses; unflagged rows have not had their individual coefficients of variation reviewed here.",
+        "quality_statistical_caveat":"Table-wide S/Z proportions describe cross-tabular cells, not freight-billing error rates among manufacturers, wholesalers, or CFS combined 4931/484 establishments. Unflagged rows have not had individual coefficients of variation reviewed here.",
+        "source_4931_484_tabulation_note":"Official 2022 CFS methodology groups NAICS 484 truck transportation with reported 4931, includes captive warehouse auxiliaries only, and excludes warehouses serving the public; reported 4931 cannot be treated as pure warehouse market.",
         "research_gates":[{
             "id":g["id"],"required_evidence":g["required_evidence"],
             "status":"HUMAN_REVIEW_OR_NEW_DIRECT_SOURCE_REQUIRED",

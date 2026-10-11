@@ -360,6 +360,25 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
             falsified,_read("research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json"),
             as_of=today)),
             "UNVERIFIED_WAREHOUSE_NAICS_SUBSTITUTED")
+        from freight.research_cfs_mode_hierarchy import build_forhire, validate_catalog as validate_mode_rows
+        forhire=build_forhire(as_of=today,prior=compared)
+        _must(forhire["qa"]["source_selected_rows"]==60,
+              "CFS_FORHIRE_INDUSTRY_SOURCE_ROWS_MISSING")
+        _must(forhire["three_sector_forhire_results"][0][
+            "for_hire_goods_value_pct_of_this_sectors_all_mode_goods"]=="53.72",
+              "INDUSTRY_FORHIRE_GOODS_SHARE_INCORRECT")
+        _must(forhire["three_sector_forhire_results"][2][
+            "combined_naics_484_and_captive_warehouse_population"] is True,
+              "WAREHOUSE_SOURCE_MIXED_WITH_NAICS484_NOT_DISCLOSED")
+        _must(forhire["qa"]["mirror_row_reproduction_against_original_census_dat_completed"] is False,
+              "MIRRORED_RAW_DATA_MASQUERADING_AS_OFFICIAL_SHA_VALIDATION")
+        _must(forhire["market_size_or_recovery_rates_established"] is False and
+              forhire["actual_paid_ltl_invoices_observed"]==0,
+              "CFS_SHIPPED_GOODS_MASQUERADING_AS_BILLING_RECOVERIES")
+        forged_rows=_read("research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json")
+        forged_rows["selected_source_rows"][0]["mode_code"]="11"
+        _must(bool(validate_mode_rows(forged_rows,as_of=today)),
+              "INVALID_FORHIRE_OR_LTL_MODE_IDENTIFIER_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -400,6 +419,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "cfs_industry_data_receipt_sha256":industry["receipt_sha256"],
                 "cfs_three_sector_source_comparisons":compared["n_industries"],
                 "cfs_industry_comparison_receipt_sha256":compared["receipt_sha256"],
+                "cfs_forhire_industry_mode_111_source_rows":forhire["qa"]["source_selected_rows"],
+                "cfs_forhire_source_receipt_sha256":forhire["receipt_sha256"],
+                "cfs_forhire_source_remains_not_ltl_spend":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,
