@@ -293,6 +293,30 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         tampered_cfs["table_rows"][0]["value_million_usd"]*=1000
         _must(bool(validate_cfs_audit(tampered_cfs,validation,as_of=today)),
               "THOUSAND_MILLION_SOURCE_UNIT_TAMPER_ACCEPTED")
+        from freight.research_cfs_archive_verifier import (
+            build_readiness as build_cfs_byte_readiness,
+            inspect_local_archive,
+        )
+        byte_status=build_cfs_byte_readiness(as_of=today)
+        _must(byte_status["expected_row_count"]==6,
+              "PRIMARY_CFS_ROW_TARGETS_MISSING")
+        _must(byte_status["browser_observed_six_source_rows"]==6,
+              "REMOTE_ORIGINAL_SOURCE_RECEIPT_INCOMPLETE")
+        _must(byte_status["browser_observed_original_zip_sha256"]==
+              "15d90f1e64c5b3fb86c5f619a32350f9c60256cc3eaaa48838115fc70f7d6499",
+              "BROWSER_SOURCE_SHA256_DRIFT")
+        _must(byte_status["original_archive_bytes_inspected_in_this_ci_run"] is False,
+              "CI_UNFETCHED_CENSUS_SOURCE_BYTES_REPORTED_AS_READ")
+        _must(byte_status["actual_official_zip_sha256_from_ci_run"] is None,
+              "FAKE_CENSUS_CI_DIGEST_PROMOTED")
+        _must(byte_status["south_press_discrepancy_officially_corrected"] is False,
+              "UNSUPPORTED_CENSUS_EDITORIAL_CORRECTION")
+        try:
+            inspect_local_archive(b"not-a-census-zip", as_of=today)
+        except ValueError:
+            pass
+        else:
+            raise ValueError("UNVERIFIED_CENSUS_ARCHIVE_INPUT_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -324,6 +348,10 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "cfs_published_table_excerpt_rows":cfs_market["table_excerpt_rows"],
                 "cfs_unresolved_press_conflicts":len(cfs_market["press_release_reconciliation"]["regional_flagged_conflicts"]),
                 "cfs_market_source_audit_receipt_sha256":cfs_market["receipt_sha256"],
+                "cfs_original_archive_verification_status":byte_status["scope"],
+                "cfs_original_archive_readiness_receipt_sha256":byte_status["receipt_sha256"],
+                "cfs_original_archive_remote_browser_sha256":byte_status["browser_observed_original_zip_sha256"],
+                "cfs_original_archive_bytes_replayed_in_ci":False,
                 "ltl_recovery_market_established":False,
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
