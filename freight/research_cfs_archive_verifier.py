@@ -220,6 +220,8 @@ def _reviewed_remote_receipt(original: dict) -> dict:
     if (receipt.get("schema_version") != 1 or
         receipt.get("scope") != "PUBLIC_CENSUS_A01_REMOTE_BROWSER_SOURCE_RECEIPT_NOT_SIGNED" or
         receipt.get("source_url") != OFFICIAL_URL or
+        receipt.get("observed_on") != "2026-10-11" or
+        receipt.get("source_archive_downloaded_in_remote_browser") is not True or
         receipt.get("read_method") != "READ_ONLY_REMOTE_BROWSER_OFFICIAL_HTTPS_ZIP_DOWNLOAD_AND_DAT_INSPECTION" or
         receipt.get("archive_size_bytes") != BROWSER_OBSERVED_ZIP_BYTE_LENGTH or
         receipt.get("browser_reported_archive_sha256") != BROWSER_OBSERVED_OFFICIAL_ZIP_SHA256 or
@@ -381,6 +383,8 @@ def build_readiness(*, as_of: date) -> dict:
     """CI observes a pinned remote-browser source receipt; it never downloads."""
     base = json.loads(AUDIT.read_text(encoding="utf-8"))
     receipt = _reviewed_remote_receipt(base)
+    if _iso(receipt["observed_on"]) > as_of:
+        raise ValueError("REMOTE_SOURCE_OBSERVATION_IS_IN_FUTURE")
     report = {
         "schema_version": 1,
         "as_of": as_of.isoformat(),
@@ -400,7 +404,7 @@ def build_readiness(*, as_of: date) -> dict:
         "local_column_mapping_approved": False,
         "publisher_signature_verified": False,
         "independent_original_rows_reproduced_by_ci_zip_parser": 0,
-        "south_press_discrepancy_corroborrated_from_raw_table": True,
+        "south_press_discrepancy_corroborated_from_raw_table": True,
         "south_press_discrepancy_officially_corrected": False,
         "automatic_source_fetch_or_schedule": False,
         "real_invoice_records_ingested": 0,
