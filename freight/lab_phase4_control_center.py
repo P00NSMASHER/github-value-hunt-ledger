@@ -18,6 +18,7 @@ from freight.research_public_campaign import campaign_brief
 from freight.research_evidence_gate import run_mission, render_html as render_opposition_html
 from freight.research_change_impact import build_refresh_queue, render_html as render_refresh_html
 from freight.research_validation_protocols import build_protocol_report, render_html as render_protocol_html
+from freight.research_rehearsal import run_rehearsal, render_html as render_rehearsal_html
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -46,6 +47,9 @@ def snapshot(max_labs: int=14) -> dict:
         )
         result["validation_protocols"]=build_protocol_report(
             as_of=date.today(), decisions=decisions
+        )
+        result["synthetic_rehearsals"]=run_rehearsal(
+            as_of=date.today(), protocol_report=result["validation_protocols"]
         )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
@@ -85,6 +89,7 @@ def render(data: dict) -> str:
     )
     source_queue=data["source_review_queue"]
     validation=data["validation_protocols"]
+    rehearsal=data["synthetic_rehearsals"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -144,6 +149,13 @@ blind adjudication, or independent outcomes have been approved.</p>
 """ +str(validation["external_studies_executed"])+""" external studies completed ·
 """ +str(validation["observed_customer_outcomes"])+""" customer outcomes established.</p>
 <a href="validation_protocols.html">Open Validation Protocols ↗</a></section>
+<section class="panel"><h2>Invented-data experimental rehearsal</h2>
+<p>Illustrative arithmetic and synthetic negative controls only, not a real customer pilot, vendor
+benchmark, legal conclusion, survey or recovered cash.</p>
+<p>""" +str(rehearsal["rehearsed_protocols"])+""" study methods rehearsed ·
+""" +str(rehearsal["invented_case_records"])+""" explicitly invented cases ·
+""" +str(rehearsal["independent_customer_observations"])+""" real outcomes.</p>
+<a href="synthetic_rehearsals.html">Open Synthetic Rehearsal Report ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -188,6 +200,13 @@ def main():
     )
     (args.out/"validation_protocols.html").write_text(
         render_protocol_html(data["validation_protocols"]),encoding="utf-8"
+    )
+    (args.out/"synthetic_rehearsals.json").write_text(
+        json.dumps(data["synthetic_rehearsals"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"synthetic_rehearsals.html").write_text(
+        render_rehearsal_html(data["synthetic_rehearsals"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
