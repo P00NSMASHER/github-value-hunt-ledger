@@ -25,6 +25,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["findings"][2]["fee_eligible_realized_cents"] == 0
     assert pack["findings"][3]["reviewer_disposition"] == "REVIEW"
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
+    assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
 
 
 def test_pack_subtracts_reversal_from_realized_value():
@@ -72,6 +73,17 @@ def test_pack_rejects_positive_credit_without_settlement_reference():
         build_pack(data)
 
 
+def test_pack_rejects_settled_credit_above_candidate_difference():
+    data = payload()
+    row = data["findings"][0]
+    row["settled_credit_cents"] = row["billed_cents"] - row["expected_cents"] + 1
+    with pytest.raises(
+        ValueError,
+        match="settled_credit_cents cannot exceed candidate difference",
+    ):
+        build_pack(data)
+
+
 def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     report = render_markdown(build_pack(payload()))
     assert "SYNTHETIC / FICTIONAL EXAMPLE" in report
@@ -80,6 +92,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "SUPPRESSED" in report
     assert "Controlling rate authority is not proven." in report
     assert "Positive settled credits require an approved or closed claim" in report
+    assert "Settled credit cannot exceed the candidate invoice difference" in report
 
 
 def test_duplicate_finding_ids_fail_closed():
