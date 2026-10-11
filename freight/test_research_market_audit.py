@@ -63,6 +63,8 @@ class PublishedFreightResearchTests(unittest.TestCase):
         p = r["press_release_reconciliation"]
         self.assertTrue(p["truck_value_pct_agrees_with_detailed_table"])
         self.assertTrue(p["truck_weight_pct_agrees_with_detailed_table"])
+        self.assertTrue(p["all_modes_shipment_value_agrees_at_press_precision"])
+        self.assertTrue(p["all_modes_shipment_weight_agrees_at_press_precision"])
         self.assertEqual(len(p["regional_flagged_conflicts"]), 1)
 
     def test_south_region_published_press_claim_is_quarantined(self):
