@@ -25,6 +25,9 @@ on:
       - 'freight/test_research_data_readiness.py'
       - 'freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json'
       - 'freight/RESEARCH_PUBLIC_DATA_READINESS.md'
+      - 'freight/research_ground_truth.py'
+      - 'freight/test_research_ground_truth.py'
+      - 'freight/RESEARCH_INVOICE_GROUND_TRUTH.md'
       - 'freight/research/SOURCE_ANCHORS_20261010.json'
       - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
@@ -54,7 +57,7 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
           PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
@@ -203,6 +206,35 @@ jobs:
           assert 'Seven public source leads' in (p/'freight_data_readiness.html').read_text()
           print('Seven public leads, zero admitted datasets, zero invoice-error truth labels.')
           PY
+      - name: Rehearse independent mock invoice ground truth and money boundaries
+        run: |
+          PYTHONPATH=. python -m freight.research_ground_truth --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'invoice_ground_truth.json').read_text())
+          assert r['scope']=='LAB14_GROUND_TRUTH_INSTRUMENT_ONLY'
+          assert r['case_count']==10
+          assert r['verified_ground_truth_cases']==0
+          assert r['actual_cash_recovered_cents']==0
+          assert r['real_customer_cases']==0
+          assert r['synthetic_only'] is True
+          assert r['external_actions_allowed'] is False
+          assert r['approved_public_performance_benchmark'] is False
+          assert r['legal_applicability_established'] is False
+          assert r['new_lab_created'] is False and r['existing_lab_number']==14
+          s=r['case_status_counts']
+          assert s['HOLD_BLIND_REVIEW_DISAGREEMENT']==1
+          assert s['HOLD_RATE_EFFECTIVE_DATE']==1
+          assert s['HOLD_NO_CONTROLLING_AUTHORITY']==1
+          assert s['HOLD_CREDIT_NOT_CASH_RECONCILIATION']==1
+          assert s['SYNTHETIC_DUPLICATE_PAYMENT_CANDIDATE']==1
+          assert s['SYNTHETIC_PRIOR_REFUND_NO_REMAINING_CASH_EXCESS']==1
+          assert len(r['receipt_sha256'])==64
+          assert 'zero verified recoveries' in (p/'invoice_ground_truth.html').read_text().lower()
+          print('Ten fictitious evidence chains; zero real invoice results or cash actions.')
+          PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -221,5 +253,7 @@ jobs:
             /tmp/retally-research-intelligence/synthetic_rehearsals.html
             /tmp/retally-research-intelligence/freight_data_readiness.json
             /tmp/retally-research-intelligence/freight_data_readiness.html
+            /tmp/retally-research-intelligence/invoice_ground_truth.json
+            /tmp/retally-research-intelligence/invoice_ground_truth.html
           if-no-files-found: error
           retention-days: 14

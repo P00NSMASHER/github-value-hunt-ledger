@@ -236,6 +236,21 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_source["sources"][0]["independent_invoice_ground_truth_present"]=True
         _must(bool(validate_catalog(forged_source,validation,as_of=today)),
               "FORGED_PUBLIC_INVOICE_GROUND_TRUTH_ACCEPTED")
+        from freight.research_ground_truth import (
+            invented_fixture_book, validate_fixtures, run_ground_truth,
+        )
+        truth=run_ground_truth(as_of=today,protocols=validation)
+        _must(truth["case_count"]==10,"INVOICE_REFERENCE_EDGE_CASES_MISSING")
+        _must(truth["verified_ground_truth_cases"]==0,
+              "FICTIONAL_INVOICES_PROMOTED_AS_INDEPENDENT_TRUTH")
+        _must(truth["actual_cash_recovered_cents"]==0,
+              "FICTITIOUS_PAYMENT_PROMOTED_AS_CASH")
+        _must(truth["case_status_counts"].get("HOLD_BLIND_REVIEW_DISAGREEMENT")==1,
+              "INDEPENDENT_REVIEW_DISAGREEMENT_SILENTLY_RESOLVED")
+        altered=invented_fixture_book()
+        altered["cases"][0]["documents"][0]["body"]+=" FORGED"
+        _must(bool(validate_fixtures(altered,validation,as_of=today)),
+              "INVOICE_DOCUMENT_TAMPER_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -258,6 +273,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "public_freight_source_leads":sources["source_leads"],
                 "public_freight_source_readiness_sha256":sources["receipt_sha256"],
                 "rights_cleared_freight_data_imports":sources["datasets_imported"],
+                "ground_truth_instrument_cases":truth["case_count"],
+                "ground_truth_instrument_receipt_sha256":truth["receipt_sha256"],
+                "real_invoice_adjudications_completed":truth["verified_ground_truth_cases"],
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
