@@ -400,13 +400,15 @@ def build_market_audit(*, as_of: date, book: dict | None = None,
     press = book["press_release"]
     national_trillion_usd = Decimal(v["us.allmodes.2022"]) / Decimal(1000000)
     national_billion_tons = Decimal(t["us.allmodes.2022"]) / Decimal(1000000)
+    # JSON's 18.0 may decode as the integer 18; numeric quantities, not
+    # lexical string representations, determine equality at press precision.
     rounded_national_value_matches = (
-        _rounded(national_trillion_usd, "0.1") ==
-        str(press["total_rounded_trillion_usd"])
+        Decimal(_rounded(national_trillion_usd, "0.1")) ==
+        Decimal(str(press["total_rounded_trillion_usd"]))
     )
     rounded_national_weight_matches = (
-        _rounded(national_billion_tons, "0.1") ==
-        str(press["total_rounded_billion_tons"])
+        Decimal(_rounded(national_billion_tons, "0.1")) ==
+        Decimal(str(press["total_rounded_billion_tons"]))
     )
     if not (rounded_national_value_matches and rounded_national_weight_matches):
         raise ValueError("PUBLISHED_NATIONAL_TOTALS_FAIL_RECONCILIATION")
