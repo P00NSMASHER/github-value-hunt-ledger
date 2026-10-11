@@ -18,7 +18,7 @@ jobs:
       - name: Check out reviewed commit
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Unit tests — zero social API calls
-        run: python3 -m unittest discover -s freight/brand/social/performance -p 'test_social_review.py' -v
+        run: python3 -m unittest discover -s freight/brand/social/performance -p 'test_*.py' -v
       - name: Exercise safe synthetic report
         run: |
           python3 freight/brand/social/performance/social_review.py \
@@ -35,6 +35,29 @@ jobs:
           assert d['counts']['VERIFIED_PUBLIC'] == 0
           assert all('SYNTHETIC_' in p['uuid'] for p in d['posts'])
           print('Offline social evidence reporting PASS; no real posting side effects')
+          PY
+      - name: Exercise strict provider-row join (synthetic, read-only)
+        run: |
+          python3 freight/brand/social/performance/metricool_join.py \
+            --schedule freight/brand/social/performance/example_metricool_snapshot.json \
+            --facebook-export freight/brand/social/performance/fixture-facebook-metricool-SYNTHETIC.json \
+            --instagram-export freight/brand/social/performance/fixture-instagram-metricool-SYNTHETIC.json \
+            --as-of 2026-10-14T16:00:00Z \
+            --output "$RUNNER_TEMP/retally-provider-evidence.md" \
+            --json-output "$RUNNER_TEMP/retally-provider-evidence.json" \
+            --verified-metrics-output "$RUNNER_TEMP/retally-provider-verified-only.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          result=json.loads((root/'retally-provider-evidence.json').read_text())
+          verified=json.loads((root/'retally-provider-verified-only.json').read_text())
+          assert result['counts']['provider_matched'] == 2
+          assert result['counts']['independently_verified_matched'] == 0
+          assert result['counts']['unmatched_or_rejected'] == 0
+          assert not verified['posts']
+          assert all(c['evidence_state']=='PROVIDER_REPORTED_UNVERIFIED' for c in result['candidates'])
+          print('SYNTHETIC Metricool rows joined, publication unverified and no metric export PASS')
           PY
       - name: Validate frozen real launch-planner snapshot
         run: |
