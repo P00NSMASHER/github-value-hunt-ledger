@@ -204,6 +204,19 @@ class SyntheticRehearsalTests(unittest.TestCase):
         q = deepcopy(p)
         q["public_performance_claims_allowed"] = True
         self.assertTrue(validate_fixture_book(b, q, as_of=AS_OF))
+        for key, value in (
+            ("approved_preregistrations", 6),
+            ("observed_customer_outcomes", 1),
+            ("external_actions_allowed", True),
+            ("new_lab_created", True),
+        ):
+            q = deepcopy(p)
+            q[key] = value
+            self.assertTrue(validate_fixture_book(b, q, as_of=AS_OF), key)
+        q = deepcopy(p)
+        q["protocols"][0]["title"] = "tampered design"
+        self.assertIn("tampered Mission 7 protocol receipt", "; ".join(
+            validate_fixture_book(b, q, as_of=AS_OF)))
 
     def test_malformed_nested_json_fails_closed_not_with_type_crashes(self):
         for pid, key, value in (
