@@ -21,6 +21,11 @@ from zipfile import BadZipFile, ZipFile
 from freight.research_evidence_gate import canon_hash
 from freight.research_market_audit import AUDIT, build_market_audit
 
+RECEIPT = Path(__file__).resolve().parent / "research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json"
+BROWSER_OBSERVED_OFFICIAL_ZIP_SHA256 = "15d90f1e64c5b3fb86c5f619a32350f9c60256cc3eaaa48838115fc70f7d6499"
+BROWSER_OBSERVED_ZIP_BYTE_LENGTH = 167855
+OFFICIAL_DATA_MEMBER = "CF2200A01.dat"
+
 OFFICIAL_URL = "https://www2.census.gov/programs-surveys/cfs/data/2022/CF2200A01.zip"
 TABLE_ID = "CF2200A01"
 LIMIT_ARCHIVE_BYTES = 2 * 1024 * 1024
@@ -100,19 +105,21 @@ def _archive_members(raw: bytes) -> tuple[list[dict], ZipFile]:
             "compressed_bytes": entry.compress_size,
             "uncompressed_bytes": entry.file_size,
             "is_csv": name.lower().endswith(".csv"),
+            "is_dat": name.lower().endswith(".dat"),
+            "is_tabular": name.lower().endswith((".csv", ".dat")),
         })
-    if not any(m["is_csv"] for m in members):
-        raise ValueError("ORIGINAL_ARCHIVE_HAS_NO_CSV")
+    if not any(m["is_tabular"] for m in members):
+        raise ValueError("ORIGINAL_ARCHIVE_HAS_NO_CSV_OR_DAT")
     return sorted(members, key=lambda x: x["member"]), archive
 
 
-def _parse_csv(archive: ZipFile, member_name: str) -> tuple[list[str], list[dict]]:
+def _parse_tabular(archive: ZipFile, member_name: str) -> tuple[list[str], list[dict]]:
     try:
         info = archive.getinfo(member_name)
     except KeyError as exc:
         raise ValueError("MAPPED_CSV_MEMBER_NOT_FOUND") from exc
-    if info.is_dir() or not member_name.lower().endswith(".csv"):
-        raise ValueError("MAPPED_MEMBER_MUST_BE_CSV")
+    if info.is_dir() or not member_name.lower().endswith((".csv", ".dat")):
+        raise ValueError("MAPPED_MEMBER_MUST_BE_CSV_OR_DAT")
     try:
         data = archive.read(member_name)
         text = data.decode("utf-8-sig")
@@ -120,7 +127,8 @@ def _parse_csv(archive: ZipFile, member_name: str) -> tuple[list[str], list[dict
         raise ValueError("CSV_UNREADABLE_OR_CORRUPT") from exc
     if "\x00" in text:
         raise ValueError("BINARY_CONTENT_IN_CSV")
-    reader = csv.DictReader(io.StringIO(text, newline=""))
+    delimiter = "|" if member_name.lower().endswith(".dat") else ","
+    reader = csv.DictReader(io.StringIO(text, newline=""), delimiter=delimiter)
     header = reader.fieldnames
     if (not header or len(header) > LIMIT_FIELDS or
         any(not x or len(x) > 150 for x in header) or
@@ -159,8 +167,8 @@ def inspect_local_archive(raw: bytes, *, as_of: date) -> dict:
     }
     for m in members:
         metadata = dict(m)
-        if m["is_csv"]:
-            header, rows = _parse_csv(archive, m["member"])
+        if m["is_tabular"]:
+            header, rows = _parse_tabular(archive, m["member"])
             metadata.update({"columns": header, "row_count": len(rows)})
         result["members"].append(metadata)
     result["receipt_sha256"] = canon_hash(result)
@@ -176,8 +184,8 @@ def _validate_mapping(mapping: dict, base: dict) -> dict:
         mapping.get("claims_of_external_approval") is not False):
         raise ValueError("MAPPING_CANNOT_ASSERT_OFFICIAL_APPROVAL")
     member = mapping.get("member")
-    if not _safe_description(member) or not member.lower().endswith(".csv"):
-        raise ValueError("MAPPING_MEMBER_REQUIRED")
+    if not _safe_description(member) or not member.lower().endswith((".csv", ".dat")):
+        raise ValueError("MAPPING_TABULAR_MEMBER_REQUIRED")
     cols = mapping.get("columns")
     if (type(cols) is not dict or set(cols) != COLUMN_KEYS or
         any(not _safe_description(v) for v in cols.values()) or
@@ -218,10 +226,10 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
     original = json.loads(AUDIT.read_text(encoding="utf-8"))
     selectors = _validate_mapping(mapping, original)
     members, archive = _archive_members(raw)
-    names = {x["member"] for x in members if x["is_csv"]}
+    names = {x["member"] for x in members if x["is_tabular"]}
     if mapping["member"] not in names:
         raise ValueError("UNRECOGNIZED_MAPPED_SOURCE_MEMBER")
-    columns, rows = _parse_csv(archive, mapping["member"])
+    columns, rows = _parse_tabular(archive, mapping["member"])
     for key in mapping["columns"].values():
         if key not in columns:
             raise ValueError("MAPPING_COLUMN_NOT_IN_SOURCE")
