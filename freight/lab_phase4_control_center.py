@@ -35,6 +35,10 @@ from freight.research_industry_comparison import (
     build_comparison as build_industry_comparison,
     render_html as render_industry_comparison_html,
 )
+from freight.research_cfs_mode_hierarchy import (
+    build_forhire as build_cfs_forhire,
+    render_html as render_cfs_forhire_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -88,6 +92,9 @@ def snapshot(max_labs: int=14) -> dict:
         result["cfs_industry_comparison"]=build_industry_comparison(
             as_of=date.today(),market_report=result["cfs_market_audit"]
         )
+        result["cfs_forhire_source"]=build_cfs_forhire(
+            as_of=date.today(),prior=result["cfs_industry_comparison"]
+        )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -134,6 +141,7 @@ def render(data: dict) -> str:
     source_bytes=data["cfs_source_byte_readiness"]
     industry=data["cfs_industry_quality"]
     comparison=data["cfs_industry_comparison"]
+    forhire=data["cfs_forhire_source"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -257,6 +265,17 @@ Mode-specific industry cells and buyer demand remain unverified.</p>
 """ +str(len(comparison["research_gates"]))+""" unresolved independent evidence gates ·
 """ +str(comparison["market_or_customer_rankings_created"])+""" commercial buyer rankings.</p>
 <a href="cfs_industry_comparison.html">Open Industry Evidence &amp; Falsification ↗</a></section>
+<section class="panel"><h2>For-hire trucking by industry — distance and weight</h2>
+<p>60 national industry/mode 111 rows from Census-format public GitHub mirrors,
+cross-checked across A18/A19 and prior official source totals. Source ZIP
+hashes were observed in earlier read-only browser research; the mirror rows
+are not original ZIP bytes replayed in CI. Reported NAICS 4931 also contains
+NAICS 484 truck transportation, so this is not a pure warehousing segment.</p>
+<p>""" +str(forhire["qa"]["source_selected_rows"])+""" source cells ·
+""" +str(len(forhire["three_sector_forhire_results"]))+""" industry groups ·
+""" +str(forhire["actual_paid_ltl_invoices_observed"])+""" real paid LTL invoice cases ·
+""" +("none" if forhire["market_size_or_recovery_rates_established"] is False else "unknown")+""" verified recovery TAM.</p>
+<a href="cfs_forhire_industry.html">Open For-Hire Census Evidence Report ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -357,6 +376,13 @@ def main():
     )
     (args.out/"cfs_industry_comparison.html").write_text(
         render_industry_comparison_html(data["cfs_industry_comparison"]),encoding="utf-8"
+    )
+    (args.out/"cfs_forhire_industry.json").write_text(
+        json.dumps(data["cfs_forhire_source"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"cfs_forhire_industry.html").write_text(
+        render_cfs_forhire_html(data["cfs_forhire_source"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
