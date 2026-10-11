@@ -13,6 +13,7 @@ from datetime import date
 from html import escape
 import json
 from pathlib import Path
+import re
 
 from freight.research_evidence_gate import canon_hash
 from freight.research_validation_protocols import build_protocol_report
@@ -86,6 +87,20 @@ def _iso(raw: object) -> date:
 
 def _meaningful(raw: object, minimum: int = 24, maximum: int = 700) -> bool:
     return type(raw) is str and minimum <= len(raw.strip()) <= maximum
+
+
+# This only detects obvious accidentally pasted sensitive details; it cannot
+# replace a governed privacy review of any eventual real source document.
+_OBVIOUS_SENSITIVE = (
+    re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"),
+    re.compile(r"\\b\\d{3}-\\d{2}-\\d{4}\\b"),
+    re.compile(r"\\b(?:\\+?1[-. ]?)?\\(?\\d{3}\\)?[-. ]?\\d{3}[-. ]?\\d{4}\\b"),
+    re.compile(r"(?:/mnt/|/home/|C:\\\\Users\\\\|Bearer\\s+|ghp_[A-Za-z0-9]{12,}|sk-[A-Za-z0-9]{12,})", re.I),
+)
+
+
+def _has_obvious_sensitive_content(value: object) -> bool:
+    return type(value) is str and any(pattern.search(value) for pattern in _OBVIOUS_SENSITIVE)
 
 
 def _hash_is_valid(record: object) -> bool:
@@ -191,6 +206,8 @@ def validate_preflight(book: dict, protocols: dict, sources: dict,
         errors.append("unapproved pilot study targets")
     if not _meaningful(book.get("intended_scope"), 50):
         errors.append("prospective pilot purpose and limitations required")
+    if _has_obvious_sensitive_content(book.get("intended_scope")):
+        errors.append("prospective planning scope may not contain personal identifiers or secrets")
     if book.get("no_customer_contact_authorized") is not True or book.get("no_new_lab") is not True:
         errors.append("pilot planning cannot contact parties or add a new lab")
     for key in ZERO_BOOK_FLAGS:
@@ -249,6 +266,8 @@ def validate_preflight(book: dict, protocols: dict, sources: dict,
                      "next_internal_step"):
             if not _meaningful(gate.get(name), 12 if name == "name" else 45):
                 errors.append(f"{gid}: missing bounded {name}")
+            if _has_obvious_sensitive_content(gate.get(name)):
+                errors.append(f"{gid}: no personal identifiers, private paths or credentials in planning text")
         expected_studies = ["M7-06"] if idx in (15, 16) else ["M7-01", "M7-06"]
         if gate.get("related_studies") != expected_studies:
             errors.append(f"{gid}: link to prospective study boundary mismatch")
