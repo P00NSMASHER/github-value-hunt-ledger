@@ -61,6 +61,15 @@ def normalize_finding(row):
     clean["carrier_response"] = str(row.get("carrier_response") or "").strip()
     clean["settlement_reference"] = str(row.get("settlement_reference") or "").strip()
     clean["unresolved_issues"] = str(row.get("unresolved_issues") or "").strip()
+    if clean["settled_credit_cents"] > 0:
+        if clean["claim_status"] not in {"APPROVED", "CLOSED"}:
+            raise ValueError(
+                "positive settled_credit_cents requires APPROVED or CLOSED claim status"
+            )
+        if not clean["settlement_reference"]:
+            raise ValueError(
+                "positive settled_credit_cents requires settlement_reference"
+            )
     clean["difference_cents"] = max(clean["billed_cents"] - clean["expected_cents"], 0)
     if clean["reversal_cents"] > clean["settled_credit_cents"]:
         raise ValueError("reversal_cents cannot exceed settled_credit_cents")
@@ -115,6 +124,7 @@ def build_pack(payload):
             "validated_is_not_settled": True,
             "preexisting_and_duplicate_value_excluded": True,
             "reversals_reduce_realized_value": True,
+            "realized_requires_settled_claim_and_reference": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -166,7 +176,8 @@ def render_markdown(pack):
         "3. An approved claim is not actual recovered funds.",
         "4. Existing, automatic, incumbent-known, duplicate, or unsupported value is suppressed from Freight Recovery attribution.",
         "5. Reversals reduce realized recovery.",
-        "6. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "6. Positive settled credits require an approved or closed claim and a settlement reference.",
+        "7. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
