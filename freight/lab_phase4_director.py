@@ -379,6 +379,25 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_rows["selected_source_rows"][0]["mode_code"]="11"
         _must(bool(validate_mode_rows(forged_rows,as_of=today)),
               "INVALID_FORHIRE_OR_LTL_MODE_IDENTIFIER_ACCEPTED")
+        from freight.research_ltl_revenue_bridge import (
+            build_revenue, validate_catalog as validate_aies_source,
+        )
+        aies=build_revenue(as_of=today)
+        _must(aies["ltl_2024_revenue_billion_usd"]=="65.096",
+              "DIRECT_CENSUS_ORIGIN_LTL_CARRIER_REVENUE_NOT_RECONCILED")
+        _must(aies["ltl_2024_share_of_all_trucking_pct"]=="16.16",
+              "LTL_CARRIER_PARENT_INDUSTRY_DENOMINATOR_WRONG")
+        _must(aies["ltl_freight_audit_recoverable_tam_usd"] is None and
+              aies["real_ltl_invoice_cases_observed"]==0 and
+              aies["commercial_uses_or_external_contact_allowed"] is False,
+              "INDUSTRY_REVENUE_MISREPRESENTED_AS_AUDIT_RECOVERIES")
+        _must(aies["source"]["full_census_origin_api_bytes_replayed"] is False,
+              "UNREAD_OFFICIAL_AIES_API_MISREPRESENTED_AS_REPLAYED")
+        false_aies=_read("research/AIES_LTL_CARRIER_REVENUE_20261011.json")
+        false_aies["fred_aies_series"][-1]["observations"][-1][
+            "revenue_thousand_usd"]=65_688_461
+        _must(bool(validate_aies_source(false_aies,as_of=today)),
+              "LEGACY_2022_REVENUE_SILENTLY_SUBSTITUTED_FOR_2024")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -422,6 +441,10 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "cfs_forhire_industry_mode_111_source_rows":forhire["qa"]["source_selected_rows"],
                 "cfs_forhire_source_receipt_sha256":forhire["receipt_sha256"],
                 "cfs_forhire_source_remains_not_ltl_spend":True,
+                "aies_ltl_2024_carrier_revenue_billion_usd":aies["ltl_2024_revenue_billion_usd"],
+                "aies_ltl_2024_pct_of_all_trucking_revenue":aies["ltl_2024_share_of_all_trucking_pct"],
+                "aies_ltl_revenue_receipt_sha256":aies["receipt_sha256"],
+                "aies_ltl_revenue_is_not_recoverable_tam":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,

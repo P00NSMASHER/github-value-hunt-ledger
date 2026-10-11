@@ -39,6 +39,10 @@ from freight.research_cfs_mode_hierarchy import (
     build_forhire as build_cfs_forhire,
     render_html as render_cfs_forhire_html,
 )
+from freight.research_ltl_revenue_bridge import (
+    build_revenue as build_aies_ltl_revenue,
+    render_html as render_aies_ltl_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -95,6 +99,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["cfs_forhire_source"]=build_cfs_forhire(
             as_of=date.today(),prior=result["cfs_industry_comparison"]
         )
+        result["aies_ltl_carrier_revenue"]=build_aies_ltl_revenue(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -142,6 +147,7 @@ def render(data: dict) -> str:
     industry=data["cfs_industry_quality"]
     comparison=data["cfs_industry_comparison"]
     forhire=data["cfs_forhire_source"]
+    aies=data["aies_ltl_carrier_revenue"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -276,6 +282,17 @@ NAICS 484 truck transportation, so this is not a pure warehousing segment.</p>
 """ +str(forhire["actual_paid_ltl_invoices_observed"])+""" real paid LTL invoice cases ·
 """ +("none" if forhire["market_size_or_recovery_rates_established"] is False else "unknown")+""" verified recovery TAM.</p>
 <a href="cfs_forhire_industry.html">Open For-Hire Census Evidence Report ↗</a></section>
+<section class="panel"><h2>2024 U.S. long-distance LTL carrier revenue — actual industry measure</h2>
+<p>The Census 2024 Annual Integrated Economic Survey, distributed by Federal Reserve
+FRED, reports 2017 NAICS 484122 employer-industry <strong>carrier revenue</strong>.
+This is a different data universe and financial metric than 2022 CFS shipped
+goods value. The three FRED codes share one Census-origin dataset; this
+offline view is a frozen web observation, not a newly downloaded Census API file.</p>
+<p>2024 NAICS 484122: <strong>$""" +str(aies["ltl_2024_revenue_billion_usd"])+""" billion</strong> ·
+""" +str(aies["ltl_2024_share_of_all_trucking_pct"])+"""% of NAICS 484 trucking revenue ·
+""" +str(aies["real_ltl_invoice_cases_observed"])+""" real audited invoices ·
+no validated recovery opportunity or customer demand.</p>
+<a href="aies_ltl_revenue.html">Open AIES LTL Carrier Revenue &amp; Evidence Limits ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -383,6 +400,13 @@ def main():
     )
     (args.out/"cfs_forhire_industry.html").write_text(
         render_cfs_forhire_html(data["cfs_forhire_source"]),encoding="utf-8"
+    )
+    (args.out/"aies_ltl_revenue.json").write_text(
+        json.dumps(data["aies_ltl_carrier_revenue"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"aies_ltl_revenue.html").write_text(
+        render_aies_ltl_html(data["aies_ltl_carrier_revenue"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],

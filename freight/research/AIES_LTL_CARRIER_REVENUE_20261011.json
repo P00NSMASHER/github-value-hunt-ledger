@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CENSUS_AIES_2024_LTL_EMPLOYER_REVENUE_NO_RECOVERY_CLAIMS",
+  "observed_on": "2026-10-11",
+  "publisher": "U.S. Census Bureau",
+  "distributor": "Federal Reserve Bank of St. Louis (FRED)",
+  "census_2024_release_date": "2026-09-03",
+  "fred_series_last_updated_on": "2026-09-10",
+  "cfs_origin_naics_population": "CFS_2022_GOODS_VALUE_MODE111_NAICS4931_INCLUDES484_NOT_AIES_CARRIER_INDUSTRY_REVENUE",
+  "naics_classification": "2017_NAICS_LONG_DISTANCE_LTL_484122_EMPLOYER_BUSINESSES",
+  "geographic_scope": "UNITED_STATES_NATIONAL",
+  "metric": "ANNUAL_EMPLOYER_ESTABLISHMENT_INDUSTRY_REVENUE_NOT_FREIGHT_INVOICES",
+  "units": "THOUSANDS_OF_NOMINAL_US_DOLLARS",
+  "source_family": "US_CENSUS_AIES_SINGLE_UNDERLYING_PUBLISHER_VIA_FRED_NOT_INDEPENDENT_SAMPLES",
+  "observation_method": "PUBLIC_CENSUS_RELEASE_AND_FRED_SERIES_WEB_VIEW_NO_ORIGINAL_CENSUS_API_OR_CSV_BYTE_REPLAY",
+  "official_release_url": "https://www.census.gov/newsroom/press-releases/2026/2024-aies-data-release.html",
+  "census_aies_api_documentation_url": "https://www.census.gov/data/developers/data-sets/aies.html",
+  "fred_aies_series": [
+    {
+      "naics": "484",
+      "series_id": "AIES484RCT00US",
+      "industry_name": "Truck Transportation, All Establishments: Revenue",
+      "source_url": "https://fred.stlouisfed.org/data/AIES484RCT00US",
+      "observations": [
+        {
+          "year": 2022,
+          "revenue_thousand_usd": 423270958
+        },
+        {
+          "year": 2023,
+          "revenue_thousand_usd": 406651010
+        },
+        {
+          "year": 2024,
+          "revenue_thousand_usd": 402827246
+        }
+      ]
+    },
+    {
+      "naics": "484121",
+      "series_id": "AIES484121RCT00US",
+      "industry_name": "General Freight Trucking, Long-Distance, Truckload, All Establishments: Revenue",
+      "source_url": "https://fred.stlouisfed.org/data/AIES484121RCT00US",
+      "observations": [
+        {
+          "year": 2022,
+          "revenue_thousand_usd": 172717339
+        },
+        {
+          "year": 2023,
+          "revenue_thousand_usd": 163025116
+        },
+        {
+          "year": 2024,
+          "revenue_thousand_usd": 161329027
+        }
+      ]
+    },
+    {
+      "naics": "484122",
+      "series_id": "AIES484122RCT00US",
+      "industry_name": "General Freight Trucking, Long-Distance, Less Than Truckload, All Establishments: Revenue",
+      "source_url": "https://fred.stlouisfed.org/data/AIES484122RCT00US",
+      "observations": [
+        {
+          "year": 2022,
+          "revenue_thousand_usd": 65688461
+        },
+        {
+          "year": 2023,
+          "revenue_thousand_usd": 64651167
+        },
+        {
+          "year": 2024,
+          "revenue_thousand_usd": 65096292
+        }
+      ]
+    }
+  ],
+  "legacy_2022_sas_comparator": {
+    "series_id": "REVEF484122ALLEST",
+    "source_url": "https://fred.stlouisfed.org/data/REVEF484122ALLEST",
+    "metric": "LEGACY_2022_SERVICES_ANNUAL_SURVEY_NOT_AIES_SERIES",
+    "year": 2022,
+    "revenue_million_usd": 68411,
+    "unit": "MILLIONS_OF_NOMINAL_US_DOLLARS",
+    "interchangeable_with_aies": false
+  },
+  "evidence_guards": {
+    "direct_official_census_api_or_original_ftp_bytes_replayed_in_repo": false,
+    "three_fred_series_independent_market_surveys": false,
+    "legacy_sas_series_interchangeable_with_aies": false,
+    "cfs_goods_values_are_carrier_revenue": false,
+    "naics_484122_includes_all_ltl_transport": false,
+    "aies_revenue_equals_auditable_customer_invoice_volume": false,
+    "actual_customer_invoice_cases_examined": 0,
+    "actual_recovered_money_proven": false,
+    "verified_invoice_error_prevalence": false,
+    "ltl_recovery_tam_established": false,
+    "buyer_demand_established": false,
+    "commercial_or_outreach_authority": false,
+    "customer_or_carrier_data_ingested": false,
+    "new_lab_created": false,
+    "data_source_terms_or_publisher_digital_signature_audited": false
+  },
+  "reviewer_note": "AIES 2024 reports Census-origin employer-business revenue under 2017 NAICS; FRED distributes the series but is not a second sample. Legacy 2022 Services Annual Survey published a different figure and must not be mixed into AIES chronology. Neither carrier revenue nor CFS shipped-goods value measures a paid customer invoice, billed mistake, collectable claim, or RETALLY opportunity."
+}
