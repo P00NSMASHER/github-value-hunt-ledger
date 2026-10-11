@@ -293,7 +293,7 @@ class CfsIndustryComparisonTests(unittest.TestCase):
         self.assertIn("future", "; ".join(validate_plan(p,s,as_of=DAY)))
         p,s=fixture()
         p["observed_on"]="2026-10-10"
-        self.assertEqual(validate_plan(p,s,as_of=DAY),[])
+        self.assertIn("cannot be backdated", "; ".join(validate_plan(p,s,as_of=DAY)))
 
     def test_html_escapes_hypotheses_and_warns_about_noninvoice_data(self):
         r=build_comparison(as_of=DAY)
@@ -303,7 +303,7 @@ class CfsIndustryComparisonTests(unittest.TestCase):
         self.assertNotIn("<script>",html)
         self.assertIn("&lt;script&gt;",html)
         self.assertIn("Compare observed freight goods",html)
-        self.assertIn("not the error rate",html)
+        self.assertIn("NOT the error rate",html)
         self.assertIn("NOT a freight rate",html)
 
     def test_reproducible_static_receipts_do_not_establish_real_results(self):
