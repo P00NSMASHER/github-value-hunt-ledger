@@ -127,7 +127,7 @@ class PrimarySourceReplayTests(unittest.TestCase):
 
     def test_fake_zip_cannot_pass_fixed_archive_sha_and_size(self):
         b, _ = fixture("CF2200A18")
-        for data in [b"PK\\x03\\x04garbage", b"", b"not a census archive"]:
+        for data in [b"PK\x03\x04garbage", b"", b"not a census archive"]:
             with self.assertRaises(ValueError):
                 _verify_archive("CF2200A18", data, b)
 
@@ -137,7 +137,7 @@ class PrimarySourceReplayTests(unittest.TestCase):
         header = OFFICIAL_PROFILES[table]["header"].split("|")
         buf = io.StringIO(newline="")
         writer = csv.DictWriter(buf, fieldnames=header, delimiter="|",
-                                extrasaction="ignore", lineterminator="\\n")
+                                extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
         dat = buf.getvalue().encode("utf-8")
