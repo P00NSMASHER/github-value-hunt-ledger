@@ -28,6 +28,10 @@ on:
       - 'freight/research_ground_truth.py'
       - 'freight/test_research_ground_truth.py'
       - 'freight/RESEARCH_INVOICE_GROUND_TRUTH.md'
+      - 'freight/research/PILOT_PREFLIGHT_20261011.json'
+      - 'freight/research_pilot_preflight.py'
+      - 'freight/test_research_pilot_preflight.py'
+      - 'freight/RESEARCH_PILOT_PREFLIGHT.md'
       - 'freight/research/SOURCE_ANCHORS_20261010.json'
       - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
@@ -57,7 +61,7 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_research_pilot_preflight.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
           PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
@@ -235,6 +239,38 @@ jobs:
           assert 'zero verified recoveries' in (p/'invoice_ground_truth.html').read_text().lower()
           print('Ten fictitious evidence chains; zero real invoice results or cash actions.')
           PY
+      - name: Build a blocked buyer-pilot preflight without receiving data
+        run: |
+          PYTHONPATH=. python -m freight.research_pilot_preflight --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'pilot_preflight.json').read_text())
+          assert r['scope']=='LAB14_PROSPECTIVE_PILOT_INTERNAL_READINESS_ONLY'
+          assert r['required_controls']==18 and r['unmet_requirements']==18
+          assert r['controls_with_independently_verified_external_evidence']==0
+          assert r['workflow_stage_count']==6
+          assert r['target_studies']==['M7-01','M7-06']
+          assert r['studies_with_pilot_data']==0
+          assert r['real_invoices_received']==0
+          assert r['actual_human_independent_reviewers']==0
+          assert r['verified_invoice_overcharges']==0
+          assert r['real_net_recovery_cents']==0
+          assert r['fictional_invoice_cases_used_as_design_tests']==10
+          a=r['fictional_test_case_reviewer_concordance']
+          assert a['agreement_fraction']=='9/10'
+          assert a['actual_independent_reviewer_reliability_established'] is False
+          assert all(x['real_world_evidence_observed'] is False
+                     and x['external_actions_permitted'] is False
+                     for x in r['evidence_preparation_queue'])
+          assert r['public_performance_claims_permitted'] is False
+          assert r['real_world_study_authorized'] is False
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          assert len(r['receipt_sha256'])==64
+          assert 'No customer consent' in (p/'pilot_preflight.html').read_text()
+          print('18 human evidence gaps, 0 real buyer pilots or authorized actions.')
+          PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -255,5 +291,7 @@ jobs:
             /tmp/retally-research-intelligence/freight_data_readiness.html
             /tmp/retally-research-intelligence/invoice_ground_truth.json
             /tmp/retally-research-intelligence/invoice_ground_truth.html
+            /tmp/retally-research-intelligence/pilot_preflight.json
+            /tmp/retally-research-intelligence/pilot_preflight.html
           if-no-files-found: error
           retention-days: 14
