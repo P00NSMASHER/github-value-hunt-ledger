@@ -24,6 +24,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["findings"][2]["attribution_state"] == "SUPPRESSED"
     assert pack["findings"][2]["fee_eligible_realized_cents"] == 0
     assert pack["findings"][3]["reviewer_disposition"] == "REVIEW"
+    assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
 
 
 def test_pack_subtracts_reversal_from_realized_value():
@@ -50,6 +51,27 @@ def test_pack_rejects_reversal_above_settled_credit():
         build_pack(data)
 
 
+@pytest.mark.parametrize("claim_status", ["NOT_SUBMITTED", "SUBMITTED", "PENDING", "DENIED"])
+def test_pack_rejects_positive_credit_without_settled_claim_status(claim_status):
+    data = payload()
+    data["findings"][0]["claim_status"] = claim_status
+    with pytest.raises(
+        ValueError,
+        match="positive settled_credit_cents requires APPROVED or CLOSED claim status",
+    ):
+        build_pack(data)
+
+
+def test_pack_rejects_positive_credit_without_settlement_reference():
+    data = payload()
+    data["findings"][0]["settlement_reference"] = ""
+    with pytest.raises(
+        ValueError,
+        match="positive settled_credit_cents requires settlement_reference",
+    ):
+        build_pack(data)
+
+
 def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     report = render_markdown(build_pack(payload()))
     assert "SYNTHETIC / FICTIONAL EXAMPLE" in report
@@ -57,6 +79,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Fee-eligible realized recovery" in report
     assert "SUPPRESSED" in report
     assert "Controlling rate authority is not proven." in report
+    assert "Positive settled credits require an approved or closed claim" in report
 
 
 def test_duplicate_finding_ids_fail_closed():
