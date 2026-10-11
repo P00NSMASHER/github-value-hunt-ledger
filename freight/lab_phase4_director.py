@@ -213,6 +213,17 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_protocols["experiments"][0]["observed_sample_count"]=99
         _must(bool(validate_protocols(forged_protocols, opposition, as_of=today)),
               "FAKE_STUDY_OUTCOME_ACCEPTED")
+        from freight.research_rehearsal import run_rehearsal, validate_fixture_book
+        rehearsal=run_rehearsal(as_of=today, protocol_report=validation)
+        _must(rehearsal["rehearsed_protocols"]==6,"SYNTHETIC_RESEARCH_METHOD_MISSING")
+        _must(rehearsal["external_studies_executed"]==0,
+              "SYNTHETIC_RESEARCH_PROMOTED_TO_EXTERNAL_STUDY")
+        _must(not rehearsal["verified_business_results"],
+              "INVENTED_CASE_PROMOTED_AS_REAL_RECOVERY")
+        adversarial=_read("research/SYNTHETIC_REHEARSALS_20261010.json")
+        adversarial["cases"][0]["adjudication"]="CLAIM_VERIFIED_BY_CUSTOMER"
+        _must(bool(validate_fixture_book(adversarial,validation,as_of=today)),
+              "FORGED_INDEPENDENT_ADJUDICATION_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -229,6 +240,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "refresh_queue_receipt_sha256":queue["receipt_sha256"],
                 "validation_design_count":validation["protocol_count"],
                 "validation_design_receipt_sha256":validation["receipt_sha256"],
+                "rehearsed_research_methods":rehearsal["rehearsed_protocols"],
+                "invented_rehearsal_records":rehearsal["invented_case_records"],
+                "synthetic_rehearsal_receipt_sha256":rehearsal["receipt_sha256"],
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")

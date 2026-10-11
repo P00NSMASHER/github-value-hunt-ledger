@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "scope": "RETALLY_LAB14_EXPLICITLY_INVENTED_SYNTHETIC_REHEARSALS",
+  "created_on": "2026-10-10",
+  "data_origin": "HAND_AUTHORED_FICTITIOUS_CASES_NOT_MODELLED_FROM_CUSTOMERS",
+  "synthetic_only": true,
+  "external_source_records": 0,
+  "human_respondents": 0,
+  "real_carrier_or_customer_records": 0,
+  "external_actions_authorized": false,
+  "purpose": "Counterexamples exercise arithmetic, data-quality and provenance controls. All names, IDs, dates, funds and outcomes are invented, not forecasts, source evidence or actual results.",
+  "cases": [
+    {
+      "protocol_id": "M7-01",
+      "case_id": "SIM-01-01",
+      "alert": true,
+      "adjudication": "SUBSTANTIATED"
+    },
+    {
+      "protocol_id": "M7-01",
+      "case_id": "SIM-01-02",
+      "alert": true,
+      "adjudication": "NOT_SUBSTANTIATED"
+    },
+    {
+      "protocol_id": "M7-01",
+      "case_id": "SIM-01-03",
+      "alert": true,
+      "adjudication": "UNRESOLVED"
+    },
+    {
+      "protocol_id": "M7-01",
+      "case_id": "SIM-01-04",
+      "alert": false,
+      "adjudication": "SUBSTANTIATED"
+    },
+    {
+      "protocol_id": "M7-01",
+      "case_id": "SIM-01-05",
+      "alert": false,
+      "adjudication": "NOT_SUBSTANTIATED"
+    },
+    {
+      "protocol_id": "M7-01",
+      "case_id": "SIM-01-06",
+      "alert": false,
+      "adjudication": "UNRESOLVED"
+    },
+    {
+      "protocol_id": "M7-02",
+      "case_id": "SIM-02-01",
+      "shipment_on": "2029-12-31",
+      "synthetic_effective_on": "2030-01-01",
+      "authority_available": true,
+      "contract_override": false,
+      "engine_decision": "IGNORE"
+    },
+    {
+      "protocol_id": "M7-02",
+      "case_id": "SIM-02-02",
+      "shipment_on": "2030-01-01",
+      "synthetic_effective_on": "2030-01-01",
+      "authority_available": true,
+      "contract_override": false,
+      "engine_decision": "APPLY"
+    },
+    {
+      "protocol_id": "M7-02",
+      "case_id": "SIM-02-03",
+      "shipment_on": "2030-01-02",
+      "synthetic_effective_on": "2030-01-01",
+      "authority_available": true,
+      "contract_override": true,
+      "engine_decision": "IGNORE"
+    },
+    {
+      "protocol_id": "M7-02",
+      "case_id": "SIM-02-04",
+      "shipment_on": "2030-01-02",
+      "synthetic_effective_on": "2030-01-01",
+      "authority_available": false,
+      "contract_override": false,
+      "engine_decision": "HOLD"
+    },
+    {
+      "protocol_id": "M7-02",
+      "case_id": "SIM-02-05",
+      "shipment_on": "2029-12-31",
+      "synthetic_effective_on": "2030-01-01",
+      "authority_available": true,
+      "contract_override": false,
+      "engine_decision": "APPLY"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-01",
+      "arm": "POSTED",
+      "response": "CORRECT"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-02",
+      "arm": "POSTED",
+      "response": "INCORRECT"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-03",
+      "arm": "POSTED",
+      "response": "NONRESPONSE"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-04",
+      "arm": "POSTED",
+      "response": "CORRECT"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-05",
+      "arm": "NEGOTIATED",
+      "response": "CORRECT"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-06",
+      "arm": "NEGOTIATED",
+      "response": "NONRESPONSE"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-07",
+      "arm": "NEGOTIATED",
+      "response": "INCORRECT"
+    },
+    {
+      "protocol_id": "M7-03",
+      "case_id": "SIM-03-08",
+      "arm": "NEGOTIATED",
+      "response": "INCORRECT"
+    },
+    {
+      "protocol_id": "M7-04",
+      "case_id": "SIM-04-01",
+      "frame_status": "QUALIFIED"
+    },
+    {
+      "protocol_id": "M7-04",
+      "case_id": "SIM-04-02",
+      "frame_status": "INELIGIBLE"
+    },
+    {
+      "protocol_id": "M7-04",
+      "case_id": "SIM-04-03",
+      "frame_status": "NONRESPONSE"
+    },
+    {
+      "protocol_id": "M7-04",
+      "case_id": "SIM-04-04",
+      "frame_status": "UNKNOWN"
+    },
+    {
+      "protocol_id": "M7-04",
+      "case_id": "SIM-04-05",
+      "frame_status": "QUALIFIED"
+    },
+    {
+      "protocol_id": "M7-05",
+      "case_id": "SIM-05-01",
+      "fixture_id": "SIM-C01",
+      "system": "RETALLY",
+      "access": "AUTHORIZED",
+      "resolution": "SUPPORTED_CORRECT"
+    },
+    {
+      "protocol_id": "M7-05",
+      "case_id": "SIM-05-02",
+      "fixture_id": "SIM-C01",
+      "system": "OTHER_LICENSED_VENDOR",
+      "access": "NOT_TESTED",
+      "resolution": "NOT_TESTED"
+    },
+    {
+      "protocol_id": "M7-05",
+      "case_id": "SIM-05-03",
+      "fixture_id": "SIM-C02",
+      "system": "RETALLY",
+      "access": "AUTHORIZED",
+      "resolution": "INCORRECT"
+    },
+    {
+      "protocol_id": "M7-05",
+      "case_id": "SIM-05-04",
+      "fixture_id": "SIM-C02",
+      "system": "OTHER_LICENSED_VENDOR",
+      "access": "AUTHORIZED",
+      "resolution": "SUPPORTED_CORRECT"
+    },
+    {
+      "protocol_id": "M7-05",
+      "case_id": "SIM-05-05",
+      "fixture_id": "SIM-C03",
+      "system": "RETALLY",
+      "access": "AUTHORIZED",
+      "resolution": "ABSTAIN"
+    },
+    {
+      "protocol_id": "M7-05",
+      "case_id": "SIM-05-06",
+      "fixture_id": "SIM-C03",
+      "system": "OTHER_LICENSED_VENDOR",
+      "access": "AUTHORIZED",
+      "resolution": "INCORRECT"
+    },
+    {
+      "protocol_id": "M7-06",
+      "case_id": "SIM-06-01",
+      "case_state": "RECOVERED",
+      "cash_fee_collected_cents": 10000,
+      "carrier_credit_cents": 50000,
+      "fee_refunds_cents": 0,
+      "labor_cents": 1500,
+      "acquisition_cents": 4000,
+      "processing_cents": 200,
+      "writeoffs_cents": 0
+    },
+    {
+      "protocol_id": "M7-06",
+      "case_id": "SIM-06-02",
+      "case_state": "ZERO_RECOVERY",
+      "cash_fee_collected_cents": 0,
+      "carrier_credit_cents": 0,
+      "fee_refunds_cents": 0,
+      "labor_cents": 3000,
+      "acquisition_cents": 1000,
+      "processing_cents": 0,
+      "writeoffs_cents": 0
+    },
+    {
+      "protocol_id": "M7-06",
+      "case_id": "SIM-06-03",
+      "case_state": "REVERSED",
+      "cash_fee_collected_cents": 5000,
+      "carrier_credit_cents": 40000,
+      "fee_refunds_cents": 5000,
+      "labor_cents": 2200,
+      "acquisition_cents": 800,
+      "processing_cents": 100,
+      "writeoffs_cents": 0
+    },
+    {
+      "protocol_id": "M7-06",
+      "case_id": "SIM-06-04",
+      "case_state": "PENDING",
+      "cash_fee_collected_cents": 0,
+      "carrier_credit_cents": 10000,
+      "fee_refunds_cents": 0,
+      "labor_cents": 900,
+      "acquisition_cents": 600,
+      "processing_cents": 0,
+      "writeoffs_cents": 0
+    },
+    {
+      "protocol_id": "M7-06",
+      "case_id": "SIM-06-05",
+      "case_state": "RECOVERED",
+      "cash_fee_collected_cents": 2000,
+      "carrier_credit_cents": 10000,
+      "fee_refunds_cents": 0,
+      "labor_cents": 4000,
+      "acquisition_cents": 0,
+      "processing_cents": 100,
+      "writeoffs_cents": 0
+    }
+  ]
+}
