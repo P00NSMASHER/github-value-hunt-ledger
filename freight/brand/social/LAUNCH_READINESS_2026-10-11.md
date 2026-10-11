@@ -59,10 +59,12 @@ The operator reported the Facebook identity update complete on October 10. Treat
 - [ ] Facebook cover shows RETALLY wordmark and legible message at desktop and phone widths.
 - [ ] Facebook action button goes to `https://www.retallyrecovery.com/#start-audit`.
 - [ ] Facebook About website field directly uses canonical `https://www.retallyrecovery.com/` (not just working via HTTP redirect).
-- [ ] Instagram public account is `@retallyrecovery`, displays RETALLY identity, freight-audit bio and functional website link.
+- [x] Instagram public text identity verified independently via fresh public fetch on October 11: `@retallyrecovery`, display name RETALLY, freight-audit bio and public link to `https://www.retallyrecovery.com/`. An independent visual/logo crop check is separate.
 - [ ] Live Meta link previews, not merely site Open Graph metadata, display approved branding and credible copy.
 
 A browser that is blocked by Meta or cannot inspect an authenticated CTA must return **unverified**, not “failed” or “completed.” Never modify profile pictures merely because a cached preview is stale.
+
+**Independent public-readback result (Oct 11):** The public Instagram page fetch returned RETALLY / @retallyrecovery, the evidence-backed freight audit and $0-upfront bio, one public post, and a clickable outbound canonical website link via Instagram's `l.instagram.com` redirect. Its public metadata reported 29 followers; this is a profile snapshot, not proof of marketing reach or qualified demand. A fresh public Facebook Page fetch returned **`login_required`**; the avatar, cover, CTA and website field remain unverified from an unauthenticated session despite the owner's reported update. No actual Facebook setting was edited in this audit. Public website readback confirms the manual email-draft disclosure, approved PNG wordmark and canonical HTTPS www address.
 
 ## Next execution checks (on demand, no scheduled task created)
 **At first Facebook post, Oct 12 after 9 AM ET:** verify actual public post URL, visible image/text, tagged destination and landing CTA. Record any Metricool error. Verify publication again on Instagram Oct 13 after 10 AM ET.
