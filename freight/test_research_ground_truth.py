@@ -100,6 +100,8 @@ class InvoiceGroundTruthTests(unittest.TestCase):
         self.assertGreater(a["effective_on"], b["cases"][4]["shipment_on"])
         row = run_ground_truth(as_of=AS_OF)["cases"][4]
         self.assertEqual(row["status"], "HOLD_RATE_EFFECTIVE_DATE")
+        self.assertIsNone(row["billed_difference_cents_fictional"])
+        self.assertIsNone(row["cash_above_mock_expected_cents_not_a_refund_right"])
 
     def test_two_blinded_reviewers_disagree_without_auto_majority(self):
         row = run_ground_truth(as_of=AS_OF)["cases"][5]
@@ -122,6 +124,8 @@ class InvoiceGroundTruthTests(unittest.TestCase):
     def test_authority_for_wrong_carrier_is_inadmissible(self):
         row = run_ground_truth(as_of=AS_OF)["cases"][8]
         self.assertEqual(row["status"], "HOLD_CARRIER_SCOPE_MISMATCH")
+        self.assertIsNone(row["billed_difference_cents_fictional"])
+        self.assertIsNone(row["cash_above_mock_expected_cents_not_a_refund_right"])
 
     def test_carrier_credit_is_not_refunded_cash(self):
         row = run_ground_truth(as_of=AS_OF)["cases"][9]
