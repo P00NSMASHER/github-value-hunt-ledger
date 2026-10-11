@@ -143,7 +143,10 @@ def validate_protocols(book: dict, decision_register: dict, *, as_of: date) -> l
             errors.append(f"{pid}: primary metric object required")
         else:
             for key in METRIC_FIELDS:
-                if not _nonempty(metric.get(key)):
+                value = metric.get(key)
+                valid = ((type(value) is str and 3 <= len(value.strip()) <= 40)
+                         if key == "unit" else _nonempty(value))
+                if not valid:
                     errors.append(f"{pid}: missing metric {key}")
             formula = metric.get("formula", "")
             if isinstance(formula, str) and (" / " not in formula or "denominator=0" not in formula):
