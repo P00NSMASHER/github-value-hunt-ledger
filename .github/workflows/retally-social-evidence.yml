@@ -59,6 +59,25 @@ jobs:
           assert all(c['evidence_state']=='PROVIDER_REPORTED_UNVERIFIED' for c in result['candidates'])
           print('SYNTHETIC Metricool rows joined, publication unverified and no metric export PASS')
           PY
+      - name: Check prelaunch queue drift detection (no network)
+        run: |
+          python3 freight/brand/social/performance/queue_preflight.py \
+            --baseline freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --current freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-preflight.json" \
+            --output "$RUNNER_TEMP/retally-preflight.md" \
+            --fail-on-risk
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-preflight.json').read_text())
+          assert result['baseline_active'] == result['current_active'] == 13
+          assert result['baseline_drafts'] == result['current_drafts'] == 4
+          assert result['severity_counts'] == {'HIGH':0, 'WARN':0, 'INFO':0}
+          assert result['publication_verification'] == 'NOT_CHECKED'
+          print('RETALLY frozen social queue preflight PASS; no external changes')
+          PY
       - name: Validate frozen real launch-planner snapshot
         run: |
           python3 freight/brand/social/performance/social_review.py \
