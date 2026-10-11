@@ -94,7 +94,8 @@ class CfsForhireModeTests(unittest.TestCase):
         self.assertTrue(row["combined_naics_484_and_captive_warehouse_population"])
         self.assertIn("NAICS 484",r["caveat"])
         self.assertIn("public-service warehouses excluded",r["caveat"])
-        self.assertNotIn("only warehouse",row["label"].lower())
+        self.assertIn("not only warehouses",row["label"].lower())
+        self.assertIn("4931/484",row["label"])
 
     def test_unqualified_suppressed_source_cells_are_never_zero_or_imputed(self):
         r=build_forhire(as_of=TODAY)
