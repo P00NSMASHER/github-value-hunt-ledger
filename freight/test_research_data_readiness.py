@@ -160,6 +160,18 @@ class PublicFreightDataReadinessTests(unittest.TestCase):
             b,p = altered("census.cfs2022.pums", "documentation_url", uri)
             self.assertTrue(validate_catalog(b,p,as_of=DAY), uri)
 
+    def test_publisher_and_research_document_are_version_pinned(self):
+        b,p = altered("census.cfs2022.pums", "publisher", "Fake Census Authority")
+        self.assertIn("publisher provenance mismatched", "; ".join(
+            validate_catalog(b,p,as_of=DAY)))
+        b,p = altered("bts.faf6.regional", "documentation_url",
+                      "https://www.bts.gov/other-data")
+        self.assertIn("documentation URL provenance mismatched", "; ".join(
+            validate_catalog(b,p,as_of=DAY)))
+        b,p = altered("census.cfs2022.pums", "release_on", "2025-01-01")
+        self.assertIn("source release chronology", "; ".join(
+            validate_catalog(b,p,as_of=DAY)))
+
     def test_duplicate_and_removed_source_are_rejected(self):
         b,p = fixture()
         b["sources"][1]["id"] = b["sources"][0]["id"]
@@ -245,6 +257,10 @@ class PublicFreightDataReadinessTests(unittest.TestCase):
         self.assertEqual(later["datasets_imported"],0)
         self.assertEqual(later["invoice_ground_truth_benchmarks"],0)
         self.assertFalse(later["public_performance_claims_allowed"])
+        self.assertEqual(later["metadata_refresh_window_days"],90)
+        self.assertEqual(later["metadata_sources_due_for_recheck"],7)
+        self.assertTrue(all(x["status"]=="PUBLIC_METADATA_STALE_RECHECK"
+                            and x["source_recheck_due"] for x in later["review_queue"]))
 
     def test_row_malformed_nested_scalar_is_held_not_promoted(self):
         for key,value in (
