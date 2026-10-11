@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "scope": "RETALLY_LAB14_INDUSTRY_COMPARISON_SURVEY_GOODS_ONLY",
+  "observed_on": "2026-10-11",
+  "survey_year": 2022,
+  "data_sources": [
+    "CF2200A18",
+    "CF2200A19",
+    "CF2200A01"
+  ],
+  "source_lineage": "SAME_CFS_2022_SURVEY_SHARED_EVIDENCE_NOT_THREE_INDEPENDENT_MARKETS",
+  "units": {
+    "value": "MILLIONS_USD_OF_GOODS_SHIPPED",
+    "weight": "THOUSAND_TONS_OF_SHIPPED_GOODS"
+  },
+  "privacy_or_customer_source_data_used": false,
+  "local_original_archives_replayed_in_ci": false,
+  "source_subpopulation_coverage_complete": false,
+  "industry_forhire_rows_verified_for_each_segment": false,
+  "paid_ltl_invoice_total_known": false,
+  "actual_audit_revenue_tam_known": false,
+  "customer_demand_established": false,
+  "real_external_claims_or_actions_authorized": false,
+  "public_marketing_accuracy_claims_authorized": false,
+  "new_lab_created": false,
+  "method": "Direct 2022 national all-mode NAICS estimates. National all-mode total denominators from unchanged A01/A18/A19. Do not sum parent-child NAICS or combine A18 and A19; calculate no within-sector for-hire fractions until individual raw rows, flags and CV are verified.",
+  "analysis_profiles": [
+    {
+      "id": "manufacturing",
+      "naics": "31-33",
+      "source_label": "Manufacturing establishments",
+      "question": "Among consenting manufacturers, what share of third-party freight spend is actual LTL paid invoices, and which charge families have independently adjudicated errors?",
+      "counterargument": "CFS high goods value may reflect valuable products, own-account trucking, truckload modes or multi-stage shipments rather than addressable LTL freight bills.",
+      "disproof": "A rights-cleared representative paid-invoice sample shows no material LTL invoice volume, low bill complexity, or almost no correctly confirmed recoverable errors.",
+      "sector_research_order_not_market_rank": 1,
+      "source_status": "CFS2022_ALL_MODE_DIRECT_TOTAL_ONLY"
+    },
+    {
+      "id": "wholesale",
+      "naics": "42",
+      "source_label": "Wholesale trade establishments",
+      "question": "Do wholesaler accounts actually pay third-party LTL invoices with enough contract/accessorial variation to justify a second-look recovery workflow?",
+      "counterargument": "Wholesale goods are often reshipped from manufacturers; summing CFS goods values or converting them to audit fees double-counts cargo and invents transport spending.",
+      "disproof": "A stratified invoice study finds most movements parcel/TL/company-owned, few paid LTL bills or limited recoverable invoice variance.",
+      "sector_research_order_not_market_rank": 2,
+      "source_status": "CFS2022_ALL_MODE_DIRECT_TOTAL_ONLY"
+    },
+    {
+      "id": "warehousing",
+      "naics": "4931",
+      "source_label": "Warehousing and storage establishments",
+      "question": "Which warehouse operators are the legal freight-payable buyer rather than a third-party handler, and what is their directly paid LTL invoice exposure?",
+      "counterargument": "Storage/fulfillment businesses may handle shipments without being the shipper of record or liable for transportation charges; high shipment value does not make them buyers.",
+      "disproof": "Documented authority mapping shows most operators do not own carrier payment, cannot share invoices or have no applicable LTL bills.",
+      "sector_research_order_not_market_rank": 3,
+      "source_status": "CFS2022_ALL_MODE_DIRECT_TOTAL_ONLY"
+    }
+  ],
+  "independent_evidence_gaps": [
+    {
+      "id": "source_consistency",
+      "description": "Verify national A18/A19 totals, survey year and original observed ZIP hashes",
+      "required_evidence": "Unchanged 2022 CFS original rows with national geography and mode identities; browser source hashes and a future separate local raw ZIP replay",
+      "dependency": "M12_AND_M14_PUBLIC_SOURCE",
+      "approved": false
+    },
+    {
+      "id": "mode_segmentation",
+      "description": "Measure industry-specific for-hire trucking instead of assuming all trucks are LTL",
+      "required_evidence": "Direct national NAICS 31-33/42/4931 x DMODE 111 rows with total SHIPDIST 001 and SHIPWT 01, all VAL/TON/CV flags checked",
+      "dependency": "A18_A19_INDUSTRY_FORHIRE_DIRECT_ROWS_NOT_YET_REPRODUCED",
+      "approved": false
+    },
+    {
+      "id": "distance_weight",
+      "description": "Compare shipment distance and weight after checking additive strata and suppression",
+      "required_evidence": "Mode 111 per-industry SHIPDIST 02-10 / SHIPWT 02-10 with independent totals, CV flags, nonoverlap, rounding tolerance and denominator matching",
+      "dependency": "ORIGINAL_BUCKET_LEVEL_ROWS_AND_NONCOMPARABLE_FLAGS",
+      "approved": false
+    },
+    {
+      "id": "customer_reality",
+      "description": "Determine actual paid LTL invoice incidence and contractual authority",
+      "required_evidence": "Human-authorized invoices matched to shipment, carrier, customer contract, payment, historical tariff and an independent adjudicator",
+      "dependency": "MISSION11_18_UNMET_BUYER_PILOT_CONTROLS",
+      "approved": false
+    }
+  ],
+  "prohibited_measures": [
+    "ANNUAL_LTL_PAID_BILLS",
+    "LTL_ONLY_FOR_HIRE_SHARE_BY_NAICS",
+    "OVERCHARGE_FREQUENCY",
+    "RECOVERABLE_CASH",
+    "FEES_COLLECTED",
+    "BUYER_PROPENSITY",
+    "MARKET_TAM_OR_SHARE",
+    "COMPETITOR_SUPERIORITY"
+  ],
+  "recommended_source_action": "Prepare read-only authorized, original-SHA-pinned extraction of direct NAICS x DMODE 111 total SHIPDIST and SHIPWT rows; keep uncertain/suppressed values missing rather than converting to zero."
+}
