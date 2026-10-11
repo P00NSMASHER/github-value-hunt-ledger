@@ -92,10 +92,10 @@ def _meaningful(raw: object, minimum: int = 24, maximum: int = 700) -> bool:
 # This only detects obvious accidentally pasted sensitive details; it cannot
 # replace a governed privacy review of any eventual real source document.
 _OBVIOUS_SENSITIVE = (
-    re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"),
-    re.compile(r"\\b\\d{3}-\\d{2}-\\d{4}\\b"),
-    re.compile(r"\\b(?:\\+?1[-. ]?)?\\(?\\d{3}\\)?[-. ]?\\d{3}[-. ]?\\d{4}\\b"),
-    re.compile(r"(?:/mnt/|/home/|C:\\\\Users\\\\|Bearer\\s+|ghp_[A-Za-z0-9]{12,}|sk-[A-Za-z0-9]{12,})", re.I),
+    re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"),
+    re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
+    re.compile(r"\b(?:\+?1[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}\b"),
+    re.compile(r"(?:/mnt/|/home/|C:\\Users\\|Bearer\s+|ghp_[A-Za-z0-9]{12,}|sk-[A-Za-z0-9]{12,})", re.I),
 )
 
 
