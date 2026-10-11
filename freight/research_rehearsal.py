@@ -103,9 +103,21 @@ def validate_fixture_book(book: dict, protocol_report: dict, *, as_of: date) -> 
         errors.append("explicit invented-case disclaimer required")
     if (type(protocol_report) is not dict or
         protocol_report.get("scope") != "LAB14_INTERNAL_STUDY_DESIGN_REVIEW_ONLY" or
-        protocol_report.get("external_studies_executed") != 0 or
-        protocol_report.get("public_performance_claims_allowed") is not False):
+        type(protocol_report.get("external_studies_executed")) is not int or
+        protocol_report["external_studies_executed"] != 0 or
+        type(protocol_report.get("observed_customer_outcomes")) is not int or
+        protocol_report["observed_customer_outcomes"] != 0 or
+        type(protocol_report.get("approved_preregistrations")) is not int or
+        protocol_report["approved_preregistrations"] != 0 or
+        protocol_report.get("external_actions_allowed") is not False or
+        protocol_report.get("public_performance_claims_allowed") is not False or
+        protocol_report.get("existing_lab_number") != 14 or
+        protocol_report.get("new_lab_created") is not False):
         return errors + ["original Mission 7 blocked protocol report required"]
+    if protocol_report.get("receipt_sha256") != canon_hash({
+        k: v for k, v in protocol_report.items() if k != "receipt_sha256"
+    }):
+        return errors + ["tampered Mission 7 protocol receipt"]
     original_protocols = protocol_report.get("protocols")
     if type(original_protocols) is not list or len(original_protocols) != 6:
         return errors + ["all six validated Mission 7 protocols required"]
