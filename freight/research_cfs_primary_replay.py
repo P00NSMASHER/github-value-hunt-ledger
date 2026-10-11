@@ -127,6 +127,9 @@ def _verify_archive(table: str, raw: bytes, frozen: dict) -> dict:
     raw_dat = archive.read(table + ".dat")
     if len(raw_dat) != spec["mirror_file_bytes"]:
         raise ValueError("OFFICIAL_DAT_BYTE_LENGTH_DIFFERS:" + table)
+    official_dat_git_blob_sha1 = _git_blob_sha1(raw_dat)
+    if official_dat_git_blob_sha1 != spec["mirror_git_blob_sha1"]:
+        raise ValueError("FULL_ORIGINAL_DAT_DIFFERS_FROM_PINNED_GITHUB_MIRROR:" + table)
     matched = _selected_rows(table, records, frozen)
     return {
         **matched,
@@ -135,9 +138,10 @@ def _verify_archive(table: str, raw: bytes, frozen: dict) -> dict:
         "official_archive_bytes": len(raw),
         "official_member": table + ".dat",
         "official_member_sha256": sha256(raw_dat).hexdigest(),
+        "official_member_git_blob_sha1": official_dat_git_blob_sha1,
         "official_member_bytes": len(raw_dat),
         "official_member_rows": len(records),
-        "whole_dat_file_identical_to_git_mirror_proven": False,
+        "whole_dat_file_identical_to_git_mirror_proven": True,
     }
 
 
@@ -176,7 +180,8 @@ def replay(*, as_of: date, zip_bytes: dict[str, bytes],
         "source_archive_sha256_previously_observed_in_browser": True,
         "tables": results, "selected_rows_matched": 60,
         "source_bytes_replayed_this_run": True,
-        "github_mirror_all_rows_byte_identical_to_census_proven": False,
+        "github_mirror_other_tables_or_other_repo_files_proven": False,
+        "a18_a19_full_mirror_dat_files_match_official_original_dat_bytes": True,
         "publisher_digitally_signed_archive_verified": False,
         "official_host_https_used_this_run": acquisition.startswith("DIRECT_"),
         "same_survey_two_tables_not_independent_research_samples": True,
@@ -189,11 +194,13 @@ def replay(*, as_of: date, zip_bytes: dict[str, bytes],
         "customer_or_carrier_records_processed": False,
         "new_lab_created": False, "lab": 14,
         "caveat": (
-            "Official archived bytes match previously observed government ZIP "
-            "SHA-256 and selected sixty Census values/flags. This does not "
-            "authenticate a publisher digital signature, establish LTL-only "
+            "Official archived ZIP SHA-256s match previously observed government "
+            "values; both extracted full A18/A19 DAT members also match the "
+            "pinned GitHub mirror's content-addressed Git blob IDs, and all "
+            "sixty selected Census source cells were independently compared. "
+            "This does not establish a publisher digital signature, LTL-only "
             "invoice spend, annual carrier charges, market demand, recoveries, "
-            "the full third-party mirror, or joint distance/weight distributions. "
+            "other third-party repo files, or joint distance/weight distributions. "
             "CFS NAICS 4931 includes NAICS 484; censored S cells are not zeros."
         ),
     }
