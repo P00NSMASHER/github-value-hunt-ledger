@@ -1,0 +1,46 @@
+name: RETALLY Lab 14 AIES Census Original FTP (Mission 19)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-aies-original-ftp.yml'
+      - 'freight/research_aies_original_ftp.py'
+      - 'freight/test_research_aies_original_ftp.py'
+      - 'freight/RESEARCH_AIES_ORIGINAL_FTP.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-source-inspection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Inspect original Census 2024 AIES archive headers and reporting grain
+        run: |
+          python - <<'PY'
+          import csv, hashlib, io, json, urllib.request, zipfile
+          url="https://www2.census.gov/programs-surveys/aies/data/2024/AIES00BASIC.zip"
+          req=urllib.request.Request(url,headers={"User-Agent":"RETALLY-Lab14-Primary-Source-Research/1.0"})
+          with urllib.request.urlopen(req,timeout=35) as response:
+              assert response.geturl()==url, "publisher redirect"
+              raw=response.read(2_000_001)
+          assert raw.startswith(b"PK\x03\x04") and len(raw)<2_000_001
+          print("PUBLISHER_ZIP",len(raw),hashlib.sha256(raw).hexdigest())
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              for e in z.infolist():
+                  print("ZIP_MEMBER",e.filename,"size",e.file_size)
+                  if e.is_dir() or e.file_size>38_000_000: continue
+                  if e.filename.lower().endswith((".csv",".dat",".txt")):
+                      data=z.read(e)
+                      try: txt=data.decode("utf-8-sig")
+                      except UnicodeError: continue
+                      lines=txt.splitlines()
+                      print("SOURCE_MEMBER",e.filename,"FIRST_HEADER",repr(lines[0][:1400] if lines else "EMPTY"),"LINE_COUNT",len(lines))
+                      for line in lines[1:]:
+                          if any(code in line for code in ("484122","484121","Truck Transportation")):
+                              print("POTENTIAL_AGGREGATE_ROW",repr(line[:1600]))
+                              if sum(1 for l in lines[1:] if "484122" in l)>2: break
+          PY
