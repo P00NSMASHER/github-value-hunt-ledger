@@ -1,0 +1,26 @@
+{
+  "note": "ENTIRELY SYNTHETIC. Illustrative connector rows, not an actual Instagram publication or real customer metric.",
+  "field_ids": [
+    "IGPO01",
+    "IGPO03",
+    "IGPO06",
+    "IGPO08",
+    "IGPO13",
+    "IGPO14",
+    "IGPO15",
+    "IGPO27"
+  ],
+  "observed_at": "2026-10-14T15:00:00Z",
+  "rows": [
+    [
+      "20261013",
+      "SYNTHETIC EXAMPLE — learn more using the link in our bio.",
+      "https://www.instagram.com/p/SYNTHETIC_IG_001/",
+      "0",
+      "1",
+      "8",
+      null,
+      "0"
+    ]
+  ]
+}
