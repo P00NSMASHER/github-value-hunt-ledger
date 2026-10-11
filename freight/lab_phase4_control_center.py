@@ -17,6 +17,7 @@ from freight.research_intelligence import render_html as render_research_html
 from freight.research_public_campaign import campaign_brief
 from freight.research_evidence_gate import run_mission, render_html as render_opposition_html
 from freight.research_change_impact import build_refresh_queue, render_html as render_refresh_html
+from freight.research_validation_protocols import build_protocol_report, render_html as render_protocol_html
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -42,6 +43,9 @@ def snapshot(max_labs: int=14) -> dict:
         result["source_review_queue"]=build_refresh_queue(
             registry=campaign_registry(as_of=date.today()),
             proof=proof, decisions=decisions, as_of=date.today()
+        )
+        result["validation_protocols"]=build_protocol_report(
+            as_of=date.today(), decisions=decisions
         )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
@@ -80,6 +84,7 @@ def render(data: dict) -> str:
         for row in opposition["decisions"]
     )
     source_queue=data["source_review_queue"]
+    validation=data["validation_protocols"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -132,6 +137,13 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:22px;font-si
 """ +str(source_queue["due_within_30_days"])+""" due within 30 days ·
 """ +str(source_queue["expired_count"])+""" expired.</p>
 <a href="research_refresh.html">Open Source Change Radar ↗</a></section>
+<section class="panel"><h2>Six falsifiable validation protocols</h2>
+<p>Research designs, not executed customer studies. No sample-size thresholds, buyer permissions,
+blind adjudication, or independent outcomes have been approved.</p>
+<p>""" +str(validation["protocol_count"])+""" source-bound designs ·
+""" +str(validation["external_studies_executed"])+""" external studies completed ·
+""" +str(validation["observed_customer_outcomes"])+""" customer outcomes established.</p>
+<a href="validation_protocols.html">Open Validation Protocols ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -169,6 +181,13 @@ def main():
     )
     (args.out/"research_refresh.html").write_text(
         render_refresh_html(data["source_review_queue"]),encoding="utf-8"
+    )
+    (args.out/"validation_protocols.json").write_text(
+        json.dumps(data["validation_protocols"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"validation_protocols.html").write_text(
+        render_protocol_html(data["validation_protocols"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
