@@ -128,3 +128,33 @@ Inspect each candidate on the real public Facebook or Instagram platform. Create
 Safety and quality rules: Match **unique**, exactly Unicode/whitespace-normalized captions on the same network and within ±1 day of the intended Eastern publication date; forbid malformed or lookalike/public-profile URLs; reject duplicate or ambiguous analytics rows; treat null as unknown, not zero; reject negative, fractional, missing and future-dated evidence. Ignore unrelated introductory posts not contained in the frozen October campaign instead of assigning their results to another post.
 
 Test with the included fixture-facebook-metricool-SYNTHETIC.json and fixture-instagram-metricool-SYNTHETIC.json, both explicitly fictional. The existing repository workflow runs all performance tests and verifies that 2 synthetic provider matches yield **0 independently verified publications and 0 exportable verified metric rows**. No scheduled task or external credentials are added.
+
+
+## October pre-publication queue-drift check (on demand; no automation)
+
+Use **queue_preflight.py** to compare the immutable October 11 source-of-truth launch snapshot with a fresh, independently retrieved Metricool getScheduledPosts JSON export. It extends the existing social_review workflow and is not a parallel publication tracker. Source post IDs are matched by stable UUID, never Metricool's mutable numeric IDs.
+
+From the repo root:
+
+~~~bash
+python3 freight/brand/social/performance/queue_preflight.py \
+  --baseline freight/brand/social/performance/baselines/retally-2026-10-11.json \
+  --current /path/to/fresh-metricool-planner.json \
+  --as-of "2026-10-11T15:00:00Z" \
+  --output /tmp/retally-queue-preflight.md \
+  --json-output /tmp/retally-queue-preflight.json \
+  --fail-on-risk
+~~~
+
+Save a fresh getScheduledPosts result covering **Oct 11–Nov 10** to the current input file. Export may be a plain JSON object with a data array or the connector JSON string inside text. **Do not silently substitute the October 11 baseline for the current export** when running a real prelaunch check. The PR-only unit workflow deliberately compares baseline to itself to verify the parser safely without accessing external accounts.
+
+The comparison detects:
+- **HIGH**: missing future active post, changed UTC publishing instant (including DST errors), disabled autopublish, draft made active, unapproved new live post, changed media, provider error, missing Facebook tracking link or changed format (for example, Reel).
+- **WARN**: changed caption, altered or missing alternative text, missing Instagram bio-link instruction or a review draft absent from the latest upcoming feed.
+- **INFO**: additional review-only drafts, nonerror provider state change or scheduled post disappearing after its due date.
+
+**Important:** Disappearance after a post's due time is not evidence of successful publication or failure. This tool does not check live public-platform permalinks, diagnose a queued-post outage, or open website forms. Continue using social_review.py and metricool_join.py with independently observed publication links and post-level analytics for actual publication and performance. An all-clear preflight means only that the compared upcoming schedule contained no detected high-risk changes, not that Facebook or Instagram accepted the post.
+
+The tool never makes network requests, changes schedule entries, updates Facebook/Instagram, reads customer records or creates recurring tasks. The --fail-on-risk flag exits with code 2 on HIGH-severity findings; without it the tool always emits a report for manual inspection. No tokens or account credentials are required. Preserve the source export date and compare before the first scheduled Oct 12 9 AM Eastern Facebook slot, then inspect actual publication on the live page.
+
+The fresh getScheduledPosts result may include unrelated YouTube/LinkedIn items. Those are explicitly ignored by the Facebook/Instagram drift check. The two additional November Field Notes drafts beyond the frozen source should appear as informational additions, never permission to publish.
