@@ -185,6 +185,17 @@ class InvoiceGroundTruthTests(unittest.TestCase):
         self.assertIn("orphan or missing", "; ".join(
             validate_fixtures(b,p,as_of=AS_OF)))
 
+    def test_fictional_blind_duplicate_votes_require_payment_documents(self):
+        b,p=fixtures()
+        case=b["cases"][2]
+        refs=case["reviewers"][0]["evidence_document_ids"]
+        self.assertTrue(any("DOC-PAY" in r for r in refs))
+        case["reviewers"][0]["evidence_document_ids"]=[
+            x for x in refs if "DOC-PAY" not in x
+        ]
+        self.assertIn("missing documented reviewer evidence","; ".join(
+            validate_fixtures(b,p,as_of=AS_OF)))
+
     def test_wrong_rate_interval_and_scope_are_rejected_or_held(self):
         b,p = fixtures()
         b["cases"][0]["authority"]["expires_on"] = "2025-01-01"
