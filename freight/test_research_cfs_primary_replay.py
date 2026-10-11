@@ -2,12 +2,17 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import csv
 from datetime import date
 from hashlib import sha256
 from html import escape
+import io
 import unittest
+from unittest.mock import patch
+from zipfile import ZipFile, ZIP_DEFLATED
 
-from freight.research_cfs_mode_hierarchy import TABLES
+from freight.research_cfs_mode_hierarchy import TABLES, _git_blob_sha1
+from freight.research_cfs_industry_quality import OFFICIAL_PROFILES
 from freight.research_cfs_primary_replay import (
     COMMON_NATIONAL, SCOPE, SELECTED_FIELDS, TABLE_AXIS, _frozen_book,
     _official_download, _selected_rows, _verify_archive, render_html, replay,
@@ -125,6 +130,38 @@ class PrimarySourceReplayTests(unittest.TestCase):
         for data in [b"PK\\x03\\x04garbage", b"", b"not a census archive"]:
             with self.assertRaises(ValueError):
                 _verify_archive("CF2200A18", data, b)
+
+    def test_complete_dat_blob_identity_gate_even_when_all_selected_cells_match(self):
+        table = "CF2200A18"
+        book, rows = fixture(table)
+        header = OFFICIAL_PROFILES[table]["header"].split("|")
+        buf = io.StringIO(newline="")
+        writer = csv.DictWriter(buf, fieldnames=header, delimiter="|",
+                                extrasaction="ignore", lineterminator="\\n")
+        writer.writeheader()
+        writer.writerows(rows)
+        dat = buf.getvalue().encode("utf-8")
+        zipped = io.BytesIO()
+        with ZipFile(zipped, "w", compression=ZIP_DEFLATED) as z:
+            z.writestr(table + ".dat", dat)
+        raw_zip = zipped.getvalue()
+        fake_source_profile = {
+            "original_zip_size_bytes": len(raw_zip),
+            "original_zip_sha256": sha256(raw_zip).hexdigest(),
+            "mirror_file_bytes": len(dat),
+            "mirror_file_row_count": len(rows),
+            "mirror_git_blob_sha1": _git_blob_sha1(dat),
+        }
+        with patch.dict(TABLES[table], fake_source_profile):
+            valid = _verify_archive(table, raw_zip, book)
+            self.assertTrue(valid["whole_dat_file_identical_to_git_mirror_proven"])
+            self.assertEqual(valid["selected_rows_matched"], 30)
+            # Even an otherwise valid original source cannot be promoted if the
+            # pinned full mirror Git blob disagrees with the original DAT.
+            TABLES[table]["mirror_git_blob_sha1"] = "0" * 40
+            with self.assertRaisesRegex(ValueError,
+                                        "FULL_ORIGINAL_DAT_DIFFERS_FROM_PINNED_GITHUB_MIRROR"):
+                _verify_archive(table, raw_zip, book)
 
     def test_replay_requires_both_verified_tables(self):
         with self.assertRaisesRegex(ValueError, "EXACTLY_TWO_ARCHIVES"):
