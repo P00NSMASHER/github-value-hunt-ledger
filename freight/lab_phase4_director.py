@@ -339,6 +339,27 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_industry["official_archives"][0]["value_flag_counts"]["S"]=0
         _must(bool(validate_industry_manifest(forged_industry,as_of=today)),
               "FABRICATED_CFS_INDUSTRY_QUALITY_COUNTS_ACCEPTED")
+        from freight.research_industry_comparison import (
+            build_comparison, validate_plan as validate_industry_comparison_plan,
+        )
+        compared=build_comparison(as_of=today,market_report=cfs_market)
+        _must(compared["n_industries"]==3,
+              "DIRECT_CENSUS_INDUSTRY_COMPARISON_MISSING")
+        _must(compared["industry_comparisons"][0][
+            "source_value_share_of_survey_covered_us_pct"]=="39.30",
+              "INCORRECT_CENSUS_INDUSTRY_DENOMINATOR")
+        _must(compared["market_or_customer_rankings_created"]==0 and
+              compared["ltl_market_tam_usd"] is None,
+              "UNVERIFIED_FREIGHT_RECOVERY_MARKET_PROMOTED")
+        _must(all(row["within_industry_for_hire_shipment_value_share_pct"] is None
+                  for row in compared["industry_comparisons"]),
+              "MISSING_INDUSTRY_FORHIRE_SHARES_HALLUCINATED")
+        falsified=_read("research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json")
+        falsified["analysis_profiles"][2]["naics"]="493"
+        _must(bool(validate_industry_comparison_plan(
+            falsified,_read("research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json"),
+            as_of=today)),
+            "UNVERIFIED_WAREHOUSE_NAICS_SUBSTITUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -377,6 +398,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "cfs_industry_origins_observed":industry["public_archive_leads"],
                 "cfs_industry_remote_source_rows":industry["remote_browser_original_rows_observed"],
                 "cfs_industry_data_receipt_sha256":industry["receipt_sha256"],
+                "cfs_three_sector_source_comparisons":compared["n_industries"],
+                "cfs_industry_comparison_receipt_sha256":compared["receipt_sha256"],
+                "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,
                 "independent_customer_studies_completed":0,

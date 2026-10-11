@@ -31,6 +31,10 @@ from freight.research_cfs_industry_quality import (
     build_readiness as build_cfs_industry_readiness,
     render_html as render_cfs_industry_html,
 )
+from freight.research_industry_comparison import (
+    build_comparison as build_industry_comparison,
+    render_html as render_industry_comparison_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -81,6 +85,9 @@ def snapshot(max_labs: int=14) -> dict:
         )
         result["cfs_source_byte_readiness"]=build_cfs_byte_readiness(as_of=date.today())
         result["cfs_industry_quality"]=build_cfs_industry_readiness(as_of=date.today())
+        result["cfs_industry_comparison"]=build_industry_comparison(
+            as_of=date.today(),market_report=result["cfs_market_audit"]
+        )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -126,6 +133,7 @@ def render(data: dict) -> str:
     market=data["cfs_market_audit"]
     source_bytes=data["cfs_source_byte_readiness"]
     industry=data["cfs_industry_quality"]
+    comparison=data["cfs_industry_comparison"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -241,6 +249,14 @@ or buyer demand data has been established.</p>
 """ +str(industry["source_rows_from_full_files_replayed_in_ci"])+""" original rows rerun in CI ·
 """ +str(industry["market_share_claims_approved"])+""" freight-audit market claims approved.</p>
 <a href="cfs_industry_quality.html">Open Census Industry Quality &amp; Hypotheses ↗</a></section>
+<section class="panel"><h2>Quantitative industry research — value and source quality</h2>
+<p>Direct Census all-mode totals for manufacturing, wholesale and warehousing. Figures
+are shipped goods, NOT paid LTL carrier bills or a recovery market estimate.
+Mode-specific industry cells and buyer demand remain unverified.</p>
+<p>""" +str(comparison["n_industries"])+""" industry comparisons ·
+""" +str(len(comparison["research_gates"]))+""" unresolved independent evidence gates ·
+""" +str(comparison["market_or_customer_rankings_created"])+""" commercial buyer rankings.</p>
+<a href="cfs_industry_comparison.html">Open Industry Evidence &amp; Falsification ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -334,6 +350,13 @@ def main():
     )
     (args.out/"cfs_industry_quality.html").write_text(
         render_cfs_industry_html(data["cfs_industry_quality"]),encoding="utf-8"
+    )
+    (args.out/"cfs_industry_comparison.json").write_text(
+        json.dumps(data["cfs_industry_comparison"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"cfs_industry_comparison.html").write_text(
+        render_industry_comparison_html(data["cfs_industry_comparison"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
