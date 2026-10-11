@@ -200,10 +200,13 @@ def validate_catalog(book: dict, protocols: dict, *, as_of: date) -> list[str]:
             errors.append(f"{ident}: source URL provenance mismatched")
         if not _https_url(s["documentation_url"]):
             errors.append(f"{ident}: unsafe documentation URL")
-        url_host = urlsplit(s["documentation_url"]).hostname
+        try:
+            url_host = (urlsplit(s["documentation_url"]).hostname
+                        if type(s["documentation_url"]) is str else None)
+        except ValueError:
+            url_host = None
         allowed_hosts = {"www.census.gov", "www.bts.gov", "rosap.ntl.bts.gov",
-                         "support.edifabric.com", "github.com",
-                         "x12.org"}
+                         "support.edifabric.com", "github.com", "x12.org"}
         if url_host not in allowed_hosts:
             errors.append(f"{ident}: documentation host outside approved review set")
         if s["source_kind"] != ref["kind"] or s["source_kind"] not in SOURCE_KINDS:
