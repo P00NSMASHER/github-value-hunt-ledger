@@ -13,6 +13,10 @@ on:
       - 'freight/research_change_impact.py'
       - 'freight/test_research_change_impact.py'
       - 'freight/RESEARCH_SOURCE_CHANGE_RADAR.md'
+      - 'freight/research_validation_protocols.py'
+      - 'freight/test_research_validation_protocols.py'
+      - 'freight/research/VALIDATION_PROTOCOLS_20261010.json'
+      - 'freight/RESEARCH_VALIDATION_PROTOCOLS.md'
       - 'freight/research/SOURCE_ANCHORS_20261010.json'
       - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
@@ -42,7 +46,7 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
           PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
@@ -110,6 +114,30 @@ jobs:
           assert 'Source Change Radar' in (p/'research_refresh.html').read_text()
           print('Source refresh work queue generated. No live capture, scheduler, or verification promotion.')
           PY
+      - name: Produce blocked, source-bound falsifiable validation study designs
+        run: |
+          PYTHONPATH=. python -m freight.research_validation_protocols --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'validation_protocols.json').read_text())
+          assert r['scope']=='LAB14_INTERNAL_STUDY_DESIGN_REVIEW_ONLY'
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          assert r['protocol_count']==6
+          assert r['external_studies_executed']==0
+          assert r['observed_customer_outcomes']==0
+          assert r['approved_preregistrations']==0
+          assert r['external_actions_allowed'] is False
+          assert r['public_performance_claims_allowed'] is False
+          assert all(x['status']=='DESIGN_REVIEW_REQUIRED_NOT_EXECUTED'
+                     and x['actual_sample_count']==0
+                     and x['can_publish_customer_results'] is False
+                     for x in r['protocols'])
+          assert len(r['receipt_sha256'])==64
+          assert 'Zero independent customer outcomes' in (p/'validation_protocols.html').read_text()
+          print('Six research protocols, zero executed studies, no external operations.')
+          PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -122,5 +150,7 @@ jobs:
             /tmp/retally-research-intelligence/opposition.html
             /tmp/retally-research-intelligence/research_refresh_queue.json
             /tmp/retally-research-intelligence/research_refresh.html
+            /tmp/retally-research-intelligence/validation_protocols.json
+            /tmp/retally-research-intelligence/validation_protocols.html
           if-no-files-found: error
           retention-days: 14

@@ -200,6 +200,19 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         _must(queue["automatic_fetch_or_schedule"] is False,"UNAPPROVED_AUTOMATIC_RESEARCH")
         _must(not queue["any_sources_independently_fact_checked"],
               "SOURCE_FRESHNESS_MISLABELED_AS_FACT_CHECKING")
+        from freight.research_validation_protocols import (
+            build_protocol_report, validate_protocols,
+        )
+        validation=build_protocol_report(as_of=today, decisions=opposition)
+        _must(validation["protocol_count"]==6,"MISSING_STUDY_DESIGN_COVERAGE")
+        _must(validation["observed_customer_outcomes"]==0,
+              "UNVERIFIED_CUSTOMER_EXPERIMENT_PROMOTED")
+        _must(all(not x["can_publish_customer_results"]
+                  for x in validation["protocols"]),"UNAPPROVED_STUDY_PUBLICATION")
+        forged_protocols=_read("research/VALIDATION_PROTOCOLS_20261010.json")
+        forged_protocols["experiments"][0]["observed_sample_count"]=99
+        _must(bool(validate_protocols(forged_protocols, opposition, as_of=today)),
+              "FAKE_STUDY_OUTCOME_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -214,6 +227,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "opposition_receipt_sha256":opposition["receipt_sha256"],
                 "refresh_queue_sources":queue["source_count"],
                 "refresh_queue_receipt_sha256":queue["receipt_sha256"],
+                "validation_design_count":validation["protocol_count"],
+                "validation_design_receipt_sha256":validation["receipt_sha256"],
+                "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
 
