@@ -22,13 +22,35 @@
       "source_index_url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
       "dataset_grain": "NAICS2017_X_DMODE_X_SHIPDIST_US_2022",
       "published_table_row_count": 7312,
-      "original_zip_size_bytes": null,
-      "original_zip_sha256": null,
-      "original_archive_observed_by_read_only_browser": false,
+      "original_zip_size_bytes": 93390,
+      "original_zip_sha256": "a18ce071599457572177dd56f8a6174594d1018da9b9024476c4e9832a357bf5",
+      "original_archive_observed_by_read_only_browser": true,
       "local_ci_replay_of_original": false,
       "table_member": "CF2200A18.dat",
-      "original_member_structure_inspected": false,
-      "source_limit": "Shipment value is value of goods and weights are tons; distance buckets and NAICS rollups overlap in totals. No freight-invoice spend."
+      "original_member_structure_inspected": true,
+      "source_limit": "Shipment value is value of goods and weights are tons; distance buckets and NAICS rollups overlap in totals. No freight-invoice spend.",
+      "remote_observed_parsed_data_rows": 7312,
+      "remote_observed_dat_uncompressed_bytes": 1040806,
+      "original_archive_members": [
+        "CF2200A18.dat",
+        "CF2200A18_FIELDS.txt",
+        "CF2200A18_README.txt"
+      ],
+      "remote_observed_header": "#GEOTYPE|ST|GEO_ID|GEO_LABEL|GEO_ID_F|NAICS2017|NAICS2017_LABEL|NAICS2017_F|DMODE|DMODE_F|DMODE_LABEL|SHIPDIST|SHIPDIST_LABEL|YEAR|VAL|VAL_F|TON|TON_F|VAL_S|VAL_S_F|TON_S|TON_S_F",
+      "national_total_axis_code": "001",
+      "unique_naics_codes_observed": 50,
+      "unique_mode_codes_observed": 21,
+      "value_flag_counts": {
+        "blank": 5430,
+        "S": 1839,
+        "Z": 43
+      },
+      "weight_flag_counts": {
+        "blank": 4991,
+        "S": 2224,
+        "Z": 97
+      },
+      "remote_observed_value_and_tonnage_reconciled_with_A01": true
     },
     {
       "table_id": "CF2200A19",
@@ -37,13 +59,35 @@
       "source_index_url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
       "dataset_grain": "NAICS2017_X_DMODE_X_SHIPWT_US_2022",
       "published_table_row_count": 6782,
-      "original_zip_size_bytes": null,
-      "original_zip_sha256": null,
-      "original_archive_observed_by_read_only_browser": false,
+      "original_zip_size_bytes": 107682,
+      "original_zip_sha256": "fe3085d23a3c76704a0d86d9213bb38d3d341b2c228990a5ebf40b6b3f1b661d",
+      "original_archive_observed_by_read_only_browser": true,
       "local_ci_replay_of_original": false,
       "table_member": "CF2200A19.dat",
-      "original_member_structure_inspected": false,
-      "source_limit": "CFS shipment weight brackets are shipment observations, not invoice weight, load-factor or a paid LTL rate. Hierarchical categories overlap."
+      "original_member_structure_inspected": true,
+      "source_limit": "CFS shipment weight brackets are shipment observations, not invoice weight, load-factor or a paid LTL rate. Hierarchical categories overlap.",
+      "remote_observed_parsed_data_rows": 6782,
+      "remote_observed_dat_uncompressed_bytes": 1017567,
+      "original_archive_members": [
+        "CF2200A19.dat",
+        "CF2200A19_FIELDS.txt",
+        "CF2200A19_README.txt"
+      ],
+      "remote_observed_header": "#GEOTYPE|ST|GEO_ID|GEO_LABEL|GEO_ID_F|DMODE|DMODE_F|DMODE_LABEL|NAICS2017|NAICS2017_LABEL|NAICS2017_F|SHIPWT|SHIPWT_LABEL|YEAR|VAL|VAL_F|TON|TON_F|AVGMILE|AVGMILE_F|VAL_S|VAL_S_F|TON_S|TON_S_F|AVGMILE_S|AVGMILE_S_F",
+      "national_total_axis_code": "01",
+      "unique_naics_codes_observed": 50,
+      "unique_mode_codes_observed": 21,
+      "value_flag_counts": {
+        "blank": 4628,
+        "S": 2063,
+        "Z": 91
+      },
+      "weight_flag_counts": {
+        "blank": 4474,
+        "S": 1956,
+        "Z": 352
+      },
+      "remote_observed_value_and_tonnage_reconciled_with_A01": true
     }
   ],
   "research_segments": [
@@ -77,7 +121,7 @@
       "id": "warehousing",
       "category": "NAICS2017 warehousing/storage (verify inclusion in source table)",
       "candidate_naics_groups": [
-        "493"
+        "4931"
       ],
       "rank": 3,
       "hypothesis": "Warehouses/distribution operations could handle multi-stop shipping, but CFS coverage and their direct invoice-payment authority cannot be assumed.",
@@ -95,5 +139,91 @@
     "Separate company-owned and customer pickup from true for-hire trucks and never substitute for LTL-only paid invoices",
     "Keep 2022 survey goods values distinct from freight invoices, customer demand, fee-eligible recovery and annual revenue"
   ],
-  "legal_boundary": "Public Census aggregate series are statistically estimated population data, not private customer records, invoiced rates, transportation contracts, recoverable overpayments, or real-world demand evidence."
+  "legal_boundary": "Public Census aggregate series are statistically estimated population data, not private customer records, invoiced rates, transportation contracts, recoverable overpayments, or real-world demand evidence.",
+  "actual_industry_source_records": [
+    {
+      "naics": "00",
+      "label": "CFS in-scope industries total",
+      "mode": "00",
+      "value_million_usd": 17996782,
+      "weight_thousand_tons": 12169793,
+      "a18_stratum": "001",
+      "a19_stratum": "01",
+      "value_flag": "",
+      "ton_flag": "",
+      "cross_archive_direct_totals_match": true
+    },
+    {
+      "naics": "00",
+      "label": "CFS for-hire truck across all industries",
+      "mode": "111",
+      "value_million_usd": 8062541,
+      "weight_thousand_tons": 3909476,
+      "a18_stratum": "001",
+      "a19_stratum": "01",
+      "value_flag": "",
+      "ton_flag": "",
+      "cross_archive_direct_totals_match": true
+    },
+    {
+      "naics": "31-33",
+      "label": "Manufacturing establishments, all modes",
+      "mode": "00",
+      "value_million_usd": 7073495,
+      "weight_thousand_tons": 4949955,
+      "a18_stratum": "001",
+      "a19_stratum": "01",
+      "value_flag": "",
+      "ton_flag": "",
+      "cross_archive_direct_totals_match": true
+    },
+    {
+      "naics": "42",
+      "label": "Wholesale trade establishments, all modes",
+      "mode": "00",
+      "value_million_usd": 8094350,
+      "weight_thousand_tons": 4115279,
+      "a18_stratum": "001",
+      "a19_stratum": "01",
+      "value_flag": "",
+      "ton_flag": "",
+      "cross_archive_direct_totals_match": true
+    },
+    {
+      "naics": "4931",
+      "label": "Warehousing and storage establishments, all modes",
+      "mode": "00",
+      "value_million_usd": 1347716,
+      "weight_thousand_tons": 305651,
+      "a18_stratum": "001",
+      "a19_stratum": "01",
+      "value_flag": "",
+      "ton_flag": "",
+      "cross_archive_direct_totals_match": true
+    },
+    {
+      "naics": "45431",
+      "label": "Electronic shopping? for-hire tonnage flagged S; NAICS label requires source review",
+      "mode": "111",
+      "value_million_usd": null,
+      "weight_thousand_tons": null,
+      "a18_stratum": "001",
+      "a19_stratum": "01",
+      "value_flag": "",
+      "ton_flag": "S",
+      "cross_archive_direct_totals_match": false
+    }
+  ],
+  "census_coverage_notes": {
+    "unique_naics": 50,
+    "unique_modes": 21,
+    "mode_134_multiple_waterways_present_in_A01_but_absent_A18_A19": true,
+    "distribution_is_not_separate_naics_label": true,
+    "warehousing_storage_source_naics": "4931",
+    "flag_S_meaning": "Estimate does not meet publication standards due to quality or sampling concerns",
+    "flag_Z_meaning": "Rounds to zero, not a missing or necessarily literal zero",
+    "all_50_naics_have_dmode_00_and_111_total_rows_in_both_archives": true,
+    "full_original_ZIP_bytes_not_materialized_to_this_git_branch": true,
+    "original_zip_observation_performed_remotely_and_no_customer_files": true
+  }
 }
