@@ -65,7 +65,7 @@ class InvoiceGroundTruthTests(unittest.TestCase):
         )
         self.assertEqual(tuple(x["status"] for x in r["cases"]), expected)
         self.assertEqual(len(r["case_status_counts"]), 10)
-        self.assertTrue(all(x["case_status_counts"].get(s) == 1 for s in expected))
+        self.assertTrue(all(r["case_status_counts"].get(s) == 1 for s in expected))
 
     def test_overbilled_mock_paid_amount_separate_from_cash_recovery(self):
         row = run_ground_truth(as_of=AS_OF)["cases"][0]
