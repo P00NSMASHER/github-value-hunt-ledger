@@ -21,6 +21,7 @@ from freight.research_validation_protocols import build_protocol_report, render_
 from freight.research_rehearsal import run_rehearsal, render_html as render_rehearsal_html
 from freight.research_data_readiness import build_readiness, render_html as render_freight_data_html
 from freight.research_ground_truth import run_ground_truth, render_html as render_truth_html
+from freight.research_pilot_preflight import build_preflight, render_html as render_pilot_html
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -58,6 +59,13 @@ def snapshot(max_labs: int=14) -> dict:
         )
         result["invoice_ground_truth"]=run_ground_truth(
             as_of=date.today(), protocols=result["validation_protocols"]
+        )
+        result["pilot_preflight"]=build_preflight(
+            as_of=date.today(),
+            protocols=result["validation_protocols"],
+            sources=result["freight_data_readiness"],
+            rehearsal=result["synthetic_rehearsals"],
+            ground=result["invoice_ground_truth"],
         )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
@@ -100,6 +108,7 @@ def render(data: dict) -> str:
     rehearsal=data["synthetic_rehearsals"]
     freight_data=data["freight_data_readiness"]
     truth=data["invoice_ground_truth"]
+    pilot=data["pilot_preflight"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -181,6 +190,13 @@ A billing difference, a paid difference, a refund and a real legal recovery are 
 """ +str(truth["verified_ground_truth_cases"])+""" authentic independently verified invoice errors ·
 """ +str(truth["actual_cash_recovered_cents"])+""" cents actual recovery.</p>
 <a href="invoice_ground_truth.html">Open Invoice Ground Truth Rehearsal ↗</a></section>
+<section class="panel"><h2>Prospective independent buyer pilot readiness</h2>
+<p>A readiness planning packet, not approval to receive customer records. Buyer authorization,
+secure intake, independent reviewers, sample selection and cash controls are not established.</p>
+<p>""" +str(pilot["unmet_requirements"])+""" independent requirements outstanding ·
+""" +str(pilot["real_invoices_received"])+""" authentic invoices reviewed ·
+""" +str(pilot["studies_with_pilot_data"])+""" customer pilots executed.</p>
+<a href="pilot_preflight.html">Open Pilot Readiness Checklist ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -246,6 +262,13 @@ def main():
     )
     (args.out/"invoice_ground_truth.html").write_text(
         render_truth_html(data["invoice_ground_truth"]),encoding="utf-8"
+    )
+    (args.out/"pilot_preflight.json").write_text(
+        json.dumps(data["pilot_preflight"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"pilot_preflight.html").write_text(
+        render_pilot_html(data["pilot_preflight"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],

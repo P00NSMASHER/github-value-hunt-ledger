@@ -251,6 +251,27 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         altered["cases"][0]["documents"][0]["body"]+=" FORGED"
         _must(bool(validate_fixtures(altered,validation,as_of=today)),
               "INVOICE_DOCUMENT_TAMPER_ACCEPTED")
+        from freight.research_pilot_preflight import (
+            build_preflight, validate_preflight,
+        )
+        pilot=build_preflight(
+            as_of=today, protocols=validation, sources=sources,
+            rehearsal=rehearsal, ground=truth
+        )
+        _must(pilot["required_controls"]==18,
+              "PILOT_DATA_AND_GOVERNANCE_REQUIREMENTS_INCOMPLETE")
+        _must(pilot["unmet_requirements"]==18,
+              "UNVERIFIED_PILOT_APPROVAL_SILENTLY_ACCEPTED")
+        _must(pilot["real_invoices_received"]==0,
+              "PILOT_SYNTHETIC_INVOICES_MISLABELED_AS_REAL")
+        _must(pilot["fictional_test_case_reviewer_concordance"][
+            "actual_independent_reviewer_reliability_established"] is False,
+              "FICTIONAL_BLIND_VOTES_PROMOTED_TO_HUMAN_INDEPENDENCE")
+        fraudulent=_read("research/PILOT_PREFLIGHT_20261011.json")
+        fraudulent["gates"][0]["external_signoff_observed"]=True
+        _must(bool(validate_preflight(
+            fraudulent, validation, sources, rehearsal, truth, as_of=today)),
+            "FORGED_CUSTOMER_PILOT_SIGNOFF_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -276,6 +297,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "ground_truth_instrument_cases":truth["case_count"],
                 "ground_truth_instrument_receipt_sha256":truth["receipt_sha256"],
                 "real_invoice_adjudications_completed":truth["verified_ground_truth_cases"],
+                "pilot_unmet_human_evidence_requirements":pilot["unmet_requirements"],
+                "pilot_preflight_receipt_sha256":pilot["receipt_sha256"],
+                "approved_independent_customer_pilots":pilot["studies_with_pilot_data"],
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")

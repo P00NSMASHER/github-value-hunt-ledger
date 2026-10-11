@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "scope": "RETALLY_LAB14_PROSPECTIVE_PILOT_PREFLIGHT_NO_REAL_RECORDS",
+  "created_on": "2026-10-11",
+  "status": "INTERNAL_DESIGN_ONLY_UNAPPROVED",
+  "proposed_studies": [
+    "M7-01",
+    "M7-06"
+  ],
+  "intended_scope": "Second-look historic LTL invoice review and net cash contribution methodology, pending independent buyer rights and security/legal signoff.",
+  "references": [
+    {
+      "organization": "NIST",
+      "url": "https://www.nist.gov/privacy-framework",
+      "why": "Voluntary enterprise privacy risk management framework; not a legal certification"
+    },
+    {
+      "organization": "AAPOR",
+      "url": "https://aapor.org/standards-and-ethics/disclosure-standards/",
+      "why": "Reporting recruitment, sample frames, sample sizes, nonresponse and research limitations; not a freight product endorsement"
+    }
+  ],
+  "no_customer_contact_authorized": true,
+  "real_customer_records_received": 0,
+  "approved_data_transfers": 0,
+  "real_buyer_authorizations_verified": 0,
+  "real_blind_reviewers_appointed": 0,
+  "live_payment_events_examined": 0,
+  "approved_external_study_results": 0,
+  "data_collection_enabled": false,
+  "external_carrier_or_financial_actions_allowed": false,
+  "public_performance_claims_allowed": false,
+  "privacy_security_clearance_proven": false,
+  "no_new_lab": true,
+  "stages": [
+    {
+      "id": "AUTHORITY",
+      "name": "Buyer authority, data rights and representation"
+    },
+    {
+      "id": "SECURITY",
+      "name": "Privacy, security and lifecycle"
+    },
+    {
+      "id": "EVIDENCE",
+      "name": "Original invoice and governing evidence chain"
+    },
+    {
+      "id": "SAMPLING",
+      "name": "Preregistered study design and frame"
+    },
+    {
+      "id": "ADJUDICATION",
+      "name": "Blind independent review and disputes"
+    },
+    {
+      "id": "ECONOMICS",
+      "name": "Net cash, reversals and publishing controls"
+    }
+  ],
+  "gates": [
+    {
+      "id": "P11-01",
+      "stage": "AUTHORITY",
+      "owner_role": "DATA_OWNER",
+      "name": "Document a specific buyer's authority",
+      "required_evidence": "Separately authenticated buyer authorization with legal-entity identity, signer capacity, covered accounts, dated approval and permissible research uses.",
+      "why_missing_blocks": "Claims or analytics on another entity's invoices could exceed the purported signer's authority.",
+      "next_internal_step": "Prepare a blank authorization checklist and owner-of-record verification procedure.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-02",
+      "stage": "AUTHORITY",
+      "owner_role": "LEGAL_COUNSEL",
+      "name": "Determine written agency and carrier-contact authority",
+      "required_evidence": "Executed representation/engagement terms identifying permitted internal audit, carrier claims, publicity limitations and jurisdiction-specific counsel review.",
+      "why_missing_blocks": "Permission to inspect a bill is not necessarily permission to contact carriers, make claims or waive defenses.",
+      "next_internal_step": "Separate internal read-only pilot scope from eventual carrier-facing authority.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-03",
+      "stage": "AUTHORITY",
+      "owner_role": "DATA_OWNER",
+      "name": "Establish all upstream data and license rights",
+      "required_evidence": "Rights inventory for invoice, BOL, contract, tariff/NMFC, payment, vendor/API and third-party records, with permitted retention and onward processing.",
+      "why_missing_blocks": "Third-party materials may be visible to the shipper but not authorized for transfer, reuse or redistribution.",
+      "next_internal_step": "Draft a document-by-document source ownership and redistribution rights inventory.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-04",
+      "stage": "SECURITY",
+      "owner_role": "SECURITY_OWNER",
+      "name": "Define data minimization and sensitive-field rules",
+      "required_evidence": "Field allowlist with owner-approved purpose, classification, redaction/segregation requirements, and exceptions process for sensitive financial and personnel information.",
+      "why_missing_blocks": "Unbounded document ingestion may expose unnecessary confidential or personal data.",
+      "next_internal_step": "Write a sample field-level redaction matrix without actual invoice uploads.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-05",
+      "stage": "SECURITY",
+      "owner_role": "SECURITY_OWNER",
+      "name": "Demonstrate controlled transfer, access and isolation",
+      "required_evidence": "Reviewed secure transfer design, encryption/key management, tenant isolation, least privilege, audit logs, and incident escalation with documented test evidence.",
+      "why_missing_blocks": "A signed study contract alone cannot demonstrate the system protects buyer records.",
+      "next_internal_step": "Prepare architecture and adversarial access-control review artifacts, without enabling production import.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-06",
+      "stage": "SECURITY",
+      "owner_role": "SECURITY_OWNER",
+      "name": "Approve deletion, retention and breach handling",
+      "required_evidence": "Owner-approved retention duration, data erasure/revocation verification, backups/export policy, and incident response obligations tied to contractual requirements.",
+      "why_missing_blocks": "No generic storage TTL can substitute for specific data owner obligations or verified deletion.",
+      "next_internal_step": "Create a human-review retention and deletion control worksheet; assume no standard legal TTL.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-07",
+      "stage": "EVIDENCE",
+      "owner_role": "RESEARCH_LEAD",
+      "name": "Bind each invoice to shipment and immutable source records",
+      "required_evidence": "Signed/rights-cleared original invoice identity, shipment/BOL/POD metadata, dates, freight mode, duplicate-key controls and independently reviewable file checksums.",
+      "why_missing_blocks": "An apparent billing duplicate may be distinct loads or an internal join error.",
+      "next_internal_step": "Design a minimal shipment-invoice linkage manifest with unknown and duplicate states.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-08",
+      "stage": "EVIDENCE",
+      "owner_role": "LEGAL_COUNSEL",
+      "name": "Establish dated governing rate and tariff precedence",
+      "required_evidence": "Contract amendments, carrier scope, tariff/NMFC editions and effective dates governing each selected shipment, independently validated for use and licensing.",
+      "why_missing_blocks": "A current public tariff or a future supplement is not automatically governing historical rate authority.",
+      "next_internal_step": "Produce a source-version decision tree for independent rate reviewers.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-09",
+      "stage": "EVIDENCE",
+      "owner_role": "FINANCE_CONTROLLER",
+      "name": "Independently reconcile bill, payment, credit and refund",
+      "required_evidence": "Payment-ledger originals with dates, chargebacks, applied credits, refunds, partial amounts, currencies and duplicate reference reconciliation.",
+      "why_missing_blocks": "Invoice errors and ledger credits do not prove the buyer paid excess cash or remains owed a refund.",
+      "next_internal_step": "Specify a cash-versus-credit evidence table and closed-loop source reconciliation.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-10",
+      "stage": "SAMPLING",
+      "owner_role": "RESEARCH_LEAD",
+      "name": "Freeze an unbiased prospective invoice sample frame",
+      "required_evidence": "Time-bounded eligible invoice population, carrier/mode/size strata, sampling selection rule, exclusions, missing records, deduplication and nonrespondent accounting.",
+      "why_missing_blocks": "Cherry-picked known bad invoices overstate error precision and ignore false negatives.",
+      "next_internal_step": "Draft a versioned cohort manifest with empty actual row set and a bias checklist.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-11",
+      "stage": "SAMPLING",
+      "owner_role": "RESEARCH_LEAD",
+      "name": "Preregister sample size, metrics and stopping decisions",
+      "required_evidence": "Independent approval of primary estimand, denominator, sample size/power rationale, missing/abstention rules, adjudication threshold and stop conditions.",
+      "why_missing_blocks": "Retrofitting thresholds after seeing outcomes risks an unsupported success conclusion.",
+      "next_internal_step": "Prepare preregistration and independent statistician-review templates.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-12",
+      "stage": "SAMPLING",
+      "owner_role": "RESEARCH_LEAD",
+      "name": "Establish comparator and negative-control fairness",
+      "required_evidence": "Same frozen invoice/rate evidence given to reviewers and authorized methods; document preprocessing, withheld labels, false positives, no-alert cases and comparison permissions.",
+      "why_missing_blocks": "Unequal access, hindsight corrections or only flagged positives bias apparent sensitivity and competitor comparisons.",
+      "next_internal_step": "Create blinded comparison and negative-control coverage definitions.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-13",
+      "stage": "ADJUDICATION",
+      "owner_role": "INDEPENDENT_ADJUDICATOR",
+      "name": "Separate two human reviewers from RETALLY alert author",
+      "required_evidence": "Individually accountable independent reviewer identity/qualification, conflict checks, assignment audit and proof alert labels were hidden before initial determination.",
+      "why_missing_blocks": "Two labels generated by the same software are not independent human agreement, even if both say blinded.",
+      "next_internal_step": "Write a dual-reviewer separation-of-duties and label-sealing workflow.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-14",
+      "stage": "ADJUDICATION",
+      "owner_role": "INDEPENDENT_ADJUDICATOR",
+      "name": "Resolve disagreement through documented third-party review",
+      "required_evidence": "Third qualified reviewer or prespecified arbitration with issue taxonomy, abstention preservation, original vote retention and defensible reasoned resolution.",
+      "why_missing_blocks": "Majority inference or overwriting original disagreements can launder uncertain alerts into truth.",
+      "next_internal_step": "Prepare an immutable disagreement docket and escalation template.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-15",
+      "stage": "ADJUDICATION",
+      "owner_role": "RESEARCH_LEAD",
+      "name": "Require source-linked case decisions and adjudication quality",
+      "required_evidence": "Case-level evidence IDs, reviewer evidence access log, contradictory-source handling, error taxonomy, inter-rater diagnostics, and corrected labels with version history.",
+      "why_missing_blocks": "Unattributed labels and self-reported reviewer accuracy do not establish a reproducible ground truth set.",
+      "next_internal_step": "Define a complete label provenance schema and denominator disclosure format.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-16",
+      "stage": "ECONOMICS",
+      "owner_role": "FINANCE_CONTROLLER",
+      "name": "Trace permitted fees to actual collected cash",
+      "required_evidence": "Signed effective fee base plus independently reconciled bank receipt, carrier payment versus credit, recovery allocation, collection reversals and charge timing.",
+      "why_missing_blocks": "A carrier credit or ledger notation must never be reported as a cash fee collected by RETALLY.",
+      "next_internal_step": "Prepare fee-recognition source audit tests using only fictional reversal examples.",
+      "related_studies": [
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-17",
+      "stage": "ECONOMICS",
+      "owner_role": "FINANCE_CONTROLLER",
+      "name": "Include failed cases, labor and downstream refunds",
+      "required_evidence": "Full inception cohort cost ledger, no-fee outcomes, time spent, acquisition/processing expenses, writeoffs, refunds, residual liabilities and double-attribution controls.",
+      "why_missing_blocks": "Excluding failures and costs can invert apparent contribution margin and overstate recoveries.",
+      "next_internal_step": "Predefine fee-eligible contribution per initiated case and variance checks.",
+      "related_studies": [
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    },
+    {
+      "id": "P11-18",
+      "stage": "ECONOMICS",
+      "owner_role": "LEGAL_COUNSEL",
+      "name": "Separately authorize external claims, publication and disposal",
+      "required_evidence": "Final legal/commercial/security review of customer release rights, claim wording, PII/confidentiality redaction, explicit external representation and source destruction obligations.",
+      "why_missing_blocks": "Passing code tests or having an internally complete pilot packet does not permit marketing claims or carrier action.",
+      "next_internal_step": "Create a final human release-readiness decision memo template; public usage stays blocked.",
+      "related_studies": [
+        "M7-01",
+        "M7-06"
+      ],
+      "status": "NOT_EVIDENCED",
+      "verified": false,
+      "external_signoff_observed": false,
+      "receipt_of_original_evidence": null,
+      "assigned_real_person": false
+    }
+  ]
+}
