@@ -205,6 +205,22 @@ class SyntheticRehearsalTests(unittest.TestCase):
         q["public_performance_claims_allowed"] = True
         self.assertTrue(validate_fixture_book(b, q, as_of=AS_OF))
 
+    def test_malformed_nested_json_fails_closed_not_with_type_crashes(self):
+        for pid, key, value in (
+            ("M7-01", "adjudication", []),
+            ("M7-02", "engine_decision", {}),
+            ("M7-03", "arm", []),
+            ("M7-04", "frame_status", {}),
+            ("M7-05", "system", []),
+            ("M7-05", "fixture_id", {}),
+            ("M7-06", "case_state", []),
+        ):
+            b, p = mutate(pid, key, value)
+            errors = validate_fixture_book(b, p, as_of=AS_OF)
+            self.assertTrue(errors, f"{pid}/{key} malformed record was accepted")
+            with self.assertRaisesRegex(ValueError, "INVALID_SYNTHETIC_REHEARSAL"):
+                run_rehearsal(as_of=AS_OF, book=b, protocol_report=p)
+
     def test_dated_replay_is_deterministic_and_digests_recompute(self):
         a = run_rehearsal(as_of=AS_OF)
         b = run_rehearsal(as_of=AS_OF)
