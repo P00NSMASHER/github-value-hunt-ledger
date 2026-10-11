@@ -62,7 +62,9 @@ def normalize_finding(row):
     clean["settlement_reference"] = str(row.get("settlement_reference") or "").strip()
     clean["unresolved_issues"] = str(row.get("unresolved_issues") or "").strip()
     clean["difference_cents"] = max(clean["billed_cents"] - clean["expected_cents"], 0)
-    clean["net_realized_cents"] = max(clean["settled_credit_cents"] - clean["reversal_cents"], 0)
+    if clean["reversal_cents"] > clean["settled_credit_cents"]:
+        raise ValueError("reversal_cents cannot exceed settled_credit_cents")
+    clean["net_realized_cents"] = clean["settled_credit_cents"] - clean["reversal_cents"]
     suppressed = (
         clean["reviewer_disposition"] != "VALIDATED"
         or clean["confidence"] != "SUPPORTED"
