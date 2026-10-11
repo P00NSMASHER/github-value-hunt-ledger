@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import warnings
-from zipfile import ZipFile, ZipInfo
+from zipfile import ZipFile, ZIP_DEFLATED
 
 from freight.research_cfs_archive_verifier import (
     OFFICIAL_URL, TABLE_ID, MAPPING_SCOPE, AUDIT,
@@ -64,7 +64,7 @@ def sample_csv(*, mutate=None, append=None, headers=None):
 
 def synthetic_zip(csv_bytes=None, member=MEMBER, extras=None):
     out = io.BytesIO()
-    with ZipFile(out, "w") as z:
+    with ZipFile(out, "w", compression=ZIP_DEFLATED) as z:
         z.writestr(member, sample_csv() if csv_bytes is None else csv_bytes)
         for name, data in extras or []:
             z.writestr(name, data)
