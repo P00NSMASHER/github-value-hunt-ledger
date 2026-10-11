@@ -398,7 +398,18 @@ def build_market_audit(*, as_of: date, book: dict | None = None,
         "actual_contingency_revenue_usd": None,
     }
     press = book["press_release"]
+    national_trillion_usd = Decimal(v["us.allmodes.2022"]) / Decimal(1000000)
     national_billion_tons = Decimal(t["us.allmodes.2022"]) / Decimal(1000000)
+    rounded_national_value_matches = (
+        _rounded(national_trillion_usd, "0.1") ==
+        str(press["total_rounded_trillion_usd"])
+    )
+    rounded_national_weight_matches = (
+        _rounded(national_billion_tons, "0.1") ==
+        str(press["total_rounded_billion_tons"])
+    )
+    if not (rounded_national_value_matches and rounded_national_weight_matches):
+        raise ValueError("PUBLISHED_NATIONAL_TOTALS_FAIL_RECONCILIATION")
     south_billion_tons = Decimal(t["south.allmodes.2022"]) / Decimal(1000000)
     south_pct = _pct(t["south.allmodes.2022"], t["us.allmodes.2022"])
     press_claim = Decimal(str(press["south_claimed_billion_tons"]))
@@ -474,6 +485,8 @@ def build_market_audit(*, as_of: date, book: dict | None = None,
         "independent_full_table_replication_completed": False,
         "published_estimate_measurements": totals,
         "press_release_reconciliation": {
+            "all_modes_shipment_value_agrees_at_press_precision": rounded_national_value_matches,
+            "all_modes_shipment_weight_agrees_at_press_precision": rounded_national_weight_matches,
             "truck_value_pct_agrees_with_detailed_table": truck_value_press_matches_table,
             "truck_weight_pct_agrees_with_detailed_table": truck_weight_press_matches_table,
             "regional_flagged_conflicts": [conflict],
