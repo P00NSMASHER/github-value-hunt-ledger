@@ -115,7 +115,10 @@ def _validate_plan_inner(plan: dict, source_book: dict, *, as_of: date) -> list[
     if set(plan) != PLAN_TOP_FIELDS or plan.get("scope") != SCOPE:
         errors.append("M15 scope or schema changed")
     try:
-        if _date(plan.get("observed_on"))>as_of:
+        observed=_date(plan.get("observed_on"))
+        if observed!=date(2026,10,11):
+            errors.append("M15 source review date cannot be backdated or shifted")
+        if observed>as_of:
             errors.append("M15 public observation date in future")
     except ValueError:
         errors.append("invalid M15 observation date")
