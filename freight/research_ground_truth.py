@@ -136,7 +136,9 @@ def _build_case(index: int, *, invoice: int, expected: int | None,
         docs.append(_doc(cid, "PAYMENT_LEDGER", _payment_body(event),
                          f"DOC-PAY-{n}"))
     pkt["documents"] = docs
-    available_docs = [d["id"] for d in docs if d["role"] != "PAYMENT_LEDGER"]
+    # Blind reviewers must receive the source payment/credit events too;
+    # the simulated disagreement is independent of any engine alert.
+    available_docs = [d["id"] for d in docs]
     for n, finding in enumerate((label1, label1 if label2 is None else label2), 1):
         pkt["reviewers"].append({
             "reviewer_id": f"FICTIONAL-REVIEWER-{n}", "finding": finding,
@@ -410,7 +412,7 @@ def validate_fixtures(book: dict, protocol: dict, *, as_of: date) -> list[str]:
             ids = review.get("evidence_document_ids")
             if (type(ids) is not list or len(ids) != len(set(map(str, ids))) or
                 any(type(x) is not str or x not in referenced for x in ids) or
-                not {cid + "-DOC-INVOICE", cid + "-DOC-SHIPMENT"} <= set(ids)):
+                not set(expected_bodies) <= set(ids)):
                 _issue(errors, cid, "orphan or missing documented reviewer evidence")
     if observed_cases != set(CASE_IDS):
         errors.append("ten-case inventory missing or duplicated")
