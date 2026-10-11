@@ -27,6 +27,10 @@ from freight.research_cfs_archive_verifier import (
     build_readiness as build_cfs_byte_readiness,
     render_html as render_cfs_byte_html,
 )
+from freight.research_cfs_industry_quality import (
+    build_readiness as build_cfs_industry_readiness,
+    render_html as render_cfs_industry_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -76,6 +80,7 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today(), protocols=result["validation_protocols"]
         )
         result["cfs_source_byte_readiness"]=build_cfs_byte_readiness(as_of=date.today())
+        result["cfs_industry_quality"]=build_cfs_industry_readiness(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -120,6 +125,7 @@ def render(data: dict) -> str:
     pilot=data["pilot_preflight"]
     market=data["cfs_market_audit"]
     source_bytes=data["cfs_source_byte_readiness"]
+    industry=data["cfs_industry_quality"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -225,6 +231,16 @@ release contradiction remains unresolved by Census editorial action.</p>
 """ +("yes" if source_bytes["browser_observed_original_zip_sha256"] else "no")+""" original ZIP hash observed ·
 """ +str(source_bytes["independent_original_rows_reproduced_by_ci_zip_parser"])+""" rows independently replayed in CI.</p>
 <a href="cfs_source_bytes.html">Open Source Archive Verification Readiness ↗</a></section>
+<section class="panel"><h2>Manufacturing and wholesale industry data: Census A18/A19</h2>
+<p>Original public Census files were inspected via read-only browser; official ZIP hashes,
+national totals and suppression/rounded-zero quality counts are recorded. No source
+archive is committed or replayed in the GitHub CI worker. No paid LTL freight-spend
+or buyer demand data has been established.</p>
+<p>""" +str(industry["remote_browser_original_rows_observed"])+""" source rows observed ·
+""" +str(industry["public_archive_leads"])+""" official survey tables ·
+""" +str(industry["source_rows_from_full_files_replayed_in_ci"])+""" original rows rerun in CI ·
+""" +str(industry["market_share_claims_approved"])+""" freight-audit market claims approved.</p>
+<a href="cfs_industry_quality.html">Open Census Industry Quality &amp; Hypotheses ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -311,6 +327,13 @@ def main():
     )
     (args.out/"cfs_source_bytes.html").write_text(
         render_cfs_byte_html(data["cfs_source_byte_readiness"]),encoding="utf-8"
+    )
+    (args.out/"cfs_industry_quality.json").write_text(
+        json.dumps(data["cfs_industry_quality"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"cfs_industry_quality.html").write_text(
+        render_cfs_industry_html(data["cfs_industry_quality"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],

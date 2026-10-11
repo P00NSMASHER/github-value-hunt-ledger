@@ -41,6 +41,10 @@ on:
       - 'freight/RESEARCH_CFS_SOURCE_ARCHIVE.md'
       - 'freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json'
       - 'freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json'
+      - 'freight/research_cfs_industry_quality.py'
+      - 'freight/test_research_cfs_industry_quality.py'
+      - 'freight/research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json'
+      - 'freight/RESEARCH_CFS_INDUSTRY_QUALITY.md'
       - 'freight/research/SOURCE_ANCHORS_20261010.json'
       - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
@@ -70,7 +74,7 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_research_pilot_preflight.py freight/test_research_market_audit.py freight/test_research_cfs_archive_verifier.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_research_pilot_preflight.py freight/test_research_market_audit.py freight/test_research_cfs_archive_verifier.py freight/test_research_cfs_industry_quality.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
           PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
@@ -344,6 +348,37 @@ jobs:
           assert 'Browser Receipt Confirmed' in (p/'cfs_source_bytes.html').read_text()
           print('Public Census original ZIP inspected via read-only browser; CI replays only synthetic DAT, never network acquisition or publisher signature.')
           PY
+      - name: Validate read-only original Census industry quality counts and refuse LTL TAM
+        run: |
+          PYTHONPATH=. python -m freight.research_cfs_industry_quality --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'cfs_industry_quality.json').read_text())
+          assert r['scope']=='LAB14_CFS_INDUSTRY_SOURCE_READINESS_NO_CI_DOWNLOAD'
+          assert r['public_archive_leads']==2
+          assert r['remote_browser_original_rows_observed']==14094
+          assert r['source_rows_from_full_files_replayed_in_ci']==0
+          assert r['source_quality_flags_dismissed']==0
+          assert r['real_customer_invoices']==0
+          assert r['verified_paid_ltl_spend_usd'] is None
+          assert r['buyer_demand_verified'] is False
+          assert r['recovery_tam_calculated'] is False
+          assert r['market_share_claims_approved']==0
+          assert r['network_or_scheduler_enabled'] is False
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          source={x['table_id']:x for x in r['sources']}
+          assert source['CF2200A18']['remote_observed_zip_sha256']=='a18ce071599457572177dd56f8a6174594d1018da9b9024476c4e9832a357bf5'
+          assert source['CF2200A19']['remote_observed_zip_sha256']=='fe3085d23a3c76704a0d86d9213bb38d3d341b2c228990a5ebf40b6b3f1b661d'
+          flags=r['remote_browser_flag_counts']
+          assert flags['CF2200A18']['value']=={'blank':5430,'S':1839,'Z':43}
+          assert flags['CF2200A19']['weight']=={'blank':4474,'S':1956,'Z':352}
+          assert len(r['verified_source_industry_direct_totals'])==5
+          assert len(r['receipt_sha256'])==64
+          assert 'Industry exposure is not invoice opportunity' in (p/'cfs_industry_quality.html').read_text()
+          print('Two genuine remote-observed CFS industry archives; synthetic-only CI; zero commercial LTL invoice or fee outcomes.')
+          PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -370,5 +405,7 @@ jobs:
             /tmp/retally-research-intelligence/market_source_audit.html
             /tmp/retally-research-intelligence/cfs_source_bytes.json
             /tmp/retally-research-intelligence/cfs_source_bytes.html
+            /tmp/retally-research-intelligence/cfs_industry_quality.json
+            /tmp/retally-research-intelligence/cfs_industry_quality.html
           if-no-files-found: error
           retention-days: 14
