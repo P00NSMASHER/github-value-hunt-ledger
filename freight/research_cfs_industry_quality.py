@@ -52,6 +52,7 @@ ROOT_FIELDS = {
     "external_contact_or_financial_actions_allowed",
     "publisher_signature_verified", "official_archives",
     "research_segments", "required_followups", "legal_boundary",
+    "actual_industry_source_records", "census_coverage_notes",
 }
 ARCHIVE_FIELDS = {
     "table_id", "name", "url", "source_index_url", "dataset_grain",
@@ -59,11 +60,44 @@ ARCHIVE_FIELDS = {
     "original_zip_sha256", "original_archive_observed_by_read_only_browser",
     "local_ci_replay_of_original", "table_member",
     "original_member_structure_inspected", "source_limit",
+    "remote_observed_parsed_data_rows",
+    "remote_observed_dat_uncompressed_bytes", "original_archive_members",
+    "remote_observed_header", "national_total_axis_code",
+    "unique_naics_codes_observed", "unique_mode_codes_observed",
+    "value_flag_counts", "weight_flag_counts",
+    "remote_observed_value_and_tonnage_reconciled_with_A01",
 }
 SEGMENT_IDS = {
     "manufacturing": ("31-33", 1),
     "wholesale": ("42", 2),
-    "warehousing": ("493", 3),
+    "warehousing": ("4931", 3),
+}
+OFFICIAL_PROFILES = {
+    "CF2200A18": {
+        "sha": "a18ce071599457572177dd56f8a6174594d1018da9b9024476c4e9832a357bf5",
+        "zip_bytes": 93390,
+        "dat_bytes": 1040806,
+        "total_axis_code": "001",
+        "value_flags": {"blank": 5430, "S": 1839, "Z": 43},
+        "weight_flags": {"blank": 4991, "S": 2224, "Z": 97},
+        "header": "#GEOTYPE|ST|GEO_ID|GEO_LABEL|GEO_ID_F|NAICS2017|NAICS2017_LABEL|NAICS2017_F|DMODE|DMODE_F|DMODE_LABEL|SHIPDIST|SHIPDIST_LABEL|YEAR|VAL|VAL_F|TON|TON_F|VAL_S|VAL_S_F|TON_S|TON_S_F",
+    },
+    "CF2200A19": {
+        "sha": "fe3085d23a3c76704a0d86d9213bb38d3d341b2c228990a5ebf40b6b3f1b661d",
+        "zip_bytes": 107682,
+        "dat_bytes": 1017567,
+        "total_axis_code": "01",
+        "value_flags": {"blank": 4628, "S": 2063, "Z": 91},
+        "weight_flags": {"blank": 4474, "S": 1956, "Z": 352},
+        "header": "#GEOTYPE|ST|GEO_ID|GEO_LABEL|GEO_ID_F|DMODE|DMODE_F|DMODE_LABEL|NAICS2017|NAICS2017_LABEL|NAICS2017_F|SHIPWT|SHIPWT_LABEL|YEAR|VAL|VAL_F|TON|TON_F|AVGMILE|AVGMILE_F|VAL_S|VAL_S_F|TON_S|TON_S_F|AVGMILE_S|AVGMILE_S_F",
+    },
+}
+INDEPENDENTLY_OBSERVED_TOTALS = {
+    ("00","00"): (17996782, 12169793),
+    ("00","111"): (8062541, 3909476),
+    ("31-33","00"): (7073495,4949955),
+    ("42","00"): (8094350,4115279),
+    ("4931","00"): (1347716,305651),
 }
 SEGMENT_FIELDS = {
     "id", "category", "candidate_naics_groups", "rank",
@@ -153,12 +187,23 @@ def _has_quality_snapshot(book: dict, *, as_of: date) -> list[str]:
             problems.append(name + ": source archive format claim inconsistent")
         size = row.get("original_zip_size_bytes")
         digest = row.get("original_zip_sha256")
-        if inspected is True:
-            if (type(size) is not int or not 10000 <= size <= 2*1024*1024 or
-                type(digest) is not str or not re.fullmatch("[0-9a-f]{64}", digest)):
-                problems.append(name + ": inspected raw file must have real source byte size/hash")
-        elif size is not None or digest is not None:
-            problems.append(name + ": unverifiable source checksum fabricated")
+        spec = OFFICIAL_PROFILES[name]
+        if inspected is not True:
+            problems.append(name + ": original source not independently inspected")
+        if (size != spec["zip_bytes"] or type(size) is not int or
+            digest != spec["sha"] or
+            row.get("remote_observed_parsed_data_rows") != expected["index_rows"] or
+            row.get("remote_observed_dat_uncompressed_bytes") != spec["dat_bytes"] or
+            row.get("original_archive_members") != [
+                name+".dat", name+"_FIELDS.txt", name+"_README.txt"] or
+            row.get("remote_observed_header") != spec["header"] or
+            row.get("national_total_axis_code") != spec["total_axis_code"] or
+            row.get("unique_naics_codes_observed") != 50 or
+            row.get("unique_mode_codes_observed") != 21 or
+            row.get("value_flag_counts") != spec["value_flags"] or
+            row.get("weight_flag_counts") != spec["weight_flags"] or
+            row.get("remote_observed_value_and_tonnage_reconciled_with_A01") is not True):
+            problems.append(name + ": pinned source byte hash, grain, census or suppression counts changed")
         if not _has_text(row.get("source_limit"), 65):
             problems.append(name + ": source limitation missing")
     if seen != set(TABLES):
@@ -191,6 +236,51 @@ def _has_quality_snapshot(book: dict, *, as_of: date) -> list[str]:
             problems.append(ident + ": falsifiable buyer research required")
     if seen_ids != set(SEGMENT_IDS):
         problems.append("segment census incomplete")
+    records=book.get("actual_industry_source_records")
+    if type(records) is not list or len(records)!=len(INDEPENDENTLY_OBSERVED_TOTALS):
+        problems.append("exactly five browser-observed original industry/mode totals required")
+    else:
+        observed_totals=set()
+        for item in records:
+            if type(item) is not dict or set(item)!={
+                "naics","label","mode","value_million_usd","weight_thousand_tons",
+                "a18_stratum","a19_stratum","value_flag","ton_flag",
+                "cross_archive_direct_totals_match",
+            }:
+                problems.append("malformed official direct industry source observation")
+                continue
+            key=(item.get("naics"),item.get("mode"))
+            if key not in INDEPENDENTLY_OBSERVED_TOTALS or key in observed_totals:
+                problems.append("repeated or unidentified source industry/mode total")
+                continue
+            observed_totals.add(key)
+            expected_value, expected_weight=INDEPENDENTLY_OBSERVED_TOTALS[key]
+            if (item.get("value_million_usd") != expected_value or
+                type(item.get("value_million_usd")) is not int or
+                item.get("weight_thousand_tons") != expected_weight or
+                type(item.get("weight_thousand_tons")) is not int or
+                item.get("a18_stratum")!="001" or
+                item.get("a19_stratum")!="01" or
+                item.get("value_flag")!="" or
+                item.get("ton_flag")!="" or
+                item.get("cross_archive_direct_totals_match") is not True or
+                not _has_text(item.get("label"),10)):
+                problems.append("published direct industry source values, units or flags do not match read-only original")
+        if observed_totals!=set(INDEPENDENTLY_OBSERVED_TOTALS):
+            problems.append("industry source comparison census incomplete")
+    coverage=book.get("census_coverage_notes")
+    if type(coverage) is not dict or (
+        coverage.get("unique_naics")!=50 or
+        coverage.get("unique_modes")!=21 or
+        coverage.get("warehousing_storage_source_naics")!="4931" or
+        coverage.get("mode_134_multiple_waterways_present_in_A01_but_absent_A18_A19") is not True or
+        coverage.get("distribution_is_not_separate_naics_label") is not True or
+        coverage.get("all_50_naics_have_dmode_00_and_111_total_rows_in_both_archives") is not True or
+        coverage.get("original_zip_observation_performed_remotely_and_no_customer_files") is not True or
+        type(coverage.get("flagged_total_example")) is not dict or
+        coverage["flagged_total_example"].get("naics")!="45431" or
+        coverage["flagged_total_example"].get("source_flag")!="S"):
+        problems.append("Census NAICS/footnote or suppression detail not source-bound")
     follow=book.get("required_followups")
     if (type(follow) is not list or len(follow)!=6 or
         any(not _has_text(s, 70) for s in follow)):
@@ -211,7 +301,9 @@ def _estimate(value: str, flag: str, cv: str, cv_flag: str) -> dict:
     if flag.strip() not in ("", "S", "D", "N", "X", "Z", "-"):
         raise ValueError("UNKNOWN_CENSUS_ESTIMATE_FLAG")
     if flag.strip():
-        return {"value":None, "status":"CENSUS_FLAGGED_ESTIMATE",
+        status = ("CENSUS_ROUNDED_TO_ZERO_NOT_LITERAL_ZERO"
+                  if flag.strip()=="Z" else "CENSUS_FLAGGED_ESTIMATE")
+        return {"value":None, "status":status,
                 "flag":flag.strip(), "cv":None, "cv_available":False}
     if not re.fullmatch(r"[0-9]{1,15}", value.replace(",", "").strip()):
         return {"value":None, "status":"MISSING_OR_NONNUMERIC_SOURCE_ESTIMATE",
@@ -254,8 +346,11 @@ def _original_source_profile(raw: bytes, table: str, manifest: dict,
     by_naics=Counter()
     by_mode=Counter()
     selected=[]
-    groups={k:[] for k in SEGMENT_IDS}
+    groups={k:[] for k in ("31-33","42","4931")}
     axes=set()
+    raw_value_flags=Counter()
+    raw_weight_flags=Counter()
+    independent_direct_totals={}
     flag_samples=[]
     original_2022_rows=0
     for row in rows:
@@ -272,6 +367,8 @@ def _original_source_profile(raw: bytes, table: str, manifest: dict,
             raise ValueError("CFS_DUPLICATE_CROSSTAB_CLAIM")
         known_keys.add(compound)
         original_2022_rows+=1
+        raw_value_flags[row["VAL_F"].strip() or "blank"]+=1
+        raw_weight_flags[row["TON_F"].strip() or "blank"]+=1
         by_naics[naics]+=1
         by_mode[mode]+=1
         axes.add(stratum)
@@ -287,7 +384,17 @@ def _original_source_profile(raw: bytes, table: str, manifest: dict,
             if len(flag_samples)<9:
                 flag_samples.append({"naics":naics,"mode":mode,"stratum":stratum,
                                     "value_flag":v["flag"],"weight_flag":t["flag"]})
-        if naics in ("31-33", "42", "493") and mode in ("00","11","111","112","113") and len(groups[naics])<15:
+        if (naics,mode) in INDEPENDENTLY_OBSERVED_TOTALS and stratum==spec["total_axis_code"]:
+            direct=INDEPENDENTLY_OBSERVED_TOTALS[(naics,mode)]
+            if (v["value"],t["value"])!=direct:
+                raise ValueError("ORIGINAL_A18_A19_SOURCE_TOTAL_DISAGREES_WITH_BROWSER_OBSERVATION")
+            independent_direct_totals[f"{naics}|{mode}"]={
+                "naics":naics,"mode":mode,
+                "value_million_usd_goods_not_freight_spend":v["value"],
+                "weight_thousand_tons":t["value"],
+                "value_flag":v["flag"],"weight_flag":t["flag"],
+            }
+        if naics in groups and mode in ("00","11","111","112","113") and len(groups[naics])<15:
             groups[naics].append({
                 "naics2017":naics, "mode":mode, "stratum":stratum,
                 "goods_value_million_usd":v["value"],
@@ -298,9 +405,16 @@ def _original_source_profile(raw: bytes, table: str, manifest: dict,
                 "weight_cv":t["cv"],
                 "not_invoice_spend_or_ltl_only":True,
             })
-    # The publisher's index count is an initial expected-shape diagnostic,
-    # not source authenticity. Exact arithmetic can differ by valid revisions.
+    # Only a locally replayed matching original archive may assert the complete
+    # Census source row count, 50 NAICS, 21 modes and all quality flag tallies.
     observed_n=original_2022_rows
+    if not synthetic:
+        if (observed_n != spec["index_rows"] or len(by_naics)!=50 or
+            len(by_mode)!=21 or
+            dict(raw_value_flags)!=OFFICIAL_PROFILES[table]["value_flags"] or
+            dict(raw_weight_flags)!=OFFICIAL_PROFILES[table]["weight_flags"] or
+            len(independent_direct_totals)!=len(INDEPENDENTLY_OBSERVED_TOTALS)):
+            raise ValueError("FULL_OFFICIAL_CFS_SOURCE_ROW_OR_SUPPRESSION_CENSUS_MISMATCH")
     report={
         "table_id":table,"source_member":spec["member"],
         "archive_sha256":digest_bytes(raw),"original_source_hash_matched":not synthetic,
@@ -313,6 +427,9 @@ def _original_source_profile(raw: bytes, table: str, manifest: dict,
         "sample_value_quality_counts":dict(sorted((k,v) for k,v in measured.items() if k.startswith("value:"))),
         "sample_weight_quality_counts":dict(sorted((k,v) for k,v in measured.items() if k.startswith("weight:"))),
         "example_suppressed_or_flagged_cells":flag_samples,
+        "raw_value_flag_counts":dict(sorted(raw_value_flags.items())),
+        "raw_weight_flag_counts":dict(sorted(raw_weight_flags.items())),
+        "independently_checked_direct_totals":independent_direct_totals,
         "industry_examples":groups,
         "invoice_billing_revenue_verified":False,
         "totaling_nested_industry_or_transport_modes_authorized":False,
@@ -347,6 +464,7 @@ def build_readiness(*, as_of: date) -> dict:
             "original_source_archive_bytes_replayed_in_ci":False,
             "remote_observed_zip_sha256":row["original_zip_sha256"],
             "remote_observed_zip_size_bytes":row["original_zip_size_bytes"],
+            "remote_observed_original_dataset_rows":row["remote_observed_parsed_data_rows"],
             "original_publisher_signature_verified":False,
             "survey_goods_value_units":"USD_MILLIONS_OF_GOODS_NOT_FREIGHT_SPEND",
             "survey_weight_units":"THOUSAND_TONS_NOT_LTL_INVOICE_CHARGES",
@@ -359,6 +477,19 @@ def build_readiness(*, as_of: date) -> dict:
         "survey_year":2022,"published_on":PUB_YEAR,
         "public_archive_leads":len(sources),"sources":sources,
         "source_rows_from_full_files_replayed_in_ci":0,
+        "remote_browser_original_rows_observed":sum(
+            x["remote_observed_parsed_data_rows"] for x in book["official_archives"]
+        ),
+        "source_review_age_days":(as_of-date.fromisoformat(book["observed_on"])).days,
+        "source_recheck_due_after_90_days":(
+            (as_of-date.fromisoformat(book["observed_on"])).days>=90
+        ),
+        "verified_source_industry_direct_totals":book["actual_industry_source_records"],
+        "remote_browser_flag_counts":{
+            x["table_id"]:{
+                "value":x["value_flag_counts"],"weight":x["weight_flag_counts"]
+            } for x in book["official_archives"]
+        },
         "real_customer_invoices":0,"source_quality_flags_dismissed":0,
         "market_share_claims_approved":0,"verified_paid_ltl_spend_usd":None,
         "buyer_demand_verified":False,"recovery_tam_calculated":False,
