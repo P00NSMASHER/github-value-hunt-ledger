@@ -296,7 +296,8 @@ def _validate_catalog_inner(book: dict, protocols: dict, *, as_of: date) -> list
         for key in ("research_hypothesis", "next_falsification", "prohibited_inference"):
             if not _meaningful(item.get(key), 60):
                 errors.append(f"{ident}: missing actionable falsification or caveat")
-        if item.get("research_priority_not_market_ranking") != {"manufacturing": 1, "wholesale": 2, "distribution": 3}[ident]:
+        if (type(item.get("research_priority_not_market_ranking")) is not int or
+            item.get("research_priority_not_market_ranking") != {"manufacturing": 1, "wholesale": 2, "distribution": 3}[ident]):
             errors.append(f"{ident}: research list order changed without review")
     if seen != V_GROUPS:
         errors.append("buyer research hypotheses missing")
@@ -366,7 +367,11 @@ def build_market_audit(*, as_of: date, book: dict | None = None,
         "truck_weight_share_of_all_shipments_pct": _rounded(_pct(t[truck], t["us.allmodes.2022"])),
         "for_hire_truck_value_share_of_all_shipments_pct": _rounded(_pct(v["us.forhire.2022"], v["us.allmodes.2022"])),
         "for_hire_truck_weight_share_of_all_shipments_pct": _rounded(_pct(t["us.forhire.2022"], t["us.allmodes.2022"])),
+        "for_hire_value_share_of_truck_total_pct": _rounded(_pct(v["us.forhire.2022"], v[truck])),
+        "company_owned_value_share_of_truck_total_pct": _rounded(_pct(v["us.company.2022"], v[truck])),
+        "customer_pickup_value_share_of_truck_total_pct": _rounded(_pct(v["us.customer.2022"], v[truck])),
         "for_hire_is_not_ltl_only": True,
+        "truck_mode_2017_to_2022_definition_changed_customer_pickup_added": True,
         "includes_company_owned_and_customer_pickup": True,
         "survey_values_not_freight_bills": True,
         "actual_paid_ltl_freight_invoices_count": None,
