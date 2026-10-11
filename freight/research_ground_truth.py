@@ -28,16 +28,16 @@ VOTES = {"EXCESS_BILLING", "DUPLICATE_PAYMENT", "NO_DIFFERENCE",
          "INSUFFICIENT_EVIDENCE"}
 EVENT_TYPES = {"PAYMENT", "REFUND", "CARRIER_CREDIT"}
 PKG_FIELDS = {
-    "case_id", "shipment_id", "invoice_id", "carrier_code", "shipment_on",
+    "case_id", "shipment_id", "invoice_id", "carrier_code", "currency", "shipment_on",
     "invoice_on", "invoice_cents", "expected_cents", "claim_category",
     "authority", "documents", "payment_events", "reviewers", "synthetic_only",
     "buyer_data_rights_verified", "external_claim_authorized",
 }
 DOC_FIELDS = {"id", "case_id", "role", "body", "body_sha256"}
 PAYMENT_FIELDS = {"event_id", "invoice_id", "kind", "posted_on",
-                  "amount_cents", "source_document_id"}
+                  "amount_cents", "currency", "source_document_id"}
 AUTHORITY_FIELDS = {"id", "source_document_id", "carrier_code", "effective_on",
-                    "expires_on", "kind", "real_contract_applicability_established"}
+                    "expires_on", "kind", "currency", "real_contract_applicability_established"}
 REVIEWER_FIELDS = {"reviewer_id", "finding", "blinded", "real_person",
                    "saw_other_vote", "evidence_document_ids"}
 ROOT = Path(__file__).resolve().parent
@@ -64,7 +64,8 @@ def _doc(cid: str, role: str, body: str, suffix: str) -> dict:
 def _invoice_body(p: dict) -> str:
     return ("FICTITIOUS invoice=" + p["invoice_id"] +
             "; shipment=" + p["shipment_id"] +
-            "; invoice_cents=" + str(p["invoice_cents"]))
+            "; invoice_cents=" + str(p["invoice_cents"]) +
+            "; currency=" + p["currency"])
 
 
 def _shipment_body(p: dict) -> str:
@@ -79,7 +80,8 @@ def _authority_body(p: dict) -> str:
             "; carrier=" + a["carrier_code"] +
             "; starts=" + a["effective_on"] +
             "; ends=" + a["expires_on"] +
-            "; expected_cents=" + str(p["expected_cents"]))
+            "; expected_cents=" + str(p["expected_cents"]) +
+            "; currency=" + a["currency"])
 
 
 def _payment_body(event: dict) -> str:
@@ -87,7 +89,8 @@ def _payment_body(event: dict) -> str:
             "; invoice=" + event["invoice_id"] +
             "; kind=" + event["kind"] +
             "; amount_cents=" + str(event["amount_cents"]) +
-            "; posted=" + event["posted_on"])
+            "; posted=" + event["posted_on"] +
+            "; currency=" + event["currency"])
 
 
 def _build_case(index: int, *, invoice: int, expected: int | None,
@@ -101,7 +104,7 @@ def _build_case(index: int, *, invoice: int, expected: int | None,
     pkt = {
         "case_id": cid, "shipment_id": f"SYN-SHIP-{index:02d}",
         "invoice_id": f"SYN-INV-{index:02d}",
-        "carrier_code": "SYN-CARRIER-A",
+        "carrier_code": "SYN-CARRIER-A", "currency": "USD",
         "shipment_on": "2026-02-01", "invoice_on": "2026-02-02",
         "invoice_cents": invoice, "expected_cents": expected,
         "claim_category": "DUPLICATE_PAYMENT" if index == 3 else "BILLING_REVIEW",
@@ -118,7 +121,7 @@ def _build_case(index: int, *, invoice: int, expected: int | None,
             "id": cid + "-RATE", "source_document_id": cid + "-DOC-RATE",
             "carrier_code": authority_carrier,
             "effective_on": effective, "expires_on": expires,
-            "kind": "INVENTED_RATE_NOTE",
+            "kind": "INVENTED_RATE_NOTE", "currency": "USD",
             "real_contract_applicability_established": False,
         }
         docs.append(_doc(cid, "RATE_AUTHORITY", _authority_body(pkt), "DOC-RATE"))
@@ -126,7 +129,7 @@ def _build_case(index: int, *, invoice: int, expected: int | None,
         event = {
             "event_id": f"{cid}-EVENT-{n}", "invoice_id": pkt["invoice_id"],
             "kind": kind, "posted_on": f"2026-02-{10 + n:02d}",
-            "amount_cents": amount,
+            "amount_cents": amount, "currency": "USD",
             "source_document_id": f"{cid}-DOC-PAY-{n}",
         }
         pkt["payment_events"].append(event)
@@ -267,6 +270,8 @@ def validate_fixtures(book: dict, protocol: dict, *, as_of: date) -> list[str]:
                 seen.add(value)
         if p.get("synthetic_only") is not True or p.get("buyer_data_rights_verified") is not False or p.get("external_claim_authorized") is not False:
             _issue(errors, cid, "real-world authority flag forbidden")
+        if p.get("currency") != "USD":
+            _issue(errors, cid, "mixed/unsupported invoice currency")
         if p.get("carrier_code") != "SYN-CARRIER-A":
             _issue(errors, cid, "unexpected real/other carrier")
         if p.get("claim_category") not in {"BILLING_REVIEW", "DUPLICATE_PAYMENT"}:
@@ -296,6 +301,7 @@ def validate_fixtures(book: dict, protocol: dict, *, as_of: date) -> list[str]:
             if (authority.get("id") != cid + "-RATE" or
                 authority.get("source_document_id") != cid + "-DOC-RATE" or
                 authority.get("kind") != "INVENTED_RATE_NOTE" or
+                authority.get("currency") != "USD" or
                 authority.get("real_contract_applicability_established") is not False):
                 _issue(errors, cid, "fake external rate document authority")
             if authority.get("carrier_code") not in {
@@ -359,6 +365,8 @@ def validate_fixtures(book: dict, protocol: dict, *, as_of: date) -> list[str]:
                 _issue(errors, cid, "duplicated/misbound financial event")
             else:
                 event_ids_global.add(eid)
+            if e.get("currency") != "USD":
+                _issue(errors, cid, "mixed/unsupported cash event currency")
             if e.get("invoice_id") != p.get("invoice_id") or e.get("source_document_id") != f"{cid}-DOC-PAY-{n}":
                 _issue(errors, cid, "payment source/invoice link mismatch")
             if e.get("kind") not in EVENT_TYPES or not _is_cents(e.get("amount_cents")) or e.get("amount_cents") == 0:
@@ -411,6 +419,18 @@ def validate_fixtures(book: dict, protocol: dict, *, as_of: date) -> list[str]:
     if not errors and canon_hash(book) != canon_hash(invented_fixture_book()):
         errors.append("fixture drift from locked invented case definitions")
     return errors
+
+
+# The public entry point catches malformed JSON field types; validation
+# failures are reported as holds, never used for a successful calculation.
+_validate_fixture_book_inner = validate_fixtures
+
+
+def validate_fixtures(book: dict, protocol: dict, *, as_of: date) -> list[str]:
+    try:
+        return _validate_fixture_book_inner(book, protocol, as_of=as_of)
+    except (TypeError, ValueError, AttributeError, KeyError, OverflowError):
+        return ["malformed nested synthetic fixture rejected"]
 
 
 def _assess_case(p: dict) -> dict:
