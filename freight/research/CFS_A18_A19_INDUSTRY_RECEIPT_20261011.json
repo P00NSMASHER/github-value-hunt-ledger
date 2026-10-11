@@ -119,7 +119,7 @@
     },
     {
       "id": "warehousing",
-      "category": "NAICS2017 warehousing/storage (verify inclusion in source table)",
+      "category": "NAICS2017 warehousing/storage establishment sector (code 4931 directly observed)",
       "candidate_naics_groups": [
         "4931"
       ],
@@ -200,18 +200,6 @@
       "value_flag": "",
       "ton_flag": "",
       "cross_archive_direct_totals_match": true
-    },
-    {
-      "naics": "45431",
-      "label": "Electronic shopping? for-hire tonnage flagged S; NAICS label requires source review",
-      "mode": "111",
-      "value_million_usd": null,
-      "weight_thousand_tons": null,
-      "a18_stratum": "001",
-      "a19_stratum": "01",
-      "value_flag": "",
-      "ton_flag": "S",
-      "cross_archive_direct_totals_match": false
     }
   ],
   "census_coverage_notes": {
@@ -224,6 +212,14 @@
     "flag_Z_meaning": "Rounds to zero, not a missing or necessarily literal zero",
     "all_50_naics_have_dmode_00_and_111_total_rows_in_both_archives": true,
     "full_original_ZIP_bytes_not_materialized_to_this_git_branch": true,
-    "original_zip_observation_performed_remotely_and_no_customer_files": true
+    "original_zip_observation_performed_remotely_and_no_customer_files": true,
+    "flagged_total_example": {
+      "naics": "45431",
+      "mode": "111",
+      "metric": "TON",
+      "value_in_raw_file": "0",
+      "source_flag": "S",
+      "interpretation": "Suppressed quality-flagged tonnage; do not interpret numeric placeholder as measured 0 tons"
+    }
   }
 }
