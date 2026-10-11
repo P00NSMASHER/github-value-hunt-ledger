@@ -40,6 +40,7 @@ MAPPING_KEYS = {"schema_version", "scope", "source_url", "table_id", "member",
                 "columns", "selectors", "claims_of_external_approval"}
 COLUMN_KEYS = {"geography", "mode", "year", "value_million_usd",
                "weight_thousand_tons"}
+OPTIONAL_COLUMNS = {"value_flag", "weight_flag", "geotype", "mode_flag"}
 SELECTOR_KEYS = {"row_id", "geography", "mode", "year"}
 
 
@@ -187,7 +188,8 @@ def _validate_mapping(mapping: dict, base: dict) -> dict:
     if not _safe_description(member) or not member.lower().endswith((".csv", ".dat")):
         raise ValueError("MAPPING_TABULAR_MEMBER_REQUIRED")
     cols = mapping.get("columns")
-    if (type(cols) is not dict or set(cols) != COLUMN_KEYS or
+    if (type(cols) is not dict or not COLUMN_KEYS <= set(cols) or
+        not set(cols) <= (COLUMN_KEYS | OPTIONAL_COLUMNS) or
         any(not _safe_description(v) for v in cols.values()) or
         len(set(cols.values())) != len(cols)):
         raise ValueError("INVALID_COLUMN_MAPPING")
@@ -212,6 +214,62 @@ def _validate_mapping(mapping: dict, base: dict) -> dict:
     return {row["row_id"]: row for row in selectors}
 
 
+def _reviewed_remote_receipt(original: dict) -> dict:
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
+    if (receipt.get("schema_version") != 1 or
+        receipt.get("scope") != "PUBLIC_CENSUS_A01_REMOTE_BROWSER_SOURCE_RECEIPT_NOT_SIGNED" or
+        receipt.get("source_url") != OFFICIAL_URL or
+        receipt.get("read_method") != "READ_ONLY_REMOTE_BROWSER_OFFICIAL_HTTPS_ZIP_DOWNLOAD_AND_DAT_INSPECTION" or
+        receipt.get("archive_size_bytes") != BROWSER_OBSERVED_ZIP_BYTE_LENGTH or
+        receipt.get("browser_reported_archive_sha256") != BROWSER_OBSERVED_OFFICIAL_ZIP_SHA256 or
+        receipt.get("raw_source_archive_committed_to_repository") is not False or
+        receipt.get("raw_source_archive_replayed_by_github_ci") is not False or
+        receipt.get("publisher_signature_validated") is not False or
+        receipt.get("actual_customer_invoice_data_present") is not False or
+        receipt.get("press_release_editorial_correction_verified") is not False or
+        receipt.get("data_file") != OFFICIAL_DATA_MEMBER or
+        receipt.get("data_delimiter") != "|" or
+        receipt.get("members") != [
+            "CF2200A01.dat", "CF2200A01_FIELDS.txt", "CF2200A01_README.txt"
+        ]):
+        raise ValueError("REMOTE_CENSUS_SOURCE_PROVENANCE_RECEIPT_CHANGED")
+    frozen = {row["id"]: row for row in original["table_rows"]}
+    rows = receipt.get("rows")
+    if type(rows) is not list or len(rows) != len(frozen):
+        raise ValueError("REMOTE_SOURCE_ROW_CENSUS_INCOMPLETE")
+    observed = set()
+    for row in rows:
+        if type(row) is not dict:
+            raise ValueError("INVALID_REMOTE_SOURCE_ROW")
+        rid = row.get("row_id")
+        if rid in observed or rid not in frozen:
+            raise ValueError("INVALID_REMOTE_SOURCE_ROW_ID")
+        observed.add(rid)
+        prior = frozen[rid]
+        if (type(row.get("val")) is not int or
+            type(row.get("ton")) is not int or
+            row["val"] != prior["value_million_usd"] or
+            row["ton"] != prior["weight_thousand_tons"] or
+            row.get("mode") != prior["mode_code"] or
+            row.get("year") != "2022" or
+            row.get("geo_label") != prior["geo"] or
+            row.get("geo_flag") != "" or
+            row.get("val_flag") != "" or row.get("ton_flag") != ""):
+            raise ValueError("REMOTE_SOURCE_VALUE_OR_FLAG_MISMATCH")
+        expected_geotype = "11" if rid == "south.allmodes.2022" else "01"
+        expected_geoid = "0200000US3" if rid == "south.allmodes.2022" else "0100000US"
+        if row.get("geotype") != expected_geotype or row.get("geo_id") != expected_geoid:
+            raise ValueError("REMOTE_SOURCE_GEOGRAPHY_MISMATCH")
+        expected_mode_flag = ("n" if rid == "us.truck.2022" else
+                              "o" if rid == "us.customer.2022" else "")
+        if row.get("mode_flag") != expected_mode_flag:
+            raise ValueError("REMOTE_SOURCE_MODE_FLAG_MISMATCH")
+        if rid in {"us.forhire.2022", "us.company.2022", "us.customer.2022"}:
+            if row.get("change_val_flag") != "N" or row.get("change_ton_flag") != "N":
+                raise ValueError("COMPARABILITY_FLAG_N_WAS_ERASED")
+    return receipt
+
+
 def _integer_cell(raw: str, *, role: str) -> int:
     # Census tables may use D, S, Z, dash, etc. These are not numeric zeros.
     normalized = raw.strip().replace(",", "")
@@ -224,7 +282,13 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
                            simulated_test_bytes: bool = False) -> dict:
     """Check six rows against M12 frozen public excerpt; not publisher truth."""
     original = json.loads(AUDIT.read_text(encoding="utf-8"))
+    receipt = _reviewed_remote_receipt(original)
     selectors = _validate_mapping(mapping, original)
+    if not simulated_test_bytes:
+        if (mapping["member"] != OFFICIAL_DATA_MEMBER or
+            len(raw) != BROWSER_OBSERVED_ZIP_BYTE_LENGTH or
+            digest_bytes(raw) != BROWSER_OBSERVED_OFFICIAL_ZIP_SHA256):
+            raise ValueError("ORIGINAL_ARCHIVE_HASH_DIFFERS_FROM_REMOTE_SOURCE_RECEIPT")
     members, archive = _archive_members(raw)
     names = {x["member"] for x in members if x["is_tabular"]}
     if mapping["member"] not in names:
@@ -247,8 +311,17 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
         raise ValueError("MISSING_CENSUS_SOURCE_ROWS")
     observed = []
     frozen = {x["id"]: x for x in original["table_rows"]}
+    remote_by_id = {item["row_id"]: item for item in receipt["rows"]}
     for rid in sorted(matches):
         row = matches[rid]
+        remote = remote_by_id[rid]
+        for key in ("value_flag", "weight_flag"):
+            if key in c and row[c[key]].strip() != "":
+                raise ValueError("CENSUS_ESTIMATE_SUPPRESSION_OR_QUALITY_FLAG")
+        if "geotype" in c and row[c["geotype"]].strip() != remote["geotype"]:
+            raise ValueError("CENSUS_SOURCE_GEOTYPE_MISMATCH")
+        if "mode_flag" in c and row[c["mode_flag"]].strip() != remote["mode_flag"]:
+            raise ValueError("CENSUS_SOURCE_MODE_COMPARABILITY_FLAG_MISMATCH")
         value = _integer_cell(row[c["value_million_usd"]], role="value")
         weight = _integer_cell(row[c["weight_thousand_tons"]], role="weight")
         expected = frozen[rid]
@@ -266,7 +339,7 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
         "as_of": as_of.isoformat(),
         "scope": ("SYNTHETIC_ARCHIVE_PARSER_TEST_NO_ORIGINAL_SOURCE"
                   if simulated_test_bytes else
-                  "LOCAL_ARCHIVE_MATCHES_RECORDED_EXCERPTS_PUBLISHER_UNAUTHENTICATED"),
+                  "LOCAL_ARCHIVE_BYTES_MATCH_BROWSER_OBSERVED_OFFICIAL_DIGEST_NO_SIGNATURE"),
         "source_url_declared_not_proven": OFFICIAL_URL,
         "original_zip_sha256_if_local_bytes": digest_bytes(raw),
         "member_name": mapping["member"],
@@ -274,6 +347,9 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
         "csv_row_count": len(rows),
         "six_excerpt_rows_matched": len(observed),
         "matched": observed,
+        "matches_browser_observed_official_archive_hash": not simulated_test_bytes,
+        "browser_observation_receipt_sha256": canon_hash(receipt),
+        "original_source_archive_replayed_in_this_run": not simulated_test_bytes,
         "mission12_press_discrepancy_auto_corrected": False,
         "no_source_independent_editorial_resolution": True,
         "original_publisher_authenticated": False,
@@ -295,31 +371,40 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
 
 
 def build_readiness(*, as_of: date) -> dict:
-    """Default deterministic CI path; no file/network acquisition."""
+    """CI observes a pinned remote-browser source receipt; it never downloads."""
     base = json.loads(AUDIT.read_text(encoding="utf-8"))
+    receipt = _reviewed_remote_receipt(base)
     report = {
         "schema_version": 1,
         "as_of": as_of.isoformat(),
-        "scope": "CFS_A01_ORIGINAL_SOURCE_BYTE_REVIEW_NOT_YET_PERFORMED",
+        "scope": "CFS_A01_REMOTE_BROWSER_SOURCE_OBSERVED_OFFLINE_CI_REPLAY_PENDING",
         "intended_original_census_zip_url": OFFICIAL_URL,
         "intended_source_table": TABLE_ID,
         "mission12_frozen_excerpt_digest": canon_hash(base),
+        "remote_browser_observation_receipt_sha256": canon_hash(receipt),
+        "browser_observed_original_zip_sha256": BROWSER_OBSERVED_OFFICIAL_ZIP_SHA256,
+        "browser_observed_zip_length_bytes": BROWSER_OBSERVED_ZIP_BYTE_LENGTH,
+        "browser_observed_six_source_rows": len(receipt["rows"]),
+        "browser_observed_source_member": OFFICIAL_DATA_MEMBER,
+        "browser_observed_source_delimiter": "|",
         "expected_row_count": len(base["table_rows"]),
-        "original_archive_bytes_inspected_in_this_run": False,
-        "actual_official_zip_sha256": None,
+        "original_archive_bytes_inspected_in_this_ci_run": False,
+        "actual_official_zip_sha256_from_ci_run": None,
         "local_column_mapping_approved": False,
         "publisher_signature_verified": False,
-        "independent_original_rows_reproduced": 0,
-        "south_press_discrepancy_cleared": False,
+        "independent_original_rows_reproduced_by_ci_zip_parser": 0,
+        "south_press_discrepancy_corroborrated_from_raw_table": True,
+        "south_press_discrepancy_officially_corrected": False,
         "automatic_source_fetch_or_schedule": False,
         "real_invoice_records_ingested": 0,
         "any_ltl_recovery_market_claim_permitted": False,
         "next_local_operator_steps": (
-            "Retrieve the exact public Census ZIP through a separately authorized "
-            "read-only process; preserve original bytes outside this repository; "
-            "run --inspect to record members/header and actual byte SHA-256; "
-            "prepare a reviewed six-row column mapping; run --verify and manually "
-            "compare source timestamps/terms. No CI source fetching."
+            "The read-only browser observed official CF2200A01.zip bytes and "
+            "the pipe-delimited .dat six-row evidence. For an independent "
+            "local rerun, obtain the same official file in an authorized "
+            "read-only operation without committing the ZIP; run --inspect "
+            "then --verify with the supplied source-format mapping. CI does "
+            "not fetch network sources. No published press release was corrected."
         ),
         "new_lab_created": False,
         "existing_lab_number": 14,
@@ -327,11 +412,10 @@ def build_readiness(*, as_of: date) -> dict:
     report["receipt_sha256"] = canon_hash(report)
     return report
 
-
 def render_html(report: dict) -> str:
     r = report
-    title = ("CFS Original Source: Inspection Still Required"
-             if r["scope"] == "CFS_A01_ORIGINAL_SOURCE_BYTE_REVIEW_NOT_YET_PERFORMED"
+    title = ("CFS Original Source: Browser Receipt Confirmed, Local Replay Pending"
+             if r["scope"] == "CFS_A01_REMOTE_BROWSER_SOURCE_OBSERVED_OFFLINE_CI_REPLAY_PENDING"
              else "Local CFS Source Bytes: Review Results")
     rows = []
     for x in r.get("matched", []):
@@ -341,8 +425,10 @@ def render_html(report: dict) -> str:
             str(x["weight_thousand_tons"]) + "</td></tr>"
         )
     body = (
-        "<p>Original Census ZIP has not been examined in this CI report. "
-        "Manual byte-level verification is still necessary.</p>"
+        "<p>Official source ZIP was read through a read-only remote browser "
+        "and its SHA-256 and six requested rows were recorded. This CI has "
+        "not replayed the ZIP bytes locally. The source is not digitally "
+        "signed and the Census press statement has not been corrected.</p>"
         if not rows else
         "<p>Local bytes matched six frozen excerpt values. This alone "
         "does not authenticate the original publisher or correct the "
