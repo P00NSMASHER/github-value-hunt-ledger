@@ -54,6 +54,9 @@ REQUIRED_SOURCE_KEYS = {
 EXPECTED = {
     "census.cfs2022.pums": {
         "url": "https://www.census.gov/data/datasets/2022/econ/cfs/historical-datasets.html",
+        "publisher": "U.S. Census Bureau / Bureau of Transportation Statistics",
+        "documentation_url": "https://www.census.gov/programs-surveys/cfs.html",
+        "release_on": "2026-01-28",
         "grain": "PUBLIC_USE_SHIPMENT_MICRODATA",
         "kind": "OFFICIAL_FEDERAL_DATASET",
         "rights": "PUBLIC_USE_LABEL_TERMS_AND_REUSE_SCOPE_REVIEW_PENDING",
@@ -61,6 +64,9 @@ EXPECTED = {
     },
     "bts.faf6.regional": {
         "url": "https://www.bts.gov/faf",
+        "publisher": "U.S. Bureau of Transportation Statistics",
+        "documentation_url": "https://rosap.ntl.bts.gov/view/dot/92758",
+        "release_on": "2026-07-31",
         "grain": "ESTIMATED_AGGREGATE_FLOW",
         "kind": "OFFICIAL_FEDERAL_DATASET",
         "rights": "FEDERAL_PUBLIC_DOWNLOAD_RIGHTS_SCOPE_REVIEW_PENDING",
@@ -68,6 +74,9 @@ EXPECTED = {
     },
     "census.cfs2022.api": {
         "url": "https://www.census.gov/data/developers/data-sets/cfs/2022.html",
+        "publisher": "U.S. Census Bureau",
+        "documentation_url": "https://www.census.gov/data/developers/data-sets/cfs.html",
+        "release_on": None,
         "grain": "PUBLISHED_AGGREGATE_STATISTICS",
         "kind": "OFFICIAL_FEDERAL_DATASET",
         "rights": "FEDERAL_API_AND_REUSE_TERMS_REVIEW_PENDING",
@@ -75,6 +84,9 @@ EXPECTED = {
     },
     "census.cfs2022.tables": {
         "url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
+        "publisher": "U.S. Census Bureau / Bureau of Transportation Statistics",
+        "documentation_url": "https://www.census.gov/programs-surveys/cfs.html",
+        "release_on": "2025-06-26",
         "grain": "PUBLISHED_AGGREGATE_STATISTICS",
         "kind": "OFFICIAL_FEDERAL_DATASET",
         "rights": "PUBLISHED_TABLE_TERMS_REVIEW_PENDING",
@@ -82,6 +94,9 @@ EXPECTED = {
     },
     "edifabric.edi210.sample": {
         "url": "https://www.edifabric.com/docs/transactions/x12-210.html",
+        "publisher": "EdiFabric / ediNation (third-party vendor)",
+        "documentation_url": "https://support.edifabric.com/hc/en-us/articles/360010597351-Parse-Generate-X12-210-Freight-Invoice",
+        "release_on": None,
         "grain": "PUBLISHED_EDI_EXAMPLE_NOT_A_REAL_VERIFIED_INVOICE",
         "kind": "PUBLISHER_ILLUSTRATIVE_EXAMPLE",
         "rights": "THIRD_PARTY_REPUBLICATION_LICENSE_NOT_ESTABLISHED",
@@ -89,6 +104,9 @@ EXPECTED = {
     },
     "github.freighttrust.x12examples": {
         "url": "https://github.com/freighttrust/X12-Examples",
+        "publisher": "freighttrust GitHub repository; apparent EdiFabric-derived examples",
+        "documentation_url": "https://github.com/freighttrust/X12-Examples/tree/master/EdiFabric.Examples.X12.T210",
+        "release_on": None,
         "grain": "PUBLISHED_EDI_EXAMPLE_NOT_A_REAL_VERIFIED_INVOICE",
         "kind": "PUBLIC_GITHUB_REPOSITORY",
         "rights": "NO_ROOT_LICENSE_OBSERVED_AND_UPSTREAM_PROVENANCE_UNRESOLVED",
@@ -96,6 +114,9 @@ EXPECTED = {
     },
     "x12.210.definition": {
         "url": "https://x12.org/node/4210",
+        "publisher": "X12 standards organization",
+        "documentation_url": "https://x12.org/products/transaction-sets",
+        "release_on": None,
         "grain": "STANDARD_DESCRIPTION_ONLY",
         "kind": "STANDARDS_DEFINITION",
         "rights": "PROPRIETARY_STANDARD_CONTENT_RIGHTS_NOT_CLEARED",
@@ -198,6 +219,12 @@ def validate_catalog(book: dict, protocols: dict, *, as_of: date) -> list[str]:
             continue
         if s["url"] != ref["url"] or not _https_url(s["url"]):
             errors.append(f"{ident}: source URL provenance mismatched")
+        if s["publisher"] != ref["publisher"]:
+            errors.append(f"{ident}: publisher provenance mismatched")
+        if s["documentation_url"] != ref["documentation_url"]:
+            errors.append(f"{ident}: documentation URL provenance mismatched")
+        if s["release_on"] != ref["release_on"]:
+            errors.append(f"{ident}: source release chronology differs from dated snapshot")
         if not _https_url(s["documentation_url"]):
             errors.append(f"{ident}: unsafe documentation URL")
         try:
@@ -257,6 +284,8 @@ def build_readiness(*, as_of: date, book: dict | None = None,
     review = []
     for position, ident in enumerate(PRIORITY, start=1):
         row = by_id[ident]
+        days_since_review = (as_of - _iso(row["reviewed_on"])).days
+        refresh_due = days_since_review >= 90
         review.append({
             "source_id": ident,
             "research_priority_ordinal_not_market_quality": position,
@@ -272,7 +301,10 @@ def build_readiness(*, as_of: date, book: dict | None = None,
             "lineage_family": row["lineage_family"],
             "next_operator_review": row["next_action"],
             "limitations": row["limitations"],
-            "status": "PUBLIC_METADATA_CATALOGUED_NOT_ADMITTED",
+            "status": ("PUBLIC_METADATA_STALE_RECHECK" if refresh_due
+                       else "PUBLIC_METADATA_CATALOGUED_NOT_ADMITTED"),
+            "days_since_source_review": days_since_review,
+            "source_recheck_due": refresh_due,
             "real_invoice_ground_truth_available": False,
             "can_run_customer_accuracy_benchmark": False,
             "dataset_bytes_examined": False,
@@ -309,6 +341,8 @@ def build_readiness(*, as_of: date, book: dict | None = None,
         "related_protocols": method_coverage,
         "review_queue": review,
         "rights_cleared_reuse_count": 0,
+        "metadata_refresh_window_days": 90,
+        "metadata_sources_due_for_recheck": sum(1 for r in review if r["source_recheck_due"]),
         "datasets_imported": 0,
         "invoice_ground_truth_benchmarks": 0,
         "independently_verified_recovery_benchmarks": 0,
