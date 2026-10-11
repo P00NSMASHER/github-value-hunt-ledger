@@ -212,6 +212,38 @@ class InvoiceGroundTruthTests(unittest.TestCase):
             self.assertIn("positive integer cents", "; ".join(
                 validate_fixtures(b,p,as_of=AS_OF)))
 
+    def test_currency_mismatch_cannot_be_net_settled(self):
+        for nested, value in (
+            ("invoice", "EUR"),
+            ("authority", "EUR"),
+            ("payment", "EUR"),
+        ):
+            b,p=fixtures()
+            if nested == "invoice":
+                b["cases"][0]["currency"] = value
+            elif nested == "authority":
+                b["cases"][0]["authority"]["currency"] = value
+            else:
+                b["cases"][0]["payment_events"][0]["currency"] = value
+            self.assertTrue(validate_fixtures(b,p,as_of=AS_OF), nested)
+            with self.assertRaisesRegex(ValueError, "INVALID_SYNTHETIC_GROUND_TRUTH"):
+                run_ground_truth(as_of=AS_OF,book=b,protocols=p)
+
+    def test_malformed_nested_payloads_fail_closed_as_errors(self):
+        for field, value in (
+            ("invoice_id", []),
+            ("shipment_on", []),
+            ("authority", {"bad": 1}),
+            ("documents", [1]),
+            ("reviewers", [None]),
+            ("payment_events", [{"invalid": 1}]),
+        ):
+            b,p=fixtures()
+            b["cases"][0][field]=value
+            self.assertTrue(validate_fixtures(b,p,as_of=AS_OF),field)
+            with self.assertRaisesRegex(ValueError,"INVALID_SYNTHETIC_GROUND_TRUTH"):
+                run_ground_truth(as_of=AS_OF,book=b,protocols=p)
+
     def test_refunds_larger_than_paid_cannot_be_counted(self):
         b,p = fixtures()
         e = b["cases"][6]["payment_events"][1]
