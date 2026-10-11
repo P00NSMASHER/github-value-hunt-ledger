@@ -34,6 +34,22 @@ def test_pack_subtracts_reversal_from_realized_value():
     assert finding["net_realized_cents"] == 6000
 
 
+def test_pack_accepts_full_reversal_as_zero_realized_value():
+    data = payload()
+    row = data["findings"][1]
+    row["reversal_cents"] = row["settled_credit_cents"]
+    pack = build_pack(data)
+    assert pack["findings"][1]["net_realized_cents"] == 0
+
+
+def test_pack_rejects_reversal_above_settled_credit():
+    data = payload()
+    row = data["findings"][1]
+    row["reversal_cents"] = row["settled_credit_cents"] + 1
+    with pytest.raises(ValueError, match="reversal_cents cannot exceed settled_credit_cents"):
+        build_pack(data)
+
+
 def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     report = render_markdown(build_pack(payload()))
     assert "SYNTHETIC / FICTIONAL EXAMPLE" in report
