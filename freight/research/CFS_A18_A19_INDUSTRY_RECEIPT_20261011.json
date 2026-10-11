@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CFS_INDUSTRY_PUBLIC_SOURCE_METADATA_AND_QUALITY_HOLD",
+  "observed_on": "2026-10-11",
+  "survey_year": 2022,
+  "publication_on": "2025-06-26",
+  "observation_method": "PUBLIC_OFFICIAL_CENSUS_INDEX_PLUS_READ_ONLY_ORIGINAL_ARCHIVE_REVIEW",
+  "original_source_binary_stored_in_repo": false,
+  "raw_data_ingested_in_ci": false,
+  "any_customer_or_carrier_records": false,
+  "actual_ltl_invoice_spend_measured": false,
+  "invoice_error_prevalence_established": false,
+  "buyer_opportunity_ranking_authorized": false,
+  "freight_audit_market_revenue_established": false,
+  "external_contact_or_financial_actions_allowed": false,
+  "publisher_signature_verified": false,
+  "official_archives": [
+    {
+      "table_id": "CF2200A18",
+      "name": "Origin NAICS by mode by shipment distance (U.S.)",
+      "url": "https://www2.census.gov/programs-surveys/cfs/data/2022/CF2200A18.zip",
+      "source_index_url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
+      "dataset_grain": "NAICS2017_X_DMODE_X_SHIPDIST_US_2022",
+      "published_table_row_count": 7312,
+      "original_zip_size_bytes": null,
+      "original_zip_sha256": null,
+      "original_archive_observed_by_read_only_browser": false,
+      "local_ci_replay_of_original": false,
+      "table_member": "CF2200A18.dat",
+      "original_member_structure_inspected": false,
+      "source_limit": "Shipment value is value of goods and weights are tons; distance buckets and NAICS rollups overlap in totals. No freight-invoice spend."
+    },
+    {
+      "table_id": "CF2200A19",
+      "name": "Origin NAICS by mode by shipment weight (U.S.)",
+      "url": "https://www2.census.gov/programs-surveys/cfs/data/2022/CF2200A19.zip",
+      "source_index_url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
+      "dataset_grain": "NAICS2017_X_DMODE_X_SHIPWT_US_2022",
+      "published_table_row_count": 6782,
+      "original_zip_size_bytes": null,
+      "original_zip_sha256": null,
+      "original_archive_observed_by_read_only_browser": false,
+      "local_ci_replay_of_original": false,
+      "table_member": "CF2200A19.dat",
+      "original_member_structure_inspected": false,
+      "source_limit": "CFS shipment weight brackets are shipment observations, not invoice weight, load-factor or a paid LTL rate. Hierarchical categories overlap."
+    }
+  ],
+  "research_segments": [
+    {
+      "id": "manufacturing",
+      "category": "NAICS2017 industry class (verify label on source)",
+      "candidate_naics_groups": [
+        "31-33"
+      ],
+      "rank": 1,
+      "hypothesis": "Some manufacturers might have recurring third-party LTL bill complexity; no paid invoice sample or demand observed.",
+      "falsifier": "Verify NAICS shipment-for-hire share with usable published cells and separately obtain a permissioned actual LTL invoice sample, false-positive controls and governing contracts.",
+      "demand_verified": false,
+      "customer_invoice_count_verified": 0,
+      "lfv_market_opportunity_usd": null
+    },
+    {
+      "id": "wholesale",
+      "category": "NAICS2017 industry class (verify label on source)",
+      "candidate_naics_groups": [
+        "42"
+      ],
+      "rank": 2,
+      "hypothesis": "Wholesale freight networks may use multi-carrier billing; route-mix and actual paid LTL invoice incidence remain unknown.",
+      "falsifier": "Inspect official NAICS-mode weight/distance rows; then independently test actual authorized paid LTL invoices, contracted rates and existing audit capabilities.",
+      "demand_verified": false,
+      "customer_invoice_count_verified": 0,
+      "lfv_market_opportunity_usd": null
+    },
+    {
+      "id": "warehousing",
+      "category": "NAICS2017 warehousing/storage (verify inclusion in source table)",
+      "candidate_naics_groups": [
+        "493"
+      ],
+      "rank": 3,
+      "hypothesis": "Warehouses/distribution operations could handle multi-stop shipping, but CFS coverage and their direct invoice-payment authority cannot be assumed.",
+      "falsifier": "Determine if NAICS 493 appears as its own category or only within auxiliary coverage, then verify buyer-owner and mode-specific invoice authority.",
+      "demand_verified": false,
+      "customer_invoice_count_verified": 0,
+      "lfv_market_opportunity_usd": null
+    }
+  ],
+  "required_followups": [
+    "Pin actual public ZIP SHA-256 and `.dat` member headers; do not infer from directory listing",
+    "Inspect NAICS2017 and hierarchy fields, multi-level total buckets for each mode and distance/weight",
+    "Count suppressed VAL/TON cells and missing/flagged coefficients of variation rather than convert flags to zero",
+    "Reconcile comparable all-distance/all-weight cells across A18/A19 only when identical NAICS, DMODE, vintage and units",
+    "Separate company-owned and customer pickup from true for-hire trucks and never substitute for LTL-only paid invoices",
+    "Keep 2022 survey goods values distinct from freight invoices, customer demand, fee-eligible recovery and annual revenue"
+  ],
+  "legal_boundary": "Public Census aggregate series are statistically estimated population data, not private customer records, invoiced rates, transportation contracts, recoverable overpayments, or real-world demand evidence."
+}
