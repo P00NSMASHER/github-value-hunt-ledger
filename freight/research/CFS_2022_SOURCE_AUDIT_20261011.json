@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CFS_2022_PUBLIC_EXCERPT_RECONCILIATION_ONLY",
+  "research_as_of": "2026-10-11",
+  "survey_year": 2022,
+  "reported_publication_date": "2025-06-26",
+  "data_origin": "OFFICIAL_PUBLICLY_VISIBLE_TABLE_AND_PRESS_EXCERPTS_MANUALLY_REVIEWED_NOT_FULL_CSV",
+  "raw_zip_downloaded": false,
+  "original_csv_contents_examined": false,
+  "upstream_zip_sha256": null,
+  "independent_issuer_signature_verified": false,
+  "invoice_level_records_received": 0,
+  "real_buyer_data_ingested": false,
+  "claim_submission_or_fee_authorized": false,
+  "commercial_market_tam_established": false,
+  "actual_ltl_invoice_spend_measured": false,
+  "public_performance_claims_permitted": false,
+  "new_lab_created": false,
+  "notes": "Published 2022 CFS tabulations survey in-scope shipments, values, weights and modes. For-hire trucking is not an LTL-only series. The 2022 truck total includes company-owned and new customer pickup; CFS and FAF lineage overlaps. All source excerpts require original-page review before external use.",
+  "sources": [
+    {
+      "id": "cfs.2022.a01.table",
+      "publisher": "U.S. Census Bureau",
+      "title": "CF2200A01 Geographic Area Series: Shipment Characteristics by Origin Geography by Mode",
+      "url": "https://data.census.gov/table/CFSAREA2022.CF2200A01",
+      "publication_date": "2025-06-26",
+      "observed_on": "2026-10-11",
+      "review_method": "OFFICIAL_TABLE_SEARCH_EXCERPT_NOT_COMPLETE_CSV",
+      "raw_dataset_downloaded": false,
+      "publisher_authenticated_digitally": false,
+      "independently_reproduced_from_full_dataset": false,
+      "scope": "Official published 2022 survey estimates, not freight invoices, invoices paid, LTL market size or recoveries"
+    },
+    {
+      "id": "cfs.2022.press.release",
+      "publisher": "U.S. Census Bureau",
+      "title": "Census Bureau Reports Shipment of U.S. Goods Reached 12.2 Billion Tons and $18.0 Trillion",
+      "url": "https://www.census.gov/newsroom/press-releases/2025/cfs-shipments-of-goods.html",
+      "publication_date": "2025-06-26",
+      "observed_on": "2026-10-11",
+      "review_method": "DIRECT_OFFICIAL_PUBLIC_RELEASE_TEXT",
+      "raw_dataset_downloaded": false,
+      "publisher_authenticated_digitally": false,
+      "independently_reproduced_from_full_dataset": false,
+      "scope": "Rounded public highlights; the South-region tonnage prose appears inconsistent with detailed published table"
+    },
+    {
+      "id": "cfs.2022.a01.directory",
+      "publisher": "U.S. Census Bureau",
+      "title": "2022 CFS Download Directory — CF2200A01.zip listing",
+      "url": "https://www2.census.gov/programs-surveys/cfs/data/2022/",
+      "publication_date": "2025-06-26",
+      "observed_on": "2026-10-11",
+      "review_method": "DIRECT_OFFICIAL_DIRECTORY_LISTING_METADATA_ONLY",
+      "raw_dataset_downloaded": false,
+      "publisher_authenticated_digitally": false,
+      "independently_reproduced_from_full_dataset": false,
+      "scope": "Directory lists 164 KB CF2200A01.zip; no ZIP bytes examined or actual original-file digest calculated"
+    }
+  ],
+  "table_rows": [
+    {
+      "id": "us.allmodes.2022",
+      "source_id": "cfs.2022.a01.table",
+      "geo": "United States",
+      "geo_class": "US",
+      "mode_code": "00",
+      "mode": "All modes",
+      "year": 2022,
+      "value_million_usd": 17996782,
+      "weight_thousand_tons": 12169793
+    },
+    {
+      "id": "us.truck.2022",
+      "source_id": "cfs.2022.a01.table",
+      "geo": "United States",
+      "geo_class": "US",
+      "mode_code": "11",
+      "mode": "Single-mode truck (incl. pickup)",
+      "year": 2022,
+      "value_million_usd": 13222965,
+      "weight_thousand_tons": 8293501
+    },
+    {
+      "id": "us.forhire.2022",
+      "source_id": "cfs.2022.a01.table",
+      "geo": "United States",
+      "geo_class": "US",
+      "mode_code": "111",
+      "mode": "For-hire truck",
+      "year": 2022,
+      "value_million_usd": 8062541,
+      "weight_thousand_tons": 3909476
+    },
+    {
+      "id": "us.company.2022",
+      "source_id": "cfs.2022.a01.table",
+      "geo": "United States",
+      "geo_class": "US",
+      "mode_code": "112",
+      "mode": "Company-owned truck",
+      "year": 2022,
+      "value_million_usd": 4141550,
+      "weight_thousand_tons": 2994372
+    },
+    {
+      "id": "us.customer.2022",
+      "source_id": "cfs.2022.a01.table",
+      "geo": "United States",
+      "geo_class": "US",
+      "mode_code": "113",
+      "mode": "Customer pickup",
+      "year": 2022,
+      "value_million_usd": 1018874,
+      "weight_thousand_tons": 1389653
+    },
+    {
+      "id": "south.allmodes.2022",
+      "source_id": "cfs.2022.a01.table",
+      "geo": "South Region",
+      "geo_class": "REGION",
+      "mode_code": "00",
+      "mode": "All modes",
+      "year": 2022,
+      "value_million_usd": 6689859,
+      "weight_thousand_tons": 4919551
+    }
+  ],
+  "press_release": {
+    "id": "press.release.2025.cfs2022",
+    "source_id": "cfs.2022.press.release",
+    "total_rounded_billion_tons": 12.2,
+    "total_rounded_trillion_usd": 18,
+    "truck_mode_weight_pct": 68.1,
+    "truck_mode_value_pct": 73.5,
+    "south_claimed_billion_tons": 1.9,
+    "south_claimed_pct_of_national_tonnage": 40.4,
+    "manufacturing_rounded_billion_tons": 4.9,
+    "manufacturing_rounded_trillion_usd": 7.1,
+    "wholesale_rounded_billion_tons": 4.1,
+    "wholesale_rounded_trillion_usd": 8.1,
+    "press_south_tonnage_consistent_with_percent": false,
+    "claimed_price_or_invoice_field_present": false
+  },
+  "candidate_verticals": [
+    {
+      "id": "manufacturing",
+      "label": "Manufacturing establishments",
+      "source_field": "press.release.2025.cfs2022.manufacturing_rounded_billion_tons",
+      "source_group": "CFS_2022_SHARED_SURVEY_FAMILY",
+      "research_hypothesis": "Manufacturers with recurring for-hire LTL invoices may have date-sensitive accessorial, freight class, discount and contract complexity; demand and error frequency are unproven.",
+      "next_falsification": "Identify a rights-cleared sample of actual paid for-hire LTL invoices and dated rate documents from consenting establishments, including invoices with no errors.",
+      "prohibited_inference": "Manufacturing commodity-shipment value cannot become LTL billings, annual recovery rate or buyer willingness.",
+      "buyer_authorization_observed": false,
+      "invoice_spend_measured": false,
+      "carrier_mode_LTL_confirmed": false,
+      "demand_validated": false,
+      "research_priority_not_market_ranking": 1
+    },
+    {
+      "id": "wholesale",
+      "label": "Wholesale establishments",
+      "source_field": "press.release.2025.cfs2022.wholesale_rounded_billion_tons",
+      "source_group": "CFS_2022_SHARED_SURVEY_FAMILY",
+      "research_hypothesis": "Wholesalers with multiple carrier contracts may be worth testing for invoice reconciliation complexity, but no observed invoice mix, actual paid charges or recovery incidence has been supplied.",
+      "next_falsification": "Before ranking buyers, document real LTL versus parcel and company-owned transport share, contract access, incumbent audit tools and buyer authority in a permissioned study.",
+      "prohibited_inference": "The source's $8.1T value of shipped goods is not freight charges, fees, audit market TAM or revenue.",
+      "buyer_authorization_observed": false,
+      "invoice_spend_measured": false,
+      "carrier_mode_LTL_confirmed": false,
+      "demand_validated": false,
+      "research_priority_not_market_ranking": 2
+    },
+    {
+      "id": "distribution",
+      "label": "Warehousing and distribution auxiliaries",
+      "source_field": "cfs.2022.press.release.industry_coverage_not_segment_value",
+      "source_group": "CFS_2022_SHARED_SURVEY_FAMILY",
+      "research_hypothesis": "Distribution establishments appear in the CFS sampling universe, but this press release does not publish an isolated warehouse truck/freight-invoice volume metric.",
+      "next_falsification": "Extract 2022 official GAS18 (NAICS × mode × distance) with source dictionary, then separately verify which movements produce third-party LTL invoices.",
+      "prohibited_inference": "Survey coverage alone cannot establish distribution-center market size or invoice-error risk.",
+      "buyer_authorization_observed": false,
+      "invoice_spend_measured": false,
+      "carrier_mode_LTL_confirmed": false,
+      "demand_validated": false,
+      "research_priority_not_market_ranking": 3
+    }
+  ],
+  "open_research_tasks": [
+    {
+      "id": "GAS18_NAICS_MODE_DISTANCE",
+      "table_id": "CF2200A18",
+      "official_listing_url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
+      "research_need": "Origin establishment NAICS crossed with domestic mode and shipping distance for 2022, with sample quality/CV and suppression disclosure; avoid classifying for-hire truck as all LTL.",
+      "download_approved": false
+    },
+    {
+      "id": "GAS19_NAICS_MODE_WEIGHT",
+      "table_id": "CF2200A19",
+      "official_listing_url": "https://www.census.gov/data/tables/2022/econ/cfs/aff-2022.html",
+      "research_need": "Understand mode mix by establishment category and shipment weight; not freight invoice charges or paid carrier spend.",
+      "download_approved": false
+    },
+    {
+      "id": "CFS_A01_FULL_ROW_RECHECK",
+      "table_id": "CF2200A01",
+      "official_listing_url": "https://www2.census.gov/programs-surveys/cfs/data/2022/",
+      "research_need": "Check official full download and methodology against searchable table for source-ratio precision and South press discrepancy, with documented file digest and terms in a separately authorized acquisition.",
+      "download_approved": false
+    }
+  ]
+}
