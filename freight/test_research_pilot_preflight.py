@@ -156,6 +156,25 @@ class PilotPreflightTests(unittest.TestCase):
         args[0]["gates"][0]["customer_name"] = "private customer"
         self.assertIn("missing or unexpected key", "; ".join(validate(args)))
 
+    def test_sensitive_identifiers_cannot_hide_in_freeform_planning_fields(self):
+        examples = (
+            "contact shipper.name@example.com",
+            "SSN 123-45-6789",
+            "call (570) 555-0123",
+            "file /mnt/private/customer-invoice.pdf",
+            "Bearer pretendedtoken",
+            "ghp_ABCDEFGHIJKLMN123456",
+        )
+        for example in examples:
+            args = list(fixture())
+            args[0]["gates"][0]["required_evidence"] += " " + example
+            self.assertIn("no personal identifiers, private paths or credentials",
+                          "; ".join(validate(args)), example)
+        args = list(fixture())
+        args[0]["intended_scope"] += " contact jane@example.com"
+        self.assertIn("planning scope may not contain personal identifiers",
+                      "; ".join(validate(args)))
+
     def test_gates_must_have_original_unverified_permits(self):
         for key, value in (
             ("status", "INDEPENDENTLY_VERIFIED"),
