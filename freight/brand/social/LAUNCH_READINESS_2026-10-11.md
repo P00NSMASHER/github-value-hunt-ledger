@@ -66,6 +66,14 @@ A browser that is blocked by Meta or cannot inspect an authenticated CTA must re
 
 **Independent public-readback result (Oct 11):** The public Instagram page fetch returned RETALLY / @retallyrecovery, the evidence-backed freight audit and $0-upfront bio, one public post, and a clickable outbound canonical website link via Instagram's `l.instagram.com` redirect. Its public metadata reported 29 followers; this is a profile snapshot, not proof of marketing reach or qualified demand. A fresh public Facebook Page fetch returned **`login_required`**; the avatar, cover, CTA and website field remain unverified from an unauthenticated session despite the owner's reported update. No actual Facebook setting was edited in this audit. Public website readback confirms the manual email-draft disclosure, approved PNG wordmark and canonical HTTPS www address.
 
+### Later October 11 public-readback and controlled audit supplement
+
+This file's early October 11 `login_required` note is a **time-specific observation**, not the final public Facebook visual state. A [later independent public Page readback](https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/344) showed a **green/black RETALLY emblem avatar**, **light-gray branded cover**, and an About website pointing directly to `https://www.retallyrecovery.com/`. This supersedes the blue-R observation **for public appearance only**. The exact uploaded PNG-master hash, full phone crop, configured action button, and authenticated Page administration remain unverified; no Page settings were changed.
+
+An October 11 fresh read-only check of the existing seven Facebook scheduled-caption URLs loaded all seven live RETALLY branded website destinations with the original source/medium/campaign/content tags preserved. That establishes working links, **not social publication, actual clicks or inquiries**. The existing [manual public-asset inspection workflow](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/workflows/retally-social-evidence.yml) was attempted through GitHub Actions but the browser required sign-in; **no workflow run or image-byte report was produced**. CDN media is therefore not independently binary-verified, rather than proved broken.
+
+See the [October organic audience research and distribution handoff](./ORGANIC_AUDIENCE_SIGNALS_2026-10.md). It introduces no new scheduled posts, paid ads, Reels, automatic commenting or changes to the protected November drafts.
+
 ## Next execution checks (on demand, no scheduled task created)
 **At first Facebook post, Oct 12 after 9 AM ET:** verify actual public post URL, visible image/text, tagged destination and landing CTA. Record any Metricool error. Verify publication again on Instagram Oct 13 after 10 AM ET.
 
