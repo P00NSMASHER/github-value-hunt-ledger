@@ -23,6 +23,15 @@ def fixture():
 
 
 class CfsIndustryComparisonTests(unittest.TestCase):
+    def test_reported_4931_combines_484_transportation_not_pure_warehouse(self):
+        r=build_comparison(as_of=DAY)
+        row=next(x for x in r["industry_comparisons"] if x["naics2017"]=="4931")
+        self.assertTrue(row["source_4931_484_tabulation_group_not_pure_warehouse"])
+        self.assertIn("4931/484",row["label"])
+        self.assertIn("captive warehouse",r["source_4931_484_tabulation_note"])
+        self.assertIn("excludes warehouses serving the public",
+                      r["source_4931_484_tabulation_note"])
+
     def test_three_exact_national_all_mode_source_comparisons(self):
         p,s=fixture()
         self.assertEqual(validate_plan(p,s,as_of=DAY),[])
@@ -106,7 +115,7 @@ class CfsIndustryComparisonTests(unittest.TestCase):
         self.assertTrue(r["same_survey_not_independent_sources"])
         self.assertEqual(r["quantitative_data_basis"],"FIVE_DIRECT_NATIONAL_A18_A19_CFS2022_TOTALS")
         self.assertIn("not freight rate",r["limits"])
-        self.assertIn("not rates among manufacturers",r["quality_statistical_caveat"])
+        self.assertIn("not freight-billing error rates among manufacturers",r["quality_statistical_caveat"])
         self.assertFalse(r["no_public_buyer_claims_authorized"] is False)
 
     def test_all_four_real_data_gates_remain_unapproved(self):
