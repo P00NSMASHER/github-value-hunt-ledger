@@ -317,6 +317,28 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
             pass
         else:
             raise ValueError("UNVERIFIED_CENSUS_ARCHIVE_INPUT_ACCEPTED")
+        from freight.research_cfs_industry_quality import (
+            build_readiness as industry_readiness,
+            validate_manifest as validate_industry_manifest,
+        )
+        industry=industry_readiness(as_of=today)
+        _must(industry["public_archive_leads"]==2,
+              "OFFICIAL_CFS_INDUSTRY_ARCHIVE_CENSUS_INCOMPLETE")
+        _must(industry["remote_browser_original_rows_observed"]==14094,
+              "CENSUS_INDUSTRY_SOURCE_ROWS_MISSING")
+        _must(industry["remote_browser_flag_counts"]["CF2200A18"]["value"]["S"]==1839,
+              "CFS_NON_PUBLISHABLE_GOODS_ESTIMATES_HIDDEN")
+        _must(industry["remote_browser_flag_counts"]["CF2200A19"]["weight"]["S"]==1956,
+              "CFS_NON_PUBLISHABLE_WEIGHT_ESTIMATES_HIDDEN")
+        _must(industry["verified_paid_ltl_spend_usd"] is None and
+              industry["buyer_demand_verified"] is False,
+              "CFS_COMMODITY_SHIPMENT_VALUES_PROMOTED_TO_REAL_FREIGHT_INVOICES")
+        _must(industry["source_rows_from_full_files_replayed_in_ci"]==0,
+              "FAKE_FULL_CFS_FILE_REPLAY_FROM_CI")
+        forged_industry=_read("research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json")
+        forged_industry["official_archives"][0]["value_flag_counts"]["S"]=0
+        _must(bool(validate_industry_manifest(forged_industry,as_of=today)),
+              "FABRICATED_CFS_INDUSTRY_QUALITY_COUNTS_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -352,6 +374,10 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "cfs_original_archive_readiness_receipt_sha256":byte_status["receipt_sha256"],
                 "cfs_original_archive_remote_browser_sha256":byte_status["browser_observed_original_zip_sha256"],
                 "cfs_original_archive_bytes_replayed_in_ci":False,
+                "cfs_industry_origins_observed":industry["public_archive_leads"],
+                "cfs_industry_remote_source_rows":industry["remote_browser_original_rows_observed"],
+                "cfs_industry_data_receipt_sha256":industry["receipt_sha256"],
+                "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
