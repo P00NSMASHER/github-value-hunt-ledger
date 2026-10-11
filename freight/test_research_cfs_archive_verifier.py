@@ -12,7 +12,7 @@ import warnings
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from freight.research_cfs_archive_verifier import (
-    OFFICIAL_URL, TABLE_ID, MAPPING_SCOPE, AUDIT,
+    OFFICIAL_URL, TABLE_ID, MAPPING_SCOPE, AUDIT, RECEIPT,
     build_readiness, digest_bytes, inspect_local_archive,
     match_original_excerpt, render_html, _read_archive,
 )
@@ -74,14 +74,20 @@ def synthetic_zip(csv_bytes=None, member=MEMBER, extras=None):
 class SourceByteVerifierTests(unittest.TestCase):
     def test_default_readiness_does_not_claim_original_zip_was_downloaded(self):
         r = build_readiness(as_of=TODAY)
-        self.assertEqual(r["scope"], "CFS_A01_ORIGINAL_SOURCE_BYTE_REVIEW_NOT_YET_PERFORMED")
-        self.assertFalse(r["original_archive_bytes_inspected_in_this_run"])
+        self.assertEqual(r["scope"], "CFS_A01_REMOTE_BROWSER_SOURCE_OBSERVED_OFFLINE_CI_REPLAY_PENDING")
+        self.assertEqual(r["browser_observed_original_zip_sha256"],
+                         "15d90f1e64c5b3fb86c5f619a32350f9c60256cc3eaaa48838115fc70f7d6499")
+        self.assertEqual(r["browser_observed_zip_length_bytes"], 167855)
+        self.assertEqual(r["browser_observed_six_source_rows"], 6)
+        self.assertEqual(r["browser_observed_source_member"], "CF2200A01.dat")
+        self.assertFalse(r["original_archive_bytes_inspected_in_this_ci_run"])
         self.assertFalse(r["publisher_signature_verified"])
         self.assertFalse(r["automatic_source_fetch_or_schedule"])
-        self.assertIsNone(r["actual_official_zip_sha256"])
-        self.assertEqual(r["independent_original_rows_reproduced"], 0)
+        self.assertIsNone(r["actual_official_zip_sha256_from_ci_run"])
+        self.assertEqual(r["independent_original_rows_reproduced_by_ci_zip_parser"], 0)
         self.assertEqual(r["expected_row_count"], 6)
-        self.assertFalse(r["south_press_discrepancy_cleared"])
+        self.assertFalse(r["south_press_discrepancy_officially_corrected"])
+        self.assertTrue(r["south_press_discrepancy_corroborrated_from_raw_table"])
         self.assertFalse(r["any_ltl_recovery_market_claim_permitted"])
         self.assertEqual(r["receipt_sha256"], canon_hash({
             k:v for k,v in r.items() if k != "receipt_sha256"
@@ -185,6 +191,64 @@ class SourceByteVerifierTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"ORIGINAL_ARCHIVE_HAS_NO_CSV"):
             inspect_local_archive(synthetic_zip(member="readme.txt"),as_of=TODAY)
 
+    def test_actual_census_dat_pipe_format_and_flags_are_understood(self):
+        receipt=json.loads(RECEIPT.read_text(encoding="utf-8"))
+        cols=["#GEOTYPE","GEO_ID","DMODE","YEAR","VAL","VAL_F",
+              "TON","TON_F","DMODE_F","VALPCHG_F","TONPCHG_F"]
+        values=[]
+        for row in receipt["rows"]:
+            values.append([
+                row["geotype"],row["geo_id"],row["mode"],row["year"],
+                str(row["val"]),row["val_flag"],str(row["ton"]),row["ton_flag"],
+                row["mode_flag"],row["change_val_flag"],row["change_ton_flag"],
+            ])
+        data=("|".join(cols)+"\n"+"\n".join("|".join(row) for row in values)+"\n").encode("utf-8")
+        orig=synthetic_zip(csv_bytes=data,member="CF2200A01.dat",
+                           extras=[("CF2200A01_FIELDS.txt","sample notes"),
+                                   ("CF2200A01_README.txt","test only")])
+        m=json.loads((RECEIPT.parent/"CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json").read_text())
+        report=match_original_excerpt(raw=orig,mapping=m,as_of=TODAY,simulated_test_bytes=True)
+        self.assertEqual(report["six_excerpt_rows_matched"],6)
+        self.assertEqual(report["member_name"],"CF2200A01.dat")
+        self.assertFalse(report["original_source_archive_replayed_in_this_run"])
+        self.assertFalse(report["original_publisher_authenticated"])
+        self.assertEqual(report["scope"],"SYNTHETIC_ARCHIVE_PARSER_TEST_NO_ORIGINAL_SOURCE")
+
+    def test_synthetic_dat_cannot_impersonate_hashed_official_archive(self):
+        m=json.loads((RECEIPT.parent/"CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json").read_text())
+        with self.assertRaisesRegex(ValueError,"ORIGINAL_ARCHIVE_HASH_DIFFERS"):
+            match_original_excerpt(raw=synthetic_zip(member="CF2200A01.dat"),
+                                   mapping=m,as_of=TODAY,simulated_test_bytes=False)
+
+    def test_remote_receipt_has_real_source_ids_units_and_blank_estimate_flags(self):
+        receipt=json.loads(RECEIPT.read_text(encoding="utf-8"))
+        self.assertEqual(receipt["archive_size_bytes"],167855)
+        self.assertEqual(receipt["data_delimiter"],"|")
+        self.assertEqual(receipt["data_file"],"CF2200A01.dat")
+        rows={x["row_id"]:x for x in receipt["rows"]}
+        self.assertEqual(rows["south.allmodes.2022"]["geo_id"],"0200000US3")
+        self.assertEqual(rows["south.allmodes.2022"]["ton"],4919551)
+        self.assertEqual(rows["us.truck.2022"]["mode_flag"],"n")
+        self.assertEqual(rows["us.customer.2022"]["mode_flag"],"o")
+        self.assertTrue(all(x["val_flag"]=="" and x["ton_flag"]=="" for x in rows.values()))
+        self.assertTrue(all(rows[x]["change_val_flag"]=="N"
+                            for x in ("us.forhire.2022","us.company.2022","us.customer.2022")))
+
+    def test_browser_source_receipt_cannot_relabel_suppressed_or_future_rules(self):
+        import freight.research_cfs_archive_verifier as module
+        with tempfile.TemporaryDirectory() as d:
+            receipt=json.loads(RECEIPT.read_text(encoding="utf-8"))
+            receipt["rows"][0]["val_flag"]="S"
+            fake=Path(d)/"forged-source.json"
+            fake.write_text(json.dumps(receipt))
+            original=module.RECEIPT
+            try:
+                module.RECEIPT=fake
+                with self.assertRaisesRegex(ValueError,"REMOTE_SOURCE_VALUE_OR_FLAG_MISMATCH"):
+                    build_readiness(as_of=TODAY)
+            finally:
+                module.RECEIPT=original
+
     def test_mapping_cannot_invent_new_source_or_version(self):
         for key,val in (("source_url","https://attacker.example/cfs.zip"),
                         ("table_id","CF2200A18"),("scope","CERTIFIED"),
@@ -249,8 +313,8 @@ class SourceByteVerifierTests(unittest.TestCase):
     def test_readiness_html_is_escaped_and_refuses_verification_claim(self):
         r=build_readiness(as_of=TODAY)
         html=render_html(r)
-        self.assertIn("Inspection Still Required",html)
-        self.assertIn("has not been examined",html)
+        self.assertIn("Browser Receipt Confirmed",html)
+        self.assertIn("read through a read-only remote browser",html)
         self.assertNotIn("official source authenticated: yes",html.lower())
         bad=deepcopy(r)
         bad["scope"]='<script>alert("x")</script>'
@@ -264,7 +328,7 @@ class SourceByteVerifierTests(unittest.TestCase):
         self.assertEqual(a,b)
         self.assertFalse(a["automatic_source_fetch_or_schedule"])
         future=build_readiness(as_of=date(2027,2,1))
-        self.assertFalse(future["independent_original_rows_reproduced"])
+        self.assertFalse(future["independent_original_rows_reproduced_by_ci_zip_parser"])
         self.assertEqual(future["real_invoice_records_ingested"],0)
 
 
