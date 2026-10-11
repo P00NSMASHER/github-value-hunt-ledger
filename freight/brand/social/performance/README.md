@@ -158,3 +158,59 @@ The comparison detects:
 The tool never makes network requests, changes schedule entries, updates Facebook/Instagram, reads customer records or creates recurring tasks. The --fail-on-risk flag exits with code 2 on HIGH-severity findings; without it the tool always emits a report for manual inspection. No tokens or account credentials are required. Preserve the source export date and compare before the first scheduled Oct 12 9 AM Eastern Facebook slot, then inspect actual publication on the live page.
 
 The fresh getScheduledPosts result may include unrelated YouTube/LinkedIn items. Those are explicitly ignored by the Facebook/Instagram drift check. The two additional November Field Notes drafts beyond the frozen source should appear as informational additions, never permission to publish.
+
+
+## Public media + landing-page preflight (manual, GET-only)
+
+The additional public_asset_preflight.py is **not a second schedule monitor**:
+queue_preflight.py verifies stable UUIDs, original dates, captions and publishing
+flags; this preflight verifies **public CDN image bytes and the tagged website
+destinations** from the same immutable October 11 snapshot. No account
+login, social publishing API, website form POST, or customer record is read.
+
+**Offline default** (does not contact the internet):
+
+~~~
+python3 freight/brand/social/performance/public_asset_preflight.py \
+  --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+  --output /tmp/retally-url-manifest.md \
+  --json-output /tmp/retally-url-manifest.json
+~~~
+
+**Live public inspection** (explicit on-demand HTTPS GET):
+
+~~~
+python3 freight/brand/social/performance/public_asset_preflight.py \
+  --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+  --live --output /tmp/retally-public-urls.md \
+  --json-output /tmp/retally-public-urls.json
+~~~
+
+Or run GitHub Actions **RETALLY social evidence review → Run workflow**.
+The workflow performs live media/site checks *only* on manual dispatch
+and uploads a seven-day Markdown/JSON review artifact. Pull-request CI
+remains completely offline. This addition does **not** create a cron job.
+
+The October 11 snapshot yields **11 distinct public images** (13 scheduled
+posts reuse two images) and **7 individually tagged Facebook destinations**.
+By default, four unpublished November carousels are excluded; use
+--include-drafts for a separate opt-in review of their image URLs, without
+publishing or approving them. Every URL must match an exact public
+hostname allowlist: static.metricool.com/planner for media and
+www.retallyrecovery.com for tracked Facebook links. Redirects are not
+followed; GET response size is bounded. Fail-closed validation rejects
+off-domain URLs and missing required source/campaign/content tags.
+
+**Result interpretation:** PASS means a valid image or branded HTML loaded
+from that testing vantage point; FAIL means a concrete 404/410 or invalid
+served format; RECHECK covers a timeout, 403/CDN restriction, 429, 5xx,
+or a potentially unsuitable image dimension. A RECHECK is *not* proof
+that Meta cannot publish, and a PASS is *not* evidence that a social post
+went live. Missing live publication receipts must still be independently
+verified using social_review.py and metricool_join.py. Provider-side
+publication, qualified inquiries and ROI are outside this preflight.
+
+The GitHub PR tests include pure in-memory fake HTTP response fixtures:
+valid PNG/JPEG, invalid image bytes, access-denied pages, timeouts,
+non-allowlisted SSRF candidates, duplicate URLs and protected drafts.
+No external network calls occur on PRs.
