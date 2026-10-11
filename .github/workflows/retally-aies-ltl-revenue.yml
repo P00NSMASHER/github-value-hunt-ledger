@@ -98,13 +98,21 @@ jobs:
           p=Path('/tmp/retally-aies-fred')
           r=json.loads((p/'aies_ltl_revenue.json').read_text())
           s=r['source']
-          assert s['fred_public_csv_replay_completed'] is True
-          assert len(s['fred_csv_replay_receipts'])==3
-          assert all(len(x['csv_sha256'])==64 and
-                     x['verified_observation_years']==[2022,2023,2024] and
-                     x['downloaded_from_census_origin_api'] is False and
-                     x['original_census_publisher_signature_proven'] is False
-                     for x in s['fred_csv_replay_receipts'])
+          if s['fresh_fred_source_status']=='VERIFIED_FRED_CSV_VALUES_AT_THIS_RUN':
+            assert s['fred_public_csv_replay_completed'] is True
+            assert len(s['fred_csv_replay_receipts'])==3
+            assert all(len(x['csv_sha256'])==64 and
+                       x['verified_observation_years']==[2022,2023,2024] and
+                       x['downloaded_from_census_origin_api'] is False and
+                       x['original_census_publisher_signature_proven'] is False
+                       for x in s['fred_csv_replay_receipts'])
+            print('FRED distributor CSV observations verified for this run.')
+          elif s['fresh_fred_source_status']=='BLOCKED_EXTERNAL_FRED_CSV_UNREACHABLE_NOT_VERIFIED':
+            assert s['fred_public_csv_replay_completed'] is False
+            assert s['fred_csv_replay_receipts']==[]
+            print('BLOCKED: FRED remote endpoint unavailable, NO newly verified source data.')
+          else:
+            raise AssertionError('SOURCE_REFRESH_UNEXPECTED_STATUS')
           assert r['ltl_2024_revenue_billion_usd']=='65.096'
           assert r['ltl_2024_share_of_all_trucking_pct']=='16.16'
           assert r['ltl_freight_audit_recoverable_tam_usd'] is None
@@ -112,7 +120,7 @@ jobs:
           assert r['buyer_demand_proven'] is False
           assert r['commercial_uses_or_external_contact_allowed'] is False
           assert s['full_census_origin_api_bytes_replayed'] is False
-          print('Three FRED published CSV receipts matched. No actual customer spend or recovery claims.')
+          print('Source status:', s['fresh_fred_source_status'], '; no customer spend or recovery claims.')
           PY
       - name: Retain source digests and report, never customer or raw CSV files
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
