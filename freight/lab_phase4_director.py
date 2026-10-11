@@ -272,6 +272,27 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         _must(bool(validate_preflight(
             fraudulent, validation, sources, rehearsal, truth, as_of=today)),
             "FORGED_CUSTOMER_PILOT_SIGNOFF_ACCEPTED")
+        from freight.research_market_audit import (
+            build_market_audit, validate_catalog as validate_cfs_audit,
+        )
+        cfs_market=build_market_audit(as_of=today,protocols=validation)
+        _must(cfs_market["table_excerpt_rows"]==6,
+              "CENSUS_PUBLIC_SOURCE_ROW_COVERAGE_INCOMPLETE")
+        _must(cfs_market["published_estimate_measurements"][
+            "truck_mode_value_components_equal_source_total"],
+              "TRUCK_CLASSIFICATION_VALUE_SUM_WRONG")
+        _must(cfs_market["published_estimate_measurements"][
+            "truck_mode_weight_components_equal_source_total"],
+              "TRUCK_CLASSIFICATION_TONNAGE_SUM_WRONG")
+        _must(cfs_market["press_release_reconciliation"][
+            "regional_flagged_conflicts"][0]["press_number_cleared_for_use"] is False,
+              "PRESS_RELEASE_REGIONAL_CONTRADICTION_SILENTLY_CORRECTED")
+        _must(cfs_market["market_ranking_or_recovery_tam_established"] is False,
+              "SHIPMENT_VALUE_MISLABELLED_AS_FREIGHT_RECOVERY_MARKET")
+        tampered_cfs=_read("research/CFS_2022_SOURCE_AUDIT_20261011.json")
+        tampered_cfs["table_rows"][0]["value_million_usd"]*=1000
+        _must(bool(validate_cfs_audit(tampered_cfs,validation,as_of=today)),
+              "THOUSAND_MILLION_SOURCE_UNIT_TAMPER_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -300,6 +321,10 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "pilot_unmet_human_evidence_requirements":pilot["unmet_requirements"],
                 "pilot_preflight_receipt_sha256":pilot["receipt_sha256"],
                 "approved_independent_customer_pilots":pilot["studies_with_pilot_data"],
+                "cfs_published_table_excerpt_rows":cfs_market["table_excerpt_rows"],
+                "cfs_unresolved_press_conflicts":len(cfs_market["press_release_reconciliation"]["regional_flagged_conflicts"]),
+                "cfs_market_source_audit_receipt_sha256":cfs_market["receipt_sha256"],
+                "ltl_recovery_market_established":False,
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
