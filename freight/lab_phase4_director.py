@@ -224,6 +224,18 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         adversarial["cases"][0]["adjudication"]="CLAIM_VERIFIED_BY_CUSTOMER"
         _must(bool(validate_fixture_book(adversarial,validation,as_of=today)),
               "FORGED_INDEPENDENT_ADJUDICATION_ACCEPTED")
+        from freight.research_data_readiness import build_readiness, validate_catalog
+        sources=build_readiness(as_of=today, protocols=validation)
+        _must(sources["source_leads"]==7,"PUBLIC_FREIGHT_SOURCE_REGISTRY_INCOMPLETE")
+        _must(sources["datasets_imported"]==0,"PUBLIC_METADATA_FRAUDULENTLY_IMPORTED")
+        _must(sources["invoice_ground_truth_benchmarks"]==0,
+              "FREIGHT_MARKET_DATA_MASQUERADING_AS_INVOICE_GROUND_TRUTH")
+        _must(sources["lineage_family_counts"]["CFS_FAF_2022_INTERDEPENDENT"]==4,
+              "DUPLICATE_SOURCE_LINEAGE_NOT_DECLARED")
+        forged_source=_read("research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json")
+        forged_source["sources"][0]["independent_invoice_ground_truth_present"]=True
+        _must(bool(validate_catalog(forged_source,validation,as_of=today)),
+              "FORGED_PUBLIC_INVOICE_GROUND_TRUTH_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -243,6 +255,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "rehearsed_research_methods":rehearsal["rehearsed_protocols"],
                 "invented_rehearsal_records":rehearsal["invented_case_records"],
                 "synthetic_rehearsal_receipt_sha256":rehearsal["receipt_sha256"],
+                "public_freight_source_leads":sources["source_leads"],
+                "public_freight_source_readiness_sha256":sources["receipt_sha256"],
+                "rights_cleared_freight_data_imports":sources["datasets_imported"],
                 "independent_customer_studies_completed":0,
                 "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
