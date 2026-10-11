@@ -38,7 +38,7 @@ def fake_archive(table="CF2200A18", *, edit=None):
        {"NAICS2017":"42","DMODE":"111",axis:"00","YEAR":"2022",
         "VAL":"0","VAL_F":"S","VAL_S":"0","VAL_S_F":"S",
         "TON":"300","TON_F":"","TON_S":"13.1","TON_S_F":""},
-       {"NAICS2017":"493","DMODE":"111",axis:"00","YEAR":"2022",
+       {"NAICS2017":"4931","DMODE":"111",axis:"00","YEAR":"2022",
         "VAL":"123","VAL_F":"","VAL_S":"0","VAL_S_F":"N",
         "TON":"0","TON_F":"N","TON_S":"0","TON_S_F":"N"},
        {"NAICS2017":"31-33","DMODE":"11",axis:"00","YEAR":"2022",
@@ -81,6 +81,66 @@ class CensusIndustryQualityTests(unittest.TestCase):
             k:v for k,v in r.items() if k!="receipt_sha256"
         }))
 
+    def test_read_only_observed_source_hashes_and_row_counts_are_pinned(self):
+        r=build_readiness(as_of=TODAY)
+        self.assertEqual(r["remote_browser_original_rows_observed"],14094)
+        self.assertEqual([s["remote_observed_zip_size_bytes"] for s in r["sources"]],
+                         [93390,107682])
+        self.assertEqual([s["remote_observed_original_dataset_rows"] for s in r["sources"]],
+                         [7312,6782])
+        self.assertEqual(r["sources"][0]["remote_observed_zip_sha256"],
+                         "a18ce071599457572177dd56f8a6174594d1018da9b9024476c4e9832a357bf5")
+        self.assertEqual(r["sources"][1]["remote_observed_zip_sha256"],
+                         "fe3085d23a3c76704a0d86d9213bb38d3d341b2c228990a5ebf40b6b3f1b661d")
+        self.assertTrue(all(s["original_source_downloaded_or_inspected_in_external_browser"]
+                            for s in r["sources"]))
+        self.assertTrue(all(s["original_source_archive_bytes_replayed_in_ci"] is False
+                            for s in r["sources"]))
+
+    def test_exact_browser_observed_cfs_quality_flag_counts(self):
+        r=build_readiness(as_of=TODAY)
+        flags=r["remote_browser_flag_counts"]
+        self.assertEqual(flags["CF2200A18"]["value"],{"blank":5430,"S":1839,"Z":43})
+        self.assertEqual(flags["CF2200A18"]["weight"],{"blank":4991,"S":2224,"Z":97})
+        self.assertEqual(flags["CF2200A19"]["value"],{"blank":4628,"S":2063,"Z":91})
+        self.assertEqual(flags["CF2200A19"]["weight"],{"blank":4474,"S":1956,"Z":352})
+        for table,n in (("CF2200A18",7312),("CF2200A19",6782)):
+            self.assertEqual(sum(flags[table]["value"].values()),n)
+            self.assertEqual(sum(flags[table]["weight"].values()),n)
+
+    def test_five_direct_national_source_rows_not_hierarchical_sum(self):
+        r=build_readiness(as_of=TODAY)
+        rows={(x["naics"],x["mode"]):x for x in r["verified_source_industry_direct_totals"]}
+        self.assertEqual(len(rows),5)
+        self.assertEqual(rows[("00","00")]["value_million_usd"],17996782)
+        self.assertEqual(rows[("00","111")]["value_million_usd"],8062541)
+        self.assertEqual(rows[("31-33","00")]["value_million_usd"],7073495)
+        self.assertEqual(rows[("42","00")]["weight_thousand_tons"],4115279)
+        self.assertEqual(rows[("4931","00")]["value_million_usd"],1347716)
+        self.assertTrue(all(x["cross_archive_direct_totals_match"] is True for x in rows.values()))
+        self.assertFalse(r["recovery_tam_calculated"])
+
+    def test_rounded_zero_flag_is_not_an_exact_zero(self):
+        def flag(rows):
+            rows[0]["VAL"]="0"
+            rows[0]["VAL_F"]="Z"
+        out=profile_local_zip(raw=fake_archive(edit=flag),table_id="CF2200A18",
+                              as_of=TODAY,synthetic_test=True)
+        self.assertEqual(out["sample_value_quality_counts"]["value:CENSUS_ROUNDED_TO_ZERO_NOT_LITERAL_ZERO"],1)
+        self.assertIsNone(out["industry_examples"]["31-33"][0]["goods_value_million_usd"])
+
+    def test_local_original_source_flag_counts_cannot_be_silently_forged(self):
+        for key,bad in (
+            ("original_zip_sha256","b"*64),
+            ("value_flag_counts",{"blank":7312,"S":0,"Z":0}),
+            ("unique_naics_codes_observed",51),
+            ("remote_observed_header","badheader"),
+            ("remote_observed_parsed_data_rows",100),
+        ):
+            b=book()
+            b["official_archives"][0][key]=bad
+            self.assertIn("pinned source byte hash", "; ".join(validate_manifest(b,as_of=TODAY)),key)
+
     def test_source_vintage_and_index_row_count_cannot_be_swapped(self):
         for key,val in (
             ("dataset_grain","NAICS2017_X_DMODE_X_SHIPWT_US_2022"),
@@ -97,8 +157,8 @@ class CensusIndustryQualityTests(unittest.TestCase):
         for key,value in (
             ("original_zip_size_bytes",105000),
             ("original_zip_sha256","b"*64),
-            ("original_archive_observed_by_read_only_browser",True),
-            ("original_member_structure_inspected",True),
+            ("original_archive_observed_by_read_only_browser",False),
+            ("original_member_structure_inspected",False),
         ):
             b=book();b["official_archives"][0][key]=value
             self.assertTrue(validate_manifest(b,as_of=TODAY),key)
@@ -122,7 +182,7 @@ class CensusIndustryQualityTests(unittest.TestCase):
         self.assertEqual([x["id"] for x in s],
                          ["manufacturing","wholesale","warehousing"])
         self.assertEqual([x["candidate_naics2017"] for x in s],
-                         [["31-33"],["42"],["493"]])
+                         [["31-33"],["42"],["4931"]])
         self.assertTrue(all(x["buying_propensity_known"] is False and
                             x["verified_paid_ltl_invoice_count"] == 0
                             for x in s))
@@ -176,14 +236,14 @@ class CensusIndustryQualityTests(unittest.TestCase):
     def test_unavailable_weight_not_reported_as_observed_zero(self):
         r=profile_local_zip(raw=fake_archive(),table_id="CF2200A18",
                             as_of=TODAY,synthetic_test=True)
-        row=r["industry_examples"]["493"][0]
+        row=r["industry_examples"]["4931"][0]
         self.assertIsNone(row["shipment_weight_thousand_tons"])
         self.assertEqual(row["shipment_weight_flag"],"N")
 
     def test_missing_cv_with_N_flag_does_not_create_certified_precision(self):
         r=profile_local_zip(raw=fake_archive(),table_id="CF2200A18",
                             as_of=TODAY,synthetic_test=True)
-        row=r["industry_examples"]["493"][0]
+        row=r["industry_examples"]["4931"][0]
         self.assertEqual(row["goods_value_million_usd"],123)
         self.assertIsNone(row["goods_value_cv"])
         self.assertTrue(r["sample_value_quality_counts"]["value:CV_NOT_ESTABLISHED"]>=1)
@@ -220,7 +280,7 @@ class CensusIndustryQualityTests(unittest.TestCase):
                               as_of=TODAY,synthetic_test=True)
 
     def test_fake_six_good_rows_cannot_claim_official_census_archive(self):
-        with self.assertRaisesRegex(ValueError,"NO_INDEPENDENT_REMOTE_SOURCE_FINGERPRINT"):
+        with self.assertRaisesRegex(ValueError,"ORIGINAL_CFS_INDUSTRY_ARCHIVE_SHA256_MISMATCH"):
             profile_local_zip(raw=fake_archive(),table_id="CF2200A18",
                               as_of=TODAY,synthetic_test=False)
 
@@ -273,6 +333,18 @@ class CensusIndustryQualityTests(unittest.TestCase):
         self.assertIn("&lt;script&gt;",html)
         self.assertNotIn("<script>",html)
         self.assertIn("Industry exposure is not invoice opportunity",html)
+
+    def test_industry_record_edit_does_not_become_new_source_truth(self):
+        b=book()
+        b["actual_industry_source_records"][0]["value_million_usd"]=50_000_000
+        self.assertIn("published direct industry source values","; ".join(
+            validate_manifest(b,as_of=TODAY)))
+
+    def test_quality_control_expires_after_90_days_without_fake_refresh(self):
+        r=build_readiness(as_of=date(2027,2,1))
+        self.assertTrue(r["source_recheck_due_after_90_days"])
+        self.assertGreaterEqual(r["source_review_age_days"],90)
+        self.assertEqual(r["source_rows_from_full_files_replayed_in_ci"],0)
 
     def test_later_replay_does_not_invent_new_source_verification(self):
         r=build_readiness(as_of=date(2027,1,20))
