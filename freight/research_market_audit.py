@@ -61,7 +61,20 @@ PRESS_NUMBERS = {
     "wholesale_rounded_trillion_usd": Decimal("8.1"),
 }
 V_GROUPS = {"manufacturing", "wholesale", "distribution"}
-OPEN_TABLES = ("CF2200A18", "CF2200A19", "CF2200A01")
+VERTICAL_BINDINGS = {
+    "manufacturing": ("Manufacturing establishments",
+                      "press.release.2025.cfs2022.manufacturing_rounded_billion_tons"),
+    "wholesale": ("Wholesale establishments",
+                  "press.release.2025.cfs2022.wholesale_rounded_billion_tons"),
+    "distribution": ("Warehousing and distribution auxiliaries",
+                     "cfs.2022.press.release.industry_coverage_not_segment_value"),
+}
+OPEN_TASK_BINDINGS = {
+    "GAS18_NAICS_MODE_DISTANCE": "CF2200A18",
+    "GAS19_NAICS_MODE_WEIGHT": "CF2200A19",
+    "CFS_A01_FULL_ROW_RECHECK": "CF2200A01",
+}
+OPEN_TABLES = tuple(OPEN_TASK_BINDINGS.values())
 REQUIRED_ROOT_FIELDS = {
     "schema_version", "scope", "research_as_of", "survey_year",
     "reported_publication_date", "data_origin", "raw_zip_downloaded",
@@ -287,6 +300,9 @@ def _validate_catalog_inner(book: dict, protocols: dict, *, as_of: date) -> list
             errors.append(f"vertical {i}: unknown or repeated segment")
             continue
         seen.add(ident)
+        label, source_field = VERTICAL_BINDINGS[ident]
+        if item.get("label") != label or item.get("source_field") != source_field:
+            errors.append(f"{ident}: vertical taxonomy or source field changed")
         if item.get("source_group") != "CFS_2022_SHARED_SURVEY_FAMILY":
             errors.append(f"{ident}: Census evidence cannot become independent studies")
         for key in ("buyer_authorization_observed", "invoice_spend_measured",
@@ -311,8 +327,9 @@ def _validate_catalog_inner(book: dict, protocols: dict, *, as_of: date) -> list
             errors.append("invalid original-table research step")
             continue
         code = item.get("table_id")
-        if code not in OPEN_TABLES or code in tables:
-            errors.append("unsupported/duplicate Census table research task")
+        task_id = item.get("id")
+        if task_id not in OPEN_TASK_BINDINGS or code != OPEN_TASK_BINDINGS[task_id] or code in tables:
+            errors.append("unsupported/duplicate Census table research task or id")
         tables.add(code)
         if item.get("download_approved") is not False or not _meaningful(item.get("research_need"), 55):
             errors.append(f"{code}: cannot claim download authority or invent review")
