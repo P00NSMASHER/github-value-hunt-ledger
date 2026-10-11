@@ -49,6 +49,10 @@ on:
       - 'freight/test_research_industry_comparison.py'
       - 'freight/research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json'
       - 'freight/RESEARCH_CFS_INDUSTRY_COMPARISON.md'
+      - 'freight/research_cfs_forhire.py'
+      - 'freight/test_research_cfs_forhire.py'
+      - 'freight/research/CFS_FORHIRE_REPLAY_PLAN_20261011.json'
+      - 'freight/RESEARCH_CFS_FORHIRE_REPLAY.md'
       - 'freight/research/SOURCE_ANCHORS_20261010.json'
       - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
@@ -78,7 +82,7 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_research_pilot_preflight.py freight/test_research_market_audit.py freight/test_research_cfs_archive_verifier.py freight/test_research_cfs_industry_quality.py freight/test_research_industry_comparison.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_research_pilot_preflight.py freight/test_research_market_audit.py freight/test_research_cfs_archive_verifier.py freight/test_research_cfs_industry_quality.py freight/test_research_industry_comparison.py freight/test_research_cfs_forhire.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
           PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
@@ -416,6 +420,34 @@ jobs:
           assert 'Compare observed freight goods' in (p/'cfs_industry_comparison.html').read_text()
           print('Three published Census industry goods comparisons, guarded quality rates, zero LTL revenue/market claims.')
           PY
+      - name: Enforce original Census for-hire extraction provenance and unverified CI data
+        run: |
+          PYTHONPATH=. python -m freight.research_cfs_forhire --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'cfs_forhire_replay.json').read_text())
+          assert r['scope']=='LAB14_CFS_FORHIRE_SECTOR_REPLAY_AWAITING_ORIGINAL_ZIPS'
+          assert r['source_files_replayed_in_ci']==0
+          assert r['source_industry_forhire_rows_reproduced_in_ci']==0
+          assert r['sectors_with_verified_forhire_numerators']==0
+          assert r['source_total_rows_to_reconcile']==12
+          assert r['approval']=='BLOCKED_NO_INDUSTRY_MODE_SOURCE_BYTE_REPLAY'
+          assert [x['naics2017'] for x in r['industry_research_targets']]==['31-33','42','4931']
+          assert all(x['forhire_value_million_usd'] is None
+                     and x['forhire_weight_thousand_tons'] is None
+                     and x['goods_value_share_pct'] is None
+                     for x in r['industry_research_targets'])
+          assert r['no_inferred_ltl_only_transport_classification'] is True
+          assert r['no_real_customer_invoice_records_used'] is True
+          assert r['no_recoverable_overcharges_observed'] is True
+          assert r['source_fetch_or_scheduler_enabled'] is False
+          assert r['new_lab_created'] is False and r['existing_lab_number']==14
+          assert len(r['receipt_sha256'])==64
+          assert 'For-hire industry evidence must come from the original source' in (p/'cfs_forhire_replay.html').read_text()
+          print('Census for-hire archive parser adversarial tests passed; real mode-111 sector cells not replayed in CI; LTL spending unknown.')
+          PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -446,5 +478,7 @@ jobs:
             /tmp/retally-research-intelligence/cfs_industry_quality.html
             /tmp/retally-research-intelligence/cfs_industry_comparison.json
             /tmp/retally-research-intelligence/cfs_industry_comparison.html
+            /tmp/retally-research-intelligence/cfs_forhire_replay.json
+            /tmp/retally-research-intelligence/cfs_forhire_replay.html
           if-no-files-found: error
           retention-days: 14
