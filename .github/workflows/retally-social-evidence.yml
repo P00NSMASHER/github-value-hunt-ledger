@@ -36,3 +36,21 @@ jobs:
           assert all('SYNTHETIC_' in p['uuid'] for p in d['posts'])
           print('Offline social evidence reporting PASS; no real posting side effects')
           PY
+      - name: Validate frozen real launch-planner snapshot
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-launch-frozen.json" \
+            --output "$RUNNER_TEMP/retally-launch-frozen.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-launch-frozen.json').read_text())
+          assert d['counts']['DRAFT'] == 4
+          assert d['counts']['UPCOMING_NOT_YET_PUBLIC'] == 13
+          assert d['counts']['VERIFIED_PUBLIC'] == 0
+          assert len(d['posts']) == 17
+          assert not [p for p in d['posts'] if not p['draft'] and p['warnings']]
+          print('Frozen RETALLY campaign snapshot PASS: 13 active + 4 unpublished draft entries')
+          PY
