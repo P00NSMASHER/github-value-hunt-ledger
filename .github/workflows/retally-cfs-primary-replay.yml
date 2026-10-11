@@ -1,0 +1,83 @@
+name: RETALLY Lab 14 Census Primary-Source Replay (Mission 17)
+on:
+  pull_request:
+    paths:
+      - 'freight/research_cfs_primary_replay.py'
+      - 'freight/test_research_cfs_primary_replay.py'
+      - 'freight/research_cfs_mode_hierarchy.py'
+      - 'freight/research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json'
+      - 'freight/RESEARCH_CFS_PRIMARY_REPLAY.md'
+      - '.github/workflows/retally-cfs-primary-replay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-adversarial-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify bounded Lab 14 source matching without network
+        run: |
+          PYTHONPATH=. python -m unittest freight.test_research_cfs_primary_replay -v
+          PYTHONPATH=. python -m unittest freight.test_research_cfs_mode_hierarchy -v
+
+  verify-original-census-zips:
+    needs: offline-adversarial-proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Download exactly two original Census public archives, rehash and replay
+        run: |
+          PYTHONPATH=. python -m freight.research_cfs_primary_replay \
+            --fetch-official --as-of-date "$(date -u +%F)" \
+            --out "$RUNNER_TEMP/retally-cfs-m17-evidence"
+      - name: Independently enforce evidence receipt and forbid claim promotion
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'retally-cfs-m17-evidence'
+          r=json.loads((p/'cfs_primary_replay.json').read_text())
+          assert r['scope']=='LAB14_CFS_OFFICIAL_BYTES_60_ROW_REPLAY_NOT_LTL_BILLING'
+          assert r['status']=='SOURCE_BYTES_MATCH_OBSERVED_HASHES_AND_60_CELLS'
+          assert r['acquisition']=='DIRECT_CENSUS_HTTPS_GET_IN_THIS_CI_RUN'
+          assert r['selected_rows_matched']==60
+          assert sorted(x['selected_rows_matched'] for x in r['tables'])==[30,30]
+          assert r['source_bytes_replayed_this_run'] is True
+          assert r['publisher_digitally_signed_archive_verified'] is False
+          assert r['github_mirror_other_tables_or_other_repo_files_proven'] is False
+          assert r['a18_a19_full_mirror_dat_files_match_official_original_dat_bytes'] is True
+          assert all(x['whole_dat_file_identical_to_git_mirror_proven'] is True
+                     and len(x['official_member_git_blob_sha1'])==40 for x in r['tables'])
+          assert r['source_2022_five_year_cfs_goods_survey_not_freight_invoices'] is True
+          assert r['actual_paid_ltl_invoices_observed']==0
+          assert r['ltl_only_freight_spend_usd'] is None
+          assert r['ltl_recovery_market_tam_usd'] is None
+          assert r['recoveries_proven'] is False
+          assert r['buyer_demand_proven'] is False
+          assert r['commercial_public_claims_authorized'] is False
+          assert r['customer_or_carrier_records_processed'] is False
+          assert r['new_lab_created'] is False and r['lab']==14
+          assert len(r['receipt_sha256'])==64
+          assert (p/'cfs_primary_replay.html').is_file()
+          print('Census A18/A19 60 source rows reproduced; NO LTL billing or marketing authority.')
+          PY
+      - name: Retain only analysis receipt, never original government archives
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-census-original-byte-replay
+          path: |
+            ${{ runner.temp }}/retally-cfs-m17-evidence/cfs_primary_replay.json
+            ${{ runner.temp }}/retally-cfs-m17-evidence/cfs_primary_replay.html
+          if-no-files-found: error
+          retention-days: 14
