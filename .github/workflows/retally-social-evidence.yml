@@ -1,0 +1,56 @@
+name: RETALLY social evidence review
+
+on:
+  pull_request:
+    paths:
+      - 'freight/brand/social/performance/**'
+      - '.github/workflows/retally-social-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-review-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Check out reviewed commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Unit tests — zero social API calls
+        run: python3 -m unittest discover -s freight/brand/social/performance -p 'test_social_review.py' -v
+      - name: Exercise safe synthetic report
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/example_metricool_snapshot.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --output "$RUNNER_TEMP/retally-social-evidence.md" \
+            --json-output "$RUNNER_TEMP/retally-social-evidence.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-social-evidence.json').read_text())
+          assert d['counts']['DRAFT'] == 1
+          assert d['counts']['UPCOMING_NOT_YET_PUBLIC'] == 2
+          assert d['counts']['VERIFIED_PUBLIC'] == 0
+          assert all('SYNTHETIC_' in p['uuid'] for p in d['posts'])
+          print('Offline social evidence reporting PASS; no real posting side effects')
+          PY
+      - name: Validate frozen real launch-planner snapshot
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-launch-frozen.json" \
+            --output "$RUNNER_TEMP/retally-launch-frozen.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-launch-frozen.json').read_text())
+          assert d['counts']['DRAFT'] == 4
+          assert d['counts']['UPCOMING_NOT_YET_PUBLIC'] == 13
+          assert d['counts']['VERIFIED_PUBLIC'] == 0
+          assert len(d['posts']) == 17
+          assert not [p for p in d['posts'] if not p['draft'] and p['warnings']]
+          print('Frozen RETALLY campaign snapshot PASS: 13 active + 4 unpublished draft entries')
+          PY
