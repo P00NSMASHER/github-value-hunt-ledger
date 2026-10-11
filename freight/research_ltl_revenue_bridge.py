@@ -327,6 +327,10 @@ def build_revenue(*, as_of: date, book: dict | None = None,
             "source_snapshot_git_blob_sha1": EXPECTED_BOOK_GIT_BLOB_SHA1,
             "full_census_origin_api_bytes_replayed": False,
             "fred_public_csv_replay_completed": downloaded_csv is not None,
+            "fresh_fred_source_status": (
+                "VERIFIED_FRED_CSV_VALUES_AT_THIS_RUN"
+                if downloaded_csv is not None else "NOT_ATTEMPTED_OFFLINE_ONLY"
+            ),
             "fred_csv_replay_receipts": remote,
         },
         "revenue_by_year": [
@@ -434,9 +438,28 @@ def main() -> None:
     args = parser.parse_args()
     as_of = date.fromisoformat(args.as_of_date)
     csv_map = None
+    network_unreachable = False
     if args.verify_fred_csv:
-        csv_map = {x["series"]: download_fred_csv(x["series"]) for x in RECORDS.values()}
+        try:
+            csv_map = {
+                x["series"]: download_fred_csv(x["series"])
+                for x in RECORDS.values()
+            }
+        except OSError:
+            # A distributor timeout / HTTP denial is not a data mismatch.
+            # No partial-source success, no false fresh-source certification.
+            csv_map = None
+            network_unreachable = True
     result = build_revenue(as_of=as_of, downloaded_csv=csv_map)
+    if network_unreachable:
+        result["source"]["fresh_fred_source_status"] = (
+            "BLOCKED_EXTERNAL_FRED_CSV_UNREACHABLE_NOT_VERIFIED"
+        )
+        result["source"]["fred_public_csv_replay_completed"] = False
+        result["source"]["fred_csv_replay_receipts"] = []
+        result["receipt_sha256"] = canon_hash({
+            k:v for k,v in result.items() if k != "receipt_sha256"
+        })
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out/"aies_ltl_revenue.json").write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -446,6 +469,7 @@ def main() -> None:
         "ltl_2024_revenue_billion_usd": result["ltl_2024_revenue_billion_usd"],
         "commercial_recovery_market_verified": False,
         "fred_csv_replayed": result["source"]["fred_public_csv_replay_completed"],
+        "fred_csv_status": result["source"]["fresh_fred_source_status"],
         "receipt_sha256": result["receipt_sha256"],
     }, sort_keys=True))
 
