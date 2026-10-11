@@ -39,6 +39,8 @@ on:
       - 'freight/research_cfs_archive_verifier.py'
       - 'freight/test_research_cfs_archive_verifier.py'
       - 'freight/RESEARCH_CFS_SOURCE_ARCHIVE.md'
+      - 'freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json'
+      - 'freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json'
       - 'freight/research/SOURCE_ANCHORS_20261010.json'
       - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
@@ -321,21 +323,26 @@ jobs:
           from pathlib import Path
           p=Path('/tmp/retally-research-intelligence')
           r=json.loads((p/'cfs_source_bytes.json').read_text())
-          assert r['scope']=='CFS_A01_ORIGINAL_SOURCE_BYTE_REVIEW_NOT_YET_PERFORMED'
+          assert r['scope']=='CFS_A01_REMOTE_BROWSER_SOURCE_OBSERVED_OFFLINE_CI_REPLAY_PENDING'
           assert r['intended_source_table']=='CF2200A01'
           assert r['expected_row_count']==6
-          assert r['original_archive_bytes_inspected_in_this_run'] is False
-          assert r['actual_official_zip_sha256'] is None
+          assert r['browser_observed_original_zip_sha256']=='15d90f1e64c5b3fb86c5f619a32350f9c60256cc3eaaa48838115fc70f7d6499'
+          assert r['browser_observed_zip_length_bytes']==167855
+          assert r['browser_observed_six_source_rows']==6
+          assert r['browser_observed_source_member']=='CF2200A01.dat'
+          assert r['original_archive_bytes_inspected_in_this_ci_run'] is False
+          assert r['actual_official_zip_sha256_from_ci_run'] is None
           assert r['publisher_signature_verified'] is False
-          assert r['independent_original_rows_reproduced']==0
-          assert r['south_press_discrepancy_cleared'] is False
+          assert r['independent_original_rows_reproduced_by_ci_zip_parser']==0
+          assert r['south_press_discrepancy_corroborated_from_raw_table'] is True
+          assert r['south_press_discrepancy_officially_corrected'] is False
           assert r['automatic_source_fetch_or_schedule'] is False
           assert r['real_invoice_records_ingested']==0
           assert r['any_ltl_recovery_market_claim_permitted'] is False
           assert r['new_lab_created'] is False and r['existing_lab_number']==14
           assert len(r['receipt_sha256'])==64
-          assert 'Inspection Still Required' in (p/'cfs_source_bytes.html').read_text()
-          print('Source original ZIP not obtained, but hostile ZIP/CSV verifier tests are complete; no Census authenticity claim.')
+          assert 'Browser Receipt Confirmed' in (p/'cfs_source_bytes.html').read_text()
+          print('Public Census original ZIP inspected via read-only browser; CI replays only synthetic DAT, never network acquisition or publisher signature.')
           PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
