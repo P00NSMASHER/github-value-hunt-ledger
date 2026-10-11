@@ -87,7 +87,7 @@ class SourceByteVerifierTests(unittest.TestCase):
         self.assertEqual(r["independent_original_rows_reproduced_by_ci_zip_parser"], 0)
         self.assertEqual(r["expected_row_count"], 6)
         self.assertFalse(r["south_press_discrepancy_officially_corrected"])
-        self.assertTrue(r["south_press_discrepancy_corroborrated_from_raw_table"])
+        self.assertTrue(r["south_press_discrepancy_corroborated_from_raw_table"])
         self.assertFalse(r["any_ltl_recovery_market_claim_permitted"])
         self.assertEqual(r["receipt_sha256"], canon_hash({
             k:v for k,v in r.items() if k != "receipt_sha256"
@@ -219,6 +219,10 @@ class SourceByteVerifierTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"ORIGINAL_ARCHIVE_HASH_DIFFERS"):
             match_original_excerpt(raw=synthetic_zip(member="CF2200A01.dat"),
                                    mapping=m,as_of=TODAY,simulated_test_bytes=False)
+
+    def test_observation_in_future_cannot_be_backdated(self):
+        with self.assertRaisesRegex(ValueError,"REMOTE_SOURCE_OBSERVATION_IS_IN_FUTURE"):
+            build_readiness(as_of=date(2026,10,10))
 
     def test_remote_receipt_has_real_source_ids_units_and_blank_estimate_flags(self):
         receipt=json.loads(RECEIPT.read_text(encoding="utf-8"))
