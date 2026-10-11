@@ -3,13 +3,16 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import date
 import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from freight.research_evidence_gate import canon_hash
 from freight.research_ltl_revenue_bridge import (
     BOOK, EXPECTED_BOOK_GIT_BLOB_SHA1, RECORDS, REPORT_SCOPE, YEARS,
     _git_blob_sha1, build_revenue, download_fred_csv, parse_fred_csv,
-    render_html, validate_catalog,
+    render_html, validate_catalog, main,
 )
 
 TODAY = date(2026, 10, 11)
@@ -216,6 +219,36 @@ class AiesLtlRevenueBridgeTests(unittest.TestCase):
             build_revenue(as_of=TODAY, downloaded_csv={
                 RECORDS["484122"]["series"]: csv_bytes("484122")
             })
+
+    def test_requested_fred_timeout_produces_explicit_blocked_receipt_not_false_pass(self):
+        with tempfile.TemporaryDirectory() as folder:
+            with patch("sys.argv", ["module", "--as-of-date", "2026-10-11",
+                                    "--out", folder, "--verify-fred-csv"]):
+                with patch("freight.research_ltl_revenue_bridge.download_fred_csv",
+                           side_effect=TimeoutError("simulated no FRED endpoint")):
+                    main()
+            r=json.loads((Path(folder)/"aies_ltl_revenue.json").read_text())
+            self.assertEqual(r["source"]["fresh_fred_source_status"],
+                             "BLOCKED_EXTERNAL_FRED_CSV_UNREACHABLE_NOT_VERIFIED")
+            self.assertFalse(r["source"]["fred_public_csv_replay_completed"])
+            self.assertEqual(r["source"]["fred_csv_replay_receipts"], [])
+            self.assertIsNone(r["ltl_freight_audit_recoverable_tam_usd"])
+            self.assertEqual(r["receipt_sha256"], canon_hash({
+                k:v for k,v in r.items() if k!="receipt_sha256"
+            }))
+
+    def test_requested_fred_value_mismatch_still_fails_not_downgraded_to_blocked(self):
+        with tempfile.TemporaryDirectory() as folder:
+            def bad_series(sid):
+                naics=next(k for k,x in RECORDS.items() if x["series"]==sid)
+                raw=csv_bytes(naics)
+                return raw.replace(b"65096292", b"65096293")
+            with patch("sys.argv", ["module", "--as-of-date", "2026-10-11",
+                                    "--out", folder, "--verify-fred-csv"]):
+                with patch("freight.research_ltl_revenue_bridge.download_fred_csv",
+                           side_effect=bad_series):
+                    with self.assertRaisesRegex(ValueError,"FRED_CSV_SOURCE_OBSERVATION_MISMATCH"):
+                        main()
 
     def test_unauthorized_csv_download_series_rejected_before_network(self):
         with self.assertRaisesRegex(ValueError, "FRED_ONLY_THREE_ALLOWLISTED"):
