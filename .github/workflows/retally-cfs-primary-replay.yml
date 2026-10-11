@@ -55,7 +55,10 @@ jobs:
           assert sorted(x['selected_rows_matched'] for x in r['tables'])==[30,30]
           assert r['source_bytes_replayed_this_run'] is True
           assert r['publisher_digitally_signed_archive_verified'] is False
-          assert r['github_mirror_all_rows_byte_identical_to_census_proven'] is False
+          assert r['github_mirror_other_tables_or_other_repo_files_proven'] is False
+          assert r['a18_a19_full_mirror_dat_files_match_official_original_dat_bytes'] is True
+          assert all(x['whole_dat_file_identical_to_git_mirror_proven'] is True
+                     and len(x['official_member_git_blob_sha1'])==40 for x in r['tables'])
           assert r['source_2022_five_year_cfs_goods_survey_not_freight_invoices'] is True
           assert r['actual_paid_ltl_invoices_observed']==0
           assert r['ltl_only_freight_spend_usd'] is None
