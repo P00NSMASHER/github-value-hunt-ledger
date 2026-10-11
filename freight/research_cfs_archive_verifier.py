@@ -40,7 +40,8 @@ MAPPING_KEYS = {"schema_version", "scope", "source_url", "table_id", "member",
                 "columns", "selectors", "claims_of_external_approval"}
 COLUMN_KEYS = {"geography", "mode", "year", "value_million_usd",
                "weight_thousand_tons"}
-OPTIONAL_COLUMNS = {"value_flag", "weight_flag", "geotype", "mode_flag"}
+OPTIONAL_COLUMNS = {"value_flag", "weight_flag", "geotype", "mode_flag",
+                    "change_value_flag", "change_weight_flag"}
 SELECTOR_KEYS = {"row_id", "geography", "mode", "year"}
 
 
@@ -285,6 +286,8 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
     receipt = _reviewed_remote_receipt(original)
     selectors = _validate_mapping(mapping, original)
     if not simulated_test_bytes:
+        # Match the exact read-only original-source archive digest observed in
+        # the official HTTPS browser session. A changed archive needs fresh review.
         if (mapping["member"] != OFFICIAL_DATA_MEMBER or
             len(raw) != BROWSER_OBSERVED_ZIP_BYTE_LENGTH or
             digest_bytes(raw) != BROWSER_OBSERVED_OFFICIAL_ZIP_SHA256):
@@ -322,6 +325,10 @@ def match_original_excerpt(*, raw: bytes, mapping: dict, as_of: date,
             raise ValueError("CENSUS_SOURCE_GEOTYPE_MISMATCH")
         if "mode_flag" in c and row[c["mode_flag"]].strip() != remote["mode_flag"]:
             raise ValueError("CENSUS_SOURCE_MODE_COMPARABILITY_FLAG_MISMATCH")
+        if "change_value_flag" in c and row[c["change_value_flag"]].strip() != remote["change_val_flag"]:
+            raise ValueError("CENSUS_SOURCE_CHANGE_COMPARABILITY_FLAG_MISMATCH")
+        if "change_weight_flag" in c and row[c["change_weight_flag"]].strip() != remote["change_ton_flag"]:
+            raise ValueError("CENSUS_SOURCE_CHANGE_COMPARABILITY_FLAG_MISMATCH")
         value = _integer_cell(row[c["value_million_usd"]], role="value")
         weight = _integer_cell(row[c["weight_thousand_tons"]], role="weight")
         expected = frozen[rid]
