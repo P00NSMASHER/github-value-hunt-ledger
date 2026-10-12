@@ -1,0 +1,66 @@
+name: RETALLY Lab 14 BLS Aggregate PPI Origin Verification (Mission 28)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bls-parent-origin.yml'
+      - 'freight/research_bls_parent_origin.py'
+      - 'freight/test_research_bls_parent_origin.py'
+      - 'freight/research/BLS_PARENT_ORIGIN_M28_20261012.json'
+      - 'freight/RESEARCH_BLS_PARENT_ORIGIN.md'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/lab_phase4_director.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  direct-bls-origin-route-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Test BLS v2, BLS v1 GET and original bulk series index without claiming source attestation
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError,URLError
+          import hashlib,json
+          source='PCU484484'
+          tests=[
+            ('bls_v2_post','https://api.bls.gov/publicAPI/v2/timeseries/data/',
+             json.dumps({'seriesid':[source],'startyear':'2017','endyear':'2024'},separators=(',',':')).encode()),
+            ('bls_v2_get','https://api.bls.gov/publicAPI/v2/timeseries/data/'+source,None),
+            ('bls_v1_get','https://api.bls.gov/publicAPI/v1/timeseries/data/'+source,None),
+            ('bls_bulk_series','https://download.bls.gov/pub/time.series/pc/pc.series',None),
+            ('bls_bulk_current','https://download.bls.gov/pub/time.series/pc/pc.data.0.Current',None),
+          ]
+          for label,url,payload in tests:
+            print('M28_ROUTE_BEGIN',label,url,flush=True)
+            try:
+              req=Request(url,data=payload,headers={'User-Agent':'Mozilla/5.0 (compatible; RETALLY-Public-BLS-Provenance/1.0)','Content-Type':'application/json'} if payload else {'User-Agent':'Mozilla/5.0 (compatible; RETALLY-Public-BLS-Provenance/1.0)'},method='POST' if payload else 'GET')
+              with urlopen(req,timeout=16) as response:
+                raw=response.read(2000001)
+                print('M28_ROUTE_HTTP',label,response.status,len(raw),response.geturl(),hashlib.sha256(raw).hexdigest(),flush=True)
+              if len(raw)>2000000:raise ValueError('SOURCE_OVER_2MB_INSPECTION_LIMIT')
+              if label.startswith('bls_v'):
+                data=json.loads(raw)
+                ss=data.get('Results',{}).get('series',[])
+                print('M28_ROUTE_API_STATUS',label,data.get('status'),data.get('message'),'ids',[x.get('seriesID') for x in ss],flush=True)
+                for series in ss:
+                  if series.get('seriesID')!=source:continue
+                  monthly=[x for x in series.get('data',[]) if x.get('year') in [str(y) for y in range(2017,2025)] and x.get('period','')>='M01' and x.get('period','')<='M12']
+                  byyear={}
+                  for row in monthly:byyear.setdefault(row['year'],[]).append((row['period'],row['value'],row.get('footnotes',[])))
+                  print('M28_PARENT_MONTHS',label,'total',len(monthly),'byyear',{y:len(v) for y,v in byyear.items()},flush=True)
+                  for y in sorted(byyear):
+                    print('M28_PARENT_YEAR',label,y,sorted(byyear[y]),flush=True)
+              else:
+                text=raw.decode('utf-8-sig',errors='replace')
+                print('M28_BULK_HEADER',label,repr(text[:150]),flush=True)
+                matched=[row[:190] for row in text.splitlines() if source in row]
+                print('M28_BULK_MATCHES',label,len(matched),'sample',matched[:8],flush=True)
+            except Exception as e:
+              print('M28_ROUTE_BLOCKED',label,type(e).__name__,str(e)[:230],flush=True)
+          PY
