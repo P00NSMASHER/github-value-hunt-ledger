@@ -469,6 +469,37 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_sas["revised_sas_cv_zero_means_exact_no_statistical_error"]=True
         _must(bool(validate_sas_benchmark_book(forged_sas,as_of=today)),
               "SAS_PUBLISHER_CV_ZERO_PROMOTED_TO_ERROR_FREE_CLAIM")
+        from freight.research_sas_peer_benchmark import (
+            report_shell as build_sas_peers,
+            validate_manifest as validate_sas_peers,
+        )
+        peers=build_sas_peers(as_of=today)
+        peer_rows={row["naics"]:row for row in peers["naics_peer_revisions"]}
+        _must(peers["naics_industries_compared"]==3 and
+              peers["all_three_industries_downward_revised"] is True and
+              peers["ltl_revised_down_more_than_parent_or_tl_in_percentage_terms"] is False,
+              "M23_SAS_BENCHMARK_NOT_GENERALIZED_ACROSS_TRUCKING_PEERS")
+        _must([peer_rows[c]["signed_revision_million_usd"] for c in
+              ("484","484121","484122")]==[-22238,-10765,-2723],
+              "M23_SAS_PARENT_TRUCKLOAD_LTL_REVISIONS_DIFFER_FROM_SOURCE")
+        _must(peers["ltl_original_parent_share_pct"]=="15.36" and
+              peers["ltl_revised_parent_share_pct"]=="15.52" and
+              peers["ltl_absolute_revision_share_of_parent_revision_pct"]=="12.24",
+              "M23_PARENT_NAICS_OVERLAP_DENOMINATOR_INCORRECT")
+        _must(peers["other_trucking_residual_revision_million_usd"]==-8750 and
+              peers["other_trucking_residual_is_a_separate_surveyed_naics"] is False,
+              "M23_CALCULATED_OTHER_TRUCKING_RESIDUAL_MISLABELLED_DIRECT_SURVEY")
+        _must(peers["source_status"]=="OFFLINE_SAS_PEER_MANIFEST_NOT_ORIGINAL_REPLAY"
+              and peers["original_workbooks_replayed_this_run"] is False,
+              "M23_OFFLINE_SOURCE_UNLAWFULLY_PROMOTED_TO_VERIFIED")
+        _must(peers["actual_independently_adjudicated_freight_invoices"]==0
+              and peers["freight_recovery_tam_usd"] is None
+              and peers["pilot_18_external_requirements_unmet"] is True,
+              "M23_SURVEY_REVISIONS_MISTAKEN_FOR_CUSTOMER_RECOVERY_EVIDENCE")
+        forged_peers=_read("research/SAS_TRUCKING_PEER_BENCHMARK_20261011.json")
+        forged_peers["survey_revisions_are_carrier_billing_overcharges"]=True
+        _must(bool(validate_sas_peers(forged_peers,as_of=today)),
+              "M23_SOURCE_REVISIONS_FRAUDULENTLY_PROMOTED_TO_OVERCHARGES")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -532,6 +563,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "sas_2022_rounding_reconciled_to_aies":sas["aies_reconciles_to_published_benchmarked_sas_nearest_million"],
                 "sas_benchmark_original_xlsx_replayed_in_director":False,
                 "sas_benchmark_source_receipt_sha256":sas["receipt_sha256"],
+                "sas_peer_naics_2022_compared":peers["naics_industries_compared"],
+                "sas_peer_all_trucking_revision_million_usd":peer_rows["484"]["signed_revision_million_usd"],
+                "sas_peer_tl_revision_million_usd":peer_rows["484121"]["signed_revision_million_usd"],
+                "sas_peer_ltl_revision_million_usd":peer_rows["484122"]["signed_revision_million_usd"],
+                "sas_peer_ltl_relative_revision_not_unique":True,
+                "sas_peer_source_receipt_sha256":peers["receipt_sha256"],
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,
