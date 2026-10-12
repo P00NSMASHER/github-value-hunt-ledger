@@ -5,6 +5,7 @@ authorize claims, or manufacture settlement truth.
 """
 from __future__ import annotations
 import argparse, hashlib, json
+from datetime import date
 from pathlib import Path
 
 VALID_DISPOSITIONS = {"VALIDATED", "REJECTED", "REVIEW"}
@@ -32,6 +33,17 @@ def require_cents(row, key):
     return value
 
 
+def require_iso_date(row, key):
+    value = require_text(row, key)
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"{key} must be a valid YYYY-MM-DD date") from exc
+    if parsed.isoformat() != value:
+        raise ValueError(f"{key} must be a valid YYYY-MM-DD date")
+    return parsed
+
+
 def normalize_finding(row):
     clean = dict(row)
     for key in (
@@ -41,6 +53,8 @@ def normalize_finding(row):
         "customer_authorization_state", "claim_status"
     ):
         clean[key] = require_text(row, key)
+    invoice_date = require_iso_date(row, "invoice_date")
+    authority_effective_date = require_iso_date(row, "authority_effective_date")
     for key in ("billed_cents", "expected_cents", "settled_credit_cents", "reversal_cents"):
         clean[key] = require_cents(row, key)
     if clean["reviewer_disposition"] not in VALID_DISPOSITIONS:
@@ -60,6 +74,14 @@ def normalize_finding(row):
         and not evidence
     ):
         raise ValueError("validated supported finding requires supporting evidence")
+    if (
+        clean["reviewer_disposition"] == "VALIDATED"
+        and clean["confidence"] == "SUPPORTED"
+        and authority_effective_date > invoice_date
+    ):
+        raise ValueError(
+            "validated supported finding authority cannot postdate invoice"
+        )
     clean["supporting_evidence"] = evidence
     for key in SUPPRESSION_FLAGS:
         clean[key] = bool(row.get(key, False))
@@ -143,6 +165,7 @@ def build_pack(payload):
             "preexisting_and_duplicate_value_excluded": True,
             "validated_difference_excludes_suppressed_findings": True,
             "validated_supported_findings_require_evidence": True,
+            "validated_supported_authority_not_after_invoice": True,
             "reversals_reduce_realized_value": True,
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
@@ -202,7 +225,8 @@ def render_markdown(pack):
         "7. Settled credit cannot exceed the candidate invoice difference.",
         "8. One positive settlement reference can support only one finding in this pack.",
         "9. A validated supported finding requires at least one supporting-evidence reference.",
-        "10. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "10. A validated supported finding cannot rely on authority effective after its invoice date.",
+        "11. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
