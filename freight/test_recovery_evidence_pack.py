@@ -17,7 +17,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     pack = build_pack(payload())
     totals = pack["totals"]
     assert totals["candidate_difference_cents"] == 28500
-    assert totals["validated_difference_cents"] == 24500
+    assert totals["validated_difference_cents"] == 19500
     assert totals["net_realized_cents"] == 18500
     assert totals["fee_eligible_realized_cents"] == 18500
     assert totals["suppressed_count"] == 2
@@ -26,6 +26,19 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["findings"][3]["reviewer_disposition"] == "REVIEW"
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
     assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
+    assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
+
+
+@pytest.mark.parametrize(
+    "suppression_flag",
+    ("incumbent_known", "automatic_credit", "preexisting_claim", "duplicate_opportunity"),
+)
+def test_validated_difference_excludes_suppressed_findings(suppression_flag):
+    data = payload()
+    data["findings"][0][suppression_flag] = True
+    pack = build_pack(data)
+    assert pack["findings"][0]["attribution_state"] == "SUPPRESSED"
+    assert pack["totals"]["validated_difference_cents"] == 7000
 
 
 def test_pack_subtracts_reversal_from_realized_value():
@@ -88,6 +101,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     report = render_markdown(build_pack(payload()))
     assert "SYNTHETIC / FICTIONAL EXAMPLE" in report
     assert "Candidate difference" in report
+    assert "Validated attributable difference: **$195.00**" in report
     assert "Fee-eligible realized recovery" in report
     assert "SUPPRESSED" in report
     assert "Controlling rate authority is not proven." in report
