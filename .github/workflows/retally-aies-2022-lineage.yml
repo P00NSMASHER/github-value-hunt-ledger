@@ -1,0 +1,142 @@
+name: RETALLY Lab 14 Census AIES 2022 Historical Linkage (Mission 21)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-aies-2022-lineage.yml'
+      - 'freight/research_aies_2022_lineage.py'
+      - 'freight/test_research_aies_2022_lineage.py'
+      - 'freight/research/AIES_2022_LEGACY_LINEAGE_20261011.json'
+      - 'freight/RESEARCH_AIES_2022_LEGACY_LINEAGE.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  offline-historical-evidence-falsification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing Lab 14 pinned requirements
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run synthetic adversarial historic source and prior forensic regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Run fourteen existing labs and historical offline source dashboard
+        run: |
+          PYTHONPATH=. python -m freight.research_aies_2022_lineage \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m21-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m21-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-m21-offline')
+          report=json.loads((p/'aies_2022_lineage.json').read_text())
+          labs=json.loads(Path('/tmp/retally-m21-control/phase4_control.json').read_text())
+          assert report['status']=='OFFLINE_HISTORICAL_METADATA_ONLY_NO_SOURCE_REPLAY'
+          assert report['matched_national_year_naics_source_cells']==0
+          assert report['verified_source_zip_sha256'] is None
+          assert report['published_2022_historical_ltl_revenue_thousand_usd']==65688461
+          assert report['legacy_sas_gap_million_usd']=='2722.539'
+          assert report['legacy_sas_gap_assigned_causal_mechanism'] is None
+          assert report['2022_collected_under_standalone_original_aies_survey'] is False
+          assert report['2022_cv_zero_means_exact_no_uncertainty'] is False
+          assert report['latest_2022_sas_benchmark_original_rows_replayed'] is False
+          assert report['ltl_recoverable_market_tam_usd'] is None
+          assert report['actual_customer_invoice_rows_processed']==0
+          assert report['human_pilot_18_controls_still_unverified'] is True
+          assert len(labs['lab_runs'])==14 and labs['failed_or_blocked_labs']==[]
+          assert labs['actual_revenue_cents']==0
+          assert labs['pilot_preflight']['unmet_requirements']==18
+          assert labs['aies_2022_publisher_historical']['receipt_sha256']==report['receipt_sha256']
+          assert 'aies_2022_lineage.html' in Path('/tmp/retally-m21-control/index.html').read_text()
+          assert (p/'aies_2022_lineage.html').is_file()
+          print('All 14 lab modules retained; 2022 primary historical source not falsely claimed by offline report.')
+          PY
+      - name: Keep historical offline receipt only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-census-2022-historic-offline
+          path: |
+            /tmp/retally-m21-offline/aies_2022_lineage.json
+            /tmp/retally-m21-offline/aies_2022_lineage.html
+          if-no-files-found: error
+          retention-days: 14
+
+  verify-official-census-2022-historical-release:
+    needs: offline-historical-evidence-falsification
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Download one exact Census government historic ZIP and verify nine cells
+        run: |
+          PYTHONPATH=. python -m freight.research_aies_2022_lineage \
+            --fetch-original --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m21-census-publisher
+      - name: Reject tampered government data and unproved 2022 survey/direct SAS revision
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m21-census-publisher/aies_2022_lineage.json').read_text())
+          assert r['scope']=='LAB14_CENSUS_AIES_2022_HISTORICAL_SOURCE_REPLAY_NOT_A_2022_DIRECT_SURVEY'
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert r['actual_customer_invoice_rows_processed']==0
+          assert r['ltl_recoverable_market_tam_usd'] is None
+          assert r['buyer_demand_established'] is False
+          assert r['human_pilot_18_controls_still_unverified'] is True
+          assert r['2022_collected_under_standalone_original_aies_survey'] is False
+          assert r['2022_cv_zero_means_exact_no_uncertainty'] is False
+          assert r['latest_2022_sas_benchmark_original_rows_replayed'] is False
+          assert r['legacy_sas_gap_assigned_causal_mechanism'] is None
+          assert r['legacy_sas_gap_million_usd']=='2722.539'
+          assert len(r['receipt_sha256'])==64
+          if r['status']=='VERIFIED_CENSUS_2024_HISTORICAL_ZIP_2022_REVENUE_LEGACY_LINKED':
+            assert r['verified_source_zip_sha256']=='1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4'
+            assert r['verified_source_dat_sha256']=='a8053af22913f1872a10a5d386a602d7a3bbecfdd4441727b8a70ecde4235648'
+            assert r['source_zip_bytes']==771290
+            assert r['source_dat_rows']==23448
+            assert r['source_dat_fields']==89
+            assert r['matched_national_year_naics_source_cells']==9
+            rows=[x for x in r['selected_source_cells'] if x['naics']=='484122']
+            assert [x['revenue_thousand_usd'] for x in rows]==[65688461,64651167,65096292]
+            assert [x['published_cv_raw'] for x in rows]==['0','.9','.9']
+            assert rows[0]['historical_2022_cv_zero_does_not_establish_zero_uncertainty'] is True
+            print('PUBLISHER ORIGINAL HISTORICAL REPLAY VERIFIED: 2022 linked source, not standalone survey or real LTL invoices.')
+          elif r['status']=='BLOCKED_CENSUS_HISTORICAL_ZIP_UNAVAILABLE_NO_NEW_REPLAY':
+            assert r['matched_national_year_naics_source_cells']==0
+            assert r['verified_source_zip_sha256'] is None
+            assert r['selected_source_cells']==[]
+            print('::warning::Original government ZIP unreachable, no newly authenticated historic source.')
+          else:
+            raise AssertionError('UNEXPECTED_SOURCE_REPLAY_STATUS')
+          PY
+      - name: Preserve only source proof JSON and HTML, not government ZIP
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-aies-2022-original-historic-replay
+          path: |
+            /tmp/retally-m21-census-publisher/aies_2022_lineage.json
+            /tmp/retally-m21-census-publisher/aies_2022_lineage.html
+          if-no-files-found: error
+          retention-days: 14

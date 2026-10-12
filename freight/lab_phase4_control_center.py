@@ -47,6 +47,10 @@ from freight.research_aies_historical_lineage import (
     report_shell as build_aies_historical_lineage,
     render_html as render_aies_historical_lineage_html,
 )
+from freight.research_aies_2022_lineage import (
+    _shell as build_aies_2022_historic,
+    render_html as render_aies_2022_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -107,6 +111,9 @@ def snapshot(max_labs: int=14) -> dict:
         result["aies_historical_lineage"]=build_aies_historical_lineage(
             as_of=date.today()
         )
+        result["aies_2022_publisher_historical"]=build_aies_2022_historic(
+            date.today()
+        )
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -156,6 +163,7 @@ def render(data: dict) -> str:
     forhire=data["cfs_forhire_source"]
     aies=data["aies_ltl_carrier_revenue"]
     historical=data["aies_historical_lineage"]
+    linked2022=data["aies_2022_publisher_historical"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -309,6 +317,17 @@ not an original archive re-download: source state <strong>"""+escape(historical[
 survey reconstruction and is NOT a fresh primary Census observation.</p>
 <p>2023 long-distance LTL employer revenue: $"""+format(historical["2023_national_ltl_thousand_usd"]/1000000, ".3f")+""" billion · 2024: $"""+format(historical["2024_national_ltl_thousand_usd"]/1000000, ".3f")+""" billion · descriptive nominal movement """+escape(historical["2023_to_2024_nominal_change_pct"])+"""% (not a proven change in recoverable customer invoices).</p>
 <a href="aies_historical_lineage.html">Open historical Census source-lineage and holds ↗</a></section>
+<section class="panel"><h2>2022 Census historical revenue — linked legacy series</h2>
+<p>Mission 21 identified the original publisher historical ZIP and selected
+2022 national NAICS 484122 revenue within the Census 2024 time-series product.
+This is not a separately fielded 2022 AIES survey and a published 2022 CV
+of zero is not proof of error-free measurement or billing accuracy.
+The operator report is offline metadata only: <strong>"""+escape(linked2022["status"])+"""</strong>.</p>
+<p>2022 Census/FRED historical LTL establishment revenue: $"""+format(linked2022["published_2022_historical_ltl_revenue_thousand_usd"]/1000000,".3f")+""" billion.
+Older legacy SAS published $68.411 billion; the $"""+escape(linked2022["legacy_sas_gap_million_usd"])+""" million
+difference has NOT been attributed to an independently verified vintage
+revision or methodology cause. No customer invoices or recoveries established.</p>
+<a href="aies_2022_lineage.html">Open 2022 publisher-historical evidence and legacy survey holds ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -431,6 +450,13 @@ def main():
     (args.out/"aies_historical_lineage.html").write_text(
         render_aies_historical_lineage_html(data["aies_historical_lineage"]),
         encoding="utf-8"
+    )
+    (args.out/"aies_2022_lineage.json").write_text(
+        json.dumps(data["aies_2022_publisher_historical"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"aies_2022_lineage.html").write_text(
+        render_aies_2022_html(data["aies_2022_publisher_historical"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
