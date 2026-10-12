@@ -378,13 +378,11 @@ earlier and August 2026 revised workbooks. For all three overlapping
 truck industry categories, revised 2018–2022 nominal employer-establishment
 revenue was lower each year, affecting historical trend comparisons.
 This offline view does not re-download Census XLSX originals: <strong>"""+escape(sas_history["source_status"])+"""</strong>.</p>
-<p>2017 unchanged anchors: """ +str(sas_history["2017_unchanged_anchor_categories"])+""" /
-3 · 2018–2022 downward revisions: """ +
-str(sas_history["2018_2022_downward_revised_categories_years"])+""" /
+<p>2017 unchanged anchors: """+str(sas_history["2017_unchanged_anchor_categories"])+""" /
+3 · 2018–2022 downward revisions: """+str(sas_history["2018_2022_downward_revised_categories_years"])+""" /
 15 · 2017–2022 earlier long-distance LTL nominal revenue change:
-""" + escape(sas_history["industry_comparisons"][2]["2017_to_2022_older_vintage_nominal_cumulative_growth_pct"])+"""%,
-new benchmark: """ +
-escape(sas_history["industry_comparisons"][2]["2017_to_2022_benchmarked_nominal_cumulative_growth_pct"])+"""%.
+""" + escape(sas_history["industry_comparisons"][2]["2017_to_2022_older_vintage_nominal_cumulative_growth_pct"]) + """%,
+new benchmark: """ + escape(sas_history["industry_comparisons"][2]["2017_to_2022_benchmarked_nominal_cumulative_growth_pct"]) + """%.
 Neither survey vintage estimates paid customer freight invoice errors,
 recoverable cash, or independently verified buyer demand.</p>
 <a href="sas_temporal_revisions.html">Open yearly Census source revision audit ↗</a></section>
