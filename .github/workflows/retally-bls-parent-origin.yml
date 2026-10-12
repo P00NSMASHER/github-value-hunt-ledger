@@ -27,7 +27,7 @@ jobs:
           from urllib.request import Request,urlopen
           from urllib.error import HTTPError,URLError
           import hashlib,json
-          source='PCU484484'
+          source='PCU484---484---'
           tests=[
             ('bls_v2_post','https://api.bls.gov/publicAPI/v2/timeseries/data/',
              json.dumps({'seriesid':[source],'startyear':'2017','endyear':'2024'},separators=(',',':')).encode()),
