@@ -1,0 +1,165 @@
+name: RETALLY Lab 14 Original BLS Parent PPI Native ID (Mission 28)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bls-parent-origin.yml'
+      - 'freight/research_bls_parent_origin.py'
+      - 'freight/test_research_bls_parent_origin.py'
+      - 'freight/research/BLS_PARENT_ORIGIN_M28_20261012.json'
+      - 'freight/RESEARCH_BLS_PARENT_ORIGIN.md'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/lab_phase4_director.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-native-source-adversarial-and-lab14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing bounded research dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run M28 original BLS native source and M18–27 research regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_bls_parent_origin.py \
+            freight/test_research_fred_parent_ppi.py \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Enforce offline source integrity and all original fourteen labs
+        run: |
+          PYTHONPATH=. python -m freight.research_bls_parent_origin \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m28-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m28-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m28-offline/bls_parent_origin.json').read_text())
+          q=json.loads(Path('/tmp/retally-m28-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_BLS_NATIVE_PCU484_AGGREGATE_ORIGINAL_API_V2_MONTHLY_SOURCE_NOT_REAL_OUTPUT'
+          assert r['source_status']=='OFFLINE_PREVIOUS_NATIVE_BLS_V2_OBSERVATIONS_NOT_REPLAYED_IN_THIS_RUN'
+          assert r['native_bls_original_series_id']=='PCU484---484---'
+          assert r['fred_redistributed_alias_series_id']=='PCU484484'
+          assert r['bls_api_v1_v2_alias_source_not_found'] is True
+          assert r['correct_subsector_id_documented_in_bls_pc_series_catalog'] is True
+          assert r['bls_months_in_previous_first_party_probe']==96
+          assert r['original_bls_api_v2_months_replayed_this_execution']==0
+          assert r['direct_original_bls_source_authenticated_in_current_run'] is False
+          assert r['2017_to_2024_census_nominal_revenue_change_pct']=='38.65'
+          assert r['2017_to_2024_bls_parent_ppi_change_pct']=='37.04'
+          assert r['2017_to_2024_illustrative_adjusted_revenue_proxy_pct']=='1.18'
+          assert r['historic_m27_fred_provisional_status_unchanged'] is True
+          assert r['index_adjustment_is_not_official_real_freight_output'] is True
+          assert r['real_customer_freight_invoices_observed']==0
+          assert r['approved_independent_billing_audit_findings']==0
+          assert r['verified_recoverable_market_tam_usd'] is None
+          assert r['18_human_customer_pilot_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(q['lab_runs'])==14 and q['failed_or_blocked_labs']==[]
+          assert q['pilot_preflight']['unmet_requirements']==18
+          assert q['actual_revenue_cents']==0
+          assert q['bls_native_parent_484_origin']['receipt_sha256']==r['receipt_sha256']
+          assert 'bls_parent_origin.html' in Path('/tmp/retally-m28-control/index.html').read_text()
+          print('Offline BLS native source identity, 14 original labs, 18 pilot blocks all VERIFIED at snapshot-grain.')
+          PY
+      - name: Retain source-grade offline JSON and HTML only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-bls-native-parent-offline
+          path: |
+            /tmp/retally-m28-offline/bls_parent_origin.json
+            /tmp/retally-m28-offline/bls_parent_origin.html
+          if-no-files-found: error
+          retention-days: 14
+
+  original-bls-v2-publisher-96-month-attestation:
+    needs: offline-native-source-adversarial-and-lab14
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Retrieve all eight years from BLS API v2 using corrected native subsector ID
+        run: |
+          PYTHONPATH=. python -m freight.research_bls_parent_origin \
+            --fetch-bls-native --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m28-original
+      - name: Validate independent original BLS publisher source and no recovery-market promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m28-original/bls_parent_origin.json').read_text())
+          assert r['scope']=='LAB14_BLS_NATIVE_PCU484_AGGREGATE_ORIGINAL_API_V2_MONTHLY_SOURCE_NOT_REAL_OUTPUT'
+          assert r['native_bls_original_series_id']=='PCU484---484---'
+          assert r['fred_redistributed_alias_series_id']=='PCU484484'
+          assert r['bls_api_v1_v2_alias_source_not_found'] is True
+          assert r['historic_m27_fred_http_attempts_in_m27_were_blocked'] is True
+          assert r['historic_m27_fred_provisional_status_unchanged'] is True
+          assert r['2017_to_2024_census_nominal_revenue_change_pct']=='38.65'
+          assert r['2017_to_2024_bls_parent_ppi_change_pct']=='37.04'
+          assert r['2017_to_2024_illustrative_adjusted_revenue_proxy_pct']=='1.18'
+          assert r['index_adjustment_is_not_official_real_freight_output'] is True
+          assert r['ppi_source_series_is_not_an_invoice_market_survey'] is True
+          assert r['real_customer_freight_invoices_observed']==0
+          assert r['approved_independent_billing_audit_findings']==0
+          assert r['verified_recoverable_market_tam_usd'] is None
+          assert r['actual_cash_refunds_proven_usd'] is None
+          assert r['buyer_demand_measured'] is False
+          assert r['external_carrier_or_customer_contact_authorized'] is False
+          assert r['private_customer_documents_accessed'] is False
+          assert r['18_human_customer_pilot_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['source_status']=='VERIFIED_DIRECT_BLS_NATIVE_PCU484_96_ORIGINAL_MONTHS_2017_2024':
+            assert r['original_bls_api_v2_months_replayed_this_execution']==96
+            assert r['direct_bls_original_v2_source_replay_completed'] is True
+            assert r['direct_original_bls_source_authenticated_in_current_run'] is True
+            assert len(r['original_bls_api_v2_raw_response_sha256'])==64
+            annual=r['yearly_index_adjustments']
+            assert [p['year'] for p in annual]==list(range(2017,2025))
+            assert all(p['source_monthly_observations']==12 for p in annual)
+            assert annual[0]['bls_original_price_index_annual_arithmetic_mean']=='134.3583'
+            assert annual[-1]['bls_original_price_index_annual_arithmetic_mean']=='184.1238'
+            print('VERIFIED 96/96 original BLS v2 native parent months and FRED alias numeric crosswalk, no real-output claims.')
+          elif r['source_status']=='BLOCKED_DIRECT_BLS_NATIVE_API_V2_NO_NEW_SOURCE_REPLAY':
+            assert r['original_bls_api_v2_months_replayed_this_execution']==0
+            assert r['direct_bls_original_v2_source_replay_completed'] is False
+            assert r['direct_original_bls_source_authenticated_in_current_run'] is False
+            print('::warning::Original BLS API unavailable; no new source attestation despite passing offline tests.')
+          else:
+            raise AssertionError('M28_WRONG_SERIES_OR_CHANGED_ORIGINAL_PUBLISHER_VALUES')
+          PY
+      - name: Preserve only source attestation JSON/HTML, no raw BLS records or customer data
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-bls-native-parent-verified-source
+          path: |
+            /tmp/retally-m28-original/bls_parent_origin.json
+            /tmp/retally-m28-original/bls_parent_origin.html
+          if-no-files-found: error
+          retention-days: 14

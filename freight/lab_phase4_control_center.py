@@ -75,6 +75,10 @@ from freight.research_fred_parent_ppi import (
     report_shell as build_fred_parent,
     render_html as render_fred_parent_html,
 )
+from freight.research_bls_parent_origin import (
+    report_shell as build_bls_native_parent,
+    render_html as render_bls_native_parent_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -144,6 +148,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["sas_aies_2017_2024_bridge"]=build_sas_aies_bridge(as_of=date.today())
         result["bls_ppi_price_adjustment"]=build_bls_ppi(as_of=date.today())
         result["fred_parent_484_ppi_provenance"]=build_fred_parent(as_of=date.today())
+        result["bls_native_parent_484_origin"]=build_bls_native_parent(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -200,6 +205,7 @@ def render(data: dict) -> str:
     bridge=data["sas_aies_2017_2024_bridge"]
     ppi=data["bls_ppi_price_adjustment"]
     fred=data["fred_parent_484_ppi_provenance"]
+    native=data["bls_native_parent_484_origin"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -445,6 +451,22 @@ provisional 2017-index-level-adjusted revenue proxy:
 """ +escape(fred["parent_2017_to_2024_provisional_price_adjusted_revenue_proxy_pct"])+"""%.
 The source must not be used as official real output or a customer billing/recovery market.</p>
 <a href="fred_parent_ppi_provenance.html">Open parent PPI source provenance and verification hold ↗</a></section>
+<section class="panel"><h2>Original BLS parent trucking PPI: correct padded series ID</h2>
+<p>The direct BLS native source ID for trucking NAICS 484 is
+<strong>PCU484---484---</strong>, distinct from FRED's PCU484484 alias.
+Original BLS v2 POST returned all 96 monthly values for 2017–2024, matching
+the previously observed FRED public table. This offline Control Center
+does NOT perform a new live API read; status:
+<strong>"""+escape(native["source_status"])+"""</strong>.</p>
+<p>Original 2017–2024 BLS producer index change:
+"""+escape(native["2017_to_2024_bls_parent_ppi_change_pct"])+"""%;
+Census all-trucking nominal revenue growth:
+"""+escape(native["2017_to_2024_census_nominal_revenue_change_pct"])+"""%;
+illustrative 2017 producer-price-level adjusted revenue proxy:
+"""+escape(native["2017_to_2024_illustrative_adjusted_revenue_proxy_pct"])+"""%.
+The direct producer-price source is not proof of official real freight output,
+paid customer invoices, billing errors or recoverable customer funds.</p>
+<a href="bls_parent_origin.html">Open native BLS source recovery, eight-year levels and economic limits ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -618,6 +640,14 @@ def main():
     )
     (args.out/"fred_parent_ppi_provenance.html").write_text(
         render_fred_parent_html(data["fred_parent_484_ppi_provenance"]),
+        encoding="utf-8"
+    )
+    (args.out/"bls_parent_origin.json").write_text(
+        json.dumps(data["bls_native_parent_484_origin"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"bls_parent_origin.html").write_text(
+        render_bls_native_parent_html(data["bls_native_parent_484_origin"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
