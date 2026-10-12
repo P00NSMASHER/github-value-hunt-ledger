@@ -79,6 +79,10 @@ from freight.research_bls_parent_origin import (
     report_shell as build_bls_native_parent,
     render_html as render_bls_native_parent_html,
 )
+from freight.research_unified_blspci import (
+    report_shell as build_unified_bls,
+    render_html as render_unified_bls_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -149,6 +153,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bls_ppi_price_adjustment"]=build_bls_ppi(as_of=date.today())
         result["fred_parent_484_ppi_provenance"]=build_fred_parent(as_of=date.today())
         result["bls_native_parent_484_origin"]=build_bls_native_parent(as_of=date.today())
+        result["bls_unified_current_evidence"]=build_unified_bls(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -206,6 +211,7 @@ def render(data: dict) -> str:
     ppi=data["bls_ppi_price_adjustment"]
     fred=data["fred_parent_484_ppi_provenance"]
     native=data["bls_native_parent_484_origin"]
+    unified=data["bls_unified_current_evidence"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -424,7 +430,24 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
-<section class="panel"><h2>BLS producer-price context: trucking revenue is not freight volume</h2>
+<section class="panel"><h2>Current consolidated original BLS evidence — 484, TL, LTL</h2>
+<p>This is the <strong>current</strong> Research Lab view for three original
+BLS native producer output price indices, with one first-party API v2 source
+available for all three. Historical M26 (invalid alias), M27 (FRED HTTP timeout)
+and M28 (correct parent native ID) reports are preserved unchanged and should
+not be mistaken for the current original-source status. Offline dashboard
+does NOT freshly call the BLS API: <strong>"""+escape(unified["status"])+"""</strong>.</p>
+<p>2017–2024 illustrative PPI-adjusted Census revenue proxy using annual-average
+monthly producer indices: parent 484 <strong>"""+escape(unified["industry_comparisons"][0]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"])+"""%</strong>,
+long-distance TL <strong>"""+escape(unified["industry_comparisons"][1]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"])+"""%</strong>,
+long-distance LTL <strong>"""+escape(unified["industry_comparisons"][2]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"])+"""%</strong>.</p>
+<p><strong>Method warning:</strong> LTL changes sign if annual revenues are
+instead divided by December-endpoint price indices: <strong>"""+escape(unified["industry_comparisons"][2]["2017_to_2024_december_endpoint_price_adjusted_revenue_pct"])+"""%</strong>
+under the non-annual endpoint sensitivity. December indexes are NOT appropriate
+substitutes for annual-average levels in this calculation. Neither proxy is official
+real freight output, freight volume, paid invoices or recoverable customer cash.</p>
+<a href="unified_bls_evidence.html">Open current verified-source policy and methodology sensitivity ↗</a></section>
+<section class="panel"><h2>BLS producer-price context: historic M26 source investigation</h2>
 <p>BLS original monthly industry producer-price indexes are published for
 long-distance truckload and LTL. Illustrative 2017-index-level adjustment of
 the Census employer-industry revenue separates revenue growth from an industry
@@ -434,9 +457,11 @@ Source status of this offline view: <strong>"""+escape(ppi["source_status"])+"""
 <p>2017–2024 nominal long-distance LTL revenue change: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_nominal_census_revenue_change_pct"])+"""%;
 industry producer output price index: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_producer_output_price_index_change_pct"])+"""%;
 illustrative price-adjusted revenue proxy: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"])+"""%.
-All trucking (NAICS 484) original BLS API source was rejected and remains UNVERIFIED.</p>
+At Mission 26, BLS API rejected the SHORT FRED identifier PCU484484.
+Mission 28 found native series PCU484---484---; current direct original
+source status is governed by the new Mission 29 consolidated report above.</p>
 <a href="bls_ppi_adjustment.html">Open BLS price adjustments, original source limitations and confidence holds ↗</a></section>
-<section class="panel"><h2>Parent trucking PPI: FRED publisher snapshot held pending replay</h2>
+<section class="panel"><h2>Historical M27 FRED publisher timeout — superseded by native BLS</h2>
 <p>The Federal Reserve Bank of St. Louis FRED displays BLS-origin PCU484484
 for NAICS 484 truck transportation, but Mission 26's direct BLS API v1
 rejected the parent series. A later independent GitHub runner could not
@@ -449,7 +474,10 @@ FRED public-table producer price index change:
 """ +escape(fred["parent_2017_to_2024_fred_displayed_price_index_change_pct"])+"""%;
 provisional 2017-index-level-adjusted revenue proxy:
 """ +escape(fred["parent_2017_to_2024_provisional_price_adjusted_revenue_proxy_pct"])+"""%.
-The source must not be used as official real output or a customer billing/recovery market.</p>
+The historic FRED HTTP snapshot remains an honest source record,
+but the corrected native original BLS API source was verified in M28
+and can now be jointly verified in M29. No proxy is official real output
+or a customer billing/recovery market.</p>
 <a href="fred_parent_ppi_provenance.html">Open parent PPI source provenance and verification hold ↗</a></section>
 <section class="panel"><h2>Original BLS parent trucking PPI: correct padded series ID</h2>
 <p>The direct BLS native source ID for trucking NAICS 484 is
@@ -648,6 +676,14 @@ def main():
     )
     (args.out/"bls_parent_origin.html").write_text(
         render_bls_native_parent_html(data["bls_native_parent_484_origin"]),
+        encoding="utf-8"
+    )
+    (args.out/"unified_bls_evidence.json").write_text(
+        json.dumps(data["bls_unified_current_evidence"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"unified_bls_evidence.html").write_text(
+        render_unified_bls_html(data["bls_unified_current_evidence"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
