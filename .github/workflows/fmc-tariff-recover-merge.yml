@@ -71,7 +71,7 @@ jobs:
           WORKFLOW_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
+          import json, os, sys
           from pathlib import Path
 
           event = os.environ.get('EVENT_NAME')
@@ -167,7 +167,7 @@ jobs:
               for r in recoveries.get('workflow_runs', [])
           )
           if duplicate:
-              print('::notice::FMC source was already successfully recovered; no artifacts will be falsely reissued.')
+              print('FMC source already successfully recovered: no duplicate artifacts issued.', file=sys.stderr)
               print('should_process=false')
           else:
               print('should_process=true')
