@@ -115,6 +115,7 @@ def compare_vendor_study(study: dict, policy: dict) -> dict:
 
     seen: set[str] = set()
     reports: dict[str, dict] = {}
+    received_sha256: set[str] = set()
     reference: tuple | None = None
     reference_truth: tuple | None = None
 
@@ -132,6 +133,10 @@ def compare_vendor_study(study: dict, policy: dict) -> dict:
             raise ComparisonInvalid("synthetic output is not buyer-authorized evidence")
         if not _strict_sha(entry.get("output_receipt_sha256")):
             raise ComparisonInvalid("source output receipt must be lowercase SHA-256")
+        if kind == "BUYER_AUTHORIZED_BLIND":
+            if entry["output_receipt_sha256"] in received_sha256:
+                raise ComparisonInvalid("vendor receipts must be distinct evidence objects")
+            received_sha256.add(entry["output_receipt_sha256"])
 
         pilot = entry.get("pilot")
         if not isinstance(pilot, dict):
@@ -198,13 +203,14 @@ def compare_vendor_study(study: dict, policy: dict) -> dict:
             "NO_VENDOR_MEASUREMENTS" if not reports else
             "INCOMPLETE_VENDOR_COVERAGE" if missing else
             "SYNTHETIC_REHEARSAL_ONLY" if not independent else
-            "SAMPLE_COMPARISON_READY" if proof_sufficient else
+            "SAMPLE_COMPARISON_READY_RECEIPTS_UNVERIFIED" if proof_sufficient else
             "METHOD_OR_ACCEPTANCE_GATES_NOT_MET"
         ),
         "observed_vendor_count": len(reports),
         "missing_vendors": list(missing),
         "vendor_results": [reports[v] for v in VENDORS if v in reports],
-        "sample_leaders_if_independently_proven": sample_leaders,
+        "provisional_same_population_max_not_verified": sample_leaders,
+        "external_vendor_receipts_independently_verified": False,
         "market_best_product_proven": False,
         "verified_realized_recovery": False,
         "source_code_access_inferred": False,
