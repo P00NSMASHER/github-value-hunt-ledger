@@ -67,6 +67,10 @@ from freight.research_sas_aies_bridge import (
     report_shell as build_sas_aies_bridge,
     render_html as render_sas_aies_bridge_html,
 )
+from freight.research_bls_ppi_bridge import (
+    report_shell as build_bls_ppi,
+    render_html as render_bls_ppi_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -134,6 +138,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["sas_peer_trucking_revisions"]=build_sas_peers(as_of=date.today())
         result["sas_temporal_history"]=build_sas_temporal(as_of=date.today())
         result["sas_aies_2017_2024_bridge"]=build_sas_aies_bridge(as_of=date.today())
+        result["bls_ppi_price_adjustment"]=build_bls_ppi(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -188,6 +193,7 @@ def render(data: dict) -> str:
     sas_peers=data["sas_peer_trucking_revisions"]
     sas_history=data["sas_temporal_history"]
     bridge=data["sas_aies_2017_2024_bridge"]
+    ppi=data["bls_ppi_price_adjustment"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -406,6 +412,18 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
+<section class="panel"><h2>BLS producer-price context: trucking revenue is not freight volume</h2>
+<p>BLS original monthly industry producer-price indexes are published for
+long-distance truckload and LTL. Illustrative 2017-index-level adjustment of
+the Census employer-industry revenue separates revenue growth from an industry
+producer output price trend, but is NOT official real freight output,
+tonnage, serviceable invoice spending, recovery dollars or customer demand.
+Source status of this offline view: <strong>"""+escape(ppi["source_status"])+"""</strong>.</p>
+<p>2017–2024 nominal long-distance LTL revenue change: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_nominal_census_revenue_change_pct"])+"""%;
+industry producer output price index: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_producer_output_price_index_change_pct"])+"""%;
+illustrative price-adjusted revenue proxy: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"])+"""%.
+All trucking (NAICS 484) original BLS API source was rejected and remains UNVERIFIED.</p>
+<a href="bls_ppi_adjustment.html">Open BLS price adjustments, original source limitations and confidence holds ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -565,6 +583,13 @@ def main():
     (args.out/"sas_aies_revenue_bridge.html").write_text(
         render_sas_aies_bridge_html(data["sas_aies_2017_2024_bridge"]),
         encoding="utf-8"
+    )
+    (args.out/"bls_ppi_adjustment.json").write_text(
+        json.dumps(data["bls_ppi_price_adjustment"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"bls_ppi_adjustment.html").write_text(
+        render_bls_ppi_html(data["bls_ppi_price_adjustment"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
