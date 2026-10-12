@@ -617,6 +617,34 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         fake_fred["direct_bls_authenticated_parent_index_available"]=True
         _must(bool(validate_fred_parent(fake_fred,as_of=today)),
               "M27_UNAUTHENTICATED_FRED_PARENT_SOURCE_ACCEPTED_AS_DIRECT_BLS")
+        from freight.research_bls_parent_origin import (
+            report_shell as build_native_parent_bls,
+            validate_catalog as validate_native_parent_bls,
+        )
+        native=build_native_parent_bls(as_of=today)
+        _must(native["source_status"]==
+              "OFFLINE_PREVIOUS_NATIVE_BLS_V2_OBSERVATIONS_NOT_REPLAYED_IN_THIS_RUN"
+              and native["original_bls_api_v2_months_replayed_this_execution"]==0,
+              "M28_OFFLINE_DIRECT_BLS_SOURCE_FRAUDULENTLY_CLAIMED_LIVE")
+        _must(native["native_bls_original_series_id"]=="PCU484---484---"
+              and native["fred_redistributed_alias_series_id"]=="PCU484484"
+              and native["bls_months_in_previous_first_party_probe"]==96,
+              "M28_NATIVE_BLS_SERIES_ID_AND_96_MONTHS_NOT_RECONCILED")
+        _must(native["2017_to_2024_census_nominal_revenue_change_pct"]=="38.65"
+              and native["2017_to_2024_bls_parent_ppi_change_pct"]=="37.04"
+              and native["2017_to_2024_illustrative_adjusted_revenue_proxy_pct"]=="1.18",
+              "M28_FIRST_PARTY_BLS_PRICE_PROXY_NOT_REPRODUCIBLE")
+        _must(native["historic_m27_fred_provisional_status_unchanged"] is True
+              and native["index_adjustment_is_not_official_real_freight_output"] is True,
+              "M28_FRED_HISTORY_OR_REAL_OUTPUT_SOURCE_MISREPRESENTED")
+        _must(native["real_customer_freight_invoices_observed"]==0 and
+              native["verified_recoverable_market_tam_usd"] is None and
+              native["18_human_customer_pilot_requirements_unmet"] is True,
+              "M28_BLS_PRICE_INDEX_MISTAKEN_FOR_PAID_FREIGHT_RECOVERIES")
+        fake_native=_read("research/BLS_PARENT_ORIGIN_M28_20261012.json")
+        fake_native["original_bls_series_id"]="PCU484484"
+        _must(bool(validate_native_parent_bls(fake_native,as_of=today)),
+              "M28_FRED_ALIAS_ACCIDENTALLY_AUTHORIZED_AS_BLS_NATIVE_ID")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -704,6 +732,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "fred_parent_484_direct_bls_authentication_complete":False,
                 "fred_parent_484_direct_fred_http_replayed_in_director":False,
                 "fred_parent_484_evidence_receipt_sha256":fred["receipt_sha256"],
+                "bls_native_parent_484_source_id":native["native_bls_original_series_id"],
+                "bls_native_parent_484_full_history_previous_probe_months":native["bls_months_in_previous_first_party_probe"],
+                "bls_native_parent_484_offline_not_fresh_api_replay":True,
+                "bls_native_parent_484_price_proxy_pct":native["2017_to_2024_illustrative_adjusted_revenue_proxy_pct"],
+                "bls_native_parent_484_source_receipt_sha256":native["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
