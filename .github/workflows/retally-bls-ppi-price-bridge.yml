@@ -1,0 +1,52 @@
+name: RETALLY Lab 14 BLS PPI Original Industry Series (Mission 26)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bls-ppi-price-bridge.yml'
+      - 'freight/research_bls_ppi_bridge.py'
+      - 'freight/test_research_bls_ppi_bridge.py'
+      - 'freight/research/BLS_PPI_TRUCKING_2017_2024_20261012.json'
+      - 'freight/RESEARCH_BLS_PPI_BRIDGE.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bls-publisher-source-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Test original BLS public API for 2017–2024 industry PPI monthly levels
+        run: |
+          python - <<'PY'
+          import json, urllib.request, hashlib
+          ids=['PCU484484','PCU484121484121','PCU484122484122']
+          url='https://api.bls.gov/publicAPI/v1/timeseries/data/'
+          payload=json.dumps({'seriesid':ids,'startyear':'2017','endyear':'2024'},separators=(',',':')).encode('ascii')
+          req=urllib.request.Request(url,data=payload,headers={'Content-Type':'application/json','User-Agent':'RETALLY-Lab14-Public-PPI-Provenance/1.0'},method='POST')
+          try:
+            with urllib.request.urlopen(req,timeout=30) as response:
+              raw=response.read(2_000_001)
+              print('PPI_HTTP',response.status, 'content_bytes',len(raw),'final_url',response.geturl(),flush=True)
+            if len(raw)>2_000_000:raise ValueError('OVERSIZE')
+            print('PPI_RESPONSE_SHA256',hashlib.sha256(raw).hexdigest(),flush=True)
+            result=json.loads(raw)
+            print('PPI_RESPONSE_STATUS',result.get('status'),result.get('message'),flush=True)
+            for series in result.get('Results',{}).get('series',[]):
+              rows=[x for x in series.get('data',[]) if x.get('year') in ('2017','2018','2019','2020','2021','2022','2023','2024') and x.get('period','')>='M01' and x.get('period','')<='M12']
+              y={}
+              for row in rows:y.setdefault(row['year'],[]).append(row)
+              print('PPI_SERIES',series.get('seriesID'),'total_monthly',len(rows),'annual_counts',{year:len(v) for year,v in y.items()},flush=True)
+              for year in ('2017','2018','2019','2020','2021','2022','2023','2024'):
+                subset=sorted(y.get(year,[]),key=lambda r:r['period'])
+                if subset:
+                  print('PPI_YEAR',series.get('seriesID'),year,
+                        [x['value'] for x in subset],
+                        'source_footnote_codes',[[f.get('code') for f in x.get('footnotes',[]) if f] for x in subset],
+                        flush=True)
+          except Exception as exc:
+            print('PPI_PUBLISHER_SOURCE_BLOCKED',type(exc).__name__,str(exc)[:230],flush=True)
+          PY
