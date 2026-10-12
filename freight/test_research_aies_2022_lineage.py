@@ -61,7 +61,11 @@ def fake_zip(rows=None, *, extra_member=False):
 
 def fake_verify(rows=None, *, extra_member=False):
     raw,dat=fake_zip(rows,extra_member=extra_member)
-    with patch.object(m21,"ZIP_BYTES",len(raw)),\
+    # Keep the real frozen-source manifest gate intact; patch only the
+    # synthetic byte parser expectations in this isolated unit fixture.
+    offline = m21._shell(TODAY)
+    with patch.object(m21,"_shell",return_value=offline),\
+         patch.object(m21,"ZIP_BYTES",len(raw)),\
          patch.object(m21,"ZIP_SHA256",sha256(raw).hexdigest()),\
          patch.object(m21,"DAT_BYTES",len(dat)),\
          patch.object(m21,"DAT_SHA256",sha256(dat).hexdigest()),\
