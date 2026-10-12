@@ -1,9 +1,10 @@
 """Synthetic adversarial acceptance for licensed temporal-charge review."""
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record
+from freight.contracts import canonical_hash
 from freight.detention_review import (
     DetentionTimeline,
     compile_detention_policy,
@@ -253,6 +254,21 @@ def test_mutated_policy_or_canonical_record_is_rejected():
         )
 
 
+def test_rehashed_noncanonical_policy_identity_is_rejected():
+    original = rule()
+    raw = asdict(replace(original, policy_id=" RATE-1 "))
+    raw.pop("policy_hash")
+    forged = replace(
+        original,
+        policy_id=" RATE-1 ",
+        policy_hash=canonical_hash({"schema": 1, **raw}),
+    )
+    with pytest.raises(ValueError, match="not canonical"):
+        review_detention_charge(
+            fixture_record(), "DET-1", forged, timeline(),
+        )
+
+
 def test_unsupported_charge_and_oversized_session_are_blocked():
     with pytest.raises(ValueError, match="supported time-based"):
         review_detention_charge(
@@ -298,13 +314,13 @@ def test_conflicting_source_kinds_cannot_turn_invoice_into_gate_evidence():
 
 # The portfolio's required GitHub Action uses 'python -m unittest discover'.
 # It would otherwise import these pytest-style functions without executing any
-# of them, yielding a misleading green CI status. Bridge every one of the 36
+# of them, yielding a misleading green CI status. Bridge every one of the 37
 # synthetic cases into the required unittest runner (without duplicating logic).
 import unittest
 
 
 class TemporalUnittestGate(unittest.TestCase):
-    def test_all_36_adversarial_cases_are_executed_by_required_ci(self):
+    def test_all_37_adversarial_cases_are_executed_by_required_ci(self):
         direct = (
             test_realistic_detention_stays_review_only_and_enters_existing_human_queue,
             test_prior_payment_reduces_supported_remaining_without_double_credit,
@@ -318,6 +334,7 @@ class TemporalUnittestGate(unittest.TestCase):
             test_no_source_contract_is_not_sufficient_even_if_verified_flag_is_true,
             test_evidence_or_contract_change_changes_proof_hash,
             test_mutated_policy_or_canonical_record_is_rejected,
+            test_rehashed_noncanonical_policy_identity_is_rejected,
             test_unsupported_charge_and_oversized_session_are_blocked,
             test_overflow_is_rejected_instead_of_wrapping_dollars,
             test_review_case_tampering_is_rejected_before_human_queue,
@@ -367,4 +384,4 @@ class TemporalUnittestGate(unittest.TestCase):
             with self.subTest(case="invalid_contract", invalid=invalid):
                 test_invalid_contract_rule_fails_compile(invalid)
                 executed += 1
-        self.assertEqual(executed, 36)
+        self.assertEqual(executed, 37)
