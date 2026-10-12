@@ -746,6 +746,36 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         bad_sectoral["bls_original_sectoral_output_equals_official_bea_real_gross_output"]=True
         _must(bool(validate_bls_sectoral_m31(bad_sectoral,as_of=today)),
               "M31_ORIGINAL_BEAS_GROSS_OUTPUT_SOURCE_FABRICATED")
+        from freight.research_bea_gross_output_m32 import (
+            report_shell as build_bea_gross_output_m32,
+            validate_book as validate_bea_gross_output_m32,
+        )
+        gross_m32=build_bea_gross_output_m32(as_of=today)
+        _must(gross_m32["status"]==
+              "M32_OFFLINE_PINNED_BEAE_TABLE16_SECONDARY_SNAPSHOT_NOT_REFETCHED" and
+              gross_m32["new_secondary_api_observations_authenticated_in_this_run"]==0,
+              "M32_OFFLINE_BEA_DBNOMICS_REPORT_FALSELY_CLAIMED_LIVE_HTTP")
+        _must(gross_m32["bea_source_table"]=="GDPbyIndustry-16" and
+              gross_m32["bea_source_series"]=="484-A" and
+              len(gross_m32["bea_2017_2024_year_index"])==8,
+              "M32_MISSING_BEA_TABLE16_ANNUAL_NAICS484_SOURCE_GRAIN")
+        _must(gross_m32["bea_real_gross_output_2017_2024_change_pct"]=="8.05" and
+              gross_m32["bls_real_sectoral_output_2017_2024_change_pct"]=="4.02" and
+              gross_m32["m29_illustrative_revenue_ppi_proxy_2017_2024_change_pct"]=="1.18" and
+              gross_m32["bea_minus_bls_output_descriptive_gap_pp"]=="4.03",
+              "M32_BEA_484_DISTINCT_ECONOMIC_MEASURES_CALCULATION_INCORRECT")
+        _must(gross_m32["direct_original_bea_table16_numeric_source_bytes_authenticated"] is False and
+              gross_m32["original_bea_publisher_source_verification_hold"] is True and
+              gross_m32["discrepancies_are_not_independently_validated_model_errors"] is True,
+              "M32_BEABEADBP_SECONDARY_SOURCE_PROMOTED_TO_PRIMARY_MODEL_ERROR")
+        _must(gross_m32["paid_customer_freight_invoices_observed"]==0 and
+              gross_m32["freight_recovery_tam_usd"] is None and
+              gross_m32["human_pilot_18_independent_requirements_unmet"] is True,
+              "M32_BEA_ECONOMIC_INDEX_PROMOTED_TO_FREIGHT_AUDIT_MARKET")
+        forged_m32=_read("research/BEA_GROSS_OUTPUT_M32_20261012.json")
+        forged_m32["bea_primary_original_484_numeric_source_authenticated"]=True
+        _must(bool(validate_bea_gross_output_m32(forged_m32,as_of=today)),
+              "M32_FALSE_DIRECT_BEA_ORIGINAL_SOURCE_AUTHORIZATION_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -854,6 +884,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bls_real_sectoral_vs_ppi_proxy_descriptive_gap_pp":sectoral["bls_minus_ppi_proxy_descriptive_gap_percentage_points"],
                 "bls_real_sectoral_not_bea_gross_output":True,
                 "bls_real_sectoral_source_receipt_sha256":sectoral["receipt_sha256"],
+                "bea_table16_real_gross_output_source_years":len(gross_m32["bea_2017_2024_year_index"]),
+                "bea_table16_real_gross_output_naics484_pct":gross_m32["bea_real_gross_output_2017_2024_change_pct"],
+                "bea_table16_secondary_not_direct_original_bea":True,
+                "bea_table16_descriptive_gap_vs_bls_sectoral_pp":gross_m32["bea_minus_bls_output_descriptive_gap_pp"],
+                "bea_table16_source_receipt_sha256":gross_m32["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
