@@ -96,8 +96,8 @@ def validate_book(book: object, *, as_of:date) -> list[str]:
         for field in REQUIRED_NULL:
             if book.get(field) is not None:
                 problems.append("M30_UNVERIFIED_BEA_OUTPUT_OR_RECOVERY_DOLLARS:"+field)
-        if (book.get("external_communications_or_financial_claims_authorized") is not False
-            or book.get("buyers_with_real_demand_verified")!=0):
+        if (book.get("reauthorize_external_business_claims") is not False
+            or book.get("buyer_demand_proven") is not False):
             problems.append("M30_UNAUTHORIZED_COMMERCIAL_CLAIM")
         pages=book.get("source_replay_ci_result")
         if pages!={
