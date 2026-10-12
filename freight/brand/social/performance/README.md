@@ -224,3 +224,16 @@ A separate, genuinely public **read-only browser** inspection opened all eleven 
 - `test_visual_receipt_20261011.py`: offline CI validates that these exact eleven URLs cover thirteen scheduled October Facebook/Instagram posts in the frozen 2026-10-11 snapshot, without accidentally including any of the four unapproved November drafts. It rejects any false 'checksum verified' or 'published' flag.
 
 The existing manual GitHub public HTTPS GET workflow is unchanged and still useful for independent server-header/byte-level review. The October 11 browser check does not convert the pending October 12 post into a verified public post. The next provider-publication check remains **October 12 after 09:00 ET**.
+
+## Owner-approved premium artwork revision — October 12
+
+The original `baselines/retally-2026-10-11.json` is an **immutable historical snapshot**. The owner approved a substantially more polished, high-gloss social master on October 11. Connected Metricool then rehosted that file as `https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png` for **exactly two existing scheduled launch posts**:
+
+- Facebook October 12, 09:00 Eastern, UUID `-1816987399007942347`;
+- Instagram October 13, 10:00 Eastern, UUID `-7860495589122225702`.
+
+The active current-state reference is `baselines/retally-2026-10-12-creative-approved.json`. The two original captions, Facebook UTM landing URL, Eastern publishing slots, POST types, AI-generated Instagram indicator and automatic delivery settings remain unchanged. **Do not treat the historical-media difference as an unexplained unauthorized drift.** The new `test_premium_creative_revision.py` checks that the *only* allowed original-to-revised differences are the two approved media+alt-text replacements; all November drafts are still blocked from publication.
+
+The offline PR tests continue to exercise the historical snapshot for historical verification. The **manual GitHub public HTTPS GET** lane and its offline media manifest now use the latest accepted creative-revision snapshot so operators inspect the currently queued new PNG. The manual public GET lane has **not** been executed merely by changing its configuration, and neither HTTP validity nor planner PENDING proves Facebook or Instagram publication.
+
+Future artwork should follow [PREMIUM_SOCIAL_CREATIVE_STANDARD_V1.md](../PREMIUM_SOCIAL_CREATIVE_STANDARD_V1.md), using the Canva master media asset `MAHXwWF8t9o` and the original approved RETALLY PNG logos for brand consistency. The accepted 1122×1402 master is a raster style reference, not an editable layered Canva template. No other active graphics or held November drafts were replaced.
