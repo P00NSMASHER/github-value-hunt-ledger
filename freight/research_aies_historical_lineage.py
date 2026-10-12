@@ -52,7 +52,7 @@ EXPECTED_2023 = {
     "484122": ("General freight trucking, long-distance, less than truckload", 64651167, "0.9"),
 }
 SOURCE_REQUIRED = {
-    "#GEOTYPE", "ST", "GEO_ID", "GEO_LABEL", "GEO_ID_F", "NAICS_F",
+    "#GEOTYPE", "ST", "GEO_ID", "GEO_LABEL", "GEO_ID_F",
     "TYPOP", "TYPOP_LABEL", "TAXSTAT", "TAXSTAT_LABEL", "YEAR",
     "RCPT_TOT_VAL", "RCPT_TOT_VAL_F", "RCPT_TOT_CV", "RCPT_TOT_CV_F",
 }
@@ -209,7 +209,7 @@ def select_national_2023(rows: list[dict], *, naics_field: str) -> list[dict]:
     """Exact national all-establishment 2023 industry grain; no source origin proof."""
     if naics_field not in ("NAICS2017","NAICS") or type(rows) is not list:
         raise ValueError("M20_WRONG_NAICS_COLUMN_OR_ROWS")
-    required = SOURCE_REQUIRED | {naics_field, naics_field+"_LABEL"}
+    required = SOURCE_REQUIRED | {naics_field, naics_field+"_LABEL", naics_field+"_F"}
     observed = {}
     for row in rows:
         if type(row) is not dict or not required <= set(row):
@@ -226,7 +226,7 @@ def select_national_2023(rows: list[dict], *, naics_field: str) -> list[dict]:
         label, val, cv = EXPECTED_2023[code]
         if row[naics_field+"_LABEL"].casefold() != label.casefold():
             raise ValueError("M20_SOURCE_NAICS_LABEL_INCORRECT:"+code)
-        for f in ("GEO_ID_F","NAICS_F","RCPT_TOT_VAL_F","RCPT_TOT_CV_F"):
+        for f in ("GEO_ID_F",naics_field+"_F","RCPT_TOT_VAL_F","RCPT_TOT_CV_F"):
             if row[f] != "":
                 raise ValueError("M20_CENSUS_ESTIMATE_SUPPRESSED_OR_FLAGGED:"+code+":"+f)
         if (row["TYPOP_LABEL"].casefold() != "all establishments"
