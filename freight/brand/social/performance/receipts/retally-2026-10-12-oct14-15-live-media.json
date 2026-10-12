@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "observation_date": "2026-10-12",
+  "scope": "Existing RETALLY Oct 14 Facebook and Oct 15 Instagram media replacements",
+  "metricool_brand_id": "7322512",
+  "status": "DEPLOYED_TO_SCHEDULED_POSTS",
+  "platform_publication_verified": false,
+  "meta_note": "Both scheduled posts remain PENDING on the checked date. A separate Oct 12 Facebook introduction has been marked PUBLISHED in Metricool; not a statement about these two.",
+  "original_file_integrity": "Original 1136x1408 JPEGs were decoded locally and SHA-256 hashed. Adobe full resolution links were used as intermediate external sources. Metricool returned new static.metricool.com host URLs. Host-side image bytes were not independently SHA-matched.",
+  "post_count": 2,
+  "posts": [
+    {
+      "uuid": "-7129364071318205444",
+      "network": "facebook",
+      "metricool_post_id_after_change": 394236354,
+      "publicationDate": {
+        "dateTime": "2026-10-14T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "provider_status": "PENDING",
+      "scheduled_autoPublish": true,
+      "scheduled_draft": false,
+      "format": "POST",
+      "original_media_url": "https://static.metricool.com/planner/202610/7322512-file-14283620392379791152.jpeg",
+      "new_rehosted_media_url": "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg",
+      "new_image_alt": "RETALLY premium emerald-and-black freight audit graphic. Headline: 'Already have a freight auditor? We check what's still unresolved.' Three glowing panels: Review prior findings; Check credits & corrections; Identify issues still open. A dark green truck at a port. 'Find it. Prove it. Recover it.' $0 upfront initial audit for agreed eligible scope.",
+      "post_caption": "Already have a freight auditor? That's not a problem. It's the starting point.\n\nA useful second look should find what's still unresolved—not take credit for somebody else's work.\n\nBefore calling an invoice issue \"new,\" reconcile:\n• Previous audit findings\n• Carrier corrections and automatic credits\n• Open disputes and approved claims\n• Rebill chains for the same shipment\n\nOnly a supported, unaddressed discrepancy belongs in the next conversation.\n\nRETALLY offers a $0-upfront initial Second-Look Recovery Audit for agreed eligible scope. Recovery work is separately authorized in writing; outcomes are not guaranteed.\n\nExplore the second-look process:\nhttps://www.retallyrecovery.com/second-look-freight-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=independent_second_look\n\n#FreightAudit #AccountsPayable",
+      "tracking_link_unchanged": true,
+      "instagram_ai_generated": null,
+      "original_uploaded_file_name": "AaEv-J2FizsLMzTX9RWnyw-AaEv-J2FmP3Ld9no8qsJpg.jpg",
+      "original_uploaded_file_dimensions_px": [
+        1136,
+        1408
+      ],
+      "original_uploaded_file_bytes": 238671,
+      "original_uploaded_file_sha256": "ce46f4ac4ba89d6d5893818e94476f54e593f4ea7cab127d2a7eb041ead3f5ff",
+      "canva_media_id": "MAHXy6EvN24",
+      "public_meta_permalink_verified": false
+    },
+    {
+      "uuid": "6484508306152771452",
+      "network": "instagram",
+      "metricool_post_id_after_change": 394236766,
+      "publicationDate": {
+        "dateTime": "2026-10-15T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "provider_status": "PENDING",
+      "scheduled_autoPublish": true,
+      "scheduled_draft": false,
+      "format": "POST",
+      "original_media_url": "https://static.metricool.com/planner/202610/7322512-file-14283620392379791152.jpeg",
+      "new_rehosted_media_url": "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg",
+      "new_image_alt": "RETALLY premium black-and-emerald freight billing graphic. Headline: 'TWO INVOICES. ONE SHIPMENT. NOT ALWAYS A DUPLICATE.' Explains that a corrected bill or credit can explain a second invoice, with three glowing cards: Match the shipment; Check corrected bills; Reconcile credits. Dark tractor-trailer at a port and reminder to investigate before claiming an overcharge.",
+      "post_caption": "TWO INVOICES. ONE SHIPMENT.\n\nIs that duplicate billing?\n\nNot necessarily.\n\nA corrected invoice, credit-and-rebill, or replacement bill can look like a duplicate until you trace the actual charges and credits.\n\nBefore flagging it:\n01 / Match the shipment or PRO number\n02 / Check original versus corrected bills\n03 / Reconcile payments and credit memos\n\nA suspicious pattern isn't automatically an overpayment. An overpayment isn't automatically a recovery.\n\nSave this checklist for your next freight AP review. More through the link in our bio.\n\n#RETALLY #FreightAudit #AccountsPayable",
+      "tracking_link_unchanged": true,
+      "instagram_ai_generated": true,
+      "original_uploaded_file_name": "AaEv-KX81-7AqrrMYkJmYw-AaEv-KX8u4Sav9rSIzKMMw 2.jpg",
+      "original_uploaded_file_dimensions_px": [
+        1136,
+        1408
+      ],
+      "original_uploaded_file_bytes": 221639,
+      "original_uploaded_file_sha256": "c6d01acb4b0cd79a7e1dc56359d95ee4bcf11954360b95a905c2aee68c7b3ad2",
+      "canva_media_id": "MAHXy245ZUs",
+      "public_meta_permalink_verified": false
+    }
+  ],
+  "never_changed": "No post captions, original UTMs, Europe/Madrid time, automatic publication flags, payment/ads, November drafts, customer data or existing scheduled ChatGPT tasks altered."
+}
