@@ -127,8 +127,13 @@ def verify_detention_policy(policy: DetentionPolicy) -> None:
     digest = fields.pop("policy_hash")
     if digest != canonical_hash({"schema": 1, **fields}):
         raise ValueError("detention policy hash mismatch")
-    compile_detention_policy(fields, source_sha256=policy.source_sha256,
-                             verified_controlling_authority=policy.verified_controlling_authority)
+    compiled = compile_detention_policy(
+        fields,
+        source_sha256=policy.source_sha256,
+        verified_controlling_authority=policy.verified_controlling_authority,
+    )
+    if compiled != policy:
+        raise ValueError("detention policy is not canonical")
 
 
 @dataclass(frozen=True)
