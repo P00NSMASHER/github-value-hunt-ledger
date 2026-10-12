@@ -19,6 +19,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert totals["candidate_difference_cents"] == 28500
     assert totals["validated_difference_cents"] == 19500
     assert totals["net_realized_cents"] == 18500
+    assert totals["attributable_net_realized_cents"] == 18500
     assert totals["fee_eligible_realized_cents"] == 18500
     assert totals["suppressed_count"] == 2
     assert pack["findings"][2]["attribution_state"] == "SUPPRESSED"
@@ -29,6 +30,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
+    assert pack["claim_boundary"]["realized_attribution_excludes_suppressed_findings"] is True
 
 
 @pytest.mark.parametrize(
@@ -41,6 +43,23 @@ def test_validated_difference_excludes_suppressed_findings(suppression_flag):
     pack = build_pack(data)
     assert pack["findings"][0]["attribution_state"] == "SUPPRESSED"
     assert pack["totals"]["validated_difference_cents"] == 7000
+
+
+def test_suppressed_credit_is_observed_but_not_attributed_or_fee_eligible():
+    data = payload()
+    data["findings"][0]["automatic_credit"] = True
+    pack = build_pack(data)
+    assert pack["findings"][0]["net_realized_cents"] == 12500
+    assert pack["findings"][0]["attribution_state"] == "SUPPRESSED"
+    assert pack["findings"][0]["fee_eligible_realized_cents"] == 0
+    assert pack["totals"]["net_realized_cents"] == 18500
+    assert pack["totals"]["attributable_net_realized_cents"] == 6000
+    assert pack["totals"]["fee_eligible_realized_cents"] == 6000
+
+    report = render_markdown(pack)
+    assert "Observed net credits (all sources): **$185.00**" in report
+    assert "Attributable net realized recovery: **$60.00**" in report
+    assert "excluded from attributed recovery" in report
 
 
 def test_pack_subtracts_reversal_from_realized_value():
@@ -134,6 +153,8 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Candidate difference" in report
     assert "Validated attributable difference: **$195.00**" in report
     assert "Fee-eligible realized recovery" in report
+    assert "Observed net credits (all sources): **$185.00**" in report
+    assert "Attributable net realized recovery: **$185.00**" in report
     assert "SUPPRESSED" in report
     assert "Controlling rate authority is not proven." in report
     assert "Positive settled credits require an approved or closed claim" in report
