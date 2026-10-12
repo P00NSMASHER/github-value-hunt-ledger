@@ -26,6 +26,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["findings"][3]["reviewer_disposition"] == "REVIEW"
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
     assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
+    assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
 
 
@@ -97,6 +98,16 @@ def test_pack_rejects_settled_credit_above_candidate_difference():
         build_pack(data)
 
 
+def test_pack_rejects_duplicate_positive_settlement_reference():
+    data = payload()
+    data["findings"][1]["settlement_reference"] = data["findings"][0]["settlement_reference"]
+    with pytest.raises(
+        ValueError,
+        match="positive settlement_reference must be unique across findings",
+    ):
+        build_pack(data)
+
+
 def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     report = render_markdown(build_pack(payload()))
     assert "SYNTHETIC / FICTIONAL EXAMPLE" in report
@@ -107,6 +118,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Controlling rate authority is not proven." in report
     assert "Positive settled credits require an approved or closed claim" in report
     assert "Settled credit cannot exceed the candidate invoice difference" in report
+    assert "One positive settlement reference can support only one finding" in report
 
 
 def test_duplicate_finding_ids_fail_closed():
