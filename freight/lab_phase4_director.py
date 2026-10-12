@@ -645,6 +645,41 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         fake_native["original_bls_series_id"]="PCU484484"
         _must(bool(validate_native_parent_bls(fake_native,as_of=today)),
               "M28_FRED_ALIAS_ACCIDENTALLY_AUTHORIZED_AS_BLS_NATIVE_ID")
+        from freight.research_unified_blspci import (
+            report_shell as build_unified_direct_bls,
+            validate_policy as validate_unified_bls_policy,
+        )
+        direct=build_unified_direct_bls(as_of=today)
+        compared={x["naics"]:x for x in direct["industry_comparisons"]}
+        _must(direct["status"]==
+              "M29_OFFLINE_PRIOR_BLS_SOURCE_OBSERVATIONS_NO_FRESH_THREE_SERIES_REPLAY"
+              and direct["current_source_authenticated_month_count"]==0,
+              "M29_OFFLINE_SOURCE_CONFLATED_WITH_FRESH_288_BLS_MONTHS")
+        _must(direct["historical_original_bls_months_in_pinned_catalogs"]==288
+              and direct["industry_counts"]==3
+              and direct["source_series_ids"]==[
+                  "PCU484---484---","PCU484121484121","PCU484122484122"],
+              "M29_THREE_NATIVE_BLS_TRUCKING_SERIES_INCOMPLETE")
+        _must([compared[x]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"]
+               for x in ("484","484121","484122")]==["1.18","2.82","-1.89"],
+              "M29_UNIFIED_SOURCE_PRICE_ADJUSTMENTS_CHANGED")
+        _must(compared["484122"][
+                  "2017_to_2024_december_endpoint_price_adjusted_revenue_pct"]=="1.60"
+              and compared["484122"][
+                  "2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"]=="-1.89"
+              and direct["december_endpoint_sensitivity_is_not_a_statistical_confidence_interval"],
+              "M29_LTL_METHOD_SENSITIVITY_SUPPRESSED_OR_FALSLY_CERTIFIED")
+        _must(direct["real_customer_freight_invoices_observed"]==0
+              if "real_customer_freight_invoices_observed" in direct
+              else direct["actual_paid_customer_freight_invoices_observed"]==0,
+              "M29_SOURCE_MISTAKEN_FOR_CUSTOMER_INVOICE_SAMPLE")
+        _must(direct["freight_recovery_market_tam_usd"] is None and
+              direct["original_18_independent_pilot_requirements_still_unmet"],
+              "M29_BLS_INDEX_PROMOTED_TO_VERIFIED_RECOVERY_MARKET")
+        fake_unified=_read("research/BLS_TRUCKING_UNIFIED_SOURCE_POLICY_M29_20261012.json")
+        fake_unified["december_endpoint_is_annual_average"]=True
+        _must(bool(validate_unified_bls_policy(fake_unified,as_of=today)),
+              "M29_FALSE_BLS_ANNUAL_AVERAGE_SUBSTITUTED_FROM_DECEMBER_MONTH")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -737,6 +772,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bls_native_parent_484_offline_not_fresh_api_replay":True,
                 "bls_native_parent_484_price_proxy_pct":native["2017_to_2024_illustrative_adjusted_revenue_proxy_pct"],
                 "bls_native_parent_484_source_receipt_sha256":native["receipt_sha256"],
+                "bls_three_industry_native_ids":direct["source_series_ids"],
+                "bls_three_industry_months_in_original_source_snapshots":direct["historical_original_bls_months_in_pinned_catalogs"],
+                "bls_three_industry_current_research_offline_not_fresh_source":True,
+                "bls_ltl_2017_2024_annual_mean_proxy_pct":compared["484122"]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"],
+                "bls_ltl_2017_2024_december_sensitivity_pct":compared["484122"]["2017_to_2024_december_endpoint_price_adjusted_revenue_pct"],
+                "bls_three_industry_unified_receipt_sha256":direct["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
