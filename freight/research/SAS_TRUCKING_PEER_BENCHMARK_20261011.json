@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CENSUS_SAS_2022_TRUCKING_PEER_BENCHMARK_NOT_CUSTOMER_FREIGHT_AUDITS",
+  "observed_on": "2026-10-11",
+  "census_origin": "U.S. Census Bureau",
+  "census_release_context": "2022 Services Annual Survey revised August 31 2026 using 2022 Economic Census benchmarking",
+  "census_release_page": "https://www.census.gov/data/tables/2022/econ/services/sas-naics.html",
+  "census_methodology_page": "https://www.census.gov/programs-surveys/sas/technical-documentation/methodology/benchmarkprocess22.html",
+  "source_family": "SAME_CENSUS_2022_SAS_INDUSTRY_SURVEY_TWO_PUBLICATION_VINTAGES_NOT_TWO_INDEPENDENT_SAMPLES",
+  "naics_vintage": "2017_NAICS",
+  "source_grain": "2022_US_EMPLOYER_FIRMS_ALL_TAX_STATUSES_REVENUE",
+  "units": "MILLIONS_OF_NOMINAL_US_DOLLARS",
+  "report_population": "NAICS484_PARENT_INCLUDES_NAICS484121_AND_484122_OTHER_SUBINDUSTRIES_NOT_SEPARATELY_IDENTIFIED",
+  "publisher_workbooks": [
+    {
+      "id": "revised_2026_sas",
+      "source_url": "https://www2.census.gov/programs-surveys/sas/tables/time-series/sas-latest/Table2.xlsx",
+      "archive_sha256": "cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac",
+      "archive_bytes": 128635,
+      "tab": "xl/worksheets/sheet1.xml",
+      "sheet_row_count": 839,
+      "title": "Table 2.  Estimated Revenue by Tax Status for Employer Firms: 2013 Through 2022",
+      "records": [
+        {
+          "naics": "484",
+          "label": "Truck Transportation",
+          "row_numbers": [
+            42,
+            43
+          ],
+          "revenue_million_usd": 423271,
+          "raw_2022_cv": "0"
+        },
+        {
+          "naics": "484121",
+          "label": "General Freight Trucking, Long-Distance, Truckload",
+          "row_numbers": [
+            46,
+            47
+          ],
+          "revenue_million_usd": 172717,
+          "raw_2022_cv": "0"
+        },
+        {
+          "naics": "484122",
+          "label": "General Freight Trucking, Long-Distance, Less Than Truckload",
+          "row_numbers": [
+            48,
+            49
+          ],
+          "revenue_million_usd": 65688,
+          "raw_2022_cv": "0"
+        }
+      ]
+    },
+    {
+      "id": "legacy_2024_sas",
+      "source_url": "https://www2.census.gov/programs-surveys/sas/tables/time-series/sas-latest/sas-22.xlsx",
+      "archive_sha256": "4aa1efe9533fb3b16f32806af4f0b1bd5c72e92f2db024e559f891e03f0bc33a",
+      "archive_bytes": 515901,
+      "tab": "xl/worksheets/sheet2.xml",
+      "sheet_row_count": 839,
+      "title": "Table 2.  Estimated Revenue by Tax Status for Employer Firms: 2013 Through 2022",
+      "records": [
+        {
+          "naics": "484",
+          "label": "Truck Transportation",
+          "row_numbers": [
+            44,
+            45
+          ],
+          "revenue_million_usd": 445509,
+          "raw_2022_cv": "1.3"
+        },
+        {
+          "naics": "484121",
+          "label": "General Freight Trucking, Long-Distance, Truckload",
+          "row_numbers": [
+            48,
+            49
+          ],
+          "revenue_million_usd": 183482,
+          "raw_2022_cv": "2.7"
+        },
+        {
+          "naics": "484122",
+          "label": "General Freight Trucking, Long-Distance, Less Than Truckload",
+          "row_numbers": [
+            50,
+            51
+          ],
+          "revenue_million_usd": 68411,
+          "raw_2022_cv": "1.6"
+        }
+      ]
+    }
+  ],
+  "aies_historical_2022_thousand_usd": {
+    "484": 423270958,
+    "484121": 172717339,
+    "484122": 65688461
+  },
+  "aies_original_census_publisher_zip_sha256": "1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4",
+  "old_and_new_tax_status_rows_are_independent_samples": false,
+  "three_trucking_naics_subsets_are_additive_independent_markets": false,
+  "residual_between_parent_and_two_children_is_separately_surveyed_naics": false,
+  "revised_2022_cv_zero_proves_zero_statistical_uncertainty": false,
+  "survey_revisions_are_carrier_billing_overcharges": false,
+  "quantitative_causal_benchmark_factor_independently_proven": false,
+  "historical_series_fielded_as_standalone_aies_2022_sample": false,
+  "consumer_invoice_data_ingested": false,
+  "customer_billing_error_frequency_established": false,
+  "recovered_freight_cash_usd": null,
+  "serviceable_recovery_market_usd": null,
+  "buyer_demand_established": false,
+  "marketing_public_claims_or_outreach_allowed": false,
+  "approved_real_customer_studies": 0,
+  "pilot_18_requirements_remain_unverified": true,
+  "lab_count_changed": false,
+  "new_scheduler_created": false,
+  "caveat": "These are source-bound Census 2022 SAS employer-industry revenue estimates in nominal millions of dollars, released under different publication vintages. Benchmark revision differences across parent truck transportation NAICS 484 and child NAICS 484121 truckload and 484122 long-distance LTL do NOT measure invoice mischarges or cash recoveries. Parent and children overlap, and the remaining parent revenue is an arithmetic residual—not a separate directly measured NAICS industry or an independent sample. The revised 2022 CV raw zero cannot certify zero survey uncertainty. The 2022 AIES historical estimates were constructed using legacy-linkage procedures, not independently fielded 2022 AIES."
+}
