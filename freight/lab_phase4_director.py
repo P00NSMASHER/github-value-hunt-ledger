@@ -421,6 +421,29 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_historical["source_year_2022_original_reproduced"]=True
         _must(bool(validate_historical(forged_historical,as_of=today)),
               "UNREPLAYED_2022_CENSUS_PUBLISHER_DATA_SILENTLY_CERTIFIED")
+        from freight.research_aies_2022_lineage import (
+            _shell as build_m21_historic,
+            validate_manifest as validate_m21_historic,
+        )
+        historical2022=build_m21_historic(today)
+        _must(historical2022["status"]=="OFFLINE_HISTORICAL_METADATA_ONLY_NO_SOURCE_REPLAY",
+              "M21_OFFLINE_DASHBOARD_CLAIMS_ORIGINAL_ZIP_REPLAY")
+        _must(historical2022["published_2022_historical_ltl_revenue_thousand_usd"]==65688461,
+              "M21_2022_CENSUS_HISTORICAL_REVENUE_MISSING")
+        _must(historical2022["legacy_sas_gap_million_usd"]=="2722.539" and
+              historical2022["legacy_sas_gap_assigned_causal_mechanism"] is None,
+              "M21_2022_LEGACY_SAS_UNPROVEN_RECONCILIATION_CERTIFIED")
+        _must(historical2022["2022_collected_under_standalone_original_aies_survey"] is False and
+              historical2022["2022_cv_zero_means_exact_no_uncertainty"] is False,
+              "M21_CENSUS_HISTORIC_LINKAGE_MISLABELED_DIRECT_SURVEY")
+        _must(historical2022["actual_customer_invoice_rows_processed"]==0 and
+              historical2022["ltl_recoverable_market_tam_usd"] is None and
+              historical2022["human_pilot_18_controls_still_unverified"] is True,
+              "M21_HISTORICAL_REVENUE_MISREPRESENTED_RECOVERY")
+        forged_m21=_read("research/AIES_2022_LEGACY_LINEAGE_20261011.json")
+        forged_m21["raw_2022_aies_standalone_survey_collected"]=True
+        _must(bool(validate_m21_historic(forged_m21,as_of=today)),
+              "M21_FAKE_STANDALONE_2022_AIES_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -473,6 +496,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "aies_2023_to_2024_nominal_change_pct":historical["2023_to_2024_nominal_change_pct"],
                 "aies_2022_primary_source_still_held":True,
                 "aies_historical_source_receipt_sha256":historical["receipt_sha256"],
+                "aies_2022_publisher_historic_snapshot":historical2022["scope"],
+                "aies_2022_historic_ltl_thousand_usd":historical2022["published_2022_historical_ltl_revenue_thousand_usd"],
+                "aies_2022_historic_original_zip_in_this_director_run":False,
+                "aies_2022_legacy_sas_gap_causal_attribution_held":True,
+                "aies_2022_historic_research_receipt_sha256":historical2022["receipt_sha256"],
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,
