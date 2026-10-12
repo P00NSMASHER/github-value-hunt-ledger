@@ -558,6 +558,37 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         bad_bridge["legacy_prebenchmark_2022_sas_can_substitute_for_revised_sas"]=True
         _must(bool(validate_sas_aies_catalog(bad_bridge,as_of=today)),
               "M25_OLD_SAS_VINTAGE_SILENTLY_PROMOTED_TO_LINKED_AIES_SOURCE")
+        from freight.research_bls_ppi_bridge import (
+            report_shell as build_bls_ppi,
+            validate_catalog as validate_bls_ppi,
+        )
+        ppi=build_bls_ppi(as_of=today)
+        ppi_codes={x["naics"]:x for x in ppi["industry_price_adjustments"]}
+        _must(ppi["source_status"]==
+              "OFFLINE_BLS_PPI_SNAPSHOT_NOT_REPLAYED_IN_THIS_RUN" and
+              ppi["original_bls_public_api_replayed_this_run"] is False,
+              "M26_OFFLINE_PPI_SNAPSHOT_PRETENDS_PUBLISHER_DOWNLOAD")
+        _must(ppi["frozen_price_index_monthly_observations"]==192 and
+              ppi["ppi_months_per_industry"]==96,
+              "M26_BLS_MONTHLY_PPI_SOURCE_COVERAGE_MISSING")
+        _must(ppi_codes["484121"][
+            "2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"]
+              =="2.82" and
+              ppi_codes["484122"][
+            "2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"]
+              =="-1.89",
+              "M26_INDUSTRY_PPI_ADJUSTMENT_CANNOT_REPRODUCE")
+        _must(ppi["parent_trucking_naics484_price_adjusted_proxy_pct"] is None and
+              ppi["parent_484_source_rejected_by_bls_v1_api_in_original_probe"] is True,
+              "M26_MISSING_PARENT_PPI_FALSELY_INFERRED")
+        _must(ppi["real_customer_freight_invoices_observed"]==0 and
+              ppi["eligible_recovery_market_tam_usd"] is None and
+              ppi["human_pilot_18_requirements_unmet"] is True,
+              "M26_PRICE_INDEX_MISREPRESENTED_AS_CUSTOMER_RECOVERY_TAM")
+        fake_ppi=_read("research/BLS_PPI_TRUCKING_2017_2024_20261012.json")
+        fake_ppi["price_adjusted_revenue_proxy_is_official_real_output_measure"]=True
+        _must(bool(validate_bls_ppi(fake_ppi,as_of=today)),
+              "M26_ILLUSTRATIVE_PRICE_PROXY_PROMOTED_TO_OFFICIAL_REAL_OUTPUT")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -636,6 +667,10 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "sas_aies_2017_2024_ltl_nominal_change_pct":bridge["industry_series"][2]["2017_to_2024_nominal_cumulative_change_pct"],
                 "sas_aies_bridge_offline_not_new_original_replay":True,
                 "sas_aies_bridge_evidence_receipt_sha256":bridge["receipt_sha256"],
+                "bls_ppi_monthly_observation_snapshot_count":ppi["frozen_price_index_monthly_observations"],
+                "bls_ppi_price_adjusted_ltl_proxy_pct":ppi_codes["484122"]["2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"],
+                "bls_ppi_parent_trucking_price_adjustment_held":True,
+                "bls_ppi_evidence_receipt_sha256":ppi["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
