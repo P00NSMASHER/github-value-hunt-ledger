@@ -36,4 +36,13 @@ Before editing Metricool:
 4. Change **only** approved image URL and accurate descriptive alt text; then re-read exact post UUID and settings. Record the newly assigned numeric ID and rehosted public media URL in a new accepted baseline. Do not overwrite historical frozen snapshots.
 5. Leave November carousels (draft=true/autoPublish=false), unrelated channels, other October posts and paid promotions alone. Verify real public Meta permalinks after actual publication; PENDING cannot certify delivery.
 
-**Current status: candidates created, NOT approved or attached to the scheduled posts.** No external publication, customer inquiry or paid spend is asserted.
+## October 12 owner approval and deployment state
+
+**The owner explicitly approved both images ("They look great").** They are therefore *creative-approved*, not rejected drafts. The October 12 read-only Canva asset metadata confirms native **1136×1408 JPEGs** at the exact MEDIA IDs above. Public thumbnail checks additionally established that both signed **161×200 JPEG** previews load and have the correct main themes; no obvious windshield branding or major headline defect was visible. Small text cannot be certified from these tiny thumbnails.
+
+**Deployment remains blocked solely by access to original-resolution image bytes.** The Canva connector currently provides generated MEDIA IDs and signed 161×200 preview links, not full-resolution export URLs. Increasing the preview size by rewriting its signed URL returned **HTTP 403 Signature invalid**, not evidence the originals are broken. A separate authorized cloud-browser export route returned insufficient credits before any site interaction. We deliberately did **not** attach thumbnail media, reconstruct a lookalike, or alter either live queue item.
+
+**Before release:** obtain the two exact originals from Canva by exporting them to full-resolution JPEG files and attaching them to this conversation, or provide an actual Canva-generated public, no-login original-resolution download URL for each. Once received, verify file dimensions and all small lettering, allow Metricool to rehost those exact bytes, change only media/alt for the two UUIDs, re-read their full captions/dates/flags, and record new mutable planner IDs. Neither Canva MEDIA ID alone nor a 161×200 thumbnail is a sufficient production media URL.
+
+**Current authoritative state:** Owner approval **YES**; file generation **YES**; original-byte handoff **WAITING**; image replacement **NOT DONE**; existing scheduled posts **UNCHANGED**; platform publication of these two future posts **NOT VERIFIED**. The original 2026-10-11 and 2026-10-12 immutable campaign baselines are preserved. Facebook's earlier October 12 introductory post is separately provider-reported **PUBLISHED**, with a distinct permalink; this is not proof of publication for October 14/15.
+
