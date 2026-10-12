@@ -1,0 +1,63 @@
+name: RETALLY Lab 14 Census SAS 2017-2022 Revision Research (Mission 24)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-sas-temporal.yml'
+      - 'freight/research_sas_temporal.py'
+      - 'freight/test_research_sas_temporal.py'
+      - 'freight/research/SAS_TEMPORAL_2017_2022_20261011.json'
+      - 'freight/RESEARCH_SAS_TEMPORAL_2017_2022.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-six-year-source-cohorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Print bounded Census SAS revenue columns for original/revised 2017-2022 trucking peers
+        run: |
+          python - <<'PY'
+          import json,re
+          from io import BytesIO
+          from zipfile import ZipFile
+          from xml.etree import ElementTree as ET
+          from hashlib import sha256
+          from freight.research_sas_benchmark import SOURCES,REVISED,LEGACY
+          from freight.research_sas_xlsx_probe import get_source
+          ns='{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+          for ident,key in ((REVISED,'revised_table2'),(LEGACY,'original_2017_2022')):
+            spec=SOURCES[ident]
+            raw=get_source(key)
+            assert sha256(raw).hexdigest()==spec['sha256'] and len(raw)==spec['bytes']
+            with ZipFile(BytesIO(raw)) as z:
+              strings=[]
+              if 'xl/sharedStrings.xml' in z.namelist():
+                tree=ET.fromstring(z.read('xl/sharedStrings.xml'))
+                for item in tree.findall(ns+'si'):
+                  strings.append(''.join(t.text or '' for t in item.iter(ns+'t')))
+              tree=ET.fromstring(z.read(spec['sheet_member']))
+              rows=tree.findall('.//'+ns+'sheetData/'+ns+'row')
+              assert len(rows)==839
+              for row in rows:
+                cells={}
+                for cell in row.findall(ns+'c'):
+                  ref=cell.get('r','')
+                  col=re.match(r'[A-Z]+',ref).group()
+                  val=cell.find(ns+'v')
+                  if cell.get('t')=='inlineStr':
+                    elem=cell.find(ns+'is')
+                    text=''.join(t.text or '' for t in elem.iter(ns+'t')) if elem is not None else ''
+                  elif val is None: text=''
+                  elif cell.get('t')=='s': text=strings[int(val.text)]
+                  else:text=val.text or ''
+                  cells[col]=text
+                if cells.get('A') in ('484','484121','484122') and cells.get('C')=='Revenue' and cells.get('D')=='All Establishments' and cells.get('E')=='Employer Firms':
+                  print('CENSUS_SAS_6YR',json.dumps({'vintage':ident,'naics':cells['A'],'row':row.get('r'),'label':cells.get('B'),'year_estimates':{str(y):cells.get({2022:'F',2021:'G',2020:'H',2019:'I',2018:'J',2017:'K'}[y]) for y in range(2017,2023)},'year_2022_cv':cells.get('P'),'sha256':sha256(raw).hexdigest()}),flush=True)
+          PY
