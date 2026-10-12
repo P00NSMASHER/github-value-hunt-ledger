@@ -103,6 +103,14 @@ def build_pack(payload):
     ids = [row["finding_id"] for row in findings]
     if len(ids) != len(set(ids)):
         raise ValueError("finding_id must be unique")
+    settlement_references = [
+        row["settlement_reference"] for row in findings
+        if row["settled_credit_cents"] > 0
+    ]
+    if len(settlement_references) != len(set(settlement_references)):
+        raise ValueError(
+            "positive settlement_reference must be unique across findings"
+        )
     totals = {
         "findings_count": len(findings),
         "validated_count": sum(row["reviewer_disposition"] == "VALIDATED" for row in findings),
@@ -131,6 +139,7 @@ def build_pack(payload):
             "reversals_reduce_realized_value": True,
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
+            "positive_settlement_reference_is_unique": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -184,7 +193,8 @@ def render_markdown(pack):
         "5. Reversals reduce realized recovery.",
         "6. Positive settled credits require an approved or closed claim and a settlement reference.",
         "7. Settled credit cannot exceed the candidate invoice difference.",
-        "8. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "8. One positive settlement reference can support only one finding in this pack.",
+        "9. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
