@@ -277,7 +277,7 @@ class EightYearCensusBridgeTests(unittest.TestCase):
         self.assertIn("&lt;script&gt;",html)
         self.assertIn("2022",html)
         self.assertIn("not a separately fielded",html)
-        self.assertIn("original Census",html)
+        self.assertIn("Original Census",html)
 
     def test_source_year_description_must_not_claim_direct_2022_sample(self):
         b=catalog()
