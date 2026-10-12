@@ -589,6 +589,34 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         fake_ppi["price_adjusted_revenue_proxy_is_official_real_output_measure"]=True
         _must(bool(validate_bls_ppi(fake_ppi,as_of=today)),
               "M26_ILLUSTRATIVE_PRICE_PROXY_PROMOTED_TO_OFFICIAL_REAL_OUTPUT")
+        from freight.research_fred_parent_ppi import (
+            report_shell as build_fred_parent,
+            validate_catalog as validate_fred_parent,
+        )
+        fred=build_fred_parent(as_of=today)
+        _must(fred["source_status"]==
+              "FRED_PUBLIC_WEB_TABLE_SNAPSHOT_NOT_FRESH_CI_PUBLISHER_REPLAY"
+              and fred["fresh_fred_distributor_http_replay_completed"] is False,
+              "M27_FRED_WEB_SNAPSHOT_FRAUDULENTLY_CLAIMED_DIRECT_HTTP_REPLAY")
+        _must(fred["source_months_2017_2024_in_web_observed_snapshot"]==96
+              and fred["fresh_monthly_observations_verified_against_fred_http_this_run"]==0,
+              "M27_FRED_PUBLIC_MONTH_COUNTS_WRONG_OR_FALSELY_AUTHENTICATED")
+        _must(fred["parent_2017_to_2024_provisional_price_adjusted_revenue_proxy_pct"]
+              =="1.18" and
+              fred["parent_2017_to_2024_fred_displayed_price_index_change_pct"]=="37.04",
+              "M27_BLS_ORIGIN_FRED_TRUCKING_PRICE_PROXY_NOT_REPRODUCIBLE")
+        _must(fred["source_is_direct_bls_api_verified"] is False and
+              fred["m26_bls_original_api_parent_source_rejection_preserved"] is True and
+              fred["parent_index_adjusted_estimate_can_be_marked_source_authenticated"] is False,
+              "M27_FRED_SOURCE_PROVENANCE_PROMOTED_TO_BLS_DIRECT")
+        _must(fred["client_paid_ltl_invoice_rows_observed"]==0 and
+              fred["freight_recoverable_market_tam_usd"] is None and
+              fred["human_customer_pilot_18_independent_requirements_still_unmet"] is True,
+              "M27_PRODUCER_PRICE_INDEX_MISLABELED_CUSTOMER_AUDIT_REVENUE")
+        fake_fred=_read("research/FRED_PARENT_484_PPI_2017_2024_20261012.json")
+        fake_fred["direct_bls_authenticated_parent_index_available"]=True
+        _must(bool(validate_fred_parent(fake_fred,as_of=today)),
+              "M27_UNAUTHENTICATED_FRED_PARENT_SOURCE_ACCEPTED_AS_DIRECT_BLS")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -671,6 +699,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bls_ppi_price_adjusted_ltl_proxy_pct":ppi_codes["484122"]["2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"],
                 "bls_ppi_parent_trucking_price_adjustment_held":True,
                 "bls_ppi_evidence_receipt_sha256":ppi["receipt_sha256"],
+                "fred_parent_484_provisional_ppi_proxy_pct":fred["parent_2017_to_2024_provisional_price_adjusted_revenue_proxy_pct"],
+                "fred_parent_484_source_web_months":fred["source_months_2017_2024_in_web_observed_snapshot"],
+                "fred_parent_484_direct_bls_authentication_complete":False,
+                "fred_parent_484_direct_fred_http_replayed_in_director":False,
+                "fred_parent_484_evidence_receipt_sha256":fred["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
