@@ -76,7 +76,7 @@ class UnifiedOriginalPPITests(unittest.TestCase):
         result=inspected_fixture()
         self.assertEqual(set(result),set(m29.PPI_SERIES))
         self.assertEqual(sum(len(r) for v in result.values() for r in v.values()),288)
-        self.assertEqual(result["PCU484---484---"][2017][0],"132.5")
+        self.assertEqual(Decimal(result["PCU484---484---"][2017][0]),Decimal("132.5"))
         self.assertEqual(result["PCU484121484121"][2024][-1],"171.718")
         self.assertEqual(result["PCU484122484122"][2024][-1],"243.422")
 
@@ -355,7 +355,7 @@ class UnifiedOriginalPPITests(unittest.TestCase):
         self.assertIn("&lt;img src=x",html)
         self.assertIn(m29.OFFLINE,html)
         self.assertIn("Dec-endpoint sensitivity",html)
-        self.assertIn("not official real output",html.lower())
+        self.assertIn("neither is official real output",html.lower())
 
 
 if __name__=="__main__":
