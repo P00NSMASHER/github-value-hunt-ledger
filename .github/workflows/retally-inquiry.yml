@@ -1,6 +1,7 @@
 name: RETALLY Inquiry CI
 on:
   push:
+    branches: [main]
     paths:
       - "functions/api/inquiry.js"
       - "freight/site/site.js"
@@ -21,6 +22,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+
+# Avoid duplicate branch push + PR validation; superseded same-ref CI is cancelled.
+concurrency:
+  group: retally-inquiry-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   intake-validation:
     runs-on: ubuntu-latest
