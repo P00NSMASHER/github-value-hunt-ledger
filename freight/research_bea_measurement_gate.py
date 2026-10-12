@@ -114,7 +114,7 @@ def validate_book(book: object, *, as_of:date) -> list[str]:
             old["year_values"]["2024"]!="101.406" or
             newer["year_values"]["2017"]!=177967 or
             newer["year_values"]["2024"]!=173669 or
-            newer["date_last_updated"]!="2026-09-30" or
+            newer["last_updated"]!="2026-09-30" or
             old["last_updated"]!="2025-09-26"):
             problems.append("M30_INDUSTRY_484_GDP_VALUE_ADDED_VINTAGES_NOT_AUTHENTICATED")
         if (book["bea_2025_to_2026_2024_index_revision_percentage_points"]!="-3.821"
@@ -183,9 +183,6 @@ def _prior(as_of:date) -> tuple[dict,dict]:
 
 def report_shell(*,as_of:date) -> dict:
     b,prior=_prior(as_of)
-    old_index=DEC(b["bea_2025_vintage_2024_real_gdp_growth_pct"]) if (
-        "bea_2025_vintage_2024_real_gdp_growth_pct" in b
-    ) else DEC(b["bea_2025_to_2026_2024_index_revision_percentage_points"]) * 0
     # Always recompute from anchored observations, not a claimed growth field.
     old_index=DEC(b["bea_real_value_added_2025_vintage"]["year_values"]["2024"])
     current=b["bea_real_value_added_2026_vintage"]["year_values"]
