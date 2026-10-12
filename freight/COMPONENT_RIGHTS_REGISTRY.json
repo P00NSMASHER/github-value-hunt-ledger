@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-20",
+  "updated_at": "2026-10-12",
   "notice": "Operational diligence registry, not a legal opinion. Commercial-use assertions are user-provided where noted. Assignment, sublicensing, redistribution, hosted/SaaS and change-of-control rights remain UNKNOWN unless separately documented.",
   "components": [
     {
@@ -207,6 +207,22 @@
         "upstream government and research data provenance",
         "classification accuracy",
         "effective-date validation"
+      ]
+    },
+    {
+      "repository": "cmiedema25-rgb/freight-audit",
+      "revision": "f46a98d11ce559b0ecb483f256d8efeb3163a0f6",
+      "role": "pinned MIT increment-rounding function for human-review-only temporal freight exceptions",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "runtime_status": "PINNED_REVIEW_ONLY_HELPER",
+      "license_notice_path": "freight/third_party/LICENSE.cmiedema25-freight-audit.txt",
+      "upstream_source_path": "src/freight_audit/money.py",
+      "adopted_source_path": "freight/vendor_detention_rounding.py",
+      "third_party_caveats": [
+        "do not import source datasets, carrier records, or proprietary customer data",
+        "source hash alone is not external contract or payment attestation"
       ]
     }
   ]
