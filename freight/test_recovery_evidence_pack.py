@@ -33,6 +33,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
     assert pack["claim_boundary"]["buyer_visible_realized_excludes_suppressed_findings"] is True
+    assert pack["claim_boundary"]["attribution_requires_customer_authorization"] is True
 
 
 @pytest.mark.parametrize(
@@ -188,6 +189,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "One carrier/invoice/shipment/category identity can support only one economic opportunity" in report
     assert "validated supported finding requires at least one supporting-evidence reference" in report
     assert "cannot rely on authority effective after its invoice date" in report
+    assert "Recovery attribution requires explicit customer authorization" in report
 
 
 def test_duplicate_finding_ids_fail_closed():
@@ -241,6 +243,9 @@ def test_unsupported_money_cannot_become_fee_eligible():
         ("automatic_credit", True),
         ("preexisting_claim", True),
         ("duplicate_opportunity", True),
+        ("customer_authorization_state", "NOT_REQUESTED"),
+        ("customer_authorization_state", "PENDING"),
+        ("customer_authorization_state", "DECLINED"),
     ),
 )
 def test_suppressed_money_cannot_inflate_buyer_visible_realized_recovery(field, value):
@@ -250,7 +255,9 @@ def test_suppressed_money_cannot_inflate_buyer_visible_realized_recovery(field, 
     assert pack["findings"][0]["net_realized_cents"] == 12500
     assert pack["findings"][0]["attribution_state"] == "SUPPRESSED"
     assert pack["totals"]["observed_net_settlement_cents"] == 18500
+    assert pack["totals"]["validated_difference_cents"] == 7000
     assert pack["totals"]["net_realized_cents"] == 6000
+    assert pack["totals"]["fee_eligible_realized_cents"] == 6000
     report = render_markdown(pack)
     assert "Observed net settlement across all findings: **$185.00**" in report
     assert "Attributable net realized recovery: **$60.00**" in report
