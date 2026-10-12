@@ -1,0 +1,59 @@
+name: RETALLY Lab 14 Census SAS Peer Benchmark (Mission 23)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-sas-peer-benchmark.yml'
+      - 'freight/research_sas_peer_benchmark.py'
+      - 'freight/test_research_sas_peer_benchmark.py'
+      - 'freight/research/SAS_TRUCKING_PEER_BENCHMARK_20261011.json'
+      - 'freight/RESEARCH_SAS_PEER_BENCHMARK.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-peer-cells:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Read exact Census 2022 SAS source peer revenue rows
+        run: |
+          python - <<'PY'
+          import json, re
+          from hashlib import sha256
+          from io import BytesIO
+          from zipfile import ZipFile
+          from xml.etree import ElementTree as ET
+          from freight.research_sas_benchmark import SOURCES, REVISED, LEGACY
+          from freight.research_sas_xlsx_probe import get_source
+          ns='{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+          for ident, key in ((REVISED,'revised_table2'),(LEGACY,'original_2017_2022')):
+              source=SOURCES[ident];raw=get_source(key)
+              assert len(raw)==source['bytes'] and sha256(raw).hexdigest()==source['sha256']
+              with ZipFile(BytesIO(raw)) as z:
+                  shared=[]
+                  if 'xl/sharedStrings.xml' in z.namelist():
+                      root=ET.fromstring(z.read('xl/sharedStrings.xml'))
+                      for item in root.findall(ns+'si'):
+                          shared.append(''.join(t.text or '' for t in item.iter(ns+'t')))
+                  root=ET.fromstring(z.read(source['sheet_member']))
+                  for row in root.findall('.//'+ns+'sheetData/'+ns+'row'):
+                      cells={}
+                      for cell in row.findall(ns+'c'):
+                          ref=cell.get('r','');v=cell.find(ns+'v')
+                          if cell.get('t')=='inlineStr':
+                              inline=cell.find(ns+'is')
+                              value=''.join(t.text or '' for t in inline.iter(ns+'t')) if inline is not None else ''
+                          elif v is None:value=''
+                          elif cell.get('t')=='s':value=shared[int(v.text)]
+                          else:value=v.text or ''
+                          cells[re.sub(r'\d+','',ref)]=value
+                      if cells.get('A') in ('484','484121','484122') and cells.get('C')=='Revenue':
+                          if cells.get('E')=='Employer Firms':
+                              print('SAS_PEER_SOURCE_ROW',json.dumps({'vintage':ident,'row':int(row.get('r')),'code':cells.get('A'),'label':cells.get('B'),'tax':cells.get('D'),'employer':cells.get('E'),'2022_million_usd':cells.get('F'),'cv_pct':cells.get('P'),'source_sha256':sha256(raw).hexdigest()}),flush=True)
+          PY
