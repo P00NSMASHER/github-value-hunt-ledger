@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CENSUS_AIES_2023_PRIMARY_ARCHIVES_NOT_2022_LEGACY_PROOF",
+  "observed_on": "2026-10-11",
+  "publisher": "U.S. Census Bureau",
+  "data_reference_year": 2023,
+  "source_families_are_not_independent": "TWO_2023_CENSUS_DISTRIBUTIONS_OF_SAME_AIES_POPULATION",
+  "historical_2022_2023_methodology": "AIES_STARTED_WITH_2023_REFERENCE_PERIOD_AND_INCORPORATED_LEGACY_SURVEYS_IN_HISTORICAL_SERIES",
+  "source_year_2022_original_reproduced": false,
+  "census_historical_2024_url_probe": "2024/API_Datasets/AIESBASICTIMESERIES.zip",
+  "census_historical_2024_url_probe_http_status": 404,
+  "source_2024_primary_verification": "M19_2024_AIES00BASIC_ZIP_REPLAYED_IN_SEPARATE_JOB_OR_BRANCH",
+  "sources": [
+    {
+      "id": "2023_published",
+      "url": "https://www2.census.gov/programs-surveys/aies/data/2023/API_Datasets/AIESBASIC2023.zip",
+      "sha256": "7da68855e995342d9039c3c2f146eee72f079eabcd9a9620e34c3596d2e4ce9e",
+      "archive_bytes": 819756,
+      "member": "AIESBASIC2023.dat",
+      "dat_bytes": 5987194,
+      "dat_rows": 13512,
+      "naics_field": "NAICS2017",
+      "data_grain": "2023_CENSUS_AIES_ALL_ESTABLISHMENTS_NATIONAL_INDUSTRY"
+    },
+    {
+      "id": "2023_timeseries",
+      "url": "https://www2.census.gov/programs-surveys/aies/data/2023/API_Datasets/AIESBASICTIMESERIES.zip",
+      "sha256": "5e69e6a025ec25398321242b170c384b57e45bce522cdadd843ec39e13dffb69",
+      "archive_bytes": 846487,
+      "member": "AIESBASICTIMESERIES.dat",
+      "dat_bytes": 6936210,
+      "dat_rows": 13512,
+      "naics_field": "NAICS",
+      "data_grain": "2023_CENSUS_AIES_HISTORICAL_DISTRIBUTION_NATIONAL_INDUSTRY"
+    }
+  ],
+  "selected_industries": [
+    {
+      "naics": "484",
+      "label": "Truck transportation",
+      "revenue_thousand_usd": 406651010,
+      "revenue_cv_pct": "0.6"
+    },
+    {
+      "naics": "484121",
+      "label": "General freight trucking, long-distance, truckload",
+      "revenue_thousand_usd": 163025116,
+      "revenue_cv_pct": "1.1"
+    },
+    {
+      "naics": "484122",
+      "label": "General freight trucking, long-distance, less than truckload",
+      "revenue_thousand_usd": 64651167,
+      "revenue_cv_pct": "0.9"
+    }
+  ],
+  "referenced_m18_2022_historical_ltl_thousand_usd": 65688461,
+  "referenced_m18_2024_ltl_thousand_usd": 65096292,
+  "historical_2022_census_original_replay": false,
+  "original_2024_census_replay_in_this_manifest": false,
+  "verified_real_customer_ltl_invoices": 0,
+  "industry_revenue_equals_customer_spend": false,
+  "ltl_recovery_tam_usd": null,
+  "real_overcharges_or_cash_recovery_proven": false,
+  "buyer_demand_proven": false,
+  "human_pilot_18_gates_completed": false,
+  "publication_or_marketing_allowed": false,
+  "customer_or_carrier_data_used": false,
+  "new_lab_created": false,
+  "source_caveat": "The 2023 AIES original and time-series distributions are duplicate publisher lineage, not independent economic surveys. Official 2024 AIES original ZIP is verified in separate Mission 19 CI, but this manifest does not re-download it. Historical 2022 values are Census/FRED legacy-constructed time series; no directly comparable government 2022 source row has been replayed in Mission 20. Survey coefficients of variation are not invoice error rates, and no paid invoices, commercial market, buyers or recoveries were verified."
+}
