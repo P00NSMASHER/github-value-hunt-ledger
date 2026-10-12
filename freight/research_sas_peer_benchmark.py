@@ -120,7 +120,7 @@ def validate_manifest(book: object, *, as_of: date) -> list[str]:
             "source_grain":"2022_US_EMPLOYER_FIRMS_ALL_TAX_STATUSES_REVENUE",
             "units":UNITS,
             "report_population":"NAICS484_PARENT_INCLUDES_NAICS484121_AND_484122_OTHER_SUBINDUSTRIES_NOT_SEPARATELY_IDENTIFIED",
-            "aies_original_census_publisher_zip_sha256":"1487da6e619f2e9701635a7f6ad282302d75921e33797060866142c0d94a4",
+            "aies_original_census_publisher_zip_sha256":"1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4",
             "approved_real_customer_studies":0,
             "recovered_freight_cash_usd":None,
             "serviceable_recovery_market_usd":None,
