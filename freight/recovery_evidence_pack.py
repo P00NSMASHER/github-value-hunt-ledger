@@ -109,6 +109,7 @@ def normalize_finding(row):
     suppressed = (
         clean["reviewer_disposition"] != "VALIDATED"
         or clean["confidence"] != "SUPPORTED"
+        or clean["customer_authorization_state"] != "AUTHORIZED"
         or any(clean[key] for key in SUPPRESSION_FLAGS)
     )
     clean["attribution_state"] = "SUPPRESSED" if suppressed else "FREIGHT_RECOVERY_ORIGIN"
@@ -192,6 +193,7 @@ def build_pack(payload):
             "positive_settlement_reference_is_unique": True,
             "economic_opportunity_identity_is_unique": True,
             "buyer_visible_realized_excludes_suppressed_findings": True,
+            "attribution_requires_customer_authorization": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -251,7 +253,8 @@ def render_markdown(pack):
         "10. A validated supported finding requires at least one supporting-evidence reference.",
         "11. A validated supported finding cannot rely on authority effective after its invoice date.",
         "12. Buyer-visible attributable realized recovery excludes suppressed findings.",
-        "13. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "13. Recovery attribution requires explicit customer authorization; unauthorized settlement observations remain visible but suppressed.",
+        "14. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
