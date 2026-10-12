@@ -131,6 +131,20 @@ def build_pack(payload):
     ids = [row["finding_id"] for row in findings]
     if len(ids) != len(set(ids)):
         raise ValueError("finding_id must be unique")
+    economic_identities = [
+        (
+            row["carrier"],
+            row["invoice_id"],
+            row["shipment_id"],
+            row["finding_category"],
+        )
+        for row in findings
+    ]
+    if len(economic_identities) != len(set(economic_identities)):
+        raise ValueError(
+            "carrier, invoice_id, shipment_id, and finding_category "
+            "must identify one economic opportunity"
+        )
     settlement_references = [
         row["settlement_reference"] for row in findings
         if row["settled_credit_cents"] > 0
@@ -176,6 +190,7 @@ def build_pack(payload):
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
             "positive_settlement_reference_is_unique": True,
+            "economic_opportunity_identity_is_unique": True,
             "buyer_visible_realized_excludes_suppressed_findings": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
@@ -232,10 +247,11 @@ def render_markdown(pack):
         "6. Positive settled credits require an approved or closed claim and a settlement reference.",
         "7. Settled credit cannot exceed the candidate invoice difference.",
         "8. One positive settlement reference can support only one finding in this pack.",
-        "9. A validated supported finding requires at least one supporting-evidence reference.",
-        "10. A validated supported finding cannot rely on authority effective after its invoice date.",
-        "11. Buyer-visible attributable realized recovery excludes suppressed findings.",
-        "12. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "9. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
+        "10. A validated supported finding requires at least one supporting-evidence reference.",
+        "11. A validated supported finding cannot rely on authority effective after its invoice date.",
+        "12. Buyer-visible attributable realized recovery excludes suppressed findings.",
+        "13. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 

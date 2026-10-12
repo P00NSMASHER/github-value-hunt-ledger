@@ -28,6 +28,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
     assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
     assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True
+    assert pack["claim_boundary"]["economic_opportunity_identity_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
@@ -184,6 +185,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Positive settled credits require an approved or closed claim" in report
     assert "Settled credit cannot exceed the candidate invoice difference" in report
     assert "One positive settlement reference can support only one finding" in report
+    assert "One carrier/invoice/shipment/category identity can support only one economic opportunity" in report
     assert "validated supported finding requires at least one supporting-evidence reference" in report
     assert "cannot rely on authority effective after its invoice date" in report
 
@@ -193,6 +195,32 @@ def test_duplicate_finding_ids_fail_closed():
     data["findings"][1]["finding_id"] = data["findings"][0]["finding_id"]
     with pytest.raises(ValueError, match="finding_id must be unique"):
         build_pack(data)
+
+
+def test_duplicate_economic_opportunity_fails_closed():
+    data = payload()
+    original = data["findings"][0]
+    duplicate = dict(original)
+    duplicate["finding_id"] = "FR-DUPLICATE"
+    duplicate["settlement_reference"] = "CREDIT-DUPLICATE"
+    data["findings"].append(duplicate)
+    with pytest.raises(
+        ValueError,
+        match="must identify one economic opportunity",
+    ):
+        build_pack(data)
+
+
+def test_same_invoice_can_hold_distinct_finding_categories():
+    data = payload()
+    original = data["findings"][0]
+    separate_charge = dict(original)
+    separate_charge["finding_id"] = "FR-ACCESSORIAL"
+    separate_charge["finding_category"] = "Unsupported detention charge"
+    separate_charge["settlement_reference"] = "CREDIT-ACCESSORIAL"
+    data["findings"].append(separate_charge)
+    pack = build_pack(data)
+    assert pack["totals"]["findings_count"] == len(data["findings"])
 
 
 def test_unsupported_money_cannot_become_fee_eligible():
