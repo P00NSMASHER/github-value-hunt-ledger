@@ -1,4 +1,4 @@
-name: RETALLY Lab 14 BLS PPI Original Industry Series (Mission 26)
+name: RETALLY Lab 14 Original BLS PPI Industry Price Analysis (Mission 26)
 on:
   pull_request:
     paths:
@@ -7,11 +7,90 @@ on:
       - 'freight/test_research_bls_ppi_bridge.py'
       - 'freight/research/BLS_PPI_TRUCKING_2017_2024_20261012.json'
       - 'freight/RESEARCH_BLS_PPI_BRIDGE.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
   workflow_dispatch:
 permissions:
   contents: read
+
 jobs:
-  bls-publisher-source-discovery:
+  offline-industry-ppi-tests-and-original-lab14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original research dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run BLS original series source adversarial tests and previous Census/recovery controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Confirm offline price-adjusted proxy is not falsely labeled real freight volume
+        run: |
+          PYTHONPATH=. python -m freight.research_bls_ppi_bridge \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m26-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m26-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m26-offline/bls_ppi_adjustment.json').read_text())
+          labs=json.loads(Path('/tmp/retally-m26-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_BLS_PPI_2017_2024_PRICE_ADJUSTED_REVENUE_PROXY_NOT_REAL_FREIGHT_OUTPUT'
+          assert r['source_status']=='OFFLINE_BLS_PPI_SNAPSHOT_NOT_REPLAYED_IN_THIS_RUN'
+          assert r['original_bls_public_api_replayed_this_run'] is False
+          assert r['source_monthly_observations_authenticated_in_this_run']==0
+          assert r['frozen_price_index_monthly_observations']==192
+          assert r['ppi_months_per_industry']==96
+          assert len(r['industry_price_adjustments'])==2
+          p={x['naics']:x for x in r['industry_price_adjustments']}
+          assert p['484121']['2017_to_2024_nominal_census_revenue_change_pct']=='43.48'
+          assert p['484122']['2017_to_2024_nominal_census_revenue_change_pct']=='40.93'
+          assert p['484121']['2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct']=='2.82'
+          assert p['484122']['2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct']=='-1.89'
+          assert r['parent_trucking_naics484_price_adjusted_proxy_pct'] is None
+          assert r['parent_484_source_rejected_by_bls_v1_api_in_original_probe'] is True
+          assert r['ppi_adjusted_revenue_proxy_not_official_bls_real_output_measure'] is True
+          assert r['real_customer_freight_invoices_observed']==0
+          assert r['eligible_recovery_market_tam_usd'] is None
+          assert r['human_pilot_18_requirements_unmet'] is True
+          assert r['new_lab_created'] is False and r['lab']==14
+          assert len(labs['lab_runs'])==14 and labs['failed_or_blocked_labs']==[]
+          assert labs['pilot_preflight']['unmet_requirements']==18
+          assert labs['actual_revenue_cents']==0
+          assert labs['bls_ppi_price_adjustment']['receipt_sha256']==r['receipt_sha256']
+          assert 'bls_ppi_adjustment.html' in Path('/tmp/retally-m26-control/index.html').read_text()
+          print('Original 14 labs and 18 pilot holds preserved; two industry price proxies clearly qualified.')
+          PY
+      - name: Retain internal BLS PPI adjustment provenance snapshot
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-bls-ppi-offline
+          path: |
+            /tmp/retally-m26-offline/bls_ppi_adjustment.json
+            /tmp/retally-m26-offline/bls_ppi_adjustment.html
+          if-no-files-found: error
+          retention-days: 14
+
+  validate-original-bls-monthly-industry-series:
+    needs: offline-industry-ppi-tests-and-original-lab14
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -19,34 +98,56 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
-      - name: Test original BLS public API for 2017–2024 industry PPI monthly levels
+      - name: Reproduce 192 monthly source levels through original BLS API
+        run: |
+          PYTHONPATH=. python -m freight.research_bls_ppi_bridge \
+            --fetch-original --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m26-bls
+      - name: Guard real output, unsupported all-trucking index and customer invoice claims
         run: |
           python - <<'PY'
-          import json, urllib.request, hashlib
-          ids=['PCU484484','PCU484121484121','PCU484122484122']
-          url='https://api.bls.gov/publicAPI/v1/timeseries/data/'
-          payload=json.dumps({'seriesid':ids,'startyear':'2017','endyear':'2024'},separators=(',',':')).encode('ascii')
-          req=urllib.request.Request(url,data=payload,headers={'Content-Type':'application/json','User-Agent':'RETALLY-Lab14-Public-PPI-Provenance/1.0'},method='POST')
-          try:
-            with urllib.request.urlopen(req,timeout=30) as response:
-              raw=response.read(2_000_001)
-              print('PPI_HTTP',response.status, 'content_bytes',len(raw),'final_url',response.geturl(),flush=True)
-            if len(raw)>2_000_000:raise ValueError('OVERSIZE')
-            print('PPI_RESPONSE_SHA256',hashlib.sha256(raw).hexdigest(),flush=True)
-            result=json.loads(raw)
-            print('PPI_RESPONSE_STATUS',result.get('status'),result.get('message'),flush=True)
-            for series in result.get('Results',{}).get('series',[]):
-              rows=[x for x in series.get('data',[]) if x.get('year') in ('2017','2018','2019','2020','2021','2022','2023','2024') and x.get('period','')>='M01' and x.get('period','')<='M12']
-              y={}
-              for row in rows:y.setdefault(row['year'],[]).append(row)
-              print('PPI_SERIES',series.get('seriesID'),'total_monthly',len(rows),'annual_counts',{year:len(v) for year,v in y.items()},flush=True)
-              for year in ('2017','2018','2019','2020','2021','2022','2023','2024'):
-                subset=sorted(y.get(year,[]),key=lambda r:r['period'])
-                if subset:
-                  print('PPI_YEAR',series.get('seriesID'),year,
-                        [x['value'] for x in subset],
-                        'source_footnote_codes',[[f.get('code') for f in x.get('footnotes',[]) if f] for x in subset],
-                        flush=True)
-          except Exception as exc:
-            print('PPI_PUBLISHER_SOURCE_BLOCKED',type(exc).__name__,str(exc)[:230],flush=True)
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m26-bls/bls_ppi_adjustment.json').read_text())
+          assert r['scope']=='LAB14_BLS_PPI_2017_2024_PRICE_ADJUSTED_REVENUE_PROXY_NOT_REAL_FREIGHT_OUTPUT'
+          assert len(r['industry_price_adjustments'])==2
+          assert r['parent_trucking_naics484_price_adjusted_proxy_pct'] is None
+          assert r['parent_484_source_rejected_by_bls_v1_api_in_original_probe'] is True
+          assert r['census_data_revenue_measure_not_exactly_same_as_bls_ppi_coverage_proven'] is True
+          assert r['ppi_adjusted_revenue_proxy_not_official_bls_real_output_measure'] is True
+          assert r['ppi_is_producer_price_not_customer_invoice_error_rate'] is True
+          assert r['real_customer_freight_invoices_observed']==0
+          assert r['actual_adjudicated_customer_overcharges']==0
+          assert r['eligible_recovery_market_tam_usd'] is None
+          assert r['actual_retally_cash_recovered_usd'] is None
+          assert r['human_pilot_18_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['source_status']=='BLS_PUBLIC_API_ORIGINAL_192_MONTHLY_PPI_LEVELS_REPRODUCED':
+              assert r['original_bls_public_api_replayed_this_run'] is True
+              assert r['source_monthly_observations_authenticated_in_this_run']==192
+              assert len(r['original_bls_source_receipt_sha256'])==64
+              indices={x['bls_series_id']:x for x in r['industry_price_adjustments']}
+              assert set(indices)=={'PCU484121484121','PCU484122484122'}
+              assert all(len(x['annual_observations'])==8 and
+                         sum(y['bls_months'] for y in x['annual_observations'])==96
+                         for x in indices.values())
+              print('VERIFIED BLS original publisher monthly series 192/192, index-based revenue proxy remains noncommercial.')
+          elif r['source_status']=='BLOCKED_BLS_PUBLIC_API_UNREACHABLE_NO_NEW_SOURCE_REPLAY':
+              assert r['original_bls_public_api_replayed_this_run'] is False
+              assert r['source_monthly_observations_authenticated_in_this_run']==0
+              assert r['original_bls_source_receipt_sha256'] is None
+              print('::warning::Original BLS API network blocked: not verified this run, no output volume claim.')
+          else:
+              raise AssertionError('UNAUTHORIZED_BLS_SOURCE_STATUS_OR_CHANGED_OBSERVATION')
           PY
+      - name: Keep only source attestation JSON/HTML, no private or full API files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-bls-original-ppi-verification
+          path: |
+            /tmp/retally-m26-bls/bls_ppi_adjustment.json
+            /tmp/retally-m26-bls/bls_ppi_adjustment.html
+          if-no-files-found: error
+          retention-days: 14
