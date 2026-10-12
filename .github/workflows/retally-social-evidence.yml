@@ -97,10 +97,28 @@ jobs:
           print('Frozen RETALLY campaign snapshot PASS: 13 active + 4 unpublished draft entries')
           PY
 
+      - name: Verify approved master revision without changing historical snapshot
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-creative-approved.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-creative-revision.json" \
+            --output "$RUNNER_TEMP/retally-creative-revision.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          r = json.loads((Path(os.environ["RUNNER_TEMP"])/"retally-creative-revision.json").read_text())
+          assert r["counts"]["DRAFT"] == 4
+          assert r["counts"]["UPCOMING_NOT_YET_PUBLIC"] == 13
+          assert r["counts"]["VERIFIED_PUBLIC"] == 0
+          assert not [p for p in r["posts"] if not p["draft"] and p["warnings"]]
+          print("Premium creative revision PASS; historical baseline left untouched")
+          PY
+
       - name: Build offline public URL manifest (zero external requests)
         run: |
           python3 freight/brand/social/performance/public_asset_preflight.py \
-            --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-creative-approved.json \
             --json-output "$RUNNER_TEMP/retally-url-manifest.json" \
             --output "$RUNNER_TEMP/retally-url-manifest.md"
           python3 - <<'PY'
@@ -117,7 +135,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           python3 freight/brand/social/performance/public_asset_preflight.py \
-            --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-creative-approved.json \
             --live --output /tmp/retally-public-check.md \
             --json-output /tmp/retally-public-check.json
       - name: Upload manually requested public-check report
