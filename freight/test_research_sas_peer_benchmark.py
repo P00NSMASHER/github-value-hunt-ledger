@@ -154,7 +154,7 @@ class SasPeerBenchmarkTests(unittest.TestCase):
             rows=mock_peer_rows(ident)
             number,data=rows[0]
             rows[0]=(number+1,data)
-            with self.assertRaisesRegex(ValueError,"M23_UNEXPECTED_NAICS_SOURCE_ROW|M23_DUPLICATE_SAS_SOURCE_RECORD"):
+            with self.assertRaisesRegex(ValueError,"M23_UNEXPECTED_NAICS_SOURCE_ROW|M23_DUPLICATE_SAS_SOURCE_RECORD|M23_SAS_NAICS_OR_TAX_COHORT_CHANGED"):
                 m23.selected_peers_from_rows(rows,ident=ident)
 
     def test_sas_census_population_or_label_spoof_rejected(self):
