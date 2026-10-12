@@ -29,6 +29,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
+    assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
 
 
 @pytest.mark.parametrize(
@@ -128,6 +129,48 @@ def test_unresolved_finding_can_enter_remediation_without_supporting_evidence():
     assert pack["findings"][3]["attribution_state"] == "SUPPRESSED"
 
 
+def test_validated_supported_finding_rejects_future_authority():
+    data = payload()
+    data["findings"][0]["authority_effective_date"] = "2026-02-13"
+    with pytest.raises(
+        ValueError,
+        match="validated supported finding authority cannot postdate invoice",
+    ):
+        build_pack(data)
+
+
+def test_authority_effective_on_invoice_date_is_valid():
+    data = payload()
+    data["findings"][0]["authority_effective_date"] = data["findings"][0]["invoice_date"]
+    pack = build_pack(data)
+    assert (
+        pack["findings"][0]["authority_effective_date"]
+        == pack["findings"][0]["invoice_date"]
+    )
+
+
+def test_unresolved_future_authority_can_enter_remediation():
+    data = payload()
+    row = data["findings"][3]
+    row["authority_effective_date"] = "2026-02-21"
+    pack = build_pack(data)
+    assert pack["findings"][3]["attribution_state"] == "SUPPRESSED"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("invoice_date", "2026-02-30"),
+        ("authority_effective_date", "2026-1-1"),
+    ),
+)
+def test_pack_rejects_invalid_or_noncanonical_dates(field, value):
+    data = payload()
+    data["findings"][0][field] = value
+    with pytest.raises(ValueError, match=f"{field} must be a valid YYYY-MM-DD date"):
+        build_pack(data)
+
+
 def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     report = render_markdown(build_pack(payload()))
     assert "SYNTHETIC / FICTIONAL EXAMPLE" in report
@@ -140,6 +183,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Settled credit cannot exceed the candidate invoice difference" in report
     assert "One positive settlement reference can support only one finding" in report
     assert "validated supported finding requires at least one supporting-evidence reference" in report
+    assert "cannot rely on authority effective after its invoice date" in report
 
 
 def test_duplicate_finding_ids_fail_closed():
