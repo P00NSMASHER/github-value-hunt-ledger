@@ -362,7 +362,7 @@ def render_html(result: dict) -> str:
         '<p>Status: <strong>'+escape(result["status"])+'</strong></p>'
         '<p>2022 LTL published Census historical revenue: $65.688461B '
         '(not 2022 direct AIES fielding). Prior legacy SAS vintage: '
-        '$68.411B; difference: $'+escape(result["legacy_sas_gap_million_usd'])+
+        '$68.411B; difference: $'+escape(result["legacy_sas_gap_million_usd"])+
         ' million. The original SAS benchmark comparison is still unadjudicated.</p>'
         '<table style="border-collapse:collapse;background:white"><thead><tr>'
         '<th>Year</th><th>2017 NAICS</th><th>Revenue ($1,000)</th>'
