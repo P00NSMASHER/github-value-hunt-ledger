@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_BEA_REAL_GROSS_OUTPUT_VS_VALUE_ADDED_COMPATIBILITY_GATE",
+  "observed_on": "2026-10-12",
+  "industry_naics": "484",
+  "industry_title": "Truck transportation",
+  "current_bea_release_date": "2026-09-30",
+  "bea_definitions_source": {
+    "url": "https://www.bea.gov/resources/guide-interactive-gdp-industry-accounts-tables",
+    "source_type": "FIRST_PARTY_BEA",
+    "source_http_verified_in_ci": true,
+    "source_html_sha256_at_probe": "6c98d1a73d978babf37b8a42df39482e23fc566feed500e4ad0f45ec1769c4fd"
+  },
+  "bea_gross_output_source": {
+    "url": "https://www.bea.gov/data/industries/gross-output-by-industry",
+    "source_type": "FIRST_PARTY_BEA",
+    "source_http_verified_in_ci": true,
+    "source_html_sha256_at_probe": "6f8b892fe5a36d00cd1d22a86f3d76bc812fd2398e7c2d45f2bda274d790cc01"
+  },
+  "bea_real_gross_output_484_2017_2024_values": null,
+  "bea_real_gross_output_484_2017_2024_source_status": "HOLD_PRIMARY_BEA_QUANTITY_INDEX_NOT_RETRIEVED",
+  "bea_real_value_added_2025_vintage": {
+    "source_url": "https://fred.stlouisfed.org/data/USTRUCKTRANQGSP",
+    "source_author": "BEA",
+    "source_distributor": "FRED",
+    "source_grade": "SECONDARY_WEB_OBSERVED_NOT_CI_REPLAYED",
+    "last_updated": "2025-09-26",
+    "metric": "CHAIN_TYPE_REAL_GDP_VALUE_ADDED_INDEX_2017_100",
+    "year_values": {
+      "2017": "100.000",
+      "2018": "99.900",
+      "2019": "98.960",
+      "2020": "97.475",
+      "2021": "106.885",
+      "2022": "95.843",
+      "2023": "95.936",
+      "2024": "101.406"
+    }
+  },
+  "bea_real_value_added_2026_vintage": {
+    "source_url": "https://fred.stlouisfed.org/data/USTRUCKTRANRGSP",
+    "source_author": "BEA",
+    "source_distributor": "FRED",
+    "source_grade": "SECONDARY_WEB_OBSERVED_NOT_CI_REPLAYED",
+    "last_updated": "2026-09-30",
+    "metric": "REAL_GDP_VALUE_ADDED_MILLIONS_CHAINED_2017_USD",
+    "year_values": {
+      "2017": 177967,
+      "2018": 177789,
+      "2019": 176117,
+      "2020": 173473,
+      "2021": 191230,
+      "2022": 171172,
+      "2023": 164742,
+      "2024": 173669
+    }
+  },
+  "bea_alternative_current_index_secondary_web_observation": {
+    "source_url": "https://alfred.stlouisfed.org/series?seid=USTRUCKTRANQGSP",
+    "source_grade": "SECONDARY_WEB_OBSERVED",
+    "reference_year": "2017",
+    "value_2017": "100.000",
+    "value_2024": "97.585",
+    "release_date": "2026-09-30"
+  },
+  "bea_2025_source_index_2024": "101.406",
+  "bea_2026_source_index_2024": "97.585",
+  "bea_2025_to_2026_2024_index_revision_percentage_points": "-3.821",
+  "source_replay_ci_result": {
+    "bea_measure_definitions": "VERIFIED_FIRST_PARTY_HTML",
+    "bea_gross_output_home_page": "VERIFIED_FIRST_PARTY_HTML",
+    "fred_bea_real_gdp_index": "BLOCKED_TIMEOUT",
+    "fred_bea_real_gdp_chained_dollars": "BLOCKED_TIMEOUT",
+    "fred_bea_csv": "BLOCKED_TIMEOUT"
+  },
+  "census_bls_m29_all_trucking_nominal_revenue_growth_pct": "38.65",
+  "census_bls_m29_price_adjusted_revenue_proxy_growth_pct": "1.18",
+  "definitions": {
+    "gross_output": "GROSS_OUTPUT_INCLUDES_SALES_RECEIPTS_AND_INTERMEDIATE_SALES",
+    "gdp_value_added": "GROSS_OUTPUT_MINUS_INTERMEDIATE_INPUTS",
+    "real_gross_output": "CHAIN_QUANTITY_INDEX_FOR_GROSS_OUTPUT_INDUSTRY",
+    "real_gdp_value_added": "CHAIN_QUANTITY_INDEX_FOR_VALUE_ADDED",
+    "census_ppi_proxy": "ILLUSTRATIVE_CENSUS_EMPLOYER_REVENUE_ADJUSTED_BY_BLS_ANNUAL_PPI"
+  },
+  "current_value_added_gdp_is_real_gross_output": false,
+  "producer_price_index_adjusted_census_revenue_is_official_real_output": false,
+  "bea_value_added_measure_sufficient_to_certify_ppi_revenue_proxy": false,
+  "reauthorize_external_business_claims": false,
+  "source_2025_bea_index_can_replace_2026_revision": false,
+  "original_gross_output_484_source_verified": false,
+  "original_bea_value_added_data_bytes_replayed_in_ci": false,
+  "gdp_and_gross_output_are_same_denominator": false,
+  "ppi_proxy_minus_value_added_delta_as_statistical_validation_allowed": false,
+  "be_a_real_gross_output_ltl_484122_direct_source_confirmed": false,
+  "client_paid_freight_invoices_observed": 0,
+  "independent_freight_invoice_overcharges": 0,
+  "actual_cash_recovered_usd": null,
+  "recoverable_freight_market_tam_usd": null,
+  "buyer_demand_proven": false,
+  "all_18_customer_pilot_approvals_satisfied": false,
+  "new_lab_created": false,
+  "scheduled_tasks_modified": false,
+  "private_client_data_ingested": false,
+  "source_caveat": "Official BEA definitions explain that industry GDP (value added) equals gross output minus intermediate inputs; real gross output is a chain-type quantity index and is different from real GDP or real value added. September 2026 BEA revisions changed the real GDP/value-added growth trajectory of NAICS 484 truck transportation. The September 2025 FRED-distributed 2024 index was 101.406 (2017=100), whereas the September 2026 revised BEA-origin index is about 97.585. Neither annual real GDP source is real gross output, so neither can authenticate Mission 29's 1.18% PPI-adjusted Census employer revenue proxy or actual freight volumes. FRED/ALFRED current and historical values were web-observed, but FRED original HTTP timed out in GitHub; source authority remains secondary for values, despite first-party BEA measurement definitions being freshly downloaded. The exact original BEA 484 real gross-output quantity series was not retrieved and remains held. These economic measures contain no actual customer paid freight invoices, carrier billing overcharges, cash refunds, customer demand or recoverable TAM. All eighteen independent real-customer pilot approvals remain unmet."
+}
