@@ -1,0 +1,48 @@
+name: RETALLY Lab 14 Unified Direct BLS PPI Evidence (Mission 29)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-unified-bls-ppi.yml'
+      - 'freight/research_unified_blspci.py'
+      - 'freight/test_research_unified_blspci.py'
+      - 'freight/RESEARCH_UNIFIED_BLS_PPI.md'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/lab_phase4_director.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unified-bls-original-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify original BLS API v2 covers all three independently correct identifiers in one response
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          from collections import Counter
+          import json
+          url='https://api.bls.gov/publicAPI/v2/timeseries/data/'
+          ids=['PCU484---484---','PCU484121484121','PCU484122484122']
+          payload=json.dumps({'seriesid':ids,'startyear':'2017','endyear':'2024'},separators=(',',':')).encode()
+          req=Request(url,data=payload,headers={'Content-Type':'application/json','User-Agent':'RETALLY-Lab14-Original-BLS-3-Industry-Replay/1.0'},method='POST')
+          with urlopen(req,timeout=30) as response:
+              assert response.geturl()==url
+              raw=response.read(500001)
+          assert len(raw)<500001
+          result=json.loads(raw)
+          print('BLS_M29_STATUS',result.get('status'),result.get('message'), 'sha256',sha256(raw).hexdigest(),flush=True)
+          for series in result.get('Results',{}).get('series',[]):
+              month=[x for x in series.get('data',[]) if x.get('year') in [str(y) for y in range(2017,2025)] and x.get('period','')>='M01' and x.get('period','')<='M12']
+              counts=Counter(x.get('year') for x in month)
+              print('BLS_M29_SERIES',series.get('seriesID'),'count',len(month),'years',dict(sorted(counts.items())),'sample',month[:1],flush=True)
+          assert result.get('status')=='REQUEST_SUCCEEDED' and result.get('message')==[]
+          assert {x.get('seriesID') for x in result['Results']['series']}==set(ids)
+          assert all(sum(x.get('year')==str(y) and 'M01'<=x.get('period','')<='M12' for x in r.get('data',[]))==12 for r in result['Results']['series'] for y in range(2017,2025))
+          print('BLS_M29_ALL_288_DIRECT_SOURCE_MONTHS_PRESENT',flush=True)
+          PY
