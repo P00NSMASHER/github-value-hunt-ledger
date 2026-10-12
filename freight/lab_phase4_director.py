@@ -500,6 +500,35 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_peers["survey_revisions_are_carrier_billing_overcharges"]=True
         _must(bool(validate_sas_peers(forged_peers,as_of=today)),
               "M23_SOURCE_REVISIONS_FRAUDULENTLY_PROMOTED_TO_OVERCHARGES")
+        from freight.research_sas_temporal import (
+            report_shell as build_sas_temporal,
+            validate_manifest as validate_sas_temporal,
+        )
+        temporal=build_sas_temporal(as_of=today)
+        _must(temporal["2017_unchanged_anchor_categories"]==3 and
+              temporal["2018_2022_downward_revised_categories_years"]==15,
+              "M24_SAS_ORIGINAL_BENCHMARK_YEAR_REVISION_PATTERN_INCOMPLETE")
+        _must(temporal["source_year_cells_changed"]==15 and
+              temporal["unique_naics_year_vintage_comparisons"]==36,
+              "M24_SAS_TEMPORAL_PEER_SOURCE_YEAR_GRAIN_MISSING")
+        _must(temporal["source_status"]==
+              "OFFLINE_PINNED_SOURCE_SNAPSHOT_ORIGINALS_NOT_REPLAYED_THIS_RUN" and
+              temporal["census_original_workbooks_replayed_this_run"] is False,
+              "M24_OFFLINE_SAS_RESEARCH_FAKES_NEW_PUBLISHER_SOURCE_REPLAY")
+        _must(temporal["industry_comparisons"][2][
+            "2017_to_2022_benchmarked_nominal_cumulative_growth_pct"]=="42.21" and
+              temporal["industry_comparisons"][2][
+            "2017_to_2022_older_vintage_nominal_cumulative_growth_pct"]=="48.10",
+              "M24_LTL_VINTAGE_GROWTH_REVISED_2022_WRONG")
+        _must(temporal["freight_invoice_error_rate_pct"] is None and
+              temporal["actual_paid_customer_freight_invoice_sample_size"]==0 and
+              temporal["recoverable_overpayment_market_usd"] is None and
+              temporal["pilot_18_independent_external_controls_still_unmet"] is True,
+              "M24_CENSUS_SURVEY_HISTORY_PROMOTED_TO_PAID_CUSTOMER_RECOVERIES")
+        fake_temporal=_read("research/SAS_TEMPORAL_2017_2022_20261011.json")
+        fake_temporal["published_2018_to_2022_revisions_can_be_called_invoice_errors"]=True
+        _must(bool(validate_sas_temporal(fake_temporal,as_of=today)),
+              "M24_FALSE_BILLING_ERROR_FROM_CENSUS_PUBLICATION_CHANGE_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -569,6 +598,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "sas_peer_ltl_revision_million_usd":peer_rows["484122"]["signed_revision_million_usd"],
                 "sas_peer_ltl_relative_revision_not_unique":True,
                 "sas_peer_source_receipt_sha256":peers["receipt_sha256"],
+                "sas_temporal_revision_2017_anchor_categories":temporal["2017_unchanged_anchor_categories"],
+                "sas_temporal_down_revised_2018_2022_source_cells":temporal["2018_2022_downward_revised_categories_years"],
+                "sas_temporal_three_industry_periods":temporal["unique_naics_year_vintage_comparisons"],
+                "sas_temporal_source_receipt_sha256":temporal["receipt_sha256"],
+                "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,

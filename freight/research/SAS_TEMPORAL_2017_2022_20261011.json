@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_SAS_2017_2022_TRUCKING_VINTAGE_TEMPORAL_REVISIONS_NOT_INVOICE_ERRORS",
+  "observed_on": "2026-10-11",
+  "publisher": "U.S. Census Bureau",
+  "population": "2017_NAICS_US_EMPLOYER_FIRMS_ALL_ESTABLISHMENTS_2022_SAS",
+  "source_family": "SAME_2022_SERVICES_ANNUAL_SURVEY_LEGACY_AND_AUGUST_2026_BENCHMARKED_RELEASES",
+  "year_range": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "source_measure": "ESTIMATED_REVENUE_MILLIONS_OF_NOMINAL_USD",
+  "year_column_order": {
+    "2017": "K",
+    "2018": "J",
+    "2019": "I",
+    "2020": "H",
+    "2021": "G",
+    "2022": "F"
+  },
+  "release_method_url": "https://www.census.gov/programs-surveys/sas/technical-documentation/methodology/benchmarkprocess22.html",
+  "release_page_url": "https://www.census.gov/data/tables/2022/econ/services/sas-naics.html",
+  "original_source_vintages": {
+    "revised_2026_sas": {
+      "source_url": "https://www2.census.gov/programs-surveys/sas/tables/time-series/sas-latest/Table2.xlsx",
+      "source_xlsx_sha256": "cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac",
+      "source_xlsx_bytes": 128635,
+      "source_sheet_member": "xl/worksheets/sheet1.xml",
+      "source_sheet_row_count": 839,
+      "original_source_title": "Table 2.  Estimated Revenue by Tax Status for Employer Firms: 2013 Through 2022",
+      "industries": {
+        "484": {
+          "naics": "484",
+          "official_label": "Truck Transportation",
+          "all_establishments_row": 42,
+          "income_tax_establishments_row": 43,
+          "raw_2022_cv_pct": "0",
+          "yearly_revenue_million_usd": {
+            "2017": 290532,
+            "2018": 310688,
+            "2019": 314044,
+            "2020": 308131,
+            "2021": 361243,
+            "2022": 423271
+          }
+        },
+        "484121": {
+          "naics": "484121",
+          "official_label": "General Freight Trucking, Long-Distance, Truckload",
+          "all_establishments_row": 46,
+          "income_tax_establishments_row": 47,
+          "raw_2022_cv_pct": "0",
+          "yearly_revenue_million_usd": {
+            "2017": 112441,
+            "2018": 122875,
+            "2019": 121331,
+            "2020": 121752,
+            "2021": 145249,
+            "2022": 172717
+          }
+        },
+        "484122": {
+          "naics": "484122",
+          "official_label": "General Freight Trucking, Long-Distance, Less Than Truckload",
+          "all_establishments_row": 48,
+          "income_tax_establishments_row": 49,
+          "raw_2022_cv_pct": "0",
+          "yearly_revenue_million_usd": {
+            "2017": 46192,
+            "2018": 49584,
+            "2019": 51037,
+            "2020": 49186,
+            "2021": 58035,
+            "2022": 65688
+          }
+        }
+      }
+    },
+    "legacy_2024_sas": {
+      "source_url": "https://www2.census.gov/programs-surveys/sas/tables/time-series/sas-latest/sas-22.xlsx",
+      "source_xlsx_sha256": "4aa1efe9533fb3b16f32806af4f0b1bd5c72e92f2db024e559f891e03f0bc33a",
+      "source_xlsx_bytes": 515901,
+      "source_sheet_member": "xl/worksheets/sheet2.xml",
+      "source_sheet_row_count": 839,
+      "original_source_title": "Table 2.  Estimated Revenue by Tax Status for Employer Firms: 2013 Through 2022",
+      "industries": {
+        "484": {
+          "naics": "484",
+          "official_label": "Truck Transportation",
+          "all_establishments_row": 44,
+          "income_tax_establishments_row": 45,
+          "raw_2022_cv_pct": "1.3",
+          "yearly_revenue_million_usd": {
+            "2017": 290532,
+            "2018": 313809,
+            "2019": 320817,
+            "2020": 318602,
+            "2021": 376903,
+            "2022": 445509
+          }
+        },
+        "484121": {
+          "naics": "484121",
+          "official_label": "General Freight Trucking, Long-Distance, Truckload",
+          "all_establishments_row": 48,
+          "income_tax_establishments_row": 49,
+          "raw_2022_cv_pct": "2.7",
+          "yearly_revenue_million_usd": {
+            "2017": 112441,
+            "2018": 124337,
+            "2019": 124566,
+            "2020": 126768,
+            "2021": 152753,
+            "2022": 183482
+          }
+        },
+        "484122": {
+          "naics": "484122",
+          "official_label": "General Freight Trucking, Long-Distance, Less Than Truckload",
+          "all_establishments_row": 50,
+          "income_tax_establishments_row": 51,
+          "raw_2022_cv_pct": "1.6",
+          "yearly_revenue_million_usd": {
+            "2017": 46192,
+            "2018": 49982,
+            "2019": 51897,
+            "2020": 50515,
+            "2021": 60003,
+            "2022": 68411
+          }
+        }
+      }
+    }
+  },
+  "parent_and_child_categories_cannot_be_added_as_distinct_markets": true,
+  "both_tax_status_rows_are_not_two_independent_observations": true,
+  "publisher_2017_anchor_equality_expected": true,
+  "published_2018_to_2022_revisions_can_be_called_invoice_errors": false,
+  "growth_estimates_are_inflation_adjusted": false,
+  "benchmarking_years_are_separate_survey_panels": false,
+  "automated_original_workbook_download_in_offline_report": false,
+  "all_source_vintages_are_independent_samples": false,
+  "revised_2022_raw_cv_zero_proves_exact_precision": false,
+  "recoverable_freight_audit_tam_usd": null,
+  "verified_paid_customer_invoices": 0,
+  "actual_retally_recovered_cash_usd": null,
+  "buyer_demand_proven": false,
+  "external_marketing_or_outreach_authorized": false,
+  "private_or_customer_data_ingested": false,
+  "new_lab_created": false,
+  "scheduled_refresh_created": false,
+  "pilot_18_independent_approvals_still_unverified": true,
+  "source_caveat": "The 2017–2022 parent trucking, long-distance truckload and long-distance LTL revenue estimates all originate from two publication vintages of the same 2022 U.S. Census Services Annual Survey; NAICS 484 includes both children and two tax-status rows are not independent replications. Revisions after 2017 reflect a later benchmark/republication context, not observed freight invoices, their prices, billing errors, refund potential or RETALLY market size. Published 2022 source coefficient-of-variation zero does not establish perfect sampling precision or legal recoveries. Nominal growth changes may be affected by price changes and cannot establish real growth without a suitable price index and variance analysis."
+}

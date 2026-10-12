@@ -59,6 +59,10 @@ from freight.research_sas_peer_benchmark import (
     report_shell as build_sas_peers,
     render_html as render_sas_peers_html,
 )
+from freight.research_sas_temporal import (
+    report_shell as build_sas_temporal,
+    render_html as render_sas_temporal_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -124,6 +128,7 @@ def snapshot(max_labs: int=14) -> dict:
         )
         result["sas_2022_benchmark_reconciliation"]=build_sas_benchmark(as_of=date.today())
         result["sas_peer_trucking_revisions"]=build_sas_peers(as_of=date.today())
+        result["sas_temporal_history"]=build_sas_temporal(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -176,6 +181,7 @@ def render(data: dict) -> str:
     linked2022=data["aies_2022_publisher_historical"]
     sas=data["sas_2022_benchmark_reconciliation"]
     sas_peers=data["sas_peer_trucking_revisions"]
+    sas_history=data["sas_temporal_history"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -366,6 +372,20 @@ long-distance TL: $"""+format(-sas_peers["naics_peer_revisions"][1]["signed_revi
 long-distance LTL: $"""+format(-sas_peers["naics_peer_revisions"][2]["signed_revision_million_usd"],",")+"""m.
 These revisions share one Census survey lineage, not independent market observations.</p>
 <a href="sas_peer_benchmark.html">Open 2022 trucking peer benchmark &amp; source QA ↗</a></section>
+<section class="panel"><h2>2017–2022 trucking revenue benchmark revision history</h2>
+<p>The Census Services Annual Survey published identical 2017 baselines in the
+earlier and August 2026 revised workbooks. For all three overlapping
+truck industry categories, revised 2018–2022 nominal employer-establishment
+revenue was lower each year, affecting historical trend comparisons.
+This offline view does not re-download Census XLSX originals: <strong>"""+escape(sas_history["source_status"])+"""</strong>.</p>
+<p>2017 unchanged anchors: """+str(sas_history["2017_unchanged_anchor_categories"])+""" /
+3 · 2018–2022 downward revisions: """+str(sas_history["2018_2022_downward_revised_categories_years"])+""" /
+15 · 2017–2022 earlier long-distance LTL nominal revenue change:
+""" + escape(sas_history["industry_comparisons"][2]["2017_to_2022_older_vintage_nominal_cumulative_growth_pct"]) + """%,
+new benchmark: """ + escape(sas_history["industry_comparisons"][2]["2017_to_2022_benchmarked_nominal_cumulative_growth_pct"]) + """%.
+Neither survey vintage estimates paid customer freight invoice errors,
+recoverable cash, or independently verified buyer demand.</p>
+<a href="sas_temporal_revisions.html">Open yearly Census source revision audit ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -510,6 +530,13 @@ def main():
     )
     (args.out/"sas_peer_benchmark.html").write_text(
         render_sas_peers_html(data["sas_peer_trucking_revisions"]),encoding="utf-8"
+    )
+    (args.out/"sas_temporal_revisions.json").write_text(
+        json.dumps(data["sas_temporal_history"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"sas_temporal_revisions.html").write_text(
+        render_sas_temporal_html(data["sas_temporal_history"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
