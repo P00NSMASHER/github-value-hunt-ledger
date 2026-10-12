@@ -117,7 +117,7 @@ def summarize_visible_repositories(rows: Iterable[Mapping], owners: Sequence[str
         private = row.get("private")
         if type(private) is not bool or visibility not in ("public", "private", "internal"):
             raise CatalogError("GitHub repository visibility metadata incomplete")
-        if (visibility == "private") != private:
+        if (visibility == "public" and private) or (visibility == "private" and not private):
             raise CatalogError("GitHub private/visibility metadata conflict")
         if visibility == "public":
             counter["visible_public"] += 1
