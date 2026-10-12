@@ -1,0 +1,26 @@
+name: RETALLY Lab 14 SAS Benchmark Investigation (Mission 22)
+on:
+  pull_request:
+    paths:
+      - 'freight/research_sas_xlsx_probe.py'
+      - 'freight/research_sas_benchmark.py'
+      - 'freight/test_research_sas_benchmark.py'
+      - 'freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json'
+      - 'freight/RESEARCH_SAS_BENCHMARK_RECONCILIATION.md'
+      - '.github/workflows/retally-sas-benchmark.yml'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-publisher-sas-workbooks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Inspect original Census SAS workbook headings and LTL rows
+        run: PYTHONPATH=. python -m freight.research_sas_xlsx_probe
