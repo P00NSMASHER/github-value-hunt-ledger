@@ -120,7 +120,7 @@ class SasBenchmark2022Tests(unittest.TestCase):
 
     def test_unknown_source_identifier_never_calls_other_websites(self):
         with self.assertRaisesRegex(ValueError,"SAS_SOURCE_ID_NOT_APPROVED"):
-            m22.selected_sas_source(source_probe(),"unknown")
+            m22.selected_sas_source(source_probe(),ident="unknown")
         with self.assertRaisesRegex(ValueError,"SAS_EXACTLY_TWO_PUBLISHER_WORKBOOKS_REQUIRED"):
             m22.verify_source_bytes(as_of=TODAY,archives={})
 
