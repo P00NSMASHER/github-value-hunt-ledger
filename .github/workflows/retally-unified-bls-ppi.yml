@@ -1,48 +1,170 @@
-name: RETALLY Lab 14 Unified Direct BLS PPI Evidence (Mission 29)
+name: RETALLY Lab 14 Unified Original BLS Trucking PPI (Mission 29)
 on:
   pull_request:
     paths:
       - '.github/workflows/retally-unified-bls-ppi.yml'
       - 'freight/research_unified_blspci.py'
       - 'freight/test_research_unified_blspci.py'
+      - 'freight/research/BLS_TRUCKING_UNIFIED_SOURCE_POLICY_M29_20261012.json'
       - 'freight/RESEARCH_UNIFIED_BLS_PPI.md'
-      - 'freight/lab_phase4_control_center.py'
       - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
   workflow_dispatch:
 permissions:
   contents: read
+
 jobs:
-  unified-bls-original-probe:
+  offline-source-reconciliation-and-original-lab14:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
-      - name: Verify original BLS API v2 covers all three independently correct identifiers in one response
+      - name: Install existing fourteen-lab test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run three BLS industry source tests and M18–28 research regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_unified_blspci.py \
+            freight/test_research_bls_parent_origin.py \
+            freight/test_research_fred_parent_ppi.py \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Generate offline unified source report and fourteen original lab evidence
+        run: |
+          PYTHONPATH=. python -m freight.research_unified_blspci \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m29-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m29-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m29-offline/unified_bls_evidence.json').read_text())
+          labs=json.loads(Path('/tmp/retally-m29-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_M29_UNIFIED_DIRECT_BLS_TRUCKING_PPI_CONTEXT_NOT_REAL_FREIGHT_OUTPUT'
+          assert r['status']=='M29_OFFLINE_PRIOR_BLS_SOURCE_OBSERVATIONS_NO_FRESH_THREE_SERIES_REPLAY'
+          assert r['source_type']=='DIRECT_FIRST_PARTY_BLS_API_V2'
+          assert r['current_original_bls_source_replayed_this_run'] is False
+          assert r['current_source_authenticated_month_count']==0
+          assert r['historical_original_bls_months_in_pinned_catalogs']==288
+          assert r['industry_counts']==3 and len(r['industry_comparisons'])==3
+          assert r['source_series_ids']==['PCU484---484---','PCU484121484121','PCU484122484122']
+          assert r['historical_m26_missing_parent_was_wrong_alias_not_deleted_bls_series'] is True
+          assert r['historical_m27_fred_source_timeout_remains_true'] is True
+          assert r['m28_native_parent_id_supersedes_invalid_fred_alias_for_current_reports'] is True
+          by={x['naics']:x for x in r['industry_comparisons']}
+          assert [by[k]['2017_to_2024_census_nominal_revenue_change_pct'] for k in ('484','484121','484122')]==['38.65','43.48','40.93']
+          assert [by[k]['2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct'] for k in ('484','484121','484122')]==['1.18','2.82','-1.89']
+          assert [by[k]['2017_to_2024_december_endpoint_price_adjusted_revenue_pct'] for k in ('484','484121','484122')]==['4.75','8.87','1.60']
+          assert by['484122']['december_minus_annual_mean_adjusted_change_percentage_points']=='3.49'
+          assert r['december_endpoint_sensitivity_is_not_a_statistical_confidence_interval'] is True
+          assert r['adjustments_measure_official_real_freight_output'] is False
+          assert r['naics484_is_parent_of_484121_and_484122_non_additive'] is True
+          assert r['actual_paid_customer_freight_invoices_observed']==0
+          assert r['independently_adjudicated_carrier_overcharges']==0
+          assert r['freight_recovery_market_tam_usd'] is None
+          assert r['original_18_independent_pilot_requirements_still_unmet'] is True
+          assert r['scheduled_tasks_created_or_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(labs['lab_runs'])==14 and labs['failed_or_blocked_labs']==[]
+          assert labs['pilot_preflight']['unmet_requirements']==18
+          assert labs['actual_revenue_cents']==0
+          assert labs['bls_unified_current_evidence']['receipt_sha256']==r['receipt_sha256']
+          assert 'unified_bls_evidence.html' in Path('/tmp/retally-m29-control/index.html').read_text()
+          print('PASS all 14 original labs, original BLS catalogs and sensitive method caution. 18 pilot gates still unmet.')
+          PY
+      - name: Upload only derived offline source report receipts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-unified-bls-ppi-offline
+          path: |
+            /tmp/retally-m29-offline/unified_bls_evidence.json
+            /tmp/retally-m29-offline/unified_bls_evidence.html
+          if-no-files-found: error
+          retention-days: 14
+
+  validate-all-three-original-bls-series-in-one-request:
+    needs: offline-source-reconciliation-and-original-lab14
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Authenticate all 288 months directly from original BLS API v2
+        run: |
+          PYTHONPATH=. python -m freight.research_unified_blspci \
+            --fetch-original --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m29-bls-original
+      - name: Require direct BLS identity and prevent false source or commercial promotion
         run: |
           python - <<'PY'
-          from urllib.request import Request,urlopen
-          from hashlib import sha256
-          from collections import Counter
           import json
-          url='https://api.bls.gov/publicAPI/v2/timeseries/data/'
-          ids=['PCU484---484---','PCU484121484121','PCU484122484122']
-          payload=json.dumps({'seriesid':ids,'startyear':'2017','endyear':'2024'},separators=(',',':')).encode()
-          req=Request(url,data=payload,headers={'Content-Type':'application/json','User-Agent':'RETALLY-Lab14-Original-BLS-3-Industry-Replay/1.0'},method='POST')
-          with urlopen(req,timeout=30) as response:
-              assert response.geturl()==url
-              raw=response.read(500001)
-          assert len(raw)<500001
-          result=json.loads(raw)
-          print('BLS_M29_STATUS',result.get('status'),result.get('message'), 'sha256',sha256(raw).hexdigest(),flush=True)
-          for series in result.get('Results',{}).get('series',[]):
-              month=[x for x in series.get('data',[]) if x.get('year') in [str(y) for y in range(2017,2025)] and x.get('period','')>='M01' and x.get('period','')<='M12']
-              counts=Counter(x.get('year') for x in month)
-              print('BLS_M29_SERIES',series.get('seriesID'),'count',len(month),'years',dict(sorted(counts.items())),'sample',month[:1],flush=True)
-          assert result.get('status')=='REQUEST_SUCCEEDED' and result.get('message')==[]
-          assert {x.get('seriesID') for x in result['Results']['series']}==set(ids)
-          assert all(sum(x.get('year')==str(y) and 'M01'<=x.get('period','')<='M12' for x in r.get('data',[]))==12 for r in result['Results']['series'] for y in range(2017,2025))
-          print('BLS_M29_ALL_288_DIRECT_SOURCE_MONTHS_PRESENT',flush=True)
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m29-bls-original/unified_bls_evidence.json').read_text())
+          assert r['scope']=='LAB14_M29_UNIFIED_DIRECT_BLS_TRUCKING_PPI_CONTEXT_NOT_REAL_FREIGHT_OUTPUT'
+          assert r['source_type']=='DIRECT_FIRST_PARTY_BLS_API_V2'
+          assert r['industry_counts']==3
+          assert r['source_series_ids']==['PCU484---484---','PCU484121484121','PCU484122484122']
+          assert r['historical_m26_missing_parent_was_wrong_alias_not_deleted_bls_series'] is True
+          assert r['historical_m27_fred_source_timeout_remains_true'] is True
+          assert r['m28_native_parent_id_supersedes_invalid_fred_alias_for_current_reports'] is True
+          assert r['legacy_source_reports_kept_as_historical_evidence'] is True
+          assert r['naics484_is_parent_of_484121_and_484122_non_additive'] is True
+          assert r['december_endpoint_sensitivity_is_not_a_statistical_confidence_interval'] is True
+          by={x['naics']:x for x in r['industry_comparisons']}
+          assert set(by)=={'484','484121','484122'}
+          assert by['484122']['2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct']=='-1.89'
+          assert by['484122']['2017_to_2024_december_endpoint_price_adjusted_revenue_pct']=='1.60'
+          assert r['adjustments_measure_official_real_freight_output'] is False
+          assert r['actual_paid_customer_freight_invoices_observed']==0
+          assert r['independently_adjudicated_carrier_overcharges']==0
+          assert r['actual_retally_cash_recovered_usd'] is None
+          assert r['freight_recovery_market_tam_usd'] is None
+          assert r['commercial_recovery_claims_or_external_contact_authorized'] is False
+          assert r['original_18_independent_pilot_requirements_still_unmet'] is True
+          assert r['scheduled_tasks_created_or_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['status']=='M29_DIRECT_BLS_V2_288_MONTHS_ALL_THREE_INDUSTRIES_AUTHENTICATED':
+            assert r['current_original_bls_source_replayed_this_run'] is True
+            assert r['current_source_authenticated_month_count']==288
+            assert len(r['original_bls_response_sha256'])==64
+            assert len(r['fresh_source_semantic_receipt_sha256'])==64
+            assert all(len(x['annual_observations'])==8 and
+                       sum(v['original_bls_annual_month_count'] for v in x['annual_observations'])==96
+                       for x in r['industry_comparisons'])
+            print('BLS ORIGINAL SOURCE VERIFIED: all three trucking industries, 288/288 monthly records.')
+          elif r['status']=='M29_BLS_V2_UNAVAILABLE_NO_FRESH_THREE_INDUSTRY_SOURCE_PROOF':
+            assert r['current_original_bls_source_replayed_this_run'] is False
+            assert r['current_source_authenticated_month_count']==0
+            assert r['original_bls_response_sha256'] is None
+            print('::warning::Original BLS network blocked. No new first-party source proof; only historical source catalogs.')
+          else:
+            raise AssertionError('ORIGINAL_BLS_RESPONSE_CHANGED_OR_UNAPPROVED_AUTHENTICATION_STATE')
           PY
+      - name: Keep internal source evidence only, no raw API or customer data
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-unified-bls-ppi-original-proof
+          path: |
+            /tmp/retally-m29-bls-original/unified_bls_evidence.json
+            /tmp/retally-m29-bls-original/unified_bls_evidence.html
+          if-no-files-found: error
+          retention-days: 14
