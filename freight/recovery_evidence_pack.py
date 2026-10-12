@@ -54,6 +54,12 @@ def normalize_finding(row):
     evidence = row.get("supporting_evidence") or []
     if not isinstance(evidence, list) or not all(isinstance(x, str) and x.strip() for x in evidence):
         raise ValueError("supporting_evidence must be a list of non-empty strings")
+    if (
+        clean["reviewer_disposition"] == "VALIDATED"
+        and clean["confidence"] == "SUPPORTED"
+        and not evidence
+    ):
+        raise ValueError("validated supported finding requires supporting evidence")
     clean["supporting_evidence"] = evidence
     for key in SUPPRESSION_FLAGS:
         clean[key] = bool(row.get(key, False))
@@ -136,6 +142,7 @@ def build_pack(payload):
             "validated_is_not_settled": True,
             "preexisting_and_duplicate_value_excluded": True,
             "validated_difference_excludes_suppressed_findings": True,
+            "validated_supported_findings_require_evidence": True,
             "reversals_reduce_realized_value": True,
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
@@ -194,7 +201,8 @@ def render_markdown(pack):
         "6. Positive settled credits require an approved or closed claim and a settlement reference.",
         "7. Settled credit cannot exceed the candidate invoice difference.",
         "8. One positive settlement reference can support only one finding in this pack.",
-        "9. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "9. A validated supported finding requires at least one supporting-evidence reference.",
+        "10. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
