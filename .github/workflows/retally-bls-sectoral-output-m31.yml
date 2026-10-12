@@ -1,0 +1,64 @@
+name: RETALLY Lab 14 BLS Real Sectoral Output vs BEA Gross Output (Mission 31)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bls-sectoral-output-m31.yml'
+      - 'freight/research_bls_sectoral_output_m31.py'
+      - 'freight/test_research_bls_sectoral_output_m31.py'
+      - 'freight/research/BLS_SECTORAL_OUTPUT_M31_20261012.json'
+      - 'freight/RESEARCH_BLS_SECTORAL_OUTPUT_M31.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bea-and-bls-original-source-reconnaissance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Replay original BLS annual sectoral-output index and verify year windows
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          import hashlib,json
+          url='https://api.bls.gov/publicAPI/v2/timeseries/data/'
+          ids=['IPUIN484T010000000','IPUIN48412T010000000','IPUIN4841T010000000']
+          payload=json.dumps({'seriesid':ids,'startyear':'2017','endyear':'2024'},separators=(',',':')).encode()
+          req=Request(url,data=payload,headers={'Content-Type':'application/json','User-Agent':'RETALLY-Lab14-BLS-Real-Sectoral-Output-Source/1.0'},method='POST')
+          with urlopen(req,timeout=28) as resp:
+            assert resp.geturl()==url
+            raw=resp.read(1800001)
+            print('M31_BLS_HTTP',resp.status,'bytes',len(raw),'sha256',hashlib.sha256(raw).hexdigest(),flush=True)
+          assert len(raw)<=1800000
+          doc=json.loads(raw)
+          print('M31_BLS_STATUS',doc.get('status'),'messages',doc.get('message'),flush=True)
+          for r in doc.get('Results',{}).get('series',[]):
+            years={}
+            for row in r.get('data',[]):
+              if row.get('year') in [str(y) for y in range(2017,2025)]:
+                years.setdefault(row['year'],[]).append({'period':row.get('period'),'value':row.get('value'),'footnotes':row.get('footnotes')})
+            print('M31_BLS_SERIES',r.get('seriesID'),'byyear',json.dumps(years,sort_keys=True),flush=True)
+          PY
+      - name: Check whether unauthenticated BEA API can provide direct gross-output industry observations
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          import json
+          url='https://apps.bea.gov/api/data/?UserID=0&method=GetData&DataSetName=GDPbyIndustry&TableID=16&Industry=484&Year=2017,2024&Frequency=A&ResultFormat=JSON'
+          try:
+            req=Request(url,headers={'User-Agent':'RETALLY-Lab14-Public-BEA-Data-Research/1.0'})
+            with urlopen(req,timeout=18) as response:
+              raw=response.read(240001)
+              print('M31_BEA_API_HTTP',response.status,'bytes',len(raw),'final',response.geturl(),flush=True)
+            text=raw.decode('utf-8',errors='replace')
+            result=json.loads(text)
+            print('M31_BEA_API_STATUS',repr(result.get('BEAAPI',{}).get('Results',{}))[:1500],flush=True)
+            print('M31_BEA_API_ERROR',repr(result.get('BEAAPI',{}).get('Error',{}))[:1500],flush=True)
+          except Exception as exc:
+            print('M31_BEA_API_BLOCKED',type(exc).__name__,str(exc)[:180],flush=True)
+          PY
