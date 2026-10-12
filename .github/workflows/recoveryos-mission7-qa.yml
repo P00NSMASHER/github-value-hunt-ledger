@@ -1,0 +1,59 @@
+name: RecoveryOS Mission 7 Financial QA
+
+on:
+  pull_request:
+    paths:
+      - "freight/mission7/**"
+      - ".github/workflows/recoveryos-mission7-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: qa-only-no-customer-data
+          POSTGRES_DB: recoveryos_m7_qa
+        options: >-
+          --health-cmd "pg_isready -U postgres -d recoveryos_m7_qa"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify clean SQL bootstrap in throwaway database
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 < freight/mission7/staging_schema.sql
+      - name: Adversarial acceptance fixtures (rolled back)
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 < freight/mission7/staging_acceptance.sql
+      - name: Two-session allocation race must commit exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 < freight/mission7/staging_race_setup.sql
+          PAYLOAD='{"payerId":"BUYER","payeeId":"CARRIER","currency":"USD","amountCents":100000,"purpose":"Synthetic concurrent test","allocations":[{"findingId":"RACE_FINDING","amountCents":100000}]}'
+          set +e
+          docker exec "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 -c "SELECT * FROM m7_prepare_instruction('CI_RACE_TENANT','ci-race-key-01','$PAYLOAD'::jsonb)" > /tmp/race-a.txt 2>&1 &
+          job_a=$!
+          docker exec "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 -c "SELECT * FROM m7_prepare_instruction('CI_RACE_TENANT','ci-race-key-02','$PAYLOAD'::jsonb)" > /tmp/race-b.txt 2>&1 &
+          job_b=$!
+          wait "$job_a"; code_a=$?
+          wait "$job_b"; code_b=$?
+          set -e
+          echo "Race statuses: $code_a $code_b"
+          cat /tmp/race-a.txt /tmp/race-b.txt
+          [[ ( "$code_a" -eq 0 && "$code_b" -ne 0 ) || ( "$code_a" -ne 0 && "$code_b" -eq 0 ) ]]
+          total=$(docker exec "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -A -t -c "SELECT coalesce(sum(amount_cents),0) FROM m7_allocations WHERE tenant_id='CI_RACE_TENANT'")
+          [[ "$total" == "100000" ]]
