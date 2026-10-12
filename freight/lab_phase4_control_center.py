@@ -71,6 +71,10 @@ from freight.research_bls_ppi_bridge import (
     report_shell as build_bls_ppi,
     render_html as render_bls_ppi_html,
 )
+from freight.research_fred_parent_ppi import (
+    report_shell as build_fred_parent,
+    render_html as render_fred_parent_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -139,6 +143,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["sas_temporal_history"]=build_sas_temporal(as_of=date.today())
         result["sas_aies_2017_2024_bridge"]=build_sas_aies_bridge(as_of=date.today())
         result["bls_ppi_price_adjustment"]=build_bls_ppi(as_of=date.today())
+        result["fred_parent_484_ppi_provenance"]=build_fred_parent(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -194,6 +199,7 @@ def render(data: dict) -> str:
     sas_history=data["sas_temporal_history"]
     bridge=data["sas_aies_2017_2024_bridge"]
     ppi=data["bls_ppi_price_adjustment"]
+    fred=data["fred_parent_484_ppi_provenance"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -424,6 +430,21 @@ industry producer output price index: """+escape(ppi["industry_price_adjustments
 illustrative price-adjusted revenue proxy: """+escape(ppi["industry_price_adjustments"][1]["2017_to_2024_illustrative_price_adjusted_revenue_proxy_change_pct"])+"""%.
 All trucking (NAICS 484) original BLS API source was rejected and remains UNVERIFIED.</p>
 <a href="bls_ppi_adjustment.html">Open BLS price adjustments, original source limitations and confidence holds ↗</a></section>
+<section class="panel"><h2>Parent trucking PPI: FRED publisher snapshot held pending replay</h2>
+<p>The Federal Reserve Bank of St. Louis FRED displays BLS-origin PCU484484
+for NAICS 484 truck transportation, but Mission 26's direct BLS API v1
+rejected the parent series. A later independent GitHub runner could not
+download FRED's data page or CSV; both timed out. This is a frozen public
+web-indexed candidate, NOT original BLS/CI source certification:
+<strong>"""+escape(fred["source_status"])+"""</strong>.</p>
+<p>2017–2024 nominal all-trucking Census revenue growth:
+""" +escape(fred["parent_2017_to_2024_nominal_census_growth_pct"])+"""%;
+FRED public-table producer price index change:
+""" +escape(fred["parent_2017_to_2024_fred_displayed_price_index_change_pct"])+"""%;
+provisional 2017-index-level-adjusted revenue proxy:
+""" +escape(fred["parent_2017_to_2024_provisional_price_adjusted_revenue_proxy_pct"])+"""%.
+The source must not be used as official real output or a customer billing/recovery market.</p>
+<a href="fred_parent_ppi_provenance.html">Open parent PPI source provenance and verification hold ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -590,6 +611,14 @@ def main():
     )
     (args.out/"bls_ppi_adjustment.html").write_text(
         render_bls_ppi_html(data["bls_ppi_price_adjustment"]),encoding="utf-8"
+    )
+    (args.out/"fred_parent_ppi_provenance.json").write_text(
+        json.dumps(data["fred_parent_484_ppi_provenance"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"fred_parent_ppi_provenance.html").write_text(
+        render_fred_parent_html(data["fred_parent_484_ppi_provenance"]),
+        encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
