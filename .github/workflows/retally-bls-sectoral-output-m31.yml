@@ -44,6 +44,35 @@ jobs:
                 years.setdefault(row['year'],[]).append({'period':row.get('period'),'value':row.get('value'),'footnotes':row.get('footnotes')})
             print('M31_BLS_SERIES',r.get('seriesID'),'byyear',json.dumps(years,sort_keys=True),flush=True)
           PY
+      - name: Inspect the September 2026 original BLS detailed-industry productivity workbook for NAICS 484 real output
+        run: |
+          python -m pip install openpyxl==3.1.5
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          from io import BytesIO
+          from openpyxl import load_workbook
+          url='https://www.bls.gov/productivity/tables/labor-productivity-detailed-industries.xlsx'
+          try:
+            with urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0 (compatible; RETALLY-Public-Industry-Output-Research/1.0)'}),timeout=25) as r:
+              raw=r.read(18000001)
+              print('M31_BLS_XLSX_HTTP',r.status,'url',r.geturl(),'bytes',len(raw),'sha256',sha256(raw).hexdigest(),flush=True)
+            if len(raw)>18000000:raise ValueError('WORKBOOK_TOO_LARGE')
+            wb=load_workbook(BytesIO(raw),read_only=True,data_only=True)
+            print('M31_BLS_WORKBOOK_SHEETS',wb.sheetnames,flush=True)
+            for sheet in wb:
+              headers=[]
+              hits=[]
+              for i,row in enumerate(sheet.iter_rows(values_only=True),start=1):
+                if i<9:headers.append([str(v)[:110] if v is not None else '' for v in row[:18]])
+                if i>16000:break
+                vals=[str(v).strip() if v is not None else '' for v in row]
+                if '484' in vals[:10] or 'Truck transportation' in vals[:10]:
+                  hits.append({'row':i,'vals':vals[:38]})
+              print('M31_BLS_XLSX_TAB',sheet.title,'headers',headers[:5],'hits',hits[:10],'hitcount',len(hits),flush=True)
+          except Exception as exc:
+            print('M31_BLS_XLSX_BLOCKED',type(exc).__name__,str(exc)[:240],flush=True)
+          PY
       - name: Check whether unauthenticated BEA API can provide direct gross-output industry observations
         run: |
           python - <<'PY'
