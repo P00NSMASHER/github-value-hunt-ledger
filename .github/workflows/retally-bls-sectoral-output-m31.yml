@@ -44,6 +44,32 @@ jobs:
                 years.setdefault(row['year'],[]).append({'period':row.get('period'),'value':row.get('value'),'footnotes':row.get('footnotes')})
             print('M31_BLS_SERIES',r.get('seriesID'),'byyear',json.dumps(years,sort_keys=True),flush=True)
           PY
+      - name: Inspect native padded BLS IP series identifiers rather than FRED aliases
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          import json
+          ids=['IPUIN484___T010000000','IPUIN48412_T010000000','IPUIN4841__T010000000']
+          url='https://api.bls.gov/publicAPI/v2/timeseries/data/'
+          body=json.dumps({'seriesid':ids,'startyear':'2017','endyear':'2024'},separators=(',',':')).encode()
+          request=Request(url,data=body,headers={'Content-Type':'application/json','User-Agent':'RETALLY-Lab14-Padded-Native-IP-Source/1.0'},method='POST')
+          with urlopen(request,timeout=30) as response:
+            assert response.geturl()==url
+            raw=response.read(900001)
+          assert len(raw)<=900000
+          data=json.loads(raw)
+          print('M31_IP_NATIVE_API',data.get('status'),data.get('message'),'bytes',len(raw),'sha256',sha256(raw).hexdigest(),flush=True)
+          for series in data.get('Results',{}).get('series',[]):
+            cells={}
+            for row in series.get('data',[]):
+              if row.get('year') in [str(y) for y in range(2017,2025)]:
+                cells.setdefault(row['year'],[]).append({
+                  'period':row.get('period'),'value':row.get('value'),
+                  'footnotes':row.get('footnotes',[])
+                })
+            print('M31_IP_NATIVE_SERIES',series.get('seriesID'),json.dumps(cells,sort_keys=True),flush=True)
+          PY
       - name: Inspect the September 2026 original BLS detailed-industry productivity workbook for NAICS 484 real output
         run: |
           python -m pip install openpyxl==3.1.5
