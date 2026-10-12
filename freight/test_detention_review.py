@@ -294,3 +294,77 @@ def test_conflicting_source_kinds_cannot_turn_invoice_into_gate_evidence():
     )
     assert "MISSING_INDEPENDENT_TIME_EVENT" in out.blocker_codes
     assert out.candidate_excess_cents is None
+
+
+# The portfolio's required GitHub Action uses 'python -m unittest discover'.
+# It would otherwise import these pytest-style functions without executing any
+# of them, yielding a misleading green CI status. Bridge every one of the 36
+# synthetic cases into the required unittest runner (without duplicating logic).
+import unittest
+
+
+class TemporalUnittestGate(unittest.TestCase):
+    def test_all_36_adversarial_cases_are_executed_by_required_ci(self):
+        direct = (
+            test_realistic_detention_stays_review_only_and_enters_existing_human_queue,
+            test_prior_payment_reduces_supported_remaining_without_double_credit,
+            test_license_adapted_rounding_modes_and_thresholds,
+            test_dst_fall_back_is_offset_aware_and_hashes_canonical_utc_instants,
+            test_unverified_contract_cannot_create_financial_candidate,
+            test_invoice_only_events_do_not_become_independent_timeline_proof,
+            test_missing_prior_payment_document_blocks_without_guessing,
+            test_duplicated_same_type_charge_lines_are_not_double_counted,
+            test_prior_paid_above_gross_requires_reconciliation,
+            test_no_source_contract_is_not_sufficient_even_if_verified_flag_is_true,
+            test_evidence_or_contract_change_changes_proof_hash,
+            test_mutated_policy_or_canonical_record_is_rejected,
+            test_unsupported_charge_and_oversized_session_are_blocked,
+            test_overflow_is_rejected_instead_of_wrapping_dollars,
+            test_review_case_tampering_is_rejected_before_human_queue,
+            test_conflicting_source_kinds_cannot_turn_invoice_into_gate_evidence,
+        )
+        executed = 0
+        for scenario in direct:
+            with self.subTest(case=scenario.__name__):
+                scenario()
+                executed += 1
+        for mode, expected in (
+            ("CEILING_TO_INCREMENT", 15), ("FLOOR_TO_INCREMENT", 0),
+            ("HALF_UP_TO_INCREMENT", 15),
+        ):
+            with self.subTest(case="rounding", mode=mode):
+                test_contract_rounding_is_explicit_not_guessed(mode, expected)
+                executed += 1
+        for changes, blocker in (
+            ({"currency": "EUR"}, "CONTRACT_SCOPE_MISMATCH"),
+            ({"carrier_id": "OTHER"}, "CONTRACT_SCOPE_MISMATCH"),
+            ({"origin_postal": "21224", "destination_postal": "17901"}, "CONTRACT_SCOPE_MISMATCH"),
+            ({"charge_code": "DEMURRAGE"}, "CONTRACT_SCOPE_MISMATCH"),
+            ({"effective_to": "2026-09-13"}, "CONTRACT_NOT_EFFECTIVE_ON_SERVICE_DATE"),
+        ):
+            with self.subTest(case="scope", changes=changes):
+                test_scope_currency_date_and_charge_type_are_fail_closed(changes, blocker)
+                executed += 1
+        for invalid in (
+            {"start_at": "2026-09-14T07:50:00"},
+            {"end_at": "2026-09-14T07:49:00-04:00"},
+            {"end_source_sha256": "source"},
+            {"prior_paid_cents": True},
+            {"prior_paid_cents": -1},
+        ):
+            with self.subTest(case="malformed", invalid=invalid):
+                test_malformed_time_evidence_or_money_is_rejected(invalid)
+                executed += 1
+        for invalid in (
+            {"billing_increment_minutes": 0},
+            {"billing_increment_minutes": 1441},
+            {"free_minutes": True},
+            {"cents_per_increment": 2**63},
+            {"rounding_mode": "UNDEFINED"},
+            {"currency": "US$"},
+            {"effective_from": "2026-02-30"},
+        ):
+            with self.subTest(case="invalid_contract", invalid=invalid):
+                test_invalid_contract_rule_fails_compile(invalid)
+                executed += 1
+        self.assertEqual(executed, 36)
