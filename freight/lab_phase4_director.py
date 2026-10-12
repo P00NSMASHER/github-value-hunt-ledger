@@ -650,7 +650,7 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
             validate_policy as validate_unified_bls_policy,
         )
         direct=build_unified_direct_bls(as_of=today)
-        compared={x["naics"]:x for x in direct["industry_comparisons"]}
+        ppi_compared={x["naics"]:x for x in direct["industry_comparisons"]}
         _must(direct["status"]==
               "M29_OFFLINE_PRIOR_BLS_SOURCE_OBSERVATIONS_NO_FRESH_THREE_SERIES_REPLAY"
               and direct["current_source_authenticated_month_count"]==0,
@@ -660,12 +660,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
               and direct["source_series_ids"]==[
                   "PCU484---484---","PCU484121484121","PCU484122484122"],
               "M29_THREE_NATIVE_BLS_TRUCKING_SERIES_INCOMPLETE")
-        _must([compared[x]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"]
+        _must([ppi_compared[x]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"]
                for x in ("484","484121","484122")]==["1.18","2.82","-1.89"],
               "M29_UNIFIED_SOURCE_PRICE_ADJUSTMENTS_CHANGED")
-        _must(compared["484122"][
+        _must(ppi_compared["484122"][
                   "2017_to_2024_december_endpoint_price_adjusted_revenue_pct"]=="1.60"
-              and compared["484122"][
+              and ppi_compared["484122"][
                   "2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"]=="-1.89"
               and direct["december_endpoint_sensitivity_is_not_a_statistical_confidence_interval"],
               "M29_LTL_METHOD_SENSITIVITY_SUPPRESSED_OR_FALSLY_CERTIFIED")
