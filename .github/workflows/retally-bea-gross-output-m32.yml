@@ -21,6 +21,31 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
+      - name: Verify actual BEA Table 16 trucking original-data redistribution API fields and dates
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          import json
+          url='https://api.db.nomics.world/v22/series/BEA/GDPbyIndustry-16/484-A?observations=1'
+          with urlopen(Request(url,headers={'User-Agent':'RETALLY-Lab14-Original-BEA-Table16-Source-Lab/1.0'}),timeout=20) as resp:
+              raw=resp.read(240001)
+              print('M32_OBS_API_HTTP',resp.status,resp.geturl(),'bytes',len(raw),'sha256',sha256(raw).hexdigest(),flush=True)
+          assert len(raw)<=240000
+          j=json.loads(raw)
+          print('M32_OBS_TOP_LEVEL',list(j),flush=True)
+          print('M32_OBS_DATASET',json.dumps({k:j.get('dataset',{}).get(k) for k in ('code','name','indexed_at','provider_code','dimensions_labels')},default=str),flush=True)
+          print('M32_OBS_PROVIDER',json.dumps(j.get('provider',{})),flush=True)
+          s=j['series']
+          print('M32_OBS_SERIES_WRAPPER',list(s),flush=True)
+          docs=s.get('docs',[])
+          print('M32_OBS_SERIES_COUNT',len(docs),flush=True)
+          for d in docs:
+              print('M32_OBS_SERIES_FIELDS',list(d),flush=True)
+              print('M32_OBS_SERIES_IDENTITY',{k:d.get(k) for k in ('series_code','series_name','dimensions','indexed_at','provider_code','dataset_code')},flush=True)
+              y=d.get('period',[]);v=d.get('value',[])
+              print('M32_OBS_LENGTHS',len(y),len(v),'selected',[(year,v[i]) for i,year in enumerate(y) if year in [str(k) for k in range(2017,2025)]],flush=True)
+          PY
       - name: Probe BEA table16 via redistributor and publisher open-data routes
         run: |
           python - <<'PY'
