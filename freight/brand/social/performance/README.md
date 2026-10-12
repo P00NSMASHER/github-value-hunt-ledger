@@ -214,3 +214,13 @@ The GitHub PR tests include pure in-memory fake HTTP response fixtures:
 valid PNG/JPEG, invalid image bytes, access-denied pages, timeouts,
 non-allowlisted SSRF candidates, duplicate URLs and protected drafts.
 No external network calls occur on PRs.
+
+## October 11 browser-visual media receipt (no publication claim)
+
+A separate, genuinely public **read-only browser** inspection opened all eleven distinct October `static.metricool.com/planner/` image URLs at a 390-pixel mobile viewport. All loaded visibly at 1080×1350, showed the full artwork without clipping, and preserved legible main text. Smaller supporting/footer copy was small. This is **browser-render evidence only**: it does **not** establish image-byte hashes/MIME, provider acceptance or live Meta publication.
+
+- [Human-readable eleven-asset observation table](./observations/README-2026-10-11.md)
+- [Machine-readable observation with exact scheduled-UUID attribution](./observations/retally-october-visual-2026-10-11.json)
+- `test_visual_receipt_20261011.py`: offline CI validates that these exact eleven URLs cover thirteen scheduled October Facebook/Instagram posts in the frozen 2026-10-11 snapshot, without accidentally including any of the four unapproved November drafts. It rejects any false 'checksum verified' or 'published' flag.
+
+The existing manual GitHub public HTTPS GET workflow is unchanged and still useful for independent server-header/byte-level review. The October 11 browser check does not convert the pending October 12 post into a verified public post. The next provider-publication check remains **October 12 after 09:00 ET**.
