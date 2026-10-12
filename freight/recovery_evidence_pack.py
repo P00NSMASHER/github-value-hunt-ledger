@@ -68,12 +68,21 @@ def normalize_finding(row):
     evidence = row.get("supporting_evidence") or []
     if not isinstance(evidence, list) or not all(isinstance(x, str) and x.strip() for x in evidence):
         raise ValueError("supporting_evidence must be a list of non-empty strings")
+    evidence = [value.strip() for value in evidence]
     if (
         clean["reviewer_disposition"] == "VALIDATED"
         and clean["confidence"] == "SUPPORTED"
         and not evidence
     ):
         raise ValueError("validated supported finding requires supporting evidence")
+    if (
+        clean["reviewer_disposition"] == "VALIDATED"
+        and clean["confidence"] == "SUPPORTED"
+        and clean["authority_reference"] not in evidence
+    ):
+        raise ValueError(
+            "validated supported finding requires authority_reference in supporting_evidence"
+        )
     if (
         clean["reviewer_disposition"] == "VALIDATED"
         and clean["confidence"] == "SUPPORTED"
@@ -185,6 +194,7 @@ def build_pack(payload):
             "preexisting_and_duplicate_value_excluded": True,
             "validated_difference_excludes_suppressed_findings": True,
             "validated_supported_findings_require_evidence": True,
+            "validated_supported_findings_bind_authority_evidence": True,
             "validated_supported_authority_not_after_invoice": True,
             "reversals_reduce_realized_value": True,
             "realized_requires_settled_claim_and_reference": True,
@@ -249,9 +259,10 @@ def render_markdown(pack):
         "8. One positive settlement reference can support only one finding in this pack.",
         "9. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
         "10. A validated supported finding requires at least one supporting-evidence reference.",
-        "11. A validated supported finding cannot rely on authority effective after its invoice date.",
-        "12. Buyer-visible attributable realized recovery excludes suppressed findings.",
-        "13. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "11. Its exact authority reference must appear in supporting evidence.",
+        "12. A validated supported finding cannot rely on authority effective after its invoice date.",
+        "13. Buyer-visible attributable realized recovery excludes suppressed findings.",
+        "14. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
