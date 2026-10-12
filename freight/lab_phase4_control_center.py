@@ -305,16 +305,9 @@ no validated recovery opportunity or customer demand.</p>
 <p>Two publisher archives for 2023 were observed with matching national
 NAICS 484/484121/484122 revenues. The 2024 original has separate M19
 publisher-source proof. This offline dashboard is a frozen research snapshot,
-not an original archive re-download: source state <strong>""" +
-escape(historical["status"]) + """</strong>. 2022 history still includes legacy
+not an original archive re-download: source state <strong>"""+escape(historical["status"])+"""</strong>. 2022 history still includes legacy
 survey reconstruction and is NOT a fresh primary Census observation.</p>
-<p>2023 long-distance LTL employer revenue: $""" +
-format(historical["2023_national_ltl_thousand_usd"]/1000000, ".3f") +
-""" billion · 2024: $""" +
-format(historical["2024_national_ltl_thousand_usd"]/1000000, ".3f") +
-""" billion · descriptive nominal movement """ +
-escape(historical["2023_to_2024_nominal_change_pct"]) +
-"""% (not a proven change in recoverable customer invoices).</p>
+<p>2023 long-distance LTL employer revenue: $"""+format(historical["2023_national_ltl_thousand_usd"]/1000000, ".3f")+""" billion · 2024: $"""+format(historical["2024_national_ltl_thousand_usd"]/1000000, ".3f")+""" billion · descriptive nominal movement """+escape(historical["2023_to_2024_nominal_change_pct"])+"""% (not a proven change in recoverable customer invoices).</p>
 <a href="aies_historical_lineage.html">Open historical Census source-lineage and holds ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
