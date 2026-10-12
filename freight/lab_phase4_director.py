@@ -398,6 +398,29 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
             "revenue_thousand_usd"]=65_688_461
         _must(bool(validate_aies_source(false_aies,as_of=today)),
               "LEGACY_2022_REVENUE_SILENTLY_SUBSTITUTED_FOR_2024")
+        from freight.research_aies_historical_lineage import (
+            report_shell as build_historical,
+            validate_manifest as validate_historical,
+        )
+        historical=build_historical(as_of=today)
+        _must(historical["2023_national_ltl_thousand_usd"]==64651167,
+              "CENSUS_2023_LTL_REVENUE_HISTORICAL_SOURCE_MISSING")
+        _must(historical["2024_national_ltl_thousand_usd"]==65096292,
+              "CENSUS_2024_LTL_REVENUE_SOURCE_MISSING")
+        _must(historical["year_2022_status"].startswith("HOLD_") and
+              historical["original_2023_and_2024_replayed_this_run"] is False,
+              "LEGACY_SOURCE_OR_OFFLINE_CENSUS_MISREPRESENTED_AS_ORIGINAL_REPLAY")
+        _must(historical["2023_to_2024_nominal_change_pct"]=="0.69" and
+              historical["2022_to_2024_cagr_or_2022_to_2023_growth_promotion_allowed"] is False,
+              "SURVEY_VINTAGE_DRIFT_MISTAKEN_FOR_AUDIT_FORECAST")
+        _must(historical["recoverable_freight_audit_tam_usd"] is None and
+              historical["actual_paid_ltl_invoices_observed"]==0 and
+              historical["18_pilot_approval_requirements_unmet"] is True,
+              "HISTORICAL_CARRIER_REVENUE_PROMOTED_TO_CUSTOMER_RECOVERIES")
+        forged_historical=_read("research/AIES_HISTORICAL_LINEAGE_20261011.json")
+        forged_historical["source_year_2022_original_reproduced"]=True
+        _must(bool(validate_historical(forged_historical,as_of=today)),
+              "UNREPLAYED_2022_CENSUS_PUBLISHER_DATA_SILENTLY_CERTIFIED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -445,6 +468,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "aies_ltl_2024_pct_of_all_trucking_revenue":aies["ltl_2024_share_of_all_trucking_pct"],
                 "aies_ltl_revenue_receipt_sha256":aies["receipt_sha256"],
                 "aies_ltl_revenue_is_not_recoverable_tam":True,
+                "aies_historical_source_scope":historical["scope"],
+                "aies_2023_research_revenue_thousand_usd":historical["2023_national_ltl_thousand_usd"],
+                "aies_2023_to_2024_nominal_change_pct":historical["2023_to_2024_nominal_change_pct"],
+                "aies_2022_primary_source_still_held":True,
+                "aies_historical_source_receipt_sha256":historical["receipt_sha256"],
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,
