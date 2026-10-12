@@ -680,6 +680,37 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         fake_unified["december_endpoint_is_annual_average"]=True
         _must(bool(validate_unified_bls_policy(fake_unified,as_of=today)),
               "M29_FALSE_BLS_ANNUAL_AVERAGE_SUBSTITUTED_FROM_DECEMBER_MONTH")
+        from freight.research_bea_measurement_gate import (
+            report_shell as build_bea_measure_gate,
+            validate_book as validate_bea_measure_book,
+            measure_compatible as check_bea_measure_compatible,
+        )
+        bea_measure=build_bea_measure_gate(as_of=today)
+        _must(bea_measure["status"]==
+              "M30_OFFLINE_BEA_DEFINITIONS_PREVIOUSLY_VERIFIED_GROSS_OUTPUT_VALUES_HELD"
+              and bea_measure["bea_original_measure_definitions_verified_in_this_run"] is False,
+              "M30_OFFLINE_BEA_DEFINITIONS_MISLABELED_FRESH_SOURCE")
+        _must(bea_measure["bea_gross_output_original_source_status"]==
+              "HOLD_PRIMARY_BEA_QUANTITY_INDEX_NOT_RETRIEVED"
+              and bea_measure["bea_484_real_gross_output_2017_2024_available_for_validation"] is False,
+              "M30_UNRETRIEVED_BEA_GROSS_OUTPUT_FALSELY_PUBLISHED")
+        _must(bea_measure["bea_value_added_2025_vintage_2017_to_2024_growth_pct"]=="1.41"
+              and bea_measure["bea_value_added_2026_vintage_2017_to_2024_growth_pct"]=="-2.42"
+              and bea_measure["bea_real_value_added_2024_index_revision_points"]=="-3.821",
+              "M30_BEA_GDP_VALUE_ADDED_YEAR_VINTAGE_CLAIM_UNRELIABLE")
+        _must(check_bea_measure_compatible(
+                claimed="ILLUSTRATIVE_CENSUS_EMPLOYER_REVENUE_BLS_PPI_PROXY",
+                benchmark="BEA_REAL_GDP_VALUE_ADDED_BY_INDUSTRY") is False
+              and bea_measure["proxy_vs_bea_value_added_difference_is_model_error"] is False,
+              "M30_BEA_VALUE_ADDED_MISUSED_AS_GROSS_OUTPUT_MODEL_VALIDATION")
+        _must(bea_measure["real_invoice_rows_validated"]==0
+              and bea_measure["recoverable_freight_market_tam_usd"] is None
+              and bea_measure["all_18_real_customer_pilot_requirements_unmet"] is True,
+              "M30_BEA_ECONOMIC_DATA_PROMOTED_TO_FREIGHT_RECOVERY")
+        fake_bea=_read("research/BEA_TRUCKING_MEASURE_COMPATIBILITY_M30_20261012.json")
+        fake_bea["original_gross_output_484_source_verified"]=True
+        _must(bool(validate_bea_measure_book(fake_bea,as_of=today)),
+              "M30_UNAUTHENTICATED_GROSS_OUTPUT_PROMOTED_TO_VERIFIED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -778,6 +809,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bls_ltl_2017_2024_annual_mean_proxy_pct":ppi_compared["484122"]["2017_to_2024_illustrative_annual_mean_price_adjusted_revenue_pct"],
                 "bls_ltl_2017_2024_december_sensitivity_pct":ppi_compared["484122"]["2017_to_2024_december_endpoint_price_adjusted_revenue_pct"],
                 "bls_three_industry_unified_receipt_sha256":direct["receipt_sha256"],
+                "bea_2025_old_value_added_2024_index":bea_measure["bea_value_added_2025_vintage_2024_index_2017eq100"],
+                "bea_2026_revised_value_added_2024_index":bea_measure["bea_value_added_2026_vintage_2024_index_2017eq100"],
+                "bea_current_gross_output_484_not_yet_source_authenticated":True,
+                "bea_value_added_not_sufficient_to_certify_bls_ppi_output_proxy":True,
+                "bea_measure_compatibility_source_receipt_sha256":bea_measure["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
