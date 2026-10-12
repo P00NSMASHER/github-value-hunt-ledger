@@ -529,6 +529,35 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         fake_temporal["published_2018_to_2022_revisions_can_be_called_invoice_errors"]=True
         _must(bool(validate_sas_temporal(fake_temporal,as_of=today)),
               "M24_FALSE_BILLING_ERROR_FROM_CENSUS_PUBLICATION_CHANGE_ACCEPTED")
+        from freight.research_sas_aies_bridge import (
+            report_shell as build_sas_aies_bridge,
+            validate_catalog as validate_sas_aies_catalog,
+        )
+        bridge=build_sas_aies_bridge(as_of=today)
+        _must(bridge["source_status"]==
+              "OFFLINE_CENSUS_BRIDGE_PRIOR_VERIFIED_SNAPSHOTS_NO_NEW_SOURCE_REPLAY" and
+              bridge["census_original_replay_completed_in_this_run"] is False,
+              "M25_OFFLINE_CENSUS_BRIDGE_FALSE_NEW_ORIGINAL_REPLAY")
+        _must(bridge["distinct_industry_year_values"]==24 and
+              len(bridge["overlap_2022"])==3 and
+              all(x["agrees_at_original_sas_nearest_million"]
+                  for x in bridge["overlap_2022"]),
+              "M25_SAS_AIES_2022_ROUNDING_CROSSWALK_INCOMPLETE")
+        _must([x["2017_to_2024_nominal_cumulative_change_pct"]
+               for x in bridge["industry_series"]]==["38.65","43.48","40.93"],
+              "M25_TRUCKING_EIGHT_YEAR_SOURCE_VERSIONED_NOMINAL_REVENUE_WRONG")
+        _must(bridge["industry_series"][2]["2023_to_2024_aies_nominal_change_pct"]
+              =="0.69" and
+              bridge["2022_aies_was_not_a_separately_fielded_2022_survey"] is True,
+              "M25_2022_HISTORICAL_LEGACY_SAMPLE_FALSIFIED")
+        _must(bridge["real_ltl_freight_invoice_cases_observed"]==0 and
+              bridge["recoverable_freight_audit_market_usd"] is None and
+              bridge["human_pilot_18_independent_requirements_unmet"] is True,
+              "M25_EMPLOYER_REVENUE_MISREPRESENTED_AS_CUSTOMER_RECOVERIES")
+        bad_bridge=_read("research/SAS_AIES_CARRIER_BRIDGE_2017_2024_20261012.json")
+        bad_bridge["legacy_prebenchmark_2022_sas_can_substitute_for_revised_sas"]=True
+        _must(bool(validate_sas_aies_catalog(bad_bridge,as_of=today)),
+              "M25_OLD_SAS_VINTAGE_SILENTLY_PROMOTED_TO_LINKED_AIES_SOURCE")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -602,6 +631,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "sas_temporal_down_revised_2018_2022_source_cells":temporal["2018_2022_downward_revised_categories_years"],
                 "sas_temporal_three_industry_periods":temporal["unique_naics_year_vintage_comparisons"],
                 "sas_temporal_source_receipt_sha256":temporal["receipt_sha256"],
+                "sas_aies_2017_2024_bridge_industry_year_cells":bridge["distinct_industry_year_values"],
+                "sas_aies_2022_overlap_crosschecks":len(bridge["overlap_2022"]),
+                "sas_aies_2017_2024_ltl_nominal_change_pct":bridge["industry_series"][2]["2017_to_2024_nominal_cumulative_change_pct"],
+                "sas_aies_bridge_offline_not_new_original_replay":True,
+                "sas_aies_bridge_evidence_receipt_sha256":bridge["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
