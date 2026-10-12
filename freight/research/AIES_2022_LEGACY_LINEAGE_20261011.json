@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CENSUS_AIES_2022_HISTORICAL_PUBLISHER_ARCHIVE_NOT_A_NEW_2022_SURVEY",
+  "observed_on": "2026-10-11",
+  "source_url": "https://www2.census.gov/programs-surveys/aies/data/2024/API_Datasets/AIESTIMESERIES.zip",
+  "original_archive_size_bytes": 771290,
+  "original_archive_sha256": "1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4",
+  "original_data_member": "AIESTIMESERIES.dat",
+  "original_data_member_bytes": 6800762,
+  "original_data_member_sha256": "a8053af22913f1872a10a5d386a602d7a3bbecfdd4441727b8a70ecde4235648",
+  "original_data_field_count": 89,
+  "original_data_row_count": 23448,
+  "archive_members": [
+    "AIESTIMESERIES.dat",
+    "AIESTIMESERIES_FIELDS.txt",
+    "AIESTIMESERIES_README.txt"
+  ],
+  "publication_date": "2026-09-10",
+  "census_reference_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "source_methodology": "https://www2.census.gov/programs-surveys/aies/technical-documentation/methodology/2023-aies-methodology.pdf",
+  "source_historical_api_documentation": "https://www.census.gov/data/developers/data-sets/aiestimeseries.html",
+  "sample_linkage": "2022 is a backcast/linked historical observation with legacy survey benchmark, not an independently collected original 2022 AIES survey.",
+  "naics_source": "2017_NAICS",
+  "geographic_scope": "0100000US",
+  "population": "NATIONAL_US_ALL_ESTABLISHMENTS_TYPOP00_TAXSTAT00",
+  "revenue_metric": "RCPT_TOT_VAL_IN_THOUSANDS_OF_NOMINAL_US_DOLLARS",
+  "same_source_family": "SINGLE_2024_AIES_HISTORICAL_CENSUS_TIME_SERIES_NOT_THREE_INDEPENDENT_SURVEYS",
+  "observations": [
+    {
+      "year": 2022,
+      "naics": "484",
+      "revenue_thousand_usd": 423270958,
+      "published_cv_raw": "0"
+    },
+    {
+      "year": 2022,
+      "naics": "484121",
+      "revenue_thousand_usd": 172717339,
+      "published_cv_raw": "0"
+    },
+    {
+      "year": 2022,
+      "naics": "484122",
+      "revenue_thousand_usd": 65688461,
+      "published_cv_raw": "0"
+    },
+    {
+      "year": 2023,
+      "naics": "484",
+      "revenue_thousand_usd": 406651010,
+      "published_cv_raw": ".6"
+    },
+    {
+      "year": 2023,
+      "naics": "484121",
+      "revenue_thousand_usd": 163025116,
+      "published_cv_raw": "1.1"
+    },
+    {
+      "year": 2023,
+      "naics": "484122",
+      "revenue_thousand_usd": 64651167,
+      "published_cv_raw": ".9"
+    },
+    {
+      "year": 2024,
+      "naics": "484",
+      "revenue_thousand_usd": 402827246,
+      "published_cv_raw": ".6"
+    },
+    {
+      "year": 2024,
+      "naics": "484121",
+      "revenue_thousand_usd": 161329027,
+      "published_cv_raw": "1.1"
+    },
+    {
+      "year": 2024,
+      "naics": "484122",
+      "revenue_thousand_usd": 65096292,
+      "published_cv_raw": ".9"
+    }
+  ],
+  "legacy_sas_2022_series": "REVEF484122ALLEST",
+  "legacy_sas_2022_revenue_million_usd": 68411,
+  "legacy_sas_series_url": "https://fred.stlouisfed.org/data/REVEF484122ALLEST",
+  "benchmark_sas_2022_release_url": "https://www.census.gov/data/tables/2022/econ/services/sas-naics.html",
+  "benchmark_sas_2022_release_date": "2026-08-31",
+  "reconciliation_status": "PUBLISHED_AIES_HISTORICAL_2022_SOURCE_VERIFIED_BUT_LEGACY_SAS_VINTAGE_DIFFERENCE_NOT_FULLY_ADJUDICATED",
+  "raw_2022_aies_standalone_survey_collected": false,
+  "historical_2022_source_archive_aies_original_year_file_found": false,
+  "original_2022_sas_benchmark_source_rows_verified": false,
+  "legacy_2022_sas_interchangeable_with_2024_aies_timeseries": false,
+  "is_2022_published_cv_zero_proof_of_exact_population": false,
+  "calculated_sample_linking_factor_disclosed": false,
+  "cross_series_growth_or_2022_to_2024_cagr_certified": false,
+  "linked_2022_2024_change_is_invoice_error_rate": false,
+  "customer_paid_invoices_observed": 0,
+  "actual_recoveries_proven": false,
+  "recovery_tam_usd": null,
+  "commercial_marketing_allowed": false,
+  "real_customer_data_or_carrier_records_present": false,
+  "lab_count_modified": false,
+  "pilot_18_real_data_gates_satisfied": false
+}
