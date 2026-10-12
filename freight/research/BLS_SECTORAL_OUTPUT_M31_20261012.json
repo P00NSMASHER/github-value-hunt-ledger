@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_ORIGINAL_BLS_REAL_SECTORAL_OUTPUT_2017_2024_NOT_BEA_GROSS_OUTPUT",
+  "as_of": "2026-10-12",
+  "publisher": "U.S. Bureau of Labor Statistics",
+  "source_program": "Industry Productivity",
+  "source_api_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+  "source_api_request": {
+    "seriesid": [
+      "IPUIN484___T010000000",
+      "IPUIN4841__T010000000",
+      "IPUIN48412_T010000000"
+    ],
+    "startyear": "2017",
+    "endyear": "2024"
+  },
+  "source_grain": "ANNUAL_A01_NOT_SEASONALLY_ADJUSTED_2017_EQUALS_100",
+  "series": [
+    {
+      "naics": "484",
+      "native_bls_id": "IPUIN484___T010000000",
+      "industry": "Truck transportation",
+      "values_by_year": {
+        "2017": "100.000",
+        "2018": "102.374",
+        "2019": "101.979",
+        "2020": "103.475",
+        "2021": "109.162",
+        "2022": "107.218",
+        "2023": "102.502",
+        "2024": "104.019"
+      }
+    },
+    {
+      "naics": "4841",
+      "native_bls_id": "IPUIN4841__T010000000",
+      "industry": "General freight trucking",
+      "values_by_year": {
+        "2017": "100.000",
+        "2018": "102.964",
+        "2019": "102.079",
+        "2020": "105.327",
+        "2021": "111.081",
+        "2022": "108.932",
+        "2023": "104.238",
+        "2024": "105.912"
+      }
+    },
+    {
+      "naics": "48412",
+      "native_bls_id": "IPUIN48412_T010000000",
+      "industry": "General freight trucking, long-distance",
+      "values_by_year": {
+        "2017": "100.000",
+        "2018": "103.007",
+        "2019": "101.809",
+        "2020": "104.963",
+        "2021": "108.995",
+        "2022": "105.299",
+        "2023": "100.840",
+        "2024": "102.984"
+      }
+    }
+  ],
+  "initial_native_bls_v2_response_sha256": "3596212ab4c68346613a76bd62777550b83aac2f4251fea7371ba5e3077dfd6e",
+  "initial_native_bls_v2_response_bytes": 2340,
+  "initial_source_discovery_workflow": "https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/38286326777",
+  "original_bls_index2017_t100": true,
+  "direct_bls_monthly_ppi_three_source_evidence_m29": true,
+  "bls_original_sectoral_output_equals_official_bea_real_gross_output": false,
+  "bls_original_sectoral_output_equals_bea_gdp_value_added": false,
+  "bls_sectoral_output_removes_intra_industry_and_intra_sector_shipments": true,
+  "bls_real_sectoral_output_and_census_ppi_proxy_are_independent_survey_samples": false,
+  "compare_naics484_bls_real_sectoral_output_with_m29_illustrative_proxy_allowed_as_descriptive_contrast": true,
+  "difference_can_be_claimed_statistical_model_error": false,
+  "gross_output_original_bea_quantity_index_naics484_verified": false,
+  "bea_api_without_registration_key_result": "HTTP_200_API_ERROR_CODE_4_USERID_NOT_ACTIVE",
+  "bea_api_key_acquired": false,
+  "original_bls_xlsx_url": "https://www.bls.gov/productivity/tables/labor-productivity-detailed-industries.xlsx",
+  "original_bls_xlsx_direct_ci_status": "HTTP_403_FORBIDDEN",
+  "fred_style_ipu_aliases_valid_original_bls_api_ids": false,
+  "source_years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "industry_hierarchy": "484_CONTAINS_4841_WHICH_CONTAINS_48412;_48412_INCLUDES_484121_AND_484122_AND_CANNOT_SUBSTITUTE_FOR_EITHER",
+  "bls2017_2024_parent_real_sectoral_output_change_pct": "4.02",
+  "m29_2017_2024_parent_illustrative_ppi_deflated_census_revenue_change_pct": "1.18",
+  "bls_minus_m29_parent_percentage_points": "2.84",
+  "all_subindustry_comparisons_are_not_tl_or_ltl_exact_match": true,
+  "publisher_vintage_revisions_should_not_be_silently_backfilled": true,
+  "direct_bea_real_output_competitor_validation_completed": false,
+  "official_real_output_can_be_promoted_from_ppi_proxy": false,
+  "real_customer_paid_ltl_invoices_observed": 0,
+  "original_customer_rate_contracts_audited": 0,
+  "independently_adjudicated_ltl_billing_errors": 0,
+  "recoverable_market_tam_usd": null,
+  "actual_cash_refunds_received_usd": null,
+  "buyers_with_verified_interest": 0,
+  "external_public_marketing_claims_allowed": false,
+  "private_customer_records_imported": false,
+  "pilot_18_independent_authorizations_satisfied": false,
+  "scheduled_tasks_modified": false,
+  "new_lab_created": false,
+  "source_caveat": "The Bureau of Labor Statistics Industry Productivity real sectoral-output measure is an official first-party annual quantity index at 2017=100 for NAICS 484, 4841 and 48412. Industry sectoral output removes intrabusiness or intra-industry shipments to avoid double counting and differs from BEA real gross output, GDP/value added, and shipment tonnage. The BLS 484 index rises by about 4.02 percent from 2017 to 2024, versus an illustrative 1.18 percent Census nominal-employer-revenue deflation based on BLS annual-average net-output PPI. Their 2.84-percentage-point difference is a descriptive method/population comparison, NOT a validated model error, confidence interval, independent randomized survey result, customer freight demand indicator, freight invoice error rate, or recoverable refund market. The 4841 and 48412 subindustry indices overlap the parent and cannot be added; the 48412 combined long-distance trucking index does NOT separately measure truckload 484121 or LTL 484122. BEA GDP/value added is different from gross output, and the original BEA 484 gross-output quantity time series remains unverified. The BEA API requires an active user key and the BLS bulk XLSX returned HTTP 403 in this CI environment; neither access outcome proves that published series are missing. No customer invoice, carrier contract, approved recovery, buyer demand or cash proceeds were observed. All 18 genuine real-customer pilot requirements remain unapproved."
+}
