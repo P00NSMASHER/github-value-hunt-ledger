@@ -329,7 +329,7 @@ def report_shell(*,as_of:date)->dict:
         "2017_to_2024_bls_parent_ppi_change_pct":price,
         "2017_to_2024_illustrative_adjusted_revenue_proxy_pct":adjusted,
         "direct_original_bls_source_authenticated_in_current_run":False,
-        "historic_fred_http_attempts_in_m27_were_blocked":True,
+        "historic_m27_fred_http_attempts_in_m27_were_blocked":True,
         "historic_m27_fred_provisional_status_unchanged":True,
         "ppi_source_series_is_not_an_invoice_market_survey":True,
         "index_adjustment_is_not_official_real_freight_output":True,
