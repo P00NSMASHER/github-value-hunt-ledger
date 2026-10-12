@@ -87,6 +87,10 @@ from freight.research_bea_measurement_gate import (
     report_shell as build_bea_measure_gate,
     render_html as render_bea_measure_html,
 )
+from freight.research_bls_sectoral_output_m31 import (
+    report_shell as build_bls_sectoral_output_m31,
+    render_html as render_bls_sectoral_output_m31,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -159,6 +163,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bls_native_parent_484_origin"]=build_bls_native_parent(as_of=date.today())
         result["bls_unified_current_evidence"]=build_unified_bls(as_of=date.today())
         result["bea_measure_compatibility_gate"]=build_bea_measure_gate(as_of=date.today())
+        result["bls_real_sectoral_output_m31"]=build_bls_sectoral_output_m31(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -218,6 +223,7 @@ def render(data: dict) -> str:
     native=data["bls_native_parent_484_origin"]
     unified=data["bls_unified_current_evidence"]
     bea_measure=data["bea_measure_compatibility_gate"]
+    sectoral_output=data["bls_real_sectoral_output_m31"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -436,6 +442,23 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
+<section class="panel"><h2>Original BLS real sectoral output — separate official index</h2>
+<p>Mission 31 established official BLS Industry Productivity native
+annual series for truck transportation NAICS 484, general freight 4841
+and long-distance general freight 48412. Those are non-additive
+nested industry categories. This OFFLINE Control Center snapshot
+does not freshly call BLS:
+<strong>"""+escape(sectoral_output["status"])+"""</strong>.</p>
+<p>2017–2024 REAL SECTORAL OUTPUT, parent NAICS 484:
+<strong>"""+escape(sectoral_output["aggregate_naics484_real_sectoral_output_2017_2024_pct"])+"""%</strong>.
+Mission 29 illustrative Census employer-revenue / BLS producer-PPI:
+<strong>"""+escape(sectoral_output["m29_aggregate_illustrative_census_ppi_revenue_proxy_2017_2024_pct"])+"""%</strong>.
+Their <strong>"""+escape(sectoral_output["bls_minus_ppi_proxy_descriptive_gap_percentage_points"])+""" percentage-point</strong>
+difference is NOT proven model error, real freight volumes, billing mistakes,
+cash recoveries or validated economic model accuracy. Sectoral output
+removes intra-industry shipments; it is not a BEA gross-output quantity index.
+Official BEA real gross output remains held pending original-source authentication.</p>
+<a href="bls_sectoral_output.html">Open BLS annual-sectoral-output evidence, source comparison and BEA limitations ↗</a></section>
 <section class="panel"><h2>BEA real gross-output validation — requires compatible original source</h2>
 <p>Mission 29 authenticates three original BLS producer-price indexes, but
 a Census-revenue divided by BLS-price proxy is not a published real
@@ -715,6 +738,13 @@ def main():
     )
     (args.out/"bea_measure_compatibility.html").write_text(
         render_bea_measure_html(data["bea_measure_compatibility_gate"]),encoding="utf-8"
+    )
+    (args.out/"bls_sectoral_output.json").write_text(
+        json.dumps(data["bls_real_sectoral_output_m31"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"bls_sectoral_output.html").write_text(
+        render_bls_sectoral_output_m31(data["bls_real_sectoral_output_m31"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
