@@ -128,6 +128,10 @@ def build_pack(payload):
             if row["attribution_state"] == "FREIGHT_RECOVERY_ORIGIN"
         ),
         "net_realized_cents": sum(row["net_realized_cents"] for row in findings),
+        "attributable_net_realized_cents": sum(
+            row["net_realized_cents"] for row in findings
+            if row["attribution_state"] == "FREIGHT_RECOVERY_ORIGIN"
+        ),
         "fee_eligible_realized_cents": sum(row["fee_eligible_realized_cents"] for row in findings),
         "suppressed_count": sum(row["attribution_state"] == "SUPPRESSED" for row in findings),
     }
@@ -147,6 +151,7 @@ def build_pack(payload):
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
             "positive_settlement_reference_is_unique": True,
+            "realized_attribution_excludes_suppressed_findings": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -169,7 +174,8 @@ def render_markdown(pack):
         f"- Review / rejected: **{t['review_count']} / {t['rejected_count']}**",
         f"- Candidate difference: **{money(t['candidate_difference_cents'])}** — not recovered cash",
         f"- Validated attributable difference: **{money(t['validated_difference_cents'])}** — not necessarily recovered",
-        f"- Net realized recovery: **{money(t['net_realized_cents'])}**",
+        f"- Observed net credits (all sources): **{money(t['net_realized_cents'])}**",
+        f"- Attributable net realized recovery: **{money(t['attributable_net_realized_cents'])}**",
         f"- Fee-eligible realized recovery: **{money(t['fee_eligible_realized_cents'])}**",
         f"- Suppressed from Freight Recovery attribution: **{t['suppressed_count']} finding(s)**", "",
         "## Finding evidence", ""
@@ -202,7 +208,8 @@ def render_markdown(pack):
         "7. Settled credit cannot exceed the candidate invoice difference.",
         "8. One positive settlement reference can support only one finding in this pack.",
         "9. A validated supported finding requires at least one supporting-evidence reference.",
-        "10. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "10. Credits tied to suppressed findings remain visible for reconciliation but are excluded from attributed recovery.",
+        "11. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
