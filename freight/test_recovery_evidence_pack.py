@@ -18,6 +18,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     totals = pack["totals"]
     assert totals["candidate_difference_cents"] == 28500
     assert totals["validated_difference_cents"] == 19500
+    assert totals["observed_net_settlement_cents"] == 18500
     assert totals["net_realized_cents"] == 18500
     assert totals["fee_eligible_realized_cents"] == 18500
     assert totals["suppressed_count"] == 2
@@ -30,6 +31,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
+    assert pack["claim_boundary"]["buyer_visible_realized_excludes_suppressed_findings"] is True
 
 
 @pytest.mark.parametrize(
@@ -200,3 +202,27 @@ def test_unsupported_money_cannot_become_fee_eligible():
     pack = build_pack(data)
     assert pack["findings"][0]["attribution_state"] == "SUPPRESSED"
     assert pack["findings"][0]["fee_eligible_realized_cents"] == 0
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("reviewer_disposition", "REJECTED"),
+        ("confidence", "INSUFFICIENT"),
+        ("incumbent_known", True),
+        ("automatic_credit", True),
+        ("preexisting_claim", True),
+        ("duplicate_opportunity", True),
+    ),
+)
+def test_suppressed_money_cannot_inflate_buyer_visible_realized_recovery(field, value):
+    data = payload()
+    data["findings"][0][field] = value
+    pack = build_pack(data)
+    assert pack["findings"][0]["net_realized_cents"] == 12500
+    assert pack["findings"][0]["attribution_state"] == "SUPPRESSED"
+    assert pack["totals"]["observed_net_settlement_cents"] == 18500
+    assert pack["totals"]["net_realized_cents"] == 6000
+    report = render_markdown(pack)
+    assert "Observed net settlement across all findings: **$185.00**" in report
+    assert "Attributable net realized recovery: **$60.00**" in report
