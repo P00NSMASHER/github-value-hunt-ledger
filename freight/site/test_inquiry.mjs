@@ -1,4 +1,6 @@
 import test from "node:test";
+import {readFileSync} from "node:fs";
+import {runInNewContext} from "node:vm";
 import assert from "node:assert/strict";
 import {normalize, validOrigin, notificationText, onRequestPost, onRequestGet} from "../../functions/api/inquiry.js";
 
@@ -263,4 +265,78 @@ test("email notification is a plain-text contact summary, not an invoice package
   const s=notificationText("RA-20261008-ABCDEF12",normalize(good()));
   assert.match(s,/Contact request only/);
   assert.doesNotMatch(s,/<html>|attachment/);
+});
+
+function runMarketingNavigationFixture(pageUrl, hrefs) {
+  const links = hrefs.map(({href, download = false}) => ({
+    href,
+    download,
+    getAttribute(name) {return name === "href" ? this.href : null;},
+    setAttribute(name, value) {if (name === "href") this.href = value;},
+    hasAttribute(name) {return name === "download" && this.download;}
+  }));
+  const dispatches = [], dataLayer = [];
+  const browser = {
+    location: new URL(pageUrl), dataLayer,
+    dispatchEvent(event) {dispatches.push(event.detail);}
+  };
+  const document = {
+    getElementById() {return null;},
+    querySelectorAll(selector) {return selector === "a[href]" ? links : [];},
+    body: {classList: {contains() {return false;}}}
+  };
+  const script = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  runInNewContext(script, {
+    URL, URLSearchParams, window: browser, document,
+    CustomEvent: class {constructor(_type, options) {this.detail = options.detail;}}
+  }, {filename: "site.js", timeout: 2000});
+  return {links, dataLayer, dispatches};
+}
+
+test("retally campaign navigation keeps UTM tags through internal CTA without leaking offsite", () => {
+  const campaign = "utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct14_evidence";
+  const hrefs = [
+    {href: "./#start-audit"},
+    {href: "freight-audit-pricing.html?view=details#pricing"},
+    {href: "https://www.retallyrecovery.com/about?utm_source=prior"},
+    {href: "#methodology"},
+    {href: "mailto:jay@retallyrecovery.com"},
+    {href: "https://example.com/audit"},
+    {href: "//evil.example/audit"},
+    {href: "assets/synthetic-pilot-demo.zip"},
+    {href: "private.csv", download: true},
+    {href: "javascript:void(0)"}
+  ];
+  const {links, dataLayer, dispatches} = runMarketingNavigationFixture(
+    "https://www.retallyrecovery.com/freight-audit-methodology?" + campaign, hrefs
+  );
+  const audit = new URL(links[0].href);
+  assert.equal(audit.pathname, "/");
+  assert.equal(audit.hash, "#start-audit");
+  assert.equal(audit.searchParams.get("utm_source"), "facebook");
+  assert.equal(audit.searchParams.get("utm_medium"), "organic_social");
+  assert.equal(audit.searchParams.get("utm_campaign"), "retally_oct2026_launch");
+  assert.equal(audit.searchParams.get("utm_content"), "oct14_evidence");
+  const pricing = new URL(links[1].href);
+  assert.equal(pricing.searchParams.get("view"), "details");
+  assert.equal(pricing.hash, "#pricing");
+  assert.equal(pricing.searchParams.get("utm_content"), "oct14_evidence");
+  const existing = new URL(links[2].href);
+  assert.equal(existing.searchParams.get("utm_source"), "prior");
+  assert.equal(existing.searchParams.get("utm_campaign"), "retally_oct2026_launch");
+  for (let i = 3; i < links.length; i++) {
+    assert.equal(links[i].href, hrefs[i].href, "Must not rewrite nonpage/offsite link " + i);
+  }
+  assert.equal(dataLayer[0].event, "freight_landing_page_viewed");
+  assert.equal(dataLayer[0].utm_content, "oct14_evidence");
+  assert.equal(dispatches[0].properties.utm_source, "facebook");
+});
+
+test("retally campaign navigation leaves direct and untagged traffic unchanged", () => {
+  const original = "./#start-audit";
+  const {links, dataLayer} = runMarketingNavigationFixture(
+    "https://www.retallyrecovery.com/freight-audit-pricing", [{href: original}]
+  );
+  assert.equal(links[0].href, original);
+  assert.equal(dataLayer[0].utm_source, undefined);
 });

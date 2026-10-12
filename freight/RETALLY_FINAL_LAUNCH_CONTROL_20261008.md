@@ -1,5 +1,27 @@
 # RETALLY | Final Commercial Launch Control Memorandum
 
+## October 12 execution: first-customer operational rehearsal
+
+**The authoritative launch tracker remains [Issue #323](https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/323). This section supersedes stale October 8 observations below; it does not grant production approval.**
+
+- Reconciled this same draft PR #329 with main `c65aa50e22f332cd9a2f564a18c3c8985e0693dc`. Preserved main's unsent-email/recipient/edit/mobile controls, provider and retention safeguards, original approved assets, attribution and duplicate controls, and later detention review. Two website conflicts resolved. No main change or automatic merge.
+- Reused existing #317/#326 proof-bound fee and Boolean consent safeguards instead of opening another PR. New fail-closed repairs reject nonboolean source permissions/secret flags, Boolean retention days and silently rounded contractual rates. Nineteen failing rate/source regressions reproduced before repair; repaired tests pass.
+- Eight fictional USD LTL invoices execute existing audit, review, claims, credits, reversal, report and 30% fee modules. Results: $725 candidates; $325 supported; $300 posted credits; $25 reversal; $275 observed net; $200 incumbent exclusion; $75 eligible; $22.50 nonbillable sample fee. A previously invoiced $30 fee requires a $7.50 fee credit. Reimport/restart preserves the snapshot and exact fee record. No real send, posting or invoice.
+- Added the bounded first-customer fixture/CLI to the existing `synthetic_rehearsal.py` and existing Freight CI. The inherited optional fixed-fee Charter is explicitly a synthetic mechanical authorization fixture; it does not certify an actual free-audit-to-contingency authority route.
+- Updated the existing `commercial/first_customer_acceptance_m2g.json`: **20 PASS / 1 FAIL / 16 BLOCKED**, with evidence, tests, corrected defects and owner action for 37 requirements, plus all 15 stage decisions. The original actual-customer gate requirements stay pending. No new tracker/system/lab.
+- Finished eight customer/operating templates in `freight/brand/`: welcome/checklist, secure submission, agreement for legal review, action authorization, communications, reconciliation, fee invoice/credit and closure/retention. Binding fields are not invented or signed.
+- Verified 1,406 Freight tests, 18 prototype tests, 17 inquiry tests, 166 overlapping operations tests, 17 separate laboratory tests and all 14 lab callsites. Separate existing production suites: FMC 94, hospital 9, TIC 17, URDB 6. Initial global pytest collection failures were missing CI dependencies and flat module-name collisions; scoped established commands passed. Historical 26 laboratory findings remain OPEN_UNVERIFIED.
+- Live public auditor: 26 pages, approved PNG bytes, canonical HTTPS redirects and HSTS/nosniff/CSP PASS; inquiry GET 503 online=false. Cloudflare flags 0, no send token, sender 2036 Unauthorized, Access not enabled, D1 0 inquiries. Drive owner-only with one manual policy and no customer files. No fresh visitor-send/Zoho-receipt/human-reply proof.
+- M8 is unpublished. Actual read-only database inspection confirms receipt role INSERT/TRUNCATE grants and no verified admission/erasure controls; payment events 0. The earlier blocked database migration was **not retried or bypassed**. Hosted financial posting remains NO-GO.
+- PA worksheet NOT SUBMITTED and operating agreement UNSIGNED; legal certificate/insurance unverified. The older public $1,650 sample gap stays disclosed and unallocated; the new fictional engagement is separately and completely reconciled.
+
+**Decision:** Public information GO. Non-sensitive manual inquiry and prepared operator documents CONDITIONAL GO. Paying customer, confidential intake, actual carrier claims, fee invoices and hosted financial posting NO-GO until real legal/customer/MFA/reviewer/posted-evidence and scoped release approvals are accepted. Automated Cloudflare intake is optional for a manual pilot and stays OFF. The draft remains unmerged.
+
+Owner order: verified legal party and counsel-reviewed terms/insurance; qualified analyst + independent reviewer/cost cap; buyer-specific signed scope/MFA/private manual workspace; actual phone-to-Zoho reply test; review exact #329 release; specific action authority and actual posting/billing/retention evidence at the relevant stages.
+
+
+## Historical October 8 register
+
 **Evidence date:** 2026-10-08. **Decision authority:** Business owner, buyer-specific authorized reviewers and appropriately qualified counsel. **Status: LIMITED MARKETING READINESS; NO-GO for confidential customer intake, carrier recovery and recovery-fee invoicing.**
 
 **This is the authoritative release-decision register.** The companion `RETALLY_FINAL_LAUNCH_HANDOFF_20261008.md` supplies operator context but does not independently authorize customer activity. Final decision evidence and GO/NO-GO gates in this file take precedence over stale draft assumptions. Reuse this existing source and release candidate, not additional laboratories, CRMs, questionnaires, parallel release branches or automatic customer-payment systems. Update evidence here when an independent owner actually closes a gate. Repository CI and synthetically rehashed evidence cannot certify external signatures, bank postings, legal registration or customer outcomes.

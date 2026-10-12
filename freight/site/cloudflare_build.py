@@ -12,7 +12,8 @@ import tempfile
 
 from freight.site.build import PUBLIC_FILES as FREIGHT_PUBLIC_FILES, build as build_freight
 from freight.site.rebase_public_urls import OLD_BASE, rebase, validate_cloudflare_seo
-from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, build as build_recoveryos
+from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, SITE_DIR as RECOVERY_SOURCE, build as build_recoveryos
+from freight.site.asset_integrity import validate_recoveryos_media
 
 REPO = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO / "cf-retally-public"
@@ -69,6 +70,7 @@ def build(output: Path = OUTPUT_DIR) -> Path:
         allow_verified_pages_inquiry(bundle)
         os.environ["RECOVERYOS_CONTACT_EMAIL"] = contact
         os.environ["RECOVERYOS_CONTACT_VERIFIED"] = "1"
+        validate_recoveryos_media(RECOVERY_SOURCE)
         build_recoveryos(root / "recoveryos")
         shutil.copytree(root / "recoveryos", bundle / "recoveryos")
         rewrites = rebase(bundle)

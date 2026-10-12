@@ -33,3 +33,11 @@ def test_fee_eligible_cannot_exceed_net():
     p["fee_eligible_recovered_cents"]=p["net_recovered_cents"]+1
     with pytest.raises(ValueError, match="fee-eligible"):
         validate(p)
+
+def test_gross_recovery_cannot_exceed_approved_claim_value():
+    p=payload()
+    p["gross_recovered_cents"]=p["approved_claim_cents"]+1
+    p["net_recovered_cents"]=p["gross_recovered_cents"]-p["reversal_cents"]
+    p["fee_eligible_recovered_cents"]=p["net_recovered_cents"]
+    with pytest.raises(ValueError, match="gross recovered cannot exceed approved claim value"):
+        validate(p)

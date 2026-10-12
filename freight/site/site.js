@@ -20,6 +20,31 @@
     Object.fromEntries(Object.entries(campaignContext).filter(([, value]) => value))
   );
 
+  // Preserve acquisition attribution when a visitor follows a first-party
+  // educational-page link to the free-audit form. Never tag offsite links or
+  // downloads, and never overwrite a destination's existing campaign value.
+  if (Object.keys(nonEmptyCampaignContext).length) {
+    for (const anchor of all("a[href]")) {
+      if (anchor.hasAttribute("download")) continue;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#")) continue;
+      let target;
+      try { target = new URL(href, window.location.href); }
+      catch (_error) { continue; }
+      if (target.origin !== window.location.origin ||
+          !["http:", "https:"].includes(target.protocol) ||
+          /\.(?:pdf|zip|csv|xlsx?|png|jpe?g|gif|webp|svg|js|css)$/i.test(target.pathname)) continue;
+      let updated = false;
+      for (const [key, value] of Object.entries(nonEmptyCampaignContext)) {
+        if (!target.searchParams.has(key)) {
+          target.searchParams.set(key, value);
+          updated = true;
+        }
+      }
+      if (updated) anchor.setAttribute("href", target.href);
+    }
+  }
+
   const EVENTS = Object.freeze({
     landingPageViewed: "freight_landing_page_viewed",
     freeAuditCtaClicked: "freight_free_audit_cta_clicked",
@@ -48,7 +73,7 @@
     });
     window.dispatchEvent(new CustomEvent("freight:analytics", { detail }));
     if (Array.isArray(window.dataLayer)) {
-      window.dataLayer.push({ event: eventName, ...properties });
+      window.dataLayer.push({ event: eventName, ...nonEmptyCampaignContext, ...properties });
     }
   };
 
@@ -250,23 +275,46 @@
       }
       const reference = makeReference();
       preparedSummary = buildSummary(reference);
-      const recipient = byId("auditRecipientAddress");
-      if (recipient) recipient.textContent = contactEmail;
       const subject = encodeURIComponent("Free Recovery Audit Request — " + fieldValue("companyName") + " — " + reference);
       const body = encodeURIComponent(preparedSummary);
       sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
       sendLink.removeAttribute("aria-disabled");
+      const recipient = byId("auditRecipient");
+      if (recipient) {
+        recipient.href = `mailto:${contactEmail}`;
+        recipient.textContent = contactEmail;
+      }
       auditForm.hidden = true;
       const ready = byId("auditReady");
       ready.hidden = false;
       ready.focus({ preventScroll: true });
       ready.scrollIntoView({ block: "center", behavior: "smooth" });
-      track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "email_draft" });
-      track(EVENTS.auditRequestPrepared, { reference });
+      // An email draft is not a received lead. Only durable D1 acceptance may
+      // emit the form-completed conversion event.
+      track(EVENTS.auditRequestPrepared, { reference, deliveryConfirmed: false });
       // Keep the mail app handoff inside the visitor's click/submit gesture.
       // Mobile browsers may suppress deferred mailto navigation.
       window.location.href = sendLink.href;
     };
+
+    byId("editAuditRequest")?.addEventListener("click", () => {
+      // Keep the visitor's inputs when their email app did not open, or when
+      // they notice an error in the prepared draft. Nothing was submitted.
+      preparedSummary = "";
+      const ready = byId("auditReady");
+      if (ready) ready.hidden = true;
+      auditForm.hidden = false;
+      const sendLink = byId("sendAuditRequest");
+      if (sendLink) {
+        sendLink.href = "#contact-pending";
+        sendLink.setAttribute("aria-disabled", "true");
+      }
+      const copyStatus = byId("copyStatus");
+      if (copyStatus) copyStatus.textContent = "";
+      setError("");
+      byId("fullName")?.focus({ preventScroll: true });
+      auditForm.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
 
     fallbackLink?.addEventListener("click", (event) => {
       event.preventDefault();
@@ -326,8 +374,14 @@
         ready.querySelector("h3").textContent = "RETALLY has received your request.";
         ready.querySelector("p:not(.eyebrow)").textContent = "Reference " + result.reference +
           ". No freight files were submitted. We will review the business details you provided.";
-        byId("sendAuditRequest").hidden = true;
-        byId("copyAuditSummary").hidden = true;
+        // A durable receipt replaces the draft-email workflow. Keeping the
+        // manual fallback visible here could prompt duplicate requests.
+        for (const id of ["sendAuditRequest", "editAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]) {
+          const emailOnly = byId(id);
+          if (emailOnly) emailOnly.hidden = true;
+        }
+        const fallbackInstructions = ready.querySelector(".audit-manual-fallback");
+        if (fallbackInstructions) fallbackInstructions.hidden = true;
         ready.hidden = false;
         ready.focus({ preventScroll: true });
         ready.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -359,6 +413,18 @@
         output.textContent = "Request details copied.";
       } catch (_error) {
         output.textContent = "Copy was unavailable. Use the prepared email instead.";
+      }
+    });
+
+    byId("copyAuditEmail")?.addEventListener("click", async () => {
+      const output = byId("copyStatus");
+      const email = byId("auditRecipient")?.textContent || "";
+      if (!email || !output) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        output.textContent = "Recipient email address copied.";
+      } catch (_error) {
+        output.textContent = "Copy was unavailable. Select the visible email address instead.";
       }
     });
   }

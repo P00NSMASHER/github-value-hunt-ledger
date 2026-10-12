@@ -1,0 +1,225 @@
+{
+  "report_version": 1,
+  "observation_date": "2026-10-11",
+  "timezone": "America/New_York",
+  "evidence_method": "read_only_public_browser_direct_image_view",
+  "browser_mobile_viewport_px": 390,
+  "observation_source": "Browser Use public-web direct visual QA, eleven exact static.metricool.com/planner URLs; no login",
+  "frozen_baseline_path": "freight/brand/social/performance/baselines/retally-2026-10-11.json",
+  "frozen_baseline_git_blob_sha": "b9d8047bcc0ccbaee9f2bfbf7ad76b9ed979c4ee",
+  "campaign_active_posts_examined": 13,
+  "unique_media_examined": 11,
+  "conclusions": {
+    "public_browser_display": "11/11 unique campaign assets visually loaded",
+    "mobile_cropping": "No image clipping or horizontal overflow observed at 390px",
+    "mobile_readability": "Main headings/text readable; small supporting or footer text may be difficult to read",
+    "image_bytes_checksum_verified": false,
+    "platform_publication_verified": false,
+    "notes": "One browser vantage point only; not a provider/Meta accepted-post receipt or full binary-integrity audit."
+  },
+  "assets": [
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-14283620392379791152.jpeg",
+      "stable_post_uuids": [
+        "-7129364071318205444",
+        "6484508306152771452"
+      ],
+      "networks": [
+        "facebook",
+        "instagram"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-16571506407541194756.jpeg",
+      "stable_post_uuids": [
+        "4515744888515085769"
+      ],
+      "networks": [
+        "facebook"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-17052938774463846946.jpeg",
+      "stable_post_uuids": [
+        "-9123081960720741284"
+      ],
+      "networks": [
+        "facebook"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-1778982742354561434.jpeg",
+      "stable_post_uuids": [
+        "-5093396272539350040"
+      ],
+      "networks": [
+        "instagram"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-2631313547745864893.jpeg",
+      "stable_post_uuids": [
+        "4856530522462570826"
+      ],
+      "networks": [
+        "instagram"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-2670847225706553496.png",
+      "stable_post_uuids": [
+        "2381321643741103769"
+      ],
+      "networks": [
+        "facebook"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-530205963497938536.png",
+      "stable_post_uuids": [
+        "7206690026091331851"
+      ],
+      "networks": [
+        "facebook"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-8451161266632424220.jpeg",
+      "stable_post_uuids": [
+        "-8389132711185331174"
+      ],
+      "networks": [
+        "facebook"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-8910111593678733120.jpeg",
+      "stable_post_uuids": [
+        "-7860495589122225702",
+        "-1816987399007942347"
+      ],
+      "networks": [
+        "instagram",
+        "facebook"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-9714268420423041954.png",
+      "stable_post_uuids": [
+        "2593190408975893039"
+      ],
+      "networks": [
+        "instagram"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    },
+    {
+      "url": "https://static.metricool.com/planner/202610/7322512-file-9901621924668583582.jpeg",
+      "stable_post_uuids": [
+        "-6636811547176385895"
+      ],
+      "networks": [
+        "instagram"
+      ],
+      "natural_width_px": 1080,
+      "natural_height_px": 1350,
+      "public_browser_loaded": true,
+      "mobile_crop_observed": false,
+      "main_text_readable": true,
+      "small_text_note": "Some smaller supporting or footer text is small at 390px; not assessed as a launch blocker",
+      "browser_visual_status": "PASS",
+      "checksum_verified": false,
+      "provider_publication_status": "NOT_VERIFIED"
+    }
+  ],
+  "protected_drafts_note": "The four November Facebook/Instagram carousels and unrelated LinkedIn/YouTube drafts were not included in this image review or authorized for publication."
+}

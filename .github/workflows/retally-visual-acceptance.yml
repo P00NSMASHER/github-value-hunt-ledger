@@ -61,6 +61,8 @@ jobs:
         run: python after/freight/site/visual_acceptance.py --site bundle-before --out evidence/before
       - name: Capture and validate 35 candidate screenshots at five widths
         run: python after/freight/site/visual_acceptance.py --site bundle-after --out evidence/after --fail-on-issues
+      - name: Verify isolated durable receipt never invites duplicate email
+        run: python after/freight/site/online_receipt_acceptance.py --site bundle-after --out evidence/after
       - name: Install pinned accessibility rules
         if: github.head_ref == 'audit/retally-visual-acceptance-20261008' || github.ref_name == 'audit/retally-visual-acceptance-20261008'
         run: npm install --no-save --ignore-scripts --prefix qa_node axe-core@4.10.3

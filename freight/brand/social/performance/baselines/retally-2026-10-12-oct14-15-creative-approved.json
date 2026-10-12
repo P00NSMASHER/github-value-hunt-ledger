@@ -1,0 +1,518 @@
+{
+  "note": "Approved creative schedule snapshot, October 12, 2026, after exact Oct14 Facebook and Oct15 Instagram image/alt replacements. Preserves planner provider statuses from historical snapshots (not current Meta publication state). The originally frozen Oct11 and previous Oct12 snapshot remain unchanged.",
+  "brand": "RETALLY",
+  "planner_brand_id": "7322512",
+  "data": [
+    {
+      "uuid": "-7860495589122225702",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-13T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black illustration explaining freight overcharge reviews in four steps: review invoices; check rates and shipment records; find billing errors; help pursue authorized recovery. Glossy black truck at a container port with an emerald network globe and raised glass step cards. Initial audit $0 upfront for agreed eligible scope."
+      ],
+      "text": "An invoice total can be right. The freight charge can still be wrong.\n\nHere's what deserves a second look:\n01 / Which rate actually governed the shipment?\n02 / What service can the records prove?\n03 / What was already corrected or credited?\n\nA flag isn't a finding. A finding isn't a refund.\n\nRETALLY keeps those stages separate—because the evidence matters more than a flashy savings estimate.\n\nSave this framework for your next invoice review. Learn more through the link in our bio.\n\nPlease don't send invoices or private rate agreements in DMs.\n\n#RETALLY #FreightAudit #LogisticsFinance",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": true
+      }
+    },
+    {
+      "uuid": "-7129364071318205444",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-14T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black freight audit graphic. Headline: 'Already have a freight auditor? We check what's still unresolved.' Three glowing panels: Review prior findings; Check credits & corrections; Identify issues still open. A dark green truck at a port. 'Find it. Prove it. Recover it.' $0 upfront initial audit for agreed eligible scope."
+      ],
+      "text": "Already have a freight auditor? That's not a problem. It's the starting point.\n\nA useful second look should find what's still unresolved—not take credit for somebody else's work.\n\nBefore calling an invoice issue \"new,\" reconcile:\n• Previous audit findings\n• Carrier corrections and automatic credits\n• Open disputes and approved claims\n• Rebill chains for the same shipment\n\nOnly a supported, unaddressed discrepancy belongs in the next conversation.\n\nRETALLY offers a $0-upfront initial Second-Look Recovery Audit for agreed eligible scope. Recovery work is separately authorized in writing; outcomes are not guaranteed.\n\nExplore the second-look process:\nhttps://www.retallyrecovery.com/second-look-freight-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=independent_second_look\n\n#FreightAudit #AccountsPayable",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "6484508306152771452",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-15T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium black-and-emerald freight billing graphic. Headline: 'TWO INVOICES. ONE SHIPMENT. NOT ALWAYS A DUPLICATE.' Explains that a corrected bill or credit can explain a second invoice, with three glowing cards: Match the shipment; Check corrected bills; Reconcile credits. Dark tractor-trailer at a port and reminder to investigate before claiming an overcharge."
+      ],
+      "text": "TWO INVOICES. ONE SHIPMENT.\n\nIs that duplicate billing?\n\nNot necessarily.\n\nA corrected invoice, credit-and-rebill, or replacement bill can look like a duplicate until you trace the actual charges and credits.\n\nBefore flagging it:\n01 / Match the shipment or PRO number\n02 / Check original versus corrected bills\n03 / Reconcile payments and credit memos\n\nA suspicious pattern isn't automatically an overpayment. An overpayment isn't automatically a recovery.\n\nSave this checklist for your next freight AP review. More through the link in our bio.\n\n#RETALLY #FreightAudit #AccountsPayable",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": true
+      }
+    },
+    {
+      "uuid": "-9123081960720741284",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-16T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17052938774463846946.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY evidence-first freight audit methodology, showing the billed charge, controlling rate authority, shipment and service record, and credit disposition."
+      ],
+      "text": "What should you get from a freight audit?\n\nNot just a spreadsheet of \"possible savings.\" A finding you can trace back to the records.\n\nRETALLY's process:\n01 / Agree on scope and a secure intake route.\n02 / Check billed charges against governing rates, shipment evidence and prior credits.\n03 / Review documented findings before separately authorizing recovery work.\n\nThe initial audit has a $0 upfront fee for agreed eligible scope. Recovery fees apply to eligible funds actually recovered under written terms; results aren't guaranteed.\n\nSee the process:\nhttps://www.retallyrecovery.com/?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct16_process#start-audit\n\n#FreightAudit #LogisticsFinance",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "4515744888515085769",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-19T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16571506407541194756.jpeg"
+      ],
+      "mediaAltText": [
+        "Four-step RETALLY evidence ledger: flagged variance, supported finding, separately customer-authorized action, and actual funds or credits received."
+      ],
+      "text": "The invoice is in AP. The rate agreement is in procurement. The proof of service is in logistics. The credit is in finance.\n\nSee the problem?\n\nA credible freight recovery finding has to connect the whole chain—not just flag a row in a spreadsheet.\n\nThat's why RETALLY separates four things:\n01 / Potential discrepancy\n02 / Evidence-backed finding\n03 / Customer-authorized recovery effort\n04 / Funds or credits actually received\n\nWhere does your team's freight review get stuck most often: rates, shipment evidence, or credits?\n\nOur evidence standard:\nhttps://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=evidence_chain_controls\n\n#TransportationFinance #FreightAudit",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "4856530522462570826",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-19T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2631313547745864893.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY's freight audit methodology: charge, controlling rate authority, shipment/service evidence and final disposition with credits."
+      ],
+      "text": "Found a suspicious freight charge. What happens next?\n\nNot an automatic claim.\n\n01 / Agree on the audit scope and how records will be shared.\n02 / Compare invoices with the applicable rates, service evidence and any existing credits.\n03 / Review the findings before deciding whether to authorize recovery.\n\nThat's the difference between spotting a pattern and making a supportable decision.\n\nRETALLY's initial audit is $0 upfront for agreed eligible scope. Recovery work requires separate written authorization; fees depend on eligible funds actually recovered. No outcome is guaranteed.\n\nSee how it works through the link in our bio.\n\n#RETALLY #FreightRecovery #LogisticsFinance",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": true
+      }
+    },
+    {
+      "uuid": "-1816987399007942347",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-12T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black illustration: 'We find freight overcharges.' Four steps show reviewing invoices, checking rates and shipment records, finding billing errors, and helping recover overcharges. A clean dark freight truck and port backdrop, network globe and subtle 3D glass panels. Initial audit $0 upfront for agreed eligible scope."
+      ],
+      "text": "Your freight invoice can add up perfectly—and still be wrong.\n\nThe real question: Does the charge match the agreed rate and the service that actually happened?\n\nThat's the RETALLY approach:\n01 / Check the invoice\n02 / Verify the governing rate terms\n03 / Match the shipment evidence\n04 / Reconcile existing credits\n\nFind the discrepancy. Prove it with records. Don't call it a recovery until eligible funds or credits are received.\n\nInitial audit: $0 upfront for agreed eligible scope. Recovery work requires separate written authorization; outcomes aren't guaranteed.\n\nExplore our approach:\nhttps://www.retallyrecovery.com/freight-audit-methodology?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=brand_methodology_intro\n\n#FreightAudit #TransportationFinance",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-8389132711185331174",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-21T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-8451161266632424220.jpeg"
+      ],
+      "mediaAltText": [
+        "Branded RETALLY illustrative freight detention audit: gate record 08:30 to 11:00, 150 minutes on site, hypothetical 120 free minutes, 30 minutes excess; invoice bills 90, a 60-minute candidate discrepancy. Not an actual customer result."
+      ],
+      "text": "90 minutes billed. 30 minutes beyond free time. Where did the other 60 come from?\n\nILLUSTRATIVE EXAMPLE — NOT A CUSTOMER RESULT.\n\nImagine a gate log showing 08:30 arrival and 11:00 departure: 150 minutes on site.\n\nIf the applicable signed agreement allows 120 free minutes from arrival, with no exceptions, that leaves 30 minutes beyond the free period. An invoice billing 90 detention minutes raises a 60-minute question.\n\nNot a proven error. Not a refund.\n\nFirst verify appointment terms, the actual detention trigger, rate-effective dates, minimums, corrected invoices and credits.\n\nHow RETALLY reviews accessorials:\nhttps://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=illustrative_detention_review\n\n#FreightAudit #DetentionCharges",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-6636811547176385895",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-21T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9901621924668583582.jpeg"
+      ],
+      "mediaAltText": [
+        "Clearly labeled illustrative detention review. Gate record 08:30–11:00 is 150 minutes on site; 120 hypothetical free minutes leave 30 beyond free time versus 90 minutes billed. The 60-minute difference is only a candidate, not a realized recovery."
+      ],
+      "text": "90 minutes of detention billed. Only 30 beyond free time?\n\nLet's check the math. This is an ILLUSTRATIVE EXAMPLE, not a customer result.\n\nGate in: 08:30\nGate out: 11:00\nTotal on site: 150 minutes\n\nAssume the applicable signed terms allow 120 free minutes from arrival, with no relevant exceptions. That leaves 30 minutes beyond free time.\n\nIf the carrier billed 90 detention minutes, the 60-minute difference is a question to investigate—not a proven overcharge or money recovered.\n\nAlways verify appointment and trigger rules, valid rates, corrections and prior credits.\n\nSave this example for your next accessorial review. More through the link in our bio.\n\n#RETALLY #FreightAudit #DetentionCharges",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": true
+      }
+    },
+    {
+      "uuid": "2381321643741103769",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-23T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2670847225706553496.png"
+      ],
+      "mediaAltText": [
+        "RETALLY branded no-upfront audit offer card, showing scope, evidence and separate recovery authorization. Fees relate only to eligible actual recoveries; no outcome is guaranteed."
+      ],
+      "text": "$0 upfront. No imaginary savings numbers.\n\nHere's what RETALLY's initial freight audit offer means:\n\n• No upfront audit fee for agreed eligible scope\n• Potential issues checked against available records\n• Findings documented before a recovery decision\n• Any recovery engagement separately authorized in writing\n• Fees based on eligible amounts actually recovered—not uncollected claims\n\nA flagged discrepancy isn't a promised refund. Results aren't guaranteed.\n\nExplore the terms:\nhttps://www.retallyrecovery.com/freight-audit-pricing?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct23_pricing\n\n#FreightRecovery #InvoiceAudit",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "2593190408975893039",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-23T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9714268420423041954.png"
+      ],
+      "mediaAltText": [
+        "RETALLY green-and-cream pricing graphic: A $0 audit isn't a refund promise. Scope, evidence and written authorization come before recovery, with no guaranteed results."
+      ],
+      "text": "A $0-upfront audit isn't a promise of money back.\n\nIt should be a clear starting point.\n\nRETALLY's initial review has no upfront fee for agreed eligible freight scope. We establish which carriers, billing periods and records are in scope before reviewing potential discrepancies.\n\nWhat happens after a finding? You decide whether to authorize recovery under separate written terms. Fees depend on eligible amounts actually recovered; results are not guaranteed.\n\nScope first. Evidence next. Recovery only when supported and authorized.\n\nFor details, visit the link in our bio.\n\n#RETALLY #FreightAudit #AccountsPayable",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": true
+      }
+    },
+    {
+      "uuid": "7206690026091331851",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-26T14:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-530205963497938536.png"
+      ],
+      "mediaAltText": [
+        "RETALLY emerald-and-charcoal credit reconciliation graphic, asking 'Already credited?' and showing original charge, adjustments and credit confirmation."
+      ],
+      "text": "Before calling a freight charge \"unrecovered,\" check one more thing: was it already credited?\n\nA reliable second look connects:\n01 / Original invoice\n02 / Governing rate agreement or tariff\n03 / Shipment and service records\n04 / Payment and adjustment history\n05 / Credit memo or refund confirmation\n\nA duplicate-looking bill may already be corrected. A flagged discrepancy is not the same as an unpaid overcharge.\n\nRETALLY's initial audit is $0 upfront for agreed eligible scope. Recovery work requires separate written authorization; results aren't guaranteed.\n\nExplore our methodology:\nhttps://www.retallyrecovery.com/freight-audit-methodology?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct26_credit_reconciliation\n\n#FreightAudit #AccountsPayable",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-5093396272539350040",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-10-27T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": false,
+      "autoPublish": true,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-1778982742354561434.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY branded secure-inquiry instructions: start with a conversation about freight modes and scope, agree on next steps, and share sensitive records only through an approved transfer route."
+      ],
+      "text": "DMs are for questions. Not freight invoices.\n\nWant to explore a second-look freight audit? Start with the basics: freight modes, the carriers involved and the billing periods you'd like reviewed.\n\nThen agree on scope and an appropriate way to exchange records.\n\nPlease don't post invoices, private rates, account numbers or payment details in comments or messages.\n\nRETALLY's initial audit has a $0 upfront fee for agreed eligible scope. Any recovery work requires separate written authorization; results aren't guaranteed.\n\nStart through the link in our bio.\n\n#RETALLY #FreightAudit #DataStewardship",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": true
+      }
+    },
+    {
+      "uuid": "7792632698307233895",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-11-02T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": true,
+      "autoPublish": false,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-7153299043667698162.png",
+        "https://static.metricool.com/planner/202610/7322512-file-15650414007348035767.png",
+        "https://static.metricool.com/planner/202610/7322512-file-17505442653676752604.png",
+        "https://static.metricool.com/planner/202610/7322512-file-13497648435232926350.png"
+      ],
+      "mediaAltText": [
+        "RETALLY Field Notes carousel, slide one of four: Billed for a liftgate? The invoice line alone is not the service record; check evidence supporting the extra fee.",
+        "RETALLY accessorial proof slide two: verify the governing contract or tariff, the fee trigger, included services, and the effective version.",
+        "RETALLY accessorial proof slide three: match delivery record, service notation, and shipment identity before treating a liftgate charge as questionable.",
+        "RETALLY slide four: three questions before a dispute—what terms governed, what documents support the service, and whether a correction or credit already occurred."
+      ],
+      "text": "A liftgate fee is on the invoice. What proves the service happened?\n\nThe charge could be valid. It could already be included in the agreement. Or it could deserve a closer look.\n\nBefore calling it an overcharge, check:\n01 / The applicable service trigger in the contract or tariff\n02 / The delivery record and any supporting service notes\n03 / Corrections or credits already issued\n\nAn invoice label is a starting point—not an automatic dispute or refund.\n\nSave the four-slide evidence checklist, or share it with the person reviewing LTL bills.\n\nRETALLY | Find it. Prove it. Recover it.\n\nhttps://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_nov2026_fieldnotes&utm_content=liftgate_evidence\n\n#FreightAudit #LTLFreight #AccountsPayable",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "1799007890085400226",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-11-03T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": true,
+      "autoPublish": false,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-5383715596287589583.png",
+        "https://static.metricool.com/planner/202610/7322512-file-14757960404333438328.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11336803061927960596.png",
+        "https://static.metricool.com/planner/202610/7322512-file-4301373812253712825.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes asks what evidence supports a billed liftgate fee.",
+        "Slide 2: check the governing contract or tariff, included services, trigger conditions and effective terms.",
+        "Slide 3: verify the delivery record, service notation and shipment identity before flagging an accessorial fee.",
+        "Slide 4: saveable checklist: governing terms, service evidence and prior credits, with no automatic refund claim."
+      ],
+      "text": "A liftgate charge appears on the invoice.\n\nWhat proves the service happened?\n\nBefore treating an accessorial fee as an overcharge, check the fine print AND the actual shipment record:\n\n01 — Did the governing contract or tariff permit the fee?\n02 — Was the additional service performed and documented?\n03 — Was the charge already corrected or credited?\n\nSometimes the fee is right. Sometimes it needs a second look. The documents decide.\n\nSave the four-slide checklist for your next LTL audit.\n\nFor RETALLY's evidence-first approach, use the link in our bio. Please don't send invoices or private contracts in DMs.\n\n#RETALLY #FreightAudit #LTL #AccountsPayable",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": false
+      }
+    },
+    {
+      "uuid": "-3688059109071566415",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-11-04T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": true,
+      "autoPublish": false,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9746827956131939835.png",
+        "https://static.metricool.com/planner/202610/7322512-file-7380222325715351658.png",
+        "https://static.metricool.com/planner/202610/7322512-file-6916016000142693938.png",
+        "https://static.metricool.com/planner/202610/7322512-file-12973848625873282339.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes highlights a shipment associated with two rate sheets and asks which version governed.",
+        "Slide 2: investigate the applicable date, effective date and signed amendments.",
+        "Slide 3: check the contract, incorporated tariff and any applicable exceptions rather than guessing which rate prevails.",
+        "Slide 4: saveable rate audit checklist: controlling version, relevant dates, exceptions and already-issued credits."
+      ],
+      "text": "One shipment. Two different rate sheets.\n\nWhich charge is actually correct?\n\nFinding an old and a new rate table isn't enough to establish a billing error. The governing agreement—and the dates and amendments it makes relevant—determine which rate applies.\n\nOur rate-version checklist:\n01 / Identify the controlling contract and any incorporated tariff\n02 / Check the date that determines which terms apply\n03 / Reconcile amendments, exceptions, rebills and credits\n\nA rate mismatch is a question to investigate, not an automatic refund.\n\nSave this four-slide explainer for the next time a carrier invoice doesn't match the rate sheet on your desk.\n\nhttps://www.retallyrecovery.com/carrier-rate-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_nov2026_fieldnotes&utm_content=rate_version\n\n#FreightAudit #CarrierRates #TransportationFinance",
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-5464319525184516120",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "publicationDate": {
+        "dateTime": "2026-11-05T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "draft": true,
+      "autoPublish": false,
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16995368350622866353.png",
+        "https://static.metricool.com/planner/202610/7322512-file-2827369008175147549.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11515298540851319582.png",
+        "https://static.metricool.com/planner/202610/7322512-file-3480295111158624296.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: one freight shipment, two rate sheets; which version applies?",
+        "Slide 2: review the shipment date, contract rate effective dates and signed amendments.",
+        "Slide 3: review governing contracts, referenced tariffs and exceptions before asserting a discrepancy.",
+        "Slide 4: saveable checklist of rate authority, controlling dates and credits."
+      ],
+      "text": "ONE LOAD. TWO RATE SHEETS.\n\nThe higher number isn't automatically the wrong one.\n\nWhen two schedules exist, start with the authority—not the invoice total.\n\nCheck:\n01 / The governing agreement\n02 / The date that controls rate applicability\n03 / Amendments, exceptions and referenced tariffs\n04 / Any corrected invoice or existing credit\n\nA rate flag needs supporting evidence before it becomes a finding. And a finding is not money recovered.\n\nSave this checklist for a future freight AP review. More methodology through the link in our bio.\n\n#RETALLY #FreightAudit #CarrierRates #LogisticsFinance",
+      "instagramData": {
+        "type": "POST",
+        "isAiGenerated": false
+      }
+    }
+  ],
+  "revision_of": "retally-2026-10-12-creative-approved.json",
+  "accepted_creative_revision": {
+    "local_approval_date": "2026-10-11",
+    "approved_theme": "premium_high_gloss_retally_social_v1",
+    "original_shared_media": "https://static.metricool.com/planner/202610/7322512-file-8910111593678733120.jpeg",
+    "accepted_shared_media": "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png",
+    "changed_post_uuids": [
+      "-1816987399007942347",
+      "-7860495589122225702"
+    ],
+    "canva_master_media_id": "MAHXwWF8t9o",
+    "adobe_asset_id": "urn:aaid:sc:US:59af9a9f-0029-4b75-a55a-6404c7f9db0b",
+    "publication_verified": false,
+    "qualifying_customer_result_claimed": false
+  },
+  "accepted_creative_revision_oct14_15": {
+    "observed_date": "2026-10-12",
+    "original_shared_image_url": "https://static.metricool.com/planner/202610/7322512-file-14283620392379791152.jpeg",
+    "changed_post_uuids": [
+      "-7129364071318205444",
+      "6484508306152771452"
+    ],
+    "scope": "media and accurate alt text only; original captions, tracked links, and Madrid-local scheduled times unchanged",
+    "original_bytes_checksum_note": "The SHA-256 fields verify user-provided local JPEG files; they do not prove Metricool rehosted-byte identity.",
+    "posts": [
+      {
+        "uuid": "-7129364071318205444",
+        "canva_media_id": "MAHXy6EvN24",
+        "uploaded_jpeg_sha256": "ce46f4ac4ba89d6d5893818e94476f54e593f4ea7cab127d2a7eb041ead3f5ff",
+        "uploaded_jpeg_bytes": 238671,
+        "original_dimensions": [
+          1136,
+          1408
+        ],
+        "rehosted_media_url": "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg",
+        "provider_id_after_update": 394236354,
+        "adobe_asset_id": "urn:aaid:sc:US:5d48c318-d02a-4787-80b2-51217e7bc245"
+      },
+      {
+        "uuid": "6484508306152771452",
+        "canva_media_id": "MAHXy245ZUs",
+        "uploaded_jpeg_sha256": "c6d01acb4b0cd79a7e1dc56359d95ee4bcf11954360b95a905c2aee68c7b3ad2",
+        "uploaded_jpeg_bytes": 221639,
+        "original_dimensions": [
+          1136,
+          1408
+        ],
+        "rehosted_media_url": "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg",
+        "provider_id_after_update": 394236766,
+        "adobe_asset_id": "urn:aaid:sc:US:d1e6f17b-59c3-48d1-aaf9-1aaf7cdc37db"
+      }
+    ],
+    "publication_verified": false
+  }
+}

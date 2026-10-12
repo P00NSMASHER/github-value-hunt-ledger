@@ -1,0 +1,28 @@
+{
+  "note": "ENTIRELY SYNTHETIC. Illustrative connector rows, not an actual Facebook publication or real customer metric.",
+  "field_ids": [
+    "FBPO01",
+    "FBPO03",
+    "FBPO06",
+    "FBPO08",
+    "FBPO11",
+    "FBPO12",
+    "FBPO13",
+    "FBPO14",
+    "FBPO23"
+  ],
+  "observed_at": "2026-10-14T15:00:00Z",
+  "rows": [
+    [
+      "20261012",
+      "SYNTHETIC EXAMPLE — see https://www.retallyrecovery.com/?utm_source=facebook&utm_medium=organic_social&utm_campaign=sample",
+      "https://www.facebook.com/SYNTHETIC_EXAMPLE/posts/SYNTHETIC_FB_001",
+      "0.0",
+      "5.0",
+      "4.0",
+      "0.0",
+      "0.0",
+      "0.0"
+    ]
+  ]
+}

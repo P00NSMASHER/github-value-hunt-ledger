@@ -85,6 +85,9 @@ def build_data_room_manifest(
 
     seen_ids: set[str] = set()
     for entry in normalized:
+        for field in ("authorized", "read_only", "contains_secrets"):
+            if type(getattr(entry, field)) is not bool:
+                raise ValueError(field + " must be a boolean")
         _required("source_id", entry.source_id)
         _required("buyer_id", entry.buyer_id)
         _required("business_unit", entry.business_unit)
@@ -105,7 +108,7 @@ def build_data_room_manifest(
             raise ValueError("pilot source must be read-only")
         if entry.contains_secrets:
             raise ValueError("credential/secret-bearing source cannot enter evidence room")
-        if not isinstance(entry.retention_days, int) or entry.retention_days <= 0:
+        if type(entry.retention_days) is not int or entry.retention_days <= 0:
             raise ValueError("retention_days must be a positive integer")
 
     body = {

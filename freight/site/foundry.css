@@ -545,3 +545,320 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
   display:block;
  }
 }
+
+
+/* RETALLY SOCIAL | Signature Glass v2.
+   Brand vectors remain exact; reflections belong to the surrounding card.
+   No image requests, filters, script or backdrop blur required. */
+.site-footer .retally-social{
+ display:grid;grid-template-columns:minmax(120px,.42fr) minmax(0,2fr);
+ align-items:center;gap:18px 30px;
+ border-top:1px solid rgba(175,255,212,.17);
+ margin-top:3px;padding-block:30px 20px;
+}
+.site-footer .retally-social__title{
+ color:#c0edcf;letter-spacing:.14em;font-size:.76rem;
+ text-transform:uppercase;font-weight:800;line-height:1.55;
+}
+.site-footer .retally-social__links{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:12px;min-width:0;
+}
+.site-footer .retally-social__button{
+ position:relative;isolation:isolate;overflow:hidden;
+ display:flex;align-items:center;gap:12px;
+ min-width:0;min-height:76px;padding:13px 14px;
+ border-radius:18px;
+ border:1px solid rgba(195,255,224,.37);
+ background:linear-gradient(158deg,#1f5348 0%,#143d35 19%,#092b25 54%,#061b18 100%);
+ color:#f4fff9;text-decoration:none;
+ box-shadow:
+  inset 0 1px 0 rgba(250,255,253,.42),
+  inset 0 -1px 0 rgba(0,0,0,.56),
+  inset 1px 0 0 rgba(255,255,255,.09),
+  0 5px 0 rgba(0,12,9,.26),
+  0 14px 22px rgba(0,10,8,.21),
+  0 0 22px rgba(80,218,154,.055);
+ transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;
+ -webkit-tap-highlight-color:transparent;
+}
+.site-footer .retally-social__button::before{
+ content:"";position:absolute;z-index:-1;pointer-events:none;
+ inset:1px 1px auto 1px;height:53%;border-radius:17px 17px 40% 40%;
+ background:linear-gradient(180deg,rgba(250,255,252,.25) 0%,
+   rgba(217,255,236,.11) 27%,rgba(205,255,227,.035) 73%,transparent 100%);
+}
+.site-footer .retally-social__button::after{
+ content:"";position:absolute;z-index:-1;pointer-events:none;
+ left:20%;right:20%;bottom:0;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(182,255,217,.32),transparent);
+}
+.site-footer .retally-social__button:hover{
+ transform:translateY(-2px);color:#fff;
+ border-color:rgba(171,255,208,.8);
+ box-shadow:
+  inset 0 1px 0 rgba(250,255,253,.5),
+  inset 0 -1px 0 rgba(0,0,0,.58),
+  0 6px 0 rgba(0,12,9,.21),
+  0 18px 26px rgba(0,10,8,.28),
+  0 0 28px rgba(91,230,169,.15);
+}
+.site-footer .retally-social__button:active{
+ transform:translateY(1px);
+ box-shadow:inset 0 2px 4px rgba(0,0,0,.34),0 4px 11px rgba(0,0,0,.18);
+}
+.site-footer .retally-social__button:focus-visible{
+ outline:3px solid #b6ffd7;outline-offset:4px;
+}
+.site-footer .retally-social__brandmark{
+ flex:none;display:grid;place-items:center;
+ width:43px;height:43px;
+ border:1px solid rgba(255,255,255,.42);
+ box-shadow:0 0 0 1px rgba(5,18,14,.3);
+}
+.site-footer .retally-social__brandmark svg{
+ display:block;width:29px;height:29px;
+}
+.site-footer .retally-social__brandmark--facebook{
+ border-radius:50%;background:#fff;
+}
+.site-footer .retally-social__brandmark--facebook svg{
+ width:35px;height:35px;fill:#0866ff;
+}
+.site-footer .retally-social__brandmark--instagram{
+ border-radius:12px;
+ background:linear-gradient(38deg,#ffdc80 0%,#f77737 27%,#fd1d1d 44%,#c13584 64%,#833ab4 81%,#5851db 100%);
+}
+.site-footer .retally-social__brandmark--instagram svg{
+ width:25px;height:25px;fill:#fff;
+}
+.site-footer .retally-social__brandmark--youtube{
+ border-radius:12px;background:#fff;
+}
+.site-footer .retally-social__brandmark--youtube svg{
+ width:34px;height:34px;fill:#ff0033;
+}
+.site-footer .retally-social__copy{
+ position:relative;display:flex;flex-direction:column;
+ min-width:0;gap:3px;line-height:1.17;
+}
+.site-footer .retally-social__copy strong{
+ display:block;color:#fff;
+ font-size:.94rem;font-weight:750;letter-spacing:.007em;
+}
+.site-footer .retally-social__detail{
+ display:block;color:#afdfc8;font-size:.70rem;font-weight:550;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.site-footer .retally-social__arrow{
+ flex:none;margin-left:auto;color:#a8e4c8;
+ font-size:1.07rem;line-height:1;
+ transform:translateY(-1px);
+}
+@media(max-width:1020px) and (min-width:681px){
+ .site-footer .retally-social{grid-template-columns:1fr;gap:14px;}
+ .site-footer .retally-social__button{padding:12px;gap:10px;}
+}
+@media(max-width:680px){
+ .site-footer .retally-social{
+  grid-template-columns:minmax(0,1fr);
+  gap:16px;padding-block:24px 18px;
+ }
+ .site-footer .retally-social__links{gap:8px;}
+ .site-footer .retally-social__button{
+  flex-direction:column;justify-content:center;
+  gap:10px;min-height:105px;min-width:0;
+  padding:15px 5px 12px;border-radius:18px;
+ }
+ .site-footer .retally-social__button::before{
+  height:52%;border-radius:17px 17px 48% 48%;
+ }
+ .site-footer .retally-social__brandmark{
+  width:44px;height:44px;
+ }
+ .site-footer .retally-social__copy{align-items:center;gap:0;width:100%;}
+ .site-footer .retally-social__copy strong{font-size:.79rem;line-height:1.15;}
+ .site-footer .retally-social__detail,
+ .site-footer .retally-social__arrow{display:none;}
+}
+@media(max-width:340px){
+ .site-footer .retally-social__links{gap:6px;}
+ .site-footer .retally-social__button{padding-inline:2px;min-height:101px;}
+ .site-footer .retally-social__brandmark{width:39px;height:39px;}
+ .site-footer .retally-social__copy strong{font-size:.74rem;}
+}
+@media(prefers-reduced-motion:reduce){
+ .site-footer .retally-social__button{transition:none;}
+ .site-footer .retally-social__button:hover,
+ .site-footer .retally-social__button:active{transform:none;}
+}
+
+
+/* RETALLY | Unified 3D Interaction Finish v1 (all first-party CTA surfaces)
+   Dimensional, optical—not heavy skeuomorphism. Keep native focus, no
+   animated loops, backdrop blur, icon substitutions, or new dependencies. */
+:root{
+ --retally-cta-edge:rgba(179,255,212,.65);
+ --retally-cta-focus:#d0ffe4;
+ --retally-cta-depth:0 4px 0 rgba(0,30,21,.36),0 13px 24px rgba(0,31,20,.24);
+ --retally-cta-depth-hover:0 6px 0 rgba(0,27,19,.31),0 18px 30px rgba(0,28,17,.30);
+}
+.button{
+ position:relative;
+ isolation:isolate;
+ overflow:hidden;
+ border-radius:12px;
+ min-height:48px;
+ border:1px solid rgba(255,255,255,.34);
+ padding:12px 22px;
+ font-weight:760;
+ letter-spacing:.005em;
+ text-shadow:0 1px 0 rgba(0,28,17,.14);
+ box-shadow:
+  inset 0 1px 0 rgba(255,255,255,.43),
+  inset 0 -1px 0 rgba(0,32,21,.35),
+  var(--retally-cta-depth);
+ transition:transform .18s ease,box-shadow .18s ease,
+            border-color .18s ease,background .18s ease,color .18s ease;
+ -webkit-tap-highlight-color:transparent;
+}
+.button::before{
+ content:"";position:absolute;inset:1px 1px auto;height:46%;
+ border-radius:10px 10px 48% 48%;
+ background:linear-gradient(180deg,rgba(255,255,255,.29) 0%,
+   rgba(255,255,255,.14) 28%,rgba(255,255,255,.035) 82%,transparent);
+ pointer-events:none;
+}
+.button::after{
+ content:"";position:absolute;left:14%;right:14%;bottom:1px;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent);
+ pointer-events:none;
+}
+.button:hover:not(:disabled):not([aria-disabled="true"]){
+ transform:translateY(-2px);
+ border-color:rgba(238,255,244,.85);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.56),
+  inset 0 -1px 0 rgba(0,32,21,.33),var(--retally-cta-depth-hover);
+}
+.button:active:not(:disabled):not([aria-disabled="true"]){
+ transform:translateY(1px);
+ box-shadow:inset 0 2px 5px rgba(0,32,19,.20),0 2px 0 rgba(0,28,19,.27),0 5px 12px rgba(0,28,19,.19);
+}
+.button:focus-visible{
+ outline:3px solid var(--retally-cta-focus);outline-offset:4px;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.52),
+  0 0 0 2px rgba(4,70,44,.95),var(--retally-cta-depth);
+}
+.button:disabled,.button[aria-disabled="true"]{
+ opacity:.58;cursor:not-allowed;transform:none;box-shadow:none;
+}
+.button.button-small{min-height:44px;padding:10px 16px;border-radius:10px;}
+/* Primary emerald glass: dark enough for white labels at every gradient stop. */
+.button.button-signal,.button.button-cobalt{
+ color:#fff;border-color:var(--retally-cta-edge);
+ background:linear-gradient(155deg,#17935d 0%,#0b7e53 31%,#096b49 61%,#06472f 100%);
+ text-shadow:0 1px 1px rgba(0,38,25,.32);
+}
+.button.button-signal:hover:not(:disabled),
+.button.button-cobalt:hover:not(:disabled){
+ color:#fff;
+ background:linear-gradient(155deg,#1a9961 0%,#0c8055 35%,#075a3d 100%);
+}
+.button.button-light,.button.button-quiet{
+ color:#0a3c2d;text-shadow:0 1px 0 rgba(255,255,255,.8);
+ border-color:#c3dbce;
+ background:linear-gradient(160deg,#fff 0%,#f6fff8 40%,#e5f3eb 100%);
+ box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #c3dbce,
+  0 4px 0 rgba(4,57,37,.16),0 12px 22px rgba(4,38,26,.15);
+}
+.button.button-light:hover:not(:disabled),
+.button.button-quiet:hover:not(:disabled){
+ color:#092f25;border-color:#9ecfb3;
+ background:linear-gradient(160deg,#fff,#ebfaef 58%,#d7efdf 100%);
+ box-shadow:inset 0 1px 0 #fff,0 6px 0 rgba(4,57,37,.12),0 18px 27px rgba(4,38,26,.19);
+}
+.button.button-ghost{
+ color:#fff;border-color:rgba(222,255,237,.68);
+ background:linear-gradient(155deg,rgba(121,197,156,.23),rgba(11,52,39,.48) 56%,rgba(5,38,29,.68));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),
+  inset 0 -1px 0 rgba(0,17,12,.3),0 4px 0 rgba(0,18,12,.2),0 12px 23px rgba(0,18,12,.26);
+}
+.button.button-ghost:hover:not(:disabled){
+ color:#fff;border-color:#d4ffe3;
+ background:linear-gradient(155deg,rgba(110,220,157,.34),rgba(9,62,44,.68));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.37),0 6px 0 rgba(0,18,12,.16),
+  0 18px 30px rgba(0,18,12,.29);
+}
+/* Header CTAs previously had their own flatter high-specificity rule. */
+.site-header .navlinks>.button.button-light{
+ color:#0c4232;border-color:#d4f2df;
+ background:linear-gradient(158deg,#fff 0%,#f4fff7 44%,#def1e4 100%);
+ box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #c5d9cb,
+  0 4px 0 rgba(0,31,20,.26),0 12px 20px rgba(0,25,17,.3);
+}
+.site-header .navlinks>.button.button-light:hover{
+ background:linear-gradient(158deg,#fff,#e4f8ec 66%,#cdebd9);
+ box-shadow:inset 0 1px 0 #fff,0 6px 0 rgba(0,31,20,.22),0 18px 26px rgba(0,25,17,.32);
+}
+/* Smaller action controls preserve their intent, not falsely primary CTAs. */
+.text-button{
+ position:relative;display:inline-flex;align-items:center;justify-content:center;
+ min-height:44px;max-width:100%;padding:10px 14px;
+ border:1px solid #a9d8bc;border-radius:10px;
+ background:linear-gradient(155deg,#fff 0%,#eaf8ef 65%,#dceee4 100%);
+ color:#07583e;text-decoration:none;
+ box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #c1dccc,
+  0 3px 0 rgba(4,74,47,.15),0 8px 16px rgba(6,58,38,.1);
+ transition:background .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.text-button:hover:not(:disabled){
+ background:linear-gradient(155deg,#fff,#dff4e7);
+ transform:translateY(-1px);
+ box-shadow:inset 0 1px 0 #fff,0 4px 0 rgba(4,74,47,.13),0 11px 19px rgba(6,58,38,.14);
+}
+.text-button:active:not(:disabled){transform:translateY(1px);box-shadow:inset 0 1px 4px rgba(0,39,20,.14);}
+.text-button:focus-visible{outline:3px solid #087a50;outline-offset:3px;}
+.text-button:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;}
+/* Author display rules must never reveal a fallback marked hidden. */
+.button[hidden],.text-button[hidden],.menu-toggle[hidden]{display:none;}
+/* The menu is a functional button, without changing its show/hide rules. */
+.site-header .menu-toggle{
+ border:1px solid rgba(203,254,225,.65);
+ border-radius:11px;min-height:44px;
+ background:linear-gradient(156deg,#246950,#114634 55%,#083323);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.38),
+  inset 0 -1px 0 rgba(0,22,15,.55),0 4px 0 rgba(0,18,12,.2),0 9px 18px rgba(0,14,10,.25);
+ transition:background .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.site-header .menu-toggle:hover{background:linear-gradient(156deg,#2b755b,#0a3b2a);transform:translateY(-1px);}
+.site-header .menu-toggle:active{transform:translateY(1px);box-shadow:inset 0 2px 5px rgba(0,0,0,.32);}
+.site-header .menu-toggle:focus-visible{outline:3px solid #baffdc;outline-offset:3px;}
+/* Mobile bar is already deliberately disabled on home; never reactivate it. */
+.mobile-cta b{
+ border:1px solid rgba(201,255,221,.7);border-radius:10px;
+ padding:12px 16px;
+ background:linear-gradient(155deg,#16955e,#086a46 64%,#06482f);
+ color:#fff;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.45),
+  inset 0 -1px 0 rgba(0,22,15,.45),0 4px 0 rgba(0,23,14,.35),0 9px 19px rgba(0,15,11,.24);
+}
+.mobile-cta:focus-visible{outline:3px solid #baffdc;outline-offset:-5px;}
+/* Existing social cards and BubblaV launch button are already premium; keep
+   their platform identities and open/close behavior unchanged. */
+@media(hover:none){
+ .button:hover:not(:disabled):not([aria-disabled="true"]),
+ .text-button:hover:not(:disabled),.site-header .menu-toggle:hover{transform:none;}
+}
+@media(prefers-reduced-motion:reduce){
+ .button,.text-button,.site-header .menu-toggle{transition:none!important;}
+ .button:hover:not(:disabled):not([aria-disabled="true"]),
+ .button:active:not(:disabled):not([aria-disabled="true"]),
+ .text-button:hover:not(:disabled),.text-button:active:not(:disabled),
+ .site-header .menu-toggle:hover,.site-header .menu-toggle:active{transform:none!important;}
+}
+@media print{
+ .button,.text-button,.site-header .menu-toggle,.mobile-cta b{
+  box-shadow:none!important;text-shadow:none!important;
+ }
+ .button::before,.button::after{display:none!important;}
+}

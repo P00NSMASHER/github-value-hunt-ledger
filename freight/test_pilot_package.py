@@ -1,5 +1,8 @@
 import hashlib
 
+from dataclasses import replace
+import pytest
+
 from freight.contracts import (
     AuthorityRef,
     PopulationRow,
@@ -65,6 +68,20 @@ def room_entries():
         SourceEntry("authority-1",BUYER,BU,"authority",H("authority-file"),True,True,False,30),
         SourceEntry("incumbent-1",BUYER,BU,"incumbent_output",H("incumbent-file"),True,True,False,30),
     ]
+
+
+@pytest.mark.parametrize("field", ["authorized", "read_only", "contains_secrets"])
+@pytest.mark.parametrize("value", ["false", "true", 0, 1, None])
+def test_data_permission_flags_cannot_be_inferred_from_non_boolean_values(field, value):
+    entry = replace(room_entries()[0], **{field: value})
+    with pytest.raises(ValueError, match=field + " must be a boolean"):
+        build_data_room_manifest(BUYER, BU, [entry])
+
+
+def test_boolean_retention_cannot_be_misread_as_one_day():
+    entry = replace(room_entries()[0], retention_days=True)
+    with pytest.raises(ValueError, match="positive integer"):
+        build_data_room_manifest(BUYER, BU, [entry])
 
 
 def test_valid_pilot_package_is_scope_and_hash_bound():

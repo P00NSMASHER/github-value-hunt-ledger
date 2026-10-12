@@ -1,30 +1,37 @@
-# RETALLY | Customer communication templates
-Do not send automatically. Sender/contact must be verified. No sensitive record attachments in introductory emails.
+# Customer communication templates
+Human-reviewed drafts. Verify sender, recipient and engagement facts; this mission sent no messages.
 
 ## Inquiry acknowledgment
-**Subject:** RETALLY | We received your freight audit inquiry
+Subject: RETALLY | Your freight review inquiry
 
-Thank you for contacting RETALLY. We will review the business details you provided and respond about eligibility, proposed review scope and next steps. Please do not send confidential invoices or shipment/rate records by ordinary email. If we proceed, we will confirm an approved secure transfer method.
+Thanks for contacting RETALLY. We will first confirm your freight, available records and our review capacity. Please share the mode, carriers, period and whether another auditor or claim is involved. Please do not email confidential invoices, rates or bank records. We will agree a secure transfer route before requesting documents.
 
-[Verified sender name and business email]
+## Scope and secure invitation
+Subject: RETALLY | Scope and submission | [Engagement]
 
-## Review scope confirmation
-**Subject:** RETALLY | Proposed audit review scope for [Company]
+The proposed review covers [Population], with [Exclusions]. Please confirm your signer and data owner. After terms and access checks are complete, use [Verified restricted workspace]. Our receipt will list received files and gaps. This message does not authorize carrier contact.
 
-Based on our conversation, an initial review would cover [modes/carriers] during [dates] and exclude [known disputes, credits and exclusions]. Please confirm the boundaries and available records. This email does not authorize carrier outreach or establish recovery fees.
+## Missing or conflicting evidence
+Subject: RETALLY | Evidence needed | [Engagement]
 
-[Verified sender]
+We confirmed receipt of [Count] records. [Items] are on hold because [Exact gap]. Please provide [Records] through the approved workspace. These items are not validated losses or recoveries. Remaining work: [State]. Next agreed update: [Date].
 
-## Secure evidence request
-**Subject:** RETALLY | Approved review records [Reference]
+## Findings ready
+Subject: RETALLY | Findings for review | [Engagement]
 
-For the agreed scope [reference], please provide [specific record classes] using the approved secure transfer mechanism confirmed separately. Do not forward confidentiality-sensitive records through this introductory email thread. Tell us about pre-existing disputes and credits to prevent duplicated claims.
+[Report version] separates supported findings, missing evidence, incumbent exclusions and clean invoices. Please resolve [Decisions]. No outside claim follows from report delivery; each action requires separate written authorization.
 
-[Verified sender]
+## Status update
+Subject: RETALLY | Recovery status | [Engagement / Date]
 
-## Recovery status update
-**Subject:** RETALLY | Recovery status [Reference]
+Supported: [Amount]. Customer-authorized: [Amount]. Carrier-approved: [Amount]. Confirmed posted benefits: [Amount]. Reversals: [Amount]. Net eligible recovery: [Amount]. The reconciliation links each figure to evidence. Open actions: [Owner/question/date]. Carrier approval alone is not posting.
 
-For [period], [count] invoices were reviewed; [count] issues were supported with evidence; [count] recovery actions received specific written customer authorization. Actual net receipts total [amount] supported by [settlement references], after adjustments and reversals. Outstanding evidence gaps: [items]. Decisions requested: [items/dates].
+## Fee correction
+Subject: RETALLY | Reversal and fee correction | [Engagement]
 
-[Verified sender]
+[Reversal ID] reduces eligible recovery by [Amount]. Revised cumulative fee: [Amount], less prior invoiced [Amount], giving a fee credit/refund of [Amount]. The statement separates the carrier reversal from RETALLY's fee correction. Please review posting differences with [Contact].
+
+## Closure
+Subject: RETALLY | Final records | [Engagement]
+
+Work is complete through [Date]. The final statement separates supported, authorized, posted, excluded and fee figures. Pending items: [Owners/list]. Access revocation and record return/deletion follow the signed schedule and documented holds. Completion is confirmed only with actual provider evidence.
