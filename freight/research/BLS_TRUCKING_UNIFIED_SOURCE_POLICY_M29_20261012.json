@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_M29_CURRENT_SOURCE_UNIFIED_ORIGINAL_BLS_THREE_TRUCKING_INDUSTRY_SERIES_NOT_REAL_OUTPUT",
+  "observed_on": "2026-10-12",
+  "publisher": "U.S. Bureau of Labor Statistics",
+  "live_api_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+  "live_api_method": "POST",
+  "series": [
+    {
+      "naics": "484",
+      "id": "PCU484---484---",
+      "expected_historical_catalog": "BLS_PARENT_ORIGIN_M28_20261012.json",
+      "annual_source_unit": "industry producer net-output index, not seasonally adjusted"
+    },
+    {
+      "naics": "484121",
+      "id": "PCU484121484121",
+      "expected_historical_catalog": "BLS_PPI_TRUCKING_2017_2024_20261012.json",
+      "annual_source_unit": "industry producer net-output index, not seasonally adjusted"
+    },
+    {
+      "naics": "484122",
+      "id": "PCU484122484122",
+      "expected_historical_catalog": "BLS_PPI_TRUCKING_2017_2024_20261012.json",
+      "annual_source_unit": "industry producer net-output index, not seasonally adjusted"
+    }
+  ],
+  "source_api_payload": {
+    "seriesid": [
+      "PCU484---484---",
+      "PCU484121484121",
+      "PCU484122484122"
+    ],
+    "startyear": "2017",
+    "endyear": "2024"
+  },
+  "first_full_three_series_source_probe_sha256": "5418c6633ceb41e44c25935b7de543293f00006510a7ec452a23e6db6a0ad80e",
+  "first_full_three_series_source_probe_run_id": 38274002011,
+  "required_years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "required_months_per_year": 12,
+  "required_monthly_observations_per_series": 96,
+  "required_monthly_observations_total": 288,
+  "original_2017_2024_nominal_revenue_source": "M25_REVISED_CENSUS_SAS_2017_2021_AIES_HISTORICAL_2022_2024",
+  "aggregate_vs_children_source_overlap": "NAICS484_PARENT_CONTAINS_484121_AND_484122_NON_ADDITIVE",
+  "annual_average_method": "ARITHMETIC_MEAN_OF_TWELVE_UNADJUSTED_MONTHLY_LEVELS",
+  "year_end_sensitivity_method": "DECEMBER_2017_VS_DECEMBER_2024_ENDPOINTS_NOT_EQUIVALENT_TO_FULL_YEAR_REVENUES",
+  "index_adjustment_formula": "CENSUS_ANNUAL_NOMINAL_REVENUE_YEAR_TIMES_PPI_2017_ANNUAL_MEAN_OVER_PPI_YEAR_ANNUAL_MEAN",
+  "year_end_sensitivity_formula": "CENSUS_2024_NOMINAL_OVER_CENSUS_2017_NOMINAL_TIMES_PPI_DEC2017_OVER_PPI_DEC2024_MINUS_1",
+  "legacy_fred_parent_alias": "PCU484484",
+  "current_native_bls_parent_id": "PCU484---484---",
+  "historical_m26_parent_missing_status_preserved_as_historical": true,
+  "historical_m27_fred_timeout_preserved_as_historical": true,
+  "current_dashboard_can_supersede_historical_source_block_when_new_288_month_live_proof": true,
+  "dashboard_offline_report_must_not_claim_fresh_bls_authentication": true,
+  "method_sensitivity_not_confidence_interval": true,
+  "adjusted_revenue_is_official_bea_or_bls_real_output": false,
+  "consumer_invoice_payments_implied_by_census_employer_revenue": false,
+  "price_index_is_customer_rate_overcharge_percentage": false,
+  "aggregate_trucking_is_sum_of_children": false,
+  "december_endpoint_is_annual_average": false,
+  "real_freight_shipping_volume_measured": false,
+  "real_cargo_tonnage_measured": false,
+  "ppi_yearly_series_stacking_creates_independent_survey_samples": false,
+  "producer_price_changes_prove_real_customer_demand": false,
+  "confidence_intervals_calculated": false,
+  "external_recovery_market_claims_allowed": false,
+  "actual_retally_refunds_usd": null,
+  "recoverable_ltl_market_tam_usd": null,
+  "real_customer_paid_freight_invoices_count": 0,
+  "pilot_18_real_customer_authorizations_satisfied": false,
+  "new_lab_created": false,
+  "scheduled_tasks_modified": false,
+  "customer_or_carrier_private_data_ingested": false,
+  "no_merges_or_deployments": true,
+  "source_caveat": "A single direct BLS v2 API POST can retrieve three original net-output producer-price-index series for overlapping NAICS 484 truck transportation, 484121 truckload, and 484122 less-than-truckload, 96 months each for 2017 through 2024. These indexes measure seller output prices, NOT real shipment tonnage, consumer freight invoice billing error rates, paid rates or recoverable refund market size. The 2017 producer price index annual mean deflation of Census employer nominal revenue is only an illustrative proxy, NOT an official BEA/BLS real output or volume estimate. December-to-December endpoint deflation is a deliberately different, method-sensitive comparison and is NOT suitable for annual revenue measurement; opposing sign does NOT independently prove any real economic contraction or growth. Parent NAICS 484 includes child industries and cannot be summed with them. Historical prior M26 missed-parent and M27 FRED-timeout records remain truthful events, but the current directly authenticated parent has a newer and stronger source state. Only a fresh original BLS v2 replay of all 288 values may set current direct-publisher verification. All 18 independent customer-pilot approvals remain unverified."
+}
