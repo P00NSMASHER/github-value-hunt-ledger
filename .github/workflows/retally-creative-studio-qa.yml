@@ -1,0 +1,48 @@
+name: RETALLY creative studio QA (draft-only)
+on:
+  pull_request:
+    paths:
+      - 'freight/brand/social/creative-lab/**'
+      - 'freight/site/assets/brand/retally-wordmark-approved.png'
+      - 'freight/site/assets/images/terminal-blue-hour.webp'
+      - '.github/workflows/retally-creative-studio-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned offline renderer dependency
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium
+      - name: Unit and render smoke tests
+        run: python -m unittest discover -s freight/brand/social/creative-lab -p 'test_*.py' -v
+      - name: Render canonical-source graphics for internal review ONLY
+        run: |
+          python freight/brand/social/creative-lab/render_social.py \
+            --repo-root . --mode production --concept all \
+            --output-dir "$RUNNER_TEMP/retally-graphics-review"
+          python - "$RUNNER_TEMP/retally-graphics-review/manifest.json" <<'PY'
+          import json,sys
+          m=json.load(open(sys.argv[1]))
+          assert m['no_publication'] is True
+          assert m['human_approval_required'] is True
+          assert m['approved_wordmark_sha256']=='08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd'
+          assert {a['concept'] for a in m['assets']}=={'rate_versions','accessorial_proof','credit_chain'}
+          assert all(a['qa']['escaped_elements']==[] and a['qa']['preview_banner'] is False for a in m['assets'])
+          PY
+      - name: Upload visual QA artifacts (not publishing assets)
+        uses: actions/upload-artifact@v4
+        with:
+          name: retally-creative-review-draft-only
+          path: ${{ runner.temp }}/retally-graphics-review/
+          retention-days: 7
