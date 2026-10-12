@@ -1,0 +1,59 @@
+name: RETALLY Lab 14 Original BEA Table16 Publisher Access (Mission 33)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bea-original-m33.yml'
+      - 'freight/research_bea_original_m33.py'
+      - 'freight/test_research_bea_original_m33.py'
+      - 'freight/research/BEA_ORIGINAL_ACCESS_M33_20261012.json'
+      - 'freight/RESEARCH_BEA_ORIGINAL_M33.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bea-official-access-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Inspect original BEA industry open-data metadata and unauthenticated Table16 endpoint
+        run: |
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          import json,re
+          routes={
+            'BEA_DATA_CATALOG':'https://apps.bea.gov/Data.json',
+            'BEA_INDUSTRY_OFFICIAL':'https://www.bea.gov/itable/gdp-by-industry',
+            'BEA_I_TABLE':'https://apps.bea.gov/iTable/?reqid=151&step=1&isURI=1',
+            'BEA_API_TABLE16_NO_KEY':'https://apps.bea.gov/api/data/?UserID=0&method=GetData&DataSetName=GDPbyIndustry&TableID=16&Industry=484&Year=2017,2024&Frequency=A&ResultFormat=JSON',
+          }
+          for name,url in routes.items():
+            print('M33_SOURCE_BEGIN',name,url,flush=True)
+            try:
+              req=Request(url,headers={'User-Agent':'RETALLY-Lab14-Original-BEA-GrossOutput-Public-Source/1.0'})
+              with urlopen(req,timeout=15) as response:
+                raw=response.read(700001)
+                print('M33_SOURCE_HTTP',name,response.status,response.geturl(),len(raw),sha256(raw).hexdigest(),flush=True)
+              if len(raw)>700000:raise ValueError('SOURCE_BYTE_LIMIT')
+              txt=raw.decode('utf-8',errors='replace')
+              if name=='BEA_DATA_CATALOG':
+                j=json.loads(txt)
+                for d in j.get('dataset',[]):
+                  if 'GDP-by-Industry' in d.get('title','') or 'Annual Industry' in d.get('title',''):
+                    print('M33_CATALOG_INDUSTRY',json.dumps({'title':d.get('title'),'distribution':d.get('distribution')},default=str)[:2100],flush=True)
+              elif name=='BEA_API_TABLE16_NO_KEY':
+                j=json.loads(txt)
+                print('M33_BEA_API_NO_KEY',json.dumps(j,default=str)[:1300],flush=True)
+              else:
+                for term in ('GDP by Industry','Export','CSV','xlsx','Download','Table 16'):
+                  found=[m.start() for m in re.finditer(re.escape(term),txt,re.I)]
+                  print('M33_SITE_TERM',name,term,len(found),'example',repr(txt[max(0,found[-1]-90):found[-1]+180]) if found else '',flush=True)
+            except Exception as e:
+              print('M33_SOURCE_BLOCKED',name,type(e).__name__,str(e)[:210],flush=True)
+          PY
