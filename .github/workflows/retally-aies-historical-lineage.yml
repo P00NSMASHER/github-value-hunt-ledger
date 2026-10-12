@@ -1,0 +1,62 @@
+name: RETALLY Lab 14 AIES Historical Publisher Reconnaissance (Mission 20)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-aies-historical-lineage.yml'
+      - 'freight/research_aies_historical_lineage.py'
+      - 'freight/test_research_aies_historical_lineage.py'
+      - 'freight/RESEARCH_AIES_HISTORICAL_LINEAGE.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publisher-reconnaissance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Inspect historic series file schema without accepting unverified claims
+        run: |
+          python - <<'PY'
+          from hashlib import sha256
+          from urllib.request import Request, urlopen
+          from zipfile import ZipFile
+          from io import BytesIO
+          import csv
+          sources = {
+              "latest_historical_2024": "https://www2.census.gov/programs-surveys/aies/data/2024/API_Datasets/AIESBASICTIMESERIES.zip",
+              "historical_2023": "https://www2.census.gov/programs-surveys/aies/data/2023/API_Datasets/AIESBASICTIMESERIES.zip",
+              "published_2023": "https://www2.census.gov/programs-surveys/aies/data/2023/API_Datasets/AIESBASIC2023.zip",
+          }
+          for label,url in sources.items():
+              print("SOURCE_START",label,url,flush=True)
+              try:
+                  request=Request(url,headers={"User-Agent":"RETALLY-Lab14-Source-Provenance/1.0"})
+                  with urlopen(request,timeout=18) as response:
+                      if response.geturl()!=url: raise ValueError("PUBLISHER_REDIRECT")
+                      raw=response.read(1_700_001)
+                  if len(raw)>1_700_000: raise ValueError("ZIP_TOO_LARGE")
+                  print("SOURCE_ZIP",label,len(raw),sha256(raw).hexdigest(),flush=True)
+                  with ZipFile(BytesIO(raw)) as z:
+                      for item in z.infolist():
+                          if item.is_dir():continue
+                          print("MEMBER",label,item.filename,item.file_size)
+                          if not item.filename.lower().endswith((".dat",".csv")):continue
+                          if item.file_size>12_000_000:raise ValueError("DAT_TOO_BIG")
+                          data=z.read(item).decode("utf-8-sig")
+                          rows=list(csv.DictReader(data.splitlines(),delimiter="|" if item.filename.endswith(".dat") else ","))
+                          print("DAT_INFO",label,item.filename,"rows",len(rows),"headers",list(rows[0])[:32] if rows else [],flush=True)
+                          chosen=[]
+                          for row in rows:
+                              if (row.get("NAICS2017") in ("484","484121","484122") or row.get("NAICS") in ("484","484121","484122")) and (row.get("YEAR") in ("2022","2023","2024")):
+                                  if row.get("GEO_ID") in ("0100000US",None) and row.get("TYPOP") in ("00",None):
+                                      chosen.append(row)
+                          for row in chosen[:14]:
+                              print("MATCH",label,{k:v for k,v in row.items() if k in ("YEAR","NAICS","NAICS2017","TYPOP","TAXSTAT","ST","GEO_ID","NAICS_LABEL","RCPT_TOT_VAL","RCPT_TOT_VAL_F","RCPT_TOT_CV","RCPT_TOT_CV_F")},flush=True)
+                          print("MATCH_COUNT",label,len(chosen),flush=True)
+              except Exception as exc:
+                  print("SOURCE_BLOCKED",label,type(exc).__name__,str(exc)[:160],flush=True)
+          PY
