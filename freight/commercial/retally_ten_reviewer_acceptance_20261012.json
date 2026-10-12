@@ -1,0 +1,173 @@
+{
+  "schema": "retally.ten_simulated_reviewers.v1",
+  "as_of": "2026-10-12",
+  "base_head": "3729a1ad6f6d15e91bc284fb5400af599d6bf49b",
+  "incorporated_main": "45b9fda935676d4181759b24d7301c8cf217edaa",
+  "reviewer_count": 10,
+  "independence_limit": "Ten separate AI tasks with distinct roles; same model family and shared source context; not ten qualified humans, counsel, insurer or actual production attestation.",
+  "reviewers": [
+    {
+      "reviewer_id": "SIM-01",
+      "role": "Scope and exclusions",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer01.md",
+      "sha256": "04632caa2822a6264bf17cbaa3e384a446935281e1c52f1673d8b1ae110f4352",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-02",
+      "role": "Financial accounting",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer02.md",
+      "sha256": "03123983c10a8ce8f8679bad60da36a324c5fca45a7fbc403f1a265b4f61119e",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-03",
+      "role": "Privacy and source controls",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer03.md",
+      "sha256": "68ed18126e836475f5980020e897e5fb4b0760aee43c4b88923215749a54539a",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-04",
+      "role": "Recovery authorization",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer04.md",
+      "sha256": "4ddb213f5eecfa87fd0bcdf15dd0af3132dca69b598c916f396dbc1180d9737c",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-05",
+      "role": "Incident controls",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer05.md",
+      "sha256": "0c420de0f730c5682b3ecea2169accf7c5ea213d72e60183312f4388ba7cf748",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-06",
+      "role": "Buyer/report quality",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer06.md",
+      "sha256": "cf6d32e5efbba6c93c6d8d8f6441a97285a370eba6951b7abad5537d32aaa5a8",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-07",
+      "role": "Adversarial replay",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer07.md",
+      "sha256": "8df45d430c97412c92c418ac125bc2cbdfbc786912d90cbfa38d2fb96760b7be",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-08",
+      "role": "Interruption and closure",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer08.md",
+      "sha256": "4323eb37da27d051db6e8eb489dbfebf902db28616cd8390b9b52f9bc5d67c31",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-09",
+      "role": "Cross-document consistency",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer09.md",
+      "sha256": "e674a698aa239cd5bc899bed05cfe277cf6c3ad05c93a80118403b193c15b31d",
+      "actual_human_appointment": false
+    },
+    {
+      "reviewer_id": "SIM-10",
+      "role": "Release and evidence boundaries",
+      "kind": "separately tasked AI simulation",
+      "source_report": "evidence/reviewers/reviewer10.md",
+      "sha256": "85d9ec9580ae2c00d8a073afb874bd43a33ddae983245a80f3ec87de7533114d",
+      "actual_human_appointment": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "T10-1",
+      "finding": "Unsupported candidate rendered Supported variance",
+      "status": "FIXED_RETESTED",
+      "evidence": "2 regressions failed before fix;26 focused pass; reviewer06/08 independently confirm held400 label"
+    },
+    {
+      "id": "T10-2",
+      "finding": "Zero unresolved-review count obscured frozen source hold and unrealized amount",
+      "status": "FIXED_RETESTED",
+      "evidence": "Explicit held400 and supported-unrealized50; reviewer06/08 retest"
+    },
+    {
+      "id": "T10-3",
+      "finding": "Prior fee invoices/credits confused with outstanding receivables or cash refunds",
+      "status": "FIXED_RETESTED",
+      "evidence": "Existing templates define cumulative net issued fees;15 independent Decimal cases; reviewer02 final retest"
+    },
+    {
+      "id": "T10-4",
+      "finding": "Discovery stage cited audit report rather than discovery evidence",
+      "status": "FIXED_RETESTED",
+      "evidence": "New synthetic discovery receipt in existing journal;15of15 hashes independently verified"
+    },
+    {
+      "id": "T10-5",
+      "finding": "Pending closure items lacked owners/dates/dispositions",
+      "status": "FIXED_RETESTED",
+      "evidence": "Structured fictional owner/date/disposition for50unrealized and400held; reviewer08 retest"
+    },
+    {
+      "id": "T10-6",
+      "finding": "Stale scratch rehearsal receipt vs final signed package",
+      "status": "FIXED_RETESTED",
+      "evidence": "Scratch replay refreshed from current source; package regenerated with consistent current signatures/hashes"
+    },
+    {
+      "id": "T10-7",
+      "finding": "Retention calendar deadline demanded before final delivery known",
+      "status": "FIXED",
+      "evidence": "Secure submission records agreed rule/trigger and interim review date; exact deadline only after verified final report delivery"
+    },
+    {
+      "id": "T10-8",
+      "finding": "Authorization retry, revocation and compromise handling needed clarity",
+      "status": "FIXED",
+      "evidence": "Existing form requires one transmission, unknown-delivery reconciliation, timestamp/revocation contact and renewed approval for changes"
+    },
+    {
+      "id": "T10-9",
+      "finding": "Agreement schedules, attribution window, risk allocation and actual insurance incomplete",
+      "status": "DEFERRED_OWNER_INSTRUCTION",
+      "evidence": "User item1 legalidentity/contracts/insurance savedlast; reviewers supplied proposed wording, not actual legalapproval or policy"
+    },
+    {
+      "id": "T10-10",
+      "finding": "Simulated reviewers cannot prove actual privateMFA or human appointments",
+      "status": "BLOCKED_EXTERNAL",
+      "evidence": "R25/R26 remain held; no live access/security or personnel claims inferred"
+    }
+  ],
+  "tests": {
+    "freight_full": 1409,
+    "focused_reporting": 26,
+    "independent_fee_scenarios": 15,
+    "counts_overlap": true
+  },
+  "scorecard": {
+    "PASS": 21,
+    "BLOCKED": 15,
+    "FAIL": 1,
+    "independently_verified_pass": 20,
+    "owner_confirmed_pass": 1
+  },
+  "decision": "Synthetic review GO; real paying-customer activation remains NO-GO pending actual legal, human, access and financial controls.",
+  "owner_steering": {
+    "at": "2026-10-12T16:26:05-04:00",
+    "item_1": "Legal identity, contracts and insurance deferred to final owner step",
+    "item_2": "Ten simulated reviewers authorized; no actual MFA or human appointment inferred",
+    "item_3": "Phone/Zoho end-to-end handoff owner-confirmed complete",
+    "literal": "1 save for last. 2 do this yourself with 10 simulated reviewers. 3 this is done and confirmed"
+  }
+}

@@ -235,7 +235,7 @@ def render_review_packet_markdown(packet: ReviewPacket) -> str:
             f"- Decision state: **{case.decision}** ({case.reason})",
             f"- Billed: **{_money(case.currency, case.billed_cents)}**",
             f"- Expected under matched rule: **{_money(case.currency, case.expected_cents)}**",
-            f"- Supported variance: **{_money(case.currency, case.variance_cents)}**",
+            f"- {'Supported variance' if case.decision == VALIDATED else 'Unverified candidate variance'}: **{_money(case.currency, case.variance_cents)}**",
             f"- Shipment: `{case.shipment_id}`",
             f"- Charge evidence hash: `{case.charge_source_hash}`",
             f"- Derivation hash: `{case.derivation_hash}`",

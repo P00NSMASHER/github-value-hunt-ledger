@@ -7,7 +7,7 @@ from enum import Enum
 import re
 from typing import Protocol
 
-from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, VALIDATED, canonical_hash
+from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, REVIEW, VALIDATED, canonical_hash
 
 
 class RecoveryCertificateSource(Protocol):
@@ -147,6 +147,9 @@ class PilotMetrics:
     false_positive_count: int
     unresolved_review_count: int
     reviewer_minutes: int
+    held_finding_count: int = 0
+    held_discrepancy_cents: int = 0
+    supported_unrealized_cents: int = 0
 
     @property
     def reviewer_hours(self) -> float:
@@ -262,6 +265,9 @@ def build_pilot_metrics(
         false_positive_count=false_positive_count,
         unresolved_review_count=unresolved_review_count,
         reviewer_minutes=reviewer_minutes,
+        held_finding_count=sum(f.status == REVIEW for f in findings.values()),
+        held_discrepancy_cents=sum(_positive_variance(f) for f in findings.values() if f.status == REVIEW),
+        supported_unrealized_cents=validated_cents - realized,
     )
 
 
@@ -283,6 +289,7 @@ def render_markdown(metrics: PilotMetrics) -> str:
             "- Challenger-only validated: **" + dollars(metrics.challenger_only_validated_cents) + "**",
             "- Settlement-proven realized: **" + dollars(metrics.realized_cents) + "**",
             "- Fee-eligible realized: **" + dollars(metrics.fee_eligible_realized_cents) + "**",
+            "- Supported but unrealized: **" + dollars(metrics.supported_unrealized_cents) + "**",
             "",
             "These totals are intentionally non-interchangeable. Discrepancy and validated dollars are not realized savings. Settlement-proven realized includes non-fee-eligible credits; only fee-eligible realized is eligible for a recovery fee.",
             "",
@@ -291,7 +298,9 @@ def render_markdown(metrics: PilotMetrics) -> str:
             "- Validated findings: " + str(metrics.validated_finding_count),
             "- Challenger-only findings: " + str(metrics.challenger_only_finding_count),
             "- False-positive findings: " + str(metrics.false_positive_count) + " (" + dollars(metrics.false_positive_cents) + ")",
-            "- Unresolved reviewed findings: " + str(metrics.unresolved_review_count) + " (" + dollars(metrics.unresolved_validated_cents) + ")",
+            "- Reviews marked UNRESOLVED: " + str(metrics.unresolved_review_count) + " (" + dollars(metrics.unresolved_validated_cents) + " validated dollars only)",
+            "- Held source findings: " + str(metrics.held_finding_count) + " (" + dollars(metrics.held_discrepancy_cents) + " unverified candidate)",
+            "Held and supported totals describe the frozen source truth; review disposition counts do not clear evidence holds or establish recovery. Changes require a newly approved truth.",
             "- Reviewer effort: " + str(metrics.reviewer_minutes) + " minutes (" + format(metrics.reviewer_hours, ".2f") + " hours)",
         ]
     ) + "\n"

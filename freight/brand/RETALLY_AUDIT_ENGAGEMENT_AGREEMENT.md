@@ -20,12 +20,12 @@ The proposed fee, subject to executed Schedule C, is 30% of uniquely attributabl
 
 Eligible recovery means a cash refund received by Customer or a carrier credit actually applied and independently confirmed in Customer's payable records, meeting the signed attribution definition. Funds remain Customer's property and go directly to Customer. Exclude incumbent-known, automatic/pre-existing, duplicated, unsupported and other agreed amounts. A holding credit balance remains unbillable until signed terms and posting proof are satisfied. Do not combine currencies.
 
-Round 30% of cumulative eligible USD cents to the nearest cent using half-up rounding, then subtract the fee already invoiced for the engagement. Splitting receipts must not change the cumulative earned fee.
+Round 30% of cumulative eligible USD cents to the nearest cent using half-up rounding, then subtract net previously billed fees for the engagement. Net previously billed fees are issued fee subtotals less issued fee credit-note subtotals, excluding taxes, voided documents, payments and cash refunds. A positive adjustment may be invoiced after approval; a negative adjustment requires a linked fee credit note; zero requires no new fee document. Payments and refunds settle receivables and never change earned or net billed fees. Splitting receipts must not change the cumulative earned fee.
 
 ## Invoices, reversals and termination
 Invoice only after independent review of signed terms, action authority, posting evidence, allocation, prior invoices and current reversal snapshot. Each invoice has an engagement-unique ID and attached reconciliation. Payment terms: [Agreed period]. Invoice dispute process: [Contact/process]. Tax applicability and invoicing identity: [Qualified review]. Pass-through costs require advance written approval.
 
-On reversal or incorrect billing, recompute cumulative fees and issue the fee credit/refund within [Agreed period]. Carrier reversals and RETALLY fee corrections are separate: $100 eligible recovery gives a $30 fee; a later $25 reversal reduces the fee to $22.50, requiring a $7.50 fee adjustment.
+On reversal or incorrect billing, recompute cumulative fees and issue the correcting fee credit note within [Agreed period]. Apply it against unpaid fees; refund an overpayment within the signed refund period using approved remittance controls. Link any refund to that credit note; do not reduce net billed fees again when paying the refund. Carrier reversals and RETALLY fee corrections are separate: $100 eligible recovery gives a $30 fee; a later $25 reversal reduces the fee to $22.50, requiring a $7.50 fee adjustment.
 
 Termination notice: [Terms]. Stop new actions on termination/revocation, reconcile completed authorized work, identify pending claims, and return/delete records under Schedule B. Post-termination attribution window: [Express terms; no implied blanket entitlement].
 

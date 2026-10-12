@@ -94,3 +94,11 @@ def test_markdown_is_human_readable_and_does_not_call_variance_savings():
     assert "verified controlling" in text
     assert "No applicable rule proof was established" in text
     assert "realized savings:**" not in text
+
+
+def test_unverified_rule_variance_is_never_labeled_supported():
+    batch, queue, charges, rules = setup()
+    text = render_review_packet_markdown(build_review_packet(batch, queue, charges, rules))
+    held_case = text.split("## 2. i2 / MISC")[1].split("## 3.")[0]
+    assert "Unverified candidate variance: **USD 50.00**" in held_case
+    assert "Supported variance" not in held_case

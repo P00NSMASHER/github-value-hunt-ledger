@@ -24,3 +24,5 @@ Execution reference: [After action].
 Delivery confirmation: [Actual recipient/provider evidence; sent is not received].
 
 Reverify validity, unchanged payload and recipient immediately before action. Record revocation and stop unsent actions. Expired, revoked, changed-amount or changed-payload approvals must be replaced.
+
+This authorization permits one recorded transmission, not recurring contact. Record its unique action ID, exact time and timezone, and revocation contact. If delivery is unknown, freeze retries and reconcile provider evidence; do not resend merely because no response arrived. New payload, recipient or further contact requires renewed approval. Revocation stops unsent work; record and notify the customer of anything already sent without promising recall. Escalate offers requiring releases, waivers or settlement compromise to the customer; this form grants no power to accept them. Carrier claim deadlines are separate from authorization expiry and must be recorded and reviewed before action.

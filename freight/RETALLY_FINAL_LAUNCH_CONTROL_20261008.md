@@ -1,5 +1,9 @@
 # RETALLY | Final Commercial Launch Control Memorandum
 
+## October 12 owner-directed ten-reviewer follow-up
+
+Supersedes earlier status below: 21 PASS /15 BLOCKED /1 FAIL; one PASS is explicitly owner-confirmed phone/Zoho handoff, not independently retested. Ten separate AI reviewer roles completed; actual human appointment/MFA remains unproven. Legal identity/contracts/insurance saved for last. Two reporting defects fixed and regressions retested; fee-accounting, discovery evidence and closure receipts corrected. Full Freight:1,409 PASS. Existing PR329 includes main45b9fda9 authority-proof fix and remains draft/unmerged. See `RETALLY_TEN_REVIEWER_ACCEPTANCE_20261012.md` and existing Issue323.
+
 ## October 12 execution: first-customer operational rehearsal
 
 **The authoritative launch tracker remains [Issue #323](https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/323). This section supersedes stale October 8 observations below; it does not grant production approval.**

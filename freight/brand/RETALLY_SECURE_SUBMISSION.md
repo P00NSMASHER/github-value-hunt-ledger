@@ -8,7 +8,7 @@ ENGAGEMENT-SPECIFIC INSTRUCTIONS - complete these fields before issuing an invit
 | Customer data owner | [Verified person and work identity] |
 | Analyst / independent reviewer | [Two named identities and roles] |
 | Population | [Carriers, dates, count, USD LTL scope] |
-| Retention deadline / holds | [Signed rule, calendar date and exceptions] |
+| Retention rule / trigger / holds | [Signed rule; final-delivery date pending until verified; interim review date; exceptions] |
 | Incident contact | [Verified contact and alternate] |
 
 ## Before upload
@@ -21,9 +21,9 @@ The existing Drive route is manual only. It does not permit a production parser,
 2. Upload only agreed originals. Exclude credentials and irrelevant personal data.
 3. Identify replacements as new versions; do not overwrite original evidence.
 4. Provide a non-sensitive inventory with filenames and document counts.
-5. Retain the acknowledgment listing byte counts, SHA-256, versions, missing files and exceptions.
+5. RETALLY supplies a document receipt listing files, digital fingerprints, versions, gaps and exceptions. Retain it; you do not need to generate fingerprints.
 
 ## Operator handling
-Record engagement, filename, byte count, hash, received time, version, permitted purpose and retention deadline. Keep originals separate from derived artifacts. Quarantine suspicious or unexpected files; do not execute embedded content. A hash proves byte identity, not contractual applicability.
+Record engagement, filename, byte count, hash, received time, version, permitted purpose, signed retention rule/trigger and interim review date. Set the exact deletion deadline after verified final-report delivery; ingestion time is a separate field. Keep originals separate from derived artifacts. Quarantine suspicious or unexpected files; do not execute embedded content. A hash proves byte identity, not contractual applicability.
 
 If access cannot be verified or an upload is interrupted, stop and reconcile the confirmed receipt before resuming. Do not fall back to the public widget, GitHub, ordinary email attachments or an unapproved parser. Record incidents and notify the designated owner through the approved channel.

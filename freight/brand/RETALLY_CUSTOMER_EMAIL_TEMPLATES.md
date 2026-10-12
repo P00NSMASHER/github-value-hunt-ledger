@@ -29,9 +29,9 @@ Supported: [Amount]. Customer-authorized: [Amount]. Carrier-approved: [Amount]. 
 ## Fee correction
 Subject: RETALLY | Reversal and fee correction | [Engagement]
 
-[Reversal ID] reduces eligible recovery by [Amount]. Revised cumulative fee: [Amount], less prior invoiced [Amount], giving a fee credit/refund of [Amount]. The statement separates the carrier reversal from RETALLY's fee correction. Please review posting differences with [Contact].
+[Reversal ID] reduces eligible recovery by [Amount]. Revised cumulative fee: [Amount], less net previously billed fees (issued fee subtotals less credit notes, excluding payments and refunds) of [Amount], giving a fee adjustment of [Amount]. A negative adjustment creates a linked credit note; any cash refund settles that credit separately. A zero adjustment creates no new invoice or credit. The statement separates the carrier reversal from RETALLY's fee correction. Please review posting differences with [Contact].
 
 ## Closure
 Subject: RETALLY | Final records | [Engagement]
 
-Work is complete through [Date]. The final statement separates supported, authorized, posted, excluded and fee figures. Pending items: [Owners/list]. Access revocation and record return/deletion follow the signed schedule and documented holds. Completion is confirmed only with actual provider evidence.
+The agreed audit review is complete through [Date]. Recovery work remains open only as listed below. The final statement separates supported, authorized, posted, excluded and fee figures. Pending items: [Owners/list]. Access revocation and record return/deletion follow the signed schedule and documented holds. Completion is confirmed only with actual provider evidence.

@@ -10,8 +10,8 @@ NOT ISSUED. Verify legal identity, tax treatment, signed terms, posting and inde
 | Currency / cutoff / snapshot | USD / [Timestamp and hash] |
 | Eligible net actual recovery | [Posting, exclusions and reversals] |
 | Cumulative 30% fee | [Half-up integer-cent calculation] |
-| Prior invoices / fee credits | [Verified ledger balance] |
-| Current fee subtotal | [Cumulative fee less prior balance] |
+| Prior invoices / fee credits | [Issued fee subtotals less issued fee credit-note subtotals; exclude taxes, voids, payments and refunds] |
+| Current fee subtotal | [Cumulative earned fee less net previously billed fees] |
 | Taxes / final total | [Qualified treatment and approved amount] |
 | Remittance route | [Privately verified company route] |
 
@@ -31,3 +31,6 @@ Northstar Industrial Supply / SYNTHETIC:NIS:2026-09. SAMPLE ONLY - NOT PAYABLE.
 | Sample subtotal, before real tax determination | $22.50 |
 
 If an earlier $30.00 fee was already invoiced, issue a $7.50 fee credit to reach the $22.50 cumulative fee. Do not add another $22.50 invoice to the earlier $30.00. No live receivable, tax determination, payment or money movement is established.
+
+## Prevent repeated billing or credits
+Net previously billed fees means issued fee subtotals minus issued fee credit-note subtotals, excluding taxes, voided documents, payments and refunds. Use this cumulative amount, never the unpaid accounts-receivable balance. A positive adjustment may be invoiced after approval; a negative adjustment requires a linked fee credit note; zero creates no new fee document. Apply the credit against unpaid fees and settle any overpayment under signed terms. A linked cash refund settles the credit without reducing fees twice. After a $30 invoice and $7.50 credit, net previously billed is $22.50: repeating the same snapshot creates no invoice or credit, even if the customer has paid.

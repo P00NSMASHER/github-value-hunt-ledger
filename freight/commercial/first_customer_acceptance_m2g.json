@@ -16,7 +16,7 @@
     },
     "public_fallback": "browser_prepared_email_draft",
     "online_inquiry_status": "DISABLED_BY_POLICY",
-    "inbound_zoho_status": "ONE_PRIOR_CONTROLLED_RECEIPT_RECORDED; WEBSITE_SEND_RECEIPT_RESPONSE_UNVERIFIED",
+    "inbound_zoho_status": "OWNER_CONFIRMED_PHONE_SEND_RECEIPT_HUMAN_REPLY_20261012; NOT_INDEPENDENTLY_RETESTED",
     "notes": "October 12 read-only verification: GET 503 online=false; both flags 0; no send token; D1 count 0. No production mutation.",
     "deployment_commit": "c65aa50e22f332cd9a2f564a18c3c8985e0693dc"
   },
@@ -64,18 +64,20 @@
       "owner": "Business owner / qualified counsel"
     },
     "verified_inbound_mail": {
-      "status": "PENDING",
-      "evidence_ref": null,
-      "reviewed_by": null,
-      "reviewed_at": null,
-      "owner": "Company mailbox owner"
+      "status": "OWNER_CONFIRMED",
+      "evidence_ref": "Issue #323 owner update 2026-10-12; chat confirmation at 16:26:05-04:00",
+      "reviewed_by": "Owner attestation; not independently observed",
+      "reviewed_at": "2026-10-12T16:26:05-04:00",
+      "owner": "Company mailbox owner",
+      "independently_verified": false
     },
     "confirmed_customer_contact_route": {
-      "status": "PENDING",
-      "evidence_ref": null,
-      "reviewed_by": null,
-      "reviewed_at": null,
-      "owner": "Website/mail owner"
+      "status": "OWNER_CONFIRMED",
+      "evidence_ref": "Issue #323 owner update 2026-10-12; chat confirmation at 16:26:05-04:00",
+      "reviewed_by": "Owner attestation; not independently observed",
+      "reviewed_at": "2026-10-12T16:26:05-04:00",
+      "owner": "Website/mail owner",
+      "independently_verified": false
     },
     "approved_buyer_workspace": {
       "status": "PENDING",
@@ -96,7 +98,8 @@
       "evidence_ref": null,
       "reviewed_by": null,
       "reviewed_at": null,
-      "owner": "RETALLY operations owner"
+      "owner": "RETALLY operations owner",
+      "notes": "Ten AI simulated roles reviewed rehearsal; actual qualified human appointment remains separate."
     },
     "synthetic_fee_eligibility_reconciled": {
       "status": "PENDING",
@@ -137,10 +140,12 @@
   "mission_acceptance": {
     "as_of": "2026-10-12",
     "scorecard": {
-      "PASS": 20,
+      "PASS": 21,
+      "BLOCKED": 15,
       "FAIL": 1,
-      "BLOCKED": 16,
-      "total": 37
+      "total": 37,
+      "independently_verified_pass": 20,
+      "owner_confirmed_pass": 1
     },
     "requirements": [
       {
@@ -236,7 +241,7 @@
         "requirement": "Independent-review proof mechanics",
         "status": "PASS",
         "scope": "SIMULATED",
-        "evidence": "Two confirmed review objects; 30 simulated reviewer minutes; one unsupported candidate excluded",
+        "evidence": "Two confirmed review objects; 30 simulated reviewer minutes; one unsupported candidate excluded Ten separately tasked simulated reviewers assessed the synthetic engagement; consolidated receipt in retally_ten_reviewer_acceptance_20261012.json.",
         "tests": "Actual buyer review, routing and claim builder",
         "defects_corrected": "Existing #326 consent controls restored to combined head",
         "remaining_dependency": "See operational boundary and related blocked row",
@@ -357,7 +362,7 @@
         "requirement": "Customer onboarding and commercial document package",
         "status": "PASS",
         "scope": "ARTIFACT",
-        "evidence": "Eight completed templates plus sample report, authorization, invoice and closure records",
+        "evidence": "Eight completed templates plus sample report, authorization, invoice and closure records Ten separately tasked simulated reviewers assessed the synthetic engagement; consolidated receipt in retally_ten_reviewer_acceptance_20261012.json.",
         "tests": "Completeness, financial wording, original brand and final PDF visual QA",
         "defects_corrected": "Filled operational and legal-review documentation gaps",
         "remaining_dependency": "See operational boundary and related blocked row",
@@ -366,13 +371,14 @@
       {
         "id": "R21",
         "requirement": "Actual visitor send -> Zoho receipt -> human reply",
-        "status": "BLOCKED",
-        "scope": "LIVE",
-        "evidence": "One earlier controlled Gmail receipt documented; new full website path unverified",
-        "tests": "DNS checked; no new mail sent or actual recipient mailbox access",
+        "status": "PASS",
+        "scope": "OWNER_CONFIRMED",
+        "evidence": "Owner confirmed prior action 3 (phone inquiry -> actual Zoho receipt -> human reply) on 2026-10-12 at 16:26 America/New_York; statement: \"3 this is done and confirmed\".",
+        "tests": "Owner attestation accepted; no new mailbox access, message or independently observed delivery test.",
         "defects_corrected": "None",
-        "remaining_dependency": "Owner tests phone email handoff, preserves Zoho receipt/headers and human response",
-        "required_owner_action": "Owner tests phone email handoff, preserves Zoho receipt/headers and human response"
+        "remaining_dependency": "Preserve actual receipt/headers privately; no repeat confirmation requested.",
+        "required_owner_action": "Completed per owner; retain private evidence.",
+        "independently_verified": false
       },
       {
         "id": "R22",
@@ -383,7 +389,7 @@
         "tests": "Read existing private business documents and official PA requirements",
         "defects_corrected": "None",
         "remaining_dependency": "Owner/counsel supplies accepted state filing or confirms lawful actual contracting party",
-        "required_owner_action": "Owner/counsel supplies accepted state filing or confirms lawful actual contracting party"
+        "required_owner_action": "DEFERRED TO LAST by owner: Owner/counsel supplies accepted state filing or confirms lawful actual contracting party"
       },
       {
         "id": "R23",
@@ -394,7 +400,7 @@
         "tests": "Inspected fee definitions, exclusions, rounding, reversals, tax and legal fields",
         "defects_corrected": "Existing nonboolean consent fix already in #329/#326; not live",
         "remaining_dependency": "Owner/counsel completes legal terms; authorized parties execute exact schedules",
-        "required_owner_action": "Owner/counsel completes legal terms; authorized parties execute exact schedules"
+        "required_owner_action": "DEFERRED TO LAST by owner: Owner/counsel completes legal terms; authorized parties execute exact schedules"
       },
       {
         "id": "R24",
@@ -405,14 +411,14 @@
         "tests": "Business readiness and document search; no purchase",
         "defects_corrected": "None",
         "remaining_dependency": "Owner obtains written broker/counsel advice and appropriate policy/binder or documented decision",
-        "required_owner_action": "Owner obtains written broker/counsel advice and appropriate policy/binder or documented decision"
+        "required_owner_action": "DEFERRED TO LAST by owner: Owner obtains written broker/counsel advice and appropriate policy/binder or documented decision"
       },
       {
         "id": "R25",
         "requirement": "Qualified independent human reviewer",
         "status": "BLOCKED",
         "scope": "EXTERNAL",
-        "evidence": "Only fictional reviewer identities/roles exercised",
+        "evidence": "Ten AI simulated reviewer roles completed; no actual human appointment or qualified customer-specific sign-off represented.",
         "tests": "Simulation review proof cannot certify actual competence or separation",
         "defects_corrected": "None",
         "remaining_dependency": "Name analyst, separate qualified reviewer, customer controller and backups",
@@ -423,7 +429,7 @@
         "requirement": "Buyer workspace MFA and permitted/denied access",
         "status": "BLOCKED",
         "scope": "EXTERNAL",
-        "evidence": "Drive folder owner-only; MFA and actual buyer/reviewer access unverified",
+        "evidence": "Restricted Drive configuration inspected previously; ten simulated reviews cannot observe actual MFA or prove buyer-specific allowed/denied access.",
         "tests": "Read actual permissions and policy; no sharing changed",
         "defects_corrected": "None",
         "remaining_dependency": "Named data owner validates MFA, restricted roster and allowed/denied identities",
@@ -562,16 +568,16 @@
       {
         "stage": "2",
         "name": "Inquiry",
-        "decision": "CONDITIONAL GO",
+        "decision": "GO (manual, non-sensitive)",
         "simulation": "PASS",
-        "evidence": "Non-sensitive email-draft route; actual send/receipt/reply blocked"
+        "evidence": "Phone/Zoho send, receipt and human response confirmed by owner 2026-10-12; no independent retest or automated intake activation."
       },
       {
         "stage": "3",
         "name": "Professional response",
-        "decision": "CONDITIONAL GO",
+        "decision": "GO (manual, non-sensitive)",
         "simulation": "PASS",
-        "evidence": "Human-reviewed response templates; real delivery unverified"
+        "evidence": "Phone/Zoho send, receipt and human response confirmed by owner 2026-10-12; no independent retest or automated intake activation."
       },
       {
         "stage": "4",
@@ -659,6 +665,20 @@
       }
     ],
     "decision": "NO-GO FOR FIRST PAYING CUSTOMER; REVIEWABLE MANUAL ROUTE PREPARED",
-    "authoritative_tracker": "https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/323"
+    "authoritative_tracker": "https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/323",
+    "owner_steering": {
+      "at": "2026-10-12T16:26:05-04:00",
+      "item_1": "Legal identity, contracts and insurance deferred to final owner step",
+      "item_2": "Ten simulated reviewers authorized; no actual MFA or human appointment inferred",
+      "item_3": "Phone/Zoho end-to-end handoff owner-confirmed complete",
+      "literal": "1 save for last. 2 do this yourself with 10 simulated reviewers. 3 this is done and confirmed"
+    }
+  },
+  "owner_steering": {
+    "at": "2026-10-12T16:26:05-04:00",
+    "item_1": "Legal identity, contracts and insurance deferred to final owner step",
+    "item_2": "Ten simulated reviewers authorized; no actual MFA or human appointment inferred",
+    "item_3": "Phone/Zoho end-to-end handoff owner-confirmed complete",
+    "literal": "1 save for last. 2 do this yourself with 10 simulated reviewers. 3 this is done and confirmed"
   }
 }

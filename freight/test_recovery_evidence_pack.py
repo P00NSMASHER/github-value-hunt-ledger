@@ -31,6 +31,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["economic_opportunity_identity_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
+    assert pack["claim_boundary"]["validated_supported_findings_bind_authority_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
     assert pack["claim_boundary"]["buyer_visible_realized_excludes_suppressed_findings"] is True
 
@@ -123,6 +124,21 @@ def test_validated_supported_finding_requires_supporting_evidence():
         build_pack(data)
 
 
+def test_validated_supported_finding_requires_named_authority_evidence():
+    data = payload()
+    row = data["findings"][0]
+    row["supporting_evidence"] = [
+        reference
+        for reference in row["supporting_evidence"]
+        if reference != row["authority_reference"]
+    ]
+    with pytest.raises(
+        ValueError,
+        match="validated supported finding requires authority_reference in supporting_evidence",
+    ):
+        build_pack(data)
+
+
 def test_unresolved_finding_can_enter_remediation_without_supporting_evidence():
     data = payload()
     data["findings"][3]["supporting_evidence"] = []
@@ -187,6 +203,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "One positive settlement reference can support only one finding" in report
     assert "One carrier/invoice/shipment/category identity can support only one economic opportunity" in report
     assert "validated supported finding requires at least one supporting-evidence reference" in report
+    assert "exact authority reference must appear in supporting evidence" in report
     assert "cannot rely on authority effective after its invoice date" in report
 
 

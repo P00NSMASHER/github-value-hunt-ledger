@@ -48,3 +48,16 @@ def test_missing_authority_and_duplicate_source_are_explicitly_rejected_or_held(
 
 def test_fictional_first_customer_replay_is_deterministic():
     assert rehearsal.run_first_customer_rehearsal() == rehearsal.run_first_customer_rehearsal()
+
+
+def test_report_keeps_unsupported_and_unrealized_amounts_visible():
+    out = rehearsal.run_first_customer_rehearsal()
+    metrics = out["metrics"]
+    assert metrics["held_finding_count"] == 1
+    assert metrics["held_discrepancy_cents"] == 40_000
+    assert metrics["supported_unrealized_cents"] == 5_000
+    from freight.pilot_reporting import PilotMetrics, render_markdown
+    report = render_markdown(PilotMetrics(**metrics))
+    assert "Held source findings: 1 ($400.00 unverified candidate)" in report
+    assert "Supported but unrealized: **$50.00**" in report
+    assert "Unresolved reviewed findings: 0" not in report
