@@ -444,6 +444,31 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_m21["raw_2022_aies_standalone_survey_collected"]=True
         _must(bool(validate_m21_historic(forged_m21,as_of=today)),
               "M21_FAKE_STANDALONE_2022_AIES_ACCEPTED")
+        from freight.research_sas_benchmark import (
+            report_shell as build_sas_benchmark,
+            validate_book as validate_sas_benchmark_book,
+        )
+        sas=build_sas_benchmark(as_of=today)
+        _must(sas["status"]=="OFFLINE_SAS_SOURCE_VINTAGE_MANIFEST_ONLY_NOT_FRESH_ZIP_REPLAY",
+              "SAS_BENCHMARK_OFFLINE_RESEARCH_FAKES_PUBLISHER_DOWNLOAD")
+        _must(sas["vintage_2026_benchmarked_sas_million_usd"]==65688 and
+              sas["vintage_2024_original_sas_million_usd"]==68411 and
+              sas["revised_minus_old_sas_million_usd"]==-2723,
+              "SAS_2022_BENCHMARK_REVISION_NOT_RECONCILED")
+        _must(sas["aies_minus_revised_sas_million_usd"]=="0.461" and
+              sas["aies_reconciles_to_published_benchmarked_sas_nearest_million"] is True,
+              "SAS_AIES_HISTORICAL_2022_ROUNDING_COMPATIBILITY_MISSING")
+        _must(sas["exact_modified_sas_sample_and_carryforward_factor_verified"] is False and
+              sas["both_cvs_not_statistically_reconciled_or_independent_samples"] is True,
+              "SAS_BENCHMARK_SPECIFIC_LATENT_ADJUSTMENT_FABRICATED")
+        _must(sas["actual_customer_paid_invoices_observed"]==0 and
+              sas["recoverable_freight_audit_tam_usd"] is None and
+              sas["human_pilot_18_approval_requirements_unmet"] is True,
+              "SAS_INDUSTRY_REVENUE_PROMOTED_TO_LTL_RECOVERY")
+        forged_sas=_read("research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json")
+        forged_sas["revised_sas_cv_zero_means_exact_no_statistical_error"]=True
+        _must(bool(validate_sas_benchmark_book(forged_sas,as_of=today)),
+              "SAS_PUBLISHER_CV_ZERO_PROMOTED_TO_ERROR_FREE_CLAIM")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -501,6 +526,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "aies_2022_historic_original_zip_in_this_director_run":False,
                 "aies_2022_legacy_sas_gap_causal_attribution_held":True,
                 "aies_2022_historic_research_receipt_sha256":historical2022["receipt_sha256"],
+                "sas_2022_old_source_million_usd":sas["vintage_2024_original_sas_million_usd"],
+                "sas_2022_benchmarked_million_usd":sas["vintage_2026_benchmarked_sas_million_usd"],
+                "sas_2022_pub_revision_million_usd":sas["revised_minus_old_sas_million_usd"],
+                "sas_2022_rounding_reconciled_to_aies":sas["aies_reconciles_to_published_benchmarked_sas_nearest_million"],
+                "sas_benchmark_original_xlsx_replayed_in_director":False,
+                "sas_benchmark_source_receipt_sha256":sas["receipt_sha256"],
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
                 "ltl_recovery_market_established":False,

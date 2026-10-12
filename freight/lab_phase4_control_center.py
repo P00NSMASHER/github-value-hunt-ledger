@@ -51,6 +51,10 @@ from freight.research_aies_2022_lineage import (
     _shell as build_aies_2022_historic,
     render_html as render_aies_2022_html,
 )
+from freight.research_sas_benchmark import (
+    report_shell as build_sas_benchmark,
+    render_html as render_sas_benchmark_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -114,6 +118,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["aies_2022_publisher_historical"]=build_aies_2022_historic(
             date.today()
         )
+        result["sas_2022_benchmark_reconciliation"]=build_sas_benchmark(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -164,6 +169,7 @@ def render(data: dict) -> str:
     aies=data["aies_ltl_carrier_revenue"]
     historical=data["aies_historical_lineage"]
     linked2022=data["aies_2022_publisher_historical"]
+    sas=data["sas_2022_benchmark_reconciliation"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -325,9 +331,23 @@ of zero is not proof of error-free measurement or billing accuracy.
 The operator report is offline metadata only: <strong>"""+escape(linked2022["status"])+"""</strong>.</p>
 <p>2022 Census/FRED historical LTL establishment revenue: $"""+format(linked2022["published_2022_historical_ltl_revenue_thousand_usd"]/1000000,".3f")+""" billion.
 Older legacy SAS published $68.411 billion; the $"""+escape(linked2022["legacy_sas_gap_million_usd"])+""" million
-difference has NOT been attributed to an independently verified vintage
-revision or methodology cause. No customer invoices or recoveries established.</p>
+difference was unresolved in Mission 21; Mission 22 now links the published
+difference to the older and August 2026 Census SAS source vintages, while a
+specific sample-linking factor remains unverified. No customer invoices or recoveries established.</p>
 <a href="aies_2022_lineage.html">Open 2022 publisher-historical evidence and legacy survey holds ↗</a></section>
+<section class="panel"><h2>2022 SAS benchmark revision — historical conflict reconciled</h2>
+<p>Original and revised 2022 Census Services Annual Survey tables provide
+different versions of employer-industry revenue for NAICS 484122. The
+August 2026 benchmark aligns with the published AIES historical figure to
+the nearest million. This offline operator snapshot has not performed
+a new original Census XLSX download: <strong>"""+escape(sas["status"])+"""</strong>.</p>
+<p>Earlier 2022 SAS: $"""+format(sas["vintage_2024_original_sas_million_usd"],",")+"""m ·
+Revised SAS: $"""+format(sas["vintage_2026_benchmarked_sas_million_usd"],",")+"""m ·
+AIES historical: $"""+escape(sas["original_aies_2022_historical_million_usd"])+"""m.
+The $"""+escape(sas["aies_minus_revised_sas_million_usd"])+"""m residual reflects
+published reporting precision, not invoice errors, contractual overcharges, or
+customer refunds. The exact industry-specific source adjustment factor is unverified.</p>
+<a href="sas_2022_reconciliation.html">Open original Census workbook provenance and vintage reconciliation ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -457,6 +477,14 @@ def main():
     )
     (args.out/"aies_2022_lineage.html").write_text(
         render_aies_2022_html(data["aies_2022_publisher_historical"]),encoding="utf-8"
+    )
+    (args.out/"sas_2022_reconciliation.json").write_text(
+        json.dumps(data["sas_2022_benchmark_reconciliation"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"sas_2022_reconciliation.html").write_text(
+        render_sas_benchmark_html(data["sas_2022_benchmark_reconciliation"]),
+        encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
