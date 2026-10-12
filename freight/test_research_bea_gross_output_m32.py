@@ -89,7 +89,7 @@ class BEAGrossOutputM32Tests(unittest.TestCase):
 
     def test_all_eight_annual_years_exact_in_frozen_data(self):
         r=m32.report_shell(as_of=TODAY)
-        self.assertEqual([y["year"] for y in r["bea_2017_2024_year_index"],list(m32.YEARS))
+        self.assertEqual([y["year"] for y in r["bea_2017_2024_year_index"]],list(m32.YEARS))
         self.assertEqual([x["chain_type_real_gross_output_index"]
                           for x in r["bea_2017_2024_year_index"]],
                          ["100.000","102.952","102.398","103.678",
