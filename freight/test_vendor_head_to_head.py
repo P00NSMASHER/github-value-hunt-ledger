@@ -3,6 +3,7 @@
 Run by the existing unittest-based Freight CI. No real customer/vendor data.
 """
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import unittest
@@ -23,7 +24,7 @@ def _entry(vendor="RecoveryOS", *, source_kind="SYNTHETIC_TEST", pilot=None):
     return {
         "vendor": vendor,
         "source_kind": source_kind,
-        "output_receipt_sha256": ("a" if vendor == "RecoveryOS" else "b") * 64,
+        "output_receipt_sha256": hashlib.sha256(("vendor-receipt:" + vendor).encode()).hexdigest(),
         "pilot": packet,
     }
 
@@ -41,7 +42,7 @@ class HeadToHeadTests(unittest.TestCase):
         self.assertFalse(report["market_best_product_proven"])
         self.assertFalse(report["source_code_access_inferred"])
         self.assertFalse(report["verified_realized_recovery"])
-        self.assertEqual(report["sample_leaders_if_independently_proven"], [])
+        self.assertEqual(report["provisional_same_population_max_not_verified"], [])
         self.assertEqual(len(report["vendor_results"]), 1)
         self.assertEqual(report["vendor_results"][0]["vendor"], "RecoveryOS")
 
@@ -158,17 +159,18 @@ class HeadToHeadTests(unittest.TestCase):
         self.assertEqual(results["missing_vendors"], [])
         self.assertEqual(results["observed_vendor_count"], 6)
         self.assertFalse(results["market_best_product_proven"])
-        self.assertEqual(results["sample_leaders_if_independently_proven"], [])
+        self.assertEqual(results["provisional_same_population_max_not_verified"], [])
 
     def test_real_output_packet_is_still_not_universal_product_claim(self):
         results = compare_vendor_study(_study(
             *(_entry(v, source_kind="AUTHORIZED_VENDOR_DEMO") for v in VENDORS),
             study_kind="BUYER_AUTHORIZED_BLIND",
         ), POLICY)
-        self.assertEqual(results["comparison_status"], "SAMPLE_COMPARISON_READY")
-        self.assertEqual(set(results["sample_leaders_if_independently_proven"]), set(VENDORS))
+        self.assertEqual(results["comparison_status"], "SAMPLE_COMPARISON_READY_RECEIPTS_UNVERIFIED")
+        self.assertEqual(set(results["provisional_same_population_max_not_verified"]), set(VENDORS))
         self.assertFalse(results["market_best_product_proven"])
         self.assertFalse(results["verified_realized_recovery"])
+        self.assertFalse(results["external_vendor_receipts_independently_verified"])
 
     def test_invalid_receipt_sha_is_rejected(self):
         r = _entry()
@@ -198,6 +200,14 @@ class HeadToHeadTests(unittest.TestCase):
             with self.subTest(study=str(study.get("study_kind"))):
                 with self.assertRaises(ComparisonInvalid):
                     compare_vendor_study(study, POLICY)
+
+    def test_duplicate_vendor_receipt_is_not_independent_evidence(self):
+        rows = [_entry("RecoveryOS"), _entry("Loop", source_kind="AUTHORIZED_VENDOR_DEMO")]
+        rows[0]["source_kind"] = "AUTHORIZED_VENDOR_DEMO"
+        rows[1]["output_receipt_sha256"] = rows[0]["output_receipt_sha256"]
+        with self.assertRaisesRegex(ComparisonInvalid, "distinct evidence"):
+            compare_vendor_study(_study(*rows, study_kind="BUYER_AUTHORIZED_BLIND"), POLICY)
+
 
 
 if __name__ == "__main__":
