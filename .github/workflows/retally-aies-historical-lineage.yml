@@ -1,62 +1,142 @@
-name: RETALLY Lab 14 AIES Historical Publisher Reconnaissance (Mission 20)
+name: RETALLY Lab 14 AIES Historic Census Source Proof (Mission 20)
 on:
   pull_request:
     paths:
       - '.github/workflows/retally-aies-historical-lineage.yml'
       - 'freight/research_aies_historical_lineage.py'
       - 'freight/test_research_aies_historical_lineage.py'
+      - 'freight/research/AIES_HISTORICAL_LINEAGE_20261011.json'
       - 'freight/RESEARCH_AIES_HISTORICAL_LINEAGE.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
   workflow_dispatch:
 permissions:
   contents: read
+
 jobs:
-  publisher-reconnaissance:
+  offline-source-adversarial-suite:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
-      - name: Inspect historic series file schema without accepting unverified claims
+      - name: Install existing laboratory CI prerequisites
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run adversarial 2022 source-hold and prior Census-replay controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Verify offline source report and fourteen existing labs
+        run: |
+          PYTHONPATH=. python -m freight.research_aies_historical_lineage \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m20-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m20-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-m20-offline')
+          r=json.loads((p/'aies_historical_lineage.json').read_text())
+          q=json.loads(Path('/tmp/retally-m20-control/phase4_control.json').read_text())
+          assert r['status']=='OFFLINE_SOURCE_METADATA_ONLY_NO_FRESH_CENSUS_REPLAY'
+          assert r['year_2022_status'].startswith('HOLD_')
+          assert r['year_2023_status']=='METADATA_SNAPSHOT_NOT_NEW_PRIMARY_BYTE_REPLAY'
+          assert r['original_2023_and_2024_replayed_this_run'] is False
+          assert r['2023_national_ltl_thousand_usd']==64651167
+          assert r['2024_national_ltl_thousand_usd']==65096292
+          assert r['2023_to_2024_nominal_change_pct']=='0.69'
+          assert r['2022_to_2024_cagr_or_2022_to_2023_growth_promotion_allowed'] is False
+          assert r['recoverable_freight_audit_tam_usd'] is None
+          assert r['actual_paid_ltl_invoices_observed']==0
+          assert len(q['lab_runs'])==14 and q['failed_or_blocked_labs']==[]
+          assert q['actual_revenue_cents']==0
+          assert q['pilot_preflight']['unmet_requirements']==18
+          assert q['aies_historical_lineage']['receipt_sha256']==r['receipt_sha256']
+          assert 'aies_historical_lineage.html' in Path('/tmp/retally-m20-control/index.html').read_text()
+          assert (p/'aies_historical_lineage.html').is_file()
+          print('M20 source metadata and entire 14-lab research suite PASS. No 2022 original certification.')
+          PY
+      - name: Preserve offline research report, not customer records
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-aies-history-offline
+          path: |
+            /tmp/retally-m20-offline/aies_historical_lineage.json
+            /tmp/retally-m20-offline/aies_historical_lineage.html
+          if-no-files-found: error
+          retention-days: 14
+
+  replay-original-census-2023-and-2024:
+    needs: offline-source-adversarial-suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Reproduce Census 2023 basic/historical and 2024 original source files
+        run: |
+          PYTHONPATH=. python -m freight.research_aies_historical_lineage \
+            --fetch-originals --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m20-source
+      - name: Enforce complete original-source attestation or explicit BLOCKED hold
         run: |
           python - <<'PY'
-          from hashlib import sha256
-          from urllib.request import Request, urlopen
-          from zipfile import ZipFile
-          from io import BytesIO
-          import csv
-          sources = {
-              "latest_historical_2024": "https://www2.census.gov/programs-surveys/aies/data/2024/API_Datasets/AIESBASICTIMESERIES.zip",
-              "historical_2023": "https://www2.census.gov/programs-surveys/aies/data/2023/API_Datasets/AIESBASICTIMESERIES.zip",
-              "published_2023": "https://www2.census.gov/programs-surveys/aies/data/2023/API_Datasets/AIESBASIC2023.zip",
-          }
-          for label,url in sources.items():
-              print("SOURCE_START",label,url,flush=True)
-              try:
-                  request=Request(url,headers={"User-Agent":"RETALLY-Lab14-Source-Provenance/1.0"})
-                  with urlopen(request,timeout=18) as response:
-                      if response.geturl()!=url: raise ValueError("PUBLISHER_REDIRECT")
-                      raw=response.read(1_700_001)
-                  if len(raw)>1_700_000: raise ValueError("ZIP_TOO_LARGE")
-                  print("SOURCE_ZIP",label,len(raw),sha256(raw).hexdigest(),flush=True)
-                  with ZipFile(BytesIO(raw)) as z:
-                      for item in z.infolist():
-                          if item.is_dir():continue
-                          print("MEMBER",label,item.filename,item.file_size)
-                          if not item.filename.lower().endswith((".dat",".csv")):continue
-                          if item.file_size>12_000_000:raise ValueError("DAT_TOO_BIG")
-                          data=z.read(item).decode("utf-8-sig")
-                          rows=list(csv.DictReader(data.splitlines(),delimiter="|" if item.filename.endswith(".dat") else ","))
-                          print("DAT_INFO",label,item.filename,"rows",len(rows),"headers",list(rows[0])[:32] if rows else [],flush=True)
-                          chosen=[]
-                          for row in rows:
-                              if (row.get("NAICS2017") in ("484","484121","484122") or row.get("NAICS") in ("484","484121","484122")) and (row.get("YEAR") in ("2022","2023","2024")):
-                                  if row.get("GEO_ID") in ("0100000US",None) and row.get("TYPOP") in ("00",None):
-                                      chosen.append(row)
-                          for row in chosen[:14]:
-                              print("MATCH",label,{k:v for k,v in row.items() if k in ("YEAR","NAICS","NAICS2017","TYPOP","TAXSTAT","ST","GEO_ID","NAICS_LABEL","RCPT_TOT_VAL","RCPT_TOT_VAL_F","RCPT_TOT_CV","RCPT_TOT_CV_F")},flush=True)
-                          print("MATCH_COUNT",label,len(chosen),flush=True)
-              except Exception as exc:
-                  print("SOURCE_BLOCKED",label,type(exc).__name__,str(exc)[:160],flush=True)
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m20-source/aies_historical_lineage.json').read_text())
+          assert r['scope']=='LAB14_AIES_2023_ORIGINAL_HISTORICAL_LINEAGE_NOT_LTL_BILLINGS'
+          assert r['year_2022_status'].startswith('HOLD_')
+          assert r['2022_to_2024_cagr_or_2022_to_2023_growth_promotion_allowed'] is False
+          assert r['source_family_is_independent_crosscheck'] is False
+          assert r['18_pilot_approval_requirements_unmet'] is True
+          assert r['actual_paid_ltl_invoices_observed']==0
+          assert r['recoverable_freight_audit_tam_usd'] is None
+          assert r['customer_billing_error_rate_pct'] is None
+          assert r['actual_cash_recovered_usd'] is None
+          assert r['marketing_contact_or_external_claims_authorized'] is False
+          assert r['new_lab_created'] is False and r['lab']==14
+          assert len(r['receipt_sha256'])==64
+          if r['status']=='VERIFIED_2023_AND_2024_CENSUS_ORIGINALS_2022_ON_HOLD':
+              assert r['original_2023_and_2024_replayed_this_run'] is True
+              proofs=r['original_2023_archive_replays']
+              assert len(proofs)==2
+              assert {p['source_id'] for p in proofs}=={'2023_published','2023_timeseries'}
+              assert all(p['source_rows_total']==13512 and
+                         len(p['source_2023_naics_rows'])==3 and
+                         len(p['data_member_sha256'])==64
+                         for p in proofs)
+              assert proofs[0]['source_2023_naics_rows']==proofs[1]['source_2023_naics_rows']
+              assert [x['revenue_thousand_usd'] for x in proofs[0]['source_2023_naics_rows']]==[406651010,163025116,64651167]
+              assert r['original_2024_m19_replay']['source_2024_ltl_revenue_thousand_usd']==65096292
+              assert r['year_2023_status'].startswith('2023_CENSUS')
+              assert r['year_2024_status'].startswith('M19_2024')
+              print('VERIFIED original 2023 dual Census and 2024 original ZIPs; 2022 remains NOT source-replayed.')
+          elif r['status']=='BLOCKED_ORIGINAL_CENSUS_ARCHIVE_FETCH_NOT_VERIFIED':
+              assert r['original_2023_and_2024_replayed_this_run'] is False
+              assert r['original_2023_archive_replays']==[]
+              assert r['original_2024_m19_replay'] is None
+              print('::warning::Census original FTP blocked; NO newly verified 2023/2024 source evidence.')
+          else:
+              raise AssertionError('SOURCE_REPLAY_UNAUTHORIZED_STATUS')
           PY
+      - name: Retain evidence receipts only (no original Census archives)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-aies-history-original-byte-replay
+          path: |
+            /tmp/retally-m20-source/aies_historical_lineage.json
+            /tmp/retally-m20-source/aies_historical_lineage.html
+          if-no-files-found: error
+          retention-days: 14
