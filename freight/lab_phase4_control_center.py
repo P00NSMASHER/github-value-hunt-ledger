@@ -83,6 +83,10 @@ from freight.research_unified_blspci import (
     report_shell as build_unified_bls,
     render_html as render_unified_bls_html,
 )
+from freight.research_bea_measurement_gate import (
+    report_shell as build_bea_measure_gate,
+    render_html as render_bea_measure_html,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -154,6 +158,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["fred_parent_484_ppi_provenance"]=build_fred_parent(as_of=date.today())
         result["bls_native_parent_484_origin"]=build_bls_native_parent(as_of=date.today())
         result["bls_unified_current_evidence"]=build_unified_bls(as_of=date.today())
+        result["bea_measure_compatibility_gate"]=build_bea_measure_gate(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -212,6 +217,7 @@ def render(data: dict) -> str:
     fred=data["fred_parent_484_ppi_provenance"]
     native=data["bls_native_parent_484_origin"]
     unified=data["bls_unified_current_evidence"]
+    bea_measure=data["bea_measure_compatibility_gate"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -430,6 +436,23 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
+<section class="panel"><h2>BEA real gross-output validation — requires compatible original source</h2>
+<p>Mission 29 authenticates three original BLS producer-price indexes, but
+a Census-revenue divided by BLS-price proxy is not a published real
+output statistic. BEA classifies industry GDP as value added,
+which is gross output minus intermediate inputs. Its published real GDP
+quantity index is not the same as BEA's real gross-output industry index.
+Current BEA-source gate: <strong>"""+escape(bea_measure["status"])+"""</strong>.</p>
+<p>BEA/FRED web-observed truck transportation 2017–2024 real GDP VALUE ADDED:
+superseded 2025-vintage <strong>"""+escape(bea_measure["bea_value_added_2025_vintage_2017_to_2024_growth_pct"])+"""%</strong>,
+September 2026 revision <strong>"""+escape(bea_measure["bea_value_added_2026_vintage_2017_to_2024_growth_pct"])+"""%</strong>.
+Mission 29's illustrative PPI-adjusted Census revenue proxy is
+<strong>"""+escape(bea_measure["census_bls_484_price_adjusted_revenue_proxy_2017_2024_pct"])+"""%</strong>.
+Differences are <strong>NOT validation errors</strong>: value added includes
+input subtraction, while the output proxy does not. Fresh original BEA
+NAICS 484 real gross-output quantity series has NOT been source-authenticated;
+real freight billing errors and refunds have not been measured.</p>
+<a href="bea_measure_compatibility.html">Open official BEA measurement definitions, GDP vintage risk and original gross-output hold ↗</a></section>
 <section class="panel"><h2>Current consolidated original BLS evidence — 484, TL, LTL</h2>
 <p>This is the <strong>current</strong> Research Lab view for three original
 BLS native producer output price indices, with one first-party API v2 source
@@ -685,6 +708,13 @@ def main():
     (args.out/"unified_bls_evidence.html").write_text(
         render_unified_bls_html(data["bls_unified_current_evidence"]),
         encoding="utf-8"
+    )
+    (args.out/"bea_measure_compatibility.json").write_text(
+        json.dumps(data["bea_measure_compatibility_gate"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"bea_measure_compatibility.html").write_text(
+        render_bea_measure_html(data["bea_measure_compatibility_gate"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
