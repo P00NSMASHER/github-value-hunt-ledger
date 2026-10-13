@@ -16,7 +16,12 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from openpyxl import Workbook
+try:
+    from openpyxl import Workbook
+except ImportError:
+    # The core repository release gate runs without optional XLSX test fixtures.
+    # The Mission 33 dedicated CI installs pinned openpyxl and runs these fully.
+    Workbook=None
 from freight.research_evidence_gate import canon_hash
 from freight import research_bea_original_m33 as m33
 
@@ -28,6 +33,8 @@ def catalog():
 
 
 def synthetic_xlsx():
+    if Workbook is None:
+        raise unittest.SkipTest("synthetic XLSX parser fixture requires openpyxl; M33 dedicated CI installs it")
     wb=Workbook()
     wb.active.title="Contents"
     for sh in m33.EXPECTED_SHEETS[1:]:
@@ -58,6 +65,8 @@ def synthetic_xlsx():
 
 
 def mutate_fixture(func):
+    if Workbook is None:
+        raise unittest.SkipTest("synthetic XLSX fixture requires openpyxl; M33 dedicated CI installs it")
     from openpyxl import load_workbook
     w=load_workbook(BytesIO(synthetic_xlsx()))
     func(w)
