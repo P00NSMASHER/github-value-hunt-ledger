@@ -166,3 +166,20 @@ V4 adds **six 4-slide educational carousels (24 originals and 24 phone screensho
 - Cover slide and finale use a full-bleed editorial photo, while steps use oversized numbered evidence rows and the comparison slide uses two stacked decision panels. The illustrative detention scenario is visibly labelled, and no hypothetical figure is represented as a real refund.
 - `v3_draft_captions.json` remains an unposted reference for the same six topics, with exactly corresponding Facebook and Instagram copy. Captions, alternative text and the final educational page require final pre-publication review.
 - No Metricool entries were created, edited, moved or published by this renderer. Existing 41 active automatic posts and the LinkedIn restricted draft remain as-is. No paid activity, customer outreach, real invoices, purchases, business registration or recurring tasks.
+
+## Phone-first single-panel alternative (v4, October 13)
+
+The previous six v3 covers were recognizably branded but **too dense in 390px feed previews**: three narrow document columns displayed low-priority labels at approximately 6px and made the evidence workflow harder to read.
+
+The additive v4 design preserves all six v3 themes, original approved logo bytes, six registered hero photos, claim disclaimers and caption proposals but changes the evidence section to **three horizontally full-width numbered rows**. Only the essential record/category and next verification step appear on each row. Small status/label scaffolding is removed from the artwork rather than squeezed smaller. The full evidence explanation stays in the platform caption.
+
+- Card headings have a 40px minimum at 1080px source size (about **14.4px in a 390px feed**); row actions have a 28px minimum (about **10.1px in a 390px feed**). Document-row alignment, visible text, non-overflow, headline and illustrative-label size are checked in the browser before screenshot export.
+- Every v4 graphic has its own 1080×1350 original and 390×488 iPhone review preview. If any text clips, a card fails its size threshold, or a row overlaps, the render **fails**, rather than silently producing a publishable-looking image.
+- Keep the original v3 files and the 24 carousel slides intact for visual comparison. The v4 single panels are supplementary cover/reference candidates, **not replacements to scheduled social posts**.
+- All release holds remain: photo rights and human visual review, wording, platform-specific alt descriptions, branded social preview, independently confirmed posting eligibility, and strict pre-registration/customer-data authorization.
+
+Run from repository root:
+
+    python freight/brand/social/creative-lab/render_social_v4.py --repo-root . --mode production --concept all --output-dir /tmp/retally-v4-phonefirst
+
+Here `production` selects registered source graphics; it is **not** a publication, approval, launch, or deployment command.
