@@ -1034,6 +1034,33 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                           persistent_attack_ids_m44[x["source_attack"]]
                       for x in atomic45["cases"]),
               "M45_PERSISTENT_OPERATION_NEGATIVE_CASE_NOT_EXECUTED")
+        from freight.lab_schema_integrity_m46 import (
+            run_campaign as run_schema_integrity_m46,
+            DDL_ATTACKS as ddl_attack_contract_m46,
+        )
+        schema46=run_schema_integrity_m46(as_of=today)
+        _must(schema46["existing_research_lab_count"]==14
+              and schema46["disposable_ddl_mutation_cases"]==10
+              and schema46["positive_synthetic_money_controls"]==50
+              and schema46["financial_read_denials"]==70
+              and schema46["attempted_write_denials"]==10
+              and schema46["preexisting_file_reopen_denials"]==10
+              and schema46["original_historical_findings_open"]==26
+              and schema46["original_historical_findings_closed"]==0
+              and schema46["human_first_customer_pilot_gates_unmet"]==18
+              and schema46["public_empirical_claims_approved"]==0
+              and schema46["actual_company_revenue_cents"]==0,
+              "M46_CORRUPTED_SCHEMA_OR_UNSUPPORTED_REAL_AUTHORITY_ACCEPTED")
+        _must(tuple(c["schema_mutation"] for c in schema46["cases"])==
+              tuple(ddl_attack_contract_m46)
+              and all(c["expected_denial"]==
+                          ddl_attack_contract_m46[c["schema_mutation"]][1]
+                      and c["read_surface_exact_denials"]==7
+                      and c["write_attempt_denied"] is True
+                      and c["reopen_denied_without_recreating_triggers"] is True
+                      and c["original_historical_defect_closed"] is False
+                      for c in schema46["cases"]),
+              "M46_SQLITE_SCHEMATIC_NEGATIVE_CONTROL_NOT_COMPLETED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1196,6 +1223,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "atomic_financial_total_denials_m45":48,
                 "atomic_financial_historical_findings_closed_m45":0,
                 "atomic_financial_receipt_sha256_m45":atomic45["receipt_sha256"],
+                "sqlite_schema_mutation_cases_m46":10,
+                "sqlite_schema_read_denials_m46":70,
+                "sqlite_schema_write_denials_m46":10,
+                "sqlite_schema_reopen_denials_m46":10,
+                "sqlite_schema_original_defects_closed_m46":0,
+                "sqlite_schema_receipt_sha256_m46":schema46["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

@@ -94,18 +94,24 @@ class SettlementStore:
         if self.path == ":memory:":
             raise ValueError("file-backed SQLite is required for concurrent connections")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        # M46: NEVER repair a pre-existing file on open by silently
+        # re-creating deleted append-only/capacity triggers. A previously
+        # existing file must pass the exact reviewed schema contract AS IS.
+        # Only a genuinely new file may be initialized from first-party SQL.
+        existed = Path(self.path).is_file()
         # sqlite3.Connection's context manager commits or rolls back but does
-        # not close the connection.  Close explicitly so Windows can delete,
-        # rotate, or restore the database after initialization.
+        # not close the connection. Close explicitly after validation.
         conn = self._connect()
         try:
             conn.execute("PRAGMA journal_mode=WAL")
-            conn.executescript(Path(__file__).with_name("settlement_schema.sql").read_text())
-            # Validate reopening from ONE pinned SQLite revision, not
-            # unrelated claim/event/reversal table reads across writers.
+            if not existed:
+                conn.executescript(Path(__file__).with_name("settlement_schema.sql").read_text())
+            # Pin reopen, source scans and schema checks to ONE read revision.
             conn.execute("BEGIN")
             try:
                 self._assert_scoped_schema(conn)
+            except sqlite3.Error as exc:
+                raise RuntimeError("M46_SQLITE_EXISTING_SOURCE_UNREADABLE") from exc
             finally:
                 conn.rollback()
         finally:

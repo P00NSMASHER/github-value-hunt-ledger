@@ -214,6 +214,11 @@ def audit_connection(con: sqlite3.Connection, *,
                 _fail("TRANSIENT_NEGATIVE_CLAIM_BALANCE")
             if current > claims[key]["amount_cents"]:
                 _fail("TRANSIENT_CLAIM_CAPACITY_EXCEEDED")
+    # Schema has to be sound *as well as* the money rows. Validate after
+    # semantic values so a source with both bad rows and missing triggers
+    # preserves its precise original financial denial first.
+    from freight.settlement_schema_guard_m46 import assert_sqlite_schema
+    assert_sqlite_schema(con)
     return {
         "scope": SCOPE,
         "input_is_current_sqlite_only_not_signed_original_evidence": True,
