@@ -86,6 +86,11 @@ EXPECTED_BEANOM=(
     "367154","401324","409425","413595",
     "490334","577292","546993","545435",
 )
+EXPECTED_CENSUS_ORIGINAL_SHA256={
+    "revised_sas_2017_2022":"cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac",
+    "linked_aies_2022_2024":"1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4",
+    "aies_basic_2024":"39c4235026672e7bffdbc36292ed976726df368f2ca435219aef1c84e8e4faa6",
+}
 EXPECTED_CENSUS=(
     "290532.000","310688.000","314044.000","308131.000",
     "361243.000","423270.958","406651.010","402827.246",
@@ -436,8 +441,11 @@ def verify_source_receipts(*,as_of:date,bea:dict,census:dict,bls:dict)->dict:
     if family_verified["census"]:
         receipts=census.get("source_original_archive_receipts")
         if (census.get("census_original_replay_completed_in_this_run") is not True
-            or len(receipts)!=3 or set(x["id"] for x in receipts)!=set(CENSUS_IDS)):
-            raise ValueError("M34_MISSING_THREE_CENSUS_ORIGINAL_ARCHIVES")
+            or type(receipts) is not list or len(receipts)!=3
+            or set(x["id"] for x in receipts)!=set(CENSUS_IDS)
+            or any(x.get("sha256")!=EXPECTED_CENSUS_ORIGINAL_SHA256[x["id"]]
+                   for x in receipts)):
+            raise ValueError("M34_MISSING_OR_CHANGED_THREE_CENSUS_ORIGINAL_ARCHIVES")
         ces=next(x for x in census["industry_series"] if x["naics"]==NAICS)
         actual={r["year"]:r for r in ces["annual_revenue"]}
         if len(actual)!=8 or any(
