@@ -132,6 +132,19 @@ def build_pilot_package(
     submission: SealedIncumbentSubmission,
     incumbent: IncumbentOutput,
 ) -> PilotPackageManifest:
+    # A constructed/replaced dataclass is not evidence of prior validation.
+    # Reuse the source policy and canonical hash at the consumption boundary.
+    verified_room = build_data_room_manifest(
+        data_room.buyer_id,
+        data_room.business_unit,
+        data_room.entries,
+        require_pilot_read_only=True,
+    )
+    if (not _valid_sha256(data_room.manifest_hash)
+            or data_room.manifest_hash != verified_room.manifest_hash):
+        raise ValueError("data-room manifest hash mismatch")
+    data_room = verified_room
+
     scope = (data_room.buyer_id, data_room.business_unit)
     objects = (
         ("population", population.buyer_id, population.business_unit),

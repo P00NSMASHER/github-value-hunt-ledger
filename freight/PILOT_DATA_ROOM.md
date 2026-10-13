@@ -1,6 +1,6 @@
 # Freight Recovery — Pilot Data Room Manifest
 
-Updated: 2026-09-20
+Updated: 2026-10-13
 
 Every controlled pilot should have one machine-checkable source manifest before truth-building begins.
 
@@ -40,6 +40,21 @@ A source does not enter the pilot evidence room when:
 - SHA-256 is missing/malformed;
 - credentials/secrets are present;
 - retention is undefined/non-positive.
+
+## Package-time revalidation
+
+`build_pilot_package` reconstructs the data-room manifest through the existing
+source validator and checks its canonical SHA-256 before consuming it. A
+constructed or replaced dataclass is not proof that its entries were validated.
+Changed entries cannot retain an old manifest digest; recomputing the digest
+cannot bypass scope, permission, read-only, secret, retention or duplicate-ID
+checks. A non-pilot read-only exception is never inherited by a pilot package.
+Canonical source reordering preserves package identity; a valid revised manifest
+produces a new package identity without mutating the supplied manifest.
+
+This is metadata consistency and policy validation, not verification of original
+source bytes, authentic customer consent, external provenance, hosted access
+controls or recovered funds. Those still require separate evidence.
 
 ## Blind-order chain
 

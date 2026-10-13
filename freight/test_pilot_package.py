@@ -1,10 +1,11 @@
 import hashlib
 
-from dataclasses import replace
+from dataclasses import asdict, replace
 import pytest
 
 from freight.contracts import (
     AuthorityRef,
+    canonical_hash,
     PopulationRow,
     freeze_population,
     freeze_truth,
@@ -147,3 +148,103 @@ def test_incumbent_source_must_be_in_data_room():
         assert "sealed incumbent source missing" in str(exc)
     else:
         raise AssertionError("unmanifested incumbent source should fail")
+
+
+def _replace_room_entries(room, entries, *, rehash=False):
+    """Construct untrusted metadata; recomputing a digest grants no permission."""
+    entries = tuple(sorted(entries, key=lambda entry: entry.source_id))
+    digest = room.manifest_hash
+    if rehash:
+        digest = canonical_hash({
+            "schema": 1,
+            "buyer_id": room.buyer_id,
+            "business_unit": room.business_unit,
+            "entries": [asdict(entry) for entry in entries],
+        })
+    return replace(room, entries=entries, manifest_hash=digest)
+
+
+@pytest.mark.parametrize("rehash", [False, True])
+@pytest.mark.parametrize("changes, message", [
+    ({"authorized": False}, "unauthorized source"),
+    ({"read_only": False}, "must be read-only"),
+    ({"contains_secrets": True}, "secret-bearing"),
+    ({"authorized": "true"}, "authorized must be a boolean"),
+    ({"read_only": 1}, "read_only must be a boolean"),
+    ({"contains_secrets": "false"}, "contains_secrets must be a boolean"),
+    ({"buyer_id": "other-buyer"}, "source scope mismatch"),
+    ({"business_unit": "other-unit"}, "source scope mismatch"),
+    ({"source_type": "unregistered"}, "unsupported source_type"),
+    ({"source_hash": "not-a-digest"}, "lowercase SHA-256"),
+    ({"retention_days": 0}, "positive integer"),
+    ({"retention_days": True}, "positive integer"),
+])
+def test_package_revalidates_every_source_even_with_a_recomputed_hash(changes, message, rehash):
+    # The extra source leaves all required source types and incumbent links intact.
+    extra = SourceEntry("extra-1", BUYER, BU, "other", H("extra"), True, True, False, 30)
+    entries = room_entries() + [extra]
+    room = build_data_room_manifest(BUYER, BU, entries)
+    entries[-1] = replace(extra, **changes)
+    untrusted = _replace_room_entries(room, entries, rehash=rehash)
+    with pytest.raises(ValueError, match=message):
+        build_pilot_package(untrusted, *proof_objects())
+
+
+@pytest.mark.parametrize("digest", [None, "", True, "A" * 64, "a" * 63, H("wrong-room")])
+def test_package_rejects_unbound_data_room_digest(digest):
+    room = build_data_room_manifest(BUYER, BU, room_entries())
+    with pytest.raises(ValueError, match="data-room manifest hash mismatch"):
+        build_pilot_package(replace(room, manifest_hash=digest), *proof_objects())
+
+
+@pytest.mark.parametrize("changes", [
+    {"source_hash": H("replacement-invoice")},
+    {"source_locator": "synthetic://replacement-invoice"},
+    {"retention_days": 60},
+    {"source_id": "replacement-id"},
+])
+def test_package_rejects_changed_metadata_under_an_old_data_room_hash(changes):
+    entries = room_entries()
+    room = build_data_room_manifest(BUYER, BU, entries)
+    entries[0] = replace(entries[0], **changes)
+    with pytest.raises(ValueError, match="data-room manifest hash mismatch"):
+        build_pilot_package(_replace_room_entries(room, entries), *proof_objects())
+
+
+@pytest.mark.parametrize("rehash", [False, True])
+def test_package_rejects_duplicate_source_ids_after_manifest_construction(rehash):
+    entries = room_entries()
+    room = build_data_room_manifest(BUYER, BU, entries)
+    untrusted = _replace_room_entries(room, entries + [entries[0]], rehash=rehash)
+    with pytest.raises(ValueError, match="duplicate source_id"):
+        build_pilot_package(untrusted, *proof_objects())
+
+
+def test_non_pilot_readonly_exception_cannot_authorize_a_pilot_package():
+    entries = [replace(entry, read_only=False) for entry in room_entries()]
+    room = build_data_room_manifest(BUYER, BU, entries, require_pilot_read_only=False)
+    with pytest.raises(ValueError, match="pilot source must be read-only"):
+        build_pilot_package(room, *proof_objects())
+
+
+def test_reordering_verified_sources_preserves_package_identity_without_mutation():
+    room = build_data_room_manifest(BUYER, BU, room_entries())
+    objects = proof_objects()
+    expected = build_pilot_package(room, *objects)
+    reordered = replace(room, entries=tuple(reversed(room.entries)))
+    original_entries = reordered.entries
+    assert build_pilot_package(reordered, *objects) == expected
+    assert reordered.entries == original_entries
+
+
+def test_rebuilt_valid_source_revision_changes_package_identity():
+    entries = room_entries()
+    original_room = build_data_room_manifest(BUYER, BU, entries)
+    objects = proof_objects()
+    original = build_pilot_package(original_room, *objects)
+    entries[0] = replace(entries[0], source_locator="synthetic://approved-revision")
+    revised_room = build_data_room_manifest(BUYER, BU, entries)
+    revised = build_pilot_package(revised_room, *objects)
+    assert revised.data_room_hash == revised_room.manifest_hash
+    assert revised.package_hash != original.package_hash
+    assert revised.population_hash == original.population_hash
