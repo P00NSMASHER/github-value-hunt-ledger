@@ -6,10 +6,16 @@ import argparse
 import os
 import re
 import shutil
+import sys
 from pathlib import Path
 
 
 SITE_DIR = Path(__file__).resolve().parent
+REPOSITORY = SITE_DIR.parent.parent
+if str(REPOSITORY) not in sys.path:
+    sys.path.insert(0,str(REPOSITORY))
+from freight.site.public_claim_guard import validate_public_text_bundle, TEXT_EXTENSIONS
+
 TEXT_FILES = ("index.html", "site.css", "site.js", "_headers", "favicon.svg")
 ASSET_FILES = (
     "analyst-review.webp",
@@ -52,8 +58,7 @@ def build(output: Path) -> None:
         raise RuntimeError("Output must be outside the RecoveryOS site source directory")
     if output.exists() and any(output.iterdir()):
         raise RuntimeError("Output directory must be empty")
-    output.mkdir(parents=True, exist_ok=True)
-
+    text_bundle = {}
     for relative_path in TEXT_FILES:
         source = _safe_source(relative_path)
         text = source.read_text(encoding="utf-8")
@@ -61,6 +66,17 @@ def build(output: Path) -> None:
             if CONTACT_TOKEN not in text:
                 raise RuntimeError("Contact placeholder is missing from index.html")
             text = text.replace(CONTACT_TOKEN, contact)
+        text_bundle[relative_path] = text
+
+    # Block fabricated recovery figures or removed illustrative ledger labels
+    # before writing any public files.
+    validate_public_text_bundle(
+        {name: text for name, text in text_bundle.items()
+         if Path(name).suffix.lower() in TEXT_EXTENSIONS},
+        site="RECOVERYOS",
+    )
+    output.mkdir(parents=True, exist_ok=True)
+    for relative_path, text in text_bundle.items():
         destination = output / relative_path
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(text, encoding="utf-8", newline="\n")
