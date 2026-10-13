@@ -54,7 +54,7 @@ class FieldNotesV3Tests(unittest.TestCase):
                 self.assertTrue(c["style"] in m.CSS_V3)
                 self.assertTrue(c["alt"].startswith("RETALLY") or c["alt"].startswith("Clearly"))
                 self.assertGreater(len(c["alt"]),60)
-                self.assertIn("data" if key=="secure_intake" else "freight" if key=="scope_first" else "",
+                self.assertIn("privacy" if key=="secure_intake" else "freight" if key=="scope_first" else "",
                               c["alt"].lower())
                 self.assertGreaterEqual(len(c["cards"]),3)
                 self.assertLess(c["focus"],len(c["cards"]))
