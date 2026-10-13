@@ -31,8 +31,9 @@ UNSUPPORTED = (
     (
         "M35-12_UNVERIFIED_ACTUAL_CUSTOMER_RECOVERIES",
         re.compile(
-            r"\b(?:retally|recoveryos|we|our\s+(?:team|clients|customers))"
-            r"\s+(?:have|has|['’]ve)\s+(?:already\s+)?(?:successfully\s+)?"
+            r"\b(?:(?:retally|recoveryos|we|our\s+(?:team|clients|customers))"
+            r"\s+(?:have|has)|we['’]ve|(?:retally|recoveryos))"
+            r"\s+(?:already\s+)?(?:successfully\s+)?"
             r"(?:recovered|saved|refunded|returned)\s+\$[\d,]+(?:\.\d{1,2})?\b",
             re.I,
         ),
@@ -40,7 +41,7 @@ UNSUPPORTED = (
     (
         "M35-15_UNVERIFIED_PAID_INVOICE_COHORT",
         re.compile(
-            r"\b(?:retally|recoveryos|we)\s+(?:have|has|['’]ve)\s+"
+            r"\b(?:(?:retally|recoveryos|we)\s+(?:have|has)|we['’]ve)\s+"
             r"(?:already\s+)?(?:audited|processed|reviewed)\s+"
             r"(?:over\s+|more\s+than\s+)?\d[\d,]*\s+"
             r"(?:real\s+)?(?:customer\s+)?(?:freight\s+)?"
@@ -94,6 +95,14 @@ UNSUPPORTED = (
         ),
     ),
     (
+        "M35-10_UNVERIFIED_PROMOTIONAL_ACCURACY",
+        re.compile(
+            r"\b(?:retally|recoveryos|our\s+audits?|we)\s+(?:are\s+|is\s+)?"
+            r"\d{2,3}(?:\.\d+)?\s*%\s+"
+            r"(?:accurate|successful|effective)\b", re.I,
+        ),
+    ),
+    (
         "M35-14_UNVERIFIED_CUSTOMER_OUTCOME_PERCENT",
         re.compile(
             r"\b(?:our|retally(?:['’]s)?|recoveryos(?:['’]s)?)\s+"
@@ -142,15 +151,16 @@ class _PublicHTML(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.words: list[str] = []
         self.skipping = 0
-        self.json_ld = False
+        self.script_text = False
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str,str | None]]) -> None:
         pairs = dict(attrs)
-        if tag in {"script","style","template","noscript"}:
-            if tag == "script" and pairs.get("type","").lower() == "application/ld+json":
-                self.json_ld = True
-            else:
-                self.skipping += 1
+        if tag == "script":
+            # Inline code can construct browser-visible copy. Check both
+            # JSON-LD and executable inline JavaScript source strings.
+            self.script_text = True
+        elif tag in {"style","template","noscript"}:
+            self.skipping += 1
         if tag == "meta":
             # Description/OG/Twitter metadata are indexed even if not visible.
             if pairs.get("content") and (
@@ -167,13 +177,13 @@ class _PublicHTML(HTMLParser):
                     self.words.append(pairs[attribute])
 
     def handle_endtag(self, tag: str) -> None:
-        if tag == "script" and self.json_ld:
-            self.json_ld = False
-        elif tag in {"script","style","template","noscript"}:
+        if tag == "script":
+            self.script_text = False
+        elif tag in {"style","template","noscript"}:
             self.skipping = max(0,self.skipping-1)
 
     def handle_data(self, data: str) -> None:
-        if self.json_ld or not self.skipping:
+        if self.script_text or not self.skipping:
             self.words.append(data)
 
 
