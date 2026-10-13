@@ -296,10 +296,19 @@ class AuditStore:
         return chain_head(self.records())
 
     def semantic_summary(self) -> dict:
-        self.verify()
-        return {
-            "buyer_id": self.buyer_id,
-            "business_unit": self.business_unit,
-            "record_count": self.count(),
-            "chain_head": self.head(),
-        }
+        """Verify/count/hash one pinned SQLite chain snapshot.
+
+        Before M49 this called verify(), count() and head() through three
+        distinct reads, permitting a concurrent append to produce a summary
+        with internally inconsistent event count and chain head.
+        """
+        def op(conn: sqlite3.Connection) -> dict:
+            events=self._records(conn)
+            verify_chain(events,buyer_id=self.buyer_id,business_unit=self.business_unit)
+            return {
+                "buyer_id":self.buyer_id,
+                "business_unit":self.business_unit,
+                "record_count":len(events),
+                "chain_head":chain_head(events),
+            }
+        return self._read(op)

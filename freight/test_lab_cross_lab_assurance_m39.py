@@ -186,6 +186,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("audit_source_read_denials_m48", 64),
             ("audit_source_append_denials_m48", 12),
             ("audit_source_original_findings_closed_m48", 1),
+            ("dual_ledger_capture_attack_cases_m49", 8),
+            ("dual_ledger_positive_bundles_m49", 8),
+            ("dual_ledger_negative_denials_m49", 8),
+            ("dual_ledger_original_findings_closed_m49", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)
