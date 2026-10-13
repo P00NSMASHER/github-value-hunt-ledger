@@ -51,6 +51,21 @@ PERFORMANCE_CLAIMS = (
         r"(?:recovered|refunded|saved|returned)\s+"
         r"(?:(?:over|more\s+than|nearly|about)\s+)?\$[\d,]+",re.I,
     )),
+    ("UNVERIFIED_CUSTOMER_RECOVERY_RESULTS",re.compile(
+        r"\b(?:our\s+(?:customers|clients|shippers)|retally\s+customers)\s+"
+        r"(?:(?:have|already|successfully)\s+){0,2}"
+        r"(?:saved|recovered|refunded)\s+"
+        r"(?:(?:over|more\s+than)\s+)?\$[\d,]+",re.I,
+    )),
+    ("UNVERIFIED_HELPED_CUSTOMERS_RECOVER",re.compile(
+        r"\b(?:we|retally)\s+(?:have\s+)?helped\s+"
+        r"(?:[\d,]+\s+)?(?:customers|shippers|clients)\s+"
+        r"(?:recover|save)\s+\$[\d,]+",re.I,
+    )),
+    ("UNVERIFIED_CUSTOMER_SUCCESS_PERCENT",re.compile(
+        r"\b\d+(?:\.\d+)?\s*%\s+of\s+(?:our\s+|retally['’]s\s+)?"
+        r"(?:customers|clients)\s+(?:saved|recovered|were\s+satisfied)\b",re.I,
+    )),
     ("UNVERIFIED_OWN_AUDIT_VOLUME",re.compile(
         r"\b(?:we(?:['’]ve|\s+have)?|retally(?:\s+has)?|our\s+team)\s+"
         r"(?:(?:have|has|already|successfully)\s+){0,2}"
@@ -180,14 +195,16 @@ def inspect_public_text(name:str,raw:str,*,policy:dict|None=None)->list[str]:
         if matcher.search(text):
             found.append("RESEARCH_ONLY_NUMBER_IN_PUBLIC_COPY_"+id_)
     for id_,matcher in PERFORMANCE_CLAIMS:
-        if matcher.search(text):
-            # A denial or warning mentioning the phrase "guaranteed refunds"
-            # is not itself a guarantee; other affirmative claims fail.
-            if id_=="UNVERIFIED_GUARANTEED_REFUNDS" and re.search(
-                r"\b(?:no|never|not)\s+(?:guaranteed\s+)?"
-                r"(?:recovery|refund|savings)\b",text,re.I
-            ):
-                continue
+        matches=list(matcher.finditer(text))
+        # "No guaranteed recovery" is not an affirmative promise.
+        # Suppression applies to THAT occurrence only: a denial elsewhere
+        # cannot hide a separate affirmative customer recovery guarantee.
+        if id_=="UNVERIFIED_GUARANTEED_REFUNDS":
+            matches=[m for m in matches if not re.search(
+                r"\b(?:no|not|never)\s*$",
+                text[max(0,m.start()-18):m.start()],re.I,
+            )]
+        if matches:
             found.append(id_)
     return sorted(set(found))
 
