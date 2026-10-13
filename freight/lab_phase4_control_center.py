@@ -139,6 +139,10 @@ from freight.lab_persistent_semantic_m44 import (
     run_campaign as run_persistent_semantic_m44,
     render_html as render_persistent_semantic_m44,
 )
+from freight.lab_atomic_financial_m45 import (
+    run_campaign as run_atomic_financial_m45,
+    render_html as render_atomic_financial_m45,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -175,6 +179,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["persistent_semantic_m44"]=run_persistent_semantic_m44(
+            as_of=date.today()
+        )
+        result["atomic_financial_m45"]=run_atomic_financial_m45(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -310,6 +317,7 @@ def render(data: dict) -> str:
     identity42=data["settlement_identity_m42"]
     temporal43=data["settlement_source_m43"]
     persistent44=data["persistent_semantic_m44"]
+    atomic45=data["atomic_financial_m45"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -551,6 +559,16 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Transactional financial guards — atomic money reads and safe writes</h2>
+<p>M45 verifies <strong>"""+str(atomic45["current_financial_read_denials"])+"""</strong>
+blocked cash, fee, claim-residual, receipt-residual and count reads, plus
+<strong>"""+str(atomic45["current_financial_write_denials"])+"""</strong>
+blocked write attempts against eight deliberately corrupted durable SQLite
+sources. All reads use the same transaction for the audit and requested
+numbers; all writes check financial semantics before and after mutation
+before commit. These are only fictional source-integrity demonstrations:
+<strong>26 original defects remain open; no real funds or buyer approval.</strong></p>
+<a href="atomic_financial_operations_m45.html">Review exact read/write rejection evidence ↗</a></section>
 <section class="panel"><h2>Persistent settlement file — eight semantic tamper shields</h2>
 <p>The original persistent SettlementStore now fails closed on
 <strong>"""+str(persistent44["reported_financial_drift_denials"])+"""/8</strong>
@@ -1056,6 +1074,14 @@ def main():
     )
     (args.out/"persistent_semantic_m44.html").write_text(
         render_persistent_semantic_m44(data["persistent_semantic_m44"]),
+        encoding="utf-8"
+    )
+    (args.out/"atomic_financial_operations_m45.json").write_text(
+        json.dumps(data["atomic_financial_m45"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"atomic_financial_operations_m45.html").write_text(
+        render_atomic_financial_m45(data["atomic_financial_m45"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

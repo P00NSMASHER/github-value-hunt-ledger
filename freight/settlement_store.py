@@ -232,7 +232,16 @@ class SettlementStore:
             conn = self._connect()
             try:
                 conn.execute("BEGIN IMMEDIATE")
+                # M45: every write, including a valid-looking retry, must
+                # begin on semantically consistent source rows; untrusted
+                # edits after the object was opened are never grandfathered.
+                # Audit after fn as well, while holding the SAME write lock:
+                # unexpected financial/source drift aborts + rolls back the
+                # entire transaction before funds/records become visible.
+                from freight.settlement_semantic_guard_m44 import audit_connection
+                audit_connection(conn, scope=self._scope)
                 out = fn(conn)
+                audit_connection(conn, scope=self._scope)
                 conn.commit()
                 return out
             except sqlite3.OperationalError as exc:
@@ -251,9 +260,23 @@ class SettlementStore:
         raise last
 
     def _read(self, fn: Callable[[sqlite3.Connection], T]) -> T:
+        """Guard every monetary/operational read on the SAME SQLite revision.
+
+        Without this fence, realized_cents, fee_eligible_cents, residuals
+        and counts could accept in-place corruption *after* a store opened
+        even though M44 blocked reporting and reopening. BEGIN pins the
+        snapshot before the semantic scan; its result and the caller's
+        SELECTs cannot observe two different concurrent revisions.
+        """
         conn = self._connect()
         try:
-            return fn(conn)
+            conn.execute("BEGIN")
+            try:
+                from freight.settlement_semantic_guard_m44 import audit_connection
+                audit_connection(conn, scope=self._scope)
+                return fn(conn)
+            finally:
+                conn.rollback()
         finally:
             conn.close()
 
@@ -759,14 +782,11 @@ class SettlementStore:
         """
         from freight.settlement_semantic_guard_m44 import audit_connection
 
-        def op(conn: sqlite3.Connection) -> dict:
-            conn.execute("BEGIN")
-            try:
-                return audit_connection(conn, scope=self._scope)
-            finally:
-                conn.rollback()
-
-        return self._read(op)
+        # _read already owns the BEGIN/ROLLBACK boundary and semantic
+        # preflight; this second explicit check returns its typed summary.
+        return self._read(
+            lambda conn: audit_connection(conn, scope=self._scope)
+        )
 
     def report_snapshot_json(self) -> str:
         """Read one immutable, scope-bound report snapshot without writing rows.
@@ -785,28 +805,20 @@ class SettlementStore:
         )
 
         def op(conn: sqlite3.Connection) -> str:
-            conn.execute("BEGIN")
-            try:
-                # Check under the SAME SQLite snapshot as the report rows.
-                # A syntactically valid but contradictory source cannot
-                # become an acceptable report just because no new write
-                # was made through the SettlementStore public API.
-                from freight.settlement_semantic_guard_m44 import audit_connection
-                audit_connection(conn, scope=self._scope)
-                rows = {
-                    table: [dict(row) for row in conn.execute(
-                        f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=? ORDER BY {key}",
-                        self._scope,
-                    )]
-                    for table, key in tables
-                }
-                return json.dumps({
-                    "schema": 1,
-                    "buyer_id": self.buyer_id,
-                    "business_unit": self.business_unit,
-                    "tables": rows,
-                }, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-            finally:
-                conn.rollback()
+            # M45 central _read guards this exact BEGIN-pinned snapshot
+            # before the report rows are selected; do not nest a BEGIN.
+            rows = {
+                table: [dict(row) for row in conn.execute(
+                    f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=? ORDER BY {key}",
+                    self._scope,
+                )]
+                for table, key in tables
+            }
+            return json.dumps({
+                "schema": 1,
+                "buyer_id": self.buyer_id,
+                "business_unit": self.business_unit,
+                "tables": rows,
+            }, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
         return self._read(op)

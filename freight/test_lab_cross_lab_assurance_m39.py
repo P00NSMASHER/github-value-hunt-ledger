@@ -169,6 +169,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("persistent_semantic_current_report_denials_m44", 7),
             ("persistent_semantic_reopen_denials_m44", 7),
             ("persistent_semantic_historical_findings_closed_m44", 1),
+            ("atomic_financial_read_denials_m45", 39),
+            ("atomic_financial_write_denials_m45", 7),
+            ("atomic_financial_total_denials_m45", 47),
+            ("atomic_financial_historical_findings_closed_m45", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)
