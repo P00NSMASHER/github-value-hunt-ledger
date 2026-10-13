@@ -6,7 +6,7 @@ production status live in the independently preserved cumulative register.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from contextlib import closing
 from pathlib import Path
 import json
@@ -62,6 +62,56 @@ def verdict(run: Experiment) -> str:
     return "INCONCLUSIVE"
 
 
+
+_EXPERIMENT_KEYS = frozenset(f.name for f in fields(Experiment))
+_RECORD_KEYS = _EXPERIMENT_KEYS | {"verdict"}
+
+
+def _verify_records(con: sqlite3.Connection) -> list[dict]:
+    """Re-derive semantics from persisted experiment fields, not a stored label.
+
+    SQLite digest chains are local consistency checks and cannot defend against
+    a hostile writer that controls this code and database simultaneously.
+    """
+    out: list[dict] = []
+    previous: str | None = None
+    expected_sequence = 1
+    rows = con.execute(
+        "SELECT sequence,experiment_id,finding_id,receipt_json,"
+        "predecessor_sha256,receipt_sha256 FROM experiments ORDER BY sequence"
+    )
+    for row in rows:
+        if type(row["sequence"]) is not int or row["sequence"] != expected_sequence:
+            raise ValueError("M40_EXPERIMENT_SEQUENCE_GAP_OR_DELETION")
+        try:
+            record = json.loads(row["receipt_json"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError("M40_EXPERIMENT_RECEIPT_INVALID_JSON") from exc
+        if type(record) is not dict or set(record) != _RECORD_KEYS:
+            raise ValueError("M40_EXPERIMENT_RECEIPT_SCHEMA_CHANGED")
+        run = Experiment(**{f: record[f] for f in _EXPERIMENT_KEYS})
+        _validate(run)
+        if row["experiment_id"] != run.experiment_id or row["finding_id"] != run.finding_id:
+            raise ValueError("M40_EXPERIMENT_ROW_IDENTITY_MISMATCH")
+        if record["verdict"] != verdict(run):
+            raise ValueError("M40_EXPERIMENT_VERDICT_NOT_DERIVED_FROM_FLAGS")
+        if row["predecessor_sha256"] != previous:
+            raise ValueError("M40_EXPERIMENT_CHAIN_PREDECESSOR_MISMATCH")
+        h = digest({"previous": previous, "receipt": record})
+        if row["receipt_sha256"] != h:
+            raise ValueError("M40_EXPERIMENT_RECEIPT_DIGEST_CHANGED")
+        previous = h
+        expected_sequence += 1
+        out.append({
+            "experiment_id": run.experiment_id,
+            "finding_id": run.finding_id,
+            "verdict": record["verdict"],
+            "receipt_sha256": h,
+            "scope": run.execution_scope,
+        })
+    return out
+
+
 class ExperimentLedger:
     def __init__(self, db_path: str | Path):
         self.path=Path(db_path)
@@ -96,6 +146,7 @@ class ExperimentLedger:
         from contextlib import closing
         with closing(self._connect()) as con, con:
             con.execute("BEGIN IMMEDIATE")
+            _verify_records(con)  # Never append or replay over corrupt prior evidence.
             existing=con.execute("SELECT receipt_json,receipt_sha256 FROM experiments WHERE experiment_id=?",
                                  (run.experiment_id,)).fetchone()
             if existing:
@@ -111,18 +162,5 @@ class ExperimentLedger:
             return True,sha
 
     def read_and_verify(self) -> list[dict]:
-        from contextlib import closing
-        out=[];previous=None
         with closing(self._connect()) as con:
-            for row in con.execute("SELECT * FROM experiments ORDER BY sequence"):
-                record=json.loads(row["receipt_json"])
-                if row["predecessor_sha256"]!=previous:
-                    raise ValueError("experiment receipt chain gap")
-                expected=digest({"previous":previous,"receipt":record})
-                if expected!=row["receipt_sha256"]:
-                    raise ValueError("experiment receipt hash mismatch")
-                previous=expected
-                out.append({"experiment_id":row["experiment_id"],"finding_id":row["finding_id"],
-                            "verdict":record["verdict"],"receipt_sha256":expected,
-                            "scope":record["execution_scope"]})
-        return out
+            return _verify_records(con)
