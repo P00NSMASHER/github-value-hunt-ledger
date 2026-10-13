@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scope": "LAB14_M33_ORIGINAL_BEA_GDPBYINDUSTRY_TABLE16_PUBLISHER_ACCESS_GATE_NO_PRIMARY_NUMERICAL_PROOF",
+  "scope": "LAB14_M33_DIRECT_FIRST_PARTY_BEA_GROSSOUTPUT_XLSX_484_TABLE16_EIGHT_YEAR_PROOF",
   "observed_on": "2026-10-12",
   "original_statistical_publisher": "U.S. Bureau of Economic Analysis",
   "official_catalog_url": "https://apps.bea.gov/Data.json",
@@ -24,8 +24,17 @@
   "official_api_unauthenticated_request_contains_original_numeric_values": false,
   "original_bea_api_authentication_satisfied": false,
   "original_bea_api_active_userid_available": false,
-  "original_bea_gross_output_primary_data_sha256": null,
-  "original_bea_gross_output_primary_year_values": null,
+  "original_bea_gross_output_primary_data_sha256": "a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46",
+  "original_bea_gross_output_primary_year_values": {
+    "2017": "100.000",
+    "2018": "102.952",
+    "2019": "102.398",
+    "2020": "103.678",
+    "2021": "109.538",
+    "2022": "108.519",
+    "2023": "107.307",
+    "2024": "108.047"
+  },
   "bea_reference_release_date": "2026-09-30",
   "target_dataset": "GDPbyIndustry",
   "target_table_id": "16",
@@ -80,5 +89,89 @@
   "eighteen_independent_customer_pilot_approvals_satisfied": false,
   "existing_lab_count_changed": false,
   "scheduled_tasks_modified": false,
-  "source_caveat": "The official U.S. Bureau of Economic Analysis open-data catalog links the GDP-by-industry tables to its official interactive iTable application and registration-only data API. Original first-party BEA Data.json and GDP-by-industry landing HTML were downloaded and checked, but neither contains the exact annual NAICS 484 Table 16 numerical data 2017 to 2024. The unauthenticated original BEA API request using public sentinel UserID 0 returned HTTP 200 with BEA APIErrorCode 1, Invalid Request - Invalid API UserId; HTTP status 200 is not evidence of successful original BEA API authentication or missing industry statistics. No owner registration, terms acceptance, key acquisition or private data use has occurred. M32 independently verified BEA-origin gross output 2017=100 and 2024=108.047 via the third-party DBnomics distributor; it is not identical to original BEA numeric file authentication. The 8.05 percent real gross output rise, BLS 4.02 percent sectoral output rise and illustrative 1.18 percent Census revenue divided by producer index are distinct non-additive economic measurements, not statistical model errors, shipment counts, contractual invoice discrepancies, collectable customer refunds, buyer demand or market value. All eighteen separate real-customer pilot requirements remain unmet."
+  "source_caveat": "The U.S. Bureau of Economic Analysis itself publishes a public, downloadable GrossOutput.xlsx file from its official apps.bea.gov industry Release/XLS/GDPxInd path. A direct independent GitHub Actions retrieval on October 12 2026 matched 506,819 bytes and SHA-256 a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46. Its annual TGO103-A source sheet is BEA Chain-Type Quantity Indexes for Gross Output by Industry, with index reference 2017=100 and September 30 2026 publication. Truck transportation industry line 44, original workbook row 52, reports 2017 through 2024 indices 100.000, 102.952, 102.398, 103.678, 109.538, 108.519, 107.307, 108.047. Separate same-workbook annual TGO104-A BEA gross output price indices, TGO105-A current-dollar millions, and TGO106-A 2017 chained-dollar millions provide source-internal price/quantity/nominal checks, but these are same-publisher distributions, not independent BEA survey replications. The 8.05 percent gross output rise is a broad NAICS 484 economic output measure, not BLS 4.02 percent sectoral output, the 1.18 percent illustrative Census/PPI revenue proxy, BEA GDP/value added, freight tonnage, paid freight invoice overcharges, legally recoverable cash or RETALLY serviceable TAM. The prior invalid API UserID result remains historically accurate, but the authenticated BEA first-party XLSX now resolves the numeric source gap without an API key. None of the eighteen independent real-customer pilot approvals is met; no customer data, contracts, payment recoveries, external communications or deployment actions have occurred.",
+  "official_first_party_grossoutput_xlsx_url": "https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx",
+  "official_first_party_grossoutput_xlsx_sha256": "a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46",
+  "official_first_party_grossoutput_xlsx_bytes": 506819,
+  "official_first_party_xlsx_sheetnames": [
+    "Contents",
+    "TGO101-A",
+    "TGO101-Q",
+    "TGO103-A",
+    "TGO103-Q",
+    "TGO104-A",
+    "TGO104-Q",
+    "TGO105-A",
+    "TGO105-Q",
+    "TGO106-A",
+    "TGO106-Q",
+    "TGO107-A",
+    "TGO107-Q"
+  ],
+  "official_first_party_xlsx_sheet": "TGO103-A",
+  "official_first_party_table_title": "Chain-Type Quantity Indexes for Gross Output by Industry",
+  "official_first_party_xlsx_row_number": 52,
+  "official_first_party_xlsx_industry_line": "44",
+  "official_first_party_xlsx_industry_title": "Truck transportation",
+  "official_first_party_xlsx_reference_year": 2017,
+  "official_first_party_xlsx_pub_date": "Data published September 30, 2026",
+  "official_first_party_xlsx_annual_source_values": {
+    "TGO103-A": {
+      "2017": "100.000",
+      "2018": "102.952",
+      "2019": "102.398",
+      "2020": "103.678",
+      "2021": "109.538",
+      "2022": "108.519",
+      "2023": "107.307",
+      "2024": "108.047"
+    },
+    "TGO104-A": {
+      "2017": "100.000",
+      "2018": "106.173",
+      "2019": "108.901",
+      "2020": "108.653",
+      "2021": "121.921",
+      "2022": "144.891",
+      "2023": "138.837",
+      "2024": "137.494"
+    },
+    "TGO105-A": {
+      "2017": "367154",
+      "2018": "401324",
+      "2019": "409425",
+      "2020": "413595",
+      "2021": "490334",
+      "2022": "577292",
+      "2023": "546993",
+      "2024": "545435"
+    },
+    "TGO106-A": {
+      "2017": "367154",
+      "2018": "377992",
+      "2019": "375959",
+      "2020": "380657",
+      "2021": "402174",
+      "2022": "398432",
+      "2023": "393982",
+      "2024": "396699"
+    }
+  },
+  "official_first_party_xlsx_units_by_sheet": {
+    "TGO103-A": "INDEX_2017_EQUALS_100",
+    "TGO104-A": "PRICE_INDEX_2017_EQUALS_100",
+    "TGO105-A": "CURRENT_DOLLAR_MILLIONS",
+    "TGO106-A": "2017_CHAINED_DOLLAR_MILLIONS"
+  },
+  "official_first_party_xlsx_contains_real_gross_output_values": true,
+  "official_first_party_numeric_xlsx_retrieval_independent_of_bea_api_key": true,
+  "original_bea_numeric_source_authenticated_via_public_xlsx": true,
+  "bls_real_sectoral_output_equivalent_to_bea_gross_output": false,
+  "census_revenue_ppi_proxy_is_official_real_output": false,
+  "original_data_same_as_customer_invoices": false,
+  "bea_index_is_direct_ltl_484122_recovery_market": false,
+  "official_bea_xlsx_and_dbnomics_values_reconcile": true,
+  "price_and_quantity_reconcile_to_nominal_within_0_02_pct": true,
+  "direct_bea_file_does_not_certify_recoverable_freight_market": true,
+  "original_source_withheld_from_repository_artifacts": true
 }
