@@ -40,9 +40,42 @@ jobs:
           assert {a['concept'] for a in m['assets']}=={'rate_versions','accessorial_proof','credit_chain'}
           assert all(a['qa']['escaped_elements']==[] and a['qa']['preview_banner'] is False for a in m['assets'])
           PY
+      - name: Render six differentiated Field Notes v3 posters and mobile previews
+        run: |
+          python freight/brand/social/creative-lab/render_social_v3.py \
+            --repo-root . --mode production --concept all \
+            --output-dir "$RUNNER_TEMP/retally-graphics-v3-review"
+          python - "$RUNNER_TEMP/retally-graphics-v3-review/manifest.json" <<'PY'
+          import hashlib,json,sys
+          from pathlib import Path
+          report=json.loads(Path(sys.argv[1]).read_text())
+          expected={'scope_first','fuel_authority','detention_clock',
+                    'claim_evidence','settlement_status','secure_intake'}
+          assert {x['concept'] for x in report['assets']}==expected
+          assert len(report['content_proposals'])==6
+          assert report['approved_wordmark_sha256']=='08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd'
+          assert report['no_publication'] is True
+          assert report['network_calls'] is False
+          assert report['human_approval_required'] is True
+          assert report['needs_owner_source_rights_and_content_review'] is True
+          assert all(not x['approved_for_publication'] for x in report['content_proposals'])
+          assert len({x['recommended_educational_route'] for x in report['content_proposals']})==6
+          for row in report['assets']:
+              assert row['qa']['escaped_elements']==[],row['qa']
+              assert row['qa']['logo']==[1619,257]
+              assert row['qa']['preview_banner'] is False
+              assert row['qa']['document_cards']==3
+              for name,hash_name in (('image','image_sha256'),('mobile_preview','mobile_sha256')):
+                  p=Path(row[name])
+                  assert hashlib.sha256(p.read_bytes()).hexdigest()==row[hash_name]
+          print('RETALLY v3: 6/6 distinct 1080×1350 + 390px QA visuals generated; never auto-published.')
+          PY
+
       - name: Upload visual QA artifacts (not publishing assets)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: retally-creative-review-draft-only
-          path: ${{ runner.temp }}/retally-graphics-review/
+          path: |
+            ${{ runner.temp }}/retally-graphics-review/
+            ${{ runner.temp }}/retally-graphics-v3-review/
           retention-days: 7
