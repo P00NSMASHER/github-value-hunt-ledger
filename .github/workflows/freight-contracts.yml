@@ -1,6 +1,7 @@
 name: Freight Commercial Contracts
 
 on:
+  workflow_call:
   push:
     paths:
       - 'freight/**'

@@ -76,11 +76,18 @@ jobs:
       - name: Check committed text integrity
         run: git diff --check
 
+  # Reuse the commercial proof suite at the caller revision; no deployment.
+  freight-commercial:
+    uses: ./.github/workflows/freight-contracts.yml
+    permissions:
+      contents: read
+
   release-gate:
     if: always()
     needs:
       - ai-business-os
       - freight
+      - freight-commercial
       - recoveryworks
       - technology-intelligence
     runs-on: ubuntu-latest
@@ -90,6 +97,7 @@ jobs:
         env:
           AI_BUSINESS_OS_RESULT: ${{ needs.ai-business-os.result }}
           FREIGHT_RESULT: ${{ needs.freight.result }}
+          FREIGHT_COMMERCIAL_RESULT: ${{ needs.freight-commercial.result }}
           RECOVERYWORKS_RESULT: ${{ needs.recoveryworks.result }}
           TECHNOLOGY_INTELLIGENCE_RESULT: ${{ needs.technology-intelligence.result }}
         shell: bash
@@ -97,6 +105,7 @@ jobs:
           set -euo pipefail
           test "$AI_BUSINESS_OS_RESULT" = "success"
           test "$FREIGHT_RESULT" = "success"
+          test "$FREIGHT_COMMERCIAL_RESULT" = "success"
           test "$RECOVERYWORKS_RESULT" = "success"
           test "$TECHNOLOGY_INTELLIGENCE_RESULT" = "success"
           echo "Repository release gate passed."
