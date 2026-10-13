@@ -667,7 +667,20 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--out",type=Path,required=True)
     parser.add_argument("--max-labs",type=int,default=14)
+    parser.add_argument("--as-of-date",type=date.fromisoformat,default=date.today())
+    parser.add_argument("--source-candidate","--candidate",dest="source_candidate",
+                        type=Path,help="Internal M38 scenario-only safe bundle; requires fresh output directory")
     args=parser.parse_args()
+    if args.source_candidate is not None:
+        if args.max_labs != 14:
+            raise ValueError("M38_CONTROL_CENTER_SCENARIO_DOES_NOT_REPLAY_LABS")
+        from freight.research_scenario_control_m38 import write_scenario
+        scoped = write_scenario(as_of=args.as_of_date,
+                                candidate_path=args.source_candidate,out=args.out)
+        print(json.dumps({"scenario_only":True,"receipt":scoped["receipt_sha256"],
+                          "withheld":scoped["claim_quarantine"]["quarantined_claim_ids"],
+                          "public_claims_authorized":0},sort_keys=True))
+        return
     data=snapshot(args.max_labs)
     args.out.mkdir(parents=True,exist_ok=True)
     (args.out/"phase4_control.json").write_text(json.dumps(data,sort_keys=True,indent=2)+"\n")
