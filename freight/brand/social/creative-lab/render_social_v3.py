@@ -21,6 +21,17 @@ CONCEPTS = (
     "claim_evidence", "settlement_status", "secure_intake",
 )
 
+# A distinct, pre-existing registered website master per editorial topic.
+# Public website inclusion does NOT prove social publication rights.
+CANONICAL_HERO_PHOTOS = {
+    "scope_first": "freight-network.webp",
+    "fuel_authority": "rate-authority.webp",
+    "detention_clock": "warehouse-handoff.webp",
+    "claim_evidence": "invoice-evidence.webp",
+    "settlement_status": "approved-path.webp",
+    "secure_intake": "dock-control.webp",
+}
+
 # Static, carefully qualified editorial content. No fabricated rates, events,
 # clients, refunds, carrier logos, or credentials.
 COPY = {
@@ -252,19 +263,59 @@ def render(output: Path, mode: str, logo: Path, photo: Path,
         raise ValueError("Unsupported render mode")
     if concept not in (*CONCEPTS,"all"):
         raise ValueError("Unsupported field notes concept")
-    # Delegates deterministic brand image verification and all browser geometry
-    # and network/security checks to the existing, already-reviewed studio.
+    names = list(CONCEPTS) if concept == "all" else [concept]
+    # Fail BEFORE the first screenshot or exported folder for a fake logo.
+    base.validate_logo(logo)
+    if mode == "production":
+        if photo.name != "terminal-blue-hour.webp" or photo.parent.name != "images":
+            raise ValueError("Production must use canonical website image source directory")
+        sources = {name: photo.parent / CANONICAL_HERO_PHOTOS[name] for name in names}
+    else:
+        sources = {name: photo for name in names}
+    for name, path in sources.items():
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"Missing or unsafe source photo for {name}")
+        base.read_image(path)
+
+    # Reuse the proven screenshot renderer: 1080x1350 plus real 390px feed
+    # screenshot, screenshot SHA, DOM clipping checks and network-request veto.
+    # Render one topic at a time to supply different locally registered art.
     original_concepts, original_template = base.CONCEPTS, base.template_html
+    parts = []
+    provenance = {}
     try:
         base.CONCEPTS = CONCEPTS
         base.template_html = template_html
-        manifest = base.run(output,mode,concept,logo,photo,executable=executable)
+        for name in names:
+            sample = base.run(output, mode, name, logo, sources[name],
+                              executable=executable)
+            parts.extend(sample["assets"])
+            provenance[name] = {
+                "registered_source_name": sources[name].name,
+                "source_sha256": base.sha256(sources[name]),
+                "reviewed_for_social_reuse": False,
+            }
     finally:
         base.CONCEPTS,base.template_html=original_concepts,original_template
-    meta = []
-    for item in manifest["assets"]:
+    manifest = {
+        "brand":"RETALLY",
+        "creative_series":"RETALLY Field Notes v3, draft-only",
+        "purpose":"offline sample-only editorial visual review",
+        "mode":mode,
+        "no_publication":True,
+        "network_calls":False,
+        "human_approval_required":True,
+        "needs_owner_source_rights_and_content_review":True,
+        "generated_content_cannot_claim_client_results":True,
+        "approved_wordmark_sha256":base.sha256(logo),
+        "production_photo_rights_review_required":True,
+        "hero_image_provenance":provenance,
+        "assets":parts,
+        "content_proposals":[],
+    }
+    for item in parts:
         c = COPY[item["concept"]]
-        meta.append({
+        manifest["content_proposals"].append({
             "concept":item["concept"],
             "caption_hook":c["caption_hook"],
             "recommended_educational_route":"/"+c["site_slug"],
@@ -272,13 +323,9 @@ def render(output: Path, mode: str, logo: Path, photo: Path,
             "image_sha256":item["image_sha256"],
             "approved_for_publication":False,
         })
-    manifest["content_proposals"] = meta
-    manifest["creative_series"] = "RETALLY Field Notes v3, draft-only"
-    manifest["needs_owner_source_rights_and_content_review"] = True
-    manifest["generated_content_cannot_claim_client_results"] = True
-    Path(output,"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
+    Path(output,"manifest.json").write_text(
+        json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
     return manifest
-
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
