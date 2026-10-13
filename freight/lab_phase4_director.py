@@ -1175,6 +1175,37 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["original_historical_defect_closed"] is False
                       for x in admission50["cases"]),
               "M50_LOCAL_SHA_REHASHED_FRAUD_DENIAL_NOT_ACTUALLY_EXECUTED")
+        from freight.lab_recovery_witness_m51 import (
+            run_campaign as audit_dual_technical_witness_m51,
+            SCENARIOS as witness_attack_contract_m51,
+        )
+        witness51=audit_dual_technical_witness_m51(as_of=today)
+        _must(witness51["existing_research_labs"]==14
+              and witness51["ephemeral_dual_signer_positive_controls"]==22
+              and witness51["different_invalid_trust_policy_or_witness_attacks"]==22
+              and witness51["exact_current_witness_gate_denials"]==22
+              and witness51["public_keys_supplied_by_caller_not_bundle"] is True
+              and witness51["both_required_roles_must_use_distinct_public_keys"] is True
+              and witness51["all_keypairs_ephemeral_and_not_written_to_files"] is True
+              and witness51["original_m50_data_source_integrity_still_required"] is True
+              and witness51["actual_recovery_activation_or_customer_approval"] is False
+              and witness51["all_26_original_historical_findings_open"]==26
+              and witness51["historical_original_findings_closed"]==0
+              and witness51["independent_first_customer_pilot_human_gates_unmet"]==18
+              and witness51["actual_customer_cash_recovered"] is None
+              and witness51["externally_publishable_empirical_claims_approved"]==0,
+              "M51_TECHNICAL_WITNESSES_MISLABELED_CUSTOMER_APPROVAL")
+        _must(tuple(x["scenario"] for x in witness51["cases"])==
+              tuple(witness_attack_contract_m51)
+              and all(x["expected_exact_denial"]==
+                      witness_attack_contract_m51[x["scenario"]]
+                      and x["two_independent_ephemeral_positive_signatures_verified"] is True
+                      and x["invalid_witness_request_rejected"] is True
+                      and x["private_signing_key_embedded_in_artifacts"] is False
+                      and x["restoration_or_first_customer_activation_performed"] is False
+                      and x["original_historical_finding_closed"] is False
+                      for x in witness51["cases"]),
+              "M51_FICTIONAL_DUAL_SIGNER_NEGATIVE_WITNESS_NOT_VERIFIED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1363,6 +1394,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "recovery_admission_negative_denials_m50":13,
                 "recovery_admission_original_findings_closed_m50":0,
                 "recovery_admission_receipt_sha256_m50":admission50["receipt_sha256"],
+                "technical_witness_positive_controls_m51":22,
+                "technical_witness_adversarial_cases_m51":22,
+                "technical_witness_negative_denials_m51":22,
+                "technical_witness_original_findings_closed_m51":0,
+                "technical_witness_receipt_sha256_m51":witness51["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

@@ -197,6 +197,10 @@ def _proof(lab: int, proof: dict) -> None:
             "recovery_admission_rehashed_attacks_m50": 13,
             "recovery_admission_negative_denials_m50": 13,
             "recovery_admission_original_findings_closed_m50": 0,
+            "technical_witness_positive_controls_m51": 22,
+            "technical_witness_adversarial_cases_m51": 22,
+            "technical_witness_negative_denials_m51": 22,
+            "technical_witness_original_findings_closed_m51": 0,
         }
         for name, expected_value in expected_flags.items():
             _check(name in proof
@@ -217,6 +221,7 @@ def _proof(lab: int, proof: dict) -> None:
             "audit_source_receipt_sha256_m48",
             "dual_ledger_receipt_sha256_m49",
             "recovery_admission_receipt_sha256_m50",
+            "technical_witness_receipt_sha256_m51",
         ):
             _check(_hex(proof.get(key)),
                    "LAB14_SOURCE_AND_PILOT_REPORT_RECEIPT_INVALID")
