@@ -119,6 +119,10 @@ from freight.lab_cross_lab_assurance_m39 import (
     assess as assess_cross_lab_m39,
     render_html as render_cross_lab_m39,
 )
+from freight.lab_historical_disposition_m40 import (
+    audit as audit_historical_findings_m40,
+    render_html as render_historical_findings_m40,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -142,6 +146,9 @@ def snapshot(max_labs: int=14) -> dict:
             record=rec,authority_book=book,store=store,assertions=a,fee_events=fees,
             verifier=verifier(),contingency=scenario())
         result["experiment_campaign"]=campaign
+        result["historical_finding_disposition_m40"]=audit_historical_findings_m40(
+            ledger_path=Path(temp)/"phase4_campaign.sqlite3"
+        )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
         proof, decisions=run_mission(as_of=date.today())
         result["research_evidence_fidelity"]=proof
@@ -270,6 +277,7 @@ def render(data: dict) -> str:
     lineage37=data["research_source_lineage_m37"]
     quarantine38=data["research_claim_quarantine_m38"]
     integrity39=data["cross_lab_integrity_m39"]
+    original40=data["historical_finding_disposition_m40"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -511,6 +519,14 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Original experiment finding dispositions — never auto-close</h2>
+<p>Audited <strong>"""+str(original40["local_experiments_recorded"])+"""</strong>
+local experiment receipts against the frozen original 26-finding register.
+<strong>"""+str(original40["original_historical_findings_open"])+"""/26 remain OPEN_UNVERIFIED</strong>;
+no synthetic test can silently promote a defect to verified repair.
+Independent baseline/candidate reproduction and separate human evidence remain required.
+<strong>0 real customer results and no public claims authorized.</strong></p>
+<a href="historical_finding_disposition.html">Inspect original finding-by-finding dispositions and unchanged two gate-only corrections ↗</a></section>
 <section class="panel"><h2>Fourteen-lab proof audit — verify, don’t trust a passing label</h2>
 <p>M39 independently checks the full executable laboratory census, exact negative
 probes, bound synthetic evidence and a second computation of the fictional
@@ -936,6 +952,14 @@ def main():
     )
     (args.out/"cross_lab_assurance.html").write_text(
         render_cross_lab_m39(data["cross_lab_integrity_m39"]),
+        encoding="utf-8"
+    )
+    (args.out/"historical_finding_disposition.json").write_text(
+        json.dumps(data["historical_finding_disposition_m40"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"historical_finding_disposition.html").write_text(
+        render_historical_findings_m40(data["historical_finding_disposition_m40"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
