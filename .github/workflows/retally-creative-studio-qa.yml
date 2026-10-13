@@ -97,7 +97,17 @@ jobs:
               assert x["educational_page"].startswith("/")
               for path,sha in ((x["image"],x["sha256"]),(x["phone_preview"],x["phone_sha256"])):
                   assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==sha
-          print("RETALLY v4: 24/24 large-type carousel slides + 24/24 phone previews passed source and editorial gates")
+          pack=json.loads((Path(sys.argv[1]).parent/"v4-review-only-post-pack.json").read_text())
+          assert pack["social_provider_mutations"] is False
+          assert pack["no_external_images_uploaded"] is True
+          assert len(pack["posts"])==12
+          assert {p["network"] for p in pack["posts"]}=={"facebook","instagram"}
+          assert all(p["draft"] and not p["autoPublish"] and not p["ready_to_publish"] for p in pack["posts"])
+          assert all(len(p["carousel_images"])==len(p["mediaAltText"])==4 for p in pack["posts"])
+          assert all(p["human_visual_approval_required"] for p in pack["posts"])
+          gallery=(Path(sys.argv[1]).parent/"review-gallery.html")
+          assert gallery.exists() and gallery.stat().st_size>1000
+          print("RETALLY v4: 24/24 large-type carousel slides + 24/24 phone previews; 12 unpublished social packs; offline review gallery OK")
           PY
 
       - name: Upload visual QA artifacts (not publishing assets)
