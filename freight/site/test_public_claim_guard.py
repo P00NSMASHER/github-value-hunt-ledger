@@ -142,6 +142,19 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
                                             "M35-12_UNVERIFIED_ACTUAL_CUSTOMER_RECOVERIES"):
                     gate.validate_public_text_bundle(r,site="RETALLY")
 
+    def test_contracted_weve_and_simple_past_marketing_recovery_claims_fail(self):
+        for phrase in (
+            "We've recovered $1,250,000 for customers.",
+            "RETALLY recovered $250,000 for shippers.",
+            "RecoveryOS refunded $10,200 for clients.",
+        ):
+            r=actual_source()
+            r["index.html"]+="<h2>"+phrase+"</h2>"
+            with self.subTest(phrase=phrase):
+                with self.assertRaisesRegex(gate.PublicClaimViolation,
+                                            "M35-12_UNVERIFIED_ACTUAL_CUSTOMER_RECOVERIES"):
+                    gate.validate_public_text_bundle(r,site="RETALLY")
+
     def test_unverified_customer_invoice_volume_claims_fail(self):
         for claim in (
             "We have audited 12,000 real customer invoices.",
@@ -154,6 +167,13 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
                 with self.assertRaisesRegex(gate.PublicClaimViolation,
                                             "M35-15_UNVERIFIED_PAID_INVOICE_COHORT"):
                     gate.validate_public_text_bundle(r,site="RECOVERYOS")
+
+    def test_weve_audited_claim_is_not_allowed(self):
+        r=actual_source()
+        r["index.html"]+="<p>We've audited 12,000 customer invoices.</p>"
+        with self.assertRaisesRegex(gate.PublicClaimViolation,
+                                    "M35-15_UNVERIFIED_PAID_INVOICE_COHORT"):
+            gate.validate_public_text_bundle(r,site="RETALLY")
 
     def test_unsupported_macro_market_size_tam_fails(self):
         for phrase in (
@@ -187,6 +207,15 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
             r["index.html"]+="<p>"+phrase+"</p>"
             with self.subTest(phrase=phrase):
                 with self.assertRaisesRegex(gate.PublicClaimViolation,"M35-10_"):
+                    gate.validate_public_text_bundle(r,site="RETALLY")
+
+    def test_unverified_promotional_accuracy_claim_fails(self):
+        for phrase in ("RETALLY is 99% accurate.", "Our audits are 95% accurate."):
+            r=actual_source()
+            r["index.html"]+="<p>"+phrase+"</p>"
+            with self.subTest(phrase=phrase):
+                with self.assertRaisesRegex(gate.PublicClaimViolation,
+                                            "M35-10_UNVERIFIED_PROMOTIONAL_ACCURACY"):
                     gate.validate_public_text_bundle(r,site="RETALLY")
 
     def test_guaranteed_recoveries_and_refunds_rejected(self):
@@ -231,6 +260,16 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
            "description":"RETALLY has recovered $250,000 for customers."}
         r["index.html"]+=(
             '<script type="application/ld+json">'+json.dumps(j)+'</script>'
+        )
+        with self.assertRaisesRegex(gate.PublicClaimViolation,
+                                    "M35-12_UNVERIFIED_ACTUAL_CUSTOMER_RECOVERIES"):
+            gate.validate_public_text_bundle(r,site="RETALLY")
+
+    def test_inline_js_that_writes_claim_is_also_checked(self):
+        r=actual_source()
+        r["index.html"]+=(
+            '<script>document.body.innerHTML += '
+            '"RETALLY has recovered $250,000 for clients";</script>'
         )
         with self.assertRaisesRegex(gate.PublicClaimViolation,
                                     "M35-12_UNVERIFIED_ACTUAL_CUSTOMER_RECOVERIES"):
