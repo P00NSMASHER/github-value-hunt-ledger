@@ -23,6 +23,7 @@ from freight.commercial_terms import (
     normalize_contingency_rate,
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
+from freight.public_claim_release_gate import require_public_copy_clearance
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -217,6 +218,10 @@ def build(
         '<p class="microcopy">Fictional data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # Enforce M35 evidence-grade and pilot authority against the final public
+    # text BEFORE creating any output. A passing scan is NOT external claim approval.
+    require_public_copy_clearance(text_bundle)
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():
