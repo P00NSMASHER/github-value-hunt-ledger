@@ -382,6 +382,74 @@ def render(repo: Path, output: Path, *, concept: str="all",
         "slide_count":len(slides),
         "phone_preview_count":len(slides),
     }
+    # Offline publication-hold handoff: all 12 existing topic-specific captions
+    # become review-only carousels with four local image files. No API calls or
+    # externally hosted URLs are invented for these unreleased images.
+    source=Path(__file__).with_name("v3_draft_captions.json")
+    proposal=json.loads(source.read_text(encoding="utf-8"))
+    by_concept={row["concept"]:row for row in proposal["content"]}
+    if set(by_concept)!=set(CONCEPTS):
+        raise ValueError("Source caption pack does not match the six carousel topics")
+    review_posts=[]
+    for name in names:
+        group=sorted([row for row in slides if row["concept"]==name],key=lambda row:row["slide"])
+        if [row["slide"] for row in group]!=[1,2,3,4]:
+            raise ValueError("Carousel must include exactly four ordered slides")
+        for network in ("facebook","instagram"):
+            original=by_concept[name][network]
+            if original.get("autoPublish") is not False or original.get("type")!="POST":
+                raise ValueError("Source caption cannot auto-publish")
+            review_posts.append({
+                "network":network,"concept":name,"draft":True,
+                "autoPublish":False,"ready_to_publish":False,
+                "status":"UNAPPROVED_LOCAL_ONLY",
+                "caption":original["caption"],
+                "carousel_images":[Path(row["image"]).name for row in group],
+                "mediaAltText":[row["proposed_alt_text"] for row in group],
+                "educational_page":"/"+v3.COPY[name]["site_slug"],
+                "source_rights_review_required":True,
+                "human_visual_approval_required":True,
+            })
+    postings={
+        "brand":"RETALLY","kind":"internal-only-carousel-draft-handoff",
+        "social_provider_mutations":False,
+        "no_external_images_uploaded":True,
+        "posts":review_posts,
+    }
+    (output/"v4-review-only-post-pack.json").write_text(
+        json.dumps(postings,indent=2)+"\n",encoding="utf8")
+    report["draft_post_pack"]="v4-review-only-post-pack.json"
+    # Self-contained, dependency-free offline visual comparison page.
+    gallery=[
+        '<!doctype html><html lang="en"><head><meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width,initial-scale=1">',
+        '<title>RETALLY carousel phone preview | review only</title>',
+        '<style>body{font:16px Arial;background:#091e1a;color:#eafff3;margin:0;padding:18px}',
+        'h1{font-size:26px}h2{font-size:21px;color:#a2f8ca}',
+        '.hint{background:#164c3b;padding:14px;border-radius:10px;max-width:860px}',
+        '.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));',
+        'gap:18px;max-width:1700px;margin:18px 0 35px}',
+        'figure{margin:0}img{width:100%;height:auto;border-radius:8px;border:1px solid #557b6b}',
+        'figcaption{padding-top:8px;font-weight:700}</style></head><body>',
+        '<h1>RETALLY Field Notes v4 — six swipe carousels</h1>',
+        '<p class="hint">Internal visual review only. Not licensed, approved,',
+        ' scheduled or published. Check readability on a real phone and',
+        ' original image rights before any future posting.</p>',
+    ]
+    for name in names:
+        gallery.append('<section><h2>'+_e(name.replace("_"," ").title())+'</h2><div class="grid">')
+        for row in sorted((x for x in slides if x["concept"]==name),
+                          key=lambda x:x["slide"]):
+            gallery.extend([
+                '<figure><img loading="lazy" src="',
+                _e(Path(row["phone_preview"]).name),
+                '" alt="',_e(row["proposed_alt_text"]),'">',
+                '<figcaption>Slide ',str(row["slide"]),'/4</figcaption></figure>'
+            ])
+        gallery.append('</div></section>')
+    gallery.append('</body></html>')
+    (output/"review-gallery.html").write_text("".join(gallery),encoding="utf8")
+    report["offline_review_gallery"]="review-gallery.html"
     (output/"manifest-v4.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf8")
     return report
 
