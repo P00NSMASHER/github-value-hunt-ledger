@@ -1,0 +1,167 @@
+name: RETALLY Lab 14 Dual Off-Bundle Recovery Witness Gate (Mission 51)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-dual-witness-m51.yml'
+      - 'freight/recovery_witness_m51.py'
+      - 'freight/lab_recovery_witness_m51.py'
+      - 'freight/test_lab_recovery_witness_m51.py'
+      - 'freight/backup_restore.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_DUAL_WITNESS_M51.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  twenty-two-dual-signer-adversarial-cases-and-fourteen-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 42
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install offline-only financial/source verification and crypto
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Verify real Ed25519 recovery witnesses, source integrity and original research controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_recovery_witness_m51.py \
+            freight/test_lab_recovery_admission_m50.py \
+            freight/test_lab_dual_ledger_backup_m49.py \
+            freight/test_backup_restore.py \
+            freight/test_lab_audit_trust_boundary_m48.py \
+            freight/test_audit_store.py \
+            freight/test_audit_ledger.py \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Verify 22 signed positive and 22 rejected witness scenarios plus original fourteen labs
+        run: |
+          PYTHONPATH=. python -m freight.lab_recovery_witness_m51 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m51
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m51-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m51/off_bundle_witness_m51.json').read_text())
+          c=json.loads(Path('/tmp/retally-m51-control/phase4_control.json').read_text())
+          assert r['scope']=='RETALLY_LAB14_M51_EXTERNAL_KEY_TWO_SIGNER_TECHNICAL_ONLY_SYNTHETIC'
+          assert r['existing_research_labs']==14 and r['new_lab_created'] is False
+          assert r['ephemeral_dual_signer_positive_controls']==22
+          assert r['different_invalid_trust_policy_or_witness_attacks']==22
+          assert r['exact_current_witness_gate_denials']==22
+          assert r['public_keys_supplied_by_caller_not_bundle'] is True
+          assert r['signatures_bound_to_manifest_scope_request_audience_expiry'] is True
+          assert r['both_required_roles_must_use_distinct_public_keys'] is True
+          assert r['all_keypairs_ephemeral_and_not_written_to_files'] is True
+          assert r['original_m50_data_source_integrity_still_required'] is True
+          assert r['actual_recovery_activation_or_customer_approval'] is False
+          assert r['all_26_original_historical_findings_open']==26
+          assert r['historical_original_findings_closed']==0
+          assert r['independent_first_customer_pilot_human_gates_unmet']==18
+          assert r['actual_customer_cash_recovered'] is None
+          assert r['externally_publishable_empirical_claims_approved']==0
+          assert len(r['cases'])==22
+          assert all(x['two_independent_ephemeral_positive_signatures_verified']
+                     and x['original_m50_local_source_consistency_passed']
+                     and x['invalid_witness_request_rejected']
+                     and x['original_four_sqlite_artifacts_untouched']
+                     and not x['private_signing_key_embedded_in_artifacts']
+                     and not x['restoration_or_first_customer_activation_performed']
+                     and not x['original_historical_finding_closed']
+                     for x in r['cases'])
+          assert len(c['lab_runs'])==14 and c['executed_labs']==list(range(1,15))
+          assert not c['failed_or_blocked_labs']
+          assert c['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert c['technical_recovery_witness_m51']['receipt_sha256']==r['receipt_sha256']
+          assert c['recovery_admission_m50']['current_exact_fail_closed_recovery_denials']==13
+          assert c['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert c['actual_revenue_cents']==0
+          assert 'off_bundle_witness_m51.html' in Path('/tmp/retally-m51-control/index.html').read_text()
+          print('M51: two in-memory test-only Ed25519 roles, 22 genuine positive technical reviews, 22 exact negative witness denials, 14 original labs, zero customer activation.')
+          PY
+      - name: Retain bounded synthetic metadata without witness private keys or original SQLite
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m51-out-of-bundle-technical-witness-negatives
+          path: |
+            /tmp/retally-m51/off_bundle_witness_m51.json
+            /tmp/retally-m51/off_bundle_witness_m51.html
+          if-no-files-found: error
+          retention-days: 14
+
+  pinned-pre-m51-local-only-versus-dual-witness-differential:
+    needs: twenty-two-dual-signer-adversarial-cases-and-fourteen-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited offline test fixture requirements and ephemeral crypto
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Pin exact M50 original source, not the moving parent commit
+        run: |
+          git fetch --no-tags --depth=1 origin 3df16eaaa4a9e68dcf0c7d240f97ae797fcf7a47
+          git show 3df16eaaa4a9e68dcf0c7d240f97ae797fcf7a47:freight/backup_restore.py > /tmp/m51_prior_restore_checker.py
+          test -s /tmp/m51_prior_restore_checker.py
+      - name: Real independent 22-case proof that local-only checks could not enforce witness policy
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from dataclasses import asdict
+          from pathlib import Path
+          from freight import backup_restore as current
+          from freight.lab_recovery_witness_m51 import (
+              SCENARIOS,_make_known_good,_attack
+          )
+          name='m51_prior_local_only_restore'
+          spec=importlib.util.spec_from_file_location(name,'/tmp/m51_prior_restore_checker.py')
+          old=importlib.util.module_from_spec(spec)
+          sys.modules[name]=old
+          spec.loader.exec_module(old)
+          assert not hasattr(old,'verify_witnessed_recovery_bundle')
+          local_accepted=technical_denied=0
+          for scenario,expected in SCENARIOS.items():
+              with tempfile.TemporaryDirectory(prefix='m51-true-previous-current-') as td:
+                  folder,result,manifest,private_test_keys,good=_make_known_good(Path(td))
+                  bad=_attack(scenario,private_test_keys,good)
+                  earlier=old.BackupRestoreResult(**asdict(result))
+                  old_local=old.verify_backup_bundle(folder,earlier)
+                  assert old_local['manifest_sha256']==manifest['manifest_sha256']
+                  local_accepted+=1
+                  try:
+                      current.verify_witnessed_recovery_bundle(folder,result,**bad)
+                  except ValueError as exc:
+                      assert expected in str(exc),(scenario,str(exc))
+                      technical_denied+=1
+                  else:
+                      raise AssertionError('M51 accepted bad review '+scenario)
+          assert (local_accepted,technical_denied)==(22,22)
+          print('M51 pinned original M50 local data check admitted all 22 healthy bundles without any witness condition; distinct off-bundle technical M51 gate rejected 22/22 invalid witness claims with exact reasons.')
+          PY

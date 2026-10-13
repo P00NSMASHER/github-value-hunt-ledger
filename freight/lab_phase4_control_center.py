@@ -163,6 +163,10 @@ from freight.lab_recovery_admission_m50 import (
     run_campaign as run_recovery_admission_m50,
     render_html as render_recovery_admission_m50,
 )
+from freight.lab_recovery_witness_m51 import (
+    run_campaign as run_dual_witness_m51,
+    render_html as render_dual_witness_m51,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -217,6 +221,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["recovery_admission_m50"]=run_recovery_admission_m50(
+            as_of=date.today()
+        )
+        result["technical_recovery_witness_m51"]=run_dual_witness_m51(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -358,6 +365,7 @@ def render(data: dict) -> str:
     audit48=data["persistent_audit_trust_m48"]
     bundle49=data["dual_ledger_backup_m49"]
     recovery50=data["recovery_admission_m50"]
+    review51=data["technical_recovery_witness_m51"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -599,6 +607,16 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Off-bundle recovery witnesses — dual cryptographic technical review</h2>
+<p>The existing Lab 14 runs <strong>"""+str(review51["exact_current_witness_gate_denials"])+"""/22</strong>
+exact false witness denials after matching a fully valid synthetic source
+bundle and two ephemeral positive Ed25519 reviews. Any future restore
+technical review requires externally provisioned distinct operator and
+security-review public keys, the same recovery manifest, scoped money,
+restore request, audience and expiring timestamps. <strong>This is not
+real customer legal permission, verified bank money, or approval to
+activate production</strong>. All 26 original findings remain open.</p>
+<a href="off_bundle_witness_m51.html">Inspect technical-source witness gates ↗</a></section>
 <section class="panel"><h2>Actual published restore admission — original row validity, not self-signed SHA alone</h2>
 <p>Existing Lab 14 now checks <strong>"""+str(recovery50["current_exact_fail_closed_recovery_denials"])+"""/13</strong>
 fake published recovery bundles that recompute their local file SHA and
@@ -1207,6 +1225,14 @@ def main():
     )
     (args.out/"recovery_admission_m50.html").write_text(
         render_recovery_admission_m50(data["recovery_admission_m50"]),
+        encoding="utf-8"
+    )
+    (args.out/"off_bundle_witness_m51.json").write_text(
+        json.dumps(data["technical_recovery_witness_m51"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"off_bundle_witness_m51.html").write_text(
+        render_dual_witness_m51(data["technical_recovery_witness_m51"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

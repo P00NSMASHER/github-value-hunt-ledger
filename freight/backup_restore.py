@@ -203,6 +203,41 @@ def verify_backup_bundle(root: str | Path,
     return record
 
 
+
+def verify_witnessed_recovery_bundle(
+    root: str | Path,
+    result: BackupRestoreResult,
+    *,
+    trust_registry: dict,
+    witness_receipts: object,
+    expected_restore_request_id: str,
+    expected_audience: str,
+    as_of_utc,
+) -> dict:
+    """Require two caller-provisioned Ed25519 technical witnesses for review.
+
+    The existing verify_backup_bundle stays a LOCAL data-integrity check.
+    It must never be confused with authorization for a real customer restore.
+    This additional API is deliberately fail-closed when review receipts,
+    external trust roots, audience or request binding are missing. It never
+    issues a restore command, changes a ledger or grants legal permission.
+    """
+    # Always validate all four actual published SQLite images BEFORE
+    # considering attestations. Valid signatures on corrupted data are
+    # insufficient and cannot override M49/M50 source rejection.
+    manifest=verify_backup_bundle(root,result)
+    from freight.recovery_witness_m51 import validate_technical_witnesses
+    return validate_technical_witnesses(
+        manifest=manifest,
+        result=result,
+        trust_registry=trust_registry,
+        witness_receipts=witness_receipts,
+        expected_restore_request_id=expected_restore_request_id,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+    )
+
+
 def _settlement_content(settlement: SettlementStore) -> dict:
     """Guard then summarize ONE scoped SQLite revision.
 

@@ -194,6 +194,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("recovery_admission_rehashed_attacks_m50", 12),
             ("recovery_admission_negative_denials_m50", 12),
             ("recovery_admission_original_findings_closed_m50", 1),
+            ("technical_witness_positive_controls_m51", 21),
+            ("technical_witness_adversarial_cases_m51", 21),
+            ("technical_witness_negative_denials_m51", 21),
+            ("technical_witness_original_findings_closed_m51", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)
