@@ -13,6 +13,21 @@ def payload():
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
 
 
+@pytest.mark.parametrize("value", ["true", "false", 1, 0, None, [], {}])
+def test_pack_rejects_non_boolean_synthetic_classification(value):
+    data = payload()
+    data["synthetic"] = value
+    with pytest.raises(ValueError, match="synthetic must be an explicit boolean"):
+        build_pack(data)
+
+
+def test_pack_requires_synthetic_classification_to_be_present():
+    data = payload()
+    data.pop("synthetic")
+    with pytest.raises(ValueError, match="synthetic must be an explicit boolean"):
+        build_pack(data)
+
+
 def test_pack_keeps_money_states_and_attribution_separate():
     pack = build_pack(payload())
     totals = pack["totals"]
@@ -25,6 +40,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["findings"][2]["attribution_state"] == "SUPPRESSED"
     assert pack["findings"][2]["fee_eligible_realized_cents"] == 0
     assert pack["findings"][3]["reviewer_disposition"] == "REVIEW"
+    assert pack["claim_boundary"]["synthetic_classification_is_explicit_boolean"] is True
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
     assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
     assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True

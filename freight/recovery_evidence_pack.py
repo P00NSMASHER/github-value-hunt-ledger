@@ -138,6 +138,9 @@ def build_pack(payload):
     customer = require_text(payload, "customer")
     population_id = require_text(payload, "population_id")
     period = require_text(payload, "period")
+    synthetic = payload.get("synthetic")
+    if not isinstance(synthetic, bool):
+        raise ValueError("synthetic must be an explicit boolean")
     rows = payload.get("findings")
     if not isinstance(rows, list) or not rows:
         raise ValueError("findings must be a non-empty list")
@@ -192,8 +195,9 @@ def build_pack(payload):
         "customer": customer,
         "population_id": population_id,
         "period": period,
-        "synthetic": bool(payload.get("synthetic", False)),
+        "synthetic": synthetic,
         "claim_boundary": {
+            "synthetic_classification_is_explicit_boolean": True,
             "potential_is_not_recovered": True,
             "validated_is_not_settled": True,
             "preexisting_and_duplicate_value_excluded": True,
