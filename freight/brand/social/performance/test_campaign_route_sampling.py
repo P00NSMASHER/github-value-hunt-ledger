@@ -81,7 +81,7 @@ class RouteSamplingTests(unittest.TestCase):
         self.snapshot["data"][1]["text"] = (
             self.snapshot["data"][1]["text"].replace(
                 "utm_source=facebook", "utm_source=instagram"))
-        with self.assertRaisesRegex(ValueError, "allowlist"):
+        with self.assertRaisesRegex(ValueError, "missing unique tracked"):
             run(self.snapshot, only_kind="landing", one_per_route=True)
 
     def test_media_validated_even_if_landing_only(self):
