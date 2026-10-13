@@ -172,7 +172,7 @@ class JanuaryCampaignReadbackTests(unittest.TestCase):
         self.assertEqual(self.receipt["metricool_brand_id"],"7322512")
         self.assertTrue(all(x["state"]=="SCHEDULED_NOT_INDEPENDENTLY_PUBLISHED"
                             for x in self.posts))
-        self.assertIn("not proof",self.receipt["platform_analytics_not_proof"].lower())
+        self.assertIn("independently dated source records",self.receipt["platform_analytics_not_proof"].lower())
         self.assertIn("LinkedIn",self.receipt["status_of_original_20_drafts"])
         self.assertNotIn("oauth",str(self.receipt).lower())
 
