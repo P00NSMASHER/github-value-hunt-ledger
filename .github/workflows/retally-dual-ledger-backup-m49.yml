@@ -1,0 +1,214 @@
+name: RETALLY Lab 14 Dual-Ledger Backup Stability and Recovery Bundle (Mission 49)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-dual-ledger-backup-m49.yml'
+      - 'freight/backup_restore.py'
+      - 'freight/audit_store.py'
+      - 'freight/lab_dual_ledger_backup_m49.py'
+      - 'freight/test_lab_dual_ledger_backup_m49.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_DUAL_LEDGER_BACKUP_M49.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  nine-capture-negative-proofs-and-original-fourteen-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original offline testing dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Real dual-ledger atomic publication, inherited settlement safety and original labs
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_dual_ledger_backup_m49.py \
+            freight/test_backup_restore.py \
+            freight/test_lab_audit_trust_boundary_m48.py \
+            freight/test_audit_store.py \
+            freight/test_audit_ledger.py \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Generate nine exact dual-ledger negative results plus existing 14-lab control
+        run: |
+          PYTHONPATH=. python -m freight.lab_dual_ledger_backup_m49 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m49
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m49-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('/tmp/retally-m49/dual_ledger_backup_m49.json').read_text())
+          d=json.loads(Path('/tmp/retally-m49-control/phase4_control.json').read_text())
+          assert m['scope']=='RETALLY_LAB14_M49_DUAL_SQLITE_BUNDLE_STABLE_WINDOW_SYNTHETIC_ONLY'
+          assert m['existing_research_labs']==14 and m['new_lab_created'] is False
+          assert m['disposable_dual_source_attack_scenarios']==9
+          assert m['matching_positive_fictional_bundles']==9
+          assert m['current_code_exact_negative_denials']==9
+          assert m['all_tenant_source_content_checked_before_and_after_capture'] is True
+          assert m['completed_bundles_use_commit_marker_last'] is True
+          assert m['failed_bundles_leave_no_new_final_sqlite_files'] is True
+          assert m['two_sqlite_files_atomically_committed_together'] is False
+          assert len(m['cases'])==9
+          assert all(x['one_known_good_synthetic_backup_and_restore_verified']
+                     and x['negative_current_code_fails_closed']
+                     and x['no_false_completion_marker_published']
+                     and x['no_partial_new_sqlite_bundle_published']
+                     and not x['original_historical_finding_closed']
+                     for x in m['cases'])
+          assert m['original_historical_findings_open']==26
+          assert m['original_historical_findings_closed']==0
+          assert m['first_customer_independent_human_controls_unmet']==18
+          assert m['externally_publishable_empirical_claims_approved']==0
+          assert m['reproducible_real_customer_cash_recovery'] is None
+          assert len(d['lab_runs'])==14 and d['executed_labs']==list(range(1,15))
+          assert d['failed_or_blocked_labs']==[]
+          assert d['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert d['dual_ledger_backup_m49']['receipt_sha256']==m['receipt_sha256']
+          assert d['persistent_audit_trust_m48']['current_real_audit_file_attack_classes']==13
+          assert d['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert d['actual_revenue_cents']==0
+          assert 'dual_ledger_backup_m49.html' in Path('/tmp/retally-m49-control/index.html').read_text()
+          print('M49: nine synthetic stable-window bundles, nine exact fail-closed source races and publication failures, 14 original labs.')
+          PY
+      - name: Retain only fictional metadata, never customer source SQLite or transaction bytes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m49-dual-ledger-backup-stable-window-evidence
+          path: |
+            /tmp/retally-m49/dual_ledger_backup_m49.json
+            /tmp/retally-m49/dual_ledger_backup_m49.html
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-pinned-prior-source-backup-differential:
+    needs: nine-capture-negative-proofs-and-original-fourteen-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited test-fixture dependencies for independent source challenge
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+      - name: Retrieve exact earlier M48 backup source (not a moving parent commit)
+        run: |
+          git fetch --no-tags --depth=1 origin d5aa20d54880f8d83b15f11b24d6ca6e87a29f03
+          git show d5aa20d54880f8d83b15f11b24d6ca6e87a29f03:freight/backup_restore.py > /tmp/m49_prior_backup.py
+          test -s /tmp/m49_prior_backup.py
+      - name: Independently replay three prior flaws vs fail-closed M49
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from pathlib import Path
+          from unittest.mock import patch
+          from freight.test_backup_restore import populated
+          from freight.audit_ledger import AuditEventType
+          from freight import backup_restore as current
+          from freight.contracts import canonical_hash
+          name='m49_old_backup_restore'
+          spec=importlib.util.spec_from_file_location(name,'/tmp/m49_prior_backup.py')
+          old=importlib.util.module_from_spec(spec)
+          sys.modules[name]=old
+          spec.loader.exec_module(old)
+          assert not hasattr(old,'verify_backup_bundle')
+          old_false_success=old_partial_files=old_overwrites=0
+
+          def mutate_after_audit(module,audit):
+              real=module._sqlite_backup
+              injected=[False]
+              def race(src,dst):
+                  real(src,dst)
+                  if dst.name=='audit.backup.sqlite3' and not injected[0]:
+                      injected[0]=True
+                      audit.append(
+                        event_type=AuditEventType.SOURCE_PRESENT,
+                        object_id='m49-test-only-racing-audit-append',
+                        occurred_at='2026-09-26T11:00:00Z',
+                        evidence_hash='c'*64,
+                      )
+              return race
+
+          with tempfile.TemporaryDirectory() as td:
+              root=Path(td)
+              audit,settlement=populated(root)
+              with patch.object(old,'_sqlite_backup',side_effect=mutate_after_audit(old,audit)):
+                  old_result=old.run_backup_restore_drill(audit,settlement,work_dir=root/'old')
+              old.verify_backup_restore_result(old_result)
+              assert old_result.source_semantic_hash==old_result.restored_semantic_hash
+              old_false_success+=1
+
+          with tempfile.TemporaryDirectory() as td:
+              root=Path(td)
+              audit,settlement=populated(root)
+              with patch.object(current,'_sqlite_backup',
+                                side_effect=mutate_after_audit(current,audit)):
+                  try:
+                      current.run_backup_restore_drill(audit,settlement,
+                                                        work_dir=root/'new')
+                  except RuntimeError as exc:
+                      assert 'M49_SOURCE_CHANGED_DURING_DUAL_LEDGER_CAPTURE' in str(exc)
+                  else:
+                      raise AssertionError('M49 accepted cross-file race')
+              assert not (root/'new').exists()
+
+          with tempfile.TemporaryDirectory() as td:
+              root=Path(td)
+              audit,settlement=populated(root)
+              previous=old._restore_copy
+              def fail_second(src,dst):
+                  if dst.name=='settlement.restored.sqlite3':
+                      raise RuntimeError('m49-restore-interruption')
+                  return previous(src,dst)
+              with patch.object(old,'_restore_copy',side_effect=fail_second):
+                  try:
+                      old.run_backup_restore_drill(audit,settlement,work_dir=root/'old')
+                  except RuntimeError as exc:
+                      assert 'm49-restore-interruption' in str(exc)
+                  else:
+                      raise AssertionError('old interrupted restore should fail')
+              assert (root/'old'/'audit.backup.sqlite3').exists()
+              assert (root/'old'/'settlement.backup.sqlite3').exists()
+              assert not (root/'old'/'capture.complete.json').exists()
+              old_partial_files+=1
+
+          with tempfile.TemporaryDirectory() as td:
+              root=Path(td)
+              audit,settlement=populated(root)
+              target=root/'old'
+              target.mkdir()
+              (target/'audit.backup.sqlite3').write_bytes(b'M49_PRIOR_APPROVED_CUSTOMER_ARTIFACT')
+              old.run_backup_restore_drill(audit,settlement,work_dir=target)
+              assert (target/'audit.backup.sqlite3').read_bytes().startswith(b'SQLite format 3')
+              old_overwrites+=1
+
+          assert (old_false_success,old_partial_files,old_overwrites)==(1,1,1)
+          print('M49 independent old/current source differential: predecessor falsely approved racing backup, left incomplete recovery files, and overwrote preexisting backup; current code rejects all.')
+          PY

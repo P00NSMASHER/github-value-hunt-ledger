@@ -1116,6 +1116,35 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and c["original_historical_defect_closed"] is False
                       for c in audit48["cases"]),
               "M48_AUDIT_SOURCE_NEGATIVE_CASE_NOT_EXECUTED")
+        from freight.lab_dual_ledger_backup_m49 import (
+            run_campaign as test_dual_ledger_backup_m49,
+            SCENARIOS as dual_ledger_attack_ids_m49,
+        )
+        dual49=test_dual_ledger_backup_m49(as_of=today)
+        _must(dual49["existing_research_labs"]==14
+              and dual49["disposable_dual_source_attack_scenarios"]==9
+              and dual49["matching_positive_fictional_bundles"]==9
+              and dual49["current_code_exact_negative_denials"]==9
+              and dual49["all_tenant_source_content_checked_before_and_after_capture"] is True
+              and dual49["completed_bundles_use_commit_marker_last"] is True
+              and dual49["failed_bundles_leave_no_new_final_sqlite_files"] is True
+              and dual49["two_sqlite_files_atomically_committed_together"] is False
+              and dual49["original_historical_findings_open"]==26
+              and dual49["original_historical_findings_closed"]==0
+              and dual49["first_customer_independent_human_controls_unmet"]==18
+              and dual49["externally_publishable_empirical_claims_approved"]==0
+              and dual49["reproducible_real_customer_cash_recovery"] is None,
+              "M49_INCOMPLETE_MULTIFILE_BACKUP_MISLABELED_READY")
+        _must(tuple(c["scenario"] for c in dual49["cases"])==
+              tuple(dual_ledger_attack_ids_m49)
+              and all(c["expected_failure"]==
+                      dual_ledger_attack_ids_m49[c["scenario"]]
+                      and c["negative_current_code_fails_closed"] is True
+                      and c["no_false_completion_marker_published"] is True
+                      and c["no_partial_new_sqlite_bundle_published"] is True
+                      and c["original_historical_finding_closed"] is False
+                      for c in dual49["cases"]),
+              "M49_BACKUP_SOURCE_RACE_OR_PARTIAL_PUBLISH_NOT_TESTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1294,6 +1323,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "audit_source_append_denials_m48":13,
                 "audit_source_original_findings_closed_m48":0,
                 "audit_source_receipt_sha256_m48":audit48["receipt_sha256"],
+                "dual_ledger_capture_attack_cases_m49":9,
+                "dual_ledger_positive_bundles_m49":9,
+                "dual_ledger_negative_denials_m49":9,
+                "dual_ledger_original_findings_closed_m49":0,
+                "dual_ledger_receipt_sha256_m49":dual49["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
