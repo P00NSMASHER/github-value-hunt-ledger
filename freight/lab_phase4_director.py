@@ -1238,6 +1238,41 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["historical_original_findings_closed"]==0
                       for x in replay52["cases"]),
               "M52_LOCAL_DURABLE_NONCE_NEGATIVE_NOT_ACTUALLY_EXECUTED")
+        from freight.lab_replay_checkpoint_m53 import (
+            run_campaign as audit_signed_replay_checkpoint_m53,
+            FAILURES as signed_checkpoint_negative_cases_m53,
+        )
+        checkpoint53=audit_signed_replay_checkpoint_m53(as_of=today)
+        _must(checkpoint53["existing_research_labs"]==14
+              and checkpoint53["synthetic_checkpointed_positive_reviews"]==19
+              and checkpoint53["same_journal_state_or_signature_negative_scenarios"]==19
+              and checkpoint53["exact_current_checkpoint_denials"]==19
+              and checkpoint53["coherent_same_inode_journal_rollback_cases"]==2
+              and checkpoint53["same_inode_coherent_row_tamper_cases"]==4
+              and checkpoint53["checkpoint_verification_occurs_under_same_sqlite_write_lock"] is True
+              and checkpoint53["successor_checkpoint_requires_separate_external_signature"] is True
+              and checkpoint53["successor_checkpoint_externally_persisted_by_this_code"] is False
+              and checkpoint53["old_m52_local_only_entrypoint_still_rollback_susceptible"] is True
+              and checkpoint53["externally_operated_nonrollbackable_checkpoint_service_provisioned"] is False
+              and checkpoint53["real_restore_or_customer_activation_executed"] is False
+              and checkpoint53["historical_original_findings_open"]==26
+              and checkpoint53["historical_original_findings_closed"]==0
+              and checkpoint53["human_first_customer_pilot_gates_unmet"]==18
+              and checkpoint53["actual_customer_cash_recovered"] is None
+              and checkpoint53["externally_publishable_empirical_claims_approved"]==0,
+              "M53_SIGNED_CHECKPOINT_MISTAKEN_FOR_EXTERNAL_CUSTOMER_AUTHORITY")
+        _must(tuple(x["scenario"] for x in checkpoint53["cases"])==
+              tuple(signed_checkpoint_negative_cases_m53)
+              and all(x["expected_exact_denial"]==
+                      signed_checkpoint_negative_cases_m53[x["scenario"]]
+                      and x["prior_valid_signed_off_journal_positive_review"] is True
+                      and x["negative_checkpoint_or_coherent_rollback_rejected"] is True
+                      and x["denied_review_left_journal_state_unchanged"] is True
+                      and x["original_four_sqlite_recovery_images_untouched"] is True
+                      and x["independent_real_signing_custodian_provisioned"] is False
+                      and x["original_historical_findings_closed"]==0
+                      for x in checkpoint53["cases"]),
+              "M53_CHECKPOINT_ROLLBACK_NEGATIVE_NOT_REPRODUCED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1436,6 +1471,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "technical_replay_exact_denials_m52":14,
                 "technical_replay_original_findings_closed_m52":0,
                 "technical_replay_receipt_sha256_m52":replay52["receipt_sha256"],
+                "signed_replay_checkpoint_positive_controls_m53":19,
+                "signed_replay_checkpoint_negative_cases_m53":19,
+                "signed_replay_checkpoint_exact_denials_m53":19,
+                "signed_replay_checkpoint_original_findings_closed_m53":0,
+                "signed_replay_checkpoint_receipt_sha256_m53":checkpoint53["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

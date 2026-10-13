@@ -296,6 +296,71 @@ def record_witnessed_recovery_review(
     )
 
 
+
+def record_checkpointed_witnessed_recovery_review(
+    root: str | Path,
+    result: BackupRestoreResult,
+    *,
+    replay_ledger,
+    trust_registry: dict,
+    witness_receipts: object,
+    expected_restore_request_id: str,
+    expected_audience: str,
+    as_of_utc,
+    external_checkpoint: object,
+    checkpoint_custodian_trust: object,
+    checkpoint_namespace: str,
+    checkpoint_audience: str,
+) -> dict:
+    """Higher-assurance LOCAL replay review, conditional on an OFF-journal anchor.
+
+    Unlike M52 local-only recording, compare the entire one-time review DB
+    against an independently held, separately signed high-water checkpoint
+    under the same SQLite write lock as consumption. This detects a restored
+    older SQLite journal whose rows/triggers are *internally consistent*.
+
+    A correctly signed next checkpoint is NOT created or published here.
+    The returned successor is only a proposal: a separate trusted custodian
+    must attest and persist it before the next checkpointed request.
+    Neither the replay journal nor two technical signers authorize actual
+    recovery, payments, legal customer signoff or real source provenance.
+    """
+    from freight.recovery_replay_m52 import (
+        TechnicalReviewReplayLedger, _reject,
+    )
+    if type(replay_ledger) is not TechnicalReviewReplayLedger:
+        _reject("JOURNAL_NOT_PROVISIONED")
+    base=Path(root).resolve()
+    journal=replay_ledger.path.resolve()
+    if journal==base or base in journal.parents:
+        _reject("JOURNAL_MUST_BE_OFF_BUNDLE")
+    # Never let an external checkpoint replace M50/M51's substantive source
+    # and two distinct reviewer signature validation.
+    checked=verify_witnessed_recovery_bundle(
+        root,result,trust_registry=trust_registry,
+        witness_receipts=witness_receipts,
+        expected_restore_request_id=expected_restore_request_id,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+    )
+    if (checked["full_customer_restore_activation_authorized"] is not False
+        or checked["historical_original_findings_closed"]!=0):
+        _reject("TECHNICAL_REVIEW_NOT_RESTRICTED")
+    manifest=verify_backup_bundle(root,result)
+    return replay_ledger.consume(
+        manifest=manifest,result=result,
+        trust_registry=trust_registry,
+        witness_receipts=witness_receipts,
+        expected_restore_request_id=expected_restore_request_id,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+        checkpoint=external_checkpoint,
+        custodian_trust=checkpoint_custodian_trust,
+        journal_namespace=checkpoint_namespace,
+        checkpoint_audience=checkpoint_audience,
+    )
+
+
 def _settlement_content(settlement: SettlementStore) -> dict:
     """Guard then summarize ONE scoped SQLite revision.
 

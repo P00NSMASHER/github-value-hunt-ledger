@@ -1,0 +1,187 @@
+name: RETALLY Lab 14 Signed Off-Journal Replay Checkpoints (Mission 53)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-signed-replay-checkpoint-m53.yml'
+      - 'freight/recovery_checkpoint_m53.py'
+      - 'freight/recovery_replay_m52.py'
+      - 'freight/lab_replay_checkpoint_m53.py'
+      - 'freight/test_lab_replay_checkpoint_m53.py'
+      - 'freight/backup_restore.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_SIGNED_CHECKPOINT_M53.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  real-sqlite-rollback-and-original-fourteen-lab-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install offline pinned source and Ed25519 research dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Test signed journal state, six-way write contention and all inherited research protections
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_replay_checkpoint_m53.py \
+            freight/test_lab_recovery_replay_m52.py \
+            freight/test_lab_recovery_witness_m51.py \
+            freight/test_lab_recovery_admission_m50.py \
+            freight/test_lab_dual_ledger_backup_m49.py \
+            freight/test_backup_restore.py \
+            freight/test_lab_audit_trust_boundary_m48.py \
+            freight/test_audit_store.py \
+            freight/test_audit_ledger.py \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Reproduce nineteen signed-checkpoint rollback and forgery negatives and original fourteen labs
+        run: |
+          PYTHONPATH=. python -m freight.lab_replay_checkpoint_m53 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m53
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m53-control
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          m=json.loads(Path('/tmp/retally-m53/signed_replay_checkpoint_m53.json').read_text())
+          c=json.loads(Path('/tmp/retally-m53-control/phase4_control.json').read_text())
+          assert m['scope']=='RETALLY_LAB14_M53_SIGNED_EXTERNAL_CHECKPOINT_ROLLBACK_TEST_SYNTHETIC'
+          assert m['existing_research_labs']==14 and m['new_lab_created'] is False
+          assert m['synthetic_checkpointed_positive_reviews']==19
+          assert m['same_journal_state_or_signature_negative_scenarios']==19
+          assert m['exact_current_checkpoint_denials']==19
+          assert m['coherent_same_inode_journal_rollback_cases']==2
+          assert m['same_inode_coherent_row_tamper_cases']==4
+          assert m['checkpoint_verification_occurs_under_same_sqlite_write_lock'] is True
+          assert m['successor_checkpoint_requires_separate_external_signature'] is True
+          assert m['successor_checkpoint_externally_persisted_by_this_code'] is False
+          assert m['old_m52_local_only_entrypoint_still_rollback_susceptible'] is True
+          assert m['externally_operated_nonrollbackable_checkpoint_service_provisioned'] is False
+          assert m['historical_original_findings_open']==26
+          assert m['historical_original_findings_closed']==0
+          assert m['human_first_customer_pilot_gates_unmet']==18
+          assert m['actual_customer_cash_recovered'] is None
+          assert len(m['cases'])==19
+          assert all(p['prior_valid_signed_off_journal_positive_review']
+                     and p['negative_checkpoint_or_coherent_rollback_rejected']
+                     and p['denied_review_left_journal_state_unchanged']
+                     and p['original_four_sqlite_recovery_images_untouched']
+                     and not p['independent_real_signing_custodian_provisioned']
+                     for p in m['cases'])
+          assert c['executed_labs']==list(range(1,15))
+          assert len(c['lab_runs'])==14 and c['failed_or_blocked_labs']==[]
+          assert c['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert c['signed_replay_checkpoint_m53']['receipt_sha256']==m['receipt_sha256']
+          assert c['technical_review_replay_m52']['exact_current_replay_and_journal_denials']==14
+          assert c['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert c['actual_revenue_cents']==0
+          assert 'signed_replay_checkpoint_m53.html' in Path('/tmp/retally-m53-control/index.html').read_text()
+          print('M53: nineteen synthetic signed-checkpoint positives and nineteen exact rollback/signature denials, original 14 labs, zero real external anchor.')
+          PY
+      - name: Store short-lived simulated receipt metadata without customer SQLite, signatures or keys
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m53-synthetic-off-journal-signed-checkpoint-negative-proofs
+          path: |
+            /tmp/retally-m53/signed_replay_checkpoint_m53.json
+            /tmp/retally-m53/signed_replay_checkpoint_m53.html
+          if-no-files-found: error
+          retention-days: 14
+
+  pinned-pre-m53-source-rollback-differential:
+    needs: real-sqlite-rollback-and-original-fourteen-lab-regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install offline test data and transient Ed25519 requirements
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Fetch actual M52 original recovery recording entrypoint, never a moving HEAD parent
+        run: |
+          git fetch --no-tags --depth=1 origin 3d663d554fb76f6099066d503be6d5eb83970ea5
+          git show 3d663d554fb76f6099066d503be6d5eb83970ea5:freight/backup_restore.py > /tmp/m53_old_local_replay_record.py
+          test -s /tmp/m53_old_local_replay_record.py
+      - name: Reproduce M52 coherent same-inode rollback bypass and M53 signed anchor denial
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from dataclasses import asdict
+          from pathlib import Path
+          from freight import backup_restore as guarded
+          from freight.lab_replay_checkpoint_m53 import (
+              _fixture,_rewrite_rows,NAMESPACE,AUDIENCE,
+          )
+          name='m53_prior_m52_local_only_source'
+          spec=importlib.util.spec_from_file_location(name,'/tmp/m53_old_local_replay_record.py')
+          old=importlib.util.module_from_spec(spec)
+          sys.modules[name]=old
+          spec.loader.exec_module(old)
+          assert hasattr(old,'record_witnessed_recovery_review')
+          assert not hasattr(old,'record_checkpointed_witnessed_recovery_review')
+          old_false_accepts=guarded_denials=0
+          for attack in ('ROLLBACK_TO_EMPTY_SAME_INODE',
+                         'REWRITE_REVIEW_MANIFEST_VALID_ROWS'):
+              with tempfile.TemporaryDirectory(prefix='retally-m53-real-prior-diff-') as td:
+                  fx=_fixture(Path(td))
+                  ledger=fx['ledger']
+                  identity=(ledger.path.stat().st_dev,ledger.path.stat().st_ino)
+                  _rewrite_rows(ledger,attack)
+                  assert (ledger.path.stat().st_dev,ledger.path.stat().st_ino)==identity
+                  assert ledger.verify()['schema_and_local_history_consistent']
+                  try:
+                      guarded.record_checkpointed_witnessed_recovery_review(
+                          fx['bundle'],fx['result'],
+                          replay_ledger=ledger,**fx['next_review_kwargs'],
+                          external_checkpoint=fx['current_checkpoint'],
+                          checkpoint_custodian_trust=fx['trust'],
+                          checkpoint_namespace=NAMESPACE,
+                          checkpoint_audience=AUDIENCE,
+                      )
+                  except ValueError as exc:
+                      assert 'M53_CHECKPOINT_STATE_MISMATCH' in str(exc)
+                      guarded_denials+=1
+                  else:
+                      raise AssertionError('M53 accepted coherent journal rollback')
+                  # The historical M52 source has NO outside signed
+                  # checkpoint, so a new proper request is admitted from
+                  # an internally valid but rolled-back/tampered journal.
+                  old_result=old.BackupRestoreResult(**asdict(fx['result']))
+                  prior=old.record_witnessed_recovery_review(
+                      fx['bundle'],old_result,
+                      replay_ledger=ledger,**fx['next_review_kwargs']
+                  )
+                  assert prior['review_attempt_recorded_once'] is True
+                  old_false_accepts+=1
+          assert (old_false_accepts,guarded_denials)==(2,2)
+          print('M53 exact historical source comparison: two internally consistent same-inode journal modifications admitted by predecessor local-only M52; explicit M53 signed-state gate denies both. M52 local-only remains rollback susceptible.')
+          PY

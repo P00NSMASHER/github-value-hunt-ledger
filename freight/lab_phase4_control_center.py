@@ -171,6 +171,10 @@ from freight.lab_recovery_replay_m52 import (
     run_campaign as run_replay_barrier_m52,
     render_html as render_replay_barrier_m52,
 )
+from freight.lab_replay_checkpoint_m53 import (
+    run_campaign as run_signed_checkpoint_m53,
+    render_html as render_signed_checkpoint_m53,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -231,6 +235,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["technical_review_replay_m52"]=run_replay_barrier_m52(
+            as_of=date.today()
+        )
+        result["signed_replay_checkpoint_m53"]=run_signed_checkpoint_m53(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -374,6 +381,7 @@ def render(data: dict) -> str:
     recovery50=data["recovery_admission_m50"]
     review51=data["technical_recovery_witness_m51"]
     replay52=data["technical_review_replay_m52"]
+    checkpoint53=data["signed_replay_checkpoint_m53"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -615,6 +623,17 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Signed off-journal replay checkpoint — coherent local rollback denied</h2>
+<p>Existing Lab 14 tests <strong>"""+str(checkpoint53["exact_current_checkpoint_denials"])+"""/19</strong>
+coherent same-inode replay journal rollbacks, row rewrites and false or
+expired external checkpoint signatures against an explicit higher-assurance
+technical review. The entire persistent journal is compared inside the
+same SQLite write lock as signed request consumption. <strong>No real
+independent custodian service was connected; the successor checkpoint
+remains unsigned and must be externally countersigned before the next
+review. The older local-only M52 entrypoint remains rollback susceptible.</strong>
+All original 26 findings and 18 human pilot gates remain open.</p>
+<a href="signed_replay_checkpoint_m53.html">Inspect independent checkpoint attack denials ↗</a></section>
 <section class="panel"><h2>One-time technical review — durable nonce and request replay denial</h2>
 <p>The existing Lab 14 executes <strong>"""+str(replay52["exact_current_replay_and_journal_denials"])+"""/14</strong>
 exact disposable SQLite replay denials across previously reviewed restore
@@ -1259,6 +1278,14 @@ def main():
     )
     (args.out/"review_replay_m52.html").write_text(
         render_replay_barrier_m52(data["technical_review_replay_m52"]),
+        encoding="utf-8"
+    )
+    (args.out/"signed_replay_checkpoint_m53.json").write_text(
+        json.dumps(data["signed_replay_checkpoint_m53"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"signed_replay_checkpoint_m53.html").write_text(
+        render_signed_checkpoint_m53(data["signed_replay_checkpoint_m53"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
