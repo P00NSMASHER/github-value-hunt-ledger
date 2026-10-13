@@ -23,6 +23,7 @@ from freight.commercial_terms import (
     normalize_contingency_rate,
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
+from freight.site.public_claim_guard import validate_public_text_bundle, TEXT_EXTENSIONS
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -217,6 +218,14 @@ def build(
         '<p class="microcopy">Fictional data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # Scan actual post-templating public HTML/SEO/JS before writing anything.
+    # This does NOT approve marketing; it blocks defined unsupported claims.
+    validate_public_text_bundle(
+        {name: text for name, text in text_bundle.items()
+         if "/" not in name and Path(name).suffix.lower() in TEXT_EXTENSIONS},
+        site="RETALLY",
+    )
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():
