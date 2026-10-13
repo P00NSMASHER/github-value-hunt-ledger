@@ -83,6 +83,7 @@ TEXT_SOURCE_FILES = (
     "site.css",
     "foundry.css",
     "site.js",
+    "worksheet.js",
     "commercial-config.js",
     "robots.txt",
     "sitemap.xml",
