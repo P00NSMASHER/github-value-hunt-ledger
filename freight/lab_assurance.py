@@ -260,9 +260,27 @@ def verify_settlement(
     if (any(type(i) is not str or not i for i in reversal_ids)
         or len(set(reversal_ids)) != len(reversal_ids)):
         _fail("DUPLICATE_OR_INVALID_REVERSAL_ID")
+    # M43: the actual SettlementStore schema enforces unique provenance hashes
+    # for each scoped source family. The independent verifier may receive
+    # exported/imported legacy SQLite with NONE of those constraints.
+    # Validate the ORIGINAL row census, not only dictionary identities.
+    for source_table, code in (
+        ("recovery_claims", "DUPLICATE_CLAIM_SOURCE"),
+        ("settlement_events", "DUPLICATE_CREDIT_SOURCE"),
+        ("counter_events", "DUPLICATE_RETURN_SOURCE"),
+    ):
+        hashes = []
+        for item in tables[source_table]:
+            hashes.append(_hash(item["source_hash"], "source_hash"))
+        if len(hashes) != len(set(hashes)):
+            _fail(code)
+
     issue_ids: set[tuple] = set()
     terms: dict[str, dict] = {}
     for cid, claim in claims.items():
+        if (type(claim["fee_disqualified"]) is not int
+            or claim["fee_disqualified"] not in (0, 1)):
+            _fail("INVALID_FEE_DISQUALIFICATION_FLAG")
         owner = _lookup(by_identity, "SOURCE_OWNER", cid)
         p = owner.payload
         for local, signed in (("claim_id", cid), ("reference", claim["reference"]),
@@ -329,6 +347,7 @@ def verify_settlement(
                 _fail("CREDIT_RETURN_PROVENANCE_MISMATCH")
         if _utc(proof.issued_at,"return_proof_time") < _utc(counter["observed_at"],"counter_observed_at"):
             _fail("RETURN_PROOF_PREDATES_OBSERVATION")
+        _money(counter["amount_cents"], "counter_cents", positive=True)
         linked = credits.get(counter["original_event_id"])
         if linked is None or linked["currency"] != counter["currency"]:
             _fail("COUNTER_MISSING_ORIGINAL")
@@ -344,14 +363,41 @@ def verify_settlement(
     credit_net_by_claim = defaultdict(int)
     credit_timelines = defaultdict(list)
     reversed_allocation = defaultdict(int); reversed_counter = defaultdict(int)
+    seen_alloc_pairs: set[tuple[str, str]] = set()
+    seen_reverse_pairs: set[tuple[str, str]] = set()
     for aid, allocation in allocations.items():
         cid,eid = allocation["claim_id"], allocation["event_id"]
         claim, credit = claims.get(cid), credits.get(eid)
         if claim is None or credit is None: _fail("ALLOCATED_SOURCE_MISSING")
+        # Two different allocation IDs cannot disguise a repeated economic
+        # edge. This is a UNIQUE constraint on the current SettlementStore,
+        # but imported source tables may lack it.
+        pair = (cid, eid)
+        if pair in seen_alloc_pairs:
+            # Preserve the original precise receipt-capacity denial when
+            # a duplicated pair ALSO overuses its signed funding event.
+            if gross_credit[eid] + _money(
+                allocation["amount_cents"], "allocated_cents", positive=True
+            ) > credit["amount_cents"]:
+                _fail("RECEIPT_OVER_ALLOCATED")
+            _fail("DUPLICATE_CLAIM_EVENT_ALLOCATION")
+        seen_alloc_pairs.add(pair)
         if (claim["currency"],claim["payer_id"],claim["payee_id"]) != (
                 credit["currency"],credit["payer_id"],credit["payee_id"]):
             _fail("ALLOCATION_COUNTERPARTY_MISMATCH")
         cents = _money(allocation["amount_cents"],"allocated_cents",positive=True)
+        # Prior M41 proof deliberately inflates one allocation beyond the
+        # original provider credit. Report RECEIPT_OVER_ALLOCATED even when
+        # the accompanying cached fee eligibility was not updated too.
+        # This preserves the independent signed-source denial precedence.
+        if gross_credit[eid] + cents > credit["amount_cents"]:
+            _fail("RECEIPT_OVER_ALLOCATED")
+        if type(allocation["mode"]) is not str or allocation["mode"] not in ("AUTO", "REVIEW"):
+            _fail("INVALID_ALLOCATION_MODE")
+        fee_eligible = allocation["fee_eligible_cents"]
+        if (type(fee_eligible) is not int
+            or fee_eligible != (0 if claim["fee_disqualified"] else cents)):
+            _fail("ALLOCATION_FEE_ELIGIBILITY_MISMATCH")
         if _utc(credit["booked_at"],"credit_booked_at") > _utc(allocation["created_at"],"allocated_at"):
             _fail("ALLOCATION_PREDATES_CREDIT")
         if _utc(claim["issued_at"],"claim_issued_at") > _utc(credit["booked_at"],"credit_booked_at"):
@@ -364,10 +410,18 @@ def verify_settlement(
         aid, counter_id = reversal["allocation_id"], reversal["counter_id"]
         allocation, counter = allocations.get(aid), counters.get(counter_id)
         if allocation is None or counter is None: _fail("REVERSAL_SOURCE_MISSING")
+        pair = (counter_id, aid)
+        if pair in seen_reverse_pairs:
+            _fail("DUPLICATE_COUNTER_ALLOCATION_REVERSAL")
+        seen_reverse_pairs.add(pair)
         if allocation["event_id"] != counter["original_event_id"]:
             _fail("REVERSAL_WRONG_RECEIPT")
         if _utc(counter["observed_at"],"counter_observed_at") > _utc(reversal["created_at"],"reversed_at"):
             _fail("REVERSAL_PREDATES_RETURN")
+        if _utc(allocation["created_at"], "allocation_created_at") > _utc(
+            reversal["created_at"], "reversal_created_at"
+        ):
+            _fail("REVERSAL_PREDATES_ALLOCATION")
         cents = _money(reversal["amount_cents"],"reversal_cents",positive=True)
         reversed_allocation[aid]+=cents
         reversed_counter[counter_id]+=cents
@@ -383,6 +437,21 @@ def verify_settlement(
     for cid, amount in credit_net_by_claim.items():
         if amount<0 or amount>claims[cid]["amount_cents"]:
             _fail("CLAIM_NET_CAPACITY_EXCEEDED")
+    # Net-at-report-end is insufficient. A sequence can temporarily recognize
+    # more money than the signed original claim and later reverse the excess,
+    # hiding a prior false-positive settlement from a net-only verifier.
+    # With same-time ambiguity, process credits before reversals so a claim
+    # is NEVER validated on an undocumented intra-timestamp order.
+    for cid, movements in credit_timelines.items():
+        live = 0
+        for when, delta in sorted(movements, key=lambda row: (
+            row[0], 0 if row[1] > 0 else 1
+        )):
+            live += delta
+            if live < 0:
+                _fail("TRANSIENT_CLAIM_NEGATIVE_BALANCE")
+            if live > claims[cid]["amount_cents"]:
+                _fail("TRANSIENT_CLAIM_CAPACITY_EXCEEDED")
 
     # Fee journal is deliberately external to existing SettlementStore, which
     # holds only underlying settlement allocations and reversals.

@@ -161,6 +161,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("settlement_legacy_duplicate_row_attacks_m42", 0),
             ("settlement_legacy_duplicate_row_denials_m42", 2),
             ("settlement_current_historical_defects_closed_m42", 3),
+            ("settlement_source_scenarios_m43", 11),
+            ("settlement_source_positive_controls_m43", 0),
+            ("settlement_source_denials_m43", 11),
+            ("settlement_source_original_defects_closed_m43", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)

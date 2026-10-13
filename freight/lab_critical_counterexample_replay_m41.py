@@ -78,14 +78,17 @@ def _inject(db: Path, finding_id: str, proofs: list) -> list:
                 ),
             )
         elif finding_id == "D-01":
-            # Even a *syntactically signed* second record cannot make the
-            # same economic issue eligible for two different case IDs.
+            # Use a DISTINCT valid original source identity so M43's
+            # provenance uniqueness guard cannot mask the intended
+            # economic-issue duplicate probe. The issue ID deliberately
+            # remains the same; source artifacts are both synthetic.
+            distinct_source_hash = sha256(b"m41-second-independent-test-invoice").hexdigest()
             con.execute(
                 "INSERT INTO recovery_claims VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     BUYER, BU, "case-2", "INV-100",
                     "SIM-CARRIER", "SIM-BUYER", "USD", 1000,
-                    CLAIM, SRC, 0,
+                    CLAIM, distinct_source_hash, 0,
                 ),
             )
             proofs = [
@@ -96,7 +99,7 @@ def _inject(db: Path, finding_id: str, proofs: list) -> list:
                     claim_id="case-2", reference="INV-100",
                     payer_id="SIM-CARRIER", payee_id="SIM-BUYER",
                     currency="USD", amount_cents=1000,
-                    issued_at=CLAIM, source_hash=SRC,
+                    issued_at=CLAIM, source_hash=distinct_source_hash,
                     economic_issue_id="accessorial-100",
                 ),
             ]
