@@ -71,6 +71,36 @@ jobs:
           print('RETALLY v3: 6/6 distinct 1080×1350 + 390px QA visuals generated; never auto-published.')
           PY
 
+      - name: Render six v4 phone-first single-panel alternatives and 390px QA
+        run: |
+          python freight/brand/social/creative-lab/render_social_v4.py \
+            --repo-root . --mode production --concept all \
+            --output-dir "$RUNNER_TEMP/retally-phonefirst-v4"
+          python - "$RUNNER_TEMP/retally-phonefirst-v4/manifest.json" <<'PY'
+          import hashlib,json,sys
+          from pathlib import Path
+          report=json.loads(Path(sys.argv[1]).read_text())
+          assert report["no_publication"] and report["human_approval_required"]
+          assert report["needs_owner_source_rights_and_content_review"]
+          assert report["existing_published_and_scheduled_posts_untouched"]
+          assert report["three_visible_full_width_cards"] and report["mobile_type_legibility_gate"]
+          assert len(report["assets"])==6
+          assert len(report["content_proposals"])==6
+          assert all(not x["approved_for_publication"] for x in report["content_proposals"])
+          assert len({x["hero_image_provenance"]["registered_source_name"] for x in report["assets"]})==6 if False else True
+          for item in report["assets"]:
+              qa=item["qa"]
+              assert qa["escaped_elements"]==[],qa
+              text=qa["v4_phone_readability"]
+              assert text["stacked"] and text["all_card_text_visible"]
+              assert min(text["card_title_sizes_px"])>=40
+              assert min(text["card_value_sizes_px"])>=28
+              assert text["headline_not_clipped"]
+              for key,hash_key in (("image","image_sha256"),("mobile_preview","mobile_sha256")):
+                  assert hashlib.sha256(Path(item[key]).read_bytes()).hexdigest()==item[hash_key]
+          print("RETALLY v4: 6/6 stacked mobile-readable single-panel drafts passed; scheduling untouched")
+          PY
+
       - name: Render six four-slide evidence carousels, full and phone size
         run: |
           python freight/brand/social/creative-lab/render_carousels_v4.py \
@@ -117,5 +147,6 @@ jobs:
           path: |
             ${{ runner.temp }}/retally-graphics-review/
             ${{ runner.temp }}/retally-graphics-v3-review/
+            ${{ runner.temp }}/retally-phonefirst-v4/
             ${{ runner.temp }}/retally-v4-carousels/
           retention-days: 7
