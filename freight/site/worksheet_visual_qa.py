@@ -153,6 +153,34 @@ def verify(bundle: Path, destination: Path) -> dict:
                             printed["checkboxIconVisible"], print_info["checkedPrintState"],
                             printed["worksheetVisible"],printed["checklistCount"]==15,
                             printed["printActionsHidden"]])
+                    if width == 390:
+                        # A real organic visitor should find the checklist
+                        # directly from the homepage, without entering or
+                        # sending an audit request.
+                        home=ctx.new_page()
+                        home_errors=[]
+                        home.on("pageerror", lambda exc: home_errors.append(type(exc).__name__))
+                        before_posts=len(posts)
+                        home.goto(base+"index.html",wait_until="load",timeout=30000)
+                        link=home.locator('.hero .button-ghost[href="freight-invoice-audit-checklist.html#worksheet"]')
+                        home.screenshot(path=str(destination/"worksheet-home-entry-390.png"),
+                                        full_page=False,animations="disabled")
+                        if link.count()!=1:
+                            print_info["homepageDiscoverability"]=False
+                        else:
+                            link.click()
+                            home.wait_for_url("**/freight-invoice-audit-checklist.html#worksheet",
+                                              timeout=12000)
+                            home.wait_for_selector('#invoiceWorksheet[data-initialized="true"]',
+                                                   timeout=12000)
+                            print_info["homepageDiscoverability"]=all([
+                                home.url.endswith("freight-invoice-audit-checklist.html#worksheet"),
+                                home.locator("#worksheet").is_visible(),
+                                home.locator("#ws-unresolved").inner_text().strip()=="—",
+                                len(posts)==before_posts,
+                                not home_errors,
+                            ])
+                        home.close()
                     ctx.close()
             finally:
                 browser.close()
@@ -162,12 +190,13 @@ def verify(bundle: Path, destination: Path) -> dict:
     report={
         "scope":"LOOPBACK_READ_ONLY_SYNTHETIC_FIGURES_NO_REAL_INVOICE",
         "buyerLeadVerified":False,"fundsRecovered":False,
-        "screenshots":[f"worksheet-{w}.png" for w,_ in SIZES]+["worksheet-print-mode-letter.png"],
+        "screenshots":[f"worksheet-{w}.png" for w,_ in SIZES]+["worksheet-print-mode-letter.png","worksheet-home-entry-390.png"],
         "records":records,"print":print_info,
         "passed":len(records)==len(SIZES) and all(x["status"]=="PASS" for x in records)
                  and print_info.get("printReadiness") is True
                  and print_info.get("localRecalculation") is True
-                 and print_info.get("privacySafeShare") is True,
+                 and print_info.get("privacySafeShare") is True
+                 and print_info.get("homepageDiscoverability") is True,
     }
     (destination/"report.json").write_text(json.dumps(report,indent=2)+"\n")
     return report
