@@ -1206,6 +1206,38 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["original_historical_finding_closed"] is False
                       for x in witness51["cases"]),
               "M51_FICTIONAL_DUAL_SIGNER_NEGATIVE_WITNESS_NOT_VERIFIED")
+        from freight.lab_recovery_replay_m52 import (
+            run_campaign as check_durable_review_replay_m52,
+            ATTACKS as durable_replay_attacks_m52,
+        )
+        replay52=check_durable_review_replay_m52(as_of=today)
+        _must(replay52["original_research_labs"]==14
+              and replay52["synthetic_original_technical_review_positive_controls"]==14
+              and replay52["durable_review_replay_negative_scenarios"]==14
+              and replay52["exact_current_replay_and_journal_denials"]==14
+              and replay52["global_restore_request_uniqueness_enforced"] is True
+              and replay52["global_witness_nonce_uniqueness_enforced"] is True
+              and replay52["local_file_identity_and_reviewed_sql_trigger_policy_enforced"] is True
+              and replay52["independently_trusted_distributed_nonce_service_established"] is False
+              and replay52["real_customer_restore_activation_performed"] is False
+              and replay52["real_customer_bank_carrier_authority_verified"] is False
+              and replay52["historical_original_findings_open"]==26
+              and replay52["historical_original_findings_closed"]==0
+              and replay52["independent_first_customer_human_controls_unmet"]==18
+              and replay52["actual_customer_cash_recovered"] is None
+              and replay52["externally_publishable_empirical_claims_approved"]==0,
+              "M52_REPLAY_LEDGER_MISTAKEN_FOR_REAL_RESTORE_AUTHORIZATION")
+        _must(tuple(x["scenario"] for x in replay52["cases"])==
+              tuple(durable_replay_attacks_m52)
+              and all(x["expected_exact_denial"]==
+                      durable_replay_attacks_m52[x["scenario"]]
+                      and x["initial_two_key_review_recorded_technical_only"] is True
+                      and x["adversarial_replay_attempt_rejected"] is True
+                      and x["source_backup_and_restore_images_untouched"] is True
+                      and x["production_activation_or_customer_approval"] is False
+                      and x["historical_original_findings_closed"]==0
+                      for x in replay52["cases"]),
+              "M52_LOCAL_DURABLE_NONCE_NEGATIVE_NOT_ACTUALLY_EXECUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1399,6 +1431,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "technical_witness_negative_denials_m51":22,
                 "technical_witness_original_findings_closed_m51":0,
                 "technical_witness_receipt_sha256_m51":witness51["receipt_sha256"],
+                "technical_replay_original_reviews_m52":14,
+                "technical_replay_negative_cases_m52":14,
+                "technical_replay_exact_denials_m52":14,
+                "technical_replay_original_findings_closed_m52":0,
+                "technical_replay_receipt_sha256_m52":replay52["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
