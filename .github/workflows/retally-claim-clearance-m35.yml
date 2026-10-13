@@ -1,0 +1,142 @@
+name: RETALLY Lab 14 Research-to-Commercial Claim Boundary (Mission 35)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-claim-clearance-m35.yml'
+      - 'freight/research_claim_clearance_m35.py'
+      - 'freight/test_research_claim_clearance_m35.py'
+      - 'freight/research/CLAIM_CLEARANCE_M35_20261012.json'
+      - 'freight/RESEARCH_CLAIM_CLEARANCE_M35.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  claim-boundary-and-original-research-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited source and synthetic fixture test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Adversarial claims, original pilot controls, government-source regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_claim_clearance_m35.py \
+            freight/test_research_pilot_preflight.py \
+            freight/test_research_economic_denominator_m34.py \
+            freight/test_research_bea_original_m33.py \
+            freight/test_research_bea_gross_output_m32.py \
+            freight/test_research_bls_sectoral_output_m31.py \
+            freight/test_research_bea_measurement_gate.py \
+            freight/test_research_unified_blspci.py \
+            freight/test_research_bls_parent_origin.py \
+            freight/test_research_fred_parent_ppi.py \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Generate typed source-bound claim report and existing 14-lab Control Center
+        run: |
+          PYTHONPATH=. python -m freight.research_claim_clearance_m35 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m35-internal
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m35-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m35-internal/claim_clearance.json').read_text())
+          labs=json.loads(Path('/tmp/retally-m35-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_M35_TYPED_INTERNAL_SOURCE_CLAIM_CLEARANCE_NO_EXTERNAL_APPROVAL'
+          assert r['source_status']=='OFFLINE_VERIFIED_PRIOR_MACRO_SOURCE_CATALOGS_NOT_FRESH_SOURCE_REPLAY'
+          assert r['source_original_publisher_replay_completed_in_this_run'] is False
+          assert r['claim_count']==16
+          assert r['qualified_internal_source_statements']==8
+          assert r['blocked_unsupported_customer_business_claims']==8
+          assert r['external_commercial_claims_authorized']==0
+          assert r['independent_customer_pilot_human_approvals_required']==18
+          assert r['independent_customer_pilot_human_approvals_verified']==0
+          assert r['independent_customer_pilot_human_approvals_unmet']==18
+          assert r['real_customer_invoices_observed']==0
+          assert r['retally_cash_recovered_usd'] is None
+          assert r['retally_recoverable_tam_usd'] is None
+          assert r['synthetic_only_reviewer_agreement']=='9/10_NOT_REAL_HUMAN_ACCURACY'
+          assert len(r['evidence_stage_progress'])==6
+          assert len(r['source_claim_registry'])==16
+          values={x['metric_key']:x['internal_value'] for x in r['source_claim_registry'][:8]}
+          assert values['DENOMINATOR_2024_GAP']=='142607.754'
+          assert values['CENSUS_TO_BEA_RATIO']=='73.85'
+          assert all(x['external_claims_authorized'] is False for x in r['source_claim_registry'])
+          assert all(x['internal_decision']=='BLOCKED_UNSUPPORTED_INFERENCE'
+                     for x in r['source_claim_registry'][8:])
+          assert all(any(g['gate_id']=='P11-18' for g in x['required_unmet_human_signoffs'])
+                     for x in r['source_claim_registry'])
+          assert r['no_new_schedule_created_or_modified'] is True
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(labs['lab_runs'])==14 and labs['failed_or_blocked_labs']==[]
+          assert labs['pilot_preflight']['unmet_requirements']==18
+          assert labs['actual_revenue_cents']==0
+          assert labs['research_claim_clearance_m35']['receipt_sha256']==r['receipt_sha256']
+          assert 'claim_clearance.html' in Path('/tmp/retally-m35-control/index.html').read_text()
+          print('M35: 8 internal macro statements; 8 customer and TAM claims BLOCKED; zero public authority; 18 real pilot approvals unmet; 14 original labs passed.')
+          PY
+      - name: Retain only internal claim-decision receipts without customer files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-m35-internal-claim-decision-receipts
+          path: |
+            /tmp/retally-m35-internal/claim_clearance.json
+            /tmp/retally-m35-internal/claim_clearance.html
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-claim-boundary-negative-proof:
+    needs: claim-boundary-and-original-research-regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Independently verify typed source categories and public-claim vetoes
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          from datetime import date
+          from copy import deepcopy
+          from freight.research_claim_clearance_m35 import (
+              report_shell, lookup_claim, validate_policy, _policy, ALL_IDS
+          )
+          r=report_shell(as_of=date(2026,10,12))
+          assert len(ALL_IDS)==16
+          for claim_id in ALL_IDS:
+              row=lookup_claim(r,claim_id)
+              assert row['external_claims_authorized'] is False
+              assert row['carrier_or_customer_contacts_authorized'] is False
+              assert row['claim_money_or_recovery_established'] is False
+              assert row['required_unmet_human_signoff_count']>=1
+          for claim_id in ALL_IDS[8:]:
+              assert lookup_claim(r,claim_id)['internal_decision']=='BLOCKED_UNSUPPORTED_INFERENCE'
+          assert lookup_claim(r,'M35-03')['internal_value']=='142607.754'
+          assert lookup_claim(r,'M35-09')['block_reason_code']=='UNVERIFIED_RECOVERY_TAM'
+          assert lookup_claim(r,'M35-16')['required_unmet_human_signoff_count']==18
+          forged=deepcopy(_policy())
+          forged['claim_registry'][0]['public_publication_authorized']=True
+          assert validate_policy(forged,as_of=date(2026,10,12))
+          print('SOURCE-INTEGRITY: 16 controlled claims; 8 false commercial interpretations blocked; 18 unapproved human pilot gates.')
+          PY
