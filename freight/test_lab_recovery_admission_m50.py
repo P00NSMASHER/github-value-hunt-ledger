@@ -200,8 +200,10 @@ class M50PublishedRecoveryAdmissionTests(unittest.TestCase):
                 guard._read_candidate(db,None)
 
     def test_wrong_signed_receipt_reason_or_false_acceptance_never_counts_as_proof(self):
-        with patch.object(lab.backup,"verify_backup_bundle",side_effect=[
-            {"source_semantic_hash":"x"*64},]):
+        with patch.object(
+            lab.backup,"verify_backup_bundle",
+            return_value={"source_semantic_hash":"x"*64},
+        ):
             with self.assertRaisesRegex(ValueError,"M50_KNOWN_GOOD_BUNDLE_BROKEN"):
                 lab.replay_one("AUDIT_BACKUP_MISSING_IMMUTABLE_TRIGGER")
 
