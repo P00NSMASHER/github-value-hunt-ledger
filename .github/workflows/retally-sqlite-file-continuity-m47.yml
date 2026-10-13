@@ -1,0 +1,170 @@
+name: RETALLY Lab 14 Durable SQLite File Continuity (Mission 47)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-sqlite-file-continuity-m47.yml'
+      - 'freight/settlement_file_identity_m47.py'
+      - 'freight/settlement_store.py'
+      - 'freight/lab_file_continuity_m47.py'
+      - 'freight/test_lab_file_continuity_m47.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_SQLITE_FILE_CONTINUITY_M47.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  original-fourteen-labs-and-file-continuity-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing offline-only regression requirements
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Exercise file replacement, source transaction, producer contract and original labs
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_backup_restore.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Generate eight actual file-continuity denials and original fourteen-lab report
+        run: |
+          PYTHONPATH=. python -m freight.lab_file_continuity_m47 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m47
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m47-control
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('/tmp/retally-m47')
+          m=json.loads((p/'sqlite_file_continuity_m47.json').read_text())
+          d=json.loads(Path('/tmp/retally-m47-control/phase4_control.json').read_text())
+          assert m['scope']=='RETALLY_LAB14_M47_CURRENT_SESSION_SQLITE_FILE_CONTINUITY_SYNTHETIC_ONLY'
+          assert m['existing_research_lab']==14 and m['new_lab_created'] is False
+          assert m['disposed_current_sqlite_path_attack_cases']==8
+          assert m['positive_fictional_money_baseline_checks']==40
+          assert m['existing_session_money_and_report_read_denials']==56
+          assert m['existing_session_write_denials']==8
+          assert m['total_file_path_attacks_blocked_on_current_operations']==64
+          assert m['original_historical_findings_closed']==0
+          assert m['all_26_original_findings_still_open']==26
+          assert m['independent_first_customer_human_approval_gates_unmet']==18
+          assert m['external_empirical_freight_recovery_claims_allowed']==0
+          assert m['real_recovered_company_cash_cents'] is None
+          assert len(m['cases'])==8
+          assert all(c['existing_session_read_denials']==7
+                     and c['existing_session_write_denials']==1
+                     and c['rejected_actions_did_not_create_or_replace_file']
+                     and c['original_historical_finding_closed'] is False
+                     for c in m['cases'])
+          assert d['executed_labs']==list(range(1,15))
+          assert len(d['lab_runs'])==14 and not d['failed_or_blocked_labs']
+          assert d['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert d['sqlite_file_continuity_m47']['receipt_sha256']==m['receipt_sha256']
+          assert d['sqlite_schema_integrity_m46']['disposable_ddl_mutation_cases']==10
+          assert d['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert d['actual_revenue_cents']==0
+          assert 'sqlite_file_continuity_m47.html' in Path('/tmp/retally-m47-control/index.html').read_text()
+          print('M47: eight path substitutions, 56 read and eight write denials, 14 original labs, 26 open historical findings.')
+          PY
+      - name: Retain only synthetic-derived metadata — no SQLite source files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m47-current-session-file-identity-synthetic-evidence
+          path: |
+            /tmp/retally-m47/sqlite_file_continuity_m47.json
+            /tmp/retally-m47/sqlite_file_continuity_m47.html
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-prior-source-file-swap-differential:
+    needs: original-fourteen-labs-and-file-continuity-regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Pin exact reviewed M46 source rather than moving HEAD^
+        run: |
+          git fetch --no-tags --depth=1 origin 4c9ff16b39ce4e520adc46e7ef624a555dd8e56a
+          git show 4c9ff16b39ce4e520adc46e7ef624a555dd8e56a:freight/settlement_store.py > /tmp/m47_prior_store.py
+          cp freight/settlement_schema.sql /tmp/settlement_schema.sql
+          test -s /tmp/m47_prior_store.py
+      - name: Prove old current-session reads could silently adopt three valid replacements
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from pathlib import Path
+          from freight.test_lab_phase3_real_chain import funded_store
+          from freight.lab_file_continuity_m47 import _mutate
+          name='m47_pre_file_pinning_store'
+          spec=importlib.util.spec_from_file_location(name,'/tmp/m47_prior_store.py')
+          prior=importlib.util.module_from_spec(spec)
+          sys.modules[name]=prior
+          spec.loader.exec_module(prior)
+          expected_old={
+              'REPLACE_WITH_EQUIVALENT_VALID_SQLITE':500,
+              'REPLACE_WITH_EMPTY_VALID_SQLITE':0,
+              'REPLACE_WITH_VALID_SQLITE_SYMLINK':500,
+          }
+          accepted=blocked=0
+          for scenario,old_cents in expected_old.items():
+              with tempfile.TemporaryDirectory() as td:
+                  current=funded_store(td)
+                  old=prior.SettlementStore(
+                      current.path,buyer_id=current.buyer_id,
+                      business_unit=current.business_unit)
+                  assert old.realized_cents()==current.realized_cents()==500
+                  _mutate(Path(current.path),scenario,
+                          (current.buyer_id,current.business_unit))
+                  # Prior M46 schema+finance checks see consistent rows
+                  # in the wrong file, even a forged empty $0 "account".
+                  assert old.realized_cents()==old_cents,scenario
+                  accepted+=1
+                  try:
+                      current.realized_cents()
+                  except RuntimeError as exc:
+                      assert ('M47_SQLITE_SOURCE_FILE_REPLACED' in str(exc)
+                              or 'M47_SQLITE_SOURCE_SYMLINK_REJECTED' in str(exc))
+                      blocked+=1
+                  else:
+                      raise AssertionError('Existing M47 session adopted replacement')
+          assert (accepted,blocked)==(3,3)
+          with tempfile.TemporaryDirectory() as td:
+              current=funded_store(td)
+              db=Path(current.path)
+              db.unlink()
+              try:
+                  current.realized_cents()
+              except RuntimeError as exc:
+                  assert 'M47_SQLITE_SOURCE_FILE_MISSING' in str(exc)
+              else:
+                  raise AssertionError('Deleted database was accepted')
+              assert not db.exists(), 'Read unexpectedly recreated deleted database'
+          print('M47 pinned differential: three previously accepted valid path substitutions now refused; missing DB never recreated.')
+          PY

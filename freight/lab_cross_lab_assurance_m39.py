@@ -181,6 +181,10 @@ def _proof(lab: int, proof: dict) -> None:
             "sqlite_schema_write_denials_m46": 10,
             "sqlite_schema_reopen_denials_m46": 10,
             "sqlite_schema_original_defects_closed_m46": 0,
+            "sqlite_file_attack_cases_m47": 8,
+            "sqlite_file_read_denials_m47": 56,
+            "sqlite_file_write_denials_m47": 8,
+            "sqlite_file_original_defects_closed_m47": 0,
         }
         for name, expected_value in expected_flags.items():
             _check(name in proof
@@ -197,6 +201,7 @@ def _proof(lab: int, proof: dict) -> None:
             "persistent_semantic_receipt_sha256_m44",
             "atomic_financial_receipt_sha256_m45",
             "sqlite_schema_receipt_sha256_m46",
+            "sqlite_file_receipt_sha256_m47",
         ):
             _check(_hex(proof.get(key)),
                    "LAB14_SOURCE_AND_PILOT_REPORT_RECEIPT_INVALID")
