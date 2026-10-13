@@ -57,6 +57,7 @@ jobs:
           node --check freight/site/site.js
           node --check freight/site/worksheet.js
           node --test freight/site/test_worksheet.cjs
+          node --test freight/site/test_worksheet_campaign.cjs
           node --check recoveryworks/site/site.js
       - name: Exercise the exact publication boundary
         env:
