@@ -130,8 +130,10 @@ def _alter(case:str,fx:dict,kwargs:dict)->tuple[dict,dict]:
         _rewrite_rows(journal,"REWRITE_REVIEW_SCOPE_VALID_ROWS")
         journal.verify()
     elif case=="LEGACY_LOCAL_ONLY_APPEND_NOT_RECONCILABLE":
-        from freight.lab_recovery_witness_m51 import _make_known_good
-        from freight.recovery_replay_m52 import TechnicalReviewReplayLedger
+        # TechnicalReviewReplayLedger is imported globally. A branch-local
+        # import would make it local across this ENTIRE function, causing
+        # all other test cases that construct alternate stores to fail with
+        # UnboundLocalError before checking real source behavior.
         # Separate never-elevated journal in a different disposable path.
         legacy=TechnicalReviewReplayLedger(
             journal.path.with_name("m55-local-only-ineligible.sqlite3"),
