@@ -103,6 +103,14 @@ class OriginalBEAXLSXTests(unittest.TestCase):
         self.assertEqual(parsed["source_year_excel_columns"]["TGO103-A"]["2017"],24)
         self.assertEqual(parsed["source_year_excel_columns"]["TGO103-A"]["2024"],31)
 
+    def test_source_industry_label_surrounding_spaces_normalized_not_reclassified(self):
+        data=mutate_fixture(
+            lambda w: w["TGO103-A"].__setitem__("B52"," Truck transportation  ")
+        )
+        parsed=m33.inspect_xlsx_content(data)
+        self.assertEqual(parsed["original_year_source_cells_reproduced"],32)
+        self.assertEqual(parsed["industry_naics"],"484")
+
     def test_quantity_series_reconciles_secondary_dbnomics_values(self):
         r=m33.report_shell(as_of=TODAY)
         indices=[x["first_party_bea_real_gross_output_quantity_index"]
