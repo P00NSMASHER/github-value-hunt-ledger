@@ -916,6 +916,26 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 as_of=today,root="CENSUS",digest="0"*64))
         _must(internal38["safe_value"] is None,
               "M38_UNVERIFIED_REVISED_SOURCE_VALUE_LEAKED_TO_INTERNAL_CLAIM")
+        from freight.lab_critical_counterexample_replay_m41 import (
+            run_campaign as replay_critical_original_analogs_m41,
+            FINDING_IDS as critical_findings_m41,
+            EXPECTED_REJECTIONS as critical_denials_m41,
+        )
+        critical41=replay_critical_original_analogs_m41(as_of=today)
+        _must(critical41["current_source_paths_attacked"]==4
+              and critical41["current_source_guards_rejected_attack"]==4
+              and critical41["historical_original_defects_open"]==26
+              and critical41["historical_original_defects_closed"]==0
+              and critical41["original_pinned_vulnerable_revisions_replayed"]==0
+              and critical41["independent_customer_pilot_controls_unmet"]==18
+              and critical41["external_empirical_commercial_claims_approved"]==0,
+              "M41_SYNTHETIC_NEGATIVE_EXPERIMENT_CLAIMED_REAL_DEFECT_CLOSURE")
+        _must(tuple(x["historical_finding_id"] for x in critical41["cases"])==
+              critical_findings_m41
+              and all(x["observed_denial"]==critical_denials_m41[x["historical_finding_id"]]
+                      and x["historical_disposition"]=="OPEN_UNVERIFIED"
+                      for x in critical41["cases"]),
+              "M41_HISTORICAL_SOURCE_GUARD_NOT_EXECUTED_OR_INCORRECT")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1054,6 +1074,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "research_m38_human_gates_unmet":18,
                 "research_m38_external_claims_authorized":0,
                 "research_m38_receipt_sha256":quarantine38["receipt_sha256"],
+                "critical_current_path_negative_replays_m41":4,
+                "critical_current_path_denials_m41":4,
+                "critical_original_findings_closed_m41":0,
+                "critical_original_vulnerable_revision_replays_m41":0,
+                "critical_current_path_report_sha256_m41":critical41["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
