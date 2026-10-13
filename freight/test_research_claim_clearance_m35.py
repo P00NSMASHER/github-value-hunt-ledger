@@ -308,7 +308,9 @@ class ClaimClearanceM35Tests(unittest.TestCase):
         r["source_claim_registry"][0]["external_claims_authorized"]=True
         r["external_commercial_claims_authorized"]=1
         rehash(r)
-        with self.assertRaisesRegex(ValueError,"M35_FORGED_CLAIM_CLEARANCE_OR_PUBLICATION_APPROVAL"):
+        with self.assertRaisesRegex(
+            ValueError,"M35_UNTRUSTED_OR_FORGED_CLAIM_DECISION_REPORT"
+        ):
             m35.lookup_claim(r,"M35-01")
 
     def test_rehashed_case_value_must_match_catalog_not_just_hash(self):
