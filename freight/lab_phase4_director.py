@@ -881,6 +881,41 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
               and hypothetical37["external_commercial_claims_authorized"]==0
               and hypothetical37["report_changes_prove_actual_publisher_revisions"] is False,
               "M37_CENSUS_SOURCE_CHANGE_DID_NOT_INVALIDATE_EXACT_CLAIMS")
+        from freight.research_claim_quarantine_m38 import (
+            report_shell as build_claim_quarantine_m38,
+            claim_view as safe_claim_use_m38,
+            INTERNAL as M38_INTERNAL,
+            EXTERNAL as M38_EXTERNAL,
+        )
+        quarantine38=build_claim_quarantine_m38(as_of=today)
+        _must(quarantine38["qualified_values_still_visible_for_internal_research_only"]==8
+              and quarantine38["qualified_values_withheld_pending_independent_replay"]==0
+              and quarantine38["prohibited_customer_market_claims_blocked"]==8
+              and quarantine38["independently_unverified_human_pilot_controls"]==18
+              and quarantine38["external_claims_authorized"]==0,
+              "M38_UNTRUSTED_BASELINE_SOURCE_RESEARCH_PROMOTED_TO_EXTERNAL_APPROVAL")
+        hypothetical38=build_claim_quarantine_m38(
+            as_of=today,candidate=hypothetical_source_m37(
+                as_of=today,root="CENSUS",digest="0"*64))
+        _must(hypothetical38["quarantined_claim_ids"]==
+              ["M35-02","M35-03","M35-04","M35-07"]
+              and hypothetical38["qualified_values_withheld_pending_independent_replay"]==4
+              and hypothetical38["claims"][2]["safe_internal_value"] is None
+              and hypothetical38["external_claims_authorized"]==0
+              and hypothetical38["independent_original_publisher_replays_in_this_run"]==0,
+              "M38_STALE_OR_UNVERIFIED_CENSUS_VALUE_NOT_QUARANTINED")
+        external38=safe_claim_use_m38(
+            as_of=today,claim_id="M35-03",purpose=M38_EXTERNAL)
+        _must(external38["safe_value"] is None
+              and external38["external_publication_authorized"] is False
+              and external38["pilot_independent_human_signoffs_unmet"]==18,
+              "M38_ORIGINAL_SOURCE_RECEIPT_FALSELY_USED_FOR_PUBLICATION")
+        internal38=safe_claim_use_m38(
+            as_of=today,claim_id="M35-03",purpose=M38_INTERNAL,
+            candidate=hypothetical_source_m37(
+                as_of=today,root="CENSUS",digest="0"*64))
+        _must(internal38["safe_value"] is None,
+              "M38_UNVERIFIED_REVISED_SOURCE_VALUE_LEAKED_TO_INTERNAL_CLAIM")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1014,6 +1049,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "research_source_lineage_m37_receipt_sha256":impact37["receipt_sha256"],
                 "hypothetical_census_revision_internal_claims_to_recheck":4,
                 "research_m37_external_publication_authority":False,
+                "research_m38_baseline_visible_internal_values":8,
+                "research_m38_hypothetical_census_values_quarantined":4,
+                "research_m38_human_gates_unmet":18,
+                "research_m38_external_claims_authorized":0,
+                "research_m38_receipt_sha256":quarantine38["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

@@ -111,6 +111,10 @@ from freight.research_source_lineage_m37 import (
     report_shell as build_source_lineage_m37,
     render_html as render_source_lineage_html_m37,
 )
+from freight.research_claim_quarantine_m38 import (
+    report_shell as build_claim_quarantine_m38,
+    render_html as render_claim_quarantine_m38,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -189,6 +193,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bea_census_nominal_denominator_m34"]=build_nominal_measure_reconciliation_m34(as_of=date.today())
         result["research_claim_clearance_m35"]=build_claim_clearance_m35(as_of=date.today())
         result["research_source_lineage_m37"]=build_source_lineage_m37(as_of=date.today())
+        result["research_claim_quarantine_m38"]=build_claim_quarantine_m38(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -254,6 +259,7 @@ def render(data: dict) -> str:
     nominal34=data["bea_census_nominal_denominator_m34"]
     claim35=data["research_claim_clearance_m35"]
     lineage37=data["research_source_lineage_m37"]
+    quarantine38=data["research_claim_quarantine_m38"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -495,6 +501,15 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Historical research-value quarantine — fail closed on source changes</h2>
+<p>M38 supplies a safe claim lookup for internal research, withholding historical
+numbers affected by an unverified source-fingerprint difference until an original
+publisher replay is independently validated. Default internal view: <strong>"""+str(quarantine38["qualified_values_still_visible_for_internal_research_only"])+"""/8</strong>
+source-qualified values remain prior-only with mandatory caveats; <strong>"""+str(quarantine38["qualified_values_withheld_pending_independent_replay"])+"""/8</strong>
+are flagged in this no-candidate baseline. Matching receipts do NOT establish
+freshness. All eight unsupported customer and market inferences remain blocked;
+<strong>18/18 human pilot requirements unmet, zero public claims authorized.</strong></p>
+<a href="claim_quarantine.html">Open value-redaction and source replay-readiness review ↗</a></section>
 <section class="panel"><h2>Trucking market denominator reconciliation — not recoverable freight bills</h2>
 <p>Original BEA gross output and Census employer-industry revenue are
 <strong>different economic measures</strong>, even though both are
@@ -652,7 +667,20 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--out",type=Path,required=True)
     parser.add_argument("--max-labs",type=int,default=14)
+    parser.add_argument("--as-of-date",type=date.fromisoformat,default=date.today())
+    parser.add_argument("--source-candidate","--candidate",dest="source_candidate",
+                        type=Path,help="Internal M38 scenario-only safe bundle; requires fresh output directory")
     args=parser.parse_args()
+    if args.source_candidate is not None:
+        if args.max_labs != 14:
+            raise ValueError("M38_CONTROL_CENTER_SCENARIO_DOES_NOT_REPLAY_LABS")
+        from freight.research_scenario_control_m38 import write_scenario
+        scoped = write_scenario(as_of=args.as_of_date,
+                                candidate_path=args.source_candidate,out=args.out)
+        print(json.dumps({"scenario_only":True,"receipt":scoped["receipt_sha256"],
+                          "withheld":scoped["claim_quarantine"]["quarantined_claim_ids"],
+                          "public_claims_authorized":0},sort_keys=True))
+        return
     data=snapshot(args.max_labs)
     args.out.mkdir(parents=True,exist_ok=True)
     (args.out/"phase4_control.json").write_text(json.dumps(data,sort_keys=True,indent=2)+"\n")
@@ -886,6 +914,14 @@ def main():
     )
     (args.out/"source_change_impact.html").write_text(
         render_source_lineage_html_m37(data["research_source_lineage_m37"]),
+        encoding="utf-8"
+    )
+    (args.out/"claim_quarantine.json").write_text(
+        json.dumps(data["research_claim_quarantine_m38"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"claim_quarantine.html").write_text(
+        render_claim_quarantine_m38(data["research_claim_quarantine_m38"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
