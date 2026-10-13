@@ -957,6 +957,29 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["source_row_observation"]["after_distinct_identity_count"]==1
                       for x,t in zip(ident42["cases"],settlement_row_attacks_m42)),
               "M42_CURRENT_VERIFIER_DID_NOT_FAIL_CLOSED_ON_DUPLICATE_ROW")
+        from freight.lab_settlement_source_m43 import (
+            run_campaign as replay_source_temporal_m43,
+            REJECTIONS as source_scenarios_m43,
+        )
+        temporal43=replay_source_temporal_m43(as_of=today)
+        _must(temporal43["current_verifier_negative_scenarios"]==12
+              and temporal43["known_good_synthetic_positive_controls"]==12
+              and temporal43["current_verifier_exact_negative_denials"]==12
+              and temporal43["historical_original_findings_open"]==26
+              and temporal43["historical_original_findings_closed"]==0
+              and temporal43["archived_original_vulnerable_source_replayed"]==0
+              and temporal43["unmet_independent_human_pilot_controls"]==18
+              and temporal43["external_empirical_claims_authorized"]==0
+              and temporal43["actual_customer_cash_recovered"] is None,
+              "M43_UNSAFE_SETTLEMENT_SOURCE_OR_HISTORICAL_CLAIM_PROMOTED")
+        _must(tuple(x["scenario"] for x in temporal43["cases"])==
+              tuple(source_scenarios_m43)
+              and all(x["actual_exact_denial"]==source_scenarios_m43[x["scenario"]]
+                      and x["positive_control_passed"] is True
+                      and x["negative_counterexample_rejected"] is True
+                      and x["historical_recoveryos_finding_closed"] is False
+                      for x in temporal43["cases"]),
+              "M43_CURRENT_SOURCE_NEGATIVE_OR_POSITIVE_CASE_NOT_VERIFIED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1104,6 +1127,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "settlement_legacy_duplicate_row_denials_m42":3,
                 "settlement_current_historical_defects_closed_m42":0,
                 "settlement_identity_report_sha256_m42":ident42["receipt_sha256"],
+                "settlement_source_scenarios_m43":12,
+                "settlement_source_positive_controls_m43":12,
+                "settlement_source_denials_m43":12,
+                "settlement_source_original_defects_closed_m43":0,
+                "settlement_source_report_sha256_m43":temporal43["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
