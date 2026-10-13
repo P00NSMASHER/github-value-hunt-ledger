@@ -74,7 +74,7 @@
   "redistributor_values_are_first_party_bea_authenticated": false,
   "unauthorized_api_userid_or_registration_attempts_permitted": false,
   "be_a_gdp_value_added_can_substitute_for_gross_output": false,
-  "original_bea_484_2017_2024_numeric_verification_completed": false,
+  "original_bea_484_2017_2024_numeric_verification_completed": true,
   "gross_output_vs_sectoral_difference_is_validated_model_error": false,
   "gross_output_vs_ppi_proxy_difference_is_validated_model_error": false,
   "catalog_revision_or_new_html_is_silent_source_certification": false,
@@ -173,5 +173,6 @@
   "official_bea_xlsx_and_dbnomics_values_reconcile": true,
   "price_and_quantity_reconcile_to_nominal_within_0_02_pct": true,
   "direct_bea_file_does_not_certify_recoverable_freight_market": true,
-  "original_source_withheld_from_repository_artifacts": true
+  "original_source_withheld_from_repository_artifacts": true,
+  "official_first_party_xlsx_and_dbnomics_values_reconcile": true
 }
