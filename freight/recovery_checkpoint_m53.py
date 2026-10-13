@@ -56,6 +56,24 @@ def _canonical_utc(value:object)->datetime:
     return moment.astimezone(timezone.utc)
 
 
+def digest_journal_rows(reviewed,nonces,security_mode:int)->str:
+    """Canonical M54-compatible digest for a pinned journal revision.
+
+    Factoring this logic makes a single exact signed-state definition
+    available for M55's one-review crash-gap reconciliation. Rows remain
+    local-only; the function cannot sign, issue or approve a checkpoint.
+    """
+    if type(security_mode) is not int or security_mode not in (0,54):
+        _fail("UNREVIEWED_JOURNAL_MODE")
+    return canonical_hash({
+        "schema_version":1,
+        "purpose":"M54_COMPLETE_LOCAL_REPLAY_JOURNAL_ROW_AND_SECURITY_MODE",
+        "local_checkpoint_mode":security_mode,
+        "review_rows":[list(row) for row in reviewed],
+        "nonce_rows":[list(row) for row in nonces],
+    })
+
+
 def journal_state(conn)->dict:
     """Verify entire persistent journal and SHA all typed rows in one snapshot.
 
@@ -82,13 +100,9 @@ def journal_state(conn)->dict:
     return {
         "review_sequence":len(reviewed),
         "local_checkpoint_mode":local_security_mode,
-        "journal_state_sha256":canonical_hash({
-            "schema_version":1,
-            "purpose":"M54_COMPLETE_LOCAL_REPLAY_JOURNAL_ROW_AND_SECURITY_MODE",
-            "local_checkpoint_mode":local_security_mode,
-            "review_rows":[list(row) for row in reviewed],
-            "nonce_rows":[list(row) for row in nonces],
-        }),
+        "journal_state_sha256":digest_journal_rows(
+            reviewed,nonces,local_security_mode
+        ),
     }
 
 
@@ -116,19 +130,17 @@ def signing_message(payload:dict)->bytes:
     ).encode("utf-8")
 
 
-def verify_checkpoint_locked(
-    conn, *,
-    checkpoint:object,
-    custodian_trust:object,
-    journal_namespace:str,
-    expected_audience:str,
+def verify_checkpoint_signature(
+    *, checkpoint:object,custodian_trust:object,
+    journal_namespace:str,expected_audience:str,
     as_of_utc:datetime,
 )->dict:
-    """Verify independently provisioned signing key against a PINNED lock.
+    """Verify a caller-held checkpoint's signature and context, NOT state.
 
-    Caller must hold BEGIN or BEGIN IMMEDIATE. This function neither
-    writes the review DB nor downloads/loads any purported keys from
-    within a backup bundle, and never accepts arbitrary attacker keys.
+    An independently signed prior high-water mark may be one committed
+    review behind the journal after a crash. This signature-only step is
+    necessary to establish that the prior state was genuinely authorized,
+    but NEVER authorizes restore or blindly accepts current journal data.
     """
     if (type(journal_namespace) is not str
         or not TOKEN.fullmatch(journal_namespace)
@@ -187,6 +199,30 @@ def verify_checkpoint_locked(
     except (InvalidSignature,ValueError) as exc:
         raise ValueError("M53_CHECKPOINT_INVALID_SIGNATURE") from exc
 
+    return payload
+
+
+def verify_checkpoint_locked(
+    conn, *,
+    checkpoint:object,
+    custodian_trust:object,
+    journal_namespace:str,
+    expected_audience:str,
+    as_of_utc:datetime,
+)->dict:
+    """Verify independently provisioned signing key against a PINNED lock.
+
+    Caller must hold BEGIN or BEGIN IMMEDIATE. This function neither
+    writes the review DB nor downloads/loads any purported keys from
+    within a backup bundle, and never accepts arbitrary attacker keys.
+    """
+    payload=verify_checkpoint_signature(
+        checkpoint=checkpoint,
+        custodian_trust=custodian_trust,
+        journal_namespace=journal_namespace,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+    )
     state=journal_state(conn)
     if (state["review_sequence"]!=payload["review_sequence"]
         or state["journal_state_sha256"]!=payload["journal_state_sha256"]):

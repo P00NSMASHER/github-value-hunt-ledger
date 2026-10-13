@@ -210,6 +210,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("checkpoint_mode_negative_cases_m54", 11),
             ("checkpoint_mode_exact_denials_m54", 12),
             ("checkpoint_mode_original_findings_closed_m54", 1),
+            ("checkpoint_reconciliation_signed_head_positives_m55", 17),
+            ("checkpoint_reconciliation_pending_gap_controls_m55", 17),
+            ("checkpoint_reconciliation_negative_denials_m55", 17),
+            ("checkpoint_reconciliation_original_findings_closed_m55", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)
