@@ -28,6 +28,7 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
     assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
     assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True
+    assert pack["claim_boundary"]["positive_settlement_reference_bound_to_evidence"] is True
     assert pack["claim_boundary"]["economic_opportunity_identity_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
@@ -89,6 +90,17 @@ def test_pack_rejects_positive_credit_without_settlement_reference():
     with pytest.raises(
         ValueError,
         match="positive settled_credit_cents requires settlement_reference",
+    ):
+        build_pack(data)
+
+
+def test_pack_rejects_positive_credit_when_settlement_reference_is_not_evidence_bound():
+    data = payload()
+    row = data["findings"][0]
+    row["supporting_evidence"].remove(row["settlement_reference"])
+    with pytest.raises(
+        ValueError,
+        match="positive settled_credit_cents requires settlement_reference in supporting_evidence",
     ):
         build_pack(data)
 
@@ -200,6 +212,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Controlling rate authority is not proven." in report
     assert "Positive settled credits require an approved or closed claim" in report
     assert "Settled credit cannot exceed the candidate invoice difference" in report
+    assert "Each positive settlement reference must appear in supporting evidence" in report
     assert "One positive settlement reference can support only one finding" in report
     assert "One carrier/invoice/shipment/category identity can support only one economic opportunity" in report
     assert "validated supported finding requires at least one supporting-evidence reference" in report
