@@ -26,40 +26,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  authorize:
-    name: Authenticate exact current main and bound external resource inputs
-    if: github.ref == 'refs/heads/main'
+  admission:
+    name: Require exact current main before any crawl
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
     steps:
-      - name: Check out immutable triggering main
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-      - name: Admit immutable main and strictly bounded resource use
+      - name: Verify main branch and immutable expected source
         shell: bash
         env:
           EXPECTED_SHA: ${{ github.sha }}
-          EVENT_NAME: ${{ github.event_name }}
-          INPUT_HISTORY_LIMIT: ${{ inputs.history_limit || '100' }}
-          INPUT_RETENTION_DAYS: ${{ inputs.retention_days || '90' }}
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = "refs/heads/main"
-          CURRENT="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
-          test -n "$CURRENT" && test "$CURRENT" = "$EXPECTED_SHA" || { echo "::error::Missing or stale main source"; exit 1; }
-          LIMIT="$INPUT_HISTORY_LIMIT"
-          [[ "$LIMIT" =~ ^[1-9][0-9]{0,2}$ ]] || { echo "::error::Malformed history_limit"; exit 1; }
-          COUNT=$((10#$LIMIT))
-          (( COUNT>=1 && COUNT<=100 )) || { echo "::error::history_limit exceeds bounded 1..100"; exit 1; }
-          [[ "$INPUT_RETENTION_DAYS" =~ ^[1-9][0-9]?$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
-          RETAIN=$((10#$INPUT_RETENTION_DAYS))
-          (( RETAIN>=1 && RETAIN<=90 )) || { echo "::error::Artifact retention must be 1..90"; exit 1; }
-          echo "Authorized main resource limits: index/history=$COUNT, retention=$RETAIN"
-
+          test "$GITHUB_REF" = 'refs/heads/main'
+          [[ "$EXPECTED_SHA" =~ ^[a-f0-9]{40}$ ]]
+          REMOTE="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
+          test "$REMOTE" = "$EXPECTED_SHA" || { echo 'Refusing stale or branch-selected ledger source.' >&2; exit 1; }
   test:
-    needs: authorize
+    needs: admission
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -73,9 +56,11 @@ jobs:
           cache-dependency-path: production/urdb_ledger/requirements.txt
       - run: python -m pip install -r requirements.txt
       - run: python -m unittest discover -v -p 'test_*.py'
+      - name: Verify bounded input regression tests
+        run: python ../../tests/test_ti_ledger_workload.py
 
   ingest:
-    needs: test
+    needs: [admission, test]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -88,10 +73,23 @@ jobs:
           cache: pip
           cache-dependency-path: production/urdb_ledger/requirements.txt
       - run: python -m pip install -r requirements.txt
+      - name: Check fresh current main and bound source workloads
+        id: parameters
+        shell: bash
+        env:
+          LEDGER_EVENT: ${{ github.event_name }}
+          INPUT_HISTORY_LIMIT: ${{ inputs.history_limit || '100' }}
+          INPUT_RETENTION_DAYS: ${{ inputs.retention_days || '90' }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          REMOTE="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
+          test "$REMOTE" = "$GITHUB_SHA" || { echo 'Main advanced; refusing outdated catalog.' >&2; exit 1; }
+          python ../../tools/ledger_workload_parameters.py --lane urdb --event "$LEDGER_EVENT" --value "$INPUT_HISTORY_LIMIT" --retention "$INPUT_RETENTION_DAYS" --run-now RUN_NOW >> "$GITHUB_OUTPUT"
       - name: Ingest official bulk and release history
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HISTORY_LIMIT: ${{ inputs.history_limit || '100' }}
+          HISTORY_LIMIT: ${{ steps.parameters.outputs.history_limit }}
         run: |
           python ingest.py \
             --out output \
@@ -103,6 +101,6 @@ jobs:
         with:
           name: openei-urdb-ledger
           path: production/urdb_ledger/output/
-          retention-days: ${{ inputs.retention_days || 90 }}
+          retention-days: ${{ steps.parameters.outputs.retention_days }}
           compression-level: 0
           if-no-files-found: error
