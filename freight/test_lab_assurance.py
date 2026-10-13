@@ -264,5 +264,43 @@ class AssuranceProofTests(unittest.TestCase):
         self.rejects("EMPTY_CLAIM_POPULATION")
 
 
+    def test_legacy_duplicate_allocation_identity_rejected_before_value_calculation(self):
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute(
+                "INSERT INTO allocations SELECT * FROM allocations "
+                "WHERE allocation_id='allocation-400'"
+            )
+        self.rejects("DUPLICATE_ALLOCATION_ID")
+
+    def test_legacy_duplicate_counter_identity_rejected_before_netting(self):
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute(
+                "INSERT INTO counter_events SELECT * FROM counter_events "
+                "WHERE counter_id='return-500'"
+            )
+        self.rejects("DUPLICATE_COUNTER_ID")
+
+    def test_legacy_duplicate_reversal_id_rejected_even_if_total_money_matches(self):
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute(
+                "UPDATE reversal_edges SET amount_cents=499 "
+                "WHERE reversal_id='reversal-500'"
+            )
+            con.execute(
+                "INSERT INTO reversal_edges SELECT buyer_id,business_unit,"
+                "reversal_id,counter_id,allocation_id,1,created_at "
+                "FROM reversal_edges WHERE reversal_id='reversal-500'"
+            )
+        self.rejects("DUPLICATE_OR_INVALID_REVERSAL_ID")
+
+    def test_null_reversal_identity_rejected_before_payment_claim(self):
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute(
+                "UPDATE reversal_edges SET reversal_id=NULL "
+                "WHERE reversal_id='reversal-500'"
+            )
+        self.rejects("DUPLICATE_OR_INVALID_REVERSAL_ID")
+
+
 if __name__=="__main__":
     unittest.main()

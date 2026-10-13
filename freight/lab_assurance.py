@@ -248,6 +248,18 @@ def verify_settlement(
     if not claims: _fail("EMPTY_CLAIM_POPULATION")
     if len(claims) != len(tables["recovery_claims"]) or len(credits) != len(tables["settlement_events"]):
         _fail("DUPLICATE_LOCAL_ID")
+    # An imported/legacy SQLite snapshot might not enforce uniqueness, even
+    # though SettlementStore does. Converting rows to dictionaries silently
+    # drops duplicate keys; reject the raw scoped row census before any
+    # counter/credit/allocation arithmetic or fee recognition.
+    if len(counters) != len(tables["counter_events"]):
+        _fail("DUPLICATE_COUNTER_ID")
+    if len(allocations) != len(tables["allocations"]):
+        _fail("DUPLICATE_ALLOCATION_ID")
+    reversal_ids = [r["reversal_id"] for r in tables["reversal_edges"]]
+    if (any(type(i) is not str or not i for i in reversal_ids)
+        or len(set(reversal_ids)) != len(reversal_ids)):
+        _fail("DUPLICATE_OR_INVALID_REVERSAL_ID")
     issue_ids: set[tuple] = set()
     terms: dict[str, dict] = {}
     for cid, claim in claims.items():

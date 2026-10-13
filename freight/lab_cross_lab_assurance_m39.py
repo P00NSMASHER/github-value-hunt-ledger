@@ -161,6 +161,9 @@ def _proof(lab: int, proof: dict) -> None:
             "critical_current_path_denials_m41": 4,
             "critical_original_findings_closed_m41": 0,
             "critical_original_vulnerable_revision_replays_m41": 0,
+            "settlement_legacy_duplicate_row_attacks_m42": 3,
+            "settlement_legacy_duplicate_row_denials_m42": 3,
+            "settlement_current_historical_defects_closed_m42": 0,
         }
         for name, expected_value in expected_flags.items():
             _check(name in proof
@@ -172,6 +175,7 @@ def _proof(lab: int, proof: dict) -> None:
             "research_source_lineage_m37_receipt_sha256",
             "research_m38_receipt_sha256",
             "critical_current_path_report_sha256_m41",
+            "settlement_identity_report_sha256_m42",
         ):
             _check(_hex(proof.get(key)),
                    "LAB14_SOURCE_AND_PILOT_REPORT_RECEIPT_INVALID")
