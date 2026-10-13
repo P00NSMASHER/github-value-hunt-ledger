@@ -46,6 +46,19 @@ class PublicClaimReleaseGateM36Tests(unittest.TestCase):
             "<p>Recovery is not guaranteed; estimates are not money recovered.</p>"
         }),set())
 
+    def test_ordinary_guarantee_faq_question_is_not_a_recovery_promise(self):
+        question="<summary>Do you guarantee freight recovery?</summary>"
+        answer="<p>No. Actual recovery depends on supporting evidence.</p>"
+        self.assertEqual(codes({"services.html":question+answer}),set())
+
+    def test_negated_guarantees_do_not_hide_positively_asserted_guarantee(self):
+        text="Do you guarantee refunds? We guarantee refunds."
+        result=codes({"claim.txt":text})
+        self.assertIn("GUARANTEED_CUSTOMER_OUTCOMES",result)
+
+    def test_clear_disclaimer_about_no_guarantees_survives(self):
+        self.assertEqual(codes({"claims.html":"<p>We do not guarantee refunds.</p>"}),set())
+
     def test_fictional_sample_invoice_numbers_without_true_outcome_claims_pass(self):
         self.assertEqual(codes({"sample.html":
             "<p>Fictional Northstar Industrial Supply invoice $1,167.60; "
