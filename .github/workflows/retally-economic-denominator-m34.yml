@@ -1,0 +1,190 @@
+name: RETALLY Lab 14 BEA Census Industry-Denominator Reconciliation (Mission 34)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-economic-denominator-m34.yml'
+      - 'freight/research_economic_denominator_m34.py'
+      - 'freight/test_research_economic_denominator_m34.py'
+      - 'freight/research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json'
+      - 'freight/RESEARCH_ECONOMIC_DENOMINATOR_M34.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  offline-cross-source-falsification-and-existing-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited research dependencies and pinned read-only XLSX QA
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Run denominator and original Census BEA BLS adversarial research regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_economic_denominator_m34.py \
+            freight/test_research_bea_original_m33.py \
+            freight/test_research_bea_gross_output_m32.py \
+            freight/test_research_bls_sectoral_output_m31.py \
+            freight/test_research_bea_measurement_gate.py \
+            freight/test_research_unified_blspci.py \
+            freight/test_research_bls_parent_origin.py \
+            freight/test_research_fred_parent_ppi.py \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Enforce original 14 labs and deny nominal industry gap as recoverable freight market
+        run: |
+          PYTHONPATH=. python -m freight.research_economic_denominator_m34 \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m34-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m34-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m34-offline/economic_denominator_reconciliation.json').read_text())
+          q=json.loads(Path('/tmp/retally-m34-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_M34_FIRST_PARTY_TRUCKING_NOMINAL_MEASURE_RECONCILIATION_NOT_INVOICE_MARKET'
+          assert r['source_status']=='M34_OFFLINE_PRIOR_VERIFIED_ORIGINAL_SOURCE_SNAPSHOTS_NO_NEW_THREE_SOURCE_REPLAY'
+          assert r['source_families_authenticated_fresh_this_run']==0
+          assert r['full_three_first_party_source_families_replayed_this_run'] is False
+          assert len(r['comparison_2017_to_2024'])==8
+          assert [x['year'] for x in r['comparison_2017_to_2024']]==list(range(2017,2025))
+          assert r['bea_minus_census_nominal_2017_million_usd']=='76622.000'
+          assert r['bea_minus_census_nominal_2024_million_usd']=='142607.754'
+          assert r['bea_minus_census_nominal_gap_increase_2017_to_2024_million_usd']=='65985.754'
+          assert r['bea_2017_to_2024_nominal_growth_pct']=='48.56'
+          assert r['census_2017_to_2024_nominal_growth_pct']=='38.65'
+          assert r['bea_minus_census_nominal_growth_percentage_points']=='9.91'
+          assert r['nominal_census_to_bea_measure_ratio_2017_pct']=='79.13'
+          assert r['nominal_census_to_bea_measure_ratio_2024_pct']=='73.85'
+          assert r['ratio_change_percentage_points']=='-5.28'
+          assert r['bea_gross_output_2017_2024_price_index_growth_pct']=='37.49'
+          assert r['bls_2017_2024_net_output_producer_price_growth_pct']=='37.04'
+          assert r['bea_minus_bls_producer_price_change_difference_pp']=='0.45'
+          assert r['nominal_gap_is_missing_carrier_invoices_or_recoverable_overcharges'] is False
+          assert r['census_nominal_ratio_to_bea_is_actual_market_coverage'] is False
+          assert r['bea_price_and_bls_net_output_ppi_interchangeable'] is False
+          assert r['real_paid_customer_freight_invoices']==0
+          assert r['recoverable_audit_market_tam_usd'] is None
+          assert r['human_pilot_18_independent_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(q['lab_runs'])==14 and q['failed_or_blocked_labs']==[]
+          assert q['pilot_preflight']['unmet_requirements']==18
+          assert q['actual_revenue_cents']==0
+          assert q['bea_census_nominal_denominator_m34']['receipt_sha256']==r['receipt_sha256']
+          assert 'economic_denominator_reconciliation.html' in Path('/tmp/retally-m34-control/index.html').read_text()
+          print('M34: 8 nominal BEA/Census annual contrasts verified; no customer TAM; 14 labs passed; 18 real pilot gates unmet.')
+          PY
+      - name: Preserve internal source-qualified offline evidence only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m34-economic-denominator-offline
+          path: |
+            /tmp/retally-m34-offline/economic_denominator_reconciliation.json
+            /tmp/retally-m34-offline/economic_denominator_reconciliation.html
+          if-no-files-found: error
+          retention-days: 14
+
+  verify-three-original-publisher-receipt-families:
+    needs: offline-cross-source-falsification-and-existing-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original BEA XLSX verification prerequisites
+        run: |
+          python -m pip install openpyxl==3.1.5
+      - name: Replay original BEA 32-cell annual gross output publisher source
+        run: |
+          PYTHONPATH=. python -m freight.research_bea_original_m33 \
+            --fetch-original --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m34-bea
+      - name: Replay exact three original Census SAS and AIES public archives
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_aies_bridge \
+            --fetch-originals --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m34-census
+      - name: Replay original BLS 288-month NAICS 484 parent and two children
+        run: |
+          PYTHONPATH=. python -m freight.research_unified_blspci \
+            --fetch-original --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m34-bls
+      - name: Correlate full direct-publisher receipts without inventing missing freight bills
+        run: |
+          PYTHONPATH=. python -m freight.research_economic_denominator_m34 \
+            --verify-original-receipts \
+              /tmp/retally-m34-bea/bea_original_gross_output.json \
+              /tmp/retally-m34-census/sas_aies_revenue_bridge.json \
+              /tmp/retally-m34-bls/unified_bls_evidence.json \
+            --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m34-verified
+      - name: Enforce original source replay, eight nominal years, and noncommercial hold
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m34-verified/economic_denominator_reconciliation.json').read_text())
+          assert r['scope']=='LAB14_M34_FIRST_PARTY_TRUCKING_NOMINAL_MEASURE_RECONCILIATION_NOT_INVOICE_MARKET'
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert r['bea_minus_census_nominal_2024_million_usd']=='142607.754'
+          assert r['bea_minus_census_nominal_2017_million_usd']=='76622.000'
+          assert r['bea_minus_census_nominal_growth_percentage_points']=='9.91'
+          assert r['bea_minus_bls_producer_price_change_difference_pp']=='0.45'
+          assert r['census_nominal_ratio_to_bea_is_actual_market_coverage'] is False
+          assert r['nominal_gap_is_missing_carrier_invoices_or_recoverable_overcharges'] is False
+          assert r['nominal_gap_has_decomposed_verified_economic_causes'] is False
+          assert r['bea_price_and_bls_net_output_ppi_interchangeable'] is False
+          assert r['real_paid_customer_freight_invoices']==0
+          assert r['adjudicated_freight_invoice_errors']==0
+          assert r['retally_recovered_cash_usd'] is None
+          assert r['recoverable_audit_market_tam_usd'] is None
+          assert r['human_pilot_18_independent_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['source_status']=='M34_THREE_FIRST_PARTY_SOURCE_FAMILIES_FRESHLY_REPLAYED_BEA_CENSUS_BLS':
+            assert r['full_three_first_party_source_families_replayed_this_run'] is True
+            assert r['source_families_authenticated_fresh_this_run']==3
+            assert r['bea_original_xlsx_sha256_verified_this_run']=='a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46'
+            assert r['census_three_publisher_archives_verified_this_run'] is True
+            assert r['bls_original_288_ppi_months_verified_this_run'] is True
+            assert set(r['fresh_source_family_receipts'])=={'bea','census','bls'}
+            assert all(len(x)==64 for x in r['fresh_source_family_receipts'].values())
+            print('VERIFIED 3/3 original government publisher families: BEA XLSX, three Census archives and BLS 288 months.')
+          elif r['source_status']=='M34_ONE_OR_MORE_FIRST_PARTY_SOURCE_FAMILIES_BLOCKED_NO_FULL_REPLAY':
+            assert r['full_three_first_party_source_families_replayed_this_run'] is False
+            assert r['source_families_authenticated_fresh_this_run']<3
+            print('::warning::One publisher route blocked; full current source attestation was NOT achieved.')
+          else:
+            raise AssertionError('M34_FALSE_PRIMARY_SOURCE_REPLAY_OR_CORRUPT_ECONOMIC_DENOMINATOR_RECEIPT')
+          PY
+      - name: Retain only source receipts and derived comparison, never raw source workbooks
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m34-cross-publisher-original-source-receipts
+          path: |
+            /tmp/retally-m34-verified/economic_denominator_reconciliation.json
+            /tmp/retally-m34-verified/economic_denominator_reconciliation.html
+          if-no-files-found: error
+          retention-days: 14
