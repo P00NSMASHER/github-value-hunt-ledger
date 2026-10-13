@@ -209,13 +209,20 @@ class PublicClaimGateM36Tests(unittest.TestCase):
         self.assertIn("UNVERIFIED_OWN_RECOVERED_MONEY",violations)
         self.assertIn("UNVERIFIED_OWN_SECURITY_CERTIFICATION",violations)
 
-    def test_script_code_and_styles_do_not_change_visible_page_classification(self):
+    def test_inline_dynamic_claims_are_scanned_and_css_not_treated_as_copy(self):
         html='<script>const value="RETALLY recovered $500,000";</script><style>.foo{content:"We recovered $1";}</style><p>Welcome to RETALLY</p>'
-        self.assertEqual(gate.inspect_public_text("about.html",html),[])
-        # The JavaScript asset is *also* scanned separately as a plain text file.
+        self.assertIn("UNVERIFIED_OWN_RECOVERED_MONEY",
+                      gate.inspect_public_text("about.html",html))
+        self.assertEqual(gate.inspect_public_text("about.html",
+            '<style>.foo{content:"We recovered $1";}</style><p>Welcome to RETALLY</p>'),[])
         self.assertIn("UNVERIFIED_OWN_RECOVERED_MONEY",
                       gate.inspect_public_text("site.js",
                           'const copy="RETALLY recovered $500,000";'))
+
+    def test_client_rendered_data_claim_attribute_cannot_hide_recovery(self):
+        html='<div data-copy="RETALLY recovered $12,000" data-track="banner"></div>'
+        self.assertIn("UNVERIFIED_OWN_RECOVERED_MONEY",
+                      gate.inspect_public_text("index.html",html))
 
     def test_unapproved_claim_in_llms_txt_or_csv_is_blocked(self):
         self.assertIn(
