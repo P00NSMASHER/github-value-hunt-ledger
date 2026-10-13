@@ -8,7 +8,7 @@ on:
       - 'freight/*OUTBOUND*'
       - '.github/workflows/freight-outreach-safety.yml'
   push:
-    branches: [main, fix/freight-outreach-safety-20261007]
+    branches: [main]
     paths:
       - 'freight/outreach*'
       - 'freight/free_growth_engine.py'
@@ -17,6 +17,11 @@ on:
       - '.github/workflows/freight-outreach-safety.yml'
 permissions:
   contents: read
+
+# Cancel only superseded PR checks. Main release evidence never cancels itself.
+concurrency:
+  group: safe-component-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   safeguard-tests:
     runs-on: ubuntu-latest
