@@ -15,6 +15,7 @@ from unittest.mock import patch
 
 from freight.site import public_claim_guard as gate
 from freight.site import build as freight_build
+from freight.site import cloudflare_build
 from recoveryworks.site import build as recovery_build
 
 
@@ -344,6 +345,34 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
                 recovery_build.build(out)
             proof=gate.validate_public_tree(out,site="RECOVERYOS")
             self.assertEqual(proof["unsupported_real_customer_claims_detected"],0)
+
+    def test_cloudflare_build_blocks_claim_injected_after_url_rebase(self):
+        original_rebase=cloudflare_build.rebase
+        with tempfile.TemporaryDirectory() as temp:
+            base=Path(temp)
+            target=base/"cf-public"
+            def inject_after_rebase(bundle):
+                changed=original_rebase(bundle)
+                home=bundle/"index.html"
+                page=home.read_text(encoding="utf-8")
+                home.write_text(
+                    page.replace("</body>",
+                                 "<p>RETALLY has recovered $250,000 for clients</p></body>"),
+                    encoding="utf-8"
+                )
+                return changed
+            with patch.object(cloudflare_build,"REPO",base):
+                with patch.object(cloudflare_build,"rebase",side_effect=inject_after_rebase):
+                    with patch.dict("os.environ",{
+                        "FREIGHT_CONTACT_EMAIL":"jay@retallyrecovery.com",
+                        "FREIGHT_CONTACT_VERIFIED":"1",
+                    },clear=True):
+                        with self.assertRaisesRegex(
+                            gate.PublicClaimViolation,
+                            "M35-12_UNVERIFIED_ACTUAL_CUSTOMER_RECOVERIES",
+                        ):
+                            cloudflare_build.build(target)
+            self.assertFalse(target.exists())
 
     def test_real_freight_builder_blocks_modified_unverified_claim_before_any_writes(self):
         original=freight_build._public_source
