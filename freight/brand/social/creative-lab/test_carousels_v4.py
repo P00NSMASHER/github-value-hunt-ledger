@@ -5,6 +5,7 @@ These tests never publish or access social-network APIs.
 from __future__ import annotations
 
 import base64
+import html
 import re
 import struct
 import tempfile
@@ -65,7 +66,7 @@ class V4CarouselTests(unittest.TestCase):
             self.assertIn("SWIPE TO REVIEW",markup)
             self.assertIn("ILLUSTRATIVE FRAMEWORK",markup)
             self.assertIn("NOT CUSTOMER RESULTS",markup)
-            self.assertIn(v4.TOPICS[name]["lead"],markup)
+            self.assertIn(html.escape(v4.TOPICS[name]["lead"],quote=True),markup)
 
     def test_slide_two_has_all_three_evidence_steps(self):
         for name in v4.CONCEPTS:
@@ -82,7 +83,7 @@ class V4CarouselTests(unittest.TestCase):
             self.assertIn("Evidence to confirm",markup)
             self.assertIn("Do not assume",markup)
             self.assertIn(v4.TOPICS[name]["evidence"],markup)
-            self.assertIn(v4.TOPICS[name]["not_evidence"],markup)
+            self.assertIn(html.escape(v4.TOPICS[name]["not_evidence"],quote=True),markup)
             self.assertEqual(markup.count('class="panel"'),2)
 
     def test_slide_four_has_topic_specific_educational_page(self):
