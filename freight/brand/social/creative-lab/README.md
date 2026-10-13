@@ -125,3 +125,28 @@ This is a graphics engine prototype with real local tests and draft PR code, not
 a claim that production content has been published, that the October calendar
 has been modified, that an image license has been fully cleared, or that any
 conversion metric has changed.
+
+---
+
+## Field Notes v3: six differentiated new social graphics (October 13)
+
+The studio now prepares **nine topic-specific 1080×1350 images and 390px phone-size previews**: three prior v2 concepts plus six v3 additions. The new six use separately registered website hero photographs, not one repeated truck image.
+
+| New visual topic | Original onsite hero image | Matching educational page |
+| --- | --- | --- |
+| Audit scope and previous credits | freight-network.webp | /freight-invoice-audit-checklist |
+| Fuel surcharge rate authority | rate-authority.webp | /carrier-rate-audit |
+| Detention timestamp example | warehouse-handoff.webp | /accessorial-charge-audit |
+| Proof package before disputes | invoice-evidence.webp | /freight-overcharge-dispute-process |
+| Approved claim versus usable credit | approved-path.webp | /freight-recovery-evidence-standard |
+| Invoice/data handling safety | dock-control.webp | /privacy |
+
+Command from repository root:
+
+    python freight/brand/social/creative-lab/render_social_v3.py --repo-root . --mode production --concept all --output-dir /tmp/retally-fieldnotes-v3-review
+
+Here *production* selects canonical image inputs, not permission to publish. Output manifests mark every item as an unapproved draft. The approved original RETALLY wordmark must pass exact SHA-256 validation before any rendering. Every photo filename and checksum is recorded separately; public website inclusion is NOT proof of broader social reuse rights.
+
+The companion v3_draft_captions.json holds 12 distinct platform captions (six Facebook, six Instagram), source-backed educational links, unique Facebook UTM content codes, and usable alt text. They are content proposals, NOT an additional active publishing queue. The illustrative detention example is labelled NOT A CUSTOMER RESULT.
+
+The existing pull-request/manual-only creative CI now renders and checks all nine topics, including full-size export geometry, 390px phone screenshots, no network/scripts, document overflow, claims/disclosures and prohibited approval states. Human visual acceptance and rights verification remain release blockers. No customer data, scheduled ChatGPT tasks, paid campaigns or social account operations are involved.
