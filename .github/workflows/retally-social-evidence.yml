@@ -103,7 +103,7 @@ jobs:
         run: |
           python3 freight/brand/social/performance/public_asset_preflight.py \
             --schedule freight/brand/social/performance/observations/retally-public-target-inventory-2026-10-13.json \
-            --only-kind landing --one-per-route --live --fail-on-hard-errors \
+            --only-kind landing --one-per-route --live --workers 4 --retry-transient 1 --fail-on-hard-errors \
             --output retally-current-route-http.md \
             --json-output retally-current-route-http.json
           python3 - <<'PY'
@@ -121,6 +121,29 @@ jobs:
           assert not report["publication_verified"]
           PY
 
+      - name: Check all 28 exact current creative assets by read-only bounded public GET
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 freight/brand/social/performance/public_asset_preflight.py \
+            --schedule freight/brand/social/performance/observations/retally-public-target-inventory-2026-10-13.json \
+            --only-kind image --live --workers 4 --retry-transient 1 --fail-on-hard-errors \
+            --output retally-current-media-http.md \
+            --json-output retally-current-media-http.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("retally-current-media-http.json").read_text())
+          counts=report["counts"]
+          assert report["representative_probe_count"]==28,report
+          assert not report["publication_verified"]
+          if counts["RECHECK"]:
+              print(f"::warning title=RETALLY CDN media review::{counts['RECHECK']} of 28 creatives need further check; avoid labeling them approved")
+          elif counts["PASS"]==28:
+              print("RETALLY 28/28 media observed with image magic, readable dimensions and acceptable orientation")
+          else:
+              raise AssertionError(f"Unexpected media probe counts: {counts}")
+          PY
+
       - name: Upload PR-only bounded public-route observation
         if: always() && github.event_name == 'pull_request'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -132,6 +155,8 @@ jobs:
             retally-current-route-http.md
             retally-current-route-http.json
             retally-destination-diagnostic.json
+            retally-current-media-http.md
+            retally-current-media-http.json
 
       - name: Exercise safe synthetic report
         run: |
