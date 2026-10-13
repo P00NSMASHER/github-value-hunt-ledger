@@ -107,6 +107,11 @@ def normalize_finding(row):
             raise ValueError(
                 "positive settled_credit_cents requires settlement_reference"
             )
+        if clean["settlement_reference"] not in evidence:
+            raise ValueError(
+                "positive settled_credit_cents requires settlement_reference "
+                "in supporting_evidence"
+            )
     clean["difference_cents"] = max(clean["billed_cents"] - clean["expected_cents"], 0)
     if clean["settled_credit_cents"] > clean["difference_cents"]:
         raise ValueError(
@@ -200,6 +205,7 @@ def build_pack(payload):
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
             "positive_settlement_reference_is_unique": True,
+            "positive_settlement_reference_bound_to_evidence": True,
             "economic_opportunity_identity_is_unique": True,
             "buyer_visible_realized_excludes_suppressed_findings": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
