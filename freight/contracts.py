@@ -460,22 +460,132 @@ def open_incumbent_output(
     )
 
 
+def _require_ledger_digest(name: str, value: str, expected: str | None = None) -> None:
+    if (type(value) is not str or len(value) != 64
+            or any(character not in "0123456789abcdef" for character in value)):
+        raise ValueError(name + " must be lowercase SHA-256")
+    if expected is not None and value != expected:
+        raise ValueError(name + " hash mismatch")
+
+
+def _verified_ledger_truth(truth: TruthManifest) -> TruthManifest:
+    """Validate supplied truth metadata and copy findings before accounting.
+
+    The ledger has no population rows or original files. This checks internal
+    integrity and authority relationships, not population membership, actual
+    source bytes, human consent, or independently confirmed recoveries.
+    """
+    if type(truth) is not TruthManifest:
+        raise ValueError("truth must be a TruthManifest")
+    _require_text("buyer_id", truth.buyer_id)
+    _require_text("business_unit", truth.business_unit)
+    _require_ledger_digest("population", truth.population_hash)
+    if type(truth.authorities) not in (tuple, list) or type(truth.findings) not in (tuple, list):
+        raise ValueError("truth authorities and findings must be record sequences")
+
+    authority_index: dict[str, AuthorityRef] = {}
+    for authority in truth.authorities:
+        if type(authority) is not AuthorityRef:
+            raise ValueError("truth authority must be an AuthorityRef")
+        for name in ("authority_id", "buyer_id", "business_unit", "customer_id",
+                     "carrier_id", "currency", "source_hash"):
+            _require_text(name, getattr(authority, name))
+        _require_scope(authority.buyer_id, authority.business_unit,
+                       truth.buyer_id, truth.business_unit, "authority")
+        if authority.authority_id in authority_index:
+            raise ValueError("duplicate authority_id: " + authority.authority_id)
+        authority_index[authority.authority_id] = AuthorityRef(**asdict(authority))
+
+    finding_index: dict[str, Finding] = {}
+    for finding in truth.findings:
+        if type(finding) is not Finding:
+            raise ValueError("truth finding must be a Finding")
+        for name in ("expected_cents", "actual_cents"):
+            value = getattr(finding, name)
+            if type(value) is not int or value < 0:
+                raise ValueError(name + " must be non-negative integer cents")
+        if type(finding.status) is not str:
+            raise ValueError("status must be VALIDATED or REVIEW")
+        if finding.authority_id is not None:
+            _require_text("authority_id", finding.authority_id)
+        fields = asdict(finding)
+        fields.pop("proof_hash")
+        verified = make_finding(**fields)
+        _require_ledger_digest("finding proof", finding.proof_hash, verified.proof_hash)
+        _require_scope(verified.buyer_id, verified.business_unit,
+                       truth.buyer_id, truth.business_unit, "finding")
+        if verified.finding_id in finding_index:
+            raise ValueError("duplicate finding_id: " + verified.finding_id)
+        if verified.status == VALIDATED:
+            authority = authority_index.get(verified.authority_id)
+            if authority is None:
+                raise ValueError("validated finding authority is missing")
+            if ((verified.customer_id, verified.carrier_id, verified.currency)
+                    != (authority.customer_id, authority.carrier_id, authority.currency)):
+                raise ValueError("authority identity mismatch: customer/carrier/currency must match finding")
+        finding_index[verified.finding_id] = verified
+
+    authorities = tuple(sorted(authority_index.values(), key=lambda item: item.authority_id))
+    findings = tuple(sorted(finding_index.values(), key=lambda item: item.finding_id))
+    body = {
+        "schema": 3, "buyer_id": truth.buyer_id, "business_unit": truth.business_unit,
+        "population_hash": truth.population_hash,
+        "authorities": [asdict(item) for item in authorities],
+        "findings": [asdict(item) for item in findings],
+    }
+    _require_ledger_digest("truth manifest", truth.truth_hash, canonical_hash(body))
+    return TruthManifest(truth.buyer_id, truth.business_unit, truth.population_hash,
+                         authorities, findings, truth.truth_hash)
+
+
+def _verified_ledger_incumbent(truth: TruthManifest, incumbent: IncumbentOutput) -> IncumbentOutput:
+    """Recheck exclusion metadata, including its nested submission digest."""
+    if type(incumbent) is not IncumbentOutput:
+        raise ValueError("incumbent must be an IncumbentOutput")
+    _require_scope(incumbent.buyer_id, incumbent.business_unit,
+                   truth.buyer_id, truth.business_unit, "incumbent output")
+    if incumbent.truth_hash != truth.truth_hash:
+        raise ValueError("incumbent output is not bound to this truth manifest")
+    if incumbent.population_hash != truth.population_hash:
+        raise ValueError("incumbent output is not bound to this population")
+    _require_text("source_hash", incumbent.source_hash)
+    if type(incumbent.finding_ids) not in (tuple, list):
+        raise ValueError("incumbent finding_ids must be a sequence")
+    for finding_id in incumbent.finding_ids:
+        _require_text("finding_id", finding_id)
+    finding_ids = tuple(sorted(incumbent.finding_ids))
+    if len(finding_ids) != len(set(finding_ids)):
+        raise ValueError("duplicate incumbent finding_id")
+    submission_body = {
+        "schema": 1, "buyer_id": incumbent.buyer_id,
+        "business_unit": incumbent.business_unit,
+        "population_hash": incumbent.population_hash, "source_hash": incumbent.source_hash,
+    }
+    _require_ledger_digest("incumbent submission", incumbent.submission_hash,
+                           canonical_hash(submission_body))
+    body = {
+        "schema": 2, "buyer_id": incumbent.buyer_id,
+        "business_unit": incumbent.business_unit,
+        "population_hash": incumbent.population_hash, "truth_hash": incumbent.truth_hash,
+        "submission_hash": incumbent.submission_hash, "source_hash": incumbent.source_hash,
+        "finding_ids": finding_ids,
+    }
+    _require_ledger_digest("incumbent output", incumbent.output_hash, canonical_hash(body))
+    return IncumbentOutput(incumbent.buyer_id, incumbent.business_unit,
+                           incumbent.population_hash, incumbent.truth_hash,
+                           incumbent.submission_hash, incumbent.source_hash,
+                           finding_ids, incumbent.output_hash)
+
+
 class RecoveryLedger:
+    """In-memory reference accounting; metadata checks do not authorize live cash."""
+
     def __init__(self, truth: TruthManifest, incumbent: IncumbentOutput | None = None):
+        truth = _verified_ledger_truth(truth)
+        if incumbent is not None:
+            incumbent = _verified_ledger_incumbent(truth, incumbent)
         self.buyer_id = truth.buyer_id
         self.business_unit = truth.business_unit
-        if incumbent is not None:
-            _require_scope(
-                incumbent.buyer_id,
-                incumbent.business_unit,
-                truth.buyer_id,
-                truth.business_unit,
-                "incumbent output",
-            )
-            if incumbent.truth_hash != truth.truth_hash:
-                raise ValueError("incumbent output is not bound to this truth manifest")
-            if incumbent.population_hash != truth.population_hash:
-                raise ValueError("incumbent output is not bound to this population")
         self._findings = {finding.finding_id: finding for finding in truth.findings}
         self._incumbent_finding_ids = (
             frozenset(incumbent.finding_ids) if incumbent is not None else frozenset()
@@ -487,6 +597,10 @@ class RecoveryLedger:
         self._seen_source_hashes: set[str] = set()
 
     def apply(self, event: SettlementEvent) -> SettlementAllocation:
+        if type(event) is not SettlementEvent:
+            raise ValueError("event must be a SettlementEvent")
+        _require_text("finding_id", event.finding_id)
+        _require_text("currency", event.currency)
         _require_scope(
             event.buyer_id,
             event.business_unit,
@@ -500,8 +614,14 @@ class RecoveryLedger:
         _require_text("settlement_id", event.settlement_id)
         _require_text("source_hash", event.source_hash)
 
-        if event.amount_cents < 0:
-            raise ValueError("settlement amount must be non-negative")
+        # Validate all accounting flags before even an ambiguous/zero path.
+        # Invalid inputs must not consume settlement IDs, sources or capacity.
+        if type(event.amount_cents) is not int or event.amount_cents < 0:
+            raise ValueError("settlement amount must be non-negative integer cents")
+        for name in ("incumbent_preidentified", "automatic_credit",
+                     "preexisting_credit", "ambiguous_allocation"):
+            if type(getattr(event, name)) is not bool:
+                raise ValueError(name + " must be a boolean")
         if event.currency != finding.currency:
             raise ValueError("settlement currency mismatch")
 

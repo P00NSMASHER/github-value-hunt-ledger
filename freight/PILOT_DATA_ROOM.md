@@ -99,3 +99,27 @@ runs the complete Freight directory; no new workflow or dependency is needed.
    - opened incumbent output.
 
 This chain proves deterministic content binding/order inside the application. It does **not** independently attest historical wall-clock time.
+
+## Reference recovery-ledger consumer
+
+`freight.contracts.RecoveryLedger` now validates truth/finding digests, duplicate
+members, buyer/unit scope, controlling-authority relationships, and incumbent
+output/submission digests before creating accounting state. It copies verified
+findings so subsequent caller-side changes cannot alter that ledger snapshot.
+Settlement amounts require non-negative integer cents; all four attribution and
+ambiguity flags require exact booleans, including on zero or ambiguous paths.
+Rejected events do not consume source identities, settlement IDs or capacity.
+Valid partial allocations, incumbent exclusions, clean/review-only populations,
+canonical ordering and certificate hash formats remain unchanged.
+
+This is the existing **in-memory reference ledger**, not the hosted settlement
+service or `SettlementStore`. Its constructor receives no original population
+rows, source bytes, or authenticated approval receipts; it cannot independently
+prove membership in those original rows, source authenticity, human consent,
+historical sealing time, or that a refund actually posted. Legacy source-token
+strings remain supported in this reference API. Real financial posting and
+customer activation still require their separate controls and evidence.
+
+Regression suite: `PYTHONPATH=. python -m pytest -q
+freight/test_recovery_ledger_integrity.py`. The complete Freight release suite
+includes these tests without another workflow or dependency.
