@@ -194,6 +194,12 @@ def verify_backup_bundle(root: str | Path,
             or not (base/name).is_file()
             or _file_hash(base/name)!=sha):
             raise ValueError("M49_BUNDLE_SQLITE_FILE_MISSING_OR_CHANGED")
+    # M50: matching local SHA receipts cannot independently establish
+    # that the *published files* have sound audit chains, schema/counter
+    # constraints, scope-bound money or matching restored generations.
+    # Validate every original-source and restore image in read-only mode.
+    from freight.restore_admission_m50 import verify_published_candidate
+    verify_published_candidate(base,result,record)
     return record
 
 
