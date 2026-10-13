@@ -148,6 +148,10 @@ def resolve_engagement(base_charter:dict,amendments:list[dict]|tuple[dict,...]=(
             raise ValueError("multiple Amendments reference the same base Charter")
         amendment_by_base[base_hash]=amendment
 
+    # Self-hashes alone do not validate the terms or approved change deltas.
+    from freight.engagement_resolution_guard import validate_resolution_inputs
+    validate_resolution_inputs(base_charter, amendments, replacement_charters)
+
     current=base_charter
     visited=set()
     path=[current["charter_hash"]]
