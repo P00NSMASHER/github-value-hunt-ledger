@@ -89,3 +89,56 @@ present.
 ## Brand presentation
 
 The original website geometry, fonts, layout, intake and recovery logic are retained. Only the approved RETALLY logos and the emerald/deep-forest color system change. Published wordmark and emblem WebP assets are compact derivatives of the approved original raster artwork. Keep the full-resolution masters in the RETALLY brand starter package. Do not rename the `FreightRecoveryAnalytics` JavaScript API or existing public URLs without a separate migration.
+
+## Customer-facing claim release safeguard (Mission 36)
+
+The current Cloudflare Pages **retally-web** project, serving
+retallyrecovery.com and www.retallyrecovery.com, connects to the
+github-value-hunt-ledger **main** branch. Its build command is
+python -m freight.site.cloudflare_build and its destination is
+cf-retally-public. These source and domain links were verified read-only;
+production remains unchanged until the source PR is reviewed and merged.
+
+New safeguards run at three points:
+
+1. Both the RETALLY and companion RecoveryOS build scripts check the
+   post-templating public HTML, search metadata, JSON-LD, inline scripts
+   and JavaScript before creating output directories.
+2. The actual Cloudflare builder checks the entire composed public bundle
+   **after** canonical URL rebasing, CSP adjustment, and RecoveryOS copy,
+   before creating cf-retally-public. A test simulates malicious public
+   copy injected after URL rebasing and confirms publication aborts.
+3. GitHub Pages verification/deployment and the repository release gate
+   additionally run the claim injection tests and inspect the final
+   customer-facing bundles before artifact upload or publication.
+
+The M35 research cases informed the nine **standalone, high-specificity
+M36 blocking patterns**. No dependency on the unmerged research module is
+introduced into the live mainline build. Patterns detect unsupported
+real-customer cash recoveries, invented invoice cohorts, fabricated
+accuracy/success percentages, recoverable TAM made from industry
+statistics, misleading BEA/Census economic gaps and guaranteed recoveries.
+
+Existing honest $0-upfront audit terms, optional separately approved
+recovery-contingent fees and the clearly marked **sample-data** website
+examples remain unchanged. Labels protecting the sample dashboard,
+sample worked audit, fee calculator and RecoveryOS illustrated findings
+are mandatory.
+
+The gate is not a complete semantic fact-checker, legal/publication
+authorization, a verification of real customer results, a live-account
+data-access control or a substitute for human content review. It does
+not independently clear external email/social/third-party chatbot copy
+or unrelated Cloudflare projects. A passing CI guard does not prove
+pilot readiness or recovered funds.
+
+After a successful local build, independently check the final output:
+
+    python -m freight.site.public_claim_guard \
+      --freight-root cf-retally-public \
+      --recoveryos-root cf-retally-public/recoveryos
+
+No customer records, network lookups, payments, outreach, scheduled
+monitoring, or deployments are performed by this validation module.
+The GitHub pull request verifies the change without merging it or
+deploying to the production custom domain.

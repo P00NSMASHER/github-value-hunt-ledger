@@ -24,6 +24,7 @@ from freight.commercial_terms import (
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 from freight.site.asset_integrity import validate_freight_media
+from freight.site.public_claim_guard import validate_public_text_bundle, TEXT_EXTENSIONS
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -361,6 +362,15 @@ def build(
     for name, page in text_bundle.items():
         if any(token in page.lower() for token in ("yorktowne", "17901", "jayp19386@")):
             raise ValueError(f"Nonbusiness contact information in public asset: {name}")
+
+    # M36: inspect all visitor-facing output AFTER social/chatbot/copy injection
+    # and BEFORE creating the output folder. This is a narrow negative gate,
+    # not a publication approval or an independent customer evidence review.
+    validate_public_text_bundle(
+        {name: value for name, value in text_bundle.items()
+         if "/" not in name and Path(name).suffix.lower() in TEXT_EXTENSIONS},
+        site="RETALLY",
+    )
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():
