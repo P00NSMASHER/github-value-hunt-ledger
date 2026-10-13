@@ -30,7 +30,7 @@ from freight.research_bls_sectoral_output_m31 import (
 )
 
 BOOK = Path(__file__).parent / "research/BEA_ORIGINAL_ACCESS_M33_20261012.json"
-BOOK_SHA1 = "9a26ba7812b6569877c71adbd5cb8ddb430c2071"
+BOOK_SHA1 = "501ec6d18cdc29b7ac6b7c718c1d85d5f520fafd"
 BEA_URL = "https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx"
 BEA_ORIGINAL_SHA256 = "a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46"
 BEA_ORIGINAL_BYTES = 506819
@@ -185,7 +185,8 @@ def validate_book(b:object,*,as_of:date)->list[str]:
         for name in FALSE_GUARDS:
             # One guard explicitly records a true prohibition, not a
             # permission: direct BEA file does not certify a recovery market.
-            want=name=="direct_bea_file_does_not_certify_recoverable_freight_market"
+            want=name in ("direct_bea_file_does_not_certify_recoverable_freight_market",
+                          "original_bea_484_2017_2024_numeric_verification_completed")
             if b.get(name) is not want:
                 errors.append("M33_FALSE_RECOVERY_OR_SOURCE_AUTHORIZATION:"+name)
         for field,v in SOURCE_NO_RECOVERY.items():
