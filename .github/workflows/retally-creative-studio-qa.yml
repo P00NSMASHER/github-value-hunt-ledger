@@ -87,7 +87,7 @@ jobs:
           assert len(report["assets"])==6
           assert len(report["content_proposals"])==6
           assert all(not x["approved_for_publication"] for x in report["content_proposals"])
-          assert len({x["hero_image_provenance"]["registered_source_name"] for x in report["assets"]})==6 if False else True
+          assert len({p["registered_source_name"] for p in report["hero_image_provenance"].values()})==6
           for item in report["assets"]:
               qa=item["qa"]
               assert qa["escaped_elements"]==[],qa
