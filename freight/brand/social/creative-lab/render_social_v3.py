@@ -170,12 +170,12 @@ CSS_V3 = r"""
 .v3 .documents{top:218px;height:282px;gap:16px}
 .v3 .document{padding:25px 19px;border-radius:22px}
 .v3 .doc-top{font-size:17px;letter-spacing:.3px;gap:4px}
-.v3 .doc-type{font-size:26px;margin:24px 0 12px;letter-spacing:-.5px}
+.v3 .doc-type{font-size:33px;line-height:1.03;margin:24px 0 12px;letter-spacing:-.7px}
 .v3 .doc-label{font-size:16px;letter-spacing:.6px;margin:16px 0 8px}
-.v3 .doc-value{font-size:20px;padding:11px;line-height:1.3}
+.v3 .doc-value{font-size:24px;padding:11px;line-height:1.23}
 .v3 .document.focus{transform:translateY(-8px) rotateX(1.6deg)}
 .v3 .keypoint{top:521px}
-.v3 .keypoint strong{font-size:20px}
+.v3 .keypoint strong{font-size:23px;line-height:1.17}
 .v3 .keypoint em{font-size:16px}
 .v3 .connector{display:none}
 .v3 .footer-note{font-size:17px}
