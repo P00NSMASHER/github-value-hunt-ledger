@@ -106,7 +106,9 @@ jobs:
           python-version: '3.11'
       - name: Extract only the immediate predecessor SettlementStore implementation
         run: |
-          git show HEAD^:freight/settlement_store.py > /tmp/m44_predecessor_store.py
+          # Exact pre-M44 M43 baseline, not HEAD^ (may be an M44 follow-up).
+          git fetch --no-tags --depth=1 origin c6496c049655dda3efdb29dfa31ec733c6cf9043
+          git show c6496c049655dda3efdb29dfa31ec733c6cf9043:freight/settlement_store.py > /tmp/m44_predecessor_store.py
           cp freight/settlement_schema.sql /tmp/settlement_schema.sql
           test -s /tmp/m44_predecessor_store.py
       - name: Independent eight-case old/current *exact same fictional database* differential
