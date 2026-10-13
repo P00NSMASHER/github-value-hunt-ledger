@@ -28,7 +28,7 @@ class M46SQLiteSchemaTests(unittest.TestCase):
     def test_exact_ten_ddl_scenarios_block_every_live_read_write_and_reopen(self):
         self.assertEqual(len(m46.DDL_ATTACKS),10)
         self.assertEqual(len(m46.READ_ACTIONS),7)
-        for attack, expected in m46.DDL_ATTACKS.items():
+        for attack, (_ddl, expected) in m46.DDL_ATTACKS.items():
             with self.subTest(attack=attack):
                 result=m46.replay_one(attack)
                 self.assertEqual(result["schema_mutation"],attack)
