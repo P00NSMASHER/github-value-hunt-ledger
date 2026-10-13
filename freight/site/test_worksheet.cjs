@@ -94,8 +94,8 @@ function harness() {
   const controls = new Map();
   const ids = ["invoiceWorksheet","ws-billed","ws-expected","ws-credits","ws-difference",
   "ws-unresolved","ws-credit-applied","ws-status","ws-error","ws-sample","ws-clear",
-  "ws-print","ws-copy","ws-copy-status"];
-  let printed = 0, copied = "", focusCount = 0;
+  "ws-print","ws-copy","ws-copy-status","ws-share","ws-share-status"];
+  let printed = 0, copied = "", shared = null, focusCount = 0;
   let networkCount=0, localStorageCount=0;
   for (const id of ids) {
     controls.set(id,{id,value:"",textContent:"",dataset:{},listeners:{},
@@ -107,13 +107,14 @@ function harness() {
   const listeners = {};
   const win = {print(){printed++;},
     addEventListener(type,fn){listeners[type]=fn;},
-    navigator:{clipboard:{async writeText(value){copied=value;}}},
+    navigator:{clipboard:{async writeText(value){copied=value;}},
+      async share(value){shared=value;}},
     fetch(){networkCount++;throw new Error("Unexpected network request")},
     localStorage:{setItem(){localStorageCount++;throw new Error("Unexpected persistence")}}
   };
   const doc = {getElementById(id){return controls.get(id)||null;},
     body:{classList:{add(x){printClasses.add(x)},remove(x){printClasses.delete(x)},contains(x){return printClasses.has(x)}}}};
-  return {doc,win,controls,listeners,printClasses,states(){return {printed,copied,focusCount,networkCount,localStorageCount}}};
+  return {doc,win,controls,listeners,printClasses,states(){return {printed,copied,shared,focusCount,networkCount,localStorageCount}}};
 }
 
 test("no markup means the script is inert on all other website pages", () => {
@@ -180,6 +181,43 @@ test("public-link copy never includes user-entered dollar amounts", async () => 
   assert.equal(state.copied,"https://www.retallyrecovery.com/freight-invoice-audit-checklist#worksheet");
   assert.ok(!state.copied.includes("1167.60"));
   assert.match(h.controls.get("ws-copy-status").textContent,/no amounts were copied/i);
+});
+
+test("native OS share sends only public worksheet URL and static copy, never inputs", async () => {
+  const h=harness();worksheet.mount(h.doc,h.win);
+  h.controls.get("ws-sample").fire("click");
+  await h.controls.get("ws-share").fire("click");
+  const payload=h.states().shared;
+  assert.ok(payload);
+  assert.deepEqual(payload,{
+    title:"RETALLY | Free Freight Invoice Audit Checklist",
+    text:"15 evidence checks and a sample-only invoice review worksheet.",
+    url:"https://www.retallyrecovery.com/freight-invoice-audit-checklist#worksheet"
+  });
+  assert.ok(!JSON.stringify(payload).includes("1167.60"));
+  assert.ok(!JSON.stringify(payload).includes("1042.60"));
+  assert.equal(h.states().networkCount,0);
+  assert.equal(h.states().localStorageCount,0);
+  assert.match(h.controls.get("ws-share-status").textContent,/No worksheet amounts/i);
+});
+
+test("non-share-capable browser copies public link without including inputs", async () => {
+  const h=harness();delete h.win.navigator.share;
+  worksheet.mount(h.doc,h.win);
+  h.controls.get("ws-sample").fire("click");
+  await h.controls.get("ws-share").fire("click");
+  assert.equal(h.states().shared,null);
+  assert.equal(h.states().copied,"https://www.retallyrecovery.com/freight-invoice-audit-checklist#worksheet");
+  assert.match(h.controls.get("ws-share-status").textContent,/No worksheet amounts/i);
+});
+
+test("user-canceled share never becomes a lead or warning about refund", async () => {
+  const h=harness();
+  h.win.navigator.share=async function(){const e=new Error("canceled");e.name="AbortError";throw e;};
+  worksheet.mount(h.doc,h.win);
+  await h.controls.get("ws-share").fire("click");
+  assert.match(h.controls.get("ws-share-status").textContent,/Share canceled/i);
+  assert.equal(h.states().networkCount,0);
 });
 
 test("mount is idempotent; no duplicate listeners or double print", () => {
