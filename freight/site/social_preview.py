@@ -39,12 +39,110 @@ ALT = {
     "assets/images/invoice-evidence.webp": "Freight invoices and records for evidence-based review",
 }
 WORKSHEET = "freight-invoice-audit-checklist.html"
-WORKSHEET_TITLE = "RETALLY | Free Printable Freight Invoice Audit Worksheet"
+WORKSHEET_TITLE = "RETALLY | Free Printable Freight Audit Worksheet"
 WORKSHEET_DESCRIPTION = (
-    "Print a 15-point freight audit checklist and compare sample or "
-    "anonymized invoice amounts privately in your browser. "
-    "Educational only; no refund or recovery is promised."
+    "Print 15 freight invoice checks and compare sample totals privately in "
+    "your browser. Educational only; no refund or recovery is promised."
 )
+
+# Human-authored, topic-specific captions designed for a small social
+# preview. They never convert an estimate into a customer result or imply
+# that confidential records can be uploaded on the public site.
+EDITORIAL_SHARE_META = {
+    "privacy.html": (
+        "RETALLY | Freight Data Privacy and Handling",
+        "See how audit scope can be discussed without sharing private invoices in messages. Confidential files require a separately approved transfer route.",
+    ),
+    "engagement-framework.html": (
+        "RETALLY | Freight Recovery Engagement Framework",
+        "Understand how review scope, customer authorization, evidence and eligible realized value are defined before recovery work.",
+    ),
+    "freight-audit-services.html": (
+        "RETALLY | Freight Invoice Audit Services",
+        "Evidence-first freight invoice review across rates, fees and prior credits. A flagged billing difference is not an approved or recovered claim.",
+    ),
+    "freight-invoice-audit.html": (
+        "RETALLY | How to Review a Freight Invoice",
+        "Match shipments, governing rates, fuel, accessorials and prior credits before treating billed differences as supported findings.",
+    ),
+    "freight-overcharge-recovery.html": (
+        "RETALLY | Freight Overcharge Recovery Process",
+        "From a documented invoice difference to an authorized dispute, carrier response and eligible funds or credits actually received.",
+    ),
+    "accessorial-charge-audit.html": (
+        "RETALLY | Freight Accessorial Charge Audit",
+        "Check detention, liftgate and other carrier fees against contracts, actual service records and credits before disputing a charge.",
+    ),
+    "freight-audit-and-payment.html": (
+        "RETALLY | Freight Audit and Payment Controls",
+        "Use contract checks, billing reconciliation and independent calculations to review freight AP charges before payment.",
+    ),
+    "duplicate-freight-charges.html": (
+        "RETALLY | Duplicate Freight Charge Checklist",
+        "Two invoices may reflect a rebill, correction or separate service. Follow shipment identity, payment and credit history first.",
+    ),
+    "carrier-rate-audit.html": (
+        "RETALLY | Carrier Rate Audit Checklist",
+        "Verify the controlling agreement, effective date, surcharge schedule and exceptions before claiming a rate mismatch.",
+    ),
+    "ltl-freight-audit.html": (
+        "RETALLY | LTL Freight Audit Guide",
+        "Review LTL freight class, billed weight, accessorials, minimums, fuel and tariff terms against shipment evidence.",
+    ),
+    "parcel-audit.html": (
+        "RETALLY | Parcel Invoice Audit Guide",
+        "Review package dimensions, service tiers, surcharges and credits using the governing carrier terms and shipment details.",
+    ),
+    WORKSHEET: (WORKSHEET_TITLE, WORKSHEET_DESCRIPTION),
+    "about.html": (
+        "About RETALLY | Freight Billing Review",
+        "Learn RETALLY's evidence-first approach to freight billing reviews and why documented findings matter more than estimates.",
+    ),
+    "freight-overcharge-dispute-process.html": (
+        "RETALLY | Freight Overcharge Dispute Guide",
+        "Build an evidence-backed dispute using the governing rate, shipment records, reproducible math and existing corrections.",
+    ),
+    "freight-audit-methodology.html": (
+        "RETALLY | Freight Audit Evidence Method",
+        "Explore a conservative review method covering shipment identity, rate authority, calculation, authorization and settlement.",
+    ),
+    "freight-audit-example.html": (
+        "RETALLY | Worked Freight Audit Example",
+        "A clearly labelled sample invoice walkthrough, from expected-charge calculation through supported findings and credit reconciliation.",
+    ),
+    "freight-audit-pricing.html": (
+        "RETALLY | Freight Audit Pricing Explained",
+        "$0 upfront for agreed eligible initial audit scope. Separate recovery fees apply only to eligible value actually recovered under written terms.",
+    ),
+    "second-look-freight-audit.html": (
+        "RETALLY | Independent Second-Look Freight Audit",
+        "An independent review starts by excluding issues, disputes and credits already identified by existing controls or auditors.",
+    ),
+    "trust.html": (
+        "RETALLY | Security, Review and Trust Center",
+        "Learn how freight information is handled, where human review matters and why confidential files stay off the public website.",
+    ),
+    "founding-program.html": (
+        "RETALLY | Freight Buyer Founding Program",
+        "Explore the founding program approach and the separate qualification, authorization and written engagement boundaries.",
+    ),
+    "referral-partners.html": (
+        "RETALLY | Freight Audit Referral Partners",
+        "Review the referral partner approach and evidence and authorization boundaries for business introductions.",
+    ),
+    "freight-recovery-evidence-standard.html": (
+        "RETALLY | Freight Recovery Evidence Standard",
+        "Separate candidate differences, supported findings, authorized claims, and eligible credits or refunds actually realized.",
+    ),
+    "post-payment-freight-audit.html": (
+        "RETALLY | Post-Payment Freight Audit Guide",
+        "Review historical paid freight invoices against governing rates, corrections and credit history to identify documented questions.",
+    ),
+    "freight-audit-companies.html": (
+        "RETALLY | Comparing Freight Audit Companies",
+        "Compare freight audit approaches by their scope, evidence rules, prior-credit treatment, recovery fees and authorization.",
+    ),
+}
 TAG_RE = {
     "title": re.compile(r"<title>([^<]+)</title>", re.IGNORECASE),
     "description": re.compile(r'<meta\s+name="description"\s+content="([^"]+)"\s*/?>',re.IGNORECASE),
@@ -90,16 +188,20 @@ def embed(content: str, page: str, *, available_images: set[str]) -> str:
         raise ValueError(f"Social image is missing from public source allowlist: {image}")
     if content.count("</head>")!=1:
         raise ValueError(f"{page}: unexpected <head> structure")
-    title=WORKSHEET_TITLE if page==WORKSHEET else _one(TAG_RE["title"],content,"title")
-    description=(WORKSHEET_DESCRIPTION if page==WORKSHEET
-                 else _one(TAG_RE["description"],content,"description"))
+    # Source title/description must exist even when the shorter social
+    # editorial text intentionally differs from SEO snippets.
+    _one(TAG_RE["title"],content,"title")
+    _one(TAG_RE["description"],content,"description")
+    if set(EDITORIAL_SHARE_META) != set(images):
+        raise ValueError("Social editorial copy must cover every registered public page")
+    title,description=EDITORIAL_SHARE_META[page]
     if "RETALLY" not in title.upper():
-        title += " | RETALLY"
+        raise ValueError(f"{page}: a share card must identify the real brand")
     canonical=_one(TAG_RE["canonical"],content,"canonical")
     expected=LEGACY_ROOT+page
     if canonical!=expected:
         raise ValueError(f"{page}: canonical URL does not match registered page")
-    if len(title)>95 or len(description)>240:
+    if len(title)>70 or len(description)>175:
         raise ValueError(f"{page}: social text should fit the source contract")
     if any(token in content for token in ('property="og:title"','name="twitter:card"',
                                           'property="og:image"')):
