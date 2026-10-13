@@ -1273,6 +1273,38 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["original_historical_findings_closed"]==0
                       for x in checkpoint53["cases"]),
               "M53_CHECKPOINT_ROLLBACK_NEGATIVE_NOT_REPRODUCED")
+        from freight.lab_checkpoint_mode_m54 import (
+            run_campaign as audit_checkpoint_downgrade_m54,
+            CASES as mode_attack_contract_m54,
+        )
+        mode54=audit_checkpoint_downgrade_m54(as_of=today)
+        _must(mode54["original_research_labs"]==14
+              and mode54["original_signed_checkpointed_technical_positive_controls"]==12
+              and mode54["same_sqlite_journal_downgrade_negative_scenarios"]==12
+              and mode54["current_exact_mode_or_checkpoint_negative_denials"]==13
+              and mode54["first_signed_review_sets_durable_mode_in_same_write_transaction"] is True
+              and mode54["already_open_and_reopened_legacy_clients_cannot_bypass_elevated_mode"] is True
+              and mode54["checkpoint_mode_bound_into_independent_signed_journal_state_hash"] is True
+              and mode54["checkpoint_security_requires_external_custody_against_full_privileged_rollback"] is True
+              and mode54["real_remote_checkpoint_custodian_provisioned"] is False
+              and mode54["customer_restore_activation_performed"] is False
+              and mode54["original_historical_findings_open"]==26
+              and mode54["original_historical_findings_closed"]==0
+              and mode54["human_first_customer_approval_gates_unmet"]==18
+              and mode54["real_recovered_customer_cash"] is None
+              and mode54["externally_publishable_empirical_claims_approved"]==0,
+              "M54_DOWNGRADE_PROTECTION_UNSUPPORTED_CUSTOMER_SECURITY_CLAIM")
+        _must(tuple(c["scenario"] for c in mode54["cases"])==
+              tuple(mode_attack_contract_m54)
+              and all(c["expected_exact_denial"]==
+                      mode_attack_contract_m54[c["scenario"]]
+                      and c["valid_original_signed_checkpointed_review_completed"] is True
+                      and c["adversarial_downgrade_or_bad_checkpoint_denied"] is True
+                      and c["current_review_rows_unchanged_by_denied_attempt"] is True
+                      and c["original_26_historical_findings_closed"]==0
+                      and c["independent_customer_pilot_gates_unmet"]==18
+                      for c in mode54["cases"]),
+              "M54_LOCAL_ONLY_DOWNGRADE_NEGATIVE_NOT_REPRODUCED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1476,6 +1508,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "signed_replay_checkpoint_exact_denials_m53":19,
                 "signed_replay_checkpoint_original_findings_closed_m53":0,
                 "signed_replay_checkpoint_receipt_sha256_m53":checkpoint53["receipt_sha256"],
+                "checkpoint_mode_positive_controls_m54":12,
+                "checkpoint_mode_negative_cases_m54":12,
+                "checkpoint_mode_exact_denials_m54":13,
+                "checkpoint_mode_original_findings_closed_m54":0,
+                "checkpoint_mode_receipt_sha256_m54":mode54["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

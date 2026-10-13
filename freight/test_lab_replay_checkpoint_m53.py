@@ -158,17 +158,19 @@ class M53SignedRollbackCheckpointTests(unittest.TestCase):
             self.assertEqual(completed["m53_successor_sequence"],3)
             self.assertEqual(fx["ledger"].verify()["durable_individual_witness_nonces"],6)
 
-    def test_original_m52_local_only_can_reaccept_coherently_rolled_back_request(self):
-        # This deliberately proves the limitation without mislabeling M52
-        # as globally repaired: only the explicit checkpointed M53 path
-        # detects separately held signed high-water state.
+    def test_original_m52_local_only_is_blocked_after_checkpoint_upgrade_but_legacy_still_risks_rollback(self):
+        # M54 eliminates the ordinary local-only downgrade on a journal
+        # whose first M53 checkpointed review was committed. It does NOT
+        # prove a still-local-only journal is resilient to privileged SQL.
         with tempfile.TemporaryDirectory() as td:
-            fx=lab._fixture(Path(td))
+            root=Path(td)
+            fx=lab._fixture(root)
             journal=fx["ledger"]
             before=(journal.path.stat().st_dev,journal.path.stat().st_ino)
             lab._rewrite_rows(journal,"ROLLBACK_TO_EMPTY_SAME_INODE")
             self.assertEqual((journal.path.stat().st_dev,journal.path.stat().st_ino),before)
             self.assertEqual(journal.verify()["technical_review_rows"],0)
+            self.assertTrue(journal.verify()["checkpoint_required_for_future_reviews"])
             with self.assertRaisesRegex(ValueError,"M53_CHECKPOINT_STATE_MISMATCH"):
                 backup.record_checkpointed_witnessed_recovery_review(
                     fx["bundle"],fx["result"],replay_ledger=journal,
@@ -179,14 +181,33 @@ class M53SignedRollbackCheckpointTests(unittest.TestCase):
                     checkpoint_audience=lab.AUDIENCE,
                 )
             self.assertEqual(journal.verify()["technical_review_rows"],0)
-            # Historical M52 local-only API still has no independent anchor
-            # and therefore accepts the exact same request again.
+            # After M54, plain M52 review ALSO cannot downgrade this
+            # elevated journal; a stored checkpoint may not be omitted.
+            with self.assertRaisesRegex(ValueError,
+                    "M54_REPLAY_CHECKPOINT_REQUIRED_LOCAL_DOWNGRADE"):
+                backup.record_witnessed_recovery_review(
+                    fx["bundle"],fx["result"],replay_ledger=journal,
+                    **fx["original_review_kwargs"]
+                )
+            self.assertEqual(journal.verify()["technical_review_rows"],0)
+
+            # The original M52 local-only creation path is deliberately
+            # still supported for unchanged legacy local test journals.
+            # It remains vulnerable to a privileged coherent row rewind.
+            legacy=TechnicalReviewReplayLedger(root/"never-elevated.sqlite3",create=True)
+            good=backup.record_witnessed_recovery_review(
+                fx["bundle"],fx["result"],replay_ledger=legacy,
+                **fx["original_review_kwargs"]
+            )
+            self.assertTrue(good["review_attempt_recorded_once"])
+            self.assertFalse(legacy.verify()["checkpoint_required_for_future_reviews"])
+            lab._rewrite_rows(legacy,"ROLLBACK_TO_EMPTY_SAME_INODE")
             old=backup.record_witnessed_recovery_review(
-                fx["bundle"],fx["result"],replay_ledger=journal,
+                fx["bundle"],fx["result"],replay_ledger=legacy,
                 **fx["original_review_kwargs"]
             )
             self.assertTrue(old["review_attempt_recorded_once"])
-            self.assertEqual(journal.verify()["technical_review_rows"],1)
+            self.assertEqual(legacy.verify()["technical_review_rows"],1)
 
     def test_six_concurrent_independent_requests_one_old_checkpoint_only_one_admitted(self):
         with tempfile.TemporaryDirectory() as td:

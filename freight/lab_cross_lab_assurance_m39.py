@@ -209,6 +209,10 @@ def _proof(lab: int, proof: dict) -> None:
             "signed_replay_checkpoint_negative_cases_m53": 19,
             "signed_replay_checkpoint_exact_denials_m53": 19,
             "signed_replay_checkpoint_original_findings_closed_m53": 0,
+            "checkpoint_mode_positive_controls_m54": 12,
+            "checkpoint_mode_negative_cases_m54": 12,
+            "checkpoint_mode_exact_denials_m54": 13,
+            "checkpoint_mode_original_findings_closed_m54": 0,
         }
         for name, expected_value in expected_flags.items():
             _check(name in proof
@@ -232,6 +236,7 @@ def _proof(lab: int, proof: dict) -> None:
             "technical_witness_receipt_sha256_m51",
             "technical_replay_receipt_sha256_m52",
             "signed_replay_checkpoint_receipt_sha256_m53",
+            "checkpoint_mode_receipt_sha256_m54",
         ):
             _check(_hex(proof.get(key)),
                    "LAB14_SOURCE_AND_PILOT_REPORT_RECEIPT_INVALID")

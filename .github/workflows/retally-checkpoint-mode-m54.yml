@@ -1,0 +1,195 @@
+name: RETALLY Lab 14 Checkpoint Mode Anti-Downgrade (Mission 54)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-checkpoint-mode-m54.yml'
+      - '.github/workflows/retally-signed-replay-checkpoint-m53.yml'
+      - 'freight/recovery_mode_m54.py'
+      - 'freight/recovery_replay_m52.py'
+      - 'freight/recovery_checkpoint_m53.py'
+      - 'freight/lab_checkpoint_mode_m54.py'
+      - 'freight/test_lab_checkpoint_mode_m54.py'
+      - 'freight/test_lab_replay_checkpoint_m53.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_CHECKPOINT_MODE_M54.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  real-checkpoint-transition-and-all-fourteen-original-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original pinned offline financial, Ed25519 and research requirements
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Prove persisted checkpoint mode and regress all earlier 14-lab controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_checkpoint_mode_m54.py \
+            freight/test_lab_replay_checkpoint_m53.py \
+            freight/test_lab_recovery_replay_m52.py \
+            freight/test_lab_recovery_witness_m51.py \
+            freight/test_lab_recovery_admission_m50.py \
+            freight/test_lab_dual_ledger_backup_m49.py \
+            freight/test_backup_restore.py \
+            freight/test_lab_audit_trust_boundary_m48.py \
+            freight/test_audit_store.py \
+            freight/test_audit_ledger.py \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Execute twelve actual downgrade attack cases and original fourteen Research Labs
+        run: |
+          PYTHONPATH=. python -m freight.lab_checkpoint_mode_m54 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m54
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m54-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('/tmp/retally-m54/checkpoint_mode_m54.json').read_text())
+          c=json.loads(Path('/tmp/retally-m54-control/phase4_control.json').read_text())
+          assert m['scope']=='RETALLY_LAB14_M54_ONE_WAY_CHECKPOINT_NO_DOWNGRADE_SYNTHETIC'
+          assert m['original_research_labs']==14 and m['new_lab_created'] is False
+          assert m['original_signed_checkpointed_technical_positive_controls']==12
+          assert m['same_sqlite_journal_downgrade_negative_scenarios']==12
+          assert m['current_exact_mode_or_checkpoint_negative_denials']==13
+          assert m['first_signed_review_sets_durable_mode_in_same_write_transaction'] is True
+          assert m['already_open_and_reopened_legacy_clients_cannot_bypass_elevated_mode'] is True
+          assert m['checkpoint_mode_bound_into_independent_signed_journal_state_hash'] is True
+          assert m['checkpoint_security_requires_external_custody_against_full_privileged_rollback'] is True
+          assert m['real_remote_checkpoint_custodian_provisioned'] is False
+          assert m['local_only_compatibility_remains_on_never_elevated_journals'] is True
+          assert m['customer_restore_activation_performed'] is False
+          assert len(m['cases'])==12
+          assert sum(row['rejection_count'] for row in m['cases'])==13
+          assert all(row['valid_original_signed_checkpointed_review_completed']
+                     and row['adversarial_downgrade_or_bad_checkpoint_denied']
+                     and row['current_review_rows_unchanged_by_denied_attempt']
+                     and row['all_four_customer_backup_images_untouched']
+                     and not row['real_external_custodian_or_bank_identity_provisioned']
+                     and row['original_26_historical_findings_closed']==0
+                     and row['independent_customer_pilot_gates_unmet']==18
+                     for row in m['cases'])
+          assert m['original_historical_findings_open']==26
+          assert m['original_historical_findings_closed']==0
+          assert m['human_first_customer_approval_gates_unmet']==18
+          assert m['real_recovered_customer_cash'] is None
+          assert len(c['lab_runs'])==14 and c['executed_labs']==list(range(1,15))
+          assert not c['failed_or_blocked_labs']
+          assert c['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert c['checkpoint_antidowngrade_m54']['receipt_sha256']==m['receipt_sha256']
+          assert c['signed_replay_checkpoint_m53']['exact_current_checkpoint_denials']==19
+          assert c['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert c['actual_revenue_cents']==0
+          assert 'checkpoint_mode_m54.html' in Path('/tmp/retally-m54-control/index.html').read_text()
+          print('M54: 12 original signed good checkpoint fixture cases, 13 exact local downgrade and header denials, all 14 historical labs. No actual trust service.')
+          PY
+      - name: Keep ephemeral research metadata, never reviewer keys or backup SQLite
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m54-checkpoint-mode-local-downgrade-synthetic-receipts
+          path: |
+            /tmp/retally-m54/checkpoint_mode_m54.json
+            /tmp/retally-m54/checkpoint_mode_m54.html
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-original-m53-local-only-downgrade-differential:
+    needs: real-checkpoint-transition-and-all-fourteen-original-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited synthetic fixture and ephemeral signature requirements
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Pin original exact M53 application and replay journal before mode downgrade changes
+        run: |
+          git fetch --no-tags --depth=1 origin 691b3c137a012712939ffd9a1c8e25d104ce2a16
+          git show 691b3c137a012712939ffd9a1c8e25d104ce2a16:freight/backup_restore.py > /tmp/m54_original_backup.py
+          git show 691b3c137a012712939ffd9a1c8e25d104ce2a16:freight/recovery_replay_m52.py > /tmp/m54_original_replay.py
+          test -s /tmp/m54_original_backup.py
+          test -s /tmp/m54_original_replay.py
+      - name: Independently prove old M53 could append without checkpoint on an elevated journal
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from dataclasses import asdict
+          from pathlib import Path
+          from unittest.mock import patch
+          from freight import backup_restore as current
+          from freight.lab_replay_checkpoint_m53 import _fixture
+          from freight.lab_recovery_replay_m52 import _new_signed_context
+
+          def load(name,where):
+              spec=importlib.util.spec_from_file_location(name,where)
+              obj=importlib.util.module_from_spec(spec)
+              sys.modules[name]=obj
+              spec.loader.exec_module(obj)
+              return obj
+          old_app=load('m54_old_m53_backup','/tmp/m54_original_backup.py')
+          old_replay=load('m54_old_m53_replay','/tmp/m54_original_replay.py')
+          assert hasattr(old_app,'record_witnessed_recovery_review')
+          assert not hasattr(old_app,'record_checkpointed_witnessed_recovery_review') is False
+          accepted_prior=denied_current=0
+          for case in ('FRESH_SIGNED_LOCAL_DOWNGRADE','ALREADY_OPEN_LEGACY_DOWNGRADE'):
+              with tempfile.TemporaryDirectory(prefix='m54-prior-and-current-') as td:
+                  fx=_fixture(Path(td))
+                  ledger=fx['ledger']
+                  assert ledger.verify()['checkpoint_required_for_future_reviews']
+                  new=_new_signed_context(
+                      fx['original_review_kwargs'],fx['reviewer_private_keys'],
+                      'm54-pinned-'+case
+                  )
+                  try:
+                      current.record_witnessed_recovery_review(
+                          fx['bundle'],fx['result'],replay_ledger=ledger,**new
+                      )
+                  except ValueError as exc:
+                      assert 'M54_REPLAY_CHECKPOINT_REQUIRED_LOCAL_DOWNGRADE' in str(exc)
+                      denied_current+=1
+                  else:
+                      raise AssertionError('M54 accepted local-only downgrade')
+                  previous_store=old_replay.TechnicalReviewReplayLedger(ledger.path)
+                  previous_result=old_app.BackupRestoreResult(**asdict(fx['result']))
+                  with patch.dict(sys.modules,{
+                      'freight.recovery_replay_m52':old_replay
+                  }):
+                      prior=old_app.record_witnessed_recovery_review(
+                          fx['bundle'],previous_result,
+                          replay_ledger=previous_store,**new
+                      )
+                  assert prior['review_attempt_recorded_once'] is True
+                  accepted_prior+=1
+          assert (accepted_prior,denied_current)==(2,2)
+          print('M54 pinned M53 application + replay source accepted two valid local-only requests on journals already checkpoint-elevated; M54 runtime refused both. No customer restore or external authority.')
+          PY

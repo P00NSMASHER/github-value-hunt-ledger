@@ -175,6 +175,10 @@ from freight.lab_replay_checkpoint_m53 import (
     run_campaign as run_signed_checkpoint_m53,
     render_html as render_signed_checkpoint_m53,
 )
+from freight.lab_checkpoint_mode_m54 import (
+    run_campaign as run_checkpoint_mode_m54,
+    render_html as render_checkpoint_mode_m54,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -238,6 +242,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["signed_replay_checkpoint_m53"]=run_signed_checkpoint_m53(
+            as_of=date.today()
+        )
+        result["checkpoint_antidowngrade_m54"]=run_checkpoint_mode_m54(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -382,6 +389,7 @@ def render(data: dict) -> str:
     review51=data["technical_recovery_witness_m51"]
     replay52=data["technical_review_replay_m52"]
     checkpoint53=data["signed_replay_checkpoint_m53"]
+    downgrade54=data["checkpoint_antidowngrade_m54"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -623,6 +631,17 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Checkpoint mode anti-downgrade — no return to local-only reviews</h2>
+<p>Existing Lab 14 demonstrates <strong>"""+str(downgrade54["same_sqlite_journal_downgrade_negative_scenarios"])+"""/12</strong>
+test-only downgrade cases denied after a signed M53 technical review.
+Its atomic persistent journal mode refuses older local-only M52 clients,
+even those opened before elevation; the M53 signed journal digest also
+commits to the checkpoint-required mode. <strong>This local mode is not
+immune to privileged SQLite header reset; a separately held signed
+checkpoint remains necessary to detect full rollback.</strong>
+No independent custodian service, actual bank/carrier authority, real
+customer activation or closure of the 26 historical findings.</p>
+<a href="checkpoint_mode_m54.html">Inspect no-downgrade and residual risk proofs ↗</a></section>
 <section class="panel"><h2>Signed off-journal replay checkpoint — coherent local rollback denied</h2>
 <p>Existing Lab 14 tests <strong>"""+str(checkpoint53["exact_current_checkpoint_denials"])+"""/19</strong>
 coherent same-inode replay journal rollbacks, row rewrites and false or
@@ -1286,6 +1305,14 @@ def main():
     )
     (args.out/"signed_replay_checkpoint_m53.html").write_text(
         render_signed_checkpoint_m53(data["signed_replay_checkpoint_m53"]),
+        encoding="utf-8"
+    )
+    (args.out/"checkpoint_mode_m54.json").write_text(
+        json.dumps(data["checkpoint_antidowngrade_m54"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"checkpoint_mode_m54.html").write_text(
+        render_checkpoint_mode_m54(data["checkpoint_antidowngrade_m54"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
