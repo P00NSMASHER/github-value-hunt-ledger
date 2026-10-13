@@ -374,16 +374,55 @@ def report_shell(*,as_of:date)->dict:
 
 
 def lookup_claim(report:dict,claim_id:str)->dict:
-    """Only controlled catalog IDs, never arbitrary claimed user text."""
+    """Typed lookup, not free-form approval or a forged hash as signature.
+
+    A matching local SHA is only a consistency check. The requested claim's
+    authority and numerical value must also match the immutable source
+    policy and the exact report's zero-publication boundaries.
+    """
     if type(claim_id) is not str or claim_id not in ALL_IDS:
         raise ValueError("M35_UNKNOWN_OR_UNCONTROLLED_CLAIM_IDENTIFIER")
-    if not _has_receipt(report) or report.get("scope")!=SCOPE:
+    if (not _has_receipt(report) or report.get("scope")!=SCOPE
+        or report.get("claim_count")!=16
+        or report.get("external_commercial_claims_authorized")!=0
+        or report.get("independent_customer_pilot_human_approvals_unmet")!=18
+        or report.get("research_to_publication_autopromotion_permitted") is not False):
         raise ValueError("M35_UNTRUSTED_OR_FORGED_CLAIM_DECISION_REPORT")
-    matching=[c for c in report.get("source_claim_registry",[])
-              if c.get("claim_id")==claim_id]
-    if len(matching)!=1:
-        raise ValueError("M35_CLAIM_MISSING_OR_DUPLICATED_FROM_APPROVED_POLICY")
-    return matching[0]
+    claims=report.get("source_claim_registry")
+    if type(claims) is not list or len(claims)!=16:
+        raise ValueError("M35_FORGED_CLAIM_CLEARANCE_OR_PUBLICATION_APPROVAL")
+    if any(
+        type(row) is not dict or row.get("claim_id")!=id_ or
+        row.get("external_claims_authorized") is not False or
+        row.get("carrier_or_customer_contacts_authorized") is not False or
+        row.get("claim_money_or_recovery_established") is not False
+        for row,id_ in zip(claims,ALL_IDS)
+    ):
+        raise ValueError("M35_FORGED_CLAIM_CLEARANCE_OR_PUBLICATION_APPROVAL")
+    index=ALL_IDS.index(claim_id)
+    row=claims[index]
+    entry=_policy()["claim_registry"][index]
+    for attr,key in (
+        ("claim_subject","name"),
+        ("metric_key","metric_key"),
+        ("internal_decision","internal_result"),
+        ("external_publication_decision","external_result"),
+        ("source_grade","evidence_class"),
+        ("reason","caveat"),
+        ("block_reason_code","block_reason_code"),
+        ("source_refs","source_refs"),
+    ):
+        if row.get(attr)!=entry.get(key):
+            raise ValueError("M35_FORGED_CLAIM_CLEARANCE_OR_PUBLICATION_APPROVAL")
+    if row.get("internal_value")!=entry["expected_value"]:
+        raise ValueError("M35_FORGED_CLAIM_CLEARANCE_OR_PUBLICATION_APPROVAL")
+    names=row.get("required_unmet_human_signoffs")
+    if (type(names) is not list
+        or [x.get("gate_id") for x in names]!=entry["required_pilot_gate_ids"]
+        or len(names)!=row.get("required_unmet_human_signoff_count")
+        or any(x.get("human_evidence_observed") is not False for x in names)):
+        raise ValueError("M35_FORGED_CLAIM_CLEARANCE_OR_PUBLICATION_APPROVAL")
+    return row
 
 
 def render_html(report:dict)->str:
