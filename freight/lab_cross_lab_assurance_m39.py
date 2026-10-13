@@ -168,6 +168,10 @@ def _proof(lab: int, proof: dict) -> None:
             "settlement_source_positive_controls_m43": 12,
             "settlement_source_denials_m43": 12,
             "settlement_source_original_defects_closed_m43": 0,
+            "persistent_semantic_current_cases_m44": 8,
+            "persistent_semantic_current_report_denials_m44": 8,
+            "persistent_semantic_reopen_denials_m44": 8,
+            "persistent_semantic_historical_findings_closed_m44": 0,
         }
         for name, expected_value in expected_flags.items():
             _check(name in proof
@@ -181,6 +185,7 @@ def _proof(lab: int, proof: dict) -> None:
             "critical_current_path_report_sha256_m41",
             "settlement_identity_report_sha256_m42",
             "settlement_source_report_sha256_m43",
+            "persistent_semantic_receipt_sha256_m44",
         ):
             _check(_hex(proof.get(key)),
                    "LAB14_SOURCE_AND_PILOT_REPORT_RECEIPT_INVALID")

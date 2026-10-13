@@ -101,7 +101,13 @@ class SettlementStore:
         try:
             conn.execute("PRAGMA journal_mode=WAL")
             conn.executescript(Path(__file__).with_name("settlement_schema.sql").read_text())
-            self._assert_scoped_schema(conn)
+            # Validate reopening from ONE pinned SQLite revision, not
+            # unrelated claim/event/reversal table reads across writers.
+            conn.execute("BEGIN")
+            try:
+                self._assert_scoped_schema(conn)
+            finally:
+                conn.rollback()
         finally:
             conn.close()
 
@@ -205,6 +211,12 @@ class SettlementStore:
                 "settlement database contains chronologically invalid evidence; "
                 "migrate or rebuild before use"
             )
+        # M44: trigger-constrained writes are not enough. Verify *stored*
+        # monetary/relational semantics on reopen, including previous rows
+        # that a privileged editor could alter before replacing triggers.
+        from freight.settlement_semantic_guard_m44 import audit_connection
+        audit_connection(conn)
+
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path, timeout=self.busy_timeout_ms / 1000, isolation_level=None)
@@ -739,6 +751,23 @@ class SettlementStore:
             self._scope,
         ).fetchone()[0]))
 
+    def assert_semantic_integrity(self) -> dict:
+        """Read-only scoped financial-source check over ONE SQLite revision.
+
+        Guarantees local structural invariants, NOT original bank/carrier
+        authentication. Intended for backup, audit and operator readiness.
+        """
+        from freight.settlement_semantic_guard_m44 import audit_connection
+
+        def op(conn: sqlite3.Connection) -> dict:
+            conn.execute("BEGIN")
+            try:
+                return audit_connection(conn, scope=self._scope)
+            finally:
+                conn.rollback()
+
+        return self._read(op)
+
     def report_snapshot_json(self) -> str:
         """Read one immutable, scope-bound report snapshot without writing rows.
 
@@ -758,6 +787,12 @@ class SettlementStore:
         def op(conn: sqlite3.Connection) -> str:
             conn.execute("BEGIN")
             try:
+                # Check under the SAME SQLite snapshot as the report rows.
+                # A syntactically valid but contradictory source cannot
+                # become an acceptable report just because no new write
+                # was made through the SettlementStore public API.
+                from freight.settlement_semantic_guard_m44 import audit_connection
+                audit_connection(conn, scope=self._scope)
                 rows = {
                     table: [dict(row) for row in conn.execute(
                         f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=? ORDER BY {key}",

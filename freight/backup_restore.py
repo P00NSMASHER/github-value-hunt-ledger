@@ -80,40 +80,55 @@ def _restore_copy(source_backup: Path, destination: Path) -> None:
     _sqlite_backup(source_backup,destination)
 
 
-def _settlement_content(settlement: SettlementStore) -> tuple[int, int, str]:
-    tables=(
-        "recovery_claims",
-        "review_claims",
-        "settlement_events",
-        "allocations",
-        "counter_events",
-        "reversal_edges",
+def _settlement_content(settlement: SettlementStore) -> dict:
+    """Guard then summarize ONE scoped SQLite revision.
+
+    Prior code queried six tables and accounting totals through separate
+    connections without a common read transaction. A concurrent return could
+    produce contradictory counts, cash totals and a valid-looking digest.
+    """
+    snapshot=json.loads(settlement.report_snapshot_json())
+    if (snapshot["buyer_id"],snapshot["business_unit"]) != (
+        settlement.buyer_id,settlement.business_unit
+    ):
+        raise RuntimeError("M44_SETTLEMENT_SNAPSHOT_SCOPE_CHANGED")
+    tables = snapshot["tables"]
+    expected = (
+        "recovery_claims", "review_claims", "settlement_events",
+        "allocations", "counter_events", "reversal_edges",
     )
-    conn=sqlite3.connect(settlement.path)
-    conn.row_factory=sqlite3.Row
-    try:
-        payload={}
-        counts={}
-        for table in tables:
-            rows=conn.execute(
-                f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=?",
-                (settlement.buyer_id,settlement.business_unit),
-            ).fetchall()
-            normalized=[dict(row) for row in rows]
-            normalized.sort(
-                key=lambda row: json.dumps(
-                    row,sort_keys=True,separators=(",",":"),ensure_ascii=False
-                )
+    if set(tables) != set(expected):
+        raise RuntimeError("M44_SETTLEMENT_SNAPSHOT_MISSING_TABLES")
+    payload = {}
+    counts = {}
+    for table in expected:
+        normalized = list(tables[table])
+        normalized.sort(
+            key=lambda row: json.dumps(
+                row, sort_keys=True, separators=(",",":"), ensure_ascii=False
             )
-            payload[table]=normalized
-            counts[table]=len(normalized)
-    finally:
-        conn.close()
-    return (
-        counts["recovery_claims"],
-        counts["review_claims"],
-        canonical_hash({"schema":1,"tables":payload}),
+        )
+        payload[table] = normalized
+        counts[table] = len(normalized)
+    reversed_by_id = {}
+    for row in tables["reversal_edges"]:
+        key = row["allocation_id"]
+        reversed_by_id[key] = reversed_by_id.get(key,0)+row["amount_cents"]
+    realized = sum(row["amount_cents"] for row in tables["allocations"]) - sum(
+        row["amount_cents"] for row in tables["reversal_edges"]
     )
+    eligible = sum(
+        max(0,row["fee_eligible_cents"]-reversed_by_id.get(row["allocation_id"],0))
+        for row in tables["allocations"]
+        if row["fee_eligible_cents"] == row["amount_cents"]
+    )
+    return {
+        "counts": counts,
+        "settlement_content_hash":
+            canonical_hash({"schema":1,"tables":payload}),
+        "realized_cents": realized,
+        "fee_eligible_cents": eligible,
+    }
 
 
 def workspace_summary(
@@ -123,23 +138,24 @@ def workspace_summary(
     if (audit.buyer_id,audit.business_unit)!=(settlement.buyer_id,settlement.business_unit):
         raise ValueError("audit/settlement workspace scope mismatch")
     audit.verify()
-    recovery_claim_count,review_claim_count,settlement_content_hash=_settlement_content(
-        settlement
-    )
+    # All settlement counts and cents are derived from the exact SAME
+    # semantically validated source snapshot, not six independent read views.
+    settlement_state=_settlement_content(settlement)
+    counts=settlement_state["counts"]
     body={
         "buyer_id":audit.buyer_id,
         "business_unit":audit.business_unit,
         "audit_record_count":audit.count(),
         "audit_chain_head":audit.head(),
-        "recovery_claim_count":recovery_claim_count,
-        "review_claim_count":review_claim_count,
-        "settlement_event_count":settlement.count("settlement_events"),
-        "allocation_count":settlement.count("allocations"),
-        "counter_event_count":settlement.count("counter_events"),
-        "reversal_edge_count":settlement.count("reversal_edges"),
-        "realized_cents":settlement.realized_cents(),
-        "fee_eligible_cents":settlement.fee_eligible_cents(),
-        "settlement_content_hash":settlement_content_hash,
+        "recovery_claim_count":counts["recovery_claims"],
+        "review_claim_count":counts["review_claims"],
+        "settlement_event_count":counts["settlement_events"],
+        "allocation_count":counts["allocations"],
+        "counter_event_count":counts["counter_events"],
+        "reversal_edge_count":counts["reversal_edges"],
+        "realized_cents":settlement_state["realized_cents"],
+        "fee_eligible_cents":settlement_state["fee_eligible_cents"],
+        "settlement_content_hash":settlement_state["settlement_content_hash"],
     }
     return WorkspaceSemanticSummary(
         **body,

@@ -980,6 +980,31 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["historical_recoveryos_finding_closed"] is False
                       for x in temporal43["cases"]),
               "M43_CURRENT_SOURCE_NEGATIVE_OR_POSITIVE_CASE_NOT_VERIFIED")
+        from freight.lab_persistent_semantic_m44 import (
+            run_campaign as audit_persistent_source_m44,
+            ATTACKS as persistent_attack_ids_m44,
+        )
+        persistent44=audit_persistent_source_m44(as_of=today)
+        _must(persistent44["current_persistent_store_cases"]==8
+              and persistent44["positive_current_store_controls"]==8
+              and persistent44["reported_financial_drift_denials"]==8
+              and persistent44["explicit_audit_denials"]==8
+              and persistent44["reopen_denials"]==8
+              and persistent44["original_historical_findings_open"]==26
+              and persistent44["original_historical_findings_closed"]==0
+              and persistent44["original_vulnerable_git_baselines_replayed"]==0
+              and persistent44["separate_independent_human_customer_pilot_controls_unmet"]==18
+              and persistent44["external_empirical_recovery_claims_approved"]==0,
+              "M44_PERSISTENT_FINANCIAL_SEMANTICS_OR_HISTORICAL_CLAIMS_BROKEN")
+        _must(tuple(x["scenario"] for x in persistent44["cases"])==
+              tuple(persistent_attack_ids_m44)
+              and all(x["expected_exact_rejection"]==persistent_attack_ids_m44[x["scenario"]]
+                      and x["current_store_report_rejected"] is True
+                      and x["current_store_audit_rejected"] is True
+                      and x["reopen_existing_store_rejected"] is True
+                      and x["original_historical_recoveryos_defect_closed"] is False
+                      for x in persistent44["cases"]),
+              "M44_PERSISTENT_REOPEN_REPORT_OR_AUDIT_FALSE_ACCEPTANCE")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1132,6 +1157,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "settlement_source_denials_m43":12,
                 "settlement_source_original_defects_closed_m43":0,
                 "settlement_source_report_sha256_m43":temporal43["receipt_sha256"],
+                "persistent_semantic_current_cases_m44":8,
+                "persistent_semantic_current_report_denials_m44":8,
+                "persistent_semantic_reopen_denials_m44":8,
+                "persistent_semantic_historical_findings_closed_m44":0,
+                "persistent_semantic_receipt_sha256_m44":persistent44["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

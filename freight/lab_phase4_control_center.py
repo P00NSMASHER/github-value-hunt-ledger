@@ -135,6 +135,10 @@ from freight.lab_settlement_source_m43 import (
     run_campaign as run_settlement_source_m43,
     render_html as render_settlement_source_m43,
 )
+from freight.lab_persistent_semantic_m44 import (
+    run_campaign as run_persistent_semantic_m44,
+    render_html as render_persistent_semantic_m44,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -168,6 +172,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["settlement_source_m43"]=run_settlement_source_m43(
+            as_of=date.today()
+        )
+        result["persistent_semantic_m44"]=run_persistent_semantic_m44(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -302,6 +309,7 @@ def render(data: dict) -> str:
     critical41=data["critical_counterexamples_m41"]
     identity42=data["settlement_identity_m42"]
     temporal43=data["settlement_source_m43"]
+    persistent44=data["persistent_semantic_m44"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -543,6 +551,15 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Persistent settlement file — eight semantic tamper shields</h2>
+<p>The original persistent SettlementStore now fails closed on
+<strong>"""+str(persistent44["reported_financial_drift_denials"])+"""/8</strong>
+current-code financial contradictions when reopening files, generating
+operational snapshots, or directly auditing stored semantics. Backups now
+use one consistent, semantically checked SQLite report for all counts and
+cash/fee fields. No independently verified bank, carrier or customer source
+is implied; <strong>all 26 original historical findings remain open.</strong></p>
+<a href="persistent_semantic_m44.html">Review all eight verified rejection reasons ↗</a></section>
 <section class="panel"><h2>Source and settlement timeline — 12 real current-code defenses</h2>
 <p>Independent verifier checks <strong>"""+str(temporal43["current_verifier_exact_negative_denials"])+"""/12</strong>
 malformed settlement scenarios with matching positive controls: transient
@@ -1031,6 +1048,14 @@ def main():
     )
     (args.out/"settlement_source_m43.html").write_text(
         render_settlement_source_m43(data["settlement_source_m43"]),
+        encoding="utf-8"
+    )
+    (args.out/"persistent_semantic_m44.json").write_text(
+        json.dumps(data["persistent_semantic_m44"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"persistent_semantic_m44.html").write_text(
+        render_persistent_semantic_m44(data["persistent_semantic_m44"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
