@@ -206,6 +206,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("signed_replay_checkpoint_negative_cases_m53", 18),
             ("signed_replay_checkpoint_exact_denials_m53", 18),
             ("signed_replay_checkpoint_original_findings_closed_m53", 1),
+            ("checkpoint_mode_positive_controls_m54", 11),
+            ("checkpoint_mode_negative_cases_m54", 11),
+            ("checkpoint_mode_exact_denials_m54", 12),
+            ("checkpoint_mode_original_findings_closed_m54", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)

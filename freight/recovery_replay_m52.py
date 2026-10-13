@@ -106,6 +106,10 @@ def _validate(conn:sqlite3.Connection)->dict:
     """Validate entire persistent replay record on one SQLite revision."""
     if _catalog(conn)!=_expected_catalog():
         _reject("SQLITE_REPLAY_SCHEMA_DRIFT")
+    # M54: the journal's header security mode is part of validation,
+    # without modifying M52's committed schema or auto-migrating files.
+    from freight.recovery_mode_m54 import mode
+    current_security_mode=mode(conn)
     if conn.execute("PRAGMA integrity_check").fetchone()[0]!="ok":
         _reject("SQLITE_INTEGRITY_FAILURE")
     if conn.execute("PRAGMA foreign_key_check").fetchone() is not None:
@@ -156,6 +160,8 @@ def _validate(conn:sqlite3.Connection)->dict:
         "technical_review_rows":len(rows),
         "durable_individual_witness_nonces":len(nonce_rows),
         "schema_and_local_history_consistent":True,
+        "checkpoint_required_for_future_reviews":
+            current_security_mode==54,
     }
 
 
@@ -281,6 +287,16 @@ class TechnicalReviewReplayLedger:
             con.execute("BEGIN IMMEDIATE")
             try:
                 _validate(con)
+                from freight.recovery_mode_m54 import (
+                    require_safe_mode,advance_mode,
+                )
+                # The local-only path CANNOT downgrade a journal once a
+                # checkpointed review raised its durable mode under this
+                # same write lock. A client opened earlier also sees mode
+                # after waiting for a concurrent checkpoint transaction.
+                require_safe_mode(
+                    con,has_signed_checkpoint=checkpoint is not None
+                )
                 # M53 high-assurance mode: verify a signed, off-journal
                 # replay checkpoint UNDER THE SAME BEGIN IMMEDIATE LOCK as
                 # the one-time request/nonce inserts. Validation before
@@ -318,6 +334,12 @@ class TechnicalReviewReplayLedger:
                         "INSERT INTO witness_nonce_consumptions "
                         "VALUES (?,?,?,?,?,?)",row
                     )
+                if checkpoint_proof is not None:
+                    # Flip 0->54 in the SAME BEGIN IMMEDIATE revision.
+                    # Rejections/rollback undo BOTH the new reviews and
+                    # this mode. The successor M53 signature will include
+                    # this committed one-way security-mode elevation.
+                    advance_mode(con,verified_checkpoint=True)
                 summary=_validate(con)
                 successor=None
                 if checkpoint_proof is not None:

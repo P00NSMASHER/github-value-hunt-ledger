@@ -64,6 +64,8 @@ def journal_state(conn)->dict:
     match across reopening and SQLite WAL checkpoints.
     """
     assurance=_validate(conn)
+    from freight.recovery_mode_m54 import mode
+    local_security_mode=mode(conn)
     reviewed=conn.execute(
         "SELECT restore_request_id,manifest_sha256,result_proof_sha256,"
         "buyer_id,business_unit,audience,reviewed_at_utc,receipt_set_sha256,decision "
@@ -79,9 +81,11 @@ def journal_state(conn)->dict:
         _fail("SOURCE_CHANGED_INSIDE_SNAPSHOT")
     return {
         "review_sequence":len(reviewed),
+        "local_checkpoint_mode":local_security_mode,
         "journal_state_sha256":canonical_hash({
             "schema_version":1,
-            "purpose":"M53_COMPLETE_LOCAL_REPLAY_JOURNAL_ROW_IMAGE",
+            "purpose":"M54_COMPLETE_LOCAL_REPLAY_JOURNAL_ROW_AND_SECURITY_MODE",
+            "local_checkpoint_mode":local_security_mode,
             "review_rows":[list(row) for row in reviewed],
             "nonce_rows":[list(row) for row in nonces],
         }),

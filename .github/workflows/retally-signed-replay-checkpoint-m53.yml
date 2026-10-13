@@ -130,11 +130,14 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 origin 3d663d554fb76f6099066d503be6d5eb83970ea5
           git show 3d663d554fb76f6099066d503be6d5eb83970ea5:freight/backup_restore.py > /tmp/m53_old_local_replay_record.py
+          git show 3d663d554fb76f6099066d503be6d5eb83970ea5:freight/recovery_replay_m52.py > /tmp/m53_old_local_replay_impl.py
           test -s /tmp/m53_old_local_replay_record.py
+          test -s /tmp/m53_old_local_replay_impl.py
       - name: Reproduce M52 coherent same-inode rollback bypass and M53 signed anchor denial
         run: |
           PYTHONPATH=. python - <<'PY'
           import importlib.util,sys,tempfile
+          from unittest.mock import patch
           from dataclasses import asdict
           from pathlib import Path
           from freight import backup_restore as guarded
@@ -148,6 +151,17 @@ jobs:
           spec.loader.exec_module(old)
           assert hasattr(old,'record_witnessed_recovery_review')
           assert not hasattr(old,'record_checkpointed_witnessed_recovery_review')
+          # M54 journals are promoted after M53's first checkpoint.
+          # A scientifically honest predecessor differential must load
+          # BOTH original M52 application and journal implementation,
+          # not silently call the new stricter M54 replay class.
+          name_impl='m53_pinned_m52_journal_impl'
+          spec_impl=importlib.util.spec_from_file_location(
+              name_impl,'/tmp/m53_old_local_replay_impl.py'
+          )
+          old_impl=importlib.util.module_from_spec(spec_impl)
+          sys.modules[name_impl]=old_impl
+          spec_impl.loader.exec_module(old_impl)
           old_false_accepts=guarded_denials=0
           for attack in ('ROLLBACK_TO_EMPTY_SAME_INODE',
                          'REWRITE_REVIEW_MANIFEST_VALID_ROWS'):
@@ -176,10 +190,17 @@ jobs:
                   # checkpoint, so a new proper request is admitted from
                   # an internally valid but rolled-back/tampered journal.
                   old_result=old.BackupRestoreResult(**asdict(fx['result']))
-                  prior=old.record_witnessed_recovery_review(
-                      fx['bundle'],old_result,
-                      replay_ledger=ledger,**fx['next_review_kwargs']
+                  predecessor_ledger=old_impl.TechnicalReviewReplayLedger(
+                      ledger.path
                   )
+                  with patch.dict(sys.modules,{
+                      'freight.recovery_replay_m52':old_impl
+                  }):
+                      prior=old.record_witnessed_recovery_review(
+                          fx['bundle'],old_result,
+                          replay_ledger=predecessor_ledger,
+                          **fx['next_review_kwargs']
+                      )
                   assert prior['review_attempt_recorded_once'] is True
                   old_false_accepts+=1
           assert (old_false_accepts,guarded_denials)==(2,2)
