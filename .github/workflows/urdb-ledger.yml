@@ -26,7 +26,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  authorize:
+    name: Authenticate exact current main and bound external resource inputs
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check out immutable triggering main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Admit immutable main and strictly bounded resource use
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_HISTORY_LIMIT: ${{ inputs.history_limit || '100' }}
+          INPUT_RETENTION_DAYS: ${{ inputs.retention_days || '90' }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          CURRENT="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
+          test -n "$CURRENT" && test "$CURRENT" = "$EXPECTED_SHA" || { echo "::error::Missing or stale main source"; exit 1; }
+          LIMIT="$INPUT_HISTORY_LIMIT"
+          [[ "$LIMIT" =~ ^[1-9][0-9]{0,2}$ ]] || { echo "::error::Malformed history_limit"; exit 1; }
+          COUNT=$((10#$LIMIT))
+          (( COUNT>=1 && COUNT<=100 )) || { echo "::error::history_limit exceeds bounded 1..100"; exit 1; }
+          [[ "$INPUT_RETENTION_DAYS" =~ ^[1-9][0-9]?$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
+          RETAIN=$((10#$INPUT_RETENTION_DAYS))
+          (( RETAIN>=1 && RETAIN<=90 )) || { echo "::error::Artifact retention must be 1..90"; exit 1; }
+          echo "Authorized main resource limits: index/history=$COUNT, retention=$RETAIN"
+
   test:
+    needs: authorize
     runs-on: ubuntu-latest
     defaults:
       run:
