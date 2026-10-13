@@ -276,6 +276,25 @@ QA_SCRIPT = r'''() => {
 }'''
 
 
+def slide_alt(concept: str, number: int) -> str:
+    """Per-slide accessibility text, never a fabricated customer description."""
+    if concept not in CONCEPTS or number not in (1,2,3,4):
+        raise ValueError("Unrecognized concept or slide")
+    item=TOPICS[concept]
+    if number==1:
+        detail="Topic opener: "+re.sub(r"<[^>]+>"," ",item["cover"]).strip()+". "+item["lead"]
+    elif number==2:
+        detail="Three evidence checks: "+ "; ".join(
+            f"{title}: {description}" for _,title,description in item["three"])
+    elif number==3:
+        detail=("Separate proof from assumption. Evidence to confirm: "+
+                item["evidence"]+" Do not assume: "+item["not_evidence"])
+    else:
+        detail=("Summary: "+re.sub(r"<[^>]+>"," ",item["last"]).strip()+". "+
+                item["closer"]+" Read the educational guide.")
+    return "RETALLY Field Notes, slide "+str(number)+" of 4. "+detail+" Illustrative framework; not an actual customer outcome."
+
+
 def png_dimensions(blob: bytes) -> tuple[int,int]:
     if not blob.startswith(b"\x89PNG\r\n\x1a\n") or len(blob)<24:
         raise ValueError("Screenshot is not PNG")
@@ -343,7 +362,9 @@ def render(repo: Path, output: Path, *, concept: str="all",
                         "phone_preview":str(phone),"sha256":digest(full),
                         "phone_sha256":digest(phone),"qa":qa,
                         "publication_approved":False,
-                        "human_visual_review_required":True
+                        "human_visual_review_required":True,
+                        "proposed_alt_text":slide_alt(name,number),
+                        "educational_page":"/"+v3.COPY[name]["site_slug"]
                     })
                     page.close();scaled.close()
         finally:
