@@ -1,0 +1,352 @@
+{
+  "brand": "RETALLY",
+  "createdDate": "2026-10-13",
+  "brandId": "7322512",
+  "series": "February 2027: Eight Freight AP Evidence Controls",
+  "status": "APPROVED_FOR_METRICOOL_SCHEDULING_NOT_PUBLICATION_RECEIPT",
+  "purpose": "Durable educational organic content across eight current buyer questions, varied website destinations",
+  "calendar": "Feb 2-26 2027, Tuesday/Thursday Facebook 09:00 ET; Wednesday/Friday Instagram 10:00 ET",
+  "imagePolicy": "Only previously scheduled RETALLY-owned/brand-used CDN media. Per-platform exact asset repeats no more than 3 across Oct 2026-Feb 2027. Two Facebook link-first posts intentionally have no image and may receive platform-generated OG previews, which are not guaranteed.",
+  "legalBoundary": "No real customer claims, estimated refund promises, authorization bypass, confidential files in social DMs, paid media, registration, account changes or lead claims.",
+  "instagramBoundary": "Caption contains no non-clickable links or unverified bio-link claim",
+  "socialProofBoundary": "Scheduled state is not independent proof of public platform delivery",
+  "existingCalendarUnchanged": true,
+  "posts": [
+    {
+      "topic": "invoice_identity",
+      "network": "facebook",
+      "dateTime": "2027-02-02T09:00:00",
+      "timezone": "America/New_York",
+      "text": "A freight invoice can be mathematically correct and still be linked to the wrong shipment or service.\n\nBefore recalculating anything, match the invoice to the shipment identifier, carrier, account, freight mode and service level. Then locate the governing commercial terms and check for replacements or prior credits.\n\nThe first deliverable is a traceable record—not an estimated refund.\n\nUse RETALLY's free 15-point printable review checklist:\nhttps://www.retallyrecovery.com/freight-invoice-audit-checklist?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_invoice_identity#worksheet\n\n#FreightAudit #TransportationFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black illustration explaining freight overcharge reviews in four steps: review invoices; check rates and shipment records; find billing errors; help pursue authorized recovery. Glossy black truck at a container port with an emerald network globe and raised glass step cards. Initial audit $0 upfront for agreed eligible scope."
+      ],
+      "sourceDay": "2026-11-10",
+      "sourceNetwork": "facebook",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "invoice_identity",
+      "network": "instagram",
+      "dateTime": "2027-02-03T10:00:00",
+      "timezone": "America/New_York",
+      "text": "What is the FIRST thing to check on a freight invoice?\n\nNot the total. The shipment identity.\n\nMatch the bill to its shipment or PRO number, carrier, account, service level and the records showing what actually moved. Only then compare the charge with the governing terms.\n\nSave this starting sequence for your next freight AP review.\n\n#RETALLY #FreightAudit #AccountsPayable",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black illustration explaining freight overcharge reviews in four steps: review invoices; check rates and shipment records; find billing errors; help pursue authorized recovery. Glossy black truck at a container port with an emerald network globe and raised glass step cards. Initial audit $0 upfront for agreed eligible scope."
+      ],
+      "sourceDay": "2026-10-13",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "rebill_or_duplicate",
+      "network": "facebook",
+      "dateTime": "2027-02-04T09:00:00",
+      "timezone": "America/New_York",
+      "text": "Two invoices contain the same shipment number. That is a reason to investigate—not yet proof of duplicate payment.\n\nTrace the original bill, any correction or replacement, the credit memo and the payment ledger. Ask whether the second document replaces the first or represents a separately authorized charge.\n\nA useful finding identifies the final economic obligation and what, if anything, remains paid twice.\n\nSee the duplicate-freight-charge evidence guide:\nhttps://www.retallyrecovery.com/duplicate-freight-charges?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_rebill_or_duplicate\n\n#FreightAudit #TransportationFinance",
+      "media": [],
+      "mediaAltText": [],
+      "sourceDay": null,
+      "sourceNetwork": null,
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "rebill_or_duplicate",
+      "network": "instagram",
+      "dateTime": "2027-02-05T10:00:00",
+      "timezone": "America/New_York",
+      "text": "TWO INVOICES ≠ TWO OVERPAYMENTS.\n\nA corrected bill can leave a misleading duplicate in an export. Before flagging it, connect four records: original invoice → replacement bill → payment → posted credit.\n\nOnly a reconciled remaining duplicate is a candidate for a supported finding. A carrier correction already received isn't a fresh recovery.\n\nSave this four-document check.\n\n#RETALLY #FreightBilling #InvoiceAudit",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium black-and-emerald freight billing graphic. Headline: 'TWO INVOICES. ONE SHIPMENT. NOT ALWAYS A DUPLICATE.' Explains that a corrected bill or credit can explain a second invoice, with three glowing cards: Match the shipment; Check corrected bills; Reconcile credits. Dark tractor-trailer at a port and reminder to investigate before claiming an overcharge."
+      ],
+      "sourceDay": "2026-10-15",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "liftgate_trigger",
+      "network": "facebook",
+      "dateTime": "2027-02-09T09:00:00",
+      "timezone": "America/New_York",
+      "text": "A liftgate accessorial appears on an LTL bill. Which evidence would show whether it belongs?\n\nStart with the agreement: is the service included, separately billable or conditional? Then inspect the delivery notation, proof of delivery and any correction or prior credit.\n\nA charge label tells you what was billed. It doesn't establish whether the service occurred or the separate fee was authorized.\n\nReview the four-slide accessorial evidence guide:\nhttps://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_liftgate_trigger\n\n#FreightAudit #TransportationFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-5383715596287589583.png",
+        "https://static.metricool.com/planner/202610/7322512-file-14757960404333438328.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11336803061927960596.png",
+        "https://static.metricool.com/planner/202610/7322512-file-4301373812253712825.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes asks what evidence supports a billed liftgate fee.",
+        "Slide 2: check the governing contract or tariff, included services, trigger conditions and effective terms.",
+        "Slide 3: verify the delivery record, service notation and shipment identity before flagging an accessorial fee.",
+        "Slide 4: saveable checklist: governing terms, service evidence and prior credits, with no automatic refund claim."
+      ],
+      "sourceDay": "2026-12-01",
+      "sourceNetwork": "facebook",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "liftgate_trigger",
+      "network": "instagram",
+      "dateTime": "2027-02-10T10:00:00",
+      "timezone": "America/New_York",
+      "text": "LIFTGATE FEE: WHAT WOULD YOU ASK FIRST?\n\nSwipe through the evidence chain:\n\n1 / What did the signed rate terms permit?\n2 / Was liftgate actually required or provided?\n3 / Does the delivery record support the event?\n4 / Did the carrier already correct or credit it?\n\nA bill line alone cannot answer those questions. Sometimes the fee is appropriate.\n\n#RETALLY #LTLFreight #FreightAudit",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-5383715596287589583.png",
+        "https://static.metricool.com/planner/202610/7322512-file-14757960404333438328.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11336803061927960596.png",
+        "https://static.metricool.com/planner/202610/7322512-file-4301373812253712825.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes asks what evidence supports a billed liftgate fee.",
+        "Slide 2: check the governing contract or tariff, included services, trigger conditions and effective terms.",
+        "Slide 3: verify the delivery record, service notation and shipment identity before flagging an accessorial fee.",
+        "Slide 4: saveable checklist: governing terms, service evidence and prior credits, with no automatic refund claim."
+      ],
+      "sourceDay": "2026-11-03",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "fuel_index_window",
+      "network": "facebook",
+      "dateTime": "2027-02-11T09:00:00",
+      "timezone": "America/New_York",
+      "text": "A fuel surcharge can use the correct formula and still reference the wrong effective schedule.\n\nTo independently reconstruct it, identify the signed rate authority, fuel index and lookback period, eligible transportation base, effective percentage table and rounding method.\n\nDon't substitute a newer online index—or simply choose the lower percentage—without the governing agreement.\n\nUse RETALLY's carrier-rate review checklist:\nhttps://www.retallyrecovery.com/carrier-rate-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_fuel_index_window\n\n#FreightAudit #TransportationFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16995368350622866353.png",
+        "https://static.metricool.com/planner/202610/7322512-file-2827369008175147549.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11515298540851319582.png",
+        "https://static.metricool.com/planner/202610/7322512-file-3480295111158624296.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: one freight shipment, two rate sheets; which version applies?",
+        "Slide 2: review the shipment date, contract rate effective dates and signed amendments.",
+        "Slide 3: review governing contracts, referenced tariffs and exceptions before asserting a discrepancy.",
+        "Slide 4: saveable checklist of rate authority, controlling dates and credits."
+      ],
+      "sourceDay": "2026-12-03",
+      "sourceNetwork": "facebook",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "fuel_index_window",
+      "network": "instagram",
+      "dateTime": "2027-02-12T10:00:00",
+      "timezone": "America/New_York",
+      "text": "ONE LOAD. TWO FUEL SURCHARGE TABLES.\n\nThe lower table isn't automatically the valid one.\n\nConfirm the contract, shipment date, applicable fuel index period, eligible base charge and rounding. Amendments and incorporated tariffs can change the answer.\n\nIf the controlling source is missing, the result is an unresolved question—not recovered money.\n\nSave this rate-authority checklist.\n\n#RETALLY #CarrierRates #LogisticsFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16995368350622866353.png",
+        "https://static.metricool.com/planner/202610/7322512-file-2827369008175147549.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11515298540851319582.png",
+        "https://static.metricool.com/planner/202610/7322512-file-3480295111158624296.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: one freight shipment, two rate sheets; which version applies?",
+        "Slide 2: review the shipment date, contract rate effective dates and signed amendments.",
+        "Slide 3: review governing contracts, referenced tariffs and exceptions before asserting a discrepancy.",
+        "Slide 4: saveable checklist of rate authority, controlling dates and credits."
+      ],
+      "sourceDay": "2026-11-05",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "free_audit_terms",
+      "network": "facebook",
+      "dateTime": "2027-02-16T09:00:00",
+      "timezone": "America/New_York",
+      "text": "What does a $0-upfront freight audit actually establish?\n\nAn agreed eligible population can be reviewed without an initial audit fee. That does not guarantee that a discrepancy exists, that a carrier will accept a claim or that any refund will follow.\n\nSeparate recovery work requires written authorization. Fees are governed by eligible value actually recovered under the agreed terms—not hypothetical savings.\n\nCompare the stages and pricing boundaries:\nhttps://www.retallyrecovery.com/freight-audit-pricing?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_free_audit_terms\n\n#FreightAudit #TransportationFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9714268420423041954.png"
+      ],
+      "mediaAltText": [
+        "RETALLY green-and-cream pricing graphic: A $0 audit isn't a refund promise. Scope, evidence and written authorization come before recovery, with no guaranteed results."
+      ],
+      "sourceDay": "2026-11-24",
+      "sourceNetwork": "facebook",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "free_audit_terms",
+      "network": "instagram",
+      "dateTime": "2027-02-17T10:00:00",
+      "timezone": "America/New_York",
+      "text": "A FREE AUDIT IS NOT A REFUND PROMISE.\n\nRETALLY's initial review is $0 upfront for agreed eligible scope.\n\nThe sequence is distinct: review invoices → document candidate differences → validate findings → separately authorize recovery → reconcile eligible funds or credits actually received.\n\nResults aren't guaranteed. Estimated savings are not cash.\n\nSave this explanation for your next audit-provider comparison.\n\n#RETALLY #FreightAudit #FreightRecovery",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9714268420423041954.png"
+      ],
+      "mediaAltText": [
+        "RETALLY green-and-cream pricing graphic: A $0 audit isn't a refund promise. Scope, evidence and written authorization come before recovery, with no guaranteed results."
+      ],
+      "sourceDay": "2026-10-23",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "dispute_packet",
+      "network": "facebook",
+      "dateTime": "2027-02-18T09:00:00",
+      "timezone": "America/New_York",
+      "text": "Would a second reviewer be able to understand a freight-billing dispute without asking for missing records?\n\nA useful case file contains five elements: shipment and invoice identity; the challenged charge; controlling rate authority; service evidence; and a reproducible expected-charge calculation, reconciled against prior credits.\n\nA supported calculation makes a claim reviewable. It isn't carrier approval or recovered funds. Customer authorization precedes any recovery outreach.\n\nSee the dispute-package sequence:\nhttps://www.retallyrecovery.com/freight-overcharge-dispute-process?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_dispute_packet\n\n#FreightAudit #TransportationFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2631313547745864893.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY's freight audit methodology: charge, controlling rate authority, shipment/service evidence and final disposition with credits."
+      ],
+      "sourceDay": "2026-11-17",
+      "sourceNetwork": "facebook",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "dispute_packet",
+      "network": "instagram",
+      "dateTime": "2027-02-19T10:00:00",
+      "timezone": "America/New_York",
+      "text": "WHAT BELONGS IN A FREIGHT DISPUTE PACKET?\n\nFive things:\n\n01 / Exact shipment and invoice\n02 / The charge being questioned\n03 / Governing rate or tariff\n04 / Service and delivery evidence\n05 / Reproducible math and prior-credit check\n\nThat package supports review. It doesn't guarantee a carrier will approve a claim.\n\nSave this before sending a dispute.\n\n#RETALLY #FreightDisputes #InvoiceAudit",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2631313547745864893.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY's freight audit methodology: charge, controlling rate authority, shipment/service evidence and final disposition with credits."
+      ],
+      "sourceDay": "2026-10-19",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "private_records",
+      "network": "facebook",
+      "dateTime": "2027-02-23T09:00:00",
+      "timezone": "America/New_York",
+      "text": "Freight invoices and rate contracts can contain private pricing and account details. Social comments and DMs are not the appropriate route to share them.\n\nAn initial conversation can stay non-sensitive: carrier categories, freight modes, general billing periods and scope. Confidential documents require an agreed secure transfer method and appropriate authorization.\n\nRETALLY's public worksheet uses illustrative or anonymized figures and doesn't upload the amounts.\n\nReview the data-handling approach:\nhttps://www.retallyrecovery.com/privacy?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_private_records\n\n#FreightAudit #TransportationFinance",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-1778982742354561434.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY branded secure-inquiry instructions: start with a conversation about freight modes and scope, agree on next steps, and share sensitive records only through an approved transfer route."
+      ],
+      "sourceDay": "2026-11-26",
+      "sourceNetwork": "facebook",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "private_records",
+      "network": "instagram",
+      "dateTime": "2027-02-24T10:00:00",
+      "timezone": "America/New_York",
+      "text": "WHAT SHOULD YOU SEND IN A FREIGHT-AUDIT DM?\n\nGeneral questions about scope are fine. Private invoices, rate agreements, account numbers and payment details are not.\n\nAgree on the review and a secure transfer route before exchanging sensitive files. The public worksheet runs locally with sample or anonymized amounts only.\n\nShare this reminder with your freight AP team.\n\n#RETALLY #DataStewardship #FreightAudit",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-1778982742354561434.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY branded secure-inquiry instructions: start with a conversation about freight modes and scope, agree on next steps, and share sensitive records only through an approved transfer route."
+      ],
+      "sourceDay": "2026-10-27",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "net_credit_status",
+      "network": "facebook",
+      "dateTime": "2027-02-25T09:00:00",
+      "timezone": "America/New_York",
+      "text": "A carrier marks a freight dispute \"approved.\" Finance still has a separate question: what value was actually received and retained?\n\nRecord the approved amount, posted credit memo, usable offset or refund, and any later reversal as distinct events tied back to the shipment and supported finding.\n\nA report that counts approvals as cash—or ignores a reversed credit—overstates the financial outcome.\n\nRead RETALLY's evidence and settlement standard:\nhttps://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_feb2027_controls&utm_content=fb_net_credit_status\n\n#FreightAudit #TransportationFinance",
+      "media": [],
+      "mediaAltText": [],
+      "sourceDay": null,
+      "sourceNetwork": null,
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    },
+    {
+      "topic": "net_credit_status",
+      "network": "instagram",
+      "dateTime": "2027-02-26T10:00:00",
+      "timezone": "America/New_York",
+      "text": "\"CREDIT APPROVED\" IS A STATUS. NOT CASH.\n\nKeep a separate record for:\n\n• Supported billing finding\n• Carrier approval\n• Usable posted credit or refund\n• Any adjustment or reversal\n\nOnly eligible net value actually realized belongs in recovery totals under the written terms. A reversal should change the total.\n\nSave this reconciliation sequence for your next close.\n\n#RETALLY #FreightRecovery #FinanceControls",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16571506407541194756.jpeg"
+      ],
+      "mediaAltText": [
+        "Four-step RETALLY evidence ledger: flagged variance, supported finding, separately customer-authorized action, and actual funds or credits received."
+      ],
+      "sourceDay": "2026-11-13",
+      "sourceNetwork": "instagram",
+      "autoPublish": true,
+      "draft": false,
+      "approval": "Reuses existing RETALLY planner artwork; text/link reviewed; no new creative asset generated",
+      "sourceEvidence": "Existing attached post media only; never customer records",
+      "linkVerification": "Canonical source-backed educational route; live delivery not asserted"
+    }
+  ]
+}
