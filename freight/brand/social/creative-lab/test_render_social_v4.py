@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import html
 import json
 from pathlib import Path
 import shutil
@@ -29,7 +30,7 @@ class V4VisualAcceptanceTests(unittest.TestCase):
             original=v3.template_html("data:image/png;base64,YWJj",
                                       "data:image/png;base64,YWJj",concept,preview=True)
             self.assertIn(v3.COPY[concept]["title"],full)
-            self.assertIn(v3.COPY[concept]["section"],full)
+            self.assertIn(html.escape(v3.COPY[concept]["section"]),full)
             self.assertIn(v3.COPY[concept]["note"],full)
             self.assertIn('<main class="artboard v3 v4 ',full)
             self.assertIn("three", "three")
