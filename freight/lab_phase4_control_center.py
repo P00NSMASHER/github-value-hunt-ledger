@@ -151,6 +151,10 @@ from freight.lab_file_continuity_m47 import (
     run_campaign as run_file_continuity_m47,
     render_html as render_file_continuity_m47,
 )
+from freight.lab_audit_trust_boundary_m48 import (
+    run_campaign as run_audit_trust_m48,
+    render_html as render_audit_trust_m48,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -196,6 +200,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["sqlite_file_continuity_m47"]=run_file_continuity_m47(
+            as_of=date.today()
+        )
+        result["persistent_audit_trust_m48"]=run_audit_trust_m48(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -334,6 +341,7 @@ def render(data: dict) -> str:
     atomic45=data["atomic_financial_m45"]
     schema46=data["sqlite_schema_integrity_m46"]
     path47=data["sqlite_file_continuity_m47"]
+    audit48=data["persistent_audit_trust_m48"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -575,6 +583,16 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Audit-trail trust boundary — stop silent log repair and forgery</h2>
+<p>Existing Lab 14 now tests <strong>"""+str(audit48["current_real_audit_file_attack_classes"])+"""/13</strong>
+local audit file deletions, replacements, weakened append-only triggers, and
+changed audit event hash chains. It verifies <strong>"""+str(audit48["current_audit_read_denials"])+"""</strong>
+read and <strong>"""+str(audit48["current_audit_append_denials"])+"""</strong>
+append denials in current code, without replacing original source history.
+This is an internal application chain, <strong>not a third-party immutable
+log, trusted timestamp or independent customer authorization</strong>.
+All 26 original findings remain open.</p>
+<a href="audit_trust_boundary_m48.html">Inspect audit history admission and source scope ↗</a></section>
 <section class="panel"><h2>Original settlement database file continuity</h2>
 <p>The existing Lab 14 now blocks <strong>"""+str(path47["total_file_path_attacks_blocked_on_current_operations"])+"""</strong>
 read/write attempts against eight deleted, renamed, substituted, symlinked
@@ -1130,6 +1148,14 @@ def main():
     )
     (args.out/"sqlite_file_continuity_m47.html").write_text(
         render_file_continuity_m47(data["sqlite_file_continuity_m47"]),
+        encoding="utf-8"
+    )
+    (args.out/"audit_trust_boundary_m48.json").write_text(
+        json.dumps(data["persistent_audit_trust_m48"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"audit_trust_boundary_m48.html").write_text(
+        render_audit_trust_m48(data["persistent_audit_trust_m48"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

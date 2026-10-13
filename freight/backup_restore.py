@@ -61,11 +61,22 @@ def _sqlite_backup(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True,exist_ok=True)
     if destination.exists():
         destination.unlink()
-    src=sqlite3.connect(str(source))
+    from freight.settlement_file_identity_m47 import identity, assert_identity
+    # sqlite3.connect(path) would implicitly recreate a deleted audit/
+    # settlement main file. For any backup SOURCE, use mode=ro and bind
+    # device/inode before + after copying to fail closed on stale paths.
+    pinned=identity(source)
+    src=sqlite3.connect(source.absolute().as_uri()+"?mode=ro",uri=True)
+    try:
+        assert_identity(source,pinned)
+    except Exception:
+        src.close()
+        raise
     dst=sqlite3.connect(str(destination))
     try:
         src.backup(dst)
         dst.commit()
+        assert_identity(source,pinned)
     finally:
         dst.close()
         src.close()
@@ -179,10 +190,17 @@ def run_backup_restore_drill(
     audit_restore=root/"audit.restored.sqlite3"
     settlement_restore=root/"settlement.restored.sqlite3"
 
+    # M48: validate authenticated application scope and both ORIGINAL file
+    # identities immediately before backup, never manufacture a fresh empty
+    # "original audit history" from a vanished SQLite main file.
     before=workspace_summary(audit,settlement)
+    audit._assert_source_identity()
+    settlement._assert_path_identity()
 
     _sqlite_backup(Path(audit.path),audit_backup)
+    audit._assert_source_identity()
     _sqlite_backup(Path(settlement.path),settlement_backup)
+    settlement._assert_path_identity()
     audit_backup_hash=_file_hash(audit_backup)
     settlement_backup_hash=_file_hash(settlement_backup)
 

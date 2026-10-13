@@ -7,6 +7,7 @@ service and does not provide independent trusted timestamping.
 """
 from __future__ import annotations
 
+import os
 import sqlite3
 import time
 from pathlib import Path
@@ -32,86 +33,85 @@ class AuditStore:
         business_unit: str,
         busy_timeout_ms: int = 5000,
     ):
-        self.path = str(path)
+        if str(path) == ":memory:":
+            raise ValueError("file-backed SQLite is required")
+        self.path = str(Path(path).absolute())
         self.buyer_id = self._text("buyer_id", buyer_id)
         self.business_unit = self._text("business_unit", business_unit)
         if type(busy_timeout_ms) is not int or not 1 <= busy_timeout_ms <= 60_000:
             raise ValueError("busy_timeout_ms must be an integer from 1 to 60000")
         self.busy_timeout_ms = busy_timeout_ms
-        if self.path == ":memory:":
-            raise ValueError("file-backed SQLite is required")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        self._initialize()
+        from freight.settlement_file_identity_m47 import (
+            create_exclusive_empty, identity,
+        )
+        # M48 closes AuditStore's preexisting create-on-read and
+        # auto-repair-on-open vulnerabilities, analogous to SettlementStore.
+        # Symlinks and deleted-main/orphan-sidecar files are never adopted.
+        is_existing=os.path.lexists(self.path)
+        if not is_existing:
+            create_exclusive_empty(self.path)
+        self._pinned_audit_file_identity=identity(self.path)
+        self._initialize(is_new=not is_existing)
         self.verify()
 
-    def _initialize(self) -> None:
-        schema = """
-            CREATE TABLE IF NOT EXISTS audit_events (
-                buyer_id TEXT NOT NULL,
-                business_unit TEXT NOT NULL,
-                sequence INTEGER NOT NULL,
-                event_type TEXT NOT NULL,
-                object_id TEXT NOT NULL,
-                occurred_at TEXT NOT NULL,
-                evidence_hash TEXT,
-                previous_hash TEXT,
-                event_hash TEXT NOT NULL,
-                PRIMARY KEY (buyer_id,business_unit,sequence),
-                UNIQUE (buyer_id,business_unit,event_hash)
-            );
+    def _assert_source_identity(self) -> None:
+        from freight.settlement_file_identity_m47 import assert_identity
+        assert_identity(self.path, self._pinned_audit_file_identity)
 
-            CREATE TRIGGER IF NOT EXISTS audit_events_immutable_update
-            BEFORE UPDATE ON audit_events
-            BEGIN
-                SELECT RAISE(ABORT,'audit event is immutable');
-            END;
-
-            CREATE TRIGGER IF NOT EXISTS audit_events_immutable_delete
-            BEFORE DELETE ON audit_events
-            BEGIN
-                SELECT RAISE(ABORT,'audit event is immutable');
-            END;
-
-            CREATE TRIGGER IF NOT EXISTS audit_events_input_guard
-            BEFORE INSERT ON audit_events
-            BEGIN
-                SELECT CASE WHEN
-                    length(NEW.occurred_at)<>27 OR
-                    NEW.occurred_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z' OR
-                    julianday(NEW.occurred_at) IS NULL OR
-                    strftime('%Y-%m-%dT%H:%M:%S',NEW.occurred_at)<>substr(NEW.occurred_at,1,19)
-                THEN RAISE(ABORT,'audit occurred_at must be canonical UTC') END;
-                SELECT CASE WHEN
-                    NEW.evidence_hash IS NOT NULL AND
-                    (length(NEW.evidence_hash)<>64 OR NEW.evidence_hash GLOB '*[^0-9a-f]*')
-                THEN RAISE(ABORT,'audit evidence_hash must be lowercase SHA-256') END;
-                SELECT CASE WHEN NEW.sequence>1 AND NEW.occurred_at < (
-                    SELECT occurred_at FROM audit_events
-                    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
-                      AND sequence=NEW.sequence-1
-                ) THEN RAISE(ABORT,'audit occurred_at values must be nondecreasing') END;
-            END;
-        """
-        delay = 0.005
-        last: Exception | None = None
+    def _initialize(self, *, is_new: bool) -> None:
+        from freight.audit_store_integrity_m48 import (
+            verify_audit_connection, SCHEMA_PATH,
+        )
+        delay=0.005
+        last=None
         for _ in range(8):
-            conn = self._connect()
+            conn=None
             try:
-                mode = str(conn.execute("PRAGMA journal_mode").fetchone()[0]).lower()
-                if mode != "wal":
-                    conn.execute("PRAGMA journal_mode=WAL")
-                conn.executescript(schema)
+                conn=self._connect()
+                mode=str(conn.execute("PRAGMA journal_mode").fetchone()[0]).lower()
+                if is_new:
+                    if mode!="wal":
+                        conn.execute("PRAGMA journal_mode=WAL")
+                    conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+                elif mode!="wal":
+                    # Do not silently mutate the journal mode of an existing
+                    # unfamiliar source; require separately reviewed migration.
+                    raise RuntimeError("M48_AUDIT_EXISTING_JOURNAL_MODE_UNREVIEWED")
+                conn.execute("BEGIN")
+                try:
+                    # Reopen verifies approved DDL and ALL tenant chains in
+                    # the same consistent read-only SQLite revision.
+                    verify_audit_connection(conn,scope=None)
+                finally:
+                    conn.rollback()
+                self._assert_source_identity()
                 return
             except sqlite3.OperationalError as exc:
-                last = exc
+                last=exc
                 if "locked" not in str(exc).lower():
                     raise
+            except RuntimeError as exc:
+                # If a second constructor won the same exclusive file
+                # creation race, it may still be executing first-time DDL.
+                # Bounded retries may observe the completed schema. Never
+                # auto-repair a permanently incomplete existing source.
+                if (
+                    is_new or not any(label in str(exc) for label in (
+                        "M48_AUDIT_SCHEMA_CATALOG_DRIFT",
+                        "M48_AUDIT_EXISTING_JOURNAL_MODE_UNREVIEWED",
+                    ))
+                ):
+                    raise
+                last=exc
             finally:
-                conn.close()
+                if conn is not None:
+                    conn.close()
             time.sleep(delay)
-            delay = min(delay * 2, 0.1)
-        assert last is not None
-        raise last
+            delay=min(delay*2,0.1)
+        if last is not None:
+            raise last
+        raise RuntimeError("M48_AUDIT_CONSTRUCTOR_FAILED")
 
     @staticmethod
     def _text(name: str, value: str) -> str:
@@ -127,14 +127,25 @@ class AuditStore:
         return self.buyer_id, self.business_unit
 
     def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(
-            self.path,
-            timeout=self.busy_timeout_ms / 1000,
-            isolation_level=None,
-        )
-        conn.row_factory = sqlite3.Row
-        conn.execute(f"PRAGMA busy_timeout={self.busy_timeout_ms}")
-        return conn
+        self._assert_source_identity()
+        try:
+            conn=sqlite3.connect(
+                Path(self.path).as_uri()+"?mode=rw",
+                uri=True,
+                timeout=self.busy_timeout_ms/1000,
+                isolation_level=None,
+            )
+        except sqlite3.OperationalError as exc:
+            self._assert_source_identity()
+            raise RuntimeError("M48_AUDIT_FILE_CONNECT_FAILED") from exc
+        try:
+            self._assert_source_identity()
+            conn.row_factory=sqlite3.Row
+            conn.execute(f"PRAGMA busy_timeout={self.busy_timeout_ms}")
+            return conn
+        except BaseException:
+            conn.close()
+            raise
 
     def _write(self, fn: Callable[[sqlite3.Connection], T]) -> T:
         delay = 0.005
@@ -143,8 +154,13 @@ class AuditStore:
             conn = self._connect()
             try:
                 conn.execute("BEGIN IMMEDIATE")
+                from freight.audit_store_integrity_m48 import verify_audit_connection
+                verify_audit_connection(conn,scope=self._scope)
                 out = fn(conn)
+                verify_audit_connection(conn,scope=self._scope)
+                self._assert_source_identity()
                 conn.commit()
+                self._assert_source_identity()
                 return out
             except sqlite3.OperationalError as exc:
                 conn.rollback()
@@ -162,9 +178,17 @@ class AuditStore:
         raise last
 
     def _read(self, fn: Callable[[sqlite3.Connection], T]) -> T:
-        conn = self._connect()
+        conn=self._connect()
         try:
-            return fn(conn)
+            conn.execute("BEGIN")
+            try:
+                from freight.audit_store_integrity_m48 import verify_audit_connection
+                verify_audit_connection(conn,scope=self._scope)
+                result=fn(conn)
+                self._assert_source_identity()
+                return result
+            finally:
+                conn.rollback()
         finally:
             conn.close()
 
