@@ -154,6 +154,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("real_invoice_adjudications_completed", 22),
             ("independent_customer_studies_completed", 1),
             ("source_refresh_automated", True),
+            ("critical_current_path_negative_replays_m41", 0),
+            ("critical_current_path_denials_m41", 3),
+            ("critical_original_findings_closed_m41", 4),
+            ("critical_original_vulnerable_revision_replays_m41", 4),
         ]
         for field, value in flags:
             r = deepcopy(self.original)
