@@ -44,6 +44,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/site/test_public_claim_guard.py
           recoveryworks/test_public_site.py
       - name: Check browser script syntax
         run: |
@@ -70,6 +71,11 @@ jobs:
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
           test "$(find /tmp/recoveryos-public -type f | wc -l)" -eq 15
           test "$(find /tmp/recoveryos-public -type l | wc -l)" -eq 0
+      - name: Block unsupported real-customer, accuracy or recovery-market copy in built artifacts
+        run: >-
+          python -m freight.site.public_claim_guard
+          --freight-root /tmp/freight-recovery-public
+          --recoveryos-root /tmp/recoveryos-public
 
   deploy:
     if: >-
@@ -103,6 +109,7 @@ jobs:
         run: |
           python freight/site/build.py --output /tmp/freight-recovery-public
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
+          python -m freight.site.public_claim_guard --freight-root /tmp/freight-recovery-public --recoveryos-root /tmp/recoveryos-public
           mkdir /tmp/freight-recovery-public/recoveryos
           cp -R /tmp/recoveryos-public/. /tmp/freight-recovery-public/recoveryos/
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
