@@ -103,7 +103,10 @@ jobs:
           python-version: '3.11'
       - name: Load immediate prior verifier source read-only, without promoting prior passes
         run: |
-          git show HEAD^:freight/lab_assurance.py > /tmp/m43-prior-verifier-source.py
+          # Pinned M42 source baseline: HEAD^ is NOT stable after later
+          # chained research PRs or documentation/test follow-up commits.
+          git fetch --no-tags --depth=1 origin 1be4320ef57256251e83e2c34eff914a19e53a06
+          git show 1be4320ef57256251e83e2c34eff914a19e53a06:freight/lab_assurance.py > /tmp/m43-prior-verifier-source.py
           test -s /tmp/m43-prior-verifier-source.py
       - name: Independently compare prior source and fixed verifier against eleven identical financial counterexamples
         run: |

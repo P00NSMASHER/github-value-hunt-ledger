@@ -58,14 +58,16 @@ def add_claim(store, finding, *, disqualified=False):
     return ClaimFindingBinding(claim.claim_id, finding.finding_id, finding.proof_hash)
 
 
-def pay(store, finding, *, event_id="payment-1", cents=2500, payer="carrier", reference=None):
+def pay(store, finding, *, event_id="payment-1", cents=2500, payer="carrier",
+        reference=None, booked_at="2026-09-02T00:00:00Z",
+        allocated_at="2026-09-02T01:00:00Z"):
     store.ingest_event(SettlementEventRecord(
         event_id, reference or finding.invoice_id, payer, "customer", finding.currency,
-        cents, "2026-09-02T00:00:00Z", sha("settlement-source-" + event_id),
+        cents, booked_at, sha("settlement-source-" + event_id),
     ))
     store.review_allocate(
         allocation_id="allocation-" + event_id, claim_id="claim-" + finding.finding_id,
-        event_id=event_id, amount_cents=cents, created_at="2026-09-02T01:00:00Z",
+        event_id=event_id, amount_cents=cents, created_at=allocated_at,
     )
 
 
@@ -100,7 +102,12 @@ def test_full_return_and_replacement_payment_reconcile_to_current_net(tmp_path):
     return_payment(store)
     returned = build_persistent_pilot_report(truth, incumbent, store, (binding,))
     assert returned.metrics.realized_cents == returned.metrics.fee_eligible_realized_cents == 0
-    pay(store, truth.findings[0], event_id="replacement")
+    # Source payment must arrive AFTER the original was returned. The prior
+    # test backdated the "replacement" before its reversal, creating an
+    # impossible temporary 5000-cent balance on a 2500-cent claim.
+    pay(store, truth.findings[0], event_id="replacement",
+        booked_at="2026-09-04T00:00:00Z",
+        allocated_at="2026-09-04T01:00:00Z")
     replacement = build_persistent_pilot_report(truth, incumbent, store, (binding,))
     assert replacement.metrics.realized_cents == store.realized_cents() == 2500
     assert replacement.metrics.fee_eligible_realized_cents == store.fee_eligible_cents() == 2500

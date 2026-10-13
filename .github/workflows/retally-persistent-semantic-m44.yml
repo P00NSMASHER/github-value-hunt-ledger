@@ -1,0 +1,153 @@
+name: RETALLY Lab 14 Persistent Settlement Semantic Integrity (Mission 44)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-persistent-semantic-m44.yml'
+      - 'freight/settlement_store.py'
+      - 'freight/settlement_semantic_guard_m44.py'
+      - 'freight/backup_restore.py'
+      - 'freight/lab_persistent_semantic_m44.py'
+      - 'freight/test_lab_persistent_semantic_m44.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_PERSISTENT_SEMANTIC_M44.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  full-persistent-snapshot-and-fourteen-lab-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited offline research test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Exercise persistent store reopen/report and all inherited revenue/research controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_backup_restore.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Run eight actual persistent SQLite drift witnesses plus original fourteen labs
+        run: |
+          PYTHONPATH=. python -m freight.lab_persistent_semantic_m44 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m44
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m44-control
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('/tmp/retally-m44/persistent_semantic_m44.json').read_text())
+          c=json.loads(Path('/tmp/retally-m44-control/phase4_control.json').read_text())
+          assert r['scope']=='RETALLY_LAB14_M44_PERSISTENT_SETTLEMENT_SEMANTIC_DRIFT_SYNTHETIC_ONLY'
+          assert r['current_persistent_store_cases']==8
+          assert r['positive_current_store_controls']==8
+          assert r['reported_financial_drift_denials']==8
+          assert r['explicit_audit_denials']==8
+          assert r['reopen_denials']==8
+          assert r['original_historical_findings_open']==26
+          assert r['original_historical_findings_closed']==0
+          assert r['separate_independent_human_customer_pilot_controls_unmet']==18
+          assert r['external_empirical_recovery_claims_approved']==0
+          assert len(r['cases'])==8
+          assert all(q['current_store_report_rejected'] and q['current_store_audit_rejected']
+                     and q['reopen_existing_store_rejected'] and
+                     q['original_historical_recoveryos_defect_closed'] is False
+                     for q in r['cases'])
+          assert len(c['lab_runs'])==14 and not c['failed_or_blocked_labs']
+          assert c['executed_labs']==list(range(1,15))
+          assert c['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert c['persistent_semantic_m44']['receipt_sha256']==r['receipt_sha256']
+          assert c['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert c['actual_revenue_cents']==0
+          assert 'persistent_semantic_m44.html' in Path('/tmp/retally-m44-control/index.html').read_text()
+          print('M44: 8 positive real-store source fixtures and 24 typed report/reopen/audit denials, 14 original labs.')
+          PY
+      - name: Retain only bounded synthetic metadata, never source DB or actual customer bytes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m44-disposable-persistent-financial-source-proofs
+          path: |
+            /tmp/retally-m44/persistent_semantic_m44.json
+            /tmp/retally-m44/persistent_semantic_m44.html
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-immediate-prior-source-differential:
+    needs: full-persistent-snapshot-and-fourteen-lab-regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Extract only the immediate predecessor SettlementStore implementation
+        run: |
+          # Exact pre-M44 M43 baseline, not HEAD^ (may be an M44 follow-up).
+          git fetch --no-tags --depth=1 origin c6496c049655dda3efdb29dfa31ec733c6cf9043
+          git show c6496c049655dda3efdb29dfa31ec733c6cf9043:freight/settlement_store.py > /tmp/m44_predecessor_store.py
+          cp freight/settlement_schema.sql /tmp/settlement_schema.sql
+          test -s /tmp/m44_predecessor_store.py
+      - name: Independent eight-case old/current *exact same fictional database* differential
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from pathlib import Path
+          from freight.lab_persistent_semantic_m44 import ATTACKS,_attack
+          from freight.test_lab_phase3_real_chain import funded_store
+          from freight.settlement_store import SettlementStore
+          name='m44_previous_persistent_store'
+          spec=importlib.util.spec_from_file_location(
+              name,'/tmp/m44_predecessor_store.py')
+          previous=importlib.util.module_from_spec(spec)
+          sys.modules[name]=previous
+          spec.loader.exec_module(previous)
+          accepted=0
+          rejected=0
+          for attack,reason in ATTACKS.items():
+              with tempfile.TemporaryDirectory() as td:
+                  original=funded_store(td)
+                  source=Path(original.path)
+                  _attack(source,attack)
+                  # Old source has SQL/timestamp/FK checks, but no financial
+                  # semantic review of historic rows. This proves actual delta.
+                  old=previous.SettlementStore(
+                      source,buyer_id=original.buyer_id,
+                      business_unit=original.business_unit)
+                  old.report_snapshot_json()
+                  accepted+=1
+                  try:
+                      SettlementStore(
+                          source,buyer_id=original.buyer_id,
+                          business_unit=original.business_unit)
+                  except RuntimeError as exc:
+                      assert reason in str(exc),(attack,str(exc))
+                      rejected+=1
+                  else:
+                      raise AssertionError('Current store accepted '+attack)
+          assert accepted==8 and rejected==8
+          print('M44 exact prior/current differential: 8 previously accepted corrupted durable SQLite images now rejected before reporting.')
+          PY
