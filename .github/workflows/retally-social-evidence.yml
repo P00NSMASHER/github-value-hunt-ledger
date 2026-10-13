@@ -34,6 +34,64 @@ jobs:
           assert any(e["code"]=="INVALID_TRACKED_CTA" for e in d["issues"])
           print("Historical unverified-intake CTA correctly rejected; live schedule untouched")
           PY
+      - name: Reconcile all 40 current public post media and tagged social routes (offline)
+        run: |
+          python3 freight/brand/social/performance/public_asset_preflight.py \
+            --schedule freight/brand/social/performance/observations/retally-public-target-inventory-2026-10-13.json \
+            --json-output "$RUNNER_TEMP/retally-current-all-public-urls.json" > "$RUNNER_TEMP/retally-current-all-public-urls.md"
+          python3 freight/brand/social/performance/public_asset_preflight.py \
+            --schedule freight/brand/social/performance/observations/retally-public-target-inventory-2026-10-13.json \
+            --only-kind landing --one-per-route \
+            --json-output "$RUNNER_TEMP/retally-live-routes-offline.json" > "$RUNNER_TEMP/retally-live-routes-offline.md"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])
+          all_urls=json.loads((root/"retally-current-all-public-urls.json").read_text())
+          routes=json.loads((root/"retally-live-routes-offline.json").read_text())
+          assert all_urls["counts"]["NOT_CHECKED"]==52, all_urls["counts"]
+          assert routes["source_tracked_url_count"]==24, routes
+          assert routes["representative_probe_count"]==11, routes
+          assert routes["counts"]["NOT_CHECKED"]==11, routes
+          assert not routes["publication_verified"]
+          assert all(row["canonical_path"].startswith("/") for row in routes["targets"])
+          print("RETALLY current campaign: 24 unique tracked URLs, 28 media, 11 source routes; no live claim")
+          PY
+
+      - name: Test actual 11 campaign pages by read-only bounded public HTTPS GET
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 freight/brand/social/performance/public_asset_preflight.py \
+            --schedule freight/brand/social/performance/observations/retally-public-target-inventory-2026-10-13.json \
+            --only-kind landing --one-per-route --live --fail-on-hard-errors \
+            --output retally-current-route-http.md \
+            --json-output retally-current-route-http.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("retally-current-route-http.json").read_text())
+          counts=report["counts"]
+          assert report["representative_probe_count"]==11
+          if counts["RECHECK"]:
+              print(f"::warning title=RETALLY HTTP uncertainty::{counts['RECHECK']} of 11 routes need recheck; do not call them verified")
+          elif counts["PASS"]==11:
+              print("RETALLY 11/11 campaign paths observed HTTP 200 with RETALLY HTML from GitHub runner")
+          else:
+              raise AssertionError("Unexpected public-route status: "+str(counts))
+          assert not report["publication_verified"]
+          PY
+
+      - name: Upload PR-only bounded public-route observation
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-current-route-http-pr-check
+          retention-days: 5
+          if-no-files-found: warn
+          path: |
+            retally-current-route-http.md
+            retally-current-route-http.json
+
       - name: Exercise safe synthetic report
         run: |
           python3 freight/brand/social/performance/social_review.py \
