@@ -61,6 +61,23 @@ jobs:
         run: python after/freight/site/visual_acceptance.py --site bundle-before --out evidence/before
       - name: Capture and validate 35 candidate screenshots at five widths
         run: python after/freight/site/visual_acceptance.py --site bundle-after --out evidence/after --fail-on-issues
+      - name: Verify worksheet phone, desktop and print journey without uploading amounts
+        run: |
+          python after/freight/site/worksheet_visual_qa.py \
+            --site bundle-after --out evidence/worksheet --fail-on-issues
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("evidence/worksheet/report.json").read_text())
+          assert report["passed"] is True, report
+          assert len(report["records"])==4
+          assert report["print"]["printReadiness"] is True
+          assert all(x["posts"]==0 and x["externalRequestSent"] is False for x in report["records"])
+          assert report["buyerLeadVerified"] is False
+          assert report["fundsRecovered"] is False
+          print("RETALLY free worksheet: all phone/desktop and print-safe privacy QA passed")
+          PY
+
       - name: Verify isolated durable receipt never invites duplicate email
         run: python after/freight/site/online_receipt_acceptance.py --site bundle-after --out evidence/after
       - name: Install pinned accessibility rules

@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="15-point freight invoice audit checklist for shipment identity, duplicates, rates, fuel, accessorials, weight, credits, settlement and reversals.">
+  <meta name="description" content="Printable freight invoice audit checklist, anonymous in-browser sample charge comparison, and 15 evidence checks. Educational only—not a refund or recovered-funds estimate.">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#062c26"><meta name="freight-contact-email" content=""><meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
-  <title>Freight Invoice Audit Checklist | RETALLY</title>
+  <title>Printable Freight Invoice Audit Checklist and Sample Worksheet | RETALLY</title>
   <link rel="canonical" href="https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit-checklist.html">
   <link rel="icon" href="assets/brand/retally-emblem-approved.png" type="image/png"><link rel="stylesheet" href="site.css?v=free-audit-contingency-v5">
   <link rel="stylesheet" href="foundry.css?v=retally-20261008">
   <script src="commercial-config.js?v=free-audit-contingency-v5" defer></script><script src="site.js?v=free-audit-contingency-v5" defer></script>
+  <script src="worksheet.js?v=local-worksheet-20261013" defer></script>
 </head>
 <body class="document-page" itemscope itemtype="https://schema.org/Service"><meta itemprop="name" content="Freight Invoice Audit Checklist">
 <meta itemprop="serviceType" content="Freight audit and recovery service">
@@ -19,7 +20,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header document-header"><div class="wrap nav-wrap"><a class="brand" href="./" aria-label="RETALLY home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="brand-name"><img src="assets/brand/retally-wordmark-approved.png" alt="RETALLY" width="1619" height="257"></span></a><a class="button button-small button-light" href="./#start-audit">Start Free Recovery Audit</a></div></header>
 <main id="main" class="document-main"><header class="document-hero"><div class="wrap document-hero-inner"><p class="eyebrow light"><span></span> Freight invoice audit checklist</p><h1>A practical checklist for reviewing carrier invoices.</h1><p>Use this checklist to structure a freight invoice review. It is designed to surface questions that deserve evidence, not to turn every difference into a recovery claim.</p></div></header>
-<div class="wrap document-layout"><aside class="document-nav"><strong>On this page</strong><a href="#before">Before review</a><a href="#checklist">15 checks</a><a href="#modes">Mode notes</a><a href="#evidence">Evidence rule</a><a href="#after">After review</a><a href="#faq">FAQ</a><a href="#next">Start free audit</a></aside>
+<div class="wrap document-layout"><aside class="document-nav"><strong>On this page</strong><a href="#before">Before review</a><a href="#checklist">15 checks</a><a href="#worksheet">Printable worksheet</a><a href="#modes">Mode notes</a><a href="#evidence">Evidence rule</a><a href="#after">After review</a><a href="#faq">FAQ</a><a href="#next">Start free audit</a></aside>
 <article class="document-content">
 <section id="before"><span class="doc-index">01</span><h2>Before you audit a freight invoice</h2>
 <p>Define the population first: entity, date range, carriers, modes, currencies, invoice set, and exclusions. A checklist is useful only when the reviewer knows what is in scope and which commercial sources are supposed to control the billed charges.</p>
@@ -27,6 +28,77 @@
 </section>
 <section id="checklist"><span class="doc-index">02</span><h2>15 freight invoice audit checks</h2><ol><li>Match each invoice to a real shipment using shipment, PRO, tracking, BOL, or equivalent identity.</li><li>Check for exact and near-duplicate invoices or duplicated charge lines.</li><li>Confirm the carrier, account, mode, and service level are correct.</li><li>Resolve the controlling contract, tariff, rate confirmation, or spot quote.</li><li>Verify the rate version and effective date that applied on the shipment date.</li><li>Recalculate the base transportation charge.</li><li>Verify discounts, minimum charges, weight breaks, and lane rules.</li><li>Audit fuel surcharge source, percentage, base, and effective period.</li><li>Validate accessorial entitlement and pricing against shipment evidence.</li><li>Check weight, dimensions, freight class, reweigh, or reclassification support where relevant.</li><li>Verify taxes, currency, and exchange-rate treatment where applicable.</li><li>Check corrected invoices, rebills, and credit-and-rebill sequences before flagging duplicates.</li><li>Identify existing automatic or incumbent-known credits so they are not double-counted.</li><li>Separate potential discrepancies from approved claims.</li><li>Link any actual credit, refund, or remittance back to one validated finding and account for later reversals.</li></ol>
 <p>For a deeper walkthrough of the calculations and evidence chain, see the <a href="freight-invoice-audit.html">freight invoice audit guide</a>.</p>
+</section>
+<section id="worksheet" class="worksheet-builder" aria-labelledby="ws-title">
+<div class="worksheet-head">
+  <p class="worksheet-kicker">RETALLY FIELD NOTES · FREE WORKSHEET · NO UPLOAD</p>
+  <h2 id="ws-title">Compare the charge. Preserve the evidence.</h2>
+  <p>Enter <strong>illustrative or anonymized dollar amounts only</strong>. This exercise subtracts a documented expected total and any already-issued credit from the billed total. It <strong>cannot validate a contract, prove an overcharge, or confirm money recovered.</strong></p>
+</div>
+<div id="invoiceWorksheet" class="worksheet-card" data-page="freight-invoice-audit-checklist">
+  <div class="worksheet-banner" role="note">
+    <strong>Runs in your browser.</strong> This worksheet makes no uploads, sends no inquiries, and does not save, transmit or share the entered amounts. Never enter invoice numbers, personal data, contracts or payment details here.
+  </div>
+  <h3>1. Illustrative amount comparison</h3>
+  <div class="worksheet-inputs">
+    <label for="ws-billed">Billed invoice total
+      <span class="ws-hint">Numbers only · USD</span>
+      <input id="ws-billed" type="text" inputmode="decimal" maxlength="13" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g., 1167.60" aria-describedby="ws-entry-note">
+    </label>
+    <label for="ws-expected">Document-supported expected total
+      <span class="ws-hint">Not an assumed lower rate</span>
+      <input id="ws-expected" type="text" inputmode="decimal" maxlength="13" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g., 1042.60" aria-describedby="ws-entry-note">
+    </label>
+    <label for="ws-credits">Related credits already received
+      <span class="ws-hint">Same charge · no double counting</span>
+      <input id="ws-credits" type="text" inputmode="decimal" maxlength="13" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g., 0.00" aria-describedby="ws-entry-note">
+    </label>
+  </div>
+  <p id="ws-entry-note" class="worksheet-small">Enter an already-calculated expected total based on governing terms and shipment evidence; this widget does not calculate rates, tariffs, fuel rules or taxes.</p>
+  <p id="ws-error" class="worksheet-error" role="alert"></p>
+  <div class="worksheet-results" aria-label="Illustrative arithmetic result">
+    <div class="worksheet-stat"><span>Positive amount difference</span><output id="ws-difference">—</output></div>
+    <div class="worksheet-stat"><span>Related credits counted</span><output id="ws-credit-applied">—</output></div>
+    <div class="worksheet-stat worksheet-stat-focus"><span>Remaining question to review</span><output id="ws-unresolved">—</output></div>
+  </div>
+  <p id="ws-status" class="worksheet-disclaimer" role="status" aria-live="polite">Enter illustrative or anonymized amounts to explore a candidate difference.</p>
+  <div class="worksheet-actions">
+    <button type="button" id="ws-sample" class="button button-cobalt">Load sample figures</button>
+    <button type="button" id="ws-clear" class="button button-quiet">Clear all amounts</button>
+  </div>
+  <h3>2. Mark the evidence you actually have</h3>
+  <p class="worksheet-small">A checked box is a question reviewed, not a verified claim. Check only when the relevant source document is available.</p>
+  <div class="worksheet-checklist" role="group" aria-label="Source evidence checks">
+    <label><input type="checkbox"> Shipment identity matches the invoice</label>
+    <label><input type="checkbox"> Correct entity, carrier, mode and service</label>
+    <label><input type="checkbox"> Duplicate and rebill chain reviewed</label>
+    <label><input type="checkbox"> Governing rate agreement identified</label>
+    <label><input type="checkbox"> Effective date and amendments verified</label>
+    <label><input type="checkbox"> Transportation base charge recalculated</label>
+    <label><input type="checkbox"> Minimums, discounts and lanes checked</label>
+    <label><input type="checkbox"> Fuel index period and method verified</label>
+    <label><input type="checkbox"> Accessorial service evidence checked</label>
+    <label><input type="checkbox"> Weight, dimensions and class verified</label>
+    <label><input type="checkbox"> Currency, tax and units reconciled</label>
+    <label><input type="checkbox"> Replacement invoices and credits linked</label>
+    <label><input type="checkbox"> Prior auditor or automatic credits excluded</label>
+    <label><input type="checkbox"> Unresolved versus supported items separated</label>
+    <label><input type="checkbox"> Reversals and net settlement addressed</label>
+  </div>
+  <div class="worksheet-evidence">
+    <p><strong>Evidence notes:</strong> <span class="worksheet-line" aria-hidden="true"></span></p>
+    <p><strong>Unresolved questions:</strong> <span class="worksheet-line" aria-hidden="true"></span></p>
+    <p><strong>Follow-up owner/date:</strong> <span class="worksheet-line" aria-hidden="true"></span></p>
+  </div>
+  <div class="worksheet-actions worksheet-sharing">
+    <button type="button" id="ws-print" class="button button-cobalt">Print this worksheet</button>
+    <button type="button" id="ws-copy" class="button button-quiet">Copy public worksheet link</button>
+    <span id="ws-copy-status" class="worksheet-small" role="status" aria-live="polite"></span>
+  </div>
+  <p class="worksheet-small worksheet-legal"><strong>Educational only:</strong> A positive arithmetic difference is neither a validated overcharge nor a guaranteed claim. Credits and refunds must be traced to documented, eligible amounts actually received; reversals reduce that value. RETALLY does not receive this worksheet or its amounts. Any recovery work requires separate customer authorization.</p>
+  <noscript><p class="worksheet-small">JavaScript is off. The 15 evidence checks and blank amounts can still be printed or completed manually.</p></noscript>
+</div>
+<p class="worksheet-after">Need the governing terms or a second reviewer? Start with <a href="freight-audit-methodology.html">RETALLY's evidence-first method</a> or <a href="second-look-freight-audit.html">second-look audit guide</a>. Please do not send confidential records through social messages or ordinary email.</p>
 </section>
 <section id="modes"><span class="doc-index">03</span><h2>Mode-specific notes</h2>
 <p><strong>LTL:</strong> pay particular attention to freight class, billed weight, reweigh/reclassification notices, lane/rate authority, minimum charges, fuel, and accessorial support. <strong>Parcel:</strong> review dimensional weight, service level, residential/remote-area surcharges, address corrections, duplicate charges, and credits. <strong>Truckload:</strong> compare the invoice to the rate confirmation or governing contract and verify detention, layover, stop-off, lumper, and other accessorial evidence. <strong>Air, ocean, and intermodal:</strong> confirm quote/tariff authority, shipment milestones, surcharges, currency, and the exact service purchased before asserting a variance.</p>
