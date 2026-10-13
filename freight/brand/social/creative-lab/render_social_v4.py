@@ -72,6 +72,8 @@ def template_html(logo: str, photo: str, concept: str, preview: bool = False) ->
     key = '<main class="artboard v3 '
     if page.count(key) != 1 or page.count("</style>") != 1:
         raise ValueError("Unexpected editorial template structure")
+    if concept == "secure_intake":
+        page = page.replace("Keep records private", "Never in DMs")
     return page.replace(key, '<main class="artboard v3 v4 ', 1).replace(
         "</style>", "\n" + CSS_V4 + "\n</style>", 1)
 
