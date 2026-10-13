@@ -115,6 +115,10 @@ from freight.research_claim_quarantine_m38 import (
     report_shell as build_claim_quarantine_m38,
     render_html as render_claim_quarantine_m38,
 )
+from freight.lab_cross_lab_assurance_m39 import (
+    assess as assess_cross_lab_m39,
+    render_html as render_cross_lab_m39,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -128,6 +132,11 @@ def snapshot(max_labs: int=14) -> dict:
         result=execute_all_labs(record=rec,authority_book=book,store=store,
                                 assertions=a,fee_events=fees,verifier=verifier(),
                                 contingency=scenario(),max_labs=max_labs)
+        # Check the original 14-lab receipt before enrichments add metadata.
+        # Deliberately partial budgets get an incomplete review, not a pass.
+        result["cross_lab_integrity_m39"]=assess_cross_lab_m39(
+            result, require_complete=False
+        )
         campaign=conduct_experiments(register=load_findings(),
             ledger_path=Path(temp)/"phase4_campaign.sqlite3",max_experiments=4,
             record=rec,authority_book=book,store=store,assertions=a,fee_events=fees,
@@ -260,6 +269,7 @@ def render(data: dict) -> str:
     claim35=data["research_claim_clearance_m35"]
     lineage37=data["research_source_lineage_m37"]
     quarantine38=data["research_claim_quarantine_m38"]
+    integrity39=data["cross_lab_integrity_m39"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -501,6 +511,15 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Fourteen-lab proof audit — verify, don’t trust a passing label</h2>
+<p>M39 independently checks the full executable laboratory census, exact negative
+probes, bound synthetic evidence and a second computation of the fictional
+three-buyer pilot. Locally executed: <strong>"""+str(integrity39["locally_executed_count"])+"""/14</strong>;
+status <strong>"""+escape(integrity39["local_review_decision"])+"""</strong>.
+Original <strong>26 historical findings remain open</strong>. Matching local
+hashes are not third-party original evidence or real-world customer approval.
+<strong>Zero actual customer payments or public claims authorized.</strong></p>
+<a href="cross_lab_assurance.html">Open every lab’s negative-proof and safety-contract review ↗</a></section>
 <section class="panel"><h2>Historical research-value quarantine — fail closed on source changes</h2>
 <p>M38 supplies a safe claim lookup for internal research, withholding historical
 numbers affected by an unverified source-fingerprint difference until an original
@@ -909,6 +928,14 @@ def main():
     )
     (args.out/"claim_quarantine.html").write_text(
         render_claim_quarantine_m38(data["research_claim_quarantine_m38"]),
+        encoding="utf-8"
+    )
+    (args.out/"cross_lab_assurance.json").write_text(
+        json.dumps(data["cross_lab_integrity_m39"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"cross_lab_assurance.html").write_text(
+        render_cross_lab_m39(data["cross_lab_integrity_m39"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

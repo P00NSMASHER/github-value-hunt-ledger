@@ -45,6 +45,13 @@ def select_experiments(register: dict, *, max_experiments: int=4,
 
 
 def verify_experiment_outcome(receipt: dict) -> None:
+    # M39 independently checks the exact 14-lab census, negative probes,
+    # inherited domain evidence, fictional customer cohort and rehashed
+    # approval/funds attacks before ANY experiment is appended to the ledger.
+    from freight.lab_cross_lab_assurance_m39 import assess
+    assurance = assess(receipt, require_complete=True)
+    if assurance["all_fourteen_locally_executed"] is not True:
+        raise ValueError("M39_RESEARCH_LAB_PROOF_INCOMPLETE")
     if receipt.get("scope")!="BOUNDED_ISOLATED_RESEARCH_ONLY":
         raise ValueError("UNSUPPORTED_EXECUTION_SCOPE")
     if receipt.get("production_api_executed") is not False:
