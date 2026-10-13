@@ -19,6 +19,21 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Unit tests — zero social API calls
         run: python3 -m unittest discover -s freight/brand/social/performance -p 'test_*.py' -v
+      - name: Verify source-backed creative gate catches the historical intake deep link
+        run: |
+          python3 freight/brand/social/performance/creative_quality_gate.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-oct14-15-creative-approved.json \
+            --json-output "$RUNNER_TEMP/retally-creative-historical.json" > "$RUNNER_TEMP/retally-creative-historical.stdout.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d=json.loads((Path(os.environ["RUNNER_TEMP"])/"retally-creative-historical.json").read_text())
+          assert d["checked_posts"] == 17
+          assert d["scope"] == "READ_ONLY_PLANNER_QUALITY_NOT_PUBLICATION_OR_REAL_CUSTOMER_PROOF"
+          assert d["provider_pending_is_not_publication_proof"] is True
+          assert any(e["code"]=="INVALID_TRACKED_CTA" for e in d["issues"])
+          print("Historical unverified-intake CTA correctly rejected; live schedule untouched")
+          PY
       - name: Exercise safe synthetic report
         run: |
           python3 freight/brand/social/performance/social_review.py \
