@@ -56,7 +56,8 @@ jobs:
           assert 'Not customer results.' in copy['index.html']
           assert 'Fictional' in copy['recovery-status-example.html']
           assert 'Fictional' in copy['freight-audit-example.html']
-          assert '30%' in copy['index.html']
+          assert 'contingencyRecoveryRateLabel: "30%"' in copy['commercial-config.js']
+          assert 'Rate confirmed before engagement' in copy['index.html']
           print('M36: original allowlisted publication boundary is clean for scoped false claims; 16 typed internal-source cases, 18 independent real pilot controls NOT satisfied, zero external legal/marketing approval.')
           PY
       - name: No scheduled checks, public claims promotion, deploy or customer data action
