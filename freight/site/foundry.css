@@ -1088,7 +1088,20 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
   color:#111!important;font-size:8.5pt!important;line-height:1.25!important;
   page-break-inside:avoid!important;
  }
- body.worksheet-print-mode .worksheet-checklist input{width:12px!important;height:12px!important;min-width:12px!important}
+ body.worksheet-print-mode .worksheet-checklist input{display:none!important}
+ body.worksheet-print-mode .worksheet-checklist label{
+  display:flex!important;flex-direction:row!important;
+  align-items:flex-start!important;gap:8px!important;
+ }
+ body.worksheet-print-mode .worksheet-checklist label::before{
+  content:"";display:block;flex:0 0 11px;width:11px;height:11px;
+  border:1px solid #4a4a4a;background:#fff;
+  box-sizing:border-box;margin-top:2px;
+ }
+ body.worksheet-print-mode .worksheet-checklist label:has(input:checked)::before{
+  content:"✓";font-size:10px;font-weight:900;line-height:10px;
+  text-align:center;
+ }
  body.worksheet-print-mode .worksheet-evidence{gap:4px!important;margin:7px 0!important}
  body.worksheet-print-mode .worksheet-evidence p{font-size:8pt!important}
  body.worksheet-print-mode .worksheet-line{border-bottom:1px solid #777!important}
