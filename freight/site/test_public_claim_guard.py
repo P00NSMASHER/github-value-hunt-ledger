@@ -73,7 +73,7 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
 
     def test_unsupported_site_or_missing_index_cannot_pass(self):
         with self.assertRaisesRegex(gate.PublicClaimViolation,
-                                    "M36_UNKNOWN_OR_MISSING_PUBLICATION_SURFACE"):
+                                    "M36_PUBLIC_INDEX_MISSING"):
             gate.validate_public_text_bundle({},site="RETALLY")
         with self.assertRaisesRegex(gate.PublicClaimViolation,
                                     "M36_UNKNOWN_OR_MISSING_PUBLICATION_SURFACE"):
