@@ -43,6 +43,8 @@ jobs:
         run: python -m unittest freight.site.test_public_repo_privacy -v
       - name: Run Freight regression suite
         run: python -m unittest discover -s freight -p "test_*.py" -v
+      - name: Run complete Freight pytest suite
+        run: PYTHONPATH=. python -m pytest -q freight
       - name: Verify pilot rights evidence consistency
         run: python -m freight.rights_evidence --stage pilot --expect CLEAR
 
