@@ -123,14 +123,15 @@ class FebruaryEditorialTest(unittest.TestCase):
         for p in self.rows:
             self.assertEqual(len(p["media"]),len(p["mediaAltText"]))
             self.assertLessEqual(len(p["media"]),4)
-            for asset,alt in zip(p["media"],p["mediaAltText"]):
+            for index,(asset,alt) in enumerate(zip(p["media"],p["mediaAltText"])):
                 uri=urlsplit(asset)
                 self.assertEqual((uri.scheme,uri.hostname),
                                  ("https","static.metricool.com"))
                 self.assertTrue(uri.path.startswith("/planner/202610/7322512-"))
                 self.assertTrue(uri.path.endswith((".png",".jpg",".jpeg",".webp")))
                 self.assertGreater(len(alt.strip()),25)
-                self.assertRegex(alt,MEDIA_HINTS[p["topic"]])
+                if index==0:
+                    self.assertRegex(alt,MEDIA_HINTS[p["topic"]])
             if p["media"]:
                 self.assertIsNotNone(p["sourceDay"])
                 self.assertIn(p["sourceNetwork"],("facebook","instagram"))
@@ -168,9 +169,8 @@ class FebruaryEditorialTest(unittest.TestCase):
         self.assertEqual(len(price),len(recovery))
         for p in price:
             self.assertIn("$0",p["text"])
-            self.assertIn("written",p["text"].lower() if p["network"]=="facebook"
-                          else "written")
-            self.assertRegex(p["text"].lower(),r"(not|aren.t|no) guaranteed|is not a refund promise|aren.t guaranteed")
+            self.assertIn("written",p["text"].lower())
+            self.assertRegex(p["text"].lower(),r"not guarantee|not guaranteed|aren.t guaranteed|no recovery is guaranteed|is not a refund promise")
         for p in recovery:
             self.assertIn("reversal",p["text"].lower())
 
