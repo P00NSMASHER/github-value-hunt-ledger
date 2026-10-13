@@ -95,6 +95,10 @@ from freight.research_bea_gross_output_m32 import (
     report_shell as build_bea_table16_m32,
     render_html as render_bea_table16_html_m32,
 )
+from freight.research_bea_original_m33 import (
+    report_shell as build_bea_original_m33,
+    render_html as render_bea_original_m33,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -169,6 +173,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bea_measure_compatibility_gate"]=build_bea_measure_gate(as_of=date.today())
         result["bls_real_sectoral_output_m31"]=build_bls_sectoral_output_m31(as_of=date.today())
         result["bea_gross_output_table16_m32"]=build_bea_table16_m32(as_of=date.today())
+        result["bea_first_party_original_xlsx_m33"]=build_bea_original_m33(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -230,6 +235,7 @@ def render(data: dict) -> str:
     bea_measure=data["bea_measure_compatibility_gate"]
     sectoral_output=data["bls_real_sectoral_output_m31"]
     bea_table16=data["bea_gross_output_table16_m32"]
+    original_bea=data["bea_first_party_original_xlsx_m33"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -448,7 +454,24 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
-<section class="panel"><h2>BEA Table 16 real gross output — BEA-origin data, secondary publisher</h2>
+<section class="panel"><h2>Original BEA numerical workbook — first-party source recovered</h2>
+<p>Official BEA GrossOutput.xlsx, publication September 30, 2026:
+NAICS 484 Truck transportation, annual original chain-type quantity index
+TGO103-A. It independently matches the earlier DBnomics-distributed
+Table 16, with additional first-party price-index, nominal-output and real
+chained-dollar crosschecks. This is an <strong>offline report</strong>
+using previously observed source values, NOT a fresh download in the
+dashboard: <strong>"""+escape(original_bea["status"])+"""</strong>.</p>
+<p>2017–2024 BEA real gross-output quantity index change:
+<strong>"""+escape(original_bea["original_bea_gross_output_2017_to_2024_pct"])+"""%</strong>.
+BEA gross-output price index change:
+<strong>"""+escape(original_bea["bea_price_index_2017_to_2024_pct"])+"""%</strong>.
+BEA current-dollar industry gross output change:
+<strong>"""+escape(original_bea["bea_nominal_gross_output_2017_to_2024_pct"])+"""%</strong>.
+These source measures are internally coherent but they are
+<strong>not customer freight bills, refund opportunities or proof of buyer demand</strong>.</p>
+<a href="bea_original_gross_output.html">Open original BEA source-grade, four-table reconciliation and customer-evidence limitations ↗</a></section>
+<section class="panel"><h2>BEA Table 16 real gross output — historical secondary-source evidence (M32)</h2>
 <p>This is the BEA chain-type quantity index for gross output by industry
 (GDPbyIndustry Table 16), exact annual NAICS 484 truck transportation
 observations from 2017–2024, <strong>as redistributed by DBnomics</strong>.
@@ -776,6 +799,13 @@ def main():
     (args.out/"bea_gross_output.html").write_text(
         render_bea_table16_html_m32(data["bea_gross_output_table16_m32"]),
         encoding="utf-8"
+    )
+    (args.out/"bea_original_gross_output.json").write_text(
+        json.dumps(data["bea_first_party_original_xlsx_m33"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"bea_original_gross_output.html").write_text(
+        render_bea_original_m33(data["bea_first_party_original_xlsx_m33"]),encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],

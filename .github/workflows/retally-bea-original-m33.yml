@@ -1,0 +1,175 @@
+name: RETALLY Lab 14 Direct Original BEA GrossOutput.xlsx (Mission 33)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bea-original-m33.yml'
+      - 'freight/research_bea_original_m33.py'
+      - 'freight/test_research_bea_original_m33.py'
+      - 'freight/research/BEA_ORIGINAL_ACCESS_M33_20261012.json'
+      - 'freight/RESEARCH_BEA_ORIGINAL_M33.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  offline-bea-first-party-source-adversarial-and-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing research suite and XLSX source parser
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Run M33 original BEA workbook adversarial and predecessor source regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_bea_original_m33.py \
+            freight/test_research_bea_gross_output_m32.py \
+            freight/test_research_bls_sectoral_output_m31.py \
+            freight/test_research_bea_measurement_gate.py \
+            freight/test_research_unified_blspci.py \
+            freight/test_research_bls_parent_origin.py \
+            freight/test_research_fred_parent_ppi.py \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Confirm offline source labels, four BEA tables and original 14 pilot labs
+        run: |
+          PYTHONPATH=. python -m freight.research_bea_original_m33 \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m33-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m33-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m33-offline/bea_original_gross_output.json').read_text())
+          q=json.loads(Path('/tmp/retally-m33-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_M33_DIRECT_ORIGINAL_BEA_GROSS_OUTPUT_XLSX_TABLE16_NAICS484_SOURCE'
+          assert r['status']=='M33_OFFLINE_PREVIOUS_BEA_DIRECT_XLSX_SOURCE_VALUES_NOT_REPLAYED_THIS_RUN'
+          assert r['fresh_original_bea_table16_year_cells_authenticated']==0
+          assert r['fresh_four_original_bea_tables_year_cells_authenticated']==0
+          assert r['direct_bea_original_numeric_source_authenticated'] is False
+          assert r['source_publisher']=='U.S. Bureau of Economic Analysis'
+          assert r['original_bea_file_expected_bytes']==506819
+          assert r['original_bea_file_expected_sha256']=='a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46'
+          assert r['official_bea_api_userid_denial_remains_true_historical_event'] is True
+          assert r['original_bea_file_download_does_not_require_bea_api_registration'] is True
+          assert r['previous_m32_secondary_source_only_remains_historical'] is True
+          assert len(r['bea_484_2017_2024_gross_output_annual_observations'])==8
+          assert r['original_bea_gross_output_2017_to_2024_pct']=='8.05'
+          assert r['bea_price_index_2017_to_2024_pct']=='37.49'
+          assert r['bea_nominal_gross_output_2017_to_2024_pct']=='48.56'
+          assert r['paid_customer_freight_invoice_rows']==0
+          assert r['recoverable_freight_market_tam_usd'] is None
+          assert r['human_pilot_18_independent_requirements_unmet'] is True
+          assert r['scheduled_tasks_created_or_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(q['lab_runs'])==14 and q['failed_or_blocked_labs']==[]
+          assert q['pilot_preflight']['unmet_requirements']==18
+          assert q['actual_revenue_cents']==0
+          assert q['bea_first_party_original_xlsx_m33']['receipt_sha256']==r['receipt_sha256']
+          assert 'bea_original_gross_output.html' in Path('/tmp/retally-m33-control/index.html').read_text()
+          print('M33 offline historical original BEA source policy and 14 original labs PASS; 18 customer approvals unmet.')
+          PY
+      - name: Preserve only derived BEA original-source status evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m33-bea-original-offline
+          path: |
+            /tmp/retally-m33-offline/bea_original_gross_output.json
+            /tmp/retally-m33-offline/bea_original_gross_output.html
+          if-no-files-found: error
+          retention-days: 14
+
+  direct-bea-publisher-excel-32-original-cells:
+    needs: offline-bea-first-party-source-adversarial-and-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned read-only XLSX source validator
+        run: python -m pip install openpyxl==3.1.5
+      - name: Authenticate first-party BEA original Excel gross output workbook
+        run: |
+          PYTHONPATH=. python -m freight.research_bea_original_m33 \
+            --fetch-original --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m33-bea
+      - name: Require full pinned original BEA source identity and 32 source cells
+        run: |
+          python - <<'PY'
+          import json
+          from decimal import Decimal
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m33-bea/bea_original_gross_output.json').read_text())
+          assert r['scope']=='LAB14_M33_DIRECT_ORIGINAL_BEA_GROSS_OUTPUT_XLSX_TABLE16_NAICS484_SOURCE'
+          assert r['source_url']=='https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx'
+          assert r['source_publisher']=='U.S. Bureau of Economic Analysis'
+          assert r['original_bea_file_expected_sha256']=='a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46'
+          assert r['original_bea_file_expected_bytes']==506819
+          assert r['original_bea_gross_output_2017_to_2024_pct']=='8.05'
+          assert r['bea_nominal_gross_output_2017_to_2024_pct']=='48.56'
+          assert r['bea_price_index_2017_to_2024_pct']=='37.49'
+          assert r['previous_m32_secondary_source_only_remains_historical'] is True
+          assert r['official_bea_api_userid_denial_remains_true_historical_event'] is True
+          assert r['economic_measure_discrepancies_are_not_forecast_errors'] is True
+          assert r['paid_customer_freight_invoice_rows']==0
+          assert r['verified_carrier_invoice_overcharges']==0
+          assert r['actual_retally_recovery_cash_usd'] is None
+          assert r['recoverable_freight_market_tam_usd'] is None
+          assert r['buyers_with_authorized_verified_demand']==0
+          assert r['human_pilot_18_independent_requirements_unmet'] is True
+          assert r['scheduled_tasks_created_or_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          if r['status']=='M33_ORIGINAL_BEA_506819_BYTE_GROSSOUTPUT_XLSX_4_TABLES_32_YEAR_CELLS_VERIFIED':
+            assert r['fresh_original_bea_publisher_xlsx_replayed_this_run'] is True
+            assert r['fresh_original_bea_table16_year_cells_authenticated']==8
+            assert r['fresh_four_original_bea_tables_year_cells_authenticated']==32
+            assert r['direct_bea_original_numeric_source_authenticated'] is True
+            assert r['fresh_original_bea_xlsx_sha256']==r['original_bea_file_expected_sha256']
+            checks=r['original_bea_workbook_internal_reconciliation']
+            assert checks['original_year_source_cells_reproduced']==32
+            assert checks['industry_naics']=='484'
+            assert checks['source_measure']=='BEA_ORIGINAL_TGO103_ANNUAL_REAL_GROSS_OUTPUT_QUANTITY'
+            assert checks['source_annual_values']['TGO103-A']['2024'] in ('108.047',)
+            assert checks['source_annual_values']['TGO104-A']['2024']=='137.494'
+            assert checks['source_annual_values']['TGO105-A']['2024']=='545435'
+            assert checks['source_annual_values']['TGO106-A']['2024']=='396699'
+            assert Decimal(checks['max_price_times_quantity_vs_nominal_relative_error'])<=Decimal('0.00002')
+            assert len(r['fresh_primary_source_semantic_receipt_sha256'])==64
+            print('VERIFIED ORIGINAL BEA 506819-byte XLSX, 8 original annual quantity years and 32 four-table annual source cells.')
+          elif r['status']=='M33_ORIGINAL_BEA_XLSX_NETWORK_UNAVAILABLE_NO_NEW_SOURCE_REPLAY':
+            assert r['fresh_original_bea_publisher_xlsx_replayed_this_run'] is False
+            assert r['fresh_original_bea_table16_year_cells_authenticated']==0
+            assert r['direct_bea_original_numeric_source_authenticated'] is False
+            print('::warning::BEA publisher XLSX source network blocked: original source not freshly authenticated.')
+          else:
+            raise AssertionError('ORIGINAL_BEA_GROSS_OUTPUT_SOURCE_DRIFT_OR_FALSE_PUBLISHER_STATUS')
+          PY
+      - name: Keep only derived official-source SHA and semantic receipts, never raw XLSX
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m33-bea-original-first-party-proof
+          path: |
+            /tmp/retally-m33-bea/bea_original_gross_output.json
+            /tmp/retally-m33-bea/bea_original_gross_output.html
+          if-no-files-found: error
+          retention-days: 14
