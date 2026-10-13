@@ -145,15 +145,23 @@ class PersistentSemanticM44Tests(unittest.TestCase):
             self.assertEqual(b.auto_allocate("e1",created_at=ALLOCATED_AT).status,
                              "ALLOCATED")
             self.assertEqual(a.assert_semantic_integrity()["validated_claims"],0)
+            # A clean tenant's report remains scoped before the malicious
+            # modification; no Tenant B customer rows may leak to Tenant A.
+            good=json.loads(a.report_snapshot_json())
+            self.assertEqual(good["buyer_id"],"TENANT-A")
+            self.assertEqual(len(good["tables"]["allocations"]),0)
             with sqlite3.connect(db) as con:
                 con.execute("DROP TRIGGER immutable_alloc_u")
                 con.execute(
                     "UPDATE allocations SET fee_eligible_cents=0 "
                     "WHERE buyer_id='TENANT-B' AND allocation_id='auto:e1:c1'"
                 )
-            good=json.loads(a.report_snapshot_json())
-            self.assertEqual(good["buyer_id"],"TENANT-A")
-            self.assertEqual(len(good["tables"]["allocations"]),0)
+            # M46's schema defense is GLOBAL, even though M44's money
+            # audit is scoped. A cannot safely use a shared database with
+            # missing protection triggers, regardless of whose rows changed.
+            with self.assertRaisesRegex(RuntimeError,
+                                         "M46_SQLITE_CATALOG_OBJECTS_CHANGED"):
+                a.report_snapshot_json()
             with self.assertRaisesRegex(RuntimeError,
                                          "M44_ALLOCATION_FEE_ELIGIBILITY_DRIFT"):
                 b.report_snapshot_json()
