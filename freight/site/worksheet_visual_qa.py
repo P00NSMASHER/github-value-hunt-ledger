@@ -102,19 +102,23 @@ def verify(bundle: Path, destination: Path) -> dict:
                         cleared=page.locator("#ws-unresolved").inner_text().strip()
                         print_info["localRecalculation"]=(updated=="$75.00" and cleared=="—")
                         page.emulate_media(media="print")
+                        page.set_viewport_size({"width":816,"height":1056})
                         page.evaluate("document.body.classList.add('worksheet-print-mode')")
                         printed=page.evaluate("""() => ({
                           headerHidden:getComputedStyle(document.querySelector('.site-header')).display==='none',
+                          skipHidden:getComputedStyle(document.querySelector('.skip')).display==='none',
+                          boldBlack:getComputedStyle(document.querySelector('.worksheet-head strong')).color==='rgb(17, 17, 17)',
                           navHidden:getComputedStyle(document.querySelector('.document-nav')).display==='none',
                           worksheetVisible:getComputedStyle(document.querySelector('.worksheet-builder')).display!=='none',
                           checklistCount:document.querySelectorAll('.worksheet-checklist input[type=checkbox]').length,
                           printActionsHidden:getComputedStyle(document.querySelector('.worksheet-sharing')).display==='none'
                         })""")
-                        page.screenshot(path=str(destination/"worksheet-print-mode-390.png"),
+                        page.screenshot(path=str(destination/"worksheet-print-mode-letter.png"),
                                         full_page=True,animations="disabled")
                         print_info["printCss"]=printed
                         print_info["printReadiness"]=all([
                             printed["headerHidden"],printed["navHidden"],
+                            printed["skipHidden"],printed["boldBlack"],
                             printed["worksheetVisible"],printed["checklistCount"]==15,
                             printed["printActionsHidden"]])
                     ctx.close()
@@ -126,7 +130,7 @@ def verify(bundle: Path, destination: Path) -> dict:
     report={
         "scope":"LOOPBACK_READ_ONLY_SYNTHETIC_FIGURES_NO_REAL_INVOICE",
         "buyerLeadVerified":False,"fundsRecovered":False,
-        "screenshots":[f"worksheet-{w}.png" for w,_ in SIZES]+["worksheet-print-mode-390.png"],
+        "screenshots":[f"worksheet-{w}.png" for w,_ in SIZES]+["worksheet-print-mode-letter.png"],
         "records":records,"print":print_info,
         "passed":len(records)==len(SIZES) and all(x["status"]=="PASS" for x in records)
                  and print_info.get("printReadiness") is True
