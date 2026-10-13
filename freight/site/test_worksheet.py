@@ -60,7 +60,7 @@ class SocialWorksheetTests(unittest.TestCase):
         parsed=Markup()
         parsed.feed(target)
         self.assertFalse(parsed.forms)
-        self.assertEqual(len(parsed.buttons),4)
+        self.assertEqual(len(parsed.buttons),5)
         self.assertTrue(all(button.get("type")=="button" for button in parsed.buttons))
         for name in ("ws-billed","ws-expected","ws-credits"):
             matching=[x for x in parsed.inputs if x.get("id")==name]
@@ -74,7 +74,7 @@ class SocialWorksheetTests(unittest.TestCase):
         parser=Markup();parser.feed(p)
         self.assertEqual(len(parser.ids),len(set(parser.ids)))
         for uid in ("ws-unresolved","ws-difference","ws-credit-applied",
-                    "ws-error","ws-status","ws-print","ws-copy","ws-clear","ws-sample"):
+                    "ws-error","ws-status","ws-print","ws-copy","ws-share","ws-share-status","ws-clear","ws-sample"):
             self.assertEqual(parser.ids.count(uid),1)
         self.assertIn('role="status"',p)
         self.assertIn('role="alert"',p)
