@@ -1,0 +1,134 @@
+{
+  "brand": "RETALLY",
+  "source": "Internal illustrative research creative pack",
+  "production_status": "REVIEW_ONLY",
+  "existing_metricool_schedule_unchanged": true,
+  "content": [
+    {
+      "concept": "scope_first",
+      "status": "CONTENT_DRAFT_NOT_SCHEDULED_OR_APPROVED",
+      "target_educational_route": "/freight-invoice-audit-checklist",
+      "suggested_image_alt_text": "RETALLY freight audit scope-freeze artwork: identify carriers, invoice date range and already-issued credits before analyzing invoices. Illustration only; no customer data.",
+      "instagram": {
+        "type": "POST",
+        "caption": "Before you calculate an overcharge, define which invoices belong in the audit.\n\nA clean starting population answers: which carriers, dates, freight modes, entities and existing credits are included?\n\nIf the scope keeps changing, the savings number becomes difficult to defend. A suspicious difference is not yet a realized recovery.\n\nSave the scope checklist for your next AP review. See the complete guide through the link in our bio.\n\n#RETALLY #FreightAudit #AccountsPayable",
+        "cta": "profile link / save / share",
+        "public_url_in_caption": false,
+        "autoPublish": false
+      },
+      "facebook": {
+        "type": "POST",
+        "caption": "A freight audit starts with a denominator, not a dollar sign.\n\nBefore reviewing carrier charges, freeze the entities, carriers, freight modes, billing dates, currencies and exclusions. Reconcile prior disputes and credits so the same correction isn't claimed twice.\n\nA potential billing difference is a question. A validated finding needs evidence. A recovered amount needs actual eligible funds or credits.\n\nUse the freight invoice audit checklist:\nhttps://www.retallyrecovery.com/freight-invoice-audit-checklist?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_v3_fieldnotes_2026&utm_content=scope_first\n\n#FreightAudit #TransportationFinance",
+        "autoPublish": false
+      },
+      "rights_clearance_required": true,
+      "visual_approval_required": true,
+      "no_real_customer_results": true
+    },
+    {
+      "concept": "fuel_authority",
+      "status": "CONTENT_DRAFT_NOT_SCHEDULED_OR_APPROVED",
+      "target_educational_route": "/carrier-rate-audit",
+      "suggested_image_alt_text": "RETALLY fuel surcharge evidence artwork showing the governing agreement, effective index period and rate base. Illustrative freight finance diagram, not a client result.",
+      "instagram": {
+        "type": "POST",
+        "caption": "The fuel-surcharge arithmetic can be correct while the underlying rule is wrong.\n\nBefore comparing a carrier's fuel charge with an online index, confirm the agreement governing that shipment, the effective surcharge table, the index/lookback period, eligible base charges and rounding.\n\nNo controlling source? Leave the issue unresolved—don't automatically take the cheaper number.\n\nSave the five-input test. Method details in our bio.\n\n#RETALLY #CarrierRates #FreightAudit",
+        "cta": "profile link / save / share",
+        "public_url_in_caption": false,
+        "autoPublish": false
+      },
+      "facebook": {
+        "type": "POST",
+        "caption": "Which fuel-surcharge table actually governed the shipment?\n\nA rate comparison is only meaningful when the contract, index period, effective date, base charge and rounding method match the agreement.\n\nFinding a lower online fuel table doesn't prove overbilling. It establishes a question to research.\n\nExplore the governing rate standard:\nhttps://www.retallyrecovery.com/carrier-rate-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_v3_fieldnotes_2026&utm_content=fuel_authority\n\n#FreightAudit #TransportationFinance",
+        "autoPublish": false
+      },
+      "rights_clearance_required": true,
+      "visual_approval_required": true,
+      "no_real_customer_results": true
+    },
+    {
+      "concept": "detention_clock",
+      "status": "CONTENT_DRAFT_NOT_SCHEDULED_OR_APPROVED",
+      "target_educational_route": "/accessorial-charge-audit",
+      "suggested_image_alt_text": "RETALLY illustrative freight detention review: gate-in 08:30, gate-out 11:00, 150 minutes onsite, hypothetically 120 free minutes, and 30 minutes beyond free time. Not a real charge or customer result.",
+      "instagram": {
+        "type": "POST",
+        "caption": "ILLUSTRATIVE EXAMPLE — NOT A CUSTOMER RESULT.\n\nA gate log says 08:30 in and 11:00 out: 150 minutes onsite.\n\nIf the signed terms hypothetically allow 120 free minutes starting at arrival, 30 minutes would remain beyond free time. If 90 minutes were billed, that is a 60-minute question—not an established overcharge.\n\nAppointment rules, actual triggers, exceptions, minimum charges, corrections and credits may change the answer.\n\nSave the calculation for your next detention review.\n\n#RETALLY #DetentionCharges #FreightAudit",
+        "cta": "profile link / save / share",
+        "public_url_in_caption": false,
+        "autoPublish": false
+      },
+      "facebook": {
+        "type": "POST",
+        "caption": "ILLUSTRATIVE DETENTION CASE — NOT A CUSTOMER RESULT.\n\nGate in: 08:30. Gate out: 11:00. Total onsite: 150 minutes.\n\nAssume a signed contract hypothetically allows 120 free minutes from arrival and no exceptions. That leaves 30 minutes beyond free time. An invoice for 90 detention minutes warrants review of the extra 60.\n\nThe gate timestamps alone do not establish a carrier error. Verify the contractual trigger, appointment provisions, corrections and prior credits.\n\nSee the accessorial evidence guide:\nhttps://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_v3_fieldnotes_2026&utm_content=detention_clock\n\n#FreightAudit #TransportationFinance",
+        "autoPublish": false
+      },
+      "rights_clearance_required": true,
+      "visual_approval_required": true,
+      "no_real_customer_results": true
+    },
+    {
+      "concept": "claim_evidence",
+      "status": "CONTENT_DRAFT_NOT_SCHEDULED_OR_APPROVED",
+      "target_educational_route": "/freight-overcharge-dispute-process",
+      "suggested_image_alt_text": "RETALLY evidence-package artwork with a freight bill, shipment/BOL identification, governing rate source and reproducible calculation. Illustrative framework only, not real customer documents.",
+      "instagram": {
+        "type": "POST",
+        "caption": "Could another reviewer understand your freight dispute from the evidence package alone?\n\nA supportable case ties together: the exact invoice, shipment identity, commercial authority in effect, service records, a repeatable calculation and any credits already issued.\n\nA flagged row is not automatically a proven claim. A supported finding is not necessarily an approved refund.\n\nShare this checklist with the person handling carrier disputes.\n\n#RETALLY #InvoiceAudit #FreightRecovery",
+        "cta": "profile link / save / share",
+        "public_url_in_caption": false,
+        "autoPublish": false
+      },
+      "facebook": {
+        "type": "POST",
+        "caption": "Could another reviewer defend your freight dispute without calling you for missing records?\n\nA good case identifies the shipment and invoice, the challenged charge, its controlling terms, the service evidence, a reproducible recalculation and prior credits.\n\nThe right package makes a decision possible; it doesn't guarantee a carrier will approve it. Customer authorization must precede recovery outreach.\n\nSee RETALLY's dispute process:\nhttps://www.retallyrecovery.com/freight-overcharge-dispute-process?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_v3_fieldnotes_2026&utm_content=claim_evidence\n\n#FreightAudit #TransportationFinance",
+        "autoPublish": false
+      },
+      "rights_clearance_required": true,
+      "visual_approval_required": true,
+      "no_real_customer_results": true
+    },
+    {
+      "concept": "settlement_status",
+      "status": "CONTENT_DRAFT_NOT_SCHEDULED_OR_APPROVED",
+      "target_educational_route": "/freight-recovery-evidence-standard",
+      "suggested_image_alt_text": "RETALLY illustrative settlement ledger distinguishing approved claim, posted and usable credit, and possible reversal, with no invented dollar amounts or customer outcomes.",
+      "instagram": {
+        "type": "POST",
+        "caption": "The carrier approved a freight credit. Is that money recovered?\n\nNot necessarily.\n\nApproval, posted credit, usable account offset, actual refund and later reversal are different events.\n\nA good recovery report identifies which stage each amount reached and reconciles any reversal before describing net eligible funds.\n\nDon't confuse estimated savings with cash. Save this finance-control distinction.\n\n#RETALLY #FreightRecovery #FinanceControls",
+        "cta": "profile link / save / share",
+        "public_url_in_caption": false,
+        "autoPublish": false
+      },
+      "facebook": {
+        "type": "POST",
+        "caption": "\"Credit approved\" is not the same as \"money recovered.\"\n\nAn approved dispute may become a credit memo, later a usable account adjustment or a refund. It may also be reversed.\n\nA reliable recovery ledger ties each event to the original finding and reports net eligible value actually received under the written engagement terms. No particular outcome is guaranteed.\n\nRead the evidence standard:\nhttps://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_v3_fieldnotes_2026&utm_content=settlement_status\n\n#FreightAudit #TransportationFinance",
+        "autoPublish": false
+      },
+      "rights_clearance_required": true,
+      "visual_approval_required": true,
+      "no_real_customer_results": true
+    },
+    {
+      "concept": "secure_intake",
+      "status": "CONTENT_DRAFT_NOT_SCHEDULED_OR_APPROVED",
+      "target_educational_route": "/privacy",
+      "suggested_image_alt_text": "RETALLY freight data stewardship artwork: general questions and scope may be discussed openly, while invoices and private rate agreements require separately agreed secure record transfer. No customer data.",
+      "instagram": {
+        "type": "POST",
+        "caption": "Do not send freight invoices, rate agreements, account numbers or bank details in social DMs.\n\nStart with non-sensitive context: what freight modes, carriers and billing periods are under review?\n\nOnly after fit and scope are agreed should sensitive records be transferred through an approved secure route. An email draft or a DM is not evidence that RETALLY received a customer request.\n\nShare this privacy reminder with your AP team.\n\n#RETALLY #FreightAudit #DataStewardship",
+        "cta": "profile link / save / share",
+        "public_url_in_caption": false,
+        "autoPublish": false
+      },
+      "facebook": {
+        "type": "POST",
+        "caption": "Social messages are for general questions—not confidential freight files.\n\nA practical initial conversation can cover freight mode, carriers, rough billing periods and audit scope. Keep invoices, private contracts, account identifiers and payment details out of comments and DMs.\n\nConfidential records require an agreed secure transfer route and appropriate authorization first.\n\nRead RETALLY's data and privacy principles:\nhttps://www.retallyrecovery.com/privacy?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_v3_fieldnotes_2026&utm_content=secure_intake\n\n#FreightAudit #TransportationFinance",
+        "autoPublish": false
+      },
+      "rights_clearance_required": true,
+      "visual_approval_required": true,
+      "no_real_customer_results": true
+    }
+  ]
+}
