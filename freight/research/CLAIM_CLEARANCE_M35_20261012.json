@@ -1,0 +1,404 @@
+{
+  "schema_version": 1,
+  "scope": "RETALLY_LAB14_M35_RESEARCH_TO_COMMERCIAL_CLAIM_FIREBREAK_NO_PUBLICATION",
+  "observed_on": "2026-10-12",
+  "lab_number": 14,
+  "source_policy": "READ_ONLY_ALREADY_GROUNDED_ECONOMIC_MEASURES_NO_NEW_ORIGINAL_PUBLISHER_REPLAY",
+  "reference_reports": {
+    "M34": "freight/research_economic_denominator_m34.py",
+    "M33": "freight/research_bea_original_m33.py",
+    "M31": "freight/research_bls_sectoral_output_m31.py",
+    "M29": "freight/research_unified_blspci.py",
+    "M11": "freight/research_pilot_preflight.py"
+  },
+  "original_pilot_gate_catalog": "freight/research/PILOT_PREFLIGHT_20261011.json",
+  "required_pilot_gate_count": 18,
+  "required_pilot_stage_count": 6,
+  "independent_human_signoffs_observed": 0,
+  "external_claims_approved": 0,
+  "real_customer_invoices_observed": 0,
+  "actual_cash_recovered_usd": null,
+  "recoverable_market_tam_usd": null,
+  "claim_registry": [
+    {
+      "id": "M35-01",
+      "name": "BEA 2024 nominal trucking gross output",
+      "metric_key": "BEA_2024_NOMINAL",
+      "expected_value": "545435.000",
+      "evidence_class": "ORIGINAL_GOVERNMENT",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Annual BEA gross output, USD millions, not paid customer freight invoices.",
+      "source_refs": [
+        "M34",
+        "M33"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-02",
+      "name": "Census 2024 employer trucking revenue",
+      "metric_key": "CENSUS_2024_REVENUE",
+      "expected_value": "402827.246",
+      "evidence_class": "ORIGINAL_GOVERNMENT",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Annual Census employer-industry revenue, USD millions, not complete carrier invoice spending.",
+      "source_refs": [
+        "M34"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-03",
+      "name": "BEA minus Census 2024 arithmetic difference",
+      "metric_key": "DENOMINATOR_2024_GAP",
+      "expected_value": "142607.754",
+      "evidence_class": "DESCRIPTIVE_ONLY",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Arithmetic gap, USD millions; coverage differences not causally decomposed or recoverable.",
+      "source_refs": [
+        "M34"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-04",
+      "name": "Census-to-BEA 2024 arithmetic ratio",
+      "metric_key": "CENSUS_TO_BEA_RATIO",
+      "expected_value": "73.85",
+      "evidence_class": "DESCRIPTIVE_ONLY",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Ratio of distinct industry statistics, percent, not a freight audit market share.",
+      "source_refs": [
+        "M34"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-05",
+      "name": "BEA 2017–2024 real gross-output change",
+      "metric_key": "BEA_GROSS_OUTPUT_CHANGE",
+      "expected_value": "8.05",
+      "evidence_class": "ORIGINAL_GOVERNMENT",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Original BEA real output quantity index change, not tonnage or customer demand.",
+      "source_refs": [
+        "M33"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-06",
+      "name": "BLS 2017–2024 real sectoral-output change",
+      "metric_key": "BLS_SECTORAL_CHANGE",
+      "expected_value": "4.02",
+      "evidence_class": "ORIGINAL_GOVERNMENT",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "BLS sectoral-output index excludes certain intra-industry shipments.",
+      "source_refs": [
+        "M31"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-07",
+      "name": "Illustrative Census–BLS PPI revenue proxy",
+      "metric_key": "CENSUS_PPI_PROXY",
+      "expected_value": "1.18",
+      "evidence_class": "MODEL_DESCRIPTIVE_ONLY",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Unofficial annual-average PPI-adjusted Census employer revenue proxy, not official real output.",
+      "source_refs": [
+        "M29"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-08",
+      "name": "Difference between BEA gross-output and BLS net-output price changes",
+      "metric_key": "PRICE_SCOPE_GAP",
+      "expected_value": "0.45",
+      "evidence_class": "DESCRIPTIVE_ONLY",
+      "internal_result": "INTERNAL_RESEARCH_WITH_SOURCE_CAVEATS",
+      "external_result": "BLOCKED_NO_LAB_PUBLICATION_AUTHORITY",
+      "required_pilot_gate_ids": [
+        "P11-18"
+      ],
+      "caveat": "Percentage-point contrast between differently scoped prices; no billing-rate error is implied.",
+      "source_refs": [
+        "M34"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-09",
+      "name": "RETALLY can recover the BEA–Census $142.608B gap",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-01",
+        "P11-03",
+        "P11-07",
+        "P11-08",
+        "P11-09",
+        "P11-10",
+        "P11-11",
+        "P11-13",
+        "P11-15",
+        "P11-18"
+      ],
+      "caveat": "No verified customer-level invoice frame, applicable contract, independent error adjudication, or owner permission; industry gap is not a recoverable market.",
+      "block_reason_code": "UNVERIFIED_RECOVERY_TAM",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-10",
+      "name": "The 73.85% Census/BEA ratio equals a freight invoice accuracy rate",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-07",
+        "P11-08",
+        "P11-10",
+        "P11-11",
+        "P11-12",
+        "P11-13",
+        "P11-14",
+        "P11-15",
+        "P11-18"
+      ],
+      "caveat": "Different industry denominators cannot measure actual carrier invoice error frequency.",
+      "block_reason_code": "UNVERIFIED_INVOICE_ERROR_RATE",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-11",
+      "name": "Synthetic 9/10 reviewer agreement establishes RETALLY 90% real-world accuracy",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-10",
+        "P11-11",
+        "P11-12",
+        "P11-13",
+        "P11-14",
+        "P11-15",
+        "P11-18"
+      ],
+      "caveat": "Both fictional reviewers are produced by the same fixture; independent human reliability is unknown.",
+      "block_reason_code": "SYNTHETIC_VERSUS_REAL",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-12",
+      "name": "RETALLY has collected verified freight refunds and contingency fees",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-01",
+        "P11-02",
+        "P11-07",
+        "P11-08",
+        "P11-09",
+        "P11-13",
+        "P11-14",
+        "P11-15",
+        "P11-16",
+        "P11-17",
+        "P11-18"
+      ],
+      "caveat": "Zero real customer invoices or funds; no independently reconciled collected cash or fee authority.",
+      "block_reason_code": "UNVERIFIED_CASH_AND_FEES",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-13",
+      "name": "RETALLY is independently authorized to audit a real buyer’s carrier invoices",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-01",
+        "P11-02",
+        "P11-03",
+        "P11-04",
+        "P11-05",
+        "P11-06",
+        "P11-18"
+      ],
+      "caveat": "No original buyer authority, data rights, privacy/security acceptance, or external-contact authorization.",
+      "block_reason_code": "UNVERIFIED_BUYER_AND_SECURITY_PERMISSION",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-14",
+      "name": "BEA and BLS government output growth proves demand for RETALLY’s services",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-01",
+        "P11-10",
+        "P11-11",
+        "P11-12",
+        "P11-15",
+        "P11-18"
+      ],
+      "caveat": "Industry output statistics are not independently observed procurement intent or buyer demand.",
+      "block_reason_code": "UNVERIFIED_BUYER_DEMAND",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-15",
+      "name": "A synthetic invoicing cohort proves an unbiased real-carrier recovery rate",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-07",
+        "P11-08",
+        "P11-09",
+        "P11-10",
+        "P11-11",
+        "P11-12",
+        "P11-13",
+        "P11-14",
+        "P11-15",
+        "P11-17",
+        "P11-18"
+      ],
+      "caveat": "Synthetic fixtures cannot establish a probability sample, original invoices, reliable human review, or recovered cash.",
+      "block_reason_code": "UNVERIFIED_CUSTOMER_OUTCOME",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    },
+    {
+      "id": "M35-16",
+      "name": "Research Lab 14 passing all checks authorizes real-customer onboarding and publication",
+      "metric_key": null,
+      "expected_value": null,
+      "evidence_class": "CUSTOMER_EMPIRICAL_PROOF_NOT_OBSERVED",
+      "internal_result": "BLOCKED_UNSUPPORTED_INFERENCE",
+      "external_result": "BLOCKED_NO_INDEPENDENT_CUSTOMER_EVIDENCE",
+      "required_pilot_gate_ids": [
+        "P11-01",
+        "P11-02",
+        "P11-03",
+        "P11-04",
+        "P11-05",
+        "P11-06",
+        "P11-07",
+        "P11-08",
+        "P11-09",
+        "P11-10",
+        "P11-11",
+        "P11-12",
+        "P11-13",
+        "P11-14",
+        "P11-15",
+        "P11-16",
+        "P11-17",
+        "P11-18"
+      ],
+      "caveat": "Test and workflow success cannot substitute for any of the eighteen independent buyer, security, evidence, adjudication, finance or publication approvals.",
+      "block_reason_code": "UNVERIFIED_HUMAN_APPROVAL",
+      "source_refs": [
+        "M11"
+      ],
+      "approves_customer_money": false,
+      "public_publication_authorized": false
+    }
+  ],
+  "claim_count": 16,
+  "qualified_internal_claim_count": 8,
+  "blocked_inference_claim_count": 8,
+  "no_external_marketing_or_outreach_authorized": true,
+  "no_client_document_import_authorized": true,
+  "no_pilot_signoff_from_research_ci": true,
+  "no_recovery_tam_from_industry_denominator_gap": true,
+  "no_statistical_confidence_from_synthetic_reviewer_agreement": true,
+  "no_assumption_that_source_receipts_are_independent_human_approvals": true,
+  "no_new_lab_created": true,
+  "no_new_schedule_created": true,
+  "source_caveat": "Mission 35 is a read-only typed evidence-to-claim boundary for Research Lab 14. Authentic original BEA, Census and BLS macroeconomic measurements may support precisely attributed internal economic statements, but cannot prove customer freight invoices, contract bill overcharges, customer consent, independent buyer demand, audit accuracy, collected refunds, recoverable total addressable market or authority to contact carriers. The 2024 nominal BEA gross output minus Census employer-revenue difference of $142607.754 million is a population and accounting contrast, not a freight billing error or recovery fund. Nine of ten fictional reviewer agreements in synthetic fixtures are NOT independent human accuracy. The existing Mission 11 pilot preflight has exactly eighteen human evidence controls in six stages, every one unmet. A passing GitHub workflow, SHA-256 consistency receipt, or independent public macroeconomic source does not satisfy privacy, legal, buyer, reviewer, finance or external publication signoff. This module approves internal education with caveats only and must never publish marketing claims or use real customer data."
+}
