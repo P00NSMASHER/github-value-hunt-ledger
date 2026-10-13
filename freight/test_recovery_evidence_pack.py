@@ -118,7 +118,9 @@ def test_pack_rejects_settled_credit_above_candidate_difference():
 
 def test_pack_rejects_duplicate_positive_settlement_reference():
     data = payload()
-    data["findings"][1]["settlement_reference"] = data["findings"][0]["settlement_reference"]
+    duplicate_reference = data["findings"][0]["settlement_reference"]
+    data["findings"][1]["settlement_reference"] = duplicate_reference
+    data["findings"][1]["supporting_evidence"].append(duplicate_reference)
     with pytest.raises(
         ValueError,
         match="positive settlement_reference must be unique across findings",
@@ -233,6 +235,10 @@ def test_duplicate_economic_opportunity_fails_closed():
     duplicate = dict(original)
     duplicate["finding_id"] = "FR-DUPLICATE"
     duplicate["settlement_reference"] = "CREDIT-DUPLICATE"
+    duplicate["supporting_evidence"] = [
+        *original["supporting_evidence"],
+        duplicate["settlement_reference"],
+    ]
     data["findings"].append(duplicate)
     with pytest.raises(
         ValueError,
@@ -248,6 +254,10 @@ def test_same_invoice_can_hold_distinct_finding_categories():
     separate_charge["finding_id"] = "FR-ACCESSORIAL"
     separate_charge["finding_category"] = "Unsupported detention charge"
     separate_charge["settlement_reference"] = "CREDIT-ACCESSORIAL"
+    separate_charge["supporting_evidence"] = [
+        *original["supporting_evidence"],
+        separate_charge["settlement_reference"],
+    ]
     data["findings"].append(separate_charge)
     pack = build_pack(data)
     assert pack["totals"]["findings_count"] == len(data["findings"])
