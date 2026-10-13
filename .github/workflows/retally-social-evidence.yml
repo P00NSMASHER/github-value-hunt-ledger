@@ -58,6 +58,46 @@ jobs:
           print("RETALLY current campaign: 24 unique tracked URLs, 28 media, 11 source routes; no live claim")
           PY
 
+      - name: Diagnose failing production destinations and owned Pages fallback (read-only)
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 - <<'PY'
+          import json
+          import urllib.request
+          import urllib.error
+          from pathlib import Path
+          paths=("/freight-recovery-evidence-standard",
+                 "/privacy", "/second-look-freight-audit", "/trust")
+          origins=("https://www.retallyrecovery.com",
+                   "https://retally-web.pages.dev")
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          opener=urllib.request.build_opener(NoRedirect())
+          results=[]
+          for origin in origins:
+              for path in paths:
+                  url=origin+path
+                  observed=[]
+                  for attempt in range(2):
+                      req=urllib.request.Request(url,method="GET",headers={
+                          "User-Agent":"RETALLY-ReadOnly-Public-Route-Diagnostic/1.0",
+                          "Cache-Control":"no-cache"})
+                      try:
+                          with opener.open(req,timeout=12) as response:
+                              status=response.status
+                              response.read(2048)
+                      except urllib.error.HTTPError as err:
+                          status=err.code
+                      except (TimeoutError,OSError,urllib.error.URLError) as err:
+                          status=type(err).__name__
+                      observed.append(status)
+                  results.append({"origin":origin,"path":path,"statuses":observed})
+                  print(f"RETALLY_ROUTE {origin}{path}: {observed}")
+          Path("retally-destination-diagnostic.json").write_text(
+              json.dumps({"network_observation_only":True,"results":results},indent=2))
+          PY
+
       - name: Test actual 11 campaign pages by read-only bounded public HTTPS GET
         if: github.event_name == 'pull_request'
         run: |
@@ -91,6 +131,7 @@ jobs:
           path: |
             retally-current-route-http.md
             retally-current-route-http.json
+            retally-destination-diagnostic.json
 
       - name: Exercise safe synthetic report
         run: |
