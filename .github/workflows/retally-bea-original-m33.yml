@@ -21,6 +21,39 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
+      - name: Download original BEA official GrossOutput.xlsx and locate Table16 484 2017–2024 row
+        run: |
+          python -m pip install openpyxl==3.1.5
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          from io import BytesIO
+          from zipfile import ZipFile
+          from openpyxl import load_workbook
+          url='https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx'
+          req=Request(url,headers={'User-Agent':'RETALLY-Lab14-Original-BEA-GrossOutput-Source-Replay/1.0'})
+          with urlopen(req,timeout=35) as res:
+            raw=res.read(18000001)
+            print('M33_PRIMARY_BEAXLS_HTTP',res.status,'url',res.geturl(),'type',res.headers.get('Content-Type'),'bytes',len(raw),'sha256',sha256(raw).hexdigest(),flush=True)
+          if len(raw)>18000000:raise ValueError('BEA_GROSSOUTPUT_XLSX_EXCEEDS_LIMIT')
+          with ZipFile(BytesIO(raw)) as z:
+            print('M33_PRIMARY_BEAXLS_MEMBERS',z.namelist()[:23],flush=True)
+          wb=load_workbook(BytesIO(raw),read_only=True,data_only=True)
+          print('M33_PRIMARY_BEAXLS_SHEETS',wb.sheetnames,flush=True)
+          for sheet in wb:
+            first=[]
+            hits=[]
+            for idx,row in enumerate(sheet.iter_rows(values_only=True),start=1):
+              if idx<=10:
+                first.append({'line':idx,'cells':[str(x)[:75] if x is not None else None for x in row[:28]]})
+              clean=[str(x).strip() if x is not None else '' for x in row]
+              if ('Truck transportation' in clean or
+                  '484' in clean[:6] or
+                  'Chain-Type Quantity Indexes for Gross Output by Industry' in clean[:8]):
+                hits.append({'line':idx,'cells':clean[:44]})
+              if idx>2500:break
+            print('M33_PRIMARY_BEAXLS_TAB',sheet.title,'max_row',sheet.max_row,'max_col',sheet.max_column,'first',first[:6],'matched_rows',hits[:16],flush=True)
+          PY
       - name: Inspect original BEA industry open-data metadata and unauthenticated Table16 endpoint
         run: |
           python - <<'PY'
