@@ -262,13 +262,14 @@ def render_markdown(pack):
         "5. Reversals reduce realized recovery.",
         "6. Positive settled credits require an approved or closed claim and a settlement reference.",
         "7. Settled credit cannot exceed the candidate invoice difference.",
-        "8. One positive settlement reference can support only one finding in this pack.",
-        "9. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
-        "10. A validated supported finding requires at least one supporting-evidence reference.",
-        "11. Its exact authority reference must appear in supporting evidence.",
-        "12. A validated supported finding cannot rely on authority effective after its invoice date.",
-        "13. Buyer-visible attributable realized recovery excludes suppressed findings.",
-        "14. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "8. Each positive settlement reference must appear in supporting evidence.",
+        "9. One positive settlement reference can support only one finding in this pack.",
+        "10. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
+        "11. A validated supported finding requires at least one supporting-evidence reference.",
+        "12. Its exact authority reference must appear in supporting evidence.",
+        "13. A validated supported finding cannot rely on authority effective after its invoice date.",
+        "14. Buyer-visible attributable realized recovery excludes suppressed findings.",
+        "15. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
