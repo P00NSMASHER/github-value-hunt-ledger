@@ -48,7 +48,7 @@ RULES = (
     ("UNVERIFIED_AUDIT_RATE",
      r"\b(?:retally(?:['’]s)?|our|we)\b.{0,55}"
      r"\b(?:accuracy|recovery|refund|success|error.detection)\s+rate"
-     r"\s*(?:of|is|:|=)\s*(?:\d{2,3}(?:\.\d+)?\s*%|\d{2,3}\s+percent)\b"),
+     r"\s*(?:of|is|:|=)\s*(?:\d{2,3}(?:\.\d+)?\s*%|\d{2,3}\s+percent)(?=\s|[.!?,;]|$)"),
     ("GUARANTEED_CUSTOMER_OUTCOMES",
      r"\b(?:guaranteed|guarantees?|promise(?:d|s)?)\s+"
      r"(?:\d{2,3}\s*%\s+)?"
@@ -221,6 +221,21 @@ def _check_authority() -> None:
         raise ValueError("PUBLIC_CLAIM_GATE_FALSE_APPROVAL")
 
 
+def _is_negated_or_faq_question(text:str,rule:str,start:int,end:int)->bool:
+    """Avoid mistaking 'Do you guarantee recovery?' or 'we do not' for a promise."""
+    if rule!="GUARANTEED_CUSTOMER_OUTCOMES":
+        return False
+    left=text[max(0,start-65):start].casefold()
+    right=text[end:min(len(text),end+10)]
+    if re.search(r"\b(?:not|never|no|without)\s+$",left):
+        return True
+    if re.search(r"\b(?:do|does|can|could|would|will)\s+(?:you|we|retally)\s+$",left) and (
+        "?" in right or "?" in text[start:]
+    ):
+        return True
+    return False
+
+
 def scan_public_copy(text_assets: dict[str,str]) -> list[CopyViolation]:
     if type(text_assets) is not dict:
         raise ValueError("PUBLIC_CLAIM_GATE_ASSET_MAP_REQUIRED")
@@ -235,7 +250,9 @@ def scan_public_copy(text_assets: dict[str,str]) -> list[CopyViolation]:
                 continue
             for rule,pattern in REGEXES:
                 match=pattern.search(value)
-                if match:
+                if match and not _is_negated_or_faq_question(
+                    value,rule,match.start(),match.end()
+                ):
                     issues.append(CopyViolation(
                         file=name,channel=channel,rule=rule,
                         excerpt=value[max(0,match.start()-44):min(len(value),match.end()+44)]
