@@ -221,8 +221,14 @@ def replay_one(case:str)->dict:
                 raise ValueError("M54_WEAK_LOCAL_REVIEW_DOWNGRADED_SIGNED_JOURNAL:"+case)
         if denials!=attempts:
             raise ValueError("M54_NEGATIVE_ATTEMPT_COUNT_INCOMPLETE")
-        if (case=="UNREVIEWED_SQLITE_MODE_HEADER"):
-            if _mode_file(ledger.path)!=99:
+        if case=="UNREVIEWED_SQLITE_MODE_HEADER":
+            # The normal guarded _mode_file deliberately rejects a header
+            # value of 99. Inspect the deliberately malformed fixture via
+            # raw sqlite3 HERE ONLY to prove the failed operation did not
+            # rewrite it back to a deceptively valid accepted mode.
+            with sqlite3.connect(ledger.path) as raw:
+                unchanged=raw.execute("PRAGMA user_version").fetchone()[0]
+            if unchanged!=99:
                 raise ValueError("M54_UNKNOWN_HEADER_REPAIRED_BY_REJECTED_WRITE")
         elif case=="TRUSTED_CHECKPOINT_AFTER_PRIVILEGED_HEADER_RESET":
             if _mode_file(ledger.path)!=LOCAL_ONLY:
