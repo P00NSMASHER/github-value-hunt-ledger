@@ -386,6 +386,12 @@ def verify_settlement(
                 credit["currency"],credit["payer_id"],credit["payee_id"]):
             _fail("ALLOCATION_COUNTERPARTY_MISMATCH")
         cents = _money(allocation["amount_cents"],"allocated_cents",positive=True)
+        # Prior M41 proof deliberately inflates one allocation beyond the
+        # original provider credit. Report RECEIPT_OVER_ALLOCATED even when
+        # the accompanying cached fee eligibility was not updated too.
+        # This preserves the independent signed-source denial precedence.
+        if gross_credit[eid] + cents > credit["amount_cents"]:
+            _fail("RECEIPT_OVER_ALLOCATED")
         if type(allocation["mode"]) is not str or allocation["mode"] not in ("AUTO", "REVIEW"):
             _fail("INVALID_ALLOCATION_MODE")
         fee_eligible = allocation["fee_eligible_cents"]
