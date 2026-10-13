@@ -44,6 +44,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/site/test_worksheet.py
           freight/site/test_asset_integrity.py
           freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
@@ -54,6 +55,8 @@ jobs:
         run: |
           node --check freight/site/commercial-config.js
           node --check freight/site/site.js
+          node --check freight/site/worksheet.js
+          node --test freight/site/test_worksheet.cjs
           node --check recoveryworks/site/site.js
       - name: Exercise the exact publication boundary
         env:
