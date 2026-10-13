@@ -14,6 +14,7 @@ from freight.site.build import PUBLIC_FILES as FREIGHT_PUBLIC_FILES, build as bu
 from freight.site.rebase_public_urls import OLD_BASE, rebase, validate_cloudflare_seo
 from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, SITE_DIR as RECOVERY_SOURCE, build as build_recoveryos
 from freight.site.asset_integrity import validate_recoveryos_media
+from freight.site.public_claim_guard import validate_public_tree
 
 REPO = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO / "cf-retally-public"
@@ -94,6 +95,11 @@ def build(output: Path = OUTPUT_DIR) -> Path:
             content = path.read_text(encoding="utf-8").lower()
             if any(token in content for token in ("yorktowne", "17901", "jayp19386@")):
                 raise RuntimeError(f"Private contact data in public bundle: {path.relative_to(bundle)}")
+        # Scan the final Cloudflare-hosted content AFTER URL rebasing,
+        # CSP adjustments, inquiry injection and RecoveryOS concatenation.
+        # Fails before the public destination is ever created.
+        validate_public_tree(bundle,site="RETALLY")
+        validate_public_tree(bundle/"recoveryos",site="RECOVERYOS")
         shutil.copytree(bundle, output)
     return output
 
