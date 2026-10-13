@@ -89,3 +89,55 @@ present.
 ## Brand presentation
 
 The original website geometry, fonts, layout, intake and recovery logic are retained. Only the approved RETALLY logos and the emerald/deep-forest color system change. Published wordmark and emblem WebP assets are compact derivatives of the approved original raster artwork. Keep the full-resolution masters in the RETALLY brand starter package. Do not rename the `FreightRecoveryAnalytics` JavaScript API or existing public URLs without a separate migration.
+
+## Public claim release safeguard — Mission 36
+
+The RETALLY site builder and the companion RecoveryOS builder run the
+**same fail-closed claim check before writing public output**. It checks
+post-templating visible HTML text, SEO metadata, JSON-LD, browser-facing
+JavaScript, and root-level text assets for high-confidence unsupported
+customer-outcome and freight-audit market assertions.
+
+The closed Mission 35 Lab 14 claim policy supplies the category boundaries.
+The public gate blocks invented customer cash recovered, claimed counts of
+real invoices processed, unsupported accuracy and recovery success rates,
+recoverable TAM fabricated from government industry data, and guaranteed
+recoveries. Legitimate service descriptions, the $0-upfront audit offer,
+written recovery-contingency terms, and clearly labeled fictional examples
+are preserved.
+
+Existing fictional report, example, and calculator labels are required. The
+same applies to the broader RecoveryOS illustrative ledger. Deleting a label
+or adding an unsupported claim blocks the build even when the synthetic
+example calculations remain internally correct.
+
+**This is a high-specificity rule gate, not general semantic fact checking,
+a legal review, an independent customer-evidence certification, or marketing
+approval.** New results, case studies, testimonials, competitive claims,
+market sizing, or actual customer consent require independent human evidence
+and the relevant approval path even if they pass these narrow checks.
+A public government source digest is not permission to claim customer
+recoveries.
+
+The GitHub Pages path has two enforcement layers:
+
+1. Both the RETALLY and RecoveryOS build scripts reject risky public copy
+   before they create output directories.
+2. The freight-site-pages workflow separately checks both final built
+   directories before deploy, including the main-only deployment job.
+   The repository-wide release gate runs the adversarial injection tests.
+
+To inspect existing finished bundles locally, run:
+
+    python -m freight.site.public_claim_guard \
+      --freight-root /tmp/freight-recovery-public \
+      --recoveryos-root /tmp/recoveryos-public
+
+Failures report only the rule code and static relative filename, not any
+untrusted or private claim text. No customer records, contact actions,
+purchases, scheduled checks, or production updates are introduced.
+
+**Scope limit:** The check covers this repository's GitHub Pages publication
+path. It does not automatically cover a separate Cloudflare Pages pipeline,
+email, a CMS, social posts, chatbot messages, or any other deployment until
+those pipelines are explicitly verified and wired to the same safeguard.
