@@ -150,3 +150,19 @@ Here *production* selects canonical image inputs, not permission to publish. Out
 The companion v3_draft_captions.json holds 12 distinct platform captions (six Facebook, six Instagram), source-backed educational links, unique Facebook UTM content codes, and usable alt text. They are content proposals, NOT an additional active publishing queue. The illustrative detention example is labelled NOT A CUSTOMER RESULT.
 
 The existing pull-request/manual-only creative CI now renders and checks all nine topics, including full-size export geometry, 390px phone screenshots, no network/scripts, document overflow, claims/disclosures and prohibited approval states. Human visual acceptance and rights verification remain release blockers. No customer data, scheduled ChatGPT tasks, paid campaigns or social account operations are involved.
+
+---
+
+## V4 large-type swipe carousels — quality-first expansion
+
+The earlier six v3 cards were technically valid but packed three pieces of evidence into a single feed image. On an actual 390px phone preview, the headlines remained readable while small evidence labels competed for space.
+
+V4 adds **six 4-slide educational carousels (24 originals and 24 phone screenshots)** using the same six verified-source topics. Each is a distinct sequence: **1. Topic hook, 2. Three evidence checks, 3. Evidence-versus-assumption decision, 4. Specific takeaway + educational reading link**. Each evidence check has its own large horizontal panel; swipe slides reserve much more room for type than the earlier three-column card layout.
+
+- Render locally: `python freight/brand/social/creative-lab/render_carousels_v4.py --repo-root . --output-dir /tmp/retally-v4-carousels --concept all`.
+- Output: six independent sets of slide1–slide4 PNGs at 1080×1350, plus matching 390×488 screen-size previews. `manifest-v4.json` includes per-slide checksums, exact wordmark checksum, unique source-photo identity, descriptive slide-specific alt text, topic-aligned educational page and explicit publication holds.
+- Authentic RETALLY wordmark is enforced at its original SHA/geometry. Each topic reuses its distinct, registered site photography without modifying image bytes. **Social-use licensing still requires clearance**.
+- Visual gates prohibit overflow, clipped panels, hidden hero text, scripts, remote calls, ordinary forms and markup injection. No trust in a rendered PNG alone: exact screenshots need human source/art review.
+- Cover slide and finale use a full-bleed editorial photo, while steps use oversized numbered evidence rows and the comparison slide uses two stacked decision panels. The illustrative detention scenario is visibly labelled, and no hypothetical figure is represented as a real refund.
+- `v3_draft_captions.json` remains an unposted reference for the same six topics, with exactly corresponding Facebook and Instagram copy. Captions, alternative text and the final educational page require final pre-publication review.
+- No Metricool entries were created, edited, moved or published by this renderer. Existing 41 active automatic posts and the LinkedIn restricted draft remain as-is. No paid activity, customer outreach, real invoices, purchases, business registration or recurring tasks.
