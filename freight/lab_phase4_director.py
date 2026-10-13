@@ -804,6 +804,36 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         fake_bea33["direct_bea_file_does_not_certify_recoverable_freight_market"]=False
         _must(bool(validate_bea_m33_book(fake_bea33,as_of=today)),
               "M33_FALSE_COMMERCIAL_RECOVERIES_FROM_ORIGINAL_BEA_FILE_ACCEPTED")
+        from freight.research_economic_denominator_m34 import (
+            report_shell as build_nominal_measure_reconciliation_m34,
+            validate_policy as validate_nominal_denominator_policy_m34,
+        )
+        nominal34=build_nominal_measure_reconciliation_m34(as_of=today)
+        _must(nominal34["source_status"]==
+              "M34_OFFLINE_PRIOR_VERIFIED_ORIGINAL_SOURCE_SNAPSHOTS_NO_NEW_THREE_SOURCE_REPLAY"
+              and nominal34["source_families_authenticated_fresh_this_run"]==0,
+              "M34_OFFLINE_ECONOMIC_SOURCE_DENOMINATOR_FALSELY_MARKED_FRESH")
+        _must(len(nominal34["comparison_2017_to_2024"])==8 and
+              nominal34["bea_minus_census_nominal_2017_million_usd"]=="76622.000" and
+              nominal34["bea_minus_census_nominal_2024_million_usd"]=="142607.754",
+              "M34_FIRST_PARTY_BEA_CENSUS_8_YEAR_NOMINAL_GAP_CHANGED")
+        _must(nominal34["bea_2017_to_2024_nominal_growth_pct"]=="48.56" and
+              nominal34["census_2017_to_2024_nominal_growth_pct"]=="38.65" and
+              nominal34["nominal_census_to_bea_measure_ratio_2024_pct"]=="73.85",
+              "M34_MISMATCHED_2026_VINTAGE_AND_DENOMINATOR_COMPARISONS")
+        _must(nominal34["bls_2017_2024_net_output_producer_price_growth_pct"]=="37.04" and
+              nominal34["bea_gross_output_2017_2024_price_index_growth_pct"]=="37.49" and
+              nominal34["bea_price_and_bls_net_output_ppi_interchangeable"] is False,
+              "M34_BEA_GROSS_OUTPUT_PRICE_NOT_SAME_AS_BLS_NET_OUTPUT_PPI")
+        _must(nominal34["nominal_gap_is_missing_carrier_invoices_or_recoverable_overcharges"] is False
+              and nominal34["census_nominal_ratio_to_bea_is_actual_market_coverage"] is False
+              and nominal34["recoverable_audit_market_tam_usd"] is None
+              and nominal34["human_pilot_18_independent_requirements_unmet"] is True,
+              "M34_DIFFERENT_INDUSTRY_DENOMINATORS_MISLABELED_AUDIT_TAM")
+        forged_m34=_read("research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json")
+        forged_m34["dollar_difference_is_customer_freight_bill_overcharges"]=True
+        _must(bool(validate_nominal_denominator_policy_m34(forged_m34,as_of=today)),
+              "M34_FREIGHT_OVERCHARGE_CLAIM_ALLOWED_FROM_GROSS_OUTPUT_DIFFERENCE")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -923,6 +953,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bea_original_484_current_dollar_2017_2024_pct":original_bea33["bea_nominal_gross_output_2017_to_2024_pct"],
                 "bea_original_484_source_report_offline_not_fresh_download":True,
                 "bea_original_gross_output_source_receipt_sha256":original_bea33["receipt_sha256"],
+                "bea_census_nominal_2017_2024_source_years":len(nominal34["comparison_2017_to_2024"]),
+                "bea_census_nominal_2024_gap_million_usd":nominal34["bea_minus_census_nominal_2024_million_usd"],
+                "bea_census_nominal_ratio_not_freight_invoice_coverage":True,
+                "bea_census_nominal_gap_not_audit_tam":True,
+                "bea_census_source_comparison_receipt_sha256":nominal34["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
