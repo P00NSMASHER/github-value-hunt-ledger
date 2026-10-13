@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/retally-claim-quarantine-m38.yml'
       - 'freight/research_claim_quarantine_m38.py'
+      - 'freight/research_scenario_control_m38.py'
+      - 'freight/test_research_scenario_control_m38.py'
       - 'freight/test_research_claim_quarantine_m38.py'
       - 'freight/RESEARCH_CLAIM_QUARANTINE_M38.md'
       - 'freight/research_source_lineage_m37.py'
@@ -32,6 +34,7 @@ jobs:
         run: |
           PYTHONPATH=. python -m pytest -q \
             freight/test_research_claim_quarantine_m38.py \
+            freight/test_research_scenario_control_m38.py \
             freight/test_research_source_lineage_m37.py \
             freight/test_research_claim_clearance_m35.py \
             freight/test_research_pilot_preflight.py \
@@ -97,6 +100,43 @@ jobs:
               assert blocked not in view
           print('M38 CENSUS what-if: exact four stale historical figures redacted; no source authentication or external authority.')
           PY
+      - name: Independently verify the Control Center scenario cannot export old values
+        run: |
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --as-of-date "$(date -u +%F)" \
+            --candidate /tmp/retally-m38-census-candidate.json \
+            --out /tmp/retally-m38-control-census-scenario
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          folder=Path('/tmp/retally-m38-control-census-scenario')
+          expected={'phase4_control.json','index.html',
+                    'source_change_impact.json','source_change_impact.html',
+                    'claim_quarantine.json','claim_quarantine.html'}
+          assert {p.name for p in folder.iterdir()}==expected
+          master=json.loads((folder/'phase4_control.json').read_text())
+          impact=json.loads((folder/'source_change_impact.json').read_text())
+          q=json.loads((folder/'claim_quarantine.json').read_text())
+          held={'M35-02','M35-03','M35-04','M35-07'}
+          assert master['scenario_only'] is True
+          assert master['legacy_unquarantined_source_reports_exported'] is False
+          assert master['external_customer_marketing_or_recovery_claims_authorized']==0
+          assert master['independent_human_customer_pilot_controls_unmet']==18
+          assert set(impact['affected_internal_source_claim_ids'])==held
+          assert set(q['quarantined_claim_ids'])==held
+          assert q['qualified_values_still_visible_for_internal_research_only']==4
+          for case in q['claims']:
+              if case['claim_id'] in held:
+                  assert case['safe_internal_value'] is None
+          for case in impact['claims']:
+              if case['claim_id'] in held:
+                  assert case['prior_internal_value'] is None
+          for p in folder.iterdir():
+              for old_value in ('402827.246','142607.754','73.85','1.18'):
+                  assert old_value not in p.read_text(),(p.name,old_value)
+          assert '545435.000' in (folder/'index.html').read_text()
+          print('Control Center: source-sensitive scenario exports only safe M37/M38 values; 4 held, 4 retained.')
+          PY
       - name: Retain only internal offline reviewed metadata receipts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -106,6 +146,10 @@ jobs:
             /tmp/retally-m38/claim_quarantine.html
             /tmp/retally-m38-census-hypothetical/claim_quarantine.json
             /tmp/retally-m38-census-hypothetical/claim_quarantine.html
+            /tmp/retally-m38-control-census-scenario/phase4_control.json
+            /tmp/retally-m38-control-census-scenario/index.html
+            /tmp/retally-m38-control-census-scenario/source_change_impact.json
+            /tmp/retally-m38-control-census-scenario/claim_quarantine.json
           if-no-files-found: error
           retention-days: 14
 
