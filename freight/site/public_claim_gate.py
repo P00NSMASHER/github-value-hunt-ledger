@@ -138,7 +138,8 @@ class _PublicationText(HTMLParser):
             meta=(a.get("name") or a.get("property") or "").lower()
             if meta in MEANINGFUL_META and a.get("content"):
                 self.parts.append(a["content"])
-        for attr in ("alt","aria-label","title"):
+        for attr in ("alt","aria-label","title","data-copy",
+                     "data-claim","data-description","data-message"):
             if a.get(attr):
                 self.parts.append(a[attr])
         if tag in ("style","script"):
@@ -150,7 +151,9 @@ class _PublicationText(HTMLParser):
             self._suppressed=None
 
     def handle_data(self,data):
-        if self._suppressed is None:
+        if self._suppressed!="style":
+            # Also scan inline scripts: client-rendered strings can become
+            # public-facing copy. CSS rule text is not prose.
             self.parts.append(data)
 
 
