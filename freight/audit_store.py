@@ -50,7 +50,18 @@ class AuditStore:
         # Symlinks and deleted-main/orphan-sidecar files are never adopted.
         is_existing=os.path.lexists(self.path)
         if not is_existing:
-            create_exclusive_empty(self.path)
+            try:
+                create_exclusive_empty(self.path)
+            except RuntimeError as exc:
+                # Multiple legitimate audit clients may start against the
+                # same missing file. Only the O_EXCL winner initializes
+                # DDL; the loser binds the actual winner's file identity
+                # and waits for its schema under the existing-file checks.
+                # Never truncate/replace an existing source or follow
+                # a symlink planted during this race.
+                if "M47_SQLITE_CREATE_PATH_ALREADY_PRESENT" not in str(exc):
+                    raise
+                is_existing=True
         self._pinned_audit_file_identity=identity(self.path)
         self._initialize(is_new=not is_existing)
         self.verify()
