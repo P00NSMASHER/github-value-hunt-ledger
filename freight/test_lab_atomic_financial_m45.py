@@ -184,15 +184,21 @@ class M45TransactionalPersistentFinancialTests(unittest.TestCase):
                 )
             )
             corrupt.auto_allocate("event-b",created_at="2026-09-02T11:00:00Z")
+            # Scoped valid reads do not leak another tenant's rows.
+            self.assertEqual(safe.realized_cents(),0)
+            self.assertEqual(safe.fee_eligible_cents(),0)
+            self.assertEqual(safe.count("allocations"),0)
             with sqlite3.connect(path) as con:
                 con.execute("DROP TRIGGER immutable_alloc_u")
                 con.execute(
                     "UPDATE allocations SET fee_eligible_cents=0 "
                     "WHERE buyer_id='TENANT-B'"
                 )
-            self.assertEqual(safe.realized_cents(),0)
-            self.assertEqual(safe.fee_eligible_cents(),0)
-            self.assertEqual(safe.count("allocations"),0)
+            # M46 must reject globally missing protection triggers even
+            # when TENANT-A's money itself remains semantically valid.
+            with self.assertRaisesRegex(RuntimeError,
+                                         "M46_SQLITE_CATALOG_OBJECTS_CHANGED"):
+                safe.realized_cents()
             with self.assertRaisesRegex(RuntimeError,
                                          "M44_ALLOCATION_FEE_ELIGIBILITY_DRIFT"):
                 corrupt.realized_cents()

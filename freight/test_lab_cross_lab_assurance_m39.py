@@ -173,6 +173,11 @@ class CrossLabM39Tests(unittest.TestCase):
             ("atomic_financial_write_denials_m45", 7),
             ("atomic_financial_total_denials_m45", 47),
             ("atomic_financial_historical_findings_closed_m45", 1),
+            ("sqlite_schema_mutation_cases_m46", 9),
+            ("sqlite_schema_read_denials_m46", 69),
+            ("sqlite_schema_write_denials_m46", 9),
+            ("sqlite_schema_reopen_denials_m46", 9),
+            ("sqlite_schema_original_defects_closed_m46", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)

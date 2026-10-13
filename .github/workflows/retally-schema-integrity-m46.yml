@@ -1,0 +1,177 @@
+name: RETALLY Lab 14 SQLite Schema and Trigger Integrity (Mission 46)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-schema-integrity-m46.yml'
+      - 'freight/settlement_schema_guard_m46.py'
+      - 'freight/lab_schema_integrity_m46.py'
+      - 'freight/test_lab_schema_integrity_m46.py'
+      - 'freight/settlement_store.py'
+      - 'freight/settlement_semantic_guard_m44.py'
+      - 'freight/settlement_schema.sql'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_SCHEMA_INTEGRITY_M46.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  schema-source-negative-proofs-and-original-fourteen-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install same original offline-only research dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Regress schema and financial transaction proofs and original source/claim gates
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_backup_restore.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Run ten real DDL attacks plus all original fourteen laboratories
+        run: |
+          PYTHONPATH=. python -m freight.lab_schema_integrity_m46 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m46
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m46-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('/tmp/retally-m46/sqlite_schema_integrity_m46.json').read_text())
+          d=json.loads(Path('/tmp/retally-m46-control/phase4_control.json').read_text())
+          assert m['scope']=='RETALLY_LAB14_M46_PERSISTENT_SCHEMA_DDL_NEGATIVE_TESTS_SYNTHETIC_ONLY'
+          assert m['existing_research_lab_count']==14 and m['new_lab_created'] is False
+          assert m['disposable_ddl_mutation_cases']==10
+          assert m['positive_synthetic_money_controls']==50
+          assert m['financial_read_denials']==70
+          assert m['attempted_write_denials']==10
+          assert m['preexisting_file_reopen_denials']==10
+          assert len(m['cases'])==10
+          assert all(c['read_surface_exact_denials']==7
+                     and c['write_attempt_denied']
+                     and c['reopen_denied_without_recreating_triggers']
+                     and c['denied_sources_did_not_change_mutated_schema']
+                     and c['original_historical_defect_closed'] is False
+                     for c in m['cases'])
+          assert m['original_historical_findings_open']==26
+          assert m['original_historical_findings_closed']==0
+          assert m['human_first_customer_pilot_gates_unmet']==18
+          assert m['public_empirical_claims_approved']==0
+          assert m['actual_company_revenue_cents']==0
+          assert len(d['lab_runs'])==14 and d['failed_or_blocked_labs']==[]
+          assert d['executed_labs']==list(range(1,15))
+          assert d['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert d['sqlite_schema_integrity_m46']['receipt_sha256']==m['receipt_sha256']
+          assert d['atomic_financial_m45']['current_financial_read_denials']==40
+          assert d['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert d['actual_revenue_cents']==0
+          assert 'sqlite_schema_integrity_m46.html' in Path('/tmp/retally-m46-control/index.html').read_text()
+          print('M46: 10 positive test-only SQLite cases, 70 read/10 write/10 reopen exact schema denials, original 14 labs passed.')
+          PY
+      - name: Retain only derived synthetic policy reports
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m46-disposable-schema-ddl-integrity
+          path: |
+            /tmp/retally-m46/sqlite_schema_integrity_m46.json
+            /tmp/retally-m46/sqlite_schema_integrity_m46.html
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-prior-source-schema-drift-challenge:
+    needs: schema-source-negative-proofs-and-original-fourteen-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Pin exact original M45 source and original M44 semantic boundary, not HEAD^
+        run: |
+          git fetch --no-tags --depth=1 origin 16b5c9fba0dc91bd149255f64a60f609aba7da50
+          git show 16b5c9fba0dc91bd149255f64a60f609aba7da50:freight/settlement_store.py > /tmp/m46_prior_store.py
+          git show 16b5c9fba0dc91bd149255f64a60f609aba7da50:freight/settlement_semantic_guard_m44.py > /tmp/m46_prior_guard.py
+          cp freight/settlement_schema.sql /tmp/settlement_schema.sql
+          test -s /tmp/m46_prior_store.py
+          test -s /tmp/m46_prior_guard.py
+      - name: Reproduce ten bypasses in prior code versus all ten current schema denials
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from pathlib import Path
+          from hashlib import sha256
+          from unittest.mock import patch
+          import freight.settlement_semantic_guard_m44 as guarded_module
+          from freight.settlement_store import SettlementEventRecord
+          from freight.lab_schema_integrity_m46 import DDL_ATTACKS,mutate_disposable_sqlite
+          from freight.test_lab_phase3_real_chain import funded_store
+
+          def load(name,path):
+              spec=importlib.util.spec_from_file_location(name,path)
+              module=importlib.util.module_from_spec(spec)
+              sys.modules[name]=module
+              spec.loader.exec_module(module)
+              return module
+
+          prior_guard=load('m46_prior_guard','/tmp/m46_prior_guard.py')
+          prior_store=load('m46_prior_store','/tmp/m46_prior_store.py')
+          old_reads=old_writes=new_denials=0
+          for scenario,(_,denial) in DDL_ATTACKS.items():
+              with tempfile.TemporaryDirectory() as td:
+                  current=funded_store(td)
+                  old=prior_store.SettlementStore(
+                      current.path,buyer_id=current.buyer_id,
+                      business_unit=current.business_unit)
+                  assert current.realized_cents()==old.realized_cents()==500
+                  mutate_disposable_sqlite(Path(current.path),scenario)
+                  # Old source must use its own PRE-M46 semantic guard.
+                  # The current global module remains patched ONLY inside
+                  # this bounded single-threaded test context.
+                  with patch.object(
+                      guarded_module,'audit_connection',
+                      prior_guard.audit_connection
+                  ):
+                      assert old.realized_cents()==500
+                      old_reads+=1
+                      eid='m46-old-missing-schema-'+scenario.lower()
+                      signed=prior_store.SettlementEventRecord(
+                          eid,'INV-100','SIM-CARRIER','SIM-BUYER',
+                          'USD',1,'2026-12-20T12:00:00Z',
+                          sha256(eid.encode()).hexdigest(),'EXTERNAL'
+                      )
+                      assert old.ingest_event(signed) is True
+                      old_writes+=1
+                  try:
+                      current.realized_cents()
+                  except RuntimeError as exc:
+                      assert denial in str(exc),(scenario,str(exc))
+                      new_denials+=1
+                  else:
+                      raise AssertionError('Current schema tamper accepted: '+scenario)
+          assert (old_reads,old_writes,new_denials)==(10,10,10)
+          print('M46 independent prior-source differential: 10 financially-consistent tampered DDL cases accepted old reads and writes; new code rejects each.')
+          PY

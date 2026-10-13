@@ -143,6 +143,10 @@ from freight.lab_atomic_financial_m45 import (
     run_campaign as run_atomic_financial_m45,
     render_html as render_atomic_financial_m45,
 )
+from freight.lab_schema_integrity_m46 import (
+    run_campaign as run_schema_integrity_m46,
+    render_html as render_schema_integrity_m46,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -182,6 +186,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["atomic_financial_m45"]=run_atomic_financial_m45(
+            as_of=date.today()
+        )
+        result["sqlite_schema_integrity_m46"]=run_schema_integrity_m46(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -318,6 +325,7 @@ def render(data: dict) -> str:
     temporal43=data["settlement_source_m43"]
     persistent44=data["persistent_semantic_m44"]
     atomic45=data["atomic_financial_m45"]
+    schema46=data["sqlite_schema_integrity_m46"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -559,6 +567,14 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Durable SQLite schema — blocked trigger and constraint tampering</h2>
+<p>The existing Lab 14 proves <strong>"""+str(schema46["disposable_ddl_mutation_cases"])+"""/10</strong>
+synthetic DDL attacks fail on seven live read APIs, ordinary writes and
+reopening an already-existing database. Missing, replaced and injected
+SQLite trigger/index/table/view definitions cannot silently be adopted when
+underlying money values still balance. <strong>26 original findings remain
+open; zero third-party bank, carrier or customer authorization.</strong></p>
+<a href="sqlite_schema_integrity_m46.html">Review original approved schema and exact test-only denials ↗</a></section>
 <section class="panel"><h2>Transactional financial guards — atomic money reads and safe writes</h2>
 <p>M45 verifies <strong>"""+str(atomic45["current_financial_read_denials"])+"""</strong>
 blocked cash, fee, claim-residual, receipt-residual and count reads, plus
@@ -1082,6 +1098,14 @@ def main():
     )
     (args.out/"atomic_financial_operations_m45.html").write_text(
         render_atomic_financial_m45(data["atomic_financial_m45"]),
+        encoding="utf-8"
+    )
+    (args.out/"sqlite_schema_integrity_m46.json").write_text(
+        json.dumps(data["sqlite_schema_integrity_m46"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"sqlite_schema_integrity_m46.html").write_text(
+        render_schema_integrity_m46(data["sqlite_schema_integrity_m46"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
