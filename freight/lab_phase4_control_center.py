@@ -127,6 +127,10 @@ from freight.lab_critical_counterexample_replay_m41 import (
     run_campaign as run_critical_counterexample_m41,
     render_html as render_critical_counterexample_m41,
 )
+from freight.lab_settlement_identity_m42 import (
+    run_campaign as run_settlement_identity_m42,
+    render_html as render_settlement_identity_m42,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -154,6 +158,9 @@ def snapshot(max_labs: int=14) -> dict:
             ledger_path=Path(temp)/"phase4_campaign.sqlite3"
         )
         result["critical_counterexamples_m41"]=run_critical_counterexample_m41(
+            as_of=date.today()
+        )
+        result["settlement_identity_m42"]=run_settlement_identity_m42(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -286,6 +293,7 @@ def render(data: dict) -> str:
     integrity39=data["cross_lab_integrity_m39"]
     original40=data["historical_finding_disposition_m40"]
     critical41=data["critical_counterexamples_m41"]
+    identity42=data["settlement_identity_m42"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -527,6 +535,13 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Legacy settlement row identity — no silent duplicate masking</h2>
+<p>The independent verifier now rejects <strong>"""+str(identity42["independent_verifier_expected_denials"])+"""/3</strong>
+attacks against duplicated allocation, counter and reversal identifiers in
+unconstrained test-only SQLite source material. These tests protect
+read-only financial reconciliation, not external bank authenticity.
+<strong>26 original historical findings remain open.</strong></p>
+<a href="settlement_identity_m42.html">Review exact duplicate-row denial evidence ↗</a></section>
 <section class="panel"><h2>Four live negative probes for critical historical failure classes</h2>
 <p>Existing Lab 14 now runs <strong>"""+str(critical41["current_source_guards_rejected_attack"])+"""/4</strong>
 current-code synthetic evidence attacks, including forged receipt balances,
@@ -984,6 +999,14 @@ def main():
     )
     (args.out/"critical_counterexample_replay.html").write_text(
         render_critical_counterexample_m41(data["critical_counterexamples_m41"]),
+        encoding="utf-8"
+    )
+    (args.out/"settlement_identity_m42.json").write_text(
+        json.dumps(data["settlement_identity_m42"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"settlement_identity_m42.html").write_text(
+        render_settlement_identity_m42(data["settlement_identity_m42"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

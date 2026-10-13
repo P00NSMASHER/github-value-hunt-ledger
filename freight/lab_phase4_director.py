@@ -936,6 +936,27 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["historical_disposition"]=="OPEN_UNVERIFIED"
                       for x in critical41["cases"]),
               "M41_HISTORICAL_SOURCE_GUARD_NOT_EXECUTED_OR_INCORRECT")
+        from freight.lab_settlement_identity_m42 import (
+            run_campaign as audit_settlement_row_ids_m42,
+            ATTACKS as settlement_row_attacks_m42,
+        )
+        ident42=audit_settlement_row_ids_m42(as_of=today)
+        _must(ident42["existing_lab_number"]==14
+              and ident42["unconstrained_duplicate_row_attacks"]==3
+              and ident42["independent_verifier_expected_denials"]==3
+              and ident42["historical_original_findings_open"]==26
+              and ident42["historical_original_findings_closed"]==0
+              and ident42["original_vulnerable_baseline_replays"]==0
+              and ident42["separate_human_pilot_controls_unmet"]==18
+              and ident42["external_publication_claims_authorized"]==0,
+              "M42_DUPLICATE_FINANCIAL_IDENTITIES_FALSELY_ACCEPTED_OR_CLAIMED_REAL")
+        _must(tuple(x["scenario"] for x in ident42["cases"])==
+              tuple(t[0] for t in settlement_row_attacks_m42)
+              and all(x["current_verifier_actual_denial"]==t[4]
+                      and x["source_row_observation"]["after_row_count"]==2
+                      and x["source_row_observation"]["after_distinct_identity_count"]==1
+                      for x,t in zip(ident42["cases"],settlement_row_attacks_m42)),
+              "M42_CURRENT_VERIFIER_DID_NOT_FAIL_CLOSED_ON_DUPLICATE_ROW")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1079,6 +1100,10 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "critical_original_findings_closed_m41":0,
                 "critical_original_vulnerable_revision_replays_m41":0,
                 "critical_current_path_report_sha256_m41":critical41["receipt_sha256"],
+                "settlement_legacy_duplicate_row_attacks_m42":3,
+                "settlement_legacy_duplicate_row_denials_m42":3,
+                "settlement_current_historical_defects_closed_m42":0,
+                "settlement_identity_report_sha256_m42":ident42["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
