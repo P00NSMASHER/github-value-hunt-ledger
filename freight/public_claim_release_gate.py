@@ -249,10 +249,11 @@ def scan_public_copy(text_assets: dict[str,str]) -> list[CopyViolation]:
             if not value:
                 continue
             for rule,pattern in REGEXES:
-                match=pattern.search(value)
-                if match and not _is_negated_or_faq_question(
-                    value,rule,match.start(),match.end()
-                ):
+                for match in pattern.finditer(value):
+                    if _is_negated_or_faq_question(
+                        value,rule,match.start(),match.end()
+                    ):
+                        continue
                     issues.append(CopyViolation(
                         file=name,channel=channel,rule=rule,
                         excerpt=value[max(0,match.start()-44):min(len(value),match.end()+44)]
