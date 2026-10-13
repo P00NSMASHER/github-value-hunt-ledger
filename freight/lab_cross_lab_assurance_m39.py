@@ -190,7 +190,11 @@ def _pilot(pilot: object) -> dict:
     _check(pilot["receipt_sha256"] ==
            digest({k: v for k, v in pilot.items() if k != "receipt_sha256"}),
            "PILOT_RECEIPT_CHANGED")
-    _check(pilot == expected, "REHASHED_FICTIONAL_PILOT_OUTCOME_CHANGED")
+    # Compare canonical JSON, not Python tuple/list identity. Persisted
+    # receipts round-trip tuple fields as JSON arrays; a forged dollar
+    # figure still changes the canonical digest and fails this gate.
+    _check(digest(pilot) == digest(expected),
+           "REHASHED_FICTIONAL_PILOT_OUTCOME_CHANGED")
     for row in pilot["cohort"]:
         _check(row.get("authorization_scope") == "SYNTHETIC_TEST_FIXTURES_ONLY"
                and row.get("actual_customer_revenue_cents") == 0
