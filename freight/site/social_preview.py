@@ -41,8 +41,8 @@ ALT = {
 WORKSHEET = "freight-invoice-audit-checklist.html"
 WORKSHEET_TITLE = "RETALLY | Free Printable Freight Audit Worksheet"
 WORKSHEET_DESCRIPTION = (
-    "Print 15 freight invoice checks and compare sample totals privately in "
-    "your browser. Educational only; no refund or recovery is promised."
+    "Print 15 freight invoice checks and compare sample or anonymized totals "
+    "privately in your browser. Educational only; no refund or recovery is promised."
 )
 
 # Human-authored, topic-specific captions designed for a small social
