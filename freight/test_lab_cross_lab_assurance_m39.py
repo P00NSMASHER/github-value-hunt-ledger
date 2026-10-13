@@ -198,6 +198,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("technical_witness_adversarial_cases_m51", 21),
             ("technical_witness_negative_denials_m51", 21),
             ("technical_witness_original_findings_closed_m51", 1),
+            ("technical_replay_original_reviews_m52", 13),
+            ("technical_replay_negative_cases_m52", 13),
+            ("technical_replay_exact_denials_m52", 13),
+            ("technical_replay_original_findings_closed_m52", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)

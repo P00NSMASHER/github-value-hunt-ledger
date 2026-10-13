@@ -238,6 +238,64 @@ def verify_witnessed_recovery_bundle(
     )
 
 
+
+def record_witnessed_recovery_review(
+    root: str | Path,
+    result: BackupRestoreResult,
+    *,
+    replay_ledger,
+    trust_registry: dict,
+    witness_receipts: object,
+    expected_restore_request_id: str,
+    expected_audience: str,
+    as_of_utc,
+) -> dict:
+    """Record a reviewed M50/M51 bundle ONCE without authorizing restoration.
+
+    Unlike read-only verify_witnessed_recovery_bundle, this explicit API
+    records restore-request ID and both signed nonces in a separately managed
+    durable journal.  Caller must provision the ledger itself OUTSIDE the
+    backup directory and retain access to the SAME store across processes.
+    Local deduplication is not an external immutable audit log or legal human
+    approval.  No recovery data is restored or customer authorization granted.
+    """
+    from freight.recovery_replay_m52 import (
+        TechnicalReviewReplayLedger, _reject,
+    )
+    if type(replay_ledger) is not TechnicalReviewReplayLedger:
+        _reject("JOURNAL_NOT_PROVISIONED")
+    # Never consume nonce state from a journal bundled beside the backup
+    # files, where a single backup editor could trivially erase replay history.
+    base=Path(root).resolve()
+    journal=replay_ledger.path.resolve()
+    if journal==base or base in journal.parents:
+        _reject("JOURNAL_MUST_BE_OFF_BUNDLE")
+    # Always check ALL four source files, both original audit histories and
+    # every witness signature BEFORE consuming the local one-time review.
+    verified=verify_witnessed_recovery_bundle(
+        root,result,
+        trust_registry=trust_registry,
+        witness_receipts=witness_receipts,
+        expected_restore_request_id=expected_restore_request_id,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+    )
+    if (verified["full_customer_restore_activation_authorized"] is not False
+        or verified["historical_original_findings_closed"]!=0):
+        _reject("TECHNICAL_REVIEW_NOT_RESTRICTED")
+    # Exact same original manifest as M50/M51.  Verification remains
+    # separately read-only; ONLY replay_ledger is modified by consume.
+    manifest=verify_backup_bundle(root,result)
+    return replay_ledger.consume(
+        manifest=manifest,result=result,
+        trust_registry=trust_registry,
+        witness_receipts=witness_receipts,
+        expected_restore_request_id=expected_restore_request_id,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+    )
+
+
 def _settlement_content(settlement: SettlementStore) -> dict:
     """Guard then summarize ONE scoped SQLite revision.
 

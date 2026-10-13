@@ -167,6 +167,10 @@ from freight.lab_recovery_witness_m51 import (
     run_campaign as run_dual_witness_m51,
     render_html as render_dual_witness_m51,
 )
+from freight.lab_recovery_replay_m52 import (
+    run_campaign as run_replay_barrier_m52,
+    render_html as render_replay_barrier_m52,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -224,6 +228,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["technical_recovery_witness_m51"]=run_dual_witness_m51(
+            as_of=date.today()
+        )
+        result["technical_review_replay_m52"]=run_replay_barrier_m52(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -366,6 +373,7 @@ def render(data: dict) -> str:
     bundle49=data["dual_ledger_backup_m49"]
     recovery50=data["recovery_admission_m50"]
     review51=data["technical_recovery_witness_m51"]
+    replay52=data["technical_review_replay_m52"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -607,6 +615,16 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>One-time technical review — durable nonce and request replay denial</h2>
+<p>The existing Lab 14 executes <strong>"""+str(replay52["exact_current_replay_and_journal_denials"])+"""/14</strong>
+exact disposable SQLite replay denials across previously reviewed restore
+requests, reused Ed25519 witness nonces, replaced replay databases and
+weakened append-only schema. Reviews are recorded in a separate,
+explicitly provisioned local journal only after all M50 source and M51
+two-signer checks pass. <strong>Local replay prevention is not an external
+immutable log, bank authorization or customer restore permission.</strong>
+All original 26 findings and 18 real human pilot gates remain unmet.</p>
+<a href="review_replay_m52.html">Inspect durable technical review denials ↗</a></section>
 <section class="panel"><h2>Off-bundle recovery witnesses — dual cryptographic technical review</h2>
 <p>The existing Lab 14 runs <strong>"""+str(review51["exact_current_witness_gate_denials"])+"""/22</strong>
 exact false witness denials after matching a fully valid synthetic source
@@ -1233,6 +1251,14 @@ def main():
     )
     (args.out/"off_bundle_witness_m51.html").write_text(
         render_dual_witness_m51(data["technical_recovery_witness_m51"]),
+        encoding="utf-8"
+    )
+    (args.out/"review_replay_m52.json").write_text(
+        json.dumps(data["technical_review_replay_m52"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"review_replay_m52.html").write_text(
+        render_replay_barrier_m52(data["technical_review_replay_m52"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
