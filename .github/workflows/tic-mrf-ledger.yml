@@ -31,7 +31,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  authorize:
+    name: Authenticate exact current main and bound external resource inputs
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check out immutable triggering main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Admit immutable main and strictly bounded resource use
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MAX_INDEXES: ${{ inputs.max_indexes || '25' }}
+          INPUT_RETENTION_DAYS: ${{ inputs.retention_days || '90' }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          CURRENT="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
+          test -n "$CURRENT" && test "$CURRENT" = "$EXPECTED_SHA" || { echo "::error::Missing or stale main source"; exit 1; }
+          if [ "$EVENT_NAME" = "push" ]; then
+            LIMIT="$(awk -F= '$1=="max_indexes"{print $2}' production/tic_mrf_ledger/RUN_NOW | tail -1)"
+            LIMIT="${LIMIT:-25}"
+          else
+            LIMIT="$INPUT_MAX_INDEXES"
+          fi
+          [[ "$LIMIT" =~ ^[0-9]{1,3}$ ]] || { echo "::error::Malformed max_indexes"; exit 1; }
+          COUNT=$((10#$LIMIT))
+          (( COUNT>=1 && COUNT<=25 )) || { echo "::error::max_indexes exceeds bounded 1..25"; exit 1; }
+          [[ "$INPUT_RETENTION_DAYS" =~ ^[0-9]{1,2}$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
+          RETAIN=$((10#$INPUT_RETENTION_DAYS))
+          (( RETAIN>=1 && RETAIN<=90 )) || { echo "::error::Artifact retention must be 1..90"; exit 1; }
+          echo "Authorized main resource limits: index/history=$COUNT, retention=$RETAIN"
+
   test:
+    needs: authorize
     runs-on: ubuntu-latest
     defaults:
       run:
