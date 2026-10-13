@@ -125,6 +125,8 @@ class SocialWorksheetTests(unittest.TestCase):
         self.assertIn("body.worksheet-print-mode",css)
         self.assertIn(".worksheet-head strong{color:#111!important}",css)
         self.assertIn("body.worksheet-print-mode .skip,",css)
+        self.assertIn(".worksheet-checklist label:has(input:checked)::before",css)
+        self.assertIn("content:\"✓\"",css)
         self.assertIn(".worksheet-checklist",css)
         self.assertIn(".worksheet-stat-focus",css)
         self.assertNotIn("body:not(.worksheet-print-mode)",css)
