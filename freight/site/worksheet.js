@@ -16,6 +16,7 @@
   const CURRENCY = new Intl.NumberFormat("en-US", {
     style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2
   });
+  const PUBLIC_WORKSHEET_URL = "https://www.retallyrecovery.com/freight-invoice-audit-checklist#worksheet";
   const SAMPLE = Object.freeze({
     billed: "1167.60", expected: "1042.60", credits: "0.00"
   });
@@ -92,7 +93,9 @@
     const print = doc.getElementById("ws-print");
     const copy = doc.getElementById("ws-copy");
     const copyStatus = doc.getElementById("ws-copy-status");
-    if (![difference, remaining, prior, status, error, sample, clear, print, copy, copyStatus].every(Boolean)) return false;
+    const share = doc.getElementById("ws-share");
+    const shareStatus = doc.getElementById("ws-share-status");
+    if (![difference, remaining, prior, status, error, sample, clear, print, copy, copyStatus, share, shareStatus].every(Boolean)) return false;
     panel.dataset.initialized = "true";
     panel.dataset.dataPolicy = "local-only-no-storage-or-upload";
 
@@ -160,13 +163,38 @@
       win.addEventListener("afterprint", cleanupPrint);
     }
     copy.addEventListener("click", async function () {
-      const publicUrl = "https://www.retallyrecovery.com/freight-invoice-audit-checklist#worksheet";
+      const publicUrl = PUBLIC_WORKSHEET_URL;
       try {
         if (!win?.navigator?.clipboard?.writeText) throw new Error("Clipboard unavailable");
         await win.navigator.clipboard.writeText(publicUrl);
         copyStatus.textContent = "Public worksheet link copied. No amounts were copied.";
       } catch (_error) {
         copyStatus.textContent = "Copy unavailable. Share the RETALLY freight invoice audit checklist page instead.";
+      }
+    });
+    share.addEventListener("click", async function () {
+      // A user-initiated OS share operation sends ONLY this public URL and
+      // static guide title. Never serialize fields, checkboxes or calculated
+      // amounts, and do not treat a share sheet as a customer inquiry.
+      const payload = Object.freeze({
+        title: "RETALLY | Free Freight Invoice Audit Checklist",
+        text: "15 evidence checks and a sample-only invoice review worksheet.",
+        url: PUBLIC_WORKSHEET_URL
+      });
+      try {
+        if (typeof win?.navigator?.share === "function") {
+          await win.navigator.share(payload);
+          shareStatus.textContent = "Share sheet completed. No worksheet amounts were shared.";
+        } else if (win?.navigator?.clipboard?.writeText) {
+          await win.navigator.clipboard.writeText(PUBLIC_WORKSHEET_URL);
+          shareStatus.textContent = "Public guide link copied. No worksheet amounts were shared.";
+        } else {
+          shareStatus.textContent = "Native sharing is unavailable. Use the copy-link option.";
+        }
+      } catch (err) {
+        shareStatus.textContent = err?.name === "AbortError"
+          ? "Share canceled. No worksheet amounts were shared."
+          : "Sharing is unavailable. Use the copy-link option.";
       }
     });
     update();
