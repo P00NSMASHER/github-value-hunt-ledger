@@ -71,6 +71,35 @@ jobs:
           print('RETALLY v3: 6/6 distinct 1080×1350 + 390px QA visuals generated; never auto-published.')
           PY
 
+      - name: Render six four-slide evidence carousels, full and phone size
+        run: |
+          python freight/brand/social/creative-lab/render_carousels_v4.py \
+            --repo-root . --concept all \
+            --output-dir "$RUNNER_TEMP/retally-v4-carousels"
+          python - "$RUNNER_TEMP/retally-v4-carousels/manifest-v4.json" <<'PY'
+          import json,hashlib,sys
+          from pathlib import Path
+          r=json.loads(Path(sys.argv[1]).read_text())
+          assert r["status"]=="INTERNAL_DRAFT_ONLY_NOT_APPROVED_FOR_PUBLICATION"
+          assert r["no_publication"] and r["no_network_requests"]
+          assert r["source_photo_rights_review_required"]
+          assert r["logo_sha256"]=="08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd"
+          assert r["slide_count"]==24 and r["phone_preview_count"]==24
+          assert len(r["sources"])==6
+          assert len(set(p["sha256"] for p in r["sources"].values()))==6
+          assert all(not p["rights_verified_for_social"] for p in r["sources"].values())
+          for x in r["slides"]:
+              assert x["qa"]["escaped_elements"]==[],x
+              assert x["qa"]["brand"]==[1619,257],x
+              assert x["qa"]["has_draft_label"]
+              assert not x["publication_approved"] and x["human_visual_review_required"]
+              assert len(x["proposed_alt_text"])>75
+              assert x["educational_page"].startswith("/")
+              for path,sha in ((x["image"],x["sha256"]),(x["phone_preview"],x["phone_sha256"])):
+                  assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==sha
+          print("RETALLY v4: 24/24 large-type carousel slides + 24/24 phone previews passed source and editorial gates")
+          PY
+
       - name: Upload visual QA artifacts (not publishing assets)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -78,4 +107,5 @@ jobs:
           path: |
             ${{ runner.temp }}/retally-graphics-review/
             ${{ runner.temp }}/retally-graphics-v3-review/
+            ${{ runner.temp }}/retally-v4-carousels/
           retention-days: 7
