@@ -49,7 +49,7 @@ def change_replacement(base, replacement, doc, **changes):
     seal(replacement, "charter_hash")
     doc["replacement_charter_hash"] = replacement["charter_hash"]
     seal(doc, "amendment_hash")
-    return base, doc, replacement
+    return base, replacement, doc
 
 
 def resolve_chain(triplet):
