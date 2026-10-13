@@ -29,7 +29,7 @@ class V4VisualAcceptanceTests(unittest.TestCase):
                                   "data:image/png;base64,YWJj",concept,preview=True)
             original=v3.template_html("data:image/png;base64,YWJj",
                                       "data:image/png;base64,YWJj",concept,preview=True)
-            self.assertIn(html.escape(v3.COPY[concept]["title"],quote=True),full)
+            self.assertIn(v3.COPY[concept]["title"],full)
             self.assertIn(html.escape(v3.COPY[concept]["section"]),full)
             self.assertIn(html.escape(v3.COPY[concept]["note"],quote=True),full)
             self.assertIn('<main class="artboard v3 v4 ',full)
@@ -53,6 +53,12 @@ class V4VisualAcceptanceTests(unittest.TestCase):
             self.assertNotIn("<script",s)
             self.assertNotIn("<iframe",s)
             self.assertNotIn("<form",s)
+
+    def test_security_data_handling_label_is_phone_length(self):
+        page=v4.template_html("x","y","secure_intake")
+        self.assertIn("Never in DMs",page)
+        self.assertNotIn("Keep records private",page)
+        self.assertIn("Keep records private",v3.template_html("x","y","secure_intake"))
 
     def test_draft_disclosures_not_removed(self):
         for key in v3.CONCEPTS:
