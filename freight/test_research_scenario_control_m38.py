@@ -175,6 +175,35 @@ class ScenarioConsumptionTests(unittest.TestCase):
             self.assertEqual(list(target.iterdir()), [legacy])
             self.assertNotIn("index.html", [p.name for p in target.iterdir()])
 
+    def test_production_recovery_consumers_cannot_import_raw_m35_m37_values(self):
+        """Regression guard: customer/settlement paths must not bypass safe claims."""
+        import ast
+        root = Path(__file__).resolve().parents[1]
+        forbidden = {
+            "freight.research_claim_clearance_m35",
+            "freight.research_source_lineage_m37",
+            "freight.research_economic_denominator_m34",
+        }
+        offenses = []
+        for folder in ("freight", "recoveryworks"):
+            for file in (root / folder).rglob("*.py"):
+                if (file.name.startswith(("test_", "research_", "lab_"))
+                    or file.name == "__init__.py"):
+                    continue  # explicitly research-only modules, not customer paths
+                tree = __import__("ast").parse(file.read_text(encoding="utf-8"))
+                imports = []
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        imports.extend(alias.name for alias in node.names)
+                    elif isinstance(node, ast.ImportFrom):
+                        prefix = node.module or ""
+                        imports.append(prefix)
+                        imports.extend(prefix + "." + alias.name for alias in node.names)
+                for name in imports:
+                    if name in forbidden:
+                        offenses.append(f"{file.relative_to(root)} imports {name}")
+        self.assertEqual(offenses, [], "\n".join(offenses))
+
     def test_unknown_source_and_unverified_fake_claim_disallowed(self):
         incoming = candidate("CENSUS")
         incoming["source_receipts"]["RETAIL_CLIENT"] = "a" * 64
