@@ -106,14 +106,14 @@ def verify(bundle: Path, destination: Path) -> dict:
                         page.evaluate("document.body.classList.add('worksheet-print-mode')")
                         # Print must reproduce checkboxes beside the text, not
                         # browser-native controls on a second line.
-                        page.locator(".worksheet-checklist input").first.check()
+                        page.evaluate("document.querySelector('.worksheet-checklist input').checked = true")
                         print_info["checkedPrintState"] = page.evaluate("""() => {
                           const label=document.querySelector('.worksheet-checklist label');
                           const before=getComputedStyle(label,'::before');
                           return before.content.includes('✓') &&
                                  getComputedStyle(label.querySelector('input')).display==='none';
                         }""")
-                        page.locator(".worksheet-checklist input").first.uncheck()
+                        page.evaluate("document.querySelector('.worksheet-checklist input').checked = false")
                         printed=page.evaluate("""() => ({
                           checkboxIconVisible:(() => {
                             const label=document.querySelector('.worksheet-checklist label');
