@@ -1,0 +1,31 @@
+name: Portfolio CI Main-Only Policy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'tests/ci-main-only-policy.test.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'tests/ci-main-only-policy.test.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: policy-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  main-only-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Assert all original CI lanes and no main cancellation
+        run: node --test tests/ci-main-only-policy.test.mjs

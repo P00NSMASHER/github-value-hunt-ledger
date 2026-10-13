@@ -2,6 +2,7 @@ name: Production Contract Tests
 
 on:
   push:
+    branches: [main]
     paths:
       - 'production/prototype.py'
       - 'production/test_prototype.py'
@@ -16,6 +17,11 @@ on:
 
 permissions:
   contents: read
+
+# Cancel only superseded PR checks. Main release evidence never cancels itself.
+concurrency:
+  group: safe-component-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
