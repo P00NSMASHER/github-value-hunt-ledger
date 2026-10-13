@@ -235,7 +235,10 @@ class TechnicalReviewReplayLedger:
 
     def consume(self,*,manifest:dict,result,trust_registry:dict,
                 witness_receipts:list|tuple,expected_restore_request_id:str,
-                expected_audience:str,as_of_utc:datetime)->dict:
+                expected_audience:str,as_of_utc:datetime,
+                checkpoint:object=None,custodian_trust:object=None,
+                journal_namespace:str|None=None,
+                checkpoint_audience:str|None=None)->dict:
         """Atomically consume verified technical review metadata ONLY.
 
         Caller must first run full M50/M51 source and signature validation.
@@ -249,6 +252,10 @@ class TechnicalReviewReplayLedger:
             or type(as_of_utc) is not datetime or as_of_utc.tzinfo is None
             or len(witness_receipts)!=2):
             _reject("INVALID_CONSUMPTION_CONTEXT")
+        if checkpoint is None and any(value is not None for value in (
+            custodian_trust,journal_namespace,checkpoint_audience
+        )):
+            _reject("CHECKPOINT_CONTEXT_WITHOUT_SIGNED_CHECKPOINT")
         reviewed_at=as_of_utc.astimezone(timezone.utc).isoformat(
             timespec="seconds"
         ).replace("+00:00","Z")
@@ -274,6 +281,20 @@ class TechnicalReviewReplayLedger:
             con.execute("BEGIN IMMEDIATE")
             try:
                 _validate(con)
+                # M53 high-assurance mode: verify a signed, off-journal
+                # replay checkpoint UNDER THE SAME BEGIN IMMEDIATE LOCK as
+                # the one-time request/nonce inserts. Validation before
+                # acquiring this lock would leave a rollback/TOCTOU race.
+                checkpoint_proof=None
+                if checkpoint is not None:
+                    from freight.recovery_checkpoint_m53 import verify_checkpoint_locked
+                    checkpoint_proof=verify_checkpoint_locked(
+                        con,checkpoint=checkpoint,
+                        custodian_trust=custodian_trust,
+                        journal_namespace=journal_namespace,
+                        expected_audience=checkpoint_audience,
+                        as_of_utc=as_of_utc,
+                    )
                 self._check_identity()
                 if con.execute(
                     "SELECT 1 FROM review_consumptions "
@@ -298,6 +319,10 @@ class TechnicalReviewReplayLedger:
                         "VALUES (?,?,?,?,?,?)",row
                     )
                 summary=_validate(con)
+                successor=None
+                if checkpoint_proof is not None:
+                    from freight.recovery_checkpoint_m53 import journal_state
+                    successor=journal_state(con)
                 self._check_identity()
                 con.commit()
                 self._check_identity()
@@ -310,7 +335,7 @@ class TechnicalReviewReplayLedger:
             raise ValueError("M52_REPLAY_LOCKED_OR_IO_FAILED") from exc
         finally:
             con.close()
-        return {
+        outcome={
             "scope":SCOPE,
             "state":TECHNICAL_STATUS,
             "review_attempt_recorded_once":True,
@@ -325,3 +350,18 @@ class TechnicalReviewReplayLedger:
             "original_historical_findings_closed":0,
             "replay_ledger_is_locally_mutable_not_external_trust_anchor":True,
         }
+        if successor is not None:
+            # The next state is deliberately UNSIGNED. An independent
+            # custodian must sign/store it outside the journal before
+            # the next checkpointed review. A crash in between leaves
+            # higher-assurance verification fail closed, not falsely ready.
+            outcome.update({
+                "m53_prior_checkpoint_verified_under_write_lock":True,
+                "m53_signed_prior_sequence":checkpoint_proof["prior_signed_sequence"],
+                "m53_successor_sequence":successor["review_sequence"],
+                "m53_successor_state_sha256":successor["journal_state_sha256"],
+                "m53_successor_requires_independent_external_signature":True,
+                "m53_external_checkpoint_updated_by_this_operation":False,
+                "m53_customer_activation_authorized":False,
+            })
+        return outcome
