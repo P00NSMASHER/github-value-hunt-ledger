@@ -1017,6 +1017,8 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
    home intake, social metadata, or background marketing UI. */
 @media print{
  body.worksheet-print-mode{background:white!important;color:#101d17!important}
+ body.worksheet-print-mode .skip,
+ body.worksheet-print-mode .retally-chat-launcher,
  body.worksheet-print-mode .site-header,
  body.worksheet-print-mode .site-footer,
  body.worksheet-print-mode .document-hero,
@@ -1047,6 +1049,7 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
   color:#111!important;font-size:22pt!important;margin:4px 0 6px!important;
  }
  body.worksheet-print-mode .worksheet-head p{color:#222!important;font-size:9pt!important;line-height:1.2!important}
+ body.worksheet-print-mode .worksheet-head strong{color:#111!important}
  body.worksheet-print-mode .worksheet-kicker{color:#333!important}
  body.worksheet-print-mode .worksheet-card{
   border:0!important;background:white!important;padding:5px 0!important;
