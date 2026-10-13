@@ -776,6 +776,34 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_m32["bea_primary_original_484_numeric_source_authenticated"]=True
         _must(bool(validate_bea_gross_output_m32(forged_m32,as_of=today)),
               "M32_FALSE_DIRECT_BEA_ORIGINAL_SOURCE_AUTHORIZATION_ACCEPTED")
+        from freight.research_bea_original_m33 import (
+            report_shell as original_bea_m33,
+            validate_book as validate_bea_m33_book,
+        )
+        original_bea33=original_bea_m33(as_of=today)
+        _must(original_bea33["status"]==
+              "M33_OFFLINE_PREVIOUS_BEA_DIRECT_XLSX_SOURCE_VALUES_NOT_REPLAYED_THIS_RUN" and
+              original_bea33["fresh_original_bea_table16_year_cells_authenticated"]==0,
+              "M33_OFFLINE_GROSS_OUTPUT_SOURCE_PRETENDS_FRESH_BEA_FILE_DOWNLOAD")
+        _must(original_bea33["source_publisher"]=="U.S. Bureau of Economic Analysis" and
+              original_bea33["original_bea_file_expected_bytes"]==506819 and
+              original_bea33["source_url"].endswith("/GrossOutput.xlsx"),
+              "M33_BEA_ORIGINAL_SOURCE_IDENTITY_OR_FILE_LENGTH_NOT_PINNED")
+        _must(original_bea33["original_bea_gross_output_2017_to_2024_pct"]=="8.05"
+              and original_bea33["bea_price_index_2017_to_2024_pct"]=="37.49"
+              and original_bea33["bea_nominal_gross_output_2017_to_2024_pct"]=="48.56",
+              "M33_BEA_GROSS_OUTPUT_SOURCE_PRICE_QUANTITY_IDENTITY_CHANGED")
+        _must(original_bea33["previous_m32_secondary_source_only_remains_historical"] is True
+              and original_bea33["official_bea_api_userid_denial_remains_true_historical_event"] is True,
+              "M33_PRIOR_SECONDARY_SOURCE_OR_API_HISTORY_DELETED")
+        _must(original_bea33["paid_customer_freight_invoice_rows"]==0
+              and original_bea33["recoverable_freight_market_tam_usd"] is None
+              and original_bea33["human_pilot_18_independent_requirements_unmet"] is True,
+              "M33_OFFICIAL_BEA_OUTPUT_FALSELY_PROMOTED_TO_CUSTOMER_AUDIT_REFUNDS")
+        fake_bea33=_read("research/BEA_ORIGINAL_ACCESS_M33_20261012.json")
+        fake_bea33["direct_bea_file_does_not_certify_recoverable_freight_market"]=False
+        _must(bool(validate_bea_m33_book(fake_bea33,as_of=today)),
+              "M33_FALSE_COMMERCIAL_RECOVERIES_FROM_ORIGINAL_BEA_FILE_ACCEPTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -889,6 +917,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bea_table16_secondary_not_direct_original_bea":True,
                 "bea_table16_descriptive_gap_vs_bls_sectoral_pp":gross_m32["bea_minus_bls_output_descriptive_gap_pp"],
                 "bea_table16_source_receipt_sha256":gross_m32["receipt_sha256"],
+                "bea_original_484_xlsx_expected_sha256":original_bea33["original_bea_file_expected_sha256"],
+                "bea_original_484_real_output_2017_2024_pct":original_bea33["original_bea_gross_output_2017_to_2024_pct"],
+                "bea_original_484_price_2017_2024_pct":original_bea33["bea_price_index_2017_to_2024_pct"],
+                "bea_original_484_current_dollar_2017_2024_pct":original_bea33["bea_nominal_gross_output_2017_to_2024_pct"],
+                "bea_original_484_source_report_offline_not_fresh_download":True,
+                "bea_original_gross_output_source_receipt_sha256":original_bea33["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
