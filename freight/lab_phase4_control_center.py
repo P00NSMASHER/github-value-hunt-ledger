@@ -103,6 +103,10 @@ from freight.research_economic_denominator_m34 import (
     report_shell as build_nominal_measure_reconciliation_m34,
     render_html as render_nominal_measure_reconciliation_m34,
 )
+from freight.research_claim_clearance_m35 import (
+    report_shell as build_claim_clearance_m35,
+    render_html as render_claim_clearance_m35,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -179,6 +183,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bea_gross_output_table16_m32"]=build_bea_table16_m32(as_of=date.today())
         result["bea_first_party_original_xlsx_m33"]=build_bea_original_m33(as_of=date.today())
         result["bea_census_nominal_denominator_m34"]=build_nominal_measure_reconciliation_m34(as_of=date.today())
+        result["research_claim_clearance_m35"]=build_claim_clearance_m35(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -242,6 +247,7 @@ def render(data: dict) -> str:
     bea_table16=data["bea_gross_output_table16_m32"]
     original_bea=data["bea_first_party_original_xlsx_m33"]
     nominal34=data["bea_census_nominal_denominator_m34"]
+    claim35=data["research_claim_clearance_m35"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -460,6 +466,20 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
+<section class="panel"><h2>Research-to-commercial claims: publication prohibited without human proof</h2>
+<p>Existing Lab 14 research sources support
+<strong>"""+str(claim35["qualified_internal_source_statements"])+"""</strong>
+attributed internal economic observations with mandatory caveats,
+and block <strong>"""+str(claim35["blocked_unsupported_customer_business_claims"])+"""</strong>
+unsupported customer, refund, invoice-accuracy and recoverable-market claims.
+<strong>Zero external commercial claims are authorized.</strong></p>
+<p>All <strong>"""+str(claim35["independent_customer_pilot_human_approvals_unmet"])+"""/18</strong>
+separately required human customer-pilot signoffs remain unmet.
+Government macroeconomic source authenticity does NOT authorize
+carrier claims, customer document transfers, public performance
+statistics or recoverable freight-market estimates. Mock reviewer
+agreement is not independent real-world accuracy.</p>
+<a href="claim_clearance.html">Open sixteen typed claim decisions with evidence requirements and original human gate IDs ↗</a></section>
 <section class="panel"><h2>Trucking market denominator reconciliation — not recoverable freight bills</h2>
 <p>Original BEA gross output and Census employer-industry revenue are
 <strong>different economic measures</strong>, even though both are
@@ -835,6 +855,14 @@ def main():
     )
     (args.out/"economic_denominator_reconciliation.html").write_text(
         render_nominal_measure_reconciliation_m34(data["bea_census_nominal_denominator_m34"]),
+        encoding="utf-8"
+    )
+    (args.out/"claim_clearance.json").write_text(
+        json.dumps(data["research_claim_clearance_m35"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"claim_clearance.html").write_text(
+        render_claim_clearance_m35(data["research_claim_clearance_m35"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
