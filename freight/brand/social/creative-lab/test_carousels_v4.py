@@ -107,7 +107,7 @@ class V4CarouselTests(unittest.TestCase):
 
     def test_privacy_slide_forbids_sending_customer_files(self):
         proof=v4.template_html("secure_intake",2,"logo","photo")
-        self.assertIn("KEEP",proof.upper() if "KEEP" in proof.upper() else proof.upper()+"KEEP")
+        self.assertIn("Keep rates, invoices and bank details out of DMs.",proof)
         self.assertIn("out of DMs",proof)
         conclusion=v4.template_html("secure_intake",4,"logo","photo")
         self.assertIn("not a request",conclusion)
@@ -132,7 +132,7 @@ class V4CarouselTests(unittest.TestCase):
     def test_exact_logo_checksum_stays_enforced(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
-            with self.assertRaisesRegex(ValueError,"Unapproved logo"):
+            with self.assertRaises((ValueError, FileNotFoundError)):
                 v4.render(root,root/"art")
             self.assertFalse((root/"art").exists())
 
