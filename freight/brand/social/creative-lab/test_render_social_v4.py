@@ -29,11 +29,11 @@ class V4VisualAcceptanceTests(unittest.TestCase):
                                   "data:image/png;base64,YWJj",concept,preview=True)
             original=v3.template_html("data:image/png;base64,YWJj",
                                       "data:image/png;base64,YWJj",concept,preview=True)
-            self.assertIn(v3.COPY[concept]["title"],full)
+            self.assertIn(html.escape(v3.COPY[concept]["title"],quote=True),full)
             self.assertIn(html.escape(v3.COPY[concept]["section"]),full)
-            self.assertIn(v3.COPY[concept]["note"],full)
+            self.assertIn(html.escape(v3.COPY[concept]["note"],quote=True),full)
             self.assertIn('<main class="artboard v3 v4 ',full)
-            self.assertIn("three", "three")
+            self.assertEqual(full.count('class="document"') + full.count('class="document focus"'),3)
             self.assertNotEqual(full,original)
 
     def test_true_full_width_stacked_rows_and_legibility_type(self):
