@@ -60,7 +60,7 @@ jobs:
           from pathlib import Path
           r=json.loads(Path('/tmp/retally-m33-offline/bea_original_gross_output.json').read_text())
           q=json.loads(Path('/tmp/retally-m33-control/phase4_control.json').read_text())
-          assert r['scope']=='LAB14_M33_DIRECT_ORIGINAL_BEA_GROSSOUTPUT_XLSX_TABLE16_NAICS484_SOURCE'
+          assert r['scope']=='LAB14_M33_DIRECT_ORIGINAL_BEA_GROSS_OUTPUT_XLSX_TABLE16_NAICS484_SOURCE'
           assert r['status']=='M33_OFFLINE_PREVIOUS_BEA_DIRECT_XLSX_SOURCE_VALUES_NOT_REPLAYED_THIS_RUN'
           assert r['fresh_original_bea_table16_year_cells_authenticated']==0
           assert r['fresh_four_original_bea_tables_year_cells_authenticated']==0
@@ -120,7 +120,7 @@ jobs:
           from decimal import Decimal
           from pathlib import Path
           r=json.loads(Path('/tmp/retally-m33-bea/bea_original_gross_output.json').read_text())
-          assert r['scope']=='LAB14_M33_DIRECT_ORIGINAL_BEA_GROSSOUTPUT_XLSX_TABLE16_NAICS484_SOURCE'
+          assert r['scope']=='LAB14_M33_DIRECT_ORIGINAL_BEA_GROSS_OUTPUT_XLSX_TABLE16_NAICS484_SOURCE'
           assert r['source_url']=='https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx'
           assert r['source_publisher']=='U.S. Bureau of Economic Analysis'
           assert r['original_bea_file_expected_sha256']=='a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46'
