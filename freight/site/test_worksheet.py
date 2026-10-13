@@ -86,7 +86,7 @@ class SocialWorksheetTests(unittest.TestCase):
         start=p.index('<section id="worksheet"')
         end=p.index('<section id="modes"',start)
         widget=p[start:end].lower()
-        self.assertIn("not a validated overcharge",widget)
+        self.assertIn("neither a validated overcharge",widget)
         self.assertIn("does not save, transmit or share the entered amounts",widget)
         self.assertIn("no uploads",widget)
         self.assertIn("customer authorization",widget)
