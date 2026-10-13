@@ -213,8 +213,40 @@ def inspect(item: dict, *, fetcher=fetch) -> dict:
 
 
 def run(snapshot: dict, *, live: bool = False, include_drafts: bool = False,
+        only_kind: str | None = None, one_per_route: bool = False,
         fetcher=fetch) -> dict:
+    """Optionally probe one representative URL per validated educational path.
+
+    All source URLs still pass the strict allowlist/UTM gate before the
+    representative route is selected. Distinct campaigns are not conflated
+    for attribution; only network HTTP reachability is deduplicated.
+    """
+    if only_kind not in (None, "landing", "image"):
+        raise ValueError("Only landing or image kind is supported")
+    if one_per_route and only_kind != "landing":
+        raise ValueError("One-per-route requires only_kind='landing'")
     manifest = targets(snapshot, include_drafts=include_drafts)
+    if only_kind is not None:
+        manifest = [item for item in manifest if item["kind"] == only_kind]
+    tracked_url_count = len(manifest)
+    if one_per_route:
+        grouped = {}
+        for item in manifest:
+            path = urlsplit(item["url"]).path
+            if path not in grouped:
+                grouped[path] = {**item, "uuids": list(item["uuids"]),
+                                 "networks": list(item["networks"]),
+                                 "tracked_url_count": 1, "canonical_path": path}
+            else:
+                representative = grouped[path]
+                representative["tracked_url_count"] += 1
+                for uid in item["uuids"]:
+                    if uid not in representative["uuids"]:
+                        representative["uuids"].append(uid)
+                for network in item["networks"]:
+                    if network not in representative["networks"]:
+                        representative["networks"].append(network)
+        manifest = sorted(grouped.values(), key=lambda row: row["canonical_path"])
     inspected = [inspect(item, fetcher=fetcher) if live
                  else {**item, "state": "NOT_CHECKED", "reason": "Network inspection not requested"}
                  for item in manifest]
@@ -222,6 +254,10 @@ def run(snapshot: dict, *, live: bool = False, include_drafts: bool = False,
               for k in ("PASS", "FAIL", "RECHECK", "NOT_CHECKED")}
     return {
         "mode": "public_https_get" if live else "offline_manifest",
+        "only_kind": only_kind,
+        "one_per_route": one_per_route,
+        "source_tracked_url_count": tracked_url_count,
+        "representative_probe_count": len(manifest),
         "publication_verified": False,
         "live_social_provider_checked": False,
         "counts": counts,
@@ -261,13 +297,18 @@ def main() -> None:
                     help="Opt-in public allowlisted HTTPS GET checks; no social API access")
     ap.add_argument("--include-drafts", action="store_true",
                     help="Also verify unpublished draft media; never publish them")
+    ap.add_argument("--only-kind", choices=("landing", "image"),
+                    help="Inspect only one category; still validate the complete source snapshot")
+    ap.add_argument("--one-per-route", action="store_true",
+                    help="With --only-kind landing, inspect one tracked URL per distinct canonical page")
     ap.add_argument("--output", help="Optional Markdown destination")
     ap.add_argument("--json-output", help="Optional JSON destination")
     ap.add_argument("--fail-on-hard-errors", action="store_true",
                     help="Exit code 2 for an observed FAIL; RECHECK remains explicitly uncertain")
     args = ap.parse_args()
     result = run(read_json(args.schedule), live=args.live,
-                 include_drafts=args.include_drafts)
+                 include_drafts=args.include_drafts,
+                 only_kind=args.only_kind, one_per_route=args.one_per_route)
     if args.output:
         Path(args.output).write_text(markdown(result), encoding="utf-8")
     else:
