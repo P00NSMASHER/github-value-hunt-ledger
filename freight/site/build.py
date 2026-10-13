@@ -23,6 +23,7 @@ from freight.commercial_terms import (
     normalize_contingency_rate,
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
+from freight.site.public_claim_gate import audit_public_bundle
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -217,6 +218,12 @@ def build(
         '<p class="microcopy">Fictional data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # Fail before creating or writing public files. This checks the EXACT
+    # transformed allowlisted bundle, including structured metadata and
+    # labeled fictional examples, against the frozen M35 claim policy.
+    # Passing is a negative static-content check, never legal approval.
+    audit_public_bundle(text_bundle)
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():
