@@ -99,6 +99,10 @@ from freight.research_bea_original_m33 import (
     report_shell as build_bea_original_m33,
     render_html as render_bea_original_m33,
 )
+from freight.research_economic_denominator_m34 import (
+    report_shell as build_nominal_measure_reconciliation_m34,
+    render_html as render_nominal_measure_reconciliation_m34,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -174,6 +178,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bls_real_sectoral_output_m31"]=build_bls_sectoral_output_m31(as_of=date.today())
         result["bea_gross_output_table16_m32"]=build_bea_table16_m32(as_of=date.today())
         result["bea_first_party_original_xlsx_m33"]=build_bea_original_m33(as_of=date.today())
+        result["bea_census_nominal_denominator_m34"]=build_nominal_measure_reconciliation_m34(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -236,6 +241,7 @@ def render(data: dict) -> str:
     sectoral_output=data["bls_real_sectoral_output_m31"]
     bea_table16=data["bea_gross_output_table16_m32"]
     original_bea=data["bea_first_party_original_xlsx_m33"]
+    nominal34=data["bea_census_nominal_denominator_m34"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -454,6 +460,22 @@ long-distance LTL """+escape(bridge["industry_series"][2]["2017_to_2024_nominal_
 These are not inflation-adjusted real freight growth, paid customer invoices,
 invoice errors, recoverable carrier refunds or buyer demand.</p>
 <a href="sas_aies_revenue_bridge.html">Open original-source 2017–2024 Census revenue bridge ↗</a></section>
+<section class="panel"><h2>Trucking market denominator reconciliation — not recoverable freight bills</h2>
+<p>Original BEA gross output and Census employer-industry revenue are
+<strong>different economic measures</strong>, even though both are
+national NAICS 484 nominal-dollar statistics. The combined original BEA,
+Census and BLS publisher source policy has current report status
+<strong>"""+escape(nominal34["source_status"])+"""</strong> (this offline
+operator view does not re-download any original publisher file).</p>
+<p>2024 BEA gross output versus Census revenue: published nominal difference
+<strong>$"""+escape(nominal34["bea_minus_census_nominal_2024_million_usd"])+""" million</strong>;
+Census-to-BEA ratio <strong>"""+escape(nominal34["nominal_census_to_bea_measure_ratio_2024_pct"])+"""%</strong>;
+this ratio is <strong>NOT a coverage estimate of paid freight bills</strong>.
+Their 2017–2024 nominal growth differs by
+<strong>"""+escape(nominal34["bea_minus_census_nominal_growth_percentage_points"])+""" percentage points</strong>.
+The BEA-versus-Census dollar gap is <strong>NOT a carrier invoice error,
+recoverable claim, refund, serviceable audit market, or RETALLY revenue</strong>.</p>
+<a href="economic_denominator_reconciliation.html">Open eight-year source-qualified denominator arithmetic and customer-evidence prohibitions ↗</a></section>
 <section class="panel"><h2>Original BEA numerical workbook — first-party source recovered</h2>
 <p>Official BEA GrossOutput.xlsx, publication September 30, 2026:
 NAICS 484 Truck transportation, annual original chain-type quantity index
@@ -806,6 +828,14 @@ def main():
     )
     (args.out/"bea_original_gross_output.html").write_text(
         render_bea_original_m33(data["bea_first_party_original_xlsx_m33"]),encoding="utf-8"
+    )
+    (args.out/"economic_denominator_reconciliation.json").write_text(
+        json.dumps(data["bea_census_nominal_denominator_m34"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"economic_denominator_reconciliation.html").write_text(
+        render_nominal_measure_reconciliation_m34(data["bea_census_nominal_denominator_m34"]),
+        encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
