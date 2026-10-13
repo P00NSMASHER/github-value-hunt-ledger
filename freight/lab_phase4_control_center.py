@@ -159,6 +159,10 @@ from freight.lab_dual_ledger_backup_m49 import (
     run_campaign as run_dual_ledger_backup_m49,
     render_html as render_dual_ledger_backup_m49,
 )
+from freight.lab_recovery_admission_m50 import (
+    run_campaign as run_recovery_admission_m50,
+    render_html as render_recovery_admission_m50,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -210,6 +214,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["dual_ledger_backup_m49"]=run_dual_ledger_backup_m49(
+            as_of=date.today()
+        )
+        result["recovery_admission_m50"]=run_recovery_admission_m50(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -350,6 +357,7 @@ def render(data: dict) -> str:
     path47=data["sqlite_file_continuity_m47"]
     audit48=data["persistent_audit_trust_m48"]
     bundle49=data["dual_ledger_backup_m49"]
+    recovery50=data["recovery_admission_m50"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -591,6 +599,15 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Actual published restore admission — original row validity, not self-signed SHA alone</h2>
+<p>Existing Lab 14 now checks <strong>"""+str(recovery50["current_exact_fail_closed_recovery_denials"])+"""/13</strong>
+fake published recovery bundles that recompute their local file SHA and
+completion receipts after source corruption. All four SQLite images are
+reopened read-only, validated across ALL tenant histories and frozen source
+generations, and checked against exactly scoped source/restored financial
+receipts. No self-signed local manifest can stand in for original external
+bank/carrier proof. <strong>26 original findings remain open.</strong></p>
+<a href="recovery_admission_m50.html">Review all thirteen exact local restore denials ↗</a></section>
 <section class="panel"><h2>Two-file recovery bundle — no mixed history or half-published claims</h2>
 <p>Existing Lab 14 now proves <strong>"""+str(bundle49["current_code_exact_negative_denials"])+"""/9</strong>
 test-only backup errors fail closed: concurrent audit or settlement writes,
@@ -1182,6 +1199,14 @@ def main():
     )
     (args.out/"dual_ledger_backup_m49.html").write_text(
         render_dual_ledger_backup_m49(data["dual_ledger_backup_m49"]),
+        encoding="utf-8"
+    )
+    (args.out/"recovery_admission_m50.json").write_text(
+        json.dumps(data["recovery_admission_m50"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"recovery_admission_m50.html").write_text(
+        render_recovery_admission_m50(data["recovery_admission_m50"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

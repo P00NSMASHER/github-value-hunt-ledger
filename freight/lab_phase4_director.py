@@ -1145,6 +1145,36 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and c["original_historical_finding_closed"] is False
                       for c in dual49["cases"]),
               "M49_BACKUP_SOURCE_RACE_OR_PARTIAL_PUBLISH_NOT_TESTED")
+        from freight.lab_recovery_admission_m50 import (
+            run_campaign as audit_published_restore_m50,
+            CASES as amended_bundle_attacks_m50,
+        )
+        admission50=audit_published_restore_m50(as_of=today)
+        _must(admission50["existing_original_labs"]==14
+              and admission50["valid_original_fictional_recovery_bundles"]==13
+              and admission50["rehash_repaired_negative_bundle_attacks"]==13
+              and admission50["current_exact_fail_closed_recovery_denials"]==13
+              and admission50["full_tenant_audit_and_settlement_semantics_checked"] is True
+              and admission50["published_backup_and_restore_generations_reconciled"] is True
+              and admission50["hash_and_schema_checks_executed_read_only"] is True
+              and admission50["original_two_file_shared_atomic_commit_proven"] is False
+              and admission50["external_immutable_or_crypto_signed_backup_proven"] is False
+              and admission50["historical_original_recoveryos_findings_open"]==26
+              and admission50["historical_original_recoveryos_findings_closed"]==0
+              and admission50["first_customer_independent_human_approval_gates_unmet"]==18
+              and admission50["real_customer_cash_recovered"] is None
+              and admission50["externally_publishable_empirical_claims_approved"]==0,
+              "M50_UNSUPPORTED_RECOVERY_ADMISSION_OR_UNVERIFIED_MONEY")
+        _must(tuple(x["case"] for x in admission50["cases"])==
+              tuple(amended_bundle_attacks_m50)
+              and all(x["expected_current_exact_denial"]==
+                           amended_bundle_attacks_m50[x["case"]]
+                      and x["predecessor_length_and_sha_only_gate_would_accept"] is True
+                      and x["current_read_only_restoration_admission_denied"] is True
+                      and x["all_four_sqlite_file_bytes_preserved_during_rejection"] is True
+                      and x["original_historical_defect_closed"] is False
+                      for x in admission50["cases"]),
+              "M50_LOCAL_SHA_REHASHED_FRAUD_DENIAL_NOT_ACTUALLY_EXECUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1328,6 +1358,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "dual_ledger_negative_denials_m49":9,
                 "dual_ledger_original_findings_closed_m49":0,
                 "dual_ledger_receipt_sha256_m49":dual49["receipt_sha256"],
+                "recovery_admission_original_bundles_m50":13,
+                "recovery_admission_rehashed_attacks_m50":13,
+                "recovery_admission_negative_denials_m50":13,
+                "recovery_admission_original_findings_closed_m50":0,
+                "recovery_admission_receipt_sha256_m50":admission50["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
