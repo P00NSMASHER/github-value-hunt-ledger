@@ -834,6 +834,35 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_m34["dollar_difference_is_customer_freight_bill_overcharges"]=True
         _must(bool(validate_nominal_denominator_policy_m34(forged_m34,as_of=today)),
               "M34_FREIGHT_OVERCHARGE_CLAIM_ALLOWED_FROM_GROSS_OUTPUT_DIFFERENCE")
+        from freight.research_claim_clearance_m35 import (
+            report_shell as build_claim_clearance_m35,
+            lookup_claim as lookup_claim_m35,
+            validate_policy as validate_claim_policy_m35,
+        )
+        clearance35=build_claim_clearance_m35(as_of=today)
+        _must(clearance35["source_status"]==
+              "OFFLINE_VERIFIED_PRIOR_MACRO_SOURCE_CATALOGS_NOT_FRESH_SOURCE_REPLAY"
+              and clearance35["source_original_publisher_replay_completed_in_this_run"] is False,
+              "M35_MACRO_SOURCE_CLAIMS_FRAUDULENTLY_REPLAYED_OR_AUTHENTICATED")
+        _must(clearance35["claim_count"]==16
+              and clearance35["qualified_internal_source_statements"]==8
+              and clearance35["blocked_unsupported_customer_business_claims"]==8,
+              "M35_EVIDENCE_TO_CLAIM_POLICY_DOES_NOT_COVER_ALL_SIXTEEN_CASES")
+        _must(clearance35["external_commercial_claims_authorized"]==0
+              and clearance35["independent_customer_pilot_human_approvals_unmet"]==18
+              and clearance35["retally_recoverable_tam_usd"] is None
+              and clearance35["retally_cash_recovered_usd"] is None,
+              "M35_MACROECONOMIC_GAP_FALSELY_RELABELED_CUSTOMER_RECOVERY")
+        _must(lookup_claim_m35(clearance35,"M35-03")["internal_value"]=="142607.754"
+              and lookup_claim_m35(clearance35,"M35-09")["internal_decision"]==
+                  "BLOCKED_UNSUPPORTED_INFERENCE"
+              and lookup_claim_m35(clearance35,"M35-16")[
+                  "required_unmet_human_signoff_count"]==18,
+              "M35_BEA_CENSUS_GAP_OR_SYNTHETIC_PILOT_WRONGLY_APPROVED")
+        forged_m35=_read("research/CLAIM_CLEARANCE_M35_20261012.json")
+        forged_m35["claim_registry"][0]["public_publication_authorized"]=True
+        _must(bool(validate_claim_policy_m35(forged_m35,as_of=today)),
+              "M35_MISLEADING_EXTERNAL_ECONOMIC_OR_CUSTOMER_CLAIM_APPROVED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -958,6 +987,12 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "bea_census_nominal_ratio_not_freight_invoice_coverage":True,
                 "bea_census_nominal_gap_not_audit_tam":True,
                 "bea_census_source_comparison_receipt_sha256":nominal34["receipt_sha256"],
+                "research_claim_clearance_total_cases":clearance35["claim_count"],
+                "research_claim_clearance_internal_statements":clearance35["qualified_internal_source_statements"],
+                "research_claim_clearance_customer_claims_blocked":clearance35["blocked_unsupported_customer_business_claims"],
+                "research_claim_clearance_pilot_gates_unmet":clearance35["independent_customer_pilot_human_approvals_unmet"],
+                "research_claim_clearance_external_approvals":0,
+                "research_claim_clearance_receipt_sha256":clearance35["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

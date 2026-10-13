@@ -1,0 +1,73 @@
+# RETALLY Research Lab 14 — Mission 35: Commercial claim-clearance firebreak
+
+**October 12, 2026 · Internal research only · Draft stacked on Mission 34 PR #425.**
+
+**Purpose:** Prevent analytically correct public economic statistics or synthetic lab output from being mistaken for proof of real customer audit performance, recoverable cash, a serviceable market, or legal permission to communicate commercial claims. This is a **read-only Research Lab 14 decision register**, not a production website/sales-copy filter and not a live approval workflow. It creates no fifteenth lab, customer file, authorization, schedule, outreach, payment or deployment.
+
+## Decision: eight internal statements, eight unsupported commercial inferences
+
+The new catalog contains **16 closed, typed claim cases** with explicit source grade, metric identifier, expected value, research decision, external decision, human evidence requirements, and caveat. Exactly **eight** are eligible for **attributed internal research only**:
+
+| Source-grounded internal measure | Source | Value and unit | Mandatory qualification |
+| --- | --- | --- | --- |
+| 2024 nominal gross trucking output | Original BEA via M33/M34 | **$545,435.000 million** | Industry gross output, not shipper-paid invoice records |
+| 2024 Census employer trucking revenue | Original Census via M34 | **$402,827.246 million** | Employer receipts, not complete transport spending |
+| BEA–Census 2024 nominal industry gap | M34 | **$142,607.754 million** | Arithmetic across different denominators; NOT recoverable errors |
+| Census/BEA trucking 2024 arithmetic ratio | M34 | **73.85%** | Not invoice market coverage, verified accuracy or share |
+| 2017–2024 BEA real gross output change | Original BEA via M33 | **+8.05%** | Real gross output, not physical freight tonnage or demand |
+| 2017–2024 BLS sectoral output change | Original BLS via M31 | **+4.02%** | Removes intra-industry shipments; not BEA gross output |
+| 2017–2024 Census revenue/BLS PPI proxy | Original public inputs via M29 | **+1.18%** | **Illustrative** annual-average deflation; not official real output |
+| BEA minus BLS producer price change | M34 | **0.45 percentage points** | BEA gross prices and BLS net-output PPIs have different scopes |
+
+**None of these statements is authorized for public marketing by this research module.** Attribution and macroeconomic source integrity are necessary but do not satisfy buyer permissions, legal review, or publication approval.
+
+The register blocks eight specific dangerous interpretations:
+- The $142.608 billion BEA–Census difference is recoverable freight-audit TAM.
+- The 73.85% Census/BEA ratio measures real freight invoice error or audit accuracy.
+- The 9/10 agreement of fictional synthetic reviewers proves 90% independent human accuracy.
+- RETALLY has verified collected refunds or earned contingency fees.
+- RETALLY has signed buyer audit authority and approved secure customer data rights.
+- Industry output growth independently proves demand for RETALLY’s service.
+- Synthetic invoices prove an unbiased real-customer recovery rate.
+- A passing research workflow or lab suite authorizes real customer onboarding/public performance claims.
+
+Each blocked interpretation includes an explanatory caveat and **explicitly references specific existing Mission 11 human-pilot gate IDs**, never automatically changing their state. Broad launch authorization connects to **all P11-01 through P11-18**.
+
+## 18 independently unmet real-customer controls reused, not duplicated
+
+The existing frozen original policy \`freight/research/PILOT_PREFLIGHT_20261011.json\` already requires three controls in each of six stages. Mission 35 does not create a second pilot checklist:
+
+| Existing stage | Examples of still-unverified human evidence |
+| --- | --- |
+| **AUTHORITY — P11-01 through 03** | Specific buyer signer/agency authority and approved data rights |
+| **SECURITY — P11-04 through 06** | Sensitive-data minimization, secure transfer/access, retention and incident plan |
+| **EVIDENCE — P11-07 through 09** | Original invoice/shipment/rate chain and independent payments reconciliation |
+| **SAMPLING — P11-10 through 12** | Prospective sampling frame, sample size and negative-control methodology |
+| **ADJUDICATION — P11-13 through 15** | Independent human reviewers, disagreements and documented case decisions |
+| **ECONOMICS — P11-16 through 18** | Actual net-collected cash, costs/reversals and independent publication authorization |
+
+All **18/18** remain **not independently evidenced**; no owner name, external approval, customer data, payment or publication rights are invented. An internal SHA-256 report receipt authenticates local content consistency, **not independent human approval**. A fabricated report that has merely been rehashed with a valid SHA still fails the claim-lookup policy check.
+
+The synthetic agreement **9/10** comes from two modeled reviewers generated by the *same* fixture function. It does not establish 90% real independent reviewer reliability or real invoice error rates.
+
+## Source provenance and controlled implementation
+
+This module consumes previously verified original government source reports **offline** and insists on matching source-grade and source-receipt fields; it never claims a fresh BEA, Census or BLS API download. The direct original government publisher-replay work was completed separately in Mission 34 and remains attributable. Mission 35's reviewer register is not a production website moderation service; it cannot automatically approve or intercept actual outbound marketing, customer messages or sales pages.
+
+- **Policy:** \`freight/research/CLAIM_CLEARANCE_M35_20261012.json\`. Git-blob-pinned, exact sixteen claim cases, eight source keys, 18 existing control IDs, no approval/outreach/real-invoice authorization and zero cash/market proof. Mutation or extra unsupported fields fail closed.
+- **Engine:** \`freight/research_claim_clearance_m35.py\`. Rebuilds and checks the previously generated M29 (BLS PPI), M31 (real sectoral output), M33 (original BEA), M34 (original BEA–Census comparison) and M11 (18 human pilot evidence) reports. Confirms expected metrics and source scopes; checks that real-customer evidence remains zero. Produces read-only JSON/HTML internal review reports. Fixed claim IDs are the only supported query interface; no arbitrary user copy can create an approval.
+- **Falsification:** \`freight/test_research_claim_clearance_m35.py\` rejects forged public permissions, rehashed positive commercial receipts, altered macroeconomic values, fake 17/18 pilot approval, fake independent synthetic-reviewer statistics, unavailable source provenance, altered gate bindings, inserted claims and hostile HTML. Synthetic receipts are not third-party authorizations.
+- **Existing Lab 14:** \`freight/lab_phase4_director.py\` adds an additional negative-source/candidate approval check **inside the original lab 14**, preserving 14 executions; \`freight/lab_phase4_control_center.py\` adds a clearly labeled internal claims report. Prior source reports and pilot definitions are unchanged.
+- **CI:** \`.github/workflows/retally-claim-clearance-m35.yml\` (PR/manual only) executes all earlier original-source research tests, the 18-gate pilot preflight suite, new claim attack cases and Lab 14 Control Center. Only derived source/claim decision receipts are retained briefly. No cron, account tokens, originals, customer data or outbound messages.
+
+Reproduce locally (Python 3.11+; prior research dependency files):
+
+    PYTHONPATH=. python -m pytest -q freight/test_research_claim_clearance_m35.py freight/test_research_pilot_preflight.py
+    PYTHONPATH=. python -m freight.research_claim_clearance_m35 --as-of-date 2026-10-12 --out /tmp/retally-m35
+    PYTHONPATH=. python -m freight.lab_phase4_control_center --out /tmp/retally-m35-all-labs
+
+## Remaining owner-dependent launch conditions
+
+RETALLY has **no independently verified real customer pilot**, no eligible invoice frame, original customer-approved rate authorities, independently adjudicated true overcharges, collected refunds or prospect-demand estimate in these research records. No research claim status can satisfy P11-18’s external publication authority automatically. Buyer authority, real data privacy/security, real invoice audit and finance/payment approval are separately required before meaningful market/pilot outcome statements can be evaluated.
+
+**NO MERGE, DEPLOYMENT, CONTACT, REAL CUSTOMER DOCUMENT INGESTION, SCHEDULE MODIFICATION, MONEY ACTION OR PUBLIC PERFORMANCE/RECOVERY MARKET CLAIM.**
