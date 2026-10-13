@@ -361,6 +361,39 @@ def record_checkpointed_witnessed_recovery_review(
     )
 
 
+
+def inspect_signed_replay_checkpoint_reconciliation(
+    *,
+    replay_ledger,
+    independently_held_checkpoint: object,
+    custodian_trust: object,
+    journal_namespace: str,
+    expected_audience: str,
+    as_of_utc,
+) -> dict:
+    """Read-only operator recovery decision support, not restore admission.
+
+    After an M53 local commit succeeds, publishing its independently
+    signed successor can fail.  This method verifies the old off-journal
+    signature and compares its FULL recorded state with the current M54
+    one-time journal.  Only a proven one-review child is labeled as
+    PENDING_EXTERNAL_COUNTERSIGN.  It does NOT issue an Ed25519 signature,
+    alter the journal or bypass the original M53 one-time write fence.
+
+    Full real customer/legal approval and third-party bank provenance
+    remain separate unfulfilled requirements.
+    """
+    from freight.recovery_reconcile_m55 import inspect_replay_checkpoint_gap
+    return inspect_replay_checkpoint_gap(
+        replay_ledger,
+        independently_held_checkpoint=independently_held_checkpoint,
+        custodian_trust=custodian_trust,
+        journal_namespace=journal_namespace,
+        expected_audience=expected_audience,
+        as_of_utc=as_of_utc,
+    )
+
+
 def _settlement_content(settlement: SettlementStore) -> dict:
     """Guard then summarize ONE scoped SQLite revision.
 

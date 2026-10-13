@@ -179,6 +179,10 @@ from freight.lab_checkpoint_mode_m54 import (
     run_campaign as run_checkpoint_mode_m54,
     render_html as render_checkpoint_mode_m54,
 )
+from freight.lab_checkpoint_reconciliation_m55 import (
+    run_campaign as run_reconciliation_m55,
+    render_html as render_reconciliation_m55,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -245,6 +249,9 @@ def snapshot(max_labs: int=14) -> dict:
             as_of=date.today()
         )
         result["checkpoint_antidowngrade_m54"]=run_checkpoint_mode_m54(
+            as_of=date.today()
+        )
+        result["checkpoint_gap_reconciliation_m55"]=run_reconciliation_m55(
             as_of=date.today()
         )
         result["research_intelligence"]=campaign_brief(as_of=date.today())
@@ -390,6 +397,7 @@ def render(data: dict) -> str:
     replay52=data["technical_review_replay_m52"]
     checkpoint53=data["signed_replay_checkpoint_m53"]
     downgrade54=data["checkpoint_antidowngrade_m54"]
+    gap55=data["checkpoint_gap_reconciliation_m55"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -631,6 +639,17 @@ A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
 confirmed source revision or permission to publish statistics or buyer results.
 <strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
 <a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
+<section class="panel"><h2>Checkpoint crash-gap reconciliation — hold unsigned successor</h2>
+<p>Existing Lab 14 verifies <strong>"""+str(gap55["current_exact_fail_closed_reconciliation_denials"])+"""/18</strong>
+real disposable journal forks, unsigned multi-review gaps, signer
+substitutions and rollback conditions. The read-only analysis compares
+one independently signed head to the original journal's full review and
+nonce row image, finding at most one exact successor. <strong>Even a valid
+one-step successor remains PENDING independent custodian countersignature,
+not customer permission, not a restore or a way to bypass M53.</strong>
+No remote custodian service exists; 26 original historical findings and
+18 human first-customer gates remain open.</p>
+<a href="checkpoint_reconciliation_m55.html">Inspect signed crash-gap hold and denial cases ↗</a></section>
 <section class="panel"><h2>Checkpoint mode anti-downgrade — no return to local-only reviews</h2>
 <p>Existing Lab 14 demonstrates <strong>"""+str(downgrade54["same_sqlite_journal_downgrade_negative_scenarios"])+"""/12</strong>
 test-only downgrade cases denied after a signed M53 technical review.
@@ -1313,6 +1332,14 @@ def main():
     )
     (args.out/"checkpoint_mode_m54.html").write_text(
         render_checkpoint_mode_m54(data["checkpoint_antidowngrade_m54"]),
+        encoding="utf-8"
+    )
+    (args.out/"checkpoint_reconciliation_m55.json").write_text(
+        json.dumps(data["checkpoint_gap_reconciliation_m55"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"checkpoint_reconciliation_m55.html").write_text(
+        render_reconciliation_m55(data["checkpoint_gap_reconciliation_m55"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],

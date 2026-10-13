@@ -1305,6 +1305,41 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and c["independent_customer_pilot_gates_unmet"]==18
                       for c in mode54["cases"]),
               "M54_LOCAL_ONLY_DOWNGRADE_NEGATIVE_NOT_REPRODUCED")
+        from freight.lab_checkpoint_reconciliation_m55 import (
+            run_campaign as audit_checkpoint_gap_m55,
+            SCENARIOS as signed_checkpoint_gap_attacks_m55,
+        )
+        gap55=audit_checkpoint_gap_m55(as_of=today)
+        _must(gap55["original_research_labs"]==14
+              and gap55["valid_original_countersigned_head_positive_controls"]==18
+              and gap55["valid_one_commit_pending_external_countersign_controls"]==18
+              and gap55["signed_journal_or_bad_custodian_negative_scenarios"]==18
+              and gap55["current_exact_fail_closed_reconciliation_denials"]==18
+              and gap55["signed_prefix_excludes_exactly_one_review_and_two_nonces"] is True
+              and gap55["journal_is_inspected_read_only_in_one_sqlite_revision"] is True
+              and gap55["multiple_local_commits_without_custodian_signatures_rejected"] is True
+              and gap55["one_step_unsigned_result_must_remain_pending_not_reauthorized"] is True
+              and gap55["external_custodian_signs_or_stores_checkpoint_by_this_code"] is False
+              and gap55["independent_remote_trust_or_immutable_high_water_service_present"] is False
+              and gap55["actual_customer_restore_or_legally_approved"] is False
+              and gap55["original_historical_findings_open"]==26
+              and gap55["original_historical_findings_closed"]==0
+              and gap55["independent_first_customer_human_gates_unmet"]==18
+              and gap55["real_customer_cash_recovered"] is None
+              and gap55["externally_publishable_empirical_claims_approved"]==0,
+              "M55_UNSIGNED_CRASH_GAP_MISTAKEN_FOR_EXTERNAL_RECOVERY_AUTHORITY")
+        _must(tuple(c["scenario"] for c in gap55["cases"])==
+              tuple(signed_checkpoint_gap_attacks_m55)
+              and all(c["exact_expected_denial"]==
+                          signed_checkpoint_gap_attacks_m55[c["scenario"]]
+                      and c["honest_one_step_unsigned_successor_held_pending"] is True
+                      and c["source_rollback_fork_or_untrusted_signature_denied"] is True
+                      and c["no_external_checkpoint_automatically_signed_or_published"] is True
+                      and c["all_four_customer_recovery_files_untouched"] is True
+                      and c["real_customer_restore_or_human_approval"] is False
+                      and c["historical_original_findings_closed"]==0
+                      for c in gap55["cases"]),
+              "M55_RECONCILIATION_NEGATIVE_NOT_ACTUALLY_EXECUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1513,6 +1548,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "checkpoint_mode_exact_denials_m54":13,
                 "checkpoint_mode_original_findings_closed_m54":0,
                 "checkpoint_mode_receipt_sha256_m54":mode54["receipt_sha256"],
+                "checkpoint_reconciliation_signed_head_positives_m55":18,
+                "checkpoint_reconciliation_pending_gap_controls_m55":18,
+                "checkpoint_reconciliation_negative_denials_m55":18,
+                "checkpoint_reconciliation_original_findings_closed_m55":0,
+                "checkpoint_reconciliation_receipt_sha256_m55":gap55["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

@@ -1,0 +1,215 @@
+name: RETALLY Lab 14 Signed Checkpoint Crash-Gap Reconciliation (Mission 55)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-checkpoint-reconcile-m55.yml'
+      - 'freight/recovery_checkpoint_m53.py'
+      - 'freight/recovery_reconcile_m55.py'
+      - 'freight/lab_checkpoint_reconciliation_m55.py'
+      - 'freight/test_lab_checkpoint_reconciliation_m55.py'
+      - 'freight/backup_restore.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_cross_lab_assurance_m39.py'
+      - 'freight/test_lab_cross_lab_assurance_m39.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_CHECKPOINT_RECONCILIATION_M55.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  eighteen-signed-parent-crash-gap-and-original-fourteen-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original pinned offline research and Ed25519 dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Prove one-step signed prefix, no auto-signing, and inherited original research labs
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_checkpoint_reconciliation_m55.py \
+            freight/test_lab_checkpoint_mode_m54.py \
+            freight/test_lab_replay_checkpoint_m53.py \
+            freight/test_lab_recovery_replay_m52.py \
+            freight/test_lab_recovery_witness_m51.py \
+            freight/test_lab_recovery_admission_m50.py \
+            freight/test_lab_dual_ledger_backup_m49.py \
+            freight/test_backup_restore.py \
+            freight/test_lab_audit_trust_boundary_m48.py \
+            freight/test_audit_store.py \
+            freight/test_audit_ledger.py \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Run eighteen independent truthful head, pending hold and exact negative pairs
+        run: |
+          PYTHONPATH=. python -m freight.lab_checkpoint_reconciliation_m55 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m55
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m55-control
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          m=json.loads(Path('/tmp/retally-m55/checkpoint_reconciliation_m55.json').read_text())
+          c=json.loads(Path('/tmp/retally-m55-control/phase4_control.json').read_text())
+          assert m['scope']=='RETALLY_LAB14_M55_SIGNED_CRASH_GAP_RECONCILIATION_SYNTHETIC_ONLY'
+          assert m['original_research_labs']==14 and m['new_lab_created'] is False
+          assert m['valid_original_countersigned_head_positive_controls']==18
+          assert m['valid_one_commit_pending_external_countersign_controls']==18
+          assert m['signed_journal_or_bad_custodian_negative_scenarios']==18
+          assert m['current_exact_fail_closed_reconciliation_denials']==18
+          assert m['signed_prefix_excludes_exactly_one_review_and_two_nonces'] is True
+          assert m['journal_is_inspected_read_only_in_one_sqlite_revision'] is True
+          assert m['one_step_unsigned_result_must_remain_pending_not_reauthorized'] is True
+          assert m['multiple_local_commits_without_custodian_signatures_rejected'] is True
+          assert m['external_custodian_signs_or_stores_checkpoint_by_this_code'] is False
+          assert m['independent_remote_trust_or_immutable_high_water_service_present'] is False
+          assert m['actual_customer_restore_or_legally_approved'] is False
+          assert len(m['cases'])==18
+          assert all(x['original_signed_head_matched_in_positive_control']
+                     and x['honest_one_step_unsigned_successor_held_pending']
+                     and x['authentic_previous_checkpoint_signature_required']
+                     and x['source_rollback_fork_or_untrusted_signature_denied']
+                     and x['no_external_checkpoint_automatically_signed_or_published']
+                     and x['all_four_customer_recovery_files_untouched']
+                     and not x['real_customer_restore_or_human_approval']
+                     and x['historical_original_findings_closed']==0
+                     for x in m['cases'])
+          assert m['original_historical_findings_open']==26
+          assert m['original_historical_findings_closed']==0
+          assert m['independent_first_customer_human_gates_unmet']==18
+          assert m['real_customer_cash_recovered'] is None
+          assert len(c['lab_runs'])==14 and c['executed_labs']==list(range(1,15))
+          assert not c['failed_or_blocked_labs']
+          assert c['cross_lab_integrity_m39']['all_fourteen_locally_executed'] is True
+          assert c['checkpoint_gap_reconciliation_m55']['receipt_sha256']==m['receipt_sha256']
+          assert c['checkpoint_antidowngrade_m54']['current_exact_mode_or_checkpoint_negative_denials']==13
+          assert c['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert c['actual_revenue_cents']==0
+          assert 'checkpoint_reconciliation_m55.html' in Path('/tmp/retally-m55-control/index.html').read_text()
+          print('M55: eighteen exact signed current matches, eighteen unsigned successor holds, eighteen exact fail-closed negatives, original fourteen labs.')
+          PY
+      - name: Retain metadata-only derived test evidence, never source DBs or private keys
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m55-checkpoint-crash-gap-synthetic-denials
+          path: |
+            /tmp/retally-m55/checkpoint_reconciliation_m55.json
+            /tmp/retally-m55/checkpoint_reconciliation_m55.html
+          if-no-files-found: error
+          retention-days: 14
+
+  pinned-m54-strict-verifier-versus-explicit-m55-hold-differential:
+    needs: eighteen-signed-parent-crash-gap-and-original-fourteen-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original test fixture and transient signature dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Pin exact original pre-M55 M54 strict checkpoint source
+        run: |
+          git fetch --no-tags --depth=1 origin d49c9109afbd99cc6ccc51786cda931e3383b762
+          git show d49c9109afbd99cc6ccc51786cda931e3383b762:freight/recovery_checkpoint_m53.py > /tmp/m55_pinned_m54_verifier.py
+          git show d49c9109afbd99cc6ccc51786cda931e3383b762:freight/backup_restore.py > /tmp/m55_pinned_m54_application.py
+          test -s /tmp/m55_pinned_m54_verifier.py
+          test -s /tmp/m55_pinned_m54_application.py
+      - name: Independently reproduce ambiguous old state mismatch and new precise read-only classification
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import importlib.util,sys,tempfile
+          from pathlib import Path
+          from freight import backup_restore as current
+          from freight.lab_replay_checkpoint_m53 import (
+              _fixture,_rewrite_rows,NAMESPACE,AUDIENCE
+          )
+          from freight.recovery_reconcile_m55 import (
+              SIGNED_HEAD_MATCH,ONE_UNSIGNED_SUCCESSOR
+          )
+
+          def load(name,path):
+              spec=importlib.util.spec_from_file_location(name,path)
+              mod=importlib.util.module_from_spec(spec)
+              sys.modules[name]=mod
+              spec.loader.exec_module(mod)
+              return mod
+
+          old=load('m55_pinned_m54_checkpoint','/tmp/m55_pinned_m54_verifier.py')
+          previous_app=load('m55_pinned_m54_backup','/tmp/m55_pinned_m54_application.py')
+          assert not hasattr(previous_app,'inspect_signed_replay_checkpoint_reconciliation')
+          old_ambiguous_mismatch=new_pending=new_fork_denial=0
+          with tempfile.TemporaryDirectory() as td:
+              fx=_fixture(Path(td))
+              con=fx['ledger']._connect()
+              try:
+                  con.execute('BEGIN')
+                  try:
+                      old.verify_checkpoint_locked(
+                          con,checkpoint=fx['initial_checkpoint'],
+                          custodian_trust=fx['trust'],journal_namespace=NAMESPACE,
+                          expected_audience=AUDIENCE,
+                          as_of_utc=fx['original_review_kwargs']['as_of_utc']
+                      )
+                  except ValueError as e:
+                      assert 'M53_CHECKPOINT_STATE_MISMATCH' in str(e)
+                      old_ambiguous_mismatch+=1
+                  else:
+                      raise AssertionError('Pre-M55 wrongly accepted stale local head')
+                  con.rollback()
+              finally:
+                  con.close()
+              newer=current.inspect_signed_replay_checkpoint_reconciliation(
+                  replay_ledger=fx['ledger'],
+                  independently_held_checkpoint=fx['initial_checkpoint'],
+                  custodian_trust=fx['trust'],journal_namespace=NAMESPACE,
+                  expected_audience=AUDIENCE,
+                  as_of_utc=fx['original_review_kwargs']['as_of_utc']
+              )
+              assert newer['state']==ONE_UNSIGNED_SUCCESSOR
+              assert newer['new_review_admission_must_remain_blocked'] is True
+              assert newer['restore_activation_authorized'] is False
+              new_pending+=1
+          with tempfile.TemporaryDirectory() as td:
+              fx=_fixture(Path(td))
+              _rewrite_rows(fx['ledger'],'REWRITE_REVIEW_MANIFEST_VALID_ROWS')
+              try:
+                  current.inspect_signed_replay_checkpoint_reconciliation(
+                      replay_ledger=fx['ledger'],
+                      independently_held_checkpoint=fx['current_checkpoint'],
+                      custodian_trust=fx['trust'],journal_namespace=NAMESPACE,
+                      expected_audience=AUDIENCE,
+                      as_of_utc=fx['original_review_kwargs']['as_of_utc']
+                  )
+              except ValueError as e:
+                  assert 'M55_RECONCILE_SAME_SEQUENCE_JOURNAL_FORK_OR_MODE_ROLLBACK' in str(e)
+                  new_fork_denial+=1
+              else:
+                  raise AssertionError('M55 accepted local rewrite')
+          assert (old_ambiguous_mismatch,new_pending,new_fork_denial)==(1,1,1)
+          print('M55 pinned previous-source differential: original M54 correctly blocked unsigned successor but could not identify crash gap; M55 safely labels exact signed direct child PENDING and still rejects same-sequence forgery.')
+          PY
