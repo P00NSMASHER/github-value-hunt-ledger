@@ -13,10 +13,10 @@ for(const [name,field,limit] of FILES){
     assert.match(x,/\bref: \$\{\{ github.sha \}\}/);
     assert.match(x,/\bgit ls-remote --exit-code/);
     assert.match(x,/test:\n    needs: authorize/);
-    assert.match(x,/\[\[ "\$LIMIT" =~ \^\[0-9\]\{1,3\}\$ \]\]/);
+    assert.match(x,/\[\[ "\$LIMIT" =~ \^\[1-9\]\[0-9\]\{0,2\}\$ \]\]/);
     assert.ok(x.includes('COUNT<= '+limit)||x.includes('COUNT<='+limit));
     assert.match(x,/RETAIN>=1 && RETAIN<=90/);
-    assert.match(x,/\[\[ "\$INPUT_RETENTION_DAYS" =~ \^\[0-9\]\{1,2\}\$ \]\]/);
+    assert.match(x,/\[\[ "\$INPUT_RETENTION_DAYS" =~ \^\[1-9\]\[0-9\]\?\$ \]\]/);
     assert.ok(x.includes(field));
     assert.doesNotMatch(x,/contents: write|secrets\.(?!GITHUB_TOKEN)/);
   });

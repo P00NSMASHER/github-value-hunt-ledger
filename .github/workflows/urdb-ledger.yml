@@ -50,10 +50,10 @@ jobs:
           CURRENT="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
           test -n "$CURRENT" && test "$CURRENT" = "$EXPECTED_SHA" || { echo "::error::Missing or stale main source"; exit 1; }
           LIMIT="$INPUT_HISTORY_LIMIT"
-          [[ "$LIMIT" =~ ^[0-9]{1,3}$ ]] || { echo "::error::Malformed history_limit"; exit 1; }
+          [[ "$LIMIT" =~ ^[1-9][0-9]{0,2}$ ]] || { echo "::error::Malformed history_limit"; exit 1; }
           COUNT=$((10#$LIMIT))
           (( COUNT>=1 && COUNT<=100 )) || { echo "::error::history_limit exceeds bounded 1..100"; exit 1; }
-          [[ "$INPUT_RETENTION_DAYS" =~ ^[0-9]{1,2}$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
+          [[ "$INPUT_RETENTION_DAYS" =~ ^[1-9][0-9]?$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
           RETAIN=$((10#$INPUT_RETENTION_DAYS))
           (( RETAIN>=1 && RETAIN<=90 )) || { echo "::error::Artifact retention must be 1..90"; exit 1; }
           echo "Authorized main resource limits: index/history=$COUNT, retention=$RETAIN"

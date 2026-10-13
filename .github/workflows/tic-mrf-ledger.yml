@@ -60,10 +60,10 @@ jobs:
           else
             LIMIT="$INPUT_MAX_INDEXES"
           fi
-          [[ "$LIMIT" =~ ^[0-9]{1,3}$ ]] || { echo "::error::Malformed max_indexes"; exit 1; }
+          [[ "$LIMIT" =~ ^[1-9][0-9]{0,2}$ ]] || { echo "::error::Malformed max_indexes"; exit 1; }
           COUNT=$((10#$LIMIT))
           (( COUNT>=1 && COUNT<=25 )) || { echo "::error::max_indexes exceeds bounded 1..25"; exit 1; }
-          [[ "$INPUT_RETENTION_DAYS" =~ ^[0-9]{1,2}$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
+          [[ "$INPUT_RETENTION_DAYS" =~ ^[1-9][0-9]?$ ]] || { echo "::error::Malformed retention_days"; exit 1; }
           RETAIN=$((10#$INPUT_RETENTION_DAYS))
           (( RETAIN>=1 && RETAIN<=90 )) || { echo "::error::Artifact retention must be 1..90"; exit 1; }
           echo "Authorized main resource limits: index/history=$COUNT, retention=$RETAIN"
