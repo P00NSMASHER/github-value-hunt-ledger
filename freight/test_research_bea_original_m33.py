@@ -97,7 +97,7 @@ class OriginalBEAXLSXTests(unittest.TestCase):
         self.assertEqual(parsed["original_year_source_cells_reproduced"],32)
         self.assertEqual(parsed["source_rows_reproduced"],4)
         self.assertEqual(parsed["publisher_release_date"],"2026-09-30")
-        self.assertEqual(parsed["index_2017"],"100.0")
+        self.assertEqual(Decimal(parsed["index_2017"]),Decimal("100"))
         self.assertEqual(parsed["index_2024"],"108.047")
         self.assertEqual(parsed["index_2017_to_2024_growth_pct"],"8.05")
         self.assertEqual(parsed["source_year_excel_columns"]["TGO103-A"]["2017"],24)
