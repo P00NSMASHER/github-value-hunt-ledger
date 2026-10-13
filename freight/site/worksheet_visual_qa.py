@@ -65,7 +65,7 @@ def verify(bundle: Path, destination: Path) -> dict:
                     geom=page.evaluate("""() => {
                        const el=document.getElementById('worksheet');
                        const ids=['ws-billed','ws-expected','ws-credits','ws-sample',
-                                   'ws-clear','ws-print','ws-copy'];
+                                   'ws-clear','ws-print','ws-copy','ws-share'];
                        const buttons=ids.map(id=>document.getElementById(id).getBoundingClientRect());
                        const outside=buttons.filter(r=>r.left < -1 || r.right > innerWidth+1);
                        const cards=[...document.querySelectorAll('.worksheet-stat')].map(x=>{
@@ -95,6 +95,21 @@ def verify(bundle: Path, destination: Path) -> dict:
                         "externalRequestSent":False,
                         "posts":len(posts),"errors":errors,"status":"PASS" if success else "RECHECK"})
                     if width==390:
+                        # Native share sheet gets only the canonical public
+                        # link and static description; never financial inputs.
+                        page.evaluate("""() => {
+                          window.__retallyShareTest=null;
+                          Object.defineProperty(navigator,'share',{configurable:true,
+                            value:async payload => {window.__retallyShareTest=payload;}});
+                        }""")
+                        page.locator("#ws-share").click()
+                        print_info["privacySafeShare"]=page.evaluate("""() => {
+                          const item=window.__retallyShareTest||{};
+                          return item.url==='https://www.retallyrecovery.com/freight-invoice-audit-checklist#worksheet'
+                            && !JSON.stringify(item).includes('1167.60')
+                            && !JSON.stringify(item).includes('1042.60')
+                            && !('billed' in item) && !('credits' in item);
+                        }""")
                         # Tests actual recalculation without claiming money was received.
                         page.locator("#ws-credits").fill("50.00")
                         updated=page.locator("#ws-unresolved").inner_text().strip()
@@ -151,7 +166,8 @@ def verify(bundle: Path, destination: Path) -> dict:
         "records":records,"print":print_info,
         "passed":len(records)==len(SIZES) and all(x["status"]=="PASS" for x in records)
                  and print_info.get("printReadiness") is True
-                 and print_info.get("localRecalculation") is True,
+                 and print_info.get("localRecalculation") is True
+                 and print_info.get("privacySafeShare") is True,
     }
     (destination/"report.json").write_text(json.dumps(report,indent=2)+"\n")
     return report
