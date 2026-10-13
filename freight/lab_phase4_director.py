@@ -1061,6 +1061,35 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and c["original_historical_defect_closed"] is False
                       for c in schema46["cases"]),
               "M46_SQLITE_SCHEMATIC_NEGATIVE_CONTROL_NOT_COMPLETED")
+        from freight.lab_file_continuity_m47 import (
+            run_campaign as audit_file_continuity_m47,
+            ATTACKS as file_attacks_m47,
+            READ_SURFACES as file_read_surfaces_m47,
+        )
+        file47=audit_file_continuity_m47(as_of=today)
+        _must(file47["existing_research_lab"]==14
+              and file47["disposed_current_sqlite_path_attack_cases"]==8
+              and file47["positive_fictional_money_baseline_checks"]==40
+              and file47["existing_session_money_and_report_read_denials"]==56
+              and file47["existing_session_write_denials"]==8
+              and file47["total_file_path_attacks_blocked_on_current_operations"]==64
+              and file47["all_26_original_findings_still_open"]==26
+              and file47["original_historical_findings_closed"]==0
+              and file47["independent_first_customer_human_approval_gates_unmet"]==18
+              and file47["external_empirical_freight_recovery_claims_allowed"]==0
+              and file47["real_recovered_company_cash_cents"] is None
+              and file47["no_registration_hosted_deployment_or_schedule_changes"] is True,
+              "M47_SILENT_PERSISTENT_DATABASE_REPLACEMENT_OR_FAKE_AUTHORITY")
+        _must(tuple(c["source_path_attack"] for c in file47["cases"])==
+              tuple(file_attacks_m47)
+              and all(c["exact_expected_denial"]==
+                          file_attacks_m47[c["source_path_attack"]]
+                      and c["existing_session_read_denials"]==len(file_read_surfaces_m47)
+                      and c["existing_session_write_denials"]==1
+                      and c["rejected_actions_did_not_create_or_replace_file"] is True
+                      and c["original_historical_finding_closed"] is False
+                      for c in file47["cases"]),
+              "M47_CURRENT_SESSION_FILE_CONTINUITY_NOT_EXECUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1229,6 +1258,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "sqlite_schema_reopen_denials_m46":10,
                 "sqlite_schema_original_defects_closed_m46":0,
                 "sqlite_schema_receipt_sha256_m46":schema46["receipt_sha256"],
+                "sqlite_file_attack_cases_m47":8,
+                "sqlite_file_read_denials_m47":56,
+                "sqlite_file_write_denials_m47":8,
+                "sqlite_file_original_defects_closed_m47":0,
+                "sqlite_file_receipt_sha256_m47":file47["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

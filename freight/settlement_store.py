@@ -8,6 +8,7 @@ EXP-001's internal proof boundary; it is not customer outcome evidence.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sqlite3
 import time
@@ -85,20 +86,29 @@ class SettlementStore:
         business_unit: str,
         busy_timeout_ms: int = 5000,
     ):
-        self.path = str(path)
+        if str(path) == ":memory:":
+            raise ValueError("file-backed SQLite is required for concurrent connections")
+        # Pin absolute location once. A later chdir must not silently select
+        # an unrelated (but structurally valid) database file.
+        self.path = str(Path(path).absolute())
         self.buyer_id = self._text("buyer_id", buyer_id)
         self.business_unit = self._text("business_unit", business_unit)
         if type(busy_timeout_ms) is not int or not 1 <= busy_timeout_ms <= 60_000:
             raise ValueError("busy_timeout_ms must be an integer from 1 to 60000")
         self.busy_timeout_ms = busy_timeout_ms
-        if self.path == ":memory:":
-            raise ValueError("file-backed SQLite is required for concurrent connections")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        # M46: NEVER repair a pre-existing file on open by silently
-        # re-creating deleted append-only/capacity triggers. A previously
-        # existing file must pass the exact reviewed schema contract AS IS.
-        # Only a genuinely new file may be initialized from first-party SQL.
-        existed = Path(self.path).is_file()
+        from freight.settlement_file_identity_m47 import (
+            identity, create_exclusive_empty,
+        )
+        # M47: never use sqlite3.connect's default create-on-missing mode for
+        # existing sessions. First-time initialization is an exclusive file
+        # create (0600 on POSIX), rejecting symlinks and orphan WAL sidecars.
+        # Existing files are validated without repair, preserving M46's
+        # reviewed schema and trigger policy.
+        existed = os.path.lexists(self.path)
+        if not existed:
+            create_exclusive_empty(self.path)
+        self._pinned_source_identity = identity(self.path)
         # sqlite3.Connection's context manager commits or rolls back but does
         # not close the connection. Close explicitly after validation.
         conn = self._connect()
@@ -116,6 +126,7 @@ class SettlementStore:
                 conn.rollback()
         finally:
             conn.close()
+        self._assert_path_identity()
 
     @staticmethod
     def _assert_scoped_schema(conn: sqlite3.Connection) -> None:
@@ -224,12 +235,35 @@ class SettlementStore:
         audit_connection(conn)
 
 
+    def _assert_path_identity(self) -> None:
+        """Fail closed if the originally opened database path was replaced."""
+        from freight.settlement_file_identity_m47 import assert_identity
+        assert_identity(self.path, self._pinned_source_identity)
+
     def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.path, timeout=self.busy_timeout_ms / 1000, isolation_level=None)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys=ON")
-        conn.execute(f"PRAGMA busy_timeout={self.busy_timeout_ms}")
-        return conn
+        # A deleted SQLite main file must never be silently re-created by a
+        # balance query, idempotent operation, or backup/report workflow.
+        # mode=rw opens only pre-existing database paths (never mode=rwc).
+        self._assert_path_identity()
+        try:
+            conn = sqlite3.connect(
+                Path(self.path).as_uri() + "?mode=rw", uri=True,
+                timeout=self.busy_timeout_ms / 1000, isolation_level=None,
+            )
+        except sqlite3.OperationalError as exc:
+            # A file removed between stat() and sqlite3.connect() is still
+            # a failed source, not a request to manufacture an empty DB.
+            self._assert_path_identity()
+            raise RuntimeError("M47_SQLITE_SOURCE_CONNECT_FAILED") from exc
+        try:
+            self._assert_path_identity()
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys=ON")
+            conn.execute(f"PRAGMA busy_timeout={self.busy_timeout_ms}")
+            return conn
+        except BaseException:
+            conn.close()
+            raise
 
     def _write(self, fn: Callable[[sqlite3.Connection], T]) -> T:
         delay = 0.005
@@ -248,7 +282,9 @@ class SettlementStore:
                 audit_connection(conn, scope=self._scope)
                 out = fn(conn)
                 audit_connection(conn, scope=self._scope)
+                self._assert_path_identity()  # after mutation, before commit
                 conn.commit()
+                self._assert_path_identity()  # refuse stale path identity
                 return out
             except sqlite3.OperationalError as exc:
                 conn.rollback()
@@ -280,7 +316,9 @@ class SettlementStore:
             try:
                 from freight.settlement_semantic_guard_m44 import audit_connection
                 audit_connection(conn, scope=self._scope)
-                return fn(conn)
+                result = fn(conn)
+                self._assert_path_identity()
+                return result
             finally:
                 conn.rollback()
         finally:
