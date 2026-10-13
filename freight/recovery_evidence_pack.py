@@ -91,6 +91,18 @@ def normalize_finding(row):
         raise ValueError(
             "validated supported finding authority cannot postdate invoice"
         )
+    authorization_reference = str(row.get("authorization_reference") or "").strip()
+    clean["authorization_reference"] = authorization_reference
+    if clean["customer_authorization_state"] == "AUTHORIZED":
+        if not authorization_reference:
+            raise ValueError(
+                "AUTHORIZED finding requires authorization_reference"
+            )
+        if authorization_reference not in evidence:
+            raise ValueError(
+                "AUTHORIZED finding requires authorization_reference "
+                "in supporting_evidence"
+            )
     clean["supporting_evidence"] = evidence
     for key in SUPPRESSION_FLAGS:
         clean[key] = bool(row.get(key, False))
@@ -212,6 +224,8 @@ def build_pack(payload):
             "positive_settlement_reference_bound_to_evidence": True,
             "economic_opportunity_identity_is_unique": True,
             "buyer_visible_realized_excludes_suppressed_findings": True,
+            "authorized_findings_require_authorization_reference": True,
+            "authorization_reference_bound_to_evidence": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -251,6 +265,7 @@ def render_markdown(pack):
             f"- Confidence / reviewer: **{row['confidence']} / {row['reviewer_disposition']}**",
             f"- Unresolved issues: {row['unresolved_issues'] or 'None'}",
             f"- Customer authorization: **{row['customer_authorization_state']}**",
+            f"- Authorization reference: {row['authorization_reference'] or 'None'}",
             f"- Claim status / carrier response: **{row['claim_status']}** / {row['carrier_response'] or 'None recorded'}",
             f"- Settlement reference: {row['settlement_reference'] or 'None'}",
             f"- Credit / reversal / net realized: **{money(row['settled_credit_cents'])} / {money(row['reversal_cents'])} / {money(row['net_realized_cents'])}**",
@@ -273,7 +288,8 @@ def render_markdown(pack):
         "12. Its exact authority reference must appear in supporting evidence.",
         "13. A validated supported finding cannot rely on authority effective after its invoice date.",
         "14. Buyer-visible attributable realized recovery excludes suppressed findings.",
-        "15. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "15. An AUTHORIZED finding requires an exact authorization reference in supporting evidence.",
+        "16. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 

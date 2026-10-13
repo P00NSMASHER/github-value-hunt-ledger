@@ -51,6 +51,8 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["claim_boundary"]["validated_supported_findings_bind_authority_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
     assert pack["claim_boundary"]["buyer_visible_realized_excludes_suppressed_findings"] is True
+    assert pack["claim_boundary"]["authorized_findings_require_authorization_reference"] is True
+    assert pack["claim_boundary"]["authorization_reference_bound_to_evidence"] is True
 
 
 @pytest.mark.parametrize(
@@ -310,3 +312,39 @@ def test_suppressed_money_cannot_inflate_buyer_visible_realized_recovery(field, 
     report = render_markdown(pack)
     assert "Observed net settlement across all findings: **$185.00**" in report
     assert "Attributable net realized recovery: **$60.00**" in report
+
+
+def test_authorized_finding_requires_authorization_reference():
+    data = payload()
+    row = data["findings"][0]
+    row.pop("authorization_reference")
+    with pytest.raises(ValueError, match="requires authorization_reference"):
+        build_pack(data)
+
+
+def test_authorized_finding_requires_authorization_reference_in_evidence():
+    data = payload()
+    row = data["findings"][0]
+    row["supporting_evidence"].remove(row["authorization_reference"])
+    with pytest.raises(ValueError, match="authorization_reference in supporting_evidence"):
+        build_pack(data)
+
+
+@pytest.mark.parametrize("state", ("NOT_REQUESTED", "PENDING", "DECLINED"))
+def test_non_authorized_finding_does_not_require_authorization_reference(state):
+    data = payload()
+    row = data["findings"][2]
+    row["customer_authorization_state"] = state
+    row.pop("authorization_reference", None)
+    pack = build_pack(data)
+    assert pack["findings"][2]["authorization_reference"] == ""
+    assert pack["findings"][2]["fee_eligible_realized_cents"] == 0
+
+
+def test_authorization_reference_is_buyer_visible_and_evidence_bound():
+    pack = build_pack(payload())
+    row = pack["findings"][0]
+    assert row["authorization_reference"] == "AUTH-PILOT-2026-001"
+    assert row["authorization_reference"] in row["supporting_evidence"]
+    report = render_markdown(pack)
+    assert "- Authorization reference: AUTH-PILOT-2026-001" in report
