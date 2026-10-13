@@ -44,6 +44,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/site/test_public_claim_guard.py
           freight/site/test_asset_integrity.py
           freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
@@ -85,6 +86,11 @@ jobs:
           test "$(find cf-retally-public -type l | wc -l)" -eq 0
           grep -F 'https://www.retallyrecovery.com/' cf-retally-public/index.html
           grep -F 'jay@retallyrecovery.com' cf-retally-public/index.html
+      - name: Verify final Cloudflare customer-facing claim boundaries post-rebase
+        run: >-
+          python -m freight.site.public_claim_guard
+          --freight-root cf-retally-public
+          --recoveryos-root cf-retally-public/recoveryos
 
   deploy:
     if: >-
@@ -120,6 +126,7 @@ jobs:
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
           mkdir /tmp/freight-recovery-public/recoveryos
           cp -R /tmp/recoveryos-public/. /tmp/freight-recovery-public/recoveryos/
+          python -m freight.site.public_claim_guard --freight-root /tmp/freight-recovery-public --recoveryos-root /tmp/freight-recovery-public/recoveryos
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: /tmp/freight-recovery-public
