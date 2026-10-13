@@ -14,7 +14,7 @@ import unittest
 from freight.site import build as builder
 from freight.site.rebase_public_urls import OLD_BASE, NEW_BASE, rebase
 from freight.site.social_preview import (
-    ALT, IMAGE_BY_TOPIC, WORKSHEET, WORKSHEET_DESCRIPTION,
+    ALT, IMAGE_BY_TOPIC, EDITORIAL_SHARE_META, WORKSHEET, WORKSHEET_DESCRIPTION,
     WORKSHEET_TITLE, embed, preview_images,
 )
 
@@ -50,6 +50,20 @@ class ShareCardTest(unittest.TestCase):
         self.assertEqual(len(IMAGE_BY_TOPIC),3)
         self.assertEqual(set(ALT),set(IMAGE_BY_TOPIC))
 
+    def test_all_editorial_cards_fit_mobile_previews_without_fake_returns(self):
+        self.assertEqual(set(EDITORIAL_SHARE_META),set(preview_images()))
+        titles,descs=[],[]
+        for name,(title,description) in EDITORIAL_SHARE_META.items():
+            self.assertLessEqual(len(title),70,name)
+            self.assertLessEqual(len(description),175,name)
+            self.assertIn("RETALLY",title.upper(),name)
+            for banned in ("guaranteed refund","guaranteed savings","our customers saved",
+                           "we recovered $","send us private invoices"):
+                self.assertNotIn(banned,description.lower(),name)
+            titles.append(title);descs.append(description)
+        self.assertEqual(len(set(titles)),24)
+        self.assertEqual(len(set(descs)),24)
+
     def test_reuse_only_allowlisted_original_public_art(self):
         topics=preview_images()
         for page,image in topics.items():
@@ -61,7 +75,7 @@ class ShareCardTest(unittest.TestCase):
 
     def test_worksheet_title_is_concise_and_not_a_fake_refund(self):
         self.assertEqual(WORKSHEET_TITLE,
-            "RETALLY | Free Printable Freight Invoice Audit Worksheet")
+            "RETALLY | Free Printable Freight Audit Worksheet")
         self.assertIn("anonymized",WORKSHEET_DESCRIPTION)
         self.assertIn("no refund",WORKSHEET_DESCRIPTION.lower())
         self.assertNotIn("real customer",WORKSHEET_DESCRIPTION.lower())
