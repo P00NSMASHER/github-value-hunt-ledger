@@ -53,7 +53,7 @@ def change_replacement(base, replacement, doc, **changes):
 
 
 def resolve_chain(triplet):
-    base, doc, replacement = triplet
+    base, replacement, doc = triplet
     return resolve_engagement(base, [doc], [replacement])
 
 
