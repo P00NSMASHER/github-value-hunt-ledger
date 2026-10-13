@@ -1,0 +1,95 @@
+name: RETALLY Public Copy Pre-Publication Evidence Gate (Mission 36)
+on:
+  pull_request:
+    paths:
+      - 'freight/public_claim_release_gate.py'
+      - 'freight/test_public_claim_release_gate.py'
+      - 'freight/site/**'
+      - 'freight/PUBLIC_COPY_CLAIM_GATE_M36.md'
+      - 'freight/research_claim_clearance_m35.py'
+      - 'freight/research/CLAIM_CLEARANCE_M35_20261012.json'
+      - '.github/workflows/retally-public-copy-claim-gate-m36.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-copy-source-and-full-site-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned public freight build dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Validate copy patterns, site build, and original human pilot/source controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_public_claim_release_gate.py \
+            freight/site/test_build.py \
+            freight/test_research_claim_clearance_m35.py \
+            freight/test_research_pilot_preflight.py \
+            freight/test_research_economic_denominator_m34.py
+      - name: Check allowlisted public source copy and original 18-signoff hold
+        run: |
+          PYTHONPATH=. python -m freight.public_claim_release_gate --site-root freight/site
+      - name: Exercise exact website output with all contact and pricing controls
+        env:
+          FREIGHT_CONTACT_EMAIL: sales@freightfixture.com
+          FREIGHT_CONTACT_VERIFIED: '1'
+          FREIGHT_CONTINGENCY_RECOVERY_RATE: '0.30'
+        run: |
+          python freight/site/build.py --output /tmp/retally-m36-clean-public
+          test "$(find /tmp/retally-m36-clean-public -type f | wc -l)" -eq 54
+          test "$(find /tmp/retally-m36-clean-public -type l | wc -l)" -eq 0
+          grep -q 'Fictional data' /tmp/retally-m36-clean-public/index.html
+          grep -q 'No recovery, no recovery fee' /tmp/retally-m36-clean-public/index.html
+          grep -q 'contingencyRecoveryRateLabel: "30%"' /tmp/retally-m36-clean-public/commercial-config.js
+
+  independent-negative-publication-proof:
+    needs: public-copy-source-and-full-site-regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Inject unsupported claims into page, metadata, JSON-LD, JS and CSV without writing
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          from freight.public_claim_release_gate import (
+              scan_public_copy, require_public_copy_clearance
+          )
+          attacks={
+              'index.html':('<h1>RETALLY has recovered $12 million for clients.</h1>'
+                            '<meta property="og:description" content="Our success rate is 98%">'
+                            '<script type="application/ld+json">'
+                            '{"@type":"Service","description":"Guaranteed refunds on invoices"}'
+                            '</script>'),
+              'site.js':'const result = "RETALLY has recovered $15 million for clients";',
+              'llms.txt':'Our recoverable freight audit market is $142.608 billion.',
+              'freight-audit-provider-scorecard.csv':'retally,Our recovery rate is 97%',
+          }
+          results=scan_public_copy(attacks)
+          observed={v.rule for v in results}
+          must={
+              'CLAIMED_CUSTOMER_RECOVERIES',
+              'UNVERIFIED_AUDIT_RATE',
+              'GUARANTEED_CUSTOMER_OUTCOMES',
+              'FABRICATED_RECOVERABLE_TAM',
+          }
+          assert must <= observed, observed
+          try:
+              require_public_copy_clearance(attacks)
+          except ValueError as exc:
+              assert 'PUBLIC_CLAIM_GATE_UNSUPPORTED_ASSERTION' in str(exc),str(exc)
+          else:
+              raise AssertionError('M36_FALSE_REAL_INVOICE_RECOVERY_CLAIMS_PUBLISHED')
+          safe={'index.html':'<p>$0-upfront audit. Authorized recovery fees apply only to actual eligible funds recovered.</p>'}
+          assert scan_public_copy(safe)==[]
+          print('Verified direct public bundle copy is fail-closed on fake recoveries, rates, TAM and structured metadata. No external publication permissions.')
+          PY

@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from freight.synthetic_pilot_bundle import verify_synthetic_pilot_bundle
 
@@ -81,6 +82,35 @@ class PublicBuildTests(unittest.TestCase):
         ):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 build(output)
+
+    def test_unsupported_real_recovery_claim_blocks_before_any_output_write(self):
+        # The source files and existing production bundle remain unchanged.
+        # Inject copy only through a local temporary file in this test.
+        with tempfile.TemporaryDirectory() as temp:
+            temp=Path(temp)
+            fake=temp/"edited-index.html"
+            fake.write_text(
+                (builder.SOURCE/"index.html").read_text(encoding="utf-8")+
+                '<section><p>RETALLY has recovered $8 million for clients.</p></section>',
+                encoding="utf-8"
+            )
+            real_source=builder._public_source
+            def read_override(name):
+                return fake if name=="index.html" else real_source(name)
+            output=temp/"out"
+            with patch.object(builder,"_public_source",side_effect=read_override):
+                with self.assertRaisesRegex(ValueError,
+                    "PUBLIC_CLAIM_GATE_UNSUPPORTED_ASSERTION"):
+                    build(output)
+            self.assertFalse(output.exists())
+
+    def test_unchanged_fictional_example_and_free_audit_survive_release_gate(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output=build(Path(temp)/"public")
+            html=(output/"index.html").read_text(encoding="utf-8")
+            self.assertIn('Fictional data',html)
+            self.assertIn('No recovery, no recovery fee',html)
+            self.assertIn('Start Free Recovery Audit',html)
 
     def test_output_contains_only_allowlisted_public_assets(self):
         with tempfile.TemporaryDirectory() as temporary:

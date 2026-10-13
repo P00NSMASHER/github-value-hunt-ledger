@@ -44,7 +44,10 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/test_public_claim_release_gate.py
           recoveryworks/test_public_site.py
+      - name: Require M35-guided public-copy claim clearance before page packaging
+        run: PYTHONPATH=. python -m freight.public_claim_release_gate --site-root freight/site
       - name: Check browser script syntax
         run: |
           node --check freight/site/commercial-config.js
