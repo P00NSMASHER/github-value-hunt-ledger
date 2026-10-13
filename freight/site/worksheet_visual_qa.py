@@ -104,7 +104,23 @@ def verify(bundle: Path, destination: Path) -> dict:
                         page.emulate_media(media="print")
                         page.set_viewport_size({"width":816,"height":1056})
                         page.evaluate("document.body.classList.add('worksheet-print-mode')")
+                        # Print must reproduce checkboxes beside the text, not
+                        # browser-native controls on a second line.
+                        page.locator(".worksheet-checklist input").first.check()
+                        print_info["checkedPrintState"] = page.evaluate("""() => {
+                          const label=document.querySelector('.worksheet-checklist label');
+                          const before=getComputedStyle(label,'::before');
+                          return before.content.includes('✓') &&
+                                 getComputedStyle(label.querySelector('input')).display==='none';
+                        }""")
+                        page.locator(".worksheet-checklist input").first.uncheck()
                         printed=page.evaluate("""() => ({
+                          checkboxIconVisible:(() => {
+                            const label=document.querySelector('.worksheet-checklist label');
+                            const style=getComputedStyle(label,'::before');
+                            return style.display==='block' && parseFloat(style.width)>=10 &&
+                              getComputedStyle(label.querySelector('input')).display==='none';
+                          })(),
                           headerHidden:getComputedStyle(document.querySelector('.site-header')).display==='none',
                           skipHidden:getComputedStyle(document.querySelector('.skip')).display==='none',
                           boldBlack:getComputedStyle(document.querySelector('.worksheet-head strong')).color==='rgb(17, 17, 17)',
@@ -119,6 +135,7 @@ def verify(bundle: Path, destination: Path) -> dict:
                         print_info["printReadiness"]=all([
                             printed["headerHidden"],printed["navHidden"],
                             printed["skipHidden"],printed["boldBlack"],
+                            printed["checkboxIconVisible"], print_info["checkedPrintState"],
                             printed["worksheetVisible"],printed["checklistCount"]==15,
                             printed["printActionsHidden"]])
                     ctx.close()
