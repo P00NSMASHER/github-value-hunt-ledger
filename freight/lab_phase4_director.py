@@ -863,6 +863,24 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged_m35["claim_registry"][0]["public_publication_authorized"]=True
         _must(bool(validate_claim_policy_m35(forged_m35,as_of=today)),
               "M35_MISLEADING_EXTERNAL_ECONOMIC_OR_CUSTOMER_CLAIM_APPROVED")
+        from freight.research_source_lineage_m37 import (
+            report_shell as source_impact_m37,
+            candidate_template as hypothetical_source_m37,
+        )
+        impact37=source_impact_m37(as_of=today)
+        _must(impact37["source_family_count"]==5
+              and impact37["external_commercial_claims_authorized"]==0
+              and impact37["original_pilot_human_signoffs_unmet"]==18
+              and impact37["candidate_sources_submitted"]==0
+              and impact37["source_original_publisher_replay_completed_in_this_run"] is False,
+              "M37_UNTRUSTED_SOURCE_FINGERPRINTS_FALSELY_DECLARED_ORIGINAL_REPLAY")
+        hypothetical37=source_impact_m37(as_of=today,candidate=hypothetical_source_m37(
+            as_of=today,root="CENSUS",digest="0"*64))
+        _must(hypothetical37["affected_internal_source_claim_ids"]==
+              ["M35-02","M35-03","M35-04","M35-07"]
+              and hypothetical37["external_commercial_claims_authorized"]==0
+              and hypothetical37["report_changes_prove_actual_publisher_revisions"] is False,
+              "M37_CENSUS_SOURCE_CHANGE_DID_NOT_INVALIDATE_EXACT_CLAIMS")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -993,6 +1011,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "research_claim_clearance_pilot_gates_unmet":clearance35["independent_customer_pilot_human_approvals_unmet"],
                 "research_claim_clearance_external_approvals":0,
                 "research_claim_clearance_receipt_sha256":clearance35["receipt_sha256"],
+                "research_source_lineage_m37_receipt_sha256":impact37["receipt_sha256"],
+                "hypothetical_census_revision_internal_claims_to_recheck":4,
+                "research_m37_external_publication_authority":False,
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,

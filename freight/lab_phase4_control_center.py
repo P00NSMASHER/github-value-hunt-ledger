@@ -107,6 +107,10 @@ from freight.research_claim_clearance_m35 import (
     report_shell as build_claim_clearance_m35,
     render_html as render_claim_clearance_m35,
 )
+from freight.research_source_lineage_m37 import (
+    report_shell as build_source_lineage_m37,
+    render_html as render_source_lineage_html_m37,
+)
 from freight.research_public_campaign import campaign_registry
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
@@ -184,6 +188,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["bea_first_party_original_xlsx_m33"]=build_bea_original_m33(as_of=date.today())
         result["bea_census_nominal_denominator_m34"]=build_nominal_measure_reconciliation_m34(as_of=date.today())
         result["research_claim_clearance_m35"]=build_claim_clearance_m35(as_of=date.today())
+        result["research_source_lineage_m37"]=build_source_lineage_m37(as_of=date.today())
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -248,6 +253,7 @@ def render(data: dict) -> str:
     original_bea=data["bea_first_party_original_xlsx_m33"]
     nominal34=data["bea_census_nominal_denominator_m34"]
     claim35=data["research_claim_clearance_m35"]
+    lineage37=data["research_source_lineage_m37"]
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RETALLY | Laboratory Intelligence</title>
@@ -480,6 +486,15 @@ carrier claims, customer document transfers, public performance
 statistics or recoverable freight-market estimates. Mock reviewer
 agreement is not independent real-world accuracy.</p>
 <a href="claim_clearance.html">Open sixteen typed claim decisions with evidence requirements and original human gate IDs ↗</a></section>
+<section class="panel"><h2>Source-family revision impact — metadata scenarios only</h2>
+<p>The new M37 review tracks <strong>"""+str(lineage37["source_family_count"])+"""</strong>
+separately attributed original-report source families and their dependencies
+across sixteen M35 claim cases. <strong>"""+str(lineage37["candidate_sources_submitted"])+"""</strong>
+independently verified new publisher source captures are claimed: none.
+A date-bound receipt difference is an <strong>unverified what-if</strong>, not a
+confirmed source revision or permission to publish statistics or buyer results.
+<strong>18/18 independently required customer-pilot signoffs remain unmet.</strong></p>
+<a href="source_change_impact.html">Open source-fingerprint comparison and precise claim revalidation requirements ↗</a></section>
 <section class="panel"><h2>Trucking market denominator reconciliation — not recoverable freight bills</h2>
 <p>Original BEA gross output and Census employer-industry revenue are
 <strong>different economic measures</strong>, even though both are
@@ -863,6 +878,14 @@ def main():
     )
     (args.out/"claim_clearance.html").write_text(
         render_claim_clearance_m35(data["research_claim_clearance_m35"]),
+        encoding="utf-8"
+    )
+    (args.out/"source_change_impact.json").write_text(
+        json.dumps(data["research_source_lineage_m37"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"source_change_impact.html").write_text(
+        render_source_lineage_html_m37(data["research_source_lineage_m37"]),
         encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
