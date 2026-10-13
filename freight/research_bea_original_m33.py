@@ -252,11 +252,11 @@ def inspect_xlsx_content(raw:bytes) -> dict:
                 if str(ws.cell(row,1).value)!=val:
                     raise ValueError("M33_BEA_ANNUAL_TABLE_HEADING_UNIT_OR_VINTAGE_CHANGED:"+name+":"+str(row))
             year_columns=_year_header(ws)
-            if str(ws.cell(52,1).value)!="44" or str(ws.cell(52,2).value)!="Truck transportation":
+            if str(ws.cell(52,1).value).strip()!="44" or str(ws.cell(52,2).value).strip()!="Truck transportation":
                 raise ValueError("M33_BEA_484_TRUCK_TRANSPORTATION_INDUSTRY_ROW_CHANGED:"+name)
             count=sum(
                 1 for row in ws.iter_rows(min_row=14,max_row=90,min_col=2,max_col=2,values_only=True)
-                if row[0]=="Truck transportation"
+                if isinstance(row[0],str) and row[0].strip()=="Truck transportation"
             )
             if count!=1:
                 raise ValueError("M33_DUPLICATE_OR_MISSING_TRUCK_INDUSTRY_CLASSIFICATION:"+name)
