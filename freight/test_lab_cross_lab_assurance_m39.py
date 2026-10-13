@@ -182,6 +182,10 @@ class CrossLabM39Tests(unittest.TestCase):
             ("sqlite_file_read_denials_m47", 55),
             ("sqlite_file_write_denials_m47", 7),
             ("sqlite_file_original_defects_closed_m47", 1),
+            ("audit_source_cases_m48", 12),
+            ("audit_source_read_denials_m48", 64),
+            ("audit_source_append_denials_m48", 12),
+            ("audit_source_original_findings_closed_m48", 1),
         ]
         for field, value in flags:
             r = deepcopy(self.original)

@@ -1090,6 +1090,32 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and c["original_historical_finding_closed"] is False
                       for c in file47["cases"]),
               "M47_CURRENT_SESSION_FILE_CONTINUITY_NOT_EXECUTED")
+        from freight.lab_audit_trust_boundary_m48 import (
+            run_campaign as audit_persistent_chain_m48,
+            ATTACKS as original_audit_attacks_m48,
+            READS as original_audit_reads_m48,
+        )
+        audit48=audit_persistent_chain_m48(as_of=today)
+        _must(audit48["original_research_labs"]==14
+              and audit48["current_real_audit_file_attack_classes"]==13
+              and audit48["verified_fictional_positive_source_records_per_attack"]==2
+              and audit48["current_audit_read_denials"]==65
+              and audit48["current_audit_append_denials"]==13
+              and audit48["original_historical_findings_open"]==26
+              and audit48["original_historical_findings_closed"]==0
+              and audit48["independent_first_customer_approval_gates_unmet"]==18
+              and audit48["independently_attested_audit_log_or_original_customer_data"] is False
+              and audit48["externally_publishable_empirical_claims"]==0,
+              "M48_AUDIT_HISTORY_ORIGINAL_APPROVAL_UNJUSTIFIED")
+        _must(tuple(c["scenario"] for c in audit48["cases"])==
+              tuple(original_audit_attacks_m48)
+              and all(c["exact_expected_denial"]==
+                          original_audit_attacks_m48[c["scenario"]]
+                      and c["existing_session_read_denials"]==len(original_audit_reads_m48)
+                      and c["existing_session_append_denials"]==1
+                      and c["original_historical_defect_closed"] is False
+                      for c in audit48["cases"]),
+              "M48_AUDIT_SOURCE_NEGATIVE_CASE_NOT_EXECUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1263,6 +1289,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "sqlite_file_write_denials_m47":8,
                 "sqlite_file_original_defects_closed_m47":0,
                 "sqlite_file_receipt_sha256_m47":file47["receipt_sha256"],
+                "audit_source_cases_m48":13,
+                "audit_source_read_denials_m48":65,
+                "audit_source_append_denials_m48":13,
+                "audit_source_original_findings_closed_m48":0,
+                "audit_source_receipt_sha256_m48":audit48["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
