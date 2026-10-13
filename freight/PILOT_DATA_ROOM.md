@@ -56,6 +56,34 @@ This is metadata consistency and policy validation, not verification of original
 source bytes, authentic customer consent, external provenance, hosted access
 controls or recovered funds. Those still require separate evidence.
 
+## Transitive proof-chain verification
+
+The package consumer also reconstructs the population, each finding, the truth
+manifest, the sealed incumbent submission and the opened incumbent output using
+the existing canonical builders. Every supplied digest must match its rebuilt
+contents. Original scope and inter-object links are checked before rebuilding;
+reconstruction must not silently repair a mismatched population or submission.
+
+Recomputed self-hashes cannot bypass frozen-population membership, authority
+scope/identity, duplicate-record rejection, required fields or valid finding
+states. Money must use non-negative integer cents, not booleans, strings or
+fractional values. Incumbent finding IDs must be text rather than coerced values.
+Clean population rows and REVIEW findings remain present; an empty finding set
+or empty incumbent result is valid and does not imply missing source records.
+Canonical reordering preserves identity, and a fully rebuilt valid revision
+changes identity without mutating caller objects.
+
+These checks apply at `build_pilot_package`, not to every independent consumer of
+the lower-level dataclasses. They do not authenticate source files, establish a
+complete row-to-original-file lineage mapping, prove historical sealing time,
+authorize a customer engagement or repair hosted settlement controls. A caller
+can still construct a different internally consistent fictional chain: only
+independent source and authorization evidence can establish real-world truth.
+
+Regression suite: `PYTHONPATH=. python -m pytest -q freight/test_pilot_package.py
+freight/test_pilot_proof_chain.py`. The existing required release workflow also
+runs the complete Freight directory; no new workflow or dependency is needed.
+
 ## Blind-order chain
 
 1. Build source/data-room manifest.
