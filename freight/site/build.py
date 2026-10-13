@@ -24,6 +24,7 @@ from freight.commercial_terms import (
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 from freight.site.asset_integrity import validate_freight_media
+from freight.site.social_preview import embed as embed_social_preview, preview_images as social_preview_images
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -330,6 +331,17 @@ def build(
         '<p class="microcopy">Sample data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # Every educational page must have a crawler-readable, topic-matched
+    # public social preview. Use only images already in the audited website
+    # binary allowlist; no externally fetched images or customer material.
+    topics = social_preview_images()
+    if set(topics) != set(PUBLIC_CONTACT_PAGES) - {"index.html"}:
+        raise ValueError("Public share-card topics must cover each informational page exactly once")
+    for name in sorted(topics):
+        text_bundle[name] = embed_social_preview(
+            text_bundle[name], name, available_images=set(BINARY_SOURCE_FILES)
+        )
 
     # Social profiles are informational, read-only outbound links. Inject the
     # same accessible component on every public marketing page at build time.
