@@ -40,7 +40,7 @@ class FieldNotesV3Tests(unittest.TestCase):
                 self.assertIn('ILLUSTRATIVE ONLY',rendered)
                 self.assertIn('NO CUSTOMER DATA',rendered)
                 self.assertIn('ORIGINAL APPROVED RETALLY WORDMARK',rendered.upper())
-                self.assertIn(c["caption_hook"],json.dumps(c))
+                self.assertIn(c["caption_hook"],json.dumps(c,ensure_ascii=False))
                 self.assertNotIn("<script",rendered.lower())
                 self.assertNotIn("<form",rendered.lower())
                 self.assertNotIn("https://",rendered.lower())
@@ -118,7 +118,7 @@ class FieldNotesV3Tests(unittest.TestCase):
         self.assertEqual(len(pages),len(set(pages)))
         for s in pages:
             self.assertIn('<main class="artboard v3',s)
-            self.assertEqual(s.count('class="document'),3)
+            self.assertEqual(s.count('class="document"') + s.count('class="document focus"'),3)
 
     def test_six_real_fullsize_and_phone_pngs_with_no_external_network(self):
         if not LOGO.is_file(): self.skipTest("Canonical brand source missing")
