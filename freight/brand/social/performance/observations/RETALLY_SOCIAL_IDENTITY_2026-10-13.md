@@ -31,3 +31,15 @@ Direct Metricool post-analytics rows requested for Oct 9–13 (timestamps report
 6. A qualified lead requires a **received and reviewed** inquiry. A homepage form start, email draft, page view, link click, or pending Metricool post is not a lead.
 
 No personal connected-account names, mailbox identifiers, tokens, customer data or raw private connector exports are stored in this note. Source results may change and must be refreshed before future inference.
+
+## Direct dual-provider Facebook post reconciliation (October 13)
+
+After filtering Windsor.ai to the **exact matched RETALLY Page ID**, the Oct 9 and Oct 12 organic Facebook records reconcile with Metricool using the immutable **Page ID + Post ID**, exact normalized caption, and same publication date.
+
+- **2 / 2 source rows matched** across separate reporting connectors. Windsor.ai reports the posts as published. Public visibility was **not independently checked**: both permalinks are still candidate post links, not publication receipts.
+- For **both** posts, all **six shared counters** matched: impressions, per-post reach, reactions, comments, shares and link clicks. Across these two records only: **13 impressions**, **3 summed post reach** (not unique people), **1 reported link click**, and **0 reported reactions/comments/shares**.
+- The two providers return **different Page-alias URL prefixes** but the exact same immutable Post ID suffix. Reconciliation is by the underlying post identity, not string-equal URLs.
+- One older publicly reported Oct 9 caption still links directly to the email-preparation form. That post is outside the mutable upcoming Metricool queue; this audit **did not claim to edit the published Page**.
+- The Instagram Windsor account mismatch and YouTube channel identity gap remain; do not aggregate those accounts' data into RETALLY.
+
+The additive cross_provider_facebook.py bridge is read-only and only reports `CROSS_PROVIDER_REPORTED_PUBLISHED` after matching exact account, post ID, normalized text and publication date. It never emits `VERIFIED_PUBLIC` without an independent public-permalink check and never converts post clicks into qualified inquiries. Review source provider lag before interpreting any future discrepancies.
