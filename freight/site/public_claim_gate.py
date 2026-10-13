@@ -71,7 +71,7 @@ PERFORMANCE_CLAIMS = (
         r"(?:(?:have|has|already|successfully)\s+){0,2}"
         r"(?:audited|reviewed|processed)\s+"
         r"(?:(?:more\s+than|over)\s+)?[\d,]+\s+"
-        r"(?:freight\s+)?(?:invoices|shipments|customer\s+accounts)\b",re.I,
+        r"(?:(?:freight|customer|carrier)\s+)?(?:invoices|shipments|accounts)\b",re.I,
     )),
     ("UNVERIFIED_OWN_RECOVERY_RATE",re.compile(
         r"\b(?:our|retally(?:['’]s)?)(?:\s+\w+){0,3}\s+"
