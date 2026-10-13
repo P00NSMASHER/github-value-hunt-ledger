@@ -423,11 +423,33 @@ def test_review_reverse_enforces_allocation_and_counter_capacity(tmp_path):
             amount_cents=6000,created_at="2026-09-03T12:01:00Z",
         )
 
-    s.ingest_counter(R(rid="r2",amt=50000))
+    # An additional 50,000-cent return would bring total returns to 65,000
+    # against the original 50,000-cent provider credit. M45 now rejects
+    # that contradiction immediately at ingestion, rather than waiting for
+    # a later manual reversal request.
+    with pytest.raises(RuntimeError,match="M44_RETURN_CAPACITY_EXCEEDS_CREDIT"):
+        s.ingest_counter(R(rid="r2",amt=50000))
+    assert s.count("counter_events") == 1
+
+    # Independently exercise the allocation-specific reversal cap using a
+    # LEGITIMATE 20,000-cent partial allocation and a separate 25,000-cent
+    # return. The amount 20,001 fits inside the return but exceeds this
+    # individual allocated edge, so it must be rejected for that reason.
+    partial=SettlementStore(
+        tmp_path/"partial-allocated-reversal.sqlite3",
+        buyer_id="TEST_BUYER",business_unit="TEST_BU",
+    )
+    partial.create_claim(C())
+    partial.ingest_event(E())
+    assert partial.review_allocate(
+        allocation_id="partial-a1",claim_id="c1",event_id="e1",
+        amount_cents=20000,created_at=ALLOCATED_AT,
+    )==ALLOCATED
+    partial.ingest_counter(R(amt=25000))
     with pytest.raises(ValueError,match="allocation reversal capacity exceeded"):
-        s.review_reverse(
-            reversal_id="rr3",counter_id="r2",allocation_id="auto:e1:c1",
-            amount_cents=40001,created_at="2026-09-03T12:02:00Z",
+        partial.review_reverse(
+            reversal_id="rr3",counter_id="r1",allocation_id="partial-a1",
+            amount_cents=20001,created_at="2026-09-03T12:02:00Z",
         )
 
 

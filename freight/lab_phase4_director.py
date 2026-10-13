@@ -1005,6 +1005,35 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                       and x["original_historical_recoveryos_defect_closed"] is False
                       for x in persistent44["cases"]),
               "M44_PERSISTENT_REOPEN_REPORT_OR_AUDIT_FALSE_ACCEPTANCE")
+        from freight.lab_atomic_financial_m45 import (
+            run_campaign as audit_atomic_financial_m45,
+            READ_SURFACES as read_surfaces_m45,
+        )
+        atomic45=audit_atomic_financial_m45(as_of=today)
+        _must(atomic45["corrupted_persistent_source_scenarios"]==8
+              and atomic45["known_good_fictional_read_surfaces_per_source"]==5
+              and atomic45["current_financial_read_denials"]==40
+              and atomic45["current_financial_write_denials"]==8
+              and atomic45["total_fail_closed_financial_operations"]==48
+              and atomic45["all_rejected_financial_operations_left_source_unmodified"] is True
+              and atomic45["financial_reconciliation_observes_one_pinned_sqlite_revision"] is True
+              and atomic45["pre_and_post_commit_semantic_validation_enabled"] is True
+              and atomic45["current_original_historical_findings_open"]==26
+              and atomic45["current_original_historical_findings_closed"]==0
+              and atomic45["independent_human_first_customer_pilot_controls_unmet"]==18
+              and atomic45["actual_customer_cash_recovered_usd"] is None
+              and atomic45["external_commercial_approval_granted"] is False,
+              "M45_UNSAFE_FINANCIAL_OPERATION_OR_UNSUPPORTED_CLAIM_ACCEPTED")
+        _must(tuple(x["source_attack"] for x in atomic45["cases"])==
+              tuple(persistent_attack_ids_m44)
+              and all(x["read_operation_denials"]==len(read_surfaces_m45)
+                      and x["write_operation_denials"]==1
+                      and x["rejected_actions_left_source_unchanged"] is True
+                      and x["original_historical_finding_closed"] is False
+                      and x["exact_source_error_code"]==
+                          persistent_attack_ids_m44[x["source_attack"]]
+                      for x in atomic45["cases"]),
+              "M45_PERSISTENT_OPERATION_NEGATIVE_CASE_NOT_EXECUTED")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -1162,6 +1191,11 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "persistent_semantic_reopen_denials_m44":8,
                 "persistent_semantic_historical_findings_closed_m44":0,
                 "persistent_semantic_receipt_sha256_m44":persistent44["receipt_sha256"],
+                "atomic_financial_read_denials_m45":40,
+                "atomic_financial_write_denials_m45":8,
+                "atomic_financial_total_denials_m45":48,
+                "atomic_financial_historical_findings_closed_m45":0,
+                "atomic_financial_receipt_sha256_m45":atomic45["receipt_sha256"],
                 "sas_temporal_source_does_not_establish_freight_recovery":True,
                 "cfs_sector_real_ltl_spend_known":False,
                 "cfs_industry_paid_invoice_market_proven":False,
