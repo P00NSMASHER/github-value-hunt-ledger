@@ -45,6 +45,54 @@ jobs:
         run: python -m unittest discover -s freight -p "test_*.py" -v
       - name: Run complete Freight pytest suite
         run: PYTHONPATH=. python -m pytest -q freight
+      # Additional source-pinned technical outcome evidence for the Brain
+      # experiment. Explicitly synthetic; not accepted first-customer proof.
+      - name: Checkout exact PR source for synthetic invoice-review evidence
+        if: ${{ github.event_name == 'pull_request' && hashFiles('freight/brain_review_measurement.py') != '' }}
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: synthetic-review-source
+          persist-credentials: false
+      - name: Produce source-pinned invoice-review tradeoff receipt
+        if: ${{ github.event_name == 'pull_request' && hashFiles('freight/brain_review_measurement.py') != '' }}
+        env:
+          REVIEW_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C synthetic-review-source rev-parse HEAD)" = "$REVIEW_SOURCE_SHA"
+          (cd synthetic-review-source && PYTHONPATH=. python -m freight.brain_review_measurement) > "$RUNNER_TEMP/retally-synthetic-review.json"
+          python - "$RUNNER_TEMP/retally-synthetic-review.json" <<'PY'
+          import json, re, sys
+          with open(sys.argv[1], encoding="utf-8") as source:
+              doc = json.load(source)
+          assert doc["evidence_kind"] == "SYNTHETIC_FIRST_PARTY_COMPARISON"
+          assert doc["real_customer_outcome"] == "NOT_MEASURED"
+          assert doc["production_deployed"] is False
+          assert doc["validated_recovery_cents"] == 0
+          assert doc["human_time_saved"] is None and doc["verified_revenue"] is None
+          assert doc["summary"]["REVIEW_SCENARIO"] == {
+              "cases": 5, "baseline_cases_flagged": 2, "candidate_cases_flagged": 5}
+          assert doc["summary"]["KNOWN_BENIGN_SYNTHETIC_TRUTH"] == {
+              "cases": 2, "baseline_cases_flagged": 0, "candidate_cases_flagged": 2}
+          assert doc["summary"]["NONMATCH_CONTROL"] == {
+              "cases": 5, "baseline_cases_flagged": 0, "candidate_cases_flagged": 0}
+          assert len(doc["cases"]) == 12
+          assert len(doc["source_sha256"]) == 5
+          assert all(re.fullmatch("[0-9a-f]{64}", sha)
+                     for sha in doc["source_sha256"].values())
+          print("Synthetic review result: 2/5 to 5/5 positive designed cases;"
+                " 0/2 to 2/2 known-benign review cases; customer value unknown")
+          PY
+      - name: Preserve exact-head synthetic review receipt (not customer evidence)
+        if: ${{ github.event_name == 'pull_request' && hashFiles('freight/brain_review_measurement.py') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: retally-review-${{ github.event.pull_request.head.sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/retally-synthetic-review.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Verify pilot rights evidence consistency
         run: python -m freight.rights_evidence --stage pilot --expect CLEAR
 
