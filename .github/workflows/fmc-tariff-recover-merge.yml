@@ -30,14 +30,29 @@ on:
     paths:
       - production/fmc_tariff_ledger/MERGE_NOW
 
+# Same source run is serialized across automatic and operator replay.
+# Existing manual MERGE_NOW remains supported but must pass the source gate.
+run-name: FMC recover source ${{ github.event.workflow_run.id || inputs.source_run_id || 'MERGE_NOW' }}
+concurrency:
+  group: fmc-tariff-recover-${{ github.event.workflow_run.id || inputs.source_run_id || github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   actions: read
 
 jobs:
   prepare:
+    # Never admit a workflow_run from a fork, unreviewed branch, or non-main
+    # manual dispatch to the potentially expensive recovery matrix.
+    if: >-
+      ${{ github.ref == 'refs/heads/main' &&
+          (github.event_name != 'workflow_run' ||
+           (github.event.workflow_run.head_branch == 'main' &&
+            github.event.workflow_run.head_repository.full_name == github.repository)) }}
     runs-on: ubuntu-latest
     outputs:
+      should_process: ${{ steps.source_gate.outputs.should_process }}
       source_run_id: ${{ steps.cfg.outputs.source_run_id }}
       shards: ${{ steps.cfg.outputs.shards }}
       shard_count: ${{ steps.cfg.outputs.shard_count }}
@@ -56,7 +71,7 @@ jobs:
           WORKFLOW_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
+          import json, os, sys
           from pathlib import Path
 
           event = os.environ.get('EVENT_NAME')
@@ -98,8 +113,69 @@ jobs:
           print('copy_raw_evidence=' + ('true' if copy_raw else 'false'))
           PY
 
+      - name: Verify source provenance, shard availability and duplicate success
+        id: source_gate
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ steps.cfg.outputs.source_run_id }}
+          SOURCE_SHARD_COUNT: ${{ steps.cfg.outputs.shard_count }}
+          EVENT_NAME: ${{ github.event_name }}
+          AUTOMATIC_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          current_main="$(git ls-remote origin refs/heads/main | cut -f1)"
+          [[ "$current_main" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "::error::Cannot verify current main HEAD"; exit 1;
+          }
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > "$RUNNER_TEMP/fmc-source-run.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100" > "$RUNNER_TEMP/fmc-source-artifacts.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/fmc-tariff-recover-merge.yml/runs?per_page=100" > "$RUNNER_TEMP/fmc-recovery-runs.json"
+          export MAIN_HEAD="$current_main"
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP'])
+          source = json.loads((root/'fmc-source-run.json').read_text())
+          artifacts = json.loads((root/'fmc-source-artifacts.json').read_text())
+          recoveries = json.loads((root/'fmc-recovery-runs.json').read_text())
+          run_id = int(os.environ['SOURCE_RUN_ID'])
+          count = int(os.environ['SOURCE_SHARD_COUNT'])
+          repo = os.environ['GITHUB_REPOSITORY']
+          if source.get('id') != run_id or source.get('name') != 'FMC Tariff Rule Ledger':
+              raise SystemExit('Source ID is not the named FMC Tariff Rule Ledger workflow')
+          if source.get('repository', {}).get('full_name') != repo or source.get('head_branch') != 'main':
+              raise SystemExit('Source run must originate from this repository main')
+          if source.get('status') != 'completed':
+              raise SystemExit('Source run must have completed')
+          if os.environ['EVENT_NAME'] == 'workflow_run':
+              if source.get('head_sha') != os.environ['AUTOMATIC_HEAD_SHA']:
+                  raise SystemExit('Event/source SHA mismatch')
+              if source.get('head_sha') != os.environ['MAIN_HEAD']:
+                  raise SystemExit('Automatic recovery source is no longer exact-main; use reviewed manual recovery')
+          available = {a['name'] for a in artifacts.get('artifacts', [])
+                       if not a.get('expired') and isinstance(a.get('name'), str)}
+          missing = [f'fmc-shard-{i}' for i in range(count) if f'fmc-shard-{i}' not in available]
+          if missing:
+              raise SystemExit(f'Source artifacts missing or expired: {len(missing)} shard(s)')
+          title = f'FMC recover source {run_id}'
+          duplicate = any(
+              r.get('id') != int(os.environ['GITHUB_RUN_ID'])
+              and r.get('display_title') == title
+              and r.get('conclusion') == 'success'
+              for r in recoveries.get('workflow_runs', [])
+          )
+          if duplicate:
+              print('FMC source already successfully recovered: no duplicate artifacts issued.', file=sys.stderr)
+              print('should_process=false')
+          else:
+              print('should_process=true')
+          PY
+
   rehydrate:
     needs: prepare
+    if: needs.prepare.outputs.should_process == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -183,6 +259,7 @@ jobs:
 
   merge_metadata:
     needs: [prepare, rehydrate]
+    if: needs.prepare.outputs.should_process == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
