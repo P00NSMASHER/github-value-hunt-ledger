@@ -15,18 +15,18 @@
       "default_branch": "main",
       "description": "Roblox tycoon in Luau: Rojo live-sync, selene + StyLua, Lune offline tests enforced by a pre-commit hook, and a headless Blender asset pipeline.",
       "discovery_query": "Roblox asset pipeline Blender Rojo",
-      "exact_revision": "4385ed05621bd007b5a65c53a93ee7c3003bbddd",
+      "exact_revision": "0d01082fc1c9c30148e018dcb5bd2293757f8af8",
       "forks": 1,
       "primary_language": "Lua",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-13T14:13:53Z",
+      "pushed_at": "2026-10-13T22:54:30Z",
       "repository": "itwillystyle/build-a-startup",
       "root_code_signals": [
         ".github",
         "src",
         "tests"
       ],
-      "size_kb": 3098,
+      "size_kb": 3219,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -59,7 +59,7 @@
     39,
     40
   ],
-  "generated_at": "2026-10-13T20:46:00.873236+00:00",
+  "generated_at": "2026-10-14T08:55:47.590485+00:00",
   "mission": "Game-asset pipelines, provenance, 3D/2D processing, optimization and content factories for StarBlox",
   "risk_review": [],
   "risk_review_count": 0,
