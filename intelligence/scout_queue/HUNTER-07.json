@@ -1,31 +1,31 @@
 {
   "api_metrics": {
-    "api_requests": 18,
-    "known_revision_skips": 6,
+    "api_requests": 19,
+    "known_revision_skips": 5,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 4,
+  "candidate_count": 5,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
       "description": "Evergreen skills for building Roblox games with AI coding agents (Claude Code, Codex, Cursor, Copilot): Studio MCP done safely, code on disk, Luau checks without Studio, Open Cloud, secure-code rules",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "4c51b85e4e2564d41d8cb3469239e88efec67d4b",
+      "exact_revision": "d93fbe3b10d7b9878f298b18e6f88e3b7d328ed0",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-10-11T22:45:31Z",
+      "pushed_at": "2026-10-13T22:49:23Z",
       "repository": "m4bwav/roblox-agent",
       "root_code_signals": [
         ".github",
         "tests"
       ],
-      "size_kb": 326,
+      "size_kb": 869,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -59,16 +59,16 @@
       "default_branch": "main",
       "description": "Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "2d5b2119df55d78e9f70a51fdd9cc55456e953cd",
+      "exact_revision": "8004bf7a9f947113a557d94cf302347403e3ced7",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-12T02:06:18Z",
+      "pushed_at": "2026-10-14T07:10:43Z",
       "repository": "Daniel987654321/roblox-studio-agent-bridge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 298,
+      "size_kb": 260,
       "stars": 70,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -107,16 +107,16 @@
       "default_branch": "main",
       "description": "Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs",
       "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "42b11046ee9cac7284ec41eb26c35859df2d8af8",
+      "exact_revision": "4520fec6bf7d509a664582197e4e783195263e54",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-12T06:48:13Z",
+      "pushed_at": "2026-10-14T02:48:26Z",
       "repository": "nahidgaming70/Roblox-QA-Sentinel",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 260,
+      "size_kb": 300,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -183,6 +183,36 @@
       },
       "triage_score": 41,
       "url": "https://github.com/Apisalam/BloxQA"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Drop-in skill that lets any AI coding agent (Claude Code, Codex, Antigravity, Cursor, OpenCode, GPT, Gemini) build, test, screenshot and publish Roblox games: Studio-first, Lune pipeline, fast lane, battle-tested on Don't Wake the Pumpkin King.  roblox, roblox-studio, luau, lune, ai-agents, claude-code, codex, cursor, antigravity, agents-md, game-d",
+      "discovery_query": "Roblox AI coding agent Studio",
+      "exact_revision": "3c7e9db622ca7208e00e68d129b1269bd9e540ce",
+      "forks": 0,
+      "primary_language": "Luau",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-10-13T23:30:34Z",
+      "repository": "hishambaoom/roblox-agent-skill-no-README-",
+      "root_code_signals": [],
+      "size_kb": 1417,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 0,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 33,
+      "url": "https://github.com/hishambaoom/roblox-agent-skill-no-README-"
     }
   ],
   "catalogs": [
@@ -190,7 +220,7 @@
     23,
     24
   ],
-  "generated_at": "2026-10-12T09:49:15.581550+00:00",
+  "generated_at": "2026-10-14T08:03:27.979810+00:00",
   "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
   "risk_review": [],
   "risk_review_count": 0,

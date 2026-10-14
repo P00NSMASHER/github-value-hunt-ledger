@@ -1,0 +1,30 @@
+name: Read-only Artifact Ledger Admission QA
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/tic-mrf-ledger.yml'
+      - '.github/workflows/urdb-ledger.yml'
+      - '.github/workflows/artifact-ledger-admission-qa.yml'
+      - 'tests/artifact-ledger-admission.test.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tic-mrf-ledger.yml'
+      - '.github/workflows/urdb-ledger.yml'
+      - '.github/workflows/artifact-ledger-admission-qa.yml'
+      - 'tests/artifact-ledger-admission.test.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - run: node --test tests/artifact-ledger-admission.test.mjs

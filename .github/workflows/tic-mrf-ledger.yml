@@ -31,7 +31,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  admission:
+    name: Require exact current main before any crawl
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Verify main branch and immutable expected source
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/main'
+          [[ "$EXPECTED_SHA" =~ ^[a-f0-9]{40}$ ]]
+          REMOTE="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
+          test "$REMOTE" = "$EXPECTED_SHA" || { echo 'Refusing stale or branch-selected ledger source.' >&2; exit 1; }
   test:
+    needs: admission
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,9 +61,11 @@ jobs:
           cache-dependency-path: production/tic_mrf_ledger/requirements.txt
       - run: python -m pip install -r requirements.txt
       - run: python -m unittest discover -v -p 'test_*.py'
+      - name: Verify bounded input regression tests
+        run: python ../../tests/test_ti_ledger_workload.py
 
   catalog:
-    needs: test
+    needs: [admission, test]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -60,22 +78,30 @@ jobs:
           cache: pip
           cache-dependency-path: production/tic_mrf_ledger/requirements.txt
       - run: python -m pip install -r requirements.txt
+      - name: Check fresh current main and bound source workloads
+        id: parameters
+        shell: bash
+        env:
+          LEDGER_EVENT: ${{ github.event_name }}
+          INPUT_MAX_INDEXES: ${{ inputs.max_indexes || '25' }}
+          INPUT_RETENTION_DAYS: ${{ inputs.retention_days || '90' }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          REMOTE="$(git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)"
+          test "$REMOTE" = "$GITHUB_SHA" || { echo 'Main advanced; refusing outdated catalog.' >&2; exit 1; }
+          python ../../tools/ledger_workload_parameters.py --lane tic --event "$LEDGER_EVENT" --value "$INPUT_MAX_INDEXES" --retention "$INPUT_RETENTION_DAYS" --run-now RUN_NOW >> "$GITHUB_OUTPUT"
       - name: Catalog historical and live payer MRF universe
         env:
           EVENT_NAME: ${{ github.event_name }}
           INPUT_PARSE_INDEXES: ${{ inputs.parse_indexes }}
-          INPUT_MAX_INDEXES: ${{ inputs.max_indexes }}
+          MAX_INDEXES: ${{ steps.parameters.outputs.max_indexes }}
         run: |
           PARSE=""
           if [ "$EVENT_NAME" = "push" ] || [ "$INPUT_PARSE_INDEXES" = "true" ]; then
             PARSE="--parse-indexes"
           fi
-          if [ "$EVENT_NAME" = "push" ]; then
-            MAX_INDEXES="$(awk -F= '$1=="max_indexes"{print $2}' RUN_NOW | tail -1)"
-            MAX_INDEXES="${MAX_INDEXES:-25}"
-          else
-            MAX_INDEXES="${INPUT_MAX_INDEXES:-25}"
-          fi
+          # Parameter bound by the separately verified immutable-main preflight.
           echo "TiC catalog max_indexes=$MAX_INDEXES"
           python catalog.py \
             --out output \
@@ -106,6 +132,6 @@ jobs:
         with:
           name: tic-payer-mrf-ledger
           path: production/tic_mrf_ledger/output/
-          retention-days: ${{ inputs.retention_days || 90 }}
+          retention-days: ${{ steps.parameters.outputs.retention_days }}
           compression-level: 6
           if-no-files-found: error

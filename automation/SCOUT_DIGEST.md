@@ -2,27 +2,27 @@
 
 **Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.
 
-Generated: 2026-10-12T11:51:04.984932+00:00
+Generated: 2026-10-14T09:26:28.680051+00:00
 Queue snapshots read: 14
-Unique exact-revision candidates: 34
+Unique exact-revision candidates: 36
 
 | Triage | Repository | Exact revision | License | Workers | Description |
 |---:|---|---|---|---|---|
 | 46 | [KSAGlory/KSA-Accessibility-Preflight](https://github.com/KSAGlory/KSA-Accessibility-Preflight) | f4ac926d9368 | MIT | HUNTER-06 | A free, read-only Roblox Studio accessibility preflight plugin for UI contrast, text scaling, small text, and reduced-motion checks. |
-| 44 | [m4bwav/roblox-agent](https://github.com/m4bwav/roblox-agent) | 4c51b85e4e25 | NOASSERTION | HUNTER-07 | Evergreen skills for building Roblox games with AI coding agents (Claude Code, Codex, Cursor, Copilot): Studio MCP done safely, code on disk, Luau checks without Studio, Open Cloud |
-| 44 | [itwillystyle/build-a-startup](https://github.com/itwillystyle/build-a-startup) | 71d1dfc611cc | UNKNOWN | HUNTER-11 | Roblox tycoon in Luau: Rojo live-sync, selene + StyLua, Lune offline tests enforced by a pre-commit hook, and a headless Blender asset pipeline. |
-| 43 | [IvanIvan09/Lua-Spatial-Farm-Assistant](https://github.com/IvanIvan09/Lua-Spatial-Farm-Assistant) | 2fb70561d936 | UNKNOWN | HUNTER-01 | Roblox Lua Automation and Spatial Analytics Framework 2026 |
-| 43 | [Daniel987654321/roblox-studio-agent-bridge](https://github.com/Daniel987654321/roblox-studio-agent-bridge) | 2d5b2119df55 | UNKNOWN | HUNTER-07 | Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits |
-| 43 | [manindesguise-source/net-lens-telemetry](https://github.com/manindesguise-source/net-lens-telemetry) | 8bd9f7b9d0a3 | UNKNOWN | HUNTER-13 | Roblox Remote Event Monitor 2026: Best Networking Analytics Tool for Developers |
-| 43 | [sahrul-rgb/typed-fish-framework](https://github.com/sahrul-rgb/typed-fish-framework) | dcec2c23b738 | UNKNOWN | HUNTER-01 | Best Typed Roblox Framework 2026: Fish-Inspired ECS Game Engine on GitHub |
-| 43 | [nahidgaming70/Roblox-QA-Sentinel](https://github.com/nahidgaming70/Roblox-QA-Sentinel) | 42b11046ee9c | UNKNOWN | HUNTER-07 | Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs |
-| 42 | [narenkarthikeyanu999/charmed-recess](https://github.com/narenkarthikeyanu999/charmed-recess) | b87ca03dfb91 | UNKNOWN | HUNTER-01 | Cooperative Spell-Casting Game Framework 2026: Build Kid-Friendly Luau Worlds |
+| 44 | [m4bwav/roblox-agent](https://github.com/m4bwav/roblox-agent) | d93fbe3b10d7 | NOASSERTION | HUNTER-07 | Evergreen skills for building Roblox games with AI coding agents (Claude Code, Codex, Cursor, Copilot): Studio MCP done safely, code on disk, Luau checks without Studio, Open Cloud |
+| 44 | [itwillystyle/build-a-startup](https://github.com/itwillystyle/build-a-startup) | 0d01082fc1c9 | UNKNOWN | HUNTER-11 | Roblox tycoon in Luau: Rojo live-sync, selene + StyLua, Lune offline tests enforced by a pre-commit hook, and a headless Blender asset pipeline. |
+| 43 | [IvanIvan09/Lua-Spatial-Farm-Assistant](https://github.com/IvanIvan09/Lua-Spatial-Farm-Assistant) | d92ec6410f04 | UNKNOWN | HUNTER-01 | Roblox Lua Automation and Spatial Analytics Framework 2026 |
+| 43 | [Daniel987654321/roblox-studio-agent-bridge](https://github.com/Daniel987654321/roblox-studio-agent-bridge) | 8004bf7a9f94 | UNKNOWN | HUNTER-07 | Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits |
+| 43 | [manindesguise-source/net-lens-telemetry](https://github.com/manindesguise-source/net-lens-telemetry) | 089e477bcb57 | UNKNOWN | HUNTER-13 | Roblox Remote Event Monitor 2026: Best Networking Analytics Tool for Developers |
+| 43 | [nahidgaming70/Roblox-QA-Sentinel](https://github.com/nahidgaming70/Roblox-QA-Sentinel) | 4520fec6bf7d | UNKNOWN | HUNTER-07 | Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs |
+| 42 | [narenkarthikeyanu999/charmed-recess](https://github.com/narenkarthikeyanu999/charmed-recess) | e2010b1bf6c4 | UNKNOWN | HUNTER-01 | Cooperative Spell-Casting Game Framework 2026: Build Kid-Friendly Luau Worlds |
 | 42 | [bigfootpp/sync](https://github.com/bigfootpp/sync) | ccc0255413da | MIT | HUNTER-01 | A lightweight animation and motion framework for Luau. |
-| 41 | [yahyaadraoui88-cell/Roblox-Project-Forge](https://github.com/yahyaadraoui88-cell/Roblox-Project-Forge) | 02ef8ec15d86 | UNKNOWN | HUNTER-01 | Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers |
-| 41 | [bisameditor-cmd/Stag-Module-Forge](https://github.com/bisameditor-cmd/Stag-Module-Forge) | e44ea8dc27d0 | UNKNOWN | HUNTER-01 | Pronghorn 2026: Fast Roblox Module Scripting Framework for Rapid Game Development |
+| 41 | [yahyaadraoui88-cell/Roblox-Project-Forge](https://github.com/yahyaadraoui88-cell/Roblox-Project-Forge) | 466980cf6a13 | UNKNOWN | HUNTER-01 | Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers |
+| 41 | [bisameditor-cmd/Stag-Module-Forge](https://github.com/bisameditor-cmd/Stag-Module-Forge) | f7dbd342e917 | UNKNOWN | HUNTER-01 | Pronghorn 2026: Fast Roblox Module Scripting Framework for Rapid Game Development |
 | 41 | [Apisalam/BloxQA](https://github.com/Apisalam/BloxQA) | f1c28527665d | MIT | HUNTER-07 | Automated QA and gameplay testing plugin for Roblox Studio. |
-| 40 | [AJAY94633/signal-run-relay](https://github.com/AJAY94633/signal-run-relay) | 2c1f148f92f4 | UNKNOWN | HUNTER-01 | Cooperative Luau Relay Game Framework for Cubacadabra Worlds 2026 |
+| 40 | [AJAY94633/signal-run-relay](https://github.com/AJAY94633/signal-run-relay) | 11005768ede5 | UNKNOWN | HUNTER-01 | Cooperative Luau Relay Game Framework for Cubacadabra Worlds 2026 |
 | 38 | [MingauRM/fobos-framework](https://github.com/MingauRM/fobos-framework) | 66b4c35ea8bc | Zlib | HUNTER-01 | A Game Framework highly inspired by LÖVE2D, Roblox and Lune. Using Luau as it's scripting language. |
+| 38 | [pranav-bt/Systems](https://github.com/pranav-bt/Systems) | 77a79f237457 | UNKNOWN | HUNTER-04 | Gameplay and AI systems for Roblox, written in Luau: an NPC AI suite (utility AI, HTN planning, perception, pathfinding, tactical queries), server-authoritative lag compensation, a |
 | 36 | [gue-hub/roblox-tycoon-kit](https://github.com/gue-hub/roblox-tycoon-kit) | 13bbda651d36 | MIT | HUNTER-01 | Modular Roblox tycoon framework — plots, droppers, buyable buttons, server-authoritative purchases |
 | 36 | [debugasync/FogWar](https://github.com/debugasync/FogWar) | 58ace7ef35c2 | MIT | HUNTER-04 | server-authoritative visibility replication for roblox shooters. clients only receive positions they can actually see, so wallhacks have nothing to read. |
 | 35 | [AquaJo/Rojoo](https://github.com/AquaJo/Rojoo) | 3ca3a15cbc8b | MPL-2.0 | HUNTER-01 | Rojo "fork", matching my workflow as roblox studio plugin |
@@ -30,9 +30,11 @@ Unique exact-revision candidates: 34
 | 35 | [kevinswint/roblox-opencloud-mcp-server](https://github.com/kevinswint/roblox-opencloud-mcp-server) | 9c14ca582f72 | MIT | HUNTER-14 | MCP server exposing Roblox Open Cloud APIs as tools for AI agents |
 | 34 | [PlasterRaikage/ROBLOX-Luau](https://github.com/PlasterRaikage/ROBLOX-Luau) | 762105d6f48d | MIT | HUNTER-12 | Roblox Luau is an advanced Luau execution engine and testing pipeline designed for the Roblox client.  This educational framework allows developers to compile and deploy custom Lua |
 | 33 | [Aryia-Behroziuan/neurons](https://github.com/Aryia-Behroziuan/neurons) | d4dc479cd29e | UNKNOWN | HUNTER-09 | An ANN is a model based on a collection of connected units or nodes called "artificial neurons", which loosely model the neurons in a biological brain. Each connection, like the sy |
+| 33 | [hishambaoom/roblox-agent-skill-no-README-](https://github.com/hishambaoom/roblox-agent-skill-no-README-) | 3c7e9db622ca | MIT | HUNTER-07 | Drop-in skill that lets any AI coding agent (Claude Code, Codex, Antigravity, Cursor, OpenCode, GPT, Gemini) build, test, screenshot and publish Roblox games: Studio-first, Lune pi |
 | 32 | [l3dotdev/EzSpec](https://github.com/l3dotdev/EzSpec) | cfc1209a50a6 | MIT | HUNTER-08 | An easy unit testing framework for Roblox / Luau |
 | 31 | [aziz8235/roblox-luau-game-framework](https://github.com/aziz8235/roblox-luau-game-framework) | 3808c92e5381 | MIT | HUNTER-01 | Open-source Roblox/Luau framework for reusable multiplayer systems, combat architecture, client/server logic, UI state, animation timing, debugging, and testing. |
 | 30 | [kpackk/roblox-gameplay-systems](https://github.com/kpackk/roblox-gameplay-systems) | 7c6cb6f618ca | MIT | HUNTER-05 | Server-authoritative Roblox gameplay systems in Luau — inventory with DataStore persistence, and a combat system with cooldowns, stun and server-side hit validation. Unit-tested. |
+| 29 | [jetoxp/jetoxp](https://github.com/jetoxp/jetoxp) | 5bfed157cc24 | UNKNOWN | HUNTER-05 | Roblox systems developer — data persistence, inventory models, server-authoritative validation. |
 | 28 | [TheFunnyMan120/roblox-datastore-mcp](https://github.com/TheFunnyMan120/roblox-datastore-mcp) | 131eaaefb352 | UNKNOWN | HUNTER-14 | MCP server for Roblox Open Cloud Datastore API v2 — 18 tools for reading, writing, and querying game datastores from AI agents |
 | 28 | [vehiclelegends/vehicle-legends](https://github.com/vehiclelegends/vehicle-legends) | 3fa7d5364581 | NOASSERTION | HUNTER-10 | An open-source Luau physics and automation framework for Roblox Vehicle Legends. Features custom chassis telemetry tuning, automated checkpoint racing, and local JSON configuration |
 | 24 | [realrrsripts/Roblox-Inventory-Equipment-Framework](https://github.com/realrrsripts/Roblox-Inventory-Equipment-Framework) | 75c9f24f6526 | MIT | HUNTER-05 | A server-authoritative inventory system designed to manage items, equipment, and player state consistently across client and server. |
