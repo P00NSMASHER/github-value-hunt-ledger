@@ -3,6 +3,7 @@ name: Freight Commercial Contracts
 on:
   workflow_call:
   push:
+    branches: [main]
     paths:
       - 'freight/**'
       - 'intelligence/capabilities.jsonl'
@@ -33,6 +34,11 @@ on:
 
 permissions:
   contents: read
+
+# Cancel only superseded PR checks; protect main evidence from cancellation.
+concurrency:
+  group: safe-component-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   contracts:
