@@ -238,6 +238,7 @@ def build_invoice_review_queue(
                 blocker_codes=(candidate.reason, "UNSCORED_REVIEW_ONLY",
                                "NO_FINANCIAL_AUTHORITY", *candidate.unresolved_evidence),
                 evidence_hashes=(population.manifest_hash, batch.batch_hash,
-                                 candidate.proof_hash, *candidate.source_hashes),
+                                 candidate.proof_hash, *candidate.source_hashes,
+                                 *candidate.charge_hashes),
             ))
     return build_queue(cases)
