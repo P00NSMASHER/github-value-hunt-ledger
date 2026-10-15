@@ -4,9 +4,9 @@ A duplicate invoice reference is not proof of duplicate service or payment.
 No real buyers, carrier records, amounts recovered, or external actions.
 """
 import unittest
-from dataclasses import replace
+from dataclasses import asdict, replace
 
-from freight.contracts import PopulationRow, freeze_population
+from freight.contracts import PopulationRow, canonical_hash, freeze_population
 from freight.duplicate_charge_review import (
     INVOICE_REFERENCE_EVIDENCE,
     POSSIBLE_CROSS_SHIPMENT_INVOICE_REFERENCE,
@@ -59,6 +59,13 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
         self.assertEqual(item.invoice_id, "INV-5")
         self.assertEqual(item.charge_ids, ("CH-1", "CH-2"))
         self.assertEqual(item.source_hashes, ("synthetic-doc-hash-1", "synthetic-doc-hash-2"))
+        self.assertEqual(
+            item.charge_hashes,
+            tuple(
+                canonical_hash({"schema": 1, **asdict(charge)})
+                for charge in (make_charge(), second())
+            ),
+        )
         self.assertEqual(item.validated_cents, 0)
         self.assertEqual(out.validated_cents, 0)
         self.assertTrue(item.requires_human_review)
@@ -144,6 +151,7 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
         self.assertEqual(forward, reverse)
         self.assertNotEqual(forward.batch_hash, changed.batch_hash)
         self.assertNotEqual(forward.candidates[0].proof_hash, changed.candidates[0].proof_hash)
+        self.assertNotEqual(forward.candidates[0].charge_hashes, changed.candidates[0].charge_hashes)
 
     def test_invalid_source_identity_and_scope_fail_closed(self):
         pop = make_population()
