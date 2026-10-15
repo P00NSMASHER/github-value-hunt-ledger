@@ -66,6 +66,10 @@ export function reserveOutreach(message, state, sender, approval, nowIso, reserv
   if (typeof optOut!=="string" || !optOut.trim() || unresolved.test(optOut) ||
       !/\bopt out\b/i.test(optOut) || !/\breply\b/i.test(optOut) || !/\bunsubscribe\b/i.test(optOut))
     errors.push("SENDER_OPT_OUT_REQUIRED");
+  const commercialNotice=sender?.commercial_notice_text;
+  if (typeof commercialNotice!=="string" || !commercialNotice.trim() ||
+      unresolved.test(commercialNotice) || !/\badvertisement\b/i.test(commercialNotice))
+    errors.push("COMMERCIAL_NOTICE_REQUIRED");
   const approvalIdentity=sender?.approval_identity;
   if (typeof approvalIdentity!=="string" || !approvalIdentity.trim() || unresolved.test(approvalIdentity))
     errors.push("SENDER_APPROVAL_IDENTITY_REQUIRED");
@@ -82,6 +86,7 @@ export function reserveOutreach(message, state, sender, approval, nowIso, reserv
   bodies.forEach((body,index)=>{
     const readable=norm(index===1?visible(String(body||"")):body);
     if (!readable.includes(norm(optOut))) errors.push("OPT_OUT_MISSING_"+index);
+    if (!readable.includes(norm(commercialNotice))) errors.push("COMMERCIAL_NOTICE_MISSING_"+index);
     if (!readable.includes(norm(sender?.identity))) errors.push("SENDER_IDENTITY_MISSING_"+index);
     if (Array.isArray(postal) && postal.some(line=>!readable.includes(norm(line))))
       errors.push("SENDER_POSTAL_MISSING_"+index);

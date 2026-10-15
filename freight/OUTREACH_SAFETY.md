@@ -33,7 +33,7 @@ node freight/outreach_preflight.mjs /private/message.json /private/ledger.json /
 
 ## Input contract
 
-sender: identity, approval_identity, postal_approved boolean, postal_lines array (street/box plus city/state/ZIP), and opt_out_text. The opt-out text must explicitly tell the recipient to reply `unsubscribe` to opt out.
+sender: identity, approval_identity, postal_approved boolean, postal_lines array (street/box plus city/state/ZIP), commercial_notice_text, and opt_out_text. The commercial notice must identify the message as an advertisement. The opt-out text must explicitly tell the recipient to reply `unsubscribe` to opt out.
 
 approval: schema_version=1, approved=true, approved_by matching sender.approval_identity, non-future approved_at ISO timestamp, unique approval_id and message_sha256 matching the exact canonical message. Missing, mismatched, changed or previously used approval fails closed.
 

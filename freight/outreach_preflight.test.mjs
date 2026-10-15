@@ -9,9 +9,10 @@ const exec=promisify(execFile), dir=mkdtempSync(join(tmpdir(),"synthetic-outreac
 const cli=fileURLToPath(new URL("./outreach_preflight.mjs",import.meta.url));
 const msg=join(dir,"message.json"), ledger=join(dir,"ledger.json"), sender=join(dir,"sender.json"), approval=join(dir,"approval.json");
 const message={to:"test@example.com",account_id:"synthetic",subject:"Review",channel:"EDITORIAL",touch:1,
- text:"Synthetic Sender\n123 Example Street\nExampletown, PA 19000\n"+OPT_OUT};
+ text:"Synthetic Sender\n123 Example Street\nExampletown, PA 19000\nAdvertisement - one-time business outreach.\n"+OPT_OUT};
 const config={identity:"Synthetic Sender",approval_identity:"Synthetic Owner",postal_approved:true,
- postal_lines:["123 Example Street","Exampletown, PA 19000"],opt_out_text:OPT_OUT};
+ postal_lines:["123 Example Street","Exampletown, PA 19000"],opt_out_text:OPT_OUT,
+ commercial_notice_text:"Advertisement - one-time business outreach."};
 function reset() {
  writeFileSync(msg,JSON.stringify(message));
  writeFileSync(sender,JSON.stringify(config));
