@@ -68,7 +68,10 @@
     "published_fee_eligible_usd": "11800.00",
     "unallocated_difference_usd": "1650.00",
     "evidence_state": "UNVERIFIED",
-    "customer_result": false
+    "customer_result": false,
+    "billing_eligible": false,
+    "customer_economic_claim_eligible": false,
+    "classification": "ILLUSTRATIVE_ONLY_PERMANENT_NONBILLABLE"
   },
   "founding_offer": {
     "max_slots": 3,
@@ -171,12 +174,30 @@
   "mission_acceptance": {
     "as_of": "2026-10-15",
     "scorecard": {
-      "PASS": 22,
-      "BLOCKED": 15,
+      "PASS": 23,
+      "BLOCKED": 14,
       "FAIL": 0,
       "total": 37,
-      "independently_verified_pass": 21,
+      "independently_verified_pass": 22,
       "owner_confirmed_pass": 1
+    },
+    "simulation_scorecard": {
+      "classification": "FICTIONAL_REHEARSAL_ONLY",
+      "PASS": 37,
+      "BLOCKED": 0,
+      "FAIL": 0,
+      "total": 37,
+      "blockers_removed_in_simulation": 14,
+      "blockers_removed_in_real_world": 0,
+      "customer_pilot_decision": "FULL_GO_SIMULATED",
+      "all_simulated_pilot_stages_available": true,
+      "confidential_intake_authorized_in_simulation": true,
+      "customer_service_authorized_in_simulation": true,
+      "financial_operations_authorized_in_simulation": true,
+      "real_customer_authorization_created": false,
+      "real_financial_authorization_created": false,
+      "evidence_ref": "freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
+      "real_scorecard_unchanged": true
     },
     "requirements": [
       {
@@ -568,13 +589,13 @@
       {
         "id": "R36",
         "requirement": "Older public sample's $1,650 fee-eligibility gap",
-        "status": "BLOCKED",
+        "status": "PASS",
         "scope": "ARTIFACT",
-        "evidence": "Live sample correctly discloses unallocated/unverified difference; no source ledger exists",
-        "tests": "Read current sample; did not invent allocation",
-        "defects_corrected": "New eight-invoice rehearsal has complete independent bridge; old sample unchanged",
-        "remaining_dependency": "Provide original item-level source attribution or keep older sample nonbillable/illustrative",
-        "required_owner_action": "Provide original item-level source attribution or keep older sample nonbillable/illustrative"
+        "evidence": "Live sample discloses the unallocated/unverified difference and the canonical gate permanently classifies it illustrative-only, nonbillable and ineligible for customer economic claims",
+        "tests": "Machine gate rejects any customer-result, billing-eligible or customer-economic-claim designation while the sample remains unverified",
+        "defects_corrected": "No source allocation was invented; the old sample is permanently excluded from billing and customer economics while the new eight-invoice rehearsal retains its separate complete bridge",
+        "remaining_dependency": null,
+        "required_owner_action": "None; do not remove the permanent nonbillable/illustrative classification without original item-level evidence and independent review"
       },
       {
         "id": "R37",

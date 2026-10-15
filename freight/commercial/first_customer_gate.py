@@ -96,6 +96,12 @@ def evaluate(snapshot):
         raise ValueError("sample eligibility delta inconsistent")
     if f.get("customer_result") is not False:
         raise ValueError("synthetic example must not be designated customer proof")
+    if f.get("billing_eligible") is not False:
+        raise ValueError("unverified synthetic example must remain nonbillable")
+    if f.get("customer_economic_claim_eligible") is not False:
+        raise ValueError("unverified synthetic example must be excluded from customer economics")
+    if f.get("classification") != "ILLUSTRATIVE_ONLY_PERMANENT_NONBILLABLE":
+        raise ValueError("unverified synthetic example must retain its permanent illustrative classification")
     status = snapshot["requirements"]
     gates = {}
     for name, required in snapshot["readiness_gates"].items():
@@ -122,6 +128,7 @@ def evaluate(snapshot):
     return {
         "as_of": snapshot["as_of"], "release_policy": snapshot["release_policy"],
         "sample_fee_eligibility_verified":verified(status["synthetic_fee_eligibility_reconciled"]),
+        "legacy_sample_permanently_nonbillable": True,
         "gates": gates,
         "all_customer_pilot_gates_ready": gates["confidential_pilot"]["ready"] and gates["qualified_proposal"]["ready"],
         "customer_kickoff_authorized": False,
