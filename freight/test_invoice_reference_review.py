@@ -213,10 +213,14 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
     def test_forged_population_manifest_digest_fails_closed(self):
         original = make_population()
         forged = replace(original, manifest_hash="0" * 64)
-        with self.assertRaisesRegex(ValueError, "population"):
-            review_reused_invoice_references(
-                forged, (make_charge(), second())
-            )
+        for reviewer in (
+            review_duplicate_charges,
+            review_reused_invoice_references,
+        ):
+            with self.subTest(reviewer=reviewer.__name__), self.assertRaisesRegex(
+                ValueError, "population"
+            ):
+                reviewer(forged, (make_charge(), second()))
 
 
 if __name__ == "__main__":
