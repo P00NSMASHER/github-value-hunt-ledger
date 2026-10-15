@@ -1,9 +1,9 @@
 """Synthetic-only Brain-to-RETALLY reviewer integration; no customer outcomes."""
 import unittest
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 from freight import reviewer_cockpit as cockpit
-from freight.contracts import PopulationRow, freeze_population
+from freight.contracts import PopulationRow, canonical_hash, freeze_population
 from freight.finding_factory import InvoiceCharge
 from freight.duplicate_charge_review import review_duplicate_charges
 
@@ -63,6 +63,11 @@ class BrainReviewCockpitTests(unittest.TestCase):
         self.assertIn(population(rows).manifest_hash, item.evidence_hashes)
         self.assertIn("synthetic-source-1", item.evidence_hashes)
         self.assertIn("synthetic-source-2", item.evidence_hashes)
+        for charge_row in rows:
+            self.assertIn(
+                canonical_hash({"schema": 1, **asdict(charge_row)}),
+                item.evidence_hashes,
+            )
         self.assertIn(item.record_hash, item.evidence_hashes)
 
     def test_same_charge_in_two_lead_classes_is_not_double_counted_as_money(self):
