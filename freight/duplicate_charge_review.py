@@ -174,6 +174,14 @@ def review_duplicate_charges(
     charges: Iterable[InvoiceCharge],
 ) -> DuplicateChargeReviewBatch:
     """Return strict semantic duplicates as evidence-bound REVIEW candidates."""
+    frozen = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if frozen != population:
+        raise ValueError("population proof or canonical ordering mismatch")
     normalized = tuple(sorted(charges, key=lambda charge: charge.charge_id))
     if len({charge.charge_id for charge in normalized}) != len(normalized):
         raise ValueError("duplicate charge_id")
