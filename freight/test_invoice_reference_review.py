@@ -169,7 +169,7 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
         for bad, diagnostic in [
             (second(charge_id="CH-2 "), "surrounding whitespace"),
             (second(charge_code=" LINEHAUL"), "surrounding whitespace"),
-            (second(source_hash="synthetic\\nsource"), "control characters"),
+            (second(source_hash="synthetic\nsource"), "control characters"),
         ]:
             with self.subTest(diagnostic=diagnostic), self.assertRaisesRegex(
                 ValueError, diagnostic
