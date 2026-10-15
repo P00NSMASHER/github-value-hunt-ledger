@@ -2,13 +2,14 @@ import { OPT_OUT, messageApprovalDigest, recipientKey, reserveOutreach } from ".
 function assert(v, msg) { if (!v) throw new Error(msg); }
 const now="2026-10-07T20:30:00Z";
 const sender={identity:"Synthetic Freight Audit",approval_identity:"Synthetic Owner",postal_approved:true,
- postal_lines:["123 Example Road","Exampletown, PA 19000"],opt_out_text:OPT_OUT};
+ postal_lines:["123 Example Road","Exampletown, PA 19000"],opt_out_text:OPT_OUT,
+ commercial_notice_text:"Advertisement - one-time business outreach."};
 const q={icp_version:"ICP_V1",approved:true,score:80,us_distributor_or_multisite_shipper:true,target_scale_band:true,
  meaningful_ltl_or_parcel:true,history_months:6,finance_owner_verified:true,disqualified:false,mature_controls:false,
  evidence:["https://example.com/research"]};
 function fixture() {
  const m={to:"buyer@example.com",account_id:"synthetic-account",subject:"Freight review",channel:"BUYER",touch:1,
- offer:"FIRST_LOOK",personalization:"Your distribution network.",text:"Your distribution network.\nSynthetic Freight Audit\n123 Example Road\nExampletown, PA 19000\n"+OPT_OUT};
+ offer:"FIRST_LOOK",personalization:"Your distribution network.",text:"Your distribution network.\nSynthetic Freight Audit\n123 Example Road\nExampletown, PA 19000\n"+sender.commercial_notice_text+"\n"+OPT_OUT};
  return {m,s:{schema_version:1,audit_hold:false,mailbox_checked_at:now,contacts:[{recipient_key:m.to,account_id:m.account_id,
  route_verified:true,suppressed:false,hold:false,status:"NO_REPLY",qualification:q}],events:[]},a:structuredClone(sender)};
 }
@@ -32,6 +33,8 @@ check("HTML only placeholder",f=>f.m.html=f.m.text+" {{company}}","UNRESOLVED_PL
 check("no sender",f=>f.a={},"APPROVED_SENDER_POSTAL_REQUIRED");
 check("unapproved postal",f=>f.a.postal_approved=false,"APPROVED_SENDER_POSTAL_REQUIRED");
 check("missing configured opt out",f=>delete f.a.opt_out_text,"SENDER_OPT_OUT_REQUIRED");
+check("missing commercial notice config",f=>delete f.a.commercial_notice_text,"COMMERCIAL_NOTICE_REQUIRED");
+check("missing commercial notice body",f=>f.m.text=f.m.text.replace(f.a.commercial_notice_text,""),"COMMERCIAL_NOTICE_MISSING_0");
 check("owner approval required",()=>{},"OWNER_APPROVAL_REQUIRED",p=>p.approved=false);
 check("wrong approver",()=>{},"OWNER_APPROVAL_REQUIRED",p=>p.approved_by="Different Owner");
 check("message changed after approval",()=>{},"OWNER_APPROVAL_MESSAGE_MISMATCH",p=>p.message_sha256="0".repeat(64));
