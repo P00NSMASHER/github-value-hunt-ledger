@@ -30,6 +30,8 @@ class RemainingGateRehearsalTests(unittest.TestCase):
             {"PASS": 37, "BLOCKED": 0, "FAIL": 0, "total": 37},
         )
         self.assertTrue(self.result["simulation_scorecard"]["real_scorecard_unchanged"])
+        self.assertEqual(self.result["simulation_scorecard"]["customer_pilot_decision"], "FULL_GO_SIMULATED")
+        self.assertTrue(self.result["simulation_scorecard"]["all_simulated_pilot_stages_available"])
         self.assertEqual(self.result["blockers_removed_in_simulation"], 14)
 
     def test_simulation_cannot_change_real_launch_status(self):
@@ -41,6 +43,11 @@ class RemainingGateRehearsalTests(unittest.TestCase):
         self.assertEqual(self.result["real_scorecard"]["BLOCKED"], 14)
         self.assertFalse(self.result["customer_authority_created"])
         self.assertFalse(self.result["external_effects_performed"])
+        self.assertFalse(self.result["simulation_scorecard"]["real_customer_authorization_created"])
+        self.assertFalse(self.result["simulation_scorecard"]["real_financial_authorization_created"])
+        self.assertEqual(len(self.result["simulation_stage_decisions"]), 8)
+        self.assertEqual({item["decision"] for item in self.result["simulation_stage_decisions"]}, {"GO_SIMULATED"})
+        self.assertEqual({item["real_action_authorized"] for item in self.result["simulation_stage_decisions"]}, {False})
 
     def test_all_people_and_provider_identities_are_visibly_fictional(self):
         emails = [actor["email"] for item in self.result["gate_receipts"] for actor in item["simulated_actors"]]
@@ -77,6 +84,7 @@ class RemainingGateRehearsalTests(unittest.TestCase):
     def test_markdown_never_promotes_simulation_to_launch_evidence(self):
         text = render_markdown(self.result)
         self.assertIn("37 PASS / 0 BLOCKED / 0 FAIL", text)
+        self.assertIn("Customer-pilot simulation decision: **FULL_GO_SIMULATED**", text)
         self.assertIn("14 blockers removed in simulation", text)
         self.assertIn("23 PASS / 14 BLOCKED / 0 FAIL", text)
         self.assertIn("Modeled 30% fee: **$22.50 — nonbillable**", text)

@@ -22,6 +22,16 @@ EXPECTED_BLOCKED = (
     "R31", "R32", "R33", "R34", "R35", "R37",
 )
 FIXED_AT = "2026-10-15T14:30:00Z"
+SIMULATED_PILOT_STAGES = (
+    ("discovery", "Public discovery and qualification"),
+    ("contract", "Fictional contracting and signature"),
+    ("confidential_intake", "Fictional confidential-record intake"),
+    ("audit", "Synthetic audit and independent review"),
+    ("claim", "Fictional customer-authorized carrier action"),
+    ("recovery", "Synthetic posted recovery and reversal"),
+    ("fee", "Nonbillable fee calculation and invoice rehearsal"),
+    ("closure", "Synthetic access revocation, retention and deletion"),
+)
 
 
 def _hash(value: object) -> str:
@@ -77,6 +87,13 @@ def run_remaining_gate_rehearsal(snapshot: dict) -> dict:
         "total": 37,
         "blockers_removed_in_simulation": 14,
         "blockers_removed_in_real_world": 0,
+        "customer_pilot_decision": "FULL_GO_SIMULATED",
+        "all_simulated_pilot_stages_available": True,
+        "confidential_intake_authorized_in_simulation": True,
+        "customer_service_authorized_in_simulation": True,
+        "financial_operations_authorized_in_simulation": True,
+        "real_customer_authorization_created": False,
+        "real_financial_authorization_created": False,
         "evidence_ref": "freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
         "real_scorecard_unchanged": True,
     }
@@ -227,6 +244,12 @@ def run_remaining_gate_rehearsal(snapshot: dict) -> dict:
         "source_sha256_after": _hash(snapshot),
         "real_scorecard": copy.deepcopy(snapshot["mission_acceptance"]["scorecard"]),
         "simulation_scorecard": copy.deepcopy(declared_simulation_score),
+        "simulation_stage_decisions": [{
+            "stage": stage,
+            "label": label,
+            "decision": "GO_SIMULATED",
+            "real_action_authorized": False,
+        } for stage, label in SIMULATED_PILOT_STAGES],
         "blockers_removed_in_simulation": len(receipts),
         "blockers_removed_in_real_world": 0,
         "real_gate_status_before": {key: rows[key]["status"] for key in EXPECTED_BLOCKED},
@@ -282,8 +305,25 @@ def verify_rehearsal(result: dict) -> None:
         raise ValueError("simulation scorecard must be 37 PASS / 0 BLOCKED / 0 FAIL")
     if simulated_score.get("real_scorecard_unchanged") is not True:
         raise ValueError("simulation scorecard must preserve the real scorecard")
+    if simulated_score.get("customer_pilot_decision") != "FULL_GO_SIMULATED":
+        raise ValueError("simulated customer pilot must have an explicit FULL_GO_SIMULATED decision")
+    simulated_permissions = (
+        "all_simulated_pilot_stages_available",
+        "confidential_intake_authorized_in_simulation",
+        "customer_service_authorized_in_simulation",
+        "financial_operations_authorized_in_simulation",
+    )
+    if not all(simulated_score.get(key) is True for key in simulated_permissions):
+        raise ValueError("every simulated customer-pilot stage must be available")
+    if simulated_score.get("real_customer_authorization_created") is not False or simulated_score.get("real_financial_authorization_created") is not False:
+        raise ValueError("simulated customer pilot cannot create real authorization")
     if result.get("blockers_removed_in_simulation") != 14 or result.get("blockers_removed_in_real_world") != 0:
         raise ValueError("simulation and real blocker-removal counts are inconsistent")
+    stage_decisions = result.get("simulation_stage_decisions", [])
+    if tuple(item.get("stage") for item in stage_decisions) != tuple(stage for stage, _ in SIMULATED_PILOT_STAGES):
+        raise ValueError("simulated customer-pilot stages are incomplete")
+    if any(item.get("decision") != "GO_SIMULATED" or item.get("real_action_authorized") is not False for item in stage_decisions):
+        raise ValueError("simulated GO cannot authorize a real action")
     for item in receipts:
         receipt_body = {key: value for key, value in item.items() if key != "receipt_sha256"}
         if item.get("receipt_sha256") != _hash(receipt_body):
@@ -308,9 +348,10 @@ def render_markdown(result: dict) -> str:
     lines = [
         "# RETALLY remaining-gates synthetic rehearsal",
         "",
-        f"Simulation: **{result['simulation_id']}**  ",
-        f"Simulation profile: **{result['simulation_scorecard']['PASS']} PASS / {result['simulation_scorecard']['BLOCKED']} BLOCKED / {result['simulation_scorecard']['FAIL']} FAIL**  ",
-        f"New simulations: **{result['simulated_pass_count']}/{result['simulated_gate_count']} passed; 14 blockers removed in simulation**  ",
+        f"Simulation: **{result['simulation_id']}**",
+        f"Simulation profile: **{result['simulation_scorecard']['PASS']} PASS / {result['simulation_scorecard']['BLOCKED']} BLOCKED / {result['simulation_scorecard']['FAIL']} FAIL**",
+        f"Customer-pilot simulation decision: **{result['simulation_scorecard']['customer_pilot_decision']}**",
+        f"New simulations: **{result['simulated_pass_count']}/{result['simulated_gate_count']} passed; 14 blockers removed in simulation**",
         f"Real evidence profile: **{result['real_scorecard']['PASS']} PASS / {result['real_scorecard']['BLOCKED']} BLOCKED / {result['real_scorecard']['FAIL']} FAIL**",
         "",
         "> This is a fictional rehearsal. It is not a signature, customer authorization, provider receipt, human review, insurance policy, legal filing, financial posting, invoice, deletion proof, merge, deployment, or spending approval.",
@@ -322,6 +363,15 @@ def render_markdown(result: dict) -> str:
     ]
     for receipt in result["gate_receipts"]:
         lines.append(f"| {receipt['gate_id']} | **{receipt['simulation_outcome']}** | **{receipt['real_gate_status']}** | No |")
+    lines.extend([
+        "",
+        "## Simulated customer-pilot stages",
+        "",
+        "| Stage | Simulation decision | Real action authorized |",
+        "| --- | --- | --- |",
+    ])
+    for stage in result["simulation_stage_decisions"]:
+        lines.append(f"| {stage['label']} | **{stage['decision']}** | No |")
     core = result["underlying_rehearsal"]
     lines.extend([
         "",

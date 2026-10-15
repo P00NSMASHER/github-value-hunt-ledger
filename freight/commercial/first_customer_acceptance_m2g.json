@@ -189,6 +189,13 @@
       "total": 37,
       "blockers_removed_in_simulation": 14,
       "blockers_removed_in_real_world": 0,
+      "customer_pilot_decision": "FULL_GO_SIMULATED",
+      "all_simulated_pilot_stages_available": true,
+      "confidential_intake_authorized_in_simulation": true,
+      "customer_service_authorized_in_simulation": true,
+      "financial_operations_authorized_in_simulation": true,
+      "real_customer_authorization_created": false,
+      "real_financial_authorization_created": false,
       "evidence_ref": "freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
       "real_scorecard_unchanged": true
     },
