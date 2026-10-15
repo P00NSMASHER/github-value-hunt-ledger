@@ -38,7 +38,7 @@ EXTERNAL_GATE_IDS = (
     "R25",  # independent qualified human
     "R26",  # actual buyer-specific MFA and access
     "R27",  # actual confidentiality and records authority
-    "R30",  # hosted receipt custody - known failure
+    "R30",  # hosted receipt custody - remediated in isolated QA; still tracked
     "R31",  # real hosted identity and provider proof
     "R32",  # actual settlement posting
     "R33",  # actual fee authority

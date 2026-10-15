@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).parent))
-from first_customer_gate import evaluate, verified
+from first_customer_gate import evaluate, evaluate_zero_spend_profile, verified
 
 BASE=json.loads((Path(__file__).parent/"first_customer_acceptance_m2g.json").read_text())
 
@@ -20,6 +20,34 @@ class FirstCustomerGateTests(unittest.TestCase):
         self.assertFalse(r["gates"]["claims_recovery"]["ready"])
         self.assertFalse(r["gates"]["sample_publication"]["ready"])
         self.assertFalse(r["all_customer_pilot_gates_ready"])
+
+    def test_zero_spend_public_manual_profile_is_ready_without_blocked_subsystems(self):
+        result=evaluate(self.clone())
+        profile=result["zero_spend_public_manual_profile"]
+        self.assertTrue(profile["ready"])
+        self.assertEqual(profile["decision"],"GO_EXISTING_ALREADY_LIVE")
+        self.assertTrue(all(profile["checks"].values()))
+        self.assertFalse(profile["customer_kickoff_authorized"])
+        self.assertFalse(profile["financial_operations_authorized"])
+        self.assertTrue(profile["blocked_subsystems_are_not_bypassed"])
+
+    def test_zero_spend_profile_fails_if_any_automated_or_money_surface_is_removed_from_hold(self):
+        cases=(
+            lambda s:s["production"]["inquiry_get_body"].update(online=True),
+            lambda s:s["zero_spend_launch_profile"].update(
+                new_external_spend_authorized_usd="1.00"),
+            lambda s:s["zero_spend_launch_profile"]["prohibited_capabilities"].remove(
+                "provider_financial_event_ingestion"),
+            lambda s:s["zero_spend_launch_profile"].update(
+                customer_service_authorized=True),
+            lambda s:s["zero_spend_launch_profile"].update(
+                financial_operations_authorized=True),
+        )
+        for mutate in cases:
+            with self.subTest(mutate=mutate):
+                snapshot=self.clone()
+                mutate(snapshot)
+                self.assertFalse(evaluate_zero_spend_profile(snapshot)["ready"])
     def test_claim_without_reviewer_fails(self):
         self.assertFalse(verified({"status":"VERIFIED","evidence_ref":"proof","reviewed_at":"2026-10-08","reviewed_by":""}))
     def test_claim_without_source_fails(self):
