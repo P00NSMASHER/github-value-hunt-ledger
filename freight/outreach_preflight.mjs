@@ -5,20 +5,21 @@ import { fileURLToPath } from "node:url";
 import { reserveOutreach } from "./outreach_guard.mjs";
 const root=resolve(dirname(fileURLToPath(import.meta.url)),"..");
 const args=process.argv.slice(2);
-if (args.length!==4) {
-  console.error("Usage: node freight/outreach_preflight.mjs PRIVATE_MESSAGE.json PRIVATE_LEDGER.json PRIVATE_SENDER.json UNIQUE_RESERVATION_ID");
+if (args.length!==5) {
+  console.error("Usage: node freight/outreach_preflight.mjs PRIVATE_MESSAGE.json PRIVATE_LEDGER.json PRIVATE_SENDER.json PRIVATE_APPROVAL.json UNIQUE_RESERVATION_ID");
   process.exit(2);
 }
 let lock, lockPath, temp;
 try {
-  const paths=args.slice(0,3).map(p=>realpathSync(p));
+  const paths=args.slice(0,4).map(p=>realpathSync(p));
   if (paths.some(p=>p===root || p.startsWith(root+sep))) throw new Error("PRIVATE_INPUTS_MUST_BE_OUTSIDE_CHECKOUT");
   lockPath=paths[1]+".lock";
   lock=openSync(lockPath,"wx",0o600);
   const message=JSON.parse(readFileSync(paths[0],"utf8"));
   const state=JSON.parse(readFileSync(paths[1],"utf8"));
   const sender=JSON.parse(readFileSync(paths[2],"utf8"));
-  const result=reserveOutreach(message,state,sender,new Date().toISOString(),args[3]);
+  const approval=JSON.parse(readFileSync(paths[3],"utf8"));
+  const result=reserveOutreach(message,state,sender,approval,new Date().toISOString(),args[4]);
   if (!result.ok) {
     console.error(JSON.stringify({ok:false,errors:result.errors}));
     process.exitCode=1;

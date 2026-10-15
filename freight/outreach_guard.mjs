@@ -1,10 +1,12 @@
+import { createHash } from "node:crypto";
+
 /**
  * Freight Recovery pre-send gate. No network or email transport.
  * State and prospect data MUST live privately outside the public checkout.
  * Callers must atomically persist the returned reservation BEFORE any send.
  * RESERVED/UNKNOWN reservations block retries until mailbox reconciliation.
  */
-export const OPT_OUT = 'Reply "no thanks" and I won\'t follow up.';
+export const OPT_OUT = 'To opt out of future marketing emails from me, reply "unsubscribe".';
 const unresolved = /\{\{[\s\S]*?\}\}|\$\{[^}]*\}|<%[\s\S]*?%>|\[[^\]\n]*(?:required|placeholder|name|company|address|insert|todo|tbd)[^\]\n]*\]|<\s*(?:name|company|address|insert)[^>]*>|\b(?:TODO|TBD|PLACEHOLDER)\b/i;
 const terminal = new Set(["OPT_OUT","NEGATIVE","HARD_BOUNCE","NO_FIT","CLOSED_NO_REPLY"]);
 function norm(s) {
@@ -17,6 +19,15 @@ function visible(html) {
     .replace(/&quot;|&#34;/gi,'"').replace(/&apos;|&#39;|&#x27;/gi,"'")
     .replace(/&amp;/gi,"&");
 }
+function canonical(value) {
+  if (Array.isArray(value)) return "["+value.map(canonical).join(",")+"]";
+  if (value && typeof value==="object") return "{"+Object.keys(value).sort()
+    .map(key=>JSON.stringify(key)+":"+canonical(value[key])).join(",")+"}";
+  return JSON.stringify(value);
+}
+export function messageApprovalDigest(message) {
+  return createHash("sha256").update(canonical(message),"utf8").digest("hex");
+}
 export function recipientKey(value) {
   if (typeof value !== "string" || !/^[^\s<>,;@]+@[^\s<>,;@]+\.[^\s<>,;@]+$/.test(value.trim()))
     throw new Error("SINGLE_RECIPIENT_REQUIRED");
@@ -26,7 +37,7 @@ export function recipientKey(value) {
     return local.split("+")[0].replace(/\./g,"")+"@gmail.com";
   return local+"@"+domain;
 }
-export function reserveOutreach(message, state, sender, nowIso, reservationId) {
+export function reserveOutreach(message, state, sender, approval, nowIso, reservationId) {
   const errors=[];
   const now=Date.parse(nowIso);
   if (!Number.isFinite(now)) throw new Error("INVALID_NOW");
@@ -51,9 +62,26 @@ export function reserveOutreach(message, state, sender, nowIso, reservationId) {
       postal.some(s=>typeof s!=="string" || !s.trim() || unresolved.test(s)) ||
       !/\d/.test(postal?.[0]||"") || !/\b[A-Z]{2}\s+\d{5}(?:-\d{4})?\b/.test(postal?.slice(1).join(" ")||""))
     errors.push("APPROVED_SENDER_POSTAL_REQUIRED");
+  const optOut=sender?.opt_out_text;
+  if (typeof optOut!=="string" || !optOut.trim() || unresolved.test(optOut) ||
+      !/\bopt out\b/i.test(optOut) || !/\breply\b/i.test(optOut) || !/\bunsubscribe\b/i.test(optOut))
+    errors.push("SENDER_OPT_OUT_REQUIRED");
+  const approvalIdentity=sender?.approval_identity;
+  if (typeof approvalIdentity!=="string" || !approvalIdentity.trim() || unresolved.test(approvalIdentity))
+    errors.push("SENDER_APPROVAL_IDENTITY_REQUIRED");
+  const approvedAt=Date.parse(approval?.approved_at);
+  if (!approval || approval.schema_version!==1 || approval.approved!==true ||
+      approval.approved_by!==approvalIdentity || !approval.approval_id?.trim() ||
+      unresolved.test(approval.approval_id) || !Number.isFinite(approvedAt) || approvedAt>now ||
+      !/^[a-f0-9]{64}$/.test(approval.message_sha256||""))
+    errors.push("OWNER_APPROVAL_REQUIRED");
+  else if (approval.message_sha256!==messageApprovalDigest(message))
+    errors.push("OWNER_APPROVAL_MESSAGE_MISMATCH");
+  if (state.events.some(e=>e.approval_id && e.approval_id===approval?.approval_id))
+    errors.push("OWNER_APPROVAL_ALREADY_USED");
   bodies.forEach((body,index)=>{
     const readable=norm(index===1?visible(String(body||"")):body);
-    if (!readable.includes(norm(OPT_OUT))) errors.push("OPT_OUT_MISSING_"+index);
+    if (!readable.includes(norm(optOut))) errors.push("OPT_OUT_MISSING_"+index);
     if (!readable.includes(norm(sender?.identity))) errors.push("SENDER_IDENTITY_MISSING_"+index);
     if (Array.isArray(postal) && postal.some(line=>!readable.includes(norm(line))))
       errors.push("SENDER_POSTAL_MISSING_"+index);
@@ -102,6 +130,7 @@ export function reserveOutreach(message, state, sender, nowIso, reservationId) {
   if (errors.length) return {ok:false,errors:[...new Set(errors)]};
   const next=JSON.parse(JSON.stringify(state));
   next.events.push({reservation_id:reservationId,recipient_key:key,account_id:message.account_id,
-    delivery:"RESERVED",reserved_at:nowIso,touch:message.touch,channel:message.channel});
+    delivery:"RESERVED",reserved_at:nowIso,touch:message.touch,channel:message.channel,
+    approval_id:approval.approval_id,approval_message_sha256:approval.message_sha256});
   return {ok:true,errors:[],state:next,reservation_id:reservationId};
 }
