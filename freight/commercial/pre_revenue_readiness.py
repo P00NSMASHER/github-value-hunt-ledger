@@ -12,6 +12,11 @@ import json
 from pathlib import Path
 
 from freight.commercial.first_customer_gate import DEFAULT, evaluate
+from freight.commercial.zero_upfront_underwriting import model_scenario
+
+SYNTHETIC_ECONOMIC_EXAMPLE = (
+    Path(__file__).with_name("fixtures") / "zero_upfront_synthetic_example.json"
+)
 
 # External actions have deliberately NO approval path in this source-only tool.
 FORBIDDEN_AUTOMATIC_ACTIONS = (
@@ -39,12 +44,23 @@ EXTERNAL_GATE_IDS = (
     "R33",  # actual fee authority
     "R34",  # lawful retention/disposal
     "R35",  # exact-source release approval
+    "R37",  # real owner-approved effort and monetary cap
 )
 
 
 def build_plan(snapshot: dict) -> dict:
     """Expose a phased, non-executing plan; never change an acceptance result."""
     checked = evaluate(snapshot)
+    if not checked["source_only_not_external_attestation"] or checked["customer_kickoff_authorized"]:
+        raise ValueError("Source-only checklist cannot provide commercial authorization")
+    # Model is a preexisting fictional risk demonstration, never a budget or
+    # permission to spend. For a zero-fee outcome founder/reviewer hours are
+    # still real economic exposure, even when cash spending is deferred.
+    modeled = model_scenario(json.loads(
+        SYNTHETIC_ECONOMIC_EXAMPLE.read_text(encoding="utf-8")
+    ))
+    if modeled["customer_kickoff_authorized"] or modeled["customer_price_or_approved_rate"]:
+        raise ValueError("Synthetic cost model must not authorize service or price")
     production = snapshot["production"]
     release_is_review_only = snapshot.get("release_policy") == "REVIEW_ONLY_NO_CUSTOMER_DATA"
     automated_inquiry_off = (
@@ -79,6 +95,15 @@ def build_plan(snapshot: dict) -> dict:
         "zoho_owner_attestation": production.get("inbound_zoho_status", "UNVERIFIED"),
         "automatic_permissions": {name: False for name in FORBIDDEN_AUTOMATIC_ACTIONS},
         "source_only_gate_status": checked["gates"],
+        "source_only_customer_authorization": False,
+        "future_pilot_economics_not_approved": {
+            "classification": modeled["classification"],
+            "zero_recovery_cost_usd_in_original_synthetic_example": modeled["cost"]["zero_recovery_loss_usd"],
+            "example_risk_decision": modeled["risk_decision"],
+            "actual_owner_hour_and_loss_caps": "NOT_APPROVED_R37_BLOCKED",
+            "independent_reviewer": "DEFERRED_R25_BLOCKED",
+            "cash_spending_or_customer_work_authorized": False,
+        },
         "historical_external_requirement_status": external_holds,
         "next_steps": {
             "before_a_real_prospect": [

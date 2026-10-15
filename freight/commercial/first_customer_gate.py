@@ -12,6 +12,13 @@ import json
 from pathlib import Path
 
 DEFAULT = Path(__file__).with_name("first_customer_acceptance_m2g.json")
+# This CLI consumes self-asserted repository JSON. A complete set of strings
+# must never be mistaken for independently authenticated customer approval.
+EXTERNAL_AUTHORIZATION_STAGES = frozenset({
+    "qualified_proposal", "confidential_pilot", "claims_recovery",
+    "sample_publication",
+})
+EXTERNAL_APPROVAL_BLOCKER = "independent_out_of_band_release_approval_required"
 
 
 def verified(item):
@@ -45,7 +52,17 @@ def evaluate(snapshot):
         missing = [key for key in required if not verified(status[key])]
         if name in ("claims_recovery",) and snapshot["founding_offer"]["actual_contingency_rate"] == "NOT_APPROVED":
             missing.append("approved_actual_contingency_terms")
-        gates[name] = {"ready": not missing, "missing":missing}
+        # Stage evidence is a source-only checklist, not a signature, a bank
+        # posting, a reviewer appointment, or a release decision. In particular,
+        # neither changing release_policy nor filling every JSON field can
+        # promote these stages to READY without a separate trusted verifier.
+        claimed_fields_complete = not missing
+        if name in EXTERNAL_AUTHORIZATION_STAGES:
+            missing.append(EXTERNAL_APPROVAL_BLOCKER)
+        gates[name] = {
+            "ready": not missing, "missing":missing,
+            "declared_fields_complete": claimed_fields_complete,
+        }
     if snapshot["production"]["inquiry_get_body"].get("online") is False and snapshot["production"]["online_inquiry_status"] != "DISABLED_BY_POLICY":
         raise ValueError("inquiry readiness contradicts observed disabled capability")
     return {
@@ -53,6 +70,9 @@ def evaluate(snapshot):
         "sample_fee_eligibility_verified":verified(status["synthetic_fee_eligibility_reconciled"]),
         "gates": gates,
         "all_customer_pilot_gates_ready": gates["confidential_pilot"]["ready"] and gates["qualified_proposal"]["ready"],
+        "customer_kickoff_authorized": False,
+        "actual_financial_operations_authorized": False,
+        "source_only_not_external_attestation": True,
     }
 
 

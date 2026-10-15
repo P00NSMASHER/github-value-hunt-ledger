@@ -23,6 +23,12 @@ class PreRevenueReadinessTests(unittest.TestCase):
         self.assertEqual(result["classification"], "READ_ONLY_PRE_REVENUE_PREPARATION")
         self.assertTrue(result["not_a_customer_launch_authorization"])
         self.assertTrue(result["safe_pre_revenue_mode"])
+        self.assertFalse(result["source_only_customer_authorization"])
+        future=result["future_pilot_economics_not_approved"]
+        self.assertEqual(future["zero_recovery_cost_usd_in_original_synthetic_example"],"2500.00")
+        self.assertEqual(future["actual_owner_hour_and_loss_caps"],"NOT_APPROVED_R37_BLOCKED")
+        self.assertEqual(future["independent_reviewer"],"DEFERRED_R25_BLOCKED")
+        self.assertFalse(future["cash_spending_or_customer_work_authorized"])
 
     def test_real_custody_and_legal_stay_held_despite_synthetic_success(self):
         result = build_plan(self.data())
@@ -31,6 +37,7 @@ class PreRevenueReadinessTests(unittest.TestCase):
         self.assertIn("R23", result["historical_external_requirement_status"])
         self.assertIn("R24", result["historical_external_requirement_status"])
         self.assertIn("R27", result["historical_external_requirement_status"])
+        self.assertEqual(result["historical_external_requirement_status"]["R37"],"BLOCKED")
         self.assertEqual(set(EXTERNAL_GATE_IDS) & set(result["historical_external_requirement_status"]),
                          set(EXTERNAL_GATE_IDS))
         self.assertFalse(result["source_only_gate_status"]["confidential_pilot"]["ready"])
@@ -59,7 +66,9 @@ class PreRevenueReadinessTests(unittest.TestCase):
             item.update(status="VERIFIED", evidence_ref="SYNTHETIC-ONLY",
                         reviewed_by="MOCK-REVIEWER", reviewed_at="2026-10-14")
         example["founding_offer"]["actual_contingency_rate"] = "0.30"
-        self.assertTrue(evaluate(example)["gates"]["confidential_pilot"]["ready"])
+        self.assertTrue(evaluate(example)["gates"]["confidential_pilot"]["declared_fields_complete"])
+        self.assertFalse(evaluate(example)["gates"]["confidential_pilot"]["ready"])
+        self.assertFalse(evaluate(example)["customer_kickoff_authorized"])
         result = build_plan(example)
         self.assertEqual(set(result["automatic_permissions"]), set(FORBIDDEN_AUTOMATIC_ACTIONS))
         self.assertEqual(set(result["automatic_permissions"].values()), {False})
