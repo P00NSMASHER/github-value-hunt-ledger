@@ -137,6 +137,21 @@ def make_case(
 
 def build_queue(cases: Iterable[ReviewCase]) -> ReviewQueue:
     normalized = tuple(cases)
+    for case in normalized:
+        if not isinstance(case, ReviewCase):
+            raise ValueError("review queue items must be ReviewCase instances")
+        expected = make_case(
+            case_id=case.case_id,
+            record_hash=case.record_hash,
+            amount_cents=case.amount_cents,
+            confidence_ppm=case.confidence_ppm,
+            novelty_ppm=case.novelty_ppm,
+            downstream_risk_ppm=case.downstream_risk_ppm,
+            blocker_codes=case.blocker_codes,
+            evidence_hashes=case.evidence_hashes,
+        )
+        if expected != case:
+            raise ValueError("case proof or canonical ordering mismatch")
     if len({x.case_id for x in normalized}) != len(normalized):
         raise ValueError("duplicate case_id")
     if len({x.case_hash for x in normalized}) != len(normalized):
