@@ -30,16 +30,18 @@ class PreRevenueReadinessTests(unittest.TestCase):
         self.assertEqual(future["independent_reviewer"],"DEFERRED_R25_BLOCKED")
         self.assertFalse(future["cash_spending_or_customer_work_authorized"])
 
-    def test_real_custody_and_legal_stay_held_despite_synthetic_success(self):
+    def test_remediated_custody_does_not_clear_external_legal_or_provider_holds(self):
         result = build_plan(self.data())
-        self.assertEqual(result["historical_external_requirement_status"]["R30"], "FAIL")
+        self.assertNotIn("R30", result["historical_external_requirement_status"])
         self.assertIn("R22", result["historical_external_requirement_status"])
         self.assertIn("R23", result["historical_external_requirement_status"])
         self.assertIn("R24", result["historical_external_requirement_status"])
         self.assertIn("R27", result["historical_external_requirement_status"])
         self.assertEqual(result["historical_external_requirement_status"]["R37"],"BLOCKED")
+        expected_holds=set(EXTERNAL_GATE_IDS)-{"R30"}
         self.assertEqual(set(EXTERNAL_GATE_IDS) & set(result["historical_external_requirement_status"]),
-                         set(EXTERNAL_GATE_IDS))
+                         expected_holds)
+        self.assertEqual(result["historical_external_requirement_status"]["R31"],"BLOCKED")
         self.assertFalse(result["source_only_gate_status"]["confidential_pilot"]["ready"])
 
     def test_independent_human_review_is_deferred_not_waived(self):

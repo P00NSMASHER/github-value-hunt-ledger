@@ -1,6 +1,6 @@
 {
   "schema_version": "m2g.1",
-  "as_of": "2026-10-12",
+  "as_of": "2026-10-15",
   "company": "RETALLY",
   "release_policy": "REVIEW_ONLY_NO_CUSTOMER_DATA",
   "production": {
@@ -17,8 +17,39 @@
     "public_fallback": "browser_prepared_email_draft",
     "online_inquiry_status": "DISABLED_BY_POLICY",
     "inbound_zoho_status": "OWNER_CONFIRMED_PHONE_SEND_RECEIPT_HUMAN_REPLY_20261012; NOT_INDEPENDENTLY_RETESTED",
-    "notes": "October 12 read-only verification: GET 503 online=false; both flags 0; no send token; D1 count 0. No production mutation.",
+    "notes": "October 15 verification: public/manual site remains live; automated inquiry flags remain 0; no send token; D1 inquiry count 0. Zero Trust Free protects the future operator path, but no operator or financial mutation route was released.",
     "deployment_commit": "c65aa50e22f332cd9a2f564a18c3c8985e0693dc"
+  },
+  "zero_spend_launch_profile": {
+    "id": "PUBLIC_INFORMATION_MANUAL_CONTACT_ONLY",
+    "decision": "GO_EXISTING_ALREADY_LIVE",
+    "new_external_spend_authorized_usd": "0.00",
+    "requires_new_deployment": false,
+    "permitted_capabilities": [
+      "public_information_website",
+      "browser_prepared_user_sent_email_draft"
+    ],
+    "prohibited_capabilities": [
+      "automatic_online_inquiry",
+      "customer_record_ingestion",
+      "confidential_file_processing",
+      "operator_case_mutation",
+      "carrier_or_customer_outreach",
+      "provider_financial_event_ingestion",
+      "payment_instruction_release",
+      "customer_billing",
+      "production_release_of_draft_329_or_332"
+    ],
+    "non_dependencies": {
+      "R28": "Automatic Cloudflare notification is not used by the user-sent manual email path.",
+      "R29": "The public/manual path has no operator mutation surface.",
+      "R30": "The public/manual path does not use the RecoveryOS financial database; isolated QA custody is separately remediated.",
+      "R31": "The public/manual path accepts no provider financial events.",
+      "R35": "The already-live public/manual site does not require either unreleased draft."
+    },
+    "full_production_authorized": false,
+    "customer_service_authorized": false,
+    "financial_operations_authorized": false
   },
   "pilot_workspace": {
     "current_state": "OWNER_ONLY_WITH_ONE_MANUAL_POLICY; NO_CUSTOMER_FILES",
@@ -138,13 +169,13 @@
     ]
   },
   "mission_acceptance": {
-    "as_of": "2026-10-12",
+    "as_of": "2026-10-15",
     "scorecard": {
-      "PASS": 21,
+      "PASS": 22,
       "BLOCKED": 15,
-      "FAIL": 1,
+      "FAIL": 0,
       "total": 37,
-      "independently_verified_pass": 20,
+      "independently_verified_pass": 21,
       "owner_confirmed_pass": 1
     },
     "requirements": [
@@ -451,44 +482,44 @@
         "requirement": "Cloudflare automatic notification delivery",
         "status": "BLOCKED",
         "scope": "EXTERNAL",
-        "evidence": "Email Sending 2036 Unauthorized; sending token absent; flags 0",
+        "evidence": "Email Sending requires an unapproved paid service; sending token absent; flags 0; manual user-sent email path remains available",
         "tests": "Read sender eligibility/configuration and Zoho DNS",
         "defects_corrected": "None",
-        "remaining_dependency": "Optional for manual pilot: owner enables sender, privately adds least-privilege secret, proves provider and Zoho receipt",
-        "required_owner_action": "Optional for manual pilot: owner enables sender, privately adds least-privilege secret, proves provider and Zoho receipt"
+        "remaining_dependency": "None for zero-spend public/manual profile; full automation requires separately approved paid sender, least-privilege secret, provider proof and Zoho receipt",
+        "required_owner_action": "Do not purchase or enable for zero-spend profile; retain flags at 0"
       },
       {
         "id": "R29",
         "requirement": "Authenticated Cloudflare operator application",
         "status": "BLOCKED",
         "scope": "EXTERNAL",
-        "evidence": "Access 9999 access.api.error.not_enabled; migrations unapplied",
-        "tests": "Read Access state",
-        "defects_corrected": "None",
-        "remaining_dependency": "Optional web/operator route: owner enables Access and two MFA identities before operator/migration acceptance",
-        "required_owner_action": "Optional web/operator route: owner enables Access and two MFA identities before operator/migration acceptance"
+        "evidence": "Zero Trust Free active; future internal path protected by exact-admin MFA Access policy; unauthenticated request redirected; 0 active seats; migrations and endpoint remain unreleased",
+        "tests": "Read organization/application/policy state and unauthenticated HTTP behavior",
+        "defects_corrected": "Access perimeter configured at zero cost; end-user app creation disabled; 30-day inactive-seat expiry",
+        "remaining_dependency": "None for zero-spend public/manual profile; operator mutation requires a second real MFA identity, released endpoint/migration and two-person acceptance",
+        "required_owner_action": "Complete MFA and appoint a second independent operator only before enabling the operator route"
       },
       {
         "id": "R30",
         "requirement": "Hosted financial receipt INSERT/TRUNCATE custody",
-        "status": "FAIL",
-        "scope": "HOSTED",
-        "evidence": "Read-only DB: owner INSERT/TRUNCATE grants; only immutable update/delete and audit-insert triggers; 0 payment events",
-        "tests": "Actual privileges/triggers queried; no prohibited DDL retried",
-        "defects_corrected": "Existing application new-receipt hold is present; database gap remains OPEN",
-        "remaining_dependency": "Authorized DB maintainer reviews limited writer role and immutable admission/erasure migration; keep hosted posting OFF",
-        "required_owner_action": "Authorized DB maintainer reviews limited writer role and immutable admission/erasure migration; keep hosted posting OFF"
+        "status": "PASS",
+        "scope": "HOSTED_QA",
+        "evidence": "Isolated Neon QA uses restricted identity/read/command roles; command login has zero direct financial DML/TRUNCATE; NOLOGIN writer owns three tenant-bound SECURITY DEFINER gateways; PUBLIC has zero execute; 0 provider events",
+        "tests": "Direct restricted SQL and hosted HTTP proved valid commands, idempotent replay, cross-tenant denial, mismatched-session denial, direct-write denial and provider-event hold",
+        "defects_corrected": "Removed privileged application fallback outside tests and installed independently owned function-only financial write gateway",
+        "remaining_dependency": "None for isolated custody control; production financial operation remains prohibited by R31 and external release gates",
+        "required_owner_action": "Keep RecoveryOS unpublished until provider authority and release approval exist"
       },
       {
         "id": "R31",
         "requirement": "Hosted positive auth and trusted provider enrollment",
         "status": "BLOCKED",
         "scope": "HOSTED",
-        "evidence": "M8 unpublished; source/UI say NO-GO and UNVERIFIED; no enrolled real provider/bank evidence",
-        "tests": "Read publish/source status; existing #331 positive hosted gate failed 403",
-        "defects_corrected": "None",
-        "remaining_dependency": "Authorized staging team proves real signed-session tenant isolation and approved provider custody; no production activation",
-        "required_owner_action": "Authorized staging team proves real signed-session tenant isolation and approved provider custody; no production activation"
+        "evidence": "M8 remains unpublished; real signed-session and tenant-isolation paths passed isolated hosted QA; payment-event append remains held; no enrolled recovery-evidence provider or bank authority",
+        "tests": "Hosted signed-session/tenant tests plus read-only inspection of dedicated RecoveryOS Stripe sandbox; no webhook endpoint and no live-mode action",
+        "defects_corrected": "Signed session, database membership, tenant selection and custody paths repaired and exercised; untrusted provider append still fails closed",
+        "remaining_dependency": "None for zero-spend public/manual profile; financial automation requires an approved recovery-evidence provider and independently controlled signing contract",
+        "required_owner_action": "Do not substitute merchant billing webhooks for freight-recovery evidence; keep provider-event posting unavailable"
       },
       {
         "id": "R32",
