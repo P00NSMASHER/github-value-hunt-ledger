@@ -79,7 +79,11 @@ class DuplicateChargeReviewBatch:
 def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
-    return value.strip()
+    if value != value.strip():
+        raise ValueError(name + " must not have surrounding whitespace")
+    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+        raise ValueError(name + " contains control characters")
+    return value
 
 
 def _validate_charge(charge: InvoiceCharge) -> None:
