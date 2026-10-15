@@ -240,6 +240,7 @@ class InvoiceReferenceReviewCandidate:
     shipment_ids: tuple[str, ...]
     charge_ids: tuple[str, ...]
     source_hashes: tuple[str, ...]
+    charge_hashes: tuple[str, ...]
     decision: str
     reason: str
     requires_human_review: bool
@@ -323,7 +324,7 @@ def review_reused_invoice_references(
             InvoiceReferenceReviewCandidate(
                 candidate_id="invoice-ref:" + proof_hash,
                 proof_hash=proof_hash,
-                **{k: v for k, v in body.items() if k not in {"schema", "population_hash", "charge_hashes"}},
+                **{k: v for k, v in body.items() if k not in {"schema", "population_hash"}},
             )
         )
     proof = canonical_hash({
