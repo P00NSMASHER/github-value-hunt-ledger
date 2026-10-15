@@ -154,6 +154,27 @@ class BrainReviewCockpitTests(unittest.TestCase):
                 )
 
 
+    def test_build_queue_rejects_forged_case_provenance(self):
+        original = cockpit.make_case(
+            case_id="case-1",
+            record_hash="record-hash",
+            amount_cents=0,
+            confidence_ppm=0,
+            novelty_ppm=0,
+            downstream_risk_ppm=0,
+            blocker_codes=("UNSCORED_REVIEW_ONLY", "NO_FINANCIAL_AUTHORITY"),
+            evidence_hashes=("evidence-hash",),
+        )
+        forged = replace(
+            original,
+            amount_cents=100_000,
+            blocker_codes=(),
+            evidence_hashes=("forged-evidence",),
+        )
+        with self.assertRaisesRegex(ValueError, "case proof"):
+            cockpit.build_queue((forged,))
+
+
 
 class BrainReviewManifestTests(unittest.TestCase):
     def test_forged_population_digest_is_rejected(self):
