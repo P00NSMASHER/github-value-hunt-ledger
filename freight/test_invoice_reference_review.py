@@ -210,6 +210,14 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
         self.assertEqual(old.validated_cents, 0)
         self.assertEqual(new.validated_cents, 0)
 
+    def test_forged_population_manifest_digest_fails_closed(self):
+        original = make_population()
+        forged = replace(original, manifest_hash="0" * 64)
+        with self.assertRaisesRegex(ValueError, "population"):
+            review_reused_invoice_references(
+                forged, (make_charge(), second())
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
