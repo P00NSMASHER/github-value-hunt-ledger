@@ -35,6 +35,16 @@ class PreRevenueReadinessTests(unittest.TestCase):
                          set(EXTERNAL_GATE_IDS))
         self.assertFalse(result["source_only_gate_status"]["confidential_pilot"]["ready"])
 
+    def test_independent_human_review_is_deferred_not_waived(self):
+        data = self.data()
+        item = next(row for row in data["mission_acceptance"]["requirements"]
+                    if row["id"] == "R25")
+        self.assertEqual(item["status"], "BLOCKED")
+        self.assertIn("DEFERRED UNTIL FIRST CREDIBLE CUSTOMER", item["required_owner_action"])
+        self.assertIn("Before any confidential pilot", item["remaining_dependency"])
+        self.assertFalse(build_plan(data)["source_only_gate_status"]["confidential_pilot"]["ready"])
+        self.assertFalse(build_plan(data)["automatic_permissions"]["customer_onboarding_or_service"])
+
     def test_only_existing_unsent_email_draft_is_prepared(self):
         result = build_plan(self.data())
         self.assertTrue(result["prepared_manual_email_draft"])
