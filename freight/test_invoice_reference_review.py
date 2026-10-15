@@ -170,6 +170,8 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
             (second(charge_id="CH-2 "), "surrounding whitespace"),
             (second(charge_code=" LINEHAUL"), "surrounding whitespace"),
             (second(source_hash="synthetic\nsource"), "control characters"),
+            (second(invoice_id="INV-\u200b5"), "control characters"),
+            (second(customer_id="fictional-\u202ecustomer"), "control characters"),
         ]:
             with self.subTest(diagnostic=diagnostic), self.assertRaisesRegex(
                 ValueError, diagnostic

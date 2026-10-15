@@ -7,6 +7,7 @@ status, credit/rebill status, and service distinction are independently proven.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
@@ -81,7 +82,7 @@ def _text(name: str, value: str) -> str:
         raise ValueError(name + " is required")
     if value != value.strip():
         raise ValueError(name + " must not have surrounding whitespace")
-    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+    if any(unicodedata.category(character) in {"Cc", "Cf", "Cs"} for character in value):
         raise ValueError(name + " contains control characters")
     return value
 
