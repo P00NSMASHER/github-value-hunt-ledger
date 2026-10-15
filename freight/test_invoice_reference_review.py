@@ -164,6 +164,18 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
             with self.subTest(bad=diagnostic), self.assertRaisesRegex(ValueError, diagnostic):
                 review_reused_invoice_references(pop, (make_charge(), bad))
 
+    def test_noncanonical_or_control_identity_text_fails_closed(self):
+        pop = make_population()
+        for bad, diagnostic in [
+            (second(charge_id="CH-2 "), "surrounding whitespace"),
+            (second(charge_code=" LINEHAUL"), "surrounding whitespace"),
+            (second(source_hash="synthetic\\nsource"), "control characters"),
+        ]:
+            with self.subTest(diagnostic=diagnostic), self.assertRaisesRegex(
+                ValueError, diagnostic
+            ):
+                review_reused_invoice_references(pop, (make_charge(), bad))
+
     def test_bad_numeric_and_service_date_types_fail_closed(self):
         pop = make_population()
         for bad, diagnostic in [
