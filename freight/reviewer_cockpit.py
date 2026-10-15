@@ -5,6 +5,7 @@ prioritizes cases and records immutable human dispositions.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Iterable
@@ -19,8 +20,9 @@ MAX_PPM = 1_000_000
 def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} is required")
-    value = value.strip()
-    if any(ord(ch) < 32 for ch in value):
+    if value != value.strip():
+        raise ValueError(f"{name} must not have surrounding whitespace")
+    if any(unicodedata.category(ch) in {"Cc", "Cf", "Cs"} for ch in value):
         raise ValueError(f"{name} contains control characters")
     return value
 

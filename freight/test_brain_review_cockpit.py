@@ -112,6 +112,48 @@ class BrainReviewCockpitTests(unittest.TestCase):
         self.assertIn("MULTI_LOAD_INVOICE_AUTHORIZATION", items[0].blocker_codes)
 
 
+    def test_case_identity_text_rejects_whitespace_and_invisible_controls(self):
+        valid = {
+            "case_id": "case-1",
+            "record_hash": "record-hash",
+            "amount_cents": 0,
+            "confidence_ppm": 0,
+            "novelty_ppm": 0,
+            "downstream_risk_ppm": 0,
+            "blocker_codes": ("REVIEW",),
+            "evidence_hashes": ("evidence-hash",),
+        }
+        invalid_values = (
+            ("case_id", " case-1"),
+            ("record_hash", "record\u200b-hash"),
+            ("blocker_codes", ("RE\u202eVIEW",)),
+            ("evidence_hashes", ("evidence\u2066hash",)),
+        )
+
+        for field, value in invalid_values:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                cockpit.make_case(**{**valid, field: value})
+
+    def test_disposition_reviewer_identity_rejects_ambiguous_text(self):
+        item = self.queue("low_confidence").items[0]
+
+        for reviewer_id in (
+            " synthetic-reviewer",
+            "synthetic\u200breviewer",
+            "synthetic\u202ereviewer",
+        ):
+            with self.subTest(reviewer_id=repr(reviewer_id)), self.assertRaises(
+                ValueError
+            ):
+                cockpit.record_disposition(
+                    item,
+                    reviewer_id=reviewer_id,
+                    decision="NEED_EVIDENCE",
+                    reason="Training example only",
+                    decided_at="2026-10-13T00:00:00Z",
+                )
+
+
 
 class BrainReviewManifestTests(unittest.TestCase):
     def test_forged_population_digest_is_rejected(self):
