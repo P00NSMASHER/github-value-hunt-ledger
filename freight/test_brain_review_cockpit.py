@@ -135,7 +135,7 @@ class BrainReviewCockpitTests(unittest.TestCase):
                 cockpit.make_case(**{**valid, field: value})
 
     def test_disposition_reviewer_identity_rejects_ambiguous_text(self):
-        item = self.queue("low_confidence").items[0]
+        item = self.queue((charge(), charge(charge_id="C2", shipment_id="LOAD-2"))).items[0]
 
         for reviewer_id in (
             " synthetic-reviewer",
