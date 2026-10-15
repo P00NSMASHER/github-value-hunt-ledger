@@ -12,7 +12,7 @@ from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
 
-from freight.contracts import PopulationManifest, canonical_hash
+from freight.contracts import PopulationManifest, canonical_hash, freeze_population
 from freight.finding_factory import InvoiceCharge
 
 
@@ -284,6 +284,14 @@ def review_reused_invoice_references(
     invalid payment, duplicated service, verified claim, or recoverable dollars.
     No third-party code is executed or included in the implementation.
     """
+    frozen = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if frozen != population:
+        raise ValueError("population proof or canonical ordering mismatch")
     normalized = tuple(sorted(charges, key=lambda c: c.charge_id))
     # Reuse the one authority for scope, unique charge IDs, source identity,
     # integer cents, dates and frozen population membership. Its own findings
