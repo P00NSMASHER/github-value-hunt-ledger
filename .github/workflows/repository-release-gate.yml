@@ -64,9 +64,11 @@ jobs:
           test "$(git -C synthetic-review-source rev-parse HEAD)" = "$REVIEW_SOURCE_SHA"
           (cd synthetic-review-source && PYTHONPATH=. python -m freight.brain_review_measurement) > "$RUNNER_TEMP/retally-synthetic-review.json"
           python - "$RUNNER_TEMP/retally-synthetic-review.json" <<'PY'
-          import json, re, sys
+          import json, os, re, sys
           with open(sys.argv[1], encoding="utf-8") as source:
               doc = json.load(source)
+          assert doc["schema_version"] == 2
+          assert doc["source_sha"] == os.environ["REVIEW_SOURCE_SHA"]
           assert doc["evidence_kind"] == "SYNTHETIC_FIRST_PARTY_COMPARISON"
           assert doc["real_customer_outcome"] == "NOT_MEASURED"
           assert doc["production_deployed"] is False

@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import re
 from dataclasses import asdict, replace
 from pathlib import Path
 from time import perf_counter_ns
@@ -18,7 +20,13 @@ from freight.duplicate_charge_review import review_duplicate_charges
 from freight.finding_factory import InvoiceCharge
 from freight.reviewer_cockpit import build_invoice_review_queue
 
-SOURCE_BASE_SHA = "29fec8afd1438e64e3590f4caf7fecbe6918d786"
+def _source_sha() -> str:
+    value = os.environ.get("REVIEW_SOURCE_SHA", "")
+    if not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise ValueError(
+            "REVIEW_SOURCE_SHA must be the exact 40-character lowercase commit SHA"
+        )
+    return value
 
 
 def scenarios():
@@ -46,6 +54,7 @@ def scenarios():
 
 
 def measure():
+    source_sha = _source_sha()
     rows = []
     for case_id, truth_class, charges in scenarios():
         population_rows = {}
@@ -77,9 +86,9 @@ def measure():
             "baseline_cases_flagged": sum(x["baseline_reviews"] > 0 for x in selected),
             "candidate_cases_flagged": sum(x["candidate_reviews"] > 0 for x in selected)}
     base = Path(__file__).parent
-    return {"schema_version": 1, "evidence_kind": "SYNTHETIC_FIRST_PARTY_COMPARISON",
+    return {"schema_version": 2, "evidence_kind": "SYNTHETIC_FIRST_PARTY_COMPARISON",
         "actor": "REVIEW_ONLY_SYNTHETIC_REHEARSAL_NOT_LIVE_BRAIN_DEPLOYMENT",
-        "source_base_sha": SOURCE_BASE_SHA,
+        "source_sha": source_sha,
         "source_sha256": {name: hashlib.sha256((base / name).read_bytes()).hexdigest()
                           for name in ("contracts.py", "finding_factory.py", "duplicate_charge_review.py",
                                        "reviewer_cockpit.py", "brain_review_measurement.py")},
