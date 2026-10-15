@@ -123,6 +123,18 @@ class FirstCustomerGateTests(unittest.TestCase):
     def test_synthetic_cannot_become_real_claim(self):
         s=self.clone();s["published_synthetic_sample"]["customer_result"]=True
         with self.assertRaisesRegex(ValueError,"synthetic"):evaluate(s)
+    def test_unverified_legacy_sample_is_permanently_nonbillable(self):
+        baseline=evaluate(self.clone())
+        self.assertTrue(baseline["legacy_sample_permanently_nonbillable"])
+        cases=(
+            ("billing_eligible", True, "nonbillable"),
+            ("customer_economic_claim_eligible", True, "customer economics"),
+            ("classification", "REVENUE_PROOF", "illustrative classification"),
+        )
+        for field,value,message in cases:
+            with self.subTest(field=field):
+                s=self.clone();s["published_synthetic_sample"][field]=value
+                with self.assertRaisesRegex(ValueError,message):evaluate(s)
     def test_mixed_inquiry_status_rejected(self):
         s=self.clone();s["production"]["online_inquiry_status"]="READY"
         with self.assertRaisesRegex(ValueError,"contradicts"):evaluate(s)
