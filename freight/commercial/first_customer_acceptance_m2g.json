@@ -181,6 +181,17 @@
       "independently_verified_pass": 22,
       "owner_confirmed_pass": 1
     },
+    "simulation_scorecard": {
+      "classification": "FICTIONAL_REHEARSAL_ONLY",
+      "PASS": 37,
+      "BLOCKED": 0,
+      "FAIL": 0,
+      "total": 37,
+      "blockers_removed_in_simulation": 14,
+      "blockers_removed_in_real_world": 0,
+      "evidence_ref": "freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
+      "real_scorecard_unchanged": true
+    },
     "requirements": [
       {
         "id": "R01",
