@@ -421,8 +421,8 @@
         "evidence": "Ten AI simulated reviewer roles completed; no actual human appointment or qualified customer-specific sign-off represented.",
         "tests": "Simulation review proof cannot certify actual competence or separation",
         "defects_corrected": "None",
-        "remaining_dependency": "Name analyst, separate qualified reviewer, customer controller and backups",
-        "required_owner_action": "Name analyst, separate qualified reviewer, customer controller and backups"
+        "remaining_dependency": "Before any confidential pilot or substantive audit, name a qualified independent human reviewer and establish customer-specific review and access authority; simulated reviewers do not qualify.",
+        "required_owner_action": "DEFERRED UNTIL FIRST CREDIBLE CUSTOMER OPPORTUNITY: no recruitment, reviewer contact or paid review now. Before real confidential audit/service, name and verify a qualified independent reviewer and document approval. Keep R25 BLOCKED until proven."
       },
       {
         "id": "R26",

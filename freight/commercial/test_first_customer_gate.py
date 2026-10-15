@@ -31,6 +31,64 @@ class FirstCustomerGateTests(unittest.TestCase):
         r=evaluate(s)
         self.assertTrue(r["gates"]["contact"]["ready"])
         self.assertFalse(r["gates"]["confidential_pilot"]["ready"])
+    def test_synthetic_verification_strings_never_authorize_real_pilot(self):
+        s=self.clone()
+        for item in s["requirements"].values():
+            item.update(status="VERIFIED",evidence_ref="TEST-FIXTURE",
+                        reviewed_by="MOCK-REVIEWER",reviewed_at="2026-10-14")
+        s["founding_offer"]["actual_contingency_rate"]="0.30"
+        # A forged release label is still just a string in source-only JSON.
+        s["release_policy"]="PRETEND_ALL_CUSTOMERS_AUTHORIZED"
+        result=evaluate(s)
+        self.assertTrue(result["gates"]["confidential_pilot"]["declared_fields_complete"])
+        self.assertFalse(result["gates"]["confidential_pilot"]["ready"])
+        self.assertFalse(result["gates"]["qualified_proposal"]["ready"])
+        self.assertFalse(result["gates"]["claims_recovery"]["ready"])
+        self.assertFalse(result["gates"]["sample_publication"]["ready"])
+        self.assertFalse(result["all_customer_pilot_gates_ready"])
+        self.assertFalse(result["customer_kickoff_authorized"])
+        self.assertFalse(result["actual_financial_operations_authorized"])
+        self.assertTrue(result["source_only_not_external_attestation"])
+        for stage in ("qualified_proposal","confidential_pilot","claims_recovery","sample_publication"):
+            self.assertIn("independent_out_of_band_release_approval_required",
+                          result["gates"][stage]["missing"])
+
+    def test_ordinary_contact_metadata_can_still_be_reviewed_without_sending(self):
+        s=self.clone()
+        for name in s["readiness_gates"]["contact"]:
+            s["requirements"][name].update(status="VERIFIED",
+                evidence_ref="SOURCE-ONLY", reviewed_by="REVIEWER",
+                reviewed_at="2026-10-14")
+        result=evaluate(s)
+        self.assertTrue(result["gates"]["contact"]["ready"])
+        self.assertFalse(result["customer_kickoff_authorized"])
+
+    def test_cli_rejects_forged_full_customer_stage(self):
+        from tempfile import TemporaryDirectory
+        from contextlib import redirect_stdout
+        from io import StringIO
+        s=self.clone()
+        for item in s["requirements"].values():
+            item.update(status="VERIFIED",evidence_ref="TEST-FIXTURE",
+                        reviewed_by="TEST-REVIEWER",reviewed_at="2026-10-14")
+        s["founding_offer"]["actual_contingency_rate"]="0.30"
+        # Even a CLI --require flag cannot elevate untrusted source-only data.
+        from first_customer_gate import main
+        with TemporaryDirectory() as directory:
+            path=Path(directory)/"fake.json"
+            path.write_text(json.dumps(s))
+            for stage in ("qualified_proposal","confidential_pilot",
+                          "claims_recovery","sample_publication"):
+                with self.subTest(stage=stage),redirect_stdout(StringIO()):
+                    import sys
+                    prior=sys.argv
+                    try:
+                        sys.argv=["first_customer_gate.py","--source",str(path),
+                                  "--require",stage]
+                        self.assertEqual(main(),2)
+                    finally:
+                        sys.argv=prior
+
     def test_invalid_sample_arithmetic_rejected(self):
         s=self.clone();s["published_synthetic_sample"]["reversals_usd"]="999.00"
         with self.assertRaisesRegex(ValueError,"gross/net"):evaluate(s)
