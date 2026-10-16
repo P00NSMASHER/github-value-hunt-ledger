@@ -54,7 +54,7 @@ def build_population_from_charge_batch(
             continue
         if current["identity"] != identity:
             raise ValueError(
-                "invoice/shipment identity conflict: customer/carrier/currency changed for " + key
+                f"invoice/shipment identity conflict: customer/carrier/currency changed for {key[0]}|{key[1]}"
             )
         current["charge_source_hashes"].append(charge.source_hash)
 
