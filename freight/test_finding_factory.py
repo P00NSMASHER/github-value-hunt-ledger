@@ -148,3 +148,14 @@ def test_batch_rejects_forged_population_manifest_digest():
     forged = replace(population(), manifest_hash="0" * 64)
     with pytest.raises(ValueError, match="population proof"):
         derive_batch(forged, [charge()], [rule()])
+
+
+
+def test_batch_rejects_invoice_shipment_delimiter_alias():
+    pop = freeze_population(
+        "buyer", "unit", "synthetic",
+        [PopulationRow("inv|segment", "shp-1", "customer", "carrier", "USD", "source")],
+    )
+    aliased = charge(invoice_id="inv", shipment_id="segment|shp-1")
+    with pytest.raises(ValueError, match="outside frozen population"):
+        derive_batch(pop, [aliased], [rule()])

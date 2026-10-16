@@ -79,3 +79,17 @@ def test_tampered_charge_scope_cannot_enter_population():
     tampered = replace(b, charges=(bad_charge,))
     with pytest.raises(ValueError, match="scope"):
         build_population_from_charge_batch(tampered, selection_rule="period")
+
+
+
+def test_delimiter_aliases_remain_distinct_population_rows():
+    b = batch(
+        "I|1,S1,C,K,USD,X1,FUEL,2026-09-01,1,100\n"
+        "I,1|S1,C,K,USD,X2,FUEL,2026-09-01,1,200\n"
+    )
+    out = build_population_from_charge_batch(b, selection_rule="period")
+    assert out.invoice_count == 2
+    assert [row.identity_key for row in out.population.rows] == [
+        ("I", "1|S1"),
+        ("I|1", "S1"),
+    ]

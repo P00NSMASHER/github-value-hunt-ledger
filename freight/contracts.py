@@ -40,6 +40,11 @@ class PopulationRow:
     def row_key(self) -> str:
         return f"{self.invoice_id}|{self.shipment_id}"
 
+    @property
+    def identity_key(self) -> tuple[str, str]:
+        """Unambiguous internal key; row_key remains display-only."""
+        return (self.invoice_id, self.shipment_id)
+
 
 @dataclass(frozen=True)
 class PopulationManifest:
@@ -180,11 +185,11 @@ def freeze_population(
     _require_text("business_unit", business_unit)
     _require_text("selection_rule", selection_rule)
 
-    normalized = tuple(sorted(rows, key=lambda row: row.row_key))
+    normalized = tuple(sorted(rows, key=lambda row: row.identity_key))
     if not normalized:
         raise ValueError("population must contain at least one row")
 
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     for row in normalized:
         for name in (
             "invoice_id",
@@ -195,9 +200,9 @@ def freeze_population(
             "source_hash",
         ):
             _require_text(name, getattr(row, name))
-        if row.row_key in seen:
+        if row.identity_key in seen:
             raise ValueError(f"duplicate population row: {row.row_key}")
-        seen.add(row.row_key)
+        seen.add(row.identity_key)
 
     body = {
         "schema": 2,
@@ -312,7 +317,7 @@ def freeze_truth(
     normalized_authorities = tuple(
         sorted(authority_index.values(), key=lambda authority: authority.authority_id)
     )
-    row_index = {row.row_key: row for row in population.rows}
+    row_index = {row.identity_key: row for row in population.rows}
     normalized = tuple(sorted(findings, key=lambda finding: finding.finding_id))
 
     seen_ids: set[str] = set()
@@ -329,7 +334,7 @@ def freeze_truth(
             "finding",
         )
 
-        row = row_index.get(f"{finding.invoice_id}|{finding.shipment_id}")
+        row = row_index.get((finding.invoice_id, finding.shipment_id))
         if row is None:
             raise ValueError(
                 f"finding outside frozen population: {finding.invoice_id}|{finding.shipment_id}"

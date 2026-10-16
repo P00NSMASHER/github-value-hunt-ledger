@@ -235,5 +235,15 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
                 reviewer(forged, (make_charge(), second()))
 
 
+
+    def test_invoice_shipment_delimiter_alias_fails_population_membership(self):
+        pop = make_population(PopulationRow(
+            "INV|5", "LOAD-1", "fictional-customer", "fictional-carrier", "USD", "source-1"
+        ))
+        aliased = make_charge(invoice_id="INV", shipment_id="5|LOAD-1")
+        with self.assertRaisesRegex(ValueError, "outside frozen population"):
+            review_duplicate_charges(pop, (aliased,))
+
+
 if __name__ == "__main__":
     unittest.main()

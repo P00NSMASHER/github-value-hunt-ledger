@@ -188,7 +188,7 @@ def review_duplicate_charges(
     if len({charge.charge_id for charge in normalized}) != len(normalized):
         raise ValueError("duplicate charge_id")
 
-    row_index = {row.row_key: row for row in population.rows}
+    row_index = {row.identity_key: row for row in population.rows}
     groups: dict[tuple[object, ...], list[InvoiceCharge]] = {}
     for charge in normalized:
         _validate_charge(charge)
@@ -197,7 +197,7 @@ def review_duplicate_charges(
             population.business_unit,
         ):
             raise ValueError("charge scope mismatch")
-        row = row_index.get(f"{charge.invoice_id}|{charge.shipment_id}")
+        row = row_index.get((charge.invoice_id, charge.shipment_id))
         if row is None:
             raise ValueError("charge outside frozen population")
         if (charge.customer_id, charge.carrier_id, charge.currency) != (

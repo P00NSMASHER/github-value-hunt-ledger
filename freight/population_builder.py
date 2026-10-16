@@ -34,11 +34,11 @@ def build_population_from_charge_batch(
         raise ValueError("selection_rule is required")
     selection_rule = selection_rule.strip()
 
-    grouped: dict[str, dict] = {}
+    grouped: dict[tuple[str, str], dict] = {}
     for charge in batch.charges:
         if (charge.buyer_id, charge.business_unit) != (batch.buyer_id, batch.business_unit):
             raise ValueError("charge scope does not match invoice batch")
-        key = f"{charge.invoice_id}|{charge.shipment_id}"
+        key = (charge.invoice_id, charge.shipment_id)
         identity = (charge.customer_id, charge.carrier_id, charge.currency)
         current = grouped.get(key)
         if current is None:
