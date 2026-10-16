@@ -202,14 +202,9 @@ def freeze_population(
 
     seen: set[tuple[str, str]] = set()
     for row in normalized:
-        for name in (
-            "invoice_id",
-            "shipment_id",
-            "customer_id",
-            "carrier_id",
-            "currency",
-            "source_hash",
-        ):
+        for name in ("invoice_id", "shipment_id"):
+            _require_canonical_identity(name, getattr(row, name))
+        for name in ("customer_id", "carrier_id", "currency", "source_hash"):
             _require_text(name, getattr(row, name))
         if row.identity_key in seen:
             raise ValueError(f"duplicate population row: {row.row_key}")
