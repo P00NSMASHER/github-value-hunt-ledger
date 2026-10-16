@@ -142,3 +142,9 @@ def test_money_and_units_require_exact_integer_semantics(bad):
     else:
         with pytest.raises(ValueError):
             derive_charge(charge(billed_cents=bad), [rule()])
+
+
+def test_batch_rejects_forged_population_manifest_digest():
+    forged = replace(population(), manifest_hash="0" * 64)
+    with pytest.raises(ValueError, match="population proof"):
+        derive_batch(forged, [charge()], [rule()])
