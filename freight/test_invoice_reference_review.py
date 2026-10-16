@@ -179,10 +179,16 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
                 review_reused_invoice_references(pop, (make_charge(), bad))
 
     def test_decomposed_unicode_identity_fails_closed_before_grouping(self):
+        canonical = "café"
         decomposed = "cafe\u0301"
+        with self.assertRaisesRegex(ValueError, "canonical Unicode"):
+            make_population(
+                PopulationRow(decomposed, "LOAD-1", "fictional-customer", "fictional-carrier", "USD", "source-1"),
+                PopulationRow(decomposed, "LOAD-2", "fictional-customer", "fictional-carrier", "USD", "source-2"),
+            )
         pop = make_population(
-            PopulationRow(decomposed, "LOAD-1", "fictional-customer", "fictional-carrier", "USD", "source-1"),
-            PopulationRow(decomposed, "LOAD-2", "fictional-customer", "fictional-carrier", "USD", "source-2"),
+            PopulationRow(canonical, "LOAD-1", "fictional-customer", "fictional-carrier", "USD", "source-1"),
+            PopulationRow(canonical, "LOAD-2", "fictional-customer", "fictional-carrier", "USD", "source-2"),
         )
         with self.assertRaisesRegex(ValueError, "canonical Unicode"):
             review_reused_invoice_references(
