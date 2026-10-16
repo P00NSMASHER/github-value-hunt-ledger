@@ -2,6 +2,7 @@
 
 import hashlib
 from html.parser import HTMLParser
+from html import unescape
 import importlib.util
 import json
 import re
@@ -109,6 +110,28 @@ class PublicBuildTests(unittest.TestCase):
                 verification,
                 "google-site-verification: google738a4fc9a0997cd0.html\n",
             )
+
+    def test_published_metadata_is_complete_and_within_search_snippet_budget(self):
+        """Catch Ahrefs-style overly long/short descriptions before publication."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            pages = list(builder.PUBLIC_CONTACT_PAGES) + ["recovery-status-example.html"]
+            for name in pages:
+                with self.subTest(page=name):
+                    markup = (output / name).read_text(encoding="utf-8")
+                    titles = re.findall(r"<title>(.*?)</title>", markup, flags=re.I | re.S)
+                    descriptions = re.findall(
+                        r'<meta\s+name="description"\s+content="([^"]*)"\s*/?>',
+                        markup,
+                        flags=re.I,
+                    )
+                    self.assertEqual(len(titles), 1, f"{name}: expected one title")
+                    self.assertEqual(len(descriptions), 1, f"{name}: expected one description")
+                    title = unescape(titles[0]).strip()
+                    description = unescape(descriptions[0]).strip()
+                    self.assertLessEqual(len(title), 60, f"{name}: title exceeds 60 characters")
+                    self.assertGreaterEqual(len(description), 100, f"{name}: description is too short")
+                    self.assertLessEqual(len(description), 160, f"{name}: description is too long")
 
     def test_contact_must_be_present_and_verified(self):
         for email, verified in [
