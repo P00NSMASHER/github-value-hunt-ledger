@@ -275,6 +275,7 @@ def make_finding(
         ("currency", currency),
     ):
         _require_text(name, value)
+    _require_canonical_identity("finding_id", finding_id)
 
     if expected_cents < 0 or actual_cents < 0:
         raise ValueError("money values must be non-negative")
