@@ -21,7 +21,7 @@ concurrency:
 jobs:
   readonly-live-acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -30,4 +30,24 @@ jobs:
       - name: Verify audit fixture behavior
         run: python -m unittest freight.site.test_verify_production_site -v
       - name: Check live artwork, security, canonical pages and internal links
-        run: python -m freight.site.verify_production_site
+        shell: bash
+        run: |
+          # Cloudflare Pages production deployment runs asynchronously after a
+          # main push. Retry during the bounded rollout window so old HTML
+          # cannot create a false 404 alert before the new bundle is live.
+          # Scheduled/manual audits always check once, with no grace period.
+          if [[ "$GITHUB_EVENT_NAME" != "push" ]]; then
+            python -m freight.site.verify_production_site
+            exit $?
+          fi
+          for attempt in $(seq 1 15); do
+            if python -m freight.site.verify_production_site; then
+              exit 0
+            fi
+            if [[ "$attempt" -eq 15 ]]; then
+              echo "Production still fails the link audit after 15 attempts."
+              exit 1
+            fi
+            echo "Waiting for Cloudflare production rollout; attempt $attempt/15."
+            sleep 20
+          done
