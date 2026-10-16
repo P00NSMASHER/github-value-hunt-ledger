@@ -404,6 +404,20 @@ def test_population_rejects_surrounding_whitespace_identity_alias(field, noncano
         freeze_population(BUYER, BU, "current invoices", [original, aliased])
 
 
+@pytest.mark.parametrize(
+    ("field", "noncanonical"),
+    [
+        ("invoice_id", "inv-e\\u0301"),
+        ("shipment_id", "shp-e\\u0301"),
+    ],
+)
+def test_population_rejects_noncanonical_unicode_identity_alias(field, noncanonical):
+    original = row("inv-é", "shp-é")
+    aliased = replace(original, **{field: noncanonical})
+    with pytest.raises(ValueError, match="canonical Unicode"):
+        freeze_population(BUYER, BU, "current invoices", [original, aliased])
+
+
 def test_finding_id_alias_cannot_double_realized_money():
     pop = population()
     with pytest.raises(ValueError, match="surrounding whitespace"):
