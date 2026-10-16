@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import unicodedata
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
@@ -162,6 +163,16 @@ class RecoveryCertificate:
 def _require_text(name: str, value: str) -> None:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} is required")
+
+
+def _require_canonical_identity(name: str, value: str) -> None:
+    _require_text(name, value)
+    if value != value.strip():
+        raise ValueError(name + " must not contain surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character).startswith("C") for character in value):
+        raise ValueError(name + " contains control characters")
 
 
 def _require_scope(
@@ -616,8 +627,8 @@ class RecoveryLedger:
         finding = self._findings.get(event.finding_id)
         if finding is None:
             raise ValueError("settlement references unknown finding")
-        _require_text("settlement_id", event.settlement_id)
-        _require_text("source_hash", event.source_hash)
+        _require_canonical_identity("settlement_id", event.settlement_id)
+        _require_canonical_identity("source_hash", event.source_hash)
 
         # Validate all accounting flags before even an ambiguous/zero path.
         # Invalid inputs must not consume settlement IDs, sources or capacity.
