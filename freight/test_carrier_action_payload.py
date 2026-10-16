@@ -200,10 +200,11 @@ def test_tampered_payload_is_rejected():
 
 
 def test_external_text_control_character_injection_is_rejected():
-    _, _, claims, proposal = setup(invoice_id="I1\tBcc")
+    _, _, claims, proposal = setup()
+    injected = replace(proposal, target_carrier_id="K\tBcc")
     with pytest.raises(ValueError, match="control characters"):
         build_carrier_action_payload(
-            proposal=proposal,
+            proposal=injected,
             recovery_claims=claims,
             action_type=ActionType.REQUEST_CREDIT_REVIEW,
         )
