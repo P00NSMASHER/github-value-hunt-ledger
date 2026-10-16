@@ -388,3 +388,18 @@ def test_population_membership_rejects_delimiter_alias():
         raise AssertionError(
             "invoice/shipment delimiter alias must not satisfy population membership"
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "noncanonical"),
+    [
+        ("invoice_id", "inv-1 "),
+        ("shipment_id", "shp-1\x00"),
+        ("invoice_id", "cafe\u0301"),
+    ],
+)
+def test_population_rejects_noncanonical_record_identity(field, noncanonical):
+    original = row("inv-1", "shp-1")
+    aliased = replace(original, **{field: noncanonical})
+    with pytest.raises(ValueError):
+        freeze_population(BUYER, BU, "current invoices", [original, aliased])
