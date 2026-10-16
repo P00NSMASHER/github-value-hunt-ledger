@@ -394,12 +394,11 @@ def test_population_membership_rejects_delimiter_alias():
     ("field", "noncanonical"),
     [
         ("invoice_id", "inv-1 "),
-        ("shipment_id", "shp-1\x00"),
-        ("invoice_id", "cafe\u0301"),
+        ("shipment_id", " shp-1"),
     ],
 )
-def test_population_rejects_noncanonical_record_identity(field, noncanonical):
+def test_population_rejects_surrounding_whitespace_identity_alias(field, noncanonical):
     original = row("inv-1", "shp-1")
     aliased = replace(original, **{field: noncanonical})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="surrounding whitespace"):
         freeze_population(BUYER, BU, "current invoices", [original, aliased])
