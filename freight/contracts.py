@@ -231,6 +231,21 @@ def freeze_population(
     )
 
 
+def _verified_population(population: PopulationManifest) -> PopulationManifest:
+    """Rebuild a supplied population before it can anchor money-bearing truth."""
+    if type(population) is not PopulationManifest:
+        raise ValueError("population must be a PopulationManifest")
+    verified = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if verified != population:
+        raise ValueError("population proof or canonical ordering mismatch")
+    return verified
+
+
 def make_finding(
     *,
     finding_id: str,
@@ -302,6 +317,7 @@ def freeze_truth(
     authorities: Iterable[AuthorityRef],
     findings: Iterable[Finding],
 ) -> TruthManifest:
+    population = _verified_population(population)
     authority_index: dict[str, AuthorityRef] = {}
     for authority in authorities:
         if authority.authority_id in authority_index:
