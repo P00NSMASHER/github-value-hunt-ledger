@@ -666,8 +666,13 @@ class RecoveryLedger:
         if event.currency != finding.currency:
             raise ValueError("settlement currency mismatch")
 
+        if event.settlement_id in self._seen_settlement_ids:
+            raise ValueError("duplicate settlement_id")
+        if event.source_hash in self._seen_source_hashes:
+            raise ValueError("settlement source already consumed")
+
         if event.ambiguous_allocation:
-            return SettlementAllocation(
+            allocation = SettlementAllocation(
                 buyer_id=self.buyer_id,
                 business_unit=self.business_unit,
                 settlement_id=event.settlement_id,
@@ -686,11 +691,10 @@ class RecoveryLedger:
                     }
                 ),
             )
-
-        if event.settlement_id in self._seen_settlement_ids:
-            raise ValueError("duplicate settlement_id")
-        if event.source_hash in self._seen_source_hashes:
-            raise ValueError("settlement source already consumed")
+            self._allocations[event.finding_id].append(allocation)
+            self._seen_settlement_ids.add(event.settlement_id)
+            self._seen_source_hashes.add(event.source_hash)
+            return allocation
 
         realized_so_far = sum(
             allocation.allocated_cents for allocation in self._allocations[event.finding_id]
