@@ -2,6 +2,12 @@ name: RETALLY Live Publication Audit
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'freight/site/**'
+      - 'recoveryworks/site/**'
+      - '.github/workflows/retally-live-publication-audit.yml'
   schedule:
     - cron: '17 12 * * *'
 
@@ -23,5 +29,5 @@ jobs:
           python-version: '3.11'
       - name: Verify audit fixture behavior
         run: python -m unittest freight.site.test_verify_production_site -v
-      - name: Check live approved artwork, security and canonical pages
+      - name: Check live artwork, security, canonical pages and internal links
         run: python -m freight.site.verify_production_site
