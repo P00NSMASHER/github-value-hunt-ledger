@@ -419,3 +419,17 @@ def test_finding_id_alias_cannot_double_realized_money():
         ledger.apply(settlement(
             "settle-2", finding_id="f-1 ", source_hash="source-2",
         ))
+
+def test_incumbent_finding_id_alias_cannot_restore_fee_eligibility():
+    pop, truth_manifest = truth()
+    sealed = seal_incumbent_submission(pop, "incumbent-file-sha")
+
+    # Incumbent-preidentified findings are never fee eligible. A display alias
+    # must not evade that exclusion by missing the canonical truth identifier.
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        open_incumbent_output(
+            population=pop,
+            truth=truth_manifest,
+            submission=sealed,
+            finding_ids=["f-1 "],
+        )
