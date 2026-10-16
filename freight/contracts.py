@@ -471,8 +471,11 @@ def open_incumbent_output(
     normalized_ids = tuple(sorted(str(item) for item in finding_ids))
     if len(normalized_ids) != len(set(normalized_ids)):
         raise ValueError("duplicate incumbent finding_id")
+    truth_finding_ids = {finding.finding_id for finding in truth.findings}
     for finding_id in normalized_ids:
-        _require_text("finding_id", finding_id)
+        _require_canonical_identity("finding_id", finding_id)
+        if finding_id not in truth_finding_ids:
+            raise ValueError("incumbent finding_id is not in frozen truth")
 
     body = {
         "schema": 2,
@@ -587,8 +590,11 @@ def _verified_ledger_incumbent(truth: TruthManifest, incumbent: IncumbentOutput)
     _require_text("source_hash", incumbent.source_hash)
     if type(incumbent.finding_ids) not in (tuple, list):
         raise ValueError("incumbent finding_ids must be a sequence")
+    truth_finding_ids = {finding.finding_id for finding in truth.findings}
     for finding_id in incumbent.finding_ids:
-        _require_text("finding_id", finding_id)
+        _require_canonical_identity("finding_id", finding_id)
+        if finding_id not in truth_finding_ids:
+            raise ValueError("incumbent finding_id is not in frozen truth")
     finding_ids = tuple(sorted(incumbent.finding_ids))
     if len(finding_ids) != len(set(finding_ids)):
         raise ValueError("duplicate incumbent finding_id")
