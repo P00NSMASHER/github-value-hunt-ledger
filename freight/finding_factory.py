@@ -15,10 +15,10 @@ authority, but only a verified controlling rule can produce VALIDATED dollars.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
-import unicodedata
 
 from freight.contracts import (
     AuthorityRef,
