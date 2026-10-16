@@ -4,6 +4,7 @@ import hashlib
 from html.parser import HTMLParser
 import importlib.util
 import json
+import re
 from pathlib import Path
 import tempfile
 import unittest
@@ -124,15 +125,20 @@ class PublicBuildTests(unittest.TestCase):
         """Cloudflare must not inject /cdn-cgi/l/email-protection into public navigation."""
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
+            checked = 0
+            pattern = re.compile(
+                r'<a\b[^>]*\bhref="mailto:sales@freightfixture\.com[^"]*"[^>]*>.*?</a>',
+                re.IGNORECASE | re.DOTALL,
+            )
             for name in builder.PUBLIC_CONTACT_PAGES:
                 with self.subTest(name=name):
                     page = (output / name).read_text(encoding="utf-8")
-                    self.assertIn(
-                        '<!--email_off--><a data-contact-link href="mailto:sales@freightfixture.com',
-                        page,
-                    )
-                    self.assertIn('</a><!--/email_off-->', page)
                     self.assertNotIn("/cdn-cgi/l/email-protection", page)
+                    for match in pattern.finditer(page):
+                        checked += 1
+                        self.assertTrue(page[:match.start()].endswith("<!--email_off-->"))
+                        self.assertTrue(page[match.end():].startswith("<!--/email_off-->"))
+            self.assertGreaterEqual(checked, len(builder.PUBLIC_CONTACT_PAGES))
 
         untrusted = (
             '<a href="mailto:sales@freightfixture.com">Public business address</a>'
