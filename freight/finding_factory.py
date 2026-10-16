@@ -18,6 +18,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
+import unicodedata
 
 from freight.contracts import (
     AuthorityRef,
@@ -128,7 +129,13 @@ class FindingFactoryBatch:
 def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
-    return value.strip()
+    if value != value.strip():
+        raise ValueError(name + " must not have surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character) in {"Cc", "Cf", "Cs"} for character in value):
+        raise ValueError(name + " contains control characters")
+    return value
 
 
 def _cents(name: str, value: int, *, positive: bool = False) -> int:
