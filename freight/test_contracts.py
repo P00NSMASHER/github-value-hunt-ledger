@@ -407,8 +407,8 @@ def test_population_rejects_surrounding_whitespace_identity_alias(field, noncano
 @pytest.mark.parametrize(
     ("field", "noncanonical"),
     [
-        ("invoice_id", "inv-e\\u0301"),
-        ("shipment_id", "shp-e\\u0301"),
+        ("invoice_id", "inv-e\u0301"),
+        ("shipment_id", "shp-e\u0301"),
     ],
 )
 def test_population_rejects_noncanonical_unicode_identity_alias(field, noncanonical):
