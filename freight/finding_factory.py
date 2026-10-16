@@ -27,6 +27,7 @@ from freight.contracts import (
     VALIDATED,
     TruthManifest,
     canonical_hash,
+    freeze_population,
     freeze_truth,
     make_finding,
 )
@@ -338,6 +339,15 @@ def derive_batch(
     charges: Iterable[InvoiceCharge],
     rules: Iterable[ChargeRule],
 ) -> FindingFactoryBatch:
+    frozen_population = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if frozen_population != population:
+        raise ValueError("population proof or canonical ordering mismatch")
+
     normalized_charges = tuple(sorted(charges, key=lambda charge: charge.charge_id))
     if len({charge.charge_id for charge in normalized_charges}) != len(normalized_charges):
         raise ValueError("duplicate charge_id")
