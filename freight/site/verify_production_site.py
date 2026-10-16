@@ -10,6 +10,7 @@ import re
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
+from time import perf_counter
 
 from freight.site.internal_links import validate_live_links
 
@@ -116,8 +117,11 @@ def inspect_live_site() -> dict[str, object]:
         raise LiveAuditError("Production sitemap incomplete or duplicates URLs")
     if any(not x.startswith(CANONICAL) for x in locs):
         raise LiveAuditError("Sitemap advertises a noncanonical hostname")
+    html_get_timings_ms = []
     for url in locs:
+        started = perf_counter()
         code, _, contents = fetch(url)
+        html_get_timings_ms.append((round((perf_counter() - started) * 1000), url))
         if code != 200:
             raise LiveAuditError(f"Indexable public page failed: {url} (HTTP {code})")
         page = contents.decode("utf-8")
@@ -139,6 +143,12 @@ def inspect_live_site() -> dict[str, object]:
         "production": "verified",
         "pages": len(locs),
         "internal_links_checked": link_audit["destinations"],
+        # Observability only: do not fail releases on noisy single-run latency.
+        # Timings measure GET of public HTML, not browser LCP or Ahrefs load time.
+        "slowest_html_get_ms": [
+            {"url": url, "ms": milliseconds}
+            for milliseconds, url in sorted(html_get_timings_ms, reverse=True)[:3]
+        ],
         "internal_link_redirects": link_audit["redirected_destinations"],
         "approved_logo_hashes": "verified",
         "tls_redirects": "verified",
