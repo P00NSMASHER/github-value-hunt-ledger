@@ -217,5 +217,23 @@ class BrainReviewManifestTests(unittest.TestCase):
             cockpit.build_invoice_review_queue(forged, rows)
 
 
+    def test_export_disposition_rejects_forged_disposition_provenance(self):
+        item = self.queue((charge(), charge(charge_id="C2", shipment_id="LOAD-2"))).items[0]
+        original = cockpit.record_disposition(
+            item,
+            reviewer_id="synthetic-reviewer",
+            decision="NEED_EVIDENCE",
+            reason="Training example only; request invoice lineage",
+            decided_at="2026-10-13T00:00:00Z",
+        )
+        forged = replace(
+            original,
+            decision="CONFIRM",
+            reason="Forged disposition retained the old proof",
+        )
+        with self.assertRaisesRegex(ValueError, "disposition proof"):
+            cockpit.export_disposition(forged)
+
+
 if __name__ == "__main__":
     unittest.main()
