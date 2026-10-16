@@ -11,6 +11,8 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 
+from freight.site.internal_links import validate_live_links
+
 CANONICAL = "https://www.retallyrecovery.com/"
 APEX = "https://retallyrecovery.com/"
 MIN_HSTS_SECONDS = 86400
@@ -83,6 +85,8 @@ def inspect_live_site() -> dict[str, object]:
     ensure_security_headers(headers)
     html = homepage.decode("utf-8")
     ensure_html(html, CANONICAL)
+    link_pages = {CANONICAL: html}
+    known_good = {CANONICAL}
     for path in APPROVED_MEDIA:
         if path not in html:
             raise LiveAuditError(f"Approved artwork is missing from home HTML: {path}")
@@ -100,6 +104,8 @@ def inspect_live_site() -> dict[str, object]:
     if os_status != 200 or b"<html" not in os_body.lower():
         raise LiveAuditError("RecoveryOS public information page missing")
     ensure_security_headers(os_headers)
+    link_pages[CANONICAL + "recoveryos/"] = os_body.decode("utf-8")
+    known_good.add(CANONICAL + "recoveryos/")
 
     map_status, _, body = fetch(CANONICAL + "sitemap.xml")
     if map_status != 200:
@@ -114,7 +120,14 @@ def inspect_live_site() -> dict[str, object]:
         code, _, contents = fetch(url)
         if code != 200:
             raise LiveAuditError(f"Indexable public page failed: {url} (HTTP {code})")
-        ensure_html(contents.decode("utf-8"), url)
+        page = contents.decode("utf-8")
+        ensure_html(page, url)
+        link_pages[url] = page
+        known_good.add(url)
+
+    # Check all clickable first-party destinations, not only sitemap entries.
+    # Reuse already verified responses and never send contact form requests.
+    link_audit = validate_live_links(link_pages, fetch, known_good)
 
     # Online intake is deliberately disabled pending separate mailbox QA.
     # A 503 is acceptable; never attempt a POST or assert delivery.
@@ -125,6 +138,8 @@ def inspect_live_site() -> dict[str, object]:
     return {
         "production": "verified",
         "pages": len(locs),
+        "internal_links_checked": link_audit["destinations"],
+        "internal_link_redirects": link_audit["redirected_destinations"],
         "approved_logo_hashes": "verified",
         "tls_redirects": "verified",
         "hsts_nosniff_csp": "verified",
