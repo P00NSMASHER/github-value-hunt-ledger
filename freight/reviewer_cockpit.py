@@ -22,6 +22,8 @@ def _text(name: str, value: str) -> str:
         raise ValueError(f"{name} is required")
     if value != value.strip():
         raise ValueError(f"{name} must not have surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(f"{name} must use canonical Unicode (NFC)")
     if any(unicodedata.category(ch) in {"Cc", "Cf", "Cs"} for ch in value):
         raise ValueError(f"{name} contains control characters")
     return value
