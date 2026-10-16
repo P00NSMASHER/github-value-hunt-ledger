@@ -244,5 +244,43 @@ class BrainReviewManifestTests(unittest.TestCase):
             cockpit.export_disposition(forged)
 
 
+    def test_export_disposition_rejects_self_consistent_detached_case_hash(self):
+        item = cockpit.make_case(
+            case_id="case-1",
+            record_hash="record-hash",
+            amount_cents=0,
+            confidence_ppm=0,
+            novelty_ppm=0,
+            downstream_risk_ppm=0,
+            blocker_codes=("UNSCORED_REVIEW_ONLY", "NO_FINANCIAL_AUTHORITY"),
+            evidence_hashes=("evidence-hash",),
+        )
+        original = cockpit.record_disposition(
+            item,
+            reviewer_id="synthetic-reviewer",
+            decision="NEED_EVIDENCE",
+            reason="Training example only; request invoice lineage",
+            decided_at="2026-10-13T00:00:00Z",
+        )
+        forged_case_hash = "0" * 64
+        forged_body = {
+            "schema": 1,
+            "case_hash": forged_case_hash,
+            "reviewer_id": original.reviewer_id,
+            "decision": original.decision,
+            "reason": original.reason,
+            "decided_at": original.decided_at,
+            "corrected_expected_cents": original.corrected_expected_cents,
+            "rule_candidate": original.rule_candidate,
+        }
+        detached = replace(
+            original,
+            case_hash=forged_case_hash,
+            disposition_hash=canonical_hash(forged_body),
+        )
+        with self.assertRaisesRegex(ValueError, "case proof"):
+            cockpit.export_disposition(detached)
+
+
 if __name__ == "__main__":
     unittest.main()
