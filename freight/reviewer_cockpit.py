@@ -179,6 +179,9 @@ def record_disposition(
     corrected_expected_cents: int | None = None,
     rule_candidate: str | None = None,
 ) -> HumanDisposition:
+    # A human decision must bind to the canonical case fields represented by
+    # case_hash, including money, blockers, and evidence—not only the digest.
+    build_queue((case,))
     reviewer_id = _text("reviewer_id", reviewer_id)
     reason = _text("reason", reason)
     decision = _text("decision", decision).upper()
