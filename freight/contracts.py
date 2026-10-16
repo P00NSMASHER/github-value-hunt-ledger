@@ -212,8 +212,7 @@ def freeze_population(
         ):
             _require_text(name, getattr(row, name))
         for name in ("invoice_id", "shipment_id"):
-            if getattr(row, name) != getattr(row, name).strip():
-                raise ValueError(name + " must not contain surrounding whitespace")
+            _require_canonical_identity(name, getattr(row, name))
         if row.identity_key in seen:
             raise ValueError(f"duplicate population row: {row.row_key}")
         seen.add(row.identity_key)
