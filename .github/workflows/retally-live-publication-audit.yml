@@ -2,6 +2,11 @@ name: RETALLY Live Publication Audit
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'freight/site/**'
+      - 'recoveryworks/site/**'
+      - '.github/workflows/retally-live-publication-audit.yml'
   push:
     branches: [main]
     paths:
