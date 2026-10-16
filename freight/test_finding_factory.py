@@ -159,3 +159,23 @@ def test_batch_rejects_invoice_shipment_delimiter_alias():
     aliased = charge(invoice_id="inv", shipment_id="segment|shp-1")
     with pytest.raises(ValueError, match="outside frozen population"):
         derive_batch(pop, [aliased], [rule()])
+
+
+def test_validated_finding_rejects_ambiguous_rule_identity_text():
+    for field, bad in (
+        ("authority_document_id", " rate-confirmation-1"),
+        ("authority_document_id", "cafe\u0301"),
+        ("document_source_hash", "rate-source\u200b"),
+    ):
+        with pytest.raises(ValueError):
+            derive_charge(charge(), [rule(**{field: bad})])
+
+
+def test_validated_finding_rejects_ambiguous_charge_identity_text():
+    for field, bad in (
+        ("charge_id", " charge-1"),
+        ("invoice_id", "cafe\u0301"),
+        ("source_hash", "line-source\u200b"),
+    ):
+        with pytest.raises(ValueError):
+            derive_charge(charge(**{field: bad}), [rule()])
