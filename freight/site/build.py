@@ -233,6 +233,26 @@ def _embed_bubblav(page: str, asset: str) -> str:
 
 
 
+
+def _leave_published_business_email_links_unmodified_by_cloudflare(page: str, contact: str) -> str:
+    """Retain verified mailto hrefs instead of emitting Cloudflare's fake 404 link.
+
+    The zone-level Email Address Obfuscation remains enabled for all other email
+    addresses. Only the intentionally public, verified RETALLY business mailbox
+    is exempt, using Cloudflare's documented HTML comment boundary.
+    """
+    pattern = re.compile(
+        r'(<a\b[^>]*\bhref="mailto:' + re.escape(contact)
+        + r'[^"]*"[^>]*>.*?</a>)',
+        re.IGNORECASE | re.DOTALL,
+    )
+    return pattern.sub(
+        lambda match: "<!--email_off-->" + match.group(1) + "<!--/email_off-->",
+        page,
+    )
+
+
+
 def _public_source(name: str) -> Path:
     path = SOURCE
     for part in Path(name).parts:
@@ -368,6 +388,13 @@ def build(
     for name in PUBLIC_CONTACT_PAGES:
         text_bundle[name] = _embed_bubblav(text_bundle[name], name)
     text_bundle["_headers"] = _allow_bubblav(text_bundle["_headers"], "_headers")
+    # Cloudflare's edge-side Email Address Obfuscation otherwise rewrites each
+    # verified public mailto href into /cdn-cgi/l/email-protection, which
+    # returns HTTP 404 to crawlers. Keep the rest of the zone protected.
+    for name in PUBLIC_CONTACT_PAGES:
+        text_bundle[name] = _leave_published_business_email_links_unmodified_by_cloudflare(
+            text_bundle[name], safe_contact
+        )
 
     # Fail closed before publishing any source text containing the removed private contact.
     # Log only the filename, never the discovered private value.
