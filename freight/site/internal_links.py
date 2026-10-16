@@ -6,12 +6,20 @@ party sites, customer APIs, contact forms, or credentials are ever made.
 from __future__ import annotations
 
 from html.parser import HTMLParser
+import re
 from pathlib import Path
 from urllib.parse import unquote, urljoin, urlsplit, urlunsplit
 
 CANONICAL = "https://www.retallyrecovery.com/"
 HOSTS = frozenset({"www.retallyrecovery.com", "retallyrecovery.com"})
 REDIRECT_CODES = frozenset({301, 302, 303, 307, 308})
+
+# The verified public sales inbox must not be rewritten into Cloudflare's
+# /cdn-cgi/l/email-protection (a non-page returning HTTP 404).
+_BUSINESS_MAILTO_ANCHOR = re.compile(
+    r'<a\b[^>]*\bhref="mailto:jay@retallyrecovery\.com[^"]*"[^>]*>.*?</a>',
+    re.IGNORECASE | re.DOTALL,
+)
 
 
 class InternalLinkError(AssertionError):
@@ -86,7 +94,14 @@ def validate_bundle_links(root: Path) -> dict[str, int]:
         if source.is_symlink():
             raise InternalLinkError(f"Symlinked HTML page: {source.relative_to(root)}")
         url = _published_url(source.relative_to(root))
-        for target in internal_destinations(source.read_text(encoding="utf-8"), url):
+        html = source.read_text(encoding="utf-8")
+        for match in _BUSINESS_MAILTO_ANCHOR.finditer(html):
+            if (not html[:match.start()].endswith("<!--email_off-->")
+                    or not html[match.end():].startswith("<!--/email_off-->")):
+                raise InternalLinkError(
+                    f"Unprotected business mailto creates Cloudflare 404: {url}"
+                )
+        for target in internal_destinations(html, url):
             parts = urlsplit(target)
             if parts.scheme != "https" or parts.netloc != "www.retallyrecovery.com":
                 raise InternalLinkError(f"Noncanonical internal link: {url} -> {target}")
