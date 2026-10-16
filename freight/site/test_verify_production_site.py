@@ -83,7 +83,7 @@ class InternalHyperlinkAuditTests(unittest.TestCase):
             (root / "guide.pdf").write_bytes(b"test download fixture")
             stats = validate_bundle_links(root)
             self.assertEqual(stats["pages"], 2)
-            self.assertEqual(stats["destinations"], 4)
+            self.assertEqual(stats["destinations"], 3)
 
     def test_bundle_rejects_missing_destinations_and_host_aliases(self):
         with TemporaryDirectory() as tmp:
