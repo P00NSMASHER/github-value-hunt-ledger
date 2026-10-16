@@ -217,6 +217,48 @@ def record_disposition(
 
 
 def export_disposition(disposition: HumanDisposition) -> dict:
+    """Export only a disposition whose fields still match its content proof."""
+    if type(disposition) is not HumanDisposition:
+        raise ValueError("disposition must be a HumanDisposition")
+    case_hash = _text("case_hash", disposition.case_hash)
+    reviewer_id = _text("reviewer_id", disposition.reviewer_id)
+    reason = _text("reason", disposition.reason)
+    decision = _text("decision", disposition.decision).upper()
+    if decision not in DECISIONS:
+        raise ValueError("unsupported review decision")
+    decided_at = _timestamp("decided_at", disposition.decided_at)
+    corrected_expected_cents = disposition.corrected_expected_cents
+    if corrected_expected_cents is not None:
+        corrected_expected_cents = _cents(
+            "corrected_expected_cents", corrected_expected_cents
+        )
+    rule_candidate = disposition.rule_candidate
+    if decision == "MODIFY_RULE":
+        rule_candidate = _text("rule_candidate", rule_candidate)
+    elif rule_candidate is not None:
+        rule_candidate = _text("rule_candidate", rule_candidate)
+    body = {
+        "schema": 1,
+        "case_hash": case_hash,
+        "reviewer_id": reviewer_id,
+        "decision": decision,
+        "reason": reason,
+        "decided_at": decided_at,
+        "corrected_expected_cents": corrected_expected_cents,
+        "rule_candidate": rule_candidate,
+    }
+    expected = HumanDisposition(
+        case_hash=case_hash,
+        reviewer_id=reviewer_id,
+        decision=decision,
+        reason=reason,
+        decided_at=decided_at,
+        corrected_expected_cents=corrected_expected_cents,
+        rule_candidate=rule_candidate,
+        disposition_hash=canonical_hash(body),
+    )
+    if expected != disposition:
+        raise ValueError("disposition proof or canonical representation mismatch")
     return asdict(disposition)
 
 
