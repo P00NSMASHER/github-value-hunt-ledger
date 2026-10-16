@@ -170,3 +170,10 @@ def test_validated_finding_rejects_whitespace_aliased_rule_identity():
 def test_validated_finding_rejects_whitespace_aliased_charge_identity():
     with pytest.raises(ValueError, match="surrounding whitespace"):
         derive_charge(charge(charge_id=" charge-1"), [rule()])
+
+
+def test_batch_rejects_canonically_equivalent_charge_id_aliases():
+    composed = charge(charge_id="charge-é")
+    decomposed = charge(charge_id="charge-é", source_hash="line-source-2")
+    with pytest.raises(ValueError, match="canonical Unicode"):
+        derive_batch(population(), [composed, decomposed], [rule()])
