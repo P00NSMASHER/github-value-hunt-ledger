@@ -350,3 +350,17 @@ def test_clean_truth_manifest_is_valid_and_deterministic():
     assert a.findings == ()
     assert a.authorities == ()
     assert a.truth_hash == b.truth_hash
+
+
+
+def test_population_membership_rejects_delimiter_alias():
+    pop = population([row("inv|segment", "shipment")])
+    aliased = finding(invoice_id="inv", shipment_id="segment|shipment")
+    try:
+        freeze_truth(pop, [authority()], [aliased])
+    except ValueError as exc:
+        assert "outside frozen population" in str(exc)
+    else:
+        raise AssertionError(
+            "invoice/shipment delimiter alias must not satisfy population membership"
+        )
