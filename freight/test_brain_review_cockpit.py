@@ -160,6 +160,21 @@ class BrainReviewCockpitTests(unittest.TestCase):
             with self.subTest(field=field), self.assertRaises(ValueError):
                 cockpit.make_case(**{**valid, field: value})
 
+    def test_case_identity_text_rejects_noncanonical_unicode(self):
+        common = {
+            "record_hash": "record-hash",
+            "amount_cents": 0,
+            "confidence_ppm": 0,
+            "novelty_ppm": 0,
+            "downstream_risk_ppm": 0,
+            "blocker_codes": ("REVIEW",),
+            "evidence_hashes": ("evidence-hash",),
+        }
+        composed = cockpit.make_case(case_id="caf\u00e9", **common)
+        self.assertEqual(composed.case_id, "caf\u00e9")
+        with self.assertRaisesRegex(ValueError, "canonical Unicode"):
+            cockpit.make_case(case_id="cafe\u0301", **common)
+
     def test_disposition_reviewer_identity_rejects_ambiguous_text(self):
         item = self.queue((charge(), charge(charge_id="C2", shipment_id="LOAD-2"))).items[0]
 
