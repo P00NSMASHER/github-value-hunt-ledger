@@ -120,6 +120,37 @@ class PublicBuildTests(unittest.TestCase):
                 with tempfile.TemporaryDirectory() as temporary, self.assertRaises(ValueError):
                     build(Path(temporary) / "public", email=email, contact_verified=verified)
 
+    def test_only_verified_public_business_mailto_links_are_exempt_from_cloudflare(self):
+        """Cloudflare must not inject /cdn-cgi/l/email-protection into public navigation."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(name=name):
+                    page = (output / name).read_text(encoding="utf-8")
+                    self.assertIn(
+                        '<!--email_off--><a data-contact-link href="mailto:sales@freightfixture.com',
+                        page,
+                    )
+                    self.assertIn('</a><!--/email_off-->', page)
+                    self.assertNotIn("/cdn-cgi/l/email-protection", page)
+
+        untrusted = (
+            '<a href="mailto:sales@freightfixture.com">Public business address</a>'
+            '<a href="mailto:private@example.net">Private address</a>'
+        )
+        transformed = builder._leave_published_business_email_links_unmodified_by_cloudflare(
+            untrusted, "sales@freightfixture.com"
+        )
+        self.assertEqual(transformed.count("<!--email_off-->"), 1)
+        self.assertIn(
+            '<a href="mailto:private@example.net">Private address</a>',
+            transformed,
+        )
+        self.assertNotIn(
+            '<!--email_off--><a href="mailto:private@example.net"',
+            transformed,
+        )
+
     def test_contingency_rate_is_validated_and_configurable(self):
         for invalid in ("", "0", "1", "-0.1", "nan"):
             with self.subTest(rate=invalid):
