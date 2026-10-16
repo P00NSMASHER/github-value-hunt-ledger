@@ -402,3 +402,20 @@ def test_population_rejects_surrounding_whitespace_identity_alias(field, noncano
     aliased = replace(original, **{field: noncanonical})
     with pytest.raises(ValueError, match="surrounding whitespace"):
         freeze_population(BUYER, BU, "current invoices", [original, aliased])
+
+
+def test_finding_id_alias_cannot_double_realized_money():
+    pop = population()
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        truth_manifest = freeze_truth(
+            pop,
+            [authority()],
+            [finding("f-1"), finding("f-1 ")],
+        )
+        ledger = RecoveryLedger(truth_manifest)
+        ledger.apply(settlement(
+            "settle-1", finding_id="f-1", source_hash="source-1",
+        ))
+        ledger.apply(settlement(
+            "settle-2", finding_id="f-1 ", source_hash="source-2",
+        ))
