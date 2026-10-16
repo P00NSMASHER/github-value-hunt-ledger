@@ -216,10 +216,18 @@ def record_disposition(
     )
 
 
-def export_disposition(disposition: HumanDisposition) -> dict:
-    """Export only a disposition whose fields still match its content proof."""
+def export_disposition(
+    disposition: HumanDisposition,
+    case: ReviewCase | None = None,
+) -> dict:
+    """Export a disposition only with its canonical reviewed-case proof."""
     if type(disposition) is not HumanDisposition:
         raise ValueError("disposition must be a HumanDisposition")
+    if case is None:
+        raise ValueError("canonical case proof is required")
+    build_queue((case,))
+    if disposition.case_hash != case.case_hash:
+        raise ValueError("disposition case proof mismatch")
     case_hash = _text("case_hash", disposition.case_hash)
     reviewer_id = _text("reviewer_id", disposition.reviewer_id)
     reason = _text("reason", disposition.reason)

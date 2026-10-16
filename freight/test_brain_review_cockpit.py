@@ -102,7 +102,7 @@ class BrainReviewCockpitTests(unittest.TestCase):
             decision="NEED_EVIDENCE", reason="Training example only; request invoice lineage",
             decided_at="2026-10-13T00:00:00Z")
         self.assertEqual(disposition.case_hash, item.case_hash)
-        self.assertEqual(cockpit.export_disposition(disposition)["decision"], "NEED_EVIDENCE")
+        self.assertEqual(cockpit.export_disposition(disposition, item)["decision"], "NEED_EVIDENCE")
         self.assertEqual(item.amount_cents, 0)
 
     def test_record_disposition_rejects_forged_case_provenance(self):
@@ -241,7 +241,7 @@ class BrainReviewManifestTests(unittest.TestCase):
             reason="Forged disposition retained the old proof",
         )
         with self.assertRaisesRegex(ValueError, "disposition proof"):
-            cockpit.export_disposition(forged)
+            cockpit.export_disposition(forged, item)
 
 
     def test_export_disposition_rejects_self_consistent_detached_case_hash(self):
