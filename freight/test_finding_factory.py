@@ -175,5 +175,6 @@ def test_validated_finding_rejects_whitespace_aliased_charge_identity():
 def test_batch_rejects_canonically_equivalent_charge_id_aliases():
     composed = charge(charge_id="charge-é")
     decomposed = charge(charge_id="charge-é", source_hash="line-source-2")
+    assert derive_batch(population(), [composed], [rule()]).validated_count == 1
     with pytest.raises(ValueError, match="canonical Unicode"):
         derive_batch(population(), [composed, decomposed], [rule()])

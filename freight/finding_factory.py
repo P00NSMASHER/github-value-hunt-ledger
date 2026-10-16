@@ -15,6 +15,7 @@ authority, but only a verified controlling rule can produce VALIDATED dollars.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
@@ -133,6 +134,15 @@ def _text(name: str, value: str) -> str:
     return value
 
 
+def _identity(name: str, value: str) -> str:
+    text = _text(name, value)
+    if unicodedata.normalize("NFC", text) != text:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character).startswith("C") for character in text):
+        raise ValueError(name + " contains control characters")
+    return text
+
+
 def _cents(name: str, value: int, *, positive: bool = False) -> int:
     lower = 1 if positive else 0
     if type(value) is not int or not lower <= value <= MAX_CENTS:
@@ -152,9 +162,10 @@ def _iso_date(name: str, value: str) -> date:
 def _validate_charge(charge: InvoiceCharge) -> date:
     for name in (
         "buyer_id", "business_unit", "invoice_id", "shipment_id", "customer_id",
-        "carrier_id", "currency", "charge_id", "charge_code", "source_hash",
+        "carrier_id", "currency", "charge_code", "source_hash",
     ):
         _text(name, getattr(charge, name))
+    _identity("charge_id", charge.charge_id)
     if type(charge.quantity_units) is not int or charge.quantity_units <= 0:
         raise ValueError("quantity_units must be a positive integer")
     _cents("billed_cents", charge.billed_cents)
