@@ -218,7 +218,16 @@ class BrainReviewManifestTests(unittest.TestCase):
 
 
     def test_export_disposition_rejects_forged_disposition_provenance(self):
-        item = self.queue((charge(), charge(charge_id="C2", shipment_id="LOAD-2"))).items[0]
+        item = cockpit.make_case(
+            case_id="case-1",
+            record_hash="record-hash",
+            amount_cents=0,
+            confidence_ppm=0,
+            novelty_ppm=0,
+            downstream_risk_ppm=0,
+            blocker_codes=("UNSCORED_REVIEW_ONLY", "NO_FINANCIAL_AUTHORITY"),
+            evidence_hashes=("evidence-hash",),
+        )
         original = cockpit.record_disposition(
             item,
             reviewer_id="synthetic-reviewer",
