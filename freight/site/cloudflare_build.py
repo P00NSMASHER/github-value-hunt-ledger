@@ -14,6 +14,7 @@ from freight.site.build import PUBLIC_FILES as FREIGHT_PUBLIC_FILES, build as bu
 from freight.site.rebase_public_urls import OLD_BASE, rebase, validate_cloudflare_seo
 from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, SITE_DIR as RECOVERY_SOURCE, build as build_recoveryos
 from freight.site.asset_integrity import validate_recoveryos_media
+from freight.site.internal_links import validate_bundle_links
 
 REPO = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO / "cf-retally-public"
@@ -75,6 +76,7 @@ def build(output: Path = OUTPUT_DIR) -> Path:
         shutil.copytree(root / "recoveryos", bundle / "recoveryos")
         rewrites = rebase(bundle)
         validated_sitemap_urls = validate_cloudflare_seo(bundle)
+        validate_bundle_links(bundle)
         if validated_sitemap_urls < 1:
             raise RuntimeError("Production sitemap cannot be empty")
         published = [path for path in bundle.rglob("*") if path.is_file()]
