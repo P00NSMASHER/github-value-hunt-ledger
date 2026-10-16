@@ -1,3 +1,5 @@
+import pytest
+
 from freight.contracts import (
     AuthorityRef,
     PopulationRow,
@@ -275,6 +277,14 @@ def test_duplicate_settlement_source_cannot_be_double_counted():
         assert "source already consumed" in str(exc)
     else:
         raise AssertionError("same settlement source cannot be reused")
+
+
+def test_settlement_source_identity_rejects_surrounding_whitespace_alias():
+    _, truth_manifest = truth()
+    ledger = RecoveryLedger(truth_manifest)
+    ledger.apply(settlement("settle-1", amount=1250, source_hash="source-hash-1"))
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        ledger.apply(settlement("settle-2", amount=1250, source_hash="source-hash-1 "))
 
 
 def test_partial_settlements_cap_at_validated_variance():
