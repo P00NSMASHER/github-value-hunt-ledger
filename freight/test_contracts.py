@@ -447,3 +447,36 @@ def test_incumbent_finding_id_alias_cannot_restore_fee_eligibility():
             submission=sealed,
             finding_ids=["f-1 "],
         )
+
+
+def test_ambiguous_settlement_evidence_cannot_be_replayed_as_realized_money():
+    _, truth_manifest = truth()
+    ledger = RecoveryLedger(truth_manifest)
+    first = ledger.apply(settlement(
+        "settle-ambiguous",
+        amount=2500,
+        source_hash="ambiguous-source-1",
+        ambiguous_allocation=True,
+    ))
+    assert first.allocated_cents == 0
+    assert first.fee_eligible_cents == 0
+
+    # A fail-closed ambiguity decision must remain in the audit trail. Reusing
+    # either identity with no new evidence cannot silently turn it into money.
+    with pytest.raises(ValueError, match="duplicate settlement_id"):
+        ledger.apply(settlement(
+            "settle-ambiguous",
+            amount=2500,
+            source_hash="new-source-2",
+        ))
+    with pytest.raises(ValueError, match="source already consumed"):
+        ledger.apply(settlement(
+            "settle-resubmitted",
+            amount=2500,
+            source_hash="ambiguous-source-1",
+        ))
+
+    certificate = ledger.certificate("f-1")
+    assert certificate.realized_cents == 0
+    assert certificate.fee_eligible_cents == 0
+    assert certificate.settlement_proof_hashes == (first.proof_hash,)
