@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from freight.contracts import (
@@ -110,6 +112,18 @@ def settlement(
         source_hash=source_hash,
         **kwargs,
     )
+
+
+
+def test_truth_rejects_forged_population_manifest_digest():
+    pop = population()
+    forged = replace(pop, manifest_hash="0" * 64)
+
+    with pytest.raises(
+        ValueError,
+        match="population proof or canonical ordering mismatch",
+    ):
+        freeze_truth(forged, [authority()], [finding()])
 
 
 def test_population_hash_is_order_independent():
