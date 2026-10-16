@@ -96,6 +96,18 @@ class InternalHyperlinkAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(InternalLinkError, "Noncanonical internal link"):
                 validate_bundle_links(root)
 
+    def test_bundle_rejects_business_mailto_without_cloudflare_exemption(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            html = '<a href="mailto:jay@retallyrecovery.com">Business contact</a>'
+            (root / "index.html").write_text(html)
+            with self.assertRaisesRegex(InternalLinkError, "Cloudflare 404"):
+                validate_bundle_links(root)
+            (root / "index.html").write_text(
+                "<!--email_off-->" + html + "<!--/email_off-->"
+            )
+            self.assertEqual(validate_bundle_links(root)["pages"], 1)
+
     def test_live_links_reuse_sitemap_checks_and_fetch_unique_destinations(self):
         calls = []
         about = CANONICAL + "about"
