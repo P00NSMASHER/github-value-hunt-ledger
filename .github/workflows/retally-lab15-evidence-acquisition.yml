@@ -67,6 +67,20 @@ jobs:
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.11"
+      - name: Switch to isolated research ledger, without modifying main
+        shell: bash
+        env:
+          EVIDENCE_BRANCH: research/retally-lab15-source-ledger
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if git ls-remote --exit-code --heads origin "$EVIDENCE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "refs/heads/$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
+            git switch -c "$EVIDENCE_BRANCH" --track "origin/$EVIDENCE_BRANCH"
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' merge --no-edit origin/main
+          else
+            git switch -c "$EVIDENCE_BRANCH" origin/main
+          fi
       - name: Acquire bounded public evidence metadata
         env:
           RETALLY_LAB15_PUBLIC_FETCH_ENABLED: "1"
@@ -93,20 +107,29 @@ jobs:
           assert all(not r['recovery_verified'] for r in d['records'])
           print('Public metadata only; no third-party invoice bytes or financial claims admitted')
           PY
-      - name: Commit new verified-source pointers, not raw invoices
+      - name: Commit metadata to isolated research branch only
+        shell: bash
+        env:
+          EVIDENCE_BRANCH: research/retally-lab15-source-ledger
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- freight/lab15/evidence_ledger.json freight/lab15/triage_queue.json
-          if git diff --cached --quiet; then
+          if ! git diff --cached --quiet; then
+            git commit -m "automation: Lab 15 public source index and triage refresh"
+          else
             echo "No new source pointers or source version changes"
-            exit 0
           fi
-          git commit -m "automation: Lab 15 source index and triage refresh"
-          git pull --rebase origin main
-          # Never publish a queue calculated against a stale source ledger.
-          python -m freight.lab15_triage --out /tmp/retally-lab15-post-rebase-queue.json
-          cmp freight/lab15/triage_queue.json /tmp/retally-lab15-post-rebase-queue.json
+          # Fail closed if the queue no longer matches the exact ledger contents.
+          python -m freight.lab15_triage --out /tmp/retally-lab15-pre-push-queue.json
+          cmp freight/lab15/triage_queue.json /tmp/retally-lab15-pre-push-queue.json
           python -m unittest -q freight.test_lab15_acquisition freight.test_lab15_triage
-          git push origin HEAD:main
+          # Non-force push: refuse to overwrite an independent update.
+          if git ls-remote --exit-code --heads origin "$EVIDENCE_BRANCH" >/dev/null 2>&1; then
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$EVIDENCE_BRANCH")" ]; then
+              git push origin "HEAD:refs/heads/$EVIDENCE_BRANCH"
+            fi
+          else
+            git push origin "HEAD:refs/heads/$EVIDENCE_BRANCH"
+          fi
