@@ -12,6 +12,11 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
 - New synthetic exemptions require independently reviewed source and data
   evidence, a new migration and tests. Broad `test` names, campaign tags or
   domain patterns must **never** silently classify customer leads as QA.
+- QA is excluded only from customer response timers, **not** from retention
+  obligations. The read-only monitor separately reports QA records older than
+  90 days and flags `SYNTHETIC_QA_RETENTION_REVIEW_REQUIRED` without deleting
+  the record or claiming a customer response. Apply the same hold and approved
+  case-purge checks to synthetic data and its provider copies.
 - The currently available Cloudflare Access application protects both
   `/api/internal/inquiry-case` and `/api/internal/inquiry-response` on
   `retallyrecovery.com` and `www.retallyrecovery.com`, preserving the existing

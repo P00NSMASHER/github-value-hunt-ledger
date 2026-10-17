@@ -60,7 +60,10 @@ export function readOnlyQueries(asOf) {
       "WHERE q.reference IS NULL" },
     { name:"qa_scope", sql:
       "SELECT (SELECT COUNT(*) FROM inquiries) AS raw_total, "+
-      "(SELECT COUNT(*) FROM inquiry_qa_registry) AS qa_total" },
+      "(SELECT COUNT(*) FROM inquiry_qa_registry) AS qa_total, "+
+      "(SELECT COUNT(*) FROM inquiry_qa_registry q "+
+      "JOIN inquiries i ON i.reference=q.reference "+
+      "WHERE i.accepted_at < "+retention+") AS aged_qa" },
     { name:"rate_limits", sql:
       "SELECT COUNT(*) AS expired_total FROM inquiry_limits WHERE expires_at < "+asOf }
   ];
@@ -132,12 +135,15 @@ export function reconcile(asOf, parts) {
   if(!Array.isArray(parts.qa_scope)||parts.qa_scope.length!==1)
     throw new Error("Missing QA classification counts; refuse false-zero lead monitor");
   const scope=parts.qa_scope[0];
-  onlyKeys(scope,["raw_total","qa_total"],"QA scope");
+  onlyKeys(scope,["raw_total","qa_total","aged_qa"],"QA scope");
   const raw_total=safeCount(scope.raw_total,"raw_total");
   const qa_total=safeCount(scope.qa_total,"qa_total");
-  if(qa_total>raw_total||raw_total!==notifications+qa_total)
+  const aged_qa=safeCount(scope.aged_qa,"aged_qa");
+  if(aged_qa>qa_total||qa_total>raw_total||raw_total!==notifications+qa_total)
     throw new Error("QA conservation violation: unclassified inquiries may be hidden");
   const alerts=[];
+  if(aged_qa>0)alerts.push({priority:"P1",code:"SYNTHETIC_QA_RETENTION_REVIEW_REQUIRED",
+    count:aged_qa,action:"A synthetic acceptance record has reached the retention review window. Keep it excluded from customer SLAs but separately inspect lawful retention, holds, evidence, and approved deletion; never auto-purge."});
   if(cases.unacknowledged>0)alerts.push({
     priority:cases.aged_unacknowledged>0?"P0":"P1",code:"UNACKNOWLEDGED_LEADS",
     count:cases.unacknowledged,action:"Assign signed, accountable reviewer; verify matching Zoho inbox reference; do not confuse message delivery with staff acknowledgment."});
@@ -174,6 +180,7 @@ export function reconcile(asOf, parts) {
     inquiry_total:notifications,
     raw_inquiry_total:raw_total,
     synthetic_qa_excluded:qa_total,
+    synthetic_qa_older_than_90_days:aged_qa,
     status_counts:counts,
     case_lifecycle:cases,
     retention:{over_90_days:aged_total,pending:aged_pending,provider_accepted:aged_provider,delivery_verified:aged_delivered},
