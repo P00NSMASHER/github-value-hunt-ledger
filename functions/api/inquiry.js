@@ -145,6 +145,14 @@ function validEnv(env) {
     typeof env.INQUIRY_NOTIFY_FROM === "string" &&
     /^[a-z0-9._+-]+@retallyrecovery\.com$/.test(env.INQUIRY_NOTIFY_FROM);
 }
+// A durable D1 receipt and a business-mail notification are separate facts.
+// Treat unknown provider states as pending, including on idempotent retries.
+function receipt(reference, notificationStatus, duplicate = false) {
+  return answer(202, {
+    ok: true, received: true, reference, duplicate,
+    notificationPending: !["provider_accepted", "delivery_verified"].includes(notificationStatus)
+  });
+}
 async function limitRequest(env, ip) {
   if (!ip) return false;
   const hour = Math.floor(Date.now() / 3600000);
@@ -242,10 +250,10 @@ export async function onRequestPost({ request, env }) {
   try {
     const db = env.INQUIRY_DB;
     const existing = await db.prepare(
-      "SELECT reference, fingerprint FROM inquiries WHERE idempotency_key=?"
+      "SELECT reference, fingerprint, notification_status FROM inquiries WHERE idempotency_key=?"
     ).bind(p.idempotencyKey).first();
     if (existing) return existing.fingerprint === fingerprint
-      ? answer(202, { ok: true, reference: existing.reference, received: true, duplicate: true })
+      ? receipt(existing.reference, existing.notification_status, true)
       : answer(409, { ok: false, error: "This request identifier was already used. Restart the form." });
     if (!await limitRequest(env, request.headers.get("CF-Connecting-IP"))) {
       return answer(429, { ok: false, error: "Please try again later or contact RETALLY by email." });
@@ -266,19 +274,24 @@ export async function onRequestPost({ request, env }) {
       }),now).run();
     if (!inserted.success) throw new Error("db_insert_failed");
     if (inserted.meta?.changes === 0) {
-      const duplicate = await db.prepare("SELECT reference,fingerprint FROM inquiries WHERE idempotency_key=?")
+      const duplicate = await db.prepare("SELECT reference,fingerprint,notification_status FROM inquiries WHERE idempotency_key=?")
         .bind(p.idempotencyKey).first();
       return duplicate?.fingerprint === fingerprint
-        ? answer(202, { ok: true, reference:duplicate.reference, received:true,duplicate:true })
+        ? receipt(duplicate.reference, duplicate.notification_status, true)
         : answer(409,{ok:false,error:"This request identifier was already used."});
     }
     // Durable acceptance is committed above. Notification is a separate, tracked state.
     let notified = false;
+    let notificationStatus = "pending";
     try { notified = await notify(env,reference,p); } catch (_) { /* pending for operator reconciliation */ }
     if (notified) {
       try {
-        await db.prepare("UPDATE inquiries SET notification_status='provider_accepted',notified_at=? WHERE reference=?")
+        const updated = await db.prepare("UPDATE inquiries SET notification_status='provider_accepted',notified_at=? WHERE reference=?")
           .bind(Math.floor(Date.now()/1000),reference).run();
+        // Never assert provider acceptance unless it was durably recorded.
+        if (updated?.success === true && (updated.meta?.changes === undefined || updated.meta.changes === 1)) {
+          notificationStatus = "provider_accepted";
+        }
       } catch (_) { /* durable inquiry is intact; reconciliation required */ }
     }
     // Incoming inquiries must never be purged as a side effect of accepting
@@ -290,7 +303,7 @@ export async function onRequestPost({ request, env }) {
       await db.prepare("DELETE FROM inquiry_limits WHERE expires_at < ?")
         .bind(now).run();
     } catch (_) { /* cleanup errors cannot roll back the saved inquiry */ }
-    return answer(202, { ok: true, received: true, reference });
+    return receipt(reference, notificationStatus);
   } catch (_) {
     // Never expose raw input, infrastructure details, tokens or stack traces.
     return answer(503, { ok: false, error: "We could not confirm receipt. Please use the email contact option." });
