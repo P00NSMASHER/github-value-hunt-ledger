@@ -275,6 +275,8 @@ def make_finding(
     ):
         _require_text(name, value)
     _require_canonical_identity("finding_id", finding_id)
+    if authority_id is not None:
+        _require_canonical_identity("authority_id", authority_id)
 
     if expected_cents < 0 or actual_cents < 0:
         raise ValueError("money values must be non-negative")
@@ -335,6 +337,7 @@ def freeze_truth(
             "source_hash",
         ):
             _require_text(name, getattr(authority, name))
+        _require_canonical_identity("authority_id", authority.authority_id)
         _require_scope(
             authority.buyer_id,
             authority.business_unit,
@@ -528,6 +531,7 @@ def _verified_ledger_truth(truth: TruthManifest) -> TruthManifest:
         for name in ("authority_id", "buyer_id", "business_unit", "customer_id",
                      "carrier_id", "currency", "source_hash"):
             _require_text(name, getattr(authority, name))
+        _require_canonical_identity("authority_id", authority.authority_id)
         _require_scope(authority.buyer_id, authority.business_unit,
                        truth.buyer_id, truth.business_unit, "authority")
         if authority.authority_id in authority_index:
@@ -545,7 +549,7 @@ def _verified_ledger_truth(truth: TruthManifest) -> TruthManifest:
         if type(finding.status) is not str:
             raise ValueError("status must be VALIDATED or REVIEW")
         if finding.authority_id is not None:
-            _require_text("authority_id", finding.authority_id)
+            _require_canonical_identity("authority_id", finding.authority_id)
         fields = asdict(finding)
         fields.pop("proof_hash")
         verified = make_finding(**fields)
