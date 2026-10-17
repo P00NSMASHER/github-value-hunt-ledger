@@ -278,8 +278,12 @@ def make_finding(
     if authority_id is not None:
         _require_canonical_identity("authority_id", authority_id)
 
-    if expected_cents < 0 or actual_cents < 0:
-        raise ValueError("money values must be non-negative")
+    for name, value in (
+        ("expected_cents", expected_cents),
+        ("actual_cents", actual_cents),
+    ):
+        if type(value) is not int or value < 0:
+            raise ValueError(name + " must be non-negative integer cents")
     if status not in {VALIDATED, REVIEW}:
         raise ValueError("status must be VALIDATED or REVIEW")
     if status == VALIDATED and not authority_id:
