@@ -24,6 +24,7 @@ def verify(site: Path, out: Path) -> dict:
         raise ValueError("Expected a complete, locally built RETALLY site")
     out.mkdir(parents=True, exist_ok=True)
     posts = []
+    receipt_state = {"notificationPending": False}
 
     def intercept(route):
         request = route.request
@@ -35,7 +36,7 @@ def verify(site: Path, out: Path) -> dict:
             if request.method == "POST":
                 posts.append(json.loads(request.post_data or "{}"))
                 return route.fulfill(status=202, content_type="application/json",
-                    body=json.dumps({"received": True, "reference": REFERENCE}))
+                    body=json.dumps({"received": True, "reference": REFERENCE, **receipt_state}))
             return route.abort()
         if url.hostname == HOST:
             path = unquote(url.path.lstrip("/")) or "index.html"
@@ -105,6 +106,44 @@ def verify(site: Path, out: Path) -> dict:
         }
         page.screenshot(path=str(out / "durable-receipt-390x844.jpg"),
             type="jpeg", quality=72, full_page=False)
+
+        # A second isolated run simulates the provider accepting no mail.
+        # The request is already durable: do not show the legacy "not sent"
+        # claim or strand the visitor with no staff-notification fallback.
+        receipt_state["notificationPending"] = True
+        page.reload(wait_until="load")
+        page.wait_for_function("""() => document.querySelector(
+            '#auditForm button[type="submit"]')?.textContent.includes('Submit My Free Audit Request')""")
+        page.locator("#fullName").fill("Synthetic Buyer")
+        page.locator("#workEmail").fill("buyer@example.invalid")
+        page.locator("#companyName").fill("TEST ONLY - NO CONTACT")
+        page.locator("#annualSpend").select_option(label="$250k–$1M")
+        page.locator('input[name="modes"][value="LTL"]').check()
+        page.evaluate("""() => {
+            const token = document.createElement('input');
+            token.name = 'cf-turnstile-response';
+            token.value = 'synthetic-token-not-verified';
+            document.querySelector('#auditForm').append(token);
+        }""")
+        page.locator("#auditForm button[type=submit]").click()
+        ready.wait_for(state="visible", timeout=15000)
+        send_href = page.locator("#sendAuditRequest").get_attribute("href") or ""
+        report["pendingNotification"] = {
+            "savedHeading": ready.locator("h3").inner_text() ==
+                "Your request is saved. Please notify RETALLY by email.",
+            "referenceShown": REFERENCE in ready.inner_text(),
+            "sameReferenceInEmail": send_href.startswith(
+                "mailto:" + page.locator('meta[name="freight-contact-email"]').get_attribute("content") + "?"
+            ) and REFERENCE in send_href,
+            "staffEmailButtonVisible": page.locator("#sendAuditRequest").is_visible(),
+            "copySummaryAvailable": page.locator("#copyAuditSummary").is_visible(),
+            "legacyNotSentHidden": "Your request has not been sent yet" not in ready.inner_text(),
+            "formHidden": not page.locator("#auditForm").is_visible(),
+            "secondRequestRecorded": len(posts) == 2,
+            "noPageErrors": not errors,
+        }
+        page.screenshot(path=str(out / "pending-notification-390x844.jpg"),
+            type="jpeg", quality=72, full_page=False)
         context.close()
         browser.close()
 
@@ -115,7 +154,8 @@ def verify(site: Path, out: Path) -> dict:
             or report["durableHeading"] != "RETALLY has received your request."
             or not report["referenceShown"] or not report["formHidden"]
             or not all(report["mailOnlyControlsHidden"].values())
-            or not report["noResendInstruction"] or report["pageErrors"]):
+            or not report["noResendInstruction"] or report["pageErrors"]
+            or not all(report["pendingNotification"].values())):
         raise AssertionError("Durable receipt browser acceptance failed: " + json.dumps(report))
     return report
 

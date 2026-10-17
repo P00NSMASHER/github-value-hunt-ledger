@@ -454,14 +454,19 @@ class PublicBuildTests(unittest.TestCase):
             ):
                 self.assertNotIn(network_or_storage_api, script)
 
-    def test_durable_receipt_hides_mail_only_actions(self):
-        """An accepted online request must not invite an email re-submission."""
+    def test_durable_receipt_handles_provider_ack_and_pending_state(self):
+        """Only unnotified saved requests may offer an optional staff email alert."""
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
             script = (output / "site.js").read_text(encoding="utf-8")
             page = (output / "index.html").read_text(encoding="utf-8")
             receipt = script.split('if (!response.ok || !result.received', 1)[1].split('} catch (error)', 1)[0]
-            self.assertIn('ready.querySelector(".eyebrow").textContent = "Request received"', receipt)
+            self.assertIn('const notificationPending = result.notificationPending !== false;', receipt)
+            self.assertIn('ready.querySelector(".eyebrow").textContent = notificationPending', receipt)
+            self.assertIn('if (notificationPending) {', receipt)
+            self.assertIn("preparedSummary = buildSummary(result.reference);", receipt)
+            self.assertIn("sendLink.hidden = false;", receipt)
+            self.assertIn('deliveryConfirmed: false', receipt)
             self.assertIn('["sendAuditRequest", "editAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]', receipt)
             self.assertIn("if (emailOnly) emailOnly.hidden = true;", receipt)
             self.assertIn('ready.querySelector(".audit-manual-fallback")', receipt)
