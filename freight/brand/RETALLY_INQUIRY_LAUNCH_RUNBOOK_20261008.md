@@ -1,5 +1,7 @@
 # RETALLY | Cloudflare inquiry launch and recovery runbook
 
+> **Historical reference only (October 8).** Cloudflare Email Sending was unavailable without a paid plan. The current draft implementation in PR #466 uses Resend's verified `notify.retallyrecovery.com` subdomain with the encrypted `RESEND_API_KEY` on Cloudflare Pages. Follow `freight/site/INQUIRY_PRODUCTION_READINESS.md` for the current activation checklist. This older runbook's Cloudflare Email Sending token and permissive historical purge instructions are **not** authorization to configure a provider or erase cases. Public direct submissions remain disabled pending independent Resend-to-Zoho delivery proof.
+
 **Status on 2026-10-08: NOT ACTIVATED.** The existing browser-created email draft remains the public contact route. Merging this implementation must not claim successful receipt or automatically replace mailto.
 
 ## Installed infrastructure
