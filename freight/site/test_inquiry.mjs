@@ -18,7 +18,7 @@ function env(db) {return {
   INQUIRY_RATE_SECRET:"salt",CLOUDFLARE_ACCOUNT_ID:"test-account",CLOUDFLARE_EMAIL_API_TOKEN:"test-token",
   INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_NOTIFY_FROM:"jay@retallyrecovery.com",INQUIRY_DB:db
 };}
-function mockDb({failInsert=false}={}) {
+function mockDb({failInsert=false,failNotificationUpdate=false}={}) {
   const inquiries=new Map(),limits=new Map(),sqlCalls=[];
   return {inquiries,limits,sqlCalls,
     prepare(sql) {sqlCalls.push(sql);return { bind(...params) {return {
@@ -39,6 +39,7 @@ function mockDb({failInsert=false}={}) {
           return {success:true,meta:{changes:1}};
         }
         if(sql.startsWith("UPDATE inquiries")) {
+          if(failNotificationUpdate) throw Error("Simulated notification status write failure");
           for(const r of inquiries.values()) if(r.reference===params[1])r.notification_status="provider_accepted";
           return {success:true};
         }
@@ -161,10 +162,13 @@ test("server stores once and notifies at most once for a duplicate retry", async
     assert.equal(first.status,202);
     const body=await first.json();
     assert.equal(body.received,true);
+    assert.equal(body.notificationPending,false);
     assert.match(body.reference,/^RA-\d{8}-[A-F0-9]{8}$/);
     const again=await onRequestPost({request:request(),env:e});
     assert.equal(again.status,202);
-    assert.equal((await again.json()).reference,body.reference);
+    const duplicate=await again.json();
+    assert.equal(duplicate.reference,body.reference);
+    assert.equal(duplicate.notificationPending,false);
     assert.equal(e.INQUIRY_DB.inquiries.size,1);
     assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"provider_accepted");
     assert.equal(remote.verifications,1);
@@ -197,6 +201,9 @@ test("provider acknowledgement must explicitly name the intended RETALLY recipie
       const e=env(db);
       const response=await onRequestPost({request:request(),env:e});
       assert.equal(response.status,202,label+": durable acceptance should not depend on email");
+      const receipt=await response.json();
+      assert.equal(receipt.received,true,label);
+      assert.equal(receipt.notificationPending,expected!=="provider_accepted",label);
       assert.equal(db.inquiries.size,1,label);
       assert.equal([...db.inquiries.values()][0].notification_status,expected,label);
       assert.equal(remote.notifications,1,label);
@@ -230,7 +237,27 @@ test("email provider failure leaves a durable pending record for operator reconc
     const e=env(mockDb());
     const r=await onRequestPost({request:request(),env:e});
     assert.equal(r.status,202);
+    assert.equal((await r.json()).notificationPending,true);
     assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
+    const duplicate=await onRequestPost({request:request(),env:e});
+    assert.equal((await duplicate.json()).notificationPending,true);
+    assert.equal(remote.notifications,1,"a duplicate never resends an uncertain notification");
+  } finally {remote.restore();}
+});
+
+test("an uncommitted provider-status update must not masquerade as a staff notification", async () => {
+  const remote=mockRemote({delivery:"delivered"});
+  try {
+    const e=env(mockDb({failNotificationUpdate:true}));
+    const r=await onRequestPost({request:request(),env:e});
+    assert.equal(r.status,202);
+    const receipt=await r.json();
+    assert.equal(receipt.received,true);
+    assert.equal(receipt.notificationPending,true);
+    assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
+    const duplicate=await onRequestPost({request:request(),env:e});
+    assert.equal((await duplicate.json()).notificationPending,true);
+    assert.equal(remote.notifications,1,"never automatically resend after an ambiguous first attempt");
   } finally {remote.restore();}
 });
 test("burst attempts limited to five per hour and no notification on rejected request", async () => {
