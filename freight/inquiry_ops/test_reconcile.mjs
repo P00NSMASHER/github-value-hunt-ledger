@@ -10,7 +10,7 @@ const empty=()=>({
   retention_review:[{aged_total:0,aged_pending:0,aged_provider:0,aged_delivered:0}],
   rate_limits:[{expired_total:0}],
   get qa_scope(){
-    return [{raw_total:this.notification_aging.reduce((n,r)=>n+Number(r.total||0),0),qa_total:0}];
+    return [{raw_total:this.notification_aging.reduce((n,r)=>n+Number(r.total||0),0),qa_total:0,aged_qa:0}];
   },
   get case_lifecycle(){
     const n=this.notification_aging.reduce((sum,x)=>sum+Number(x.total||0),0);
@@ -192,7 +192,7 @@ test("an incomplete or internally inconsistent case aggregate cannot be shown as
 
 test("a known synthetic receipt is reconciled separately, not represented as a failed customer response",()=>{
  const p=empty();
- Object.defineProperty(p,"qa_scope",{value:[{raw_total:1,qa_total:1}],configurable:true});
+ Object.defineProperty(p,"qa_scope",{value:[{raw_total:1,qa_total:1,aged_qa:0}],configurable:true});
  const result=reconcile(TIME,p);
  assert.equal(result.raw_inquiry_total,1);
  assert.equal(result.synthetic_qa_excluded,1);
@@ -200,12 +200,13 @@ test("a known synthetic receipt is reconciled separately, not represented as a f
  assert.ok(!result.alerts.some(a=>a.code==="UNACKNOWLEDGED_LEADS"));
 });
 test("an alleged QA exclusion cannot conceal an unaccounted real lead",()=>{
- const p=empty();Object.defineProperty(p,"qa_scope",{value:[{raw_total:2,qa_total:1}],configurable:true});
+ const p=empty();Object.defineProperty(p,"qa_scope",{value:[{raw_total:2,qa_total:1,aged_qa:0}],configurable:true});
  assert.throws(()=>reconcile(TIME,p),/QA conservation/);
 });
 test("unexpected QA count schema, missing QA scope and negative count all fail closed",()=>{
- for(const row of [{raw_total:1,qa_total:-1},{raw_total:1,qa_total:2},
-   {raw_total:0,qa_total:0,work_email:"hidden@example.invalid"}]){
+ for(const row of [{raw_total:1,qa_total:-1,aged_qa:0},{raw_total:1,qa_total:2,aged_qa:0},
+   {raw_total:0,qa_total:0,aged_qa:0,work_email:"hidden@example.invalid"},
+   {raw_total:1,qa_total:1,aged_qa:2}]){
    const p=empty();Object.defineProperty(p,"qa_scope",{value:[row],configurable:true});
    assert.throws(()=>reconcile(TIME,p),/Invalid|conservation|Unexpected/);
  }
@@ -243,6 +244,7 @@ test("SQLite migration registers only the exact proven owner QA case, never a re
   const parts=Object.fromEntries(readOnlyQueries(TIME).map(q=>[q.name,db.prepare(q.sql).all()]));
   assert.equal(parts.qa_scope[0].raw_total,2);
   assert.equal(parts.qa_scope[0].qa_total,1);
+  assert.equal(parts.qa_scope[0].aged_qa,0);
   assert.equal(parts.notification_aging.length,1);
   const result=reconcile(TIME,parts);
   assert.equal(result.raw_inquiry_total,2);
@@ -251,4 +253,18 @@ test("SQLite migration registers only the exact proven owner QA case, never a re
   assert.equal(result.case_lifecycle.unacknowledged,1);
   assert.ok(result.alerts.some(a=>a.code==="UNACKNOWLEDGED_LEADS"&&a.count===1));
  }finally{db.close();}
+});
+
+test("aged verified synthetic test prompts retention review without an unanswered-customer alarm",()=>{
+ const p=empty();Object.defineProperty(p,"qa_scope",{value:[{raw_total:1,qa_total:1,aged_qa:1}],configurable:true});
+ const result=reconcile(TIME,p);
+ assert.equal(result.inquiry_total,0);
+ assert.equal(result.synthetic_qa_excluded,1);
+ assert.equal(result.synthetic_qa_older_than_90_days,1);
+ assert.ok(result.alerts.some(a=>a.code==="SYNTHETIC_QA_RETENTION_REVIEW_REQUIRED"&&a.priority==="P1"));
+ assert.equal(result.alerts.some(a=>a.code==="UNACKNOWLEDGED_LEADS"),false);
+});
+test("aged synthetic records cannot exceed verified QA scope",()=>{
+ const p=empty();Object.defineProperty(p,"qa_scope",{value:[{raw_total:1,qa_total:1,aged_qa:2}],configurable:true});
+ assert.throws(()=>reconcile(TIME,p),/QA conservation/);
 });
