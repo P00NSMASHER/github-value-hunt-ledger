@@ -105,5 +105,8 @@ jobs:
           fi
           git commit -m "automation: Lab 15 source index and triage refresh"
           git pull --rebase origin main
+          # Never publish a queue calculated against a stale source ledger.
+          python -m freight.lab15_triage --out /tmp/retally-lab15-post-rebase-queue.json
+          cmp freight/lab15/triage_queue.json /tmp/retally-lab15-post-rebase-queue.json
           python -m unittest -q freight.test_lab15_acquisition freight.test_lab15_triage
           git push origin HEAD:main
