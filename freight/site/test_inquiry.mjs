@@ -41,7 +41,7 @@ function mockDb({failInsert=false,failNotificationUpdate=false}={}) {
         if(sql.startsWith("UPDATE inquiries")) {
           if(failNotificationUpdate) throw Error("Simulated notification status write failure");
           for(const r of inquiries.values()) if(r.reference===params[1])r.notification_status="provider_accepted";
-          return {success:true};
+          return {success:true,meta:{changes:1}};
         }
         if(sql.startsWith("DELETE FROM inquiries")) {
           // Reproduce the original destructive behavior on historical records.
