@@ -186,6 +186,25 @@ def validate_ledger(ledger: dict) -> None:
         if record["id"] != ident or ident in seen:
             raise EvidenceError("BAD_RECORD_ID")
         seen.add(ident)
+        host = urlsplit(url).hostname
+        expected_hosts = {
+            "GAO_DECISION": {"gao.gov", "www.gao.gov"},
+            "PUBLIC_REGULATORY_EXHIBIT": {"psc.ky.gov"},
+            "PUBLIC_BANKRUPTCY_EXHIBIT": {"document.epiq11.com"},
+            "DATASET_CATALOG_LEAD": {"github.com", "zenodo.org",
+                                     "dataverse.harvard.edu"},
+        }
+        if record["kind"] not in expected_hosts or host not in expected_hosts[record["kind"]]:
+            raise EvidenceError("SOURCE_KIND_HOST_MISMATCH")
+        permitted_publisher = {
+            "github.com": "GITHUB", "zenodo.org": "ZENODO",
+            "dataverse.harvard.edu": "DATAVERSE",
+        }
+        if record["kind"] == "DATASET_CATALOG_LEAD":
+            if record["discovered_by"] != permitted_publisher[host]:
+                raise EvidenceError("UNVERIFIED_CATALOG_PUBLISHER")
+        elif record["discovered_by"] != "SEED":
+            raise EvidenceError("SEED_ORIGIN_MISMATCH")
         if (record["state"] not in RECORD_STATES
                 or record["rights"] != RIGHTS_HOLD
                 or record["raw_document_stored"] is not False
@@ -204,7 +223,10 @@ def validate_ledger(ledger: dict) -> None:
                  or record["content_version"] < 1 or record["bytes_seen"] < 1
                  or record["kind"] != "GAO_DECISION"):
             raise EvidenceError("INVALID_SOURCE_RECEIPT")
-        if digest is None and (record["content_version"] != 0 or record["bytes_seen"] != 0):
+        if digest is None and (record["content_version"] != 0 or record["bytes_seen"] != 0
+                               or record["state"] == "PUBLIC_SOURCE_FINGERPRINTED"):
+            raise EvidenceError("INVALID_SOURCE_RECEIPT")
+        if digest is not None and record["state"] != "PUBLIC_SOURCE_FINGERPRINTED":
             raise EvidenceError("INVALID_SOURCE_RECEIPT")
         if (not isinstance(record["title"], str)
                 or record["title"] != scrub_title(record["title"])
@@ -212,7 +234,7 @@ def validate_ledger(ledger: dict) -> None:
                 or not re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ",
                                     record["first_seen"])):
             raise EvidenceError("BAD_RECORD_TEXT")
-    if len(seen) > 5000:
+    if len(seen) > 20000:
         raise EvidenceError("LEDGER_CAP_EXCEEDED")
 
 
