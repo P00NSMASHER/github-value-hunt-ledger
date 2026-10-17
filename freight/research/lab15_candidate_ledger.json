@@ -1,7 +1,31 @@
 {
-  "digest_sha256": "ce2baac34a74eb4063eec9bbda96e58ba461b030890a6e5bdfd94c2065172be4",
+  "digest_sha256": "81985a0917042ddd3b006e9718eb8992c554cdcc6f9a998610b195a4ad8a2f29",
   "lab": 15,
   "leads": [
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "1108fe9a7d3db838bed635744b71d4b22e00bb143b541c619159ab3686da9bce",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.48550/arxiv.2203.02799"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "451e83ffa0f19b5d580679c4f0a378abc430eaacd32c4e34e05aca4642a7e5f5",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.7910/dvn/9c0mus"
+    },
     {
       "actual_cash_recovery_verified": false,
       "customer_use_authorized": false,
@@ -30,6 +54,18 @@
       "actual_cash_recovery_verified": false,
       "customer_use_authorized": false,
       "first_seen": "2026-10-17",
+      "id": "7d18c8724235189708b79c8f821bcda6bbd54f6a55392f54d26553c33e1ab2b3",
+      "invoice_bytes_archived": false,
+      "provider": "github",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "github freight research candidate",
+      "url": "https://github.com/Salomiairy11/VendorLite"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
       "id": "897a415ec29a9d96caaed9d4a7a0acd4de6fa3e9e246f1d99da27a459cf43929",
       "invoice_bytes_archived": false,
       "provider": "previously_observed_public_url",
@@ -49,6 +85,42 @@
       "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
       "title": "GAO public LTL rate dispute decision B-148465",
       "url": "https://www.gao.gov/products/b-148465"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "d0a30a825299372b73387832031f64013038bcbaeea1ed7d6d2b3532b162b1e7",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.22004/ag.econ.317427"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "df93242cda9874012440acf2212e808f98a0c77e8bd2898e6ca370418f213313",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.71548/8598"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "eed3d2e0318df7b8f13dc3b32eee0bc831e63d34f90c0b88b559801405e1e8a1",
+      "invoice_bytes_archived": false,
+      "provider": "dataverse",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "dataverse freight research candidate",
+      "url": "https://doi.org/10.7910/DVN/9C0MUS"
     }
   ],
   "schema_version": 1,
