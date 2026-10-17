@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {DatabaseSync} from "node:sqlite";
 import {readOnlyQueries,reconcile,collect,dryRun} from "./reconcile.mjs";
 
 const TIME=Math.floor(Date.parse("2026-10-08T16:00:00Z")/1000);
@@ -7,6 +9,9 @@ const empty=()=>({
   notification_aging:[],
   retention_review:[{aged_total:0,aged_pending:0,aged_provider:0,aged_delivered:0}],
   rate_limits:[{expired_total:0}],
+  get qa_scope(){
+    return [{raw_total:this.notification_aging.reduce((n,r)=>n+Number(r.total||0),0),qa_total:0}];
+  },
   get case_lifecycle(){
     const n=this.notification_aging.reduce((sum,x)=>sum+Number(x.total||0),0);
     return [{total:n,unacknowledged:n,acknowledged:0,closed:0,
@@ -21,7 +26,7 @@ function notification(s,n,age=300,overHour=0,overDay=0) {
 const clone=x=>JSON.parse(JSON.stringify(x));
 test("SQL is exclusively read-only, aggregate-only, bounded and avoids personal data",()=>{
   const queries=readOnlyQueries(TIME);
-  assert.deepEqual(queries.map(x=>x.name),["notification_aging","retention_review","case_lifecycle","rate_limits"]);
+  assert.deepEqual(queries.map(x=>x.name),["notification_aging","retention_review","case_lifecycle","qa_scope","rate_limits"]);
   for(const q of queries) {
     assert.match(q.sql,/^SELECT /);
     assert.doesNotMatch(q.sql,/\b(?:DELETE|UPDATE|INSERT|DROP|ALTER|REPLACE|TRUNCATE)\b/i);
@@ -30,7 +35,7 @@ test("SQL is exclusively read-only, aggregate-only, bounded and avoids personal 
 });
 test("dry run has no credential values or API request",()=>{
   const x=dryRun("2026-10-08T16:00:00Z");
-  assert.equal(x.statements.length,4);
+  assert.equal(x.statements.length,5);
   assert.match(x.warning,/Never interpret provider acceptance/);
 });
 test("reject malformed UTC time",()=>{
@@ -124,11 +129,12 @@ test("mocked remote D1 collector requests only exact SELECT statements, one per 
     assert.match(url,/\/d1\/database\/qa-id\/query$/);
     let rows=q.includes("GROUP BY")?p.notification_aging:
       q.includes("LEFT JOIN inquiry_case_dispositions")?p.case_lifecycle:
+      q.includes("(SELECT COUNT(*) FROM inquiry_qa_registry)")?p.qa_scope:
       q.includes("FROM inquiry_limits")?p.rate_limits:p.retention_review;
     return {ok:true,json:async()=>({success:true,result:[{results:rows}]})};
   };
   const r=await collect(TIME,{accountId:"qa",databaseId:"qa-id",token:"synthetic"},fetcher);
-  assert.equal(r.inquiry_total,0);assert.equal(asked.length,4);
+  assert.equal(r.inquiry_total,0);assert.equal(asked.length,5);
 });
 test("remote permission denial fails closed, never interprets as no leads",async()=>{
   const fetcher=async()=>({ok:false,status:403});
@@ -182,4 +188,64 @@ test("an incomplete or internally inconsistent case aggregate cannot be shown as
  const q=empty();q.notification_aging=[notification("delivery_verified",1)];
  withCase(q,{total:0,unacknowledged:0});
  assert.throws(()=>reconcile(TIME,q),/inconsistent/i);
+});
+
+test("a known synthetic receipt is reconciled separately, not represented as a failed customer response",()=>{
+ const p=empty();
+ Object.defineProperty(p,"qa_scope",{value:[{raw_total:1,qa_total:1}],configurable:true});
+ const result=reconcile(TIME,p);
+ assert.equal(result.raw_inquiry_total,1);
+ assert.equal(result.synthetic_qa_excluded,1);
+ assert.equal(result.inquiry_total,0);
+ assert.ok(!result.alerts.some(a=>a.code==="UNACKNOWLEDGED_LEADS"));
+});
+test("an alleged QA exclusion cannot conceal an unaccounted real lead",()=>{
+ const p=empty();Object.defineProperty(p,"qa_scope",{value:[{raw_total:2,qa_total:1}],configurable:true});
+ assert.throws(()=>reconcile(TIME,p),/QA conservation/);
+});
+test("unexpected QA count schema, missing QA scope and negative count all fail closed",()=>{
+ for(const row of [{raw_total:1,qa_total:-1},{raw_total:1,qa_total:2},
+   {raw_total:0,qa_total:0,work_email:"hidden@example.invalid"}]){
+   const p=empty();Object.defineProperty(p,"qa_scope",{value:[row],configurable:true});
+   assert.throws(()=>reconcile(TIME,p),/Invalid|conservation|Unexpected/);
+ }
+ const p=empty();delete p.qa_scope;
+ assert.throws(()=>reconcile(TIME,p),/Incomplete/);
+});
+test("SQLite migration registers only the exact proven owner QA case, never a real customer lead",()=>{
+ const db=new DatabaseSync(":memory:");
+ try{
+  db.exec("PRAGMA foreign_keys=ON");
+  db.exec(readFileSync(new URL("../site/migrations/0001_inquiry.sql",import.meta.url),"utf8"));
+  const seed=db.prepare(`INSERT INTO inquiries
+   (reference,idempotency_key,fingerprint,full_name,work_email,company_name,
+    annual_spend,modes_json,details_json,accepted_at,notification_status)
+   VALUES(?,?,?,?,?,?,?,?,?,?,'delivery_verified')`);
+  const t=TIME-90000;
+  seed.run("RA-20261017-26F3BC58","qa-key","qa-fingerprint","RETALLY QA TEST",
+   "synthetic@example.invalid","RETALLY INTERNAL TEST","Under $250k",
+   '["Parcel"]',"{}",t);
+  seed.run("RA-20261017-CAFEBABE","lead-key","lead-fingerprint","Real Example",
+   "lead@example.invalid","Example Shipper","$250k–$1M",'["LTL"]',"{}",t);
+  const sql=readFileSync(new URL("../site/migrations/0005_inquiry_qa_registry.sql",import.meta.url),"utf8");
+  db.exec(sql);db.exec(sql); // additive reruns preserve the one approved provenance row
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM inquiry_qa_registry").get().n,1);
+  assert.throws(()=>db.exec("UPDATE inquiry_qa_registry SET tagged_at=1"),/immutable/);
+  assert.throws(()=>db.exec("DELETE FROM inquiry_qa_registry"),/denied/);
+  assert.throws(()=>db.prepare(`INSERT INTO inquiry_qa_registry
+    (reference,provenance,evidence_ref,tagged_at)
+    VALUES(?,'OWNER_LIVE_SYNTHETIC_ACCEPTANCE_20261017','github-value-hunt-ledger#466',?)`)
+    .run("RA-20261017-CAFEBABE",TIME),/unreviewed/);
+  // A real customer-like record must still produce the normal unanswered-lead alert.
+  const parts=Object.fromEntries(readOnlyQueries(TIME).map(q=>[q.name,db.prepare(q.sql).all()]));
+  assert.equal(parts.qa_scope[0].raw_total,2);
+  assert.equal(parts.qa_scope[0].qa_total,1);
+  assert.equal(parts.notification_aging.length,1);
+  const result=reconcile(TIME,parts);
+  assert.equal(result.raw_inquiry_total,2);
+  assert.equal(result.inquiry_total,1);
+  assert.equal(result.synthetic_qa_excluded,1);
+  assert.equal(result.case_lifecycle.unacknowledged,1);
+  assert.ok(result.alerts.some(a=>a.code==="UNACKNOWLEDGED_LEADS"&&a.count===1));
+ }finally{db.close();}
 });
