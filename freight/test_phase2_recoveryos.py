@@ -250,3 +250,43 @@ def test_payment_orchestration_requires_human_authorization_and_observed_settlem
     reversed_snapshot = orchestrator.snapshot()
     assert reversed_snapshot.current_state == "REVERSED"
     assert reversed_snapshot.settled_cents == 0
+
+
+def test_payment_persistent_identities_reject_unicode_aliases():
+    base = {
+        "instruction_id": "PAY-1",
+        "buyer_id": "BUYER-1",
+        "business_unit": "BU-1",
+        "payer_id": "CARRIER-A",
+        "payee_id": "CUSTOMER-1",
+        "currency": "USD",
+        "amount_cents": 10_000,
+        "purpose": "Recovery remittance",
+        "finding_proof_hashes": ("f" * 64,),
+        "idempotency_key": "payment-1",
+    }
+    for field, alias in (
+        ("instruction_id", "PAY-e\u0301"),
+        ("idempotency_key", "payment-e\u0301"),
+    ):
+        values = {**base, field: alias}
+        with pytest.raises(ValueError, match=field + " must use canonical Unicode"):
+            prepare_payment_instruction(**values)
+
+    instruction = prepare_payment_instruction(**base)
+    orchestrator = PaymentOrchestrator(instruction)
+    orchestrator.authorize(authorize_payment(
+        instruction,
+        authorized_by="owner-1",
+        reason="Approved against confirmed finding.",
+        authorized_at="2026-10-07T03:01:00Z",
+    ))
+    with pytest.raises(ValueError, match="provider_reference contains control characters"):
+        orchestrator.record_provider_event(
+            state="SUBMITTED",
+            provider="Provider",
+            provider_reference="R\u200b1",
+            amount_cents=10_000,
+            source_hash="1" * 64,
+            occurred_at="2026-10-07T03:02:00Z",
+        )
