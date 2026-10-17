@@ -355,7 +355,9 @@
         submitButton.textContent = "Submitting securely…";
       }
       const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 12000);
+      // Turnstile (up to 7s) and Resend (up to 9s) are sequential.
+      // Allow additional time for D1 commits and network overhead.
+      const timeout = window.setTimeout(() => controller.abort(), 30000);
       setError("");
       try {
         const response = await fetch("/api/inquiry", {
@@ -416,8 +418,16 @@
           deliveryConfirmed: false
         });
       } catch (error) {
-        setError((error.message || "Unable to confirm receipt.") +
-          " Your form has not shown a confirmation. You can use the email method instead.");
+        // Timeout is not evidence that D1 rejected the request. Retain the
+        // existing idempotency key for a safe retry of the SAME receipt.
+        if (error?.name === "AbortError") {
+          setError("Confirmation timed out. Your request may already be saved. " +
+            "Complete the security check and retry this same form to retrieve " +
+            "the existing reference. Avoid sending a duplicate request.");
+        } else {
+          setError((error.message || "Unable to confirm receipt.") +
+            " Your form has not shown a confirmation. You can use the email method instead.");
+        }
         if (fallbackLink) fallbackLink.hidden = false;
         window.turnstile?.reset?.();
       } finally {
