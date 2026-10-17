@@ -18,13 +18,16 @@
       "supporting_evidence": [
         "BOL-501",
         "POD-501",
-        "RATE-PA-NJ-v3"
+        "RATE-PA-NJ-v3",
+        "CREDIT-9001",
+        "AUTH-PILOT-2026-001"
       ],
       "finding_category": "rate discrepancy",
       "confidence": "SUPPORTED",
       "unresolved_issues": "",
       "reviewer_disposition": "VALIDATED",
       "customer_authorization_state": "AUTHORIZED",
+      "authorization_reference": "AUTH-PILOT-2026-001",
       "claim_status": "CLOSED",
       "carrier_response": "fictional credit approved",
       "settlement_reference": "CREDIT-9001",
@@ -49,13 +52,16 @@
       "authority_effective_date": "2026-01-05",
       "supporting_evidence": [
         "TRACK-502",
-        "PARCEL-2026-A"
+        "PARCEL-2026-A",
+        "CREDIT-9002",
+        "AUTH-PILOT-2026-001"
       ],
       "finding_category": "unsupported accessorial",
       "confidence": "SUPPORTED",
       "unresolved_issues": "",
       "reviewer_disposition": "VALIDATED",
       "customer_authorization_state": "AUTHORIZED",
+      "authorization_reference": "AUTH-PILOT-2026-001",
       "claim_status": "CLOSED",
       "carrier_response": "fictional credit approved then partially reversed",
       "settlement_reference": "CREDIT-9002",

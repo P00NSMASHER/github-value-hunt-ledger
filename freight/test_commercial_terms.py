@@ -43,3 +43,16 @@ def test_estimated_or_excess_fee_base_is_rejected():
             actual_recovered_cents=5_000,
             fee_eligible_recovered_cents=6_000,
         )
+
+
+@pytest.mark.parametrize("rate", ["0.00001", "0.99999", "0.30001"])
+def test_contract_rate_is_never_silently_changed_by_precision_rounding(rate):
+    with pytest.raises(ValueError, match="precision"):
+        normalize_contingency_rate(rate)
+
+
+@pytest.mark.parametrize("cents,fee", [(0, 0), (1, 0), (5, 2), (199, 60), (7_500, 2_250)])
+def test_thirty_percent_fee_uses_half_up_cents_without_float_rounding(cents, fee):
+    result = calculate_recovery_fee(actual_recovered_cents=cents)
+    assert result.recovery_fee_cents == fee
+    assert result.customer_net_recovery_cents + fee == cents

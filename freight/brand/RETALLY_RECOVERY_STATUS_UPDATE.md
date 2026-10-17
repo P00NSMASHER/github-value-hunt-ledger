@@ -1,19 +1,23 @@
-# RETALLY | Recovery status update
-*Customer: [name] | Period: [date range] | Report: [reference]*
+# Recovery reconciliation statement
+Customer / engagement: [Fields]. Currency: USD. As of: [Timestamp]. Reviewer: [Name]. Version / snapshot: [Fields]. Missing values mean unknown, not zero.
 
-The report must distinguish candidate, supported, authorized and actually received outcomes.
+| State | Amount | Required proof |
+| --- | --- | --- |
+| Candidate difference | [Amount] | Unverified items separated |
+| Supported findings | [Amount] | Controlling source, calculation and review |
+| Authorized actions | [Amount] | Signed exact scope and payload |
+| Carrier-approved claims | [Amount] | Carrier response; not posting |
+| Gross posted benefits | [Amount] | Unique recovery and customer posting |
+| Reversals | [Amount] | Original event link and dated allocation |
+| Observed net benefits | [Gross less reversals] | Includes excluded recovery |
+| Incumbent / other exclusions | [Amount] | Item-level contractual classification |
+| Attributable eligible net | [Amount] | Posting and signed definition |
+| Cumulative fee | [30%, half-up cents] | Signed rate and current snapshot |
+| Prior fee invoices/credits | [Net issued fees less issued credit notes] | Unique billing ledger; exclude taxes, voids, payments and refunds |
+| Current invoice/fee credit | [Cumulative earned less net previously billed fees] | Independent billing sign-off |
 
-| Status | Value | Evidence / reference |
-| --- | ---: | --- |
-| Candidate issues | [value] | [register IDs; not validated] |
-| Supported findings | [value] | [contracts and source documents] |
-| Customer-approved claims | [value] | [written authorizations] |
-| Net received funds | [value] | [posted settlements, credits, reversals] |
+Every item links finding, invoice/shipment, claim, authorization, response, posting, reversal, exclusion and reviewer. Allocate each source event once. Do not add currencies.
 
-**Movements:** [newly supported findings, new authorizations, carrier responses, actual settlement changes].
+Keep ambiguous matches, missing posting and pending recoveries separate. A new reversal invalidates the old report; recompute and notify the customer. Restarts replay immutable events or stop on conflict, never create another recovery or invoice.
 
-**Customer decisions required:** [specific claim, evidence, owner, due date].
-
-**Open gaps:** [missing controlling authority, conflicting records, pre-existing disputes].
-
-Avoid portraying estimates as collected funds. Replace placeholders only using reviewed engagement data.
+Show supported but unrealized amounts and held unverified candidates separately, with item owner and next review date. Zero review dispositions marked unresolved does not mean every source gap or recovery is complete. Payments settle receivables and must not create a new fee.

@@ -24,7 +24,10 @@ def normalize_contingency_rate(value: Decimal | str | int | float) -> Decimal:
         raise ValueError("contingency recovery rate must be a number") from error
     if not rate.is_finite() or rate <= 0 or rate >= 1:
         raise ValueError("contingency recovery rate must be greater than 0 and less than 1")
-    return rate.quantize(Decimal("0.0001")).normalize()
+    rounded = rate.quantize(Decimal("0.0001"))
+    if rounded != rate:
+        raise ValueError("contingency recovery rate precision cannot exceed four decimal places")
+    return rounded.normalize()
 
 
 def contingency_rate_label(rate: Decimal | str | int | float) -> str:
