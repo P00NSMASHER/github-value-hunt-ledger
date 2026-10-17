@@ -4,6 +4,9 @@ on:
     paths:
       - '.github/workflows/retally-journal-fork-m55.yml'
       - 'freight/recovery_checkpoint_m53.py'
+      - 'freight/recovery_reconcile_m55.py'
+      - 'freight/test_lab_checkpoint_reconciliation_m55.py'
+      - 'freight/RESEARCH_CHECKPOINT_RECONCILIATION_M55.md'
       - 'freight/test_lab_journal_fork_m55.py'
       - 'freight/RESEARCH_JOURNAL_FORK_M55.md'
   workflow_dispatch:
@@ -26,6 +29,7 @@ jobs:
         run: |
           PYTHONPATH=. python -m pytest -q \
             freight/test_lab_journal_fork_m55.py \
+            freight/test_lab_checkpoint_reconciliation_m55.py \
             freight/test_lab_checkpoint_mode_m54.py \
             freight/test_lab_replay_checkpoint_m53.py \
             freight/test_lab_recovery_replay_m52.py \
@@ -66,5 +70,9 @@ jobs:
           assert c['actual_revenue_cents']==0
           assert c['checkpoint_antidowngrade_m54']['current_exact_mode_or_checkpoint_negative_denials']==13
           assert c['signed_replay_checkpoint_m53']['exact_current_checkpoint_denials']==19
-          print('M55: physical journal fork identity checks and all 14 original labs pass; no real external custodian or customer authorization.')
+          assert c['checkpoint_gap_reconciliation_m55']['valid_original_countersigned_head_positive_controls']==18
+          assert c['checkpoint_gap_reconciliation_m55']['valid_one_commit_pending_external_countersign_controls']==18
+          assert c['checkpoint_gap_reconciliation_m55']['current_exact_fail_closed_reconciliation_denials']==18
+          assert c['checkpoint_gap_reconciliation_m55']['independent_first_customer_human_gates_unmet']==18
+          print('Unified M55: journal fork binding + signed crash-gap holds pass for 14 original labs; no real custodian/customer authority.')
           PY
