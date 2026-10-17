@@ -480,3 +480,26 @@ def test_ambiguous_settlement_evidence_cannot_be_replayed_as_realized_money():
     assert certificate.realized_cents == 0
     assert certificate.fee_eligible_cents == 0
     assert certificate.settlement_proof_hashes == (first.proof_hash,)
+
+@pytest.mark.parametrize("authority_id", ["auth-1 ", "auth-e\u0301"])
+def test_validated_truth_rejects_noncanonical_authority_identity(authority_id):
+    pop = population()
+    with pytest.raises(
+        ValueError,
+        match="surrounding whitespace|canonical Unicode",
+    ):
+        freeze_truth(
+            pop,
+            [authority(authority_id)],
+            [finding(authority_id=authority_id)],
+        )
+
+
+def test_validated_truth_accepts_canonical_non_ascii_authority_identity():
+    pop = population()
+    manifest = freeze_truth(
+        pop,
+        [authority("auth-é")],
+        [finding(authority_id="auth-é")],
+    )
+    assert manifest.findings[0].validated_cents == 2500
