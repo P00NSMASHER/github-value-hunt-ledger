@@ -62,15 +62,20 @@ const env=db=>({
 });
 function count(db,table){return Number(db.prepare("SELECT COUNT(*) AS n FROM "+table).get().n)}
 function seedVerifiedResponse(db,ref="RA-20261008-AAAABBBB") {
- // Purely synthetic fixture to exercise case closure policy. No real response claimed.
+ // Purely synthetic two-step fixture; no real customer response is claimed.
  const sent=now()-60,verified=now();
  db.prepare(`INSERT INTO inquiry_response_states
   (reference,response_state,responded_at,reported_by,response_evidence_digest,
-   verified_at,verified_by,verification_evidence_digest,
    last_action_id,last_action,last_actor_sub,last_evidence_digest,last_action_at)
-  VALUES(?,'VERIFIED',?,?,?,?,?,?,?,?,?,?,?)`).run(
-  ref,sent,reviewer.sub,"a".repeat(64),verified,approver.sub,"b".repeat(64),
-  uuid(81),"VERIFY_RESPONSE",approver.sub,"b".repeat(64),verified);
+  VALUES(?,'REPORTED',?,?,?,?,?,?,?,?)`).run(
+  ref,sent,reviewer.sub,"a".repeat(64),uuid(80),
+  "RECORD_RESPONSE",reviewer.sub,"a".repeat(64),sent);
+ db.prepare(`UPDATE inquiry_response_states SET response_state='VERIFIED',
+  verified_at=?,verified_by=?,verification_evidence_digest=?,
+  last_action_id=?,last_action=?,last_actor_sub=?,last_evidence_digest=?,last_action_at=?
+  WHERE reference=? AND response_state='REPORTED'`).run(
+  verified,approver.sub,"b".repeat(64),uuid(81),
+  "VERIFY_RESPONSE",approver.sub,"b".repeat(64),verified,ref);
 }
 let signerReady;
 const setup=async()=>{
@@ -309,5 +314,39 @@ test("response evidence survives approved retention purge only as immutable acti
  assert.equal(count(db,"inquiry_response_states"),0);
  assert.equal(count(db,"inquiry_response_action_audit"),2);
  assert.equal(count(db,"inquiry_purge_audit"),1);
+ db.close();
+});
+
+test("database rejects direct CLOSED state and unverified closure even by privileged SQL",async()=>{
+ const {db,adapter}=dbWithFixture(),e=env(adapter);
+ const t=now();
+ assert.throws(()=>db.prepare(`INSERT INTO inquiry_case_dispositions
+   (reference,case_state,operator_id,acknowledged_at,closed_at)
+   VALUES(?,'CLOSED','synthetic-admin',?,?)`).run("RA-20261008-AAAABBBB",t-60,t),
+   /inquiry_cannot_start_closed/);
+ assert.equal((await run(reviewer,initial("ACKNOWLEDGE"),e)).status,200);
+ assert.throws(()=>db.prepare(`UPDATE inquiry_case_dispositions SET
+    case_state='CLOSED',closed_at=?,retention_until=?
+    WHERE reference=?`).run(t,t+90*86400,"RA-20261008-AAAABBBB"),
+   /inquiry_close_requires_verified_response_or_waiver/);
+ assert.equal(count(db,"inquiry_case_action_audit"),1);
+ db.close();
+});
+test("database denies fabricated one-step VERIFIED response and raw row removal",async()=>{
+ const {db,adapter}=dbWithFixture(),e=env(adapter);
+ await run(reviewer,initial("ACKNOWLEDGE"),e);
+ const t=now();
+ assert.throws(()=>db.prepare(`INSERT INTO inquiry_response_states
+    (reference,response_state,responded_at,reported_by,response_evidence_digest,
+     verified_at,verified_by,verification_evidence_digest,last_action_id,
+     last_action,last_actor_sub,last_evidence_digest,last_action_at)
+    VALUES(?,'VERIFIED',?,?,?,?,?,?,?,?,?,?,?)`).run(
+       "RA-20261008-AAAABBBB",t-10,reviewer.sub,"a".repeat(64),
+       t,approver.sub,"b".repeat(64),uuid(55),"VERIFY_RESPONSE",
+       approver.sub,"b".repeat(64),t),/inquiry_response_requires_separate_review_transition/);
+ assert.equal((await runResponse(reviewer,initial("RECORD_RESPONSE",undefined,56),e)).status,200);
+ assert.throws(()=>db.exec("DELETE FROM inquiry_response_states"),
+    /inquiry_response_delete_denied/);
+ assert.equal(count(db,"inquiry_response_action_audit"),1);
  db.close();
 });

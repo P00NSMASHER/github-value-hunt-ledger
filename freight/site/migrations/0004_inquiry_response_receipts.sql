@@ -1,7 +1,7 @@
 -- RETALLY lead-response evidence gate: additive; run only after 0001, 0002, 0003.
 -- No existing inquiry or case is silently marked responded.
--- Evidence digest is a pointer to approved, independently inspected Zoho material;
--- it is NOT a standalone proof that a response was sent or received.
+-- Evidence digest points to approved, independently inspected Zoho material.
+-- It is NOT standalone proof that a response was sent or received.
 CREATE TABLE IF NOT EXISTS inquiry_response_states (
  reference TEXT PRIMARY KEY REFERENCES inquiries(reference) ON DELETE CASCADE,
  response_state TEXT NOT NULL CHECK(response_state IN ('REPORTED','VERIFIED','WAIVED')),
@@ -101,4 +101,27 @@ BEFORE DELETE ON inquiry_response_states
 WHEN EXISTS(SELECT 1 FROM inquiries WHERE reference=OLD.reference)
 BEGIN
  SELECT RAISE(ABORT,'inquiry_response_delete_denied');
+END;
+
+-- A closure cannot bypass independent reply evidence through an accidental
+-- direct database update. JWT/identity rules remain exclusively server-enforced.
+CREATE TRIGGER IF NOT EXISTS inquiry_case_close_requires_response
+BEFORE UPDATE OF case_state ON inquiry_case_dispositions
+WHEN NEW.case_state='CLOSED' AND OLD.case_state<>'CLOSED'
+ AND NOT EXISTS(SELECT 1 FROM inquiry_response_states r
+   WHERE r.reference=NEW.reference AND r.response_state IN ('VERIFIED','WAIVED'))
+BEGIN
+ SELECT RAISE(ABORT,'inquiry_close_requires_verified_response_or_waiver');
+END;
+CREATE TRIGGER IF NOT EXISTS inquiry_case_disallow_closed_insert
+BEFORE INSERT ON inquiry_case_dispositions
+WHEN NEW.case_state='CLOSED'
+BEGIN
+ SELECT RAISE(ABORT,'inquiry_cannot_start_closed');
+END;
+CREATE TRIGGER IF NOT EXISTS inquiry_response_disallow_verified_insert
+BEFORE INSERT ON inquiry_response_states
+WHEN NEW.response_state='VERIFIED'
+BEGIN
+ SELECT RAISE(ABORT,'inquiry_response_requires_separate_review_transition');
 END;
