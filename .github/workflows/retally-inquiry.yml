@@ -4,6 +4,12 @@ on:
     branches: [main]
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/internal/**"
+      - "freight/site/operator_access_auth.js"
+      - "freight/inquiry_ops/**"
+      - "freight/site/test_inquiry_case.mjs"
+      - "freight/site/test_inquiry_retention.py"
+      - "freight/site/privacy.html"
       - "freight/site/site.js"
       - "freight/site/index.html"
       - "freight/site/_headers"
@@ -13,6 +19,12 @@ on:
   pull_request:
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/internal/**"
+      - "freight/site/operator_access_auth.js"
+      - "freight/inquiry_ops/**"
+      - "freight/site/test_inquiry_case.mjs"
+      - "freight/site/test_inquiry_retention.py"
+      - "freight/site/privacy.html"
       - "freight/site/site.js"
       - "freight/site/index.html"
       - "freight/site/_headers"
@@ -43,6 +55,13 @@ jobs:
         run: node --experimental-default-type=module --check functions/api/inquiry.js
       - name: Secure inquiry unit and mocked integration tests
         run: node --experimental-default-type=module --test freight/site/test_inquiry.mjs
+      - name: Signed human response, privacy and retention policy tests
+        run: |
+          node --check functions/api/internal/inquiry-case.js
+          node --check functions/api/internal/inquiry-response.js
+          node --check freight/site/operator_access_auth.js
+          node --experimental-sqlite --test freight/site/test_inquiry_case.mjs freight/inquiry_ops/test_reconcile.mjs
+          python -m unittest freight.site.test_inquiry_retention
       - name: Verify generated Cloudflare-only API Content Security Policy
         env:
           FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com

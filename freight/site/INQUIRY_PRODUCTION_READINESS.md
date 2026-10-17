@@ -6,7 +6,23 @@ Zoho business inbox, and the always-available browser-prepared email fallback.
 This is an operations checklist, **not** approval to enable the online feature,
 create customer records, change billing, or contact a carrier.
 
-## Current Resend integration checkpoint (2026-10-17, PR #466)
+## Verified live delivery checkpoint (17 October 2026)
+
+- PR #466 was merged. A real Turnstile-protected synthetic submission returned
+  `RA-20261017-26F3BC58` and created exactly ONE durable D1 inquiry.
+- Resend accepted the notification and independent Zoho inbox screenshots
+  showed the exact matching reference and synthetic form details. That specific
+  D1 record was marked `delivery_verified` after owner evidence was inspected.
+- Production online intake was returned to `FREIGHT_INQUIRY_ENABLED=0` and
+  `FREIGHT_INQUIRY_MAILBOX_VERIFIED=0` on a successful Cloudflare deployment.
+- These facts prove provider-to-mailbox delivery of one QA request. They do NOT
+  establish human lead response, reply evidence, lawful record erasure,
+  authorized independent case approvers, or continuous inbox monitoring.
+- The follow-on lead-response/retention implementation has an independent
+  staged schema and Access-authenticated operator action design. Follow
+  `freight/inquiry_ops/OPERATIONS.md` and its release gates.
+
+## Historical Resend integration checkpoint (2026-10-17, PR #466)
 
 - Resend sending subdomain `notify.retallyrecovery.com` is verified in the
   operator's Resend dashboard. Existing Zoho MX stays unchanged.
@@ -22,8 +38,9 @@ create customer records, change billing, or contact a carrier.
 - `FREIGHT_INQUIRY_ENABLED=0` and `FREIGHT_INQUIRY_MAILBOX_VERIFIED=0`
   deliberately remain in production. Mailbox delivery, human follow-up, and
   live end-to-end acceptance have not been proven by a secret binding or CI.
-- This remains a draft, unmerged source change. No direct public submissions,
-  paid service, or confidential freight files have been authorized.
+- At this earlier snapshot the PR was still a draft. Subsequent source merge
+  and live synthetic confirmation are documented above. Actual live customer
+  operations remain separately gated.
 
 ## Historical independent baseline (2026-10-08; Cloudflare email provider)
 
