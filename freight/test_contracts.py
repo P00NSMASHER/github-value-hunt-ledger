@@ -115,6 +115,20 @@ def settlement(
 
 
 
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    [
+        ("expected", True),
+        ("expected", 1.5),
+        ("actual", True),
+        ("actual", 1.5),
+    ],
+)
+def test_finding_money_requires_exact_integer_cents(field, bad_value):
+    with pytest.raises(ValueError, match="non-negative integer cents"):
+        finding(**{field: bad_value})
+
 def test_truth_rejects_forged_population_manifest_digest():
     pop = population()
     forged = replace(pop, manifest_hash="0" * 64)
