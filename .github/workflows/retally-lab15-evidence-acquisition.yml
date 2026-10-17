@@ -5,6 +5,8 @@ on:
     paths:
       - 'freight/lab15_acquisition.py'
       - 'freight/test_lab15_acquisition.py'
+      - 'freight/lab15_triage.py'
+      - 'freight/test_lab15_triage.py'
       - 'freight/lab15/**'
       - 'freight/LAB15_AUTONOMOUS_EVIDENCE_ACQUISITION.md'
       - '.github/workflows/retally-lab15-evidence-acquisition.yml'
@@ -13,6 +15,8 @@ on:
     paths:
       - 'freight/lab15_acquisition.py'
       - 'freight/test_lab15_acquisition.py'
+      - 'freight/lab15_triage.py'
+      - 'freight/test_lab15_triage.py'
       - 'freight/lab15/**'
       - 'freight/LAB15_AUTONOMOUS_EVIDENCE_ACQUISITION.md'
       - '.github/workflows/retally-lab15-evidence-acquisition.yml'
@@ -39,11 +43,13 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile Lab 15
-        run: python -m py_compile freight/lab15_acquisition.py freight/test_lab15_acquisition.py
+        run: python -m py_compile freight/lab15_acquisition.py freight/test_lab15_acquisition.py freight/lab15_triage.py freight/test_lab15_triage.py
       - name: Validate offline controls, custody, and registry integrity
-        run: python -m unittest -v freight.test_lab15_acquisition
+        run: python -m unittest -v freight.test_lab15_acquisition freight.test_lab15_triage
       - name: Verify the seeded ledger schema
-        run: python -m freight.lab15_acquisition --report /tmp/retally-lab15-offline-summary.json
+        run: |
+          python -m freight.lab15_acquisition --report /tmp/retally-lab15-offline-summary.json
+          python -m freight.lab15_triage --out /tmp/retally-lab15-offline-triage.json
 
   acquire:
     needs: validate
@@ -67,11 +73,19 @@ jobs:
         run: |
           python -m freight.lab15_acquisition \
             --live --report /tmp/retally-lab15-run-summary.json
+          python -m freight.lab15_triage --out freight/lab15/triage_queue.json
       - name: Independently verify no original documents or financial approvals persist
         run: |
           python - <<'PY'
+          import json
+          from pathlib import Path
           from freight.lab15_acquisition import read_ledger
+          from freight.lab15_triage import validate_queue
           d = read_ledger()
+          annotations = json.loads(Path('freight/lab15/evidence_annotations.json').read_text())
+          triage = json.loads(Path('freight/lab15/triage_queue.json').read_text())
+          validate_queue(triage, d, annotations)
+          assert triage['sources_with_complete_approved_real_case'] == 0
           assert all(not r['raw_document_stored'] for r in d['records'])
           assert all(not r['commercial_test_approved'] for r in d['records'])
           assert all(not r['independent_invoice_error_verified'] for r in d['records'])
@@ -84,12 +98,15 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- freight/lab15/evidence_ledger.json
+          git add -- freight/lab15/evidence_ledger.json freight/lab15/triage_queue.json
           if git diff --cached --quiet; then
             echo "No new source pointers or source version changes"
             exit 0
           fi
-          git commit -m "automation: Lab 15 public freight evidence metadata refresh"
+          git commit -m "automation: Lab 15 source index and triage refresh"
           git pull --rebase origin main
-          python -m unittest -q freight.test_lab15_acquisition
+          # Never publish a queue calculated against a stale source ledger.
+          python -m freight.lab15_triage --out /tmp/retally-lab15-post-rebase-queue.json
+          cmp freight/lab15/triage_queue.json /tmp/retally-lab15-post-rebase-queue.json
+          python -m unittest -q freight.test_lab15_acquisition freight.test_lab15_triage
           git push origin HEAD:main
