@@ -11,6 +11,7 @@ import json
 import re
 import sqlite3
 import time
+import unicodedata
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
@@ -250,7 +251,9 @@ class SettlementStore:
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"{name} is required")
         normalized = value.strip()
-        if any(ord(character) < 32 for character in normalized):
+        if unicodedata.normalize("NFC", normalized) != normalized:
+            raise ValueError(f"{name} must use canonical Unicode (NFC)")
+        if any(unicodedata.category(character).startswith("C") for character in normalized):
             raise ValueError(f"{name} cannot contain control characters")
         return normalized
 
