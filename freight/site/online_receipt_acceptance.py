@@ -35,7 +35,7 @@ def verify(site: Path, out: Path) -> dict:
             if request.method == "POST":
                 posts.append(json.loads(request.post_data or "{}"))
                 return route.fulfill(status=202, content_type="application/json",
-                    body=json.dumps({"received": True, "reference": REFERENCE}))
+                    body=json.dumps({"received": True, "reference": REFERENCE, "notificationPending": False}))
             return route.abort()
         if url.hostname == HOST:
             path = unquote(url.path.lstrip("/")) or "index.html"
