@@ -1,7 +1,7 @@
 """Synthetic accounting cases for persistent report integration."""
 import hashlib
 import json
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
@@ -272,3 +272,38 @@ def test_snapshot_tables_share_one_database_revision_during_concurrent_return(tm
     after = build_persistent_pilot_report(truth, incumbent, store, (binding,))
     assert after.metrics.realized_cents == 0
     assert canonical_hash(json.loads(after.settlement_snapshot_json)) == after.settlement_snapshot_hash
+
+
+def test_unrelated_incumbent_output_cannot_restore_fee_eligibility(tmp_path):
+    """An internally hashed output must still bind to this truth/population."""
+    truth, incumbent, store = case(tmp_path, incumbent_ids=("finding-0",))
+    finding = truth.findings[0]
+    binding = add_claim(store, finding, disqualified=False)
+    pay(store, finding)
+
+    unrelated_population_hash = "0" * 64
+    unrelated_truth_hash = "1" * 64
+    unrelated_submission_hash = canonical_hash({
+        "schema": 1,
+        "buyer_id": incumbent.buyer_id,
+        "business_unit": incumbent.business_unit,
+        "population_hash": unrelated_population_hash,
+        "source_hash": incumbent.source_hash,
+    })
+    unrelated = replace(
+        incumbent,
+        population_hash=unrelated_population_hash,
+        truth_hash=unrelated_truth_hash,
+        submission_hash=unrelated_submission_hash,
+        finding_ids=(),
+        output_hash="",
+    )
+    output_body = {"schema": 2, **asdict(unrelated)}
+    output_body.pop("output_hash")
+    unrelated = replace(unrelated, output_hash=canonical_hash(output_body))
+
+    with pytest.raises(
+        ValueError,
+        match="incumbent output is not bound to (this truth|this population)",
+    ):
+        build_persistent_pilot_report(truth, unrelated, store, (binding,))
