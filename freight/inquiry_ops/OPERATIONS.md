@@ -12,6 +12,11 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
 - New synthetic exemptions require independently reviewed source and data
   evidence, a new migration and tests. Broad `test` names, campaign tags or
   domain patterns must **never** silently classify customer leads as QA.
+- QA is excluded only from customer response timers, **not** from retention
+  obligations. The read-only monitor separately reports QA records older than
+  90 days and flags `SYNTHETIC_QA_RETENTION_REVIEW_REQUIRED` without deleting
+  the record or claiming a customer response. Apply the same hold and approved
+  case-purge checks to synthetic data and its provider copies.
 - The currently available Cloudflare Access application protects both
   `/api/internal/inquiry-case` and `/api/internal/inquiry-response` on
   `retallyrecovery.com` and `www.retallyrecovery.com`, preserving the existing
@@ -20,9 +25,16 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
 
 
 ## Operating boundary and true status
-- Public prospect intake is **OFF** until the full operator access, staffed monitoring,
-  privacy-notice, legal/reviewer and customer launch gates are independently cleared.
-  The website email-draft fallback remains available.
+- **Current online contact-intake state (owner-authorized October 17, 2026): ON.**
+  The existing public, Turnstile-protected free-audit form accepts non-sensitive
+  contact and broad freight-qualification information into D1 and triggers a
+  Resend notification to the Zoho business inbox. Production Cloudflare Pages
+  release 2ea40c78-8be9-427a-9c80-986b5f2fb297 succeeded with
+  FREIGHT_INQUIRY_ENABLED=1 and FREIGHT_INQUIRY_MAILBOX_VERIFIED=1.
+  If the email notification is unconfirmed, the customer sees an optional
+  manual-email fallback using the same durable receipt reference.
+  This is **lead capture only**, not approval for file uploads, a paid
+  freight-audit engagement, carrier disputes or money movement.
 - The single controlled `RA-20261017-26F3BC58` QA request had verified D1
   storage, Resend acceptance and independently viewed Zoho inbox delivery.
   It is not a real customer lead and **not** evidence of an actual staff reply.
@@ -79,8 +91,13 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
   4/24 **elapsed** hours are earlier warning indicators, not exact business
   calendar calculations; weekends/holidays need operator interpretation.
 - For every new reference: match it to the actual Zoho inbox message, check
-  deliverability, validate metadata only, assign signed reviewer and record
-  `ACKNOWLEDGE`. No customer is accepted for a service merely by this step.
+  deliverability and inspect contact metadata only. A real person must review
+  and respond as appropriate. **While case-writing is disabled**, preserve
+  the evidence and track the human follow-up in the restricted business
+  mailbox; do not fabricate a D1 `ACKNOWLEDGED` state. After separately
+  authenticated reviewer and approver identities are installed, use the
+  signed case and response-action workflow. Receiving a lead alone is not
+  customer acceptance for a service.
 - Before replying, check consent, suppression/no-contact requests, fit,
   existing agreements, and relevant business registration/insurance gates.
   Human authorization is required for a prospect contact; never have AI,
@@ -111,10 +128,14 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
   Zoho, reconcile the real outcome, and retain an operator-only evidence link.
   Do not retry a possibly accepted email blindly or create duplicate leads.
 - If D1 query errors or gives malformed aggregates, status is **UNKNOWN**,
-  never `0 leads`. Escalate and retain the disabled public-intake fallback.
-- No recurring monitor, scheduler or notification sender is installed by
-  this code. Establish an authorized scoped read-only credential, real staffing
-  and separately verified monitoring before a public SLA or always-on launch.
+  never `0 leads`. Escalate; if real leads could be lost, set public intake
+  and mailbox flags back to `0` and use the existing email-draft fallback.
+- Resend sends one immediate notification per accepted direct request, but
+  **no independent recurring inbox/D1 monitor or staffed SLA is proven**.
+  Check Zoho's Inbox and Spam manually (including weekends while the form
+  remains open), and reconcile any unconfirmed notification directly in
+  restricted D1. Do not promise response times until human coverage and a
+  properly scoped read-only monitor are independently verified.
 
 ## Retention, privacy and erasure
 - Qualification records have a normal **90-day review point** measured from
@@ -144,8 +165,11 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
   actual customer inquiries.
 
 ## Safe deployment and proof
-1. Keep public form OFF, run Node/SQLite/retention checks on an isolated
-   database; ensure real Turnstile, sender credentials and Zoho untouched.
+1. Public contact-intake is ON under direct owner authorization after the
+   earlier verified real Turnstile/D1/Resend/Zoho QA test. Preserve Turnstile,
+   sender secrets and Zoho; run new software changes against an isolated
+   database first. To roll back only intake, set both production public
+   flags to `0` and deploy/retry the same known-safe Pages code.
 2. Apply additive migrations 0002, 0003 then 0004 to D1 under explicitly
    reviewed change control. Never replay ALTER statements blindly.
 3. Prove old records are conserved, guard triggers exist, permitted scoped
@@ -155,8 +179,11 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
    real principals. Test real JWTs, same-origin, expired token and revocation.
 5. Validate actual authorized outbound lead response evidence, manual rota,
    deletion/privacy request triage and provider storage obligations.
-6. Only after all steps, consider online public-intake enablement via separate
-   release. Keep rollbacks limited to public flags; never discard D1 records.
+6. The online form is already available for limited contact capture. Keep
+   restricted staff case-writing OFF until two distinct verified human
+   identities, actual MFA/role checks, staff coverage and privacy obligations
+   are independently satisfied. Keep rollbacks limited to public intake flags;
+   never discard D1 records.
 
 ## Current acceptance meaning
 Passing synthetic signed JWTs, SQLite tests or a migrated schema establishes

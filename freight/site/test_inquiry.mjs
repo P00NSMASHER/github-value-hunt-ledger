@@ -371,3 +371,22 @@ test("retally campaign navigation leaves direct and untagged traffic unchanged",
   assert.equal(links[0].href, original);
   assert.equal(dataLayer[0].utm_source, undefined);
 });
+
+test("online form waits for sequential Turnstile and Resend before declaring the receipt uncertain", () => {
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const backend = readFileSync(new URL("../../functions/api/inquiry.js", import.meta.url), "utf8");
+  const clientTimeout = front.match(/window\.setTimeout\(\(\) => controller\.abort\(\), (\d+)\)/);
+  assert.ok(clientTimeout, "The online form must have a bounded fetch deadline");
+  const providerTimeouts = [...backend.matchAll(/AbortSignal\.timeout\((\d+)\)/g)]
+    .map(x => Number(x[1]));
+  assert.deepEqual(providerTimeouts.sort((a,b) => a-b), [7000,9000],
+    "Review the client budget if upstream deadlines change");
+  assert.ok(Number(clientTimeout[1]) >= providerTimeouts.reduce((x,y) => x+y,0)+8000,
+    "Wait for sequential provider deadlines plus database and transport margin");
+  assert.match(front, /error\?\.name === "AbortError"/);
+  assert.match(front, /Your request may already be saved/);
+  assert.match(front, /retry this same form to retrieve/);
+  assert.match(front, /pendingRequestKey \|\|= window\.crypto\?\.randomUUID\?\.\(\)/);
+  assert.match(backend,/SELECT reference, fingerprint, notification_status FROM inquiries WHERE idempotency_key=\?/);
+  assert.match(backend,/notificationPending/);
+});

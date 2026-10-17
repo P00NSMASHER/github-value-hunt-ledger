@@ -3,10 +3,41 @@
 **Scope:** The public site's existing `/api/inquiry` Cloudflare Pages Function,
 D1 `INQUIRY_DB` binding, Cloudflare Turnstile, provider email notification,
 Zoho business inbox, and the always-available browser-prepared email fallback.
-This is an operations checklist, **not** approval to enable the online feature,
-create customer records, change billing, or contact a carrier.
+This documents the owner's narrowly authorized **contact-only online
+intake**, not approval to accept confidential freight documents, engage a
+paid customer, move funds, change billing, or contact a carrier.
 
-## Verified live delivery checkpoint (17 October 2026)
+## Current production state — online contact intake enabled (17 October 2026)
+
+- Owner explicitly authorized leaving the public audit-request form enabled,
+  following the completed real Turnstile → D1 → Resend → Zoho synthetic test.
+- Cloudflare Pages `retally-web` production deployment
+  `2ea40c78-8be9-427a-9c80-986b5f2fb297` completed successfully on
+  commit `6b19fe985870418aec9cccb9003a21dec2c32721`.
+- Independent Cloudflare project readback: `FREIGHT_INQUIRY_ENABLED=1`,
+  `FREIGHT_INQUIRY_MAILBOX_VERIFIED=1`. Production retains encrypted
+  `RESEND_API_KEY`, `INQUIRY_DB`, the fixed Zoho recipient, Turnstile,
+  same-origin restrictions, rate limiting, idempotency and failure fallback.
+- Only contact and broad freight-qualification fields are accepted; document
+  uploads, credential submissions, actual recovery actions, customer contracting
+  and automated prospect replies remain out of scope.
+- Restricted `RETALLY_CASE_WRITES_ENABLED` and
+  `RETALLY_CASE_POLICY_APPROVED` are *not enabled*. Do not fabricate human
+  acknowledgment or case-close events. Until actual staff roles are qualified,
+  the owner must monitor `jay@retallyrecovery.com` and handle leads manually.
+  **No guaranteed response SLA or independent round-the-clock monitoring
+  has been verified.** Customer intake does not imply commercial readiness.
+- Read-only production D1 pre-release reconciliation:
+  raw inquiries `1`, previously verified synthetic QA `1`,
+  actual customer leads `0`. The old QA record remains preserved.
+- If a provider/mailbox incident arises or staff can no longer handle leads,
+  set both public flags back to `0`, deploy a known-safe revision, verify
+  `GET /api/inquiry` returns `online:false`, and reconcile every stored
+  request before any reactivation. Do not delete historical records.
+
+## Historical live delivery checkpoint (17 October 2026)
+
+
 
 - PR #466 was merged. A real Turnstile-protected synthetic submission returned
   `RA-20261017-26F3BC58` and created exactly ONE durable D1 inquiry.
