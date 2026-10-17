@@ -216,7 +216,10 @@ test("SQLite migration registers only the exact proven owner QA case, never a re
  const db=new DatabaseSync(":memory:");
  try{
   db.exec("PRAGMA foreign_keys=ON");
-  db.exec(readFileSync(new URL("../site/migrations/0001_inquiry.sql",import.meta.url),"utf8"));
+  for(const n of ["0001_inquiry.sql","0002_inquiry_case_retention.sql",
+    "0003_inquiry_verified_case_actions.sql","0004_inquiry_response_receipts.sql"]){
+    db.exec(readFileSync(new URL("../site/migrations/"+n,import.meta.url),"utf8"));
+  }
   const seed=db.prepare(`INSERT INTO inquiries
    (reference,idempotency_key,fingerprint,full_name,work_email,company_name,
     annual_spend,modes_json,details_json,accepted_at,notification_status)
