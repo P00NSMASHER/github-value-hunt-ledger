@@ -55,3 +55,25 @@ Default is offline, with zero network access. For an explicitly authorized bound
 The scheduled job sets that environment guard on main only. No live acquisition runs on an unmerged draft PR.
 
 Next expansion after proof of rights and storage security: private customer-authorized acquisition with original invoice, effective contract/rate, BOL/POD, payment/credit events, incumbent findings and independently adjudicated labels; blind test splits and a pre-registered evaluation protocol; source-specific retention and deletion. Keep those source documents outside GitHub and separate from public research metadata.
+
+## Source-bound review queue
+
+The six-hour acquisition job also generates `freight/lab15/triage_queue.json` using
+`freight/lab15_triage.py`. The queue joins the existing public-source ledger with
+`freight/lab15/evidence_annotations.json`, which contains a small set of **prior
+research observations only** for actual Kentucky and bankruptcy invoice exhibits
+and GAO decisions. It sorts manual follow-up leads by previously reported
+original invoice, rate quotation, independent shipment record, payment receipt,
+prior-auditor finding, and independent decision coverage.
+
+An observation remains `PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED`;
+a gap remains `evidence_not_reported` rather than "no such document exists."
+Weights are review triage heuristics, **not** rating accuracy, recoverable dollars,
+commercial authorization, or independently verified ground truth. Unannotated
+automatically discovered sources get no evidence-coverage credit. Every output
+record explicitly blocks commercial reuse approval, customer authority, confirmed
+invoice error and actual cash recovery. The queue is content-bound to the exact
+ledger and annotation digest and validated on each automatic run.
+
+Run offline: `python -m unittest -v freight.test_lab15_triage`, then
+`python -m freight.lab15_triage --out /tmp/retally-lab15-triage.json`.
