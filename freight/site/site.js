@@ -368,24 +368,53 @@
           throw new Error(result.error || "We could not confirm receipt.");
         }
         // This screen is shown ONLY after Cloudflare confirms durable D1 acceptance.
+        // Saving the request is not proof that the business inbox was notified.
+        const notificationPending = result.notificationPending !== false;
         auditForm.hidden = true;
         const ready = byId("auditReady");
-        ready.querySelector(".eyebrow").textContent = "Request received";
-        ready.querySelector("h3").textContent = "RETALLY has received your request.";
+        ready.querySelector(".eyebrow").textContent = notificationPending
+          ? "Request saved — notification pending" : "Request received";
+        ready.querySelector("h3").textContent = notificationPending
+          ? "Your request is saved. Please notify RETALLY by email."
+          : "RETALLY has received your request.";
         ready.querySelector("p:not(.eyebrow)").textContent = "Reference " + result.reference +
-          ". No freight files were submitted. We will review the business details you provided.";
-        // A durable receipt replaces the draft-email workflow. Keeping the
-        // manual fallback visible here could prompt duplicate requests.
+          (notificationPending
+            ? ". Your details are securely saved, but we could not confirm a staff email alert. Use the email button below to make sure the team sees your request."
+            : ". No freight files were submitted. We will review the business details you provided.");
         for (const id of ["sendAuditRequest", "editAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]) {
           const emailOnly = byId(id);
           if (emailOnly) emailOnly.hidden = true;
         }
+        // These legacy instructions say the entire inquiry was not submitted;
+        // never show them for a confirmed durable receipt.
         const fallbackInstructions = ready.querySelector(".audit-manual-fallback");
         if (fallbackInstructions) fallbackInstructions.hidden = true;
+        if (notificationPending) {
+          // Delayed/failed mail must not strand an otherwise durable lead.
+          // Preserve the SAME reference so staff can reconcile any email.
+          const contactEmail = document.querySelector('meta[name="freight-contact-email"]')?.content.trim() || "";
+          preparedSummary = buildSummary(result.reference);
+          const sendLink = byId("sendAuditRequest");
+          if (contactEmail && sendLink) {
+            const subject = encodeURIComponent("RETALLY Saved Audit Request — " + result.reference);
+            sendLink.href = "mailto:" + contactEmail + "?subject=" + subject +
+              "&body=" + encodeURIComponent(preparedSummary);
+            sendLink.removeAttribute("aria-disabled");
+            sendLink.textContent = "Email RETALLY About This Request";
+            sendLink.hidden = false;
+          }
+          const copySummary = byId("copyAuditSummary");
+          if (copySummary) copySummary.hidden = false;
+          const copyStatus = byId("copyStatus");
+          if (copyStatus) copyStatus.hidden = false;
+        }
         ready.hidden = false;
         ready.focus({ preventScroll: true });
         ready.scrollIntoView({ block: "center", behavior: "smooth" });
-        track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "durable_intake" });
+        track(EVENTS.auditFormCompleted, {
+          completedSteps: 1, method: "durable_intake", notificationPending,
+          deliveryConfirmed: false
+        });
       } catch (error) {
         setError((error.message || "Unable to confirm receipt.") +
           " Your form has not shown a confirmation. You can use the email method instead.");
