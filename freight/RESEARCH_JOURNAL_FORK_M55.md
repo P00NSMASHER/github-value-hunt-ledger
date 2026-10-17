@@ -13,3 +13,28 @@ M53/M54 bind an Ed25519 checkpoint to all review rows, nonce rows, and the check
 **All 26 original historical findings remain OPEN_UNVERIFIED; all 18 independent human first-customer approval gates remain unmet.** No business registration, real customer/bank/carrier approval, money movement, production deployment or scheduled task change.
 
 **DRAFT / UNMERGED / UNDEPLOYED.**
+
+## October 17 integration with the independent crash-gap M55 branch
+
+This candidate unifies the **independent** draft research strands #459 and #460:
+the exact off-journal Ed25519 signed predecessor/one unsigned successor diagnosis
+and the physical journal-instance binding for copied/replaced SQLite files.
+Neither is a production recovery authority. The branches remain untouched.
+
+The one canonical `digest_journal_rows(...,local_journal_identity_sha256=...)`
+now includes the absolute canonical path, device and inode identity in
+BOTH the live signed-head hash and the reconstructed predecessor hash.
+The reconciler must compare a signed ancestor **for this same journal
+instance**. Merely copying the same rows and consuming a new unsigned
+technical review cannot be labeled as an eligible pending descendant.
+
+Independent cross-branch negative controls: copied identical signed head
+is denied, and copied one-step unsigned successor is denied, while the
+original unchanged file can reopen and a true one-step child is held as
+`ONE_UNSIGNED_SUCCESSOR_REQUIRES_EXTERNAL_COUNTERSIGN` without
+issuing a signature or bypassing the consuming write gate.
+
+This is review-only integration. All 26 original historical findings
+remain OPEN_UNVERIFIED and all 18 independent human/customer release
+conditions remain unmet. No customer, claim, payment, legal authorization,
+remote custodian or production deployment was added. Exact-head CI is required.
