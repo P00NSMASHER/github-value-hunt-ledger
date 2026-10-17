@@ -132,8 +132,9 @@ def verify(site: Path, out: Path) -> dict:
             "savedHeading": ready.locator("h3").inner_text() ==
                 "Your request is saved. Please notify RETALLY by email.",
             "referenceShown": REFERENCE in ready.inner_text(),
-            "sameReferenceInEmail": send_href.startswith("mailto:jay@retallyrecovery.com?") and
-                REFERENCE in send_href,
+            "sameReferenceInEmail": send_href.startswith(
+                "mailto:" + page.locator('meta[name="freight-contact-email"]').get_attribute("content") + "?"
+            ) and REFERENCE in send_href,
             "staffEmailButtonVisible": page.locator("#sendAuditRequest").is_visible(),
             "copySummaryAvailable": page.locator("#copyAuditSummary").is_visible(),
             "legacyNotSentHidden": "Your request has not been sent yet" not in ready.inner_text(),
