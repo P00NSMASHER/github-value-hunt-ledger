@@ -1,6 +1,24 @@
 # RETALLY — Lead response, retention and evidence operations
 Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries.
 
+### Provenance and reporting accuracy
+- The owner-verified one-time live delivery test `RA-20261017-26F3BC58` is
+  stored in an additive, append-only `inquiry_qa_registry` provenance ledger.
+  Only that exact reference with its synthetic identity and delivered status
+  can enter the registry. It stays in D1; it is **not** deleted or closed.
+- Aggregate reporting now reconciles `raw_inquiry_total = business_inquiry_total +
+  synthetic_qa_excluded`. Every real and unclassified lead remains in the
+  alert queue. Unknown, duplicate or inconsistent QA status fails closed.
+- New synthetic exemptions require independently reviewed source and data
+  evidence, a new migration and tests. Broad `test` names, campaign tags or
+  domain patterns must **never** silently classify customer leads as QA.
+- The currently available Cloudflare Access application protects both
+  `/api/internal/inquiry-case` and `/api/internal/inquiry-response` on
+  `retallyrecovery.com` and `www.retallyrecovery.com`, preserving the existing
+  exact email, IdP and MFA policy. This is defense in depth, not proof of two
+  separately enrolled authorized staff identities.
+
+
 ## Operating boundary and true status
 - Public prospect intake is **OFF** until the full operator access, staffed monitoring,
   privacy-notice, legal/reviewer and customer launch gates are independently cleared.
@@ -81,7 +99,9 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
 ## Monitoring and escalation
 - Read-only command (Node 22+): `node freight/inquiry_ops/reconcile.mjs --dry-run`
   or `--live` with an approved, read-only Cloudflare API token supplied via
-  a secure credential manager. It runs four fixed aggregate SELECT statements.
+  a secure credential manager. It runs five fixed aggregate SELECT statements,
+  with gross receipt count, verified QA exclusions, real-lead counts and
+  bounded age/retention aggregates; no names, emails or body content are returned.
 - P0: pending-notification over 1 elapsed hour, an unacknowledged case over
   4 elapsed hours, response evidence incomplete after 24 elapsed hours,
   closed-without-verified-reply corruption, or expired unresolved retention.
@@ -92,9 +112,9 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
   Do not retry a possibly accepted email blindly or create duplicate leads.
 - If D1 query errors or gives malformed aggregates, status is **UNKNOWN**,
   never `0 leads`. Escalate and retain the disabled public-intake fallback.
-- No scheduler or notification sender is installed by this code. Establish
-  named staffing/coverage and verified monitoring before a public SLA or
-  always-on online launch.
+- No recurring monitor, scheduler or notification sender is installed by
+  this code. Establish an authorized scoped read-only credential, real staffing
+  and separately verified monitoring before a public SLA or always-on launch.
 
 ## Retention, privacy and erasure
 - Qualification records have a normal **90-day review point** measured from
