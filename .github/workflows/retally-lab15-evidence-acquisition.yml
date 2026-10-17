@@ -7,8 +7,6 @@ on:
       - 'freight/test_lab15_acquisition.py'
       - 'freight/lab15_triage.py'
       - 'freight/test_lab15_triage.py'
-      - 'freight/lab15_triage.py'
-      - 'freight/test_lab15_triage.py'
       - 'freight/lab15/**'
       - 'freight/LAB15_AUTONOMOUS_EVIDENCE_ACQUISITION.md'
       - '.github/workflows/retally-lab15-evidence-acquisition.yml'
@@ -17,6 +15,8 @@ on:
     paths:
       - 'freight/lab15_acquisition.py'
       - 'freight/test_lab15_acquisition.py'
+      - 'freight/lab15_triage.py'
+      - 'freight/test_lab15_triage.py'
       - 'freight/lab15/**'
       - 'freight/LAB15_AUTONOMOUS_EVIDENCE_ACQUISITION.md'
       - '.github/workflows/retally-lab15-evidence-acquisition.yml'
