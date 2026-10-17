@@ -15,7 +15,7 @@ Lab 15 is independent of Labs 1–14. The unmerged Lab 14 research chain, 18 ext
 3. Discover newly indexed dataset **metadata** from public GitHub, Zenodo and Harvard Dataverse catalog APIs. Apply freight/invoice relevance filters; exclude self-identified fictional/demo datasets. Never access any private repository, document or customer account.
 4. Append new rights-held source pointers to freight/lab15/evidence_ledger.json. Canonical URL hashes prevent duplicates; changes to known GAO public documents increment versioned source receipts.
 5. Validate immutable holds on unverified payment, fee, document reuse, real accuracy and customer authority. A content hash proves the fetched bytes' identity, not correctness or permission.
-6. A read-only pull-request test checks the code and ledger. Once the workflow is merged to main, a GitHub Actions run every six hours (17 */6 * * *) updates only the public **metadata ledger**, and commits only when something new or changed was seen. Job is serialized with safe non-force push. GitHub may delay or skip schedules.
+6. A read-only pull-request test checks the code and ledger. Once the workflow is merged to main, a GitHub Actions run every six hours (17 */6 * * *) updates only the public **metadata ledger** and the derived triage queue on the isolated `research/retally-lab15-source-ledger` branch. It never pushes discovery data to `main`. Job is serialized with safe non-force push; the existing public metadata catalog is separate. GitHub may delay or skip schedules.
 
 ## Source classifications
 
