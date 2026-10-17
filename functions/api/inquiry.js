@@ -15,6 +15,9 @@ const RECORDS = new Set(["Invoice export", "Rate agreements", "Shipment records"
 const CAMPAIGN = new Set(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
 const HOSTS = new Set(["www.retallyrecovery.com", "retallyrecovery.com"]);
 const MAX_BODY_BYTES = 8192;
+// Fixed sender belongs exclusively to the verified Resend sending subdomain.
+// The primary RETALLY business inbox stays with Zoho; its MX is not changed.
+const RESEND_FROM = "RETALLY Audit Notifications <audit@notify.retallyrecovery.com>";
 const SENSITIVE = /\b(?:password|passcode|api[\s_-]?key|access[\s_-]?token|bank[\s_-]?account|routing[\s_-]?number|card[\s_-]?number|cvv|iban|swift[\s_-]?code)\b/i;
 
 function answer(code, body) {
@@ -139,11 +142,9 @@ function validEnv(env) {
     env.INQUIRY_DB?.prepare &&
     env.TURNSTILE_SECRET && env.TURNSTILE_SITEKEY &&
     env.INQUIRY_RATE_SECRET &&
-    env.CLOUDFLARE_EMAIL_API_TOKEN &&
-    env.CLOUDFLARE_ACCOUNT_ID &&
-    env.INQUIRY_NOTIFY_TO === "jay@retallyrecovery.com" &&
-    typeof env.INQUIRY_NOTIFY_FROM === "string" &&
-    /^[a-z0-9._+-]+@retallyrecovery\.com$/.test(env.INQUIRY_NOTIFY_FROM);
+    typeof env.RESEND_API_KEY === "string" && env.RESEND_API_KEY.startsWith("re_") &&
+    env.RESEND_API_KEY.length >= 12 &&
+    env.INQUIRY_NOTIFY_TO === "jay@retallyrecovery.com";
 }
 // A durable D1 receipt and a business-mail notification are separate facts.
 // Treat unknown provider states as pending, including on idempotent retries.
@@ -200,39 +201,30 @@ export function notificationText(reference, p) {
   return lines.join("\n");
 }
 async function notify(env, reference, p) {
-  const res = await fetch(
-    "https://api.cloudflare.com/client/v4/accounts/" + encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID) + "/email/sending/send",
-    {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + env.CLOUDFLARE_EMAIL_API_TOKEN, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: env.INQUIRY_NOTIFY_FROM,
-        to: [env.INQUIRY_NOTIFY_TO],
-        reply_to: p.workEmail,
-        subject: "RETALLY Free Audit | " + reference,
-        text: notificationText(reference, p)
-      }),
-      signal: AbortSignal.timeout(9000)
-    }
-  );
-  if (!res.ok) return false;
-  const json = await res.json();
-  // Cloudflare API success or a message ID is not proof the intended inbox
-  // accepted this notification. The provider can suppress a recipient even
-  // when the overall call succeeds. Queueing is not mailbox delivery.
-  if (json?.success !== true || !json.result ||
-      typeof json.result !== "object" || Array.isArray(json.result)) return false;
-  const { delivered, queued, suppressed_recipients, permanent_bounces } = json.result;
-  // All four recipient arrays are required by the Cloudflare Sending contract.
-  // Missing or malformed lists must not silently mean "no suppressions".
-  if (![delivered, queued, suppressed_recipients, permanent_bounces]
-      .every(Array.isArray)) return false;
-  const target = env.INQUIRY_NOTIFY_TO.toLowerCase();
-  const includesTarget = list => list.some(value =>
-    typeof value === "string" && value.toLowerCase() === target);
-  return !includesTarget(suppressed_recipients) &&
-    !includesTarget(permanent_bounces) &&
-    (includesTarget(delivered) || includesTarget(queued));
+  // Resend's 200 + UUID proves only API acceptance, NOT recipient-mailbox
+  // delivery. The separately verified Zoho receipt remains a release gate.
+  // A stable provider key reduces duplicate sends on ambiguous transport retries.
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + env.RESEND_API_KEY,
+      "Content-Type": "application/json",
+      "Idempotency-Key": "retally-audit-" + reference
+    },
+    body: JSON.stringify({
+      from: RESEND_FROM,
+      to: [env.INQUIRY_NOTIFY_TO],
+      reply_to: p.workEmail,
+      subject: "RETALLY Free Audit | " + reference,
+      text: notificationText(reference, p)
+    }),
+    signal: AbortSignal.timeout(9000)
+  });
+  if (res.status !== 200) return false;
+  const result = await res.json();
+  return result !== null && typeof result === "object" &&
+    !Array.isArray(result) && typeof result.id === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(result.id);
 }
 export async function onRequestPost({ request, env }) {
   // A backend deployment alone does not enable this service for the public.
