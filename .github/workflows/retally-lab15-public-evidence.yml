@@ -1,0 +1,103 @@
+name: RETALLY Lab 15 - Public Freight Evidence Discovery
+
+on:
+  pull_request:
+    paths:
+      - 'freight/lab15_evidence_harvester.py'
+      - 'freight/test_lab15_evidence_harvester.py'
+      - 'freight/research/lab15_public_seeds.json'
+      - 'freight/research/lab15_candidate_ledger.json'
+      - 'freight/LAB15_EVIDENCE_ACQUISITION.md'
+      - '.github/workflows/retally-lab15-public-evidence.yml'
+  schedule:
+    - cron: '17 9,21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-lab15-public-evidence
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Validate source policy and ledger adversarial tests
+        run: python -m unittest freight.test_lab15_evidence_harvester -v
+      - name: Compile code and parse seed/ledger
+        run: |
+          python -m compileall -q freight/lab15_evidence_harvester.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from freight.lab15_evidence_harvester import validate_ledger
+          json.loads(Path('freight/research/lab15_public_seeds.json').read_text())
+          validate_ledger(json.loads(Path('freight/research/lab15_candidate_ledger.json').read_text()))
+          print('Lab 15 only: metadata state validated; zero customer documents accepted')
+          PY
+
+  discover:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Isolate all automated updates outside protected main
+        shell: bash
+        env:
+          EVIDENCE_BRANCH: research/retally-lab15-candidate-ledger
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if git ls-remote --exit-code --heads origin "$EVIDENCE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "refs/heads/$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
+            git switch -c "$EVIDENCE_BRANCH" --track "origin/$EVIDENCE_BRANCH"
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' merge --no-edit origin/main
+          else
+            git switch -c "$EVIDENCE_BRANCH" origin/main
+          fi
+      - name: Run public metadata discovery; no confidential document downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest freight.test_lab15_evidence_harvester -q
+          python -m freight.lab15_evidence_harvester --network --report /tmp/retally-lab15-run.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('/tmp/retally-lab15-run.json').read_text())
+          assert result['claims_or_marketing_approved'] is False
+          assert result['customer_documents_saved'] == 0
+          print('Lab15', json.dumps({k:result[k] for k in ('scan_date','total_leads','new_leads','api_query_failures')},sort_keys=True))
+          PY
+      - name: Push append-only research leads to isolated evidence branch
+        env:
+          EVIDENCE_BRANCH: research/retally-lab15-candidate-ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- freight/research/lab15_candidate_ledger.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research: append metadata-only Lab 15 public freight leads'
+          fi
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$EVIDENCE_BRANCH" 2>/dev/null || echo missing)" ]; then
+            git push origin "HEAD:refs/heads/$EVIDENCE_BRANCH"
+          fi
