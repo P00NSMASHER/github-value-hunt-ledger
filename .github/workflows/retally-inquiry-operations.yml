@@ -1,0 +1,27 @@
+name: RETALLY Inquiry Operations QA
+
+on:
+  pull_request:
+    paths:
+      - "freight/inquiry_ops/**"
+      - ".github/workflows/retally-inquiry-operations.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safe-reconciliation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Read source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Show runtime
+        run: node --version
+      - name: Syntax check
+        run: node --check freight/inquiry_ops/reconcile.mjs
+      - name: Deterministic synthetic tests
+        run: node --test freight/inquiry_ops/test_reconcile.mjs
+      - name: SQL dry run only
+        run: node freight/inquiry_ops/reconcile.mjs --dry-run --as-of=2026-10-08T16:00:00Z
