@@ -52,7 +52,8 @@ def _fail(code:str)->None:
 
 
 def _direct_child_count(review_rows:list,nonce_rows:list,
-                        predecessor_sha:str,predecessor_count:int)->int:
+                        predecessor_sha:str,predecessor_count:int,
+                        local_journal_identity_sha256:str)->int:
     """Find exact one-step signed-prefix row image; never infer chronology.
 
     The original M52 journal has no insertion-order serial. Enumerate each
@@ -76,6 +77,7 @@ def _direct_child_count(review_rows:list,nonce_rows:list,
         for previous_mode in (LOCAL_ONLY,CHECKPOINT_REQUIRED):
             if digest_journal_rows(
                 ancestors,ancestor_nonces,previous_mode,
+                local_journal_identity_sha256=local_journal_identity_sha256
             )==predecessor_sha:
                 matches+=1
     return matches
@@ -147,6 +149,7 @@ def inspect_replay_checkpoint_gap(
 
             predecessor_matches=_direct_child_count(
                 rows,nonces,signed["journal_state_sha256"],previous_count,
+                current["local_journal_identity_sha256"],
             )
             if predecessor_matches!=1:
                 _fail("NOT_AN_EXACT_ONE_REVIEW_SIGNED_SUCCESSOR")
