@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "seeds": [
+    {
+      "title": "Public bankruptcy exhibit: multiple historical LTL carrier invoices and dimensional adjustments",
+      "url": "https://document.epiq11.com/document/getdocumentbycode/?docId=3412364&projectCode=NRD&source=DM"
+    },
+    {
+      "title": "Public bankruptcy exhibit: corrected LTL invoice and rate quotation",
+      "url": "https://document.epiq11.com/document/getdocumentbycode?docId=4228494&projectCode=NHH&source=DM"
+    },
+    {
+      "title": "GAO public LTL rate dispute decision B-148465",
+      "url": "https://www.gao.gov/products/b-148465"
+    },
+    {
+      "title": "GAO public LTL corrected freight-billing decision B-143246",
+      "url": "https://www.gao.gov/products/b-143246"
+    }
+  ]
+}
