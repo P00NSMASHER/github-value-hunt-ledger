@@ -97,6 +97,49 @@ class M55JournalForkBindingTests(unittest.TestCase):
                 )
             self.assertEqual(empty.verify()["technical_review_rows"],0)
 
+    def _reconcile(self,fx,ledger,checkpoint):
+        return backup.inspect_signed_replay_checkpoint_reconciliation(
+            replay_ledger=ledger,
+            independently_held_checkpoint=checkpoint,
+            custodian_trust=fx["trust"],
+            journal_namespace=NAMESPACE,
+            expected_audience=AUDIENCE,
+            as_of_utc=fx["original_review_kwargs"]["as_of_utc"],
+        )
+
+    def test_signed_head_reconciliation_rejects_copy_of_same_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            fx=_fixture(root)
+            copy=root/"copy-for-read-only-reconciliation.sqlite3"
+            _clone(fx["ledger"].path,copy)
+            cloned=TechnicalReviewReplayLedger(copy)
+            with self.assertRaisesRegex(
+                ValueError,"M55_RECONCILE_SAME_SEQUENCE_JOURNAL_FORK_OR_MODE_ROLLBACK"
+            ):
+                self._reconcile(fx,cloned,fx["current_checkpoint"])
+            self.assertEqual(cloned.verify()["technical_review_rows"],1)
+
+    def test_one_unsigned_successor_remains_pending_on_original_but_not_copy(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            fx=_fixture(root)
+            self._review(fx,fx["ledger"],fx["current_checkpoint"])
+            original=self._reconcile(fx,fx["ledger"],fx["current_checkpoint"])
+            self.assertEqual(
+                original["state"],"ONE_UNSIGNED_SUCCESSOR_REQUIRES_EXTERNAL_COUNTERSIGN"
+            )
+            self.assertTrue(original["new_review_admission_must_remain_blocked"])
+            self.assertFalse(original["restore_activation_authorized"])
+            copy=root/"copied-uncountersigned-successor.sqlite3"
+            _clone(fx["ledger"].path,copy)
+            cloned=TechnicalReviewReplayLedger(copy)
+            with self.assertRaisesRegex(
+                ValueError,"M55_RECONCILE_NOT_AN_EXACT_ONE_REVIEW_SIGNED_SUCCESSOR"
+            ):
+                self._reconcile(fx,cloned,fx["current_checkpoint"])
+            self.assertEqual(cloned.verify()["technical_review_rows"],2)
+
     def test_signed_state_does_not_claim_external_file_attestation(self):
         with tempfile.TemporaryDirectory() as td:
             fx=_fixture(Path(td))
