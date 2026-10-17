@@ -31,13 +31,15 @@ export function readOnlyQueries(asOf) {
       "SELECT notification_status, COUNT(*) AS total, MIN(accepted_at) AS oldest_at, "+
       "SUM(CASE WHEN accepted_at <= "+hour+" THEN 1 ELSE 0 END) AS aged_hour, "+
       "SUM(CASE WHEN accepted_at <= "+day+" THEN 1 ELSE 0 END) AS aged_day "+
-      "FROM inquiries GROUP BY notification_status ORDER BY notification_status" },
+      "FROM inquiries i LEFT JOIN inquiry_qa_registry q ON q.reference=i.reference "+
+      "WHERE q.reference IS NULL GROUP BY notification_status ORDER BY notification_status" },
     { name:"retention_review", sql:
       "SELECT COUNT(*) AS aged_total, "+
       "COALESCE(SUM(CASE WHEN notification_status='pending' THEN 1 ELSE 0 END),0) AS aged_pending, "+
       "COALESCE(SUM(CASE WHEN notification_status='provider_accepted' THEN 1 ELSE 0 END),0) AS aged_provider, "+
       "COALESCE(SUM(CASE WHEN notification_status='delivery_verified' THEN 1 ELSE 0 END),0) AS aged_delivered "+
-      "FROM inquiries WHERE accepted_at < "+retention },
+      "FROM inquiries i LEFT JOIN inquiry_qa_registry q ON q.reference=i.reference "+
+      "WHERE i.accepted_at < "+retention+" AND q.reference IS NULL" },
     { name:"case_lifecycle", sql:
       "SELECT COUNT(*) AS total, "+
       "COALESCE(SUM(CASE WHEN d.reference IS NULL THEN 1 ELSE 0 END),0) AS unacknowledged, "+
@@ -53,7 +55,12 @@ export function readOnlyQueries(asOf) {
       "COALESCE(SUM(CASE WHEN i.accepted_at < "+retention+" AND (d.case_state IS NULL OR d.case_state<>'CLOSED') THEN 1 ELSE 0 END),0) AS expired_unresolved, "+
       "COALESCE(SUM(CASE WHEN i.accepted_at < "+retention+" AND d.case_state='CLOSED' AND d.purge_approved_at IS NULL THEN 1 ELSE 0 END),0) AS expired_closed_unapproved "+
       "FROM inquiries i LEFT JOIN inquiry_case_dispositions d ON d.reference=i.reference "+
-      "LEFT JOIN inquiry_response_states r ON r.reference=i.reference" },
+      "LEFT JOIN inquiry_response_states r ON r.reference=i.reference "+
+      "LEFT JOIN inquiry_qa_registry q ON q.reference=i.reference "+
+      "WHERE q.reference IS NULL" },
+    { name:"qa_scope", sql:
+      "SELECT (SELECT COUNT(*) FROM inquiries) AS raw_total, "+
+      "(SELECT COUNT(*) FROM inquiry_qa_registry) AS qa_total" },
     { name:"rate_limits", sql:
       "SELECT COUNT(*) AS expired_total FROM inquiry_limits WHERE expires_at < "+asOf }
   ];
@@ -122,6 +129,14 @@ export function reconcile(asOf, parts) {
      cases.closed_unverified>cases.closed) {
     throw new Error("Lead lifecycle aggregate inconsistent with notifications or retained cases");
   }
+  if(!Array.isArray(parts.qa_scope)||parts.qa_scope.length!==1)
+    throw new Error("Missing QA classification counts; refuse false-zero lead monitor");
+  const scope=parts.qa_scope[0];
+  onlyKeys(scope,["raw_total","qa_total"],"QA scope");
+  const raw_total=safeCount(scope.raw_total,"raw_total");
+  const qa_total=safeCount(scope.qa_total,"qa_total");
+  if(qa_total>raw_total||raw_total!==notifications+qa_total)
+    throw new Error("QA conservation violation: unclassified inquiries may be hidden");
   const alerts=[];
   if(cases.unacknowledged>0)alerts.push({
     priority:cases.aged_unacknowledged>0?"P0":"P1",code:"UNACKNOWLEDGED_LEADS",
@@ -157,6 +172,8 @@ export function reconcile(asOf, parts) {
   return {
     as_of:new Date(asOf*1000).toISOString(),source:"read-only D1 aggregates",
     inquiry_total:notifications,
+    raw_inquiry_total:raw_total,
+    synthetic_qa_excluded:qa_total,
     status_counts:counts,
     case_lifecycle:cases,
     retention:{over_90_days:aged_total,pending:aged_pending,provider_accepted:aged_provider,delivery_verified:aged_delivered},
