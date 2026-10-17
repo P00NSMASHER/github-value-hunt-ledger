@@ -160,6 +160,27 @@ class Lab15Tests(unittest.TestCase):
         with self.assertRaises(lab.EvidenceError):
             lab.validate_ledger(changed)
 
+    def test_source_kind_and_publisher_spoofing_rejected(self):
+        original, _ = lab.run_cycle(self.fresh(), SEED_ROWS, now=NOW,
+                                    pause=lambda _: None)
+        for kind, publisher in (("DATASET_CATALOG_LEAD", "GITHUB"),
+                                ("PUBLIC_BANKRUPTCY_EXHIBIT", "SEED"),
+                                ("GAO_DECISION", "DATAVERSE")):
+            forged = copy.deepcopy(original)
+            candidate = next(x for x in forged["records"] if x["url"] == GAO)
+            candidate["kind"] = kind
+            candidate["discovered_by"] = publisher
+            with self.subTest(kind=kind), self.assertRaises(lab.EvidenceError):
+                lab.validate_ledger(forged)
+
+    def test_fingerprint_state_cannot_be_forged(self):
+        original, _ = lab.run_cycle(self.fresh(), SEED_ROWS, now=NOW,
+                                    pause=lambda _: None)
+        row = next(x for x in original["records"] if x["url"] == GAO)
+        row["state"] = "PUBLIC_SOURCE_FINGERPRINTED"
+        with self.assertRaises(lab.EvidenceError):
+            lab.validate_ledger(original)
+
     def test_seed_authority_spoof_and_duplicate_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             file = Path(d) / "sources.json"
