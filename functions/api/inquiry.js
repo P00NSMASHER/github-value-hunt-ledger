@@ -289,7 +289,7 @@ export async function onRequestPost({ request, env }) {
         const updated = await db.prepare("UPDATE inquiries SET notification_status='provider_accepted',notified_at=? WHERE reference=?")
           .bind(Math.floor(Date.now()/1000),reference).run();
         // Never assert provider acceptance unless it was durably recorded.
-        if (updated?.success === true && (updated.meta?.changes === undefined || updated.meta.changes === 1)) {
+        if (updated?.success === true && updated.meta?.changes === 1) {
           notificationStatus = "provider_accepted";
         }
       } catch (_) { /* durable inquiry is intact; reconciliation required */ }
