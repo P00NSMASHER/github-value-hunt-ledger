@@ -53,3 +53,22 @@ No independent external signer, real remotely nonrollbackable high-water service
     PYTHONPATH=. python -m freight.lab_phase4_control_center --out /tmp/retally-m55-control
 
 **DRAFT / UNMERGED / NO LIVE DEPLOYMENT.**
+
+## October 17 combined journal-instance verification
+
+The separate M55 fork-binding research (#460) is now combined with this
+crash-gap reconciler in a new review-only integration branch; the original
+draft PRs are left unchanged. A signed full state digest now binds
+`local_journal_identity_sha256` (derived from canonical path, device, inode).
+`_direct_child_count` reconstructs the signed predecessor using the
+**same local instance identity** as the inspected current journal. This
+prevents a copied signed head or copied, structurally correct, unsigned
+child from silently inheriting an unrelated journal's trusted checkpoint.
+
+Legitimate original-file crash-gap descendants are still
+**PENDING_EXTERNAL_COUNTERSIGN** only, never authorized to admit further
+review or publish a financial recovery. The local file fingerprint is not
+an independently held signer, robust cross-host identity, nonrollbackable
+remote receipt or independent customer authorization. CI must exercise
+both M55 test modules in one exact-head run and keep the 14-lab/26-open/18-unmet
+release boundary intact.

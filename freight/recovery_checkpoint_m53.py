@@ -20,6 +20,9 @@ import binascii
 from datetime import datetime,timedelta,timezone
 from hashlib import sha256
 import json
+import os
+import stat
+from pathlib import Path
 from typing import Mapping
 
 from freight.contracts import canonical_hash
@@ -56,19 +59,54 @@ def _canonical_utc(value:object)->datetime:
     return moment.astimezone(timezone.utc)
 
 
-def digest_journal_rows(reviewed,nonces,security_mode:int)->str:
-    """Canonical M54-compatible digest for a pinned journal revision.
+def _journal_file_binding(conn)->str:
+    """Local filesystem identity; defense in depth, NOT external custody.
 
-    Factoring this logic makes a single exact signed-state definition
-    available for M55's one-review crash-gap reconciliation. Rows remain
-    local-only; the function cannot sign, issue or approve a checkpoint.
+    The connection must refer to an actual on-disk primary SQLite file.
+    We hash the device+inode and canonical location, not raw file paths.
+    This makes a copied empty or populated journal on another local inode
+    ineligible for a checkpoint signed for the original instance.
+    A privileged filesystem actor can defeat or reuse local identities;
+    migrations require explicit re-anchoring by a trusted custodian.
+    """
+    try:
+        rows=conn.execute("PRAGMA database_list").fetchall()
+    except Exception as exc:
+        raise ValueError("M55_JOURNAL_IDENTITY_UNREADABLE") from exc
+    mains=[row for row in rows if len(row)==3 and row[1]=="main"]
+    if len(mains)!=1 or not isinstance(mains[0][2],str) or not mains[0][2]:
+        raise ValueError("M55_JOURNAL_FILE_BACKING_REQUIRED")
+    path=Path(mains[0][2])
+    try:
+        metadata=os.stat(path,follow_symlinks=False)
+    except OSError as exc:
+        raise ValueError("M55_JOURNAL_IDENTITY_UNREADABLE") from exc
+    if not stat.S_ISREG(metadata.st_mode) or metadata.st_ino<=0:
+        raise ValueError("M55_JOURNAL_FILE_BACKING_REQUIRED")
+    return canonical_hash({
+        "purpose":"M55_LOCAL_JOURNAL_INSTANCE_FILE_IDENTITY",
+        "absolute_path":str(path.resolve(strict=True)),
+        "device":metadata.st_dev,
+        "inode":metadata.st_ino,
+    })
+
+
+def digest_journal_rows(reviewed,nonces,security_mode:int,*,local_journal_identity_sha256:str)->str:
+    """One canonical signed state for M55 fork and crash-gap review.
+
+    A copied journal cannot reconstruct the signed predecessor, because
+    local file identity is included in each full and prefix row digest.
+    This is only local filesystem binding, NOT external remote custody.
     """
     if type(security_mode) is not int or security_mode not in (0,54):
         _fail("UNREVIEWED_JOURNAL_MODE")
+    if type(local_journal_identity_sha256) is not str or not HEX64.fullmatch(local_journal_identity_sha256):
+        _fail("INVALID_LOCAL_JOURNAL_IDENTITY")
     return canonical_hash({
         "schema_version":1,
-        "purpose":"M54_COMPLETE_LOCAL_REPLAY_JOURNAL_ROW_AND_SECURITY_MODE",
+        "purpose":"M55_COMPLETE_JOURNAL_ROWS_MODE_AND_LOCAL_INSTANCE",
         "local_checkpoint_mode":security_mode,
+        "local_journal_identity_sha256":local_journal_identity_sha256,
         "review_rows":[list(row) for row in reviewed],
         "nonce_rows":[list(row) for row in nonces],
     })
@@ -84,6 +122,7 @@ def journal_state(conn)->dict:
     assurance=_validate(conn)
     from freight.recovery_mode_m54 import mode
     local_security_mode=mode(conn)
+    local_journal_identity_sha256=_journal_file_binding(conn)
     reviewed=conn.execute(
         "SELECT restore_request_id,manifest_sha256,result_proof_sha256,"
         "buyer_id,business_unit,audience,reviewed_at_utc,receipt_set_sha256,decision "
@@ -100,8 +139,10 @@ def journal_state(conn)->dict:
     return {
         "review_sequence":len(reviewed),
         "local_checkpoint_mode":local_security_mode,
+        "local_journal_identity_sha256":local_journal_identity_sha256,
         "journal_state_sha256":digest_journal_rows(
-            reviewed,nonces,local_security_mode
+            reviewed,nonces,local_security_mode,
+            local_journal_identity_sha256=local_journal_identity_sha256
         ),
     }
 
