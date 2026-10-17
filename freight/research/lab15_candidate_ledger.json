@@ -1,7 +1,56 @@
 {
-  "digest_sha256": "5ac994b499f565bfc5f74aa80f9751ef69c48a838b08fd188af33fd3f8ffd520",
+  "digest_sha256": "ce2baac34a74eb4063eec9bbda96e58ba461b030890a6e5bdfd94c2065172be4",
   "lab": 15,
-  "leads": [],
+  "leads": [
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "68660c9668093ba95fdd94603e870695990853c2f7e9cb60a0c35a220a292ece",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "GAO public LTL corrected freight-billing decision B-143246",
+      "url": "https://www.gao.gov/products/b-143246"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "6db7c9793082fb8594760db293d15be23572a369179ab7ea21b684c2c49c282d",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "Public bankruptcy exhibit: multiple historical LTL carrier invoices and dimensional adjustments",
+      "url": "https://document.epiq11.com/document/getdocumentbycode/?docId=3412364&projectCode=NRD&source=DM"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "897a415ec29a9d96caaed9d4a7a0acd4de6fa3e9e246f1d99da27a459cf43929",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "Public bankruptcy exhibit: corrected LTL invoice and rate quotation",
+      "url": "https://document.epiq11.com/document/getdocumentbycode?docId=4228494&projectCode=NHH&source=DM"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-17",
+      "id": "a4131c53f76d7c85e290e8485c6f5b24e7a115f2e03112f3ff7a775f3d3868fe",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "GAO public LTL rate dispute decision B-148465",
+      "url": "https://www.gao.gov/products/b-148465"
+    }
+  ],
   "schema_version": 1,
   "scope": "PUBLIC_METADATA_ONLY_NO_CUSTOMER_DOCUMENTS"
 }
