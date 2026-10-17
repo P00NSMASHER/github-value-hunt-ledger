@@ -4,12 +4,13 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+from urllib.error import HTTPError
 import socket
 import unittest
 from unittest.mock import patch
 
 from freight.lab15_evidence_harvester import (
-    Rejected, SOURCES, blank_ledger, new_lead, run, sanitize_title, source_items,
+    Rejected, SOURCES, blank_ledger, dedup_key, digest, new_lead, run, sanitize_title, source_items,
     validate_ledger, verify_url, NoRedirect, public_addresses,
 )
 
@@ -120,7 +121,38 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(report['api_query_failures']), len(SOURCES))
         self.assertEqual(report['total_leads'], 4)
         self.assertFalse(report['claims_or_marketing_approved'])
+        self.assertEqual(report['status'], 'PARTIAL_DISCOVERY_PROVIDER_ERRORS')
+        self.assertTrue(all(x.endswith(':TIMEOUTERROR') for x in report['api_query_failures']))
         validate_ledger(obj)
+
+    def test_first_run_doi_case_collision_collapses_preserving_original_receipt(self):
+        low = new_lead('https://doi.org/10.7910/dvn/9c0mus', 'DataCite LTL invoice evidence candidate', 'datacite', '2026-10-16')
+        high = new_lead('https://doi.org/10.7910/DVN/9C0MUS', 'Dataverse LTL invoice evidence candidate', 'dataverse', '2026-10-17')
+        self.assertEqual(dedup_key(low['url']), dedup_key(high['url']))
+        old = blank_ledger()
+        old['leads'] = [low, high]
+        old['digest_sha256'] = digest({k: old[k] for k in old if k != 'digest_sha256'})
+        with self.assertRaisesRegex(Rejected, 'DUPLICATE_CANONICAL_URL'):
+            validate_ledger(old)
+        repaired, report = run(old, seeds(), now=NOW)
+        validate_ledger(repaired)
+        self.assertIn(low, repaired['leads'])
+        self.assertNotIn(high, repaired['leads'])
+        self.assertEqual(report['total_leads'], 5)
+        self.assertEqual(report['new_leads'], 4)
+        self.assertFalse(any(row['customer_use_authorized'] or row['rated_ground_truth_verified'] for row in repaired['leads']))
+        twice, again = run(repaired, seeds(), now=NOW)
+        self.assertEqual(twice, repaired)
+        self.assertEqual(again['new_leads'], 0)
+
+    def test_provider_http_error_category_and_partial_run_status(self):
+        def blocked(url):
+            raise HTTPError(url, 403, 'Denied', None, None)
+        result, report = run(blank_ledger(), seeds(), network=True, transport=blocked, now=NOW)
+        self.assertEqual(report['status'], 'PARTIAL_DISCOVERY_PROVIDER_ERRORS')
+        self.assertEqual(report['api_query_failures'].count('data_gov:HTTP_403'), 2)
+        self.assertEqual(len(report['api_query_failures']), len(SOURCES))
+        validate_ledger(result)
 
 
 if __name__ == '__main__':

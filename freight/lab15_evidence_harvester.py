@@ -14,6 +14,7 @@ import json
 from pathlib import Path
 import re
 import socket
+from urllib.error import HTTPError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -68,6 +69,13 @@ def verify_url(url: object, *, api: bool = False) -> str:
             raise Rejected("CONTACT_IN_PATH")
     except ValueError as exc:
         raise Rejected("INVALID_URL") from exc
+    return url
+
+
+def dedup_key(url: str) -> str:
+    parsed = urlsplit(verify_url(url))
+    if parsed.hostname == 'doi.org' and not parsed.query:
+        return 'doi:' + parsed.path.casefold()
     return url
 
 
@@ -183,7 +191,7 @@ def blank_ledger() -> dict:
     return {**base, "digest_sha256": digest(base)}
 
 
-def validate_ledger(data: object) -> dict:
+def validate_ledger(data: object, *, allow_legacy_duplicates: bool = False) -> dict:
     if not isinstance(data, dict) or set(data) != {"schema_version", "lab", "scope", "leads", "digest_sha256"}:
         raise Rejected("BAD_LEDGER_SCHEMA")
     if data["schema_version"] != SCHEMA or data["lab"] != 15 or data["scope"] != "PUBLIC_METADATA_ONLY_NO_CUSTOMER_DOCUMENTS":
@@ -196,6 +204,8 @@ def validate_ledger(data: object) -> dict:
     for row in rows:
         if not isinstance(row, dict) or row != new_lead(row.get("url"), row.get("title"), row.get("provider"), row.get("first_seen")):
             raise Rejected("UNAPPROVED_LEDGER_PROMOTION")
+    if not allow_legacy_duplicates and len({dedup_key(row['url']) for row in rows}) != len(rows):
+        raise Rejected('DUPLICATE_CANONICAL_URL')
     if data["digest_sha256"] != digest({key: data[key] for key in data if key != "digest_sha256"}):
         raise Rejected("LEDGER_DIGEST_MISMATCH")
     return data
@@ -203,11 +213,13 @@ def validate_ledger(data: object) -> dict:
 
 def run(ledger: dict, seeds: object, *, network: bool = False, transport=None, now: datetime | None = None) -> tuple[dict, dict]:
     """Return (append-only ledger, transient run summary). No external calls by default."""
-    validate_ledger(ledger)
+    validate_ledger(ledger, allow_legacy_duplicates=True)
     if not isinstance(seeds, dict) or seeds.get("schema_version") != 1 or not isinstance(seeds.get("seeds"), list):
         raise Rejected("BAD_SEEDS")
     seen_date = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).date().isoformat()
-    existing = {entry["id"]: entry for entry in ledger["leads"]}
+    existing = {}
+    for entry in sorted(ledger['leads'], key=lambda row: (row['first_seen'], row['id'])):
+        existing.setdefault(dedup_key(entry['url']), entry)
     new_count = 0
     errors = []
     fetch = transport or fetch_json
@@ -225,15 +237,21 @@ def run(ledger: dict, seeds: object, *, network: bool = False, transport=None, n
                         collected.append(new_lead(link, provider.replace("_", " ") + " freight research candidate", provider, seen_date))
                     except (Rejected, ValueError, TypeError):
                         continue
-            except (Rejected, ValueError, TypeError, TimeoutError, OSError, json.JSONDecodeError):
-                errors.append(provider + ":FETCH_OR_PARSE_FAILED")
+            except (Rejected, ValueError, TypeError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+                code = (str(exc) if isinstance(exc, Rejected) else
+                        f'HTTP_{exc.code}' if isinstance(exc, HTTPError) else
+                        'BAD_JSON' if isinstance(exc, json.JSONDecodeError) else
+                        type(exc).__name__.upper())
+                errors.append(provider + ':' + code)
     for item in collected:
-        if item["id"] not in existing and new_count < MAX_NEW_PER_RUN and len(existing) < MAX_LEADS:
-            existing[item["id"]] = item
+        key = dedup_key(item['url'])
+        if key not in existing and new_count < MAX_NEW_PER_RUN and len(existing) < MAX_LEADS:
+            existing[key] = item
             new_count += 1
     base = {"schema_version": SCHEMA, "lab": 15, "scope": "PUBLIC_METADATA_ONLY_NO_CUSTOMER_DOCUMENTS", "leads": sorted(existing.values(), key=lambda r: r["id"])}
     result = {**base, "digest_sha256": digest(base)}
-    report = {"status": "UNVERIFIED_PUBLIC_SOURCE_LEADS_ONLY", "scan_date": seen_date,
+    validate_ledger(result)
+    report = {"status": "PARTIAL_DISCOVERY_PROVIDER_ERRORS" if errors else "UNVERIFIED_PUBLIC_SOURCE_LEADS_ONLY", "scan_date": seen_date,
               "public_api_network_used": bool(network), "api_queries_attempted": len(SOURCES) if network else 0,
               "api_query_failures": errors, "new_leads": new_count, "total_leads": len(existing),
               "customer_documents_saved": 0, "confirmed_rate_errors": 0,
