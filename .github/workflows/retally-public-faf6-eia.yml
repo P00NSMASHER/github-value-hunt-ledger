@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/retally-public-faf6-eia.yml'
       - 'freight/public_faf6_eia_v1.py'
+      - 'freight/public_original_research_control.py'
+      - 'freight/test_public_original_research_control.py'
       - 'freight/public_carrier_schedules_v1.py'
       - 'freight/public_cfs2022_prefix_v1.py'
       - 'freight/public_cfs2022_official_example_v1.py'
@@ -47,6 +49,32 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_official_example_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+      - name: Reconcile all original public research source families in sanitized evidence report
+        run: |
+          PYTHONPATH=. python -m freight.public_original_research_control --out /tmp/retally-lab14-public-research
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/retally-lab14-public-research/public_evidence_census.json').read_text())
+          assert data['scope']=='RETALLY_EXISTING_LAB14_PUBLIC_SOURCE_CENSUS_RESEARCH_ONLY'
+          assert data['total_bounded_observations']==307
+          assert len(data['original_public_source_record_counts'])==5
+          assert data['standalone_official_publisher_examples']==1
+          assert data['standalone_external_adjudication_records']==1
+          assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
+          assert data['stb_sample_accounting_year_histogram']=={'2024':100}
+          assert data['fmc_award_actual_cash_received_verified'] is False
+          assert data['real_RETALLY_customer_invoices_seen']==0
+          assert data['actual_RETALLY_cash_recovered_cents']==0
+          assert data['original_historical_findings_still_open']==26
+          assert data['independent_first_customer_human_gates_unmet']==18
+          assert data['commercial_claim_clearance']=='NO_GO'
+          page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
+          assert 'NOT verified customer invoices' in page
+          assert 'NO-GO' in page
+          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one official award, no customer recoveries.')
+          PY
       - name: Prohibit invoice and recovery claim promotion
         run: |
           PYTHONPATH=. python -m freight.public_faf6_eia_v1 > /tmp/public_benchmark_report.json
