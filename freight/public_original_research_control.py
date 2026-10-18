@@ -20,6 +20,7 @@ from freight.public_cfs2022_prefix_v1 import report as cfs_prefix
 from freight.public_stb_waybill_prefix_v1 import report as stb_prefix
 from freight.public_cfs2022_official_example_v1 import verified_published_example
 from freight.public_fmc_adjudication_v1 import verified_public_order
+from freight.public_gao_historical_collection_v1 import public_collection_report
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -42,6 +43,7 @@ def snapshot() -> dict:
     stb=stb_prefix()
     maryland=verified_published_example()
     fmc=verified_public_order()
+    gao=public_collection_report()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -81,6 +83,20 @@ def snapshot() -> dict:
         and fmc["actual_payment_verified_cents"] is None
         and fmc["claimant_bank_or_payment_receipt_confirmed"] is False
         and fmc["retally_validated_recovery_cents"]==0
+        and gao["historical_distinct_decisions"]==6
+        and gao["gao_reported_collection_events"]==7
+        and gao["agency_reported_collection_modes"]=={
+            "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":2,
+            "GOVERNMENT_APPLIED_SET_OFF":5,
+        }
+        and gao["cases_with_uncollected_future_deduction"]==1
+        and gao["cases_with_carrier_refund_authorized_but_unverified_paid"]==1
+        and gao["source_transcribed_historical_collection_report_not_payment_bank_proof"] is True
+        and gao["actual_carrier_account_bank_or_Treasury_posting_independently_verified"] is False
+        and gao["final_unreversed_net_government_recovery_total_cents"] is None
+        and gao["real_RETALLY_customer_invoices_examined"]==0
+        and gao["real_RETALLY_customer_recoveries_cents"]==0
+        and gao["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -89,6 +105,14 @@ def snapshot() -> dict:
         "total_bounded_observations":sum(observed.values()),
         "standalone_official_publisher_examples":1,
         "standalone_external_adjudication_records":1,
+        "separate_original_GAO_historical_collection_decisions":gao["historical_distinct_decisions"],
+        "separate_GAO_reported_historical_collection_events":gao["gao_reported_collection_events"],
+        "GAO_original_reported_refunds":gao["agency_reported_collection_modes"]["CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT"],
+        "GAO_original_reported_applied_setoffs":gao["agency_reported_collection_modes"]["GOVERNMENT_APPLIED_SET_OFF"],
+        "GAO_decisions_are_external_historical_not_307_source_observations":True,
+        "GAO_reported_collections_not_independently_Treasury_bank_verified":True,
+        "GAO_final_unreversed_net_government_recovery_total_cents":None,
+        "GAO_future_uncollected_or_carrier_reimbursement_unverified":True,
         "census_official_md_origin_pums_record_count":maryland["pums_md_origin_unweighted_record_count"],
         "census_official_md_origin_weighted_GOODS_value_usd":maryland["census_published_weighted_goods_value_usd"],
         "census_official_md_origin_gvf_cv_percent":maryland["census_published_gvf_cv_percent"],
@@ -134,7 +158,9 @@ def html_report(data:dict)->str:
         f"<tbody>{rows}</tbody></table>"
         "<p>Maryland's Census-weighted goods value is a separately published "
         "worked example; the FMC award is legally ordered, not independently "
-        "confirmed paid. Neither is RETALLY revenue.</p>"
+        "confirmed paid. Six distinct GAO government historical case decisions "
+        "describe collected offsets/refunds, but no original bank/Treasury postings "
+        "were independently inspected. None is RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
         " (local integrity only, not an external signature).</p>"
         "<p>26 historical issues open; 18 human gates unmet. "
