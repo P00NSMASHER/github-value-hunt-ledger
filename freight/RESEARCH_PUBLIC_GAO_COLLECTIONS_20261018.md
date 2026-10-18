@@ -163,3 +163,54 @@ scope or a private company's power to offset carrier balances**.
 No real RETALLY client/customer freight invoice, actual carrier
 settlement, real customer recovery or recoverable-performance figure
 has been acquired or validated.
+
+
+## Additional adverse GAO collection decision: offset applied, but legally disallowed (1979)
+
+**Original independent U.S. GAO publication:**
+[Review of GSA Setoff Action Against Carrier — B-192974 (March 29, 1979)](https://www.gao.gov/products/b-192974)
+([four-page Comptroller General PDF](https://www.gao.gov/assets/b-192974.pdf)).
+
+This case is a deliberate counterexample to the mistaken claim that **any
+executed deduction equals a valid or permanently retained overcharge
+recovery**.
+
+Braswell Motor Freight filed for bankruptcy in December 1976, followed
+by confirmation of its arrangement in July 1977. GSA later attempted
+to collect older transportation overcharge claims by deducting sums
+the government separately owed the carrier:
+
+| Event explicitly distinguished by GAO | Historical amount | Source determination |
+|---|---:|---|
+| Pre-petition carrier payables set off against pre-petition claims | **$2,147.59** | Properly offset, per this specific original decision |
+| Post-petition carrier payables set off against pre-petition claims | **$5,141.05** | Offset previously executed **but improper**, lacking debt mutuality |
+| Additional asserted pre-petition overcharge claims not filed/proved in the bankruptcy | **$7,473.08** | Discharged/uncollectible under the case facts, **not cash recovered** |
+| Separate proof of claim filed in the bankruptcy | **$1,430.24** | A filed claim, **not evidence of payment** |
+
+GAO concluded that GSA should allow Yellow Freight's $5,141.05
+reimbursement claim **if otherwise correct**. That is a legal outcome
+or direction, not independently inspected bank proof that the
+government actually **paid** the carrier. The filing/offset/claim
+categories are not automatically additive: the agency's additional
+overcharge claims, filed proof, and pre- versus post-petition
+bills payable represent distinct underlying accounting buckets.
+Arithmetic must not manufacture a false final balance.
+
+`freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json`
+and `freight/public_gao_setoff_reversal_v1.py` pin the GAO source,
+historical bankruptcy dates, legally upheld $2,147.59 and disallowed
+$5,141.05, absence of independently confirmed repayment, no private
+customer legal authority and no RETALLY cash. The dedicated negative
+tests fail on changed money, forged repayment, reversed legal finding,
+fictional invoices, or current-day setoff authorization.
+
+**Critical distinction:** This is an **additional adverse original
+decision**, not an eighth positive GAO collection case, and not an
+extra source row in the 307 BTS/EIA/carrier/Census/STB observations.
+Its direct source evidence provides a strong reason for conservative
+contract/authority/custody controls. The 1979 Bankruptcy Act rules
+are **not** assumed to be a statement of current bankruptcy law or
+binding on prospective private commercial clients.
+
+**Evidence tier: PUBLISHED_GAO_SETTLEMENT_REVERSAL_OR_DISALLOWANCE;
+PAYMENT_BACK_UNVERIFIED; FINAL_NET_RECOVERY_UNVERIFIED.**
