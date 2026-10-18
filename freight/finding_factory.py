@@ -178,6 +178,7 @@ def _validate_rule(rule: ChargeRule) -> tuple[date, date | None]:
         "authority_document_id", "charge_code", "document_source_hash",
     ):
         _text(name, getattr(rule, name))
+    _identity("authority_document_id", rule.authority_document_id)
     if type(rule.verified_controlling_authority) is not bool:
         raise ValueError("verified_controlling_authority must be a boolean")
     start = _iso_date("effective_from", rule.effective_from)
