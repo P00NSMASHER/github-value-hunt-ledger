@@ -95,7 +95,7 @@ def test_does_not_change_checked_in_source_or_cloudflare_build(tmp_path):
     assert (output / "assets/brand/retally-emblem-approved.png").read_bytes() == original_asset
     sitemap = ET.fromstring((output / "sitemap.xml").read_text())
     indexed = [x.text for x in sitemap.findall(".//{*}loc")]
-    assert len(indexed) == len(PUBLIC_CONTACT_PAGES)
+    assert len(indexed) == len(PUBLIC_CONTACT_PAGES) + 1
     assert all(u and u.startswith(NEW_BASE) and not u.endswith(".html") for u in indexed)
     assert (output / "robots.txt").read_text().count(
         "Sitemap: " + NEW_BASE + "sitemap.xml"
