@@ -1,6 +1,7 @@
 """Bounded original Census CFS PUMS sample integrity; not representative."""
 import csv
 import json
+from hashlib import sha256
 from pathlib import Path
 from decimal import Decimal
 HERE=Path(__file__).resolve().parent
@@ -10,6 +11,10 @@ def report():
     m=json.loads((HERE/"fixtures/public_census_cfs2022_pums_first100_manifest.json").read_text())
     if p.is_symlink() or not p.is_file() or p.stat().st_size>16000:
         raise ValueError("CFS_UNTRUSTED_SAMPLE")
+    raw=p.read_bytes()
+    if (len(raw)!=m.get("fixture_bytes") or
+        sha256(raw).hexdigest()!=m.get("fixture_sha256")):
+        raise ValueError("CFS_ORIGINAL_ROW_BYTES_CHANGED")
     with p.open(newline="",encoding="utf-8-sig") as f:
         reader=csv.DictReader(f)
         if tuple(reader.fieldnames or ())!=COLUMNS:raise ValueError("CFS_INVALID_SCHEMA")
