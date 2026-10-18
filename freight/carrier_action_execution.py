@@ -154,6 +154,21 @@ def _text(name: str, value: str) -> str:
     return value.strip()
 
 
+def _finding_ids(value: tuple[str, ...]) -> tuple[str, ...]:
+    if not isinstance(value, tuple) or not value:
+        raise ValueError("finding_ids must be a non-empty tuple")
+    if any(
+        not isinstance(finding_id, str)
+        or not finding_id
+        or finding_id != finding_id.strip()
+        for finding_id in value
+    ):
+        raise ValueError("finding_ids must contain canonical non-empty strings")
+    if len(set(value)) != len(value) or value != tuple(sorted(value)):
+        raise ValueError("finding_ids must be unique and canonically ordered")
+    return value
+
+
 def _timestamp(name: str, value: str) -> tuple[str, datetime]:
     text = _text(name, value)
     normalized = text[:-1] + "+00:00" if text.endswith("Z") else text
@@ -489,6 +504,7 @@ def verify_carrier_action_execution_receipt(
         raise ValueError("invalid execution receipt action type") from exc
     if type(receipt.requested_cents) is not int or receipt.requested_cents <= 0:
         raise ValueError("execution receipt requested_cents must be a positive integer")
+    _finding_ids(receipt.finding_ids)
     _, prepared_dt = _timestamp("prepared_at", receipt.prepared_at)
     _, executed_dt = _timestamp("executed_at", receipt.executed_at)
     if executed_dt < prepared_dt:
@@ -650,6 +666,7 @@ def verify_carrier_action_delivery_receipt(
         raise ValueError("invalid delivery receipt channel") from exc
     if type(receipt.requested_cents) is not int or receipt.requested_cents <= 0:
         raise ValueError("delivery receipt requested_cents must be a positive integer")
+    _finding_ids(receipt.finding_ids)
     _, submitted_dt = _timestamp("submitted_at", receipt.submitted_at)
     _, delivered_dt = _timestamp("delivered_at", receipt.delivered_at)
     if delivered_dt < submitted_dt:
