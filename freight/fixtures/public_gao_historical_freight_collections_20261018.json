@@ -124,6 +124,28 @@
         2076
       ],
       "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "B-197658",
+      "decision_date": "1980-08-25",
+      "source_url": "https://www.gao.gov/assets/b-197658.pdf",
+      "historical_context": "Original GAO three-page decision: one steel-post consignment shipped using three bills of lading; carrier refunded part of assessed overcharge and government recovered remaining balance by offset.",
+      "originally_paid_cents": 782042,
+      "final_agency_assessed_overcharge_cents": 164979,
+      "gao_reported_collection_events": [
+        {
+          "kind": "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",
+          "amount_cents": 110967
+        },
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 54012
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
     }
   ],
   "explicit_source_limits": [
@@ -131,6 +153,6 @@
     "A proposed additional deduction is not a completed collection; a certificate authorizing reimbursement to the carrier is not verified as paid.",
     "Amounts may refer to multiple shipment legs or government-specific tariff law. No generalization to present-day private commercial freight billing.",
     "These are third-party federal-government historical collection reports, not recoveries performed by RETALLY.",
-    "This bounded purposive set of six published cases is neither representative of freight invoices nor a recoverable-rate statistic."
+    "This bounded purposive set of seven published cases is neither representative of freight invoices nor a recoverable-rate statistic."
   ]
 }
