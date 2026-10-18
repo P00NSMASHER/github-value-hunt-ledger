@@ -483,8 +483,10 @@ def verify_carrier_action_execution_receipt(
     _text("target_customer_id", receipt.target_customer_id)
     _text("currency", receipt.currency)
     _text("executor_role", receipt.executor_role)
-    _timestamp("prepared_at", receipt.prepared_at)
-    _timestamp("executed_at", receipt.executed_at)
+    _, prepared_dt = _timestamp("prepared_at", receipt.prepared_at)
+    _, executed_dt = _timestamp("executed_at", receipt.executed_at)
+    if executed_dt < prepared_dt:
+        raise ValueError("executed_at cannot precede prepared_at")
     try:
         outcome = ExecutionOutcome(receipt.outcome)
     except ValueError as exc:
