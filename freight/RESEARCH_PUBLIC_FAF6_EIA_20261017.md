@@ -551,3 +551,27 @@ All original 26 historical defects and 18 independent human gates
 remain open. Source-integrity CI must pass on the exact final draft head;
 no private carrier documents, outbound contact, production change or
 payment authority is implied.
+
+
+### Original GSA FY2023 corrective vendor payment (separate from recoveries)
+
+The first-party GSA FY2025 congressional justification reports it **paid
+approximately $29.6 million back to a DoD transportation vendor** after
+contracting-officer findings that earlier GSA overcharge notices were
+wrong. A further potential **$11.8 million** was described as
+unresolved, **not paid**. This is a real public government accounting
+correction and is intentionally **a negative-control record**:
+the amount represents GSA's own reported payment **to** a vendor
+to correct erroneous collections, not actual customer freight overcharge
+refunds or RETALLY revenue.
+
+See `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md` and
+`freight/public_gsa_false_positive_payment_v1.py` for exact source
+URL, accounting provenance, distinction from six old GAO historical
+collection decisions and the separate unpaid FMC award. The source
+census treats it as a **standalone corrective government payment
+statement**, and **does not** increase the **307** bounded public
+freight research rows. The source has not independently verified
+bank transaction/voucher bytes or private customer billing.
+No source authorizes a current recovery claim, automatic setoff,
+collection from carriers, extra schedules or public savings advertising.
