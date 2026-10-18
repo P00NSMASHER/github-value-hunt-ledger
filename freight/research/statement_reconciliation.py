@@ -21,6 +21,8 @@ class StatementLine:
     statement_original_cents: int
     statement_open_cents: int
     parent_ref: str | None = None
+    shipment_pro: str | None = None
+    shipment_bol: str | None = None
 
 
 @dataclass(frozen=True)
@@ -51,6 +53,12 @@ def _money(value: int | None, *, optional: bool = False) -> None:
         raise ValueError("money must be nonnegative integer cents (not bool/float)")
 
 
+def _ref(value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("invoice_ref required")
+    return value.strip().upper()
+
+
 def compare(
     rows: list[StatementLine],
     *,
@@ -67,13 +75,12 @@ def compare(
     seen: set[str] = set()
     flags: set[str] = set()
     sum_original = sum_open = checked = 0
-    bases = {r.invoice_ref for r in rows if r.kind == "BASE"}
+    bases = {_ref(r.invoice_ref): r for r in rows if r.kind == "BASE"}
     for row in rows:
-        if not row.invoice_ref or not row.invoice_ref.strip():
-            raise ValueError("invoice_ref required")
-        if row.invoice_ref in seen:
+        ref = _ref(row.invoice_ref)
+        if ref in seen:
             raise ValueError("duplicate invoice reference; fail closed")
-        seen.add(row.invoice_ref)
+        seen.add(ref)
         if row.kind not in ("BASE", "ADJUSTMENT"):
             raise ValueError("unknown kind")
         for amount in (row.statement_original_cents, row.statement_open_cents):
@@ -90,8 +97,16 @@ def compare(
             if row.invoice_face_cents != row.statement_original_cents:
                 flags.add("INVOICE_FACE_STATEMENT_MISMATCH")
         if row.kind == "ADJUSTMENT":
-            if not row.parent_ref or row.parent_ref not in bases:
+            parent = bases.get(_ref(row.parent_ref)) if row.parent_ref else None
+            if parent is None:
                 flags.add("UNRESOLVED_ADJUSTMENT_PARENT")
+            else:
+                links = (row.shipment_pro, row.shipment_bol, parent.shipment_pro, parent.shipment_bol)
+                if any(not isinstance(link, str) or not link.strip() for link in links):
+                    flags.add("ADJUSTMENT_SHIPMENT_IDENTITY_UNVERIFIED")
+                elif (row.shipment_pro.strip().upper() != parent.shipment_pro.strip().upper()
+                      or row.shipment_bol.strip().upper() != parent.shipment_bol.strip().upper()):
+                    flags.add("ADJUSTMENT_SHIPMENT_IDENTITY_MISMATCH")
         elif row.parent_ref:
             flags.add("BASE_CANNOT_HAVE_PARENT")
         sum_original += row.statement_original_cents
