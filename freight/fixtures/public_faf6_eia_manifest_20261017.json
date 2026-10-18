@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "as_of_date": "2026-10-17",
+  "intent": "source_bound_public_freight_market_context_only",
+  "lab": "RETALLY existing Lab 14, research-only",
+  "eligibility": [
+    "descriptive_commodity_flow",
+    "historical_diesel_price_context"
+  ],
+  "prohibited_conclusions": [
+    "actual_customer_invoice",
+    "contractual_tariff",
+    "carrier_surcharge_schedule",
+    "identified_overcharge",
+    "recoverable_cents",
+    "actual_savings",
+    "2026_lane_quote",
+    "prospect_outreach_authority"
+  ],
+  "faf6": {
+    "publisher": "US Department of Transportation / Bureau of Transportation Statistics",
+    "source_page": "https://www.bts.gov/faf",
+    "source_doI": "https://doi.org/10.21949/fhgm-g335",
+    "source_archive": "https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0_State.zip",
+    "source_archive_sha256": "50c6a8bb857b94998a634306234b805af6a114f7ce76ef0b02f34660d01a3e0d",
+    "archive_bytes": 6823123,
+    "internal_csv": "FAF6.0_State.csv",
+    "internal_csv_sha256": "e6ff7d1a48a3bc0181435230df508da9b5587a5a009f341e925a31d4a6055d55",
+    "internal_csv_bytes": 22948261,
+    "source_rows": 599529,
+    "origin_geography": "2022 domestic state FIPS (24 Maryland / 42 Pennsylvania)",
+    "data_vintage": "FAF6.0 benchmark 2022, published 2026; modeled estimates",
+    "mode_code": "1=truck, as defined by FAF data tabulation tool",
+    "trade_type_code": "1=domestic only",
+    "commodity_code": "SCTG2, 2-digit commodity code",
+    "weight_unit": "thousand short tons",
+    "value_unit": "million constant 2022 USD of goods moved, NOT freight transportation charges",
+    "extraction": "exact source rows with dms_mode=1,trade_type=1, state pairs (24,42),(42,24); no weighting or sample invention",
+    "frozen_rows": 78,
+    "md_to_pa": {
+      "rows": 39,
+      "tons_2022": "9294.353721",
+      "value_2022": "17053.202765"
+    },
+    "pa_to_md": {
+      "rows": 39,
+      "tons_2022": "22583.687532",
+      "value_2022": "22012.297371"
+    },
+    "fixture": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv"
+  },
+  "eia": {
+    "publisher": "US Energy Information Administration",
+    "source_page": "https://www.eia.gov/dnav/pet/PET_PRI_GND_A_EPD2D_PTE_DPGAL_W.htm",
+    "published_week": "2026-10-12",
+    "measurement": "Retail on-highway diesel price including taxes; USD per gallon; not contract fuel-surcharge tariff",
+    "scope": [
+      "US",
+      "PADD1",
+      "PADD1B"
+    ],
+    "snapshot_weeks": 6,
+    "frozen_rows": 18,
+    "latest_prices": {
+      "US": "6.179",
+      "PADD1": "5.908",
+      "PADD1B": "6.471"
+    },
+    "fixture": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv"
+  },
+  "custody_notes": [
+    "The full BTS source ZIP was directly downloaded through a public-web research browser and hashes were computed on 2026-10-17.",
+    "No private customer invoice, tariff agreement, actual carrier remittance, payment record, verified real savings or proprietary source was acquired.",
+    "The ZIP bytes are not uploaded to GitHub; a bounded extract, strong full-archive hash and local verification script allow independent replay.",
+    "If the publisher changes the archive, quarantine until an authorized new-vintage evidence review; never silently treat a revision as comparable."
+  ]
+}

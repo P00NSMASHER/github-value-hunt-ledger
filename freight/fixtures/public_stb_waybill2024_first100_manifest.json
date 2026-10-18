@@ -1,0 +1,74 @@
+{
+  "as_of_date": "2026-10-18",
+  "publisher": "US Surface Transportation Board",
+  "source_page": "https://www.stb.gov/reports-data/waybill/",
+  "source_zip": "https://www.stb.gov/wp-content/uploads/PublicUseWaybillSample2024.zip",
+  "zip_size": 68197449,
+  "zip_entries": 7,
+  "zip_original_member": "PublicUseWaybillSample2024.txt",
+  "member_compressed_bytes": 66413233,
+  "member_uncompressed_bytes": 539561337,
+  "member_crc32": "3048824b",
+  "member_local_offset": 1783486,
+  "source_range": "bytes=1783486-2045629",
+  "source_range_sha256": "51bdff79ade49491bcd5d3ef670a079a1d263372ef9dffb24ee8086a57b68059",
+  "first_records": 100,
+  "record_width": 247,
+  "line_ending": "CRLF",
+  "sample_bytes": 24900,
+  "sample_sha256": "007a598863ba5e7a6b2a8e09b2f75c0ccabcb9588df7c582a2445c7d9967e1d4",
+  "sample": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+  "caveats": [
+    "Fixed-width field columns not yet decoded against official 2024 reference guide.",
+    "Revenue in the public-use file may be masked and not represent actual waybill revenue.",
+    "First 100 lines are not a representative random draw; no national rail-rate or recovery estimates.",
+    "Full archive SHA and full-member CRC not independently replayed; only ZIP central directory metadata and exact source range verified.",
+    "No confidential waybill access attempted; only expressly public-use artifact."
+  ],
+  "classification": "REAL_PUBLIC_RECORDS_FROZEN_FIELDS_NOT_YET_ADJUDICATED",
+  "official_layout_reference": "https://www.stb.gov/wp-content/uploads/2024-STB-Waybill-Reference-Guide.pdf",
+  "official_layout_table": "Table 4-6 page 103; Table 4-7 page 105",
+  "source_accounting_period_field": {
+    "one_based_columns": "7-10",
+    "format": "mmyy",
+    "semantics": "month/year the waybill was entered into railroad revenue-accounting system"
+  },
+  "source_waybill_date_field": {
+    "one_based_columns": "1-6",
+    "format": "mmddyy",
+    "semantics": "date railroad originally prepared waybill"
+  },
+  "frozen_prefix_accounting_year_histogram": {
+    "2024": 100
+  },
+  "frozen_prefix_waybill_year_histogram": {
+    "2018": 14,
+    "2020": 1,
+    "2021": 20,
+    "2022": 65
+  },
+  "frozen_prefix_accounting_period_histogram": {
+    "1024": 11,
+    "1124": 11,
+    "1224": 1,
+    "0124": 9,
+    "0224": 1,
+    "0324": 6,
+    "0424": 16,
+    "0524": 8,
+    "0624": 13,
+    "0724": 2,
+    "0824": 6,
+    "0924": 16
+  },
+  "first_original_record": {
+    "waybill_date_raw": "041118",
+    "accounting_period_raw": "0324"
+  },
+  "dated_scope_limitations": [
+    "All 100 frozen sample rows have accounting year 2024, but their original waybill dates span 2018, 2020, 2021 and 2022.",
+    "Do not relabel earlier waybill dates as 2024 shipment movements.",
+    "Reason that older waybills were entered into 2024 accounting periods is not established by this bounded sample.",
+    "Do not infer the year composition of the complete published file from its first 100 rows."
+  ]
+}

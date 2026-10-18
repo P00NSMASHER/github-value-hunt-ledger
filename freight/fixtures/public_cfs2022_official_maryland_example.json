@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source": "US_CENSUS_2022_CFS_PUMS_USERS_GUIDE_OFFICIAL_WORKED_EXAMPLE",
+  "original_guide_url": "https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums_users_guide.pdf",
+  "source_location": "Printed page 7, Example of calculations using the CFS PUMS",
+  "survey_year": 2022,
+  "shipment_domain": "ORIG_STATE = 24 (all Maryland-origin shipments in CFS-covered establishments, all destinations, all modes)",
+  "published_example_pums_domain_records": 612317,
+  "published_example_weighted_goods_value_usd": "198598788295",
+  "published_example_total_value_gvf_coefficients": {
+    "a": "3.905",
+    "b": "0.011",
+    "c": "-0.010"
+  },
+  "published_example_coefficient_of_variation_percent": "9.74",
+  "weighting_rule": "Weighted sum of SHIPMT_VALUE * WGT_FACTOR across every CFS PUMS shipment in origin-state-24 domain",
+  "variance_rule": "Census GVF: exp(a+b*ln(n)+c*(ln(n))^2) gives CV as a PERCENT; coefficient n is PUMS domain record count",
+  "never_interchange_with": [
+    "FAF6 MD-to-PA 2022 goods-flow estimate",
+    "transportation freight spend or rail fuel cost",
+    "customer contract rate or carrier invoice",
+    "true privately submitted freight charges",
+    "actual overpayment or recovery"
+  ],
+  "actual_source_rows_downloaded_for_this_example": 0,
+  "this_is_official_published_example_not_locally_recomputed_from_full_file": true,
+  "ordinary_100_row_prefix_permitted_as_substitute": false,
+  "full_census_pums_sha_verified": false,
+  "own_customer_invoices_seen": 0,
+  "real_recoveries_cents": 0
+}
