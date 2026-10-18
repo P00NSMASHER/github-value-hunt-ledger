@@ -2,7 +2,7 @@
   "schema_version": 1,
   "as_of_date": "2026-10-18",
   "purpose": "real_original_SEC_filed_historical_shipper_carrier_contract_rate_source_not_invoice",
-  "source_class": "SIGNED_OR_FILED_HISTORICAL_RATE_AGREEMENT_EXHIBITS",
+  "source_class": "SEC_FILED_HISTORICAL_CONTRACT_OR_FORM_EXHIBITS",
   "customer_role": "EXTERNAL_TO_RETALLY",
   "contracts": [
     {
@@ -115,7 +115,8 @@
       "off_band_fuel_prices_proven_by_this_excerpt": false,
       "current_operational_status_verified": false,
       "actual_invoice_and_lane_Appendices_seen": false,
-      "original_EDGAR_document_binary_hashed": false
+      "original_EDGAR_document_binary_hashed": false,
+      "carrier_signature_independently_authenticated": false
     }
   ],
   "shared_controls": {
@@ -128,5 +129,11 @@
     "synthetic_calculations_only": true,
     "disagreement_requires_actual_signed_contract_tariff_and_original_invoice": true,
     "commercial_claim_clearance": "NO_GO"
-  }
+  },
+  "custody_notes": [
+    "A signed NEDAK exhibit is reproduced in an SEC filing; the Swift form's carrier signature/completeness is not independently authenticated.",
+    "The two examples are published 2005/2007 historical filed references, not current agreed or amended terms.",
+    "SEC HTML bytes and signature authenticity were not separately cryptographically attested.",
+    "Every rate demonstration must use explicitly marked invented input values; no invoices, gallons moved, diesel paid or money recovered are proven."
+  ]
 }
