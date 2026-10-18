@@ -314,6 +314,8 @@ def issue_authorization(
         raise ValueError("expires_on cannot precede issued_on")
     if type(max_validity_days) is not int or max_validity_days < 1:
         raise ValueError("max_validity_days must be a positive integer")
+    if max_validity_days > MAX_VALIDITY_DAYS:
+        raise ValueError("max_validity_days cannot exceed internal maximum")
     if (expires - issued).days > max_validity_days:
         raise ValueError("authorization validity exceeds internal maximum")
 
