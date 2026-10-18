@@ -49,6 +49,13 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertEqual(data["GSA_appropriation_table_rows_separately_verified"],7)
         self.assertTrue(data["GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof"])
         self.assertTrue(data["GSA_program_receipts_cannot_establish_RETALLY_recovery_rate"])
+        self.assertEqual(data["separate_2025_DC_Circuit_Crowley_original_decisions"],1)
+        self.assertTrue(data["Crowley_2025_court_reversed_scope_to_audit_non_carrier"])
+        self.assertEqual(data["Crowley_alleged_nocs_more_than"],50000)
+        self.assertEqual(data["Crowley_alleged_aggregated_dollars_APPROX_not_proven_cents"],3700000000)
+        self.assertEqual(data["Crowley_parallel_11_8m_damages_DEMAND_NOT_AWARD_cents"],1180000000)
+        self.assertTrue(data["Crowley_2026_final_claim_payment_not_verified"])
+        self.assertTrue(data["Crowley_federal_case_holding_not_private_RETALLY_authority"])
         self.assertEqual(data["census_official_md_origin_pums_record_count"],612317)
         self.assertEqual(data["census_official_md_origin_gvf_cv_percent"],"9.74")
         self.assertTrue(data["fmc_award_actual_cash_received_verified"] is False)
@@ -176,6 +183,20 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_gao_appeal_cannot_promote_allegations_or_claimed_damages_to_retally(self):
+        original=src.crowley_appellate_scope()
+        for key,bad in [
+            ("historical_notices_are_customer_errors_confirmed",True),
+            ("court_did_not_award_individual_damages",False),
+            ("later_litigation_or_payment_2026_outcome_verified",True),
+            ("no_private_commercial_freight_setoff_authority",False),
+            ("retally_recovered_cents",1180000000),
+        ]:
+            with self.subTest(key=key):
+                with patch.object(src,"crowley_appellate_scope",return_value={**original,key:bad}):
+                    with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -186,6 +207,8 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("ERRONEOUS notices of overcharge",html)
         self.assertIn("GAO decision found $5,141.05",html)
         self.assertIn("FY2024/25 PLANNED values",html)
+        self.assertIn("federal appellate decision restricted GSA authority",html)
+        self.assertIn("$11.8M demand are NOT validated recovery money",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
