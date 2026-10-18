@@ -1,0 +1,48 @@
+name: RETALLY Lab 14 Original GAO Historical Freight Collections
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-gao-historical-collections.yml'
+      - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/test_public_gao_historical_collection_v1.py'
+      - 'freight/fixtures/public_gao_historical_freight_collections_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-historical-collection-and-negative-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Validate exact original GAO historical case figures and false-claim denials
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+      - name: Fail closed on any implication that GAO decisions prove RETALLY money recovered
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_historical_collection_v1 > /tmp/retally_lab14_gao_historical.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally_lab14_gao_historical.json').read_text())
+          assert x['scope']=='LAB14_ORIGINAL_GAO_GOVERNMENT_COLLECTION_CASES_NOT_CUSTOMER_SAVINGS'
+          assert x['historical_distinct_decisions']==6
+          assert x['gao_reported_collection_events']==7
+          assert x['agency_reported_collection_modes']=={
+            'CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT':2,
+            'GOVERNMENT_APPLIED_SET_OFF':5,
+          }
+          assert x['cases_with_uncollected_future_deduction']==1
+          assert x['cases_with_carrier_refund_authorized_but_unverified_paid']==1
+          assert x['cases_with_disputed_amount_variants']==1
+          assert x['actual_carrier_account_bank_or_Treasury_posting_independently_verified'] is False
+          assert x['final_unreversed_net_government_recovery_total_cents'] is None
+          assert x['real_RETALLY_customer_invoices_examined']==0
+          assert x['real_RETALLY_customer_recoveries_cents']==0
+          assert x['commercial_claim_clearance']=='NO_GO'
+          print('Lab14 first-party GAO record review: six historical dockets / seven collection events; zero verified RETALLY cash.')
+          PY
