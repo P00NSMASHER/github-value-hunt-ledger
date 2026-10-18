@@ -308,3 +308,25 @@ Current combined bounded authentic public-source observations:
 100 Census CFS public-use shipment records, and 100 STB public-use rail
 waybill rows (original fixed-width bytes only). There are **zero**
 independently verified customer invoices and **zero** verified recoveries.
+
+
+### Verified fixed-width positions from the original STB 2024 guide
+
+Primary official reference: https://www.stb.gov/wp-content/uploads/2024-STB-Waybill-Reference-Guide.pdf
+
+**Table 4-6 (page 103, publication pagination)** documents all 247
+fixed-width positions, including Waybill Date (1–6), Carloads (11–14),
+STCC Commodity Code (36–40), Billed Weight (41–47), Actual Weight
+(48–54), Origin BEA (104–106) and Destination BEA (126–128).
+`freight/public_stb_waybill_prefix_v1.py` now checks these exact
+original field positions on each of the 100 records without decoding
+or making claims about the **potentially masked freight revenue**
+positions 55–63.
+
+**Data-vintage warning:** The first frozen record carries raw six-digit
+Waybill Date `041118` even though the document is labeled 2024. This
+is preserved as published and explicitly classified
+`waybill_date_year_interpretation=UNVERIFIED` until its meaning,
+historical carryover and file lineage can be independently reconciled.
+Do not date-adjust, extrapolate or claim it represents a 2024
+commercial invoice.
