@@ -18,6 +18,14 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertEqual(len(data["original_public_source_record_counts"]),5)
         self.assertEqual(data["standalone_official_publisher_examples"],1)
         self.assertEqual(data["standalone_external_adjudication_records"],1)
+        self.assertEqual(data["separate_original_GAO_historical_collection_decisions"],6)
+        self.assertEqual(data["separate_GAO_reported_historical_collection_events"],7)
+        self.assertEqual(data["GAO_original_reported_refunds"],2)
+        self.assertEqual(data["GAO_original_reported_applied_setoffs"],5)
+        self.assertTrue(data["GAO_decisions_are_external_historical_not_307_source_observations"])
+        self.assertTrue(data["GAO_reported_collections_not_independently_Treasury_bank_verified"])
+        self.assertIsNone(data["GAO_final_unreversed_net_government_recovery_total_cents"])
+        self.assertTrue(data["GAO_future_uncollected_or_carrier_reimbursement_unverified"])
         self.assertEqual(data["census_official_md_origin_pums_record_count"],612317)
         self.assertEqual(data["census_official_md_origin_gvf_cv_percent"],"9.74")
         self.assertTrue(data["fmc_award_actual_cash_received_verified"] is False)
@@ -62,11 +70,36 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_SOURCE_COUNTS"):
                 src.snapshot()
 
+    def test_false_independent_gao_bank_settlement_is_rejected(self):
+        original=src.public_collection_report()
+        with patch.object(src,"public_collection_report",return_value={
+            **original,
+            "actual_carrier_account_bank_or_Treasury_posting_independently_verified":True,
+        }):
+            with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                src.snapshot()
+
+    def test_forged_gao_net_collection_or_incorrect_event_count_fails(self):
+        original=src.public_collection_report()
+        for key,change in [
+            ("final_unreversed_net_government_recovery_total_cents",457107),
+            ("gao_reported_collection_events",8),
+            ("real_RETALLY_customer_recoveries_cents",457107),
+        ]:
+            with self.subTest(key=key):
+                with patch.object(src,"public_collection_report",return_value={
+                    **original,key:change,
+                }):
+                    with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
         self.assertIn("research only",html)
         self.assertIn("NOT verified customer invoices",html)
+        self.assertIn("Six distinct GAO government historical case decisions",html)
+        self.assertIn("no original bank/Treasury postings",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
