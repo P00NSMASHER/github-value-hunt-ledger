@@ -19,7 +19,7 @@ class OriginalFederalAppellateScopeTest(unittest.TestCase):
         self.assertFalse(x["historical_notices_are_customer_errors_confirmed"])
         self.assertEqual(x["contemporaneous_court_of_federal_claims_demand_usd_not_paid"],11800000)
         self.assertFalse(x["later_litigation_or_payment_2026_outcome_verified"])
-        self.assertFalse(x["no_private_commercial_freight_setoff_authority"])
+        self.assertTrue(x["no_private_commercial_freight_setoff_authority"])
         self.assertEqual(x["retally_real_customer_invoice_count"],0)
         self.assertEqual(x["retally_recovered_cents"],0)
         self.assertEqual(x["commercial_claim_clearance"],"NO_GO")
