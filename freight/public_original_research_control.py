@@ -277,7 +277,7 @@ def html_report(data:dict)->str:
         "worked example; the FMC award is legally ordered, not independently "
         "confirmed paid. Seven distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
-        "were independently inspected. Separately, GAO found $5,141.05 "
+        "were independently inspected. Separately, a GAO decision found $5,141.05 "
         "of applied post-bankruptcy-petition setoffs invalid; another 1980 "
         "GAO memorandum records GSA conceding an applied $475.36 offset "
         "improper. Neither carrier's repayment was independently proven. "
