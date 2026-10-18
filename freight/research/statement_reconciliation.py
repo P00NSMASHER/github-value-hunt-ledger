@@ -146,3 +146,62 @@ def compare(
         exception_codes=tuple(sorted(flags)),
         state="REVIEW_REQUIRED" if flags else "RESEARCH_ARITHMETIC_ONLY",
     )
+
+
+@dataclass(frozen=True)
+class SourceReferencedLiabilityTransfer:
+    """Court-disposition metadata, not certified document content or cash proof."""
+
+    original: ClaimSnapshot
+    revised: ClaimSnapshot
+    transferred_liability_cents: int
+    receiving_entity: str
+    public_court_order_url: str
+
+
+@dataclass(frozen=True)
+class LiabilityTransferAssessment:
+    state: Literal["SOURCE_REFERENCED_LIABILITY_TRANSFER", "REVIEW_REQUIRED"]
+    exception_codes: tuple[str, ...]
+    transferred_liability_cents: int
+    remaining_claim_cents: int
+    verified_recovered_cents: int = 0
+    verified_overcharge_cents: int = 0
+    commercial_reuse_authorized: bool = False
+
+
+def assess_claim_liability_transfer(record: SourceReferencedLiabilityTransfer) -> LiabilityTransferAssessment:
+    """Check evidence *references* and ledger arithmetic without inferring cash.
+
+    A matching HTTPS court link is a required provenance pointer, not proof its
+    contents were read or independently adjudicated by this pure function.
+    """
+    _money(record.original.claim_cents)
+    _money(record.revised.claim_cents)
+    _money(record.transferred_liability_cents)
+    flags: set[str] = set()
+    identities = []
+    for item in (record.original, record.revised):
+        parts = (item.debtor_ref, item.creditor_ref, item.claim_ref)
+        if any(not isinstance(p, str) or not p.strip() for p in parts):
+            flags.add("CLAIM_IDENTITY_UNVERIFIED")
+            continue
+        identities.append(tuple(p.strip().upper() for p in parts))
+    if len(identities) != 2 or identities[0] != identities[1]:
+        flags.add("CROSS_CLAIM_COMPARISON_BLOCKED")
+    if (record.original.claim_cents - record.transferred_liability_cents
+            != record.revised.claim_cents):
+        flags.add("CLAIM_TRANSFER_ARITHMETIC_MISMATCH")
+    if not isinstance(record.receiving_entity, str) or not record.receiving_entity.strip():
+        flags.add("TRANSFER_RECEIVING_ENTITY_UNVERIFIED")
+    if (not isinstance(record.public_court_order_url, str)
+            or not record.public_court_order_url.startswith(
+                "https://document.epiq11.com/document/getdocumentsbydocket/"
+            )):
+        flags.add("PUBLIC_COURT_ORDER_REFERENCE_MISSING")
+    return LiabilityTransferAssessment(
+        state="REVIEW_REQUIRED" if flags else "SOURCE_REFERENCED_LIABILITY_TRANSFER",
+        exception_codes=tuple(sorted(flags)),
+        transferred_liability_cents=record.transferred_liability_cents,
+        remaining_claim_cents=record.revised.claim_cents,
+    )
