@@ -718,3 +718,43 @@ def test_reconstructed_truth_cannot_fabricate_negative_expected_cents():
             issued_on="2026-09-21",
             expires_on="2026-09-22",
         )
+
+def test_self_hashed_review_revalidates_timestamp_before_external_authorization():
+    c = charter()
+    resolution = resolve_engagement(c)
+    truth, reviews = proof()
+    forged = reviews[0]
+    object.__setattr__(forged, "reviewed_at", "not-a-date")
+    review_body = {
+        "schema": 1,
+        "finding_id": forged.finding_id,
+        "finding_proof_hash": forged.finding_proof_hash,
+        "disposition": forged.disposition.value,
+        "reviewer_minutes": forged.reviewer_minutes,
+        "reviewer_role": forged.reviewer_role,
+        "reviewed_at": forged.reviewed_at,
+    }
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(forged, "review_hash", canonical_hash(review_body))
+
+    with pytest.raises(ValueError, match="reviewed_at"):
+        issue_authorization(
+            resolution=resolution,
+            operative_charter=c,
+            truth=truth,
+            reviews=(forged,),
+            authorization_id="ACT-FORGED-REVIEW-TIME",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1",),
+            currency="USD",
+            authorized_cents=1000,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-22",
+        )
+
