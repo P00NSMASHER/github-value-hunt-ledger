@@ -656,3 +656,65 @@ def test_authorization_validity_limit_cannot_exceed_internal_maximum():
             expires_on="2026-11-30",
             max_validity_days=365,
         )
+
+def test_reconstructed_truth_cannot_fabricate_negative_expected_cents():
+    c = charter()
+    resolution = resolve_engagement(c)
+    truth, reviews = proof()
+    finding = truth.findings[0]
+
+    object.__setattr__(finding, "expected_cents", -100000)
+    finding_body = {
+        "schema": 2,
+        "finding_id": finding.finding_id,
+        "buyer_id": finding.buyer_id,
+        "business_unit": finding.business_unit,
+        "invoice_id": finding.invoice_id,
+        "shipment_id": finding.shipment_id,
+        "customer_id": finding.customer_id,
+        "carrier_id": finding.carrier_id,
+        "currency": finding.currency,
+        "authority_id": finding.authority_id,
+        "expected_cents": finding.expected_cents,
+        "actual_cents": finding.actual_cents,
+        "status": finding.status,
+    }
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(finding, "proof_hash", canonical_hash(finding_body))
+    forged_review = make_finding_review(
+        finding,
+        ReviewDisposition.CONFIRMED,
+        reviewer_role="Buyer Controller",
+        reviewed_at="2026-09-21T09:00:00-04:00",
+        reviewer_minutes=5,
+    )
+    truth_body = {
+        "schema": 3,
+        "buyer_id": truth.buyer_id,
+        "business_unit": truth.business_unit,
+        "population_hash": truth.population_hash,
+        "authorities": [asdict(authority) for authority in truth.authorities],
+        "findings": [asdict(item) for item in truth.findings],
+    }
+    object.__setattr__(truth, "truth_hash", canonical_hash(truth_body))
+
+    with pytest.raises(ValueError, match="expected_cents"):
+        issue_authorization(
+            resolution=resolution,
+            operative_charter=c,
+            truth=truth,
+            reviews=(forged_review, reviews[1]),
+            authorization_id="ACT-FORGED-AMOUNT",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1",),
+            currency="USD",
+            authorized_cents=100000,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-22",
+        )
