@@ -101,6 +101,7 @@ TEXT_SOURCE_FILES = (
     "_headers",
     "google738a4fc9a0997cd0.html",
     "freight-audit-provider-scorecard.csv",
+    "freight-recovery-evidence-ledger.csv",
     "assets/fonts/ATTRIBUTION.json",
     "assets/fonts/LICENSE-HANKEN-GROTESK.txt",
     "assets/fonts/LICENSE-INSTRUMENT-SERIF.txt",
