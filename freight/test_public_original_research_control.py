@@ -26,6 +26,12 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["GAO_reported_collections_not_independently_Treasury_bank_verified"])
         self.assertIsNone(data["GAO_final_unreversed_net_government_recovery_total_cents"])
         self.assertTrue(data["GAO_future_uncollected_or_carrier_reimbursement_unverified"])
+        self.assertTrue(data["GAO_1980_original_one_lot_vs_multiple_BOL_rate_reconciliation"])
+        self.assertEqual(data["GAO_1980_one_lot_allowed_charge_cents"],617063)
+        self.assertEqual(data["GAO_1980_multiple_BOL_carrier_rate_cents"],671075)
+        self.assertEqual(data["GAO_1980_voluntary_carrier_refund_cents"],110967)
+        self.assertEqual(data["GAO_1980_remainder_setoff_cents"],54012)
+        self.assertTrue(data["GAO_1980_no_original_tariff_or_Treasury_receipt_examined"])
         self.assertEqual(data["separate_GSA_false_positive_correction_public_report_records"],1)
         self.assertEqual(data["GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents"],2960000000)
         self.assertTrue(data["GSA_payment_direction_government_to_vendor_NOT_RETALLY"])
@@ -109,6 +115,24 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
             with self.subTest(field=field):
                 with patch.object(src,"gsa_false_positive_refund",
                                   return_value={**original,field:bad_value}):
+                    with self.assertRaisesRegex(
+                        ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
+                    ):
+                        src.snapshot()
+
+    def test_GAO_1980_competing_trailer_rate_cannot_fake_modern_recovery(self):
+        original=src.public_collection_report()
+        for field,new in [
+            ("original_GAO_1980_one_tender_correct_charge_cents",617064),
+            ("original_GAO_1980_carrier_multiple_BOL_competing_charge_cents",617063),
+            ("original_GAO_1980_carrier_partial_refund_cents",164979),
+            ("original_GAO_1980_remaining_government_setoff_cents",0),
+            ("original_GAO_1980_no_original_bill_or_tariff_scans",False),
+        ]:
+            with self.subTest(field=field):
+                with patch.object(src,"public_collection_report",return_value={
+                    **original,field:new
+                }):
                     with self.assertRaisesRegex(
                         ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
                     ):
