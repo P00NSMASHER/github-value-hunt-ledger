@@ -23,6 +23,7 @@ from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
+from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -48,6 +49,7 @@ def snapshot() -> dict:
     gao=public_collection_report()
     gsa=gsa_false_positive_refund()
     reversal=verified_historical_reversal()
+    fund=gsa_fund_accounting()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -130,6 +132,20 @@ def snapshot() -> dict:
         and reversal["not_included_in_GAO_approved_historical_collection_tally"] is True
         and reversal["actual_RETALLY_cash_recovered_cents"]==0
         and reversal["commercial_claim_clearance"]=="NO_GO"
+        and fund["accounting_fact_rows"]==7
+        and fund["FY2023_ACTUAL_fund_receipts_thousand_USD"]==12354
+        and fund["FY2024_PLAN_fund_receipts_thousand_USD"]==4168
+        and fund["FY2025_PLAN_fund_receipts_thousand_USD"]==12506
+        and fund["FY2023_ACTUAL_transfer_TO_suspense_thousand_USD"]==-20674
+        and fund["FY2023_ACTUAL_annual_obligations_thousand_USD"]==10960
+        and fund["FY2023_vendor_corrective_payment_APPROX_million_USD"]=="29.6"
+        and fund["rounding_narrative_NOT_exact_transaction_voucher"] is True
+        and fund["transfer_cannot_be_deducted_from_same_year_receipts_to_compute_recovery_rate"] is True
+        and fund["no_customer_freight_invoice_verification"] is True
+        and fund["no_independent_bank_or_Treasury_receipt"] is True
+        and fund["no_actual_RETALLY_customer_cash_cents"]==0
+        and fund["no_customer_recovery_performance_forecast"] is True
+        and fund["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -162,6 +178,13 @@ def snapshot() -> dict:
         "GAO_1979_reversal_reimbursement_not_verified":True,
         "GAO_1979_negative_case_not_approved_collection":True,
         "GAO_1979_private_setoff_authority_not_established":True,
+        "GSA_FY2023_original_accounting_receipts_thousands_USD":12354,
+        "GSA_FY2024_original_receipts_PLAN_thousands_USD":4168,
+        "GSA_FY2025_original_receipts_PLAN_thousands_USD":12506,
+        "GSA_FY2023_transfer_to_suspense_thousands_USD":-20674,
+        "GSA_appropriation_table_rows_separately_verified":7,
+        "GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof":True,
+        "GSA_program_receipts_cannot_establish_RETALLY_recovery_rate":True,
         "census_official_md_origin_pums_record_count":maryland["pums_md_origin_unweighted_record_count"],
         "census_official_md_origin_weighted_GOODS_value_usd":maryland["census_published_weighted_goods_value_usd"],
         "census_official_md_origin_gvf_cv_percent":maryland["census_published_gvf_cv_percent"],
@@ -212,7 +235,10 @@ def html_report(data:dict)->str:
         "were independently inspected. Another GAO decision found $5,141.05 "
         "of applied post-bankruptcy-petition setoffs invalid, with no proof "
         "of the carrier's repayment. A separate GSA report documents "
-        "a vendor repayment following ERRONEOUS notices of overcharge. Neither "
+        "a vendor repayment following ERRONEOUS notices of overcharge. "
+        "The same public FY2025 budget gives FY2023 original fund receipts and "
+        "FY2024/25 PLANNED values; these are government fund accounting, not "
+        "private invoice credits or recoverable amounts. Neither "
         "publication establishes RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
         " (local integrity only, not an external signature).</p>"
