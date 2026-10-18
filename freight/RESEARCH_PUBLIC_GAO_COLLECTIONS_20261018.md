@@ -315,3 +315,37 @@ change the original 26 historical/18 human approval holds.
 **Decision tier: ORIGINAL_2025_APPELLATE_AUTHORITY;
 PAYMENT_CLAIM_NOT_ADJUDICATED_IN_THIS_APPEAL;
 NO_PRIVATE_CUSTOMER_RECOVERY_AUTHORITY.**
+
+
+## Second original GAO wrongful-offset counterexample — B-197184 (March 26, 1980)
+
+The original two-page federal letter and memorandum
+[GAO B-197184](https://www.gao.gov/assets/b-197184.pdf)
+record that GSA **had deducted $475.36 from Yellow Freight**, for a
+transportation overcharge originally attributed to Braswell Motor
+Freight Lines. Following Yellow's protest, GSA **agreed the deduction
+was improper**, and GAO dismissed review as **moot** because Yellow's
+claim would be allowed if otherwise proper. The **1976** GBL and
+Braswell bankruptcy dates matter to that historic case, not a private
+freight agreement now.
+
+The public correspondence does **not** establish that any Treasury
+payment or bank credit reimbursing Yellow Freight actually occurred.
+This is a **second separately sourced wrongful applied-offset case**,
+distinct from `B-192974`'s disputed $5,141.05 and deliberately
+**excluded** from the seven positive GAO historical collection
+decisions and nine GAO-reported collection events.
+
+The source-tied receipt and six negative tests are in
+`freight/fixtures/public_gao_b197184_improper_deduction_1980.json`,
+`freight/public_gao_b197184_reversal_v1.py`, and
+`freight/test_public_gao_b197184_reversal_v1.py`.
+See `freight/RESEARCH_GAO_B197184_IMPROPER_SET_OFF_1980.md`
+for a complete source chronology, original GBL number, money amount,
+unverified repayments, and no-current-law/no-customer safeguards.
+
+Both original GAO reversal cases are source-grade historical evidence
+that an **already-executed deduction may later be conceded or ruled
+improper**. Neither proves actual payment back to the carrier,
+final net collections, current private-contract authority or
+RETALLY customer savings.

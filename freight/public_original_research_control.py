@@ -23,6 +23,7 @@ from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
+from freight.public_gao_b197184_reversal_v1 import verified_improper_offset as verified_1980_improper_offset
 from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
 from freight.public_crowley_appeal_scope_v1 import report as crowley_appellate_scope
 
@@ -50,6 +51,7 @@ def snapshot() -> dict:
     gao=public_collection_report()
     gsa=gsa_false_positive_refund()
     reversal=verified_historical_reversal()
+    newer_reversal=verified_1980_improper_offset()
     fund=gsa_fund_accounting()
     appellate=crowley_appellate_scope()
 
@@ -134,6 +136,20 @@ def snapshot() -> dict:
         and reversal["not_included_in_GAO_approved_historical_collection_tally"] is True
         and reversal["actual_RETALLY_cash_recovered_cents"]==0
         and reversal["commercial_claim_clearance"]=="NO_GO"
+        and newer_reversal["original_decision_count"]==1
+        and newer_reversal["original_offset_reported_applied_cents"]==47536
+        and newer_reversal["GSA_later_admitted_setoff_wrong"] is True
+        and newer_reversal["GAO_review_closed_as_moot"] is True
+        and newer_reversal["GAO_claim_allowable_subject_to_other_propriety"] is True
+        and newer_reversal["carrier_actual_repayment_confirmed"] is False
+        and newer_reversal["confirmed_carrier_bank_disbursement_cents"] is None
+        and newer_reversal["permanent_legally_retained_government_collection_cents"] is None
+        and newer_reversal["original_full_pdf_SHA256_not_verified"] is True
+        and newer_reversal["distinct_from_GAO_B192974_larger_improper_setoff"] is True
+        and newer_reversal["not_a_separate_RETALLY_customer_case"] is True
+        and newer_reversal["real_RETALLY_customer_invoice_count"]==0
+        and newer_reversal["real_RETALLY_cash_recovered_cents"]==0
+        and newer_reversal["commercial_claim_clearance"]=="NO_GO"
         and fund["accounting_fact_rows"]==7
         and fund["FY2023_ACTUAL_fund_receipts_thousand_USD"]==12354
         and fund["FY2024_PLAN_fund_receipts_thousand_USD"]==4168
@@ -194,6 +210,12 @@ def snapshot() -> dict:
         "GAO_1979_reversal_reimbursement_not_verified":True,
         "GAO_1979_negative_case_not_approved_collection":True,
         "GAO_1979_private_setoff_authority_not_established":True,
+        "separate_1980_GAO_improper_collection_concession_decisions":1,
+        "GAO_1980_B197184_improper_collected_offset_cents":47536,
+        "GAO_1980_B197184_original_GSA_admission_and_GAO_moot_dismissal":True,
+        "GAO_1980_B197184_repayment_not_confirmed":True,
+        "GAO_1980_B197184_not_in_approved_collection_tally":True,
+        "two_distinct_GAO_applied_but_later_disallowed_offset_cases":2,
         "GSA_FY2023_original_accounting_receipts_thousands_USD":12354,
         "GSA_FY2024_original_receipts_PLAN_thousands_USD":4168,
         "GSA_FY2025_original_receipts_PLAN_thousands_USD":12506,
@@ -255,9 +277,11 @@ def html_report(data:dict)->str:
         "worked example; the FMC award is legally ordered, not independently "
         "confirmed paid. Seven distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
-        "were independently inspected. Another GAO decision found $5,141.05 "
-        "of applied post-bankruptcy-petition setoffs invalid, with no proof "
-        "of the carrier's repayment. A separate GSA report documents "
+        "were independently inspected. Separately, a GAO decision found $5,141.05 "
+        "of applied post-bankruptcy-petition setoffs invalid; another 1980 "
+        "GAO memorandum records GSA conceding an applied $475.36 offset "
+        "improper. Neither carrier's repayment was independently proven. "
+        "A separate GSA report documents "
         "a vendor repayment following ERRONEOUS notices of overcharge. "
         "The same public FY2025 budget gives FY2023 original fund receipts and "
         "FY2024/25 PLANNED values; these are government fund accounting, not "

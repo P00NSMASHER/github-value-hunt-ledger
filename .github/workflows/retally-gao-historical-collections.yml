@@ -11,6 +11,10 @@ on:
       - 'freight/test_public_gsa_transport_audit_fund_v1.py'
       - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
       - 'freight/public_gao_setoff_reversal_v1.py'
+      - 'freight/public_gao_b197184_reversal_v1.py'
+      - 'freight/test_public_gao_b197184_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b197184_improper_deduction_1980.json'
+      - 'freight/RESEARCH_GAO_B197184_IMPROPER_SET_OFF_1980.md'
       - 'freight/test_public_gao_setoff_reversal_v1.py'
       - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
       - 'freight/public_gsa_false_positive_payment_v1.py'
@@ -37,6 +41,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b197184_reversal_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
       - name: Reject erroneous overcharge deductions mistakenly treated as retained recoveries
         run: |
@@ -73,6 +78,26 @@ jobs:
           assert r['actual_RETALLY_cash_recovered_cents']==0
           assert r['commercial_claim_clearance']=='NO_GO'
           print('GAO B-192974: executed post-petition offset later held invalid; no verified returned cash, no client recovery.')
+          PY
+      - name: Confirm another original 1980 GAO already-executed deduction was found improper
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_b197184_reversal_v1 > /tmp/retally_b197184_improper_setoff.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally_b197184_improper_setoff.json').read_text())
+          assert x['original_decision_count']==1
+          assert x['original_offset_reported_applied_cents']==47536
+          assert x['GSA_later_admitted_setoff_wrong'] is True
+          assert x['GAO_review_closed_as_moot'] is True
+          assert x['GAO_claim_allowable_subject_to_other_propriety'] is True
+          assert x['carrier_actual_repayment_confirmed'] is False
+          assert x['confirmed_carrier_bank_disbursement_cents'] is None
+          assert x['permanent_legally_retained_government_collection_cents'] is None
+          assert x['distinct_from_GAO_B192974_larger_improper_setoff'] is True
+          assert x['real_RETALLY_cash_recovered_cents']==0
+          assert x['commercial_claim_clearance']=='NO_GO'
+          print('Original GAO 1980: applied $475.36 setoff was improper; no independently verified refund to carrier.')
           PY
       - name: Confirm actual versus planned GSA fund activity without inventing invoice recoveries
         run: |
