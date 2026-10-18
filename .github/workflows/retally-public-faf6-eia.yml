@@ -1,0 +1,49 @@
+name: RETALLY Lab 14 Original Public Data Provenance (FAF6 / EIA)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-public-faf6-eia.yml'
+      - 'freight/public_faf6_eia_v1.py'
+      - 'freight/test_public_faf6_eia_v1.py'
+      - 'freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv'
+      - 'freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv'
+      - 'freight/fixtures/public_faf6_eia_manifest_20261017.json'
+      - 'freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-public-evidence-validity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify only exact publicly reported flow and price source records
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_faf6_eia_v1
+      - name: Prohibit invoice and recovery claim promotion
+        run: |
+          PYTHONPATH=. python -m freight.public_faf6_eia_v1 > /tmp/public_benchmark_report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/public_benchmark_report.json').read_text())
+          assert data['scope']=='RETALLY_EXISTING_LAB14_PUBLIC_SOURCE_BENCHMARK_ONLY'
+          assert data['faf6_source_rows_in_snapshot']==78
+          assert data['eia_observations']==18
+          assert data['modeled_commodity_value_is_not_freight_spend'] is True
+          assert data['diesel_retail_price_is_not_customer_surcharge_authority'] is True
+          assert data['real_invoices_or_tariffs_examined'] is False
+          assert data['verified_overcharge_cents'] is None
+          assert data['validated_customer_recovery_cents']==0
+          assert data['automated_customer_contact_authorized'] is False
+          assert data['commercial_claim_clearance']=='NOT_ESTABLISHED'
+          assert data['all_26_historical_findings_still_open'] is True
+          assert data['human_pilot_approvals_met'] is False
+          assert data['faf6_state_pairs']['md_to_pa']['rows']==39
+          assert data['faf6_state_pairs']['pa_to_md']['rows']==39
+          print('Research-only acceptance: verified 78 BTS FAF6 source rows + 18 EIA observations. No invoice or money claims.')
+          PY
