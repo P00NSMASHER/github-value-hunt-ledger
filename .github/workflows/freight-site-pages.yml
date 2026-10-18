@@ -51,6 +51,7 @@ jobs:
           freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
           freight/site/test_rebase_public_urls.py
+          freight/site/test_legacy_pages_canonical.py
           freight/marketing/test_indexnow_notify.py
           freight/brand/test_brand_finishing.py
           recoveryworks/test_public_site.py
@@ -76,6 +77,8 @@ jobs:
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq "$(python -c 'from freight.site.build import PUBLIC_FILES;print(sum("/" not in p for p in PUBLIC_FILES))')"
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 1
           test "$(find /tmp/freight-recovery-public -type l | wc -l)" -eq 0
+          python -m freight.site.legacy_pages_canonical /tmp/freight-recovery-public
+          grep -F 'rel="canonical" href="https://www.retallyrecovery.com/"' /tmp/freight-recovery-public/index.html
       - name: Exercise the RecoveryOS publication boundary
         env:
           RECOVERYOS_CONTACT_EMAIL: sales@recoveryfixture.com
@@ -129,6 +132,7 @@ jobs:
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
           mkdir /tmp/freight-recovery-public/recoveryos
           cp -R /tmp/recoveryos-public/. /tmp/freight-recovery-public/recoveryos/
+          python -m freight.site.legacy_pages_canonical /tmp/freight-recovery-public
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: /tmp/freight-recovery-public
