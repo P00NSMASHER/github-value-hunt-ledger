@@ -6,6 +6,9 @@ on:
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_crowley_appeal_scope_v1.py'
+      - 'freight/test_public_crowley_appeal_scope_v1.py'
+      - 'freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json'
       - 'freight/public_gsa_transport_audit_fund_v1.py'
       - 'freight/test_public_gsa_transport_audit_fund_v1.py'
       - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
@@ -64,6 +67,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
@@ -109,6 +113,13 @@ jobs:
           assert data['GSA_appropriation_table_rows_separately_verified']==7
           assert data['GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof'] is True
           assert data['GSA_program_receipts_cannot_establish_RETALLY_recovery_rate'] is True
+          assert data['separate_2025_DC_Circuit_Crowley_original_decisions']==1
+          assert data['Crowley_2025_court_reversed_scope_to_audit_non_carrier'] is True
+          assert data['Crowley_alleged_nocs_more_than']==50000
+          assert data['Crowley_alleged_aggregated_dollars_APPROX_not_proven_cents']==3700000000
+          assert data['Crowley_parallel_11_8m_damages_DEMAND_NOT_AWARD_cents']==1180000000
+          assert data['Crowley_2026_final_claim_payment_not_verified'] is True
+          assert data['Crowley_federal_case_holding_not_private_RETALLY_authority'] is True
           assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
           assert data['stb_sample_accounting_year_histogram']=={'2024':100}
           assert data['fmc_award_actual_cash_received_verified'] is False
