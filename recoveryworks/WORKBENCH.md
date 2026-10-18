@@ -23,6 +23,33 @@ python -m recoveryworks.seven_branch_simulation --workspace /private/retally-reh
 
 The resulting `simulation-acceptance.json` explicitly records zero real customers, zero real recovered dollars, zero external actions, and no commercial certification. It exercises actual adapters, access checks, ledger transitions and restore logic; it does not mock successful results.
 
+## Credential operations
+
+New role keys expire after 24 hours. The running server reads the authoritative
+credential metadata at every authentication check, so rotation and revocation do
+not require a restart. A request already authorized before revocation may finish;
+stop the server first when responding to a suspected active compromise.
+
+Only the local filesystem administrator can manage keys; there is no HTTP key
+administration endpoint. Rotate a role while retaining its review identity:
+
+```sh
+python -m recoveryworks.workbench_credentials --workspace /private/retally-demo --role reviewer --hours 24 --reason 'Scheduled rotation'
+```
+
+Add `--revoke` to disable a role without issuing a replacement. Valid lifetimes
+are 1–168 hours. The command never prints secrets: retrieve the new key from the
+private `credentials.json` and distribute it through your approved secure channel.
+Changes and reasons are recorded in `workspace.json`; these local administrative
+records are not independently authenticated or immutable audit evidence.
+
+**Upgrade:** older credentials without an expiration fail closed. Rotate each of
+`customer`, `reviewer`, `independent`, and `operator` before resuming use. The same
+procedure recovers access after snapshot restore. Restore always disables all
+saved keys, including keys that were valid when the backup was taken. Review and
+ledger history remain unchanged. If writing the plaintext key file fails after
+rotation, the old key remains disabled; run rotation again locally to recover.
+
 ## Product workflow
 
 1. **Customer/operator:** upload CSV or JSON, map CSV headers, and inspect row counts. Original bytes and normalized bytes are separately hashed and retained. Unsupported columns are never guessed into financial meaning. Optional reversal, return and procurement conversion columns are preserved.
@@ -31,7 +58,7 @@ The resulting `simulation-acceptance.json` explicitly records zero real customer
 4. **Reviewer and independent reviewer:** examine cases separately. Each role has a different bearer credential. The customer cannot approve evidence or run scans.
 5. **Customer:** authorize the reviewed case. Simulation can exercise the full flow directly. In live mode, authorization requires a separately reviewed frozen case bundle and customer authorization document; the document actor must match the signed-in customer.
 6. **Operator:** record an externally submitted claim only from reviewed action-envelope and exact artifact evidence; post partial receipts and linked reversals only from reviewed cash-event documents; track net cash, fees and remaining potential. Historical receipts and reversals stay in the hash-chained journal.
-7. **Operator:** back up the complete workspace and restore it into a separate temporary location. Source originals, normalized evidence, intake records, role-token hashes and ledger are verified. Plaintext credential keys are excluded from backups; retain them separately. Credential rotation/account recovery is a deployment integration requirement, not an implemented UI feature.
+7. **Operator:** back up the complete workspace and restore it into a separate temporary location. Source originals, normalized evidence, intake records, role-token hashes and ledger are verified. Plaintext keys are excluded from backups. Restore disables every saved credential so an older backup cannot resurrect a revoked key. Issue fresh keys locally after restore.
 
 ## Live proof documents
 
@@ -46,6 +73,7 @@ Select reviewed documents in the case drawer before live actions. An unreviewed,
 
 ## Financial lifecycle
 
+- Dashboard amounts carry their case currency; metrics are grouped by currency with no inferred exchange rates.
 - `CashEvent` records incremental signed amounts and fee deltas. Replaying the same event is idempotent; changing an existing event ID is rejected.
 - Receipts cannot exceed the case's supported recovery. Negative postings require the original positive receipt in the same case and cannot over-reverse its money or fee.
 - Existing legacy `mark_recovered` receipts can be reversed with the new API without rewriting historical journal hashes.
@@ -80,7 +108,7 @@ Reproduce Python checks with `python -m unittest discover -s recoveryworks -p 't
 
 ## Actual deployment boundaries
 
-The workbench is an operator-controlled local application, not a publicly deployed multitenant SaaS. Production SSO/MFA, hosted transport/TLS, credential rotation and account recovery, signed reviewer identity, production retention/deletion scheduling, live bank/carrier/accounting connectors, operational monitoring and customer support ownership still require deployment-specific implementation and verification. Local token role separation is not a claim of enterprise identity assurance.
+The workbench is an operator-controlled local application, not a publicly deployed multitenant SaaS. Production SSO/MFA, hosted transport/TLS, enterprise account recovery, signed reviewer identity, production retention/deletion scheduling, live bank/carrier/accounting connectors, operational monitoring and customer support ownership still require deployment-specific implementation and verification. Local token role separation is not a claim of enterprise identity assurance.
 
 The restore hash checks detect accidental corruption and mismatched bytes; they do not establish third-party authenticity against an attacker able to rewrite both files and hashes. Protect the private volume and backup location with the deployment's access controls and encryption.
 

@@ -25,6 +25,17 @@ const fs=require('fs');
  await page.waitForTimeout(100);
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth);
  if(errors.length||overflow)throw Error(JSON.stringify({errors,overflow}));
- console.log(JSON.stringify({cases:7,desktop:'PASS',mobile:'PASS',backup_restore:'PASS',evidence_read:'PASS',javascript_errors:errors.length}));
+ // Synthetic API fixture verifies display grouping only; no exchange rate is inferred.
+ await page.route('**/api/state',async route=>{
+  const response=await route.fetch();const fixture=await response.json();
+  fixture.cases=fixture.cases.slice(0,2).map((c,i)=>({...c,currency:i?'EUR':'USD',potential_cents:i?20000:10000,recovered_cents:0,fee_cents:0,remaining_cents:i?20000:10000}));
+  await route.fulfill({response,json:fixture});
+ });
+ await page.locator('#refresh').click();
+ await page.locator('#metrics strong').filter({hasText:'EUR'}).first().waitFor();
+ const amounts=(await page.locator('#metrics strong').allTextContents()).map(t=>t.replace(/\s/g,''));
+ if(!amounts.includes('EUR200.00')||!amounts.includes('USD100.00')||amounts.some(t=>t.includes('300.00')))throw Error('Mixed currencies were combined or mislabeled');
+ if(await page.locator('#case-list details').count()!==2)throw Error('Currency fixture did not refresh');
+ console.log(JSON.stringify({mixed_currency_display:'PASS',cases:7,desktop:'PASS',mobile:'PASS',backup_restore:'PASS',evidence_read:'PASS',javascript_errors:errors.length}));
  await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});

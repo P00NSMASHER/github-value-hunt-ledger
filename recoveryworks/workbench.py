@@ -8,7 +8,7 @@ import io
 import json
 from pathlib import Path
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from .cli import write_private_json
 from .durable_ledger import DurableRecoveryLedger
@@ -50,8 +50,9 @@ class Workspace:
         tokens = {role: secrets.token_urlsafe(32) for role in ROLES}
         write_private_json(root / 'workspace.json', {
             'schema': 1, 'client_id': client_id.strip(), 'simulation': simulation,
-            'created_at': timestamp(), 'tokens': {
-                sha(token.encode()): {'role': role, 'actor_id': ('SIMULATED/' if simulation else '') + role}
+            'created_at': timestamp(), 'credential_events': [], 'tokens': {
+                sha(token.encode()): {'role': role, 'actor_id': ('SIMULATED/' if simulation else '') + role,
+                                     'expires_at': (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()}
                 for role, token in tokens.items()}})
         write_private_json(root / 'credentials.json', tokens)
         write_private_json(root / 'intake.json', {'sources': {}, 'settings': {}})
@@ -60,10 +61,63 @@ class Workspace:
     def principal(self, token):
         digest = sha(str(token).encode())
         # Constant-time digest comparisons; random bearer tokens never appear in logs.
-        for stored, identity in self.meta['tokens'].items():
+        metadata = json.loads((self.root / 'workspace.json').read_text())
+        for stored, identity in metadata['tokens'].items():
             if hmac.compare_digest(stored, digest):
-                return identity
+                try:
+                    expires = datetime.fromisoformat(identity['expires_at'].replace('Z', '+00:00'))
+                    valid = expires.tzinfo is not None and datetime.now(timezone.utc) < expires
+                except (KeyError, TypeError, ValueError, AttributeError):
+                    valid = False
+                if not valid:
+                    raise PermissionError('expired workspace credential; local administrator must rotate it')
+                return dict(identity)
         raise PermissionError('invalid workspace credential')
+
+    def manage_credential(self, role, *, revoke=False, hours=24, reason):
+        """Local filesystem administrator only; deliberately not an HTTP operation.
+
+        Rotate without changing actor identity, so prior review separation remains
+        intact. Metadata is authoritative; stale plaintext keys always fail closed.
+        """
+        if role not in ROLES or type(revoke) is not bool:
+            raise ValueError('invalid credential role or operation')
+        if type(hours) is not int or not 1 <= hours <= 168:
+            raise ValueError('credential lifetime must be 1 to 168 hours')
+        if not isinstance(reason, str) or not reason.strip() or len(reason) > 1000:
+            raise ValueError('credential change reason required (maximum 1000 characters)')
+        with private_file_lock(self.root / '.workspace.lock'):
+            metadata = json.loads((self.root / 'workspace.json').read_text())
+            previous = [entry for entry in metadata['tokens'].values() if entry['role'] == role]
+            actor = ('SIMULATED/' if metadata['simulation'] else '') + role
+            if previous:
+                actors = {entry['actor_id'] for entry in previous}
+                if len(actors) != 1:
+                    raise ValueError('ambiguous role identity')
+                actor = actors.pop()
+            metadata['tokens'] = {key: entry for key, entry in metadata['tokens'].items()
+                                  if entry['role'] != role}
+            token = None
+            if not revoke:
+                token = secrets.token_urlsafe(32)
+                metadata['tokens'][sha(token.encode())] = {
+                    'role': role, 'actor_id': actor,
+                    'expires_at': (datetime.now(timezone.utc) + timedelta(hours=hours)).isoformat()}
+            metadata.setdefault('credential_events', []).append({
+                'role': role, 'actor_id': actor, 'operation': 'revoke' if revoke else 'rotate',
+                'occurred_at': timestamp(), 'reason': reason.strip(),
+                'authority': 'local_filesystem_administrator'})
+            write_private_json(self.root / 'workspace.json', metadata)
+            # If this second write fails, the old key is already disabled. Retry
+            # rotation locally to recover; never roll back the revocation.
+            path = self.root / 'credentials.json'
+            credentials = json.loads(path.read_text()) if path.exists() else {}
+            credentials.pop(role, None)
+            if token:
+                credentials[role] = token
+            write_private_json(path, credentials)
+            self.meta = metadata
+            return {'role': role, 'operation': 'revoke' if revoke else 'rotate'}
 
     def require(self, token, roles):
         identity = self.principal(token)
@@ -273,7 +327,7 @@ class Workspace:
                 'schemas': SCHEMAS, 'conflicts': [e for e in scan.get('exceptions', []) if e.get('code') == 'ECONOMIC_LOSS_CONFLICT'], 'cases': [{
                     'finding_id': r.finding.finding_id, 'branch': r.finding.branch.value,
                     'counterparty': r.finding.counterparty_id, 'reference': r.finding.reference,
-                    'state': r.case_state.value, 'potential_cents': r.finding.potential_recovery_cents,
+                    'state': r.case_state.value, 'currency': r.finding.currency, 'potential_cents': r.finding.potential_recovery_cents,
                     'recovered_cents': r.recovered_cents, 'fee_cents': r.fee_cents,
                     'remaining_cents': r.finding.potential_recovery_cents - r.recovered_cents,
                     'hold': holds.get(r.finding.finding_id), 'record_hash': r.record_hash,
@@ -427,6 +481,13 @@ class Workspace:
         root.mkdir(mode=0o700, parents=True, exist_ok=False)
         for name,item in files.items():
             atomic_private_write(root/name,item['content'].encode())
+        metadata = json.loads((root / 'workspace.json').read_text())
+        metadata['tokens'] = {}
+        metadata.setdefault('credential_events', []).append({
+            'operation': 'restore_disable_all', 'occurred_at': timestamp(),
+            'authority': 'local_filesystem_administrator',
+            'reason': 'Restored snapshots require fresh credentials; old keys cannot be resurrected.'})
+        write_private_json(root / 'workspace.json', metadata)
         workspace=cls(root)
         ledger=workspace.store.load()
         if (ledger.journal.head_hash if ledger else None) != snapshot['journal_head']:

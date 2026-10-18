@@ -89,7 +89,11 @@ class WorkbenchTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 Workspace.restore_snapshot(changed,root/'traversal')
             restored=Workspace.restore_snapshot(snapshot,root/'restored')
-            self.assertEqual(restored.cases(tokens['customer'])['head_hash'],receipt['journal_head'])
+            with self.assertRaises(PermissionError):
+                restored.cases(tokens['customer'])
+            restored.manage_credential('customer', reason='restore access')
+            fresh=json.loads((restored.root/'credentials.json').read_text())
+            self.assertEqual(restored.cases(fresh['customer'])['head_hash'],receipt['journal_head'])
 
     def test_corrected_case_can_be_reviewed_without_double_counting(self):
         with tempfile.TemporaryDirectory() as directory:

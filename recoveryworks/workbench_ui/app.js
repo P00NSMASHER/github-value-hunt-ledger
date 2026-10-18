@@ -1,7 +1,7 @@
 'use strict';
 let credential = '', state = null, uploadText = '', uploadMapping = {};
 const $ = id => document.getElementById(id);
-const money = cents => new Intl.NumberFormat('en-US', {style:'currency',currency:'USD'}).format(cents/100);
+const money = (cents, currency) => new Intl.NumberFormat('en-US', {style:'currency',currency,currencyDisplay:'code'}).format(cents/100);
 const node = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 async function api(path, data) {
   const response = await fetch('/api/'+path, {method:data===undefined?'GET':'POST', headers:{'Authorization':'Bearer '+credential, 'Content-Type':'application/json'}, ...(data===undefined?{}:{body:JSON.stringify(data)})});
@@ -14,9 +14,14 @@ async function refresh() {
  state=await api('state');$('login').hidden=true;$('workspace').hidden=false;$('logout').hidden=false;
  $('mode').textContent=state.simulation?'SIMULATION — Synthetic customers, reviewers and money. No live recoveries or approvals.':'PRIVATE PILOT — Evidence and approvals require authorized people. External actions use the controlled workflow.';
  $('client').textContent=state.client_id;$('actor').textContent=state.actor.role.toUpperCase();
- const active=state.cases.filter(c=>!c.hold&&c.state!=='REJECTED');
- const totals=[['Recorded potential',state.cases.reduce((a,c)=>a+c.potential_cents,0)],['Available for review',active.reduce((a,c)=>a+c.remaining_cents,0)],['Net received',state.cases.reduce((a,c)=>a+c.recovered_cents,0)],['Net fees',state.cases.reduce((a,c)=>a+c.fee_cents,0)]];
- $('metrics').replaceChildren(...totals.map(([label,value])=>{const e=node('div',undefined,'metric');e.append(node('span',label),node('strong',money(value)));return e;}));
+ const currencies=[...new Set(state.cases.map(c=>c.currency))].sort();
+ const metrics=[];
+ for(const currency of currencies){
+  const cases=state.cases.filter(c=>c.currency===currency), active=cases.filter(c=>!c.hold&&c.state!=='REJECTED');
+  const totals=[['Recorded potential',cases.reduce((a,c)=>a+c.potential_cents,0)],['Available for review',active.reduce((a,c)=>a+c.remaining_cents,0)],['Net received',cases.reduce((a,c)=>a+c.recovered_cents,0)],['Net fees',cases.reduce((a,c)=>a+c.fee_cents,0)]];
+  for(const [label,value] of totals){const e=node('div',undefined,'metric');e.append(node('span',label),node('strong',money(value,currency)));metrics.push(e);}
+ }
+ $('metrics').replaceChildren(...metrics);
  renderCases();renderSources();
  const selected=$('branch').value;$('branch').replaceChildren(...Object.keys(state.schemas).map(b=>{const e=node('option',b);e.value=b;return e;}));if(selected)$('branch').value=selected;setSources();
  $('upload-form').hidden=!['customer','operator'].includes(state.actor.role);$('settings-form').hidden=state.actor.role!=='operator';$('scan').disabled=state.actor.role!=='operator';$('backup').disabled=state.actor.role!=='operator';
@@ -24,8 +29,8 @@ async function refresh() {
 function renderCases(){
  $('case-list').replaceChildren();if(!state.cases.length)$('case-list').append(node('p','No cases yet. Upload and review evidence, then run a scan.'));
  for(const c of state.cases){
- const detail=node('details',undefined,'case'),summary=node('summary');summary.append(node('span',c.branch.toUpperCase()+' · '+c.reference),node('span',money(c.potential_cents)+' · '+(c.hold?'ON HOLD':c.state),'pill'+(c.hold?' hold':'')));detail.append(summary);
- detail.append(node('p',c.counterparty+' · Net received '+money(c.recovered_cents)+' · Remaining '+money(c.remaining_cents),'muted'));
+ const detail=node('details',undefined,'case'),summary=node('summary');summary.append(node('span',c.branch.toUpperCase()+' · '+c.reference),node('span',money(c.potential_cents,c.currency)+' · '+(c.hold?'ON HOLD':c.state),'pill'+(c.hold?' hold':'')));detail.append(summary);
+ detail.append(node('p',c.counterparty+' · Net received '+money(c.recovered_cents,c.currency)+' · Remaining '+money(c.remaining_cents,c.currency),'muted'));
  if(c.hold)detail.append(node('p',c.hold,'banner'));
  const evidence=node('div'); for(const e of c.evidence)evidence.append(node('p',e.kind+' · '+e.locator+' · SHA-256 '+e.sha256,'muted'));detail.append(evidence);
  const form=node('form'); const note=field(form,'Review / authorization note'); const controls=node('div',undefined,'actions');
