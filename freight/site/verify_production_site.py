@@ -17,6 +17,8 @@ from freight.site.internal_links import validate_live_links
 CANONICAL = "https://www.retallyrecovery.com/"
 APEX = "https://retallyrecovery.com/"
 MIN_HSTS_SECONDS = 86400
+LTL_COMPARATOR_PAGE = CANONICAL + "ltl-reweigh-evidence-comparator"
+LTL_COMPARATOR_SCRIPT = CANONICAL + "ltl-evidence-comparator.js"
 APPROVED_MEDIA = {
     "assets/brand/retally-wordmark-approved.png":
         "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd",
@@ -79,6 +81,28 @@ def ensure_html(html: str, url: str) -> None:
         raise LiveAuditError(f"Private contact identifier exposed on {url}")
 
 
+
+def ensure_ltl_comparator(html: str, script: str) -> None:
+    """Require the new free LTL comparison workflow, not just an old healthy site.
+
+    Public GET text is untrusted evidence; this check does not run any JavaScript,
+    accept user data or call the inquiry endpoint with POST.
+    """
+    for marker in (
+        'id="ltlCompareForm"',
+        'id="ltlCompareResults"',
+        'src="ltl-evidence-comparator.js?',
+        "No login",
+    ):
+        if marker not in html:
+            raise LiveAuditError(f"Production LTL comparator missing page contract: {marker}")
+    if "function compare(input)" not in script:
+        raise LiveAuditError("Production LTL comparator JavaScript missing calculation")
+    for prohibited in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "sendBeacon"):
+        if prohibited in script:
+            raise LiveAuditError("Production LTL calculator contains forbidden data access")
+
+
 def inspect_live_site() -> dict[str, object]:
     status, headers, homepage = fetch(CANONICAL)
     if status != 200:
@@ -117,6 +141,8 @@ def inspect_live_site() -> dict[str, object]:
         raise LiveAuditError("Production sitemap incomplete or duplicates URLs")
     if any(not x.startswith(CANONICAL) for x in locs):
         raise LiveAuditError("Sitemap advertises a noncanonical hostname")
+    if LTL_COMPARATOR_PAGE not in locs:
+        raise LiveAuditError("New LTL buyer comparator is missing from live sitemap")
     html_get_timings_ms = []
     for url in locs:
         started = perf_counter()
@@ -133,6 +159,17 @@ def inspect_live_site() -> dict[str, object]:
     # Reuse already verified responses and never send contact form requests.
     link_audit = validate_live_links(link_pages, fetch, known_good)
 
+    # The old build can pass a general sitemap audit before Cloudflare finishes.
+    # Verify both the actual new HTML and its working first-party calculation
+    # script, without executing code, contacting customers, or sending inquiry data.
+    script_status, _, script_body = fetch(LTL_COMPARATOR_SCRIPT)
+    if script_status != 200:
+        raise LiveAuditError(f"Production LTL comparator script HTTP {script_status}")
+    ensure_ltl_comparator(
+        link_pages[LTL_COMPARATOR_PAGE],
+        script_body.decode("utf-8"),
+    )
+
     # Online intake is deliberately disabled pending separate mailbox QA.
     # A 503 is acceptable; never attempt a POST or assert delivery.
     intake_status, _, _ = fetch(CANONICAL + "api/inquiry")
@@ -141,6 +178,7 @@ def inspect_live_site() -> dict[str, object]:
 
     return {
         "production": "verified",
+        "ltl_buyer_comparator": "verified",
         "pages": len(locs),
         "internal_links_checked": link_audit["destinations"],
         # Observability only: do not fail releases on noisy single-run latency.

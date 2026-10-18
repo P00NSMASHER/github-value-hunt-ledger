@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare original LTL weight, dimensions and density with a carrier reweigh using a free, private browser calculator. No freight class or refund guesses.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="theme-color" content="#062c26"><meta name="freight-contact-email" content=""><meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <title>Free LTL Reweigh Evidence Comparator | RETALLY</title>
+  <link rel="canonical" href="https://p00nsmasher.github.io/github-value-hunt-ledger/ltl-reweigh-evidence-comparator.html">
+  <link rel="icon" href="assets/brand/retally-emblem-approved.png" type="image/png"><link rel="stylesheet" href="site.css?v=free-audit-contingency-v5">
+  <link rel="stylesheet" href="foundry.css?v=retally-20261008">
+  <script src="commercial-config.js?v=free-audit-contingency-v5" defer></script><script src="site.js?v=free-audit-contingency-v5" defer></script>
+  <script src="ltl-evidence-comparator.js?v=20261018a" defer></script>
+</head>
+<body class="document-page" itemscope itemtype="https://schema.org/Service"><meta itemprop="name" content="LTL Reweigh Evidence Comparator">
+<meta itemprop="serviceType" content="Freight audit and recovery service">
+<meta itemprop="areaServed" content="United States">
+<meta itemprop="url" content="https://p00nsmasher.github.io/github-value-hunt-ledger/ltl-reweigh-evidence-comparator.html">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header document-header"><div class="wrap nav-wrap"><a class="brand" href="./" aria-label="RETALLY home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="brand-name"><img src="assets/brand/retally-wordmark-approved.png" alt="RETALLY" width="1619" height="257"></span></a><a class="button button-small button-light" href="./#start-audit">Start Free Recovery Audit</a></div></header>
+<main id="main" class="document-main">
+<header class="document-hero"><div class="wrap document-hero-inner">
+<p class="eyebrow light"><span></span> RETALLY FREE TOOL · NO UPLOAD</p>
+<h1>Compare the LTL reweigh. Keep the evidence straight.</h1>
+<p>Enter the <strong>original</strong> and <strong>revised</strong> outside handling-unit measurements to compare cubic feet, gross weight and pounds per cubic foot (PCF). The difference is a question to investigate—not a freight class assignment, an overcharge or a promised refund.</p>
+<p class="document-meta">Free calculator · No login · No invoice or personal data</p></div></header>
+<div class="wrap document-layout">
+<aside class="document-nav" aria-label="On this page"><strong>On this page</strong>
+<a href="#compare">Compare measurements</a><a href="#method">Measurement method</a><a href="#proof">Evidence checklist</a>
+<a href="#faq">Common questions</a><a href="#start">Free audit</a></aside>
+<article class="document-content">
+<section id="compare" class="retally-ltl-tool" aria-labelledby="ltl-tool-title">
+<span class="doc-index">01</span><h2 id="ltl-tool-title">Original vs. carrier-revised freight</h2>
+<p><strong>Enter non-identifying figures only.</strong> Never enter invoice numbers, shipment IDs, contract rates, customer names or private terms. These inputs are calculated locally in this browser tab. The calculator does not transmit or store them. The site's optional chat is separate; see <a href="privacy.html">Privacy</a>.</p>
+<form id="ltlCompareForm" class="retally-ltl-form" novalidate>
+<label class="retally-ltl-count">Number of <strong>identical</strong> handling units
+<input id="ltlUnits" type="number" name="handlingUnits" min="1" max="1000" step="1" required inputmode="numeric" autocomplete="off" placeholder="e.g. 1">
+<span class="retally-ltl-hint">Use this only for pallets/crates/cartons with identical dimensions and weight per unit. For mixed loads, compute each handling-unit type separately; don't treat a mixed load as identical.</span>
+</label>
+<div class="retally-ltl-sides">
+<fieldset class="retally-ltl-side"><legend>01 / Original tender details</legend>
+<p class="retally-ltl-hint">Outside dimensions, gross weight and packaging/pallet as tendered.</p>
+<div class="retally-ltl-grid">
+<label>Length (in) <input id="ltlOriginalLength" name="originalLength" type="number" min="0.01" max="1200" step="any" inputmode="decimal" required autocomplete="off" placeholder="48"></label>
+<label>Width (in) <input id="ltlOriginalWidth" name="originalWidth" type="number" min="0.01" max="1200" step="any" inputmode="decimal" required autocomplete="off" placeholder="40"></label>
+<label>Height (in) <input id="ltlOriginalHeight" name="originalHeight" type="number" min="0.01" max="1200" step="any" inputmode="decimal" required autocomplete="off" placeholder="45"></label>
+<label>Gross weight (lb / unit) <input id="ltlOriginalWeight" name="originalWeight" type="number" min="0.01" max="200000" step="any" inputmode="decimal" required autocomplete="off" placeholder="450"></label>
+</div></fieldset>
+<fieldset class="retally-ltl-side"><legend>02 / Carrier-revised details</legend>
+<p class="retally-ltl-hint">Enter the revised figures stated by the carrier; don't assume they're independently verified.</p>
+<div class="retally-ltl-grid">
+<label>Length (in) <input id="ltlCarrierLength" name="carrierLength" type="number" min="0.01" max="1200" step="any" inputmode="decimal" required autocomplete="off" placeholder="48"></label>
+<label>Width (in) <input id="ltlCarrierWidth" name="carrierWidth" type="number" min="0.01" max="1200" step="any" inputmode="decimal" required autocomplete="off" placeholder="40"></label>
+<label>Height (in) <input id="ltlCarrierHeight" name="carrierHeight" type="number" min="0.01" max="1200" step="any" inputmode="decimal" required autocomplete="off" placeholder="48"></label>
+<label>Gross weight (lb / unit) <input id="ltlCarrierWeight" name="carrierWeight" type="number" min="0.01" max="200000" step="any" inputmode="decimal" required autocomplete="off" placeholder="500"></label>
+</div></fieldset>
+</div>
+<p class="retally-ltl-hint">Use the greatest straight-line outside dimensions, including pallets, packaging and projections. Gross weight includes the handling unit as tendered. This does not calculate NMFC class, tariff, accessorials or allowed recovery.</p>
+<div class="retally-ltl-actions">
+<button type="submit" class="button button-cobalt">Compare figures</button>
+<button id="ltlDemo" type="button" class="text-button">Load fictional example</button>
+<button id="ltlClear" type="button" class="text-button">Clear figures</button>
+</div>
+<p id="ltlCompareError" role="alert" class="form-error" aria-live="polite"></p>
+</form>
+<section id="ltlCompareResults" class="retally-ltl-results" aria-labelledby="ltl-results-title" hidden>
+<h3 id="ltl-results-title">Comparison — numbers, not an audit finding</h3>
+<div class="retally-free-table" role="region" tabindex="0" aria-label="Comparison of original and revised freight metrics">
+<table><caption>One type of identical handling unit; full-precision arithmetic, display rounded to two decimals</caption>
+<thead><tr><th scope="col">Measure</th><th scope="col">Original</th><th scope="col">Carrier-revised</th><th scope="col">Difference</th></tr></thead>
+<tbody>
+<tr><th scope="row">Gross weight (lb)</th><td><output id="ltlOriginalTotalWeight">—</output></td><td><output id="ltlCarrierTotalWeight">—</output></td><td><output id="ltlWeightDifference">—</output></td></tr>
+<tr><th scope="row">Cubic feet (ft³)</th><td><output id="ltlOriginalCube">—</output></td><td><output id="ltlCarrierCube">—</output></td><td><output id="ltlCubeDifference">—</output></td></tr>
+<tr><th scope="row">Density (lb/ft³)</th><td><output id="ltlOriginalDensity">—</output></td><td><output id="ltlCarrierDensity">—</output></td><td><output id="ltlDensityDifference">—</output></td></tr>
+</tbody></table></div>
+<p id="ltlResultSummary" role="status" aria-live="polite"></p>
+<p class="doc-small">This tool does not independently verify scale data, measurement method, density-based item eligibility, current NMFC item/sub-number, special handling, tariffs, rate effective dates or prior credits. Do not infer a claim or a refund from a difference. No results are saved by the calculator.</p>
+<button id="ltlPrint" type="button" class="text-button">Print this comparison</button>
+</section>
+</section>
+
+<section id="method"><span class="doc-index">02</span><h2>How this calculation works</h2>
+<p>NMFTA's published handling-unit method uses the greatest straight-line length × width × height in inches, including projections, divided by 1,728 to obtain cubic feet. Gross handling-unit weight ÷ volume gives density in pounds per cubic foot (PCF). This comparison multiplies both weight and cube by the number of <em>identical</em> units and uses full-precision values before displaying two decimals.</p>
+<p><strong>Source:</strong> <a href="https://help.nmfta.org/hc/en-us/articles/38932065434011-How-is-the-density-of-a-handling-unit-calculated" rel="noopener noreferrer" target="_blank">NMFTA, How is the density of a handling unit calculated? (March 2026)</a>. NMFC modernization took effect July 19, 2025; classification still requires the applicable item, customer/carrier commercial terms and potentially handling, stowability or liability factors. See <a href="https://help.nmfta.org/hc/en-us/articles/32790591446427-NMFC-Classification-FAQs" rel="noopener noreferrer" target="_blank">NMFTA's classification FAQ</a>.</p>
+<div class="doc-callout"><strong>Illustration, not a freight-class quote.</strong><p>A pallet measuring 48 × 40 × 45 inches and weighing 450 lb has 50 cubic feet and 9.00 PCF. A revised 48 × 40 × 48 inch, 500 lb measurement is 53.33 cubic feet and 9.375 PCF. Those figures describe the proposed measurement change; they do not establish whether it was authorized or incorrectly charged.</p></div>
+</section>
+<section id="proof" class="retally-fieldkit"><span class="doc-index">03</span><h2>Seven checks before taking action</h2>
+<ol><li>☐ Match the buyer's PRO/BOL, handling unit count, commodity and billed entity in the approved private system.</li>
+<li>☐ Preserve the original greatest outside dimensions, packaging and gross weight.</li>
+<li>☐ Obtain the carrier's actual reweigh, inspection/dimensioning evidence and measurement date.</li>
+<li>☐ Resolve the NMFC item/sub-number and applicable effective classification rules rather than inferring class from density alone.</li>
+<li>☐ Review customer contract, tariff, rate exceptions/FAK terms and shipment effective date.</li>
+<li>☐ Reconcile duplicate bills, credit/rebill corrections, prior disputes, refunds and existing audit findings.</li>
+<li>☐ Have an authorized reviewer decide whether to request clarification, accept the adjustment, or pursue a separately approved dispute.</li></ol>
+<p><a href="ltl-reweigh-reclass-checklist.html">Printable LTL source-evidence checklist</a> · <a href="freight-credit-rebill-audit.html">Credit-and-rebill check</a> · <a href="freight-invoice-audit-checklist.html">15-point freight audit worksheet</a>.</p>
+</section>
+<section id="faq" itemscope itemtype="https://schema.org/FAQPage"><span class="doc-index">04</span><h2>Freight density and reweigh FAQ</h2>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">Does a higher density mean the carrier's reclassification is correct?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">Not automatically. Freight class also depends on the controlling NMFC item and sub-number, agreed tariff or exceptions, and potentially handling, stowability or liability. Weight and volume alone are not a class determination.</p></div></details>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">Is a higher revised gross weight proof of an overcharge?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">No. Confirm the actual measurement, date, contract, effective rating rule and any corrected invoices or credits. A numerical discrepancy alone is not an allowed refund.</p></div></details>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">Can this tool calculate different pallet sizes in one shipment?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">It compares one identical handling-unit type at a time. Mixed types need separately measured handling units; never apply one unit's dimensions across dissimilar pallets.</p></div></details>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">Are my invoices or measurements uploaded?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">No freight records or personal details are requested. This comparator uses local arithmetic on entered numbers, without writing them to a RETALLY server or local browser storage. Other website features such as optional chat are separate.</p></div></details>
+</section>
+<section id="start"><span class="doc-index">05</span><h2>Need an evidence-first second look?</h2>
+<p>RETALLY offers a $0-upfront initial audit for agreed eligible scope. Actual recovery work requires a separate written engagement and customer approval; fees are tied to eligible actual recovered funds, with no guaranteed outcome. Start with broad, non-sensitive qualification details only. Never send invoices, rate agreements or banking details through public forms, social messages or ordinary email.</p>
+<a class="button button-cobalt" href="./#start-audit" data-track="free_audit_cta_clicked">Request a Free Audit</a>
+</section>
+</article></div></main><footer class="site-footer compact-footer"><div class="wrap footer-bottom"><span>&copy; 2026 RETALLY</span><span><a href="./">Home</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="engagement-framework.html">Engagement framework</a></span></div></footer>
+</body></html>

@@ -149,6 +149,11 @@ class PublicBuildTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
             checked = 0
+            share_checked = 0
+            share_pattern = re.compile(
+                r'<a\b[^>]*\bhref="mailto:\?[^"]*"[^>]*>.*?</a>',
+                re.IGNORECASE | re.DOTALL,
+            )
             pattern = re.compile(
                 r'<a\b[^>]*\bhref="mailto:sales@freightfixture\.com[^"]*"[^>]*>.*?</a>',
                 re.IGNORECASE | re.DOTALL,
@@ -161,7 +166,12 @@ class PublicBuildTests(unittest.TestCase):
                         checked += 1
                         self.assertTrue(page[:match.start()].endswith("<!--email_off-->"))
                         self.assertTrue(page[match.end():].startswith("<!--/email_off-->"))
+                    for match in share_pattern.finditer(page):
+                        share_checked += 1
+                        self.assertTrue(page[:match.start()].endswith("<!--email_off-->"), name)
+                        self.assertTrue(page[match.end():].startswith("<!--/email_off-->"), name)
             self.assertGreater(checked, 0)
+            self.assertEqual(share_checked, 3, "All three free share drafts must be Cloudflare-safe")
 
         untrusted = (
             '<a href="mailto:sales@freightfixture.com">Public business address</a>'
@@ -598,6 +608,31 @@ class PublicBuildTests(unittest.TestCase):
             self.assertEqual(["keep.txt"], [file.name for file in output.iterdir()])
 
 
+class RetallyOrganicAdvisorShareTests(unittest.TestCase):
+    """Referral material must not contact prospects or imply an accepted inquiry."""
+
+    def test_share_kit_is_customer_opt_in_and_never_sends_from_public_site(self):
+        from html import unescape as decode_html
+        with tempfile.TemporaryDirectory() as temporary:
+            out = build(Path(temporary) / "public")
+            page = (out / "referral-partners.html").read_text(encoding="utf-8")
+            readable = decode_html(page)
+            self.assertEqual(page.count('id="share"'), 1)
+            self.assertEqual(page.count('href="mailto:?subject='), 1)
+            self.assertIn("No account required", (out / "freight-credit-rebill-audit.html").read_text())
+            self.assertIn("utm_source=advisor_referral", readable)
+            self.assertIn("utm_campaign=retally_referral_kit_2026", readable)
+            self.assertIn("self-service audit-request form", page)
+            self.assertIn("nothing is sent automatically", page)
+            self.assertIn("do not need to share the client's identity", page.lower())
+            self.assertIn("freight-credit-rebill-audit.html", page)
+            self.assertIn("ltl-reweigh-reclass-checklist.html", page)
+            self.assertNotIn('type="file"', page)
+            self.assertNotIn("Guaranteed recovery", page)
+            self.assertIn("separately agreed", page)
+
+
+
 class PublicChatbotTests(unittest.TestCase):
     """Prevent chat embedding from breaking the audited publication boundary."""
 
@@ -935,6 +970,31 @@ class RetallyOrganicProofCardTests(unittest.TestCase):
                 self.assertEqual(sitemap.count(name), 1)
             self.assertIn('href="ltl-reweigh-reclass-checklist.html"', (root / names[0]).read_text())
             self.assertIn('href="freight-credit-rebill-audit.html"', (root / names[1]).read_text())
+
+
+
+class RetallyLtlEvidenceComparatorTests(unittest.TestCase):
+    """Buyer source comparisons have no network, file uploads or class guesses."""
+
+    def test_public_comparator_is_bundled_and_discoverable_without_customer_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = build(Path(temp) / "public")
+            page = (out / "ltl-reweigh-evidence-comparator.html").read_text()
+            javascript = (out / "ltl-evidence-comparator.js").read_text()
+            for item in ('id="ltlCompareForm"', 'id="ltlCompareResults"',
+                         'src="ltl-evidence-comparator.js?v=20261018a"',
+                         'NMFTA', 'identical handling unit', 'property="og:title"'):
+                self.assertIn(item, page)
+            for item in ('type="file"', 'name="fullName"'):
+                self.assertNotIn(item, page)
+            for item in ('fetch(', 'XMLHttpRequest', 'localStorage', 'sessionStorage', 'sendBeacon'):
+                self.assertNotIn(item, javascript)
+            self.assertIn('href="ltl-reweigh-evidence-comparator.html"', (out / "index.html").read_text())
+            self.assertIn('href="ltl-reweigh-evidence-comparator.html"',
+                          (out / "ltl-reweigh-reclass-checklist.html").read_text())
+            self.assertIn('ltl-reweigh-evidence-comparator.html', (out / "sitemap.xml").read_text())
+            self.assertIn('ltl-evidence-comparator.js', builder.PUBLIC_FILES)
+            self.assertNotIn('test_ltl_evidence_comparator.cjs', builder.PUBLIC_FILES)
 
 
 if __name__ == "__main__":

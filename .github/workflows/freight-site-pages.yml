@@ -58,6 +58,8 @@ jobs:
           node --check freight/site/commercial-config.js
           node --check freight/site/site.js
           node --check freight/site/worksheet.js
+          node --check freight/site/ltl-evidence-comparator.js
+          node --test freight/site/test_ltl_evidence_comparator.cjs
           node --test freight/site/test_worksheet.cjs
           node --test freight/site/test_worksheet_campaign.cjs
           node --check recoveryworks/site/site.js
