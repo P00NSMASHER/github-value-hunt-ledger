@@ -5,6 +5,10 @@ on:
       - '.github/workflows/retally-public-faf6-eia.yml'
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
+      - 'freight/public_gao_rating_lineitem_original_v1.py'
+      - 'freight/test_public_gao_rating_lineitem_original_v1.py'
+      - 'freight/fixtures/public_gao_rate_reclassification_and_origin_rebuttal_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_RATE_ORIGIN_20261018.md'
       - 'freight/public_gao_historical_collection_v1.py'
       - 'freight/public_crowley_appeal_scope_v1.py'
       - 'freight/test_public_crowley_appeal_scope_v1.py'
@@ -66,6 +70,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_rating_lineitem_original_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
@@ -84,6 +89,15 @@ jobs:
           assert data['standalone_official_publisher_examples']==1
           assert data['standalone_external_adjudication_records']==1
           assert data['separate_original_GAO_historical_collection_decisions']==7
+          assert data['distinct_original_GAO_rate_and_origin_correction_decisions_NOT_307_rows']==2
+          assert data['distinct_GAO_rate_and_origin_case_BOL_references']==3
+          assert data['GAO_1967_historical_cwt_original_bill_cents']==27517
+          assert data['GAO_1967_historical_cwt_allowable_bill_cents']==13929
+          assert data['GAO_1967_historical_federal_setoff_cents']==13588
+          assert data['GAO_1976_wrong_origin_13328_setoff_reimbursement_NOT_VERIFIED'] is True
+          assert data['GAO_1976_other_bol_settlement_certificate_NOT_VERIFIED_PAID'] is True
+          assert data['GAO_historical_rate_source_NOT_current_private_tariff'] is True
+          assert data['GAO_lineitem_government_reports_NOT_independent_bank_receipts'] is True
           assert data['separate_GAO_reported_historical_collection_events']==9
           assert data['GAO_original_reported_refunds']==3
           assert data['GAO_original_reported_applied_setoffs']==6
