@@ -271,3 +271,40 @@ PENDING rather than a clean data source; locate and inspect a documented
 data-bearing member and verify its field dictionary before any import.
 STB explicitly warns that public-waybill revenue may be masked and not
 actual waybill revenue. Do not use it for customer recovery calculations.
+
+
+### Subsequent STB triage: actual public-use fixed-width records found
+
+The initial STB archive warning described only the first ZIP member.
+An independent central-directory inspection subsequently identified **seven**
+members, including the actual `PublicUseWaybillSample2024.txt`:
+**539,561,337 uncompressed bytes** (66,413,233 compressed, CRC32
+`3048824b`, ZIP member local offset `1783486`). The overall official ZIP
+is 68,197,449 bytes. The public text data begins with **fixed-width
+247-character ASCII records** separated by CRLF, not a CSV.
+
+An original 262,144-byte range starting at the ZIP member was downloaded
+directly from the STB source (range SHA-256
+`51bdff79ade49491bcd5d3ef670a079a1d263372ef9dffb24ee8086a57b68059`).
+The first **100 original records** were frozen as
+`freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt`,
+24,900 bytes including line endings, SHA-256
+`007a598863ba5e7a6b2a8e09b2f75c0ccabcb9588df7c582a2445c7d9967e1d4`.
+`freight/public_stb_waybill_prefix_v1.py` and corresponding regression
+tests verify the exact source bytes, fixed-width record layout, and reject
+deliberate mutations.
+
+**This supersedes the earlier “not immediately tabular” triage, but
+does not certify decoded rail fields.** The 2024 STB guide must be independently
+used to establish exact field boundaries, masks, redactions, sampling weights
+and units before analyzing any values. In particular, published rail revenue
+may be masked and must never be labeled as an authentic amount billed or
+paid by a customer. This 100-row prefix is also not a representative
+rail shipment sample; neither the full archive nor the entire text member
+has been downloaded or CRC/hash verified.
+
+Current combined bounded authentic public-source observations:
+78 BTS FAF6 flow rows, 18 EIA price values, 11 historical carrier posted rates,
+100 Census CFS public-use shipment records, and 100 STB public-use rail
+waybill rows (original fixed-width bytes only). There are **zero**
+independently verified customer invoices and **zero** verified recoveries.
