@@ -43,14 +43,15 @@ EXPECTED_CONTEXTS={
     "B-152324": "Government motor freight tariff minimum-weight dispute; one documented shipment and two collection mechanisms",
     "A-14046": "Three government rail freight shipments, original setoff and separately proposed additional collection",
     "B-166167": "Government air-engine motor freight overcharge offset; later proposed reimbursement settlement to carrier not evidenced paid",
-    "B-146511": "Government freight bill of lading tariff limitation, original 1951 deduction subsequently disputed, inconsistent supplemental claim variants"
+    "B-146511": "Government freight bill of lading tariff limitation, original 1951 deduction subsequently disputed, inconsistent supplemental claim variants",
+    "B-197658": "Original GAO three-page decision: one steel-post consignment shipped using three bills of lading; carrier refunded part of assessed overcharge and government recovered remaining balance by offset."
 }
 EXPECTED_SOURCE_LIMITS=tuple([
     "GAO's decision account reports an offset or refund; original private carrier statements, invoice images and Treasury bank settlement ledgers were not reviewed.",
     "A proposed additional deduction is not a completed collection; a certificate authorizing reimbursement to the carrier is not verified as paid.",
     "Amounts may refer to multiple shipment legs or government-specific tariff law. No generalization to present-day private commercial freight billing.",
     "These are third-party federal-government historical collection reports, not recoveries performed by RETALLY.",
-    "This bounded purposive set of six published cases is neither representative of freight invoices nor a recoverable-rate statistic."
+    "This bounded purposive set of seven published cases is neither representative of freight invoices nor a recoverable-rate statistic."
 ])
 
 # Fixed facts transcribed and checked against ORIGINAL GAO publication pages.
@@ -89,6 +90,15 @@ EXPECTED={
         "date":"1969-08-14","path":"b-166167","original":423177,
         "assessed":301632,"events":[("GOVERNMENT_APPLIED_SET_OFF",301632)],
         "future":0,"possible_carrier_return":105083,"disputed_variants":[],
+    },
+    "B-197658":{
+        "date":"1980-08-25","url":"https://www.gao.gov/assets/b-197658.pdf",
+        "original":782042,"assessed":164979,
+        "events":[
+          ("CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",110967),
+          ("GOVERNMENT_APPLIED_SET_OFF",54012),
+        ],
+        "future":0,"possible_carrier_return":0,"disputed_variants":[],
     },
 }
 
@@ -135,7 +145,7 @@ def verified_gao_cases()->list[dict]:
         seen.add(case_id)
         pin=EXPECTED[case_id]
         if (row["decision_date"]!=pin["date"]
-            or row["source_url"]!="https://www.gao.gov/products/"+pin["path"]
+            or row["source_url"]!=pin.get("url","https://www.gao.gov/products/"+pin.get("path",""))
             or type(row["historical_context"]) is not str
             or row["historical_context"]!=EXPECTED_CONTEXTS[case_id]
             or row["original_bill_of_lading_independently_examined"] is not False
@@ -174,6 +184,10 @@ def verified_gao_cases()->list[dict]:
         _fail("SAME_SHIPMENT_CHARGES_NOT_RECONCILED")
     # B-166167: $1050.83 authorized for later repayment TO THE CARRIER;
     # no proof a refund certificate was actually paid, so no final net claim.
+    if fixed["B-197658"]["originally_paid_cents"]-sum(
+        ev["amount_cents"] for ev in fixed["B-197658"]["gao_reported_collection_events"]
+    )!=617063:
+        _fail("1980_GAO_REFUND_AND_SET_OFF_NOT_RECONCILED")
     if fixed["B-166167"]["carrier_reimbursement_authorized_but_payment_unverified_cents"]!=105083:
         _fail("UNVERIFIED_REVERSAL_AMOUNT_CHANGED")
     return data["cases"]
@@ -183,7 +197,7 @@ def public_collection_report()->dict:
     rows=verified_gao_cases()
     events=[e for row in rows for e in row["gao_reported_collection_events"]]
     by_type={kind:sum(e["kind"]==kind for e in events) for kind in sorted(EVENTS)}
-    if len(events)!=7 or by_type!={"CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":2,"GOVERNMENT_APPLIED_SET_OFF":5}:
+    if len(events)!=9 or by_type!={"CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":3,"GOVERNMENT_APPLIED_SET_OFF":6}:
         _fail("REPORT_EVENT_CENSUS_INCONSISTENT")
     return {
         "scope":"LAB14_ORIGINAL_GAO_GOVERNMENT_COLLECTION_CASES_NOT_CUSTOMER_SAVINGS",
