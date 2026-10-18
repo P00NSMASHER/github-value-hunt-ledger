@@ -221,13 +221,15 @@ their SHA-256 is
 `d9f78acc810c1290712f87dc082debef801e8d0ef360cfb0521ea289b84b309f`.
 From that compressed prefix, the **first 100 complete original data records**
 were extracted with original column spellings and exact values, without
-inventing or extrapolating observations. The bounded nonrandom fixture is
+inventing or extrapolating observations. The bounded deterministic file-prefix fixture is
 `freight/fixtures/public_census_cfs2022_pums_first100.csv`. Its provenance
 and precise archive metadata are in the adjacent JSON manifest.
 
 These records are **real Census public-use anonymized shipment microdata,
-not actual invoices**. This intentionally partial, first-100 sample is neither
-a probability sample of our choosing nor a representative estimate, and its
+not actual invoices**. The Census guide explicitly says it assigned
+SHIPMT_ID after **randomly sorting the complete PUMS records**.
+Nevertheless, RETALLY's first-100-prefix extract is not a separately designed,
+weighted, representative population estimator, and its
 `WGT_FACTOR` values must not be casually extrapolated to produce national
 totals. The full 677MB archive has NOT yet been downloaded or SHA-256
 verified, so no full-file integrity, national flow estimates, or other
@@ -376,9 +378,10 @@ invoiced for a particular movement.
 - Census explicitly cautions that PUMS estimates may differ substantially
   from its published CFS statistics and recommends the **published CFS
   tables whenever an official estimate is already available**.
-- RETALLY's preserved 100-row **first-file prefix is not a randomized,
-  design-valid or representative subsample**, even if the true full
-  PUMS factors are present. Population-shipment, total goods value,
+- The publisher randomly ordered the original PUMS before assigning
+  SHIPMT_ID, but RETALLY's deterministic first-100-row excerpt is **not
+  a separately designed, variance-qualified representative estimator**,
+  even with the full survey factors present. Population-shipment, total goods value,
   tonnage, carrier spend, average lane cost, variance, confidence intervals
   and recoverable amounts are **prohibited for that prefix**.
 - The offline source checker now enforces the original 100-row SHA-256,
@@ -395,3 +398,36 @@ invoiced for a particular movement.
 These restrictions are **separate** from the 26 still-unverified historical
 findings and 18 unmet human pilot approvals. Original customers, invoices,
 payments, contract rates and real recoveries remain absent.
+
+
+### Census-published Maryland weighted-goods-value demonstration (not derived from our 100 rows)
+
+The original 2022 CFS PUMS Data Users Guide **printed page 7**
+provides a fully worked, original-publisher Maryland-origin example:
+`ORIG_STATE = 24` contains **612,317 source records** in the complete PUMS.
+Census reports the weighted sum of merchandise/commodity values
+`Σ(WGT_FACTOR × SHIPMT_VALUE) = $198,598,788,295`, with modeled
+coefficient of variation **9.74%**.
+
+The official example's CV uses the generalized variance function for a
+total-value estimate:
+`exp(a + b·ln(n) + c·[ln(n)]²)`, with `n = 612317`,
+`a = 3.905`, `b = 0.011`, and `c = -0.010`. RETALLY independently
+recomputes **9.74%** from these published constants; it **does not**
+claim to have downloaded or recomputed the full PUMS weighted sum.
+The exact frozen printed source values and prohibitions are stored in
+`freight/fixtures/public_cfs2022_official_maryland_example.json`
+and validated by
+`freight/public_cfs2022_official_example_v1.py` with independent
+negative tests.
+
+**Do not conflate domains:** This guide demonstration covers Maryland-
+origin shipments to **all** destinations and all modes in CFS-covered
+establishments. The previously frozen BTS FAF6 Maryland-to-Pennsylvania
+truck-only goods-value flow covers an entirely different model and
+origin/destination/mode scope. Neither figure is customer transportation
+spend, a tariff, a recoverable loss, or a refund.
+
+This verified guide example is useful for testing population estimation
+methodology with original published numbers and variance; **it does
+not justify applying survey weights to RETALLY's 100-row extract**.
