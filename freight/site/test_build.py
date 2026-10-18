@@ -997,5 +997,21 @@ class RetallyLtlEvidenceComparatorTests(unittest.TestCase):
             self.assertNotIn('test_ltl_evidence_comparator.cjs', builder.PUBLIC_FILES)
 
 
+
+class RetallyIndexNowPublicationTests(unittest.TestCase):
+    """Only the public ownership proof is published; the notifier stays private."""
+
+    def test_indexnow_public_key_exact_and_no_credential_or_customer_assets(self):
+        from freight.marketing.indexnow_notify import KEY
+        with tempfile.TemporaryDirectory() as temp:
+            public = build(Path(temp) / "public")
+            name = KEY + ".txt"
+            self.assertIn(name, builder.TEXT_SOURCE_FILES)
+            self.assertEqual((public / name).read_text(encoding="utf-8"), KEY + "\n")
+            self.assertEqual(len(KEY), 32)
+            self.assertNotIn("indexnow_notify.py", builder.PUBLIC_FILES)
+            self.assertNotIn("test_indexnow_notify.py", builder.PUBLIC_FILES)
+
+
 if __name__ == "__main__":
     unittest.main()

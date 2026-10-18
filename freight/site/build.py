@@ -97,6 +97,7 @@ TEXT_SOURCE_FILES = (
     "sitemap.xml",
     "site.webmanifest",
     "llms.txt",
+    "1a17119c023bc3e3c0abe34188f4eeb4.txt",
     "_headers",
     "google738a4fc9a0997cd0.html",
     "freight-audit-provider-scorecard.csv",

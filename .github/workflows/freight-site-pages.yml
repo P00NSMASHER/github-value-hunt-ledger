@@ -51,6 +51,7 @@ jobs:
           freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
           freight/site/test_rebase_public_urls.py
+          freight/marketing/test_indexnow_notify.py
           freight/brand/test_brand_finishing.py
           recoveryworks/test_public_site.py
       - name: Check browser script syntax
