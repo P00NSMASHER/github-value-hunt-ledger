@@ -10,31 +10,38 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Open public Epiq docket 623 using installed headless Chrome
+      - name: Inspect exact public court orders 623 and 593 for claim 10002
         shell: bash
         run: |
           python - <<'PY'
-          import shutil,subprocess,re,html
-          b=shutil.which("google-chrome") or shutil.which("chromium-browser") or shutil.which("chromium")
-          print("BROWSER_AVAILABLE",bool(b))
-          if not b:
-              raise SystemExit(0)
-          for docket in (623,593):
-              u=f"https://dm.epiq11.com/case/mosaiccompanies/dockets/{docket}"
+          import re,hashlib,subprocess,tempfile,os
+          from urllib.request import Request,urlopen
+          entries=[(623,1227468),(593,1216147)]
+          for docket,id in entries:
+              url=f"https://document.epiq11.com/document/getdocumentsbydocket/?docketId={id}&projectCode=MCX&docketNumber={docket}&source=DM"
               try:
-                  cmd=[b,"--headless=new","--no-sandbox","--disable-dev-shm-usage","--disable-gpu","--virtual-time-budget=12000","--dump-dom",u]
-                  p=subprocess.run(cmd,capture_output=True,text=True,timeout=65,check=False)
-                  data=p.stdout[:2500000]
-                  print("DOCKET",docket,"EXIT",p.returncode,"DOM_CHARS",len(data),"STDERR_CHARS",len(p.stderr))
-                  print("DOCKET_TERMS",{v:len(list(re.finditer(re.escape(v),data,re.I))) for v in ("GlobalTranz","623","593","Docket","view all docs","docketId","document")})
-                  links=re.findall(r'href=["\']([^"\']+)["\']',data,re.I)
-                  print("DOC_LINK_CANDIDATES",[html.unescape(x)[:250] for x in sorted(set(links)) if "docketId" in x or "document/get" in x or "documentbycode" in x][:20])
-                  for token in ("Second Omnibus Objection", "Order Sustaining","View All Docs","GlobalTranz"):
-                      m=re.search(re.escape(token),data,re.I)
-                      if m:
-                          snippet=re.sub(r"<[^>]*>"," ",data[max(0,m.start()-200):m.end()+240])
-                          print("PUBLIC_DOM_SNIPPET",token,html.unescape(snippet.replace("\n"," "))[:350])
+                  req=Request(url,headers={"User-Agent":"Mozilla/5.0 (public court records research)","Accept":"application/pdf"})
+                  with urlopen(req,timeout=25) as r:
+                      data=r.read(25_000_000)
+                      print("PUBLIC_DOCKET",docket,"HTTP",r.status,"TYPE",r.headers.get("Content-Type"),"LENGTH",len(data),"SHA256",hashlib.sha256(data).hexdigest())
+                  if data[:4]!=b"%PDF":
+                      print("NOT_PDF_FIRST_BYTES",repr(data[:70]))
+                      continue
+                  with tempfile.TemporaryDirectory() as temp:
+                      p=os.path.join(temp,"court_order.pdf")
+                      with open(p,"wb") as g:g.write(data)
+                      meta=subprocess.run(["pdfinfo",p],capture_output=True,text=True,timeout=12)
+                      print("PDF_METADATA",docket,[(x.strip()) for x in meta.stdout.splitlines() if x.startswith(("Pages:","File size:","Title:"))])
+                      run=subprocess.run(["pdftotext","-layout",p,"-"],capture_output=True,text=True,timeout=30)
+                      text=run.stdout[:2_000_000]
+                      print("PDF_TEXT_STATUS",docket,run.returncode,"CHARS",len(text))
+                      for needle in ("GlobalTranz","10002","25,954.47","1,496.52","24,457.95"):
+                          m=list(re.finditer(re.escape(needle),text,re.I))
+                          print("MATCH",docket,needle,len(m))
+                          for found in m[:6]:
+                              snippet=text[max(0,found.start()-350):min(len(text),found.end()+460)]
+                              print("CASE_SNIPPET",docket,needle," ".join(snippet.split())[:720])
               except Exception as exc:
-                  print("CHROME_PUBLIC_PAGE_FAILED",docket,type(exc).__name__,str(exc)[:180])
-          print("Only public docket listing DOM inspected; no source PDF or customer invoice content retained.")
+                  print("PUBLIC_DOCKET_FETCH_FAILURE",docket,type(exc).__name__,str(exc)[:250])
+          print("No raw court documents or third-party invoice contents retained or committed.")
           PY
