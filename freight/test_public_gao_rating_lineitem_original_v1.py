@@ -113,6 +113,12 @@ class TwoGAODecisionRatingAndSourceControls(unittest.TestCase):
         self._alter(lambda x:x["sources"][0].update(
             {"private_customer_tariff":"CURRENT"}))
 
+    def test_original_source_limitations_cannot_be_rewritten_as_modern_tariff_authority(self):
+        self._alter(lambda x:x["general_prohibitions"].__setitem__(
+            0,"These government decisions authorize RETALLY to collect all customer carrier overcharges today"))
+        self._alter(lambda x:x["general_prohibitions"].__setitem__(
+            3,"A GAO refund recommendation proves actual carrier repayment and settled bank receipt"))
+
     def test_publisher_source_hostname_and_existence_bound(self):
         self._alter(lambda x:x["sources"][0].update(
             {"url":"https://fake.example/products/b-160344"}))
