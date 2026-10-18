@@ -239,12 +239,18 @@ def issue_authorization(
     _verify_charter(operative_charter, resolution)
 
     _identity("authorization_id", authorization_id)
-    _required("target_carrier_id", target_carrier_id)
-    _required("target_customer_id", target_customer_id)
+    for name, value in (
+        ("engagement_id", resolution.engagement_id),
+        ("buyer_id", resolution.buyer_id),
+        ("business_unit", resolution.business_unit),
+        ("target_carrier_id", target_carrier_id),
+        ("target_customer_id", target_customer_id),
+        ("currency", currency),
+        ("approver_role", approver_role),
+    ):
+        _identity(name, value)
     _sha("recipient_reference_hash", recipient_reference_hash)
     _sha("action_payload_hash", action_payload_hash)
-    _required("currency", currency)
-    _required("approver_role", approver_role)
 
     if approver_role != operative_charter["buyer_action_approver_role"]:
         raise ValueError("approver_role does not match operative Charter")
@@ -375,6 +381,20 @@ def _verify_authorization(auth: ExternalActionAuthorization) -> None:
     _sha("authorization_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("authorization hash mismatch")
+    for field in (
+        "engagement_id",
+        "buyer_id",
+        "business_unit",
+        "target_carrier_id",
+        "target_customer_id",
+        "currency",
+        "approver_role",
+    ):
+        _identity(field, getattr(auth, field))
+    try:
+        ActionType(auth.action_type)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("action_type is not recognized") from exc
     for field in (
         "engagement_resolution_hash",
         "operative_charter_hash",
