@@ -131,3 +131,70 @@ is required to run the tests.
 
 **Release state: RESEARCH_PUBLIC_SOURCE_SNAPSHOT_VERIFIED.**
 Commercial claims, financial operations and recovery case outputs: **NO-GO**.
+
+
+## Second original-source layer: publicly posted carrier fuel schedules
+
+Eleven exact public numerical observations were added after independently
+viewing **carrier-owned** pages, preserving original effective dates,
+service scope and the original source URL on every row.
+
+| Carrier-owned original | Bounded records | Confirmed effective date / posted percentage |
+|---|---:|---|
+| FedEx Freight U.S. LTL | 6 | Oct 14–20, 2026: **57.50%**; based on EIA national Oct 12 **$6.179/gal** |
+| UPS U.S. Domestic Ground | 4 | Sep 28, 2026: **30.25%** (last rate in this frozen excerpt, NOT a claim it applied on Oct 17) |
+| Union Pacific U.S. Domestic Intermodal | 1 | Oct 12–18, 2026: **58.0%** (official Oct 6 announcement PR2026-66) |
+
+Primary sources:
+- FedEx Freight:
+  https://www.fedexfreight.com/en-us/support-resources/tariffs-rates-information/fuel-surcharges
+- FedEx previous weeks:
+  https://www.fedexfreight.com/fragments/fuel-surcharge-table
+- UPS Fuel Surcharges:
+  https://www.ups.com/us/en/support/shipping-support/shipping-costs-rates/fuel-surcharges
+- Union Pacific direct announcement:
+  https://www.up.com/announcements/intermodal/2026/PR2026-66
+
+**FedEx EIA cross-publisher validation:** Six dated FedEx Freight LTL weekly
+rates (Sep 9, 16, 23, 30 and Oct 7, 14) include the national U.S. EIA
+diesel index observed on the **preceding Monday**. All six originally
+published index values match the independently frozen six EIA national
+weekly observations by exact `Decimal` equality. For UPS and Union
+Pacific we retain the official percent only and do **not** infer an EIA
+index date that was not established by the specific published excerpt.
+
+Code: `freight/public_carrier_schedules_v1.py` and its independent
+adversarial tests `freight/test_public_carrier_schedules_v1.py`.
+The result is **dated PUBLIC_CARRIER_REFERENCE_ONLY**. It is not a
+customer-specific surcharge schedule or recovery entitlement:
+- FedEx expressly states the **customer agreement is the final authority**
+  and Item 570 determines the applicable linehaul and fuel-consuming
+  service charge basis. UPS states the specific posted schedule effective
+  on the shipment date applies and describes relevant service exclusions.
+- A public fuel surcharge is a published percentage, not the surcharge
+  actually billed, the customer's tariff exception, base rate,
+  contractual discounts, qualifying accessorial charges or payment truth.
+- Vendor schedule pages can change, and this excerpt is intentionally
+  bounded; do not infer a missing week or use a prior observation as a
+  current customer quote.
+- No rights to republish entire proprietary guides or access private
+  carrier portals are asserted; we preserve a few factual numbers and
+  source URLs for internal research.
+
+### Target design for a real second-look audit
+
+GSA's original transportation invoice audit guidance recommends checking
+the **actual invoice**, the **bill of lading**, applicable **rates/charges**,
+and whether contracted services were performed:
+https://www.gsa.gov/policy-regulations/policy/transportation-management-policy/transportation-invoice-audit
+
+This is a useful *evaluation standard*, not evidence a real customer
+overpayment exists. RETALLY still has no independently authorized
+customer invoice, customer-specific agreement/rate authority, payment
+or credit memo, carrier-approved adjustment, or actual recovered funds.
+
+The public excerpt now comprises **78 original modeled FAF6 rows + 18
+EIA retail observations + 11 dated public carrier facts** across three
+independent publisher families (BTS, EIA and carriers). None is a
+customer invoice or a claim that RETALLY found another auditor's missed
+overcharge.
