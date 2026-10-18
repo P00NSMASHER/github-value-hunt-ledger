@@ -8,29 +8,36 @@ permissions:
 jobs:
   public-docket:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
-      - name: Read only the Epiq public docket shell and public script references
+      - name: Inspect public Epiq frontend API routing (no docket documents retained)
         shell: bash
         run: |
           python - <<'PY'
           import re
-          from urllib.request import Request, urlopen
-          urls = [
-              "https://dm.epiq11.com/case/mosaiccompanies/dockets",
-              "https://dm.epiq11.com/case/mosaiccompanies",
-          ]
-          for url in urls:
-              try:
-                  req = Request(url, headers={"User-Agent":"Mozilla/5.0 (RETALLY-public-research; read-only)", "Accept":"text/html"})
-                  with urlopen(req, timeout=12) as resp:
-                      data=resp.read(240_000).decode("utf-8","replace")
-                      print("URL",url,"STATUS",resp.status,"CHARS",len(data),"HTML_TITLE",re.findall(r"<title[^>]*>(.*?)</title>",data,re.I|re.S)[:2])
-                      scripts=re.findall(r'<script[^>]+src=["\']([^"\']+)',data,re.I)
-                      print("PUBLIC_SCRIPT_PATHS",scripts[:20])
-                      for token in ("GlobalTranz","623","Docket","api","__NEXT_DATA__","angular"):
-                          print("HTML_TOKEN",token,token.lower() in data.lower())
-              except Exception as exc:
-                  print("PUBLIC_FETCH_FAILURE", url, type(exc).__name__,str(exc)[:160])
-          print("No customer documents, private sources, emails, POSTs, or evidence bytes copied.")
+          from urllib.request import Request,urlopen
+          url="https://dm.epiq11.com/dist/main-CGTEPJD6.js"
+          try:
+              req=Request(url,headers={"User-Agent":"Mozilla/5.0 (RETALLY-public-research; read-only)","Accept":"application/javascript"})
+              with urlopen(req,timeout=15) as resp:
+                  code=resp.read(14_000_000).decode("utf-8","replace")
+                  print("PUBLIC_BUNDLE",url,"STATUS",resp.status,"READ_CHARS",len(code),"REPORTED_LEN",resp.headers.get("Content-Length"))
+                  keywords=[
+                      "getdocumentsbydocket","getdocumentbycode","/api/","api/docket","getDocket",
+                      "searchDocket","docketNumber","DocketService","docketId","docketnumber","CaseDockets",
+                      "getCaseDockets","apiUrl","baseUrl","apiBase","documentsbydocket","getDockets"
+                  ]
+                  for word in keywords:
+                      m=list(re.finditer(re.escape(word),code,re.I))
+                      print("TOKEN",word,"COUNT",len(m))
+                      for z in m[:5]:
+                          print("CONTEXT",word,code[max(0,z.start()-150):min(len(code),z.end()+190)].replace("\n"," ")[:360])
+                  print("PUBLIC_API_URL_STRINGS")
+                  found=re.findall(r'["\\x27](https?://[^"\\x27 ]{7,220})["\\x27]',code)
+                  for link in sorted(set(found)):
+                      if ("api" in link.lower() or "epiq" in link.lower()) and not any(w in link.lower() for w in ("token=","key=","auth=")):
+                          print("PUBLIC_LINK",link[:220])
+          except Exception as e:
+              print("PUBLIC_BUNDLE_FETCH_FAILED",type(e).__name__,str(e)[:180])
+          print("Only public website JavaScript examined; no claims records, invoice bytes or personal details read.")
           PY
