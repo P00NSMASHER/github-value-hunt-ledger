@@ -26,7 +26,8 @@ IMAGE_BY_TOPIC = {
     }),
     "assets/images/invoice-evidence.webp": frozenset({
         "freight-invoice-audit.html", "accessorial-charge-audit.html",
-        "duplicate-freight-charges.html", "carrier-rate-audit.html",
+        "duplicate-freight-charges.html", "freight-credit-rebill-audit.html",
+        "ltl-reweigh-reclass-checklist.html", "carrier-rate-audit.html",
         "freight-invoice-audit-checklist.html",
         "freight-overcharge-dispute-process.html", "freight-audit-methodology.html",
         "freight-audit-example.html", "second-look-freight-audit.html",
@@ -80,6 +81,14 @@ EDITORIAL_SHARE_META = {
     "duplicate-freight-charges.html": (
         "RETALLY | Duplicate Freight Charge Checklist",
         "Two invoices may reflect a rebill, correction or separate service. Follow shipment identity, payment and credit history first.",
+    ),
+    "freight-credit-rebill-audit.html": (
+        "RETALLY | Freight Credit and Rebill Audit Checklist",
+        "Link original freight invoices, corrected bills and posted credits. Free printable proof card; no confidential invoice information is uploaded.",
+    ),
+    "ltl-reweigh-reclass-checklist.html": (
+        "RETALLY | LTL Reweigh and Reclass Evidence Checklist",
+        "Free evidence card for LTL weight/class changes, governing rate terms and corrections. Review sources before disputing an adjustment.",
     ),
     "carrier-rate-audit.html": (
         "RETALLY | Carrier Rate Audit Checklist",
