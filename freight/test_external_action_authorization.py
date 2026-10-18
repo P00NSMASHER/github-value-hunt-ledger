@@ -490,6 +490,26 @@ def test_authorization_identity_rejects_alias_forms(authorization_id):
     with pytest.raises(ValueError, match="authorization_id"):
         auth(authorization_id=authorization_id)
 
+@pytest.mark.parametrize(
+    "revocation_id",
+    (
+        " REV-001",
+        "REV-e\\u0301",
+        "REV-\\u200b001",
+    ),
+)
+def test_revocation_identity_rejects_alias_forms(revocation_id):
+    a = auth()
+    with pytest.raises(ValueError, match="revocation_id"):
+        revoke_authorization(
+            a,
+            revocation_id=revocation_id,
+            revoked_on="2026-09-22",
+            approver_role="VP Supply Chain",
+            reason="Buyer withdrew approval",
+        )
+
+
 def test_authorized_cents_rejects_boolean_alias():
     with pytest.raises(ValueError, match="authorized_cents"):
         auth(authorized_cents=True)
