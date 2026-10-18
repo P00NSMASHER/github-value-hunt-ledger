@@ -5,6 +5,10 @@ on:
       - '.github/workflows/retally-public-faf6-eia.yml'
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
+      - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/test_public_gao_historical_collection_v1.py'
+      - 'freight/fixtures/public_gao_historical_freight_collections_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md'
       - 'freight/test_public_original_research_control.py'
       - 'freight/public_carrier_schedules_v1.py'
       - 'freight/public_cfs2022_prefix_v1.py'
@@ -50,6 +54,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
       - name: Reconcile all original public research source families in sanitized evidence report
         run: |
           PYTHONPATH=. python -m freight.public_original_research_control --out /tmp/retally-lab14-public-research
@@ -62,6 +67,13 @@ jobs:
           assert len(data['original_public_source_record_counts'])==5
           assert data['standalone_official_publisher_examples']==1
           assert data['standalone_external_adjudication_records']==1
+          assert data['separate_original_GAO_historical_collection_decisions']==6
+          assert data['separate_GAO_reported_historical_collection_events']==7
+          assert data['GAO_original_reported_refunds']==2
+          assert data['GAO_original_reported_applied_setoffs']==5
+          assert data['GAO_decisions_are_external_historical_not_307_source_observations'] is True
+          assert data['GAO_reported_collections_not_independently_Treasury_bank_verified'] is True
+          assert data['GAO_final_unreversed_net_government_recovery_total_cents'] is None
           assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
           assert data['stb_sample_accounting_year_histogram']=={'2024':100}
           assert data['fmc_award_actual_cash_received_verified'] is False
@@ -73,7 +85,7 @@ jobs:
           page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
           assert 'NOT verified customer invoices' in page
           assert 'NO-GO' in page
-          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one official award, no customer recoveries.')
+          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one award, six separate GAO historical decisions; no customer recoveries.')
           PY
       - name: Prohibit invoice and recovery claim promotion
         run: |
