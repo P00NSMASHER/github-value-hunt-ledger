@@ -89,6 +89,22 @@ class GAOHistoricalGovernmentCollections(unittest.TestCase):
         self._tamper(lambda x:x["cases"][3].update({"customer_invoice_usd":127.75}))
         self._tamper(lambda x:x["cases"][0].update({"case_id":"B-152324"}))
 
+    def test_non_money_source_narratives_cannot_be_rewritten_as_retally_sales(self):
+        self._tamper(lambda x:x["cases"][0].update({
+            "historical_context":"RETALLY recovered funds from a modern customer invoice, cash already settled."
+        }))
+        self._tamper(lambda x:x["cases"][5].update({
+            "historical_context":"All parties agree every historical reimbursement was paid and final."
+        }))
+
+    def test_missing_original_source_limitations_fail_closed(self):
+        self._tamper(lambda x:x["explicit_source_limits"].__setitem__(
+            0,"A bank and every carrier invoice were independently checked and verified.")
+        )
+        self._tamper(lambda x:x["explicit_source_limits"].__setitem__(
+            4,"This sample represents current private freight contracts and proves savings.")
+        )
+
     def test_fmc_adjudicated_award_is_a_distinct_lower_settlement_tier(self):
         from freight.public_fmc_adjudication_v1 import verified_public_order
         court=verified_public_order()
