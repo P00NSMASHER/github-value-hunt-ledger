@@ -1,4 +1,4 @@
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
@@ -29,7 +29,7 @@ from freight.carrier_action_workflow import (
     CarrierActionApprovalInput,
     build_carrier_action_proposal_batch,
 )
-from freight.contracts import open_incumbent_output, seal_incumbent_submission
+from freight.contracts import canonical_hash, open_incumbent_output, seal_incumbent_submission
 from freight.engagement_state import resolve_engagement
 from freight.external_action_authorization import (
     ActionType,
@@ -344,6 +344,32 @@ def test_tampered_intent_is_rejected():
             proposal=proposal,
             payload=payload,
             recovery_claims=claims,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "forged_hash"),
+    [
+        ("finding_proof_hashes", "1" * 64),
+        ("finding_review_hashes", "2" * 64),
+    ],
+)
+def test_self_hashed_authorization_cannot_replace_proposal_evidence_bindings(
+    field, forged_hash
+):
+    auth, proposal, payload, claims = setup()
+    forged = replace(auth, **{field: tuple(forged_hash for _ in auth.finding_ids)})
+    body = asdict(forged)
+    body.pop("authorization_hash")
+    forged = replace(forged, authorization_hash=canonical_hash(body))
+
+    with pytest.raises(ValueError, match="authorization finding .* mismatch"):
+        build_carrier_action_execution_intent(
+            authorization=forged,
+            proposal=proposal,
+            payload=payload,
+            recovery_claims=claims,
+            prepared_at="2026-09-21T11:00:00Z",
         )
 
 

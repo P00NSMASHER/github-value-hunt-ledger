@@ -195,6 +195,27 @@ def _verify_authorization_payload_scope(
         raise ValueError("authorization currency mismatch")
     if authorization.finding_ids != tuple(sorted(proposal.finding_ids)):
         raise ValueError("authorization finding set mismatch")
+    proposal_evidence = {
+        finding_id: (proof_hash, review_hash)
+        for finding_id, proof_hash, review_hash in zip(
+            proposal.finding_ids,
+            proposal.finding_proof_hashes,
+            proposal.finding_review_hashes,
+            strict=True,
+        )
+    }
+    expected_proof_hashes = tuple(
+        proposal_evidence[finding_id][0]
+        for finding_id in authorization.finding_ids
+    )
+    expected_review_hashes = tuple(
+        proposal_evidence[finding_id][1]
+        for finding_id in authorization.finding_ids
+    )
+    if authorization.finding_proof_hashes != expected_proof_hashes:
+        raise ValueError("authorization finding proof mismatch")
+    if authorization.finding_review_hashes != expected_review_hashes:
+        raise ValueError("authorization finding review mismatch")
     if authorization.authorized_cents != payload.requested_cents:
         raise ValueError("authorization amount does not equal canonical payload amount")
     if payload.proposal_hash != proposal.proposal_hash:
