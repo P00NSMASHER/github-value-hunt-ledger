@@ -92,14 +92,54 @@ class TestReconciliation(unittest.TestCase):
             row("AGGREGATE-PLACEHOLDER-1", 1000000),
             row("AGGREGATE-PLACEHOLDER-2", 1602661, 1595447),
         ], statement_control_cents=2595447, claims=[
-            ClaimSnapshot("creditor_statement", 2595447),
-            ClaimSnapshot("later_claim_register", 149652),
+            ClaimSnapshot("creditor_statement", 2595447, "WZ-DEBTOR", "BROKER-CREDITOR", "CLAIM-10002"),
+            ClaimSnapshot("later_claim_register", 149652, "WZ-DEBTOR", "BROKER-CREDITOR", "CLAIM-10002"),
         ])
         self.assertEqual(result.statement_original_cents, 2602661)
         self.assertEqual(result.statement_open_cents, 2595447)
         self.assertIn("CONFLICTING_EXTERNAL_CLAIM_SNAPSHOTS", result.exception_codes)
         self.assertEqual(result.verified_recovered_cents, 0)
         # This is a synthetic aggregated example, not a two-invoice assertion.
+
+
+    def test_different_debtors_cannot_be_called_claim_conflict(self):
+        result = compare([row("EXAMPLE", 100)], statement_control_cents=100, claims=[
+            ClaimSnapshot("s1", 100, "DEBTOR-WZ", "BROKER", "10002"),
+            ClaimSnapshot("s2", 10, "DEBTOR-OTHER", "BROKER", "10002"),
+        ])
+        self.assertIn("CROSS_CLAIM_COMPARISON_BLOCKED", result.exception_codes)
+        self.assertNotIn("CONFLICTING_EXTERNAL_CLAIM_SNAPSHOTS", result.exception_codes)
+        self.assertEqual(result.verified_recovered_cents, 0)
+
+    def test_different_creditors_cannot_be_called_claim_conflict(self):
+        result = compare([row("EXAMPLE", 100)], statement_control_cents=100, claims=[
+            ClaimSnapshot("broker", 100, "DEBTOR-WZ", "BROKER", "10002"),
+            ClaimSnapshot("carrier", 10, "DEBTOR-WZ", "CARRIER-XPO", "10005"),
+        ])
+        self.assertIn("CROSS_CLAIM_COMPARISON_BLOCKED", result.exception_codes)
+        self.assertNotIn("EXTERNAL_CLAIM_DIFFERS_FROM_STATEMENT", result.exception_codes)
+
+    def test_distinct_claim_ids_cannot_be_conflated(self):
+        result = compare([row("EXAMPLE", 100)], statement_control_cents=100, claims=[
+            ClaimSnapshot("a", 100, "D", "C", "CLAIM-1"),
+            ClaimSnapshot("b", 99, "D", "C", "CLAIM-2"),
+        ])
+        self.assertIn("CROSS_CLAIM_COMPARISON_BLOCKED", result.exception_codes)
+
+    def test_unknown_claim_identity_requires_review(self):
+        result = compare([row("EXAMPLE", 100)], statement_control_cents=100, claims=[
+            ClaimSnapshot("unscoped", 25),
+        ])
+        self.assertIn("CLAIM_IDENTITY_UNVERIFIED", result.exception_codes)
+        self.assertIn("CROSS_CLAIM_COMPARISON_BLOCKED", result.exception_codes)
+
+    def test_case_normalized_same_claim_reconciles(self):
+        result = compare([row("EXAMPLE", 100)], statement_control_cents=100, claims=[
+            ClaimSnapshot("a", 100, "  debtor ", "Creditor", "00001 "),
+            ClaimSnapshot("b", 100, "DEBTOR", " creditor ", "00001"),
+        ])
+        self.assertEqual(result.state, "RESEARCH_ARITHMETIC_ONLY")
+        self.assertEqual(result.exception_codes, ())
 
     def test_duplicate_reference_fails_closed(self):
         with self.assertRaisesRegex(ValueError, "duplicate invoice"):
