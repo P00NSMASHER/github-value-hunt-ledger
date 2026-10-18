@@ -47,7 +47,7 @@ def consolidate_generated_legacy(directory: Path, names: tuple[str, ...] = PUBLI
         raise ValueError("Refusing a symlink in generated public output")
 
     # The extra sample report is also indexable with a legacy canonical,
-    # although it is deliberately excluded from the public sitemap.
+    # and remains an indexable URL in the public sitemap.
     page_names = sorted(required | set(_EXTRA_CANONICAL))
     staged: dict[Path, str] = {}
     for name in page_names:
