@@ -141,7 +141,7 @@ jobs:
           page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
           assert 'NOT verified customer invoices' in page
           assert 'NO-GO' in page
-          print('Lab14 source census: 307 public rows, Census example, FMC unpaid award, seven positive GAO cases, one GAO legally disallowed setoff, one GSA vendor repayment. No customer recovery.')
+          print('Lab14 source census: 307 public rows, Census example, FMC unpaid award, seven positive GAO cases, two distinct GAO deductions later found improper, one GSA vendor repayment. No customer recovery.')
           PY
       - name: Prohibit invoice and recovery claim promotion
         run: |
