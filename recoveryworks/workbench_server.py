@@ -5,10 +5,43 @@ import csv
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
 import json
+import threading
 from pathlib import Path
 from .workbench import Workspace, MAX_UPLOAD
 
 ASSETS = Path(__file__).with_name('workbench_ui')
+
+
+class BoundedHTTPServer(ThreadingHTTPServer):
+    """Bound idle sockets and worker threads for the private operator service."""
+    daemon_threads = True
+    request_queue_size = 16
+
+    def __init__(self, address, handler, *, max_connections=16, socket_timeout=10):
+        self.slots = threading.BoundedSemaphore(max_connections)
+        self.socket_timeout = socket_timeout
+        super().__init__(address, handler)
+
+    def get_request(self):
+        request, address = super().get_request()
+        request.settimeout(self.socket_timeout)
+        return request, address
+
+    def process_request(self, request, client_address):
+        if not self.slots.acquire(blocking=False):
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self.slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self.slots.release()
 
 
 def make_server(workspace, port=0):
@@ -29,6 +62,9 @@ def make_server(workspace, port=0):
             self.wfile.write(raw)
 
         def request_valid(self):
+            for header in ('Host', 'Origin', 'Authorization', 'Content-Length', 'Content-Type'):
+                if len(self.headers.get_all(header, [])) > 1:
+                    raise PermissionError('ambiguous request headers')
             host = self.headers.get('Host', '')
             allowed = {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}
             if host not in allowed:
@@ -57,6 +93,8 @@ def make_server(workspace, port=0):
                 self.reply(200, (ASSETS / name).read_bytes(), kind)
             except PermissionError as exc:
                 self.reply(403, {'error': str(exc)})
+            except Exception:
+                self.reply(500, {'error': 'workspace unavailable; inspect private health report'})
 
         def do_POST(self):
             try:
@@ -68,7 +106,10 @@ def make_server(workspace, port=0):
                     raise ValueError('invalid request size')
                 if self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
                     raise ValueError('JSON request required')
-                data = json.loads(self.rfile.read(length))
+                raw = self.rfile.read(length)
+                if len(raw) != length:
+                    raise ValueError('incomplete request body')
+                data = json.loads(raw)
                 if not isinstance(data, dict):
                     raise ValueError('request must be an object')
                 if self.path == '/api/upload':
@@ -94,6 +135,12 @@ def make_server(workspace, port=0):
                     result = workspace.scan(token)
                 elif self.path == '/api/action':
                     result = workspace.action(token, data['action'], data['finding_id'], data['expected_head'], data.get('data', {}))
+                elif self.path == '/api/onboarding':
+                    result = workspace.submit_onboarding(token, data['branch'], data['scope'])
+                elif self.path == '/api/review-onboarding':
+                    result = workspace.review_onboarding(token, data['branch'], data['expected_scope_hash'], data['note'])
+                elif self.path == '/api/customer-delivery':
+                    result = workspace.customer_delivery(token)
                 elif self.path == '/api/backup':
                     result = workspace.backup(token)
                 else:
@@ -106,7 +153,7 @@ def make_server(workspace, port=0):
             except Exception:
                 self.reply(500, {'error': 'operation failed; private workspace was not certified'})
 
-    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server = BoundedHTTPServer(('127.0.0.1', port), Handler)
     server.daemon_threads = True
     return server
 

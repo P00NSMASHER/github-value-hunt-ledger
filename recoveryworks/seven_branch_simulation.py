@@ -54,7 +54,25 @@ def seed(root):
     workspace.configure(tokens['operator'],'ap',{'default_effective_from':'2026-01-01'})
     workspace.configure(tokens['operator'],'utility',{'default_effective_from':'2026-01-01','utility_id':'Utility A'})
     workspace.configure(tokens['operator'],'rebate',{'as_of_date':'2026-10-18'})
+    authorize_population(workspace, tokens)
     return workspace, tokens
+
+
+def authorize_population(workspace, tokens, branches=None):
+    """Fixture-only customer and reviewer decisions, always visibly synthetic."""
+    if not workspace.meta['simulation']:
+        raise ValueError('synthetic onboarding cannot authorize a live workspace')
+    intake = workspace._intake()
+    for branch in (branches or EXPECTED):
+        record = workspace.submit_onboarding(tokens['customer'], branch, {
+            'period_start': '2026-01-01', 'period_end': '2026-10-18', 'currency': 'USD',
+            'account_scope': 'SIMULATED accounts in fixture', 'source_system': 'SIMULATED exports',
+            'exclusions': 'None within this synthetic fixture; not a real customer population',
+            'population_reconciliation': 'SIMULATED source completeness checked against fixture oracle',
+            'expected_rows': {key: value['rows'] for key, value in intake['sources'].items() if value['branch'] == branch},
+            'authorized_to_analyze': True})
+        workspace.review_onboarding(tokens['reviewer'], branch, record['scope_hash'],
+                                    'SIMULATED audit scope and complete fixture population review')
 
 
 def exercise(workspace, tokens):
@@ -97,6 +115,13 @@ def exercise(workspace, tokens):
             act('operator','cash',{'event_id':event_id,'amount_cents':cents,'fee_cents':cents*3//10,
                 'source_hash':sha(('SIMULATED-CASH/'+event_id).encode()),'reverses_id':reverses})
     backup=workspace.backup(tokens['operator'])
+    delivery = workspace.customer_delivery(tokens['customer'])
+    if len(json.loads(delivery['json'])['cases']) != 7:
+        raise AssertionError('customer delivery did not include all seven branches')
+    from .workbench_health import check_workspace
+    health = check_workspace(workspace.root)
+    if not health['healthy']:
+        raise AssertionError(health)
     final=workspace.cases(tokens['customer'])
     results={}
     for case in final['cases']:
@@ -108,6 +133,8 @@ def exercise(workspace, tokens):
             'journey':'PASS','scope':'synthetic happy path + hold/release + partial receipts + reversal'}
     report={'simulation':True,'real_customers':0,'real_recovered_cents':0,'external_actions_sent':0,
         'commercially_validated':False,'branches':results,'restore_verified':backup['restore_verified'],
+        'customer_scope_and_population_review':True, 'customer_delivery_verified':True,
+        'local_health_and_restore_verified':True, 'production_certified':False,
         'repeat_scan_idempotent':True,'customer_self_approval_blocked':True,
         'journal_head':final['head_hash'],'limitations':['Synthetic scenarios do not measure real-world recall or market superiority.',
         'Local role credentials are not enterprise SSO. No public deployment or external claim transport is enabled.']}

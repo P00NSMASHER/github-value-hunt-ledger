@@ -22,7 +22,7 @@ async function refresh() {
   for(const [label,value] of totals){const e=node('div',undefined,'metric');e.append(node('span',label),node('strong',money(value,currency)));metrics.push(e);}
  }
  $('metrics').replaceChildren(...metrics);
- renderCases();renderSources();
+ renderCases();renderSources();renderOnboarding();
  const selected=$('branch').value;$('branch').replaceChildren(...Object.keys(state.schemas).map(b=>{const e=node('option',b);e.value=b;return e;}));if(selected)$('branch').value=selected;setSources();
  $('upload-form').hidden=!['customer','operator'].includes(state.actor.role);$('settings-form').hidden=state.actor.role!=='operator';$('scan').disabled=state.actor.role!=='operator';$('backup').disabled=state.actor.role!=='operator';
 }
@@ -64,3 +64,29 @@ $('backup').addEventListener('click',()=>guard(async()=>{$('operation-result').t
 $('login-form').addEventListener('submit',e=>{e.preventDefault();credential=$('token').value;$('token').value='';guard(refresh);});
 $('logout').addEventListener('click',()=>{credential='';state=null;location.reload();});$('refresh').addEventListener('click',()=>guard(refresh));
 for(const tab of document.querySelectorAll('[data-panel]'))tab.addEventListener('click',()=>{for(const p of document.querySelectorAll('.panel'))p.hidden=p.id!==tab.dataset.panel;for(const b of document.querySelectorAll('[data-panel]'))b.classList.toggle('active',b===tab);});
+
+function renderOnboarding(){
+ $('onboarding-list').replaceChildren();
+ for(const [branch,item] of Object.entries(state.onboarding)){
+  const box=node('div',undefined,'source');box.append(node('h3',branch.toUpperCase()),node('p',item.analysis_ready?'Ready for analysis':item.blockers.join('; ')));
+  if(item.record){box.append(node('pre',JSON.stringify(item.record.scope,null,2)));}
+  if(state.actor.role==='customer'){
+   const form=node('form'),inputs={};
+   for(const [key,label,type,value] of [['period_start','Period start','date',''],['period_end','Period end','date',''],['account_scope','Accounts and business units','text',''],['source_system','Source system','text',''],['exclusions','Excluded records or accounts (write None if none)','text',''],['population_reconciliation','How exports reconcile to the full account population','text','']])inputs[key]=field(form,label,type,item.record?.scope[key]||value);
+   const counts={};for(const [key,source] of Object.entries(state.sources).filter(([,s])=>s.branch===branch)){counts[key]=field(form,'Independent export count for '+source.source+' (uploaded '+source.rows+')','number','');counts[key].min='0';counts[key].step='1';}
+   const consent=node('label','I am authorized to permit analysis of these accounts and sources. This is not permission to submit claims.');const check=node('input');check.type='checkbox';check.required=true;consent.prepend(check);form.append(consent);
+   const submit=node('button','Authorize analysis scope');submit.type='submit';form.append(submit);
+   form.addEventListener('submit',event=>{event.preventDefault();guard(async()=>{const scope=Object.fromEntries(Object.entries(inputs).map(([k,v])=>[k,v.value]));scope.currency=state.currency;scope.authorized_to_analyze=check.checked;scope.expected_rows=Object.fromEntries(Object.entries(counts).map(([k,v])=>[k,Number(v.value)]));await api('onboarding',{branch,scope});await refresh();});});box.append(form);
+  }
+  if(['reviewer','independent'].includes(state.actor.role)&&item.record){const form=node('div'),note=field(form,'Account, period, exclusions and population reconciliation review');form.append(button('Verify audit scope',async()=>{await api('review-onboarding',{branch,expected_scope_hash:item.record.scope_hash,note:note.value});await refresh();}));box.append(form);}
+  $('onboarding-list').append(box);
+ }
+}
+$('customer-report').addEventListener('click',()=>guard(async()=>{
+ const report=await api('customer-delivery',{});
+ const extension=$('report-format').value,type={html:'text/html',csv:'text/csv',json:'application/json'}[extension];
+ {
+  const url=URL.createObjectURL(new Blob([report[extension]],{type})),link=node('a');link.href=url;link.download='retally-'+(report.simulation?'SIMULATION-':'')+report.sha256.slice(0,12)+'.'+extension;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }
+ $('operation-result').textContent='Customer report generated. SHA-256 '+report.sha256;
+}));

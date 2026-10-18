@@ -11,6 +11,7 @@ import secrets
 from datetime import datetime, timezone, timedelta
 
 from .cli import write_private_json
+from .workbench_onboarding import OnboardingMixin, population, digest as population_digest
 from .durable_ledger import DurableRecoveryLedger
 from .expansion_pilot import SOURCES
 from .financial_events import CashEvent
@@ -33,23 +34,25 @@ def timestamp():
     return datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
 
 
-class Workspace:
+class Workspace(OnboardingMixin):
     def __init__(self, root):
         self.root = Path(root).resolve()
         self.meta = json.loads((self.root / 'workspace.json').read_text())
         self.store = LocalBundleStore(self.root / 'ledger.json')
 
     @classmethod
-    def create(cls, root, client_id, *, simulation=True):
+    def create(cls, root, client_id, *, simulation=True, currency="USD"):
         root = Path(root)
         if not isinstance(client_id, str) or not client_id.strip():
             raise ValueError('client_id required')
         if type(simulation) is not bool:
             raise ValueError('simulation must be boolean')
+        if not isinstance(currency, str) or len(currency) != 3 or not currency.isascii() or not currency.isupper() or not currency.isalpha():
+            raise ValueError('three-letter uppercase currency required')
         root.mkdir(parents=True, mode=0o700, exist_ok=False)
         tokens = {role: secrets.token_urlsafe(32) for role in ROLES}
         write_private_json(root / 'workspace.json', {
-            'schema': 1, 'client_id': client_id.strip(), 'simulation': simulation,
+            'schema': 1, 'client_id': client_id.strip(), 'simulation': simulation, 'currency': currency,
             'created_at': timestamp(), 'credential_events': [], 'tokens': {
                 sha(token.encode()): {'role': role, 'actor_id': ('SIMULATED/' if simulation else '') + role,
                                      'expires_at': (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()}
@@ -293,11 +296,14 @@ class Workspace:
         self.require(token, ('operator',))
         with private_file_lock(self.root / '.workspace.lock'):
             intake = self._intake()
-            config = {'client_id': self.meta['client_id'], 'currency': 'USD'}
+            config = {'client_id': self.meta['client_id'], 'currency': self.meta.get('currency', 'USD')}
             active = {item['branch'] for item in intake['sources'].values()}
             if not active:
                 raise ValueError('upload branch sources first')
             for branch in sorted(active):
+                errors = self._onboarding_errors(intake, branch)
+                if errors:
+                    raise ValueError(branch + ': ' + '; '.join(errors))
                 job = dict(intake['settings'].get(branch, {}))
                 for source, (_, flag) in SCHEMAS[branch].items():
                     record = intake['sources'].get(branch + '/' + source)
@@ -311,6 +317,7 @@ class Workspace:
                         job[flag] = True
                 config[branch] = job
             result = run_scan360_config(config, state_path=self.store.path, base_dir=self.root).as_dict()
+            result['population_hashes'] = {branch: population_digest(population(intake, branch)) for branch in active}
             result['simulation'] = self.meta['simulation']
             result['commercially_validated'] = False
             write_private_json(self.root / 'scan-report.json', result)
@@ -322,6 +329,7 @@ class Workspace:
         holds = ledger.reconciliation_holds()
         scan = json.loads((self.root / 'scan-report.json').read_text()) if (self.root / 'scan-report.json').exists() else {}
         return {'client_id': self.meta['client_id'], 'simulation': self.meta['simulation'], 'actor': actor,
+                'currency': self.meta.get('currency', 'USD'), 'onboarding': self.onboarding_status(),
                 'head_hash': ledger.journal.head_hash, 'sources': self._intake()['sources'],
                 'documents': self._intake().get('documents', {}),
                 'schemas': SCHEMAS, 'conflicts': [e for e in scan.get('exceptions', []) if e.get('code') == 'ECONOMIC_LOSS_CONFLICT'], 'cases': [{
@@ -349,6 +357,17 @@ class Workspace:
             record = ledger.get(finding_id)
             if record.finding.client_id != self.meta['client_id']:
                 raise PermissionError('case outside workspace')
+            if action in {'approve', 'independent', 'authorize', 'claim'}:
+                intake = self._intake()
+                branch = record.finding.branch.value
+                if any(source['branch'] == branch for source in intake['sources'].values()):
+                    errors = self._onboarding_errors(intake, branch)
+                    if errors:
+                        raise ValueError('current intake approval required: ' + '; '.join(errors))
+                    scan_path = self.root / 'scan-report.json'
+                    scan = json.loads(scan_path.read_text()) if scan_path.exists() else {}
+                    if scan.get('population_hashes', {}).get(branch) != population_digest(population(intake, branch)):
+                        raise ValueError('rescan current approved sources before case actions')
             note = data.get('note', '')
             if action == 'approve':
                 ledger.approve(finding_id, actor['actor_id'], note)
@@ -426,6 +445,20 @@ class Workspace:
             self.store.save(ledger, expected_head_hash=expected_head, enforce_expected=True)
             return {'head_hash': ledger.journal.head_hash, 'simulation': self.meta['simulation'],
                     'external_action_sent': False}
+
+    def customer_delivery(self, token):
+        from .customer_delivery import build_delivery
+        self.principal(token)
+        with private_file_lock(self.root / '.workspace.lock'):
+            intake = self._intake()
+            active = {source['branch'] for source in intake['sources'].values()}
+            scan_path = self.root / 'scan-report.json'
+            scan = json.loads(scan_path.read_text()) if scan_path.exists() else {}
+            if any(self._onboarding_errors(intake, branch) for branch in active):
+                raise ValueError('current customer scope and intake review required before delivery')
+            if any(scan.get('population_hashes', {}).get(branch) != population_digest(population(intake, branch)) for branch in active):
+                raise ValueError('rescan current approved sources before customer delivery')
+            return build_delivery(self.cases(token))
 
     def backup(self, token):
         self.require(token, ('operator',))

@@ -50,11 +50,30 @@ saved keys, including keys that were valid when the backup was taken. Review and
 ledger history remain unchanged. If writing the plaintext key file fails after
 rotation, the old key remains disabled; run rotation again locally to recover.
 
+## Pilot setup and operations
+
+See [PILOT_OPERATIONS.md](PILOT_OPERATIONS.md) for supported scope in each branch,
+live workspace initialization, customer intake, report delivery, health checks,
+backup/restore, incident response and the remaining deployment requirements.
+
+All seven branches now require exact-population customer authorization and an
+independent intake review before scanning. Upload counts must reconcile to declared
+export counts. Sources and settings are hashed into the approval; changing either
+requires renewed scope and review. Preclaim case actions and customer delivery also
+require a scan of the current approved population. Existing manually imported live
+cases retain their separate reviewed case-proof workflow.
+
+The customer report download supports printable HTML, spreadsheet-safe CSV and a
+canonical JSON evidence report. Reports separate currencies, flag simulation,
+preserve case/hold status and bind the journal head; they do not certify bank cash.
+The authenticated role controls access. Downloaded reports require the same private
+handling as original evidence.
+
 ## Product workflow
 
 1. **Customer/operator:** upload CSV or JSON, map CSV headers, and inspect row counts. Original bytes and normalized bytes are separately hashed and retained. Unsupported columns are never guessed into financial meaning. Optional reversal, return and procurement conversion columns are preserved.
 2. **Reviewer:** inspect the uploaded source and verify the exact current hash with a note. The customer cannot self-verify. Changed evidence invalidates review.
-3. **Operator:** set evidence-supported scope dates and utility identity, then scan complete source sets. No arbitrary paths or verification flags are accepted through the HTTP API.
+3. **Customer and reviewer:** authorize and independently review the exact account/period scope, source population and exclusions. **Operator:** set evidence-supported scope dates and utility identity, then scan complete source sets. No arbitrary paths or verification flags are accepted through the HTTP API.
 4. **Reviewer and independent reviewer:** examine cases separately. Each role has a different bearer credential. The customer cannot approve evidence or run scans.
 5. **Customer:** authorize the reviewed case. Simulation can exercise the full flow directly. In live mode, authorization requires a separately reviewed frozen case bundle and customer authorization document; the document actor must match the signed-in customer.
 6. **Operator:** record an externally submitted claim only from reviewed action-envelope and exact artifact evidence; post partial receipts and linked reversals only from reviewed cash-event documents; track net cash, fees and remaining potential. Historical receipts and reversals stay in the hash-chained journal.

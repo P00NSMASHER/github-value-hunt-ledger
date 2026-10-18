@@ -103,6 +103,8 @@ class WorkbenchTests(unittest.TestCase):
             content=workspace.read_source(tokens['customer'],record['id'])['content'].replace(',10,100\n',',10,110\n')
             updated=workspace.upload(tokens['customer'],'procurement','invoice_lines_csv',content)
             workspace.review_source(tokens['reviewer'],'procurement','invoice_lines_csv',updated['normalized_sha256'],'SIMULATED correction')
+            from recoveryworks.seven_branch_simulation import authorize_population
+            authorize_population(workspace,tokens,['procurement'])
             result=workspace.scan(tokens['operator'])
             conflict=next(e for e in result['exceptions'] if e['code']=='ECONOMIC_LOSS_CONFLICT')
             old=conflict['existing_finding_id']

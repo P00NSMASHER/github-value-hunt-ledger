@@ -9,6 +9,8 @@ microsite.
 
 ## Seven-branch private workbench
 
+[Managed pilot setup and operations](PILOT_OPERATIONS.md) covers customer onboarding, supported scope in all seven branches, customer reports and health/restore checks.
+
 The Freight, AP, Warranty/Credit, Procurement, Rebate, Parcel and Utility branches
 have a shared private workbench and a reproducible synthetic customer journey.
 See [WORKBENCH.md](WORKBENCH.md) for setup, supported scope and acceptance boundaries.
