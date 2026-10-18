@@ -23,6 +23,7 @@ from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 from freight.public_sec_contract_authority_v1 import report as original_sec_contract_report
+from freight.public_crowley_court_money_lineage_v1 import report as original_court_money_lineage
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -48,6 +49,7 @@ def snapshot() -> dict:
     gao=public_collection_report()
     gsa=gsa_false_positive_refund()
     sec=original_sec_contract_report()
+    crowley=original_court_money_lineage()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -133,6 +135,24 @@ def snapshot() -> dict:
         and sec["actual_RETALLY_overcharge_cents"] is None
         and sec["actual_RETALLY_recovery_cents"]==0
         and sec["commercial_claim_clearance"]=="NO_GO"
+        and crowley["source_documents"]==3
+        and crowley["source_timeline_events"]==4
+        and crowley["GSA_FY2023_reported_vendor_refund_approx_cents"]==2960000000
+        and crowley["GSA_FY2023_reported_vendor_refund_approx_cents"]==
+              gsa["publisher_reported_vendor_payment_approx_cents"]
+        and crowley["2023_DFTS_29_6m_refund_promise_and_GSA_paid_report_same_money"] is True
+        and crowley["must_not_double_count_29_6m_as_59_2m"] is True
+        and crowley["GSA_FY2023_bank_transfer_receipt_independently_authenticated"] is False
+        and crowley["2023_separate_Ocean_USC9_refund_only_promised_cents"]==3584043
+        and crowley["2023_Ocean_USC9_bank_payment_verified"] is False
+        and crowley["2025_11_8m_Claims_Court_damages_claim_cents"]==1180000000
+        and crowley["2025_11_8m_claim_was_awarded_or_paid_by_appeal"] is False
+        and crowley["current_2026_parallel_docket_resolution"] is None
+        and crowley["DCCircuit_2025_limited_GSA_audit_to_carriers_and_freight_forwarders"] is True
+        and crowley["private_RETALLY_can_issue_statutory_GSA_offsets"] is False
+        and crowley["RETALLY_customer_invoices_ever_verified"]==0
+        and crowley["RETALLY_customer_cash_recovered_cents"]==0
+        and crowley["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -146,6 +166,13 @@ def snapshot() -> dict:
         "SEC_2007_exact_source_table_rows":7,
         "SEC_2005_selected_source_fuel_bands":7,
         "SEC_no_original_customer_invoices_or_2026_contract_applicability":True,
+        "separate_Crowley_GSA_2023_2025_original_source_documents":3,
+        "separate_Crowley_GSA_financial_timeline_events":4,
+        "court_original_2023_DFTS_refund_promise_is_same_29_6m_as_GSA_reported_payment":True,
+        "court_budget_pair_not_two_independent_29_6m_payments":True,
+        "court_separate_Ocean_USC9_refund_35840_43_PROMISE_NOT_PAID":True,
+        "court_11_8m_claim_as_of_2025_NOT_AN_APPELLATE_AWARD_OR_PAID":True,
+        "court_private_statutory_setoff_right_for_RETALLY":False,
         "standalone_external_adjudication_records":1,
         "separate_original_GAO_historical_collection_decisions":gao["historical_distinct_decisions"],
         "separate_GAO_reported_historical_collection_events":gao["gao_reported_collection_events"],
@@ -215,7 +242,11 @@ def html_report(data:dict)->str:
         "describe collected offsets/refunds, but no original bank/Treasury postings "
         "were independently inspected. Two SEC-filed historical motor-carrier "
         "agreements have different local versus federal diesel indexes and "
-        "neither supplies current customer invoices. A separate GSA report documents "
+        "neither supplies current customer invoices. Original federal court "
+        "and GSA financial reports refer to the SAME $29.6 million repayment "
+        "at different stages, never two separate cash receipts; $11.8 million "
+        "claimed in the 2025 appeal was not a money award. "
+        "A separate GSA report documents "
         "a vendor repayment following ERRONEOUS notices of overcharge. Neither "
         "publication establishes RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
