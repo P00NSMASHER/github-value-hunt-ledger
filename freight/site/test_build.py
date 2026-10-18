@@ -598,6 +598,31 @@ class PublicBuildTests(unittest.TestCase):
             self.assertEqual(["keep.txt"], [file.name for file in output.iterdir()])
 
 
+class RetallyOrganicAdvisorShareTests(unittest.TestCase):
+    """Referral material must not contact prospects or imply an accepted inquiry."""
+
+    def test_share_kit_is_customer_opt_in_and_never_sends_from_public_site(self):
+        from html import unescape as decode_html
+        with tempfile.TemporaryDirectory() as temporary:
+            out = build(Path(temporary) / "public")
+            page = (out / "referral-partners.html").read_text(encoding="utf-8")
+            readable = decode_html(page)
+            self.assertEqual(page.count('id="share"'), 1)
+            self.assertEqual(page.count('href="mailto:?subject='), 1)
+            self.assertIn("No account required", (out / "freight-credit-rebill-audit.html").read_text())
+            self.assertIn("utm_source=advisor_referral", readable)
+            self.assertIn("utm_campaign=retally_referral_kit_2026", readable)
+            self.assertIn("self-service audit-request form", page)
+            self.assertIn("nothing is sent automatically", page)
+            self.assertIn("do not need to share the client's identity", page.lower())
+            self.assertIn("freight-credit-rebill-audit.html", page)
+            self.assertIn("ltl-reweigh-reclass-checklist.html", page)
+            self.assertNotIn('type="file"', page)
+            self.assertNotIn("Guaranteed recovery", page)
+            self.assertIn("separately agreed", page)
+
+
+
 class PublicChatbotTests(unittest.TestCase):
     """Prevent chat embedding from breaking the audited publication boundary."""
 

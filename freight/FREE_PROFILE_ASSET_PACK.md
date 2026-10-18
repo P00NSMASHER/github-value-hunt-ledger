@@ -1,6 +1,6 @@
 # RETALLY — free business profile asset pack
 
-Updated: 2026-10-08
+Updated: 2026-10-18
 Status: **APPLICATION-READY, NOT PUBLISHED OR VERIFIED**
 
 This file is an asset pack and eligibility checklist, not a claim that platform
@@ -52,13 +52,13 @@ audit; duplicate charges; carrier rate review; accessorial charge audit.
 
 | Priority | Platform | Current eligibility conclusion | Free route | Registration state |
 | --- | --- | --- | --- | --- |
-| 1 | LinkedIn Company Page | Eligible for remote B2B organizations; an authorized real-person LinkedIn account is required | https://www.linkedin.com/help/linkedin/answer/a542801 | **NOT CONFIRMED**; search existing and claim first |
+| 1 | LinkedIn Company Page | **CONNECTED and verified for organic publishing** through RETALLY company account; not a paid page | https://www.linkedin.com/company/retallyrecovery/ | **LIVE**; published company posts confirmed via connected org 146751112 |
 | 2 | Schuylkill County Online | Free for independently owned and locally rooted Schuylkill businesses; Professional Services category available; confirm genuine local ownership | https://www.schuylkillcounty.online/suggest-business | **NOT FOUND IN VISIBLE 730-LISTING DIRECTORY**; suggest for editorial review, then owner-claim |
 | 3 | SchuylkillPA.com | Free Schuylkill County business registration advertised for local businesses; existing listings and category moderation require owner review | https://schuylkillpa.com/schuylkill-business/directory/add-listing/ | **NOT CONFIRMED**; authenticated signup required |
 | 4 | Alignable Free Guest | U.S. active business owner/authorized representative eligible; free Guest plan limited, Paid Basic is $29/month and unnecessary | https://www.alignable.com/ | **NOT CONFIRMED**; search previous business account and verify before signup |
-| 5 | Apple Business | Eligible for virtual and online-only business brand registration; a location/Maps place card has separate conditions | https://business.apple.com/ | **NOT CONFIRMED**; search existing presence |
+| 5 | Apple Business | Online-only businesses are supported, but sign-up requires a legal organization name; RETALLY has deferred forming a separate entity | https://business.apple.com/ | **HOLD** until an accurate applicant legal identity and account can be provided, without registering RETALLY prematurely |
 | 6 | Better Business Bureau | Free Business Profile claim/add request; publication subject to review, not accreditation | https://www.bbb.org/get-listed | **NOT CONFIRMED**; BBB lookup first |
-| 7 | Clutch Basic | Free B2B service-provider profile; only register if offered service taxonomy fits freight auditing honestly | https://clutch.co/get-listed | **CATEGORY FIT PENDING** |
+| 7 | Clutch Basic | **Conditional**: B2B category fit may qualify, but free Basic currently does **not** provide a website link from directory listings | https://clutch.co/get-listed | **DEFER** until true service taxonomy, staff/project fields and value are confirmed; no paid Verified upgrade |
 | 8 | Manta | Free Company Listing, but online-only/non-storefront acceptance must be confirmed at entry | https://www.manta.com/business-listings/free-business-listing | **ELIGIBILITY PENDING** |
 | HOLD | Google Business Profile | **Not eligible based on current remote-only evidence**; must meet customers face to face during stated hours | https://support.google.com/business/answer/13763036 | DO NOT REGISTER without real in-person basis |
 | HOLD | Bing Places for Business | **Not eligible based on current remote-only evidence**; requires customer-facing physical premises OR staff customer visits | https://www.bing.com/forbusiness/help/modernExperience | DO NOT REGISTER without real in-person basis |

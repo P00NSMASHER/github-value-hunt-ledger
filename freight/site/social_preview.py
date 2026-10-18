@@ -137,7 +137,7 @@ EDITORIAL_SHARE_META = {
     ),
     "referral-partners.html": (
         "RETALLY | Freight Audit Referral Partners",
-        "Review the referral partner approach and evidence and authorization boundaries for business introductions.",
+        "Free advisor share kit for CFOs, accountants and logistics consultants: an evidence-first freight checklist clients can use or share without files.",
     ),
     "freight-recovery-evidence-standard.html": (
         "RETALLY | Freight Recovery Evidence Standard",
