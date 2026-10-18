@@ -93,6 +93,13 @@ def snapshot() -> dict:
         }
         and gao["cases_with_uncollected_future_deduction"]==1
         and gao["cases_with_carrier_refund_authorized_but_unverified_paid"]==1
+        and gao["original_GAO_1980_rating_reconciled"] is True
+        and gao["original_GAO_1980_one_tender_correct_charge_cents"]==617063
+        and gao["original_GAO_1980_carrier_multiple_BOL_competing_charge_cents"]==671075
+        and gao["original_GAO_1980_carrier_partial_refund_cents"]==110967
+        and gao["original_GAO_1980_remaining_government_setoff_cents"]==54012
+        and gao["original_GAO_1980_full_PDF_original_SHA_unverified"] is True
+        and gao["original_GAO_1980_no_original_bill_or_tariff_scans"] is True
         and gao["source_transcribed_historical_collection_report_not_payment_bank_proof"] is True
         and gao["actual_carrier_account_bank_or_Treasury_posting_independently_verified"] is False
         and gao["final_unreversed_net_government_recovery_total_cents"] is None
@@ -125,6 +132,12 @@ def snapshot() -> dict:
         "GAO_reported_collections_not_independently_Treasury_bank_verified":True,
         "GAO_final_unreversed_net_government_recovery_total_cents":None,
         "GAO_future_uncollected_or_carrier_reimbursement_unverified":True,
+        "GAO_1980_original_one_lot_vs_multiple_BOL_rate_reconciliation":True,
+        "GAO_1980_one_lot_allowed_charge_cents":617063,
+        "GAO_1980_multiple_BOL_carrier_rate_cents":671075,
+        "GAO_1980_voluntary_carrier_refund_cents":110967,
+        "GAO_1980_remainder_setoff_cents":54012,
+        "GAO_1980_no_original_tariff_or_Treasury_receipt_examined":True,
         "separate_GSA_false_positive_correction_public_report_records":1,
         "GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents":2960000000,
         "GSA_payment_direction_government_to_vendor_NOT_RETALLY":True,
