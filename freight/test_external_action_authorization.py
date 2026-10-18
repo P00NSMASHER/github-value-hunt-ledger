@@ -576,3 +576,40 @@ def test_self_hashed_authorization_cannot_extend_original_validity_bound():
             currency="USD",
             requested_cents=1,
         )
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "engagement_resolution_hash",
+        "operative_charter_hash",
+        "recipient_reference_hash",
+        "action_payload_hash",
+        "finding_proof_hashes",
+        "finding_review_hashes",
+    ),
+)
+def test_self_hashed_authorization_revalidates_evidence_binding_hashes(field):
+    a = auth()
+    if field in {"finding_proof_hashes", "finding_review_hashes"}:
+        object.__setattr__(a, field, tuple("not-a-hash" for _ in getattr(a, field)))
+    else:
+        object.__setattr__(a, field, "not-a-hash")
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match="lowercase SHA-256"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash=a.recipient_reference_hash,
+            action_payload_hash=a.action_payload_hash,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=1,
+        )
