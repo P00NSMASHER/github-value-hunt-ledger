@@ -149,6 +149,11 @@ class PublicBuildTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
             checked = 0
+            share_checked = 0
+            share_pattern = re.compile(
+                r'<a\b[^>]*\bhref="mailto:\?[^"]*"[^>]*>.*?</a>',
+                re.IGNORECASE | re.DOTALL,
+            )
             pattern = re.compile(
                 r'<a\b[^>]*\bhref="mailto:sales@freightfixture\.com[^"]*"[^>]*>.*?</a>',
                 re.IGNORECASE | re.DOTALL,
@@ -161,7 +166,12 @@ class PublicBuildTests(unittest.TestCase):
                         checked += 1
                         self.assertTrue(page[:match.start()].endswith("<!--email_off-->"))
                         self.assertTrue(page[match.end():].startswith("<!--/email_off-->"))
+                    for match in share_pattern.finditer(page):
+                        share_checked += 1
+                        self.assertTrue(page[:match.start()].endswith("<!--email_off-->"), name)
+                        self.assertTrue(page[match.end():].startswith("<!--/email_off-->"), name)
             self.assertGreater(checked, 0)
+            self.assertEqual(share_checked, 3, "All three free share drafts must be Cloudflare-safe")
 
         untrusted = (
             '<a href="mailto:sales@freightfixture.com">Public business address</a>'
