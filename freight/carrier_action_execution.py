@@ -634,6 +634,16 @@ def verify_carrier_action_delivery_receipt(
         "verifier_role",
     ):
         _text(name, getattr(receipt, name))
+    try:
+        ActionType(receipt.action_type)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("invalid delivery receipt action type") from exc
+    try:
+        ExecutionChannel(receipt.channel)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("invalid delivery receipt channel") from exc
+    if type(receipt.requested_cents) is not int or receipt.requested_cents <= 0:
+        raise ValueError("delivery receipt requested_cents must be a positive integer")
     _, submitted_dt = _timestamp("submitted_at", receipt.submitted_at)
     _, delivered_dt = _timestamp("delivered_at", receipt.delivered_at)
     if delivered_dt < submitted_dt:
