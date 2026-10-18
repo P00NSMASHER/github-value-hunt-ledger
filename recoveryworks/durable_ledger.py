@@ -58,6 +58,13 @@ class DurableRecoveryLedger(RecoveryLedger):
             }, occurred_at=record.updated_at)
         return record
 
+    def hold_for_reconciliation(self, finding_id: str, reason: str, *, occurred_at=None):
+        timestamp = self._event_time(occurred_at)
+        record = super().hold_for_reconciliation(finding_id, reason, occurred_at=timestamp)
+        self.journal.append("RECONCILIATION_HOLD", finding_id, {"reason": reason.strip()},
+                            occurred_at=timestamp)
+        return record
+
     def approve(
         self,
         finding_id: str,
@@ -256,6 +263,9 @@ class DurableRecoveryLedger(RecoveryLedger):
                     finding_from_payload(data["finding"]),
                     occurred_at=event.occurred_at,
                 )
+            elif action == "RECONCILIATION_HOLD":
+                ledger.hold_for_reconciliation(event.finding_id, data["reason"],
+                                               occurred_at=event.occurred_at)
             elif action == "APPROVE":
                 ledger.approve(
                     event.finding_id,

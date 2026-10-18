@@ -40,7 +40,7 @@ def _optional(row: Mapping[str, str], column: str) -> str | None:
     return str(value).strip()
 
 
-def _money_to_cents(value: str, *, field: str) -> int:
+def _money_to_cents(value: str, *, field: str, signed: bool = False) -> int:
     text = (value or "").strip().replace("$", "").replace(",", "")
     if not text:
         raise ValueError(f"{field} is required")
@@ -48,7 +48,9 @@ def _money_to_cents(value: str, *, field: str) -> int:
         amount = Decimal(text)
     except InvalidOperation as exc:
         raise ValueError(f"{field} has invalid money value {value!r}") from exc
-    if amount < 0:
+    if not amount.is_finite():
+        raise ValueError("money must be finite")
+    if amount < 0 and not signed:
         raise ValueError(f"{field} cannot be negative")
     return int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
@@ -95,10 +97,11 @@ def load_warranty_credit_settlements_csv(
             entitlement_id=_required(row, "Entitlement_ID", row_number),
             amount_received_cents=_money_to_cents(
                 _required(row, "Amount_Received", row_number),
-                field="Amount_Received",
+                field="Amount_Received", signed=True,
             ),
             settlement_date=_required(row, "Settlement_Date", row_number),
             settlement_kind=_required(row, "Settlement_Kind", row_number),
+            reverses_id=_optional(row, "Reverses_ID"),
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,

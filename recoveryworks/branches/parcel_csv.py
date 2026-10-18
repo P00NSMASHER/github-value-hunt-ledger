@@ -77,6 +77,8 @@ def _money_to_cents(value: str, *, field: str) -> int:
         amount = Decimal(text)
     except InvalidOperation as exc:
         raise ValueError(f"{field} has invalid money value {value!r}") from exc
+    if not amount.is_finite():
+        raise ValueError("money must be finite")
     if amount < 0:
         raise ValueError(f"{field} cannot be negative")
     return int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))

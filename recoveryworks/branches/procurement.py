@@ -30,6 +30,8 @@ def _decimal(name: str, value: str | int | float | Decimal) -> Decimal:
         result = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise ValueError(f"{name} must be numeric") from exc
+    if not result.is_finite():
+        raise ValueError(f"{name} must be finite")
     if result < 0:
         raise ValueError(f"{name} must be non-negative")
     return result
@@ -118,7 +120,11 @@ class ProcurementAuthority:
     verified: bool
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    contracted_unit_price: str | None = None
+
     def __post_init__(self) -> None:
+        if self.contracted_unit_price is not None:
+            _decimal("contracted_unit_price", self.contracted_unit_price)
         for name in (
             "authority_id", "supplier_id", "po_line_id", "sku",
             "effective_from", "price_basis", "source_hash", "source_locator",
@@ -154,6 +160,7 @@ class ProcurementAuthority:
             "effective_from": self.effective_from,
             "effective_to": self.effective_to,
             "contracted_unit_price_cents": self.contracted_unit_price_cents,
+            "contracted_unit_price": self.contracted_unit_price,
             "price_basis": self.price_basis,
             "source_hash": self.source_hash,
         }
@@ -171,6 +178,7 @@ class ProcurementAuthority:
                 "po_line_id": self.po_line_id,
                 "sku": self.normalized_sku,
                 "contracted_unit_price_cents": self.contracted_unit_price_cents,
+            "contracted_unit_price": self.contracted_unit_price,
                 "price_basis": self.price_basis,
                 **dict(self.metadata),
             },
@@ -316,7 +324,8 @@ def audit_procurement_lines(
         approval = approvals[0]
 
         expected_cents = _extended_cents(
-            authority.contracted_unit_price_cents,
+            (Decimal(authority.contracted_unit_price) * 100
+             if authority.contracted_unit_price is not None else authority.contracted_unit_price_cents),
             approval.quantity,
         )
         if line.actual_line_cents <= expected_cents:
@@ -346,6 +355,7 @@ def audit_procurement_lines(
                 "invoiced_quantity": str(_decimal("invoiced_quantity", line.invoiced_quantity)),
                 "approved_billable_quantity": str(approval.quantity),
                 "contracted_unit_price_cents": authority.contracted_unit_price_cents,
+                "contracted_unit_price": authority.contracted_unit_price,
                 "authority_id": authority.authority_id,
                 "price_basis": authority.price_basis,
                 "quantity_basis": approval.quantity_basis,

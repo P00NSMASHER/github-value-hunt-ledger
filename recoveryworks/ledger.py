@@ -61,10 +61,35 @@ class LedgerRecord:
         return canonical_hash(payload)
 
 
+class EconomicLossConflict(ValueError):
+    """A changed proof must be reconciled with its existing economic case."""
+
+    def __init__(self, finding_id: str):
+        self.finding_id = finding_id
+        super().__init__("economic loss already recorded as " + finding_id
+                         + "; reconcile changed evidence before adding another case")
+
+
+def economic_loss_key(finding: RecoveryFinding) -> tuple:
+    # Evidence hashes identify proof versions, not separate financial losses.
+    explicit = finding.metadata.get("economic_loss_id")
+    if explicit is not None:
+        if not isinstance(explicit, str) or not explicit.strip():
+            raise ValueError("economic_loss_id must be nonempty text")
+        return (finding.client_id, finding.currency, "explicit", explicit.strip())
+    return (finding.client_id, finding.currency, finding.branch.value,
+            finding.counterparty_id, finding.reference,
+            finding.metadata.get("account_id", ""),
+            finding.metadata.get("shipment_id", ""),
+            finding.metadata.get("business_unit", ""))
+
+
 class RecoveryLedger:
     def __init__(self) -> None:
         self._records: dict[str, LedgerRecord] = {}
         self._proof_index: dict[str, str] = {}
+        self._economic_index: dict[tuple, str] = {}
+        self._reconciliation_holds: dict[str, str] = {}
         self._settlement_id_index: dict[tuple[str, str], str] = {}
         self._settlement_source_index: dict[tuple[str, str, str], str] = {}
 
@@ -123,6 +148,9 @@ class RecoveryLedger:
             return self._records[existing_id]
         if finding.finding_id in self._records:
             raise ValueError("finding_id already exists with different proof")
+        key = economic_loss_key(finding)
+        if key in self._economic_index:
+            raise EconomicLossConflict(self._economic_index[key])
         state = CaseState.VALIDATED if finding.state is FindingState.VALIDATED else CaseState.REVIEW
         record = LedgerRecord(
             finding=finding,
@@ -131,7 +159,23 @@ class RecoveryLedger:
         )
         self._records[finding.finding_id] = record
         self._proof_index[finding.proof_hash] = finding.finding_id
+        self._economic_index[key] = finding.finding_id
         return record
+
+    def hold_for_reconciliation(self, finding_id: str, reason: str, *, occurred_at=None):
+        record = self.get(finding_id)
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("reconciliation hold reason required")
+        self._transition_time(record, occurred_at)
+        self._reconciliation_holds[finding_id] = reason.strip()
+        return record
+
+    def reconciliation_holds(self) -> dict[str, str]:
+        return dict(self._reconciliation_holds)
+
+    def _check_reconciliation_hold(self, finding_id: str) -> None:
+        if finding_id in self._reconciliation_holds:
+            raise ValueError("case is held for evidence reconciliation")
 
     def get(self, finding_id: str) -> LedgerRecord:
         try:
@@ -149,6 +193,7 @@ class RecoveryLedger:
     ) -> LedgerRecord:
         reviewer_id = self._text("reviewer_id", reviewer_id)
         note = self._text("review note", note)
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "approval")
         if record.reviewer_approved:
@@ -174,6 +219,7 @@ class RecoveryLedger:
     ) -> LedgerRecord:
         reviewer_id = self._text("independent reviewer_id", reviewer_id)
         note = self._text("independent review note", note)
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "independent approval")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -200,6 +246,7 @@ class RecoveryLedger:
         occurred_at: str | None = None,
     ) -> LedgerRecord:
         authorization_id = self._text("authorization_id", authorization_id)
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "authorization")
         if self._high_value(record):
@@ -226,6 +273,7 @@ class RecoveryLedger:
         *,
         occurred_at: str | None = None,
     ) -> LedgerRecord:
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "case authorization")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -305,6 +353,7 @@ class RecoveryLedger:
         *,
         occurred_at: str | None = None,
     ) -> LedgerRecord:
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
             raise ValueError("claim action requires explicit authorization")
@@ -351,6 +400,7 @@ class RecoveryLedger:
         *,
         occurred_at: str | None = None,
     ) -> LedgerRecord:
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         if record.case_state is not CaseState.CLAIMED:
             raise ValueError("only CLAIMED cases may be marked recovered")
