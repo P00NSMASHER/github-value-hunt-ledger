@@ -347,3 +347,51 @@ parse both fields, enforce valid dates and the 2024 accounting-year
 histogram, and reject inconsistent accounting chronology. An accounting
 year is not evidence of a 2024 shipment movement, customer invoice,
 freight revenue charged, or recoverable overpayment.
+
+
+### Census 2022 PUMS sampling and disclosure controls — verified against the original guide
+
+Official source: [2022 CFS Public Use Microdata Sample Data Users Guide]
+(https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums_users_guide.pdf),
+issued January 2026, pages 2–4; original methodological source:
+https://www.census.gov/programs-surveys/cfs/technical-documentation/methodology.html.
+
+**What the genuine source supports:** The complete Census PUMS is documented
+as **37,576,546** anonymized shipment records collected from approximately
+50,000 responding establishments. Its shipped-goods value is in **dollars**,
+shipping weight in **pounds**, and geographic distance in **great-circle
+miles**. None is a freight carrier invoice charge or the rate actually
+invoiced for a particular movement.
+
+- Census `WGT_FACTOR` is a *survey shipment tabulation factor*, combining
+  selection/design weights, subsampling, disclosure avoidance noise and
+  poststratification; it is rounded to **one decimal** and top-coded at
+  **3,588,000**. A few genuine records may have factors **under 1**, so a
+  valid factor is positive—not necessarily >= 1.
+- The published PUMS also truncates shipment goods value above
+  **$30,000,000**, topcodes other large fields, rounds quantities, collapses
+  some detailed geographic and commodity identifiers and adds privacy noise.
+  It therefore cannot serve as a verified original invoice or identical
+  replacement for confidential survey truth.
+- Census explicitly cautions that PUMS estimates may differ substantially
+  from its published CFS statistics and recommends the **published CFS
+  tables whenever an official estimate is already available**.
+- RETALLY's preserved 100-row **first-file prefix is not a randomized,
+  design-valid or representative subsample**, even if the true full
+  PUMS factors are present. Population-shipment, total goods value,
+  tonnage, carrier spend, average lane cost, variance, confidence intervals
+  and recoverable amounts are **prohibited for that prefix**.
+- The offline source checker now enforces the original 100-row SHA-256,
+  one-decimal positive finite weight factors, published top-coded maximum
+  factor and the pinned Census guide/non-extrapolation policy. Independent
+  negative tests try forging the metadata to enable extrapolation and
+  rehashing an impossibly large weighting factor; both must fail.
+- **Still needed for genuinely statistical analysis:** complete 2022 PUMS
+  file download and integrity validation; domain/industry coverage and
+  geographies checked against official codebook; defensible weighted
+  calculations; and separate replication/variance controls. Nothing in
+  this document claims those gates have been satisfied.
+
+These restrictions are **separate** from the 26 still-unverified historical
+findings and 18 unmet human pilot approvals. Original customers, invoices,
+payments, contract rates and real recoveries remain absent.
