@@ -61,7 +61,7 @@ class TwoGAODecisionRatingAndSourceControls(unittest.TestCase):
         self.assertEqual(x["government_B160344_claimed_paid_cents"],27517)
         self.assertEqual(x["government_B160344_allowable_cents"],13929)
         self.assertEqual(x["government_B160344_reported_collection_by_setoff_cents"],13588)
-        self.assertTrue(x["government_B186603_chair_13328_setoff_later_disallowed_in_source"])
+        self.assertTrue(x["government_B186603_chair_13328_setoff_origin_basis_rebutted_claim_allowance_conditional"])
         self.assertTrue(x["all_event_net_cash_totals_explicitly_UNVERIFIED"])
         self.assertFalse(x["government_B186603_chair_repayment_bank_receipt_verified"])
         self.assertEqual(x["real_RETALLY_client_invoices"],0)
