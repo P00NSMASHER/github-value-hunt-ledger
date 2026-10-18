@@ -1140,3 +1140,70 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  .document-page .retally-fieldkit{background:#fff;box-shadow:none;border:1px solid #777;break-inside:avoid}
  .document-page .retally-fieldkit ol{font-size:10pt}
 }
+
+
+/* RETALLY local-only LTL evidence comparator: responsive and print-safe. */
+.document-page .retally-ltl-tool{
+ background:#f5fcf7;border:1px solid #b0cfb7;border-radius:18px;
+ padding:clamp(16px,3vw,28px);margin:16px 0 28px;
+ box-shadow:0 6px 22px rgba(2,39,23,.08);
+}
+.document-page .retally-ltl-form{display:block;margin-top:16px}
+.document-page .retally-ltl-count{display:block;max-width:540px;font-weight:730}
+.document-page .retally-ltl-count input{
+ display:block;width:min(240px,100%);min-height:48px;margin-block:8px;
+ border:1px solid #8caf9d;border-radius:9px;padding:10px 12px;
+ background:#fff;color:#123c2b;font-size:1rem;
+}
+.document-page .retally-ltl-hint{
+ display:block;margin:8px 0 14px;color:#405f50;
+ font-size:.87rem;font-weight:440;line-height:1.5;
+}
+.document-page .retally-ltl-sides{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:21px 0 14px;
+}
+.document-page .retally-ltl-side{
+ margin:0;min-width:0;border:1px solid #bbd8c3;border-radius:14px;
+ padding:16px;background:#fff;
+}
+.document-page .retally-ltl-side legend{
+ font-weight:780;color:#0a5940;padding-inline:4px;max-width:100%;
+}
+.document-page .retally-ltl-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px;
+}
+.document-page .retally-ltl-grid label{
+ display:flex;flex-direction:column;gap:6px;color:#244c38;
+ font-size:.84rem;font-weight:680;min-width:0;
+}
+.document-page .retally-ltl-grid input{
+ width:100%;min-width:0;min-height:45px;border-radius:9px;
+ border:1px solid #94b6a1;padding:10px;
+ font:inherit;font-size:1rem;color:#102b1e;background:#fff;
+}
+.document-page .retally-ltl-grid input:focus-visible,
+.document-page .retally-ltl-count input:focus-visible{
+ outline:3px solid #11855b;outline-offset:2px;border-color:#006d46;
+}
+.document-page .retally-ltl-actions{display:flex;flex-wrap:wrap;align-items:center;gap:11px;margin:18px 0}
+.document-page .retally-ltl-results{border-top:1px solid #b0cfb7;padding-top:20px;margin-top:18px}
+.document-page .retally-ltl-results h3{color:#164933}
+.document-page .retally-ltl-results .retally-free-table{background:#fff}
+.document-page .retally-ltl-results #ltlResultSummary{font-weight:700;color:#124c36}
+.document-page .retally-ltl-results output{font-variant-numeric:tabular-nums}
+.document-page .retally-ltl-tool .form-error{color:#9a1836;font-weight:650}
+@media(max-width:780px){
+ .document-page .retally-ltl-sides{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:420px){
+ .document-page .retally-ltl-grid{grid-template-columns:minmax(0,1fr)}
+ .document-page .retally-ltl-tool{padding:15px}
+}
+@media print{
+ .document-page .retally-ltl-tool{border:1px solid #555;background:#fff;box-shadow:none}
+ .document-page .retally-ltl-actions,.document-page #ltlPrint{display:none!important}
+ .document-page .retally-ltl-sides{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .document-page .retally-ltl-side{padding:8px}
+ .document-page .retally-ltl-grid input{min-height:25px;padding:5px}
+ .document-page .retally-ltl-results{break-inside:avoid}
+}

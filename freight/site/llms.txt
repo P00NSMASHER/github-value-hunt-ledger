@@ -25,6 +25,7 @@
 - https://p00nsmasher.github.io/github-value-hunt-ledger/accessorial-charge-audit.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/ltl-freight-audit.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/ltl-reweigh-reclass-checklist.html
+- https://p00nsmasher.github.io/github-value-hunt-ledger/ltl-reweigh-evidence-comparator.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/parcel-audit.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/freight-overcharge-recovery.html
 
