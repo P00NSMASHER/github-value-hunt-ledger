@@ -470,3 +470,16 @@ def test_review_bound_to_old_finding_proof_cannot_authorize_changed_finding():
             issued_on="2026-09-21",
             expires_on="2026-09-22",
         )
+
+
+@pytest.mark.parametrize(
+    "authorization_id",
+    (
+        " ACT-001",
+        "ACT-e\u0301",
+        "ACT-\u200b001",
+    ),
+)
+def test_authorization_identity_rejects_alias_forms(authorization_id):
+    with pytest.raises(ValueError, match="authorization_id"):
+        auth(authorization_id=authorization_id)
