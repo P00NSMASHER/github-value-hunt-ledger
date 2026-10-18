@@ -75,6 +75,12 @@ jobs:
           assert data['separate_GAO_reported_historical_collection_events']==9
           assert data['GAO_original_reported_refunds']==3
           assert data['GAO_original_reported_applied_setoffs']==6
+          assert data['GAO_1980_original_one_lot_vs_multiple_BOL_rate_reconciliation'] is True
+          assert data['GAO_1980_one_lot_allowed_charge_cents']==617063
+          assert data['GAO_1980_multiple_BOL_carrier_rate_cents']==671075
+          assert data['GAO_1980_voluntary_carrier_refund_cents']==110967
+          assert data['GAO_1980_remainder_setoff_cents']==54012
+          assert data['GAO_1980_no_original_tariff_or_Treasury_receipt_examined'] is True
           assert data['GAO_decisions_are_external_historical_not_307_source_observations'] is True
           assert data['GAO_reported_collections_not_independently_Treasury_bank_verified'] is True
           assert data['GAO_final_unreversed_net_government_recovery_total_cents'] is None
