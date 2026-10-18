@@ -287,6 +287,38 @@ def test_receipt_rejects_execution_before_intent_preparation():
         )
 
 
+def test_self_hashed_receipt_cannot_backdate_execution_before_preparation():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent, executed_at="2026-09-21T11:01:00Z"),
+    )
+    forged = replace(
+        receipt,
+        executed_at="2026-09-21T10:59:59.000000Z",
+    )
+    body = asdict(forged)
+    body.pop("receipt_hash")
+    forged = replace(
+        forged,
+        receipt_hash=canonical_hash({"schema": 1, **body}),
+    )
+
+    with pytest.raises(ValueError, match="cannot precede"):
+        verify_carrier_action_execution_receipt(forged)
+
+
 def test_revocation_after_preparation_blocks_later_execution_receipt():
     auth, proposal, payload, claims = setup()
     intent = build_carrier_action_execution_intent(
