@@ -178,3 +178,21 @@ def test_batch_rejects_canonically_equivalent_charge_id_aliases():
     assert derive_batch(population(), [composed], [rule()]).validated_count == 1
     with pytest.raises(ValueError, match="canonical Unicode"):
         derive_batch(population(), [composed, decomposed], [rule()])
+
+
+
+@pytest.mark.parametrize(
+    ("bad_authority_id", "diagnostic"),
+    [
+        ("rate-e\u0301-confirmation", "canonical Unicode"),
+        ("rate-\u200bconfirmation", "control characters"),
+    ],
+)
+def test_validated_rule_rejects_noncanonical_authority_document_identity(
+    bad_authority_id, diagnostic
+):
+    with pytest.raises(ValueError, match=diagnostic):
+        derive_charge(
+            charge(),
+            [rule(authority_document_id=bad_authority_id)],
+        )
