@@ -515,3 +515,39 @@ not an externally signed government or bank receipt. The original
 26 historical findings and 18 independent human pilot requirements
 remain open. The client-facing website and production financial systems
 are not modified.
+
+
+## New source tier: actual historical government-REPORTED collections
+
+In an independently sourced supplemental GAO evidence tranche (see
+`freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`) six original,
+public, first-party U.S. Government Accountability Office decisions
+**report** seven historical transportation overcharge collection events:
+two carrier-refunded payments and five government-applied offsets.
+These are **real agency-published collection accounts**—substantively
+different from an outstanding award—but not independently inspected
+Treasury bank postings or original invoice/contract scans.
+
+These cases include a mixed original refund+setoff (`B-152324`),
+an assessed remaining amount not yet deducted (`A-14046`), a later
+carrier-reimbursement certificate not proven executed (`B-166167`),
+and conflicting later supplemental-claim dollar representations
+(`B-146511`). Every event is stored as an integer-cent and source
+URL-bound assertion with negative tests prohibiting duplicate money,
+pending-collection promotion and fabricated original invoice evidence.
+
+**Do not inflate the source record tally:** the unchanged **307**
+bounded BTS/EIA/carrier/Census/STB source records remain a separate
+category. The **one** Census statistical worked example, **one** FMC
+adjudicated award, and **six** GAO historical collection decisions are
+different document/evidence categories. They cannot be pooled as
+customer freight bills or used to calculate RETALLY's recovery rate.
+
+The consolidated `freight/public_original_research_control.py`
+report now exposes the original GAO cases as a distinct **government
+collection narrative** tier with **zero** independent Treasury/bank
+verifications and **zero** real RETALLY customer collections.
+All original 26 historical defects and 18 independent human gates
+remain open. Source-integrity CI must pass on the exact final draft head;
+no private carrier documents, outbound contact, production change or
+payment authority is implied.
