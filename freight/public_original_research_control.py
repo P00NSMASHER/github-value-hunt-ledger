@@ -25,6 +25,7 @@ from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_pos
 from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
 from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
 from freight.public_crowley_appeal_scope_v1 import report as crowley_appellate_scope
+from freight.public_gao_rating_lineitem_original_v1 import report as original_gao_lineitem
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -52,6 +53,7 @@ def snapshot() -> dict:
     reversal=verified_historical_reversal()
     fund=gsa_fund_accounting()
     appellate=crowley_appellate_scope()
+    lineitem=original_gao_lineitem()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -162,6 +164,23 @@ def snapshot() -> dict:
         and appellate["retally_real_customer_invoice_count"]==0
         and appellate["retally_recovered_cents"]==0
         and appellate["commercial_claim_clearance"]=="NO_GO"
+        and lineitem["original_GAO_published_decisions_reviewed"]==2
+        and lineitem["distinct_GBL_references_in_decisions"]==3
+        and lineitem["government_B160344_actual_reported_weight_lb"]==1485
+        and lineitem["government_B160344_claimed_paid_cents"]==27517
+        and lineitem["government_B160344_allowable_cents"]==13929
+        and lineitem["government_B160344_reported_collection_by_setoff_cents"]==13588
+        and lineitem["government_B160344_paid_date_precedes_corrected_description"] is True
+        and lineitem["government_B186603_chair_GBL_origin_disproved"] is True
+        and lineitem["government_B186603_chair_13328_setoff_later_disallowed_in_source"] is True
+        and lineitem["government_B186603_chair_repayment_bank_receipt_verified"] is False
+        and lineitem["government_B186603_blanket_5765_offset_separately_recorded"] is True
+        and lineitem["government_B186603_blanket_2290_certificate_not_proved_paid"] is True
+        and lineitem["all_event_net_cash_totals_explicitly_UNVERIFIED"] is True
+        and lineitem["real_RETALLY_client_invoices"]==0
+        and lineitem["real_RETALLY_customer_overcharges_cents"]==0
+        and lineitem["real_RETALLY_customer_recoveries_cents"]==0
+        and lineitem["commercial_release"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -171,6 +190,15 @@ def snapshot() -> dict:
         "standalone_official_publisher_examples":1,
         "standalone_external_adjudication_records":1,
         "separate_original_GAO_historical_collection_decisions":gao["historical_distinct_decisions"],
+        "distinct_original_GAO_rate_and_origin_correction_decisions_NOT_307_rows":2,
+        "distinct_GAO_rate_and_origin_case_BOL_references":3,
+        "GAO_1967_historical_cwt_original_bill_cents":27517,
+        "GAO_1967_historical_cwt_allowable_bill_cents":13929,
+        "GAO_1967_historical_federal_setoff_cents":13588,
+        "GAO_1976_wrong_origin_13328_setoff_reimbursement_NOT_VERIFIED":True,
+        "GAO_1976_other_bol_settlement_certificate_NOT_VERIFIED_PAID":True,
+        "GAO_historical_rate_source_NOT_current_private_tariff":True,
+        "GAO_lineitem_government_reports_NOT_independent_bank_receipts":True,
         "separate_GAO_reported_historical_collection_events":gao["gao_reported_collection_events"],
         "GAO_original_reported_refunds":gao["agency_reported_collection_modes"]["CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT"],
         "GAO_original_reported_applied_setoffs":gao["agency_reported_collection_modes"]["GOVERNMENT_APPLIED_SET_OFF"],
