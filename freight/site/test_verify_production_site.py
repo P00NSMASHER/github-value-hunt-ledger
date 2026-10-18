@@ -108,6 +108,17 @@ class InternalHyperlinkAuditTests(unittest.TestCase):
             )
             self.assertEqual(validate_bundle_links(root)["pages"], 1)
 
+    def test_recipientless_share_draft_requires_narrow_cloudflare_exemption(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            page = root / "index.html"
+            draft = '<a href="mailto:?subject=Free%20Guide&amp;body=Hello">Prepare email draft</a>'
+            page.write_text(draft, encoding="utf-8")
+            with self.assertRaisesRegex(InternalLinkError, "recipientless share draft creates Cloudflare 404"):
+                validate_bundle_links(root)
+            page.write_text("<!--email_off-->" + draft + "<!--/email_off-->", encoding="utf-8")
+            self.assertEqual(validate_bundle_links(root)["pages"], 1)
+
     def test_live_links_reuse_sitemap_checks_and_fetch_unique_destinations(self):
         calls = []
         about = CANONICAL + "about"
