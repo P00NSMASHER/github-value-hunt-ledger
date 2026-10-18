@@ -20,7 +20,7 @@ Two adjustment pairs can be traced beyond suffix matching to matching **PRO and 
 
 The new module freight/research/statement_reconciliation.py accepts only caller-supplied structured metadata. It checks invoice face vs statement original, statement totals, canonical duplicate references, explicit base/adjustment linkage **requiring matching PRO and BOL identifiers**, unknown parents, changed open balances and contradictory external claim snapshots. It never derives recovered cash, an overcharge, source reuse rights, or shipment-family counts.
 
-Run the 20 deterministic **synthetic-only** tests:
+Run the 25 deterministic **synthetic-only** tests:
 
     python -m unittest freight.test_globaltranz_reconciliation -v
 
@@ -76,3 +76,9 @@ The [July 28, 2026 numerical claims register, Docket 648](https://document.epiq1
 Some publicly cited GlobalTranz broker invoices name XPO or R&L as underlying carriers. This provides a worthwhile **two-creditor / one-shipment hypothesis** for a future authorized invoice identity test: compare carrier-originated proof-of-claim invoices against the broker's billed invoice, original PRO/BOL/customer entity, service date, and payment allocation. **The register alone proves no invoice overlap, duplicate debt, erroneous claim, recovery, or freight billing mistake.** No XPO/R&L original claim attachments were fetched or reproduced.
 
 As of March 31, 2026, [W & Z Oldco's own post-confirmation report, Docket 637](https://document.epiq11.com/document/getdocumentsbydocket/?docketId=1231443&docketNumber=637&projectCode=MCX&source=DM) reports **$0 in general unsecured distributions**, but the filing also notes the effective-date transfer of valid claims and assets to the separate liquidating trust. Therefore this **does not exclude independent trust-level or later creditor payments**. The creditor-specific disbursement record remains unavailable.
+
+## Claim-identity comparison gate (2026-10-18)
+
+The research comparator now requires each optional external claim snapshot to carry a **legal debtor reference, creditor reference, and claim identifier**. It normalizes case/whitespace only for these keys and compares monetary claim snapshots **only when all three keys agree across sources**. Missing or differing identities yield `CLAIM_IDENTITY_UNVERIFIED` / `CROSS_CLAIM_COMPARISON_BLOCKED`, **not** a supposed recovery or discrepancy.
+
+Five new synthetic negative/positive regression tests cover cross-debtor, cross-creditor, different claim numbers, missing identifiers, and consistent normalized identifiers. This is a research safeguard, not a determination that any XPO/R&L and GlobalTranz invoice represents the same shipment or liability. A valid identity comparison alone does not prove the underlying rate, credit or payment. Normal PR gates must pass before any promotion.
