@@ -64,8 +64,8 @@
       "effective_date": "2005-02-28",
       "shipper": "Swift & Company, Inc.",
       "carrier": "LOAD SOURCE LOGISTICS",
-      "service": "Swift shipments tendered under executed agreement; actual lane rates in priority Appendices J, I, K",
-      "units": "USD surcharge per loaded mile",
+      "service": "Swift shipments under SEC-filed carrier contract form; current execution and lane-rate Appendices J/I/K are not independently authenticated",
+      "units": "USD fuel surcharge per contract-rated shipment mile",
       "fuel_index": "DOE_NATIONAL_AVERAGE_DIESEL_MON_OR_FEDERAL_HOLIDAY_TUE",
       "fuel_assessment": "index determined Monday or federal-holiday Tuesday; applies shipments beginning following Monday",
       "contract_rate_precedence": [
