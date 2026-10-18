@@ -304,6 +304,7 @@ def verify_gao_1980_original_rating_arithmetic()->dict:
 
 def public_collection_report()->dict:
     rows=verified_gao_cases()
+    gaob1980=verify_gao_1980_original_rating_arithmetic()
     events=[e for row in rows for e in row["gao_reported_collection_events"]]
     by_type={kind:sum(e["kind"]==kind for e in events) for kind in sorted(EVENTS)}
     if len(events)!=9 or by_type!={"CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":3,"GOVERNMENT_APPLIED_SET_OFF":6}:
@@ -317,6 +318,17 @@ def public_collection_report()->dict:
         "cases_with_uncollected_future_deduction":1,
         "cases_with_carrier_refund_authorized_but_unverified_paid":1,
         "cases_with_disputed_amount_variants":1,
+        "original_GAO_1980_rating_reconciled":True,
+        "original_GAO_1980_one_tender_correct_charge_cents":
+            gaob1980["GAO_correct_one_lot_charge_cents"],
+        "original_GAO_1980_carrier_multiple_BOL_competing_charge_cents":
+            gaob1980["carrier_competing_multiple_bill_charge_cents"],
+        "original_GAO_1980_carrier_partial_refund_cents":
+            gaob1980["carrier_voluntary_refund_cents"],
+        "original_GAO_1980_remaining_government_setoff_cents":
+            gaob1980["GAO_remaining_applied_setoff_cents"],
+        "original_GAO_1980_full_PDF_original_SHA_unverified":True,
+        "original_GAO_1980_no_original_bill_or_tariff_scans":True,
         "source_transcribed_historical_collection_report_not_payment_bank_proof":True,
         "full_original_invoice_images_compared":False,
         "actual_carrier_account_bank_or_Treasury_posting_independently_verified":False,
