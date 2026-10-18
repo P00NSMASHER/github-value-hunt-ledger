@@ -1,6 +1,9 @@
 """Synthetic-only test cases. No real invoice numbers or customer documents."""
 import unittest
-from freight.research.statement_reconciliation import ClaimSnapshot, StatementLine, compare
+from freight.research.statement_reconciliation import (
+    ClaimSnapshot, SourceReferencedLiabilityTransfer, StatementLine,
+    assess_claim_liability_transfer, compare,
+)
 
 
 def row(ref, invoice, open_amount=None, *, face=True, kind="BASE", parent=None, pro=None, bol=None):
@@ -172,6 +175,60 @@ class TestReconciliation(unittest.TestCase):
     def test_base_parent_mislabel_blocks(self):
         result = compare([row("EXAMPLE", 100, parent="EXAMPLE")], statement_control_cents=100)
         self.assertIn("BASE_CANNOT_HAVE_PARENT", result.exception_codes)
+
+
+class TestCourtLiabilityTransfer(unittest.TestCase):
+    """Synthetic cents and identities; checks a *referenced* order, not its contents."""
+
+    def example(self, **overrides):
+        fields = dict(
+            original=ClaimSnapshot("filed", 12345, "DEBTOR-A", "CREDITOR-B", "CLAIM-7"),
+            revised=ClaimSnapshot("later_register", 2345, "DEBTOR-A", "CREDITOR-B", "CLAIM-7"),
+            transferred_liability_cents=10000,
+            receiving_entity="ASSET-BUYER-C",
+            public_court_order_url=(
+                "https://document.epiq11.com/document/getdocumentsbydocket/"
+                "?docketId=12345&projectCode=DEMO&docketNumber=90&source=DM"
+            ),
+        )
+        fields.update(overrides)
+        return SourceReferencedLiabilityTransfer(**fields)
+
+    def test_source_referenced_transfer_reconciles_without_cash_or_rights(self):
+        outcome = assess_claim_liability_transfer(self.example())
+        self.assertEqual(outcome.state, "SOURCE_REFERENCED_LIABILITY_TRANSFER")
+        self.assertEqual(outcome.transferred_liability_cents, 10000)
+        self.assertEqual(outcome.remaining_claim_cents, 2345)
+        self.assertEqual(outcome.verified_recovered_cents, 0)
+        self.assertEqual(outcome.verified_overcharge_cents, 0)
+        self.assertFalse(outcome.commercial_reuse_authorized)
+        self.assertEqual(outcome.exception_codes, ())
+
+    def test_mismatched_claim_transfer_amount_remains_review_required(self):
+        outcome = assess_claim_liability_transfer(
+            self.example(transferred_liability_cents=9999))
+        self.assertEqual(outcome.state, "REVIEW_REQUIRED")
+        self.assertIn("CLAIM_TRANSFER_ARITHMETIC_MISMATCH", outcome.exception_codes)
+
+    def test_different_debtor_disallows_transfer_attribution(self):
+        outcome = assess_claim_liability_transfer(self.example(
+            revised=ClaimSnapshot("later", 2345, "OTHER-DEBTOR", "CREDITOR-B", "CLAIM-7")))
+        self.assertIn("CROSS_CLAIM_COMPARISON_BLOCKED", outcome.exception_codes)
+        self.assertEqual(outcome.verified_recovered_cents, 0)
+
+    def test_missing_official_order_reference_fails_closed(self):
+        outcome = assess_claim_liability_transfer(
+            self.example(public_court_order_url="https://example.com/unsupported"))
+        self.assertIn("PUBLIC_COURT_ORDER_REFERENCE_MISSING", outcome.exception_codes)
+
+    def test_missing_purchaser_held_for_review(self):
+        outcome = assess_claim_liability_transfer(self.example(receiving_entity="  "))
+        self.assertIn("TRANSFER_RECEIVING_ENTITY_UNVERIFIED", outcome.exception_codes)
+
+    def test_negative_transfer_is_invalid(self):
+        with self.assertRaises(ValueError):
+            assess_claim_liability_transfer(
+                self.example(transferred_liability_cents=-1))
 
 
 if __name__ == "__main__":
