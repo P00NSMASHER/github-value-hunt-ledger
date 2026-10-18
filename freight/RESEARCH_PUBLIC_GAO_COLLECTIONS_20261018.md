@@ -263,3 +263,55 @@ the FY2023 $29.6 million corrective vendor payment**, not a new customer
 case or one of the seven GAO positive collections. It adds **seven fund
 accounting line items** kept outside the 307 bounded BTS/EIA/CFS/STB
 freight market data observations and outside real customer recoveries.
+
+
+## Later authoritative case-status update: D.C. Circuit Crowley decision (July 2025)
+
+**Direct original appellate opinion:**
+[Crowley Government Services, Inc. v. GSA, No. 23-5183, July 18, 2025]
+(https://media.cadc.uscourts.gov/opinions/docs/2025/07/23-5183-2126136.pdf),
+U.S. Court of Appeals for the D.C. Circuit (56 pages including dissent).
+
+This opinion is **more recent than GSA's FY2025 budget discussion of
+FY2023 events**. A majority held that the particular audit power in
+31 U.S.C. § 3726(b) concerned bills submitted by carriers and freight
+forwarders, and that **Crowley acted as an intermediary—not a carrier
+under the DFTS I agreement at issue**. It reversed the lower
+court's broader GSA-audit-scope ruling and remanded for further
+proceedings.
+
+The official opinion also describes more than **50,000 Notices of
+Overcharge** alleging **about $37 million** from 2018 through
+August 2021 and later states that the accumulated notice count
+exceeded 100,000. These are historical **agency allegations**, not
+original customer invoices RETALLY obtained, independently audited
+transportation charges, actual bank transfers or validated recovered
+savings. It notes **three contracting-officer decisions** that
+rejected the contested GSA notice interpretations.
+
+The court separately referenced a **$11.8 million damages demand**
+in a Court of Federal Claims action in the course of assessing its
+own jurisdiction and whether the appeal remained a live dispute.
+**The D.C. Circuit did not award Crowley $11.8 million or prove
+any corresponding bank payment.** A claim's precise post-July-2025
+financial disposition or its status today in October 2026 has
+not been independently confirmed here.
+
+The source is frozen in
+`freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json`
+and separately checked by `freight/public_crowley_appeal_scope_v1.py`
+and its negative tests. The checks reject altering the case
+scope, converting $37 million of **allegations** into proven
+errors, converting the $11.8 million **demand** into a judgment
+or payment, inferring a current private commercial setoff
+right, or asserting original bank/PDF byte proof not obtained.
+
+This is **one separately counted original federal court decision**,
+not a new GAO source-case collection, new customer invoice,
+government receipts-account row, or 308th bounded public freight
+sample record. It does not add verified RETALLY revenue or
+change the original 26 historical/18 human approval holds.
+
+**Decision tier: ORIGINAL_2025_APPELLATE_AUTHORITY;
+PAYMENT_CLAIM_NOT_ADJUDICATED_IN_THIS_APPEAL;
+NO_PRIVATE_CUSTOMER_RECOVERY_AUTHORITY.**
