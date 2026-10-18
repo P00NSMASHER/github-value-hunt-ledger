@@ -910,7 +910,8 @@ class RetallyAllButtonFinishTests(unittest.TestCase):
             self.assertIn('type="submit">Open My Free Audit Request</button>', page)
             self.assertIn('id="retallyChatLauncher"', page)
             self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
-            self.assertNotIn("linkedin.com/company/retally", page)
+            self.assertIn('href="https://www.linkedin.com/company/retallyrecovery/"', page)
+            self.assertNotIn("linkedin.com/in/", page.lower())
 
 if __name__ == "__main__":
     unittest.main()
