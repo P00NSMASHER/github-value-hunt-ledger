@@ -18,6 +18,14 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertEqual(len(data["original_public_source_record_counts"]),5)
         self.assertEqual(data["standalone_official_publisher_examples"],1)
         self.assertEqual(data["standalone_external_adjudication_records"],1)
+        self.assertEqual(data["separate_public_FMC_litigant_invoice_OCR_candidate_documents"],1)
+        self.assertEqual(data["FMC_2017_OCR_candidate_line_total_cents"],918593)
+        self.assertTrue(data["FMC_2017_duplicate_page_OCR_conflict_open"])
+        self.assertTrue(data["FMC_2017_original_carrier_issued_invoice_authentication_MISSING"])
+        self.assertTrue(data["FMC_2017_mode_mismatch_only_litigant_allegation"])
+        self.assertTrue(data["FMC_2017_invoice_paid_status_UNVERIFIED"])
+        self.assertIsNone(data["FMC_2017_overcharge_cents_NOT_PROVEN"])
+        self.assertEqual(data["FMC_2017_retally_client_invoice_count_ZERO"],0)
         self.assertEqual(data["separate_original_GAO_historical_collection_decisions"],7)
         self.assertEqual(data["distinct_original_GAO_rate_and_origin_correction_decisions_NOT_307_rows"],2)
         self.assertEqual(data["distinct_GAO_rate_and_origin_case_BOL_references"],3)
@@ -225,6 +233,24 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                         ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_fmc_public_invoice_ocr_not_a_customer_recovery(self):
+        original=src.public_fmc_invoice_candidate()
+        for name,val in (
+            ("unique_actual_source_invoice_verified",True),
+            ("adjacent_OCR_rendition_uncertain",False),
+            ("invoice_actually_paid_verified",True),
+            ("original_bill_of_lading_cross_match_verified",True),
+            ("mode_mismatch_is_LITIGANT_ALLEGATION_only",False),
+            ("adjudicated_charge_invalidity_proven",True),
+            ("invoice_overcharge_cents",540000),
+            ("real_RETALLY_customer_invoices",1),
+        ):
+            with self.subTest(name=name):
+                with patch.object(src,"public_fmc_invoice_candidate",
+                                  return_value={**original,name:val}):
+                    with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -232,6 +258,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("NOT verified customer invoices",html)
         self.assertIn("Seven distinct GAO government historical case decisions",html)
         self.assertIn("original 1967/1976 GAO cases",html)
+        self.assertIn("A separate FMC 2017 publicly filed invoice image",html)
         self.assertIn("carrier claim remains conditional",html)
         self.assertIn("no original bank/Treasury postings",html)
         self.assertIn("ERRONEOUS notices of overcharge",html)
