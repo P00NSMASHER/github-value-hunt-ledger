@@ -18,6 +18,6 @@ No new vendors, subscriptions, saved browser identifiers or third-party analytic
 
 ## Evidence limits
 
-A passing GitHub workflow establishes that the IndexNow endpoint acknowledged the submitted URLs, if any. If a release changes no indexable HTML, the workflow exits as `skipped` without an external POST. A successful notification may not result in any search index listing.
+IndexNow **HTTP 200** reports accepted submission, but does not establish crawling, indexing, visitors, leads or revenue. **HTTP 202** reports only that the URL notification was received and the public ownership-key validation remains pending; it is not yet a verified submission. The job records `key_validation_pending` rather than claiming completion. If a release changes no indexable HTML, the workflow exits as `skipped` without a POST. Do not repeatedly submit the same unchanged URLs.
 
 Official docs: https://www.indexnow.org/documentation and https://www2.bing.com/indexnow/getstarted .
