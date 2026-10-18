@@ -42,6 +42,13 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["GAO_1979_reversal_reimbursement_not_verified"])
         self.assertTrue(data["GAO_1979_negative_case_not_approved_collection"])
         self.assertTrue(data["GAO_1979_private_setoff_authority_not_established"])
+        self.assertEqual(data["GSA_FY2023_original_accounting_receipts_thousands_USD"],12354)
+        self.assertEqual(data["GSA_FY2024_original_receipts_PLAN_thousands_USD"],4168)
+        self.assertEqual(data["GSA_FY2025_original_receipts_PLAN_thousands_USD"],12506)
+        self.assertEqual(data["GSA_FY2023_transfer_to_suspense_thousands_USD"],-20674)
+        self.assertEqual(data["GSA_appropriation_table_rows_separately_verified"],7)
+        self.assertTrue(data["GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof"])
+        self.assertTrue(data["GSA_program_receipts_cannot_establish_RETALLY_recovery_rate"])
         self.assertEqual(data["census_official_md_origin_pums_record_count"],612317)
         self.assertEqual(data["census_official_md_origin_gvf_cv_percent"],"9.74")
         self.assertTrue(data["fmc_award_actual_cash_received_verified"] is False)
@@ -156,6 +163,19 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_false_gsa_budget_receipts_are_not_retally_cash_proof(self):
+        original=src.gsa_fund_accounting()
+        for key,val in [
+            ("FY2023_ACTUAL_fund_receipts_thousand_USD",29600),
+            ("FY2024_PLAN_fund_receipts_thousand_USD",12354),
+            ("transfer_cannot_be_deducted_from_same_year_receipts_to_compute_recovery_rate",False),
+            ("no_actual_RETALLY_customer_cash_cents",1235400000),
+        ]:
+            with self.subTest(key=key):
+                with patch.object(src,"gsa_fund_accounting",return_value={**original,key:val}):
+                    with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -165,6 +185,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("no original bank/Treasury postings",html)
         self.assertIn("ERRONEOUS notices of overcharge",html)
         self.assertIn("GAO decision found $5,141.05",html)
+        self.assertIn("FY2024/25 PLANNED values",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
