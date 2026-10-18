@@ -71,10 +71,10 @@ jobs:
           assert len(data['original_public_source_record_counts'])==5
           assert data['standalone_official_publisher_examples']==1
           assert data['standalone_external_adjudication_records']==1
-          assert data['separate_original_GAO_historical_collection_decisions']==6
-          assert data['separate_GAO_reported_historical_collection_events']==7
-          assert data['GAO_original_reported_refunds']==2
-          assert data['GAO_original_reported_applied_setoffs']==5
+          assert data['separate_original_GAO_historical_collection_decisions']==7
+          assert data['separate_GAO_reported_historical_collection_events']==9
+          assert data['GAO_original_reported_refunds']==3
+          assert data['GAO_original_reported_applied_setoffs']==6
           assert data['GAO_decisions_are_external_historical_not_307_source_observations'] is True
           assert data['GAO_reported_collections_not_independently_Treasury_bank_verified'] is True
           assert data['GAO_final_unreversed_net_government_recovery_total_cents'] is None
@@ -94,7 +94,7 @@ jobs:
           page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
           assert 'NOT verified customer invoices' in page
           assert 'NO-GO' in page
-          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one award, six GAO historical cases, one separate GSA wrongful-overcharge repayment; NO customer recovery.')
+          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one award, seven GAO historical cases, one separate GSA wrongful-overcharge repayment; NO customer recovery.')
           PY
       - name: Prohibit invoice and recovery claim promotion
         run: |
