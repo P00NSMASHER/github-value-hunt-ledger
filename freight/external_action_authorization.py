@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from enum import Enum
@@ -91,6 +92,18 @@ def _required(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
     return value.strip()
+
+
+def _identity(name: str, value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(name + " is required")
+    if value != value.strip():
+        raise ValueError(name + " must not contain surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character).startswith("C") for character in value):
+        raise ValueError(name + " cannot contain control characters")
+    return value
 
 
 def _sha(name: str, value: str) -> str:
@@ -225,7 +238,7 @@ def issue_authorization(
     _verify_resolution(resolution)
     _verify_charter(operative_charter, resolution)
 
-    _required("authorization_id", authorization_id)
+    _identity("authorization_id", authorization_id)
     _required("target_carrier_id", target_carrier_id)
     _required("target_customer_id", target_customer_id)
     _sha("recipient_reference_hash", recipient_reference_hash)
@@ -358,6 +371,7 @@ def issue_authorization(
 def _verify_authorization(auth: ExternalActionAuthorization) -> None:
     body = asdict(auth)
     digest = body.pop("authorization_hash")
+    _identity("authorization_id", auth.authorization_id)
     _sha("authorization_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("authorization hash mismatch")
