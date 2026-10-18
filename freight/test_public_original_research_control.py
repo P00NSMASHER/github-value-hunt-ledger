@@ -231,6 +231,8 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("research only",html)
         self.assertIn("NOT verified customer invoices",html)
         self.assertIn("Seven distinct GAO government historical case decisions",html)
+        self.assertIn("original 1967/1976 GAO cases",html)
+        self.assertIn("carrier claim remains conditional",html)
         self.assertIn("no original bank/Treasury postings",html)
         self.assertIn("ERRONEOUS notices of overcharge",html)
         self.assertIn("GAO decision found $5,141.05",html)
