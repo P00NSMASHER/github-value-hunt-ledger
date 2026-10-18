@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "source_publisher": "U.S. Federal Maritime Commission Reading Room",
+  "original_public_filing": "CMI Distribution, Inc. response to presiding judge's August 16, 2017 order to supplement the record",
+  "fmc_docket": "17-05",
+  "published_document_url": "https://www2.fmc.gov/readingroom/docs/17-05/17-05_Cmpl_sup_rcd.pdf/",
+  "document_pdf_pages": 113,
+  "original_public_pdf_exhibit_page_indices_zero_based": [
+    19,
+    20
+  ],
+  "extraction_scope": "ONLY_FOUR_CHARGE_NUMBERS_AND_TOTAL_TRANSCRIBED_FROM_PUBLIC_PDF_EXHIBIT_OCR",
+  "publication_status": "LITIGANT_FILED_EXHIBIT_NOT_ADJUDICATED_TRUTH",
+  "shown_invoice_issuer_organization": "Service by Air, Inc.",
+  "shown_invoice_billed_organization": "CMI Distribution, Inc.",
+  "charges": [
+    {
+      "label": "AIR FREIGHT",
+      "cents": 540000
+    },
+    {
+      "label": "IMPORT DUTY/TAX",
+      "cents": 171293
+    },
+    {
+      "label": "CONTAINER STRIPPING",
+      "cents": 112300
+    },
+    {
+      "label": "APPOINTMENT DELIVERY",
+      "cents": 95000
+    }
+  ],
+  "publicly_indexed_page19_total_cents": 918593,
+  "page20_OCR_duplicate_rendering_has_inconsistent_total_glyphs": true,
+  "same_image_layout_two_adjacent_pages_do_not_establish_two_independent_invoices": true,
+  "publicly_filed_complaint_alleges_container_moved_by_ocean_while_invoice_label_air_freight": true,
+  "allegation_carrier_currently_disputed_or_adjudicated": "NOT_ESTABLISHED",
+  "original_ocean_BOL_image_cross_match_independently_inspected": false,
+  "source_indexed_pdf_invoice_image_visually_inspected_independently": false,
+  "original_carrier_issued_document_independently_authenticated": false,
+  "copied_public_filing_pdf_full_SHA256_verified": false,
+  "original_payment_or_bank_receipt_authenticated": false,
+  "directly_applicable_signed_freight_contract_or_tariff_obtained": false,
+  "current_RETALLY_customer_relationship_or_authorization": false,
+  "actual_invoice_overcharge_independently_proven": false,
+  "recoverable_amount_cents": null,
+  "real_RETALLY_customer_invoices_adjudicated": 0,
+  "real_RETALLY_customer_recovered_cents": 0,
+  "source_limitations": [
+    "The reproduction is in a public litigant filing, not a separately authenticated carrier statement or verified business customer intake.",
+    "The filed party alleges an air-versus-ocean mismatch; this is a disputed assertion rather than an independent adjudication of contract charge applicability.",
+    "OCR in the second overlapping invoice image has inconsistent total glyphs; only the four consistently recognized numeric line-items and the matching first extracted total are retained as candidate values.",
+    "No independent scan page comparison, complete document cryptographic hash or original carrier bill-of-lading-to-invoice chain has been obtained.",
+    "A bill describing air freight on a container-associated movement does not by itself determine overcharge, since modes, accessorials, tariff basis and line-item descriptions need contract evidence.",
+    "No customer authorization, funds recovery, refund or independent bank posting is established."
+  ]
+}
