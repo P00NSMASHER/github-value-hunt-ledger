@@ -713,3 +713,31 @@ def test_delivery_renderer_keeps_delivery_separate_from_recovery():
     assert "Delivery Confirmation" in text
     assert "Delivery confirmed: **yes**" in text
     assert "does not prove settlement" in text
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("action_type", "UNRECOGNIZED_ACTION"),
+        ("channel", "UNRECOGNIZED_CHANNEL"),
+        ("requested_cents", True),
+        ("requested_cents", 0),
+        ("requested_cents", -1),
+    ],
+)
+def test_self_hashed_delivery_receipt_rejects_invalid_semantics(field, value):
+    _, _, _, _, _, submitted = submitted_context()
+    receipt = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    forged = replace(receipt, **{field: value})
+    body = asdict(forged)
+    body.pop("delivery_receipt_hash")
+    forged = replace(
+        forged,
+        delivery_receipt_hash=canonical_hash({"schema": 1, **body}),
+    )
+
+    with pytest.raises(ValueError):
+        verify_carrier_action_delivery_receipt(forged)
