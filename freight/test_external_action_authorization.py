@@ -553,3 +553,26 @@ def test_requested_cents_rejects_boolean_alias():
             currency="USD",
             requested_cents=True,
         )
+
+
+def test_self_hashed_authorization_cannot_extend_original_validity_bound():
+    a = auth()
+    object.__setattr__(a, "expires_on", "2026-11-30")
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match="validity"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-11-01",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=1,
+        )
