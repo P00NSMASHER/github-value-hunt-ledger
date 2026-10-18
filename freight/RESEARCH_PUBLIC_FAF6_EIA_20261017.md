@@ -198,3 +198,44 @@ EIA retail observations + 11 dated public carrier facts** across three
 independent publisher families (BTS, EIA and carriers). None is a
 customer invoice or a claim that RETALLY found another auditor's missed
 overcharge.
+
+
+## New actual shipment-record source: Census 2022 CFS PUMS (bounded original prefix)
+
+Direct federal ZIP:
+https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums.zip
+
+Data/guide:
+https://www.census.gov/data/datasets/2022/econ/cfs/historical-datasets.html
+
+The original federal endpoint returned **206 Partial Content** for requested
+byte ranges. Its ZIP central directory identifies a single source member,
+`cfs_2022_pums.csv`, **2,824,487,751 uncompressed bytes**,
+677,530,492 compressed member bytes, and original ZIP total **677,530,696
+bytes** (CRC32 0x3a9fd854). The file starts with 18 native fields including
+`SHIPMT_ID`, shipment origin/destination, sector, SCTG, mode, goods value,
+weight, distance, temperature/export/hazmat categories and `WGT_FACTOR`.
+
+The first 131,072 original ZIP bytes were accessed directly by byte range;
+their SHA-256 is
+`d9f78acc810c1290712f87dc082debef801e8d0ef360cfb0521ea289b84b309f`.
+From that compressed prefix, the **first 100 complete original data records**
+were extracted with original column spellings and exact values, without
+inventing or extrapolating observations. The bounded nonrandom fixture is
+`freight/fixtures/public_census_cfs2022_pums_first100.csv`. Its provenance
+and precise archive metadata are in the adjacent JSON manifest.
+
+These records are **real Census public-use anonymized shipment microdata,
+not actual invoices**. This intentionally partial, first-100 sample is neither
+a probability sample of our choosing nor a representative estimate, and its
+`WGT_FACTOR` values must not be casually extrapolated to produce national
+totals. The full 677MB archive has NOT yet been downloaded or SHA-256
+verified, so no full-file integrity, national flow estimates, or other
+sampling claims are made.
+
+Run the offline source-prefix integrity check:
+`PYTHONPATH=. python -m unittest freight.test_public_cfs2022_prefix_v1`.
+It rejects changed schema, record count, row sequence, and unsupported
+negative shipping values or sampling weights. **No confidential customer
+files, contracts, payment evidence, recovery claims or public marketing
+numbers** were added.
