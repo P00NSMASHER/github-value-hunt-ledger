@@ -136,5 +136,47 @@ class GAOHistoricalGovernmentCollections(unittest.TestCase):
         self.assertEqual(agency["real_RETALLY_customer_recoveries_cents"],0)
 
 
+    def test_real_1980_GAO_one_tender_versus_three_bills_rates_reconcile(self):
+        math=source.verify_gao_1980_original_rating_arithmetic()
+        self.assertEqual(math["original_paid_cents"],782042)
+        self.assertEqual(math["real_one_tendered_lot_lb"],107129)
+        self.assertEqual(math["carrier_proposed_two_bill_load_lb"],80506)
+        self.assertEqual(math["carrier_proposed_third_bill_minimum_lb"],36000)
+        self.assertEqual(math["historical_source_quoted_rate_cents_per_100lb"],576)
+        self.assertEqual(math["GAO_correct_one_lot_charge_cents"],617063)
+        self.assertEqual(math["carrier_competing_multiple_bill_charge_cents"],671075)
+        self.assertEqual(math["carrier_voluntary_refund_cents"],110967)
+        self.assertEqual(math["GAO_remaining_applied_setoff_cents"],54012)
+        self.assertEqual(math["sum_original_historical_collections_cents"],164979)
+        self.assertEqual(782042-110967-54012,617063)
+
+    def test_competing_historical_BOL_grouping_cannot_fabricate_a_valid_rate(self):
+        baseline=source.GAO_B197658_PUBLISHED_RATING
+        for field,bad_value in [
+            ("number_of_distinct_original_tendered_shipments",3),
+            ("total_one_tendered_lot_lb",107128),
+            ("minimum_weight_if_third_trailer_separate_lb",26623),
+            ("historical_quoted_rate_cents_per_100lb",575),
+            ("carrier_separate_trailers_claim_cents",617063),
+        ]:
+            with self.subTest(changed_field=field):
+                altered={**baseline,field:bad_value}
+                with patch.object(source,"GAO_B197658_PUBLISHED_RATING",altered):
+                    with self.assertRaisesRegex(
+                        ValueError,"GAO_COLLECTION_PROOF_1980_RATING_ORIGINAL_SOURCE_CHANGED"
+                    ):
+                        source.verify_gao_1980_original_rating_arithmetic()
+
+    def test_original_PDF_source_math_is_not_original_tariff_or_cash_recovery_proof(self):
+        result=source.verify_gao_1980_original_rating_arithmetic()
+        self.assertFalse(result["quoted_historical_tariff_original_pages_examined"])
+        self.assertFalse(result["original_bills_of_lading_images_examined"])
+        self.assertFalse(result["independent_bank_or_Treasury_receipt_examined"])
+        self.assertTrue(result["GAO_decision_PDF_text_read_but_complete_sha256_unverified"])
+        self.assertEqual(result["real_RETALLY_customer_invoices"],0)
+        self.assertEqual(result["real_RETALLY_recovery_cents"],0)
+        self.assertEqual(result["commercial_claim_clearance"],"NO_GO")
+
+
 if __name__=="__main__":
     unittest.main()
