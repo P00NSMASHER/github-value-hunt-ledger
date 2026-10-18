@@ -21,6 +21,7 @@ from freight.public_stb_waybill_prefix_v1 import report as stb_prefix
 from freight.public_cfs2022_official_example_v1 import verified_published_example
 from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
+from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -44,6 +45,7 @@ def snapshot() -> dict:
     maryland=verified_published_example()
     fmc=verified_public_order()
     gao=public_collection_report()
+    gsa=gsa_false_positive_refund()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -97,6 +99,16 @@ def snapshot() -> dict:
         and gao["real_RETALLY_customer_invoices_examined"]==0
         and gao["real_RETALLY_customer_recoveries_cents"]==0
         and gao["commercial_claim_clearance"]=="NO_GO"
+        and gsa["source_reports_FY2023_vendor_payment_made"] is True
+        and gsa["reported_payment_FROM_government_TO_vendor"] is True
+        and gsa["publisher_reported_vendor_payment_approx_cents"]==2960000000
+        and gsa["possible_additional_payment_limit_cents_NOT_PROVEN"]==1180000000
+        and gsa["possible_additional_payment_executed"] is False
+        and gsa["notices_of_overcharge_declared_erroneous"] is True
+        and gsa["is_recovered_overcharge_by_RETALLY"] is False
+        and gsa["validated_RETALLY_customer_cash_cents"]==0
+        and gsa["independent_vendor_bank_statement_seen"] is False
+        and gsa["commercial_recovery_claim"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -113,6 +125,11 @@ def snapshot() -> dict:
         "GAO_reported_collections_not_independently_Treasury_bank_verified":True,
         "GAO_final_unreversed_net_government_recovery_total_cents":None,
         "GAO_future_uncollected_or_carrier_reimbursement_unverified":True,
+        "separate_GSA_false_positive_correction_public_report_records":1,
+        "GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents":2960000000,
+        "GSA_payment_direction_government_to_vendor_NOT_RETALLY":True,
+        "GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED":True,
+        "government_NOCs_may_be_erroneous_and_collections_reversed":True,
         "census_official_md_origin_pums_record_count":maryland["pums_md_origin_unweighted_record_count"],
         "census_official_md_origin_weighted_GOODS_value_usd":maryland["census_published_weighted_goods_value_usd"],
         "census_official_md_origin_gvf_cv_percent":maryland["census_published_gvf_cv_percent"],
@@ -160,7 +177,9 @@ def html_report(data:dict)->str:
         "worked example; the FMC award is legally ordered, not independently "
         "confirmed paid. Six distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
-        "were independently inspected. None is RETALLY revenue.</p>"
+        "were independently inspected. A separate GSA government report documents "
+        "a vendor repayment following ERRONEOUS notices of overcharge. Neither "
+        "publication establishes RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
         " (local integrity only, not an external signature).</p>"
         "<p>26 historical issues open; 18 human gates unmet. "
