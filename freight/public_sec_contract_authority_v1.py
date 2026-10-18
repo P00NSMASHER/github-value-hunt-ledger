@@ -48,7 +48,7 @@ EXPECTED={
   "fuel":DOE_FUEL,
  }
 }
-TOP_KEYS=frozenset({"schema_version","as_of_date","purpose","source_class","customer_role","contracts","shared_controls"})
+TOP_KEYS=frozenset({"schema_version","as_of_date","purpose","source_class","customer_role","contracts","shared_controls","custody_notes"})
 ALL_CONTROLS={
  "actual_RETALLY_customer_contracts":0,
  "actual_RETALLY_customer_invoices":0,
@@ -75,7 +75,7 @@ SWIFT_FIELDS=frozenset({
  "no_automatic_add_fuel_by_shipper","selected_original_published_fuel_bands",
  "off_band_fuel_prices_proven_by_this_excerpt",
  "current_operational_status_verified","actual_invoice_and_lane_Appendices_seen",
- "original_EDGAR_document_binary_hashed",
+ "original_EDGAR_document_binary_hashed","carrier_signature_independently_authenticated",
 })
 
 def _fail(reason:str)->None:
@@ -102,8 +102,11 @@ def verified_source_exhibits()->dict:
         or type(data["schema_version"]) is not int or data["schema_version"]!=1
         or data["as_of_date"]!="2026-10-18"
         or data["purpose"]!="real_original_SEC_filed_historical_shipper_carrier_contract_rate_source_not_invoice"
-        or data["source_class"]!="SIGNED_OR_FILED_HISTORICAL_RATE_AGREEMENT_EXHIBITS"
+        or data["source_class"]!="SEC_FILED_HISTORICAL_CONTRACT_OR_FORM_EXHIBITS"
         or data["customer_role"]!="EXTERNAL_TO_RETALLY"
+        or type(data.get("custody_notes")) is not list
+        or len(data["custody_notes"])!=4
+        or not all(type(x) is str and len(x)>=60 for x in data["custody_notes"])
         or data["shared_controls"]!=ALL_CONTROLS
         or type(data["contracts"]) is not list or len(data["contracts"])!=2):
         _fail("INVALID_SOURCE_OR_FINANCIAL_CLAIM")
@@ -151,6 +154,7 @@ def verified_source_exhibits()->dict:
                 or x["current_operational_status_verified"] is not False
                 or x["actual_invoice_and_lane_Appendices_seen"] is not False
                 or x["original_EDGAR_document_binary_hashed"] is not False
+                or x["carrier_signature_independently_authenticated"] is not False
                 or x["exhibit"]!="EX-10.8 Motor Carrier Transportation Agreement, Appendix D Fuel Surcharge Policy"
                 or type(bands) is not list or len(bands)!=len(SWIFT_TIERS)):
                 _fail("SWIFT_RATE_OR_SCOPE_CHANGED")
