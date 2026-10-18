@@ -520,10 +520,10 @@ are not modified.
 ## New source tier: actual historical government-REPORTED collections
 
 In an independently sourced supplemental GAO evidence tranche (see
-`freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`) six original,
+`freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`) seven original,
 public, first-party U.S. Government Accountability Office decisions
-**report** seven historical transportation overcharge collection events:
-two carrier-refunded payments and five government-applied offsets.
+**report** nine historical transportation overcharge collection events:
+three carrier-refunded payments and six government-applied offsets.
 These are **real agency-published collection accounts**—substantively
 different from an outstanding award—but not independently inspected
 Treasury bank postings or original invoice/contract scans.
@@ -567,7 +567,7 @@ refunds or RETALLY revenue.
 
 See `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md` and
 `freight/public_gsa_false_positive_payment_v1.py` for exact source
-URL, accounting provenance, distinction from six old GAO historical
+URL, accounting provenance, distinction from seven old GAO historical
 collection decisions and the separate unpaid FMC award. The source
 census treats it as a **standalone corrective government payment
 statement**, and **does not** increase the **307** bounded public
@@ -575,3 +575,14 @@ freight research rows. The source has not independently verified
 bank transaction/voucher bytes or private customer billing.
 No source authorizes a current recovery claim, automatic setoff,
 collection from carriers, extra schedules or public savings advertising.
+
+**Additional primary PDF source (August 25, 1980):** Original GAO
+decision [B-197658](https://www.gao.gov/assets/b-197658.pdf)
+reports **$1,109.67 refunded by the freight carrier** and the
+**$540.12 remaining shortfall later recovered by setoff** from an
+$1,649.79 assessed overcharge. The federal statement's original
+$7,820.42 amount paid minus the two separately evidenced
+collections equals $6,170.63 allowed charges. The original PDF
+page text was directly reviewed; **independent original PDF
+SHA-256 and bank/Treasury posting verification remain missing**.
+Do not treat the two events as two shipments or as a RETALLY recovery.
