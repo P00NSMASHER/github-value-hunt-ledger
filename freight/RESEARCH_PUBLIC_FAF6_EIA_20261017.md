@@ -239,3 +239,22 @@ It rejects changed schema, record count, row sequence, and unsupported
 negative shipping values or sampling weights. **No confidential customer
 files, contracts, payment evidence, recovery claims or public marketing
 numbers** were added.
+
+
+## Next original-source candidate: STB public-use railroad waybills
+
+Official Surface Transportation Board:
+https://www.stb.gov/reports-data/waybill/
+
+The STB publicly describes a **Public Use Waybill File** generated from a
+confidential railroad Waybill Sample File. Its original documentation warns
+that the freight revenue field **may be masked** and may not equal the actual
+waybill revenue. This is promising for rail shipment research, but the sample
+must be version-frozen, source-field meanings established and reported
+revenues kept separate from any real invoice or recovery claim.
+
+**Status: SOURCE DISCOVERED, NOT INGESTED OR VERIFIED.** No waybill
+microdata has been downloaded, no tariffs or shipper agreements verified and
+no freight revenues or rates inferred. Next source step is a bounded original
+STB publication/file plus schema/field-level integrity test, preserving masking
+rules and avoiding exposure of any restricted confidential sample.
