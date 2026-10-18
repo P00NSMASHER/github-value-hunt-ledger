@@ -6,6 +6,9 @@ on:
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gao_setoff_reversal_v1.py'
+      - 'freight/test_public_gao_setoff_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
       - 'freight/public_gsa_false_positive_payment_v1.py'
       - 'freight/test_public_gsa_false_positive_payment_v1.py'
       - 'freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json'
@@ -58,6 +61,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
       - name: Reconcile all original public research source families in sanitized evidence report
         run: |
@@ -89,6 +93,11 @@ jobs:
           assert data['GSA_payment_direction_government_to_vendor_NOT_RETALLY'] is True
           assert data['GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED'] is True
           assert data['government_NOCs_may_be_erroneous_and_collections_reversed'] is True
+          assert data['separate_GAO_1979_improper_setoff_decisions']==1
+          assert data['GAO_1979_applied_but_later_disallowed_offset_cents']==514105
+          assert data['GAO_1979_reversal_reimbursement_not_verified'] is True
+          assert data['GAO_1979_negative_case_not_approved_collection'] is True
+          assert data['GAO_1979_private_setoff_authority_not_established'] is True
           assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
           assert data['stb_sample_accounting_year_histogram']=={'2024':100}
           assert data['fmc_award_actual_cash_received_verified'] is False
@@ -100,7 +109,7 @@ jobs:
           page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
           assert 'NOT verified customer invoices' in page
           assert 'NO-GO' in page
-          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one award, seven GAO historical cases, one separate GSA wrongful-overcharge repayment; NO customer recovery.')
+          print('Lab14 source census: 307 public rows, Census example, FMC unpaid award, seven positive GAO cases, one GAO legally disallowed setoff, one GSA vendor repayment. No customer recovery.')
           PY
       - name: Prohibit invoice and recovery claim promotion
         run: |
