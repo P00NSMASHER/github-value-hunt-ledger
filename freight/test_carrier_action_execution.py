@@ -810,3 +810,44 @@ def test_self_hashed_receipts_reject_noncanonical_finding_sets(kind, finding_ids
 
     with pytest.raises(ValueError, match="finding_ids"):
         verify(forged)
+
+@pytest.mark.parametrize("kind", ("execution", "delivery"))
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("buyer_id", "caf\u0065\u0301"),
+        ("business_unit", "unit\u200b"),
+        ("target_carrier_id", "carrier\u2060"),
+        ("currency", "USD\u200b"),
+    ],
+)
+def test_self_hashed_receipts_reject_noncanonical_scope_identities(
+    kind, field, value
+):
+    _, _, _, _, _, submitted = submitted_context()
+    if kind == "execution":
+        forged = replace(submitted, **{field: value})
+        body = asdict(forged)
+        body.pop("receipt_hash")
+        forged = replace(
+            forged,
+            receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_execution_receipt
+    else:
+        receipt = record_carrier_action_delivery_confirmation(
+            submitted_receipt=submitted,
+            evidence=delivery_evidence(submitted),
+        )
+        forged = replace(receipt, **{field: value})
+        body = asdict(forged)
+        body.pop("delivery_receipt_hash")
+        forged = replace(
+            forged,
+            delivery_receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_delivery_receipt
+
+    with pytest.raises(ValueError, match="canonical Unicode|control"):
+        verify(forged)
+
