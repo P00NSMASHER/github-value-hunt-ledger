@@ -193,6 +193,115 @@ def verified_gao_cases()->list[dict]:
     return data["cases"]
 
 
+
+# Source: original GAO scanned 3-page B-197658 (25 Aug 1980),
+# https://www.gao.gov/assets/b-197658.pdf, pages 1–3.
+# These are documentary assertions, NOT independently sourced
+# bill-of-lading scans, contract schedules or bank settlement statements.
+GAO_B197658_PUBLISHED_RATING={
+    "original_paid_cents":782042,
+    "total_one_tendered_lot_lb":107129,
+    "first_two_trailers_lb":80506,
+    "third_trailer_lb":26623,
+    "minimum_weight_if_third_trailer_separate_lb":36000,
+    "historical_quoted_rate_cents_per_100lb":576,
+    "gaodetermined_correct_charge_cents":617063,
+    "carrier_separate_trailers_claim_cents":671075,
+    "carrier_voluntary_refund_cents":110967,
+    "remaining_government_applied_setoff_cents":54012,
+    "total_assessed_overcharge_cents":164979,
+    "bills_of_lading":["4141","4142","4148"],
+    "consolidated_government_bill_of_lading":"K-3341434",
+    "number_of_distinct_original_tendered_shipments":1,
+}
+
+
+def verify_gao_1980_original_rating_arithmetic()->dict:
+    """Reproduce two publicly disputed historical rate calculations only.
+
+    A one-lot shipment and a three-bill carrier assertion differ only
+    in rate/minimum-weight applicability; number of BOLs does NOT
+    independently settle whether the movement comprised many tenders.
+    The GAO's 1980 classification interpretation is NOT a current
+    private shipper entitlement or evidence of any actual RETALLY refund.
+    """
+    row=next(x for x in verified_gao_cases() if x["case_id"]=="B-197658")
+    c=GAO_B197658_PUBLISHED_RATING
+    expected={
+        "original_paid_cents":782042,
+        "total_one_tendered_lot_lb":107129,
+        "first_two_trailers_lb":80506,
+        "third_trailer_lb":26623,
+        "minimum_weight_if_third_trailer_separate_lb":36000,
+        "historical_quoted_rate_cents_per_100lb":576,
+        "gaodetermined_correct_charge_cents":617063,
+        "carrier_separate_trailers_claim_cents":671075,
+        "carrier_voluntary_refund_cents":110967,
+        "remaining_government_applied_setoff_cents":54012,
+        "total_assessed_overcharge_cents":164979,
+        "bills_of_lading":["4141","4142","4148"],
+        "consolidated_government_bill_of_lading":"K-3341434",
+        "number_of_distinct_original_tendered_shipments":1,
+    }
+    if type(c) is not dict or c!=expected:
+        _fail("1980_RATING_ORIGINAL_SOURCE_CHANGED")
+    if (row["originally_paid_cents"]!=c["original_paid_cents"]
+        or row["final_agency_assessed_overcharge_cents"]
+            !=c["total_assessed_overcharge_cents"]
+        or [e["amount_cents"] for e in row["gao_reported_collection_events"]]
+            !=[c["carrier_voluntary_refund_cents"],
+               c["remaining_government_applied_setoff_cents"]]):
+        _fail("1980_RATE_AND_COLLECTION_DISAGREE")
+    def charge_cents(pounds:int)->int:
+        if type(pounds) is not int or pounds<=0:
+            _fail("1980_BAD_SHIPMENT_WEIGHT")
+        return (pounds*c["historical_quoted_rate_cents_per_100lb"]+50)//100
+    if (c["first_two_trailers_lb"]+c["third_trailer_lb"]
+        !=c["total_one_tendered_lot_lb"]):
+        _fail("1980_SHIPMENT_WEIGHT_CONSERVATION")
+    gao_one_tender=charge_cents(c["total_one_tendered_lot_lb"])
+    carrier_two_bols=charge_cents(c["first_two_trailers_lb"])
+    carrier_third_min=charge_cents(max(
+        c["third_trailer_lb"],
+        c["minimum_weight_if_third_trailer_separate_lb"],
+    ))
+    carrier_claim=carrier_two_bols+carrier_third_min
+    if (gao_one_tender!=c["gaodetermined_correct_charge_cents"]
+        or carrier_claim!=c["carrier_separate_trailers_claim_cents"]
+        or carrier_claim-gao_one_tender!=c["remaining_government_applied_setoff_cents"]
+        or c["original_paid_cents"]-carrier_claim!=c["carrier_voluntary_refund_cents"]
+        or c["original_paid_cents"]-gao_one_tender
+            !=c["total_assessed_overcharge_cents"]):
+        _fail("1980_RATING_RECONCILIATION_FAILED")
+    return {
+        "scope":"1980_ORIGINAL_GAO_HISTORICAL_TARIFF_DISPUTE_ARITHMETIC_ONLY",
+        "original_source_url":"https://www.gao.gov/assets/b-197658.pdf",
+        "GAO_source_pdf_page_count":3,
+        "original_paid_cents":c["original_paid_cents"],
+        "real_one_tendered_lot_lb":c["total_one_tendered_lot_lb"],
+        "carrier_proposed_two_bill_load_lb":c["first_two_trailers_lb"],
+        "carrier_proposed_third_bill_minimum_lb":
+            c["minimum_weight_if_third_trailer_separate_lb"],
+        "historical_source_quoted_rate_cents_per_100lb":
+            c["historical_quoted_rate_cents_per_100lb"],
+        "GAO_correct_one_lot_charge_cents":gao_one_tender,
+        "carrier_competing_multiple_bill_charge_cents":carrier_claim,
+        "carrier_voluntary_refund_cents":c["carrier_voluntary_refund_cents"],
+        "GAO_remaining_applied_setoff_cents":
+            c["remaining_government_applied_setoff_cents"],
+        "sum_original_historical_collections_cents":
+            c["total_assessed_overcharge_cents"],
+        "quoted_historical_tariff_original_pages_examined":False,
+        "original_bills_of_lading_images_examined":False,
+        "independent_bank_or_Treasury_receipt_examined":False,
+        "GAO_decision_PDF_text_read_but_complete_sha256_unverified":True,
+        "real_RETALLY_customer_invoices":0,
+        "real_RETALLY_recovery_cents":0,
+        "present_day_carrier_contract_applicability":"UNVERIFIED",
+        "commercial_claim_clearance":"NO_GO",
+    }
+
+
 def public_collection_report()->dict:
     rows=verified_gao_cases()
     events=[e for row in rows for e in row["gao_reported_collection_events"]]
