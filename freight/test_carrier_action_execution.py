@@ -779,3 +779,34 @@ def test_self_hashed_execution_receipt_rejects_invalid_action_or_amount(field, v
 
     with pytest.raises(ValueError):
         verify_carrier_action_execution_receipt(forged)
+
+
+@pytest.mark.parametrize("kind", ("execution", "delivery"))
+@pytest.mark.parametrize("finding_ids", ((), ("DUPLICATE", "DUPLICATE")))
+def test_self_hashed_receipts_reject_noncanonical_finding_sets(kind, finding_ids):
+    auth, proposal, payload, claims, intent, submitted = submitted_context()
+    if kind == "execution":
+        forged = replace(submitted, finding_ids=finding_ids)
+        body = asdict(forged)
+        body.pop("receipt_hash")
+        forged = replace(
+            forged,
+            receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_execution_receipt
+    else:
+        receipt = record_carrier_action_delivery_confirmation(
+            submitted_receipt=submitted,
+            evidence=delivery_evidence(submitted),
+        )
+        forged = replace(receipt, finding_ids=finding_ids)
+        body = asdict(forged)
+        body.pop("delivery_receipt_hash")
+        forged = replace(
+            forged,
+            delivery_receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_delivery_receipt
+
+    with pytest.raises(ValueError, match="finding_ids"):
+        verify(forged)
