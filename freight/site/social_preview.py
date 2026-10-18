@@ -27,7 +27,8 @@ IMAGE_BY_TOPIC = {
     "assets/images/invoice-evidence.webp": frozenset({
         "freight-invoice-audit.html", "accessorial-charge-audit.html",
         "duplicate-freight-charges.html", "freight-credit-rebill-audit.html",
-        "ltl-reweigh-reclass-checklist.html", "carrier-rate-audit.html",
+        "ltl-reweigh-reclass-checklist.html", "ltl-reweigh-evidence-comparator.html",
+        "carrier-rate-audit.html",
         "freight-invoice-audit-checklist.html",
         "freight-overcharge-dispute-process.html", "freight-audit-methodology.html",
         "freight-audit-example.html", "second-look-freight-audit.html",
@@ -89,6 +90,10 @@ EDITORIAL_SHARE_META = {
     "ltl-reweigh-reclass-checklist.html": (
         "RETALLY | LTL Reweigh and Reclass Evidence Checklist",
         "Free evidence card for LTL weight/class changes, governing rate terms and corrections. Review sources before disputing an adjustment.",
+    ),
+    "ltl-reweigh-evidence-comparator.html": (
+        "RETALLY | LTL Reweigh Measurement Comparator",
+        "Compare original and carrier-revised LTL dimensions, gross weight and freight density in your browser. No freight class, rate or refund is claimed.",
     ),
     "carrier-rate-audit.html": (
         "RETALLY | Carrier Rate Audit Checklist",
