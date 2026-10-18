@@ -629,3 +629,36 @@ or verified dollar recovered has been obtained. The 26 historical findings
 and 18 independent customer-approval gates remain unresolved. The research
 source-census and original 14-lab Control Center are review-only;
 no production or public marketing claim is authorized.
+
+
+## Primary federal court source — GSA correction, noncarrier audit authority and overlapping money claims
+
+A separate source-vintage chronology now binds three **original federal
+government documents** for the Crowley/GSA DFTS dispute:
+- District of Columbia federal district court **July 28, 2023**
+  memorandum opinion, quoting GSA's **April 21, 2023 commitment**
+  to return **approximately $29.6 million** in DFTS offsets, plus
+  a **separate $35,840.43 Ocean USC 9 contract refund promise**.
+- GSA's own FY2025 congressional justification reports **paying $29.6M
+  in fiscal 2023** in response to erroneous overcharge notices. This
+  is the agency's statement about its **same prior DFTS corrective
+  payment**, not an extra $29.6 million to add to the 2023 promise.
+- **July 18, 2025 D.C. Circuit Court of Appeals, No. 23-5183** held
+  that the cited federal audit provision **31 U.S.C. § 3726(b)** limits
+  GSA audits to bills presented by carriers/freight forwarders; Crowley,
+  a non-carrier coordination intermediary, was not covered by that
+  authority. It reversed the relevant lower-court scope ruling and
+  remanded. The separate Court of Federal Claims **$11.8M damages claim**
+  was described as still litigated, **not paid or awarded by this appeal**.
+
+Source/document/test details:
+`freight/RESEARCH_CROWLEY_COURT_GSA_MONEY_LINEAGE_20261018.md` and
+`freight/public_crowley_court_money_lineage_v1.py`.
+Neither original court opinion is a private-company offset authorization.
+**No final 2026 Court of Federal Claims docket resolution, original
+government bank transfer, signed customer agreement or RETALLY recovered
+funds were verified.** The three court/budget documents, four financial
+events and four different evidentiary states are *separate from the
+original 307 shipment/index/public freight observations*. Do not add
+the 2023 promise and FY2023 reported payment together or double-count
+their source lineage as two independent customer recoveries.
