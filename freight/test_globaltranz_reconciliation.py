@@ -3,13 +3,13 @@ import unittest
 from freight.research.statement_reconciliation import ClaimSnapshot, StatementLine, compare
 
 
-def row(ref, invoice, open_amount=None, *, face=True, kind="BASE", parent=None):
+def row(ref, invoice, open_amount=None, *, face=True, kind="BASE", parent=None, pro=None, bol=None):
     return StatementLine(
         invoice_ref=ref, kind=kind,
         invoice_face_cents=invoice if face else None,
         statement_original_cents=invoice,
         statement_open_cents=invoice if open_amount is None else open_amount,
-        parent_ref=parent,
+        parent_ref=parent, shipment_pro=pro, shipment_bol=bol,
     )
 
 
@@ -33,11 +33,44 @@ class TestReconciliation(unittest.TestCase):
 
     def test_known_adjustment_not_collapsed_into_base(self):
         result = compare([
-            row("EXAMPLE-1", 86109),
-            row("EXAMPLE-1-ADJ", 5644, kind="ADJUSTMENT", parent="EXAMPLE-1"),
+            row("EXAMPLE-1", 86109, pro="PRO-001", bol="BOL-001"),
+            row("EXAMPLE-1-ADJ", 5644, kind="ADJUSTMENT", parent="EXAMPLE-1", pro="PRO-001", bol="BOL-001"),
         ], statement_control_cents=91753)
         self.assertEqual(result.row_count, 2)
         self.assertEqual(result.statement_open_cents, 91753)
+        self.assertEqual(result.exception_codes, ())
+
+    def test_adjustment_without_pro_bol_held(self):
+        result = compare([
+            row("BASE-1", 100),
+            row("BASE-1 A", 20, kind="ADJUSTMENT", parent="BASE-1"),
+        ], statement_control_cents=120)
+        self.assertIn("ADJUSTMENT_SHIPMENT_IDENTITY_UNVERIFIED", result.exception_codes)
+        self.assertEqual(result.verified_overcharge_cents, 0)
+
+    def test_adjustment_pro_mismatch_held(self):
+        result = compare([
+            row("BASE-1", 100, pro="P-11", bol="B-11"),
+            row("BASE-1 A", 20, kind="ADJUSTMENT", parent="BASE-1", pro="P-22", bol="B-11"),
+        ], statement_control_cents=120)
+        self.assertIn("ADJUSTMENT_SHIPMENT_IDENTITY_MISMATCH", result.exception_codes)
+
+    def test_adjustment_bol_mismatch_held(self):
+        result = compare([
+            row("BASE-1", 100, pro="P-11", bol="B-11"),
+            row("BASE-1 A", 20, kind="ADJUSTMENT", parent="BASE-1", pro="P-11", bol="B-22"),
+        ], statement_control_cents=120)
+        self.assertIn("ADJUSTMENT_SHIPMENT_IDENTITY_MISMATCH", result.exception_codes)
+
+    def test_invoice_reference_dedup_normalizes_whitespace_and_case(self):
+        with self.assertRaisesRegex(ValueError, "duplicate invoice"):
+            compare([row("EXAMPLE", 100), row(" example  ", 200)], statement_control_cents=300)
+
+    def test_parent_reference_normalization_still_requires_shipment_match(self):
+        result = compare([
+            row("BASE-1", 100, pro="pro-11", bol="bol-11"),
+            row("BASE-1 A", 20, kind="ADJUSTMENT", parent=" base-1 ", pro="PRO-11", bol="BOL-11"),
+        ], statement_control_cents=120)
         self.assertEqual(result.exception_codes, ())
 
     def test_face_mismatch_blocks(self):
