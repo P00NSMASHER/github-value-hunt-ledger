@@ -1,0 +1,51 @@
+name: RETALLY Lab 14 Original GAO Freight Line-Item Math and Evidence Reversals
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-gao-original-lineitem.yml'
+      - 'freight/public_gao_rating_lineitem_original_v1.py'
+      - 'freight/test_public_gao_rating_lineitem_original_v1.py'
+      - 'freight/fixtures/public_gao_rate_reclassification_and_origin_rebuttal_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_RATE_ORIGIN_20261018.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-billed-rate-and-rebuttal-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Original GAO publication and adversarial rating review
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_rating_lineitem_original_v1
+      - name: Preserve paid, allowable and overturned-setoff evidence boundaries
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_rating_lineitem_original_v1 > /tmp/retally_gao_historical_rating.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally_gao_historical_rating.json').read_text())
+          assert r['scope']=='TWO_ORIGINAL_GAO_DOCUMENTARY_RATING_CASES_RESEARCH_ONLY'
+          assert r['original_GAO_published_decisions_reviewed']==2
+          assert r['distinct_GBL_references_in_decisions']==3
+          assert r['government_B160344_actual_reported_weight_lb']==1485
+          assert r['government_B160344_claimed_paid_cents']==27517
+          assert r['government_B160344_allowable_cents']==13929
+          assert r['government_B160344_reported_collection_by_setoff_cents']==13588
+          assert r['government_B160344_paid_date_precedes_corrected_description'] is True
+          assert r['government_B186603_chair_GBL_origin_disproved'] is True
+          assert r['government_B186603_chair_13328_setoff_origin_basis_rebutted_claim_allowance_conditional'] is True
+          assert r['government_B186603_chair_repayment_bank_receipt_verified'] is False
+          assert r['government_B186603_blanket_5765_offset_separately_recorded'] is True
+          assert r['government_B186603_blanket_2290_certificate_not_proved_paid'] is True
+          assert r['all_event_net_cash_totals_explicitly_UNVERIFIED'] is True
+          assert r['real_RETALLY_client_invoices']==0
+          assert r['real_RETALLY_customer_overcharges_cents']==0
+          assert r['real_RETALLY_customer_recoveries_cents']==0
+          assert r['commercial_release']=='NO_GO'
+          print('Original GAO billed-rate arithmetic passes; challenged origin and return-to-carrier remain correctly held.')
+          PY

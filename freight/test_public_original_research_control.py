@@ -19,6 +19,15 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertEqual(data["standalone_official_publisher_examples"],1)
         self.assertEqual(data["standalone_external_adjudication_records"],1)
         self.assertEqual(data["separate_original_GAO_historical_collection_decisions"],7)
+        self.assertEqual(data["distinct_original_GAO_rate_and_origin_correction_decisions_NOT_307_rows"],2)
+        self.assertEqual(data["distinct_GAO_rate_and_origin_case_BOL_references"],3)
+        self.assertEqual(data["GAO_1967_historical_cwt_original_bill_cents"],27517)
+        self.assertEqual(data["GAO_1967_historical_cwt_allowable_bill_cents"],13929)
+        self.assertEqual(data["GAO_1967_historical_federal_setoff_cents"],13588)
+        self.assertTrue(data["GAO_1976_wrong_origin_13328_setoff_reimbursement_NOT_VERIFIED"])
+        self.assertTrue(data["GAO_1976_other_bol_settlement_certificate_NOT_VERIFIED_PAID"])
+        self.assertTrue(data["GAO_historical_rate_source_NOT_current_private_tariff"])
+        self.assertTrue(data["GAO_lineitem_government_reports_NOT_independent_bank_receipts"])
         self.assertEqual(data["separate_GAO_reported_historical_collection_events"],9)
         self.assertEqual(data["GAO_original_reported_refunds"],3)
         self.assertEqual(data["GAO_original_reported_applied_setoffs"],6)
@@ -197,12 +206,33 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_false_government_lineitem_payment_or_modern_tariff_will_not_pass_census(self):
+        original=src.original_gao_lineitem()
+        for field,value in (
+            ("government_B160344_claimed_paid_cents",27518),
+            ("government_B160344_allowable_cents",0),
+            ("government_B160344_reported_collection_by_setoff_cents",13589),
+            ("government_B160344_paid_date_precedes_corrected_description",False),
+            ("government_B186603_chair_repayment_bank_receipt_verified",True),
+            ("all_event_net_cash_totals_explicitly_UNVERIFIED",False),
+            ("real_RETALLY_customer_recoveries_cents",13588),
+            ("commercial_release","GO"),
+        ):
+            with self.subTest(field=field):
+                with patch.object(src,"original_gao_lineitem",
+                    return_value={**original,field:value}):
+                    with self.assertRaisesRegex(
+                        ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
         self.assertIn("research only",html)
         self.assertIn("NOT verified customer invoices",html)
         self.assertIn("Seven distinct GAO government historical case decisions",html)
+        self.assertIn("original 1967/1976 GAO cases",html)
+        self.assertIn("carrier claim remains conditional",html)
         self.assertIn("no original bank/Treasury postings",html)
         self.assertIn("ERRONEOUS notices of overcharge",html)
         self.assertIn("GAO decision found $5,141.05",html)
