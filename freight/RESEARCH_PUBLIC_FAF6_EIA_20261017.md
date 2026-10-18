@@ -586,3 +586,24 @@ collections equals $6,170.63 allowed charges. The original PDF
 page text was directly reviewed; **independent original PDF
 SHA-256 and bank/Treasury posting verification remain missing**.
 Do not treat the two events as two shipments or as a RETALLY recovery.
+
+
+### Adverse source-ground-truth control: GAO B-192974 (1979)
+
+GAO's original four-page decision
+[Review of GSA Setoff Action Against Carrier](https://www.gao.gov/products/b-192974)
+held that the government had **improperly deducted $5,141.05**
+from post-bankruptcy-petition payables for an older alleged carrier
+overcharge. A separately documented **$2,147.59** pre-petition
+deduction was considered proper. The former amount had actually
+been **set off** before GAO found it improper; the decision's
+instruction to allow the successor carrier's claim if otherwise
+correct does not prove it had been reimbursed.
+
+This is **not** a newly confirmed recovered overcharge, customer
+invoice or present-day rule governing private shipments. It is
+a separate `GAO_SETTLEMENT_REVERSAL` evidence tier, deliberately
+excluded from the seven original GAO historical positive collection
+decision counts and the 307 non-equivalent public freight rows.
+The negative validator, source artifact and exact case accounting
+are in `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`.
