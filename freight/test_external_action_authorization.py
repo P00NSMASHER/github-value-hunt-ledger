@@ -494,8 +494,8 @@ def test_authorization_identity_rejects_alias_forms(authorization_id):
     "revocation_id",
     (
         " REV-001",
-        "REV-e\\u0301",
-        "REV-\\u200b001",
+        "REV-e\u0301",
+        "REV-\u200b001",
     ),
 )
 def test_revocation_identity_rejects_alias_forms(revocation_id):
