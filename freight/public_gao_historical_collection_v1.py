@@ -35,6 +35,24 @@ CASE_KEYS=frozenset({
 })
 EVENT_KEYS=frozenset({"kind","amount_cents"})
 
+# Exact publisher-scope interpretation is protected from drift; event money
+# alone cannot establish a current customer recovery or claim authority.
+EXPECTED_CONTEXTS={
+    "B-148465": "Motor freight, reported incorrect routing/rate on government LTL shipment",
+    "B-148981": "Motor freight, publicly reported original payment and carrier refund after combination-rate audit; one selected shipment only",
+    "B-152324": "Government motor freight tariff minimum-weight dispute; one documented shipment and two collection mechanisms",
+    "A-14046": "Three government rail freight shipments, original setoff and separately proposed additional collection",
+    "B-166167": "Government air-engine motor freight overcharge offset; later proposed reimbursement settlement to carrier not evidenced paid",
+    "B-146511": "Government freight bill of lading tariff limitation, original 1951 deduction subsequently disputed, inconsistent supplemental claim variants"
+}
+EXPECTED_SOURCE_LIMITS=tuple([
+    "GAO's decision account reports an offset or refund; original private carrier statements, invoice images and Treasury bank settlement ledgers were not reviewed.",
+    "A proposed additional deduction is not a completed collection; a certificate authorizing reimbursement to the carrier is not verified as paid.",
+    "Amounts may refer to multiple shipment legs or government-specific tariff law. No generalization to present-day private commercial freight billing.",
+    "These are third-party federal-government historical collection reports, not recoveries performed by RETALLY.",
+    "This bounded purposive set of six published cases is neither representative of freight invoices nor a recoverable-rate statistic."
+])
+
 # Fixed facts transcribed and checked against ORIGINAL GAO publication pages.
 # Historical administrative accounts are stronger than unpaid award notices,
 # but remain weaker than a separately authenticated bank/Treasury ledger.
@@ -104,7 +122,7 @@ def verified_gao_cases()->list[dict]:
             "actual_retally_client_invoices","actual_retally_customer_recoveries_cents"))
         or type(data["explicit_source_limits"]) is not list
         or len(data["explicit_source_limits"])!=5
-        or not all(type(x) is str and len(x)>40 for x in data["explicit_source_limits"])
+        or tuple(data["explicit_source_limits"])!=EXPECTED_SOURCE_LIMITS
         or type(data["cases"]) is not list or len(data["cases"])!=len(EXPECTED)):
         _fail("SOURCE_CLASSIFICATION_OR_SCOPE_CHANGED")
     seen=set()
@@ -119,7 +137,7 @@ def verified_gao_cases()->list[dict]:
         if (row["decision_date"]!=pin["date"]
             or row["source_url"]!="https://www.gao.gov/products/"+pin["path"]
             or type(row["historical_context"]) is not str
-            or not 30<=len(row["historical_context"])<=300
+            or row["historical_context"]!=EXPECTED_CONTEXTS[case_id]
             or row["original_bill_of_lading_independently_examined"] is not False
             or _strict_cents(row["originally_paid_cents"])!=pin["original"]
             or _strict_cents(row["final_agency_assessed_overcharge_cents"])!=pin["assessed"]
