@@ -323,10 +323,27 @@ original field positions on each of the 100 records without decoding
 or making claims about the **potentially masked freight revenue**
 positions 55–63.
 
-**Data-vintage warning:** The first frozen record carries raw six-digit
-Waybill Date `041118` even though the document is labeled 2024. This
-is preserved as published and explicitly classified
-`waybill_date_year_interpretation=UNVERIFIED` until its meaning,
-historical carryover and file lineage can be independently reconciled.
-Do not date-adjust, extrapolate or claim it represents a 2024
-commercial invoice.
+**Waybill-date and accounting-period distinction (verified against the
+original STB 2024 reference guide, Table 4-6 / Table 4-7):**
+
+The six-digit waybill date (columns 1–6, `mmddyy`) is when the
+originating railroad prepared the document. The separate four-digit
+accounting period (columns 7–10, `mmyy`) is the month/year the study
+waybill entered the railroad's revenue-accounting system.
+
+The frozen first 100 records therefore contain 100 accounting periods in
+**2024**, despite waybill-document dates from 2018 (14 records), 2020
+(1 record), 2021 (20 records), and 2022 (65 records). The first original
+record's `041118` waybill date means **April 11, 2018**, whereas its
+`0324` accounting period means **March 2024**. This is a genuine
+two-field distinction—not grounds to rewrite the 2018 date to 2024 or
+to call the ZIP mislabeled.
+
+**Remaining uncertainty:** The precise business process that led these
+older waybills to be entered in 2024 accounts is not established by
+the first 100 rows or the guide. No chronology or date distribution is
+asserted for the entire published file. Source tests now independently
+parse both fields, enforce valid dates and the 2024 accounting-year
+histogram, and reject inconsistent accounting chronology. An accounting
+year is not evidence of a 2024 shipment movement, customer invoice,
+freight revenue charged, or recoverable overpayment.
