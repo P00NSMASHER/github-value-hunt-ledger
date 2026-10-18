@@ -63,3 +63,16 @@ Public search was unable to retrieve the claim-specific schedules. The Epiq publ
 - The docket records [Docket 657, filed August 31, 2026](https://www.inforuptcy.com/browse-filings/delaware-bankruptcy-court/1%3A25-bk-11296/bankruptcy-case-mosaic-companies-llc), a **quarter ending June 30, 2026 post-confirmation report for Walker & Zanger**, but underlying financial tables have not been retrieved and cannot be presumed to be zero.
 
 **Proof still required**: operative claim-specific order exhibits in 593/605/619/623, amount basis and date, actual creditor/estate payment/credit records. No claim-to-cash attribution, customer recovery, or freight overcharge benchmark promotion.
+
+## Same-debtor independent carrier claims — potential cross-payee duplicate exposure (2026-10-18)
+
+The [July 28, 2026 numerical claims register, Docket 648](https://document.epiq11.com/document/getdocumentbycode?docId=4596109&projectCode=MCX&source=DM) separately lists:
+
+- **GlobalTranz Enterprises, LLC**, claim **10002**, Walker & Zanger, LLC: **$1,496.52** registered unsecured amount, with no explanatory comment.
+- **XPO Logistics Freight, Inc.**, claim **10005**, Walker & Zanger, LLC: **$2,762.66** unsecured (same debtor).
+- **R&L Carriers, Inc.**, claim **10053**, Walker & Zanger, LLC: **$11,932.47** unsecured (same debtor). Distinct R&L claim **10054** relates to *Surfaces Southeast, LLC*; **do not group different legal debtors**.
+- **Southeastern Freight Lines** claims **10037/10049** relate to Mosaic Companies/Surfaces Southeast Holdco, not the same Walker & Zanger legal debtor, and #10049 amends #10037. Again, do not count as overlaps with 10002 without authoritative debtor and shipment links.
+
+Some publicly cited GlobalTranz broker invoices name XPO or R&L as underlying carriers. This provides a worthwhile **two-creditor / one-shipment hypothesis** for a future authorized invoice identity test: compare carrier-originated proof-of-claim invoices against the broker's billed invoice, original PRO/BOL/customer entity, service date, and payment allocation. **The register alone proves no invoice overlap, duplicate debt, erroneous claim, recovery, or freight billing mistake.** No XPO/R&L original claim attachments were fetched or reproduced.
+
+As of March 31, 2026, [W & Z Oldco's own post-confirmation report, Docket 637](https://document.epiq11.com/document/getdocumentsbydocket/?docketId=1231443&docketNumber=637&projectCode=MCX&source=DM) reports **$0 in general unsecured distributions**, but the filing also notes the effective-date transfer of valid claims and assets to the separate liquidating trust. Therefore this **does not exclude independent trust-level or later creditor payments**. The creditor-specific disbursement record remains unavailable.
