@@ -483,6 +483,12 @@ def verify_carrier_action_execution_receipt(
     _text("target_customer_id", receipt.target_customer_id)
     _text("currency", receipt.currency)
     _text("executor_role", receipt.executor_role)
+    try:
+        ActionType(receipt.action_type)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("invalid execution receipt action type") from exc
+    if type(receipt.requested_cents) is not int or receipt.requested_cents <= 0:
+        raise ValueError("execution receipt requested_cents must be a positive integer")
     _, prepared_dt = _timestamp("prepared_at", receipt.prepared_at)
     _, executed_dt = _timestamp("executed_at", receipt.executed_at)
     if executed_dt < prepared_dt:
