@@ -24,9 +24,9 @@ Two adjustment pairs can be traced beyond suffix matching to matching **PRO and 
 
 ## Research-only comparator
 
-The new module freight/research/statement_reconciliation.py accepts only caller-supplied structured metadata. It checks invoice face vs statement original, statement totals, canonical duplicate references, explicit base/adjustment linkage **requiring matching PRO and BOL identifiers**, unknown parents, changed open balances and contradictory external claim snapshots. It never derives recovered cash, an overcharge, source reuse rights, or shipment-family counts.
+The new module freight/research/statement_reconciliation.py accepts only caller-supplied structured metadata. It checks invoice face vs statement original, statement totals, canonical duplicate references, explicit base/adjustment linkage **requiring matching PRO and BOL identifiers**, unknown parents, changed open balances and contradictory external claim snapshots. It never derives recovered cash, an overcharge, source reuse rights, or shipment-family counts. The optional `assess_claim_liability_transfer` safeguard checks matching claim identity, original-minus-transfer arithmetic, receiving-entity identification, and a referenced official public court-order URL. **A URL check is not automated verification of court-document contents.** Its output labels the result as a **source-referenced liability transfer**, explicitly assigns **zero verified recovered cash and zero verified overcharge**, and requires review if its constraints fail.
 
-Run the 25 deterministic **synthetic-only** tests:
+Run the 31 deterministic **synthetic-only** tests:
 
     python -m unittest freight.test_globaltranz_reconciliation -v
 
