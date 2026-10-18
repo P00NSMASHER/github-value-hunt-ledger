@@ -112,6 +112,16 @@ class OriginalSECFiledsContractAuthority(unittest.TestCase):
         self._mutate(lambda x:x["contracts"][0].update({"document_url":"https://unverified.example/contract"}))
         self._mutate(lambda x:x["contracts"][0].update({"paid_invoice_cents":100000}))
 
+    def test_historical_service_scope_index_timing_and_source_notes_cannot_be_upgraded(self):
+        self._mutate(lambda x:x["contracts"][0].update({
+            "service":"All 2026 RETALLY shipper lanes automatically authorized"}))
+        self._mutate(lambda x:x["contracts"][1].update({
+            "fuel_assessment":"2026 EIA average automatically controls all customers"}))
+        self._mutate(lambda x:x["contracts"][1].update({
+            "units":"USD fuel surcharge per ethanol gallon unloaded"}))
+        self._mutate(lambda x:x["custody_notes"].__setitem__(
+            0,"This original agreement is presently signed by all RETALLY customers and authorizes a verified actual refund of $1000."))
+
     def test_latest_report_holds_both_contracts_as_externally_real_not_current_terms(self):
         r=sec.report()
         self.assertEqual(r["independently_published_original_SEC_agreements"],2)
