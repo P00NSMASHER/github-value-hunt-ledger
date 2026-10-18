@@ -375,6 +375,8 @@ def _verify_authorization(auth: ExternalActionAuthorization) -> None:
     _sha("authorization_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("authorization hash mismatch")
+    if type(auth.authorized_cents) is not int or auth.authorized_cents <= 0:
+        raise ValueError("authorized_cents must be a positive integer")
     for field in (
         "money_movement_authorized",
         "settlement_acceptance_authorized",
