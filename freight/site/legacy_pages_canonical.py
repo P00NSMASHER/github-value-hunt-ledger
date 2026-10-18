@@ -79,13 +79,16 @@ def consolidate_generated_legacy(directory: Path, names: tuple[str, ...] = PUBLI
     xml = sitemap.read_text(encoding="utf-8")
     document = ET.fromstring(xml)
     actual = [el.text for el in document.iter(_SITEMAP_LOC)]
+    # The public sample report has its own indexable canonical in the
+    # real, 29-URL sitemap; don't silently drop it during consolidation.
+    sitemap_pages = required | set(_EXTRA_CANONICAL)
     expected_sitemap = {
         OLD_BASE + ("" if name == "index.html" else name)
-        for name in required
+        for name in sitemap_pages
     }
-    if len(actual) != len(required) or set(actual) != expected_sitemap:
+    if len(actual) != len(sitemap_pages) or set(actual) != expected_sitemap:
         raise ValueError("Legacy sitemap changed unexpectedly; do not write SEO signals")
-    for page in sorted(required):
+    for page in sorted(sitemap_pages):
         old_url = OLD_BASE + ("" if page == "index.html" else page)
         xml = xml.replace("<loc>" + old_url + "</loc>",
                           "<loc>" + primary_url(old_url) + "</loc>")
@@ -117,7 +120,7 @@ def consolidate_generated_legacy(directory: Path, names: tuple[str, ...] = PUBLI
     # Fail-closed reads above prevent partial results on a bad source schema.
     for path, content in staged.items():
         path.write_text(content, encoding="utf-8")
-    return {"html_pages": len(page_names), "sitemap_urls": len(required),
+    return {"html_pages": len(page_names), "sitemap_urls": len(sitemap_pages),
             "text_assets_updated": len(staged)}
 
 
