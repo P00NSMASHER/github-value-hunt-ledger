@@ -997,5 +997,63 @@ class RetallyLtlEvidenceComparatorTests(unittest.TestCase):
             self.assertNotIn('test_ltl_evidence_comparator.cjs', builder.PUBLIC_FILES)
 
 
+
+class RetallyIndexNowPublicationTests(unittest.TestCase):
+    """Only the public ownership proof is published; the notifier stays private."""
+
+    def test_indexnow_public_key_exact_and_no_credential_or_customer_assets(self):
+        from freight.marketing.indexnow_notify import KEY
+        with tempfile.TemporaryDirectory() as temp:
+            public = build(Path(temp) / "public")
+            name = KEY + ".txt"
+            self.assertIn(name, builder.TEXT_SOURCE_FILES)
+            self.assertEqual((public / name).read_text(encoding="utf-8"), KEY + "\n")
+            self.assertEqual(len(KEY), 32)
+            self.assertNotIn("indexnow_notify.py", builder.PUBLIC_FILES)
+            self.assertNotIn("test_indexnow_notify.py", builder.PUBLIC_FILES)
+
+
+
+class RetallyBlankFreightEvidenceLedgerTests(unittest.TestCase):
+    """This buyer lead magnet is an empty local spreadsheet, never a recovery claim."""
+
+    def test_blank_template_columns_and_public_download_destinations(self):
+        import csv
+        from io import StringIO
+        with tempfile.TemporaryDirectory() as temp:
+            output = build(Path(temp) / "public")
+            name = "freight-recovery-evidence-ledger.csv"
+            self.assertIn(name, builder.TEXT_SOURCE_FILES)
+            source = (output / name).read_text(encoding="utf-8")
+            rows = list(csv.reader(StringIO(source)))
+            self.assertEqual(len(rows), 2, "One header and one blank starter row")
+            headers = rows[0]
+            self.assertEqual(len(headers), 24)
+            self.assertEqual(len(set(headers)), 24)
+            for heading in (
+                "Review_ID", "Governing_Rate_Terms_Source_Keep_Local",
+                "Candidate_Difference_Not_Savings",
+                "Previously_Applied_Credit_Or_Existing_Claim",
+                "Evidence_Status", "Human_Review_Outcome",
+                "Customer_Authorization", "Credit_Or_Refund_Actually_Posted",
+                "Reversal_Or_Offset",
+                "Net_Eligible_Realized_Value_Subject_To_Terms",
+                "Private_Evidence_Notes_Keep_Local",
+            ):
+                self.assertIn(heading, headers)
+            self.assertEqual(rows[1], [""] * len(headers))
+            self.assertNotIn("=", source)
+            self.assertNotIn("@", source)
+            for page in ("index.html", "freight-invoice-audit-checklist.html",
+                         "freight-recovery-evidence-standard.html", "referral-partners.html"):
+                markup = (output / page).read_text(encoding="utf-8")
+                self.assertIn('href="' + name + '" download', markup)
+            guide = (output / "freight-invoice-audit-checklist.html").read_text(encoding="utf-8")
+            self.assertIn('id="ledger"', guide)
+            self.assertIn("No macros or formulas", guide)
+            self.assertIn("candidate", guide.lower())
+            self.assertNotIn('type="file"', guide.lower())
+
+
 if __name__ == "__main__":
     unittest.main()

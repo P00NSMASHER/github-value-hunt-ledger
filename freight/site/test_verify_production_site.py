@@ -12,6 +12,7 @@ from email.message import Message
 from freight.site.verify_production_site import (
     APPROVED_MEDIA, LiveAuditError, ensure_html, ensure_logo,
     ensure_security_headers, ensure_ltl_comparator, LTL_COMPARATOR_PAGE,
+    ensure_blank_evidence_ledger,
 )
 
 
@@ -65,6 +66,17 @@ class ProductionSmokeInvariantTests(unittest.TestCase):
         ):
             with self.assertRaises(LiveAuditError):
                 ensure_ltl_comparator(html, brokenjs)
+
+
+    def test_blank_evidence_register_must_be_exact_current_release_asset(self):
+        source = Path(__file__).with_name("freight-recovery-evidence-ledger.csv").read_bytes()
+        ensure_blank_evidence_ledger(source, source)
+        for malformed in (source + b"Unauthorized,10000\n",
+                          source.replace(b"Candidate_Difference_Not_Savings",
+                                         b"Confirmed_Recovery"),
+                          b""):
+            with self.assertRaises(LiveAuditError):
+                ensure_blank_evidence_ledger(malformed, source)
 
     def test_corrupted_published_logo_is_detected(self):
         for path in APPROVED_MEDIA:

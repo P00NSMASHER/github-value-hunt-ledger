@@ -6,6 +6,9 @@ build cannot conceal a missing public asset or disabled HTTPS security header.
 from __future__ import annotations
 
 import hashlib
+import csv
+from io import StringIO
+from pathlib import Path
 import re
 import urllib.error
 import urllib.request
@@ -19,6 +22,7 @@ APEX = "https://retallyrecovery.com/"
 MIN_HSTS_SECONDS = 86400
 LTL_COMPARATOR_PAGE = CANONICAL + "ltl-reweigh-evidence-comparator"
 LTL_COMPARATOR_SCRIPT = CANONICAL + "ltl-evidence-comparator.js"
+EVIDENCE_LEDGER_RESOURCE = "freight-recovery-evidence-ledger.csv"
 APPROVED_MEDIA = {
     "assets/brand/retally-wordmark-approved.png":
         "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd",
@@ -103,6 +107,28 @@ def ensure_ltl_comparator(html: str, script: str) -> None:
             raise LiveAuditError("Production LTL calculator contains forbidden data access")
 
 
+
+def ensure_blank_evidence_ledger(published: bytes, source: bytes) -> None:
+    """Compare to the exact checked-out blank ledger; no user files are read."""
+    if published != source:
+        raise LiveAuditError("Production blank evidence ledger differs from verified release")
+    try:
+        rows = list(csv.reader(StringIO(published.decode("utf-8"))))
+    except (UnicodeDecodeError, csv.Error) as error:
+        raise LiveAuditError("Production blank ledger is not valid UTF-8 CSV") from error
+    if len(rows) != 2 or len(rows[0]) != 24 or len(set(rows[0])) != 24:
+        raise LiveAuditError("Production ledger schema is incomplete")
+    for name in (
+        "Candidate_Difference_Not_Savings", "Previously_Applied_Credit_Or_Existing_Claim",
+        "Evidence_Status", "Customer_Authorization", "Reversal_Or_Offset",
+        "Net_Eligible_Realized_Value_Subject_To_Terms",
+    ):
+        if name not in rows[0]:
+            raise LiveAuditError("Production ledger lost its recovery-integrity boundary")
+    if rows[1] != [""] * len(rows[0]):
+        raise LiveAuditError("Production ledger must not contain customer or sample data")
+
+
 def inspect_live_site() -> dict[str, object]:
     status, headers, homepage = fetch(CANONICAL)
     if status != 200:
@@ -170,6 +196,14 @@ def inspect_live_site() -> dict[str, object]:
         script_body.decode("utf-8"),
     )
 
+    # A healthy stale site can otherwise pass without publishing the new
+    # buyer download. The GET-only receipt verifies byte-for-byte public CSV.
+    ledger_status, _, ledger_body = fetch(CANONICAL + EVIDENCE_LEDGER_RESOURCE)
+    if ledger_status != 200:
+        raise LiveAuditError(f"Production blank evidence ledger HTTP {ledger_status}")
+    expected_ledger = Path(__file__).with_name(EVIDENCE_LEDGER_RESOURCE).read_bytes()
+    ensure_blank_evidence_ledger(ledger_body, expected_ledger)
+
     # Online intake is deliberately disabled pending separate mailbox QA.
     # A 503 is acceptable; never attempt a POST or assert delivery.
     intake_status, _, _ = fetch(CANONICAL + "api/inquiry")
@@ -179,6 +213,7 @@ def inspect_live_site() -> dict[str, object]:
     return {
         "production": "verified",
         "ltl_buyer_comparator": "verified",
+        "blank_evidence_ledger": "verified",
         "pages": len(locs),
         "internal_links_checked": link_audit["destinations"],
         # Observability only: do not fail releases on noisy single-run latency.
