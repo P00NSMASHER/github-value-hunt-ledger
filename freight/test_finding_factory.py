@@ -142,3 +142,39 @@ def test_money_and_units_require_exact_integer_semantics(bad):
     else:
         with pytest.raises(ValueError):
             derive_charge(charge(billed_cents=bad), [rule()])
+
+
+def test_batch_rejects_forged_population_manifest_digest():
+    forged = replace(population(), manifest_hash="0" * 64)
+    with pytest.raises(ValueError, match="population proof"):
+        derive_batch(forged, [charge()], [rule()])
+
+
+
+def test_batch_rejects_invoice_shipment_delimiter_alias():
+    pop = freeze_population(
+        "buyer", "unit", "synthetic",
+        [PopulationRow("inv|segment", "shp-1", "customer", "carrier", "USD", "source")],
+    )
+    aliased = charge(invoice_id="inv", shipment_id="segment|shp-1")
+    with pytest.raises(ValueError, match="outside frozen population"):
+        derive_batch(pop, [aliased], [rule()])
+
+
+
+def test_validated_finding_rejects_whitespace_aliased_rule_identity():
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        derive_charge(charge(), [rule(authority_document_id=" rate-confirmation-1")])
+
+
+def test_validated_finding_rejects_whitespace_aliased_charge_identity():
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        derive_charge(charge(charge_id=" charge-1"), [rule()])
+
+
+def test_batch_rejects_canonically_equivalent_charge_id_aliases():
+    composed = charge(charge_id="charge-é")
+    decomposed = charge(charge_id="charge-é", source_hash="line-source-2")
+    assert derive_batch(population(), [composed], [rule()]).validated_count == 1
+    with pytest.raises(ValueError, match="canonical Unicode"):
+        derive_batch(population(), [composed, decomposed], [rule()])

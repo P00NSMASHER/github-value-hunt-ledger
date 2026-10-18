@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Iterable
+import unicodedata
 
 from freight.contracts import canonical_hash
 
@@ -30,6 +31,18 @@ def _text(name: str, value: str) -> str:
         raise ValueError(f"{name} is required")
     value = value.strip()
     if any(ord(ch) < 32 for ch in value):
+        raise ValueError(f"{name} contains control characters")
+    return value
+
+
+def _identity(name: str, value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{name} is required")
+    if value != value.strip():
+        raise ValueError(f"{name} must not contain surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(f"{name} must use canonical Unicode (NFC)")
+    if any(unicodedata.category(ch).startswith("C") for ch in value):
         raise ValueError(f"{name} contains control characters")
     return value
 
@@ -115,7 +128,7 @@ def prepare_payment_instruction(
     idempotency_key: str,
 ) -> PaymentInstruction:
     fields = {
-        "instruction_id": _text("instruction_id", instruction_id),
+        "instruction_id": _identity("instruction_id", instruction_id),
         "buyer_id": _text("buyer_id", buyer_id),
         "business_unit": _text("business_unit", business_unit),
         "payer_id": _text("payer_id", payer_id),
@@ -123,7 +136,7 @@ def prepare_payment_instruction(
         "currency": _text("currency", currency).upper(),
         "amount_cents": _cents("amount_cents", amount_cents, positive=True),
         "purpose": _text("purpose", purpose),
-        "idempotency_key": _text("idempotency_key", idempotency_key),
+        "idempotency_key": _identity("idempotency_key", idempotency_key),
     }
     if len(fields["currency"]) != 3 or not fields["currency"].isalpha():
         raise ValueError("currency must be three letters")
@@ -207,7 +220,7 @@ class PaymentOrchestrator:
         if state not in TRANSITIONS.get(prior, set()):
             raise ValueError(f"invalid payment transition {prior} -> {state}")
         provider = _text("provider", provider)
-        provider_reference = _text("provider_reference", provider_reference)
+        provider_reference = _identity("provider_reference", provider_reference)
         source_hash = _text("source_hash", source_hash)
         occurred_at = _timestamp("occurred_at", occurred_at)
         amount_cents = _cents("amount_cents", amount_cents, positive=True)

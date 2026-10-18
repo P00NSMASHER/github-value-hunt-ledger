@@ -5,11 +5,13 @@ prioritizes cases and records immutable human dispositions.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Iterable
 
-from freight.contracts import canonical_hash
+from freight.contracts import PopulationManifest, canonical_hash, freeze_population
+from freight.finding_factory import InvoiceCharge
 
 DECISIONS = {"CONFIRM", "REJECT", "NEED_EVIDENCE", "MODIFY_RULE", "ESCALATE"}
 MAX_PPM = 1_000_000
@@ -18,8 +20,11 @@ MAX_PPM = 1_000_000
 def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} is required")
-    value = value.strip()
-    if any(ord(ch) < 32 for ch in value):
+    if value != value.strip():
+        raise ValueError(f"{name} must not have surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(f"{name} must use canonical Unicode (NFC)")
+    if any(unicodedata.category(ch) in {"Cc", "Cf", "Cs"} for ch in value):
         raise ValueError(f"{name} contains control characters")
     return value
 
@@ -134,6 +139,21 @@ def make_case(
 
 def build_queue(cases: Iterable[ReviewCase]) -> ReviewQueue:
     normalized = tuple(cases)
+    for case in normalized:
+        if not isinstance(case, ReviewCase):
+            raise ValueError("review queue items must be ReviewCase instances")
+        expected = make_case(
+            case_id=case.case_id,
+            record_hash=case.record_hash,
+            amount_cents=case.amount_cents,
+            confidence_ppm=case.confidence_ppm,
+            novelty_ppm=case.novelty_ppm,
+            downstream_risk_ppm=case.downstream_risk_ppm,
+            blocker_codes=case.blocker_codes,
+            evidence_hashes=case.evidence_hashes,
+        )
+        if expected != case:
+            raise ValueError("case proof or canonical ordering mismatch")
     if len({x.case_id for x in normalized}) != len(normalized):
         raise ValueError("duplicate case_id")
     if len({x.case_hash for x in normalized}) != len(normalized):
@@ -161,6 +181,9 @@ def record_disposition(
     corrected_expected_cents: int | None = None,
     rule_candidate: str | None = None,
 ) -> HumanDisposition:
+    # A human decision must bind to the canonical case fields represented by
+    # case_hash, including money, blockers, and evidence—not only the digest.
+    build_queue((case,))
     reviewer_id = _text("reviewer_id", reviewer_id)
     reason = _text("reason", reason)
     decision = _text("decision", decision).upper()
@@ -195,5 +218,99 @@ def record_disposition(
     )
 
 
-def export_disposition(disposition: HumanDisposition) -> dict:
+def export_disposition(
+    disposition: HumanDisposition,
+    case: ReviewCase | None = None,
+) -> dict:
+    """Export a disposition only with its canonical reviewed-case proof."""
+    if type(disposition) is not HumanDisposition:
+        raise ValueError("disposition must be a HumanDisposition")
+    if case is None:
+        raise ValueError("canonical case proof is required")
+    build_queue((case,))
+    if disposition.case_hash != case.case_hash:
+        raise ValueError("disposition case proof mismatch")
+    case_hash = _text("case_hash", disposition.case_hash)
+    reviewer_id = _text("reviewer_id", disposition.reviewer_id)
+    reason = _text("reason", disposition.reason)
+    decision = _text("decision", disposition.decision).upper()
+    if decision not in DECISIONS:
+        raise ValueError("unsupported review decision")
+    decided_at = _timestamp("decided_at", disposition.decided_at)
+    corrected_expected_cents = disposition.corrected_expected_cents
+    if corrected_expected_cents is not None:
+        corrected_expected_cents = _cents(
+            "corrected_expected_cents", corrected_expected_cents
+        )
+    rule_candidate = disposition.rule_candidate
+    if decision == "MODIFY_RULE":
+        rule_candidate = _text("rule_candidate", rule_candidate)
+    elif rule_candidate is not None:
+        rule_candidate = _text("rule_candidate", rule_candidate)
+    body = {
+        "schema": 1,
+        "case_hash": case_hash,
+        "reviewer_id": reviewer_id,
+        "decision": decision,
+        "reason": reason,
+        "decided_at": decided_at,
+        "corrected_expected_cents": corrected_expected_cents,
+        "rule_candidate": rule_candidate,
+    }
+    expected = HumanDisposition(
+        case_hash=case_hash,
+        reviewer_id=reviewer_id,
+        decision=decision,
+        reason=reason,
+        decided_at=decided_at,
+        corrected_expected_cents=corrected_expected_cents,
+        rule_candidate=rule_candidate,
+        disposition_hash=canonical_hash(body),
+    )
+    if expected != disposition:
+        raise ValueError("disposition proof or canonical representation mismatch")
     return asdict(disposition)
+
+
+def build_invoice_review_queue(
+    population: PopulationManifest, charges: Iterable[InvoiceCharge],
+) -> ReviewQueue:
+    """Connect existing invoice detectors to the existing human-review cockpit.
+
+    No payable amount, estimated savings or confidence is inferred from a
+    duplicate-looking reference. Zero scoring fields mean UNSCORED, not a
+    calibrated estimate. Legitimate consolidated invoices and rebills can
+    still enter this review queue; only separately authorized human evidence
+    can resolve them. This function performs no I/O or disposition recording.
+    """
+    from freight.duplicate_charge_review import (
+        review_duplicate_charges,
+        review_reused_invoice_references,
+    )
+
+    frozen = freeze_population(population.buyer_id, population.business_unit,
+                               population.selection_rule, population.rows)
+    if frozen != population:
+        raise ValueError("population proof or canonical ordering mismatch")
+    normalized = tuple(charges)
+    batches = (
+        review_duplicate_charges(population, normalized),
+        review_reused_invoice_references(population, normalized),
+    )
+    cases = []
+    for batch in batches:
+        for candidate in batch.candidates:
+            cases.append(make_case(
+                case_id=candidate.candidate_id,
+                record_hash=candidate.proof_hash,
+                amount_cents=0,
+                confidence_ppm=0,
+                novelty_ppm=0,
+                downstream_risk_ppm=0,
+                blocker_codes=(candidate.reason, "UNSCORED_REVIEW_ONLY",
+                               "NO_FINANCIAL_AUTHORITY", *candidate.unresolved_evidence),
+                evidence_hashes=(population.manifest_hash, batch.batch_hash,
+                                 candidate.proof_hash, *candidate.source_hashes,
+                                 *candidate.charge_hashes),
+            ))
+    return build_queue(cases)

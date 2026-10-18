@@ -589,3 +589,14 @@ def test_reopen_rejects_legacy_noncanonical_evidence(tmp_path):
     conn.close()
     with pytest.raises(RuntimeError,match="noncanonical settlement_events"):
         SettlementStore(path,buyer_id="TEST_BUYER",business_unit="TEST_BU")
+
+
+def test_canonical_unicode_event_identity_rejects_duplicate_evidence_alias(tmp_path):
+    """One external event cannot become two records through Unicode aliases."""
+    store = S(tmp_path)
+    store.create_claim(C(amt=50000))
+    canonical_id = "payment-é"
+    alias_id = "payment-é"
+    store.ingest_event(E(canonical_id, amt=25000))
+    with pytest.raises(ValueError, match="event_id must use canonical Unicode"):
+        store.ingest_event(E(alias_id, amt=25000))

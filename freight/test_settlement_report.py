@@ -272,3 +272,4 @@ def test_snapshot_tables_share_one_database_revision_during_concurrent_return(tm
     after = build_persistent_pilot_report(truth, incumbent, store, (binding,))
     assert after.metrics.realized_cents == 0
     assert canonical_hash(json.loads(after.settlement_snapshot_json)) == after.settlement_snapshot_hash
+

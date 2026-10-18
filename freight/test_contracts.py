@@ -1,3 +1,7 @@
+from dataclasses import replace
+
+import pytest
+
 from freight.contracts import (
     AuthorityRef,
     PopulationRow,
@@ -108,6 +112,32 @@ def settlement(
         source_hash=source_hash,
         **kwargs,
     )
+
+
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    [
+        ("expected", True),
+        ("expected", 1.5),
+        ("actual", True),
+        ("actual", 1.5),
+    ],
+)
+def test_finding_money_requires_exact_integer_cents(field, bad_value):
+    with pytest.raises(ValueError, match="non-negative integer cents"):
+        finding(**{field: bad_value})
+
+def test_truth_rejects_forged_population_manifest_digest():
+    pop = population()
+    forged = replace(pop, manifest_hash="0" * 64)
+
+    with pytest.raises(
+        ValueError,
+        match="population proof or canonical ordering mismatch",
+    ):
+        freeze_truth(forged, [authority()], [finding()])
 
 
 def test_population_hash_is_order_independent():
@@ -277,6 +307,14 @@ def test_duplicate_settlement_source_cannot_be_double_counted():
         raise AssertionError("same settlement source cannot be reused")
 
 
+def test_settlement_source_identity_rejects_surrounding_whitespace_alias():
+    _, truth_manifest = truth()
+    ledger = RecoveryLedger(truth_manifest)
+    ledger.apply(settlement("settle-1", amount=1250, source_hash="source-hash-1"))
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        ledger.apply(settlement("settle-2", amount=1250, source_hash="source-hash-1 "))
+
+
 def test_partial_settlements_cap_at_validated_variance():
     _, truth_manifest = truth()
     ledger = RecoveryLedger(truth_manifest)
@@ -350,3 +388,132 @@ def test_clean_truth_manifest_is_valid_and_deterministic():
     assert a.findings == ()
     assert a.authorities == ()
     assert a.truth_hash == b.truth_hash
+
+
+
+def test_population_membership_rejects_delimiter_alias():
+    pop = population([row("inv|segment", "shipment")])
+    aliased = finding(invoice_id="inv", shipment_id="segment|shipment")
+    try:
+        freeze_truth(pop, [authority()], [aliased])
+    except ValueError as exc:
+        assert "outside frozen population" in str(exc)
+    else:
+        raise AssertionError(
+            "invoice/shipment delimiter alias must not satisfy population membership"
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "noncanonical"),
+    [
+        ("invoice_id", "inv-1 "),
+        ("shipment_id", " shp-1"),
+    ],
+)
+def test_population_rejects_surrounding_whitespace_identity_alias(field, noncanonical):
+    original = row("inv-1", "shp-1")
+    aliased = replace(original, **{field: noncanonical})
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        freeze_population(BUYER, BU, "current invoices", [original, aliased])
+
+
+@pytest.mark.parametrize(
+    ("field", "noncanonical"),
+    [
+        ("invoice_id", "inv-e\u0301"),
+        ("shipment_id", "shp-e\u0301"),
+    ],
+)
+def test_population_rejects_noncanonical_unicode_identity_alias(field, noncanonical):
+    original = row("inv-é", "shp-é")
+    aliased = replace(original, **{field: noncanonical})
+    with pytest.raises(ValueError, match="canonical Unicode"):
+        freeze_population(BUYER, BU, "current invoices", [original, aliased])
+
+
+def test_finding_id_alias_cannot_double_realized_money():
+    pop = population()
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        truth_manifest = freeze_truth(
+            pop,
+            [authority()],
+            [finding("f-1"), finding("f-1 ")],
+        )
+        ledger = RecoveryLedger(truth_manifest)
+        ledger.apply(settlement(
+            "settle-1", finding_id="f-1", source_hash="source-1",
+        ))
+        ledger.apply(settlement(
+            "settle-2", finding_id="f-1 ", source_hash="source-2",
+        ))
+
+def test_incumbent_finding_id_alias_cannot_restore_fee_eligibility():
+    pop, truth_manifest = truth()
+    sealed = seal_incumbent_submission(pop, "incumbent-file-sha")
+
+    # Incumbent-preidentified findings are never fee eligible. A display alias
+    # must not evade that exclusion by missing the canonical truth identifier.
+    with pytest.raises(ValueError, match="surrounding whitespace"):
+        open_incumbent_output(
+            population=pop,
+            truth=truth_manifest,
+            submission=sealed,
+            finding_ids=["f-1 "],
+        )
+
+
+def test_ambiguous_settlement_evidence_cannot_be_replayed_as_realized_money():
+    _, truth_manifest = truth()
+    ledger = RecoveryLedger(truth_manifest)
+    first = ledger.apply(settlement(
+        "settle-ambiguous",
+        amount=2500,
+        source_hash="ambiguous-source-1",
+        ambiguous_allocation=True,
+    ))
+    assert first.allocated_cents == 0
+    assert first.fee_eligible_cents == 0
+
+    # A fail-closed ambiguity decision must remain in the audit trail. Reusing
+    # either identity with no new evidence cannot silently turn it into money.
+    with pytest.raises(ValueError, match="duplicate settlement_id"):
+        ledger.apply(settlement(
+            "settle-ambiguous",
+            amount=2500,
+            source_hash="new-source-2",
+        ))
+    with pytest.raises(ValueError, match="source already consumed"):
+        ledger.apply(settlement(
+            "settle-resubmitted",
+            amount=2500,
+            source_hash="ambiguous-source-1",
+        ))
+
+    certificate = ledger.certificate("f-1")
+    assert certificate.realized_cents == 0
+    assert certificate.fee_eligible_cents == 0
+    assert certificate.settlement_proof_hashes == (first.proof_hash,)
+
+@pytest.mark.parametrize("authority_id", ["auth-1 ", "auth-e\u0301"])
+def test_validated_truth_rejects_noncanonical_authority_identity(authority_id):
+    pop = population()
+    with pytest.raises(
+        ValueError,
+        match="surrounding whitespace|canonical Unicode",
+    ):
+        freeze_truth(
+            pop,
+            [authority(authority_id)],
+            [finding(authority_id=authority_id)],
+        )
+
+
+def test_validated_truth_accepts_canonical_non_ascii_authority_identity():
+    pop = population()
+    manifest = freeze_truth(
+        pop,
+        [authority("auth-é")],
+        [finding(authority_id="auth-é")],
+    )
+    assert manifest.findings[0].validated_cents == 2500

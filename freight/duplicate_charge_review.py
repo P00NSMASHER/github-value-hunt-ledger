@@ -7,11 +7,12 @@ status, credit/rebill status, and service distinction are independently proven.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
 
-from freight.contracts import PopulationManifest, canonical_hash
+from freight.contracts import PopulationManifest, canonical_hash, freeze_population
 from freight.finding_factory import InvoiceCharge
 
 
@@ -79,7 +80,13 @@ class DuplicateChargeReviewBatch:
 def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
-    return value.strip()
+    if value != value.strip():
+        raise ValueError(name + " must not have surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character) in {"Cc", "Cf", "Cs"} for character in value):
+        raise ValueError(name + " contains control characters")
+    return value
 
 
 def _validate_charge(charge: InvoiceCharge) -> None:
@@ -169,11 +176,19 @@ def review_duplicate_charges(
     charges: Iterable[InvoiceCharge],
 ) -> DuplicateChargeReviewBatch:
     """Return strict semantic duplicates as evidence-bound REVIEW candidates."""
+    frozen = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if frozen != population:
+        raise ValueError("population proof or canonical ordering mismatch")
     normalized = tuple(sorted(charges, key=lambda charge: charge.charge_id))
     if len({charge.charge_id for charge in normalized}) != len(normalized):
         raise ValueError("duplicate charge_id")
 
-    row_index = {row.row_key: row for row in population.rows}
+    row_index = {row.identity_key: row for row in population.rows}
     groups: dict[tuple[object, ...], list[InvoiceCharge]] = {}
     for charge in normalized:
         _validate_charge(charge)
@@ -182,7 +197,7 @@ def review_duplicate_charges(
             population.business_unit,
         ):
             raise ValueError("charge scope mismatch")
-        row = row_index.get(f"{charge.invoice_id}|{charge.shipment_id}")
+        row = row_index.get((charge.invoice_id, charge.shipment_id))
         if row is None:
             raise ValueError("charge outside frozen population")
         if (charge.customer_id, charge.carrier_id, charge.currency) != (
@@ -210,4 +225,141 @@ def review_duplicate_charges(
         population_hash=population.manifest_hash,
         candidates=candidates,
         batch_hash=canonical_hash(body),
+    )
+
+
+# A complementary identity-level review. This is NOT a money-bearing finding
+# and does not change review_duplicate_charges or its existing classification.
+# A repeated carrier invoice number on distinct shipments can also be an
+# authorized consolidated multi-load invoice or a rebill; it never establishes
+# an overpayment, payable hold, carrier fault, or amount recoverable.
+POSSIBLE_CROSS_SHIPMENT_INVOICE_REFERENCE = "POSSIBLE_CROSS_SHIPMENT_INVOICE_REFERENCE"
+INVOICE_REFERENCE_EVIDENCE = (
+    "INVOICE_LINEAGE",
+    "PAYMENT_STATUS",
+    "CREDIT_REBILL_STATUS",
+    "MULTI_LOAD_INVOICE_AUTHORIZATION",
+    "SERVICE_DISTINCTION",
+)
+
+
+@dataclass(frozen=True)
+class InvoiceReferenceReviewCandidate:
+    candidate_id: str
+    buyer_id: str
+    business_unit: str
+    customer_id: str
+    carrier_id: str
+    currency: str
+    invoice_id: str
+    shipment_ids: tuple[str, ...]
+    charge_ids: tuple[str, ...]
+    source_hashes: tuple[str, ...]
+    charge_hashes: tuple[str, ...]
+    decision: str
+    reason: str
+    requires_human_review: bool
+    may_assert_validated_dollars: bool
+    unresolved_evidence: tuple[str, ...]
+    proof_hash: str
+
+    @property
+    def validated_cents(self) -> int:
+        return 0
+
+
+@dataclass(frozen=True)
+class InvoiceReferenceReviewBatch:
+    population_hash: str
+    candidates: tuple[InvoiceReferenceReviewCandidate, ...]
+    batch_hash: str
+
+    @property
+    def review_count(self) -> int:
+        return len(self.candidates)
+
+    @property
+    def validated_cents(self) -> int:
+        return 0
+
+
+def review_reused_invoice_references(
+    population: PopulationManifest,
+    charges: Iterable[InvoiceCharge],
+) -> InvoiceReferenceReviewBatch:
+    """Review exact carrier-invoice ID reuse across DISTINCT shipments only.
+
+    This deliberately shares the established frozen-population and charge
+    identity validation. It never infers that repeated identifiers mean an
+    invalid payment, duplicated service, verified claim, or recoverable dollars.
+    No third-party code is executed or included in the implementation.
+    """
+    frozen = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if frozen != population:
+        raise ValueError("population proof or canonical ordering mismatch")
+    normalized = tuple(sorted(charges, key=lambda c: c.charge_id))
+    # Reuse the one authority for scope, unique charge IDs, source identity,
+    # integer cents, dates and frozen population membership. Its own findings
+    # remain independent; this new API only returns invoice-ID review leads.
+    review_duplicate_charges(population, normalized)
+    groups: dict[tuple[str, str, str, str, str, str], list[InvoiceCharge]] = {}
+    for charge in normalized:
+        key = (
+            charge.buyer_id,
+            charge.business_unit,
+            charge.customer_id,
+            charge.carrier_id,
+            charge.currency,
+            charge.invoice_id,
+        )
+        groups.setdefault(key, []).append(charge)
+    candidates = []
+    for key, group in sorted(groups.items()):
+        shipments = tuple(sorted({charge.shipment_id for charge in group}))
+        if len(shipments) < 2:
+            continue
+        body = {
+            "schema": 1,
+            "population_hash": population.manifest_hash,
+            "buyer_id": key[0],
+            "business_unit": key[1],
+            "customer_id": key[2],
+            "carrier_id": key[3],
+            "currency": key[4],
+            "invoice_id": key[5],
+            "shipment_ids": shipments,
+            "charge_ids": tuple(charge.charge_id for charge in group),
+            "source_hashes": tuple(charge.source_hash for charge in group),
+            "charge_hashes": tuple(canonical_hash({"schema": 1, **asdict(charge)}) for charge in group),
+            "decision": REVIEW,
+            "reason": POSSIBLE_CROSS_SHIPMENT_INVOICE_REFERENCE,
+            "requires_human_review": True,
+            "may_assert_validated_dollars": False,
+            "unresolved_evidence": INVOICE_REFERENCE_EVIDENCE,
+        }
+        proof_hash = canonical_hash(body)
+        candidates.append(
+            InvoiceReferenceReviewCandidate(
+                candidate_id="invoice-ref:" + proof_hash,
+                proof_hash=proof_hash,
+                **{k: v for k, v in body.items() if k not in {"schema", "population_hash"}},
+            )
+        )
+    proof = canonical_hash({
+        "schema": 1,
+        "population_hash": population.manifest_hash,
+        "input_charge_hashes": [
+            canonical_hash({"schema": 1, **asdict(charge)}) for charge in normalized
+        ],
+        "candidate_proof_hashes": [candidate.proof_hash for candidate in candidates],
+    })
+    return InvoiceReferenceReviewBatch(
+        population_hash=population.manifest_hash,
+        candidates=tuple(candidates),
+        batch_hash=proof,
     )
