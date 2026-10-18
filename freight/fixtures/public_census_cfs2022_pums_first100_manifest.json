@@ -1,0 +1,26 @@
+{
+  "publisher": "US Census Bureau",
+  "survey": "2022 Commodity Flow Survey Public Use Microdata",
+  "source_url": "https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums.zip",
+  "source_page": "https://www.census.gov/data/datasets/2022/econ/cfs/historical-datasets.html",
+  "compressed_archive_bytes": 677530696,
+  "zip_central_directory": {
+    "entry": "cfs_2022_pums.csv",
+    "method": "deflate",
+    "compressed_bytes": 677530492,
+    "uncompressed_bytes": 2824487751,
+    "crc32": "3a9fd854",
+    "entries": 1
+  },
+  "source_prefix_range": "bytes=0-131071",
+  "source_prefix_sha256": "d9f78acc810c1290712f87dc082debef801e8d0ef360cfb0521ea289b84b309f",
+  "first_complete_rows": 100,
+  "fixture": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+  "notes": [
+    "Unweighted and nonrandom 100-row prefix. No statistical estimates may be drawn from this prefix.",
+    "SHIPMT_VALUE denotes shipment goods value, not billed transportation.",
+    "WGT_FACTOR survey design weight; do not sum sample unweighted or claim national results.",
+    "No original actual customer invoice or carrier agreement.",
+    "Full 677MB source was not downloaded; ZIP central directory was independently read using byte-range requests."
+  ]
+}
