@@ -24,5 +24,29 @@
     "Full 677MB source was not downloaded; ZIP central directory was independently read using byte-range requests."
   ],
   "fixture_sha256": "ab75a35ab109a8b2f2923c6a66b20712bc972aa968c09c3dd9f4286f6972a260",
-  "fixture_bytes": 7734
+  "fixture_bytes": 7734,
+  "official_users_guide": "https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums_users_guide.pdf",
+  "official_methodology": "https://www.census.gov/programs-surveys/cfs/technical-documentation/methodology.html",
+  "original_2022_pums_source_population": {
+    "shipment_records": 37576546,
+    "approx_responding_establishments": 50000,
+    "privacy_modified": true,
+    "shipment_value_unit": "USD of goods shipped, not freight rate",
+    "shipment_weight_unit": "pounds",
+    "distance_unit": "great-circle miles"
+  },
+  "weight_policy": {
+    "field": "WGT_FACTOR",
+    "interpretation": "shipment tabulation weighting factor accounts for survey design, subsampling, poststratification and disclosure-avoidance adjustments",
+    "official_weight_cap": "3588000",
+    "precision": "one decimal",
+    "per_sample_100_row_extrapolation_authorized": false,
+    "published_CFS_estimates_take_precedence": true,
+    "variance_estimable_from_first_100_rows": false
+  },
+  "disclosure_policy": {
+    "description": "PUMS records may include topcoding, noise infusion, truncation, rounding and geographic/commodity collapsing",
+    "published_value_truncation": "30000000",
+    "privacy_modified_values_not_invoices": true
+  }
 }
