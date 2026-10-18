@@ -4,6 +4,9 @@ on:
     paths:
       - '.github/workflows/retally-gao-historical-collections.yml'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gao_setoff_reversal_v1.py'
+      - 'freight/test_public_gao_setoff_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
       - 'freight/public_gsa_false_positive_payment_v1.py'
       - 'freight/test_public_gsa_false_positive_payment_v1.py'
       - 'freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json'
@@ -25,6 +28,7 @@ jobs:
       - name: Validate exact original GAO historical case figures and false-claim denials
         run: |
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
       - name: Reject erroneous overcharge deductions mistakenly treated as retained recoveries
         run: |
@@ -42,6 +46,25 @@ jobs:
           assert x['validated_RETALLY_customer_cash_cents']==0
           assert x['commercial_recovery_claim']=='NO_GO'
           print('Real GSA vendor repayment shows cost of erroneous audit notices; no RETALLY recoveries.')
+          PY
+      - name: Verify historically applied offset later found improper is NOT a valid retained recovery
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_setoff_reversal_v1 > /tmp/retally_lab14_gao_improper_offset.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally_lab14_gao_improper_offset.json').read_text())
+          assert r['original_decisions']==1
+          assert r['prepetition_allowable_setoff_cents_reported']==214759
+          assert r['postpetition_GOVERNMENT_applied_offset_LATER_DISALLOWED_cents']==514105
+          assert r['illegal_postpetition_offset_is_valid_permanent_recovery'] is False
+          assert r['GAO_said_allow_carrier_claim_if_otherwise_correct'] is True
+          assert r['independent_carrier_repayment_bank_receipt_obtained'] is False
+          assert r['government_final_net_collections_credible_cents'] is None
+          assert r['not_included_in_GAO_approved_historical_collection_tally'] is True
+          assert r['actual_RETALLY_cash_recovered_cents']==0
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('GAO B-192974: executed post-petition offset later held invalid; no verified returned cash, no client recovery.')
           PY
       - name: Fail closed on any implication that GAO decisions prove RETALLY money recovered
         run: |
