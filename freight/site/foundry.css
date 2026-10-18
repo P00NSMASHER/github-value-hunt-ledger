@@ -1116,3 +1116,27 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  body.worksheet-print-mode .worksheet-builder .worksheet-card{break-inside:avoid!important}
  body.worksheet-print-mode *{-webkit-print-color-adjust:economy!important;print-color-adjust:economy!important}
 }
+
+
+/* RETALLY static buyer evidence cards: zero-upload, printer-friendly resources. */
+.document-page .retally-fieldkit{
+ background:linear-gradient(155deg,#f4fff7,#e5f5ea);border:1px solid #9dcdb1;
+ border-radius:16px;padding:clamp(15px,3vw,29px);margin:24px 0;
+ box-shadow:0 7px 19px rgba(7,45,29,.08);
+}
+.document-page .retally-fieldkit ol{padding-left:1.5rem;line-height:1.65}
+.document-page .retally-fieldkit li{margin-block:9px}
+.document-page .retally-free-table{max-width:100%;overflow-x:auto;border:1px solid #adcbb7;border-radius:12px;background:#fff;margin:20px 0}
+.document-page .retally-free-table table{border-collapse:collapse;width:100%;min-width:510px}
+.document-page .retally-free-table caption{padding:12px;text-align:left;font-weight:750;color:#134331}
+.document-page .retally-free-table td,.document-page .retally-free-table th{padding:12px 13px;text-align:left;vertical-align:top;border-bottom:1px solid #d3e8d9}
+.document-page .retally-free-table th{background:#e9f8ef;color:#123c2d;font-weight:750}
+.document-page .retally-free-table tbody tr:last-child td{border-bottom:0}
+.document-page .retally-free-table:focus-visible{outline:3px solid #087a50;outline-offset:4px}
+@media print{
+ .document-page .retally-free-table{overflow:visible;border-color:#777}
+ .document-page .retally-free-table table{min-width:0;font-size:10pt}
+ .document-page .retally-free-table td,.document-page .retally-free-table th{padding:5pt}
+ .document-page .retally-fieldkit{background:#fff;box-shadow:none;border:1px solid #777;break-inside:avoid}
+ .document-page .retally-fieldkit ol{font-size:10pt}
+}
