@@ -741,3 +741,41 @@ def test_self_hashed_delivery_receipt_rejects_invalid_semantics(field, value):
 
     with pytest.raises(ValueError):
         verify_carrier_action_delivery_receipt(forged)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("action_type", "UNRECOGNIZED_ACTION"),
+        ("requested_cents", True),
+        ("requested_cents", 0),
+        ("requested_cents", -1),
+    ],
+)
+def test_self_hashed_execution_receipt_rejects_invalid_action_or_amount(field, value):
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent),
+    )
+    forged = replace(receipt, **{field: value})
+    body = asdict(forged)
+    body.pop("receipt_hash")
+    forged = replace(
+        forged,
+        receipt_hash=canonical_hash({"schema": 1, **body}),
+    )
+
+    with pytest.raises(ValueError):
+        verify_carrier_action_execution_receipt(forged)
