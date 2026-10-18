@@ -10,38 +10,33 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Inspect exact public court orders 623 and 593 for claim 10002
+      - name: Install bounded open-source PDF text reader
+        run: python -m pip install --disable-pip-version-check --quiet pypdf==5.6.0
+      - name: Read public objection/order schedules only; do not persist court PDFs
         shell: bash
         run: |
           python - <<'PY'
-          import re,hashlib,subprocess,tempfile,os
+          import re,hashlib,io
           from urllib.request import Request,urlopen
-          entries=[(623,1227468),(593,1216147)]
-          for docket,id in entries:
-              url=f"https://document.epiq11.com/document/getdocumentsbydocket/?docketId={id}&projectCode=MCX&docketNumber={docket}&source=DM"
+          from pypdf import PdfReader
+          for docket,id in [(623,1227468),(593,1216147)]:
+              u=f"https://document.epiq11.com/document/getdocumentsbydocket/?docketId={id}&projectCode=MCX&docketNumber={docket}&source=DM"
               try:
-                  req=Request(url,headers={"User-Agent":"Mozilla/5.0 (public court records research)","Accept":"application/pdf"})
-                  with urlopen(req,timeout=25) as r:
-                      data=r.read(25_000_000)
-                      print("PUBLIC_DOCKET",docket,"HTTP",r.status,"TYPE",r.headers.get("Content-Type"),"LENGTH",len(data),"SHA256",hashlib.sha256(data).hexdigest())
-                  if data[:4]!=b"%PDF":
-                      print("NOT_PDF_FIRST_BYTES",repr(data[:70]))
-                      continue
-                  with tempfile.TemporaryDirectory() as temp:
-                      p=os.path.join(temp,"court_order.pdf")
-                      with open(p,"wb") as g:g.write(data)
-                      meta=subprocess.run(["pdfinfo",p],capture_output=True,text=True,timeout=12)
-                      print("PDF_METADATA",docket,[(x.strip()) for x in meta.stdout.splitlines() if x.startswith(("Pages:","File size:","Title:"))])
-                      run=subprocess.run(["pdftotext","-layout",p,"-"],capture_output=True,text=True,timeout=30)
-                      text=run.stdout[:2_000_000]
-                      print("PDF_TEXT_STATUS",docket,run.returncode,"CHARS",len(text))
-                      for needle in ("GlobalTranz","10002","25,954.47","1,496.52","24,457.95"):
-                          m=list(re.finditer(re.escape(needle),text,re.I))
-                          print("MATCH",docket,needle,len(m))
-                          for found in m[:6]:
-                              snippet=text[max(0,found.start()-350):min(len(text),found.end()+460)]
-                              print("CASE_SNIPPET",docket,needle," ".join(snippet.split())[:720])
+                  with urlopen(Request(u,headers={"User-Agent":"Mozilla/5.0 (public bankruptcy docket research)"}),timeout=25) as r:
+                      data=r.read(12_000_000)
+                      print("PUBLIC_PDF",docket,r.status,len(data),hashlib.sha256(data).hexdigest())
+                  if not data.startswith(b"%PDF"):continue
+                  pdf=PdfReader(io.BytesIO(data),strict=False)
+                  print("PDF_PAGES",docket,len(pdf.pages))
+                  for page_idx,page in enumerate(pdf.pages):
+                      text=page.extract_text() or ""
+                      for needle in ("GlobalTranz", "10002","25,954.47","1,496.52","24,457.95"):
+                          matches=list(re.finditer(re.escape(needle),text,re.I))
+                          for m in matches[:4]:
+                              excerpt=" ".join(text[max(0,m.start()-400):m.end()+550].split())
+                              print("MATCH_DOCKET_PAGE",docket,page_idx+1,needle,excerpt[:920])
+                  print("PDF_TEXT_REVIEW_COMPLETE",docket)
               except Exception as exc:
-                  print("PUBLIC_DOCKET_FETCH_FAILURE",docket,type(exc).__name__,str(exc)[:250])
-          print("No raw court documents or third-party invoice contents retained or committed.")
+                  print("DOCUMENT_EXTRACTION_FAILURE",docket,type(exc).__name__,str(exc)[:250])
+          print("Public court orders only; no original invoice PDFs, confidential data, or external outreach.")
           PY
