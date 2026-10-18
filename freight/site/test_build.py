@@ -294,12 +294,13 @@ class PublicBuildTests(unittest.TestCase):
             social = [
                 "https://www.facebook.com/p/Retally-61595467040747/",
                 "https://www.instagram.com/retallyrecovery/",
+                "https://www.linkedin.com/company/retallyrecovery/",
                 "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
             ]
             self.assertEqual(org.get("sameAs"), social)
             for url in social:
                 self.assertEqual(index.count('href="' + url + '"'), 1)
-            for name in ("Facebook", "Instagram", "YouTube"):
+            for name in ("Facebook", "Instagram", "LinkedIn", "YouTube"):
                 self.assertIn('aria-label="RETALLY on ' + name + ' (opens in a new tab)"', index)
             self.assertNotIn("amuhricaaa", index)
             self.assertEqual(
@@ -785,6 +786,7 @@ class RetallySocialFooterTests(unittest.TestCase):
             verified = (
                 "https://www.facebook.com/p/Retally-61595467040747/",
                 "https://www.instagram.com/retallyrecovery/",
+                "https://www.linkedin.com/company/retallyrecovery/",
                 "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
             )
             for name in builder.PUBLIC_CONTACT_PAGES:
@@ -795,16 +797,16 @@ class RetallySocialFooterTests(unittest.TestCase):
                     self.assertEqual(page.count('class="retally-social__links"'), 1)
                     for url in verified:
                         self.assertEqual(page.count('href="' + url + '"'), 1)
-                    for network in ("Facebook", "Instagram", "YouTube"):
+                    for network in ("Facebook", "Instagram", "LinkedIn", "YouTube"):
                         self.assertIn(
                             'aria-label="RETALLY on ' + network
                             + ' (opens in a new tab)"', page
                         )
                     social = page.split('<nav class="wrap retally-social"', 1)[1].split("</nav>", 1)[0]
-                    self.assertEqual(social.count('target="_blank" rel="noopener noreferrer"'), 3)
-                    self.assertEqual(social.count('focusable="false"'), 3)
-                    self.assertEqual(social.count('class="retally-social__brandmark '), 3)
-                    self.assertEqual(social.count('class="retally-social__button '), 3)
+                    self.assertEqual(social.count('target="_blank" rel="noopener noreferrer"'), 4)
+                    self.assertEqual(social.count('focusable="false"'), 4)
+                    self.assertEqual(social.count('class="retally-social__brandmark '), 4)
+                    self.assertEqual(social.count('class="retally-social__button '), 4)
                     for slug, network, url, detail, official_path in builder.SOCIAL_CHANNELS:
                         self.assertIn('retally-social__button--' + slug, social)
                         self.assertIn('retally-social__brandmark--' + slug, social)
@@ -812,8 +814,8 @@ class RetallySocialFooterTests(unittest.TestCase):
                         self.assertIn('>' + network + '</strong>', social)
                         self.assertIn('>' + detail + '</span>', social)
                     self.assertIn('foundry.css?v=retally-all-buttons-3d-20261010', page)
-                    self.assertEqual(social.count('<svg '), 3)
-                    self.assertNotIn("linkedin.com/company/retally", page.lower())
+                    self.assertEqual(social.count('<svg '), 4)
+                    self.assertNotIn("linkedin.com/in/", page.lower())
 
     def test_mobile_and_keyboard_presentation_are_not_icon_only(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -824,12 +826,14 @@ class RetallySocialFooterTests(unittest.TestCase):
                 ".site-footer .retally-social__button:focus-visible",
                 ".site-footer .retally-social__brandmark--facebook",
                 ".site-footer .retally-social__brandmark--instagram",
+                ".site-footer .retally-social__brandmark--linkedin",
                 ".site-footer .retally-social__brandmark--youtube",
                 "fill:#0866ff",
                 "fill:#ff0033",
                 "fill:#fff",
                 "background:linear-gradient(38deg,#ffdc80",
-                "grid-template-columns:repeat(3,minmax(0,1fr))",
+                "grid-template-columns:repeat(4,minmax(0,1fr))",
+                "grid-template-columns:repeat(2,minmax(0,1fr))",
                 "min-height:105px",
                 "@media(max-width:340px)",
                 "@media(prefers-reduced-motion:reduce)",
@@ -906,7 +910,8 @@ class RetallyAllButtonFinishTests(unittest.TestCase):
             self.assertIn('type="submit">Open My Free Audit Request</button>', page)
             self.assertIn('id="retallyChatLauncher"', page)
             self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
-            self.assertNotIn("linkedin.com/company/retally", page)
+            self.assertIn('href="https://www.linkedin.com/company/retallyrecovery/"', page)
+            self.assertNotIn("linkedin.com/in/", page.lower())
 
 if __name__ == "__main__":
     unittest.main()

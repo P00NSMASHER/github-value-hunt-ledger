@@ -561,7 +561,7 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  text-transform:uppercase;font-weight:800;line-height:1.55;
 }
 .site-footer .retally-social__links{
- display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
  gap:12px;min-width:0;
 }
 .site-footer .retally-social__button{
@@ -632,6 +632,12 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 .site-footer .retally-social__brandmark--instagram svg{
  width:25px;height:25px;fill:#fff;
 }
+.site-footer .retally-social__brandmark--linkedin{
+ border-radius:10px;background:#0a66c2;
+}
+.site-footer .retally-social__brandmark--linkedin svg{
+ width:26px;height:26px;fill:#fff;
+}
 .site-footer .retally-social__brandmark--youtube{
  border-radius:12px;background:#fff;
 }
@@ -657,6 +663,7 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 }
 @media(max-width:1020px) and (min-width:681px){
  .site-footer .retally-social{grid-template-columns:1fr;gap:14px;}
+ .site-footer .retally-social__links{grid-template-columns:repeat(2,minmax(0,1fr));}
  .site-footer .retally-social__button{padding:12px;gap:10px;}
 }
 @media(max-width:680px){
@@ -664,7 +671,7 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
   grid-template-columns:minmax(0,1fr);
   gap:16px;padding-block:24px 18px;
  }
- .site-footer .retally-social__links{gap:8px;}
+ .site-footer .retally-social__links{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
  .site-footer .retally-social__button{
   flex-direction:column;justify-content:center;
   gap:10px;min-height:105px;min-width:0;
