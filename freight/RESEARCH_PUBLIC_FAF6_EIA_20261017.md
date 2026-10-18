@@ -431,3 +431,49 @@ spend, a tariff, a recoverable loss, or a refund.
 This verified guide example is useful for testing population estimation
 methodology with original published numbers and variance; **it does
 not justify applying survey weights to RETALLY's 100-row extract**.
+
+
+### Authentic federal adjudicated overcharge-related dispute: an award is not recovered cash
+
+As a new, **separately labeled legal/evidence source** (not a shipment
+benchmark), RETALLY examined the official Federal Maritime Commission
+**Docket 2030(I)** publication. The agency's **April 28, 2026 Notice Not
+to Review** records that its March 27 small-claims initial decision became
+*administratively final*. The FMC ordered the respondent to pay **$8,668.79
+in reparations** plus **$985.72 interest**, or **$9,654.51 total**,
+by **May 13, 2026**.
+
+Official original publication:
+https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf
+
+This is authentic first-party government **award/order evidence** about a
+third-party dispute, not a RETALLY engagement, lender/bank statement,
+original billed-rate tariff, or independently witnessed refund.
+**No payment confirmation has been inspected**. An official payment
+order establishes a legal obligation recorded in the notice; it does NOT
+establish a successful cash transfer, actual satisfaction of the order,
+the respondent's current compliance, or money recovered for RETALLY.
+
+The frozen factual receipt
+`freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json`
+records the exact agency docket/date/source, separates reparations from
+interest in *integer cents*, and explicitly keeps
+`actual_money_recovered_cents=null` and
+`retally_customer_recoveries_cents=0`. It notes that only the
+publisher-indexed text was reviewed, not an independently hashed complete
+original PDF or any bank settlement statement.
+
+The offline guard and negative tests in
+`freight/public_fmc_adjudication_v1.py` /
+`freight/test_public_fmc_adjudication_v1.py`
+reject attempts to change awarded cents, add invented invoice rows,
+describe a payable judgment as paid, or claim the award as RETALLY
+customer proceeds. This example must remain a **separate external
+adjudication category**, not be mixed with BTS/EIA freight-flow rows
+or used to imply RETALLY has independently recovered any money.
+This is historical research, not legal advice on another person's case.
+
+Separate external confirmation of *receipt of funds* is required before
+any source may graduate from `ADJUDICATED_AWARD` to
+`ACTUALLY_RECEIVED_RECOVERY`. No external outreach, payment handling,
+litigation action or customer contact is performed.
