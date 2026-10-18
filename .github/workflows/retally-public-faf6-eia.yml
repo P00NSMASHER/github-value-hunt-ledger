@@ -6,6 +6,9 @@ on:
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_carrier_schedules_v1.py'
       - 'freight/public_cfs2022_prefix_v1.py'
+      - 'freight/public_cfs2022_official_example_v1.py'
+      - 'freight/test_public_cfs2022_official_example_v1.py'
+      - 'freight/fixtures/public_cfs2022_official_maryland_example.json'
       - 'freight/public_stb_waybill_prefix_v1.py'
       - 'freight/test_public_stb_waybill_prefix_v1.py'
       - 'freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt'
@@ -38,6 +41,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_faf6_eia_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_carrier_schedules_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_prefix_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_official_example_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
       - name: Prohibit invoice and recovery claim promotion
         run: |
@@ -61,6 +65,22 @@ jobs:
           assert data['faf6_state_pairs']['md_to_pa']['rows']==39
           assert data['faf6_state_pairs']['pa_to_md']['rows']==39
           print('Research-only acceptance: verified 78 BTS FAF6 source rows + 18 EIA observations. No invoice or money claims.')
+          PY
+      - name: Compare official full-PUMS Census Maryland example without inferring freight spending
+        run: |
+          PYTHONPATH=. python -m freight.public_cfs2022_official_example_v1 > /tmp/cfs_md_publisher_example.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/cfs_md_publisher_example.json').read_text())
+          assert r['pums_md_origin_unweighted_record_count']==612317
+          assert r['census_published_weighted_goods_value_usd']=='198598788295'
+          assert r['census_published_gvf_cv_percent']=='9.74'
+          assert r['country_or_route_total_freight_spend'] is None
+          assert r['100_prefix_rows_used_to_make_estimate'] is False
+          assert r['no_original_customer_tariff_invoice_or_recoveries'] is True
+          assert r['commercial_claim_clearance']=='NOT_ESTABLISHED'
+          print('Official Census MD goods-value example and CV verified; no customer invoice or recoveries.')
           PY
       - name: Verify carrier original date/index reference without asserting a customer tariff
         run: |
