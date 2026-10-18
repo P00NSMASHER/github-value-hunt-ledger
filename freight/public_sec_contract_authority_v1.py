@@ -40,13 +40,17 @@ EXPECTED={
   "carrier":"Western Oil Trans Inc",
   "url":"https://www.sec.gov/Archives/edgar/data/1337226/000092290707000474/form8kexh101_072507.htm",
   "fuel":LOCAL_FUEL,
+  "service":"Atkinson Ethanol Storage Site to O'Neill Ethanol Storage Site (Nebraska bulk ethanol)",
+  "assessment":"price checked on 15th and 30th; locked from original tender through transportation",
  },
  SWIFT:{
   "effective":"2005-02-28","shipper":"Swift & Company, Inc.",
   "carrier":"LOAD SOURCE LOGISTICS",
   "url":"https://www.sec.gov/Archives/edgar/data/757563/000129707705000148/mcagree.htm",
   "fuel":DOE_FUEL,
- }
+  "service":"Swift shipments under SEC-filed carrier contract form; current execution and lane-rate Appendices J/I/K are not independently authenticated",
+  "assessment":"index determined Monday or federal-holiday Tuesday; applies shipments beginning following Monday",
+ },
 }
 TOP_KEYS=frozenset({"schema_version","as_of_date","purpose","source_class","customer_role","contracts","shared_controls","custody_notes"})
 ALL_CONTROLS={
@@ -104,9 +108,12 @@ def verified_source_exhibits()->dict:
         or data["purpose"]!="real_original_SEC_filed_historical_shipper_carrier_contract_rate_source_not_invoice"
         or data["source_class"]!="SEC_FILED_HISTORICAL_CONTRACT_OR_FORM_EXHIBITS"
         or data["customer_role"]!="EXTERNAL_TO_RETALLY"
-        or type(data.get("custody_notes")) is not list
-        or len(data["custody_notes"])!=4
-        or not all(type(x) is str and len(x)>=60 for x in data["custody_notes"])
+        or data.get("custody_notes")!=[
+            "A signed NEDAK exhibit is reproduced in an SEC filing; the Swift form's carrier signature/completeness is not independently authenticated.",
+            "The two examples are published 2005/2007 historical filed references, not current agreed or amended terms.",
+            "SEC HTML bytes and signature authenticity were not separately cryptographically attested.",
+            "Every rate demonstration must use explicitly marked invented input values; no invoices, gallons moved, diesel paid or money recovered are proven.",
+        ]
         or data["shared_controls"]!=ALL_CONTROLS
         or type(data["contracts"]) is not list or len(data["contracts"])!=2):
         _fail("INVALID_SOURCE_OR_FINANCIAL_CLAIM")
@@ -120,7 +127,8 @@ def verified_source_exhibits()->dict:
         ref=EXPECTED[key]
         if (x["document_url"]!=ref["url"] or x["effective_date"]!=ref["effective"]
             or x["shipper"]!=ref["shipper"] or x["carrier"]!=ref["carrier"]
-            or x["fuel_index"]!=ref["fuel"]):
+            or x["fuel_index"]!=ref["fuel"] or x["service"]!=ref["service"]
+            or x["fuel_assessment"]!=ref["assessment"]):
             _fail("SHIPPERS_OR_AGREEMENT_OR_FUEL_AUTHORITY_CHANGED")
         if key==NEDAK:
             steps=x["published_fuel_table"]
@@ -146,7 +154,7 @@ def verified_source_exhibits()->dict:
             if seen!=NEDAK_TIERS:_fail("NEDAK_FUEL_SOURCE_TIER_MISMATCH")
         else:
             bands=x["selected_original_published_fuel_bands"]
-            if (x["units"]!="USD surcharge per loaded mile"
+            if (x["units"]!="USD fuel surcharge per contract-rated shipment mile"
                 or x["contract_rate_precedence"]!=["Appendix J","Appendix I","Appendix K"]
                 or x["carrier_must_include_fuel_as_separate_invoice_line"] is not True
                 or x["no_automatic_add_fuel_by_shipper"] is not True
