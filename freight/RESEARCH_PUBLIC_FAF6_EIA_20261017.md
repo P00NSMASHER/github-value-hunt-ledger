@@ -607,3 +607,27 @@ excluded from the seven original GAO historical positive collection
 decision counts and the 307 non-equivalent public freight rows.
 The negative validator, source artifact and exact case accounting
 are in `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`.
+
+
+### Another original GAO applied setoff later conceded improper
+
+[GAO B-197184 (March 26, 1980)](https://www.gao.gov/assets/b-197184.pdf)
+records GSA's earlier **$475.36 deduction** from Yellow Freight for
+an alleged overcharge originally collected by a separate carrier.
+GSA later **acknowledged the deduction was improper**, and GAO
+dismissed the review as moot with only a conditional allowance
+of the carrier's claim—**no actual reimbursing bank/Treasury payment
+has been independently proven**.
+
+The case is kept distinct from older GAO B-192974's **$5,141.05**
+improper bankruptcy-related offset, and from the seven
+historical *affirmative collection* decisions. It is a
+second `GAO_APPLIED_OFFSET_LATER_DISALLOWED` negative source, not a
+refund actually recovered by RETALLY, or even proof that the carrier
+was subsequently made whole.
+
+Its exact source URL, 1980 memorandum and conditional repayment
+limits are documented in
+`freight/RESEARCH_GAO_B197184_IMPROPER_SET_OFF_1980.md`.
+The source census keeps all **307** frozen market/survey reference
+rows separate from these original GAO legal histories.
