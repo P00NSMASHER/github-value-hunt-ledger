@@ -21,6 +21,13 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["SEC_contracts_not_in_307_public_observation_count"])
         self.assertTrue(data["SEC_2007_local_vs_2005_national_index_distinct"])
         self.assertTrue(data["SEC_no_original_customer_invoices_or_2026_contract_applicability"])
+        self.assertEqual(data["separate_Crowley_GSA_2023_2025_original_source_documents"],3)
+        self.assertEqual(data["separate_Crowley_GSA_financial_timeline_events"],4)
+        self.assertTrue(data["court_original_2023_DFTS_refund_promise_is_same_29_6m_as_GSA_reported_payment"])
+        self.assertTrue(data["court_budget_pair_not_two_independent_29_6m_payments"])
+        self.assertTrue(data["court_separate_Ocean_USC9_refund_35840_43_PROMISE_NOT_PAID"])
+        self.assertTrue(data["court_11_8m_claim_as_of_2025_NOT_AN_APPELLATE_AWARD_OR_PAID"])
+        self.assertFalse(data["court_private_statutory_setoff_right_for_RETALLY"])
         self.assertEqual(data["standalone_external_adjudication_records"],1)
         self.assertEqual(data["separate_original_GAO_historical_collection_decisions"],7)
         self.assertEqual(data["separate_GAO_reported_historical_collection_events"],9)
@@ -166,6 +173,32 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
             with self.subTest(changed=list(change)),patch.object(
                 src,"original_sec_contract_report",return_value={**original,**change}
             ):
+                with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                    src.snapshot()
+
+    def test_dftsi_2023_original_promise_and_reported_paid_amount_not_double_counted(self):
+        original=src.original_court_money_lineage()
+        with patch.object(src,"original_court_money_lineage",return_value={
+            **original,"GSA_FY2023_reported_vendor_refund_approx_cents":5920000000,
+        }):
+            with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                src.snapshot()
+        with patch.object(src,"original_court_money_lineage",return_value={
+            **original,"must_not_double_count_29_6m_as_59_2m":False,
+        }):
+            with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                src.snapshot()
+
+    def test_distinct_ocean_promise_and_claims_court_11800000_not_earned(self):
+        original=src.original_court_money_lineage()
+        for change in [
+            {"2023_Ocean_USC9_bank_payment_verified":True},
+            {"2025_11_8m_claim_was_awarded_or_paid_by_appeal":True},
+            {"RETALLY_customer_cash_recovered_cents":1180000000},
+            {"private_RETALLY_can_issue_statutory_GSA_offsets":True},
+        ]:
+            with self.subTest(change=change),patch.object(src,"original_court_money_lineage",
+                                                          return_value={**original,**change}):
                 with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                     src.snapshot()
 
