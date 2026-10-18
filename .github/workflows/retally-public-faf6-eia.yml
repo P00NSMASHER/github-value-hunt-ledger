@@ -1,9 +1,13 @@
-name: RETALLY Lab 14 Original Public Data Provenance (FAF6 / EIA)
+name: RETALLY Lab 14 Original Public Freight Evidence (BTS / EIA / Carrier)
 on:
   pull_request:
     paths:
       - '.github/workflows/retally-public-faf6-eia.yml'
       - 'freight/public_faf6_eia_v1.py'
+      - 'freight/public_carrier_schedules_v1.py'
+      - 'freight/test_public_carrier_schedules_v1.py'
+      - 'freight/fixtures/public_carrier_fuel_schedule_20261017.csv'
+      - 'freight/fixtures/public_carrier_surcharge_manifest_20261017.json'
       - 'freight/test_public_faf6_eia_v1.py'
       - 'freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv'
       - 'freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv'
@@ -24,6 +28,7 @@ jobs:
       - name: Verify only exact publicly reported flow and price source records
         run: |
           PYTHONPATH=. python -m unittest -v freight.test_public_faf6_eia_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_carrier_schedules_v1
       - name: Prohibit invoice and recovery claim promotion
         run: |
           PYTHONPATH=. python -m freight.public_faf6_eia_v1 > /tmp/public_benchmark_report.json
@@ -46,4 +51,22 @@ jobs:
           assert data['faf6_state_pairs']['md_to_pa']['rows']==39
           assert data['faf6_state_pairs']['pa_to_md']['rows']==39
           print('Research-only acceptance: verified 78 BTS FAF6 source rows + 18 EIA observations. No invoice or money claims.')
+          PY
+      - name: Verify carrier original date/index reference without asserting a customer tariff
+        run: |
+          PYTHONPATH=. python -m freight.public_carrier_schedules_v1 > /tmp/carrier_public_reference.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/carrier_public_reference.json').read_text())
+          assert report['source_rows']==11 and report['carrier_source_families']==3
+          assert report['fedex_freight_eia_weekly_pairs']==6
+          assert report['ups_domestic_ground_observations']==4
+          assert report['union_pacific_intermodal_announcements']==1
+          assert report['customer_agreement_still_controls'] is True
+          assert report['public_surcharge_is_not_billed_invoice_charge'] is True
+          assert report['verified_customer_invoice_count']==0
+          assert report['verified_overcharge_cents'] is None
+          assert report['financial_recovery_authorized'] is False
+          print('Research-only acceptance: eleven official carrier historical schedule facts. No customer tariff or recovery proof.')
           PY
