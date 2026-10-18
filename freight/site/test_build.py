@@ -972,5 +972,30 @@ class RetallyOrganicProofCardTests(unittest.TestCase):
             self.assertIn('href="freight-credit-rebill-audit.html"', (root / names[1]).read_text())
 
 
+
+class RetallyLtlEvidenceComparatorTests(unittest.TestCase):
+    """Buyer source comparisons have no network, file uploads or class guesses."""
+
+    def test_public_comparator_is_bundled_and_discoverable_without_customer_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = build(Path(temp) / "public")
+            page = (out / "ltl-reweigh-evidence-comparator.html").read_text()
+            javascript = (out / "ltl-evidence-comparator.js").read_text()
+            for item in ('id="ltlCompareForm"', 'id="ltlCompareResults"',
+                         'src="ltl-evidence-comparator.js?v=20261018a"',
+                         'NMFTA', 'identical handling unit', 'property="og:title"'):
+                self.assertIn(item, page)
+            for item in ('type="file"', 'name="fullName"'):
+                self.assertNotIn(item, page)
+            for item in ('fetch(', 'XMLHttpRequest', 'localStorage', 'sessionStorage', 'sendBeacon'):
+                self.assertNotIn(item, javascript)
+            self.assertIn('href="ltl-reweigh-evidence-comparator.html"', (out / "index.html").read_text())
+            self.assertIn('href="ltl-reweigh-evidence-comparator.html"',
+                          (out / "ltl-reweigh-reclass-checklist.html").read_text())
+            self.assertIn('ltl-reweigh-evidence-comparator.html', (out / "sitemap.xml").read_text())
+            self.assertIn('ltl-evidence-comparator.js', builder.PUBLIC_FILES)
+            self.assertNotIn('test_ltl_evidence_comparator.cjs', builder.PUBLIC_FILES)
+
+
 if __name__ == "__main__":
     unittest.main()
