@@ -483,3 +483,24 @@ def test_review_bound_to_old_finding_proof_cannot_authorize_changed_finding():
 def test_authorization_identity_rejects_alias_forms(authorization_id):
     with pytest.raises(ValueError, match="authorization_id"):
         auth(authorization_id=authorization_id)
+
+def test_authorized_cents_rejects_boolean_alias():
+    with pytest.raises(ValueError, match="authorized_cents"):
+        auth(authorized_cents=True)
+
+
+def test_requested_cents_rejects_boolean_alias():
+    a = auth()
+    with pytest.raises(ValueError, match="requested_cents"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=True,
+        )
