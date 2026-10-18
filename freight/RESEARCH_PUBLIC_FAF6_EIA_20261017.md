@@ -586,3 +586,46 @@ collections equals $6,170.63 allowed charges. The original PDF
 page text was directly reviewed; **independent original PDF
 SHA-256 and bank/Treasury posting verification remain missing**.
 Do not treat the two events as two shipments or as a RETALLY recovery.
+
+
+## Source-grade contract authority: original SEC-filed transportation agreements
+
+Two actual publicly filed historical shipper/carrier agreements establish
+a **different, contract-specific type of real research evidence** from
+modeled BTS flows, EIA diesel retail averages, generic carrier surcharge
+tables or public GAO/GSA disputes.
+
+- [NEDAK Ethanol / Western Oil Trans (SEC Exhibit 10.1, July 19 2007)](https://www.sec.gov/Archives/edgar/data/1337226/000092290707000474/form8kexh101_072507.htm):
+  actual historical **$0.01299 per ethanol gallon unloaded** for the
+  Atkinson-to-O'Neill storage route, with fuel increments per gallon tied
+  to **nonaffiliated local Nebraska #2 diesel price**, not national EIA.
+  Seven explicit fuel-price/surcharge pairs are recorded. Do not interpolate
+  or infer current contract amendments or invoice amounts.
+- [Swift & Company / Load Source Logistics (SEC Exhibit 10.8, February 28 2005)](https://www.sec.gov/Archives/edgar/data/757563/000129707705000148/mcagree.htm):
+  its historical carrier contract form instead uses a **national DOE
+  diesel index** and a **cents-per-mile** fuel schedule, with a separate
+  fuel invoice line and precedence among negotiated lane appendices
+  J → I → K. Current execution/signature and complete rate appendix
+  coverage are unverified. A fuel surcharge without the original lane
+  rate is **not** the total invoice charge.
+
+Both original rate families are frozen in
+`freight/fixtures/public_sec_2005_2007_original_carrier_rate_contracts.json`
+with source-bound evidence tests and deterministic **synthetic-only** arithmetic
+in `freight/public_sec_contract_authority_v1.py`. SEC publication does not
+establish RETALLY customer authority or a current, unamended contract.
+The wrong fuel index or wrong units, unsupported pricing band,
+fabricated contract signature or invoice, unreviewed 2026 EIA pricing,
+and marketed overcharge result **must fail closed**.
+
+These are **two distinct historical agreement documents**, not two
+additional shipment observations. The five prior public freight categories
+remain **307** bounded rows; the Census guide example, FMC order,
+seven historical GAO decisions and GSA erroneous-overcharge repayment
+remain separately attributed original publication classes.
+
+No actual RETALLY customer freight bill, 2026 contract, payment credit
+or verified dollar recovered has been obtained. The 26 historical findings
+and 18 independent customer-approval gates remain unresolved. The research
+source-census and original 14-lab Control Center are review-only;
+no production or public marketing claim is authorized.

@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "as_of_date": "2026-10-18",
+  "purpose": "real_original_SEC_filed_historical_shipper_carrier_contract_rate_source_not_invoice",
+  "source_class": "SEC_FILED_HISTORICAL_CONTRACT_OR_FORM_EXHIBITS",
+  "customer_role": "EXTERNAL_TO_RETALLY",
+  "contracts": [
+    {
+      "key": "NEDAK_WESTERN_2007",
+      "document_url": "https://www.sec.gov/Archives/edgar/data/1337226/000092290707000474/form8kexh101_072507.htm",
+      "exhibit": "EX-10.1, Exhibit A Transportation Rate/Bulk Fuel Surcharge",
+      "effective_date": "2007-07-19",
+      "shipper": "NEDAK Ethanol LLC",
+      "carrier": "Western Oil Trans Inc",
+      "service": "Atkinson Ethanol Storage Site to O'Neill Ethanol Storage Site (Nebraska bulk ethanol)",
+      "units": "USD per gallon of ethanol unloaded",
+      "base_rate_usd_per_unloaded_gallon": "0.01299",
+      "fuel_index": "LOCAL_NONAFFILIATED_NO2_DIESEL_RETAIL_O_NEILL_NE",
+      "fuel_assessment": "price checked on 15th and 30th; locked from original tender through transportation",
+      "carrier_invoice_forms": [
+        "freight_bill",
+        "EDI_as_invoice"
+      ],
+      "contract_supersedes_conflicting_tariff": true,
+      "published_fuel_table": [
+        {
+          "price_usd_per_gallon": "2.499",
+          "surcharge_usd_per_unloaded_gallon": "0"
+        },
+        {
+          "price_usd_per_gallon": "2.749",
+          "surcharge_usd_per_unloaded_gallon": "0.0003"
+        },
+        {
+          "price_usd_per_gallon": "2.999",
+          "surcharge_usd_per_unloaded_gallon": "0.0006"
+        },
+        {
+          "price_usd_per_gallon": "3.249",
+          "surcharge_usd_per_unloaded_gallon": "0.0009"
+        },
+        {
+          "price_usd_per_gallon": "3.499",
+          "surcharge_usd_per_unloaded_gallon": "0.0012"
+        },
+        {
+          "price_usd_per_gallon": "3.749",
+          "surcharge_usd_per_unloaded_gallon": "0.0015"
+        },
+        {
+          "price_usd_per_gallon": "3.999",
+          "surcharge_usd_per_unloaded_gallon": "0.0018"
+        }
+      ],
+      "off_table_fuel_prices_proven_by_this_excerpt": false,
+      "current_operational_status_verified": false,
+      "actual_billed_shipment_invoice_seen": false,
+      "original_EDGAR_document_binary_hashed": false
+    },
+    {
+      "key": "SWIFT_LOAD_SOURCE_2005",
+      "document_url": "https://www.sec.gov/Archives/edgar/data/757563/000129707705000148/mcagree.htm",
+      "exhibit": "EX-10.8 Motor Carrier Transportation Agreement, Appendix D Fuel Surcharge Policy",
+      "effective_date": "2005-02-28",
+      "shipper": "Swift & Company, Inc.",
+      "carrier": "LOAD SOURCE LOGISTICS",
+      "service": "Swift shipments under SEC-filed carrier contract form; current execution and lane-rate Appendices J/I/K are not independently authenticated",
+      "units": "USD fuel surcharge per contract-rated shipment mile",
+      "fuel_index": "DOE_NATIONAL_AVERAGE_DIESEL_MON_OR_FEDERAL_HOLIDAY_TUE",
+      "fuel_assessment": "index determined Monday or federal-holiday Tuesday; applies shipments beginning following Monday",
+      "contract_rate_precedence": [
+        "Appendix J",
+        "Appendix I",
+        "Appendix K"
+      ],
+      "carrier_must_include_fuel_as_separate_invoice_line": true,
+      "no_automatic_add_fuel_by_shipper": true,
+      "selected_original_published_fuel_bands": [
+        {
+          "min_usd_per_gallon": "1.200",
+          "max_usd_per_gallon": "1.249",
+          "surcharge_cents_per_mile": 0
+        },
+        {
+          "min_usd_per_gallon": "1.250",
+          "max_usd_per_gallon": "1.299",
+          "surcharge_cents_per_mile": 1
+        },
+        {
+          "min_usd_per_gallon": "1.300",
+          "max_usd_per_gallon": "1.349",
+          "surcharge_cents_per_mile": 2
+        },
+        {
+          "min_usd_per_gallon": "1.350",
+          "max_usd_per_gallon": "1.399",
+          "surcharge_cents_per_mile": 3
+        },
+        {
+          "min_usd_per_gallon": "1.400",
+          "max_usd_per_gallon": "1.449",
+          "surcharge_cents_per_mile": 4
+        },
+        {
+          "min_usd_per_gallon": "1.450",
+          "max_usd_per_gallon": "1.499",
+          "surcharge_cents_per_mile": 5
+        },
+        {
+          "min_usd_per_gallon": "1.500",
+          "max_usd_per_gallon": "1.549",
+          "surcharge_cents_per_mile": 6
+        }
+      ],
+      "off_band_fuel_prices_proven_by_this_excerpt": false,
+      "current_operational_status_verified": false,
+      "actual_invoice_and_lane_Appendices_seen": false,
+      "original_EDGAR_document_binary_hashed": false,
+      "carrier_signature_independently_authenticated": false
+    }
+  ],
+  "shared_controls": {
+    "actual_RETALLY_customer_contracts": 0,
+    "actual_RETALLY_customer_invoices": 0,
+    "RETALLY_verified_overcharge_cents": null,
+    "RETALLY_verified_recoveries_cents": 0,
+    "source_excerpts_do_not_prove_current_terms": true,
+    "no_price_estimate_beyond_listed_index_tiers": true,
+    "synthetic_calculations_only": true,
+    "disagreement_requires_actual_signed_contract_tariff_and_original_invoice": true,
+    "commercial_claim_clearance": "NO_GO"
+  },
+  "custody_notes": [
+    "A signed NEDAK exhibit is reproduced in an SEC filing; the Swift form's carrier signature/completeness is not independently authenticated.",
+    "The two examples are published 2005/2007 historical filed references, not current agreed or amended terms.",
+    "SEC HTML bytes and signature authenticity were not separately cryptographically attested.",
+    "Every rate demonstration must use explicitly marked invented input values; no invoices, gallons moved, diesel paid or money recovered are proven."
+  ]
+}

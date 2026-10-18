@@ -17,6 +17,10 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertEqual(data["total_bounded_observations"],307)
         self.assertEqual(len(data["original_public_source_record_counts"]),5)
         self.assertEqual(data["standalone_official_publisher_examples"],1)
+        self.assertEqual(data["separate_original_SEC_historical_carrier_agreements"],2)
+        self.assertTrue(data["SEC_contracts_not_in_307_public_observation_count"])
+        self.assertTrue(data["SEC_2007_local_vs_2005_national_index_distinct"])
+        self.assertTrue(data["SEC_no_original_customer_invoices_or_2026_contract_applicability"])
         self.assertEqual(data["standalone_external_adjudication_records"],1)
         self.assertEqual(data["separate_original_GAO_historical_collection_decisions"],7)
         self.assertEqual(data["separate_GAO_reported_historical_collection_events"],9)
@@ -137,6 +141,33 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                         ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
                     ):
                         src.snapshot()
+
+    def test_source_census_rejects_2026_eia_substitution_for_local_2007_rate(self):
+        original=src.original_sec_contract_report()
+        with patch.object(src,"original_sec_contract_report",return_value={
+            **original,"2026_EIA_prices_not_approved_for_2007_local_index":False,
+        }):
+            with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                src.snapshot()
+
+    def test_forged_current_customer_contract_or_wrong_2005_fuel_units_fail(self):
+        original=src.original_sec_contract_report()
+        for change in [
+            {"actual_RETALLY_customer_invoices":1},
+            {"historical_governing_index_methods":{
+                "NEDAK_WESTERN_2007":"DOE_NATIONAL_AVERAGE_DIESEL_MON_OR_FEDERAL_HOLIDAY_TUE",
+                "SWIFT_LOAD_SOURCE_2005":"LOCAL_NONAFFILIATED_NO2_DIESEL_RETAIL_O_NEILL_NE",
+            }},
+            {"NEDAK_illustration_not_actual_invoice":{
+                **original["NEDAK_illustration_not_actual_invoice"],
+                "hypothetical_unamended_freight_charge_usd":"14.33",
+            }},
+        ]:
+            with self.subTest(changed=list(change)),patch.object(
+                src,"original_sec_contract_report",return_value={**original,**change}
+            ):
+                with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                    src.snapshot()
 
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
