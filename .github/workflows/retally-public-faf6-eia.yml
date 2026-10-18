@@ -6,6 +6,9 @@ on:
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gsa_transport_audit_fund_v1.py'
+      - 'freight/test_public_gsa_transport_audit_fund_v1.py'
+      - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
       - 'freight/public_gao_setoff_reversal_v1.py'
       - 'freight/test_public_gao_setoff_reversal_v1.py'
       - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
@@ -61,6 +64,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
       - name: Reconcile all original public research source families in sanitized evidence report
@@ -98,6 +102,13 @@ jobs:
           assert data['GAO_1979_reversal_reimbursement_not_verified'] is True
           assert data['GAO_1979_negative_case_not_approved_collection'] is True
           assert data['GAO_1979_private_setoff_authority_not_established'] is True
+          assert data['GSA_FY2023_original_accounting_receipts_thousands_USD']==12354
+          assert data['GSA_FY2024_original_receipts_PLAN_thousands_USD']==4168
+          assert data['GSA_FY2025_original_receipts_PLAN_thousands_USD']==12506
+          assert data['GSA_FY2023_transfer_to_suspense_thousands_USD']==-20674
+          assert data['GSA_appropriation_table_rows_separately_verified']==7
+          assert data['GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof'] is True
+          assert data['GSA_program_receipts_cannot_establish_RETALLY_recovery_rate'] is True
           assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
           assert data['stb_sample_accounting_year_histogram']=={'2024':100}
           assert data['fmc_award_actual_cash_received_verified'] is False
