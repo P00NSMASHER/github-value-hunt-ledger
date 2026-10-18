@@ -913,5 +913,29 @@ class RetallyAllButtonFinishTests(unittest.TestCase):
             self.assertIn('href="https://www.linkedin.com/company/retallyrecovery/"', page)
             self.assertNotIn("linkedin.com/in/", page.lower())
 
+
+class RetallyOrganicProofCardTests(unittest.TestCase):
+    """Original free buyer resources must be printable and never solicit customer files."""
+
+    def test_public_guides_are_discoverable_and_upload_free(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = build(Path(temp) / "site")
+            names = ("freight-credit-rebill-audit.html", "ltl-reweigh-reclass-checklist.html")
+            for name in names:
+                page = (root / name).read_text(encoding="utf-8")
+                self.assertIn('class="retally-fieldkit"', page)
+                self.assertIn("No account required", page)
+                self.assertIn('href="./#start-audit"', page)
+                self.assertNotIn('type="file"', page.lower())
+                self.assertIn('property="og:title"', page)
+            home = (root / "index.html").read_text(encoding="utf-8")
+            sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
+            for name in names:
+                self.assertIn('href="' + name + '"', home)
+                self.assertEqual(sitemap.count(name), 1)
+            self.assertIn('href="ltl-reweigh-reclass-checklist.html"', (root / names[0]).read_text())
+            self.assertIn('href="freight-credit-rebill-audit.html"', (root / names[1]).read_text())
+
+
 if __name__ == "__main__":
     unittest.main()
