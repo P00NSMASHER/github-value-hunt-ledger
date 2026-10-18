@@ -42,6 +42,12 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["GAO_1979_reversal_reimbursement_not_verified"])
         self.assertTrue(data["GAO_1979_negative_case_not_approved_collection"])
         self.assertTrue(data["GAO_1979_private_setoff_authority_not_established"])
+        self.assertEqual(data["separate_1980_GAO_improper_collection_concession_decisions"],1)
+        self.assertEqual(data["GAO_1980_B197184_improper_collected_offset_cents"],47536)
+        self.assertTrue(data["GAO_1980_B197184_original_GSA_admission_and_GAO_moot_dismissal"])
+        self.assertTrue(data["GAO_1980_B197184_repayment_not_confirmed"])
+        self.assertTrue(data["GAO_1980_B197184_not_in_approved_collection_tally"])
+        self.assertEqual(data["two_distinct_GAO_applied_but_later_disallowed_offset_cases"],2)
         self.assertEqual(data["GSA_FY2023_original_accounting_receipts_thousands_USD"],12354)
         self.assertEqual(data["GSA_FY2024_original_receipts_PLAN_thousands_USD"],4168)
         self.assertEqual(data["GSA_FY2025_original_receipts_PLAN_thousands_USD"],12506)
@@ -170,6 +176,24 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_original_1980_wrongful_offset_cannot_be_called_retained_recovery(self):
+        original=src.verified_1980_improper_offset()
+        for key,wrong in [
+            ("GSA_later_admitted_setoff_wrong",False),
+            ("carrier_actual_repayment_confirmed",True),
+            ("confirmed_carrier_bank_disbursement_cents",47536),
+            ("permanent_legally_retained_government_collection_cents",47536),
+            ("real_RETALLY_cash_recovered_cents",47536),
+            ("distinct_from_GAO_B192974_larger_improper_setoff",False),
+        ]:
+            with self.subTest(key=key):
+                with patch.object(src,"verified_1980_improper_offset",
+                                  return_value={**original,key:wrong}):
+                    with self.assertRaisesRegex(
+                        ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
+                    ):
+                        src.snapshot()
+
     def test_false_gsa_budget_receipts_are_not_retally_cash_proof(self):
         original=src.gsa_fund_accounting()
         for key,val in [
@@ -206,6 +230,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("no original bank/Treasury postings",html)
         self.assertIn("ERRONEOUS notices of overcharge",html)
         self.assertIn("GAO decision found $5,141.05",html)
+        self.assertIn("an applied $475.36 offset",html)
         self.assertIn("FY2024/25 PLANNED values",html)
         self.assertIn("federal appellate decision restricted GSA authority",html)
         self.assertIn("$11.8M demand are NOT validated recovery money",html)
