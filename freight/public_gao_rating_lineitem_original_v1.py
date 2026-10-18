@@ -89,6 +89,14 @@ B186603={
 }
 SCOPE="TWO_GAO_PUBLISHED_HISTORICAL_RATE_AND_DOCUMENT_CORRECTION_CASES"
 EVIDENCE_LEVEL="ORIGINAL_GAO_PUBLIC_DECISION_TEXT_NOT_INDEPENDENT_ORIGINAL_BILL_TARIFF_OR_TREASURY"
+SOURCE_RESTRICTIONS=(
+ "Decisions apply to historical federal shipments; current private freight contracts and tariff terms are not proved",
+ "Original payment and setoff amounts come from published GAO decision texts, not independently obtained remittance or bank evidence",
+ "A post-payment bill-of-lading correction requires separately established source authority and cannot silently rewrite the original billing context",
+ "A GAO recommendation to allow a reclaimed amount does not independently prove repayment to the carrier",
+ "Shipments in the same GAO decision are not the same invoice and must never be summed into a recovery rate",
+ "No RETALLY customer invoices, actual recovered customer cash, commercial authority or private carrier adjustments were obtained"
+)
 
 def _deny(reason:str)->None:
     raise ValueError("GAO_RATING_SOURCE_"+reason)
@@ -120,9 +128,8 @@ def reviewed_source()->dict:
             "retally_actual_customer_invoices","retally_verified_recoveries_cents",
             "bank_or_treasury_receipts_independently_examined"))
         or data["verified_commercial_recovery_clearance"] is not False
-        or not isinstance(data["general_prohibitions"],list)
-        or len(data["general_prohibitions"])!=6
-        or any(type(x) is not str or len(x)<35 for x in data["general_prohibitions"])
+        or type(data["general_prohibitions"]) is not list
+        or tuple(data["general_prohibitions"])!=SOURCE_RESTRICTIONS
         or type(data["sources"]) is not list or len(data["sources"])!=2
         or data["sources"][0]!=B160344 or data["sources"][1]!=B186603):
         _deny("DOCUMENT_OR_CUSTOMER_AUTHORITY_CHANGED")
