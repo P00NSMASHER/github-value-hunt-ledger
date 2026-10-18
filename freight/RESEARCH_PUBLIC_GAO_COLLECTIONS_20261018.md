@@ -214,3 +214,52 @@ binding on prospective private commercial clients.
 
 **Evidence tier: PUBLISHED_GAO_SETTLEMENT_REVERSAL_OR_DISALLOWANCE;
 PAYMENT_BACK_UNVERIFIED; FINAL_NET_RECOVERY_UNVERIFIED.**
+
+
+## Original government transport-audit fund account: FY2023 ACTUAL vs later PLANS
+
+The same official
+[GSA FY2025 Congressional Justification](https://www.gsa.gov/system/files/GSA%20FY%202025%20Congressional%20Justification.pdf),
+**Permanent Budget Authority, printed page P-5** (PDF page 294 if counted
+from page 1), reports actual and planned **special fund** accounting
+in **thousands of dollars**:
+
+| Official government accounting row | FY2023 actual | FY2024 plan | FY2025 plan |
+|---|---:|---:|---:|
+| Special Fund Receipts | **$12,354 thousand** | $4,168 thousand | $12,506 thousand |
+| Transfer to Suspense Fund to Pay Transportation Service Provider | **($20,674 thousand)** | Not shown | Not shown |
+| Annual appropriated obligations | **$10,960 thousand** | $9,728 thousand | $11,565 thousand |
+
+**Crucial limitations:** A 2023 receipt-account inflow is a distinct fund
+accounting line, not documentary evidence of any one freight customer
+having been overcharged. FY2024 and FY2025 rows are **budget plans**, not
+actual receipts. The $20.674 million transfer draws from a fund with
+prior-year balances; do not subtract it from $12.354 million in **same-year
+receipts** and misinterpret the result as the program's return on
+investment or recoverable cash.
+
+The original GSA note also says the vendor payment was approximately
+$29.6 million, funded by about $20.7 million from the receipts account
+and $8.9 million from the suspense account. The precise table transfer
+$20.674 million rounds to **$20.7 million at the one-decimal-million
+narrative precision**. The approximate narrative is not a bank voucher
+or a cents-accurate transferred sum.
+
+`freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json`
+preserves seven original accounting numbers with separate fiscal year,
+reported ACTUAL/PLAN status, original unit `USD THOUSANDS`, precise
+negative transfer direction and public source page. The isolated offline
+validator and negative tests in
+`freight/public_gsa_transport_audit_fund_v1.py` reject:
+- presenting FY2024 or FY2025 plans as realized receipts;
+- changing reported amount, year, transfer sign, currency units, or source;
+- claiming the payment to the vendor was customer money recovered;
+- confusing the fund with a verified individual customer invoice,
+  independently authenticated Treasury/bank posting or available
+  RETALLY fee-based recovery performance.
+
+This source is an extension of the **same GSA report already used for
+the FY2023 $29.6 million corrective vendor payment**, not a new customer
+case or one of the seven GAO positive collections. It adds **seven fund
+accounting line items** kept outside the 307 bounded BTS/EIA/CFS/STB
+freight market data observations and outside real customer recoveries.
