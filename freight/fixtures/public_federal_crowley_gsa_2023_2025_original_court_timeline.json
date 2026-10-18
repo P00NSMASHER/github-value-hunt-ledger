@@ -22,10 +22,10 @@
       "publisher": "U.S. General Services Administration",
       "official_url": "https://www.gsa.gov/system/files/GSA%20FY%202025%20Congressional%20Justification.pdf",
       "case_docket": "GSA FY2025 Congressional Justification, Transportation Audits P-2/P-5",
-      "decided": "2024-03-01",
-      "source_document_date_is_approximate": true,
       "page_location": "PDF pages 291–294: FY2023 program narrative and funding footnote",
-      "full_original_source_pdf_downloaded_and_sha_verified": false
+      "full_original_source_pdf_downloaded_and_sha_verified": false,
+      "document_fiscal_budget_year": 2025,
+      "exact_publisher_release_date_unverified": true
     },
     {
       "id": "CADC_2025_CROWLEY_APPEAL",
