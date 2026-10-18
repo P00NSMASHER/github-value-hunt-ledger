@@ -92,3 +92,62 @@ refund-to-carrier negative tests. CI:
 
 **Disposition: ORIGINAL_GAO_AGENCY_COLLECTION_ACCOUNTS_VERIFIED_AS_PUBLISHED;
 INDEPENDENT_BANK_VERIFICATION_MISSING; NO RETALLY CASH OR RECOVERY CLAIM.**
+
+
+## Contemporary false-positive repayment — GSA's own financial report
+
+The U.S. General Services Administration's **FY 2025 Congressional
+Justification, Transportation Audit Contracts and Contract
+Administration**, printed pages P-2 through P-5, reports that **in FY
+2023 the program made a voluntary $29.6 million payment back to a
+Defense Department vendor** following contracting-officer decisions
+that earlier Notices of Overcharge were erroneous.
+
+Original first-party source:
+https://www.gsa.gov/system/files/GSA%20FY%202025%20Congressional%20Justification.pdf
+
+The report's financial narrative allocates approximately **$20.7 million
+from the receipt account** and **$8.9 million from the suspense
+account** to that payment, summing to the $29.6 million the agency
+reported. The report separately says litigation **could require up
+to another $11.8 million** paid to that vendor; this amount is
+*contingent/unresolved*, **not a second confirmed payment**.
+
+Independent related public case context:
+[GAO B-421982](https://www.gao.gov/products/b-421982) describes
+Crowley's defense transportation contract overcharge disputes.
+The underlying contract's competent contracting officer reached
+decisions contradicting GSA's audit rate interpretation. Those
+statutory/contractual boundaries are **specific to that federal
+procurement setting** and cannot be generalized to RETALLY's
+potential private business customers.
+
+`freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json`
+freezes only the original GSA source, amount, fiscal year, payment
+**direction** and uncertainty. The offline checker and tests in
+`freight/public_gsa_false_positive_payment_v1.py` strictly reject:
+- calling the **government-to-vendor refund** money recovered **by RETALLY**;
+- treating the possible **$11.8 million additional liability** as already paid;
+- claiming underlying invoice/contract image review, a personally inspected
+  bank posting or independently hashed complete original GSA PDF;
+- silently mixing this corrective repayment with older GAO
+  government-reported overcharge collections and the FMC unpaid award.
+
+**Critical conclusion:** A notice or deduction can turn out to be
+erroneous; collection is not permanent until contractual authority,
+independent review, repayment/reversal and final financial custody
+are established. Claiming financial success too early exposes the
+customer to additional legal and accounting risk. The GSA document
+is first-party official publisher evidence of an accounting payment
+reported by the agency, NOT a direct bank/Treasury transfer receipt
+inspected by RETALLY.
+
+As separately documented in GSA's FY2026 congressional justification,
+GSA was beginning to wind down its centralized Transportation
+Audits program after changing/delegating agency authority in 2025.
+These historical GAO/GSA cases **do not establish today's legal
+scope or a private company's power to offset carrier balances**.
+
+No real RETALLY client/customer freight invoice, actual carrier
+settlement, real customer recovery or recoverable-performance figure
+has been acquired or validated.
