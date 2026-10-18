@@ -7,6 +7,9 @@ on:
       - 'freight/public_carrier_schedules_v1.py'
       - 'freight/public_cfs2022_prefix_v1.py'
       - 'freight/public_cfs2022_official_example_v1.py'
+      - 'freight/public_fmc_adjudication_v1.py'
+      - 'freight/test_public_fmc_adjudication_v1.py'
+      - 'freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json'
       - 'freight/test_public_cfs2022_official_example_v1.py'
       - 'freight/fixtures/public_cfs2022_official_maryland_example.json'
       - 'freight/public_stb_waybill_prefix_v1.py'
@@ -42,6 +45,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_carrier_schedules_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_official_example_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
       - name: Prohibit invoice and recovery claim promotion
         run: |
@@ -81,6 +85,23 @@ jobs:
           assert r['no_original_customer_tariff_invoice_or_recoveries'] is True
           assert r['commercial_claim_clearance']=='NOT_ESTABLISHED'
           print('Official Census MD goods-value example and CV verified; no customer invoice or recoveries.')
+          PY
+      - name: Hold adjudicated FMC third-party award separately from verified payment
+        run: |
+          PYTHONPATH=. python -m freight.public_fmc_adjudication_v1 > /tmp/fmc_public_award.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/fmc_public_award.json').read_text())
+          assert r['documented_final_reparations_order_cents']==965451
+          assert r['documented_reparations_cents']==866879
+          assert r['documented_interest_cents']==98572
+          assert r['administratively_final_as_of_2026_04_28'] is True
+          assert r['actual_payment_verified_cents'] is None
+          assert r['claimant_bank_or_payment_receipt_confirmed'] is False
+          assert r['retally_validated_recovery_cents']==0
+          assert r['customer_recovery_or_marketing_authority']=='NOT_ESTABLISHED'
+          print('Original FMC award verified as award only; no original customer settlement or RETALLY recovery.')
           PY
       - name: Verify carrier original date/index reference without asserting a customer tariff
         run: |
