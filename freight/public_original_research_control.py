@@ -172,7 +172,7 @@ def snapshot() -> dict:
         and lineitem["government_B160344_reported_collection_by_setoff_cents"]==13588
         and lineitem["government_B160344_paid_date_precedes_corrected_description"] is True
         and lineitem["government_B186603_chair_GBL_origin_disproved"] is True
-        and lineitem["government_B186603_chair_13328_setoff_later_disallowed_in_source"] is True
+        and lineitem["government_B186603_chair_13328_setoff_origin_basis_rebutted_claim_allowance_conditional"] is True
         and lineitem["government_B186603_chair_repayment_bank_receipt_verified"] is False
         and lineitem["government_B186603_blanket_5765_offset_separately_recorded"] is True
         and lineitem["government_B186603_blanket_2290_certificate_not_proved_paid"] is True
