@@ -22,6 +22,7 @@ from freight.public_cfs2022_official_example_v1 import verified_published_exampl
 from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
+from freight.public_sec_contract_authority_v1 import report as original_sec_contract_report
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -46,6 +47,7 @@ def snapshot() -> dict:
     fmc=verified_public_order()
     gao=public_collection_report()
     gsa=gsa_false_positive_refund()
+    sec=original_sec_contract_report()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -116,6 +118,21 @@ def snapshot() -> dict:
         and gsa["validated_RETALLY_customer_cash_cents"]==0
         and gsa["independent_vendor_bank_statement_seen"] is False
         and gsa["commercial_recovery_claim"]=="NO_GO"
+        and sec["independently_published_original_SEC_agreements"]==2
+        and sec["NEDAK_2007_published_rate_rows"]==7
+        and sec["SWIFT_2005_selected_fuel_bands"]==7
+        and sec["historical_governing_index_methods"]=={
+            "NEDAK_WESTERN_2007":"LOCAL_NONAFFILIATED_NO2_DIESEL_RETAIL_O_NEILL_NE",
+            "SWIFT_LOAD_SOURCE_2005":"DOE_NATIONAL_AVERAGE_DIESEL_MON_OR_FEDERAL_HOLIDAY_TUE",
+        }
+        and sec["NEDAK_illustration_not_actual_invoice"]["hypothetical_unamended_freight_charge_usd"]=="13.29"
+        and sec["SWIFT_illustration_not_actual_invoice"]["hypothetical_FUEL_ONLY_charge_usd"]=="1.50"
+        and sec["current_signed_amendments_and_invoices_unverified"] is True
+        and sec["2026_EIA_prices_not_approved_for_2007_local_index"] is True
+        and sec["actual_RETALLY_customer_invoices"]==0
+        and sec["actual_RETALLY_overcharge_cents"] is None
+        and sec["actual_RETALLY_recovery_cents"]==0
+        and sec["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -123,6 +140,12 @@ def snapshot() -> dict:
         "original_public_source_record_counts":SOURCE_COUNTS,
         "total_bounded_observations":sum(observed.values()),
         "standalone_official_publisher_examples":1,
+        "separate_original_SEC_historical_carrier_agreements":2,
+        "SEC_contracts_not_in_307_public_observation_count":True,
+        "SEC_2007_local_vs_2005_national_index_distinct":True,
+        "SEC_2007_exact_source_table_rows":7,
+        "SEC_2005_selected_source_fuel_bands":7,
+        "SEC_no_original_customer_invoices_or_2026_contract_applicability":True,
         "standalone_external_adjudication_records":1,
         "separate_original_GAO_historical_collection_decisions":gao["historical_distinct_decisions"],
         "separate_GAO_reported_historical_collection_events":gao["gao_reported_collection_events"],
@@ -190,7 +213,9 @@ def html_report(data:dict)->str:
         "worked example; the FMC award is legally ordered, not independently "
         "confirmed paid. Seven distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
-        "were independently inspected. A separate GSA government report documents "
+        "were independently inspected. Two SEC-filed historical motor-carrier "
+        "agreements have different local versus federal diesel indexes and "
+        "neither supplies current customer invoices. A separate GSA report documents "
         "a vendor repayment following ERRONEOUS notices of overcharge. Neither "
         "publication establishes RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
