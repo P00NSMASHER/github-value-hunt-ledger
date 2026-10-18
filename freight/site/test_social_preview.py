@@ -45,8 +45,8 @@ class ShareCardTest(unittest.TestCase):
     def test_exact_registry_matches_all_current_public_information_pages(self):
         topics=preview_images()
         self.assertEqual(set(topics),set(builder.PUBLIC_CONTACT_PAGES)-{"index.html"})
-        self.assertEqual(len(topics),24)
-        self.assertEqual(len(set(topics)),24)
+        self.assertEqual(len(topics),26)
+        self.assertEqual(len(set(topics)),26)
         self.assertEqual(len(IMAGE_BY_TOPIC),3)
         self.assertEqual(set(ALT),set(IMAGE_BY_TOPIC))
 
@@ -61,8 +61,8 @@ class ShareCardTest(unittest.TestCase):
                            "we recovered $","send us private invoices"):
                 self.assertNotIn(banned,description.lower(),name)
             titles.append(title);descs.append(description)
-        self.assertEqual(len(set(titles)),24)
-        self.assertEqual(len(set(descs)),24)
+        self.assertEqual(len(set(titles)),26)
+        self.assertEqual(len(set(descs)),26)
 
     def test_reuse_only_allowlisted_original_public_art(self):
         topics=preview_images()
