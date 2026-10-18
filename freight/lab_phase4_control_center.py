@@ -12,6 +12,10 @@ from datetime import date
 import tempfile
 
 from freight.lab_phase4_director import execute_all_labs, priority_actions
+from freight.public_original_research_control import (
+    snapshot as snapshot_public_original_source_census,
+    html_report as render_public_original_source_census,
+)
 from freight.lab_phase4_experiments import conduct_experiments, load_findings
 from freight.research_intelligence import render_html as render_research_html
 from freight.research_public_campaign import campaign_brief
@@ -315,6 +319,7 @@ def snapshot(max_labs: int=14) -> dict:
         result["research_claim_clearance_m35"]=build_claim_clearance_m35(as_of=date.today())
         result["research_source_lineage_m37"]=build_source_lineage_m37(as_of=date.today())
         result["research_claim_quarantine_m38"]=build_claim_quarantine_m38(as_of=date.today())
+        result["original_public_evidence_v1"]=snapshot_public_original_source_census()
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -954,6 +959,14 @@ illustrative 2017 producer-price-level adjusted revenue proxy:
 The direct producer-price source is not proof of official real freight output,
 paid customer invoices, billing errors or recoverable customer funds.</p>
 <a href="bls_parent_origin.html">Open native BLS source recovery, eight-year levels and economic limits ↗</a></section>
+<section class="panel"><h2>Original public freight evidence — separate source-truth panel</h2>
+<p>The source-bound reference collection contains <strong>"""+str(data["original_public_evidence_v1"]["total_bounded_observations"])+"""</strong>
+bounded public data rows or observations plus one independently published
+Census statistical example and one third-party legal payment order.
+None is a customer invoice, proved overcharge, paid restitution or RETALLY recovery.
+All 26 original historical findings remain OPEN_UNVERIFIED and all 18
+human first-customer release gates remain unmet.</p>
+<a href="public_evidence_census.html">Open public-source original provenance, distinct scope and NO-GO decision ↗</a></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -966,6 +979,14 @@ def main():
     data=snapshot(args.max_labs)
     args.out.mkdir(parents=True,exist_ok=True)
     (args.out/"phase4_control.json").write_text(json.dumps(data,sort_keys=True,indent=2)+"\n")
+    (args.out/"public_evidence_census.json").write_text(
+        json.dumps(data["original_public_evidence_v1"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"public_evidence_census.html").write_text(
+        render_public_original_source_census(data["original_public_evidence_v1"]),
+        encoding="utf-8"
+    )
     (args.out/"index.html").write_text(render(data))
     (args.out/"research_intelligence.json").write_text(
         json.dumps(data["research_intelligence"],sort_keys=True,indent=2)+"\n",encoding="utf-8"
