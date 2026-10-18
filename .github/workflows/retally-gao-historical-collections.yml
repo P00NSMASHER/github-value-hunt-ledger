@@ -51,11 +51,11 @@ jobs:
           from pathlib import Path
           x=json.loads(Path('/tmp/retally_lab14_gao_historical.json').read_text())
           assert x['scope']=='LAB14_ORIGINAL_GAO_GOVERNMENT_COLLECTION_CASES_NOT_CUSTOMER_SAVINGS'
-          assert x['historical_distinct_decisions']==6
-          assert x['gao_reported_collection_events']==7
+          assert x['historical_distinct_decisions']==7
+          assert x['gao_reported_collection_events']==9
           assert x['agency_reported_collection_modes']=={
-            'CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT':2,
-            'GOVERNMENT_APPLIED_SET_OFF':5,
+            'CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT':3,
+            'GOVERNMENT_APPLIED_SET_OFF':6,
           }
           assert x['cases_with_uncollected_future_deduction']==1
           assert x['cases_with_carrier_refund_authorized_but_unverified_paid']==1
@@ -65,5 +65,5 @@ jobs:
           assert x['real_RETALLY_customer_invoices_examined']==0
           assert x['real_RETALLY_customer_recoveries_cents']==0
           assert x['commercial_claim_clearance']=='NO_GO'
-          print('Lab14 first-party GAO record review: six historical dockets / seven collection events; zero verified RETALLY cash.')
+          print('Lab14 first-party GAO record review: seven historical dockets / nine collection events; zero verified RETALLY cash.')
           PY
