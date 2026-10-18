@@ -26,6 +26,7 @@ from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
 from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
 from freight.public_crowley_appeal_scope_v1 import report as crowley_appellate_scope
 from freight.public_gao_rating_lineitem_original_v1 import report as original_gao_lineitem
+from freight.public_fmc_invoice_exhibit_candidate_v1 import report as public_fmc_invoice_candidate
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -54,6 +55,7 @@ def snapshot() -> dict:
     fund=gsa_fund_accounting()
     appellate=crowley_appellate_scope()
     lineitem=original_gao_lineitem()
+    invoice=public_fmc_invoice_candidate()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -181,6 +183,24 @@ def snapshot() -> dict:
         and lineitem["real_RETALLY_customer_overcharges_cents"]==0
         and lineitem["real_RETALLY_customer_recoveries_cents"]==0
         and lineitem["commercial_release"]=="NO_GO"
+        and invoice["scope"]=="FMC_PUBLIC_LITIGANT_FILED_INVOICE_IMAGE_CANDIDATE_NOT_VERIFIED_CARRIER_BILL"
+        and invoice["distinct_charge_labels"]==4
+        and invoice["candidate_OCR_line_total_cents"]==918593
+        and invoice["candidate_OCR_extracted_invoice_total_cents"]==918593
+        and invoice["candidate_OCR_arithmetic_reconciles"] is True
+        and invoice["adjacent_OCR_rendition_uncertain"] is True
+        and invoice["one_candidate_invoice_not_two_independent_invoices"] is True
+        and invoice["unique_actual_source_invoice_verified"] is False
+        and invoice["mode_mismatch_is_LITIGANT_ALLEGATION_only"] is True
+        and invoice["original_bill_of_lading_cross_match_verified"] is False
+        and invoice["invoice_actually_paid_verified"] is False
+        and invoice["carrier_specific_contract_and_tariff_verified"] is False
+        and invoice["adjudicated_charge_invalidity_proven"] is False
+        and invoice["invoice_overcharge_cents"] is None
+        and invoice["actual_cash_received_cents"] is None
+        and invoice["real_RETALLY_customer_invoices"]==0
+        and invoice["real_RETALLY_customer_recoveries_cents"]==0
+        and invoice["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -189,6 +209,14 @@ def snapshot() -> dict:
         "total_bounded_observations":sum(observed.values()),
         "standalone_official_publisher_examples":1,
         "standalone_external_adjudication_records":1,
+        "separate_public_FMC_litigant_invoice_OCR_candidate_documents":1,
+        "FMC_2017_OCR_candidate_line_total_cents":918593,
+        "FMC_2017_duplicate_page_OCR_conflict_open":True,
+        "FMC_2017_original_carrier_issued_invoice_authentication_MISSING":True,
+        "FMC_2017_mode_mismatch_only_litigant_allegation":True,
+        "FMC_2017_invoice_paid_status_UNVERIFIED":True,
+        "FMC_2017_overcharge_cents_NOT_PROVEN":None,
+        "FMC_2017_retally_client_invoice_count_ZERO":0,
         "separate_original_GAO_historical_collection_decisions":gao["historical_distinct_decisions"],
         "distinct_original_GAO_rate_and_origin_correction_decisions_NOT_307_rows":2,
         "distinct_GAO_rate_and_origin_case_BOL_references":3,
@@ -284,7 +312,10 @@ def html_report(data:dict)->str:
         "confirmed paid. Separate original 1967/1976 GAO cases show exact "
         "historical freight-rate arithmetic and a rebutted bill-of-lading origin; "
         "the carrier claim remains conditional, with no authenticated repayment. "
-        "Seven distinct GAO government historical case decisions "
+        "A separate FMC 2017 publicly filed invoice image yields a candidate "
+        "four-line $9,185.93 OCR arithmetic total, but original invoice "
+        "authentication, amount paid, alleged ocean/air mismatch and loss "
+        "remain unverified. Seven distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
         "were independently inspected. Another GAO decision found $5,141.05 "
         "of applied post-bankruptcy-petition setoffs invalid, with no proof "
