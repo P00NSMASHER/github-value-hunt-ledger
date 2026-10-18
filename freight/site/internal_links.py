@@ -20,6 +20,14 @@ _BUSINESS_MAILTO_ANCHOR = re.compile(
     r'<a\b[^>]*\bhref="mailto:jay@retallyrecovery\.com[^"]*"[^>]*>.*?</a>',
     re.IGNORECASE | re.DOTALL,
 )
+# Even an addressless "mailto:?subject=..." may be rewritten by the zone's
+# Email Address Obfuscation into /cdn-cgi/l/email-protection (404).
+# Preserve approved, explicitly recipientless user-gesture email draft links
+# with Cloudflare's narrow per-link exemption, not a zone-wide disable.
+_RECIPIENTLESS_SHARE_MAILTO_ANCHOR = re.compile(
+    r'<a\b[^>]*\bhref="mailto:\?[^"]*"[^>]*>.*?</a>',
+    re.IGNORECASE | re.DOTALL,
+)
 
 
 class InternalLinkError(AssertionError):
@@ -95,12 +103,16 @@ def validate_bundle_links(root: Path) -> dict[str, int]:
             raise InternalLinkError(f"Symlinked HTML page: {source.relative_to(root)}")
         url = _published_url(source.relative_to(root))
         html = source.read_text(encoding="utf-8")
-        for match in _BUSINESS_MAILTO_ANCHOR.finditer(html):
-            if (not html[:match.start()].endswith("<!--email_off-->")
-                    or not html[match.end():].startswith("<!--/email_off-->")):
-                raise InternalLinkError(
-                    f"Unprotected business mailto creates Cloudflare 404: {url}"
-                )
+        for pattern, kind in (
+            (_BUSINESS_MAILTO_ANCHOR, "business mailto"),
+            (_RECIPIENTLESS_SHARE_MAILTO_ANCHOR, "recipientless share draft"),
+        ):
+            for match in pattern.finditer(html):
+                if (not html[:match.start()].endswith("<!--email_off-->")
+                        or not html[match.end():].startswith("<!--/email_off-->")):
+                    raise InternalLinkError(
+                        f"Unprotected {kind} creates Cloudflare 404: {url}"
+                    )
         for target in internal_destinations(html, url):
             parts = urlsplit(target)
             if parts.scheme != "https" or parts.netloc != "www.retallyrecovery.com":

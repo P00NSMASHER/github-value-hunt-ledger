@@ -26,7 +26,9 @@ IMAGE_BY_TOPIC = {
     }),
     "assets/images/invoice-evidence.webp": frozenset({
         "freight-invoice-audit.html", "accessorial-charge-audit.html",
-        "duplicate-freight-charges.html", "carrier-rate-audit.html",
+        "duplicate-freight-charges.html", "freight-credit-rebill-audit.html",
+        "ltl-reweigh-reclass-checklist.html", "ltl-reweigh-evidence-comparator.html",
+        "carrier-rate-audit.html",
         "freight-invoice-audit-checklist.html",
         "freight-overcharge-dispute-process.html", "freight-audit-methodology.html",
         "freight-audit-example.html", "second-look-freight-audit.html",
@@ -81,6 +83,18 @@ EDITORIAL_SHARE_META = {
         "RETALLY | Duplicate Freight Charge Checklist",
         "Two invoices may reflect a rebill, correction or separate service. Follow shipment identity, payment and credit history first.",
     ),
+    "freight-credit-rebill-audit.html": (
+        "RETALLY | Freight Credit and Rebill Audit Checklist",
+        "Link original freight invoices, corrected bills and posted credits. Free printable proof card; no confidential invoice information is uploaded.",
+    ),
+    "ltl-reweigh-reclass-checklist.html": (
+        "RETALLY | LTL Reweigh and Reclass Evidence Checklist",
+        "Free evidence card for LTL weight/class changes, governing rate terms and corrections. Review sources before disputing an adjustment.",
+    ),
+    "ltl-reweigh-evidence-comparator.html": (
+        "RETALLY | LTL Reweigh Measurement Comparator",
+        "Compare original and carrier-revised LTL dimensions, gross weight and freight density in your browser. No freight class, rate or refund is claimed.",
+    ),
     "carrier-rate-audit.html": (
         "RETALLY | Carrier Rate Audit Checklist",
         "Verify the controlling agreement, effective date, surcharge schedule and exceptions before claiming a rate mismatch.",
@@ -128,7 +142,7 @@ EDITORIAL_SHARE_META = {
     ),
     "referral-partners.html": (
         "RETALLY | Freight Audit Referral Partners",
-        "Review the referral partner approach and evidence and authorization boundaries for business introductions.",
+        "Free advisor share kit for CFOs, accountants and logistics consultants: an evidence-first freight checklist clients can use or share without files.",
     ),
     "freight-recovery-evidence-standard.html": (
         "RETALLY | Freight Recovery Evidence Standard",

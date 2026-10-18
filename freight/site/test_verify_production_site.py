@@ -11,7 +11,8 @@ from email.message import Message
 
 from freight.site.verify_production_site import (
     APPROVED_MEDIA, LiveAuditError, ensure_html, ensure_logo,
-    ensure_security_headers,
+    ensure_security_headers, ensure_ltl_comparator, LTL_COMPARATOR_PAGE,
+    ensure_blank_evidence_ledger,
 )
 
 
@@ -36,6 +37,46 @@ class ProductionSmokeInvariantTests(unittest.TestCase):
         ):
             with self.subTest(args=args), self.assertRaises(LiveAuditError):
                 ensure_security_headers(self.headers(**args))
+
+
+    def test_ltl_buyer_tool_must_be_real_both_in_page_and_script(self):
+        html=(
+            '<form id="ltlCompareForm">'
+            '<section id="ltlCompareResults" hidden></section>'
+            '<script src="ltl-evidence-comparator.js?v=20261018a"></script>'
+            'No login'
+        )
+        js='function compare(input) { return input; }'
+        ensure_ltl_comparator(html,js)
+        self.assertEqual(
+            LTL_COMPARATOR_PAGE,
+            "https://www.retallyrecovery.com/ltl-reweigh-evidence-comparator",
+        )
+        for broken in (
+            html.replace('id="ltlCompareForm"', 'id="missingForm"'),
+            html.replace("ltl-evidence-comparator.js", "other-script.js"),
+            html.replace("No login", "Signup required"),
+        ):
+            with self.subTest(broken=broken[:50]), self.assertRaises(LiveAuditError):
+                ensure_ltl_comparator(broken,js)
+        for brokenjs in (
+            "/* error */",
+            js + "\nfetch('/api/inquiry');",
+            js + "\nlocalStorage.setItem('amount','x');",
+        ):
+            with self.assertRaises(LiveAuditError):
+                ensure_ltl_comparator(html, brokenjs)
+
+
+    def test_blank_evidence_register_must_be_exact_current_release_asset(self):
+        source = Path(__file__).with_name("freight-recovery-evidence-ledger.csv").read_bytes()
+        ensure_blank_evidence_ledger(source, source)
+        for malformed in (source + b"Unauthorized,10000\n",
+                          source.replace(b"Candidate_Difference_Not_Savings",
+                                         b"Confirmed_Recovery"),
+                          b""):
+            with self.assertRaises(LiveAuditError):
+                ensure_blank_evidence_ledger(malformed, source)
 
     def test_corrupted_published_logo_is_detected(self):
         for path in APPROVED_MEDIA:
@@ -106,6 +147,17 @@ class InternalHyperlinkAuditTests(unittest.TestCase):
             (root / "index.html").write_text(
                 "<!--email_off-->" + html + "<!--/email_off-->"
             )
+            self.assertEqual(validate_bundle_links(root)["pages"], 1)
+
+    def test_recipientless_share_draft_requires_narrow_cloudflare_exemption(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            page = root / "index.html"
+            draft = '<a href="mailto:?subject=Free%20Guide&amp;body=Hello">Prepare email draft</a>'
+            page.write_text(draft, encoding="utf-8")
+            with self.assertRaisesRegex(InternalLinkError, "recipientless share draft creates Cloudflare 404"):
+                validate_bundle_links(root)
+            page.write_text("<!--email_off-->" + draft + "<!--/email_off-->", encoding="utf-8")
             self.assertEqual(validate_bundle_links(root)["pages"], 1)
 
     def test_live_links_reuse_sitemap_checks_and_fetch_unique_destinations(self):

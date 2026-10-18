@@ -51,6 +51,7 @@ jobs:
           freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
           freight/site/test_rebase_public_urls.py
+          freight/marketing/test_indexnow_notify.py
           freight/brand/test_brand_finishing.py
           recoveryworks/test_public_site.py
       - name: Check browser script syntax
@@ -58,6 +59,8 @@ jobs:
           node --check freight/site/commercial-config.js
           node --check freight/site/site.js
           node --check freight/site/worksheet.js
+          node --check freight/site/ltl-evidence-comparator.js
+          node --test freight/site/test_ltl_evidence_comparator.cjs
           node --test freight/site/test_worksheet.cjs
           node --test freight/site/test_worksheet_campaign.cjs
           node --check recoveryworks/site/site.js
