@@ -10,13 +10,17 @@
 
 The **$24,457.95** difference between the filed claim and later register remains unexplained. Nothing in these documents establishes that the difference is a customer credit, freight overcharge, refund, recovery, payment, or claim allowance event.
 
-Prior manual research of the public filing reports **102 account-statement entries**, original charges **$26,026.61**, and open statement balances **$25,954.47**, with a **$72.14** opening-vs-face difference requiring evidence. Those 102 records have **not been ingested or independently replayed** by the research comparator. Counting source invoice pages as separate shipments is also unsafe. The filing contains **broker-issued invoices**, not verified originals from every underlying carrier.
+Additional public case lead: [court-filed June 2026 certificate of service](https://document.epiq11.com/document/getdocumentbycode?docId=4581915&projectCode=MCX&source=DM) identifies the May 29 **Docket 623**, a sustained second omnibus claims objection concerning no-liability, reduced-amount, and reclassified claims. **No source inspected proves GlobalTranz claim 10002 was included.** The order/schedule, claim amendment trail, and actual cash ledger must be checked before attributing any delta to that order.
+
+The public filing's statement pages (PDF pages 115–117, one-indexed) report **102 account-statement entries**. A second analyst-side integer/decimal recalculation of the 46+46+10 indexed amount rows, including two joined page-break lines, reproduced original charges of **$26,026.61** and open balances of **$25,954.47**, exactly matching the filed claim. The sole $72.14 face-to-open change needs a credit/payment/adjustment trail. These 102 source rows have **not** been ingested or independently replayed by the RETALLY comparator, and this text-extraction check is not a full page-image verification. Do not publish underlying third-party invoice rows to GitHub.
+
+Two adjustment pairs can be traced beyond suffix matching to matching **PRO and customer BOL** identifiers in the public pages: an XPO $861.09 original plus $56.44 reweigh adjustment, and an ABF $1,718.04 original plus $29.88 reweigh adjustment. These are valid document cross-references, not evidence of incorrect charges or independent carrier weight certificates. A third adjustment lacks its base within the indexed statement. Counting invoice pages as separate shipments is unsafe. These are **broker-issued invoices**, not verified originals from every underlying carrier.
 
 ## Research-only comparator
 
-The new module freight/research/statement_reconciliation.py accepts only caller-supplied structured metadata. It checks invoice face vs statement original, statement totals, duplicate references, explicit base/adjustment linkage, unknown parents, changed open balances and contradictory external claim snapshots. It never derives recovered cash, an overcharge, source reuse rights, or shipment-family counts.
+The new module freight/research/statement_reconciliation.py accepts only caller-supplied structured metadata. It checks invoice face vs statement original, statement totals, canonical duplicate references, explicit base/adjustment linkage **requiring matching PRO and BOL identifiers**, unknown parents, changed open balances and contradictory external claim snapshots. It never derives recovered cash, an overcharge, source reuse rights, or shipment-family counts.
 
-Run the 15 deterministic **synthetic-only** tests:
+Run the 20 deterministic **synthetic-only** tests:
 
     python -m unittest freight.test_globaltranz_reconciliation -v
 
