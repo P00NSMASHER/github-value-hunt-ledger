@@ -1,0 +1,47 @@
+name: RETALLY Lab 14 Public FMC Filed Invoice Arithmetic and Evidence Holds
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-fmc-invoice-exhibit.yml'
+      - 'freight/public_fmc_invoice_exhibit_candidate_v1.py'
+      - 'freight/test_public_fmc_invoice_exhibit_candidate_v1.py'
+      - 'freight/fixtures/public_fmc_17_05_invoice_image_candidate_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_FMC_INVOICE_EXHIBIT_20261018.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  one-public-filed-invoice-not-customer-loss:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify source-bound exhibit amounts and forged-payment negative cases
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_fmc_invoice_exhibit_candidate_v1
+      - name: Confirm source has one OCR candidate, not verified customer savings
+        run: |
+          PYTHONPATH=. python -m freight.public_fmc_invoice_exhibit_candidate_v1 > /tmp/fmc_invoice_exhibit_candidate.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/fmc_invoice_exhibit_candidate.json').read_text())
+          assert x['scope']=='FMC_PUBLIC_LITIGANT_FILED_INVOICE_IMAGE_CANDIDATE_NOT_VERIFIED_CARRIER_BILL'
+          assert x['federal_public_filing_docket']=='17-05'
+          assert x['one_candidate_invoice_not_two_independent_invoices'] is True
+          assert x['candidate_OCR_line_total_cents']==918593
+          assert x['candidate_OCR_extracted_invoice_total_cents']==918593
+          assert x['adjacent_OCR_rendition_uncertain'] is True
+          assert x['mode_mismatch_is_LITIGANT_ALLEGATION_only'] is True
+          assert x['original_bill_of_lading_cross_match_verified'] is False
+          assert x['invoice_actually_paid_verified'] is False
+          assert x['adjudicated_charge_invalidity_proven'] is False
+          assert x['real_RETALLY_customer_invoices']==0
+          assert x['real_RETALLY_customer_recoveries_cents']==0
+          assert x['invoice_overcharge_cents'] is None
+          assert x['commercial_claim_clearance']=='NO_GO'
+          print('Original FMC public filing gives four invoice-OCR candidates; no verified customer invoice, loss or payment.')
+          PY
