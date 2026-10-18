@@ -26,6 +26,11 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["GAO_reported_collections_not_independently_Treasury_bank_verified"])
         self.assertIsNone(data["GAO_final_unreversed_net_government_recovery_total_cents"])
         self.assertTrue(data["GAO_future_uncollected_or_carrier_reimbursement_unverified"])
+        self.assertEqual(data["separate_GSA_false_positive_correction_public_report_records"],1)
+        self.assertEqual(data["GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents"],2960000000)
+        self.assertTrue(data["GSA_payment_direction_government_to_vendor_NOT_RETALLY"])
+        self.assertTrue(data["GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED"])
+        self.assertTrue(data["government_NOCs_may_be_erroneous_and_collections_reversed"])
         self.assertEqual(data["census_official_md_origin_pums_record_count"],612317)
         self.assertEqual(data["census_official_md_origin_gvf_cv_percent"],"9.74")
         self.assertTrue(data["fmc_award_actual_cash_received_verified"] is False)
@@ -93,6 +98,22 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_gsa_real_vendor_repayment_cannot_be_counted_as_retally_savings(self):
+        original=src.gsa_false_positive_refund()
+        for field,bad_value in [
+            ("is_recovered_overcharge_by_RETALLY",True),
+            ("reported_payment_FROM_government_TO_vendor",False),
+            ("validated_RETALLY_customer_cash_cents",2960000000),
+            ("possible_additional_payment_executed",True),
+        ]:
+            with self.subTest(field=field):
+                with patch.object(src,"gsa_false_positive_refund",
+                                  return_value={**original,field:bad_value}):
+                    with self.assertRaisesRegex(
+                        ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
+                    ):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -100,6 +121,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("NOT verified customer invoices",html)
         self.assertIn("Six distinct GAO government historical case decisions",html)
         self.assertIn("no original bank/Treasury postings",html)
+        self.assertIn("ERRONEOUS notices of overcharge",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
