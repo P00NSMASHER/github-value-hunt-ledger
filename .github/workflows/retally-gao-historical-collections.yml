@@ -53,6 +53,13 @@ jobs:
           assert x['scope']=='LAB14_ORIGINAL_GAO_GOVERNMENT_COLLECTION_CASES_NOT_CUSTOMER_SAVINGS'
           assert x['historical_distinct_decisions']==7
           assert x['gao_reported_collection_events']==9
+          assert x['original_GAO_1980_rating_reconciled'] is True
+          assert x['original_GAO_1980_one_tender_correct_charge_cents']==617063
+          assert x['original_GAO_1980_carrier_multiple_BOL_competing_charge_cents']==671075
+          assert x['original_GAO_1980_carrier_partial_refund_cents']==110967
+          assert x['original_GAO_1980_remaining_government_setoff_cents']==54012
+          assert x['original_GAO_1980_full_PDF_original_SHA_unverified'] is True
+          assert x['original_GAO_1980_no_original_bill_or_tariff_scans'] is True
           assert x['agency_reported_collection_modes']=={
             'CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT':3,
             'GOVERNMENT_APPLIED_SET_OFF':6,
