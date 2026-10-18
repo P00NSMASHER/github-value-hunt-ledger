@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from typing import Any, Mapping
+from dataclasses import asdict
+from .financial_events import CashEvent
 
 from .assurance import (
     CaseProofBundle,
@@ -63,6 +65,37 @@ class DurableRecoveryLedger(RecoveryLedger):
         record = super().hold_for_reconciliation(finding_id, reason, occurred_at=timestamp)
         self.journal.append("RECONCILIATION_HOLD", finding_id, {"reason": reason.strip()},
                             occurred_at=timestamp)
+        return record
+
+    def resolve_reconciliation(self, finding_id: str, *, reviewer_id: str,
+                               independent_reviewer_id: str, evidence_hash: str,
+                               expected_record_hash: str, expected_hold_hash: str, note: str, occurred_at=None):
+        timestamp = self._event_time(occurred_at)
+        data = dict(reviewer_id=reviewer_id, independent_reviewer_id=independent_reviewer_id,
+                    evidence_hash=evidence_hash, expected_record_hash=expected_record_hash, expected_hold_hash=expected_hold_hash, note=note)
+        record = super().resolve_reconciliation(finding_id, **data, occurred_at=timestamp)
+        self.journal.append("RESOLVE_RECONCILIATION", finding_id, data, occurred_at=timestamp)
+        return record
+
+    def revise_held_case(self, finding_id: str, replacement: RecoveryFinding, *,
+                         reviewer_id: str, independent_reviewer_id: str, evidence_hash: str,
+                         expected_record_hash: str, expected_hold_hash: str, note: str, occurred_at=None):
+        timestamp = self._event_time(occurred_at)
+        data = dict(reviewer_id=reviewer_id, independent_reviewer_id=independent_reviewer_id,
+                    evidence_hash=evidence_hash, expected_record_hash=expected_record_hash, expected_hold_hash=expected_hold_hash, note=note)
+        record = super().revise_held_case(finding_id, replacement, **data, occurred_at=timestamp)
+        self.journal.append("REVISE_CASE", finding_id,
+                            {**data, "replacement": finding_to_payload(replacement)}, occurred_at=timestamp)
+        return record
+
+    def post_cash_event(self, event: CashEvent, *, occurred_at=None):
+        if not isinstance(event, CashEvent):
+            raise ValueError("CashEvent required")
+        exists = (self.get(event.finding_id).finding.client_id, event.event_id) in self._cash_events
+        timestamp = self._event_time(occurred_at)
+        record = super().post_cash_event(event, occurred_at=timestamp)
+        if not exists:
+            self.journal.append("CASH_EVENT", event.finding_id, asdict(event), occurred_at=timestamp)
         return record
 
     def approve(
@@ -266,6 +299,14 @@ class DurableRecoveryLedger(RecoveryLedger):
             elif action == "RECONCILIATION_HOLD":
                 ledger.hold_for_reconciliation(event.finding_id, data["reason"],
                                                occurred_at=event.occurred_at)
+            elif action == "RESOLVE_RECONCILIATION":
+                ledger.resolve_reconciliation(event.finding_id, **dict(data), occurred_at=event.occurred_at)
+            elif action == "REVISE_CASE":
+                review = dict(data)
+                replacement = finding_from_payload(review.pop("replacement"))
+                ledger.revise_held_case(event.finding_id, replacement, **review, occurred_at=event.occurred_at)
+            elif action == "CASH_EVENT":
+                ledger.post_cash_event(CashEvent(**dict(data)), occurred_at=event.occurred_at)
             elif action == "APPROVE":
                 ledger.approve(
                     event.finding_id,

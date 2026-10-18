@@ -8,6 +8,7 @@ from typing import Any, Mapping
 from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine
 from .ledger import EconomicLossConflict
+from .journal import finding_to_payload
 from .report import RecoveryScan360Report, build_scan360_report
 from .store import LocalBundleStore
 from .branches.ap import audit_ap_recovery
@@ -59,6 +60,7 @@ from .branches.merchant_fee_csv import (
     load_merchant_transaction_summaries_csv,
 )
 from .branches.parcel import audit_parcel_charges
+from .branches.parcel_rating import load_rating_bundle
 from .branches.parcel_csv import load_parcel_assessments_csv, load_parcel_charges_csv
 from .branches.procurement import audit_procurement_lines
 from .branches.procurement_csv import (
@@ -173,7 +175,9 @@ def run_scan360_config(
             ledger.hold_for_reconciliation(exc.finding_id, str(exc))
             exceptions.append({"branch": finding.branch.value,
                                "reference": finding.reference,
-                               "code": "ECONOMIC_LOSS_CONFLICT", "detail": str(exc)})
+                               "code": "ECONOMIC_LOSS_CONFLICT", "detail": str(exc),
+                               "existing_finding_id": exc.finding_id,
+                               "replacement": finding_to_payload(finding)})
             return False
         return True
 
@@ -647,16 +651,23 @@ def run_scan360_config(
                 job, "charge_source_verified", context=f"parcel[{job_index}]"
             ),
         )
-        assessments = load_parcel_assessments_csv(
-            _resolve(
-                base,
-                job.get("assessments_csv"),
-                name=f"parcel[{job_index}].assessments_csv",
-            ),
-            verified=_bool_setting(
-                job, "assessment_source_verified", context=f"parcel[{job_index}]"
-            ),
-        )
+        if bool(job.get("rating_json")) == bool(job.get("assessments_csv")):
+            raise ValueError("parcel requires exactly one of rating_json or assessments_csv")
+        if job.get("rating_json"):
+            assessments = load_rating_bundle(
+                _resolve(base, job["rating_json"], name="parcel.rating_json"), charges,
+                verified=_bool_setting(job, "assessment_source_verified", context="parcel.rating_json"), currency=currency)
+        else:
+            assessments = load_parcel_assessments_csv(
+                _resolve(
+                    base,
+                    job.get("assessments_csv"),
+                    name=f"parcel[{job_index}].assessments_csv",
+                ),
+                verified=_bool_setting(
+                    job, "assessment_source_verified", context=f"parcel[{job_index}]"
+                ),
+            )
         batch = audit_parcel_charges(
             client_id=client_id,
             charges=charges,

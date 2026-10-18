@@ -7,6 +7,13 @@ The broader public business site lives in `recoveryworks/site/`. It is built
 from an exact allowlist and published beside the separate Freight Recovery
 microsite.
 
+## Seven-branch private workbench
+
+The Freight, AP, Warranty/Credit, Procurement, Rebate, Parcel and Utility branches
+have a shared private workbench and a reproducible synthetic customer journey.
+See [WORKBENCH.md](WORKBENCH.md) for setup, supported scope and acceptance boundaries.
+Simulated reviewers and receipts are explicitly labeled and never certify real customer readiness.
+
 ## Initial branches
 
 - **FreightRecovery** — carrier overcharges and contract/rate leakage.

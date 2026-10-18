@@ -2,6 +2,12 @@
 
 Scope: Freight, AP, Warranty/Credit, Procurement, Rebate, Parcel, Utility.
 
+**Follow-up:** [WORKBENCH.md](WORKBENCH.md) documents the subsequent implementation:
+private role-scoped UI, mapped intake, case revision/hold release, partial cash and fee
+reversals, full workspace backup/replay, dimensional parcel rating, procurement unit
+conversion, and seven simulated customer journeys. The remaining-work list below
+records the earlier delivery baseline; the follow-up acceptance table is current.
+
 This delivery hardens existing ingestion and calculations and adds an evidence-bound launch review. It does **not** establish seven customer-ready businesses. No authorized customer records, production operating evidence, or independent competitive benchmark were supplied for this change.
 
 ## Implemented
