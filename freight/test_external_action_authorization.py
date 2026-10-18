@@ -648,3 +648,11 @@ def test_self_hashed_authorization_rejects_scope_identity_aliases(field, alias):
             currency=a.currency,
             requested_cents=1,
         )
+
+
+def test_authorization_validity_limit_cannot_exceed_internal_maximum():
+    with pytest.raises(ValueError, match="internal maximum"):
+        auth(
+            expires_on="2026-11-30",
+            max_validity_days=365,
+        )
