@@ -613,3 +613,38 @@ def test_self_hashed_authorization_revalidates_evidence_binding_hashes(field):
             currency="USD",
             requested_cents=1,
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "alias"),
+    (
+        ("engagement_id", "engagement-e\u0301"),
+        ("buyer_id", "buyer-e\u0301"),
+        ("business_unit", "bu-\u200b1"),
+        ("target_carrier_id", "carrier-e\u0301"),
+        ("target_customer_id", " CUST-1"),
+        ("currency", "USD\u200b"),
+        ("approver_role", "VP Supply Chai\u0301n"),
+    ),
+)
+def test_self_hashed_authorization_rejects_scope_identity_aliases(field, alias):
+    a = auth()
+    object.__setattr__(a, field, alias)
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match=field):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id=a.target_carrier_id,
+            target_customer_id=a.target_customer_id,
+            recipient_reference_hash=a.recipient_reference_hash,
+            action_payload_hash=a.action_payload_hash,
+            finding_ids=a.finding_ids,
+            currency=a.currency,
+            requested_cents=1,
+        )
