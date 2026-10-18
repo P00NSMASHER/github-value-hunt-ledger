@@ -6,7 +6,7 @@
 
 Only GitHub Pages **generated output** is retargeted by `freight/site/legacy_pages_canonical.py`, during its separate deploy job. Cloudflare Pages' source, existing production canonicalization, hosted APIs, Turnstile, sitemap, branding, inquiry data, security headers and release checks remain unaffected.
 
-For every indexable root public marketing HTML and the indexable sample report:
+For every indexable root public marketing HTML and the sample report (29 sitemap URLs total):
 - Retarget exactly one legacy canonical to the corresponding production **extensionless 200 URL**.
 - Update absolute legacy OG/social/JSON-LD identity references to the same official host, preserving original legacy-relative HTML navigation for fallback readers.
 - Advertise only official canonicals in the old sitemap and `robots.txt`, and update the public `llms.txt` references.
