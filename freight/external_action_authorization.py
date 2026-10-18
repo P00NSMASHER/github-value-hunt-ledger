@@ -297,7 +297,7 @@ def issue_authorization(
         proof_hashes.append(finding.proof_hash)
         validated_total += finding.validated_cents
 
-    if not isinstance(authorized_cents, int) or authorized_cents <= 0:
+    if type(authorized_cents) is not int or authorized_cents <= 0:
         raise ValueError("authorized_cents must be a positive integer")
     if authorized_cents > validated_total:
         raise ValueError("authorized_cents cannot exceed selected validated findings")
@@ -511,7 +511,7 @@ def assert_action_allowed(
         raise ValueError("finding set exceeds authorization")
     if currency != auth.currency:
         raise ValueError("currency exceeds authorization")
-    if not isinstance(requested_cents, int) or requested_cents <= 0:
+    if type(requested_cents) is not int or requested_cents <= 0:
         raise ValueError("requested_cents must be positive")
     if requested_cents > auth.authorized_cents:
         raise ValueError("requested amount exceeds authorization")
