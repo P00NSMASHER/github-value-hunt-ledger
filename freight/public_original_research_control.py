@@ -24,6 +24,7 @@ from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
 from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
+from freight.public_crowley_appeal_scope_v1 import report as crowley_appellate_scope
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -50,6 +51,7 @@ def snapshot() -> dict:
     gsa=gsa_false_positive_refund()
     reversal=verified_historical_reversal()
     fund=gsa_fund_accounting()
+    appellate=crowley_appellate_scope()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -146,6 +148,20 @@ def snapshot() -> dict:
         and fund["no_actual_RETALLY_customer_cash_cents"]==0
         and fund["no_customer_recovery_performance_forecast"] is True
         and fund["commercial_claim_clearance"]=="NO_GO"
+        and appellate["original_published_decisions"]==1
+        and appellate["official_opinion_date"]=="2025-07-18"
+        and appellate["court_reversed_lower_GSA_audit_scope_holding"] is True
+        and appellate["court_remanded_for_further_proceedings"] is True
+        and appellate["court_did_not_award_individual_damages"] is True
+        and appellate["published_minimum_notices_of_overcharge_alleged_exceeds"]==50000
+        and appellate["published_alleged_gross_amount_approx_usd"]==37000000
+        and appellate["historical_notices_are_customer_errors_confirmed"] is False
+        and appellate["contemporaneous_court_of_federal_claims_demand_usd_not_paid"]==11800000
+        and appellate["later_litigation_or_payment_2026_outcome_verified"] is False
+        and appellate["no_private_commercial_freight_setoff_authority"] is True
+        and appellate["retally_real_customer_invoice_count"]==0
+        and appellate["retally_recovered_cents"]==0
+        and appellate["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -185,6 +201,13 @@ def snapshot() -> dict:
         "GSA_appropriation_table_rows_separately_verified":7,
         "GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof":True,
         "GSA_program_receipts_cannot_establish_RETALLY_recovery_rate":True,
+        "separate_2025_DC_Circuit_Crowley_original_decisions":1,
+        "Crowley_2025_court_reversed_scope_to_audit_non_carrier":True,
+        "Crowley_alleged_nocs_more_than":50000,
+        "Crowley_alleged_aggregated_dollars_APPROX_not_proven_cents":3700000000,
+        "Crowley_parallel_11_8m_damages_DEMAND_NOT_AWARD_cents":1180000000,
+        "Crowley_2026_final_claim_payment_not_verified":True,
+        "Crowley_federal_case_holding_not_private_RETALLY_authority":True,
         "census_official_md_origin_pums_record_count":maryland["pums_md_origin_unweighted_record_count"],
         "census_official_md_origin_weighted_GOODS_value_usd":maryland["census_published_weighted_goods_value_usd"],
         "census_official_md_origin_gvf_cv_percent":maryland["census_published_gvf_cv_percent"],
@@ -238,7 +261,10 @@ def html_report(data:dict)->str:
         "a vendor repayment following ERRONEOUS notices of overcharge. "
         "The same public FY2025 budget gives FY2023 original fund receipts and "
         "FY2024/25 PLANNED values; these are government fund accounting, not "
-        "private invoice credits or recoverable amounts. Neither "
+        "private invoice credits or recoverable amounts. A separate 2025 "
+        "federal appellate decision restricted GSA authority for the "
+        "particular non-carrier intermediary's bills; alleged $37M NOCs "
+        "and a separate $11.8M demand are NOT validated recovery money. Neither "
         "publication establishes RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
         " (local integrity only, not an external signature).</p>"
