@@ -30,6 +30,7 @@ def report():
     if (m.get("official_users_guide")!=
         "https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums_users_guide.pdf"
         or m.get("original_2022_pums_source_population",{}).get("shipment_records")!=37576546
+        or m.get("source_ordering")!="PUBLISHER_RANDOMLY_SORTED_SHIPMENT_IDS"
         or m.get("weight_policy",{}).get("official_weight_cap")!="3588000"
         or m.get("weight_policy",{}).get("per_sample_100_row_extrapolation_authorized") is not False
         or m.get("disclosure_policy",{}).get("privacy_modified_values_not_invoices") is not True):
@@ -51,13 +52,16 @@ def report():
     if m["first_complete_rows"]!=100 or m["compressed_archive_bytes"]!=677530696:
         raise ValueError("CFS_INVALID_MANIFEST")
     return {"source":"CENSUS_2022_CFS_PUBLIC_USE_MICRODATA","sample_rows":100,
-        "method":"NONRANDOM_EXACT_FILE_PREFIX","full_source_downloaded":False,
+        "method":"FIRST_100_OF_PUBLISHER_RANDOMIZED_RECORD_ORDER_NO_POPULATION_ESTIMATION",
+        "full_source_downloaded":False,
         "shipment_value_is_not_freight_charge":True,"national_estimate_authorized":False,
         "official_CFS_2022_PUMS_guide_applied":True,
         "full_source_record_count_from_guide_only":37576546,
         "actual_original_full_source_record_count_verified":False,
         "disclosure_modified_values_not_original_invoices":True,
         "sample_not_representative_or_weighted":True,
+        "publisher_ranks_shipment_ids_after_random_record_sort":True,
+        "sample_prefix_is_not_separately_designed_population_estimator":True,
         "WGT_FACTOR_meaning_documented_but_not_used_for_population_extrapolation":True,
         "published_official_CFS_tables_preferred_for_population_estimates":True,
         "validated_invoice_count":0,"verified_recoveries_cents":0}
