@@ -170,7 +170,7 @@ def report()->dict:
      "government_B160344_reported_collection_by_setoff_cents":charge["government_applied_setoff_cents"],
      "government_B160344_paid_date_precedes_corrected_description":True,
      "government_B186603_chair_GBL_origin_disproved":True,
-     "government_B186603_chair_13328_setoff_later_disallowed_in_source":True,
+     "government_B186603_chair_13328_setoff_origin_basis_rebutted_claim_allowance_conditional":True,
      "government_B186603_chair_repayment_bank_receipt_verified":False,
      "government_B186603_blanket_5765_offset_separately_recorded":True,
      "government_B186603_blanket_2290_certificate_not_proved_paid":True,
