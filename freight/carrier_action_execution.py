@@ -7,6 +7,7 @@ Authorization, submission and delivery remain distinct states.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
@@ -152,6 +153,17 @@ def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
     return value.strip()
+
+
+def _identity(name: str, value: str) -> str:
+    text = _text(name, value)
+    if value != text:
+        raise ValueError(name + " must not contain surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode")
+    if any(unicodedata.category(character).startswith("C") for character in value):
+        raise ValueError(name + " must not contain control characters")
+    return value
 
 
 def _finding_ids(value: tuple[str, ...]) -> tuple[str, ...]:
@@ -491,13 +503,13 @@ def verify_carrier_action_execution_receipt(
     _sha("external_reference_hash", receipt.external_reference_hash)
     _sha("evidence_source_hash", receipt.evidence_source_hash)
     _sha("receipt_hash", receipt.receipt_hash)
-    _text("buyer_id", receipt.buyer_id)
-    _text("business_unit", receipt.business_unit)
-    _text("authorization_id", receipt.authorization_id)
-    _text("target_carrier_id", receipt.target_carrier_id)
-    _text("target_customer_id", receipt.target_customer_id)
-    _text("currency", receipt.currency)
-    _text("executor_role", receipt.executor_role)
+    _identity("buyer_id", receipt.buyer_id)
+    _identity("business_unit", receipt.business_unit)
+    _identity("authorization_id", receipt.authorization_id)
+    _identity("target_carrier_id", receipt.target_carrier_id)
+    _identity("target_customer_id", receipt.target_customer_id)
+    _identity("currency", receipt.currency)
+    _identity("executor_role", receipt.executor_role)
     try:
         ActionType(receipt.action_type)
     except (TypeError, ValueError) as exc:
@@ -648,14 +660,14 @@ def verify_carrier_action_delivery_receipt(
     for name in (
         "buyer_id",
         "business_unit",
-        "action_type",
         "target_carrier_id",
         "target_customer_id",
         "currency",
-        "channel",
         "verifier_role",
     ):
-        _text(name, getattr(receipt, name))
+        _identity(name, getattr(receipt, name))
+    _text("action_type", receipt.action_type)
+    _text("channel", receipt.channel)
     try:
         ActionType(receipt.action_type)
     except (TypeError, ValueError) as exc:
