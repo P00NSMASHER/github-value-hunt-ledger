@@ -22,5 +22,7 @@
     "WGT_FACTOR survey design weight; do not sum sample unweighted or claim national results.",
     "No original actual customer invoice or carrier agreement.",
     "Full 677MB source was not downloaded; ZIP central directory was independently read using byte-range requests."
-  ]
+  ],
+  "fixture_sha256": "ab75a35ab109a8b2f2923c6a66b20712bc972aa968c09c3dd9f4286f6972a260",
+  "fixture_bytes": 7734
 }
