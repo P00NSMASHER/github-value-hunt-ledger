@@ -375,6 +375,25 @@ def _verify_authorization(auth: ExternalActionAuthorization) -> None:
     _sha("authorization_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("authorization hash mismatch")
+    for field in (
+        "engagement_resolution_hash",
+        "operative_charter_hash",
+        "recipient_reference_hash",
+        "action_payload_hash",
+    ):
+        _sha(field, getattr(auth, field))
+    if type(auth.finding_ids) is not tuple or not auth.finding_ids:
+        raise ValueError("finding_ids must be a non-empty tuple")
+    for finding_id in auth.finding_ids:
+        _identity("finding_id", finding_id)
+    if tuple(sorted(auth.finding_ids)) != auth.finding_ids or len(set(auth.finding_ids)) != len(auth.finding_ids):
+        raise ValueError("finding_ids must be unique and canonically ordered")
+    for field in ("finding_proof_hashes", "finding_review_hashes"):
+        values = getattr(auth, field)
+        if type(values) is not tuple or len(values) != len(auth.finding_ids):
+            raise ValueError(field + " must align one-for-one with finding_ids")
+        for value in values:
+            _sha(field, value)
     if type(auth.authorized_cents) is not int or auth.authorized_cents <= 0:
         raise ValueError("authorized_cents must be a positive integer")
     issued = _parse_date("issued_on", auth.issued_on)
