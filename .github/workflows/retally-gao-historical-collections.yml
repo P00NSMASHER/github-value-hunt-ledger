@@ -4,6 +4,9 @@ on:
     paths:
       - '.github/workflows/retally-gao-historical-collections.yml'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gsa_transport_audit_fund_v1.py'
+      - 'freight/test_public_gsa_transport_audit_fund_v1.py'
+      - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
       - 'freight/public_gao_setoff_reversal_v1.py'
       - 'freight/test_public_gao_setoff_reversal_v1.py'
       - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
@@ -28,6 +31,7 @@ jobs:
       - name: Validate exact original GAO historical case figures and false-claim denials
         run: |
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
       - name: Reject erroneous overcharge deductions mistakenly treated as retained recoveries
@@ -65,6 +69,25 @@ jobs:
           assert r['actual_RETALLY_cash_recovered_cents']==0
           assert r['commercial_claim_clearance']=='NO_GO'
           print('GAO B-192974: executed post-petition offset later held invalid; no verified returned cash, no client recovery.')
+          PY
+      - name: Confirm actual versus planned GSA fund activity without inventing invoice recoveries
+        run: |
+          PYTHONPATH=. python -m freight.public_gsa_transport_audit_fund_v1 > /tmp/gsa_transport_audit_fund.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/gsa_transport_audit_fund.json').read_text())
+          assert r['accounting_fact_rows']==7
+          assert r['FY2023_ACTUAL_fund_receipts_thousand_USD']==12354
+          assert r['FY2024_PLAN_fund_receipts_thousand_USD']==4168
+          assert r['FY2025_PLAN_fund_receipts_thousand_USD']==12506
+          assert r['FY2023_ACTUAL_transfer_TO_suspense_thousand_USD']==-20674
+          assert r['FY2023_ACTUAL_annual_obligations_thousand_USD']==10960
+          assert r['FY2023_vendor_corrective_payment_APPROX_million_USD']=='29.6'
+          assert r['no_independent_bank_or_Treasury_receipt'] is True
+          assert r['no_actual_RETALLY_customer_cash_cents']==0
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('GSA FY2023 fund ACTUAL receipts, corrective transfer and later-year PLANS remain separate. No client recoveries.')
           PY
       - name: Fail closed on any implication that GAO decisions prove RETALLY money recovered
         run: |
