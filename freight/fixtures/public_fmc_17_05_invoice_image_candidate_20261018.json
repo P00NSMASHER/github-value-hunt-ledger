@@ -54,5 +54,10 @@
     "No independent scan page comparison, complete document cryptographic hash or original carrier bill-of-lading-to-invoice chain has been obtained.",
     "A bill describing air freight on a container-associated movement does not by itself determine overcharge, since modes, accessorials, tariff basis and line-item descriptions need contract evidence.",
     "No customer authorization, funds recovery, refund or independent bank posting is established."
-  ]
+  ],
+  "litigant_filing_narrative_footnote_number": 5,
+  "litigant_filing_corroborating_container_id": "TCKU 1771451",
+  "litigant_filing_footnote_describes_usd_5400_air_freight_for_same_container": true,
+  "litigant_filing_footnote_identifies_ocean_bol_and_invoice_in_exhibit2": true,
+  "footnote_exhibit_link_is_party_assertion_not_independent_bol_authentication": true
 }
