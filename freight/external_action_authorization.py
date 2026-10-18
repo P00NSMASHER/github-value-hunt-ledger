@@ -377,6 +377,12 @@ def _verify_authorization(auth: ExternalActionAuthorization) -> None:
         raise ValueError("authorization hash mismatch")
     if type(auth.authorized_cents) is not int or auth.authorized_cents <= 0:
         raise ValueError("authorized_cents must be a positive integer")
+    issued = _parse_date("issued_on", auth.issued_on)
+    expires = _parse_date("expires_on", auth.expires_on)
+    if expires < issued:
+        raise ValueError("expires_on cannot precede issued_on")
+    if (expires - issued).days > MAX_VALIDITY_DAYS:
+        raise ValueError("authorization validity exceeds internal maximum")
     for field in (
         "money_movement_authorized",
         "settlement_acceptance_authorized",
