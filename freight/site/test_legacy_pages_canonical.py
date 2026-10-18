@@ -33,6 +33,7 @@ def make_fixture(root: Path):
         'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
         '<url><loc>' + OLD_BASE + '</loc></url>'
         '<url><loc>' + OLD_BASE + 'about.html</loc></url>'
+        '<url><loc>' + OLD_BASE + 'recovery-status-example.html</loc></url>'
         '</urlset>',
         encoding="utf-8",
     )
@@ -48,7 +49,7 @@ def test_only_generated_fallback_canoncial_and_source_links(tmp_path):
     names = make_fixture(tmp_path)
     original_404 = (tmp_path / "404.html").read_bytes()
     result = consolidate_generated_legacy(tmp_path, names)
-    assert result == {"html_pages": 3, "sitemap_urls": 2, "text_assets_updated": 6}
+    assert result == {"html_pages": 3, "sitemap_urls": 3, "text_assets_updated": 6}
     for name in ("index.html", "about.html", "recovery-status-example.html"):
         content = (tmp_path / name).read_text(encoding="utf-8")
         old = OLD_BASE + ("" if name == "index.html" else name)
@@ -84,7 +85,7 @@ def test_does_not_change_checked_in_source_or_cloudflare_build(tmp_path):
     original_js = (output / "site.js").read_bytes()
     assert OLD_BASE in original
     result = consolidate_generated_legacy(output)
-    assert result["sitemap_urls"] == len(PUBLIC_CONTACT_PAGES)
+    assert result["sitemap_urls"] == len(PUBLIC_CONTACT_PAGES) + 1
     assert result["html_pages"] == len(PUBLIC_CONTACT_PAGES) + 1
     assert OLD_BASE not in (output / "index.html").read_text()
     assert (output / "index.html").read_text().count(
