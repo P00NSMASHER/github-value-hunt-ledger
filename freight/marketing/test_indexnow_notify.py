@@ -60,9 +60,17 @@ class IndexNowSafetyTests(unittest.TestCase):
              patch.object(n,"verify_published") as verify, \
              patch.object(n,"submit_once",return_value=200) as submit:
             result=n.notify("a"*40,attempts=1,delay=0)
-            self.assertEqual(result["state"],"received")
+            self.assertEqual(result["state"],"submitted")
             verify.assert_called_once_with([target])
             submit.assert_called_once_with([target])
+        with patch.object(n,"changed_git_paths",return_value=["freight/site/ltl-reweigh-evidence-comparator.html"]), \
+             patch.object(n,"verify_published"), \
+             patch.object(n,"submit_once",return_value=202) as submit:
+            result=n.notify("a"*40,attempts=1,delay=0)
+            self.assertEqual(result["state"],"key_validation_pending")
+            self.assertEqual(result["http_status"],202)
+            self.assertIn("validation", result["note"])
+            submit.assert_called_once()
         with patch.object(n,"changed_git_paths",return_value=["freight/site/site.css"]), \
              patch.object(n,"submit_once") as submit:
             self.assertEqual(n.notify("a"*40)["state"],"skipped")

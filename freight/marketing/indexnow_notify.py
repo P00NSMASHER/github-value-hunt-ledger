@@ -125,9 +125,16 @@ def notify(commit: str, attempts: int = 15, delay: int = 20) -> dict[str, object
             print(f"Production readiness unavailable on check {attempt}/{attempts}; retrying verification.")
             time.sleep(delay)
     response = submit_once(urls)
+    if response == 202:
+        state = "key_validation_pending"
+        note = ("IndexNow received the URL notification; ownership key validation is "
+                "still pending (HTTP 202). Crawling or indexing is not established.")
+    else:
+        state = "submitted"
+        note = ("IndexNow accepted the URL notification (HTTP 200). "
+                "Crawling, indexing, traffic and revenue are not guaranteed.")
     return {
-        "state": "received", "changed_urls": urls, "http_status": response,
-        "note": "IndexNow acknowledged receipt; crawl, ranking and indexing are not guaranteed.",
+        "state": state, "changed_urls": urls, "http_status": response, "note": note,
     }
 
 
