@@ -8,28 +8,33 @@ permissions:
 jobs:
   public-docket:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
-      - name: Identify public Epiq docket list endpoint without accessing document contents
+      - name: Open public Epiq docket 623 using installed headless Chrome
         shell: bash
         run: |
           python - <<'PY'
-          import re
-          from urllib.request import Request,urlopen
-          u="https://dm.epiq11.com/dist/main-CGTEPJD6.js"
-          req=Request(u,headers={"User-Agent":"Mozilla/5.0 (read-only public docket research)"})
-          with urlopen(req,timeout=12) as resp:
-              s=resp.read(9_000_000).decode("utf-8","replace")
-          print("JS_VERSION_PUBLIC",len(s))
-          for m in re.finditer(r"/api/",s):
-              start=max(0,m.start()-120)
-              end=min(len(s),m.end()+200)
-              print("API_ROUTE_CONTEXT",s[start:end].replace("\n"," ")[:325])
-          for term in ("searchDockets","getdockets","docketNumber","loadDockets","getDocketData"):
-              print("FUNCTION",term)
-              matches=list(re.finditer(re.escape(term),s,re.I))
-              print("COUNT",len(matches))
-              for m in matches[-5:]:
-                  print("FUNCTION_CONTEXT",s[max(0,m.start()-250):m.end()+250].replace("\n"," ")[:530])
-          print("No claims documents or private information accessed.")
+          import shutil,subprocess,re,html
+          b=shutil.which("google-chrome") or shutil.which("chromium-browser") or shutil.which("chromium")
+          print("BROWSER_AVAILABLE",bool(b))
+          if not b:
+              raise SystemExit(0)
+          for docket in (623,593):
+              u=f"https://dm.epiq11.com/case/mosaiccompanies/dockets/{docket}"
+              try:
+                  cmd=[b,"--headless=new","--no-sandbox","--disable-dev-shm-usage","--disable-gpu","--virtual-time-budget=12000","--dump-dom",u]
+                  p=subprocess.run(cmd,capture_output=True,text=True,timeout=65,check=False)
+                  data=p.stdout[:2500000]
+                  print("DOCKET",docket,"EXIT",p.returncode,"DOM_CHARS",len(data),"STDERR_CHARS",len(p.stderr))
+                  print("DOCKET_TERMS",{v:len(list(re.finditer(re.escape(v),data,re.I))) for v in ("GlobalTranz","623","593","Docket","view all docs","docketId","document")})
+                  links=re.findall(r'href=["\']([^"\']+)["\']',data,re.I)
+                  print("DOC_LINK_CANDIDATES",[html.unescape(x)[:250] for x in sorted(set(links)) if "docketId" in x or "document/get" in x or "documentbycode" in x][:20])
+                  for token in ("Second Omnibus Objection", "Order Sustaining","View All Docs","GlobalTranz"):
+                      m=re.search(re.escape(token),data,re.I)
+                      if m:
+                          snippet=re.sub(r"<[^>]*>"," ",data[max(0,m.start()-200):m.end()+240])
+                          print("PUBLIC_DOM_SNIPPET",token,html.unescape(snippet.replace("\n"," "))[:350])
+              except Exception as exc:
+                  print("CHROME_PUBLIC_PAGE_FAILED",docket,type(exc).__name__,str(exc)[:180])
+          print("Only public docket listing DOM inspected; no source PDF or customer invoice content retained.")
           PY
