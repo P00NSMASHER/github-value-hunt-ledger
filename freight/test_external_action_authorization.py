@@ -354,6 +354,12 @@ def test_authorization_validity_is_bounded():
         auth(expires_on="2026-11-30")
 
 
+@pytest.mark.parametrize("max_validity_days", [30.0, float("nan"), float("inf")])
+def test_authorization_validity_limit_requires_exact_positive_integer_days(max_validity_days):
+    with pytest.raises(ValueError, match="max_validity_days must be a positive integer"):
+        auth(max_validity_days=max_validity_days)
+
+
 def test_revocation_immediately_blocks_action():
     a = auth()
     r = revoke_authorization(
