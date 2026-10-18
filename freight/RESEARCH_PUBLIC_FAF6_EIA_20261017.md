@@ -258,3 +258,16 @@ microdata has been downloaded, no tariffs or shipper agreements verified and
 no freight revenues or rates inferred. Next source step is a bounded original
 STB publication/file plus schema/field-level integrity test, preserving masking
 rules and avoiding exposure of any restricted confidential sample.
+
+
+### STB download triage (additional source-check warning)
+
+A HEAD request to the publisher's linked `PublicUseWaybillSample2024.zip`
+returned HTTP 200, byte-range support, and 68,197,449 bytes; its first
+ZIP member is `BEA_001_to_109.jpg` (JPEG document imagery), **not an
+immediately ingestible structured waybill row**. No rail revenue fields
+were extracted or validated. Treat this download as DOCUMENT / SCAN
+PENDING rather than a clean data source; locate and inspect a documented
+data-bearing member and verify its field dictionary before any import.
+STB explicitly warns that public-waybill revenue may be masked and not
+actual waybill revenue. Do not use it for customer recovery calculations.
