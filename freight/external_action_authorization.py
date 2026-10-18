@@ -396,7 +396,7 @@ def revoke_authorization(
     reason: str,
 ) -> AuthorizationRevocation:
     _verify_authorization(auth)
-    _required("revocation_id", revocation_id)
+    _identity("revocation_id", revocation_id)
     _required("reason", reason)
     _required("approver_role", approver_role)
     if approver_role != auth.approver_role:
@@ -427,6 +427,7 @@ def revoke_authorization(
 def _verify_revocation(auth: ExternalActionAuthorization, revocation: AuthorizationRevocation) -> None:
     body = asdict(revocation)
     digest = body.pop("revocation_hash")
+    _identity("revocation_id", revocation.revocation_id)
     _sha("revocation_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("revocation hash mismatch")
