@@ -6,6 +6,7 @@ the supplied record set but does not provide independent external timestamping.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
@@ -47,7 +48,9 @@ def _required(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
     normalized = value.strip()
-    if any(ord(character) < 32 for character in normalized):
+    if normalized != unicodedata.normalize("NFC", normalized):
+        raise ValueError(name + " must use canonical Unicode")
+    if any(unicodedata.category(character).startswith("C") for character in normalized):
         raise ValueError(name + " cannot contain control characters")
     return normalized
 
