@@ -23,6 +23,7 @@ EXPECTED={
         "a":"3.905","b":"0.011","c":"-0.010",
     },
 }
+ALLOWED_SOURCE_KEYS=frozenset(['schema_version','source','original_guide_url','source_location','survey_year','shipment_domain','published_example_pums_domain_records','published_example_weighted_goods_value_usd','published_example_total_value_gvf_coefficients','published_example_coefficient_of_variation_percent','weighting_rule','variance_rule','never_interchange_with','actual_source_rows_downloaded_for_this_example','this_is_official_published_example_not_locally_recomputed_from_full_file','ordinary_100_row_prefix_permitted_as_substitute','full_census_pums_sha_verified','own_customer_invoices_seen','real_recoveries_cents'])
 NONCLAIMS={
     "ordinary_100_row_prefix_permitted_as_substitute":False,
     "full_census_pums_sha_verified":False,
@@ -37,7 +38,8 @@ def verified_published_example()->dict:
         x=json.loads(SOURCE.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as e:
         raise ValueError("CFS_MD_EXAMPLE_INVALID_JSON") from e
-    if (type(x) is not dict or x.get("schema_version")!=1
+    if (type(x) is not dict or frozenset(x)!=ALLOWED_SOURCE_KEYS
+        or x.get("schema_version")!=1
         or x.get("original_guide_url")!="https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums_users_guide.pdf"
         or x.get("shipment_domain")!="ORIG_STATE = 24 (all Maryland-origin shipments in CFS-covered establishments, all destinations, all modes)"
         or not all(x.get(k)==v for k,v in EXPECTED.items())
