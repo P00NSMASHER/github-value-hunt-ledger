@@ -34,3 +34,16 @@ Existing repository-wide Freight and release CI must run on the PR and all norma
 - For a freight error: separately obtain controlling effective rate terms, underlying carrier invoice, BOL/PRO, independent classification/weight evidence, prior auditor results and payment/credit proof.
 - Maintain independent adjudication and blind frozen validation; apply existing release and customer-data security controls.
 - No customer outreach, payments, private-data extraction, new scheduled actions or changes to protected main were made.
+
+## Claim-specific litigation trail (verified public court evidence; 2026-10-18)
+
+**This is a materially stronger procedural link, not yet a verified dollar-level disposition or proof of freight overbilling.**
+
+- **March 20, 2026 — Docket 593:** Trust filed a *second omnibus substantive objection* covering no-liability, reduced-amount and reclassified claims. [March 30 service certificate, Docket 595](https://document.epiq11.com/document/getdocumentbycode?docId=4566977&projectCode=MCX&source=DM) includes **GlobalTranz Enterprises LLC on the dedicated second-objection service lists**.
+- **May 28, 2026 — Docket 619:** Certification of counsel regarding the second omnibus objection; documented in the [Epiq Docket 625 certificate](https://document.epiq11.com/document/getdocumentbycode?docId=4581183&projectCode=MCX&source=DM).
+- **May 29, 2026 — Docket 623:** Court sustained the second omnibus substantive objection, as verified by its [June 3 Docket 626 certificate of service](https://document.epiq11.com/document/getdocumentbycode?docId=4581915&projectCode=MCX&source=DM). Docket 626 explicitly says **Exhibit C and Exhibit F received only the second omnibus order**. GlobalTranz is listed on Exhibit C (PDF page 9) and Exhibit F (PDF page 16), strongly tying it to the sustained objection. This does not identify the exact claim schedule or confirm the category/revised amount for GlobalTranz.
+- **July 28, 2026:** Public [numerical claims register](https://document.epiq11.com/document/getdocumentbycode?docId=4596109&projectCode=MCX&source=DM) identifies GlobalTranz proof of claim **10002** as **$1,496.52 unsecured** with the original July 17, 2025 filing date and no explanatory comment.
+
+**Still missing, do not infer:** Complete Docket 593 objection schedules, the clean/amended exhibit to Docket 619 and signed Docket 623 order schedules identifying proof of claim 10002, plus any payment/distribution/credit posting. At present the defensible finding is **court objections and a later lower registered claim**, not a confirmed $24,457.95 freight billing correction, creditor refund, or cash recovery.
+
+Public search was unable to retrieve the claim-specific schedules. The Epiq public docket website requires dynamic browser navigation; no paid PACER access, private case materials, or outreach were used. The two categorical possibilities—substantive reduction/partial disallowance versus a separate amendment/reconciliation—remain open pending the operative schedule. A court-imposed claim reduction is not a RETALLY-generated recovery even if the reduction is eventually confirmed.
