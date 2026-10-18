@@ -22,10 +22,11 @@ Original first-party cases, each checked against its publisher page:
 | [A-14046](https://www.gao.gov/products/14046), 1926 | $889.63 across three rail shipments | **$83.58 already deducted** | **Additional $44.17** still described as due and to be deducted/refunded; NOT already collected |
 | [B-166167](https://www.gao.gov/products/b-166167), 1969 | $4,231.77 | **$3,016.32 setoff collected**, according to GAO | GAO was **authorizing a $1,050.83 refund back to the carrier**; proof of execution not inspected; no final net inferred |
 | [B-146511](https://www.gao.gov/products/b-146511-2), 1965 | $152.05 | **$20.74 recovered by deduction** in 1951, GAO says | Later supplemental claim narrative also cites **$20.70 and $20.76**; those alternate figures are NOT added as separate collections |
+| [B-197658](https://www.gao.gov/assets/b-197658.pdf), 1980 | $7,820.42 | **$1,109.67 carrier-refunded, then $540.12 recovered by setoff**, total $1,649.79 | Three bills of lading represented one shipment under the GAO decision; allowable charge $6,170.63; independently inspected bank/Treasury posting absent |
 
-These are **six distinct agency decision records** and **seven separately
-described collection events** (two voluntary refunds and five applied
-government deductions). The seven events are *not* a national recovery
+These are **seven distinct agency decision records** and **nine separately
+described collection events** (three voluntary refunds and six applied
+government deductions). The nine events are *not* a national recovery
 statistic. Cases were selected because their original public record describes
 a historical collection action, not through representative freight-invoice
 sampling. No dollar total from these cases should be marketed as validated
@@ -35,7 +36,7 @@ current savings or RETALLY revenue.
 
 1. **Public carrier or EIA rate:** published schedule/index only; applicability and actual billing unknown.
 2. **Source-supported audit finding or award:** an amount may be due, but no transfer or offset was necessarily made.
-3. **Agency's original administrative decision REPORTS a carrier refund or executed offset:** authentic publisher assertion of historical collection; **separate bank, Treasury, account statement and original source documents still not inspected**. This is the level the six GAO cases support.
+3. **Agency's original administrative decision REPORTS a carrier refund or executed offset:** authentic publisher assertion of historical collection; **separate bank, Treasury, account statement and original source documents still not inspected**. This is the level the seven GAO cases support.
 4. **Authenticated proof of remitted/posted payment, contemporaneous freight bill, applicable historical tariff and a final case disposition:** stronger corroboration, **none obtained for these selected cases**.
 5. **Verified RETALLY client recovery:** requires customer authority, original charge, agreement, payment/credit evidence and owner-controlled fee/case accounting. **None obtained**.
 
@@ -51,6 +52,17 @@ Treasury disbursement or the recipient's bank.
 All amounts are frozen as **integer historical U.S. cents**, not current-value
 dollars or assumed 2026 prices. Case `B-152324` reconciles:
 `$1,835.25 - $514.50 - $740.27 = $580.48`.
+Original 1980 GAO decision `B-197658` independently documents
+one 107,129-pound lot of steel posts, physically carried using three
+bills of lading; original charges paid **$7,820.42**, correct
+truckload charges **$6,170.63**, assessed overcharge **$1,649.79**.
+The carrier **refunded $1,109.67**, then the government **recovered the
+remaining $540.12 by setoff**. This is one source-identified *shipment*
+with two different collection events—not two recoveries to two different
+customers. The government PDF's index-accessible full text was inspected,
+but its binary bytes have **not** been independently downloaded/hashed,
+and no actual external bank/Treasury posting was examined.
+
 Case `A-14046` reconciles the later assessment:
 `$83.58 deducted + $44.17 still due = $127.75`.
 Neither the missing `$44.17` nor the `$1,050.83` reimbursement to the
