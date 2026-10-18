@@ -22,6 +22,7 @@ from freight.public_cfs2022_official_example_v1 import verified_published_exampl
 from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
+from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
 
 SOURCE_COUNTS={
     "BTS_FAF6_MODELED_GOODS_FLOWS":78,
@@ -46,6 +47,7 @@ def snapshot() -> dict:
     fmc=verified_public_order()
     gao=public_collection_report()
     gsa=gsa_false_positive_refund()
+    reversal=verified_historical_reversal()
 
     observed={
         "BTS_FAF6_MODELED_GOODS_FLOWS":faf["faf6_source_rows_in_snapshot"],
@@ -116,6 +118,18 @@ def snapshot() -> dict:
         and gsa["validated_RETALLY_customer_cash_cents"]==0
         and gsa["independent_vendor_bank_statement_seen"] is False
         and gsa["commercial_recovery_claim"]=="NO_GO"
+        and reversal["original_decisions"]==1
+        and reversal["prepetition_allowable_setoff_cents_reported"]==214759
+        and reversal["postpetition_GOVERNMENT_applied_offset_LATER_DISALLOWED_cents"]==514105
+        and reversal["original_offset_was_reported_executed"] is True
+        and reversal["illegal_postpetition_offset_is_valid_permanent_recovery"] is False
+        and reversal["GAO_said_allow_carrier_claim_if_otherwise_correct"] is True
+        and reversal["independent_carrier_repayment_bank_receipt_obtained"] is False
+        and reversal["government_final_net_collections_credible_cents"] is None
+        and reversal["current_private_shipment_setoff_authorized"] is False
+        and reversal["not_included_in_GAO_approved_historical_collection_tally"] is True
+        and reversal["actual_RETALLY_cash_recovered_cents"]==0
+        and reversal["commercial_claim_clearance"]=="NO_GO"
     ):
         _reject("INVALID_CUSTOMER_CLAIM_OR_SOURCE_STATUS")
     result={
@@ -143,6 +157,11 @@ def snapshot() -> dict:
         "GSA_payment_direction_government_to_vendor_NOT_RETALLY":True,
         "GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED":True,
         "government_NOCs_may_be_erroneous_and_collections_reversed":True,
+        "separate_GAO_1979_improper_setoff_decisions":1,
+        "GAO_1979_applied_but_later_disallowed_offset_cents":514105,
+        "GAO_1979_reversal_reimbursement_not_verified":True,
+        "GAO_1979_negative_case_not_approved_collection":True,
+        "GAO_1979_private_setoff_authority_not_established":True,
         "census_official_md_origin_pums_record_count":maryland["pums_md_origin_unweighted_record_count"],
         "census_official_md_origin_weighted_GOODS_value_usd":maryland["census_published_weighted_goods_value_usd"],
         "census_official_md_origin_gvf_cv_percent":maryland["census_published_gvf_cv_percent"],
@@ -190,7 +209,9 @@ def html_report(data:dict)->str:
         "worked example; the FMC award is legally ordered, not independently "
         "confirmed paid. Seven distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
-        "were independently inspected. A separate GSA government report documents "
+        "were independently inspected. Another GAO decision found $5,141.05 "
+        "of applied post-bankruptcy-petition setoffs invalid, with no proof "
+        "of the carrier's repayment. A separate GSA report documents "
         "a vendor repayment following ERRONEOUS notices of overcharge. Neither "
         "publication establishes RETALLY revenue.</p>"
         f"<p>Source content hash: <code>{escape(data['local_content_sha256'])}</code>"
