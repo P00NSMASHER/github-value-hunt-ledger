@@ -13,11 +13,11 @@ from freight import public_gao_historical_collection_v1 as source
 class GAOHistoricalGovernmentCollections(unittest.TestCase):
     def test_agency_reported_collections_are_not_retally_cash(self):
         report=source.public_collection_report()
-        self.assertEqual(report["historical_distinct_decisions"],6)
-        self.assertEqual(report["gao_reported_collection_events"],7)
+        self.assertEqual(report["historical_distinct_decisions"],7)
+        self.assertEqual(report["gao_reported_collection_events"],9)
         self.assertEqual(report["agency_reported_collection_modes"],{
-            "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":2,
-            "GOVERNMENT_APPLIED_SET_OFF":5,
+            "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":3,
+            "GOVERNMENT_APPLIED_SET_OFF":6,
         })
         self.assertEqual(report["cases_with_uncollected_future_deduction"],1)
         self.assertEqual(report["cases_with_carrier_refund_authorized_but_unverified_paid"],1)
@@ -39,6 +39,27 @@ class GAOHistoricalGovernmentCollections(unittest.TestCase):
             {"kind":"GOVERNMENT_APPLIED_SET_OFF","amount_cents":74027},
         ])
         self.assertEqual(183525-51450-74027,58048)
+
+    def test_direct_original_1980_GAO_pdf_refund_plus_final_setoff(self):
+        case={x["case_id"]:x for x in source.verified_gao_cases()}["B-197658"]
+        self.assertEqual(case["decision_date"],"1980-08-25")
+        self.assertEqual(case["source_url"],"https://www.gao.gov/assets/b-197658.pdf")
+        self.assertEqual(case["originally_paid_cents"],782042)
+        self.assertEqual(case["final_agency_assessed_overcharge_cents"],164979)
+        self.assertEqual(case["gao_reported_collection_events"],[
+            {"kind":"CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT","amount_cents":110967},
+            {"kind":"GOVERNMENT_APPLIED_SET_OFF","amount_cents":54012},
+        ])
+        self.assertEqual(782042-110967-54012,617063)
+        self.assertFalse(case["original_bill_of_lading_independently_examined"])
+
+    def test_original_1980_GAO_pdf_partial_refund_cannot_be_counted_twice(self):
+        self._tamper(lambda x:x["cases"][6]["gao_reported_collection_events"].append(
+            {"kind":"GOVERNMENT_APPLIED_SET_OFF","amount_cents":54012}))
+        self._tamper(lambda x:x["cases"][6]["gao_reported_collection_events"][0].update(
+            {"amount_cents":164979}))
+        self._tamper(lambda x:x["cases"][6].update(
+            {"source_url":"https://www.gao.gov/products/b-197658"}))
 
     def test_uncollected_future_overcharge_cannot_be_counted_as_offset(self):
         x={row["case_id"]:row for row in source.verified_gao_cases()}["A-14046"]
