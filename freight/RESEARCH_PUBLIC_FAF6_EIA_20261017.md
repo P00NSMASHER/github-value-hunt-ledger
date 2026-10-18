@@ -477,3 +477,41 @@ Separate external confirmation of *receipt of funds* is required before
 any source may graduate from `ADJUDICATED_AWARD` to
 `ACTUALLY_RECEIVED_RECOVERY`. No external outreach, payment handling,
 litigation action or customer contact is performed.
+
+
+### Unified read-only Lab 14 public-evidence census
+
+The source-specific validators now feed a single **sanitized, deterministic
+read-only report** that reconciles source categories *without claiming they
+are statistically or legally equivalent*:
+
+```bash
+PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+PYTHONPATH=. python -m freight.public_original_research_control \
+  --out /tmp/retally-lab14-original-sources
+```
+
+This creates `public_evidence_census.json` and `index.html` with only
+category/count/trust-status facts. The report does not copy the original
+raw shipper records, introduce a prospect identity, disclose a carrier
+customer contract, or store any private account credentials.
+
+It independently checks **307 bounded source records/observations**
+(78 BTS FAF6, 18 EIA, 11 dated carrier reference rates, 100 Census
+public-use shipment records, 100 STB public-use waybill records),
+**one separate original Census-published statistical worked example**
+and **one separate, administratively final FMC reparations order**.
+The last two are separate *evidence classes* and **are not additional
+shipment observations**.
+
+The source census rejects changes to source counts, a falsely reported
+2024 STB shipment-year histogram, attempts to multiply the first 100
+Census rows into national totals, claimed customer freight charges,
+and conversion of an FMC payment order into verified recovered cash.
+
+**Acceptance is limited to this unmerged research draft.** The report's
+SHA-256 digest is a reproducible *local content-integrity checksum*,
+not an externally signed government or bank receipt. The original
+26 historical findings and 18 independent human pilot requirements
+remain open. The client-facing website and production financial systems
+are not modified.
