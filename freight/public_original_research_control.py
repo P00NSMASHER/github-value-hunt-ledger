@@ -85,11 +85,11 @@ def snapshot() -> dict:
         and fmc["actual_payment_verified_cents"] is None
         and fmc["claimant_bank_or_payment_receipt_confirmed"] is False
         and fmc["retally_validated_recovery_cents"]==0
-        and gao["historical_distinct_decisions"]==6
-        and gao["gao_reported_collection_events"]==7
+        and gao["historical_distinct_decisions"]==7
+        and gao["gao_reported_collection_events"]==9
         and gao["agency_reported_collection_modes"]=={
-            "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":2,
-            "GOVERNMENT_APPLIED_SET_OFF":5,
+            "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":3,
+            "GOVERNMENT_APPLIED_SET_OFF":6,
         }
         and gao["cases_with_uncollected_future_deduction"]==1
         and gao["cases_with_carrier_refund_authorized_but_unverified_paid"]==1
@@ -175,7 +175,7 @@ def html_report(data:dict)->str:
         f"<tbody>{rows}</tbody></table>"
         "<p>Maryland's Census-weighted goods value is a separately published "
         "worked example; the FMC award is legally ordered, not independently "
-        "confirmed paid. Six distinct GAO government historical case decisions "
+        "confirmed paid. Seven distinct GAO government historical case decisions "
         "describe collected offsets/refunds, but no original bank/Treasury postings "
         "were independently inspected. A separate GSA government report documents "
         "a vendor repayment following ERRONEOUS notices of overcharge. Neither "
