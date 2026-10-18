@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2026-10-18",
+  "publisher": "US Surface Transportation Board",
+  "source_page": "https://www.stb.gov/reports-data/waybill/",
+  "source_zip": "https://www.stb.gov/wp-content/uploads/PublicUseWaybillSample2024.zip",
+  "zip_size": 68197449,
+  "zip_entries": 7,
+  "zip_original_member": "PublicUseWaybillSample2024.txt",
+  "member_compressed_bytes": 66413233,
+  "member_uncompressed_bytes": 539561337,
+  "member_crc32": "3048824b",
+  "member_local_offset": 1783486,
+  "source_range": "bytes=1783486-2045629",
+  "source_range_sha256": "51bdff79ade49491bcd5d3ef670a079a1d263372ef9dffb24ee8086a57b68059",
+  "first_records": 100,
+  "record_width": 247,
+  "line_ending": "CRLF",
+  "sample_bytes": 24900,
+  "sample_sha256": "007a598863ba5e7a6b2a8e09b2f75c0ccabcb9588df7c582a2445c7d9967e1d4",
+  "sample": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+  "caveats": [
+    "Fixed-width field columns not yet decoded against official 2024 reference guide.",
+    "Revenue in the public-use file may be masked and not represent actual waybill revenue.",
+    "First 100 lines are not a representative random draw; no national rail-rate or recovery estimates.",
+    "Full archive SHA and full-member CRC not independently replayed; only ZIP central directory metadata and exact source range verified.",
+    "No confidential waybill access attempted; only expressly public-use artifact."
+  ],
+  "classification": "REAL_PUBLIC_RECORDS_FROZEN_FIELDS_NOT_YET_ADJUDICATED"
+}
