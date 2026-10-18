@@ -165,6 +165,10 @@ def _verify_resolution(resolution: EngagementResolution) -> None:
 
 
 def _verify_finding_proof(finding) -> None:
+    for field in ("expected_cents", "actual_cents"):
+        value = getattr(finding, field)
+        if type(value) is not int or value < 0:
+            raise ValueError(field + " must be a non-negative integer: " + finding.finding_id)
     body = {
         "schema": 2,
         "finding_id": finding.finding_id,
