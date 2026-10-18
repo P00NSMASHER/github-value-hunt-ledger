@@ -37,6 +37,11 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["GSA_payment_direction_government_to_vendor_NOT_RETALLY"])
         self.assertTrue(data["GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED"])
         self.assertTrue(data["government_NOCs_may_be_erroneous_and_collections_reversed"])
+        self.assertEqual(data["separate_GAO_1979_improper_setoff_decisions"],1)
+        self.assertEqual(data["GAO_1979_applied_but_later_disallowed_offset_cents"],514105)
+        self.assertTrue(data["GAO_1979_reversal_reimbursement_not_verified"])
+        self.assertTrue(data["GAO_1979_negative_case_not_approved_collection"])
+        self.assertTrue(data["GAO_1979_private_setoff_authority_not_established"])
         self.assertEqual(data["census_official_md_origin_pums_record_count"],612317)
         self.assertEqual(data["census_official_md_origin_gvf_cv_percent"],"9.74")
         self.assertTrue(data["fmc_award_actual_cash_received_verified"] is False)
@@ -138,6 +143,19 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     ):
                         src.snapshot()
 
+    def test_improper_setoff_reversal_cannot_be_reported_as_valid_collected_money(self):
+        original=src.verified_historical_reversal()
+        for key,bad in [
+            ("illegal_postpetition_offset_is_valid_permanent_recovery",True),
+            ("independent_carrier_repayment_bank_receipt_obtained",True),
+            ("government_final_net_collections_credible_cents",514105),
+            ("actual_RETALLY_cash_recovered_cents",514105),
+        ]:
+            with self.subTest(key=key):
+                with patch.object(src,"verified_historical_reversal",return_value={**original,key:bad}):
+                    with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -146,6 +164,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("Seven distinct GAO government historical case decisions",html)
         self.assertIn("no original bank/Treasury postings",html)
         self.assertIn("ERRONEOUS notices of overcharge",html)
+        self.assertIn("GAO decision found $5,141.05",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
