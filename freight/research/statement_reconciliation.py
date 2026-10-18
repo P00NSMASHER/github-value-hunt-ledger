@@ -29,6 +29,9 @@ class StatementLine:
 class ClaimSnapshot:
     source_label: str
     claim_cents: int
+    debtor_ref: str | None = None
+    creditor_ref: str | None = None
+    claim_ref: str | None = None
 
 
 @dataclass(frozen=True)
@@ -118,10 +121,21 @@ def compare(
         raise ValueError("duplicate claim snapshot source")
     for claim in claims:
         _money(claim.claim_cents)
-    if claims and len({c.claim_cents for c in claims}) > 1:
-        flags.add("CONFLICTING_EXTERNAL_CLAIM_SNAPSHOTS")
-    if claims and any(c.claim_cents != sum_open for c in claims):
-        flags.add("EXTERNAL_CLAIM_DIFFERS_FROM_STATEMENT")
+    if claims:
+        identities = []
+        for claim in claims:
+            identity = (claim.debtor_ref, claim.creditor_ref, claim.claim_ref)
+            if any(not isinstance(part, str) or not part.strip() for part in identity):
+                flags.add("CLAIM_IDENTITY_UNVERIFIED")
+            else:
+                identities.append(tuple(part.strip().upper() for part in identity))
+        if len(identities) != len(claims) or len(set(identities)) != 1:
+            flags.add("CROSS_CLAIM_COMPARISON_BLOCKED")
+        else:
+            if len({c.claim_cents for c in claims}) > 1:
+                flags.add("CONFLICTING_EXTERNAL_CLAIM_SNAPSHOTS")
+            if any(c.claim_cents != sum_open for c in claims):
+                flags.add("EXTERNAL_CLAIM_DIFFERS_FROM_STATEMENT")
     return Reconciliation(
         row_count=len(rows),
         invoice_family_count=None,  # PRO/BOL and buyer evidence required; never suffix-count.
