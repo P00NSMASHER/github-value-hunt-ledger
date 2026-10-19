@@ -281,6 +281,31 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
             self.assertFalse(SOURCE_REGISTRY[key]["required"])
             self.assertTrue(SOURCE_REGISTRY[key]["private_third_party_content"])
 
+    def test_original_exemption_source_requires_same_page_conditions(self):
+        p = case_text_signals(
+            "india-dgft-2022-rice-export-exemption",
+            ["Government of India Notification No. 42/2015-2020 "
+             "entered Customs Station before 8.9.2022 with timestamp"]
+        )
+        self.assertEqual(p["original_regulatory_exemption_text_pages"], [1])
+        self.assertFalse(p["particular_shipments_entered_before_cutoff_timestamp_verified"])
+        self.assertFalse(p["carrier_credit_cleared_to_customer_verified"])
+        self.assertFalse(p["this_regulation_is_a_carrier_rate_agreement"])
+
+    def test_exemption_notice_is_not_by_itself_a_source_shipment_label(self):
+        p = case_text_signals(
+            "india-dgft-2022-rice-export-exemption",
+            ["Notification 42/2015-2020", "Customs Station before 8.9.2022"]
+        )
+        self.assertEqual(p["original_regulatory_exemption_text_pages"], [])
+        self.assertFalse(p["original_bank_payment_verified"])
+
+    def test_regulatory_notice_registry_is_not_a_customer_bill(self):
+        r = SOURCE_REGISTRY["india-dgft-2022-rice-export-exemption"]
+        self.assertFalse(r["required"])
+        self.assertFalse(r["private_third_party_content"])
+        self.assertIn("EXEMPTION", r["role"])
+
     def test_private_local_download_is_owner_only_and_source_hashed(self):
         with tempfile.TemporaryDirectory() as root:
             path = os.path.join(root, "originals")
