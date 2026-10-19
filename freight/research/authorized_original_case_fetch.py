@@ -29,6 +29,7 @@ ALLOWED_HOSTS = frozenset((
     "document.epiq11.com",
     "www.cbca.gov",
     "www2.fmc.gov",
+    "www.cma-cgm.com",
 ))
 SOURCE_REGISTRY = {
     "globaltranz-original-broker-bills": {
@@ -70,6 +71,18 @@ SOURCE_REGISTRY = {
     "fmc-kaushik-quote-invoices-zelle-evidence": {
         "url": "https://www2.fmc.gov/readingroom/docs/26-10/%2801%29%2026-10%20Verified%20Complaint%20%28as%20served%29.pdf/",
         "role": "ORIGINAL_LOGISTICS_QUOTE_INVOICE_BOL_PAYMENT_ALLEGATIONS_NO_REFUND",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "cma-cgm-india-2022-export-detention-rate": {
+        "url": "https://www.cma-cgm.com/assets/public/pdf/Export%20Detention%20Charges%20-%2020%20Jan%202022.pdf",
+        "role": "ISSUED_INDIA_GENERAL_EXPORT_DETENTION_TARIFF_EFFECTIVE_2022_01_20_NOT_SHIPMENT_MATCHED",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "cma-cgm-india-2022-export-demurrage-rate": {
+        "url": "https://www.cma-cgm.com/assets/public/documents/Export%20Demurrage%20Charges%20-%2020%20Jan%202022_0.pdf",
+        "role": "ISSUED_INDIA_GENERAL_EXPORT_DEMURRAGE_TARIFF_EFFECTIVE_2022_01_20_NOT_SHIPMENT_MATCHED",
         "private_third_party_content": True,
         "required": False,
     },
@@ -190,6 +203,18 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
     Never return raw extracted PDF content or third-party invoice references.
     """
     normalized = [" ".join(p.split()).casefold() for p in pages]
+    if source_id in ("cma-cgm-india-2022-export-detention-rate",
+                     "cma-cgm-india-2022-export-demurrage-rate"):
+        matches = [i + 1 for i, p in enumerate(normalized)
+                   if ("20th jan" in p or "20 jan 2022" in p)
+                   and ("cma cgm" in p or "cma - cgm" in p)][:3]
+        return {
+            "issued_general_rate_effective_date_text_pages": matches,
+            "particular_shipments_rated_against_this_tariff": False,
+            "private_agreement_or_later_amendment_excluded": False,
+            "shipper_original_payment_bank_clearing_verified": False,
+            "final_credit_to_shipper_executed": False,
+        }
     if source_id == "fmc-color-brands-original-invoices-and-ach":
         original_invoices = ("i1909095", "i2007047", "i2109072", "i2201018")
         invoice_pages = {key: [i + 1 for i, page in enumerate(normalized)
