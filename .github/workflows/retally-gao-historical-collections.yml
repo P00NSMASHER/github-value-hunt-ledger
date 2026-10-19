@@ -4,6 +4,9 @@ on:
     paths:
       - '.github/workflows/retally-gao-historical-collections.yml'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gao_b261127_contract_counterexample.py'
+      - 'freight/test_public_gao_b261127_contract_counterexample.py'
+      - 'freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json'
       - 'freight/public_crowley_appeal_scope_v1.py'
       - 'freight/test_public_crowley_appeal_scope_v1.py'
       - 'freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json'
@@ -34,6 +37,7 @@ jobs:
       - name: Validate exact original GAO historical case figures and false-claim denials
         run: |
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b261127_contract_counterexample.py
           PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
@@ -113,6 +117,23 @@ jobs:
           assert r['retally_recovered_cents']==0
           assert r['commercial_claim_clearance']=='NO_GO'
           print('2025 federal appellate authority was limited; alleged NOCs and $11.8m claim not RETALLY cash.')
+          PY
+      - name: Independently reject naive $1,373.00 TCN-vs-GBL false overcharge in GAO B-261127
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_b261127_contract_counterexample > /tmp/gaocontractinterpretations.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/gaocontractinterpretations.json').read_text())
+          assert r['historical_1980_government_reported_refund_and_setoff_cents']==164979
+          assert r['historical_1996_apparent_charge_difference_cents']==137300
+          assert r['historical_1996_GAO_sustained_note12_overcharge_cents']==0
+          assert r['one_bill_of_lading_always_equals_a_single_chargeable_shipment'] is False
+          assert r['prebilling_government_approved_methods_must_be_reviewed'] is True
+          assert r['verified_RETALLY_recoveries_cents']==0
+          assert r['retally_prospect_contact_or_recovery_authorized'] is False
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('Two GAO original decisions have opposite contract-specific outcomes; no generic false money claim.')
           PY
       - name: Fail closed on any implication that GAO decisions prove RETALLY money recovered
         run: |
