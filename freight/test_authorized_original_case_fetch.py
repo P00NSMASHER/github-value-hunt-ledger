@@ -249,6 +249,38 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
             self.assertFalse(SOURCE_REGISTRY[key]["required"])
             self.assertTrue(SOURCE_REGISTRY[key]["private_third_party_content"])
 
+    def test_2022_carrier_detention_tariff_date_is_not_shipment_rate_proof(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-detention-rate",
+            ["CMA CGM Revision 20th Jan 2022. Export Container Detention Charges"],
+        )
+        self.assertEqual(p["issued_general_rate_effective_date_text_pages"], [1])
+        self.assertFalse(p["particular_shipments_rated_against_this_tariff"])
+        self.assertFalse(p["private_agreement_or_later_amendment_excluded"])
+        self.assertFalse(p["final_credit_to_shipper_executed"])
+
+    def test_export_demurrage_not_interchangeable_with_detention(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-demurrage-rate",
+            ["CMA - CGM Revision 20th January 2022 export demurrage charges"],
+        )
+        self.assertEqual(p["issued_general_rate_effective_date_text_pages"], [1])
+        self.assertFalse(p["particular_shipments_rated_against_this_tariff"])
+
+    def test_rate_reference_without_effective_date_is_held(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-detention-rate",
+            ["CMA CGM official India general rates 2026"],
+        )
+        self.assertEqual(p["issued_general_rate_effective_date_text_pages"], [])
+
+    def test_new_rate_documents_are_optional_third_party_sources(self):
+        for key in ("cma-cgm-india-2022-export-detention-rate",
+                    "cma-cgm-india-2022-export-demurrage-rate"):
+            self.assertIn(key, SOURCE_REGISTRY)
+            self.assertFalse(SOURCE_REGISTRY[key]["required"])
+            self.assertTrue(SOURCE_REGISTRY[key]["private_third_party_content"])
+
     def test_private_local_download_is_owner_only_and_source_hashed(self):
         with tempfile.TemporaryDirectory() as root:
             path = os.path.join(root, "originals")
