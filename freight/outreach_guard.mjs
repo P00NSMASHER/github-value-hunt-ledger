@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 /**
  * Freight Recovery pre-send gate. No network or email transport.
  * State and prospect data MUST live privately outside the public checkout.
@@ -26,6 +27,16 @@ export function recipientKey(value) {
     return local.split("+")[0].replace(/\./g,"")+"@gmail.com";
   return local+"@"+domain;
 }
+// Hash the exact proposed recipient and message. This digest alone is NOT approval.
+export function outreachApprovalDigest(message) {
+  return createHash("sha256").update(JSON.stringify({
+    to:recipientKey(message.to), account_id:message.account_id,
+    channel:message.channel, touch:message.touch, offer:message.offer??null,
+    subject:message.subject??"", text:message.text??"", html:message.html??null,
+    personalization:message.personalization??null
+  })).digest("hex");
+}
+
 export function reserveOutreach(message, state, sender, nowIso, reservationId) {
   const errors=[];
   const now=Date.parse(nowIso);
@@ -80,6 +91,39 @@ export function reserveOutreach(message, state, sender, nowIso, reservationId) {
         !norm(message.text).includes(norm(message.personalization))) errors.push("PERSONALIZATION_REQUIRED");
   } else if (!["REFERRAL","EDITORIAL","DIRECTORY"].includes(message.channel) ||
              contact?.channel_approved!==true) errors.push("CHANNEL_APPROVAL_REQUIRED");
+  // A ready campaign or old send is not consent. Require a separate private
+  // owner approval bound to this exact message and short validity window.
+  // This checks receipt consistency, NOT signer identity; direct sends can
+  // bypass this no-transport reservation tool and remain prohibited without approval.
+  const approval=sender?.owner_approval;
+  let approved=false;
+  if (approval && typeof approval==="object") {
+    const start=Date.parse(approval.approved_at);
+    const end=Date.parse(approval.expires_at);
+    const validTime=typeof approval.approved_at==="string" &&
+      typeof approval.expires_at==="string" &&
+      /^\\d{4}-\\d{2}-\\d{2}T.*Z$/.test(approval.approved_at) &&
+      /^\\d{4}-\\d{2}-\\d{2}T.*Z$/.test(approval.expires_at) &&
+      Number.isFinite(start) && Number.isFinite(end) &&
+      start<=now && now<end && end>start && end-start<=7*24*60*60*1000;
+    try {
+      approved=approval.confirmed_by_owner===true &&
+        approval.approved_by==="OWNER" &&
+        typeof approval.approval_id==="string" &&
+        /^[a-zA-Z0-9][a-zA-Z0-9._:-]{7,119}$/.test(approval.approval_id) &&
+        typeof approval.evidence_ref==="string" &&
+        approval.evidence_ref.trim().length>=12 &&
+        approval.recipient_key===key &&
+        approval.account_id===message.account_id &&
+        approval.channel===message.channel &&
+        approval.touch===message.touch &&
+        validTime &&
+        approval.message_sha256===outreachApprovalDigest(message);
+    } catch { approved=false; }
+  }
+  if (!approved) errors.push("EXPLICIT_OWNER_APPROVAL_REQUIRED");
+  else if (state.events.some(e=>e.owner_approval_id===approval.approval_id))
+    errors.push("OWNER_APPROVAL_ALREADY_USED");
   const past=state.events.filter(e=>e.recipient_key===key || e.account_id===message.account_id);
   if (past.some(e=>["RESERVED","UNKNOWN"].includes(e.delivery))) errors.push("UNRESOLVED_PRIOR_SEND");
   if (past.some(e=>!["SENT","CANCELLED","RESERVED","UNKNOWN","DRAFT"].includes(e.delivery)))
@@ -102,6 +146,7 @@ export function reserveOutreach(message, state, sender, nowIso, reservationId) {
   if (errors.length) return {ok:false,errors:[...new Set(errors)]};
   const next=JSON.parse(JSON.stringify(state));
   next.events.push({reservation_id:reservationId,recipient_key:key,account_id:message.account_id,
-    delivery:"RESERVED",reserved_at:nowIso,touch:message.touch,channel:message.channel});
+    delivery:"RESERVED",reserved_at:nowIso,touch:message.touch,channel:message.channel,
+    owner_approval_id:approval.approval_id});
   return {ok:true,errors:[],state:next,reservation_id:reservationId};
 }
