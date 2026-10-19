@@ -113,7 +113,9 @@ def date_value(value: str):
 
 
 def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
-                cross_period_keys: set | None = None) -> dict:
+                cross_period_keys: set | None = None,
+                cross_period_history: dict | None = None,
+                source_month: str | None = None) -> dict:
     """Returns only aggregate statistics and SHA-256; source rows never leave memory.
 
     The published 'Fully paid' flag + EFT/reference is accounting ledger evidence,
@@ -154,6 +156,14 @@ def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
     invoice_keys = Counter()
     amount_cents_total = 0
     cross_period_duplicate_rows = 0
+    cross_period_unique_invoice_amount_cents = 0
+    duplicate_prior_months = Counter()
+    repeated_same_payment_ref = 0
+    repeated_different_payment_ref = 0
+    repeated_same_invoice_amount = 0
+    repeated_different_invoice_amount = 0
+    outside_published_payment_month = 0
+    min_payment_date = max_payment_date = None
     for cells in reader:
         if not cells or all(not value.strip() for value in cells):
             continue
@@ -192,6 +202,12 @@ def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
         fully_paid += 1
         complete += 1
         amount_cents_total += cents
+        if source_month is not None and payment_date.strftime("%Y-%m") != source_month:
+            outside_published_payment_month += 1
+        if min_payment_date is None or payment_date < min_payment_date:
+            min_payment_date = payment_date
+        if max_payment_date is None or payment_date > max_payment_date:
+            max_payment_date = payment_date
         invoice_id = (
             row["Supplier Number"].upper(),
             row["Invoice Number"].upper(),
@@ -204,6 +220,22 @@ def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
                 cross_period_duplicate_rows += 1
             else:
                 cross_period_keys.add(invoice_id)
+        if cross_period_history is not None:
+            prior = cross_period_history.get(invoice_id)
+            if prior is None:
+                cross_period_history[invoice_id] = (
+                    source_month, cents, row["Payment Number"], payment_date.isoformat())
+                cross_period_unique_invoice_amount_cents += cents
+            else:
+                duplicate_prior_months[prior[0] or "UNKNOWN_PERIOD"] += 1
+                if prior[1] == cents:
+                    repeated_same_invoice_amount += 1
+                else:
+                    repeated_different_invoice_amount += 1
+                if prior[2] == row["Payment Number"]:
+                    repeated_same_payment_ref += 1
+                else:
+                    repeated_different_payment_ref += 1
     if not total:
         raise SourceHold("ZERO_SOURCE_ROWS")
     return {
@@ -212,6 +244,15 @@ def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
         "source_url": source_url,
         "preamble_rows_before_header": header_preamble_rows,
         "cross_period_duplicate_invoice_rows": cross_period_duplicate_rows,
+        "unique_cross_period_invoice_amount_gbp_cents": cross_period_unique_invoice_amount_cents if cross_period_history is not None else None,
+        "duplicate_prior_period_counts": dict(sorted(duplicate_prior_months.items())),
+        "repeat_invoice_same_payment_reference": repeated_same_payment_ref,
+        "repeat_invoice_different_payment_reference": repeated_different_payment_ref,
+        "repeat_invoice_same_reported_invoice_amount": repeated_same_invoice_amount,
+        "repeat_invoice_different_reported_invoice_amount": repeated_different_invoice_amount,
+        "source_payment_date_min": min_payment_date.isoformat() if min_payment_date else None,
+        "source_payment_date_max": max_payment_date.isoformat() if max_payment_date else None,
+        "payment_dates_outside_named_report_month": outside_published_payment_month if source_month is not None else None,
         "source_sha256": sha,
         "source_bytes": len(raw),
         "license_label": LICENSE_LABEL,
@@ -256,8 +297,10 @@ def main() -> None:
     try:
         if args.live_all:
             seen = set()
+            history = {}
             result = {period: profile_csv(fetch_official_csv(url),
-                                          source_url=url, cross_period_keys=seen)
+                                          source_url=url, cross_period_keys=seen,
+                                          cross_period_history=history, source_month=period)
                       for period, url in SOURCE_URLS.items()}
             summary = {
                 "status": "MULTIPERIOD_PUBLISHED_LEDGER_REPLAY_ONLY",
@@ -266,6 +309,10 @@ def main() -> None:
                 "complete_paid_reference_rows": sum(r["complete_paid_reference_rows"] for r in result.values()),
                 "cross_period_duplicate_invoice_rows": sum(r["cross_period_duplicate_invoice_rows"] for r in result.values()),
                 "distinct_cross_period_invoice_keys": len(seen),
+                "unique_invoice_amount_gbp_cents": sum(r["unique_cross_period_invoice_amount_gbp_cents"] for r in result.values()),
+                "repeated_same_payment_reference": sum(r["repeat_invoice_same_payment_reference"] for r in result.values()),
+                "repeated_different_payment_reference": sum(r["repeat_invoice_different_payment_reference"] for r in result.values()),
+                "payment_dates_outside_named_report_month": sum(r["payment_dates_outside_named_report_month"] for r in result.values()),
                 "reported_invoice_amount_gbp_cents": sum(
                     r["total_reported_invoice_amount_gbp_cents_for_complete_rows"]
                     for r in result.values()),
