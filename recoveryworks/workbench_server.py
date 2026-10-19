@@ -4,6 +4,7 @@ import argparse
 import csv
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
+import ipaddress
 import json
 import re
 import threading
@@ -62,6 +63,12 @@ def validated_external_origin(value):
             or any(part.startswith('-') or part.endswith('-') or len(part) > 63
                    for part in hostname.split('.'))):
         raise ValueError('external origin must be an exact HTTPS DNS hostname without port or path')
+    try:
+        ipaddress.ip_address(hostname)
+    except ValueError:
+        pass
+    else:
+        raise ValueError('external origin must be a DNS hostname, not an IP address')
     return value
 
 
