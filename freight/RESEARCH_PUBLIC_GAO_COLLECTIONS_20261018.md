@@ -315,3 +315,74 @@ change the original 26 historical/18 human approval holds.
 **Decision tier: ORIGINAL_2025_APPELLATE_AUTHORITY;
 PAYMENT_CLAIM_NOT_ADJUDICATED_IN_THIS_APPEAL;
 NO_PRIVATE_CUSTOMER_RECOVERY_AUTHORITY.**
+
+
+## Independent contract-interpretation counterexample — GAO B-261127 (1996)
+
+**First-party original publication:** [Matter of Canupp Trucking,
+B-261127, February 15, 1996](https://www.gao.gov/products/b-261127).
+This is a separately counted **adverse rate-dispute decision**, not an
+eighth positive historic GAO collection, another customer invoice,
+or another of the 307 original market/survey observations.
+
+The government alleged that Canupp's `Note 12` pickup/delivery pricing
+should use the entire **one Government Bill of Lading (GBL)** as the
+unit of shipment. But the specific MTMC/NAVMTO tender **600029** had
+no definition incorporated for that particular Note, and **qualified
+government staff affirmatively advised the carrier, before billing,
+to use each Transportation Control Number (TCN)**. The carrier then
+used that interpretation, it reported, on 1,062 GBLs and remained
+uncontested for over three years. GAO found the **TCN-based Note 12
+charges valid** under that contract, though it **denied additional
+Note 14 terminal-service charges** as duplicative.
+
+### A GAO-published *actual billed-charge example* that did not produce an overcharge
+
+| Original published component for GBL `C-8,141,261` | Amount |
+|---|---:|
+| 63 TCNs charged $25.00 minimum | $1,575.00 |
+| Two further TCN charges | $28.50 + $55.90 |
+| **Carrier's reported Note 12 charges** | **$1,659.40** |
+| Government's proposed *one GBL* rate, 14,320 pounds × $2.00/cwt | $286.40 |
+| **Mathematical difference if government's interpretation applied** | **$1,373.00** |
+| GAO-sustained recoverable **Note 12 overcharge** | **$0.00** |
+
+This is a publisher-documented bill-line arithmetic example, **not**
+a downloaded carrier invoice image or customer-supplied signed tariff
+copy. No independent bank payment, issued credit memo, actual customer
+contract or current private rate authority was obtained.
+
+The original decision independently references the *opposite*
+[GAO B-197658 (1980) Yellow Freight decision](https://www.gao.gov/assets/b-197658.pdf),
+which **upheld a government $1,649.79 refund and setoff** where a single
+steel-post lot was tendered simultaneously despite three individual
+carrier bills of lading. The **specific tender definition and
+authorized prior course of billing differ** between these two cases.
+Neither a blanket `one BOL means one shipment` rule nor a rule
+that all split BOLs may be combined would fit both outcomes.
+
+**Software protection added:** A new isolated, typed original-source
+validator `freight/public_gao_b261127_contract_counterexample.py`
+recomputes all the 1996 components in integer cents, compares that
+decision to the older, existing GAO B-197658 source validator, and
+requires **zero** recoverable Note 12 overcharge in the 1996 case.
+Its adversarial tests reject changed charges, counts, source URLs,
+fake contract evidence, fabricated carrier refunds, ignored
+prebilling government approval or claims that the $1,373.00
+difference is RETALLY savings.
+
+The consolidated original research report now separately classifies
+**seven historical GAO government-reported collection decisions**,
+**one 1979 later-disallowed setoff** and **one 1996 mathematically
+disputed but expressly carrier-upheld tariff interpretation**, plus
+independent GSA budget, Court of Appeals, Census, FMC and public
+market-source material. None establishes an independently authorized
+commercial recovery claim, a customer refund, retained client cash,
+or a present-day legal precedent automatically governing private shippers.
+
+**Operational gate:** For a real RETALLY audit, obtain and authenticate
+the *effective customer contract, incorporated tariff and amendments,
+prior authorized billing interpretations, relevant shipment/tender
+facts and paid invoice* before computing a recoverable difference;
+then require a separate post-dispute credit/payment receipt. These
+historical GAO documents do not supply that customer authority.
