@@ -45,11 +45,10 @@
     }
   ],
   "max_original_overcharge_amount_proved_valid_per_decision_cents": null,
-  "reported_GSA_applied_deductions_cents": 19093,
-  "carrier_claim_or_certificate_due_at_most_cents": 15618,
   "actual_carrier_refunds_paid_verified_cents": null,
   "RETALLY_original_customer_invoices_verified": 0,
   "RETALLY_recoveries_cents": 0,
   "legal_status": "GAO_1976_ORIGINAL_BOL_ORIGIN_REBUTTED_AND_REPAYMENT_ONLY_CONDITIONAL",
-  "note": "Carrier repayment of $133.28 was conditionally allowed; neither carrier settlement certificate nor separate bank statements were verified as paid. The two shipments are separate transactions."
+  "note": "Carrier repayment of $133.28 was conditionally allowed; neither carrier settlement certificate nor separate bank statements were verified as paid. The two shipments are separate transactions.",
+  "two_distinct_GBLs_must_not_be_combined_as_a_single_recovered_balance": true
 }
