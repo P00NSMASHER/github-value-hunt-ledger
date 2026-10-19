@@ -38,6 +38,12 @@ ORIGIN_REQUIRED = {
     "INDEPENDENT_FINAL_ADJUDICATION": "INDEPENDENT_FINAL_REVIEW",
     "EXECUTED_RECOVERY_CLEARING": "INDEPENDENT_BANK_OR_PROCESSOR_CLEARED",
 }
+# A detention claim cannot be rated against a demurrage tariff. Combined
+# services are a different documented service, never a silent synonym.
+CHARGE_TYPES = frozenset({
+    "LINEHAUL", "DETENTION", "DEMURRAGE", "MERGED_DETENTION_DEMURRAGE",
+    "STORAGE", "ACCESSORIAL",
+})
 _SHA256 = re.compile(r"[a-f0-9]{64}\Z")
 
 
@@ -61,6 +67,9 @@ class EvidencePointer:
     # not inferred from a common invoice, a judgment or a credit-note heading.
     payment_payer_ref: str | None = None
     payment_payee_ref: str | None = None
+    # An independent reviewer must verify this from the *source document*,
+    # not merely from a filename or a rate used for a different charge.
+    charge_type: str | None = None
 
 
 @dataclass(frozen=True)
@@ -89,6 +98,7 @@ class RecoveryCaseCandidate:
     # shipping line separately credited an intermediary / booking agent.
     original_payment_payer_ref: str | None = None
     recovery_beneficiary_ref: str | None = None
+    charge_type: str | None = None
 
 
 @dataclass(frozen=True)
@@ -165,6 +175,9 @@ def assess_candidate(case: RecoveryCaseCandidate) -> AdmissionDecision:
         flags.add("SHIPMENT_DATE_UNVERIFIED")
     if case.currency != "USD":
         flags.add("CURRENCY_SCOPE_UNSUPPORTED")
+    charge_type = _ref(case.charge_type)
+    if charge_type not in CHARGE_TYPES:
+        flags.add("CASE_CHARGE_TYPE_UNVERIFIED")
     for v in (case.billed_cents, case.original_paid_cents,
               case.controlling_charge_cents, case.adjudicated_error_cents,
               case.executed_recovery_cents):
@@ -223,6 +236,12 @@ def assess_candidate(case: RecoveryCaseCandidate) -> AdmissionDecision:
             flags.add("SHIPMENT_IDENTITY_MISMATCH")
         if doc.issuer_role != ORIGIN_REQUIRED[doc.kind]:
             flags.add("NOT_ORIGINAL_OR_INDEPENDENT_SOURCE_" + doc.kind)
+        if doc.kind in ("ORIGINAL_CARRIER_INVOICE", "EFFECTIVE_RATE_AUTHORITY"):
+            documented_class = _ref(doc.charge_type)
+            if documented_class not in CHARGE_TYPES:
+                flags.add("INVOICE_OR_RATE_SERVICE_CLASS_NOT_SOURCE_VERIFIED")
+            elif charge_type and documented_class != charge_type:
+                flags.add("INVOICE_RATE_SERVICE_CLASS_MISMATCH")
         if doc.kind == "ORIGINAL_PAYMENT_CLEARING":
             if not _ref(doc.payment_payer_ref) or not _ref(doc.payment_payee_ref):
                 flags.add("ORIGINAL_BANK_PAYMENT_PARTIES_MISSING")
