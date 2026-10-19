@@ -215,6 +215,40 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
             self.assertIn(key, SOURCE_REGISTRY)
             self.assertFalse(SOURCE_REGISTRY[key]["required"])
 
+    def test_color_brands_invoice_ach_reference_not_proven_bank_clearance(self):
+        records = [
+            "AAF Invoice I2007047 ocean freight and cargo insurance.",
+            "Exhibit 3: Proof of Complainant ACH payment of Invoice I2007047",
+        ]
+        got = case_text_signals("fmc-color-brands-original-invoices-and-ach", records)
+        self.assertEqual(got["original_invoice_reference_pages"]["i2007047"], [1, 2])
+        self.assertEqual(got["filed_ach_payment_evidence_reference_pages"], [2])
+        self.assertFalse(got["separately_bank_cleared_original_payment_verified"])
+        self.assertFalse(got["executed_reparations_bank_receipt_verified"])
+        self.assertFalse(got["frozen_invoice_level_overcharge_truth_verified"])
+
+    def test_color_brands_no_invoice_reference_yields_empty_not_success(self):
+        got = case_text_signals("fmc-color-brands-original-invoices-and-ach",
+                                ["No referenced freight bill here", "ACH banking instructions only"])
+        self.assertEqual(got["original_invoice_reference_pages"]["i2109072"], [])
+        self.assertFalse(got["governing_effective_tariff_or_rate_verified"])
+
+    def test_zelle_under_protest_is_not_refund_or_adjudication(self):
+        got = case_text_signals("fmc-kaushik-quote-invoices-zelle-evidence",
+                                ["SFL original invoice $7,840.00", "Zelle paid under protest"])
+        self.assertEqual(got["filed_forwarder_invoice_text_pages"], [1])
+        self.assertEqual(got["filed_original_payment_claim_pages"], [2])
+        self.assertTrue(got["refund_executed_not_established"])
+        self.assertFalse(got["overcharge_independently_adjudicated"])
+
+    def test_new_research_source_is_optional_and_private_data_unpublished(self):
+        keys = ("fmc-color-brands-original-invoices-and-ach",
+                "fmc-kaushik-quote-invoices-zelle-evidence")
+        for key in keys:
+            self.assertIn(key, SOURCE_REGISTRY)
+            self.assertFalse(SOURCE_REGISTRY[key]["required"])
+            self.assertTrue(SOURCE_REGISTRY[key]["private_third_party_content"])
+
     def test_private_local_download_is_owner_only_and_source_hashed(self):
         with tempfile.TemporaryDirectory() as root:
             path = os.path.join(root, "originals")
