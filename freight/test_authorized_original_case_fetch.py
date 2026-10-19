@@ -175,6 +175,15 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
                               ["ABF bill unrelated", "051894063 without carrier header"])
         self.assertEqual(p["carrier_origin_invoice_text_reference_pages"], [])
 
+    def test_possible_abf_refund_allowance_is_not_a_settled_credit(self):
+        p = case_text_signals(
+            "arcbest-underlying-carrier-invoices",
+            ["ABF invoice 051894063. A refund allowance of US-$21.61 may be paid to consignee."],
+        )
+        self.assertEqual(p["conditional_unloading_allowance_text_pages"], [1])
+        self.assertFalse(p["conditional_allowance_proves_executed_refund"])
+        self.assertFalse(p["actual_original_payment_bank_clearing_verified"])
+
     def test_fmc_original_carrier_invoice_refund_not_implied(self):
         p = case_text_signals("fmc-pro-transport-carrier-invoice-exhibits",
                               ["PRO TRANSPORT INC Invoice 84579 BOL B436543"])
