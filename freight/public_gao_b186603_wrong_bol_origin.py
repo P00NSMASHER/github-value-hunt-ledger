@@ -52,8 +52,8 @@ def verified_original_gao_origin_decision()->dict:
         _fail("ORIGINAL_DECISION_CLASSIFICATION_CHANGED")
     x,y=d["historical_shipment_disputes"]
     if (type(x) is not dict or type(y) is not dict
-        or set(x)!=["GBL","date","product","units","weight_lb","published_bill_of_lading_origin","agency_investigated_actual_origin","destination","original_freight_payment_cents","gsa_applied_setoff_cents","GAO_conclusion","payment_back_to_carrier_proven","independent_original_BOL_or_carrier_PRO_scan_examined","carrier_original_PRO_mentioned","documentation_evidence","originally_typed_destination_and_origin_are_verified_same_document"]
-        or set(y)!=["GBL","date","product","units","weight_lb","published_bill_of_lading_origin","agency_investigated_actual_origin","destination","original_freight_payment_cents","gsa_applied_setoff_cents","GAO_conclusion","settlement_certificate_issued_cents","settlement_certificate_paid_back_to_carrier_verified"]
+        or set(x)!=set(["GBL","date","product","units","weight_lb","published_bill_of_lading_origin","agency_investigated_actual_origin","destination","original_freight_payment_cents","gsa_applied_setoff_cents","GAO_conclusion","payment_back_to_carrier_proven","independent_original_BOL_or_carrier_PRO_scan_examined","carrier_original_PRO_mentioned","documentation_evidence","originally_typed_destination_and_origin_are_verified_same_document"])
+        or set(y)!=set(["GBL","date","product","units","weight_lb","published_bill_of_lading_origin","agency_investigated_actual_origin","destination","original_freight_payment_cents","gsa_applied_setoff_cents","GAO_conclusion","settlement_certificate_issued_cents","settlement_certificate_paid_back_to_carrier_verified"])
         or x.get("GBL")!="F-7349731"
         or x.get("date")!="1972-12-21"
         or x.get("product")!="40 arm chairs"
