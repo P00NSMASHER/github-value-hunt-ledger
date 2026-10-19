@@ -137,7 +137,7 @@ def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
     for idx, candidate in enumerate(reader):
         if idx >= 6:
             break
-        normalized = [" ".join(cell.replace("\\ufeff", "").split()) for cell in candidate]
+        normalized = [" ".join(cell.replace("\ufeff", "").split()) for cell in candidate]
         if set(REQUIRED).issubset(normalized):
             headers = normalized
             header_preamble_rows = idx
