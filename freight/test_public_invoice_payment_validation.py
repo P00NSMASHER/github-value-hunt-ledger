@@ -126,6 +126,34 @@ class TestPublicInvoicePaymentProfile(unittest.TestCase):
         self.assertEqual(may["cross_period_duplicate_invoice_rows"], 0)
         self.assertEqual(len(seen), 2)
 
+
+    def test_cross_period_same_invoice_same_payment_does_not_double_count_value(self):
+        seen = set()
+        history = {}
+        profile_csv(csv_bytes({}), source_month="2026-06",
+                    cross_period_keys=seen, cross_period_history=history)
+        later = profile_csv(csv_bytes({}), source_month="2026-07",
+                            cross_period_keys=seen, cross_period_history=history)
+        self.assertEqual(later["cross_period_duplicate_invoice_rows"], 1)
+        self.assertEqual(later["repeat_invoice_same_payment_reference"], 1)
+        self.assertEqual(later["repeat_invoice_same_reported_invoice_amount"], 1)
+        self.assertEqual(later["unique_cross_period_invoice_amount_gbp_cents"], 0)
+        self.assertEqual(later["duplicate_prior_period_counts"], {"2026-06": 1})
+
+    def test_same_invoice_different_payment_reference_is_not_claimed_recovery(self):
+        history = {}
+        profile_csv(csv_bytes({}), source_month="2026-06", cross_period_history=history)
+        later = profile_csv(csv_bytes({"Payment Number": "PAY-2"}),
+                            source_month="2026-07", cross_period_history=history)
+        self.assertEqual(later["repeat_invoice_different_payment_reference"], 1)
+        self.assertEqual(later["verified_retally_recovered_cents"], 0)
+
+    def test_source_month_validates_payment_date_coverage(self):
+        result = profile_csv(csv_bytes({}), source_month="2026-04")
+        self.assertEqual(result["payment_dates_outside_named_report_month"], 1)
+        self.assertEqual(result["source_payment_date_min"], "2026-07-01")
+        self.assertEqual(result["source_payment_date_max"], "2026-07-01")
+
     def test_pinned_url_guard_blocks_arbitrary_network_calls(self):
         with self.assertRaisesRegex(SourceHold, "SOURCE_NOT_PINNED"):
             fetch_official_csv("https://example.net/secret")
