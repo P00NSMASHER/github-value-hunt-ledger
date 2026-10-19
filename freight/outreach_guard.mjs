@@ -102,8 +102,8 @@ export function reserveOutreach(message, state, sender, nowIso, reservationId) {
     const end=Date.parse(approval.expires_at);
     const validTime=typeof approval.approved_at==="string" &&
       typeof approval.expires_at==="string" &&
-      /^\\d{4}-\\d{2}-\\d{2}T.*Z$/.test(approval.approved_at) &&
-      /^\\d{4}-\\d{2}-\\d{2}T.*Z$/.test(approval.expires_at) &&
+      /^\d{4}-\d{2}-\d{2}T.*Z$/.test(approval.approved_at) &&
+      /^\d{4}-\d{2}-\d{2}T.*Z$/.test(approval.expires_at) &&
       Number.isFinite(start) && Number.isFinite(end) &&
       start<=now && now<end && end>start && end-start<=7*24*60*60*1000;
     try {
