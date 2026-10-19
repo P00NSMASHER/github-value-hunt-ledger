@@ -306,6 +306,67 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
         self.assertFalse(r["private_third_party_content"])
         self.assertIn("EXEMPTION", r["role"])
 
+    def test_official_export_detention_rate_same_page_table_is_found(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-det-primary-tariff-pdf", [
+                "D&D TARIFFS INDIA EXPORT - ALL PLACES TARIFF IN USD "
+                "EFFECTIVE DATE: 20-JAN-2022 STANDARD - SPLITTED "
+                "DETENTION 10 FREE DAYS From 11th To 17th 35 70 70"
+            ])
+        self.assertEqual(p["official_export_2022_detention_rate_pages"], [1])
+        self.assertEqual(p["candidate_standard_20ft_11to17_usd_per_day"], 35)
+        self.assertEqual(p["candidate_standard_40ft_11to17_usd_per_day"], 70)
+        self.assertFalse(p["governing_effective_rate_for_bol_amc1912992_verified"])
+        self.assertFalse(p["actual_customer_bank_settlement_verified"])
+
+    def test_anl_brand_does_not_prove_cma_sungold_carrier_contract(self):
+        p = case_text_signals(
+            "cma-cgm-anl-india-2022-split-dd-tariff-pdf", [
+                "D&D TARIFFS INDIA EXPORT - ALL (EXCEPT FOR ICD) "
+                "EFFECTIVE DATE: 20-JAN-2022 DETENTION "
+                "10 FREE DAYS From 11th To 17th 35 70 70"
+            ])
+        self.assertEqual(p["official_export_2022_detention_rate_pages"], [1])
+        self.assertFalse(p["carrier_brand_same_as_sungold_booking_proven"])
+        self.assertFalse(p["governing_effective_rate_for_bol_amc1912992_verified"])
+
+    def test_rate_date_and_tariff_tables_on_different_pages_not_validated(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-det-primary-tariff-pdf", [
+                "D&D TARIFFS INDIA EXPORT - ALL PLACES EFFECTIVE DATE 20-JAN-2022",
+                "DETENTION 10 FREE DAYS From 11th To 17th 35 70 70",
+            ])
+        self.assertEqual(p["official_export_2022_detention_rate_pages"], [])
+        self.assertIsNone(p["candidate_standard_20ft_11to17_usd_per_day"])
+
+    def test_2024_tariff_is_not_2022_controlling_rate(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-det-primary-tariff-pdf", [
+                "EXPORT - ALL PLACES DETENTION 10 FREE DAYS 35 70 70 "
+                "EFFECTIVE DATE: 01-JUL-2024",
+            ])
+        self.assertEqual(p["official_export_2022_detention_rate_pages"], [])
+
+    def test_export_demurrage_only_table_is_not_detention_authority(self):
+        p = case_text_signals(
+            "cma-cgm-india-2022-export-det-primary-tariff-pdf", [
+                "EXPORT - ALL PLACES DEMURRAGE 10 FREE DAYS "
+                "EFFECTIVE DATE: 20-JAN-2022 From 11th To 17th 35 70 70"
+            ])
+        self.assertEqual(p["official_export_2022_detention_rate_pages"], [])
+
+    def test_real_official_original_pdf_registry_urls_unchanged_and_held(self):
+        two = (
+            "cma-cgm-india-2022-export-det-primary-tariff-pdf",
+            "cma-cgm-anl-india-2022-split-dd-tariff-pdf",
+        )
+        for name in two:
+            entry = SOURCE_REGISTRY[name]
+            self.assertTrue(entry["url"].startswith("https://www.cma-cgm.com/assets/public/"))
+            self.assertTrue(entry["url"].endswith(".pdf"))
+            self.assertFalse(entry["required"])
+            self.assertTrue(entry["private_third_party_content"])
+
     def test_private_local_download_is_owner_only_and_source_hashed(self):
         with tempfile.TemporaryDirectory() as root:
             path = os.path.join(root, "originals")
