@@ -70,7 +70,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
-          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b261127_contract_counterexample.py
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b261127_contract_counterexample
           PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
