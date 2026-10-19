@@ -21,6 +21,7 @@ from freight.public_stb_waybill_prefix_v1 import report as stb_prefix
 from freight.public_cfs2022_official_example_v1 import verified_published_example
 from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
+from freight.public_gao_b261127_contract_counterexample import compare_opposite_contract_interpretations
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
 from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
@@ -48,6 +49,7 @@ def snapshot() -> dict:
     maryland=verified_published_example()
     fmc=verified_public_order()
     gao=public_collection_report()
+    contract_counterexample=compare_opposite_contract_interpretations()
     gsa=gsa_false_positive_refund()
     reversal=verified_historical_reversal()
     fund=gsa_fund_accounting()
@@ -112,6 +114,17 @@ def snapshot() -> dict:
         and gao["real_RETALLY_customer_invoices_examined"]==0
         and gao["real_RETALLY_customer_recoveries_cents"]==0
         and gao["commercial_claim_clearance"]=="NO_GO"
+        and contract_counterexample["historical_1980_government_reported_refund_and_setoff_cents"]==164979
+        and contract_counterexample["historical_1996_apparent_charge_difference_cents"]==137300
+        and contract_counterexample["historical_1996_GAO_rejected_overcharge_cents"]==137300
+        and contract_counterexample["historical_1996_GAO_sustained_note12_overcharge_cents"]==0
+        and contract_counterexample["same_source_authority_or_tariff_in_both_cases"] is False
+        and contract_counterexample["one_bill_of_lading_always_equals_a_single_chargeable_shipment"] is False
+        and contract_counterexample["prebilling_government_approved_methods_must_be_reviewed"] is True
+        and contract_counterexample["contract_effective_terms_must_be_independently_proven"] is True
+        and contract_counterexample["verified_RETALLY_recoveries_cents"]==0
+        and contract_counterexample["retally_prospect_contact_or_recovery_authorized"] is False
+        and contract_counterexample["commercial_claim_clearance"]=="NO_GO"
         and gsa["source_reports_FY2023_vendor_payment_made"] is True
         and gsa["reported_payment_FROM_government_TO_vendor"] is True
         and gsa["publisher_reported_vendor_payment_approx_cents"]==2960000000
@@ -184,6 +197,13 @@ def snapshot() -> dict:
         "GAO_1980_voluntary_carrier_refund_cents":110967,
         "GAO_1980_remainder_setoff_cents":54012,
         "GAO_1980_no_original_tariff_or_Treasury_receipt_examined":True,
+        "separate_original_GAO_1996_contract_specific_carrier_upheld_decisions":1,
+        "GAO_1996_same_GBL_apparent_difference_USD_CENTS_not_recoverable":137300,
+        "GAO_1996_original_publication_upheld_TCN_based_billings":True,
+        "GAO_1996_rejected_NOTE14_additional_terminal_charge":True,
+        "GAO_1996_mathematical_invoice_variance_NOT_A_VALID_OVERCHARGE":True,
+        "GAO_1980_vs_1996_CONTRACT_AUTHORITY_IS_CASE_SPECIFIC":True,
+        "GAO_1996_contract_specific_entitlement_NOT_RETALLY_CASH":True,
         "separate_GSA_false_positive_correction_public_report_records":1,
         "GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents":2960000000,
         "GSA_payment_direction_government_to_vendor_NOT_RETALLY":True,
@@ -261,7 +281,11 @@ def html_report(data:dict)->str:
         "a vendor repayment following ERRONEOUS notices of overcharge. "
         "The same public FY2025 budget gives FY2023 original fund receipts and "
         "FY2024/25 PLANNED values; these are government fund accounting, not "
-        "private invoice credits or recoverable amounts. A separate 2025 "
+        "private invoice credits or recoverable amounts. An original 1996 "
+        "GAO decision independently upheld a carrier charge despite a "
+        "$1,373 mathematical difference, because the agency had approved "
+        "the contract's TCN-based billing interpretation beforehand; "
+        "no private shipper recovery is implied. A separate 2025 "
         "federal appellate decision restricted GSA authority for the "
         "particular non-carrier intermediary's bills; alleged $37M NOCs "
         "and a separate $11.8M demand are NOT validated recovery money. Neither "
