@@ -1,0 +1,53 @@
+name: RETALLY Original Freight Case Source Acquisition (Research Only)
+
+on:
+  pull_request:
+    paths:
+      - 'freight/research/authorized_original_case_fetch.py'
+      - 'freight/test_authorized_original_case_fetch.py'
+      - '.github/workflows/retally-authorized-original-case-acquisition.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-original-source-readonly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-download-guards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout research proposal
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Test bounded public source downloads without network
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python -m py_compile freight/research/authorized_original_case_fetch.py
+          PYTHONPATH=. python -m unittest -v freight.test_authorized_original_case_fetch
+
+  inspect-public-pdfs:
+    needs: synthetic-download-guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Download original official PDFs into memory; emit hashes only
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          # Exact pinned HTTPS links only; no login/contact/FOIA/credentials.
+          # Never save third-party PDF files to repo or Actions artifacts.
+          # Official source SHA-256 hashes, statuses and sizes only.
+          PYTHONPATH=. python -m freight.research.authorized_original_case_fetch --live
