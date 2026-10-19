@@ -153,6 +153,20 @@ class TestCompleteFreightChain(unittest.TestCase):
         self.assertIn("CURRENCY_SCOPE_UNSUPPORTED", r.flags)
         self.assertIn("INVALID_CENTS", r.flags)
 
+    def test_unhashable_digest_is_review_hold_not_exception(self):
+        c = modify_doc(example_case(), "ORIGINAL_CARRIER_INVOICE",
+                       source_sha256=["invalid", "digest"])
+        result = assess_candidate(c)
+        self.assertIn("SOURCE_PROVENANCE_UNVERIFIED", result.flags)
+        self.assertEqual(result.state, "RESEARCH_HOLD")
+
+    def test_unhashable_evidence_kind_is_review_hold_not_exception(self):
+        c = replace(example_case(),
+                    evidence=(replace(example_case().evidence[0], kind=["bad"]),))
+        result = assess_candidate(c)
+        self.assertIn("UNKNOWN_EVIDENCE_ROLE", result.flags)
+        self.assertEqual(result.state, "RESEARCH_HOLD")
+
     def test_aggregate_statement_not_initial_paid_voucher(self):
         c = modify_doc(example_case(), "ORIGINAL_PAYMENT_CLEARING",
                        issuer_role="COURT_CLAIM_REGISTER")
