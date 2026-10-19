@@ -20,7 +20,7 @@
 
 **Critical distinction:** ₹689,695.85 was *paid by the shipper as detention*; ₹619,339.26 was **credited by the carrier to the forwarder**; ₹619,339.26 was then **judicially ordered to be paid onward to the shipper**. The final leg remains unverified. The original USD 7,780.50 ocean freight is an independent monetary event; do not convert it into the INR detention rate or duplicate it in a recovery measure.
 
-**The credit arose after the carrier determined charges should be waived/refunded in light of applicable export notifications**, not from a proven erroneous arithmetic application of a generally published tariff. The court expressly noted no written agreement establishing the forwarder's entitlement to retain the credit (¶52). A 2022 rate-table URL does not fill the missing customer-specific tariff authority or establish bill-level overcharge. 
+**The credit arose after the carrier determined charges should be waived/refunded in light of applicable export notifications**, not from a proven erroneous arithmetic application of a generally published tariff. The court expressly noted no written agreement establishing the forwarder's entitlement to retain the credit (¶52). The judgment at ¶¶57–60 independently **rejected ₹70,356.59 of the original ₹689,695.85** because no source credit or refund was proved for that difference. Thus, even the court will not promote a paid invoice's entire face amount to a refunded amount. A 2022 rate-table URL does not fill the missing customer-specific tariff authority or establish bill-level overcharge. 
 
 ## Rights and admissibility
 
@@ -38,3 +38,20 @@ The user expressly permits downloading records. This permits authorized **read-o
 The Indian eCourts case lookup may require an interactive CAPTCHA and may not publicly release exhibit images. **No CAPTCHA bypass, impersonation, fee, request or contact is authorized.**
 
 **No claim of four-document closure:** the verified sources support an independent court-described payment→credit→entitlement *narrative* for one shipment, but original source files and final beneficiary settlement are still missing.
+
+
+## Independent official rate and regulation source receipts (read-only CI)
+
+[Original PDF source receipt, GitHub Actions run 39298823769](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/39298823769), captured on October 19, 2026:
+
+| Original publisher source | Exact byte retrieval | Verified state |
+| --- | --- | --- |
+| [CMA CGM general India **export demurrage** rate PDF, Jan 20, 2022](https://www.cma-cgm.com/assets/public/documents/Export%20Demurrage%20Charges%20-%2020%20Jan%202022_0.pdf) | 177,395 bytes; **SHA-256 `d9d292679d9ea3e486ecbb0d3eb1dcf4c781ddf51176d467f56ea13474030701`** | PDF downloaded, 2 pages extracted and contemporaneous general tariff heading confirmed on page 1. **Not the equipment detention rate automatically.** |
+| [CMA CGM general India **export detention** rate PDF, Jan 20, 2022](https://www.cma-cgm.com/assets/public/pdf/Export%20Detention%20Charges%20-%2020%20Jan%202022.pdf) | No original bytes obtained in this run: `ORIGINAL_SOURCE_UNAVAILABLE` | Original publisher's indexed PDF text lists **10 free days** with later USD/day tiers depending on container size and GENERAL/SPECIAL equipment. Rates are *published tariff context*, **not independent proof of governing terms for BOL AMC1912992**, service-day counts, equipment categories, exchange rate or amendments. |
+| [Government of India DGFT Notification 42/2015-2020, Nov 7, 2022](https://apeda.gov.in/sites/default/files/dgft_notifications/Notification%20No%2042%20dt%2007%2011%202022%20-English_0.pdf) | 428,958 bytes; **SHA-256 `7224f91a5e6b7b5322fd41588c953db134457deb0013d12d0d91c6df7e54ede4`** | Original PDF downloaded (one page), but source text is **image-only/not extractable** in pinned pypdf, no OCR/visual-page review performed. [Official APEDA archived listing](https://apeda.gov.in/dgft-notifications-archive) identifies amendment to broken-rice exports. Publisher indexed text describes eligibility tied to container entry before Sept 8, 2022 with a customs-electronic timestamp. **No independent timestamp for this precise BOL, and this is a regulation, not a carrier rate.** |
+
+**Critical caution:** Neither the independent government export notice nor the general carrier detention/demurrage tariff establishes this shipper's specific contractual detention rate, legal entitlement under the tariff, or which regulatory clause the carrier used to authorize this specific credit. The earlier sworn testimony/judgment establishes the credit and its beneficiary; original source financial documents have not been downloaded in this research lane. No final customer bank clearing, so **RETALLY verified recovered value remains $0**.
+
+## Financial-beneficiary safeguard and tests
+
+The existing `freight/research/complete_case_gate.py` now requires both original payment-party identity and **ultimate customer credit recipient identity**. A credit reaching a forwarder or broker fails with `REFUND_TO_INTERMEDIARY_NOT_CUSTOMER_RECOVERY` until a separate, independently cleared pass-through to the paying shipper is proved. The revised 30 synthetic case-gate tests exercise omitted payer, wrong payee, mismatched independent bank counterparties and court-credit-to-intermediary negative controls. Another 39 synthetic security tests cover bounded source downloading and the source distinction between carrier detention rates and government export exemptions. **These tests are not live validation of Sungold documents or the RETALLY software's freight detection precision.** Last verified head at this report update: GitHub Actions 39298823820 (repository Freight release gate) and 39298823769 (original source acquisition) both completed successfully; no original government/carrier/financial PDF bytes were persisted to public Git.
