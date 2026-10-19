@@ -12,5 +12,5 @@ ingress:
         required: true
         teamName: shy-surf-d83b
         audTag:
-          - REPLACE_WITH_WORKBENCH_ACCESS_APP_AUDIENCE
+          - f282332ddcc68e93a7a5071881301b090acbf5df75e8177c11b8ee51bd9222f0
   - service: http_status:404
