@@ -46,7 +46,7 @@ check("missing opt out",f=>f.m.text=f.m.text.replace(OPT_OUT,""),"OPT_OUT_MISSIN
 check("HTML opt out missing",f=>f.m.html=f.m.text.replace(OPT_OUT,""),"OPT_OUT_MISSING_1");
 check("HTML script not footer",f=>f.m.html=f.m.text.replace(OPT_OUT,"<script>"+OPT_OUT+"</script>"),"OPT_OUT_MISSING_1");
 check("cc blocked",f=>f.m.cc="other@example.com","CC_BCC_NOT_ALLOWED");
-check("multi recipient blocked",f=>f.m.to+=",other@example.com","SINGLE_RECIPIENT_REQUIRED");
+check("multi recipient blocked",f=>{f.m.to+=",other@example.com";f.skipGrant=true;},"SINGLE_RECIPIENT_REQUIRED");
 check("stale mailbox",f=>f.s.mailbox_checked_at="2026-10-07T20:19:59Z","MAILBOX_RECHECK_REQUIRED");
 check("audit hold default",f=>delete f.s.audit_hold,"AUDIT_HOLD");
 check("unknown contact",f=>f.s.contacts=[],"RESEARCHED_CONTACT_REQUIRED");
