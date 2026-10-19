@@ -57,6 +57,10 @@ class EvidencePointer:
     independently_reviewed: bool = False
     effective_from: str | None = None
     effective_until: str | None = None
+    # Payment/credit counterparties must be linked by an independent source,
+    # not inferred from a common invoice, a judgment or a credit-note heading.
+    payment_payer_ref: str | None = None
+    payment_payee_ref: str | None = None
 
 
 @dataclass(frozen=True)
@@ -81,6 +85,10 @@ class RecoveryCaseCandidate:
     blind_label_frozen_sha256: str | None
     evidence: tuple[EvidencePointer, ...]
     liability_transfer_only: bool = False
+    # Required for commercial customer-recovery validation even when a
+    # shipping line separately credited an intermediary / booking agent.
+    original_payment_payer_ref: str | None = None
+    recovery_beneficiary_ref: str | None = None
 
 
 @dataclass(frozen=True)
@@ -141,6 +149,17 @@ def assess_candidate(case: RecoveryCaseCandidate) -> AdmissionDecision:
                 case.recovery_clearing_reference):
         if not _ref(ref):
             flags.add("CASE_IDENTITY_OR_PAYMENT_LINK_MISSING")
+    original_payer = _ref(case.original_payment_payer_ref)
+    recovery_beneficiary = _ref(case.recovery_beneficiary_ref)
+    if original_payer is None:
+        flags.add("ORIGINAL_PAYMENT_PAYER_UNVERIFIED")
+    if recovery_beneficiary is None:
+        flags.add("CUSTOMER_RECOVERY_BENEFICIARY_UNVERIFIED")
+    # A positive benchmark here models a *direct customer recovery* only.
+    # If an intermediary receives a credit, a second, independently cleared
+    # pass-through event is required and must be modeled separately.
+    if original_payer and recovery_beneficiary and original_payer != recovery_beneficiary:
+        flags.add("DIRECT_CUSTOMER_RECOVERY_IDENTITY_MISMATCH")
     shipment = _iso(case.shipment_date)
     if not shipment:
         flags.add("SHIPMENT_DATE_UNVERIFIED")
@@ -204,6 +223,16 @@ def assess_candidate(case: RecoveryCaseCandidate) -> AdmissionDecision:
             flags.add("SHIPMENT_IDENTITY_MISMATCH")
         if doc.issuer_role != ORIGIN_REQUIRED[doc.kind]:
             flags.add("NOT_ORIGINAL_OR_INDEPENDENT_SOURCE_" + doc.kind)
+        if doc.kind == "ORIGINAL_PAYMENT_CLEARING":
+            if not _ref(doc.payment_payer_ref) or not _ref(doc.payment_payee_ref):
+                flags.add("ORIGINAL_BANK_PAYMENT_PARTIES_MISSING")
+            elif original_payer and _ref(doc.payment_payer_ref) != original_payer:
+                flags.add("ORIGINAL_BANK_PAYMENT_PAYER_MISMATCH")
+        if doc.kind == "EXECUTED_RECOVERY_CLEARING":
+            if not _ref(doc.payment_payer_ref) or not _ref(doc.payment_payee_ref):
+                flags.add("EXECUTED_REFUND_BANK_PARTIES_MISSING")
+            elif recovery_beneficiary and _ref(doc.payment_payee_ref) != recovery_beneficiary:
+                flags.add("REFUND_TO_INTERMEDIARY_NOT_CUSTOMER_RECOVERY")
         if (not doc.explicit_commercial_testing_grant
                 or not _https(doc.rights_authority_url)):
             flags.add("COMMERCIAL_TEST_RIGHTS_NOT_CLEARED")
