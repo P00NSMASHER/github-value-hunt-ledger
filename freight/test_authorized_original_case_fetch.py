@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 from freight.research.authorized_original_case_fetch import (
     AcquisitionHold, SOURCE_REGISTRY, MAX_PDF_BYTES, fetch_pinned_pdf,
     inspect_sources, normalize_https_url, private_destination, validate_pdf,
+    case_text_signals, inspect_pdf_text,
 )
 
 
@@ -113,6 +114,53 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
             1,
         )
         self.assertTrue(all("INVOICE-SECRET" not in str(x) for x in report["sources"]))
+
+
+    def test_claim_transfer_requires_same_page_exact_claim_numbers_and_artivo(self):
+        one = "GlobalTranz proof of claim 10002 original 25,954.47"
+        two = "Transferred to Artivo 24,457.95 retained 1,496.52"
+        result = case_text_signals(
+            "court-globaltranz-final-order-623", [one, two]
+        )
+        self.assertFalse(result["court_claim_liability_transfer_page_coincident"])
+        self.assertEqual(result["matching_source_pages"], [])
+
+    def test_claim_transfer_matches_only_coincident_page_not_cash(self):
+        text = "GlobalTranz 10002 original 25,954.47 transferred 24,457.95 to Artivo retained 1,496.52"
+        result = case_text_signals(
+            "court-globaltranz-final-order-623", ["unrelated page", text]
+        )
+        self.assertTrue(result["court_claim_liability_transfer_page_coincident"])
+        self.assertEqual(result["matching_source_pages"], [2])
+        self.assertFalse(result["reported_transfer_is_recovery"])
+
+    def test_broker_issued_invoice_never_becomes_carrier_origin_bill(self):
+        result = case_text_signals(
+            "globaltranz-original-broker-bills", [
+                "Globaltranz Invoice Carrier: ExampleCarrier",
+            ]
+        )
+        self.assertTrue(result["original_broker_invoice_page_identified"])
+        self.assertFalse(result["original_underlying_carrier_invoice_verified"])
+
+    def test_adjudicator_win_has_no_refund_clearing(self):
+        result = case_text_signals(
+            "cbca-aare-6578-adjudication", ["AARE's claim is granted"]
+        )
+        self.assertTrue(result["independent_board_granted_aare_claim"])
+        self.assertFalse(result["refund_bank_clearing_verified"])
+
+    def test_adjudicator_loss_has_no_offset_clearing(self):
+        result = case_text_signals(
+            "cbca-arpin-6729-adjudication", ["The claim is denied."]
+        )
+        self.assertTrue(result["independent_board_denied_arpin_claim"])
+        self.assertFalse(result["offset_bank_clearing_verified"])
+
+    def test_malformed_fake_pdf_never_claims_text_provenance(self):
+        # PDF header and EOF alone do not guarantee searchable page content.
+        result = inspect_pdf_text("court-globaltranz-final-order-623", SYNTHETIC_PDF)
+        self.assertNotEqual(result.get("source_text_status"), "TEXT_EXTRACTED_NO_SOURCE_TEXT_LOGGED")
 
     def test_private_local_download_is_owner_only_and_source_hashed(self):
         with tempfile.TemporaryDirectory() as root:
