@@ -55,6 +55,7 @@ def validated_external_origin(value):
     parsed = urlsplit(value)
     hostname = parsed.hostname
     if (parsed.scheme != 'https' or not hostname or parsed.netloc != hostname
+            or value != 'https://' + hostname
             or parsed.username or parsed.password or parsed.path or parsed.query
             or parsed.fragment
             or not re.fullmatch(r'[a-z0-9-]+(?:\.[a-z0-9-]+)+', hostname)
