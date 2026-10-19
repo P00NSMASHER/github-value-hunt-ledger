@@ -1,0 +1,16 @@
+# Configuration TEMPLATE ONLY — do not create any route before independent release approval.
+# Locally managed Cloudflare Tunnel created by an authorized administrator.
+# The Cloudflare Access application MUST first have an independently approved Allow policy.
+# Protect with Access / JWT enforcement at the cloudflared origin is mandatory.
+tunnel: REPLACE_WITH_APPROVED_TUNNEL_UUID
+credentials-file: /etc/cloudflared/REPLACE_WITH_APPROVED_TUNNEL_UUID.json
+ingress:
+  - hostname: workbench.retallyrecovery.com
+    service: http://127.0.0.1:18765
+    originRequest:
+      access:
+        required: true
+        teamName: shy-surf-d83b
+        audTag:
+          - REPLACE_WITH_WORKBENCH_ACCESS_APP_AUDIENCE
+  - service: http_status:404
