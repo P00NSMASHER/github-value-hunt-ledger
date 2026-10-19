@@ -173,7 +173,7 @@ def assess_candidate(case: RecoveryCaseCandidate) -> AdmissionDecision:
         records: tuple[EvidencePointer, ...] = ()
     else:
         records = case.evidence
-    kinds = [x.kind for x in records if isinstance(x, EvidencePointer)]
+    kinds = [x.kind for x in records if isinstance(x, EvidencePointer) and isinstance(x.kind, str)]
     for kind in REQUIRED_KINDS - set(kinds):
         flags.add("MISSING_" + kind)
     if len(kinds) != len(set(kinds)):
@@ -184,14 +184,16 @@ def assess_candidate(case: RecoveryCaseCandidate) -> AdmissionDecision:
     for doc in records:
         if not isinstance(doc, EvidencePointer):
             continue
-        if doc.kind not in REQUIRED_KINDS:
+        if not isinstance(doc.kind, str) or doc.kind not in REQUIRED_KINDS:
             flags.add("UNKNOWN_EVIDENCE_ROLE")
             continue
-        if not _https(doc.url) or not isinstance(doc.source_sha256, str) or not _SHA256.fullmatch(doc.source_sha256):
+        valid_sha = isinstance(doc.source_sha256, str) and bool(_SHA256.fullmatch(doc.source_sha256))
+        if not _https(doc.url) or not valid_sha:
             flags.add("SOURCE_PROVENANCE_UNVERIFIED")
-        if doc.source_sha256 in digests:
-            flags.add("INDEPENDENT_DOCUMENT_PROVENANCE_NOT_DISTINCT")
-        digests.add(doc.source_sha256)
+        if valid_sha:
+            if doc.source_sha256 in digests:
+                flags.add("INDEPENDENT_DOCUMENT_PROVENANCE_NOT_DISTINCT")
+            digests.add(doc.source_sha256)
         if _ref(doc.invoice_ref) != _ref(case.invoice_ref):
             flags.add("INVOICE_IDENTITY_MISMATCH")
         if doc.kind in ("ORIGINAL_CARRIER_INVOICE", "SHIPMENT_BOL_POD",
