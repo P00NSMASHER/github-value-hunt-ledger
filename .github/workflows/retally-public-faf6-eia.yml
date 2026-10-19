@@ -6,6 +6,9 @@ on:
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
       - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gao_b261127_contract_counterexample.py'
+      - 'freight/test_public_gao_b261127_contract_counterexample.py'
+      - 'freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json'
       - 'freight/public_crowley_appeal_scope_v1.py'
       - 'freight/test_public_crowley_appeal_scope_v1.py'
       - 'freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json'
@@ -67,6 +70,7 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b261127_contract_counterexample.py
           PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
@@ -88,6 +92,9 @@ jobs:
           assert data['GAO_original_reported_refunds']==3
           assert data['GAO_original_reported_applied_setoffs']==6
           assert data['GAO_1980_original_one_lot_vs_multiple_BOL_rate_reconciliation'] is True
+          assert data['separate_original_GAO_1996_contract_specific_carrier_upheld_decisions']==1
+          assert data['GAO_1996_same_GBL_apparent_difference_USD_CENTS_not_recoverable']==137300
+          assert data['GAO_1996_mathematical_invoice_variance_NOT_A_VALID_OVERCHARGE'] is True
           assert data['GAO_1980_one_lot_allowed_charge_cents']==617063
           assert data['GAO_1980_multiple_BOL_carrier_rate_cents']==671075
           assert data['GAO_1980_voluntary_carrier_refund_cents']==110967
