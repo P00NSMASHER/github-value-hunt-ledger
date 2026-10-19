@@ -28,6 +28,7 @@ ALLOWED_HOSTS = frozenset((
     "ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net",
     "document.epiq11.com",
     "www.cbca.gov",
+    "www2.fmc.gov",
 ))
 SOURCE_REGISTRY = {
     "globaltranz-original-broker-bills": {
@@ -35,6 +36,30 @@ SOURCE_REGISTRY = {
         "role": "ORIGINAL_BROKER_ISSUED_INVOICES_WITH_CLAIM_10002",
         "private_third_party_content": True,
         "required": True,
+    },
+    "arcbest-underlying-carrier-invoices": {
+        "url": "https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408",
+        "role": "DIRECT_ABF_ARCBEST_ORIGINAL_CARRIER_BILLS_BANKRUPTCY_EXHIBIT",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "fmc-pro-transport-carrier-invoice-exhibits": {
+        "url": "https://www2.fmc.gov/readingroom/docs/16-12/16-12_Memo_opp_Mtn_Dismiss.pdf/",
+        "role": "DIRECT_PRO_TRANSPORT_CARRIER_INVOICE_AND_BOL_EXHIBITS",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "fmc-uti-freight-invoice-and-bol": {
+        "url": "https://www2.fmc.gov/readingroom/docs/13-04/13_04_Joint_%20Respse_%20to_%20Order.pdf/",
+        "role": "UTI_FORWARDER_FREIGHT_INVOICE_AND_ORIGINAL_BOL_EXHIBITS",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "fmc-terra-refund-decision": {
+        "url": "https://www2.fmc.gov/readingroom/docs/2027%28I%29/%2801%29%202027%28I%29%20Initial%20Decision.pdf/",
+        "role": "FMC_REFUND_ACKNOWLEDGED_BUT_CLAIM_DENIED_NEGATIVE_CONTROL",
+        "private_third_party_content": False,
+        "required": False,
     },
     "court-globaltranz-final-order-623": {
         "url": "https://document.epiq11.com/document/getdocumentsbydocket/?docketId=1227468&projectCode=MCX&docketNumber=623&source=DM",
@@ -169,6 +194,39 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
         return {
             "original_broker_invoice_page_identified": has_invoice_page,
             "original_underlying_carrier_invoice_verified": False,
+        }
+    if source_id == "arcbest-underlying-carrier-invoices":
+        matches = [i + 1 for i, p in enumerate(normalized)
+                   if "051894063" in p and ("arcbest" in p or "abf" in p)]
+        return {
+            "carrier_origin_invoice_text_reference_pages": matches[:3],
+            "actual_original_payment_bank_clearing_verified": False,
+            "freight_overcharge_adjudicated": False,
+        }
+    if source_id == "fmc-pro-transport-carrier-invoice-exhibits":
+        matches = [i + 1 for i, p in enumerate(normalized)
+                   if "84579" in p and ("pro transport" in p or "b436543" in p)]
+        return {
+            "issued_carrier_invoice_text_reference_pages": matches[:3],
+            "bank_cleared_original_payment_verified": False,
+            "bank_cleared_executed_refund_verified": False,
+        }
+    if source_id == "fmc-uti-freight-invoice-and-bol":
+        matches = [i + 1 for i, p in enumerate(normalized)
+                   if "chi023693200" in p and ("uti" in p or "5860613289" in p)]
+        return {
+            "original_forwarder_invoice_text_reference_pages": matches[:3],
+            "underlying_linehaul_carrier_bill_verified": False,
+            "bank_cleared_recovery_verified": False,
+        }
+    if source_id == "fmc-terra-refund-decision":
+        refund = [i + 1 for i, p in enumerate(normalized)
+                  if ("1,985" in p or "1985" in p) and "refund" in p]
+        return {
+            "adjudication_text_mentions_refund_pages": refund[:3],
+            "original_invoice_bank_link_verified": False,
+            "bank_cleared_refund_verified": False,
+            "overcharge_independently_adjudicated": False,
         }
     if source_id == "cbca-aare-6578-adjudication":
         return {"independent_board_granted_aare_claim": any(
