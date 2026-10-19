@@ -32,6 +32,12 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertEqual(data["GAO_1980_voluntary_carrier_refund_cents"],110967)
         self.assertEqual(data["GAO_1980_remainder_setoff_cents"],54012)
         self.assertTrue(data["GAO_1980_no_original_tariff_or_Treasury_receipt_examined"])
+        self.assertEqual(data["separate_original_GAO_1996_contract_specific_carrier_upheld_decisions"],1)
+        self.assertEqual(data["GAO_1996_same_GBL_apparent_difference_USD_CENTS_not_recoverable"],137300)
+        self.assertTrue(data["GAO_1996_original_publication_upheld_TCN_based_billings"])
+        self.assertTrue(data["GAO_1996_rejected_NOTE14_additional_terminal_charge"])
+        self.assertTrue(data["GAO_1996_mathematical_invoice_variance_NOT_A_VALID_OVERCHARGE"])
+        self.assertTrue(data["GAO_1980_vs_1996_CONTRACT_AUTHORITY_IS_CASE_SPECIFIC"])
         self.assertEqual(data["separate_GSA_false_positive_correction_public_report_records"],1)
         self.assertEqual(data["GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents"],2960000000)
         self.assertTrue(data["GSA_payment_direction_government_to_vendor_NOT_RETALLY"])
@@ -197,6 +203,24 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"):
                         src.snapshot()
 
+    def test_case_specific_1996_137300_apparent_overcharge_cannot_be_retally_cash(self):
+        original=src.compare_opposite_contract_interpretations()
+        for k,v in [
+            ("historical_1996_GAO_rejected_overcharge_cents",0),
+            ("historical_1996_GAO_sustained_note12_overcharge_cents",137300),
+            ("same_source_authority_or_tariff_in_both_cases",True),
+            ("one_bill_of_lading_always_equals_a_single_chargeable_shipment",True),
+            ("verified_RETALLY_recoveries_cents",137300),
+            ("retally_prospect_contact_or_recovery_authorized",True),
+        ]:
+            with self.subTest(k=k):
+                with patch.object(src,"compare_opposite_contract_interpretations",
+                                  return_value={**original,k:v}):
+                    with self.assertRaisesRegex(
+                        ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
+                    ):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -209,6 +233,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("FY2024/25 PLANNED values",html)
         self.assertIn("federal appellate decision restricted GSA authority",html)
         self.assertIn("$11.8M demand are NOT validated recovery money",html)
+        self.assertIn("$1,373 mathematical difference",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
