@@ -24,6 +24,14 @@ PUBLISHER_DATASET = (
     "spend-over-25-000-in-pennine-care-nhs-foundation-trust"
 )
 SOURCE_URL = "https://www.penninecare.nhs.uk/download_file/5920/277"
+# Exact direct CSV links from the OGL publisher catalog (April through August).
+SOURCE_URLS = {
+    "2026-04": "https://www.penninecare.nhs.uk/download_file/5855/277",
+    "2026-05": "https://www.penninecare.nhs.uk/download_file/5874/277",
+    "2026-06": "https://www.penninecare.nhs.uk/download_file/5910/277",
+    "2026-07": SOURCE_URL,
+    "2026-08": "https://www.penninecare.nhs.uk/download_file/5941/277",
+}
 LICENSE_LABEL = "UK Open Government Licence v3.0 (publisher's catalog metadata)"
 LICENSE_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
 MAX_SOURCE_BYTES = 4_000_000
@@ -104,7 +112,8 @@ def date_value(value: str):
     raise ValueError("BAD_DATE")
 
 
-def profile_csv(raw: bytes) -> dict:
+def profile_csv(raw: bytes, *, source_url: str = SOURCE_URL,
+                cross_period_keys: set | None = None) -> dict:
     """Returns only aggregate statistics and SHA-256; source rows never leave memory.
 
     The published 'Fully paid' flag + EFT/reference is accounting ledger evidence,
@@ -120,16 +129,23 @@ def profile_csv(raw: bytes) -> dict:
         raise SourceHold("UNRECOGNIZED_CSV_ENCODING") from exc
     if "\x00" in decoded[:2000] or "<html" in decoded[:1000].lower():
         raise SourceHold("NOT_CSV_CONTENT")
-    reader = csv.DictReader(io.StringIO(decoded, newline=""))
-    if not reader.fieldnames:
-        raise SourceHold("MISSING_HEADER")
-    headers = [" ".join(h.replace("\ufeff", "").split()) for h in reader.fieldnames]
+    # Some official CSV exports put report title/blank lines before the real header.
+    # The first real row must contain ALL independently known required fields.
+    reader = csv.reader(io.StringIO(decoded, newline=""))
+    headers = None
+    header_preamble_rows = 0
+    for idx, candidate in enumerate(reader):
+        if idx >= 6:
+            break
+        normalized = [" ".join(cell.replace("\\ufeff", "").split()) for cell in candidate]
+        if set(REQUIRED).issubset(normalized):
+            headers = normalized
+            header_preamble_rows = idx
+            break
+    if headers is None:
+        raise SourceHold("MISSING_REQUIRED_FIELDS")
     if len(set(headers)) != len(headers):
         raise SourceHold("DUPLICATE_HEADER")
-    if not set(REQUIRED).issubset(headers):
-        raise SourceHold("MISSING_REQUIRED_FIELDS")
-    # DictReader keys are original header spellings; normalize only header keys.
-    original_to_normal = dict(zip(reader.fieldnames, headers))
     total = complete = fully_paid = invalid_amount = invalid_date = before_invoice = 0
     missing = Counter()
     statuses = Counter()
@@ -137,14 +153,16 @@ def profile_csv(raw: bytes) -> dict:
     payment_to_invoice = defaultdict(set)
     invoice_keys = Counter()
     amount_cents_total = 0
-    for original_row in reader:
+    cross_period_duplicate_rows = 0
+    for cells in reader:
+        if not cells or all(not value.strip() for value in cells):
+            continue
         total += 1
         if total > MAX_DATA_ROWS:
             raise SourceHold("ROW_LIMIT_EXCEEDED")
-        if None in original_row:
-            raise SourceHold("MALFORMED_CSV_EXTRA_CELLS")
-        row = {original_to_normal[key]: (value or "").strip()
-               for key, value in original_row.items()}
+        if len(cells) != len(headers):
+            raise SourceHold("MALFORMED_CSV_CELL_COUNT")
+        row = {name: value.strip() for name, value in zip(headers, cells)}
         empty = [field for field in REQUIRED if not row[field]]
         for field in empty:
             missing[field] += 1
@@ -181,12 +199,19 @@ def profile_csv(raw: bytes) -> dict:
         )
         invoice_keys[invoice_id] += 1
         payment_to_invoice[row["Payment Number"]].add(invoice_id)
+        if cross_period_keys is not None:
+            if invoice_id in cross_period_keys:
+                cross_period_duplicate_rows += 1
+            else:
+                cross_period_keys.add(invoice_id)
     if not total:
         raise SourceHold("ZERO_SOURCE_ROWS")
     return {
         "dataset": "Pennine Care NHS Foundation Trust | expenditure over GBP25000",
         "publisher_dataset_url": PUBLISHER_DATASET,
-        "source_url": SOURCE_URL,
+        "source_url": source_url,
+        "preamble_rows_before_header": header_preamble_rows,
+        "cross_period_duplicate_invoice_rows": cross_period_duplicate_rows,
         "source_sha256": sha,
         "source_bytes": len(raw),
         "license_label": LICENSE_LABEL,
@@ -223,18 +248,37 @@ def profile_csv(raw: bytes) -> dict:
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--live", action="store_true", help="Fetch exact official public CSV.")
+    parser.add_argument("--live", action="store_true", help="Fetch exact July official public CSV.")
+    parser.add_argument("--live-all", action="store_true", help="Read April-August official sources and cross-check IDs.")
     args = parser.parse_args()
-    if not args.live:
-        raise SystemExit("No source download without an explicit --live flag")
+    if not args.live and not args.live_all:
+        raise SystemExit("No source download without an explicit --live or --live-all flag")
     try:
-        result = profile_csv(fetch_official_csv())
+        if args.live_all:
+            seen = set()
+            result = {period: profile_csv(fetch_official_csv(url),
+                                          source_url=url, cross_period_keys=seen)
+                      for period, url in SOURCE_URLS.items()}
+            summary = {
+                "status": "MULTIPERIOD_PUBLISHED_LEDGER_REPLAY_ONLY",
+                "months": len(result),
+                "source_row_count": sum(r["source_row_count"] for r in result.values()),
+                "complete_paid_reference_rows": sum(r["complete_paid_reference_rows"] for r in result.values()),
+                "cross_period_duplicate_invoice_rows": sum(r["cross_period_duplicate_invoice_rows"] for r in result.values()),
+                "distinct_cross_period_invoice_keys": len(seen),
+                "reported_invoice_amount_gbp_cents": sum(
+                    r["total_reported_invoice_amount_gbp_cents_for_complete_rows"]
+                    for r in result.values()),
+                "freight_cash_recovery_verified": False,
+                "source_snapshots": result,
+            }
+        else:
+            summary = {"status": "PUBLIC_LEDGER_REPLAY_PROFILING_ONLY",
+                       **profile_csv(fetch_official_csv())}
     except SourceHold as exc:
-        # Non-sensitive failure message; command nonzero fails CI without false green.
         print(json.dumps({"status": "PUBLIC_REPLAY_HELD", "reason": str(exc)}))
         raise SystemExit(2) from None
-    print(json.dumps({"status": "PUBLIC_LEDGER_REPLAY_PROFILING_ONLY", **result},
-                     sort_keys=True, indent=2))
+    print(json.dumps(summary, sort_keys=True, indent=2))
 
 
 if __name__ == "__main__":
