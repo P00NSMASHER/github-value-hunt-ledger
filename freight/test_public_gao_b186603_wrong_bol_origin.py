@@ -47,6 +47,9 @@ class GAOPublishedWaybillOriginTests(unittest.TestCase):
             {"independent_original_BOL_or_carrier_PRO_scan_examined":True}))
         self._alter(lambda x:x["historical_shipment_disputes"][0].update(
             {"payment_back_to_carrier_proven":True}))
+        self._alter(lambda x:x["historical_shipment_disputes"][0]["documentation_evidence"].__setitem__(
+            0,"Washington DC was verified manufacturing origin"))
+        self._alter(lambda x:x.update({"note":"Carrier repayment was proven as paid."}))
 
     def test_forged_deduction_refund_and_pretend_private_cash_rejected(self):
         self._alter(lambda x:x["historical_shipment_disputes"][0].update(
