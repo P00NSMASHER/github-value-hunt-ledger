@@ -5,6 +5,8 @@ on:
     paths:
       - 'freight/research/authorized_original_case_fetch.py'
       - 'freight/test_authorized_original_case_fetch.py'
+      - 'freight/research/cma_2022_tariff_discovery.py'
+      - 'freight/test_cma_2022_tariff_discovery.py'
       - '.github/workflows/retally-authorized-original-case-acquisition.yml'
 
 permissions:
@@ -30,7 +32,7 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: |
           python -m py_compile freight/research/authorized_original_case_fetch.py
-          PYTHONPATH=. python -m unittest -v freight.test_authorized_original_case_fetch
+          PYTHONPATH=. python -m unittest -v freight.test_authorized_original_case_fetch freight.test_cma_2022_tariff_discovery
 
   inspect-public-pdfs:
     needs: synthetic-download-guards
@@ -53,3 +55,10 @@ jobs:
           # Never save third-party PDF files to repo or Actions artifacts.
           # Official source SHA-256 hashes, statuses and sizes only.
           PYTHONPATH=. python -m freight.research.authorized_original_case_fetch --live
+      - name: Inspect archived official CMA CGM January 2022 tariff PDF links (read-only)
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          # Historical official announcement only; no forms, login, user data, or writes.
+          # Reports only publicly issued PDF URLs and publisher HTML digest.
+          PYTHONPATH=. python -m freight.research.cma_2022_tariff_discovery --live
