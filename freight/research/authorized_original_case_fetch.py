@@ -198,8 +198,12 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
     if source_id == "arcbest-underlying-carrier-invoices":
         matches = [i + 1 for i, p in enumerate(normalized)
                    if "051894063" in p and ("arcbest" in p or "abf" in p)]
+        conditional = [i + 1 for i, p in enumerate(normalized)
+                       if "refund allowance" in p and "may be" in p and "21.61" in p]
         return {
             "carrier_origin_invoice_text_reference_pages": matches[:3],
+            "conditional_unloading_allowance_text_pages": conditional[:3],
+            "conditional_allowance_proves_executed_refund": False,
             "actual_original_payment_bank_clearing_verified": False,
             "freight_overcharge_adjudicated": False,
         }
