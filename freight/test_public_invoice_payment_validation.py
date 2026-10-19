@@ -98,6 +98,34 @@ class TestPublicInvoicePaymentProfile(unittest.TestCase):
         with self.assertRaisesRegex(SourceHold, "SOURCE_SIZE_HOLD"):
             profile_csv(b"x" * (MAX_SOURCE_BYTES + 1))
 
+
+    def test_report_title_preamble_is_not_mistaken_for_header(self):
+        preamble = "RT2N0012 - AP Invoices over 25K,,,,,,,,,,,,,,,\n" + (
+            ",,,,,,,,,,,,,,,\n"
+        )
+        record = csv_bytes({}).decode("utf-8-sig")
+        p = profile_csv((preamble + record).encode("utf-8"))
+        self.assertEqual(p["source_row_count"], 1)
+        self.assertEqual(p["complete_paid_reference_rows"], 1)
+        self.assertEqual(p["preamble_rows_before_header"], 2)
+
+    def test_duplicate_invoice_cross_month_is_reported_not_assumed_recovery(self):
+        seen = set()
+        april = profile_csv(csv_bytes({}), cross_period_keys=seen)
+        may = profile_csv(csv_bytes({}), cross_period_keys=seen)
+        self.assertEqual(april["cross_period_duplicate_invoice_rows"], 0)
+        self.assertEqual(may["cross_period_duplicate_invoice_rows"], 1)
+        self.assertEqual(len(seen), 1)
+        self.assertEqual(may["verified_retally_recovered_cents"], 0)
+
+    def test_different_months_new_invoices_not_marked_duplicate(self):
+        seen = set()
+        april = profile_csv(csv_bytes({"Invoice Number": "INV-APR"}), cross_period_keys=seen)
+        may = profile_csv(csv_bytes({"Invoice Number": "INV-MAY"}), cross_period_keys=seen)
+        self.assertEqual(april["cross_period_duplicate_invoice_rows"], 0)
+        self.assertEqual(may["cross_period_duplicate_invoice_rows"], 0)
+        self.assertEqual(len(seen), 2)
+
     def test_pinned_url_guard_blocks_arbitrary_network_calls(self):
         with self.assertRaisesRegex(SourceHold, "SOURCE_NOT_PINNED"):
             fetch_official_csv("https://example.net/secret")
