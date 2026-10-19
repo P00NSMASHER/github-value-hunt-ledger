@@ -38,7 +38,7 @@ $ErrorActionPreference = 'Stop'
 $file = $env:RETALLY_PRIVATE_FILE
 $user = New-Object System.Security.Principal.SecurityIdentifier($env:RETALLY_PRIVATE_USER_SID)
 $system = New-Object System.Security.Principal.SecurityIdentifier('S-1-5-18')
-$acl = Get-Acl -LiteralPath $file
+$acl = [System.IO.File]::GetAccessControl($file)
 $acl.SetAccessRuleProtection($true, $false)
 foreach ($entry in @($acl.Access)) {
     [void]$acl.RemoveAccessRuleSpecific($entry)
@@ -47,13 +47,13 @@ $allow = [System.Security.AccessControl.AccessControlType]::Allow
 $full = [System.Security.AccessControl.FileSystemRights]::FullControl
 $acl.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($user, $full, $allow)))
 $acl.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($system, $full, $allow)))
-Set-Acl -LiteralPath $file -AclObject $acl
+[System.IO.File]::SetAccessControl($file, $acl)
 """
 
 _WINDOWS_ACL_VERIFY = r"""
 $ErrorActionPreference = 'Stop'
 $file = $env:RETALLY_PRIVATE_FILE
-$acl = Get-Acl -LiteralPath $file
+$acl = [System.IO.File]::GetAccessControl($file)
 if (-not $acl.AreAccessRulesProtected) { exit 2 }
 $entries = @($acl.Access)
 if ($entries.Count -ne 2) { exit 3 }
