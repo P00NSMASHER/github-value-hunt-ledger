@@ -59,7 +59,7 @@ class _SameHostOnly(HTTPRedirectHandler):
 
 
 def fetch_official_csv(url: str = SOURCE_URL) -> bytes:
-    if url != SOURCE_URL:
+    if url not in SOURCE_URLS.values():
         raise SourceHold("SOURCE_NOT_PINNED")
     req = Request(url, headers={
         "User-Agent": "RETALLY-PublicEvidence-Research/1.0",
