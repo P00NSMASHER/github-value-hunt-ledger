@@ -22,6 +22,7 @@ from freight.public_cfs2022_official_example_v1 import verified_published_exampl
 from freight.public_fmc_adjudication_v1 import verified_public_order
 from freight.public_gao_historical_collection_v1 import public_collection_report
 from freight.public_gao_b261127_contract_counterexample import compare_opposite_contract_interpretations
+from freight.public_gao_b186603_wrong_bol_origin import verified_original_gao_origin_decision
 from freight.public_gsa_false_positive_payment_v1 import report as gsa_false_positive_refund
 from freight.public_gao_setoff_reversal_v1 import verified_historical_reversal
 from freight.public_gsa_transport_audit_fund_v1 import verified_accounting as gsa_fund_accounting
@@ -50,6 +51,7 @@ def snapshot() -> dict:
     fmc=verified_public_order()
     gao=public_collection_report()
     contract_counterexample=compare_opposite_contract_interpretations()
+    bol_origin_case=verified_original_gao_origin_decision()
     gsa=gsa_false_positive_refund()
     reversal=verified_historical_reversal()
     fund=gsa_fund_accounting()
@@ -125,6 +127,21 @@ def snapshot() -> dict:
         and contract_counterexample["verified_RETALLY_recoveries_cents"]==0
         and contract_counterexample["retally_prospect_contact_or_recovery_authorized"] is False
         and contract_counterexample["commercial_claim_clearance"]=="NO_GO"
+        and bol_origin_case["original_decisions"]==1
+        and bol_origin_case["distinct_GBLs_in_decision"]==2
+        and bol_origin_case["carrier_government_payment_for_chairs_cents"]==39816
+        and bol_origin_case["government_applied_offset_based_on_incorrect_origin_cents"]==13328
+        and bol_origin_case["GAO_established_actual_origin"]=="Canton, Mississippi"
+        and bol_origin_case["GAO_rebutted_BOL_presumption_with_independent_shipment_evidence"] is True
+        and bol_origin_case["GAO_conditional_carrier_reimbursement_claim_cents"]==13328
+        and bol_origin_case["carrier_repayment_proven_cents"] is None
+        and bol_origin_case["separate_blanket_GBL_applied_setoff_cents"]==5765
+        and bol_origin_case["separate_blanket_settlement_certificate_issued_cents"]==2290
+        and bol_origin_case["separate_blanket_settlement_certificate_paid_verified"] is False
+        and bol_origin_case["cannot_add_amounts_from_separate_shipments_as_one_recovery"] is True
+        and bol_origin_case["original_BOL_scan_or_carrier_PRO_full_bytes_independently_verified"] is False
+        and bol_origin_case["retally_verified_recovered_cents"]==0
+        and bol_origin_case["commercial_claim_clearance"]=="NO_GO"
         and gsa["source_reports_FY2023_vendor_payment_made"] is True
         and gsa["reported_payment_FROM_government_TO_vendor"] is True
         and gsa["publisher_reported_vendor_payment_approx_cents"]==2960000000
@@ -204,6 +221,13 @@ def snapshot() -> dict:
         "GAO_1996_mathematical_invoice_variance_NOT_A_VALID_OVERCHARGE":True,
         "GAO_1980_vs_1996_CONTRACT_AUTHORITY_IS_CASE_SPECIFIC":True,
         "GAO_1996_contract_specific_entitlement_NOT_RETALLY_CASH":True,
+        "separate_original_GAO_1976_wrong_BOL_origin_decisions":1,
+        "GAO_1976_applied_offset_on_disproven_shipper_origin_cents":13328,
+        "GAO_1976_carrier_repayment_only_conditionally_allowed":True,
+        "GAO_1976_repayment_to_carrier_verified_cents":None,
+        "GAO_1976_independent_shipment_origin_evidence_overrode_BOL_text":True,
+        "GAO_1976_blanket_GBL_has_its_own_setoff_and_certificate":True,
+        "GAO_1976_distinct_GBL_balances_must_not_be_combined":True,
         "separate_GSA_false_positive_correction_public_report_records":1,
         "GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents":2960000000,
         "GSA_payment_direction_government_to_vendor_NOT_RETALLY":True,
@@ -285,7 +309,11 @@ def html_report(data:dict)->str:
         "GAO decision independently upheld a carrier charge despite a "
         "$1,373 mathematical difference, because the agency had approved "
         "the contract's TCN-based billing interpretation beforehand; "
-        "no private shipper recovery is implied. A separate 2025 "
+        "no private shipper recovery is implied. An independent 1976 GAO "
+        "decision rebutted the government BOL's typed Washington DC origin "
+        "with factory evidence showing shipment from Canton Mississippi; "
+        "the carrier's $133.28 repayment claim was allowed only if otherwise "
+        "correct, with no receipt showing it was paid. A separate 2025 "
         "federal appellate decision restricted GSA authority for the "
         "particular non-carrier intermediary's bills; alleged $37M NOCs "
         "and a separate $11.8M demand are NOT validated recovery money. Neither "
