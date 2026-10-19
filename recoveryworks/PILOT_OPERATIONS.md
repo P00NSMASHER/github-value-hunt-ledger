@@ -108,6 +108,10 @@ created within 24 hours. This is not production or security certification.
   Saturated new sockets are closed. This is a small pilot service, not a load-tested
   internet service.
 
+## Optional encrypted off-device archive preflight
+
+Once a fresh complete local snapshot has been verified, use the optional `offsite_archive` tool in [OFFSITE_BACKUP.md](OFFSITE_BACKUP.md) to create an authenticated AES-256-GCM ciphertext copy and independently verify restore. The tool does **not** upload files, certify remote storage, escrow recovery keys, attest workstation disk encryption, or authorize use of an organization-managed device. All such release controls must be verified by the responsible owners. Plaintext `.json` snapshots must not be moved to shared cloud destinations.
+
 ## Restore
 
 ```sh
