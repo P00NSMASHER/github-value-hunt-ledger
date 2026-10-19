@@ -30,6 +30,7 @@ ALLOWED_HOSTS = frozenset((
     "www.cbca.gov",
     "www2.fmc.gov",
     "www.cma-cgm.com",
+    "apeda.gov.in",
 ))
 SOURCE_REGISTRY = {
     "globaltranz-original-broker-bills": {
@@ -84,6 +85,12 @@ SOURCE_REGISTRY = {
         "url": "https://www.cma-cgm.com/assets/public/documents/Export%20Demurrage%20Charges%20-%2020%20Jan%202022_0.pdf",
         "role": "ISSUED_INDIA_GENERAL_EXPORT_DEMURRAGE_TARIFF_EFFECTIVE_2022_01_20_NOT_SHIPMENT_MATCHED",
         "private_third_party_content": True,
+        "required": False,
+    },
+    "india-dgft-2022-rice-export-exemption": {
+        "url": "https://apeda.gov.in/sites/default/files/dgft_notifications/Notification%20No%2042%20dt%2007%2011%202022%20-English_0.pdf",
+        "role": "ISSUED_EXPORT_EXEMPTION_NOTIFY_42_2022_REQUIRES_PRIOR_CUSTOMS_REGISTRATION",
+        "private_third_party_content": False,
         "required": False,
     },
     "court-globaltranz-final-order-623": {
@@ -203,6 +210,17 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
     Never return raw extracted PDF content or third-party invoice references.
     """
     normalized = [" ".join(p.split()).casefold() for p in pages]
+    if source_id == "india-dgft-2022-rice-export-exemption":
+        references = [i + 1 for i, page in enumerate(normalized)
+                      if "42/2015-2020" in page and "8.9.2022" in page
+                      and ("customs station" in page or "container freight station" in page)]
+        return {
+            "original_regulatory_exemption_text_pages": references[:3],
+            "particular_shipments_entered_before_cutoff_timestamp_verified": False,
+            "original_bank_payment_verified": False,
+            "carrier_credit_cleared_to_customer_verified": False,
+            "this_regulation_is_a_carrier_rate_agreement": False,
+        }
     if source_id in ("cma-cgm-india-2022-export-detention-rate",
                      "cma-cgm-india-2022-export-demurrage-rate"):
         matches = [i + 1 for i, p in enumerate(normalized)
