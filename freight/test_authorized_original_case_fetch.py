@@ -1,0 +1,134 @@
+"""Offline synthetic-only tests: no third-party source material or network."""
+from __future__ import annotations
+
+import hashlib
+import os
+import tempfile
+import unittest
+from pathlib import Path
+from urllib.parse import urlsplit
+
+from freight.research.authorized_original_case_fetch import (
+    AcquisitionHold, SOURCE_REGISTRY, MAX_PDF_BYTES, fetch_pinned_pdf,
+    inspect_sources, normalize_https_url, private_destination, validate_pdf,
+)
+
+
+SYNTHETIC_PDF = b"%PDF-1.4\n" + b"SYNTHETIC-ONLY-DOCUMENT\n" * 12 + b"\n%%EOF\n"
+
+
+class FakeReply:
+    def __init__(self, url, payload=SYNTHETIC_PDF, status=200):
+        self.url, self.payload, self.status = url, payload, status
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+    def geturl(self):
+        return self.url
+
+    def read(self, limit):
+        return self.payload[:limit]
+
+
+def fake_retrieve(url):
+    if url == SOURCE_REGISTRY["globaltranz-original-broker-bills"]["url"]:
+        return FakeReply(url)
+    raise ConnectionError("synthetic unavailable")
+
+
+class TestOriginalSourceAcquisition(unittest.TestCase):
+    def test_known_pdf_verifies_bytes(self):
+        validate_pdf(SYNTHETIC_PDF)
+
+    def test_naked_text_page_is_not_original_pdf(self):
+        with self.assertRaisesRegex(AcquisitionHold, "NOT_AN_ORIGINAL_PDF"):
+            validate_pdf(b"<!doctype html><html>" + b"x" * 120 + b"</html>")
+
+    def test_truncated_pdf_refused(self):
+        with self.assertRaisesRegex(AcquisitionHold, "TRUNCATED_PDF_END"):
+            validate_pdf(b"%PDF-1.4\n" + b"x" * 150)
+
+    def test_oversized_payload_refused(self):
+        with self.assertRaisesRegex(AcquisitionHold, "EMPTY_OR_OVERSIZED_PDF"):
+            validate_pdf(b"%PDF-" + b"x" * MAX_PDF_BYTES)
+
+    def test_unknown_url_is_not_fetched(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNREGISTERED_SOURCE"):
+            fetch_pinned_pdf("https://example.invalid/unknown", retrieve=fake_retrieve)
+
+    def test_host_spoof_blocked(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNSAFE_SOURCE_URL"):
+            normalize_https_url("https://www.cbca.gov.evil.example/file.pdf")
+
+    def test_non_https_blocked(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNSAFE_SOURCE_URL"):
+            normalize_https_url("http://www.cbca.gov/files/decision.pdf")
+
+    def test_path_traversal_blocked(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNSAFE_SOURCE_URL"):
+            normalize_https_url("https://www.cbca.gov/files/%2e%2e/secrets")
+
+    def test_credentialed_url_blocked(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNSAFE_SOURCE_URL"):
+            normalize_https_url("https://name:password@www.cbca.gov/files/a.pdf")
+
+    def test_only_original_byte_retrieval_can_claim_success(self):
+        result = fetch_pinned_pdf("globaltranz-original-broker-bills", retrieve=fake_retrieve)
+        self.assertEqual(result, SYNTHETIC_PDF)
+
+    def test_wrong_final_url_holds_even_for_valid_pdf(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNEXPECTED_HTTP_OR_FINAL_URL"):
+            fetch_pinned_pdf(
+                "globaltranz-original-broker-bills",
+                retrieve=lambda _: FakeReply(
+                    "https://www.cbca.gov/other.pdf"
+                )
+            )
+
+    def test_http_failure_holds(self):
+        with self.assertRaisesRegex(AcquisitionHold, "UNEXPECTED_HTTP_OR_FINAL_URL"):
+            fetch_pinned_pdf(
+                "globaltranz-original-broker-bills",
+                retrieve=lambda url: FakeReply(url, status=404),
+            )
+
+    def test_public_checkout_directories_forbidden(self):
+        checkout = Path(__file__).resolve().parents[1]
+        with self.assertRaisesRegex(AcquisitionHold, "NO_ORIGINAL_DOCUMENT_BYTES_IN_GIT"):
+            private_destination(str(checkout / "freight" / "no-real-documents"))
+
+    def test_synthetic_retrieval_report_never_implies_recovery(self):
+        report = inspect_sources(retrieve=fake_retrieve)
+        self.assertEqual(report["retrieved_document_count"], 1)
+        self.assertFalse(report["freight_recovery_case_complete"])
+        self.assertFalse(report["bank_clearing_verified"])
+        self.assertEqual(report["verified_retally_recovered_cents"], 0)
+        self.assertFalse(report["raw_bytes_in_public_repository"])
+        self.assertEqual(
+            [e["state"] for e in report["sources"]].count("DOWNLOADED_ORIGINAL_PDF_BYTES"),
+            1,
+        )
+        self.assertTrue(all("INVOICE-SECRET" not in str(x) for x in report["sources"]))
+
+    def test_private_local_download_is_owner_only_and_source_hashed(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = os.path.join(root, "originals")
+            receipt = inspect_sources(retrieve=fake_retrieve, dest=path)
+            name = "globaltranz-original-broker-bills.pdf"
+            stored = Path(path) / name
+            self.assertTrue(stored.exists())
+            self.assertEqual(stored.read_bytes(), SYNTHETIC_PDF)
+            self.assertEqual(
+                receipt["sources"][0]["sha256"],
+                hashlib.sha256(SYNTHETIC_PDF).hexdigest(),
+            )
+            if os.name != "nt":
+                self.assertEqual(stored.stat().st_mode & 0o777, 0o600)
+
+
+if __name__ == "__main__":
+    unittest.main()
