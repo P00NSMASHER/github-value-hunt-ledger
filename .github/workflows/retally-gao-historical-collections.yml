@@ -5,6 +5,9 @@ on:
       - '.github/workflows/retally-gao-historical-collections.yml'
       - 'freight/public_gao_historical_collection_v1.py'
       - 'freight/public_gao_b261127_contract_counterexample.py'
+      - 'freight/public_gao_b186603_wrong_bol_origin.py'
+      - 'freight/test_public_gao_b186603_wrong_bol_origin.py'
+      - 'freight/fixtures/public_gao_b186603_wrong_gbl_origin_1976.json'
       - 'freight/test_public_gao_b261127_contract_counterexample.py'
       - 'freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json'
       - 'freight/public_crowley_appeal_scope_v1.py'
@@ -38,6 +41,7 @@ jobs:
         run: |
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_b261127_contract_counterexample
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b186603_wrong_bol_origin
           PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
@@ -134,6 +138,27 @@ jobs:
           assert r['retally_prospect_contact_or_recovery_authorized'] is False
           assert r['commercial_claim_clearance']=='NO_GO'
           print('Two GAO original decisions have opposite contract-specific outcomes; no generic false money claim.')
+          PY
+      - name: Hold GAO B-186603 inaccurate bill of lading origin and conditional carrier refund
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_b186603_wrong_bol_origin > /tmp/retally_lab14_gao_waybill_origin.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally_lab14_gao_waybill_origin.json').read_text())
+          assert r['distinct_GBLs_in_decision']==2
+          assert r['carrier_government_payment_for_chairs_cents']==39816
+          assert r['government_applied_offset_based_on_incorrect_origin_cents']==13328
+          assert r['GAO_established_actual_origin']=='Canton, Mississippi'
+          assert r['GAO_rebutted_BOL_presumption_with_independent_shipment_evidence'] is True
+          assert r['GAO_conditional_carrier_reimbursement_claim_cents']==13328
+          assert r['carrier_repayment_proven_cents'] is None
+          assert r['separate_blanket_GBL_applied_setoff_cents']==5765
+          assert r['separate_blanket_settlement_certificate_issued_cents']==2290
+          assert r['separate_blanket_settlement_certificate_paid_verified'] is False
+          assert r['retally_verified_recovered_cents']==0
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('Original GAO B-186603 rebuts incorrect waybill origin; no independently verified carrier repayment.')
           PY
       - name: Fail closed on any implication that GAO decisions prove RETALLY money recovered
         run: |
