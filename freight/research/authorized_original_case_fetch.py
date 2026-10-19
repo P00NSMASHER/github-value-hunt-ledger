@@ -14,6 +14,8 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
+import subprocess
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -142,6 +144,66 @@ def private_destination(dest: str) -> Path:
     return target
 
 
+
+def case_text_signals(source_id: str, pages: list[str]) -> dict:
+    """Verify key terms share ONE page, not merely the same PDF or search snippet.
+
+    This is source-text corroboration only, not admissibility or final recovery.
+    Never return raw extracted PDF content or third-party invoice references.
+    """
+    normalized = [" ".join(p.split()).casefold() for p in pages]
+    if source_id in ("court-globaltranz-final-order-623", "court-globaltranz-objection-593"):
+        wanted = ("globaltranz", "10002", "25,954.47", "1,496.52", "24,457.95", "artivo")
+        matches = [i + 1 for i, page in enumerate(normalized) if all(t in page for t in wanted)]
+        return {
+            "court_claim_liability_transfer_page_coincident": bool(matches),
+            "matching_source_pages": matches[:3],
+            "reported_transfer_is_recovery": False,
+        }
+    if source_id == "globaltranz-original-broker-bills":
+        has_invoice_page = any(
+            "globaltranz" in page and "invoice" in page and "carrier:" in page
+            for page in normalized
+        )
+        return {
+            "original_broker_invoice_page_identified": has_invoice_page,
+            "original_underlying_carrier_invoice_verified": False,
+        }
+    if source_id == "cbca-aare-6578-adjudication":
+        return {"independent_board_granted_aare_claim": any(
+            "aare" in page and "claim is granted" in page for page in normalized
+        ), "refund_bank_clearing_verified": False}
+    if source_id == "cbca-arpin-6729-adjudication":
+        return {"independent_board_denied_arpin_claim": any(
+            "claim is denied" in page for page in normalized
+        ), "offset_bank_clearing_verified": False}
+    return {}
+
+
+def inspect_pdf_text(source_id: str, payload: bytes) -> dict:
+    """Use existing local poppler if installed; never log raw legal/finance text."""
+    if not shutil.which("pdftotext"):
+        return {"source_text_status": "TEXT_EXTRACTOR_MISSING"}
+    try:
+        proc = subprocess.run(
+            ["pdftotext", "-layout", "-enc", "UTF-8", "-", "-"],
+            input=payload, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            timeout=25, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return {"source_text_status": "TEXT_EXTRACTION_UNAVAILABLE"}
+    if proc.returncode != 0 or not proc.stdout or len(proc.stdout) > 12_000_000:
+        return {"source_text_status": "TEXT_EXTRACTION_UNAVAILABLE"}
+    pages = proc.stdout.decode("utf-8", errors="replace").split("\f")
+    if pages and not pages[-1].strip():
+        pages.pop()
+    return {
+        "source_text_status": "TEXT_EXTRACTED_NO_SOURCE_TEXT_LOGGED",
+        "extracted_page_count": len(pages),
+        "source_signals": case_text_signals(source_id, pages),
+    }
+
+
 def inspect_sources(*, retrieve=None, dest: str | None = None) -> dict:
     path = private_destination(dest) if dest else None
     checked: list[dict] = []
@@ -155,6 +217,7 @@ def inspect_sources(*, retrieve=None, dest: str | None = None) -> dict:
             record.update(state="DOWNLOADED_ORIGINAL_PDF_BYTES",
                           size_bytes=len(payload),
                           sha256=hashlib.sha256(payload).hexdigest())
+            record.update(inspect_pdf_text(key, payload))
             downloaded += 1
             if path:
                 out = path / (key + ".pdf")
