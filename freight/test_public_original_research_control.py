@@ -37,6 +37,13 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertTrue(data["GAO_1996_original_publication_upheld_TCN_based_billings"])
         self.assertTrue(data["GAO_1996_rejected_NOTE14_additional_terminal_charge"])
         self.assertTrue(data["GAO_1996_mathematical_invoice_variance_NOT_A_VALID_OVERCHARGE"])
+        self.assertEqual(data["separate_original_GAO_1976_wrong_BOL_origin_decisions"],1)
+        self.assertEqual(data["GAO_1976_applied_offset_on_disproven_shipper_origin_cents"],13328)
+        self.assertTrue(data["GAO_1976_carrier_repayment_only_conditionally_allowed"])
+        self.assertIsNone(data["GAO_1976_repayment_to_carrier_verified_cents"])
+        self.assertTrue(data["GAO_1976_independent_shipment_origin_evidence_overrode_BOL_text"])
+        self.assertTrue(data["GAO_1976_blanket_GBL_has_its_own_setoff_and_certificate"])
+        self.assertTrue(data["GAO_1976_distinct_GBL_balances_must_not_be_combined"])
         self.assertTrue(data["GAO_1980_vs_1996_CONTRACT_AUTHORITY_IS_CASE_SPECIFIC"])
         self.assertEqual(data["separate_GSA_false_positive_correction_public_report_records"],1)
         self.assertEqual(data["GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents"],2960000000)
@@ -221,6 +228,24 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
                     ):
                         src.snapshot()
 
+    def test_wrong_waybill_origin_requires_external_evidence_and_conditional_repayment(self):
+        original=src.verified_original_gao_origin_decision()
+        for field,bad in [
+            ("GAO_established_actual_origin","Washington, D.C."),
+            ("GAO_rebutted_BOL_presumption_with_independent_shipment_evidence",False),
+            ("carrier_repayment_proven_cents",13328),
+            ("separate_blanket_settlement_certificate_paid_verified",True),
+            ("cannot_add_amounts_from_separate_shipments_as_one_recovery",False),
+            ("retally_verified_recovered_cents",13328),
+        ]:
+            with self.subTest(field=field):
+                with patch.object(src,"verified_original_gao_origin_decision",
+                                  return_value={**original,field:bad}):
+                    with self.assertRaisesRegex(
+                        ValueError,"LAB14_PUBLIC_EVIDENCE_INVALID_CUSTOMER_CLAIM"
+                    ):
+                        src.snapshot()
+
     def test_report_contains_no_raw_customer_personal_information(self):
         summary=src.snapshot()
         html=src.html_report(summary)
@@ -234,6 +259,7 @@ class Lab14PublicSourceCensusTests(unittest.TestCase):
         self.assertIn("federal appellate decision restricted GSA authority",html)
         self.assertIn("$11.8M demand are NOT validated recovery money",html)
         self.assertIn("$1,373 mathematical difference",html)
+        self.assertIn("the carrier's $133.28 repayment claim was allowed only if otherwise",html)
         self.assertNotIn("Work email:",html)
         self.assertNotIn("SHIPMT_ID,",html)
         self.assertNotIn("Customer recovered",html)
