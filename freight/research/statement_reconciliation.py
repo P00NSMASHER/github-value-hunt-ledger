@@ -205,3 +205,81 @@ def assess_claim_liability_transfer(record: SourceReferencedLiabilityTransfer) -
         transferred_liability_cents=record.transferred_liability_cents,
         remaining_claim_cents=record.revised.claim_cents,
     )
+
+@dataclass(frozen=True)
+class SourceReferencedHistoricalOffset:
+    """Public government decision metadata; not original invoice or banking proof."""
+
+    case_ref: str
+    carrier_ref: str
+    shipment_ref: str
+    total_paid_cents: int
+    allowed_charge_cents: int
+    deducted_cents: int
+    official_decision_url: str
+
+
+@dataclass(frozen=True)
+class HistoricalOffsetAssessment:
+    state: Literal["SOURCE_REFERENCED_HISTORICAL_OFFSET", "REVIEW_REQUIRED"]
+    exception_codes: tuple[str, ...]
+    reported_deducted_cents: int
+    # Do not equate another organization's historical offsets with our recoveries.
+    verified_retally_recovered_cents: int = 0
+    verified_retally_overcharge_cents: int = 0
+    invoice_validation_ready: bool = False
+    commercial_reuse_authorized: bool = False
+
+
+def assess_historical_offset(record: SourceReferencedHistoricalOffset) -> HistoricalOffsetAssessment:
+    """Fail-closed consistency check for a *referenced* public offset decision.
+
+    This function never opens a decision, validates actual payment/credit,
+    matches an original rate agreement, or judges an invoice-level truth label.
+    Only exact paid-minus-allowed adjustments fit this narrow source pattern.
+    """
+    from urllib.parse import urlsplit
+    import re
+
+    for amount in (record.total_paid_cents, record.allowed_charge_cents, record.deducted_cents):
+        _money(amount)
+    flags: set[str] = set()
+    for value, flag in (
+        (record.carrier_ref, "HISTORICAL_CARRIER_ID_UNVERIFIED"),
+        (record.shipment_ref, "HISTORICAL_SHIPMENT_ID_UNVERIFIED"),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            flags.add(flag)
+    valid_case = (
+        isinstance(record.case_ref, str)
+        and re.fullmatch(r"B-[0-9]{6}", record.case_ref.strip().upper()) is not None
+    )
+    if not valid_case:
+        flags.add("HISTORICAL_CASE_ID_UNVERIFIED")
+    case_path = record.case_ref.strip().lower() if valid_case else ""
+    valid_url = False
+    if isinstance(record.official_decision_url, str):
+        try:
+            parsed = urlsplit(record.official_decision_url)
+            valid_url = (
+                parsed.scheme == "https"
+                and parsed.netloc == "www.gao.gov"
+                and parsed.path.rstrip("/") in (
+                    f"/products/{case_path}", f"/products/{case_path}-0"
+                )
+                and not parsed.query and not parsed.fragment
+            )
+        except ValueError:
+            valid_url = False
+    if not valid_url:
+        flags.add("OFFICIAL_HISTORICAL_DECISION_REFERENCE_MISSING")
+    if (record.deducted_cents == 0 or
+            record.total_paid_cents <= record.allowed_charge_cents):
+        flags.add("NO_POSITIVE_FREIGHT_OFFSET")
+    if record.total_paid_cents - record.allowed_charge_cents != record.deducted_cents:
+        flags.add("HISTORICAL_OFFSET_ARITHMETIC_MISMATCH")
+    return HistoricalOffsetAssessment(
+        state="REVIEW_REQUIRED" if flags else "SOURCE_REFERENCED_HISTORICAL_OFFSET",
+        exception_codes=tuple(sorted(flags)),
+        reported_deducted_cents=record.deducted_cents if not flags else 0,
+    )
