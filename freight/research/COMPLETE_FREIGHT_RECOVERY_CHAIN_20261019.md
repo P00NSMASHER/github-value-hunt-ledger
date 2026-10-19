@@ -48,7 +48,7 @@ The GAO decision is government-authored/public-domain **narrative evidence**. Re
 
 ## Engineering control implemented (synthetic only)
 
-`freight/research/complete_case_gate.py` and `freight/test_complete_case_gate.py` add 20 deterministic examples verifying that *no case* is admitted for blind replay without distinct source pointers, source hashes, original carrier invoice, effective rate, BOL/POD, original bank settlement, separate adjudication and actual recovery/offset clearing, independent verification, explicit rights, invoice/shipment linkage and blind labels. Even a synthetically complete case returns **READY_FOR_INDEPENDENT_BLIND_REPLAY**, **not** verified RETALLY accuracy or recovered cash. This does not itself fetch/validate source documents.
+`freight/research/complete_case_gate.py` and `freight/test_complete_case_gate.py` add 22 deterministic examples verifying that *no case* is admitted for blind replay without distinct source pointers, source hashes, original carrier invoice, effective rate, BOL/POD, original bank settlement, separate adjudication and actual recovery/offset clearing, independent verification, explicit rights, invoice/shipment linkage and blind labels. Even a synthetically complete case returns **READY_FOR_INDEPENDENT_BLIND_REPLAY**, **not** verified RETALLY accuracy or recovered cash. This does not itself fetch/validate source documents.
 
 A future record must also pass privacy, signed-buyer authority, retention, exact-rate calculation, source authenticity and the existing protected-main independent CI/release process; positive observed error labels alone never prove RETALLY found them.
 
