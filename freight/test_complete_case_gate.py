@@ -30,6 +30,8 @@ def example_case(**changes):
         payment_payee_ref=("SYN-CARRIER" if kind == "ORIGINAL_PAYMENT_CLEARING"
                            else "SYN-DEBTOR" if kind == "EXECUTED_RECOVERY_CLEARING"
                            else None),
+        charge_type="LINEHAUL" if kind in ("ORIGINAL_CARRIER_INVOICE",
+                                           "EFFECTIVE_RATE_AUTHORITY") else None,
     ) for i,kind in enumerate(sorted(REQUIRED_KINDS)))
     vals = dict(
         legal_debtor_ref="SYN-DEBTOR", creditor_ref="SYN-CREDITOR",
@@ -42,6 +44,7 @@ def example_case(**changes):
         outcome_independent_of_retally=True,
         original_payment_payer_ref="SYN-DEBTOR",
         recovery_beneficiary_ref="SYN-DEBTOR",
+        charge_type="LINEHAUL",
         blind_label_frozen_sha256="a"*64, evidence=docs,
     )
     vals.update(changes)
@@ -220,6 +223,52 @@ class TestCompleteFreightChain(unittest.TestCase):
         self.assertEqual(result.state, "READY_FOR_INDEPENDENT_BLIND_REPLAY")
         self.assertFalse(result.freight_accuracy_independently_validated)
         self.assertEqual(result.verified_retally_recovered_cents, 0)
+
+    def test_carrier_detention_invoice_cannot_use_demurrage_tariff(self):
+        c = example_case(charge_type="DETENTION")
+        c = modify_doc(c, "ORIGINAL_CARRIER_INVOICE", charge_type="DETENTION")
+        c = modify_doc(c, "EFFECTIVE_RATE_AUTHORITY", charge_type="DEMURRAGE")
+        result = assess_candidate(c)
+        self.assertIn("INVOICE_RATE_SERVICE_CLASS_MISMATCH", result.flags)
+        self.assertEqual(result.state, "RESEARCH_HOLD")
+        self.assertEqual(result.verified_retally_recovered_cents, 0)
+
+    def test_detention_invoice_with_source_verified_detention_rate_is_only_ready(self):
+        c = example_case(charge_type="DETENTION")
+        c = modify_doc(c, "ORIGINAL_CARRIER_INVOICE", charge_type="DETENTION")
+        c = modify_doc(c, "EFFECTIVE_RATE_AUTHORITY", charge_type="DETENTION")
+        result = assess_candidate(c)
+        self.assertEqual(result.state, "READY_FOR_INDEPENDENT_BLIND_REPLAY")
+        self.assertFalse(result.freight_accuracy_independently_validated)
+
+    def test_unknown_rate_service_class_fails_closed(self):
+        c = modify_doc(example_case(), "EFFECTIVE_RATE_AUTHORITY", charge_type=None)
+        self.assertIn("INVOICE_OR_RATE_SERVICE_CLASS_NOT_SOURCE_VERIFIED",
+                      assess_candidate(c).flags)
+
+    def test_unknown_invoice_service_class_fails_closed(self):
+        c = modify_doc(example_case(), "ORIGINAL_CARRIER_INVOICE", charge_type=None)
+        self.assertIn("INVOICE_OR_RATE_SERVICE_CLASS_NOT_SOURCE_VERIFIED",
+                      assess_candidate(c).flags)
+
+    def test_case_without_known_charge_type_never_passes(self):
+        self.assertIn("CASE_CHARGE_TYPE_UNVERIFIED",
+                      assess_candidate(example_case(charge_type=None)).flags)
+
+    def test_merged_detention_and_demurrage_require_explicit_source_agreement(self):
+        c = example_case(charge_type="MERGED_DETENTION_DEMURRAGE")
+        c = modify_doc(c, "ORIGINAL_CARRIER_INVOICE",
+                       charge_type="MERGED_DETENTION_DEMURRAGE")
+        c = modify_doc(c, "EFFECTIVE_RATE_AUTHORITY",
+                       charge_type="MERGED_DETENTION_DEMURRAGE")
+        self.assertEqual(assess_candidate(c).state,
+                         "READY_FOR_INDEPENDENT_BLIND_REPLAY")
+
+    def test_bogus_rate_service_class_must_not_pass(self):
+        c = modify_doc(example_case(), "EFFECTIVE_RATE_AUTHORITY",
+                       charge_type="CARRIER_PRICING")
+        self.assertIn("INVOICE_OR_RATE_SERVICE_CLASS_NOT_SOURCE_VERIFIED",
+                      assess_candidate(c).flags)
 
     def test_aggregate_statement_not_initial_paid_voucher(self):
         c = modify_doc(example_case(), "ORIGINAL_PAYMENT_CLEARING",
