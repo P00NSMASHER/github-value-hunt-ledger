@@ -15,6 +15,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -236,7 +237,7 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
             # Only accept a published *source table*, not loose dates/text
             # from separate pages of a document or an invented tariff URL.
             standard_slab=("35 70 70" in page or
-                           bool(__import__("re").search(r"\\b35\\s+70\\s+70\\b",page)))
+                           bool(re.search(r"\\b35\\s+70\\s+70\\b",page)))
             if all((export,effective,detention,free_days,standard_slab)):
                 matched.append(idx+1)
         return {
