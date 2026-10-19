@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -181,25 +182,52 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
 
 
 def inspect_pdf_text(source_id: str, payload: bytes) -> dict:
-    """Use existing local poppler if installed; never log raw legal/finance text."""
-    if not shutil.which("pdftotext"):
-        return {"source_text_status": "TEXT_EXTRACTOR_MISSING"}
+    """Extract source text privately for per-page checks and stable-content SHA.
+
+    Byte-level PDF hashes can change with document generation metadata. A
+    normalized per-page text hash is an additional comparison, never a
+    replacement for keeping the original downloaded-byte SHA-256 receipt.
+    """
+    pages = None
     try:
-        proc = subprocess.run(
-            ["pdftotext", "-layout", "-enc", "UTF-8", "-", "-"],
-            input=payload, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            timeout=25, check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return {"source_text_status": "TEXT_EXTRACTION_UNAVAILABLE"}
-    if proc.returncode != 0 or not proc.stdout or len(proc.stdout) > 12_000_000:
-        return {"source_text_status": "TEXT_EXTRACTION_UNAVAILABLE"}
-    pages = proc.stdout.decode("utf-8", errors="replace").split("\f")
-    if pages and not pages[-1].strip():
-        pages.pop()
+        from pypdf import PdfReader
+    except ImportError:
+        PdfReader = None
+    if PdfReader is not None:
+        try:
+            reader = PdfReader(io.BytesIO(payload), strict=False)
+            if reader.is_encrypted:
+                raise ValueError("encrypted PDF held")
+            if len(reader.pages) > 500:
+                raise ValueError("unbounded pages")
+            pages = [(page.extract_text() or "") for page in reader.pages]
+        except (ValueError, OSError, Exception):
+            pages = None
+    if pages is None and shutil.which("pdftotext"):
+        try:
+            proc = subprocess.run(
+                ["pdftotext", "-layout", "-enc", "UTF-8", "-", "-"],
+                input=payload, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                timeout=25, check=False,
+            )
+            if proc.returncode == 0 and proc.stdout and len(proc.stdout) <= 12_000_000:
+                pages = proc.stdout.decode("utf-8", errors="replace").split("\f")
+                if pages and not pages[-1].strip():
+                    pages.pop()
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    if pages is None:
+        return {"source_text_status": "TEXT_EXTRACTOR_MISSING_OR_PDF_PARSE_HELD"}
+    if not any(page.strip() for page in pages):
+        return {"source_text_status": "SOURCE_TEXT_NOT_READABLE_NO_OCR",
+                "extracted_page_count": len(pages)}
+    normalized = "\f".join(" ".join(p.split()).casefold() for p in pages).encode("utf-8")
+    if len(normalized) > 12_000_000:
+        return {"source_text_status": "EXTRACTED_TEXT_SIZE_HOLD"}
     return {
         "source_text_status": "TEXT_EXTRACTED_NO_SOURCE_TEXT_LOGGED",
         "extracted_page_count": len(pages),
+        "normalized_page_text_sha256": hashlib.sha256(normalized).hexdigest(),
         "source_signals": case_text_signals(source_id, pages),
     }
 
