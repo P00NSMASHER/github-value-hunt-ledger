@@ -29,7 +29,7 @@ class CloudflareOriginTests(unittest.TestCase):
                       'https://workbench.retallyrecovery.com#fragment',
                       'https://user:pw@workbench.retallyrecovery.com',
                       'https://-invalid.retallyrecovery.com',
-                      'https://127.0.0.1', 'https://localhost',
+                      'https://127.0.0.1', 'https://192.0.2.1', 'https://localhost',
                       ' https://workbench.retallyrecovery.com', 'workbench.retallyrecovery.com'):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 validated_external_origin(value)
