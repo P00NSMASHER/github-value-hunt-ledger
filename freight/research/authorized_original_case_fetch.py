@@ -87,6 +87,18 @@ SOURCE_REGISTRY = {
         "private_third_party_content": True,
         "required": False,
     },
+    "cma-cgm-india-2022-export-det-primary-tariff-pdf": {
+        "url": "https://www.cma-cgm.com/assets/public/documents/DD_Tarifs_IN_2020-04-01%2028-7-23_1.pdf",
+        "role": "OFFICIAL_CMA_CGM_INDIA_2022_EXPORT_ALL_PLACES_DETENTION_TARIFF_ORIGINAL_NOT_SHIPMENT_LINKED",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "cma-cgm-anl-india-2022-split-dd-tariff-pdf": {
+        "url": "https://www.cma-cgm.com/assets/public/dnd-documents/anl/DD_Tarifs_IN_2022-01-20%2021012022.pdf",
+        "role": "OFFICIAL_ANL_INDIA_2022_EXPORT_DETENTION_DEMURRAGE_SPLIT_RATE_NOT_CMA_BOOKING_PROOF",
+        "private_third_party_content": True,
+        "required": False,
+    },
     "india-dgft-2022-rice-export-exemption": {
         "url": "https://apeda.gov.in/sites/default/files/dgft_notifications/Notification%20No%2042%20dt%2007%2011%202022%20-English_0.pdf",
         "role": "ISSUED_EXPORT_EXEMPTION_NOTIFY_42_2022_REQUIRES_PRIOR_CUSTOMS_REGISTRATION",
@@ -210,6 +222,33 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
     Never return raw extracted PDF content or third-party invoice references.
     """
     normalized = [" ".join(p.split()).casefold() for p in pages]
+    if source_id in (
+        "cma-cgm-india-2022-export-det-primary-tariff-pdf",
+        "cma-cgm-anl-india-2022-split-dd-tariff-pdf",
+    ):
+        matched=[]
+        for idx,page in enumerate(normalized):
+            export=("export - all places" in page
+                    or "export - all (except for icd)" in page)
+            effective=("20-jan-2022" in page or "20 jan 2022" in page)
+            detention="detention" in page
+            free_days="10 free days" in page
+            # Only accept a published *source table*, not loose dates/text
+            # from separate pages of a document or an invented tariff URL.
+            standard_slab=("35 70 70" in page or
+                           bool(__import__("re").search(r"\\b35\\s+70\\s+70\\b",page)))
+            if all((export,effective,detention,free_days,standard_slab)):
+                matched.append(idx+1)
+        return {
+            "official_export_2022_detention_rate_pages": matched[:3],
+            "candidate_standard_20ft_11to17_usd_per_day": 35 if matched else None,
+            "candidate_standard_40ft_11to17_usd_per_day": 70 if matched else None,
+            "carrier_brand_same_as_sungold_booking_proven": False,
+            "shipment_container_size_and_chargeable_days_verified": False,
+            "private_carrier_rate_override_excluded": False,
+            "governing_effective_rate_for_bol_amc1912992_verified": False,
+            "actual_customer_bank_settlement_verified": False,
+        }
     if source_id == "india-dgft-2022-rice-export-exemption":
         references = [i + 1 for i, page in enumerate(normalized)
                       if "42/2015-2020" in page and "8.9.2022" in page
