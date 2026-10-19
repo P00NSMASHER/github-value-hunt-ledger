@@ -13,9 +13,9 @@ The user previously required approval before any outside contact. These template
 
 I am researching publicly adjudicated federal transportation overcharge records. I am seeking only existing, **non-protected** case-file materials for **CBCA 6729-RATE, In the Matter of Arpin Group Inc., decision August 13, 2020**. The decision addresses 2018 reweigh tickets, GSA's 2018 Notice of Overcharge, an October 21, 2019 settlement certificate, and HTOS 2017.
 
-Could you advise whether the following existing records are available for electronic review or a no-charge digital copy, or refer me to the records custodian under [48 CFR 6101.9(e)](https://www.law.cornell.edu/cfr/text/48/6101.9)?
+Under [48 CFR Part 6103](https://www.law.cornell.edu/cfr/text/48/part-6103), transportation RATE cases have their own procedures, separate from contract-dispute Rule 4 exhibit rules. Could you advise whether any of the following **existing filed records/attachments** are available for electronic review or no-charge digital copies, or refer me to their proper custodian?
 
-1. The existing indexed appeal-file/Rule 4 exhibit list and non-confidential copies, especially original carrier bill, original GBL/BOL, January 8, 2018 weight tickets, effective 2017 tender/rate authority, original paid invoice/voucher, GSA Notice of Overcharge, September 4 2018 GSA dispute response, October 21 2019 final settlement certificate and contemporaneous evidence of any actual executed government offset.
+1. Any existing RATE-case filing index/docket sheet (if maintained) and non-confidential supporting filings or attachments, especially original carrier bill, original GBL/BOL, January 8, 2018 weight tickets, effective 2017 tender/rate authority, original paid invoice/voucher, GSA Notice of Overcharge, September 4 2018 GSA dispute response, October 21 2019 final settlement certificate and contemporaneous evidence of any actual executed government offset.
 2. Please omit protected/in-camera records, bank routing/account numbers, tax identifiers, employee details and any documents not releasable under applicable procedures.
 3. Please identify existing record references or custodians if documents are not in the Board file. No new matching analysis or export is requested.
 
@@ -31,7 +31,7 @@ Thank you.
 
 **Unsent text:**
 
-I seek the original non-protected indexed appeal-file exhibits for **CBCA 6578-RATE, AARE Logistics LLC**, concerning the seven GSA overcharge notices on 2014 shipments and AARE's documented **$15,549.08 payment to GSA**. Please provide any existing digital exhibit index and nonconfidential copies of original seven carrier invoices, GBLs, source rate tenders accepted into GFM, GSA NOCs, original government paid-voucher records, the original **AARE-to-GSA** $15,549.08 receipt and, if one exists, the distinct government **reimbursement to AARE** settlement voucher after the Board granted AARE's claim.
+I seek existing non-protected RATE-case submissions and any filed documentary exhibits for **CBCA 6578-RATE, AARE Logistics LLC**, concerning the seven GSA overcharge notices on 2014 shipments and AARE's documented **$15,549.08 payment to GSA**. Please provide any existing digital exhibit index and nonconfidential copies of original seven carrier invoices, GBLs, source rate tenders accepted into GFM, GSA NOCs, original government paid-voucher records, the original **AARE-to-GSA** $15,549.08 receipt and, if one exists, the distinct government **reimbursement to AARE** settlement voucher after the Board granted AARE's claim.
 
 If the exhibits are protected, destroyed, or otherwise unavailable, please identify the public custodian or existing index and refrain from charging any fees. Do not create or infer missing financial evidence. I understand that a public opinion and grant of AARE's claim do not prove a completed government refund or confer rights to privately authored materials.
 
