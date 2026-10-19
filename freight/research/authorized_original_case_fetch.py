@@ -61,6 +61,18 @@ SOURCE_REGISTRY = {
         "private_third_party_content": False,
         "required": False,
     },
+    "fmc-color-brands-original-invoices-and-ach": {
+        "url": "https://www2.fmc.gov/readingroom/docs/22-18/22-18%20Declaration%20with%20Exhibits%20of%20Daniel%20Lutz%20in%20Support%20of%20Complainant%27s%20Request%20for%20Judgment.pdf/",
+        "role": "AAF_ORIGINAL_OCEAN_FREIGHT_INVOICES_AND_REDACTED_ACH_PROOFS",
+        "private_third_party_content": True,
+        "required": False,
+    },
+    "fmc-kaushik-quote-invoices-zelle-evidence": {
+        "url": "https://www2.fmc.gov/readingroom/docs/26-10/%2801%29%2026-10%20Verified%20Complaint%20%28as%20served%29.pdf/",
+        "role": "ORIGINAL_LOGISTICS_QUOTE_INVOICE_BOL_PAYMENT_ALLEGATIONS_NO_REFUND",
+        "private_third_party_content": True,
+        "required": False,
+    },
     "court-globaltranz-final-order-623": {
         "url": "https://document.epiq11.com/document/getdocumentsbydocket/?docketId=1227468&projectCode=MCX&docketNumber=623&source=DM",
         "role": "NONCASH_LIABILITY_TRANSFER_COURT_ORDER",
@@ -178,6 +190,35 @@ def case_text_signals(source_id: str, pages: list[str]) -> dict:
     Never return raw extracted PDF content or third-party invoice references.
     """
     normalized = [" ".join(p.split()).casefold() for p in pages]
+    if source_id == "fmc-color-brands-original-invoices-and-ach":
+        original_invoices = ("i1909095", "i2007047", "i2109072", "i2201018")
+        invoice_pages = {key: [i + 1 for i, page in enumerate(normalized)
+                              if key in page][:4] for key in original_invoices}
+        # A sworn exhibit's claim of ACH corroboration is stronger than
+        # remittance instructions but does NOT independently verify bank settlement.
+        ach_exhibit_pages = [i + 1 for i, page in enumerate(normalized)
+                             if "ach" in page and
+                             ("payment" in page or "bank" in page)][:12]
+        return {
+            "original_invoice_reference_pages": invoice_pages,
+            "filed_ach_payment_evidence_reference_pages": ach_exhibit_pages,
+            "separately_bank_cleared_original_payment_verified": False,
+            "governing_effective_tariff_or_rate_verified": False,
+            "executed_reparations_bank_receipt_verified": False,
+            "frozen_invoice_level_overcharge_truth_verified": False,
+        }
+    if source_id == "fmc-kaushik-quote-invoices-zelle-evidence":
+        invoice_pages = [i + 1 for i, page in enumerate(normalized)
+                         if "invoice" in page and "sfl" in page][:8]
+        zelle_pages = [i + 1 for i, page in enumerate(normalized)
+                       if "zelle" in page and "paid" in page][:8]
+        return {
+            "filed_forwarder_invoice_text_pages": invoice_pages,
+            "filed_original_payment_claim_pages": zelle_pages,
+            "refund_executed_not_established": True,
+            "overcharge_independently_adjudicated": False,
+            "payment_protest_does_not_prove_overcharge": True,
+        }
     if source_id in ("court-globaltranz-final-order-623", "court-globaltranz-objection-593"):
         wanted = ("globaltranz", "10002", "25,954.47", "1,496.52", "24,457.95", "artivo")
         matches = [i + 1 for i, page in enumerate(normalized) if all(t in page for t in wanted)]
