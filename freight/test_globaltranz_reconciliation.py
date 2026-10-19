@@ -3,6 +3,7 @@ import unittest
 from freight.research.statement_reconciliation import (
     ClaimSnapshot, SourceReferencedLiabilityTransfer, StatementLine,
     assess_claim_liability_transfer, compare,
+    SourceReferencedHistoricalOffset, assess_historical_offset,
 )
 
 
@@ -229,6 +230,86 @@ class TestCourtLiabilityTransfer(unittest.TestCase):
         with self.assertRaises(ValueError):
             assess_claim_liability_transfer(
                 self.example(transferred_liability_cents=-1))
+
+
+class TestHistoricalPublicOffsets(unittest.TestCase):
+    """Synthetic metadata only: GAO citations and real invoice data are not imported."""
+
+    def example(self, **overrides):
+        fields = dict(
+            case_ref="B-999999", carrier_ref="CARRIER-EXAMPLE",
+            shipment_ref="BOL-EXAMPLE",
+            total_paid_cents=12500, allowed_charge_cents=2500,
+            deducted_cents=10000,
+            official_decision_url="https://www.gao.gov/products/b-999999",
+        )
+        fields.update(overrides)
+        return SourceReferencedHistoricalOffset(**fields)
+
+    def test_consistent_public_offset_has_no_retally_recovery_or_rights(self):
+        result = assess_historical_offset(self.example())
+        self.assertEqual(result.state, "SOURCE_REFERENCED_HISTORICAL_OFFSET")
+        self.assertEqual(result.reported_deducted_cents, 10000)
+        self.assertEqual(result.verified_retally_recovered_cents, 0)
+        self.assertEqual(result.verified_retally_overcharge_cents, 0)
+        self.assertFalse(result.invoice_validation_ready)
+        self.assertFalse(result.commercial_reuse_authorized)
+
+    def test_official_decision_variant_suffix_is_permitted(self):
+        result = assess_historical_offset(self.example(
+            official_decision_url="https://www.gao.gov/products/b-999999-0"))
+        self.assertEqual(result.exception_codes, ())
+
+    def test_reported_deduction_must_match_paid_less_allowed(self):
+        result = assess_historical_offset(self.example(deducted_cents=9999))
+        self.assertIn("HISTORICAL_OFFSET_ARITHMETIC_MISMATCH", result.exception_codes)
+        self.assertEqual(result.reported_deducted_cents, 0)
+
+    def test_missing_carrier_reference_blocks(self):
+        result = assess_historical_offset(self.example(carrier_ref="  "))
+        self.assertIn("HISTORICAL_CARRIER_ID_UNVERIFIED", result.exception_codes)
+
+    def test_missing_bol_blocks(self):
+        result = assess_historical_offset(self.example(shipment_ref=""))
+        self.assertIn("HISTORICAL_SHIPMENT_ID_UNVERIFIED", result.exception_codes)
+
+    def test_unrelated_domain_does_not_count_as_official_decision(self):
+        result = assess_historical_offset(self.example(
+            official_decision_url="https://www.gao.gov.evil.example/products/b-999999"))
+        self.assertIn("OFFICIAL_HISTORICAL_DECISION_REFERENCE_MISSING", result.exception_codes)
+
+    def test_non_https_url_not_accepted(self):
+        result = assess_historical_offset(self.example(
+            official_decision_url="http://www.gao.gov/products/b-999999"))
+        self.assertIn("OFFICIAL_HISTORICAL_DECISION_REFERENCE_MISSING", result.exception_codes)
+
+    def test_different_decision_number_not_accepted(self):
+        result = assess_historical_offset(self.example(
+            official_decision_url="https://www.gao.gov/products/b-888888"))
+        self.assertIn("OFFICIAL_HISTORICAL_DECISION_REFERENCE_MISSING", result.exception_codes)
+
+    def test_liability_transfer_is_not_a_historical_cash_offset(self):
+        result = assess_historical_offset(self.example(
+            official_decision_url="https://document.epiq11.com/document/getdocumentsbydocket/",
+        ))
+        self.assertEqual(result.state, "REVIEW_REQUIRED")
+        self.assertEqual(result.reported_deducted_cents, 0)
+        self.assertEqual(result.verified_retally_recovered_cents, 0)
+
+    def test_zero_deduction_is_not_a_recovery(self):
+        result = assess_historical_offset(self.example(
+            total_paid_cents=2500, allowed_charge_cents=2500, deducted_cents=0))
+        self.assertIn("NO_POSITIVE_FREIGHT_OFFSET", result.exception_codes)
+        self.assertEqual(result.reported_deducted_cents, 0)
+
+    def test_float_amount_fails_closed(self):
+        with self.assertRaises(ValueError):
+            assess_historical_offset(self.example(deducted_cents=100.5))
+
+    def test_invalid_case_identifier_fails_closed(self):
+        result = assess_historical_offset(self.example(case_ref="INVOICE-0123"))
+        self.assertIn("HISTORICAL_CASE_ID_UNVERIFIED", result.exception_codes)
+        self.assertIn("OFFICIAL_HISTORICAL_DECISION_REFERENCE_MISSING", result.exception_codes)
 
 
 if __name__ == "__main__":
