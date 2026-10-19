@@ -6,6 +6,8 @@
 
 **Arithmetic:** $25,954.47 original claim − $24,457.95 transferred liability = **$1,496.52 retained claim**, unexplained face-value difference **$0.00**. The court records explain liability allocation after an asset sale, **not an invalid freight invoice, customer credit, cash refund, actual settlement, or RETALLY-generated recovery**. Do not use the transferred amount as a recovered-dollar example or freight billing accuracy label. No private or paid docket access was needed. Original PDF bytes remain outside this repository.
 
+**Independent transaction corroboration (different source from the court):** [Artivo/Transom's August 26, 2025 closing announcement](https://transomcap.com/news/artivo-surfaces-backed-by-transom-capital-completes-acquisition-of-walker-zanger-and-anthology-brands-from-mosaic-companies/) confirms that the Walker Zanger/Anthology acquisition **closed**, rather than remaining a pending July 2025 purchase agreement. The [debtor CEO's July 8, 2025 sworn first-day declaration, Docket #4](https://document.epiq11.com/document/getdocumentsbydocket/?docketId=1164757&docketNumber=4&projectCode=MCX&source=DM) describes a **$17.5 million cash-plus-assumed-liabilities** transaction. Neither of these sources proves Artivo **paid GlobalTranz**, identifies invoice-level assumptions, or changes the Docket #623 claim-specific noncash classification.
+
 **Research only. No customer data imported, commercial reuse license inferred, overcharge adjudicated, settlement confirmed, or recovery established.**
 
 ## Traceable public sources
