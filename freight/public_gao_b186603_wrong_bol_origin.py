@@ -71,6 +71,8 @@ def verified_original_gao_origin_decision()->dict:
         or x.get("independent_original_BOL_or_carrier_PRO_scan_examined") is not False
         or x.get("carrier_original_PRO_mentioned")!="75741955"
         or x.get("originally_typed_destination_and_origin_are_verified_same_document") is not False
+        or x.get("documentation_evidence")!=["Manufacturer Shelby Williams stated chair factories in Morristown TN and Canton MS, not Washington DC","Veterans Administration had no warehouse in Washington DC for this shipment","Washington DC was order office only, not the departure point"]
+        or d.get("note")!="Carrier repayment of $133.28 was conditionally allowed; neither carrier settlement certificate nor separate bank statements were verified as paid. The two shipments are separate transactions."
         or type(x.get("documentation_evidence")) is not list
         or len(x["documentation_evidence"])!=3
         or any(type(t) is not str for t in x["documentation_evidence"])):
