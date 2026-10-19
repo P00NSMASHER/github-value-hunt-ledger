@@ -162,6 +162,50 @@ class TestOriginalSourceAcquisition(unittest.TestCase):
         result = inspect_pdf_text("court-globaltranz-final-order-623", SYNTHETIC_PDF)
         self.assertNotEqual(result.get("source_text_status"), "TEXT_EXTRACTED_NO_SOURCE_TEXT_LOGGED")
 
+
+    def test_direct_carrier_invoice_reference_does_not_prove_payment(self):
+        p = case_text_signals("arcbest-underlying-carrier-invoices",
+                              ["ABF Freight Bill 051894063 amount 2123.79"])
+        self.assertEqual(p["carrier_origin_invoice_text_reference_pages"], [1])
+        self.assertFalse(p["actual_original_payment_bank_clearing_verified"])
+        self.assertFalse(p["freight_overcharge_adjudicated"])
+
+    def test_direct_carrier_invoice_pages_must_not_be_invented(self):
+        p = case_text_signals("arcbest-underlying-carrier-invoices",
+                              ["ABF bill unrelated", "051894063 without carrier header"])
+        self.assertEqual(p["carrier_origin_invoice_text_reference_pages"], [])
+
+    def test_fmc_original_carrier_invoice_refund_not_implied(self):
+        p = case_text_signals("fmc-pro-transport-carrier-invoice-exhibits",
+                              ["PRO TRANSPORT INC Invoice 84579 BOL B436543"])
+        self.assertEqual(p["issued_carrier_invoice_text_reference_pages"], [1])
+        self.assertFalse(p["bank_cleared_original_payment_verified"])
+        self.assertFalse(p["bank_cleared_executed_refund_verified"])
+
+    def test_fmc_forwarder_invoice_not_underlying_linehaul_carrier_bill(self):
+        p = case_text_signals("fmc-uti-freight-invoice-and-bol",
+                              ["UTI invoice CHI023693200 shipment BOL 5860613289"])
+        self.assertEqual(p["original_forwarder_invoice_text_reference_pages"], [1])
+        self.assertFalse(p["underlying_linehaul_carrier_bill_verified"])
+        self.assertFalse(p["bank_cleared_recovery_verified"])
+
+    def test_fmc_claimant_acknowledges_refund_not_bank_cleared_overcharge(self):
+        p = case_text_signals("fmc-terra-refund-decision",
+                              ["Complainant acknowledged a refund of $1,985"])
+        self.assertEqual(p["adjudication_text_mentions_refund_pages"], [1])
+        self.assertFalse(p["bank_cleared_refund_verified"])
+        self.assertFalse(p["overcharge_independently_adjudicated"])
+
+    def test_registry_never_marks_new_case_as_required_positive(self):
+        for key in (
+            "arcbest-underlying-carrier-invoices",
+            "fmc-pro-transport-carrier-invoice-exhibits",
+            "fmc-uti-freight-invoice-and-bol",
+            "fmc-terra-refund-decision",
+        ):
+            self.assertIn(key, SOURCE_REGISTRY)
+            self.assertFalse(SOURCE_REGISTRY[key]["required"])
+
     def test_private_local_download_is_owner_only_and_source_hashed(self):
         with tempfile.TemporaryDirectory() as root:
             path = os.path.join(root, "originals")
