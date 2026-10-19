@@ -607,3 +607,62 @@ excluded from the seven original GAO historical positive collection
 decision counts and the 307 non-equivalent public freight rows.
 The negative validator, source artifact and exact case accounting
 are in `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`.
+
+
+## Another original counterexample — GAO B-186603 (1976): the GBL itself gave the wrong origin
+
+**Official first-party decision:** [B-186603, December 22, 1976](https://www.gao.gov/products/b-186603).
+
+The government originally paid Navajo Freight Lines **$398.16** for
+government bill of lading **F-7349731** (40 chairs, 2,800 pounds).
+The paperwork showed the goods originating in **Washington, D.C.**
+The government issued an alleged overcharge notice and **deducted
+$133.28** from amounts it otherwise owed the carrier.
+
+Independent underlying source statements cited by GAO contradicted
+the typed BOL origin: the VA reported no relevant warehouse in
+Washington, and manufacturer Shelby Williams said its production
+locations included **Canton, Mississippi**; Washington was only
+the purchasing/ordering office. GAO found the presumption from the
+BOL's typed Washington origin rebutted, concluded the shipment's
+actual origin was Canton, and directed GSA to **allow the carrier's
+$133.28 claim IF OTHERWISE CORRECT**.
+
+**Do not confuse legal permission with a paid reversal:**
+the GAO decision establishes that the $133.28 had earlier been
+deducted and that repayment was conditionally supportable. It does
+NOT independently establish that GSA subsequently paid that amount
+back to Navajo. The manufacturer statement, carrier PRO
+`75741955` and physical BOL images were described in the GAO
+decision, but were not obtained as separately hashed documents
+by RETALLY.
+
+This same original published GAO decision contains a **distinct**
+government BOL **D-8271398** (1,624 pounds of blankets, June 1972)
+in which an earlier **$57.65** deduction led GSA to **issue**
+a **$22.90** settlement certificate. Issuance of the certificate
+is not bank evidence that $22.90 was remitted or received.
+These two government bills are NOT a single settlement transaction,
+and their dollar fields must not be pooled to manufacture a cash
+recovery or loss.
+
+The strict offline source-bound validator
+`freight/public_gao_b186603_wrong_bol_origin.py` and its negative
+tests retain both event streams, require the competing origin evidence
+and conditional payment status, prohibit extra imaginary invoice
+data, and distinguish the original offset from a confirmed repayment.
+
+**Why it matters to RETALLY:** An address on a shipping document may
+identify an order office rather than the real pickup origin.
+A variance algorithm that uses unverified BOL origins can itself
+create an invalid overcharge claim. Real customer cases would require
+authenticated shipper pickup/loading records, actual BOL, carrier PRO,
+contract and invoices, independent review of conflicting evidence and
+a separate credit/payment receipt.
+
+This is **another adverse original GAO case** outside the seven
+separately established original historical government-reported
+collection decisions, outside the previous contract-ambiguity
+case B-261127, and outside the 307 bounded public market/survey
+records. It does NOT imply a presently binding private carrier
+refund authority or any RETALLY customer cash.
