@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "original_publisher": "U.S. General Services Administration",
+  "document_name": "FY2025 Congressional Justification — Permanent Budget Authority, Transportation Audit Contracts and Contract Administration",
+  "original_url": "https://www.gsa.gov/system/files/GSA%20FY%202025%20Congressional%20Justification.pdf",
+  "source_report_pdf_page_zero_based": 293,
+  "source_printed_page": "P-5",
+  "source_table": "Amounts Available for Obligation / Special Fund Receipts",
+  "original_source_table_unit": "USD THOUSANDS",
+  "facts": [
+    {
+      "line": "Special Fund Receipts",
+      "fiscal_year": 2023,
+      "budget_status": "ACTUAL",
+      "value_thousands_usd": 12354
+    },
+    {
+      "line": "Special Fund Receipts",
+      "fiscal_year": 2024,
+      "budget_status": "PLAN",
+      "value_thousands_usd": 4168
+    },
+    {
+      "line": "Special Fund Receipts",
+      "fiscal_year": 2025,
+      "budget_status": "PLAN",
+      "value_thousands_usd": 12506
+    },
+    {
+      "line": "Transfer to Suspense Fund to Pay Transportation Service Provider",
+      "fiscal_year": 2023,
+      "budget_status": "ACTUAL",
+      "value_thousands_usd": -20674
+    },
+    {
+      "line": "Obligations, appropriated (annual)",
+      "fiscal_year": 2023,
+      "budget_status": "ACTUAL",
+      "value_thousands_usd": 10960
+    },
+    {
+      "line": "Obligations, appropriated (annual)",
+      "fiscal_year": 2024,
+      "budget_status": "PLAN",
+      "value_thousands_usd": 9728
+    },
+    {
+      "line": "Obligations, appropriated (annual)",
+      "fiscal_year": 2025,
+      "budget_status": "PLAN",
+      "value_thousands_usd": 11565
+    }
+  ],
+  "source_narrative_reported_vendor_repayment_approx_million_usd": "29.6",
+  "source_narrative_receipts_portion_approx_million_usd": "20.7",
+  "source_narrative_unallocated_suspense_portion_approx_million_usd": "8.9",
+  "source_receipt_transfer_exact_table_thousands_usd": -20674,
+  "bookkeeping_rounding_precision_caveat": "Published narrative in one decimal million USD is rounded; detailed FY2023 line is thousand USD, not a direct bank statement.",
+  "receipts_are_not_individually_verified_customer_freight_overcharge_refunds": true,
+  "reported_vendor_payment_is_refund_TO_vendor_for_erroneous_NOCs": true,
+  "future_fiscal_year_plans_are_not_actuals": true,
+  "independent_bank_Treasury_electronic_transfer_examined": false,
+  "current_applicability_to_RETALLY_private_customer": "NOT_ESTABLISHED",
+  "no_customer_invoice_or_recovered_funds": true
+}

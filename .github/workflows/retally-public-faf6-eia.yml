@@ -5,6 +5,28 @@ on:
       - '.github/workflows/retally-public-faf6-eia.yml'
       - 'freight/public_faf6_eia_v1.py'
       - 'freight/public_original_research_control.py'
+      - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_gao_b261127_contract_counterexample.py'
+      - 'freight/public_gao_b186603_wrong_bol_origin.py'
+      - 'freight/test_public_gao_b186603_wrong_bol_origin.py'
+      - 'freight/fixtures/public_gao_b186603_wrong_gbl_origin_1976.json'
+      - 'freight/test_public_gao_b261127_contract_counterexample.py'
+      - 'freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json'
+      - 'freight/public_crowley_appeal_scope_v1.py'
+      - 'freight/test_public_crowley_appeal_scope_v1.py'
+      - 'freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json'
+      - 'freight/public_gsa_transport_audit_fund_v1.py'
+      - 'freight/test_public_gsa_transport_audit_fund_v1.py'
+      - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
+      - 'freight/public_gao_setoff_reversal_v1.py'
+      - 'freight/test_public_gao_setoff_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
+      - 'freight/public_gsa_false_positive_payment_v1.py'
+      - 'freight/test_public_gsa_false_positive_payment_v1.py'
+      - 'freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json'
+      - 'freight/test_public_gao_historical_collection_v1.py'
+      - 'freight/fixtures/public_gao_historical_freight_collections_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md'
       - 'freight/test_public_original_research_control.py'
       - 'freight/public_carrier_schedules_v1.py'
       - 'freight/public_cfs2022_prefix_v1.py'
@@ -50,6 +72,13 @@ jobs:
           PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
           PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b261127_contract_counterexample
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b186603_wrong_bol_origin
+          PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
       - name: Reconcile all original public research source families in sanitized evidence report
         run: |
           PYTHONPATH=. python -m freight.public_original_research_control --out /tmp/retally-lab14-public-research
@@ -62,6 +91,51 @@ jobs:
           assert len(data['original_public_source_record_counts'])==5
           assert data['standalone_official_publisher_examples']==1
           assert data['standalone_external_adjudication_records']==1
+          assert data['separate_original_GAO_historical_collection_decisions']==7
+          assert data['separate_GAO_reported_historical_collection_events']==9
+          assert data['GAO_original_reported_refunds']==3
+          assert data['GAO_original_reported_applied_setoffs']==6
+          assert data['GAO_1980_original_one_lot_vs_multiple_BOL_rate_reconciliation'] is True
+          assert data['separate_original_GAO_1996_contract_specific_carrier_upheld_decisions']==1
+          assert data['GAO_1996_same_GBL_apparent_difference_USD_CENTS_not_recoverable']==137300
+          assert data['GAO_1996_mathematical_invoice_variance_NOT_A_VALID_OVERCHARGE'] is True
+          assert data['separate_original_GAO_1976_wrong_BOL_origin_decisions']==1
+          assert data['GAO_1976_applied_offset_on_disproven_shipper_origin_cents']==13328
+          assert data['GAO_1976_carrier_repayment_only_conditionally_allowed'] is True
+          assert data['GAO_1976_repayment_to_carrier_verified_cents'] is None
+          assert data['GAO_1976_distinct_GBL_balances_must_not_be_combined'] is True
+          assert data['GAO_1980_one_lot_allowed_charge_cents']==617063
+          assert data['GAO_1980_multiple_BOL_carrier_rate_cents']==671075
+          assert data['GAO_1980_voluntary_carrier_refund_cents']==110967
+          assert data['GAO_1980_remainder_setoff_cents']==54012
+          assert data['GAO_1980_no_original_tariff_or_Treasury_receipt_examined'] is True
+          assert data['GAO_decisions_are_external_historical_not_307_source_observations'] is True
+          assert data['GAO_reported_collections_not_independently_Treasury_bank_verified'] is True
+          assert data['GAO_final_unreversed_net_government_recovery_total_cents'] is None
+          assert data['separate_GSA_false_positive_correction_public_report_records']==1
+          assert data['GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents']==2960000000
+          assert data['GSA_payment_direction_government_to_vendor_NOT_RETALLY'] is True
+          assert data['GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED'] is True
+          assert data['government_NOCs_may_be_erroneous_and_collections_reversed'] is True
+          assert data['separate_GAO_1979_improper_setoff_decisions']==1
+          assert data['GAO_1979_applied_but_later_disallowed_offset_cents']==514105
+          assert data['GAO_1979_reversal_reimbursement_not_verified'] is True
+          assert data['GAO_1979_negative_case_not_approved_collection'] is True
+          assert data['GAO_1979_private_setoff_authority_not_established'] is True
+          assert data['GSA_FY2023_original_accounting_receipts_thousands_USD']==12354
+          assert data['GSA_FY2024_original_receipts_PLAN_thousands_USD']==4168
+          assert data['GSA_FY2025_original_receipts_PLAN_thousands_USD']==12506
+          assert data['GSA_FY2023_transfer_to_suspense_thousands_USD']==-20674
+          assert data['GSA_appropriation_table_rows_separately_verified']==7
+          assert data['GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof'] is True
+          assert data['GSA_program_receipts_cannot_establish_RETALLY_recovery_rate'] is True
+          assert data['separate_2025_DC_Circuit_Crowley_original_decisions']==1
+          assert data['Crowley_2025_court_reversed_scope_to_audit_non_carrier'] is True
+          assert data['Crowley_alleged_nocs_more_than']==50000
+          assert data['Crowley_alleged_aggregated_dollars_APPROX_not_proven_cents']==3700000000
+          assert data['Crowley_parallel_11_8m_damages_DEMAND_NOT_AWARD_cents']==1180000000
+          assert data['Crowley_2026_final_claim_payment_not_verified'] is True
+          assert data['Crowley_federal_case_holding_not_private_RETALLY_authority'] is True
           assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
           assert data['stb_sample_accounting_year_histogram']=={'2024':100}
           assert data['fmc_award_actual_cash_received_verified'] is False
@@ -73,7 +147,7 @@ jobs:
           page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
           assert 'NOT verified customer invoices' in page
           assert 'NO-GO' in page
-          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one official award, no customer recoveries.')
+          print('Lab14 source census: 307 public rows, Census example, FMC unpaid award, seven positive GAO cases, one GAO legally disallowed setoff, one GSA vendor repayment. No customer recovery.')
           PY
       - name: Prohibit invoice and recovery claim promotion
         run: |

@@ -1,0 +1,349 @@
+"""RETALLY Lab 14 — authentic GAO historical government collection accounts.
+
+These publicly published GAO decisions report historical carrier refunds,
+applied offsets/setoffs, contemplated deductions and reimbursement orders.
+They are NOT original freight-invoice images, third-party bank statements,
+RETALLY customer collections, current tariff authority or a recovery model.
+
+Completely offline, read-only; no secrets, purchases, outreach or mutation.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+ROOT=Path(__file__).resolve().parent
+SOURCE=ROOT/"fixtures/public_gao_historical_freight_collections_20261018.json"
+SCOPE="HISTORICAL_US_GOVERNMENT_FREIGHT_AUDITS_NOT_RETALLY_CLIENTS"
+PUBLISHER="U.S. Government Accountability Office"
+TIER="GAO_REPORTED_REFUND_OR_APPLIED_SET_OFF_NOT_INDEPENDENT_BANK_RECEIPT"
+EVENTS=frozenset({"GOVERNMENT_APPLIED_SET_OFF","CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT"})
+MAIN_KEYS=frozenset({
+ "schema_version","reviewed_at_utc","publisher","source_mode","settlement_proof_tier",
+ "scope","external_original_bills_of_lading_examined",
+ "independent_Treasury_or_carrier_bank_transaction_statements_examined",
+ "actual_retally_client_invoices","actual_retally_customer_recoveries_cents",
+ "cases","explicit_source_limits"
+})
+CASE_KEYS=frozenset({
+ "case_id","decision_date","source_url","historical_context",
+ "originally_paid_cents","final_agency_assessed_overcharge_cents",
+ "gao_reported_collection_events","outstanding_or_future_collection_cents",
+ "carrier_reimbursement_authorized_but_payment_unverified_cents",
+ "supplemental_carrier_claim_amount_variants_cents",
+ "original_bill_of_lading_independently_examined"
+})
+EVENT_KEYS=frozenset({"kind","amount_cents"})
+
+# Exact publisher-scope interpretation is protected from drift; event money
+# alone cannot establish a current customer recovery or claim authority.
+EXPECTED_CONTEXTS={
+    "B-148465": "Motor freight, reported incorrect routing/rate on government LTL shipment",
+    "B-148981": "Motor freight, publicly reported original payment and carrier refund after combination-rate audit; one selected shipment only",
+    "B-152324": "Government motor freight tariff minimum-weight dispute; one documented shipment and two collection mechanisms",
+    "A-14046": "Three government rail freight shipments, original setoff and separately proposed additional collection",
+    "B-166167": "Government air-engine motor freight overcharge offset; later proposed reimbursement settlement to carrier not evidenced paid",
+    "B-146511": "Government freight bill of lading tariff limitation, original 1951 deduction subsequently disputed, inconsistent supplemental claim variants",
+    "B-197658": "Original GAO three-page decision: one steel-post consignment shipped using three bills of lading; carrier refunded part of assessed overcharge and government recovered remaining balance by offset."
+}
+EXPECTED_SOURCE_LIMITS=tuple([
+    "GAO's decision account reports an offset or refund; original private carrier statements, invoice images and Treasury bank settlement ledgers were not reviewed.",
+    "A proposed additional deduction is not a completed collection; a certificate authorizing reimbursement to the carrier is not verified as paid.",
+    "Amounts may refer to multiple shipment legs or government-specific tariff law. No generalization to present-day private commercial freight billing.",
+    "These are third-party federal-government historical collection reports, not recoveries performed by RETALLY.",
+    "This bounded purposive set of seven published cases is neither representative of freight invoices nor a recoverable-rate statistic."
+])
+
+# Fixed facts transcribed and checked against ORIGINAL GAO publication pages.
+# Historical administrative accounts are stronger than unpaid award notices,
+# but remain weaker than a separately authenticated bank/Treasury ledger.
+EXPECTED={
+    "A-14046":{
+        "date":"1926-04-23","path":"14046","original":88963,
+        "assessed":12775,"events":[("GOVERNMENT_APPLIED_SET_OFF",8358)],
+        "future":4417,"possible_carrier_return":0,"disputed_variants":[],
+    },
+    "B-146511":{
+        "date":"1965-06-02","path":"b-146511-2","original":15205,
+        "assessed":2074,"events":[("GOVERNMENT_APPLIED_SET_OFF",2074)],
+        "future":0,"possible_carrier_return":0,"disputed_variants":[2070,2076],
+    },
+    "B-148465":{
+        "date":"1962-08-27","path":"b-148465","original":54688,
+        "assessed":6122,"events":[("GOVERNMENT_APPLIED_SET_OFF",6122)],
+        "future":0,"possible_carrier_return":0,"disputed_variants":[],
+    },
+    "B-148981":{
+        "date":"1962-11-29","path":"b-148981","original":175500,
+        "assessed":13444,
+        "events":[("CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",13444)],
+        "future":0,"possible_carrier_return":0,"disputed_variants":[],
+    },
+    "B-152324":{
+        "date":"1964-04-21","path":"b-152324-0","original":183525,
+        "assessed":125477,"events":[
+            ("CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",51450),
+            ("GOVERNMENT_APPLIED_SET_OFF",74027),
+        ],"future":0,"possible_carrier_return":0,"disputed_variants":[],
+    },
+    "B-166167":{
+        "date":"1969-08-14","path":"b-166167","original":423177,
+        "assessed":301632,"events":[("GOVERNMENT_APPLIED_SET_OFF",301632)],
+        "future":0,"possible_carrier_return":105083,"disputed_variants":[],
+    },
+    "B-197658":{
+        "date":"1980-08-25","url":"https://www.gao.gov/assets/b-197658.pdf",
+        "original":782042,"assessed":164979,
+        "events":[
+          ("CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",110967),
+          ("GOVERNMENT_APPLIED_SET_OFF",54012),
+        ],
+        "future":0,"possible_carrier_return":0,"disputed_variants":[],
+    },
+}
+
+
+def _fail(reason:str)->None:
+    raise ValueError("GAO_COLLECTION_PROOF_"+reason)
+
+
+def _strict_cents(value:object)->int:
+    if type(value) is not int or value<0 or value>100_000_000:
+        _fail("UNREVIEWED_MONEY_FIELD")
+    return value
+
+
+def verified_gao_cases()->list[dict]:
+    if SOURCE.is_symlink() or not SOURCE.is_file() or SOURCE.stat().st_size>32_000:
+        _fail("UNTRUSTED_SOURCE_FILE")
+    try:
+        data=json.loads(SOURCE.read_text(encoding="utf-8"))
+    except (UnicodeError, OSError, json.JSONDecodeError) as exc:
+        raise ValueError("GAO_COLLECTION_PROOF_INVALID_JSON") from exc
+    if (type(data) is not dict or frozenset(data)!=MAIN_KEYS
+        or data["schema_version"]!=1 or type(data["schema_version"]) is not int
+        or data["reviewed_at_utc"]!="2026-10-18"
+        or data["publisher"]!=PUBLISHER or data["scope"]!=SCOPE
+        or data["source_mode"]!="PRIMARY_GAO_PUBLISHED_ADMINISTRATIVE_DECISIONS_TEXT"
+        or data["settlement_proof_tier"]!=TIER
+        or any(type(data[k]) is not int or data[k]!=0 for k in (
+            "external_original_bills_of_lading_examined",
+            "independent_Treasury_or_carrier_bank_transaction_statements_examined",
+            "actual_retally_client_invoices","actual_retally_customer_recoveries_cents"))
+        or type(data["explicit_source_limits"]) is not list
+        or len(data["explicit_source_limits"])!=5
+        or tuple(data["explicit_source_limits"])!=EXPECTED_SOURCE_LIMITS
+        or type(data["cases"]) is not list or len(data["cases"])!=len(EXPECTED)):
+        _fail("SOURCE_CLASSIFICATION_OR_SCOPE_CHANGED")
+    seen=set()
+    for row in data["cases"]:
+        if type(row) is not dict or frozenset(row)!=CASE_KEYS:
+            _fail("UNEXPECTED_CASE_FIELDS")
+        case_id=row.get("case_id")
+        if type(case_id) is not str or case_id not in EXPECTED or case_id in seen:
+            _fail("UNKNOWN_DUPLICATE_CASE")
+        seen.add(case_id)
+        pin=EXPECTED[case_id]
+        if (row["decision_date"]!=pin["date"]
+            or row["source_url"]!=pin.get("url","https://www.gao.gov/products/"+pin.get("path",""))
+            or type(row["historical_context"]) is not str
+            or row["historical_context"]!=EXPECTED_CONTEXTS[case_id]
+            or row["original_bill_of_lading_independently_examined"] is not False
+            or _strict_cents(row["originally_paid_cents"])!=pin["original"]
+            or _strict_cents(row["final_agency_assessed_overcharge_cents"])!=pin["assessed"]
+            or _strict_cents(row["outstanding_or_future_collection_cents"])!=pin["future"]
+            or _strict_cents(row["carrier_reimbursement_authorized_but_payment_unverified_cents"])
+               !=pin["possible_carrier_return"]
+            or row["supplemental_carrier_claim_amount_variants_cents"]!=pin["disputed_variants"]):
+            _fail("ORIGINAL_GAO_CASE_FACT_MISMATCH")
+        events=row["gao_reported_collection_events"]
+        if type(events) is not list or len(events)!=len(pin["events"]):
+            _fail("SOURCE_EVENT_COUNT_MISMATCH")
+        pairs=[]
+        for ev in events:
+            if (type(ev) is not dict or frozenset(ev)!=EVENT_KEYS
+                or ev["kind"] not in EVENTS):
+                _fail("INVALID_GAO_EVENT")
+            pairs.append((ev["kind"],_strict_cents(ev["amount_cents"])))
+        if pairs!=pin["events"] or any(amount<=0 for _,amount in pairs):
+            _fail("MISSTATED_AGENCY_RECORDED_COLLECTION")
+        if (sum(amount for _,amount in pairs) + row["outstanding_or_future_collection_cents"]
+            !=row["final_agency_assessed_overcharge_cents"]):
+            _fail("ASSESSED_VS_COLLECTED_OR_PENDING_ARITHMETIC")
+        if (row["originally_paid_cents"]<row["final_agency_assessed_overcharge_cents"]):
+            _fail("HISTORICAL_AMOUNT_EXCEEDS_ORIGINAL_PAYMENT")
+
+    if seen!=set(EXPECTED):
+        _fail("SOURCE_CASE_COVERAGE_CHANGED")
+    fixed={x["case_id"]:x for x in data["cases"]}
+    # In B-152324, one GAO-described shipment had original $1835.25,
+    # refund $514.50, applied deduction $740.27, allowing $580.48.
+    if fixed["B-152324"]["originally_paid_cents"]-sum(
+        ev["amount_cents"] for ev in fixed["B-152324"]["gao_reported_collection_events"]
+    )!=58048:
+        _fail("SAME_SHIPMENT_CHARGES_NOT_RECONCILED")
+    # B-166167: $1050.83 authorized for later repayment TO THE CARRIER;
+    # no proof a refund certificate was actually paid, so no final net claim.
+    if fixed["B-197658"]["originally_paid_cents"]-sum(
+        ev["amount_cents"] for ev in fixed["B-197658"]["gao_reported_collection_events"]
+    )!=617063:
+        _fail("1980_GAO_REFUND_AND_SET_OFF_NOT_RECONCILED")
+    if fixed["B-166167"]["carrier_reimbursement_authorized_but_payment_unverified_cents"]!=105083:
+        _fail("UNVERIFIED_REVERSAL_AMOUNT_CHANGED")
+    return data["cases"]
+
+
+
+# Source: original GAO scanned 3-page B-197658 (25 Aug 1980),
+# https://www.gao.gov/assets/b-197658.pdf, pages 1–3.
+# These are documentary assertions, NOT independently sourced
+# bill-of-lading scans, contract schedules or bank settlement statements.
+GAO_B197658_PUBLISHED_RATING={
+    "original_paid_cents":782042,
+    "total_one_tendered_lot_lb":107129,
+    "first_two_trailers_lb":80506,
+    "third_trailer_lb":26623,
+    "minimum_weight_if_third_trailer_separate_lb":36000,
+    "historical_quoted_rate_cents_per_100lb":576,
+    "gaodetermined_correct_charge_cents":617063,
+    "carrier_separate_trailers_claim_cents":671075,
+    "carrier_voluntary_refund_cents":110967,
+    "remaining_government_applied_setoff_cents":54012,
+    "total_assessed_overcharge_cents":164979,
+    "bills_of_lading":["4141","4142","4148"],
+    "consolidated_government_bill_of_lading":"K-3341434",
+    "number_of_distinct_original_tendered_shipments":1,
+}
+
+
+def verify_gao_1980_original_rating_arithmetic()->dict:
+    """Reproduce two publicly disputed historical rate calculations only.
+
+    A one-lot shipment and a three-bill carrier assertion differ only
+    in rate/minimum-weight applicability; number of BOLs does NOT
+    independently settle whether the movement comprised many tenders.
+    The GAO's 1980 classification interpretation is NOT a current
+    private shipper entitlement or evidence of any actual RETALLY refund.
+    """
+    row=next(x for x in verified_gao_cases() if x["case_id"]=="B-197658")
+    c=GAO_B197658_PUBLISHED_RATING
+    expected={
+        "original_paid_cents":782042,
+        "total_one_tendered_lot_lb":107129,
+        "first_two_trailers_lb":80506,
+        "third_trailer_lb":26623,
+        "minimum_weight_if_third_trailer_separate_lb":36000,
+        "historical_quoted_rate_cents_per_100lb":576,
+        "gaodetermined_correct_charge_cents":617063,
+        "carrier_separate_trailers_claim_cents":671075,
+        "carrier_voluntary_refund_cents":110967,
+        "remaining_government_applied_setoff_cents":54012,
+        "total_assessed_overcharge_cents":164979,
+        "bills_of_lading":["4141","4142","4148"],
+        "consolidated_government_bill_of_lading":"K-3341434",
+        "number_of_distinct_original_tendered_shipments":1,
+    }
+    if type(c) is not dict or c!=expected:
+        _fail("1980_RATING_ORIGINAL_SOURCE_CHANGED")
+    if (row["originally_paid_cents"]!=c["original_paid_cents"]
+        or row["final_agency_assessed_overcharge_cents"]
+            !=c["total_assessed_overcharge_cents"]
+        or [e["amount_cents"] for e in row["gao_reported_collection_events"]]
+            !=[c["carrier_voluntary_refund_cents"],
+               c["remaining_government_applied_setoff_cents"]]):
+        _fail("1980_RATE_AND_COLLECTION_DISAGREE")
+    def charge_cents(pounds:int)->int:
+        if type(pounds) is not int or pounds<=0:
+            _fail("1980_BAD_SHIPMENT_WEIGHT")
+        return (pounds*c["historical_quoted_rate_cents_per_100lb"]+50)//100
+    if (c["first_two_trailers_lb"]+c["third_trailer_lb"]
+        !=c["total_one_tendered_lot_lb"]):
+        _fail("1980_SHIPMENT_WEIGHT_CONSERVATION")
+    gao_one_tender=charge_cents(c["total_one_tendered_lot_lb"])
+    carrier_two_bols=charge_cents(c["first_two_trailers_lb"])
+    carrier_third_min=charge_cents(max(
+        c["third_trailer_lb"],
+        c["minimum_weight_if_third_trailer_separate_lb"],
+    ))
+    carrier_claim=carrier_two_bols+carrier_third_min
+    if (gao_one_tender!=c["gaodetermined_correct_charge_cents"]
+        or carrier_claim!=c["carrier_separate_trailers_claim_cents"]
+        or carrier_claim-gao_one_tender!=c["remaining_government_applied_setoff_cents"]
+        or c["original_paid_cents"]-carrier_claim!=c["carrier_voluntary_refund_cents"]
+        or c["original_paid_cents"]-gao_one_tender
+            !=c["total_assessed_overcharge_cents"]):
+        _fail("1980_RATING_RECONCILIATION_FAILED")
+    return {
+        "scope":"1980_ORIGINAL_GAO_HISTORICAL_TARIFF_DISPUTE_ARITHMETIC_ONLY",
+        "original_source_url":"https://www.gao.gov/assets/b-197658.pdf",
+        "GAO_source_pdf_page_count":3,
+        "original_paid_cents":c["original_paid_cents"],
+        "real_one_tendered_lot_lb":c["total_one_tendered_lot_lb"],
+        "carrier_proposed_two_bill_load_lb":c["first_two_trailers_lb"],
+        "carrier_proposed_third_bill_minimum_lb":
+            c["minimum_weight_if_third_trailer_separate_lb"],
+        "historical_source_quoted_rate_cents_per_100lb":
+            c["historical_quoted_rate_cents_per_100lb"],
+        "GAO_correct_one_lot_charge_cents":gao_one_tender,
+        "carrier_competing_multiple_bill_charge_cents":carrier_claim,
+        "carrier_voluntary_refund_cents":c["carrier_voluntary_refund_cents"],
+        "GAO_remaining_applied_setoff_cents":
+            c["remaining_government_applied_setoff_cents"],
+        "sum_original_historical_collections_cents":
+            c["total_assessed_overcharge_cents"],
+        "quoted_historical_tariff_original_pages_examined":False,
+        "original_bills_of_lading_images_examined":False,
+        "independent_bank_or_Treasury_receipt_examined":False,
+        "GAO_decision_PDF_text_read_but_complete_sha256_unverified":True,
+        "real_RETALLY_customer_invoices":0,
+        "real_RETALLY_recovery_cents":0,
+        "present_day_carrier_contract_applicability":"UNVERIFIED",
+        "commercial_claim_clearance":"NO_GO",
+    }
+
+
+def public_collection_report()->dict:
+    rows=verified_gao_cases()
+    gaob1980=verify_gao_1980_original_rating_arithmetic()
+    events=[e for row in rows for e in row["gao_reported_collection_events"]]
+    by_type={kind:sum(e["kind"]==kind for e in events) for kind in sorted(EVENTS)}
+    if len(events)!=9 or by_type!={"CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT":3,"GOVERNMENT_APPLIED_SET_OFF":6}:
+        _fail("REPORT_EVENT_CENSUS_INCONSISTENT")
+    return {
+        "scope":"LAB14_ORIGINAL_GAO_GOVERNMENT_COLLECTION_CASES_NOT_CUSTOMER_SAVINGS",
+        "publisher":"U.S. Government Accountability Office",
+        "historical_distinct_decisions":len(rows),
+        "gao_reported_collection_events":len(events),
+        "agency_reported_collection_modes":by_type,
+        "cases_with_uncollected_future_deduction":1,
+        "cases_with_carrier_refund_authorized_but_unverified_paid":1,
+        "cases_with_disputed_amount_variants":1,
+        "original_GAO_1980_rating_reconciled":True,
+        "original_GAO_1980_one_tender_correct_charge_cents":
+            gaob1980["GAO_correct_one_lot_charge_cents"],
+        "original_GAO_1980_carrier_multiple_BOL_competing_charge_cents":
+            gaob1980["carrier_competing_multiple_bill_charge_cents"],
+        "original_GAO_1980_carrier_partial_refund_cents":
+            gaob1980["carrier_voluntary_refund_cents"],
+        "original_GAO_1980_remaining_government_setoff_cents":
+            gaob1980["GAO_remaining_applied_setoff_cents"],
+        "original_GAO_1980_full_PDF_original_SHA_unverified":True,
+        "original_GAO_1980_no_original_bill_or_tariff_scans":True,
+        "source_transcribed_historical_collection_report_not_payment_bank_proof":True,
+        "full_original_invoice_images_compared":False,
+        "actual_carrier_account_bank_or_Treasury_posting_independently_verified":False,
+        "final_unreversed_net_government_recovery_total_cents":None,
+        "real_RETALLY_customer_invoices_examined":0,
+        "real_RETALLY_customer_recoveries_cents":0,
+        "market_accuracy_or_recoverable_rate_inferred":False,
+        "different_government_vs_private_shipper_legal_authority":True,
+        "commercial_claim_clearance":"NO_GO",
+    }
+
+
+def main()->None:
+    print(json.dumps(public_collection_report(),sort_keys=True,indent=2))
+
+
+if __name__=="__main__":
+    main()

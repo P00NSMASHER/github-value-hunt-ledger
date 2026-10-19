@@ -515,3 +515,154 @@ not an externally signed government or bank receipt. The original
 26 historical findings and 18 independent human pilot requirements
 remain open. The client-facing website and production financial systems
 are not modified.
+
+
+## New source tier: actual historical government-REPORTED collections
+
+In an independently sourced supplemental GAO evidence tranche (see
+`freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`) seven original,
+public, first-party U.S. Government Accountability Office decisions
+**report** nine historical transportation overcharge collection events:
+three carrier-refunded payments and six government-applied offsets.
+These are **real agency-published collection accounts**—substantively
+different from an outstanding award—but not independently inspected
+Treasury bank postings or original invoice/contract scans.
+
+These cases include a mixed original refund+setoff (`B-152324`),
+an assessed remaining amount not yet deducted (`A-14046`), a later
+carrier-reimbursement certificate not proven executed (`B-166167`),
+and conflicting later supplemental-claim dollar representations
+(`B-146511`). Every event is stored as an integer-cent and source
+URL-bound assertion with negative tests prohibiting duplicate money,
+pending-collection promotion and fabricated original invoice evidence.
+
+**Do not inflate the source record tally:** the unchanged **307**
+bounded BTS/EIA/carrier/Census/STB source records remain a separate
+category. The **one** Census statistical worked example, **one** FMC
+adjudicated award, and **six** GAO historical collection decisions are
+different document/evidence categories. They cannot be pooled as
+customer freight bills or used to calculate RETALLY's recovery rate.
+
+The consolidated `freight/public_original_research_control.py`
+report now exposes the original GAO cases as a distinct **government
+collection narrative** tier with **zero** independent Treasury/bank
+verifications and **zero** real RETALLY customer collections.
+All original 26 historical defects and 18 independent human gates
+remain open. Source-integrity CI must pass on the exact final draft head;
+no private carrier documents, outbound contact, production change or
+payment authority is implied.
+
+
+### Original GSA FY2023 corrective vendor payment (separate from recoveries)
+
+The first-party GSA FY2025 congressional justification reports it **paid
+approximately $29.6 million back to a DoD transportation vendor** after
+contracting-officer findings that earlier GSA overcharge notices were
+wrong. A further potential **$11.8 million** was described as
+unresolved, **not paid**. This is a real public government accounting
+correction and is intentionally **a negative-control record**:
+the amount represents GSA's own reported payment **to** a vendor
+to correct erroneous collections, not actual customer freight overcharge
+refunds or RETALLY revenue.
+
+See `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md` and
+`freight/public_gsa_false_positive_payment_v1.py` for exact source
+URL, accounting provenance, distinction from seven old GAO historical
+collection decisions and the separate unpaid FMC award. The source
+census treats it as a **standalone corrective government payment
+statement**, and **does not** increase the **307** bounded public
+freight research rows. The source has not independently verified
+bank transaction/voucher bytes or private customer billing.
+No source authorizes a current recovery claim, automatic setoff,
+collection from carriers, extra schedules or public savings advertising.
+
+**Additional primary PDF source (August 25, 1980):** Original GAO
+decision [B-197658](https://www.gao.gov/assets/b-197658.pdf)
+reports **$1,109.67 refunded by the freight carrier** and the
+**$540.12 remaining shortfall later recovered by setoff** from an
+$1,649.79 assessed overcharge. The federal statement's original
+$7,820.42 amount paid minus the two separately evidenced
+collections equals $6,170.63 allowed charges. The original PDF
+page text was directly reviewed; **independent original PDF
+SHA-256 and bank/Treasury posting verification remain missing**.
+Do not treat the two events as two shipments or as a RETALLY recovery.
+
+
+### Adverse source-ground-truth control: GAO B-192974 (1979)
+
+GAO's original four-page decision
+[Review of GSA Setoff Action Against Carrier](https://www.gao.gov/products/b-192974)
+held that the government had **improperly deducted $5,141.05**
+from post-bankruptcy-petition payables for an older alleged carrier
+overcharge. A separately documented **$2,147.59** pre-petition
+deduction was considered proper. The former amount had actually
+been **set off** before GAO found it improper; the decision's
+instruction to allow the successor carrier's claim if otherwise
+correct does not prove it had been reimbursed.
+
+This is **not** a newly confirmed recovered overcharge, customer
+invoice or present-day rule governing private shipments. It is
+a separate `GAO_SETTLEMENT_REVERSAL` evidence tier, deliberately
+excluded from the seven original GAO historical positive collection
+decision counts and the 307 non-equivalent public freight rows.
+The negative validator, source artifact and exact case accounting
+are in `freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md`.
+
+
+## Another original counterexample — GAO B-186603 (1976): the GBL itself gave the wrong origin
+
+**Official first-party decision:** [B-186603, December 22, 1976](https://www.gao.gov/products/b-186603).
+
+The government originally paid Navajo Freight Lines **$398.16** for
+government bill of lading **F-7349731** (40 chairs, 2,800 pounds).
+The paperwork showed the goods originating in **Washington, D.C.**
+The government issued an alleged overcharge notice and **deducted
+$133.28** from amounts it otherwise owed the carrier.
+
+Independent underlying source statements cited by GAO contradicted
+the typed BOL origin: the VA reported no relevant warehouse in
+Washington, and manufacturer Shelby Williams said its production
+locations included **Canton, Mississippi**; Washington was only
+the purchasing/ordering office. GAO found the presumption from the
+BOL's typed Washington origin rebutted, concluded the shipment's
+actual origin was Canton, and directed GSA to **allow the carrier's
+$133.28 claim IF OTHERWISE CORRECT**.
+
+**Do not confuse legal permission with a paid reversal:**
+the GAO decision establishes that the $133.28 had earlier been
+deducted and that repayment was conditionally supportable. It does
+NOT independently establish that GSA subsequently paid that amount
+back to Navajo. The manufacturer statement, carrier PRO
+`75741955` and physical BOL images were described in the GAO
+decision, but were not obtained as separately hashed documents
+by RETALLY.
+
+This same original published GAO decision contains a **distinct**
+government BOL **D-8271398** (1,624 pounds of blankets, June 1972)
+in which an earlier **$57.65** deduction led GSA to **issue**
+a **$22.90** settlement certificate. Issuance of the certificate
+is not bank evidence that $22.90 was remitted or received.
+These two government bills are NOT a single settlement transaction,
+and their dollar fields must not be pooled to manufacture a cash
+recovery or loss.
+
+The strict offline source-bound validator
+`freight/public_gao_b186603_wrong_bol_origin.py` and its negative
+tests retain both event streams, require the competing origin evidence
+and conditional payment status, prohibit extra imaginary invoice
+data, and distinguish the original offset from a confirmed repayment.
+
+**Why it matters to RETALLY:** An address on a shipping document may
+identify an order office rather than the real pickup origin.
+A variance algorithm that uses unverified BOL origins can itself
+create an invalid overcharge claim. Real customer cases would require
+authenticated shipper pickup/loading records, actual BOL, carrier PRO,
+contract and invoices, independent review of conflicting evidence and
+a separate credit/payment receipt.
+
+This is **another adverse original GAO case** outside the seven
+separately established original historical government-reported
+collection decisions, outside the previous contract-ambiguity
+case B-261127, and outside the 307 bounded public market/survey
+records. It does NOT imply a presently binding private carrier
+refund authority or any RETALLY customer cash.
