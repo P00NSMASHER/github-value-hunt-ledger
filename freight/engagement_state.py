@@ -62,9 +62,37 @@ def _verify_charter(charter:dict)->None:
             raise ValueError("Charter "+key+" is required")
     if charter.get("external_action_authorized") is not False:
         raise ValueError("Charter external_action_authorized must be false")
-    authorized=bool(charter.get("customer_data_authorized"))
-    if authorized and charter.get("charter_state")!="KICKOFF_AUTHORIZED":
-        raise ValueError("customer_data_authorized requires KICKOFF_AUTHORIZED Charter")
+    authorized=charter.get("customer_data_authorized")
+    if type(authorized) is not bool:
+        raise ValueError("Charter customer_data_authorized must be a boolean")
+    state=charter.get("charter_state")
+    if state not in {"KICKOFF_AUTHORIZED","PRELAUNCH_ACCEPTED","PENDING_ACKNOWLEDGMENT"}:
+        raise ValueError("invalid Charter state")
+    if authorized is not (state=="KICKOFF_AUTHORIZED"):
+        raise ValueError("Charter customer_data_authorized contradicts state")
+    if authorized and charter.get("launch_status")!="READY":
+        raise ValueError("Authorized Charter must have READY launch status")
+    acknowledgments=charter.get("acknowledgments")
+    names=(
+        "buyer_acknowledges_scope",
+        "buyer_acknowledges_blind_protocol",
+        "buyer_acknowledges_report_totals_separate",
+        "buyer_acknowledges_no_guaranteed_recovery",
+        "freight_acknowledges_no_external_action_without_buyer_approval",
+    )
+    if not isinstance(acknowledgments,dict) or any(
+        type(acknowledgments.get(name)) is not bool for name in names
+    ):
+        raise ValueError("Charter acknowledgments must be booleans")
+    all_approved=all(acknowledgments[name] is True for name in names)
+    if state=="KICKOFF_AUTHORIZED" and not all_approved:
+        raise ValueError("KICKOFF_AUTHORIZED requires explicit acknowledgments")
+    if state=="PRELAUNCH_ACCEPTED" and not all_approved:
+        raise ValueError("PRELAUNCH_ACCEPTED requires explicit acknowledgments")
+    if state=="PENDING_ACKNOWLEDGMENT" and all_approved:
+        raise ValueError("Pending Charter cannot have every acknowledgment")
+    if charter.get("external_action_policy")!="SEPARATE_BUYER_APPROVAL_REQUIRED":
+        raise ValueError("Charter external action policy invalid")
 
 def _verify_amendment(amendment:dict)->None:
     _verify_hash(amendment,"amendment_hash","Amendment")
@@ -74,6 +102,13 @@ def _verify_amendment(amendment:dict)->None:
             raise ValueError("Amendment "+key+" is required")
     if amendment.get("external_action_authorized") is not False:
         raise ValueError("Amendment external_action_authorized must be false")
+    for name in ("kickoff_suspended","customer_data_authorized",
+                 "requires_readiness_revalidation","requires_launch_revalidation",
+                 "requires_new_activation","requires_reacknowledgment"):
+        if type(amendment.get(name)) is not bool:
+            raise ValueError("Amendment "+name+" must be a boolean")
+    if amendment.get("external_action_policy")!="SEPARATE_BUYER_APPROVAL_REQUIRED":
+        raise ValueError("Amendment external action policy invalid")
     state=amendment["amendment_state"]
     if state not in {"PENDING_ACKNOWLEDGMENT","ACCEPTED_REPLACEMENT_REQUIRED","SUPERSEDED_BY_REPLACEMENT"}:
         raise ValueError("invalid Amendment state")
@@ -139,7 +174,7 @@ def resolve_engagement(base_charter:dict,amendments:list[dict]|tuple[dict,...]=(
             continue
         break
 
-    charter_authorized=bool(current.get("customer_data_authorized"))
+    charter_authorized=current["customer_data_authorized"] is True
     state=current.get("charter_state")
     amendment=active_amendment
 
