@@ -189,6 +189,8 @@ class IndependentAccuracyReport:
     method_status: str
     publication_claim_approved: bool
     report_hash: str
+    source_claimed_complete_cases_unverified: int = 0
+    unsupported_automatic_positive_calls: int = 0
 
 
 def score_sealed_freight(
@@ -225,11 +227,19 @@ def score_sealed_freight(
     if by_model.keys() != by_truth.keys():
         raise ValueError("sealed truth/model case populations differ")
     tp = tn = fp = fn = abstain_positive = abstain_negative = unknown = 0
+    claimed_complete = sum(_eligible_truth(t) for t in by_truth.values())
+    unsupported_positive = 0
     for case_id in sorted(by_truth):
         t = by_truth[case_id]
         p = by_model[case_id]
-        if not _eligible_truth(t):
+        # The presence of four unrelated SHA strings and different *claimed*
+        # reviewer names is not proof of their identity, the bank issuer, the
+        # controlling rate, or a blind independent adjudication. Real cases
+        # must be externally authenticated by a separate trusted gate, which
+        # is NOT implemented by this self-contained scoring instrument.
+        if study_kind == "REAL_EXTERNAL_REVIEW_PENDING" or not _eligible_truth(t):
             unknown += 1
+            unsupported_positive += int(p.predicted_label == "POSITIVE")
             continue
         if p.predicted_label == "REVIEW":
             if t.truth_label == "POSITIVE":
@@ -254,9 +264,10 @@ def score_sealed_freight(
     fp_den = tn+fp+abstain_negative
     fpr = fp/fp_den if fp_den else None
     method = (
-        "INSUFFICIENT_INDEPENDENT_LABELS" if known == 0
-        else "INTERNAL_SYNTHETIC_REHEARSAL_ONLY" if study_kind == "SYNTHETIC_REHEARSAL"
-        else "EXTERNAL_REVIEW_AND_BUYER_ACCEPTANCE_PENDING"
+        "EXTERNAL_PROVENANCE_AUTHENTICATION_REQUIRED"
+        if study_kind == "REAL_EXTERNAL_REVIEW_PENDING" and claimed_complete
+        else "INSUFFICIENT_INDEPENDENT_LABELS" if known == 0
+        else "INTERNAL_SYNTHETIC_REHEARSAL_ONLY"
     )
     metrics = {
         "population": len(model.cases), "known": known, "unknown": unknown,
@@ -266,6 +277,8 @@ def score_sealed_freight(
         "model_seal": model.supplied_seal_sha256,
         "truth_seal": truth.supplied_seal_sha256, "unseal": joint_unseal_at,
         "method": method, "claim_approved": False,
+        "source_claimed_complete_unverified": claimed_complete,
+        "unsupported_automatic_positive_calls": unsupported_positive,
     }
     return IndependentAccuracyReport(
         len(model.cases), known, unknown, tp+tn+fp+fn,
@@ -273,4 +286,6 @@ def score_sealed_freight(
         abstain_positive, abstain_negative, precision, recall, fpr,
         _wilson(tp, tp+fp), _wilson(fp, fp_den),
         method, False, canonical_hash(metrics),
+        claimed_complete if study_kind == "REAL_EXTERNAL_REVIEW_PENDING" else 0,
+        unsupported_positive,
     )
