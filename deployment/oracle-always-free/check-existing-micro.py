@@ -189,8 +189,9 @@ def inspect_running_micro(receipt: dict) -> dict:
                               "--instance-id", receipt["instance_id"],
                               region=region), "instance boot attachments")
     attached = [x for x in attached if BASE.active(x)]
-    require(len(attached) == 1 and
-            isinstance(attached[0].get("boot-volume-id"), str),
+    require(len(attached) == 1
+            and attached[0].get("lifecycle-state") == "ATTACHED"
+            and isinstance(attached[0].get("boot-volume-id"), str),
             "Running VM must have exactly one verifiable boot volume")
     volume = _get("bv", "boot-volume", "get", "--boot-volume-id",
                   attached[0]["boot-volume-id"], region=region)
