@@ -72,4 +72,12 @@ RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/install-staging.sh FULL_
 
 The installer must verify **x86-64 hardware and OCI v2 instance metadata shape `VM.Standard.E2.1.Micro`** before any package installation. It stages only a synthetic workspace, runs its seven-branch acceptance, installs systemd with a Micro-specific `MemoryHigh=640M`/`MemoryMax=768M` drop-in, and leaves the private workbench service **stopped and disabled**. A1 installation remains separate and works without the Micro flag.
 
+The separate **read-only on-host checker also requires the Micro flag**, but only after an operator has explicitly approved and started a synthetic service:
+
+```sh
+RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/check-staging.sh
+```
+
+The checker independently queries the current OCI v2 instance identity and exact E2 Micro shape before testing the loopback-only listener, HTTP authorization failures and isolated workspace health. It does **not** change OCI networking, start or enable a service, create external access, handle customer data or certify production.
+
 Later, verify host encryption, operator authorization, encrypted independently retrieved off-device backups, data-retention and customer scope; establish protected Cloudflare Access and origin-JWT validation *before* any hostname routing. The existing public RETALLY website is unaffected. **No genuine customer data is permitted under the current release hold.**
