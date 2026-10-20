@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prepare SIMULATED staging only on an approved Oracle Always Free ARM64 host.
+# Prepare SIMULATED staging only on an attested OCI Always Free A1 or E2 Micro host.
 # Never create a paid resource, start a service, expose a tunnel, or process customers.
 set -euo pipefail
 
@@ -43,7 +43,8 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 4
 fi
 if [[ ! -f recoveryworks/workbench_server.py ||
-      ! -f deployment/oracle-always-free/retally-synthetic.service ]]; then
+      ! -f deployment/oracle-always-free/retally-synthetic.service ||
+      ( "$micro_host" == 1 && ! -f deployment/oracle-always-free/retally-micro-memory.conf ) ]]; then
   echo 'Missing required reviewed workbench/deployment files.' >&2
   exit 5
 fi
@@ -62,6 +63,7 @@ if [[ -e "$workspace_dir" || -L "$workspace_dir" ]]; then
   exit 7
 fi
 if [[ -e "$unit_path" || -L "$unit_path" ]] ||
+   [[ -e /etc/systemd/system/retally-synthetic.service.d/oci-micro-memory.conf ]] ||
    systemctl is-active --quiet retally-synthetic.service ||
    systemctl is-enabled --quiet retally-synthetic.service; then
   echo 'An existing service must be reviewed separately before a fresh install.' >&2
