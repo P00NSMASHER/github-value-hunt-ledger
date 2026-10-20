@@ -117,3 +117,20 @@ jobs:
           assert not any(p.name in {'credentials.json', '.env', 'private-key.pem'} for p in root.rglob('*'))
           print('PASS: staging scripts parse; source stays loopback; access and release holds preserved.')
           PY
+
+  oracle-micro-memory-rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Real seven-branch synthetic acceptance inside 768 MiB isolation
+        run: |
+          set -eu
+          docker run --rm \
+            --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
+            --user 65534:65534 --memory 768m --memory-swap 768m --cpus 0.125 \
+            --pids-limit 128 --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=192m \
+            -e RETALLY_SYNTHETIC_ONLY=1 -e PYTHONDONTWRITEBYTECODE=1 \
+            -e PYTHONUNBUFFERED=1 -v "$PWD:/repo:ro" -w /repo \
+            python:3.11-slim-bookworm \
+            python deployment/oracle-always-free/micro-memory-smoke.py
