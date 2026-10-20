@@ -131,6 +131,11 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(result["source_pages_fetched"], 8)
         self.assertEqual(result["full_independent_case_labels_for_test_invoices"], 0)
         self.assertIsNone(result["real_freight_accuracy_from_these_sources"])
+        notes = result["curated_official_decision_challenge_examples"]
+        self.assertEqual(len(notes), 3)
+        self.assertEqual(notes["B-221594-0"]["independent_decision_summary"],
+                         "GOVERNMENT_OVERCHARGE_DETERMINATION_REVERSED")
+        self.assertTrue(all(not r["is_label_for_test_invoice"] for r in notes.values()))
 
     def test_native_pdf_ingress_is_not_pdf_extraction(self):
         receipt = ingest_bytes(
