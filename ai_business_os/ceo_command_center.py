@@ -19,6 +19,7 @@ from ai_business_os.portfolio_planning import build_portfolio_plan
 from ai_business_os.production_bridge import ProductionBridgeError, ProductionReadBridge
 from ai_business_os.retally_group import build_group_view, identity_candidates
 from ai_business_os.retally_permitplate import PermitPlateNYCReader
+from ai_business_os.retally_capturebrief import CaptureBriefOutcomeReader
 
 
 class CommandCenterError(ValueError):
@@ -145,13 +146,17 @@ class CommandCenterOperator:
         self, bridge: ProductionReadBridge, *, expected_schema_fingerprint: str,
         customer_register_reader: Callable[[], Mapping[str, Any]] | None = None,
         permitplate_nyc_reader: PermitPlateNYCReader | None = None,
+        capturebrief_outcome_reader: CaptureBriefOutcomeReader | None = None,
     ):
         if permitplate_nyc_reader is not None and not isinstance(permitplate_nyc_reader, PermitPlateNYCReader):
             raise CommandCenterError("PermitPlate NYC reader has an unsupported type")
+        if capturebrief_outcome_reader is not None and not isinstance(capturebrief_outcome_reader, CaptureBriefOutcomeReader):
+            raise CommandCenterError("CaptureBrief outcome reader has an unsupported type")
         self.bridge = bridge
         self.expected_schema_fingerprint = expected_schema_fingerprint
         self.customer_register_reader = customer_register_reader
         self.permitplate_nyc_reader = permitplate_nyc_reader
+        self.capturebrief_outcome_reader = capturebrief_outcome_reader
 
     def dashboard(self, *, include_private_group: bool = False) -> dict[str, Any]:
         if type(include_private_group) is not bool:
@@ -207,12 +212,20 @@ class CommandCenterOperator:
             except Exception:
                 # A private provider can include confidential details in errors.
                 raise CommandCenterError("private customer register could not be validated") from None
-        observation["service_registers"] = {"permitplate_nyc": {"mode": "NOT_CONNECTED"}}
+        observation["service_registers"] = {
+            "permitplate_nyc": {"mode": "NOT_CONNECTED"},
+            "capturebrief": {"mode": "NOT_CONNECTED"},
+        }
         if self.permitplate_nyc_reader is not None:
             try:
                 observation["service_registers"]["permitplate_nyc"] = self.permitplate_nyc_reader.observe()
             except Exception:
                 raise CommandCenterError("private PermitPlate NYC source could not be validated") from None
+        if self.capturebrief_outcome_reader is not None:
+            try:
+                observation["service_registers"]["capturebrief"] = self.capturebrief_outcome_reader.observe()
+            except Exception:
+                raise CommandCenterError("private CaptureBrief outcome source could not be validated") from None
         return observation
 
     def propose_objective(self, text: str, *, requested_by: str, priority: int = 80) -> dict[str, Any]:

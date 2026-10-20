@@ -200,6 +200,65 @@ unconfigured reader reports `NOT_CONNECTED`. Successful source observation does
 not approve a missing private business binding. The default dashboard does not
 invoke this reader; the public dashboard remains disconnected.
 
+## CaptureBrief immutable outcome snapshot reader
+
+`retally_capturebrief.CaptureBriefOutcomeReader` is a second, explicitly optional
+service adapter. It recognizes the append-only CaptureBrief outcome producer at
+[pinned source commit](https://github.com/P00NSMASHER/capturebrief/blob/12d90024f053a78ead7936abf092931fce240d3e/capturebrief_core/outcomes.py).
+It does **not** discover a live outcome ledger, establish a customer account map,
+connect to Stripe, access a local path, or infer group revenue. The original
+CaptureBrief verifier opens a filesystem sidecar lock; this adapter never invokes
+that verifier or modifies the live source.
+
+The approved private runtime must independently authenticate the source and
+capture a consistent immutable byte snapshot. Its callable must return exactly:
+
+```python
+{
+    "present": True,  # Explicit, independently established source existence
+    "content": immutable_jsonl_bytes,  # bytes, not a path or decoded string
+    "snapshot_sha256": sha256_of_exact_bytes,  # 64 lowercase hex characters
+    "observed_at": timezone_aware_capture_time,  # RFC3339 string
+}
+```
+
+The immutable snapshot's provider, location, access permissions, and retention
+must be configured outside this repository. Missing/unavailable files, invalid
+timestamps, malformed/partial JSONL, duplicate JSON keys, hash-chain breaks,
+invalid event types, case-fingerprint collisions, source rewinds and historical
+rewrites **fail closed**. Only explicitly present, zero-byte snapshots count as
+observed empty. A matching SHA-256 checks byte consistency; it cannot authenticate
+a provider, writer, or payment processor. Source-age status measures snapshot
+capture time, not how recently CaptureBrief performed customer work.
+
+```python
+from ai_business_os.retally_capturebrief import CaptureBriefOutcomeReader
+
+# Only after the private owner/operator has verified the true source location.
+capturebrief_reader = CaptureBriefOutcomeReader(approved_immutable_snapshot_reader)
+operator = CommandCenterOperator(
+    ProductionReadBridge(private_read_executor),
+    expected_schema_fingerprint=approved_schema_fingerprint,
+    capturebrief_outcome_reader=capturebrief_reader,
+)
+capturebrief_result = operator.group_observation()["service_registers"]["capturebrief"]
+```
+
+The output contains only record counts, event-type counts, **distinct case count**
+(not customer count), delivery-binding errors, and hash/freshness metadata. It
+exposes no case IDs, customer data, evidence references or financial amounts.
+Cash collected, paying customers, profit and qualified leads remain unknown.
+Declared PAYMENT events do not establish settled funds. No legal identity,
+business binding, customer referral or operational authority is created.
+
+A missing reader reports `NOT_CONNECTED` in the private command-center
+observation; the default CEO dashboard does not invoke any service reader.
+The reader's append-only continuity checks are bounded to one process lifetime;
+the private runtime must retain approved checkpoints across restarts if needed.
+Tests use only synthetic local bytes and do not claim a live CaptureBrief read.
+The live outcome-ledger location, authoritative snapshot transport, and
+case-to-account mapping remain unresolved before production enablement.
+
 ## Remaining operating work
 
 1. Review exact private business-to-catalog bindings while retaining source IDs;
@@ -208,9 +267,10 @@ invoke this reader; the public dashboard remains disconnected.
    operational records. Recovered source documents do not approve private business
    bindings; resolve conflicting mappings separately.
 2. Configure the PermitPlate NYC read callbacks and protected key in the approved
-   private runtime. Resolve CaptureBrief's live outcome-ledger location and
-   account identity map before adding its adapter. Reconcile the separate PA
-   product scope before importing its orders into this group catalog.
+   private runtime. Locate and authenticate CaptureBrief's real outcome-ledger,
+   immutable snapshot transport and case-to-account mapping before enabling the
+   source-only CaptureBrief adapter. Reconcile the separate PA product scope
+   before importing its orders into this group catalog.
 3. Use existing independent outcome/finance verification before adding monetary
    metrics or reporting paying customers.
 4. Complete the normal source and production release requirements before enabling
@@ -222,7 +282,7 @@ database migrations or recurring tasks are implemented by this observation layer
 ## Verification
 
 ```bash
-python -m unittest ai_business_os.test_retally_group_private ai_business_os.test_retally_customer_register ai_business_os.test_retally_permitplate ai_business_os.test_retally_group ai_business_os.test_ceo_command_center
+python -m unittest ai_business_os.test_retally_group_private ai_business_os.test_retally_customer_register ai_business_os.test_retally_permitplate ai_business_os.test_retally_group ai_business_os.test_retally_capturebrief ai_business_os.test_retally_capturebrief_integration ai_business_os.test_ceo_command_center
 ```
 
 Tests use synthetic identities and records. A read-only live SQL observation can
