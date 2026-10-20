@@ -717,3 +717,65 @@ def test_self_hashed_claim_batch_rejects_duplicate_review_proof_identity():
 
     with pytest.raises(ValueError, match="duplicate recovery review proof"):
         verify_recovery_claim_batch(forged)
+
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (("buyer_id", "buyer\u200b"), ("business_unit", "freight\u202e")),
+)
+def test_self_hashed_claim_batch_rejects_invisible_scope_identity(field, value):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, **{field: value}, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="identity must be canonical text"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_invisible_payer_identity():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original = batch.records[0]
+    record = replace(
+        original,
+        payer_id=original.payer_id + "\u200b",
+        record_hash="",
+    )
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[0], payer_id=record.payer_id)
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            claims=(claim,) + batch.claims[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="identity must be canonical text"):
+        verify_recovery_claim_batch(forged)
