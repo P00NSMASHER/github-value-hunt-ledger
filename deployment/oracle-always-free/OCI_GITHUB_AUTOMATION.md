@@ -9,6 +9,10 @@
 - It checks private Standard bucket retally-synthetic-sealed-recovery for NoPublicAccess, versioning/events/replication disabled; and the known VM ID, RUNNING state, VM.Standard.E2.1.Micro shape. Calls only OCI GetBucket and GetInstance. There are **no object lists, reads, writes, uploads, restores, SSH or network changes**. Output is generic, with no OCI OCIDs or secrets.
 - A passing monitor is NOT a passing encrypted-restore test or customer-ready release. The pre-existing synthetic orphan tracked in PR #520/#522 remains untouched.
 
+**Competing candidate notice:** PR #523 separately proposes a different OCI read-only observer with limited object inventory access. Do not merge/activate both workflows together or assume either is approved. Reconcile them through independent source review and retain just one scheduled Oracle identity. This candidate verifies only synthetic bucket and existing VM metadata; it cannot inspect objects or establish backup quality.
+
+**OIDC subject compatibility:** GitHub repositories created, renamed or opted in after July 15, 2026 may produce an immutable default subject. The monitor accepts ONLY either `repo:P00NSMASHER/github-value-hunt-ledger:ref:refs/heads/main` or `repo:P00NSMASHER@22281248/github-value-hunt-ledger@1376771019:ref:refs/heads/main`, and checks numeric IDs, workflow, issuer, audience and timestamps independently. Never use a wildcard subject. Oracle trust conditions bind the numeric repo/owner IDs instead of relying on a mutable subject.
+
 ## 1. Identity domain and token-exchange trust: owner action
 
 Using an Oracle identity-domain administrator account, create a **dedicated non-administrator confidential OAuth application** for this monitor. If the administrator needs a separate OAuth application to provision the trust, do not use that elevated app in GitHub. The runtime OAuth client has a client ID and secret which stay in GitHub Actions Secrets, not in issues/chat/repository variables. **This design avoids OCI user API signing keys, but does require an OAuth client secret.**
@@ -73,7 +77,7 @@ After independent PR approval and merging, visit https://github.com/P00NSMASHER/
 
 **Repository Variables:** RETALLY_OCI_DOMAIN_URL (identity domain HTTPS origin such as https://idcs-xxxx.identity.oraclecloud.com, no path); RETALLY_OCI_NAMESPACE (existing Object Storage namespace); RETALLY_OCI_COMPARTMENT_OCID (existing compartment OCID); RETALLY_OCI_VM_OCID (specific existing VM OCID).
 
-**Activation variable:** RETALLY_OCI_MONITOR_ENABLED must remain absent/false until identity trust, effective permission review and negative controls are independently accepted. Only then set RETALLY_OCI_MONITOR_ENABLED=true.
+**Activation variable:** RETALLY_OCI_MONITOR_ENABLED must remain absent/false until identity trust, effective permission review and negative controls are independently accepted. When absent/false, GitHub reports an explicit NOT ACTIVE job without any Oracle API calls. Only then set RETALLY_OCI_MONITOR_ENABLED=true.
 
 No OCI credentials may be entered in GitHub code, PR comments or chat.
 
