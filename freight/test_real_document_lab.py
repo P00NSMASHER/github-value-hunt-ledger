@@ -10,6 +10,7 @@ from freight.real_document_lab import (
     fetch_public, iso_date, minor, parse_pennine_csv, statement_rows,
     reference_scoped_replay, InvoiceFace, _rating_probe, survey_historical_adjudications,
     adversarial_declared_payment_controls, require_frozen_source, digest, _ApprovedRedirects,
+    historical_reference_money_controls,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -186,6 +187,29 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(notes["B-221594-0"]["independent_decision_summary"],
                          "GOVERNMENT_OVERCHARGE_DETERMINATION_REVERSED")
         self.assertTrue(all(not r["is_label_for_test_invoice"] for r in notes.values()))
+
+    def test_real_historical_GAO_decision_arithmetic_never_becomes_recovery(self):
+        result = historical_reference_money_controls()
+        self.assertTrue(result["all_reference_arithmetic_exact"])
+        self.assertEqual(result["reference_cases"], 3)
+        self.assertTrue(all(result["checks"].values()))
+        self.assertEqual(result["original_invoice_documents_joined"], 0)
+        self.assertEqual(result["independently_scored_freight_cases"], 0)
+        self.assertEqual(result["recovery_claims_usd_minor"], 0)
+        # A rate/tender invalidation cannot be turned into an overcharge
+        # finding merely because a billed-minus-proposed subtraction works.
+        from copy import deepcopy
+        from freight.real_document_lab import HISTORICAL_GAO_AMOUNT_REFERENCES
+        corrupt = deepcopy(HISTORICAL_GAO_AMOUNT_REFERENCES)
+        corrupt["B-221594-0"]["legal_disposition"] = "INVALID_TEST_OVERRIDE"
+        with patch.dict(
+            "freight.real_document_lab.HISTORICAL_GAO_AMOUNT_REFERENCES",
+            corrupt, clear=True,
+        ):
+            check = historical_reference_money_controls()
+        self.assertFalse(check["all_reference_arithmetic_exact"])
+        self.assertFalse(check["checks"][
+            "gao_b221594_ledger_math_does_not_validate_invalid_deduction"])
 
     def test_native_pdf_ingress_is_not_pdf_extraction(self):
         receipt = ingest_bytes(
