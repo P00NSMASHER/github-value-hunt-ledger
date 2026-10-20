@@ -310,3 +310,45 @@ def test_self_hashed_claim_batch_rejects_invalid_money_semantics(amount_cents):
 
     with pytest.raises(ValueError, match="positive integer cents"):
         verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_duplicate_claim_identity():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    record = batch.records[0]
+    claim = batch.claims[0]
+    binding = batch.bindings[0]
+    forged = replace(
+        batch,
+        records=(record, record),
+        claims=(claim, claim),
+        bindings=(binding, binding),
+        fee_disqualified_count=2 * int(record.fee_disqualified),
+        batch_hash="",
+    )
+    batch_body = {
+        "schema": 1,
+        "buyer_id": forged.buyer_id,
+        "business_unit": forged.business_unit,
+        "truth_hash": forged.truth_hash,
+        "incumbent_output_hash": forged.incumbent_output_hash,
+        "buyer_review_batch_hash": forged.buyer_review_batch_hash,
+        "issued_at": forged.issued_at,
+        "state": forged.state,
+        "confirmed_review_count": forged.confirmed_review_count,
+        "claim_count": forged.claim_count,
+        "fee_disqualified_count": forged.fee_disqualified_count,
+        "records": [asdict(item) for item in forged.records],
+        "bindings": [asdict(item) for item in forged.bindings],
+    }
+    forged = replace(forged, batch_hash=canonical_hash(batch_body))
+
+    with pytest.raises(ValueError, match="duplicate recovery claim identity"):
+        verify_recovery_claim_batch(forged)
