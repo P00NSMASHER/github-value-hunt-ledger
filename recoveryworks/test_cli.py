@@ -14,7 +14,7 @@ class Scan360CliTests(unittest.TestCase):
             (root / "Payments.csv").write_text(
                 "Payment_Number,Vendor,Invoice_Number,Amount,Payment_Date\n"
                 "P-1,V,INV-1,100.00,2026-08-01\n"
-                "P-2,V,INV-1-DUP,100.00,2026-08-02\n",
+                "P-2,V,INV-1,100.00,2026-08-02\n",
                 encoding="utf-8",
             )
             (root / "AP_Invoices.csv").write_text(

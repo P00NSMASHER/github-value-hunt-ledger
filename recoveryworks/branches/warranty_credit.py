@@ -7,6 +7,7 @@ from datetime import date
 from typing import Any, Iterable, Mapping
 
 from recoveryworks.engine import RecoveryObservation
+from recoveryworks.financial_events import net_settlements
 from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
 
@@ -122,6 +123,8 @@ class WarrantyCreditSettlement:
     settlement_kind: str = "CREDIT_MEMO"
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    reverses_id: str | None = None
+
     def __post_init__(self) -> None:
         for name in (
             "settlement_id", "entitlement_id", "settlement_date",
@@ -129,7 +132,14 @@ class WarrantyCreditSettlement:
         ):
             _required(name, getattr(self, name))
         _iso_date("settlement_date", self.settlement_date)
-        _cents("amount_received_cents", self.amount_received_cents)
+        if type(self.amount_received_cents) is not int:
+            raise ValueError("amount_received_cents must be integer cents")
+        if self.amount_received_cents < 0 and (self.settlement_kind != "REVERSAL" or not self.reverses_id):
+            raise ValueError("negative settlement requires REVERSAL and reverses_id")
+        if self.settlement_kind not in {"CREDIT_MEMO", "APPLIED_CREDIT", "CASH_REFUND", "REVERSAL", "ZERO_CONFIRMED"}:
+            raise ValueError("unsupported settlement kind; issued/unapplied credits require reconciliation")
+        if self.settlement_kind == "ZERO_CONFIRMED" and self.amount_received_cents != 0:
+            raise ValueError("ZERO_CONFIRMED must have zero amount")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
@@ -145,6 +155,7 @@ class WarrantyCreditSettlement:
                 "amount_received_cents": self.amount_received_cents,
                 "settlement_date": self.settlement_date,
                 "settlement_kind": self.settlement_kind,
+                "reverses_id": self.reverses_id,
                 **dict(self.metadata),
             },
         )
@@ -233,7 +244,11 @@ def audit_warranty_credits(
             ))
             continue
 
-        actual_cents = sum(s.amount_received_cents for s in group_settlements)
+        try:
+            actual_cents = net_settlements(group_settlements, amount_field="amount_received_cents")
+        except ValueError as exc:
+            exceptions.append(WarrantyCreditAuditException(entitlement_id, "INVALID_SETTLEMENT_LINEAGE", str(exc)))
+            continue
         if entitlement.entitled_cents <= actual_cents:
             continue
 
