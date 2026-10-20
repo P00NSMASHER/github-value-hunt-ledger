@@ -1,4 +1,4 @@
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
@@ -7,13 +7,14 @@ from freight.buyer_review_workflow import (
     BuyerReviewDecisionInput,
     build_buyer_review_batch,
 )
-from freight.contracts import open_incumbent_output, seal_incumbent_submission
+from freight.contracts import canonical_hash, open_incumbent_output, seal_incumbent_submission
 from freight.pilot_reporting import ReviewDisposition
 from freight.recovery_claim_workflow import (
     RecoveryClaimBatchState,
     build_recovery_claim_batch,
     persist_recovery_claim_batch,
     render_recovery_claim_batch_markdown,
+    verify_recovery_claim_batch,
 )
 from freight.settlement_store import SettlementStore
 
@@ -259,3 +260,53 @@ def test_persistence_rejects_tampered_claim_before_writing(tmp_path):
     with pytest.raises(ValueError, match="does not match persisted claim"):
         persist_recovery_claim_batch(store, bad)
     assert store.count("recovery_claims") == 0
+
+
+@pytest.mark.parametrize("amount_cents", [True, 0, -1])
+def test_self_hashed_claim_batch_rejects_invalid_money_semantics(amount_cents):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original_record = batch.records[0]
+    record = replace(original_record, amount_cents=amount_cents, record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[0], amount_cents=amount_cents)
+    forged = replace(
+        batch,
+        records=(record,) + batch.records[1:],
+        claims=(claim,) + batch.claims[1:],
+        batch_hash="",
+    )
+    batch_body = {
+        "schema": 1,
+        "buyer_id": forged.buyer_id,
+        "business_unit": forged.business_unit,
+        "truth_hash": forged.truth_hash,
+        "incumbent_output_hash": forged.incumbent_output_hash,
+        "buyer_review_batch_hash": forged.buyer_review_batch_hash,
+        "issued_at": forged.issued_at,
+        "state": forged.state,
+        "confirmed_review_count": forged.confirmed_review_count,
+        "claim_count": forged.claim_count,
+        "fee_disqualified_count": forged.fee_disqualified_count,
+        "records": [asdict(item) for item in forged.records],
+        "bindings": [asdict(item) for item in forged.bindings],
+    }
+    forged = replace(forged, batch_hash=canonical_hash(batch_body))
+
+    with pytest.raises(ValueError, match="positive integer cents"):
+        verify_recovery_claim_batch(forged)
