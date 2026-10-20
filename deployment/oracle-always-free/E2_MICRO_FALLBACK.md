@@ -14,9 +14,9 @@ See [Oracle Always Free](https://docs.oracle.com/en-us/iaas/Content/FreeTier/fre
 
 ## CI acceptance before attempting a VM
 
-The `oracle-micro-memory-rehearsal` job runs the *actual seven-branch synthetic journey*, local backup/restore, health checks and loopback HTTP negative tests in a Docker container constrained to **768 MiB RAM**, with no swap, no network, a half-CPU quota, a read-only repository and an unprivileged UID. A passing job indicates the fixture workload fits; it does **not** simulate full production customer datasets or the Micro's 1/8 baseline OCPU. Do not represent this as independently adjudicated customer proof.
+The `oracle-micro-memory-rehearsal` job runs the *actual seven-branch synthetic journey*, local backup/restore, health checks and loopback HTTP negative tests in a Docker container constrained to **768 MiB RAM**, with no swap, no network, a 1/8-CPU quota (the fixed Micro baseline), a read-only repository and an unprivileged UID. A passing job indicates the fixture workload fits; it does **not** simulate full production customer datasets or the Micro's 1/8 baseline OCPU. Do not represent this as independently adjudicated customer proof.
 
-The connected CI reported **seven passing synthetic journeys, restore, local health and HTTP controls, 31.3 MiB peak child RSS and 8.2 seconds elapsed** at 0.5 CPU in this controlled rehearsal. Later sustained host acceptance and security review are required.
+An initial rehearsal at 0.5 CPU reported **seven passing synthetic journeys, restore, local health and HTTP controls, 31.3 MiB peak child RSS and 8.2 seconds elapsed**. The current CI additionally constrains the workload to **0.125 CPU**; verify its separate results at the exact PR head. Later sustained host acceptance and security review are required.
 
 ## A. Reinspect the existing partial network (read-only)
 
