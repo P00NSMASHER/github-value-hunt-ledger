@@ -60,10 +60,16 @@ def cli(*args: str, region: str | None = None, timeout: int = 90):
         raise Stop('OCI CLI unavailable or timed out; use the signed-in Oracle Cloud Shell.') from exc
     if result.returncode:
         # Do not expose provider response data or credentials in the chat.
-        error_lines = (result.stderr or '').strip().splitlines()
-        error = next((x.strip() for x in error_lines if 'ServiceError' in x or 'NotAuthorized' in x),
-                     f'exit status {result.returncode}')
-        raise Stop(f'OCI {" ".join(args[:3])} failed ({error[:180]}). No paid fallback.')
+        # Restrict errors to public provider code labels; never leak CLI stderr,
+        # request IDs, account information or credentials into operator output.
+        raw_error = result.stderr or ''
+        labels = ('OutOfHostCapacity', 'ServiceLimitExceeded', 'LimitExceeded',
+                  'NotAuthorizedOrNotFound', 'InvalidParameter', 'TooManyRequests',
+                  'InternalError', 'ServiceError')
+        label = next((tag for tag in labels if tag.lower() in raw_error.lower()), None)
+        if re.search(r'out of host capacity', raw_error, re.IGNORECASE):
+            label = 'OutOfHostCapacity'
+        raise Stop(f'OCI {" ".join(args[:3])} failed ({label or "exit status "+str(result.returncode)}). No paid fallback.')
     if not result.stdout.strip():
         # OCI CLI 3.91 on signed-in Cloud Shell reports a successful EMPTY list
         # with zero stdout bytes. Requery without --all; only two consistent,
@@ -150,7 +156,7 @@ def compartments(tenancy: str, region: str) -> list[str]:
     return list(dict.fromkeys(ids))
 
 
-def read_inventory(tenancy: str, region: str):
+def read_inventory(tenancy: str, region: str, *, existing_vcn_id: str | None = None):
     ads = data_list(cli('iam', 'availability-domain', 'list', '--compartment-id', tenancy,
                         region=region), 'availability domains')
     ad_names = [a.get('name') for a in ads if a.get('name')]
@@ -161,6 +167,7 @@ def read_inventory(tenancy: str, region: str):
     found_names = []
     vcns = []
     networks = []
+    owned_vcn_count = 0
     for compartment in compartments_ids:
         instances = data_list(cli('compute', 'instance', 'list', '--compartment-id', compartment,
                                   '--all', region=region), 'compute instances')
@@ -189,10 +196,18 @@ def read_inventory(tenancy: str, region: str):
         for v in vs:
             if active(v):
                 vcns.append(v)
-                if v.get('display-name') == VPC_NAME:
-                    found_names.append(v.get('id'))
-                networks.extend(v.get('cidr-blocks') or ([v['cidr-block']] if v.get('cidr-block') else []))
+                blocks = v.get('cidr-blocks') or ([v['cidr-block']] if v.get('cidr-block') else [])
+                if existing_vcn_id and v.get('id') == existing_vcn_id:
+                    owned_vcn_count += 1
+                    ensure(v.get('display-name') == VPC_NAME and blocks == [str(VPC_NETWORK)],
+                           'Recorded staging VCN identity or CIDR changed; refusing resume.')
+                else:
+                    if v.get('display-name') == VPC_NAME:
+                        found_names.append(v.get('id'))
+                    networks.extend(blocks)
     ensure(not found_names, 'RETALLY instance/VCN already exists; refusing duplicate resources.')
+    if existing_vcn_id:
+        ensure(owned_vcn_count == 1, 'Exactly one original staging VCN must be visible for resume.')
     ensure(ocpus + OCPUS <= MAX_A1_OCPUS and ram + RAM_GB <= MAX_A1_MEMORY_GB,
            f'Always Free A1 allocation unavailable (in use: {ocpus} OCPU, {ram} GB RAM).')
     ensure(size_gb + BOOT_GB <= MAX_BLOCK_STORAGE_GB,
