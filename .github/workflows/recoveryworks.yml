@@ -128,7 +128,7 @@ jobs:
           set -eu
           docker run --rm \
             --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
-            --user 65534:65534 --memory 768m --memory-swap 768m --cpus 0.5 \
+            --user 65534:65534 --memory 768m --memory-swap 768m --cpus 0.125 \
             --pids-limit 128 --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=192m \
             -e RETALLY_SYNTHETIC_ONLY=1 -e PYTHONDONTWRITEBYTECODE=1 \
             -e PYTHONUNBUFFERED=1 -v "$PWD:/repo:ro" -w /repo \
