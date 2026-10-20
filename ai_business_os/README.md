@@ -28,8 +28,11 @@ The PermitPlate NYC adapter reads its existing onboarding ledger and initializat
 anchor at one immutable source revision, checks integrity, and reports source age
 and holds separately. It exposes aggregate observations only. The
 [source reconciliation](RETALLY_GROUP_SOURCE_RECONCILIATION.md) distinguishes
-project/repository evidence from private business bindings and records the
-ScopeSignal/CaptureBrief association conflict.
+project/repository evidence and original private-artifact provenance from private
+business bindings. It recovers the RehabSignal, Contractor Quote Recovery and
+[App Factory product sources](RETALLY_APP_FACTORY_SOURCE_MAP.md), and records the
+separate ScopeSignal/CaptureBrief association conflict. Public private-source
+references contain lookup keys and dates; exact artifact identities stay private.
 Existing schedules, pricing, legal identities and release controls are unchanged.
 
 ```bash

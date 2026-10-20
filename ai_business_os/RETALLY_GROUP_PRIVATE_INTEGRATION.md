@@ -179,7 +179,9 @@ invoke this reader; the public dashboard remains disconnected.
 
 1. Review exact private business-to-catalog bindings while retaining source IDs;
    use the [typed source reconciliation](RETALLY_GROUP_SOURCE_RECONCILIATION.md)
-   to distinguish project/repository evidence and resolve conflicting mappings.
+   to distinguish project/repository evidence, historical private artifacts and
+   operational records. Recovered source documents do not approve private business
+   bindings; resolve conflicting mappings separately.
 2. Configure the PermitPlate NYC read callbacks and protected key in the approved
    private runtime. Resolve CaptureBrief's live outcome-ledger location and
    account identity map before adding its adapter. Reconcile the separate PA

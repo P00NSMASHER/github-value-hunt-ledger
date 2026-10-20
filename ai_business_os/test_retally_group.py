@@ -17,6 +17,23 @@ from ai_business_os.production_bridge import ProductionReadBridge
 from ai_business_os.test_ceo_command_center import FakeProduction
 
 
+def _catalog_with_private_source():
+    catalog = load_catalog()
+    entry = next(row for row in catalog["entries"] if row["id"] == "rehabsignal")
+    entry.update({
+        "name": "Synthetic private artifact",
+        "evidence_status": "PRIVATE_ARTIFACT_DOCUMENTED",
+        "sources": [],
+        "private_source_refs": [{
+            "record_key": "retally-src-20261020-synthetic-handoff",
+            "label": 'Synthetic <review> & "handoff"',
+            "source_as_of": catalog["as_of"],
+            "reviewed_on": catalog["as_of"],
+        }],
+    })
+    return catalog
+
+
 class CatalogTests(unittest.TestCase):
     def setUp(self):
         self.catalog = load_catalog()
@@ -147,6 +164,155 @@ class CatalogTests(unittest.TestCase):
                 target["private_customer_records"] = [{"private_contact_ref": "private:example"}]
                 with self.assertRaisesRegex(GroupCatalogError, "unexpected fields"):
                     build_group_view(changed)
+
+
+class PrivateSourceTests(unittest.TestCase):
+    def setUp(self):
+        self.catalog = _catalog_with_private_source()
+        self.entry = next(row for row in self.catalog["entries"] if row["id"] == "rehabsignal")
+
+    def test_private_evidence_needs_a_nonempty_reference_list(self):
+        for refs in (None, [], "private-file", {}):
+            with self.subTest(refs=refs):
+                changed = copy.deepcopy(self.catalog)
+                entry = next(row for row in changed["entries"] if row["id"] == "rehabsignal")
+                if refs is None:
+                    entry.pop("private_source_refs")
+                else:
+                    entry["private_source_refs"] = refs
+                with self.assertRaises(GroupCatalogError):
+                    validate_catalog(changed)
+
+    def test_private_reference_dates_are_ordered_and_canonical(self):
+        for source_date, review_date, message in (
+            ("2000-01-02", "2000-01-01", "later than its review"),
+            (self.catalog["as_of"], "2099-01-01", "catalog snapshot"),
+            ("not-a-date", self.catalog["as_of"], "ISO date"),
+            (self.catalog["as_of"], "20990101", "YYYY-MM-DD"),
+        ):
+            with self.subTest(source_date=source_date, review_date=review_date):
+                self.entry["private_source_refs"][0].update({
+                    "source_as_of": source_date, "reviewed_on": review_date,
+                })
+                with self.assertRaisesRegex(GroupCatalogError, message):
+                    validate_catalog(self.catalog)
+
+    def test_private_record_keys_are_bounded_public_review_keys(self):
+        prefix = "retally-src-20261020-"
+        for key in ("file-private-123", "https://private.invalid/file",
+                    "retally-src-2026102-handoff", "retally-src-20261020-Handoff",
+                    prefix, prefix + "a" * (101 - len(prefix))):
+            with self.subTest(key=key):
+                self.entry["private_source_refs"][0]["record_key"] = key
+                with self.assertRaisesRegex(GroupCatalogError, "record key"):
+                    validate_catalog(self.catalog)
+        self.entry["private_source_refs"][0]["record_key"] = prefix + "a" * (100 - len(prefix))
+        validate_catalog(self.catalog)
+
+    def test_private_labels_require_nonempty_printable_text(self):
+        for label in ("", " ", "handoff\nprivate-data", "handoff\x00", "handoff\u202e"):
+            with self.subTest(label=label):
+                self.entry["private_source_refs"][0]["label"] = label
+                with self.assertRaisesRegex(GroupCatalogError, "label"):
+                    validate_catalog(self.catalog)
+
+    def test_private_references_reject_provider_ids_urls_and_missing_fields(self):
+        for field, value in (
+            ("file_id", "file-private-123"), ("private_id", "provider-private-123"),
+            ("url", "https://private.invalid/file"), ("uri", "private://file/123"),
+        ):
+            with self.subTest(field=field):
+                ref = self.entry["private_source_refs"][0]
+                ref[field] = value
+                with self.assertRaisesRegex(GroupCatalogError, "unexpected fields"):
+                    validate_catalog(self.catalog)
+                ref.pop(field)
+        self.entry["private_source_refs"][0].pop("label")
+        with self.assertRaisesRegex(GroupCatalogError, "missing required fields"):
+            validate_catalog(self.catalog)
+
+    def test_private_record_keys_are_unique_within_and_across_entries(self):
+        ref = self.entry["private_source_refs"][0]
+        self.entry["private_source_refs"].append(copy.deepcopy(ref))
+        with self.assertRaisesRegex(GroupCatalogError, "duplicate private source record key"):
+            validate_catalog(self.catalog)
+        self.entry["private_source_refs"].pop()
+        self.catalog["entries"][0]["private_source_refs"] = [copy.deepcopy(ref)]
+        with self.assertRaisesRegex(GroupCatalogError, "duplicate private source record key"):
+            validate_catalog(self.catalog)
+
+    def test_context_only_cannot_carry_even_empty_private_references(self):
+        self.entry["evidence_status"] = "CONTEXT_ONLY"
+        for refs in (self.entry["private_source_refs"], []):
+            with self.subTest(refs=refs):
+                self.entry["private_source_refs"] = refs
+                with self.assertRaisesRegex(GroupCatalogError, "context-only"):
+                    validate_catalog(self.catalog)
+
+    def test_private_evidence_preserves_public_url_and_authority_boundaries(self):
+        view = build_group_view(self.catalog)
+        self.assertTrue(all(value is None for value in view["financial_metrics"].values()))
+        self.assertEqual([], self.entry["sources"])
+        for path, value in (
+            (("financial_metrics", "cash_collected"), 0),
+            (("boundaries", "legal_identity"), "VERIFIED"),
+            (("boundaries", "live_customer_state"), "CONNECTED"),
+            (("authority", "external_actions_authorized"), True),
+            (("authority", "production_state_mutation_authorized"), True),
+        ):
+            with self.subTest(path=path):
+                changed = copy.deepcopy(self.catalog)
+                changed[path[0]][path[1]] = value
+                with self.assertRaises(GroupCatalogError):
+                    validate_catalog(changed)
+        self.entry["sources"] = [{
+            "label": "Unapproved external reference", "url": "https://private.invalid/source",
+            "observed_on": self.catalog["as_of"],
+        }]
+        with self.assertRaisesRegex(GroupCatalogError, "public owner GitHub"):
+            validate_catalog(self.catalog)
+
+    def test_private_evidence_does_not_change_identity_candidates_or_authorize_mutation(self):
+        rows = [{"id": "synthetic-business", "slug": "rehabsignal", "name": "private customer name"}]
+        original = copy.deepcopy(rows)
+        result = identity_candidates(rows, self.catalog)
+        self.entry["evidence_status"] = "CONTEXT_ONLY"
+        self.entry.pop("private_source_refs")
+        self.assertEqual(result, identity_candidates(rows, self.catalog))
+        self.assertEqual(original, rows)
+        self.assertFalse(result["identity_mutation_authorized"])
+        self.assertFalse(result["commercial_readiness_assessed"])
+        self.assertNotIn("private customer name", json.dumps(result))
+
+    def test_private_source_rendering_is_escaped_nonclickable_and_not_pending(self):
+        from ai_business_os.retally_group_dashboard import render_dashboard
+        html = render_dashboard(build_group_view(self.catalog))
+        card = html.split("<h3>Synthetic private artifact</h3>", 1)[1].split("</article>", 1)[0]
+        self.assertIn("Private source reviewed", card)
+        self.assertIn("Synthetic &lt;review&gt; &amp; &quot;handoff&quot;", card)
+        self.assertIn("Record retally-src-20261020-synthetic-handoff", card)
+        self.assertIn(f'Source as of {self.catalog["as_of"]}', card)
+        self.assertIn(f'Reviewed {self.catalog["as_of"]}', card)
+        self.assertNotIn("<a ", card)
+        self.assertNotIn("Source binding pending", card)
+
+    def test_renderer_escapes_private_keys_and_dates_even_after_projection_tampering(self):
+        from ai_business_os.retally_group_dashboard import render_dashboard
+        view = build_group_view(self.catalog)
+        entry = next(row for row in view["entries"] if row["id"] == "rehabsignal")
+        for key in ("record_key", "source_as_of", "reviewed_on"):
+            entry["private_source_refs"][0][key] = '<img src=x onerror="bad()">'
+        html = render_dashboard(view)
+        self.assertNotIn("<img src=x", html)
+        self.assertEqual(3, html.count("&lt;img src=x onerror=&quot;bad()&quot;&gt;"))
+        for field, value in (("cash_collected", 10), ("paying_customers", 1)):
+            view["financial_metrics"][field] = value
+            with self.assertRaisesRegex(ValueError, "financial or customer"):
+                render_dashboard(view)
+            view["financial_metrics"][field] = None
+        view["boundaries"]["legal_identity"] = "VERIFIED"
+        with self.assertRaisesRegex(ValueError, "legal, brand, or spending"):
+            render_dashboard(view)
 
 
 class IdentityTests(unittest.TestCase):

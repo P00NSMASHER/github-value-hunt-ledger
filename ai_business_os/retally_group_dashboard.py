@@ -54,8 +54,11 @@ def _safe_https(value: object) -> str | None:
     return value
 
 
-def _sources(sources: Sequence[Mapping[str, object]]) -> str:
-    if not sources:
+def _sources(
+    sources: Sequence[Mapping[str, object]],
+    private_source_refs: Sequence[Mapping[str, object]] = (),
+) -> str:
+    if not sources and not private_source_refs:
         return '<p class="source-pending">Source binding pending</p>'
     rows = []
     for source in sources:
@@ -70,6 +73,14 @@ def _sources(sources: Sequence[Mapping[str, object]]) -> str:
         date = source.get("observed_on")
         observed = f'<span class="source-date">Observed {_text(date)}</span>' if date else ""
         rows.append(f"<li>{link}{observed}</li>")
+    for ref in private_source_refs:
+        rows.append(
+            '<li class="private-source">'
+            f'<span>{_text(ref.get("label"))}</span>'
+            f'<span class="source-date">Record {_text(ref.get("record_key"))}</span>'
+            f'<span class="source-date">Source as of {_text(ref.get("source_as_of"))}; '
+            f'Reviewed {_text(ref.get("reviewed_on"))}</span></li>'
+        )
     return '<ul class="sources">' + "".join(rows) + "</ul>"
 
 
@@ -85,10 +96,12 @@ def _entry(entry: Mapping[str, object], division_names: Mapping[str, str]) -> st
         raise ValueError("unsupported planning entry kind")
     division_id = str(entry.get("division_id", ""))
     evidence = entry.get("evidence_status")
-    evidence_label = (
-        "Repository documented" if evidence == "REPOSITORY_DOCUMENTED" else "Source unresolved"
-    )
-    evidence_class = "documented" if evidence == "REPOSITORY_DOCUMENTED" else "unresolved"
+    if evidence == "REPOSITORY_DOCUMENTED":
+        evidence_label, evidence_class = "Repository documented", "documented"
+    elif evidence == "PRIVATE_ARTIFACT_DOCUMENTED":
+        evidence_label, evidence_class = "Private source reviewed", "documented"
+    else:
+        evidence_label, evidence_class = "Source unresolved", "unresolved"
     search = " ".join(
         str(entry.get(key, "")) for key in ("name", "purpose", "stage", "next_action")
     )
@@ -107,7 +120,7 @@ def _entry(entry: Mapping[str, object], division_names: Mapping[str, str]) -> st
         f'<p>{_text(entry.get("next_action"))}</p></div>'
         '<footer class="card-footer">'
         f'<span class="evidence {evidence_class}">{evidence_label}</span>'
-        + _sources(entry.get("sources", []))
+        + _sources(entry.get("sources", []), entry.get("private_source_refs", []))
         + "</footer></article>"
     )
 

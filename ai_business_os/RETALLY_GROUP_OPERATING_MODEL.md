@@ -23,17 +23,18 @@ planning metadata, never customer documents or confidential engagement records.
 
 The [source reconciliation record](RETALLY_GROUP_SOURCE_RECONCILIATION.md) now
 distinguishes private business identities, public project identities, product
-families and research sources. It records a conflicting ScopeSignal/CaptureBrief
-association and the unresolved product-source gaps. Public project registration
-alone does not supply a private business binding.
+families, research sources and original private artifacts. It recovers the three
+previously missing product sources and retains the separate ScopeSignal/CaptureBrief
+association conflict. Source references and public project registration do not
+supply private business bindings.
 
 ## Four proposed divisions
 
 | Division | Offers and projects | Scope |
 | --- | --- | --- |
 | RETALLY Recovery | Freight, AP, warranty/supplier credits, procurement, rebates, parcel, utilities; remaining RecoveryWorks branches as expansion coverage | Document evidence-backed financial discrepancies and support explicitly authorized recovery. Branch code or synthetic acceptance does not establish real customer performance. |
-| RETALLY Intelligence | CaptureBrief, PermitPlate, context-reported RehabSignal | Specialized research for distinct buyers. Each offer keeps its own qualification, evidence, delivery and authorization requirements. |
-| RETALLY Tools & Data | SheetHarbor, x402 product family, unresolved App Factory product candidates | Useful spreadsheets, software and data services. Product variants are not counted as separate companies. |
+| RETALLY Intelligence | CaptureBrief, PermitPlate, RehabSignal with original private offer documentation | Specialized research for distinct buyers. Each offer keeps its own qualification, evidence, delivery and authorization requirements. |
+| RETALLY Tools & Data | SheetHarbor, x402 product family, App Factory draft local candidates with pinned source | Useful spreadsheets, software and data services. Product variants are not counted as separate companies. |
 | RETALLY Ventures | ScopeSignal concept, Contractor Quote Recovery experiment, market-surveillance research, Resonance | Validate defined customer problems and deliverables before promotion. Research and demonstrations do not establish commercial readiness. |
 
 **CaptureBrief** is a supervised Decision Evidence review of one existing public
@@ -49,8 +50,13 @@ or guarantee opening dates, purchase intent or leads.
 **SheetHarbor** comprises maker economics spreadsheets; its documented Excel
 compatibility gate remains unresolved. **x402** is one product family with separate
 production-reference and staging records; present availability and net revenue
-need fresh evidence. **RehabSignal** and App Factory candidates need authoritative
-source bindings. **Resonance** is senior-living cultural engagement planning;
+need fresh evidence. **RehabSignal** has an original Pennsylvania SNF territory-brief
+offer and execution plan; current delivery economics and demand need revalidation.
+**App Factory products** have three implemented engines and nine default editions
+on a draft, unmerged candidate branch; their [source map](RETALLY_APP_FACTORY_SOURCE_MAP.md)
+does not establish a release. **Contractor Quote Recovery** is documented as a
+historical outreach experiment without an established paid offer or dedicated
+verified fulfillment system in its original audit. **Resonance** is senior-living cultural engagement planning;
 demo evidence does not establish participant benefit. **Market surveillance**
 remains research without trade execution. Personal/family projects, retired
 products and unrelated private projects are excluded from commercial reporting.

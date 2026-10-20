@@ -115,16 +115,24 @@
       "name": "RehabSignal",
       "division_id": "intelligence",
       "kind": "venture",
-      "purpose": "Candidate public-source account research for contract-therapy business-development teams.",
-      "stage": "Product source unresolved",
+      "purpose": "Public-source Pennsylvania skilled-nursing account research for contract-therapy business-development teams.",
+      "stage": "Original offer and execution plan recovered; current readiness unverified",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Locate the authoritative product brief and confirm the buyer, deliverable and current owner before offering it.",
-      "evidence_status": "CONTEXT_ONLY",
+      "next_action": "Revalidate the September territory-brief scope, delivery economics and current owner before activation; retain the original sources as historical evidence.",
+      "evidence_status": "PRIVATE_ARTIFACT_DOCUMENTED",
       "sources": [],
       "candidate_production_slugs": [
         "rehabsignal"
       ],
-      "commercial_readiness": "NOT_ASSESSED"
+      "commercial_readiness": "NOT_ASSESSED",
+      "private_source_refs": [
+        {
+          "record_key": "retally-src-20261020-rehabsignal",
+          "label": "Original territory-brief offer, handoff and execution pack",
+          "source_as_of": "2026-09-12",
+          "reviewed_on": "2026-10-20"
+        }
+      ]
     },
     {
       "id": "sheetharbor",
@@ -155,17 +163,39 @@
       "name": "App Factory products",
       "division_id": "tools-data",
       "kind": "product_family",
-      "purpose": "Candidate Supply Desk, Renewal Desk, Client Intake, estimating and inventory tools; individual source bindings remain unresolved.",
-      "stage": "Candidate catalog needs reconciliation",
+      "purpose": "Three application engines with nine default editions: document workflow, quote-to-order and inventory control; additional variants remain workflow hypotheses.",
+      "stage": "Draft local synthetic candidates; source recovered; unmerged",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Bind each retained tool to an owned source and current acceptance record; count variants as products.",
-      "evidence_status": "CONTEXT_ONLY",
+      "next_action": "Review the pinned candidate and retained edition acceptance evidence before any release; keep these products separate from x402 API services and shared factory infrastructure.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
-          "label": "Factory infrastructure contract",
-          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/ai_business_os/SOFTWARE_FACTORY_CONTRACT.md",
+          "label": "Supply Desk, Renewal Desk and Client Intake recipes",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/recipes.json",
           "observed_on": "2026-10-20",
-          "git_blob_sha": "b71a6c7b6efd907e900bbbe80e6c250939be24bf"
+          "git_blob_sha": "fd0135235c8644bc6be4f8b318181d0c38af924e"
+        },
+        {
+          "label": "Print, rental and field-service estimating recipes",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/quote-family/recipes.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "1638a532ccb321455eb167ed77d4f16d837e93ad"
+        },
+        {
+          "label": "MRO, rental and hospitality inventory recipes",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/inventory-family/recipes.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "5eb317f4449d415e1d40de4ad57b52f336c71eec"
+        },
+        {
+          "label": "Full local application manufacturing implementation",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/manufacturing/README.md",
+          "observed_on": "2026-10-20"
+        },
+        {
+          "label": "Inspected draft candidate PR 60; open and unmerged at review",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/pull/60",
+          "observed_on": "2026-10-20"
         }
       ],
       "candidate_production_slugs": [],
@@ -241,16 +271,24 @@
       "name": "Contractor Quote Recovery",
       "division_id": "ventures",
       "kind": "venture",
-      "purpose": "Prior contractor quote follow-up experiment with an unresolved formal offer.",
-      "stage": "Experiment; source unresolved",
+      "purpose": "Historical Contractor Quote Recovery outreach experiment; the paid offer and fulfillment scope remain unverified.",
+      "stage": "Original experiment record recovered; offer and fulfillment unresolved",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Recover the original experiment and define a repeatable deliverable before further commercialization.",
-      "evidence_status": "CONTEXT_ONLY",
+      "next_action": "Establish the buyer, bounded offer and repeatable delivery evidence before activation; keep the historical experiment separate from the App Factory quote tools.",
+      "evidence_status": "PRIVATE_ARTIFACT_DOCUMENTED",
       "sources": [],
       "candidate_production_slugs": [
         "contractor-quote-recovery"
       ],
-      "commercial_readiness": "NOT_ASSESSED"
+      "commercial_readiness": "NOT_ASSESSED",
+      "private_source_refs": [
+        {
+          "record_key": "retally-src-20261020-contractor-quote-recovery",
+          "label": "Original business-launch audit identifying the outreach experiment",
+          "source_as_of": "2026-09-21",
+          "reviewed_on": "2026-10-20"
+        }
+      ]
     },
     {
       "id": "resonance",

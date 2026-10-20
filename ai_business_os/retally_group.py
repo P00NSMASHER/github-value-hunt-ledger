@@ -30,6 +30,7 @@ INITIAL_SERVICES = {
     "rebates", "parcel", "utilities",
 }
 _ID = re.compile(r"[a-z][a-z0-9-]{0,79}\Z")
+_PRIVATE_SOURCE_KEY = re.compile(r"retally-src-[0-9]{8}-[a-z0-9-]+\Z")
 
 
 class GroupCatalogError(ValueError):
@@ -100,6 +101,25 @@ def _sources(row: dict[str, Any], as_of: date) -> None:
                      "invalid source blob hash")
 
 
+def _private_sources(row: dict[str, Any], as_of: date, record_keys: set[str]) -> None:
+    """Accept public review references, never private provider IDs or URLs."""
+    refs = row.get("private_source_refs", [])
+    _require(isinstance(refs, list), "private_source_refs must be a list")
+    for ref in refs:
+        _keys(ref, {"record_key", "label", "source_as_of", "reviewed_on"}, "private source reference")
+        key = ref.get("record_key")
+        _require(isinstance(key, str) and len(key) <= 100
+                 and bool(_PRIVATE_SOURCE_KEY.fullmatch(key)), "invalid private source record key")
+        _require(key not in record_keys, "duplicate private source record key")
+        record_keys.add(key)
+        label = _text(ref.get("label"), "private source label")
+        _require(label.isprintable(), "private source label must be printable single-line text")
+        source_date = _date(ref.get("source_as_of"), "private source date")
+        review_date = _date(ref.get("reviewed_on"), "private source review date")
+        _require(source_date <= review_date, "private source date cannot be later than its review date")
+        _require(review_date <= as_of, "private source review date cannot be later than catalog snapshot")
+
+
 def validate_catalog(catalog: Mapping[str, Any]) -> None:
     """Validate public planning data without conferring any production authority."""
     _require(isinstance(catalog, Mapping), "catalog must be an object")
@@ -145,19 +165,29 @@ def validate_catalog(catalog: Mapping[str, Any]) -> None:
     entries = _rows(catalog.get("entries"), "entry")
     _require(bool(entries), "catalog entries cannot be empty")
     all_slugs: set[str] = set()
+    private_record_keys: set[str] = set()
     for entry in entries:
         _keys(entry, {"id", "name", "division_id", "kind", "purpose", "stage", "owner_role",
                       "next_action", "evidence_status", "sources", "candidate_production_slugs",
-                      "commercial_readiness"}, "entry")
+                      "commercial_readiness"}, "entry", {"private_source_refs"})
         for field in ("name", "purpose", "stage", "owner_role", "next_action"):
             _text(entry.get(field), f"entry {field}")
         _require(entry.get("kind") in KINDS, "invalid entry kind")
         _require(entry.get("division_id") in division_ids, "entry has an unknown division")
         _require(entry.get("commercial_readiness") == "NOT_ASSESSED", "catalog does not assess commercial readiness")
-        _require(entry.get("evidence_status") in {"REPOSITORY_DOCUMENTED", "CONTEXT_ONLY"}, "invalid evidence status")
+        _require(entry.get("evidence_status") in {
+            "REPOSITORY_DOCUMENTED", "PRIVATE_ARTIFACT_DOCUMENTED", "CONTEXT_ONLY",
+        }, "invalid evidence status")
         _sources(entry, as_of)
+        _private_sources(entry, as_of, private_record_keys)
         if entry["evidence_status"] == "REPOSITORY_DOCUMENTED":
             _require(bool(entry["sources"]), "repository-documented entry needs a source")
+        elif entry["evidence_status"] == "PRIVATE_ARTIFACT_DOCUMENTED":
+            _require(bool(entry.get("private_source_refs")),
+                     "private-artifact-documented entry needs a private source reference")
+        else:
+            _require("private_source_refs" not in entry,
+                     "context-only entry cannot carry private_source_refs")
         slugs = entry.get("candidate_production_slugs")
         _require(isinstance(slugs, list), "candidate slugs must be a list")
         for slug in slugs:
