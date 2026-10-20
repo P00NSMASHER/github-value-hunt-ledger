@@ -122,6 +122,38 @@ class OciBackupTests(unittest.TestCase):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
 
+    def test_download_requires_etag_and_bounded_private_ciphertext(self):
+        filename = self.root / "remote-ciphertext.rtbk"
+        raw = b"bounded test ciphertext"
+        def fake_get(*args, **kwargs):
+            self.assertIn("--if-match", args)
+            self.assertEqual(args[args.index("--if-match") + 1], "KNOWN-ETAG")
+            self.assertIn("--no-multipart", args)
+            filename.write_bytes(raw)
+            filename.chmod(0o600)
+            return '{"output": null}'
+        with patch.object(self.store, "cli", side_effect=fake_get) as downloaded:
+            self.assertEqual(self.store.get("synthetic-only/test.rtbk", filename,
+                                            etag="KNOWN-ETAG", max_size=len(raw)), raw)
+        downloaded.assert_called_once()
+        for bad in ("", "bad etag", "bad\\netag"):
+            with self.subTest(etag=bad), patch.object(self.store, "cli") as download:
+                with self.assertRaises(backup.Refused):
+                    self.store.get("synthetic-only/test.rtbk", self.root / "new.rtbk",
+                                   etag=bad, max_size=256)
+                download.assert_not_called()
+
+    def test_download_refuses_excess_of_prevalidated_head_size(self):
+        target = self.root / "oversized.rtbk"
+        def write_large(*args, **kwargs):
+            target.write_bytes(b"a" * 21)
+            target.chmod(0o600)
+            return '{"output": null}'
+        with patch.object(self.store, "cli", side_effect=write_large):
+            with self.assertRaisesRegex(backup.Refused, "prevalidated HEAD size"):
+                self.store.get("synthetic-only/test.rtbk", target,
+                               etag="KNOWN-ETAG", max_size=20)
+
     def test_bucket_privacy_fails_closed(self):
         valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
                  "storage-tier": "Standard", "versioning": "Disabled",
@@ -199,7 +231,9 @@ class RealEnginesOfflineTest(unittest.TestCase):
                 self.assertNotIn(key, objects)
                 objects[key] = source.read_bytes()
 
-            def get(key, path):
+            def get(key, path, *, etag, max_size):
+                self.assertEqual(etag, "frozen-etag")
+                self.assertEqual(max_size, len(objects[key]))
                 raw = objects[key]
                 path.write_bytes(raw)
                 path.chmod(0o600)
