@@ -81,3 +81,37 @@ RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/check-staging.sh
 The checker independently queries the current OCI v2 instance identity and exact E2 Micro shape before testing the loopback-only listener, HTTP authorization failures and isolated workspace health. It does **not** change OCI networking, start or enable a service, create external access, handle customer data or certify production.
 
 Later, verify host encryption, operator authorization, encrypted independently retrieved off-device backups, data-retention and customer scope; establish protected Cloudflare Access and origin-JWT validation *before* any hostname routing. The existing public RETALLY website is unaffected. **No genuine customer data is permitted under the current release hold.**
+
+
+## D. Read-only attestation of an already-running E2 Micro
+
+**Use this instead of provisioning again if the final instance receipt already
+exists.** From the authenticated owner Cloud Shell, download the exact reviewed
+commit's provision-cloud-shell.py and check-existing-micro.py side by side.
+Check their published SHA-256 digests locally before executing anything.
+Run only:
+
+    python3 check-existing-micro.py
+
+The script refuses partial/stale/nonprivate receipts, verifies the *actual*
+OCI tenancy home region, running fixed Micro shape, official Ubuntu 24.04 image,
+exact 50-GiB boot volume and attachment, original VCN/subnet/route identities,
+and **both** zero-inbound VCN security-list rules **and** zero attached NSGs
+on the VM's only VNIC. Unknown or absent NSG fields also fail closed.
+
+This is an **existing-instance read-only audit**: only OCI GET and LIST
+operations, no resource creation, firewall change, SSH connection, tunneling,
+billing action, customer data, or new credential. The result intentionally
+omits provider OCIDs, IP addresses and secrets. The safe report always marks
+guest firewall, private-service installation, off-device restore, account
+zero charges, independent review, and commercial production readiness as
+unverified/false. No CI mock run may be reported as a live OCI acceptance.
+Review every source commit, exact file checksum and live OCI response again
+before considering an operator-only synthetic installation.
+
+The service installer and check-staging.sh continue to require explicit
+RETALLY_MICRO_HOST=1 for x86-64 E2 Micro, and the verified OCI v2 metadata
+shape before any staging installation or health acceptance. Neither script
+starts/enables the service, creates a Cloudflare Allow policy/DNS/tunnel,
+installs customer originals, or authorizes public access. The customer
+production launch decision remains **HOLD**.
