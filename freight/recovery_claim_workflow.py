@@ -11,6 +11,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
 import re
+import unicodedata
 
 from freight.buyer_review_workflow import (
     BuyerReviewBatch,
@@ -27,6 +28,15 @@ from freight.settlement_store import RecoveryClaim, SettlementStore
 
 _SHA256_RE = re.compile(r"[0-9a-f]{64}")
 _CURRENCY_RE = re.compile(r"[A-Z]{3}")
+
+
+def _require_canonical_identity(value: str) -> None:
+    if (
+        value != value.strip()
+        or unicodedata.normalize("NFC", value) != value
+        or any(unicodedata.category(character).startswith("C") for character in value)
+    ):
+        raise ValueError("recovery claim identity must be canonical text")
 
 
 class RecoveryClaimBatchState(str, Enum):
@@ -280,6 +290,8 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         for value in (batch.buyer_id, batch.business_unit)
     ):
         raise ValueError("recovery claim scope identifiers must be non-empty strings")
+    for value in (batch.buyer_id, batch.business_unit):
+        _require_canonical_identity(value)
     if any(
         not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None
         for value in (
@@ -337,6 +349,15 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
             )
         ):
             raise ValueError("recovery claim text fields must be non-empty strings")
+        for value in (
+            record.claim_id,
+            record.finding_id,
+            record.reference,
+            record.payer_id,
+            record.payee_id,
+            record.currency,
+        ):
+            _require_canonical_identity(value)
         if _CURRENCY_RE.fullmatch(record.currency) is None:
             raise ValueError(
                 "recovery claim currency must be a three-letter uppercase code"
