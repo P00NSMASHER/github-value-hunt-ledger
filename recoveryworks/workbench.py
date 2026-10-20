@@ -131,6 +131,19 @@ class Workspace(OnboardingMixin):
     def _intake(self):
         return json.loads((self.root / 'intake.json').read_text())
 
+    def _verified_evidence_bytes(self, record):
+        """Fail closed if either the preserved original or normalized file changed."""
+        try:
+            normalized = (self.root / record['path']).read_bytes()
+            original = (self.root / 'sources' / (record['id'] + '.original')).read_bytes()
+        except (OSError, KeyError, TypeError) as exc:
+            raise ValueError('original or normalized evidence missing') from exc
+        if sha(normalized) != record.get('normalized_sha256'):
+            raise ValueError('normalized evidence bytes changed')
+        if sha(original) != record.get('raw_sha256'):
+            raise ValueError('original evidence bytes changed')
+        return normalized
+
     def upload(self, token, branch, source, content, mapping=None):
         identity = self.require(token, ('customer', 'operator'))
         if branch not in SCHEMAS or source not in SCHEMAS[branch]:
@@ -182,6 +195,7 @@ class Workspace(OnboardingMixin):
             key = branch + '/' + source
             previous = intake['sources'].get(key)
             if previous and previous['id'] == receipt_id:
+                self._verified_evidence_bytes(previous)
                 return previous
             atomic_private_write(self.root / path, normalized)
             atomic_private_write(self.root / ('sources/' + receipt_id + '.original'), raw)
@@ -214,6 +228,7 @@ class Workspace(OnboardingMixin):
             intake = self._intake()
             documents = intake.setdefault('documents', {})
             if receipt_id in documents:
+                self._verified_evidence_bytes(documents[receipt_id])
                 return documents[receipt_id]
             atomic_private_write(self.root/record['path'], raw)
             atomic_private_write(self.root/('sources/'+receipt_id+'.original'), content.encode())
@@ -230,7 +245,7 @@ class Workspace(OnboardingMixin):
             record = intake.get('documents', {}).get(receipt_id)
             if record is None or record['uploaded_by'] == actor['actor_id']:
                 raise ValueError("distinct document reviewer required")
-            digest = sha((self.root/record['path']).read_bytes())
+            digest = sha(self._verified_evidence_bytes(record))
             if digest != expected_sha256 or digest != record['normalized_sha256']:
                 raise ValueError("document changed since review")
             record['review'] = {'actor_id': actor['actor_id'], 'sha256': digest,
@@ -242,8 +257,8 @@ class Workspace(OnboardingMixin):
         record = self._intake().get('documents', {}).get(receipt_id)
         if not record or record['finding_id'] != finding_id or record['kind'] != kind or not record['review']:
             raise ValueError("reviewed in-scope " + kind + " document required")
-        raw = (self.root/record['path']).read_bytes()
-        if sha(raw) != record['normalized_sha256'] or sha(raw) != record['review']['sha256']:
+        raw = self._verified_evidence_bytes(record)
+        if sha(raw) != record['review']['sha256']:
             raise ValueError("reviewed document bytes changed")
         return json.loads(raw)
 
@@ -253,9 +268,7 @@ class Workspace(OnboardingMixin):
         record = next((r for r in list(intake['sources'].values()) + list(intake.get('documents', {}).values()) if r['id'] == receipt_id), None)
         if record is None:
             raise ValueError("source is not in this workspace")
-        raw = (self.root / record['path']).read_bytes()
-        if sha(raw) != record['normalized_sha256']:
-            raise ValueError("source bytes changed")
+        raw = self._verified_evidence_bytes(record)
         return {'content': raw.decode(), 'sha256': sha(raw)}
 
     def review_source(self, token, branch, source, expected_sha256, note):
@@ -265,7 +278,7 @@ class Workspace(OnboardingMixin):
         with private_file_lock(self.root / '.workspace.lock'):
             intake = self._intake()
             record = intake['sources'][branch + '/' + source]
-            digest = sha((self.root / record['path']).read_bytes())
+            digest = sha(self._verified_evidence_bytes(record))
             if digest != expected_sha256 or digest != record['normalized_sha256']:
                 raise ValueError('source changed since review began')
             if actor['actor_id'] == record['uploaded_by']:
