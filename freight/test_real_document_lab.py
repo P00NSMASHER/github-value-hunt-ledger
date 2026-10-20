@@ -8,7 +8,7 @@ from freight.ingestion_gateway import IngressEnvelope, ingest_bytes
 from freight.real_document_lab import (
     _arcbest_page, _global_page, _recon_result, blind_freight_assessment,
     fetch_public, iso_date, minor, parse_pennine_csv, statement_rows,
-    reference_scoped_replay,
+    reference_scoped_replay, InvoiceFace, _rating_probe, survey_historical_adjudications,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -105,6 +105,32 @@ class LaboratoryTests(unittest.TestCase):
             invoice_rows, declarations, a_keys, b_keys, max_group_size=1)
         self.assertEqual(capped["matched_invoices"], 1)
         self.assertEqual(capped["unmatched_over_group_bound_invoices"], 2)
+
+    def test_actual_freight_rating_engine_abstains_on_lab_proxy(self):
+        page = (
+            "ORIGINAL INVOICE\nService: LTL\nFreight Bill No: 044177205\n"
+            "AMOUNT DUE: $314.77\nShipper Acct. # 00001\n"
+            "Freight Bill No: 044177205\n"
+            "SHIPPER NAME\nLAUREL HILL, NC 28351\n"
+            "CONSIGNEE NAME\nMERIDEN, CT 06450\n"
+            "Shipping Date: 05/01/2024\n"
+            "Total Pieces Total Weight TOTAL AMOUNT\n$314.77 1 320\n"
+        )
+        face = InvoiceFace("arcbest", "044177205", 1, 31477,
+                           None, "2024-05-01", "LTL")
+        result = _rating_probe([face], [page], "a" * 64)
+        self.assertEqual(result["lab_proxy_canonical_records_executed"], 1)
+        self.assertEqual(result["engine_review_required"], 1)
+        self.assertEqual(result["unsafe_auto_money_or_nondeterministic"], 0)
+        self.assertEqual(result["auto_overcharges_asserted"], 0)
+
+    def test_adjudication_refs_cannot_be_promoted_to_labels(self):
+        with patch("freight.real_document_lab.fetch_public", return_value=b"<html>GAO</html>"):
+            result = survey_historical_adjudications()
+        self.assertEqual(result["government_decision_reference_count"], 8)
+        self.assertEqual(result["source_pages_fetched"], 8)
+        self.assertEqual(result["full_independent_case_labels_for_test_invoices"], 0)
+        self.assertIsNone(result["real_freight_accuracy_from_these_sources"])
 
     def test_native_pdf_ingress_is_not_pdf_extraction(self):
         receipt = ingest_bytes(
