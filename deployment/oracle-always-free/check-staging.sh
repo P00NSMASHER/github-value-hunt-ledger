@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 # Read-only synthetic health checks. Run only after the service is explicitly started.
 set -euo pipefail
-if [[ $(uname -m) != 'aarch64' ]]; then
-  echo 'Not the expected A1 Arm64 staging host.' >&2
+# Both reviewed OCI Always Free host types use the same v2 IMDS
+# attestation. The Micro requires an explicit operator environment flag.
+# No network, public tunnel, or customer access is enabled by this check.
+if [[ $(uname -m) == 'aarch64' ]]; then
+  python3 /opt/retally/current/deployment/oracle-always-free/verify_oci_host.py --a1
+elif [[ $(uname -m) == 'x86_64' && ${RETALLY_MICRO_HOST:-} == 1 ]]; then
+  python3 /opt/retally/current/deployment/oracle-always-free/verify_oci_host.py --micro
+else
+  echo 'Not a reviewed OCI A1 or explicitly attested Always Free E2 Micro host.' >&2
   exit 2
 fi
 if ! systemctl is-active --quiet retally-synthetic.service; then

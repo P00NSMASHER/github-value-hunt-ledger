@@ -28,6 +28,22 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertNotIn("sudo systemctl start", script)
         self.assertNotIn("sudo systemctl enable", script)
 
+    def test_a1_and_micro_installer_and_checker_use_identical_host_attestation(self):
+        installer = INSTALLER.read_text(encoding="utf-8")
+        checker = (ROOT / "check-staging.sh").read_text(encoding="utf-8")
+        self.assertIn("RETALLY_MICRO_HOST", installer)
+        self.assertIn("RETALLY_MICRO_HOST", checker)
+        self.assertIn("verify_oci_host.py --micro", installer)
+        self.assertIn("verify_oci_host.py --a1", installer)
+        self.assertIn("verify_oci_host.py --micro", checker)
+        self.assertIn("verify_oci_host.py --a1", checker)
+        self.assertLess(installer.index("verify_oci_host.py --a1"),
+                        installer.index("sudo apt-get update"))
+        self.assertNotIn("Not the expected A1 Arm64 staging host", checker)
+        self.assertIn("systemctl is-active --quiet", checker)
+        self.assertNotIn("systemctl start retally-synthetic", checker)
+        self.assertNotIn("systemctl enable retally-synthetic", checker)
+
     def test_git_archive_excludes_ignored_local_secrets(self):
         script = INSTALLER.read_text(encoding="utf-8")
         self.assertIn('git archive --format=tar "$actual_sha"', script)

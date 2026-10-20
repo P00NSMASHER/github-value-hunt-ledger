@@ -19,16 +19,6 @@ if [[ $(uname -m) != 'aarch64' ]]; then
     echo 'Only reviewed OCI A1 or explicitly attested Always Free E2 Micro hosts are supported.' >&2
     exit 2
   fi
-  python3 - <<'PY'
-import json
-from urllib.request import Request, urlopen
-request = Request("http://169.254.169.254/opc/v2/instance/",
-                  headers={"Authorization": "Bearer Oracle"})
-with urlopen(request, timeout=6) as response:
-    identity = json.load(response)
-if identity.get("shape") != "VM.Standard.E2.1.Micro":
-    raise SystemExit("Expected OCI fixed Always Free E2 Micro shape from IMDS.")
-PY
   micro_host=1
 fi
 repo_root=$(git rev-parse --show-toplevel)
@@ -44,9 +34,18 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 if [[ ! -f recoveryworks/workbench_server.py ||
       ! -f deployment/oracle-always-free/retally-synthetic.service ||
+      ! -f deployment/oracle-always-free/verify_oci_host.py ||
       ( "$micro_host" == 1 && ! -f deployment/oracle-always-free/retally-micro-memory.conf ) ]]; then
   echo 'Missing required reviewed workbench/deployment files.' >&2
   exit 5
+fi
+
+# Authenticate the CURRENT OCI VM against non-proxied v2 IMDS before
+# installing packages, modifying services, or allocating persistent storage.
+if [[ "$micro_host" == 1 ]]; then
+  python3 deployment/oracle-always-free/verify_oci_host.py --micro
+else
+  python3 deployment/oracle-always-free/verify_oci_host.py --a1
 fi
 
 release_dir="/opt/retally/releases/$actual_sha"
