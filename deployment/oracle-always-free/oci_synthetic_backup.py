@@ -145,12 +145,38 @@ class OciStore:
     def objects(self, prefix: str) -> list[dict]:
         # Never treat a single OCI page as a complete remote inventory. OCI defaults
         # to 100 objects; cleanup/duplicate guards require the entire prefix.
-        raw = self.data("os", "object", "list", *self.args(), "--prefix", prefix, "--all")
-        # OCI 3.x returns {'data': {'objects': [...]}} on most versions,
-        # and may return {'data': [...]} on some Cloud Shell releases.
-        items = raw.get("objects") if isinstance(raw, dict) else raw
+        ensure(prefix in ("synthetic-only/", "synthetic-recovery/"),
+               "Only known synthetic prefixes may be inspected.")
+        args = ("os", "object", "list", *self.args(), "--prefix", prefix, "--all")
+        raw = self.cli(*args)
+        if not raw.strip():
+            # Some OCI Cloud Shell CLI versions emit no JSON when a successful
+            # list operation has zero entries. Treating blank stdout as [] on
+            # its own would conceal an incomplete or unauthorized inventory.
+            # Independently query the count across ALL pages; only an explicit
+            # integer zero, reported with a successful CLI response, is enough.
+            second = self.cli(*args, "--query", "length(data)")
+            try:
+                count = json.loads(second.strip())
+            except ValueError as exc:
+                raise Refused("OCI empty object population could not be independently confirmed.") from exc
+            ensure(type(count) is int and count == 0,
+                   "OCI object list disagrees with the independent full-population count.")
+            return []
+        try:
+            parsed = json.loads(raw)
+        except ValueError as exc:
+            raise Refused("OCI object inventory returned invalid JSON.") from exc
+        ensure(isinstance(parsed, dict) and "data" in parsed,
+               "OCI object inventory lacks the data population.")
+        data = parsed["data"]
+        # OCI may return either {'data': {'objects': [...]}} or
+        # {'data': [...]}, depending on installed CLI version.
+        items = data.get("objects") if isinstance(data, dict) else data
         ensure(isinstance(items, list) and all(isinstance(x, dict) and isinstance(x.get("name"), str)
                                                for x in items), "Unexpected OCI object list shape.")
+        ensure(all(x["name"].startswith(prefix) for x in items),
+               "OCI object inventory includes objects outside the requested synthetic prefix.")
         return items
 
     def get(self, name: str, destination: Path, *, etag: str, max_size: int = MAX_SEALED) -> bytes:
