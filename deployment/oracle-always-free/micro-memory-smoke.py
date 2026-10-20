@@ -107,7 +107,7 @@ def main() -> int:
             "schema": 1, "kind": "OCI E2 Micro resource-budget rehearsal",
             "simulation": True, "branch_journeys": 7, "health": "PASS",
             "backup_restore": "PASS", "http_isolation": "PASS",
-            "memory_limit_mib": 768, "cpu_quota": 0.5,
+            "memory_limit_mib": 768, "cpu_quota": 0.125,
             "measured_peak_child_rss_mib": round(maximum_child_kib / 1024, 1),
             "elapsed_seconds": round(elapsed, 1),
             "real_customers": 0, "external_actions": 0,
