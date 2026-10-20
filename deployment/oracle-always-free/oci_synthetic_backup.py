@@ -155,8 +155,9 @@ class OciStore:
 
     def get(self, name: str, destination: Path, *, etag: str, max_size: int = MAX_SEALED) -> bytes:
         ensure(not destination.exists() and not destination.is_symlink(), "Ciphertext download destination exists.")
-        ensure(isinstance(etag, str) and 0 < len(etag) <= 256 and
-               not any(c.isspace() for c in etag), "Download needs one verified object ETag.")
+        ensure(isinstance(etag, str) and
+               re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", etag) is not None,
+               "Download needs one verified OCI object ETag without unsafe characters.")
         ensure(type(max_size) is int and 0 < max_size <= MAX_SEALED,
                "Download size bound must be a positive synthetic-only limit.")
         # HEAD must first confirm content-length <= max_size. The If-Match
