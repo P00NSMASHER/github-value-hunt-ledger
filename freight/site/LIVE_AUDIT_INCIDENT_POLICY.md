@@ -11,7 +11,7 @@ The existing daily and post-release `RETALLY Live Publication Audit` performs pu
 - **Cancelled, skipped, PR-originated, wrong-repo, stale or incomplete events:** no incident mutation. Missing authoritative run metadata fails the alert job rather than inventing a passing audit.
 - **Raw Cloudflare `EdgeResponseStatus=504` counts:** no notification. Some are internal `earlyHintsCache` or `edgeWorkerCacheAPI` cache misses and cannot be equated with failed user requests.
 
-This is a **GitHub Issue workflow**, not an external email, paging subscription, or paid observability service. Whether issue notifications reach any specific person depends on their GitHub subscription settings. GitHub-hosted Actions minutes remain subject to the repository's existing plan/usage; do not claim unlimited free runner capacity.
+This is a **GitHub Issue workflow**, not an external email, paging subscription, or paid observability service. Each confirmed failure issue/comment mentions `@P00NSMASHER` to surface it to the owner through GitHub notifications; actual device/email delivery still depends on the owner's GitHub notification settings. GitHub-hosted Actions minutes remain subject to the repository's existing plan/usage; do not claim unlimited free runner capacity.
 
 ## Authorization and security
 
