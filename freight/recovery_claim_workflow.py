@@ -278,6 +278,14 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
     finding_ids = tuple(record.finding_id for record in batch.records)
     if len(set(claim_ids)) != len(claim_ids) or len(set(finding_ids)) != len(finding_ids):
         raise ValueError("duplicate recovery claim identity")
+    canonical_issued_at, _ = _timestamp(batch.issued_at)
+    if canonical_issued_at != batch.issued_at:
+        raise ValueError("recovery claim batch issued_at must be canonical UTC")
+    if (
+        type(batch.confirmed_review_count) is not int
+        or batch.confirmed_review_count != batch.claim_count
+    ):
+        raise ValueError("recovery claim confirmed review count mismatch")
 
     for record, claim, binding in zip(
         batch.records,
@@ -287,6 +295,8 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
     ):
         if type(record.amount_cents) is not int or not 0 < record.amount_cents <= 2**63 - 1:
             raise ValueError("recovery claim amount must be positive integer cents within SQLite range")
+        if record.issued_at != batch.issued_at:
+            raise ValueError("recovery claim issued-at mismatch")
         if (
             record.claim_id != claim.claim_id
             or record.claim_id != binding.claim_id
