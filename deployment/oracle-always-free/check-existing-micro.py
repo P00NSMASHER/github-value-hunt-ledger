@@ -163,7 +163,7 @@ def inspect_running_micro(receipt: dict) -> dict:
                            region=region), "VM attached VNICs")
     require(len(vnics) == 1
             and vnics[0].get("subnet-id") == receipt["subnet_id"]
-            and vnics[0].get("nsg-ids") in ([], None),
+            and vnics[0].get("nsg-ids") == [],
             "VM has unexpected VNIC or attached network security groups")
     # Empty security-list ingress AND zero attached NSGs are required
     # together. Never interpret an unattested private NSG as no ingress.
