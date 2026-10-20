@@ -14,7 +14,7 @@
 
 `oci_synthetic_backup.py` verifies only the *synthetic* six nonfreight + freight branch fixture by running the real engines, local sealed snapshot code, OCI object upload, remote readback, and new isolated recovery with old credentials invalidated. It rejects all customer data and uses a newly generated synthetic passphrase that is never output or saved. The test object is deleted after successful verification using an ETag-conditional delete; receipts are owner-only. **It does not establish ongoing backup protection, retention or passphrase escrow for real customers.**
 
-The tool never creates an OCI VM, virtual network, bucket, subscription, API key, or customer operation. `--inspect` is read-only and can be used on stock Cloud Shell with no Python crypto dependencies. OCI commands use `--no-retry`; uploads use `--no-overwrite` and `--verify-checksum`; failed/ambiguous uploads leave private receipts and stop rather than creating duplicate objects.
+The tool never creates an OCI VM, virtual network, bucket, subscription, API key, or customer operation. `--inspect` is read-only and can be used on stock Cloud Shell with no Python crypto dependencies. All synthetic object prefix inventories use `oci os object list --all`; OCI otherwise defaults to the first 100 entries. A partial object inventory must never authorize cleanup, a claim that the prefix is empty, or another upload. OCI commands use `--no-retry`; uploads use `--no-overwrite` and `--verify-checksum`; failed/ambiguous uploads leave private receipts and stop rather than creating duplicate objects.
 
 ## Execution on the user's existing authenticated OCI Cloud Shell
 
