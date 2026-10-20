@@ -512,3 +512,46 @@ def test_self_hashed_claim_batch_rejects_blank_scope_identity(field, value):
 
     with pytest.raises(ValueError, match="scope identifiers must be non-empty"):
         verify_recovery_claim_batch(forged)
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("truth_hash", "incumbent_output_hash", "buyer_review_batch_hash"),
+)
+def test_self_hashed_claim_batch_rejects_invalid_provenance_digest(field):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    provenance = {
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+    }
+    provenance[field] = ""
+    records = []
+    for original in batch.records:
+        record = replace(original, record_hash="")
+        body = {
+            "schema": 1,
+            **provenance,
+            **asdict(record),
+        }
+        body.pop("record_hash")
+        records.append(replace(record, record_hash=canonical_hash(body)))
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            **{field: ""},
+            records=tuple(records),
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="provenance hashes must be SHA-256"):
+        verify_recovery_claim_batch(forged)
