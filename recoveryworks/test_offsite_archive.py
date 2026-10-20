@@ -14,15 +14,49 @@ from recoveryworks.seven_branch_simulation import seed
 
 @unittest.skipUnless(importlib.util.find_spec("cryptography"), "optional offsite crypto package absent")
 class OffsiteArchiveTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """Build one *immutable* original snapshot, avoiding repeated Windows
+        ACL/PowerShell setup for the same seven-branch synthetic population.
+
+        Each test still writes its own archive and restores to its own
+        isolated directory. Real scrypt/AES-GCM operations are NOT mocked.
+        """
+        super().setUpClass()
+        cls.fixture_temp = tempfile.TemporaryDirectory()
+        try:
+            fixture_root = Path(cls.fixture_temp.name)
+            cls.workspace, cls.tokens = seed(fixture_root / "synthetic")
+            cls.workspace.scan(cls.tokens["operator"])
+            receipt = cls.workspace.backup(cls.tokens["operator"])
+            cls.snapshot = cls.workspace.root / "backups" / (receipt["snapshot_id"] + ".json")
+            cls.snapshot_sha256 = hashlib.sha256(cls.snapshot.read_bytes()).hexdigest()
+        except BaseException:
+            cls.fixture_temp.cleanup()
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            assert hashlib.sha256(cls.snapshot.read_bytes()).hexdigest() == cls.snapshot_sha256, (
+                "shared original snapshot changed during encrypted-archive tests"
+            )
+        finally:
+            cls.fixture_temp.cleanup()
+            super().tearDownClass()
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        self.workspace, self.tokens = seed(self.root / "synthetic")
-        self.workspace.scan(self.tokens["operator"])
-        receipt = self.workspace.backup(self.tokens["operator"])
-        self.snapshot = self.workspace.root / "backups" / (receipt["snapshot_id"] + ".json")
+        self.assertEqual(hashlib.sha256(self.snapshot.read_bytes()).hexdigest(),
+                         self.snapshot_sha256)
         self.password = "test-only-passphrase-with-at-least-twenty-characters"
+
+    def tearDown(self):
+        self.assertEqual(hashlib.sha256(self.snapshot.read_bytes()).hexdigest(),
+                         self.snapshot_sha256, "archive test mutated the shared source")
+        super().tearDown()
 
     def test_encryption_stores_no_plaintext_and_restores_credentials_revoked(self):
         archive = self.root / "sealed.rtbk"
