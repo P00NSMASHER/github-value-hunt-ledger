@@ -37,6 +37,23 @@ jobs:
           python -m py_compile deployment/oracle-always-free/oci_readonly_health.py
           python -m unittest discover -s deployment/oracle-always-free -p 'test_oci_readonly_health.py' -v
 
+  disabled-state:
+    name: OCI NOT CONFIGURED — no provider calls
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/main' &&
+      vars.RETALLY_OCI_MONITOR_ENABLED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      contents: read
+    steps:
+      - name: Mark disabled state without accessing OCI
+        run: |
+          echo '::warning::RETALLY Oracle monitoring is NOT CONFIGURED. No OCI requests sent.'
+          echo '### RETALLY OCI automation NOT ACTIVE' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This is a dry configuration check, not an Oracle health result.' >> "$GITHUB_STEP_SUMMARY"
+
   oracle-readonly:
     needs: validate-offline
     # NEVER run a privileged job on PR/fork/non-main; disabled by default.
