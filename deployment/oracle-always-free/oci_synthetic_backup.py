@@ -35,6 +35,7 @@ LEGACY_QUARANTINE = RECEIPT_ROOT / "legacy-orphan-quarantine.json"
 BUCKET_NAME = "retally-synthetic-sealed-recovery"
 LEGACY_MAGIC = b"RETALLY-GCM-CANARY-1"
 LEGACY_OBJECT = re.compile(r"synthetic-only/[0-9a-f]{24}\.rtbk\Z")
+RECOVERY_OBJECT = re.compile(r"synthetic-recovery/[0-9a-f]{32}\.rtbk\Z")
 MAX_CANARY = 4 * 1024
 MAX_SEALED = 16 * 1024 * 1024  # synthetic acceptance, NOT a production snapshot allowance
 
@@ -200,6 +201,8 @@ class OciStore:
         return destination.read_bytes()
 
     def put(self, name: str, source: Path) -> str:
+        ensure(isinstance(name, str) and RECOVERY_OBJECT.fullmatch(name) is not None,
+               "New uploads must use a 32-hex synthetic-recovery object key.")
         ensure(_private(source) and source.stat().st_size <= MAX_SEALED,
                "Synthetic ciphertext source is not private or is oversized.")
         # OCI --no-overwrite may return exit code ZERO with an "already exists"
@@ -232,6 +235,10 @@ class OciStore:
         return h
 
     def delete_version(self, name: str, etag: str) -> None:
+        ensure(isinstance(name, str) and
+               (RECOVERY_OBJECT.fullmatch(name) is not None or
+                LEGACY_OBJECT.fullmatch(name) is not None),
+               "Refusing to delete an object outside the approved synthetic key formats.")
         ensure(isinstance(etag, str) and bool(etag), "Conditional delete needs an original ETag.")
         # --if-match prevents deletion of a different object after an unknown overwrite.
         self.cli("os", "object", "delete", *self.args(), "--name", name,
