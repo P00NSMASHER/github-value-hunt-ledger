@@ -72,6 +72,8 @@ jobs:
           assert gt['pages'] == 120
           assert abf['pages'] == 74
           for case in (gt, abf):
+              assert case['frozen_original_sha256_verified'] is True
+              assert len(case['source_face_catalog_sha256']) == 64
               assert case['retally_native_ingress'] == 'ACCEPT'
               assert case['retally_native_route'] == 'DOCUMENT_EXTRACTION_REQUIRED'
               assert case['invoice_face_amounts_extracted'] == case['distinct_invoice_face_ids']
@@ -100,9 +102,24 @@ jobs:
           assert rated['unsafe_auto_money_or_nondeterministic'] == 0
           assert rated['auto_overcharges_asserted'] == 0
           assert accounting['original_disclosed_rows'] == 314
+          from freight.real_document_lab import FROZEN_DOCUMENT_SHA256, FROZEN_PENNINE_SHA256
+          assert gt['sha256'] == FROZEN_DOCUMENT_SHA256['globaltranz']
+          assert abf['sha256'] == FROZEN_DOCUMENT_SHA256['arcbest']
+          for month, file in accounting['source_files'].items():
+              assert file['sha256'] == FROZEN_PENNINE_SHA256[month]
           assert accounting['unique_invoice_economic_identities'] == 273
           assert accounting['cross_month_repeated_rows'] == 41
           assert accounting['declared_payment_references'] == 217
+          assert accounting['published_payment_status_counts'] == {'fully paid': 273}
+          assert accounting['same_supplier_invoice_with_different_amount_or_date'] == 0
+          assert accounting['missing_payment_number_rows'] == 0
+          assert accounting['negative_invoice_amount_rows'] == 0
+          assert accounting['zero_invoice_amount_rows'] == 0
+          controls = accounting['adversarial_source_declared_payment_controls']
+          assert controls['scenario_count'] == 4
+          assert controls['all_controls_detected'] is True
+          assert all(controls['checks'].values())
+          assert controls['independently_cleared_bank_rows_used'] == 0
           assert accounting['invoice_total_minor_deduplicated'] == 7423667742
           assert accounting['payment_declaration_total_minor_derived_from_same_invoices'] == 7423667742
           unscoped = accounting['retally_reconciliation_kernel']
@@ -113,10 +130,19 @@ jobs:
           assert scoped['unmatched_invoices'] == 0
           assert scoped['cross_reference_false_joins'] == 0
           assert blind['total_eligible_scored'] == 0
+          assert blind['predictions_frozen_before_truth'] is False
+          assert blind['independent_blind_truth_adjudication_completed'] is False
+          assert blind['blinding_protocol_status'] == 'NOT_EXECUTED_INDEPENDENT_TRUTH_AND_REVIEWERS_ABSENT'
+          assert len(blind['frozen_unscored_case_catalog_sha256']) == 64
           assert blind['unknown_cases_preserved'] == 110
           history = doc['historical_adjudication_reference_survey']
           assert history['government_decision_reference_count'] == 8
           assert history['full_independent_case_labels_for_test_invoices'] == 0
+          history_math = history['decision_text_arithmetic_controls']
+          assert history_math['all_reference_arithmetic_exact'] is True
+          assert history_math['reference_cases'] == 3
+          assert history_math['independently_scored_freight_cases'] == 0
+          assert history_math['recovery_claims_usd_minor'] == 0
           notes = history['curated_official_decision_challenge_examples']
           assert len(notes) == 3
           assert all(x['is_label_for_test_invoice'] is False for x in notes.values())
@@ -129,7 +155,8 @@ jobs:
               stream.write(f"- ArcBest: {abf['distinct_invoice_face_ids']} original invoices; {rated['engine_review_required']} source-derived laboratory proxies passed into the real rating engine, all REVIEW REQUIRED.\n")
               stream.write(f"- Pennine: {accounting['original_disclosed_rows']} disclosures, {accounting['unique_invoice_economic_identities']} unique invoices, {accounting['cross_month_repeated_rows']} repeated disclosures.\n")
               stream.write(f"- Actual RETALLY kernel: unscoped matched {unscoped['matched_invoices']} / 273; bounded reference-scoped replay matched {scoped['matched_invoices']} / 273; zero cross-reference mismatches.\n")
-              stream.write(f"- Historical GAO decision references: 8; fully linked independent labels: 0. Freight precision/recall/accuracy **not calculable**.\n")
+              stream.write(f"- All four deliberate accounting-corruption controls detected; original public source bytes match seven frozen SHA-256 values.\n")
+              stream.write(f"- Historical GAO decision references: 8; three adjudicated financial-arithmetic precedents checked; fully linked independent labels: 0. Freight precision/recall/accuracy **not calculable**.\n")
               stream.write('\n**Limits:** same-source payment declarations are not bank clearing; ArcBest rating probes use openly marked non-admissible proxies; no commercial or customer recovery claim.\n')
           print('PASS: original document lab remains research-only, no cash or accuracy claim')
           PY
