@@ -221,6 +221,9 @@ class OciBackupTests(unittest.TestCase):
         filename = self.root / "remote-ciphertext.rtbk"
         raw = b"bounded test ciphertext"
         def fake_get(*args, **kwargs):
+            if args[:3] == ("os", "object", "head"):
+                return json.dumps({"etag": "KNOWN-ETAG", "content-length": len(raw)})
+            self.assertEqual(args[:3], ("os", "object", "get"))
             self.assertIn("--if-match", args)
             self.assertEqual(args[args.index("--if-match") + 1], "KNOWN-ETAG")
             self.assertIn("--no-multipart", args)
@@ -230,7 +233,9 @@ class OciBackupTests(unittest.TestCase):
         with patch.object(self.store, "cli", side_effect=fake_get) as downloaded:
             self.assertEqual(self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", filename,
                                             etag="KNOWN-ETAG", max_size=len(raw)), raw)
-        downloaded.assert_called_once()
+        self.assertEqual(downloaded.call_count, 2, "mandatory HEAD must precede GET")
+        self.assertEqual(downloaded.call_args_list[0].args[:3], ("os", "object", "head"))
+        self.assertEqual(downloaded.call_args_list[1].args[:3], ("os", "object", "get"))
         for bad in ("", "bad etag", "bad\\netag"):
             with self.subTest(etag=bad), patch.object(self.store, "cli") as download:
                 with self.assertRaises(backup.Refused):
@@ -240,14 +245,50 @@ class OciBackupTests(unittest.TestCase):
 
     def test_download_refuses_excess_of_prevalidated_head_size(self):
         target = self.root / "oversized.rtbk"
-        def write_large(*args, **kwargs):
-            target.write_bytes(b"a" * 21)
-            target.chmod(0o600)
-            return '{"output": null}'
-        with patch.object(self.store, "cli", side_effect=write_large):
-            with self.assertRaisesRegex(backup.Refused, "prevalidated HEAD size"):
+        with patch.object(self.store, "cli",
+                          return_value=json.dumps({"etag": "KNOWN-ETAG", "content-length": 21})) as cli:
+            with self.assertRaisesRegex(backup.Refused, "download bound"):
                 self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", target,
                                etag="KNOWN-ETAG", max_size=20)
+        cli.assert_called_once()
+        self.assertEqual(cli.call_args.args[:3], ("os", "object", "head"))
+        self.assertFalse(target.exists(), "oversized ciphertext must not be fetched")
+
+    def test_low_level_get_always_requires_matching_head_etag_and_valid_length(self):
+        name = "synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk"
+        cases = [
+            {"etag": "DIFFERENT", "content-length": 64},
+            {"etag": "KNOWN-ETAG", "content-length": 0},
+            {"etag": "KNOWN-ETAG", "content-length": -1},
+            {"etag": "KNOWN-ETAG", "content-length": True},
+            {"etag": "KNOWN-ETAG", "content-length": None},
+            {"etag": "KNOWN-ETAG", "content-length": "NaN"},
+            {"etag": "KNOWN-ETAG", "content-length": "10.5"},
+            {"etag": "KNOWN-ETAG", "content-length": 257},
+        ]
+        for i, metadata in enumerate(cases):
+            target = self.root / f"unread-{i}.rtbk"
+            with self.subTest(metadata=metadata), patch.object(
+                    self.store, "cli", return_value=json.dumps(metadata)) as cli:
+                with self.assertRaises(backup.Refused):
+                    self.store.get(name, target, etag="KNOWN-ETAG", max_size=256)
+                cli.assert_called_once()
+                self.assertEqual(cli.call_args.args[:3], ("os", "object", "head"))
+                self.assertFalse(target.exists(), "invalid HEAD must not download bytes")
+
+    def test_download_refuses_provider_get_length_drift(self):
+        target = self.root / "drifted.rtbk"
+        def wrong_length(*args, **kwargs):
+            if args[:3] == ("os", "object", "head"):
+                return json.dumps({"etag": "KNOWN-ETAG", "content-length": 10})
+            target.write_bytes(b"9" * 9)
+            target.chmod(0o600)
+            return '{"output": null}'
+        with patch.object(self.store, "cli", side_effect=wrong_length) as cli:
+            with self.assertRaisesRegex(backup.Refused, "differs from prevalidated HEAD size"):
+                self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", target,
+                               etag="KNOWN-ETAG", max_size=20)
+        self.assertEqual(cli.call_count, 2)
 
     def test_bucket_privacy_fails_closed(self):
         valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
