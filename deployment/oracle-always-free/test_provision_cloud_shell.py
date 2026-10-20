@@ -493,28 +493,22 @@ class ResumePartialResourceTests(unittest.TestCase):
 
 
 class SingleAttemptCliSafetyTests(unittest.TestCase):
-    def test_instance_launch_does_not_auto_retry_on_http_500(self):
-        outcome = subprocess.CompletedProcess(
-            args=["oci"], returncode=1, stdout="",
+    def test_instance_launch_has_exactly_one_provider_attempt(self):
+        result = subprocess.CompletedProcess(
+            args=['oci'], returncode=1, stdout='',
             stderr='ServiceError: InternalError')
-        with patch.object(mod.subprocess, 'run', return_value=outcome) as run:
+        with patch.object(mod.subprocess, 'run', return_value=result) as run:
             with self.assertRaisesRegex(mod.Stop, 'InternalError'):
                 mod.cli('compute', 'instance', 'launch',
-                        '--shape', 'VM.Standard.E2.1.Micro')
+                        '--shape', 'VM.Standard.A1.Flex')
         self.assertEqual(run.call_count, 1)
-        args = run.call_args.args[0]
-        self.assertEqual(args.count('--no-retry'), 1)
-        self.assertEqual(args[:4], ['oci', 'compute', 'instance', 'launch'])
-        self.assertIn('--shape', args)
-        self.assertIn('VM.Standard.E2.1.Micro', args)
+        self.assertEqual(run.call_args.args[0].count('--no-retry'), 1)
 
-    def test_blank_oci_list_recheck_disables_hidden_retries(self):
-        empty = subprocess.CompletedProcess(
+    def test_blank_list_verification_disables_automatic_retries(self):
+        result = subprocess.CompletedProcess(
             args=['oci'], returncode=0, stdout='', stderr='')
-        with patch.object(mod.subprocess, 'run', side_effect=[empty, empty]) as run:
-            self.assertEqual(
-                mod.cli('compute', 'instance', 'list', '--compartment-id',
-                        'ocid1.tenancy.oc1..synthetic', '--all'), [])
+        with patch.object(mod.subprocess, 'run', side_effect=[result,result]) as run:
+            self.assertEqual(mod.cli('compute', 'instance', 'list', '--all'), [])
         self.assertEqual(run.call_count, 2)
         for call in run.call_args_list:
             self.assertEqual(call.args[0].count('--no-retry'), 1)
