@@ -64,6 +64,32 @@ def cli(*args: str, region: str | None = None, timeout: int = 90):
         error = next((x.strip() for x in error_lines if 'ServiceError' in x or 'NotAuthorized' in x),
                      f'exit status {result.returncode}')
         raise Stop(f'OCI {" ".join(args[:3])} failed ({error[:180]}). No paid fallback.')
+    if not result.stdout.strip():
+        # OCI CLI 3.91 on signed-in Cloud Shell reports a successful EMPTY list
+        # with zero stdout bytes. Requery without --all; only two consistent,
+        # warning-free successful empty reads may be treated as an empty list.
+        ensure(len(args) >= 3 and args[2] == 'list' and not result.stderr.strip(),
+               'OCI returned no JSON for a non-list operation or with warnings.')
+        verification_args = [str(a) for a in args if a != '--all']
+        verification_cmd = ['oci', *verification_args, '--output', 'json']
+        if region:
+            verification_cmd += ['--region', region]
+        try:
+            verified = subprocess.run(
+                verification_cmd, capture_output=True, text=True,
+                timeout=timeout, check=False)
+        except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
+            raise Stop('Cannot independently confirm an empty OCI resource list.') from exc
+        ensure(verified.returncode == 0 and not verified.stderr.strip(),
+               'OCI empty-list check failed; no resources will be created.')
+        if verified.stdout.strip():
+            try:
+                explicit = json.loads(verified.stdout)
+            except json.JSONDecodeError as exc:
+                raise Stop('OCI empty-list check returned invalid JSON.') from exc
+            ensure(isinstance(explicit, dict) and explicit.get('data') == [],
+                   'OCI empty-list check disagreed with original inventory.')
+        return []
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError as exc:
