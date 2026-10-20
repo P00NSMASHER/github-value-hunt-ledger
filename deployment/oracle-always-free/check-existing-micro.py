@@ -158,15 +158,35 @@ def inspect_running_micro(receipt: dict) -> dict:
             and subnet.get("cidr-block") == BASE.SUBNET_NETWORK,
             "The VM subnet changed or references unapproved security lists")
 
+    # OCI list-vnics is PAGINATED and deliberately omits interfaces that
+    # are ATTACHING or DETACHING. Fetch every page, then independently
+    # reconcile all in-flight VNIC attachments before asserting zero ingress.
+    # Otherwise, a secondary or transitioning interface could be invisible.
     vnics = _list(BASE.cli("compute", "instance", "list-vnics",
-                           "--instance-id", receipt["instance_id"],
+                           "--instance-id", receipt["instance_id"], "--all",
                            region=region), "VM attached VNICs")
     require(len(vnics) == 1
+            and isinstance(vnics[0].get("id"), str)
+            and vnics[0]["id"].startswith("ocid1.vnic.")
             and vnics[0].get("subnet-id") == receipt["subnet_id"]
             and vnics[0].get("nsg-ids") == [],
             "VM has unexpected VNIC or attached network security groups")
-    # Empty security-list ingress AND zero attached NSGs are required
-    # together. Never interpret an unattested private NSG as no ingress.
+    vnic_links = _list(BASE.cli(
+        "compute", "vnic-attachment", "list",
+        "--compartment-id", tenant,
+        "--availability-domain", receipt["availability_domain"],
+        "--instance-id", receipt["instance_id"], "--all",
+        region=region), "VM VNIC attachment lifecycle")
+    active_links = [item for item in vnic_links
+                    if item.get("lifecycle-state") != "DETACHED"]
+    require(len(active_links) == 1
+            and active_links[0].get("lifecycle-state") == "ATTACHED"
+            and active_links[0].get("instance-id") == receipt["instance_id"]
+            and active_links[0].get("compartment-id") == tenant
+            and active_links[0].get("vnic-id") == vnics[0]["id"],
+            "VNIC attachment has missing, conflicting or transient network state")
+    # Empty security-list ingress AND zero attached NSGs AND a single
+    # independently verified ATTACHED interface are mandatory together.
     routes = _get("network", "route-table", "get", "--rt-id",
                   receipt["route_table_id"], region=region)
     route_rules = routes.get("route-rules")

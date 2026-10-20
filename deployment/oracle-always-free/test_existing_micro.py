@@ -77,8 +77,15 @@ def replies(s):
             "cidr-block": AUDIT.BASE.SUBNET_NETWORK,
         },
         ("compute", "instance", "list-vnics"): [
-            {"subnet-id": s["subnet_id"], "nsg-ids": []}
+            {"id": identity("vnic"), "subnet-id": s["subnet_id"], "nsg-ids": []}
         ],
+        ("compute", "vnic-attachment", "list"): [{
+            "id": identity("vnicattachment"),
+            "instance-id": s["instance_id"],
+            "compartment-id": s["tenancy_id"],
+            "vnic-id": identity("vnic"),
+            "lifecycle-state": "ATTACHED",
+        }],
         ("network", "route-table", "get"): {
             "id": s["route_table_id"], "vcn-id": s["vcn_id"],
             "route-rules": [{
@@ -142,6 +149,21 @@ class ExistingMicroAuditTests(unittest.TestCase):
         self.assertIn(self.receipt["tenancy_id"], boot_queries[0])
         self.assertIn("--instance-id", boot_queries[0])
         self.assertIn("--all", boot_queries[0], "boot attachment audit must exhaust pages")
+        vnic_queries = [args for args, _ in called if args[:3] ==
+                        ("compute", "instance", "list-vnics")]
+        self.assertEqual(len(vnic_queries), 1)
+        self.assertIn("--all", vnic_queries[0],
+                      "OCI list-vnics must exhaust all pagination pages")
+        link_queries = [args for args, _ in called if args[:3] ==
+                        ("compute", "vnic-attachment", "list")]
+        self.assertEqual(len(link_queries), 1)
+        for option, value in (("--compartment-id", self.receipt["tenancy_id"]),
+                              ("--instance-id", self.receipt["instance_id"]),
+                              ("--availability-domain", self.receipt["availability_domain"])):
+            self.assertIn(option, link_queries[0])
+            self.assertIn(value, link_queries[0])
+        self.assertIn("--all", link_queries[0],
+                      "in-flight VNIC attachments can hide on later pages")
         serialized = json.dumps(report)
         self.assertNotIn("ocid1.", serialized)
         self.assertNotIn("10.76.", serialized)
@@ -159,6 +181,13 @@ class ExistingMicroAuditTests(unittest.TestCase):
              [{"source": "0.0.0.0/0", "protocol": "all"}]),
             (("network", "subnet", "get"), "security-list-ids", []),
             (("compute", "instance", "list-vnics"), "nsg-ids", [identity("networksecuritygroup")]),
+            (("compute", "instance", "list-vnics"), "id", identity("vnic") + "-other"),
+            (("compute", "vnic-attachment", "list"), "vnic-id", identity("vnic") + "-other"),
+            (("compute", "vnic-attachment", "list"), "instance-id", identity("instance") + "-other"),
+            (("compute", "vnic-attachment", "list"), "compartment-id", identity("tenancy") + "-other"),
+            (("compute", "vnic-attachment", "list"), "lifecycle-state", "ATTACHING"),
+            (("compute", "vnic-attachment", "list"), "lifecycle-state", "DETACHING"),
+            (("compute", "vnic-attachment", "list"), "lifecycle-state", "UNKNOWN_ENUM_VALUE"),
             (("network", "route-table", "get"), "route-rules", []),
             (("network", "internet-gateway", "get"), "is-enabled", False),
             (("compute", "boot-volume-attachment", "list"), "boot-volume-id", "WRONG-BOOT"),
@@ -183,6 +212,16 @@ class ExistingMicroAuditTests(unittest.TestCase):
              [{"subnet-id": self.receipt["subnet_id"]}]),
             (("compute", "boot-volume-attachment", "list"),
              self.responses[("compute", "boot-volume-attachment", "list")] * 2),
+            (("compute", "vnic-attachment", "list"), []),
+            (("compute", "vnic-attachment", "list"),
+             self.responses[("compute", "vnic-attachment", "list")] * 2),
+            # A second interface still ATTACHING would be omitted by
+            # list-vnics; checking complete attachment pages must reject it.
+            (("compute", "vnic-attachment", "list"),
+             self.responses[("compute", "vnic-attachment", "list")]
+             + [{**self.responses[("compute", "vnic-attachment", "list")][0],
+                 "vnic-id": identity("vnic") + "-secondary",
+                 "lifecycle-state": "ATTACHING"}]),
         ]:
             with self.subTest(key=key):
                 api = {k: json.loads(json.dumps(v)) for k, v in self.responses.items()}
