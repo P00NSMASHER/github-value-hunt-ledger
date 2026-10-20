@@ -143,7 +143,9 @@ class OciStore:
                "OCI bucket privacy, tier, versioning or replication state changed.")
 
     def objects(self, prefix: str) -> list[dict]:
-        raw = self.data("os", "object", "list", *self.args(), "--prefix", prefix)
+        # Never treat a single OCI page as a complete remote inventory. OCI defaults
+        # to 100 objects; cleanup/duplicate guards require the entire prefix.
+        raw = self.data("os", "object", "list", *self.args(), "--prefix", prefix, "--all")
         # OCI 3.x returns {'data': {'objects': [...]}} on most versions,
         # and may return {'data': [...]} on some Cloud Shell releases.
         items = raw.get("objects") if isinstance(raw, dict) else raw
