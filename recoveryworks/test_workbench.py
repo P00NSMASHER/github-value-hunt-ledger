@@ -187,5 +187,19 @@ class WorkbenchTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 act('operator','cash',{'document_id':receipt['id']})
             workspace.review_document(tokens['reviewer'],receipt['id'],receipt['normalized_sha256'],'SYNTHETIC receipt review')
-            act('operator','cash',{'document_id':receipt['id']})
-            self.assertEqual(workspace.store.load().get(finding.finding_id).recovered_cents,2000)
+            original_head = workspace.store.current_head_hash()
+            with self.assertRaisesRegex(ValueError, 'INDEPENDENT_CASH_SETTLEMENT_VERIFIER_NOT_IMPLEMENTED'):
+                act('operator','cash',{'document_id':receipt['id']})
+            # Even a forged verified=True document, with a valid source hash,
+            # a distinct reviewer and prior authorization, is not bank proof.
+            forged = workspace.upload_document(
+                tokens['operator'], finding.finding_id, 'cash_event',
+                json.dumps(asdict(replace(event, verified=True))))
+            workspace.review_document(tokens['independent'], forged['id'],
+                                      forged['normalized_sha256'],
+                                      'SYNTHETIC fake bank verification flag')
+            with self.assertRaisesRegex(ValueError, 'INDEPENDENT_CASH_SETTLEMENT_VERIFIER_NOT_IMPLEMENTED'):
+                act('operator','cash',{'document_id':forged['id']})
+            self.assertEqual(workspace.store.current_head_hash(), original_head)
+            self.assertEqual(workspace.store.load().get(finding.finding_id).recovered_cents, 0)
+            self.assertEqual(workspace.cases(tokens['customer'])['cases'][0]['recovered_cents'], 0)
