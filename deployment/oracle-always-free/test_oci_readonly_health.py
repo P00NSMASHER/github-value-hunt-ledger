@@ -189,5 +189,38 @@ class AccessTests(unittest.TestCase):
         self.assertIn("FAIL", stream.getvalue())
 
 
+class WorkflowSecretIsolationTests(unittest.TestCase):
+    def test_oauth_credentials_reach_only_the_final_readonly_step(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github" / "workflows" / "retally-oci-readonly.yml").read_text()
+        self.assertIn("  oracle-readonly:\n", workflow)
+        privileged = workflow.split("  oracle-readonly:\n", 1)[1]
+        anchor = "      - name: Verify private Oracle bucket and VM (read-only)\n"
+        self.assertIn(anchor, privileged)
+        before_final, final = privileged.split(anchor, 1)
+        self.assertIn("id-token: write", before_final)
+        self.assertIn("vars.RETALLY_OCI_MONITOR_ENABLED", before_final)
+        self.assertIn("python -m pip install", before_final)
+        self.assertIn("        env:\n", final)
+        self.assertIn("        run: python deployment/oracle-always-free/oci_readonly_health.py", final)
+        for key in ("RETALLY_OCI_CLIENT_ID", "RETALLY_OCI_CLIENT_SECRET"):
+            expression = "secrets." + key
+            self.assertNotIn(expression, before_final,
+                             "OAuth credentials leaked to setup or pip steps")
+            self.assertEqual(privileged.count(expression), 1,
+                             "OAuth secret must be scoped to one step only")
+            self.assertIn(expression, final)
+            self.assertLess(final.index(expression),
+                            final.index("        run: python"),
+                            "Secret must be scoped to the verification step")
+        # Fork/PR test jobs must not request OIDC or receive OCI secrets.
+        offline = workflow.split("  validate-offline:\n", 1)[1].split(
+            "\n  disabled-state:\n", 1)[0]
+        self.assertNotIn("id-token: write", offline)
+        self.assertNotIn("secrets.RETALLY_OCI_CLIENT_SECRET", offline)
+        self.assertIn("github.event_name == 'schedule'", before_final)
+        self.assertIn("github.ref == 'refs/heads/main'", before_final)
+
+
 if __name__ == "__main__":
     unittest.main()
