@@ -90,17 +90,43 @@ class OciBackupTests(unittest.TestCase):
         self.assertIn("Standard", cmd)
 
     def test_object_metadata_expected_vs_unsupported_response_shapes(self):
-        with patch.object(self.store, "data", return_value={"objects": [{"name": "synthetic-only/a"}]}):
-            self.assertEqual(len(self.store.objects("synthetic-only/")), 1)
-        with patch.object(self.store, "data", return_value=[{"name": "synthetic-only/a"}]):
-            self.assertEqual(len(self.store.objects("synthetic-only/")), 1)
-        with patch.object(self.store, "data", return_value={"unexpected": []}):
+        expected = [{"name": "synthetic-only/a"}]
+        with patch.object(self.store, "cli", return_value=json.dumps({"data": {"objects": expected}})):
+            self.assertEqual(self.store.objects("synthetic-only/"), expected)
+        with patch.object(self.store, "cli", return_value=json.dumps({"data": expected})):
+            self.assertEqual(self.store.objects("synthetic-only/"), expected)
+        with patch.object(self.store, "cli", return_value='{"data":{"unexpected":[]}}'):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
         with patch.object(self.store, "cli", return_value='{"etag":"ETAG-TOP-LEVEL"}'):
             self.assertEqual(self.store.head("test")["etag"], "ETAG-TOP-LEVEL")
         with patch.object(self.store, "cli", return_value='{"data":{"etag":"NESTED"}}'):
             self.assertEqual(self.store.head("test")["etag"], "NESTED")
+
+    def test_empty_object_list_requires_second_full_count_query(self):
+        # The authenticated OCI Cloud Shell CLI has returned successful empty
+        # list stdout on some operations; never interpret blank as absence alone.
+        with patch.object(self.store, "cli", side_effect=["", "0\\n"]) as call:
+            self.assertEqual(self.store.objects("synthetic-only/"), [])
+        self.assertEqual(call.call_count, 2)
+        a, b = [q.args for q in call.call_args_list]
+        self.assertIn("--all", a)
+        self.assertIn("--all", b)
+        self.assertEqual(b[-2:], ("--query", "length(data)"))
+
+    def test_inconsistent_blank_list_does_not_authorize_cleanup_or_upload(self):
+        for count in ("1", "-1", '"zero"', "null", "true", '{"data":[]}', "", "not-json"):
+            with self.subTest(count=count), patch.object(self.store, "cli", side_effect=["", count]):
+                with self.assertRaises(backup.Refused):
+                    self.store.objects("synthetic-only/")
+        with patch.object(self.store, "cli", return_value='{"data":[{"name":"customer/secret.rtbk"}]}'):
+            with self.assertRaises(backup.Refused):
+                self.store.objects("synthetic-only/")
+
+    def test_explicit_empty_json_is_accepted_without_fallback(self):
+        with patch.object(self.store, "cli", return_value='{"data":[]}') as call:
+            self.assertEqual(self.store.objects("synthetic-recovery/"), [])
+        call.assert_called_once()
 
     def test_full_object_inventory_paginated_before_cleanup_or_repeat(self):
         # OCI defaults object list to 100 entries. Refuse to mistake page 1
