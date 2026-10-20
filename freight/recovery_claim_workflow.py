@@ -305,8 +305,11 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         raise ValueError("recovery claim batch cardinality mismatch")
     claim_ids = tuple(record.claim_id for record in batch.records)
     finding_ids = tuple(record.finding_id for record in batch.records)
+    review_hashes = tuple(record.review_hash for record in batch.records)
     if len(set(claim_ids)) != len(claim_ids) or len(set(finding_ids)) != len(finding_ids):
         raise ValueError("duplicate recovery claim identity")
+    if len(set(review_hashes)) != len(review_hashes):
+        raise ValueError("duplicate recovery review proof")
     canonical_issued_at, _ = _timestamp(batch.issued_at)
     if canonical_issued_at != batch.issued_at:
         raise ValueError("recovery claim batch issued_at must be canonical UTC")
