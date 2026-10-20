@@ -66,7 +66,11 @@ the key. Live mode never accepts the simulation claim/cash shortcuts.
    and calculation evidence. Corrected evidence needs renewed intake approval and
    reviewed case replacement. Preserve old ledger history.
 5. Use the existing primary/independent case reviews and reviewed live case bundle,
-   customer authorization, external-action record and cash evidence workflow.
+   customer authorization and reviewed external-action record. The current live
+   cash-evidence path accepts document upload and review, **but cannot post recovered
+   cash**: `INDEPENDENT_CASH_SETTLEMENT_VERIFIER_NOT_IMPLEMENTED` blocks any
+   self-attested bank/provider flag from becoming verified money. An independently
+   authenticated settlement and buyer acceptance remain separate release gates.
    A workbench record is not permission to contact a counterparty. No external
    messages, claim submissions or money movements are performed by this service.
 6. Select a report format under Operations and download the customer report. HTML is
