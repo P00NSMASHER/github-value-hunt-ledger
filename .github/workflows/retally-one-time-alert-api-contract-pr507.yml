@@ -1,0 +1,46 @@
+name: RETALLY One-Time Alert API Contract Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - '.github/workflows/retally-one-time-alert-api-contract-pr507.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  read-only-api-contract:
+    if: >-
+      github.event.pull_request.number == 507 &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout reviewed candidate code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify latest GitHub workflow-run API contract, read-only
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os
+          from freight.site.live_audit_incident import GithubAPI, WORKFLOW
+          api = GithubAPI(os.environ['GH_TOKEN'])
+          response = api.call('GET', '/actions/workflows/' + WORKFLOW + '/runs?branch=main&per_page=20')
+          assert isinstance(response, dict), 'Unexpected GitHub workflow API response'
+          runs = response.get('workflow_runs')
+          assert isinstance(runs, list), 'GitHub workflow_runs list absent'
+          assert runs, 'No authoritative main-branch audit runs available'
+          for run in runs:
+              assert isinstance(run.get('id'), int), 'Workflow run id not integer'
+              assert 'head_branch' in run and 'event' in run, 'Expected branch and event missing'
+              assert 'status' in run and 'conclusion' in run, 'Expected status and conclusion missing'
+          print('RETALLY_READ_ONLY_GITHUB_AUDIT_API_CONTRACT_PASSED')
+          print('Authoritative workflow runs inspected:', len(runs))
+          PY
