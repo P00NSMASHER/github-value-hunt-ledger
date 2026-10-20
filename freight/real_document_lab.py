@@ -43,6 +43,23 @@ HISTORICAL_GAO = {
     "B-195862": "https://www.gao.gov/products/b-195862",
     "B-221705": "https://www.gao.gov/products/b-221705",
 }
+# Independently published decision outcomes are REFERENCE CHALLENGES, never
+# freight-error ground truth for the unrelated 2024-25 invoices in this lab.
+# Each note is backed by the exact public GAO decision URL above.
+HISTORICAL_REFERENCE_NOTES = {
+    "B-143246": {
+        "independent_decision_summary": "AUDIT_SUSTAINED_AFTER_PARTIAL_ALLOWANCE",
+        "adversarial_check": "Mixed-commodity container classification may require line-specific rating; do not treat all freight as one highest-rated package.",
+    },
+    "B-148465": {
+        "independent_decision_summary": "AUDITED_OVERCHARGE_COLLECTED_BY_OFFSET",
+        "adversarial_check": "Carrier routing responsibilities can alter the correct through-rate calculation; cannot simply assert the original charge is correct.",
+    },
+    "B-221594-0": {
+        "independent_decision_summary": "GOVERNMENT_OVERCHARGE_DETERMINATION_REVERSED",
+        "adversarial_check": "Rejected governing-rate tender is not enforceable merely because it yields a smaller calculated charge; prevent false positive.",
+    },
+}
 PENNINE = {
     "2026-04": "https://www.penninecare.nhs.uk/download_file/5855/277",
     "2026-05": "https://www.penninecare.nhs.uk/download_file/5874/277",
@@ -731,6 +748,10 @@ def survey_historical_adjudications() -> dict:
         "source_pages_fetched": sum(x["source_accessible"] for x in notes.values()),
         "full_independent_case_labels_for_test_invoices": 0,
         "real_freight_accuracy_from_these_sources": None,
+        "curated_official_decision_challenge_examples": {
+            key: {"official_source": HISTORICAL_GAO[key], **value, "is_label_for_test_invoice": False}
+            for key, value in HISTORICAL_REFERENCE_NOTES.items()
+        },
         "references": notes,
     }
 
