@@ -19,7 +19,7 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(minor("£35,032.20"), 3503220)
         self.assertEqual(minor("(12.34)"), -1234)
         self.assertEqual(minor("0.09"), 9)
-        for bad in ("NaN", "1.234", "1e3", "1,2,3x", ""):
+        for bad in ("NaN", "1.234", "1e3", "1,2,3x", "1,2", "1,23.45", "1,234,56", "££1.00", ""):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 minor(bad)
 
