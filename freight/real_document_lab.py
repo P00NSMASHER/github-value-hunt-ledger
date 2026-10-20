@@ -60,6 +60,62 @@ HISTORICAL_REFERENCE_NOTES = {
         "adversarial_check": "Rejected governing-rate tender is not enforceable merely because it yields a smaller calculated charge; prevent false positive.",
     },
 }
+# Values quoted in the official GAO decisions are reference arithmetic ONLY.
+# They lack linked original buyer invoices / controlling-rate exhibits / bank
+# records in RETALLY's current 110-invoice original-document population.
+HISTORICAL_GAO_AMOUNT_REFERENCES = {
+    "B-143246": {
+        "paid_major": "627.24",
+        "original_audit_deduction_major": "340.21",
+        "later_carrier_allowance_major": "11.81",
+        "sustained_disputed_reclaim_major": "328.40",
+        "legal_disposition": "AUDIT_SUSTAINED_WITH_PARTIAL_ALLOWANCE",
+    },
+    "B-148465": {
+        "paid_major": "546.88",
+        "collected_offset_major": "61.22",
+        "legal_disposition": "PAID_FREIGHT_OVERCHARGE_OFFSET_AFFIRMED",
+    },
+    "B-221594-0": {
+        "paid_major": "942.00",
+        "gsa_proposed_charge_major": "721.25",
+        "gsa_collected_deduction_major": "220.75",
+        "legal_disposition": "GSA_DEDUCTION_INVALID_REJECTED_TENDER",
+    },
+}
+
+
+def historical_reference_money_controls() -> dict:
+    """Compare financial arithmetic in GAO narrative *without* freight scoring."""
+    b143 = HISTORICAL_GAO_AMOUNT_REFERENCES["B-143246"]
+    b148 = HISTORICAL_GAO_AMOUNT_REFERENCES["B-148465"]
+    b221 = HISTORICAL_GAO_AMOUNT_REFERENCES["B-221594-0"]
+    checks = {
+        "gao_b143246_net_reclaim_exact": (
+            minor(b143["original_audit_deduction_major"]) -
+            minor(b143["later_carrier_allowance_major"]) ==
+            minor(b143["sustained_disputed_reclaim_major"])
+        ),
+        "gao_b148465_collected_offset_within_original_payment": (
+            0 < minor(b148["collected_offset_major"]) <= minor(b148["paid_major"])
+        ),
+        "gao_b221594_ledger_math_does_not_validate_invalid_deduction": (
+            minor(b221["paid_major"]) - minor(b221["gsa_proposed_charge_major"]) ==
+            minor(b221["gsa_collected_deduction_major"])
+            and b221["legal_disposition"] == "GSA_DEDUCTION_INVALID_REJECTED_TENDER"
+        ),
+    }
+    return {
+        "reference_cases": len(checks),
+        "checks": checks,
+        "all_reference_arithmetic_exact": all(checks.values()),
+        "source": "PUBLIC_GAO_DECISION_TEXT_CURATED_NOT_INDEPENDENT_BANK_ARTIFACTS",
+        "original_invoice_documents_joined": 0,
+        "independently_scored_freight_cases": 0,
+        "recovery_claims_usd_minor": 0,
+    }
+
+
 PENNINE = {
     "2026-04": "https://www.penninecare.nhs.uk/download_file/5855/277",
     "2026-05": "https://www.penninecare.nhs.uk/download_file/5874/277",
@@ -800,6 +856,20 @@ def benchmark_pennine() -> dict:
             id=ident, amount=f"{Decimal(amount) / 100:.2f}",
             date=row["payment date"], currency="GBP", reference=row["payment number"]))
     recon = _recon_result(invoices, counterparts, {**invoice_group, **payment_group})
+    payment_status_counts = Counter(
+        str(row["payment status name"]).strip().casefold() or "<empty>"
+        for row in unique_rows
+    )
+    supplier_invoice_variants: dict[str, set[str]] = defaultdict(set)
+    for row in unique_rows:
+        supplier_invoice_key = _key(row, ("supplier number", "invoice number"))
+        supplier_invoice_variants[supplier_invoice_key].add(
+            _key(row, ("invoice date", "invoice_amount_minor")))
+    changed_invoice_amount_or_date = sum(
+        len(variants) > 1 for variants in supplier_invoice_variants.values())
+    empty_pay_references = sum(not row["payment number"] for row in unique_rows)
+    negative_invoice_rows = sum(row["invoice_amount_minor"] < 0 for row in unique_rows)
+    zero_invoice_rows = sum(row["invoice_amount_minor"] == 0 for row in unique_rows)
     payment_ref_sizes = Counter(len(group) for group in payment_declarations.values())
     return {
         "data_classification": "GENERAL_ACCOUNTING_ONLY_NOT_FREIGHT",
@@ -814,6 +884,11 @@ def benchmark_pennine() -> dict:
         "cross_month_repeated_rows": cross_month_repeats,
         "invoice_identity_with_changed_payment_reference": changed_payment_ids,
         "declared_payment_references": len(payment_declarations),
+        "published_payment_status_counts": dict(sorted(payment_status_counts.items())),
+        "same_supplier_invoice_with_different_amount_or_date": changed_invoice_amount_or_date,
+        "missing_payment_number_rows": empty_pay_references,
+        "negative_invoice_amount_rows": negative_invoice_rows,
+        "zero_invoice_amount_rows": zero_invoice_rows,
         "payment_reference_group_sizes": dict(sorted(payment_ref_sizes.items())),
         "invoice_total_minor_deduplicated": sum(r["invoice_amount_minor"] for r in unique_rows),
         "payment_declaration_total_minor_derived_from_same_invoices": sum(
@@ -879,6 +954,7 @@ def survey_historical_adjudications() -> dict:
         "source_pages_fetched": sum(x["source_accessible"] for x in notes.values()),
         "full_independent_case_labels_for_test_invoices": 0,
         "real_freight_accuracy_from_these_sources": None,
+        "decision_text_arithmetic_controls": historical_reference_money_controls(),
         "curated_official_decision_challenge_examples": {
             key: {"official_source": HISTORICAL_GAO[key], **value, "is_label_for_test_invoice": False}
             for key, value in HISTORICAL_REFERENCE_NOTES.items()
