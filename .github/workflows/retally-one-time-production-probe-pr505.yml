@@ -1,0 +1,29 @@
+name: RETALLY One-Time Independent Production GET Probe
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - '.github/workflows/retally-one-time-production-probe-pr505.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  readonly-production-probe:
+    if: >-
+      github.event.pull_request.number == 505 &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact proposed RETALLY audit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify 504 retry and fail-closed fixtures
+        run: python -m unittest freight.site.test_verify_production_site -v
+      - name: Run actual independent production audit with public GETs only
+        run: python -m freight.site.verify_production_site
