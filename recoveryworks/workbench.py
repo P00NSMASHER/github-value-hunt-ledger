@@ -409,17 +409,25 @@ class Workspace(OnboardingMixin):
             elif action == 'cash':
                 if not self.meta['simulation']:
                     payload = self._reviewed_document(data.get('document_id'), finding_id, 'cash_event')
-                    event = CashEvent(**{**payload, 'verified': True})
+                    # Even a distinctly reviewed, hash-pinned source document
+                    # is NOT an authenticated bank/carrier settlement. The
+                    # submitted "verified" boolean is never external proof.
+                    # Parse the document for case integrity, but do not mint
+                    # recovered customer cash until a trusted issuer-verifier
+                    # and governed settlement acceptance are implemented.
+                    event = CashEvent(**{**payload, 'verified': False})
                     if event.finding_id != finding_id:
                         raise ValueError('cash event case mismatch')
-                else:
-                    previous = ledger._cash_events.get((record.finding.client_id, data['event_id']))
-                    event = CashEvent(event_id=data['event_id'], finding_id=finding_id,
-                                      amount_cents=data['amount_cents'], fee_cents=data.get('fee_cents', 0),
-                                      currency=record.finding.currency, source_hash=data['source_hash'],
-                                      source_locator='simulation://' + data['event_id'],
-                                      observed_at=previous.observed_at if previous else timestamp(),
-                                      verified=True, reverses_id=data.get('reverses_id'))
+                    raise ValueError(
+                        'INDEPENDENT_CASH_SETTLEMENT_VERIFIER_NOT_IMPLEMENTED: '
+                        'reviewed documents cannot prove customer recovery')
+                previous = ledger._cash_events.get((record.finding.client_id, data['event_id']))
+                event = CashEvent(event_id=data['event_id'], finding_id=finding_id,
+                                  amount_cents=data['amount_cents'], fee_cents=data.get('fee_cents', 0),
+                                  currency=record.finding.currency, source_hash=data['source_hash'],
+                                  source_locator='simulation://' + data['event_id'],
+                                  observed_at=previous.observed_at if previous else timestamp(),
+                                  verified=True, reverses_id=data.get('reverses_id'))
                 ledger.post_cash_event(event)
             elif action == 'hold':
                 if not isinstance(note, str) or not note.strip():
