@@ -96,6 +96,18 @@ jobs:
           assert identities['invoice_face_not_listed_on_statement'] == 0
           assert identities['statement_identifier_without_extracted_invoice_face'] == 2
           assert identities['source_date_gaps_over_180_days'] == 2
+          source_lines = gt['original_invoice_line_amount_reconciliation']
+          assert source_lines['invoice_faces_considered'] == 100
+          assert source_lines['component_tokens_extracted'] == 387
+          assert source_lines['negative_adjustment_tokens'] == 93
+          assert source_lines['invoice_faces_containing_negative_discounts'] == 93
+          assert source_lines['invoice_faces_canonical_signed_charge_schema_compatible'] == 7
+          assert source_lines['invoice_face_exact_line_sum'] == 100
+          assert source_lines['invoice_face_nonmatching_extracted_line_sum'] == 0
+          assert source_lines['invoice_face_component_text_unavailable'] == 0
+          assert source_lines['every_face_conserved'] is True
+          assert source_lines['production_freight_ChargeLine_accepts_negative_discounts'] is False
+          assert source_lines['line_sum_proves_controlling_rate_or_overcharge'] is False
           rated = abf['retally_rating_engine']
           assert rated['lab_proxy_canonical_records_executed'] >= 5
           assert rated['engine_review_required'] == rated['lab_proxy_canonical_records_executed']
@@ -152,6 +164,7 @@ jobs:
           with summary.open('a', encoding='utf-8') as stream:
               stream.write('## RETALLY read-only original-document benchmark\n\n')
               stream.write(f"- GlobalTranz: {gt['distinct_invoice_face_ids']} original invoice faces, {stmt['rows']} statement lines; {stmt['face_to_statement_original_amount']['matched_invoices']} source-document amount joins.\n")
+              stream.write(f"- GlobalTranz original charge math: {source_lines['invoice_face_exact_line_sum']}/100 line sums exact from {source_lines['component_tokens_extracted']} original charge tokens; {source_lines['invoice_faces_containing_negative_discounts']} invoices require unsupported signed freight discount lines (tracked in issue #509).\n")
               stream.write(f"- ArcBest: {abf['distinct_invoice_face_ids']} original invoices; {rated['engine_review_required']} source-derived laboratory proxies passed into the real rating engine, all REVIEW REQUIRED.\n")
               stream.write(f"- Pennine: {accounting['original_disclosed_rows']} disclosures, {accounting['unique_invoice_economic_identities']} unique invoices, {accounting['cross_month_repeated_rows']} repeated disclosures.\n")
               stream.write(f"- Actual RETALLY kernel: unscoped matched {unscoped['matched_invoices']} / 273; bounded reference-scoped replay matched {scoped['matched_invoices']} / 273; zero cross-reference mismatches.\n")
