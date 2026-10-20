@@ -282,6 +282,7 @@ class OciBackupTests(unittest.TestCase):
         raw = backup.LEGACY_MAGIC + b"N" * 12 + b"authenticated-test-ciphertext"
         calls = []
         with patch.object(backup, "LEGACY_CLEANUP", self.orphan_receipt), \
+             patch.object(backup, "LEGACY_DELETE_ATTEMPT", self.root / "delete-attempt.json"), \
              patch.object(self.store, "bucket_check"), \
              patch.object(self.store, "objects", side_effect=[[{"name": key}], []]), \
              patch.object(self.store, "get", return_value=raw), \
@@ -293,6 +294,36 @@ class OciBackupTests(unittest.TestCase):
         self.assertEqual(calls, [(key, "KNOWN-ETAG")])
         self.assertEqual(self.orphan_receipt.stat().st_mode & 0o777, 0o600)
         self.assertTrue(json.loads(self.orphan_receipt.read_text())["remote_canary_deleted"])
+        intent = self.root / "delete-attempt.json"
+        self.assertEqual(intent.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(json.loads(intent.read_text())["frozen_etag"], "KNOWN-ETAG")
+
+    def test_uncertain_legacy_delete_leaves_receipt_and_prohibits_repeat(self):
+        key = "synthetic-only/0123456789abcdef01234567.rtbk"
+        raw = backup.LEGACY_MAGIC + b"N" * 12 + b"ciphertext-test-only"
+        attempt = self.root / "uncertain-delete-attempt.json"
+        with (patch.object(backup, "LEGACY_CLEANUP", self.orphan_receipt),
+              patch.object(backup, "LEGACY_DELETE_ATTEMPT", attempt),
+              patch.object(self.store, "bucket_check"),
+              patch.object(self.store, "objects", return_value=[{"name": key}]),
+              patch.object(self.store, "head", return_value={
+                  "etag": "FROZEN-ETAG", "content-length": len(raw)}),
+              patch.object(self.store, "get", return_value=raw),
+              patch.object(self.store, "delete_version",
+                           side_effect=backup.Refused("provider timeout")) as delete):
+            with self.assertRaisesRegex(backup.Refused, "provider timeout"):
+                backup.cleanup_legacy(self.store,
+                                      expected_object_name=key,
+                                      expected_sha256=backup.sha(raw))
+            self.assertTrue(attempt.is_file())
+            self.assertEqual(attempt.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(json.loads(attempt.read_text())["object_name"], key)
+            self.assertFalse(self.orphan_receipt.exists())
+            with self.assertRaisesRegex(backup.Refused, "uncertain delete attempt"):
+                backup.cleanup_legacy(self.store,
+                                      expected_object_name=key,
+                                      expected_sha256=backup.sha(raw))
+            delete.assert_called_once()
 
     def test_cleanup_rejects_unrelated_or_changed_objects(self):
         wrong_names = ["synthetic-only/secret.rtbk", "customer/invoices.rtbk",
