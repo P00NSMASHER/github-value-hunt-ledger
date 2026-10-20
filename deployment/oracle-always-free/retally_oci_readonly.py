@@ -74,9 +74,11 @@ def validate_endpoint(url, *, github=False):
     ensure(host and not host.startswith(".") and ".." not in host and not p.fragment,
            "Invalid identity endpoint host.")
     if github:
-        ensure(host == "token.actions.githubusercontent.com"
-               or host.endswith(".actions.githubusercontent.com"),
-               "GitHub OIDC endpoint host is unexpected.")
+        # GitHub Actions exposes the token request endpoint on this exact
+        # GitHub-owned host. Trusting every *.actions.githubusercontent.com
+        # subdomain would accept unrelated services as token issuers.
+        ensure(host == "pipelines.actions.githubusercontent.com",
+               "GitHub OIDC request endpoint host is unexpected.")
         ensure(p.path.startswith("/"), "GitHub OIDC path invalid.")
         return url
     ensure(host.endswith(".identity.oraclecloud.com")
