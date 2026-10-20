@@ -378,35 +378,57 @@ def globaltranz_charge_components(text: str) -> tuple[int, ...] | None:
 def globaltranz_invoice_line_total_benchmark(
     faces: list[InvoiceFace], texts: list[str],
 ) -> dict:
-    """Replay observed charge tokens through RETALLY canonical charge types."""
+    """Measure real invoice-line money with explicit signed-adjustment hold.
+
+    Freight canonical ChargeLine rejects negative billed_cents. Preserve that
+    product limitation: do not silently drop or convert original discounts to
+    nonnegative charges. Use the REAL reconciliation kernel money parser to
+    replay negative amounts separately, and count any affected invoice as not
+    fully representable by the production freight line schema.
+    """
     from freight.canonical_schema import ChargeLine
     exact = unmatched = unextracted = 0
     line_items = negative_adjustments = 0
+    discounted_faces = 0
+    canonical_roundtrip_faces = 0
     fingerprints = []
     for face in faces:
         components = globaltranz_charge_components(texts[face.page - 1])
         if not components or face.cents is None:
             unextracted += 1
             continue
-        charge_lines = tuple(
+        nonnegative_lines = tuple(
             ChargeLine(
                 charge_id=f"lab-component:{face.page}:{idx}",
-                charge_code="ORIGINAL_PDF_CHARGE_COMPONENT",
+                charge_code="ORIGINAL_PDF_NONNEGATIVE_COMPONENT",
                 billed_cents=amount,
             )
-            for idx, amount in enumerate(components, 1)
+            for idx, amount in enumerate(components, 1) if amount >= 0
         )
-        line_items += len(charge_lines)
-        negative_adjustments += sum(item.billed_cents < 0 for item in charge_lines)
-        computed = sum(item.billed_cents for item in charge_lines)
+        negative = [amount for amount in components if amount < 0]
+        # Actual RecoveryWorks reconciliation parser handles signed decimals.
+        signed_adjustments = [
+            parse_amount_to_minor(f"{Decimal(amount) / Decimal(100):.2f}", 2)
+            for amount in negative
+        ]
+        if signed_adjustments != negative:
+            raise ValueError("signed original invoice amount corrupted in kernel")
+        computed = sum(item.billed_cents for item in nonnegative_lines) + sum(signed_adjustments)
+        line_items += len(components)
+        negative_adjustments += len(negative)
+        discounted_faces += int(bool(negative))
+        canonical_roundtrip_faces += int(not negative)
         exact += int(computed == face.cents)
         unmatched += int(computed != face.cents)
-        fingerprints.append((face.number, computed, face.cents, len(charge_lines)))
+        fingerprints.append((face.number, computed, face.cents, len(components), len(negative)))
     return {
-        "source": "ORIGINAL_PDF_LINE_AMOUNT_TOKENS_REPLAYED_AS_RETALLY_CHARGELINE",
+        "source": "ORIGINAL_PDF_COMPONENTS_REPLAYED_BY_CANONICAL_POSITIVE_LINES_AND_SIGNED_RECONCILIATION_PARSER",
         "invoice_faces_considered": len(faces),
         "component_tokens_extracted": line_items,
         "negative_adjustment_tokens": negative_adjustments,
+        "invoice_faces_containing_negative_discounts": discounted_faces,
+        "invoice_faces_canonical_signed_charge_schema_compatible": canonical_roundtrip_faces,
+        "production_freight_ChargeLine_accepts_negative_discounts": False,
         "invoice_face_exact_line_sum": exact,
         "invoice_face_nonmatching_extracted_line_sum": unmatched,
         "invoice_face_component_text_unavailable": unextracted,
