@@ -355,7 +355,7 @@ def verify_partial_network(state: dict, tenancy: str, region: str) -> None:
     ids = ('vcn_id', 'security_list_id', 'route_table_id',
            'internet_gateway_id', 'subnet_id')
     ensure(all(isinstance(state.get(k), str) and
-               re.fullmatch(r'ocid1\\.[A-Za-z][A-Za-z0-9]*\\.[A-Za-z0-9.]+', state[k])
+               re.fullmatch(r'ocid1\.[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9.]+', state[k])
                for k in ids), 'Partial receipt lacks exact OCI resource identifiers.')
 
     vcn = cli('network', 'vcn', 'get', '--vcn-id', state['vcn_id'], region=region)
