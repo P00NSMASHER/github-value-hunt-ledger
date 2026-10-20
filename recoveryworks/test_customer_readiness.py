@@ -120,7 +120,7 @@ class CustomerReadinessTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(report['json'].encode()).hexdigest(),
                          report['sha256'])
         # Actual synthetic fixture remains source-isolated; no money moved.
-        self.assertEqual(self.workspace.store.load().rollup()['recovered_cents'], 0)
+        self.assertEqual(self.workspace.store.load().rollup()['totals']['recovered_cents'], 0)
 
     def test_health_checks_restore_and_detects_revocation_and_tamper(self):
         from recoveryworks.workbench_health import check_workspace
