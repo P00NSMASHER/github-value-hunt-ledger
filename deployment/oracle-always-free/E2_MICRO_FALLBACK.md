@@ -58,7 +58,7 @@ The script prints the plan and requires the exact phrase `CREATE ONE RETALLY FRE
 - Original Cloud Shell **public** RSA SSH key only.
 - A public IPv4 for **outbound networking**, but OCI Security List ingress remains **DENY ALL**, including ports 22, 80, 443, 8765 and 18765.
 
-An OCI error, timeout, wrong shape, unexpected state, insufficient free inventory or disagreement with the receipt **stops without paid fallbacks**. No automatic retry is performed because instance state may be uncertain. On success, the tool writes a new owner-only final receipt and archives the original partial evidence.
+An OCI error, timeout, wrong shape, unexpected state, insufficient free inventory or disagreement with the receipt **stops without paid fallbacks**. Before sending the first launch request, the tool atomically creates an owner-only, durable marker at `~/.retally-oracle/micro-launch-attempt.json`. This remains in place even after an OCI HTTP 500, timeout or incomplete response. **Any further `--create` is blocked until a separate manual reconciliation of the OCI inventory and audit history.** Do not delete the marker simply to retry: ambiguous provider responses can conceal a newly created instance. Read-only preflight remains available and identifies the retry lock. On success, the tool writes a new owner-only final receipt, archives the original partial evidence and retains the attempt marker as an audit trail. No automatic retry is performed because instance state may be uncertain.
 
 **Important:** the zero-ingress network means direct SSH will not work. Use an approved Oracle Console/Bastion path for later synthetic installation, never a broad 0.0.0.0/0 SSH rule.
 
