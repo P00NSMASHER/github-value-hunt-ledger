@@ -129,6 +129,17 @@ class IdentitySecurity(unittest.TestCase):
                          "https://idcs-example.identity.oraclecloud.com/oauth2/v1/token")
         with self.assertRaises(m.Refused):
             m.validate_endpoint("https://evil.tld/t", github=True)
+        self.assertEqual(
+            m.validate_endpoint("https://pipelines.actions.githubusercontent.com/a?x=1",
+                                github=True),
+            "https://pipelines.actions.githubusercontent.com/a?x=1")
+        for untrusted in (
+            "https://attacker.actions.githubusercontent.com/a?x=1",
+            "https://token.actions.githubusercontent.com/a?x=1",
+            "https://fake.pipelines.actions.githubusercontent.com/a?x=1",
+        ):
+            with self.subTest(untrusted=untrusted), self.assertRaises(m.Refused):
+                m.validate_endpoint(untrusted, github=True)
 
     def test_all_claims_and_expiry_fail_closed(self):
         m.validate_claims(claims(), now=1760000020)
