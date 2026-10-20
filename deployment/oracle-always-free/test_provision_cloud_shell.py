@@ -239,5 +239,57 @@ class CloudShellCliParsingTests(unittest.TestCase):
         self.assertEqual(called.call_count, 1)
 
 
+
+class CloudShellFipsKeyTests(unittest.TestCase):
+    def test_rsa4096_keypair_created_with_private_permissions(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            private = root / 'test_rsa4096'
+            public = root / 'test_rsa4096.pub'
+            captured = []
+            def generate(args, **kwargs):
+                captured.append(args)
+                private.write_text('TEST ONLY PRIVATE KEY', encoding='ascii')
+                public.write_text('ssh-rsa TEST-ONLY-NONKEY', encoding='ascii')
+                return mod.subprocess.CompletedProcess(args, 0)
+            with (patch.object(mod,'RESOURCE_DIR',root),
+                  patch.object(mod,'PRIVATE_KEY',private),
+                  patch.object(mod,'PUBLIC_KEY',public),
+                  patch.object(mod.subprocess,'run',side_effect=generate)):
+                self.assertEqual(mod.generate_keypair(),public)
+            self.assertEqual(len(captured),1)
+            self.assertEqual(captured[0][:6], ['ssh-keygen','-q','-t','rsa','-b','4096'])
+            self.assertEqual(private.stat().st_mode & 0o777,0o600)
+            self.assertEqual(public.stat().st_mode & 0o777,0o600)
+
+    def test_ed25519_keys_cannot_be_reused_in_fips_profile(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            private=root / 'test_rsa4096'
+            public=root / 'test_rsa4096.pub'
+            private.write_text('TEST KEY ONLY',encoding='ascii')
+            public.write_text('ssh-ed25519 TEST-ONLY',encoding='ascii')
+            private.chmod(0o600)
+            with (patch.object(mod,'RESOURCE_DIR',root),
+                  patch.object(mod,'PRIVATE_KEY',private),
+                  patch.object(mod,'PUBLIC_KEY',public)):
+                with self.assertRaisesRegex(mod.Stop,'SSH key permissions/type'):
+                    mod.generate_keypair()
+
+    def test_fips_keygen_failure_prevents_any_cloud_creation(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            with (patch.object(mod,'RESOURCE_DIR',root),
+                  patch.object(mod,'PRIVATE_KEY',root/'test_rsa4096'),
+                  patch.object(mod,'PUBLIC_KEY',root/'test_rsa4096.pub'),
+                  patch.object(mod.subprocess,'run',
+                               return_value=mod.subprocess.CompletedProcess(['ssh-keygen'],255)),
+                  patch.object(mod,'make_network') as network):
+                with self.assertRaisesRegex(mod.Stop,'Could not generate'):
+                    mod.generate_keypair()
+                network.assert_not_called()
+
+
+
 if __name__=='__main__':
     unittest.main()
