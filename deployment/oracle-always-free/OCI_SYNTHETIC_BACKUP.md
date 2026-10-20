@@ -35,7 +35,16 @@ python3 deployment/oracle-always-free/oci_synthetic_backup.py --cleanup-legacy-c
   --expected-legacy-object-name 'synthetic-only/PRIOR_VERIFIED_KEY.rtbk' \
   --expected-legacy-ciphertext-sha256 'PRIOR_VERIFIED_64_HEX_SHA256'
 
-# Do not exercise if --inspect shows any other unreconciled objects.
+# Default exercise refuses any unresolved historical object.
+# If the prior canary lacks independently frozen original SHA evidence,
+# preserve it (do not delete!) while testing the DIFFERENT synthetic-recovery/
+# prefix with strict private quarantine evidence.
+# This option requires EXACTLY ONE bounded legacy magic candidate; the orphan
+# remains unresolved and cannot be counted as a recovered backup.
+python3 deployment/oracle-always-free/oci_synthetic_backup.py --exercise \
+  --preserve-legacy-orphan
+
+# When the historical prefix is genuinely EMPTY, omit --preserve-legacy-orphan.
 # Run the real simulated seven-branch flow, encrypt, upload, retrieve,
 # SHA-256 compare, replay/restore, invalidate all old tokens, reject tampering,
 # and delete the exact current test object conditionally.
@@ -43,6 +52,21 @@ python3 deployment/oracle-always-free/oci_synthetic_backup.py --exercise
 ```
 
 For any failed/partial command, **stop**. Inspect OCI audit, the bucket object inventory and the owner-only receipt before continuing; never delete arbitrary bucket objects, erase retry/attempt markers or repeat `--exercise` blindly. If the synthetic test fails *before* remote deletion, the object may already exist. Leave the partial receipt intact until a separately reviewed reconciliation.
+
+A separate `--exercise --preserve-legacy-orphan` option now permits a
+**new, isolated** recovery test while leaving the historical orphan completely
+untouched. The quarantine procedure checks a single small historical object,
+free Standard tier, the precise legacy key format, a bounded HEAD size,
+ETag-conditioned downloaded bytes and the expected synthetic magic. It writes
+an owner-only `legacy-orphan-quarantine.json` containing the **currently
+observed** SHA-256, expressly marking original upload identity as unverified;
+it does **not** use that hash to authorize deletion. The new workbench backup
+test uses exclusively `synthetic-recovery/`, decrypts only the new fixture,
+conditionally deletes only its own exact temporary object and confirms that
+the original canary remains. No prior orphan is ever imported into a workspace
+or counted as a valid backup. An unexpected extra object, changed head/ETag,
+or existing quarantine receipt stops new uploads. The ordinary `--exercise`
+mode still refuses to proceed when the historical prefix is nonempty.
 
 The cleanup command now also requires a **previously frozen, independently
 approved original key and ciphertext SHA-256**. If the previous upload did
@@ -62,6 +86,6 @@ remote HEAD content-length and freezes the original ETag; the download uses OCI 
 - The bucket stays `NoPublicAccess`, Standard tier, versioning disabled; no unexpected events/replication services are activated; use stays below the 20 GB Always Free threshold.
 - All CI and genuine independent source approval gates for PRs #493, #500, #502, #508, #516, and this dependent PR remain mandatory before live customer workflows.
 
-**Current known gap:** No live OCI restore acceptance has yet been completed. No service is installed on the VM and customer release remains HOLD. Owner-only local receipts and unchanged OCI settings do not establish a disaster-recovery SLA.
+**Current known gap:** No live OCI restore acceptance has yet been completed. The previous small synthetic canary remains unverified and must NOT be deleted merely because its current hash is known. No service is installed on the VM and customer release remains HOLD. Owner-only local receipts and unchanged OCI settings do not establish a disaster-recovery SLA.
 
 Resources: [OCI Object Storage free limits](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm), [object put with no-overwrite and checksum](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/os/object/put.html), [ETag-conditional delete](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/os/object/delete.html).
