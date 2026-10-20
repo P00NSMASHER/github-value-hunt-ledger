@@ -352,3 +352,62 @@ def test_self_hashed_claim_batch_rejects_duplicate_claim_identity():
 
     with pytest.raises(ValueError, match="duplicate recovery claim identity"):
         verify_recovery_claim_batch(forged)
+
+
+def _rehash_claim_batch_for_readback_test(batch):
+    body = {
+        "schema": 1,
+        "buyer_id": batch.buyer_id,
+        "business_unit": batch.business_unit,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        "issued_at": batch.issued_at,
+        "state": batch.state,
+        "confirmed_review_count": batch.confirmed_review_count,
+        "claim_count": batch.claim_count,
+        "fee_disqualified_count": batch.fee_disqualified_count,
+        "records": [asdict(item) for item in batch.records],
+        "bindings": [asdict(item) for item in batch.bindings],
+    }
+    return replace(batch, batch_hash=canonical_hash(body))
+
+
+def test_self_hashed_claim_batch_rejects_envelope_record_issue_time_mismatch():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, issued_at="2026-09-21T11:00:00Z", batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="issued-at mismatch"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_inflated_confirmed_review_count():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            confirmed_review_count=batch.confirmed_review_count + 1,
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="confirmed review count mismatch"):
+        verify_recovery_claim_batch(forged)
