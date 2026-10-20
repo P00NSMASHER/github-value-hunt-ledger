@@ -95,6 +95,11 @@ class ContextTests(unittest.TestCase):
     def test_github_claim_exactness_and_expiry(self):
         good = claims()
         m.validate_claims(good, "schedule")
+        immutable = dict(good)
+        immutable["sub"] = m.IMMUTABLE_SUBJECT
+        m.validate_claims(immutable, "schedule")
+        self.assertIn("@22281248/", immutable["sub"])
+        self.assertIn("@1376771019:", immutable["sub"])
         for key, value in [
             ("iss", "https://evil.example"), ("aud", "evil"),
             ("sub", "repo:bad/other:ref:refs/heads/main"),
