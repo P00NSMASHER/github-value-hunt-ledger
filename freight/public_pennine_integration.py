@@ -50,8 +50,9 @@ def read_pinned_month(month: str) -> bytes:
         Request(url, headers={"User-Agent": "RETALLY-public-research-accounting-replay/1.0"}),
         timeout=30,
     ) as response:
-        if response.geturl().split("/download_file/")[0] != ROOT:
-            raise ValueError("public disclosure source redirected to unexpected endpoint")
+        actual = urlparse(response.geturl())
+        if actual.scheme != "https" or actual.hostname != "www.penninecare.nhs.uk":
+            raise ValueError("public disclosure escaped approved HTTPS origin")
         raw = response.read(MAX_CSV_BYTES + 1)
     if len(raw) > MAX_CSV_BYTES or sha256(raw).hexdigest() != expected:
         raise ValueError("public disclosure source bytes changed; human reapproval required")
