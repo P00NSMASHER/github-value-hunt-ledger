@@ -274,6 +274,10 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         len(batch.records) == len(batch.claims) == len(batch.bindings) == batch.claim_count
     ):
         raise ValueError("recovery claim batch cardinality mismatch")
+    claim_ids = tuple(record.claim_id for record in batch.records)
+    finding_ids = tuple(record.finding_id for record in batch.records)
+    if len(set(claim_ids)) != len(claim_ids) or len(set(finding_ids)) != len(finding_ids):
+        raise ValueError("duplicate recovery claim identity")
 
     for record, claim, binding in zip(
         batch.records,
