@@ -31,7 +31,8 @@ class FakeResponse:
 
 class HostAttestationTests(unittest.TestCase):
     def setUp(self):
-        self.arm = {"id": "ocid1.instance.oc1.synthetic-A1", "shape": "VM.Standard.A1.Flex"}
+        self.arm = {"id": "ocid1.instance.oc1.synthetic-A1", "shape": "VM.Standard.A1.Flex",
+                    "shapeConfig": {"ocpus": 2, "memoryInGBs": 12}}
         self.micro = {"id": "ocid1.instance.oc1.synthetic-MICRO",
                       "shape": "VM.Standard.E2.1.Micro",
                       "shapeConfig": {"memoryInGBs": 1}}
@@ -61,8 +62,42 @@ class HostAttestationTests(unittest.TestCase):
         for data, arch, arg in [(self.arm, "aarch64", "--a1"),
                                 (self.micro, "x86_64", "--micro")]:
             with self.subTest(arg=arg), patch.object(MODULE, "read_metadata", return_value=data), \
-                    patch.object(MODULE.platform, "machine", return_value=arch):
+                    patch.object(MODULE.platform, "machine", return_value=arch), \
+                    patch.object(MODULE, "read_shape_config",
+                                 return_value={"ocpus": 2, "memoryInGBs": 12}):
                 self.assertEqual(MODULE.main([arg]), 0)
+
+    def test_a1_flex_requires_exact_approved_size_not_just_shape_name(self):
+        for config in (None, {}, {"ocpus": 4, "memoryInGBs": 24},
+                       {"ocpus": 2, "memoryInGBs": 24},
+                       {"ocpus": 3, "memoryInGBs": 12},
+                       {"ocpus": True, "memoryInGBs": 12},
+                       {"ocpus": 2, "memoryInGBs": False},
+                       {"ocpus": "2", "memoryInGBs": 12}):
+            with self.subTest(config=config), self.assertRaises(ValueError):
+                MODULE.verify_instance_metadata(
+                    {**self.arm, "shapeConfig": None}, "aarch64", "a1",
+                    shape_config=config)
+        MODULE.verify_instance_metadata(
+            self.arm, "aarch64", "a1",
+            shape_config={"ocpus": 2.0, "memoryInGBs": 12.0})
+        with patch.object(MODULE, "read_metadata", return_value={"ocpus": 2, "memoryInGBs": 12}):
+            self.assertEqual(MODULE.read_shape_config(), {"ocpus": 2, "memoryInGBs": 12})
+        with self.assertRaises(ValueError):
+            MODULE.read_metadata("http://unapproved.invalid/")
+
+    def test_shape_config_read_stays_bounded_and_same_linklocal_origin(self):
+        class FakeOpener:
+            def open(self, request, timeout):
+                self.request, self.timeout = request, timeout
+                return FakeResponse({"ocpus": 2, "memoryInGBs": 12},
+                                    url=MODULE.SHAPE_CONFIG_URL)
+        opener = FakeOpener()
+        with patch.object(MODULE, "build_opener", return_value=opener):
+            self.assertEqual(MODULE.read_shape_config()["memoryInGBs"], 12)
+        self.assertEqual(opener.request.full_url, MODULE.SHAPE_CONFIG_URL)
+        self.assertEqual(opener.request.get_header("Authorization"), "Bearer Oracle")
+        self.assertEqual(opener.timeout, 6)
 
     def test_linklocal_metadata_request_uses_no_proxy_and_no_redirect(self):
         class FakeOpener:
