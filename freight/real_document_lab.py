@@ -253,6 +253,85 @@ def _recon_result(a: list[ReconTxn], b: list[ReconTxn], lookup: dict[str, str] |
     }
 
 
+
+
+def reference_scoped_replay(
+    invoices: list[ReconTxn], counterpart: list[ReconTxn],
+    invoice_group: dict[str, str], payment_group: dict[str, str],
+    *, max_group_size: int = 8,
+) -> dict:
+    """Safely invoke the EXISTING kernel per source-declared payment reference.
+
+    The native unscoped bounded many-to-one search considers the first 18
+    unmatched invoices in its date window, regardless of payment reference.
+    The reference-scoped adapter cannot pair an invoice with another remittance
+    and preserves the original unscoped result for a comparative diagnostic.
+    No bank payment is manufactured: counterparts remain same-source aggregate
+    declarations. Groups above the explicit bound abstain.
+    """
+    by_invoice: dict[str, list[ReconTxn]] = defaultdict(list)
+    by_payment: dict[str, list[ReconTxn]] = defaultdict(list)
+    for row in invoices:
+        by_invoice[invoice_group[row.id]].append(row)
+    for row in counterpart:
+        by_payment[payment_group[row.id]].append(row)
+    if any(len(x) != 1 for x in by_payment.values()):
+        raise ValueError("ambiguous source-declared grouped counterpart")
+    result_by_rule: Counter = Counter()
+    grouped_matched = 0
+    grouped_unmatched = 0
+    wrong_join = 0
+    groups_matched = 0
+    limit_groups = 0
+    limit_invoices = 0
+    observed_max = max((len(x) for x in by_invoice.values()), default=0)
+    for ref in sorted(set(by_invoice) | set(by_payment)):
+        internal = by_invoice.get(ref, [])
+        settlement = by_payment.get(ref, [])
+        if not internal or not settlement:
+            grouped_unmatched += len(internal)
+            continue
+        if len(internal) > max_group_size:
+            limit_groups += 1
+            limit_invoices += len(internal)
+            grouped_unmatched += len(internal)
+            continue
+        config = ReconConfig(
+            decimals=2, date_window_days=0, amount_tolerance_bps=0,
+            many_to_one=ManyToOneConfig(
+                enabled=True, date_window_days=0, tolerance_bps=0,
+                max_group_size=max_group_size, max_candidates=18, max_nodes=50_000),
+        )
+        replay = reconcile(internal, settlement, config)
+        result_by_rule.update(replay.summary.by_rule)
+        grouped_matched += replay.summary.matched_internal
+        grouped_unmatched += replay.summary.unmatched_internal
+        groups_matched += replay.summary.matched_settlement
+        for match in replay.matches:
+            for aid in match.internal_ids:
+                for bid in match.settlement_ids:
+                    wrong_join += int(invoice_group[aid] != payment_group[bid])
+    report = {
+        "kernel": "recoveryworks.reconciliation_kernel.reconcile",
+        "isolation": "SOURCE_DECLARED_PAYMENT_REFERENCE_CURRENCY_AND_DATE",
+        "max_group_size": max_group_size,
+        "largest_actual_declared_group": observed_max,
+        "original_unique_invoices": len(invoices),
+        "same_source_payment_reference_groups": len(by_payment),
+        "matched_invoices": grouped_matched,
+        "unmatched_invoices": grouped_unmatched,
+        "matched_groups": groups_matched,
+        "unmatched_over_group_bound_invoices": limit_invoices,
+        "groups_over_group_bound": limit_groups,
+        "by_kernel_rule": dict(result_by_rule),
+        "cross_reference_false_joins": wrong_join,
+        "independent_bank_settlements_tested": 0,
+        "independent_payment_accuracy": None,
+    }
+    if grouped_matched + grouped_unmatched != len(invoices):
+        raise ValueError("invoice-count conservation failed")
+    return report
+
 def benchmark_freight() -> dict:
     results: dict = {}
     for issuer, url in DOCUMENTS.items():
@@ -477,6 +556,10 @@ def benchmark_pennine() -> dict:
             for group in payment_declarations.values()
         ),
         "retally_reconciliation_kernel": recon,
+        "retally_source_reference_scoped_kernel_replay": reference_scoped_replay(
+            invoices, counterparts, invoice_group, payment_group, max_group_size=8),
+        "global_kernel_limit_interpretation":
+            "The default unscoped many-to-one first-18-candidate search is not reference-partitioned; unmatched is NOT evidence of unpaid invoices.",
         "row_count_matches_prior_baseline": len(all_rows) == EXPECTED["pennine_disclosed_rows"],
         "unique_count_matches_prior_baseline": len(by_identity) == EXPECTED["pennine_unique_invoices"],
         "independent_bank_clearing_verified": False,
@@ -513,6 +596,7 @@ def blind_freight_assessment(freight: dict) -> dict:
     return {
         "protocol": "freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md",
         "predictions_frozen_before_truth": True,
+        "independent_blind_truth_adjudication_completed": False,
         "prediction_summary": pred,
         "reference_cases": "HISTORICAL_GAO_DECISIONS_REFERENCE_ONLY_WITHOUT_LINKED_INVOICE_RATE_AND_PAYMENT",
         "label_policy": "POSITIVE_OR_NEGATIVE_ONLY_WHEN_FULLY_INDEPENDENT_EVIDENCE_EXISTS",
