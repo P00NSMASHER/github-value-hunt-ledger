@@ -102,6 +102,26 @@ class OciBackupTests(unittest.TestCase):
         with patch.object(self.store, "cli", return_value='{"data":{"etag":"NESTED"}}'):
             self.assertEqual(self.store.head("test")["etag"], "NESTED")
 
+    def test_full_object_inventory_paginated_before_cleanup_or_repeat(self):
+        # OCI defaults object list to 100 entries. Refuse to mistake page 1
+        # for a complete object population when gating deletions and uploads.
+        first = {"data": [{"name": "synthetic-only/a"}]}
+        with patch.object(self.store, "cli", return_value=json.dumps(first)) as call:
+            self.assertEqual(self.store.objects("synthetic-only/"), first["data"])
+        args = call.call_args.args
+        self.assertIn("--all", args)
+        self.assertIn("--prefix", args)
+        self.assertEqual(args[args.index("--prefix") + 1], "synthetic-only/")
+        self.assertNotIn("--limit", args)
+
+    def test_full_object_inventory_rejects_non_json_or_incomplete_structure(self):
+        with patch.object(self.store, "cli", return_value=""):
+            with self.assertRaises(backup.Refused):
+                self.store.objects("synthetic-only/")
+        with patch.object(self.store, "cli", return_value='{"data":{"prefixes":["synthetic-only/"]}}'):
+            with self.assertRaises(backup.Refused):
+                self.store.objects("synthetic-only/")
+
     def test_bucket_privacy_fails_closed(self):
         valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
                  "storage-tier": "Standard", "versioning": "Disabled",
