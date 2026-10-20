@@ -98,7 +98,7 @@ EXPECTED = {
 }
 LIMIT = 35_000_000
 ALLOW_HOSTS = {"ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net", "www.penninecare.nhs.uk", "www.gao.gov", "gao.gov"}
-MONEY_RE = re.compile(r"^-?\d+(?:\.\d{1,2})?$")
+MONEY_RE = re.compile(r"^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$")
 
 
 @dataclass(frozen=True)
@@ -133,12 +133,14 @@ def fetch_public(url: str) -> bytes:
 
 def minor(raw: str) -> int:
     """Normalize a CSV presentation amount, then use RETALLY's exact parser."""
-    value = raw.strip().replace(",", "").replace("£", "").replace("$", "").strip()
+    value = raw.strip()
+    if value.startswith(("£", "$")):
+        value = value[1:].strip()
     if value.startswith("(") and value.endswith(")"):
         value = "-" + value[1:-1]
     if not MONEY_RE.fullmatch(value):
-        raise ValueError("invalid decimal money")
-    return parse_amount_to_minor(value, 2)
+        raise ValueError("invalid decimal money or thousands grouping")
+    return parse_amount_to_minor(value.replace(",", ""), 2)
 
 
 def iso_date(raw: str, *, formats: tuple[str, ...] = ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y")) -> str:
