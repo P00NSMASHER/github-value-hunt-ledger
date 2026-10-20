@@ -58,6 +58,7 @@ class FinancialMovement:
     provenance_type: str
     independently_verified: bool = False
     reverses_movement_id: str | None = None
+    invoice_record_hash: str | None = None
 
     def __post_init__(self) -> None:
         _required(self.movement_id, "movement_id")
@@ -70,6 +71,10 @@ class FinancialMovement:
         except (TypeError, ValueError) as exc:
             raise ValueError("movement date must be YYYY-MM-DD") from exc
         _sha(self.source_sha256, "source_sha256")
+        if self.invoice_record_hash is not None:
+            _sha(self.invoice_record_hash, "invoice_record_hash")
+        if self.independently_verified and self.invoice_record_hash is None:
+            raise ValueError("verified financial movements require an exact invoice hash")
         if self.provenance_type not in PROVENANCE_TYPES:
             raise ValueError("unsupported financial provenance type")
         if type(self.independently_verified) is not bool:
@@ -99,6 +104,7 @@ class FinancialBalance:
     blockers: tuple[str, ...]
     movement_count: int
     receipt_hash: str
+    original_record_hash: str
 
 
 def replay_financial_movements(
@@ -118,10 +124,15 @@ def replay_financial_movements(
         raise ValueError("financial movements must be typed")
     seen: dict[str, FinancialMovement] = {}
     reversed_ids: set[str] = set()
+    unbound_movement = False
     net_cash = net_credit = checked_cash = checked_credit = 0
     for event in events:
         if event.movement_id in seen:
             raise ValueError("duplicate financial movement id")
+        if event.invoice_record_hash is None:
+            unbound_movement = True
+        elif event.invoice_record_hash != record.record_hash:
+            raise ValueError("financial movement belongs to a different invoice hash")
         if event.source_sha256 in {s.sha256 for s in record.sources} and event.independently_verified:
             raise ValueError("original invoice cannot independently prove cash settlement")
         sign = 1
@@ -158,6 +169,8 @@ def replay_financial_movements(
     blockers = set()
     if any(not e.independently_verified for e in events):
         blockers.add("SETTLEMENT_EVIDENCE_NOT_ALL_INDEPENDENT")
+    if unbound_movement:
+        blockers.add("FINANCIAL_MOVEMENT_NOT_BOUND_TO_ORIGINAL_INVOICE")
     if outstanding < 0:
         blockers.add("NEGATIVE_BALANCE_REQUIRES_INDEPENDENT_REVIEW")
     status = "REVIEW_REQUIRED" if blockers else "BALANCE_RECONCILED"
@@ -181,6 +194,7 @@ def replay_financial_movements(
         remaining_balance_cents=outstanding,
         status=status, blockers=tuple(sorted(blockers)),
         movement_count=len(events), receipt_hash=canonical_hash(body),
+        original_record_hash=record.record_hash,
     )
 
 
@@ -205,7 +219,9 @@ def financial_claim_gate(
 ) -> FinancialClaimGate:
     """Fail closed: rating is not adjudication; same-source payment is not cash."""
     verify_record(record)
-    if record.record_hash != rating.record_hash or record.invoice_id != balance.invoice_id:
+    if (record.record_hash != rating.record_hash
+            or record.invoice_id != balance.invoice_id
+            or record.record_hash != balance.original_record_hash):
         raise ValueError("rating and balance must refer to this exact original invoice")
     _sha(balance.receipt_hash, "balance receipt_hash")
     if type(human_release_approved) is not bool:
@@ -229,12 +245,15 @@ def financial_claim_gate(
         blockers.add("NO_POSITIVE_RATE_DISCREPANCY")
     if balance.verified_net_cash_cents <= 0:
         blockers.add("NO_INDEPENDENT_BANK_CLEARED_PAYMENT")
-    # Even if the evidentiary gates are clear, invoice-to-payment only proves
-    # paid exposure; a separately observed carrier refund must establish cash
-    # actually recovered. Never infer realized recovery from rated variance.
-    validated = candidate if not blockers and candidate is not None else 0
+    # Signed original invoices, bank receipts and role names are not by
+    # themselves an externally adjudicated buyer pilot. Real-world financial
+    # validation occurs in the separate governed freight.audit_acceptance gate
+    # with independently verified evidence and approval. This primitive
+    # deliberately cannot mint validated or realized customer dollars.
+    blockers.add("GOVERNED_BUYER_AUDIT_ACCEPTANCE_NOT_COMPLETED")
+    validated = 0
     realized = 0
-    status = "VALIDATED_OPPORTUNITY" if validated else "REVIEW_REQUIRED"
+    status = "REVIEW_REQUIRED"
     body = {
         "schema": 1, "record_hash": record.record_hash,
         "rating_hash": rating.rating_hash, "balance_hash": balance.receipt_hash,
