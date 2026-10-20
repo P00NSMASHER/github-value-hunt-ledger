@@ -82,6 +82,14 @@ Actions artifacts, or public step summaries.
     is a historical precedent test, not an independent linked label or a
     RETALLY recovery.
 
+11. Reconcile original GlobalTranz **freight, fuel and discount** line amounts
+    against each face total. The production canonical `ChargeLine` prohibits
+    negative discounts: 93/100 original invoices need separately modeled signed
+    adjustments. The laboratory uses only the actual reconciliation kernel's
+    signed-money parser for those discounts, and records schema incompatibility
+    rather than implying production acceptance. See
+    https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/509.
+
 ## Run locally or in the read-only PR workflow
 
 Use Python 3.11 and install pymupdf==1.26.5 in an isolated environment.
@@ -92,6 +100,10 @@ Use Python 3.11 and install pymupdf==1.26.5 in an isolated environment.
 Output is aggregate metric metadata only. No raw invoice or buyer bytes are
 persisted after the process ends. The Actions job is read-only, uses no secret,
 does not upload artifacts, and cannot merge or deploy.
+
+**Do not** promote the research-only signed-discount fallback to production
+without an independently reviewed, bounded signed-credit/discount model.
+Keep a freight-specific proof hold even when invoice arithmetic reconciles.
 
 **Do not** put source PDFs/CSVs into the public repository. A production-ready
 PDF extraction service, independent customer tariff/rates, payment/bank evidence,
