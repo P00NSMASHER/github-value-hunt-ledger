@@ -270,6 +270,11 @@ def build_recovery_claim_batch(
 def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
     if not isinstance(batch, RecoveryClaimBatch):
         raise ValueError("batch must be a RecoveryClaimBatch")
+    if any(
+        not isinstance(value, str) or not value.strip()
+        for value in (batch.buyer_id, batch.business_unit)
+    ):
+        raise ValueError("recovery claim scope identifiers must be non-empty strings")
     if type(batch.claim_count) is not int or batch.claim_count < 0:
         raise ValueError("recovery claim claim count must be a non-negative integer")
     if (
