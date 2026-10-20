@@ -490,3 +490,25 @@ def test_self_hashed_claim_batch_rejects_non_boolean_fee_flags():
 
     with pytest.raises(ValueError, match="fee-disqualification flags must be boolean"):
         verify_recovery_claim_batch(forged)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (("buyer_id", ""), ("business_unit", "   ")),
+)
+def test_self_hashed_claim_batch_rejects_blank_scope_identity(field, value):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, **{field: value}, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="scope identifiers must be non-empty"):
+        verify_recovery_claim_batch(forged)
