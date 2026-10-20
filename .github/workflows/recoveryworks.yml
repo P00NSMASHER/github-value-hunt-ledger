@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - "recoveryworks/**"
+      - "deployment/oracle-always-free/**"
       - ".github/workflows/recoveryworks.yml"
   pull_request:
     paths:
       - "recoveryworks/**"
+      - "deployment/oracle-always-free/**"
       - ".github/workflows/recoveryworks.yml"
 
 permissions:
@@ -67,8 +69,8 @@ jobs:
           python-version: "3.11"
       - name: Install optional encrypted-backup verifier
         run: python -m pip install --disable-pip-version-check "cryptography==45.0.7"
-      - name: Windows encrypted-backup and role-key acceptance
-        run: python -m unittest recoveryworks.test_offsite_archive recoveryworks.test_workbench_credentials -v
+      - name: Windows encrypted-backup, private ACL and role-key acceptance
+        run: python -m unittest recoveryworks.test_offsite_archive recoveryworks.test_workbench_credentials recoveryworks.test_private_io_windows_acl -v
 
   oracle-staging-template:
     runs-on: ubuntu-latest
@@ -79,12 +81,16 @@ jobs:
         run: |
           bash -n deployment/oracle-always-free/install-staging.sh
           bash -n deployment/oracle-always-free/check-staging.sh
+          python -m unittest discover -s deployment/oracle-always-free -p 'test_*.py' -v
           python - <<'PY'
           from pathlib import Path
           root = Path('deployment/oracle-always-free')
           unit = (root/'retally-synthetic.service').read_text()
           installer = (root/'install-staging.sh').read_text()
           tunnel = (root/'cloudflared-config.yml.example').read_text()
+          workflow = Path('.github/workflows/recoveryworks.yml').read_text()
+          assert workflow.count('"deployment/oracle-always-free/**"') == 2
+          assert 'recoveryworks.test_private_io_windows_acl -v' in workflow
           assert '--workspace /var/lib/retally/synthetic-preview' in unit
           assert '--external-origin https://workbench.retallyrecovery.com' in unit
           assert '--port 18765' in unit
