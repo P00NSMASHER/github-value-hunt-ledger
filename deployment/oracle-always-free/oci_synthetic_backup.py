@@ -31,6 +31,7 @@ BUCKET_RECEIPT = RECEIPT_ROOT / "sealed-backup-bucket-receipt.json"
 ATTEMPT = RECEIPT_ROOT / "synthetic-backup-upload-attempt.json"
 ACCEPTANCE = RECEIPT_ROOT / "synthetic-backup-acceptance.json"
 LEGACY_CLEANUP = RECEIPT_ROOT / "legacy-synthetic-canary-cleanup.json"
+LEGACY_DELETE_ATTEMPT = RECEIPT_ROOT / "legacy-synthetic-canary-delete-attempt.json"
 LEGACY_QUARANTINE = RECEIPT_ROOT / "legacy-orphan-quarantine.json"
 BUCKET_NAME = "retally-synthetic-sealed-recovery"
 LEGACY_MAGIC = b"RETALLY-GCM-CANARY-1"
@@ -269,8 +270,9 @@ def cleanup_legacy(store: OciStore, *, expected_object_name: str,
     Never perform a bulk delete; require specific key syntax, verified canary
     magic + bounded length, ETag-conditional delete, and new empty inventory.
     """
-    ensure(not LEGACY_CLEANUP.exists() and not LEGACY_CLEANUP.is_symlink(),
-           "Legacy cleanup already recorded; refuse repeat.")
+    ensure(not LEGACY_CLEANUP.exists() and not LEGACY_CLEANUP.is_symlink() and
+           not LEGACY_DELETE_ATTEMPT.exists() and not LEGACY_DELETE_ATTEMPT.is_symlink(),
+           "Legacy cleanup or uncertain delete attempt already recorded; refuse repeat.")
     # The current object name/magic cannot independently establish the
     # ORIGINAL uploaded ciphertext identity. Require a separately frozen
     # approved exact name and SHA-256 before any provider deletion.
@@ -305,6 +307,15 @@ def cleanup_legacy(store: OciStore, *, expected_object_name: str,
                "Remote object cannot be proven to be the prior small synthetic canary.")
     ensure(sha(raw) == expected_sha256,
            "Remote ciphertext SHA-256 differs from the previously approved original.")
+    # Persist exact deletion intent BEFORE the provider request: a connection
+    # timeout can mean the conditional DELETE succeeded remotely. Never retry
+    # an uncertain deletion or replace its immutable evidence automatically.
+    private_receipt(LEGACY_DELETE_ATTEMPT, {
+        "schema": 1, "synthetic_only": True, "object_name": name,
+        "original_ciphertext_sha256": expected_sha256, "frozen_etag": h["etag"],
+        "status": "DELETE_OUTCOME_UNCERTAIN_UNTIL_REMOTE_RECONCILIATION",
+        "production_backup_verified": False,
+    })
     store.delete_version(name, h["etag"])
     ensure(not store.objects("synthetic-only/"),
            "Legacy canary deletion was not confirmed by independent listing.")
