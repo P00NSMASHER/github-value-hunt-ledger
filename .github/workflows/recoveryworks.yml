@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - "recoveryworks/**"
+      - "deployment/oracle-always-free/**"
       - ".github/workflows/recoveryworks.yml"
   pull_request:
     paths:
       - "recoveryworks/**"
+      - "deployment/oracle-always-free/**"
       - ".github/workflows/recoveryworks.yml"
 
 permissions:
@@ -80,3 +82,38 @@ jobs:
         run: python -m pip install --disable-pip-version-check "cryptography==45.0.7"
       - name: Windows encrypted-backup, private ACL and role-key acceptance
         run: python -m unittest recoveryworks.test_offsite_archive recoveryworks.test_workbench_credentials recoveryworks.test_private_io_windows_acl -v
+
+  oracle-staging-template:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Validate free-VM deployment scripts, isolation and release holds
+        run: |
+          bash -n deployment/oracle-always-free/install-staging.sh
+          bash -n deployment/oracle-always-free/check-staging.sh
+          python -m unittest discover -s deployment/oracle-always-free -p 'test_*.py' -v
+          python - <<'PY'
+          from pathlib import Path
+          root = Path('deployment/oracle-always-free')
+          unit = (root/'retally-synthetic.service').read_text()
+          installer = (root/'install-staging.sh').read_text()
+          tunnel = (root/'cloudflared-config.yml.example').read_text()
+          workflow = Path('.github/workflows/recoveryworks.yml').read_text()
+          trigger_config = workflow.split('permissions:', 1)[0]
+          assert trigger_config.count('"deployment/oracle-always-free/**"') == 2
+          assert 'recoveryworks.test_private_io_windows_acl -v' in workflow
+          assert '  private-acl-windows:' in workflow
+          assert '--workspace /var/lib/retally/synthetic-preview' in unit
+          assert '--external-origin https://workbench.retallyrecovery.com' in unit
+          assert '--port 18765' in unit
+          assert 'User=retally' in unit and 'ProtectSystem=strict' in unit
+          assert "('127.0.0.1', port)" in Path('recoveryworks/workbench_server.py').read_text()
+          assert 'sudo systemctl start ' not in installer
+          assert 'sudo systemctl enable ' not in installer
+          assert 'REPLACE_WITH_APPROVED_TUNNEL_UUID' in tunnel
+          assert 'required: true' in tunnel and 'http_status:404' in tunnel
+          assert 'f282332ddcc68e93a7a5071881301b090acbf5df75e8177c11b8ee51bd9222f0' in tunnel
+          assert not any(p.name in {'credentials.json', '.env', 'private-key.pem'} for p in root.rglob('*'))
+          print('PASS: staging scripts parse; source stays loopback; access and release holds preserved.')
+          PY

@@ -4,9 +4,12 @@ import argparse
 import csv
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
+import ipaddress
 import json
+import re
 import threading
 from pathlib import Path
+from urllib.parse import urlsplit
 from .workbench import Workspace, MAX_UPLOAD
 
 ASSETS = Path(__file__).with_name('workbench_ui')
@@ -44,7 +47,33 @@ class BoundedHTTPServer(ThreadingHTTPServer):
             self.slots.release()
 
 
-def make_server(workspace, port=0):
+def validated_external_origin(value):
+    """Permit one exact HTTPS DNS origin; the listening socket remains loopback."""
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError('external origin must be an HTTPS URL')
+    parsed = urlsplit(value)
+    hostname = parsed.hostname
+    if (parsed.scheme != 'https' or not hostname or parsed.netloc != hostname
+            or value != 'https://' + hostname
+            or parsed.username or parsed.password or parsed.path or parsed.query
+            or parsed.fragment
+            or not re.fullmatch(r'[a-z0-9-]+(?:\.[a-z0-9-]+)+', hostname)
+            or any(part.startswith('-') or part.endswith('-') or len(part) > 63
+                   for part in hostname.split('.'))):
+        raise ValueError('external origin must be an exact HTTPS DNS hostname without port or path')
+    try:
+        ipaddress.ip_address(hostname)
+    except ValueError:
+        pass
+    else:
+        raise ValueError('external origin must be a DNS hostname, not an IP address')
+    return value
+
+
+def make_server(workspace, port=0, *, external_origin=None):
+    external_origin = validated_external_origin(external_origin)
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -66,11 +95,16 @@ def make_server(workspace, port=0):
                 if len(self.headers.get_all(header, [])) > 1:
                     raise PermissionError('ambiguous request headers')
             host = self.headers.get('Host', '')
-            allowed = {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}
-            if host not in allowed:
-                raise PermissionError('invalid loopback host')
+            local_hosts = {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}
+            allowed_hosts = set(local_hosts)
+            allowed_origins = {'http://' + value for value in local_hosts}
+            if external_origin:
+                allowed_hosts.add(urlsplit(external_origin).hostname)
+                allowed_origins.add(external_origin)
+            if host not in allowed_hosts:
+                raise PermissionError('invalid approved workbench host')
             origin = self.headers.get('Origin')
-            if origin and origin not in {'http://' + value for value in allowed}:
+            if origin and origin not in allowed_origins:
                 raise PermissionError('cross-origin request rejected')
 
         def token(self):
@@ -162,8 +196,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', required=True)
     parser.add_argument('--port', type=int, default=8765)
+    parser.add_argument('--external-origin', default=None,
+                        help='Exact Cloudflare Access-protected HTTPS origin; socket stays on loopback')
     args = parser.parse_args(argv)
-    server = make_server(Workspace(args.workspace), args.port)
+    server = make_server(Workspace(args.workspace), args.port, external_origin=args.external_origin)
     print(f'Open http://127.0.0.1:{server.server_port}; credentials remain in the private workspace.')
     try:
         server.serve_forever()
