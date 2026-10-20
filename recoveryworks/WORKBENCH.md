@@ -76,7 +76,7 @@ handling as original evidence.
 3. **Customer and reviewer:** authorize and independently review the exact account/period scope, source population and exclusions. **Operator:** set evidence-supported scope dates and utility identity, then scan complete source sets. No arbitrary paths or verification flags are accepted through the HTTP API.
 4. **Reviewer and independent reviewer:** examine cases separately. Each role has a different bearer credential. The customer cannot approve evidence or run scans.
 5. **Customer:** authorize the reviewed case. Simulation can exercise the full flow directly. In live mode, authorization requires a separately reviewed frozen case bundle and customer authorization document; the document actor must match the signed-in customer.
-6. **Operator:** record an externally submitted claim only from reviewed action-envelope and exact artifact evidence; post partial receipts and linked reversals only from reviewed cash-event documents; track net cash, fees and remaining potential. Historical receipts and reversals stay in the hash-chained journal.
+6. **Operator:** record an externally submitted claim only from reviewed action-envelope and exact artifact evidence. In the **synthetic workspace only**, test partial receipts and linked reversals in the journal. In live mode, reviewed cash-event documents can be retained as proposed evidence but the cash-posting endpoint refuses to create a recovered-cash balance until separately authenticated bank/carrier settlement verification and governed buyer acceptance exist. No live cash or external actions are sent by the service.
 7. **Operator:** back up the complete workspace and restore it into a separate temporary location. Source originals, normalized evidence, intake records, role-token hashes and ledger are verified. Plaintext keys are excluded from backups. Restore disables every saved credential so an older backup cannot resurrect a revoked key. Issue fresh keys locally after restore.
 
 ## Live proof documents
@@ -86,14 +86,14 @@ The case drawer accepts four JSON document kinds, each bound to a specific case:
 - `case_bundle`: existing `case_bundle_to_payload` format, uploaded by a reviewer and verified by a distinct reviewer.
 - `authorization`: existing `authorization_to_payload` format, uploaded by the customer and reviewed separately.
 - `external_action`: object containing `envelope` (`external_action_to_payload`), exact `artifact_text`, `submitted_at`, and `submission_reference`. The operator records an already-submitted action. The app checks artifact bytes, amounts, case/authorization hashes, actor, dates and expiry. It sends nothing.
-- `cash_event`: the `CashEvent` field shape. An operator uploads it and a distinct reviewer verifies the current document hash. The server derives verified status from that reviewed document, not from the uploaded `verified` flag.
+- `cash_event`: the `CashEvent` field shape. The operator may upload it and a distinct reviewer can check its hash. **A hash match or separate local role key does not authenticate a bank/carrier issuer.** For live workspaces the endpoint fails with `INDEPENDENT_CASH_SETTLEMENT_VERIFIER_NOT_IMPLEMENTED`, **regardless of the uploaded `verified` flag**, and keeps recovered cash at zero. Only synthetic workspaces can currently post receipts for regression testing.
 
 Select reviewed documents in the case drawer before live actions. An unreviewed, stale, wrong-case or wrong-kind document fails closed. Seven-figure dossier requirements remain in the existing specialized workflow; the workbench does not bypass them. Document review records do not cryptographically authenticate a bank or counterparty; the reviewer must inspect genuine source evidence.
 
 ## Financial lifecycle
 
 - Dashboard amounts carry their case currency; metrics are grouped by currency with no inferred exchange rates.
-- `CashEvent` records incremental signed amounts and fee deltas. Replaying the same event is idempotent; changing an existing event ID is rejected.
+- In **synthetic testing**, `CashEvent` records incremental signed amounts and fee deltas. Replaying the same event is idempotent; changing an existing event ID is rejected. The underlying ledger is a calculation primitive, not an external bank issuer verifier. Live API cash posting remains held until an authenticated settlement-evidence integration is independently accepted.
 - Receipts cannot exceed the case's supported recovery. Negative postings require the original positive receipt in the same case and cannot over-reverse its money or fee.
 - Existing legacy `mark_recovered` receipts can be reversed with the new API without rewriting historical journal hashes.
 - A full reversal leaves a historical RECOVERED lifecycle record with zero **net** received; the dashboard displays remaining potential separately. RECOVERED does not mean fully collected.
