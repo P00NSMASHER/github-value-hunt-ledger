@@ -40,7 +40,7 @@ python3 deployment/oracle-always-free/oci_synthetic_backup.py --exercise
 
 For any failed/partial command, **stop**. Inspect OCI audit, the bucket object inventory and the owner-only receipt before continuing; never delete arbitrary bucket objects, erase retry/attempt markers or repeat `--exercise` blindly. If the synthetic test fails *before* remote deletion, the object may already exist. Leave the partial receipt intact until a separately reviewed reconciliation.
 
-The cleanup command only applies to the exact unneeded small October 20 synthetic canary. It does not generalize to real records, evidence or arbitrary `.rtbk` archives. Never run bulk delete. Source content for the observed canary is already irrecoverable because the one-time synthetic key was not saved.
+The cleanup command only applies to the exact unneeded small October 20 synthetic canary. Before downloading, it verifies the remote HEAD content-length and freezes the original ETag; the download uses OCI `--if-match` to prevent a concurrent substitution with a larger or different object. The same bound-and-ETag check applies to the real-engine synthetic recovery exercise. It does not generalize to real records, evidence or arbitrary `.rtbk` archives. Never run bulk delete. Source content for the observed canary is already irrecoverable because the one-time synthetic key was not saved.
 
 ## Acceptance criteria and release status
 
