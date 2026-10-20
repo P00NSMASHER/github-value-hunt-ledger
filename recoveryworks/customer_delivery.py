@@ -61,9 +61,14 @@ def build_delivery(state):
               'potential_cents', 'recovered_cents', 'fee_cents', 'remaining_cents', 'hold', 'record_hash')
     output = io.StringIO(newline='')
     writer = csv.writer(output, lineterminator='\n')
-    writer.writerow(('simulation', *fields))
+    # Keep the original CSV columns in order for compatibility; append the
+    # explicit unverified status so spreadsheet-only consumers do not mistake
+    # posted "recovered_cents" for independently authenticated bank receipts.
+    writer.writerow(('simulation', *fields, 'external_cash_verification_status'))
     for record in cases:
-        writer.writerow([str(state['simulation']).lower(), *(csv_cell(record[key] if record[key] is not None else '') for key in fields)])
+        writer.writerow([str(state['simulation']).lower(),
+                         *(csv_cell(record[key] if record[key] is not None else '') for key in fields),
+                         payload['external_cash_verification_status']])
     escape = lambda value: html.escape(str(value), quote=True)
     rows = ''.join('<tr>' + ''.join('<td>' + escape(record[key] if record[key] is not None else '') + '</td>' for key in fields) + '</tr>' for record in cases)
     summary = ''.join('<li>' + escape(currency) + ': potential ' + str(value['potential_cents']) +
