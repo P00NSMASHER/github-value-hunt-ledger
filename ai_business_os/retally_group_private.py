@@ -131,6 +131,7 @@ def build_private_group_observation(
 
 Freshness means query observation age, not the age or completeness of all
 business activity. Unknown/unmapped businesses are counted without disclosure.
+Catalog source provenance is separate from exact business-table matching.
 """
     _require(type(max_age_seconds) is int and max_age_seconds > 0,
              "maximum observation age must be a positive integer")
@@ -166,14 +167,22 @@ business activity. Unknown/unmapped businesses are counted without disclosure.
             "catalog_id": entry["id"], "division_id": entry["division_id"],
             "binding_status": status, "binding_approved": False,
             "candidate_businesses": rows,
+            "catalog_source_provenance": {
+                "evidence_status": entry["evidence_status"],
+                "repository_sources": copy.deepcopy(entry["sources"]),
+                "private_artifact_refs": copy.deepcopy(entry.get("private_source_refs", [])),
+            },
         })
     serialized = json.dumps(source, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     age = (current - observed).total_seconds()
     return {
         "mode": "PRIVATE_READ_ONLY_SOURCE_OBSERVATION",
         "source_schema": "ai_business_os_prod",
+        "identity_namespace": "ai_business_os_prod.businesses",
+        "identity_match_basis": "EXACT_CANDIDATE_PRODUCTION_SLUG",
         "schema_fingerprint": source["schema_fingerprint"],
         "catalog_sha256": public_view["catalog_sha256"],
+        "catalog_as_of": data["as_of"],
         "source_snapshot_sha256": hashlib.sha256(serialized.encode("utf-8")).hexdigest(),
         "observed_at": source["observed_at"],
         "evaluated_at": current.isoformat(),

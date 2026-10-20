@@ -16,9 +16,13 @@ experiment. The full eleven-entry catalog now has nine repository-documented
 entries and two private-artifact-documented entries; no entry remains
 `CONTEXT_ONLY`. These are source classifications, not launch or readiness states.
 
-ScopeSignal retains an owned research source and a conflicting coverage
-association. Source recovery does not supply a private business identity,
-establish a paid offer, or create customer or financial evidence.
+ScopeSignal retains its owned research source. A reviewed correction in
+[Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732)
+removes the mistaken CaptureBrief association from the candidate coverage record
+and leaves ScopeSignal's project identity explicitly unresolved. The correction
+is unmerged; the inspected main revision retains the original association.
+Source recovery does not supply a private business identity, establish a paid
+offer, or create customer or financial evidence.
 
 The private read-only reconciliation check at `2026-10-20T14:49:26Z` found no
 additional matching operational candidates for these nine entries in the
@@ -41,7 +45,7 @@ legal ownership, customer identity or operational authority.
 | `app-factory-products` | Original recipe and implementation sources in `x402-product-factory` at candidate `fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88`; [A1]–[A4] and the [edition source map](RETALLY_APP_FACTORY_SOURCE_MAP.md). | Implementation source recovered; three engines and nine default editions. Candidate is draft and unmerged. | Review retained-edition acceptance and release evidence. Keep the shared factory, application editions, x402 APIs and subordinate hypotheses distinct. |
 | `x402-services` | Product family `P00NSMASHER/x402-product-factory`; product records in [X1], canonical route map in [X2]. | Source bound; product records and deployed route identities require separate reconciliation. | Map each retained product to its canonical route and seller. Preserve staging and legacy-shadow distinctions and verify actual availability separately. |
 | `rehabsignal` | Original private territory-brief offer, handoff and execution pack; public-safe reference [D1]. | Offer and operating-document sources recovered; historical research-service venture. | Revalidate current owner, scoped delivery economics and demand before activation. A reviewed offer does not establish software deployment or a paying customer. |
-| `scopesignal` | Owned research lane in [L2]. Coverage record [P2] associates ScopeSignal with `PRJ-004`, but [P1] defines `PRJ-004` as CaptureBrief. | Conflicting source association. | Resolve the association against both exact source versions before any binding. Identify an owned implementation separately from third-party research references. |
+| `scopesignal` | Owned research lane in [L2] and historical concept in [H2]. Original coverage [P2] incorrectly associates it with CaptureBrief's `PRJ-004`; proposed correction [P6] retains a null project ID. | Correction reviewed and submitted in unmerged PR #732; canonical identity remains unassigned. | Complete the upstream review/integration process. Require separate identity evidence before binding, and distinguish owned implementation from third-party research references. |
 | `contractor-quote-recovery` | Original private business-launch audit; public-safe reference [D2]. | Historical outreach experiment source recovered. The audit did not establish a paid offer or dedicated verified fulfillment system. | Establish the buyer, bounded offer and repeatable delivery process. Keep it separate from ScopeSignal and App Factory quote-to-order tools. |
 | `resonance` | Venture/product repository `P00NSMASHER/resonance-qloo`, supported by [R1]. | Source bound; no corresponding declared project found in the inspected [P1] registry. | Reconcile the repository to an authorized product or initiative identity. Keep demonstration evidence separate from measured participant benefit and commercial results. |
 | `market-surveillance` | Research project `PRJ-007`, slug `market-surveillance-research`, repository `P00NSMASHER/trading-platform` in [P1] and [M1]. | Source bound; research identity is distinct from a business identity. | Compare the project slug only in the project/initiative namespace. Preserve historical research scope and the absence of execution authority. |
@@ -49,6 +53,16 @@ legal ownership, customer identity or operational authority.
 No project slug was added to `candidate_production_slugs`, whose current matching
 path reads the business table. A project, product or repository match must not
 silently convert a `NO_SOURCE_MATCH` business observation into a verified link.
+
+The identity outputs now declare their business-table namespace and exact-slug
+match basis explicitly. Private observation rows report catalog source provenance
+beside the unchanged business binding status. `NO_SOURCE_MATCH` therefore means
+no matching observed business row; it does not mean that the catalog entry lacks
+repository or private-artifact documentation. Catalog and query dates are kept
+separate. A further minimal identity-only read at `2026-10-20T17:59:55Z` found no
+additional exact product-slug, initiative-key or documented owner-repository
+matches for these nine entries. This did not query customer or financial payloads
+and does not establish absence outside those exact namespaces and keys.
 
 ## Specific conflicts and scope boundaries
 
@@ -62,13 +76,32 @@ business, customer register or delivery authority.
 
 The owned ScopeSignal lane [L2] is a research collection. A third-party project
 with the same name is cited there as a reference; it is not an owned product
-binding. Retain the source conflict until an accountable owner resolves it.
+binding. Neither shared repository provenance nor a similar name supplies a
+canonical project identity.
 
 The recovered September 25 identity registry [H1] also assigns `PRJ-004` to
 CaptureBrief. Its companion inventory [H2] lists ScopeSignal / Construction
 Change Leakage Recovery separately as a commercial opportunity and names an
 `EXP-005` authority-to-paid benchmark. This corroborates the distinction; it
 does not establish a replacement project ID or permit a private identity merge.
+
+The proposed correction [P6] in
+[Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732)
+retains ScopeSignal as a `COMMERCIAL_CONCEPT`, sets `canonical_project_id` to
+`null`, and declares `PROJECT_IDENTITY_UNRESOLVED`. Its two source references
+point to [L2] and [H2]. The accompanying validator [P7] accepts this explicit
+unresolved state only with a null ID and unique, immutable owner-repository
+file references. Bound rows retain their existing project-reference contract;
+unrecognized states and extra authority fields are rejected. The correction
+creates no project, autonomy profile, business binding or execution permission.
+
+The candidate passed 34 registry tests and independent automated review before
+submission. Its twelve registered projects and twelve autonomy profiles remain
+unchanged. This is technical review evidence, not human release approval. As of
+the October 20 source snapshot, the PR is open and unmerged, so [P2] remains the
+inspected main record. The next identity decision must establish ScopeSignal
+separately; it must not reuse CaptureBrief's `PRJ-004` or Hunter's `PRJ-008` merely
+to fill the gap.
 
 The inspected Portfolio Brain registry also retains historical classifications:
 RecoveryOS appears as a RecoveryWorks alias, and StarBlox is marked active.
@@ -162,8 +195,9 @@ estimating code were not substituted for Contractor Quote Recovery's experiment.
    initiative and repository namespaces. Require exact candidate matching,
    explicit relationship provenance and conflict/duplicate handling; a repository
    match must never authorize a business or customer merge.
-3. Preserve the recovered original sources and keep ScopeSignal's conflicting
-   association out of approved identity bindings. Establish a current owner and
+3. Preserve the recovered original sources and track ScopeSignal's proposed
+   correction [P6] through the existing integration process. Keep its canonical
+   identity unassigned until separately evidenced. Establish a current owner and
    source-specific operating evidence before any private binding. In particular,
    Contractor Quote Recovery still needs an offer/fulfillment definition, and
    App Factory's candidate source does not supply release approval.
@@ -190,6 +224,8 @@ commercial success.
 | P3 | [PermitPlate NYC product definition](https://github.com/P00NSMASHER/permitplate-nyc/blob/7be09a82249ab1ef6b6a9de7402690dbefd47f5e/README.md) | `b15f7c60defa7b39dcf68311e2d5282b85e70a0e` |
 | P4 | [Portfolio Brain active implementation and scope](https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/README.md) | `a6ba8bf831806879b6a2cc86076b94979bba2bb9` |
 | P5 | [PA Permit Pack order runbook](https://github.com/P00NSMASHER/permitplate-nyc/blob/7be09a82249ab1ef6b6a9de7402690dbefd47f5e/operations/PA_PERMIT_PACK_ORDER_RUNBOOK.md) | `275ae616ee15c1abe1b3d6095253d89ceede5af3` |
+| P6 | [Proposed ScopeSignal coverage correction, unmerged PR #732](https://github.com/P00NSMASHER/portfolio-brain/blob/27150fe15a6f748bd461e20dec325d32a6864142/registry/PORTFOLIO_COVERAGE.json) | `49886d0a96177c9eb40b164c64e4d8b9187582f4` |
+| P7 | [Candidate coverage validator](https://github.com/P00NSMASHER/portfolio-brain/blob/27150fe15a6f748bd461e20dec325d32a6864142/registry/validate_registry.py) | `bd0a4ec9251a9d5ddbf26cafb8520fa376fb864d` |
 | L1 | [SheetHarbor product repository seed](https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/handoffs/sheetharbor/product_repo_seed/README.md) | `3bcdb21d947a5c86d4926559205c939335e6f444` |
 | L2 | [ScopeSignal research lane](https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/lanes/04-construction-scopesignal.md) | `5f897f7e9e5a45c35f2094beefc3e536efc36912` |
 | L3 | [Software Factory infrastructure contract](https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/ai_business_os/SOFTWARE_FACTORY_CONTRACT.md) | `b71a6c7b6efd907e900bbbe80e6c250939be24bf` |

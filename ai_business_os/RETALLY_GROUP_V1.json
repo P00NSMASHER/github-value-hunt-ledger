@@ -237,9 +237,9 @@
       "division_id": "ventures",
       "kind": "venture",
       "purpose": "Construction scope and change-order evidence product thesis.",
-      "stage": "Research lane; source identity conflict",
+      "stage": "Research lane; unbound identity correction proposed",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Resolve the Portfolio Brain coverage conflict that associates ScopeSignal with CaptureBrief PRJ-004 before linking; separate owned implementation from third-party reference software.",
+      "next_action": "Review Portfolio Brain PR #732, which removes the mistaken CaptureBrief PRJ-004 association; keep ScopeSignal unbound until a separate canonical identity is evidenced, and distinguish owned implementation from third-party research references.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -249,7 +249,7 @@
           "git_blob_sha": "5f897f7e9e5a45c35f2094beefc3e536efc36912"
         },
         {
-          "label": "Coverage association to reconcile",
+          "label": "Historical conflicting coverage association",
           "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/PORTFOLIO_COVERAGE.json",
           "observed_on": "2026-10-20",
           "git_blob_sha": "ba03a9709d799b4d2cc9f3feaa3c599d46290deb"
@@ -259,6 +259,12 @@
           "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
           "observed_on": "2026-10-20",
           "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
+        },
+        {
+          "label": "Proposed unbound coverage correction (unmerged PR #732)",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/27150fe15a6f748bd461e20dec325d32a6864142/registry/PORTFOLIO_COVERAGE.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "49886d0a96177c9eb40b164c64e4d8b9187582f4"
         }
       ],
       "candidate_production_slugs": [

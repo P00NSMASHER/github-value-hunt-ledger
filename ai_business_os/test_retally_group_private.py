@@ -212,6 +212,72 @@ class PrivateGroupObservationTests(unittest.TestCase):
         self.assertEqual(0, empty_view["observed_business_records"])
         self.assertIsNone(empty_view["verified_metrics"]["paying_customers"])
 
+    def test_business_match_scope_preserves_missing_matches_despite_documented_sources(self):
+        catalog = load_catalog()
+        view = observe(catalog=catalog)
+        self.assertEqual("ai_business_os_prod.businesses", view["identity_namespace"])
+        self.assertEqual("EXACT_CANDIDATE_PRODUCTION_SLUG", view["identity_match_basis"])
+        self.assertEqual(catalog["as_of"], view["catalog_as_of"])
+        self.assertEqual(2, view["matched_catalog_entries"])
+        self.assertEqual(9, view["unmatched_catalog_entries"])
+        entries = {entry["catalog_id"]: entry for entry in view["entries"]}
+        self.assertEqual("MULTIPLE_SOURCE_RECORDS", entries["retally-recovery"]["binding_status"])
+        self.assertEqual("REVIEW_REQUIRED", entries["capturebrief"]["binding_status"])
+        for entry_id in ("permitplate", "app-factory-products", "rehabsignal"):
+            with self.subTest(entry_id=entry_id):
+                self.assertEqual("NO_SOURCE_MATCH", entries[entry_id]["binding_status"])
+                self.assertEqual([], entries[entry_id]["candidate_businesses"])
+                self.assertNotEqual("CONTEXT_ONLY",
+                                    entries[entry_id]["catalog_source_provenance"]["evidence_status"])
+
+    def test_catalog_provenance_projects_validated_evidence_without_operating_authority(self):
+        catalog = load_catalog()
+        view = observe(catalog=catalog)
+        entries = {entry["catalog_id"]: entry for entry in view["entries"]}
+        for entry_id in ("permitplate", "rehabsignal"):
+            source_entry = next(entry for entry in catalog["entries"] if entry["id"] == entry_id)
+            with self.subTest(entry_id=entry_id):
+                self.assertEqual({
+                    "evidence_status": source_entry["evidence_status"],
+                    "repository_sources": source_entry["sources"],
+                    "private_artifact_refs": source_entry.get("private_source_refs", []),
+                }, entries[entry_id]["catalog_source_provenance"])
+                self.assertFalse(entries[entry_id]["binding_approved"])
+        artifact = entries["rehabsignal"]["catalog_source_provenance"]["private_artifact_refs"][0]
+        self.assertLess(artifact["source_as_of"], artifact["reviewed_on"])
+        self.assertTrue(all(value is None for value in view["verified_metrics"].values()))
+        self.assertTrue(all(value is False for value in view["authority"].values()))
+        for entry_id, field in (("permitplate", "sources"), ("rehabsignal", "private_source_refs")):
+            invalid = copy.deepcopy(catalog)
+            entry = next(row for row in invalid["entries"] if row["id"] == entry_id)
+            entry[field][0]["provider_payload"] = "private-provider-value"
+            with self.subTest(field=field), self.assertRaises(GroupCatalogError) as caught:
+                observe(catalog=invalid)
+            self.assertNotIn("private-provider-value", str(caught.exception))
+
+    def test_provenance_is_detached_and_shared_repository_does_not_expand_business_matches(self):
+        catalog = load_catalog()
+        baseline = observe(catalog=catalog)
+        app_factory = next(row for row in catalog["entries"] if row["id"] == "app-factory-products")
+        x402 = next(row for row in catalog["entries"] if row["id"] == "x402-services")
+        app_factory["sources"].append(x402["sources"][0])
+        original = copy.deepcopy(catalog)
+        view = observe(catalog=catalog)
+        for field in ("observed_business_records", "matched_catalog_entries",
+                      "unmatched_catalog_entries", "source_snapshot_sha256"):
+            self.assertEqual(baseline[field], view[field])
+        for before, after in zip(baseline["entries"], view["entries"]):
+            self.assertEqual(before["binding_status"], after["binding_status"])
+            self.assertEqual(before["candidate_businesses"], after["candidate_businesses"])
+        pristine = copy.deepcopy(view)
+        entries = {entry["catalog_id"]: entry for entry in view["entries"]}
+        entries["app-factory-products"]["catalog_source_provenance"]["repository_sources"][-1]["label"] = "changed"
+        entries["rehabsignal"]["catalog_source_provenance"]["private_artifact_refs"][0]["label"] = "changed"
+        self.assertEqual(original, catalog)
+        self.assertEqual(pristine, observe(catalog=catalog))
+        self.assertEqual(x402["sources"], entries["x402-services"]["catalog_source_provenance"]["repository_sources"])
+        self.assertNotIn("totals", view)
+
     def test_private_observation_cannot_be_public_catalog_or_html(self):
         view = observe()
         with self.assertRaises(ValueError):

@@ -316,6 +316,27 @@ class PrivateSourceTests(unittest.TestCase):
 
 
 class IdentityTests(unittest.TestCase):
+    def test_business_identity_scope_reaches_command_center_without_cross_namespace_inference(self):
+        result = identity_candidates([
+            {"id": "b1", "slug": "capturebrief"},
+            {"id": "b2", "slug": "market-surveillance-research"},
+            {"id": "b3", "slug": "supplier-desk"},
+        ])
+        self.assertEqual("ai_business_os_prod.businesses", result["identity_namespace"])
+        self.assertEqual("EXACT_CANDIDATE_PRODUCTION_SLUG", result["identity_match_basis"])
+        self.assertEqual([{"catalog_id": "capturebrief", "private_record_ids": ["b1"],
+                           "reconciliation_required": False}], result["matches"])
+        self.assertEqual(2, result["unmapped_record_count"])
+        prod = FakeProduction()
+        operator = CommandCenterOperator(ProductionReadBridge(prod.read), expected_schema_fingerprint="a" * 64)
+        dashboard = operator.dashboard()
+        observed = dashboard["retally_group"]["identity_candidates"]
+        self.assertEqual(result["identity_namespace"], observed["identity_namespace"])
+        self.assertEqual(result["identity_match_basis"], observed["identity_match_basis"])
+        self.assertIsNone(dashboard["retally_group"]["private_observation"])
+        self.assertNotIn("catalog_source_provenance", observed)
+        self.assertEqual([], prod.writes)
+
     def test_legacy_identity_overlap_requires_reconciliation_and_preserves_ids(self):
         rows = [{"id": "b1", "slug": "freightrecovery", "name": "private name"},
                 {"id": "b2", "slug": "recoveryworks", "name": "another private name"}]

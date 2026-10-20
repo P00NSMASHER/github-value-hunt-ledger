@@ -24,6 +24,31 @@ per catalog entry. A unique exact-slug match requires review. Multiple candidate
 records stay separate. Entries without a match are explicit. Unmapped source
 records are counted without exposing their identities in this projection.
 
+### Business matching and source documentation
+
+Both identity-candidate output and the optional private observation declare
+`identity_namespace: ai_business_os_prod.businesses` and
+`identity_match_basis: EXACT_CANDIDATE_PRODUCTION_SLUG`. The existing wire
+statuses describe that business-table lookup only:
+
+| Binding status | Meaning within the observed business table |
+| --- | --- |
+| `NO_SOURCE_MATCH` | No exact candidate business slug matched. Repository or private-artifact documentation may still exist. |
+| `REVIEW_REQUIRED` | One business record matched; the candidate remains unapproved. |
+| `MULTIPLE_SOURCE_RECORDS` | Multiple business records matched; their identities and counts remain separate. |
+
+Each private observation row also includes `catalog_source_provenance`: the
+catalog's evidence status, detached repository references and public-safe private
+artifact references. `catalog_as_of` identifies the catalog snapshot separately
+from the database query's `observed_at`. A current query does not refresh the
+underlying documents or certify their present commercial status.
+
+These fields add no query, business match or approved relationship. Portfolio
+Brain project IDs, private initiative keys, repository names and App Factory
+recipe IDs remain separate namespaces. The same repository can supply evidence
+for more than one catalog entry without increasing business or customer totals.
+Private artifact identifiers and contents are not included in this projection.
+
 **Record counts are not verified business outcomes.** A customer table row is not
 proof of a paying customer; a financial event is not proof of settled fees; an
 external-outcome row is not new independent verification. Verified lead, customer,

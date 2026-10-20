@@ -24,9 +24,11 @@ planning metadata, never customer documents or confidential engagement records.
 The [source reconciliation record](RETALLY_GROUP_SOURCE_RECONCILIATION.md) now
 distinguishes private business identities, public project identities, product
 families, research sources and original private artifacts. It recovers the three
-previously missing product sources and retains the separate ScopeSignal/CaptureBrief
-association conflict. Source references and public project registration do not
-supply private business bindings.
+previously missing product sources and tracks the proposed ScopeSignal correction
+in [Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732).
+The unmerged correction removes ScopeSignal's mistaken CaptureBrief association
+and retains it as an unbound commercial concept with source evidence. Source
+references and public project registration do not supply private business bindings.
 
 ## Four proposed divisions
 

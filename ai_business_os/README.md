@@ -20,6 +20,10 @@ null; catalog entries and tested code are not evidence of launched businesses.
 An [opt-in private observation](RETALLY_GROUP_PRIVATE_INTEGRATION.md) now reads
 existing business identities and source-record counts through the production
 bridge. It reports missing and ambiguous group mappings without approving them.
+Both identity outputs explicitly name the private business-table namespace and
+exact-slug matching rule. The opt-in observation reports catalog source
+provenance separately, so a documented product can correctly have no business
+record match. Query freshness does not refresh historical source documents.
 The customer-register validator checks record relationships and summarizes
 declared workflow stages; payment declarations never become verified revenue.
 Actual operating records remain in `ai_business_os_prod` and approved private
@@ -31,7 +35,9 @@ and holds separately. It exposes aggregate observations only. The
 project/repository evidence and original private-artifact provenance from private
 business bindings. It recovers the RehabSignal, Contractor Quote Recovery and
 [App Factory product sources](RETALLY_APP_FACTORY_SOURCE_MAP.md), and records the
-separate ScopeSignal/CaptureBrief association conflict. Public private-source
+proposed ScopeSignal correction in [Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732).
+That unmerged correction leaves ScopeSignal's project identity unassigned and
+preserves CaptureBrief's `PRJ-004` identity. Public private-source
 references contain lookup keys and dates; exact artifact identities stay private.
 Existing schedules, pricing, legal identities and release controls are unchanged.
 

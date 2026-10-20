@@ -305,6 +305,8 @@ def identity_candidates(
             unmapped += 1
     return {
         "mode": "READ_ONLY_IDENTITY_CANDIDATES",
+        "identity_namespace": "ai_business_os_prod.businesses",
+        "identity_match_basis": "EXACT_CANDIDATE_PRODUCTION_SLUG",
         "identity_mutation_authorized": False,
         "commercial_readiness_assessed": False,
         "unmapped_record_count": unmapped,
