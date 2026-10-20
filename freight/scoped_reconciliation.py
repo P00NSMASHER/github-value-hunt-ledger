@@ -22,7 +22,7 @@ class ScopedTxn:
     buyer_id: str
     business_unit: str
     counterparty_id: str
-    origin: str  # ORIGINAL_INVOICE, BANK_CLEARED, CUSTOMER_DECLARATION
+    origin: str  # source-declared ORIGINAL_INVOICE, BANK_CLEARED, CUSTOMER_DECLARATION
 
     def __post_init__(self) -> None:
         for value in (self.buyer_id, self.business_unit, self.counterparty_id):
@@ -48,6 +48,7 @@ class ScopeReconciliation:
     proven_cleared_payment_count: int
     independent_payment_accuracy: float | None
     result_hash: str
+    bank_labeled_counterpart_matches: int = 0
 
 
 def _group_key(row: ScopedTxn) -> tuple[str, ...] | None:
@@ -99,7 +100,7 @@ def reconcile_scoped(
     mismatches = 0
     by_rule: dict[str, int] = {}
     proof_material = []
-    proven_cleared = 0
+    bank_labeled = 0
     for key in sorted(set(aa) | set(bb)):
         lhs = sorted(aa.get(key, []), key=lambda x: x.txn.id)
         rhs = sorted(bb.get(key, []), key=lambda x: x.txn.id)
@@ -134,8 +135,8 @@ def reconcile_scoped(
                 _group_key(b_by_id[id_]) for id_ in match.settlement_ids
             }
             mismatches += int(refs != {key})
-            proven_cleared += sum(b_by_id[id_].origin == "BANK_CLEARED"
-                                  for id_ in match.settlement_ids)
+            bank_labeled += sum(b_by_id[id_].origin == "BANK_CLEARED"
+                                 for id_ in match.settlement_ids)
         proof_material.append((key, result.summary.matched_internal,
                                result.summary.matched_settlement,
                                canonical_hash(result.canonical_json())))
@@ -147,13 +148,15 @@ def reconcile_scoped(
         "rules": by_rule, "review_groups": review_groups,
         "bound_groups": bound_groups, "errors": mismatches,
         "proof_material": proof_material,
+        "source_labeled_bank_matches": bank_labeled,
+        "independently_verified_bank_matches": 0,
     }
     return ScopeReconciliation(
         len(a), len(b), matched_a, matched_b,
         len(a) - matched_a, len(b) - matched_b,
         matched_groups, by_rule, review_groups, bound_groups,
-        mismatches, proven_cleared,
-        # Bank matching itself is NOT an independent accuracy evaluation;
-        # missing gold-standard bank labels means no precision/recall.
-        None, canonical_hash(body),
+        mismatches, 0,
+        # A label of BANK_CLEARED is self-declared input, not an externally
+        # authenticated bank receipt. Never use it to prove a cash movement.
+        None, canonical_hash(body), bank_labeled,
     )
