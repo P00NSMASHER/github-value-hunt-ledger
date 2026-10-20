@@ -31,6 +31,7 @@ BUCKET_RECEIPT = RECEIPT_ROOT / "sealed-backup-bucket-receipt.json"
 ATTEMPT = RECEIPT_ROOT / "synthetic-backup-upload-attempt.json"
 ACCEPTANCE = RECEIPT_ROOT / "synthetic-backup-acceptance.json"
 LEGACY_CLEANUP = RECEIPT_ROOT / "legacy-synthetic-canary-cleanup.json"
+LEGACY_QUARANTINE = RECEIPT_ROOT / "legacy-orphan-quarantine.json"
 BUCKET_NAME = "retally-synthetic-sealed-recovery"
 LEGACY_MAGIC = b"RETALLY-GCM-CANARY-1"
 LEGACY_OBJECT = re.compile(r"synthetic-only/[0-9a-f]{24}\.rtbk\Z")
@@ -290,13 +291,73 @@ def cleanup_legacy(store: OciStore, *, expected_object_name: str,
     return {"legacy_canary_cleaned": True, "remaining": 0, "production_backup_verified": False}
 
 
-def synthetic_roundtrip(store: OciStore) -> dict:
+def quarantine_legacy_orphan(store: OciStore, items: list[dict]) -> dict:
+    """Preserve one bounded historical synthetic canary, without deleting it.
+
+    The remote-observed hash is NOT independent evidence of the original
+    upload. This permits a separate new-object restore experiment only;
+    the historical orphan remains unresolved and is never used as a source.
+    """
+    ensure(not LEGACY_QUARANTINE.exists() and not LEGACY_QUARANTINE.is_symlink(),
+           "Historical synthetic orphan was already quarantined; manual review is required.")
+    ensure(len(items) == 1 and isinstance(items[0], dict),
+           "Expected exactly one separately isolated historical synthetic canary.")
+    name = items[0].get("name")
+    ensure(isinstance(name, str) and LEGACY_OBJECT.fullmatch(name) is not None,
+           "Unexpected legacy object name; refuse any new recovery upload.")
+    metadata = store.head(name)
+    try:
+        length = int(metadata["content-length"])
+    except (TypeError, ValueError, KeyError) as exc:
+        raise Refused("Historical object HEAD length is unavailable.") from exc
+    ensure(40 <= length <= MAX_CANARY, "Historical object is not a bounded synthetic canary.")
+    ensure("storage-tier" not in metadata or metadata["storage-tier"] == "Standard",
+           "Historical object storage tier differs from free Standard.")
+    if "size" in items[0]:
+        ensure(type(items[0]["size"]) is int and items[0]["size"] == length,
+               "Legacy list and HEAD content length disagree.")
+    with tempfile.TemporaryDirectory(prefix="retally-legacy-quarantine-") as home:
+        downloaded = Path(home) / "sealed-legacy.rtbk"
+        raw = store.get(name, downloaded, etag=metadata["etag"], max_size=MAX_CANARY)
+        ensure(len(raw) == length and raw.startswith(LEGACY_MAGIC),
+               "Historical object is not the expected small synthetic canary format.")
+        observed = sha(raw)
+    # Recheck inventory after remote readback; never delete the historic object.
+    refreshed = store.objects("synthetic-only/")
+    ensure(len(refreshed) == 1 and refreshed[0].get("name") == name,
+           "Legacy object inventory changed during quarantine.")
+    private_receipt(LEGACY_QUARANTINE, {
+        "schema": 1, "legacy_object_name": name,
+        "remote_observed_sha256": observed,
+        "remote_observed_length": length, "synthetic_format_candidate": True,
+        "original_upload_identity_independently_verified": False,
+        "legacy_object_deleted": False,
+        "production_backup_verified": False,
+        "status": "QUARANTINED_UNRESOLVED_DO_NOT_DELETE",
+    })
+    return {"legacy_orphan_quarantined": True, "legacy_orphan_deleted": False}
+
+
+def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False) -> dict:
     """Exercise actual RecoveryWorks source adapters, encryption and restore."""
     ensure(not ATTEMPT.exists() and not ACCEPTANCE.exists(),
            "Prior synthetic backup attempt/result exists; reconcile before repeat.")
     store.bucket_check()
-    ensure(not store.objects("synthetic-only/") and not store.objects("synthetic-recovery/"),
-           "Existing synthetic objects must be reconciled before testing.")
+    legacy = store.objects("synthetic-only/")
+    current = store.objects("synthetic-recovery/")
+    ensure(not current, "Existing recovery objects must be reconciled before any new test.")
+    quarantined = False
+    if legacy:
+        ensure(type(preserve_legacy_orphan) is bool and preserve_legacy_orphan,
+               "Historical synthetic orphan unresolved: explicit quarantine needed.")
+        # Quarantine the old canary into an owner-only receipt. The new test
+        # exclusively uses the separate synthetic-recovery/ prefix and cannot
+        # delete any object in synthetic-only/.
+        quarantine_legacy_orphan(store, legacy)
+        quarantined = True
+    else:
+        ensure(not preserve_legacy_orphan,
+               "Explicit quarantine requested but no legacy synthetic object exists.")
 
     # Late imports: read-only inspection can run on stock OCI Cloud Shell.
     from recoveryworks.seven_branch_simulation import seed, exercise
@@ -375,11 +436,16 @@ def synthetic_roundtrip(store: OciStore) -> dict:
                   "remote_readback_verified": True, "actual_restore_verified": True,
                   "credentials_revoked": True, "tampered_archive_rejected": True,
                   "temporary_remote_object_deleted": True, "customer_files": 0,
+                  "legacy_orphan_quarantined": quarantined,
+                  "legacy_orphan_deleted": False,
                   "production_backup_verified": False, "separate_key_escrow_verified": False}
         private_receipt(ACCEPTANCE, result)
         return {"synthetic_off_device_restore": True, "branches": 7,
                 "remote_ciphertext_verified": True, "tamper_rejected": True,
-                "temporary_object_removed": True, "production_backup_verified": False}
+                "temporary_object_removed": True,
+                "legacy_orphan_quarantined": quarantined,
+                "legacy_orphan_deleted": False,
+                "production_backup_verified": False}
 
 
 def main(argv=None) -> int:
@@ -394,8 +460,12 @@ def main(argv=None) -> int:
                         help="separately verified original synthetic object name")
     parser.add_argument("--expected-legacy-ciphertext-sha256",
                         help="independently recorded original synthetic ciphertext hash")
+    parser.add_argument("--preserve-legacy-orphan", action="store_true",
+                        help="explicitly quarantine one historic synthetic canary without deleting it; exercise only")
     args = parser.parse_args(argv)
     os.umask(0o077)
+    ensure(not args.preserve_legacy_orphan or args.exercise,
+           "Preserving an orphan is only supported for a new isolated exercise.")
     receipt = parse_bucket_receipt(BUCKET_RECEIPT)
     store = OciStore(receipt)
     if args.inspect:
@@ -405,7 +475,8 @@ def main(argv=None) -> int:
                                 expected_object_name=args.expected_legacy_object_name,
                                 expected_sha256=args.expected_legacy_ciphertext_sha256)
     else:
-        output = synthetic_roundtrip(store)
+        output = synthetic_roundtrip(store,
+                                     preserve_legacy_orphan=args.preserve_legacy_orphan)
     print(json.dumps(output, sort_keys=True))
     return 0
 
