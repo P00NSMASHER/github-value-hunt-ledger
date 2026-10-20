@@ -433,11 +433,20 @@ def benchmark_freight() -> dict:
                 f.cents is not None and any(s["original"] == f.cents for s in by_statement_number[f.number])
                 for f in unique.values() if f.number in paired_ids
             )
+            source_date_gaps = [
+                min(abs((datetime.fromisoformat(f.invoice_date) -
+                         datetime.fromisoformat(st["date"])).days)
+                    for st in by_statement_number[f.number])
+                for f in unique.values()
+                if f.number in paired_ids and f.invoice_date
+            ]
             out["face_statement_identity_diagnostic"] = {
                 "invoice_face_distinct_ids": len(face_ids),
                 "statement_distinct_ids": len(statement_ids),
                 "both_sources_share_identifier": len(paired_ids),
                 "same_identifier_and_original_amount": amount_consistent,
+                "source_date_gaps_over_180_days": sum(gap > 180 for gap in source_date_gaps),
+                "maximum_face_to_statement_recorded_date_gap_days": max(source_date_gaps, default=None),
                 "same_identifier_but_original_amount_differs": len(paired_ids) - amount_consistent,
                 "invoice_face_not_listed_on_statement": len(face_ids - statement_ids),
                 "statement_identifier_without_extracted_invoice_face": len(statement_ids - face_ids),
