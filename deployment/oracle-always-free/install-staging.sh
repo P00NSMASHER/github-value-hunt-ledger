@@ -81,14 +81,14 @@ if [[ -e "$workspace_dir" || -L "$workspace_dir" ]]; then
   echo 'Concurrent staging workspace detected; refusing overwrite.' >&2
   exit 7
 fi
-sudo -u retally env PYTHONDONTWRITEBYTECODE=1 "PYTHONPATH=$staging" python3 -m recoveryworks.seven_branch_simulation --workspace "$workspace_dir" --exercise >/dev/null
-sudo -u retally env PYTHONDONTWRITEBYTECODE=1 "PYTHONPATH=$staging" python3 -m recoveryworks.workbench_health --workspace "$workspace_dir" >/dev/null
+sudo -u retally -- sh -c 'cd "$1" && PYTHONDONTWRITEBYTECODE=1 python3 -m recoveryworks.seven_branch_simulation --workspace "$2" --exercise >/dev/null' retally-staging "$staging" "$workspace_dir"
+sudo -u retally -- sh -c 'cd "$1" && PYTHONDONTWRITEBYTECODE=1 python3 -m recoveryworks.workbench_health --workspace "$2" >/dev/null' retally-health "$staging" "$workspace_dir"
 
 if [[ -e "$release_dir" || -L "$release_dir" ]]; then
   echo 'Concurrent release destination detected; refusing overwrite.' >&2
   exit 6
 fi
-sudo mv -- "$staging" "$release_dir"
+sudo mv -T -- "$staging" "$release_dir"
 staging=''
 sudo install -m 0644 "$release_dir/deployment/oracle-always-free/retally-synthetic.service" "$unit_path"
 sudo systemctl daemon-reload
