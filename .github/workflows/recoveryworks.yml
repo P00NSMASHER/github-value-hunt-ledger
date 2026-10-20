@@ -59,9 +59,20 @@ jobs:
           done
           node recoveryworks/workbench_ui/smoke.cjs "$RUNNER_TEMP/retally-ui"
 
+  private-acl-windows:
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Verify owner-only Windows ACLs
+        run: python -m unittest recoveryworks.test_private_io_windows_acl -v
+
   encrypted-backup-windows:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -92,6 +103,7 @@ jobs:
           trigger_config = workflow.split('permissions:', 1)[0]
           assert trigger_config.count('"deployment/oracle-always-free/**"') == 2
           assert 'recoveryworks.test_private_io_windows_acl -v' in workflow
+          assert '  private-acl-windows:' in workflow
           assert '--workspace /var/lib/retally/synthetic-preview' in unit
           assert '--external-origin https://workbench.retallyrecovery.com' in unit
           assert '--port 18765' in unit
