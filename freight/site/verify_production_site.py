@@ -13,7 +13,8 @@ import re
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
-from time import perf_counter
+from time import perf_counter, sleep
+from urllib.parse import urlsplit
 
 from freight.site.internal_links import validate_live_links
 
@@ -23,6 +24,10 @@ MIN_HSTS_SECONDS = 86400
 LTL_COMPARATOR_PAGE = CANONICAL + "ltl-reweigh-evidence-comparator"
 LTL_COMPARATOR_SCRIPT = CANONICAL + "ltl-evidence-comparator.js"
 EVIDENCE_LEDGER_RESOURCE = "freight-recovery-evidence-ledger.csv"
+# Retries apply ONLY to transient public GET 504s. Other statuses (including
+# intentionally disabled inquiry GET 503) and content/security mismatches
+# remain fail-closed. This does not reinterpret Cloudflare internal cache logs.
+TRANSIENT_504_RETRY_DELAYS_SECONDS = (0.25, 0.5)
 APPROVED_MEDIA = {
     "assets/brand/retally-wordmark-approved.png":
         "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd",
@@ -41,18 +46,34 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def fetch(url: str) -> tuple[int, object, bytes]:
-    """A GET-only bounded public request, without cookies or credentials."""
+    """GET-only public read; tolerate two brief 504s, but never a persistent one.
+
+    A final 504 stays visible to the existing live-audit failure gates.
+    No redirect following, non-GET requests, customer data, or unbounded loops.
+    """
     opener = urllib.request.build_opener(_NoRedirect())
     req = urllib.request.Request(url, headers={
         "User-Agent": "RETALLY-Public-Release-Audit/1.0",
         "Cache-Control": "no-cache",
     }, method="GET")
-    try:
-        response = opener.open(req, timeout=18)
-    except urllib.error.HTTPError as error:
-        response = error
-    with response:
-        return response.status, response.headers, response.read(2_000_001)
+    for attempt in range(len(TRANSIENT_504_RETRY_DELAYS_SECONDS) + 1):
+        try:
+            response = opener.open(req, timeout=18)
+        except urllib.error.HTTPError as error:
+            response = error
+        with response:
+            status, headers, body = (
+                response.status, response.headers, response.read(2_000_001)
+            )
+        if status != 504 or attempt == len(TRANSIENT_504_RETRY_DELAYS_SECONDS):
+            return status, headers, body
+        print(
+            f"Transient public GET HTTP 504 for {urlsplit(url).path or '/'}; "
+            f"retry {attempt + 1}/{len(TRANSIENT_504_RETRY_DELAYS_SECONDS)}",
+            flush=True,
+        )
+        sleep(TRANSIENT_504_RETRY_DELAYS_SECONDS[attempt])
+    raise AssertionError("Unreachable bounded public GET state")
 
 
 def ensure_security_headers(headers) -> None:
