@@ -28,6 +28,30 @@ class ParcelRatingTests(unittest.TestCase):
         self.assertEqual(finding.potential_recovery_cents,805)
         self.assertEqual(finding.state,FindingState.VALIDATED)
 
+    def test_rating_bundle_uses_calendar_order_for_compact_iso_dates(self):
+        import json
+        from dataclasses import asdict
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from recoveryworks.branches.parcel_rating import load_rating_bundle
+
+        # Python date.fromisoformat accepts compact ISO dates. The old string
+        # filter wrongly excluded these even though rate_parcel accepted them.
+        rate=asdict(replace(contract(), effective_from='20260101', effective_to='20261231'))
+        measure=asdict(measurements())
+        with TemporaryDirectory() as directory:
+            path=Path(directory)/'rating.json'
+            path.write_text(json.dumps({'contracts':[rate], 'measurements':[measure]}), encoding='utf-8')
+            assessed=load_rating_bundle(path, (charge(),), verified=True)
+            self.assertEqual(len(assessed), 1)
+            self.assertEqual(assessed[0].expected_total_cents, 2195)
+            self.assertTrue(assessed[0].verified)
+            # Boundaries are inclusive; dates beyond the interval fail closed.
+            self.assertEqual(len(load_rating_bundle(
+                path, (replace(charge(), ship_date='20261231'),), verified=True)), 1)
+            with self.assertRaisesRegex(ValueError, 'exactly one in-scope'):
+                load_rating_bundle(path, (replace(charge(), ship_date='20270101'),), verified=True)
+
     def test_unverified_measurement_cannot_validate(self):
         self.assertFalse(rate_parcel(charge(),replace(measurements(),verified=False),contract()).verified)
 

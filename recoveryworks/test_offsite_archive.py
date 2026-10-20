@@ -1,10 +1,12 @@
 """Offline cryptographic acceptance plus real Workspace snapshot round-trip."""
 from __future__ import annotations
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from recoveryworks.offsite_archive import seal_bytes, unseal_bytes, seal_file, verify_file, restore_file
 from recoveryworks.seven_branch_simulation import seed
@@ -36,6 +38,27 @@ class OffsiteArchiveTests(unittest.TestCase):
             with self.assertRaises(PermissionError):
                 from recoveryworks.workbench import Workspace
                 Workspace(dest).principal(token)
+
+    def test_verify_hashes_the_same_ciphertext_that_was_authenticated(self):
+        archive = self.root / "verify-once.rtbk"
+        seal_file(self.snapshot, archive, self.password)
+        original_read = Path.read_bytes
+        archive_reads = 0
+
+        def simulate_replacement_between_reads(path):
+            nonlocal archive_reads
+            if path == archive:
+                archive_reads += 1
+                if archive_reads > 1:
+                    return b"replaced-after-authentication"
+            return original_read(path)
+
+        with patch.object(Path, "read_bytes", simulate_replacement_between_reads):
+            verified = verify_file(archive, self.password)
+        self.assertEqual(archive_reads, 1, "verification must not read the archive twice")
+        self.assertEqual(verified["sealed_sha256"], hashlib.sha256(archive.read_bytes()).hexdigest())
+        self.assertTrue(verified["restore_verified"])
+        self.assertFalse(verified["off_device_verified"])
 
     def test_wrong_password_header_mutation_tag_mutation_and_truncation_fail(self):
         raw = self.snapshot.read_bytes()
