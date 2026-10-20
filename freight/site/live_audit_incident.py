@@ -39,11 +39,17 @@ def event_details(payload: dict) -> dict | None:
 
 
 def is_latest_trusted_run(run_id: int, results: list[dict]) -> bool:
-    """Keep late workflow events from undoing newer recovery or failure."""
+    """Use the newest completed, actionable audit, not cancelled/running jobs.
+
+    A cancelled or skipped newer run is not recovery evidence and must not
+    suppress an older genuine failure. A newer running audit has no result yet.
+    """
     candidates = [
         x for x in results
         if x.get("head_branch") == "main"
         and x.get("event") in ALLOWED_TRIGGER_EVENTS
+        and x.get("status") == "completed"
+        and x.get("conclusion") in ALERT_CONCLUSIONS | RECOVERY_CONCLUSIONS
         and isinstance(x.get("id"), int)
     ]
     return any(x["id"] == run_id for x in candidates) and run_id == max(
@@ -112,8 +118,15 @@ def process(api: GithubAPI, details: dict) -> str:
     )
     if not isinstance(runs, dict) or not isinstance(runs.get("workflow_runs"), list):
         raise RuntimeError("Could not independently establish current live-audit run")
-    if not any(x.get("id") == details["id"] for x in runs["workflow_runs"]):
-        raise RuntimeError("The triggering live-site audit run could not be verified")
+    matches = [x for x in runs["workflow_runs"] if x.get("id") == details["id"]]
+    if len(matches) != 1 or any(
+        x.get("status") != "completed" or
+        x.get("head_branch") != "main" or
+        x.get("event") != details["event"] or
+        x.get("conclusion") != details["conclusion"]
+        for x in matches
+    ):
+        raise RuntimeError("The triggering audit completion could not be verified")
     if not is_latest_trusted_run(details["id"], runs["workflow_runs"]):
         return "STALE_RUN_IGNORED"
 
