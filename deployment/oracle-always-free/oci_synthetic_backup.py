@@ -140,9 +140,11 @@ class OciStore:
         ensure(isinstance(b, dict) and b.get("name") == self.bucket and
                b.get("public-access-type") == "NoPublicAccess" and
                b.get("storage-tier") == "Standard" and b.get("versioning") == "Disabled" and
-               b.get("object-events-enabled") in (False, None) and
-               b.get("replication-enabled") in (False, None),
-               "OCI bucket privacy, tier, versioning or replication state changed.")
+               b.get("object-events-enabled") is False and
+               b.get("replication-enabled") is False and
+               "auto-tiering" in b and b["auto-tiering"] in (None, "Disabled") and
+               "object-lifecycle-policy-etag" in b and b["object-lifecycle-policy-etag"] is None,
+               "OCI bucket privacy, tier, auto-tiering, lifecycle, events or replication state changed.")
 
     def objects(self, prefix: str) -> list[dict]:
         # Never treat a single OCI page as a complete remote inventory. OCI defaults
@@ -171,6 +173,10 @@ class OciStore:
             raise Refused("OCI object inventory returned invalid JSON.") from exc
         ensure(isinstance(parsed, dict) and "data" in parsed,
                "OCI object inventory lacks the data population.")
+        # OCI --all must have consumed every page. A remaining continuation
+        # forbids any claim of an empty prefix, safe deletion or fresh upload.
+        ensure(not parsed.get("next-start-with") and not parsed.get("opc-next-page"),
+               "OCI object inventory still has a continuation; full pagination unverified.")
         data = parsed["data"]
         # OCI may return either {'data': {'objects': [...]}} or
         # {'data': [...]}, depending on installed CLI version.
