@@ -105,6 +105,8 @@ class FinancialBalance:
     movement_count: int
     receipt_hash: str
     original_record_hash: str
+    source_attested_net_cash_cents: int = 0
+    source_attested_net_postinvoice_credits_cents: int = 0
 
 
 def replay_financial_movements(
@@ -169,6 +171,10 @@ def replay_financial_movements(
     blockers = set()
     if any(not e.independently_verified for e in events):
         blockers.add("SETTLEMENT_EVIDENCE_NOT_ALL_INDEPENDENT")
+    # A boolean on an imported row, even BANK_CLEARED provenance and a SHA,
+    # cannot authenticate a bank or carrier. Require separately authenticated
+    # external issuer receipts, which this primitive intentionally lacks.
+    blockers.add("INDEPENDENT_SETTLEMENT_AUTHENTICATION_NOT_IMPLEMENTED")
     if unbound_movement:
         blockers.add("FINANCIAL_MOVEMENT_NOT_BOUND_TO_ORIGINAL_INVOICE")
     if outstanding < 0:
@@ -178,7 +184,8 @@ def replay_financial_movements(
         "schema": 1, "record_hash": record.record_hash,
         "movement_hashes": [canonical_hash(asdict(e)) for e in events],
         "net_cash": net_cash, "net_credit": net_credit,
-        "verified_cash": checked_cash, "verified_credit": checked_credit,
+        "source_attested_cash": checked_cash, "source_attested_credit": checked_credit,
+        "externally_verified_cash": 0, "externally_verified_credit": 0,
         "outstanding": outstanding, "status": status,
         "blockers": sorted(blockers),
     }
@@ -188,13 +195,15 @@ def replay_financial_movements(
         gross_charges_cents=record.gross_charge_cents,
         original_discount_and_credit_cents=record.adjustment_total_cents,
         declared_net_cash_cents=net_cash,
-        verified_net_cash_cents=checked_cash,
+        verified_net_cash_cents=0,
         declared_net_postinvoice_credits_cents=net_credit,
-        verified_net_postinvoice_credits_cents=checked_credit,
+        verified_net_postinvoice_credits_cents=0,
         remaining_balance_cents=outstanding,
         status=status, blockers=tuple(sorted(blockers)),
         movement_count=len(events), receipt_hash=canonical_hash(body),
         original_record_hash=record.record_hash,
+        source_attested_net_cash_cents=checked_cash,
+        source_attested_net_postinvoice_credits_cents=checked_credit,
     )
 
 
