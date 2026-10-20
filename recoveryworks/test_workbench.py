@@ -11,6 +11,15 @@ from recoveryworks.workbench_server import make_server
 
 
 class WorkbenchTests(unittest.TestCase):
+    def test_real_cash_ui_cannot_advertise_unverified_recovery_as_available(self):
+        from recoveryworks.workbench_server import ASSETS
+        script = (ASSETS / 'app.js').read_text(encoding='utf-8')
+        self.assertIn('Live recovered-cash posting is disabled', script)
+        self.assertIn('Record operator-reported external submission', script)
+        self.assertIn('issuer proof not established', script)
+        self.assertIn('Post simulated receipt', script)
+        self.assertNotIn("button('Post reviewed receipt / reversal'", script)
+
     def test_seven_branch_customer_journey(self):
         with tempfile.TemporaryDirectory() as directory:
             workspace,tokens=seed(Path(directory)/'client')

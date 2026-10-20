@@ -12,13 +12,13 @@ function button(text, action) { const b=node('button',text);b.type='button';b.ad
 function field(form,label,type='text',value='') { const wrapper=node('label',label), input=node('input');input.type=type;input.value=value;input.required=true;wrapper.append(input);form.append(wrapper);return input; }
 async function refresh() {
  state=await api('state');$('login').hidden=true;$('workspace').hidden=false;$('logout').hidden=false;
- $('mode').textContent=state.simulation?'SIMULATION — Synthetic customers, reviewers and money. No live recoveries or approvals.':'PRIVATE PILOT — Evidence and approvals require authorized people. External actions use the controlled workflow.';
+ $('mode').textContent=state.simulation?'SIMULATION — Synthetic customers, reviewers and money. No live recoveries or approvals.':'PRIVATE WORKBENCH — No customer-production approval. External cash recovery cannot be verified without authenticated bank/carrier evidence.';
  $('client').textContent=state.client_id;$('actor').textContent=state.actor.role.toUpperCase();
  const currencies=[...new Set(state.cases.map(c=>c.currency))].sort();
  const metrics=[];
  for(const currency of currencies){
   const cases=state.cases.filter(c=>c.currency===currency), active=cases.filter(c=>!c.hold&&c.state!=='REJECTED');
-  const totals=[['Recorded potential',cases.reduce((a,c)=>a+c.potential_cents,0)],['Available for review',active.reduce((a,c)=>a+c.remaining_cents,0)],['Net received',cases.reduce((a,c)=>a+c.recovered_cents,0)],['Net fees',cases.reduce((a,c)=>a+c.fee_cents,0)]];
+  const totals=[['Recorded potential',cases.reduce((a,c)=>a+c.potential_cents,0)],['Available for review',active.reduce((a,c)=>a+c.remaining_cents,0)],[(state.simulation?'Simulated net received':'Recorded receipts (issuer unverified)'),cases.reduce((a,c)=>a+c.recovered_cents,0)],['Net fees',cases.reduce((a,c)=>a+c.fee_cents,0)]];
   for(const [label,value] of totals){const e=node('div',undefined,'metric');e.append(node('span',label),node('strong',money(value,currency)));metrics.push(e);}
  }
  $('metrics').replaceChildren(...metrics);
@@ -30,7 +30,7 @@ function renderCases(){
  $('case-list').replaceChildren();if(!state.cases.length)$('case-list').append(node('p','No cases yet. Upload and review evidence, then run a scan.'));
  for(const c of state.cases){
  const detail=node('details',undefined,'case'),summary=node('summary');summary.append(node('span',c.branch.toUpperCase()+' · '+c.reference),node('span',money(c.potential_cents,c.currency)+' · '+(c.hold?'ON HOLD':c.state),'pill'+(c.hold?' hold':'')));detail.append(summary);
- detail.append(node('p',c.counterparty+' · Net received '+money(c.recovered_cents,c.currency)+' · Remaining '+money(c.remaining_cents,c.currency),'muted'));
+ detail.append(node('p',c.counterparty+' · '+(state.simulation?'Simulated net received ':'Recorded receipts (issuer proof not established) ')+money(c.recovered_cents,c.currency)+' · Remaining '+money(c.remaining_cents,c.currency),'muted'));
  if(c.hold)detail.append(node('p',c.hold,'banner'));
  const evidence=node('div'); for(const e of c.evidence)evidence.append(node('p',e.kind+' · '+e.locator+' · SHA-256 '+e.sha256,'muted'));detail.append(evidence);
  const form=node('form'); const note=field(form,'Review / authorization note'); const controls=node('div',undefined,'actions');
@@ -42,7 +42,7 @@ function renderCases(){
  if(state.actor.role==='independent'){controls.append(button('Independent approval',()=>act('independent')));if(c.hold){const hash=field(form,'Reconciliation evidence SHA-256');controls.append(button('Retain proof and release hold',()=>act('resolve',{evidence_hash:hash.value,expected_record_hash:c.record_hash})));for(const conflict of state.conflicts.filter(x=>x.existing_finding_id===c.finding_id)){const replacement=conflict.replacement;controls.append(button('Replace with corrected case '+replacement.finding_id.slice(-8),()=>act('revise',{evidence_hash:hash.value,expected_record_hash:c.record_hash,replacement_id:replacement.finding_id})));}}}
  if(state.actor.role==='customer')controls.append(button('Authorize this case',()=>act('authorize')));
  if(state.actor.role==='operator'&&state.simulation){controls.append(button('Simulate claim submission',()=>act('claim')));const id=field(form,'Receipt / reversal ID'),amount=field(form,'Amount in cents (negative for reversal)','number'),fee=field(form,'Fee in cents','number','0'),hash=field(form,'Simulated receipt SHA-256'),reverse=field(form,'Original receipt ID (reversals only)');reverse.required=false;controls.append(button('Post simulated receipt',()=>act('cash',{event_id:id.value,amount_cents:Number(amount.value),fee_cents:Number(fee.value),source_hash:hash.value,reverses_id:reverse.value||null})));}
- if(state.actor.role==='operator'&&!state.simulation)controls.append(button('Record reviewed external submission',()=>act('claim')),button('Post reviewed receipt / reversal',()=>act('cash')));
+ if(state.actor.role==='operator'&&!state.simulation){controls.append(button('Record operator-reported external submission',()=>act('claim')));controls.append(node('p','Live recovered-cash posting is disabled until independent bank/carrier settlement authentication and customer release approval are verified. A reviewed document alone is not payment proof.','banner'));}
  form.addEventListener('submit',e=>e.preventDefault());form.append(controls);detail.append(form);
  const kinds={customer:['authorization'],reviewer:['case_bundle'],independent:['case_bundle'],operator:['external_action','cash_event']}[state.actor.role];
  const attachment=node('form'),kindLabel=node('label','Proof document'),kindSelect=node('select');for(const kind of kinds){const option=node('option',kind.replaceAll('_',' '));option.value=kind;kindSelect.append(option);}kindLabel.append(kindSelect);attachment.append(kindLabel);const file=field(attachment,'JSON evidence file','file');file.accept='.json';attachment.append(button('Upload case evidence',async()=>{if(!file.files[0])throw Error('Choose a JSON evidence file');await api('document',{finding_id:c.finding_id,kind:kindSelect.value,content:await file.files[0].text()});await refresh();}));attachment.addEventListener('submit',e=>e.preventDefault());detail.append(attachment);
