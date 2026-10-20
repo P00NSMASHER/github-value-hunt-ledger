@@ -1,0 +1,70 @@
+name: RETALLY Oracle Read-Only Health
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-oci-readonly.yml'
+      - 'deployment/oracle-always-free/oci_readonly_health.py'
+      - 'deployment/oracle-always-free/test_oci_readonly_health.py'
+      - 'deployment/oracle-always-free/OCI_GITHUB_AUTOMATION.md'
+  schedule:
+    # GitHub-hosted, independent of PAAM-L044 and OCI Cloud Shell.
+    - cron: '23 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-oci-readonly-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Compile and test without OCI credentials
+        run: |
+          python -m py_compile deployment/oracle-always-free/oci_readonly_health.py
+          python -m unittest discover -s deployment/oracle-always-free -p 'test_oci_readonly_health.py' -v
+
+  oracle-readonly:
+    needs: validate-offline
+    # NEVER run a privileged job on PR/fork/non-main; disabled by default.
+    if: >-
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
+      vars.RETALLY_OCI_MONITOR_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      RETALLY_OCI_MONITOR_ENABLED: ${{ vars.RETALLY_OCI_MONITOR_ENABLED }}
+      RETALLY_OCI_DOMAIN_URL: ${{ vars.RETALLY_OCI_DOMAIN_URL }}
+      RETALLY_OCI_NAMESPACE: ${{ vars.RETALLY_OCI_NAMESPACE }}
+      RETALLY_OCI_COMPARTMENT_OCID: ${{ vars.RETALLY_OCI_COMPARTMENT_OCID }}
+      RETALLY_OCI_VM_OCID: ${{ vars.RETALLY_OCI_VM_OCID }}
+      RETALLY_OCI_CLIENT_ID: ${{ secrets.RETALLY_OCI_CLIENT_ID }}
+      RETALLY_OCI_CLIENT_SECRET: ${{ secrets.RETALLY_OCI_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned official OCI SDK
+        run: python -m pip install --disable-pip-version-check 'oci==2.188.0'
+      - name: Verify private Oracle bucket and VM (read-only)
+        run: python deployment/oracle-always-free/oci_readonly_health.py
