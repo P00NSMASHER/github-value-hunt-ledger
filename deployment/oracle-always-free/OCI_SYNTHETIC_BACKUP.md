@@ -70,7 +70,10 @@ or existing quarantine receipt stops new uploads. The ordinary `--exercise`
 mode still refuses to proceed when the historical prefix is nonempty.
 
 The cleanup command now also requires a **previously frozen, independently
-approved original key and ciphertext SHA-256**. If the previous upload did
+approved original key and ciphertext SHA-256**. Once verified, it writes an
+owner-only immutable **legacy delete-attempt receipt before conditional DELETE**.
+If the provider operation times out, the receipt survives and blocks automatic
+retries; reconcile remote inventory and provider audit evidence manually. If the previous upload did
 not retain that evidence, **do not delete the orphan**. Its present filename,
 magic header, ETag and newly calculated remote hash are not independent
 proof of which original was uploaded. Before downloading, it verifies
@@ -84,7 +87,7 @@ remote HEAD content-length and freezes the original ETag; the download uses OCI 
 - Independent filesystem restore of the remote retrieved snapshot passes, including source hashes, journal integrity and revocation of prior role tokens; changed ciphertext is rejected.
 - Read-back verified temporary synthetic object is removed using a frozen ETag; remote prefix is empty afterwards.
 - Owner-only receipt at `~/.retally-oracle/synthetic-backup-acceptance.json` reports only synthetic facts; separate key custody is explicitly **not** accepted.
-- The bucket stays `NoPublicAccess`, Standard tier, versioning disabled; no unexpected events/replication services are activated; use stays below the 20 GB Always Free threshold.
+- The bucket stays `NoPublicAccess`, Standard tier, versioning disabled; remote metadata explicitly confirms events and replication disabled, auto-tiering disabled or null, and no lifecycle policy. Missing security fields and incomplete pagination must fail closed. Current use and any new uploads must stay within Always Free limits; the utility does not prove an account-wide $0 bill.
 - All CI and genuine independent source approval gates for PRs #493, #500, #502, #508, #516, and this dependent PR remain mandatory before live customer workflows.
 
 **Current known gap:** No live OCI restore acceptance has yet been completed. The previous small synthetic canary remains unverified and must NOT be deleted merely because its current hash is known. No service is installed on the VM and customer release remains HOLD. Owner-only local receipts and unchanged OCI settings do not establish a disaster-recovery SLA.
