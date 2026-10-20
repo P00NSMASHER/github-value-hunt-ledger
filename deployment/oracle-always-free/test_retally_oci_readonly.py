@@ -223,5 +223,34 @@ class OCIReadOnlySecurity(unittest.TestCase):
         self.assertNotIn(m.BUCKET, rendered)
 
 
+class WorkflowCredentialExposureTests(unittest.TestCase):
+    def test_oauth_client_secret_is_scoped_to_the_observer_step_only(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github" / "workflows" / "retally-oracle-readonly.yml").read_text()
+        self.assertIn("  observe:\n", workflow)
+        privileged = workflow.split("  observe:\n", 1)[1]
+        anchor = "      - name: Verify GitHub OIDC and use short-lived OCI resource identity\n"
+        self.assertIn(anchor, privileged)
+        before, observer = privileged.split(anchor, 1)
+        self.assertIn("id-token: write", before)
+        self.assertIn("github.ref == 'refs/heads/main'", before)
+        self.assertIn("python -m pip install", before)
+        self.assertIn("        env:\n", observer)
+        self.assertIn("        run: python deployment/oracle-always-free/retally_oci_readonly.py", observer)
+        for name in ("RETALLY_OCI_OAUTH_CLIENT_ID", "RETALLY_OCI_OAUTH_CLIENT_SECRET"):
+            expression = "secrets." + name
+            self.assertNotIn(expression, before,
+                             "Unrelated checkout/install steps received OAuth credentials")
+            self.assertEqual(privileged.count(expression), 1)
+            self.assertIn(expression, observer)
+            self.assertLess(observer.index(expression),
+                            observer.index("        run: python"),
+                            "OAuth secret must be scoped to the observer process")
+        unprivileged = workflow.split("  offline-contract:\n", 1)[1].split(
+            "\n  disabled-state:\n", 1)[0]
+        self.assertNotIn("id-token: write", unprivileged)
+        self.assertNotIn("secrets.RETALLY_OCI_OAUTH_CLIENT_SECRET", unprivileged)
+
+
 if __name__ == "__main__":
     unittest.main()
