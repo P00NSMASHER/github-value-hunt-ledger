@@ -411,3 +411,82 @@ def test_self_hashed_claim_batch_rejects_inflated_confirmed_review_count():
 
     with pytest.raises(ValueError, match="confirmed review count mismatch"):
         verify_recovery_claim_batch(forged)
+
+
+
+def test_self_hashed_claim_batch_rejects_boolean_claim_count():
+    artifacts, review, incumbent = setup(
+        dispositions=(ReviewDisposition.FALSE_POSITIVE, ReviewDisposition.UNRESOLVED)
+    )
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, claim_count=False, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="claim count must be a non-negative integer"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_boolean_fee_disqualified_count():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, fee_disqualified_count=True, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="fee-disqualified count must be a non-negative integer"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_non_boolean_fee_flags():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original_record = batch.records[1]
+    record = replace(
+        original_record,
+        incumbent_preidentified=1,
+        fee_disqualified=1,
+        record_hash="",
+    )
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[1], fee_disqualified=1)
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(batch.records[0], record),
+            claims=(batch.claims[0], claim),
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="fee-disqualification flags must be boolean"):
+        verify_recovery_claim_batch(forged)
