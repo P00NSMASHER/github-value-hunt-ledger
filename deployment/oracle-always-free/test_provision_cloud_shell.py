@@ -291,5 +291,205 @@ class CloudShellFipsKeyTests(unittest.TestCase):
 
 
 
+
+class ResumePartialResourceTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.base=Path(self.temp.name)
+        self.partial=self.base/'partial.json'
+        self.receipt=self.base/'final.json'
+        self.private=self.base/'fake-rsa'
+        self.public=self.base/'fake-rsa.pub'
+        self.private.write_text('TEST-PRIVATE-KEY-FIXTURE',encoding='ascii')
+        self.private.chmod(0o600)
+        self.public.write_text('ssh-rsa TEST-ONLY',encoding='ascii')
+        self.public.chmod(0o600)
+        self.ids={name:'ocid1.'+kind+'.oc1.iad.fixture' for name,kind in [
+            ('vcn_id','vcn'),('security_list_id','securitylist'),
+            ('route_table_id','routetable'),('internet_gateway_id','internetgateway'),
+            ('subnet_id','subnet')]}
+        self.state={
+            'schema':1,'phase':'subnet_created','tenancy_id':TENANCY,
+            'home_region':REGION,'release_status':'HOLD',
+            'no_customer_data':True,'no_open_ingress':True,
+            'public_key_path':str(self.public),'key_private_path':str(self.private),
+            **self.ids}
+        self.partial.write_text(json.dumps(self.state),encoding='utf-8')
+        self.partial.chmod(0o600)
+
+    def patches(self):
+        from contextlib import ExitStack
+        stack=ExitStack()
+        stack.enter_context(patch.object(mod,'PARTIAL',self.partial))
+        stack.enter_context(patch.object(mod,'RECEIPT',self.receipt))
+        stack.enter_context(patch.object(mod,'RESOURCE_DIR',self.base))
+        stack.enter_context(patch.object(mod,'PRIVATE_KEY',self.private))
+        stack.enter_context(patch.object(mod,'PUBLIC_KEY',self.public))
+        return stack
+
+    def fake_network(self,*args,region=None,timeout=90):
+        op=' '.join(args[:3])
+        if op == 'network vcn get':
+            return {'id':self.ids['vcn_id'],'display-name':mod.VPC_NAME,
+                    'lifecycle-state':'AVAILABLE','cidr-blocks':[str(mod.VPC_NETWORK)],
+                    'default-security-list-id':self.ids['security_list_id'],
+                    'default-route-table-id':self.ids['route_table_id']}
+        if op == 'network security-list get':
+            return {'id':self.ids['security_list_id'],
+                    'vcn-id':self.ids['vcn_id'],'ingress-security-rules':[]}
+        if op == 'network subnet get':
+            return {'id':self.ids['subnet_id'],'vcn-id':self.ids['vcn_id'],
+                    'lifecycle-state':'AVAILABLE','display-name':'retally-outbound-no-inbound',
+                    'cidr-block':mod.SUBNET_NETWORK,
+                    'security-list-ids':[self.ids['security_list_id']],
+                    'prohibit-public-ip-on-vnic':False}
+        if op == 'network internet-gateway get':
+            return {'id':self.ids['internet_gateway_id'],
+                    'vcn-id':self.ids['vcn_id'],
+                    'is-enabled':True,'display-name':'retally-outbound-only'}
+        if op == 'network route-table get':
+            return {'id':self.ids['route_table_id'],'vcn-id':self.ids['vcn_id'],
+                    'route-rules':[{'destination':'0.0.0.0/0',
+                                    'network-entity-id':self.ids['internet_gateway_id']}]}
+        raise AssertionError('unexpected OCI action '+op)
+
+    def test_network_verified_read_only(self):
+        with self.patches(), patch.object(mod,'cli',side_effect=self.fake_network) as checked:
+            mod.verify_partial_network(self.state,TENANCY,REGION)
+        self.assertEqual(checked.call_count,5)
+        self.assertTrue(all(call.args[2]=='get' for call in checked.call_args_list))
+
+    def test_unapproved_ingress_fails_closed(self):
+        def unsafe(*args,**kwargs):
+            result=self.fake_network(*args,**kwargs)
+            if args[:3]==('network','security-list','get'):
+                result['ingress-security-rules']=[{'source':'0.0.0.0/0'}]
+            return result
+        with self.patches(), patch.object(mod,'cli',side_effect=unsafe):
+            with self.assertRaisesRegex(mod.Stop,'zero-ingress'):
+                mod.verify_partial_network(self.state,TENANCY,REGION)
+
+    def test_wrong_subnet_or_gateway_fails_closed(self):
+        for name in ('subnet','internet-gateway'):
+            def changed(*args,**kwargs):
+                result=self.fake_network(*args,**kwargs)
+                if args[1]==name:
+                    result['vcn-id']='ocid1.vcn.oc1.iad.other'
+                return result
+            with self.subTest(name=name),self.patches(),patch.object(mod,'cli',side_effect=changed):
+                with self.assertRaises(mod.Stop):
+                    mod.verify_partial_network(self.state,TENANCY,REGION)
+
+    def test_mismatched_receipt_cannot_resume(self):
+        with self.patches(),patch.object(mod,'cli',side_effect=self.fake_network):
+            for change in ({'release_status':'APPROVED'},
+                           {'phase':'gateway_created'},
+                           {'instance_id':'ocid1.instance.oc1.iad.existing'},
+                           {'home_region':'us-phoenix-1'}):
+                with self.subTest(change=change):
+                    with self.assertRaises(mod.Stop):
+                        mod.verify_partial_network({**self.state,**change},TENANCY,REGION)
+
+    def test_resume_inventory_reuses_only_original_exact_vcn(self):
+        def network_and_resources(*args,**kwargs):
+            if args[:3]==('network','vcn','list'):
+                return [{'id':self.ids['vcn_id'],'display-name':mod.VPC_NAME,
+                         'cidr-blocks':[str(mod.VPC_NETWORK)],'lifecycle-state':'AVAILABLE'}]
+            return fake_oci(*args,**kwargs)
+        with self.patches(),patch.object(mod,'cli',side_effect=network_and_resources):
+            inv=mod.read_inventory(TENANCY,REGION,
+                                   existing_vcn_id=self.ids['vcn_id'])
+        self.assertEqual(inv['vcn_count'],1)
+        self.assertEqual(inv['a1_ocpus_in_use'],0)
+
+    def test_changed_or_duplicate_vcn_rejected(self):
+        for kind in ('wrong_cidr','other_duplicate'):
+            def changed(*args,**kwargs):
+                if args[:3]==('network','vcn','list'):
+                    first={'id':self.ids['vcn_id'],'display-name':mod.VPC_NAME,
+                           'cidr-blocks':[str(mod.VPC_NETWORK)],'lifecycle-state':'AVAILABLE'}
+                    if kind=='wrong_cidr':
+                        first['cidr-blocks']=['10.80.0.0/16']
+                        return [first]
+                    return [first,{'id':'ocid1.vcn.oc1.iad.other',
+                                   'display-name':mod.VPC_NAME,'cidr-blocks':['10.82.0.0/16'],
+                                   'lifecycle-state':'AVAILABLE'}]
+                return fake_oci(*args,**kwargs)
+            with self.subTest(kind=kind),self.patches(),patch.object(mod,'cli',side_effect=changed):
+                with self.assertRaises(mod.Stop):
+                    mod.read_inventory(TENANCY,REGION,
+                                       existing_vcn_id=self.ids['vcn_id'])
+
+    def test_partial_inspection_never_writes(self):
+        inv={'existing_instances':0,'a1_ocpus_in_use':0,
+             'block_volume_gb_in_use':0,'vcn_count':1}
+        with (self.patches(),
+              patch.object(mod,'read_tenancy',return_value=TENANCY),
+              patch.object(mod,'home_region',return_value=REGION),
+              patch.object(mod,'verify_partial_network') as checked,
+              patch.object(mod,'read_inventory',return_value=inv),
+              patch.object(mod,'launch_vm') as launch,
+              patch.object(mod,'make_network') as network,
+              patch('builtins.print')):
+            self.assertEqual(mod.main(['--inspect-partial']),0)
+        launch.assert_not_called()
+        network.assert_not_called()
+        checked.assert_called_once()
+        self.assertTrue(self.partial.exists())
+        self.assertFalse(self.receipt.exists())
+
+    def test_resume_needs_tty_and_never_creates_network(self):
+        inv={'existing_instances':0,'a1_ocpus_in_use':0,
+             'block_volume_gb_in_use':0,'vcn_count':1}
+        with (self.patches(),
+              patch.object(mod,'read_tenancy',return_value=TENANCY),
+              patch.object(mod,'home_region',return_value=REGION),
+              patch.object(mod,'verify_partial_network'),
+              patch.object(mod,'read_inventory',return_value=inv),
+              patch.object(mod.sys.stdin,'isatty',return_value=False),
+              patch.object(mod,'launch_vm') as launch,
+              patch.object(mod,'make_network') as network,
+              patch('builtins.print')):
+            with self.assertRaisesRegex(mod.Stop,'interactive'):
+                mod.main(['--resume'])
+        launch.assert_not_called()
+        network.assert_not_called()
+
+    def test_successful_resume_finalizes_without_new_network(self):
+        inv={'existing_instances':0,'a1_ocpus_in_use':0,
+             'block_volume_gb_in_use':0,'vcn_count':1}
+        def launch(inv,state,key):
+            self.assertEqual(key,self.public)
+            state['instance_id']='ocid1.instance.oc1.iad.synthetic'
+        with (self.patches(),
+              patch.object(mod,'read_tenancy',return_value=TENANCY),
+              patch.object(mod,'home_region',return_value=REGION),
+              patch.object(mod,'verify_partial_network') as checked,
+              patch.object(mod,'read_inventory',return_value=inv),
+              patch.object(mod.sys.stdin,'isatty',return_value=True),
+              patch('builtins.input',return_value='RESUME RETALLY ALWAYS FREE'),
+              patch.object(mod,'launch_vm',side_effect=launch) as called,
+              patch.object(mod,'make_network') as network,
+              patch('builtins.print')):
+            self.assertEqual(mod.main(['--resume']),0)
+        self.assertEqual(checked.call_count,2)
+        called.assert_called_once()
+        network.assert_not_called()
+        self.assertFalse(self.partial.exists())
+        self.assertTrue(self.receipt.exists())
+        self.assertTrue(json.loads(self.receipt.read_text())['instance_id'].startswith('ocid1.instance.'))
+
+    def test_unsafe_cli_error_does_not_leak_provider_stderr(self):
+        message='ServiceError:\\n{"code": "InternalError", "message": "SECRET_ACCOUNT_REFERENCE"}'
+        error=subprocess.CompletedProcess(['oci'],1,stdout='',stderr=message)
+        with patch.object(mod.subprocess,'run',return_value=error):
+            with self.assertRaises(mod.Stop) as caught:
+                mod.cli('compute','instance','launch')
+        self.assertIn('InternalError',str(caught.exception))
+        self.assertNotIn('SECRET_ACCOUNT_REFERENCE',str(caught.exception))
+
+
+
 if __name__=='__main__':
     unittest.main()
