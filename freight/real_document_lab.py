@@ -310,7 +310,7 @@ def reference_scoped_replay(
             decimals=2, date_window_days=0, amount_tolerance_bps=0,
             many_to_one=ManyToOneConfig(
                 enabled=True, date_window_days=0, tolerance_bps=0,
-                max_group_size=max_group_size, max_candidates=18, max_nodes=50_000),
+                max_group_size=max(2, max_group_size), max_candidates=18, max_nodes=50_000),
         )
         replay = reconcile(internal, settlement, config)
         result_by_rule.update(replay.summary.by_rule)
