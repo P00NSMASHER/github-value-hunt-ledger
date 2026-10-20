@@ -96,8 +96,15 @@ Run only:
 The script refuses partial/stale/nonprivate receipts, verifies the *actual*
 OCI tenancy home region, running fixed Micro shape, official Ubuntu 24.04 image,
 exact 50-GiB boot volume and attachment, original VCN/subnet/route identities,
-and **both** zero-inbound VCN security-list rules **and** zero attached NSGs
-on the VM's only VNIC. Unknown or absent NSG fields also fail closed.
+and **zero default VCN security-list ingress** plus either **zero attached NSGs**
+or one explicitly owner-receipted, independently verified **private-only**
+management NSG. The optional owner-only
+`~/.retally-oracle/temporary-private-ssh.json` must identify the exact VNIC,
+NSG, and rule. The read-only audit queries every live NSG rule and only
+accepts **one TCP/22 rule from 10.76.1.0/24**, with no public or additional
+rules. Unknown fields, receipt drift, unlisted rules or any public ingress fail
+closed. Private-only SSH is **not zero total ingress**, is not a customer-facing
+route, and does not grant commercial deployment approval.
 
 This is an **existing-instance read-only audit**: only OCI GET and LIST
 operations, no resource creation, firewall change, SSH connection, tunneling,

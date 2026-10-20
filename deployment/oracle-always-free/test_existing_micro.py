@@ -99,7 +99,7 @@ def replies(s):
     }
 
 
-def run(s, api):
+def run(s, api, *, private_ssh_receipt=None):
     commands = []
     def read(*args, region=None, timeout=90):
         commands.append((args, region))
@@ -108,7 +108,7 @@ def run(s, api):
         return api[args[:3]]
     with patch.object(AUDIT.BASE, "home_region", return_value="us-ashburn-1"), \
          patch.object(AUDIT.BASE, "cli", side_effect=read):
-        return AUDIT.inspect_running_micro(s), commands
+        return AUDIT.inspect_running_micro(s, private_ssh_receipt=private_ssh_receipt), commands
 
 
 class ExistingMicroAuditTests(unittest.TestCase):
@@ -145,6 +145,80 @@ class ExistingMicroAuditTests(unittest.TestCase):
         serialized = json.dumps(report)
         self.assertNotIn("ocid1.", serialized)
         self.assertNotIn("10.76.", serialized)
+
+    def test_attested_private_subnet_ssh_nsg_and_adversarial_rule_drift(self):
+        private = {"nsg_id": identity("networksecuritygroup"),
+                   "vnic_id": identity("vnic"),
+                   "rule_id": "ABCD-PRIVATE-SSH-ONLY"}
+        api = {k: json.loads(json.dumps(v)) for k, v in self.responses.items()}
+        api[("compute", "instance", "list-vnics")][0].update({
+            "id": private["vnic_id"], "nsg-ids": [private["nsg_id"]]})
+        api[("network", "nsg", "get")] = {
+            "id": private["nsg_id"], "vcn-id": self.receipt["vcn_id"],
+            "lifecycle-state": "AVAILABLE"}
+        api[("network", "nsg", "rules")] = [{
+            "id": private["rule_id"], "direction": "INGRESS",
+            "source-type": "CIDR_BLOCK", "source": AUDIT.BASE.SUBNET_NETWORK,
+            "protocol": "6", "is-stateless": False,
+            "tcp-options": {"destination-port-range": {"min": 22, "max": 22}}}]
+        report, calls = run(self.receipt, api, private_ssh_receipt=private)
+        self.assertEqual(report["vm_attached_nsg_count"], 1)
+        self.assertTrue(report["private_management_ssh_rule_verified"])
+        self.assertTrue(report["no_public_ingress_rules_verified"])
+        self.assertFalse(report["commercial_production_certified"])
+        self.assertEqual(report["customer_release_status"], "HOLD")
+        query = [args for args, _ in calls if args[:3] == ("network", "nsg", "rules")]
+        self.assertEqual(len(query), 1)
+        self.assertIn("--all", query[0])
+        self.assertNotIn("--direction", query[0])
+        with self.assertRaises(AUDIT.BASE.Stop):
+            run(self.receipt, api)  # owner-receipt absent
+        for field, bad in [
+            ("id", "ALTERED-RULE"), ("direction", "EGRESS"),
+            ("source", "0.0.0.0/0"), ("source", "10.76.0.0/16"),
+            ("source-type", "SERVICE_CIDR_BLOCK"), ("protocol", "all"),
+            ("is-stateless", True),
+            ("tcp-options", {"destination-port-range": {"min": 22, "max": 443}}),
+            ("tcp-options", {"destination-port-range": {"min": True, "max": 22}}),
+        ]:
+            with self.subTest(field=field, bad=bad):
+                modified = {k: json.loads(json.dumps(v)) for k, v in api.items()}
+                modified[("network", "nsg", "rules")][0][field] = bad
+                with self.assertRaises(AUDIT.BASE.Stop):
+                    run(self.receipt, modified, private_ssh_receipt=private)
+        doubled = {k: json.loads(json.dumps(v)) for k, v in api.items()}
+        doubled[("network", "nsg", "rules")].append({
+            "id": "UNAPPROVED", "direction": "INGRESS",
+            "source": "0.0.0.0/0", "protocol": "all"})
+        with self.assertRaises(AUDIT.BASE.Stop):
+            run(self.receipt, doubled, private_ssh_receipt=private)
+        wrong_vcn = {k: json.loads(json.dumps(v)) for k, v in api.items()}
+        wrong_vcn[("network", "nsg", "get")]["vcn-id"] = "not-the-right-vcn"
+        with self.assertRaises(AUDIT.BASE.Stop):
+            run(self.receipt, wrong_vcn, private_ssh_receipt=private)
+
+    def test_private_management_receipt_must_be_owner_only_and_complete(self):
+        proof = {"nsg_id": identity("networksecuritygroup"),
+                 "vnic_id": identity("vnic"), "rule_id": "ABCD-PRIVATE-SSH-ONLY"}
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "private-ssh.json"
+            path.write_text(json.dumps(proof), encoding="utf-8")
+            path.chmod(0o600)
+            self.assertEqual(AUDIT._read_private_ssh_receipt(path), proof)
+            path.chmod(0o644)
+            with self.assertRaises(AUDIT.BASE.Stop):
+                AUDIT._read_private_ssh_receipt(path)
+            path.chmod(0o600)
+            linked = Path(folder) / "linked.json"
+            linked.symlink_to(path)
+            with self.assertRaises(AUDIT.BASE.Stop):
+                AUDIT._read_private_ssh_receipt(linked)
+            for missing in ("nsg_id", "vnic_id", "rule_id"):
+                malformed = dict(proof)
+                malformed.pop(missing)
+                path.write_text(json.dumps(malformed), encoding="utf-8")
+                with self.subTest(missing=missing), self.assertRaises(AUDIT.BASE.Stop):
+                    AUDIT._read_private_ssh_receipt(path)
 
     def test_adversarial_provider_replies_fail_closed(self):
         mutations = [

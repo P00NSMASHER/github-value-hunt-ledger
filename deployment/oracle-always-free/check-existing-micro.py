@@ -33,6 +33,7 @@ SHAPE = "VM.Standard.E2.1.Micro"
 BOOT_GB = 50
 EXPECTED_RELEASE = "HOLD"
 FINAL_RECEIPT = BASE.RECEIPT
+PRIVATE_SSH_RECEIPT = BASE.RESOURCE_DIR / "temporary-private-ssh.json"
 
 
 def require(condition, reason):
@@ -100,7 +101,69 @@ def _read_final_receipt(path: Path = FINAL_RECEIPT) -> dict:
     return receipt
 
 
-def inspect_running_micro(receipt: dict) -> dict:
+
+
+def _read_private_ssh_receipt(path: Path = PRIVATE_SSH_RECEIPT) -> dict:
+    """Private filesystem record is a pointer; OCI remains the truth source."""
+    require(path.is_file() and not path.is_symlink(), "Private SSH NSG receipt is missing")
+    meta = os.stat(path)
+    require(stat.S_ISREG(meta.st_mode) and (meta.st_mode & 0o077) == 0
+            and meta.st_uid == os.geteuid(),
+            "Private SSH NSG receipt owner or permissions are not verified")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise BASE.Stop("Private SSH NSG receipt is unreadable") from None
+    require(isinstance(data, dict), "Private SSH NSG receipt is not an object")
+    _id(data.get("nsg_id"), "networksecuritygroup")
+    _id(data.get("vnic_id"), "vnic")
+    require(isinstance(data.get("rule_id"), str)
+            and re.fullmatch(r"[A-Za-z0-9_-]{4,128}", data["rule_id"]),
+            "Private SSH NSG receipt has no exact rule identity")
+    return data
+
+
+def _verify_vnic_nsg(receipt: dict, vnic: dict,
+                     private_ssh_receipt: dict | None, region: str) -> int:
+    """Attest *all* NSG rules: no NSG, or one exact private-only SSH rule."""
+    attached = vnic.get("nsg-ids")
+    require(isinstance(attached, list), "VNIC network security groups unknown")
+    if attached == []:
+        require(private_ssh_receipt is None, "Stale private SSH NSG receipt")
+        return 0
+    require(len(attached) == 1 and isinstance(private_ssh_receipt, dict),
+            "Unrecognized or multiple VM network security groups")
+    nsg_id = _id(private_ssh_receipt.get("nsg_id"), "networksecuritygroup")
+    vnic_id = _id(private_ssh_receipt.get("vnic_id"), "vnic")
+    require(attached == [nsg_id] and vnic.get("id") == vnic_id,
+            "Private SSH NSG receipt not bound to the actual VM VNIC")
+    group = _get("network", "nsg", "get", "--nsg-id", nsg_id, region=region)
+    require(group.get("id") == nsg_id and group.get("vcn-id") == receipt["vcn_id"]
+            and group.get("lifecycle-state") == "AVAILABLE",
+            "Attached NSG no longer belongs to the approved VCN")
+    # Read ALL pages without filtering directions. Missing information is HOLD.
+    rules = _list(BASE.cli("network", "nsg", "rules", "list",
+                           "--nsg-id", nsg_id, "--all", region=region),
+                  "complete management NSG rules")
+    require(len(rules) == 1, "Management NSG has additional or missing rules")
+    rule = rules[0]
+    require(rule.get("id") == private_ssh_receipt.get("rule_id")
+            and rule.get("direction") == "INGRESS"
+            and rule.get("source-type") == "CIDR_BLOCK"
+            and rule.get("source") == BASE.SUBNET_NETWORK
+            and rule.get("protocol") == "6"
+            and rule.get("is-stateless") is False,
+            "Management NSG source, protocol, or exact rule identity changed")
+    tcp = rule.get("tcp-options")
+    require(isinstance(tcp, dict)
+            and tcp.get("destination-port-range") == {"min": 22, "max": 22}
+            and type((tcp.get("destination-port-range") or {}).get("min")) is int
+            and type((tcp.get("destination-port-range") or {}).get("max")) is int
+            and tcp.get("source-port-range") is None,
+            "Management NSG is not strictly scoped to TCP/22")
+    return 1
+
+def inspect_running_micro(receipt: dict, *, private_ssh_receipt: dict | None = None) -> dict:
     """Read independently from OCI; return only aggregate-safe checks."""
     tenant, region = receipt["tenancy_id"], receipt["home_region"]
     require(BASE.home_region(tenant) == region,
@@ -161,12 +224,12 @@ def inspect_running_micro(receipt: dict) -> dict:
     vnics = _list(BASE.cli("compute", "instance", "list-vnics",
                            "--instance-id", receipt["instance_id"],
                            region=region), "VM attached VNICs")
-    require(len(vnics) == 1
-            and vnics[0].get("subnet-id") == receipt["subnet_id"]
-            and vnics[0].get("nsg-ids") == [],
-            "VM has unexpected VNIC or attached network security groups")
-    # Empty security-list ingress AND zero attached NSGs are required
-    # together. Never interpret an unattested private NSG as no ingress.
+    require(len(vnics) == 1 and vnics[0].get("subnet-id") == receipt["subnet_id"],
+            "VM has unexpected VNIC or unapproved subnet")
+    management_nsg_count = _verify_vnic_nsg(
+        receipt, vnics[0], private_ssh_receipt, region)
+    # A separately attested private-only SSH management rule is NEVER
+    # reported as zero total ingress. The original security list remains closed.
     routes = _get("network", "route-table", "get", "--rt-id",
                   receipt["route_table_id"], region=region)
     route_rules = routes.get("route-rules")
@@ -210,7 +273,9 @@ def inspect_running_micro(receipt: dict) -> dict:
         "boot_volume_gb": BOOT_GB,
         "vm_expected_subnet_and_vnic_verified": True,
         "oci_security_list_zero_ingress": True,
-        "vm_attached_nsg_count": 0,
+        "vm_attached_nsg_count": management_nsg_count,
+        "private_management_ssh_rule_verified": management_nsg_count == 1,
+        "no_public_ingress_rules_verified": True,
         "outbound_route_verified": True,
         "app_installed": None,
         "guest_firewall_verified": False,
@@ -226,8 +291,15 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--receipt", type=Path, default=FINAL_RECEIPT,
                         help="owner-controlled exact OCI final receipt, read-only")
+    parser.add_argument("--private-ssh-receipt", type=Path,
+                        default=PRIVATE_SSH_RECEIPT,
+                        help="optional owner-only private SSH NSG receipt")
     args = parser.parse_args(argv)
-    report = inspect_running_micro(_read_final_receipt(args.receipt))
+    private_proof = None
+    if args.private_ssh_receipt.exists() or args.private_ssh_receipt.is_symlink():
+        private_proof = _read_private_ssh_receipt(args.private_ssh_receipt)
+    report = inspect_running_micro(_read_final_receipt(args.receipt),
+                                   private_ssh_receipt=private_proof)
     print(json.dumps(report, sort_keys=True))
     return 0
 
