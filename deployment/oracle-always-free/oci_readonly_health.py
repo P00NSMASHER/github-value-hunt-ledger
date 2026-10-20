@@ -184,11 +184,13 @@ def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str
     return token
 
 
-def check_bucket(bucket: object) -> None:
+def check_bucket(bucket: object, expected_compartment: str) -> None:
     def value(name):
         return getattr(bucket, name, None)
     require(value("name") == BUCKET and value("public_access_type") == "NoPublicAccess",
             "Private bucket identity/access check failed")
+    require(value("compartment_id") == expected_compartment,
+            "Private bucket is not in the expected OCI compartment")
     require(value("storage_tier") == "Standard" and value("versioning") == "Disabled",
             "Private bucket storage-tier/versioning check failed")
     require(value("object_events_enabled") is False and
@@ -198,9 +200,12 @@ def check_bucket(bucket: object) -> None:
             "Unexpected automatic storage-tier change")
 
 
-def check_instance(instance: object, expected_id: str) -> None:
+def check_instance(instance: object, expected_id: str,
+                   expected_compartment: str) -> None:
     require(getattr(instance, "id", None) == expected_id,
             "OCI VM identity check failed")
+    require(getattr(instance, "compartment_id", None) == expected_compartment,
+            "OCI VM is not in the expected OCI compartment")
     require(getattr(instance, "shape", None) == SHAPE, "OCI VM shape changed")
     require(getattr(instance, "lifecycle_state", None) == "RUNNING",
             "OCI VM is not RUNNING")
@@ -229,9 +234,10 @@ def do_live_check(settings: dict[str, str]) -> None:
                                                      retry_strategy=no_retry)
     compute = oci.core.ComputeClient(cfg, signer=signer, retry_strategy=no_retry)
     bucket = storage.get_bucket(settings["RETALLY_OCI_NAMESPACE"], BUCKET).data
-    check_bucket(bucket)
+    check_bucket(bucket, settings["RETALLY_OCI_COMPARTMENT_OCID"])
     vm = compute.get_instance(settings["RETALLY_OCI_VM_OCID"]).data
-    check_instance(vm, settings["RETALLY_OCI_VM_OCID"])
+    check_instance(vm, settings["RETALLY_OCI_VM_OCID"],
+                   settings["RETALLY_OCI_COMPARTMENT_OCID"])
 
 
 def report(ok: bool) -> None:
