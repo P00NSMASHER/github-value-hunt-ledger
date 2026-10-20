@@ -65,8 +65,6 @@ jobs:
       id-token: write
     env:
       RETALLY_OCI_IDENTITY_DOMAIN_URL: ${{ vars.RETALLY_OCI_IDENTITY_DOMAIN_URL }}
-      RETALLY_OCI_OAUTH_CLIENT_ID: ${{ secrets.RETALLY_OCI_OAUTH_CLIENT_ID }}
-      RETALLY_OCI_OAUTH_CLIENT_SECRET: ${{ secrets.RETALLY_OCI_OAUTH_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -77,4 +75,9 @@ jobs:
       - name: Install pinned Oracle SDK (no OCI CLI config or user API key)
         run: python -m pip install --disable-pip-version-check 'oci==2.188.0'
       - name: Verify GitHub OIDC and use short-lived OCI resource identity
+        # OAuth credentials are visible only to the final restricted OCI process,
+        # never to checkout, Python setup, or the SDK package installer.
+        env:
+          RETALLY_OCI_OAUTH_CLIENT_ID: ${{ secrets.RETALLY_OCI_OAUTH_CLIENT_ID }}
+          RETALLY_OCI_OAUTH_CLIENT_SECRET: ${{ secrets.RETALLY_OCI_OAUTH_CLIENT_SECRET }}
         run: python deployment/oracle-always-free/retally_oci_readonly.py
