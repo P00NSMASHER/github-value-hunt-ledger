@@ -167,12 +167,16 @@ def test_cash_credit_and_reversal_conservation_without_invented_refunds():
     refund = movement("R1", "REFUND", 300, True, record=r)
     before = replay_financial_movements(r, (cash, credit, refund))
     assert before.declared_net_cash_cents == 9700
-    assert before.verified_net_cash_cents == 9700
+    assert before.verified_net_cash_cents == 0
+    assert before.source_attested_net_cash_cents == 9700
+    assert before.status == 'REVIEW_REQUIRED'
+    assert 'INDEPENDENT_SETTLEMENT_AUTHENTICATION_NOT_IMPLEMENTED' in before.blockers
     assert before.declared_net_postinvoice_credits_cents == 1200
     assert before.remaining_balance_cents == r.billed_total_cents - 10900
     reverse = movement("REVP", "PAYMENT_REVERSAL", 10000, True, "P1", record=r)
     after = replay_financial_movements(r, (cash, credit, refund, reverse))
-    assert after.verified_net_cash_cents == -300
+    assert after.verified_net_cash_cents == 0
+    assert after.source_attested_net_cash_cents == -300
     assert after.declared_net_postinvoice_credits_cents == 1200
     assert after.remaining_balance_cents == r.billed_total_cents - 900
     assert before.receipt_hash != after.receipt_hash
@@ -214,6 +218,9 @@ def test_financial_release_review_and_no_cash_recovery_without_refund_proof():
     assert approved.rated_discrepancy_cents == 2700
     assert approved.validated_discrepancy_cents == 0
     assert "GOVERNED_BUYER_AUDIT_ACCEPTANCE_NOT_COMPLETED" in approved.blockers
+    assert 'NO_INDEPENDENT_BANK_CLEARED_PAYMENT' in approved.blockers
+    assert cleared.verified_net_cash_cents == 0
+    assert cleared.source_attested_net_cash_cents == 18700
     assert approved.realized_recovery_cents == 0
     held = financial_claim_gate(record, rating, cleared, human_release_approved=False)
     assert held.validated_discrepancy_cents == 0
@@ -260,7 +267,8 @@ def test_money_proof_cannot_be_reused_for_another_invoice():
     altered = replace(original, record_hash="0" * 64)
     valid = movement("B1", "PAYMENT", 1000, True, record=original)
     replay = replay_financial_movements(original, (valid,))
-    assert replay.verified_net_cash_cents == 1000
+    assert replay.verified_net_cash_cents == 0
+    assert replay.source_attested_net_cash_cents == 1000
     mismatch_invoice = build_record(
         buyer_id=original.buyer_id, business_unit=original.business_unit,
         invoice_id="a second invoice", invoice_date=original.invoice_date,
@@ -290,7 +298,9 @@ def test_scoped_kernel_corruption_and_bounded_review():
     invoices = [_scoped("I1", "12.00", "PAY-1"), _scoped("I2", "9.00", "PAY-1")]
     correct = _scoped("B1", "21.00", "PAY-1", "BANK_CLEARED")
     baseline = reconcile_scoped(invoices, [correct])
-    assert baseline.matched_internal == 2 and baseline.proven_cleared_payment_count == 1
+    assert baseline.matched_internal == 2
+    assert baseline.bank_labeled_counterpart_matches == 1
+    assert baseline.proven_cleared_payment_count == 0
     for corrupted in [
         replace(correct, txn=replace(correct.txn, amount="21.01")),
         replace(correct, txn=replace(correct.txn, reference="PAY-2")),
