@@ -345,6 +345,8 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
             raise ValueError(
                 "recovery claim record proof hashes must be SHA-256 digests"
             )
+        if record.claim_id != "claim:" + record.finding_proof_hash:
+            raise ValueError("recovery claim id must derive from finding proof")
         if (
             type(record.incumbent_preidentified) is not bool
             or type(record.fee_disqualified) is not bool
