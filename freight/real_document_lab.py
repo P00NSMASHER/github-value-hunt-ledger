@@ -407,35 +407,122 @@ def benchmark_freight() -> dict:
 
 
 def _rating_probe(faces: list[InvoiceFace], texts: list[str], pdf_sha256: str) -> dict:
-    """Use only PDF-grounded fields to exercise the real rating engine.
+    """Run the actual freight schema/rating engine on SOURCE-DERIVED lab proxies.
 
-    A face-total is explicitly a proxy charge and cannot establish a true
-    carrier charge breakdown. No rate book is supplied; all results must abstain.
+    PDF invoice 'total weight' is a BILL-REPORTED rated weight, not an
+    independently established actual shipment weight. Shipment date substitutes
+    for absent invoice issue date. Invoice face total substitutes for a detailed
+    freight charge breakdown. These are prohibited as freight-accuracy ground
+    truth and may only smoke-test the engine's REVIEW_REQUIRED behavior.
     """
     from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record
     from freight.rate_authority import AuthorityBook
     from freight.rating_engine import REVIEW_REQUIRED, rate_record
 
-    count = blocked = reviewed = bad_money = 0
+    accepted = blocked = review = unsafe = 0
     reasons: Counter = Counter()
+    rating_hashes = []
     for face in faces:
-        count += 1
         page_text = texts[face.page - 1]
-        if face.cents is None or not face.shipment_date or not face.mode:
+        if (face.cents is None or not face.shipment_date or
+                not face.mode or face.cents <= 0):
             blocked += 1
-            reasons["MISSING_FACE_AMOUNT_MODE_OR_SHIPMENT_DATE"] += 1
+            reasons["SOURCE_MISSING_AMOUNT_MODE_OR_SHIPMENT_DATE"] += 1
             continue
-        # Postal codes and billed weight are deliberately NOT imputed from
-        # remittance addresses or rating tables. This avoids fabricated
-        # origin, destination and actual-shipment fields in a canonical record.
-        blocked += 1
-        reasons["ORIGIN_DESTINATION_ACTUAL_WEIGHT_AND_INVOICE_DATE_UNVERIFIED"] += 1
+
+        # Parse shipper and consignee ZIP codes from the repeated main
+        # invoice freight-bill header, not from the lockbox/Bill To fields.
+        references = list(re.finditer(
+            r"Freight\s+Bill\s+No:?\s*" + re.escape(face.number) + r"\b",
+            page_text, re.I))
+        if len(references) < 2:
+            blocked += 1
+            reasons["MAIN_FREIGHT_BILL_SHIPPER_CONSIGNEE_NOT_FOUND"] += 1
+            continue
+        shipment_region = page_text[references[-1].end():]
+        shipment_region = re.split(r"Shipping\s+Date:", shipment_region, maxsplit=1, flags=re.I)[0]
+        zips = re.findall(r"\b(\d{5})(?:-\d{4})?\b", shipment_region)
+        if len(zips) != 2:
+            blocked += 1
+            reasons["SOURCE_ORIGIN_DESTINATION_POSTAL_AMBIGUOUS"] += 1
+            continue
+
+        # Read printed billed pieces/weight only. Never silently infer it
+        # from later weight certificates or third-party contracted rates.
+        weight = re.search(
+            r"Total\s+Pieces\s+Total\s+Weight\s+TOTAL\s+AMOUNT\s+"
+            r"\$?\s*[\d,]+\.\d{2}\s+([\d,]+)\s+([\d,]+)",
+            page_text, re.I,
+        )
+        if not weight:
+            blocked += 1
+            reasons["SOURCE_BILLED_PIECES_WEIGHT_UNREADABLE"] += 1
+            continue
+        pieces = int(weight.group(1).replace(",", ""))
+        pounds = int(weight.group(2).replace(",", ""))
+        if pieces < 1 or pounds < 1:
+            blocked += 1
+            reasons["SOURCE_NON_POSITIVE_BILLED_PIECES_WEIGHT"] += 1
+            continue
+
+        document = SourceArtifact(
+            source_id="public:arcbest:" + _safe_sha(face.number),
+            kind="PUBLIC_COURT_ORIGINAL_INVOICE",
+            sha256=pdf_sha256,
+            observed_at="2026-10-19T00:00:00.000000Z",
+            transport="BATCH", filename="arcbest.pdf",
+        )
+        # All three stand-ins are explicitly test-only, not trusted buyer facts.
+        record = build_record(
+            buyer_id="ISOLATED_PUBLIC_RESEARCH_ONLY", business_unit="DOCUMENT_PROBE",
+            invoice_id=face.number, invoice_date=face.shipment_date,
+            customer_id="SDI_USA_LLC", currency="USD",
+            shipment=ShipmentFacts(
+                shipment_id="invoice-reference:" + face.number,
+                carrier_id="ABF_FREIGHT", mode=face.mode,
+                service_date=face.shipment_date,
+                origin_postal=zips[0], destination_postal=zips[1],
+                actual_weight_grams=int((Decimal(pounds) * Decimal("453.59237")).to_integral_value()),
+                package_count=pieces,
+            ),
+            charges=(ChargeLine(
+                charge_id="LAB_INVOICE_FACE_" + _safe_sha(face.number),
+                charge_code="DOCUMENT_FACE_TOTAL_NOT_RATE_LINE",
+                billed_cents=face.cents),),
+            sources=(document,),
+        )
+        try:
+            outcome = rate_record(record, AuthorityBook(()))
+            rerun = rate_record(record, AuthorityBook(()))
+            if (outcome.status != REVIEW_REQUIRED or
+                    outcome.expected_total_cents is not None or
+                    outcome.variance_cents is not None or
+                    outcome.rating_hash != rerun.rating_hash):
+                unsafe += 1
+                reasons["ENGINE_UNSAFE_DECISION_OR_NONDETERMINISM"] += 1
+                continue
+            accepted += 1
+            review += 1
+            rating_hashes.append(outcome.rating_hash)
+        except ValueError:
+            blocked += 1
+            reasons["SCHEMA_REJECTED_LAB_PROXY"] += 1
     return {
-        "invoice_faces_considered": count,
-        "canonical_records_rated": reviewed,
+        "invoice_faces_considered": len(faces),
+        "lab_proxy_canonical_records_executed": accepted,
         "source_completeness_blocked": blocked,
-        "auto_overcharges_asserted": bad_money,
-        "status": "NOT_RATEABLE_WITHOUT_COMPLETE_INVOICE_FACTS_AND_CONTROLLING_TARIFF",
+        "engine_review_required": review,
+        "unsafe_auto_money_or_nondeterministic": unsafe,
+        "auto_overcharges_asserted": 0,
+        "lab_proxy_rating_hash_sha256": digest(
+            "".join(rating_hashes).encode("utf-8")),
+        "status": "NO_VERIFIED_CONTROLLING_RATE_SO_REVIEW_ONLY",
+        "source_proxies_not_accuracy_evidence": [
+            "Shipment date used in place of missing invoice issue date",
+            "Bill-reported rated weight not independently established actual weight",
+            "Source invoice grand total used as placeholder charge, not rated charge lines",
+            "No shipment-specific effective customer tariff/rate authority",
+        ],
         "blockers": dict(reasons),
     }
 
