@@ -36,8 +36,8 @@ SUBNET_NETWORK = '10.76.1.0/24'
 RESOURCE_DIR = Path.home() / '.retally-oracle'
 RECEIPT = RESOURCE_DIR / 'always-free-staging-receipt.json'
 PARTIAL = RESOURCE_DIR / 'partial-setup-receipt.json'
-PUBLIC_KEY = RESOURCE_DIR / 'retally_oci_a1_ed25519.pub'
-PRIVATE_KEY = RESOURCE_DIR / 'retally_oci_a1_ed25519'
+PUBLIC_KEY = RESOURCE_DIR / 'retally_oci_a1_rsa4096.pub'
+PRIVATE_KEY = RESOURCE_DIR / 'retally_oci_a1_rsa4096'
 
 
 class Stop(RuntimeError):
@@ -242,6 +242,7 @@ def safe_receipt(data: dict, *, partial: bool):
 
 
 def generate_keypair():
+    # Oracle Cloud Shell enforces FIPS mode and rejects Ed25519. Use RSA-4096.
     RESOURCE_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(RESOURCE_DIR, 0o700)
     ensure(PRIVATE_KEY.exists() == PUBLIC_KEY.exists(),
@@ -249,10 +250,10 @@ def generate_keypair():
     if PRIVATE_KEY.exists():
         ensure(PRIVATE_KEY.is_file() and PUBLIC_KEY.is_file() and
                (PRIVATE_KEY.stat().st_mode & 0o077) == 0 and
-               PUBLIC_KEY.read_text(encoding='ascii').startswith('ssh-ed25519 '),
+               PUBLIC_KEY.read_text(encoding='ascii').startswith('ssh-rsa '),
                'Existing Cloud Shell SSH key permissions/type are not acceptable.')
         return PUBLIC_KEY
-    ensure(subprocess.run(['ssh-keygen', '-q', '-t', 'ed25519', '-N', '', '-f', str(PRIVATE_KEY)],
+    ensure(subprocess.run(['ssh-keygen', '-q', '-t', 'rsa', '-b', '4096', '-N', '', '-f', str(PRIVATE_KEY)],
                           capture_output=True, check=False, timeout=30).returncode == 0,
            'Could not generate the SSH keypair in Cloud Shell.')
     os.chmod(PRIVATE_KEY, 0o600)
