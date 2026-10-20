@@ -64,6 +64,12 @@ class SnapshotReaderTests(unittest.TestCase):
     def reader(self, data):
         return CaptureBriefOutcomeReader(lambda: copy.deepcopy(data))
 
+    def test_snapshot_capture_timestamp_cannot_race_reader_clock(self):
+        def live_capture():
+            return snapshot(observed=datetime.now(timezone.utc).isoformat())
+        result = CaptureBriefOutcomeReader(live_capture).observe()
+        self.assertEqual("PRESENT_EMPTY", result["snapshot_presence"])
+
     def test_genuinely_present_empty_snapshot_not_missing_file(self):
         got = self.reader(snapshot()).observe(now=NOW)
         self.assertEqual("PRESENT_EMPTY", got["snapshot_presence"])

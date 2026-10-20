@@ -243,8 +243,8 @@ class CaptureBriefOutcomeReader:
     def observe(self, *, now: datetime | None = None) -> dict[str, Any]:
         with self._lock:
             try:
-                current = _now(now)
                 snapshot = self._read_snapshot()
+                current = _now(now)
                 _require(isinstance(snapshot, Mapping) and set(snapshot) == _SNAPSHOT_FIELDS)
                 _require(snapshot["present"] is True)
                 raw = snapshot["content"]
