@@ -491,6 +491,10 @@ def benchmark_freight() -> dict:
         out = {
             "source_url": url,
             "sha256": digest(raw),
+            "frozen_original_sha256_verified": True,
+            "source_face_catalog_sha256": digest(json.dumps(
+                [(f.number, f.page, f.cents) for f in sorted(unique.values(), key=lambda row: row.number)],
+                separators=(",", ":"), ensure_ascii=True).encode()),
             "pdf_bytes": len(raw),
             "pages": len(texts),
             "pages_with_text": sum(bool(t.strip()) for t in texts),
@@ -902,8 +906,14 @@ def blind_freight_assessment(freight: dict) -> dict:
     # truth package required to score RETALLY freight error detection.
     return {
         "protocol": "freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md",
-        "predictions_frozen_before_truth": True,
+        "blinding_protocol_status": "NOT_EXECUTED_INDEPENDENT_TRUTH_AND_REVIEWERS_ABSENT",
+        "predictions_frozen_before_truth": False,
         "independent_blind_truth_adjudication_completed": False,
+        "frozen_unscored_case_catalog_sha256": digest(json.dumps(
+            sorted((kind, info["sha256"], info["source_face_catalog_sha256"],
+                    info["distinct_invoice_face_ids"]) for kind, info in freight.items()),
+            separators=(",", ":"), ensure_ascii=True).encode()),
+        "model_output_evaluated_on_truth_cases": 0,
         "prediction_summary": pred,
         "reference_cases": "HISTORICAL_GAO_DECISIONS_REFERENCE_ONLY_WITHOUT_LINKED_INVOICE_RATE_AND_PAYMENT",
         "label_policy": "POSITIVE_OR_NEGATIVE_ONLY_WHEN_FULLY_INDEPENDENT_EVIDENCE_EXISTS",
