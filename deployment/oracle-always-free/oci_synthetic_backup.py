@@ -146,6 +146,17 @@ class OciStore:
                "auto-tiering" in b and b["auto-tiering"] in (None, "Disabled") and
                "object-lifecycle-policy-etag" in b and b["object-lifecycle-policy-etag"] is None,
                "OCI bucket privacy, tier, auto-tiering, lifecycle, events or replication state changed.")
+        # Unknown KMS/audit state or soft-delete may invalidate $0 guardrails
+        # and the claim that a temporary encrypted object was removed.
+        ensure("kms-key-id" in b and b["kms-key-id"] is None and
+               b.get("object-level-audit-mode") == "Disabled",
+               "OCI bucket KMS key or object-level audit state is not approved.")
+        deletion = b.get("soft-delete-policy")
+        ensure(isinstance(deletion, dict) and
+               isinstance(deletion.get("current-policy"), dict) and
+               deletion["current-policy"].get("soft-delete-mode") == "Disabled" and
+               "next-policy" in deletion and deletion["next-policy"] is None,
+               "OCI soft-delete is enabled, scheduled, or unknown; deletion proof is unsafe.")
 
     def objects(self, prefix: str) -> list[dict]:
         # Never treat a single OCI page as a complete remote inventory. OCI defaults
