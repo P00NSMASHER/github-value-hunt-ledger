@@ -117,6 +117,10 @@ class CustomerReadinessTests(unittest.TestCase):
         self.assertIn('Cash verification: NOT VERIFIED.', report['html'])
         self.assertIn('No displayed receipt is independently authenticated', report['html'])
         self.assertIn('12750', report['csv'])
+        self.assertTrue(report['csv'].splitlines()[0].endswith(
+            ',external_cash_verification_status'))
+        self.assertTrue(all(line.endswith(',NOT_VERIFIED')
+                            for line in report['csv'].splitlines()[1:]))
         self.assertEqual(hashlib.sha256(report['json'].encode()).hexdigest(),
                          report['sha256'])
         # Actual synthetic fixture remains source-isolated; no money moved.
