@@ -555,3 +555,36 @@ def test_self_hashed_claim_batch_rejects_invalid_provenance_digest(field):
 
     with pytest.raises(ValueError, match="provenance hashes must be SHA-256"):
         verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_blank_review_proof_digest():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original = batch.records[0]
+    record = replace(original, review_hash="", record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="record proof hashes must be SHA-256"):
+        verify_recovery_claim_batch(forged)
