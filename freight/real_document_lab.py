@@ -22,7 +22,7 @@ import json
 import re
 from pathlib import Path
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from freight.ingestion_gateway import IngressEnvelope, ingest_bytes
 from recoveryworks.reconciliation_kernel import (
@@ -117,14 +117,50 @@ def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+# Frozen source-byte identities from the accepted 2026-10-20 original replay.
+# Content changes require an explicit reviewed baseline update, not blind refresh.
+FROZEN_DOCUMENT_SHA256 = {
+    "globaltranz": "45d4b8fae33234d3b9efe087e60a10dc5f6fc45f8cc9f5099560c6c63bfb33b4",
+    "arcbest": "4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17",
+}
+FROZEN_PENNINE_SHA256 = {
+    "2026-04": "314cd0c021f137b43b94e81bb93f26aece5b3b0a021e99c42d43546a640c3d90",
+    "2026-05": "5957ead9c23d57039e267dc18076c7b8d711a14b97cbea6d9a9ff0629aeb5028",
+    "2026-06": "318aeeedbf55d05bcffce5076ac893a84bdb6ebe5e7c851bb3f3c45dbbdea8fc",
+    "2026-07": "ecb986bd0e33cf402f7cb86ff68bc91368d18a5dfc39410e4e2019c045c3de15",
+    "2026-08": "4153ccbbbe27307afddba1d6651bfd9db8a774cc84e4fd23d62b3a2d1059d796",
+}
+
+
+def require_frozen_source(kind: str, label: str, data: bytes) -> str:
+    expected = (FROZEN_DOCUMENT_SHA256 if kind == "document" else
+                FROZEN_PENNINE_SHA256 if kind == "pennine" else None)
+    if expected is None or label not in expected:
+        raise ValueError("unknown frozen source identity")
+    actual = digest(data)
+    if actual != expected[label]:
+        raise ValueError(f"FROZEN_PUBLIC_SOURCE_CHANGED:{kind}:{label}")
+    return actual
+
+
+class _ApprovedRedirects(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target = urlparse(newurl)
+        if target.scheme != "https" or target.hostname not in ALLOW_HOSTS:
+            raise ValueError("out-of-allowlist source redirect blocked before request")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
 def fetch_public(url: str) -> bytes:
     """Fixed allowlist, bounded reads; never accept redirects to new hosts."""
-    if urlparse(url).hostname not in ALLOW_HOSTS:
-        raise ValueError("unapproved source host")
+    parts = urlparse(url)
+    if parts.scheme != "https" or parts.hostname not in ALLOW_HOSTS or parts.username or parts.password:
+        raise ValueError("unapproved HTTPS source origin")
     request = Request(url, headers={"User-Agent": "RETALLY-Research-Document-QA/1.0"})
-    with urlopen(request, timeout=45) as response:
-        if urlparse(response.geturl()).hostname not in ALLOW_HOSTS:
-            raise ValueError("source redirect changed host")
+    with build_opener(_ApprovedRedirects()).open(request, timeout=45) as response:
+        final = urlparse(response.geturl())
+        if final.scheme != "https" or final.hostname not in ALLOW_HOSTS:
+            raise ValueError("unapproved final source origin")
         data = response.read(LIMIT + 1)
     if not data or len(data) > LIMIT:
         raise ValueError("source empty or over 35 MB")
@@ -160,7 +196,15 @@ def pdf_texts(raw: bytes) -> list[str]:
         raise ValueError("non-PDF supplied")
     doc = pymupdf.open(stream=raw, filetype="pdf")
     try:
-        return [page.get_text("text", sort=False) for page in doc]
+        if len(doc) > 150:
+            raise ValueError("document page limit exceeded")
+        pages: list[str] = []
+        for page in doc:
+            data = page.get_text("text", sort=False)
+            if len(data) > 200_000:
+                raise ValueError("excessive page text size")
+            pages.append(data)
+        return pages
     finally:
         doc.close()
 
@@ -365,6 +409,7 @@ def benchmark_freight() -> dict:
     results: dict = {}
     for issuer, url in DOCUMENTS.items():
         raw = fetch_public(url)
+        source_hash = require_frozen_source("document", issuer, raw)
         native = ingest_bytes(IngressEnvelope(
             ingress_id="test:" + issuer, buyer_id="BENCHMARK_ONLY",
             business_unit="ISOLATED_NO_CUSTOMER", transport="BATCH",
@@ -592,8 +637,8 @@ def _key(row: dict, fields: tuple[str, ...]) -> str:
 
 
 def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
-    data = raw.decode("utf-8-sig", errors="replace")
-    reader = csv.reader(io.StringIO(data, newline=""))
+    data = raw.decode("utf-8-sig", errors="strict")
+    reader = csv.reader(io.StringIO(data, newline=""), strict=True)
     required = ("supplier number", "invoice number", "invoice date",
                 "invoice amount", "payment number", "payment date",
                 "payment currency", "payment status name")
@@ -635,6 +680,7 @@ def benchmark_pennine() -> dict:
     monthly_counts = {}
     for month, url in PENNINE.items():
         raw = fetch_public(url)
+        require_frozen_source("pennine", month, raw)
         rows = parse_pennine_csv(raw, month)
         monthly_counts[month] = len(rows)
         source_hashes[month] = {"url": url, "sha256": digest(raw), "bytes": len(raw)}
