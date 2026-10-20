@@ -405,6 +405,74 @@ def reference_scoped_replay(
         raise ValueError("invoice-count conservation failed")
     return report
 
+
+def adversarial_declared_payment_controls(
+    invoices: list[ReconTxn], counterparts: list[ReconTxn],
+    invoice_group: dict[str, str], payment_group: dict[str, str],
+) -> dict:
+    """Falsify source-derived reconciliation using controlled corruptions.
+
+    These tests *do not* supply independent bank transactions. They establish
+    that the existing matching engine + bounded reference scope detect
+    deliberate one-cent, reference, currency and duplicate-declaration faults
+    in a copy of the actual Pennine invoice population.
+    """
+    counts = Counter(invoice_group.values())
+    exemplar = next(
+        (row for row in counterparts if counts[payment_group[row.id]] == 1),
+        None,
+    )
+    if exemplar is None:
+        raise ValueError("no singleton payment declaration for negative controls")
+    base = reference_scoped_replay(invoices, counterparts, invoice_group, payment_group)
+    if base["matched_invoices"] != len(invoices):
+        raise ValueError("cannot assess controlled corruption before structural baseline matches")
+
+    def altered(*, amount: str | None = None, currency: str | None = None) -> list[ReconTxn]:
+        return [
+            (ReconTxn(id=row.id,
+                      amount=(amount if amount is not None else row.amount),
+                      date=row.date, currency=currency or row.currency,
+                      reference=row.reference)
+             if row.id == exemplar.id else row)
+            for row in counterparts
+        ]
+
+    tampered_amount = str(Decimal(str(exemplar.amount)) + Decimal("0.01"))
+    penny_result = reference_scoped_replay(
+        invoices, altered(amount=tampered_amount), invoice_group, payment_group)
+    wrong_ref_map = dict(payment_group)
+    wrong_ref_map[exemplar.id] = "LAB_NEGATIVE_CONTROL_DIFFERENT_PAYMENT_REFERENCE"
+    # This deliberately changes only the reference-group matching assertion.
+    wrong_ref_result = reference_scoped_replay(
+        invoices, counterparts, invoice_group, wrong_ref_map)
+    wrong_currency_result = reference_scoped_replay(
+        invoices, altered(currency="USD"), invoice_group, payment_group)
+
+    duplicate_rejected = False
+    try:
+        reference_scoped_replay(
+            invoices, counterparts + [exemplar], invoice_group, payment_group)
+    except ValueError as exc:
+        duplicate_rejected = "ambiguous source-declared grouped counterpart" in str(exc)
+
+    checks = {
+        "one_penny_corrupt_declaration_unmatched": penny_result["unmatched_invoices"] == 1,
+        "wrong_payment_reference_unmatched": wrong_ref_result["unmatched_invoices"] == 1,
+        "wrong_currency_unmatched": wrong_currency_result["unmatched_invoices"] == 1,
+        "duplicate_payment_declaration_rejected": duplicate_rejected,
+    }
+    return {
+        "kind": "CONTROLLED_NEGATIVE_CONTROLS_NOT_REAL_PAYMENT_OUTCOMES",
+        "real_invoice_rows_replayed": len(invoices),
+        "scenario_count": len(checks),
+        "checks": checks,
+        "all_controls_detected": all(checks.values()),
+        "independently_cleared_bank_rows_used": 0,
+        "real_world_economic_false_positive_rate": None,
+    }
+
+
 def benchmark_freight() -> dict:
     results: dict = {}
     for issuer, url in DOCUMENTS.items():
@@ -751,6 +819,8 @@ def benchmark_pennine() -> dict:
         "retally_reconciliation_kernel": recon,
         "retally_source_reference_scoped_kernel_replay": reference_scoped_replay(
             invoices, counterparts, invoice_group, payment_group, max_group_size=8),
+        "adversarial_source_declared_payment_controls": adversarial_declared_payment_controls(
+            invoices, counterparts, invoice_group, payment_group),
         "global_kernel_limit_interpretation":
             "The default unscoped many-to-one first-18-candidate search is not reference-partitioned; unmatched is NOT evidence of unpaid invoices.",
         "row_count_matches_prior_baseline": len(all_rows) == EXPECTED["pennine_disclosed_rows"],
