@@ -20,10 +20,13 @@ class RetallyFinishingTests(unittest.TestCase):
         self.assertIn("font-style:italic;",css)
         self.assertIn(".home-simple .mobile-cta{display:none!important}",css)
 
-    def test_site_hero_and_contact_workflow_unchanged(self):
+    def test_site_hero_buyer_copy_and_contact_workflow_preserved(self):
         page=(SITE / "index.html").read_text(encoding="utf-8")
         script=(SITE / "site.js").read_text(encoding="utf-8")
-        self.assertIn("We find freight billing errors, document the evidence, and help recover overpayments.",page)
+        self.assertIn(
+            '<p class="lead">Review historical freight charges against the rates, shipment records and credits that should govern them. RETALLY documents supportable findings and helps pursue recovery with your approval.</p>',
+            page,
+        )
         self.assertIn('id="auditForm"',page)
         self.assertIn("mailto:",script)
         self.assertIn('id="fee-calculator"',page)
