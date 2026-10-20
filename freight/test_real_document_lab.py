@@ -8,6 +8,7 @@ from freight.ingestion_gateway import IngressEnvelope, ingest_bytes
 from freight.real_document_lab import (
     _arcbest_page, _global_page, _recon_result, blind_freight_assessment,
     fetch_public, iso_date, minor, parse_pennine_csv, statement_rows,
+    reference_scoped_replay,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -81,6 +82,29 @@ class LaboratoryTests(unittest.TestCase):
         counterpart = [ReconTxn("p2", "100.00", "2026-07-01", "GBP", "PAY-2")]
         report = _recon_result(internal, counterpart, {"i1": "PAY-1", "p2": "PAY-2"})
         self.assertGreaterEqual(report["cross_reference_false_joins"], 1)
+
+    def test_actual_kernel_reference_scope_preserves_many_invoice_groups(self):
+        invoice_rows = [
+            ReconTxn("i1", "12.00", "2026-07-01", "GBP", "PAY1"),
+            ReconTxn("i2", "9.00", "2026-07-01", "GBP", "PAY1"),
+            ReconTxn("i3", "5.00", "2026-07-01", "GBP", "PAY2"),
+        ]
+        declarations = [
+            ReconTxn("p1", "21.00", "2026-07-01", "GBP", "PAY1"),
+            ReconTxn("p2", "5.00", "2026-07-01", "GBP", "PAY2"),
+        ]
+        a_keys = {"i1": "PAY1", "i2": "PAY1", "i3": "PAY2"}
+        b_keys = {"p1": "PAY1", "p2": "PAY2"}
+        result = reference_scoped_replay(
+            invoice_rows, declarations, a_keys, b_keys, max_group_size=8)
+        self.assertEqual(result["matched_invoices"], 3)
+        self.assertEqual(result["matched_groups"], 2)
+        self.assertEqual(result["cross_reference_false_joins"], 0)
+        self.assertEqual(result["by_kernel_rule"]["many-to-one"], 1)
+        capped = reference_scoped_replay(
+            invoice_rows, declarations, a_keys, b_keys, max_group_size=1)
+        self.assertEqual(capped["matched_invoices"], 1)
+        self.assertEqual(capped["unmatched_over_group_bound_invoices"], 2)
 
     def test_native_pdf_ingress_is_not_pdf_extraction(self):
         receipt = ingest_bytes(
