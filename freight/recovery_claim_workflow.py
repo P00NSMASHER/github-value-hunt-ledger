@@ -321,6 +321,13 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         batch.bindings,
         strict=True,
     ):
+        if any(
+            not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None
+            for value in (record.finding_proof_hash, record.review_hash)
+        ):
+            raise ValueError(
+                "recovery claim record proof hashes must be SHA-256 digests"
+            )
         if (
             type(record.incumbent_preidentified) is not bool
             or type(record.fee_disqualified) is not bool
