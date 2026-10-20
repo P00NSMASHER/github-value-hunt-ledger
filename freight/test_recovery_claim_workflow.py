@@ -588,3 +588,55 @@ def test_self_hashed_claim_batch_rejects_blank_review_proof_digest():
 
     with pytest.raises(ValueError, match="record proof hashes must be SHA-256"):
         verify_recovery_claim_batch(forged)
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("claim_id", "finding_id", "reference", "payer_id", "payee_id", "currency"),
+)
+def test_self_hashed_claim_batch_rejects_blank_claim_field(field):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original_record = batch.records[0]
+    record = replace(original_record, **{field: "   "}, record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+
+    claim_fields = {"claim_id", "reference", "payer_id", "payee_id", "currency"}
+    claim = (
+        replace(batch.claims[0], **{field: "   "})
+        if field in claim_fields
+        else batch.claims[0]
+    )
+    binding_fields = {"claim_id", "finding_id"}
+    binding = (
+        replace(batch.bindings[0], **{field: "   "})
+        if field in binding_fields
+        else batch.bindings[0]
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            claims=(claim,) + batch.claims[1:],
+            bindings=(binding,) + batch.bindings[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="claim text fields must be non-empty"):
+        verify_recovery_claim_batch(forged)
