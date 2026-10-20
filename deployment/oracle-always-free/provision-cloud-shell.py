@@ -329,6 +329,82 @@ def make_network(tenancy: str, region: str, state: dict):
     return state
 
 
+def verify_partial_network(state: dict, tenancy: str, region: str) -> None:
+    """Read-only, exact-resource verification; never creates or edits any OCI object."""
+    ensure(isinstance(state, dict) and state.get('schema') == 1 and
+           state.get('phase') == 'subnet_created' and not state.get('instance_id'),
+           'Only a fully-created network with no recorded VM may be inspected or resumed.')
+    ensure(state.get('tenancy_id') == tenancy and state.get('home_region') == region,
+           'Partial receipt belongs to a different tenancy or home region.')
+    ensure(state.get('release_status') == 'HOLD' and
+           state.get('no_customer_data') is True and state.get('no_open_ingress') is True,
+           'Original safety holds cannot be verified.')
+    ensure(PARTIAL.is_file() and not PARTIAL.is_symlink() and
+           os.stat(PARTIAL).st_mode & 0o077 == 0 and
+           os.stat(PARTIAL).st_uid == os.geteuid(),
+           'Private partial receipt permissions/owner are not verified.')
+    ensure(state.get('public_key_path') == str(PUBLIC_KEY) and
+           state.get('key_private_path') == str(PRIVATE_KEY),
+           'Recorded SSH key path does not match the original staging key.')
+    ensure(PRIVATE_KEY.is_file() and PUBLIC_KEY.is_file() and
+           not PRIVATE_KEY.is_symlink() and not PUBLIC_KEY.is_symlink() and
+           os.stat(PRIVATE_KEY).st_mode & 0o077 == 0 and
+           PUBLIC_KEY.read_text(encoding='ascii').startswith('ssh-rsa '),
+           'Original owner-only RSA-4096 SSH keypair must remain present.')
+
+    ids = ('vcn_id', 'security_list_id', 'route_table_id',
+           'internet_gateway_id', 'subnet_id')
+    ensure(all(isinstance(state.get(k), str) and
+               re.fullmatch(r'ocid1\\.[A-Za-z][A-Za-z0-9]*\\.[A-Za-z0-9.]+', state[k])
+               for k in ids), 'Partial receipt lacks exact OCI resource identifiers.')
+
+    vcn = cli('network', 'vcn', 'get', '--vcn-id', state['vcn_id'], region=region)
+    ensure(isinstance(vcn, dict) and vcn.get('id') == state['vcn_id'] and
+           vcn.get('lifecycle-state') == 'AVAILABLE' and
+           vcn.get('display-name') == VPC_NAME and
+           vcn.get('cidr-blocks') == [str(VPC_NETWORK)] and
+           vcn.get('default-security-list-id') == state['security_list_id'] and
+           vcn.get('default-route-table-id') == state['route_table_id'],
+           'Original VCN or its default security/route identities changed.')
+
+    access = cli('network', 'security-list', 'get',
+                 '--security-list-id', state['security_list_id'], region=region)
+    ensure(isinstance(access, dict) and access.get('id') == state['security_list_id'] and
+           access.get('vcn-id') == state['vcn_id'] and
+           access.get('ingress-security-rules') == [],
+           'Original VCN no longer has a zero-ingress security list.')
+
+    subnet = cli('network', 'subnet', 'get', '--subnet-id', state['subnet_id'],
+                 region=region)
+    ensure(isinstance(subnet, dict) and subnet.get('id') == state['subnet_id'] and
+           subnet.get('lifecycle-state') == 'AVAILABLE' and
+           subnet.get('display-name') == 'retally-outbound-no-inbound' and
+           subnet.get('vcn-id') == state['vcn_id'] and
+           subnet.get('cidr-block') == SUBNET_NETWORK and
+           subnet.get('security-list-ids') == [state['security_list_id']] and
+           subnet.get('prohibit-public-ip-on-vnic') is False,
+           'Original subnet isolation or source permissions cannot be verified.')
+
+    gateway = cli('network', 'internet-gateway', 'get',
+                  '--ig-id', state['internet_gateway_id'], region=region)
+    ensure(isinstance(gateway, dict) and
+           gateway.get('id') == state['internet_gateway_id'] and
+           gateway.get('vcn-id') == state['vcn_id'] and
+           gateway.get('is-enabled') is True and
+           gateway.get('display-name') == 'retally-outbound-only',
+           'Outbound-only gateway identity has changed.')
+
+    route = cli('network', 'route-table', 'get',
+                '--rt-id', state['route_table_id'], region=region)
+    rules = route.get('route-rules') if isinstance(route, dict) else None
+    ensure(isinstance(route, dict) and route.get('id') == state['route_table_id'] and
+           route.get('vcn-id') == state['vcn_id'] and
+           isinstance(rules, list) and len(rules) == 1 and
+           (rules[0].get('destination') or rules[0].get('cidr-block')) == '0.0.0.0/0' and
+           rules[0].get('network-entity-id') == state['internet_gateway_id'],
+           'Outbound-only route no longer matches the recorded gateway.')
+
+
 def launch_vm(inventory: dict, state: dict, ssh_public_key: Path):
     region = inventory['home_region']
     for ad in inventory['ads']:
