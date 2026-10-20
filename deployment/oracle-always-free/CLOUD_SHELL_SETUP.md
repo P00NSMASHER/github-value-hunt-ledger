@@ -26,7 +26,7 @@
 - One `VM.Standard.A1.Flex` with **2 OCPUs / 12 GB RAM**, in the **OCI tenancy home region**.
 - Official **Ubuntu 24.04 Arm64**, one 50-GB boot volume; no marketplace or paid images.
 - One VCN, one public subnet with a public outbound address, one internet gateway, with **zero allowed incoming network ports**. Default SSH ingress is removed and read back **before** a VM or subnet is created. Inbound traffic to RETALLY ports 18765/8765/80/443 remains denied.
-- A local SSH keypair in Cloud Shell at `~/.retally-oracle`; private key remains in Cloud Shell with owner-only permissions. Do not copy or paste the private key into chat.
+- A **FIPS-compatible RSA-4096 SSH keypair** in Cloud Shell at `~/.retally-oracle/retally_oci_a1_rsa4096` (private, mode 0600) and `.pub` (public). The Oracle Cloud Shell environment rejects Ed25519 with `ED25519 keys are not allowed in FIPS mode`. The RSA-4096 private key remains entirely within Cloud Shell. Never copy or paste it into chat or a workstation.
 - An operator-only local receipt `~/.retally-oracle/always-free-staging-receipt.json` recording OCI IDs. If cloud provisioning partially fails, the tool retains a separate partial receipt and refuses an unsafe retry.
 
 ## Important limitations
@@ -34,7 +34,7 @@
 - This is a **free-resource configuration**, not a guaranteed zero-dollar billing cap for an account with other billable resources or a changed plan. Oracle capacity can be unavailable and inactive A1 instances may be reclaimed. Do not select an alternate paid shape.
 - **No workbench runs, no Cloudflare Tunnel, no access bypass and no customer data are installed.** This is intentional until PR #493, PR #500, PR #502 and this script obtain their required independent approvals.
 - Because all inbound rules are denied, direct SSH to the public address will not work. Later administration requires an approved secure Oracle Bastion/console method or a narrowly approved SSH rule. Do not open `0.0.0.0/0` on port 22.
-- Oracle Cloud Shell is not controlled by ChatGPT in this conversation. It is the only place where the actual tenancy can be changed after you securely sign in.
+- OCI tenancy commands must run inside the authenticated Oracle Cloud Shell. Remote Desktop Commander can relay authorized keyboard input to Cloud Shell, but the local Windows workstation is not an approved RETALLY customer-data host. Do not transfer customer workspaces or credentials to it.
 - Do not send API keys, tenancy passwords, passwords, Cloud Shell configuration files or SSH private keys here.
 
 Official documentation: [Oracle Always Free](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm), [Cloud Shell](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellintro.htm), and [OCI CLI instance launch](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/compute/instance/launch.html).
