@@ -267,6 +267,116 @@ class OciBackupTests(unittest.TestCase):
         delete.assert_not_called()
 
 
+
+class LegacyOrphanIsolationTests(unittest.TestCase):
+    """A historical unverified orphan must never be silently deleted or reused."""
+
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory(prefix="retally-orphan-quarantine-test-")
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        self.root.chmod(0o700)
+        self.receipt = self.root / "quarantine.json"
+        self.store = backup.OciStore({
+            "bucket": backup.BUCKET_NAME,
+            "namespace": "syntheticnamespace",
+            "region": "us-ashburn-1",
+        })
+        self.key = "synthetic-only/0123456789abcdef01234567.rtbk"
+        self.raw = backup.LEGACY_MAGIC + b"N" * 12 + b"historical-synthetic-ciphertext-test"
+
+    def test_verifiable_small_orphan_preserved_with_private_untrusted_receipt(self):
+        objects = [{"name": self.key, "size": len(self.raw)}]
+
+        def fetch(key, path, *, etag, max_size):
+            self.assertEqual((key, etag, max_size),
+                             (self.key, "etag-legacy", backup.MAX_CANARY))
+            path.write_bytes(self.raw)
+            path.chmod(0o600)
+            return self.raw
+
+        with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
+              patch.object(self.store, "head",
+                           return_value={"etag": "etag-legacy", "content-length": str(len(self.raw)),
+                                         "storage-tier": "Standard"}),
+              patch.object(self.store, "get", side_effect=fetch) as get,
+              patch.object(self.store, "objects", return_value=objects),
+              patch.object(self.store, "delete_version") as delete):
+            result = backup.quarantine_legacy_orphan(self.store, objects)
+        self.assertTrue(result["legacy_orphan_quarantined"])
+        self.assertFalse(result["legacy_orphan_deleted"])
+        self.assertEqual(get.call_count, 1)
+        delete.assert_not_called()
+        self.assertEqual(self.receipt.stat().st_mode & 0o777, 0o600)
+        report = json.loads(self.receipt.read_text())
+        self.assertEqual(report["remote_observed_sha256"], backup.sha(self.raw))
+        self.assertFalse(report["original_upload_identity_independently_verified"])
+        self.assertFalse(report["legacy_object_deleted"])
+        self.assertEqual(report["status"], "QUARANTINED_UNRESOLVED_DO_NOT_DELETE")
+
+    def test_multiple_or_wrong_named_orphans_are_never_quarantined(self):
+        for items in ([{"name": self.key}, {"name": "synthetic-only/" + "b"*24 + ".rtbk"}],
+                      [{"name": "customers/invoices.rtbk"}],
+                      [{"name": "synthetic-only/not-hex.rtbk"}], []):
+            with (self.subTest(items=items),
+                  patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
+                  patch.object(self.store, "get") as get,
+                  patch.object(self.store, "delete_version") as delete):
+                with self.assertRaises(backup.Refused):
+                    backup.quarantine_legacy_orphan(self.store, items)
+                get.assert_not_called()
+                delete.assert_not_called()
+        self.assertFalse(self.receipt.exists())
+
+    def test_changed_remote_size_or_wrong_magic_fails_closed(self):
+        items = [{"name": self.key, "size": len(self.raw)}]
+        for size, content in ((backup.MAX_CANARY + 1, self.raw),
+                              (len(self.raw), b"WRONG-MAGIC" + self.raw),
+                              (len(self.raw), self.raw[:-1])):
+            with (self.subTest(size=size, contentlen=len(content)),
+                  patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
+                  patch.object(self.store, "head", return_value={
+                      "etag": "etag-legacy", "content-length": str(size),
+                      "storage-tier": "Standard"}),
+                  patch.object(self.store, "get", return_value=content),
+                  patch.object(self.store, "delete_version") as delete):
+                with self.assertRaises(backup.Refused):
+                    backup.quarantine_legacy_orphan(self.store, items)
+                delete.assert_not_called()
+        self.assertFalse(self.receipt.exists())
+
+    def test_existing_quarantine_blocks_repeated_acceptance(self):
+        self.receipt.write_text('{"previous":true}', encoding="ascii")
+        with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
+              patch.object(self.store, "get") as get,
+              patch.object(self.store, "delete_version") as delete):
+            with self.assertRaises(backup.Refused):
+                backup.quarantine_legacy_orphan(self.store, [{"name": self.key}])
+            get.assert_not_called()
+            delete.assert_not_called()
+
+    def test_unapproved_orphan_blocks_new_upload(self):
+        with (patch.object(self.store, "bucket_check"),
+              patch.object(self.store, "objects",
+                           side_effect=[[{"name": self.key}], []]),
+              patch.object(self.store, "put") as put):
+            with self.assertRaisesRegex(backup.Refused, "explicit quarantine"):
+                backup.synthetic_roundtrip(self.store)
+            put.assert_not_called()
+
+    def test_orphan_preservation_flag_only_allowed_with_exercise(self):
+        with self.assertRaisesRegex(backup.Refused, "only supported"):
+            backup.main(["--inspect", "--preserve-legacy-orphan"])
+
+    def test_quarantine_flag_requires_a_real_historical_orphan(self):
+        with (patch.object(self.store, "bucket_check"),
+              patch.object(self.store, "objects", side_effect=[[], []]),
+              patch.object(self.store, "put") as put):
+            with self.assertRaisesRegex(backup.Refused, "no legacy"):
+                backup.synthetic_roundtrip(self.store, preserve_legacy_orphan=True)
+            put.assert_not_called()
+
+
 class RealEnginesOfflineTest(unittest.TestCase):
     """Uses the real seven-branch simulation + encryption, fake remote object APIs."""
 
