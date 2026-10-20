@@ -46,6 +46,7 @@ class MicroResourceTests(unittest.TestCase):
 
     def bridge(self):
         stack = ExitStack()
+        stack.enter_context(patch.object(micro.BASE, "RESOURCE_DIR", self.root))
         stack.enter_context(patch.object(micro.BASE, "PARTIAL", self.partial))
         stack.enter_context(patch.object(micro.BASE, "RECEIPT", self.complete))
         stack.enter_context(patch.object(micro.BASE, "PUBLIC_KEY", self.public))
