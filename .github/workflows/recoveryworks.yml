@@ -89,7 +89,8 @@ jobs:
           installer = (root/'install-staging.sh').read_text()
           tunnel = (root/'cloudflared-config.yml.example').read_text()
           workflow = Path('.github/workflows/recoveryworks.yml').read_text()
-          assert workflow.count('"deployment/oracle-always-free/**"') == 2
+          trigger_config = workflow.split('permissions:', 1)[0]
+          assert trigger_config.count('"deployment/oracle-always-free/**"') == 2
           assert 'recoveryworks.test_private_io_windows_acl -v' in workflow
           assert '--workspace /var/lib/retally/synthetic-preview' in unit
           assert '--external-origin https://workbench.retallyrecovery.com' in unit
