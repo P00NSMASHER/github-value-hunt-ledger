@@ -134,7 +134,8 @@ def process(api: GithubAPI, details: dict) -> str:
     link = run_url(details["id"])
     if details["conclusion"] in ALERT_CONCLUSIONS:
         message = (
-            f"**Read-only live publication audit {details['conclusion']}**: {link}\n\n"
+            f"@P00NSMASHER — **Read-only live publication audit "
+            f"{details['conclusion']}**: {link}\n\n"
             "An independent public GET/content/security check or the audit "
             "runner itself failed. Investigate the exact workflow job logs. "
             "**This does not prove customer-visible downtime.** Cloudflare "
