@@ -35,7 +35,9 @@ jobs:
           # Cloudflare Pages production deployment runs asynchronously after a
           # main push. Retry during the bounded rollout window so old HTML
           # cannot create a false 404 alert before the new bundle is live.
-          # Scheduled/manual audits always check once, with no grace period.
+          # Scheduled/manual runs still verify the full site once; individual
+          # public GETs retry only transient HTTP 504 at most twice. Persistent
+          # 504, missing assets and security/content failures remain blocking.
           if [[ "$GITHUB_EVENT_NAME" != "push" ]]; then
             python -m freight.site.verify_production_site
             exit $?
