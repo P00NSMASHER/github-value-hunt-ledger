@@ -185,9 +185,10 @@ def inspect_running_micro(receipt: dict) -> dict:
             "Outbound gateway identity or status changed")
 
     attached = _list(BASE.cli("compute", "boot-volume-attachment", "list",
+                              "--availability-domain", receipt["availability_domain"],
                               "--compartment-id", tenant,
                               "--instance-id", receipt["instance_id"],
-                              region=region), "instance boot attachments")
+                              "--all", region=region), "instance boot attachments")
     attached = [x for x in attached if BASE.active(x)]
     require(len(attached) == 1
             and attached[0].get("lifecycle-state") == "ATTACHED"
