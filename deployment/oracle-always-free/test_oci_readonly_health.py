@@ -124,13 +124,15 @@ class ContextTests(unittest.TestCase):
 
 class AccessTests(unittest.TestCase):
     def test_bucket_expected_private_no_events_no_replication(self):
-        good = dict(name=m.BUCKET, public_access_type="NoPublicAccess",
+        good = dict(name=m.BUCKET, compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"],
+                    public_access_type="NoPublicAccess",
                     storage_tier="Standard", versioning="Disabled",
                     object_events_enabled=False, replication_enabled=False,
                     auto_tiering="Disabled")
-        m.check_bucket(SimpleNamespace(**good))
+        m.check_bucket(SimpleNamespace(**good), fixture()["RETALLY_OCI_COMPARTMENT_OCID"])
         for field, bad in [
-            ("name", "another"), ("public_access_type", "ObjectRead"),
+            ("name", "another"), ("compartment_id", "wrong"),
+            ("public_access_type", "ObjectRead"),
             ("storage_tier", "Archive"), ("versioning", "Enabled"),
             ("object_events_enabled", True), ("replication_enabled", True),
             ("replication_enabled", None), ("auto_tiering", "InfrequentAccess"),
@@ -139,20 +141,22 @@ class AccessTests(unittest.TestCase):
                 x = dict(good)
                 x[field] = bad
                 with self.assertRaises(m.Refused):
-                    m.check_bucket(SimpleNamespace(**x))
+                    m.check_bucket(SimpleNamespace(**x), fixture()["RETALLY_OCI_COMPARTMENT_OCID"])
 
     def test_vm_expected_running_shape(self):
-        vm = dict(id=fixture()["RETALLY_OCI_VM_OCID"], shape=m.SHAPE,
+        vm = dict(id=fixture()["RETALLY_OCI_VM_OCID"],
+                  compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"], shape=m.SHAPE,
                   lifecycle_state="RUNNING")
-        m.check_instance(SimpleNamespace(**vm), vm["id"])
+        m.check_instance(SimpleNamespace(**vm), vm["id"], vm["compartment_id"])
         for field, value in [
-            ("id", "wrong"), ("shape", "VM.Standard.A1.Flex"),
+            ("id", "wrong"), ("compartment_id", "wrong"),
+            ("shape", "VM.Standard.A1.Flex"),
             ("lifecycle_state", "STOPPED"),
         ]:
             x = dict(vm)
             x[field] = value
             with self.assertRaises(m.Refused):
-                m.check_instance(SimpleNamespace(**x), vm["id"])
+                m.check_instance(SimpleNamespace(**x), vm["id"], vm["compartment_id"])
 
     def test_rpst_exchange_uses_strict_token_type_and_no_write_scope(self):
         s = fixture()
