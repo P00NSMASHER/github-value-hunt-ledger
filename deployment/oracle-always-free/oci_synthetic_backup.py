@@ -153,13 +153,22 @@ class OciStore:
                                                for x in items), "Unexpected OCI object list shape.")
         return items
 
-    def get(self, name: str, destination: Path) -> bytes:
+    def get(self, name: str, destination: Path, *, etag: str, max_size: int = MAX_SEALED) -> bytes:
         ensure(not destination.exists() and not destination.is_symlink(), "Ciphertext download destination exists.")
-        # The get CLI can return {'output': null}, not {'data': ...}.
-        self.cli("os", "object", "get", *self.args(), "--name", name, "--file", str(destination),
+        ensure(isinstance(etag, str) and 0 < len(etag) <= 256 and
+               not any(c.isspace() for c in etag), "Download needs one verified object ETag.")
+        ensure(type(max_size) is int and 0 < max_size <= MAX_SEALED,
+               "Download size bound must be a positive synthetic-only limit.")
+        # HEAD must first confirm content-length <= max_size. The If-Match
+        # freezes that bounded version so a concurrent overwrite cannot
+        # substitute a larger or different object during download.
+        # OCI GET returns {'output': null}, not {'data': ...}.
+        self.cli("os", "object", "get", *self.args(), "--name", name,
+                 "--file", str(destination), "--if-match", etag,
                  "--no-multipart", timeout=120)
         ensure(_private(destination), "Downloaded ciphertext is not owner-only.")
-        ensure(destination.stat().st_size <= MAX_SEALED, "Downloaded ciphertext exceeds synthetic limit.")
+        ensure(destination.stat().st_size <= max_size,
+               "Downloaded ciphertext exceeds prevalidated HEAD size bound.")
         return destination.read_bytes()
 
     def put(self, name: str, source: Path) -> None:
@@ -216,14 +225,21 @@ def cleanup_legacy(store: OciStore) -> dict:
     name = items[0]["name"]
     ensure(LEGACY_OBJECT.fullmatch(name) is not None,
            "Legacy object name is not the exact prior synthetic canary format.")
+    h = store.head(name)
+    try:
+        expected_length = int(h["content-length"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise Refused("Legacy object's HEAD size is missing or invalid.") from exc
+    ensure(40 <= expected_length <= MAX_CANARY,
+           "Legacy object is not a bounded small synthetic canary.")
+    if "size" in items[0]:
+        ensure(items[0]["size"] == expected_length,
+               "Legacy list size disagrees with remote HEAD size.")
     with tempfile.TemporaryDirectory(prefix="retally-orphan-reconcile-") as home:
         target = Path(home) / "ciphertext.rtbk"
-        raw = store.get(name, target)
-        ensure(40 <= len(raw) <= MAX_CANARY and raw.startswith(LEGACY_MAGIC),
+        raw = store.get(name, target, etag=h["etag"], max_size=MAX_CANARY)
+        ensure(len(raw) == expected_length and raw.startswith(LEGACY_MAGIC),
                "Remote object cannot be proven to be the prior small synthetic canary.")
-    h = store.head(name)
-    ensure(int(h.get("content-length", len(raw))) == len(raw),
-           "Remote object length changed before conditional deletion.")
     store.delete_version(name, h["etag"])
     ensure(not store.objects("synthetic-only/"),
            "Legacy canary deletion was not confirmed by independent listing.")
@@ -276,8 +292,15 @@ def synthetic_roundtrip(store: OciStore) -> dict:
         # If the network times out after the provider accepts PUT, the marker
         # remains and no automatic second PUT or DELETE is allowed.
         store.put(key, sealed)
+        h = store.head(key)
+        try:
+            remote_length = int(h["content-length"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise Refused("New ciphertext object's HEAD size is invalid.") from exc
+        ensure(remote_length == len(ciphertext) and remote_length <= MAX_SEALED,
+               "Remote ciphertext HEAD size does not match the sealed original.")
         downloaded = base / "downloaded.rtbk"
-        remote_raw = store.get(key, downloaded)
+        remote_raw = store.get(key, downloaded, etag=h["etag"], max_size=remote_length)
         ensure(sha(remote_raw) == fingerprint, "Downloaded ciphertext SHA-256 mismatch.")
         verified = verify_file(downloaded, passphrase)
         ensure(verified["restore_verified"] is True and
@@ -303,7 +326,6 @@ def synthetic_roundtrip(store: OciStore) -> dict:
         else:
             raise Refused("Modified ciphertext was accepted; AEAD integrity is broken.")
 
-        h = store.head(key)
         store.delete_version(key, h["etag"])
         ensure(not store.objects("synthetic-recovery/"),
                "OCI test object deletion unverified; stop, do not re-upload.")
