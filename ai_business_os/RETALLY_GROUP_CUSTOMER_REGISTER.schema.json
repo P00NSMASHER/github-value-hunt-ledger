@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RETALLY Group private customer register contract",
+  "description": "Shape specification only. Nonempty evidence references do not authenticate authorization, payment, quality, delivery or legal status. Canonical private stores remain authoritative. No customer records are included.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "storage_authority",
+    "accounts",
+    "engagements",
+    "referrals"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "storage_authority": {
+      "const": "ai_business_os_prod_and_approved_private_service_stores"
+    },
+    "accounts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/account"
+      }
+    },
+    "engagements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/engagement"
+      }
+    },
+    "referrals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/referral"
+      }
+    }
+  },
+  "$defs": {
+    "account": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "account_ref": {
+          "type": "string",
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        },
+        "private_contact_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "account_ref",
+        "private_contact_ref",
+        "created_at"
+      ]
+    },
+    "engagement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engagement_ref": {
+          "type": "string",
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        },
+        "account_ref": {
+          "type": "string",
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        },
+        "catalog_entry_id": {
+          "type": "string",
+          "enum": [
+            "retally-recovery",
+            "capturebrief",
+            "permitplate",
+            "rehabsignal",
+            "sheetharbor",
+            "app-factory-products",
+            "x402-services",
+            "scopesignal",
+            "contractor-quote-recovery",
+            "resonance",
+            "market-surveillance"
+          ]
+        },
+        "service_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "owner_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stage": {
+          "type": "string",
+          "enum": [
+            "inquiry",
+            "qualified",
+            "scoped",
+            "ready",
+            "fulfillment",
+            "quality-reviewed",
+            "delivered",
+            "closed"
+          ]
+        },
+        "payment_status": {
+          "type": "string",
+          "enum": [
+            "NOT_DUE",
+            "PENDING",
+            "PARTIAL",
+            "PAID",
+            "REFUNDED",
+            "DISPUTED",
+            "UNKNOWN"
+          ]
+        },
+        "agreement_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "customer_authorization_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "release_approval_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "input_manifest_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "quality_review_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "delivery_receipt_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "financial_reconciliation_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        },
+        "retention_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "engagement_ref",
+        "account_ref",
+        "catalog_entry_id",
+        "service_ref",
+        "owner_role",
+        "stage",
+        "payment_status",
+        "agreement_ref",
+        "customer_authorization_ref",
+        "release_approval_ref",
+        "input_manifest_ref",
+        "quality_review_ref",
+        "delivery_receipt_ref",
+        "financial_reconciliation_ref",
+        "currency",
+        "retention_policy_ref",
+        "updated_at"
+      ]
+    },
+    "referral": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "referral_ref": {
+          "type": "string",
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        },
+        "account_ref": {
+          "type": "string",
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        },
+        "source_engagement_ref": {
+          "type": "string",
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        },
+        "target_catalog_entry_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "customer_permission_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "owner_action_approval_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^private:[A-Za-z0-9:_-]{1,160}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PROPOSED",
+            "PERMISSION_PENDING",
+            "AUTHORIZED_INTERNAL_HANDOFF",
+            "DECLINED",
+            "CLOSED"
+          ]
+        },
+        "resulting_engagement_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z]+:[A-Za-z0-9_-]{1,80}$"
+        }
+      },
+      "required": [
+        "referral_ref",
+        "account_ref",
+        "source_engagement_ref",
+        "target_catalog_entry_id",
+        "customer_permission_ref",
+        "owner_action_approval_ref",
+        "status",
+        "resulting_engagement_ref"
+      ]
+    }
+  },
+  "$comment": "A future private adapter must additionally enforce unique stable references, cross-record integrity, idempotent event handling, service-specific authority, timestamp ordering, retention/access controls and authoritative evidence checks. This schema does not perform those checks or authorize any action."
+}

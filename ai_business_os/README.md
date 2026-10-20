@@ -2,6 +2,25 @@
 
 This directory is the incremental implementation of the nine-part AI Business OS upgrade.
 
+## RETALLY Group operating structure
+
+The [group operating model](RETALLY_GROUP_OPERATING_MODEL.md) adds a source-linked
+business catalog, shared customer-workflow specification and standalone management
+preview. The existing CEO dashboard also exposes read-only identity candidates;
+it does not merge private business identities or change operating authority.
+
+```bash
+python -m ai_business_os.retally_group validate
+python -m ai_business_os.retally_group render --output /tmp/retally-group-preview.html
+python -m unittest ai_business_os.test_retally_group ai_business_os.test_ceo_command_center
+```
+
+The preview has no customer or financial connection. Unknown values remain null;
+catalog entries and tested code are not evidence of launched businesses. Actual
+operating records remain in `ai_business_os_prod` and approved private service
+stores. See the [empty register contract](RETALLY_GROUP_CUSTOMER_REGISTER.schema.json).
+Existing schedules, pricing, legal identities and release controls are unchanged.
+
 ## Step 1 — Persistent agent runtime
 
 Status: implemented and merged.
@@ -230,3 +249,4 @@ and architecture growth are never treated as external outcomes.
 
 Current live state remains fail-closed: there are zero real verified external outcomes, so no
 initiative has become allocation-ready merely because this mechanism was implemented.
+

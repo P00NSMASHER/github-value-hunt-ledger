@@ -16,6 +16,7 @@ from typing import Any
 
 from ai_business_os.portfolio_planning import build_portfolio_plan
 from ai_business_os.production_bridge import ProductionBridgeError, ProductionReadBridge
+from ai_business_os.retally_group import build_group_view, identity_candidates
 
 
 class CommandCenterError(ValueError):
@@ -159,6 +160,10 @@ class CommandCenterOperator:
             "businesses": portfolio["businesses"],
             "pending_approvals": portfolio["pending_approvals"],
             "planning": plan,
+            "retally_group": {
+                "catalog": build_group_view(),
+                "identity_candidates": identity_candidates(portfolio["businesses"]),
+            },
         }
 
     def propose_objective(self, text: str, *, requested_by: str, priority: int = 80) -> dict[str, Any]:
@@ -333,3 +338,4 @@ class CommandCenterOperator:
             "decided_by": principal,
             "receipt": decided[0],
         }
+
