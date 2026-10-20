@@ -16,8 +16,10 @@ class RuntimeGatewayWorkerContractTests(unittest.TestCase):
 
     def test_worker_gateway_remains_named_operation_only(self):
         source = GATEWAY.read_text(encoding="utf-8")
-        for action in ("worker_claim", "worker_heartbeat", "worker_submit", "worker_fail"):
+        for action in ("worker_status", "worker_claim", "worker_heartbeat", "worker_submit", "worker_fail"):
             self.assertIn(f'case "{action}"', source)
+        self.assertIn("from ai_business_os_prod.agent_heartbeats", source)
+        self.assertIn("from ai_business_os_prod.agent_runs", source)
         self.assertNotIn("arbitrary_sql", source.lower())
 
 
