@@ -34,11 +34,13 @@ def adjusted(amount=28061):
     )
 
 
-def movement(id_, kind, amount, verified=False, target=None, *, source=BANK_SHA):
+def movement(id_, kind, amount, verified=False, target=None, *,
+             source=BANK_SHA, record=None):
+    record = record or ltl_record()
     return FinancialMovement(
         id_, kind, amount, "2026-10-03", source,
         "BANK_CLEARED" if verified else "CUSTOMER_STATEMENT",
-        verified, target,
+        verified, target, record.record_hash,
     )
 
 
@@ -158,17 +160,17 @@ def test_api_accepts_typed_adjustments_and_rejects_untyped_negative_lines():
 
 def test_cash_credit_and_reversal_conservation_without_invented_refunds():
     r = adjusted(100)
-    cash = movement("P1", "PAYMENT", 10000, True)
+    cash = movement("P1", "PAYMENT", 10000, True, record=r)
     credit = FinancialMovement(
         "C1", "CREDIT_APPLIED", 1200, "2026-10-03", COURT_SHA,
-        "CARRIER_CREDIT", True)
-    refund = movement("R1", "REFUND", 300, True)
+        "CARRIER_CREDIT", True, None, r.record_hash)
+    refund = movement("R1", "REFUND", 300, True, record=r)
     before = replay_financial_movements(r, (cash, credit, refund))
     assert before.declared_net_cash_cents == 9700
     assert before.verified_net_cash_cents == 9700
     assert before.declared_net_postinvoice_credits_cents == 1200
     assert before.remaining_balance_cents == r.billed_total_cents - 10900
-    reverse = movement("REVP", "PAYMENT_REVERSAL", 10000, True, "P1")
+    reverse = movement("REVP", "PAYMENT_REVERSAL", 10000, True, "P1", record=r)
     after = replay_financial_movements(r, (cash, credit, refund, reverse))
     assert after.verified_net_cash_cents == -300
     assert after.declared_net_postinvoice_credits_cents == 1200
@@ -191,7 +193,7 @@ def test_financial_ledger_guards_duplicate_reverse_and_unverified_original():
             record, (movement("self", "PAYMENT", 1000, True, source=PDF_SHA),))
     with pytest.raises(ValueError, match="independently verified"):
         FinancialMovement("P", "PAYMENT", 1000, "2026-10-03", PDF_SHA,
-                          "CUSTOMER_STATEMENT", True)
+                          "CUSTOMER_STATEMENT", True, None, record.record_hash)
 
 
 def test_financial_release_review_and_no_cash_recovery_without_refund_proof():
@@ -210,7 +212,8 @@ def test_financial_release_review_and_no_cash_recovery_without_refund_proof():
         record, rating, cleared, independent_adjudication_sha256=COURT_SHA,
         human_release_approved=True)
     assert approved.rated_discrepancy_cents == 2700
-    assert approved.validated_discrepancy_cents == 2700
+    assert approved.validated_discrepancy_cents == 0
+    assert "GOVERNED_BUYER_AUDIT_ACCEPTANCE_NOT_COMPLETED" in approved.blockers
     assert approved.realized_recovery_cents == 0
     held = financial_claim_gate(record, rating, cleared, human_release_approved=False)
     assert held.validated_discrepancy_cents == 0
@@ -251,6 +254,27 @@ def test_reference_scoped_matching_for_real_pennine_distribution():
     assert shuffled.result_hash == result.result_hash
     assert shuffled.matched_internal == 273
 
+
+def test_money_proof_cannot_be_reused_for_another_invoice():
+    original = ltl_record()
+    altered = replace(original, record_hash="0" * 64)
+    valid = movement("B1", "PAYMENT", 1000, True, record=original)
+    replay = replay_financial_movements(original, (valid,))
+    assert replay.verified_net_cash_cents == 1000
+    mismatch_invoice = build_record(
+        buyer_id=original.buyer_id, business_unit=original.business_unit,
+        invoice_id="a second invoice", invoice_date=original.invoice_date,
+        customer_id=original.customer_id, currency=original.currency,
+        shipment=original.shipment, charges=original.charges,
+        sources=original.sources)
+    with pytest.raises(ValueError, match="different invoice hash"):
+        replay_financial_movements(mismatch_invoice, (valid,))
+    with pytest.raises(ValueError, match="exact original invoice"):
+        financial_claim_gate(
+            mismatch_invoice,
+            rate_record(mismatch_invoice, AuthorityBook(())),
+            replay,
+        )
 
 def test_reference_scope_does_not_match_reused_ids_across_buyers_or_suppliers():
     inv = [_scoped("I1", "10.00", "ABC", buyer="B1", vendor="V1")]
