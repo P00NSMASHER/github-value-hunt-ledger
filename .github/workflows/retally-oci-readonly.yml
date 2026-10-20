@@ -72,8 +72,6 @@ jobs:
       RETALLY_OCI_NAMESPACE: ${{ vars.RETALLY_OCI_NAMESPACE }}
       RETALLY_OCI_COMPARTMENT_OCID: ${{ vars.RETALLY_OCI_COMPARTMENT_OCID }}
       RETALLY_OCI_VM_OCID: ${{ vars.RETALLY_OCI_VM_OCID }}
-      RETALLY_OCI_CLIENT_ID: ${{ secrets.RETALLY_OCI_CLIENT_ID }}
-      RETALLY_OCI_CLIENT_SECRET: ${{ secrets.RETALLY_OCI_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -84,4 +82,9 @@ jobs:
       - name: Install pinned official OCI SDK
         run: python -m pip install --disable-pip-version-check 'oci==2.188.0'
       - name: Verify private Oracle bucket and VM (read-only)
+        # OAuth credentials are never exposed to checkout/setup-python or pip.
+        # Only the final, read-only verification process receives the secrets.
+        env:
+          RETALLY_OCI_CLIENT_ID: ${{ secrets.RETALLY_OCI_CLIENT_ID }}
+          RETALLY_OCI_CLIENT_SECRET: ${{ secrets.RETALLY_OCI_CLIENT_SECRET }}
         run: python deployment/oracle-always-free/oci_readonly_health.py
