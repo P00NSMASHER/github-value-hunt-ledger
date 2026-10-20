@@ -270,6 +270,16 @@ def build_recovery_claim_batch(
 def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
     if not isinstance(batch, RecoveryClaimBatch):
         raise ValueError("batch must be a RecoveryClaimBatch")
+    if type(batch.claim_count) is not int or batch.claim_count < 0:
+        raise ValueError("recovery claim claim count must be a non-negative integer")
+    if (
+        type(batch.fee_disqualified_count) is not int
+        or not 0 <= batch.fee_disqualified_count <= batch.claim_count
+    ):
+        raise ValueError(
+            "recovery claim fee-disqualified count must be a non-negative integer "
+            "not exceeding claim count"
+        )
     if not (
         len(batch.records) == len(batch.claims) == len(batch.bindings) == batch.claim_count
     ):
@@ -293,6 +303,12 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         batch.bindings,
         strict=True,
     ):
+        if (
+            type(record.incumbent_preidentified) is not bool
+            or type(record.fee_disqualified) is not bool
+            or type(claim.fee_disqualified) is not bool
+        ):
+            raise ValueError("recovery claim fee-disqualification flags must be boolean")
         if type(record.amount_cents) is not int or not 0 < record.amount_cents <= 2**63 - 1:
             raise ValueError("recovery claim amount must be positive integer cents within SQLite range")
         if record.issued_at != batch.issued_at:
