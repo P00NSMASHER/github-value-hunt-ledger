@@ -22,6 +22,12 @@ OWNER_ID = "22281248"
 WORKFLOW = ".github/workflows/retally-oci-readonly.yml"
 WORKFLOW_REF = f"{REPOSITORY}/{WORKFLOW}@refs/heads/main"
 SUBJECT = f"repo:{REPOSITORY}:ref:refs/heads/main"
+# GitHub repos created, renamed, or opted in after July 15 2026 use an
+# immutable GitHub OIDC default sub with numeric owner and repository IDs.
+IMMUTABLE_SUBJECT = (
+    f"repo:P00NSMASHER@{OWNER_ID}/github-value-hunt-ledger@{REPOSITORY_ID}"
+    ":ref:refs/heads/main"
+)
 AUDIENCE = "https://cloud.oracle.com"
 ISSUER = "https://token.actions.githubusercontent.com"
 REGION = "us-ashburn-1"
@@ -122,8 +128,11 @@ def decode_claims_for_preflight(jwt: str) -> dict:
 
 def validate_claims(claims: dict, event_name: str, now: int | None = None) -> None:
     """Defense in depth, not an authentication or JWT signature check."""
+    # Exact legacy and immutable GitHub subjects; no patterns or wildcards.
+    require(claims.get("sub") in (SUBJECT, IMMUTABLE_SUBJECT),
+            "GitHub OIDC subject does not match the approved repository")
     for key, expected in {
-        "iss": ISSUER, "aud": AUDIENCE, "sub": SUBJECT,
+        "iss": ISSUER, "aud": AUDIENCE,
         "repository": REPOSITORY, "repository_id": REPOSITORY_ID,
         "repository_owner_id": OWNER_ID, "workflow_ref": WORKFLOW_REF,
         "ref": "refs/heads/main", "event_name": event_name,
