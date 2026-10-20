@@ -135,10 +135,11 @@ def run_public_census_replay() -> dict:
         supplier = row["supplier number"]
         payment_key = (supplier, row["payment number"], row["payment date"], "GBP")
         groups[payment_key].append(row)
+        amount_minor = row["invoice amount minor"]
+        amount_text = ("-" if amount_minor < 0 else "") + str(abs(amount_minor)//100) + "." + f"{abs(amount_minor)%100:02d}"
         invoices.append(ScopedTxn(
             ReconTxn("original:" + _anon(tuple(str(x) for x in key)),
-                     f"{row['invoice amount minor']/100:.2f}", # converted below; amounts bounded in source
-                     row["payment date"], "GBP", row["payment number"]),
+                     amount_text, row["payment date"], "GBP", row["payment number"]),
             buyer_id="PUBLIC_NHS_RESEARCH", business_unit="PUBLIC_FINANCE",
             counterparty_id=supplier, origin="ORIGINAL_INVOICE",
         ))
