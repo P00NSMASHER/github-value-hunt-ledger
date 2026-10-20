@@ -116,6 +116,24 @@ def test_blind_freeze_cannot_be_replayed_after_reveal_or_with_conflicts(mutation
             study_kind="REAL_EXTERNAL_REVIEW_PENDING")
 
 
+def test_self_claimed_complete_real_evidence_cannot_manufacture_independence():
+    # Four distinct SHA strings and separately named fictional reviewers are
+    # a synthetic proof of parsing, never independent external adjudication.
+    model, truth = freeze([case(1, "POSITIVE", "POSITIVE"),
+                           case(2, "NEGATIVE", "NEGATIVE")])
+    report = score_sealed_freight(
+        model, truth, joint_unseal_at=UNSEAL_AT,
+        study_kind="REAL_EXTERNAL_REVIEW_PENDING")
+    assert report.complete_independent_truth_count == 0
+    assert report.unresolved_truth_count == 2
+    assert report.source_claimed_complete_cases_unverified == 2
+    assert report.unsupported_automatic_positive_calls == 1
+    assert report.precision is None
+    assert report.false_positive_rate is None
+    assert report.publication_claim_approved is False
+    assert report.method_status == "EXTERNAL_PROVENANCE_AUTHENTICATION_REQUIRED"
+
+
 def test_missing_or_reused_corroboration_is_unresolved():
     t, m = case(1, "POSITIVE", "POSITIVE")
     invalid_rate = replace(t, applicable_rate_sha256=t.original_invoice_sha256)
