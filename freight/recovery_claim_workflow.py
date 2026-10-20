@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
+import re
 
 from freight.buyer_review_workflow import (
     BuyerReviewBatch,
@@ -22,6 +23,9 @@ from freight.review_packet import ReviewPacket
 from freight.review_routing import ReviewRouting
 from freight.settlement_report import ClaimFindingBinding
 from freight.settlement_store import RecoveryClaim, SettlementStore
+
+
+_SHA256_RE = re.compile(r"[0-9a-f]{64}")
 
 
 class RecoveryClaimBatchState(str, Enum):
@@ -275,6 +279,15 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         for value in (batch.buyer_id, batch.business_unit)
     ):
         raise ValueError("recovery claim scope identifiers must be non-empty strings")
+    if any(
+        not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None
+        for value in (
+            batch.truth_hash,
+            batch.incumbent_output_hash,
+            batch.buyer_review_batch_hash,
+        )
+    ):
+        raise ValueError("recovery claim provenance hashes must be SHA-256 digests")
     if type(batch.claim_count) is not int or batch.claim_count < 0:
         raise ValueError("recovery claim claim count must be a non-negative integer")
     if (
