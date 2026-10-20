@@ -64,5 +64,61 @@ jobs:
           assert accounting['independent_bank_clearing_verified'] is False
           assert accounting['economic_false_positive_rate'] is None
           assert accounting['recovery_cents'] == 0
+          # Fail closed on source drift, parser regression, dropped populations,
+          # amount handling errors or accidental label/cash promotion.
+          gt = freight['globaltranz']
+          abf = freight['arcbest']
+          assert gt['pages'] == 120
+          assert abf['pages'] == 74
+          for case in (gt, abf):
+              assert case['retally_native_ingress'] == 'ACCEPT'
+              assert case['retally_native_route'] == 'DOCUMENT_EXTRACTION_REQUIRED'
+              assert case['invoice_face_amounts_extracted'] == case['distinct_invoice_face_ids']
+              checks = case['invoice_face_anchor_verification']
+              assert checks['failed'] == 0 and checks['passed'] == checks['checks']
+          assert gt['distinct_invoice_face_ids'] == 100
+          assert abf['distinct_invoice_face_ids'] == 10
+          assert gt['invoice_face_anchor_verification']['checks'] == 5
+          assert abf['invoice_face_anchor_verification']['checks'] == 10
+          stmt = gt['statement']
+          assert stmt['rows'] == 102
+          assert stmt['original_total_minor'] == 2602661
+          assert stmt['current_total_minor'] == 2595447
+          assert stmt['balance_delta_minor'] == 7214
+          assert stmt['face_to_statement_original_amount']['cross_reference_false_joins'] == 0
+          rated = abf['retally_rating_engine']
+          assert rated['lab_proxy_canonical_records_executed'] >= 5
+          assert rated['engine_review_required'] == rated['lab_proxy_canonical_records_executed']
+          assert rated['unsafe_auto_money_or_nondeterministic'] == 0
+          assert rated['auto_overcharges_asserted'] == 0
+          assert accounting['original_disclosed_rows'] == 314
+          assert accounting['unique_invoice_economic_identities'] == 273
+          assert accounting['cross_month_repeated_rows'] == 41
+          assert accounting['declared_payment_references'] == 217
+          assert accounting['invoice_total_minor_deduplicated'] == 7423667742
+          assert accounting['payment_declaration_total_minor_derived_from_same_invoices'] == 7423667742
+          unscoped = accounting['retally_reconciliation_kernel']
+          scoped = accounting['retally_source_reference_scoped_kernel_replay']
+          assert unscoped['cross_reference_false_joins'] == 0
+          assert scoped['matched_invoices'] == 273
+          assert scoped['matched_groups'] == 217
+          assert scoped['unmatched_invoices'] == 0
+          assert scoped['cross_reference_false_joins'] == 0
+          assert blind['total_eligible_scored'] == 0
+          assert blind['unknown_cases_preserved'] == 110
+          history = doc['historical_adjudication_reference_survey']
+          assert history['government_decision_reference_count'] == 8
+          assert history['full_independent_case_labels_for_test_invoices'] == 0
+          import os
+          from pathlib import Path
+          summary = Path(os.environ['GITHUB_STEP_SUMMARY'])
+          with summary.open('a', encoding='utf-8') as stream:
+              stream.write('## RETALLY read-only original-document benchmark\n\n')
+              stream.write(f"- GlobalTranz: {gt['distinct_invoice_face_ids']} original invoice faces, {stmt['rows']} statement lines; {stmt['face_to_statement_original_amount']['matched_invoices']} source-document amount joins.\n")
+              stream.write(f"- ArcBest: {abf['distinct_invoice_face_ids']} original invoices; {rated['engine_review_required']} source-derived laboratory proxies passed into the real rating engine, all REVIEW REQUIRED.\n")
+              stream.write(f"- Pennine: {accounting['original_disclosed_rows']} disclosures, {accounting['unique_invoice_economic_identities']} unique invoices, {accounting['cross_month_repeated_rows']} repeated disclosures.\n")
+              stream.write(f"- Actual RETALLY kernel: unscoped matched {unscoped['matched_invoices']} / 273; bounded reference-scoped replay matched {scoped['matched_invoices']} / 273; zero cross-reference mismatches.\n")
+              stream.write(f"- Historical GAO decision references: 8; fully linked independent labels: 0. Freight precision/recall/accuracy **not calculable**.\n")
+              stream.write('\n**Limits:** same-source payment declarations are not bank clearing; ArcBest rating probes use openly marked non-admissible proxies; no commercial or customer recovery claim.\n')
           print('PASS: original document lab remains research-only, no cash or accuracy claim')
           PY
