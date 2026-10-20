@@ -1,19 +1,96 @@
 """Pure fixture checks; network access belongs only to explicit live smoke runs."""
-import unittest
+from email.message import Message
+from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import MagicMock, call, patch
+import unittest
+import urllib.error
 
 from freight.site.internal_links import (
     CANONICAL, InternalLinkError, internal_destinations,
     validate_bundle_links, validate_live_links,
 )
-from email.message import Message
-
 from freight.site.verify_production_site import (
     APPROVED_MEDIA, LiveAuditError, ensure_html, ensure_logo,
     ensure_security_headers, ensure_ltl_comparator, LTL_COMPARATOR_PAGE,
-    ensure_blank_evidence_ledger,
+    ensure_blank_evidence_ledger, fetch, TRANSIENT_504_RETRY_DELAYS_SECONDS,
 )
+
+
+class PublicGetRetryTests(unittest.TestCase):
+    """Do not let cache-miss 504 noise mask actual production failure."""
+
+    URL = "https://www.retallyrecovery.com/trust"
+
+    @classmethod
+    def http_error(cls, status: int):
+        return urllib.error.HTTPError(
+            cls.URL, status, "fixture", Message(), BytesIO(b"fixture-error"),
+        )
+
+    @staticmethod
+    def http_ok():
+        response = MagicMock()
+        response.status = 200
+        response.headers = Message()
+        response.read.return_value = b"fixture-success"
+        response.__enter__.return_value = response
+        return response
+
+    def test_one_transient_504_get_retries_then_succeeds(self):
+        with patch("freight.site.verify_production_site.urllib.request.build_opener") as make, \
+             patch("freight.site.verify_production_site.sleep") as pause:
+            opener = make.return_value
+            opener.open.side_effect = [self.http_error(504), self.http_ok()]
+            self.assertEqual(fetch(self.URL)[::2], (200, b"fixture-success"))
+            self.assertEqual(opener.open.call_count, 2)
+            self.assertEqual(pause.call_args_list, [call(TRANSIENT_504_RETRY_DELAYS_SECONDS[0])])
+            for invoked in opener.open.call_args_list:
+                request = invoked.args[0]
+                self.assertEqual(request.get_method(), "GET")
+                self.assertEqual(request.full_url, self.URL)
+                self.assertEqual(invoked.kwargs["timeout"], 18)
+
+    def test_repeated_504_is_not_suppressed(self):
+        with patch("freight.site.verify_production_site.urllib.request.build_opener") as make, \
+             patch("freight.site.verify_production_site.sleep") as pause:
+            make.return_value.open.side_effect = [self.http_error(504) for _ in range(3)]
+            status, _, body = fetch(self.URL)
+            self.assertEqual(status, 504)
+            self.assertEqual(body, b"fixture-error")
+            self.assertEqual(make.return_value.open.call_count, 3)
+            self.assertEqual(pause.call_args_list, [
+                call(TRANSIENT_504_RETRY_DELAYS_SECONDS[0]),
+                call(TRANSIENT_504_RETRY_DELAYS_SECONDS[1]),
+            ])
+
+    def test_404_503_and_redirect_never_retry(self):
+        for status in (301, 404, 503):
+            with self.subTest(status=status), \
+                 patch("freight.site.verify_production_site.urllib.request.build_opener") as make, \
+                 patch("freight.site.verify_production_site.sleep") as pause:
+                make.return_value.open.side_effect = [self.http_error(status)]
+                self.assertEqual(fetch(self.URL)[0], status)
+                self.assertEqual(make.return_value.open.call_count, 1)
+                pause.assert_not_called()
+
+    def test_504_then_404_still_fails(self):
+        with patch("freight.site.verify_production_site.urllib.request.build_opener") as make, \
+             patch("freight.site.verify_production_site.sleep") as pause:
+            make.return_value.open.side_effect = [self.http_error(504), self.http_error(404)]
+            self.assertEqual(fetch(self.URL)[0], 404)
+            self.assertEqual(make.return_value.open.call_count, 2)
+            self.assertEqual(pause.call_count, 1)
+
+    def test_transport_error_not_hidden_by_retry(self):
+        with patch("freight.site.verify_production_site.urllib.request.build_opener") as make, \
+             patch("freight.site.verify_production_site.sleep") as pause:
+            make.return_value.open.side_effect = urllib.error.URLError("fixture disconnect")
+            with self.assertRaises(urllib.error.URLError):
+                fetch(self.URL)
+            self.assertEqual(make.return_value.open.call_count, 1)
+            pause.assert_not_called()
 
 
 class ProductionSmokeInvariantTests(unittest.TestCase):
