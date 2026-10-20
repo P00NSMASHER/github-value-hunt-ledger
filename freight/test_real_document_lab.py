@@ -9,6 +9,7 @@ from freight.real_document_lab import (
     _arcbest_page, _global_page, _recon_result, blind_freight_assessment,
     fetch_public, iso_date, minor, parse_pennine_csv, statement_rows,
     reference_scoped_replay, InvoiceFace, _rating_probe, survey_historical_adjudications,
+    adversarial_declared_payment_controls, require_frozen_source, digest, _ApprovedRedirects,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -22,6 +23,36 @@ class LaboratoryTests(unittest.TestCase):
         for bad in ("NaN", "1.234", "1e3", "1,2,3x", "1,2", "1,23.45", "1,234,56", "££1.00", ""):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 minor(bad)
+
+    def test_frozen_public_sources_reject_byte_drift(self):
+        with self.assertRaisesRegex(ValueError, "FROZEN_PUBLIC_SOURCE_CHANGED"):
+            require_frozen_source("document", "globaltranz", b"%PDF-1.4 changed source")
+        with self.assertRaisesRegex(ValueError, "unknown frozen source identity"):
+            require_frozen_source("pennine", "unknown", b"x")
+        payload = b"known legitimate fixture bytes"
+        with patch.dict("freight.real_document_lab.FROZEN_DOCUMENT_SHA256",
+                        {"globaltranz": digest(payload)}):
+            self.assertEqual(
+                require_frozen_source("document", "globaltranz", payload),
+                digest(payload),
+            )
+
+    def test_allowlisted_https_redirect_checked_before_follow(self):
+        from urllib.request import Request
+        request = Request("https://www.penninecare.nhs.uk/download_file/5855/277")
+        handler = _ApprovedRedirects()
+        for target in (
+            "https://evil.example.net/collect",
+            "http://www.penninecare.nhs.uk/download_file/5855/277",
+        ):
+            with self.subTest(target=target), self.assertRaises(ValueError):
+                handler.redirect_request(request, None, 302, "found", {}, target)
+        with self.assertRaises(ValueError):
+            fetch_public("http://www.penninecare.nhs.uk/download_file/5855/277")
+
+    def test_csv_bytes_decode_fail_closed(self):
+        with self.assertRaises(UnicodeDecodeError):
+            parse_pennine_csv(b"\xff\xfe", "2026-08")
 
     def test_uk_source_dates_and_money_are_exact(self):
         self.assertEqual(iso_date("05/08/2026"), "2026-08-05")
@@ -106,6 +137,25 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(capped["matched_invoices"], 1)
         self.assertEqual(capped["unmatched_over_group_bound_invoices"], 2)
 
+    def test_real_kernel_falsifies_corrupted_source_declarations(self):
+        invoices = [
+            ReconTxn("inv-1", "12.00", "2026-07-01", "GBP", "PAY1"),
+            ReconTxn("inv-2", "9.00", "2026-07-01", "GBP", "PAY1"),
+            ReconTxn("inv-3", "5.00", "2026-07-01", "GBP", "PAY2"),
+        ]
+        declarations = [
+            ReconTxn("pay-1", "21.00", "2026-07-01", "GBP", "PAY1"),
+            ReconTxn("pay-2", "5.00", "2026-07-01", "GBP", "PAY2"),
+        ]
+        inv = {"inv-1": "PAY1", "inv-2": "PAY1", "inv-3": "PAY2"}
+        pay = {"pay-1": "PAY1", "pay-2": "PAY2"}
+        result = adversarial_declared_payment_controls(invoices, declarations, inv, pay)
+        self.assertEqual(result["scenario_count"], 4)
+        self.assertTrue(result["all_controls_detected"])
+        self.assertTrue(all(result["checks"].values()))
+        self.assertEqual(result["independently_cleared_bank_rows_used"], 0)
+        self.assertIsNone(result["real_world_economic_false_positive_rate"])
+
     def test_actual_freight_rating_engine_abstains_on_lab_proxy(self):
         page = (
             "ORIGINAL INVOICE\nService: LTL\nFreight Bill No: 044177205\n"
@@ -147,10 +197,17 @@ class LaboratoryTests(unittest.TestCase):
 
     def test_blinded_freight_does_not_invent_labels(self):
         result = blind_freight_assessment({
-            "globaltranz": {"distinct_invoice_face_ids": 100},
-            "arcbest": {"distinct_invoice_face_ids": 10},
+            "globaltranz": {"distinct_invoice_face_ids": 100,
+                            "sha256": "a" * 64,
+                            "source_face_catalog_sha256": "c" * 64},
+            "arcbest": {"distinct_invoice_face_ids": 10,
+                        "sha256": "b" * 64,
+                        "source_face_catalog_sha256": "d" * 64},
         })
         self.assertEqual(result["unknown_cases_preserved"], 110)
+        self.assertFalse(result["predictions_frozen_before_truth"])
+        self.assertEqual(result["blinding_protocol_status"],
+                         "NOT_EXECUTED_INDEPENDENT_TRUTH_AND_REVIEWERS_ABSENT")
         self.assertIsNone(result["precision"])
         self.assertIsNone(result["freight_detection_accuracy"])
         self.assertEqual(result["validated_recovery_cents"], 0)
