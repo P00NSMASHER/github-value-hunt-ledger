@@ -2,6 +2,7 @@
 from __future__ import annotations
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
@@ -171,6 +172,71 @@ class AlwaysFreePreflightTests(unittest.TestCase):
             result=mod.launch_vm(inventory,state,Path('/tmp/test-pub-key-do-not-use'))
         self.assertEqual(result['instance_id'],'ocid1.instance.fixture')
         self.assertEqual(result['actual_ocpus'],2)
+
+
+class CloudShellCliParsingTests(unittest.TestCase):
+    @staticmethod
+    def result(cmd, stdout='', stderr='', rc=0):
+        return subprocess.CompletedProcess(cmd, rc, stdout=stdout, stderr=stderr)
+
+    def test_successful_empty_list_is_independently_rechecked(self):
+        commands=[]
+        def respond(command, **kwargs):
+            commands.append(command)
+            return self.result(command)
+        with patch.object(mod.subprocess, 'run', side_effect=respond):
+            self.assertEqual(mod.cli('iam', 'compartment', 'list', '--all'), [])
+        self.assertEqual(len(commands), 2)
+        self.assertIn('--all', commands[0])
+        self.assertNotIn('--all', commands[1])
+
+    def test_empty_unpaginated_response_can_be_checked(self):
+        with patch.object(mod.subprocess, 'run',
+                          return_value=self.result(['oci'])) as called:
+            self.assertEqual(mod.cli('bv', 'volume', 'list'), [])
+        self.assertEqual(called.call_count, 2)
+
+    def test_failed_or_warned_empty_list_still_fails_closed(self):
+        for stderr, rc in [('WARNING: result may be incomplete', 0),
+                           ('', 3)]:
+            with self.subTest(stderr=stderr, rc=rc):
+                with patch.object(mod.subprocess, 'run',
+                                  return_value=self.result(['oci'], stderr=stderr, rc=rc)):
+                    with self.assertRaises(mod.Stop):
+                        mod.cli('network', 'vcn', 'list', '--all')
+
+    def test_second_list_disagreement_is_not_silenced(self):
+        empty=self.result(['oci'])
+        nonempty=self.result(['oci'], stdout=json.dumps({'data':[{'id':'existing'}]}))
+        with patch.object(mod.subprocess, 'run', side_effect=[empty, nonempty]):
+            with self.assertRaisesRegex(mod.Stop, 'disagreed'):
+                mod.cli('compute', 'instance', 'list', '--all')
+
+    def test_second_check_can_return_explicit_empty_json(self):
+        empty=self.result(['oci'])
+        explicit=self.result(['oci'], stdout=json.dumps({'data':[]}))
+        with patch.object(mod.subprocess, 'run', side_effect=[empty, explicit]):
+            self.assertEqual(mod.cli('iam', 'compartment', 'list', '--all'), [])
+
+    def test_blank_mutation_response_is_never_accepted(self):
+        with patch.object(mod.subprocess, 'run',
+                          return_value=self.result(['oci'])) as called:
+            with self.assertRaisesRegex(mod.Stop, 'non-list'):
+                mod.cli('network', 'vcn', 'create')
+        self.assertEqual(called.call_count, 1)
+
+    def test_malformed_json_response_is_never_accepted(self):
+        with patch.object(mod.subprocess, 'run',
+                          return_value=self.result(['oci'],stdout='not-json')):
+            with self.assertRaisesRegex(mod.Stop, 'invalid JSON'):
+                mod.cli('compute', 'instance', 'list')
+
+    def test_valid_structured_response_preserved(self):
+        value={'data':[{'shape':mod.SHAPE}]}
+        with patch.object(mod.subprocess, 'run',
+                          return_value=self.result(['oci'], stdout=json.dumps(value))) as called:
+            self.assertEqual(mod.cli('compute', 'shape', 'list'), value['data'])
+        self.assertEqual(called.call_count, 1)
 
 
 if __name__=='__main__':
