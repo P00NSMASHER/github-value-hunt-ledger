@@ -640,3 +640,42 @@ def test_self_hashed_claim_batch_rejects_blank_claim_field(field):
 
     with pytest.raises(ValueError, match="claim text fields must be non-empty"):
         verify_recovery_claim_batch(forged)
+
+
+
+def test_self_hashed_claim_batch_rejects_claim_id_detached_from_finding_proof():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged_claim_id = "claim:" + "f" * 64
+    original = batch.records[0]
+    record = replace(original, claim_id=forged_claim_id, record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[0], claim_id=forged_claim_id)
+    binding = replace(batch.bindings[0], claim_id=forged_claim_id)
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            claims=(claim,) + batch.claims[1:],
+            bindings=(binding,) + batch.bindings[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="claim id must derive from finding proof"):
+        verify_recovery_claim_batch(forged)
