@@ -3,7 +3,7 @@
 
 **Find it. Prove it. Recover it.**
 
-We find freight billing errors, document the evidence, and help recover overpayments.
+We help finance, AP and logistics teams review historical carrier charges, document supported differences and pursue customer-approved recoveries when the records justify action.
 
 ### How it works
 1. **Find it.** Review an agreed freight invoice population against shipment data and rate terms.
@@ -19,6 +19,6 @@ We find freight billing errors, document the evidence, and help recover overpaym
 A $0-upfront initial audit for eligible agreed scope. Recovery support requires separate approval and signed commercial terms. No recovery is guaranteed; a recovery fee applies only to eligible actual recoveries under those terms.
 
 ### First step
-Request a short fit conversation through the current **verified** website/contact route. Never send confidential invoices or contracts in the first inquiry.
+Start with a short fit conversation through RETALLY's public audit-request form. Provide non-sensitive details only; we agree on scope and a secure record-transfer route before requesting freight documents.
 
 *Draft source copy. Attach only to a verified business identity and use the approved full-resolution RETALLY wordmark on the final one-page PDF.*
