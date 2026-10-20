@@ -133,6 +133,15 @@ class ExistingMicroAuditTests(unittest.TestCase):
         self.assertTrue(all(args[2] in {"get", "list", "list-vnics"}
                             for args, _ in called))
         self.assertTrue(all(region == "us-ashburn-1" for _, region in called))
+        boot_queries = [args for args, _ in called if args[:3] ==
+                        ("compute", "boot-volume-attachment", "list")]
+        self.assertEqual(len(boot_queries), 1)
+        self.assertIn("--availability-domain", boot_queries[0])
+        self.assertIn(self.receipt["availability_domain"], boot_queries[0])
+        self.assertIn("--compartment-id", boot_queries[0])
+        self.assertIn(self.receipt["tenancy_id"], boot_queries[0])
+        self.assertIn("--instance-id", boot_queries[0])
+        self.assertIn("--all", boot_queries[0], "boot attachment audit must exhaust pages")
         serialized = json.dumps(report)
         self.assertNotIn("ocid1.", serialized)
         self.assertNotIn("10.76.", serialized)
