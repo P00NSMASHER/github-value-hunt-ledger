@@ -23,6 +23,12 @@ no uploaded artifacts. Research scope only.
 - Input SHA-256:
   - GlobalTranz: 45d4b8fae33234d3b9efe087e60a10dc5f6fc45f8cc9f5099560c6c63bfb33b4
   - ArcBest: 4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17
+- All seven source files (two PDFs and five NHS CSVs) are now checked against
+  the frozen original SHA-256 manifest **before any extraction or parsing**.
+  A changed byte fails the run pending an explicitly reviewed baseline update.
+- Source retrieval uses a strict HTTPS host allowlist, follows only approved
+  HTTPS redirects, limits response size and PDF page text, and rejects invalid
+  CSV Unicode rather than replacing corrupt bytes.
 - Fifteen previously observed public face-value anchors passed (5 GlobalTranz
   and 10 ArcBest). The lab uses PyMuPDF as a **separate, research-only**
   extraction adapter; RETALLY's native PDF ingress is a request for extraction,
@@ -73,6 +79,10 @@ Licence: https://www.data.gov.uk/dataset/31ef5153-cf9c-45f7-9bcf-e2c86200d00b/sp
   identity. Repeated disclosures are **not duplicate payments**.
 - Deduplicated source-declared invoice amount total: **£74,236,677.42**,
   not cleared bank outflow and not RETALLY-recovered revenue.
+- The source payment-status field says **fully paid** on all 273 unique invoice
+  records. No invoice IDs are missing a payment number, and this census has no
+  negative or zero invoice amounts or conflicting supplier/invoice-date/amount
+  identities. These are **publisher assertions**, not independent clearing.
 - **217** source-declared payment-reference/date/currency groups; 178 single
   invoice groups and 39 legitimate multiple-invoice groups (largest: eight).
 - With original RETALLY kernel on one unpartitioned population:
@@ -85,6 +95,13 @@ Licence: https://www.data.gov.uk/dataset/31ef5153-cf9c-45f7-9bcf-e2c86200d00b/sp
   joins, **0** unmatched invoice declarations. This is a valid same-source
   structural join/amount-conservation check, **not independent payment
   verification**.
+- A negative-control replay deliberately corrupted one real-published
+  payment-group declaration at a time: a **one-penny difference**, a
+  **different payment reference**, a **wrong currency**, and a
+  **duplicate payment-group declaration**. All **four defects** were
+  rejected or routed unmatched by the source-reference-scoped actual
+  reconciliation engine. These are **laboratory fault-injection checks**,
+  not observations of customer payment errors.
 - Money is parsed in integer minor units; malformed comma grouping, fractional
   overprecision, NaN, exponential amounts and invalid dates fail closed.
 - Real economic false-positive and duplicate-payment rates are
@@ -97,6 +114,10 @@ Licence: https://www.data.gov.uk/dataset/31ef5153-cf9c-45f7-9bcf-e2c86200d00b/sp
   original invoice + controlling effective rate + actual payment + independent
   adjudication: **0**.
 - Unknown/held for further evidence: **110**.
+- The 110-case source-input catalog is hash-frozen without logging invoice
+  identities, but **independent blind adjudication has not been executed**:
+  no separate truth owner, reviewer attestations or eligible labels exist.
+  No claim is made that a true independent blinded accuracy trial passed.
 - **Precision, recall, specificity and freight detection accuracy: NULL /
   NOT ESTIMABLE**, not zero percent and not 100 percent.
 - Eight historical U.S. GAO rulings are indexed as adjudication reference
@@ -110,6 +131,14 @@ Licence: https://www.data.gov.uk/dataset/31ef5153-cf9c-45f7-9bcf-e2c86200d00b/sp
   - https://www.gao.gov/products/b-221594-0 — government overcharge
     determination reversed because the tender used for lower rates had been
     rejected; negative/false-positive authority example.
+- Exact-cents GAO reference arithmetic checked: B-143246's $340.21
+  initial audit deduction minus the later $11.81 carrier allowance leaves
+  $328.40 disputed; B-148465 documents a $61.22 offset on $546.88
+  previously paid; B-221594 documents $942 billed minus a GSA-proposed
+  $721.25 = $220.75, but the **GSA deduction was overturned because the
+  proposed lower-rate tender was not valid**. All three arithmetic controls
+  passed; none can certify RETALLY freight detection, recovered cash or
+  independent linked bank clearance.
 - None of those historical cases labels any GlobalTranz or ArcBest invoice in
   the present documents. No historical settlement is RETALLY's own recovery.
 
