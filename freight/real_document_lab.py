@@ -33,6 +33,16 @@ DOCUMENTS = {
     "globaltranz": "https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/10247",
     "arcbest": "https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408",
 }
+HISTORICAL_GAO = {
+    "B-143246": "https://www.gao.gov/products/b-143246",
+    "B-148465": "https://www.gao.gov/products/b-148465",
+    "B-161664": "https://www.gao.gov/products/b-161664",
+    "B-199805-0": "https://www.gao.gov/products/b-199805-0",
+    "B-223311-0": "https://www.gao.gov/products/b-223311-0",
+    "B-221594-0": "https://www.gao.gov/products/b-221594-0",
+    "B-195862": "https://www.gao.gov/products/b-195862",
+    "B-221705": "https://www.gao.gov/products/b-221705",
+}
 PENNINE = {
     "2026-04": "https://www.penninecare.nhs.uk/download_file/5855/277",
     "2026-05": "https://www.penninecare.nhs.uk/download_file/5874/277",
@@ -70,7 +80,7 @@ EXPECTED = {
     "pennine_unique_invoices": 273,
 }
 LIMIT = 35_000_000
-ALLOW_HOSTS = {"ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net", "www.penninecare.nhs.uk"}
+ALLOW_HOSTS = {"ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net", "www.penninecare.nhs.uk", "www.gao.gov", "gao.gov"}
 MONEY_RE = re.compile(r"^-?\d+(?:\.\d{1,2})?$")
 
 
@@ -662,6 +672,46 @@ def benchmark_pennine() -> dict:
     }
 
 
+
+
+def survey_historical_adjudications() -> dict:
+    """Fingerprint actual historical government decisions as reference sources.
+
+    A decision about SOME freight billing does not label a different carrier
+    invoice in the original-document test population. Original underlying
+    invoice+effective tariff+payment+fully linked adjudication are still
+    required to score a specific detection.
+    """
+    notes = {}
+    for case_id, url in HISTORICAL_GAO.items():
+        try:
+            raw = fetch_public(url)
+            notes[case_id] = {
+                "source_url": url,
+                "source_accessible": True,
+                "sha256": digest(raw),
+                "source_bytes": len(raw),
+                "independently_matched_to_a_test_invoice": False,
+                "complete_invoice_rate_payment_adjudication_chain": False,
+                "classification": "UNRESOLVED_NOT_AN_ACCURACY_LABEL",
+            }
+        except (OSError, ValueError) as exc:
+            notes[case_id] = {
+                "source_url": url,
+                "source_accessible": False,
+                "reason": type(exc).__name__,
+                "independently_matched_to_a_test_invoice": False,
+                "complete_invoice_rate_payment_adjudication_chain": False,
+                "classification": "SOURCE_UNAVAILABLE_NOT_AN_ACCURACY_LABEL",
+            }
+    return {
+        "government_decision_reference_count": len(notes),
+        "source_pages_fetched": sum(x["source_accessible"] for x in notes.values()),
+        "full_independent_case_labels_for_test_invoices": 0,
+        "real_freight_accuracy_from_these_sources": None,
+        "references": notes,
+    }
+
 def blind_freight_assessment(freight: dict) -> dict:
     from freight.rate_authority import AuthorityBook
     from freight.rating_engine import REVIEW_REQUIRED
@@ -706,6 +756,7 @@ def run() -> dict:
     freight = benchmark_freight()
     accounting = benchmark_pennine()
     blind = blind_freight_assessment(freight)
+    historical = survey_historical_adjudications()
     report = {
         "schema_version": 1,
         "laboratory": "RETALLY_REAL_DOCUMENT_RESEARCH_LAB",
@@ -716,6 +767,7 @@ def run() -> dict:
         "freight_original_document_benchmark": freight,
         "general_accounting_invoice_payment_reference_benchmark": accounting,
         "blinded_freight_error_evaluation": blind,
+        "historical_adjudication_reference_survey": historical,
     }
     assert blind["precision"] is None and blind["freight_detection_accuracy"] is None
     assert all(info["validated_overcharge_cents"] == 0 for info in freight.values())
