@@ -281,6 +281,8 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         batch.bindings,
         strict=True,
     ):
+        if type(record.amount_cents) is not int or not 0 < record.amount_cents <= 2**63 - 1:
+            raise ValueError("recovery claim amount must be positive integer cents within SQLite range")
         if (
             record.claim_id != claim.claim_id
             or record.claim_id != binding.claim_id
