@@ -6,6 +6,7 @@ on:
       - 'freight/real_document_lab.py'
       - 'freight/test_real_document_lab.py'
       - 'freight/REAL_DOCUMENT_LAB.md'
+      - 'freight/REAL_DOCUMENT_LAB_RESULTS_2026-10-20.md'
       - '.github/workflows/retally-real-document-lab.yml'
   workflow_dispatch:
 
@@ -86,6 +87,13 @@ jobs:
           assert stmt['current_total_minor'] == 2595447
           assert stmt['balance_delta_minor'] == 7214
           assert stmt['face_to_statement_original_amount']['cross_reference_false_joins'] == 0
+          assert stmt['face_to_statement_original_amount']['matched_invoices'] == 98
+          identities = gt['face_statement_identity_diagnostic']
+          assert identities['both_sources_share_identifier'] == 100
+          assert identities['same_identifier_and_original_amount'] == 100
+          assert identities['invoice_face_not_listed_on_statement'] == 0
+          assert identities['statement_identifier_without_extracted_invoice_face'] == 2
+          assert identities['source_date_gaps_over_180_days'] == 2
           rated = abf['retally_rating_engine']
           assert rated['lab_proxy_canonical_records_executed'] >= 5
           assert rated['engine_review_required'] == rated['lab_proxy_canonical_records_executed']
@@ -109,6 +117,9 @@ jobs:
           history = doc['historical_adjudication_reference_survey']
           assert history['government_decision_reference_count'] == 8
           assert history['full_independent_case_labels_for_test_invoices'] == 0
+          notes = history['curated_official_decision_challenge_examples']
+          assert len(notes) == 3
+          assert all(x['is_label_for_test_invoice'] is False for x in notes.values())
           import os
           from pathlib import Path
           summary = Path(os.environ['GITHUB_STEP_SUMMARY'])
