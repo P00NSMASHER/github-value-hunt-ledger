@@ -34,6 +34,24 @@ no uploaded artifacts. Research scope only.
   extraction adapter; RETALLY's native PDF ingress is a request for extraction,
   not an already deployed PDF invoice extraction engine.
 
+### GlobalTranz original charge-component calculation
+
+- The original invoice PDF contains **387 extracted charge components**, with
+  actual freight/fuel/discount arithmetic matching **100/100** invoice-face
+  totals exactly. **0** extracted component groups failed or were unreadable.
+  This is source-document arithmetic, not a contracted rate or bank settlement.
+- **93/100** original invoices contain negative discounts. RETALLY's present
+  canonical freight `ChargeLine` rejects negative billed amounts; therefore
+  **only 7/100** invoice line populations can be represented faithfully by that
+  production charge type without a separately modeled adjustment.
+- Research-only processing combined nonnegative real canonical `ChargeLine`
+  objects with the actual reconciliation kernel's signed-money parser. It did
+  **not** silently discard discounts or change production financial rules.
+- A separately reviewed product fix is tracked in
+  [issue #509](https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/509).
+  This is a real input compatibility defect, **not** evidence of a freight
+  overcharge or a successful recovery.
+
 ### GlobalTranz statement reconciliation
 
 - All **100/100** original invoice faces share exact **invoice identifiers
@@ -146,7 +164,8 @@ Licence: https://www.data.gov.uk/dataset/31ef5153-cf9c-45f7-9bcf-e2c86200d00b/sp
 
 **Research laboratory: GREEN. Customer-proof/real-accuracy acceptance: HOLD.**
 
-Remaining evidence gaps: native production PDF extractor, provenance-complete
+Remaining evidence gaps: production support for typed signed discounts/credits
+(issue #509), native production PDF extractor, provenance-complete
 shipment and line-item facts, shipment-specific effective contractual rate,
 independent bank-cleared payments/refunds, a blinded independently adjudicated
 linked positive-and-negative freight population, and separate commercial
