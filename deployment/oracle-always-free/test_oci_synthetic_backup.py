@@ -81,7 +81,7 @@ class OciBackupTests(unittest.TestCase):
         source.chmod(0o600)
         response = subprocess.CompletedProcess(["oci"], 0, '{"etag":"OCI-TEST-ETAG"}\n', "")
         with patch.object(backup.subprocess, "run", return_value=response) as run:
-            self.assertEqual(self.store.put("synthetic-recovery/test.rtbk", source),
+            self.assertEqual(self.store.put("synthetic-recovery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.rtbk", source),
                              "OCI-TEST-ETAG")
         cmd = run.call_args.args[0]
         self.assertIn("--no-overwrite", cmd)
@@ -106,8 +106,43 @@ class OciBackupTests(unittest.TestCase):
             with self.subTest(reply=reply), patch.object(self.store, "cli",
                                                           return_value=reply) as cli:
                 with self.assertRaises(backup.Refused):
-                    self.store.put("synthetic-recovery/canary.rtbk", source)
+                    self.store.put("synthetic-recovery/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.rtbk", source)
                 cli.assert_called_once()
+
+    def test_writes_are_restricted_to_exact_synthetic_key_patterns(self):
+        source = self.root / "synthetic-ciphertext.rtbk"
+        source.write_bytes(b"synthetic data only")
+        source.chmod(0o600)
+        forbidden = [
+            "customer/invoices.rtbk",
+            "synthetic-only/0123456789abcdef01234567.rtbk",
+            "synthetic-recovery/not-a-random-key.rtbk",
+            "synthetic-recovery/" + "g"*32 + ".rtbk",
+            "synthetic-recovery/" + "a"*32 + ".json",
+            "synthetic-recovery/" + "a"*32 + ".rtbk/../customers",
+            "", None,
+        ]
+        with patch.object(self.store, "cli") as cli:
+            for key in forbidden:
+                with self.subTest(key=key):
+                    with self.assertRaises(backup.Refused):
+                        self.store.put(key, source)
+                    with self.assertRaises(backup.Refused):
+                        self.store.delete_version(key, "trusted-etag")
+            cli.assert_not_called()
+
+    def test_exact_fresh_key_delete_requires_etag(self):
+        key = "synthetic-recovery/" + "c"*32 + ".rtbk"
+        with patch.object(self.store, "cli", return_value="") as cli:
+            with self.assertRaises(backup.Refused):
+                self.store.delete_version(key, "")
+            cli.assert_not_called()
+            self.store.delete_version(key, "etag-frozen")
+            self.assertEqual(cli.call_count, 1)
+            args = cli.call_args.args
+            self.assertIn("--if-match", args)
+            self.assertEqual(args[args.index("--if-match") + 1], "etag-frozen")
+            self.assertIn(key, args)
 
     def test_object_metadata_expected_vs_unsupported_response_shapes(self):
         expected = [{"name": "synthetic-only/a"}]
