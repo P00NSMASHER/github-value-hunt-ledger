@@ -441,9 +441,61 @@ def launch_vm(inventory: dict, state: dict, ssh_public_key: Path):
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tenancy-id', help='OCI tenancy OCID, automatically read from Cloud Shell when available')
-    parser.add_argument('--apply', action='store_true', help='Create an Always Free-sized VM after interactive confirmation')
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument('--apply', action='store_true',
+                         help='Create an Always Free-sized VM after interactive confirmation')
+    actions.add_argument('--inspect-partial', action='store_true',
+                         help='Read-only verification of recorded partial network; no changes')
+    actions.add_argument('--resume', action='store_true',
+                         help='Resume only the recorded subnet after fresh explicit confirmation')
     args = parser.parse_args(argv)
     os.umask(0o077)
+    if args.inspect_partial or args.resume:
+        ensure(not RECEIPT.exists() and PARTIAL.exists(),
+               'Partial receipt required and completed receipt must be absent.')
+        try:
+            state = json.loads(PARTIAL.read_text(encoding='utf-8'))
+        except (ValueError, OSError) as exc:
+            raise Stop('Partial resource receipt unreadable; manual reconciliation required.') from exc
+        tenancy = read_tenancy(args.tenancy_id)
+        region = home_region(tenancy)
+        verify_partial_network(state, tenancy, region)
+        inventory = read_inventory(tenancy, region, existing_vcn_id=state['vcn_id'])
+        print(json.dumps({
+            'status': 'PARTIAL_NETWORK_VERIFIED',
+            'region': region, 'shape': SHAPE, 'ocpus': OCPUS,
+            'ram_gb': RAM_GB, 'boot_gb': BOOT_GB,
+            'network': 'REUSED_NOT_RECREATED', 'incoming': 'DENY_ALL',
+            'existing_instances': inventory['existing_instances'],
+            'a1_ocpus_in_use': inventory['a1_ocpus_in_use'],
+            'storage_gb_in_use': inventory['block_volume_gb_in_use'],
+            'release_status': 'HOLD', 'customer_data': 'NONE',
+        }, indent=2))
+        if args.inspect_partial:
+            print('READ-ONLY partial inspection passed. No OCI writes performed.')
+            return 0
+        ensure(sys.stdin.isatty(), 'Resume requires an interactive Oracle Cloud Shell.')
+        print('Oracle launch previously returned HTTP 500. This tries the SAME')
+        print('Always Free-sized VM only in the existing verified network.')
+        print('It will not create a new network or switch to a paid shape.')
+        phrase = input('Type RESUME RETALLY ALWAYS FREE to proceed: ').strip()
+        ensure(phrase == 'RESUME RETALLY ALWAYS FREE', 'No resume confirmation; nothing created.')
+        # Reconcile again AFTER user confirmation, guarding against stale inventory.
+        verify_partial_network(state, tenancy, region)
+        inventory = read_inventory(tenancy, region, existing_vcn_id=state['vcn_id'])
+        try:
+            launch_vm(inventory, state, PUBLIC_KEY)
+        except Stop:
+            print(f'Existing partial receipt preserved at {PARTIAL}. Do not run --apply.',
+                  file=sys.stderr)
+            raise
+        safe_receipt(state, partial=False)
+        PARTIAL.unlink()
+        print('Verified Always Free-sized VM; network reused, no service deployed.')
+        print(f'Instance OCID: {state["instance_id"]}')
+        print(f'Private receipt: {RECEIPT}')
+        return 0
+
     ensure(not RECEIPT.exists() and not PARTIAL.exists(),
            f'Prior OCI staging receipt exists in {RESOURCE_DIR}; refusing duplicate creation.')
     tenancy = read_tenancy(args.tenancy_id)
