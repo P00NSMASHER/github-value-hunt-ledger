@@ -479,7 +479,7 @@ def _rating_probe(faces: list[InvoiceFace], texts: list[str], pdf_sha256: str) -
             source_id="public:arcbest:" + _safe_sha(face.number),
             kind="PUBLIC_COURT_ORIGINAL_INVOICE",
             sha256=pdf_sha256,
-            observed_at="2026-10-19T00:00:00.000000Z",
+            observed_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
             transport="BATCH", filename="arcbest.pdf",
         )
         # All three stand-ins are explicitly test-only, not trusted buyer facts.
