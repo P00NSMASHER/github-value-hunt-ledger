@@ -11,9 +11,25 @@ if [[ $(id -u) -eq 0 ]]; then
   echo 'Run as a regular authorized Ubuntu account with sudo, not as root.' >&2
   exit 1
 fi
+# A1 is the default. x86-64 must be explicitly requested and independently
+# checked against OCI instance metadata to allow only the fixed Always Free Micro.
+micro_host=0
 if [[ $(uname -m) != 'aarch64' ]]; then
-  echo 'Expected OCI Always Free Ampere A1 ARM64 host; refusing other architectures.' >&2
-  exit 2
+  if [[ $(uname -m) != 'x86_64' || ${RETALLY_MICRO_HOST:-} != 1 ]]; then
+    echo 'Only reviewed OCI A1 or explicitly attested Always Free E2 Micro hosts are supported.' >&2
+    exit 2
+  fi
+  python3 - <<'PY'
+import json
+from urllib.request import Request, urlopen
+request = Request("http://169.254.169.254/opc/v2/instance/",
+                  headers={"Authorization": "Bearer Oracle"})
+with urlopen(request, timeout=6) as response:
+    identity = json.load(response)
+if identity.get("shape") != "VM.Standard.E2.1.Micro":
+    raise SystemExit("Expected OCI fixed Always Free E2 Micro shape from IMDS.")
+PY
+  micro_host=1
 fi
 repo_root=$(git rev-parse --show-toplevel)
 cd "$repo_root"
@@ -91,6 +107,12 @@ fi
 sudo mv -T -- "$staging" "$release_dir"
 staging=''
 sudo install -m 0644 "$release_dir/deployment/oracle-always-free/retally-synthetic.service" "$unit_path"
+if [[ "$micro_host" == 1 ]]; then
+  # Leave RAM for the 1 GiB guest OS. Synthetic service remains DISABLED.
+  sudo install -d -m 0755 /etc/systemd/system/retally-synthetic.service.d
+  sudo install -m 0644 "$release_dir/deployment/oracle-always-free/retally-micro-memory.conf" \
+    /etc/systemd/system/retally-synthetic.service.d/oci-micro-memory.conf
+fi
 sudo systemctl daemon-reload
 if systemctl is-active --quiet retally-synthetic.service ||
    systemctl is-enabled --quiet retally-synthetic.service; then
