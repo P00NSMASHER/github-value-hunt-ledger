@@ -207,16 +207,29 @@ class OciStore:
         ensure(not destination.exists() and not destination.is_symlink(), "Ciphertext download destination exists.")
         ensure(type(max_size) is int and 0 < max_size <= MAX_SEALED,
                "Download size bound must be a positive synthetic-only limit.")
-        # HEAD must first confirm content-length <= max_size. The If-Match
-        # freezes that bounded version so a concurrent overwrite cannot
-        # substitute a larger or different object during download.
-        # OCI GET returns {'output': null}, not {'data': ...}.
+        # Enforce HEAD at the transport boundary, rather than relying on a
+        # caller to remember an earlier check. Refuse unknown lengths and
+        # unrelated versions BEFORE allowing OCI CLI to write any bytes.
+        h = self.head(name)
+        ensure(synthetic_etag(h["etag"]) == etag,
+               "OCI HEAD object version disagrees with requested synthetic ETag.")
+        reported = h.get("content-length")
+        if type(reported) is int:
+            length = reported
+        elif isinstance(reported, str) and re.fullmatch(r"[0-9]{1,12}", reported):
+            length = int(reported)
+        else:
+            raise Refused("OCI HEAD content length is absent or not an exact integer.")
+        ensure(0 < length <= max_size,
+               "OCI HEAD ciphertext size exceeds the synthetic-only download bound.")
+        # --if-match ties GET to the checked object version; no multipart,
+        # partial receipt or unbounded caller-supplied download size.
         self.cli("os", "object", "get", *self.args(), "--name", name,
                  "--file", str(destination), "--if-match", etag,
                  "--no-multipart", timeout=120)
         ensure(_private(destination), "Downloaded ciphertext is not owner-only.")
-        ensure(destination.stat().st_size <= max_size,
-               "Downloaded ciphertext exceeds prevalidated HEAD size bound.")
+        ensure(destination.stat().st_size == length,
+               "Downloaded ciphertext differs from prevalidated HEAD size.")
         return destination.read_bytes()
 
     def put(self, name: str, source: Path) -> str:
