@@ -139,8 +139,11 @@ def seal_file(snapshot_path: Path, destination: Path, passphrase: str) -> dict:
 
 
 def verify_file(source: Path, passphrase: str) -> dict:
-    raw = unseal_bytes(source.read_bytes(), passphrase)
-    return {"sealed_sha256": _digest(source.read_bytes()),
+    # Hash the exact ciphertext bytes that were authenticated and restored.
+    # A second disk read could report a digest for different, unverified bytes.
+    sealed = source.read_bytes()
+    raw = unseal_bytes(sealed, passphrase)
+    return {"sealed_sha256": _digest(sealed),
             "snapshot_sha256": _digest(raw), "restore_verified": True,
             "off_device_verified": False}
 

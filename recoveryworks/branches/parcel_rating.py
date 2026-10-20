@@ -164,10 +164,13 @@ def load_rating_bundle(path, charges, *, verified=False, currency="USD"):
         measured[measurement.shipment_id]=measurement
     results=[]
     for charge in charges:
+        # Compare parsed calendar dates, not string representations of ISO dates.
+        # Python accepts YYYYMMDD as well as YYYY-MM-DD; lexical ordering does not.
+        shipment_date = date.fromisoformat(charge.ship_date)
         candidates=[c for c in contracts if c.carrier_id==charge.carrier_id and
                     normalize_service(c.service_code)==charge.normalized_service and
                     normalize_zone(c.zone)==charge.normalized_zone and
-                    c.effective_from<=charge.ship_date<=c.effective_to]
+                    date.fromisoformat(c.effective_from)<=shipment_date<=date.fromisoformat(c.effective_to)]
         if len(candidates)!=1 or charge.shipment_id not in measured:
             raise ValueError('exactly one in-scope contract and measurement required per shipment')
         results.append(rate_parcel(charge,measured[charge.shipment_id],candidates[0],currency=currency))

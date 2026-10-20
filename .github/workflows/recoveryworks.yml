@@ -67,5 +67,5 @@ jobs:
           python-version: "3.11"
       - name: Install optional encrypted-backup verifier
         run: python -m pip install --disable-pip-version-check "cryptography==45.0.7"
-      - name: Windows encrypted-backup and role-key acceptance
-        run: python -m unittest recoveryworks.test_offsite_archive recoveryworks.test_workbench_credentials -v
+      - name: Windows encrypted-backup, private ACL and role-key acceptance
+        run: python -m unittest recoveryworks.test_offsite_archive recoveryworks.test_workbench_credentials recoveryworks.test_private_io_windows_acl -v
