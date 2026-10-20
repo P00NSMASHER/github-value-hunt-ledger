@@ -106,7 +106,7 @@ class OciBackupTests(unittest.TestCase):
     def test_empty_object_list_requires_second_full_count_query(self):
         # The authenticated OCI Cloud Shell CLI has returned successful empty
         # list stdout on some operations; never interpret blank as absence alone.
-        with patch.object(self.store, "cli", side_effect=["", "0\\n"]) as call:
+        with patch.object(self.store, "cli", side_effect=["", "0\n"]) as call:
             self.assertEqual(self.store.objects("synthetic-only/"), [])
         self.assertEqual(call.call_count, 2)
         a, b = [q.args for q in call.call_args_list]
