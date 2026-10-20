@@ -45,15 +45,24 @@ Actions artifacts, or public step summaries.
    per remittance reference, missing payment reference and malformed amounts.
    This is a same-source structural financial benchmark, **not** bank clearing,
    independent settlement accuracy, verified duplicates or proven overcharges.
-5. The freight rating path requires provenance-complete canonical shipment
-   fields and verified, applicable rate authority. Missing original-data
-   fields are **BLOCKED**; absent controlling authority triggers **REVIEW**,
-   never a fabricated expected rate or positive recovery.
+5. A separate ArcBest smoke test may construct canonical records from the
+   original document's printed postal codes, rated weight, shipment date and
+   total. It explicitly marks the **shipment-date-as-invoice-date proxy**, the
+   **rated-weight-as-actual-weight proxy**, and **face-total-as-charge proxy**.
+   These records are inadmissible as freight accuracy evidence. The real rating
+   engine must return REVIEW_REQUIRED with no expected rate or dollar finding.
+   Missing source fields remain BLOCKED.
 6. The blinded freight evaluator freezes a prediction-side unknown/review state
    and counts only complete, independently labeled positive/negative economic
-   cases. Incomplete historical decisions remain UNRESOLVED. Precision,
-   recall, false-positive rate and real detection accuracy stay **null** when
-   the eligible denominator is zero.
+   cases. Eight historical GAO adjudication URLs are fingerprinted as public
+   reference sources, but none is silently attached to a different original
+   invoice. Missing case linkage remains UNRESOLVED. Precision, recall,
+   specificity and real detection accuracy stay **null** with no labels.
+7. Compare unscoped vs source-reference-partitioned runs of the actual RETALLY
+   reconciliation kernel. The native many-to-one global candidate window is
+   bounded at 18; the lab's strictly partitioned replay retains that bounded
+   kernel while only allowing matches within the same declared payment reference.
+   This measures structural consistency, not bank-cleared matching accuracy.
 
 ## Run locally or in the read-only PR workflow
 
