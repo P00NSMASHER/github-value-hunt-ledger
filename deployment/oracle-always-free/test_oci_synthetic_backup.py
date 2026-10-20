@@ -81,13 +81,33 @@ class OciBackupTests(unittest.TestCase):
         source.chmod(0o600)
         response = subprocess.CompletedProcess(["oci"], 0, '{"etag":"OCI-TEST-ETAG"}\n', "")
         with patch.object(backup.subprocess, "run", return_value=response) as run:
-            self.store.put("synthetic-recovery/test.rtbk", source)
+            self.assertEqual(self.store.put("synthetic-recovery/test.rtbk", source),
+                             "OCI-TEST-ETAG")
         cmd = run.call_args.args[0]
         self.assertIn("--no-overwrite", cmd)
         self.assertIn("--verify-checksum", cmd)
         self.assertIn("--no-multipart", cmd)
         self.assertNotIn("--force", cmd)
         self.assertIn("Standard", cmd)
+
+    def test_cli_no_overwrite_success_is_not_a_successful_put(self):
+        # OCI documents exit 0 and a top-level 'output' message when the
+        # object already exists and --no-overwrite skips the upload.
+        source = self.root / "canary.rtbk"
+        source.write_bytes(b"encrypted-fixture")
+        source.chmod(0o600)
+        replies = [
+            '{"output":"The object already exists and was not overwritten"}',
+            '{"output":null}', "",
+            '{"data":{"etag":"WRONG-LEVEL"}}', "not-json",
+            '{"etag":null}', '{"etag":"bad etag"}',
+        ]
+        for reply in replies:
+            with self.subTest(reply=reply), patch.object(self.store, "cli",
+                                                          return_value=reply) as cli:
+                with self.assertRaises(backup.Refused):
+                    self.store.put("synthetic-recovery/canary.rtbk", source)
+                cli.assert_called_once()
 
     def test_object_metadata_expected_vs_unsupported_response_shapes(self):
         expected = [{"name": "synthetic-only/a"}]
@@ -345,6 +365,26 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
                 delete.assert_not_called()
         self.assertFalse(self.receipt.exists())
 
+    def test_final_legacy_preservation_refuses_changed_etag_or_ciphertext(self):
+        original = {"_name": self.key, "_etag": "etag-legacy",
+                    "_length": len(self.raw), "_sha256": backup.sha(self.raw)}
+        objects = [{"name": self.key, "size": len(self.raw)}]
+        with (patch.object(self.store, "objects", return_value=objects),
+              patch.object(self.store, "head", return_value={
+                  "etag": "changed-etag", "content-length": len(self.raw)}),
+              patch.object(self.store, "get") as get):
+            with self.assertRaisesRegex(backup.Refused, "ETag changed"):
+                backup.confirm_legacy_orphan_unchanged(
+                    self.store, original, self.root / "final-check.rtbk")
+            get.assert_not_called()
+        with (patch.object(self.store, "objects", return_value=objects),
+              patch.object(self.store, "head", return_value={
+                  "etag": "etag-legacy", "content-length": len(self.raw)}),
+              patch.object(self.store, "get", return_value=b"X" + self.raw[1:])):
+            with self.assertRaisesRegex(backup.Refused, "ciphertext changed"):
+                backup.confirm_legacy_orphan_unchanged(
+                    self.store, original, self.root / "final-check.rtbk")
+
     def test_existing_quarantine_blocks_repeated_acceptance(self):
         self.receipt.write_text('{"previous":true}', encoding="ascii")
         with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
@@ -394,6 +434,7 @@ class RealEnginesOfflineTest(unittest.TestCase):
             def put(key, source):
                 self.assertNotIn(key, objects)
                 objects[key] = source.read_bytes()
+                return "frozen-etag"
 
             def get(key, path, *, etag, max_size):
                 self.assertEqual(etag, "frozen-etag")
@@ -431,6 +472,31 @@ class RealEnginesOfflineTest(unittest.TestCase):
                 backup.private_receipt(attempt, {"should": "never overwrite"})
 
 
+    def test_mismatched_provider_upload_and_head_etag_refuses_restore(self):
+        from importlib.util import find_spec
+        if find_spec("cryptography") is None or find_spec("recoveryworks") is None:
+            self.skipTest("requires actual workbench and optional encryption module")
+        with tempfile.TemporaryDirectory(prefix="retally-oci-head-mismatch-") as folder:
+            root = Path(folder)
+            root.chmod(0o700)
+            store = backup.OciStore({
+                "bucket": backup.BUCKET_NAME, "namespace": "example", "region": "us-ashburn-1"
+            })
+            with (patch.object(backup, "ATTEMPT", root / "attempt.json"),
+                  patch.object(backup, "ACCEPTANCE", root / "acceptance.json"),
+                  patch.object(store, "bucket_check"),
+                  patch.object(store, "objects", return_value=[]),
+                  patch.object(store, "put", return_value="etag-uploaded"),
+                  patch.object(store, "head", return_value={"etag": "etag-changed"}),
+                  patch.object(store, "get") as get,
+                  patch.object(store, "delete_version") as delete):
+                with self.assertRaisesRegex(backup.Refused, "ETag differs"):
+                    backup.synthetic_roundtrip(store)
+                get.assert_not_called()
+                delete.assert_not_called()
+            self.assertTrue((root / "attempt.json").is_file())
+            self.assertFalse((root / "acceptance.json").exists())
+
     def test_real_seven_branch_roundtrip_leaves_unverified_orphan_intact(self):
         from importlib.util import find_spec
         if find_spec("cryptography") is None or find_spec("recoveryworks") is None:
@@ -458,6 +524,7 @@ class RealEnginesOfflineTest(unittest.TestCase):
                 self.assertNotIn(key, objects)
                 objects[key] = source.read_bytes()
                 actions.append(("put", key))
+                return "frozen-etag"
 
             def get(key, destination, *, etag, max_size):
                 self.assertEqual(etag, "frozen-etag")
@@ -495,7 +562,9 @@ class RealEnginesOfflineTest(unittest.TestCase):
             self.assertEqual(objects, {legacy_key: historical})
             self.assertEqual(len([a for a in actions if a[0] == "put"]), 1)
             self.assertEqual(len([a for a in actions if a[0] == "delete"]), 1)
-            self.assertEqual(len([a for a in actions if a[0] == "get"]), 2)
+            self.assertEqual(len([a for a in actions if a[0] == "get"]), 3)
+            self.assertEqual([a[1].split("/")[0] for a in actions if a[0] == "get"],
+                             ["synthetic-only", "synthetic-recovery", "synthetic-only"])
             self.assertTrue(quarantine.exists())
             self.assertEqual(quarantine.stat().st_mode & 0o777, 0o600)
             untrusted = json.loads(quarantine.read_text())
