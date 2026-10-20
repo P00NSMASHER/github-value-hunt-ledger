@@ -203,6 +203,14 @@ class OciBackupTests(unittest.TestCase):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
 
+    def test_incomplete_paginated_inventory_is_not_full_population_evidence(self):
+        for continuation in ("next-start-with", "opc-next-page"):
+            with self.subTest(continuation=continuation), patch.object(
+                    self.store, "cli", return_value=json.dumps({
+                        "data": [], continuation: "additional-page-token"})):
+                with self.assertRaisesRegex(backup.Refused, "continuation"):
+                    self.store.objects("synthetic-recovery/")
+
     def test_download_requires_etag_and_bounded_private_ciphertext(self):
         filename = self.root / "remote-ciphertext.rtbk"
         raw = b"bounded test ciphertext"
@@ -238,13 +246,23 @@ class OciBackupTests(unittest.TestCase):
     def test_bucket_privacy_fails_closed(self):
         valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
                  "storage-tier": "Standard", "versioning": "Disabled",
-                 "object-events-enabled": False, "replication-enabled": False}
+                 "object-events-enabled": False, "replication-enabled": False,
+                 "auto-tiering": "Disabled", "object-lifecycle-policy-etag": None}
         with patch.object(self.store, "data", return_value=valid):
             self.store.bucket_check()
         for field, value in (("public-access-type", "ObjectRead"),
                              ("storage-tier", "Archive"), ("versioning", "Enabled"),
-                             ("object-events-enabled", True)):
+                             ("object-events-enabled", True),
+                             ("replication-enabled", True),
+                             ("auto-tiering", "InfrequentAccess"),
+                             ("object-lifecycle-policy-etag", "new-lifecycle-policy")):
             with self.subTest(field=field), patch.object(self.store, "data", return_value={**valid, field: value}):
+                with self.assertRaises(backup.Refused):
+                    self.store.bucket_check()
+        for missing in ("object-events-enabled", "replication-enabled",
+                        "auto-tiering", "object-lifecycle-policy-etag"):
+            with self.subTest(missing=missing), patch.object(self.store, "data",
+                    return_value={k: v for k, v in valid.items() if k != missing}):
                 with self.assertRaises(backup.Refused):
                     self.store.bucket_check()
 
