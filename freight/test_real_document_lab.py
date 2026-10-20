@@ -113,6 +113,12 @@ class LaboratoryTests(unittest.TestCase):
         report = globaltranz_invoice_line_total_benchmark([face], [content])
         self.assertEqual(report["invoice_face_exact_line_sum"], 1)
         self.assertEqual(report["negative_adjustment_tokens"], 1)
+        self.assertEqual(report["invoice_faces_containing_negative_discounts"], 1)
+        self.assertEqual(report["invoice_faces_canonical_signed_charge_schema_compatible"], 0)
+        self.assertFalse(report["production_freight_ChargeLine_accepts_negative_discounts"])
+        from freight.canonical_schema import ChargeLine
+        with self.assertRaisesRegex(ValueError, "billed_cents"):
+            ChargeLine(charge_id="discount", charge_code="DISC", billed_cents=-1)
         self.assertTrue(report["every_face_conserved"])
         self.assertFalse(report["line_sum_proves_controlling_rate_or_overcharge"])
         modified = content.replace("78.91", "78.92")
