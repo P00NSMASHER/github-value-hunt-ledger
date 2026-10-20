@@ -4,8 +4,8 @@
 **NOT ASSESSABLE**; production PDF-extraction acceptance **NOT PASSED**.
 No approved commercial recovery, verified refund or first-customer accuracy claim.
 
-**Reproducible run:** https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/39354189557
-**Tested source commit:** ff2a5174ff16cebf98fef1b8b5de0806d21f3342
+**Latest complete real-document replay:** https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/39355774995
+**Tested source commit:** d66ccb55c58175822ab73f74c81f1a2544018530
 **Isolation:** read-only GitHub-hosted Ubuntu runner, no checkout credentials
 retained, no Git writes, raw invoice bytes or extracted invoice rows committed,
 no uploaded artifacts. Research scope only.
