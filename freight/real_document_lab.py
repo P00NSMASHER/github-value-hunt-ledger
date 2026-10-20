@@ -349,6 +349,75 @@ def check_anchors(faces: list[InvoiceFace], anchors: dict) -> dict:
     return {"checks": len(checks), "passed": sum(checks), "failed": len(checks) - sum(checks)}
 
 
+def globaltranz_charge_components(text: str) -> tuple[int, ...] | None:
+    """Extract charge-column decimal tokens, not rates or physical weights.
+
+    The original GlobalTranz pages print variable line charges after the
+    'Pieces Pallet ... Charges' header and before the 'Total:' amount. This
+    lab-only extraction is deliberately strict and treats PDF text-layout
+    uncertainty as UNKNOWN instead of inventing rated charge lines.
+    """
+    start = re.search(
+        r"Pieces\s+Pallet\s+Description\s+Class\s+Weight\s+Charges\b",
+        text, re.I)
+    if not start:
+        return None
+    end = re.search(r"\bTotal:\s*[\d,.]+\s+[\d,.]+\s+USD\b",
+                    text[start.end():], re.I)
+    if not end:
+        return None
+    region = text[start.end():start.end()+end.start()]
+    amounts = []
+    for line in region.splitlines():
+        candidate = line.strip()
+        if re.fullmatch(r"-?(?:\d+|\d{1,3}(?:,\d{3})+)\.\d{2}", candidate):
+            amounts.append(minor(candidate))
+    return tuple(amounts) if amounts else None
+
+
+def globaltranz_invoice_line_total_benchmark(
+    faces: list[InvoiceFace], texts: list[str],
+) -> dict:
+    """Replay observed charge tokens through RETALLY canonical charge types."""
+    from freight.canonical_schema import ChargeLine
+    exact = unmatched = unextracted = 0
+    line_items = negative_adjustments = 0
+    fingerprints = []
+    for face in faces:
+        components = globaltranz_charge_components(texts[face.page - 1])
+        if not components or face.cents is None:
+            unextracted += 1
+            continue
+        charge_lines = tuple(
+            ChargeLine(
+                charge_id=f"lab-component:{face.page}:{idx}",
+                charge_code="ORIGINAL_PDF_CHARGE_COMPONENT",
+                billed_cents=amount,
+            )
+            for idx, amount in enumerate(components, 1)
+        )
+        line_items += len(charge_lines)
+        negative_adjustments += sum(item.billed_cents < 0 for item in charge_lines)
+        computed = sum(item.billed_cents for item in charge_lines)
+        exact += int(computed == face.cents)
+        unmatched += int(computed != face.cents)
+        fingerprints.append((face.number, computed, face.cents, len(charge_lines)))
+    return {
+        "source": "ORIGINAL_PDF_LINE_AMOUNT_TOKENS_REPLAYED_AS_RETALLY_CHARGELINE",
+        "invoice_faces_considered": len(faces),
+        "component_tokens_extracted": line_items,
+        "negative_adjustment_tokens": negative_adjustments,
+        "invoice_face_exact_line_sum": exact,
+        "invoice_face_nonmatching_extracted_line_sum": unmatched,
+        "invoice_face_component_text_unavailable": unextracted,
+        "every_face_conserved": exact + unmatched + unextracted == len(faces),
+        "line_sum_proves_controlling_rate_or_overcharge": False,
+        "line_sum_proves_cash_settlement": False,
+        "stable_line_comparison_sha256": digest(json.dumps(
+            sorted(fingerprints), separators=(",", ":")).encode()),
+    }
+
+
 def _safe_sha(identifier: str) -> str:
     return hashlib.sha256(identifier.encode("utf-8")).hexdigest()[:20]
 
@@ -567,6 +636,8 @@ def benchmark_freight() -> dict:
             "realized_recovery_cents": 0,
         }
         if issuer == "globaltranz":
+            out["original_invoice_line_amount_reconciliation"] = (
+                globaltranz_invoice_line_total_benchmark(list(unique.values()), texts))
             statements = statement_rows(texts)
             invoice_rows = []
             statement_txns = []
