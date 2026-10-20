@@ -207,7 +207,10 @@ def benchmark_accounting(fetcher=fetch_official_csv, *, pinned=True) -> dict:
     broad_window = reconcile(internal, payments, ReconConfig(date_window_days=365, **base))
     identity_control = reconcile(aligned_internal, aligned_payments,
                                  ReconConfig(date_window_days=3, **base))
+    errors = (_summary_matches(default_window, len(rows))["cross_invoice_misjoins"]
+              + _summary_matches(broad_window, len(rows))["cross_invoice_misjoins"])
     return {
+        "quality_gate": "FAIL_UNSAFE_GENERIC_CROSS_INVOICE_JOINS" if errors else "PASS_SOURCE_LEDGER_ASSOCIATIONS",
         "state": "REAL_PUBLISHER_ACCOUNTING_ANNOTATION_KERNEL_REPLAY",
         "source": "Pennine Care NHS FT OGL v3 April-August 2026",
         "population": population,
@@ -238,6 +241,21 @@ def _extract_text_invoice(text: str) -> tuple[str | None, int | None]:
         r"(?:USD\s*)?\$?\s*([0-9][0-9,]*\.[0-9]{2})\b",
         flat,
     )
+    # GlobalTranz's tabular heading separates 'Invoice / No' from the
+    # adjacent date/date/reference row. A tightly scoped date-date-reference
+    # fallback reads that source layout without consulting the golden ID list.
+    if invoice is None:
+        invoice = re.search(
+            r"(?<!\\d)\\d{2}/\\d{2}/\\d{4}\\s+\\d{2}/\\d{2}/\\d{4}\\s+"
+            r"([0-9]{8}(?:\\s+[A-Z])?)(?!\\d)", flat,
+        )
+    # GlobalTranz's freight charge table closes with
+    # 'Total: <shipment weight> <invoice total> USD', not 'Amount Due: $...'.
+    if amount is None:
+        amount = re.search(
+            r"(?i)\\bTotal:\\s*[0-9][0-9,.]*\\s+"
+            r"([0-9][0-9,]*\\.[0-9]{2})\\s+USD\\b", flat,
+        )
     cents = None
     if amount:
         cents = parse_amount_to_minor(amount.group(1).replace(",", ""), 2)
