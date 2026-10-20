@@ -15,6 +15,7 @@ from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_ope
 
 METADATA_URL = "http://169.254.169.254/opc/v2/instance/"
 MAX_METADATA_BYTES = 131072
+SHAPE_CONFIG_URL = METADATA_URL + "shapeConfig"
 HOST_TYPES = {
     "a1": ("aarch64", "VM.Standard.A1.Flex"),
     "micro": ("x86_64", "VM.Standard.E2.1.Micro"),
@@ -26,13 +27,15 @@ class DenyRedirect(HTTPRedirectHandler):
         raise ValueError("OCI instance metadata redirect forbidden")
 
 
-def read_metadata() -> dict:
-    request = Request(METADATA_URL, headers={"Authorization": "Bearer Oracle"},
+def read_metadata(url: str = METADATA_URL) -> dict:
+    if url not in {METADATA_URL, SHAPE_CONFIG_URL}:
+        raise ValueError("Unapproved OCI metadata endpoint")
+    request = Request(url, headers={"Authorization": "Bearer Oracle"},
                       method="GET")
     opener = build_opener(ProxyHandler({}), DenyRedirect())
     try:
         with opener.open(request, timeout=6) as response:
-            if response.geturl() != METADATA_URL:
+            if response.geturl() != url:
                 raise ValueError("OCI instance metadata source changed")
             raw = response.read(MAX_METADATA_BYTES + 1)
     except (OSError, ValueError) as exc:
@@ -48,7 +51,13 @@ def read_metadata() -> dict:
     return data
 
 
-def verify_instance_metadata(data: dict, architecture: str, flavor: str) -> None:
+def read_shape_config() -> dict:
+    """Read the separate official OCI IMDSv2 allocation endpoint, fail closed."""
+    return read_metadata(SHAPE_CONFIG_URL)
+
+
+def verify_instance_metadata(data: dict, architecture: str, flavor: str,
+                             *, shape_config: dict | None = None) -> None:
     if flavor not in HOST_TYPES or not isinstance(data, dict):
         raise ValueError("Unsupported OCI host type")
     expected_arch, expected_shape = HOST_TYPES[flavor]
@@ -58,15 +67,23 @@ def verify_instance_metadata(data: dict, architecture: str, flavor: str) -> None
         raise ValueError("OCI host is not the exact approved free shape")
     if not isinstance(data.get("id"), str) or not data["id"].startswith("ocid1.instance."):
         raise ValueError("OCI instance identity missing")
-    # The E2.1.Micro is a fixed-size, one-GiB shape. If OCI exposes its
-    # allocation fields, a mismatched memory or CPU shape is a hard hold.
-    config = data.get("shapeConfig")
-    if config is not None:
+    config = shape_config if shape_config is not None else data.get("shapeConfig")
+    if flavor == "a1":
+        # A1.Flex can exceed the Always Free allocation; the nominal shape
+        # name alone is NOT sufficient. Our reviewed staging profile explicitly
+        # requests 2 OCPUs and 12 GiB, and missing IMDS shapeConfig is a HOLD.
+        if not isinstance(config, dict):
+            raise ValueError("OCI A1 allocation is missing; free quota not proved")
+        for key, expected in (("ocpus", 2), ("memoryInGBs", 12)):
+            value = config.get(key)
+            if type(value) not in {int, float} or value != expected:
+                raise ValueError("OCI A1 allocation differs from 2 OCPU / 12 GiB")
+    elif config is not None:
         if not isinstance(config, dict):
             raise ValueError("OCI shape configuration must be an object")
-        if flavor == "micro" and "memoryInGBs" in config and (
+        if "memoryInGBs" in config and (
             type(config["memoryInGBs"]) not in {int, float}
-            or float(config["memoryInGBs"]) != 1.0
+            or config["memoryInGBs"] != 1
         ):
             raise ValueError("OCI Micro is not the fixed one-GiB shape")
 
@@ -80,7 +97,10 @@ def main(argv=None):
                        help="verify the reviewed Always Free E2.1.Micro x86 host")
     args = parser.parse_args(argv)
     flavor = "micro" if args.micro else "a1"
-    verify_instance_metadata(read_metadata(), platform.machine(), flavor)
+    identity = read_metadata()
+    allocation = read_shape_config() if flavor == "a1" else None
+    verify_instance_metadata(identity, platform.machine(), flavor,
+                             shape_config=allocation)
     print("PASS: exact OCI staging host shape attested; production/customer approval NOT granted")
     return 0
 
