@@ -491,5 +491,35 @@ class ResumePartialResourceTests(unittest.TestCase):
 
 
 
+
+class SingleAttemptCliSafetyTests(unittest.TestCase):
+    def test_instance_launch_does_not_auto_retry_on_http_500(self):
+        outcome = subprocess.CompletedProcess(
+            args=["oci"], returncode=1, stdout="",
+            stderr='ServiceError: InternalError')
+        with patch.object(mod.subprocess, 'run', return_value=outcome) as run:
+            with self.assertRaisesRegex(mod.Stop, 'InternalError'):
+                mod.cli('compute', 'instance', 'launch',
+                        '--shape', 'VM.Standard.E2.1.Micro')
+        self.assertEqual(run.call_count, 1)
+        args = run.call_args.args[0]
+        self.assertEqual(args.count('--no-retry'), 1)
+        self.assertEqual(args[:4], ['oci', 'compute', 'instance', 'launch'])
+        self.assertIn('--shape', args)
+        self.assertIn('VM.Standard.E2.1.Micro', args)
+
+    def test_blank_oci_list_recheck_disables_hidden_retries(self):
+        empty = subprocess.CompletedProcess(
+            args=['oci'], returncode=0, stdout='', stderr='')
+        with patch.object(mod.subprocess, 'run', side_effect=[empty, empty]) as run:
+            self.assertEqual(
+                mod.cli('compute', 'instance', 'list', '--compartment-id',
+                        'ocid1.tenancy.oc1..synthetic', '--all'), [])
+        self.assertEqual(run.call_count, 2)
+        for call in run.call_args_list:
+            self.assertEqual(call.args[0].count('--no-retry'), 1)
+
+
+
 if __name__=='__main__':
     unittest.main()
