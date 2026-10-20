@@ -20,6 +20,11 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertIn('sudo mv -Tf -- "$candidate_link" /opt/retally/current', script)
         self.assertNotIn("sudo ln -sfn", script)
         self.assertNotIn("sudo rsync", script)
+        # PYTHONPATH alone is insufficient: Python -m normally imports from the
+        # current checkout first, including an ignored local module.
+        self.assertEqual(script.count("sudo -u retally -- sh -c 'cd \"$1\" &&"), 2)
+        self.assertNotIn("PYTHONPATH=$staging", script)
+        self.assertIn('sudo mv -T -- "$staging" "$release_dir"', script)
         self.assertNotIn("sudo systemctl start", script)
         self.assertNotIn("sudo systemctl enable", script)
 
