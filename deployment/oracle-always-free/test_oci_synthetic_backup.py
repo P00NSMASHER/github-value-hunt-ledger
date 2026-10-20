@@ -431,5 +431,82 @@ class RealEnginesOfflineTest(unittest.TestCase):
                 backup.private_receipt(attempt, {"should": "never overwrite"})
 
 
+    def test_real_seven_branch_roundtrip_leaves_unverified_orphan_intact(self):
+        from importlib.util import find_spec
+        if find_spec("cryptography") is None or find_spec("recoveryworks") is None:
+            self.skipTest("requires source and optional cryptography")
+        with tempfile.TemporaryDirectory(prefix="retally-oci-quarantined-seven-branch-") as folder:
+            home = Path(folder)
+            home.chmod(0o700)
+            attempt = home / "attempt.json"
+            acceptance = home / "acceptance.json"
+            quarantine = home / "untrusted-legacy.json"
+            legacy_key = "synthetic-only/1234567890abcdef12345678.rtbk"
+            historical = backup.LEGACY_MAGIC + b"N" * 12 + b"synthetic-old-gcm-canary-do-not-delete"
+            objects = {legacy_key: historical}
+            actions = []
+            store = backup.OciStore({
+                "bucket": backup.BUCKET_NAME, "namespace": "example", "region": "us-ashburn-1"
+            })
+
+            def listing(prefix):
+                return [{"name": key, "size": len(value)}
+                        for key, value in objects.items() if key.startswith(prefix)]
+
+            def put(key, source):
+                self.assertTrue(key.startswith("synthetic-recovery/"))
+                self.assertNotIn(key, objects)
+                objects[key] = source.read_bytes()
+                actions.append(("put", key))
+
+            def get(key, destination, *, etag, max_size):
+                self.assertEqual(etag, "frozen-etag")
+                raw = objects[key]
+                self.assertLessEqual(len(raw), max_size)
+                destination.write_bytes(raw)
+                destination.chmod(0o600)
+                actions.append(("get", key))
+                return raw
+
+            def head(key):
+                return {"etag": "frozen-etag", "content-length": len(objects[key]),
+                        "storage-tier": "Standard"}
+
+            def delete(key, etag):
+                self.assertTrue(key.startswith("synthetic-recovery/"))
+                self.assertEqual(etag, "frozen-etag")
+                actions.append(("delete", key))
+                del objects[key]
+
+            with (patch.object(backup, "ATTEMPT", attempt),
+                  patch.object(backup, "ACCEPTANCE", acceptance),
+                  patch.object(backup, "LEGACY_QUARANTINE", quarantine),
+                  patch.object(store, "bucket_check"),
+                  patch.object(store, "objects", side_effect=listing),
+                  patch.object(store, "put", side_effect=put),
+                  patch.object(store, "get", side_effect=get),
+                  patch.object(store, "head", side_effect=head),
+                  patch.object(store, "delete_version", side_effect=delete)):
+                result = backup.synthetic_roundtrip(
+                    store, preserve_legacy_orphan=True)
+            self.assertTrue(result["synthetic_off_device_restore"])
+            self.assertTrue(result["legacy_orphan_quarantined"])
+            self.assertFalse(result["legacy_orphan_deleted"])
+            self.assertEqual(objects, {legacy_key: historical})
+            self.assertEqual(len([a for a in actions if a[0] == "put"]), 1)
+            self.assertEqual(len([a for a in actions if a[0] == "delete"]), 1)
+            self.assertEqual(len([a for a in actions if a[0] == "get"]), 2)
+            self.assertTrue(quarantine.exists())
+            self.assertEqual(quarantine.stat().st_mode & 0o777, 0o600)
+            untrusted = json.loads(quarantine.read_text())
+            self.assertEqual(untrusted["legacy_object_name"], legacy_key)
+            self.assertFalse(untrusted["original_upload_identity_independently_verified"])
+            restored = json.loads(acceptance.read_text())
+            self.assertTrue(restored["credentials_revoked"])
+            self.assertTrue(restored["legacy_orphan_quarantined"])
+            self.assertFalse(restored["legacy_orphan_deleted"])
+            self.assertFalse(restored["production_backup_verified"])
+
+
 if __name__ == "__main__":
     unittest.main()
