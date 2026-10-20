@@ -258,7 +258,11 @@ class OciBackupTests(unittest.TestCase):
         valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
                  "storage-tier": "Standard", "versioning": "Disabled",
                  "object-events-enabled": False, "replication-enabled": False,
-                 "auto-tiering": "Disabled", "object-lifecycle-policy-etag": None}
+                 "auto-tiering": "Disabled", "object-lifecycle-policy-etag": None,
+                 "kms-key-id": None, "object-level-audit-mode": "Disabled",
+                 "soft-delete-policy": {
+                     "current-policy": {"soft-delete-mode": "Disabled"},
+                     "next-policy": None}}
         with patch.object(self.store, "data", return_value=valid):
             self.store.bucket_check()
         for field, value in (("public-access-type", "ObjectRead"),
@@ -266,12 +270,22 @@ class OciBackupTests(unittest.TestCase):
                              ("object-events-enabled", True),
                              ("replication-enabled", True),
                              ("auto-tiering", "InfrequentAccess"),
-                             ("object-lifecycle-policy-etag", "new-lifecycle-policy")):
+                             ("object-lifecycle-policy-etag", "new-lifecycle-policy"),
+                             ("kms-key-id", "ocid1.key.oc1..unexpected"),
+                             ("object-level-audit-mode", "Enabled"),
+                             ("soft-delete-policy", None),
+                             ("soft-delete-policy", {
+                                 "current-policy": {"soft-delete-mode": "Enabled"},
+                                 "next-policy": None}),
+                             ("soft-delete-policy", {
+                                 "current-policy": {"soft-delete-mode": "Disabled"},
+                                 "next-policy": {"soft-delete-mode": "Enabled"}})):
             with self.subTest(field=field), patch.object(self.store, "data", return_value={**valid, field: value}):
                 with self.assertRaises(backup.Refused):
                     self.store.bucket_check()
         for missing in ("object-events-enabled", "replication-enabled",
-                        "auto-tiering", "object-lifecycle-policy-etag"):
+                        "auto-tiering", "object-lifecycle-policy-etag",
+                         "kms-key-id", "object-level-audit-mode", "soft-delete-policy"):
             with self.subTest(missing=missing), patch.object(self.store, "data",
                     return_value={k: v for k, v in valid.items() if k != missing}):
                 with self.assertRaises(backup.Refused):
