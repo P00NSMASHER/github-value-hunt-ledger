@@ -19,7 +19,11 @@ publication of original invoice content.
   supplies a matched original invoice, effective shipment-specific tariff,
   cleared payment, and complete binary adjudication label.
 
-Source URLs are fixed in real_document_lab.py. The test job fetches these source
+Source URLs and seven frozen original-file SHA-256 digests are fixed in
+real_document_lab.py. Input byte drift fails closed before processing; a
+changed source requires independent provenance review and an explicit baseline
+change. Fetches enforce HTTPS origin and redirect allowlists, size limits,
+strict UTF-8, and bounded PDF pages/text. The test job fetches these source
 bytes only into an ephemeral GitHub-hosted runner. It does **not** store their
 original bytes, invoice rows, per-invoice identities, or extracted text in Git,
 Actions artifacts, or public step summaries.
@@ -54,7 +58,9 @@ Actions artifacts, or public step summaries.
    Missing source fields remain BLOCKED.
 6. The blinded freight evaluator freezes a prediction-side unknown/review state
    and counts only complete, independently labeled positive/negative economic
-   cases. Eight historical GAO adjudication URLs are fingerprinted as public
+   cases. Until an independent truth owner and reviewers have actually frozen
+   their work, the report explicitly says blindness **NOT EXECUTED**, and
+   metrics stay NULL. Eight historical GAO adjudication URLs are indexed as public
    reference sources, but none is silently attached to a different original
    invoice. Missing case linkage remains UNRESOLVED. Precision, recall,
    specificity and real detection accuracy stay **null** with no labels.
@@ -63,6 +69,18 @@ Actions artifacts, or public step summaries.
    bounded at 18; the lab's strictly partitioned replay retains that bounded
    kernel while only allowing matches within the same declared payment reference.
    This measures structural consistency, not bank-cleared matching accuracy.
+8. Run four **controlled negative tests** with the real published invoice
+   population: plus-one-penny counterpart amount, incorrect payment reference,
+   wrong currency, and duplicate grouped payment declaration. All must result
+   in an unmatched or rejected assertion. These are laboratory-injected
+   counterexamples, not demonstrated customer payment errors.
+9. Retain source-published payment-status counts, null/malformed values,
+   supplier-and-invoice economic identity variants and negative/zero amounts
+   as explicit general-accounting data-quality diagnostics.
+10. Check independent GAO decision-narrative arithmetic in integer cents,
+    including the **reversal** of an allegedly lower-rate collection. This
+    is a historical precedent test, not an independent linked label or a
+    RETALLY recovery.
 
 ## Run locally or in the read-only PR workflow
 
