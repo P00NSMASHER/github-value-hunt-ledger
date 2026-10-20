@@ -405,6 +405,28 @@ def benchmark_freight() -> dict:
                 "face_to_statement_original_amount": _recon_result(invoice_rows, statement_txns, token),
                 "bank_payment_reconciliation": "NOT_POSSIBLE_NO_BANK_RECORD",
             }
+            # Explain face/statement non-joins without storing invoice numbers.
+            by_statement_number: dict[str, list[dict]] = defaultdict(list)
+            for row in statements:
+                by_statement_number[row["number"]].append(row)
+            face_ids = set(unique)
+            statement_ids = set(by_statement_number)
+            paired_ids = face_ids & statement_ids
+            amount_consistent = sum(
+                f.cents is not None and any(s["original"] == f.cents for s in by_statement_number[f.number])
+                for f in unique.values() if f.number in paired_ids
+            )
+            out["face_statement_identity_diagnostic"] = {
+                "invoice_face_distinct_ids": len(face_ids),
+                "statement_distinct_ids": len(statement_ids),
+                "both_sources_share_identifier": len(paired_ids),
+                "same_identifier_and_original_amount": amount_consistent,
+                "same_identifier_but_original_amount_differs": len(paired_ids) - amount_consistent,
+                "invoice_face_not_listed_on_statement": len(face_ids - statement_ids),
+                "statement_identifier_without_extracted_invoice_face": len(statement_ids - face_ids),
+                "duplicate_statement_identifier_rows": len(statements) - len(statement_ids),
+                "these_differences_are_not_payment_or_overcharge_findings": True,
+            }
             parents = {re.sub(r"\s+A$", "", f.number) for f in unique.values()}
             out["invoice_families_adjustments_not_silently_collapsed"] = len(parents)
         else:
