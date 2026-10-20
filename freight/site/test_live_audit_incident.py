@@ -44,21 +44,28 @@ class IncidentEventTests(unittest.TestCase):
 
     def test_newer_run_prevents_stale_alert(self):
         runs = [
-            {"id": 100, "head_branch": "main", "event": "schedule"},
-            {"id": 101, "head_branch": "main", "event": "push"},
+            {"id": 100, "head_branch": "main", "event": "schedule",
+             "status": "completed", "conclusion": "failure"},
+            {"id": 101, "head_branch": "main", "event": "push",
+             "status": "completed", "conclusion": "success"},
+            {"id": 102, "head_branch": "main", "event": "schedule",
+             "status": "completed", "conclusion": "cancelled"},
+            {"id": 103, "head_branch": "main", "event": "schedule",
+             "status": "in_progress", "conclusion": None},
         ]
         self.assertFalse(is_latest_trusted_run(100, runs))
         self.assertTrue(is_latest_trusted_run(101, runs))
         self.assertFalse(is_latest_trusted_run(102, runs))
         self.assertFalse(is_latest_trusted_run(101, []))
 
-    def api(self, runs=None, issues=None):
+    def api(self, runs=None, issues=None, conclusion="failure"):
         mock = Mock()
 
         def route(method, path, data=None):
             if path.startswith("/actions/workflows/"):
                 return {"workflow_runs": runs if runs is not None else [
-                    {"id": 5, "head_branch": "main", "event": "schedule"},
+                    {"id": 5, "head_branch": "main", "event": "schedule",
+                     "status": "completed", "conclusion": conclusion},
                 ]}
             if path.startswith("/issues?"):
                 return issues if issues is not None else []
@@ -74,7 +81,7 @@ class IncidentEventTests(unittest.TestCase):
     def test_new_failure_creates_one_accurate_issue(self):
         api = self.api()
         self.assertEqual(
-            process(api, {"id": 5, "conclusion": "failure"}),
+            process(api, {"id": 5, "conclusion": "failure", "event": "schedule"}),
             "LIVE_AUDIT_INCIDENT_OPENED",
         )
         new_issue = [
@@ -106,29 +113,49 @@ class IncidentEventTests(unittest.TestCase):
         api = self.api(issues=[
             {"number": 9, "title": TITLE},
             {"number": 10, "title": "Other"},
-        ])
+        ], conclusion="success")
         self.assertEqual(
-            process(api, {"id": 5, "conclusion": "success"}),
+            process(api, {"id": 5, "conclusion": "success", "event": "schedule"}),
             "RECOVERY_EVIDENCED_AND_INCIDENT_CLOSED",
         )
         paths = [x.args[1] for x in api.call.call_args_list]
         self.assertIn("/issues/9", paths)
         self.assertNotIn("/issues/10", paths)
         self.assertEqual(
-            process(self.api(), {"id": 5, "conclusion": "success"}),
+            process(self.api(conclusion="success"), {"id": 5, "conclusion": "success"}),
             "LIVE_AUDIT_PASSED_NO_OPEN_INCIDENT",
         )
 
     def test_stale_events_do_not_touch_issues(self):
         api = self.api(runs=[
-            {"id": 6, "head_branch": "main", "event": "schedule"},
-            {"id": 5, "head_branch": "main", "event": "schedule"},
+            {"id": 6, "head_branch": "main", "event": "schedule",
+             "status": "completed", "conclusion": "success"},
+            {"id": 5, "head_branch": "main", "event": "schedule",
+             "status": "completed", "conclusion": "failure"},
         ])
         self.assertEqual(
             process(api, {"id": 5, "conclusion": "failure"}),
             "STALE_RUN_IGNORED",
         )
         self.assertEqual(api.call.call_count, 1)
+
+    def test_reject_mismatched_authoritative_conclusion(self):
+        api = self.api(conclusion="success")
+        with self.assertRaisesRegex(RuntimeError, "completion could not be verified"):
+            process(api, {"id": 5, "conclusion": "failure", "event": "schedule"})
+        self.assertEqual(api.call.call_count, 1)
+
+    def test_cancelled_newer_run_does_not_hide_older_failure(self):
+        api = self.api(runs=[
+            {"id": 5, "head_branch": "main", "event": "schedule",
+             "status": "completed", "conclusion": "failure"},
+            {"id": 6, "head_branch": "main", "event": "push",
+             "status": "completed", "conclusion": "cancelled"},
+        ])
+        self.assertEqual(
+            process(api, {"id": 5, "conclusion": "failure", "event": "schedule"}),
+            "LIVE_AUDIT_INCIDENT_OPENED",
+        )
 
     def test_missing_run_confirmation_fails_closed(self):
         api = self.api(runs=[])
