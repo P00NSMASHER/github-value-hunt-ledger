@@ -115,7 +115,6 @@ class OciBackupTests(unittest.TestCase):
         source.chmod(0o600)
         forbidden = [
             "customer/invoices.rtbk",
-            "synthetic-only/0123456789abcdef01234567.rtbk",
             "synthetic-recovery/not-a-random-key.rtbk",
             "synthetic-recovery/" + "g"*32 + ".rtbk",
             "synthetic-recovery/" + "a"*32 + ".json",
@@ -130,6 +129,18 @@ class OciBackupTests(unittest.TestCase):
                     with self.assertRaises(backup.Refused):
                         self.store.delete_version(key, "trusted-etag")
             cli.assert_not_called()
+
+    def test_exact_legacy_key_is_conditional_only(self):
+        # Legacy deletion is authorized only through cleanup_legacy's separate
+        # original-key and original-SHA checks; the underlying OCI operation
+        # must still be ETag conditional, never an unqualified bulk removal.
+        key = "synthetic-only/0123456789abcdef01234567.rtbk"
+        with patch.object(self.store, "cli", return_value="") as cli:
+            self.store.delete_version(key, "frozen-legacy-etag")
+        args = cli.call_args.args
+        self.assertIn("--if-match", args)
+        self.assertEqual(args[args.index("--if-match") + 1], "frozen-legacy-etag")
+        self.assertIn(key, args)
 
     def test_exact_fresh_key_delete_requires_etag(self):
         key = "synthetic-recovery/" + "c"*32 + ".rtbk"
