@@ -384,7 +384,7 @@ def test_self_hashed_claim_batch_rejects_envelope_record_issue_time_mismatch():
         issued_at="2026-09-21T10:00:00Z",
     )
     forged = _rehash_claim_batch_for_readback_test(
-        replace(batch, issued_at="2026-09-21T11:00:00Z", batch_hash="")
+        replace(batch, issued_at="2026-09-21T11:00:00.000000Z", batch_hash="")
     )
 
     with pytest.raises(ValueError, match="issued-at mismatch"):
