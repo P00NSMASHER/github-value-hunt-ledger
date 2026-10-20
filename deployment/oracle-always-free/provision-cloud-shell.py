@@ -50,7 +50,7 @@ def ensure(condition: bool, message: str) -> None:
 
 
 def cli(*args: str, region: str | None = None, timeout: int = 90):
-    cmd = ['oci', *map(str, args), '--output', 'json']
+    cmd = ['oci', *map(str, args), '--output', 'json', '--no-retry']
     if region:
         cmd += ['--region', region]
     try:
@@ -77,7 +77,7 @@ def cli(*args: str, region: str | None = None, timeout: int = 90):
         ensure(len(args) >= 3 and args[2] == 'list' and not result.stderr.strip(),
                'OCI returned no JSON for a non-list operation or with warnings.')
         verification_args = [str(a) for a in args if a != '--all']
-        verification_cmd = ['oci', *verification_args, '--output', 'json']
+        verification_cmd = ['oci', *verification_args, '--output', 'json', '--no-retry']
         if region:
             verification_cmd += ['--region', region]
         try:
