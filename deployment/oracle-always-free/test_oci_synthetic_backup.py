@@ -81,7 +81,7 @@ class OciBackupTests(unittest.TestCase):
         source.chmod(0o600)
         response = subprocess.CompletedProcess(["oci"], 0, '{"etag":"OCI-TEST-ETAG"}\n', "")
         with patch.object(backup.subprocess, "run", return_value=response) as run:
-            self.store.put("synthetic-recovery/test.rtbk", source)
+            self.store.put("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk", source)
         cmd = run.call_args.args[0]
         self.assertIn("--no-overwrite", cmd)
         self.assertIn("--verify-checksum", cmd)
@@ -99,9 +99,59 @@ class OciBackupTests(unittest.TestCase):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
         with patch.object(self.store, "cli", return_value='{"etag":"ETAG-TOP-LEVEL"}'):
-            self.assertEqual(self.store.head("test")["etag"], "ETAG-TOP-LEVEL")
+            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "ETAG-TOP-LEVEL")
         with patch.object(self.store, "cli", return_value='{"data":{"etag":"NESTED"}}'):
-            self.assertEqual(self.store.head("test")["etag"], "NESTED")
+            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "NESTED")
+
+
+    def test_low_level_object_mutations_cannot_target_unrelated_or_unstructured_keys(self):
+        # A caller mistake must not upload synthetic ciphertext under an
+        # unrelated, paid, financial, or customer-data object prefix.
+        source = self.root / "sealed.rtbk"
+        source.write_bytes(b"test synthetic ciphertext")
+        source.chmod(0o600)
+        valid_new = "synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk"
+        valid_old = "synthetic-only/0123456789abcdef01234567.rtbk"
+        forbidden = (
+            "", "customer/live-account.rtbk", "backups/real-customer.rtbk",
+            "synthetic-recovery/../customer.rtbk",
+            "synthetic-only/" + "a"*24 + ".json",
+            "synthetic-recovery/" + "b"*24 + ".rtbk",
+            "synthetic-recovery/" + "c"*32 + ".rtbk/customer",
+        )
+        with patch.object(self.store, "cli") as invoked:
+            for name in forbidden:
+                with self.subTest(name=name):
+                    with self.assertRaises(backup.Refused):
+                        self.store.put(name, source)
+                    with self.assertRaises(backup.Refused):
+                        self.store.delete_version(name, "known-ETag")
+                    with self.assertRaises(backup.Refused):
+                        self.store.head(name)
+                    with self.assertRaises(backup.Refused):
+                        self.store.get(name, self.root / "downloaded.rtbk",
+                                       etag="known-ETag", max_size=1024)
+            with self.assertRaises(backup.Refused):
+                self.store.put(valid_old, source)
+            for invalid_tag in ("", "two words", "a\\nInjected", "../unsafe"):
+                with self.subTest(etag=invalid_tag), self.assertRaises(backup.Refused):
+                    self.store.delete_version(valid_new, invalid_tag)
+            invoked.assert_not_called()
+
+    def test_low_level_approved_synthetic_delete_uses_conditional_etag(self):
+        # The existing synthetic recovery, and separately-authorized legacy
+        # cleanup, still have their legitimate ETag-frozen delete operation.
+        with patch.object(self.store, "cli", return_value='{"output":null}') as invoked:
+            for name in ("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk", "synthetic-only/0123456789abcdef01234567.rtbk"):
+                with self.subTest(name=name):
+                    self.store.delete_version(name, "frozen-ETag")
+        self.assertEqual(invoked.call_count, 2)
+        for call in invoked.call_args_list:
+            args = call.args
+            self.assertEqual(args[:3], ("os", "object", "delete"))
+            self.assertIn("--if-match", args)
+            self.assertEqual(args[args.index("--if-match") + 1], "frozen-ETag")
+            self.assertIn("--force", args)
 
     def test_empty_object_list_requires_second_full_count_query(self):
         # The authenticated OCI Cloud Shell CLI has returned successful empty
@@ -159,13 +209,13 @@ class OciBackupTests(unittest.TestCase):
             filename.chmod(0o600)
             return '{"output": null}'
         with patch.object(self.store, "cli", side_effect=fake_get) as downloaded:
-            self.assertEqual(self.store.get("synthetic-only/test.rtbk", filename,
+            self.assertEqual(self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", filename,
                                             etag="KNOWN-ETAG", max_size=len(raw)), raw)
         downloaded.assert_called_once()
         for bad in ("", "bad etag", "bad\\netag"):
             with self.subTest(etag=bad), patch.object(self.store, "cli") as download:
                 with self.assertRaises(backup.Refused):
-                    self.store.get("synthetic-only/test.rtbk", self.root / "new.rtbk",
+                    self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", self.root / "new.rtbk",
                                    etag=bad, max_size=256)
                 download.assert_not_called()
 
@@ -177,7 +227,7 @@ class OciBackupTests(unittest.TestCase):
             return '{"output": null}'
         with patch.object(self.store, "cli", side_effect=write_large):
             with self.assertRaisesRegex(backup.Refused, "prevalidated HEAD size"):
-                self.store.get("synthetic-only/test.rtbk", target,
+                self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", target,
                                etag="KNOWN-ETAG", max_size=20)
 
     def test_bucket_privacy_fails_closed(self):

@@ -35,6 +35,7 @@ LEGACY_QUARANTINE = RECEIPT_ROOT / "legacy-orphan-quarantine.json"
 BUCKET_NAME = "retally-synthetic-sealed-recovery"
 LEGACY_MAGIC = b"RETALLY-GCM-CANARY-1"
 LEGACY_OBJECT = re.compile(r"synthetic-only/[0-9a-f]{24}\.rtbk\Z")
+RECOVERY_OBJECT = re.compile(r"synthetic-recovery/[0-9a-f]{32}\.rtbk\Z")
 MAX_CANARY = 4 * 1024
 MAX_SEALED = 16 * 1024 * 1024  # synthetic acceptance, NOT a production snapshot allowance
 
@@ -79,6 +80,26 @@ def private_receipt(path: Path, document: dict) -> None:
 
 def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
+
+
+def synthetic_object_key(name: str, *, upload: bool = False) -> str:
+    """No Object Storage operation may target unrelated/customer object keys.
+
+    Historical legacy objects can only be inspected or conditionally deleted.
+    All new uploads are unique, fixed-shape synthetic-recovery objects.
+    """
+    valid = isinstance(name, str) and bool(RECOVERY_OBJECT.fullmatch(name))
+    if not upload:
+        valid = valid or (isinstance(name, str) and bool(LEGACY_OBJECT.fullmatch(name)))
+    ensure(valid, "Unapproved OCI object name; synthetic-only operations required.")
+    return name
+
+
+def synthetic_etag(value: str) -> str:
+    ensure(isinstance(value, str) and
+           re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", value) is not None,
+           "An exact provider ETag is required for the synthetic object.")
+    return value
 
 
 def parse_bucket_receipt(path: Path) -> dict:
@@ -181,10 +202,9 @@ class OciStore:
         return items
 
     def get(self, name: str, destination: Path, *, etag: str, max_size: int = MAX_SEALED) -> bytes:
+        name = synthetic_object_key(name)
+        etag = synthetic_etag(etag)
         ensure(not destination.exists() and not destination.is_symlink(), "Ciphertext download destination exists.")
-        ensure(isinstance(etag, str) and
-               re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", etag) is not None,
-               "Download needs one verified OCI object ETag without unsafe characters.")
         ensure(type(max_size) is int and 0 < max_size <= MAX_SEALED,
                "Download size bound must be a positive synthetic-only limit.")
         # HEAD must first confirm content-length <= max_size. The If-Match
@@ -200,6 +220,7 @@ class OciStore:
         return destination.read_bytes()
 
     def put(self, name: str, source: Path) -> None:
+        name = synthetic_object_key(name, upload=True)
         ensure(_private(source) and source.stat().st_size <= MAX_SEALED,
                "Synthetic ciphertext source is not private or is oversized.")
         # CLI 'put' normally returns a *top-level* etag, with no 'data' field.
@@ -209,6 +230,7 @@ class OciStore:
                  "--verify-checksum", timeout=150)
 
     def head(self, name: str) -> dict:
+        name = synthetic_object_key(name)
         raw = self.cli("os", "object", "head", *self.args(), "--name", name)
         try:
             h = json.loads(raw)
@@ -222,7 +244,8 @@ class OciStore:
         return h
 
     def delete_version(self, name: str, etag: str) -> None:
-        ensure(isinstance(etag, str) and bool(etag), "Conditional delete needs an original ETag.")
+        name = synthetic_object_key(name)
+        etag = synthetic_etag(etag)
         # --if-match prevents deletion of a different object after an unknown overwrite.
         self.cli("os", "object", "delete", *self.args(), "--name", name,
                  "--if-match", etag, "--force")
