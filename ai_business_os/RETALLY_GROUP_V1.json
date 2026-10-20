@@ -70,7 +70,7 @@
       "sources": [
         {
           "label": "Business model v7",
-          "url": "https://github.com/P00NSMASHER/capturebrief/blob/main/BUSINESS-MODEL-v7.md",
+          "url": "https://github.com/P00NSMASHER/capturebrief/blob/12d90024f053a78ead7936abf092931fce240d3e/BUSINESS-MODEL-v7.md",
           "observed_on": "2026-10-20",
           "git_blob_sha": "94550041063722ee2cf582402cb958221ba29fb4"
         }
@@ -88,14 +88,20 @@
       "purpose": "Source-linked NYC restaurant applicant, licensing and buildout research for restaurant vendors.",
       "stage": "Founder-curated offer documented",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Verify the existing private order, payment and delivery workflow against its first-subscriber release checks.",
+      "next_action": "Verify the NYC subscriber-specific private order, payment and delivery workflow against its first-subscriber release checks; keep PA Permit Pack and x402 records separate.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
           "label": "Canonical product definition",
-          "url": "https://github.com/P00NSMASHER/permitplate-nyc/blob/main/README.md",
+          "url": "https://github.com/P00NSMASHER/permitplate-nyc/blob/7be09a82249ab1ef6b6a9de7402690dbefd47f5e/README.md",
           "observed_on": "2026-10-20",
           "git_blob_sha": "b15f7c60defa7b39dcf68311e2d5282b85e70a0e"
+        },
+        {
+          "label": "Declared Portfolio Brain project identity",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
         }
       ],
       "candidate_production_slugs": [
@@ -134,7 +140,8 @@
         {
           "label": "Product release seed",
           "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/handoffs/sheetharbor/product_repo_seed/README.md",
-          "observed_on": "2026-10-20"
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "3bcdb21d947a5c86d4926559205c939335e6f444"
         }
       ],
       "candidate_production_slugs": [
@@ -157,7 +164,8 @@
         {
           "label": "Factory infrastructure contract",
           "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/ai_business_os/SOFTWARE_FACTORY_CONTRACT.md",
-          "observed_on": "2026-10-20"
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "b71a6c7b6efd907e900bbbe80e6c250939be24bf"
         }
       ],
       "candidate_production_slugs": [],
@@ -176,14 +184,15 @@
       "sources": [
         {
           "label": "Canonical routing map",
-          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/main/production-topology.json",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/27293158aeda848f2bc68ce2c5f6aca71b57cb44/production-topology.json",
           "observed_on": "2026-10-20",
           "git_blob_sha": "882ed7fbcc5867f874b0e097e88191512dab4ebc"
         },
         {
           "label": "Product registry",
-          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/main/product-registry.json",
-          "observed_on": "2026-10-20"
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/27293158aeda848f2bc68ce2c5f6aca71b57cb44/product-registry.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "7c4045dc2282e966107a56ba3beb4c2acc234c08"
         }
       ],
       "candidate_production_slugs": [
@@ -198,15 +207,28 @@
       "division_id": "ventures",
       "kind": "venture",
       "purpose": "Construction scope and change-order evidence product thesis.",
-      "stage": "Research lane",
+      "stage": "Research lane; source identity conflict",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Separate owned implementation from third-party reference software and define one bounded demonstrable outcome.",
+      "next_action": "Resolve the Portfolio Brain coverage conflict that associates ScopeSignal with CaptureBrief PRJ-004 before linking; separate owned implementation from third-party reference software.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
           "label": "Construction research lane",
           "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/lanes/04-construction-scopesignal.md",
-          "observed_on": "2026-10-20"
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "5f897f7e9e5a45c35f2094beefc3e536efc36912"
+        },
+        {
+          "label": "Coverage association to reconcile",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/PORTFOLIO_COVERAGE.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "ba03a9709d799b4d2cc9f3feaa3c599d46290deb"
+        },
+        {
+          "label": "CaptureBrief PRJ-004 identity for conflict review",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
         }
       ],
       "candidate_production_slugs": [
@@ -243,7 +265,7 @@
       "sources": [
         {
           "label": "Canonical product and evidence",
-          "url": "https://github.com/P00NSMASHER/resonance-qloo/blob/main/README.md",
+          "url": "https://github.com/P00NSMASHER/resonance-qloo/blob/3b6e24ba8cdff2321924be12f8d0347b49b71d05/README.md",
           "observed_on": "2026-10-20",
           "git_blob_sha": "bfd54f9c9c934ec6ea086bc3268903d4c8e5ba1e"
         }
@@ -267,9 +289,15 @@
       "sources": [
         {
           "label": "Research scope",
-          "url": "https://github.com/P00NSMASHER/trading-platform/blob/main/README.md",
+          "url": "https://github.com/P00NSMASHER/trading-platform/blob/6f7710512e6ac2f86e8cb12ad233a08980cf0220/README.md",
           "observed_on": "2026-10-20",
           "git_blob_sha": "1857e25649c49c5ef4d3de58d336c8cf8c0a68ee"
+        },
+        {
+          "label": "Declared Portfolio Brain project identity",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
         }
       ],
       "candidate_production_slugs": [
@@ -432,8 +460,9 @@
       "sources": [
         {
           "label": "Portfolio Brain scope",
-          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/main/README.md",
-          "observed_on": "2026-10-20"
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/README.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "a6ba8bf831806879b6a2cc86076b94979bba2bb9"
         }
       ]
     },
@@ -457,7 +486,8 @@
         {
           "label": "Canonical software factory",
           "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/ai_business_os/SOFTWARE_FACTORY_CONTRACT.md",
-          "observed_on": "2026-10-20"
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "b71a6c7b6efd907e900bbbe80e6c250939be24bf"
         }
       ]
     }

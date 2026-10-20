@@ -24,10 +24,16 @@ The customer-register validator checks record relationships and summarizes
 declared workflow stages; payment declarations never become verified revenue.
 Actual operating records remain in `ai_business_os_prod` and approved private
 service stores. See the [empty register contract](RETALLY_GROUP_CUSTOMER_REGISTER.schema.json).
+The PermitPlate NYC adapter reads its existing onboarding ledger and initialization
+anchor at one immutable source revision, checks integrity, and reports source age
+and holds separately. It exposes aggregate observations only. The
+[source reconciliation](RETALLY_GROUP_SOURCE_RECONCILIATION.md) distinguishes
+project/repository evidence from private business bindings and records the
+ScopeSignal/CaptureBrief association conflict.
 Existing schedules, pricing, legal identities and release controls are unchanged.
 
 ```bash
-python -m unittest ai_business_os.test_retally_group_private ai_business_os.test_retally_customer_register
+python -m unittest ai_business_os.test_retally_group_private ai_business_os.test_retally_customer_register ai_business_os.test_retally_permitplate
 ```
 
 ## Step 1 — Persistent agent runtime

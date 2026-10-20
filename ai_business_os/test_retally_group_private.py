@@ -2,6 +2,7 @@
 
 import copy
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 from pathlib import Path
 import unittest
@@ -16,6 +17,7 @@ from ai_business_os.retally_group_dashboard import render_dashboard
 from ai_business_os.retally_group_private import (
     GroupObservationError, build_private_group_observation, normalize_source_snapshot,
 )
+from ai_business_os.retally_permitplate import PermitPlateNYCReader
 from ai_business_os.test_ceo_command_center import FakeProduction
 
 
@@ -300,6 +302,42 @@ class GroupCommandCenterTests(unittest.TestCase):
             ProductionReadBridge(self.prod.read), expected_schema_fingerprint=FINGERPRINT,
         )
 
+    def service_reader(self, *, stale=False, broken=False):
+        calls = []
+        checked = datetime.now(timezone.utc) - timedelta(hours=48 if stale else 1)
+        initialized = (checked - timedelta(hours=1)).isoformat()
+        def digest(value):
+            return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        baseline = {
+            "version": "PermitPlate-private-checkout-intake-v1.0.0",
+            "initializedAt": initialized, "checkedAt": initialized, "subscriptions": {},
+        }
+        ledger = {**baseline, "checkedAt": checked.isoformat()}
+        ledger["ledgerFingerprint"] = digest(ledger)
+        anchor = {
+            "version": "PermitPlate-private-checkout-anchor-v1.0.0",
+            "initializedAt": initialized, "baselineLedgerFingerprint": digest(baseline),
+        }
+        anchor["anchorFingerprint"] = digest(anchor)
+        files = {}
+        for path, data in (("state/curated-onboarding-ledger.json", ledger),
+                           ("state/curated-onboarding-anchor.json", anchor)):
+            content = json.dumps(data) + "\n"
+            raw = content.encode()
+            files[path] = {
+                "commit_sha": "a" * 40, "content": content,
+                "blob_sha": hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest(),
+            }
+        def resolve():
+            calls.append("resolve")
+            return "a" * 40
+        def read(revision, path):
+            calls.append((revision, path))
+            if broken:
+                raise RuntimeError("private-service-token-and-contact-must-not-appear")
+            return copy.deepcopy(files[path])
+        return PermitPlateNYCReader(resolve, read, pseudonym_key=b"synthetic-key-for-tests-only-000000"), calls
+
     def test_default_dashboard_does_not_read_optional_source_or_register(self):
         def unexpected_register_read():
             self.fail("default dashboard invoked private register reader")
@@ -316,6 +354,7 @@ class GroupCommandCenterTests(unittest.TestCase):
         self.assertEqual("CURRENT", observation["freshness"])
         self.assertEqual(2, observation["matched_catalog_entries"])
         self.assertEqual("NOT_CONNECTED", observation["customer_register"]["mode"])
+        self.assertEqual("NOT_CONNECTED", observation["service_registers"]["permitplate_nyc"]["mode"])
         self.assertIsNone(observation["customer_register"]["observed_account_count"])
         self.assertIsNone(observation["verified_metrics"]["cash_collected"])
         self.assertEqual(1, sum(sql == RETALLY_GROUP_SOURCE_SQL for sql, _ in self.prod.calls))
@@ -355,6 +394,56 @@ class GroupCommandCenterTests(unittest.TestCase):
         for flag in (None, 0, 1, "true", {}):
             with self.subTest(flag=flag), self.assertRaises(CommandCenterError):
                 self.operator.dashboard(include_private_group=flag)
+        self.assertEqual([], self.prod.calls)
+
+    def test_default_dashboard_does_not_resolve_or_fetch_configured_service(self):
+        reader, calls = self.service_reader()
+        self.operator.permitplate_nyc_reader = reader
+        view = self.operator.dashboard()
+        self.assertEqual([], calls)
+        self.assertIsNone(view["retally_group"]["private_observation"])
+        self.assertEqual([], self.prod.writes)
+
+    def test_service_observation_keeps_business_binding_and_financial_metrics_unapproved(self):
+        reader, calls = self.service_reader()
+        self.operator.permitplate_nyc_reader = reader
+        result = self.operator.group_observation()
+        service = result["service_registers"]["permitplate_nyc"]
+        self.assertEqual(3, len(calls))
+        self.assertEqual("resolve", calls[0])
+        self.assertEqual("CURRENT", service["source_observation"]["freshness"])
+        self.assertEqual({"accounts": 0, "engagements": 0, "referrals": 0},
+                         service["register_observation"]["observed_counts"])
+        self.assertEqual("NOT_CONNECTED", result["customer_register"]["mode"])
+        permitplate = next(row for row in result["entries"] if row["catalog_id"] == "permitplate")
+        self.assertEqual("NO_SOURCE_MATCH", permitplate["binding_status"])
+        self.assertFalse(permitplate["binding_approved"])
+        self.assertTrue(all(value is None for value in service["register_observation"]["verified_metrics"].values()))
+        self.assertNotIn("totals", result)
+        self.assertEqual([], self.prod.writes)
+
+    def test_service_freshness_stays_separate_from_fresh_database_observation(self):
+        reader, _ = self.service_reader(stale=True)
+        self.operator.permitplate_nyc_reader = reader
+        result = self.operator.group_observation()
+        self.assertEqual("CURRENT", result["freshness"])
+        self.assertEqual("STALE", result["service_registers"]["permitplate_nyc"]["source_observation"]["freshness"])
+
+    def test_service_provider_failure_is_redacted_and_never_empty_success(self):
+        reader, calls = self.service_reader(broken=True)
+        self.operator.permitplate_nyc_reader = reader
+        with self.assertRaises(CommandCenterError) as caught:
+            self.operator.group_observation()
+        self.assertEqual("private PermitPlate NYC source could not be validated", str(caught.exception))
+        self.assertTrue(caught.exception.__suppress_context__)
+        self.assertEqual(2, len(calls))
+        self.assertEqual([], self.prod.writes)
+
+    def test_service_reader_type_is_checked_before_database_reads(self):
+        with self.assertRaises(CommandCenterError):
+            CommandCenterOperator(ProductionReadBridge(self.prod.read),
+                                  expected_schema_fingerprint=FINGERPRINT,
+                                  permitplate_nyc_reader=lambda: {"private_payload": "secret"})
         self.assertEqual([], self.prod.calls)
 
 

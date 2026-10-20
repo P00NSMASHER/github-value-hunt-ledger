@@ -21,6 +21,12 @@ No customer store, workflow mutation, cross-product access, or hosted customer
 portal is created by this overlay. Public files contain source references and
 planning metadata, never customer documents or confidential engagement records.
 
+The [source reconciliation record](RETALLY_GROUP_SOURCE_RECONCILIATION.md) now
+distinguishes private business identities, public project identities, product
+families and research sources. It records a conflicting ScopeSignal/CaptureBrief
+association and the unresolved product-source gaps. Public project registration
+alone does not supply a private business binding.
+
 ## Four proposed divisions
 
 | Division | Offers and projects | Scope |
