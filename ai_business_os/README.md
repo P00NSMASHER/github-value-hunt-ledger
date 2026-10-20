@@ -15,11 +15,20 @@ python -m ai_business_os.retally_group render --output /tmp/retally-group-previe
 python -m unittest ai_business_os.test_retally_group ai_business_os.test_ceo_command_center
 ```
 
-The preview has no customer or financial connection. Unknown values remain null;
-catalog entries and tested code are not evidence of launched businesses. Actual
-operating records remain in `ai_business_os_prod` and approved private service
-stores. See the [empty register contract](RETALLY_GROUP_CUSTOMER_REGISTER.schema.json).
+The public preview has no customer or financial connection. Unknown values remain
+null; catalog entries and tested code are not evidence of launched businesses.
+An [opt-in private observation](RETALLY_GROUP_PRIVATE_INTEGRATION.md) now reads
+existing business identities and source-record counts through the production
+bridge. It reports missing and ambiguous group mappings without approving them.
+The customer-register validator checks record relationships and summarizes
+declared workflow stages; payment declarations never become verified revenue.
+Actual operating records remain in `ai_business_os_prod` and approved private
+service stores. See the [empty register contract](RETALLY_GROUP_CUSTOMER_REGISTER.schema.json).
 Existing schedules, pricing, legal identities and release controls are unchanged.
+
+```bash
+python -m unittest ai_business_os.test_retally_group_private ai_business_os.test_retally_customer_register
+```
 
 ## Step 1 — Persistent agent runtime
 

@@ -13,10 +13,13 @@ mappings require reconciliation against that private system before integration.
 Catalog groupings cannot merge businesses, customers, repositories, permissions,
 or accounting records. Existing source identities and evidence remain intact.
 
-The customer-register schema is an empty specification. No live customer register,
-private-state integration, cross-product access, or hosted customer portal is
-created by this overlay. Public files contain source references and planning
-metadata, never customer documents or confidential engagement records.
+The customer-register schema is an empty specification with executable shape and
+relationship validation. The [private observation adapter](RETALLY_GROUP_PRIVATE_INTEGRATION.md)
+can inspect existing business records and source counts through an authenticated
+private runtime. Customer-register input remains optional and separately supplied.
+No customer store, workflow mutation, cross-product access, or hosted customer
+portal is created by this overlay. Public files contain source references and
+planning metadata, never customer documents or confidential engagement records.
 
 ## Four proposed divisions
 

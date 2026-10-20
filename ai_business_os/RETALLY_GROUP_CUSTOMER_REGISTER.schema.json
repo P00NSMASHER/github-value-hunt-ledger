@@ -279,5 +279,5 @@
       ]
     }
   },
-  "$comment": "A future private adapter must additionally enforce unique stable references, cross-record integrity, idempotent event handling, service-specific authority, timestamp ordering, retention/access controls and authoritative evidence checks. This schema does not perform those checks or authorize any action."
+  "$comment": "retally_customer_register.py adds strict unique references, cross-record integrity, catalog/service consistency and timestamp ordering. It observes declarations only. A private runtime must separately enforce authenticated source access, idempotent event handling, service-specific authority, retention/access controls and authoritative evidence checks. Neither this schema nor its read-only validator authorizes an action or verifies payment."
 }
