@@ -199,14 +199,24 @@ class OciStore:
                "Downloaded ciphertext exceeds prevalidated HEAD size bound.")
         return destination.read_bytes()
 
-    def put(self, name: str, source: Path) -> None:
+    def put(self, name: str, source: Path) -> str:
         ensure(_private(source) and source.stat().st_size <= MAX_SEALED,
                "Synthetic ciphertext source is not private or is oversized.")
-        # CLI 'put' normally returns a *top-level* etag, with no 'data' field.
-        # Command success alone is not off-device evidence; get/readback is mandatory.
-        self.cli("os", "object", "put", *self.args(), "--name", name, "--file", str(source),
-                 "--storage-tier", "Standard", "--no-overwrite", "--no-multipart",
-                 "--verify-checksum", timeout=150)
+        # OCI --no-overwrite may return exit code ZERO with an "already exists"
+        # output instead of uploading. Require the documented TOP-LEVEL ETag
+        # before treating the PUT as positively acknowledged; never require
+        # an unrelated nested 'data' field, and never retry uncertain writes.
+        raw = self.cli("os", "object", "put", *self.args(), "--name", name, "--file", str(source),
+                       "--storage-tier", "Standard", "--no-overwrite", "--no-multipart",
+                       "--verify-checksum", timeout=150)
+        try:
+            reply = json.loads(raw)
+        except ValueError as exc:
+            raise Refused("OCI PUT lacks a verifiable acknowledgement; reconcile the attempt receipt before retry.") from exc
+        ensure(isinstance(reply, dict) and isinstance(reply.get("etag"), str) and
+               re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", reply["etag"]) is not None,
+               "OCI PUT did not confirm a new upload ETag; object may already exist. Reconcile before retry.")
+        return reply["etag"]
 
     def head(self, name: str) -> dict:
         raw = self.cli("os", "object", "head", *self.args(), "--name", name)
@@ -335,7 +345,31 @@ def quarantine_legacy_orphan(store: OciStore, items: list[dict]) -> dict:
         "production_backup_verified": False,
         "status": "QUARANTINED_UNRESOLVED_DO_NOT_DELETE",
     })
-    return {"legacy_orphan_quarantined": True, "legacy_orphan_deleted": False}
+    return {"legacy_orphan_quarantined": True, "legacy_orphan_deleted": False,
+            "_name": name, "_etag": metadata["etag"],
+            "_length": length, "_sha256": observed}
+
+
+def confirm_legacy_orphan_unchanged(store: OciStore, state: dict, destination: Path) -> None:
+    """Verify the quarantined old object still exists, unchanged, after the new test."""
+    current = store.objects("synthetic-only/")
+    ensure(len(current) == 1 and current[0].get("name") == state["_name"],
+           "Quarantined legacy object no longer has its original isolated inventory.")
+    h = store.head(state["_name"])
+    ensure(h.get("etag") == state["_etag"],
+           "Quarantined legacy object ETag changed during the synthetic exercise.")
+    try:
+        length = int(h["content-length"])
+    except (KeyError, ValueError, TypeError) as exc:
+        raise Refused("Quarantined legacy object length could not be rechecked.") from exc
+    ensure(length == state["_length"],
+           "Quarantined legacy object length changed during the synthetic exercise.")
+    if "size" in current[0]:
+        ensure(type(current[0]["size"]) is int and current[0]["size"] == length,
+               "Quarantined legacy object inventory disagrees with HEAD.")
+    raw = store.get(state["_name"], destination, etag=state["_etag"], max_size=MAX_CANARY)
+    ensure(len(raw) == length and sha(raw) == state["_sha256"],
+           "Quarantined legacy object's remote ciphertext changed during the exercise.")
 
 
 def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False) -> dict:
@@ -347,13 +381,14 @@ def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False
     current = store.objects("synthetic-recovery/")
     ensure(not current, "Existing recovery objects must be reconciled before any new test.")
     quarantined = False
+    legacy_state = None
     if legacy:
         ensure(type(preserve_legacy_orphan) is bool and preserve_legacy_orphan,
                "Historical synthetic orphan unresolved: explicit quarantine needed.")
         # Quarantine the old canary into an owner-only receipt. The new test
         # exclusively uses the separate synthetic-recovery/ prefix and cannot
         # delete any object in synthetic-only/.
-        quarantine_legacy_orphan(store, legacy)
+        legacy_state = quarantine_legacy_orphan(store, legacy)
         quarantined = True
     else:
         ensure(not preserve_legacy_orphan,
@@ -393,8 +428,10 @@ def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False
                                   "production_backup_verified": False})
         # If the network times out after the provider accepts PUT, the marker
         # remains and no automatic second PUT or DELETE is allowed.
-        store.put(key, sealed)
+        put_etag = store.put(key, sealed)
         h = store.head(key)
+        ensure(h["etag"] == put_etag,
+               "OCI HEAD ETag differs from the positively acknowledged upload; do not delete.")
         try:
             remote_length = int(h["content-length"])
         except (KeyError, TypeError, ValueError) as exc:
@@ -431,6 +468,9 @@ def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False
         store.delete_version(key, h["etag"])
         ensure(not store.objects("synthetic-recovery/"),
                "OCI test object deletion unverified; stop, do not re-upload.")
+        if legacy_state is not None:
+            confirm_legacy_orphan_unchanged(
+                store, legacy_state, base / "legacy-preservation-confirm.rtbk")
         result = {"schema": 1, "simulation": True, "branches_verified": 7,
                   "remote_ciphertext_sha256": fingerprint,
                   "remote_readback_verified": True, "actual_restore_verified": True,
