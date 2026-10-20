@@ -197,6 +197,8 @@ class OciBackupTests(unittest.TestCase):
              patch.object(self.store, "bucket_check"), \
              patch.object(self.store, "objects", return_value=[{"name": "synthetic-only/" + "b" * 24 + ".rtbk"}]), \
              patch.object(self.store, "get", return_value=b"not-the-legacy-canary"), \
+             patch.object(self.store, "head", return_value={
+                 "etag": "TEST-ETAG", "content-length": len(b"not-the-legacy-canary")}), \
              patch.object(self.store, "delete_version") as delete:
             with self.assertRaises(backup.Refused):
                 backup.cleanup_legacy(self.store)
