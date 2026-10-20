@@ -1,0 +1,68 @@
+name: RETALLY R4 Deterministic Reliability and QA Dashboard
+
+on:
+  pull_request:
+    paths:
+      - 'freight/reliability_dashboard.py'
+      - 'freight/test_reliability_dashboard_r4.py'
+      - 'freight/R4_DETERMINISTIC_RELEASE_QA.md'
+      - '.github/workflows/retally-r4-deterministic-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freight/reliability_dashboard.py'
+      - 'freight/test_reliability_dashboard_r4.py'
+      - '.github/workflows/retally-r4-deterministic-qa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  engineering-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check -r production/requirements-ci.txt
+      - name: Seeded integer-money properties and governance dashboard
+        run: PYTHONPATH=. python -m pytest -q freight/test_reliability_dashboard_r4.py
+      - name: Complete R1/R2/R3 regression chain
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_financial_integrity_r1.py \
+            freight/test_original_pdf_extraction_r2.py \
+            freight/test_sealed_real_accuracy_r3.py \
+            freight/test_phase3_accuracy.py
+      - name: Benchmark synthetic 10K and 100K invoices without exposure
+        run: |
+          python - <<'PY'
+          from freight.reliability_dashboard import run_deterministic_throughput, safe_perf_json
+          for size in (10_000, 100_000):
+              outcome = run_deterministic_throughput(size)
+              assert outcome.matched_internal == size
+              assert outcome.deterministic_replay
+              assert outcome.cross_reference_errors == 0
+              assert outcome.missing_internal == 0
+              assert outcome.production_accuracy_claim is False
+              print(safe_perf_json(outcome))
+          PY
+      - name: Summary is aggregate-only and release is held
+        run: |
+          python - <<'PY'
+          from freight.reliability_dashboard import acceptance_snapshot, html_dashboard
+          snap = acceptance_snapshot(
+              invoices_extracted=110, invoices_exact=110, pinned_source_files=7,
+              accounting_invoice_population=273, accounting_matched=273,
+              accounting_cross_scope_errors=0, freight_labeled=0,
+              freight_unknown=110, precision=None)
+          html = html_dashboard(snap)
+          assert snap.release_status == 'RELEASE_HOLD'
+          assert 'NOT ESTIMABLE' in html
+          assert snap.independently_verified_cash_recovery_cents == 0
+          print('PASS: 110 original freight cases remain UNKNOWN, not 100% accuracy')
+          PY
