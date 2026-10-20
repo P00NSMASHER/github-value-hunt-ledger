@@ -14,7 +14,7 @@
 
 `oci_synthetic_backup.py` verifies only the *synthetic* six nonfreight + freight branch fixture by running the real engines, local sealed snapshot code, OCI object upload, remote readback, and new isolated recovery with old credentials invalidated. It rejects all customer data and uses a newly generated synthetic passphrase that is never output or saved. The test object is deleted after successful verification using an ETag-conditional delete; receipts are owner-only. **It does not establish ongoing backup protection, retention or passphrase escrow for real customers.**
 
-The tool never creates an OCI VM, virtual network, bucket, subscription, API key, or customer operation. `--inspect` is read-only and can be used on stock Cloud Shell with no Python crypto dependencies. All synthetic object prefix inventories use `oci os object list --all`; OCI otherwise defaults to the first 100 entries. Some Cloud Shell CLI versions return zero stdout bytes for a successful empty-list response. A blank inventory is **not** accepted as evidence of emptiness: the tool performs a second, full-pagination query for `length(data)` and accepts only an explicit integer zero. Any disagreement, nonnumeric count, error, warning or unsupported shape stops the operation. A partial object inventory must never authorize cleanup, a claim that the prefix is empty, or another upload. OCI commands use `--no-retry`; uploads use `--no-overwrite` and `--verify-checksum`; failed/ambiguous uploads leave private receipts and stop rather than creating duplicate objects.
+The tool never creates an OCI VM, virtual network, bucket, subscription, API key, or customer operation. `--inspect` is read-only and can be used on stock Cloud Shell with no Python crypto dependencies. All synthetic object prefix inventories use `oci os object list --all`; OCI otherwise defaults to the first 100 entries. Some Cloud Shell CLI versions return zero stdout bytes for a successful empty-list response. A blank inventory is **not** accepted as evidence of emptiness: the tool performs a second, full-pagination query for `length(data)` and accepts only an explicit integer zero. Any disagreement, nonnumeric count, error, warning or unsupported shape stops the operation. A partial object inventory must never authorize cleanup, a claim that the prefix is empty, or another upload. OCI commands use `--no-retry`; uploads use `--no-overwrite` and `--verify-checksum`; failed/ambiguous uploads leave private receipts and stop rather than creating duplicate objects. **OCI `put --no-overwrite` can return exit status zero with `{"output":"The object already exists and was not overwritten"}`. That is NOT an upload acknowledgement. The candidate requires a top-level `etag` on PUT, then verifies the exact same ETag by independent HEAD before attempting GET. Empty, nested, or existing-object PUT responses fail closed.**
 
 ## Execution on the user's existing authenticated OCI Cloud Shell
 
@@ -62,8 +62,9 @@ an owner-only `legacy-orphan-quarantine.json` containing the **currently
 observed** SHA-256, expressly marking original upload identity as unverified;
 it does **not** use that hash to authorize deletion. The new workbench backup
 test uses exclusively `synthetic-recovery/`, decrypts only the new fixture,
-conditionally deletes only its own exact temporary object and confirms that
-the original canary remains. No prior orphan is ever imported into a workspace
+conditionally deletes only its own exact temporary object and then performs
+a second full inventory, frozen-ETag HEAD and bounded remote-ciphertext SHA-256
+readback to confirm the original canary remains byte-identical. No prior orphan is ever imported into a workspace
 or counted as a valid backup. An unexpected extra object, changed head/ETag,
 or existing quarantine receipt stops new uploads. The ordinary `--exercise`
 mode still refuses to proceed when the historical prefix is nonempty.
