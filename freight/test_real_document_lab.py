@@ -10,7 +10,8 @@ from freight.real_document_lab import (
     fetch_public, iso_date, minor, parse_pennine_csv, statement_rows,
     reference_scoped_replay, InvoiceFace, _rating_probe, survey_historical_adjudications,
     adversarial_declared_payment_controls, require_frozen_source, digest, _ApprovedRedirects,
-    historical_reference_money_controls,
+    historical_reference_money_controls, globaltranz_charge_components,
+    globaltranz_invoice_line_total_benchmark,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -96,6 +97,28 @@ class LaboratoryTests(unittest.TestCase):
         f = _arcbest_page(arc_text, 16)
         self.assertIsNotNone(f)
         self.assertEqual((f.number, f.cents, f.mode), ("051894063", 212379, "LTL"))
+
+    def test_actual_invoice_component_sum_and_adversarial_one_cent(self):
+        content = (
+            "Pieces Pallet Description Class Weight Charges\n"
+            "1\n0\nTILE\n175\n200\n"
+            "542.78\n78.91\n-280.61\n"
+            "Total: 200.00 341.08 USD\n"
+        )
+        self.assertEqual(globaltranz_charge_components(content),
+                         (54278, 7891, -28061))
+        face = InvoiceFace(
+            "globaltranz", "30794056", 1, 34108,
+            "2025-05-13", "2025-04-25", None)
+        report = globaltranz_invoice_line_total_benchmark([face], [content])
+        self.assertEqual(report["invoice_face_exact_line_sum"], 1)
+        self.assertEqual(report["negative_adjustment_tokens"], 1)
+        self.assertTrue(report["every_face_conserved"])
+        self.assertFalse(report["line_sum_proves_controlling_rate_or_overcharge"])
+        modified = content.replace("78.91", "78.92")
+        changed = globaltranz_invoice_line_total_benchmark([face], [modified])
+        self.assertEqual(changed["invoice_face_exact_line_sum"], 0)
+        self.assertEqual(changed["invoice_face_nonmatching_extracted_line_sum"], 1)
 
     def test_open_statement_is_not_a_cleared_payment(self):
         texts = [""] * 120
