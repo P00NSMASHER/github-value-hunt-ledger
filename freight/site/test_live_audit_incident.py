@@ -102,7 +102,7 @@ class IncidentEventTests(unittest.TestCase):
     def test_existing_failure_updates_not_duplicates(self):
         api = self.api(issues=[{"number": 9, "title": TITLE}])
         self.assertEqual(
-            process(api, {"id": 5, "conclusion": "failure"}),
+            process(api, {"id": 5, "conclusion": "failure", "event": "schedule"}),
             "ACTIVE_INCIDENT_UPDATED",
         )
         paths = [x.args[1] for x in api.call.call_args_list]
@@ -122,7 +122,7 @@ class IncidentEventTests(unittest.TestCase):
         self.assertIn("/issues/9", paths)
         self.assertNotIn("/issues/10", paths)
         self.assertEqual(
-            process(self.api(conclusion="success"), {"id": 5, "conclusion": "success"}),
+            process(self.api(conclusion="success"), {"id": 5, "conclusion": "success", "event": "schedule"}),
             "LIVE_AUDIT_PASSED_NO_OPEN_INCIDENT",
         )
 
@@ -134,7 +134,7 @@ class IncidentEventTests(unittest.TestCase):
              "status": "completed", "conclusion": "failure"},
         ])
         self.assertEqual(
-            process(api, {"id": 5, "conclusion": "failure"}),
+            process(api, {"id": 5, "conclusion": "failure", "event": "schedule"}),
             "STALE_RUN_IGNORED",
         )
         self.assertEqual(api.call.call_count, 1)
@@ -160,7 +160,7 @@ class IncidentEventTests(unittest.TestCase):
     def test_missing_run_confirmation_fails_closed(self):
         api = self.api(runs=[])
         with self.assertRaises(RuntimeError):
-            process(api, {"id": 5, "conclusion": "success"})
+            process(api, {"id": 5, "conclusion": "success", "event": "schedule"})
         self.assertEqual(api.call.call_count, 1)
 
 
