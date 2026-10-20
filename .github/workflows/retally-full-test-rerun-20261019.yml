@@ -1,0 +1,176 @@
+name: RETALLY Full Test Rerun - Current Main SHA
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-full-test-rerun-20261019.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RETALLY_TESTED_MAIN_SHA: 04252c375e8abf8564dd42a5fd5524bf6635a4fa
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  freight-unit-and-contracts:
+    name: Full freight root test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout unchanged exact production source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 04252c375e8abf8564dd42a5fd5524bf6635a4fa
+          persist-credentials: false
+      - name: Setup pinned Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: |
+          test "$(git rev-parse HEAD)" = "$RETALLY_TESTED_MAIN_SHA"
+          python -m pip install --disable-pip-version-check --no-input -r production/requirements-ci.txt
+          python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5
+      - name: Rerun every root freight test module
+        run: PYTHONPATH=. python -m pytest -q freight/test_*.py
+      - name: Rerun existing prototype CI tests
+        run: PYTHONPATH=. python -m pytest -q production/test_prototype.py
+
+  recoveryworks-unit:
+    name: RecoveryWorks shared engine and seven branch tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 04252c375e8abf8564dd42a5fd5524bf6635a4fa
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: |
+          test "$(git rev-parse HEAD)" = "$RETALLY_TESTED_MAIN_SHA"
+          python -m pip install --disable-pip-version-check --no-input -r production/requirements-ci.txt
+      - name: Rerun every root RecoveryWorks test module
+        run: PYTHONPATH=. python -m pytest -q recoveryworks/test_*.py
+
+  actual-original-document-replay:
+    name: Original freight and Pennine source replay
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 04252c375e8abf8564dd42a5fd5524bf6635a4fa
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: |
+          test "$(git rev-parse HEAD)" = "$RETALLY_TESTED_MAIN_SHA"
+          python -m pip install --disable-pip-version-check --no-input -r production/requirements-ci.txt
+          python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5
+      - name: SHA-checked original GlobalTranz and ArcBest PDFs
+        run: |
+          python - <<'PY'
+          import json
+          from freight.original_pdf_extraction import (
+              fetch_frozen_public_original, parse_original_pdf, safe_summary
+          )
+          results={}
+          for issuer in ('GLOBALTRANZ','ARCBEST'):
+              results[issuer]=safe_summary(parse_original_pdf(
+                  issuer,fetch_frozen_public_original(issuer)))
+          assert results['GLOBALTRANZ']['original_invoice_count']==100
+          assert results['GLOBALTRANZ']['exact_original_invoice_amount_count']==100
+          assert results['GLOBALTRANZ']['typed_discount_or_credit_invoice_count']==93
+          assert results['ARCBEST']['original_invoice_count']==10
+          assert results['ARCBEST']['exact_original_invoice_amount_count']==10
+          assert results['ARCBEST']['claimable_recovery_cents']==0
+          assert results['ARCBEST']['freight_error_accuracy'] is None
+          print(json.dumps(results,sort_keys=True,indent=2))
+          PY
+      - name: Five original Pennine files and actual reconciliation engine
+        run: |
+          python - <<'PY'
+          import json
+          from freight.public_pennine_integration import run_public_census_replay, assert_public_census_result
+          report=run_public_census_replay()
+          assert_public_census_result(report)
+          assert report['disclosed_rows']==314
+          assert report['unique_economic_invoices']==273
+          assert report['matched_original_invoices']==273
+          assert report['independently_proven_bank_settlements']==0
+          assert report['actual_freight_detection_accuracy'] is None
+          print(json.dumps(report,sort_keys=True,indent=2))
+          PY
+      - name: Real-document lab source-accounting and label safety
+        run: |
+          python -m freight.real_document_lab --output /tmp/retally-full-rerun-lab-report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally-full-rerun-lab-report.json').read_text())
+          assert x['freight_original_document_benchmark']['globaltranz']['original_invoice_line_amount_reconciliation']['invoice_face_exact_line_sum']==100
+          assert x['blinded_freight_error_evaluation']['freight_detection_accuracy'] is None
+          assert x['general_accounting_invoice_payment_reference_benchmark']['economic_false_positive_rate'] is None
+          assert x['commercial_reuse_validated'] is False
+          print('PASS: original evidence research-only; no independent truth added')
+          PY
+
+  scale-and-production-holds:
+    name: 100K synthetic scale, governance and false-claim gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 04252c375e8abf8564dd42a5fd5524bf6635a4fa
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: |
+          test "$(git rev-parse HEAD)" = "$RETALLY_TESTED_MAIN_SHA"
+          python -m pip install --disable-pip-version-check --no-input -r production/requirements-ci.txt
+      - name: Repeat synthetic 10000 and 100000 invoice deterministic tests
+        run: |
+          python - <<'PY'
+          import json
+          from freight.reliability_dashboard import run_deterministic_throughput
+          for n in (10000,100000):
+              res=run_deterministic_throughput(n)
+              assert res.synthetic_invoice_count==res.matched_internal==n
+              assert res.missing_internal==0
+              assert res.cross_reference_errors==0
+              assert res.deterministic_replay
+              assert res.production_accuracy_claim is False
+              print(json.dumps({'invoices':n,'seconds':res.median_run_seconds,'records_per_second':res.records_per_second,'deterministic':res.deterministic_replay},sort_keys=True))
+          PY
+      - name: Repeat synthetic bank/rate/adjudication refusal checks
+        run: |
+          python - <<'PY'
+          import json
+          from freight.simulated_release_acceptance import run_simulated_acceptance
+          r=run_simulated_acceptance()
+          assert r['scenario_count']==7 and r['all_controls_pass'] is True
+          assert r['externally_verified_bank_minor']==0
+          assert r['external_real_freight_precision'] is None
+          assert r['original_real_cases_unknown']==110
+          assert r['true_external_approval_observed'] is False
+          assert r['production_release_status']=='RELEASE_HOLD'
+          print(json.dumps({'scenario_count':7,'all_controls_pass':True,'externally_verified_bank_minor':0,'real_freight_accuracy':None,'production_release_status':'RELEASE_HOLD'},sort_keys=True))
+          PY
+      - name: Verify committed independent-customer-truth hold
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('freight/POSTMERGE_RELEASE_TRUTH_2026-10-19.json').read_text())
+          assert p['customer_production_acceptance']=='RELEASE_HOLD'
+          assert p['real_freight_truth_unknown_cases']==110
+          assert p['real_freight_detection_precision'] is None
+          assert p['independent_approving_github_reviews_observed']==0
+          print('PASS: production customer acceptance remains held')
+          PY
