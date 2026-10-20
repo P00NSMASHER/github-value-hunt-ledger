@@ -29,7 +29,11 @@ python3 deployment/oracle-always-free/oci_synthetic_backup.py --inspect
 # The previously abandoned canary may be cleaned only if exactly ONE object
 # matches the prior synthetic-only/<24 hex>.rtbk name, the fixed magic bytes,
 # and the bounded small ciphertext size. It uses a fresh ETag conditional delete.
-python3 deployment/oracle-always-free/oci_synthetic_backup.py --cleanup-legacy-canary
+# Only if original independent evidence supplies BOTH the exact prior key
+# and original ciphertext SHA-256. Today's remote checksum cannot substitute.
+python3 deployment/oracle-always-free/oci_synthetic_backup.py --cleanup-legacy-canary \
+  --expected-legacy-object-name 'synthetic-only/PRIOR_VERIFIED_KEY.rtbk' \
+  --expected-legacy-ciphertext-sha256 'PRIOR_VERIFIED_64_HEX_SHA256'
 
 # Do not exercise if --inspect shows any other unreconciled objects.
 # Run the real simulated seven-branch flow, encrypt, upload, retrieve,
@@ -40,7 +44,12 @@ python3 deployment/oracle-always-free/oci_synthetic_backup.py --exercise
 
 For any failed/partial command, **stop**. Inspect OCI audit, the bucket object inventory and the owner-only receipt before continuing; never delete arbitrary bucket objects, erase retry/attempt markers or repeat `--exercise` blindly. If the synthetic test fails *before* remote deletion, the object may already exist. Leave the partial receipt intact until a separately reviewed reconciliation.
 
-The cleanup command only applies to the exact unneeded small October 20 synthetic canary. Before downloading, it verifies the remote HEAD content-length and freezes the original ETag; the download uses OCI `--if-match` to prevent a concurrent substitution with a larger or different object. The same bound-and-ETag check applies to the real-engine synthetic recovery exercise. It does not generalize to real records, evidence or arbitrary `.rtbk` archives. Never run bulk delete. Source content for the observed canary is already irrecoverable because the one-time synthetic key was not saved.
+The cleanup command now also requires a **previously frozen, independently
+approved original key and ciphertext SHA-256**. If the previous upload did
+not retain that evidence, **do not delete the orphan**. Its present filename,
+magic header, ETag and newly calculated remote hash are not independent
+proof of which original was uploaded. Before downloading, it verifies
+remote HEAD content-length and freezes the original ETag; the download uses OCI `--if-match` to prevent a concurrent substitution with a larger or different object. The same bound-and-ETag check applies to the real-engine synthetic recovery exercise. It does not generalize to real records, evidence or arbitrary `.rtbk` archives. Never run bulk delete. Source content for the observed canary is already irrecoverable because the one-time synthetic key was not saved.
 
 ## Acceptance criteria and release status
 

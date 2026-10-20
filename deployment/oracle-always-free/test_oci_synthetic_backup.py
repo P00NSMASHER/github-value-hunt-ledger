@@ -203,7 +203,9 @@ class OciBackupTests(unittest.TestCase):
              patch.object(self.store, "get", return_value=raw), \
              patch.object(self.store, "head", return_value={"etag": "KNOWN-ETAG", "content-length": len(raw)}), \
              patch.object(self.store, "delete_version", side_effect=lambda *args: calls.append(args)):
-            self.assertEqual(backup.cleanup_legacy(self.store)["legacy_canary_cleaned"], True)
+            self.assertEqual(backup.cleanup_legacy(
+                self.store, expected_object_name=key,
+                expected_sha256=backup.sha(raw))["legacy_canary_cleaned"], True)
         self.assertEqual(calls, [(key, "KNOWN-ETAG")])
         self.assertEqual(self.orphan_receipt.stat().st_mode & 0o777, 0o600)
         self.assertTrue(json.loads(self.orphan_receipt.read_text())["remote_canary_deleted"])
@@ -217,7 +219,8 @@ class OciBackupTests(unittest.TestCase):
                  patch.object(self.store, "objects", return_value=[{"name": name}]), \
                  patch.object(self.store, "delete_version") as delete:
                 with self.assertRaises(backup.Refused):
-                    backup.cleanup_legacy(self.store)
+                    backup.cleanup_legacy(self.store, expected_object_name=name,
+                                          expected_sha256="0" * 64)
                 delete.assert_not_called()
         with patch.object(backup, "LEGACY_CLEANUP", self.orphan_receipt), \
              patch.object(self.store, "bucket_check"), \
@@ -227,8 +230,31 @@ class OciBackupTests(unittest.TestCase):
                  "etag": "TEST-ETAG", "content-length": len(b"not-the-legacy-canary")}), \
              patch.object(self.store, "delete_version") as delete:
             with self.assertRaises(backup.Refused):
-                backup.cleanup_legacy(self.store)
+                backup.cleanup_legacy(
+                    self.store,
+                    expected_object_name="synthetic-only/" + "b" * 24 + ".rtbk",
+                    expected_sha256=backup.sha(b"not-the-legacy-canary"))
             delete.assert_not_called()
+
+    def test_identical_pattern_magic_and_etag_are_not_original_authority(self):
+        key = "synthetic-only/0123456789abcdef01234567.rtbk"
+        raw = backup.LEGACY_MAGIC + b"N" * 12 + b"authenticated-test-ciphertext"
+        with patch.object(backup, "LEGACY_CLEANUP", self.orphan_receipt), \
+             patch.object(self.store, "bucket_check"), \
+             patch.object(self.store, "objects", return_value=[{"name": key}]), \
+             patch.object(self.store, "head", return_value={
+                 "etag": "KNOWN-ETAG", "content-length": len(raw)}), \
+             patch.object(self.store, "get", return_value=raw), \
+             patch.object(self.store, "delete_version") as delete:
+            for name, expected in [
+                (key, "0"*64), (key, ""), (None, backup.sha(raw)),
+                ("synthetic-only/" + "f"*24 + ".rtbk", backup.sha(raw)),
+            ]:
+                with self.subTest(name=name, expected=expected), self.assertRaises(backup.Refused):
+                    backup.cleanup_legacy(self.store, expected_object_name=name,
+                                          expected_sha256=expected)
+            delete.assert_not_called()
+        self.assertFalse(self.orphan_receipt.exists())
 
     def test_inspect_is_read_only(self):
         with patch.object(self.store, "bucket_check"), \

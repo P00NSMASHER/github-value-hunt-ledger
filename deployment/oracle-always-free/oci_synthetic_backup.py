@@ -238,7 +238,8 @@ def inspect(store: OciStore) -> dict:
     }
 
 
-def cleanup_legacy(store: OciStore) -> dict:
+def cleanup_legacy(store: OciStore, *, expected_object_name: str,
+                   expected_sha256: str) -> dict:
     """Delete only the ONE known, unreachable 2026-10-20 synthetic canary.
 
     Never perform a bulk delete; require specific key syntax, verified canary
@@ -246,10 +247,21 @@ def cleanup_legacy(store: OciStore) -> dict:
     """
     ensure(not LEGACY_CLEANUP.exists() and not LEGACY_CLEANUP.is_symlink(),
            "Legacy cleanup already recorded; refuse repeat.")
+    # The current object name/magic cannot independently establish the
+    # ORIGINAL uploaded ciphertext identity. Require a separately frozen
+    # approved exact name and SHA-256 before any provider deletion.
+    ensure(isinstance(expected_object_name, str)
+           and LEGACY_OBJECT.fullmatch(expected_object_name) is not None,
+           "Legacy deletion requires the preapproved original exact object key.")
+    ensure(isinstance(expected_sha256, str)
+           and re.fullmatch(r"[a-f0-9]{64}", expected_sha256) is not None,
+           "Legacy deletion requires a preapproved original ciphertext SHA-256.")
     store.bucket_check()
     items = store.objects("synthetic-only/")
     ensure(len(items) == 1, "Legacy cleanup requires exactly one candidate.")
     name = items[0]["name"]
+    ensure(name == expected_object_name,
+           "Provider object key changed since the original independent approval.")
     ensure(LEGACY_OBJECT.fullmatch(name) is not None,
            "Legacy object name is not the exact prior synthetic canary format.")
     h = store.head(name)
@@ -267,6 +279,8 @@ def cleanup_legacy(store: OciStore) -> dict:
         raw = store.get(name, target, etag=h["etag"], max_size=MAX_CANARY)
         ensure(len(raw) == expected_length and raw.startswith(LEGACY_MAGIC),
                "Remote object cannot be proven to be the prior small synthetic canary.")
+    ensure(sha(raw) == expected_sha256,
+           "Remote ciphertext SHA-256 differs from the previously approved original.")
     store.delete_version(name, h["etag"])
     ensure(not store.objects("synthetic-only/"),
            "Legacy canary deletion was not confirmed by independent listing.")
@@ -376,6 +390,10 @@ def main(argv=None) -> int:
                          help="Delete only the exact small synthetic orphan with conditional ETag")
     actions.add_argument("--exercise", action="store_true",
                          help="Run seven real-engine synthetic journeys and remote archive recovery")
+    parser.add_argument("--expected-legacy-object-name",
+                        help="separately verified original synthetic object name")
+    parser.add_argument("--expected-legacy-ciphertext-sha256",
+                        help="independently recorded original synthetic ciphertext hash")
     args = parser.parse_args(argv)
     os.umask(0o077)
     receipt = parse_bucket_receipt(BUCKET_RECEIPT)
@@ -383,7 +401,9 @@ def main(argv=None) -> int:
     if args.inspect:
         output = inspect(store)
     elif args.cleanup_legacy_canary:
-        output = cleanup_legacy(store)
+        output = cleanup_legacy(store,
+                                expected_object_name=args.expected_legacy_object_name,
+                                expected_sha256=args.expected_legacy_ciphertext_sha256)
     else:
         output = synthetic_roundtrip(store)
     print(json.dumps(output, sort_keys=True))
