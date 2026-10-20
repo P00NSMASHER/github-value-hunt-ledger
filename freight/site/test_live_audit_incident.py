@@ -90,6 +90,7 @@ class IncidentEventTests(unittest.TestCase):
         ]
         self.assertEqual(len(new_issue), 1)
         self.assertEqual(new_issue[0].args[2]["title"], TITLE)
+        self.assertIn("@P00NSMASHER", new_issue[0].args[2]["body"])
         self.assertIn(
             "does not prove customer-visible downtime",
             new_issue[0].args[2]["body"],
