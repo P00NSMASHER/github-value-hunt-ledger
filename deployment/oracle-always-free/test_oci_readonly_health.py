@@ -92,6 +92,53 @@ class ContextTests(unittest.TestCase):
                 with self.assertRaises(m.Refused):
                     m.require_env(s)
 
+    def test_accepts_documented_github_oidc_hosted_runner_origins(self):
+        # GitHub documents *.actions.githubusercontent.com for OIDC retrieval.
+        # Real GitHub-hosted runners may use regional pipelinesghub* origins.
+        for hostname in (
+            "pipelines.actions.githubusercontent.com",
+            "pipelinesghubeus13.actions.githubusercontent.com",
+            "pipelinesghubwus24.actions.githubusercontent.com",
+        ):
+            with self.subTest(hostname=hostname):
+                s = fixture()
+                s["ACTIONS_ID_TOKEN_REQUEST_URL"] = (
+                    f"https://{hostname}/oidc/token?x=1")
+                self.assertEqual(m.require_env(s), s)
+        for url in (
+            "https://evil.actions.githubusercontent.com/oidc/token?x=1",
+            "https://pipelinesghub.actions.githubusercontent.com/oidc/token",
+            "https://pipelinesghub-.actions.githubusercontent.com/oidc/token",
+            "https://pipelinesghubeus13.actions.githubusercontent.com.evil.net/oidc/token",
+            "https://pipelinesghubeus13.actions.githubusercontent.com@evil.net/oidc/token",
+            "http://pipelinesghubeus13.actions.githubusercontent.com/oidc/token",
+            "https://pipelinesghubeus13.actions.githubusercontent.com:443/oidc/token",
+        ):
+            with self.subTest(url=url):
+                s = fixture()
+                s["ACTIONS_ID_TOKEN_REQUEST_URL"] = url
+                with self.assertRaises(m.Refused):
+                    m.require_env(s)
+
+    def test_rejected_oidc_url_reports_safe_host_only(self):
+        for url, allowed_label in (
+            ("https://pipelinesghubeus13.actions.githubusercontent.com:444/idtoken?SECRET_QUERY",
+             "pipelinesghubeus13"),
+            ("https://untrusted.example/idtoken?SECRET_QUERY", "OTHER"),
+        ):
+            with self.subTest(url=url):
+                s = fixture()
+                s["ACTIONS_ID_TOKEN_REQUEST_URL"] = url
+                output = io.StringIO()
+                with patch("sys.stdout", output):
+                    with self.assertRaises(m.Refused):
+                        m.require_env(s)
+                self.assertIn("RETALLY OCI OIDC ORIGIN: ", output.getvalue())
+                self.assertIn("label=" + allowed_label, output.getvalue())
+                self.assertNotIn("SECRET_QUERY", output.getvalue())
+                self.assertNotIn("idtoken", output.getvalue())
+                self.assertNotIn("untrusted.example", output.getvalue())
+
     def test_sanitized_context_failure_names_key_not_value(self):
         bad = fixture()
         bad["GITHUB_REPOSITORY_ID"] = "TOP_SECRET_FOR_TEST"

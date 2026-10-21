@@ -2,6 +2,7 @@
 from __future__ import annotations
 import importlib.util
 import json
+import os
 import subprocess
 from pathlib import Path
 import tempfile
@@ -241,6 +242,8 @@ class CloudShellCliParsingTests(unittest.TestCase):
 
 
 class CloudShellFipsKeyTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI owner/mode or FIPS key-permission fixture requires POSIX; verified on Linux")
     def test_rsa4096_keypair_created_with_private_permissions(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -354,12 +357,16 @@ class ResumePartialResourceTests(unittest.TestCase):
                                     'network-entity-id':self.ids['internet_gateway_id']}]}
         raise AssertionError('unexpected OCI action '+op)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI owner/mode or FIPS key-permission fixture requires POSIX; verified on Linux")
     def test_network_verified_read_only(self):
         with self.patches(), patch.object(mod,'cli',side_effect=self.fake_network) as checked:
             mod.verify_partial_network(self.state,TENANCY,REGION)
         self.assertEqual(checked.call_count,5)
         self.assertTrue(all(call.args[2]=='get' for call in checked.call_args_list))
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI owner/mode or FIPS key-permission fixture requires POSIX; verified on Linux")
     def test_unapproved_ingress_fails_closed(self):
         def unsafe(*args,**kwargs):
             result=self.fake_network(*args,**kwargs)
