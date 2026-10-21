@@ -30,6 +30,8 @@ def _decimal(name: str, value: str | int | float | Decimal) -> Decimal:
         result = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise ValueError(f"{name} must be numeric") from exc
+    if not result.is_finite():
+        raise ValueError(f"{name} must be finite")
     if result < 0:
         raise ValueError(f"{name} must be non-negative")
     return result
@@ -118,7 +120,14 @@ class ProcurementAuthority:
     verified: bool
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    contracted_unit_price: str | None = None
+    price_unit: str | None = None
+
     def __post_init__(self) -> None:
+        if self.price_unit is not None:
+            _required("price_unit", self.price_unit)
+        if self.contracted_unit_price is not None:
+            _decimal("contracted_unit_price", self.contracted_unit_price)
         for name in (
             "authority_id", "supplier_id", "po_line_id", "sku",
             "effective_from", "price_basis", "source_hash", "source_locator",
@@ -154,6 +163,8 @@ class ProcurementAuthority:
             "effective_from": self.effective_from,
             "effective_to": self.effective_to,
             "contracted_unit_price_cents": self.contracted_unit_price_cents,
+            "contracted_unit_price": self.contracted_unit_price,
+                "price_unit": self.price_unit,
             "price_basis": self.price_basis,
             "source_hash": self.source_hash,
         }
@@ -171,6 +182,8 @@ class ProcurementAuthority:
                 "po_line_id": self.po_line_id,
                 "sku": self.normalized_sku,
                 "contracted_unit_price_cents": self.contracted_unit_price_cents,
+            "contracted_unit_price": self.contracted_unit_price,
+                "price_unit": self.price_unit,
                 "price_basis": self.price_basis,
                 **dict(self.metadata),
             },
@@ -187,7 +200,20 @@ class ProcurementQuantityApproval:
     verified: bool
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    quantity_unit: str | None = None
+    price_units_per_quantity_unit: str | None = None
+    conversion_basis: str | None = None
+    conversion_reviewer_id: str | None = None
+
     def __post_init__(self) -> None:
+        if self.quantity_unit is not None:
+            _required("quantity_unit", self.quantity_unit)
+        if self.price_units_per_quantity_unit is not None:
+            if _decimal("price_units_per_quantity_unit", self.price_units_per_quantity_unit) <= 0:
+                raise ValueError("conversion factor must be positive")
+            _required("quantity_unit", self.quantity_unit)
+            _required("conversion_basis", self.conversion_basis)
+            _required("conversion_reviewer_id", self.conversion_reviewer_id)
         _required("invoice_line_id", self.invoice_line_id)
         _decimal("approved_billable_quantity", self.approved_billable_quantity)
         _required("quantity_basis", self.quantity_basis)
@@ -206,6 +232,10 @@ class ProcurementQuantityApproval:
                 "invoice_line_id": self.invoice_line_id,
                 "approved_billable_quantity": str(self.quantity),
                 "quantity_basis": self.quantity_basis,
+                "quantity_unit": self.quantity_unit,
+                "price_units_per_quantity_unit": self.price_units_per_quantity_unit,
+                "conversion_basis": self.conversion_basis,
+                "conversion_reviewer_id": self.conversion_reviewer_id,
                 "source_hash": self.source_hash,
                 "source_locator": self.source_locator,
             }),
@@ -217,6 +247,10 @@ class ProcurementQuantityApproval:
                 "invoice_line_id": self.invoice_line_id,
                 "approved_billable_quantity": str(self.quantity),
                 "quantity_basis": self.quantity_basis,
+                "quantity_unit": self.quantity_unit,
+                "price_units_per_quantity_unit": self.price_units_per_quantity_unit,
+                "conversion_basis": self.conversion_basis,
+                "conversion_reviewer_id": self.conversion_reviewer_id,
                 **dict(self.metadata),
             },
         )
@@ -315,9 +349,23 @@ def audit_procurement_lines(
             continue
         approval = approvals[0]
 
+        effective_quantity = approval.quantity
+        if authority.price_unit is not None or approval.quantity_unit is not None:
+            if not authority.price_unit or not approval.quantity_unit:
+                exceptions.append(ProcurementAuditException(line_id, "INCOMPLETE_UNIT_SCOPE", "price and quantity units both required"))
+                continue
+            if authority.price_unit != approval.quantity_unit:
+                if approval.price_units_per_quantity_unit is None:
+                    exceptions.append(ProcurementAuditException(line_id, "MISSING_UNIT_CONVERSION", "reviewed conversion required"))
+                    continue
+                effective_quantity *= _decimal("conversion factor", approval.price_units_per_quantity_unit)
+            elif approval.price_units_per_quantity_unit is not None and Decimal(approval.price_units_per_quantity_unit) != 1:
+                exceptions.append(ProcurementAuditException(line_id, "CONTRADICTORY_UNIT_CONVERSION", "identical units require factor one"))
+                continue
         expected_cents = _extended_cents(
-            authority.contracted_unit_price_cents,
-            approval.quantity,
+            (Decimal(authority.contracted_unit_price) * 100
+             if authority.contracted_unit_price is not None else authority.contracted_unit_price_cents),
+            effective_quantity,
         )
         if line.actual_line_cents <= expected_cents:
             continue
@@ -346,6 +394,9 @@ def audit_procurement_lines(
                 "invoiced_quantity": str(_decimal("invoiced_quantity", line.invoiced_quantity)),
                 "approved_billable_quantity": str(approval.quantity),
                 "contracted_unit_price_cents": authority.contracted_unit_price_cents,
+                "contracted_unit_price": authority.contracted_unit_price,
+                "price_unit": authority.price_unit,
+                "effective_price_quantity": str(effective_quantity),
                 "authority_id": authority.authority_id,
                 "price_basis": authority.price_basis,
                 "quantity_basis": approval.quantity_basis,
