@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
+import subprocess
+import tempfile
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -52,7 +55,7 @@ def fake_api(method: str, path: str, payload: dict | None = None):
             return {"status": "ahead", "ahead_by": 1, "behind_by": 0,
                     "files": [{"filename": OTHER, "status": "modified"}]}
         if path == repo + "/compare/" + LATEST + "..." + PROOF:
-            return {"status": "ahead", "ahead_by": 1, "behind_by": 0,
+            return {"status": "ahead", "ahead_by": 2, "behind_by": 0,
                     "files": [{"filename": FILE, "status": "added"}]}
     if method == "POST":
         if path == repo + "/git/refs":
@@ -180,6 +183,57 @@ class RaceProofTests(TestCase):
              self.assertRaises(ProposalHold):
             merge.dispatch_and_verify(BRANCH, HEAD, deadline=5010.0)
         provider.assert_not_called()
+
+    def test_actual_git_proof_has_two_reachable_commits_and_one_file_change(self):
+        """Avoid mocking GitHub's genuine two-parent merged-graph count."""
+        with tempfile.TemporaryDirectory(prefix="retally-real-proof-") as tmp:
+            repo = Path(tmp)
+            def git(*args):
+                done = subprocess.run(["git", *args], cwd=repo,
+                                      capture_output=True, text=True,
+                                      timeout=15, check=True)
+                return done.stdout.strip()
+            git("init", "-q")
+            git("config", "user.email", "offline-qa@example.invalid")
+            git("config", "user.name", "Offline QA")
+            (repo / "base.txt").write_text("base\n")
+            git("add", "base.txt")
+            git("commit", "-qm", "base")
+            git("branch", "-M", "main")
+            git("checkout", "-qb", "writer")
+            (repo / "lanes").mkdir()
+            (repo / "lanes/synthetic.md").write_text("TEST_ONLY\n")
+            git("add", "lanes/synthetic.md")
+            git("commit", "-qm", "writer")
+            writer = git("rev-parse", "HEAD")
+            git("checkout", "-q", "main")
+            (repo / "unrelated.txt").write_text("main advance\n")
+            git("add", "unrelated.txt")
+            git("commit", "-qm", "unrelated main")
+            main = git("rev-parse", "HEAD")
+            git("checkout", "-qb", "proof")
+            git("merge", "--no-ff", "-qm", "merge proof", writer)
+            proof = git("rev-parse", "HEAD")
+            self.assertEqual(git("rev-list", "--count", main + ".." + proof), "2")
+            self.assertEqual(git("rev-list", "--parents", "-n", "1", proof).split()[1:],
+                             [main, writer])
+            self.assertEqual(git("diff", "--name-only", main, proof),
+                             "lanes/synthetic.md")
+
+    def test_forged_single_commit_proof_is_rejected_before_dispatch(self):
+        def fake_bad(method, path, payload=None):
+            if path.endswith("/compare/" + LATEST + "..." + PROOF):
+                return {"status": "ahead", "ahead_by": 1, "behind_by": 0,
+                        "files": [{"filename": FILE, "status": "added"}]}
+            return fake_api(method, path, payload)
+        with patch.dict(os.environ, {"GITHUB_RUN_ID": "39631700353",
+                                      "GITHUB_RUN_ATTEMPT": "1",
+                                      "RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED": "true"}), \
+             patch.object(merge, "gh", side_effect=fake_bad), \
+             patch.object(merge, "dispatch_and_verify") as ci, \
+             self.assertRaises(ProposalHold):
+            merge.integrate(LANE, 99, HEAD, BASE)
+            ci.assert_not_called()
 
     def test_default_disabled_proof_mode_never_writes_git_refs_or_merges(self):
         calls = []

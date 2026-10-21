@@ -20,3 +20,14 @@ No administrator bypass, human reviewer gate, external customer claims, OCI oper
 - **Provider acceptance still required:** a future safe synthetic race test or naturally occurring disjoint advance should prove the branch-proof API and final identical tree. Do not state live race recovery success on the basis of mocks alone.
 
 **Customer production release: HOLD.**
+
+### Real Git proof topology correction
+
+A disposable Git graph confirms that an isolated proof merge on top of an
+unrelated current-main commit reaches **two** new commits (the original
+single-parent generated evidence commit and the two-parent proof merge).
+GitHub's compare must report `ahead_by=2` even though one allowlisted file
+changes. The original mocked `ahead_by=1` positive would reject every
+legitimate live merge. This candidate now checks the real Git topology and
+rejects contradictory single-commit proof responses. The recovery flag
+remains disabled pending actual provider-backed acceptance.

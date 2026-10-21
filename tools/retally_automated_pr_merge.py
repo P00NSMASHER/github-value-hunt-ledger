@@ -232,7 +232,10 @@ def _prove_and_merge_updated_main(
     changes = gh("GET", f"repos/{REPO}/compare/{latest_main}...{proof_sha}")
     items = changes.get("files") if isinstance(changes, dict) else None
     if (not isinstance(changes, dict) or changes.get("status") != "ahead"
-        or changes.get("ahead_by") != 1 or changes.get("behind_by") != 0
+        # A two-parent proof merge makes the original writer commit and
+        # the proof merge reachable beyond latest main. Git compare must
+        # report TWO commits ahead even though only one scoped file differs.
+        or changes.get("ahead_by") != 2 or changes.get("behind_by") != 0
         or not isinstance(items, list) or len(items) != len(approved_files)
         or {x.get("filename") for x in items if isinstance(x, dict)}
              != set(approved_files)
