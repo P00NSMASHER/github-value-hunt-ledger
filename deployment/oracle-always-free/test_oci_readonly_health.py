@@ -288,6 +288,26 @@ class AccessTests(unittest.TestCase):
             with self.assertRaises(m.Refused):
                 m.check_instance(SimpleNamespace(**x), vm["id"], vm["compartment_id"])
 
+    def test_rpst_public_key_uses_single_line_der_base64_not_pem(self):
+        # Oracle's RPST GitHub token-exchange implementations use base64 DER
+        # SubjectPublicKeyInfo as one form field, without PEM delimiters.
+        der = bytes.fromhex("300d06092a864886f70d0101010500")
+        encoded = m.encode_rpst_public_key(der)
+        self.assertEqual(encoded, base64.b64encode(der).decode("ascii"))
+        self.assertEqual(base64.b64decode(encoded, validate=True), der)
+        self.assertNotIn("BEGIN PUBLIC KEY", encoded)
+        self.assertNotIn("\\n", encoded)
+        for invalid in ("PUBLIC KEY", b"", b"not-der"):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(m.Refused):
+                    m.encode_rpst_public_key(invalid)
+
+    def test_rpst_key_serializer_is_used_by_live_path(self):
+        import inspect
+        live = inspect.getsource(m.do_live_check)
+        self.assertIn("serialization.Encoding.DER", live)
+        self.assertIn("encode_rpst_public_key(", live)
+
     def test_rpst_exchange_uses_strict_token_type_and_no_write_scope(self):
         s = fixture()
         token = jwt(claims())
