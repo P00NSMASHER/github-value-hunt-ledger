@@ -226,7 +226,14 @@ def github_oidc_token(settings: dict[str, str]) -> str:
     return jwt
 
 
-def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str) -> str:
+def encode_rpst_public_key(public_der: bytes) -> str:
+    """Oracle RPST exchange expects DER SPKI in one Base64 field, not PEM."""
+    require(isinstance(public_der, bytes) and len(public_der) >= 15 and
+            public_der[0] == 0x30, "Invalid DER public key")
+    return base64.b64encode(public_der).decode("ascii")
+
+
+def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_key_b64: str) -> str:
     # A dedicated, NON-ADMIN identity-domain OAuth client may invoke token
     # exchange only. It is not itself a blanket OCI API authorization.
     credentials = (settings["RETALLY_OCI_CLIENT_ID"] + ":" +
@@ -236,7 +243,7 @@ def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str
     payload = urlencode({
         "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
         "requested_token_type": "urn:oci:token-type:oci-rpst",
-        "public_key": public_pem, "subject_token": github_jwt,
+        "public_key": public_key_b64, "subject_token": github_jwt,
         "subject_token_type": "jwt", "res_type": "ref_github", "rpst_exp": "20",
     }).encode("utf-8")
     request = Request(url, data=payload, method="POST", headers={
@@ -299,13 +306,14 @@ def do_live_check(settings: dict[str, str]) -> None:
     except Exception:
         raise Refused("OIDC_TOKEN_OR_CLAIMS") from None
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    public_pem = key.public_key().public_bytes(
-        serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
+    public_der = key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
+    public_key_b64 = encode_rpst_public_key(public_der)
     private_pem = key.private_bytes(
         serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption()).decode()
     try:
-        rpst = exchange_for_rpst(settings, jwt, public_pem)
+        rpst = exchange_for_rpst(settings, jwt, public_key_b64)
     except Refused as exc:
         # The category was already reduced to a fixed non-secret allowlist.
         label = str(exc)
