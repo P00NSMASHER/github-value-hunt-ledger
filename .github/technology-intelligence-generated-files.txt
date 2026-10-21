@@ -7,6 +7,14 @@ intelligence/search_strategies.jsonl
 intelligence/query_families.jsonl
 intelligence/derived_edges.jsonl
 intelligence/LEARNING_REPORT.md
+intelligence/search_move_metrics.json
+intelligence/SEARCH_MOVE_REPORT.md
+intelligence/search_move_policy.json
+intelligence/SEARCH_MOVE_POLICY.md
+intelligence/coordination_metrics.json
+intelligence/COORDINATION_REPORT.md
+intelligence/efficiency_metrics.json
+intelligence/EFFICIENCY_REPORT.md
 intelligence/LEARNING_STATE.json
 intelligence/learning_curriculum.json
 intelligence/LEARNING_CURRICULUM.md
