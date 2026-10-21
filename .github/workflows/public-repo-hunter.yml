@@ -111,7 +111,6 @@ jobs:
         id: persist
         env:
           WORKER: ${{ steps.route.outputs.worker }}
-          PR_MODE: ${{ vars.RETALLY_SCOUT_PR_ENABLED }}
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -125,27 +124,23 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "automation: refresh ${WORKER} scout state"
           git pull --rebase origin main
-          if [ "$PR_MODE" = "true" ]; then
-            BRANCH="automation/retally-scout-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-            BASE_SHA="$(git rev-parse HEAD^)"
-            HEAD_SHA="$(git rev-parse HEAD)"
-            git push origin "HEAD:refs/heads/$BRANCH"
-            {
-              echo "proposal_ready=true"
-              echo "branch=$BRANCH"
-              echo "base_sha=$BASE_SHA"
-              echo "head_sha=$HEAD_SHA"
-            } >> "$GITHUB_OUTPUT"
-          else
-            git push origin HEAD:main
-          fi
+          BRANCH="automation/retally-scout-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          BASE_SHA="$(git rev-parse HEAD^)"
+          HEAD_SHA="$(git rev-parse HEAD)"
+          git push origin "HEAD:refs/heads/$BRANCH"
+          {
+            echo "proposal_ready=true"
+            echo "branch=$BRANCH"
+            echo "base_sha=$BASE_SHA"
+            echo "head_sha=$HEAD_SHA"
+          } >> "$GITHUB_OUTPUT"
+
 
   submit-pr:
     needs: scout
     if: >-
       (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main' &&
-      vars.RETALLY_SCOUT_PR_ENABLED == 'true' &&
       needs.scout.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5

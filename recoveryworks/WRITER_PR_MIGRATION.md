@@ -85,3 +85,20 @@ This change does **not** activate `RETALLY_CATALOG_PR_ENABLED` or
 `RETALLY_INTEGRATOR_PR_ENABLED`; both remain separate owner-controlled
 switches. It also does not process the old September 20 queue advice.
 Customer production and financial-source authorization remain HOLD.
+
+## Enforced source routing after four live acceptance tests
+
+The four automated writer lanes have each produced a real bot-authored PR
+and a successful exact-SHA five-job release-gate run: Scout #579,
+Integrator #548, Catalog #550 and Technology Intelligence #558.
+The separate writer feature-flag fallback is retired in this source change.
+Every scheduled writer uses a scoped, run-specific proposal branch and the
+trusted bot PR controller; a configuration regression, permission error,
+conflicting source update or failed CI must stop the operation rather than
+push directly to `main`.
+
+A GitHub Actions run of the Technology Intelligence CLI without
+`--proposal-branch` is rejected before Git operations. The checked-in
+ruleset remains disabled until the repository administrator activates and
+verifies real protection, including a fresh no-review synthetic canary.
+No production service or customer data acceptance is implied.
