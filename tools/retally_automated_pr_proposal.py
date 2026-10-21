@@ -26,7 +26,7 @@ ALLOWED_EVENTS = frozenset({"schedule", "workflow_dispatch", "push"})
 
 def gh(method: str, path: str, payload: dict | None = None):
     if not (path.startswith("repos/" + REPO + "/") and
-            method in ("GET", "POST")):
+            method in ("GET", "POST", "PUT")):
         raise ProposalHold("Unapproved repository API request")
     args = ["gh", "api", "--method", method, path]
     if payload is not None:
