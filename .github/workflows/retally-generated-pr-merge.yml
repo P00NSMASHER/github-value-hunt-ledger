@@ -1,0 +1,82 @@
+name: RETALLY Generated PR Guarded Merge
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/retally-generated-pr-merge.yml"
+      - "tools/retally_automated_pr_proposal.py"
+      - "tools/retally_automated_pr_merge.py"
+      - "tests/test_ti_retally_generated_pr_controller.py"
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Exact generated evidence-only PR number
+        required: true
+        type: string
+      lane:
+        description: Source-scoped writer lane
+        required: true
+        type: choice
+        options: [scout, catalog, integrator, technology]
+      head_sha:
+        description: Exact generated single-parent commit
+        required: true
+        type: string
+      base_sha:
+        description: Exact current main parent at proposal creation
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-generated-pr-guard-${{ github.event_name }}-${{ inputs.lane || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-offline:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Test generated PR authority and failure semantics
+        run: python -m unittest -v tests.test_ti_retally_generated_pr_controller
+
+  guarded-merge:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'P00NSMASHER/github-value-hunt-ledger' &&
+      github.ref == 'refs/heads/main' &&
+      github.actor == 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+      checks: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Require actual CI and bounded generated-source authority before merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+          INPUT_LANE: ${{ inputs.lane }}
+          INPUT_HEAD_SHA: ${{ inputs.head_sha }}
+          INPUT_BASE_SHA: ${{ inputs.base_sha }}
+        run: python tools/retally_automated_pr_merge.py
