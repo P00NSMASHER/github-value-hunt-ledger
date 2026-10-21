@@ -46,6 +46,27 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual({"sheetharbor", "app-factory-products", "x402-services"},
                          {e["id"] for e in view["entries"] if e["kind"] == "product_family"})
 
+    def test_owner_only_quality_approval_keeps_checks_and_no_production_authority(self):
+        workflow = {row["id"]: row for row in self.catalog["workflow"]}
+        quality = workflow["quality-reviewed"]
+        self.assertEqual("OWNER_QUALITY_ASSURANCE", quality["owner_role"])
+        self.assertTrue(any("Owner acceptance" in v for v in quality["required_evidence"]))
+        self.assertTrue(any("quality checks" in v for v in quality["required_evidence"]))
+        self.assertFalse(self.catalog["authority"]["production_state_mutation_authorized"])
+
+    def test_independent_human_review_cannot_silently_become_required_again(self):
+        for new_role, new_evidence in (
+            ("INDEPENDENT_REVIEWER", ["Owner acceptance", "Independent approval"]),
+            ("OWNER_QUALITY_ASSURANCE", ["Current source version", "Resolved material defects"]),
+        ):
+            with self.subTest(role=new_role, evidence=new_evidence):
+                changed = copy.deepcopy(self.catalog)
+                quality = next(row for row in changed["workflow"] if row["id"] == "quality-reviewed")
+                quality["owner_role"] = new_role
+                quality["required_evidence"] = new_evidence
+                with self.assertRaisesRegex(GroupCatalogError, "owner acceptance"):
+                    validate_catalog(changed)
+
     def test_unconnected_metrics_stay_unknown(self):
         view = build_group_view(self.catalog)
         self.assertTrue(all(v is None for v in view["financial_metrics"].values()))
