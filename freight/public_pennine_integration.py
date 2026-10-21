@@ -16,6 +16,7 @@ import csv
 import io
 import re
 
+from freight.pennine_publication_integrity import require_matching_payment_annotations
 from freight.scoped_reconciliation import ScopedTxn, reconcile_scoped
 from recoveryworks.reconciliation_kernel import ReconTxn, parse_amount_to_minor
 
@@ -127,7 +128,9 @@ def run_public_census_replay() -> dict:
         key = (row["supplier number"], row["invoice number"],
                row["invoice date"], row["invoice amount minor"])
         if key in identity:
-            # Repeated published invoice rows are NOT duplicate payments.
+            # Repeated disclosures are not a second payment, but silently
+            # choosing the first conflicting annotation is also invalid.
+            require_matching_payment_annotations(identity[key], row)
             continue
         identity[key] = row
     invoices: list[ScopedTxn] = []
@@ -164,6 +167,7 @@ def run_public_census_replay() -> dict:
         "disclosed_rows": len(rows),
         "unique_economic_invoices": len(identity),
         "repeated_disclosures_not_duplicate_payments": len(rows)-len(identity),
+        "republication_payment_annotations_consistent": True,
         "supplier_reference_payment_declaration_groups": len(groups),
         "exact_invoiced_source_minor": amount_total,
         "exact_grouped_source_minor": sum(
@@ -198,5 +202,7 @@ def assert_public_census_result(result: dict) -> None:
     for field, value in expected.items():
         if result.get(field) != value:
             raise ValueError("public accounting regression mismatch: " + field)
+    if result.get("republication_payment_annotations_consistent") is not True:
+        raise ValueError("public accounting replay lacks verified republication consistency")
     if result.get("actual_freight_detection_accuracy") is not None:
         raise ValueError("general accounting data cannot label freight accuracy")

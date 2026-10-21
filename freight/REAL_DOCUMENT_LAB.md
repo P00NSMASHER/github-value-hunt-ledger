@@ -49,6 +49,11 @@ Actions artifacts, or public step summaries.
    per remittance reference, missing payment reference and malformed amounts.
    This is a same-source structural financial benchmark, **not** bank clearing,
    independent settlement accuracy, verified duplicates or proven overcharges.
+   A republished economic invoice must retain the same reported payment
+   reference, date, currency and status; any conflict fails the entire replay
+   before first-row deduplication or matching. Legitimate multiple invoices
+   under one remittance stay distinct, and payment keys include the supplier
+   so two unrelated suppliers cannot be merged by coincidentally equal numbers.
 5. A separate ArcBest smoke test may construct canonical records from the
    original document's printed postal codes, rated weight, shipment date and
    total. It explicitly marks the **shipment-date-as-invoice-date proxy**, the

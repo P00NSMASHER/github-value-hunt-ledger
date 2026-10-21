@@ -70,6 +70,7 @@ def test_result_integrity_cannot_forge_success():
         "disclosed_rows": 314,
         "unique_economic_invoices": 273,
         "repeated_disclosures_not_duplicate_payments": 41,
+        "republication_payment_annotations_consistent": True,
         "exact_invoiced_source_minor": 7423667742,
         "exact_grouped_source_minor": 7423667742,
         "matched_original_invoices": 273,
@@ -83,6 +84,8 @@ def test_result_integrity_cannot_forge_success():
     assert_public_census_result(result)
     for field, tampered in [
         ("matched_original_invoices", 272),
+        ("republication_payment_annotations_consistent", False),
+        ("republication_payment_annotations_consistent", 1),
         ("independently_proven_bank_settlements", 273),
         ("realized_recovery_minor", 1),
         ("actual_freight_detection_accuracy", 1.0),

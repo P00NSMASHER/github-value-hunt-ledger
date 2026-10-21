@@ -25,6 +25,7 @@ from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from freight.ingestion_gateway import IngressEnvelope, ingest_bytes
+from freight.pennine_publication_integrity import require_matching_payment_annotations
 from recoveryworks.reconciliation_kernel import (
     ManyToOneConfig, ReconConfig, ReconTxn, parse_amount_to_minor, reconcile,
 )
@@ -857,6 +858,11 @@ def _key(row: dict, fields: tuple[str, ...]) -> str:
     return "\x1f".join(str(row[k]) for k in fields)
 
 
+def _payment_scope_key(row: dict) -> str:
+    """Supplier is part of remittance identity; identical payment numbers alone are not."""
+    return _key(row, ("supplier number", "payment number", "payment date", "payment currency"))
+
+
 def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
     data = raw.decode("utf-8-sig", errors="strict")
     reader = csv.reader(io.StringIO(data, newline=""), strict=True)
@@ -915,6 +921,9 @@ def benchmark_pennine() -> dict:
     for row in all_rows:
         by_identity[_key(row, inv_fields)].append(row)
         by_decl[_key(row, declaration_fields)].append(row)
+    for group in by_identity.values():
+        for republished in group[1:]:
+            require_matching_payment_annotations(group[0], republished)
     unique_rows = [group[0] for group in by_identity.values()]
     disclosed_overlap = sum(len(x) - 1 for x in by_identity.values())
     repeated_declarations = sum(len(x) - 1 for x in by_decl.values())
@@ -932,7 +941,7 @@ def benchmark_pennine() -> dict:
     payment_group: dict[str, str] = {}
     for row in unique_rows:
         key = _key(row, inv_fields)
-        pay_key = _key(row, ("payment number", "payment date", "payment currency"))
+        pay_key = _payment_scope_key(row)
         tid = "inv:" + _safe_sha(key)
         invoice_group[tid] = pay_key
         invoices.append(ReconTxn(
@@ -973,6 +982,7 @@ def benchmark_pennine() -> dict:
         "original_disclosed_rows": len(all_rows),
         "unique_invoice_economic_identities": len(by_identity),
         "repeated_invoice_disclosures_not_duplicate_payments": disclosed_overlap,
+        "republication_payment_annotations_consistent": True,
         "exact_repeated_declarations": repeated_declarations,
         "cross_month_repeated_rows": cross_month_repeats,
         "invoice_identity_with_changed_payment_reference": changed_payment_ids,
