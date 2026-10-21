@@ -209,6 +209,49 @@ class ContextTests(unittest.TestCase):
                 m.decode_claims_for_preflight(token)
 
 
+class AuthErrorTests(unittest.TestCase):
+    def test_http_error_classification_is_bounded_and_never_leaks_provider_body(self):
+        from urllib.error import HTTPError
+        secret = "SHOULD_NOT_LEAK_PRIVATE_PROVIDER_RESPONSE"
+        req = m.Request("https://idcs-example.identity.oraclecloud.com/oauth2/v1/token",
+                        data=b"synthetic")
+        for status, provider_error, expected in (
+            (400, "invalid_request", "AUTH_HTTP_400_invalid_request"),
+            (401, "invalid_client", "AUTH_HTTP_401_invalid_client"),
+            (403, "access_denied", "AUTH_HTTP_403_access_denied"),
+            (500, "arbitrary_" + secret, "AUTH_HTTP_500_other"),
+        ):
+            with self.subTest(status=status):
+                body = json.dumps({"error": provider_error,
+                                   "error_description": secret}).encode()
+                err = HTTPError(req.full_url, status, secret, {},
+                                io.BytesIO(body))
+                class FakeOpener:
+                    def open(self, *a, **kw):
+                        raise err
+                with patch.object(m, "build_opener", return_value=FakeOpener()):
+                    with self.assertRaises(m.Refused) as caught:
+                        m.json_response(req)
+                self.assertEqual(str(caught.exception), expected)
+                self.assertNotIn(secret, str(caught.exception))
+
+    def test_exchange_reports_only_fixed_http_and_oauth_category(self):
+        settings = fixture()
+        for label, diagnostic in (
+            ("AUTH_HTTP_401_invalid_client",
+             "OCI_TOKEN_EXCHANGE_AUTH_HTTP_401_invalid_client"),
+            ("AUTH_HTTP_400_invalid_grant",
+             "OCI_TOKEN_EXCHANGE_AUTH_HTTP_400_invalid_grant"),
+            ("Authentication secret leak", "OCI_TOKEN_EXCHANGE"),
+        ):
+            with self.subTest(label=label):
+                with patch.object(m, "json_response", side_effect=m.Refused(label)):
+                    with self.assertRaises(m.Refused) as caught:
+                        m.exchange_for_rpst(settings, "synthetic.jwt.token", "PUBLIC")
+                self.assertEqual(str(caught.exception), diagnostic)
+                self.assertEqual(m.safe_failure_code(caught.exception), diagnostic)
+
+
 class AccessTests(unittest.TestCase):
     def test_bucket_expected_private_no_events_no_replication(self):
         good = dict(name=m.BUCKET, compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"],
@@ -244,6 +287,26 @@ class AccessTests(unittest.TestCase):
             x[field] = value
             with self.assertRaises(m.Refused):
                 m.check_instance(SimpleNamespace(**x), vm["id"], vm["compartment_id"])
+
+    def test_rpst_public_key_uses_single_line_der_base64_not_pem(self):
+        # Oracle's RPST GitHub token-exchange implementations use base64 DER
+        # SubjectPublicKeyInfo as one form field, without PEM delimiters.
+        der = bytes.fromhex("300d06092a864886f70d0101010500")
+        encoded = m.encode_rpst_public_key(der)
+        self.assertEqual(encoded, base64.b64encode(der).decode("ascii"))
+        self.assertEqual(base64.b64decode(encoded, validate=True), der)
+        self.assertNotIn("BEGIN PUBLIC KEY", encoded)
+        self.assertNotIn("\\n", encoded)
+        for invalid in ("PUBLIC KEY", b"", b"not-der"):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(m.Refused):
+                    m.encode_rpst_public_key(invalid)
+
+    def test_rpst_key_serializer_is_used_by_live_path(self):
+        import inspect
+        live = inspect.getsource(m.do_live_check)
+        self.assertIn("serialization.Encoding.DER", live)
+        self.assertIn("encode_rpst_public_key(", live)
 
     def test_rpst_exchange_uses_strict_token_type_and_no_write_scope(self):
         s = fixture()
