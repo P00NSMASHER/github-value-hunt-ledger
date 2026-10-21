@@ -169,16 +169,41 @@ class OciBackupTests(unittest.TestCase):
         with patch.object(self.store, "cli", return_value='{"data":{"etag":"NESTED"}}'):
             self.assertEqual(self.store.head("test")["etag"], "NESTED")
 
-    def test_empty_object_list_requires_second_full_count_query(self):
-        # The authenticated OCI Cloud Shell CLI has returned successful empty
-        # list stdout on some operations; never interpret blank as absence alone.
-        with patch.object(self.store, "cli", side_effect=["", "0\n"]) as call:
-            self.assertEqual(self.store.objects("synthetic-only/"), [])
-        self.assertEqual(call.call_count, 2)
-        a, b = [q.args for q in call.call_args_list]
-        self.assertIn("--all", a)
-        self.assertIn("--all", b)
-        self.assertEqual(b[-2:], ("--query", "length(data)"))
+    def test_typed_empty_omission_requires_independent_signed_rest_population(self):
+        success = json.dumps({"status": "200 OK", "data": {"objects": []}})
+        for typed in ("", '{"prefixes": []}'):
+            with self.subTest(typed=typed), patch.object(
+                    self.store, "cli", side_effect=[typed, success]) as call:
+                self.assertEqual(self.store.objects("synthetic-recovery/"), [])
+            self.assertEqual(call.call_count, 2)
+            first, second = [q.args for q in call.call_args_list]
+            self.assertIn("--all", first)
+            self.assertIn("--prefix", first)
+            self.assertEqual(second[:3], ("raw-request", "--http-method", "GET"))
+            self.assertEqual(second[3], "--target-uri")
+            self.assertEqual(second[4],
+                             "https://objectstorage.us-ashburn-1.oraclecloud.com/n/"
+                             "syntheticnamespace/b/" + backup.BUCKET_NAME +
+                             "/o?prefix=synthetic-recovery%2F&limit=1")
+
+    def test_empty_omission_refuses_remote_items_or_pagination(self):
+        invalid_raw = [
+            '{"status":"200 OK","data":{"objects":[{"name":"synthetic-recovery/test"}]}}',
+            '{"status":"200 OK","data":{"objects":[],"nextStartWith":"more"}}',
+            '{"status":"200 OK","data":{"objects":[],"prefixes":["synthetic-recovery/"]}}',
+            '{"status":"200 OK","data":{"prefixes":[]}}',
+            '{"status":"403 Forbidden","data":{"objects":[]}}',
+            '{"status":"200 OK","data":[]}',
+        ]
+        for reply in invalid_raw:
+            with self.subTest(reply=reply), patch.object(
+                    self.store, "cli", side_effect=['{"prefixes":[]}', reply]):
+                with self.assertRaises(backup.Refused):
+                    self.store.objects("synthetic-recovery/")
+        with patch.object(self.store, "cli", return_value='{"prefixes":["unknown"]}') as call:
+            with self.assertRaises(backup.Refused):
+                self.store.objects("synthetic-recovery/")
+            call.assert_called_once()
 
     def test_inconsistent_blank_list_does_not_authorize_cleanup_or_upload(self):
         for count in ("1", "-1", '"zero"', "null", "true", '{"data":[]}', "", "not-json"):
