@@ -46,6 +46,20 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual({"sheetharbor", "app-factory-products", "x402-services"},
                          {e["id"] for e in view["entries"] if e["kind"] == "product_family"})
 
+    def test_scopesignal_registry_merge_is_pinned_without_approving_identity(self):
+        entry = next(e for e in self.catalog["entries"] if e["id"] == "scopesignal")
+        correction = next(s for s in entry["sources"] if s["git_blob_sha"] ==
+                          "49886d0a96177c9eb40b164c64e4d8b9187582f4")
+        self.assertEqual("2026-10-21", self.catalog["as_of"])
+        self.assertEqual("2026-10-21", correction["observed_on"])
+        self.assertIn("Merged unbound coverage correction", correction["label"])
+        self.assertIn("/blob/8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c/",
+                      correction["url"])
+        self.assertNotIn("unmerged pr #732", json.dumps(entry).lower())
+        self.assertIn("canonical identity unresolved", entry["stage"])
+        self.assertEqual("NOT_ASSESSED", entry["commercial_readiness"])
+        self.assertIs(self.catalog["authority"]["production_state_mutation_authorized"], False)
+
     def test_no_internal_human_reviews_keeps_automated_quality_and_no_authority(self):
         quality = next(v for v in self.catalog["workflow"] if v["id"] == "quality-reviewed")
         self.assertEqual("AUTOMATED_QUALITY_GATE", quality["owner_role"])
