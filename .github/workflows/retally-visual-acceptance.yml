@@ -80,6 +80,8 @@ jobs:
 
       - name: Verify isolated durable receipt never invites duplicate email
         run: python after/freight/site/online_receipt_acceptance.py --site bundle-after --out evidence/after
+      - name: Install pinned group accessibility rules
+        run: npm install --no-save --ignore-scripts --prefix qa_node axe-core@4.10.3
       - name: Verify RETALLY Group pages at desktop, tablet and phone widths
         working-directory: after
         env:
@@ -87,7 +89,7 @@ jobs:
           FREIGHT_CONTACT_VERIFIED: '1'
         run: |
           python -m freight.site.cloudflare_build
-          python -m freight.site.group.visual_qa --site cf-retally-public --out ../evidence/group
+          python -m freight.site.group.visual_qa --site cf-retally-public --out ../evidence/group --axe-js ../qa_node/node_modules/axe-core/axe.min.js
       - name: Install pinned accessibility rules
         if: github.head_ref == 'audit/retally-visual-acceptance-20261008' || github.ref_name == 'audit/retally-visual-acceptance-20261008'
         run: npm install --no-save --ignore-scripts --prefix qa_node axe-core@4.10.3

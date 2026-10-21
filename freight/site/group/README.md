@@ -72,3 +72,37 @@ FREIGHT_CONTACT_EMAIL=jay@retallyrecovery.com FREIGHT_CONTACT_VERIFIED=1 \
 
 Output is `cf-retally-public`, containing only the explicit public allowlist.
 The build refuses to overwrite an existing output directory.
+
+## Editorial design release — 2026-10-21
+
+The homepage prioritizes the three existing offers. Eight previews, integrations,
+demonstrations and research projects retain separate pages and explicit status.
+Grouped navigation, earlier sample links, shared green/cream styling and a local
+email composer reduce unnecessary steps without changing operating systems.
+The freight chat launcher hides while the intake form is in the viewport.
+
+Three new editorial photographs were created with the built-in image-generation
+tool and visually reviewed. They are illustrative, not client locations, staff,
+product screenshots or proof of results. Approved RETALLY logos are unchanged.
+
+| Asset | Art direction | Published variants |
+|---|---|---|
+| research | Sunlit stone desk, green folio, notebooks, unbranded laptop; natural materials | 768×512 and 1536×1024 WebP |
+| restaurant | NYC corner café, green frames, warm wood, brick, morning light; no readable branding | 768×512 and 1536×1024 WebP |
+| tools | Oak maker bench, ceramics, candles, measuring tools, blank notebook; natural daylight | 768×512 and 1536×1024 WebP |
+
+The six reviewed filenames form an explicit allowlist. Build validation rejects
+extra assets, symlinks, malformed WebP, wrong geometry or any image above 450 KB.
+PNG generation masters are not shipped. Responsive image widths, intrinsic
+dimensions and lazy loading keep the new photography within a small page budget.
+
+The contact composer only prepares or copies a message. Nothing is posted,
+tracked, stored or sent by the page. The existing freight-only inquiry endpoint
+is not reused for other businesses. Existing mailto opt-outs remain intact.
+
+Visual acceptance runs all 13 routes at 1440, 768, 390 and 320 CSS pixels, with
+real lazy-image loading, keyboard navigation, email-draft updates and chat
+clearance (also at the previously affected 1363×936). Pinned axe-core checks
+current desktop and phone pages for serious/critical WCAG rule failures.
+These checks do not establish full WCAG conformance, email delivery, payment
+fulfillment or commercial readiness of the separately labelled prototypes.
