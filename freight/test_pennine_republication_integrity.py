@@ -240,3 +240,26 @@ def test_public_source_registries_have_identical_pins_and_urls():
         assert lab.PENNINE[month] == census.ROOT + "/download_file/" + route
         assert lab.FROZEN_PENNINE_SHA256[month] == digest
         assert type(expected_rows) is int and expected_rows > 0
+
+
+@pytest.mark.parametrize("broken_ids", [
+    b"35,,06/07/2026,\x2229,601.74\x22,,05/08/2026,GBP,Fully paid",
+    b"35,,06/07/2026,\x2229,601.74\x22,,05/08/2026,GBP,",
+])
+def test_post_header_accounting_row_missing_both_identities_fails_closed(
+    broken_ids,
+):
+    """A published nonblank row cannot silently vanish from the denominator."""
+    original = _original()
+    changed = original + broken_ids + b"\n"
+    assert changed != original
+    with pytest.raises(ValueError, match="MISSING_PUBLIC_INVOICE_AND_PAYMENT_ID"):
+        census.decode_month(changed, "2026-08")
+    with pytest.raises(ValueError, match="MISSING_PUBLIC_INVOICE_AND_PAYMENT_ID"):
+        lab.parse_pennine_csv(changed, "2026-08")
+
+
+def test_blank_csv_separator_after_header_is_not_a_dropped_invoice():
+    raw = _original() + b"\n"
+    assert len(census.decode_month(raw, "2026-08")) == 1
+    assert len(lab.parse_pennine_csv(raw, "2026-08")) == 1

@@ -103,7 +103,9 @@ def decode_month(raw: bytes, month: str) -> tuple[dict, ...]:
             raise ValueError("truncated public CSV record")
         record = {key: fields[index].strip() for key, index in heading.items()}
         if not record["invoice number"] and not record["payment number"]:
-            continue
+            # A populated source row is not an ignorable separator. Neither
+            # source parsing nor later deduplication may hide its existence.
+            raise ValueError("MISSING_PUBLIC_INVOICE_AND_PAYMENT_ID")
         for key in ("supplier number", "invoice number", "payment number"):
             if not record[key]:
                 raise ValueError("missing publicly disclosed source identity")

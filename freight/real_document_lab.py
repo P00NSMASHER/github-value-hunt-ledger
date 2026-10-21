@@ -889,7 +889,8 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
             raise ValueError("TRUNCATED_PUBLIC_CSV_INVOICE_RECORD")
         x = {name: row[pos].strip() for name, pos in headings.items()}
         if not x["invoice number"] and not x["payment number"]:
-            continue
+            # Both adapters must fail closed on populated, unidentifiable rows.
+            raise ValueError("MISSING_PUBLIC_INVOICE_AND_PAYMENT_ID")
         if not x["supplier number"] or not x["invoice number"]:
             raise ValueError("missing invoice identity in source month")
         for name in ("supplier number", "invoice number"):

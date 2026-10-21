@@ -105,7 +105,8 @@ independent payment truth label.
 9. Retain source-published payment-status counts, null/malformed values,
    supplier-and-invoice economic identity variants and negative/zero amounts
    as explicit general-accounting data-quality diagnostics. Reject nonblank
-   truncated CSV rows instead of silently omitting them from the population.
+   truncated CSV rows and nonblank rows missing both invoice and payment IDs
+   instead of silently omitting them from the population.
 10. Check independent GAO decision-narrative arithmetic in integer cents,
     including the **reversal** of an allegedly lower-rate collection. This
     is a historical precedent test, not an independent linked label or a
