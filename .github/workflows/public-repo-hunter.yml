@@ -168,7 +168,7 @@ jobs:
           PROPOSED_BASE: ${{ needs.scout.outputs.base_sha }}
           PROPOSED_HEAD: ${{ needs.scout.outputs.head_sha }}
         run: >-
-          python tools/retally_automated_pr_proposal.py
+          python -m tools.retally_automated_pr_proposal
           --lane scout
           --branch "$PROPOSED_BRANCH"
           --base-sha "$PROPOSED_BASE"

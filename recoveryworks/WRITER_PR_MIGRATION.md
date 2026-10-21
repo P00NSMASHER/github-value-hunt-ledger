@@ -49,3 +49,7 @@ spending, private host installation or data-retention acceptance.
 ## Staged opt-in writer changes
 
 The four workflows now offer a PR publishing path behind the disabled repository variable the independent lane switches RETALLY_SCOUT_PR_ENABLED, RETALLY_CATALOG_PR_ENABLED, RETALLY_INTEGRATOR_PR_ENABLED and RETALLY_TECHNOLOGY_PR_ENABLED. Without that variable they retain their existing scheduled behavior. With the variable explicitly set to true after successful canary acceptance, the source job pushes only its isolated, run-specific evidence branch and a separate minimally scoped job proposes the PR. This source change alone neither activates new behavior nor enables main protection. Production release remains HOLD.
+
+### Verified Python entry-point preflight
+
+The production runner executes both proposed GitHub automation commands with `python -m tools.retally_automated_pr_proposal` and `python -m tools.retally_automated_pr_merge`, from the repository root. Direct file invocation fails with `ModuleNotFoundError` because Python starts with `tools/` rather than the repository root on its import search path. A real Windows exact-SHA test exposed this; the fixed module launch is required for successful unattended proposals. Automated tests assert the entry points import successfully but refuse an untrusted/missing Actions identity before any provider request.

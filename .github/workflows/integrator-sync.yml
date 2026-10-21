@@ -175,7 +175,7 @@ jobs:
           PROPOSED_BASE: ${{ needs.sync.outputs.base_sha }}
           PROPOSED_HEAD: ${{ needs.sync.outputs.head_sha }}
         run: >-
-          python tools/retally_automated_pr_proposal.py
+          python -m tools.retally_automated_pr_proposal
           --lane integrator
           --branch "$PROPOSED_BRANCH"
           --base-sha "$PROPOSED_BASE"

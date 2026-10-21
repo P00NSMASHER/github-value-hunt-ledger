@@ -171,7 +171,7 @@ jobs:
           PROPOSED_BASE: ${{ needs.persist-generated.outputs.base_sha }}
           PROPOSED_HEAD: ${{ needs.persist-generated.outputs.head_sha }}
         run: >-
-          python tools/retally_automated_pr_proposal.py
+          python -m tools.retally_automated_pr_proposal
           --lane technology
           --branch "$PROPOSED_BRANCH"
           --base-sha "$PROPOSED_BASE"

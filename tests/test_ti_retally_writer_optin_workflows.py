@@ -42,5 +42,45 @@ class WriterModeTests(unittest.TestCase):
         policy=(ROOT/"recoveryworks/CODE_RELEASE_POLICY.md").read_text()
         self.assertIn("production_release=HOLD",policy)
 
+    def test_real_module_entry_points_refuse_untrusted_context(self):
+        import os
+        import subprocess
+        import sys
+        env = os.environ.copy()
+        for key in ("GITHUB_REPOSITORY", "GH_TOKEN", "GITHUB_EVENT_NAME",
+                    "GITHUB_ACTOR", "GITHUB_REF"):
+            env.pop(key, None)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        cases = [
+            ([sys.executable, "-m", "tools.retally_automated_pr_merge"],
+             "RETALLY GUARDED MERGE HOLD:"),
+            ([sys.executable, "-m", "tools.retally_automated_pr_proposal",
+              "--lane", "scout",
+              "--branch", "automation/retally-scout-39603064849-1",
+              "--base-sha", "a" * 40,
+              "--head-sha", "b" * 40],
+             "RETALLY PROPOSAL HOLD:"),
+        ]
+        for command, expected in cases:
+            with self.subTest(command=command[2]):
+                result = subprocess.run(
+                    command, cwd=ROOT, env=env, capture_output=True, text=True,
+                    timeout=15, check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertIn(expected, result.stderr)
+                self.assertNotIn("ModuleNotFoundError", result.stderr)
+
+    def test_generated_writer_jobs_use_module_entry_points(self):
+        controller = (ROOT / ".github/workflows/retally-generated-pr-merge.yml").read_text()
+        self.assertIn("python -m tools.retally_automated_pr_merge", controller)
+        self.assertNotIn("python tools/retally_automated_pr_merge.py", controller)
+        for name in ("public-repo-hunter.yml", "catalog-append.yml",
+                     "integrator-sync.yml", "technology-intelligence.yml"):
+            workflow = (ROOT / ".github/workflows" / name).read_text()
+            with self.subTest(name=name):
+                self.assertIn("python -m tools.retally_automated_pr_proposal", workflow)
+                self.assertNotIn("python tools/retally_automated_pr_proposal.py", workflow)
+
 if __name__=="__main__":
     unittest.main()
