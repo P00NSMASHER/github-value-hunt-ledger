@@ -33,7 +33,7 @@
 
 If Oracle returns `500-InternalError` while launching the VM, the installer writes `~/.retally-oracle/partial-setup-receipt.json`. This receipt contains the original VCN, security list, route table, internet gateway and subnet identifiers. **Do not delete it, rerun `--apply`, or create a second VCN.** An HTTP 500 does not establish why the launch failed; it must not be silently treated as proof of capacity shortage.
 
-After an independently reviewed code revision has been downloaded from an immutable commit and checked against its expected SHA-256, run only the read-only inspection first:
+After an owner-authorized, CI-tested code revision has been downloaded from an immutable commit and checked against its expected SHA-256, run only the read-only inspection first:
 
 ```sh
 python3 "$HOME/retally-oci-free.py" --inspect-partial
@@ -49,12 +49,12 @@ python3 "$HOME/retally-oci-free.py" --resume
 
 The script requires the exact phrase `RESUME RETALLY ALWAYS FREE`. It rechecks the environment after confirmation, **reuses the existing network**, requests only one A1 shape with 2 OCPUs, 12 GB memory and a 50-GB official Ubuntu boot image, and stops rather than selecting a paid shape or creating a new network. A new `500-InternalError` preserves the partial receipt and remains a release hold. OCI may have temporarily limited shape capacity; check [Oracle's Always Free capacity guidance](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm) rather than blindly looping through requests.
 
-**Neither command constitutes independent code approval, hosting acceptance, verified backups or permission to process real customers.** Do not call `--resume` concurrently from multiple Cloud Shell sessions.
+**Neither command constitutes hosting acceptance, verified customer backups or permission to process real customer data.** Independent code approval is not required under the owner-authorized RETALLY code policy. Do not call `--resume` concurrently from multiple Cloud Shell sessions.
 
 ## Important limitations
 
 - This is a **free-resource configuration**, not a guaranteed zero-dollar billing cap for an account with other billable resources or a changed plan. Oracle capacity can be unavailable and inactive A1 instances may be reclaimed. Do not select an alternate paid shape.
-- **No workbench runs, no Cloudflare Tunnel, no access bypass and no customer data are installed.** This is intentional until PR #493, PR #500, PR #502 and this script obtain their required independent approvals.
+- **No workbench runs, no Cloudflare Tunnel, no access bypass and no customer data are installed.** This is intentional until code integration passes exact-head CI, the owner authorizes installation, and distinct host/customer release requirements are met. No external code reviewer is required.
 - Because all inbound rules are denied, direct SSH to the public address will not work. Later administration requires an approved secure Oracle Bastion/console method or a narrowly approved SSH rule. Do not open `0.0.0.0/0` on port 22.
 - OCI tenancy commands must run inside the authenticated Oracle Cloud Shell. Remote Desktop Commander can relay authorized keyboard input to Cloud Shell, but the local Windows workstation is not an approved RETALLY customer-data host. Do not transfer customer workspaces or credentials to it.
 - Do not send API keys, tenancy passwords, passwords, Cloud Shell configuration files or SSH private keys here.
