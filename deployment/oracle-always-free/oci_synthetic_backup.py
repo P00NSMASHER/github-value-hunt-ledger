@@ -207,40 +207,63 @@ class OciStore:
                "nextPolicy" in deletion and deletion["nextPolicy"] is None,
                "Raw OCI soft-delete is enabled, scheduled, or unknown; deletion proof is unsafe.")
 
+    def confirm_empty_prefix(self, prefix: str) -> None:
+        """Independently prove OCI's typed empty-list omission via signed REST.
+
+        A successful 'oci os object list --all' can return only {'prefixes':[]}
+        for an empty population. JMESPath length(data) fails on that omission.
+        Do not infer emptiness from missing data: use a second exact provider GET.
+        """
+        ensure(prefix in ("synthetic-only/", "synthetic-recovery/") and
+               self.region == "us-ashburn-1" and self.bucket == BUCKET_NAME and
+               re.fullmatch(r"[A-Za-z0-9_-]{2,80}", self.namespace) is not None,
+               "Independent empty-list proof requires the exact original private OCI bucket.")
+        encoded_prefix = prefix.replace("/", "%2F")
+        uri = ("https://objectstorage.us-ashburn-1.oraclecloud.com/n/" +
+               self.namespace + "/b/" + self.bucket +
+               "/o?prefix=" + encoded_prefix + "&limit=1")
+        raw = self.cli("raw-request", "--http-method", "GET", "--target-uri", uri)
+        try:
+            reply = json.loads(raw)
+        except ValueError as exc:
+            raise Refused("Signed OCI empty-object proof is not valid JSON.") from exc
+        ensure(isinstance(reply, dict) and reply.get("status") == "200 OK"
+               and isinstance(reply.get("data"), dict),
+               "Signed OCI empty-object proof was not exact HTTP 200.")
+        population = reply["data"]
+        ensure("objects" in population and population["objects"] == [] and
+               isinstance(population["objects"], list) and
+               not population.get("nextStartWith") and
+               population.get("prefixes") in (None, []),
+               "Independent OCI object population is not conclusively empty.")
+
     def objects(self, prefix: str) -> list[dict]:
-        # Never treat a single OCI page as a complete remote inventory. OCI defaults
-        # to 100 objects; cleanup/duplicate guards require the entire prefix.
+        # --all consumes every page for nonempty populations; never trust page 1.
         ensure(prefix in ("synthetic-only/", "synthetic-recovery/"),
                "Only known synthetic prefixes may be inspected.")
         args = ("os", "object", "list", *self.args(), "--prefix", prefix, "--all")
         raw = self.cli(*args)
         if not raw.strip():
-            # Some OCI Cloud Shell CLI versions emit no JSON when a successful
-            # list operation has zero entries. Treating blank stdout as [] on
-            # its own would conceal an incomplete or unauthorized inventory.
-            # Independently query the count across ALL pages; only an explicit
-            # integer zero, reported with a successful CLI response, is enough.
-            second = self.cli(*args, "--query", "length(data)")
-            try:
-                count = json.loads(second.strip())
-            except ValueError as exc:
-                raise Refused("OCI empty object population could not be independently confirmed.") from exc
-            ensure(type(count) is int and count == 0,
-                   "OCI object list disagrees with the independent full-population count.")
+            self.confirm_empty_prefix(prefix)
             return []
         try:
             parsed = json.loads(raw)
         except ValueError as exc:
             raise Refused("OCI object inventory returned invalid JSON.") from exc
-        ensure(isinstance(parsed, dict) and "data" in parsed,
-               "OCI object inventory lacks the data population.")
-        # OCI --all must have consumed every page. A remaining continuation
-        # forbids any claim of an empty prefix, safe deletion or fresh upload.
+        ensure(isinstance(parsed, dict),
+               "OCI object inventory is not a JSON object.")
         ensure(not parsed.get("next-start-with") and not parsed.get("opc-next-page"),
                "OCI object inventory still has a continuation; full pagination unverified.")
+        if "data" not in parsed:
+            # Observed on the actual Cloud Shell when the prefix is empty:
+            # {"prefixes": []}, with no data key. The independently signed
+            # REST ListObjects response must still show objects=[] and no page.
+            ensure(set(parsed) == {"prefixes"} and parsed["prefixes"] == [],
+                   "OCI object inventory lacks the data population.")
+            self.confirm_empty_prefix(prefix)
+            return []
         data = parsed["data"]
-        # OCI may return either {'data': {'objects': [...]}} or
-        # {'data': [...]}, depending on installed CLI version.
+        # Typed CLI may return {'data':{'objects': [...]}} or {'data': [...]}.
         items = data.get("objects") if isinstance(data, dict) else data
         ensure(isinstance(items, list) and all(isinstance(x, dict) and isinstance(x.get("name"), str)
                                                for x in items), "Unexpected OCI object list shape.")
