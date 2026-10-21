@@ -25,7 +25,7 @@
         ".github"
       ],
       "size_kb": 805,
-      "stars": 1,
+      "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "framework",
@@ -42,11 +42,11 @@
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 2,
-        "stars": 1,
+        "stars": 2,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 41,
+      "triage_score": 42,
       "url": "https://github.com/andrian-syh/rblx-twill"
     }
   ],
@@ -56,7 +56,7 @@
     31,
     42
   ],
-  "generated_at": "2026-10-19T20:06:44.433299+00:00",
+  "generated_at": "2026-10-20T18:38:09.785855+00:00",
   "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
   "risk_review": [
     {

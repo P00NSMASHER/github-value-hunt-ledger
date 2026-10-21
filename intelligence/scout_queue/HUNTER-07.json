@@ -68,7 +68,7 @@
         "package.json"
       ],
       "size_kb": 1380,
-      "stars": 10,
+      "stars": 11,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "agent-skills",
@@ -112,7 +112,7 @@
         "tests"
       ],
       "size_kb": 830,
-      "stars": 1,
+      "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "agent-skills",
@@ -133,11 +133,11 @@
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 6,
-        "stars": 1,
+        "stars": 2,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 45,
+      "triage_score": 46,
       "url": "https://github.com/m4bwav/roblox-agent"
     },
     {
@@ -145,16 +145,16 @@
       "default_branch": "main",
       "description": "Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "a3bbcb8b741e160b4b36202e0a4b2701c1ce0df3",
+      "exact_revision": "f02db7700f5976bab95f2fbf9db890ef7f91e82d",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-19T19:03:46Z",
+      "pushed_at": "2026-10-20T14:43:59Z",
       "repository": "Daniel987654321/roblox-studio-agent-bridge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 371,
+      "size_kb": 387,
       "stars": 73,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -193,16 +193,16 @@
       "default_branch": "main",
       "description": "Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs",
       "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "b4447f75bac6cca2b4479ec110fad567f88052a8",
+      "exact_revision": "935ae2c976ed29d72811116aed6410e242d6e7a6",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-19T17:59:34Z",
+      "pushed_at": "2026-10-20T17:38:25Z",
       "repository": "nahidgaming70/Roblox-QA-Sentinel",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 427,
+      "size_kb": 448,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -265,7 +265,7 @@
     23,
     24
   ],
-  "generated_at": "2026-10-19T20:15:06.855091+00:00",
+  "generated_at": "2026-10-20T18:46:46.555984+00:00",
   "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
   "risk_review": [],
   "risk_review_count": 0,
