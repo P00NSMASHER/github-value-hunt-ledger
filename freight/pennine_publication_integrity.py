@@ -31,15 +31,22 @@ def require_matching_payment_annotations(
         )
 
 
-def require_canonical_source_identity(value: str, *, allow_empty: bool = False) -> None:
-    """Reject alias-form source IDs before delimiter-keying or hashing.
+def require_canonical_source_identity(
+    value: str, *, allow_empty: bool = False, raw_value: str | None = None,
+) -> None:
+    """Reject Unicode and delimiter aliases before source identity keying.
 
-    Invoice and supplier identifiers may be Unicode NFC text, but embedded
-    Unicode controls (including the record-separator delimiter) cannot become
-    distinct source identities or counterfeit transaction keys.
+    Validate original CSV cell bytes as decoded text *before* stripping normal
+    display whitespace: Python's strip removes trailing U+001F and could
+    otherwise hide a collision with an unrelated clean invoice reference.
     """
     if (
-        type(value) is not str
+        (raw_value is not None and (
+            type(raw_value) is not str
+            or unicodedata.normalize("NFC", raw_value) != raw_value
+            or any(unicodedata.category(char).startswith("C") for char in raw_value)
+        ))
+        or type(value) is not str
         or (not value and not allow_empty)
         or value != value.strip()
         or unicodedata.normalize("NFC", value) != value

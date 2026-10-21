@@ -879,6 +879,8 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
         names = [re.sub(r"\s+", " ", v.strip().casefold()) for v in row]
         if headings is None:
             if all(n in names for n in required):
+                if any(names.count(name) != 1 for name in required):
+                    raise ValueError("AMBIGUOUS_PUBLIC_SOURCE_HEADERS")
                 headings = {name: names.index(name) for name in required}
             continue
         if not row or all(not x.strip() for x in row):
@@ -891,8 +893,13 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
         if not x["supplier number"] or not x["invoice number"]:
             raise ValueError("missing invoice identity in source month")
         for name in ("supplier number", "invoice number"):
-            require_canonical_source_identity(x[name])
-        require_canonical_source_identity(x["payment number"], allow_empty=True)
+            require_canonical_source_identity(
+                x[name], raw_value=row[headings[name]],
+            )
+        require_canonical_source_identity(
+            x["payment number"], allow_empty=True,
+            raw_value=row[headings["payment number"]],
+        )
         x["invoice date"] = iso_date(x["invoice date"])
         x["payment date"] = iso_date(x["payment date"])
         x["invoice_amount_minor"] = minor(x["invoice amount"])

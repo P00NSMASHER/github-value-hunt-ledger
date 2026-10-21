@@ -168,3 +168,24 @@ def test_different_suppliers_can_have_the_same_invoice_number_and_amount_changes
     assert result["unique_economic_invoices"] == 2
     assert result["matched_original_invoices"] == 2
     assert result["republication_payment_annotations_consistent"] is True
+
+
+@pytest.mark.parametrize("raw_id", [
+    b"000123\x1f",  # Python strip() would silently erase a trailing delimiter
+    b"\x1f000123",  # Python strip() would silently erase a leading delimiter
+])
+def test_both_parsers_reject_control_char_before_implicit_stripping(raw_id):
+    corrupt = _original().replace(b"000123", raw_id)
+    with pytest.raises(ValueError, match="NONCANONICAL_PUBLIC_SOURCE_IDENTITY"):
+        census.decode_month(corrupt, "2026-08")
+    with pytest.raises(ValueError, match="NONCANONICAL_PUBLIC_SOURCE_IDENTITY"):
+        lab.parse_pennine_csv(corrupt, "2026-08")
+
+
+def test_both_parsers_reject_duplicate_required_csv_header():
+    corrupt = _original().replace(b"Invoice Number,Invoice Date",
+                                  b"Invoice Number,Invoice Number,Invoice Date")
+    with pytest.raises(ValueError, match="AMBIGUOUS_PUBLIC_SOURCE_HEADERS"):
+        census.decode_month(corrupt, "2026-08")
+    with pytest.raises(ValueError, match="AMBIGUOUS_PUBLIC_SOURCE_HEADERS"):
+        lab.parse_pennine_csv(corrupt, "2026-08")

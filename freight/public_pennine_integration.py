@@ -89,6 +89,8 @@ def decode_month(raw: bytes, month: str) -> tuple[dict, ...]:
         norm = [re.sub(r"\s+", " ", x.strip().lower()) for x in fields]
         if heading is None:
             if all(x in norm for x in REQUIRED):
+                if any(norm.count(key) != 1 for key in REQUIRED):
+                    raise ValueError("AMBIGUOUS_PUBLIC_SOURCE_HEADERS")
                 heading = {key: norm.index(key) for key in REQUIRED}
             continue
         if not fields or not any(f.strip() for f in fields):
@@ -101,7 +103,9 @@ def decode_month(raw: bytes, month: str) -> tuple[dict, ...]:
         for key in ("supplier number", "invoice number", "payment number"):
             if not record[key]:
                 raise ValueError("missing publicly disclosed source identity")
-            require_canonical_source_identity(record[key])
+            require_canonical_source_identity(
+                record[key], raw_value=fields[heading[key]],
+            )
         if record["payment currency"].upper() != "GBP":
             raise ValueError("unexpected public currency")
         record["invoice date"] = _date(record["invoice date"])

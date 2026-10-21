@@ -58,6 +58,10 @@ Actions artifacts, or public step summaries.
    invoice amount is held for source adjudication, not silently counted as a
    second invoice; control-character or Unicode alias-form source identities
    are rejected before delimiter-based keys and derived transaction IDs.
+   CSV header candidates must contain each required field exactly once.
+   Original invoice, supplier and remittance cells are checked before
+   whitespace stripping, so a trailing control character cannot vanish into
+   the same hashed identity as the clean invoice.
 5. A separate ArcBest smoke test may construct canonical records from the
    original document's printed postal codes, rated weight, shipment date and
    total. It explicitly marks the **shipment-date-as-invoice-date proxy**, the
