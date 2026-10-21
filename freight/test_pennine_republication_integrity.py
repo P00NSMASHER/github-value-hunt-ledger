@@ -332,3 +332,93 @@ def test_reference_scoped_replay_requires_exact_map_coverage(missing_map,extra_m
         lab.reference_scoped_replay(
             [a], [b], invoice_group, {b.id: "PAY-A"},
         )
+
+def test_reference_scoped_replay_reports_orphan_declaration_not_false_complete():
+    """All invoices matched does not mean all declared payments reconciled."""
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    invoice = ReconTxn("syn-invoice", "25.00", "2026-07-01", "GBP", "PAY-A")
+    matched = ReconTxn("syn-decl", "25.00", "2026-07-01", "GBP", "PAY-A")
+    orphan = ReconTxn("syn-orphan", "400.00", "2026-07-01", "GBP", "PAY-ORPHAN")
+    result = lab.reference_scoped_replay(
+        [invoice], [matched, orphan],
+        {invoice.id: "PAY-A"},
+        {matched.id: "PAY-A", orphan.id: "PAY-ORPHAN"},
+    )
+    assert result["matched_invoices"] == 1
+    assert result["matched_groups"] == 1
+    assert result["unmatched_invoices"] == 0
+    assert result["matched_counterparts"] == 1
+    assert result["unmatched_counterparts"] == 1
+    assert result["unmatched_source_declaration_groups"] == 1
+    assert result["source_declaration_reconciliation_complete"] is False
+    assert result["independent_bank_settlements_tested"] == 0
+
+
+def test_reference_scoped_replay_counts_unmatched_amount_declaration():
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    invoice = ReconTxn("syn-invoice", "25.00", "2026-07-01", "GBP", "PAY-A")
+    declared = ReconTxn("syn-decl", "25.01", "2026-07-01", "GBP", "PAY-A")
+    result = lab.reference_scoped_replay(
+        [invoice], [declared], {invoice.id: "PAY-A"}, {declared.id: "PAY-A"},
+    )
+    assert result["matched_invoices"] == 0
+    assert result["unmatched_invoices"] == 1
+    assert result["matched_counterparts"] == 0
+    assert result["unmatched_counterparts"] == 1
+    assert result["unmatched_source_declaration_groups"] == 1
+    assert result["source_declaration_reconciliation_complete"] is False
+
+
+def test_reference_scoped_replay_counts_bounded_out_declaration():
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    a = ReconTxn("syn-a", "12.00", "2026-07-01", "GBP", "PAY-A")
+    b = ReconTxn("syn-b", "13.00", "2026-07-01", "GBP", "PAY-A")
+    declaration = ReconTxn("syn-decl", "25.00", "2026-07-01", "GBP", "PAY-A")
+    result = lab.reference_scoped_replay(
+        [a, b], [declaration],
+        {a.id: "PAY-A", b.id: "PAY-A"},
+        {declaration.id: "PAY-A"}, max_group_size=1,
+    )
+    assert result["groups_over_group_bound"] == 1
+    assert result["unmatched_invoices"] == 2
+    assert result["unmatched_counterparts"] == 1
+    assert result["unmatched_source_declaration_groups"] == 1
+    assert result["source_declaration_reconciliation_complete"] is False
+
+
+def test_reference_scoped_replay_empty_population_not_accepted_as_success():
+    result = lab.reference_scoped_replay([], [], {}, {})
+    assert result["original_unique_invoices"] == 0
+    assert result["same_source_payment_reference_groups"] == 0
+    assert result["source_declaration_reconciliation_complete"] is False
+    assert result["matched_counterparts"] == 0
+    assert result["unmatched_counterparts"] == 0
+
+def test_adversarial_declared_payment_controls_refuse_incomplete_declaration_baseline():
+    """Injected fault tests cannot certify a baseline with unexamined payment rows."""
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    invoice = ReconTxn("synthetic-invoice", "25.00", "2026-07-01", "GBP", "PAY-A")
+    matching = ReconTxn("synthetic-declaration", "25.00", "2026-07-01", "GBP", "PAY-A")
+    orphan = ReconTxn("synthetic-orphan", "400.00", "2026-07-01", "GBP", "PAY-B")
+    with pytest.raises(ValueError, match="cannot assess controlled corruption"):
+        lab.adversarial_declared_payment_controls(
+            [invoice], [matching, orphan],
+            {invoice.id: "PAY-A"},
+            {matching.id: "PAY-A", orphan.id: "PAY-B"},
+        )
+
+
+def test_reference_scoped_replay_reports_full_same_source_success():
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    invoice = ReconTxn("synthetic-invoice", "25.00", "2026-07-01", "GBP", "PAY-A")
+    matching = ReconTxn("synthetic-declaration", "25.00", "2026-07-01", "GBP", "PAY-A")
+    result = lab.reference_scoped_replay(
+        [invoice], [matching], {invoice.id: "PAY-A"}, {matching.id: "PAY-A"},
+    )
+    assert result["matched_invoices"] == 1
+    assert result["matched_counterparts"] == 1
+    assert result["unmatched_invoices"] == 0
+    assert result["unmatched_counterparts"] == 0
+    assert result["unmatched_source_declaration_groups"] == 0
+    assert result["source_declaration_reconciliation_complete"] is True
+    assert result["independent_bank_settlements_tested"] == 0

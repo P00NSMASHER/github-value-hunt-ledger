@@ -105,6 +105,13 @@ independent payment truth label.
    reference. Supplier identity in full keys is still sourced from the same
    publisher disclosure, not an independent bank identity confirmation.
    This measures structural consistency, not bank-cleared matching accuracy.
+   Completeness is explicitly two-sided: the report counts matched and
+   unmatched source-declared counterparts as well as invoices. An orphaned
+   declaration, oversized/unmatched group, or empty population leaves
+   `source_declaration_reconciliation_complete=false`, even if every invoice
+   is matched. The controlled fault-injection suite requires this complete
+   same-source baseline before testing mutations. Neither a matched
+   declaration nor this completeness flag establishes independent bank clearing.
 8. Run four **controlled negative tests** with the real published invoice
    population: plus-one-penny counterpart amount, incorrect payment reference,
    wrong currency, and duplicate grouped payment declaration. All must result

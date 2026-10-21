@@ -554,6 +554,9 @@ def reference_scoped_replay(
     result_by_rule: Counter = Counter()
     grouped_matched = 0
     grouped_unmatched = 0
+    grouped_matched_counterparts = 0
+    grouped_unmatched_counterparts = 0
+    unmatched_source_declaration_groups = 0
     wrong_join = 0
     groups_matched = 0
     limit_groups = 0
@@ -564,11 +567,15 @@ def reference_scoped_replay(
         settlement = by_payment.get(ref, [])
         if not internal or not settlement:
             grouped_unmatched += len(internal)
+            grouped_unmatched_counterparts += len(settlement)
+            unmatched_source_declaration_groups += int(bool(settlement))
             continue
         if len(internal) > max_group_size:
             limit_groups += 1
             limit_invoices += len(internal)
             grouped_unmatched += len(internal)
+            grouped_unmatched_counterparts += len(settlement)
+            unmatched_source_declaration_groups += int(bool(settlement))
             continue
         config = ReconConfig(
             decimals=2, date_window_days=0, amount_tolerance_bps=0,
@@ -580,6 +587,11 @@ def reference_scoped_replay(
         result_by_rule.update(replay.summary.by_rule)
         grouped_matched += replay.summary.matched_internal
         grouped_unmatched += replay.summary.unmatched_internal
+        grouped_matched_counterparts += replay.summary.matched_settlement
+        grouped_unmatched_counterparts += replay.summary.unmatched_settlement
+        unmatched_source_declaration_groups += int(
+            replay.summary.unmatched_settlement > 0
+        )
         groups_matched += replay.summary.matched_settlement
         for match in replay.matches:
             for aid in match.internal_ids:
@@ -594,6 +606,16 @@ def reference_scoped_replay(
         "same_source_payment_reference_groups": len(by_payment),
         "matched_invoices": grouped_matched,
         "unmatched_invoices": grouped_unmatched,
+        "matched_counterparts": grouped_matched_counterparts,
+        "unmatched_counterparts": grouped_unmatched_counterparts,
+        "unmatched_source_declaration_groups": unmatched_source_declaration_groups,
+        "source_declaration_reconciliation_complete": bool(
+            invoices and counterpart
+            and grouped_unmatched == 0
+            and grouped_unmatched_counterparts == 0
+            and wrong_join == 0
+            and limit_groups == 0
+        ),
         "matched_groups": groups_matched,
         "unmatched_over_group_bound_invoices": limit_invoices,
         "groups_over_group_bound": limit_groups,
@@ -604,6 +626,8 @@ def reference_scoped_replay(
     }
     if grouped_matched + grouped_unmatched != len(invoices):
         raise ValueError("invoice-count conservation failed")
+    if grouped_matched_counterparts + grouped_unmatched_counterparts != len(counterpart):
+        raise ValueError("source-declaration-count conservation failed")
     return report
 
 
@@ -626,7 +650,8 @@ def adversarial_declared_payment_controls(
     if exemplar is None:
         raise ValueError("no singleton payment declaration for negative controls")
     base = reference_scoped_replay(invoices, counterparts, invoice_group, payment_group)
-    if base["matched_invoices"] != len(invoices):
+    if (base["matched_invoices"] != len(invoices)
+            or not base["source_declaration_reconciliation_complete"]):
         raise ValueError("cannot assess controlled corruption before structural baseline matches")
 
     def altered(*, amount: str | None = None, currency: str | None = None) -> list[ReconTxn]:

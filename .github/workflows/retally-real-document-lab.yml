@@ -149,6 +149,10 @@ jobs:
           assert scoped['matched_invoices'] == 273
           assert scoped['matched_groups'] == 217
           assert scoped['unmatched_invoices'] == 0
+          assert scoped['matched_counterparts'] == 217
+          assert scoped['unmatched_counterparts'] == 0
+          assert scoped['unmatched_source_declaration_groups'] == 0
+          assert scoped['source_declaration_reconciliation_complete'] is True
           assert scoped['cross_reference_false_joins'] == 0
           assert blind['total_eligible_scored'] == 0
           assert blind['predictions_frozen_before_truth'] is False
