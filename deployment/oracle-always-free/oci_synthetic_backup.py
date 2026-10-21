@@ -194,8 +194,10 @@ class OciStore:
                raw.get("objectLevelAuditMode") == "Disabled" and
                raw.get("objectEventsEnabled") is False and
                raw.get("replicationEnabled") is False and
-               "objectLifecyclePolicyEtag" in raw and
-               raw["objectLifecyclePolicyEtag"] is None and
+               # The older REST representation may omit this OPTIONAL field.
+               # Its typed SDK value is required above, and both bucket ETags
+               # must match; an explicit non-null REST value is still refused.
+               raw.get("objectLifecyclePolicyEtag") is None and
                "autoTiering" in raw and raw["autoTiering"] in (None, "Disabled"),
                "Raw OCI bucket has unapproved KMS, audit, tier, events, replication or lifecycle state.")
         deletion = raw.get("softDeletePolicy")
