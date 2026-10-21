@@ -312,6 +312,35 @@ def _arcbest_page(text: str, page: int) -> InvoiceFace | None:
                        parsed_mode, None if amount else "FACE_AMOUNT_UNREADABLE")
 
 
+def index_unique_invoice_faces(
+    faces: list[InvoiceFace], issuer: str,
+) -> dict[str, InvoiceFace]:
+    """Index a single original PDF without masking duplicate invoice faces.
+
+    Repeated face IDs may be duplicate pages, conflicting invoice amounts or
+    extraction mistakes. All are review-required source ambiguities; never
+    last-write-wins. Diagnostic errors intentionally omit invoice identifiers.
+    """
+    if issuer not in {"globaltranz", "arcbest"} or type(faces) is not list:
+        raise ValueError("INVALID_PUBLIC_INVOICE_FACE_CATALOG")
+    unique: dict[str, InvoiceFace] = {}
+    for face in faces:
+        if (
+            type(face) is not InvoiceFace
+            or face.issuer != issuer
+            or type(face.number) is not str
+            or not face.number.strip()
+            or type(face.page) is not int
+            or face.page < 1
+            or (face.cents is not None and type(face.cents) is not int)
+        ):
+            raise ValueError("INVALID_PUBLIC_INVOICE_FACE_CATALOG")
+        if face.number in unique:
+            raise ValueError("DUPLICATE_PUBLIC_ORIGINAL_INVOICE_FACE")
+        unique[face.number] = face
+    return unique
+
+
 def extract_faces(issuer: str, texts: list[str]) -> list[InvoiceFace]:
     selected = []
     for index, text in enumerate(texts):
@@ -321,6 +350,7 @@ def extract_faces(issuer: str, texts: list[str]) -> list[InvoiceFace]:
                   else _arcbest_page(text, index + 1))
         if result:
             selected.append(result)
+    index_unique_invoice_faces(selected, issuer)
     return selected
 
 
@@ -346,7 +376,7 @@ def statement_rows(texts: list[str]) -> list[dict]:
 
 
 def check_anchors(faces: list[InvoiceFace], anchors: dict) -> dict:
-    by_id = {f.number: f for f in faces}
+    by_id = index_unique_invoice_faces(faces, faces[0].issuer) if faces else {}
     checks = []
     for number, (page, cents) in anchors.items():
         face = by_id.get(number)
@@ -732,7 +762,7 @@ def benchmark_freight() -> dict:
         faces = extract_faces(issuer, texts)
         anchor = check_anchors(faces,
             GLOBAL_FACE_ANCHORS if issuer == "globaltranz" else ARCBEST_FACE_ANCHORS)
-        unique = {f.number: f for f in faces}
+        unique = index_unique_invoice_faces(faces, issuer)
         out = {
             "source_url": url,
             "sha256": digest(raw),

@@ -44,7 +44,12 @@ independent payment truth label.
 2. Use pymupdf as an explicitly **lab-only document text adapter** to extract
    invoice identifiers, face totals, service types and source pages. Cross-check
    against independently observed original-document spot checks. No OCR guesses
-   or ungrounded fields.
+   or ungrounded fields. Enforce unique original invoice-face identifiers before
+   indexing, anchor checks or reconciliation. A repeated face (including a
+   copied page) or a conflicting face amount fails the source replay rather
+   than silently replacing the first entry with the last. Diagnostic errors
+   disclose no underlying invoice identifiers. This is document consistency
+   checking, not evidence of a carrier overcharge.
 3. Reconcile GlobalTranz original invoice face amounts against **original**
    statement amounts using RETALLY's recoveryworks.reconciliation_kernel
    engine. Keep current statement balances separate; do not infer
