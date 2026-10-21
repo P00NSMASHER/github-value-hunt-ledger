@@ -70,7 +70,8 @@ def fake_api(method: str, path: str, payload: dict | None = None):
 
 class RaceProofTests(TestCase):
     def test_disjoint_main_update_gets_one_isolated_ci_proof_and_normal_merge(self):
-        env = {"GITHUB_RUN_ID": "39631700353", "GITHUB_RUN_ATTEMPT": "1"}
+        env = {"GITHUB_RUN_ID": "39631700353", "GITHUB_RUN_ATTEMPT": "1",
+               "RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED": "true"}
         calls = []
         def traced(method, route, payload=None):
             calls.append((method, route))
@@ -145,7 +146,8 @@ class RaceProofTests(TestCase):
                 return fake_api(method, path, payload)
             with self.subTest(target=target), \
                  patch.dict(os.environ, {"GITHUB_RUN_ID": "39631700353",
-                                         "GITHUB_RUN_ATTEMPT": "1"}), \
+                                         "GITHUB_RUN_ATTEMPT": "1",
+                                         "RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED": "true"}), \
                  patch.object(merge, "gh", side_effect=wrong), \
                  patch.object(merge, "dispatch_and_verify") as fresh, \
                  self.assertRaises(ProposalHold):
@@ -164,7 +166,8 @@ class RaceProofTests(TestCase):
                     return {"commit": {"sha": "9" * 40}}
             return fake_api(method, path, payload)
         with patch.dict(os.environ, {"GITHUB_RUN_ID": "39631700353",
-                                     "GITHUB_RUN_ATTEMPT": "1"}), \
+                                     "GITHUB_RUN_ATTEMPT": "1",
+                                     "RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED": "true"}), \
              patch.object(merge, "gh", side_effect=provider), \
              patch.object(merge, "dispatch_and_verify", return_value=45), \
              self.assertRaises(ProposalHold):
@@ -177,6 +180,21 @@ class RaceProofTests(TestCase):
              self.assertRaises(ProposalHold):
             merge.dispatch_and_verify(BRANCH, HEAD, deadline=5010.0)
         provider.assert_not_called()
+
+    def test_default_disabled_proof_mode_never_writes_git_refs_or_merges(self):
+        calls = []
+        def observe(method, path, payload=None):
+            calls.append((method, path))
+            return fake_api(method, path, payload)
+        with patch.dict(os.environ, {"GITHUB_RUN_ID": "39631700353",
+                                     "GITHUB_RUN_ATTEMPT": "1",
+                                     "RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED": "false"}), \
+             patch.object(merge, "gh", side_effect=observe), \
+             patch.object(merge, "dispatch_and_verify") as ci, \
+             self.assertRaises(ProposalHold):
+            merge.integrate(LANE, 99, HEAD, BASE)
+            ci.assert_not_called()
+        self.assertFalse(any(method in {"POST", "PUT"} for method, _ in calls))
 
     def test_missing_run_identity_refuses_provider_write(self):
         with patch.dict(os.environ, {"GITHUB_RUN_ID": "", "GITHUB_RUN_ATTEMPT": "1"}), \
