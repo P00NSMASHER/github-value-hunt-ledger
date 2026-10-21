@@ -1,8 +1,10 @@
 """Compose the RETALLY Group public pages on the existing allowlisted bundle."""
 from html import escape
+from hashlib import sha256
 from pathlib import Path
 import re
 from urllib.parse import quote
+from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 from freight.site.group.catalog import BUSINESSES, DIVISIONS
@@ -161,4 +163,25 @@ def build_group(bundle):
         url = ET.SubElement(tree.getroot(), "{" + ns + "}url")
         ET.SubElement(url, "{" + ns + "}loc").text = NEW_BASE + route + "/"
     tree.write(sitemap, encoding="utf-8", xml_declaration=True)
+    _version_design_assets(bundle)
+
+
+def _version_design_assets(bundle):
+    """Returning visitors must receive the assets matching the current HTML."""
+    revisions = {
+        name: sha256((bundle / name).read_bytes()).hexdigest()[:16]
+        for name in ("group.css", "group.js", "foundry.css", "site.js")
+    }
+
+    def version(match):
+        key, reference = match.groups()
+        url = urlsplit(reference)
+        name = url.path.removeprefix("/")
+        if url.scheme or url.netloc or name not in revisions:
+            return match.group(0)
+        return f'{key}="{url.path}?v={revisions[name]}"'
+
+    for page in bundle.rglob("*.html"):
+        html = page.read_text(encoding="utf-8")
+        page.write_text(re.sub(r'\b(href|src)="([^"]+)"', version, html), encoding="utf-8")
 
