@@ -7,12 +7,13 @@ challenge, worksheet and public resources retain their established root paths.
 
 ## Release state
 
-Prepared for preview on 2026-10-21. The requested target is **retally.com**.
-The currently connected production domain is **www.retallyrecovery.com**.
-The authenticated hosting inventory does not contain a retally.com zone or a
-retally.com custom domain. Do not claim that the target domain is connected.
+On 2026-10-21 the owner clarified that the intended domain is
+**retallyrecovery.com**. The canonical production URL is
+**https://www.retallyrecovery.com/**. The domain is already connected to the
+existing Cloudflare Pages project; no registrar, DNS or mailbox migration is
+required. The earlier retally.com access blocker is resolved by this correction.
 
-The preview is a consolidated marketing site. Existing CaptureBrief and
+This is a consolidated marketing site. Existing CaptureBrief and
 PermitPlate checkout/fulfillment pages and the Resonance demonstration remain on
 their established hosts. The client portal remains an authenticated application.
 Those operational systems have not been migrated or proxied under this site.
@@ -38,31 +39,21 @@ explicitly curated in `catalog.py`; do not infer commercial availability from a
 repository test result. New enquiry links only prepare an email draft. There is
 no new tracking, upload, payment, waitlist subscription or outbound message flow.
 
-## Domain cutover requirements
+## Production publication
 
-1. Obtain authorized DNS/registrar access for the exact `retally.com` domain.
-   Its ownership elsewhere is not resolved by absence from this hosting account.
-   Do not purchase or transfer it without separate bounded instructions.
-2. Inventory and preserve its existing DNS, mail, verification and security
-   records. Add the intended web hostname to the existing Pages project using
-   the hosting provider's required validation. Verify TLS before changing links.
-3. Update the canonical origin, SEO validation, first-party host allowlists,
-   inquiry browser host detection, server Origin checks, managed-challenge
-   hostname configuration, production audit URLs and search-discovery files as
-   one tested migration. Do not merely search/replace the business mailbox.
-4. Use a target-domain preview to verify every page, asset, source URL, security
-   header, customer entry point and inquiry path. A preview email-draft fallback
-   is not evidence of production notification delivery.
-5. Deploy the verified source, then verify the exact live revision. Only after
-   successful target-domain validation add path-preserving redirects from the
-   old marketing destinations. Keep provider checkout, API and authenticated
-   client applications on their working hosts until individually migrated.
-6. Keep the previous production deployment available for rollback. Preserve the
-   `jay@retallyrecovery.com` mailbox and its DNS unless a separate mail migration
-   is actually completed and verified.
-
-Do not redirect the existing sites to an unconnected domain. This branch is
-intentionally reviewable before the domain-access blocker is resolved.
+1. Publish the tested consolidation through the existing protected source and
+   Cloudflare Pages pipeline. Preserve the configured canonical www hostname,
+   apex redirect, mail records, inquiry origins and managed-challenge settings.
+2. Verify the actual production homepage, all eleven business pages, assets,
+   metadata, public resources, security headers and GET-only inquiry status.
+   A successful public-page check is not evidence of enquiry email delivery.
+3. Keep provider checkout, API and authenticated client applications on their
+   working hosts. Their integrations have not been migrated by this release.
+4. Reconcile duplicate legacy marketing offers before replacing their entry
+   points. Do not redirect an operational purchase or fulfilment path to a page
+   that links back to the same old destination.
+5. Keep the previous production deployment available for rollback. Preserve the
+   existing `jay@retallyrecovery.com` business mailbox and DNS.
 
 ## Verification
 
