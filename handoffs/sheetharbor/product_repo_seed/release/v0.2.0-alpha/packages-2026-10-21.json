@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "release": "v0.2.0-alpha",
+  "packaged_on": "2026-10-21",
+  "canonical_workbook_bytes_changed": false,
+  "packages": [
+    {
+      "filename": "SheetHarbor_Maker_Economics_Verified_v0.2.0-alpha_2026-10-21.zip",
+      "products": [
+        "SH-CANDLE",
+        "SH-FDM",
+        "SH-EMB",
+        "SH-SCREEN"
+      ],
+      "bytes": 101530,
+      "sha256": "abe59985d596d9cabbf65d2954a2f81840c2215e0dd75a810bc87d771b3ba92f"
+    },
+    {
+      "filename": "SheetHarbor_Custom_Apparel_Verified_v0.2.0-alpha_2026-10-21.zip",
+      "products": [
+        "SH-EMB",
+        "SH-SCREEN"
+      ],
+      "bytes": 50506,
+      "sha256": "54e23ae3e70a7884426d3f31ba08c41df90cbe12dd0120f17b56ae2e276f469d"
+    }
+  ],
+  "readme_notes": [
+    "Historical compatibility-pending and QA-handoff workbook wording is superseded for exact canonical hashes by the dated release evidence.",
+    "Embedded suggested prices are historical planning suggestions, not an active sale price.",
+    "The full manifest and receipt cover all four products; only SH-EMB and SH-SCREEN are included in the Custom Apparel subset.",
+    "Native Google Sheets acceptance is the retained September 20 receipt, not a new October 21 run."
+  ],
+  "storefront_created": false,
+  "new_stable_version_created": false,
+  "customer_outcomes_established": false
+}

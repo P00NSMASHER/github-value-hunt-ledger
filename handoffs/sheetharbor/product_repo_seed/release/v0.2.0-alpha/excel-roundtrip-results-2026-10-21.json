@@ -1,0 +1,62 @@
+{
+  "gate": "microsoft_excel_roundtrip",
+  "tested_at_utc": "2026-10-21T17:22:55.0712584Z",
+  "excel_version": "16.0",
+  "excel_build": "17830",
+  "products": [
+    {
+      "product_id": "SH-CANDLE",
+      "source_file": "SheetHarbor_Candle_Economics_v0.2.0-alpha.xlsx",
+      "source_sha256_expected": "b289019dbf6c129d640a7b431ab52f3431f9f6d5bf0ead387b309341005631ba",
+      "source_sha256_actual": "b289019dbf6c129d640a7b431ab52f3431f9f6d5bf0ead387b309341005631ba",
+      "excel_version": "16.0",
+      "excel_build": "17830",
+      "first_open_checks": "pass",
+      "reopen_checks": "pass",
+      "roundtrip_file": "SheetHarbor_Candle_Economics_v0.2.0-alpha-excel-roundtrip.xlsx",
+      "roundtrip_sha256": "67e35e56e2301b0d843086f398cb81e5c0086a7f7694b3c246319910bc08a9e7",
+      "failures": []
+    },
+    {
+      "product_id": "SH-FDM",
+      "source_file": "SheetHarbor_FDM_3D_Printing_Economics_v0.2.0-alpha.xlsx",
+      "source_sha256_expected": "94d69ceecf4f894ddacc8ae36f882dde25a918072aa7b802f2b9039a4631a94c",
+      "source_sha256_actual": "94d69ceecf4f894ddacc8ae36f882dde25a918072aa7b802f2b9039a4631a94c",
+      "excel_version": "16.0",
+      "excel_build": "17830",
+      "first_open_checks": "pass",
+      "reopen_checks": "pass",
+      "roundtrip_file": "SheetHarbor_FDM_3D_Printing_Economics_v0.2.0-alpha-excel-roundtrip.xlsx",
+      "roundtrip_sha256": "522e13e5864b0c640afc43c36f3ca7ae342a7de642f1fe93153a47b25f499d20",
+      "failures": []
+    },
+    {
+      "product_id": "SH-EMB",
+      "source_file": "SheetHarbor_Embroidery_Economics_v0.2.0-alpha.xlsx",
+      "source_sha256_expected": "384108221ab99173f91c54d7b5cacbf1c24212b76ea07d05cd56c168fe37bc8d",
+      "source_sha256_actual": "384108221ab99173f91c54d7b5cacbf1c24212b76ea07d05cd56c168fe37bc8d",
+      "excel_version": "16.0",
+      "excel_build": "17830",
+      "first_open_checks": "pass",
+      "reopen_checks": "pass",
+      "roundtrip_file": "SheetHarbor_Embroidery_Economics_v0.2.0-alpha-excel-roundtrip.xlsx",
+      "roundtrip_sha256": "20d09a55ec562396b14bbed65f35b463ba6fc35a6c3cfe9482feb347a4736262",
+      "failures": []
+    },
+    {
+      "product_id": "SH-SCREEN",
+      "source_file": "SheetHarbor_Screen_Printing_Economics_v0.2.0-alpha.xlsx",
+      "source_sha256_expected": "702b5fd6fdcdc69638d570699b323c021b18d3540241d63a24a2828169241b84",
+      "source_sha256_actual": "702b5fd6fdcdc69638d570699b323c021b18d3540241d63a24a2828169241b84",
+      "excel_version": "16.0",
+      "excel_build": "17830",
+      "first_open_checks": "pass",
+      "reopen_checks": "pass",
+      "roundtrip_file": "SheetHarbor_Screen_Printing_Economics_v0.2.0-alpha-excel-roundtrip.xlsx",
+      "roundtrip_sha256": "8174efd19159232d39d2c834d0a64b0cb19e5dc91787b0d22c1fcce98889d0da",
+      "failures": []
+    }
+  ],
+  "pass": true,
+  "failures": []
+}

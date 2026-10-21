@@ -52,6 +52,7 @@ jobs:
           freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
           freight/site/test_rebase_public_urls.py
+          freight/site/group/test_group.py
           freight/site/test_legacy_pages_canonical.py
           freight/marketing/test_indexnow_notify.py
           freight/brand/test_brand_finishing.py
@@ -60,6 +61,7 @@ jobs:
         run: |
           node --check freight/site/commercial-config.js
           node --check freight/site/site.js
+          node --check freight/site/group/group.js
           node --check freight/site/worksheet.js
           node --check freight/site/ltl-evidence-comparator.js
           node --test freight/site/test_ltl_evidence_comparator.cjs
