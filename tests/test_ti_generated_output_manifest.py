@@ -118,6 +118,38 @@ class GeneratedOutputManifestTests(unittest.TestCase):
             ["intelligence/efficiency_metrics.json"],
         )
 
+    def test_dependency_order_preserves_generated_evidence_authority(self):
+        # Guard against an apparently green build persisting metrics that
+        # were computed before their own prerequisite intake/derivation.
+        ordered = ordered_build_steps()
+        # The intake source is synchronized once before and again after
+        # importing new runs. This deliberate two-phase sync is the sole
+        # permitted repeated generator step.
+        self.assertEqual(
+            ordered[:3],
+            ("tools/ti_sync.py", "tools/ti_ingest_runs.py", "tools/ti_sync.py"),
+        )
+        self.assertEqual(
+            [i for i, script in enumerate(ordered)
+             if script == "tools/ti_sync.py"],
+            [0, 2],
+        )
+        self.assertEqual(len(ordered) - len(set(ordered)), 1)
+        precedences = (
+            ("tools/ti_search_move_learning.py", "tools/ti_search_move_policy.py"),
+            ("tools/ti_registry.py", "tools/ti_efficiency_report.py"),
+            ("tools/ti_coordination_report.py", "tools/ti_attribution.py"),
+            ("tools/ti_learning_state.py", "tools/ti_learning_state_validate.py"),
+            ("tools/ti_training_environment.py",
+             "tools/ti_training_environment_validate.py"),
+            ("tools/ti_dispatch.py", "tools/ti_dispatch_validate.py"),
+        )
+        for producer, consumer in precedences:
+            with self.subTest(producer=producer, consumer=consumer):
+                self.assertIn(producer, ordered)
+                self.assertIn(consumer, ordered)
+                self.assertLess(ordered.index(producer), ordered.index(consumer))
+
     def test_publisher_consumes_the_same_checked_manifest(self):
         publisher = SOURCE.read_text(encoding="utf-8")
         self.assertIn('"technology-intelligence-generated-files.txt"', publisher)
