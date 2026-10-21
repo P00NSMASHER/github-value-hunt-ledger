@@ -38,8 +38,9 @@ location and account mapping remain unconnected. The
 project/repository evidence and original private-artifact provenance from private
 business bindings. It recovers the RehabSignal, Contractor Quote Recovery and
 [App Factory product sources](RETALLY_APP_FACTORY_SOURCE_MAP.md), and records the
-proposed ScopeSignal correction in [Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732).
-That unmerged correction leaves ScopeSignal's project identity unassigned and
+merged ScopeSignal correction in [Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732),
+verified at exact merge commit `8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c`.
+That correction leaves ScopeSignal's project identity unassigned and
 preserves CaptureBrief's `PRJ-004` identity. Public private-source
 references contain lookup keys and dates; exact artifact identities stay private.
 Existing schedules, pricing, legal identities and release controls are unchanged.
