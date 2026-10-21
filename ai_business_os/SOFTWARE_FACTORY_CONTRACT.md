@@ -40,21 +40,29 @@ matches the intended operation.
 
 That separation lets more coding work become autonomous without turning repository access into
 unrestricted production authority.
-## RETALLY Group — owner-only human approval
+## RETALLY Group — no mandatory human reviews
 
-For RETALLY Group internal source and release decisions, the owner is the only
-required **human** approver. A separate independent human reviewer is optional,
-not a release prerequisite. This is a scoped authorization-policy change, not a
-grant of machine production authority and not a change to other project policies.
+**RETALLY internal source, code and quality reviews use automated evidence-based
+verification.** No peer reviewer, external reviewer, owner code-review signature,
+or owner artifact-quality sign-off is a required stage for current or future
+RETALLY Group work. The RETALLY public catalog and validator enforce that
+policy using `internal_human_review_required=false`,
+`internal_quality_gate=AUTOMATED_EVIDENCE_QA`, and an
+`AUTOMATED_QUALITY_GATE` workflow role. Required checks must bind to an exact
+candidate revision/artifact, fail closed on unknown or stale evidence, and record
+material defects; no system may claim a human reviewed work that nobody reviewed.
 
-The Step-2 independent auditor is still a separately evidenced technical
-verification stage; it is not a second human approval. All existing fail-closed
-acceptance tests, security checks, branch protections, and Step-6 kill switches
-remain effective. A production/factory merge still needs a **persisted exact**
-owner PRODUCTION_CHANGE authorization matching the current PR, head SHA, merge
-method and audit hash. This general owner policy instruction is not a substitute
-for that exact approval record. Claims of a human review must never be fabricated.
+**Review is not authorization.** This policy does not change the implemented
+Step-6 mandatory authorization rules for external writes, production changes,
+money movements, destructive operations, or policy changes. An exact, authenticated
+authorization may still be required to execute one of those actions. It is not
+a second person or a discretionary code-quality review. Likewise protected-main
+status checks, independent automated auditors, kill switches and budgets remain
+enforced. No assistant or bot may forge approval receipts or skip a required
+authorization, nor does a passing code check authenticate customer, Stripe,
+settlement, source ownership or delivery evidence.
 
-For customer artifacts, owner quality acceptance can replace an otherwise
-optional second human sign-off, but cannot replace source accuracy, delivery
-authorization, payment verification, or legally/contractually required review.
+Legal, regulatory and contractual requirements for a qualified human professional
+are outside this internal-review policy. If required evidence or external
+authorization is unavailable, preserve the relevant hold rather than inventing
+or silently granting permission.
