@@ -43,12 +43,12 @@ def event(kind, *, case="CB-SYNTHETIC", case_sha=CASE_SHA, bundle=None,
             "data": samples[kind] if data is None else data}
 
 
-def producer_ledger(*events):
+def producer_ledger(*events, recorded_at="2026-10-20T20:00:00+00:00"):
     lines = []
     previous = GENESIS
     for item in events:
         body = {"ledger_version": "capturebrief-evidence-ledger-v1", "record_type": "CAPTUREBRIEF_OUTCOME_EVENT",
-                "recorded_at": "2026-10-20T20:00:00+00:00", "previous_record_sha256": previous,
+                "recorded_at": recorded_at, "previous_record_sha256": previous,
                 "payload_sha256": digest(canonical(item)), "payload": item}
         body["record_sha256"] = digest(canonical(body))
         lines.append(json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
@@ -69,6 +69,24 @@ class SnapshotReaderTests(unittest.TestCase):
             return snapshot(observed=datetime.now(timezone.utc).isoformat())
         result = CaptureBriefOutcomeReader(live_capture).observe()
         self.assertEqual("PRESENT_EMPTY", result["snapshot_presence"])
+
+    def test_actual_producer_fractional_capture_time_keeps_same_second_event(self):
+        # CaptureBrief PR #67 emits microsecond precision instead of rounding
+        # the producer's observation down before this record was appended.
+        raw = producer_ledger(
+            event("EFFORT", at="2026-10-20T20:00:00.987000Z"),
+            recorded_at="2026-10-20T20:00:00.987123+00:00",
+        )
+        observed = "2026-10-20T20:00:00.987654+00:00"
+        result = self.reader(snapshot(raw, observed=observed)).observe(now=NOW)
+        self.assertEqual(1, result["outcome_event_count"])
+        self.assertEqual(1, result["ledger_record_count"])
+        self.assertEqual("UNVERIFIED_BY_READER", result["source_authenticity"])
+        self.assertEqual("NOT_CONNECTED", result["account_identity_binding"])
+        self.assertTrue(all(value is None for value in result["verified_metrics"].values()))
+        # Rounding the receipt down falsely moves the valid record into the future.
+        with self.assertRaises(CaptureBriefObservationError):
+            self.reader(snapshot(raw, observed="2026-10-20T20:00:00+00:00")).observe(now=NOW)
 
     def test_genuinely_present_empty_snapshot_not_missing_file(self):
         got = self.reader(snapshot()).observe(now=NOW)

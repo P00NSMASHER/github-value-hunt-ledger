@@ -4,7 +4,11 @@ on:
   pull_request:
     paths:
       - 'freight/real_document_lab.py'
+      - 'freight/public_pennine_integration.py'
+      - 'freight/pennine_publication_integrity.py'
       - 'freight/test_real_document_lab.py'
+      - 'freight/test_public_pennine_integration.py'
+      - 'freight/test_pennine_republication_integrity.py'
       - 'freight/REAL_DOCUMENT_LAB.md'
       - 'freight/REAL_DOCUMENT_LAB_RESULTS_2026-10-20.md'
       - '.github/workflows/retally-real-document-lab.yml'
@@ -31,11 +35,12 @@ jobs:
           python-version: '3.11'
       - name: Install isolated original-PDF text extractor
         run: |
-          python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5
+          python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5 pytest==8.4.2
       - name: Compile and adversarially test lab contracts
         run: |
-          python -m py_compile freight/real_document_lab.py freight/test_real_document_lab.py
+          python -m py_compile freight/real_document_lab.py freight/public_pennine_integration.py freight/pennine_publication_integrity.py freight/test_real_document_lab.py
           python -m unittest -v freight.test_real_document_lab
+          python -m pytest -q freight/test_public_pennine_integration.py freight/test_pennine_republication_integrity.py
       - name: Replay original public invoices and Pennine disclosures
         env:
           PYTHONDONTWRITEBYTECODE: '1'
@@ -114,6 +119,8 @@ jobs:
           assert rated['unsafe_auto_money_or_nondeterministic'] == 0
           assert rated['auto_overcharges_asserted'] == 0
           assert accounting['original_disclosed_rows'] == 314
+          assert accounting['same_source_dual_adapter_parity_verified'] is True
+          assert accounting['same_source_dual_adapter_records_cross_checked'] == 314
           from freight.real_document_lab import FROZEN_DOCUMENT_SHA256, FROZEN_PENNINE_SHA256
           assert gt['sha256'] == FROZEN_DOCUMENT_SHA256['globaltranz']
           assert abf['sha256'] == FROZEN_DOCUMENT_SHA256['arcbest']
@@ -121,6 +128,8 @@ jobs:
               assert file['sha256'] == FROZEN_PENNINE_SHA256[month]
           assert accounting['unique_invoice_economic_identities'] == 273
           assert accounting['cross_month_repeated_rows'] == 41
+          assert accounting['republication_payment_annotations_consistent'] is True
+          assert accounting['invoice_identity_with_changed_payment_reference'] == 0
           assert accounting['declared_payment_references'] == 217
           assert accounting['published_payment_status_counts'] == {'fully paid': 273}
           assert accounting['same_supplier_invoice_with_different_amount_or_date'] == 0
@@ -140,6 +149,10 @@ jobs:
           assert scoped['matched_invoices'] == 273
           assert scoped['matched_groups'] == 217
           assert scoped['unmatched_invoices'] == 0
+          assert scoped['matched_counterparts'] == 217
+          assert scoped['unmatched_counterparts'] == 0
+          assert scoped['unmatched_source_declaration_groups'] == 0
+          assert scoped['source_declaration_reconciliation_complete'] is True
           assert scoped['cross_reference_false_joins'] == 0
           assert blind['total_eligible_scored'] == 0
           assert blind['predictions_frozen_before_truth'] is False
@@ -166,7 +179,7 @@ jobs:
               stream.write(f"- GlobalTranz: {gt['distinct_invoice_face_ids']} original invoice faces, {stmt['rows']} statement lines; {stmt['face_to_statement_original_amount']['matched_invoices']} source-document amount joins.\n")
               stream.write(f"- GlobalTranz original charge math: {source_lines['invoice_face_exact_line_sum']}/100 line sums exact from {source_lines['component_tokens_extracted']} original charge tokens; {source_lines['invoice_faces_containing_negative_discounts']} invoices require unsupported signed freight discount lines (tracked in issue #509).\n")
               stream.write(f"- ArcBest: {abf['distinct_invoice_face_ids']} original invoices; {rated['engine_review_required']} source-derived laboratory proxies passed into the real rating engine, all REVIEW REQUIRED.\n")
-              stream.write(f"- Pennine: {accounting['original_disclosed_rows']} disclosures, {accounting['unique_invoice_economic_identities']} unique invoices, {accounting['cross_month_repeated_rows']} repeated disclosures.\n")
+              stream.write(f"- Pennine: {accounting['original_disclosed_rows']} disclosures, {accounting['unique_invoice_economic_identities']} unique invoices, {accounting['cross_month_repeated_rows']} repeated disclosures; consistent source payment annotations: {accounting['republication_payment_annotations_consistent']}.\n")
               stream.write(f"- Actual RETALLY kernel: unscoped matched {unscoped['matched_invoices']} / 273; bounded reference-scoped replay matched {scoped['matched_invoices']} / 273; zero cross-reference mismatches.\n")
               stream.write(f"- All four deliberate accounting-corruption controls detected; original public source bytes match seven frozen SHA-256 values.\n")
               stream.write(f"- Historical GAO decision references: 8; three adjudicated financial-arithmetic precedents checked; fully linked independent labels: 0. Freight precision/recall/accuracy **not calculable**.\n")
