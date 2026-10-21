@@ -120,6 +120,25 @@ class ContextTests(unittest.TestCase):
                 with self.assertRaises(m.Refused):
                     m.require_env(s)
 
+    def test_rejected_oidc_url_reports_safe_host_only(self):
+        for url, allowed_label in (
+            ("https://pipelinesghubeus13.actions.githubusercontent.com:444/idtoken?SECRET_QUERY",
+             "pipelinesghubeus13"),
+            ("https://untrusted.example/idtoken?SECRET_QUERY", "OTHER"),
+        ):
+            with self.subTest(url=url):
+                s = fixture()
+                s["ACTIONS_ID_TOKEN_REQUEST_URL"] = url
+                output = io.StringIO()
+                with patch("sys.stdout", output):
+                    with self.assertRaises(m.Refused):
+                        m.require_env(s)
+                self.assertIn("RETALLY OCI OIDC ORIGIN: ", output.getvalue())
+                self.assertIn("label=" + allowed_label, output.getvalue())
+                self.assertNotIn("SECRET_QUERY", output.getvalue())
+                self.assertNotIn("idtoken", output.getvalue())
+                self.assertNotIn("untrusted.example", output.getvalue())
+
     def test_sanitized_context_failure_names_key_not_value(self):
         bad = fixture()
         bad["GITHUB_REPOSITORY_ID"] = "TOP_SECRET_FOR_TEST"
