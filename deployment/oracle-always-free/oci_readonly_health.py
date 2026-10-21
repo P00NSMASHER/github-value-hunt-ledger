@@ -284,6 +284,13 @@ def safe_failure_code(exc: Exception) -> str:
         ):
             return label
         if label in {
+            "Only scheduled or manual main-branch execution is allowed",
+            "Monitor is not explicitly enabled",
+            "Identity-domain URL must be an OCI HTTPS identity domain origin",
+            "GitHub OIDC request endpoint is not trusted",
+            "Invalid OCI namespace",
+            "Invalid OCI compartment/tenancy OCID",
+            "Invalid expected VM OCID",
             "OIDC_TOKEN_OR_CLAIMS", "OCI_TOKEN_EXCHANGE",
             "OCI_SIGNER_INITIALIZATION", "OCI_CLIENT_INITIALIZATION",
             "OCI_BUCKET_READ_OR_VALIDATION", "OCI_INSTANCE_READ_OR_VALIDATION",
