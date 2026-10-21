@@ -110,6 +110,22 @@ class ContextTests(unittest.TestCase):
         self.assertEqual(m.safe_failure_code(m.Refused("OCI_TOKEN_EXCHANGE")),
                          "OCI_TOKEN_EXCHANGE")
 
+    def test_fixed_preflight_reasons_report_safe_codes(self):
+        allowed = (
+            "Only scheduled or manual main-branch execution is allowed",
+            "Monitor is not explicitly enabled",
+            "Identity-domain URL must be an OCI HTTPS identity domain origin",
+            "GitHub OIDC request endpoint is not trusted",
+            "Invalid OCI namespace",
+            "Invalid OCI compartment/tenancy OCID",
+            "Invalid expected VM OCID",
+        )
+        for reason in allowed:
+            with self.subTest(reason=reason):
+                self.assertEqual(m.safe_failure_code(m.Refused(reason)), reason)
+        self.assertEqual(m.safe_failure_code(m.Refused("SECRET_EXAMPLE_VALUE")),
+                         "UNCLASSIFIED_FAILURE")
+
     def test_github_claim_exactness_and_expiry(self):
         good = claims()
         m.validate_claims(good, "schedule")
