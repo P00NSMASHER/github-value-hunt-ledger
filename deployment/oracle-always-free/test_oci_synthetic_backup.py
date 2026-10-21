@@ -641,7 +641,7 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
              patch.object(self.store, "delete_version") as delete:
             state = backup.resume_legacy_quarantine(self.store, items)
         self.assertEqual(state["_sha256"], backup.sha(self.raw))
-        self.assertEqual(get.call_count, 2)
+        self.assertEqual(get.call_count, 1)
         self.assertEqual(self.receipt.read_bytes(), frozen)
         delete.assert_not_called()
 
