@@ -915,14 +915,52 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
     return rows
 
 
+def verify_public_csv_adapter_parity(
+    laboratory_rows: list[dict], publisher_rows: tuple[dict, ...] | list[dict],
+) -> int:
+    """Check independent parser outputs for exact same-source row multiset.
+
+    Both parsers consume the same public source; agreement is a parser
+    consistency test, not a second bank ledger or payment authentication.
+    Never include private source identifiers in raised errors or reports.
+    """
+    if type(laboratory_rows) is not list or type(publisher_rows) not in (list, tuple):
+        raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_INVALID")
+    fields = ("supplier number", "invoice number", "invoice date",
+              "payment number", "payment date", "payment currency",
+              "payment status name")
+
+    def row_key(row: dict, amount_field: str) -> tuple:
+        try:
+            amount = row[amount_field]
+            parts = tuple(row[field] for field in fields)
+        except (TypeError, KeyError):
+            raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_INVALID") from None
+        if type(amount) is not int or any(type(value) is not str for value in parts):
+            raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_INVALID")
+        return parts + (amount,)
+
+    left = Counter(row_key(row, "invoice_amount_minor") for row in laboratory_rows)
+    right = Counter(row_key(row, "invoice amount minor") for row in publisher_rows)
+    if left != right:
+        raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_MISMATCH")
+    return len(laboratory_rows)
+
+
 def benchmark_pennine() -> dict:
+    from freight.public_pennine_integration import decode_month as independent_decode_month
+
     all_rows: list[dict] = []
     source_hashes = {}
     monthly_counts = {}
+    parity_records = 0
     for month, url in PENNINE.items():
         raw = fetch_public(url)
         require_frozen_source("pennine", month, raw)
         rows = parse_pennine_csv(raw, month)
+        parity_records += verify_public_csv_adapter_parity(
+            rows, independent_decode_month(raw, month),
+        )
         monthly_counts[month] = len(rows)
         source_hashes[month] = {"url": url, "sha256": digest(raw), "bytes": len(raw)}
         all_rows.extend(rows)
@@ -1003,6 +1041,8 @@ def benchmark_pennine() -> dict:
         "source_files": source_hashes,
         "monthly_rows": monthly_counts,
         "original_disclosed_rows": len(all_rows),
+        "same_source_dual_adapter_parity_verified": True,
+        "same_source_dual_adapter_records_cross_checked": parity_records,
         "unique_invoice_economic_identities": len(by_identity),
         "repeated_invoice_disclosures_not_duplicate_payments": disclosed_overlap,
         "republication_payment_annotations_consistent": True,

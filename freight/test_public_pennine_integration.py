@@ -101,7 +101,7 @@ def _complete_public_report_fixture():
         "independently_proven_bank_settlements": 0,
         "actual_freight_detection_accuracy": None,
         "realized_recovery_minor": 0,
-        "replay_hash": "a" * 64,
+        "replay_hash": "c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213",
         "publication_claim_approved": False,
     }
 
@@ -128,3 +128,10 @@ def test_public_report_receipt_rejects_false_accounting_provenance(field, corrup
     original[field] = corrupt
     with pytest.raises(ValueError):
         assert_public_census_result(original)
+
+
+def test_census_replay_hash_is_source_pinned_not_merely_well_formed():
+    forged = _complete_public_report_fixture()
+    forged["replay_hash"] = "b" * 64  # valid SHA-256 syntax, wrong result
+    with pytest.raises(ValueError, match="replay_hash"):
+        assert_public_census_result(forged)

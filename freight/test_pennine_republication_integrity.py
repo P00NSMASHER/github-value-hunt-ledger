@@ -189,3 +189,54 @@ def test_both_parsers_reject_duplicate_required_csv_header():
         census.decode_month(corrupt, "2026-08")
     with pytest.raises(ValueError, match="AMBIGUOUS_PUBLIC_SOURCE_HEADERS"):
         lab.parse_pennine_csv(corrupt, "2026-08")
+
+
+def test_pennine_dual_source_parser_parity_preserves_every_record():
+    original = _original()
+    lab_rows = lab.parse_pennine_csv(original, "2026-08")
+    census_rows = census.decode_month(original, "2026-08")
+    lab.verify_public_csv_adapter_parity(lab_rows, census_rows)
+
+
+def test_pennine_dual_source_parser_parity_refuses_one_penny_drift():
+    original = _original()
+    lab_rows = lab.parse_pennine_csv(original, "2026-08")
+    census_rows = [dict(row) for row in census.decode_month(original, "2026-08")]
+    census_rows[0]["invoice amount minor"] += 1
+    with pytest.raises(ValueError, match="PUBLIC_CSV_ADAPTER_PARITY_MISMATCH") as error:
+        lab.verify_public_csv_adapter_parity(lab_rows, census_rows)
+    assert "000123" not in str(error.value)
+
+
+def test_pennine_dual_source_parser_parity_refuses_row_drop():
+    original = _original()
+    lab_rows = lab.parse_pennine_csv(original, "2026-08")
+    with pytest.raises(ValueError, match="PUBLIC_CSV_ADAPTER_PARITY_MISMATCH"):
+        lab.verify_public_csv_adapter_parity(lab_rows, [])
+
+def test_actual_lab_benchmark_aborts_if_independent_parser_diverges():
+    source = _original()
+    parsed = [dict(x) for x in census.decode_month(source, "2026-08")]
+    parsed[0]["invoice amount minor"] += 1
+    with patch.dict(lab.PENNINE, {
+        "2026-08": "https://example.invalid/synthetic"
+    }, clear=True), patch.object(lab, "fetch_public", return_value=source), \
+         patch.object(lab, "require_frozen_source", return_value="synthetic-only"), \
+         patch.object(census, "decode_month", return_value=tuple(parsed)):
+        with pytest.raises(ValueError, match="PUBLIC_CSV_ADAPTER_PARITY_MISMATCH"):
+            lab.benchmark_pennine()
+
+
+def test_adapter_parity_respects_duplicate_multiplicity():
+    source = _original()
+    lab_rows = lab.parse_pennine_csv(source, "2026-08")
+    published = census.decode_month(source, "2026-08")
+    with pytest.raises(ValueError, match="PUBLIC_CSV_ADAPTER_PARITY_MISMATCH"):
+        lab.verify_public_csv_adapter_parity(lab_rows, published + published)
+
+def test_public_source_registries_have_identical_pins_and_urls():
+    assert set(lab.PENNINE) == set(lab.FROZEN_PENNINE_SHA256) == set(census.SOURCES)
+    for month, (route, digest, expected_rows) in census.SOURCES.items():
+        assert lab.PENNINE[month] == census.ROOT + "/download_file/" + route
+        assert lab.FROZEN_PENNINE_SHA256[month] == digest
+        assert type(expected_rows) is int and expected_rows > 0

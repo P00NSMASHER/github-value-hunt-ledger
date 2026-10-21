@@ -28,6 +28,14 @@ bytes only into an ephemeral GitHub-hosted runner. It does **not** store their
 original bytes, invoice rows, per-invoice identities, or extracted text in Git,
 Actions artifacts, or public step summaries.
 
+The source-scoped Pennine accounting replay digest is also pinned to an exact
+SHA-256 fingerprint observed independently on Windows and a GitHub-hosted Linux
+run: `c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213`.
+A source or reconciliation-algorithm change that alters this fingerprint must
+be reviewed and explicitly re-baselined. The fingerprint binds a specific
+source/kernel replay; it is **not** a cryptographic bank attestation or an
+independent payment truth label.
+
 ## Real engine calls and evidence limits
 
 1. Run freight.ingestion_gateway.ingest_bytes on **each original PDF**. The
@@ -62,6 +70,13 @@ Actions artifacts, or public step summaries.
    Original invoice, supplier and remittance cells are checked before
    whitespace stripping, so a trailing control character cannot vanish into
    the same hashed identity as the clean invoice.
+   The laboratory also parses each original Pennine CSV through the separate
+   public census adapter and compares the complete normalized row multisets
+   (including integer pennies, references, dates, status and duplicate counts)
+   in memory. It emits only aggregate pass/count metadata. Both adapters read
+   the **same publisher bytes**: agreement detects parser drift and missing
+   rows, not independent payment or settlement truth. Frozen source URL/SHA
+   registries must agree between adapters.
 5. A separate ArcBest smoke test may construct canonical records from the
    original document's printed postal codes, rated weight, shipment date and
    total. It explicitly marks the **shipment-date-as-invoice-date proxy**, the

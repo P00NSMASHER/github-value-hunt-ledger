@@ -119,6 +119,8 @@ jobs:
           assert rated['unsafe_auto_money_or_nondeterministic'] == 0
           assert rated['auto_overcharges_asserted'] == 0
           assert accounting['original_disclosed_rows'] == 314
+          assert accounting['same_source_dual_adapter_parity_verified'] is True
+          assert accounting['same_source_dual_adapter_records_cross_checked'] == 314
           from freight.real_document_lab import FROZEN_DOCUMENT_SHA256, FROZEN_PENNINE_SHA256
           assert gt['sha256'] == FROZEN_DOCUMENT_SHA256['globaltranz']
           assert abf['sha256'] == FROZEN_DOCUMENT_SHA256['arcbest']

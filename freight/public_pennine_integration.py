@@ -32,6 +32,10 @@ SOURCES = {
     "2026-07": ("5920/277", "ecb986bd0e33cf402f7cb86ff68bc91368d18a5dfc39410e4e2019c045c3de15", 103),
     "2026-08": ("5941/277", "4153ccbbbe27307afddba1d6651bfd9db8a774cc84e4fd23d62b3a2d1059d796", 41),
 }
+# Independently replayed on both Windows and the hosted Linux acceptance runner.
+# Regression fingerprint of pinned source bytes through the current scoped
+# reconciliation kernel; never a bank authentication or customer truth proof.
+EXPECTED_CENSUS_REPLAY_SHA256 = "c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213"
 MAX_CSV_BYTES = 250_000
 AMOUNT_RE = re.compile(r"^-?(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)(?:\.[0-9]{1,2})?$")
 REQUIRED = ("supplier number", "invoice number", "invoice date", "invoice amount",
@@ -246,7 +250,9 @@ def assert_public_census_result(result: dict) -> None:
 
     replay_hash = result.get("replay_hash")
     if type(replay_hash) is not str or re.fullmatch(r"[0-9a-f]{64}", replay_hash) is None:
-        raise ValueError("public accounting replay hash must be lower-case SHA-256")
+        raise ValueError("public accounting replay_hash must be lower-case SHA-256")
+    if replay_hash != EXPECTED_CENSUS_REPLAY_SHA256:
+        raise ValueError("public accounting replay_hash differs from frozen source/kernel witness")
 
     if result.get("republication_payment_annotations_consistent") is not True:
         raise ValueError("public accounting replay lacks verified republication consistency")
