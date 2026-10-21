@@ -11,6 +11,76 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError, sync_pla
 from freight.site.group.build import ROUTES
 
 
+CONSOLE_HEADING = "What would you like to move forward?"
+GREEN_CANVAS = "rgb(7, 58, 47)"
+
+
+def check_group_canvas(page, slug, output, width):
+    """Check the exposed page canvas and sticky navigation below the hero."""
+    selectors = ([".group-principles", "#businesses", ".group-approach", ".studio-section"]
+                 if not slug else [".group-footer"] if slug == "contact" else
+                 [".business-section-nav", "#focus", "#next-steps", "#scope"])
+    surfaces = page.evaluate("""selectors => {
+      const background = element => {
+        while (element) {
+          const color = getComputedStyle(element).backgroundColor;
+          if (color !== 'rgba(0, 0, 0, 0)' && color !== 'transparent') return color;
+          element = element.parentElement;
+        }
+        return 'transparent';
+      };
+      return ['body', ...selectors].map(selector => {
+        const element = document.querySelector(selector);
+        return {selector, present: !!element, background: element ? background(element) : null};
+      });
+    }""", selectors)
+    assert all(surface["present"] and surface["background"] == GREEN_CANVAS
+               for surface in surfaces), {"route": slug or "home", "width": width, "surfaces": surfaces}
+    header = page.locator(".group-header")
+    header_state = """element => {
+      const rect = element.getBoundingClientRect(), style = getComputedStyle(element);
+      return {top: rect.top, height: rect.height, background: style.backgroundColor,
+              color: style.color, position: style.position, scrollY: window.scrollY};
+    }"""
+    before = header.evaluate(header_state)
+    target = "#businesses" if not slug else ".group-footer" if slug == "contact" else "#focus"
+    page.locator(target).evaluate("""async element => {
+      const header = document.querySelector('.group-header');
+      window.scrollTo({top: element.getBoundingClientRect().top + scrollY - header.offsetHeight,
+                       behavior: 'instant'});
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }""")
+    after = header.evaluate(header_state)
+    assert before["background"] == after["background"] == GREEN_CANVAS, (before, after)
+    assert before["color"] == after["color"] and before["color"] != GREEN_CANVAS, (before, after)
+    assert before["position"] == after["position"] == "sticky", (before, after)
+    assert abs(before["top"]) <= 1 and abs(after["top"]) <= 1 and after["scrollY"] > 0, (before, after)
+    if slug in ("", "capturebrief"):
+        page.screenshot(path=str(output / f'{slug or "home"}-{width}-beyond-hero.png'), full_page=False)
+    page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
+    return {"route": slug or "home", "width": width, "surfaces": surfaces,
+            "header_before": before, "header_after": after}
+
+
+def check_console_breakpoints(page, base, output):
+    """Guard the 501–800px interval where hiding a break joined two words."""
+    results = []
+    for width in (500, 501, 768, 800, 801):
+        page.set_viewport_size({"width": width, "height": 1024})
+        page.goto(base + "/", wait_until="networkidle")
+        page.evaluate("document.fonts.ready")
+        heading = page.locator(".hero-console h2")
+        assert heading.is_visible()
+        text = " ".join(heading.inner_text().split())
+        assert text == CONSOLE_HEADING, {"width": width, "visible_heading": text}
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+        if width in (501, 800):
+            heading.scroll_into_view_if_needed()
+            page.screenshot(path=str(output / f"home-console-{width}.png"), full_page=False)
+        results.append({"width": width, "visible_heading": text, "passed": True})
+    return results
+
+
 def load_page_images(page):
     """Exercise native lazy loading before judging images or taking screenshots."""
     page.evaluate("""async () => {
@@ -112,6 +182,7 @@ def main():
     Thread(target=server.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{server.server_port}"
     report = {"pages": [], "interactions": [], "chat_clearance": [], "non_get_requests": [],
+              "green_canvas": [], "console_breakpoints": [],
               "external_requests_blocked": 0, "passed": False,
               "accessibility": {"status": "pending" if axe_source else "skipped",
                                 "reason": None if axe_source else "No local axe-core script supplied with --axe-js",
@@ -161,6 +232,8 @@ def main():
                     page.screenshot(path=str(args.out / f'{slug or "home"}-{width}.png'), full_page=True)
                     if slug in ("", "capturebrief", "contact"):
                         page.screenshot(path=str(args.out / f'{slug or "home"}-{width}-viewport.png'), full_page=False)
+                    if slug != "recovery":
+                        report["green_canvas"].append(check_group_canvas(page, slug, args.out, width))
                 page.goto(base + "/")
                 menu = page.locator(".business-menu summary")
                 menu.focus()
@@ -187,6 +260,7 @@ def main():
             context.route("**/*", route)
             page = context.new_page()
             report["chat_clearance"].append(check_chat_clearance(page, base, args.out, 1363, 936))
+            report["console_breakpoints"] = check_console_breakpoints(page, base, args.out)
             context.close()
             browser.close()
         assert not report["non_get_requests"]
@@ -200,6 +274,8 @@ def main():
         (args.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"RETALLY Group: {len(report['pages'])} responsive page checks, keyboard menus, business navigation, "
           f"email-draft controls, legacy freight anchors and {len(report['chat_clearance'])} chat-clearance checks passed; "
+          f"{len(report['green_canvas'])} green-canvas/header checks and "
+          f"{len(report['console_breakpoints'])} heading-breakpoint checks passed; "
           f"no POSTs sent. Accessibility: {report['accessibility']['status']}.")
 
 

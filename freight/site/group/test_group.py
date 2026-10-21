@@ -282,6 +282,18 @@ def test_homepage_features_only_the_three_available_offers(bundle):
     assert sorted(featured) == ["/capturebrief/", "/permitplate/", "/recovery/"]
 
 
+def test_homepage_offer_heading_preserves_word_separation_without_layout_breaks(bundle):
+    page = Page((bundle / "index.html").read_text())
+    headings = [(tag, attrs, parents) for tag, attrs, parents in page.elements
+                if tag == "h2" and within(parents, css_class="hero-console")]
+    assert len(headings) == 1
+    # Join actual text nodes without inserting spaces: otherwise this test would
+    # conceal the original `you<br>like` regression when CSS hides the break.
+    text = "".join(text for text, parents in page.texts
+                   if within(parents, css_class="hero-console") and within(parents, tag="h2"))
+    assert " ".join(text.split()) == "What would you like to move forward?"
+
+
 def test_returning_visitors_receive_current_design_assets(bundle, tmp_path):
     names = {"group.css", "group.js", "foundry.css", "site.js"}
     seen = set()
