@@ -11,6 +11,14 @@ The repository owner expressly authorizes code integration **without a required 
 3. Respect existing GitHub protected-branch rules and merge permissions. Do **not** force-push, dismiss checks, spoof reviews, disable verification jobs or bypass GitHub protections to achieve a merge.
 4. Stage/merge dependent changes in correct order, rechecking the current target SHA. Keep changes reversible and retain test evidence.
 
+## GitHub main branch enforcement
+
+The proposed GitHub ruleset in [`.github/retally-main-ruleset.json`](../.github/retally-main-ruleset.json) applies to **only the default branch** and requires pull requests, zero human approvals, GitHub Actions `release-gate`, no bypass actors, no deletions or force pushes, and tests against the latest base branch. It is a declarative **configuration candidate**, not proof that GitHub has installed it.
+
+The repository-owner administrator must apply the manifest through GitHub's Settings → Rules → Rulesets interface (or an appropriately authenticated `gh api --method POST repos/P00NSMASHER/github-value-hunt-ledger/rulesets --input .github/retally-main-ruleset.json`). Do not paste credentials, relax repository protections or use an unverified token. Read back `GET /repos/P00NSMASHER/github-value-hunt-ledger/rulesets` and `GET /repos/P00NSMASHER/github-value-hunt-ledger/rules/branches/main` to confirm enforcement, then verify a small disposable PR merges with exact-head CI success and **no human review**. A failed or unavailable admin operation does not count as protection.
+
+**Only `release-gate` is globally required**: `Repository Release Gate` runs for every pull request and its final job fails unless all four independent CI lanes pass. `main-only-policy` and the specialized `RecoveryWorks` jobs are path-filtered and must *not* be required globally, or unrelated PRs can become permanently unmergeable. Never disable these specialized checks when relevant.
+
 ## Separate operational and customer boundaries — NOT waived
 
 - A code merge is **not** an approval to create billed infrastructure, turn on a VM service, publish Cloudflare DNS/tunnels, create Access Allow policies, or process customer data.
