@@ -480,6 +480,32 @@ def _recon_result(a: list[ReconTxn], b: list[ReconTxn], lookup: dict[str, str] |
 
 
 
+def _validate_replay_group_binding(row: ReconTxn, group: str) -> None:
+    """Bind a claimed source remittance partition to the actual transaction.
+
+    Full publisher keys contain supplier, reference, date and currency; compact
+    synthetic fixtures contain the reference alone. Both forms must agree with
+    original source-derived transaction fields before invoking the kernel.
+    """
+    if type(group) is not str or not group or group != group.strip():
+        raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+    parts = group.split(chr(31))
+    if len(parts) == 4:
+        supplier, reference, date, currency = parts
+        if (
+            not supplier or supplier != supplier.strip()
+            or not reference or (reference, date, currency) != (
+                row.reference, row.date, row.currency
+            )
+        ):
+            raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+    elif len(parts) == 1:
+        if group != row.reference:
+            raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+    else:
+        raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+
+
 def reference_scoped_replay(
     invoices: list[ReconTxn], counterpart: list[ReconTxn],
     invoice_group: dict[str, str], payment_group: dict[str, str],
@@ -492,8 +518,31 @@ def reference_scoped_replay(
     The reference-scoped adapter cannot pair an invoice with another remittance
     and preserves the original unscoped result for a comparative diagnostic.
     No bank payment is manufactured: counterparts remain same-source aggregate
-    declarations. Groups above the explicit bound abstain.
+    declarations. Groups above the explicit bound abstain. Mapping labels
+    cannot silently contradict the source-derived reference, date or currency.
     """
+    # The kernel's many-to-one candidate window is 18; a larger bound would
+    # silently under-search some supposedly eligible remittance partitions.
+    if type(max_group_size) is not int or not 1 <= max_group_size <= 18:
+        raise ValueError("INVALID_SOURCE_GROUP_BOUND")
+    if type(invoices) is not list or type(counterpart) is not list:
+        raise ValueError("PUBLIC_SOURCE_TRANSACTIONS_INVALID")
+    all_rows = invoices + counterpart
+    if any(type(row) is not ReconTxn or type(row.id) is not str or not row.id
+           for row in all_rows):
+        raise ValueError("PUBLIC_SOURCE_TRANSACTIONS_INVALID")
+    all_ids = [row.id for row in all_rows]
+    if len(set(all_ids)) != len(all_ids):
+        raise ValueError("DUPLICATE_SOURCE_TRANSACTION_ID")
+    if (type(invoice_group) is not dict or type(payment_group) is not dict
+            or set(invoice_group) != {row.id for row in invoices}
+            or set(payment_group) != {row.id for row in counterpart}):
+        raise ValueError("PUBLIC_SOURCE_GROUP_LABEL_COVERAGE_MISMATCH")
+    for row in invoices:
+        _validate_replay_group_binding(row, invoice_group[row.id])
+    for row in counterpart:
+        _validate_replay_group_binding(row, payment_group[row.id])
+
     by_invoice: dict[str, list[ReconTxn]] = defaultdict(list)
     by_payment: dict[str, list[ReconTxn]] = defaultdict(list)
     for row in invoices:
@@ -595,23 +644,42 @@ def adversarial_declared_payment_controls(
         invoices, altered(amount=tampered_amount), invoice_group, payment_group)
     wrong_ref_map = dict(payment_group)
     wrong_ref_map[exemplar.id] = "LAB_NEGATIVE_CONTROL_DIFFERENT_PAYMENT_REFERENCE"
-    # This deliberately changes only the reference-group matching assertion.
-    wrong_ref_result = reference_scoped_replay(
-        invoices, counterparts, invoice_group, wrong_ref_map)
-    wrong_currency_result = reference_scoped_replay(
-        invoices, altered(currency="USD"), invoice_group, payment_group)
+    # The hardened entry boundary rejects a source-label mismatch even before
+    # its amount/date fallback can silently match an incorrectly labeled row.
+    wrong_ref_held = False
+    try:
+        wrong_ref_result = reference_scoped_replay(
+            invoices, counterparts, invoice_group, wrong_ref_map)
+        wrong_ref_held = wrong_ref_result["unmatched_invoices"] == 1
+    except ValueError as exc:
+        if str(exc) != "PUBLIC_SOURCE_GROUP_BINDING_MISMATCH":
+            raise
+        wrong_ref_held = True
+
+    wrong_currency_held = False
+    try:
+        wrong_currency_result = reference_scoped_replay(
+            invoices, altered(currency="USD"), invoice_group, payment_group)
+        wrong_currency_held = wrong_currency_result["unmatched_invoices"] == 1
+    except ValueError as exc:
+        if str(exc) != "PUBLIC_SOURCE_GROUP_BINDING_MISMATCH":
+            raise
+        wrong_currency_held = True
 
     duplicate_rejected = False
     try:
         reference_scoped_replay(
             invoices, counterparts + [exemplar], invoice_group, payment_group)
     except ValueError as exc:
-        duplicate_rejected = "ambiguous source-declared grouped counterpart" in str(exc)
+        duplicate_rejected = str(exc) in {
+            "ambiguous source-declared grouped counterpart",
+            "DUPLICATE_SOURCE_TRANSACTION_ID",
+        }
 
     checks = {
         "one_penny_corrupt_declaration_unmatched": penny_result["unmatched_invoices"] == 1,
-        "wrong_payment_reference_unmatched": wrong_ref_result["unmatched_invoices"] == 1,
-        "wrong_currency_unmatched": wrong_currency_result["unmatched_invoices"] == 1,
+        "wrong_payment_reference_unmatched": wrong_ref_held,
+        "wrong_currency_unmatched": wrong_currency_held,
         "duplicate_payment_declaration_rejected": duplicate_rejected,
     }
     return {

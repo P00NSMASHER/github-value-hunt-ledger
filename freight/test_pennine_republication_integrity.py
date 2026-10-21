@@ -263,3 +263,72 @@ def test_blank_csv_separator_after_header_is_not_a_dropped_invoice():
     raw = _original() + b"\n"
     assert len(census.decode_month(raw, "2026-08")) == 1
     assert len(lab.parse_pennine_csv(raw, "2026-08")) == 1
+
+# Source-label adversarial tests: all values are synthetic, never publisher rows.
+def _synthetic_reference_pairs():
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    invoice = ReconTxn("synthetic-invoice-1", "25.00", "2026-07-01", "GBP", "PAY-A")
+    declaration = ReconTxn("synthetic-declaration-1", "25.00", "2026-07-01", "GBP", "PAY-B")
+    forged_group = chr(31).join(("SUP-1", "PAY-A", "2026-07-01", "GBP"))
+    return invoice, declaration, forged_group
+
+
+def test_reference_scoped_replay_rejects_forged_group_with_mismatched_payment_reference():
+    invoice, declaration, group = _synthetic_reference_pairs()
+    with pytest.raises(ValueError, match="PUBLIC_SOURCE_GROUP_BINDING_MISMATCH"):
+        lab.reference_scoped_replay(
+            [invoice], [declaration], {invoice.id: group}, {declaration.id: group},
+        )
+
+
+@pytest.mark.parametrize("forged_group", [
+    chr(31).join(("SUP-1", "PAY-A", "2026-07-02", "GBP")),
+    chr(31).join(("SUP-1", "PAY-A", "2026-07-01", "USD")),
+    "PAY-X",
+    chr(31).join(("SUP-1", "PAY-A", "GBP")),
+    "",
+])
+def test_reference_scoped_replay_rejects_misbound_invoice_label(forged_group):
+    invoice, declaration, _ = _synthetic_reference_pairs()
+    # Independent synthetic same-reference declaration: only map label is malformed.
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    other = ReconTxn(declaration.id, declaration.amount, declaration.date,
+                     declaration.currency, invoice.reference)
+    with pytest.raises(ValueError, match="PUBLIC_SOURCE_GROUP_BINDING_MISMATCH"):
+        lab.reference_scoped_replay(
+            [invoice], [other],
+            {invoice.id: forged_group}, {other.id: forged_group},
+        )
+
+
+@pytest.mark.parametrize("invalid_bound", [0, -1, True, False, 19, 1000000, 8.0, None])
+def test_reference_scoped_replay_rejects_invalid_group_limit(invalid_bound):
+    invoice, declaration, group = _synthetic_reference_pairs()
+    with pytest.raises(ValueError, match="INVALID_SOURCE_GROUP_BOUND"):
+        lab.reference_scoped_replay(
+            [invoice], [declaration], {invoice.id: group}, {declaration.id: group},
+            max_group_size=invalid_bound,
+        )
+
+
+def test_reference_scoped_replay_rejects_duplicate_transaction_id_across_groups():
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    a = ReconTxn("duplicate-id", "20.00", "2026-07-01", "GBP", "PAY-A")
+    b = ReconTxn("duplicate-id", "5.00", "2026-07-01", "GBP", "PAY-B")
+    c = ReconTxn("source-declaration", "25.00", "2026-07-01", "GBP", "PAY-A")
+    with pytest.raises(ValueError, match="DUPLICATE_SOURCE_TRANSACTION_ID"):
+        lab.reference_scoped_replay(
+            [a,b], [c], {a.id: "PAY-A"}, {c.id: "PAY-A"},
+        )
+
+
+@pytest.mark.parametrize("missing_map,extra_map", [(True,False),(False,True)])
+def test_reference_scoped_replay_requires_exact_map_coverage(missing_map,extra_map):
+    from recoveryworks.reconciliation_kernel import ReconTxn
+    a = ReconTxn("synthetic-invoice", "25.00", "2026-07-01", "GBP", "PAY-A")
+    b = ReconTxn("synthetic-declaration", "25.00", "2026-07-01", "GBP", "PAY-A")
+    invoice_group = {} if missing_map else {a.id: "PAY-A", "unknown": "PAY-A"}
+    with pytest.raises(ValueError, match="PUBLIC_SOURCE_GROUP_LABEL_COVERAGE_MISMATCH"):
+        lab.reference_scoped_replay(
+            [a], [b], invoice_group, {b.id: "PAY-A"},
+        )

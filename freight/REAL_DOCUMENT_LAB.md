@@ -96,6 +96,14 @@ independent payment truth label.
    reconciliation kernel. The native many-to-one global candidate window is
    bounded at 18; the lab's strictly partitioned replay retains that bounded
    kernel while only allowing matches within the same declared payment reference.
+   Before kernel execution, the adapter verifies exact transaction-ID uniqueness,
+   complete group-key coverage, source-key reference/date/currency binding,
+   and an exact integer group bound between 1 and 18. A deliberately mislabeled
+   transaction is **rejected** rather than matched through amount/date fallback
+   and reported as having zero cross-reference errors. Synthetic single-field
+   reference keys remain accepted only when equal to the actual transaction
+   reference. Supplier identity in full keys is still sourced from the same
+   publisher disclosure, not an independent bank identity confirmation.
    This measures structural consistency, not bank-cleared matching accuracy.
 8. Run four **controlled negative tests** with the real published invoice
    population: plus-one-penny counterpart amount, incorrect payment reference,
