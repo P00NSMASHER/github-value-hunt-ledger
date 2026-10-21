@@ -41,6 +41,12 @@ OIDC_HOST = "pipelines.actions.githubusercontent.com"
 OIDC_REGIONAL_HOST = re.compile(
     r"pipelinesghub[a-z0-9]{1,24}\.actions\.githubusercontent\.com"
 )
+# Confirmed in authenticated GitHub-hosted run 39606539848. GitHub also
+# serves job-scoped OIDC requests from regional run-actions-N-azure-REGION
+# endpoints. Never accept an arbitrary domain or user-configured suffix.
+OIDC_AZURE_RUNNER_HOST = re.compile(
+    r"run-actions-[0-9]{1,3}-azure-[a-z0-9]{2,24}\.actions\.githubusercontent\.com"
+)
 MAX_TOKEN = 32768
 
 
@@ -84,7 +90,8 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
     oidc = urlparse(environ["ACTIONS_ID_TOKEN_REQUEST_URL"])
     approved_oidc_host = (
         oidc.hostname == OIDC_HOST or
-        OIDC_REGIONAL_HOST.fullmatch(oidc.hostname or "") is not None
+        OIDC_REGIONAL_HOST.fullmatch(oidc.hostname or "") is not None or
+        OIDC_AZURE_RUNNER_HOST.fullmatch(oidc.hostname or "") is not None
     )
     approved_oidc_origin = (
         oidc.scheme == "https" and approved_oidc_host and
