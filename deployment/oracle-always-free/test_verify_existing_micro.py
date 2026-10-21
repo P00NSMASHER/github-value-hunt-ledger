@@ -42,7 +42,7 @@ class CompleteMicroAcceptanceCompatibilityTests(unittest.TestCase):
                 raise AssertionError("Unknown provider read in strict audit")
             return deepcopy(self.responses[tuple(args[:3])])
         with patch.object(LIVE.STRICT.BASE, "home_region",
-                          return_value=self.receipt["home_region"]), \\
+                          return_value=self.receipt["home_region"]), \
              patch.object(LIVE.STRICT.BASE, "cli", side_effect=read):
             return LIVE.audit_existing_micro(
                 self.receipt if receipt is None else receipt)
