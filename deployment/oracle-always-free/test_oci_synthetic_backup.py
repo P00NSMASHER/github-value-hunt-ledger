@@ -336,13 +336,28 @@ class OciBackupTests(unittest.TestCase):
                     self.store.bucket_check()
         for missing in ("kmsKeyId", "objectLevelAuditMode", "softDeletePolicy",
                         "objectEventsEnabled", "replicationEnabled", "autoTiering",
-                        "objectLifecyclePolicyEtag", "etag", "name", "namespace"):
+                        "etag", "name", "namespace"):
             with self.subTest(missing=missing), \
                  patch.object(self.store, "data", return_value=typed), \
                  patch.object(self.store, "raw_bucket",
                               return_value={k: v for k, v in raw.items() if k != missing}):
                 with self.assertRaises(backup.Refused):
                     self.store.bucket_check()
+
+    def test_raw_rest_may_omit_optional_lifecycle_etag_only_when_sdk_confirms_none(self):
+        typed, raw = self._bucket_fixtures()
+        without_optional = {k: v for k, v in raw.items()
+                            if k != "objectLifecyclePolicyEtag"}
+        with patch.object(self.store, "data", return_value=typed), \
+             patch.object(self.store, "raw_bucket", return_value=without_optional):
+            self.store.bucket_check()
+        # Removing the typed CLI's explicit null must still fail closed.
+        without_typed = {k: v for k, v in typed.items()
+                         if k != "object-lifecycle-policy-etag"}
+        with patch.object(self.store, "data", return_value=without_typed), \
+             patch.object(self.store, "raw_bucket", return_value=without_optional):
+            with self.assertRaises(backup.Refused):
+                self.store.bucket_check()
 
     def test_raw_bucket_uses_fixed_signed_get_no_unapproved_endpoint(self):
         _, raw = self._bucket_fixtures()
