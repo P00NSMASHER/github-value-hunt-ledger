@@ -137,9 +137,8 @@ jobs:
               raise SystemExit("Generated TI state did not produce an accepted proposal")
           PY
           else
-            python tools/ti_persist_generated.py \
-              --max-attempts 5 \
-              --clean-untracked-on-rebuild
+            echo '::error::RETALLY_TECHNOLOGY_PR_ENABLED is not true; direct-main publishing is prohibited' >&2
+            exit 2
           fi
 
 

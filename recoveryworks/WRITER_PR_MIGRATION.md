@@ -85,3 +85,29 @@ This change does **not** activate `RETALLY_CATALOG_PR_ENABLED` or
 `RETALLY_INTEGRATOR_PR_ENABLED`; both remain separate owner-controlled
 switches. It also does not process the old September 20 queue advice.
 Customer production and financial-source authorization remain HOLD.
+
+
+## Owner-authorized PR-only enforcement after four live writer acceptances
+
+All four writer lanes have now been exercised through real GitHub PR
+creation and independently dispatched exact-head release-gate CI:
+
+- Scout PR #544: **automatic merge success**.
+- Integrator PR #548: **automatic merge success**.
+- Catalog PR #550: proposal and all CI passed, but unrelated main
+  movement correctly stopped automatic merging. The owner later merged
+  the same source. This is evidence of an outstanding source-race
+  recovery gap, **not** proof of unattended reconciliation.
+- Technology Intelligence PR #558: **automatic merge success**, with
+  30 source-scoped generated files and no direct-main write.
+
+The PR-only source migration removes all four direct-main fallback
+branches. If a lane flag is missing or not exactly true, the writer
+fails visibly without publishing anything. Technology Intelligence's
+CLI likewise requires an explicit isolated PR branch and refuses to
+push to main from the normal production path.
+
+The declared GitHub main ruleset remains DISABLED until repository
+administration applies it and checks the live ruleset effect. This
+source change does not create/remove any rules or amend customer,
+Oracle or commercial release permissions. Customer production HOLD.

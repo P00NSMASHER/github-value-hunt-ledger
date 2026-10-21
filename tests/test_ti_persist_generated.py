@@ -7,10 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from ti_persist_generated import (  # noqa: E402
-    is_non_fast_forward_failure,
-    persist_generated,
-)
+from ti_persist_generated import persist_generated  # noqa: E402
 
 
 def run(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -36,6 +33,7 @@ class PersistGeneratedTests(unittest.TestCase):
         self.remote = self.root / "remote.git"
         self.worker = self.root / "worker"
         self.racer = self.root / "racer"
+        self.proposal_branch = "automation/retally-technology-39603064849-1"
 
         run(
             self.root,
@@ -114,10 +112,11 @@ class PersistGeneratedTests(unittest.TestCase):
             ["generated.txt"],
             max_attempts=3,
             rebuild_fn=self.rebuild,
+            proposal_branch=self.proposal_branch,
             before_push=race,
         )
 
-        self.assertEqual(result["status"], "pushed")
+        self.assertEqual(result["status"], "proposed")
         self.assertEqual(result["attempts"], 2)
         self.assertEqual(result["rebuilt_attempts"], 1)
 
@@ -127,7 +126,7 @@ class PersistGeneratedTests(unittest.TestCase):
             "git",
             "clone",
             "--branch",
-            "main",
+            self.proposal_branch,
             str(self.remote),
             str(verify),
         )
@@ -183,11 +182,12 @@ class PersistGeneratedTests(unittest.TestCase):
             ["generated.txt"],
             max_attempts=3,
             rebuild_fn=contaminated_rebuild,
+            proposal_branch=self.proposal_branch,
             before_push=race,
             clean_untracked_on_rebuild=True,
         )
 
-        self.assertEqual(result["status"], "pushed")
+        self.assertEqual(result["status"], "proposed")
         self.assertFalse(contaminant.exists())
 
         verify = self.root / "verify-clean-race"
@@ -196,7 +196,7 @@ class PersistGeneratedTests(unittest.TestCase):
             "git",
             "clone",
             "--branch",
-            "main",
+            self.proposal_branch,
             str(self.remote),
             str(verify),
         )
@@ -217,9 +217,10 @@ class PersistGeneratedTests(unittest.TestCase):
             ["generated.txt"],
             max_attempts=2,
             rebuild_fn=self.rebuild,
+            proposal_branch=self.proposal_branch,
         )
 
-        self.assertEqual(result["status"], "pushed")
+        self.assertEqual(result["status"], "proposed")
         self.assertTrue(local_only.exists())
 
     def test_only_whitelisted_generated_paths_are_committed(self):
@@ -234,8 +235,9 @@ class PersistGeneratedTests(unittest.TestCase):
             ["generated.txt"],
             max_attempts=2,
             rebuild_fn=self.rebuild,
+            proposal_branch=self.proposal_branch,
         )
-        self.assertEqual(result["status"], "pushed")
+        self.assertEqual(result["status"], "proposed")
 
         verify = self.root / "verify-whitelist"
         run(
@@ -243,7 +245,7 @@ class PersistGeneratedTests(unittest.TestCase):
             "git",
             "clone",
             "--branch",
-            "main",
+            self.proposal_branch,
             str(self.remote),
             str(verify),
         )
@@ -260,26 +262,21 @@ class PersistGeneratedTests(unittest.TestCase):
             ["generated.txt"],
             max_attempts=2,
             rebuild_fn=self.rebuild,
+            proposal_branch=self.proposal_branch,
         )
         self.assertEqual(result["status"], "clean")
         self.assertEqual(result["attempts"], 1)
 
-    def test_non_fast_forward_detection_is_narrow(self):
-        rejected = subprocess.CompletedProcess(
-            args=["git", "push"],
-            returncode=1,
-            stdout="",
-            stderr="! [rejected] HEAD -> main (fetch first)",
-        )
-        auth = subprocess.CompletedProcess(
-            args=["git", "push"],
-            returncode=1,
-            stdout="",
-            stderr="fatal: authentication failed",
-        )
-        self.assertTrue(is_non_fast_forward_failure(rejected))
-        self.assertFalse(is_non_fast_forward_failure(auth))
-
+    def test_omitting_pr_branch_never_writes_to_main(self):
+        self.rebuild(self.worker)
+        original_main = git(self.worker, "rev-parse", "HEAD").stdout.strip()
+        with self.assertRaisesRegex(ValueError, "requires an isolated PR branch"):
+            persist_generated(
+                self.worker, ["generated.txt"],
+                max_attempts=2, rebuild_fn=self.rebuild,
+            )
+        after_main = git(self.worker, "ls-remote", "--heads", "origin", "main")
+        self.assertEqual(after_main.stdout.split()[0], original_main)
 
     def test_isolated_technology_proposal_preserves_current_main(self):
         branch = "automation/retally-technology-39603064849-1"

@@ -69,28 +69,37 @@ class MainBranchRulesetTests(unittest.TestCase):
             self.assertIn('test "$' + var + '" = "success"', body)
 
     def test_activation_is_blocked_by_existing_direct_main_writers(self):
-        # A PR-only ruleset would strand scheduled writers still pushing into
-        # main. Keep the template disabled until every writer is migrated.
+        # A ruleset with required PRs is safe only if every scheduled source
+        # writer has removed its old direct-main fallback altogether.
+        import re
+
         direct = []
-        writer_files = {
-            "catalog-append.yml": "git push",
-            "integrator-sync.yml": "git push",
-            "public-repo-hunter.yml": "git push origin HEAD:main",
-        }
-        for name, marker in writer_files.items():
-            body = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
-            if marker in body:
+        patterns = (
+            r"(?m)^\s*git push\s*$",
+            r"(?m)^\s*git push\s+origin\s+(?:HEAD:main|main)(?:\s|$)",
+        )
+        names = (
+            "catalog-append.yml",
+            "integrator-sync.yml",
+            "public-repo-hunter.yml",
+            "technology-intelligence.yml",
+        )
+        for name in names:
+            body = (ROOT / ".github" / "workflows" / name).read_text(
+                encoding="utf-8"
+            )
+            if any(re.search(pattern, body) for pattern in patterns):
                 direct.append(name)
-        ti = (ROOT / "tools" / "ti_persist_generated.py").read_text(encoding="utf-8")
-        workflow = (ROOT / ".github" / "workflows" / "technology-intelligence.yml").read_text(
+            self.assertIn("direct-main publishing is prohibited", body)
+        ti = (ROOT / "tools" / "ti_persist_generated.py").read_text(
             encoding="utf-8"
         )
-        if '"HEAD:main"' in ti and "ti_persist_generated.py" in workflow:
-            direct.append("technology-intelligence.yml")
-        if self.ruleset["enforcement"] == "active":
-            self.assertEqual(direct, [], "Direct-main writers must migrate before protection")
-        # Deliberately do not assert that any writer must remain; migrating
-        # them is a prerequisite for switching the manifest to active.
+        if '"HEAD:main"' in ti or 'git push origin main' in ti:
+            direct.append("ti_persist_generated.py")
+        self.assertEqual(
+            direct, [], "Direct-main fallback remains in active writer source"
+        )
+
 
     def test_customer_release_remains_a_separate_hold(self):
         policy = (ROOT / "recoveryworks" / "CODE_RELEASE_POLICY.md").read_text(

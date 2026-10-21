@@ -1,4 +1,4 @@
-"""Check the four scoped PR publishing lanes remain disabled by default."""
+"""Ensure all four GitHub evidence writers publish only through guarded PRs."""
 from pathlib import Path
 import json
 import unittest
@@ -6,7 +6,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 
 class WriterModeTests(unittest.TestCase):
-    def test_four_lanes_keep_original_writer_as_default(self):
+    def test_four_lanes_are_pr_only_and_fail_closed_without_enabled_switch(self):
         lanes={"public-repo-hunter.yml":"scout","catalog-append.yml":"catalog",
                "integrator-sync.yml":"integrator",
                "technology-intelligence.yml":"technology"}
@@ -26,6 +26,10 @@ class WriterModeTests(unittest.TestCase):
                 self.assertIn("refs/heads/main",s)
                 self.assertIn("pull-requests: write",s)
                 self.assertIn("actions: write",s)
+                self.assertIn("direct-main publishing is prohibited",s)
+                self.assertIn("exit 2",s)
+                self.assertNotIn("git push origin HEAD:main",s)
+                self.assertNotIn("\n            git push\n",s)
 
     def test_legacy_job_schedules_and_payloads_remain_present(self):
         files={".github/workflows/public-repo-hunter.yml":'7 4,16 * * *',

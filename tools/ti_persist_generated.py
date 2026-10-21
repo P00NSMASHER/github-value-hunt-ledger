@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Persist generated intelligence safely under concurrent main-branch writers."""
+"""Stage generated intelligence safely through source-pinned isolated PR branches."""
 
 from __future__ import annotations
 
@@ -105,15 +105,6 @@ def default_rebuild(repo: Path) -> None:
     git(repo, "diff", "--check")
 
 
-def is_non_fast_forward_failure(result: subprocess.CompletedProcess[str]) -> bool:
-    text = f"{result.stdout}\n{result.stderr}".lower()
-    return (
-        "fetch first" in text
-        or "non-fast-forward" in text
-        or ("rejected" in text and "head -> main" in text)
-    )
-
-
 def persist_generated(
     repo: Path,
     generated_paths: Sequence[str],
@@ -126,10 +117,11 @@ def persist_generated(
 ) -> dict[str, object]:
     if max_attempts < 1:
         raise ValueError("max_attempts must be >= 1")
-    if proposal_branch is not None:
-        if (PROPOSAL_BRANCH.fullmatch(proposal_branch) is None or
-                not proposal_branch.startswith("automation/retally-technology-")):
-            raise ValueError("Unsafe or non-TI generated evidence branch")
+    if proposal_branch is None:
+        raise ValueError("Generated TI publishing requires an isolated PR branch")
+    if (PROPOSAL_BRANCH.fullmatch(proposal_branch) is None or
+            not proposal_branch.startswith("automation/retally-technology-")):
+        raise ValueError("Unsafe or non-TI generated evidence branch")
 
     git(repo, "config", "user.name", "github-actions[bot]")
     git(
@@ -173,52 +165,36 @@ def persist_generated(
         if before_push is not None:
             before_push(attempt)
 
-        if proposal_branch is not None:
-            # Push a fresh, exact-run synthetic evidence candidate only.  A
-            # failure must NOT fall back to direct main or force the branch.
-            pushed = git(
-                repo, "push", "origin",
-                "HEAD:refs/heads/" + proposal_branch, check=False,
-            )
-            if pushed.returncode:
-                raise RuntimeError("isolated technology evidence branch push failed; "
-                                   "do not force, retry or write main")
-            return {
-                "status": "proposed",
-                "attempts": attempt,
-                "rebuilt_attempts": rebuilt_attempts,
-                "head_sha": git(repo, "rev-parse", "HEAD").stdout.strip(),
-                "base_sha": remote_head,
-                "branch": proposal_branch,
-            }
+        # A real concurrent main writer can advance after the first source
+        # snapshot, even when local generation passed. Rebuild from the new
+        # main commit before creating ANY remote proposal branch.
+        git(repo, "fetch", "origin", "main")
+        latest_main = git(repo, "rev-parse", "origin/main").stdout.strip()
+        if latest_main != remote_head:
+            if attempt == max_attempts:
+                raise RuntimeError(
+                    "technology evidence main changed during every bounded "
+                    "proposal attempt; no branch or main write was performed"
+                )
+            continue
 
         pushed = git(
-            repo,
-            "push",
-            "origin",
-            "HEAD:main",
-            check=False,
+            repo, "push", "origin",
+            "HEAD:refs/heads/" + proposal_branch, check=False,
         )
-        if pushed.returncode == 0:
-            return {
-                "status": "pushed",
-                "attempts": attempt,
-                "rebuilt_attempts": rebuilt_attempts,
-                "head_sha": git(repo, "rev-parse", "HEAD").stdout.strip(),
-            }
-
-        if not is_non_fast_forward_failure(pushed):
+        if pushed.returncode:
             raise RuntimeError(
-                "generated intelligence push failed for a non-retryable reason:\n"
-                + pushed.stdout
-                + pushed.stderr
+                "isolated technology evidence branch push failed; "
+                "no force, no duplicate, no direct main fallback"
             )
-
-        if attempt == max_attempts:
-            raise RuntimeError(
-                f"generated intelligence push lost {max_attempts} "
-                "consecutive non-fast-forward races"
-            )
+        return {
+            "status": "proposed",
+            "attempts": attempt,
+            "rebuilt_attempts": rebuilt_attempts,
+            "head_sha": git(repo, "rev-parse", "HEAD").stdout.strip(),
+            "base_sha": remote_head,
+            "branch": proposal_branch,
+        }
 
     raise AssertionError("unreachable")
 
@@ -237,8 +213,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--proposal-branch",
-        default=None,
-        help="Opt-in isolated technology-evidence branch, never a main write",
+        required=True,
+        help="Required isolated technology-evidence PR branch; no direct main fallback",
     )
     parser.add_argument(
         "--clean-untracked-on-rebuild",

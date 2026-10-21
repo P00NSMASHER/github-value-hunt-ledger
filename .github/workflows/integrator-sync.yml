@@ -153,7 +153,8 @@ jobs:
               echo "head_sha=$HEAD_SHA"
             } >> "$GITHUB_OUTPUT"
           else
-            git push
+            echo '::error::RETALLY_INTEGRATOR_PR_ENABLED is not true; direct-main publishing is prohibited' >&2
+            exit 2
           fi
 
   submit-pr:
