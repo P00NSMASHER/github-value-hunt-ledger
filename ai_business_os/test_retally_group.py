@@ -55,7 +55,7 @@ class CatalogTests(unittest.TestCase):
         self.assertIn("Merged unbound coverage correction", correction["label"])
         self.assertIn("/blob/8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c/",
                       correction["url"])
-        self.assertNotIn("unmerged PR #732", json.dumps(entry).lower())
+        self.assertNotIn("unmerged pr #732", json.dumps(entry).lower())
         self.assertIn("canonical identity unresolved", entry["stage"])
         self.assertEqual("NOT_ASSESSED", entry["commercial_readiness"])
         self.assertIs(self.catalog["authority"]["production_state_mutation_authorized"], False)
