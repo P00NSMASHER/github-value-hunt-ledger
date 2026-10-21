@@ -227,6 +227,11 @@ def validate_catalog(catalog: Mapping[str, Any]) -> None:
         _require(isinstance(evidence, list) and bool(evidence), "workflow requires evidence criteria")
         for item in evidence:
             _text(item, "evidence criterion")
+    quality = next(row for row in workflow if row["id"] == "quality-reviewed")
+    _require(quality["owner_role"] == "OWNER_QUALITY_ASSURANCE",
+             "RETALLY quality stage must require owner acceptance, not a second human approver")
+    _require(any("Owner acceptance" in row for row in quality["required_evidence"]),
+             "RETALLY quality stage must declare owner acceptance evidence")
     priorities = _rows(catalog.get("priorities"), "priority")
     for item in priorities:
         _keys(item, {"id", "title", "owner_role", "timeframe", "status", "done_when"}, "priority")
