@@ -122,7 +122,19 @@ class GeneratedOutputManifestTests(unittest.TestCase):
         # Guard against an apparently green build persisting metrics that
         # were computed before their own prerequisite intake/derivation.
         ordered = ordered_build_steps()
-        self.assertEqual(len(ordered), len(set(ordered)))
+        # The intake source is synchronized once before and again after
+        # importing new runs. This deliberate two-phase sync is the sole
+        # permitted repeated generator step.
+        self.assertEqual(
+            ordered[:3],
+            ("tools/ti_sync.py", "tools/ti_ingest_runs.py", "tools/ti_sync.py"),
+        )
+        self.assertEqual(
+            [i for i, script in enumerate(ordered)
+             if script == "tools/ti_sync.py"],
+            [0, 2],
+        )
+        self.assertEqual(len(ordered) - len(set(ordered)), 1)
         precedences = (
             ("tools/ti_search_move_learning.py", "tools/ti_search_move_policy.py"),
             ("tools/ti_registry.py", "tools/ti_efficiency_report.py"),
