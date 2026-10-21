@@ -104,6 +104,35 @@ where status in (%s, %s)
 order by priority desc, created_at asc
 """
 
+RETALLY_GROUP_SOURCE_SQL = """
+select
+    ai_business_os_prod.schema_fingerprint_v1() as schema_fingerprint,
+    statement_timestamp() as observed_at,
+    coalesce((
+        select jsonb_agg(jsonb_build_object(
+            'id', b.id::text,
+            'slug', b.slug,
+            'customer_records', (
+                select count(*) from ai_business_os_prod.customers c
+                where c.business_id = b.id
+            ),
+            'financial_event_records', (
+                select count(*) from ai_business_os_prod.financial_events f
+                where f.business_id = b.id
+            ),
+            'external_outcome_records', (
+                select count(*) from ai_business_os_prod.external_outcomes e
+                where e.business_id = b.id
+            )
+        ) order by b.slug, b.id)
+        from ai_business_os_prod.businesses b
+    ), '[]'::jsonb) as businesses,
+    (
+        select count(*) from ai_business_os_prod.external_outcomes e
+        where e.business_id is null
+    ) as unattributed_external_outcome_records
+"""
+
 _MUTATING_WORD = re.compile(
     r"\b(insert|update|delete|alter|drop|create|grant|revoke|truncate|copy|call|execute|set)\b",
     re.IGNORECASE,
@@ -154,6 +183,29 @@ class ProductionReadBridge:
     def businesses(self) -> list[dict[str, Any]]:
         return self._run(BUSINESSES_SQL)
 
+    def retally_group_source_snapshot(self, *, expected_schema_fingerprint: str) -> dict[str, Any]:
+        """Observe only source identities and counts, using one consistent SELECT.
+
+        No customer identifiers, names, documents, amounts or contact fields are
+        selected. The private executor remains responsible for authentication and
+        read permissions. Counts cover only records visible to that executor.
+        """
+        from ai_business_os.retally_group_private import (
+            GroupObservationError, normalize_source_snapshot,
+        )
+
+        if type(expected_schema_fingerprint) is not str or not _SHA256.fullmatch(expected_schema_fingerprint):
+            raise ProductionBridgeError("expected schema fingerprint is not a SHA-256 digest")
+        self.assert_schema_current(expected_schema_fingerprint)
+        rows = self._run(RETALLY_GROUP_SOURCE_SQL)
+        if len(rows) != 1:
+            raise ProductionBridgeError("expected exactly one group source snapshot")
+        try:
+            return normalize_source_snapshot(
+                rows[0], expected_schema_fingerprint=expected_schema_fingerprint)
+        except GroupObservationError as exc:
+            raise ProductionBridgeError(str(exc)) from None
+
     def latest_command_center_snapshot(self) -> dict[str, Any] | None:
         rows = self._run(LATEST_COMMAND_CENTER_SQL)
         if not rows:
@@ -201,3 +253,4 @@ class ProductionReadBridge:
             "command_center": self.latest_command_center_snapshot(),
             "pending_approvals": self.pending_approvals(),
         }
+
