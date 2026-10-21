@@ -36,20 +36,16 @@ def obligation(vendor, invoice, cents, *, verified=True):
 
 
 class APBranchTests(unittest.TestCase):
-    def test_invoice_normalization_only_strips_known_suffix(self):
-        self.assertEqual(normalize_invoice_number("inv-2001-R"), "INV-2001")
-        self.assertEqual(normalize_invoice_number("inv-2001-DUP"), "INV-2001")
-        self.assertNotEqual(
-            normalize_invoice_number("INV-100"),
-            normalize_invoice_number("INV-1000"),
-        )
+    def test_invoice_normalization_preserves_suffix_identity(self):
+        self.assertEqual(normalize_invoice_number("inv-2001-R"), "INV-2001-R")
+        self.assertNotEqual(normalize_invoice_number("INV-100"), normalize_invoice_number("INV-100R"))
 
     def test_orphan_exact_duplicate_stays_review(self):
         observations = build_ap_observations(
             client_id="client",
             payments=(
                 payment("p1", "vendor", "INV-2001", 432100),
-                payment("p2", "vendor", "INV-2001-R", 432100),
+                payment("p2", "vendor", "INV-2001", 432100),
             ),
         )
         self.assertEqual(len(observations), 1)
@@ -63,7 +59,7 @@ class APBranchTests(unittest.TestCase):
             client_id="client",
             payments=(
                 payment("p1", "vendor", "INV-2001", 432100),
-                payment("p2", "vendor", "INV-2001-R", 432100),
+                payment("p2", "vendor", "INV-2001", 432100),
             ),
             obligations=(obligation("vendor", "INV-2001", 432100),),
         )
@@ -78,8 +74,8 @@ class APBranchTests(unittest.TestCase):
             client_id="client",
             payments=(
                 payment("p1", "vendor", "INV-7", 10000),
-                payment("p2", "vendor", "INV-7-DUP", 10000),
-                payment("p3", "vendor", "INV-7-COPY", 10000),
+                payment("p2", "vendor", "INV-7", 10000),
+                payment("p3", "vendor", "INV-7", 10000),
             ),
             obligations=(obligation("vendor", "INV-7", 10000),),
         )
@@ -103,7 +99,7 @@ class APBranchTests(unittest.TestCase):
             client_id="client",
             payments=(
                 payment("p1", "vendor", "INV-1", 10000, verified=True),
-                payment("p2", "vendor", "INV-1-R", 10000, verified=False),
+                payment("p2", "vendor", "INV-1", 10000, verified=False),
             ),
             obligations=(obligation("vendor", "INV-1", 10000, verified=True),),
         )

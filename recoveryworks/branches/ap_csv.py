@@ -44,6 +44,8 @@ def _parse_money(value: str, *, allow_zero: bool, allow_negative: bool) -> int:
         amount = Decimal(text)
     except InvalidOperation as exc:
         raise ValueError(f"invalid money value: {value!r}") from exc
+    if not amount.is_finite():
+        raise ValueError("money value must be finite")
     if parenthetical:
         amount = -amount
     cents = int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
@@ -102,7 +104,8 @@ def load_payments_csv(
             payment_id=_value(row, columns["payment_id"], row_number=row_number),
             vendor_id=_value(row, columns["vendor_id"], row_number=row_number),
             invoice_number=_value(row, columns["invoice_number"], row_number=row_number),
-            amount_cents=money_to_cents(_value(row, columns["amount"], row_number=row_number)),
+            amount_cents=signed_money_to_cents(_value(row, columns["amount"], row_number=row_number)),
+            reverses_id=(row.get("Reverses_ID") or "").strip() or None,
             payment_date=(row.get(columns.get("payment_date", "")) or "").strip() or None,
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
