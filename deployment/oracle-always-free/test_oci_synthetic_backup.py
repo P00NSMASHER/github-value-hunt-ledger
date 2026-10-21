@@ -40,6 +40,8 @@ class OciBackupTests(unittest.TestCase):
         self.receipt.write_text(json.dumps(doc), encoding="utf-8")
         self.receipt.chmod(0o600)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_exact_bucket_receipt_and_owner_permissions(self):
         self.assertEqual(backup.parse_bucket_receipt(self.receipt)["bucket"], backup.BUCKET_NAME)
         for change in ({"storage_tier": "InfrequentAccess"}, {"public_access_type": "ObjectRead"},
@@ -54,6 +56,8 @@ class OciBackupTests(unittest.TestCase):
         with self.assertRaises(backup.Refused):
             backup.parse_bucket_receipt(self.receipt)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_receipt_no_overwrite_and_symlink_refused(self):
         one = self.root / "attempt.json"
         backup.private_receipt(one, {"synthetic": True})
@@ -75,6 +79,8 @@ class OciBackupTests(unittest.TestCase):
         self.assertEqual(run.call_args.args[0].count("--no-retry"), 1)
         self.assertEqual(run.call_args.args[0].count("--region"), 1)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_top_level_object_put_response_is_accepted(self):
         source = self.root / "synthetic.rtbk"
         source.write_bytes(b"synthetic ciphertext only")
@@ -90,6 +96,8 @@ class OciBackupTests(unittest.TestCase):
         self.assertNotIn("--force", cmd)
         self.assertIn("Standard", cmd)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_cli_no_overwrite_success_is_not_a_successful_put(self):
         # OCI documents exit 0 and a top-level 'output' message when the
         # object already exists and --no-overwrite skips the upload.
@@ -292,6 +300,8 @@ class OciBackupTests(unittest.TestCase):
                 with self.assertRaisesRegex(backup.Refused, "continuation"):
                     self.store.objects("synthetic-recovery/")
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_download_requires_etag_and_bounded_private_ciphertext(self):
         filename = self.root / "remote-ciphertext.rtbk"
         raw = b"bounded test ciphertext"
@@ -313,6 +323,8 @@ class OciBackupTests(unittest.TestCase):
                                    etag=bad, max_size=256)
                 download.assert_not_called()
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_download_refuses_excess_of_prevalidated_head_size(self):
         target = self.root / "oversized.rtbk"
         def write_large(*args, **kwargs):
@@ -452,6 +464,8 @@ class OciBackupTests(unittest.TestCase):
                 self.store.raw_bucket()
             cli.assert_not_called()
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_cleanup_only_exact_legacy_synthetic_canary_with_etag(self):
         key = "synthetic-only/0123456789abcdef01234567.rtbk"
         raw = backup.LEGACY_MAGIC + b"N" * 12 + b"authenticated-test-ciphertext"
@@ -473,6 +487,8 @@ class OciBackupTests(unittest.TestCase):
         self.assertEqual(intent.stat().st_mode & 0o777, 0o600)
         self.assertEqual(json.loads(intent.read_text())["frozen_etag"], "KNOWN-ETAG")
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_uncertain_legacy_delete_leaves_receipt_and_prohibits_repeat(self):
         key = "synthetic-only/0123456789abcdef01234567.rtbk"
         raw = backup.LEGACY_MAGIC + b"N" * 12 + b"ciphertext-test-only"
@@ -575,6 +591,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
         self.key = "synthetic-only/0123456789abcdef01234567.rtbk"
         self.raw = backup.LEGACY_MAGIC + b"N" * 12 + b"historical-synthetic-ciphertext-test"
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_verifiable_small_orphan_preserved_with_private_untrusted_receipt(self):
         objects = [{"name": self.key, "size": len(self.raw)}]
 
@@ -665,6 +683,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
                 "production_backup_verified": False,
                 "status": "QUARANTINED_UNRESOLVED_DO_NOT_DELETE"}
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_reuses_private_receipt_only_after_fresh_exact_remote_readback(self):
         receipt = self._resume_receipt()
         self.receipt.write_text(json.dumps(receipt), encoding="utf-8")
@@ -690,6 +710,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
         self.assertEqual(self.receipt.read_bytes(), frozen)
         delete.assert_not_called()
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_resume_refuses_tampered_or_readable_receipt(self):
         good = self._resume_receipt()
         items = [{"name": self.key, "size": len(self.raw)}]
@@ -744,6 +766,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
             get.assert_not_called()
             delete.assert_not_called()
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_unapproved_orphan_blocks_new_upload(self):
         with (patch.object(self.store, "bucket_check"),
               patch.object(self.store, "objects",
@@ -757,6 +781,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
         with self.assertRaisesRegex(backup.Refused, "only supported"):
             backup.main(["--inspect", "--preserve-legacy-orphan"])
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI private-file owner/mode assertions require POSIX; Linux CI covers this case")
     def test_quarantine_flag_requires_a_real_historical_orphan(self):
         with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
               patch.object(self.store, "bucket_check"),

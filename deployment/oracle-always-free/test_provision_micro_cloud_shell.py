@@ -4,6 +4,7 @@ from __future__ import annotations
 from contextlib import ExitStack
 import importlib.util
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -216,6 +217,8 @@ class MicroResourceTests(unittest.TestCase):
                 micro.launch_single_micro(plan,self.original)
         self.assertNotIn("instance_id",self.original)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI owner/mode or FIPS key-permission fixture requires POSIX; verified on Linux")
     def test_successful_resume_preserves_original_partial_evidence(self):
         plan={"ad":AD1,"tenancy":TENANCY,"image_id":"ocid1.image.oc1.iad.fake",
               "home_region":REGION,"image_name":"Synthetic Ubuntu",

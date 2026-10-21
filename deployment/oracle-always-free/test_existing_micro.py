@@ -229,6 +229,8 @@ class ExistingMicroAuditTests(unittest.TestCase):
                 with self.assertRaises(AUDIT.BASE.Stop):
                     run(self.receipt, api)
 
+    @unittest.skipUnless(os.name == "posix",
+                         "OCI owner/mode or FIPS key-permission fixture requires POSIX; verified on Linux")
     def test_receipt_private_owner_state_and_shape_required(self):
         with tempfile.TemporaryDirectory() as temp:
             receipt = Path(temp) / "receipt.json"
