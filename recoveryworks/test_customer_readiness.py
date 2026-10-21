@@ -144,6 +144,51 @@ class CustomerReadinessTests(unittest.TestCase):
         self.assertFalse(health['healthy'])
         self.assertNotIn(str(self.workspace.root), json.dumps(health))
 
+    def test_backup_preserves_windows_and_unicode_original_bytes(self):
+        self.workspace.scan(self.tokens['operator'])
+        original = self.workspace._intake()['sources']['ap/payments_csv']
+        source = self.workspace.read_source(self.tokens['customer'], original['id'])['content']
+        content = '\ufeff' + source.replace('PAY-2', 'PAY-é3').replace('\n', '\r\n')
+        uploaded = self.workspace.upload(self.tokens['customer'], 'ap', 'payments_csv', content)
+        receipt = self.workspace.backup(self.tokens['operator'])
+        snapshot = json.loads((self.workspace.root / 'backups' / (receipt['snapshot_id'] + '.json')).read_text())
+        restored = Workspace.restore_snapshot(snapshot, Path(self.temp.name) / 'restored')
+        raw_path = 'sources/' + uploaded['id'] + '.original'
+        self.assertEqual((restored.root / raw_path).read_bytes(), content.encode('utf-8'))
+        self.assertEqual(hashlib.sha256((restored.root / raw_path).read_bytes()).hexdigest(), uploaded['raw_sha256'])
+        self.assertFalse(restored.meta['tokens'])
+
+    def test_backup_freshness_uses_hashed_capture_time_not_filesystem_time(self):
+        from datetime import datetime, timedelta, timezone
+        from unittest.mock import patch
+        from recoveryworks.workbench_health import check_workspace
+        self.workspace.scan(self.tokens['operator'])
+        for age in (timedelta(days=2), timedelta(days=-1)):
+            with self.subTest(age=age):
+                captured = (datetime.now(timezone.utc) - age).isoformat()
+                with patch('recoveryworks.workbench.timestamp', return_value=captured):
+                    receipt = self.workspace.backup(self.tokens['operator'])
+                health = check_workspace(self.workspace.root)
+                check = next(c for c in health['checks'] if c['check'] == 'recent_verified_backup')
+                self.assertFalse(check['ok'], health)
+        self.workspace.backup(self.tokens['operator'])
+        self.assertTrue(check_workspace(self.workspace.root)['healthy'])
+
+    def test_legacy_backup_restores_but_does_not_claim_freshness(self):
+        from recoveryworks.workbench_health import check_workspace
+        self.workspace.scan(self.tokens['operator'])
+        receipt = self.workspace.backup(self.tokens['operator'])
+        path = self.workspace.root / 'backups' / (receipt['snapshot_id'] + '.json')
+        snapshot = json.loads(path.read_text())
+        del snapshot['captured_at']
+        encoded = json.dumps(snapshot, sort_keys=True).encode()
+        legacy = path.with_name(hashlib.sha256(encoded).hexdigest() + '.json')
+        legacy.write_bytes(encoded)
+        path.unlink()
+        Workspace.restore_snapshot(snapshot, Path(self.temp.name) / 'legacy-restored')
+        health = check_workspace(self.workspace.root)
+        self.assertFalse(next(c for c in health['checks'] if c['check'] == 'recent_verified_backup')['ok'])
+
     def test_duplicate_auth_headers_and_idle_socket_fail_closed(self):
         import http.client
         import socket
