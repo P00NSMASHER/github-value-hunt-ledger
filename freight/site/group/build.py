@@ -67,12 +67,10 @@ def home():
         category, price = captions[b["slug"]]
         featured += f'''<a class="business-card featured-card" href="/{b['slug']}/"><div class="card-image">{photos[b['slug']]}</div><div class="card-copy"><p class="group-kicker">{category}</p><h3>{escape(b['name'])}</h3><p>{escape(b['summary'])}</p><div class="card-bottom"><span>{price}</span><span aria-hidden="true">↗</span></div></div></a>'''
     studio = ""
-    for n, (division, title, desc) in enumerate(DIVISIONS[1:], 2):
-        rows = ""
-        for b in BUSINESSES[3:]:
-            if b["division"] == division:
-                rows += f'''<a class="portfolio-item" href="/{b['slug']}/"><span class="group-status">{escape(b['status'])}</span><h3>{escape(b['name'])}<span aria-hidden="true">↗</span></h3><p>{escape(b['summary'])}</p></a>'''
-        studio += f'<section id="division-{n}" class="studio-column"><p class="group-kicker">{escape(division)}</p>{rows}</section>'
+    anchors = {"rehabsignal": "division-2", "sheetharbor": "division-3", "scopesignal": "division-4"}
+    for b in BUSINESSES[3:]:
+        anchor = f' id="{anchors[b["slug"]]}"' if b["slug"] in anchors else ""
+        studio += f'''<a class="portfolio-item"{anchor} href="/{b['slug']}/"><span class="group-status">{escape(b['status'])}</span><h3>{escape(b['name'])}<span aria-hidden="true">↗</span></h3><p>{escape(b['summary'])}</p></a>'''
     body = f'''<section class="group-hero"><div class="group-wrap group-hero-grid"><div class="hero-intro"><p class="group-kicker">RECOVERY · RESEARCH · PRACTICAL TOOLS</p><h1>Find the value.<br><em>Move forward.</em></h1><p class="group-lead">Recover freight overcharges. Research your next opportunity. Put clearer evidence behind your business decisions.</p><div class="group-actions">{link("Find your service ↓", "#businesses", "group-button")}{link("Talk to RETALLY ↗", "/contact/", "group-text-link")}</div><p class="group-hero-note">Focused businesses. A clear place to start.</p></div><figure class="hero-photograph">{photograph("research", "A sunlit workspace with research notebooks, a green folio and a laptop", True)}<figcaption><span>THE RETALLY APPROACH</span><strong>Good work starts<br>with a closer look.</strong></figcaption></figure></div></section>
 <div class="group-principles"><div class="group-wrap"><span>Evidence before claims</span><span>Human judgment where it matters</span><span>Clear scope from the start</span></div></div>
 <section class="group-section group-wrap" id="businesses"><div class="section-title-row"><div><p class="group-kicker">AVAILABLE TODAY</p><h2>A useful next step.</h2></div><p>Three focused offers.<br>Choose the problem you need to solve.</p></div><div class="featured-grid" id="division-1">{featured}</div></section>

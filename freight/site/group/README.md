@@ -103,6 +103,6 @@ is not reused for other businesses. Existing mailto opt-outs remain intact.
 Visual acceptance runs all 13 routes at 1440, 768, 390 and 320 CSS pixels, with
 real lazy-image loading, keyboard navigation, email-draft updates and chat
 clearance (also at the previously affected 1363×936). Pinned axe-core checks
-current desktop and phone pages for serious/critical WCAG rule failures.
+all four current viewport sizes for serious/critical WCAG rule failures.
 These checks do not establish full WCAG conformance, email delivery, payment
 fulfillment or commercial readiness of the separately labelled prototypes.
