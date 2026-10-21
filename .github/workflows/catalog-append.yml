@@ -29,9 +29,18 @@ jobs:
           fetch-depth: 0
       - name: Preserve triggered payload and update checkout
         shell: bash
+        env:
+          RETALLY_BEFORE_SHA: ${{ github.event.before }}
+          RETALLY_SOURCE_SHA: ${{ github.sha }}
         run: |
           cp .github/catalog_append_payload.json /tmp/catalog_append_payload.json
           git pull --rebase origin main
+          python -m tools.retally_payload_incremental \
+            --kind catalog \
+            --before "$RETALLY_BEFORE_SHA" \
+            --after "$RETALLY_SOURCE_SHA" \
+            --input /tmp/catalog_append_payload.json \
+            --output /tmp/catalog_append_delta.json
       - name: Append catalog payload idempotently
         shell: bash
         run: |
@@ -60,7 +69,7 @@ jobs:
                   raise SystemExit(f'path escapes repository: {rel}')
               return resolved, normalized
 
-          payload = json.loads(Path('/tmp/catalog_append_payload.json').read_text())
+          payload = json.loads(Path('/tmp/catalog_append_delta.json').read_text())
           marker = payload.get('marker', '')
           append = payload.get('append')
           if not isinstance(marker, str) or not marker or len(marker) > 500:
