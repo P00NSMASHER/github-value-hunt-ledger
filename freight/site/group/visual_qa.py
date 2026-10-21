@@ -88,7 +88,8 @@ def check_accessibility(page, axe_source):
         values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']}});
       return {version: axe.version, violations: result.violations.map(violation => ({
         id: violation.id, impact: violation.impact, description: violation.description,
-        nodes: violation.nodes.length, sample: violation.nodes.slice(0, 3).map(node => node.target)
+        nodes: violation.nodes.length, sample: violation.nodes.slice(0, 3).map(node => node.target),
+        details: violation.nodes.map(node => ({target: node.target, failureSummary: node.failureSummary}))
       }))};
     }""")
 
@@ -110,7 +111,7 @@ def main():
               "external_requests_blocked": 0, "passed": False,
               "accessibility": {"status": "pending" if axe_source else "skipped",
                                 "reason": None if axe_source else "No local axe-core script supplied with --axe-js",
-                                "checks": []}}
+                                "checks": [], "blocking_failures": []}}
     try:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
@@ -143,12 +144,17 @@ def main():
                     result.update({"route": slug or "home", "width": width, "status": response.status})
                     report["pages"].append(result)
                     assert result["status"] == 200 and result["overflow"] <= 1 and result["h1Count"] == 1 and result["mainPresent"] and not result["brokenImages"], result
-                    if axe_source and width in (1440, 390):
+                    if axe_source:
                         accessibility = {"route": slug or "home", "width": width, **check_accessibility(page, axe_source)}
                         report["accessibility"]["checks"].append(accessibility)
-                        assert not any(v["impact"] in ("serious", "critical") for v in accessibility["violations"]), accessibility
-                    if (width == 390 or (width == 1440 and slug in ("", "capturebrief", "recovery"))):
-                        page.screenshot(path=str(args.out / f'{slug or "home"}-{width}.png'), full_page=True)
+                        blocking = [v for v in accessibility["violations"] if v["impact"] in ("serious", "critical")]
+                        if blocking:
+                            report["accessibility"]["blocking_failures"].append({
+                                "route": slug or "home", "width": width, "violations": blocking})
+                            report["accessibility"]["status"] = "failed"
+                    # Capture every route/viewport, including failed accessibility checks,
+                    # so one defect cannot hide the remaining release evidence.
+                    page.screenshot(path=str(args.out / f'{slug or "home"}-{width}.png'), full_page=True)
                 page.goto(base + "/")
                 menu = page.locator(".business-menu summary")
                 menu.focus()
@@ -179,6 +185,8 @@ def main():
             browser.close()
         assert not report["non_get_requests"]
         if axe_source:
+            failures = report["accessibility"]["blocking_failures"]
+            assert not failures, f"Serious/critical accessibility failures in {len(failures)} route/viewport checks; see {args.out / 'report.json'}"
             report["accessibility"]["status"] = "passed"
         report["passed"] = True
     finally:
