@@ -155,6 +155,51 @@ class OciBackupTests(unittest.TestCase):
             self.assertEqual(args[args.index("--if-match") + 1], "etag-frozen")
             self.assertIn(key, args)
 
+    def test_low_level_get_head_and_delete_restrict_synthetic_keys_and_etags(self):
+        source = self.root / "mock-ciphertext.rtbk"
+        source.write_bytes(b"synthetic data only")
+        source.chmod(0o600)
+        approved_new = "synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk"
+        approved_old = "synthetic-only/0123456789abcdef01234567.rtbk"
+        forbidden = (
+            None, "", "customer/invoice.rtbk", "backups/actual-customer.rtbk",
+            "synthetic-only/" + "a" * 24 + ".json",
+            "synthetic-recovery/" + "b" * 24 + ".rtbk",
+            "synthetic-recovery/../customer.rtbk",
+            approved_new + "/customer", "synthetic-recovery/" + "G" * 32 + ".rtbk",
+        )
+        with patch.object(self.store, "cli") as remote:
+            for name in forbidden:
+                with self.subTest(name=name), self.assertRaises(backup.Refused):
+                    self.store.head(name)
+                with self.subTest(name=name), self.assertRaises(backup.Refused):
+                    self.store.get(name, self.root / "download.rtbk", etag="valid-etag", max_size=256)
+                with self.subTest(name=name), self.assertRaises(backup.Refused):
+                    self.store.delete_version(name, "valid-etag")
+                with self.subTest(name=name), self.assertRaises(backup.Refused):
+                    self.store.put(name, source)
+            with self.assertRaises(backup.Refused):
+                self.store.put(approved_old, source)
+            for value in ("", None, "two words", "injected\\nheader", "../unsafe", "x" * 257):
+                with self.subTest(etag=value), self.assertRaises(backup.Refused):
+                    self.store.get(approved_new, self.root / "download.rtbk",
+                                   etag=value, max_size=256)
+                with self.subTest(etag=value), self.assertRaises(backup.Refused):
+                    self.store.delete_version(approved_old, value)
+            remote.assert_not_called()
+
+    def test_low_level_approved_synthetic_read_and_delete_target_only_frozen_etag(self):
+        with patch.object(self.store, "cli", return_value='{"etag":"expected"}') as remote:
+            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "expected")
+            self.assertEqual(self.store.head("synthetic-only/0123456789abcdef01234567.rtbk")["etag"], "expected")
+            self.store.delete_version("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk", "etag-123")
+            self.store.delete_version("synthetic-only/0123456789abcdef01234567.rtbk", "etag-123")
+        self.assertEqual(remote.call_count, 4)
+        for entry in remote.call_args_list[2:]:
+            arguments = entry.args
+            self.assertEqual(arguments[:3], ("os", "object", "delete"))
+            self.assertEqual(arguments[arguments.index("--if-match") + 1], "etag-123")
+
     def test_object_metadata_expected_vs_unsupported_response_shapes(self):
         expected = [{"name": "synthetic-only/a"}]
         with patch.object(self.store, "cli", return_value=json.dumps({"data": {"objects": expected}})):
@@ -165,9 +210,9 @@ class OciBackupTests(unittest.TestCase):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
         with patch.object(self.store, "cli", return_value='{"etag":"ETAG-TOP-LEVEL"}'):
-            self.assertEqual(self.store.head("test")["etag"], "ETAG-TOP-LEVEL")
+            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "ETAG-TOP-LEVEL")
         with patch.object(self.store, "cli", return_value='{"data":{"etag":"NESTED"}}'):
-            self.assertEqual(self.store.head("test")["etag"], "NESTED")
+            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "NESTED")
 
     def test_typed_empty_omission_requires_independent_signed_rest_population(self):
         success = json.dumps({"status": "200 OK", "data": {"objects": []}})
@@ -258,13 +303,13 @@ class OciBackupTests(unittest.TestCase):
             filename.chmod(0o600)
             return '{"output": null}'
         with patch.object(self.store, "cli", side_effect=fake_get) as downloaded:
-            self.assertEqual(self.store.get("synthetic-only/test.rtbk", filename,
+            self.assertEqual(self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", filename,
                                             etag="KNOWN-ETAG", max_size=len(raw)), raw)
         downloaded.assert_called_once()
         for bad in ("", "bad etag", "bad\\netag"):
             with self.subTest(etag=bad), patch.object(self.store, "cli") as download:
                 with self.assertRaises(backup.Refused):
-                    self.store.get("synthetic-only/test.rtbk", self.root / "new.rtbk",
+                    self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", self.root / "new.rtbk",
                                    etag=bad, max_size=256)
                 download.assert_not_called()
 
@@ -276,7 +321,7 @@ class OciBackupTests(unittest.TestCase):
             return '{"output": null}'
         with patch.object(self.store, "cli", side_effect=write_large):
             with self.assertRaisesRegex(backup.Refused, "prevalidated HEAD size"):
-                self.store.get("synthetic-only/test.rtbk", target,
+                self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", target,
                                etag="KNOWN-ETAG", max_size=20)
 
     def _bucket_fixtures(self):
