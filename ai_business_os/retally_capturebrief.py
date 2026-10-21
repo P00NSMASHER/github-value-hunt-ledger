@@ -174,7 +174,9 @@ def _verified_records(raw: bytes, observed: datetime) -> tuple[list[str], Counte
         raise CaptureBriefObservationError(_ERROR) from None
     if text:
         _require(text.endswith("\n"))  # Append-only producer writes complete lines.
-        lines = text.splitlines()
+        # The producer delimits records with LF only. splitlines() also breaks
+        # valid JSON strings containing U+0085, U+2028 or U+2029.
+        lines = text[:-1].split("\n")
     else:
         lines = []
     _require(len(lines) <= _MAX_LINES and all(line for line in lines))
