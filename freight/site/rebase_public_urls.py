@@ -77,12 +77,13 @@ def rebase(directory: Path) -> int:
     return replacements
 
 
-def validate_cloudflare_seo(directory: Path) -> int:
+def validate_cloudflare_seo(directory: Path, extra_routes: tuple[str, ...] = ()) -> int:
     """Fail the Pages build if its advertised URLs would redirect or disagree."""
     if not directory.is_dir():
         raise ValueError("Public bundle directory does not exist")
     page_stems = _page_stems(directory)
-    expected = {NEW_BASE} | {NEW_BASE + stem for stem in page_stems}
+    expected = ({NEW_BASE} | {NEW_BASE + stem for stem in page_stems}
+                | {NEW_BASE + route + "/" for route in extra_routes})
     sitemap = directory / "sitemap.xml"
     root = ET.fromstring(sitemap.read_text(encoding="utf-8"))
     actual = [element.text for element in root.iter(SITEMAP_LOC)]
@@ -95,6 +96,8 @@ def validate_cloudflare_seo(directory: Path) -> int:
         )
     for stem, file in [("", directory / "index.html")] + [
         (stem, directory / f"{stem}.html") for stem in page_stems
+    ] + [
+        (route + "/", directory / route / "index.html") for route in extra_routes
     ]:
         canonical = CANONICAL_PATTERN.findall(file.read_text(encoding="utf-8"))
         correct = NEW_BASE + stem
