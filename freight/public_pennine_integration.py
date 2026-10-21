@@ -203,11 +203,21 @@ def run_public_census_replay() -> dict:
 
 
 def assert_public_census_result(result: dict) -> None:
+    """Verify the bounded source-only census without promoting bank truth.
+
+    Freeze provenance, month-level grain and exact Python types. In particular,
+    bool must not masquerade as integer zero, and a forged BANK scope must not
+    change a source-derived invoice/declaration replay into cash evidence.
+    """
+    if type(result) is not dict:
+        raise ValueError("public accounting receipt must be a dict")
     expected = {
+        "scope": "PUBLIC_SAME_SOURCE_ACCOUNTING_ONLY",
         "source_months": 5,
         "disclosed_rows": 314,
         "unique_economic_invoices": 273,
         "repeated_disclosures_not_duplicate_payments": 41,
+        "supplier_reference_payment_declaration_groups": 217,
         "exact_invoiced_source_minor": 7423667742,
         "exact_grouped_source_minor": 7423667742,
         "matched_original_invoices": 273,
@@ -218,9 +228,36 @@ def assert_public_census_result(result: dict) -> None:
         "publication_claim_approved": False,
     }
     for field, value in expected.items():
-        if result.get(field) != value:
+        observed = result.get(field)
+        if type(observed) is not type(value) or observed != value:
             raise ValueError("public accounting regression mismatch: " + field)
+
+    expected_monthly = {month: entry[2] for month, entry in SOURCES.items()}
+    monthly = result.get("monthly_rows")
+    if (
+        type(monthly) is not dict
+        or set(monthly) != set(expected_monthly)
+        or any(type(monthly[month]) is not int or
+               monthly[month] != expected_count
+               for month, expected_count in expected_monthly.items())
+        or sum(monthly.values()) != result["disclosed_rows"]
+    ):
+        raise ValueError("public accounting monthly source distribution mismatch")
+
+    replay_hash = result.get("replay_hash")
+    if type(replay_hash) is not str or re.fullmatch(r"[0-9a-f]{64}", replay_hash) is None:
+        raise ValueError("public accounting replay hash must be lower-case SHA-256")
+
     if result.get("republication_payment_annotations_consistent") is not True:
         raise ValueError("public accounting replay lacks verified republication consistency")
     if result.get("actual_freight_detection_accuracy") is not None:
         raise ValueError("general accounting data cannot label freight accuracy")
+    if (
+        result["unique_economic_invoices"]
+        + result["repeated_disclosures_not_duplicate_payments"]
+        != result["disclosed_rows"]
+        or result["matched_original_invoices"] + result["unmatched_original_invoices"]
+        != result["unique_economic_invoices"]
+        or result["exact_invoiced_source_minor"] != result["exact_grouped_source_minor"]
+    ):
+        raise ValueError("public accounting population or money conservation mismatch")

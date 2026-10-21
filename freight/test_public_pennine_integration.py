@@ -65,22 +65,7 @@ def test_incomplete_csv_source_rows_fail_closed():
 
 
 def test_result_integrity_cannot_forge_success():
-    result = {
-        "source_months": 5,
-        "disclosed_rows": 314,
-        "unique_economic_invoices": 273,
-        "repeated_disclosures_not_duplicate_payments": 41,
-        "republication_payment_annotations_consistent": True,
-        "exact_invoiced_source_minor": 7423667742,
-        "exact_grouped_source_minor": 7423667742,
-        "matched_original_invoices": 273,
-        "unmatched_original_invoices": 0,
-        "mismatched_source_references": 0,
-        "independently_proven_bank_settlements": 0,
-        "realized_recovery_minor": 0,
-        "publication_claim_approved": False,
-        "actual_freight_detection_accuracy": None,
-    }
+    result = _complete_public_report_fixture()
     assert_public_census_result(result)
     for field, tampered in [
         ("matched_original_invoices", 272),
@@ -94,3 +79,52 @@ def test_result_integrity_cannot_forge_success():
         changed[field] = tampered
         with pytest.raises(ValueError):
             assert_public_census_result(changed)
+
+
+def _complete_public_report_fixture():
+    """Aggregate-only frozen census receipt, without publisher row identities."""
+    return {
+        "scope": "PUBLIC_SAME_SOURCE_ACCOUNTING_ONLY",
+        "source_months": 5,
+        "monthly_rows": {"2026-04": 67, "2026-05": 53, "2026-06": 50,
+                         "2026-07": 103, "2026-08": 41},
+        "disclosed_rows": 314,
+        "unique_economic_invoices": 273,
+        "repeated_disclosures_not_duplicate_payments": 41,
+        "republication_payment_annotations_consistent": True,
+        "supplier_reference_payment_declaration_groups": 217,
+        "exact_invoiced_source_minor": 7423667742,
+        "exact_grouped_source_minor": 7423667742,
+        "matched_original_invoices": 273,
+        "unmatched_original_invoices": 0,
+        "mismatched_source_references": 0,
+        "independently_proven_bank_settlements": 0,
+        "actual_freight_detection_accuracy": None,
+        "realized_recovery_minor": 0,
+        "replay_hash": "a" * 64,
+        "publication_claim_approved": False,
+    }
+
+
+@pytest.mark.parametrize("field,corrupt", [
+    ("scope", "BANK_CLEARED_ACCOUNTING"),
+    ("supplier_reference_payment_declaration_groups", 216),
+    ("monthly_rows", {"2026-04": 66, "2026-05": 54, "2026-06": 50,
+                      "2026-07": 103, "2026-08": 41}),
+    ("monthly_rows", {"2026-04": 67, "2026-05": 53, "2026-06": 50,
+                      "2026-07": 103, "2026-08": 41, "2026-09": 0}),
+    ("replay_hash", None),
+    ("replay_hash", "forged"),
+    ("replay_hash", "A" * 64),
+    ("publication_claim_approved", 0),
+    ("unmatched_original_invoices", False),
+    ("independently_proven_bank_settlements", False),
+    ("matched_original_invoices", 273.0),
+    ("source_months", 5.0),
+])
+def test_public_report_receipt_rejects_false_accounting_provenance(field, corrupt):
+    original = _complete_public_report_fixture()
+    assert_public_census_result(original)
+    original[field] = corrupt
+    with pytest.raises(ValueError):
+        assert_public_census_result(original)
