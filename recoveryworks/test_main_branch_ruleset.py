@@ -19,7 +19,7 @@ class MainBranchRulesetTests(unittest.TestCase):
 
     def test_scope_and_zero_bypass_exact_default_branch(self):
         self.assertEqual(self.ruleset["target"], "branch")
-        self.assertEqual(self.ruleset["enforcement"], "active")
+        self.assertEqual(self.ruleset["enforcement"], "disabled")
         self.assertEqual(self.ruleset["bypass_actors"], [])
         self.assertEqual(self.ruleset["conditions"]["ref_name"], {
             "include": ["~DEFAULT_BRANCH"], "exclude": [],
@@ -67,6 +67,30 @@ class MainBranchRulesetTests(unittest.TestCase):
         for var in ("AI_BUSINESS_OS_RESULT", "FREIGHT_RESULT",
                     "RECOVERYWORKS_RESULT", "TECHNOLOGY_INTELLIGENCE_RESULT"):
             self.assertIn('test "$' + var + '" = "success"', body)
+
+    def test_activation_is_blocked_by_existing_direct_main_writers(self):
+        # A PR-only ruleset would strand scheduled writers still pushing into
+        # main. Keep the template disabled until every writer is migrated.
+        direct = []
+        writer_files = {
+            "catalog-append.yml": "git push",
+            "integrator-sync.yml": "git push",
+            "public-repo-hunter.yml": "git push origin HEAD:main",
+        }
+        for name, marker in writer_files.items():
+            body = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
+            if marker in body:
+                direct.append(name)
+        ti = (ROOT / "tools" / "ti_persist_generated.py").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github" / "workflows" / "technology-intelligence.yml").read_text(
+            encoding="utf-8"
+        )
+        if '"HEAD:main"' in ti and "ti_persist_generated.py" in workflow:
+            direct.append("technology-intelligence.yml")
+        if self.ruleset["enforcement"] == "active":
+            self.assertEqual(direct, [], "Direct-main writers must migrate before protection")
+        # Deliberately do not assert that any writer must remain; migrating
+        # them is a prerequisite for switching the manifest to active.
 
     def test_customer_release_remains_a_separate_hold(self):
         policy = (ROOT / "recoveryworks" / "CODE_RELEASE_POLICY.md").read_text(
