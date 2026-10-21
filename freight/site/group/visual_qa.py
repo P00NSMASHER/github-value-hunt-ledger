@@ -20,6 +20,10 @@ def load_page_images(page):
       for (const image of document.querySelectorAll('img[loading="lazy"]')) {
         image.scrollIntoView({block: 'center', behavior: 'instant'});
         await nextPaint();
+        // A completed network response can still be undecoded when a full-page
+        // capture moves the image off screen. Paint it while it is in view.
+        try { await image.decode(); } catch (_) { /* recorded below */ }
+        await nextPaint();
       }
       window.scrollTo({top: 0, behavior: 'instant'});
       await nextPaint();
@@ -115,7 +119,7 @@ def main():
     try:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
-            for width, height in ((1440, 900), (768, 1024), (390, 844), (320, 700)):
+            for width, height in ((1440, 900), (768, 1024), (390, 844), (375, 812), (320, 700)):
                 context = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="reduce",
                                               is_mobile=width <= 390, has_touch=width <= 390,
                                               bypass_csp=bool(axe_source))
@@ -155,6 +159,8 @@ def main():
                     # Capture every route/viewport, including failed accessibility checks,
                     # so one defect cannot hide the remaining release evidence.
                     page.screenshot(path=str(args.out / f'{slug or "home"}-{width}.png'), full_page=True)
+                    if slug in ("", "capturebrief", "contact"):
+                        page.screenshot(path=str(args.out / f'{slug or "home"}-{width}-viewport.png'), full_page=False)
                 page.goto(base + "/")
                 menu = page.locator(".business-menu summary")
                 menu.focus()

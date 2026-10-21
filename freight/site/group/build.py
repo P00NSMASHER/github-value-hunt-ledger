@@ -8,13 +8,15 @@ from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 from freight.site.group.catalog import BUSINESSES, DIVISIONS
+from freight.site.group.home_page import render_home
+from freight.site.group.business_pages import render_business
 from freight.site.rebase_public_urls import NEW_BASE
 from freight.site.asset_integrity import assert_webp, AssetIntegrityError
 
 SOURCE = Path(__file__).parent
 ROUTES = tuple(b["slug"] for b in BUSINESSES) + ("contact",)
 # index replaces the freight homepage; all other additions are explicit.
-IMAGE_NAMES = tuple(f"{name}-{width}.webp" for name in ("research", "restaurant", "tools") for width in (768, 1536))
+IMAGE_NAMES = tuple(f"{name}-{width}.webp" for name in ("research", "restaurant", "tools", "hero", "digital") for width in (768, 1536))
 ADDED_FILES = tuple(f"{slug}/index.html" for slug in ROUTES) + ("group.css", "group.js") + tuple("assets/group/" + name for name in IMAGE_NAMES)
 
 
@@ -51,51 +53,18 @@ def document(title, description, route, body):
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{escape(title)} | RETALLY Group</title><meta name="description" content="{escape(description, quote=True)}">
 <meta name="theme-color" content="#06392f"><meta name="referrer" content="no-referrer">
-<meta name="site-release" content="retally-group-20261021"><meta name="design-release" content="retally-design-20261021"><meta name="robots" content="index,follow">
+<meta name="site-release" content="retally-group-20261021"><meta name="design-release" content="retally-freight-benchmark-20261021"><meta name="robots" content="index,follow">
 <link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:site_name" content="RETALLY Group"><meta property="og:title" content="{escape(title, quote=True)} | RETALLY Group"><meta property="og:description" content="{escape(description, quote=True)}"><meta property="og:url" content="{canonical}"><meta property="og:image" content="{NEW_BASE}assets/brand/retally-wordmark-approved.png"><meta property="og:image:alt" content="RETALLY"><meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/brand/retally-emblem-approved.png" type="image/png"><link rel="preload" href="/assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/group.css"><script src="/group.js" defer></script>
 </head><body class="group-site">{header()}<main id="main">{body}</main>{footer()}</body></html>'''
 
 
 def home():
-    featured = ""
-    photos = {
-        "capturebrief": photograph("research", "Sunlit research desk with notebooks and a green folio"),
-        "permitplate": photograph("restaurant", "Illustrative New York corner restaurant with green window frames"),
-        "recovery": '<img class="editorial-photo" src="/assets/images/terminal-blue-hour-800.webp" width="800" height="500" alt="Freight terminal at blue hour" loading="lazy" decoding="async">',
-    }
-    captions = {"recovery": ("Freight audit & recovery", "Start with a free audit"), "capturebrief": ("Federal opportunity research", "$149 / one review"), "permitplate": ("NYC restaurant intelligence", "$79 / month")}
-    for b in BUSINESSES[:3]:
-        category, price = captions[b["slug"]]
-        featured += f'''<a class="business-card featured-card" href="/{b['slug']}/"><div class="card-image">{photos[b['slug']]}</div><div class="card-copy"><p class="group-kicker">{category}</p><h3>{escape(b['name'])}</h3><p>{escape(b['summary'])}</p><div class="card-bottom"><span>{price}</span><span aria-hidden="true">↗</span></div></div></a>'''
-    studio = ""
-    anchors = {"rehabsignal": "division-2", "sheetharbor": "division-3", "scopesignal": "division-4"}
-    for b in BUSINESSES[3:]:
-        anchor = f' id="{anchors[b["slug"]]}"' if b["slug"] in anchors else ""
-        studio += f'''<a class="portfolio-item"{anchor} href="/{b['slug']}/"><span class="group-status">{escape(b['status'])}</span><h3>{escape(b['name'])}<span aria-hidden="true">↗</span></h3><p>{escape(b['summary'])}</p></a>'''
-    body = f'''<section class="group-hero"><div class="group-wrap group-hero-grid"><div class="hero-intro"><p class="group-kicker">RECOVERY · RESEARCH · PRACTICAL TOOLS</p><h1>Find the value.<br><em>Move forward.</em></h1><p class="group-lead">Recover freight overcharges. Research your next opportunity. Put clearer evidence behind your business decisions.</p><div class="group-actions">{link("Find your service ↓", "#businesses", "group-button")}{link("Talk to RETALLY ↗", "/contact/", "group-text-link")}</div><p class="group-hero-note">Focused businesses. A clear place to start.</p></div><figure class="hero-photograph">{photograph("research", "A sunlit workspace with research notebooks, a green folio and a laptop", True)}<figcaption><span>THE RETALLY APPROACH</span><strong>Good work starts<br>with a closer look.</strong></figcaption></figure></div></section>
-<div class="group-principles"><div class="group-wrap"><span>Evidence before claims</span><span>Human judgment where it matters</span><span>Clear scope from the start</span></div></div>
-<section class="group-section group-wrap" id="businesses"><div class="section-title-row"><div><p class="group-kicker">AVAILABLE TODAY</p><h2>A useful next step.</h2></div><p>Three focused offers.<br>Choose the problem you need to solve.</p></div><div class="featured-grid" id="division-1">{featured}</div></section>
-<section class="studio-section"><div class="group-wrap"><div class="section-title-row"><div><p class="group-kicker">MORE FROM RETALLY</p><h2>In the studio.</h2></div><p>Tools, previews and ideas taking shape.<br>Each page shows its current stage.</p></div><div class="studio-grid">{studio}</div></div></section>
-<section class="group-approach" id="approach"><div class="group-wrap approach-layout"><figure class="approach-photo">{photograph("tools", "Ceramics, a candle and measuring tools on an oak maker’s workbench")}</figure><div><p class="group-kicker">HOW WE WORK</p><h2>Specific problems.<br><em>Thoughtful solutions.</em></h2><p>Understand the work. Examine the evidence. Make the next step clear.</p><p>That approach connects every RETALLY business, from freight recovery to focused research and practical tools. We explain the scope, the limits and what happens next before you commit.</p>{link("Find your starting point →", "/contact/", "group-text-link")}</div></div></section>'''
-    return document("Recovery, intelligence & practical tools", "Explore RETALLY Group: recovery services, focused business research, spreadsheets, applications and public-data tools.", "", body)
+    return document("Recovery, intelligence & practical tools", "Explore RETALLY Group: recovery services, focused business research, spreadsheets, applications and public-data tools.", "", render_home(BUSINESSES, photograph, link))
 
 
 def business_page(b):
-    target = b.get("href", mail(b["name"]))
-    features = "".join(f'<article><span class="feature-index">0{i}</span><h3>{escape(t)}</h3><p>{escape(d)}</p></article>' for i, (t, d) in enumerate(b["features"], 1))
-    steps = "".join(f'<li><span>0{i}</span><p>{escape(s)}</p></li>' for i, s in enumerate(b["steps"], 1))
-    resources = "".join(link(label + " ↗", href, "group-text-link") for label, href in b["links"])
-    photo_names = {"capturebrief": ("research", "Research notebooks and a laptop in a sunlit workspace"), "permitplate": ("restaurant", "Illustrative New York corner restaurant"), "sheetharbor": ("tools", "Maker’s workbench with ceramics, a candle and measuring tools")}
-    offer_photo = photograph(*photo_names[b["slug"]], eager=True) if b["slug"] in photo_names else ""
-    sample = link(b["links"][0][0] + " ↗", b["links"][0][1], "group-text-link sample-link") if b["slug"] in {"capturebrief", "permitplate"} else ""
-    pricing = f'<p class="group-price">{b["price"]}<span>{b["unit"]}</span></p>' if "price" in b else '<p class="group-card-stage">' + escape(b["status"]) + '</p>'
-    action_note = "Opens the existing product site for the full offer and next step." if "href" in b else "Opens an email draft. Nothing is sent automatically."
-    body = f'''<section class="business-hero"><div class="group-wrap"><nav class="group-breadcrumb" aria-label="Breadcrumb"><a href="/">RETALLY Group</a><span aria-hidden="true">/</span><span>{escape(b['name'])}</span></nav><div class="business-hero-grid"><div><p class="group-kicker">{escape(b['division'])} / {escape(b['name'])}</p><h1>{escape(b['headline'])}</h1><p class="group-lead">{escape(b['summary'])}</p><p class="business-audience">For {escape(b['audience'][0].lower() + b['audience'][1:])}.</p></div><aside class="business-offer">{offer_photo}<div class="offer-content"><span class="group-status">{escape(b['status'])}</span><h2>{escape(b['name'])}</h2>{pricing}{link(b['cta'] + " ↗", target, "group-button")}{sample}<p class="group-small">{action_note}</p></div></aside></div></div></section>
-<section class="group-section group-wrap"><div class="group-section-heading"><p class="group-kicker">THE FOCUS</p><h2>Built around your decision.</h2><p>{escape(b['detail'])}</p></div><div class="group-features">{features}</div></section>
-<section class="group-how"><div class="group-wrap group-two-col"><div><p class="group-kicker">YOUR NEXT STEP</p><h2>A clear way<br><em>to begin.</em></h2></div><ol class="group-steps">{steps}</ol></div></section>
-<section class="group-section group-wrap"><div class="group-two-col"><div><p class="group-kicker">SCOPE &amp; AVAILABILITY</p><h2>Know what to expect.</h2></div><div><p class="group-boundary">{escape(b['boundary'])}</p><div class="group-resource-links">{resources}</div><p class="group-small">Questions about {escape(b['name'])}? {link("Email RETALLY", mail(b['name']))}. Include the business name and a brief, non-sensitive description of what you need.</p></div></div></section>'''
-    return document(b["name"], b["summary"], b["slug"] + "/", body)
+    return document(b["name"], b["summary"], b["slug"] + "/", render_business(b, photograph, link, mail))
 
 
 def contact_page():

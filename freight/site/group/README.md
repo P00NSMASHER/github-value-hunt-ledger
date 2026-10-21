@@ -81,7 +81,7 @@ Grouped navigation, earlier sample links, shared green/cream styling and a local
 email composer reduce unnecessary steps without changing operating systems.
 The freight chat launcher hides while the intake form is in the viewport.
 
-Three new editorial photographs were created with the built-in image-generation
+Five new editorial photographs were created with the built-in image-generation
 tool and visually reviewed. They are illustrative, not client locations, staff,
 product screenshots or proof of results. Approved RETALLY logos are unchanged.
 
@@ -90,8 +90,10 @@ product screenshots or proof of results. Approved RETALLY logos are unchanged.
 | research | Sunlit stone desk, green folio, notebooks, unbranded laptop; natural materials | 768×512 and 1536×1024 WebP |
 | restaurant | NYC corner café, green frames, warm wood, brick, morning light; no readable branding | 768×512 and 1536×1024 WebP |
 | tools | Oak maker bench, ceramics, candles, measuring tools, blank notebook; natural daylight | 768×512 and 1536×1024 WebP |
+| hero | Business research studio at blue hour, dark green space and warm desk detail; illustrative city view | 768×512 and 1536×1024 WebP |
+| digital | Photorealistic oak/aluminum technology workspace, blank screens, green accents | 768×512 and 1536×1024 WebP |
 
-The six reviewed filenames form an explicit allowlist. Build validation rejects
+The ten reviewed filenames form an explicit allowlist. Build validation rejects
 extra assets, symlinks, malformed WebP, wrong geometry or any image above 450 KB.
 PNG generation masters are not shipped. Responsive image widths, intrinsic
 dimensions and lazy loading keep the new photography within a small page budget.
@@ -100,9 +102,21 @@ The contact composer only prepares or copies a message. Nothing is posted,
 tracked, stored or sent by the page. The existing freight-only inquiry endpoint
 is not reused for other businesses. Existing mailto opt-outs remain intact.
 
-Visual acceptance runs all 13 routes at 1440, 768, 390 and 320 CSS pixels, with
+Visual acceptance runs all 13 routes at 1440, 768, 390, 375 and 320 CSS pixels, with
 real lazy-image loading, keyboard navigation, email-draft updates and chat
 clearance (also at the previously affected 1363×936). Pinned axe-core checks
-all four current viewport sizes for serious/critical WCAG rule failures.
+all five current viewport sizes for serious/critical WCAG rule failures.
 These checks do not establish full WCAG conformance, email delivery, payment
 fulfillment or commercial readiness of the separately labelled prototypes.
+
+
+The owner-directed benchmark revision adopts the existing freight Recovery
+site's photographic depth, dark green heroes, raised controls and clear offer
+panels. The homepage has three current offer cards and eight clearly staged
+business entries. All ten other business pages have subject-specific imagery,
+source-backed offer details, process steps and explicit scope/resources panels.
+Recovery retains its own visual system and working intake.
+
+Content-derived CSS/JavaScript URLs prevent existing browser caches from mixing
+new HTML with an old stylesheet or script; the regression changes CSS bytes and
+checks that its URL changes automatically.

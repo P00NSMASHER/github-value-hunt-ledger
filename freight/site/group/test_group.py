@@ -75,6 +75,10 @@ def within(parents, *, tag=None, element_id=None, css_class=None):
 
 # This reviewed contract is deliberately independent of the production allowlist.
 REVIEWED_IMAGES = {
+    "hero-768.webp": (768, 512),
+    "hero-1536.webp": (1536, 1024),
+    "digital-768.webp": (768, 512),
+    "digital-1536.webp": (1536, 1024),
     "research-768.webp": (768, 512),
     "research-1536.webp": (1536, 1024),
     "restaurant-768.webp": (768, 512),
@@ -186,10 +190,11 @@ def test_group_photography_matches_reviewed_assets_and_page_budget(bundle):
                 filename = ref.removeprefix("/assets/group/")
                 assert filename in REVIEWED_IMAGES, (html, ref)
                 used.add(filename)
-        for tag, attrs, _ in page.elements:
+        for tag, attrs, parents in page.elements:
             if tag == "img" and attrs.get("src", "").startswith("/assets/group/"):
                 assert (int(attrs["width"]), int(attrs["height"])) == (1536, 1024)
-                assert attrs.get("alt", "").strip()
+                assert "alt" in attrs
+                assert attrs["alt"].strip() or any(a.get("aria-hidden") == "true" for _, a in parents)
                 assert attrs.get("loading") in {"eager", "lazy"}
                 assert attrs.get("sizes")
                 name = Path(attrs["src"]).name.removesuffix("-1536.webp")
