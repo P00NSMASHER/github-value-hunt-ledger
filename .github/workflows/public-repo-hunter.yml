@@ -51,6 +51,11 @@ concurrency:
 
 jobs:
   scout:
+    outputs:
+      proposal_ready: ${{ steps.persist.outputs.proposal_ready }}
+      branch: ${{ steps.persist.outputs.branch }}
+      base_sha: ${{ steps.persist.outputs.base_sha }}
+      head_sha: ${{ steps.persist.outputs.head_sha }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -103,8 +108,10 @@ jobs:
             python tools/public_repo_scout.py --worker "$WORKER"
           fi
       - name: Commit queue refresh
+        id: persist
         env:
           WORKER: ${{ steps.route.outputs.worker }}
+          PR_MODE: ${{ vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED }}
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -118,4 +125,51 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "automation: refresh ${WORKER} scout state"
           git pull --rebase origin main
-          git push origin HEAD:main
+          if [ "$PR_MODE" = "true" ]; then
+            BRANCH="automation/retally-scout-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            BASE_SHA="$(git rev-parse HEAD^)"
+            HEAD_SHA="$(git rev-parse HEAD)"
+            git push origin "HEAD:refs/heads/$BRANCH"
+            {
+              echo "proposal_ready=true"
+              echo "branch=$BRANCH"
+              echo "base_sha=$BASE_SHA"
+              echo "head_sha=$HEAD_SHA"
+            } >> "$GITHUB_OUTPUT"
+          else
+            git push origin HEAD:main
+          fi
+
+  submit-pr:
+    needs: scout
+    if: >-
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
+      vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED == 'true' &&
+      needs.scout.outputs.proposal_ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Verify scoped Scout evidence before dispatching real CI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROPOSED_BRANCH: ${{ needs.scout.outputs.branch }}
+          PROPOSED_BASE: ${{ needs.scout.outputs.base_sha }}
+          PROPOSED_HEAD: ${{ needs.scout.outputs.head_sha }}
+        run: >-
+          python tools/retally_automated_pr_proposal.py
+          --lane scout
+          --branch "$PROPOSED_BRANCH"
+          --base-sha "$PROPOSED_BASE"
+          --head-sha "$PROPOSED_HEAD"
