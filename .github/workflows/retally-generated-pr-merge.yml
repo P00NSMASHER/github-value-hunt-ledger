@@ -49,7 +49,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Test generated PR authority and failure semantics
-        run: python -m unittest -v tests.test_ti_retally_generated_pr_controller
+        run: >-
+          python -m unittest -v
+          tests.test_ti_retally_generated_pr_controller
+          tests.test_ti_retally_main_race_recovery
 
   guarded-merge:
     if: >-
@@ -75,6 +78,7 @@ jobs:
       - name: Require actual CI and bounded generated-source authority before merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED: ${{ vars.RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED }}
           INPUT_PR_NUMBER: ${{ inputs.pr_number }}
           INPUT_LANE: ${{ inputs.lane }}
           INPUT_HEAD_SHA: ${{ inputs.head_sha }}
