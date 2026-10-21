@@ -35,6 +35,12 @@ BUCKET = "retally-synthetic-sealed-recovery"
 SHAPE = "VM.Standard.E2.1.Micro"
 ALLOWED_EVENTS = {"schedule", "workflow_dispatch"}
 OIDC_HOST = "pipelines.actions.githubusercontent.com"
+# GitHub documents *.actions.githubusercontent.com for the token-request
+# endpoint. Its hosted runners also use regional pipelinesghub* subdomains.
+# Restrict to those exact GitHub-operated pipeline host shapes.
+OIDC_REGIONAL_HOST = re.compile(
+    r"pipelinesghub[a-z0-9]{1,24}\.actions\.githubusercontent\.com"
+)
 MAX_TOKEN = 32768
 
 
@@ -76,8 +82,13 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
             domain.path in ("", "/") and not domain.query and not domain.fragment,
             "Identity-domain URL must be an OCI HTTPS identity domain origin")
     oidc = urlparse(environ["ACTIONS_ID_TOKEN_REQUEST_URL"])
-    require(oidc.scheme == "https" and oidc.hostname == OIDC_HOST and
-            not oidc.username and not oidc.password and not oidc.port,
+    approved_oidc_host = (
+        oidc.hostname == OIDC_HOST or
+        OIDC_REGIONAL_HOST.fullmatch(oidc.hostname or "") is not None
+    )
+    require(oidc.scheme == "https" and approved_oidc_host and
+            not oidc.username and not oidc.password and not oidc.port and
+            bool(oidc.path) and not oidc.fragment,
             "GitHub OIDC request endpoint is not trusted")
     require(re.fullmatch(r"[a-zA-Z0-9_-]{2,80}",
                          environ["RETALLY_OCI_NAMESPACE"]) is not None,
