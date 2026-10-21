@@ -54,6 +54,10 @@ Actions artifacts, or public step summaries.
    before first-row deduplication or matching. Legitimate multiple invoices
    under one remittance stay distinct, and payment keys include the supplier
    so two unrelated suppliers cannot be merged by coincidentally equal numbers.
+   The same supplier/invoice number with a different issue date or exact
+   invoice amount is held for source adjudication, not silently counted as a
+   second invoice; control-character or Unicode alias-form source identities
+   are rejected before delimiter-based keys and derived transaction IDs.
 5. A separate ArcBest smoke test may construct canonical records from the
    original document's printed postal codes, rated weight, shipment date and
    total. It explicitly marks the **shipment-date-as-invoice-date proxy**, the

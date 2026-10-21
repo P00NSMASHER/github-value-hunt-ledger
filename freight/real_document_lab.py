@@ -25,7 +25,11 @@ from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from freight.ingestion_gateway import IngressEnvelope, ingest_bytes
-from freight.pennine_publication_integrity import require_matching_payment_annotations
+from freight.pennine_publication_integrity import (
+    require_canonical_source_identity,
+    require_matching_payment_annotations,
+    require_stable_invoice_economics,
+)
 from recoveryworks.reconciliation_kernel import (
     ManyToOneConfig, ReconConfig, ReconTxn, parse_amount_to_minor, reconcile,
 )
@@ -886,6 +890,9 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
             continue
         if not x["supplier number"] or not x["invoice number"]:
             raise ValueError("missing invoice identity in source month")
+        for name in ("supplier number", "invoice number"):
+            require_canonical_source_identity(x[name])
+        require_canonical_source_identity(x["payment number"], allow_empty=True)
         x["invoice date"] = iso_date(x["invoice date"])
         x["payment date"] = iso_date(x["payment date"])
         x["invoice_amount_minor"] = minor(x["invoice amount"])
@@ -918,7 +925,16 @@ def benchmark_pennine() -> dict:
     declaration_fields = inv_fields + ("payment number", "payment date", "payment currency")
     by_identity: dict[str, list[dict]] = defaultdict(list)
     by_decl: dict[str, list[dict]] = defaultdict(list)
+    supplier_invoice_first: dict[tuple[str, str], dict] = {}
     for row in all_rows:
+        supplier_invoice = (row["supplier number"], row["invoice number"])
+        if supplier_invoice in supplier_invoice_first:
+            require_stable_invoice_economics(
+                supplier_invoice_first[supplier_invoice], row,
+                amount_field="invoice_amount_minor",
+            )
+        else:
+            supplier_invoice_first[supplier_invoice] = row
         by_identity[_key(row, inv_fields)].append(row)
         by_decl[_key(row, declaration_fields)].append(row)
     for group in by_identity.values():

@@ -113,3 +113,58 @@ def test_lab_truncated_csv_row_cannot_disappear_from_published_population():
         lab.parse_pennine_csv(corrupt, "2026-08")
     with pytest.raises(ValueError, match="truncated"):
         census.decode_month(corrupt, "2026-08")
+
+
+@pytest.mark.parametrize("original,replacement", [
+    ("29,601.74", "29,601.75"),
+    ("06/07/2026", "07/07/2026"),
+])
+def test_public_census_holds_reused_invoice_with_changed_economics(
+    original, replacement,
+):
+    conflicting = _original().replace(original.encode(), replacement.encode())
+    with pytest.raises(ValueError, match="INVOICE_ECONOMIC_IDENTITY_CONFLICT") as exc:
+        _replay(_original(), conflicting)
+    assert "000123" not in str(exc.value)  # no supplier / invoice in errors
+
+
+@pytest.mark.parametrize("original,replacement", [
+    ("29,601.74", "29,601.75"),
+    ("06/07/2026", "07/07/2026"),
+])
+def test_original_document_lab_holds_reused_invoice_with_changed_economics(
+    original, replacement,
+):
+    conflicting = _original().replace(original.encode(), replacement.encode())
+    with patch.dict(lab.PENNINE, {
+        "2026-07": "https://example.invalid/one",
+        "2026-08": "https://example.invalid/two",
+    }, clear=True), patch.object(
+        lab, "fetch_public", side_effect=[_original(), conflicting],
+    ), patch.object(lab, "require_frozen_source", return_value="synthetic-only"):
+        with pytest.raises(ValueError, match="INVOICE_ECONOMIC_IDENTITY_CONFLICT"):
+            lab.benchmark_pennine()
+
+
+@pytest.mark.parametrize("id_mutation", [
+    b"000\x1f123",  # delimiter collision in laboratory's old join-based keys
+    b"00\xe2\x80\x8d0123",  # invisible Unicode format control
+    "Cafe\u0301".encode("utf-8"),  # Unicode canonical decomposition alias
+])
+def test_both_pennine_parsers_reject_ambiguous_invoice_id(id_mutation):
+    corrupt = _original().replace(b"000123", id_mutation)
+    with pytest.raises(ValueError, match="NONCANONICAL_PUBLIC_SOURCE_IDENTITY"):
+        census.decode_month(corrupt, "2026-08")
+    with pytest.raises(ValueError, match="NONCANONICAL_PUBLIC_SOURCE_IDENTITY"):
+        lab.parse_pennine_csv(corrupt, "2026-08")
+
+
+def test_different_suppliers_can_have_the_same_invoice_number_and_amount_changes():
+    baseline = _original()
+    second = baseline.replace(b"35,000123", b"36,000123").replace(
+        b"29,601.74", b"29,601.75",
+    )
+    result = _replay(baseline, second)
+    assert result["unique_economic_invoices"] == 2
+    assert result["matched_original_invoices"] == 2
+    assert result["republication_payment_annotations_consistent"] is True

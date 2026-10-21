@@ -16,7 +16,11 @@ import csv
 import io
 import re
 
-from freight.pennine_publication_integrity import require_matching_payment_annotations
+from freight.pennine_publication_integrity import (
+    require_canonical_source_identity,
+    require_matching_payment_annotations,
+    require_stable_invoice_economics,
+)
 from freight.scoped_reconciliation import ScopedTxn, reconcile_scoped
 from recoveryworks.reconciliation_kernel import ReconTxn, parse_amount_to_minor
 
@@ -97,6 +101,7 @@ def decode_month(raw: bytes, month: str) -> tuple[dict, ...]:
         for key in ("supplier number", "invoice number", "payment number"):
             if not record[key]:
                 raise ValueError("missing publicly disclosed source identity")
+            require_canonical_source_identity(record[key])
         if record["payment currency"].upper() != "GBP":
             raise ValueError("unexpected public currency")
         record["invoice date"] = _date(record["invoice date"])
@@ -124,7 +129,16 @@ def run_public_census_replay() -> dict:
         month_counts[month] = len(month_rows)
         rows.extend(month_rows)
     identity: dict[tuple[str, str, str, int], dict] = {}
+    supplier_invoice_first: dict[tuple[str, str], dict] = {}
     for row in rows:
+        supplier_invoice = (row["supplier number"], row["invoice number"])
+        if supplier_invoice in supplier_invoice_first:
+            require_stable_invoice_economics(
+                supplier_invoice_first[supplier_invoice], row,
+                amount_field="invoice amount minor",
+            )
+        else:
+            supplier_invoice_first[supplier_invoice] = row
         key = (row["supplier number"], row["invoice number"],
                row["invoice date"], row["invoice amount minor"])
         if key in identity:

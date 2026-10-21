@@ -7,6 +7,7 @@ reconciliation unsafe. No source identifiers enter errors or returned output.
 from __future__ import annotations
 
 from collections.abc import Mapping
+import unicodedata
 
 
 def _annotation(record: Mapping[str, object]) -> tuple[str, str, str, str]:
@@ -27,4 +28,47 @@ def require_matching_payment_annotations(
         raise ValueError(
             "REPUBLICATION_PAYMENT_ANNOTATION_CONFLICT: "
             "same economic invoice has conflicting publisher payment evidence"
+        )
+
+
+def require_canonical_source_identity(value: str, *, allow_empty: bool = False) -> None:
+    """Reject alias-form source IDs before delimiter-keying or hashing.
+
+    Invoice and supplier identifiers may be Unicode NFC text, but embedded
+    Unicode controls (including the record-separator delimiter) cannot become
+    distinct source identities or counterfeit transaction keys.
+    """
+    if (
+        type(value) is not str
+        or (not value and not allow_empty)
+        or value != value.strip()
+        or unicodedata.normalize("NFC", value) != value
+        or any(unicodedata.category(char).startswith("C") for char in value)
+    ):
+        raise ValueError("NONCANONICAL_PUBLIC_SOURCE_IDENTITY")
+
+
+def require_stable_invoice_economics(
+    first: Mapping[str, object], subsequent: Mapping[str, object], *,
+    amount_field: str,
+) -> None:
+    """Hold reused supplier/invoice keys with competing issue dates or amounts.
+
+    A legal correction or recycled invoice number needs external adjudication:
+    it must not be silently classified as a second unique invoice or payment.
+    """
+    if (
+        type(first[amount_field]) is not int
+        or type(subsequent[amount_field]) is not int
+        or type(first["invoice date"]) is not str
+        or type(subsequent["invoice date"]) is not str
+    ):
+        raise ValueError("PUBLIC_INVOICE_ECONOMICS_INVALID")
+    if (
+        first["invoice date"] != subsequent["invoice date"]
+        or first[amount_field] != subsequent[amount_field]
+    ):
+        raise ValueError(
+            "INVOICE_ECONOMIC_IDENTITY_CONFLICT: "
+            "supplier/invoice reference has competing published amounts or dates"
         )
