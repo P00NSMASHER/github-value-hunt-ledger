@@ -479,10 +479,88 @@ def confirm_legacy_orphan_unchanged(store: OciStore, state: dict, destination: P
            "Quarantined legacy object's remote ciphertext changed during the exercise.")
 
 
+def load_workbench_engines() -> tuple:
+    """Resolve pinned local dependencies before any durable receipt or remote mutation."""
+    source_root = Path(__file__).resolve().parents[2]
+    ensure((source_root / "recoveryworks" / "workbench.py").is_file() and
+           (source_root / "recoveryworks" / "offsite_archive.py").is_file(),
+           "Pinned RecoveryWorks checkout is incomplete.")
+    if str(source_root) not in sys.path:
+        sys.path.insert(0, str(source_root))
+    try:
+        from recoveryworks.seven_branch_simulation import seed, exercise
+        from recoveryworks.offsite_archive import seal_file, verify_file, unseal_bytes, restore_file
+        from recoveryworks.workbench import Workspace
+        from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    except (ImportError, OSError):
+        raise Refused("Pinned RecoveryWorks or cryptography dependency cannot be loaded.") from None
+    return seed, exercise, seal_file, verify_file, unseal_bytes, restore_file, Workspace
+
+
+def resume_legacy_quarantine(store: OciStore, items: list[dict]) -> dict:
+    """Recheck the immutable legacy receipt without overwriting it or deleting the object.
+
+    Allowed only when the previous attempt stopped before any upload receipt.
+    A previously observed remote SHA is NOT evidence of original upload identity.
+    """
+    ensure(_private(LEGACY_QUARANTINE),
+           "Historical canary quarantine receipt is not a private owner-only file.")
+    ensure(not ATTEMPT.exists() and not ACCEPTANCE.exists(),
+           "A previous upload or acceptance exists: never automatically resume.")
+    try:
+        observed = json.loads(LEGACY_QUARANTINE.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        raise Refused("Historical quarantine receipt is unreadable.") from None
+    required_keys = {
+        "schema", "legacy_object_name", "remote_observed_sha256",
+        "remote_observed_length", "synthetic_format_candidate",
+        "original_upload_identity_independently_verified", "legacy_object_deleted",
+        "production_backup_verified", "status"
+    }
+    ensure(isinstance(observed, dict) and set(observed) == required_keys and
+           type(observed["schema"]) is int and observed["schema"] == 1 and
+           observed["synthetic_format_candidate"] is True and
+           observed["original_upload_identity_independently_verified"] is False and
+           observed["legacy_object_deleted"] is False and
+           observed["production_backup_verified"] is False and
+           observed["status"] == "QUARANTINED_UNRESOLVED_DO_NOT_DELETE",
+           "Historical quarantine receipt is altered or no longer eligible.")
+    name = observed["legacy_object_name"]
+    expected_sha = observed["remote_observed_sha256"]
+    length = observed["remote_observed_length"]
+    ensure(isinstance(name, str) and LEGACY_OBJECT.fullmatch(name) is not None and
+           isinstance(expected_sha, str) and re.fullmatch(r"[a-f0-9]{64}", expected_sha) is not None and
+           type(length) is int and 40 <= length <= MAX_CANARY,
+           "Historical quarantine object identity or size is invalid.")
+    ensure(len(items) == 1 and items[0].get("name") == name,
+           "Historical quarantine disagrees with current remote inventory.")
+    head = store.head(name)
+    try:
+        actual_length = int(head["content-length"])
+    except (KeyError, ValueError, TypeError):
+        raise Refused("Historical canary size cannot be independently checked.") from None
+    etag = head.get("etag")
+    ensure(actual_length == length and
+           ("storage-tier" not in head or head["storage-tier"] == "Standard") and
+           isinstance(etag, str) and re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", etag) is not None,
+           "Quarantined object changed size, tier or ETag format.")
+    state = {"legacy_orphan_quarantined": True, "legacy_orphan_deleted": False,
+             "_name": name, "_etag": etag, "_length": length, "_sha256": expected_sha}
+    with tempfile.TemporaryDirectory(prefix="retally-legacy-revalidate-") as scratch:
+        ciphertext = Path(scratch) / "legacy.rtbk"
+        confirm_legacy_orphan_unchanged(store, state, ciphertext)
+        ensure(ciphertext.read_bytes().startswith(LEGACY_MAGIC),
+               "Quarantined canary's synthetic magic is not verified.")
+    return state
+
+
 def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False) -> dict:
     """Exercise actual RecoveryWorks source adapters, encryption and restore."""
     ensure(not ATTEMPT.exists() and not ACCEPTANCE.exists(),
            "Prior synthetic backup attempt/result exists; reconcile before repeat.")
+    # Local import errors must never strand an immutable quarantine receipt.
+    seed, exercise, seal_file, verify_file, unseal_bytes, restore_file, Workspace = load_workbench_engines()
     store.bucket_check()
     legacy = store.objects("synthetic-only/")
     current = store.objects("synthetic-recovery/")
@@ -495,16 +573,16 @@ def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False
         # Quarantine the old canary into an owner-only receipt. The new test
         # exclusively uses the separate synthetic-recovery/ prefix and cannot
         # delete any object in synthetic-only/.
-        legacy_state = quarantine_legacy_orphan(store, legacy)
+        # Prior receipt may be reused only after fresh exact remote checks.
+        if LEGACY_QUARANTINE.exists() or LEGACY_QUARANTINE.is_symlink():
+            legacy_state = resume_legacy_quarantine(store, legacy)
+        else:
+            legacy_state = quarantine_legacy_orphan(store, legacy)
         quarantined = True
     else:
-        ensure(not preserve_legacy_orphan,
-               "Explicit quarantine requested but no legacy synthetic object exists.")
-
-    # Late imports: read-only inspection can run on stock OCI Cloud Shell.
-    from recoveryworks.seven_branch_simulation import seed, exercise
-    from recoveryworks.offsite_archive import seal_file, verify_file, unseal_bytes, restore_file
-    from recoveryworks.workbench import Workspace
+        ensure(not preserve_legacy_orphan and
+               not LEGACY_QUARANTINE.exists() and not LEGACY_QUARANTINE.is_symlink(),
+               "Historical quarantine receipt and live OCI object disagree.")
 
     with tempfile.TemporaryDirectory(prefix="retally-recovery-synthetic-") as temp:
         base = Path(temp)
