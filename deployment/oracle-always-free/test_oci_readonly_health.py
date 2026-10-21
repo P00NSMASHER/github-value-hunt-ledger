@@ -92,6 +92,40 @@ class ContextTests(unittest.TestCase):
                 with self.assertRaises(m.Refused):
                     m.require_env(s)
 
+    def test_sanitized_context_failure_names_key_not_value(self):
+        bad = fixture()
+        bad["GITHUB_REPOSITORY_ID"] = "TOP_SECRET_FOR_TEST"
+        stream = io.StringIO()
+        with patch.dict(m.os.environ, bad, clear=True), patch("sys.stdout", stream):
+            self.assertEqual(m.main(), 1)
+        self.assertIn("RETALLY OCI DIAG: Untrusted GitHub execution context: GITHUB_REPOSITORY_ID", stream.getvalue())
+        self.assertNotIn("TOP_SECRET_FOR_TEST", stream.getvalue())
+        self.assertIn("FAIL", stream.getvalue())
+
+    def test_diagnostics_never_include_unexpected_exception_messages(self):
+        self.assertEqual(m.safe_failure_code(ValueError("TOP_SECRET_FOR_TEST")),
+                         "UNCLASSIFIED_FAILURE")
+        self.assertEqual(m.safe_failure_code(m.Refused("TOP_SECRET_FOR_TEST")),
+                         "UNCLASSIFIED_FAILURE")
+        self.assertEqual(m.safe_failure_code(m.Refused("OCI_TOKEN_EXCHANGE")),
+                         "OCI_TOKEN_EXCHANGE")
+
+    def test_fixed_preflight_reasons_report_safe_codes(self):
+        allowed = (
+            "Only scheduled or manual main-branch execution is allowed",
+            "Monitor is not explicitly enabled",
+            "Identity-domain URL must be an OCI HTTPS identity domain origin",
+            "GitHub OIDC request endpoint is not trusted",
+            "Invalid OCI namespace",
+            "Invalid OCI compartment/tenancy OCID",
+            "Invalid expected VM OCID",
+        )
+        for reason in allowed:
+            with self.subTest(reason=reason):
+                self.assertEqual(m.safe_failure_code(m.Refused(reason)), reason)
+        self.assertEqual(m.safe_failure_code(m.Refused("SECRET_EXAMPLE_VALUE")),
+                         "UNCLASSIFIED_FAILURE")
+
     def test_github_claim_exactness_and_expiry(self):
         good = claims()
         m.validate_claims(good, "schedule")
