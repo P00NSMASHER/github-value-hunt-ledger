@@ -254,42 +254,118 @@ class OciBackupTests(unittest.TestCase):
                 self.store.get("synthetic-only/test.rtbk", target,
                                etag="KNOWN-ETAG", max_size=20)
 
-    def test_bucket_privacy_fails_closed(self):
-        valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
-                 "storage-tier": "Standard", "versioning": "Disabled",
-                 "object-events-enabled": False, "replication-enabled": False,
-                 "auto-tiering": "Disabled", "object-lifecycle-policy-etag": None,
-                 "kms-key-id": None, "object-level-audit-mode": "Disabled",
-                 "soft-delete-policy": {
-                     "current-policy": {"soft-delete-mode": "Disabled"},
-                     "next-policy": None}}
-        with patch.object(self.store, "data", return_value=valid):
+    def _bucket_fixtures(self):
+        typed = {"name": backup.BUCKET_NAME, "namespace": self.store.namespace,
+                 "etag": "frozen-bucket-etag",
+                 "public-access-type": "NoPublicAccess", "storage-tier": "Standard",
+                 "versioning": "Disabled", "object-events-enabled": False,
+                 "replication-enabled": False, "auto-tiering": "Disabled",
+                 "object-lifecycle-policy-etag": None, "kms-key-id": None,
+                 # This is the ACTUAL old Cloud Shell SDK field shape.
+                 "object-level-audit-mode": None}
+        raw = {"name": backup.BUCKET_NAME, "namespace": self.store.namespace,
+               "etag": "frozen-bucket-etag",
+               "publicAccessType": "NoPublicAccess", "storageTier": "Standard",
+               "versioning": "Disabled", "objectEventsEnabled": False,
+               "replicationEnabled": False, "autoTiering": "Disabled",
+               "objectLifecyclePolicyEtag": None, "kmsKeyId": None,
+               "objectLevelAuditMode": "Disabled",
+               "softDeletePolicy": {"currentPolicy": {"softDeleteMode": "Disabled"},
+                                    "nextPolicy": None}}
+        return typed, raw
+
+    def test_real_older_sdk_null_and_omitted_fields_need_authenticated_raw_get(self):
+        typed, raw = self._bucket_fixtures()
+        self.assertNotIn("soft-delete-policy", typed)
+        self.assertIsNone(typed["object-level-audit-mode"])
+        with patch.object(self.store, "data", return_value=typed), \
+             patch.object(self.store, "raw_bucket", return_value=raw) as raw_call:
             self.store.bucket_check()
-        for field, value in (("public-access-type", "ObjectRead"),
-                             ("storage-tier", "Archive"), ("versioning", "Enabled"),
-                             ("object-events-enabled", True),
-                             ("replication-enabled", True),
-                             ("auto-tiering", "InfrequentAccess"),
-                             ("object-lifecycle-policy-etag", "new-lifecycle-policy"),
-                             ("kms-key-id", "ocid1.key.oc1..unexpected"),
-                             ("object-level-audit-mode", "Enabled"),
-                             ("soft-delete-policy", None),
-                             ("soft-delete-policy", {
-                                 "current-policy": {"soft-delete-mode": "Enabled"},
-                                 "next-policy": None}),
-                             ("soft-delete-policy", {
-                                 "current-policy": {"soft-delete-mode": "Disabled"},
-                                 "next-policy": {"soft-delete-mode": "Enabled"}})):
-            with self.subTest(field=field), patch.object(self.store, "data", return_value={**valid, field: value}):
+        raw_call.assert_called_once()
+
+    def test_core_bucket_privacy_or_identity_disagreements_fail_closed(self):
+        typed, raw = self._bucket_fixtures()
+        changes = (("public-access-type", "ObjectRead"),
+                   ("storage-tier", "Archive"), ("versioning", "Enabled"),
+                   ("object-events-enabled", True), ("replication-enabled", True),
+                   ("auto-tiering", "InfrequentAccess"),
+                   ("object-lifecycle-policy-etag", "unsafe-lifecycle"),
+                   ("kms-key-id", "ocid1.key.oc1..unexpected"),
+                   ("object-level-audit-mode", "Enabled"),
+                   ("name", "another-bucket"), ("namespace", "anotherns"))
+        for field, value in changes:
+            with self.subTest(field=field), \
+                 patch.object(self.store, "data", return_value={**typed, field: value}), \
+                 patch.object(self.store, "raw_bucket", return_value=raw):
                 with self.assertRaises(backup.Refused):
                     self.store.bucket_check()
-        for missing in ("object-events-enabled", "replication-enabled",
-                        "auto-tiering", "object-lifecycle-policy-etag",
-                         "kms-key-id", "object-level-audit-mode", "soft-delete-policy"):
-            with self.subTest(missing=missing), patch.object(self.store, "data",
-                    return_value={k: v for k, v in valid.items() if k != missing}):
+        for field in ("object-events-enabled", "replication-enabled", "auto-tiering",
+                      "object-lifecycle-policy-etag", "kms-key-id", "etag"):
+            with self.subTest(missing=field), \
+                 patch.object(self.store, "data",
+                              return_value={k: v for k, v in typed.items() if k != field}), \
+                 patch.object(self.store, "raw_bucket", return_value=raw):
                 with self.assertRaises(backup.Refused):
                     self.store.bucket_check()
+        with patch.object(self.store, "data", return_value={
+                **typed, "soft-delete-policy": {
+                    "current-policy": {"soft-delete-mode": "Enabled"}, "next-policy": None}
+                }), patch.object(self.store, "raw_bucket", return_value=raw):
+            with self.assertRaises(backup.Refused):
+                self.store.bucket_check()
+
+    def test_raw_provider_refuses_unsafe_or_missing_advanced_fields(self):
+        typed, raw = self._bucket_fixtures()
+        altered = (
+            {"kmsKeyId": "ocid1.key.oc1..unexpected"}, {"objectLevelAuditMode": "Enabled"},
+            {"objectLevelAuditMode": None}, {"softDeletePolicy": None},
+            {"softDeletePolicy": {"currentPolicy": {"softDeleteMode": "Enabled"},
+                                  "nextPolicy": None}},
+            {"softDeletePolicy": {"currentPolicy": {"softDeleteMode": "Disabled"},
+                                  "nextPolicy": {"softDeleteMode": "Enabled"}}},
+            {"etag": "changed-between-reads"},
+            {"publicAccessType": "ObjectRead"},
+            {"objectEventsEnabled": True}, {"autoTiering": "InfrequentAccess"},
+            {"objectLifecyclePolicyEtag": "unsafe-lifecycle"},
+        )
+        for mutation in altered:
+            with self.subTest(mutation=mutation), \
+                 patch.object(self.store, "data", return_value=typed), \
+                 patch.object(self.store, "raw_bucket", return_value={**raw, **mutation}):
+                with self.assertRaises(backup.Refused):
+                    self.store.bucket_check()
+        for missing in ("kmsKeyId", "objectLevelAuditMode", "softDeletePolicy",
+                        "objectEventsEnabled", "replicationEnabled", "autoTiering",
+                        "objectLifecyclePolicyEtag", "etag", "name", "namespace"):
+            with self.subTest(missing=missing), \
+                 patch.object(self.store, "data", return_value=typed), \
+                 patch.object(self.store, "raw_bucket",
+                              return_value={k: v for k, v in raw.items() if k != missing}):
+                with self.assertRaises(backup.Refused):
+                    self.store.bucket_check()
+
+    def test_raw_bucket_uses_fixed_signed_get_no_unapproved_endpoint(self):
+        _, raw = self._bucket_fixtures()
+        valid = json.dumps({"status": "200 OK", "data": raw})
+        with patch.object(self.store, "cli", return_value=valid) as cli:
+            self.assertEqual(self.store.raw_bucket(), raw)
+        args = cli.call_args.args
+        self.assertEqual(args[:3], ("raw-request", "--http-method", "GET"))
+        self.assertEqual(args[3], "--target-uri")
+        self.assertEqual(args[4], "https://objectstorage.us-ashburn-1.oraclecloud.com/n/"
+                                 "syntheticnamespace/b/" + backup.BUCKET_NAME)
+        for result in ("", "not-json", '{}',
+                       json.dumps({"status": "500 Internal Server Error", "data": raw}),
+                       json.dumps({"status": "200 OK", "data": []})):
+            with self.subTest(result=result), \
+                 patch.object(self.store, "cli", return_value=result):
+                with self.assertRaises(backup.Refused):
+                    self.store.raw_bucket()
+        self.store.region = "not-approved"
+        with patch.object(self.store, "cli") as cli:
+            with self.assertRaises(backup.Refused):
+                self.store.raw_bucket()
+            cli.assert_not_called()
 
     def test_cleanup_only_exact_legacy_synthetic_canary_with_etag(self):
         key = "synthetic-only/0123456789abcdef01234567.rtbk"
