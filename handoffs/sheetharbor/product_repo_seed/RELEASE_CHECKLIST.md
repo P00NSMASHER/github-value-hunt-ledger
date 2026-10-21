@@ -14,7 +14,9 @@
 ## P1 — post-freeze quality work
 
 - [ ] Normalize terminology and UX across vertical products.
-- [ ] Package Embroidery + Screen Printing as Custom Apparel Pricing Family.
-- [ ] Package all four as Maker Economics Bundle.
+- [x] Package Embroidery + Screen Printing as Custom Apparel Pricing Family (October 21; see package manifest).
+- [x] Package all four as Maker Economics Bundle (October 21; see package manifest).
 - [ ] Run structured user pilots.
 - [ ] Maintain a marketing-claim registry tied to pilot evidence.
+
+Package identities and historical workbook-text clarification are recorded in `release/v0.2.0-alpha/packages-2026-10-21.json`. The ZIP artifacts are distributed separately; this record does not create a storefront or new stable release.
