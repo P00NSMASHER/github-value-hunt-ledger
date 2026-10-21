@@ -259,16 +259,19 @@ Tests use only synthetic local bytes and do not claim a live CaptureBrief read.
 The live outcome-ledger location, authoritative snapshot transport, and
 case-to-account mapping remain unresolved before production enablement.
 
-## Human release authority
+## Automated quality verification and release authorization
 
-The RETALLY Group owner is the sole human approver required by this group's
-internal policy. A separate independent person need not review or approve these
-source-only changes or subsequent group quality acceptance. Existing automated
-independent technical audit and CI remain mandatory where required, as do exact
-Step-6 owner PRODUCTION_CHANGE approvals, protected-branch restrictions and
-all source-evidence checks. Internal policy cannot waive an external legal or
-contractual reviewer. Neither this policy nor a passing test authorizes the
-optional private adapters to read a source that has not been authenticated.
+RETALLY Group quality acceptance uses automated checks tied to the exact source
+revision and artifact, with independent technical audit evidence where required.
+Human code-review signatures are not quality evidence in this internal workflow.
+Existing Step-6 authenticated owner PRODUCTION_CHANGE authorizations are still
+required for governed production mutations, and protected-branch checks remain
+enforced. Those authorizations concern permission to execute, not a code-review
+stage. External legal and contractual obligations are unaffected.
+
+Passing checks never authenticates a live customer source or provider payment.
+The optional private adapters stay disabled until their source authenticity,
+permissions and account-to-business bindings are established.
 
 ## Remaining operating work
 
