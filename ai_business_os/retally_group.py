@@ -138,8 +138,13 @@ def validate_catalog(catalog: Mapping[str, Any]) -> None:
              "source repository revision must be an exact Git commit")
     authority = catalog.get("authority", {})
     _keys(authority, {"planning_only", "external_actions_authorized", "public_rebrand_authorized",
-                      "production_state_mutation_authorized", "registration_policy"}, "authority")
+                      "production_state_mutation_authorized", "registration_policy",
+                      "internal_human_review_required", "internal_quality_gate"}, "authority")
     _text(authority.get("registration_policy"), "registration policy")
+    _require(authority.get("internal_human_review_required") is False,
+             "RETALLY internal human review must remain disabled")
+    _require(authority.get("internal_quality_gate") == "AUTOMATED_EVIDENCE_QA",
+             "RETALLY internal quality verification must be automated")
     _require(authority.get("planning_only") is True, "planning_only must be true")
     for key in ("external_actions_authorized", "public_rebrand_authorized", "production_state_mutation_authorized"):
         _require(authority.get(key) is False, f"{key} must be false")
@@ -228,10 +233,15 @@ def validate_catalog(catalog: Mapping[str, Any]) -> None:
         for item in evidence:
             _text(item, "evidence criterion")
     quality = next(row for row in workflow if row["id"] == "quality-reviewed")
-    _require(quality["owner_role"] == "OWNER_QUALITY_ASSURANCE",
-             "RETALLY quality stage must require owner acceptance, not a second human approver")
-    _require(any("Owner acceptance" in row for row in quality["required_evidence"]),
-             "RETALLY quality stage must declare owner acceptance evidence")
+    _require(quality["owner_role"] == "AUTOMATED_QUALITY_GATE",
+             "RETALLY quality stage must have no mandatory human reviewer")
+    _require(any("automated" in row.lower() for row in quality["required_evidence"]),
+             "RETALLY quality stage must declare independent automated verification")
+    _require(any("source" in row.lower() for row in quality["required_evidence"]),
+             "RETALLY quality stage must retain source-validity evidence")
+    _require(not any("human review" in row.lower() or "owner acceptance" in row.lower()
+                     or "independent reviewer" in row.lower() for row in quality["required_evidence"]),
+             "RETALLY quality stage must not reintroduce a human review gate")
     priorities = _rows(catalog.get("priorities"), "priority")
     for item in priorities:
         _keys(item, {"id", "title", "owner_role", "timeframe", "status", "done_when"}, "priority")
