@@ -75,7 +75,7 @@ class APRealIngestionTests(unittest.TestCase):
     def test_statement_credit_can_confirm_duplicate_without_obligation(self):
         batch = audit_ap_recovery(
             client_id="client",
-            payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
+            payments=(payment("P-1"), payment("P-2", invoice="INV-1")),
             statements=(statement(-10000),),
         )
         self.assertEqual(len(batch.observations), 1)
@@ -87,7 +87,7 @@ class APRealIngestionTests(unittest.TestCase):
     def test_contradictory_positive_statement_forces_review(self):
         batch = audit_ap_recovery(
             client_id="client",
-            payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
+            payments=(payment("P-1"), payment("P-2", invoice="INV-1")),
             obligations=(obligation(),),
             statements=(statement(5000),),
         )
@@ -99,7 +99,7 @@ class APRealIngestionTests(unittest.TestCase):
     def test_mismatched_statement_credit_does_not_double_count_or_validate(self):
         batch = audit_ap_recovery(
             client_id="client",
-            payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
+            payments=(payment("P-1"), payment("P-2", invoice="INV-1")),
             statements=(statement(-5000),),
         )
         self.assertEqual(len(batch.observations), 1)

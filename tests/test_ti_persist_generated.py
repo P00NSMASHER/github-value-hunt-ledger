@@ -281,5 +281,54 @@ class PersistGeneratedTests(unittest.TestCase):
         self.assertFalse(is_non_fast_forward_failure(auth))
 
 
+    def test_isolated_technology_proposal_preserves_current_main(self):
+        branch = "automation/retally-technology-39603064849-1"
+        original_main = git(self.worker, "rev-parse", "HEAD").stdout.strip()
+        self.rebuild(self.worker)
+        result = persist_generated(
+            self.worker, ["generated.txt"], proposal_branch=branch,
+            rebuild_fn=self.rebuild, max_attempts=3,
+        )
+        self.assertEqual(result["status"], "proposed")
+        self.assertEqual(result["branch"], branch)
+        self.assertEqual(result["base_sha"], original_main)
+        self.assertEqual(result["attempts"], 1)
+        # No implicit fallback or mirror push to main.
+        after_main = git(self.worker, "ls-remote", "--heads", "origin", "main")
+        self.assertEqual(after_main.stdout.split()[0], original_main)
+        after_branch = git(self.worker, "ls-remote", "--heads", "origin", branch)
+        self.assertEqual(after_branch.stdout.split()[0], result["head_sha"])
+
+    def test_refuse_unapproved_proposal_branch_without_remote_write(self):
+        self.rebuild(self.worker)
+        original_main = git(self.worker, "rev-parse", "HEAD").stdout.strip()
+        for branch in ("main", "automation/retally-scout-39603064849-1",
+                       "automation/retally-technology-0-1",
+                       "automation/retally-technology-39603064849-1/extra"):
+            with self.subTest(branch=branch), self.assertRaises(ValueError):
+                persist_generated(self.worker, ["generated.txt"],
+                                  proposal_branch=branch, rebuild_fn=self.rebuild)
+        after_main = git(self.worker, "ls-remote", "--heads", "origin", "main")
+        self.assertEqual(after_main.stdout.split()[0], original_main)
+
+    def test_existing_remote_proposal_is_not_overwritten_or_force_pushed(self):
+        branch = "automation/retally-technology-39603064849-1"
+        original_main = git(self.worker, "rev-parse", "HEAD").stdout.strip()
+        git(self.racer, "switch", "-c", branch)
+        (self.racer / "generated.txt").write_text("existing evidence\n", encoding="utf-8")
+        git(self.racer, "add", "generated.txt")
+        git(self.racer, "commit", "-m", "pre-existing external proposal")
+        git(self.racer, "push", "origin", "HEAD:refs/heads/" + branch)
+        original_proposal = git(self.racer, "rev-parse", "HEAD").stdout.strip()
+        self.rebuild(self.worker)
+        with self.assertRaisesRegex(RuntimeError, "isolated technology evidence branch push failed"):
+            persist_generated(self.worker, ["generated.txt"],
+                              proposal_branch=branch, rebuild_fn=self.rebuild)
+        after_branch = git(self.worker, "ls-remote", "--heads", "origin", branch)
+        self.assertEqual(after_branch.stdout.split()[0], original_proposal)
+        after_main = git(self.worker, "ls-remote", "--heads", "origin", "main")
+        self.assertEqual(after_main.stdout.split()[0], original_main)
+
+
 if __name__ == "__main__":
     unittest.main()
