@@ -187,6 +187,26 @@ bounded repository-tree and properly typed history searches do not cover every
 private, deleted or unsynced source. Broad construction research and App Factory
 estimating code were not substituted for Contractor Quote Recovery's experiment.
 
+## CaptureBrief local source-name disambiguation — October 20
+
+A bounded read-only filename and first-record-schema inspection on PAAM-L044
+checked the known local CaptureBrief application workspace and five ordinary
+work/document directories. The application workspace contained development
+checkouts and example fixtures, but no identified live producer ledger.
+Four historical `intelligence/outcomes.jsonl` files were discovered elsewhere.
+Their first-record keys identify RETALLY research outcomes
+(`outcome_id`/`experiment_id`), **not** CaptureBrief records requiring
+`ledger_version: capturebrief-evidence-ledger-v1` and
+`record_type: CAPTUREBRIEF_OUTCOME_EVENT`. Those files are expressly excluded
+from the CaptureBrief adapter's eligible source set.
+
+This check inspected filenames, filesystem metadata and limited record
+field names, not underlying customer records or amounts. It does not establish
+absence on other devices, in unsearched locations or in cloud services.
+The actual authoritative CaptureBrief outcome source, authenticated immutable
+snapshot handoff and case-to-account/business binding remain unresolved.
+No private source was copied, changed, published or enabled.
+
 ## Implementation sequence
 
 1. Preserve this matrix and the pinned catalog sources as the reviewable source
