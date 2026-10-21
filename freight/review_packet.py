@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
+from freight.money_format import format_cents
 from freight.contracts import REVIEW, VALIDATED, canonical_hash
 from freight.finding_factory import ChargeRule, FindingFactoryBatch, InvoiceCharge
 from freight.review_queue import ReviewQueue, build_review_queue
@@ -212,7 +213,7 @@ def build_review_packet(
 def _money(currency: str, cents: int | None) -> str:
     if cents is None:
         return "Not established"
-    return f"{currency} {cents / 100:,.2f}"
+    return f"{currency} {format_cents(cents)}"
 
 
 def render_review_packet_markdown(packet: ReviewPacket) -> str:

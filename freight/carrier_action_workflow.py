@@ -10,6 +10,7 @@ import re
 from dataclasses import asdict, dataclass
 from enum import Enum
 
+from freight.money_format import format_cents
 from freight.buyer_review_workflow import BuyerReviewBatch, verify_buyer_review_batch
 from freight.contracts import TruthManifest, canonical_hash
 from freight.engagement_state import EngagementResolution
@@ -298,7 +299,7 @@ def render_carrier_action_proposals_markdown(batch: CarrierActionProposalBatch) 
         f"- State: **{batch.state}**",
         f"- Claims: **{batch.claim_count}**",
         f"- Proposals: **{batch.proposal_count}**",
-        "- Total claim amount: **$" + format(batch.total_claim_cents / 100, ",.2f") + "**",
+        "- Total claim amount: **$" + format_cents(batch.total_claim_cents) + "**",
         f"- Proposal batch hash: `{batch.batch_hash}`",
         "",
         "Proposals are grouped by carrier, customer/payee and currency.",
@@ -310,8 +311,8 @@ def render_carrier_action_proposals_markdown(batch: CarrierActionProposalBatch) 
             f"## {proposal.target_carrier_id} / {proposal.target_customer_id} / {proposal.currency}",
             "",
             f"- Claims: **{len(proposal.claim_ids)}**",
-            "- Total: **" + proposal.currency + " " + format(proposal.total_claim_cents / 100, ",.2f") + "**",
-            "- Fee-disqualified amount: **" + proposal.currency + " " + format(proposal.fee_disqualified_cents / 100, ",.2f") + "**",
+            "- Total: **" + proposal.currency + " " + format_cents(proposal.total_claim_cents) + "**",
+            "- Fee-disqualified amount: **" + proposal.currency + " " + format_cents(proposal.fee_disqualified_cents) + "**",
             "- Finding IDs: " + ", ".join(proposal.finding_ids),
             f"- Proposal hash: `{proposal.proposal_hash}`",
             "",

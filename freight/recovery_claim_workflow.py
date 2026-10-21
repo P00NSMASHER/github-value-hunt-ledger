@@ -13,6 +13,7 @@ from enum import Enum
 import re
 import unicodedata
 
+from freight.money_format import format_cents
 from freight.buyer_review_workflow import (
     BuyerReviewBatch,
     BuyerReviewState,
@@ -514,7 +515,7 @@ def render_recovery_claim_batch_markdown(batch: RecoveryClaimBatch) -> str:
             f"## {record.claim_id}",
             "",
             f"- Finding: `{record.finding_id}`",
-            f"- Currency / amount: **{record.currency} {record.amount_cents / 100:,.2f}**",
+            f"- Currency / amount: **{record.currency} {format_cents(record.amount_cents)}**",
             f"- Reference: `{record.reference}`",
             f"- Payer / payee: `{record.payer_id}` → `{record.payee_id}`",
             f"- Fee disqualified: **{'yes' if record.fee_disqualified else 'no'}**",

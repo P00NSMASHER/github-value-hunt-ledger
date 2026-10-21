@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
+from freight.money_format import format_cents
 from freight.contracts import canonical_hash
 from freight.review_packet import (
     ADD_APPLICABLE_RULE,
@@ -170,7 +171,7 @@ def build_remediation_plan(
 def _money(cents: int | None) -> str:
     if cents is None:
         return "Not established"
-    return "$" + format(cents / 100, ",.2f")
+    return "$" + format_cents(cents)
 
 
 def render_remediation_plan_markdown(plan: RemediationPlan) -> str:

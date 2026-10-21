@@ -7,6 +7,7 @@ from enum import Enum
 import re
 from typing import Protocol
 
+from freight.money_format import format_cents
 from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, REVIEW, VALIDATED, canonical_hash
 
 
@@ -271,7 +272,7 @@ def build_pilot_metrics(
 
 
 def dollars(cents: int) -> str:
-    return "$" + format(cents / 100, ",.2f")
+    return "$" + format_cents(cents)
 
 
 def render_markdown(metrics: PilotMetrics) -> str:

@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Iterable
 
+from freight.money_format import format_cents
 from freight.carrier_action_payload import (
     CarrierActionPayload,
     verify_carrier_action_payload,
@@ -734,7 +735,7 @@ def render_execution_intent_markdown(intent: CarrierActionExecutionIntent) -> st
         f"- Action: **{intent.action_type}**",
         f"- Buyer / business unit: **{intent.buyer_id} / {intent.business_unit}**",
         f"- Carrier / customer: **{intent.target_carrier_id} / {intent.target_customer_id}**",
-        f"- Amount: **{intent.currency} {intent.requested_cents / 100:,.2f}**",
+        f"- Amount: **{intent.currency} {format_cents(intent.requested_cents)}**",
         f"- Prepared at: **{intent.prepared_at}**",
         f"- Idempotency key: `{intent.execution_key}`",
         f"- Intent hash: `{intent.intent_hash}`",
