@@ -610,6 +610,85 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
                 backup.confirm_legacy_orphan_unchanged(
                     self.store, original, self.root / "final-check.rtbk")
 
+    def _resume_receipt(self):
+        return {"schema": 1, "legacy_object_name": self.key,
+                "remote_observed_sha256": backup.sha(self.raw),
+                "remote_observed_length": len(self.raw),
+                "synthetic_format_candidate": True,
+                "original_upload_identity_independently_verified": False,
+                "legacy_object_deleted": False,
+                "production_backup_verified": False,
+                "status": "QUARANTINED_UNRESOLVED_DO_NOT_DELETE"}
+
+    def test_reuses_private_receipt_only_after_fresh_exact_remote_readback(self):
+        receipt = self._resume_receipt()
+        self.receipt.write_text(json.dumps(receipt), encoding="utf-8")
+        self.receipt.chmod(0o600)
+        frozen = self.receipt.read_bytes()
+        items = [{"name": self.key, "size": len(self.raw)}]
+        def readback(name, destination, *, etag, max_size):
+            self.assertEqual((name, etag, max_size),
+                             (self.key, "new-frozen-etag", backup.MAX_CANARY))
+            destination.write_bytes(self.raw)
+            destination.chmod(0o600)
+            return self.raw
+        with patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+             patch.object(self.store, "objects", return_value=items), \
+             patch.object(self.store, "head", return_value={
+                 "etag": "new-frozen-etag", "content-length": len(self.raw),
+                 "storage-tier": "Standard"}), \
+             patch.object(self.store, "get", side_effect=readback) as get, \
+             patch.object(self.store, "delete_version") as delete:
+            state = backup.resume_legacy_quarantine(self.store, items)
+        self.assertEqual(state["_sha256"], backup.sha(self.raw))
+        self.assertEqual(get.call_count, 2)
+        self.assertEqual(self.receipt.read_bytes(), frozen)
+        delete.assert_not_called()
+
+    def test_resume_refuses_tampered_or_readable_receipt(self):
+        good = self._resume_receipt()
+        items = [{"name": self.key, "size": len(self.raw)}]
+        for change in ({"legacy_object_deleted": True}, {"status": "APPROVED"},
+                       {"remote_observed_sha256": "0"*64},
+                       {"remote_observed_length": len(self.raw)+1},
+                       {"legacy_object_name": "synthetic-only/"+"f"*24+".rtbk"}):
+            with self.subTest(change=change):
+                self.receipt.write_text(json.dumps({**good, **change}), encoding="utf-8")
+                self.receipt.chmod(0o600)
+                with patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+                     patch.object(self.store, "head", return_value={
+                         "etag": "safe-etag", "content-length": len(self.raw)}), \
+                     patch.object(self.store, "objects", return_value=items), \
+                     patch.object(self.store, "get", return_value=self.raw), \
+                     patch.object(self.store, "delete_version") as delete:
+                    with self.assertRaises(backup.Refused):
+                        backup.resume_legacy_quarantine(self.store, items)
+                    delete.assert_not_called()
+        self.receipt.write_text(json.dumps(good), encoding="utf-8")
+        self.receipt.chmod(0o644)
+        with patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+             patch.object(self.store, "get") as get:
+            with self.assertRaises(backup.Refused):
+                backup.resume_legacy_quarantine(self.store, items)
+            get.assert_not_called()
+
+    def test_preflight_missing_dependency_never_writes_receipt_or_uploads(self):
+        attempt = self.root / "preflight-upload-attempt.json"
+        acceptance = self.root / "preflight-result.json"
+        with patch.object(backup, "ATTEMPT", attempt), \
+             patch.object(backup, "ACCEPTANCE", acceptance), \
+             patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+             patch.object(backup, "load_workbench_engines",
+                          side_effect=backup.Refused("unavailable local library")), \
+             patch.object(self.store, "bucket_check") as bucket, \
+             patch.object(self.store, "put") as upload:
+            with self.assertRaisesRegex(backup.Refused, "unavailable local library"):
+                backup.synthetic_roundtrip(self.store, preserve_legacy_orphan=True)
+            bucket.assert_not_called()
+            upload.assert_not_called()
+            self.assertFalse(self.receipt.exists())
+            self.assertFalse(attempt.exists())
+
     def test_existing_quarantine_blocks_repeated_acceptance(self):
         self.receipt.write_text('{"previous":true}', encoding="ascii")
         with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
