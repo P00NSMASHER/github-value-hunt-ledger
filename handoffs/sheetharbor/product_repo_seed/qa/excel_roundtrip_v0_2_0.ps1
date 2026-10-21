@@ -42,14 +42,18 @@ function Release-ComObjectSafely([object]$Object) {
 }
 
 function Get-FormulaErrorCount([object]$Worksheet) {
-    $xlCellTypeFormulas = -4123
-    $xlErrors = 16
+    $used = $null
     try {
-        $errors = $Worksheet.UsedRange.SpecialCells($xlCellTypeFormulas, $xlErrors)
-        $count = [int]$errors.Count
-        Release-ComObjectSafely $errors
-        return $count
-    } catch { return 0 }
+        $used = $Worksheet.UsedRange
+        $address = $used.Address($false, $false)
+        # SpecialCells throws for both no matches and real COM failures. Never
+        # turn every exception into a zero-error acceptance result.
+        $count = $Worksheet.Evaluate("SUMPRODUCT(--ISERROR($address))")
+        if ($null -eq $count -or $count -isnot [double] -or $count -lt 0) {
+            throw "Formula error inspection did not return a valid count"
+        }
+        return [int]$count
+    } finally { Release-ComObjectSafely $used }
 }
 
 function Test-WorkbookState([object]$Workbook, [hashtable]$Product, [string]$Stage) {
@@ -73,14 +77,20 @@ function Test-WorkbookState([object]$Workbook, [hashtable]$Product, [string]$Sta
                 }
             } finally { Release-ComObjectSafely $cell }
         }
-        $formulaErrors = Get-FormulaErrorCount $worksheet
-        if ($formulaErrors -gt 0) {
-            $failures.Add("$Stage $($Product.Sheet) contains $formulaErrors formula error cell(s)")
+        for ($sheetIndex = 1; $sheetIndex -le $Workbook.Worksheets.Count; $sheetIndex++) {
+            $checkedSheet = $null
+            try {
+                $checkedSheet = $Workbook.Worksheets.Item($sheetIndex)
+                $formulaErrors = Get-FormulaErrorCount $checkedSheet
+                if ($formulaErrors -gt 0) {
+                    $failures.Add("$Stage $($checkedSheet.Name) contains $formulaErrors error cell(s)")
+                }
+            } finally { Release-ComObjectSafely $checkedSheet }
         }
     } catch {
         $failures.Add("$Stage worksheet check failed: $($_.Exception.Message)")
     } finally { Release-ComObjectSafely $worksheet }
-    return @($failures)
+    return $failures.ToArray()
 }
 
 $artifactRoot = (Resolve-Path $ArtifactDir).Path
@@ -94,7 +104,7 @@ try {
     $excel = New-Object -ComObject Excel.Application
     $excel.Visible = $false
     $excel.DisplayAlerts = $false
-    try { $excel.AutomationSecurity = 3 } catch { }
+    $excel.AutomationSecurity = 3
     $excelVersion = [string]$excel.Version
     $excelBuild = [string]$excel.Build
 
@@ -153,7 +163,7 @@ try {
             } finally { Release-ComObjectSafely $workbook }
         }
 
-        $result.failures = @($failures)
+        $result.failures = $failures.ToArray()
         if ($failures.Count -gt 0) {
             foreach ($f in $failures) { $overallFailures.Add("$($product.Id): $f") }
         }
@@ -164,8 +174,8 @@ try {
         gate="microsoft_excel_roundtrip"
         tested_at_utc=[DateTime]::UtcNow.ToString("o")
         excel_version=$excelVersion; excel_build=$excelBuild
-        products=@($results); pass=($overallFailures.Count -eq 0)
-        failures=@($overallFailures)
+        products=$results.ToArray(); pass=($overallFailures.Count -eq 0)
+        failures=$overallFailures.ToArray()
     }
     $evidencePath = Join-Path $outputRoot "excel-roundtrip-results.json"
     $evidence | ConvertTo-Json -Depth 8 | Set-Content -Encoding UTF8 $evidencePath
