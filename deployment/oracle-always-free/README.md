@@ -1,13 +1,13 @@
 # RETALLY Oracle Always Free: private seven-branch synthetic staging
 
-**Status: RELEASE HOLD.** This directory prepares a private Linux staging host for the existing RecoveryWorks application. It does not create a server, publish the workbench, permit real customer data, make purchases, send claims, or certify an independent review. Keep the existing public RETALLY Pages website unchanged.
+**Status: RELEASE HOLD.** This directory prepares a private Linux staging host for the existing RecoveryWorks application. It does not create a server, publish the workbench, permit real customer data, make purchases, send claims, or certify a customer-production release. Keep the existing public RETALLY Pages website unchanged.
 
 ## Verified service boundaries
 
-- Application code: the reviewed source revision of [PR #493](https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/493), plus the optional encrypted snapshot work in [PR #500](https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/500), plus this deployment PR **after independent acceptance**.
+- Application code: the seven-branch RecoveryOS integration in PR #518 and the tested encrypted OCI restoration in dependent PR #524. An **owner-authorized merge with passing exact-head CI** replaces any mandatory separate code-review approval. See [CODE_RELEASE_POLICY.md](../../recoveryworks/CODE_RELEASE_POLICY.md). Customer authorization and financial evidence review remain distinct requirements.
 - Existing Cloudflare account/zone: `retallyrecovery.com`. A separate Access application **RETALLY seven-branch private workbench — release hold** already protects `workbench.retallyrecovery.com` with zero Allow policies; default deny. Access application ID `690352a7-12e3-4c86-8953-2f005e1de892`.
-- Cloudflare Tunnel is **not** created, and there is **no DNS record** for the workbench hostname. Do not create either before accepting the reviewed release and defining named operators.
-- Web server: `127.0.0.1:18765` only. `--external-origin https://workbench.retallyrecovery.com` narrowly permits the exact HTTPS browser Host/Origin while preserving the loopback socket, current bearer credentials, and existing source/review gates.
+- Cloudflare Tunnel is **not** created, and there is **no DNS record** for the workbench hostname. Do not create either before accepting an owner-authorized, CI-validated release and defining named operators.
+- Web server: `127.0.0.1:18765` only. `--external-origin https://workbench.retallyrecovery.com` narrowly permits the exact HTTPS browser Host/Origin while preserving the loopback socket, current bearer credentials, and existing source and customer-authorization gates.
 - Cloudflare Tunnel ingress must enforce JWT validation using **Protect with Access** and the exact `audTag` in `cloudflared-config.yml.example`. Do not publish a hostname that bypasses Access.
 - All seven branches are exercised only in a `simulation=true` workspace. There is no automatic case submission, outbound messages, payment or claims.
 - Cloudflare R2 is currently **not activated** in the connected account. R2 requires its own subscription checkout and usage beyond free allowances may incur costs. **Never enable billable services or upload plaintext customer snapshots without authorization.**
@@ -36,7 +36,7 @@ OCI Block Volume boot/storage is AES-256 encrypted at rest with Oracle-managed k
 
 Sources: [Always Free resources](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm), [OCI encryption](https://docs.oracle.com/en-us/iaas/Content/Block/Concepts/blockvolumeencryption.htm).
 
-## 2. Stage the reviewed source (no public network route)
+## 2. Stage the owner-authorized, CI-tested source (no public network route)
 
 On the Ubuntu VM, access the shell through an approved method. Clone the public source with Git; do not paste keys into terminal history.
 
@@ -44,17 +44,17 @@ On the Ubuntu VM, access the shell through an approved method. Clone the public 
 git clone https://github.com/P00NSMASHER/github-value-hunt-ledger.git retally-deploy-src
 cd retally-deploy-src
 git fetch origin --prune
-git checkout --detach FULL_INDEPENDENTLY_ACCEPTED_RELEASE_SHA
-bash deployment/oracle-always-free/install-staging.sh FULL_INDEPENDENTLY_ACCEPTED_RELEASE_SHA
+git checkout --detach FULL_OWNER_AUTHORIZED_CI_GREEN_SHA
+bash deployment/oracle-always-free/install-staging.sh FULL_OWNER_AUTHORIZED_CI_GREEN_SHA
 ```
 
 The installer checks the **exact SHA**, clean repository, and the live OCI v2 instance identity and shape: either the approved Arm64 A1 or the **explicitly opted-in x86-64 E2.1.Micro**. It creates a least-privileged `retally` service user, deploys immutable root-owned source into `/opt/retally/releases/<SHA>`, seeds the complete **synthetic** seven-branch acceptance journey under `/var/lib/retally/synthetic-preview`, and installs a hardened `retally-synthetic.service` unit. The installer **does not enable or start the service**. The shape-attestation request is non-proxied, refuses redirects, and does not authorize customer data.
 
-SHA equality is a reproducibility check, **not** independent release approval. Never replace a real workspace with this synthetic workspace.
+SHA equality proves source identity, **not** production host or customer-release acceptance. Never replace a real workspace with this synthetic workspace.
 
 ## 3. Activate private access only after acceptance
 
-1. Obtain independent PR #493 review/merge; independently review the dependent encryption and deployment changes. Verify latest combined release gate, no conflicts and exact accepted production SHA.
+1. Under the repository owner's authorization, merge CI-green PR #518 first, then the integrated dependent PR #524 with its own exact-head CI. No separate human code reviewer is required by this RETALLY code policy. Verify protected-main permissions, clean diff, release gate and immutable target SHA; do not substitute an earlier PR's CI for the final head.
 2. In **Cloudflare Zero Trust > Access applications**, verify the separate workbench application above. Configure named human reviewers, strong SSO/MFA, and an explicit minimum necessary Allow policy; remove any unsafe bypass. Do not broaden the existing inquiry application.
 3. Install signed `cloudflared` packages using Cloudflare's [Ubuntu apt instructions](https://developers.cloudflare.com/tunnel/features/locally-managed-tunnels/create-local-tunnel/); do not use an unreviewed curl-to-shell installer.
 4. Create a locally managed tunnel with credential files stored root-only under `/etc/cloudflared`. Substitute its real UUID in `cloudflared-config.yml.example`. Verify `cloudflared tunnel ingress validate`. The pre-populated `audTag` is the verified workbench Access audience; it is not a secret.
@@ -78,14 +78,16 @@ R2 **free allowance is not a promise of zero bills**. If the owner requires a st
 
 | Gate | Current status |
 |---|---|
-| GitHub PR #493 independent review and merge | **HOLD** |
-| Dependent encrypted archive / Windows ACL review | **HOLD** |
-| OCI account and Always Free VM provisioning | **NOT DONE** |
+| Owner-authorized guarded GitHub code merge (#518 and #524), exact-head CI | **PENDING MERGE** |
+| Encrypted archive / Windows ACL test jobs | **REQUIRED: EXACT-HEAD PASS** |
+| OCI account and Always Free E2 Micro VM provisioning | **DONE; live read-only audit Oct 21** |
 | OCI boot-volume encryption attested for this instance | **NOT DONE** |
 | Existing Cloudflare private Access app, default-deny | **DONE** |
 | Cloudflare tunnel with origin JWT enforcement | **NOT DONE** |
 | Named operator, distinct reviewers and customer authorization | **NOT DONE** |
-| R2 encrypted off-device snapshot read-back + independent restore | **NOT DONE** |
+| OCI synthetic encrypted off-device snapshot read-back + isolated restore | **PASS on PR #520 source (synthetic only)** |
+| Real customer encrypted backup retention / independent source recovery | **NOT ACCEPTED** |
+| R2 activation | **NOT DONE / no subscription** |
 | Any real client information in cloud | **NONE** |
 
 This is a release-acceptance checklist, not permission to bypass missing gates or increase spend.

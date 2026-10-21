@@ -1,6 +1,6 @@
 # Oracle Always Free E2 Micro fallback for RETALLY
 
-**Release decision: HOLD.** Use only synthetic data. The seven-branch Python workbench has not passed genuine independent PR approval or real-customer onboarding evidence. No new services, public routes, billable options, off-device backups or customers are authorized by this workflow.
+**Release decision: HOLD.** Use only synthetic data. The seven-branch workbench is subject to the owner's code-merge authorization and exact-head CI, not an independent code reviewer. Real-customer onboarding evidence has not been accepted. No new services, public routes, billable options, off-device backups or customers are authorized by this workflow.
 
 ## Why this fallback exists
 
@@ -22,14 +22,14 @@ An initial rehearsal at 0.5 CPU reported **seven passing synthetic journeys, res
 
 Use **only** Oracle Cloud Shell while authenticated to the correct OCI tenancy. Never put OCI credentials, SSH private keys, customer files or volume secrets in ChatGPT or GitHub.
 
-Download **both** files from the exact reviewed GitHub commit into the **same** Cloud Shell directory; verify the GitHub SHA and the published SHA-256 checksums before running:
+Download **both** files from an exact owner-authorized, CI-tested GitHub commit into the **same** Cloud Shell directory; verify the GitHub SHA and the published SHA-256 checksums before running:
 
 ```sh
 mkdir -p "$HOME/retally-micro-stage"
 cd "$HOME/retally-micro-stage"
-# Use the exact independently reviewed full Git SHA, not a floating branch.
-curl -fsSL "https://raw.githubusercontent.com/P00NSMASHER/github-value-hunt-ledger/REVIEWED_FULL_SHA/deployment/oracle-always-free/provision-cloud-shell.py" -o provision-cloud-shell.py
-curl -fsSL "https://raw.githubusercontent.com/P00NSMASHER/github-value-hunt-ledger/REVIEWED_FULL_SHA/deployment/oracle-always-free/provision-micro-cloud-shell.py" -o provision-micro-cloud-shell.py
+# Use an exact owner-authorized, CI-green full Git SHA, not a floating branch.
+curl -fsSL "https://raw.githubusercontent.com/P00NSMASHER/github-value-hunt-ledger/CI_GREEN_FULL_SHA/deployment/oracle-always-free/provision-cloud-shell.py" -o provision-cloud-shell.py
+curl -fsSL "https://raw.githubusercontent.com/P00NSMASHER/github-value-hunt-ledger/CI_GREEN_FULL_SHA/deployment/oracle-always-free/provision-micro-cloud-shell.py" -o provision-micro-cloud-shell.py
 # Confirm checksums separately through a trusted release receipt.
 python3 provision-micro-cloud-shell.py
 ```
@@ -64,10 +64,10 @@ An OCI error, timeout, wrong shape, unexpected state, insufficient free inventor
 
 ## C. Install a synthetic-only workbench (release hold remains)
 
-After a VM is actually running, obtain independent review of PRs #493, #500, #502, #508 and this PR. Install the accepted exact repository commit through the existing reviewed installer with the Micro-specific flag:
+After the VM is running, verify owner-authorized integration of PR #518 and PR #524, exact-head CI, and a clean immutable source checkout. A separate human code reviewer is not required. The separate **host/operator authorization and customer release holds remain**. Install only the authorized exact commit through the pinned installer with the Micro-specific flag:
 
 ```sh
-RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/install-staging.sh FULL_REVIEWED_RELEASE_SHA
+RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/install-staging.sh FULL_OWNER_AUTHORIZED_CI_GREEN_SHA
 ```
 
 The installer must verify **x86-64 hardware and OCI v2 instance metadata shape `VM.Standard.E2.1.Micro`** before any package installation. It stages only a synthetic workspace, runs its seven-branch acceptance, installs systemd with a Micro-specific `MemoryHigh=640M`/`MemoryMax=768M` drop-in, and leaves the private workbench service **stopped and disabled**. A1 installation remains separate and works without the Micro flag.
@@ -104,8 +104,8 @@ operations, no resource creation, firewall change, SSH connection, tunneling,
 billing action, customer data, or new credential. The result intentionally
 omits provider OCIDs, IP addresses and secrets. The safe report always marks
 guest firewall, private-service installation, off-device restore, account
-zero charges, independent review, and commercial production readiness as
-unverified/false. No CI mock run may be reported as a live OCI acceptance.
+zero charges and commercial production readiness as unverified/false.
+Code review uses the repository owner's explicit approval and exact-head CI; these provider audits do not establish customer release. No CI mock run may be reported as a live OCI acceptance.
 Review every source commit, exact file checksum and live OCI response again
 before considering an operator-only synthetic installation.
 

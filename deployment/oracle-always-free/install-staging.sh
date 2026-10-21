@@ -127,4 +127,4 @@ sudo ln -s "$release_dir" "$candidate_link"
 sudo mv -Tf -- "$candidate_link" /opt/retally/current
 candidate_link=''
 echo 'SIMULATION staged; service NOT started, NOT enabled; no customer records installed.'
-echo 'Independent code approval, host acceptance, Access policy and sealed-backup restore remain required.'
+echo 'Owner-authorized CI-green code; separate host acceptance, Access policy and customer backup custody remain required.'
