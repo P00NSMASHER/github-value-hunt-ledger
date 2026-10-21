@@ -56,7 +56,7 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
         "GITHUB_WORKFLOW_REF": WORKFLOW_REF,
     }
     for key, expected in context.items():
-        require(environ.get(key) == expected, "Untrusted GitHub execution context")
+        require(environ.get(key) == expected, "Untrusted GitHub execution context: " + key)
     require(environ.get("GITHUB_EVENT_NAME") in ALLOWED_EVENTS,
             "Only scheduled or manual main-branch execution is allowed")
     require(environ.get("RETALLY_OCI_MONITOR_ENABLED") == "true",
@@ -68,7 +68,7 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
     )
     for key in required:
         require(bool(environ.get(key, "").strip()),
-                "Missing required Oracle/GitHub monitor configuration")
+                "Missing required Oracle/GitHub monitor configuration: " + key)
     domain = urlparse(environ["RETALLY_OCI_DOMAIN_URL"])
     require(domain.scheme == "https" and bool(domain.hostname) and
             domain.hostname.endswith(".identity.oraclecloud.com") and
@@ -217,27 +217,45 @@ def do_live_check(settings: dict[str, str]) -> None:
     from cryptography.hazmat.primitives.asymmetric import rsa
     import oci
 
-    jwt = github_oidc_token(settings)
+    try:
+        jwt = github_oidc_token(settings)
+    except Exception:
+        raise Refused("OIDC_TOKEN_OR_CLAIMS") from None
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_pem = key.public_key().public_bytes(
         serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
     private_pem = key.private_bytes(
         serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption()).decode()
-    rpst = exchange_for_rpst(settings, jwt, public_pem)
+    try:
+        rpst = exchange_for_rpst(settings, jwt, public_pem)
+    except Exception:
+        raise Refused("OCI_TOKEN_EXCHANGE") from None
     # In-memory ephemeral key and RPST only. No OCI writes, object-list or GET.
-    signer = oci.auth.signers.EphemeralResourcePrincipalSigner(
-        session_token=rpst, private_key=private_pem, region=REGION)
+    try:
+        signer = oci.auth.signers.EphemeralResourcePrincipalSigner(
+            session_token=rpst, private_key=private_pem, region=REGION)
+    except Exception:
+        raise Refused("OCI_SIGNER_INITIALIZATION") from None
     cfg = {"region": REGION, "additional_user_agent": "retally-oci-readonly-health/1"}
     no_retry = oci.retry.NoneRetryStrategy()
-    storage = oci.object_storage.ObjectStorageClient(cfg, signer=signer,
-                                                     retry_strategy=no_retry)
-    compute = oci.core.ComputeClient(cfg, signer=signer, retry_strategy=no_retry)
-    bucket = storage.get_bucket(settings["RETALLY_OCI_NAMESPACE"], BUCKET).data
-    check_bucket(bucket, settings["RETALLY_OCI_COMPARTMENT_OCID"])
-    vm = compute.get_instance(settings["RETALLY_OCI_VM_OCID"]).data
-    check_instance(vm, settings["RETALLY_OCI_VM_OCID"],
-                   settings["RETALLY_OCI_COMPARTMENT_OCID"])
+    try:
+        storage = oci.object_storage.ObjectStorageClient(cfg, signer=signer,
+                                                         retry_strategy=no_retry)
+        compute = oci.core.ComputeClient(cfg, signer=signer, retry_strategy=no_retry)
+    except Exception:
+        raise Refused("OCI_CLIENT_INITIALIZATION") from None
+    try:
+        bucket = storage.get_bucket(settings["RETALLY_OCI_NAMESPACE"], BUCKET).data
+        check_bucket(bucket, settings["RETALLY_OCI_COMPARTMENT_OCID"])
+    except Exception:
+        raise Refused("OCI_BUCKET_READ_OR_VALIDATION") from None
+    try:
+        vm = compute.get_instance(settings["RETALLY_OCI_VM_OCID"]).data
+        check_instance(vm, settings["RETALLY_OCI_VM_OCID"],
+                       settings["RETALLY_OCI_COMPARTMENT_OCID"])
+    except Exception:
+        raise Refused("OCI_INSTANCE_READ_OR_VALIDATION") from None
 
 
 def report(ok: bool) -> None:
@@ -256,12 +274,31 @@ def report(ok: bool) -> None:
             pass
 
 
+def safe_failure_code(exc: Exception) -> str:
+    """Expose only fixed labels or configuration KEY NAMES, never values."""
+    if isinstance(exc, Refused):
+        label = str(exc)
+        if re.fullmatch(
+            r"(Untrusted GitHub execution context|Missing required Oracle/GitHub monitor configuration): [A-Z_]{2,64}",
+            label,
+        ):
+            return label
+        if label in {
+            "OIDC_TOKEN_OR_CLAIMS", "OCI_TOKEN_EXCHANGE",
+            "OCI_SIGNER_INITIALIZATION", "OCI_CLIENT_INITIALIZATION",
+            "OCI_BUCKET_READ_OR_VALIDATION", "OCI_INSTANCE_READ_OR_VALIDATION",
+        }:
+            return label
+    return "UNCLASSIFIED_FAILURE"
+
+
 def main() -> int:
     try:
         settings = require_env(os.environ)
         do_live_check(settings)
-    except Exception:
-        # No exception body, OCI identifier, JWT, key, secret or HTTP response in logs.
+    except Exception as exc:
+        # A bounded status label only. Never emit exception bodies or credentials.
+        print("RETALLY OCI DIAG: " + safe_failure_code(exc))
         report(False)
         return 1
     report(True)
