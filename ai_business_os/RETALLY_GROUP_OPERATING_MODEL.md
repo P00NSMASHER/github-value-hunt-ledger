@@ -68,8 +68,8 @@ products and unrelated private projects are excluded from commercial reporting.
 The portfolio owner sets priorities and accepts commercial changes. Product-owner,
 fulfillment, quality-review, finance-review and engineering responsibilities must
 be assigned to actual authorized operators when an engagement exists; labels do
-not invent staff or approval. The owner may perform required human quality
-acceptance; a second human approver is not mandatory for RETALLY Group.
+not invent staff or approval. Internal quality acceptance is validated using source-linked automated checks
+bound to the exact artifact; execution permissions remain governed separately.
 
 Portfolio Brain coordinates authorized engineering, reliability and reporting.
 RecoveryOS supplies recovery evidence, calculations and case history. AI Business
@@ -90,14 +90,14 @@ implemented state transitions or permission grants in this preview.
 | Inquiry | Recorded request origin, received time, requested offer and a private source reference. Operator tests remain labeled separately. |
 | Qualified | Offer-specific buyer fit, permitted input types, scope suitability and duplicate review. Similar names alone cannot merge customers. |
 | Scoped | Customer-accepted service, deliverable, price model, responsibilities, time expectations and scoped data-use permissions. |
-| Ready for fulfillment | Current service release/operating acceptance, required source evidence, assigned reviewer, exact service authorization and any contractually required advance-payment verification. |
+| Ready for fulfillment | Current service release/operating acceptance, required source evidence, passing automated quality evidence, exact service authorization and any contractually required advance-payment verification. |
 | In fulfillment | Authorized task started with source-linked work records, artifact versions and appropriate private access. |
-| Quality reviewed | Automated/service-specific quality checks and owner acceptance bound to the exact deliverable version. No separate independent human reviewer is required by RETALLY Group internal policy; external legal/contractual obligations remain unchanged. |
+| Quality reviewed | Automated tests, independent technical verification, source-version checks and immutable quality receipts bound to the exact deliverable. Internal quality acceptance is evidence-based; external legal/contractual obligations remain unchanged. |
 | Delivered | Exact reviewed artifact sent under specific send authority through an approved channel, with delivery/provider evidence. A generated file alone is insufficient. |
 | Closed | Contractual completion or explicit cancellation disposition, remaining corrections/refunds resolved, and financial disposition recorded without inventing payment. |
 
 Record failed checks and unresolved evidence as holds. Material source or artifact
-changes require the relevant review to be repeated before further action.
+changes require the relevant automated verification to be rerun before further action.
 
 **Payment status is orthogonal to delivery stage.** Advance-paid research and
 contingency recovery have different timing. Maintain explicit payment, refund,
@@ -125,7 +125,7 @@ These are planning windows, not new scheduled tasks or promised completion dates
 | Window | Accountable responsibility | Completion evidence |
 | --- | --- | --- |
 | First 14 days | Portfolio owner + engineering | Reconcile canonical identities; resolve missing source bindings; retain exclusions; document readiness gaps and one next milestone per offer. Validate the read-only catalog, workflow specification and preview. |
-| Through day 45 | Product owner + fulfillment + finance/quality reviewers | Prepare reviewed private-system integration; preserve current commercial priorities; establish offer-specific acceptance, effort and delivery records when genuine authorized engagements exist. Source changes require separate implementation and release review. |
+| Through day 45 | Product owner + fulfillment + evidence-based finance checks | Prepare source-verified private-system integration; preserve current commercial priorities; establish offer-specific acceptance, effort and delivery records when genuine authorized engagements exist. Source changes require new implementation checks and release validation. |
 | Through day 90 | Portfolio owner + product/finance reviewers | Assess actual demand, delivery effort and collected fees; propose relevant referrals only with specific permission; promote, revise or retain experiments based on evidence. Integrate shared workflows only where measured savings justify them. |
 
 ## Owner boundaries
@@ -133,11 +133,12 @@ These are planning windows, not new scheduled tasks or promised completion dates
 Registration remains deferred under the owner's existing policy until an actual
 customer. This is an operating proposal, not legal or tax advice. No new spending,
 external contacts, added/rescheduled tasks or public rebrand activation are included.
-The owner's “Get started” authorizes this source-only implementation. The owner's
-October 20 direction removes separate independent **human** approval for RETALLY
-Group. Automated independent verification, current-source QA, protected-branch
-controls and exact persisted Step-6 owner authorization for production/factory
-merges still apply. This does not waive an external contractual or legal review.
+The owner's “Get started” authorized source-only implementation. Internal
+quality review is recorded through automated evidence-based checks, not a manual
+sign-off step. Independent technical verification, current-source QA and
+protected-branch controls still apply. Existing Step-6 authenticated owner
+authorization is an execution permission rather than a quality-review receipt;
+this policy does not waive external contractual or legal requirements.
 
 ## Primary source references
 
