@@ -35,7 +35,7 @@
       "purpose": "Evidence-led audit and authorized recovery across freight and related business expenses.",
       "stage": "Seven-branch rollout preparation",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Resolve the existing private-host and independent release requirements; establish the first genuine authorized delivery.",
+      "next_action": "Resolve private-host readiness and owner-authorized release checks; establish the first genuine authorized delivery.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -591,10 +591,10 @@
     {
       "id": "quality-reviewed",
       "label": "Quality reviewed",
-      "owner_role": "INDEPENDENT_REVIEWER",
+      "owner_role": "OWNER_QUALITY_ASSURANCE",
       "required_evidence": [
-        "Independent review evidence where required",
-        "Current source version",
+        "Exact-artifact automated and service-specific quality checks",
+        "Owner acceptance bound to the current artifact and source version",
         "Resolved material defects"
       ]
     },
@@ -626,7 +626,7 @@
       "owner_role": "ENGINEERING",
       "timeframe": "Days 1–14",
       "status": "IN_PROGRESS",
-      "done_when": "Versioned register, workflow and dashboard pass source checks and separate review."
+      "done_when": "Versioned register, workflow and dashboard pass source checks, owner acceptance and protected release gates."
     },
     {
       "id": "identity-map",
