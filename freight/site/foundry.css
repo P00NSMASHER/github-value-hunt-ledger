@@ -268,7 +268,9 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 .retally-chat-launcher:focus-visible {
  outline:3px solid #b9ffda;outline-offset:5px;
 }
-.retally-chat-launcher[hidden],.retally-chat-fallback .retally-chat-launcher {display:none!important}
+.retally-chat-launcher[hidden],
+.retally-chat-fallback .retally-chat-launcher,
+.retally-chat-intake-visible .retally-chat-launcher {display:none!important}
 /* Hide only the native collapsed launcher. Opening restores the original
    BubblaV iframe, including its own chat, close and keyboard UI. */
 .retally-chat-enhanced:not(.retally-chat-open):not(.retally-chat-fallback) #bv-chat-frame {

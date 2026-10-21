@@ -2,11 +2,15 @@
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
+import re
+import shutil
 import xml.etree.ElementTree as ET
 
 import pytest
 
 from freight.site import cloudflare_build
+from freight.site.asset_integrity import AssetIntegrityError, webp_dimensions
+from freight.site.group import build as group_build
 from freight.site.group.build import ROUTES, ADDED_FILES
 from freight.site.group.catalog import BUSINESSES
 from freight.site.rebase_public_urls import NEW_BASE, validate_cloudflare_seo
@@ -28,10 +32,16 @@ class Page(HTMLParser):
         self.refs = []
         self.ids = set()
         self.h1_count = 0
+        self.elements = []
+        self.texts = []
+        self.parents = []
         self.feed(text)
 
     def handle_starttag(self, tag, attributes):
         attrs = dict(attributes)
+        self.elements.append((tag, attrs, tuple(self.parents)))
+        if tag not in {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}:
+            self.parents.append((tag, attrs))
         if tag == "h1":
             self.h1_count += 1
         if "id" in attrs:
@@ -44,6 +54,33 @@ class Page(HTMLParser):
             for candidate in attrs.get(key, "").split(","):
                 if candidate.strip():
                     self.refs.append(("image", candidate.strip().split()[0]))
+
+    def handle_endtag(self, tag):
+        for i in range(len(self.parents) - 1, -1, -1):
+            if self.parents[i][0] == tag:
+                del self.parents[i:]
+                break
+
+    def handle_data(self, text):
+        self.texts.append((text, tuple(self.parents)))
+
+
+def within(parents, *, tag=None, element_id=None, css_class=None):
+    return any((tag is None or name == tag)
+               and (element_id is None or attrs.get("id") == element_id)
+               and (css_class is None or css_class in attrs.get("class", "").split())
+               for name, attrs in parents)
+
+
+# This reviewed contract is deliberately independent of the production allowlist.
+REVIEWED_IMAGES = {
+    "research-768.webp": (768, 512),
+    "research-1536.webp": (1536, 1024),
+    "restaurant-768.webp": (768, 512),
+    "restaurant-1536.webp": (1536, 1024),
+    "tools-768.webp": (768, 512),
+    "tools-1536.webp": (1536, 1024),
+}
 
 
 def target_file(root, path):
@@ -122,3 +159,118 @@ def test_group_business_email_cannot_be_rewritten_to_cloudflare_404(bundle):
         html = (bundle / route / "index.html").read_text()
         outside_opt_out = re.sub(r"<!--email_off-->.*?<!--/email_off-->", "", html, flags=re.S)
         assert "jay@retallyrecovery.com" not in outside_opt_out, route
+
+
+def test_group_photography_matches_reviewed_assets_and_page_budget(bundle):
+    source = group_build.SOURCE / "assets"
+    published = bundle / "assets/group"
+    assert set(group_build.IMAGE_NAMES) == set(REVIEWED_IMAGES)
+    assert {p.name for p in source.iterdir()} == set(REVIEWED_IMAGES)
+    assert {p.name for p in published.iterdir()} == set(REVIEWED_IMAGES)
+    assert {f.removeprefix("assets/group/") for f in ADDED_FILES
+            if f.startswith("assets/group/")} == set(REVIEWED_IMAGES)
+    for filename, geometry in REVIEWED_IMAGES.items():
+        original = source / filename
+        assert original.is_file() and not original.is_symlink()
+        data = (published / filename).read_bytes()
+        assert data == original.read_bytes()
+        assert 25_000 <= len(data) <= 450_000, filename
+        assert webp_dimensions(data) == geometry, filename
+
+    used = set()
+    for html in bundle.rglob("*.html"):
+        page = Page(html.read_text())
+        for _, ref in page.refs:
+            if ref.startswith("/assets/group/"):
+                filename = ref.removeprefix("/assets/group/")
+                assert filename in REVIEWED_IMAGES, (html, ref)
+                used.add(filename)
+        for tag, attrs, _ in page.elements:
+            if tag == "img" and attrs.get("src", "").startswith("/assets/group/"):
+                assert (int(attrs["width"]), int(attrs["height"])) == (1536, 1024)
+                assert attrs.get("alt", "").strip()
+                assert attrs.get("loading") in {"eager", "lazy"}
+                assert attrs.get("sizes")
+                name = Path(attrs["src"]).name.removesuffix("-1536.webp")
+                variants = {part.strip() for part in attrs.get("srcset", "").split(",")}
+                assert variants == {f"/assets/group/{name}-768.webp 768w",
+                                    f"/assets/group/{name}-1536.webp 1536w"}
+    assert used == set(REVIEWED_IMAGES)
+
+
+@pytest.mark.parametrize("fault", ["unreviewed", "symlink", "geometry", "oversize", "malformed"])
+def test_group_build_rejects_unreviewed_or_invalid_photography(tmp_path, monkeypatch, fault):
+    source = tmp_path / "source"
+    shutil.copytree(group_build.SOURCE, source)
+    image = source / "assets/research-1536.webp"
+    if fault == "unreviewed":
+        (source / "assets/unreviewed.png").write_bytes(b"not approved")
+    elif fault == "symlink":
+        image.unlink()
+        image.symlink_to(group_build.SOURCE / "assets/research-1536.webp")
+    elif fault == "geometry":
+        image.write_bytes((source / "assets/research-768.webp").read_bytes())
+    elif fault == "oversize":
+        image.write_bytes(b"x" * 450_001)
+    else:
+        data = image.read_bytes()
+        image.write_bytes(b"FAIL" + data[4:])
+    monkeypatch.setattr(group_build, "SOURCE", source)
+    output = tmp_path / "public"
+    (output / "assets").mkdir(parents=True)
+    (output / "index.html").write_text("<html><head></head><body></body></html>")
+    with pytest.raises(AssetIntegrityError):
+        group_build.build_group(output)
+
+
+def test_contact_composer_is_labelled_and_explicitly_prepares_an_email_draft(bundle):
+    page = Page((bundle / "contact/index.html").read_text())
+    forms = [attrs for tag, attrs, _ in page.elements if tag == "form"]
+    assert len(forms) == 1
+    assert forms[0]["id"] == "group-enquiry"
+    assert not forms[0].get("action")
+    assert "hidden" in forms[0]  # Direct email remains available without JavaScript.
+    controls = [(tag, attrs) for tag, attrs, parents in page.elements
+                if tag in {"input", "select", "textarea"}
+                and within(parents, element_id="group-enquiry")]
+    assert {tag for tag, _ in controls} >= {"select", "textarea"}
+    for _, attrs in controls:
+        assert attrs.get("type") != "file"
+        assert attrs.get("id")
+        assert any(text.strip() and any(tag == "label" and label.get("for") == attrs["id"]
+                   for tag, label in parents) for text, parents in page.texts), attrs
+    composer_copy = " ".join(text for text, parents in page.texts
+                             if within(parents, element_id="group-enquiry")).lower()
+    assert "draft" in composer_copy
+    assert re.search(r"nothing\s+(?:is|has been)\s+sent", composer_copy)
+    assert any(tag == "p" and attrs.get("role") == "status"
+               for tag, attrs, parents in page.elements
+               if within(parents, element_id="group-enquiry"))
+    draft = next(attrs for tag, attrs, _ in page.elements
+                 if tag == "a" and attrs.get("id") == "enquiry-draft")
+    assert urlsplit(draft["href"]).scheme == "mailto"
+    assert urlsplit(draft["href"]).path == "jay@retallyrecovery.com"
+    assert ("a", "/recovery/#start-audit") in page.refs
+    assert "auditForm" not in page.ids
+    assert {ref for tag, ref in page.refs if tag == "script"} == {"/group.js"}
+    script = (bundle / "group.js").read_text()
+    # The group composer has no transport or storage. Freight owns its API.
+    assert not re.search(r"/api/|\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket|localStorage|sessionStorage)\b", script)
+
+
+@pytest.mark.parametrize("slug", ["capturebrief", "permitplate"])
+def test_sample_link_is_available_beside_the_product_offer(bundle, slug):
+    business = next(b for b in BUSINESSES if b["slug"] == slug)
+    page = Page((bundle / slug / "index.html").read_text())
+    offer_links = {attrs["href"] for tag, attrs, parents in page.elements
+                   if tag == "a" and within(parents, tag="aside", css_class="business-offer")}
+    assert business["href"] in offer_links
+    assert business["links"][0][1] in offer_links
+    assert business["href"] != business["links"][0][1]
+
+
+def test_homepage_features_only_the_three_available_offers(bundle):
+    page = Page((bundle / "index.html").read_text())
+    featured = [attrs["href"] for tag, attrs, parents in page.elements
+                if tag == "a" and within(parents, element_id="businesses")]
+    assert sorted(featured) == ["/capturebrief/", "/permitplate/", "/recovery/"]
