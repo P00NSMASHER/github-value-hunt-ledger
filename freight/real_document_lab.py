@@ -880,7 +880,7 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
         if not row or all(not x.strip() for x in row):
             continue
         if max(headings.values()) >= len(row):
-            continue
+            raise ValueError("TRUNCATED_PUBLIC_CSV_INVOICE_RECORD")
         x = {name: row[pos].strip() for name, pos in headings.items()}
         if not x["invoice number"] and not x["payment number"]:
             continue

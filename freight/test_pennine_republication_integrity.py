@@ -103,3 +103,13 @@ def test_actual_kernel_keeps_equal_remittance_reference_but_distinct_suppliers_a
     assert scoped["cross_reference_false_joins"] == 0
     assert report["independent_bank_clearing_verified"] is False
     assert report["economic_false_positive_rate"] is None
+
+
+def test_lab_truncated_csv_row_cannot_disappear_from_published_population():
+    # Before the repair the lab silently dropped this nonblank truncated
+    # invoice, making its measured source population incomplete.
+    corrupt = _original() + b"36,000124\n"
+    with pytest.raises(ValueError, match="TRUNCATED_PUBLIC_CSV_INVOICE_RECORD"):
+        lab.parse_pennine_csv(corrupt, "2026-08")
+    with pytest.raises(ValueError, match="truncated"):
+        census.decode_month(corrupt, "2026-08")
