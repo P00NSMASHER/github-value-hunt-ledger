@@ -74,7 +74,7 @@ class MainBranchRulesetTests(unittest.TestCase):
         )
         self.assertIn("production_release=HOLD", policy)
         self.assertIn("customer authorization", policy.lower())
-        self.assertIn("no required separate human", policy.lower())
+        self.assertIn("without a required separate human", policy.lower())
 
 
 if __name__ == "__main__":
