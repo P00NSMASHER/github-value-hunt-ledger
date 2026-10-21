@@ -19,8 +19,7 @@ def _real_hold():
         accounting_invoice_population=273, accounting_matched=273,
         accounting_cross_scope_errors=0, freight_labeled=0, freight_unknown=110,
         precision=None,
-        rights_approved=False, independent_review_approved=False,
-        production_approved=False,
+        rights_approved=False, production_approved=False,
     )
 
 
@@ -31,7 +30,8 @@ def test_original_real_document_status_remains_hold():
     assert state.independently_verified_cash_recovery_cents == 0
     assert state.distinct_invoice_disclosures == 273
     assert "REAL_FREIGHT_ACCURACY_UNPROVEN" in state.blockers
-    assert "INDEPENDENT_RELEASE_REVIEW_MISSING" in state.blockers
+    assert "INDEPENDENT_RELEASE_REVIEW_MISSING" not in state.blockers
+    assert "EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED" in state.blockers
     assert len(state.manifest_hash) == 64
     assert state == _real_hold()
 
@@ -42,6 +42,8 @@ def test_dashboard_aggregate_only_and_no_public_money_claim():
     assert "RELEASE_HOLD" in doc
     assert "NOT ESTIMABLE" in doc
     assert "noindex,nofollow" in doc
+    assert "automated evidence-based QA" in doc
+    assert "without independent approval" not in doc.lower()
     assert "recovered dollars: 0" not in doc
     for sensitive in ("30794056", "051894063", "GlobalTranz", "Pennine Care"):
         assert sensitive not in doc
@@ -60,8 +62,7 @@ def test_invalid_release_signals_fail_closed(input_key, value):
         invoices_extracted=110, invoices_exact=110, pinned_source_files=7,
         accounting_invoice_population=273, accounting_matched=273,
         accounting_cross_scope_errors=0, freight_labeled=0, freight_unknown=110,
-        precision=None, rights_approved=False, independent_review_approved=False,
-        production_approved=False)
+        precision=None, rights_approved=False, production_approved=False)
     data[input_key] = value
     with pytest.raises(ValueError):
         acceptance_snapshot(**data)
@@ -72,8 +73,7 @@ def test_governance_cannot_self_approve_on_math_alone():
         invoices_extracted=110, invoices_exact=110, pinned_source_files=7,
         accounting_invoice_population=273, accounting_matched=273,
         accounting_cross_scope_errors=0, freight_labeled=110, freight_unknown=0,
-        precision=1.0, rights_approved=True,
-        independent_review_approved=True, production_approved=True)
+        precision=1.0, rights_approved=True, production_approved=True)
     assert snapshot.release_status == "RELEASE_HOLD"
     assert "EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED" in snapshot.blockers
 
@@ -124,3 +124,32 @@ def test_exact_minor_unit_invoice_conservation_randomized():
         assert record.gross_charge_cents - record.adjustment_total_cents == record.billed_total_cents
         assert record.billed_total_cents == gross - discount
         assert record.billed_total_cents >= 0
+
+
+
+def test_no_human_reviewer_prerequisite_for_internal_research_qa():
+    """Engineering checks are automated; customer evidence gates remain real."""
+    from inspect import signature
+    from freight.reliability_dashboard import ReadinessSnapshot
+
+    assert "independent_review_approved" not in signature(acceptance_snapshot).parameters
+    assert "independent_reviewer_approved" not in ReadinessSnapshot.__dataclass_fields__
+    state = _real_hold()
+    assert state.release_status == "RELEASE_HOLD"
+    assert "INDEPENDENT_RELEASE_REVIEW_MISSING" not in state.blockers
+    assert "REAL_FREIGHT_ACCURACY_UNPROVEN" in state.blockers
+    assert "COMMERCIAL_RIGHTS_NOT_RELEASED" in state.blockers
+    assert "PRODUCTION_DEPLOYMENT_NOT_APPROVED" in state.blockers
+    assert "EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED" in state.blockers
+
+
+def test_disallowed_review_boolean_cannot_approve_release():
+    params = dict(
+        invoices_extracted=110, invoices_exact=110, pinned_source_files=7,
+        accounting_invoice_population=273, accounting_matched=273,
+        accounting_cross_scope_errors=0, freight_labeled=0, freight_unknown=110,
+        precision=None, rights_approved=True, production_approved=True,
+        independent_review_approved=True,
+    )
+    with pytest.raises(TypeError, match="independent_review_approved"):
+        acceptance_snapshot(**params)

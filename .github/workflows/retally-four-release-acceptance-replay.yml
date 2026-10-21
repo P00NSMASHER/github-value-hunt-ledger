@@ -94,7 +94,8 @@ jobs:
               accounting_cross_scope_errors=0,freight_labeled=0,
               freight_unknown=110,precision=None)
           assert snap.release_status == "RELEASE_HOLD"
-          assert "INDEPENDENT_RELEASE_REVIEW_MISSING" in snap.blockers
+          assert "INDEPENDENT_RELEASE_REVIEW_MISSING" not in snap.blockers
+          assert "EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED" in snap.blockers
           assert "REAL_FREIGHT_ACCURACY_UNPROVEN" in snap.blockers
           print("PASS: simulated release is NOT production customer acceptance")
           PY
