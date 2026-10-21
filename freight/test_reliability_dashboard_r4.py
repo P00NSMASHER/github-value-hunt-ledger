@@ -153,3 +153,31 @@ def test_disallowed_review_boolean_cannot_approve_release():
     )
     with pytest.raises(TypeError, match="independent_review_approved"):
         acceptance_snapshot(**params)
+
+def test_future_readiness_changes_trigger_specialized_automated_ci():
+    """Future QA/policy edits must not silently miss the source-locked replay."""
+    from pathlib import Path
+    workflow = (
+        Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "retally-four-release-acceptance-replay.yml"
+    ).read_text(encoding="utf-8")
+    for changed in (
+        "freight/reliability_dashboard.py",
+        "freight/test_reliability_dashboard_r4.py",
+        "recoveryworks/CODE_RELEASE_POLICY.md",
+    ):
+        assert f"      - '{changed}'" in workflow
+    assert "freight/test_reliability_dashboard_r4.py" in workflow
+
+
+def test_customer_truth_workflow_has_one_unwaived_pilot_hold():
+    from pathlib import Path
+    workflow = (
+        Path(__file__).resolve().parents[1]
+        / ".github" / "workflows" / "retally-real-customer-evidence-gate.yml"
+    ).read_text(encoding="utf-8")
+    assert workflow.count(
+        "assert 'EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED' in s.blockers"
+    ) == 1
+    assert "independently_verified_cash_recovery_minor" in workflow
+    assert "bank_cleared_real_customer_settlements_verified" in workflow

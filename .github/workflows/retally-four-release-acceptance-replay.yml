@@ -7,6 +7,9 @@ on:
       - 'freight/test_public_pennine_integration.py'
       - 'freight/simulated_release_acceptance.py'
       - 'freight/test_simulated_release_acceptance.py'
+      - 'freight/reliability_dashboard.py'
+      - 'freight/test_reliability_dashboard_r4.py'
+      - 'recoveryworks/CODE_RELEASE_POLICY.md'
       - 'freight/FOUR_RELEASE_GOVERNANCE_REHEARSAL.md'
       - '.github/workflows/retally-four-release-acceptance-replay.yml'
 
