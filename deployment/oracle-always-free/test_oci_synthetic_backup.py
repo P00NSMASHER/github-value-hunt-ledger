@@ -713,7 +713,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
             backup.main(["--inspect", "--preserve-legacy-orphan"])
 
     def test_quarantine_flag_requires_a_real_historical_orphan(self):
-        with (patch.object(self.store, "bucket_check"),
+        with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
+              patch.object(self.store, "bucket_check"),
               patch.object(self.store, "objects", side_effect=[[], []]),
               patch.object(self.store, "put") as put):
             with self.assertRaisesRegex(backup.Refused, "no legacy"):
@@ -757,6 +758,7 @@ class RealEnginesOfflineTest(unittest.TestCase):
 
             with patch.object(backup, "ATTEMPT", attempt), \
                  patch.object(backup, "ACCEPTANCE", result), \
+                 patch.object(backup, "LEGACY_QUARANTINE", root / "quarantine.json"), \
                  patch.object(bucket, "bucket_check"), \
                  patch.object(bucket, "objects", side_effect=lambda prefix: [
                      {"name": key} for key in objects if key.startswith(prefix)]), \
@@ -788,6 +790,7 @@ class RealEnginesOfflineTest(unittest.TestCase):
             })
             with (patch.object(backup, "ATTEMPT", root / "attempt.json"),
                   patch.object(backup, "ACCEPTANCE", root / "acceptance.json"),
+                  patch.object(backup, "LEGACY_QUARANTINE", root / "quarantine.json"),
                   patch.object(store, "bucket_check"),
                   patch.object(store, "objects", return_value=[]),
                   patch.object(store, "put", return_value="etag-uploaded"),
