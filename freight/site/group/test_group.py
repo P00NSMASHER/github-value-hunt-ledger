@@ -112,3 +112,13 @@ def test_nested_canonical_regression_is_rejected(bundle, tmp_path):
     page.write_text(page.read_text().replace(NEW_BASE + "capturebrief/", NEW_BASE))
     with pytest.raises(ValueError, match="self-referencing canonical"):
         validate_cloudflare_seo(copy, ROUTES)
+
+
+def test_group_business_email_cannot_be_rewritten_to_cloudflare_404(bundle):
+    # Cloudflare rewrites bare email text as well as mailto anchors. The zone
+    # keeps obfuscation enabled; approved business addresses use its opt-out.
+    import re
+    for route in ("",) + tuple(r + "/" for r in ROUTES if r != "recovery"):
+        html = (bundle / route / "index.html").read_text()
+        outside_opt_out = re.sub(r"<!--email_off-->.*?<!--/email_off-->", "", html, flags=re.S)
+        assert "jay@retallyrecovery.com" not in outside_opt_out, route
