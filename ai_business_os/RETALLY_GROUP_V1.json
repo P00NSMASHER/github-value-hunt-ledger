@@ -35,7 +35,7 @@
       "purpose": "Evidence-led audit and authorized recovery across freight and related business expenses.",
       "stage": "Seven-branch rollout preparation",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Resolve private-host readiness and owner-authorized release checks; establish the first genuine authorized delivery.",
+      "next_action": "Resolve private-host readiness and automated release checks; establish the first genuinely authorized customer delivery.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -591,11 +591,11 @@
     {
       "id": "quality-reviewed",
       "label": "Quality reviewed",
-      "owner_role": "OWNER_QUALITY_ASSURANCE",
+      "owner_role": "AUTOMATED_QUALITY_GATE",
       "required_evidence": [
-        "Exact-artifact automated and service-specific quality checks",
-        "Owner acceptance bound to the current artifact and source version",
-        "Resolved material defects"
+        "Independent automated test and source-validity receipts bound to the exact artifact",
+        "Recorded current source revision and reproducible quality results",
+        "Resolved material defects and enforceable release checks"
       ]
     },
     {
@@ -626,7 +626,7 @@
       "owner_role": "ENGINEERING",
       "timeframe": "Days 1–14",
       "status": "IN_PROGRESS",
-      "done_when": "Versioned register, workflow and dashboard pass source checks, owner acceptance and protected release gates."
+      "done_when": "Versioned register, workflow and dashboard pass reproducible automated checks, with no mandatory human review."
     },
     {
       "id": "identity-map",
@@ -704,6 +704,8 @@
     "external_actions_authorized": false,
     "public_rebrand_authorized": false,
     "production_state_mutation_authorized": false,
-    "registration_policy": "Deferred under existing owner policy; this package does not determine applicable legal obligations."
+    "registration_policy": "Deferred under existing owner policy; this package does not determine applicable legal obligations.",
+    "internal_human_review_required": false,
+    "internal_quality_gate": "AUTOMATED_EVIDENCE_QA"
   }
 }
