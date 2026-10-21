@@ -46,25 +46,42 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual({"sheetharbor", "app-factory-products", "x402-services"},
                          {e["id"] for e in view["entries"] if e["kind"] == "product_family"})
 
-    def test_owner_only_quality_approval_keeps_checks_and_no_production_authority(self):
-        workflow = {row["id"]: row for row in self.catalog["workflow"]}
-        quality = workflow["quality-reviewed"]
-        self.assertEqual("OWNER_QUALITY_ASSURANCE", quality["owner_role"])
-        self.assertTrue(any("Owner acceptance" in v for v in quality["required_evidence"]))
-        self.assertTrue(any("quality checks" in v for v in quality["required_evidence"]))
+    def test_no_internal_human_reviews_keeps_automated_quality_and_no_authority(self):
+        quality = next(v for v in self.catalog["workflow"] if v["id"] == "quality-reviewed")
+        self.assertEqual("AUTOMATED_QUALITY_GATE", quality["owner_role"])
+        self.assertTrue(any("automated" in v.lower() for v in quality["required_evidence"]))
+        self.assertTrue(any("source" in v.lower() for v in quality["required_evidence"]))
+        self.assertIs(self.catalog["authority"]["internal_human_review_required"], False)
+        self.assertEqual("AUTOMATED_EVIDENCE_QA",
+                         self.catalog["authority"]["internal_quality_gate"])
         self.assertFalse(self.catalog["authority"]["production_state_mutation_authorized"])
 
-    def test_independent_human_review_cannot_silently_become_required_again(self):
-        for new_role, new_evidence in (
+    def test_current_and_future_human_review_requirement_rejected(self):
+        for role, evidence in (
             ("INDEPENDENT_REVIEWER", ["Owner acceptance", "Independent approval"]),
             ("OWNER_QUALITY_ASSURANCE", ["Current source version", "Resolved material defects"]),
+            ("AUTOMATED_QUALITY_GATE", ["Owner acceptance required", "Automated tests"]),
+            ("AUTOMATED_QUALITY_GATE", ["Independent reviewer approval", "Automated tests"]),
         ):
-            with self.subTest(role=new_role, evidence=new_evidence):
+            with self.subTest(role=role, evidence=evidence):
                 changed = copy.deepcopy(self.catalog)
-                quality = next(row for row in changed["workflow"] if row["id"] == "quality-reviewed")
-                quality["owner_role"] = new_role
-                quality["required_evidence"] = new_evidence
-                with self.assertRaisesRegex(GroupCatalogError, "owner acceptance"):
+                quality = next(v for v in changed["workflow"] if v["id"] == "quality-reviewed")
+                quality["owner_role"], quality["required_evidence"] = role, evidence
+                with self.assertRaises(GroupCatalogError):
+                    validate_catalog(changed)
+
+    def test_automatic_review_policy_cannot_be_weakened(self):
+        for field, value in (
+            ("internal_human_review_required", True),
+            ("internal_human_review_required", "false"),
+            ("internal_human_review_required", None),
+            ("internal_quality_gate", "HUMAN_QA"),
+            ("internal_quality_gate", None),
+        ):
+            with self.subTest(field=field, value=value):
+                changed = copy.deepcopy(self.catalog)
+                changed["authority"][field] = value
+                with self.assertRaises(GroupCatalogError):
                     validate_catalog(changed)
 
     def test_unconnected_metrics_stay_unknown(self):
