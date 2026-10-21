@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from typing import Callable, Sequence
 
+from retally_writer_proposal_policy import PROPOSAL_BRANCH, ProposalHold
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = (
@@ -120,9 +122,14 @@ def persist_generated(
     rebuild_fn: Callable[[Path], None] = default_rebuild,
     before_push: Callable[[int], None] | None = None,
     clean_untracked_on_rebuild: bool = False,
+    proposal_branch: str | None = None,
 ) -> dict[str, object]:
     if max_attempts < 1:
         raise ValueError("max_attempts must be >= 1")
+    if proposal_branch is not None:
+        if (PROPOSAL_BRANCH.fullmatch(proposal_branch) is None or
+                not proposal_branch.startswith("automation/retally-technology-")):
+            raise ValueError("Unsafe or non-TI generated evidence branch")
 
     git(repo, "config", "user.name", "github-actions[bot]")
     git(
@@ -165,6 +172,25 @@ def persist_generated(
 
         if before_push is not None:
             before_push(attempt)
+
+        if proposal_branch is not None:
+            # Push a fresh, exact-run synthetic evidence candidate only.  A
+            # failure must NOT fall back to direct main or force the branch.
+            pushed = git(
+                repo, "push", "origin",
+                "HEAD:refs/heads/" + proposal_branch, check=False,
+            )
+            if pushed.returncode:
+                raise RuntimeError("isolated technology evidence branch push failed; "
+                                   "do not force, retry or write main")
+            return {
+                "status": "proposed",
+                "attempts": attempt,
+                "rebuilt_attempts": rebuilt_attempts,
+                "head_sha": git(repo, "rev-parse", "HEAD").stdout.strip(),
+                "base_sha": remote_head,
+                "branch": proposal_branch,
+            }
 
         pushed = git(
             repo,
@@ -210,6 +236,11 @@ def main() -> int:
         default=5,
     )
     parser.add_argument(
+        "--proposal-branch",
+        default=None,
+        help="Opt-in isolated technology-evidence branch, never a main write",
+    )
+    parser.add_argument(
         "--clean-untracked-on-rebuild",
         action="store_true",
         help=(
@@ -226,6 +257,7 @@ def main() -> int:
         paths,
         max_attempts=args.max_attempts,
         clean_untracked_on_rebuild=args.clean_untracked_on_rebuild,
+        proposal_branch=args.proposal_branch,
     )
     print(json.dumps(result, sort_keys=True))
     return 0
