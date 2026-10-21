@@ -20,6 +20,10 @@ def load_page_images(page):
       for (const image of document.querySelectorAll('img[loading="lazy"]')) {
         image.scrollIntoView({block: 'center', behavior: 'instant'});
         await nextPaint();
+        // A completed network response can still be undecoded when a full-page
+        // capture moves the image off screen. Paint it while it is in view.
+        try { await image.decode(); } catch (_) { /* recorded below */ }
+        await nextPaint();
       }
       window.scrollTo({top: 0, behavior: 'instant'});
       await nextPaint();
