@@ -167,6 +167,19 @@ class SnapshotReaderTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(CaptureBriefObservationError):
                 self.reader(snapshot(broken)).observe(now=NOW)
 
+    def test_unicode_line_separators_inside_json_are_not_record_boundaries(self):
+        # The CaptureBrief producer writes ensure_ascii=False JSONL: these
+        # characters can legitimately occur inside a JSON string field.
+        for codepoint in (0x85, 0x2028, 0x2029):
+            with self.subTest(codepoint=codepoint):
+                case = "CB-" + chr(codepoint) + "-SYNTHETIC"
+                raw = producer_ledger(event("PAYMENT", case=case))
+                self.assertIn(chr(codepoint).encode("utf-8"), raw)
+                result = self.reader(snapshot(raw)).observe(now=NOW)
+                self.assertEqual(1, result["ledger_record_count"])
+                self.assertEqual(1, result["distinct_case_count_not_customer_count"])
+                self.assertNotIn(case, json.dumps(result, ensure_ascii=False))
+
     def test_duplicate_json_keys_and_incomplete_lines_fail(self):
         raw = producer_ledger(event("PAYMENT"))
         with self.assertRaises(CaptureBriefObservationError):
