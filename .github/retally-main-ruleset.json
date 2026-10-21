@@ -1,7 +1,7 @@
 {
-  "name": "RETALLY main: pull requests + automated release gate (zero reviews)",
+  "name": "RETALLY main: proposed PR + CI guard (zero reviews; activation held)",
   "target": "branch",
-  "enforcement": "active",
+  "enforcement": "disabled",
   "bypass_actors": [],
   "conditions": {
     "ref_name": {
