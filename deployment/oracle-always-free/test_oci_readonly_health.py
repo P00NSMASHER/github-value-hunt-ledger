@@ -99,6 +99,8 @@ class ContextTests(unittest.TestCase):
             "pipelines.actions.githubusercontent.com",
             "pipelinesghubeus13.actions.githubusercontent.com",
             "pipelinesghubwus24.actions.githubusercontent.com",
+            "run-actions-1-azure-eastus.actions.githubusercontent.com",
+            "run-actions-24-azure-westus2.actions.githubusercontent.com",
         ):
             with self.subTest(hostname=hostname):
                 s = fixture()
@@ -107,6 +109,10 @@ class ContextTests(unittest.TestCase):
                 self.assertEqual(m.require_env(s), s)
         for url in (
             "https://evil.actions.githubusercontent.com/oidc/token?x=1",
+            "https://run-actions-x-azure-eastus.actions.githubusercontent.com/oidc/token",
+            "https://run-actions-1-azure-eastus.actions.githubusercontent.com.evil.net/oidc/token",
+            "https://run-actions-1-azure-eastus.actions.githubusercontent.com:444/oidc/token",
+            "http://run-actions-1-azure-eastus.actions.githubusercontent.com/oidc/token",
             "https://pipelinesghub.actions.githubusercontent.com/oidc/token",
             "https://pipelinesghub-.actions.githubusercontent.com/oidc/token",
             "https://pipelinesghubeus13.actions.githubusercontent.com.evil.net/oidc/token",
