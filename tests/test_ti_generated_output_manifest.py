@@ -159,7 +159,14 @@ class GeneratedOutputManifestTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("tools/ti_persist_generated.py", workflow)
-        self.assertIn("RETALLY_TECHNOLOGY_PR_ENABLED", workflow)
+        # A feature flag must never revive a direct-main workflow branch.
+        # All GitHub Actions publishing uses a frozen proposal branch and
+        # the exact-SHA PR merge controller, independent of repository vars.
+        self.assertNotIn("RETALLY_TECHNOLOGY_PR_ENABLED", workflow)
+        self.assertNotIn("PR_MODE", workflow)
+        self.assertIn("--proposal-branch", workflow)
+        self.assertIn("python -m tools.retally_automated_pr_proposal", workflow)
+        self.assertIn('os.environ.get("GITHUB_ACTIONS") == "true"', publisher)
         policy = (ROOT / "recoveryworks/CODE_RELEASE_POLICY.md").read_text(
             encoding="utf-8"
         )
