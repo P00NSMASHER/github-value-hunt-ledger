@@ -28,6 +28,14 @@ bytes only into an ephemeral GitHub-hosted runner. It does **not** store their
 original bytes, invoice rows, per-invoice identities, or extracted text in Git,
 Actions artifacts, or public step summaries.
 
+The source-scoped Pennine accounting replay digest is also pinned to an exact
+SHA-256 fingerprint observed independently on Windows and a GitHub-hosted Linux
+run: `c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213`.
+A source or reconciliation-algorithm change that alters this fingerprint must
+be reviewed and explicitly re-baselined. The fingerprint binds a specific
+source/kernel replay; it is **not** a cryptographic bank attestation or an
+independent payment truth label.
+
 ## Real engine calls and evidence limits
 
 1. Run freight.ingestion_gateway.ingest_bytes on **each original PDF**. The
@@ -36,7 +44,12 @@ Actions artifacts, or public step summaries.
 2. Use pymupdf as an explicitly **lab-only document text adapter** to extract
    invoice identifiers, face totals, service types and source pages. Cross-check
    against independently observed original-document spot checks. No OCR guesses
-   or ungrounded fields.
+   or ungrounded fields. Enforce unique original invoice-face identifiers before
+   indexing, anchor checks or reconciliation. A repeated face (including a
+   copied page) or a conflicting face amount fails the source replay rather
+   than silently replacing the first entry with the last. Diagnostic errors
+   disclose no underlying invoice identifiers. This is document consistency
+   checking, not evidence of a carrier overcharge.
 3. Reconcile GlobalTranz original invoice face amounts against **original**
    statement amounts using RETALLY's recoveryworks.reconciliation_kernel
    engine. Keep current statement balances separate; do not infer
@@ -49,6 +62,26 @@ Actions artifacts, or public step summaries.
    per remittance reference, missing payment reference and malformed amounts.
    This is a same-source structural financial benchmark, **not** bank clearing,
    independent settlement accuracy, verified duplicates or proven overcharges.
+   A republished economic invoice must retain the same reported payment
+   reference, date, currency and status; any conflict fails the entire replay
+   before first-row deduplication or matching. Legitimate multiple invoices
+   under one remittance stay distinct, and payment keys include the supplier
+   so two unrelated suppliers cannot be merged by coincidentally equal numbers.
+   The same supplier/invoice number with a different issue date or exact
+   invoice amount is held for source adjudication, not silently counted as a
+   second invoice; control-character or Unicode alias-form source identities
+   are rejected before delimiter-based keys and derived transaction IDs.
+   CSV header candidates must contain each required field exactly once.
+   Original invoice, supplier and remittance cells are checked before
+   whitespace stripping, so a trailing control character cannot vanish into
+   the same hashed identity as the clean invoice.
+   The laboratory also parses each original Pennine CSV through the separate
+   public census adapter and compares the complete normalized row multisets
+   (including integer pennies, references, dates, status and duplicate counts)
+   in memory. It emits only aggregate pass/count metadata. Both adapters read
+   the **same publisher bytes**: agreement detects parser drift and missing
+   rows, not independent payment or settlement truth. Frozen source URL/SHA
+   registries must agree between adapters.
 5. A separate ArcBest smoke test may construct canonical records from the
    original document's printed postal codes, rated weight, shipment date and
    total. It explicitly marks the **shipment-date-as-invoice-date proxy**, the
@@ -68,7 +101,22 @@ Actions artifacts, or public step summaries.
    reconciliation kernel. The native many-to-one global candidate window is
    bounded at 18; the lab's strictly partitioned replay retains that bounded
    kernel while only allowing matches within the same declared payment reference.
+   Before kernel execution, the adapter verifies exact transaction-ID uniqueness,
+   complete group-key coverage, source-key reference/date/currency binding,
+   and an exact integer group bound between 1 and 18. A deliberately mislabeled
+   transaction is **rejected** rather than matched through amount/date fallback
+   and reported as having zero cross-reference errors. Synthetic single-field
+   reference keys remain accepted only when equal to the actual transaction
+   reference. Supplier identity in full keys is still sourced from the same
+   publisher disclosure, not an independent bank identity confirmation.
    This measures structural consistency, not bank-cleared matching accuracy.
+   Completeness is explicitly two-sided: the report counts matched and
+   unmatched source-declared counterparts as well as invoices. An orphaned
+   declaration, oversized/unmatched group, or empty population leaves
+   `source_declaration_reconciliation_complete=false`, even if every invoice
+   is matched. The controlled fault-injection suite requires this complete
+   same-source baseline before testing mutations. Neither a matched
+   declaration nor this completeness flag establishes independent bank clearing.
 8. Run four **controlled negative tests** with the real published invoice
    population: plus-one-penny counterpart amount, incorrect payment reference,
    wrong currency, and duplicate grouped payment declaration. All must result
@@ -76,7 +124,9 @@ Actions artifacts, or public step summaries.
    counterexamples, not demonstrated customer payment errors.
 9. Retain source-published payment-status counts, null/malformed values,
    supplier-and-invoice economic identity variants and negative/zero amounts
-   as explicit general-accounting data-quality diagnostics.
+   as explicit general-accounting data-quality diagnostics. Reject nonblank
+   truncated CSV rows and nonblank rows missing both invoice and payment IDs
+   instead of silently omitting them from the population.
 10. Check independent GAO decision-narrative arithmetic in integer cents,
     including the **reversal** of an allegedly lower-rate collection. This
     is a historical precedent test, not an independent linked label or a
