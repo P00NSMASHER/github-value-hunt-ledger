@@ -46,14 +46,21 @@ def check_workspace(root):
             record('active_branch_intake', bool(active) and all(statuses[b]['analysis_ready'] for b in active),
                    'exact customer scope and independent source review for active branches')
             backups = list((root / 'backups').glob('*.json'))
-            recent = [p for p in backups if datetime.now(timezone.utc).timestamp() - p.stat().st_mtime <= 86400]
             backup_ok = False
-            if recent:
+            if backups:
                 import tempfile
-                latest = max(recent, key=lambda p: p.stat().st_mtime)
+                latest = max(backups, key=lambda p: p.stat().st_mtime)
                 snapshot = json.loads(latest.read_text())
                 encoded = json.dumps(snapshot, sort_keys=True).encode()
-                if hashlib.sha256(encoded).hexdigest() == latest.stem:
+                try:
+                    captured = datetime.fromisoformat(snapshot.get('captured_at', '').replace('Z', '+00:00'))
+                    age = (datetime.now(timezone.utc) - captured).total_seconds()
+                    fresh = captured.tzinfo is not None and 0 <= age <= 86400
+                except (ValueError, TypeError, AttributeError):
+                    fresh = False
+                # Copying/touching an old backup must not renew its recovery SLA.
+                # Legacy snapshots remain restorable but need a fresh backup.
+                if fresh and hashlib.sha256(encoded).hexdigest() == latest.stem:
                     with tempfile.TemporaryDirectory() as temporary:
                         Workspace.restore_snapshot(snapshot, Path(temporary) / 'restored')
                     backup_ok = True

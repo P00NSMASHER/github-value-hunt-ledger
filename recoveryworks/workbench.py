@@ -479,10 +479,15 @@ class Workspace(OnboardingMixin):
             names = ['workspace.json', 'intake.json']
             names += [p.name for p in (self.root/'ledger.json', self.root/'scan-report.json') if p.exists()]
             names += ['sources/'+p.name for p in (self.root/'sources').glob('*') if p.is_file()]
-            files = {name: {'content': (self.root/name).read_text(),
-                            'sha256': sha((self.root/name).read_bytes())} for name in sorted(names)}
+            # Read once as bytes. Text-mode reads translate Windows CRLF and
+            # lone CR, invalidating the original evidence hash on restore.
+            files = {}
+            for name in sorted(names):
+                raw = (self.root / name).read_bytes()
+                files[name] = {'content': raw.decode('utf-8'), 'sha256': sha(raw)}
             snapshot = {'schema': 1, 'simulation': self.meta['simulation'],
-                        'journal_head': ledger.journal.head_hash, 'files': files}
+                        'journal_head': ledger.journal.head_hash, 'files': files,
+                        'captured_at': timestamp()}
             identity = sha(json.dumps(snapshot, sort_keys=True).encode())
             write_private_json(self.root/('backups/'+identity+'.json'), snapshot)
             # Restore every captured file into a new isolated temporary workspace, then replay it.
