@@ -435,6 +435,14 @@ class PreviewTests(unittest.TestCase):
         self.assertNotIn('href="javascript:', html)
         self.assertIn("&lt;img", html)
 
+    def test_versioned_preview_matches_current_catalog_and_renderer(self):
+        from ai_business_os.retally_group_dashboard import render_dashboard
+        html = render_dashboard(build_group_view())
+        tracked = CATALOG_PATH.with_name("RETALLY_GROUP_DASHBOARD.html").read_bytes()
+        self.assertEqual(html.encode("utf-8"), tracked)
+        self.assertIn("Automated quality gate", html)
+        self.assertNotIn("Owner quality assurance", html)
+
     def test_render_cli_writes_offline_preview_and_refuses_overwrite(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "preview.html"
