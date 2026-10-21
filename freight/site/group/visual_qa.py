@@ -81,6 +81,28 @@ def check_console_breakpoints(page, base, output):
     return results
 
 
+def check_card_heading_contrast(page):
+    """Axe may leave gradient backgrounds untested; check each actual stop."""
+    results = page.evaluate("""() => {
+      const channels = value => value.match(/[\\d.]+/g).slice(0, 3).map(Number);
+      const luminance = rgb => rgb.map(v => v / 255)
+        .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
+        .reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+      return [...document.querySelectorAll('.portfolio-item h3')].map(heading => {
+        const panel = getComputedStyle(heading.closest('.portfolio-item'));
+        const colors = panel.backgroundImage.match(/rgba?\\([^)]+\\)/g) || [panel.backgroundColor];
+        const foreground = luminance(channels(getComputedStyle(heading).color));
+        const contrast = Math.min(...colors.map(color => {
+          const background = luminance(channels(color));
+          return (Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05);
+        }));
+        return {text: heading.innerText, contrast};
+      });
+    }""")
+    assert len(results) == 8 and all(item['contrast'] >= 4.5 for item in results), results
+    return results
+
+
 def load_page_images(page):
     """Exercise native lazy loading before judging images or taking screenshots."""
     page.evaluate("""async () => {
@@ -182,7 +204,7 @@ def main():
     Thread(target=server.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{server.server_port}"
     report = {"pages": [], "interactions": [], "chat_clearance": [], "non_get_requests": [],
-              "green_canvas": [], "console_breakpoints": [],
+              "green_canvas": [], "console_breakpoints": [], "card_heading_contrast": [],
               "external_requests_blocked": 0, "passed": False,
               "accessibility": {"status": "pending" if axe_source else "skipped",
                                 "reason": None if axe_source else "No local axe-core script supplied with --axe-js",
@@ -218,6 +240,8 @@ def main():
                     })""")
                     result.update({"route": slug or "home", "width": width, "status": response.status})
                     report["pages"].append(result)
+                    if not slug:
+                        report["card_heading_contrast"].append({"width": width, "headings": check_card_heading_contrast(page)})
                     assert result["status"] == 200 and result["overflow"] <= 1 and result["h1Count"] == 1 and result["mainPresent"] and not result["brokenImages"], result
                     if axe_source:
                         accessibility = {"route": slug or "home", "width": width, **check_accessibility(page, axe_source)}
