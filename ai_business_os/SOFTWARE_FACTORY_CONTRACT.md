@@ -40,3 +40,21 @@ matches the intended operation.
 
 That separation lets more coding work become autonomous without turning repository access into
 unrestricted production authority.
+## RETALLY Group — owner-only human approval
+
+For RETALLY Group internal source and release decisions, the owner is the only
+required **human** approver. A separate independent human reviewer is optional,
+not a release prerequisite. This is a scoped authorization-policy change, not a
+grant of machine production authority and not a change to other project policies.
+
+The Step-2 independent auditor is still a separately evidenced technical
+verification stage; it is not a second human approval. All existing fail-closed
+acceptance tests, security checks, branch protections, and Step-6 kill switches
+remain effective. A production/factory merge still needs a **persisted exact**
+owner PRODUCTION_CHANGE authorization matching the current PR, head SHA, merge
+method and audit hash. This general owner policy instruction is not a substitute
+for that exact approval record. Claims of a human review must never be fabricated.
+
+For customer artifacts, owner quality acceptance can replace an otherwise
+optional second human sign-off, but cannot replace source accuracy, delivery
+authorization, payment verification, or legally/contractually required review.
