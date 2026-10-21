@@ -1,5 +1,6 @@
 """Release checks for migrated pages, links, metadata and freight continuity."""
 from html.parser import HTMLParser
+from hashlib import sha256
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 import re
@@ -252,7 +253,7 @@ def test_contact_composer_is_labelled_and_explicitly_prepares_an_email_draft(bun
     assert urlsplit(draft["href"]).path == "jay@retallyrecovery.com"
     assert ("a", "/recovery/#start-audit") in page.refs
     assert "auditForm" not in page.ids
-    assert {ref for tag, ref in page.refs if tag == "script"} == {"/group.js"}
+    assert {urlsplit(ref).path for tag, ref in page.refs if tag == "script"} == {"/group.js"}
     script = (bundle / "group.js").read_text()
     # The group composer has no transport or storage. Freight owns its API.
     assert not re.search(r"/api/|\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket|localStorage|sessionStorage)\b", script)
@@ -274,3 +275,29 @@ def test_homepage_features_only_the_three_available_offers(bundle):
     featured = [attrs["href"] for tag, attrs, parents in page.elements
                 if tag == "a" and within(parents, element_id="businesses")]
     assert sorted(featured) == ["/capturebrief/", "/permitplate/", "/recovery/"]
+
+
+def test_returning_visitors_receive_current_design_assets(bundle, tmp_path):
+    names = {"group.css", "group.js", "foundry.css", "site.js"}
+    seen = set()
+    for source in bundle.rglob("*.html"):
+        for tag, reference in Page(source.read_text()).refs:
+            url = urlsplit(reference)
+            name = url.path.removeprefix("/")
+            if not url.netloc and name in names:
+                expected = sha256((bundle / name).read_bytes()).hexdigest()[:16]
+                assert url.query == "v=" + expected, (source, reference)
+                seen.add(name)
+    assert seen == names
+    # A later stylesheet edit must change its URL without a manual release tag.
+    for name in names:
+        shutil.copyfile(bundle / name, tmp_path / name)
+    shutil.copyfile(bundle / "index.html", tmp_path / "index.html")
+    before = (tmp_path / "index.html").read_text()
+    with (tmp_path / "group.css").open("a") as changed:
+        changed.write("\n/* subsequent design revision */\n")
+    group_build._version_design_assets(tmp_path)
+    after = (tmp_path / "index.html").read_text()
+    css_ref = lambda html: next(ref for _, ref in Page(html).refs if urlsplit(ref).path == "/group.css")
+    assert css_ref(before) != css_ref(after)
+    assert {ref for tag, ref in Page(before).refs if tag == "script"} == {ref for tag, ref in Page(after).refs if tag == "script"}
