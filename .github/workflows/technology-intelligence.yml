@@ -106,7 +106,7 @@ jobs:
         id: persist
         env:
           TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
-          PR_MODE: ${{ vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED }}
+          PR_MODE: ${{ vars.RETALLY_TECHNOLOGY_PR_ENABLED }}
         shell: bash
         run: |
           set -euo pipefail
@@ -148,7 +148,7 @@ jobs:
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
-      vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED == 'true' &&
+      vars.RETALLY_TECHNOLOGY_PR_ENABLED == 'true' &&
       needs.persist-generated.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5

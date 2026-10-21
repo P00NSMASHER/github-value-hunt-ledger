@@ -111,7 +111,7 @@ jobs:
         id: persist
         env:
           WORKER: ${{ steps.route.outputs.worker }}
-          PR_MODE: ${{ vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED }}
+          PR_MODE: ${{ vars.RETALLY_SCOUT_PR_ENABLED }}
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -145,7 +145,7 @@ jobs:
     if: >-
       (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main' &&
-      vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED == 'true' &&
+      vars.RETALLY_SCOUT_PR_ENABLED == 'true' &&
       needs.scout.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5

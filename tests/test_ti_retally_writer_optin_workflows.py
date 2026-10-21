@@ -10,10 +10,15 @@ class WriterModeTests(unittest.TestCase):
         lanes={"public-repo-hunter.yml":"scout","catalog-append.yml":"catalog",
                "integrator-sync.yml":"integrator",
                "technology-intelligence.yml":"technology"}
+        switches={"public-repo-hunter.yml":"RETALLY_SCOUT_PR_ENABLED",
+                  "catalog-append.yml":"RETALLY_CATALOG_PR_ENABLED",
+                  "integrator-sync.yml":"RETALLY_INTEGRATOR_PR_ENABLED",
+                  "technology-intelligence.yml":"RETALLY_TECHNOLOGY_PR_ENABLED"}
         for file,lane in lanes.items():
             s=(ROOT/".github"/"workflows"/file).read_text()
             with self.subTest(file=file):
-                self.assertIn("RETALLY_AUTOMATED_PR_WRITERS_ENABLED",s)
+                self.assertIn(switches[file],s)
+                self.assertNotIn("RETALLY_AUTOMATED_PR_WRITERS_ENABLED",s)
                 self.assertIn('if [ "$PR_MODE" = "true" ]; then',s)
                 self.assertIn("  submit-pr:",s)
                 self.assertIn("--lane "+lane,s)
