@@ -204,7 +204,7 @@ invoke this reader; the public dashboard remains disconnected.
 
 `retally_capturebrief.CaptureBriefOutcomeReader` is a second, explicitly optional
 service adapter. It recognizes the append-only CaptureBrief outcome producer at
-[pinned source commit](https://github.com/P00NSMASHER/capturebrief/blob/12d90024f053a78ead7936abf092931fce240d3e/capturebrief_core/outcomes.py).
+[pinned source commit](https://github.com/P00NSMASHER/capturebrief/blob/9449210bb8d2fbaf2c618e3ccdc6e993a8d1152d/capturebrief_core/outcomes.py).
 It does **not** discover a live outcome ledger, establish a customer account map,
 connect to Stripe, access a local path, or infer group revenue. The original
 CaptureBrief verifier opens a filesystem sidecar lock; this adapter never invokes
@@ -223,7 +223,27 @@ capture a consistent immutable byte snapshot. Its callable must return exactly:
 ```
 
 The immutable snapshot's provider, location, access permissions, and retention
-must be configured outside this repository. Missing/unavailable files, invalid
+must be configured outside this repository. CaptureBrief now supplies a bounded
+producer-side handoff, `capturebrief_core.ledger.read_verified_outcome_snapshot`,
+merged in [PR #66](https://github.com/P00NSMASHER/capturebrief/pull/66).
+[PR #67](https://github.com/P00NSMASHER/capturebrief/pull/67) preserves
+microsecond timestamp ordering so a just-written ledger event is not
+misidentified as future evidence. Only the verified, separately approved
+private producer runtime may invoke that function with its authenticated exact
+ledger location and transfer the resulting four-field snapshot to RETALLY.
+For example, **inside that approved private runtime**, not on the public site:
+
+```python
+from capturebrief_core.ledger import read_verified_outcome_snapshot
+
+def approved_immutable_snapshot_reader():
+    # This approved path and filesystem ownership must be authenticated
+    # independently; finding a file with a matching name is not sufficient.
+    return read_verified_outcome_snapshot(authenticated_producer_ledger_path)
+```
+
+No path discovery, account binding, or production activation is implemented by
+this example. Missing/unavailable files, invalid
 timestamps, malformed/partial JSONL, duplicate JSON keys, hash-chain breaks,
 invalid event types, case-fingerprint collisions, source rewinds and historical
 rewrites **fail closed**. Only explicitly present, zero-byte snapshots count as
