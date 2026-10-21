@@ -79,4 +79,4 @@ jobs:
           INPUT_LANE: ${{ inputs.lane }}
           INPUT_HEAD_SHA: ${{ inputs.head_sha }}
           INPUT_BASE_SHA: ${{ inputs.base_sha }}
-        run: python tools/retally_automated_pr_merge.py
+        run: python -m tools.retally_automated_pr_merge
