@@ -10,10 +10,15 @@ from pathlib import Path
 import shutil
 import tempfile
 
-from freight.site.build import PUBLIC_FILES as FREIGHT_PUBLIC_FILES, build as build_freight
+from freight.site.build import (
+    PUBLIC_FILES as FREIGHT_PUBLIC_FILES,
+    _leave_published_business_email_links_unmodified_by_cloudflare,
+    build as build_freight,
+)
 from freight.site.rebase_public_urls import OLD_BASE, rebase, validate_cloudflare_seo
 from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, SITE_DIR as RECOVERY_SOURCE, build as build_recoveryos
 from freight.site.asset_integrity import validate_recoveryos_media
+from freight.site.internal_links import validate_bundle_links
 
 REPO = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO / "cf-retally-public"
@@ -73,8 +78,18 @@ def build(output: Path = OUTPUT_DIR) -> Path:
         validate_recoveryos_media(RECOVERY_SOURCE)
         build_recoveryos(root / "recoveryos")
         shutil.copytree(root / "recoveryos", bundle / "recoveryos")
+        # The RecoveryOS information page uses the same intentionally public
+        # business mailbox, and Cloudflare rewrites its mailto anchors too.
+        recovery_home = bundle / "recoveryos" / "index.html"
+        recovery_home.write_text(
+            _leave_published_business_email_links_unmodified_by_cloudflare(
+                recovery_home.read_text(encoding="utf-8"), contact
+            ),
+            encoding="utf-8",
+        )
         rewrites = rebase(bundle)
         validated_sitemap_urls = validate_cloudflare_seo(bundle)
+        validate_bundle_links(bundle)
         if validated_sitemap_urls < 1:
             raise RuntimeError("Production sitemap cannot be empty")
         published = [path for path in bundle.rglob("*") if path.is_file()]

@@ -11,11 +11,15 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from ai_business_os.portfolio_planning import build_portfolio_plan
 from ai_business_os.production_bridge import ProductionBridgeError, ProductionReadBridge
+from ai_business_os.retally_group import build_group_view, identity_candidates
+from ai_business_os.retally_permitplate import PermitPlateNYCReader
+from ai_business_os.retally_capturebrief import CaptureBriefOutcomeReader
 
 
 class CommandCenterError(ValueError):
@@ -138,11 +142,25 @@ def _business_refs(text: str, businesses: Sequence[Mapping[str, Any]]) -> list[s
 class CommandCenterOperator:
     """Human-facing production orchestration over existing Business OS controls."""
 
-    def __init__(self, bridge: ProductionReadBridge, *, expected_schema_fingerprint: str):
+    def __init__(
+        self, bridge: ProductionReadBridge, *, expected_schema_fingerprint: str,
+        customer_register_reader: Callable[[], Mapping[str, Any]] | None = None,
+        permitplate_nyc_reader: PermitPlateNYCReader | None = None,
+        capturebrief_outcome_reader: CaptureBriefOutcomeReader | None = None,
+    ):
+        if permitplate_nyc_reader is not None and not isinstance(permitplate_nyc_reader, PermitPlateNYCReader):
+            raise CommandCenterError("PermitPlate NYC reader has an unsupported type")
+        if capturebrief_outcome_reader is not None and not isinstance(capturebrief_outcome_reader, CaptureBriefOutcomeReader):
+            raise CommandCenterError("CaptureBrief outcome reader has an unsupported type")
         self.bridge = bridge
         self.expected_schema_fingerprint = expected_schema_fingerprint
+        self.customer_register_reader = customer_register_reader
+        self.permitplate_nyc_reader = permitplate_nyc_reader
+        self.capturebrief_outcome_reader = capturebrief_outcome_reader
 
-    def dashboard(self) -> dict[str, Any]:
+    def dashboard(self, *, include_private_group: bool = False) -> dict[str, Any]:
+        if type(include_private_group) is not bool:
+            raise CommandCenterError("private group observation flag must be Boolean")
         fingerprint = self.bridge.assert_schema_current(self.expected_schema_fingerprint)
         portfolio = self.bridge.portfolio_view(expected_schema_fingerprint=fingerprint)
         inputs = self.bridge.planning_inputs()
@@ -159,7 +177,56 @@ class CommandCenterOperator:
             "businesses": portfolio["businesses"],
             "pending_approvals": portfolio["pending_approvals"],
             "planning": plan,
+            "retally_group": {
+                "catalog": build_group_view(),
+                "identity_candidates": identity_candidates(portfolio["businesses"]),
+                "private_observation": self.group_observation() if include_private_group else None,
+            },
         }
+
+    def group_observation(self) -> dict[str, Any]:
+        """Observe private source counts and optional register declarations.
+
+        The runtime injects authenticated, authorized readers. Supplying a reader
+        does not authenticate it or approve any catalog-to-business binding.
+        The response is private and must never be passed to the public renderer.
+        """
+        from ai_business_os.retally_group_private import build_private_group_observation
+        from ai_business_os.retally_customer_register import build_register_observation
+
+        source = self.bridge.retally_group_source_snapshot(
+            expected_schema_fingerprint=self.expected_schema_fingerprint)
+        now = datetime.now(timezone.utc)
+        observation = build_private_group_observation(
+            source, expected_schema_fingerprint=self.expected_schema_fingerprint, now=now)
+        if self.customer_register_reader is None:
+            observation["customer_register"] = {
+                "mode": "NOT_CONNECTED", "observed_account_count": None,
+                "observed_engagement_count": None,
+            }
+        else:
+            try:
+                register = self.customer_register_reader()
+                observation["customer_register"] = build_register_observation(
+                    register, observed_at=datetime.now(timezone.utc))
+            except Exception:
+                # A private provider can include confidential details in errors.
+                raise CommandCenterError("private customer register could not be validated") from None
+        observation["service_registers"] = {
+            "permitplate_nyc": {"mode": "NOT_CONNECTED"},
+            "capturebrief": {"mode": "NOT_CONNECTED"},
+        }
+        if self.permitplate_nyc_reader is not None:
+            try:
+                observation["service_registers"]["permitplate_nyc"] = self.permitplate_nyc_reader.observe()
+            except Exception:
+                raise CommandCenterError("private PermitPlate NYC source could not be validated") from None
+        if self.capturebrief_outcome_reader is not None:
+            try:
+                observation["service_registers"]["capturebrief"] = self.capturebrief_outcome_reader.observe()
+            except Exception:
+                raise CommandCenterError("private CaptureBrief outcome source could not be validated") from None
+        return observation
 
     def propose_objective(self, text: str, *, requested_by: str, priority: int = 80) -> dict[str, Any]:
         objective = _clean_text(text)
@@ -333,3 +400,4 @@ class CommandCenterOperator:
             "decided_by": principal,
             "receipt": decided[0],
         }
+

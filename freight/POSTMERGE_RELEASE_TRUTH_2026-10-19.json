@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "recorded_date_eastern": "2026-10-19",
+  "evidence_state": "SOURCE_CODE_MERGED_RESEARCH_ONLY",
+  "source_main_commit": "e266d404770eb804f543b15b479437c5b9186ff4",
+  "source_main_tree": "95126b4893cbb723ab616f6b5bfc6fce171e5f3e",
+  "merged_pull_requests": [
+    506,
+    510,
+    511,
+    512,
+    513
+  ],
+  "independent_approving_github_reviews_observed": 0,
+  "branch_protection_enabled_when_checked": false,
+  "original_freight_invoice_faces": 110,
+  "original_globaltranz_invoice_faces": 100,
+  "original_arcbest_invoice_faces": 10,
+  "real_freight_truth_positive_cases_independently_complete": 0,
+  "real_freight_truth_negative_cases_independently_complete": 0,
+  "real_freight_truth_unknown_cases": 110,
+  "real_freight_detection_precision": null,
+  "bank_cleared_real_customer_settlements_verified": 0,
+  "shipment_specific_buyer_rates_independently_verified": 0,
+  "independently_verified_cash_recovery_minor": 0,
+  "published_pennine_rows": 314,
+  "unique_pennine_invoices": 273,
+  "pennine_same_source_reference_matches": 273,
+  "independent_payment_accuracy": null,
+  "synthetic_release_refusal_checks": 7,
+  "synthetic_release_refusal_checks_passed": 7,
+  "model_generated_reviewer_approvals_count_as_independent": false,
+  "customer_rights_and_private_runtime_approved": false,
+  "customer_production_acceptance": "RELEASE_HOLD",
+  "open_customer_gates": [
+    "GENUINE_INDEPENDENT_CODE_REVIEW",
+    "VERIFIED_ORIGINAL_CUSTOMER_RATE",
+    "INDEPENDENT_BANK_CLEARED_PAYMENT",
+    "ADJUDICATED_POSITIVE_AND_NEGATIVE_TRUTH",
+    "PRIVATE_DOCUMENT_SANDBOX_AND_RIGHTS",
+    "REAL_PRODUCTION_PILOT_ACCEPTANCE"
+  ]
+}

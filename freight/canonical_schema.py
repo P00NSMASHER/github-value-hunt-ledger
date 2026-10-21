@@ -15,6 +15,8 @@ from typing import Iterable
 from freight.contracts import canonical_hash
 
 SCHEMA_VERSION = 1
+SIGNED_INVOICE_SCHEMA_VERSION = 2
+ADJUSTMENT_KINDS = frozenset({'DISCOUNT', 'INVOICE_CREDIT'})
 MODES = {"PARCEL", "LTL", "TL", "INTERMODAL", "AIR", "OCEAN"}
 TRANSPORTS = {"API", "EMAIL", "SFTP", "PORTAL", "UPLOAD", "BATCH"}
 CURRENCY_RE = re.compile(r"^[A-Z]{3}$")
@@ -179,6 +181,32 @@ class ChargeLine:
 
 
 @dataclass(frozen=True)
+class InvoiceAdjustment:
+    """Explicit reduction on the original invoice, not a bank refund or payment.
+
+    Use unsigned magnitude so arbitrary negative freight charges remain illegal.
+    A post-invoice payment, refund, or reversed settlement is NOT an adjustment
+    of the original invoiced amount and must enter the settlement ledger instead.
+    """
+
+    adjustment_id: str
+    kind: str
+    amount_cents: int
+    source_sha256: str
+    applies_to_charge_id: str | None = None
+
+    def __post_init__(self) -> None:
+        _text('adjustment_id', self.adjustment_id)
+        if self.kind not in ADJUSTMENT_KINDS:
+            raise ValueError('unsupported original-invoice adjustment kind')
+        _int('amount_cents', self.amount_cents, minimum=1)
+        if not SHA256_RE.fullmatch(self.source_sha256):
+            raise ValueError('adjustment source_sha256 must be lowercase SHA-256')
+        if self.applies_to_charge_id is not None:
+            _text('applies_to_charge_id', self.applies_to_charge_id)
+
+
+@dataclass(frozen=True)
 class CanonicalFreightRecord:
     schema_version: int
     buyer_id: str
@@ -192,10 +220,19 @@ class CanonicalFreightRecord:
     sources: tuple[SourceArtifact, ...]
     account_id: str | None
     record_hash: str
+    adjustments: tuple[InvoiceAdjustment, ...] = ()
+
+    @property
+    def gross_charge_cents(self) -> int:
+        return sum(line.billed_cents for line in self.charges)
+
+    @property
+    def adjustment_total_cents(self) -> int:
+        return sum(adjustment.amount_cents for adjustment in self.adjustments)
 
     @property
     def billed_total_cents(self) -> int:
-        return sum(line.billed_cents for line in self.charges)
+        return self.gross_charge_cents - self.adjustment_total_cents
 
     @property
     def mode(self) -> str:
@@ -206,10 +243,10 @@ def _record_body(
     *, buyer_id: str, business_unit: str, invoice_id: str, invoice_date: str,
     customer_id: str, currency: str, shipment: ShipmentFacts,
     charges: tuple[ChargeLine, ...], sources: tuple[SourceArtifact, ...],
-    account_id: str | None,
+    account_id: str | None, adjustments: tuple[InvoiceAdjustment, ...] = (),
 ) -> dict:
-    return {
-        "schema_version": SCHEMA_VERSION,
+    body = {
+        "schema_version": (SIGNED_INVOICE_SCHEMA_VERSION if adjustments else SCHEMA_VERSION),
         "buyer_id": buyer_id,
         "business_unit": business_unit,
         "invoice_id": invoice_id,
@@ -221,6 +258,9 @@ def _record_body(
         "sources": [asdict(x) for x in sources],
         "account_id": account_id,
     }
+    if adjustments:
+        body['adjustments'] = [asdict(x) for x in adjustments]
+    return body
 
 
 def build_record(
@@ -228,6 +268,7 @@ def build_record(
     customer_id: str, currency: str, shipment: ShipmentFacts,
     charges: Iterable[ChargeLine], sources: Iterable[SourceArtifact],
     account_id: str | None = None,
+    adjustments: Iterable[InvoiceAdjustment] = (),
 ) -> CanonicalFreightRecord:
     buyer_id = _text("buyer_id", buyer_id)
     business_unit = _text("business_unit", business_unit)
@@ -241,6 +282,7 @@ def build_record(
         account_id = _text("account_id", account_id)
     normalized_charges = tuple(charges)
     normalized_sources = tuple(sources)
+    normalized_adjustments = tuple(adjustments)
     if not normalized_charges:
         raise ValueError("record requires at least one charge")
     if not normalized_sources:
@@ -249,14 +291,29 @@ def build_record(
         raise ValueError("duplicate charge_id")
     if len({x.source_id for x in normalized_sources}) != len(normalized_sources):
         raise ValueError("duplicate source_id")
+    if not all(isinstance(x, InvoiceAdjustment) for x in normalized_adjustments):
+        raise ValueError('invoice adjustments must be typed InvoiceAdjustment entries')
+    if len({x.adjustment_id for x in normalized_adjustments}) != len(normalized_adjustments):
+        raise ValueError('duplicate adjustment_id')
+    if {x.charge_id for x in normalized_charges} & {x.adjustment_id for x in normalized_adjustments}:
+        raise ValueError('charge/adjustment identifier collision')
+    charge_ids = {x.charge_id for x in normalized_charges}
+    source_hashes = {x.sha256 for x in normalized_sources}
+    for adjustment in normalized_adjustments:
+        if adjustment.source_sha256 not in source_hashes:
+            raise ValueError('adjustment lacks an invoice-bound original source')
+        if adjustment.applies_to_charge_id is not None and adjustment.applies_to_charge_id not in charge_ids:
+            raise ValueError('adjustment references missing charge_id')
+    if sum(x.amount_cents for x in normalized_adjustments) > sum(x.billed_cents for x in normalized_charges):
+        raise ValueError('original invoice discounts exceed gross charges')
     body = _record_body(
         buyer_id=buyer_id, business_unit=business_unit, invoice_id=invoice_id,
         invoice_date=invoice_date, customer_id=customer_id, currency=currency,
         shipment=shipment, charges=normalized_charges, sources=normalized_sources,
-        account_id=account_id,
+        account_id=account_id, adjustments=normalized_adjustments,
     )
     return CanonicalFreightRecord(
-        schema_version=SCHEMA_VERSION,
+        schema_version=(SIGNED_INVOICE_SCHEMA_VERSION if normalized_adjustments else SCHEMA_VERSION),
         buyer_id=buyer_id,
         business_unit=business_unit,
         invoice_id=invoice_id,
@@ -268,11 +325,12 @@ def build_record(
         sources=normalized_sources,
         account_id=account_id,
         record_hash=canonical_hash(body),
+        adjustments=normalized_adjustments,
     )
 
 
 def verify_record(record: CanonicalFreightRecord) -> None:
-    if record.schema_version != SCHEMA_VERSION:
+    if record.schema_version not in (SCHEMA_VERSION, SIGNED_INVOICE_SCHEMA_VERSION):
         raise ValueError("unsupported canonical schema version")
     rebuilt = build_record(
         buyer_id=record.buyer_id,
@@ -285,8 +343,9 @@ def verify_record(record: CanonicalFreightRecord) -> None:
         charges=record.charges,
         sources=record.sources,
         account_id=record.account_id,
+        adjustments=record.adjustments,
     )
-    if rebuilt.record_hash != record.record_hash:
+    if rebuilt.schema_version != record.schema_version or rebuilt.record_hash != record.record_hash:
         raise ValueError("canonical freight record hash mismatch")
 
 
@@ -297,5 +356,5 @@ def record_payload(record: CanonicalFreightRecord) -> dict:
         invoice_id=record.invoice_id, invoice_date=record.invoice_date,
         customer_id=record.customer_id, currency=record.currency,
         shipment=record.shipment, charges=record.charges, sources=record.sources,
-        account_id=record.account_id,
+        account_id=record.account_id, adjustments=record.adjustments,
     ), "record_hash": record.record_hash}
