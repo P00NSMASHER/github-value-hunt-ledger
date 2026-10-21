@@ -136,9 +136,31 @@ class OciStore:
     def args(self) -> tuple[str, ...]:
         return "--namespace", self.namespace, "--bucket-name", self.bucket
 
+    def raw_bucket(self) -> dict:
+        """Read the signed OCI REST representation without older SDK field loss.
+
+        Cloud Shell's typed bucket GET may return null/omit newly introduced
+        audit or soft-delete fields. Never treat omission as 'Disabled'.
+        """
+        ensure(self.region == "us-ashburn-1" and self.bucket == BUCKET_NAME and
+               re.fullmatch(r"[A-Za-z0-9_-]{2,80}", self.namespace) is not None,
+               "Raw provider audit requires the original exact Ashburn synthetic bucket.")
+        uri = ("https://objectstorage.us-ashburn-1.oraclecloud.com/n/" +
+               self.namespace + "/b/" + self.bucket)
+        payload = self.cli("raw-request", "--http-method", "GET", "--target-uri", uri)
+        try:
+            response = json.loads(payload)
+        except ValueError as exc:
+            raise Refused("Authenticated OCI raw bucket GET returned invalid JSON.") from exc
+        ensure(isinstance(response, dict) and response.get("status") == "200 OK"
+               and isinstance(response.get("data"), dict),
+               "Authenticated OCI raw bucket GET was not an exact HTTP 200 data object.")
+        return response["data"]
+
     def bucket_check(self) -> None:
         b = self.data("os", "bucket", "get", *self.args())
         ensure(isinstance(b, dict) and b.get("name") == self.bucket and
+               b.get("namespace") == self.namespace and
                b.get("public-access-type") == "NoPublicAccess" and
                b.get("storage-tier") == "Standard" and b.get("versioning") == "Disabled" and
                b.get("object-events-enabled") is False and
@@ -146,17 +168,42 @@ class OciStore:
                "auto-tiering" in b and b["auto-tiering"] in (None, "Disabled") and
                "object-lifecycle-policy-etag" in b and b["object-lifecycle-policy-etag"] is None,
                "OCI bucket privacy, tier, auto-tiering, lifecycle, events or replication state changed.")
-        # Unknown KMS/audit state or soft-delete may invalidate $0 guardrails
-        # and the claim that a temporary encrypted object was removed.
+        # The typed CLI may omit these newer properties, but may not contradict
+        # the independent signed raw response (particularly a paid KMS key).
         ensure("kms-key-id" in b and b["kms-key-id"] is None and
-               b.get("object-level-audit-mode") == "Disabled",
-               "OCI bucket KMS key or object-level audit state is not approved.")
-        deletion = b.get("soft-delete-policy")
+               b.get("object-level-audit-mode") in (None, "Disabled"),
+               "Typed OCI bucket reports an unapproved KMS key or audit mode.")
+        typed_soft = b.get("soft-delete-policy")
+        ensure(typed_soft is None or
+               (isinstance(typed_soft, dict) and
+                isinstance(typed_soft.get("current-policy"), dict) and
+                typed_soft["current-policy"].get("soft-delete-mode") == "Disabled" and
+                "next-policy" in typed_soft and typed_soft["next-policy"] is None),
+               "Typed OCI bucket reports an unsafe soft-delete policy.")
+
+        raw = self.raw_bucket()
+        # ETag binding means the two provider reads describe the same exact
+        # bucket configuration, not separate moments with changed policy.
+        ensure(isinstance(b.get("etag"), str) and bool(b["etag"]) and
+               raw.get("etag") == b["etag"] and raw.get("name") == self.bucket and
+               raw.get("namespace") == self.namespace and
+               raw.get("publicAccessType") == "NoPublicAccess" and
+               raw.get("storageTier") == "Standard" and raw.get("versioning") == "Disabled",
+               "Typed and raw OCI bucket identity, ETag or core safety fields disagree.")
+        ensure("kmsKeyId" in raw and raw["kmsKeyId"] is None and
+               raw.get("objectLevelAuditMode") == "Disabled" and
+               raw.get("objectEventsEnabled") is False and
+               raw.get("replicationEnabled") is False and
+               "objectLifecyclePolicyEtag" in raw and
+               raw["objectLifecyclePolicyEtag"] is None and
+               "autoTiering" in raw and raw["autoTiering"] in (None, "Disabled"),
+               "Raw OCI bucket has unapproved KMS, audit, tier, events, replication or lifecycle state.")
+        deletion = raw.get("softDeletePolicy")
         ensure(isinstance(deletion, dict) and
-               isinstance(deletion.get("current-policy"), dict) and
-               deletion["current-policy"].get("soft-delete-mode") == "Disabled" and
-               "next-policy" in deletion and deletion["next-policy"] is None,
-               "OCI soft-delete is enabled, scheduled, or unknown; deletion proof is unsafe.")
+               isinstance(deletion.get("currentPolicy"), dict) and
+               deletion["currentPolicy"].get("softDeleteMode") == "Disabled" and
+               "nextPolicy" in deletion and deletion["nextPolicy"] is None,
+               "Raw OCI soft-delete is enabled, scheduled, or unknown; deletion proof is unsafe.")
 
     def objects(self, prefix: str) -> list[dict]:
         # Never treat a single OCI page as a complete remote inventory. OCI defaults
