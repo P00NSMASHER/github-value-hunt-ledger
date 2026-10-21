@@ -68,7 +68,8 @@ products and unrelated private projects are excluded from commercial reporting.
 The portfolio owner sets priorities and accepts commercial changes. Product-owner,
 fulfillment, quality-review, finance-review and engineering responsibilities must
 be assigned to actual authorized operators when an engagement exists; labels do
-not invent staff or independent approval.
+not invent staff or approval. The owner may perform required human quality
+acceptance; a second human approver is not mandatory for RETALLY Group.
 
 Portfolio Brain coordinates authorized engineering, reliability and reporting.
 RecoveryOS supplies recovery evidence, calculations and case history. AI Business
@@ -91,7 +92,7 @@ implemented state transitions or permission grants in this preview.
 | Scoped | Customer-accepted service, deliverable, price model, responsibilities, time expectations and scoped data-use permissions. |
 | Ready for fulfillment | Current service release/operating acceptance, required source evidence, assigned reviewer, exact service authorization and any contractually required advance-payment verification. |
 | In fulfillment | Authorized task started with source-linked work records, artifact versions and appropriate private access. |
-| Quality reviewed | Required service checks and an authorized review receipt bound to the exact deliverable version. Genuine independent review remains necessary wherever the service requires it. |
+| Quality reviewed | Automated/service-specific quality checks and owner acceptance bound to the exact deliverable version. No separate independent human reviewer is required by RETALLY Group internal policy; external legal/contractual obligations remain unchanged. |
 | Delivered | Exact reviewed artifact sent under specific send authority through an approved channel, with delivery/provider evidence. A generated file alone is insufficient. |
 | Closed | Contractual completion or explicit cancellation disposition, remaining corrections/refunds resolved, and financial disposition recorded without inventing payment. |
 
@@ -132,8 +133,11 @@ These are planning windows, not new scheduled tasks or promised completion dates
 Registration remains deferred under the owner's existing policy until an actual
 customer. This is an operating proposal, not legal or tax advice. No new spending,
 external contacts, added/rescheduled tasks or public rebrand activation are included.
-The owner's “Get started” authorizes this source-only implementation; genuine
-review, protected-branch controls and separate release requirements still apply.
+The owner's “Get started” authorizes this source-only implementation. The owner's
+October 20 direction removes separate independent **human** approval for RETALLY
+Group. Automated independent verification, current-source QA, protected-branch
+controls and exact persisted Step-6 owner authorization for production/factory
+merges still apply. This does not waive an external contractual or legal review.
 
 ## Primary source references
 
