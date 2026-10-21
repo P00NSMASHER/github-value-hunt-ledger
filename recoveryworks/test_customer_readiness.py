@@ -97,6 +97,35 @@ class CustomerReadinessTests(unittest.TestCase):
         for text in ('=1', '+1', '-1', '@SUM(A1)', '\t=1', '  =1'):
             self.assertTrue(csv_cell(text).startswith("'"))
 
+    def test_export_cannot_certify_self_posted_receipts_as_bank_proven_cash(self):
+        # Adversarial report-only state: a malicious or mistaken local ledger
+        # caller has populated positive recovered cents. This does not create
+        # any real customer payment or independently authenticated issuer proof.
+        self.workspace.scan(self.tokens['operator'])
+        state = self.workspace.cases(self.tokens['customer'])
+        state['simulation'] = False
+        state['cases'][0]['recovered_cents'] = 12750
+        state['cases'][0]['fee_cents'] = 550
+        state['cases'][0]['remaining_cents'] = 0
+        report = build_delivery(state)
+        payload = json.loads(report['json'])
+        self.assertEqual(payload['totals_by_currency']['USD']['net_received_cents'], 12750)
+        self.assertEqual(payload['external_cash_verification_status'], 'NOT_VERIFIED')
+        self.assertIsNone(payload['independently_verified_realized_recovery_cents'])
+        self.assertIs(payload['externally_verified_recovery_claim_approved'], False)
+        self.assertIs(payload['commercially_validated'], False)
+        self.assertIn('Cash verification: NOT VERIFIED.', report['html'])
+        self.assertIn('No displayed receipt is independently authenticated', report['html'])
+        self.assertIn('12750', report['csv'])
+        self.assertTrue(report['csv'].splitlines()[0].endswith(
+            ',external_cash_verification_status'))
+        self.assertTrue(all(line.endswith(',NOT_VERIFIED')
+                            for line in report['csv'].splitlines()[1:]))
+        self.assertEqual(hashlib.sha256(report['json'].encode()).hexdigest(),
+                         report['sha256'])
+        # Actual synthetic fixture remains source-isolated; no money moved.
+        self.assertEqual(self.workspace.store.load().rollup()['totals']['recovered_cents'], 0)
+
     def test_health_checks_restore_and_detects_revocation_and_tamper(self):
         from recoveryworks.workbench_health import check_workspace
         self.workspace.scan(self.tokens['operator'])

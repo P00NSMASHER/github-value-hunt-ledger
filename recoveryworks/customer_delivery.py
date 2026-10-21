@@ -37,13 +37,22 @@ def build_delivery(state):
         'schema': 1, 'client_id': state['client_id'], 'simulation': state['simulation'],
         'generated_at': datetime.now(timezone.utc).isoformat(), 'journal_head': state['head_hash'],
         'purpose': 'Customer audit progress report; not a claim submission, invoice or bank attestation.',
-        'commercially_validated': False, 'totals_by_currency': totals, 'cases': cases,
+        'commercially_validated': False,
+        # The local ledger records operator-entered receipt events. No trusted
+        # issuer/bank verifier is wired into this private workbench yet. Preserve
+        # those provisional amounts for reconciliation, but NEVER export a
+        # numeric independently verified realized-cash amount.
+        'external_cash_verification_status': 'NOT_VERIFIED',
+        'independently_verified_realized_recovery_cents': None,
+        'externally_verified_recovery_claim_approved': False,
+        'totals_by_currency': totals, 'cases': cases,
         'intake_status': {branch: {'analysis_ready': item['analysis_ready'], 'blockers': item['blockers'],
                                  'scope_hash': item['record']['scope_hash'] if item['record'] else None,
                                  'scope': item['record']['scope'] if item['record'] else None}
                           for branch, item in state['onboarding'].items()},
         'notes': ['Potential is not recovered money. Holds and rejected cases require attention.',
                   'Net receipts and fees reflect reviewed ledger postings, not independently authenticated bank balances.',
+                  'No bank/carrier issuer-verification integration exists; do not describe any displayed receipt as independently confirmed cash.',
                   'Different currencies are never combined or converted.',
                   'Source completeness and account/period scope rely on the recorded customer and reviewer attestations.']}
     raw = json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False)
@@ -52,9 +61,14 @@ def build_delivery(state):
               'potential_cents', 'recovered_cents', 'fee_cents', 'remaining_cents', 'hold', 'record_hash')
     output = io.StringIO(newline='')
     writer = csv.writer(output, lineterminator='\n')
-    writer.writerow(('simulation', *fields))
+    # Keep the original CSV columns in order for compatibility; append the
+    # explicit unverified status so spreadsheet-only consumers do not mistake
+    # posted "recovered_cents" for independently authenticated bank receipts.
+    writer.writerow(('simulation', *fields, 'external_cash_verification_status'))
     for record in cases:
-        writer.writerow([str(state['simulation']).lower(), *(csv_cell(record[key] if record[key] is not None else '') for key in fields)])
+        writer.writerow([str(state['simulation']).lower(),
+                         *(csv_cell(record[key] if record[key] is not None else '') for key in fields),
+                         payload['external_cash_verification_status']])
     escape = lambda value: html.escape(str(value), quote=True)
     rows = ''.join('<tr>' + ''.join('<td>' + escape(record[key] if record[key] is not None else '') + '</td>' for key in fields) + '</tr>' for record in cases)
     summary = ''.join('<li>' + escape(currency) + ': potential ' + str(value['potential_cents']) +
@@ -65,7 +79,7 @@ def build_delivery(state):
                 '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; base-uri \'none\'; form-action \'none\'">'
                 '<title>RETALLY customer audit report</title><style>body{font:15px system-ui;margin:32px;color:#18342a}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px;text-align:left;overflow-wrap:anywhere}.scroll{overflow:auto}h1{color:#007653}@media print{body{margin:10px;font-size:9px}}</style>'
                 '<h1>RETALLY customer audit report</h1><p>' + ('SIMULATION — synthetic records, no actual recoveries.' if state['simulation'] else 'PRIVATE — customer financial information.') +
-                '</p><p>Client: ' + escape(state['client_id']) + '</p><p>' + escape(payload['purpose']) +
+                '</p><p><strong>Cash verification: NOT VERIFIED.</strong> No displayed receipt is independently authenticated by a bank or carrier; verified realized customer cash is not established.</p><p>Client: ' + escape(state['client_id']) + '</p><p>' + escape(payload['purpose']) +
                 '</p><ul>' + summary + '</ul><div class="scroll"><table><thead><tr>' +
                 ''.join('<th>' + escape(key.replace('_', ' ')) + '</th>' for key in fields) +
                 '</tr></thead><tbody>' + rows + '</tbody></table></div><ul>' +

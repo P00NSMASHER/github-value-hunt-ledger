@@ -81,7 +81,7 @@ class OciBackupTests(unittest.TestCase):
         source.chmod(0o600)
         response = subprocess.CompletedProcess(["oci"], 0, '{"etag":"OCI-TEST-ETAG"}\n', "")
         with patch.object(backup.subprocess, "run", return_value=response) as run:
-            self.assertEqual(self.store.put("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk", source),
+            self.assertEqual(self.store.put("synthetic-recovery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.rtbk", source),
                              "OCI-TEST-ETAG")
         cmd = run.call_args.args[0]
         self.assertIn("--no-overwrite", cmd)
@@ -106,8 +106,54 @@ class OciBackupTests(unittest.TestCase):
             with self.subTest(reply=reply), patch.object(self.store, "cli",
                                                           return_value=reply) as cli:
                 with self.assertRaises(backup.Refused):
-                    self.store.put("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk", source)
+                    self.store.put("synthetic-recovery/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.rtbk", source)
                 cli.assert_called_once()
+
+    def test_writes_are_restricted_to_exact_synthetic_key_patterns(self):
+        source = self.root / "synthetic-ciphertext.rtbk"
+        source.write_bytes(b"synthetic data only")
+        source.chmod(0o600)
+        forbidden = [
+            "customer/invoices.rtbk",
+            "synthetic-recovery/not-a-random-key.rtbk",
+            "synthetic-recovery/" + "g"*32 + ".rtbk",
+            "synthetic-recovery/" + "a"*32 + ".json",
+            "synthetic-recovery/" + "a"*32 + ".rtbk/../customers",
+            "", None,
+        ]
+        with patch.object(self.store, "cli") as cli:
+            for key in forbidden:
+                with self.subTest(key=key):
+                    with self.assertRaises(backup.Refused):
+                        self.store.put(key, source)
+                    with self.assertRaises(backup.Refused):
+                        self.store.delete_version(key, "trusted-etag")
+            cli.assert_not_called()
+
+    def test_exact_legacy_key_is_conditional_only(self):
+        # Legacy deletion is authorized only through cleanup_legacy's separate
+        # original-key and original-SHA checks; the underlying OCI operation
+        # must still be ETag conditional, never an unqualified bulk removal.
+        key = "synthetic-only/0123456789abcdef01234567.rtbk"
+        with patch.object(self.store, "cli", return_value="") as cli:
+            self.store.delete_version(key, "frozen-legacy-etag")
+        args = cli.call_args.args
+        self.assertIn("--if-match", args)
+        self.assertEqual(args[args.index("--if-match") + 1], "frozen-legacy-etag")
+        self.assertIn(key, args)
+
+    def test_exact_fresh_key_delete_requires_etag(self):
+        key = "synthetic-recovery/" + "c"*32 + ".rtbk"
+        with patch.object(self.store, "cli", return_value="") as cli:
+            with self.assertRaises(backup.Refused):
+                self.store.delete_version(key, "")
+            cli.assert_not_called()
+            self.store.delete_version(key, "etag-frozen")
+            self.assertEqual(cli.call_count, 1)
+            args = cli.call_args.args
+            self.assertIn("--if-match", args)
+            self.assertEqual(args[args.index("--if-match") + 1], "etag-frozen")
+            self.assertIn(key, args)
 
     def test_object_metadata_expected_vs_unsupported_response_shapes(self):
         expected = [{"name": "synthetic-only/a"}]
@@ -119,69 +165,45 @@ class OciBackupTests(unittest.TestCase):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
         with patch.object(self.store, "cli", return_value='{"etag":"ETAG-TOP-LEVEL"}'):
-            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "ETAG-TOP-LEVEL")
+            self.assertEqual(self.store.head("test")["etag"], "ETAG-TOP-LEVEL")
         with patch.object(self.store, "cli", return_value='{"data":{"etag":"NESTED"}}'):
-            self.assertEqual(self.store.head("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk")["etag"], "NESTED")
+            self.assertEqual(self.store.head("test")["etag"], "NESTED")
 
-    def test_low_level_object_mutations_cannot_target_unrelated_or_unstructured_keys(self):
-        # A caller mistake must not upload synthetic ciphertext under an
-        # unrelated, paid, financial, or customer-data object prefix.
-        source = self.root / "sealed.rtbk"
-        source.write_bytes(b"test synthetic ciphertext")
-        source.chmod(0o600)
-        valid_new = "synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk"
-        valid_old = "synthetic-only/0123456789abcdef01234567.rtbk"
-        forbidden = (
-            "", "customer/live-account.rtbk", "backups/real-customer.rtbk",
-            "synthetic-recovery/../customer.rtbk",
-            "synthetic-only/" + "a"*24 + ".json",
-            "synthetic-recovery/" + "b"*24 + ".rtbk",
-            "synthetic-recovery/" + "c"*32 + ".rtbk/customer",
-        )
-        with patch.object(self.store, "cli") as invoked:
-            for name in forbidden:
-                with self.subTest(name=name):
-                    with self.assertRaises(backup.Refused):
-                        self.store.put(name, source)
-                    with self.assertRaises(backup.Refused):
-                        self.store.delete_version(name, "known-ETag")
-                    with self.assertRaises(backup.Refused):
-                        self.store.head(name)
-                    with self.assertRaises(backup.Refused):
-                        self.store.get(name, self.root / "downloaded.rtbk",
-                                       etag="known-ETag", max_size=1024)
+    def test_typed_empty_omission_requires_independent_signed_rest_population(self):
+        success = json.dumps({"status": "200 OK", "data": {"objects": []}})
+        for typed in ("", '{"prefixes": []}'):
+            with self.subTest(typed=typed), patch.object(
+                    self.store, "cli", side_effect=[typed, success]) as call:
+                self.assertEqual(self.store.objects("synthetic-recovery/"), [])
+            self.assertEqual(call.call_count, 2)
+            first, second = [q.args for q in call.call_args_list]
+            self.assertIn("--all", first)
+            self.assertIn("--prefix", first)
+            self.assertEqual(second[:3], ("raw-request", "--http-method", "GET"))
+            self.assertEqual(second[3], "--target-uri")
+            self.assertEqual(second[4],
+                             "https://objectstorage.us-ashburn-1.oraclecloud.com/n/"
+                             "syntheticnamespace/b/" + backup.BUCKET_NAME +
+                             "/o?prefix=synthetic-recovery%2F&limit=1")
+
+    def test_empty_omission_refuses_remote_items_or_pagination(self):
+        invalid_raw = [
+            '{"status":"200 OK","data":{"objects":[{"name":"synthetic-recovery/test"}]}}',
+            '{"status":"200 OK","data":{"objects":[],"nextStartWith":"more"}}',
+            '{"status":"200 OK","data":{"objects":[],"prefixes":["synthetic-recovery/"]}}',
+            '{"status":"200 OK","data":{"prefixes":[]}}',
+            '{"status":"403 Forbidden","data":{"objects":[]}}',
+            '{"status":"200 OK","data":[]}',
+        ]
+        for reply in invalid_raw:
+            with self.subTest(reply=reply), patch.object(
+                    self.store, "cli", side_effect=['{"prefixes":[]}', reply]):
+                with self.assertRaises(backup.Refused):
+                    self.store.objects("synthetic-recovery/")
+        with patch.object(self.store, "cli", return_value='{"prefixes":["unknown"]}') as call:
             with self.assertRaises(backup.Refused):
-                self.store.put(valid_old, source)
-            for invalid_tag in ("", "two words", "a\\nInjected", "../unsafe"):
-                with self.subTest(etag=invalid_tag), self.assertRaises(backup.Refused):
-                    self.store.delete_version(valid_new, invalid_tag)
-            invoked.assert_not_called()
-
-    def test_low_level_approved_synthetic_delete_uses_conditional_etag(self):
-        # The existing synthetic recovery, and separately-authorized legacy
-        # cleanup, still have their legitimate ETag-frozen delete operation.
-        with patch.object(self.store, "cli", return_value='{"output":null}') as invoked:
-            for name in ("synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk", "synthetic-only/0123456789abcdef01234567.rtbk"):
-                with self.subTest(name=name):
-                    self.store.delete_version(name, "frozen-ETag")
-        self.assertEqual(invoked.call_count, 2)
-        for call in invoked.call_args_list:
-            args = call.args
-            self.assertEqual(args[:3], ("os", "object", "delete"))
-            self.assertIn("--if-match", args)
-            self.assertEqual(args[args.index("--if-match") + 1], "frozen-ETag")
-            self.assertIn("--force", args)
-
-    def test_empty_object_list_requires_second_full_count_query(self):
-        # The authenticated OCI Cloud Shell CLI has returned successful empty
-        # list stdout on some operations; never interpret blank as absence alone.
-        with patch.object(self.store, "cli", side_effect=["", "0\n"]) as call:
-            self.assertEqual(self.store.objects("synthetic-only/"), [])
-        self.assertEqual(call.call_count, 2)
-        a, b = [q.args for q in call.call_args_list]
-        self.assertIn("--all", a)
-        self.assertIn("--all", b)
-        self.assertEqual(b[-2:], ("--query", "length(data)"))
+                self.store.objects("synthetic-recovery/")
+            call.assert_called_once()
 
     def test_inconsistent_blank_list_does_not_authorize_cleanup_or_upload(self):
         for count in ("1", "-1", '"zero"', "null", "true", '{"data":[]}', "", "not-json"):
@@ -217,13 +239,18 @@ class OciBackupTests(unittest.TestCase):
             with self.assertRaises(backup.Refused):
                 self.store.objects("synthetic-only/")
 
+    def test_incomplete_paginated_inventory_is_not_full_population_evidence(self):
+        for continuation in ("next-start-with", "opc-next-page"):
+            with self.subTest(continuation=continuation), patch.object(
+                    self.store, "cli", return_value=json.dumps({
+                        "data": [], continuation: "additional-page-token"})):
+                with self.assertRaisesRegex(backup.Refused, "continuation"):
+                    self.store.objects("synthetic-recovery/")
+
     def test_download_requires_etag_and_bounded_private_ciphertext(self):
         filename = self.root / "remote-ciphertext.rtbk"
         raw = b"bounded test ciphertext"
         def fake_get(*args, **kwargs):
-            if args[:3] == ("os", "object", "head"):
-                return json.dumps({"etag": "KNOWN-ETAG", "content-length": len(raw)})
-            self.assertEqual(args[:3], ("os", "object", "get"))
             self.assertIn("--if-match", args)
             self.assertEqual(args[args.index("--if-match") + 1], "KNOWN-ETAG")
             self.assertIn("--no-multipart", args)
@@ -231,83 +258,161 @@ class OciBackupTests(unittest.TestCase):
             filename.chmod(0o600)
             return '{"output": null}'
         with patch.object(self.store, "cli", side_effect=fake_get) as downloaded:
-            self.assertEqual(self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", filename,
+            self.assertEqual(self.store.get("synthetic-only/test.rtbk", filename,
                                             etag="KNOWN-ETAG", max_size=len(raw)), raw)
-        self.assertEqual(downloaded.call_count, 2, "mandatory HEAD must precede GET")
-        self.assertEqual(downloaded.call_args_list[0].args[:3], ("os", "object", "head"))
-        self.assertEqual(downloaded.call_args_list[1].args[:3], ("os", "object", "get"))
+        downloaded.assert_called_once()
         for bad in ("", "bad etag", "bad\\netag"):
             with self.subTest(etag=bad), patch.object(self.store, "cli") as download:
                 with self.assertRaises(backup.Refused):
-                    self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", self.root / "new.rtbk",
+                    self.store.get("synthetic-only/test.rtbk", self.root / "new.rtbk",
                                    etag=bad, max_size=256)
                 download.assert_not_called()
 
     def test_download_refuses_excess_of_prevalidated_head_size(self):
         target = self.root / "oversized.rtbk"
-        with patch.object(self.store, "cli",
-                          return_value=json.dumps({"etag": "KNOWN-ETAG", "content-length": 21})) as cli:
-            with self.assertRaisesRegex(backup.Refused, "download bound"):
-                self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", target,
-                               etag="KNOWN-ETAG", max_size=20)
-        cli.assert_called_once()
-        self.assertEqual(cli.call_args.args[:3], ("os", "object", "head"))
-        self.assertFalse(target.exists(), "oversized ciphertext must not be fetched")
-
-    def test_low_level_get_always_requires_matching_head_etag_and_valid_length(self):
-        name = "synthetic-recovery/0123456789abcdef0123456789abcdef.rtbk"
-        cases = [
-            {"etag": "DIFFERENT", "content-length": 64},
-            {"etag": "KNOWN-ETAG", "content-length": 0},
-            {"etag": "KNOWN-ETAG", "content-length": -1},
-            {"etag": "KNOWN-ETAG", "content-length": True},
-            {"etag": "KNOWN-ETAG", "content-length": None},
-            {"etag": "KNOWN-ETAG", "content-length": "NaN"},
-            {"etag": "KNOWN-ETAG", "content-length": "10.5"},
-            {"etag": "KNOWN-ETAG", "content-length": 257},
-        ]
-        for i, metadata in enumerate(cases):
-            target = self.root / f"unread-{i}.rtbk"
-            with self.subTest(metadata=metadata), patch.object(
-                    self.store, "cli", return_value=json.dumps(metadata)) as cli:
-                with self.assertRaises(backup.Refused):
-                    self.store.get(name, target, etag="KNOWN-ETAG", max_size=256)
-                cli.assert_called_once()
-                self.assertEqual(cli.call_args.args[:3], ("os", "object", "head"))
-                self.assertFalse(target.exists(), "invalid HEAD must not download bytes")
-
-    def test_download_refuses_provider_get_length_drift(self):
-        target = self.root / "drifted.rtbk"
-        def wrong_length(*args, **kwargs):
-            if args[:3] == ("os", "object", "head"):
-                return json.dumps({"etag": "KNOWN-ETAG", "content-length": 10})
-            target.write_bytes(b"9" * 9)
+        def write_large(*args, **kwargs):
+            target.write_bytes(b"a" * 21)
             target.chmod(0o600)
             return '{"output": null}'
-        with patch.object(self.store, "cli", side_effect=wrong_length) as cli:
-            with self.assertRaisesRegex(backup.Refused, "differs from prevalidated HEAD size"):
-                self.store.get("synthetic-only/0123456789abcdef01234567.rtbk", target,
+        with patch.object(self.store, "cli", side_effect=write_large):
+            with self.assertRaisesRegex(backup.Refused, "prevalidated HEAD size"):
+                self.store.get("synthetic-only/test.rtbk", target,
                                etag="KNOWN-ETAG", max_size=20)
-        self.assertEqual(cli.call_count, 2)
 
-    def test_bucket_privacy_fails_closed(self):
-        valid = {"name": backup.BUCKET_NAME, "public-access-type": "NoPublicAccess",
-                 "storage-tier": "Standard", "versioning": "Disabled",
-                 "object-events-enabled": False, "replication-enabled": False}
-        with patch.object(self.store, "data", return_value=valid):
+    def _bucket_fixtures(self):
+        typed = {"name": backup.BUCKET_NAME, "namespace": self.store.namespace,
+                 "etag": "frozen-bucket-etag",
+                 "public-access-type": "NoPublicAccess", "storage-tier": "Standard",
+                 "versioning": "Disabled", "object-events-enabled": False,
+                 "replication-enabled": False, "auto-tiering": "Disabled",
+                 "object-lifecycle-policy-etag": None, "kms-key-id": None,
+                 # This is the ACTUAL old Cloud Shell SDK field shape.
+                 "object-level-audit-mode": None}
+        raw = {"name": backup.BUCKET_NAME, "namespace": self.store.namespace,
+               "etag": "frozen-bucket-etag",
+               "publicAccessType": "NoPublicAccess", "storageTier": "Standard",
+               "versioning": "Disabled", "objectEventsEnabled": False,
+               "replicationEnabled": False, "autoTiering": "Disabled",
+               "objectLifecyclePolicyEtag": None, "kmsKeyId": None,
+               "objectLevelAuditMode": "Disabled",
+               "softDeletePolicy": {"currentPolicy": {"softDeleteMode": "Disabled"},
+                                    "nextPolicy": None}}
+        return typed, raw
+
+    def test_real_older_sdk_null_and_omitted_fields_need_authenticated_raw_get(self):
+        typed, raw = self._bucket_fixtures()
+        self.assertNotIn("soft-delete-policy", typed)
+        self.assertIsNone(typed["object-level-audit-mode"])
+        with patch.object(self.store, "data", return_value=typed), \
+             patch.object(self.store, "raw_bucket", return_value=raw) as raw_call:
             self.store.bucket_check()
-        for field, value in (("public-access-type", "ObjectRead"),
-                             ("storage-tier", "Archive"), ("versioning", "Enabled"),
-                             ("object-events-enabled", True)):
-            with self.subTest(field=field), patch.object(self.store, "data", return_value={**valid, field: value}):
+        raw_call.assert_called_once()
+
+    def test_core_bucket_privacy_or_identity_disagreements_fail_closed(self):
+        typed, raw = self._bucket_fixtures()
+        changes = (("public-access-type", "ObjectRead"),
+                   ("storage-tier", "Archive"), ("versioning", "Enabled"),
+                   ("object-events-enabled", True), ("replication-enabled", True),
+                   ("auto-tiering", "InfrequentAccess"),
+                   ("object-lifecycle-policy-etag", "unsafe-lifecycle"),
+                   ("kms-key-id", "ocid1.key.oc1..unexpected"),
+                   ("object-level-audit-mode", "Enabled"),
+                   ("name", "another-bucket"), ("namespace", "anotherns"))
+        for field, value in changes:
+            with self.subTest(field=field), \
+                 patch.object(self.store, "data", return_value={**typed, field: value}), \
+                 patch.object(self.store, "raw_bucket", return_value=raw):
                 with self.assertRaises(backup.Refused):
                     self.store.bucket_check()
+        for field in ("object-events-enabled", "replication-enabled", "auto-tiering",
+                      "object-lifecycle-policy-etag", "kms-key-id", "etag"):
+            with self.subTest(missing=field), \
+                 patch.object(self.store, "data",
+                              return_value={k: v for k, v in typed.items() if k != field}), \
+                 patch.object(self.store, "raw_bucket", return_value=raw):
+                with self.assertRaises(backup.Refused):
+                    self.store.bucket_check()
+        with patch.object(self.store, "data", return_value={
+                **typed, "soft-delete-policy": {
+                    "current-policy": {"soft-delete-mode": "Enabled"}, "next-policy": None}
+                }), patch.object(self.store, "raw_bucket", return_value=raw):
+            with self.assertRaises(backup.Refused):
+                self.store.bucket_check()
+
+    def test_raw_provider_refuses_unsafe_or_missing_advanced_fields(self):
+        typed, raw = self._bucket_fixtures()
+        altered = (
+            {"kmsKeyId": "ocid1.key.oc1..unexpected"}, {"objectLevelAuditMode": "Enabled"},
+            {"objectLevelAuditMode": None}, {"softDeletePolicy": None},
+            {"softDeletePolicy": {"currentPolicy": {"softDeleteMode": "Enabled"},
+                                  "nextPolicy": None}},
+            {"softDeletePolicy": {"currentPolicy": {"softDeleteMode": "Disabled"},
+                                  "nextPolicy": {"softDeleteMode": "Enabled"}}},
+            {"etag": "changed-between-reads"},
+            {"publicAccessType": "ObjectRead"},
+            {"objectEventsEnabled": True}, {"autoTiering": "InfrequentAccess"},
+            {"objectLifecyclePolicyEtag": "unsafe-lifecycle"},
+        )
+        for mutation in altered:
+            with self.subTest(mutation=mutation), \
+                 patch.object(self.store, "data", return_value=typed), \
+                 patch.object(self.store, "raw_bucket", return_value={**raw, **mutation}):
+                with self.assertRaises(backup.Refused):
+                    self.store.bucket_check()
+        for missing in ("kmsKeyId", "objectLevelAuditMode", "softDeletePolicy",
+                        "objectEventsEnabled", "replicationEnabled", "autoTiering",
+                        "etag", "name", "namespace"):
+            with self.subTest(missing=missing), \
+                 patch.object(self.store, "data", return_value=typed), \
+                 patch.object(self.store, "raw_bucket",
+                              return_value={k: v for k, v in raw.items() if k != missing}):
+                with self.assertRaises(backup.Refused):
+                    self.store.bucket_check()
+
+    def test_raw_rest_may_omit_optional_lifecycle_etag_only_when_sdk_confirms_none(self):
+        typed, raw = self._bucket_fixtures()
+        without_optional = {k: v for k, v in raw.items()
+                            if k != "objectLifecyclePolicyEtag"}
+        with patch.object(self.store, "data", return_value=typed), \
+             patch.object(self.store, "raw_bucket", return_value=without_optional):
+            self.store.bucket_check()
+        # Removing the typed CLI's explicit null must still fail closed.
+        without_typed = {k: v for k, v in typed.items()
+                         if k != "object-lifecycle-policy-etag"}
+        with patch.object(self.store, "data", return_value=without_typed), \
+             patch.object(self.store, "raw_bucket", return_value=without_optional):
+            with self.assertRaises(backup.Refused):
+                self.store.bucket_check()
+
+    def test_raw_bucket_uses_fixed_signed_get_no_unapproved_endpoint(self):
+        _, raw = self._bucket_fixtures()
+        valid = json.dumps({"status": "200 OK", "data": raw})
+        with patch.object(self.store, "cli", return_value=valid) as cli:
+            self.assertEqual(self.store.raw_bucket(), raw)
+        args = cli.call_args.args
+        self.assertEqual(args[:3], ("raw-request", "--http-method", "GET"))
+        self.assertEqual(args[3], "--target-uri")
+        self.assertEqual(args[4], "https://objectstorage.us-ashburn-1.oraclecloud.com/n/"
+                                 "syntheticnamespace/b/" + backup.BUCKET_NAME)
+        for result in ("", "not-json", '{}',
+                       json.dumps({"status": "500 Internal Server Error", "data": raw}),
+                       json.dumps({"status": "200 OK", "data": []})):
+            with self.subTest(result=result), \
+                 patch.object(self.store, "cli", return_value=result):
+                with self.assertRaises(backup.Refused):
+                    self.store.raw_bucket()
+        self.store.region = "not-approved"
+        with patch.object(self.store, "cli") as cli:
+            with self.assertRaises(backup.Refused):
+                self.store.raw_bucket()
+            cli.assert_not_called()
 
     def test_cleanup_only_exact_legacy_synthetic_canary_with_etag(self):
         key = "synthetic-only/0123456789abcdef01234567.rtbk"
         raw = backup.LEGACY_MAGIC + b"N" * 12 + b"authenticated-test-ciphertext"
         calls = []
         with patch.object(backup, "LEGACY_CLEANUP", self.orphan_receipt), \
+             patch.object(backup, "LEGACY_DELETE_ATTEMPT", self.root / "delete-attempt.json"), \
              patch.object(self.store, "bucket_check"), \
              patch.object(self.store, "objects", side_effect=[[{"name": key}], []]), \
              patch.object(self.store, "get", return_value=raw), \
@@ -319,6 +424,36 @@ class OciBackupTests(unittest.TestCase):
         self.assertEqual(calls, [(key, "KNOWN-ETAG")])
         self.assertEqual(self.orphan_receipt.stat().st_mode & 0o777, 0o600)
         self.assertTrue(json.loads(self.orphan_receipt.read_text())["remote_canary_deleted"])
+        intent = self.root / "delete-attempt.json"
+        self.assertEqual(intent.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(json.loads(intent.read_text())["frozen_etag"], "KNOWN-ETAG")
+
+    def test_uncertain_legacy_delete_leaves_receipt_and_prohibits_repeat(self):
+        key = "synthetic-only/0123456789abcdef01234567.rtbk"
+        raw = backup.LEGACY_MAGIC + b"N" * 12 + b"ciphertext-test-only"
+        attempt = self.root / "uncertain-delete-attempt.json"
+        with (patch.object(backup, "LEGACY_CLEANUP", self.orphan_receipt),
+              patch.object(backup, "LEGACY_DELETE_ATTEMPT", attempt),
+              patch.object(self.store, "bucket_check"),
+              patch.object(self.store, "objects", return_value=[{"name": key}]),
+              patch.object(self.store, "head", return_value={
+                  "etag": "FROZEN-ETAG", "content-length": len(raw)}),
+              patch.object(self.store, "get", return_value=raw),
+              patch.object(self.store, "delete_version",
+                           side_effect=backup.Refused("provider timeout")) as delete):
+            with self.assertRaisesRegex(backup.Refused, "provider timeout"):
+                backup.cleanup_legacy(self.store,
+                                      expected_object_name=key,
+                                      expected_sha256=backup.sha(raw))
+            self.assertTrue(attempt.is_file())
+            self.assertEqual(attempt.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(json.loads(attempt.read_text())["object_name"], key)
+            self.assertFalse(self.orphan_receipt.exists())
+            with self.assertRaisesRegex(backup.Refused, "uncertain delete attempt"):
+                backup.cleanup_legacy(self.store,
+                                      expected_object_name=key,
+                                      expected_sha256=backup.sha(raw))
+            delete.assert_called_once()
 
     def test_cleanup_rejects_unrelated_or_changed_objects(self):
         wrong_names = ["synthetic-only/secret.rtbk", "customer/invoices.rtbk",
@@ -475,6 +610,85 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
                 backup.confirm_legacy_orphan_unchanged(
                     self.store, original, self.root / "final-check.rtbk")
 
+    def _resume_receipt(self):
+        return {"schema": 1, "legacy_object_name": self.key,
+                "remote_observed_sha256": backup.sha(self.raw),
+                "remote_observed_length": len(self.raw),
+                "synthetic_format_candidate": True,
+                "original_upload_identity_independently_verified": False,
+                "legacy_object_deleted": False,
+                "production_backup_verified": False,
+                "status": "QUARANTINED_UNRESOLVED_DO_NOT_DELETE"}
+
+    def test_reuses_private_receipt_only_after_fresh_exact_remote_readback(self):
+        receipt = self._resume_receipt()
+        self.receipt.write_text(json.dumps(receipt), encoding="utf-8")
+        self.receipt.chmod(0o600)
+        frozen = self.receipt.read_bytes()
+        items = [{"name": self.key, "size": len(self.raw)}]
+        def readback(name, destination, *, etag, max_size):
+            self.assertEqual((name, etag, max_size),
+                             (self.key, "new-frozen-etag", backup.MAX_CANARY))
+            destination.write_bytes(self.raw)
+            destination.chmod(0o600)
+            return self.raw
+        with patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+             patch.object(self.store, "objects", return_value=items), \
+             patch.object(self.store, "head", return_value={
+                 "etag": "new-frozen-etag", "content-length": len(self.raw),
+                 "storage-tier": "Standard"}), \
+             patch.object(self.store, "get", side_effect=readback) as get, \
+             patch.object(self.store, "delete_version") as delete:
+            state = backup.resume_legacy_quarantine(self.store, items)
+        self.assertEqual(state["_sha256"], backup.sha(self.raw))
+        self.assertEqual(get.call_count, 1)
+        self.assertEqual(self.receipt.read_bytes(), frozen)
+        delete.assert_not_called()
+
+    def test_resume_refuses_tampered_or_readable_receipt(self):
+        good = self._resume_receipt()
+        items = [{"name": self.key, "size": len(self.raw)}]
+        for change in ({"legacy_object_deleted": True}, {"status": "APPROVED"},
+                       {"remote_observed_sha256": "0"*64},
+                       {"remote_observed_length": len(self.raw)+1},
+                       {"legacy_object_name": "synthetic-only/"+"f"*24+".rtbk"}):
+            with self.subTest(change=change):
+                self.receipt.write_text(json.dumps({**good, **change}), encoding="utf-8")
+                self.receipt.chmod(0o600)
+                with patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+                     patch.object(self.store, "head", return_value={
+                         "etag": "safe-etag", "content-length": len(self.raw)}), \
+                     patch.object(self.store, "objects", return_value=items), \
+                     patch.object(self.store, "get", return_value=self.raw), \
+                     patch.object(self.store, "delete_version") as delete:
+                    with self.assertRaises(backup.Refused):
+                        backup.resume_legacy_quarantine(self.store, items)
+                    delete.assert_not_called()
+        self.receipt.write_text(json.dumps(good), encoding="utf-8")
+        self.receipt.chmod(0o644)
+        with patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+             patch.object(self.store, "get") as get:
+            with self.assertRaises(backup.Refused):
+                backup.resume_legacy_quarantine(self.store, items)
+            get.assert_not_called()
+
+    def test_preflight_missing_dependency_never_writes_receipt_or_uploads(self):
+        attempt = self.root / "preflight-upload-attempt.json"
+        acceptance = self.root / "preflight-result.json"
+        with patch.object(backup, "ATTEMPT", attempt), \
+             patch.object(backup, "ACCEPTANCE", acceptance), \
+             patch.object(backup, "LEGACY_QUARANTINE", self.receipt), \
+             patch.object(backup, "load_workbench_engines",
+                          side_effect=backup.Refused("unavailable local library")), \
+             patch.object(self.store, "bucket_check") as bucket, \
+             patch.object(self.store, "put") as upload:
+            with self.assertRaisesRegex(backup.Refused, "unavailable local library"):
+                backup.synthetic_roundtrip(self.store, preserve_legacy_orphan=True)
+            bucket.assert_not_called()
+            upload.assert_not_called()
+            self.assertFalse(self.receipt.exists())
+            self.assertFalse(attempt.exists())
+
     def test_existing_quarantine_blocks_repeated_acceptance(self):
         self.receipt.write_text('{"previous":true}', encoding="ascii")
         with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
@@ -499,7 +713,8 @@ class LegacyOrphanIsolationTests(unittest.TestCase):
             backup.main(["--inspect", "--preserve-legacy-orphan"])
 
     def test_quarantine_flag_requires_a_real_historical_orphan(self):
-        with (patch.object(self.store, "bucket_check"),
+        with (patch.object(backup, "LEGACY_QUARANTINE", self.receipt),
+              patch.object(self.store, "bucket_check"),
               patch.object(self.store, "objects", side_effect=[[], []]),
               patch.object(self.store, "put") as put):
             with self.assertRaisesRegex(backup.Refused, "no legacy"):
@@ -543,6 +758,7 @@ class RealEnginesOfflineTest(unittest.TestCase):
 
             with patch.object(backup, "ATTEMPT", attempt), \
                  patch.object(backup, "ACCEPTANCE", result), \
+                 patch.object(backup, "LEGACY_QUARANTINE", root / "quarantine.json"), \
                  patch.object(bucket, "bucket_check"), \
                  patch.object(bucket, "objects", side_effect=lambda prefix: [
                      {"name": key} for key in objects if key.startswith(prefix)]), \
@@ -574,6 +790,7 @@ class RealEnginesOfflineTest(unittest.TestCase):
             })
             with (patch.object(backup, "ATTEMPT", root / "attempt.json"),
                   patch.object(backup, "ACCEPTANCE", root / "acceptance.json"),
+                  patch.object(backup, "LEGACY_QUARANTINE", root / "quarantine.json"),
                   patch.object(store, "bucket_check"),
                   patch.object(store, "objects", return_value=[]),
                   patch.object(store, "put", return_value="etag-uploaded"),

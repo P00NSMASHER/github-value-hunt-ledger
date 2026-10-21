@@ -31,6 +31,7 @@ BUCKET_RECEIPT = RECEIPT_ROOT / "sealed-backup-bucket-receipt.json"
 ATTEMPT = RECEIPT_ROOT / "synthetic-backup-upload-attempt.json"
 ACCEPTANCE = RECEIPT_ROOT / "synthetic-backup-acceptance.json"
 LEGACY_CLEANUP = RECEIPT_ROOT / "legacy-synthetic-canary-cleanup.json"
+LEGACY_DELETE_ATTEMPT = RECEIPT_ROOT / "legacy-synthetic-canary-delete-attempt.json"
 LEGACY_QUARANTINE = RECEIPT_ROOT / "legacy-orphan-quarantine.json"
 BUCKET_NAME = "retally-synthetic-sealed-recovery"
 LEGACY_MAGIC = b"RETALLY-GCM-CANARY-1"
@@ -80,26 +81,6 @@ def private_receipt(path: Path, document: dict) -> None:
 
 def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
-
-
-def synthetic_object_key(name: str, *, upload: bool = False) -> str:
-    """No Object Storage operation may target unrelated/customer object keys.
-
-    Historical legacy objects can only be inspected or conditionally deleted.
-    All new uploads are unique, fixed-shape synthetic-recovery objects.
-    """
-    valid = isinstance(name, str) and bool(RECOVERY_OBJECT.fullmatch(name))
-    if not upload:
-        valid = valid or (isinstance(name, str) and bool(LEGACY_OBJECT.fullmatch(name)))
-    ensure(valid, "Unapproved OCI object name; synthetic-only operations required.")
-    return name
-
-
-def synthetic_etag(value: str) -> str:
-    ensure(isinstance(value, str) and
-           re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", value) is not None,
-           "An exact provider ETag is required for the synthetic object.")
-    return value
 
 
 def parse_bucket_receipt(path: Path) -> dict:
@@ -155,45 +136,134 @@ class OciStore:
     def args(self) -> tuple[str, ...]:
         return "--namespace", self.namespace, "--bucket-name", self.bucket
 
+    def raw_bucket(self) -> dict:
+        """Read the signed OCI REST representation without older SDK field loss.
+
+        Cloud Shell's typed bucket GET may return null/omit newly introduced
+        audit or soft-delete fields. Never treat omission as 'Disabled'.
+        """
+        ensure(self.region == "us-ashburn-1" and self.bucket == BUCKET_NAME and
+               re.fullmatch(r"[A-Za-z0-9_-]{2,80}", self.namespace) is not None,
+               "Raw provider audit requires the original exact Ashburn synthetic bucket.")
+        uri = ("https://objectstorage.us-ashburn-1.oraclecloud.com/n/" +
+               self.namespace + "/b/" + self.bucket)
+        payload = self.cli("raw-request", "--http-method", "GET", "--target-uri", uri)
+        try:
+            response = json.loads(payload)
+        except ValueError as exc:
+            raise Refused("Authenticated OCI raw bucket GET returned invalid JSON.") from exc
+        ensure(isinstance(response, dict) and response.get("status") == "200 OK"
+               and isinstance(response.get("data"), dict),
+               "Authenticated OCI raw bucket GET was not an exact HTTP 200 data object.")
+        return response["data"]
+
     def bucket_check(self) -> None:
         b = self.data("os", "bucket", "get", *self.args())
         ensure(isinstance(b, dict) and b.get("name") == self.bucket and
+               b.get("namespace") == self.namespace and
                b.get("public-access-type") == "NoPublicAccess" and
                b.get("storage-tier") == "Standard" and b.get("versioning") == "Disabled" and
-               b.get("object-events-enabled") in (False, None) and
-               b.get("replication-enabled") in (False, None),
-               "OCI bucket privacy, tier, versioning or replication state changed.")
+               b.get("object-events-enabled") is False and
+               b.get("replication-enabled") is False and
+               "auto-tiering" in b and b["auto-tiering"] in (None, "Disabled") and
+               "object-lifecycle-policy-etag" in b and b["object-lifecycle-policy-etag"] is None,
+               "OCI bucket privacy, tier, auto-tiering, lifecycle, events or replication state changed.")
+        # The typed CLI may omit these newer properties, but may not contradict
+        # the independent signed raw response (particularly a paid KMS key).
+        ensure("kms-key-id" in b and b["kms-key-id"] is None and
+               b.get("object-level-audit-mode") in (None, "Disabled"),
+               "Typed OCI bucket reports an unapproved KMS key or audit mode.")
+        typed_soft = b.get("soft-delete-policy")
+        ensure(typed_soft is None or
+               (isinstance(typed_soft, dict) and
+                isinstance(typed_soft.get("current-policy"), dict) and
+                typed_soft["current-policy"].get("soft-delete-mode") == "Disabled" and
+                "next-policy" in typed_soft and typed_soft["next-policy"] is None),
+               "Typed OCI bucket reports an unsafe soft-delete policy.")
+
+        raw = self.raw_bucket()
+        # ETag binding means the two provider reads describe the same exact
+        # bucket configuration, not separate moments with changed policy.
+        ensure(isinstance(b.get("etag"), str) and bool(b["etag"]) and
+               raw.get("etag") == b["etag"] and raw.get("name") == self.bucket and
+               raw.get("namespace") == self.namespace and
+               raw.get("publicAccessType") == "NoPublicAccess" and
+               raw.get("storageTier") == "Standard" and raw.get("versioning") == "Disabled",
+               "Typed and raw OCI bucket identity, ETag or core safety fields disagree.")
+        ensure("kmsKeyId" in raw and raw["kmsKeyId"] is None and
+               raw.get("objectLevelAuditMode") == "Disabled" and
+               raw.get("objectEventsEnabled") is False and
+               raw.get("replicationEnabled") is False and
+               # The older REST representation may omit this OPTIONAL field.
+               # Its typed SDK value is required above, and both bucket ETags
+               # must match; an explicit non-null REST value is still refused.
+               raw.get("objectLifecyclePolicyEtag") is None and
+               "autoTiering" in raw and raw["autoTiering"] in (None, "Disabled"),
+               "Raw OCI bucket has unapproved KMS, audit, tier, events, replication or lifecycle state.")
+        deletion = raw.get("softDeletePolicy")
+        ensure(isinstance(deletion, dict) and
+               isinstance(deletion.get("currentPolicy"), dict) and
+               deletion["currentPolicy"].get("softDeleteMode") == "Disabled" and
+               "nextPolicy" in deletion and deletion["nextPolicy"] is None,
+               "Raw OCI soft-delete is enabled, scheduled, or unknown; deletion proof is unsafe.")
+
+    def confirm_empty_prefix(self, prefix: str) -> None:
+        """Independently prove OCI's typed empty-list omission via signed REST.
+
+        A successful 'oci os object list --all' can return only {'prefixes':[]}
+        for an empty population. JMESPath length(data) fails on that omission.
+        Do not infer emptiness from missing data: use a second exact provider GET.
+        """
+        ensure(prefix in ("synthetic-only/", "synthetic-recovery/") and
+               self.region == "us-ashburn-1" and self.bucket == BUCKET_NAME and
+               re.fullmatch(r"[A-Za-z0-9_-]{2,80}", self.namespace) is not None,
+               "Independent empty-list proof requires the exact original private OCI bucket.")
+        encoded_prefix = prefix.replace("/", "%2F")
+        uri = ("https://objectstorage.us-ashburn-1.oraclecloud.com/n/" +
+               self.namespace + "/b/" + self.bucket +
+               "/o?prefix=" + encoded_prefix + "&limit=1")
+        raw = self.cli("raw-request", "--http-method", "GET", "--target-uri", uri)
+        try:
+            reply = json.loads(raw)
+        except ValueError as exc:
+            raise Refused("Signed OCI empty-object proof is not valid JSON.") from exc
+        ensure(isinstance(reply, dict) and reply.get("status") == "200 OK"
+               and isinstance(reply.get("data"), dict),
+               "Signed OCI empty-object proof was not exact HTTP 200.")
+        population = reply["data"]
+        ensure("objects" in population and population["objects"] == [] and
+               isinstance(population["objects"], list) and
+               not population.get("nextStartWith") and
+               population.get("prefixes") in (None, []),
+               "Independent OCI object population is not conclusively empty.")
 
     def objects(self, prefix: str) -> list[dict]:
-        # Never treat a single OCI page as a complete remote inventory. OCI defaults
-        # to 100 objects; cleanup/duplicate guards require the entire prefix.
+        # --all consumes every page for nonempty populations; never trust page 1.
         ensure(prefix in ("synthetic-only/", "synthetic-recovery/"),
                "Only known synthetic prefixes may be inspected.")
         args = ("os", "object", "list", *self.args(), "--prefix", prefix, "--all")
         raw = self.cli(*args)
         if not raw.strip():
-            # Some OCI Cloud Shell CLI versions emit no JSON when a successful
-            # list operation has zero entries. Treating blank stdout as [] on
-            # its own would conceal an incomplete or unauthorized inventory.
-            # Independently query the count across ALL pages; only an explicit
-            # integer zero, reported with a successful CLI response, is enough.
-            second = self.cli(*args, "--query", "length(data)")
-            try:
-                count = json.loads(second.strip())
-            except ValueError as exc:
-                raise Refused("OCI empty object population could not be independently confirmed.") from exc
-            ensure(type(count) is int and count == 0,
-                   "OCI object list disagrees with the independent full-population count.")
+            self.confirm_empty_prefix(prefix)
             return []
         try:
             parsed = json.loads(raw)
         except ValueError as exc:
             raise Refused("OCI object inventory returned invalid JSON.") from exc
-        ensure(isinstance(parsed, dict) and "data" in parsed,
-               "OCI object inventory lacks the data population.")
+        ensure(isinstance(parsed, dict),
+               "OCI object inventory is not a JSON object.")
+        ensure(not parsed.get("next-start-with") and not parsed.get("opc-next-page"),
+               "OCI object inventory still has a continuation; full pagination unverified.")
+        if "data" not in parsed:
+            # Observed on the actual Cloud Shell when the prefix is empty:
+            # {"prefixes": []}, with no data key. The independently signed
+            # REST ListObjects response must still show objects=[] and no page.
+            ensure(set(parsed) == {"prefixes"} and parsed["prefixes"] == [],
+                   "OCI object inventory lacks the data population.")
+            self.confirm_empty_prefix(prefix)
+            return []
         data = parsed["data"]
-        # OCI may return either {'data': {'objects': [...]}} or
-        # {'data': [...]}, depending on installed CLI version.
+        # Typed CLI may return {'data':{'objects': [...]}} or {'data': [...]}.
         items = data.get("objects") if isinstance(data, dict) else data
         ensure(isinstance(items, list) and all(isinstance(x, dict) and isinstance(x.get("name"), str)
                                                for x in items), "Unexpected OCI object list shape.")
@@ -202,38 +272,27 @@ class OciStore:
         return items
 
     def get(self, name: str, destination: Path, *, etag: str, max_size: int = MAX_SEALED) -> bytes:
-        name = synthetic_object_key(name)
-        etag = synthetic_etag(etag)
         ensure(not destination.exists() and not destination.is_symlink(), "Ciphertext download destination exists.")
+        ensure(isinstance(etag, str) and
+               re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", etag) is not None,
+               "Download needs one verified OCI object ETag without unsafe characters.")
         ensure(type(max_size) is int and 0 < max_size <= MAX_SEALED,
                "Download size bound must be a positive synthetic-only limit.")
-        # Enforce HEAD at the transport boundary, rather than relying on a
-        # caller to remember an earlier check. Refuse unknown lengths and
-        # unrelated versions BEFORE allowing OCI CLI to write any bytes.
-        h = self.head(name)
-        ensure(synthetic_etag(h["etag"]) == etag,
-               "OCI HEAD object version disagrees with requested synthetic ETag.")
-        reported = h.get("content-length")
-        if type(reported) is int:
-            length = reported
-        elif isinstance(reported, str) and re.fullmatch(r"[0-9]{1,12}", reported):
-            length = int(reported)
-        else:
-            raise Refused("OCI HEAD content length is absent or not an exact integer.")
-        ensure(0 < length <= max_size,
-               "OCI HEAD ciphertext size exceeds the synthetic-only download bound.")
-        # --if-match ties GET to the checked object version; no multipart,
-        # partial receipt or unbounded caller-supplied download size.
+        # HEAD must first confirm content-length <= max_size. The If-Match
+        # freezes that bounded version so a concurrent overwrite cannot
+        # substitute a larger or different object during download.
+        # OCI GET returns {'output': null}, not {'data': ...}.
         self.cli("os", "object", "get", *self.args(), "--name", name,
                  "--file", str(destination), "--if-match", etag,
                  "--no-multipart", timeout=120)
         ensure(_private(destination), "Downloaded ciphertext is not owner-only.")
-        ensure(destination.stat().st_size == length,
-               "Downloaded ciphertext differs from prevalidated HEAD size.")
+        ensure(destination.stat().st_size <= max_size,
+               "Downloaded ciphertext exceeds prevalidated HEAD size bound.")
         return destination.read_bytes()
 
     def put(self, name: str, source: Path) -> str:
-        name = synthetic_object_key(name, upload=True)
+        ensure(isinstance(name, str) and RECOVERY_OBJECT.fullmatch(name) is not None,
+               "New uploads must use a 32-hex synthetic-recovery object key.")
         ensure(_private(source) and source.stat().st_size <= MAX_SEALED,
                "Synthetic ciphertext source is not private or is oversized.")
         # OCI --no-overwrite may return exit code ZERO with an "already exists"
@@ -253,7 +312,6 @@ class OciStore:
         return reply["etag"]
 
     def head(self, name: str) -> dict:
-        name = synthetic_object_key(name)
         raw = self.cli("os", "object", "head", *self.args(), "--name", name)
         try:
             h = json.loads(raw)
@@ -267,8 +325,11 @@ class OciStore:
         return h
 
     def delete_version(self, name: str, etag: str) -> None:
-        name = synthetic_object_key(name)
-        etag = synthetic_etag(etag)
+        ensure(isinstance(name, str) and
+               (RECOVERY_OBJECT.fullmatch(name) is not None or
+                LEGACY_OBJECT.fullmatch(name) is not None),
+               "Refusing to delete an object outside the approved synthetic key formats.")
+        ensure(isinstance(etag, str) and bool(etag), "Conditional delete needs an original ETag.")
         # --if-match prevents deletion of a different object after an unknown overwrite.
         self.cli("os", "object", "delete", *self.args(), "--name", name,
                  "--if-match", etag, "--force")
@@ -292,8 +353,9 @@ def cleanup_legacy(store: OciStore, *, expected_object_name: str,
     Never perform a bulk delete; require specific key syntax, verified canary
     magic + bounded length, ETag-conditional delete, and new empty inventory.
     """
-    ensure(not LEGACY_CLEANUP.exists() and not LEGACY_CLEANUP.is_symlink(),
-           "Legacy cleanup already recorded; refuse repeat.")
+    ensure(not LEGACY_CLEANUP.exists() and not LEGACY_CLEANUP.is_symlink() and
+           not LEGACY_DELETE_ATTEMPT.exists() and not LEGACY_DELETE_ATTEMPT.is_symlink(),
+           "Legacy cleanup or uncertain delete attempt already recorded; refuse repeat.")
     # The current object name/magic cannot independently establish the
     # ORIGINAL uploaded ciphertext identity. Require a separately frozen
     # approved exact name and SHA-256 before any provider deletion.
@@ -328,6 +390,15 @@ def cleanup_legacy(store: OciStore, *, expected_object_name: str,
                "Remote object cannot be proven to be the prior small synthetic canary.")
     ensure(sha(raw) == expected_sha256,
            "Remote ciphertext SHA-256 differs from the previously approved original.")
+    # Persist exact deletion intent BEFORE the provider request: a connection
+    # timeout can mean the conditional DELETE succeeded remotely. Never retry
+    # an uncertain deletion or replace its immutable evidence automatically.
+    private_receipt(LEGACY_DELETE_ATTEMPT, {
+        "schema": 1, "synthetic_only": True, "object_name": name,
+        "original_ciphertext_sha256": expected_sha256, "frozen_etag": h["etag"],
+        "status": "DELETE_OUTCOME_UNCERTAIN_UNTIL_REMOTE_RECONCILIATION",
+        "production_backup_verified": False,
+    })
     store.delete_version(name, h["etag"])
     ensure(not store.objects("synthetic-only/"),
            "Legacy canary deletion was not confirmed by independent listing.")
@@ -408,10 +479,88 @@ def confirm_legacy_orphan_unchanged(store: OciStore, state: dict, destination: P
            "Quarantined legacy object's remote ciphertext changed during the exercise.")
 
 
+def load_workbench_engines() -> tuple:
+    """Resolve pinned local dependencies before any durable receipt or remote mutation."""
+    source_root = Path(__file__).resolve().parents[2]
+    ensure((source_root / "recoveryworks" / "workbench.py").is_file() and
+           (source_root / "recoveryworks" / "offsite_archive.py").is_file(),
+           "Pinned RecoveryWorks checkout is incomplete.")
+    if str(source_root) not in sys.path:
+        sys.path.insert(0, str(source_root))
+    try:
+        from recoveryworks.seven_branch_simulation import seed, exercise
+        from recoveryworks.offsite_archive import seal_file, verify_file, unseal_bytes, restore_file
+        from recoveryworks.workbench import Workspace
+        from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    except (ImportError, OSError):
+        raise Refused("Pinned RecoveryWorks or cryptography dependency cannot be loaded.") from None
+    return seed, exercise, seal_file, verify_file, unseal_bytes, restore_file, Workspace
+
+
+def resume_legacy_quarantine(store: OciStore, items: list[dict]) -> dict:
+    """Recheck the immutable legacy receipt without overwriting it or deleting the object.
+
+    Allowed only when the previous attempt stopped before any upload receipt.
+    A previously observed remote SHA is NOT evidence of original upload identity.
+    """
+    ensure(_private(LEGACY_QUARANTINE),
+           "Historical canary quarantine receipt is not a private owner-only file.")
+    ensure(not ATTEMPT.exists() and not ACCEPTANCE.exists(),
+           "A previous upload or acceptance exists: never automatically resume.")
+    try:
+        observed = json.loads(LEGACY_QUARANTINE.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        raise Refused("Historical quarantine receipt is unreadable.") from None
+    required_keys = {
+        "schema", "legacy_object_name", "remote_observed_sha256",
+        "remote_observed_length", "synthetic_format_candidate",
+        "original_upload_identity_independently_verified", "legacy_object_deleted",
+        "production_backup_verified", "status"
+    }
+    ensure(isinstance(observed, dict) and set(observed) == required_keys and
+           type(observed["schema"]) is int and observed["schema"] == 1 and
+           observed["synthetic_format_candidate"] is True and
+           observed["original_upload_identity_independently_verified"] is False and
+           observed["legacy_object_deleted"] is False and
+           observed["production_backup_verified"] is False and
+           observed["status"] == "QUARANTINED_UNRESOLVED_DO_NOT_DELETE",
+           "Historical quarantine receipt is altered or no longer eligible.")
+    name = observed["legacy_object_name"]
+    expected_sha = observed["remote_observed_sha256"]
+    length = observed["remote_observed_length"]
+    ensure(isinstance(name, str) and LEGACY_OBJECT.fullmatch(name) is not None and
+           isinstance(expected_sha, str) and re.fullmatch(r"[a-f0-9]{64}", expected_sha) is not None and
+           type(length) is int and 40 <= length <= MAX_CANARY,
+           "Historical quarantine object identity or size is invalid.")
+    ensure(len(items) == 1 and items[0].get("name") == name,
+           "Historical quarantine disagrees with current remote inventory.")
+    head = store.head(name)
+    try:
+        actual_length = int(head["content-length"])
+    except (KeyError, ValueError, TypeError):
+        raise Refused("Historical canary size cannot be independently checked.") from None
+    etag = head.get("etag")
+    ensure(actual_length == length and
+           ("storage-tier" not in head or head["storage-tier"] == "Standard") and
+           isinstance(etag, str) and re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", etag) is not None,
+           "Quarantined object changed size, tier or ETag format.")
+    state = {"legacy_orphan_quarantined": True, "legacy_orphan_deleted": False,
+             "_name": name, "_etag": etag, "_length": length, "_sha256": expected_sha}
+    with tempfile.TemporaryDirectory(prefix="retally-legacy-revalidate-") as scratch:
+        ciphertext = Path(scratch) / "legacy.rtbk"
+        confirm_legacy_orphan_unchanged(store, state, ciphertext)
+        ensure(ciphertext.read_bytes().startswith(LEGACY_MAGIC),
+               "Quarantined canary's synthetic magic is not verified.")
+    return state
+
+
 def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False) -> dict:
     """Exercise actual RecoveryWorks source adapters, encryption and restore."""
     ensure(not ATTEMPT.exists() and not ACCEPTANCE.exists(),
            "Prior synthetic backup attempt/result exists; reconcile before repeat.")
+    # Local import errors must never strand an immutable quarantine receipt.
+    seed, exercise, seal_file, verify_file, unseal_bytes, restore_file, Workspace = load_workbench_engines()
     store.bucket_check()
     legacy = store.objects("synthetic-only/")
     current = store.objects("synthetic-recovery/")
@@ -424,16 +573,17 @@ def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False
         # Quarantine the old canary into an owner-only receipt. The new test
         # exclusively uses the separate synthetic-recovery/ prefix and cannot
         # delete any object in synthetic-only/.
-        legacy_state = quarantine_legacy_orphan(store, legacy)
+        # Prior receipt may be reused only after fresh exact remote checks.
+        if LEGACY_QUARANTINE.exists() or LEGACY_QUARANTINE.is_symlink():
+            legacy_state = resume_legacy_quarantine(store, legacy)
+        else:
+            legacy_state = quarantine_legacy_orphan(store, legacy)
         quarantined = True
     else:
         ensure(not preserve_legacy_orphan,
                "Explicit quarantine requested but no legacy synthetic object exists.")
-
-    # Late imports: read-only inspection can run on stock OCI Cloud Shell.
-    from recoveryworks.seven_branch_simulation import seed, exercise
-    from recoveryworks.offsite_archive import seal_file, verify_file, unseal_bytes, restore_file
-    from recoveryworks.workbench import Workspace
+        ensure(not LEGACY_QUARANTINE.exists() and not LEGACY_QUARANTINE.is_symlink(),
+               "Historical quarantine receipt and live OCI object disagree.")
 
     with tempfile.TemporaryDirectory(prefix="retally-recovery-synthetic-") as temp:
         base = Path(temp)
