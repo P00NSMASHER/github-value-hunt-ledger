@@ -7,6 +7,8 @@ from typing import Any, Mapping
 
 from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine
+from .ledger import EconomicLossConflict
+from .journal import finding_to_payload
 from .report import RecoveryScan360Report, build_scan360_report
 from .store import LocalBundleStore
 from .branches.ap import audit_ap_recovery
@@ -58,6 +60,7 @@ from .branches.merchant_fee_csv import (
     load_merchant_transaction_summaries_csv,
 )
 from .branches.parcel import audit_parcel_charges
+from .branches.parcel_rating import load_rating_bundle
 from .branches.parcel_csv import load_parcel_assessments_csv, load_parcel_charges_csv
 from .branches.procurement import audit_procurement_lines
 from .branches.procurement_csv import (
@@ -159,7 +162,25 @@ def run_scan360_config(
     before_ids = {record.finding.finding_id for record in ledger.records()}
     added_ids: list[str] = []
     exceptions: list[dict[str, Any]] = []
+    for finding_id, reason in ledger.reconciliation_holds().items():
+        held = ledger.get(finding_id).finding
+        exceptions.append({"branch": held.branch.value, "reference": held.reference,
+                           "code": "RECONCILIATION_HOLD", "detail": reason})
     engine = RecoveryEngine()
+
+    def record_finding(finding):
+        try:
+            ledger.add(finding)
+        except EconomicLossConflict as exc:
+            ledger.hold_for_reconciliation(exc.finding_id, str(exc))
+            exceptions.append({"branch": finding.branch.value,
+                               "reference": finding.reference,
+                               "code": "ECONOMIC_LOSS_CONFLICT", "detail": str(exc),
+                               "existing_finding_id": exc.finding_id,
+                               "replacement": finding_to_payload(finding)})
+            return False
+        return True
+
 
     for job_index, job in enumerate(_jobs(config.get("freight"), name="freight")):
         truth_path = job.get("truth_manifest_json")
@@ -197,7 +218,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -262,7 +284,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -310,7 +333,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -358,7 +382,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -417,7 +442,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -479,7 +505,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -541,7 +568,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -606,7 +634,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -622,16 +651,23 @@ def run_scan360_config(
                 job, "charge_source_verified", context=f"parcel[{job_index}]"
             ),
         )
-        assessments = load_parcel_assessments_csv(
-            _resolve(
-                base,
-                job.get("assessments_csv"),
-                name=f"parcel[{job_index}].assessments_csv",
-            ),
-            verified=_bool_setting(
-                job, "assessment_source_verified", context=f"parcel[{job_index}]"
-            ),
-        )
+        if bool(job.get("rating_json")) == bool(job.get("assessments_csv")):
+            raise ValueError("parcel requires exactly one of rating_json or assessments_csv")
+        if job.get("rating_json"):
+            assessments = load_rating_bundle(
+                _resolve(base, job["rating_json"], name="parcel.rating_json"), charges,
+                verified=_bool_setting(job, "assessment_source_verified", context="parcel.rating_json"), currency=currency)
+        else:
+            assessments = load_parcel_assessments_csv(
+                _resolve(
+                    base,
+                    job.get("assessments_csv"),
+                    name=f"parcel[{job_index}].assessments_csv",
+                ),
+                verified=_bool_setting(
+                    job, "assessment_source_verified", context=f"parcel[{job_index}]"
+                ),
+            )
         batch = audit_parcel_charges(
             client_id=client_id,
             charges=charges,
@@ -650,7 +686,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -706,7 +743,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -755,7 +793,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -820,7 +859,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -878,7 +918,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -992,7 +1033,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if (
                 finding.finding_id not in before_ids
                 and finding.finding_id not in added_ids
@@ -1046,7 +1088,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -1082,6 +1125,7 @@ def run_scan360_config(
             ),
         )
         batch = audit_rebates(
+            as_of_date=job.get("as_of_date"),
             client_id=client_id,
             programs=programs,
             purchases=purchases,
@@ -1100,7 +1144,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -1154,7 +1199,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -1219,7 +1265,8 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            if not record_finding(finding):
+                continue
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 

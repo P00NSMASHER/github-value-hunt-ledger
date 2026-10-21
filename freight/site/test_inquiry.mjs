@@ -15,10 +15,10 @@ const good = () => ({
 function env(db) {return {
   FREIGHT_INQUIRY_ENABLED:"1",FREIGHT_INQUIRY_MAILBOX_VERIFIED:"1",
   TURNSTILE_SITEKEY:"sitekey-synthetic-123456",TURNSTILE_SECRET:"secret",
-  INQUIRY_RATE_SECRET:"salt",CLOUDFLARE_ACCOUNT_ID:"test-account",CLOUDFLARE_EMAIL_API_TOKEN:"test-token",
-  INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_NOTIFY_FROM:"jay@retallyrecovery.com",INQUIRY_DB:db
+  INQUIRY_RATE_SECRET:"salt",RESEND_API_KEY:"re_synthetic_test_key",
+  INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_DB:db
 };}
-function mockDb({failInsert=false}={}) {
+function mockDb({failInsert=false,failNotificationUpdate=false}={}) {
   const inquiries=new Map(),limits=new Map(),sqlCalls=[];
   return {inquiries,limits,sqlCalls,
     prepare(sql) {sqlCalls.push(sql);return { bind(...params) {return {
@@ -39,8 +39,9 @@ function mockDb({failInsert=false}={}) {
           return {success:true,meta:{changes:1}};
         }
         if(sql.startsWith("UPDATE inquiries")) {
+          if(failNotificationUpdate) throw Error("Simulated notification status write failure");
           for(const r of inquiries.values()) if(r.reference===params[1])r.notification_status="provider_accepted";
-          return {success:true};
+          return {success:true,meta:{changes:1}};
         }
         if(sql.startsWith("DELETE FROM inquiries")) {
           // Reproduce the original destructive behavior on historical records.
@@ -59,32 +60,28 @@ function request(data=good(),{origin="https://www.retallyrecovery.com",host="www
     body:JSON.stringify(data)
   });
 }
-function mockRemote({captcha=true,notify=true,delivery="delivered",providerResponse=null,providerStatus=null}={}) {
+function mockRemote({captcha=true,notify=true,providerResponse=null,providerStatus=null,transportThrows=false}={}) {
   const real=globalThis.fetch;
   let verifications=0,notifications=0;
-  globalThis.fetch=async (url) => {
+  const sent=[];
+  globalThis.fetch=async (url, options={}) => {
     if(String(url).includes("siteverify")) {
       verifications++;
       return Response.json({success:captcha,action:"retally_audit",hostname:"www.retallyrecovery.com"});
     }
-    if(String(url).includes("email/sending/send")) {
+    if(String(url)==="https://api.resend.com/emails") {
       notifications++;
+      sent.push({url:String(url),method:options.method,headers:options.headers,
+        body:JSON.parse(options.body)});
+      if(transportThrows) throw Error("Synthetic network timeout");
       if(providerResponse==="invalid-json") return new Response("{invalid", {status:200});
-      const target="jay@retallyrecovery.com";
-      const result={delivered:[],queued:[],suppressed_recipients:[],permanent_bounces:[],message_id:"<synthetic@example.invalid>"};
-      if(delivery==="delivered" || delivery==="suppressed_and_delivered") result.delivered=[target];
-      if(delivery==="queued" || delivery==="bounced_and_queued") result.queued=[target];
-      if(delivery==="suppressed" || delivery==="suppressed_and_delivered") result.suppressed_recipients=[target];
-      if(delivery==="bounced" || delivery==="bounced_and_queued") result.permanent_bounces=[target];
-      if(delivery==="other") result.delivered=["other@example.org"];
-      if(delivery==="case_variant") result.delivered=["JAY@RETALLYRECOVERY.COM"];
-      return Response.json(providerResponse ?? {success:notify,result},
+      return Response.json(providerResponse ?? {id:"96bb5678-1234-4fbc-8fed-123456789abc"},
         {status:providerStatus ?? (notify?200:503)});
     }
     throw Error("Unexpected URL");
   };
   return { get verifications(){return verifications;},get notifications(){return notifications;},
-    restore(){globalThis.fetch=real;} };
+    get sent(){return sent;},restore(){globalThis.fetch=real;} };
 }
 test("normalizes valid inputs and rejects injection, secrets, unknown fields and uploads", () => {
   assert.ok(normalize(good()));
@@ -111,12 +108,13 @@ test("all independent online-intake activation gates fail closed", async () => {
   const cases = [
     ["owner has not enabled the service", e => { e.FREIGHT_INQUIRY_ENABLED = "0"; }],
     ["business mailbox has not been independently verified", e => { e.FREIGHT_INQUIRY_MAILBOX_VERIFIED = "0"; }],
-    ["email-sending API token was never installed", e => { delete e.CLOUDFLARE_EMAIL_API_TOKEN; }],
+    ["Resend API token was never installed", e => { delete e.RESEND_API_KEY; }],
+    ["Resend API token has invalid shape", e => { e.RESEND_API_KEY = "test-token"; }],
     ["durable inquiry database is missing", e => { delete e.INQUIRY_DB; }],
     ["Turnstile secret is missing", e => { delete e.TURNSTILE_SECRET; }],
     ["rate limiter secret is missing", e => { delete e.INQUIRY_RATE_SECRET; }],
     ["business notification recipient does not match", e => { e.INQUIRY_NOTIFY_TO = "other@example.org"; }],
-    ["notification sender does not use the business domain", e => { e.INQUIRY_NOTIFY_FROM = "other@example.org"; }],
+    ["notification recipient missing", e => { delete e.INQUIRY_NOTIFY_TO; }],
   ];
   for (const [reason, disable] of cases) {
     const db = mockDb();
@@ -161,33 +159,43 @@ test("server stores once and notifies at most once for a duplicate retry", async
     assert.equal(first.status,202);
     const body=await first.json();
     assert.equal(body.received,true);
+    assert.equal(body.notificationPending,false);
     assert.match(body.reference,/^RA-\d{8}-[A-F0-9]{8}$/);
     const again=await onRequestPost({request:request(),env:e});
     assert.equal(again.status,202);
-    assert.equal((await again.json()).reference,body.reference);
+    const duplicate=await again.json();
+    assert.equal(duplicate.reference,body.reference);
+    assert.equal(duplicate.notificationPending,false);
     assert.equal(e.INQUIRY_DB.inquiries.size,1);
     assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"provider_accepted");
     assert.equal(remote.verifications,1);
     assert.equal(remote.notifications,1);
+    const sent=remote.sent[0];
+    assert.equal(sent.url,"https://api.resend.com/emails");
+    assert.equal(sent.method,"POST");
+    assert.equal(sent.headers.Authorization,"Bearer re_synthetic_test_key");
+    assert.equal(sent.headers["Idempotency-Key"],"retally-audit-"+body.reference);
+    assert.equal(sent.body.from,"RETALLY Audit Notifications <audit@notify.retallyrecovery.com>");
+    assert.deepEqual(sent.body.to,["jay@retallyrecovery.com"]);
+    assert.equal(sent.body.reply_to,"qa@example.org");
+    assert.equal(sent.body.subject,"RETALLY Free Audit | "+body.reference);
+    assert.equal(sent.body.attachments,undefined,"the inquiry never uploads freight files");
   } finally {remote.restore();}
 });
-test("provider acknowledgement must explicitly name the intended RETALLY recipient", async () => {
+test("Resend API acceptance requires HTTP 200 with UUID; never assert mailbox delivery", async () => {
   const scenarios=[
-    ["delivered recipient", {delivery:"delivered"}, "provider_accepted"],
-    ["queued recipient", {delivery:"queued"}, "provider_accepted"],
-    ["case-insensitive recipient", {delivery:"case_variant"}, "provider_accepted"],
-    ["suppressed recipient", {delivery:"suppressed"}, "pending"],
-    ["permanently bounced recipient", {delivery:"bounced"}, "pending"],
-    ["another recipient accepted instead", {delivery:"other"}, "pending"],
-    ["positive delivered and suppression conflict", {delivery:"suppressed_and_delivered"}, "pending"],
-    ["positive queued and bounce conflict", {delivery:"bounced_and_queued"}, "pending"],
-    ["provider HTTP failure", {notify:false}, "pending"],
-    ["success without result", {providerResponse:{success:true,id:"synthetic"}}, "pending"],
-    ["message ID without success", {providerResponse:{id:"synthetic",result:{delivered:["jay@retallyrecovery.com"],queued:[],suppressed_recipients:[],permanent_bounces:[]}}}, "pending"],
-    ["wrong recipient only", {providerResponse:{success:true,result:{delivered:["different@example.org"],queued:[],suppressed_recipients:[],permanent_bounces:[]}}}, "pending"],
-    ["missing suppression list", {providerResponse:{success:true,result:{delivered:["jay@retallyrecovery.com"],queued:[],permanent_bounces:[]}}}, "pending"],
-    ["invalid suppressed list type", {providerResponse:{success:true,result:{delivered:["jay@retallyrecovery.com"],queued:[],suppressed_recipients:"",permanent_bounces:[]}}}, "pending"],
-    ["false success despite delivered field", {providerResponse:{success:false,result:{delivered:["jay@retallyrecovery.com"],queued:[],suppressed_recipients:[],permanent_bounces:[]}}}, "pending"],
+    ["Resend accepted email with UUID", {}, "provider_accepted"],
+    ["provider authentication failure", {notify:false,providerStatus:401}, "pending"],
+    ["sender domain unverified", {notify:false,providerStatus:403}, "pending"],
+    ["rate limit", {notify:false,providerStatus:429}, "pending"],
+    ["provider outage", {notify:false,providerStatus:503}, "pending"],
+    ["transport timeout", {transportThrows:true}, "pending"],
+    ["unexpected HTTP 201", {providerStatus:201}, "pending"],
+    ["missing email ID", {providerResponse:{}}, "pending"],
+    ["null email ID", {providerResponse:{id:null}}, "pending"],
+    ["invalid email ID", {providerResponse:{id:"message-123"}}, "pending"],
+    ["Cloudflare provider response cannot impersonate Resend", {providerResponse:{success:true,result:{delivered:["jay@retallyrecovery.com"]}}}, "pending"],
+    ["provider returned non-object", {providerResponse:[]}, "pending"],
     ["malformed provider JSON", {providerResponse:"invalid-json"}, "pending"],
   ];
   for(const [label,options,expected] of scenarios) {
@@ -197,6 +205,9 @@ test("provider acknowledgement must explicitly name the intended RETALLY recipie
       const e=env(db);
       const response=await onRequestPost({request:request(),env:e});
       assert.equal(response.status,202,label+": durable acceptance should not depend on email");
+      const receipt=await response.json();
+      assert.equal(receipt.received,true,label);
+      assert.equal(receipt.notificationPending,expected!=="provider_accepted",label);
       assert.equal(db.inquiries.size,1,label);
       assert.equal([...db.inquiries.values()][0].notification_status,expected,label);
       assert.equal(remote.notifications,1,label);
@@ -230,7 +241,27 @@ test("email provider failure leaves a durable pending record for operator reconc
     const e=env(mockDb());
     const r=await onRequestPost({request:request(),env:e});
     assert.equal(r.status,202);
+    assert.equal((await r.json()).notificationPending,true);
     assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
+    const duplicate=await onRequestPost({request:request(),env:e});
+    assert.equal((await duplicate.json()).notificationPending,true);
+    assert.equal(remote.notifications,1,"a duplicate never resends an uncertain notification");
+  } finally {remote.restore();}
+});
+
+test("an uncommitted provider-status update must not masquerade as a staff notification", async () => {
+  const remote=mockRemote();
+  try {
+    const e=env(mockDb({failNotificationUpdate:true}));
+    const r=await onRequestPost({request:request(),env:e});
+    assert.equal(r.status,202);
+    const receipt=await r.json();
+    assert.equal(receipt.received,true);
+    assert.equal(receipt.notificationPending,true);
+    assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
+    const duplicate=await onRequestPost({request:request(),env:e});
+    assert.equal((await duplicate.json()).notificationPending,true);
+    assert.equal(remote.notifications,1,"never automatically resend after an ambiguous first attempt");
   } finally {remote.restore();}
 });
 test("burst attempts limited to five per hour and no notification on rejected request", async () => {
@@ -339,4 +370,23 @@ test("retally campaign navigation leaves direct and untagged traffic unchanged",
   );
   assert.equal(links[0].href, original);
   assert.equal(dataLayer[0].utm_source, undefined);
+});
+
+test("online form waits for sequential Turnstile and Resend before declaring the receipt uncertain", () => {
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const backend = readFileSync(new URL("../../functions/api/inquiry.js", import.meta.url), "utf8");
+  const clientTimeout = front.match(/window\.setTimeout\(\(\) => controller\.abort\(\), (\d+)\)/);
+  assert.ok(clientTimeout, "The online form must have a bounded fetch deadline");
+  const providerTimeouts = [...backend.matchAll(/AbortSignal\.timeout\((\d+)\)/g)]
+    .map(x => Number(x[1]));
+  assert.deepEqual(providerTimeouts.sort((a,b) => a-b), [7000,9000],
+    "Review the client budget if upstream deadlines change");
+  assert.ok(Number(clientTimeout[1]) >= providerTimeouts.reduce((x,y) => x+y,0)+8000,
+    "Wait for sequential provider deadlines plus database and transport margin");
+  assert.match(front, /error\?\.name === "AbortError"/);
+  assert.match(front, /Your request may already be saved/);
+  assert.match(front, /retry this same form to retrieve/);
+  assert.match(front, /pendingRequestKey \|\|= window\.crypto\?\.randomUUID\?\.\(\)/);
+  assert.match(backend,/SELECT reference, fingerprint, notification_status FROM inquiries WHERE idempotency_key=\?/);
+  assert.match(backend,/notificationPending/);
 });

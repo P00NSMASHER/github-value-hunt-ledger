@@ -40,3 +40,29 @@ matches the intended operation.
 
 That separation lets more coding work become autonomous without turning repository access into
 unrestricted production authority.
+## RETALLY Group — no mandatory human reviews
+
+**RETALLY internal source, code and quality reviews use automated evidence-based
+verification.** No peer reviewer, external reviewer, owner code-review signature,
+or owner artifact-quality sign-off is a required stage for current or future
+RETALLY Group work. The RETALLY public catalog and validator enforce that
+policy using `internal_human_review_required=false`,
+`internal_quality_gate=AUTOMATED_EVIDENCE_QA`, and an
+`AUTOMATED_QUALITY_GATE` workflow role. Required checks must bind to an exact
+candidate revision/artifact, fail closed on unknown or stale evidence, and record
+material defects; no system may claim a human reviewed work that nobody reviewed.
+
+**Review is not authorization.** This policy does not change the implemented
+Step-6 mandatory authorization rules for external writes, production changes,
+money movements, destructive operations, or policy changes. An exact, authenticated
+authorization may still be required to execute one of those actions. It is not
+a second person or a discretionary code-quality review. Likewise protected-main
+status checks, independent automated auditors, kill switches and budgets remain
+enforced. No assistant or bot may forge approval receipts or skip a required
+authorization, nor does a passing code check authenticate customer, Stripe,
+settlement, source ownership or delivery evidence.
+
+Legal, regulatory and contractual requirements for a qualified human professional
+are outside this internal-review policy. If required evidence or external
+authorization is unavailable, preserve the relevant hold rather than inventing
+or silently granting permission.

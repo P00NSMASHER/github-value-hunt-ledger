@@ -38,7 +38,7 @@ def build_scan360_report(ledger: RecoveryLedger, client_id: str) -> RecoveryScan
         raise ValueError("client_id is required")
     client_id = client_id.strip()
 
-    records = [r for r in ledger.records() if r.finding.client_id == client_id]
+    records = [r for r in ledger.active_records() if r.finding.client_id == client_id]
     currencies = {r.finding.currency for r in records}
     if len(currencies) > 1:
         raise ValueError("scan360 report requires a single currency per client report")

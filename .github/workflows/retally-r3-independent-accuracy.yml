@@ -1,0 +1,60 @@
+name: RETALLY R3 Independent Blinded Accuracy Safety
+
+on:
+  pull_request:
+    paths:
+      - 'freight/sealed_real_accuracy.py'
+      - 'freight/test_sealed_real_accuracy_r3.py'
+      - 'freight/R3_INDEPENDENT_ACCURACY.md'
+      - '.github/workflows/retally-r3-independent-accuracy.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freight/sealed_real_accuracy.py'
+      - 'freight/test_sealed_real_accuracy_r3.py'
+      - '.github/workflows/retally-r3-independent-accuracy.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  blind-accuracy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check -r production/requirements-ci.txt
+      - name: Validate independent truth/model seals and scoring
+        run: PYTHONPATH=. python -m pytest -q freight/test_sealed_real_accuracy_r3.py
+      - name: Validate original buyer pilot acceptance controls unchanged
+        run: PYTHONPATH=. python -m pytest -q freight/test_audit_acceptance.py freight/test_phase3_accuracy.py
+      - name: Enforce unknown original freight cases cannot earn a score
+        run: |
+          python - <<'PY'
+          from freight.sealed_real_accuracy import (
+              ModelCall, TruthCall, PredictionSeal, TruthSeal,
+              prediction_seal_hash, truth_seal_hash, score_sealed_freight,
+          )
+          model_time = '2026-10-18T12:00:00+00:00'
+          truth_time = '2026-10-18T13:00:00+00:00'
+          model_cases = tuple(ModelCall(str(i), 'REVIEW', 0, 'f'*64) for i in range(110))
+          truth_cases = tuple(TruthCall(str(i), 'UNRESOLVED', 0, 'a'*64, None, None,
+                                        None, False) for i in range(110))
+          model = PredictionSeal('model', model_time, model_cases,
+                                 prediction_seal_hash('model', model_time, model_cases))
+          truth = TruthSeal('truth', 'reviewer A', 'reviewer B', truth_time, truth_cases,
+                            truth_seal_hash('truth', 'reviewer A', 'reviewer B', truth_time, truth_cases))
+          result = score_sealed_freight(model, truth,
+                    joint_unseal_at='2026-10-18T14:00:00+00:00',
+                    study_kind='REAL_EXTERNAL_REVIEW_PENDING')
+          assert result.population_count == result.unresolved_truth_count == 110
+          assert result.complete_independent_truth_count == 0
+          assert result.precision is None and result.false_positive_rate is None
+          assert result.publication_claim_approved is False
+          print('PASS: no labels, no scored real-world accuracy')
+          PY

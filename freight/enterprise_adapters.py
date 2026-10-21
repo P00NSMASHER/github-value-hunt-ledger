@@ -13,6 +13,7 @@ from typing import Iterable
 from freight.canonical_schema import (
     CanonicalFreightRecord,
     ChargeLine,
+    InvoiceAdjustment,
     PackageFacts,
     ShipmentFacts,
     SourceArtifact,
@@ -113,6 +114,22 @@ def canonical_record_from_api(payload: dict) -> CanonicalFreightRecord:
     if len(sources) != len(sources_raw):
         raise ValueError("each source must be an object")
 
+    adjustments_raw = payload.get("adjustments", [])
+    if not isinstance(adjustments_raw, list):
+        raise ValueError("adjustments must be a list")
+    if any(not isinstance(x, dict) for x in adjustments_raw):
+        raise ValueError("each adjustment must be an object")
+    adjustments = tuple(
+        InvoiceAdjustment(
+            adjustment_id=_text("adjustment_id", item.get("adjustment_id")),
+            kind=_text("kind", item.get("kind")).upper(),
+            amount_cents=_int("amount_cents", item.get("amount_cents"), minimum=1),
+            source_sha256=_text("source_sha256", item.get("source_sha256")),
+            applies_to_charge_id=item.get("applies_to_charge_id"),
+        )
+        for item in adjustments_raw
+    )
+
     return build_record(
         buyer_id=_text("buyer_id", payload.get("buyer_id")),
         business_unit=_text("business_unit", payload.get("business_unit")),
@@ -124,6 +141,7 @@ def canonical_record_from_api(payload: dict) -> CanonicalFreightRecord:
         charges=charges,
         sources=sources,
         account_id=payload.get("account_id"),
+        adjustments=adjustments,
     )
 
 

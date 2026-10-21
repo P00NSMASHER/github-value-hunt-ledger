@@ -15,6 +15,9 @@ const RECORDS = new Set(["Invoice export", "Rate agreements", "Shipment records"
 const CAMPAIGN = new Set(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
 const HOSTS = new Set(["www.retallyrecovery.com", "retallyrecovery.com"]);
 const MAX_BODY_BYTES = 8192;
+// Fixed sender belongs exclusively to the verified Resend sending subdomain.
+// The primary RETALLY business inbox stays with Zoho; its MX is not changed.
+const RESEND_FROM = "RETALLY Audit Notifications <audit@notify.retallyrecovery.com>";
 const SENSITIVE = /\b(?:password|passcode|api[\s_-]?key|access[\s_-]?token|bank[\s_-]?account|routing[\s_-]?number|card[\s_-]?number|cvv|iban|swift[\s_-]?code)\b/i;
 
 function answer(code, body) {
@@ -139,11 +142,17 @@ function validEnv(env) {
     env.INQUIRY_DB?.prepare &&
     env.TURNSTILE_SECRET && env.TURNSTILE_SITEKEY &&
     env.INQUIRY_RATE_SECRET &&
-    env.CLOUDFLARE_EMAIL_API_TOKEN &&
-    env.CLOUDFLARE_ACCOUNT_ID &&
-    env.INQUIRY_NOTIFY_TO === "jay@retallyrecovery.com" &&
-    typeof env.INQUIRY_NOTIFY_FROM === "string" &&
-    /^[a-z0-9._+-]+@retallyrecovery\.com$/.test(env.INQUIRY_NOTIFY_FROM);
+    typeof env.RESEND_API_KEY === "string" && env.RESEND_API_KEY.startsWith("re_") &&
+    env.RESEND_API_KEY.length >= 12 &&
+    env.INQUIRY_NOTIFY_TO === "jay@retallyrecovery.com";
+}
+// A durable D1 receipt and a business-mail notification are separate facts.
+// Treat unknown provider states as pending, including on idempotent retries.
+function receipt(reference, notificationStatus, duplicate = false) {
+  return answer(202, {
+    ok: true, received: true, reference, duplicate,
+    notificationPending: !["provider_accepted", "delivery_verified"].includes(notificationStatus)
+  });
 }
 async function limitRequest(env, ip) {
   if (!ip) return false;
@@ -192,39 +201,30 @@ export function notificationText(reference, p) {
   return lines.join("\n");
 }
 async function notify(env, reference, p) {
-  const res = await fetch(
-    "https://api.cloudflare.com/client/v4/accounts/" + encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID) + "/email/sending/send",
-    {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + env.CLOUDFLARE_EMAIL_API_TOKEN, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: env.INQUIRY_NOTIFY_FROM,
-        to: [env.INQUIRY_NOTIFY_TO],
-        reply_to: p.workEmail,
-        subject: "RETALLY Free Audit | " + reference,
-        text: notificationText(reference, p)
-      }),
-      signal: AbortSignal.timeout(9000)
-    }
-  );
-  if (!res.ok) return false;
-  const json = await res.json();
-  // Cloudflare API success or a message ID is not proof the intended inbox
-  // accepted this notification. The provider can suppress a recipient even
-  // when the overall call succeeds. Queueing is not mailbox delivery.
-  if (json?.success !== true || !json.result ||
-      typeof json.result !== "object" || Array.isArray(json.result)) return false;
-  const { delivered, queued, suppressed_recipients, permanent_bounces } = json.result;
-  // All four recipient arrays are required by the Cloudflare Sending contract.
-  // Missing or malformed lists must not silently mean "no suppressions".
-  if (![delivered, queued, suppressed_recipients, permanent_bounces]
-      .every(Array.isArray)) return false;
-  const target = env.INQUIRY_NOTIFY_TO.toLowerCase();
-  const includesTarget = list => list.some(value =>
-    typeof value === "string" && value.toLowerCase() === target);
-  return !includesTarget(suppressed_recipients) &&
-    !includesTarget(permanent_bounces) &&
-    (includesTarget(delivered) || includesTarget(queued));
+  // Resend's 200 + UUID proves only API acceptance, NOT recipient-mailbox
+  // delivery. The separately verified Zoho receipt remains a release gate.
+  // A stable provider key reduces duplicate sends on ambiguous transport retries.
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + env.RESEND_API_KEY,
+      "Content-Type": "application/json",
+      "Idempotency-Key": "retally-audit-" + reference
+    },
+    body: JSON.stringify({
+      from: RESEND_FROM,
+      to: [env.INQUIRY_NOTIFY_TO],
+      reply_to: p.workEmail,
+      subject: "RETALLY Free Audit | " + reference,
+      text: notificationText(reference, p)
+    }),
+    signal: AbortSignal.timeout(9000)
+  });
+  if (res.status !== 200) return false;
+  const result = await res.json();
+  return result !== null && typeof result === "object" &&
+    !Array.isArray(result) && typeof result.id === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(result.id);
 }
 export async function onRequestPost({ request, env }) {
   // A backend deployment alone does not enable this service for the public.
@@ -242,10 +242,10 @@ export async function onRequestPost({ request, env }) {
   try {
     const db = env.INQUIRY_DB;
     const existing = await db.prepare(
-      "SELECT reference, fingerprint FROM inquiries WHERE idempotency_key=?"
+      "SELECT reference, fingerprint, notification_status FROM inquiries WHERE idempotency_key=?"
     ).bind(p.idempotencyKey).first();
     if (existing) return existing.fingerprint === fingerprint
-      ? answer(202, { ok: true, reference: existing.reference, received: true, duplicate: true })
+      ? receipt(existing.reference, existing.notification_status, true)
       : answer(409, { ok: false, error: "This request identifier was already used. Restart the form." });
     if (!await limitRequest(env, request.headers.get("CF-Connecting-IP"))) {
       return answer(429, { ok: false, error: "Please try again later or contact RETALLY by email." });
@@ -266,19 +266,24 @@ export async function onRequestPost({ request, env }) {
       }),now).run();
     if (!inserted.success) throw new Error("db_insert_failed");
     if (inserted.meta?.changes === 0) {
-      const duplicate = await db.prepare("SELECT reference,fingerprint FROM inquiries WHERE idempotency_key=?")
+      const duplicate = await db.prepare("SELECT reference,fingerprint,notification_status FROM inquiries WHERE idempotency_key=?")
         .bind(p.idempotencyKey).first();
       return duplicate?.fingerprint === fingerprint
-        ? answer(202, { ok: true, reference:duplicate.reference, received:true,duplicate:true })
+        ? receipt(duplicate.reference, duplicate.notification_status, true)
         : answer(409,{ok:false,error:"This request identifier was already used."});
     }
     // Durable acceptance is committed above. Notification is a separate, tracked state.
     let notified = false;
+    let notificationStatus = "pending";
     try { notified = await notify(env,reference,p); } catch (_) { /* pending for operator reconciliation */ }
     if (notified) {
       try {
-        await db.prepare("UPDATE inquiries SET notification_status='provider_accepted',notified_at=? WHERE reference=?")
+        const updated = await db.prepare("UPDATE inquiries SET notification_status='provider_accepted',notified_at=? WHERE reference=?")
           .bind(Math.floor(Date.now()/1000),reference).run();
+        // Never assert provider acceptance unless it was durably recorded.
+        if (updated?.success === true && updated.meta?.changes === 1) {
+          notificationStatus = "provider_accepted";
+        }
       } catch (_) { /* durable inquiry is intact; reconciliation required */ }
     }
     // Incoming inquiries must never be purged as a side effect of accepting
@@ -290,7 +295,7 @@ export async function onRequestPost({ request, env }) {
       await db.prepare("DELETE FROM inquiry_limits WHERE expires_at < ?")
         .bind(now).run();
     } catch (_) { /* cleanup errors cannot roll back the saved inquiry */ }
-    return answer(202, { ok: true, received: true, reference });
+    return receipt(reference, notificationStatus);
   } catch (_) {
     // Never expose raw input, infrastructure details, tokens or stack traces.
     return answer(503, { ok: false, error: "We could not confirm receipt. Please use the email contact option." });
