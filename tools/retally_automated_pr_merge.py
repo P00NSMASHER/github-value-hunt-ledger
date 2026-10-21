@@ -102,12 +102,14 @@ def match_fresh_run(runs: list[dict], branch: str, sha: str, started: dt.datetim
     return None
 
 
-def dispatch_and_verify(branch: str, sha: str) -> int:
+def dispatch_and_verify(branch: str, sha: str, *, deadline: float | None = None) -> int:
     since = dt.datetime.now(dt.timezone.utc)
     gh("POST", f"repos/{REPO}/actions/workflows/{GATE_WORKFLOW}/dispatches",
        {"ref": branch})
     print("Exact-head CI workflow dispatch accepted", flush=True)
     for attempt in range(95):
+        if deadline is not None and time.monotonic() + 15 >= deadline:
+            raise ProposalHold("Bounded total proof-CI runtime exhausted")
         time.sleep(15)
         listing = gh("GET", f"repos/{REPO}/actions/workflows/{GATE_WORKFLOW}/runs"
                      "?event=workflow_dispatch&branch=" + quote(branch, safe="")
@@ -135,6 +137,7 @@ def dispatch_and_verify(branch: str, sha: str) -> int:
 MAX_RECONCILE_COMMITS = 12
 MAX_RECONCILE_FILES = 200
 MAX_TOTAL_RECONCILE_SECONDS = 480
+MAX_TOTAL_PROOF_SECONDS = 1650  # 27.5 minutes within a 30-minute job
 PROOF_BRANCH = re.compile(r"automation/retally-proof-([1-9][0-9]{3,15})-([1-9][0-9]{0,3})")
 
 
@@ -235,7 +238,8 @@ def _prove_and_merge_updated_main(
 
     # Crucial: a newly dispatched five-lane gate runs on the actual merged
     # tree, not the outdated bot proposal, and has a fresh exact SHA.
-    run_id = dispatch_and_verify(proof_branch, proof_sha)
+    run_id = dispatch_and_verify(
+        proof_branch, proof_sha, deadline=start_time + MAX_TOTAL_PROOF_SECONDS)
     guarded_target(lane, number, head_sha, base_sha,
                    require_current_main=False)
     if _current_main_sha() != latest_main:
