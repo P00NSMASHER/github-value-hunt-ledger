@@ -194,6 +194,8 @@ def _prove_and_merge_updated_main(
     approved_files: tuple[str, ...], *, start_time: float,
 ) -> dict[str, object]:
     """Never rebase/force a source branch; test exact combined tree on isolated ref."""
+    if os.environ.get("RETALLY_GUARDED_MAIN_RACE_PROOF_ENABLED") != "true":
+        raise ProposalHold("Combined-tree proof recovery is not yet explicitly enabled")
     if time.monotonic() - start_time >= MAX_TOTAL_RECONCILE_SECONDS:
         raise ProposalHold("Proof retry budget exceeded after source CI")
     latest_main = _current_main_sha()
