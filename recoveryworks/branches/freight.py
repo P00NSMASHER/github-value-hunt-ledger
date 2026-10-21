@@ -50,6 +50,7 @@ def from_freight_finding(finding, authority=None, *, source_locator: str = "frei
         confidence_basis="existing freight proof hash + verified authority when supplied",
         metadata={
             "shipment_id": finding.shipment_id,
+            "business_unit": getattr(finding, "business_unit", ""),
             "customer_id": finding.customer_id,
             "freight_finding_id": finding.finding_id,
             "freight_proof_hash": finding.proof_hash,

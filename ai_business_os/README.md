@@ -2,6 +2,53 @@
 
 This directory is the incremental implementation of the nine-part AI Business OS upgrade.
 
+## RETALLY Group operating structure
+
+The [group operating model](RETALLY_GROUP_OPERATING_MODEL.md) adds a source-linked
+business catalog, shared customer-workflow specification and standalone management
+preview. The existing CEO dashboard also exposes read-only identity candidates;
+it does not merge private business identities or change operating authority.
+
+```bash
+python -m ai_business_os.retally_group validate
+python -m ai_business_os.retally_group render --output /tmp/retally-group-preview.html
+python -m unittest ai_business_os.test_retally_group ai_business_os.test_ceo_command_center
+```
+
+The public preview has no customer or financial connection. Unknown values remain
+null; catalog entries and tested code are not evidence of launched businesses.
+An [opt-in private observation](RETALLY_GROUP_PRIVATE_INTEGRATION.md) now reads
+existing business identities and source-record counts through the production
+bridge. It reports missing and ambiguous group mappings without approving them.
+Both identity outputs explicitly name the private business-table namespace and
+exact-slug matching rule. The opt-in observation reports catalog source
+provenance separately, so a documented product can correctly have no business
+record match. Query freshness does not refresh historical source documents.
+The customer-register validator checks record relationships and summarizes
+declared workflow stages; payment declarations never become verified revenue.
+Actual operating records remain in `ai_business_os_prod` and approved private
+service stores. See the [empty register contract](RETALLY_GROUP_CUSTOMER_REGISTER.schema.json).
+The PermitPlate NYC adapter reads its existing onboarding ledger and initialization
+anchor at one immutable source revision, checks integrity, and reports source age
+and holds separately. It exposes aggregate observations only. A separate,
+optional CaptureBrief outcome adapter verifies explicitly supplied immutable
+ledger bytes and returns aggregate event/case observations only; its live source
+location and account mapping remain unconnected. The
+[source reconciliation](RETALLY_GROUP_SOURCE_RECONCILIATION.md) distinguishes
+project/repository evidence and original private-artifact provenance from private
+business bindings. It recovers the RehabSignal, Contractor Quote Recovery and
+[App Factory product sources](RETALLY_APP_FACTORY_SOURCE_MAP.md), and records the
+merged ScopeSignal correction in [Portfolio Brain PR #732](https://github.com/P00NSMASHER/portfolio-brain/pull/732),
+verified at exact merge commit `8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c`.
+That correction leaves ScopeSignal's project identity unassigned and
+preserves CaptureBrief's `PRJ-004` identity. Public private-source
+references contain lookup keys and dates; exact artifact identities stay private.
+Existing schedules, pricing, legal identities and release controls are unchanged.
+
+```bash
+python -m unittest ai_business_os.test_retally_group_private ai_business_os.test_retally_customer_register ai_business_os.test_retally_permitplate
+```
+
 ## Step 1 — Persistent agent runtime
 
 Status: implemented and merged.
@@ -230,3 +277,4 @@ and architecture growth are never treated as external outcomes.
 
 Current live state remains fail-closed: there are zero real verified external outcomes, so no
 initiative has become allocation-ready merely because this mechanism was implemented.
+

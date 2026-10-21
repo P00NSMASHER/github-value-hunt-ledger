@@ -52,6 +52,8 @@ def _money_to_cents(value: str, *, field: str) -> int:
         amount = Decimal(text)
     except InvalidOperation as exc:
         raise ValueError(f"{field} has invalid money value {value!r}") from exc
+    if not amount.is_finite():
+        raise ValueError("money must be finite")
     if amount < 0:
         raise ValueError(f"{field} cannot be negative")
     return int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
@@ -105,7 +107,9 @@ def load_procurement_authorities_csv(
                 _required(row, "Contracted_Unit_Price", row_number),
                 field="Contracted_Unit_Price",
             ),
+            contracted_unit_price=_required(row, "Contracted_Unit_Price", row_number).replace("$", "").replace(",", ""),
             price_basis=_required(row, "Price_Basis", row_number),
+            price_unit=_optional(row, "Price_Unit"),
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
@@ -128,6 +132,10 @@ def load_procurement_quantities_csv(
                 row, "Approved_Billable_Quantity", row_number
             ),
             quantity_basis=_required(row, "Quantity_Basis", row_number),
+            quantity_unit=_optional(row, "Quantity_Unit"),
+            price_units_per_quantity_unit=_optional(row, "Price_Units_Per_Quantity_Unit"),
+            conversion_basis=_optional(row, "Conversion_Basis"),
+            conversion_reviewer_id=_optional(row, "Conversion_Reviewer_ID"),
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
