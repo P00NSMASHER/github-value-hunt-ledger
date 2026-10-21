@@ -86,10 +86,30 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
         oidc.hostname == OIDC_HOST or
         OIDC_REGIONAL_HOST.fullmatch(oidc.hostname or "") is not None
     )
-    require(oidc.scheme == "https" and approved_oidc_host and
-            not oidc.username and not oidc.password and not oidc.port and
-            bool(oidc.path) and not oidc.fragment,
-            "GitHub OIDC request endpoint is not trusted")
+    approved_oidc_origin = (
+        oidc.scheme == "https" and approved_oidc_host and
+        not oidc.username and not oidc.password and not oidc.port and
+        bool(oidc.path) and not oidc.fragment
+    )
+    if not approved_oidc_origin:
+        # The request URL can contain a job-specific token path/query. Never
+        # log those fields. Print only validated GitHub subdomain metadata.
+        hostname = oidc.hostname or ""
+        is_github_host = re.fullmatch(
+            r"[a-z0-9][a-z0-9-]{1,62}\.actions\.githubusercontent\.com",
+            hostname,
+        ) is not None
+        label = hostname.split(".", 1)[0] if is_github_host else "OTHER"
+        print(
+            "RETALLY OCI OIDC ORIGIN: label=" + label +
+            " github_suffix=" + str(is_github_host) +
+            " https=" + str(oidc.scheme == "https") +
+            " port_explicit=" + str(oidc.port is not None) +
+            " path_present=" + str(bool(oidc.path)) +
+            " userinfo_present=" + str(bool(oidc.username or oidc.password)) +
+            " fragment_present=" + str(bool(oidc.fragment))
+        )
+    require(approved_oidc_origin, "GitHub OIDC request endpoint is not trusted")
     require(re.fullmatch(r"[a-zA-Z0-9_-]{2,80}",
                          environ["RETALLY_OCI_NAMESPACE"]) is not None,
             "Invalid OCI namespace")
