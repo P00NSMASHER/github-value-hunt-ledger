@@ -127,6 +127,7 @@
  /* Porcelain panels: a restrained highlight, a defined rim and a soft shadow. */
  .hero-console,.enquiry-card,.premium-business-hero .business-offer,.featured-card,.portfolio-item,.premium-features .premium-feature,.premium-steps li,.business-resource-panel,.next-step-panel{color:#14362d;background:linear-gradient(145deg,#fff 0%,#f6fbf7 48%,#eaf4ee 100%);border-color:#d7ebe0;box-shadow:inset 0 2px 0 #fff,inset 0 -1px 0 #c5ddcf,0 6px 0 #00271f44,0 22px 42px #001e1938}
  .hero-console h2{text-wrap:balance;max-width:22ch}
+ .photo-caption-label{display:inline-block;padding:6px 9px;border:1px solid #80ae9770;border-radius:4px;background:#073a2f;color:#f0faf4;font-size:10px;font-weight:750;line-height:1.5;letter-spacing:.08em;box-shadow:0 2px 8px #001e1933}
  .group-site .portfolio-item,.group-site .featured-card{color:#14362d}
  .featured-card:hover,.portfolio-item:hover{border-color:#a0d7bb;box-shadow:inset 0 2px 0 #fff,0 8px 0 #00271f44,0 28px 48px #001e1959}
  .approach-photo,.business-context-photo{border:1px solid #c0dfcd70;box-shadow:inset 0 1px 0 #ffffff40,0 18px 40px #001e1940}
