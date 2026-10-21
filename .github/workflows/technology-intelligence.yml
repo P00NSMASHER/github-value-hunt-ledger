@@ -72,6 +72,11 @@ jobs:
   persist-generated:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'github-actions[bot]'
     needs: validate
+    outputs:
+      proposal_ready: ${{ steps.persist.outputs.proposal_ready }}
+      branch: ${{ steps.persist.outputs.branch }}
+      base_sha: ${{ steps.persist.outputs.base_sha }}
+      head_sha: ${{ steps.persist.outputs.head_sha }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -97,10 +102,77 @@ jobs:
       - name: Check generated text for whitespace errors
         run: git diff --check
 
-      - name: Persist generated intelligence on main
+      - name: Persist generated intelligence using the active publishing mode
+        id: persist
         env:
           TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
+          PR_MODE: ${{ vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$PR_MODE" = "true" ]; then
+            BRANCH="automation/retally-technology-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            python tools/ti_persist_generated.py \
+              --max-attempts 5 \
+              --clean-untracked-on-rebuild \
+              --proposal-branch "$BRANCH" \
+              > "$RUNNER_TEMP/retally-ti-proposal.json"
+            python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "retally-ti-proposal.json").read_text()
+          )
+          if report.get("status") == "proposed":
+              expected = ("automation/retally-technology-" +
+                          os.environ["GITHUB_RUN_ID"] + "-" +
+                          os.environ["GITHUB_RUN_ATTEMPT"])
+              assert report["branch"] == expected
+              print("proposal_ready=true")
+              print("branch=" + report["branch"])
+              print("base_sha=" + report["base_sha"])
+              print("head_sha=" + report["head_sha"])
+          elif report.get("status") != "clean":
+              raise SystemExit("Generated TI state did not produce an accepted proposal")
+          PY
+          else
+            python tools/ti_persist_generated.py \
+              --max-attempts 5 \
+              --clean-untracked-on-rebuild
+          fi
+
+
+  submit-pr:
+    needs: persist-generated
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.RETALLY_AUTOMATED_PR_WRITERS_ENABLED == 'true' &&
+      needs.persist-generated.outputs.proposal_ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Verify scoped technology evidence before dispatching real CI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROPOSED_BRANCH: ${{ needs.persist-generated.outputs.branch }}
+          PROPOSED_BASE: ${{ needs.persist-generated.outputs.base_sha }}
+          PROPOSED_HEAD: ${{ needs.persist-generated.outputs.head_sha }}
         run: >-
-          python tools/ti_persist_generated.py
-          --max-attempts 5
-          --clean-untracked-on-rebuild
+          python tools/retally_automated_pr_proposal.py
+          --lane technology
+          --branch "$PROPOSED_BRANCH"
+          --base-sha "$PROPOSED_BASE"
+          --head-sha "$PROPOSED_HEAD"
