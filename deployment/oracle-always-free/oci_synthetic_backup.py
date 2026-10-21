@@ -580,8 +580,9 @@ def synthetic_roundtrip(store: OciStore, *, preserve_legacy_orphan: bool = False
             legacy_state = quarantine_legacy_orphan(store, legacy)
         quarantined = True
     else:
-        ensure(not preserve_legacy_orphan and
-               not LEGACY_QUARANTINE.exists() and not LEGACY_QUARANTINE.is_symlink(),
+        ensure(not preserve_legacy_orphan,
+               "Explicit quarantine requested but no legacy synthetic object exists.")
+        ensure(not LEGACY_QUARANTINE.exists() and not LEGACY_QUARANTINE.is_symlink(),
                "Historical quarantine receipt and live OCI object disagree.")
 
     with tempfile.TemporaryDirectory(prefix="retally-recovery-synthetic-") as temp:
