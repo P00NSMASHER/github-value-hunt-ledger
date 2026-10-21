@@ -83,6 +83,22 @@ def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def synthetic_object_key(name: str, *, upload: bool = False) -> str:
+    """Restrict all OCI object mutations/reads to exact synthetic test keys."""
+    valid = isinstance(name, str) and RECOVERY_OBJECT.fullmatch(name) is not None
+    if not upload:
+        valid = valid or (isinstance(name, str) and LEGACY_OBJECT.fullmatch(name) is not None)
+    ensure(valid, "Refusing non-synthetic OCI object key.")
+    return name
+
+
+def synthetic_etag(value: str) -> str:
+    ensure(isinstance(value, str) and
+           re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", value) is not None,
+           "Refusing unsafe or missing OCI object ETag.")
+    return value
+
+
 def parse_bucket_receipt(path: Path) -> dict:
     ensure(_private(path), "Bucket receipt must be a private regular file owned by this user.")
     try:
@@ -272,10 +288,9 @@ class OciStore:
         return items
 
     def get(self, name: str, destination: Path, *, etag: str, max_size: int = MAX_SEALED) -> bytes:
+        name = synthetic_object_key(name)
+        etag = synthetic_etag(etag)
         ensure(not destination.exists() and not destination.is_symlink(), "Ciphertext download destination exists.")
-        ensure(isinstance(etag, str) and
-               re.fullmatch(r"[A-Za-z0-9._:-]{1,256}", etag) is not None,
-               "Download needs one verified OCI object ETag without unsafe characters.")
         ensure(type(max_size) is int and 0 < max_size <= MAX_SEALED,
                "Download size bound must be a positive synthetic-only limit.")
         # HEAD must first confirm content-length <= max_size. The If-Match
@@ -291,8 +306,7 @@ class OciStore:
         return destination.read_bytes()
 
     def put(self, name: str, source: Path) -> str:
-        ensure(isinstance(name, str) and RECOVERY_OBJECT.fullmatch(name) is not None,
-               "New uploads must use a 32-hex synthetic-recovery object key.")
+        name = synthetic_object_key(name, upload=True)
         ensure(_private(source) and source.stat().st_size <= MAX_SEALED,
                "Synthetic ciphertext source is not private or is oversized.")
         # OCI --no-overwrite may return exit code ZERO with an "already exists"
@@ -312,6 +326,7 @@ class OciStore:
         return reply["etag"]
 
     def head(self, name: str) -> dict:
+        name = synthetic_object_key(name)
         raw = self.cli("os", "object", "head", *self.args(), "--name", name)
         try:
             h = json.loads(raw)
@@ -325,11 +340,8 @@ class OciStore:
         return h
 
     def delete_version(self, name: str, etag: str) -> None:
-        ensure(isinstance(name, str) and
-               (RECOVERY_OBJECT.fullmatch(name) is not None or
-                LEGACY_OBJECT.fullmatch(name) is not None),
-               "Refusing to delete an object outside the approved synthetic key formats.")
-        ensure(isinstance(etag, str) and bool(etag), "Conditional delete needs an original ETag.")
+        name = synthetic_object_key(name)
+        etag = synthetic_etag(etag)
         # --if-match prevents deletion of a different object after an unknown overwrite.
         self.cli("os", "object", "delete", *self.args(), "--name", name,
                  "--if-match", etag, "--force")
