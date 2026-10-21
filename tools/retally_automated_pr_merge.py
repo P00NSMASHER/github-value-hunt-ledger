@@ -103,6 +103,8 @@ def match_fresh_run(runs: list[dict], branch: str, sha: str, started: dt.datetim
 
 
 def dispatch_and_verify(branch: str, sha: str, *, deadline: float | None = None) -> int:
+    if deadline is not None and time.monotonic() + 15 >= deadline:
+        raise ProposalHold("No remaining runtime budget to dispatch proof CI")
     since = dt.datetime.now(dt.timezone.utc)
     gh("POST", f"repos/{REPO}/actions/workflows/{GATE_WORKFLOW}/dispatches",
        {"ref": branch})
