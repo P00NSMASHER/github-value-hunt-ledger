@@ -78,7 +78,10 @@ class RaceProofTests(TestCase):
         with patch.dict(os.environ, env), patch.object(merge, "gh", side_effect=traced), \
              patch.object(merge, "dispatch_and_verify", return_value=455) as fresh:
             result = merge.integrate(LANE, 99, HEAD, BASE)
-        fresh.assert_called_once_with(PROOF_BRANCH, PROOF)
+        fresh.assert_called_once()
+        self.assertEqual(fresh.call_args.args, (PROOF_BRANCH, PROOF))
+        self.assertIn("deadline", fresh.call_args.kwargs)
+        self.assertIsInstance(fresh.call_args.kwargs["deadline"], float)
         self.assertEqual(result["result"], "MERGED_WITH_RECONCILED_TREE_CI")
         self.assertEqual(result["ci_run_id"], 455)
         self.assertEqual(result["merged_sha"], MERGED)
@@ -167,6 +170,13 @@ class RaceProofTests(TestCase):
              self.assertRaises(ProposalHold):
             merge.integrate(LANE, 99, HEAD, BASE)
         self.assertFalse(any(method == "PUT" for method, _ in calls))
+
+    def test_expired_budget_blocks_ci_dispatch_before_provider_writes(self):
+        with patch.object(merge.time, "monotonic", return_value=5000.0), \
+             patch.object(merge, "gh") as provider, \
+             self.assertRaises(ProposalHold):
+            merge.dispatch_and_verify(BRANCH, HEAD, deadline=5010.0)
+        provider.assert_not_called()
 
     def test_missing_run_identity_refuses_provider_write(self):
         with patch.dict(os.environ, {"GITHUB_RUN_ID": "", "GITHUB_RUN_ATTEMPT": "1"}), \
