@@ -7,7 +7,7 @@ failure are not an empty ledger. This module neither discovers a live source nor
 binds source cases to customer identities or verifies payments.
 
 Pinned producer: P00NSMASHER/capturebrief @
-12d90024f053a78ead7936abf092931fce240d3e,
+9449210bb8d2fbaf2c618e3ccdc6e993a8d1152de,
 capturebrief_core/{model,ledger,outcomes}.py.
 """
 

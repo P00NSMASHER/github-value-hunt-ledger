@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import time
+from urllib.error import HTTPError
 from urllib.parse import urlencode, urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -35,6 +36,18 @@ BUCKET = "retally-synthetic-sealed-recovery"
 SHAPE = "VM.Standard.E2.1.Micro"
 ALLOWED_EVENTS = {"schedule", "workflow_dispatch"}
 OIDC_HOST = "pipelines.actions.githubusercontent.com"
+# GitHub documents *.actions.githubusercontent.com for the token-request
+# endpoint. Its hosted runners also use regional pipelinesghub* subdomains.
+# Restrict to those exact GitHub-operated pipeline host shapes.
+OIDC_REGIONAL_HOST = re.compile(
+    r"pipelinesghub[a-z0-9]{1,24}\.actions\.githubusercontent\.com"
+)
+# Confirmed in authenticated GitHub-hosted run 39606539848. GitHub also
+# serves job-scoped OIDC requests from regional run-actions-N-azure-REGION
+# endpoints. Never accept an arbitrary domain or user-configured suffix.
+OIDC_AZURE_RUNNER_HOST = re.compile(
+    r"run-actions-[0-9]{1,3}-azure-[a-z0-9]{2,24}\.actions\.githubusercontent\.com"
+)
 MAX_TOKEN = 32768
 
 
@@ -76,9 +89,35 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
             domain.path in ("", "/") and not domain.query and not domain.fragment,
             "Identity-domain URL must be an OCI HTTPS identity domain origin")
     oidc = urlparse(environ["ACTIONS_ID_TOKEN_REQUEST_URL"])
-    require(oidc.scheme == "https" and oidc.hostname == OIDC_HOST and
-            not oidc.username and not oidc.password and not oidc.port,
-            "GitHub OIDC request endpoint is not trusted")
+    approved_oidc_host = (
+        oidc.hostname == OIDC_HOST or
+        OIDC_REGIONAL_HOST.fullmatch(oidc.hostname or "") is not None or
+        OIDC_AZURE_RUNNER_HOST.fullmatch(oidc.hostname or "") is not None
+    )
+    approved_oidc_origin = (
+        oidc.scheme == "https" and approved_oidc_host and
+        not oidc.username and not oidc.password and not oidc.port and
+        bool(oidc.path) and not oidc.fragment
+    )
+    if not approved_oidc_origin:
+        # The request URL can contain a job-specific token path/query. Never
+        # log those fields. Print only validated GitHub subdomain metadata.
+        hostname = oidc.hostname or ""
+        is_github_host = re.fullmatch(
+            r"[a-z0-9][a-z0-9-]{1,62}\.actions\.githubusercontent\.com",
+            hostname,
+        ) is not None
+        label = hostname.split(".", 1)[0] if is_github_host else "OTHER"
+        print(
+            "RETALLY OCI OIDC ORIGIN: label=" + label +
+            " github_suffix=" + str(is_github_host) +
+            " https=" + str(oidc.scheme == "https") +
+            " port_explicit=" + str(oidc.port is not None) +
+            " path_present=" + str(bool(oidc.path)) +
+            " userinfo_present=" + str(bool(oidc.username or oidc.password)) +
+            " fragment_present=" + str(bool(oidc.fragment))
+        )
+    require(approved_oidc_origin, "GitHub OIDC request endpoint is not trusted")
     require(re.fullmatch(r"[a-zA-Z0-9_-]{2,80}",
                          environ["RETALLY_OCI_NAMESPACE"]) is not None,
             "Invalid OCI namespace")
@@ -97,10 +136,37 @@ class NoRedirect(HTTPRedirectHandler):
         raise Refused("Authentication endpoint redirect refused")
 
 
+# Fixed allowlists only; provider messages, token URLs, JWTs and credentials
+# must never appear in diagnostics or exception strings.
+AUTH_HTTP_STATUSES = {400, 401, 403, 404, 405, 409, 422, 429, 500, 502, 503}
+AUTH_OAUTH_ERRORS = {
+    "invalid_client", "unauthorized_client", "invalid_grant",
+    "invalid_request", "unsupported_grant_type", "access_denied",
+}
+
+
+def classify_auth_http_error(error: HTTPError) -> str:
+    status = str(error.code) if type(error.code) is int and error.code in AUTH_HTTP_STATUSES else "other"
+    category = "other"
+    try:
+        # Read a bounded response privately. Only the exact approved 'error'
+        # category can escape; descriptions and unknown keys are discarded.
+        raw = error.read(4097)
+        if len(raw) <= 4096:
+            doc = json.loads(raw)
+            if isinstance(doc, dict) and doc.get("error") in AUTH_OAUTH_ERRORS:
+                category = doc["error"]
+    except Exception:
+        pass
+    return "AUTH_HTTP_" + status + "_" + category
+
+
 def json_response(request: Request, limit: int = MAX_TOKEN) -> dict:
     try:
         with build_opener(NoRedirect()).open(request, timeout=15) as response:
             raw = response.read(limit + 1)
+    except HTTPError as exc:
+        raise Refused(classify_auth_http_error(exc)) from None
     except Exception:
         raise Refused("Authentication service request failed (details withheld)") from None
     require(len(raw) <= limit, "Authentication service response too large")
@@ -160,7 +226,14 @@ def github_oidc_token(settings: dict[str, str]) -> str:
     return jwt
 
 
-def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str) -> str:
+def encode_rpst_public_key(public_der: bytes) -> str:
+    """Oracle RPST exchange expects DER SPKI in one Base64 field, not PEM."""
+    require(isinstance(public_der, bytes) and len(public_der) >= 15 and
+            public_der[0] == 0x30, "Invalid DER public key")
+    return base64.b64encode(public_der).decode("ascii")
+
+
+def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_key_b64: str) -> str:
     # A dedicated, NON-ADMIN identity-domain OAuth client may invoke token
     # exchange only. It is not itself a blanket OCI API authorization.
     credentials = (settings["RETALLY_OCI_CLIENT_ID"] + ":" +
@@ -170,7 +243,7 @@ def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str
     payload = urlencode({
         "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
         "requested_token_type": "urn:oci:token-type:oci-rpst",
-        "public_key": public_pem, "subject_token": github_jwt,
+        "public_key": public_key_b64, "subject_token": github_jwt,
         "subject_token_type": "jwt", "res_type": "ref_github", "rpst_exp": "20",
     }).encode("utf-8")
     request = Request(url, data=payload, method="POST", headers={
@@ -178,7 +251,18 @@ def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
     })
-    token = json_response(request).get("token")
+    try:
+        token = json_response(request).get("token")
+    except Refused as exc:
+        error_code = str(exc)
+        if re.fullmatch(
+            r"AUTH_HTTP_(?:400|401|403|404|405|409|422|429|500|502|503|other)_"
+            r"(?:invalid_client|unauthorized_client|invalid_grant|invalid_request|"
+            r"unsupported_grant_type|access_denied|other)",
+            error_code,
+        ):
+            raise Refused("OCI_TOKEN_EXCHANGE_" + error_code) from None
+        raise Refused("OCI_TOKEN_EXCHANGE") from None
     require(isinstance(token, str) and token.count(".") == 2 and len(token) <= MAX_TOKEN,
             "OCI did not issue a valid-shaped RPST")
     return token
@@ -222,13 +306,25 @@ def do_live_check(settings: dict[str, str]) -> None:
     except Exception:
         raise Refused("OIDC_TOKEN_OR_CLAIMS") from None
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    public_pem = key.public_key().public_bytes(
-        serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
+    public_der = key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
+    public_key_b64 = encode_rpst_public_key(public_der)
     private_pem = key.private_bytes(
         serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption()).decode()
     try:
-        rpst = exchange_for_rpst(settings, jwt, public_pem)
+        rpst = exchange_for_rpst(settings, jwt, public_key_b64)
+    except Refused as exc:
+        # The category was already reduced to a fixed non-secret allowlist.
+        label = str(exc)
+        if re.fullmatch(
+            r"OCI_TOKEN_EXCHANGE_AUTH_HTTP_(?:400|401|403|404|405|409|422|429|500|502|503|other)_"
+            r"(?:invalid_client|unauthorized_client|invalid_grant|invalid_request|"
+            r"unsupported_grant_type|access_denied|other)",
+            label,
+        ):
+            raise Refused(label) from None
+        raise Refused("OCI_TOKEN_EXCHANGE") from None
     except Exception:
         raise Refused("OCI_TOKEN_EXCHANGE") from None
     # In-memory ephemeral key and RPST only. No OCI writes, object-list or GET.
@@ -283,7 +379,21 @@ def safe_failure_code(exc: Exception) -> str:
             label,
         ):
             return label
+        if re.fullmatch(
+            r"OCI_TOKEN_EXCHANGE_AUTH_HTTP_(?:400|401|403|404|405|409|422|429|500|502|503|other)_"
+            r"(?:invalid_client|unauthorized_client|invalid_grant|invalid_request|"
+            r"unsupported_grant_type|access_denied|other)",
+            label,
+        ):
+            return label
         if label in {
+            "Only scheduled or manual main-branch execution is allowed",
+            "Monitor is not explicitly enabled",
+            "Identity-domain URL must be an OCI HTTPS identity domain origin",
+            "GitHub OIDC request endpoint is not trusted",
+            "Invalid OCI namespace",
+            "Invalid OCI compartment/tenancy OCID",
+            "Invalid expected VM OCID",
             "OIDC_TOKEN_OR_CLAIMS", "OCI_TOKEN_EXCHANGE",
             "OCI_SIGNER_INITIALIZATION", "OCI_CLIENT_INITIALIZATION",
             "OCI_BUCKET_READ_OR_VALIDATION", "OCI_INSTANCE_READ_OR_VALIDATION",

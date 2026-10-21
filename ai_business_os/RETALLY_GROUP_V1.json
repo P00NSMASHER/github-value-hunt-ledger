@@ -2,7 +2,7 @@
   "catalog_version": 1,
   "title": "RETALLY Group",
   "mode": "PLANNING_PREVIEW",
-  "as_of": "2026-10-20",
+  "as_of": "2026-10-21",
   "source_repository_revision": "04252c375e8abf8564dd42a5fd5524bf6635a4fa",
   "divisions": [
     {
@@ -237,9 +237,9 @@
       "division_id": "ventures",
       "kind": "venture",
       "purpose": "Construction scope and change-order evidence product thesis.",
-      "stage": "Research lane; unbound identity correction proposed",
+      "stage": "Research lane; coverage correction merged; canonical identity unresolved",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Review Portfolio Brain PR #732, which removes the mistaken CaptureBrief PRJ-004 association; keep ScopeSignal unbound until a separate canonical identity is evidenced, and distinguish owned implementation from third-party research references.",
+      "next_action": "Preserve the merged Portfolio Brain PR #732 correction and keep ScopeSignal unbound. Establish a distinct source-backed canonical project identity and verified private business mapping before any operational integration; distinguish owned research from third-party references.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -261,9 +261,9 @@
           "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
         },
         {
-          "label": "Proposed unbound coverage correction (unmerged PR #732)",
-          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/27150fe15a6f748bd461e20dec325d32a6864142/registry/PORTFOLIO_COVERAGE.json",
-          "observed_on": "2026-10-20",
+          "label": "Merged unbound coverage correction (Portfolio Brain PR #732)",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c/registry/PORTFOLIO_COVERAGE.json",
+          "observed_on": "2026-10-21",
           "git_blob_sha": "49886d0a96177c9eb40b164c64e4d8b9187582f4"
         }
       ],

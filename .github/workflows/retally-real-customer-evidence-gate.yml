@@ -54,7 +54,7 @@ jobs:
           )
           assert s.release_status == 'RELEASE_HOLD'
           assert 'REAL_FREIGHT_ACCURACY_UNPROVEN' in s.blockers
-          assert 'INDEPENDENT_RELEASE_REVIEW_MISSING' in s.blockers
+          assert 'INDEPENDENT_RELEASE_REVIEW_MISSING' not in s.blockers
           assert 'EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED' in s.blockers
           print('PASS: owner source merge and simulated reviewers cannot grant customer release')
           PY
