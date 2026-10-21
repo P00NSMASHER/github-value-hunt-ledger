@@ -1,0 +1,34 @@
+[Unit]
+Description=RETALLY seven-branch synthetic-only private workbench
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=retally
+Group=retally
+WorkingDirectory=/opt/retally/current
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 -m recoveryworks.workbench_server --workspace /var/lib/retally/synthetic-preview --port 18765 --external-origin https://workbench.retallyrecovery.com
+Restart=on-failure
+RestartSec=5s
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/retally
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

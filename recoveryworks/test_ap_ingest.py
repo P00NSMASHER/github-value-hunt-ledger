@@ -90,7 +90,7 @@ class APIngestTests(unittest.TestCase):
             payments.write_text(
                 "Payment_Number,Vendor,Invoice_Number,Amount,Payment_Date\n"
                 "P-1,Vendor A,INV-1,100.00,2026-08-01\n"
-                "P-2,Vendor A,INV-1-DUP,100.00,2026-08-02\n",
+                "P-2,Vendor A,INV-1,100.00,2026-08-02\n",
                 encoding="utf-8",
             )
             invoices.write_text(

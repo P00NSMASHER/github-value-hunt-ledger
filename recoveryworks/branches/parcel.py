@@ -41,6 +41,8 @@ def _decimal(name: str, value: str | int | float | Decimal) -> Decimal:
         result = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise ValueError(f"{name} must be numeric") from exc
+    if not result.is_finite():
+        raise ValueError(f"{name} must be finite")
     if result < 0:
         raise ValueError(f"{name} must be non-negative")
     return result

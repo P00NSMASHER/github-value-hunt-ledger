@@ -67,6 +67,8 @@ def _quantity(name: str, value: str | int | float | Decimal | None) -> Decimal:
         result = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise ValueError(f"{name} must be numeric") from exc
+    if not result.is_finite():
+        raise ValueError(f"{name} must be finite")
     if result < 0:
         raise ValueError(f"{name} must be non-negative")
     return result
@@ -470,7 +472,18 @@ def audit_utility_bills(
     observations: list[RecoveryObservation] = []
     exceptions: list[UtilityAuditException] = []
 
-    for bill in sorted(bills, key=lambda b: b.bill_id):
+    grouped_bills = {}
+    for bill in bills:
+        key = (bill.utility_id, bill.account_id, bill.bill_id)
+        grouped_bills.setdefault(key, []).append(bill)
+    unique_bills = []
+    for key, values in sorted(grouped_bills.items()):
+        if len(values) > 1:
+            exceptions.append(UtilityAuditException(key[2], "DUPLICATE_UTILITY_BILL",
+                "Repeated bill identity requires reconciliation; all versions excluded"))
+            continue
+        unique_bills.append(values[0])
+    for bill in sorted(unique_bills, key=lambda b: b.bill_id):
         versions = tariff_index.get(
             (bill.utility_id, bill.normalized_service_class), []
         )

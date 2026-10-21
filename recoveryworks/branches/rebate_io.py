@@ -18,7 +18,7 @@ from .rebate import (
 )
 
 
-def _money_to_cents(value: str) -> int:
+def _money_to_cents(value: str, *, signed: bool = False) -> int:
     text = (value or "").strip().replace("$", "").replace(",", "")
     if not text:
         raise ValueError("money value is required")
@@ -26,7 +26,9 @@ def _money_to_cents(value: str) -> int:
         amount = Decimal(text)
     except InvalidOperation as exc:
         raise ValueError(f"invalid money value: {value!r}") from exc
-    if amount < 0:
+    if not amount.is_finite():
+        raise ValueError("money must be finite")
+    if amount < 0 and not signed:
         raise ValueError("money value must be non-negative")
     return int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
@@ -137,6 +139,8 @@ def load_rebate_programs_json(
             program_id=str(entry.get("program_id") or "").strip(),
             period_start=str(entry.get("period_start") or "").strip(),
             period_end=str(entry.get("period_end") or "").strip(),
+            return_policy=entry.get("return_policy"),
+            payment_due_date=entry.get("payment_due_date"),
             tier_mode=tier_mode,
             measurement_basis=measurement_basis,
             tiers=tuple(tiers),
@@ -161,16 +165,17 @@ def load_rebate_purchases_csv(
             qty = Decimal(quantity)
         except InvalidOperation as exc:
             raise ValueError(f"row {row_number}: Quantity must be numeric") from exc
-        if qty < 0:
-            raise ValueError(f"row {row_number}: Quantity must be non-negative")
+        if not qty.is_finite():
+            raise ValueError("quantity must be finite")
         result.append(RebatePurchaseLine(
             purchase_id=_required(row, "Purchase_ID", row_number),
             supplier_id=_required(row, "Supplier", row_number),
             program_id=_required(row, "Program_ID", row_number),
             purchase_date=_required(row, "Purchase_Date", row_number),
             quantity=str(qty),
+            return_of_purchase_id=(row.get("Return_Of_Purchase_ID") or "").strip() or None,
             net_spend_cents=_money_to_cents(
-                _required(row, "Net_Spend", row_number)
+                _required(row, "Net_Spend", row_number), signed=True
             ),
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
@@ -193,9 +198,10 @@ def load_rebate_settlements_csv(
             supplier_id=_required(row, "Supplier", row_number),
             program_id=_required(row, "Program_ID", row_number),
             amount_received_cents=_money_to_cents(
-                _required(row, "Amount_Received", row_number)
+                _required(row, "Amount_Received", row_number), signed=True
             ),
             settlement_date=_required(row, "Settlement_Date", row_number),
+            reverses_id=(row.get("Reverses_ID") or "").strip() or None,
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
