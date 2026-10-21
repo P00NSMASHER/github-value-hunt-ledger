@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import time
+from urllib.error import HTTPError
 from urllib.parse import urlencode, urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -135,10 +136,37 @@ class NoRedirect(HTTPRedirectHandler):
         raise Refused("Authentication endpoint redirect refused")
 
 
+# Fixed allowlists only; provider messages, token URLs, JWTs and credentials
+# must never appear in diagnostics or exception strings.
+AUTH_HTTP_STATUSES = {400, 401, 403, 404, 405, 409, 422, 429, 500, 502, 503}
+AUTH_OAUTH_ERRORS = {
+    "invalid_client", "unauthorized_client", "invalid_grant",
+    "invalid_request", "unsupported_grant_type", "access_denied",
+}
+
+
+def classify_auth_http_error(error: HTTPError) -> str:
+    status = str(error.code) if type(error.code) is int and error.code in AUTH_HTTP_STATUSES else "other"
+    category = "other"
+    try:
+        # Read a bounded response privately. Only the exact approved 'error'
+        # category can escape; descriptions and unknown keys are discarded.
+        raw = error.read(4097)
+        if len(raw) <= 4096:
+            doc = json.loads(raw)
+            if isinstance(doc, dict) and doc.get("error") in AUTH_OAUTH_ERRORS:
+                category = doc["error"]
+    except Exception:
+        pass
+    return "AUTH_HTTP_" + status + "_" + category
+
+
 def json_response(request: Request, limit: int = MAX_TOKEN) -> dict:
     try:
         with build_opener(NoRedirect()).open(request, timeout=15) as response:
             raw = response.read(limit + 1)
+    except HTTPError as exc:
+        raise Refused(classify_auth_http_error(exc)) from None
     except Exception:
         raise Refused("Authentication service request failed (details withheld)") from None
     require(len(raw) <= limit, "Authentication service response too large")
@@ -216,7 +244,18 @@ def exchange_for_rpst(settings: dict[str, str], github_jwt: str, public_pem: str
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
     })
-    token = json_response(request).get("token")
+    try:
+        token = json_response(request).get("token")
+    except Refused as exc:
+        error_code = str(exc)
+        if re.fullmatch(
+            r"AUTH_HTTP_(?:400|401|403|404|405|409|422|429|500|502|503|other)_"
+            r"(?:invalid_client|unauthorized_client|invalid_grant|invalid_request|"
+            r"unsupported_grant_type|access_denied|other)",
+            error_code,
+        ):
+            raise Refused("OCI_TOKEN_EXCHANGE_" + error_code) from None
+        raise Refused("OCI_TOKEN_EXCHANGE") from None
     require(isinstance(token, str) and token.count(".") == 2 and len(token) <= MAX_TOKEN,
             "OCI did not issue a valid-shaped RPST")
     return token
@@ -267,6 +306,17 @@ def do_live_check(settings: dict[str, str]) -> None:
         serialization.NoEncryption()).decode()
     try:
         rpst = exchange_for_rpst(settings, jwt, public_pem)
+    except Refused as exc:
+        # The category was already reduced to a fixed non-secret allowlist.
+        label = str(exc)
+        if re.fullmatch(
+            r"OCI_TOKEN_EXCHANGE_AUTH_HTTP_(?:400|401|403|404|405|409|422|429|500|502|503|other)_"
+            r"(?:invalid_client|unauthorized_client|invalid_grant|invalid_request|"
+            r"unsupported_grant_type|access_denied|other)",
+            label,
+        ):
+            raise Refused(label) from None
+        raise Refused("OCI_TOKEN_EXCHANGE") from None
     except Exception:
         raise Refused("OCI_TOKEN_EXCHANGE") from None
     # In-memory ephemeral key and RPST only. No OCI writes, object-list or GET.
@@ -318,6 +368,13 @@ def safe_failure_code(exc: Exception) -> str:
         label = str(exc)
         if re.fullmatch(
             r"(Untrusted GitHub execution context|Missing required Oracle/GitHub monitor configuration): [A-Z_]{2,64}",
+            label,
+        ):
+            return label
+        if re.fullmatch(
+            r"OCI_TOKEN_EXCHANGE_AUTH_HTTP_(?:400|401|403|404|405|409|422|429|500|502|503|other)_"
+            r"(?:invalid_client|unauthorized_client|invalid_grant|invalid_request|"
+            r"unsupported_grant_type|access_denied|other)",
             label,
         ):
             return label
