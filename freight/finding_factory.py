@@ -15,6 +15,7 @@ authority, but only a verified controlling rule can produce VALIDATED dollars.
 """
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Iterable
@@ -27,6 +28,7 @@ from freight.contracts import (
     VALIDATED,
     TruthManifest,
     canonical_hash,
+    freeze_population,
     freeze_truth,
     make_finding,
 )
@@ -127,7 +129,18 @@ class FindingFactoryBatch:
 def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
-    return value.strip()
+    if value != value.strip():
+        raise ValueError(name + " must not have surrounding whitespace")
+    return value
+
+
+def _identity(name: str, value: str) -> str:
+    text = _text(name, value)
+    if unicodedata.normalize("NFC", text) != text:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character).startswith("C") for character in text):
+        raise ValueError(name + " contains control characters")
+    return text
 
 
 def _cents(name: str, value: int, *, positive: bool = False) -> int:
@@ -149,9 +162,10 @@ def _iso_date(name: str, value: str) -> date:
 def _validate_charge(charge: InvoiceCharge) -> date:
     for name in (
         "buyer_id", "business_unit", "invoice_id", "shipment_id", "customer_id",
-        "carrier_id", "currency", "charge_id", "charge_code", "source_hash",
+        "carrier_id", "currency", "charge_code", "source_hash",
     ):
         _text(name, getattr(charge, name))
+    _identity("charge_id", charge.charge_id)
     if type(charge.quantity_units) is not int or charge.quantity_units <= 0:
         raise ValueError("quantity_units must be a positive integer")
     _cents("billed_cents", charge.billed_cents)
@@ -164,6 +178,7 @@ def _validate_rule(rule: ChargeRule) -> tuple[date, date | None]:
         "authority_document_id", "charge_code", "document_source_hash",
     ):
         _text(name, getattr(rule, name))
+    _identity("authority_document_id", rule.authority_document_id)
     if type(rule.verified_controlling_authority) is not bool:
         raise ValueError("verified_controlling_authority must be a boolean")
     start = _iso_date("effective_from", rule.effective_from)
@@ -338,18 +353,27 @@ def derive_batch(
     charges: Iterable[InvoiceCharge],
     rules: Iterable[ChargeRule],
 ) -> FindingFactoryBatch:
+    frozen_population = freeze_population(
+        population.buyer_id,
+        population.business_unit,
+        population.selection_rule,
+        population.rows,
+    )
+    if frozen_population != population:
+        raise ValueError("population proof or canonical ordering mismatch")
+
     normalized_charges = tuple(sorted(charges, key=lambda charge: charge.charge_id))
     if len({charge.charge_id for charge in normalized_charges}) != len(normalized_charges):
         raise ValueError("duplicate charge_id")
     normalized_rules = tuple(rules)
-    row_index = {row.row_key: row for row in population.rows}
+    row_index = {row.identity_key: row for row in population.rows}
 
     derivations = []
     for charge in normalized_charges:
         _validate_charge(charge)
         if (charge.buyer_id, charge.business_unit) != (population.buyer_id, population.business_unit):
             raise ValueError("charge scope mismatch")
-        row = row_index.get(f"{charge.invoice_id}|{charge.shipment_id}")
+        row = row_index.get((charge.invoice_id, charge.shipment_id))
         if row is None:
             raise ValueError("charge outside frozen population")
         if (charge.customer_id, charge.carrier_id, charge.currency) != (

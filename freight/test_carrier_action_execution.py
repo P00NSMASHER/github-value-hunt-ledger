@@ -1,4 +1,4 @@
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
@@ -29,7 +29,7 @@ from freight.carrier_action_workflow import (
     CarrierActionApprovalInput,
     build_carrier_action_proposal_batch,
 )
-from freight.contracts import open_incumbent_output, seal_incumbent_submission
+from freight.contracts import canonical_hash, open_incumbent_output, seal_incumbent_submission
 from freight.engagement_state import resolve_engagement
 from freight.external_action_authorization import (
     ActionType,
@@ -287,6 +287,38 @@ def test_receipt_rejects_execution_before_intent_preparation():
         )
 
 
+def test_self_hashed_receipt_cannot_backdate_execution_before_preparation():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent, executed_at="2026-09-21T11:01:00Z"),
+    )
+    forged = replace(
+        receipt,
+        executed_at="2026-09-21T10:59:59.000000Z",
+    )
+    body = asdict(forged)
+    body.pop("receipt_hash")
+    forged = replace(
+        forged,
+        receipt_hash=canonical_hash({"schema": 1, **body}),
+    )
+
+    with pytest.raises(ValueError, match="cannot precede"):
+        verify_carrier_action_execution_receipt(forged)
+
+
 def test_revocation_after_preparation_blocks_later_execution_receipt():
     auth, proposal, payload, claims = setup()
     intent = build_carrier_action_execution_intent(
@@ -344,6 +376,32 @@ def test_tampered_intent_is_rejected():
             proposal=proposal,
             payload=payload,
             recovery_claims=claims,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "forged_hash"),
+    [
+        ("finding_proof_hashes", "1" * 64),
+        ("finding_review_hashes", "2" * 64),
+    ],
+)
+def test_self_hashed_authorization_cannot_replace_proposal_evidence_bindings(
+    field, forged_hash
+):
+    auth, proposal, payload, claims = setup()
+    forged = replace(auth, **{field: tuple(forged_hash for _ in auth.finding_ids)})
+    body = asdict(forged)
+    body.pop("authorization_hash")
+    forged = replace(forged, authorization_hash=canonical_hash(body))
+
+    with pytest.raises(ValueError, match="authorization finding .* mismatch"):
+        build_carrier_action_execution_intent(
+            authorization=forged,
+            proposal=proposal,
+            payload=payload,
+            recovery_claims=claims,
+            prepared_at="2026-09-21T11:00:00Z",
         )
 
 
@@ -655,3 +713,141 @@ def test_delivery_renderer_keeps_delivery_separate_from_recovery():
     assert "Delivery Confirmation" in text
     assert "Delivery confirmed: **yes**" in text
     assert "does not prove settlement" in text
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("action_type", "UNRECOGNIZED_ACTION"),
+        ("channel", "UNRECOGNIZED_CHANNEL"),
+        ("requested_cents", True),
+        ("requested_cents", 0),
+        ("requested_cents", -1),
+    ],
+)
+def test_self_hashed_delivery_receipt_rejects_invalid_semantics(field, value):
+    _, _, _, _, _, submitted = submitted_context()
+    receipt = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    forged = replace(receipt, **{field: value})
+    body = asdict(forged)
+    body.pop("delivery_receipt_hash")
+    forged = replace(
+        forged,
+        delivery_receipt_hash=canonical_hash({"schema": 1, **body}),
+    )
+
+    with pytest.raises(ValueError):
+        verify_carrier_action_delivery_receipt(forged)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("action_type", "UNRECOGNIZED_ACTION"),
+        ("requested_cents", True),
+        ("requested_cents", 0),
+        ("requested_cents", -1),
+    ],
+)
+def test_self_hashed_execution_receipt_rejects_invalid_action_or_amount(field, value):
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent),
+    )
+    forged = replace(receipt, **{field: value})
+    body = asdict(forged)
+    body.pop("receipt_hash")
+    forged = replace(
+        forged,
+        receipt_hash=canonical_hash({"schema": 1, **body}),
+    )
+
+    with pytest.raises(ValueError):
+        verify_carrier_action_execution_receipt(forged)
+
+
+@pytest.mark.parametrize("kind", ("execution", "delivery"))
+@pytest.mark.parametrize("finding_ids", ((), ("DUPLICATE", "DUPLICATE")))
+def test_self_hashed_receipts_reject_noncanonical_finding_sets(kind, finding_ids):
+    auth, proposal, payload, claims, intent, submitted = submitted_context()
+    if kind == "execution":
+        forged = replace(submitted, finding_ids=finding_ids)
+        body = asdict(forged)
+        body.pop("receipt_hash")
+        forged = replace(
+            forged,
+            receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_execution_receipt
+    else:
+        receipt = record_carrier_action_delivery_confirmation(
+            submitted_receipt=submitted,
+            evidence=delivery_evidence(submitted),
+        )
+        forged = replace(receipt, finding_ids=finding_ids)
+        body = asdict(forged)
+        body.pop("delivery_receipt_hash")
+        forged = replace(
+            forged,
+            delivery_receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_delivery_receipt
+
+    with pytest.raises(ValueError, match="finding_ids"):
+        verify(forged)
+
+@pytest.mark.parametrize("kind", ("execution", "delivery"))
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("buyer_id", "caf\u0065\u0301"),
+        ("business_unit", "unit\u200b"),
+        ("target_carrier_id", "carrier\u2060"),
+        ("currency", "USD\u200b"),
+    ],
+)
+def test_self_hashed_receipts_reject_noncanonical_scope_identities(
+    kind, field, value
+):
+    _, _, _, _, _, submitted = submitted_context()
+    if kind == "execution":
+        forged = replace(submitted, **{field: value})
+        body = asdict(forged)
+        body.pop("receipt_hash")
+        forged = replace(
+            forged,
+            receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_execution_receipt
+    else:
+        receipt = record_carrier_action_delivery_confirmation(
+            submitted_receipt=submitted,
+            evidence=delivery_evidence(submitted),
+        )
+        forged = replace(receipt, **{field: value})
+        body = asdict(forged)
+        body.pop("delivery_receipt_hash")
+        forged = replace(
+            forged,
+            delivery_receipt_hash=canonical_hash({"schema": 1, **body}),
+        )
+        verify = verify_carrier_action_delivery_receipt
+
+    with pytest.raises(ValueError, match="canonical Unicode|control"):
+        verify(forged)
+

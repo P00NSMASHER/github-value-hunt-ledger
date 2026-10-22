@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Iterable
 
+from freight.money_format import format_cents
 from freight.audit_run_manifest import AuditRunManifest, build_audit_run_manifest
 from freight.finding_factory import FindingFactoryBatch, REVIEW, VALIDATED, derive_batch
 from freight.invoice_csv_adapter import InvoiceChargeCSVBatch, parse_invoice_charge_csv
@@ -384,9 +385,9 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         *[
             "- " + item.currency
             + " — Validated discrepancy: **"
-            + item.currency + " " + format(item.validated_discrepancy_cents / 100, ",.2f")
+            + item.currency + " " + format_cents(item.validated_discrepancy_cents)
             + "**; review discrepancy with a calculable expected amount: **"
-            + item.currency + " " + format(item.review_discrepancy_cents / 100, ",.2f")
+            + item.currency + " " + format_cents(item.review_discrepancy_cents)
             + "**"
             for item in summary.currency_discrepancies
         ],

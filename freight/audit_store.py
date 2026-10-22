@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sqlite3
 import time
+import unicodedata
 from pathlib import Path
 from typing import Callable, TypeVar
 
@@ -118,7 +119,9 @@ class AuditStore:
         if not isinstance(value, str) or not value.strip():
             raise ValueError(name + " is required")
         normalized = value.strip()
-        if any(ord(character) < 32 for character in normalized):
+        if normalized != unicodedata.normalize("NFC", normalized):
+            raise ValueError(name + " must use canonical Unicode")
+        if any(unicodedata.category(character).startswith("C") for character in normalized):
             raise ValueError(name + " cannot contain control characters")
         return normalized
 

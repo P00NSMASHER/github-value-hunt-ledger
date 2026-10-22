@@ -10,7 +10,10 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
+import re
+import unicodedata
 
+from freight.money_format import format_cents
 from freight.buyer_review_workflow import (
     BuyerReviewBatch,
     BuyerReviewState,
@@ -22,6 +25,19 @@ from freight.review_packet import ReviewPacket
 from freight.review_routing import ReviewRouting
 from freight.settlement_report import ClaimFindingBinding
 from freight.settlement_store import RecoveryClaim, SettlementStore
+
+
+_SHA256_RE = re.compile(r"[0-9a-f]{64}")
+_CURRENCY_RE = re.compile(r"[A-Z]{3}")
+
+
+def _require_canonical_identity(value: str) -> None:
+    if (
+        value != value.strip()
+        or unicodedata.normalize("NFC", value) != value
+        or any(unicodedata.category(character).startswith("C") for character in value)
+    ):
+        raise ValueError("recovery claim identity must be canonical text")
 
 
 class RecoveryClaimBatchState(str, Enum):
@@ -270,10 +286,51 @@ def build_recovery_claim_batch(
 def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
     if not isinstance(batch, RecoveryClaimBatch):
         raise ValueError("batch must be a RecoveryClaimBatch")
+    if any(
+        not isinstance(value, str) or not value.strip()
+        for value in (batch.buyer_id, batch.business_unit)
+    ):
+        raise ValueError("recovery claim scope identifiers must be non-empty strings")
+    for value in (batch.buyer_id, batch.business_unit):
+        _require_canonical_identity(value)
+    if any(
+        not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None
+        for value in (
+            batch.truth_hash,
+            batch.incumbent_output_hash,
+            batch.buyer_review_batch_hash,
+        )
+    ):
+        raise ValueError("recovery claim provenance hashes must be SHA-256 digests")
+    if type(batch.claim_count) is not int or batch.claim_count < 0:
+        raise ValueError("recovery claim claim count must be a non-negative integer")
+    if (
+        type(batch.fee_disqualified_count) is not int
+        or not 0 <= batch.fee_disqualified_count <= batch.claim_count
+    ):
+        raise ValueError(
+            "recovery claim fee-disqualified count must be a non-negative integer "
+            "not exceeding claim count"
+        )
     if not (
         len(batch.records) == len(batch.claims) == len(batch.bindings) == batch.claim_count
     ):
         raise ValueError("recovery claim batch cardinality mismatch")
+    claim_ids = tuple(record.claim_id for record in batch.records)
+    finding_ids = tuple(record.finding_id for record in batch.records)
+    review_hashes = tuple(record.review_hash for record in batch.records)
+    if len(set(claim_ids)) != len(claim_ids) or len(set(finding_ids)) != len(finding_ids):
+        raise ValueError("duplicate recovery claim identity")
+    if len(set(review_hashes)) != len(review_hashes):
+        raise ValueError("duplicate recovery review proof")
+    canonical_issued_at, _ = _timestamp(batch.issued_at)
+    if canonical_issued_at != batch.issued_at:
+        raise ValueError("recovery claim batch issued_at must be canonical UTC")
+    if (
+        type(batch.confirmed_review_count) is not int
+        or batch.confirmed_review_count != batch.claim_count
+    ):
+        raise ValueError("recovery claim confirmed review count mismatch")
 
     for record, claim, binding in zip(
         batch.records,
@@ -281,6 +338,50 @@ def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         batch.bindings,
         strict=True,
     ):
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (
+                record.claim_id,
+                record.finding_id,
+                record.reference,
+                record.payer_id,
+                record.payee_id,
+                record.currency,
+            )
+        ):
+            raise ValueError("recovery claim text fields must be non-empty strings")
+        for value in (
+            record.claim_id,
+            record.finding_id,
+            record.reference,
+            record.payer_id,
+            record.payee_id,
+            record.currency,
+        ):
+            _require_canonical_identity(value)
+        if _CURRENCY_RE.fullmatch(record.currency) is None:
+            raise ValueError(
+                "recovery claim currency must be a three-letter uppercase code"
+            )
+        if any(
+            not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None
+            for value in (record.finding_proof_hash, record.review_hash)
+        ):
+            raise ValueError(
+                "recovery claim record proof hashes must be SHA-256 digests"
+            )
+        if record.claim_id != "claim:" + record.finding_proof_hash:
+            raise ValueError("recovery claim id must derive from finding proof")
+        if (
+            type(record.incumbent_preidentified) is not bool
+            or type(record.fee_disqualified) is not bool
+            or type(claim.fee_disqualified) is not bool
+        ):
+            raise ValueError("recovery claim fee-disqualification flags must be boolean")
+        if type(record.amount_cents) is not int or not 0 < record.amount_cents <= 2**63 - 1:
+            raise ValueError("recovery claim amount must be positive integer cents within SQLite range")
+        if record.issued_at != batch.issued_at:
+            raise ValueError("recovery claim issued-at mismatch")
         if (
             record.claim_id != claim.claim_id
             or record.claim_id != binding.claim_id
@@ -414,7 +515,7 @@ def render_recovery_claim_batch_markdown(batch: RecoveryClaimBatch) -> str:
             f"## {record.claim_id}",
             "",
             f"- Finding: `{record.finding_id}`",
-            f"- Currency / amount: **{record.currency} {record.amount_cents / 100:,.2f}**",
+            f"- Currency / amount: **{record.currency} {format_cents(record.amount_cents)}**",
             f"- Reference: `{record.reference}`",
             f"- Payer / payee: `{record.payer_id}` → `{record.payee_id}`",
             f"- Fee disqualified: **{'yes' if record.fee_disqualified else 'no'}**",

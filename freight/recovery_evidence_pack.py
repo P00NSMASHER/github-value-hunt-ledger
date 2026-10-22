@@ -8,6 +8,11 @@ import argparse, hashlib, json
 from datetime import date
 from pathlib import Path
 
+if __package__:
+    from freight.money_format import format_cents
+else:
+    from money_format import format_cents
+
 VALID_DISPOSITIONS = {"VALIDATED", "REJECTED", "REVIEW"}
 VALID_AUTH = {"NOT_REQUESTED", "PENDING", "AUTHORIZED", "DECLINED"}
 VALID_CLAIM = {"NOT_SUBMITTED", "SUBMITTED", "PENDING", "APPROVED", "DENIED", "CLOSED"}
@@ -16,7 +21,7 @@ SUPPRESSION_FLAGS = ("incumbent_known", "automatic_credit", "preexisting_claim",
 
 
 def money(cents):
-    return ("-" if cents < 0 else "") + "$" + f"{abs(cents) / 100:,.2f}"
+    return ("-" if cents < 0 else "") + "$" + format_cents(abs(cents))
 
 
 def require_text(row, key):

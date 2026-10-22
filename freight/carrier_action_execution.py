@@ -7,11 +7,13 @@ Authorization, submission and delivery remain distinct states.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Iterable
 
+from freight.money_format import format_cents
 from freight.carrier_action_payload import (
     CarrierActionPayload,
     verify_carrier_action_payload,
@@ -154,6 +156,32 @@ def _text(name: str, value: str) -> str:
     return value.strip()
 
 
+def _identity(name: str, value: str) -> str:
+    text = _text(name, value)
+    if value != text:
+        raise ValueError(name + " must not contain surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode")
+    if any(unicodedata.category(character).startswith("C") for character in value):
+        raise ValueError(name + " must not contain control characters")
+    return value
+
+
+def _finding_ids(value: tuple[str, ...]) -> tuple[str, ...]:
+    if not isinstance(value, tuple) or not value:
+        raise ValueError("finding_ids must be a non-empty tuple")
+    if any(
+        not isinstance(finding_id, str)
+        or not finding_id
+        or finding_id != finding_id.strip()
+        for finding_id in value
+    ):
+        raise ValueError("finding_ids must contain canonical non-empty strings")
+    if len(set(value)) != len(value) or value != tuple(sorted(value)):
+        raise ValueError("finding_ids must be unique and canonically ordered")
+    return value
+
+
 def _timestamp(name: str, value: str) -> tuple[str, datetime]:
     text = _text(name, value)
     normalized = text[:-1] + "+00:00" if text.endswith("Z") else text
@@ -195,6 +223,27 @@ def _verify_authorization_payload_scope(
         raise ValueError("authorization currency mismatch")
     if authorization.finding_ids != tuple(sorted(proposal.finding_ids)):
         raise ValueError("authorization finding set mismatch")
+    proposal_evidence = {
+        finding_id: (proof_hash, review_hash)
+        for finding_id, proof_hash, review_hash in zip(
+            proposal.finding_ids,
+            proposal.finding_proof_hashes,
+            proposal.finding_review_hashes,
+            strict=True,
+        )
+    }
+    expected_proof_hashes = tuple(
+        proposal_evidence[finding_id][0]
+        for finding_id in authorization.finding_ids
+    )
+    expected_review_hashes = tuple(
+        proposal_evidence[finding_id][1]
+        for finding_id in authorization.finding_ids
+    )
+    if authorization.finding_proof_hashes != expected_proof_hashes:
+        raise ValueError("authorization finding proof mismatch")
+    if authorization.finding_review_hashes != expected_review_hashes:
+        raise ValueError("authorization finding review mismatch")
     if authorization.authorized_cents != payload.requested_cents:
         raise ValueError("authorization amount does not equal canonical payload amount")
     if payload.proposal_hash != proposal.proposal_hash:
@@ -455,15 +504,24 @@ def verify_carrier_action_execution_receipt(
     _sha("external_reference_hash", receipt.external_reference_hash)
     _sha("evidence_source_hash", receipt.evidence_source_hash)
     _sha("receipt_hash", receipt.receipt_hash)
-    _text("buyer_id", receipt.buyer_id)
-    _text("business_unit", receipt.business_unit)
-    _text("authorization_id", receipt.authorization_id)
-    _text("target_carrier_id", receipt.target_carrier_id)
-    _text("target_customer_id", receipt.target_customer_id)
-    _text("currency", receipt.currency)
-    _text("executor_role", receipt.executor_role)
-    _timestamp("prepared_at", receipt.prepared_at)
-    _timestamp("executed_at", receipt.executed_at)
+    _identity("buyer_id", receipt.buyer_id)
+    _identity("business_unit", receipt.business_unit)
+    _identity("authorization_id", receipt.authorization_id)
+    _identity("target_carrier_id", receipt.target_carrier_id)
+    _identity("target_customer_id", receipt.target_customer_id)
+    _identity("currency", receipt.currency)
+    _identity("executor_role", receipt.executor_role)
+    try:
+        ActionType(receipt.action_type)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("invalid execution receipt action type") from exc
+    if type(receipt.requested_cents) is not int or receipt.requested_cents <= 0:
+        raise ValueError("execution receipt requested_cents must be a positive integer")
+    _finding_ids(receipt.finding_ids)
+    _, prepared_dt = _timestamp("prepared_at", receipt.prepared_at)
+    _, executed_dt = _timestamp("executed_at", receipt.executed_at)
+    if executed_dt < prepared_dt:
+        raise ValueError("executed_at cannot precede prepared_at")
     try:
         outcome = ExecutionOutcome(receipt.outcome)
     except ValueError as exc:
@@ -603,14 +661,25 @@ def verify_carrier_action_delivery_receipt(
     for name in (
         "buyer_id",
         "business_unit",
-        "action_type",
         "target_carrier_id",
         "target_customer_id",
         "currency",
-        "channel",
         "verifier_role",
     ):
-        _text(name, getattr(receipt, name))
+        _identity(name, getattr(receipt, name))
+    _text("action_type", receipt.action_type)
+    _text("channel", receipt.channel)
+    try:
+        ActionType(receipt.action_type)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("invalid delivery receipt action type") from exc
+    try:
+        ExecutionChannel(receipt.channel)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("invalid delivery receipt channel") from exc
+    if type(receipt.requested_cents) is not int or receipt.requested_cents <= 0:
+        raise ValueError("delivery receipt requested_cents must be a positive integer")
+    _finding_ids(receipt.finding_ids)
     _, submitted_dt = _timestamp("submitted_at", receipt.submitted_at)
     _, delivered_dt = _timestamp("delivered_at", receipt.delivered_at)
     if delivered_dt < submitted_dt:
@@ -666,7 +735,7 @@ def render_execution_intent_markdown(intent: CarrierActionExecutionIntent) -> st
         f"- Action: **{intent.action_type}**",
         f"- Buyer / business unit: **{intent.buyer_id} / {intent.business_unit}**",
         f"- Carrier / customer: **{intent.target_carrier_id} / {intent.target_customer_id}**",
-        f"- Amount: **{intent.currency} {intent.requested_cents / 100:,.2f}**",
+        f"- Amount: **{intent.currency} {format_cents(intent.requested_cents)}**",
         f"- Prepared at: **{intent.prepared_at}**",
         f"- Idempotency key: `{intent.execution_key}`",
         f"- Intent hash: `{intent.intent_hash}`",

@@ -354,6 +354,12 @@ def test_authorization_validity_is_bounded():
         auth(expires_on="2026-11-30")
 
 
+@pytest.mark.parametrize("max_validity_days", [30.0, float("nan"), float("inf")])
+def test_authorization_validity_limit_requires_exact_positive_integer_days(max_validity_days):
+    with pytest.raises(ValueError, match="max_validity_days must be a positive integer"):
+        auth(max_validity_days=max_validity_days)
+
+
 def test_revocation_immediately_blocks_action():
     a = auth()
     r = revoke_authorization(
@@ -386,6 +392,29 @@ def test_tampered_authorization_is_rejected():
     object.__setattr__(a, "authorized_cents", 999999)
     with pytest.raises(ValueError, match="authorization hash mismatch"):
         evaluate_authorization(a, as_of_date="2026-09-22")
+
+
+def test_self_hashed_authorization_cannot_reintroduce_boolean_money():
+    a = auth()
+    object.__setattr__(a, "authorized_cents", True)
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match="authorized_cents"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=1,
+        )
 
 
 def test_unbound_confirmed_review_cannot_authorize_external_action():
@@ -470,3 +499,262 @@ def test_review_bound_to_old_finding_proof_cannot_authorize_changed_finding():
             issued_on="2026-09-21",
             expires_on="2026-09-22",
         )
+
+
+@pytest.mark.parametrize(
+    "authorization_id",
+    (
+        " ACT-001",
+        "ACT-e\u0301",
+        "ACT-\u200b001",
+    ),
+)
+def test_authorization_identity_rejects_alias_forms(authorization_id):
+    with pytest.raises(ValueError, match="authorization_id"):
+        auth(authorization_id=authorization_id)
+
+@pytest.mark.parametrize(
+    "revocation_id",
+    (
+        " REV-001",
+        "REV-e\u0301",
+        "REV-\u200b001",
+    ),
+)
+def test_revocation_identity_rejects_alias_forms(revocation_id):
+    a = auth()
+    with pytest.raises(ValueError, match="revocation_id"):
+        revoke_authorization(
+            a,
+            revocation_id=revocation_id,
+            revoked_on="2026-09-22",
+            approver_role="VP Supply Chain",
+            reason="Buyer withdrew approval",
+        )
+
+
+def test_authorized_cents_rejects_boolean_alias():
+    with pytest.raises(ValueError, match="authorized_cents"):
+        auth(authorized_cents=True)
+
+
+def test_requested_cents_rejects_boolean_alias():
+    a = auth()
+    with pytest.raises(ValueError, match="requested_cents"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=True,
+        )
+
+
+def test_self_hashed_authorization_cannot_extend_original_validity_bound():
+    a = auth()
+    object.__setattr__(a, "expires_on", "2026-11-30")
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match="validity"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-11-01",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=1,
+        )
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "engagement_resolution_hash",
+        "operative_charter_hash",
+        "recipient_reference_hash",
+        "action_payload_hash",
+        "finding_proof_hashes",
+        "finding_review_hashes",
+    ),
+)
+def test_self_hashed_authorization_revalidates_evidence_binding_hashes(field):
+    a = auth()
+    if field in {"finding_proof_hashes", "finding_review_hashes"}:
+        object.__setattr__(a, field, tuple("not-a-hash" for _ in getattr(a, field)))
+    else:
+        object.__setattr__(a, field, "not-a-hash")
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match="lowercase SHA-256"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash=a.recipient_reference_hash,
+            action_payload_hash=a.action_payload_hash,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "alias"),
+    (
+        ("engagement_id", "engagement-e\u0301"),
+        ("buyer_id", "buyer-e\u0301"),
+        ("business_unit", "bu-\u200b1"),
+        ("target_carrier_id", "carrier-e\u0301"),
+        ("target_customer_id", " CUST-1"),
+        ("currency", "USD\u200b"),
+        ("approver_role", "VP Supply Chai\u0301n"),
+    ),
+)
+def test_self_hashed_authorization_rejects_scope_identity_aliases(field, alias):
+    a = auth()
+    object.__setattr__(a, field, alias)
+    body = asdict(a)
+    body.pop("authorization_hash")
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(a, "authorization_hash", canonical_hash(body))
+    with pytest.raises(ValueError, match=field):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id=a.target_carrier_id,
+            target_customer_id=a.target_customer_id,
+            recipient_reference_hash=a.recipient_reference_hash,
+            action_payload_hash=a.action_payload_hash,
+            finding_ids=a.finding_ids,
+            currency=a.currency,
+            requested_cents=1,
+        )
+
+
+def test_authorization_validity_limit_cannot_exceed_internal_maximum():
+    with pytest.raises(ValueError, match="internal maximum"):
+        auth(
+            expires_on="2026-11-30",
+            max_validity_days=365,
+        )
+
+def test_reconstructed_truth_cannot_fabricate_negative_expected_cents():
+    c = charter()
+    resolution = resolve_engagement(c)
+    truth, reviews = proof()
+    finding = truth.findings[0]
+
+    object.__setattr__(finding, "expected_cents", -100000)
+    finding_body = {
+        "schema": 2,
+        "finding_id": finding.finding_id,
+        "buyer_id": finding.buyer_id,
+        "business_unit": finding.business_unit,
+        "invoice_id": finding.invoice_id,
+        "shipment_id": finding.shipment_id,
+        "customer_id": finding.customer_id,
+        "carrier_id": finding.carrier_id,
+        "currency": finding.currency,
+        "authority_id": finding.authority_id,
+        "expected_cents": finding.expected_cents,
+        "actual_cents": finding.actual_cents,
+        "status": finding.status,
+    }
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(finding, "proof_hash", canonical_hash(finding_body))
+    forged_review = make_finding_review(
+        finding,
+        ReviewDisposition.CONFIRMED,
+        reviewer_role="Buyer Controller",
+        reviewed_at="2026-09-21T09:00:00-04:00",
+        reviewer_minutes=5,
+    )
+    truth_body = {
+        "schema": 3,
+        "buyer_id": truth.buyer_id,
+        "business_unit": truth.business_unit,
+        "population_hash": truth.population_hash,
+        "authorities": [asdict(authority) for authority in truth.authorities],
+        "findings": [asdict(item) for item in truth.findings],
+    }
+    object.__setattr__(truth, "truth_hash", canonical_hash(truth_body))
+
+    with pytest.raises(ValueError, match="expected_cents"):
+        issue_authorization(
+            resolution=resolution,
+            operative_charter=c,
+            truth=truth,
+            reviews=(forged_review, reviews[1]),
+            authorization_id="ACT-FORGED-AMOUNT",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1",),
+            currency="USD",
+            authorized_cents=100000,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-22",
+        )
+
+def test_self_hashed_review_revalidates_timestamp_before_external_authorization():
+    c = charter()
+    resolution = resolve_engagement(c)
+    truth, reviews = proof()
+    forged = reviews[0]
+    object.__setattr__(forged, "reviewed_at", "not-a-date")
+    review_body = {
+        "schema": 1,
+        "finding_id": forged.finding_id,
+        "finding_proof_hash": forged.finding_proof_hash,
+        "disposition": forged.disposition.value,
+        "reviewer_minutes": forged.reviewer_minutes,
+        "reviewer_role": forged.reviewer_role,
+        "reviewed_at": forged.reviewed_at,
+    }
+    from freight.contracts import canonical_hash
+
+    object.__setattr__(forged, "review_hash", canonical_hash(review_body))
+
+    with pytest.raises(ValueError, match="reviewed_at"):
+        issue_authorization(
+            resolution=resolution,
+            operative_charter=c,
+            truth=truth,
+            reviews=(forged,),
+            authorization_id="ACT-FORGED-REVIEW-TIME",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1",),
+            currency="USD",
+            authorized_cents=1000,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-22",
+        )
+

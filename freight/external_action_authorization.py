@@ -9,10 +9,12 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
 from enum import Enum
 
+from freight.money_format import format_cents
 from freight.contracts import TruthManifest, VALIDATED, canonical_hash
 from freight.engagement_state import EngagementResolution, EngagementState
 from freight.pilot_reporting import FindingReview, ReviewDisposition, verify_finding_review
@@ -93,6 +95,18 @@ def _required(name: str, value: str) -> str:
     return value.strip()
 
 
+def _identity(name: str, value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(name + " is required")
+    if value != value.strip():
+        raise ValueError(name + " must not contain surrounding whitespace")
+    if unicodedata.normalize("NFC", value) != value:
+        raise ValueError(name + " must use canonical Unicode (NFC)")
+    if any(unicodedata.category(character).startswith("C") for character in value):
+        raise ValueError(name + " cannot contain control characters")
+    return value
+
+
 def _sha(name: str, value: str) -> str:
     value = _required(name, value)
     if not SHA256_RE.fullmatch(value):
@@ -152,6 +166,10 @@ def _verify_resolution(resolution: EngagementResolution) -> None:
 
 
 def _verify_finding_proof(finding) -> None:
+    for field in ("expected_cents", "actual_cents"):
+        value = getattr(finding, field)
+        if type(value) is not int or value < 0:
+            raise ValueError(field + " must be a non-negative integer: " + finding.finding_id)
     body = {
         "schema": 2,
         "finding_id": finding.finding_id,
@@ -225,13 +243,19 @@ def issue_authorization(
     _verify_resolution(resolution)
     _verify_charter(operative_charter, resolution)
 
-    _required("authorization_id", authorization_id)
-    _required("target_carrier_id", target_carrier_id)
-    _required("target_customer_id", target_customer_id)
+    _identity("authorization_id", authorization_id)
+    for name, value in (
+        ("engagement_id", resolution.engagement_id),
+        ("buyer_id", resolution.buyer_id),
+        ("business_unit", resolution.business_unit),
+        ("target_carrier_id", target_carrier_id),
+        ("target_customer_id", target_customer_id),
+        ("currency", currency),
+        ("approver_role", approver_role),
+    ):
+        _identity(name, value)
     _sha("recipient_reference_hash", recipient_reference_hash)
     _sha("action_payload_hash", action_payload_hash)
-    _required("currency", currency)
-    _required("approver_role", approver_role)
 
     if approver_role != operative_charter["buyer_action_approver_role"]:
         raise ValueError("approver_role does not match operative Charter")
@@ -284,7 +308,7 @@ def issue_authorization(
         proof_hashes.append(finding.proof_hash)
         validated_total += finding.validated_cents
 
-    if not isinstance(authorized_cents, int) or authorized_cents <= 0:
+    if type(authorized_cents) is not int or authorized_cents <= 0:
         raise ValueError("authorized_cents must be a positive integer")
     if authorized_cents > validated_total:
         raise ValueError("authorized_cents cannot exceed selected validated findings")
@@ -293,8 +317,10 @@ def issue_authorization(
     expires = _parse_date("expires_on", expires_on)
     if expires < issued:
         raise ValueError("expires_on cannot precede issued_on")
-    if max_validity_days < 1:
-        raise ValueError("max_validity_days must be positive")
+    if type(max_validity_days) is not int or max_validity_days < 1:
+        raise ValueError("max_validity_days must be a positive integer")
+    if max_validity_days > MAX_VALIDITY_DAYS:
+        raise ValueError("max_validity_days cannot exceed internal maximum")
     if (expires - issued).days > max_validity_days:
         raise ValueError("authorization validity exceeds internal maximum")
 
@@ -358,9 +384,51 @@ def issue_authorization(
 def _verify_authorization(auth: ExternalActionAuthorization) -> None:
     body = asdict(auth)
     digest = body.pop("authorization_hash")
+    _identity("authorization_id", auth.authorization_id)
     _sha("authorization_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("authorization hash mismatch")
+    for field in (
+        "engagement_id",
+        "buyer_id",
+        "business_unit",
+        "target_carrier_id",
+        "target_customer_id",
+        "currency",
+        "approver_role",
+    ):
+        _identity(field, getattr(auth, field))
+    try:
+        ActionType(auth.action_type)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("action_type is not recognized") from exc
+    for field in (
+        "engagement_resolution_hash",
+        "operative_charter_hash",
+        "recipient_reference_hash",
+        "action_payload_hash",
+    ):
+        _sha(field, getattr(auth, field))
+    if type(auth.finding_ids) is not tuple or not auth.finding_ids:
+        raise ValueError("finding_ids must be a non-empty tuple")
+    for finding_id in auth.finding_ids:
+        _identity("finding_id", finding_id)
+    if tuple(sorted(auth.finding_ids)) != auth.finding_ids or len(set(auth.finding_ids)) != len(auth.finding_ids):
+        raise ValueError("finding_ids must be unique and canonically ordered")
+    for field in ("finding_proof_hashes", "finding_review_hashes"):
+        values = getattr(auth, field)
+        if type(values) is not tuple or len(values) != len(auth.finding_ids):
+            raise ValueError(field + " must align one-for-one with finding_ids")
+        for value in values:
+            _sha(field, value)
+    if type(auth.authorized_cents) is not int or auth.authorized_cents <= 0:
+        raise ValueError("authorized_cents must be a positive integer")
+    issued = _parse_date("issued_on", auth.issued_on)
+    expires = _parse_date("expires_on", auth.expires_on)
+    if expires < issued:
+        raise ValueError("expires_on cannot precede issued_on")
+    if (expires - issued).days > MAX_VALIDITY_DAYS:
+        raise ValueError("authorization validity exceeds internal maximum")
     for field in (
         "money_movement_authorized",
         "settlement_acceptance_authorized",
@@ -382,7 +450,7 @@ def revoke_authorization(
     reason: str,
 ) -> AuthorizationRevocation:
     _verify_authorization(auth)
-    _required("revocation_id", revocation_id)
+    _identity("revocation_id", revocation_id)
     _required("reason", reason)
     _required("approver_role", approver_role)
     if approver_role != auth.approver_role:
@@ -413,6 +481,7 @@ def revoke_authorization(
 def _verify_revocation(auth: ExternalActionAuthorization, revocation: AuthorizationRevocation) -> None:
     body = asdict(revocation)
     digest = body.pop("revocation_hash")
+    _identity("revocation_id", revocation.revocation_id)
     _sha("revocation_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("revocation hash mismatch")
@@ -497,7 +566,7 @@ def assert_action_allowed(
         raise ValueError("finding set exceeds authorization")
     if currency != auth.currency:
         raise ValueError("currency exceeds authorization")
-    if not isinstance(requested_cents, int) or requested_cents <= 0:
+    if type(requested_cents) is not int or requested_cents <= 0:
         raise ValueError("requested_cents must be positive")
     if requested_cents > auth.authorized_cents:
         raise ValueError("requested amount exceeds authorization")
@@ -513,7 +582,7 @@ def render_markdown(auth: ExternalActionAuthorization) -> str:
             f"**Action:** {auth.action_type}",
             f"**Target carrier:** `{auth.target_carrier_id}`",
             f"**Target customer:** `{auth.target_customer_id}`",
-            f"**Authorized maximum:** {auth.currency} {auth.authorized_cents / 100:,.2f}",
+            f"**Authorized maximum:** {auth.currency} {format_cents(auth.authorized_cents)}",
             f"**Issued / expires:** {auth.issued_on} / {auth.expires_on}",
             f"**Approver role:** {auth.approver_role}",
             f"**Authorization hash:** `{auth.authorization_hash}`",

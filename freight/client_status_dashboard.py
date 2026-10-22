@@ -8,6 +8,11 @@ import argparse, json
 from html import escape
 from pathlib import Path
 
+if __package__:
+    from freight.money_format import format_cents
+else:
+    from money_format import format_cents
+
 COUNT_KEYS = (
     "records_reviewed",
     "candidates_flagged",
@@ -81,7 +86,7 @@ def validate(payload):
 
 
 def money(cents):
-    return "$" + f"{cents / 100:,.2f}"
+    return "$" + format_cents(cents)
 
 
 def render_html(payload):

@@ -130,6 +130,23 @@ def test_concurrent_appends_preserve_one_monotonic_chain(tmp_path):
     assert store.count()==20
 
 
+def test_store_rejects_noncanonical_unicode_scope_aliases(tmp_path):
+    with pytest.raises(ValueError, match="canonical Unicode"):
+        S(tmp_path, buyer="CAFE\u0301")
+    with pytest.raises(ValueError, match="canonical Unicode"):
+        S(tmp_path, bu="OPE\u0301RATIONS")
+
+
+def test_store_rejects_invisible_control_in_audited_object_identity(tmp_path):
+    store = S(tmp_path)
+    with pytest.raises(ValueError, match="control characters"):
+        store.append(
+            event_type=AuditEventType.SOURCE_PRESENT,
+            object_id="claim-\u200b1",
+            occurred_at="2026-09-20T12:00:00Z",
+        )
+
+
 @pytest.mark.parametrize("timeout", [True, False, 0, -1, 60_001, "5000", 5.5])
 def test_busy_timeout_rejects_non_integer_or_unsafe_values(tmp_path, timeout):
     with pytest.raises(ValueError,match="busy_timeout_ms"):

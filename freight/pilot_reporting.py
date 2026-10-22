@@ -7,6 +7,7 @@ from enum import Enum
 import re
 from typing import Protocol
 
+from freight.money_format import format_cents
 from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, REVIEW, VALIDATED, canonical_hash
 
 
@@ -117,17 +118,16 @@ def verify_finding_review(
         raise ValueError("finding review proof hash does not match current finding")
     if review.reviewer_role is None or review.reviewed_at is None:
         raise ValueError("proof-bound finding review metadata is incomplete")
-    body = {
-        "schema": 1,
-        "finding_id": review.finding_id,
-        "finding_proof_hash": review.finding_proof_hash,
-        "disposition": review.disposition.value,
-        "reviewer_minutes": review.reviewer_minutes,
-        "reviewer_role": review.reviewer_role,
-        "reviewed_at": review.reviewed_at,
-    }
-    if canonical_hash(body) != review.review_hash:
-        raise ValueError("finding review hash mismatch")
+    verified = FindingReview(
+        finding_id=review.finding_id,
+        disposition=review.disposition,
+        reviewer_minutes=review.reviewer_minutes,
+        finding_proof_hash=review.finding_proof_hash,
+        reviewer_role=review.reviewer_role,
+        reviewed_at=review.reviewed_at,
+    )
+    if verified != review:
+        raise ValueError("finding review proof or canonical metadata mismatch")
 
 
 @dataclass(frozen=True)
@@ -272,7 +272,7 @@ def build_pilot_metrics(
 
 
 def dollars(cents: int) -> str:
-    return "$" + format(cents / 100, ",.2f")
+    return "$" + format_cents(cents)
 
 
 def render_markdown(metrics: PilotMetrics) -> str:
