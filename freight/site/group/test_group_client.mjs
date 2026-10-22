@@ -53,6 +53,7 @@ test('initialization is read-only and accepts old display-name and slug links', 
     assert.equal(p.el('enquiry-business').value, 'capturebrief');
     assert.equal(p.el('send-enquiry').disabled, true);
     assert.equal(p.verification.options.action, 'retally_group');
+    assert.equal(p.verification.options.size, 'compact'); // 150px fits the narrow phone card
     p.verify();
     assert.match(p.el('enquiry-status').textContent, /Nothing has been sent yet/);
   }

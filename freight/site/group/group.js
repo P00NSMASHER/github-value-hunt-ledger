@@ -94,7 +94,8 @@ if (enquiryForm) {
             sitekey: config.siteKey,
             action: "retally_group",
             theme: "light",
-            size: "flexible",
+            // Flexible has a 300px minimum; compact also fits the phone card.
+            size: "compact",
             callback: value => {
               token = value;
               online = true;
