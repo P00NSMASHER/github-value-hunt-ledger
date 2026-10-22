@@ -620,9 +620,9 @@ class SettlementStore:
                 "AND c.claim_id=h.claim_id "
                 "WHERE h.buyer_id=? AND h.business_unit=? "
                 "AND c.reference=? AND c.payer_id=? AND c.payee_id=? "
-                "AND c.currency=? AND h.observed_at<=? LIMIT 1",
+                "AND c.currency=? LIMIT 1",
                 (*self._scope, event["reference"],event["payer_id"],
-                 event["payee_id"],event["currency"],created_at),
+                 event["payee_id"],event["currency"]),
             ).fetchone():
                 return Decision(REVIEW,reason="claim dispute hold prevents automatic recovery allocation")
             old = conn.execute(

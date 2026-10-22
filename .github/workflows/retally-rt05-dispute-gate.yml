@@ -11,6 +11,7 @@ on:
       - 'freight/settlement_review_workflow.py'
       - 'freight/test_rt05_dispute_integrity.py'
       - 'freight/test_rt05_boundary_redteam.py'
+      - 'freight/test_rt05_backdated_allocation.py'
       - 'freight/RT05_DISPUTE_BOUNDARY_ACCEPTANCE.md'
       - '.github/workflows/retally-rt05-dispute-gate.yml'
   push:
@@ -24,6 +25,7 @@ on:
       - 'freight/settlement_review_workflow.py'
       - 'freight/test_rt05_dispute_integrity.py'
       - 'freight/test_rt05_boundary_redteam.py'
+      - 'freight/test_rt05_backdated_allocation.py'
       - '.github/workflows/retally-rt05-dispute-gate.yml'
 
 permissions:
@@ -54,9 +56,9 @@ jobs:
       - name: Install bounded test dependencies
         run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2 tzdata==2025.2
       - name: Compile source-bound claims, holds and red-team suite
-        run: python -m compileall -q freight/settlement_store.py freight/recovery_resilience.py freight/currency_reporting.py freight/settlement_report.py freight/settlement_review_workflow.py freight/test_rt05_dispute_integrity.py freight/test_rt05_boundary_redteam.py
+        run: python -m compileall -q freight/settlement_store.py freight/recovery_resilience.py freight/currency_reporting.py freight/settlement_report.py freight/settlement_review_workflow.py freight/test_rt05_dispute_integrity.py freight/test_rt05_boundary_redteam.py freight/test_rt05_backdated_allocation.py
       - name: Run synthetic disputed-claim transaction and concurrency tests
-        run: python -m pytest -q freight/test_rt05_dispute_integrity.py freight/test_rt05_boundary_redteam.py
+        run: python -m pytest -q freight/test_rt05_dispute_integrity.py freight/test_rt05_boundary_redteam.py freight/test_rt05_backdated_allocation.py
       - name: Verify git source integrity
         run: git diff --check
 
