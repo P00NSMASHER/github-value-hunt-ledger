@@ -291,7 +291,7 @@ def test_homepage_offer_heading_preserves_word_separation_without_layout_breaks(
     # conceal the original `you<br>like` regression when CSS hides the break.
     text = "".join(text for text, parents in page.texts
                    if within(parents, css_class="hero-console") and within(parents, tag="h2"))
-    assert " ".join(text.split()) == "What would you like to move forward?"
+    assert " ".join(text.split()) == "What would you like to move forward with?"
 
 
 def test_returning_visitors_receive_current_design_assets(bundle, tmp_path):
