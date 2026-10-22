@@ -7,3 +7,39 @@
 @media(max-width:580px){body{font-size:16px}.wrap{width:calc(100% - 32px)}.header-inner{flex-wrap:wrap;padding-top:20px;padding-bottom:10px;gap:8px}.header-inner nav{width:100%;justify-content:space-between;gap:12px}.header-inner nav a{font-size:14px}.hero-content{padding-top:48px;padding-bottom:56px}h1{font-size:49px}.lead{font-size:18px}.actions{gap:14px}.company-grid,.about-grid,.contact-section{grid-template-columns:1fr}.company-card>img{height:185px}.section{padding-top:48px;padding-bottom:48px}.section-heading h2{font-size:43px}.company-content{padding:24px}.company-content h3{font-size:25px}.about-section{padding:48px 0}.about-grid{gap:16px}.contact-section{gap:22px}.contact-panel{padding:25px 0 0;border-left:0;border-top:1px solid var(--line)}.footer-inner{grid-template-columns:1fr}.footer-links{gap:22px}.footer-note{grid-column:auto}.document{padding-top:48px;padding-bottom:56px}.document h1{font-size:48px}.document-intro{font-size:18px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}.button:hover{transform:none}}
 
+
+/* The shared receipt flow lives only on the Group contact card. */
+.contact-section{grid-template-columns:.9fr 1.1fr;align-items:start;gap:56px}
+.contact-direct{border-top:1px solid var(--line);padding-top:26px;margin-top:28px}
+.contact-direct>p:not(.eyebrow){margin:20px 0 0}
+.contact-direct a:not(.button){overflow-wrap:anywhere}
+.freight-contact-route{margin-top:26px}
+.freight-contact-route a{display:inline-block;min-height:44px;padding:8px 0}
+.contact-panel.enquiry-card{border:1px solid var(--line);border-radius:12px;padding:32px;background:#fffcf6;box-shadow:0 14px 35px #173b310c;min-width:0}
+.enquiry-card>p.eyebrow{margin:0 0 16px;color:#53695f}
+.enquiry-card h3{font-size:27px;line-height:1.2;letter-spacing:-.02em;margin-bottom:22px}
+.enquiry-card fieldset{border:0;padding:0;margin:0;min-width:0}
+.enquiry-card label{display:block;font-size:15px;font-weight:700;margin:18px 0 8px}
+.enquiry-card fieldset>label:first-of-type{margin-top:0}
+.enquiry-card input:not([type="checkbox"]),.enquiry-card select,.enquiry-card textarea{display:block;width:100%;max-width:100%;border:1px solid #8b9e92;border-radius:7px;background:#fff;color:var(--ink);font:inherit;font-size:16px;padding:12px;min-height:48px;box-shadow:inset 0 2px 4px #173b3109}
+.enquiry-card textarea{resize:vertical;line-height:1.5}
+.enquiry-card textarea::placeholder{color:#596d60;opacity:1}
+.enquiry-card .enquiry-optional{font-size:13px;font-weight:400}
+.enquiry-card .enquiry-consent{display:flex;align-items:flex-start;gap:12px;font-size:14px;font-weight:400;line-height:1.6}
+.enquiry-consent input{flex:0 0 20px;width:20px;height:20px;margin:3px 0 0;accent-color:var(--pine)}
+.enquiry-card .small{font-size:13px;line-height:1.65;margin:12px 0 0;color:#52645d}
+.enquiry-card #enquiry-turnstile{margin-top:20px;min-height:1px;max-width:100%}
+.enquiry-card #send-enquiry{width:100%;margin-top:20px;font-family:inherit;cursor:pointer}
+.enquiry-card #send-enquiry:disabled{background:#dfe6df;color:#52645d;border-color:#cad5cb;box-shadow:none;transform:none;cursor:default}
+.enquiry-card #enquiry-status{overflow-wrap:anywhere;font-weight:600;color:var(--ink)}
+.enquiry-alternatives{border-top:1px solid var(--line);margin-top:24px;padding-top:10px}
+.enquiry-alternatives .text-link{display:inline-flex;min-height:44px;margin:8px 18px 0 0;font-size:14px;font-family:inherit}
+.copy-draft{border:0;background:transparent;color:inherit;padding:0;font:inherit;cursor:pointer}
+.enquiry-card #enquiry-copy-text{margin-top:14px;font-size:14px}
+.enquiry-card [hidden]{display:none!important}
+.enquiry-card fieldset:disabled input,.enquiry-card fieldset:disabled select,.enquiry-card fieldset:disabled textarea{opacity:.75}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:is(button,input,select,textarea):focus-visible{outline:3px solid #b55c22;outline-offset:5px}
+@media(max-width:900px){.contact-section{grid-template-columns:1fr;gap:30px}.contact-intro{max-width:660px}.contact-panel.enquiry-card{max-width:660px;width:100%}}
+@media(max-width:580px){.contact-panel.enquiry-card{padding:24px}.enquiry-card h3{font-size:25px}.contact-direct{padding-top:24px}.enquiry-alternatives .text-link{margin-right:14px}}
+@media(max-width:360px){.contact-panel.enquiry-card{padding:20px}}

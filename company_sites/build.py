@@ -31,7 +31,7 @@ PROFILES = {
     "group": {
         "url_key": "GROUP_URL",
         "pages": ("index.html", "privacy/index.html"),
-        "files": ("index.html", "privacy/index.html", "site.css", "_headers"),
+        "files": ("index.html", "privacy/index.html", "site.css", "enquiry.js", "_headers"),
         "assets": {
             "assets/hero.webp": "freight/site/group/assets/hero-1536.webp",
             "assets/freight.webp": "freight/site/assets/images/terminal-blue-hour-800.webp",
@@ -130,6 +130,10 @@ def build(company: str, output: Path, public_url: str | None = None) -> Path:
     asset_sources = {name: _source(REPO_ROOT / origin) for name, origin in profile["assets"].items()}
     commit = _source_commit()
     css_revision = hashlib.sha256(text_sources["site.css"].encode()).hexdigest()[:16]
+    script_revisions = {
+        name: hashlib.sha256(content.encode()).hexdigest()[:16]
+        for name, content in text_sources.items() if name.endswith(".js")
+    }
     output.mkdir(parents=True, exist_ok=True)
 
     for name, content in text_sources.items():
@@ -139,8 +143,10 @@ def build(company: str, output: Path, public_url: str | None = None) -> Path:
             raise ValueError(f"Unresolved publication token in {name}")
         if name.endswith(".html"):
             content = content.replace('href="/site.css"', f'href="/site.css?v={css_revision}"')
+            for script, revision in script_revisions.items():
+                content = content.replace(f'src="/{script}"', f'src="/{script}?v={revision}"')
             # Cloudflare must not rewrite the public inbox into an injected
-            # email-obfuscation script; these sites intentionally run no scripts.
+            # email-obfuscation script outside the explicit script allowlist.
             content = re.sub(r"(<body(?:\s[^>]*)?>)", r"\1<!--email_off-->", content, count=1)
             content = content.replace("</body>", "<!--/email_off--></body>")
         destination = output / name

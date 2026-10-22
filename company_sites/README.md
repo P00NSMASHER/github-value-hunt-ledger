@@ -23,16 +23,22 @@ remain separate. No functions, worker, customer data or operational system enter
 either company's explicit publication allowlist.
 
 The builder refuses nonempty outputs, unsafe sources and unresolved tokens. It
-copies only named existing images/fonts and ships their font licenses. The
-pages have no JavaScript, accounts, file uploads, analytics or payment submission.
-The restrictive CSP reflects those actual capabilities.
+copies only named existing images/fonts and ships their font licenses. The Group
+homepage includes one allowlisted, content-versioned enquiry client; RecoveryWorks
+remains script-free. Neither site provides accounts, file uploads, analytics or
+payment submission. Each site's restrictive CSP reflects its actual capabilities.
 
 Run the publication checks from the repository root:
 
     python -m unittest discover -s company_sites -p 'test_*.py'
+    node --test company_sites/test_group_client.mjs
 
 These check output isolation, local links and anchors, canonical URLs, security
 headers, source-revision attribution and refusal to overwrite source or output.
+The isolated client tests use a minimal DOM and mocked transport. They verify
+explicit submission, consent, security expiry, saved receipts, uncertain-response
+retries, fallback copying and active/legacy business query selection without any
+browser network, provider call or production submission.
 
 ## Production map and restoration
 
@@ -85,9 +91,41 @@ canonical base. Product privacy URLs retain their established privacy.html path.
 
 The public inbox is the existing published jay@retallyrecovery.com address.
 Brand-specific mail subjects route each enquiry without inventing new mailboxes.
-Links explicitly open the visitor's email app; there is no claim that the site
-has sent or stored a request. email_off comments prevent Cloudflare from
-injecting its email-obfuscation script into these script-free pages.
+Email links explicitly open the visitor's email app, and copying is never
+described as sending. email_off comments prevent Cloudflare from injecting an
+email-obfuscation script outside the explicit publication allowlist.
+
+### Group secure enquiry
+
+`group/enquiry.js` adapts the receipt flow from source revision
+`c46b7405d8f766334b16aede807acdbf3f2604ff`. It loads only on the Group homepage.
+GET checks availability at `https://www.retallyrecovery.com/api/group-inquiry`;
+only an explicit, valid form submission sends a POST to that same endpoint.
+Both requests use `credentials: "omit"`, CORS mode, no-store caching and no
+redirect following. The backend must admit only the verified Group origin for
+cross-origin requests and validate the matching Turnstile hostname/action.
+
+The form selects only `general`, `recovery`, `recoveryworks`, `permitplate` or
+`capturebrief`. Old display names `RETALLY Recovery` and `PermitPlate NYC` map
+to their active businesses; retired experiment values default to `general`.
+The client receives the public Turnstile site key from availability configuration
+and renders the compact widget. No secret is embedded in the public output.
+
+A success state requires HTTP 202 plus a valid saved reference and explicit
+`ok`/`received` flags. A pending notification remains a successful save without
+claiming email delivery. Uncertain responses keep the details on the page; an
+unchanged retry keeps its idempotency key while a changed enquiry gets a new key.
+This retry identity lasts for the current page session and is not browser storage.
+Email draft and copy alternatives remain available, including when secure intake
+or the security widget is unavailable. Without JavaScript, direct email remains
+visible and the nonfunctional form stays hidden.
+
+The Group CSP admits local scripts and `challenges.cloudflare.com` for Turnstile,
+and permits connections only to the site itself, the fixed Freight-hosted intake
+origin and Turnstile. Native form navigation remains blocked. The Group project
+still publishes no Functions; deploy the matching backend/CORS change with the
+frontend before enabling this flow in production. RecoveryWorks retains
+`script-src 'none'` and `connect-src 'none'`.
 
 Each output exposes build-info.json containing the target, canonical URL and
 CF_PAGES_COMMIT_SHA (or GITHUB_SHA). A build with neither variable says local /

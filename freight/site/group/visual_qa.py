@@ -33,6 +33,52 @@ NAVIGATION = {
     "group": ("/#businesses", "/#about", "/#contact"),
     "recoveryworks": ("/#services", "/#process", "/#example", "/engagement/", "/#contact"),
 }
+GROUP_INQUIRY_URL = PUBLIC_URLS["freight"] + "api/group-inquiry"
+
+
+def install_group_security_fixture(context, base):
+    """Show a compact widget without loading or solving a real challenge."""
+    context.add_init_script("""(() => {
+      if (location.origin !== """ + json.dumps(base) + """) return;
+      const state = window.__retallyGroupQA = {widgets: []};
+      window.turnstile = {
+        render(selector, options) {
+          const holder = document.querySelector(selector);
+          const fixture = document.createElement('div');
+          fixture.dataset.qaTurnstile = 'compact';
+          fixture.setAttribute('role', 'img');
+          fixture.setAttribute('aria-label', 'Isolated security verification fixture');
+          fixture.style.cssText = 'width:150px;height:140px;background:#fff;color:#111;border:1px solid #888;display:grid;place-items:center;text-align:center;font:14px sans-serif';
+          fixture.textContent = 'Security verification fixture';
+          holder.appendChild(fixture);
+          state.widgets.push({selector, action: options.action, size: options.size});
+          state.verify = () => options.callback('isolated-qa-token-never-sent');
+          state.expire = () => options['expired-callback']();
+          return 0;
+        },
+        reset() { state.expire(); }
+      };
+    })();""")
+
+
+def check_group_widget(page, width):
+    page.wait_for_function("window.__retallyGroupQA?.widgets.length === 1")
+    assert page.evaluate("window.__retallyGroupQA.widgets") == [
+        {"selector": "#enquiry-turnstile", "action": "retally_group", "size": "compact"}]
+    holder = page.locator("#enquiry-turnstile")
+    assert holder.get_attribute("role") == "group"
+    assert holder.get_attribute("aria-label") == "Security verification"
+    geometry = holder.evaluate("""element => {
+      const holder = element.getBoundingClientRect();
+      const widget = element.querySelector('[data-qa-turnstile]').getBoundingClientRect();
+      return {holderLeft: holder.left, holderRight: holder.right, widgetLeft: widget.left,
+              widgetRight: widget.right, widgetWidth: widget.width,
+              overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth};
+    }""")
+    assert geometry["widgetWidth"] == 150 and geometry["overflow"] <= 1, geometry
+    assert geometry["widgetLeft"] >= geometry["holderLeft"] - 1, geometry
+    assert geometry["widgetRight"] <= geometry["holderRight"] + 1, geometry
+    return {"width": width, "compact_widget": True, "geometry": geometry, "provider_loaded": False}
 
 
 class QuietHandler(SimpleHTTPRequestHandler):
@@ -214,16 +260,86 @@ def check_company_navigation(page, base, company):
     return {"keyboard_destinations": list(NAVIGATION[company])}
 
 
+def check_secure_group_contact(page, base, output, width, axe_source, report):
+    page.goto(base + "/?business=CaptureBrief#contact", wait_until="networkidle")
+    form = page.locator("#group-enquiry")
+    assert form.is_visible()
+    fields = {name: form.locator("#enquiry-" + name)
+              for name in ("business", "name", "email", "company", "message", "consent")}
+    for control in fields.values():
+        assert control.evaluate("element => [...element.labels].some(label => label.textContent.trim())"), "Enquiry field needs a visible label"
+    business, name, email, company, message, consent = (fields[key] for key in fields)
+    assert business.locator("option").evaluate_all("elements => elements.map(element => element.value)") == [
+        "general", "recovery", "recoveryworks", "permitplate", "capturebrief"]
+    assert business.input_value() == "capturebrief"
+    assert message.get_attribute("maxlength") == "800"
+    assert email.get_attribute("type") == "email"
+    assert consent.get_attribute("required") is not None and not consent.is_checked()
+    assert form.locator('input[type="file"]').count() == 0
+    submit = form.locator("#send-enquiry")
+    assert submit.get_attribute("type") == "submit" and submit.is_disabled()
+    status = form.locator("#enquiry-status")
+    assert status.get_attribute("role") == "status" and status.get_attribute("aria-live") == "polite"
+    report["group_widget"].append(check_group_widget(page, width))
+
+    sample = "QA preview only. Please do not send this draft."
+    name.fill("Example Person")
+    email.fill("person@example.test")
+    company.fill("Acceptance fixture")
+    message.fill(sample)
+    draft = form.locator("#enquiry-draft")
+    check_keyboard_target(draft)
+    for value, label in (("capturebrief", "CaptureBrief"), ("permitplate", "PermitPlate")):
+        business.select_option(value=value)
+        url = urlsplit(draft.get_attribute("href"))
+        parts = parse_qs(url.query)
+        assert url.scheme == "mailto" and url.path == "jay@retallyrecovery.com"
+        assert label in parts.get("subject", [""])[0]
+        assert all(detail in parts.get("body", [""])[0]
+                   for detail in (sample, "Example Person", "person@example.test", "Acceptance fixture"))
+    consent.check()
+    assert form.evaluate("element => element.checkValidity()")
+    assert submit.is_disabled()  # Consent alone cannot bypass security verification.
+    page.evaluate("window.__retallyGroupQA.verify()")
+    assert submit.is_enabled()
+    assert "Nothing has been sent yet" in status.inner_text()
+    record_accessibility(page, axe_source, report, "group", "home#contact-ready", width)
+    submit.scroll_into_view_if_needed()
+    page.screenshot(path=str(output / f"group-contact-ready-{width}.png"), full_page=False)
+    page.evaluate("window.__retallyGroupQA.expire()")
+    assert submit.is_disabled() and "expired" in status.inner_text()
+
+    # The route fixture changes only this isolated GET response. No request
+    # reaches the API, and the real client must expose its honest fallback.
+    page.goto(base + "/?qa_intake=offline#contact", wait_until="networkidle")
+    assert page.locator("#group-enquiry").is_visible()
+    assert page.locator("#send-enquiry").is_disabled()
+    offline = page.locator("#enquiry-status").inner_text()
+    assert "unavailable" in offline and "not been sent" in offline
+    assert page.evaluate("window.__retallyGroupQA.widgets.length") == 0
+    draft = page.locator("#enquiry-draft")
+    check_keyboard_target(draft)
+    assert urlsplit(draft.get_attribute("href")).path == "jay@retallyrecovery.com"
+    assert page.locator("#copy-enquiry").is_visible()
+    page.locator("#contact").scroll_into_view_if_needed()
+    page.screenshot(path=str(output / f"group-contact-offline-{width}.png"), full_page=False)
+    return {"labelled_fields": True, "explicit_consent": True, "no_upload": True,
+            "compact_widget": True, "verification_required": True, "expiry_disables_send": True,
+            "email_draft_updates": True, "offline_intake_fallback": True,
+            "submit_clicked": False, "mailto_navigation": False}
+
+
 def check_company_contact(page, base, company):
+    """RecoveryWorks retains its explicit email-only enquiry path."""
+    assert company == "recoveryworks"
     page.goto(base + "/#contact", wait_until="networkidle")
-    selector = ".contact-panel" if company == "group" else ".contact-card"
-    panel = page.locator(selector)
+    panel = page.locator(".contact-card")
     link = panel.locator("a.button")
     assert link.count() == 1
     check_keyboard_target(link)
     draft = urlsplit(link.get_attribute("href"))
     fields = parse_qs(draft.query)
-    expected = "RETALLY Group" if company == "group" else "RETALLY RecoveryWorks"
+    expected = "RETALLY RecoveryWorks"
     assert draft.scheme == "mailto" and draft.path == "jay@retallyrecovery.com"
     assert expected in fields.get("subject", [""])[0]
     assert "Opens your email app." in panel.inner_text()
@@ -293,6 +409,19 @@ def check_accessibility(page, axe_source):
     }""")
 
 
+def record_accessibility(page, axe_source, report, company, slug, width):
+    if not axe_source:
+        return
+    result = {"site": company, "route": slug or "home", "width": width,
+              **check_accessibility(page, axe_source)}
+    report["accessibility"]["checks"].append(result)
+    blocking = [item for item in result["violations"] if item["impact"] in ("serious", "critical")]
+    if blocking:
+        report["accessibility"]["blocking_failures"].append({
+            "site": company, "route": slug or "home", "width": width, "violations": blocking})
+        report["accessibility"]["status"] = "failed"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--site", type=Path, required=True, help="Restored freight Cloudflare bundle")
@@ -316,6 +445,7 @@ def main():
     servers, bases = [], {}
     report = {"pages": [], "interactions": [], "chat_clearance": [], "non_get_requests": [],
               "company_canvas": [], "heading_breakpoints": [], "card_heading_contrast": [],
+              "group_widget": [], "group_config_mocks": [],
               "local_company_handoffs": [], "external_requests_blocked": 0, "passed": False,
               "accessibility": {"status": "pending" if axe_source else "skipped",
                                 "reason": None if axe_source else "No local axe-core script supplied with --axe-js",
@@ -335,6 +465,14 @@ def main():
             if request.method != "GET":
                 report["non_get_requests"].append(request.method)
                 request_route.abort()
+            elif (request.url == GROUP_INQUIRY_URL and not request.is_navigation_request()
+                  and urlsplit(request.frame.url).netloc == urlsplit(bases["group"]).netloc):
+                online = parse_qs(urlsplit(request.frame.url).query).get("qa_intake") != ["offline"]
+                report["group_config_mocks"].append({"online": online, "method": "GET"})
+                request_route.fulfill(status=200, headers={
+                    "Content-Type": "application/json", "Cache-Control": "no-store",
+                    "Access-Control-Allow-Origin": bases["group"], "Vary": "Origin"},
+                    body=json.dumps({"online": online, "siteKey": "isolated-public-fixture" if online else ""}))
             elif parsed.netloc in local_hosts:
                 request_route.continue_()
             elif request.is_navigation_request() and parsed.netloc in public_to_local:
@@ -355,6 +493,7 @@ def main():
                                               is_mobile=width <= 390, has_touch=width <= 390,
                                               bypass_csp=bool(axe_source))
                 context.route("**/*", route)
+                install_group_security_fixture(context, bases["group"])
                 page = context.new_page()
                 for company, slugs in routes.items():
                     for slug in slugs:
@@ -370,15 +509,7 @@ def main():
                         result.update({"site": company, "route": slug or "home", "width": width, "status": response.status})
                         report["pages"].append(result)
                         assert result["status"] == 200 and result["overflow"] <= 1 and result["h1Count"] == 1 and result["mainPresent"] and not result["brokenImages"], result
-                        if axe_source:
-                            accessibility = {"site": company, "route": slug or "home", "width": width,
-                                             **check_accessibility(page, axe_source)}
-                            report["accessibility"]["checks"].append(accessibility)
-                            blocking = [v for v in accessibility["violations"] if v["impact"] in ("serious", "critical")]
-                            if blocking:
-                                report["accessibility"]["blocking_failures"].append({
-                                    "site": company, "route": slug or "home", "width": width, "violations": blocking})
-                                report["accessibility"]["status"] = "failed"
+                        record_accessibility(page, axe_source, report, company, slug, width)
                         # Keep evidence from every route, including accessibility
                         # failures, so one defect cannot hide the remaining pages.
                         name = f'{company}-{slug or "home"}-{width}'
@@ -395,19 +526,26 @@ def main():
                 for company in HEADINGS:
                     interaction[company] = {
                         "navigation": check_company_navigation(page, bases[company], company),
-                        "contact": check_company_contact(page, bases[company], company)}
+                        "contact": (check_secure_group_contact(page, bases[company], args.out, width, axe_source, report)
+                                    if company == "group" else check_company_contact(page, bases[company], company))}
                 report["interactions"].append(interaction)
                 report["chat_clearance"].append(check_chat_clearance(page, bases["freight"], args.out, width, height))
                 context.close()
             # Preserve the extra geometry where the original launcher obscured submit.
-            context = browser.new_context(viewport={"width": 1363, "height": 936}, reduced_motion="reduce")
+            context = browser.new_context(viewport={"width": 1363, "height": 936}, reduced_motion="reduce",
+                                          bypass_csp=bool(axe_source))
             context.route("**/*", route)
+            install_group_security_fixture(context, bases["group"])
             page = context.new_page()
             report["chat_clearance"].append(check_chat_clearance(page, bases["freight"], args.out, 1363, 936))
+            report["group_desktop_contact"] = check_secure_group_contact(
+                page, bases["group"], args.out, 1363, axe_source, report)
             report["heading_breakpoints"] = check_heading_breakpoints(page, bases, args.out)
             context.close()
             browser.close()
         assert len(report["pages"]) == sum(map(len, routes.values())) * len(VIEWPORTS) == 95
+        assert len(report["group_widget"]) == 6
+        assert report["group_config_mocks"] and all(item["method"] == "GET" for item in report["group_config_mocks"])
         assert not report["non_get_requests"]
         if axe_source:
             failures = report["accessibility"]["blocking_failures"]
@@ -420,9 +558,10 @@ def main():
             server.server_close()
         (args.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"RETALLY separate sites: {len(report['pages'])} responsive page checks, four direct company destinations, "
-          f"keyboard navigation, disclosed email handoffs, freight anchors and {len(report['chat_clearance'])} chat-clearance checks passed; "
+          f"keyboard navigation, secure Group controls, disclosed email handoffs, freight anchors and {len(report['chat_clearance'])} chat-clearance checks passed; "
           f"{len(report['company_canvas'])} company canvas/header checks and "
           f"{len(report['heading_breakpoints'])} heading-breakpoint checks passed; "
+          f"{len(report['group_widget'])} compact security-widget checks passed; "
           f"no POSTs sent. Accessibility: {report['accessibility']['status']}.")
 
 

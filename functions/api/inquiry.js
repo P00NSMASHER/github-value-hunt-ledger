@@ -34,7 +34,7 @@ function answer(code, body) {
 function invalid(message = "Please review the form details and try again.") {
   return answer(400, { ok: false, error: message });
 }
-function cleanString(x, limit, required = false) {
+export function cleanString(x, limit, required = false) {
   if (typeof x !== "string" || x.length > limit * 3) return null;
   const v = x.trim().replace(/\s+/g, " ");
   return (!v && required) || v.length > limit || /[\x00-\x08\x0B-\x1F\x7F]/.test(v) ? null : v;
@@ -48,7 +48,7 @@ function checkedList(x, allowed, required = false) {
   if (x.some(v => typeof v !== "string" || !allowed.has(v))) return null;
   return [...new Set(x)].sort();
 }
-function validEmail(x) {
+export function validEmail(x) {
   return x && x.length <= 160 && /^[a-zA-Z0-9][a-zA-Z0-9._%+\-]{0,62}@[a-zA-Z0-9](?:[a-zA-Z0-9.\-]{0,190}[a-zA-Z0-9])?\.[a-zA-Z]{2,24}$/.test(x) &&
     !x.includes("..");
 }
@@ -171,7 +171,7 @@ async function limitRequest(env, ip) {
   }
   return true;
 }
-async function verifyTurnstile(p, request, env) {
+async function verifyTurnstile(p, request, env, policy) {
   const form = new FormData();
   form.set("secret", env.TURNSTILE_SECRET);
   form.set("response", p.turnstileToken);
@@ -182,7 +182,10 @@ async function verifyTurnstile(p, request, env) {
   });
   if (!response.ok) return false;
   const r = await response.json();
-  return r.success === true && r.action === "retally_audit" && HOSTS.has(r.hostname);
+  return r.success === true && r.action === policy.turnstileAction &&
+    (policy.validTurnstileHostname
+      ? policy.validTurnstileHostname(r.hostname, request)
+      : HOSTS.has(r.hostname));
 }
 export function notificationText(reference, p) {
   const lines = [
@@ -200,7 +203,7 @@ export function notificationText(reference, p) {
   ];
   return lines.join("\n");
 }
-async function notify(env, reference, p) {
+async function notify(env, reference, p, policy) {
   // Resend's 200 + UUID proves only API acceptance, NOT recipient-mailbox
   // delivery. The separately verified Zoho receipt remains a release gate.
   // A stable provider key reduces duplicate sends on ambiguous transport retries.
@@ -215,8 +218,8 @@ async function notify(env, reference, p) {
       from: RESEND_FROM,
       to: [env.INQUIRY_NOTIFY_TO],
       reply_to: p.workEmail,
-      subject: "RETALLY Free Audit | " + reference,
-      text: notificationText(reference, p)
+      subject: policy.subject + " | " + reference,
+      text: policy.notificationText(reference, p)
     }),
     signal: AbortSignal.timeout(9000)
   });
@@ -226,15 +229,25 @@ async function notify(env, reference, p) {
     !Array.isArray(result) && typeof result.id === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(result.id);
 }
-export async function onRequestPost({ request, env }) {
+const FREIGHT_POLICY = Object.freeze({
+  normalize, turnstileAction: "retally_audit", subject: "RETALLY Free Audit", notificationText,
+  details: p => ({
+    monthlyShipments:p.monthlyShipments,invoiceHistory:p.invoiceHistory,suspectedIssues:p.suspectedIssues,
+    records:p.records,majorCarriers:p.majorCarriers,issueNotes:p.issueNotes,campaign:p.campaign
+  })
+});
+
+// Only server-owned route policies call this shared transport. Request bodies
+// cannot supply a policy, recipient, provider endpoint, action or SQL schema.
+export async function receiveInquiry({ request, env }, policy) {
   // A backend deployment alone does not enable this service for the public.
   if (!validEnv(env)) return answer(503, { ok: false, error: "Online submission is not available. Please use the email contact option." });
-  if (!validOrigin(request)) return answer(403, { ok: false, error: "Request origin was not accepted." });
+  if (!(policy.validOrigin || validOrigin)(request)) return answer(403, { ok: false, error: "Request origin was not accepted." });
   if (!/^application\/json(?:\s*;.*)?$/i.test(request.headers.get("content-type") || "")) {
     return answer(415, { ok: false, error: "Only the secure form is supported. No file attachments are accepted." });
   }
   let p;
-  try { p = normalize(await boundedJson(request)); }
+  try { p = policy.normalize(await boundedJson(request)); }
   catch (e) { return e.message === "too_large" ? answer(413, { ok: false, error: "Request is too large. Do not include documents." }) : invalid(); }
   if (!p) return invalid("Please correct the form. Do not include account numbers, credentials or attachments.");
   const payload = canonical(p);
@@ -250,7 +263,7 @@ export async function onRequestPost({ request, env }) {
     if (!await limitRequest(env, request.headers.get("CF-Connecting-IP"))) {
       return answer(429, { ok: false, error: "Please try again later or contact RETALLY by email." });
     }
-    if (!await verifyTurnstile(p, request, env)) {
+    if (!await verifyTurnstile(p, request, env, policy)) {
       return invalid("Verification expired or failed. Refresh the verification and try again.");
     }
     const reference = "RA-" + new Date().toISOString().slice(0,10).replaceAll("-","") +
@@ -260,10 +273,7 @@ export async function onRequestPost({ request, env }) {
       "INSERT INTO inquiries(reference,idempotency_key,fingerprint,full_name,work_email,company_name,annual_spend,modes_json,details_json,accepted_at,notification_status) " +
       "VALUES(?,?,?,?,?,?,?,?,?,?,'pending') ON CONFLICT(idempotency_key) DO NOTHING"
     ).bind(reference,p.idempotencyKey,fingerprint,p.fullName,p.workEmail,p.companyName,p.annualSpend,
-      JSON.stringify(p.modes), JSON.stringify({
-        monthlyShipments:p.monthlyShipments,invoiceHistory:p.invoiceHistory,suspectedIssues:p.suspectedIssues,
-        records:p.records,majorCarriers:p.majorCarriers,issueNotes:p.issueNotes,campaign:p.campaign
-      }),now).run();
+      JSON.stringify(p.modes), JSON.stringify(policy.details(p)),now).run();
     if (!inserted.success) throw new Error("db_insert_failed");
     if (inserted.meta?.changes === 0) {
       const duplicate = await db.prepare("SELECT reference,fingerprint,notification_status FROM inquiries WHERE idempotency_key=?")
@@ -275,7 +285,7 @@ export async function onRequestPost({ request, env }) {
     // Durable acceptance is committed above. Notification is a separate, tracked state.
     let notified = false;
     let notificationStatus = "pending";
-    try { notified = await notify(env,reference,p); } catch (_) { /* pending for operator reconciliation */ }
+    try { notified = await notify(env,reference,p,policy); } catch (_) { /* pending for operator reconciliation */ }
     if (notified) {
       try {
         const updated = await db.prepare("UPDATE inquiries SET notification_status='provider_accepted',notified_at=? WHERE reference=?")
@@ -300,6 +310,9 @@ export async function onRequestPost({ request, env }) {
     // Never expose raw input, infrastructure details, tokens or stack traces.
     return answer(503, { ok: false, error: "We could not confirm receipt. Please use the email contact option." });
   }
+}
+export function onRequestPost(context) {
+  return receiveInquiry(context, FREIGHT_POLICY);
 }
 export function onRequestGet({ env }) {
   if (!validEnv(env)) return answer(503, { online: false });

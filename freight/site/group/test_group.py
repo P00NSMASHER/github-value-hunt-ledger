@@ -158,6 +158,7 @@ def test_successor_links_resolve_directly_without_changing_unrelated_urls(tmp_pa
 <a href="capturebrief/?source=old&amp;campaign=launch#sample">Sample</a>
 <a href="https://www.retallyrecovery.com/permitplate/index.html#nyc">NYC</a>
 <a href="/recoveryos/">Other recovery</a><a href="/contact/">Contact</a>
+<a href="/contact/?business=CaptureBrief">CaptureBrief enquiry</a>
 <a href="/rehabsignal/">Archive</a><a href="/recoveryos/guide.pdf">Guide</a>
 <a href="#pricing">Pricing</a><a href="mailto:jay@retallyrecovery.com">Email</a>
 <link rel="canonical" href="https://www.retallyrecovery.com/">''')
@@ -168,6 +169,7 @@ def test_successor_links_resolve_directly_without_changing_unrelated_urls(tmp_pa
     assert 'href="https://permitplate.retallyrecovery.com/#nyc"' in html
     assert 'href="https://recoveryworks.retallyrecovery.com/"' in html
     assert 'href="https://group.retallyrecovery.com/#contact"' in html
+    assert 'href="https://group.retallyrecovery.com/?business=CaptureBrief#contact"' in html
     for unchanged in ("/rehabsignal/", "/recoveryos/guide.pdf", "#pricing", "mailto:jay@retallyrecovery.com"):
         assert f'href="{unchanged}"' in html
     assert f'<link rel="canonical" href="{NEW_BASE}">' in html
