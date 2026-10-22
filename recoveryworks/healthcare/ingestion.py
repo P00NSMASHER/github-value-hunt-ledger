@@ -44,11 +44,25 @@ def _record(cls, raw):
     allowed = {f.name for f in fields(cls)}
     if set(raw) - allowed:
         raise ValueError('UNKNOWN_FIELD')
+    # Dataclass convenience defaults are NOT authority or source evidence.
+    # Do not allow a real import to implicitly mark unclassified supplies as
+    # fixed-pack, a receipt as accepted, or an unreviewed invoice as active.
+    required_explicit = {
+        'ProductIdentity': ('category',),
+        'InvoiceLine': ('line_number', 'status', 'unsupported_components'),
+        'ContractAuthority': ('rounding', 'quantity_basis'),
+        'ReceiptEvent': ('accepted',),
+        'PaymentEvent': ('kind',),
+    }.get(cls.__name__, ())
+    if any(key not in raw for key in required_explicit):
+        raise ValueError('MISSING_CRITICAL_FIELD')
     values = dict(raw)
     for key in ('source', 'authority_source', 'receipt_source', 'notice_source'):
         if key in values and values[key] is not None:
             if type(values[key]) is not dict:
                 raise ValueError('INVALID_SOURCE')
+            if 'system' not in values[key]:
+                raise ValueError('MISSING_SOURCE_ORIGIN')
             values[key] = SourceRef(**values[key])
     if type(values.get('scope')) is not dict:
         raise ValueError('MISSING_SCOPE')

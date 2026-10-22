@@ -420,6 +420,43 @@ class EngineTests(unittest.TestCase):
         self.assertIn('DUPLICATE_CREDIT_EVENT', {h.code for h in r.holds})
         self.assertEqual(r.remaining_candidate_cents, 0)
 
+    def test_missing_critical_state_fields_never_default_to_verified(self):
+        b = fixture()
+        from recoveryworks.healthcare.models import TABLE_TYPES
+        table_names = {v: k for k, v in TABLE_TYPES.items()}
+        raw_original = {'schema_version': 1}
+        for row in b.records:
+            raw_original.setdefault(table_names[type(row)], []).append(asdict(row))
+        for table, key in [('products', 'category'), ('invoices', 'status'),
+                           ('invoices', 'line_number'), ('invoices', 'unsupported_components'),
+                           ('contracts', 'rounding'), ('contracts', 'quantity_basis'),
+                           ('receipts', 'accepted'), ('payments', 'kind')]:
+            raw = json.loads(json.dumps(raw_original))
+            del raw[table][0][key]
+            data = json.dumps(raw).encode()
+            counts = tuple(sorted((k, len(v)) for k, v in raw.items() if k != 'schema_version'))
+            approval = ApprovedScope((SCOPE,), hashlib.sha256(data).hexdigest(), counts,
+                                      '2026-01-01','2026-12-31','2026-04-30','2026-03-10', True)
+            batch = import_json(data, approval)
+            with self.subTest(table=table, field=key):
+                self.assertIn('MISSING_CRITICAL_FIELD', {h.code for h in batch.holds})
+                self.assertFalse(batch.complete)
+
+    def test_missing_original_source_system_is_held(self):
+        b = fixture()
+        from recoveryworks.healthcare.models import TABLE_TYPES
+        names = {v: k for k, v in TABLE_TYPES.items()}
+        raw = {'schema_version': 1}
+        for row in b.records:
+            raw.setdefault(names[type(row)], []).append(asdict(row))
+        del raw['invoices'][0]['source']['system']
+        data = json.dumps(raw).encode()
+        counts = tuple(sorted((k, len(v)) for k, v in raw.items() if k != 'schema_version'))
+        scope = ApprovedScope((SCOPE,), hashlib.sha256(data).hexdigest(), counts,
+                              '2026-01-01', '2026-12-31', '2026-04-30', '2026-03-10', True)
+        result = import_json(data, scope)
+        self.assertIn('MISSING_SOURCE_ORIGIN', {h.code for h in result.holds})
+
 
 if __name__ == '__main__':
     unittest.main()
