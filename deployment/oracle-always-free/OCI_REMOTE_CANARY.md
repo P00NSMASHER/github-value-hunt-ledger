@@ -23,7 +23,7 @@ Relevant Oracle official references:
 
 ## GitHub configuration AFTER passing the above checks
 
-Add NEW encrypted GitHub Actions secrets `RETALLY_OCI_RUN_CLIENT_ID`, `RETALLY_OCI_RUN_CLIENT_SECRET`. Add NEW variables `RETALLY_OCI_RUN_DOMAIN_URL` (identity-domain HTTPS origin), `RETALLY_OCI_RUN_APPROVED_SHA` (exact CI-green main SHA), and `RETALLY_OCI_RUN_COMMAND_ENABLED`. The last flag must stay absent or `false` until the independent checks and complete configuration pass. The script reuses the already-configured nonsensitive `RETALLY_OCI_COMPARTMENT_OCID` and `RETALLY_OCI_VM_OCID` variables, but NEVER the original monitor's secret.
+Add NEW encrypted GitHub Actions secrets `RETALLY_OCI_RUN_CLIENT_ID`, `RETALLY_OCI_RUN_CLIENT_SECRET`. Add NEW variables `RETALLY_OCI_RUN_DOMAIN_URL` (identity-domain HTTPS origin), `RETALLY_OCI_VM_COMPARTMENT_OCID` (the dedicated compartment containing only the approved VM), `RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID` (the same compartment, for command records), `RETALLY_OCI_RUN_APPROVED_SHA` (exact CI-green main SHA), and `RETALLY_OCI_RUN_COMMAND_ENABLED`. The last flag must stay absent or `false` until the independent checks and complete configuration pass. The script reuses `RETALLY_OCI_VM_OCID` to pin the target, but NEVER the original monitor's secret. Keep command creation restricted to that exact VM; grant command-result reads only inside its dedicated compartment.
 
 Run **Actions → RETALLY OCI Remote No-Write Canary → Run workflow** on `main`, only after the exact selected SHA is verified and recorded. The workflow's PR lane runs ONLY offline unit tests. An attempted dispatch while disabled produces an explicit failed HOLD job, not a false green live certificate. Scheduled execution is intentionally absent.
 
