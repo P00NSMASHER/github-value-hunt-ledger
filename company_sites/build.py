@@ -33,6 +33,14 @@ PROFILES = {
         "pages": ("index.html", "privacy/index.html"),
         "files": ("index.html", "privacy/index.html", "site.css", "enquiry.js", "_headers"),
         "assets": {
+            "assets/brand/freightrecovery-600-20261022.webp": "freight/site/assets/brand/freightrecovery-600-20261022.webp",
+            "assets/brand/freightrecovery-1200-20261022.webp": "freight/site/assets/brand/freightrecovery-1200-20261022.webp",
+            "assets/brand/recoveryos-600-20261022.webp": "freight/site/assets/brand/recoveryos-600-20261022.webp",
+            "assets/brand/recoveryos-1200-20261022.webp": "freight/site/assets/brand/recoveryos-1200-20261022.webp",
+            "assets/brand/permitplate-600-20261022.webp": "freight/site/assets/brand/permitplate-600-20261022.webp",
+            "assets/brand/permitplate-1200-20261022.webp": "freight/site/assets/brand/permitplate-1200-20261022.webp",
+            "assets/brand/capturebrief-600-20261022.webp": "freight/site/assets/brand/capturebrief-600-20261022.webp",
+            "assets/brand/capturebrief-1200-20261022.webp": "freight/site/assets/brand/capturebrief-1200-20261022.webp",
             "assets/hero.webp": "freight/site/group/assets/hero-1536.webp",
             "assets/freight.webp": "freight/site/assets/images/terminal-blue-hour-800.webp",
             "assets/recoveryworks.webp": "recoveryworks/site/assets/analyst-review.webp",
@@ -51,6 +59,8 @@ PROFILES = {
         "pages": ("index.html", "engagement/index.html", "privacy/index.html"),
         "files": ("index.html", "engagement/index.html", "privacy/index.html", "site.css", "_headers"),
         "assets": {
+            "assets/brand/recoveryos-600-20261022.webp": "freight/site/assets/brand/recoveryos-600-20261022.webp",
+            "assets/brand/recoveryos-1200-20261022.webp": "freight/site/assets/brand/recoveryos-1200-20261022.webp",
             "assets/hero-industrial.webp": "recoveryworks/site/assets/hero-industrial.webp",
             "assets/analyst-review.webp": "recoveryworks/site/assets/analyst-review.webp",
             "assets/proof-stack.webp": "recoveryworks/site/assets/proof-stack.webp",
