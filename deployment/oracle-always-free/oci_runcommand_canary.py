@@ -44,7 +44,8 @@ EXPECTED_KEYS = {
 }
 REQUIRED = (
     "RETALLY_OCI_RUN_DOMAIN_URL", "RETALLY_OCI_RUN_CLIENT_ID",
-    "RETALLY_OCI_RUN_CLIENT_SECRET", "RETALLY_OCI_COMPARTMENT_OCID",
+    "RETALLY_OCI_RUN_CLIENT_SECRET", "RETALLY_OCI_VM_COMPARTMENT_OCID",
+    "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
     "RETALLY_OCI_VM_OCID", "ACTIONS_ID_TOKEN_REQUEST_URL",
     "ACTIONS_ID_TOKEN_REQUEST_TOKEN", "RETALLY_OCI_RUN_APPROVED_SHA",
     "GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT",
@@ -79,11 +80,20 @@ def check_context(env: dict[str, str]) -> None:
                  oidc.port is None and not oidc.username and not oidc.password and
                  not oidc.fragment, "UNTRUSTED_GITHUB_OIDC_ENDPOINT")
     auth.require(re.fullmatch(r"ocid1\.(compartment|tenancy)\.oc1\.[a-z0-9.-]+",
-                                  env["RETALLY_OCI_COMPARTMENT_OCID"]) is not None,
+                                  env["RETALLY_OCI_VM_COMPARTMENT_OCID"]) is not None,
                  "COMPARTMENT_INVALID")
+    auth.require(re.fullmatch(r"ocid1\.compartment\.oc1\.[a-z0-9.-]+",
+                                  env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"]) is not None,
+                 "COMPARTMENT_INVALID")
+    auth.require(env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"] ==
+                 env["RETALLY_OCI_VM_COMPARTMENT_OCID"], "COMPARTMENT_INVALID")
     auth.require(re.fullmatch(r"ocid1\.instance\.oc1\.[a-z0-9.-]+",
                                   env["RETALLY_OCI_VM_OCID"]) is not None,
                  "INSTANCE_INVALID")
+    existing = env.get("GITHUB_INPUT_EXISTING_COMMAND_ID", "").strip()
+    auth.require(not existing or re.fullmatch(
+        r"ocid1\.instanceagentcommand\.oc1\.[a-z0-9.-]+", existing) is not None,
+        "COMMAND_ID_INVALID")
     auth.require(env["RETALLY_OCI_RUN_CLIENT_ID"] != env.get("RETALLY_OCI_CLIENT_ID"),
                  "SHARED_MONITOR_CREDENTIAL_REFUSED")
 
@@ -120,7 +130,7 @@ def get_github_jwt(env: dict[str, str]) -> str:
 
 def check_vm(vm: object, env: dict[str, str]) -> None:
     auth.require(getattr(vm, "id", None) == env["RETALLY_OCI_VM_OCID"] and
-                 getattr(vm, "compartment_id", None) == env["RETALLY_OCI_COMPARTMENT_OCID"] and
+                 getattr(vm, "compartment_id", None) == env["RETALLY_OCI_VM_COMPARTMENT_OCID"] and
                  getattr(vm, "shape", None) == VM_SHAPE and
                  getattr(vm, "lifecycle_state", None) == "RUNNING", "INSTANCE_NOT_APPROVED")
     agent = getattr(vm, "agent_config", None)
@@ -147,7 +157,7 @@ def check_plugin(plugins: list[object]) -> None:
 def make_command_details(oci, env: dict[str, str]):
     m = oci.compute_instance_agent.models
     return m.CreateInstanceAgentCommandDetails(
-        compartment_id=env["RETALLY_OCI_COMPARTMENT_OCID"],
+        compartment_id=env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
         execution_time_out_in_seconds=45,
         display_name="RETALLY synthetic no-write canary",
         target=m.InstanceAgentCommandTarget(instance_id=env["RETALLY_OCI_VM_OCID"]),
@@ -175,7 +185,63 @@ def check_execution(run: object, command_id: str, vm_id: str) -> bool:
     return True
 
 
-def execute_canary(env: dict[str, str]) -> None:
+def poll_existing_command(command, command_id: str, instance_id: str,
+                          max_attempts: int = 45, delay_seconds: int = 4) -> None:
+    """Poll the *same* accepted command. Never resubmit on lookup errors.
+
+    OCI Audit reproduced a 404 on a read just milliseconds after successful
+    command creation. A bounded 404-only read retry permits propagation while
+    retaining refusal for other errors and all unverified output/identities.
+    """
+    auth.require(max_attempts >= 1 and delay_seconds >= 0, "EXECUTION_LOOKUP_UNVERIFIED")
+    for attempt in range(max_attempts):
+        try:
+            result = command.get_instance_agent_command_execution(
+                command_id, instance_id).data
+        except Exception as exc:
+            # Oracle can return NotAuthorizedOrNotFound before a just-created
+            # command has propagated. An actual permission denial with the same
+            # code still fails after a finite number of READS. Never recreate.
+            if (getattr(exc, "status", None) == 404 and
+                    getattr(exc, "code", None) in ("NotAuthorizedOrNotFound", "NotFound") and
+                    attempt + 1 < max_attempts):
+                time.sleep(delay_seconds)
+                continue
+            raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
+        if check_execution(result, command_id, instance_id):
+            return
+        if attempt + 1 < max_attempts:
+            time.sleep(delay_seconds)
+    raise auth.Refused("EXECUTION_UNCONFIRMED_NO_RETRY")
+
+
+def submit_or_reconcile(oci, command, env: dict[str, str]) -> bool:
+    """Return True only when this invocation creates a command."""
+    existing = env.get("GITHUB_INPUT_EXISTING_COMMAND_ID", "").strip()
+    if existing:
+        # Read once only. This mode exists to reconcile a known accepted
+        # command without any chance of resubmission.
+        poll_existing_command(command, existing, env["RETALLY_OCI_VM_OCID"],
+                              max_attempts=1, delay_seconds=0)
+        return False
+    details = make_command_details(oci, env)
+    request_key = hashlib.sha256((
+        "retally-synthetic:" + env["GITHUB_RUN_ID"] + ":" + env["GITHUB_RUN_ATTEMPT"]
+    ).encode()).hexdigest()
+    try:
+        created = command.create_instance_agent_command(
+            details, opc_retry_token=request_key).data
+    except Exception:
+        raise auth.Refused("COMMAND_ACCEPTANCE_UNKNOWN_NO_RETRY") from None
+    command_id = getattr(created, "id", None)
+    auth.require(isinstance(command_id, str) and
+                 command_id.startswith("ocid1.instanceagentcommand."),
+                 "COMMAND_ACKNOWLEDGEMENT_INVALID")
+    poll_existing_command(command, command_id, env["RETALLY_OCI_VM_OCID"])
+    return True
+
+
+def execute_canary(env: dict[str, str]) -> bool:
     check_context(env)  # Before importing OCI or doing any network I/O.
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import rsa
@@ -208,45 +274,21 @@ def execute_canary(env: dict[str, str]) -> None:
             cfg, signer=signer, retry_strategy=noretry)
         check_vm(compute.get_instance(env["RETALLY_OCI_VM_OCID"]).data, env)
         check_plugin(plugin.list_instance_agent_plugins(
-            env["RETALLY_OCI_COMPARTMENT_OCID"], env["RETALLY_OCI_VM_OCID"],
+            env["RETALLY_OCI_VM_COMPARTMENT_OCID"], env["RETALLY_OCI_VM_OCID"],
             name="Compute Instance Run Command").data)
     except auth.Refused:
         raise
     except Exception:
         raise auth.Refused("PROVIDER_PREFLIGHT_FAILED") from None
 
-    details = make_command_details(oci, env)
-    # One create only. Ambiguous SDK errors require Oracle Audit reconciliation.
-    request_key = hashlib.sha256((
-        "retally-synthetic:" + env["GITHUB_RUN_ID"] + ":" + env["GITHUB_RUN_ATTEMPT"]
-    ).encode()).hexdigest()
-    try:
-        created = command.create_instance_agent_command(
-            details, opc_retry_token=request_key).data
-    except Exception:
-        raise auth.Refused("COMMAND_ACCEPTANCE_UNKNOWN_NO_RETRY") from None
-    command_id = getattr(created, "id", None)
-    auth.require(isinstance(command_id, str) and
-                 command_id.startswith("ocid1.instanceagentcommand."),
-                 "COMMAND_ACKNOWLEDGEMENT_INVALID")
-    for _ in range(60):
-        try:
-            result = command.get_instance_agent_command_execution(
-                command_id, env["RETALLY_OCI_VM_OCID"]).data
-            if check_execution(result, command_id, env["RETALLY_OCI_VM_OCID"]):
-                return
-        except auth.Refused:
-            raise
-        except Exception:
-            raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
-        time.sleep(4)
-    raise auth.Refused("EXECUTION_UNCONFIRMED_NO_RETRY")
+    return submit_or_reconcile(oci, command, env)
 
 
 PUBLIC_CODES = {
     "INVALID_GITHUB_CONTEXT", "RUN_COMMAND_DISABLED", "MISSING_CONFIGURATION",
     "SOURCE_SHA_INVALID", "SOURCE_SHA_NOT_APPROVED", "UNTRUSTED_IDENTITY_DOMAIN",
     "UNTRUSTED_GITHUB_OIDC_ENDPOINT", "COMPARTMENT_INVALID", "INSTANCE_INVALID",
+    "COMMAND_ID_INVALID",
     "SHARED_MONITOR_CREDENTIAL_REFUSED", "OIDC_CLAIMS_REJECTED", "OIDC_TOKEN_EXPIRED",
     "INSTANCE_NOT_APPROVED", "AGENT_CONFIGURATION_UNVERIFIED", "RUN_PLUGIN_NOT_ENABLED",
     "RUN_PLUGIN_NOT_RUNNING", "EXECUTION_IDENTITY_MISMATCH",
@@ -259,13 +301,15 @@ PUBLIC_CODES = {
 
 def main() -> int:
     try:
-        execute_canary(dict(os.environ))
+        created = execute_canary(dict(os.environ))
     except Exception as exc:
         print("RETALLY OCI REMOTE: HOLD " + (
             str(exc) if isinstance(exc, auth.Refused) and str(exc) in PUBLIC_CODES
             else "UNCLASSIFIED_FAILURE"))
         return 1
-    print("RETALLY OCI REMOTE: PASS (one synthetic, no-write command on verified VM)")
+    print("RETALLY OCI REMOTE: PASS (" + (
+        "one synthetic, no-write command on verified VM" if created else
+        "existing accepted command reconciled; no command created") + ")")
     print("RETALLY CUSTOMER RELEASE: HOLD")
     return 0
 

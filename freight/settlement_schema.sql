@@ -22,6 +22,57 @@ CREATE TABLE IF NOT EXISTS review_claims (
   FOREIGN KEY (buyer_id,business_unit,claim_id)
     REFERENCES recovery_claims(buyer_id,business_unit,claim_id)
 );
+
+-- RT05: Immutable, scoped, source-declared notice. No release is inferred from
+-- a reviewer string, a carrier credit, a test MAC or an unadjudicated claim.
+CREATE TABLE IF NOT EXISTS claim_dispute_holds (
+  buyer_id TEXT NOT NULL,
+  business_unit TEXT NOT NULL,
+  hold_id TEXT NOT NULL,
+  claim_id TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK(kind IN (
+    'CARRIER_DISPUTE','CARRIER_DENIAL','CUSTOMER_DISPUTE',
+    'CUSTOMER_WITHDRAWAL','INSOLVENCY_NOTICE',
+    'CARRIER_OUT_OF_BUSINESS','CLAIM_TIME_BAR_CONCERN'
+  )),
+  observed_at TEXT NOT NULL,
+  source_hash TEXT NOT NULL,
+  PRIMARY KEY (buyer_id,business_unit,hold_id),
+  UNIQUE (buyer_id,business_unit,source_hash),
+  FOREIGN KEY (buyer_id,business_unit,claim_id)
+    REFERENCES recovery_claims(buyer_id,business_unit,claim_id)
+);
+CREATE INDEX IF NOT EXISTS idx_dispute_hold_claim
+  ON claim_dispute_holds(buyer_id,business_unit,claim_id);
+CREATE TRIGGER IF NOT EXISTS immutable_dispute_hold_u
+  BEFORE UPDATE ON claim_dispute_holds
+  BEGIN SELECT RAISE(ABORT,'claim dispute hold is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS immutable_dispute_hold_d
+  BEFORE DELETE ON claim_dispute_holds
+  BEGIN SELECT RAISE(ABORT,'claim dispute hold is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS dispute_hold_source_guard
+  BEFORE INSERT ON claim_dispute_holds BEGIN
+  SELECT CASE WHEN
+    length(NEW.source_hash)<>64 OR NEW.source_hash GLOB '*[^0-9a-f]*'
+    OR length(NEW.hold_id)<>64 OR NEW.hold_id GLOB '*[^0-9a-f]*'
+  THEN RAISE(ABORT,'dispute hold source hashes must be SHA-256') END;
+  SELECT CASE WHEN
+    length(NEW.observed_at)<>27 OR NEW.observed_at NOT GLOB
+       '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.observed_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.observed_at)<>substr(NEW.observed_at,1,19)
+  THEN RAISE(ABORT,'dispute hold observed_at must be canonical UTC') END;
+  SELECT CASE WHEN NEW.observed_at < (
+    SELECT issued_at FROM recovery_claims
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND claim_id=NEW.claim_id
+  ) THEN RAISE(ABORT,'dispute hold predates original claim') END;
+  SELECT CASE WHEN NEW.source_hash=(
+    SELECT source_hash FROM recovery_claims
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND claim_id=NEW.claim_id
+  ) THEN RAISE(ABORT,'dispute notice cannot reuse claim source') END;
+END;
 CREATE TABLE IF NOT EXISTS settlement_events (
   buyer_id TEXT NOT NULL,
   business_unit TEXT NOT NULL,
@@ -265,4 +316,14 @@ CREATE TRIGGER IF NOT EXISTS reversal_event_match BEFORE INSERT ON reversal_edge
     (SELECT original_event_id FROM counter_events WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND counter_id=NEW.counter_id)
     <> (SELECT event_id FROM allocations WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND allocation_id=NEW.allocation_id)
   THEN RAISE(ABORT,'counter event does not fund allocation') END;
+END;
+
+-- SQL-level guard: direct legacy INSERT cannot silently bypass Python.
+CREATE TRIGGER IF NOT EXISTS allocation_active_dispute_guard
+  BEFORE INSERT ON allocations BEGIN
+  SELECT CASE WHEN EXISTS(
+    SELECT 1 FROM claim_dispute_holds h
+    WHERE h.buyer_id=NEW.buyer_id AND h.business_unit=NEW.business_unit
+      AND h.claim_id=NEW.claim_id
+  ) THEN RAISE(ABORT,'claim dispute hold prevents allocation') END;
 END;
