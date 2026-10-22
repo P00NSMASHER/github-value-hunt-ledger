@@ -1,0 +1,96 @@
+name: RETALLY RT05 Dispute-Integrity Boundary
+
+on:
+  pull_request:
+    paths:
+      - 'freight/settlement_schema.sql'
+      - 'freight/settlement_store.py'
+      - 'freight/recovery_resilience.py'
+      - 'freight/settlement_report.py'
+      - 'freight/currency_reporting.py'
+      - 'freight/settlement_review_workflow.py'
+      - 'freight/test_rt05_dispute_integrity.py'
+      - 'freight/test_rt05_boundary_redteam.py'
+      - 'freight/test_rt05_backdated_allocation.py'
+      - 'freight/RT05_DISPUTE_BOUNDARY_ACCEPTANCE.md'
+      - '.github/workflows/retally-rt05-dispute-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freight/settlement_schema.sql'
+      - 'freight/settlement_store.py'
+      - 'freight/recovery_resilience.py'
+      - 'freight/settlement_report.py'
+      - 'freight/currency_reporting.py'
+      - 'freight/settlement_review_workflow.py'
+      - 'freight/test_rt05_dispute_integrity.py'
+      - 'freight/test_rt05_boundary_redteam.py'
+      - 'freight/test_rt05_backdated_allocation.py'
+      - '.github/workflows/retally-rt05-dispute-gate.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-rt05-claim-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  dispute-boundary:
+    name: dispute-redteam-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout exact tested source without credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Pin Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install bounded test dependencies
+        run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2 tzdata==2025.2
+      - name: Compile source-bound claims, holds and red-team suite
+        run: python -m compileall -q freight/settlement_store.py freight/recovery_resilience.py freight/currency_reporting.py freight/settlement_report.py freight/settlement_review_workflow.py freight/test_rt05_dispute_integrity.py freight/test_rt05_boundary_redteam.py freight/test_rt05_backdated_allocation.py
+      - name: Run synthetic disputed-claim transaction and concurrency tests
+        run: python -m pytest -q freight/test_rt05_dispute_integrity.py freight/test_rt05_boundary_redteam.py freight/test_rt05_backdated_allocation.py
+      - name: Verify git source integrity
+        run: git diff --check
+
+  preserve-settlement-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2
+      - name: Run original financial, freight and pilot correctness controls
+        run: |
+          python -m pytest -q \
+            freight/test_priority0_financial_integrity.py \
+            freight/test_priority1_financial_assurance.py \
+            freight/test_priority2_evidence.py \
+            freight/test_priority3_recovery_resilience.py \
+            freight/test_priority4_adversarial_lab.py \
+            freight/test_redteam_round2_repairs.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_review_workflow.py \
+            freight/test_settlement_lifecycle_workflow.py \
+            freight/test_settlement_report.py \
+            freight/test_recovery_claim_workflow.py \
+            freight/test_financial_integrity_r1.py
+      - name: Reject inadvertent real financial source fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! git ls-files freight/fixtures | grep -Ei '\.(pdf|xlsx|csv|db|sqlite3)$'
+          ! git ls-files freight | grep -Ei 'private.*(invoice|customer|bank).*\.(pdf|csv|db)$'

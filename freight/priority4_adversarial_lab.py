@@ -418,8 +418,33 @@ def assert_independent_invariants(
         raise AssertionError("incomplete source-bound receipt")
 
 
+def _assert_safe_receipt_result(result: RecoveryScenarioResult) -> None:
+    """A receipt cannot certify prohibited financial/customer assertions.
+
+    The original stress oracle guards ordinary execute_case(), but the public
+    receipt creator and verifier also need independent fail-closed checks:
+    callers must not be able to bypass the oracle by minting a new receipt.
+    """
+    if not isinstance(result, RecoveryScenarioResult):
+        raise AssertionError("typed recovery result required for synthetic receipt")
+    if (result.externally_approved_case or result.carrier_contact_attempts
+            or result.payment_actions_performed or result.independently_verified_cash_cents
+            or result.customer_fee_billable_cents
+            or result.settlement.real_recovered_cash_cents
+            or result.settlement.source_authenticated_payment_cents
+            or result.feasibility.probabilities_empirically_calibrated
+            or not result.feasibility.no_billable_fee_authority):
+        raise AssertionError("financial actions, fees, verified cash or approvals forbidden in synthetic receipt")
+    if any(not t.no_external_action or not t.no_money_movement
+           for t in result.customer_request_triage):
+        raise AssertionError("synthetic receipt contains executable customer request")
+    if not result.report_hash or len(result.report_hash) != 64:
+        raise AssertionError("synthetic receipt lacks a valid source hash")
+
+
 def case_receipt(plan: StressPlan, result: RecoveryScenarioResult) -> CaseReceipt:
     _assert_plan_integrity(plan)
+    _assert_safe_receipt_result(result)
     fields = {
         "case_id": result.case_id,
         "ordinal": plan.ordinal,
@@ -443,6 +468,7 @@ def case_receipt(plan: StressPlan, result: RecoveryScenarioResult) -> CaseReceip
 
 
 def verify_receipt(plan: StressPlan, result: RecoveryScenarioResult, receipt: CaseReceipt) -> None:
+    _assert_safe_receipt_result(result)
     if not isinstance(receipt, CaseReceipt) or receipt != case_receipt(plan, result):
         raise AssertionError("tampered/replayed stress receipt does not match source inputs")
     if receipt.input_sha256 != plan.input_sha256 or not receipt.no_external_actions:
