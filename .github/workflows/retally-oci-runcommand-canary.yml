@@ -8,6 +8,11 @@ on:
       - 'deployment/oracle-always-free/test_oci_runcommand_canary.py'
       - 'deployment/oracle-always-free/OCI_REMOTE_CANARY.md'
   workflow_dispatch:
+    inputs:
+      existing_command_id:
+        description: 'Optional accepted command OCID to reconcile without creating a command'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -65,6 +70,7 @@ jobs:
       RETALLY_OCI_VM_COMPARTMENT_OCID: ${{ vars.RETALLY_OCI_VM_COMPARTMENT_OCID }}
       RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID: ${{ vars.RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID }}
       RETALLY_OCI_VM_OCID: ${{ vars.RETALLY_OCI_VM_OCID }}
+      GITHUB_INPUT_EXISTING_COMMAND_ID: ${{ inputs.existing_command_id }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
