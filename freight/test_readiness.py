@@ -1,6 +1,11 @@
+import math
+
+import pytest
+
 from freight.readiness import (
     PilotReadinessInput,
     ReadinessStatus,
+    _validate_ratio,
     assess_readiness,
 )
 
@@ -68,3 +73,35 @@ def test_invalid_coverage_is_rejected():
         assert "between 0 and 1" in str(exc)
     else:
         raise AssertionError("coverage > 1 should fail")
+
+
+@pytest.mark.parametrize("value", ["false", "true", 0, 1, None, [], {}])
+def test_hard_blockers_require_exact_booleans(value):
+    with pytest.raises(ValueError, match="authorization_documented must be a boolean"):
+        assess_readiness(ready_input(authorization_documented=value))
+
+
+@pytest.mark.parametrize("value", [True, False, "1", None, math.nan, math.inf, -math.inf])
+def test_coverage_requires_finite_numeric_ratios_not_booleans(value):
+    with pytest.raises(ValueError, match="invoice_source_coverage must be a finite number"):
+        assess_readiness(ready_input(invoice_source_coverage=value))
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "invoice_source_coverage",
+        "authority_source_coverage",
+        "shipment_evidence_coverage",
+    ],
+)
+@pytest.mark.parametrize("value", [10**400, -(10**400)])
+def test_oversized_integer_coverage_is_bounded_validation(field, value):
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        assess_readiness(ready_input(**{field: value}))
+
+
+@pytest.mark.parametrize("value", [10**400, -(10**400)])
+def test_validate_ratio_rejects_oversized_integer_without_overflow(value):
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        _validate_ratio("invoice_source_coverage", value)
