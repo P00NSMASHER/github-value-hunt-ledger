@@ -36,8 +36,9 @@ Those operational systems have not been migrated or proxied under this site.
 
 The private planning catalog is not serialized into the website. Public copy is
 explicitly curated in `catalog.py`; do not infer commercial availability from a
-repository test result. New enquiry links only prepare an email draft. There is
-no new tracking, upload, payment, waitlist subscription or outbound message flow.
+repository test result. Enquiry links now lead to the shared private contact
+form. Only CaptureBrief and PermitPlate expose their existing Stripe checkout
+links; research and preview pages do not gain a purchase or upload flow.
 
 ## Production publication
 
@@ -98,9 +99,30 @@ extra assets, symlinks, malformed WebP, wrong geometry or any image above 450 KB
 PNG generation masters are not shipped. Responsive image widths, intrinsic
 dimensions and lazy loading keep the new photography within a small page budget.
 
-The contact composer only prepares or copies a message. Nothing is posted,
-tracked, stored or sent by the page. The existing freight-only inquiry endpoint
-is not reused for other businesses. Existing mailto opt-outs remain intact.
+## Shared enquiry integration — 2026-10-22
+
+The contact form checks `GET /api/group-inquiry` before enabling secure intake.
+An explicit visitor submission sends name, email, optional company, allowlisted
+business, a non-sensitive message of up to 800 characters, consent, a Turnstile
+`retally_group` token and a request UUID. The API uses the existing private
+storage and notification infrastructure. The freight `/api/inquiry` contract
+remains separate. There is no document upload, browser persistence or analytics
+of form contents, and no submission occurs on page load.
+
+A saved reference is shown only after a valid HTTP 202 receipt. Notification
+pending is disclosed separately; the page never treats it as a failed save or
+claims delivery to an inbox. Network uncertainty preserves the entered details
+and request key for a safe retry. Fields are locked after a confirmed save.
+The email draft and complete manual-copy fallback remain available when the
+API, security challenge or clipboard is unavailable. Existing mailto opt-outs
+remain intact, and copies are explicitly described as unsent.
+
+`node freight/site/group/test_group_client.mjs` exercises the form with mocked
+transport and security verification: idle behavior, business-link compatibility,
+offline fallback, exact payload, saved/pending receipts, lost-response retries,
+changed request keys, malformed receipts, duplicate clicks and manual copying.
+These checks do not send an enquiry or email. A production GET and page readback
+verify availability; positive delivery needs a separately authorized live test.
 
 Visual acceptance runs all 13 routes at 1440, 768, 390, 375 and 320 CSS pixels, with
 real lazy-image loading, keyboard navigation, email-draft updates and chat
@@ -120,3 +142,4 @@ Recovery retains its own visual system and working intake.
 Content-derived CSS/JavaScript URLs prevent existing browser caches from mixing
 new HTML with an old stylesheet or script; the regression changes CSS bytes and
 checks that its URL changes automatically.
+

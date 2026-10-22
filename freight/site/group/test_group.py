@@ -137,7 +137,7 @@ def test_unavailable_products_do_not_gain_purchase_or_upload_flows(bundle):
         if b["status"] in {"Research", "Research prototype", "In development", "Private evaluation", "Preview available"}:
             html = (bundle / b["slug"] / "index.html").read_text()
             assert b["status"] in html
-            assert "mailto:jay@retallyrecovery.com?subject=" in html
+            assert 'href="/contact/?business=' + b["slug"] + '"' in html
             assert "buy.stripe.com" not in html
             assert "<form" not in html
             assert 'type="file"' not in html
@@ -229,7 +229,7 @@ def test_group_build_rejects_unreviewed_or_invalid_photography(tmp_path, monkeyp
         group_build.build_group(output)
 
 
-def test_contact_composer_is_labelled_and_explicitly_prepares_an_email_draft(bundle):
+def test_contact_form_is_labelled_private_and_requires_a_saved_receipt(bundle):
     page = Page((bundle / "contact/index.html").read_text())
     forms = [attrs for tag, attrs, _ in page.elements if tag == "form"]
     assert len(forms) == 1
@@ -243,7 +243,7 @@ def test_contact_composer_is_labelled_and_explicitly_prepares_an_email_draft(bun
     for _, attrs in controls:
         assert attrs.get("type") != "file"
         assert attrs.get("id")
-        assert any(text.strip() and any(tag == "label" and label.get("for") == attrs["id"]
+        assert attrs.get("aria-label") or any(text.strip() and any(tag == "label" and label.get("for") == attrs["id"]
                    for tag, label in parents) for text, parents in page.texts), attrs
     composer_copy = " ".join(text for text, parents in page.texts
                              if within(parents, element_id="group-enquiry")).lower()
@@ -260,8 +260,23 @@ def test_contact_composer_is_labelled_and_explicitly_prepares_an_email_draft(bun
     assert "auditForm" not in page.ids
     assert {urlsplit(ref).path for tag, ref in page.refs if tag == "script"} == {"/group.js"}
     script = (bundle / "group.js").read_text()
-    # The group composer has no transport or storage. Freight owns its API.
-    assert not re.search(r"/api/|\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket|localStorage|sessionStorage)\b", script)
+    assert "/api/group-inquiry" in script
+    assert 'action: "retally_group"' in script
+    assert 'response.status !== 202' in script
+    assert 'receipt.received !== true' in script
+    assert not re.search(r"\b(?:localStorage|sessionStorage|sendBeacon|WebSocket)\b", script)
+    by_id = {attrs["id"]: attrs for _, attrs in controls}
+    assert by_id["enquiry-message"]["maxlength"] == "800"
+    assert by_id["enquiry-email"]["type"] == "email"
+    assert "required" in by_id["enquiry-consent"]
+    assert by_id["enquiry-consent"]["type"] == "checkbox"
+    assert "checked" not in by_id["enquiry-consent"]
+    assert "not confirm email delivery" in composer_copy
+    assert "privately store" in composer_copy
+    security = next(attrs for tag, attrs, _ in page.elements if attrs.get("id") == "enquiry-turnstile")
+    assert security.get("role") == "group"
+    assert security.get("aria-label") == "Security verification"
+    assert all(b["slug"] in (bundle / "contact/index.html").read_text() for b in BUSINESSES)
 
 
 @pytest.mark.parametrize("slug", ["capturebrief", "permitplate"])
@@ -318,3 +333,4 @@ def test_returning_visitors_receive_current_design_assets(bundle, tmp_path):
     css_ref = lambda html: next(ref for _, ref in Page(html).refs if urlsplit(ref).path == "/group.css")
     assert css_ref(before) != css_ref(after)
     assert {ref for tag, ref in Page(before).refs if tag == "script"} == {ref for tag, ref in Page(after).refs if tag == "script"}
+

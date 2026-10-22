@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/group-inquiry.js"
       - "functions/api/internal/**"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
@@ -14,11 +15,14 @@ on:
       - "freight/site/index.html"
       - "freight/site/_headers"
       - "freight/site/test_inquiry.mjs"
+      - "freight/site/test_group_inquiry.mjs"
+      - "freight/site/group/**"
       - "freight/site/migrations/**"
       - ".github/workflows/retally-inquiry.yml"
   pull_request:
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/group-inquiry.js"
       - "functions/api/internal/**"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
@@ -29,6 +33,8 @@ on:
       - "freight/site/index.html"
       - "freight/site/_headers"
       - "freight/site/test_inquiry.mjs"
+      - "freight/site/test_group_inquiry.mjs"
+      - "freight/site/group/**"
       - "freight/site/migrations/**"
       - ".github/workflows/retally-inquiry.yml"
   workflow_dispatch:
@@ -50,11 +56,17 @@ jobs:
         with:
           node-version: "22"
       - name: Browser JavaScript syntax
-        run: node --check freight/site/site.js
+        run: |
+          node --check freight/site/site.js
+          node --check freight/site/group/group.js
       - name: Pages API JavaScript syntax
-        run: node --experimental-default-type=module --check functions/api/inquiry.js
+        run: |
+          node --experimental-default-type=module --check functions/api/inquiry.js
+          node --experimental-default-type=module --check functions/api/group-inquiry.js
       - name: Secure inquiry unit and mocked integration tests
-        run: node --experimental-default-type=module --test freight/site/test_inquiry.mjs
+        run: |
+          node --experimental-default-type=module --test freight/site/test_inquiry.mjs freight/site/test_group_inquiry.mjs
+          node freight/site/group/test_group_client.mjs
       - name: Signed human response, privacy and retention policy tests
         run: |
           node --check functions/api/internal/inquiry-case.js
@@ -75,6 +87,7 @@ jobs:
           public = Path('cf-retally-public')
           recovery = (public / 'recovery/index.html').read_text()
           group = (public / 'index.html').read_text()
+          contact = (public / 'contact/index.html').read_text()
           headers = (public / '_headers').read_text()
           legacy = (SOURCE / 'index.html').read_text()
           # Require the precise existing vendor and Turnstile allowlist. The
@@ -96,5 +109,8 @@ jobs:
           assert 'id="auditForm"' in recovery
           assert '<link rel="canonical" href="https://www.retallyrecovery.com/">' in group
           assert 'id="auditForm"' not in group
+          assert 'id="group-enquiry"' in contact
+          assert 'http-equiv="Content-Security-Policy"' not in contact
+          assert '/*' in headers
           assert len([x for x in public.rglob('*') if x.is_file()]) == EXPECTED_FILES
           PY
