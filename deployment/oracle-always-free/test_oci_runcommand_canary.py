@@ -27,8 +27,8 @@ def fixture():
         "RETALLY_OCI_RUN_DOMAIN_URL": "https://idcs-example.identity.oraclecloud.com",
         "RETALLY_OCI_RUN_CLIENT_ID": "remote-only-client",
         "RETALLY_OCI_RUN_CLIENT_SECRET": "dummy-never-live",
-        "RETALLY_OCI_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcompartment",
-        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcommands",
+        "RETALLY_OCI_VM_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
+        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
         "RETALLY_OCI_VM_OCID": "ocid1.instance.oc1.iad.testinstance",
         "ACTIONS_ID_TOKEN_REQUEST_URL": "https://pipelines.actions.githubusercontent.com/oidc/token?a=b",
         "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "dummy-gh-job-token",
@@ -36,6 +36,7 @@ def fixture():
         "GITHUB_SHA": "a" * 40,
         "GITHUB_RUN_ID": "1234567890",
         "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_INPUT_EXISTING_COMMAND_ID": "",
     }
 
 
@@ -65,8 +66,11 @@ class ContextTests(unittest.TestCase):
             ("RETALLY_OCI_RUN_DOMAIN_URL", "https://idcs-abc.identity.oraclecloud.com@evil.net"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://evil.example/token"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://bad.actions.githubusercontent.com/token"),
-            ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_VM_COMPARTMENT_OCID", "bad"),
             ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
+             "ocid1.compartment.oc1..differentcompartment"),
+            ("GITHUB_INPUT_EXISTING_COMMAND_ID", "bad"),
             ("RETALLY_OCI_RUN_CLIENT_SECRET", ""),
         ]:
             with self.subTest(key=key):
@@ -140,7 +144,7 @@ class ProviderTests(unittest.TestCase):
     def vm(self):
         return SimpleNamespace(
             id=fixture()["RETALLY_OCI_VM_OCID"],
-            compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"],
+            compartment_id=fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"],
             shape=m.VM_SHAPE, lifecycle_state="RUNNING",
             agent_config=SimpleNamespace(are_all_plugins_disabled=False, plugins_config=[
                 SimpleNamespace(name="Compute Instance Run Command", desired_state="ENABLED")]))
@@ -217,6 +221,18 @@ class ProviderTests(unittest.TestCase):
                                     delay_seconds=1)
         self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
         self.assertEqual(sleeper.call_count, 2)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_reconcile_mode_reads_once_and_never_creates(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        env = fixture()
+        env["GITHUB_INPUT_EXISTING_COMMAND_ID"] = command_id
+        command = Mock()
+        with patch.object(m, "poll_existing_command") as poll:
+            self.assertFalse(m.submit_or_reconcile(None, command, env))
+        poll.assert_called_once_with(
+            command, command_id, env["RETALLY_OCI_VM_OCID"],
+            max_attempts=1, delay_seconds=0)
         command.create_instance_agent_command.assert_not_called()
 
     def test_existing_command_poll_exhausts_404_without_recreate(self):
@@ -337,7 +353,8 @@ class ProviderTests(unittest.TestCase):
         self.assertEqual(data.execution_time_out_in_seconds,45)
         self.assertEqual(data.compartment_id,
                          fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"])
-        self.assertNotEqual(data.compartment_id, fixture()["RETALLY_OCI_COMPARTMENT_OCID"])
+        self.assertEqual(data.compartment_id,
+                         fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"])
         self.assertEqual(data.target.instance_id,fixture()["RETALLY_OCI_VM_OCID"])
         self.assertEqual(data.content.source.text,m.CANARY)
         self.assertFalse(hasattr(data.content,"command_string"))
