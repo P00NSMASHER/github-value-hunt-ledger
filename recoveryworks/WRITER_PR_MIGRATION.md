@@ -1,6 +1,10 @@
-# RETALLY automated writer PR migration — first release stage
+# RETALLY automated writer PR migration
 
-**Status:** code policy only. Existing scheduled writers remain unchanged.
+**Current status — October 21, 2026:** all four writers publish through guarded PRs only after merged PR #582; live default-branch ruleset 25608380 is active with strict GitHub Actions `release-gate`, zero required human approvals and no bypass actors. See [CODE_RELEASE_POLICY.md](CODE_RELEASE_POLICY.md) for the verified provider state and protected canary acceptance.
+
+## Historical first release stage — superseded by current status
+
+The following sections preserve the staged migration record. Their disabled flags and activation instructions describe earlier states, not the current workflow configuration.
 
 Four workflows still push data directly to `main`: Scout,
 `catalog-append.yml`, `integrator-sync.yml`, and
@@ -99,6 +103,7 @@ push directly to `main`.
 
 A GitHub Actions run of the Technology Intelligence CLI without
 `--proposal-branch` is rejected before Git operations. The checked-in
-ruleset remains disabled until the repository administrator activates and
-verifies real protection, including a fresh no-review synthetic canary.
+ruleset now records the verified active provider configuration. The policy-update
+PR is the fresh no-review protected merge canary, with actual CI and merge
+evidence required before it is called accepted.
 No production service or customer data acceptance is implied.
