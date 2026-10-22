@@ -216,8 +216,11 @@ class ProviderTests(unittest.TestCase):
         command = Mock()
         command.get_instance_agent_command_execution.side_effect = [
             NotVisible(), NotVisible(), SimpleNamespace(data=terminal)]
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[], headers={})
         with patch.object(m.time, "sleep") as sleeper:
-            m.poll_existing_command(command, command_id, vm_id, max_attempts=4,
+            m.poll_existing_command(command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                    command_id, vm_id, max_attempts=4,
                                     delay_seconds=1)
         self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
         self.assertEqual(sleeper.call_count, 2)
@@ -231,9 +234,49 @@ class ProviderTests(unittest.TestCase):
         with patch.object(m, "poll_existing_command") as poll:
             self.assertFalse(m.submit_or_reconcile(None, command, env))
         poll.assert_called_once_with(
-            command, command_id, env["RETALLY_OCI_VM_OCID"],
+            command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+            command_id, env["RETALLY_OCI_VM_OCID"],
             max_attempts=1, delay_seconds=0)
         command.create_instance_agent_command.assert_not_called()
+
+    def test_get_404_uses_exact_bounded_execution_list_without_recreate(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        class NotVisible(Exception):
+            status = 404
+            code = "NotAuthorizedOrNotFound"
+        terminal = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="SUCCEEDED",
+            content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                    text=m.MARKER + "\n"))
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = NotVisible()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[terminal], headers={})
+        m.poll_existing_command(
+            command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+            command_id, vm_id, max_attempts=1, delay_seconds=0)
+        command.list_instance_agent_command_executions.assert_called_once_with(
+            fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"], vm_id, limit=100)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_execution_list_refuses_pagination_or_duplicate_identity(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        command = Mock()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[], headers={"opc-next-page": "hidden"})
+        with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_LOOKUP_UNVERIFIED"):
+            m.list_exact_execution(
+                command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                command_id, vm_id)
+        duplicate = SimpleNamespace(instance_agent_command_id=command_id)
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[duplicate, duplicate], headers={})
+        with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_IDENTITY_MISMATCH"):
+            m.list_exact_execution(
+                command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                command_id, vm_id)
 
     def test_existing_command_poll_exhausts_404_without_recreate(self):
         command_id = "ocid1.instanceagentcommand.oc1.dummy"
@@ -243,9 +286,13 @@ class ProviderTests(unittest.TestCase):
             code = "NotAuthorizedOrNotFound"
         command = Mock()
         command.get_instance_agent_command_execution.side_effect = NotVisible()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[], headers={})
         with patch.object(m.time, "sleep") as sleeper:
             with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_LOOKUP_UNVERIFIED"):
-                m.poll_existing_command(command, command_id, vm_id,
+                m.poll_existing_command(command,
+                                        fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                        command_id, vm_id,
                                         max_attempts=3, delay_seconds=1)
         self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
         self.assertEqual(sleeper.call_count, 2)
@@ -265,7 +312,9 @@ class ProviderTests(unittest.TestCase):
                 with patch.object(m.time, "sleep") as sleeper:
                     with self.assertRaisesRegex(m.auth.Refused,
                                                 "EXECUTION_LOOKUP_UNVERIFIED"):
-                        m.poll_existing_command(command, command_id, vm_id,
+                        m.poll_existing_command(command,
+                                                fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                                command_id, vm_id,
                                                 max_attempts=4, delay_seconds=1)
                 command.get_instance_agent_command_execution.assert_called_once_with(
                     command_id, vm_id)
@@ -287,7 +336,9 @@ class ProviderTests(unittest.TestCase):
                     data=record)
                 with patch.object(m.time, "sleep") as sleeper:
                     with self.assertRaises(m.auth.Refused):
-                        m.poll_existing_command(command, command_id, vm_id,
+                        m.poll_existing_command(command,
+                                                fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                                command_id, vm_id,
                                                 max_attempts=4, delay_seconds=1)
                 sleeper.assert_not_called()
                 command.create_instance_agent_command.assert_not_called()
@@ -305,7 +356,9 @@ class ProviderTests(unittest.TestCase):
         command.get_instance_agent_command_execution.side_effect = [
             SimpleNamespace(data=result), SimpleNamespace(data=success)]
         with patch.object(m.time, "sleep") as sleeper:
-            m.poll_existing_command(command, command_id, vm_id,
+            m.poll_existing_command(command,
+                                    fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                    command_id, vm_id,
                                     max_attempts=2, delay_seconds=1)
         self.assertEqual(command.get_instance_agent_command_execution.call_count, 2)
         sleeper.assert_called_once_with(1)
