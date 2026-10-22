@@ -1,0 +1,1754 @@
+{
+  "cases": [
+    {
+      "audit_manifest_sha256": "f360634387c6096b3e5540ca572e5700f8497c3e49be1aadf69226ebd4100aa4",
+      "bundle_sha256": "193ce9aadb039659b091b9778ec179ac84772fd2394e18f6067532dd2d0704bf",
+      "case": "SYNTH-AUDIT-000",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "4e45ae964fe7debf6b96384aed65e45cdc2b6b7481564624047b88a3828dcfcb",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1948a8404f10378daffbcb000850d51bd66d1ff61cbf1b5232af6597b2a54d58",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "be79b3dffe2e80d3338a46f61bba21393f9b75b7bd7f46a725a916f13e54eb55",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "768ffcc927ff66c71e57df219da3cb6aa68d8593079a31e45b37dd9481992ebe"
+    },
+    {
+      "audit_manifest_sha256": "b9db8acca9c88456d4f5344604f3c88795fa9f80fff1b7971c9810f508245b0c",
+      "bundle_sha256": "4453cc9bfd643ccd9d15a10a39cd7cb70ed001f833c24d7bcd59d1c41a4e77a6",
+      "case": "SYNTH-AUDIT-001",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "d41f36a9f60a3dc19ac029e58807c4fbfa4f2f4df6466a10e2206103c28b9399",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "342343cab6ce292baa9b4aa1de48f26d3e21f68de824b4e4bddabae9f82e742a",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "0c2bb5ef209d771004e25472b9914125c6de0cd122ecfd97c6d8a51d126352ec",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "97191fd70a21563afab0026bce7d5bbe251595564c936d523654cd760f2553df"
+    },
+    {
+      "audit_manifest_sha256": "d2fcb1afb9924446948b464fd42fe2dd6d6328960df668d7936ddd4b6101c2e7",
+      "bundle_sha256": "dc33ebee25e50b8a58a06477c3226d5fdf5f92ffd36838a53c309f77774177ab",
+      "case": "SYNTH-AUDIT-002",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "2e7e3fc5e1b3399cb0759dc0a3c486989ae2ac238ec698c6432882cce7baca82",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "80cd7d58e6b414e0657e886689290e66cb137f6958feedc1dea1eb27cc41fb91",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "2772b1ec46047d9f62d7ef1f8bbc9ca228467d3c910d3654c6ad524c3070f4f7",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "d5e2073019beda8acf1ffe650aa2e2791fe22c9fc7c3e6f27df9dbcb9adbae26"
+    },
+    {
+      "audit_manifest_sha256": "894b7466436086a243647b5b1170a723afccbec1ccdb4a2d0f35123352aebd6c",
+      "bundle_sha256": "bb8ba6f9d938273a8d93fcc36123eb5166a6d750821f97d7008fee8f1297346b",
+      "case": "SYNTH-AUDIT-003",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "d3bd1fc0188586d10da67956212b027c89a953d08f2c22f6948d45fe7d910671",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "6f71c98e2e03b575654c94c10693265185c2dfe660e093c1dc224588daa4b8c2",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "b143c6fb10904115431682cfb6e78d345d2f64acee0f45f634f2ecaeb5d5de8a",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "8eac1e9dc1ce6608165314e049df532050ba5f23c92062fa62e5e501faae4ea8"
+    },
+    {
+      "audit_manifest_sha256": "bd8e2f7aa78bb2e37622d7631f1bb6968715af1a14bf26c97c88425a27537573",
+      "bundle_sha256": "ab91abbbcd05ebdda795503a3282c518a69b0f93a62a7c20ee1500742df688e3",
+      "case": "SYNTH-AUDIT-004",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "fbca725ca43f3091f33f662153b99bb1f66f8e97daad0063d1bd3eba36c0bd83",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "f28a2d8ffd344bb93e2270b243fb428aed27b9c0253a4326dcbd3c8c7b0136c0",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "25cb2863c52df454d757317853a3c70d634cf36debef6c4a9e1442b3edbd084a",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "28eb0fde5afcdeb9e65583b695a3ef9f33d5a4cadb5e66677bf689c9a58c934e"
+    },
+    {
+      "audit_manifest_sha256": "274016cc0131fdb2e4835f47ea6787d07b019e59627e66ed1006e6d06b84fc7f",
+      "bundle_sha256": "01dd57c165c94e25da3143b088948c9d6f1368c0b7c8a174e5c552e30b67ec5e",
+      "case": "SYNTH-AUDIT-005",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "9ceccc3ff54cfefe9bf00f1f7d4facb5b858ce5d2dda3529f2c68e80fc57ac18",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "284506125bbca38fe7187039b91b4fc9da331f5e970eebdd5265d8499c100c31",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "252060c4372d596319704e79fb92ba04904b0c3c932ad970343bac3da0463843"
+    },
+    {
+      "audit_manifest_sha256": "f4acd1e68017fca038cb924134e368517e58d7910c7222d571bf5c6e1a76d5b0",
+      "bundle_sha256": "2f7749c489c10ee7993972999f580299f86b0a6baad107c3c3c938af4ff7627d",
+      "case": "SYNTH-AUDIT-006",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "d696be2e7d4e3e16561baea3ebc6ad3c504b0c19cf27fb3ebf033fa919507b5b",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "c4965f78e5d1f38040d0ba096ed4e700db25970f5ad248911828cd2065df3027",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "a9b482e7ef88eb31489372d32ce8e1cc2fffd50e65f8bc643a63438aff1c3d2c"
+    },
+    {
+      "audit_manifest_sha256": "bbf18c508ec854aa275ea3e2e48edb1a018c62eff2caa65f171550fb39159d89",
+      "bundle_sha256": "26e9f34ac723ca6687b03a5c3756714ecd3b2411042515d08d956ae97b8e3ecd",
+      "case": "SYNTH-AUDIT-007",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5f6078152e64d78f958c378563494012a72aeecf5ec6475c10020511b2b07c27",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "4fd1b5e2e4a7f47bda746d249f0e46c25601baecb2bbf45335d6792d70ae6e87",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "5c1713ee2d515185271bb5f5a24c8f21bf6356eae9e884309f7e60d5ffd9ee72"
+    },
+    {
+      "audit_manifest_sha256": "04be0fd4ea1827f300813a552c727eafd83535c2ba823f9085314c408cb313e2",
+      "bundle_sha256": "8ed1770876483da9249e8460255cad99b14ffb78b049efca1a44e702e12c3f9e",
+      "case": "SYNTH-AUDIT-008",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "ef688d82291fa05d180a44bf9d264a2b730a2b1bdd774466039ffc247880c7a6",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "3301197085d13ad732230db00eaea3544184b46037f6fe71a209702d2c64e4ae",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "155e7242848abe2ca79659b11554b2836dcc7a518fe96a5bec4feb14a206c2fc",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "27f065818f9db8512c95bcf63f86077daee8ae9366397e61c77d870015c8421a"
+    },
+    {
+      "audit_manifest_sha256": "deb271dfa9bd5e841ab16216e9e7e72a4abb43b70957946eddaaf5249eb585c3",
+      "bundle_sha256": "275bd03885cf5960489a49b422baacb990dfbd48721fac58ade6b290ca2e412b",
+      "case": "SYNTH-AUDIT-009",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "2411a97e705d283c1fe29d0601cc49e4be7e02632e1d50386142c48e018a77a6",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "544af60073baf58a4a11119b78972d401ce2966a13f5ef290f29eb8cbef0c129",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "fa11615bb511aa0ef15e48450fa87599265c38128ebeed9658e49e52c903d276"
+    },
+    {
+      "audit_manifest_sha256": "a55f1da599a8a7cd34fa2ce4de3e73299ae17247700670107b41a2e12f5e3a16",
+      "bundle_sha256": "fc9dfb5e4d99a0a556019c5b210953819f9b5091d431c0260c76ff0521a4f565",
+      "case": "SYNTH-AUDIT-010",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5c75a5ec55844487582d156a3c9d82a960eff6801131a5329bd386d74e283cbb",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "75ea1655833ff727b5fe23db7011d4fce06b9020228f95039992632bfd9f64d8",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "7c9d472ad15db1a9f8cb7a06afb7cd48f96016c73a2ac097b3bd237d35cfa242"
+    },
+    {
+      "audit_manifest_sha256": "ff4d5cd05ac814f0b9052d9e780db4df16222f08396514e2e272e71d70063d99",
+      "bundle_sha256": "f191677791a617111ab86b9915ce5082b3f5b12aa7819edeb0b4c320bc1ee5c6",
+      "case": "SYNTH-AUDIT-011",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "e62aeeb2bb082fbc63d9b5b075d8342ee65845062726c038631688efd80a0028",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "12d98f94c49d59ce569f8103f754761a8d253093fbab381f9d7fd03c34fb2ad2",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "f2e6391748860af953c279653106ef02a4f97120f91fdc641efad837c30a1d69"
+    },
+    {
+      "audit_manifest_sha256": "77bda780c224b1f22becff15c8783a0534f33b04a2fea87deb942f9674622ad6",
+      "bundle_sha256": "2cee5613a81cf220898e330f8630b9ce89808dc4c576f9effcbac601dfa3507d",
+      "case": "SYNTH-AUDIT-012",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "85df67b88ba01ca06221d06e576d9f312dae30a28809fb4eab6390d2f7b44f8e",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "b347393e50fa261b73b44759743c9764b12f42889978d5263fdbf40b88398383",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "50e42a44639fadc7d9ab079381061f5776625666638151f7feaac4ecc4609833"
+    },
+    {
+      "audit_manifest_sha256": "c26bc971db67b973d525b60ae6a654c83528a43285afab2466bcf934b04bbae2",
+      "bundle_sha256": "05e99f31897f81adbf8572085942c3378e4d1b6be9d8727e024f84f90b41dc65",
+      "case": "SYNTH-AUDIT-013",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "93a9578b7c5129c770d74cb544276a993a9fe5023b6e1466c22bafb5714e4e83",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "bb1e339d0d9eff1aad2713db52032243af20cf19d23640b3f6f937a57e6cdf09",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "63223029b7d75b8fd7aed9e0a25dc5883186661a30dcf22171ec3814b93c43a5",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "fd36029388ec03b6b3547a6a5d26f7e99992c947c7cb7584708b1e68016b3b1a"
+    },
+    {
+      "audit_manifest_sha256": "bdf29bf842e0f131ca1340ee0f3b397e1227f5f72637f96e820e3541fac42e59",
+      "bundle_sha256": "d40682aab99a01fdcb312f85b073e98ed6af8a090b403cb7b9bd0d9b48e82325",
+      "case": "SYNTH-AUDIT-014",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5a5660801a93d55926e9239694515be3a3dd297aedcd287eace5d6332652b670",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "60bdfc62b173cf5061f7b18b8e24c8ae95bbee927cfaa3bffa2fde4f0e6e8bae",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "60676607df21a82aadff47d800208683ef85dbd63bab4a56ea4e8d42f67f251b",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "03c59e8964e1d5e3c6a69c0102c242da976b371414fb76aa63f45e63f43a00cb"
+    },
+    {
+      "audit_manifest_sha256": "25f057c0a1a356751d53d67ea75e03869e99e02a961ed0f4690bd62e20b77379",
+      "bundle_sha256": "88307f3fe4bc1ec23934219074b97c9a3d96297b4196aad52a09a4f9a62d9a49",
+      "case": "SYNTH-AUDIT-015",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "41ff5a9730330bbea315c189f4f83f93cc8adb858a73c531d27745e09722e03d",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "f423abda063625dbbf3fa8d24a8ecbf8605ab2e1a46f2c241d2cf84360b0588a",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "3e95d3196be99fb5404a18c9d2e8669aa9d5bea1f8855bed7401099f1d12410a",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "7c44f9f4bd04327ef30a3b9f2a61a52e398d1e2fe95591b1ff8fe64c1b213337"
+    },
+    {
+      "audit_manifest_sha256": "07c5121a4c8473c06bd671138a6b7ef7cbb79a25754302d477b41d2b6488c6e9",
+      "bundle_sha256": "d5f2780ba65b62f5808270f2b90c9865d6ae409fc68a7e6cd678c4bdc8dc209e",
+      "case": "SYNTH-AUDIT-016",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "b698cd9e5c2c2b70cd0beecbd6759dd963410d4ed70e9d5a42aa20239323d819",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "ee2198b61fa8ecf4ef481ef6e7ee6e5d2f6d6186fda277042526a9dc66599127",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "a1476d88abce6a7205721c80da85726e95d9a96abc4f060cc8cadd73bebdfbc4",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "7c1464dc202c15260e0b8cc7cae475198cfbec85ee16059df5dd45d667f36454"
+    },
+    {
+      "audit_manifest_sha256": "832c7cfc02ad0b10dac5e747ca4f6fc6e1540c4c919f3115e029fffaf626688c",
+      "bundle_sha256": "cf9ed68f14e6d887df2dc1358c3351bb40df4a273e7d942c135b861798b200a4",
+      "case": "SYNTH-AUDIT-017",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "81150c119cffecaac6f9dc4fdad109f297bad4f9837cda3d1f6b0491fb6de1d8",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "0a2d4165d3f8d059d891c4326988c677fee3765e7ddfae15440ce8712e63a331",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "eee6079def30cd78bdac2a5091c17b601ebb1da9633e43708b616116fcdb8e13",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "41be3562df609b981d4471a639b1f6718563acd736623e54e2766c74c6393a30"
+    },
+    {
+      "audit_manifest_sha256": "04672ceb4b826855bdb532c18f7997deb1060866eed2d4cb47eecf836fccba03",
+      "bundle_sha256": "17eb5bba4427906667cebdb13733cd23b72cb1b930dfa8401c0db8caff33eb26",
+      "case": "SYNTH-AUDIT-018",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "6a2d5448b9ab0a50815b0bb3584411590a344db699bee2237242c458034122e2",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "c092dcfddab0bb9d93e8dbdc4fedcc899124b3a0f2cd1903b5b74cfe54824d85",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "5dfde98a40e1b121445812c25aca3985790b2b68696257a7fcfac07cc4360959"
+    },
+    {
+      "audit_manifest_sha256": "86dd875a98884c668eeed4370e703512bf1c0d5cbee96ba7c777ab43de65221a",
+      "bundle_sha256": "9fb0f522260358a3961dac8fcc305d97f6d00794d5fe58fe4e13531413511753",
+      "case": "SYNTH-AUDIT-019",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "efb396c9211dc1ae62704b45ffd77ed9e73689c630a1320fdec818f42df316e0",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1f477cf3c5f7dcad3702a33606eb438a6f8ebde479270cb03fe9aa63e98f5183",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "98df265902a33dd4487671db4e273c78aa296c0e5dc7c14294e9457a432c08e4"
+    },
+    {
+      "audit_manifest_sha256": "a54ff15153374b8185fbba25268ac1da180f84521818754e6c7c208a9663dbb8",
+      "bundle_sha256": "afac29f48ef0f833df98d273dda1eaa286049c23e2deef5a9784e6de1e6b1862",
+      "case": "SYNTH-AUDIT-020",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "d0d9f8102b7e0e2177a5b3a1466a58d1afc0c7e39509c9bace07731f95b28eeb",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "c5fe5ea1d6398b2b45d36a90fe3321ed0b11c77bbdda6c0f89a67b31f4cb3b06",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "9103f9ef0e213bfa1282ab87e54cd4243554cdfb8e2b16946313619eab1c3779"
+    },
+    {
+      "audit_manifest_sha256": "9492c8eb9878e91774048ce112e3f7f57ff4820b16de6c776db35cf989bbd141",
+      "bundle_sha256": "471c25f948fe18bb7540d6cc3521906c942c197e518788c2207e27ed05c7931a",
+      "case": "SYNTH-AUDIT-021",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "4a2e0852b436b89c5923fdcfbdccbb76ff19bc1c80daf98858c987fec2490c16",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "be62230f359adca19dd4a97993f198fe920e7c22da523a4219bf1385ce22fc28",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "2408ea061795f5223c374dd1e3a40c04572de15bca242ecd3431982ddfd2f3f7",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "6c1d3aafa4980fda71a45e16150b3e81e76419ce17b47c665e3d1fea4b0c89c3"
+    },
+    {
+      "audit_manifest_sha256": "88831a258c39bc0df33ed2540136c6d89e7be951cfdd320200f9263f59a49ace",
+      "bundle_sha256": "ce9470d9591d7be771e00ef6c8d9b1edff073ae4703ddefc8f9b54713bb84a2b",
+      "case": "SYNTH-AUDIT-022",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "ff1250dd5ea960d816dda4cf8b001d2eb11a646c4424bf92b8dfe73ca36de49c",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "aa8c5e82402116e149b9dda93502b90c9f930162264185c5472c2d5027b6117c",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "810ba490245b6d11032135ee5b4a99404af41f62db0957c53147443d58cb8bcf"
+    },
+    {
+      "audit_manifest_sha256": "7daf0386f098db2425282a45fa0406abc3300cec0ae9f37e63f08b182848965a",
+      "bundle_sha256": "55a8fd827c9d9171708487edad16f3096c6e12db5f41ef998e32f92d52ccc0f3",
+      "case": "SYNTH-AUDIT-023",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "25f2f5b2da7651b1f451b8c629f46be3d2ab0e587e7539d608e9b0945d913677",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "77d02386925181c6ecb84e62cb4ba3750753b9cbd77b8bb8f0f039385e244379",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "0654597110f9ff3305d164f07debc30cbf45cb27a9034fdf78e3e78d8929d417"
+    },
+    {
+      "audit_manifest_sha256": "df20a49980e1d5f3373df73e0b046cf3e8fe637dffe2a58c343e18e057e1433f",
+      "bundle_sha256": "d047a7492700a755debb2ba5612e91fc98b5f827bf3c8c69cd0087d58204ef00",
+      "case": "SYNTH-AUDIT-024",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "c74762395e16c4d49cf2d994235ff58efaf3df21c8f5f1b669f63698424bf3f8",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "2e53c6385be948e7d16ad982f89d39612e34a7875abbf37c31a96f2406dcfa2b",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "005f7389d2560f2b7492537704db2abe12863b4dcbcedec1624ad6e6de7688db"
+    },
+    {
+      "audit_manifest_sha256": "b428a47d435eb13f9cf3a51e4f4dc42ad06bc7806d78eea011bb003706ffc0ec",
+      "bundle_sha256": "f4a13e364b7612e59e681fc43ce22cc2b2aa3d89be4516b1045971f6dcc46f86",
+      "case": "SYNTH-AUDIT-025",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "96877bbad079ac0f7b28123e52d92a8a9f0366d662ccf05a8bba94efc2623529",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "74eece908a3419f37a2693d214c42961dd99559acda249a8ee27f7838d2d3e2b",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "ddb056e7dcfb0454acd582bbcf65851df9c5da62836c667c0d7cc8e068dc1d84"
+    },
+    {
+      "audit_manifest_sha256": "ff89487f41eee99a6e8589748cdd088c87a778fe0c22f3fb45646cca18cf597c",
+      "bundle_sha256": "614b22a78dbc98dce37b262837970ce84db8a250fbd59b4cb9a04423ea62ad87",
+      "case": "SYNTH-AUDIT-026",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "940e8f3f798241cfb64409a78cde476d1d77c881bf01561f10d2bf6b5ac70437",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "58e6ab9d02ed22ca68b8f0bafaf1a0c8a8e846aceeb6c6106488eb5c59ee647a",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "bb5d2e1a70f6d0294a5d7b2d2a2a0587c4944ba7b0530a6b615587ca0cbfe201",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "af6803e8e6dcb2e1448fff7ac38ebbaed5f6733ed28ac3e969b8fb19c7f5dbb6"
+    },
+    {
+      "audit_manifest_sha256": "079805d2e88cb59f172bbf658e1e7efe2f1f0d6d2db1f3bfd9f2738481e59d4b",
+      "bundle_sha256": "c7df311133d04ebd91271d98c2d83756b9cecf37b57c5cce6b623b357666305f",
+      "case": "SYNTH-AUDIT-027",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "3ce575e12787d9965ba1bf47a021f40059ad5a186498b221a9882518deae3ccd",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "7fc126fad2ff8712aa1301b82008604eeab183a6a977f0599a18a29bcd9b41e7",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "5f85689482062b19a6cede5bf16fe1c2bac2e2ce7c440abe11fe6adde24ca7d5",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "dfcbaf4ca5e7e0e1e94ee565a94a5ce2a04d6ee1257a9d0939acf421cd060022"
+    },
+    {
+      "audit_manifest_sha256": "65740beebffba3d29d60dc52264c76a0087d398d5f1ae92ba553addbb53716ce",
+      "bundle_sha256": "23918b36422232a55d98851281096278168800f7d271cbfdf5eabe3a3158292c",
+      "case": "SYNTH-AUDIT-028",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "2413483380dde16ce590a16062535ac7ba72e8484a0c0ec135f8b7130a023027",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "29a57f5c5fc65a86a5ff307e4c66fe1b6bb6fa9e6ef1df2a4bf19bef8d14880c",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "c59766d8a3f99b13a02c76a4829e23ae99b66442ffde7d9c62a7db1128a06cc8",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "4b53ccb999a4240d732f9056d2f96bba90d21a15544efdd25c3bb0d07ea54d62"
+    },
+    {
+      "audit_manifest_sha256": "541055332cbc9b39ceb56bcf7bcf9e78f41c65e7461aea927df212a0f8877272",
+      "bundle_sha256": "366ea09c08b1139a9a318a0b898240f9532d5ab4fa91470704a5233c0eab2908",
+      "case": "SYNTH-AUDIT-029",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "be51d8167a416740afc121c670743b490023ec7210fae28960de2250ad436e31",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "d4dc2b1793e960d67df01a7dfe78634164acc4a88b16109bbd901322acf40731",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "f3f8aff53362623186e9384960c34bc837a7629f7c4b6c9eec7bfddebb3b2ec7",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "f401bf61cc0cd1d4352c372ca68786bc7db586e79c0a0bfae524d1e9392f75c9"
+    },
+    {
+      "audit_manifest_sha256": "f9ecc7d0786d352e9e96c7df45257a0f48dce2608a02ba303243a656e3523600",
+      "bundle_sha256": "561adda4096fef5ea51a5cb2921d7b7ebc9a8de47fed279b72434351718bfab7",
+      "case": "SYNTH-AUDIT-030",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "fcfbd488499cbcbad783bdd4d34de2226f2c151008cc05804f07f3ca6e404089",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "42b06dddf51e9c8e40d55895003cd54b0362d773e74dff5b64c3a845f5d94a2c",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "3b6d5ff076286e62ab233772fada47cdf2524097f7883038e29bcbd8e198b45b",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "4ff6867840385b901893829289cca6ddb43e08c6271e40a84e1be7fe880e11ad"
+    },
+    {
+      "audit_manifest_sha256": "4f84f67be82e441672cf42733b3c0d8bedcdc50df51f45e6b828b397f78f103a",
+      "bundle_sha256": "cfc7fa80e58325e8a8545fc25d6ac2d10740acf6bf2f910e219d83e4562a6ce0",
+      "case": "SYNTH-AUDIT-031",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "c60566bf9439d354ed7cbb3c84b1bc73f469238ad8c5017e2adc6c1d7b633c42",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "b32ba6638ccc223442f50d9a69dadf9c8cb15317f39e85ad21f77e3527eb2612",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "3937b62448f39cc330a17cf041edbe6316eb44426542554355ad41129bba0c54"
+    },
+    {
+      "audit_manifest_sha256": "433bf9b74a2765dd26cf00ec47d013f9a622b274494a529f4c35852a4a2b5550",
+      "bundle_sha256": "140b1ee1c378c413fdce624a71201214c70b167c644fabf2f901e7300f21d779",
+      "case": "SYNTH-AUDIT-032",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "578d6aef4312cb1935450f1b25a2bda428da27d4fcf0e48921c394ecad7f87d9",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "b34ae468cceb9c528499821b77fbaab525992a98f0c6e35f8e30c7e54515c0d4",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "adc141968badbc063afbf6645964794ed12e3b11d5d3dc4ac9570e55cb7a93bd"
+    },
+    {
+      "audit_manifest_sha256": "100b85d25d75d46d7b316beb1a0cb2e81035939d5e477db1df17c39c1735d9e6",
+      "bundle_sha256": "bc793724029c31bc5904bd4a61e5bd7c81333696e28849bebcc3fae3d53c4c2f",
+      "case": "SYNTH-AUDIT-033",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "aeb3a6e41e0994e9d4c5027b4372546da0542d44f048ec59c5b06bf413002641",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "05a47d1e8a06ae37c20c50cad3bf900d123f5dc90f3b8d3656a8978ea5019c7c",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "12210d2b05abb432edc0c4306743de347420804619796ef7768771469fa10600"
+    },
+    {
+      "audit_manifest_sha256": "f65a38bfd6961c95df78957e88d7736806b343fbe40d2ee0973f0452fb923eff",
+      "bundle_sha256": "b7694449da99a0982bad129bb3856c026df6342c34044b33a2dbaf14271e82af",
+      "case": "SYNTH-AUDIT-034",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "c9a7fc8bf0d196c15a5e24ee98c0f101a0b5a73c66257a076a41a0178955d913",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "bac51ff0bde308330dc4beae2dec4195070390c7155244a0af0fabf82e698fee",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "8c6af784da520ea630a088e2a8b7019790ceab28e6725f2f8cbdd9f2d35bdd9f",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "2ad959102b1b6d4b79aa4ba3f6f78a46e7bb18618019a65671d24913c0078674"
+    },
+    {
+      "audit_manifest_sha256": "7e6cf8ab96517472ed17c23b1c2f03a58ef14a74fea5a3f13a768c0d3b0ddcc6",
+      "bundle_sha256": "6920d5842dff261a3275cd26f52f264cf9c7d8f375b355e579ff1d6971270c70",
+      "case": "SYNTH-AUDIT-035",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "0f75257d48acf263804cab4b08894ab70f869e4511e688db786ef06eb7efbd70",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "cb55034b11e3207c0013b3a95b4a0e23510dda7e488bd7da30ed026d35b4d791",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "f0fe2e763098d904269b2f208b0b64dba182bc50807084e956933e66c64a5536"
+    },
+    {
+      "audit_manifest_sha256": "a1332e688115b3cba0207aae958ff07e8ff3826c51acc85b829e376279a1a3a5",
+      "bundle_sha256": "27c3c84bb85bb26f1068fc860ca06e54b443d1a19f766f632e07c2988bcc46d0",
+      "case": "SYNTH-AUDIT-036",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "6dbdba8fd1fe95d47465cbab7dd3619caaa89743cd188c7c67c644b2888c1f10",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "ab9f103f995053f52fe5a2667d43b3925b15bda748e599888b532a3d6e8b5d76",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "169305baf778bd7e6c6b0f18831f37bf117fbdbddde2eb327e3b553604eb8db3"
+    },
+    {
+      "audit_manifest_sha256": "cf346718d6624c059152b4a199408028d52598bccd98d9d3a21d41e0ad40858f",
+      "bundle_sha256": "dae281d98dac5d069f8c1b5908b09942d69ad8101c3f66f0e4bb64cc771282cd",
+      "case": "SYNTH-AUDIT-037",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "418915e9dc62b99d369f282c6a25c2bb82ef44a7bc9d1f38f52abfca6399b56b",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "c0c5e62c5d04429be017ce6d40fe8b6744a9871869dd5054145b84a49996f889",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "ae6f015ce7809be33b933374b05db38f977b4e4ee214fd487a29916e739c8afd"
+    },
+    {
+      "audit_manifest_sha256": "e120dab214dc1782cfe4ce8d6971d4c19b4360243018c3fd687323bcca920132",
+      "bundle_sha256": "4bc4eba190decf71eca760eb72095f064a9b46a08a94561587db256475f53669",
+      "case": "SYNTH-AUDIT-038",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5807845ad0f6b8f60dc57232f629d149e883563f0de079dab5c124e2b74dca6e",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "fb5395fadf8c41ee2730950e5c7fce91c60bc572ce2b03646002ed4aac9c8e86",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "dd2bd47b1816440c8cc059308572323582a3a00450a4d39d615a49d6315bc779"
+    },
+    {
+      "audit_manifest_sha256": "dd8902ec654f04c5d09842e5f9b5c81f96ea57fb41baffbc26aec3fdd40c3b5a",
+      "bundle_sha256": "cfceb39087187aaef3130232627e892483817f84abfd31d75d22bc2fe0cdc10b",
+      "case": "SYNTH-AUDIT-039",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "1b50382fbebb62186a481bd39865442533b9e6ca9fc177da352fded81423e79e",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "14ab78a53ed406d2c430fa2fb60863cd3606812218fa6544f4b4aaf3d9f69cc9",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "74ac0270436f1fdb085876810a4e1b76ac0ccb2d9875ce3c4df81210daf7bc9a",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "e047b8d1f346c2b853e4354ed78d6544918b60c52edbc684c0808c1a3519f627"
+    },
+    {
+      "audit_manifest_sha256": "61464cc038dc5711f0bc06c5496551730d1d9465fc4f7d341e0b2479aecd6ac1",
+      "bundle_sha256": "f0a14c607b1c87716a5be7cddd160d18a4efee575184b825ce921f76fdc2ed4d",
+      "case": "SYNTH-AUDIT-040",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "496c46ba6b7c9a5b86112f22160310a6d9e86a289393acd9332c4c42857faa17",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "0ed29b1135eab23211205b990e4d67b819c39183100dfe386ff84444a33f5315",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "61716fb7d2def9dbb3fa1c733384f8c15dd66b4f61969dae57e1b6ee7591f849",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "1220f16a86b2ff504805af6a48410a74ce6bf9a99ea23f9f6ea35f7d1ac2a4ce"
+    },
+    {
+      "audit_manifest_sha256": "5b9792603117f227199503ecddd79af3679d55c8c8872afb8b578e04a273d437",
+      "bundle_sha256": "b2bbc62c51bd9b89bc7dda9b0406f097b1035bd04c2341b1478bacb9cda9f07b",
+      "case": "SYNTH-AUDIT-041",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "bd4517a073a7538c36324a01bb6c05ccd267207b9cbdfd06ccd82d3109626aab",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "e56a200c3805a212f61046e2fa9e732b52ef9752da7a405ac67a215f61d9bfe5",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "6cb3339df88c040bd2e39182ba9e4029effac81b5b1b9b171127a83f76e53451",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "2edd1050d86fef79bc9f87f39a27a4d26d53a42952f41307ecc209154783fb28"
+    },
+    {
+      "audit_manifest_sha256": "5e46620520f2d61fdb6748d5e5b0bbe46c9cd812282679edd8a5e0345a654efa",
+      "bundle_sha256": "e9a0c86b49c37be9b67f70369215d1c2991c699fc1e2cfb0141c281bcee2f523",
+      "case": "SYNTH-AUDIT-042",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "19cea492057b48a08b51dae9fc530be916b9646a83914676a708fbddf628ed78",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "73009c97aa773a4167f799a487a4d6e81bbd1e8ae5086a8d33bf0af026b1179d",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "00c80c96bd04460ca3559c0ad10a21ee12199925c92f2a2441406d2eb152aeb0",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "ae777413f66b0296b6162d92fde0dee76585421b52afb59018b686ac2f840e63"
+    },
+    {
+      "audit_manifest_sha256": "6f18dbd857631e43a5fb47e144d483ca02b4aa7f4e05615537b536e0e7d5428a",
+      "bundle_sha256": "c19bdf8061eaa82520e682d28b324d596d4c882463eee90417ec3a2a5f915b95",
+      "case": "SYNTH-AUDIT-043",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "7a0f4a94ecd1c5afd00d79a7d6d32e9dd7f9bda409a2a4979df2836a919fe8ce",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "a980b78ddfabeefe68ef38fdfa95f9156e75eb3c62ff9a1f92228dd1a161ae39",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "0e59a089799a2849d8d9d5c31ec36089e2ac6cd90eb8d90918485332cfe4380b",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "0a73156844c1e400d1e0ff1fda594e18550c24f2250d07b8edc7ec646bf994b3"
+    },
+    {
+      "audit_manifest_sha256": "2d330b6f95f68139da24acc014d71fbf88355ae64e6b41c26b0fd07f61f142c9",
+      "bundle_sha256": "68e9523bce6b52faf6334a189d323b55dcb9e02c10ad51511c5ccb901206f03a",
+      "case": "SYNTH-AUDIT-044",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "a5e3593220735d122fa566d22c489f284163f2e5b903b6ced035a368fac39a68",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "68609c83d6eb096de30bd674ef8fdd669a17190dab9e4d00b6caaf3472dd4af7",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "1c10ad209c77451e9ff5ebc56daf053f46d3c640725a8c1ae8beda37e46fb6da"
+    },
+    {
+      "audit_manifest_sha256": "04298d65e29ced8472ec33963fb179e46c0cea6af9326b5a9f8324be0ed1d2c1",
+      "bundle_sha256": "9e7b8c6524f3b47c0993d5c4abdf4fa1e9a21f5074cab8ca361b832cd0cf1479",
+      "case": "SYNTH-AUDIT-045",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "92595846eec06465a78005f4f5c8c93d081cbf5cb2fd552fb9b812617ffbaba9",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "3068f3e4c5e820def7ddbfe1c02f47cea483cf5a8381a3ba866465ac095e001f",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "42774b7640372230e270d5a40772fca332ef43da9069c59637d0c4c80ce3a698"
+    },
+    {
+      "audit_manifest_sha256": "51ab74bbf08e6c8de35f708873f998284d9b92aeedfb8b6458f16bad7dc7d797",
+      "bundle_sha256": "29d4a3f04465e9851b5f2c47ff9530f7df69edef2d11127266902f373be67221",
+      "case": "SYNTH-AUDIT-046",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "f1bbe201724cac122644c6f01b51cc0123bfb359c37938fda6b69aa3614cf1d0",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "ee9165d9b2068adc6f1fb91fb0b0221cffee888b6a766a5830bf22b73696b442",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "8c955fdb619b6ca001c61e37694b8da484de369a3ea0fe02fe27e0367f69ca1b"
+    },
+    {
+      "audit_manifest_sha256": "b6113c26246c15b49a344fe9993899ba9c8db813a50903aa59812d8f3ae13950",
+      "bundle_sha256": "29ec42e0de22e3d77abfcf1b7637cbd932ca50776e1d62d4433b59ccec5f39e7",
+      "case": "SYNTH-AUDIT-047",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "a53760e84608e8c8b170eef58e9a6960fd85019146deaea3d55856eed5abb99e",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "6ab5cc98faf6f921a4bee4d9cf2e48f44d74c7ac9ee61866c28c53260ef99546",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "4ac4f7753ff4048953a69742c842d5fa6d875ef2b0e8e44088c7ae9fcf3ec94b",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "2c6b0ae0674803bd87f7f1e317d288de759a9e5d770282b59185d84c5578e9b6"
+    },
+    {
+      "audit_manifest_sha256": "5eab14f234e46b7a3b1fb05fae8af485f7a821ae3162fa7ed3bacee69e88a2ad",
+      "bundle_sha256": "98b11172447f5d24682974fcd8589b31537dde6ace8dfb6f688e7ec22c085e2f",
+      "case": "SYNTH-AUDIT-048",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "dae24fe1447e0df023040c6168ad1f727993f50fe4f6308372e8142c43574b06",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "7a0dbb9cde86e63d1b3d21739f418851bb842b3048151c0051a4692a3e26e724",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "93f8a3ca1b4e2be9bff6517cda854599b7dfa7fee6a3720961e210e491ad2bb0"
+    },
+    {
+      "audit_manifest_sha256": "cb5fcd7b61fdb2cf15ac45bb6b7bc0f581ddb974d81b403f5125d7ee7868b714",
+      "bundle_sha256": "d7051455ab6010655051891b6c7fc736da652519191592951628563d9a64c592",
+      "case": "SYNTH-AUDIT-049",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "a4f1030dfb17d5dbf4a4c0b5cf0e0f7e058ef42ebbd0a1b064605ee195e074a2",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "757bbfbdffdea01ed0bb259f7286a13a0834763f6a6ccc4a4eb1aea971ff3518",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "0ae0b297ef400fbd7a0e19508e3598db5356f7652fdc9d9fa688195e31596264"
+    },
+    {
+      "audit_manifest_sha256": "053a63f5d6570ebaa8bb18bd6e89c2dfa964afbd90039cc7b5958a00aad77453",
+      "bundle_sha256": "94cd813b6a4e5ea9fd9b836b300651240d83abf217d6e7bc918b684cb4a4e4a8",
+      "case": "SYNTH-AUDIT-050",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "8d8a203c7cc6c53a3865798d42bec56948f48c5b736832221249651b52f76b07",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "b589ec7ae53db2d1a73e7e15d286f0ac621d558d96216b2b781547e767cbe7c3",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "91c510248b5a918a26bb6f8c13eb8935e2dbc8f6b11549671251a03b691e9137"
+    },
+    {
+      "audit_manifest_sha256": "0c54447db3265c88882ffffe4099af46d3f8be02b5c5853c358cf96182c1b405",
+      "bundle_sha256": "4ee35db20dd992fd750ed98726c0540193e16a56b1dd586229b5013912bd40c0",
+      "case": "SYNTH-AUDIT-051",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "34bed835f5cd4251bccc19029ad39953d3bd1b666cccde1c8494c5e61e1320ab",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "7f115ce235498ff98fc54416464981de66283cdcc46faab82fb7794919bb294f",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "e23e8eed294789fbec97e2202144160bac7107a24b1661a36b36ffaeedd7e965"
+    },
+    {
+      "audit_manifest_sha256": "1203736dfab62eb40098156616ea04bc1a70807172a6fe4219833bbea7695c84",
+      "bundle_sha256": "26395ded2a4a8e8cda879e0ea7e7de8c17c0814d5e3c5f989990a019a0d6a97e",
+      "case": "SYNTH-AUDIT-052",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5ff1700af27421eb90792c9148aacc4636d600f3ebdde29405e576fe08800d82",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "01650fe0d93a1d783563ab1ab588d4d64bb02743063a544c07af071c378c4ef2",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "acbf4c4ccfc3fe23d668447446cec3be1943d4ad2d6ae4efef0179e85749e5ab",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "c4fc08b03216d72f521c1ab38a6fa38e5a4caabc0f34116610211588e95bb5aa"
+    },
+    {
+      "audit_manifest_sha256": "9356fec04002f3e095afeff4556cf1d1d7a784694c9853c19a17c8517e386c90",
+      "bundle_sha256": "de7b4576aed21f950c59c7ec5f7613a3845ceace7a9789efb6ac65c27fa68989",
+      "case": "SYNTH-AUDIT-053",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "0d3e596c352d0af93c0a57320e9713b2701eaab9a6b3820e02c08b012db652eb",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "dffed67923648adb7ca2d751aa91cda5598296929e3006e012d87da118460004",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "be0c36ec3f6eb8e5a7127f5680da448d4e0506cf65bfa478b2050e4da1ad8b6d",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "541023803294161386ec6376547fe2207ca04babc5dde3e72a2d6b0069c1d021"
+    },
+    {
+      "audit_manifest_sha256": "1cd8b2941c67194f9380d70c345aa90cd9a4615bb97255b702bdb70e68091f39",
+      "bundle_sha256": "9eb4e5f1014fd3a926082ec40a78a20a6957ef11a4e52497de72ad0b4eb113dc",
+      "case": "SYNTH-AUDIT-054",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "8f8d05c6f21fea6f7eb0c8601162ba2908823b5befdf9cec809d0fa193dfc960",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "24aae3e583863d7c87f669657afefcd0df827892631da80ccf8569089f9fe9a4",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "c6742a816904f3c4606a9f733632848db8221d02311446bbc6ea549f5db84b2a",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "e9fc5b16a2a0a8bf8bd4917ac38b5b0619fd3944d27a102fa5908663b4fe1c24"
+    },
+    {
+      "audit_manifest_sha256": "1d3b0344456886355da67db721b6685b4f3810ec39cf2cc37bb09cf58a6d33f3",
+      "bundle_sha256": "87601f05bba94208313394f1ae068f83794598e746016c59cb7254a74cd3aa69",
+      "case": "SYNTH-AUDIT-055",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "e0938280e2b904baa7969eac3411b54cec11429407f50f5989b7bb44b9611238",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1bb21350513a6f0b4647132a433c7e0aa2e2e6d1d4cd6544980341f8d5711e21",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "91ef5da58aac109e67a57304e5ce0a08acdf832a51c03ce8c2f43a6d998131db",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "e26ff9582fcb7987c5deec380ca409ac534662c168251b1ce2059c91527e069f"
+    },
+    {
+      "audit_manifest_sha256": "51c33d4c77ad51bbcd155b66a7d13ebdf292f64068cf7e94913729a76301d15f",
+      "bundle_sha256": "5fdacd4c8231ecd275275593de30a1a31f668287df5682eda13c9e9519cc7afb",
+      "case": "SYNTH-AUDIT-056",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "71f4679adc213519ff68d237424fab5d98151e67672aeedc332858ab87cc258c",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "28f1d2bf5ff2027d89b221cca718f2ce118982cb501724415d4752a1adcf1bea",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "eac6277bc47994a90d92fd38905af31a48b39c9d27d6162d036b50450efbe6b9",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "8213c9edb5600d4412bea02fa34065ebde124f81a741a56f031064acbb24a7bb"
+    },
+    {
+      "audit_manifest_sha256": "4f8c676d9f231248fb27d51416d49459be6d6795605308918b8422e39620d352",
+      "bundle_sha256": "fd89178e92d46131f093210a3e3442c7ce01a16eeace89fc9de46c174d128f26",
+      "case": "SYNTH-AUDIT-057",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "53752fdfdee3859bf327e0a54c694d8dc3c7b3742a88e460d03f73824ac4333f",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "bc20b12d2f4d5587b42012a685f172f6cad2761662b0b736fb2b4a491684adb7",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "ac18290c8dd5716dda9cdbd54f717d37058ce65941f89a0f7d16f3051396cb54"
+    },
+    {
+      "audit_manifest_sha256": "6874adff8e1a1a7707c369249662e1ecad8a30bbdc8ad068417b35793b6071de",
+      "bundle_sha256": "1ef5d308240367f04312f3c0b4984e54d329513a8e7844009d05c0dc60f1100b",
+      "case": "SYNTH-AUDIT-058",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "294e058c8412879c4ed7ac14908f7e200efb5038fdf456de0823f345dcc0c447",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "14ae061034e2b005dde89a858942eff4ab52fb3dc52e133f19ec90132d0453ec",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "e195e665f08bcb20e3a04d560cbe8f29e4eb4e86a0d9bde611de870ab710b08a"
+    },
+    {
+      "audit_manifest_sha256": "e1e911b63db8a23923f7b9fba10211d2adeba13c25881b19e90ad5f2fb718a64",
+      "bundle_sha256": "7dceb03f75aab223f045f35e54bc46f27124e91be2c500e545f69f52f52e2be1",
+      "case": "SYNTH-AUDIT-059",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "fc13863df0c9f0b72818c8ac19bf5109f52e242bf78dcb914644ec50d56f9895",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "6da4477f650c4ea64b85ec58de251c1dd6acd701808f57e58e7ec95472b4e294",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "bd5de1448af725f4ce22ebede663380852c5ee52f9ebb02d4a7a6d6ece13f6b4"
+    },
+    {
+      "audit_manifest_sha256": "d418873e9dcc3fd0339d34eecb8d7f9c574a1269560fd3d6ea4cc01b5f4421f6",
+      "bundle_sha256": "4dd30b7f492f02d2277b1f534756eee4996025b4d6b7c613032430bb0bfba467",
+      "case": "SYNTH-AUDIT-060",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "cb52c9046acce48771bc2891e593be952744e8d28c8efe85cd93339c9d52619f",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "9e58d8f47ed0db034a85ecc5893b71678e97b4e03eeef993163b7729f41305ca",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "eef63805b64bb483860cadf84ea0744e25b4825356cbf2852b511170e7804f02",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "299beaba291934b868a1da76390ea7aa11cf14ce01c43641abccf7d6619740d2"
+    },
+    {
+      "audit_manifest_sha256": "302a3e973aa46d7e9b5b5fe7b54b67dc71f8f4cfde61a7479e0a36c4f9f4b676",
+      "bundle_sha256": "f9cb8ec56bb0f98722dc14c2955caba727b2f1dc42fc821e04d42fd5437a6788",
+      "case": "SYNTH-AUDIT-061",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "643d9efac7cd90744ed7a104e58297a16054dacf1efe8b567ed123283b4e9a08",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "e2c743c40357e65eadb75a53a35e525e9c399ebad5e81b4488e8bd515cbd1e3c",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "f14519261e5846493f9184e4b84be94e2c00e7b61a520d13a77901cc7a1115ac"
+    },
+    {
+      "audit_manifest_sha256": "a732cfff9eadc3e842e59edd17579c5b99435231d3c0d66df7da7cf9d6b9e938",
+      "bundle_sha256": "102f521719b5303d046b780cece0480e883ac7f6a204611ca228e8722836d86f",
+      "case": "SYNTH-AUDIT-062",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5a5442da16dfc29efaba832ec66a61eaebdcf54fc6868d3502b42bb25e93c78a",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "2b08915383529725da3afeea92b2035a977935d983b880121e9b84bb21004324",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "7e19c503a603bbe0199a52acdaa9ae274b1c2b8d3ede9d6169d09ffe00404ce0"
+    },
+    {
+      "audit_manifest_sha256": "a6a916a74aa13aa03610e025cca270e03d65ad0586135cc6b77f870de486075e",
+      "bundle_sha256": "a80594261a7fe7aa0722f43eac5eb8c85c13163b698363cd8d9e8a20444a49e1",
+      "case": "SYNTH-AUDIT-063",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5412b301ea5799d6369538dcd5075c396b682d9bfafd4480ff9d7495c85c80ae",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "f1f334c4280bef42a6b4b2bb0b91fdeb561aa528950ccff2bc1ef71717478601",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "b1c00fb29c8de8ae5db068f91fd7896803864b25d272aff6da5ad264e0b43ec1"
+    },
+    {
+      "audit_manifest_sha256": "4b3a4fddd26e5fe9173ba2724a0a40f7c3ff669d8629ffe2dbb3af3d3832faea",
+      "bundle_sha256": "974d89340cf89ac33234951c6959c00d31b522d6b31f2f3b81caa1cc3c1b124a",
+      "case": "SYNTH-AUDIT-064",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "fa9680c50900c207510ad6b862fe0a67f3de48445bbb7dfa05c65e6a17688a2a",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1cc9ca1bd91fd57db1c01baed02e7b81fb250d72a0f41ef80ae736f76a92e599",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "faebd9c8d8229c33082326765b56077c903261f9898665916eab2341f3dbc1e3"
+    },
+    {
+      "audit_manifest_sha256": "b916d54683e1767a609d3e8a3a1cf13c94ccebcc5ef97aaf4b1068ae6e8490df",
+      "bundle_sha256": "1963a5401e79a4f76a012711278a72eed3bed5905a13a2de92d255a5c4ab0f36",
+      "case": "SYNTH-AUDIT-065",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "c62e6430b95fb7dbac3bd57382640bff689935204775c8313f33e66990961983",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "a26d30adc9d807557ebcd423fc8b9b615da10822bff819c91d2110af1417e8af",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "f40b171e72c4abd7193ad5218078b6c48771e22358e1ea8fd2f0ed6ef87ecf55",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "56b7bf596cc0cca24fb00640e4cca64c67e5637100bb71446374130052dea221"
+    },
+    {
+      "audit_manifest_sha256": "2d4626c01e871ba1187addf55a7b905352bd4f2ffa9b61674a63641bb3fbfa6c",
+      "bundle_sha256": "4742ad33d1df12f95b892f2fc4bf521391219c154e94d05e146750950cd87b67",
+      "case": "SYNTH-AUDIT-066",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "6e9ee69a388de0be22a2705a15927fc1f54b1156d31114017437259658c22567",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "173acaac806adabf3a962be58427cdb426fbdb2ca22c1d4b20ddae7f32f61c2d",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "787fe491e7a63bd56432a3b25e855813f135c70a5d7229627e2289c27ea475cb",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "6a6126c2675eabb1ccaa57efe5f9ddd759094c955346de03a67a5ce9122472ea"
+    },
+    {
+      "audit_manifest_sha256": "0afe151a5017eb7fc038adda2254bdf13083687c9a00b8dbb39f464a18768666",
+      "bundle_sha256": "8df9a5dd438ad27f6cd71c2849b8a746e198357b7562f182afc03ec12d1eacc8",
+      "case": "SYNTH-AUDIT-067",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "8b11c258c9ba49ceadf3962de90f0cef6743522132d9f77beda60d2ca922b328",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1a3de6e1e33666034290d7314a42003c82a20e1c3ac39e40adaafff31ce4cf1c",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "d168a82ff588749ea6f187f8c4f445f5fcc7d34e7c02d22bda990e37af739605",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "50d03ecd8d5b5959e1b2c0785af57859e4ed496b86bd60d933ac369cd544cb5d"
+    },
+    {
+      "audit_manifest_sha256": "534edc2f0e5d69a49052872ad6d11f61076eb1956663b7bdf6e95b5b0b68c746",
+      "bundle_sha256": "d11409b8fd9265efe73e4f16fdd38cead12d3295e13d88d645f746d7cebbe1fd",
+      "case": "SYNTH-AUDIT-068",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "4abda6935b9c674411df402a774c4c2c887db3a85b410e4c840a9755b56af31b",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "7c7faac29a75feb56f4f5d77f1ea7364076d3cd98c6d3e168cf959f4de15741f",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "eb272e99271670d64ca541b1be9f831f4767ca475eeb4324a9d8f3971e4691d1",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "964aed21a3d170f6db50f01257670293296354e399c0afa9f7eee31d967b4810"
+    },
+    {
+      "audit_manifest_sha256": "72544e2293ceccbc8ea1903e0ed57363d35bab0de5700745d5a6b3a556612273",
+      "bundle_sha256": "4fb143516fa9330c4807b1840eb077dab3bf4e34269ca5dbbe7c9fd11c0650a9",
+      "case": "SYNTH-AUDIT-069",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "66efb4375f92998450bca3c5a82435ceb43d96bec418e488f4d90ec84f82a669",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "4edbdd98245ba4c104397c9129b14424deaa38f2ffbd98638883f35002a3f8a8",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "dd7a93cf4c1a2d5c2edbbc829067206a4a43b8ee5bb97b3927773698723acaad",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "b3b462f2e3c02729dee578e4fb7808c196aa617418689e4b95d0fb9c8272039e"
+    },
+    {
+      "audit_manifest_sha256": "e3e5af7808495884afc7c108f8e2a655ddf78a4d35d78d64a045efd0752341ab",
+      "bundle_sha256": "08191cd1aa720d24a693068c4669cf88c3d6853a71b878423167af0ee6e2770c",
+      "case": "SYNTH-AUDIT-070",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "8367dbd22af85bd72d217e755ac361d7c69e5e4d54dd285821b3e25af2cd8917",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "d607934b4e04e630be25b40de66a0063eac2e626fc714648384a709db3ec28ce",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "698fb4adab8de3d0fe994fe7eac14a0692d955f891965a5852c82b22131368a1"
+    },
+    {
+      "audit_manifest_sha256": "324825e33f6d56ab08bb57a6988f3bd08576381fece2d2c401f29005ae609a6e",
+      "bundle_sha256": "d6c27533beb00012573410c2be176fcf623e0711faec7f3322cc1208998ab8c4",
+      "case": "SYNTH-AUDIT-071",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "96cfa8c25750f291cfca5a7df12cd8b851bc4bda1a4897d868b41d92a0f94e78",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "6c3b0ca28c15db485fad3596e7574381b37d53ce11abc8b69f541d18bdb6bd99",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "3ce900dcef1453f6fe514e2c22890da1f396290a700ce6522a3d1489ee9d56e0"
+    },
+    {
+      "audit_manifest_sha256": "146f86f62e5f3de736a0f48eec8cdc24731c44a2149d22495cdb0068a7d0f3c7",
+      "bundle_sha256": "e64daaaa5ff7a8be664d425ce6805bd0a1d4d3d84e0b6bf864c4d6269174920a",
+      "case": "SYNTH-AUDIT-072",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "8f6d6856abf0cc4531c835581e7b83954e9300630297e34ae7adb01e6354e2ad",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1bf5c4f1328fdda8ce35d3a9410386d7f93d433aa78e8fd0e971728a720c97b3",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "c5c7760918af32b6d3fb41529c019cf7be8ba8f24bd87b9f86c99d3576f3ac23"
+    },
+    {
+      "audit_manifest_sha256": "ab83b656c5e2850b2d5521681736a942636c3ba1721251348358f2b34a5bab87",
+      "bundle_sha256": "6218ae9dcc3b395800b4a9f8f511beb1a85d0d96bbbc1fcc2347258b2c2d2dd2",
+      "case": "SYNTH-AUDIT-073",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "96f8085425b64d8ed05db18b9590d112fb9dad6c03d0bd95fe1e62551942877f",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "0bd6dacba4272d1285b50ba18d60beb9d884c33ca9fb3fb73ce2bcf6b3832013",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "9f99124fd6023e3d0ea84beca115458d02fe5d74d08885b7ac12dfdc0c65a894",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "8c9df22f3c16904536da4ba419ea8ac58273ac26df76f40fe93aba178c2f52ad"
+    },
+    {
+      "audit_manifest_sha256": "ed84d6b44c19f49809a8d57d4e5263b07e94b96726e1ecf450da4c7a0be4df90",
+      "bundle_sha256": "6dd779531207236abd389f615472208e58d497c3bf5a748700f0c6f6bde30fe0",
+      "case": "SYNTH-AUDIT-074",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "a41d2f90638187976ae6ad3b589bab6cf9b7bfcb8fc9d1388fbb4657ee16d28a",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "d5240acd50bf627c11ac8db23c9086e6396bd9f84f0a5641526c536e23699372",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "820a255a2b08a978addc47963bc4201c0a51b6b50c85dacedcc9109b77936aab"
+    },
+    {
+      "audit_manifest_sha256": "d9425eb1c76ecc4cb583164ae0214197a529eba977fc41204a4de8df92588c06",
+      "bundle_sha256": "a62c2b0271331fa0b7c5360d7348f03165dfd80c93523347e7671200b59920f8",
+      "case": "SYNTH-AUDIT-075",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "6db2537d73223cbf3a844918ca60b7da97052e050aba784a55150763edf9566a",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "21a6fed698cfd368955a1876c6a6c75fb8706cf5fa6c7ca86945b86d0bee1680",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "726862a262be3761973b08070c5a206d0ef23278a0e109a1436e21de9abb7d0d"
+    },
+    {
+      "audit_manifest_sha256": "f6648a02aa25f715624d99189d0c44e5bf9839d1045c060a61df879fe6d4318b",
+      "bundle_sha256": "9326b4695f20240bbc38d822af23889b37ae2a38190ae00db33cc865ea927f2e",
+      "case": "SYNTH-AUDIT-076",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "3043b45470f163089d4a2aa7f10608f9487cef39cdd8b633538dae6f5f1edf7b",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "6b4754a6d0269d2f49bd3bc3be646210910282f91046cdebd09924ab29be0b76",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "0972a154fae95643b5e5de3e7fab6fbfff4e0c7c450dddf6fe29b03c9f7f6acb"
+    },
+    {
+      "audit_manifest_sha256": "10be5184f6cc24c4fa8143adcac0a0fd1238436d190207cd23359656f1923a81",
+      "bundle_sha256": "c155733ef641e6f4e10737afc3e2e9f0b5a5d2ffaa884fb99afa866594e1974c",
+      "case": "SYNTH-AUDIT-077",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "3201590f89bac54ead3548823361c77ce5290baacc48187485e6287feb9e1897",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "04a8a79f645c5592b9b1c285bb705f9afae06737958d82f5fcdce641bc20e472",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "cdeac2ade278c341fc4ff41bd178d7719bb1497db952be61aee0151bf50f6602"
+    },
+    {
+      "audit_manifest_sha256": "e340f996ec6f2e24678a26da63eef455d57172b39f99530bf8438e515937c44f",
+      "bundle_sha256": "93de212927b273eff6c26ff8871e587e4dee86dc65bb87190f6883e723e13b8c",
+      "case": "SYNTH-AUDIT-078",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "9adf69669367ba5df99167ea44ee47b6ce22d35dbb7604b57fdf9b3f17e0c970",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "8c84bb397730e08e74a67bf53750cb236ad8c84035606a4eaf82f4b490a77be6",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "1b282dafea8e61b23999b41c66f8c90cebd0824adf3d4bd196e5dc313a7e973d",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "ed246f94df78ef8dcb7784ac387834e4b33b5ff8bdc142cb95d29c2354fdcc5b"
+    },
+    {
+      "audit_manifest_sha256": "dbdd8258e197eb686ee93cfec67ce2c174db9314be494dbab3be4b50ea4b94e5",
+      "bundle_sha256": "cee9afffb4d53335e6d5681ef1f5e1843b0d8c5ade8d909b23c3e9a28417f38e",
+      "case": "SYNTH-AUDIT-079",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "b6d15f77a75fa1329ec33a395b7d97e2e0fe6bd44cbd29d23ace1cb36fda68c7",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "a8dd9a420fc0464e15665a1f2275b2c10b23895ad6e9fa88aeaf7566333781ca",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "6c04b7055025400ac796894888555566405e1754b60675d9333b4acbe62416c8",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "dbe0e580fbb1376f3194e39fd6aff261353c08fb91b7966188907621deced0f7"
+    },
+    {
+      "audit_manifest_sha256": "67b3b090da4006e7dd357d689872987fb8212f5f7c37858ca4613a392d24a4ff",
+      "bundle_sha256": "88deee10c6392c2ee36c3f31492d510eaf88b1b8b923f60e3b4f2d27891d048c",
+      "case": "SYNTH-AUDIT-080",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "2474560938a80c23da398c7b05365be710dc807efa987def5fe9f4938b32a294",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "cbdd5387015ca3588fe57c014012c52172646de08d5c0e29322390018c7df5a0",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "10773def28752b6f0351d617cebe63736f1c405b9b3d0c2ef21133016ed956f7",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "e3050019580b88ac9ccbff7fcb3dbfe9c34dfebe8409c030222cebfa06813430"
+    },
+    {
+      "audit_manifest_sha256": "af24177c70eaf1a730abc22d5e45116876ce49c0f806b1842f61d6bbd21afcef",
+      "bundle_sha256": "44c3e57f19dc26dbcfc5e81112c26b9c27942603185199804c18b2d0f81cfe30",
+      "case": "SYNTH-AUDIT-081",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5c5e8b47174b6cff70fc49fe105530f5658eac538c161c26656e7633a52795ce",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "2c7a45d2e42e281858324250af34a17e93abc9b2643ec9c89a846e0705c957a2",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "7ea725774f1204dd5a3cdace50abe9d4ca7ebb088dc10eeb45dcf8e088f2980e",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "e18fefe5607569dd8021a93e3144a851c527e190b5823c2e81699e6196c19725"
+    },
+    {
+      "audit_manifest_sha256": "67122dbc3efabb636f8b030217fca7707f6a4717ee274a33c1d41c0375d50c12",
+      "bundle_sha256": "83d1ac7144338aad2319f1116ee6b5b9f6091764d56486deb0e8fd5b4df3ac35",
+      "case": "SYNTH-AUDIT-082",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "9866d9aef2181e21ae05f52829fd1856c64093ded5e71ca284a27877a5d6879d",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "0eb25aab28076adf6c2f7e943036c0c9e37456b4de5ec5fe5af20024063e6488",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "775d717d3651e7fc278322a823197e9686d80a62ce6eaf7387d0c8e35a267ca8",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "53b851a89d97cede17984336d42a8bc22ca51c48631f005abf1f4cc1acb301ea"
+    },
+    {
+      "audit_manifest_sha256": "59bd86c83e3bec9d9ed25b656766629d71ff39fd35da8cb3535402209c432fba",
+      "bundle_sha256": "7fcacafcab696e8205f6c7696366c18a1dc018e76cbc7df2de52caa254479436",
+      "case": "SYNTH-AUDIT-083",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5f11e05a2bc3561f0fc40de5ab845a17bfdc938d123aba3170042a093751be1c",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "7b2e02a405d5280299884965a5a5e11a6b5eb7625c8bfd414c7c6f5c2f3b117b",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "349e579261b5ed5af11cb60d7aebb6f43477603f271eeb9baa80e1d1d9f20ec5"
+    },
+    {
+      "audit_manifest_sha256": "dde0f29a11a75bddd8821377e6dae421c5f5f643816d6610ec2a8ba98aa7f372",
+      "bundle_sha256": "74414b52c6dd2db8df032f5ad9293a03abc9e18c2c8a374f271c20bac126744a",
+      "case": "SYNTH-AUDIT-084",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "4bfcebe46973e7a6a4fc80485e085082fe8691b356ae3cbcbbfe7f67294876a6",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "275391c4764cde49c32eeb5ce0ecba29f933b57d772115e9894f95d03cc3c0be",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "ba60fa4644762aec9a93d61da17a434813390e5f5a24d779d20468a68d072854"
+    },
+    {
+      "audit_manifest_sha256": "8aff3bf1435ae9bf5b8eb7487e5762118c77b12a92b2562767600ca5b5046e47",
+      "bundle_sha256": "aae27ac0cfc8ab874db7ef210360c08904198f68a8b8030a38c996ff5f5aaae2",
+      "case": "SYNTH-AUDIT-085",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "e09859b8cd06943c8e7c7888d2950559c8895cc0f9be171ef6aabea477bc8ab2",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "02dce194fc48db345f06ce9c6a90fe1068c4dba8e455485c1d880ad448441201",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "7329345e135be9657e6b7bf13fd39a8f0a52f173cb75ef20c98f813649816ff3"
+    },
+    {
+      "audit_manifest_sha256": "e7aaf75af03b858bc6b327cbeceb7fadfb95b137d229388bbf935914b825362d",
+      "bundle_sha256": "3ac34b5bacc9edab991cd4cb4d756e9518b8c758c0dcd6fd01b4efd779a88616",
+      "case": "SYNTH-AUDIT-086",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "c5580394faf4e1cf7ff7a6b3e76c27ebd00a3ef1e25240778b4c25c36bd4745f",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "59c7ccb844ad949ffbefe1f15d60c457e92bb668c16de9c4726f8763f8dc4111",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "b6be7a163dcd814900920e37e8a7e6d39c4e156d5547b3eb4094957b5f4b79ff",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "cf2ca1d516af34f242c75c21ca04216099662641ba92d3b07091825bb390285f"
+    },
+    {
+      "audit_manifest_sha256": "10154845f54177b545c11cb2971797ea56e010771fddce1e6ea5b1c676b2d13a",
+      "bundle_sha256": "8ccf76a88804c167f1dff3b08fd094e4690f1481269066fce5e92109d6836319",
+      "case": "SYNTH-AUDIT-087",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "645449184c0e19b7b723a2f697f7c93a20e8b1f3321d3c726c72c2983c538ebd",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "05f2c03b2efc0a609a2fe1b8781cf320dce439c7e4ffee71d088f802bedc6da1",
+      "probe": {
+        "category": "fractional-cent-input",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "c3b95a1b3ebf31d988221ea28292cb54a17d750e589b80f00ec603af02004433"
+    },
+    {
+      "audit_manifest_sha256": "64d3bcea75ee48b96e1e6ceefed8213945ed3266eb7b752203345e1772a58f4a",
+      "bundle_sha256": "496a4503c200cb71eb8959ea267889412f732e16805b252bcdc43a01b004abca",
+      "case": "SYNTH-AUDIT-088",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "865f7de637f799453f5d3a24af36f15d1d7cde30c554c71e3fde0dd6455d0e91",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "06f77a49fe7c6c5c36c3dbf909d3627412ceca196d792d01a5322c876146db03",
+      "probe": {
+        "category": "negative-billed-cents",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "c08067b1920b21eae57c72df8d5d62603ae790e5f57c60443d18b696ea2223a8"
+    },
+    {
+      "audit_manifest_sha256": "47b7f6d3a89093fa40405e564a5ef50badc51ef9dc095170d5bd6a402ec16184",
+      "bundle_sha256": "77eb409c7ee04ff25afd091ed560f3b4cdc5a6cb4bec8e0340419b1b09ca1d99",
+      "case": "SYNTH-AUDIT-089",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "5977d6daecdede6b46dc1c97e720512a029d6e563f360d739fa1bd8bdc67d197",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "ded3ad16cf21a04fb9e41d427dc72d161a0aff86a60237805e349cf04b471a67",
+      "probe": {
+        "category": "unicode-numeric-alias",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "6ab34db7aa29e4ddaa49e14adcd4ba869fdd61bb189a49022a80ce1598e1580f"
+    },
+    {
+      "audit_manifest_sha256": "b8ce9e0c3bb6f928773a0da71d794315c57842e08e9301680de861351028167a",
+      "bundle_sha256": "ce22cfeaccae3a764294eca68c4641ae3dd21c8eadf1a8316f5beff72960e80c",
+      "case": "SYNTH-AUDIT-090",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "f6e28430abd197da49138c26b0e043fc1731231e37d076764cc0bcc18dd50ccb",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "4bd72d8ecda35ea5eaab8257c3314e94bf1e312d0cf9f4ea27255719ff7bb78b",
+      "probe": {
+        "category": "duplicate-charge-evidence",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "5113fbed9d4d00a1d47cbfd1e517c382252e611d90b6c09ee4fbd31a9f816788"
+    },
+    {
+      "audit_manifest_sha256": "7a24b04d583dd4ae3fbb2a2ac02d40d21dc42595788d8e15f877d4b8d1425ebc",
+      "bundle_sha256": "0c1816f1bf99a5a3a0729034cf394c1f4f9dd36c23b69278e4ee0d3ef13af75d",
+      "case": "SYNTH-AUDIT-091",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "61d3d519cf2dd93cfc1eebc6c28ef6609d0676e95a273763ce06b1968d4cf53f",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "e6bee94e970445ec69b00c22a1c8023c310ad8aeae285e8bf72f75986db19173",
+      "probe": {
+        "category": "verified-overbill",
+        "error_code": null,
+        "manifest": "b161fe5f6dd0c9743b7075d1cc28f914de72feb884a8a628dc60a540ed738eaf",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "8bda7c8dad9fc0d54e12658f91301b7cd8ba43685cc22c2aef68ccb2af3f2e3a"
+    },
+    {
+      "audit_manifest_sha256": "b703e9e904915b1f582c66f19a1104bbdee6a1dcb8c90046e5439fc2fbc958a8",
+      "bundle_sha256": "eefe4859cee994a2bc18c6eea17960c35c1ef8335622478c23524da35eb63a44",
+      "case": "SYNTH-AUDIT-092",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "b323f7694d6d393ea5a81ab1b8f560a5479924d3ffc9f24a33328d91c227e77c",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "032c1818c1dd3aa930c1ae9247330a33bde102fc055d0c2e07f8e44e269ebc48",
+      "probe": {
+        "category": "verified-exact",
+        "error_code": null,
+        "manifest": "ff06d5ec4e9f00768dd3b4e2847553f0e4475b984a7be6df0fd6aa001186bbc8",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "69e9b22a64acc73e1920d7424d99ea2c67b1df069fb75f7b3e035d6b1bf156dd"
+    },
+    {
+      "audit_manifest_sha256": "3eab4d1e283e54e52bf1dd6162df002f6af409eb2293c892819f93da63b6513a",
+      "bundle_sha256": "e8161fa43fb7bf4cb37aa5587917672a2cee2d1992d11e52a39c062051771210",
+      "case": "SYNTH-AUDIT-093",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "cb4b1229feb6642f9221169843779ea76c73def32e45a40280d9923185f04173",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "066d23f786817b2620add3360f7f721a549e4403ef04a764b8128b8d0c7e394f",
+      "probe": {
+        "category": "verified-underbill",
+        "error_code": null,
+        "manifest": "d4ef00a2df0cbb0b314f7bf48c93bd0f095b72026e6e56bbc563dbee46bd4227",
+        "stage": "COMPLETE",
+        "state": "CLEAN"
+      },
+      "snapshot_sha256": "0e943a1ebb8ac60b2bd47b1f61f734fb2abb0d5f40cbf8a59c2817ce07d1c7f2"
+    },
+    {
+      "audit_manifest_sha256": "9fcfc68e5d1cc6d12a7ef9e392a6e847531f58f57ffe458bb4e3f310bdac26d5",
+      "bundle_sha256": "b568adfea72d73326a94127655cefcbad7d87145f14b5fab2041338ed4ac9fc8",
+      "case": "SYNTH-AUDIT-094",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "b8fb988a6e00e88e454655d54ddef1a3d5e5cd67b0a9b01319dc9aeaad3ef4bd",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "7ab6d3dd14ddc29788884db1768bd8267cc70e79ab103e34f1adca830e92ddcf",
+      "probe": {
+        "category": "unverified-rate-authority",
+        "error_code": null,
+        "manifest": "cf9b6c19a47fc3f97420f246778f6309e809a9ccb71a64a28b34cee8323b54a1",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "be0bc90fd693a8478f83a8f81c933d69609924765b994ac922c0a21928cc36e4"
+    },
+    {
+      "audit_manifest_sha256": "8a9704f5d0f2463c5f079f40ce497aba397bb569efa1c0b06beb41189d37be0e",
+      "bundle_sha256": "a4f68cd15045a2020b4dbbfa745956c751133db463ba6d754ec507e2a196ca96",
+      "case": "SYNTH-AUDIT-095",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "1a92618a7ddaa343e96f14f232f560a90a442a2d5f58848b1e8bb7d9d242006d",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "9e0f5aaca16910f9fb96cf3293ae2937aaab36ee258f21e685857ad68c406a46",
+      "probe": {
+        "category": "missing-rate-authority",
+        "error_code": null,
+        "manifest": "1b9da3a8191924309695d64924dea5c47f746ac3e263c57ea758b9e9ca5fccc7",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "b90a2bb0f8e82f65cda515dca06aa8f35bc84b3faafa086b44566c89f2c862cd"
+    },
+    {
+      "audit_manifest_sha256": "b1de335e479acfb7af3ba518df98be720709820375de1ef3c85ca2507ab58cbf",
+      "bundle_sha256": "eb0e7800fef004c34a179e0204b3150eab6cc63ece0c04efe9d2e487d0dabc10",
+      "case": "SYNTH-AUDIT-096",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "b6805ad07152dc7bc9a54b566763299d25a05315dc415a58e0580eb45901fdd7",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "1ab3b88f46a20ee7676c6f9ff9f325a9ea535a888f4e42a18a942640d4ff157d",
+      "probe": {
+        "category": "invalid-service-date",
+        "error_code": "INVOICE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "INVOICE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "8234defded11bdea9dedad9a366da6fc5e423ccef3c4c78abe75b126582d53d8"
+    },
+    {
+      "audit_manifest_sha256": "e85856c5d328ecd3c2d80941de6c145e5269bad967f4b4d0adc63707ea3a4ac9",
+      "bundle_sha256": "68e2692e39bf97533a04a5042924341636b4b9f62a5f6246a532bb6e640fbb13",
+      "case": "SYNTH-AUDIT-097",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "904a9076e01a3ae999f7b933c970a8d13e404651728b5d7f1b9c56b9cc74c80e",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "c2ab2373e346f44b987d2eec4cf7d0d3416d34b54d86782ca7aafe273f815d2c",
+      "probe": {
+        "category": "conflicting-invoice-identity",
+        "error_code": "POPULATION_FREEZE_FAILED",
+        "manifest": null,
+        "stage": "POPULATION_FREEZE",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "2ee5a789888fc6d56234d241f2a9726ccec9dc972d717912d395c2cf885733a7"
+    },
+    {
+      "audit_manifest_sha256": "e9db79883cb7823438b0c570dd025a55f9aa014cb08ea025965c3a6553b73daf",
+      "bundle_sha256": "5a143afa17b55799f58944fb10de897f2b17ee449720ea6dede542f969c2df7e",
+      "case": "SYNTH-AUDIT-098",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "dc0043595369ee158ec1ec2745ff121428f3b6455ff94ecae27894ee99150f8e",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "160c47a46176be49be7d7d731b9075ed8f67f15a11dc4f92d5f6fbc68dad09dd",
+      "probe": {
+        "category": "incomplete-fixed-rate",
+        "error_code": "RULE_INGEST_FAILED",
+        "manifest": null,
+        "stage": "RULE_INGEST",
+        "state": "BLOCKED"
+      },
+      "snapshot_sha256": "a6db8d48549c4d7cc1476fad735e0a547d583409fe9e58714592197c8851a76e"
+    },
+    {
+      "audit_manifest_sha256": "d608cc8261749efdb438671ab84fa1912cd020ec32554aaa6e60ebe1569271b6",
+      "bundle_sha256": "a4818fb07444abef87cc602bda175dc97e6a38727aefe3193ea1c78f94f62327",
+      "case": "SYNTH-AUDIT-099",
+      "customer_money_observed": false,
+      "declared_settlement_fixture_sha256": "6c2cdbee3191ee3de94ae584900e99be875ad4ef5af10891baad963658341ece",
+      "external_action_performed": false,
+      "invoice_fixture_sha256": "0680d1d06981e2d1658b626552a260983d5a091c390e5b947aff64b81650fdf9",
+      "probe": {
+        "category": "mismatched-currency",
+        "error_code": null,
+        "manifest": "bfaf6e98affb8420e16df4e031666d45c719caba71dd6a048465f70098533996",
+        "stage": "COMPLETE",
+        "state": "REVIEW_REQUIRED"
+      },
+      "snapshot_sha256": "04b3b10d8b60dbbbd835c0d78adc710dfb48a4bad197ae2ae214c4ae5dd36224"
+    }
+  ],
+  "cases_sha256": "fee9685201216133cdbbb2d664a65afbee6108eee7a52f205ae475cc73adefdd",
+  "classification": "SYNTHETIC_ONLY_NOT_CUSTOMER_FREIGHT_ACCURACY",
+  "failures": [],
+  "limitations": [
+    "Source-pinned synthetic fixture variants, not 100 independent real freight invoices.",
+    "Fictional approvals, carrier actions, credit memos and reversals are simulated locally, not observed external events.",
+    "No customer bank payments, carrier tariffs, independent adjudications or recovered funds verified.",
+    "Lab real-document totals are historical reference, not rerun or revalidated here.",
+    "No software engine or public GitHub files changed, and no network actions initiated by this script."
+  ],
+  "observed": {
+    "distinct_freight_invoice_identities": 300,
+    "distinct_full_lifecycle_run_hashes": 100,
+    "distinct_synthetic_settlement_snapshots": 100,
+    "full_lifecycle_audits_failed": 0,
+    "full_lifecycle_audits_passed": 100,
+    "independently_adjudicated_original_freight_labels": null,
+    "pre_review_fault_injection_cases_tested": 100,
+    "probe_categories_and_outcomes": {
+      "conflicting-invoice-identity:BLOCKED": 8,
+      "duplicate-charge-evidence:BLOCKED": 7,
+      "fractional-cent-input:BLOCKED": 7,
+      "incomplete-fixed-rate:BLOCKED": 8,
+      "invalid-service-date:BLOCKED": 8,
+      "mismatched-currency:REVIEW_REQUIRED": 8,
+      "missing-rate-authority:REVIEW_REQUIRED": 8,
+      "negative-billed-cents:BLOCKED": 7,
+      "unicode-numeric-alias:BLOCKED": 7,
+      "unverified-rate-authority:REVIEW_REQUIRED": 8,
+      "verified-exact:CLEAN": 8,
+      "verified-overbill:REVIEW_REQUIRED": 8,
+      "verified-underbill:CLEAN": 8
+    },
+    "real_false_negative_rate": null,
+    "real_false_positive_rate": null,
+    "requested_full_lifecycle_audits": 100,
+    "verified_real_settlements": null
+  },
+  "schema": 1,
+  "source": {
+    "base_invoice_fixture_sha256": "23114c2adda7ff5fdae58bfea8177727a500d515bc4248195ef43c900bd5a9cd",
+    "base_settlement_fixture_sha256": "dc66f0734037bdc23371043f9e93d18054b586195540f75f2b5e6b9918775949",
+    "commit": "7a43c19f0b298285a28b46ff1fd0f3d4349f4344",
+    "full_lifecycle_module": "freight/synthetic_rehearsal.py",
+    "lab_result_doc_sha256": "2dcd8a53a89174e5a199af4f90ffce8927a7b673914b7e16f6c30a55022c2e5a",
+    "original_document_bytes_refetched": false,
+    "phase3_synthetic_gold_fixture_sha256": "e53404f4c881e61fe01959bb5cdba972519ff39247d58a80392ab59593aee78e",
+    "pre_review_module": "freight/audit_workflow.py",
+    "repository": "P00NSMASHER/github-value-hunt-ledger"
+  }
+}
