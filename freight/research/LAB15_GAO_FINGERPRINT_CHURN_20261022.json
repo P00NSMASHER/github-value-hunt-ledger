@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "fingerprint": "P00NSMASHER/github-value-hunt-ledger | freight/lab15/evidence_ledger.json | 2026-10-22 04:53Z all-eight-GAO-same-size-SHA-churn",
+  "classification": "SOURCE_PROVENANCE_ANOMALY_SEMANTIC_CHANGE_UNKNOWN",
+  "source_cohort": "PUBLIC_GAO_DECISION_METADATA_NOT_REAL_FREIGHT_INVOICE_EXTRACTION_OR_FINANCIAL_RECONCILIATION_OR_FREIGHT_ERROR_ACCURACY",
+  "observed_at_utc": "2026-10-22T04:53:29Z",
+  "repository": "P00NSMASHER/github-value-hunt-ledger",
+  "previous_repository_commit": "dec19868c8db2524b9e9c24e277be8585e34ffff",
+  "current_repository_commit": "df6bebfc3fa70027ea3f5c190f3e180f0806125e",
+  "previous_ledger_git_blob_sha": "4d54b0015f4011ee03d72b9aa06121be2ef49a16",
+  "current_ledger_git_blob_sha": "04b22683f3a0f0ae309bd49250e6dc022cc370f7",
+  "total_registered_sources": 13,
+  "gao_decision_sources": 8,
+  "gao_digest_changes": 8,
+  "all_changed_sources_preserved_same_byte_length": true,
+  "source_document_bytes_retained": false,
+  "independent_semantic_change_verification": "UNKNOWN",
+  "cause_of_hash_variation": "UNKNOWN",
+  "contract_payment_adjudicated_freight_ground_truth": "UNKNOWN",
+  "commercial_reuse_rights": "UNVERIFIED",
+  "invoice_error_detection_accuracy": "NOT_ESTABLISHED",
+  "owner_handoff": "RETALLY Lab 15 source-acquisition/evidence evaluator; independently compare original GAO decision body and volatile page bytes before classifying any observed SHA as a substantive edit. Preserve both raw-byte receipts, historical failures, all source rights holds, and original versions; do not auto-promote invoice outcomes.",
+  "observed_changes": [
+    {
+      "source_id": "src-48bbdbf852723fb514d33526",
+      "source_url": "https://www.gao.gov/products/b-223311-0",
+      "previous_sha256": "a26d55dfc090f10a940618eef4c40afea65b5d4367b9b0aeb18f72743b38dd0d",
+      "current_sha256": "e568e0465c3147800fb9017d2f8c1e94fbadd52178e196735e2a779d9b95ef1e",
+      "previous_bytes": 86258,
+      "current_bytes": 86258,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-68660c9668093ba95fdd9460",
+      "source_url": "https://www.gao.gov/products/b-143246",
+      "previous_sha256": "d7c8db2a833c40e7c2d2eda777a8792bed4595af26c0d85a983a395646666daf",
+      "current_sha256": "dacd88c09971649861e0810870ee9337228a227993ac41654a47e333936e3f6b",
+      "previous_bytes": 83784,
+      "current_bytes": 83784,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-68b2dc928094407c76b16465",
+      "source_url": "https://www.gao.gov/products/b-161664",
+      "previous_sha256": "3bf98ba74939a43f1b5497066125c45b68714457bdff3348951a1a5017c31ae9",
+      "current_sha256": "6e85effe41b9cb4292caf4211ff7d684810a43addf52066900abb3c2d77833b9",
+      "previous_bytes": 83613,
+      "current_bytes": 83613,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-849bf6ffaadcd5e67cd274ec",
+      "source_url": "https://www.gao.gov/products/b-195862",
+      "previous_sha256": "9d9ec315a69a5e39cd6941e3e29851bf39b88cd76ba4f3b71cecb9134aad844e",
+      "current_sha256": "399a284d39e0db2492a2f69e34dd63bd8c1997a54d16f8d947aeb8b0e2845dab",
+      "previous_bytes": 81506,
+      "current_bytes": 81506,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-a2fe6bfb402aa319f797e39e",
+      "source_url": "https://www.gao.gov/products/b-221705",
+      "previous_sha256": "88777b726ced4e285e9f8f3ad2dd9ed7440ea33b14dc636d45ee9dab01928ecf",
+      "current_sha256": "c0a46f56cb6cdc945c0fbf4b93778705f7a284cf2b264d0644714c7db0ed29c3",
+      "previous_bytes": 80229,
+      "current_bytes": 80229,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-a4131c53f76d7c85e290e848",
+      "source_url": "https://www.gao.gov/products/b-148465",
+      "previous_sha256": "3636594ee7fba0a2a359bc588913babd473236278981da5696e41bdf6ba4dee3",
+      "current_sha256": "3fac66a5cc042b852583f5dd6a49169dd519f214ec414626c7c1af9b310cfa10",
+      "previous_bytes": 83048,
+      "current_bytes": 83048,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-e0acade169007fa1a455c9b1",
+      "source_url": "https://www.gao.gov/products/b-221594-0",
+      "previous_sha256": "73682c8be391c5bb8c4b8f6173b876e55daa037fa6942171d6457901ac5e6bec",
+      "current_sha256": "8aec44d2b000dd23bfbdf281388178dce698ddb0a95e066b55e91e0b687ab09c",
+      "previous_bytes": 86071,
+      "current_bytes": 86071,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    },
+    {
+      "source_id": "src-fb9bf13c34be8981595ddf36",
+      "source_url": "https://www.gao.gov/products/b-199805-0",
+      "previous_sha256": "c92bdf0a5154392510ed0b25e4e3aa1dd787db1b4dde9bb5b009eac85cc6432d",
+      "current_sha256": "53cd708ce7d554f9fac7603b3f915fb0e7cbd7efc417f17b74902525165d2db4",
+      "previous_bytes": 88786,
+      "current_bytes": 88786,
+      "previous_content_version": 9,
+      "current_content_version": 10
+    }
+  ]
+}
