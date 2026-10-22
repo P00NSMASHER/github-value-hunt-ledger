@@ -171,3 +171,28 @@ def test_unrelated_event_fee_stays_available_during_other_return_hold(tmp_path):
     assert row.unresolved_counter_cents == 2000
     assert inspect(s, "A", "INV-A", 10000).settlement.source_declared_candidate_fee_cents == 0
     assert inspect(s, "B", "INV-B", 3000).settlement.source_declared_candidate_fee_cents == 3000
+
+
+def test_independent_120_case_oracle_requires_zero_fee_during_pending_return():
+    from freight.priority4_adversarial_lab import (
+        independent_oracle, make_plan, CREDIT_MODES,
+    )
+
+    plans = (make_plan(i) for i in range(120))
+    eligible_pending = [
+        p for p in plans if p.credit_mode == "PENDING_RETURN" and p.ordinal % 11
+    ]
+    assert eligible_pending  # compare against separately synthesized expected state
+    for p in eligible_pending:
+        oracle = independent_oracle(p)
+        assert oracle.pending_return_cents > 0
+        assert oracle.fee_base_cents == 0
+        assert oracle.settled_net_cents > 0
+    assert "PENDING_RETURN" in CREDIT_MODES
+    settled = next(
+        p for p in (make_plan(i) for i in range(120))
+        if p.credit_mode == "FULL_CREDIT" and p.ordinal % 11
+    )
+    baseline = independent_oracle(settled)
+    assert baseline.pending_return_cents == 0
+    assert baseline.fee_base_cents == baseline.settled_net_cents > 0
