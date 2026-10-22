@@ -68,29 +68,26 @@ class MainBranchRulesetTests(unittest.TestCase):
                     "RECOVERYWORKS_RESULT", "TECHNOLOGY_INTELLIGENCE_RESULT"):
             self.assertIn('test "$' + var + '" = "success"', body)
 
-    def test_activation_is_blocked_by_existing_direct_main_writers(self):
-        # A PR-only ruleset would strand scheduled writers still pushing into
-        # main. Keep the template disabled until every writer is migrated.
-        direct = []
-        writer_files = {
-            "catalog-append.yml": "git push",
-            "integrator-sync.yml": "git push",
-            "public-repo-hunter.yml": "git push origin HEAD:main",
-        }
-        for name, marker in writer_files.items():
-            body = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
-            if marker in body:
-                direct.append(name)
-        ti = (ROOT / "tools" / "ti_persist_generated.py").read_text(encoding="utf-8")
-        workflow = (ROOT / ".github" / "workflows" / "technology-intelligence.yml").read_text(
-            encoding="utf-8"
-        )
-        if '"HEAD:main"' in ti and "ti_persist_generated.py" in workflow:
-            direct.append("technology-intelligence.yml")
-        if self.ruleset["enforcement"] == "active":
-            self.assertEqual(direct, [], "Direct-main writers must migrate before protection")
-        # Deliberately do not assert that any writer must remain; migrating
-        # them is a prerequisite for switching the manifest to active.
+    def test_scheduled_writers_do_not_contain_direct_main_pushes(self):
+        directory = ROOT / ".github" / "workflows"
+        for filename in ("catalog-append.yml", "integrator-sync.yml",
+                         "public-repo-hunter.yml", "technology-intelligence.yml"):
+            content = (directory / filename).read_text(encoding="utf-8")
+            with self.subTest(filename=filename):
+                self.assertIn("  submit-pr:", content)
+                self.assertIn("tools.retally_automated_pr_proposal", content)
+                self.assertNotIn("PR_MODE", content)
+                self.assertNotIn("_PR_ENABLED", content)
+                self.assertNotIn("git push origin HEAD:main", content)
+                self.assertNotRegex(content, r"(?m)^\s+git push\s*$")
+                if filename == "technology-intelligence.yml":
+                    self.assertIn("--proposal-branch", content)
+                else:
+                    self.assertIn('git push origin "HEAD:refs/heads/$BRANCH"', content)
+        script = (ROOT / "tools" / "ti_persist_generated.py").read_text(
+            encoding="utf-8")
+        self.assertIn('os.environ.get("GITHUB_ACTIONS") == "true"', script)
+        self.assertIn("and args.proposal_branch is None", script)
 
     def test_customer_release_remains_a_separate_hold(self):
         policy = (ROOT / "recoveryworks" / "CODE_RELEASE_POLICY.md").read_text(
