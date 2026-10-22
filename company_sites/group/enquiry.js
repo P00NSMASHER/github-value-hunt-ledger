@@ -102,6 +102,9 @@ if (enquiryForm) {
               if (!received && !busy) status.textContent = "Security verification is unavailable. Please retry it, or use the email draft below.";
             }
           });
+          if (!token && !received && !busy) {
+            status.textContent = "Complete the security verification to enable secure sending. Nothing has been sent.";
+          }
         } catch { securityUnavailable(); }
       };
       if (window.turnstile) render();
