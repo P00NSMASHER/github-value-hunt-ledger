@@ -1,25 +1,59 @@
-"""Isolated CI acceptance for the consolidated marketing site; no live traffic."""
+"""Isolated acceptance for freight and independently built company sites; no live traffic."""
 import argparse
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 from threading import Thread
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlsplit, urlunsplit
 
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError, sync_playwright
-from freight.site.group.build import ROUTES
+from freight.site.group.build import LEGACY_ROUTES
 
 
-CONSOLE_HEADING = "What would you like to move forward?"
-GREEN_CANVAS = "rgb(7, 58, 47)"
+VIEWPORTS = ((1440, 900), (768, 1024), (390, 844), (375, 812), (320, 700))
+PUBLIC_URLS = {
+    "freight": "https://www.retallyrecovery.com/",
+    "group": "https://group.retallyrecovery.com/",
+    "recoveryworks": "https://recoveryworks.retallyrecovery.com/",
+    "permitplate": "https://permitplate.retallyrecovery.com/",
+    "capturebrief": "https://capturebrief.retallyrecovery.com/",
+}
+COMPANY_CARDS = {
+    "RETALLY Freight Recovery": PUBLIC_URLS["freight"],
+    "RETALLY RecoveryWorks": PUBLIC_URLS["recoveryworks"],
+    "PermitPlate": PUBLIC_URLS["permitplate"],
+    "CaptureBrief": PUBLIC_URLS["capturebrief"],
+}
+HEADINGS = {
+    "group": "Focused businesses. Clear purpose.",
+    "recoveryworks": "Find the gap. Keep the proof.",
+}
+NAVIGATION = {
+    "group": ("/#businesses", "/#about", "/#contact"),
+    "recoveryworks": ("/#services", "/#process", "/#example", "/engagement/", "/#contact"),
+}
 
 
-def check_group_canvas(page, slug, output, width):
-    """Check the exposed page canvas and sticky navigation below the hero."""
-    selectors = ([".group-principles", "#businesses", ".group-approach", ".studio-section"]
-                 if not slug else [".group-footer"] if slug == "contact" else
-                 [".business-section-nav", "#focus", "#next-steps", "#scope"])
+class QuietHandler(SimpleHTTPRequestHandler):
+    def log_message(self, *_):
+        pass
+
+
+def check_company_canvas(page, company, slug, output, width):
+    """Check each company's own canvas and intentionally static navigation."""
+    if company == "group":
+        expected = {"body": "rgb(245, 242, 233)", ".site-header": "rgb(6, 44, 37)",
+                    ".site-footer": "rgb(6, 44, 37)"}
+        if not slug:
+            expected.update({"#businesses": "rgb(245, 242, 233)",
+                             "#about": "rgb(7, 62, 50)", "#contact": "rgb(245, 242, 233)"})
+    else:
+        expected = {"body": "rgb(244, 241, 235)", ".site-header": "rgb(18, 26, 53)",
+                    ".site-footer": "rgb(12, 18, 41)"}
+        if not slug:
+            expected.update({"#services": "rgb(244, 241, 235)",
+                             "#process": "rgb(33, 43, 76)", "#contact": "rgb(18, 26, 53)"})
     surfaces = page.evaluate("""selectors => {
       const background = element => {
         while (element) {
@@ -29,68 +63,65 @@ def check_group_canvas(page, slug, output, width):
         }
         return 'transparent';
       };
-      return ['body', ...selectors].map(selector => {
+      return selectors.map(selector => {
         const element = document.querySelector(selector);
         return {selector, present: !!element, background: element ? background(element) : null};
       });
-    }""", selectors)
-    assert all(surface["present"] and surface["background"] == GREEN_CANVAS
-               for surface in surfaces), {"route": slug or "home", "width": width, "surfaces": surfaces}
-    header = page.locator(".group-header")
-    header_state = """element => {
+    }""", list(expected))
+    assert all(item["present"] and item["background"] == expected[item["selector"]]
+               for item in surfaces), {"site": company, "route": slug, "width": width, "surfaces": surfaces}
+    header = page.locator(".site-header")
+    state = """element => {
       const rect = element.getBoundingClientRect(), style = getComputedStyle(element);
-      return {top: rect.top, height: rect.height, background: style.backgroundColor,
-              color: style.color, position: style.position, scrollY: window.scrollY};
+      return {top: rect.top, background: style.backgroundColor, color: style.color,
+              position: style.position, scrollY: window.scrollY};
     }"""
-    before = header.evaluate(header_state)
-    target = "#businesses" if not slug else ".group-footer" if slug == "contact" else "#focus"
-    page.locator(target).evaluate("""async element => {
-      const header = document.querySelector('.group-header');
-      window.scrollTo({top: element.getBoundingClientRect().top + scrollY - header.offsetHeight,
-                       behavior: 'instant'});
-      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    }""")
-    after = header.evaluate(header_state)
-    assert before["background"] == after["background"] == GREEN_CANVAS, (before, after)
-    assert before["color"] == after["color"] and before["color"] != GREEN_CANVAS, (before, after)
-    assert before["position"] == after["position"] == "sticky", (before, after)
-    assert abs(before["top"]) <= 1 and abs(after["top"]) <= 1 and after["scrollY"] > 0, (before, after)
-    if slug in ("", "capturebrief"):
-        page.screenshot(path=str(output / f'{slug or "home"}-{width}-beyond-hero.png'), full_page=False)
+    before = header.evaluate(state)
+    page.locator(".site-footer" if slug else "#businesses" if company == "group" else "#services").scroll_into_view_if_needed()
+    after = header.evaluate(state)
+    assert before["background"] == after["background"] == expected[".site-header"], (before, after)
+    assert before["color"] == after["color"] and before["color"] != before["background"], (before, after)
+    assert before["position"] == after["position"] == "static", (before, after)
+    assert abs(before["top"]) <= 1 and after["top"] < 0 and after["scrollY"] > 0, (before, after)
+    if not slug:
+        page.screenshot(path=str(output / f"{company}-{width}-beyond-hero.png"), full_page=False)
     page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
-    return {"route": slug or "home", "width": width, "surfaces": surfaces,
+    return {"site": company, "route": slug or "home", "width": width, "surfaces": surfaces,
             "header_before": before, "header_after": after}
 
 
-def check_console_breakpoints(page, base, output):
-    """Guard the 501–800px interval where hiding a break joined two words."""
+def check_heading_breakpoints(page, bases, output):
+    """Retain the 501–800px wrapping guard on both independent company heroes."""
     results = []
-    for width in (500, 501, 768, 800, 801):
-        page.set_viewport_size({"width": width, "height": 1024})
-        page.goto(base + "/", wait_until="networkidle")
-        page.evaluate("document.fonts.ready")
-        heading = page.locator(".hero-console h2")
-        assert heading.is_visible()
-        text = " ".join(heading.inner_text().split())
-        assert text == CONSOLE_HEADING, {"width": width, "visible_heading": text}
-        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
-        if width in (501, 800):
-            heading.scroll_into_view_if_needed()
-            page.screenshot(path=str(output / f"home-console-{width}.png"), full_page=False)
-        results.append({"width": width, "visible_heading": text, "passed": True})
+    for company, expected in HEADINGS.items():
+        for width in (500, 501, 768, 800, 801):
+            page.set_viewport_size({"width": width, "height": 1024})
+            page.goto(bases[company] + "/", wait_until="networkidle")
+            page.evaluate("document.fonts.ready")
+            heading = page.locator(".hero h1")
+            assert heading.is_visible()
+            text = " ".join(heading.inner_text().split())
+            assert text == expected, {"site": company, "width": width, "visible_heading": text}
+            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+            if width in (501, 800):
+                page.screenshot(path=str(output / f"{company}-heading-{width}.png"), full_page=False)
+            results.append({"site": company, "width": width, "visible_heading": text, "passed": True})
     return results
 
 
-def check_card_heading_contrast(page):
+def check_card_heading_contrast(page, company):
     """Axe may leave gradient backgrounds untested; check each actual stop."""
-    results = page.evaluate("""() => {
-      const channels = value => value.match(/[\\d.]+/g).slice(0, 3).map(Number);
+    selector, panel, expected = (
+        (".company-card h3", ".company-card", 4) if company == "group" else
+        (".service-cards article h3, .pilot-card h2", ".service-cards article, .pilot-card", 3))
+    results = page.evaluate(r"""({selector, panel}) => {
+      const channels = value => value.match(/[\d.]+/g).slice(0, 3).map(Number);
       const luminance = rgb => rgb.map(v => v / 255)
         .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
         .reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
-      return [...document.querySelectorAll('.portfolio-item h3')].map(heading => {
-        const panel = getComputedStyle(heading.closest('.portfolio-item'));
-        const colors = panel.backgroundImage.match(/rgba?\\([^)]+\\)/g) || [panel.backgroundColor];
+      return [...document.querySelectorAll(selector)].map(heading => {
+        const style = getComputedStyle(heading.closest(panel));
+        const colors = style.backgroundImage.match(/rgba?\([^)]+\)/g) || [style.backgroundColor];
         const foreground = luminance(channels(getComputedStyle(heading).color));
         const contrast = Math.min(...colors.map(color => {
           const background = luminance(channels(color));
@@ -98,8 +129,8 @@ def check_card_heading_contrast(page):
         }));
         return {text: heading.innerText, contrast};
       });
-    }""")
-    assert len(results) == 8 and all(item['contrast'] >= 4.5 for item in results), results
+    }""", {"selector": selector, "panel": panel})
+    assert len(results) == expected and all(item["contrast"] >= 4.5 for item in results), results
     return results
 
 
@@ -128,39 +159,111 @@ def load_page_images(page):
         pass
 
 
-def check_contact_composer(page, base):
-    page.goto(base + "/contact/", wait_until="networkidle")
-    form = page.locator("#group-enquiry")
-    assert form.is_visible()
-    business = form.locator("#enquiry-business")
-    message = form.locator("#enquiry-message")
-    for control in (business, message):
-        assert control.evaluate("element => [...element.labels].some(label => label.textContent.trim())"), "Enquiry field needs a visible label"
-    submit = form.get_by_role("button", name="Open email draft", exact=True)
-    assert submit.get_attribute("type") == "submit" and submit.is_visible()
-    assert page.locator("#enquiry-status").evaluate("element => element.getAttribute('role') === 'status' || ['polite', 'assertive'].includes(element.getAttribute('aria-live'))")
-    sample = "QA preview only. Please do not send this draft."
-    business.select_option(label="CaptureBrief")
-    message.fill(sample)
-    page.wait_for_function("document.querySelector('#enquiry-draft')?.getAttribute('href')?.startsWith('mailto:')")
-    draft = urlsplit(page.locator("#enquiry-draft").get_attribute("href"))
+def check_keyboard_target(link):
+    assert link.is_visible()
+    link.focus()
+    assert link.evaluate("element => element === document.activeElement")
+    assert link.evaluate("element => element.getBoundingClientRect().height >= 44"), link.inner_text()
+
+
+def check_company_cards(page, bases):
+    """Assert all four real destinations; exercise locally available successors."""
+    page.goto(bases["group"] + "/", wait_until="networkidle")
+    cards = page.locator(".company-card")
+    assert cards.count() == len(COMPANY_CARDS) == 4
+    found = {}
+    for card in cards.all():
+        title = " ".join(card.locator("h3").inner_text().split())
+        link = card.locator(".card-end a")
+        assert link.count() == 1
+        check_keyboard_target(link)
+        found[title] = link.get_attribute("href")
+    assert found == COMPANY_CARDS, found
+    for company, title in (("freight", "RETALLY Freight Recovery"),
+                           ("recoveryworks", "RETALLY RecoveryWorks")):
+        page.goto(bases["group"] + "/", wait_until="networkidle")
+        link = page.locator(".company-card").filter(has=page.get_by_role("heading", name=title, exact=True)).locator(".card-end a")
+        check_keyboard_target(link)
+        page.keyboard.press("Enter")
+        page.wait_for_url(bases[company] + "/")
+        if company == "freight":
+            assert page.locator("#auditForm").count() == 1
+        else:
+            assert " ".join(page.locator(".hero h1").inner_text().split()) == HEADINGS[company]
+    # PermitPlate/CaptureBrief are independently tested in their own repositories.
+    # Their real hrefs and keyboard focus are checked above; no live request is sent.
+    return {"destinations": found, "local_keyboard_navigation": ["freight", "recoveryworks"],
+            "permitplate_capturebrief": "destination and keyboard focus checked; no live navigation"}
+
+
+def check_company_navigation(page, base, company):
+    for href in NAVIGATION[company]:
+        page.goto(base + "/", wait_until="networkidle")
+        nav = page.get_by_role("navigation", name="Primary navigation", exact=True)
+        assert nav.locator("a").count() == len(NAVIGATION[company])
+        link = nav.locator(f'a[href="{href}"]')
+        assert link.count() == 1
+        check_keyboard_target(link)
+        page.keyboard.press("Enter")
+        page.wait_for_url(base + href)
+        target = urlsplit(href)
+        if target.fragment:
+            assert page.locator(f"#{target.fragment}").is_visible()
+        else:
+            assert page.locator("main#main h1").is_visible()
+    return {"keyboard_destinations": list(NAVIGATION[company])}
+
+
+def check_company_contact(page, base, company):
+    page.goto(base + "/#contact", wait_until="networkidle")
+    selector = ".contact-panel" if company == "group" else ".contact-card"
+    panel = page.locator(selector)
+    link = panel.locator("a.button")
+    assert link.count() == 1
+    check_keyboard_target(link)
+    draft = urlsplit(link.get_attribute("href"))
     fields = parse_qs(draft.query)
+    expected = "RETALLY Group" if company == "group" else "RETALLY RecoveryWorks"
     assert draft.scheme == "mailto" and draft.path == "jay@retallyrecovery.com"
-    assert "CaptureBrief" in fields.get("subject", [""])[0]
-    assert sample in fields.get("body", [""])[0]
-    assert page.locator("#enquiry-status").inner_text().strip()
-    business.select_option(label="PermitPlate NYC")
-    updated = parse_qs(urlsplit(page.locator("#enquiry-draft").get_attribute("href")).query)
-    assert "PermitPlate NYC" in updated.get("subject", [""])[0]
-    assert sample in updated.get("body", [""])[0]
-    assert urlsplit(page.url).path == "/contact/"
-    # Deliberately do not click the submit button or the mailto anchor.
-    return {"email_draft_updates": True, "labelled_fields": True,
-            "live_status": True, "submit_clicked": False, "mailto_navigation": False}
+    assert expected in fields.get("subject", [""])[0]
+    assert "Opens your email app." in panel.inner_text()
+    assert page.locator("form, input[type=file]").count() == 0
+    # Inspect the deliberate email handoff without opening a draft or sending it.
+    return {"recipient": draft.path, "subject": fields["subject"][0],
+            "email_handoff_disclosed": True, "mailto_navigation": False}
+
+
+def check_freight_navigation(page, base):
+    page.goto(base + "/", wait_until="networkidle")
+    assert page.locator("body.home-simple").count() == 1
+    assert page.locator(".group-header, .group-home, .company-grid").count() == 0
+    assert page.locator(f'.footer-bottom a[href="{PUBLIC_URLS["group"]}"]').count() == 1
+    toggle = page.locator("#menuToggle")
+    nav = page.locator("#mainNav")
+    assert nav.locator("a").count() == 5
+    if toggle.is_visible():
+        toggle.focus()
+        page.keyboard.press("Enter")
+        assert toggle.get_attribute("aria-expanded") == "true"
+        assert all(link.is_visible() for link in nav.locator("a").all())
+        page.keyboard.press("Enter")
+        assert toggle.get_attribute("aria-expanded") == "false"
+        assert toggle.evaluate("element => element === document.activeElement")
+    # The original root owns freight anchors. The /recovery/ HTML is also checked
+    # as a static-preview fallback; HTTP 301 behavior is verified separately.
+    for path in ("/", "/recovery/"):
+        page.goto(base + path + "?utm_source=acceptance#start-audit", wait_until="networkidle")
+        location = urlsplit(page.url)
+        assert location.path == path and location.fragment == "start-audit"
+        assert parse_qs(location.query) == {"utm_source": ["acceptance"]}
+        assert page.locator("#auditForm").is_visible()
+        assert page.locator('link[rel="canonical"]').get_attribute("href") == PUBLIC_URLS["freight"]
+    return {"root_freight_home": True, "navigation_keyboard": True,
+            "root_and_legacy_fallback_anchors": True, "production_redirect_tested": False}
 
 
 def check_chat_clearance(page, base, output, width, height):
-    page.goto(base + "/recovery/#start-audit", wait_until="networkidle")
+    page.goto(base + "/#start-audit", wait_until="networkidle")
     launcher = page.locator("#retallyChatLauncher")
     assert launcher.count() == 1
     submit = page.locator('#auditForm button[type="submit"]')
@@ -168,7 +271,7 @@ def check_chat_clearance(page, base, output, width, height):
     assert submit.is_visible()
     assert submit.evaluate("element => {const r = element.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0;}")
     launcher.wait_for(state="hidden")
-    page.screenshot(path=str(output / f"recovery-intake-clear-{width}.png"), full_page=False)
+    page.screenshot(path=str(output / f"freight-intake-clear-{width}.png"), full_page=False)
     page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
     launcher.wait_for(state="visible")
     assert page.locator("#auditForm").evaluate("element => {const r = element.getBoundingClientRect(); return r.top >= innerHeight || r.bottom <= 0;}")
@@ -192,101 +295,119 @@ def check_accessibility(page, axe_source):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--site", type=Path, required=True)
+    parser.add_argument("--site", type=Path, required=True, help="Restored freight Cloudflare bundle")
+    parser.add_argument("--group-site", type=Path, required=True, help="Independent Group bundle")
+    parser.add_argument("--recoveryworks-site", type=Path, required=True, help="Independent RecoveryWorks bundle")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--axe-js", type=Path, help="Local axe-core script; never fetched by the QA browser")
     args = parser.parse_args()
+    roots = {"freight": args.site, "group": args.group_site, "recoveryworks": args.recoveryworks_site}
+    if any(not (root / "index.html").is_file() for root in roots.values()):
+        parser.error("Each --site argument must point to its own existing built site")
+    if len({root.resolve() for root in roots.values()}) != 3:
+        parser.error("Freight, Group and RecoveryWorks must be independently built directories")
     if args.axe_js and not args.axe_js.is_file():
         parser.error("--axe-js must point to an existing local axe-core script")
     axe_source = args.axe_js.read_text() if args.axe_js else None
     args.out.mkdir(parents=True, exist_ok=True)
-    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=str(args.site.resolve())))
-    Thread(target=server.serve_forever, daemon=True).start()
-    base = f"http://127.0.0.1:{server.server_port}"
+    routes = {"freight": ("",) + LEGACY_ROUTES + ("recoveryos",),
+              "group": ("", "privacy"), "recoveryworks": ("", "engagement", "privacy")}
+    assert len(routes["freight"]) == 14, "Legacy route coverage changed; review the screenshot contract"
+    servers, bases = [], {}
     report = {"pages": [], "interactions": [], "chat_clearance": [], "non_get_requests": [],
-              "green_canvas": [], "console_breakpoints": [], "card_heading_contrast": [],
-              "external_requests_blocked": 0, "passed": False,
+              "company_canvas": [], "heading_breakpoints": [], "card_heading_contrast": [],
+              "local_company_handoffs": [], "external_requests_blocked": 0, "passed": False,
               "accessibility": {"status": "pending" if axe_source else "skipped",
                                 "reason": None if axe_source else "No local axe-core script supplied with --axe-js",
                                 "checks": [], "blocking_failures": []}}
     try:
+        for company, root in roots.items():
+            server = ThreadingHTTPServer(("127.0.0.1", 0), partial(QuietHandler, directory=str(root.resolve())))
+            servers.append(server)
+            Thread(target=server.serve_forever, daemon=True).start()
+            bases[company] = f"http://127.0.0.1:{server.server_port}"
+        local_hosts = {urlsplit(base).netloc for base in bases.values()}
+        public_to_local = {urlsplit(PUBLIC_URLS[company]).netloc: base for company, base in bases.items()}
+
+        def route(request_route):
+            request = request_route.request
+            parsed = urlsplit(request.url)
+            if request.method != "GET":
+                report["non_get_requests"].append(request.method)
+                request_route.abort()
+            elif parsed.netloc in local_hosts:
+                request_route.continue_()
+            elif request.is_navigation_request() and parsed.netloc in public_to_local:
+                # Keep production hrefs intact, but exercise their destination
+                # using another independently built local server. No live traffic.
+                local = public_to_local[parsed.netloc]
+                destination = local + urlunsplit(("", "", parsed.path, parsed.query, parsed.fragment))
+                report["local_company_handoffs"].append({"public": request.url, "local": destination})
+                request_route.fulfill(status=302, headers={"Location": destination}, body="")
+            else:
+                report["external_requests_blocked"] += 1
+                request_route.abort()
+
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
-            for width, height in ((1440, 900), (768, 1024), (390, 844), (375, 812), (320, 700)):
+            for width, height in VIEWPORTS:
                 context = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="reduce",
                                               is_mobile=width <= 390, has_touch=width <= 390,
                                               bypass_csp=bool(axe_source))
-                def route(request_route):
-                    request = request_route.request
-                    if request.method != "GET":
-                        report["non_get_requests"].append(request.method)
-                        request_route.abort()
-                    elif urlsplit(request.url).netloc != urlsplit(base).netloc:
-                        report["external_requests_blocked"] += 1
-                        request_route.abort()
-                    else:
-                        request_route.continue_()
                 context.route("**/*", route)
                 page = context.new_page()
-                for slug in ("",) + ROUTES:
-                    response = page.goto(base + "/" + (slug + "/" if slug else ""), wait_until="networkidle")
-                    load_page_images(page)
-                    result = page.evaluate("""() => ({
-                      overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,
-                      h1Count: document.querySelectorAll('h1').length,
-                      brokenImages: [...document.images].filter(im => !im.complete || !im.naturalWidth).map(im => im.getAttribute('src')),
-                      title: document.title,
-                      mainPresent: !!document.querySelector('main#main')
-                    })""")
-                    result.update({"route": slug or "home", "width": width, "status": response.status})
-                    report["pages"].append(result)
-                    if not slug:
-                        report["card_heading_contrast"].append({"width": width, "headings": check_card_heading_contrast(page)})
-                    assert result["status"] == 200 and result["overflow"] <= 1 and result["h1Count"] == 1 and result["mainPresent"] and not result["brokenImages"], result
-                    if axe_source:
-                        accessibility = {"route": slug or "home", "width": width, **check_accessibility(page, axe_source)}
-                        report["accessibility"]["checks"].append(accessibility)
-                        blocking = [v for v in accessibility["violations"] if v["impact"] in ("serious", "critical")]
-                        if blocking:
-                            report["accessibility"]["blocking_failures"].append({
-                                "route": slug or "home", "width": width, "violations": blocking})
-                            report["accessibility"]["status"] = "failed"
-                    # Capture every route/viewport, including failed accessibility checks,
-                    # so one defect cannot hide the remaining release evidence.
-                    page.screenshot(path=str(args.out / f'{slug or "home"}-{width}.png'), full_page=True)
-                    if slug in ("", "capturebrief", "contact"):
-                        page.screenshot(path=str(args.out / f'{slug or "home"}-{width}-viewport.png'), full_page=False)
-                    if slug != "recovery":
-                        report["green_canvas"].append(check_group_canvas(page, slug, args.out, width))
-                page.goto(base + "/")
-                menu = page.locator(".business-menu summary")
-                menu.focus()
-                page.keyboard.press("Enter")
-                assert page.locator(".business-menu").get_attribute("open") is not None
-                assert page.locator(".business-menu-panel a").count() == 11
-                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
-                page.keyboard.press("Escape")
-                assert page.locator(".business-menu").get_attribute("open") is None
-                assert menu.evaluate("element => element === document.activeElement")
-                page.locator('.business-card[href="/capturebrief/"]').first.click()
-                page.wait_for_url("**/capturebrief/")
-                assert page.get_by_role("heading", name="Know what your bid decision rests on.").is_visible()
-                page.goto(base + "/?utm_source=acceptance#start-audit")
-                page.wait_for_url("**/recovery/?utm_source=acceptance#start-audit")
-                assert page.locator("#auditForm").is_visible()
-                contact = check_contact_composer(page, base)
-                report["interactions"].append({"width": width, "menu_keyboard": True, "business_navigation": True,
-                                               "legacy_freight_anchor": True, "contact_composer": contact})
-                report["chat_clearance"].append(check_chat_clearance(page, base, args.out, width, height))
+                for company, slugs in routes.items():
+                    for slug in slugs:
+                        response = page.goto(bases[company] + "/" + (slug + "/" if slug else ""), wait_until="networkidle")
+                        load_page_images(page)
+                        result = page.evaluate("""() => ({
+                          overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,
+                          h1Count: document.querySelectorAll('h1').length,
+                          brokenImages: [...document.images].filter(im => !im.complete || !im.naturalWidth).map(im => im.getAttribute('src')),
+                          title: document.title,
+                          mainPresent: !!document.querySelector('main#main')
+                        })""")
+                        result.update({"site": company, "route": slug or "home", "width": width, "status": response.status})
+                        report["pages"].append(result)
+                        assert result["status"] == 200 and result["overflow"] <= 1 and result["h1Count"] == 1 and result["mainPresent"] and not result["brokenImages"], result
+                        if axe_source:
+                            accessibility = {"site": company, "route": slug or "home", "width": width,
+                                             **check_accessibility(page, axe_source)}
+                            report["accessibility"]["checks"].append(accessibility)
+                            blocking = [v for v in accessibility["violations"] if v["impact"] in ("serious", "critical")]
+                            if blocking:
+                                report["accessibility"]["blocking_failures"].append({
+                                    "site": company, "route": slug or "home", "width": width, "violations": blocking})
+                                report["accessibility"]["status"] = "failed"
+                        # Keep evidence from every route, including accessibility
+                        # failures, so one defect cannot hide the remaining pages.
+                        name = f'{company}-{slug or "home"}-{width}'
+                        page.screenshot(path=str(args.out / f"{name}.png"), full_page=True)
+                        if not slug:
+                            page.screenshot(path=str(args.out / f"{name}-viewport.png"), full_page=False)
+                        if company != "freight":
+                            report["company_canvas"].append(check_company_canvas(page, company, slug, args.out, width))
+                            if not slug:
+                                report["card_heading_contrast"].append({
+                                    "site": company, "width": width, "headings": check_card_heading_contrast(page, company)})
+                interaction = {"width": width, "company_cards": check_company_cards(page, bases),
+                               "freight": check_freight_navigation(page, bases["freight"])}
+                for company in HEADINGS:
+                    interaction[company] = {
+                        "navigation": check_company_navigation(page, bases[company], company),
+                        "contact": check_company_contact(page, bases[company], company)}
+                report["interactions"].append(interaction)
+                report["chat_clearance"].append(check_chat_clearance(page, bases["freight"], args.out, width, height))
                 context.close()
-            # Reproduce the desktop geometry where the original launcher obscured submit.
+            # Preserve the extra geometry where the original launcher obscured submit.
             context = browser.new_context(viewport={"width": 1363, "height": 936}, reduced_motion="reduce")
             context.route("**/*", route)
             page = context.new_page()
-            report["chat_clearance"].append(check_chat_clearance(page, base, args.out, 1363, 936))
-            report["console_breakpoints"] = check_console_breakpoints(page, base, args.out)
+            report["chat_clearance"].append(check_chat_clearance(page, bases["freight"], args.out, 1363, 936))
+            report["heading_breakpoints"] = check_heading_breakpoints(page, bases, args.out)
             context.close()
             browser.close()
+        assert len(report["pages"]) == sum(map(len, routes.values())) * len(VIEWPORTS) == 95
         assert not report["non_get_requests"]
         if axe_source:
             failures = report["accessibility"]["blocking_failures"]
@@ -294,14 +415,17 @@ def main():
             report["accessibility"]["status"] = "passed"
         report["passed"] = True
     finally:
-        server.shutdown()
+        for server in servers:
+            server.shutdown()
+            server.server_close()
         (args.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(f"RETALLY Group: {len(report['pages'])} responsive page checks, keyboard menus, business navigation, "
-          f"email-draft controls, legacy freight anchors and {len(report['chat_clearance'])} chat-clearance checks passed; "
-          f"{len(report['green_canvas'])} green-canvas/header checks and "
-          f"{len(report['console_breakpoints'])} heading-breakpoint checks passed; "
+    print(f"RETALLY separate sites: {len(report['pages'])} responsive page checks, four direct company destinations, "
+          f"keyboard navigation, disclosed email handoffs, freight anchors and {len(report['chat_clearance'])} chat-clearance checks passed; "
+          f"{len(report['company_canvas'])} company canvas/header checks and "
+          f"{len(report['heading_breakpoints'])} heading-breakpoint checks passed; "
           f"no POSTs sent. Accessibility: {report['accessibility']['status']}.")
 
 
 if __name__ == "__main__":
     main()
+
