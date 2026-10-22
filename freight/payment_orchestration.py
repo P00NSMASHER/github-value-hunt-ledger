@@ -145,6 +145,7 @@ def authorize_payment(
     reason: str,
     authorized_at: str,
 ) -> PaymentAuthorization:
+    _verify_instruction(instruction)
     authorized_by = _text("authorized_by", authorized_by)
     reason = _text("reason", reason)
     authorized_at = _timestamp("authorized_at", authorized_at)
@@ -166,8 +167,46 @@ def authorize_payment(
     )
 
 
+def _verify_instruction(instruction: PaymentInstruction) -> None:
+    """Reconstruct and compare every immutable field, not only its old hash."""
+    if type(instruction) is not PaymentInstruction:
+        raise ValueError("payment instruction must be a canonical PaymentInstruction")
+    expected = prepare_payment_instruction(
+        instruction_id=instruction.instruction_id,
+        buyer_id=instruction.buyer_id,
+        business_unit=instruction.business_unit,
+        payer_id=instruction.payer_id,
+        payee_id=instruction.payee_id,
+        currency=instruction.currency,
+        amount_cents=instruction.amount_cents,
+        purpose=instruction.purpose,
+        finding_proof_hashes=instruction.finding_proof_hashes,
+        idempotency_key=instruction.idempotency_key,
+    )
+    if instruction != expected:
+        raise ValueError("payment instruction hash or bound fields mismatch")
+
+
+def _verify_authorization(
+    instruction: PaymentInstruction, authorization: PaymentAuthorization
+) -> None:
+    """Reject altered approval fields even when an old seal was retained."""
+    _verify_instruction(instruction)
+    if type(authorization) is not PaymentAuthorization:
+        raise ValueError("invalid payment authorization type")
+    expected = authorize_payment(
+        instruction,
+        authorized_by=authorization.authorized_by,
+        reason=authorization.reason,
+        authorized_at=authorization.authorized_at,
+    )
+    if authorization != expected:
+        raise ValueError("payment authorization hash or bound fields mismatch")
+
+
 class PaymentOrchestrator:
     def __init__(self, instruction: PaymentInstruction):
+        _verify_instruction(instruction)
         self.instruction = instruction
         self.authorization: PaymentAuthorization | None = None
         self.events: list[ProviderPaymentEvent] = []
@@ -179,6 +218,7 @@ class PaymentOrchestrator:
         return "AUTHORIZED" if self.authorization is not None else "PREPARED"
 
     def authorize(self, authorization: PaymentAuthorization) -> None:
+        _verify_authorization(self.instruction, authorization)
         if self.authorization is not None:
             if self.authorization.authorization_hash == authorization.authorization_hash:
                 return
@@ -199,8 +239,10 @@ class PaymentOrchestrator:
         source_hash: str,
         occurred_at: str,
     ) -> ProviderPaymentEvent:
+        _verify_instruction(self.instruction)
         if self.authorization is None:
             raise ValueError("provider payment event requires prior human authorization")
+        _verify_authorization(self.instruction, self.authorization)
         if state not in PROVIDER_STATES:
             raise ValueError("unsupported provider payment state")
         prior = self.current_state
@@ -210,6 +252,8 @@ class PaymentOrchestrator:
         provider_reference = _text("provider_reference", provider_reference)
         source_hash = _text("source_hash", source_hash)
         occurred_at = _timestamp("occurred_at", occurred_at)
+        if occurred_at < self.authorization.authorized_at:
+            raise ValueError("provider event predates payment authorization")
         amount_cents = _cents("amount_cents", amount_cents, positive=True)
         if amount_cents != self.instruction.amount_cents:
             raise ValueError("provider event amount must match payment instruction")
@@ -242,6 +286,9 @@ class PaymentOrchestrator:
         return event
 
     def snapshot(self) -> PaymentSnapshot:
+        _verify_instruction(self.instruction)
+        if self.authorization is not None:
+            _verify_authorization(self.instruction, self.authorization)
         state = self.current_state
         settled = self.instruction.amount_cents if state == "SETTLED" else 0
         body = {
