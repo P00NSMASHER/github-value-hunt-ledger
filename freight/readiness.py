@@ -5,6 +5,7 @@ The numeric score is for planning. Hard blockers always dominate the score.
 from __future__ import annotations
 import argparse
 import json
+import math
 from dataclasses import asdict, dataclass
 from enum import Enum
 from pathlib import Path
@@ -57,11 +58,22 @@ COVERAGE_THRESHOLDS = (
     ("shipment_evidence_coverage", 0.80, "shipment_evidence_coverage_below_80pct"),
 )
 
-def _validate_ratio(name: str, value: float) -> None:
-    if not isinstance(value, (int, float)) or value < 0 or value > 1:
+def _validate_ratio(name: str, value: int | float) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{name} must be a finite number between 0 and 1")
+    if isinstance(value, float) and not math.isfinite(value):
+        raise ValueError(f"{name} must be a finite number between 0 and 1")
+    if value < 0 or value > 1:
         raise ValueError(f"{name} must be between 0 and 1")
 
+
+def _validate_boolean(name: str, value: bool) -> None:
+    if type(value) is not bool:
+        raise ValueError(f"{name} must be a boolean")
+
 def assess_readiness(inp: PilotReadinessInput) -> ReadinessAssessment:
+    for name, _ in HARD_BLOCKERS:
+        _validate_boolean(name, getattr(inp, name))
     for name, _, _ in COVERAGE_THRESHOLDS:
         _validate_ratio(name, getattr(inp, name))
 
