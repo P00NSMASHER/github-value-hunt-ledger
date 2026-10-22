@@ -19,7 +19,7 @@ class MainBranchRulesetTests(unittest.TestCase):
 
     def test_scope_and_zero_bypass_exact_default_branch(self):
         self.assertEqual(self.ruleset["target"], "branch")
-        self.assertEqual(self.ruleset["enforcement"], "disabled")
+        self.assertEqual(self.ruleset["enforcement"], "active")
         self.assertEqual(self.ruleset["bypass_actors"], [])
         self.assertEqual(self.ruleset["conditions"]["ref_name"], {
             "include": ["~DEFAULT_BRANCH"], "exclude": [],
@@ -32,13 +32,15 @@ class MainBranchRulesetTests(unittest.TestCase):
         params = self.rules["pull_request"]["parameters"]
         self.assertEqual(params["required_approving_review_count"], 0)
         for field in ("dismiss_stale_reviews_on_push", "require_code_owner_review",
-                      "require_last_push_approval", "required_review_thread_resolution"):
+                      "require_last_push_approval", "required_review_thread_resolution",
+                      "require_extra_approval_for_unattributed_changes"):
             self.assertIs(params[field], False)
         self.assertEqual(set(params["allowed_merge_methods"]), {"merge", "squash", "rebase"})
 
     def test_required_status_is_unique_aggregate_from_github_actions(self):
         params = self.rules["required_status_checks"]["parameters"]
         self.assertIs(params["strict_required_status_checks_policy"], True)
+        self.assertIs(params["do_not_enforce_on_create"], False)
         self.assertEqual(params["required_status_checks"], [
             {"context": "release-gate", "integration_id": 15368},
         ])

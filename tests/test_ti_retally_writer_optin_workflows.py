@@ -62,9 +62,9 @@ class WriterModeTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("GitHub Actions refuses direct-main persistence", result.stderr)
 
-    def test_ruleset_activation_remains_separate_from_code_update(self):
+    def test_active_ruleset_preserves_customer_evidence_boundary(self):
         manifest = json.loads((ROOT / ".github/retally-main-ruleset.json").read_text())
-        self.assertEqual(manifest["enforcement"], "disabled")
+        self.assertEqual(manifest["enforcement"], "active")
         checks = manifest["rules"][-1]["parameters"]["required_status_checks"]
         self.assertEqual(checks, [{"context": "release-gate", "integration_id": 15368}])
         policy = (ROOT / "recoveryworks/CODE_RELEASE_POLICY.md").read_text()
