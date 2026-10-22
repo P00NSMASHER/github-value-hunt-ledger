@@ -58,12 +58,10 @@ COVERAGE_THRESHOLDS = (
     ("shipment_evidence_coverage", 0.80, "shipment_evidence_coverage_below_80pct"),
 )
 
-def _validate_ratio(name: str, value: float) -> None:
-    if (
-        isinstance(value, bool)
-        or not isinstance(value, (int, float))
-        or not math.isfinite(value)
-    ):
+def _validate_ratio(name: str, value: int | float) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{name} must be a finite number between 0 and 1")
+    if isinstance(value, float) and not math.isfinite(value):
         raise ValueError(f"{name} must be a finite number between 0 and 1")
     if value < 0 or value > 1:
         raise ValueError(f"{name} must be between 0 and 1")
