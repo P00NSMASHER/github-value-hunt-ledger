@@ -161,6 +161,32 @@ class ProviderTests(unittest.TestCase):
         with self.assertRaises(m.auth.Refused):
             m.check_vm(altered, fixture())
 
+    def test_default_plugin_configuration_accepts_confirmed_running_plugin(self):
+        for config in (None, [], [SimpleNamespace(name="Compute Instance Monitoring", desired_state="ENABLED")]):
+            with self.subTest(config=config):
+                vm = self.vm()
+                vm.agent_config.plugins_config = config
+                try:
+                    m.check_vm(vm, fixture())
+                except m.auth.Refused as exc:
+                    self.fail("Valid OCI default plugin configuration rejected: " + str(exc))
+                m.check_plugin([SimpleNamespace(name="Compute Instance Run Command", status="RUNNING")])
+                with self.assertRaises(m.auth.Refused):
+                    m.check_plugin([SimpleNamespace(name="Compute Instance Run Command", status="STOPPED")])
+
+    def test_defaults_do_not_override_disabled_or_malformed_configuration(self):
+        for disabled, config in (
+            (True, None), (None, None), (False, {}), (False, "ENABLED"),
+            (False, [SimpleNamespace(name="Compute Instance Run Command", desired_state="ENABLED")] * 2),
+            (False, [SimpleNamespace(name="Compute Instance Run Command", desired_state="DISABLED")]),
+        ):
+            with self.subTest(disabled=disabled, config=config):
+                vm = self.vm()
+                vm.agent_config.are_all_plugins_disabled = disabled
+                vm.agent_config.plugins_config = config
+                with self.assertRaises(m.auth.Refused):
+                    m.check_vm(vm, fixture())
+
     def test_plugin_must_be_running(self):
         m.check_plugin([SimpleNamespace(name="Compute Instance Run Command", status="RUNNING")])
         for state in ("STOPPED", "NOT_SUPPORTED", "INVALID", "UNKNOWN_ENUM_VALUE"):
