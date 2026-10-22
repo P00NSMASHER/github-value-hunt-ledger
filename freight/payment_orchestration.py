@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
+from functools import wraps
+from threading import RLock
 from typing import Iterable, Mapping
 
 from freight.contracts import canonical_hash
@@ -205,6 +207,20 @@ def _verify_authorization(
         raise ValueError("payment authorization hash or bound fields mismatch")
 
 
+def _atomic_payment_transition(method):
+    """One in-memory instruction's authorization and ledger append are atomic.
+
+    Locking is per orchestrator instance and does not confer provider
+    authentication or cross-process persistence. Production callers must
+    still use the existing external financial authorization gates.
+    """
+    @wraps(method)
+    def synchronized(self, *args, **kwargs):
+        with self._lock:
+            return method(self, *args, **kwargs)
+    return synchronized
+
+
 class PaymentOrchestrator:
     def __init__(
         self,
@@ -216,6 +232,7 @@ class PaymentOrchestrator:
         _verify_instruction(instruction)
         if type(require_trusted_approval) is not bool:
             raise ValueError("require_trusted_approval must be boolean")
+        self._lock = RLock()
         self.instruction = instruction
         self.authorization: PaymentAuthorization | None = None
         self.events: list[ProviderPaymentEvent] = []
@@ -244,11 +261,13 @@ class PaymentOrchestrator:
             raise ValueError("trusted approval attestation predates its authorization")
 
     @property
+    @_atomic_payment_transition
     def current_state(self) -> str:
         if self.events:
             return self.events[-1].state
         return "AUTHORIZED" if self.authorization is not None else "PREPARED"
 
+    @_atomic_payment_transition
     def authorize(
         self, authorization: PaymentAuthorization,
         *, attestation: SourceAttestation | None = None,
@@ -276,6 +295,7 @@ class PaymentOrchestrator:
         if attestation is not None:
             self._approval_attestation = attestation
 
+    @_atomic_payment_transition
     def record_provider_event(
         self,
         *,
@@ -349,6 +369,7 @@ class PaymentOrchestrator:
         self.events.append(event)
         return event
 
+    @_atomic_payment_transition
     def snapshot(self) -> PaymentSnapshot:
         _verify_instruction(self.instruction)
         if self.authorization is not None:
