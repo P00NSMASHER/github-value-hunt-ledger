@@ -1,0 +1,37 @@
+{
+  "actual_customer_financial_actions": 0,
+  "classification": "SYNTHETIC_NO_REAL_FREIGHT_ACCURACY",
+  "credit_patterns": {
+    "FULL_CREDIT": 384,
+    "FULL_REVERSAL": 384,
+    "NO_SETTLEMENT": 384,
+    "PARTIAL_CREDIT": 384,
+    "PARTIAL_REVERSAL": 384,
+    "PENDING_RETURN": 384,
+    "REPLAY_STORM": 384,
+    "SPLIT_CREDITS": 384
+  },
+  "currencies": 3,
+  "freight_modes": 6,
+  "independently_adjudicated_freight_labels": 0,
+  "input_receipt_count": 3072,
+  "persona_currency_mode_min": 18,
+  "persona_event_pattern_min": 12,
+  "persona_request_pattern_min": 12,
+  "personas": 12,
+  "population": 3072,
+  "receipt_list_sha256": "ec80c4f1693b377786b7b49ba77dbfba7729c9059a0b486bfaddc121d6145647",
+  "scenario_event_combinations": 12,
+  "scenario_request_combinations": 12,
+  "schema": "retally-priority4-manifest-v1",
+  "seed": 20261022,
+  "states": {
+    "CONTRACTUAL_TIME_BAR_REVIEW_HOLD": 256,
+    "CUSTOMER_WITHDRAWAL_REVIEW_HOLD": 428,
+    "DISPUTED_EVIDENCE_HOLD": 938,
+    "INSOLVENCY_LEGAL_HOLD": 768,
+    "RETENTION_PRIVACY_REVIEW_HOLD": 170,
+    "RETURN_REVERSAL_REVIEW_HOLD": 170,
+    "UNVERIFIED_CARRIER_OFFER_REVIEW": 342
+  }
+}
