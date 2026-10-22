@@ -107,6 +107,11 @@ TEXT_SOURCE_FILES = (
     "assets/fonts/LICENSE-INSTRUMENT-SERIF.txt",
 )
 BINARY_SOURCE_FILES = (
+    "assets/brand/freightrecovery-600-20261022.webp",
+    "assets/brand/freightrecovery-1200-20261022.webp",
+    "assets/brand/freightrecovery-wordmark-20261022.webp",
+    "assets/brand/freightrecovery-social-20261022.png",
+    "assets/brand/freightrecovery-icon-20261022.png",
     "assets/fonts/hanken-grotesk-latin.woff2",
     "assets/fonts/instrument-serif-italic-latin.woff2",
     "assets/fonts/instrument-serif-latin.woff2",

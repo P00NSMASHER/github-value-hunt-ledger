@@ -1,0 +1,166 @@
+{
+  "release": "approved-retally-logos-20261022",
+  "derivation": "Owner-approved white-background artwork, proportionally downsampled. Header is the unchanged wordmark and endorsement region. No AI regeneration.",
+  "brands": {
+    "freightrecovery": {
+      "name": "FreightRecovery by RETALLY",
+      "source_sha256": "f69f384eac341d3457decf14ebea2a21feebfe22376640672151ef0c37ba7bd2",
+      "source_dimensions": [
+        6144,
+        4096
+      ],
+      "files": {
+        "freightrecovery-600-20261022.webp": {
+          "sha256": "58dbd15973065e09f1d4ebc8d9418525b3938471ced04051dce750405cb3d857",
+          "width": 600,
+          "height": 400,
+          "bytes": 49464
+        },
+        "freightrecovery-1200-20261022.webp": {
+          "sha256": "3cba04dacb9aa5b237af0ff1298aa0bf38811b2773508df64b8cd652c04dd2f8",
+          "width": 1200,
+          "height": 800,
+          "bytes": 119710
+        },
+        "freightrecovery-wordmark-20261022.webp": {
+          "sha256": "8f6679a16f4a10b6e1c541dec4e3318ad7d245abc0018eb2816c70e3e0644660",
+          "width": 640,
+          "height": 121,
+          "bytes": 15118
+        },
+        "freightrecovery-social-20261022.png": {
+          "sha256": "d7c389b2f5c628dad555b48c4501e5d5c1fa8f0e2cf12819fd94208cc5c31c03",
+          "width": 1200,
+          "height": 630,
+          "bytes": 530019
+        },
+        "freightrecovery-icon-20261022.png": {
+          "sha256": "9cc59c69322dce15d12a98df4ba38175b5fe27f457baeb8e4acdf3576f50d669",
+          "width": 256,
+          "height": 256,
+          "bytes": 65535
+        }
+      }
+    },
+    "recoveryos": {
+      "name": "RecoveryOS by RETALLY",
+      "source_sha256": "3bd1d9f547465764eaec49f4e1b5439fd6b4071ff1250d376a711a7263317112",
+      "source_dimensions": [
+        6144,
+        4096
+      ],
+      "files": {
+        "recoveryos-600-20261022.webp": {
+          "sha256": "0947d2e8c995905f09a1948339fe07759d4b9d3b607c4e2534ec42040e3a13ee",
+          "width": 600,
+          "height": 400,
+          "bytes": 45450
+        },
+        "recoveryos-1200-20261022.webp": {
+          "sha256": "58d67d57c238c0ab49202b7f6c83aebc424018aeec3334f5e323adac43f1d092",
+          "width": 1200,
+          "height": 800,
+          "bytes": 112784
+        },
+        "recoveryos-wordmark-20261022.webp": {
+          "sha256": "2c564def884a29df57ae3ece766cee085327750a94c1d10fab9c41b41b6b47eb",
+          "width": 640,
+          "height": 119,
+          "bytes": 13570
+        },
+        "recoveryos-social-20261022.png": {
+          "sha256": "f14f7d8286aa1731e5313cfe0a5f37094dd18bbdb09f5bfde1295dbbe211c807",
+          "width": 1200,
+          "height": 630,
+          "bytes": 480256
+        },
+        "recoveryos-icon-20261022.png": {
+          "sha256": "932b9b26773eb2d3492ef6eb37910fa48e6c61368df17294b1a1867acba5054b",
+          "width": 256,
+          "height": 256,
+          "bytes": 59581
+        }
+      }
+    },
+    "permitplate": {
+      "name": "PermitPlate by RETALLY",
+      "source_sha256": "4c34118fca23f1743f6e34e71dc5e65366c61f612619fa5264a14cfc6861874f",
+      "source_dimensions": [
+        6144,
+        4096
+      ],
+      "files": {
+        "permitplate-600-20261022.webp": {
+          "sha256": "090947b925274a59cc8ba9eba2c9243df2297bd44556e5f1ce0d704fcc0498c0",
+          "width": 600,
+          "height": 400,
+          "bytes": 47400
+        },
+        "permitplate-1200-20261022.webp": {
+          "sha256": "a8c8da27bd251494792d90a7e595a5efb8afff5ef08f88f2a87aba35dbba2afa",
+          "width": 1200,
+          "height": 800,
+          "bytes": 118482
+        },
+        "permitplate-wordmark-20261022.webp": {
+          "sha256": "86dbd105af12dc3fb39d950ff143b672acf4ab70d42cdb668934fb0f5424be3f",
+          "width": 640,
+          "height": 127,
+          "bytes": 13220
+        },
+        "permitplate-social-20261022.png": {
+          "sha256": "98c8d9b3c36f891c91908fbec2d8c6d2fd1067f0dc6c30ae296bacd8a208a637",
+          "width": 1200,
+          "height": 630,
+          "bytes": 500709
+        },
+        "permitplate-icon-20261022.png": {
+          "sha256": "aafe3a759c066bc2ce90547fa6ac4dbd4d619926e6a164bd5b5cebc2f90b4b0d",
+          "width": 256,
+          "height": 256,
+          "bytes": 64454
+        }
+      }
+    },
+    "capturebrief": {
+      "name": "CaptureBrief by RETALLY",
+      "source_sha256": "b48b332918001972060bbabb0190ed577ca9ab6f1c2d49589fc273abc8b36b8c",
+      "source_dimensions": [
+        6144,
+        4096
+      ],
+      "files": {
+        "capturebrief-600-20261022.webp": {
+          "sha256": "ff63865e61f5646dc4fd504df9b2fe6bb4609780f4dd43c7215abbb2e0132620",
+          "width": 600,
+          "height": 400,
+          "bytes": 38380
+        },
+        "capturebrief-1200-20261022.webp": {
+          "sha256": "74673a39d3b0cdb7922571ea5d55f130a59a402f89e6eea761e55ff7f0e01bf4",
+          "width": 1200,
+          "height": 800,
+          "bytes": 91354
+        },
+        "capturebrief-wordmark-20261022.webp": {
+          "sha256": "cd015d2a652b4972e327db68ad9a597da6b3921b715dbcc5b146179a50058464",
+          "width": 640,
+          "height": 127,
+          "bytes": 13926
+        },
+        "capturebrief-social-20261022.png": {
+          "sha256": "16cc4afc2e13b78f2f6a64c56d25e021bdff1a86b475a0f90948523aa2ad40db",
+          "width": 1200,
+          "height": 630,
+          "bytes": 435673
+        },
+        "capturebrief-icon-20261022.png": {
+          "sha256": "68fc384f5697a321f3c23c4b8e08c6d55889525b32cf0ad84a4378247f0bc4ac",
+          "width": 256,
+          "height": 256,
+          "bytes": 55490
+        }
+      }
+    }
+  }
+}
