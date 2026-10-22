@@ -209,6 +209,10 @@ class SettlementObservation:
     source_authenticated_payment_cents: int = 0
     real_recovered_cash_cents: int = 0
     fee_disqualified: bool = False
+    # Shared-event returns have no defensible per-claim amount allocation.
+    # Expose hash references only; the globally counted amount is available
+    # exactly once from the currency-partitioned settlement report.
+    unattributed_shared_return_event_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -321,19 +325,38 @@ def _settlement_read_only(
     # Unapplied counter-events may still reverse an allocation. HOLD the
     # candidate amount; they must never quietly count as settled cash.
     pending = 0
+    shared_event_return_ids = set()
     for counter in tables["counter_events"]:
-        if counter["original_event_id"] not in linked_event_ids:
+        event_id = counter["original_event_id"]
+        if event_id not in linked_event_ids:
             continue
         used = sum(x["amount_cents"] for x in tables["reversal_edges"]
                    if x["counter_id"] == counter["counter_id"])
         if used > counter["amount_cents"]:
             raise ValueError("counter evidence was over-consumed")
-        pending += counter["amount_cents"] - used
+        residual = counter["amount_cents"] - used
+        if not residual:
+            continue
+        # A counter funds the settlement event, NOT one particular claim. If
+        # that event was allocated to multiple claims, showing its full
+        # residual within each claim would make aggregate reports overstate
+        # a single return. Keep the amount only in event-wide reporting.
+        claim_ids = {a["claim_id"] for a in tables["allocations"]
+                     if a["event_id"] == event_id}
+        if len(claim_ids) > 1:
+            shared_event_return_ids.add(canonical_hash({
+                "schema": 1, "counter_id": counter["counter_id"],
+                "event_id": event_id, "buyer": scenario.buyer_id,
+                "business_unit": scenario.business_unit,
+            }))
+        else:
+            pending += residual
     net = total - reverted
     return SettlementObservation(
         snapshot_sha, total, reverted, net,
         fee, pending, scenario.disputed_cents - net,
         0, 0, bool(claim["fee_disqualified"]),
+        tuple(sorted(shared_event_return_ids)),
     )
 
 
@@ -480,6 +503,8 @@ def evaluate_recovery_scenario(
             blockers.add(t.blocker)
     if settlement.outstanding_return_cents:
         blockers.add("UNAPPLIED_RETURN_COULD_CHANGE_DECLARED_RECOVERY")
+    if settlement.unattributed_shared_return_event_ids:
+        blockers.add("SHARED_EVENT_RETURN_REQUIRES_NONADDITIVE_ALLOCATION_REVIEW")
     if any(e.kind in {"INSOLVENCY_NOTICE", "CARRIER_OUT_OF_BUSINESS"} for e in event_list):
         blockers.add("INSOLVENCY_OR_NONPAYMENT_LEGAL_REVIEW")
     if "CLAIM_TIME_BAR_CONCERN" in kinds:
@@ -518,7 +543,9 @@ def evaluate_recovery_scenario(
         state = "CUSTOMER_WITHDRAWAL_REVIEW_HOLD"
     elif "CARRIER_DISPUTE" in kinds or "CARRIER_DENIAL" in kinds or "CUSTOMER_DISPUTE" in kinds:
         state = "DISPUTED_EVIDENCE_HOLD"
-    elif settlement.outstanding_return_cents or "PAYMENT_REVERSAL_NOTICE" in kinds:
+    elif (settlement.outstanding_return_cents
+          or settlement.unattributed_shared_return_event_ids
+          or "PAYMENT_REVERSAL_NOTICE" in kinds):
         state = "RETURN_REVERSAL_REVIEW_HOLD"
     elif "DELETE_ALL_EVIDENCE" in request_kinds or "RETENTION_EXCEPTION" in request_kinds:
         state = "RETENTION_PRIVACY_REVIEW_HOLD"
@@ -550,7 +577,13 @@ def evaluate_recovery_scenario(
     body = {
         "schema": 1, "scenario": asdict(scenario), "evidence": evidence,
         "status": state, "blockers": sorted(blockers),
-        "settlement": asdict(settlement),
+        # Preserve the exact legacy report digest for cases without any
+        # shared event-level return, including the pinned Priority-4 baseline.
+        "settlement": (
+            asdict(settlement) if settlement.unattributed_shared_return_event_ids
+            else {k: v for k, v in asdict(settlement).items()
+                  if k != "unattributed_shared_return_event_ids"}
+        ),
         "feasibility": asdict(result),
         "requests": [asdict(r) for r in triage],
         "actions": sorted(actions),
