@@ -8,7 +8,32 @@
 <meta property="og:type" content="website"><meta property="og:site_name" content="RETALLY Group">
 <meta property="og:title" content="RETALLY Group | Four focused businesses"><meta property="og:description" content="Freight recovery, business expense review, permit research and federal opportunity evidence. Find the right RETALLY business.">
 <meta property="og:url" content="{{SITE_URL}}"><meta property="og:image" content="{{SITE_URL}}assets/hero.webp">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}#organization",
+      "name": "RETALLY Group",
+      "url": "{{SITE_URL}}",
+      "description": "Four focused business services spanning freight recovery, business expense review, permit research and public federal opportunity evidence.",
+      "logo": "{{SITE_URL}}assets/brand/retally-emblem-approved.png"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{SITE_URL}}#website",
+      "name": "RETALLY Group",
+      "url": "{{SITE_URL}}",
+      "publisher": {
+        "@id": "{{SITE_URL}}#organization"
+      }
+    }
+  ]
+}
+</script>
+<link rel="icon" href="/assets/brand/retally-emblem-approved.png" type="image/png">
 <link rel="preload" href="/assets/hanken.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/site.css">
 <script src="/enquiry.js" defer></script>
