@@ -209,6 +209,7 @@ class SettlementObservation:
     source_authenticated_payment_cents: int = 0
     real_recovered_cash_cents: int = 0
     fee_disqualified: bool = False
+    dispute_hold_active: bool = False
     # Shared-event returns have no defensible per-claim amount allocation.
     # Expose hash references only; the globally counted amount is available
     # exactly once from the currency-partitioned settlement report.
@@ -286,6 +287,10 @@ def _settlement_read_only(
         scenario.issued_at, scenario.source_finding_sha256,
     ):
         raise ValueError("settlement claim does not match frozen recovery scenario")
+    active_dispute_hold = any(
+        x["claim_id"] == scenario.claim_id
+        for x in tables.get("claim_dispute_holds", ())
+    )
     allocations = [a for a in tables["allocations"] if a["claim_id"] == scenario.claim_id]
     by_event = {e["event_id"]: e for e in tables["settlement_events"]}
     by_alloc = {a["allocation_id"]: a for a in allocations}
@@ -317,7 +322,7 @@ def _settlement_read_only(
             raise ValueError("source-declared fee eligibility is inconsistent")
         total += amount
         reverted += reverse
-        if eligible:
+        if eligible and not active_dispute_hold:
             fee += amount - reverse
         linked_event_ids.add(a["event_id"])
     if total > scenario.disputed_cents or reverted > total:
@@ -356,7 +361,7 @@ def _settlement_read_only(
         snapshot_sha, total, reverted, net,
         fee, pending, scenario.disputed_cents - net,
         0, 0, bool(claim["fee_disqualified"]),
-        tuple(sorted(shared_event_return_ids)),
+        active_dispute_hold, tuple(sorted(shared_event_return_ids)),
     )
 
 
@@ -501,6 +506,8 @@ def evaluate_recovery_scenario(
     for t in triage:
         if t.blocker:
             blockers.add(t.blocker)
+    if settlement.dispute_hold_active:
+        blockers.add("DURABLE_DISPUTE_HOLD_FORBIDS_VALIDATED_RECOVERY_AND_FEE")
     if settlement.outstanding_return_cents:
         blockers.add("UNAPPLIED_RETURN_COULD_CHANGE_DECLARED_RECOVERY")
     if settlement.unattributed_shared_return_event_ids:
@@ -533,7 +540,7 @@ def evaluate_recovery_scenario(
     feasible_remaining = max(scenario.disputed_cents - settlement.source_declared_net_cents, 0)
     result = _feasibility(
         feasible_remaining, assumptions, financial_blockers=blockers,
-        fee_disqualified=settlement.fee_disqualified,
+        fee_disqualified=settlement.fee_disqualified or settlement.dispute_hold_active,
     )
     if "INSOLVENCY_NOTICE" in kinds or "CARRIER_OUT_OF_BUSINESS" in kinds:
         state = "INSOLVENCY_LEGAL_HOLD"
@@ -541,7 +548,9 @@ def evaluate_recovery_scenario(
         state = "CONTRACTUAL_TIME_BAR_REVIEW_HOLD"
     elif "CUSTOMER_WITHDRAWAL" in kinds or "WITHDRAW_CASE" in request_kinds:
         state = "CUSTOMER_WITHDRAWAL_REVIEW_HOLD"
-    elif "CARRIER_DISPUTE" in kinds or "CARRIER_DENIAL" in kinds or "CUSTOMER_DISPUTE" in kinds:
+    elif (settlement.dispute_hold_active
+          or "CARRIER_DISPUTE" in kinds or "CARRIER_DENIAL" in kinds
+          or "CUSTOMER_DISPUTE" in kinds):
         state = "DISPUTED_EVIDENCE_HOLD"
     elif (settlement.outstanding_return_cents
           or settlement.unattributed_shared_return_event_ids
@@ -579,11 +588,12 @@ def evaluate_recovery_scenario(
         "status": state, "blockers": sorted(blockers),
         # Preserve the exact legacy report digest for cases without any
         # shared event-level return, including the pinned Priority-4 baseline.
-        "settlement": (
-            asdict(settlement) if settlement.unattributed_shared_return_event_ids
-            else {k: v for k, v in asdict(settlement).items()
-                  if k != "unattributed_shared_return_event_ids"}
-        ),
+        "settlement": {
+            k: v for k, v in asdict(settlement).items()
+            if (k != "unattributed_shared_return_event_ids"
+                or settlement.unattributed_shared_return_event_ids)
+            and (k != "dispute_hold_active" or settlement.dispute_hold_active)
+        },
         "feasibility": asdict(result),
         "requests": [asdict(r) for r in triage],
         "actions": sorted(actions),
@@ -596,4 +606,61 @@ def evaluate_recovery_scenario(
         (today - issued).days, overdue, evidence,
         settlement, result, triage, tuple(sorted(actions)),
         False, 0, 0, 0, 0, canonical_hash(body),
+    )
+
+
+def record_recovery_dispute_notice(
+    store: SettlementStore,
+    *,
+    scenario: RecoveryScenario,
+    notice: RecoveryEvent,
+) -> bool:
+    """Durably register *source-declared* contested recovery before allocation.
+
+    This is the enforced intake entry point; evaluate_recovery_scenario is
+    intentionally read-only. A document SHA or textual carrier denial never
+    proves customer consent, executed rights or bank-settled funds.
+    """
+    if not isinstance(store, SettlementStore):
+        raise ValueError("dispute source admission requires an isolated settlement store")
+    if not isinstance(scenario, RecoveryScenario) or not isinstance(notice, RecoveryEvent):
+        raise ValueError("typed bound scenario and dispute notice required")
+    if (store.buyer_id, store.business_unit) != (
+        scenario.buyer_id, scenario.business_unit
+    ):
+        raise ValueError("dispute store tenant scope mismatch")
+    kinds = {
+        "CARRIER_DISPUTE", "CARRIER_DENIAL", "CUSTOMER_DISPUTE",
+        "CUSTOMER_WITHDRAWAL", "INSOLVENCY_NOTICE",
+        "CARRIER_OUT_OF_BUSINESS", "CLAIM_TIME_BAR_CONCERN",
+    }
+    if notice.kind not in kinds:
+        raise ValueError("not a permitted durable dispute/hold notice")
+    if notice.amount_cents is not None:
+        raise ValueError("dispute notice cannot invent monetary evidence")
+    if notice.source_sha256 in {
+        scenario.source_finding_sha256, scenario.source_invoice_sha256
+    }:
+        raise ValueError("dispute notice must have an independent source")
+    claim = next(
+        (x for x in json.loads(store.report_snapshot_json())["tables"]["recovery_claims"]
+         if x["claim_id"] == scenario.claim_id),
+        None,
+    )
+    if claim is None:
+        raise ValueError("unknown recovery claim")
+    if (
+        claim["reference"],claim["payer_id"],claim["payee_id"],claim["currency"],
+        claim["amount_cents"],claim["issued_at"],claim["source_hash"]
+    ) != (
+        scenario.case_id,scenario.payer_id,scenario.payee_id,scenario.currency,
+        scenario.disputed_cents,scenario.issued_at,scenario.source_finding_sha256,
+    ):
+        raise ValueError("claim source/currency/identity/amount mismatch")
+    return store.place_claim_dispute_hold(
+        claim_id=scenario.claim_id,
+        kind=notice.kind,
+        source_hash=notice.source_sha256,
+        observed_at=notice.observed_at,
+        expected_claim_source_sha256=scenario.source_finding_sha256,
     )
