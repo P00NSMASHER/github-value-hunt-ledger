@@ -185,13 +185,29 @@ def check_execution(run: object, command_id: str, vm_id: str) -> bool:
     return True
 
 
-def poll_existing_command(command, command_id: str, instance_id: str,
+def list_exact_execution(command, compartment_id: str, command_id: str,
+                         instance_id: str):
+    response = command.list_instance_agent_command_executions(
+        compartment_id, instance_id, limit=100)
+    headers = getattr(response, "headers", {})
+    auth.require(isinstance(headers, dict) and not headers.get("opc-next-page"),
+                 "EXECUTION_LOOKUP_UNVERIFIED")
+    items = getattr(response, "data", None)
+    auth.require(isinstance(items, list), "EXECUTION_LOOKUP_UNVERIFIED")
+    matches = [item for item in items
+               if getattr(item, "instance_agent_command_id", None) == command_id]
+    auth.require(len(matches) <= 1, "EXECUTION_IDENTITY_MISMATCH")
+    return matches[0] if matches else None
+
+
+def poll_existing_command(command, compartment_id: str, command_id: str, instance_id: str,
                           max_attempts: int = 45, delay_seconds: int = 4) -> None:
     """Poll the *same* accepted command. Never resubmit on lookup errors.
 
-    OCI Audit reproduced a 404 on a read just milliseconds after successful
-    command creation. A bounded 404-only read retry permits propagation while
-    retaining refusal for other errors and all unverified output/identities.
+    OCI can return 404 for the per-command execution endpoint even after the
+    record exists. On that exact error, use the documented compartment- and
+    instance-bounded execution list, select the exact command ID, and retain
+    the same strict identity/output validation. Neither path creates a command.
     """
     auth.require(max_attempts >= 1 and delay_seconds >= 0, "EXECUTION_LOOKUP_UNVERIFIED")
     for attempt in range(max_attempts):
@@ -199,15 +215,22 @@ def poll_existing_command(command, command_id: str, instance_id: str,
             result = command.get_instance_agent_command_execution(
                 command_id, instance_id).data
         except Exception as exc:
-            # Oracle can return NotAuthorizedOrNotFound before a just-created
-            # command has propagated. An actual permission denial with the same
-            # code still fails after a finite number of READS. Never recreate.
             if (getattr(exc, "status", None) == 404 and
-                    getattr(exc, "code", None) in ("NotAuthorizedOrNotFound", "NotFound") and
-                    attempt + 1 < max_attempts):
-                time.sleep(delay_seconds)
-                continue
-            raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
+                    getattr(exc, "code", None) in ("NotAuthorizedOrNotFound", "NotFound")):
+                try:
+                    result = list_exact_execution(
+                        command, compartment_id, command_id, instance_id)
+                except auth.Refused:
+                    raise
+                except Exception:
+                    result = None
+                if result is None:
+                    if attempt + 1 < max_attempts:
+                        time.sleep(delay_seconds)
+                        continue
+                    raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
+            else:
+                raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
         if check_execution(result, command_id, instance_id):
             return
         if attempt + 1 < max_attempts:
@@ -221,7 +244,8 @@ def submit_or_reconcile(oci, command, env: dict[str, str]) -> bool:
     if existing:
         # Read once only. This mode exists to reconcile a known accepted
         # command without any chance of resubmission.
-        poll_existing_command(command, existing, env["RETALLY_OCI_VM_OCID"],
+        poll_existing_command(command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                              existing, env["RETALLY_OCI_VM_OCID"],
                               max_attempts=1, delay_seconds=0)
         return False
     details = make_command_details(oci, env)
@@ -237,7 +261,8 @@ def submit_or_reconcile(oci, command, env: dict[str, str]) -> bool:
     auth.require(isinstance(command_id, str) and
                  command_id.startswith("ocid1.instanceagentcommand."),
                  "COMMAND_ACKNOWLEDGEMENT_INVALID")
-    poll_existing_command(command, command_id, env["RETALLY_OCI_VM_OCID"])
+    poll_existing_command(command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                          command_id, env["RETALLY_OCI_VM_OCID"])
     return True
 
 
