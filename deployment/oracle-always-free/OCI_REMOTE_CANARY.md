@@ -33,4 +33,6 @@ The script checks repository, numeric owner/repository IDs, exact workflow ref, 
 
 On an ambiguous command creation error or status timeout, **do not rerun** until the original request is reconciled in OCI Audit. The command may have been accepted even if the network response failed. SDK automatic retries are disabled. No synthetic success can satisfy confidential customer or real financial-operation gates.
 
+For a known accepted command, the optional manual `existing_command_id` input performs one read and output validation only. It never calls command creation. Use it to verify delayed visibility without duplicating an uncertain operation.
+
 **Follow-on (not activated here):** after a genuine remote canary succeeds, add a separately approved, source-locked synthetic-only staging installer, host-health acceptance, encrypted recoverability and rollback verification. Never convert the canary into an arbitrary shell command or assume a passing code test proves on-host deployment. Customer authorization and private workbench access remain HOLD.

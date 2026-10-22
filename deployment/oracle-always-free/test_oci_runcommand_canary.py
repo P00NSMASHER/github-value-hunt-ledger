@@ -36,6 +36,7 @@ def fixture():
         "GITHUB_SHA": "a" * 40,
         "GITHUB_RUN_ID": "1234567890",
         "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_INPUT_EXISTING_COMMAND_ID": "",
     }
 
 
@@ -69,6 +70,7 @@ class ContextTests(unittest.TestCase):
             ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID", "bad"),
             ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
              "ocid1.compartment.oc1..differentcompartment"),
+            ("GITHUB_INPUT_EXISTING_COMMAND_ID", "bad"),
             ("RETALLY_OCI_RUN_CLIENT_SECRET", ""),
         ]:
             with self.subTest(key=key):
@@ -219,6 +221,18 @@ class ProviderTests(unittest.TestCase):
                                     delay_seconds=1)
         self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
         self.assertEqual(sleeper.call_count, 2)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_reconcile_mode_reads_once_and_never_creates(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        env = fixture()
+        env["GITHUB_INPUT_EXISTING_COMMAND_ID"] = command_id
+        command = Mock()
+        with patch.object(m, "poll_existing_command") as poll:
+            self.assertFalse(m.submit_or_reconcile(None, command, env))
+        poll.assert_called_once_with(
+            command, command_id, env["RETALLY_OCI_VM_OCID"],
+            max_attempts=1, delay_seconds=0)
         command.create_instance_agent_command.assert_not_called()
 
     def test_existing_command_poll_exhausts_404_without_recreate(self):
