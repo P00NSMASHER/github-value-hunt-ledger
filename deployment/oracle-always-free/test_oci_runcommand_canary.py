@@ -206,7 +206,7 @@ class ProviderTests(unittest.TestCase):
         terminal = SimpleNamespace(instance_agent_command_id=command_id,
             instance_id=vm_id, lifecycle_state="SUCCEEDED",
             content=SimpleNamespace(output_type="TEXT", exit_code=0,
-                                    text=m.MARKER + "\\n"))
+                                    text=m.MARKER + "\n"))
         command = Mock()
         command.get_instance_agent_command_execution.side_effect = [
             NotVisible(), NotVisible(), SimpleNamespace(data=terminal)]
@@ -263,7 +263,7 @@ class ProviderTests(unittest.TestCase):
                 record = SimpleNamespace(instance_agent_command_id=wrong_command,
                     instance_id=vm_id, lifecycle_state=state,
                     content=SimpleNamespace(output_type="TEXT", exit_code=0,
-                                            text=m.MARKER + "\\n"))
+                                            text=m.MARKER + "\n"))
                 command = Mock()
                 command.get_instance_agent_command_execution.return_value = SimpleNamespace(
                     data=record)
@@ -282,7 +282,7 @@ class ProviderTests(unittest.TestCase):
         success = SimpleNamespace(instance_agent_command_id=command_id,
             instance_id=vm_id, lifecycle_state="SUCCEEDED",
             content=SimpleNamespace(output_type="TEXT", exit_code=0,
-                                    text=m.MARKER + "\\n"))
+                                    text=m.MARKER + "\n"))
         command = Mock()
         command.get_instance_agent_command_execution.side_effect = [
             SimpleNamespace(data=result), SimpleNamespace(data=success)]
