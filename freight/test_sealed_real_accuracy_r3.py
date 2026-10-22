@@ -170,3 +170,22 @@ def test_reordering_does_not_change_sealed_math():
     assert report.complete_independent_truth_count == 50
     assert report.precision is None
     assert report.false_positive_rate == 0
+
+
+def test_report_hash_distinguishes_study_kind_even_when_every_case_is_unknown():
+    """One study population must not have the same evidence receipt in two tiers."""
+    model, truth = freeze([case(1, "UNRESOLVED", "REVIEW", complete=False)])
+    synthetic = score_sealed_freight(
+        model, truth, joint_unseal_at=UNSEAL_AT,
+        study_kind="SYNTHETIC_REHEARSAL",
+    )
+    pending_real = score_sealed_freight(
+        model, truth, joint_unseal_at=UNSEAL_AT,
+        study_kind="REAL_EXTERNAL_REVIEW_PENDING",
+    )
+    assert synthetic.method_status == pending_real.method_status == "INSUFFICIENT_INDEPENDENT_LABELS"
+    assert synthetic.complete_independent_truth_count == pending_real.complete_independent_truth_count == 0
+    assert synthetic.unresolved_truth_count == pending_real.unresolved_truth_count == 1
+    assert synthetic.precision is pending_real.precision is None
+    assert not synthetic.publication_claim_approved and not pending_real.publication_claim_approved
+    assert synthetic.report_hash != pending_real.report_hash
