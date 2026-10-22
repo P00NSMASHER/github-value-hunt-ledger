@@ -18,3 +18,7 @@ No changes were made to the established read-only monitor, customer release gate
 ## Separate host acceptance
 
 The existing `VM.Standard.E2.1.Micro` completed a read-only, temporary seven-branch synthetic stage test using `7778049571f79731a3023b03d5dc33b617f0a715`, with exact marker `RETALLY_OCI_SEVEN_BRANCH_EPHEMERAL_STAGE_OK`. The script deleted its temporary workspace and never started or installed a persistent service. This is host-level ephemeral acceptance, not durable customer deployment.
+
+## Current-base reconciliation
+
+The repair branch was reconciled with protected `main` `1b3b9bee41081f9f1ace7950ecac37d14ab5d7ba` after that branch advanced with the separate RT05 dispute-hold repair. The current-main change did not overlap the four OCI candidate files. Earlier green checks are not reused: the reconciled candidate requires fresh exact-head CI before any protected integration.
