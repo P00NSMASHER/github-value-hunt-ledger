@@ -74,11 +74,21 @@ class PublicationTests(unittest.TestCase):
                         self.assertNotIn("{{", html)
                         self.assertFalse(document.unsafe_attributes)
                         self.assertTrue({"iframe", "object"}.isdisjoint(document.tags))
+                        scripts = [attrs for tag, attrs, _ in document.elements if tag == "script"]
+                        data_scripts = [a for a in scripts if a.get("type") == "application/ld+json" and "src" not in a]
+                        runtime_scripts = [a for a in scripts if a not in data_scripts]
                         if company == "group" and page == "index.html":
                             self.assertEqual(1, document.tags.count("form"))
-                            self.assertEqual(1, document.tags.count("script"))
+                            self.assertEqual(1, len(data_scripts))
+                            self.assertEqual(1, len(runtime_scripts))
+                            self.assertTrue(runtime_scripts[0]["src"].startswith("/enquiry.js?v="))
+                        elif company == "recoveryworks" and page == "index.html":
+                            self.assertEqual(1, len(data_scripts))
+                            self.assertFalse(runtime_scripts)
+                            self.assertNotIn("form", document.tags)
                         else:
-                            self.assertTrue({"script", "form"}.isdisjoint(document.tags))
+                            self.assertFalse(scripts)
+                            self.assertNotIn("form", document.tags)
                         for reference in document.references:
                             url = urlsplit(reference)
                             self.assertNotEqual("javascript", url.scheme)
@@ -182,7 +192,7 @@ class PublicationTests(unittest.TestCase):
                 self.assertIn(text, form_copy)
             self.assertIn("https://www.retallyrecovery.com/#start-audit", document.references)
             self.assertNotIn("auditForm", document.ids)
-            scripts = [attrs for tag, attrs, _ in document.elements if tag == "script"]
+            scripts = [attrs for tag, attrs, _ in document.elements if tag == "script" and attrs.get("src")]
             script = (output / "enquiry.js").read_text()
             revision = hashlib.sha256((output / "enquiry.js").read_bytes()).hexdigest()[:16]
             self.assertEqual(["/enquiry.js?v=" + revision], [attrs["src"] for attrs in scripts])
