@@ -242,6 +242,8 @@ def make_finding(
     ):
         _require_text(name, value)
 
+    if any(type(value) is not int for value in (expected_cents, actual_cents)):
+        raise ValueError("money values must be exact integer cents")
     if expected_cents < 0 or actual_cents < 0:
         raise ValueError("money values must be non-negative")
     if status not in {VALIDATED, REVIEW}:
@@ -500,6 +502,8 @@ class RecoveryLedger:
         _require_text("settlement_id", event.settlement_id)
         _require_text("source_hash", event.source_hash)
 
+        if type(event.amount_cents) is not int:
+            raise ValueError("settlement amount must be exact integer cents")
         if event.amount_cents < 0:
             raise ValueError("settlement amount must be non-negative")
         if event.currency != finding.currency:

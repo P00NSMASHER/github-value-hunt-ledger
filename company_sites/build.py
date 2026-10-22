@@ -33,6 +33,7 @@ PROFILES = {
         "pages": ("index.html", "privacy/index.html"),
         "files": ("index.html", "privacy/index.html", "site.css", "enquiry.js", "_headers"),
         "assets": {
+            "assets/brand/retally-emblem-approved.png": "freight/site/assets/brand/retally-emblem-approved.png",
             "assets/brand/freightrecovery-emblem.webp": "freight/site/assets/brand/freightrecovery-emblem.webp",
             "assets/brand/recoveryos-emblem.webp": "freight/site/assets/brand/recoveryos-emblem.webp",
             "assets/brand/permitplate-emblem.webp": "freight/site/assets/brand/permitplate-emblem.webp",

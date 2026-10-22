@@ -248,13 +248,15 @@ class RecoveryWorksTests(unittest.TestCase):
         self.assertEqual(ledger.rollup()["totals"]["cases"], 1)
 
     def test_freight_bridge_preserves_authority_gate(self):
-        f = SimpleNamespace(
-            finding_id="f1", proof_hash=H("proof"), buyer_id="buyer",
-            carrier_id="carrier", invoice_id="inv", currency="USD",
-            expected_cents=1000, actual_cents=1500, status="VALIDATED",
-            shipment_id="ship", customer_id="customer",
-        )
-        authority = SimpleNamespace(authority_id="a1", source_hash=H("authorityhash"))
+        from freight.contracts import AuthorityRef, make_finding
+        f=make_finding(finding_id="f1",buyer_id="buyer",business_unit="BU-1",
+                       invoice_id="inv",shipment_id="ship",customer_id="customer",
+                       carrier_id="carrier",currency="USD",authority_id="a1",
+                       expected_cents=1000,actual_cents=1500,status="VALIDATED")
+        authority=AuthorityRef(
+            authority_id="a1",buyer_id="buyer",business_unit="BU-1",
+            customer_id="customer",carrier_id="carrier",currency="USD",
+            source_hash=H("authorityhash"))
         obs = from_freight_finding(f, authority)
         finding = RecoveryEngine().evaluate(obs)
         self.assertIs(finding.state, FindingState.VALIDATED)

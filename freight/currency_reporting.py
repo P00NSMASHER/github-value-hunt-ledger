@@ -49,8 +49,13 @@ def build_currency_settlement_report(store: SettlementStore) -> CurrencySettleme
     claims = {x["claim_id"]: x for x in tables["recovery_claims"]}
     events = {x["event_id"]: x for x in tables["settlement_events"]}
     allocations = {x["allocation_id"]: x for x in tables["allocations"]}
+    disputed_claim_ids = {x["claim_id"]
+                          for x in tables.get("claim_dispute_holds", ())}
     counters = {x["counter_id"]: x for x in tables["counter_events"]}
     rows = {}
+    # Fee candidates tied to a still-unapplied source return must be held,
+    # not counted as fee eligible, even when the return spans multiple claims.
+    provisional_fee_by_event: dict[str, int] = {}
     def bucket(currency: str) -> dict[str, int]:
         canonical = require_cent_currency(currency)
         return rows.setdefault(canonical, {
@@ -78,7 +83,11 @@ def build_currency_settlement_report(store: SettlementStore) -> CurrencySettleme
             raise ValueError("allocation fee eligibility is inconsistent")
         target = bucket(claim["currency"])
         target["allocations"] += amt
-        target["fee_net"] += fee
+        if allocation["claim_id"] not in disputed_claim_ids:
+            target["fee_net"] += fee
+            provisional_fee_by_event[event["event_id"]] = (
+                provisional_fee_by_event.get(event["event_id"], 0) + fee
+            )
     counter_applied = {}
     for reversal in tables["reversal_edges"]:
         allocation = allocations.get(reversal["allocation_id"])
@@ -93,15 +102,26 @@ def build_currency_settlement_report(store: SettlementStore) -> CurrencySettleme
         amt = require_exact_cents("reversed amount", reversal["amount_cents"], positive=True)
         row = bucket(event["currency"])
         row["reversals"] += amt
-        if allocation["fee_eligible_cents"]:
+        if allocation["fee_eligible_cents"] and allocation["claim_id"] not in disputed_claim_ids:
             row["fee_net"] -= amt
+            provisional_fee_by_event[event["event_id"]] -= amt
         counter_applied[counter["counter_id"]] = counter_applied.get(counter["counter_id"], 0) + amt
+    unresolved_event_ids = set()
     for counter in counters.values():
         row = bucket(counter["currency"])
         outstanding = require_exact_cents("counter amount", counter["amount_cents"], positive=True) - counter_applied.get(counter["counter_id"],0)
         if outstanding < 0:
             raise ValueError("counter replay exceeds immutable reversal capacity")
         row["unresolved"] += outstanding
+        if outstanding:
+            unresolved_event_ids.add(counter["original_event_id"])
+    # The retained allocation and return evidence remains unchanged. Only the
+    # unverified fee-base candidate is suppressed until source reconciliation.
+    for event_id in unresolved_event_ids:
+        event = events.get(event_id)
+        if event is None:
+            raise ValueError("unresolved return references an unknown source event")
+        bucket(event["currency"])["fee_net"] -= provisional_fee_by_event.get(event_id, 0)
     output = []
     for currency, value in sorted(rows.items()):
         net = value["allocations"] - value["reversals"]

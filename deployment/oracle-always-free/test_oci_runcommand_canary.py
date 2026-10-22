@@ -10,7 +10,7 @@ import sys
 import time
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
@@ -27,7 +27,8 @@ def fixture():
         "RETALLY_OCI_RUN_DOMAIN_URL": "https://idcs-example.identity.oraclecloud.com",
         "RETALLY_OCI_RUN_CLIENT_ID": "remote-only-client",
         "RETALLY_OCI_RUN_CLIENT_SECRET": "dummy-never-live",
-        "RETALLY_OCI_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcompartment",
+        "RETALLY_OCI_VM_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
+        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
         "RETALLY_OCI_VM_OCID": "ocid1.instance.oc1.iad.testinstance",
         "ACTIONS_ID_TOKEN_REQUEST_URL": "https://pipelines.actions.githubusercontent.com/oidc/token?a=b",
         "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "dummy-gh-job-token",
@@ -35,6 +36,7 @@ def fixture():
         "GITHUB_SHA": "a" * 40,
         "GITHUB_RUN_ID": "1234567890",
         "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_INPUT_EXISTING_COMMAND_ID": "",
     }
 
 
@@ -64,7 +66,11 @@ class ContextTests(unittest.TestCase):
             ("RETALLY_OCI_RUN_DOMAIN_URL", "https://idcs-abc.identity.oraclecloud.com@evil.net"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://evil.example/token"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://bad.actions.githubusercontent.com/token"),
-            ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_VM_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
+             "ocid1.compartment.oc1..differentcompartment"),
+            ("GITHUB_INPUT_EXISTING_COMMAND_ID", "bad"),
             ("RETALLY_OCI_RUN_CLIENT_SECRET", ""),
         ]:
             with self.subTest(key=key):
@@ -138,7 +144,7 @@ class ProviderTests(unittest.TestCase):
     def vm(self):
         return SimpleNamespace(
             id=fixture()["RETALLY_OCI_VM_OCID"],
-            compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"],
+            compartment_id=fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"],
             shape=m.VM_SHAPE, lifecycle_state="RUNNING",
             agent_config=SimpleNamespace(are_all_plugins_disabled=False, plugins_config=[
                 SimpleNamespace(name="Compute Instance Run Command", desired_state="ENABLED")]))
@@ -197,6 +203,167 @@ class ProviderTests(unittest.TestCase):
         with self.assertRaises(m.auth.Refused):
             m.check_plugin([])
 
+    def test_existing_command_poll_recovers_after_transient_404_without_recreate(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        class NotVisible(Exception):
+            status = 404
+            code = "NotAuthorizedOrNotFound"
+        terminal = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="SUCCEEDED",
+            content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                    text=m.MARKER + "\n"))
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = [
+            NotVisible(), NotVisible(), SimpleNamespace(data=terminal)]
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[], headers={})
+        with patch.object(m.time, "sleep") as sleeper:
+            m.poll_existing_command(command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                    command_id, vm_id, max_attempts=4,
+                                    delay_seconds=1)
+        self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
+        self.assertEqual(sleeper.call_count, 2)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_reconcile_mode_reads_once_and_never_creates(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        env = fixture()
+        env["GITHUB_INPUT_EXISTING_COMMAND_ID"] = command_id
+        command = Mock()
+        with patch.object(m, "poll_existing_command") as poll:
+            self.assertFalse(m.submit_or_reconcile(None, command, env))
+        poll.assert_called_once_with(
+            command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+            command_id, env["RETALLY_OCI_VM_OCID"],
+            max_attempts=1, delay_seconds=0)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_get_404_uses_exact_bounded_execution_list_without_recreate(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        class NotVisible(Exception):
+            status = 404
+            code = "NotAuthorizedOrNotFound"
+        terminal = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="SUCCEEDED",
+            content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                    text=m.MARKER + "\n"))
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = NotVisible()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[terminal], headers={})
+        m.poll_existing_command(
+            command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+            command_id, vm_id, max_attempts=1, delay_seconds=0)
+        command.list_instance_agent_command_executions.assert_called_once_with(
+            fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"], vm_id, limit=100)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_execution_list_refuses_pagination_or_duplicate_identity(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        command = Mock()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[], headers={"opc-next-page": "hidden"})
+        with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_LOOKUP_UNVERIFIED"):
+            m.list_exact_execution(
+                command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                command_id, vm_id)
+        duplicate = SimpleNamespace(instance_agent_command_id=command_id)
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[duplicate, duplicate], headers={})
+        with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_IDENTITY_MISMATCH"):
+            m.list_exact_execution(
+                command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                command_id, vm_id)
+
+    def test_existing_command_poll_exhausts_404_without_recreate(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        class NotVisible(Exception):
+            status = 404
+            code = "NotAuthorizedOrNotFound"
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = NotVisible()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[], headers={})
+        with patch.object(m.time, "sleep") as sleeper:
+            with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_LOOKUP_UNVERIFIED"):
+                m.poll_existing_command(command,
+                                        fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                        command_id, vm_id,
+                                        max_attempts=3, delay_seconds=1)
+        self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
+        self.assertEqual(sleeper.call_count, 2)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_existing_command_poll_rejects_other_provider_errors_immediately(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        for status, code in ((401, "NotAuthenticated"), (403, "Forbidden"),
+                             (404, "InvalidParameter"), (429, "TooManyRequests"),
+                             (500, "InternalError")):
+            with self.subTest(status=status, code=code):
+                exc = type("RemoteReadError", (Exception,),
+                           {"status": status, "code": code})()
+                command = Mock()
+                command.get_instance_agent_command_execution.side_effect = exc
+                with patch.object(m.time, "sleep") as sleeper:
+                    with self.assertRaisesRegex(m.auth.Refused,
+                                                "EXECUTION_LOOKUP_UNVERIFIED"):
+                        m.poll_existing_command(command,
+                                                fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                                command_id, vm_id,
+                                                max_attempts=4, delay_seconds=1)
+                command.get_instance_agent_command_execution.assert_called_once_with(
+                    command_id, vm_id)
+                sleeper.assert_not_called()
+                command.create_instance_agent_command.assert_not_called()
+
+    def test_existing_command_poll_rejects_mismatched_or_failed_execution(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        for wrong_command, state in (("other", "SUCCEEDED"),
+                                     (command_id, "FAILED")):
+            with self.subTest(wrong_command=wrong_command, state=state):
+                record = SimpleNamespace(instance_agent_command_id=wrong_command,
+                    instance_id=vm_id, lifecycle_state=state,
+                    content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                            text=m.MARKER + "\n"))
+                command = Mock()
+                command.get_instance_agent_command_execution.return_value = SimpleNamespace(
+                    data=record)
+                with patch.object(m.time, "sleep") as sleeper:
+                    with self.assertRaises(m.auth.Refused):
+                        m.poll_existing_command(command,
+                                                fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                                command_id, vm_id,
+                                                max_attempts=4, delay_seconds=1)
+                sleeper.assert_not_called()
+                command.create_instance_agent_command.assert_not_called()
+
+    def test_poll_in_progress_then_success_bounded(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        result = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="IN_PROGRESS", content=None)
+        success = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="SUCCEEDED",
+            content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                    text=m.MARKER + "\n"))
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = [
+            SimpleNamespace(data=result), SimpleNamespace(data=success)]
+        with patch.object(m.time, "sleep") as sleeper:
+            m.poll_existing_command(command,
+                                    fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                                    command_id, vm_id,
+                                    max_attempts=2, delay_seconds=1)
+        self.assertEqual(command.get_instance_agent_command_execution.call_count, 2)
+        sleeper.assert_called_once_with(1)
+        command.create_instance_agent_command.assert_not_called()
+
     def test_script_is_fixed_short_nonroot_and_no_write(self):
         self.assertLess(len(m.CANARY.encode()), 4096)
         self.assertIn('test "$(id -u)" -ne 0', m.CANARY)
@@ -237,6 +404,10 @@ class ProviderTests(unittest.TestCase):
         fake = SimpleNamespace(compute_instance_agent=SimpleNamespace(models=types))
         data = m.make_command_details(fake,fixture())
         self.assertEqual(data.execution_time_out_in_seconds,45)
+        self.assertEqual(data.compartment_id,
+                         fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"])
+        self.assertEqual(data.compartment_id,
+                         fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"])
         self.assertEqual(data.target.instance_id,fixture()["RETALLY_OCI_VM_OCID"])
         self.assertEqual(data.content.source.text,m.CANARY)
         self.assertFalse(hasattr(data.content,"command_string"))

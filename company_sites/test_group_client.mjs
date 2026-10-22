@@ -48,6 +48,14 @@ async function page({online = true, query = '', post, clipboard = true, scriptEr
     submit: () => el('group-enquiry').fire('submit')};
 }
 
+test('rendered verification gives an explicit next step before a token exists', async () => {
+  const p = await page();
+  assert.equal(p.calls.length, 1);
+  assert.equal(p.el('send-enquiry').disabled, true);
+  assert.match(p.el('enquiry-status').textContent, /Complete the security verification/);
+  assert.match(p.el('enquiry-status').textContent, /Nothing has been sent/);
+});
+
 test('initialization is read-only and accepts old display-name and slug links', async () => {
   for (const query of ['?business=CaptureBrief', '?business=capturebrief']) {
     const p = await page({query});
