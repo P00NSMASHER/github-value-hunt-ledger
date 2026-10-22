@@ -1,0 +1,307 @@
+"""Isolated CI acceptance for the consolidated marketing site; no live traffic."""
+import argparse
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+import json
+from pathlib import Path
+from threading import Thread
+from urllib.parse import parse_qs, urlsplit
+
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError, sync_playwright
+from freight.site.group.build import ROUTES
+
+
+CONSOLE_HEADING = "What would you like to move forward?"
+GREEN_CANVAS = "rgb(7, 58, 47)"
+
+
+def check_group_canvas(page, slug, output, width):
+    """Check the exposed page canvas and sticky navigation below the hero."""
+    selectors = ([".group-principles", "#businesses", ".group-approach", ".studio-section"]
+                 if not slug else [".group-footer"] if slug == "contact" else
+                 [".business-section-nav", "#focus", "#next-steps", "#scope"])
+    surfaces = page.evaluate("""selectors => {
+      const background = element => {
+        while (element) {
+          const color = getComputedStyle(element).backgroundColor;
+          if (color !== 'rgba(0, 0, 0, 0)' && color !== 'transparent') return color;
+          element = element.parentElement;
+        }
+        return 'transparent';
+      };
+      return ['body', ...selectors].map(selector => {
+        const element = document.querySelector(selector);
+        return {selector, present: !!element, background: element ? background(element) : null};
+      });
+    }""", selectors)
+    assert all(surface["present"] and surface["background"] == GREEN_CANVAS
+               for surface in surfaces), {"route": slug or "home", "width": width, "surfaces": surfaces}
+    header = page.locator(".group-header")
+    header_state = """element => {
+      const rect = element.getBoundingClientRect(), style = getComputedStyle(element);
+      return {top: rect.top, height: rect.height, background: style.backgroundColor,
+              color: style.color, position: style.position, scrollY: window.scrollY};
+    }"""
+    before = header.evaluate(header_state)
+    target = "#businesses" if not slug else ".group-footer" if slug == "contact" else "#focus"
+    page.locator(target).evaluate("""async element => {
+      const header = document.querySelector('.group-header');
+      window.scrollTo({top: element.getBoundingClientRect().top + scrollY - header.offsetHeight,
+                       behavior: 'instant'});
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }""")
+    after = header.evaluate(header_state)
+    assert before["background"] == after["background"] == GREEN_CANVAS, (before, after)
+    assert before["color"] == after["color"] and before["color"] != GREEN_CANVAS, (before, after)
+    assert before["position"] == after["position"] == "sticky", (before, after)
+    assert abs(before["top"]) <= 1 and abs(after["top"]) <= 1 and after["scrollY"] > 0, (before, after)
+    if slug in ("", "capturebrief"):
+        page.screenshot(path=str(output / f'{slug or "home"}-{width}-beyond-hero.png'), full_page=False)
+    page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
+    return {"route": slug or "home", "width": width, "surfaces": surfaces,
+            "header_before": before, "header_after": after}
+
+
+def check_console_breakpoints(page, base, output):
+    """Guard the 501–800px interval where hiding a break joined two words."""
+    results = []
+    for width in (500, 501, 768, 800, 801):
+        page.set_viewport_size({"width": width, "height": 1024})
+        page.goto(base + "/", wait_until="networkidle")
+        page.evaluate("document.fonts.ready")
+        heading = page.locator(".hero-console h2")
+        assert heading.is_visible()
+        text = " ".join(heading.inner_text().split())
+        assert text == CONSOLE_HEADING, {"width": width, "visible_heading": text}
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+        if width in (501, 800):
+            heading.scroll_into_view_if_needed()
+            page.screenshot(path=str(output / f"home-console-{width}.png"), full_page=False)
+        results.append({"width": width, "visible_heading": text, "passed": True})
+    return results
+
+
+def check_card_heading_contrast(page):
+    """Axe may leave gradient backgrounds untested; check each actual stop."""
+    results = page.evaluate("""() => {
+      const channels = value => value.match(/[\\d.]+/g).slice(0, 3).map(Number);
+      const luminance = rgb => rgb.map(v => v / 255)
+        .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
+        .reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+      return [...document.querySelectorAll('.portfolio-item h3')].map(heading => {
+        const panel = getComputedStyle(heading.closest('.portfolio-item'));
+        const colors = panel.backgroundImage.match(/rgba?\\([^)]+\\)/g) || [panel.backgroundColor];
+        const foreground = luminance(channels(getComputedStyle(heading).color));
+        const contrast = Math.min(...colors.map(color => {
+          const background = luminance(channels(color));
+          return (Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05);
+        }));
+        return {text: heading.innerText, contrast};
+      });
+    }""")
+    assert len(results) == 8 and all(item['contrast'] >= 4.5 for item in results), results
+    return results
+
+
+def load_page_images(page):
+    """Exercise native lazy loading before judging images or taking screenshots."""
+    page.evaluate("""async () => {
+      await document.fonts.ready;
+      const nextPaint = () => new Promise(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      for (const image of document.querySelectorAll('img[loading="lazy"]')) {
+        image.scrollIntoView({block: 'center', behavior: 'instant'});
+        await nextPaint();
+        // A completed network response can still be undecoded when a full-page
+        // capture moves the image off screen. Paint it while it is in view.
+        try { await image.decode(); } catch (_) { /* recorded below */ }
+        await nextPaint();
+      }
+      window.scrollTo({top: 0, behavior: 'instant'});
+      await nextPaint();
+    }""")
+    try:
+        page.wait_for_function("[...document.images].every(image => image.complete)", timeout=10000)
+    except PlaywrightTimeoutError:
+        # The document check below records the actual unfinished image URLs.
+        # A broken image is never treated as a successful lazy-load check.
+        pass
+
+
+def check_contact_composer(page, base):
+    page.goto(base + "/contact/", wait_until="networkidle")
+    form = page.locator("#group-enquiry")
+    assert form.is_visible()
+    business = form.locator("#enquiry-business")
+    message = form.locator("#enquiry-message")
+    for control in (business, message):
+        assert control.evaluate("element => [...element.labels].some(label => label.textContent.trim())"), "Enquiry field needs a visible label"
+    submit = form.get_by_role("button", name="Open email draft", exact=True)
+    assert submit.get_attribute("type") == "submit" and submit.is_visible()
+    assert page.locator("#enquiry-status").evaluate("element => element.getAttribute('role') === 'status' || ['polite', 'assertive'].includes(element.getAttribute('aria-live'))")
+    sample = "QA preview only. Please do not send this draft."
+    business.select_option(label="CaptureBrief")
+    message.fill(sample)
+    page.wait_for_function("document.querySelector('#enquiry-draft')?.getAttribute('href')?.startsWith('mailto:')")
+    draft = urlsplit(page.locator("#enquiry-draft").get_attribute("href"))
+    fields = parse_qs(draft.query)
+    assert draft.scheme == "mailto" and draft.path == "jay@retallyrecovery.com"
+    assert "CaptureBrief" in fields.get("subject", [""])[0]
+    assert sample in fields.get("body", [""])[0]
+    assert page.locator("#enquiry-status").inner_text().strip()
+    business.select_option(label="PermitPlate NYC")
+    updated = parse_qs(urlsplit(page.locator("#enquiry-draft").get_attribute("href")).query)
+    assert "PermitPlate NYC" in updated.get("subject", [""])[0]
+    assert sample in updated.get("body", [""])[0]
+    assert urlsplit(page.url).path == "/contact/"
+    # Deliberately do not click the submit button or the mailto anchor.
+    return {"email_draft_updates": True, "labelled_fields": True,
+            "live_status": True, "submit_clicked": False, "mailto_navigation": False}
+
+
+def check_chat_clearance(page, base, output, width, height):
+    page.goto(base + "/recovery/#start-audit", wait_until="networkidle")
+    launcher = page.locator("#retallyChatLauncher")
+    assert launcher.count() == 1
+    submit = page.locator('#auditForm button[type="submit"]')
+    submit.scroll_into_view_if_needed()
+    assert submit.is_visible()
+    assert submit.evaluate("element => {const r = element.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0;}")
+    launcher.wait_for(state="hidden")
+    page.screenshot(path=str(output / f"recovery-intake-clear-{width}.png"), full_page=False)
+    page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
+    launcher.wait_for(state="visible")
+    assert page.locator("#auditForm").evaluate("element => {const r = element.getBoundingClientRect(); return r.top >= innerHeight || r.bottom <= 0;}")
+    return {"width": width, "height": height, "launcher_hidden_at_intake": True,
+            "launcher_restored_at_hero": True, "form_submitted": False}
+
+
+def check_accessibility(page, axe_source):
+    # Only the isolated QA browser receives this script; deployed CSP is unchanged.
+    page.add_script_tag(content=axe_source)
+    return page.evaluate("""async () => {
+      const result = await axe.run(document, {runOnly: {type: 'tag',
+        values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']}});
+      return {version: axe.version, violations: result.violations.map(violation => ({
+        id: violation.id, impact: violation.impact, description: violation.description,
+        nodes: violation.nodes.length, sample: violation.nodes.slice(0, 3).map(node => node.target),
+        details: violation.nodes.map(node => ({target: node.target, failureSummary: node.failureSummary}))
+      }))};
+    }""")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--site", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--axe-js", type=Path, help="Local axe-core script; never fetched by the QA browser")
+    args = parser.parse_args()
+    if args.axe_js and not args.axe_js.is_file():
+        parser.error("--axe-js must point to an existing local axe-core script")
+    axe_source = args.axe_js.read_text() if args.axe_js else None
+    args.out.mkdir(parents=True, exist_ok=True)
+    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=str(args.site.resolve())))
+    Thread(target=server.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{server.server_port}"
+    report = {"pages": [], "interactions": [], "chat_clearance": [], "non_get_requests": [],
+              "green_canvas": [], "console_breakpoints": [], "card_heading_contrast": [],
+              "external_requests_blocked": 0, "passed": False,
+              "accessibility": {"status": "pending" if axe_source else "skipped",
+                                "reason": None if axe_source else "No local axe-core script supplied with --axe-js",
+                                "checks": [], "blocking_failures": []}}
+    try:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch()
+            for width, height in ((1440, 900), (768, 1024), (390, 844), (375, 812), (320, 700)):
+                context = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="reduce",
+                                              is_mobile=width <= 390, has_touch=width <= 390,
+                                              bypass_csp=bool(axe_source))
+                def route(request_route):
+                    request = request_route.request
+                    if request.method != "GET":
+                        report["non_get_requests"].append(request.method)
+                        request_route.abort()
+                    elif urlsplit(request.url).netloc != urlsplit(base).netloc:
+                        report["external_requests_blocked"] += 1
+                        request_route.abort()
+                    else:
+                        request_route.continue_()
+                context.route("**/*", route)
+                page = context.new_page()
+                for slug in ("",) + ROUTES:
+                    response = page.goto(base + "/" + (slug + "/" if slug else ""), wait_until="networkidle")
+                    load_page_images(page)
+                    result = page.evaluate("""() => ({
+                      overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,
+                      h1Count: document.querySelectorAll('h1').length,
+                      brokenImages: [...document.images].filter(im => !im.complete || !im.naturalWidth).map(im => im.getAttribute('src')),
+                      title: document.title,
+                      mainPresent: !!document.querySelector('main#main')
+                    })""")
+                    result.update({"route": slug or "home", "width": width, "status": response.status})
+                    report["pages"].append(result)
+                    if not slug:
+                        report["card_heading_contrast"].append({"width": width, "headings": check_card_heading_contrast(page)})
+                    assert result["status"] == 200 and result["overflow"] <= 1 and result["h1Count"] == 1 and result["mainPresent"] and not result["brokenImages"], result
+                    if axe_source:
+                        accessibility = {"route": slug or "home", "width": width, **check_accessibility(page, axe_source)}
+                        report["accessibility"]["checks"].append(accessibility)
+                        blocking = [v for v in accessibility["violations"] if v["impact"] in ("serious", "critical")]
+                        if blocking:
+                            report["accessibility"]["blocking_failures"].append({
+                                "route": slug or "home", "width": width, "violations": blocking})
+                            report["accessibility"]["status"] = "failed"
+                    # Capture every route/viewport, including failed accessibility checks,
+                    # so one defect cannot hide the remaining release evidence.
+                    page.screenshot(path=str(args.out / f'{slug or "home"}-{width}.png'), full_page=True)
+                    if slug in ("", "capturebrief", "contact"):
+                        page.screenshot(path=str(args.out / f'{slug or "home"}-{width}-viewport.png'), full_page=False)
+                    if slug != "recovery":
+                        report["green_canvas"].append(check_group_canvas(page, slug, args.out, width))
+                page.goto(base + "/")
+                menu = page.locator(".business-menu summary")
+                menu.focus()
+                page.keyboard.press("Enter")
+                assert page.locator(".business-menu").get_attribute("open") is not None
+                assert page.locator(".business-menu-panel a").count() == 11
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+                page.keyboard.press("Escape")
+                assert page.locator(".business-menu").get_attribute("open") is None
+                assert menu.evaluate("element => element === document.activeElement")
+                page.locator('.business-card[href="/capturebrief/"]').first.click()
+                page.wait_for_url("**/capturebrief/")
+                assert page.get_by_role("heading", name="Know what your bid decision rests on.").is_visible()
+                page.goto(base + "/?utm_source=acceptance#start-audit")
+                page.wait_for_url("**/recovery/?utm_source=acceptance#start-audit")
+                assert page.locator("#auditForm").is_visible()
+                contact = check_contact_composer(page, base)
+                report["interactions"].append({"width": width, "menu_keyboard": True, "business_navigation": True,
+                                               "legacy_freight_anchor": True, "contact_composer": contact})
+                report["chat_clearance"].append(check_chat_clearance(page, base, args.out, width, height))
+                context.close()
+            # Reproduce the desktop geometry where the original launcher obscured submit.
+            context = browser.new_context(viewport={"width": 1363, "height": 936}, reduced_motion="reduce")
+            context.route("**/*", route)
+            page = context.new_page()
+            report["chat_clearance"].append(check_chat_clearance(page, base, args.out, 1363, 936))
+            report["console_breakpoints"] = check_console_breakpoints(page, base, args.out)
+            context.close()
+            browser.close()
+        assert not report["non_get_requests"]
+        if axe_source:
+            failures = report["accessibility"]["blocking_failures"]
+            assert not failures, f"Serious/critical accessibility failures in {len(failures)} route/viewport checks; see {args.out / 'report.json'}"
+            report["accessibility"]["status"] = "passed"
+        report["passed"] = True
+    finally:
+        server.shutdown()
+        (args.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+    print(f"RETALLY Group: {len(report['pages'])} responsive page checks, keyboard menus, business navigation, "
+          f"email-draft controls, legacy freight anchors and {len(report['chat_clearance'])} chat-clearance checks passed; "
+          f"{len(report['green_canvas'])} green-canvas/header checks and "
+          f"{len(report['console_breakpoints'])} heading-breakpoint checks passed; "
+          f"no POSTs sent. Accessibility: {report['accessibility']['status']}.")
+
+
+if __name__ == "__main__":
+    main()

@@ -73,7 +73,8 @@ jobs:
           from freight.site.build import SOURCE
           from freight.site.cloudflare_build import EXPECTED_FILES
           public = Path('cf-retally-public')
-          index = (public / 'index.html').read_text()
+          recovery = (public / 'recovery/index.html').read_text()
+          group = (public / 'index.html').read_text()
           headers = (public / '_headers').read_text()
           legacy = (SOURCE / 'index.html').read_text()
           # Require the precise existing vendor and Turnstile allowlist. The
@@ -85,12 +86,15 @@ jobs:
           frame = ("frame-src https://www.bubblav.com https://bubblav.com "
                    "https://*.bubblav.com https://challenges.cloudflare.com;")
           script = "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"
-          for published in (index, headers):
+          for published in (recovery, headers):
               assert connect in published
               assert frame in published
               assert script in published
           assert "connect-src 'none'" in legacy
           assert "script-src 'self';" in legacy
-          assert "https://www.retallyrecovery.com/" in index
+          assert '<link rel="canonical" href="https://www.retallyrecovery.com/recovery/">' in recovery
+          assert 'id="auditForm"' in recovery
+          assert '<link rel="canonical" href="https://www.retallyrecovery.com/">' in group
+          assert 'id="auditForm"' not in group
           assert len([x for x in public.rglob('*') if x.is_file()]) == EXPECTED_FILES
           PY

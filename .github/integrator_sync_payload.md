@@ -128,3 +128,10 @@ These are architecture/evidence signals only; no adoption or revenue acceleratio
 - **Payout Finality / Commission Assurance strengthens technically.** Terminal provider scanning makes a read-only Payout Finality Sentinel more credible, but reason-aware historical entitlement mapping and independent bank/payroll outcome are still required.
 - **Workforce Schedule Rule-Version Acceptance Test becomes a clearer bounded wedge.** Temporal rule-version selection plus deterministic repair can expose schedules that were valid under configured settings but not provably valid under the correct effective/known-at authority; jurisdictional rule substance remains external.
 - No opportunity rank is increased from repository evidence alone. No new realized customer value or revenue is recorded in this integration.
+
+
+=== APPEND lanes/retally-pr-publishing-canary-20261021.md ===
+# RETALLY guarded Integrator publishing test — SYNTHETIC ONLY
+Test of one GitHub source-scoped, CI-gated unattended pull-request update.
+No customer, financial, freight, Oracle, identity or production evidence.
+Classification: TEST_ONLY. Commercial approval and production release: HOLD.

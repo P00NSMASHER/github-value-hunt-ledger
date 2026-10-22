@@ -2,8 +2,8 @@
   "catalog_version": 1,
   "title": "RETALLY Group",
   "mode": "PLANNING_PREVIEW",
-  "as_of": "2026-10-20",
-  "source_repository_revision": "04252c375e8abf8564dd42a5fd5524bf6635a4fa",
+  "as_of": "2026-10-21",
+  "source_repository_revision": "9fc918eb61e2fbfc83af071cf16e0815431b4478",
   "divisions": [
     {
       "id": "recovery",
@@ -63,9 +63,9 @@
       "division_id": "intelligence",
       "kind": "business",
       "purpose": "Supervised Decision Evidence review for one existing public federal IT, cyber, or cloud pursuit.",
-      "stage": "Offer documented; acceptance separate",
+      "stage": "Twelve private pilot feature heads integrated; customer operation unverified",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Complete the existing source-retention and release checks, then verify one authorized customer deliverable.",
+      "next_action": "Use the integrated private intake, Stripe reconciliation and order registry; establish current approved source coverage, private-host recovery and real buyer scope before accepting delivery commitments. Keep first-pilot admission separate from a completed 14-day watch.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -73,6 +73,11 @@
           "url": "https://github.com/P00NSMASHER/capturebrief/blob/12d90024f053a78ead7936abf092931fce240d3e/BUSINESS-MODEL-v7.md",
           "observed_on": "2026-10-20",
           "git_blob_sha": "94550041063722ee2cf582402cb958221ba29fb4"
+        },
+        {
+          "label": "Merged combined private pilot core: 706 local tests and hosted Linux/Windows acceptance",
+          "url": "https://github.com/P00NSMASHER/capturebrief/pull/69",
+          "observed_on": "2026-10-21"
         }
       ],
       "candidate_production_slugs": [
@@ -86,9 +91,9 @@
       "division_id": "intelligence",
       "kind": "business",
       "purpose": "Source-linked NYC restaurant applicant, licensing and buildout research for restaurant vendors.",
-      "stage": "Founder-curated offer documented",
+      "stage": "Founder-curated offer available in source; paid scoring remains held",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Verify the NYC subscriber-specific private order, payment and delivery workflow against its first-subscriber release checks; keep PA Permit Pack and x402 records separate.",
+      "next_action": "Verify the NYC subscriber-specific private order, payment and delivery workflow for the founder-curated no-score offer. Keep internal V4 scoring separate from paid scored-feed promotion; current legacy benchmark overlap is insufficient.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -102,6 +107,11 @@
           "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
           "observed_on": "2026-10-20",
           "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
+        },
+        {
+          "label": "Current internal V4 scoring and commercial boundary",
+          "url": "https://github.com/P00NSMASHER/permitplate-nyc/blob/d6547aac35036d8338c986707dc6002a33864276/operations/NYC_INTERNAL_V4_SCORING.md",
+          "observed_on": "2026-10-21"
         }
       ],
       "candidate_production_slugs": [
@@ -140,9 +150,9 @@
       "division_id": "tools-data",
       "kind": "product_family",
       "purpose": "Spreadsheet tools for maker economics, profitability and inventory decisions.",
-      "stage": "Alpha release evidence incomplete",
+      "stage": "All four alpha workbooks cleared technical freeze gates",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Close the documented Excel round-trip acceptance gap before promoting a release.",
+      "next_action": "Use the hash-pinned Maker Economics and Custom Apparel packages; finish the product release, checkout, support and customer terms before selling. Do not claim customer outcomes from compatibility tests.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -150,6 +160,16 @@
           "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/handoffs/sheetharbor/product_repo_seed/README.md",
           "observed_on": "2026-10-20",
           "git_blob_sha": "3bcdb21d947a5c86d4926559205c939335e6f444"
+        },
+        {
+          "label": "Merged native Excel acceptance and release manifest",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/559",
+          "observed_on": "2026-10-21"
+        },
+        {
+          "label": "Exact native Excel receipt for all four canonical workbooks",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/9fc918eb61e2fbfc83af071cf16e0815431b4478/handoffs/sheetharbor/product_repo_seed/release/v0.2.0-alpha/excel-roundtrip-results-2026-10-21.json",
+          "observed_on": "2026-10-21"
         }
       ],
       "candidate_production_slugs": [
@@ -164,9 +184,9 @@
       "division_id": "tools-data",
       "kind": "product_family",
       "purpose": "Three application engines with nine default editions: document workflow, quote-to-order and inventory control; additional variants remain workflow hypotheses.",
-      "stage": "Draft local synthetic candidates; source recovered; unmerged",
+      "stage": "Nine private application editions built and accepted; production integration pending",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Review the pinned candidate and retained edition acceptance evidence before any release; keep these products separate from x402 API services and shared factory infrastructure.",
+      "next_action": "Promote the reviewed private source stack through its integration gates, then provision the actual customer runtime, recovery and support path before a paid hosted launch. Keep synthetic package acceptance separate from customer acceptance.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -196,6 +216,11 @@
           "label": "Inspected draft candidate PR 60; open and unmerged at review",
           "url": "https://github.com/P00NSMASHER/x402-product-factory/pull/60",
           "observed_on": "2026-10-20"
+        },
+        {
+          "label": "Exact tested private candidate: nine packaged editions accepted locally",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/commit/38b2cf91d3022d4b0068391e0eb0df888cf7ed12",
+          "observed_on": "2026-10-21"
         }
       ],
       "candidate_production_slugs": [],
@@ -237,9 +262,9 @@
       "division_id": "ventures",
       "kind": "venture",
       "purpose": "Construction scope and change-order evidence product thesis.",
-      "stage": "Research lane; unbound identity correction proposed",
+      "stage": "Research lane; coverage correction merged; canonical identity unresolved",
       "owner_role": "CHIEF_OF_STAFF",
-      "next_action": "Review Portfolio Brain PR #732, which removes the mistaken CaptureBrief PRJ-004 association; keep ScopeSignal unbound until a separate canonical identity is evidenced, and distinguish owned implementation from third-party research references.",
+      "next_action": "Preserve the merged Portfolio Brain PR #732 correction and keep ScopeSignal unbound. Establish a distinct source-backed canonical project identity and verified private business mapping before any operational integration; distinguish owned research from third-party references.",
       "evidence_status": "REPOSITORY_DOCUMENTED",
       "sources": [
         {
@@ -261,9 +286,9 @@
           "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
         },
         {
-          "label": "Proposed unbound coverage correction (unmerged PR #732)",
-          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/27150fe15a6f748bd461e20dec325d32a6864142/registry/PORTFOLIO_COVERAGE.json",
-          "observed_on": "2026-10-20",
+          "label": "Merged unbound coverage correction (Portfolio Brain PR #732)",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c/registry/PORTFOLIO_COVERAGE.json",
+          "observed_on": "2026-10-21",
           "git_blob_sha": "49886d0a96177c9eb40b164c64e4d8b9187582f4"
         }
       ],
@@ -624,7 +649,7 @@
       "id": "group-foundation",
       "title": "Publish the group operating foundation",
       "owner_role": "ENGINEERING",
-      "timeframe": "Days 1–14",
+      "timeframe": "Days 1\u201314",
       "status": "IN_PROGRESS",
       "done_when": "Versioned register, workflow and dashboard pass reproducible automated checks, with no mandatory human review."
     },
@@ -632,7 +657,7 @@
       "id": "identity-map",
       "title": "Reconcile existing business identities",
       "owner_role": "CHIEF_OF_STAFF",
-      "timeframe": "Days 1–14",
+      "timeframe": "Days 1\u201314",
       "status": "PLANNED",
       "done_when": "Every retained venture maps to a canonical private identity or has a specific unresolved source gap."
     },
@@ -640,7 +665,7 @@
       "id": "private-register",
       "title": "Connect the private customer register",
       "owner_role": "ENGINEERING",
-      "timeframe": "Days 15–45",
+      "timeframe": "Days 15\u201345",
       "status": "PLANNED",
       "done_when": "A reviewed adapter maps authorized records to the existing private source of truth; duplicates and access boundaries pass acceptance."
     },
@@ -648,7 +673,7 @@
       "id": "first-delivery",
       "title": "Verify repeatable customer delivery",
       "owner_role": "OPERATIONS",
-      "timeframe": "Days 15–45",
+      "timeframe": "Days 15\u201345",
       "status": "PLANNED",
       "done_when": "Existing product-specific release checks and one genuine authorized delivery are evidenced for each active pilot."
     },
@@ -656,7 +681,7 @@
       "id": "financial-view",
       "title": "Connect evidence-backed financial reporting",
       "owner_role": "FINANCE_ANALYTICS",
-      "timeframe": "Days 15–45",
+      "timeframe": "Days 15\u201345",
       "status": "PLANNED",
       "done_when": "Collected fees, costs, refunds and customer recoveries reconcile separately by business and currency."
     },
@@ -664,7 +689,7 @@
       "id": "referral-pilot",
       "title": "Evaluate one relevant cross-service referral",
       "owner_role": "GROWTH_SALES",
-      "timeframe": "Days 46–90",
+      "timeframe": "Days 46\u201390",
       "status": "PLANNED",
       "done_when": "A customer-authorized referral has a tracked outcome and measured delivery effort; no duplicate revenue attribution."
     },
@@ -672,7 +697,7 @@
       "id": "brand-rollout",
       "title": "Prepare the endorsed-brand rollout",
       "owner_role": "PRODUCT",
-      "timeframe": "Days 46–90",
+      "timeframe": "Days 46\u201390",
       "status": "PLANNED",
       "done_when": "Approved name/ownership checks and product-specific copy support the proposed group directory."
     }

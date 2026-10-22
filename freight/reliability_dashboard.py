@@ -32,7 +32,6 @@ class ReadinessSnapshot:
     real_freight_precision: float | None
     independently_verified_cash_recovery_cents: int
     rights_release_approved: bool
-    independent_reviewer_approved: bool
     production_deployment_approved: bool
     release_status: str
     blockers: tuple[str, ...]
@@ -52,7 +51,6 @@ def acceptance_snapshot(
     precision: float | None,
     verified_recovery_cents: int = 0,
     rights_approved: bool = False,
-    independent_review_approved: bool = False,
     production_approved: bool = False,
 ) -> ReadinessSnapshot:
     numeric = (
@@ -66,9 +64,9 @@ def acceptance_snapshot(
         raise ValueError("aggregate totals violate population conservation")
     if precision is not None and (type(precision) is not float or not 0 <= precision <= 1):
         raise ValueError("freight precision must be bounded numeric or unknown")
-    for val in (rights_approved, independent_review_approved, production_approved):
+    for val in (rights_approved, production_approved):
         if type(val) is not bool:
-            raise ValueError("governance approval must be boolean")
+            raise ValueError("governance authorization must be boolean")
     blockers: list[str] = []
     if pinned_source_files < 2:
         blockers.append("ORIGINAL_SOURCE_PROVENANCE_INCOMPLETE")
@@ -80,8 +78,6 @@ def acceptance_snapshot(
         blockers.append("REAL_FREIGHT_ACCURACY_UNPROVEN")
     if not rights_approved:
         blockers.append("COMMERCIAL_RIGHTS_NOT_RELEASED")
-    if not independent_review_approved:
-        blockers.append("INDEPENDENT_RELEASE_REVIEW_MISSING")
     if not production_approved:
         blockers.append("PRODUCTION_DEPLOYMENT_NOT_APPROVED")
     # Even a score with a narrow internal population is not independently
@@ -89,12 +85,12 @@ def acceptance_snapshot(
     blockers.append("EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED")
     status = "RELEASE_HOLD" if blockers else "READY_FOR_SEPARATE_ACCEPTANCE"
     body = {
-        "schema": 1, "invoice_count": invoices_extracted, "exact": invoices_exact,
+        "schema": 2, "invoice_count": invoices_extracted, "exact": invoices_exact,
         "pins": pinned_source_files, "accounting_count": accounting_invoice_population,
         "matched": accounting_matched, "scoping_errors": accounting_cross_scope_errors,
         "freight_labeled": freight_labeled, "freight_unknown": freight_unknown,
         "precision": precision, "verified_recovered_cents": verified_recovery_cents,
-        "rights": rights_approved, "reviewed": independent_review_approved,
+        "rights": rights_approved, "code_quality_policy": "AUTOMATED_EVIDENCE_QA",
         "deployed": production_approved, "status": status, "blockers": blockers,
     }
     return ReadinessSnapshot(
@@ -102,7 +98,7 @@ def acceptance_snapshot(
         accounting_invoice_population, accounting_matched,
         accounting_cross_scope_errors, freight_labeled, freight_unknown,
         precision, verified_recovery_cents,
-        rights_approved, independent_review_approved, production_approved,
+        rights_approved, production_approved,
         status, tuple(blockers), canonical_hash(body),
     )
 
@@ -143,7 +139,9 @@ def html_dashboard(snapshot: ReadinessSnapshot) -> str:
         " settlement, commercial rights, freight accuracy, or collected cash.</p>"
         "<table>" + table_rows + "</table>"
         "<h2>Open acceptance holds</h2><ul>" + holds + "</ul>"
-        "<p>Do not publish externally or deploy without independent approval.</p>"
+        "<p>Internal code quality uses automated evidence-based QA. External "
+        "publication or deployment still requires authentic source evidence, "
+        "applicable customer authorization, and separate release approval.</p>"
         "</body></html>"
     )
 

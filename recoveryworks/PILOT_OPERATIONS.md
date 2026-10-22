@@ -94,6 +94,12 @@ and normalized evidence, journal replay, private file permissions, unexpired rol
 active-branch intake, at least 100 MiB free space, and an actual restore of a backup
 created within 24 hours. This is not production or security certification.
 
+Backup freshness uses the capture time included in the hashed snapshot, not the
+filesystem modification time. Copying an old snapshot cannot make it fresh. Older
+snapshots without a capture time remain restorable; create a new verified backup
+before using them to satisfy the health check. Original UTF-8 evidence, including
+Windows CSV line endings and byte-order marks, is preserved byte-for-byte.
+
 - **Before and after a work session:** use Verify backup and restore. Copy snapshots
   to the approved encrypted backup location. The health check validates local backup
   recovery, not off-device storage availability. Agree actual recovery objectives;

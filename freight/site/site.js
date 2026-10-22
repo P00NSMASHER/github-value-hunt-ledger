@@ -474,6 +474,26 @@
   const retallyChat = byId("retallyChatLauncher");
   if (retallyChat) {
     const body = document.body;
+    // Keep the optional floating launcher clear of the enquiry controls.
+    // An explicitly opened chat, including the native vendor fallback, is
+    // unchanged. The launcher returns once the form is out of view.
+    const chatIntake = byId("auditForm");
+    if (chatIntake) {
+      const syncChatIntakeVisibility = () => {
+        const rect = chatIntake.getBoundingClientRect();
+        body.classList.toggle("retally-chat-intake-visible",
+          rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight);
+      };
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(entries => {
+          body.classList.toggle("retally-chat-intake-visible", entries.some(entry => entry.isIntersecting));
+        }).observe(chatIntake);
+      } else {
+        window.addEventListener("scroll", syncChatIntakeVisibility, {passive: true});
+        window.addEventListener("resize", syncChatIntakeVisibility);
+      }
+      syncChatIntakeVisibility();
+    }
     let pendingOpenAt = 0;
     let openedThisAttempt = false;
     const fallbackToVendor = () => {

@@ -1,8 +1,10 @@
 # RETALLY code integration policy — owner authorized
 
-**Effective October 21, 2026. Scope:** `P00NSMASHER/github-value-hunt-ledger` RecoveryWorks seven-branch application, synthetic OCI backup transport, and their deployment scripts.
+**Effective October 21, 2026. Scope:** `P00NSMASHER/github-value-hunt-ledger` RETALLY internal engineering, including its freight original-document/reconciliation research, RecoveryWorks seven-branch application, synthetic OCI backup transport, and related engineering workflows.
 
-The repository owner expressly authorizes code integration **without a required separate human/independent code-review approval** for this scoped source. Previously documented human code-review prerequisites are superseded for this scope. Neither an AI simulation nor a fabricated GitHub reviewer approval is needed or permitted.
+The repository owner authorizes current and future internal RETALLY **source changes, code quality checks, and integration without a required separate human/independent code-review prerequisite**. The automated evidence-based QA process (exact-head tests, source checks, security checks, release-gate CI, reproducible artifacts and protected-branch rules) remains required. Previously documented human code-review prerequisites are superseded **only as code-review prerequisites**. A fabricated reviewer approval or simulated reviewer identity is neither needed nor permitted.
+
+Removing the human code-review requirement does **not** remove the repository's exact-action authorization requirements for merges or production changes, and does not turn internal invoice arithmetic, publisher payment annotations, or synthetic examples into independently proven customer receipts, tariffs or recovered cash. Research work may be approved as research without claiming real freight accuracy or cash settlement.
 
 ## Required automated merge conditions
 

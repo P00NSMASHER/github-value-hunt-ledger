@@ -43,12 +43,12 @@ def event(kind, *, case="CB-SYNTHETIC", case_sha=CASE_SHA, bundle=None,
             "data": samples[kind] if data is None else data}
 
 
-def producer_ledger(*events):
+def producer_ledger(*events, recorded_at="2026-10-20T20:00:00+00:00"):
     lines = []
     previous = GENESIS
     for item in events:
         body = {"ledger_version": "capturebrief-evidence-ledger-v1", "record_type": "CAPTUREBRIEF_OUTCOME_EVENT",
-                "recorded_at": "2026-10-20T20:00:00+00:00", "previous_record_sha256": previous,
+                "recorded_at": recorded_at, "previous_record_sha256": previous,
                 "payload_sha256": digest(canonical(item)), "payload": item}
         body["record_sha256"] = digest(canonical(body))
         lines.append(json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
@@ -69,6 +69,80 @@ class SnapshotReaderTests(unittest.TestCase):
             return snapshot(observed=datetime.now(timezone.utc).isoformat())
         result = CaptureBriefOutcomeReader(live_capture).observe()
         self.assertEqual("PRESENT_EMPTY", result["snapshot_presence"])
+
+    def test_actual_producer_fractional_capture_time_keeps_same_second_event(self):
+        # CaptureBrief PR #67 emits microsecond precision instead of rounding
+        # the producer's observation down before this record was appended.
+        raw = producer_ledger(
+            event("EFFORT", at="2026-10-20T20:00:00.987000Z"),
+            recorded_at="2026-10-20T20:00:00.987123+00:00",
+        )
+        observed = "2026-10-20T20:00:00.987654+00:00"
+        result = self.reader(snapshot(raw, observed=observed)).observe(now=NOW)
+        self.assertEqual(1, result["outcome_event_count"])
+        self.assertEqual(1, result["ledger_record_count"])
+        self.assertEqual("UNVERIFIED_BY_READER", result["source_authenticity"])
+        self.assertEqual("NOT_CONNECTED", result["account_identity_binding"])
+        self.assertTrue(all(value is None for value in result["verified_metrics"].values()))
+        # Rounding the receipt down falsely moves the valid record into the future.
+        with self.assertRaises(CaptureBriefObservationError):
+            self.reader(snapshot(raw, observed="2026-10-20T20:00:00+00:00")).observe(now=NOW)
+
+    def test_recursive_forbidden_fields_fail_even_in_valid_hash_chains(self):
+        # The producer's policy is recursive. UNKNOWN/UNPAID references are
+        # permitted to omit a scalar ref, but cannot smuggle restricted keys.
+        unsafe = [
+            {"email": "synthetic"},
+            {"safe": {"CoMpAnY_NaMe": "synthetic"}},
+            [{"Buyer": "synthetic"}],
+            {"safe": [{"notes": "synthetic"}]},
+            {"ROI": 1},
+            {"safe": {"items": [None, {"free_text": "synthetic"}]}},
+        ]
+        for state in ("UNKNOWN", "UNPAID"):
+            for value in unsafe:
+                with self.subTest(state=state, shape=repr(value)):
+                    current = event("PAYMENT", data={
+                        "state": state, "payment_evidence_ref": value,
+                    })
+                    raw = producer_ledger(current)
+                    with self.assertRaises(CaptureBriefObservationError) as denied:
+                        self.reader(snapshot(raw)).observe(now=NOW)
+                    self.assertNotIn("synthetic", str(denied.exception))
+                    self.assertTrue(denied.exception.__suppress_context__)
+
+    def test_unknown_and_unpaid_scalar_receipt_controls_still_pass(self):
+        # Preserve the source producer's optional field semantics and no
+        # customer/financial verification in the consumer read projection.
+        for state in ("UNKNOWN", "UNPAID"):
+            for mode in ("missing", "null", "scalar"):
+                with self.subTest(state=state, mode=mode):
+                    data = {"state": state}
+                    if mode == "null":
+                        data["payment_evidence_ref"] = None
+                    if mode == "scalar":
+                        data["payment_evidence_ref"] = "processor:synthetic-receipt"
+                    result = self.reader(snapshot(producer_ledger(
+                        event("PAYMENT", data=data)))).observe(now=NOW)
+                    self.assertEqual(1, result["outcome_event_count"])
+                    self.assertEqual("UNVERIFIED_BY_READER", result["source_authenticity"])
+                    self.assertEqual("NOT_CONNECTED", result["account_identity_binding"])
+                    self.assertTrue(all(v is None for v in result["verified_metrics"].values()))
+
+    def test_non_outcome_payload_semantics_stay_uninterpreted(self):
+        # Generic evidence ledger events are not commercial outcome events.
+        record = json.loads(producer_ledger(event("EFFORT")).decode("utf-8"))
+        record["record_type"] = "SYNTHETIC_OTHER_EVIDENCE"
+        record["payload"] = {"nested": [{"email": "synthetic"}]}
+        record["payload_sha256"] = digest(canonical(record["payload"]))
+        record["record_sha256"] = digest(canonical({
+            k: v for k, v in record.items() if k != "record_sha256"
+        }))
+        raw = (json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n").encode()
+        result = self.reader(snapshot(raw)).observe(now=NOW)
+        self.assertEqual(1, result["ledger_record_count"])
+        self.assertEqual(0, result["outcome_event_count"])
+        self.assertEqual(0, result["distinct_case_count_not_customer_count"])
 
     def test_genuinely_present_empty_snapshot_not_missing_file(self):
         got = self.reader(snapshot()).observe(now=NOW)

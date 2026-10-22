@@ -266,5 +266,44 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(result["validated_recovery_cents"], 0)
 
 
+    def test_repeated_original_invoice_face_must_not_be_silently_overwritten(self):
+        from freight.real_document_lab import index_unique_invoice_faces
+        a = InvoiceFace("arcbest", "051894063", 16, 212379,
+                        None, "2024-05-02", "LTL")
+        same_identical = InvoiceFace("arcbest", "051894063", 18, 212379,
+                                     None, "2024-05-02", "LTL")
+        changed_amount = InvoiceFace("arcbest", "051894063", 18, 212380,
+                                     None, "2024-05-02", "LTL")
+        for duplicate in (same_identical, changed_amount):
+            with self.subTest(case=duplicate.cents), self.assertRaisesRegex(
+                ValueError, "DUPLICATE_PUBLIC_ORIGINAL_INVOICE_FACE"
+            ) as cm:
+                index_unique_invoice_faces([a, duplicate], "arcbest")
+            self.assertNotIn(a.number, str(cm.exception))
+        self.assertEqual(index_unique_invoice_faces([a], "arcbest"), {a.number: a})
+
+    def test_pdf_adapter_rejects_repeated_original_invoice_face_id(self):
+        from freight.real_document_lab import extract_faces, check_anchors
+        original = (
+            "ORIGINAL INVOICE\n"
+            "Service: LTL\n"
+            "Freight bill No: 051894063\n"
+            "Shipment Date: 05/02/2024\n"
+            "AMOUNT DUE: $2,123.79\n"
+        )
+        with self.assertRaisesRegex(
+            ValueError, "DUPLICATE_PUBLIC_ORIGINAL_INVOICE_FACE"
+        ):
+            extract_faces("arcbest", [original, original])
+        prior = InvoiceFace("arcbest", "051894063", 16, 212379, None,
+                            "2024-05-02", "LTL")
+        mutated = InvoiceFace("arcbest", "051894063", 19, 212380, None,
+                              "2024-05-02", "LTL")
+        with self.assertRaisesRegex(
+            ValueError, "DUPLICATE_PUBLIC_ORIGINAL_INVOICE_FACE"
+        ):
+            check_anchors([prior, mutated], {"051894063": (19, 212380)})
+
+
 if __name__ == "__main__":
     unittest.main()

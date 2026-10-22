@@ -75,8 +75,7 @@ def run_simulated_acceptance() -> dict:
         accounting_invoice_population=273,accounting_matched=273,
         accounting_cross_scope_errors=0,freight_labeled=0,
         freight_unknown=110,precision=None,
-        rights_approved=True, independent_review_approved=True,
-        production_approved=True)
+        rights_approved=True, production_approved=True)
     checks={
         "synthetic_invoice_rating_candidate_positive":
             rating.variance_cents==2700,

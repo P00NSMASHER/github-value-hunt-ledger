@@ -10,17 +10,17 @@ This is a cautious retrieval-method curriculum, not an autonomous command. It ba
 
 | Move type | Recommended share | Uses | Productive hit | Retrieval-limited | Evidence |
 |---|---:|---:|---:|---:|---|
-| direct_domain_search | 9.1% | 0 | — | — | insufficient |
+| adjacent_domain_invariant | 9.1% | 0 | — | — | insufficient |
 | code_signature_search | 9.1% | 0 | — | — | insufficient |
+| contributor_or_commit_lineage | 9.1% | 0 | — | — | insufficient |
+| direct_domain_search | 9.1% | 0 | — | — | insufficient |
+| history_archaeology | 9.1% | 0 | — | — | insufficient |
+| independent_comparator | 9.1% | 0 | — | — | insufficient |
 | official_source_trace | 9.1% | 0 | — | — | insufficient |
 | organization_graph | 9.1% | 0 | — | — | insufficient |
-| contributor_or_commit_lineage | 9.1% | 0 | — | — | insufficient |
-| paper_to_code_lineage | 9.1% | 0 | — | — | insufficient |
-| package_or_dependency_graph | 9.1% | 0 | — | — | insufficient |
-| adjacent_domain_invariant | 9.1% | 0 | — | — | insufficient |
-| independent_comparator | 9.1% | 0 | — | — | insufficient |
-| history_archaeology | 9.1% | 0 | — | — | insufficient |
 | other | 9.1% | 0 | — | — | insufficient |
+| package_or_dependency_graph | 9.1% | 0 | — | — | insufficient |
+| paper_to_code_lineage | 9.1% | 0 | — | — | insufficient |
 
 ## Use
 

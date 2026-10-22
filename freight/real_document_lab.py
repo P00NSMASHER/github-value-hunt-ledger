@@ -25,6 +25,11 @@ from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from freight.ingestion_gateway import IngressEnvelope, ingest_bytes
+from freight.pennine_publication_integrity import (
+    require_canonical_source_identity,
+    require_matching_payment_annotations,
+    require_stable_invoice_economics,
+)
 from recoveryworks.reconciliation_kernel import (
     ManyToOneConfig, ReconConfig, ReconTxn, parse_amount_to_minor, reconcile,
 )
@@ -307,6 +312,35 @@ def _arcbest_page(text: str, page: int) -> InvoiceFace | None:
                        parsed_mode, None if amount else "FACE_AMOUNT_UNREADABLE")
 
 
+def index_unique_invoice_faces(
+    faces: list[InvoiceFace], issuer: str,
+) -> dict[str, InvoiceFace]:
+    """Index a single original PDF without masking duplicate invoice faces.
+
+    Repeated face IDs may be duplicate pages, conflicting invoice amounts or
+    extraction mistakes. All are review-required source ambiguities; never
+    last-write-wins. Diagnostic errors intentionally omit invoice identifiers.
+    """
+    if issuer not in {"globaltranz", "arcbest"} or type(faces) is not list:
+        raise ValueError("INVALID_PUBLIC_INVOICE_FACE_CATALOG")
+    unique: dict[str, InvoiceFace] = {}
+    for face in faces:
+        if (
+            type(face) is not InvoiceFace
+            or face.issuer != issuer
+            or type(face.number) is not str
+            or not face.number.strip()
+            or type(face.page) is not int
+            or face.page < 1
+            or (face.cents is not None and type(face.cents) is not int)
+        ):
+            raise ValueError("INVALID_PUBLIC_INVOICE_FACE_CATALOG")
+        if face.number in unique:
+            raise ValueError("DUPLICATE_PUBLIC_ORIGINAL_INVOICE_FACE")
+        unique[face.number] = face
+    return unique
+
+
 def extract_faces(issuer: str, texts: list[str]) -> list[InvoiceFace]:
     selected = []
     for index, text in enumerate(texts):
@@ -316,6 +350,7 @@ def extract_faces(issuer: str, texts: list[str]) -> list[InvoiceFace]:
                   else _arcbest_page(text, index + 1))
         if result:
             selected.append(result)
+    index_unique_invoice_faces(selected, issuer)
     return selected
 
 
@@ -341,7 +376,7 @@ def statement_rows(texts: list[str]) -> list[dict]:
 
 
 def check_anchors(faces: list[InvoiceFace], anchors: dict) -> dict:
-    by_id = {f.number: f for f in faces}
+    by_id = index_unique_invoice_faces(faces, faces[0].issuer) if faces else {}
     checks = []
     for number, (page, cents) in anchors.items():
         face = by_id.get(number)
@@ -475,6 +510,32 @@ def _recon_result(a: list[ReconTxn], b: list[ReconTxn], lookup: dict[str, str] |
 
 
 
+def _validate_replay_group_binding(row: ReconTxn, group: str) -> None:
+    """Bind a claimed source remittance partition to the actual transaction.
+
+    Full publisher keys contain supplier, reference, date and currency; compact
+    synthetic fixtures contain the reference alone. Both forms must agree with
+    original source-derived transaction fields before invoking the kernel.
+    """
+    if type(group) is not str or not group or group != group.strip():
+        raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+    parts = group.split(chr(31))
+    if len(parts) == 4:
+        supplier, reference, date, currency = parts
+        if (
+            not supplier or supplier != supplier.strip()
+            or not reference or (reference, date, currency) != (
+                row.reference, row.date, row.currency
+            )
+        ):
+            raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+    elif len(parts) == 1:
+        if group != row.reference:
+            raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+    else:
+        raise ValueError("PUBLIC_SOURCE_GROUP_BINDING_MISMATCH")
+
+
 def reference_scoped_replay(
     invoices: list[ReconTxn], counterpart: list[ReconTxn],
     invoice_group: dict[str, str], payment_group: dict[str, str],
@@ -487,8 +548,31 @@ def reference_scoped_replay(
     The reference-scoped adapter cannot pair an invoice with another remittance
     and preserves the original unscoped result for a comparative diagnostic.
     No bank payment is manufactured: counterparts remain same-source aggregate
-    declarations. Groups above the explicit bound abstain.
+    declarations. Groups above the explicit bound abstain. Mapping labels
+    cannot silently contradict the source-derived reference, date or currency.
     """
+    # The kernel's many-to-one candidate window is 18; a larger bound would
+    # silently under-search some supposedly eligible remittance partitions.
+    if type(max_group_size) is not int or not 1 <= max_group_size <= 18:
+        raise ValueError("INVALID_SOURCE_GROUP_BOUND")
+    if type(invoices) is not list or type(counterpart) is not list:
+        raise ValueError("PUBLIC_SOURCE_TRANSACTIONS_INVALID")
+    all_rows = invoices + counterpart
+    if any(type(row) is not ReconTxn or type(row.id) is not str or not row.id
+           for row in all_rows):
+        raise ValueError("PUBLIC_SOURCE_TRANSACTIONS_INVALID")
+    all_ids = [row.id for row in all_rows]
+    if len(set(all_ids)) != len(all_ids):
+        raise ValueError("DUPLICATE_SOURCE_TRANSACTION_ID")
+    if (type(invoice_group) is not dict or type(payment_group) is not dict
+            or set(invoice_group) != {row.id for row in invoices}
+            or set(payment_group) != {row.id for row in counterpart}):
+        raise ValueError("PUBLIC_SOURCE_GROUP_LABEL_COVERAGE_MISMATCH")
+    for row in invoices:
+        _validate_replay_group_binding(row, invoice_group[row.id])
+    for row in counterpart:
+        _validate_replay_group_binding(row, payment_group[row.id])
+
     by_invoice: dict[str, list[ReconTxn]] = defaultdict(list)
     by_payment: dict[str, list[ReconTxn]] = defaultdict(list)
     for row in invoices:
@@ -500,6 +584,9 @@ def reference_scoped_replay(
     result_by_rule: Counter = Counter()
     grouped_matched = 0
     grouped_unmatched = 0
+    grouped_matched_counterparts = 0
+    grouped_unmatched_counterparts = 0
+    unmatched_source_declaration_groups = 0
     wrong_join = 0
     groups_matched = 0
     limit_groups = 0
@@ -510,11 +597,15 @@ def reference_scoped_replay(
         settlement = by_payment.get(ref, [])
         if not internal or not settlement:
             grouped_unmatched += len(internal)
+            grouped_unmatched_counterparts += len(settlement)
+            unmatched_source_declaration_groups += int(bool(settlement))
             continue
         if len(internal) > max_group_size:
             limit_groups += 1
             limit_invoices += len(internal)
             grouped_unmatched += len(internal)
+            grouped_unmatched_counterparts += len(settlement)
+            unmatched_source_declaration_groups += int(bool(settlement))
             continue
         config = ReconConfig(
             decimals=2, date_window_days=0, amount_tolerance_bps=0,
@@ -526,6 +617,11 @@ def reference_scoped_replay(
         result_by_rule.update(replay.summary.by_rule)
         grouped_matched += replay.summary.matched_internal
         grouped_unmatched += replay.summary.unmatched_internal
+        grouped_matched_counterparts += replay.summary.matched_settlement
+        grouped_unmatched_counterparts += replay.summary.unmatched_settlement
+        unmatched_source_declaration_groups += int(
+            replay.summary.unmatched_settlement > 0
+        )
         groups_matched += replay.summary.matched_settlement
         for match in replay.matches:
             for aid in match.internal_ids:
@@ -540,6 +636,16 @@ def reference_scoped_replay(
         "same_source_payment_reference_groups": len(by_payment),
         "matched_invoices": grouped_matched,
         "unmatched_invoices": grouped_unmatched,
+        "matched_counterparts": grouped_matched_counterparts,
+        "unmatched_counterparts": grouped_unmatched_counterparts,
+        "unmatched_source_declaration_groups": unmatched_source_declaration_groups,
+        "source_declaration_reconciliation_complete": bool(
+            invoices and counterpart
+            and grouped_unmatched == 0
+            and grouped_unmatched_counterparts == 0
+            and wrong_join == 0
+            and limit_groups == 0
+        ),
         "matched_groups": groups_matched,
         "unmatched_over_group_bound_invoices": limit_invoices,
         "groups_over_group_bound": limit_groups,
@@ -550,6 +656,8 @@ def reference_scoped_replay(
     }
     if grouped_matched + grouped_unmatched != len(invoices):
         raise ValueError("invoice-count conservation failed")
+    if grouped_matched_counterparts + grouped_unmatched_counterparts != len(counterpart):
+        raise ValueError("source-declaration-count conservation failed")
     return report
 
 
@@ -572,7 +680,8 @@ def adversarial_declared_payment_controls(
     if exemplar is None:
         raise ValueError("no singleton payment declaration for negative controls")
     base = reference_scoped_replay(invoices, counterparts, invoice_group, payment_group)
-    if base["matched_invoices"] != len(invoices):
+    if (base["matched_invoices"] != len(invoices)
+            or not base["source_declaration_reconciliation_complete"]):
         raise ValueError("cannot assess controlled corruption before structural baseline matches")
 
     def altered(*, amount: str | None = None, currency: str | None = None) -> list[ReconTxn]:
@@ -590,23 +699,42 @@ def adversarial_declared_payment_controls(
         invoices, altered(amount=tampered_amount), invoice_group, payment_group)
     wrong_ref_map = dict(payment_group)
     wrong_ref_map[exemplar.id] = "LAB_NEGATIVE_CONTROL_DIFFERENT_PAYMENT_REFERENCE"
-    # This deliberately changes only the reference-group matching assertion.
-    wrong_ref_result = reference_scoped_replay(
-        invoices, counterparts, invoice_group, wrong_ref_map)
-    wrong_currency_result = reference_scoped_replay(
-        invoices, altered(currency="USD"), invoice_group, payment_group)
+    # The hardened entry boundary rejects a source-label mismatch even before
+    # its amount/date fallback can silently match an incorrectly labeled row.
+    wrong_ref_held = False
+    try:
+        wrong_ref_result = reference_scoped_replay(
+            invoices, counterparts, invoice_group, wrong_ref_map)
+        wrong_ref_held = wrong_ref_result["unmatched_invoices"] == 1
+    except ValueError as exc:
+        if str(exc) != "PUBLIC_SOURCE_GROUP_BINDING_MISMATCH":
+            raise
+        wrong_ref_held = True
+
+    wrong_currency_held = False
+    try:
+        wrong_currency_result = reference_scoped_replay(
+            invoices, altered(currency="USD"), invoice_group, payment_group)
+        wrong_currency_held = wrong_currency_result["unmatched_invoices"] == 1
+    except ValueError as exc:
+        if str(exc) != "PUBLIC_SOURCE_GROUP_BINDING_MISMATCH":
+            raise
+        wrong_currency_held = True
 
     duplicate_rejected = False
     try:
         reference_scoped_replay(
             invoices, counterparts + [exemplar], invoice_group, payment_group)
     except ValueError as exc:
-        duplicate_rejected = "ambiguous source-declared grouped counterpart" in str(exc)
+        duplicate_rejected = str(exc) in {
+            "ambiguous source-declared grouped counterpart",
+            "DUPLICATE_SOURCE_TRANSACTION_ID",
+        }
 
     checks = {
         "one_penny_corrupt_declaration_unmatched": penny_result["unmatched_invoices"] == 1,
-        "wrong_payment_reference_unmatched": wrong_ref_result["unmatched_invoices"] == 1,
-        "wrong_currency_unmatched": wrong_currency_result["unmatched_invoices"] == 1,
+        "wrong_payment_reference_unmatched": wrong_ref_held,
+        "wrong_currency_unmatched": wrong_currency_held,
         "duplicate_payment_declaration_rejected": duplicate_rejected,
     }
     return {
@@ -634,7 +762,7 @@ def benchmark_freight() -> dict:
         faces = extract_faces(issuer, texts)
         anchor = check_anchors(faces,
             GLOBAL_FACE_ANCHORS if issuer == "globaltranz" else ARCBEST_FACE_ANCHORS)
-        unique = {f.number: f for f in faces}
+        unique = index_unique_invoice_faces(faces, issuer)
         out = {
             "source_url": url,
             "sha256": digest(raw),
@@ -857,6 +985,11 @@ def _key(row: dict, fields: tuple[str, ...]) -> str:
     return "\x1f".join(str(row[k]) for k in fields)
 
 
+def _payment_scope_key(row: dict) -> str:
+    """Supplier is part of remittance identity; identical payment numbers alone are not."""
+    return _key(row, ("supplier number", "payment number", "payment date", "payment currency"))
+
+
 def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
     data = raw.decode("utf-8-sig", errors="strict")
     reader = csv.reader(io.StringIO(data, newline=""), strict=True)
@@ -869,17 +1002,28 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
         names = [re.sub(r"\s+", " ", v.strip().casefold()) for v in row]
         if headings is None:
             if all(n in names for n in required):
+                if any(names.count(name) != 1 for name in required):
+                    raise ValueError("AMBIGUOUS_PUBLIC_SOURCE_HEADERS")
                 headings = {name: names.index(name) for name in required}
             continue
         if not row or all(not x.strip() for x in row):
             continue
         if max(headings.values()) >= len(row):
-            continue
+            raise ValueError("TRUNCATED_PUBLIC_CSV_INVOICE_RECORD")
         x = {name: row[pos].strip() for name, pos in headings.items()}
         if not x["invoice number"] and not x["payment number"]:
-            continue
+            # Both adapters must fail closed on populated, unidentifiable rows.
+            raise ValueError("MISSING_PUBLIC_INVOICE_AND_PAYMENT_ID")
         if not x["supplier number"] or not x["invoice number"]:
             raise ValueError("missing invoice identity in source month")
+        for name in ("supplier number", "invoice number"):
+            require_canonical_source_identity(
+                x[name], raw_value=row[headings[name]],
+            )
+        require_canonical_source_identity(
+            x["payment number"], allow_empty=True,
+            raw_value=row[headings["payment number"]],
+        )
         x["invoice date"] = iso_date(x["invoice date"])
         x["payment date"] = iso_date(x["payment date"])
         x["invoice_amount_minor"] = minor(x["invoice amount"])
@@ -895,14 +1039,52 @@ def parse_pennine_csv(raw: bytes, month: str) -> list[dict]:
     return rows
 
 
+def verify_public_csv_adapter_parity(
+    laboratory_rows: list[dict], publisher_rows: tuple[dict, ...] | list[dict],
+) -> int:
+    """Check independent parser outputs for exact same-source row multiset.
+
+    Both parsers consume the same public source; agreement is a parser
+    consistency test, not a second bank ledger or payment authentication.
+    Never include private source identifiers in raised errors or reports.
+    """
+    if type(laboratory_rows) is not list or type(publisher_rows) not in (list, tuple):
+        raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_INVALID")
+    fields = ("supplier number", "invoice number", "invoice date",
+              "payment number", "payment date", "payment currency",
+              "payment status name")
+
+    def row_key(row: dict, amount_field: str) -> tuple:
+        try:
+            amount = row[amount_field]
+            parts = tuple(row[field] for field in fields)
+        except (TypeError, KeyError):
+            raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_INVALID") from None
+        if type(amount) is not int or any(type(value) is not str for value in parts):
+            raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_INVALID")
+        return parts + (amount,)
+
+    left = Counter(row_key(row, "invoice_amount_minor") for row in laboratory_rows)
+    right = Counter(row_key(row, "invoice amount minor") for row in publisher_rows)
+    if left != right:
+        raise ValueError("PUBLIC_CSV_ADAPTER_PARITY_MISMATCH")
+    return len(laboratory_rows)
+
+
 def benchmark_pennine() -> dict:
+    from freight.public_pennine_integration import decode_month as independent_decode_month
+
     all_rows: list[dict] = []
     source_hashes = {}
     monthly_counts = {}
+    parity_records = 0
     for month, url in PENNINE.items():
         raw = fetch_public(url)
         require_frozen_source("pennine", month, raw)
         rows = parse_pennine_csv(raw, month)
+        parity_records += verify_public_csv_adapter_parity(
+            rows, independent_decode_month(raw, month),
+        )
         monthly_counts[month] = len(rows)
         source_hashes[month] = {"url": url, "sha256": digest(raw), "bytes": len(raw)}
         all_rows.extend(rows)
@@ -912,9 +1094,21 @@ def benchmark_pennine() -> dict:
     declaration_fields = inv_fields + ("payment number", "payment date", "payment currency")
     by_identity: dict[str, list[dict]] = defaultdict(list)
     by_decl: dict[str, list[dict]] = defaultdict(list)
+    supplier_invoice_first: dict[tuple[str, str], dict] = {}
     for row in all_rows:
+        supplier_invoice = (row["supplier number"], row["invoice number"])
+        if supplier_invoice in supplier_invoice_first:
+            require_stable_invoice_economics(
+                supplier_invoice_first[supplier_invoice], row,
+                amount_field="invoice_amount_minor",
+            )
+        else:
+            supplier_invoice_first[supplier_invoice] = row
         by_identity[_key(row, inv_fields)].append(row)
         by_decl[_key(row, declaration_fields)].append(row)
+    for group in by_identity.values():
+        for republished in group[1:]:
+            require_matching_payment_annotations(group[0], republished)
     unique_rows = [group[0] for group in by_identity.values()]
     disclosed_overlap = sum(len(x) - 1 for x in by_identity.values())
     repeated_declarations = sum(len(x) - 1 for x in by_decl.values())
@@ -932,7 +1126,7 @@ def benchmark_pennine() -> dict:
     payment_group: dict[str, str] = {}
     for row in unique_rows:
         key = _key(row, inv_fields)
-        pay_key = _key(row, ("payment number", "payment date", "payment currency"))
+        pay_key = _payment_scope_key(row)
         tid = "inv:" + _safe_sha(key)
         invoice_group[tid] = pay_key
         invoices.append(ReconTxn(
@@ -971,8 +1165,11 @@ def benchmark_pennine() -> dict:
         "source_files": source_hashes,
         "monthly_rows": monthly_counts,
         "original_disclosed_rows": len(all_rows),
+        "same_source_dual_adapter_parity_verified": True,
+        "same_source_dual_adapter_records_cross_checked": parity_records,
         "unique_invoice_economic_identities": len(by_identity),
         "repeated_invoice_disclosures_not_duplicate_payments": disclosed_overlap,
+        "republication_payment_annotations_consistent": True,
         "exact_repeated_declarations": repeated_declarations,
         "cross_month_repeated_rows": cross_month_repeats,
         "invoice_identity_with_changed_payment_reference": changed_payment_ids,

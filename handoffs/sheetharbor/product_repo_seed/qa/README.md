@@ -21,4 +21,10 @@ It does not mutate the canonical source files. For each workbook it:
 9. recalculates and repeats the checks;
 10. writes `excel-roundtrip-results.json` with the Excel version/build and per-product evidence.
 
-A nonzero exit code blocks release.
+A nonzero exit code blocks release. Formula-error inspection covers every worksheet
+and fails on inspection errors. Windows PowerShell collection results use explicit
+arrays so the gate can produce its receipt on both Windows PowerShell and PowerShell.
+
+Actual October 21, 2026 acceptance: all four unchanged canonical workbooks passed
+on Microsoft Excel 16.0 build 17830. The exact source and exported-copy hashes are
+retained in `../release/v0.2.0-alpha/excel-roundtrip-results-2026-10-21.json`.

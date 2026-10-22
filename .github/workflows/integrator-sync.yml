@@ -29,9 +29,18 @@ jobs:
           fetch-depth: 0
       - name: Preserve triggered payload and update checkout
         shell: bash
+        env:
+          RETALLY_BEFORE_SHA: ${{ github.event.before }}
+          RETALLY_SOURCE_SHA: ${{ github.sha }}
         run: |
           cp .github/integrator_sync_payload.md /tmp/integrator_sync_payload.md
           git pull --rebase origin main
+          python -m tools.retally_payload_incremental \
+            --kind integrator \
+            --before "$RETALLY_BEFORE_SHA" \
+            --after "$RETALLY_SOURCE_SHA" \
+            --input /tmp/integrator_sync_payload.md \
+            --output /tmp/integrator_sync_delta_payload.md
       - name: Apply integrator payload
         shell: bash
         run: |
@@ -62,7 +71,7 @@ jobs:
                   raise SystemExit(f'path escapes repository: {rel}')
               return resolved, normalized
 
-          text = Path('/tmp/integrator_sync_payload.md').read_text()
+          text = Path('/tmp/integrator_sync_delta_payload.md').read_text()
           lines = text.splitlines()
           if not lines or not lines[0].startswith('MARKER: '):
               raise SystemExit('payload must start with MARKER: ')
