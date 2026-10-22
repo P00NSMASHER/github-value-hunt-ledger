@@ -10,7 +10,7 @@ import sys
 import time
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
@@ -196,6 +196,102 @@ class ProviderTests(unittest.TestCase):
                         name="Compute Instance Run Command",status=state)])
         with self.assertRaises(m.auth.Refused):
             m.check_plugin([])
+
+    def test_existing_command_poll_recovers_after_transient_404_without_recreate(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        class NotVisible(Exception):
+            status = 404
+            code = "NotAuthorizedOrNotFound"
+        terminal = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="SUCCEEDED",
+            content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                    text=m.MARKER + "\n"))
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = [
+            NotVisible(), NotVisible(), SimpleNamespace(data=terminal)]
+        with patch.object(m.time, "sleep") as sleeper:
+            m.poll_existing_command(command, command_id, vm_id, max_attempts=4,
+                                    delay_seconds=1)
+        self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
+        self.assertEqual(sleeper.call_count, 2)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_existing_command_poll_exhausts_404_without_recreate(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        class NotVisible(Exception):
+            status = 404
+            code = "NotAuthorizedOrNotFound"
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = NotVisible()
+        with patch.object(m.time, "sleep") as sleeper:
+            with self.assertRaisesRegex(m.auth.Refused, "EXECUTION_LOOKUP_UNVERIFIED"):
+                m.poll_existing_command(command, command_id, vm_id,
+                                        max_attempts=3, delay_seconds=1)
+        self.assertEqual(command.get_instance_agent_command_execution.call_count, 3)
+        self.assertEqual(sleeper.call_count, 2)
+        command.create_instance_agent_command.assert_not_called()
+
+    def test_existing_command_poll_rejects_other_provider_errors_immediately(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        for status, code in ((401, "NotAuthenticated"), (403, "Forbidden"),
+                             (404, "InvalidParameter"), (429, "TooManyRequests"),
+                             (500, "InternalError")):
+            with self.subTest(status=status, code=code):
+                exc = type("RemoteReadError", (Exception,),
+                           {"status": status, "code": code})()
+                command = Mock()
+                command.get_instance_agent_command_execution.side_effect = exc
+                with patch.object(m.time, "sleep") as sleeper:
+                    with self.assertRaisesRegex(m.auth.Refused,
+                                                "EXECUTION_LOOKUP_UNVERIFIED"):
+                        m.poll_existing_command(command, command_id, vm_id,
+                                                max_attempts=4, delay_seconds=1)
+                command.get_instance_agent_command_execution.assert_called_once_with(
+                    command_id, vm_id)
+                sleeper.assert_not_called()
+                command.create_instance_agent_command.assert_not_called()
+
+    def test_existing_command_poll_rejects_mismatched_or_failed_execution(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        for wrong_command, state in (("other", "SUCCEEDED"),
+                                     (command_id, "FAILED")):
+            with self.subTest(wrong_command=wrong_command, state=state):
+                record = SimpleNamespace(instance_agent_command_id=wrong_command,
+                    instance_id=vm_id, lifecycle_state=state,
+                    content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                            text=m.MARKER + "\n"))
+                command = Mock()
+                command.get_instance_agent_command_execution.return_value = SimpleNamespace(
+                    data=record)
+                with patch.object(m.time, "sleep") as sleeper:
+                    with self.assertRaises(m.auth.Refused):
+                        m.poll_existing_command(command, command_id, vm_id,
+                                                max_attempts=4, delay_seconds=1)
+                sleeper.assert_not_called()
+                command.create_instance_agent_command.assert_not_called()
+
+    def test_poll_in_progress_then_success_bounded(self):
+        command_id = "ocid1.instanceagentcommand.oc1.dummy"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        result = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="IN_PROGRESS", content=None)
+        success = SimpleNamespace(instance_agent_command_id=command_id,
+            instance_id=vm_id, lifecycle_state="SUCCEEDED",
+            content=SimpleNamespace(output_type="TEXT", exit_code=0,
+                                    text=m.MARKER + "\n"))
+        command = Mock()
+        command.get_instance_agent_command_execution.side_effect = [
+            SimpleNamespace(data=result), SimpleNamespace(data=success)]
+        with patch.object(m.time, "sleep") as sleeper:
+            m.poll_existing_command(command, command_id, vm_id,
+                                    max_attempts=2, delay_seconds=1)
+        self.assertEqual(command.get_instance_agent_command_execution.call_count, 2)
+        sleeper.assert_called_once_with(1)
+        command.create_instance_agent_command.assert_not_called()
 
     def test_script_is_fixed_short_nonroot_and_no_write(self):
         self.assertLess(len(m.CANARY.encode()), 4096)

@@ -175,6 +175,36 @@ def check_execution(run: object, command_id: str, vm_id: str) -> bool:
     return True
 
 
+def poll_existing_command(command, command_id: str, instance_id: str,
+                          max_attempts: int = 45, delay_seconds: int = 4) -> None:
+    """Poll the *same* accepted command. Never resubmit on lookup errors.
+
+    OCI Audit reproduced a 404 on a read just milliseconds after successful
+    command creation. A bounded 404-only read retry permits propagation while
+    retaining refusal for other errors and all unverified output/identities.
+    """
+    auth.require(max_attempts >= 1 and delay_seconds >= 0, "EXECUTION_LOOKUP_UNVERIFIED")
+    for attempt in range(max_attempts):
+        try:
+            result = command.get_instance_agent_command_execution(
+                command_id, instance_id).data
+        except Exception as exc:
+            # Oracle can return NotAuthorizedOrNotFound before a just-created
+            # command has propagated. An actual permission denial with the same
+            # code still fails after a finite number of READS. Never recreate.
+            if (getattr(exc, "status", None) == 404 and
+                    getattr(exc, "code", None) in ("NotAuthorizedOrNotFound", "NotFound") and
+                    attempt + 1 < max_attempts):
+                time.sleep(delay_seconds)
+                continue
+            raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
+        if check_execution(result, command_id, instance_id):
+            return
+        if attempt + 1 < max_attempts:
+            time.sleep(delay_seconds)
+    raise auth.Refused("EXECUTION_UNCONFIRMED_NO_RETRY")
+
+
 def execute_canary(env: dict[str, str]) -> None:
     check_context(env)  # Before importing OCI or doing any network I/O.
     from cryptography.hazmat.primitives import serialization
@@ -229,18 +259,7 @@ def execute_canary(env: dict[str, str]) -> None:
     auth.require(isinstance(command_id, str) and
                  command_id.startswith("ocid1.instanceagentcommand."),
                  "COMMAND_ACKNOWLEDGEMENT_INVALID")
-    for _ in range(60):
-        try:
-            result = command.get_instance_agent_command_execution(
-                command_id, env["RETALLY_OCI_VM_OCID"]).data
-            if check_execution(result, command_id, env["RETALLY_OCI_VM_OCID"]):
-                return
-        except auth.Refused:
-            raise
-        except Exception:
-            raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
-        time.sleep(4)
-    raise auth.Refused("EXECUTION_UNCONFIRMED_NO_RETRY")
+    poll_existing_command(command, command_id, env["RETALLY_OCI_VM_OCID"])
 
 
 PUBLIC_CODES = {
