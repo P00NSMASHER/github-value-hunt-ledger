@@ -6,12 +6,21 @@ on:
       - 'freight/original_pdf_extraction.py'
       - 'freight/test_original_pdf_extraction_r2.py'
       - 'freight/R2_DOCUMENT_INTELLIGENCE.md'
+      - 'freight/priority2_evidence.py'
+      - 'freight/priority2_pipeline.py'
+      - 'freight/test_priority2_evidence.py'
+      - 'freight/test_priority2_pipeline.py'
+      - 'freight/PRIORITY2_SOURCE_BOUND_ACCEPTANCE.md'
       - '.github/workflows/retally-r2-documents.yml'
   push:
     branches: [main]
     paths:
       - 'freight/original_pdf_extraction.py'
       - 'freight/test_original_pdf_extraction_r2.py'
+      - 'freight/priority2_evidence.py'
+      - 'freight/priority2_pipeline.py'
+      - 'freight/test_priority2_evidence.py'
+      - 'freight/test_priority2_pipeline.py'
       - '.github/workflows/retally-r2-documents.yml'
 
 permissions:
@@ -29,8 +38,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install --disable-pip-version-check --no-input pytest pymupdf==1.26.5
-      - name: Isolated document adapter failure controls
-        run: PYTHONPATH=. python -m pytest -q freight/test_original_pdf_extraction_r2.py
+      - name: Isolated original PDF, strict rate and reconciliation evidence tests
+        run: PYTHONPATH=. python -m pytest -q freight/test_original_pdf_extraction_r2.py freight/test_priority2_evidence.py freight/test_priority2_pipeline.py
       - name: Replay both frozen original court PDFs and typed discounts
         env:
           PYTHONDONTWRITEBYTECODE: '1'
@@ -41,11 +50,21 @@ jobs:
           from freight.original_pdf_extraction import (
               fetch_frozen_public_original, parse_original_pdf, safe_summary,
           )
+          from freight.priority2_pipeline import review_original_extraction
           originals = {}
           for issuer in ("GLOBALTRANZ", "ARCBEST"):
               raw = fetch_frozen_public_original(issuer)
               batch = parse_original_pdf(issuer, raw)
               originals[issuer] = safe_summary(batch)
+              evidence = review_original_extraction(batch, original_pdf_bytes=raw)
+              assert evidence.frozen_original_population_complete
+              assert evidence.face_amounts_verified == batch.invoice_count
+              assert evidence.invoices_missing_freight_accuracy_evidence == batch.invoice_count
+              assert evidence.unresolved_invoice_count == batch.invoice_count
+              assert evidence.commercially_recovered_cents == 0
+              assert evidence.independently_adjudicated_freight_errors == 0
+              assert evidence.bank_cleared_payment_receipts == 0
+              assert evidence.real_precision is None and evidence.real_recall is None
           assert originals["GLOBALTRANZ"]["original_invoice_count"] == 100
           assert originals["GLOBALTRANZ"]["exact_original_invoice_amount_count"] == 100
           assert originals["GLOBALTRANZ"]["typed_discount_or_credit_invoice_count"] == 93
