@@ -15,6 +15,7 @@ from freight.site.verify_production_site import (
     APPROVED_MEDIA, LiveAuditError, ensure_html, ensure_logo,
     ensure_security_headers, ensure_ltl_comparator, LTL_COMPARATOR_PAGE,
     ensure_blank_evidence_ledger, fetch, TRANSIENT_504_RETRY_DELAYS_SECONDS,
+    ensure_freight_home, verify_recoveryworks_handoff, RECOVERYWORKS_CANONICAL,
 )
 
 
@@ -103,6 +104,39 @@ class ProductionSmokeInvariantTests(unittest.TestCase):
             if csp else "default-src 'self'"
         )
         return h
+
+    def test_group_catalogue_cannot_replace_freight_home(self):
+        home = ('<body class="home-simple"><h1>Find it.</h1>'
+                '<form id="auditForm"></form><section id="start-audit"></section>'
+                '<section id="pricing"></section></body>')
+        ensure_freight_home(home)
+        for broken in (home.replace('id="auditForm"', 'id="removed"'),
+                       home.replace('class="home-simple"', 'class="group-site"'),
+                       home + '<div class="portfolio-bar"></div>'):
+            with self.assertRaises(LiveAuditError):
+                ensure_freight_home(broken)
+
+    def test_successor_handoff_requires_exact_destination_and_valid_page(self):
+        page = ('<link rel="canonical" href="' + RECOVERYWORKS_CANONICAL + '">').encode()
+        fetcher = MagicMock(side_effect=[
+            (301, {"Location": RECOVERYWORKS_CANONICAL}, b""),
+            (200, self.headers(), page),
+        ])
+        verify_recoveryworks_handoff(fetcher)
+        self.assertEqual(fetcher.call_args_list, [
+            call(CANONICAL + "recoveryos/"), call(RECOVERYWORKS_CANONICAL),
+        ])
+        for location in ("https://unapproved.example/", "/recovery/", ""):
+            fetcher = MagicMock(return_value=(301, {"Location": location}, b""))
+            with self.assertRaises(LiveAuditError):
+                verify_recoveryworks_handoff(fetcher)
+            self.assertEqual(fetcher.call_count, 1)
+        fetcher = MagicMock(side_effect=[
+            (301, {"Location": RECOVERYWORKS_CANONICAL}, b""),
+            (404, self.headers(), page),
+        ])
+        with self.assertRaises(LiveAuditError):
+            verify_recoveryworks_handoff(fetcher)
 
     def test_expected_staged_security_policy(self):
         ensure_security_headers(self.headers())

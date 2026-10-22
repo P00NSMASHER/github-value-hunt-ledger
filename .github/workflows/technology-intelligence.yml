@@ -106,18 +106,16 @@ jobs:
         id: persist
         env:
           TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
-          PR_MODE: ${{ vars.RETALLY_TECHNOLOGY_PR_ENABLED }}
         shell: bash
         run: |
           set -euo pipefail
-          if [ "$PR_MODE" = "true" ]; then
-            BRANCH="automation/retally-technology-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-            python tools/ti_persist_generated.py \
-              --max-attempts 5 \
-              --clean-untracked-on-rebuild \
-              --proposal-branch "$BRANCH" \
-              > "$RUNNER_TEMP/retally-ti-proposal.json"
-            python - <<'PY' >> "$GITHUB_OUTPUT"
+          BRANCH="automation/retally-technology-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          python tools/ti_persist_generated.py \
+            --max-attempts 5 \
+            --clean-untracked-on-rebuild \
+            --proposal-branch "$BRANCH" \
+            > "$RUNNER_TEMP/retally-ti-proposal.json"
+          python - <<'PY' >> "$GITHUB_OUTPUT"
           import json
           import os
           from pathlib import Path
@@ -136,11 +134,7 @@ jobs:
           elif report.get("status") != "clean":
               raise SystemExit("Generated TI state did not produce an accepted proposal")
           PY
-          else
-            python tools/ti_persist_generated.py \
-              --max-attempts 5 \
-              --clean-untracked-on-rebuild
-          fi
+
 
 
   submit-pr:
@@ -148,7 +142,6 @@ jobs:
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
-      vars.RETALLY_TECHNOLOGY_PR_ENABLED == 'true' &&
       needs.persist-generated.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5

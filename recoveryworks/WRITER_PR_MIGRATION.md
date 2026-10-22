@@ -1,6 +1,10 @@
-# RETALLY automated writer PR migration — first release stage
+# RETALLY automated writer PR migration
 
-**Status:** code policy only. Existing scheduled writers remain unchanged.
+**Current status — October 21, 2026:** all four writers publish through guarded PRs only after merged PR #582; live default-branch ruleset 25608380 is active with strict GitHub Actions `release-gate`, zero required human approvals and no bypass actors. See [CODE_RELEASE_POLICY.md](CODE_RELEASE_POLICY.md) for the verified provider state and protected canary acceptance.
+
+## Historical first release stage — superseded by current status
+
+The following sections preserve the staged migration record. Their disabled flags and activation instructions describe earlier states, not the current workflow configuration.
 
 Four workflows still push data directly to `main`: Scout,
 `catalog-append.yml`, `integrator-sync.yml`, and
@@ -85,3 +89,21 @@ This change does **not** activate `RETALLY_CATALOG_PR_ENABLED` or
 `RETALLY_INTEGRATOR_PR_ENABLED`; both remain separate owner-controlled
 switches. It also does not process the old September 20 queue advice.
 Customer production and financial-source authorization remain HOLD.
+
+## Enforced source routing after four live acceptance tests
+
+The four automated writer lanes have each produced a real bot-authored PR
+and a successful exact-SHA five-job release-gate run: Scout #579,
+Integrator #548, Catalog #550 and Technology Intelligence #558.
+The separate writer feature-flag fallback is retired in this source change.
+Every scheduled writer uses a scoped, run-specific proposal branch and the
+trusted bot PR controller; a configuration regression, permission error,
+conflicting source update or failed CI must stop the operation rather than
+push directly to `main`.
+
+A GitHub Actions run of the Technology Intelligence CLI without
+`--proposal-branch` is rejected before Git operations. The checked-in
+ruleset now records the verified active provider configuration. The policy-update
+PR is the fresh no-review protected merge canary, with actual CI and merge
+evidence required before it is called accepted.
+No production service or customer data acceptance is implied.

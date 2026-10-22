@@ -1,7 +1,7 @@
 {
-  "name": "RETALLY main: proposed PR + CI guard (zero reviews; activation held)",
+  "name": "Main",
   "target": "branch",
-  "enforcement": "disabled",
+  "enforcement": "active",
   "bypass_actors": [],
   "conditions": {
     "ref_name": {
@@ -30,7 +30,8 @@
           "merge",
           "squash",
           "rebase"
-        ]
+        ],
+        "require_extra_approval_for_unattributed_changes": false
       }
     },
     {
@@ -42,7 +43,8 @@
             "integration_id": 15368
           }
         ],
-        "strict_required_status_checks_policy": true
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false
       }
     }
   ]

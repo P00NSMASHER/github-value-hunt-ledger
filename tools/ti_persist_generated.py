@@ -251,6 +251,12 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    # GitHub Actions must never silently return to the legacy direct-main
+    # implementation when a feature variable is missing or misconfigured.
+    if os.environ.get("GITHUB_ACTIONS") == "true" and args.proposal_branch is None:
+        raise SystemExit("GitHub Actions refuses direct-main persistence: "
+                         "--proposal-branch is required.")
+
     paths = read_manifest(args.manifest)
     result = persist_generated(
         ROOT,

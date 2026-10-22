@@ -29,7 +29,8 @@ def render_business(b, photograph, link, mail):
     else:
         headline_html = escape(headline)
     hero_photo = re.sub(r'\bsizes="[^"]*"', 'sizes="100vw"', photograph(photo, "", eager=True))
-    target = b.get("href", mail(b["name"]))
+    contact = "/contact/?business=" + b["slug"]
+    target = b.get("href", contact)
     price = (f'<p class="group-price"><strong>{escape(b["price"])}</strong><span>{escape(b["unit"])}</span></p>'
              if "price" in b else '<p class="offer-stage-note">Start with the right fit.</p>')
     offer_points = "".join(f'<li>{escape(title)}</li>' for title, _ in b["features"])
@@ -38,7 +39,10 @@ def render_business(b, photograph, link, mail):
         label, href = b["links"][0]
         sample = '<div class="offer-sample"><span>See the work before you decide</span>' + link(label + " ↗", href, "group-text-link sample-link") + '</div>'
     action_note = ("Continue to the product site for its full scope and next step."
-                   if "href" in b else "Opens an email draft. Nothing is sent automatically.")
+                   if "href" in b else "Tell RETALLY what you need using the shared enquiry form.")
+    if "purchase_note" in b:
+        legal_links = " · ".join(link(label, href) for label, href in b["purchase_links"])
+        action_note = "Secure checkout opens on Stripe. " + escape(b["purchase_note"]) + "<br>By purchasing, you agree to the published terms. " + legal_links
     features = "".join(
         f'<article class="premium-feature"><span class="feature-index" aria-hidden="true">0{i}</span><h3>{escape(title)}</h3><p>{escape(detail)}</p></article>'
         for i, (title, detail) in enumerate(b["features"], 1))
@@ -47,7 +51,7 @@ def render_business(b, photograph, link, mail):
         for i, (title, detail) in enumerate(zip(step_titles, b["steps"]), 1))
     resources = "".join(link(label + " ↗", href, "business-resource-link") for label, href in b["links"])
     if not resources:
-        resources = link("Ask about " + b["name"] + " ↗", mail(b["name"]), "business-resource-link")
+        resources = link("Ask about " + b["name"] + " ↗", contact, "business-resource-link")
     resource_heading = "Explore the details." if b["links"] else "Talk through the fit."
     audience = b["audience"][0].lower() + b["audience"][1:]
     return f'''<section class="premium-business-hero">
@@ -58,4 +62,5 @@ def render_business(b, photograph, link, mail):
 <nav class="business-section-nav" aria-label="On this page"><div class="group-wrap"><a href="#focus">What it covers <span aria-hidden="true">↘</span></a><a href="#next-steps">How to begin <span aria-hidden="true">↘</span></a><a href="#scope">Scope &amp; resources <span aria-hidden="true">↘</span></a></div></nav>
 <section class="group-section group-wrap premium-business-focus" id="focus"><div class="business-section-heading"><div><p class="group-kicker">THE FOCUS</p><h2>{escape(focus_heading)}</h2></div><p>{escape(b['detail'])}</p></div><div class="group-features premium-features">{features}</div></section>
 <section class="business-process-section" id="next-steps"><div class="group-wrap business-process-grid"><div class="business-process-intro"><p class="group-kicker">YOUR NEXT STEP</p><h2>A clear way<br><em>to begin.</em></h2><p class="process-stage">Current stage: <strong>{status}</strong></p><figure class="business-context-photo">{photograph(photo, alt)}<figcaption>Illustrative setting for the work.</figcaption></figure></div><ol class="group-steps premium-steps">{steps}</ol></div></section>
-<section class="group-section group-wrap premium-business-scope" id="scope"><div class="business-scope-copy"><p class="group-kicker">SCOPE &amp; AVAILABILITY</p><h2>Clarity comes first.</h2><p class="group-boundary">{escape(b['boundary'])}</p><p class="business-scope-question">Questions about {name}? {link('Email RETALLY', mail(b['name']))}. A brief, non-sensitive description of what you need is enough to begin.</p></div><aside class="business-resource-panel" aria-labelledby="business-resource-title"><p class="group-kicker">KEEP EXPLORING</p><h3 id="business-resource-title">{resource_heading}</h3><div class="group-resource-links">{resources}</div>{link('Explore all RETALLY businesses →', '/#businesses', 'business-directory-link')}</aside></section>'''
+<section class="group-section group-wrap premium-business-scope" id="scope"><div class="business-scope-copy"><p class="group-kicker">SCOPE &amp; AVAILABILITY</p><h2>Clarity comes first.</h2><p class="group-boundary">{escape(b['boundary'])}</p><p class="business-scope-question">Questions about {name}? {link('Contact RETALLY', contact)}. A brief, non-sensitive description of what you need is enough to begin.</p></div><aside class="business-resource-panel" aria-labelledby="business-resource-title"><p class="group-kicker">KEEP EXPLORING</p><h3 id="business-resource-title">{resource_heading}</h3><div class="group-resource-links">{resources}</div>{link('Explore all RETALLY businesses →', '/#businesses', 'business-directory-link')}</aside></section>'''
+
