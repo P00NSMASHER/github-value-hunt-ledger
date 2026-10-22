@@ -27,8 +27,8 @@ def fixture():
         "RETALLY_OCI_RUN_DOMAIN_URL": "https://idcs-example.identity.oraclecloud.com",
         "RETALLY_OCI_RUN_CLIENT_ID": "remote-only-client",
         "RETALLY_OCI_RUN_CLIENT_SECRET": "dummy-never-live",
-        "RETALLY_OCI_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcompartment",
-        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcommands",
+        "RETALLY_OCI_VM_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
+        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
         "RETALLY_OCI_VM_OCID": "ocid1.instance.oc1.iad.testinstance",
         "ACTIONS_ID_TOKEN_REQUEST_URL": "https://pipelines.actions.githubusercontent.com/oidc/token?a=b",
         "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "dummy-gh-job-token",
@@ -65,8 +65,10 @@ class ContextTests(unittest.TestCase):
             ("RETALLY_OCI_RUN_DOMAIN_URL", "https://idcs-abc.identity.oraclecloud.com@evil.net"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://evil.example/token"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://bad.actions.githubusercontent.com/token"),
-            ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_VM_COMPARTMENT_OCID", "bad"),
             ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
+             "ocid1.compartment.oc1..differentcompartment"),
             ("RETALLY_OCI_RUN_CLIENT_SECRET", ""),
         ]:
             with self.subTest(key=key):
@@ -140,7 +142,7 @@ class ProviderTests(unittest.TestCase):
     def vm(self):
         return SimpleNamespace(
             id=fixture()["RETALLY_OCI_VM_OCID"],
-            compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"],
+            compartment_id=fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"],
             shape=m.VM_SHAPE, lifecycle_state="RUNNING",
             agent_config=SimpleNamespace(are_all_plugins_disabled=False, plugins_config=[
                 SimpleNamespace(name="Compute Instance Run Command", desired_state="ENABLED")]))
@@ -337,7 +339,8 @@ class ProviderTests(unittest.TestCase):
         self.assertEqual(data.execution_time_out_in_seconds,45)
         self.assertEqual(data.compartment_id,
                          fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"])
-        self.assertNotEqual(data.compartment_id, fixture()["RETALLY_OCI_COMPARTMENT_OCID"])
+        self.assertEqual(data.compartment_id,
+                         fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"])
         self.assertEqual(data.target.instance_id,fixture()["RETALLY_OCI_VM_OCID"])
         self.assertEqual(data.content.source.text,m.CANARY)
         self.assertFalse(hasattr(data.content,"command_string"))

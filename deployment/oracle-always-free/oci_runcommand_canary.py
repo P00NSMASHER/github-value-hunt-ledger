@@ -44,7 +44,7 @@ EXPECTED_KEYS = {
 }
 REQUIRED = (
     "RETALLY_OCI_RUN_DOMAIN_URL", "RETALLY_OCI_RUN_CLIENT_ID",
-    "RETALLY_OCI_RUN_CLIENT_SECRET", "RETALLY_OCI_COMPARTMENT_OCID",
+    "RETALLY_OCI_RUN_CLIENT_SECRET", "RETALLY_OCI_VM_COMPARTMENT_OCID",
     "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
     "RETALLY_OCI_VM_OCID", "ACTIONS_ID_TOKEN_REQUEST_URL",
     "ACTIONS_ID_TOKEN_REQUEST_TOKEN", "RETALLY_OCI_RUN_APPROVED_SHA",
@@ -80,11 +80,13 @@ def check_context(env: dict[str, str]) -> None:
                  oidc.port is None and not oidc.username and not oidc.password and
                  not oidc.fragment, "UNTRUSTED_GITHUB_OIDC_ENDPOINT")
     auth.require(re.fullmatch(r"ocid1\.(compartment|tenancy)\.oc1\.[a-z0-9.-]+",
-                                  env["RETALLY_OCI_COMPARTMENT_OCID"]) is not None,
+                                  env["RETALLY_OCI_VM_COMPARTMENT_OCID"]) is not None,
                  "COMPARTMENT_INVALID")
     auth.require(re.fullmatch(r"ocid1\.compartment\.oc1\.[a-z0-9.-]+",
                                   env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"]) is not None,
                  "COMPARTMENT_INVALID")
+    auth.require(env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"] ==
+                 env["RETALLY_OCI_VM_COMPARTMENT_OCID"], "COMPARTMENT_INVALID")
     auth.require(re.fullmatch(r"ocid1\.instance\.oc1\.[a-z0-9.-]+",
                                   env["RETALLY_OCI_VM_OCID"]) is not None,
                  "INSTANCE_INVALID")
@@ -124,7 +126,7 @@ def get_github_jwt(env: dict[str, str]) -> str:
 
 def check_vm(vm: object, env: dict[str, str]) -> None:
     auth.require(getattr(vm, "id", None) == env["RETALLY_OCI_VM_OCID"] and
-                 getattr(vm, "compartment_id", None) == env["RETALLY_OCI_COMPARTMENT_OCID"] and
+                 getattr(vm, "compartment_id", None) == env["RETALLY_OCI_VM_COMPARTMENT_OCID"] and
                  getattr(vm, "shape", None) == VM_SHAPE and
                  getattr(vm, "lifecycle_state", None) == "RUNNING", "INSTANCE_NOT_APPROVED")
     agent = getattr(vm, "agent_config", None)
@@ -242,7 +244,7 @@ def execute_canary(env: dict[str, str]) -> None:
             cfg, signer=signer, retry_strategy=noretry)
         check_vm(compute.get_instance(env["RETALLY_OCI_VM_OCID"]).data, env)
         check_plugin(plugin.list_instance_agent_plugins(
-            env["RETALLY_OCI_COMPARTMENT_OCID"], env["RETALLY_OCI_VM_OCID"],
+            env["RETALLY_OCI_VM_COMPARTMENT_OCID"], env["RETALLY_OCI_VM_OCID"],
             name="Compute Instance Run Command").data)
     except auth.Refused:
         raise

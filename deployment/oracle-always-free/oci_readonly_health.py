@@ -76,7 +76,8 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
             "Monitor is not explicitly enabled")
     required = (
         "RETALLY_OCI_DOMAIN_URL", "RETALLY_OCI_CLIENT_ID", "RETALLY_OCI_CLIENT_SECRET",
-        "RETALLY_OCI_NAMESPACE", "RETALLY_OCI_COMPARTMENT_OCID", "RETALLY_OCI_VM_OCID",
+        "RETALLY_OCI_NAMESPACE", "RETALLY_OCI_COMPARTMENT_OCID",
+        "RETALLY_OCI_VM_COMPARTMENT_OCID", "RETALLY_OCI_VM_OCID",
         "ACTIONS_ID_TOKEN_REQUEST_URL", "ACTIONS_ID_TOKEN_REQUEST_TOKEN",
     )
     for key in required:
@@ -124,6 +125,9 @@ def require_env(environ: dict[str, str]) -> dict[str, str]:
     compartment = environ["RETALLY_OCI_COMPARTMENT_OCID"]
     require(re.fullmatch(r"ocid1\.(compartment|tenancy)\.oc1\.[a-z0-9.-]+", compartment)
             is not None, "Invalid OCI compartment/tenancy OCID")
+    require(re.fullmatch(r"ocid1\.compartment\.oc1\.[a-z0-9.-]+",
+                         environ["RETALLY_OCI_VM_COMPARTMENT_OCID"]) is not None,
+            "Invalid OCI VM compartment OCID")
     require(re.fullmatch(r"ocid1\.instance\.oc1\.[a-z0-9.-]+",
                          environ["RETALLY_OCI_VM_OCID"]) is not None,
             "Invalid expected VM OCID")
@@ -349,7 +353,7 @@ def do_live_check(settings: dict[str, str]) -> None:
     try:
         vm = compute.get_instance(settings["RETALLY_OCI_VM_OCID"]).data
         check_instance(vm, settings["RETALLY_OCI_VM_OCID"],
-                       settings["RETALLY_OCI_COMPARTMENT_OCID"])
+                       settings["RETALLY_OCI_VM_COMPARTMENT_OCID"])
     except Exception:
         raise Refused("OCI_INSTANCE_READ_OR_VALIDATION") from None
 
@@ -393,6 +397,7 @@ def safe_failure_code(exc: Exception) -> str:
             "GitHub OIDC request endpoint is not trusted",
             "Invalid OCI namespace",
             "Invalid OCI compartment/tenancy OCID",
+            "Invalid OCI VM compartment OCID",
             "Invalid expected VM OCID",
             "OIDC_TOKEN_OR_CLAIMS", "OCI_TOKEN_EXCHANGE",
             "OCI_SIGNER_INITIALIZATION", "OCI_CLIENT_INITIALIZATION",
