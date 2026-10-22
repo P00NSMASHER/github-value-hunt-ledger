@@ -13,6 +13,21 @@ def payload():
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
 
 
+@pytest.mark.parametrize("value", ["true", "false", 1, 0, None, [], {}])
+def test_pack_rejects_non_boolean_synthetic_classification(value):
+    data = payload()
+    data["synthetic"] = value
+    with pytest.raises(ValueError, match="synthetic must be an explicit boolean"):
+        build_pack(data)
+
+
+def test_pack_requires_synthetic_classification_to_be_present():
+    data = payload()
+    data.pop("synthetic")
+    with pytest.raises(ValueError, match="synthetic must be an explicit boolean"):
+        build_pack(data)
+
+
 def test_pack_keeps_money_states_and_attribution_separate():
     pack = build_pack(payload())
     totals = pack["totals"]
@@ -25,15 +40,19 @@ def test_pack_keeps_money_states_and_attribution_separate():
     assert pack["findings"][2]["attribution_state"] == "SUPPRESSED"
     assert pack["findings"][2]["fee_eligible_realized_cents"] == 0
     assert pack["findings"][3]["reviewer_disposition"] == "REVIEW"
+    assert pack["claim_boundary"]["synthetic_classification_is_explicit_boolean"] is True
     assert pack["claim_boundary"]["realized_requires_settled_claim_and_reference"] is True
     assert pack["claim_boundary"]["realized_cannot_exceed_candidate_difference"] is True
     assert pack["claim_boundary"]["positive_settlement_reference_is_unique"] is True
+    assert pack["claim_boundary"]["positive_settlement_reference_bound_to_evidence"] is True
     assert pack["claim_boundary"]["economic_opportunity_identity_is_unique"] is True
     assert pack["claim_boundary"]["validated_difference_excludes_suppressed_findings"] is True
     assert pack["claim_boundary"]["validated_supported_findings_require_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_findings_bind_authority_evidence"] is True
     assert pack["claim_boundary"]["validated_supported_authority_not_after_invoice"] is True
     assert pack["claim_boundary"]["buyer_visible_realized_excludes_suppressed_findings"] is True
+    assert pack["claim_boundary"]["authorized_findings_require_authorization_reference"] is True
+    assert pack["claim_boundary"]["authorization_reference_bound_to_evidence"] is True
 
 
 @pytest.mark.parametrize(
@@ -93,6 +112,17 @@ def test_pack_rejects_positive_credit_without_settlement_reference():
         build_pack(data)
 
 
+def test_pack_rejects_positive_credit_when_settlement_reference_is_not_evidence_bound():
+    data = payload()
+    row = data["findings"][0]
+    row["supporting_evidence"].remove(row["settlement_reference"])
+    with pytest.raises(
+        ValueError,
+        match="positive settled_credit_cents requires settlement_reference in supporting_evidence",
+    ):
+        build_pack(data)
+
+
 def test_pack_rejects_settled_credit_above_candidate_difference():
     data = payload()
     row = data["findings"][0]
@@ -106,7 +136,9 @@ def test_pack_rejects_settled_credit_above_candidate_difference():
 
 def test_pack_rejects_duplicate_positive_settlement_reference():
     data = payload()
-    data["findings"][1]["settlement_reference"] = data["findings"][0]["settlement_reference"]
+    duplicate_reference = data["findings"][0]["settlement_reference"]
+    data["findings"][1]["settlement_reference"] = duplicate_reference
+    data["findings"][1]["supporting_evidence"].append(duplicate_reference)
     with pytest.raises(
         ValueError,
         match="positive settlement_reference must be unique across findings",
@@ -200,6 +232,7 @@ def test_markdown_is_buyer_legible_and_explicitly_synthetic():
     assert "Controlling rate authority is not proven." in report
     assert "Positive settled credits require an approved or closed claim" in report
     assert "Settled credit cannot exceed the candidate invoice difference" in report
+    assert "Each positive settlement reference must appear in supporting evidence" in report
     assert "One positive settlement reference can support only one finding" in report
     assert "One carrier/invoice/shipment/category identity can support only one economic opportunity" in report
     assert "validated supported finding requires at least one supporting-evidence reference" in report
@@ -220,6 +253,10 @@ def test_duplicate_economic_opportunity_fails_closed():
     duplicate = dict(original)
     duplicate["finding_id"] = "FR-DUPLICATE"
     duplicate["settlement_reference"] = "CREDIT-DUPLICATE"
+    duplicate["supporting_evidence"] = [
+        *original["supporting_evidence"],
+        duplicate["settlement_reference"],
+    ]
     data["findings"].append(duplicate)
     with pytest.raises(
         ValueError,
@@ -235,6 +272,10 @@ def test_same_invoice_can_hold_distinct_finding_categories():
     separate_charge["finding_id"] = "FR-ACCESSORIAL"
     separate_charge["finding_category"] = "Unsupported detention charge"
     separate_charge["settlement_reference"] = "CREDIT-ACCESSORIAL"
+    separate_charge["supporting_evidence"] = [
+        *original["supporting_evidence"],
+        separate_charge["settlement_reference"],
+    ]
     data["findings"].append(separate_charge)
     pack = build_pack(data)
     assert pack["totals"]["findings_count"] == len(data["findings"])
@@ -271,3 +312,39 @@ def test_suppressed_money_cannot_inflate_buyer_visible_realized_recovery(field, 
     report = render_markdown(pack)
     assert "Observed net settlement across all findings: **$185.00**" in report
     assert "Attributable net realized recovery: **$60.00**" in report
+
+
+def test_authorized_finding_requires_authorization_reference():
+    data = payload()
+    row = data["findings"][0]
+    row.pop("authorization_reference")
+    with pytest.raises(ValueError, match="requires authorization_reference"):
+        build_pack(data)
+
+
+def test_authorized_finding_requires_authorization_reference_in_evidence():
+    data = payload()
+    row = data["findings"][0]
+    row["supporting_evidence"].remove(row["authorization_reference"])
+    with pytest.raises(ValueError, match="authorization_reference in supporting_evidence"):
+        build_pack(data)
+
+
+@pytest.mark.parametrize("state", ("NOT_REQUESTED", "PENDING", "DECLINED"))
+def test_non_authorized_finding_does_not_require_authorization_reference(state):
+    data = payload()
+    row = data["findings"][2]
+    row["customer_authorization_state"] = state
+    row.pop("authorization_reference", None)
+    pack = build_pack(data)
+    assert pack["findings"][2]["authorization_reference"] == ""
+    assert pack["findings"][2]["fee_eligible_realized_cents"] == 0
+
+
+def test_authorization_reference_is_buyer_visible_and_evidence_bound():
+    pack = build_pack(payload())
+    row = pack["findings"][0]
+    assert row["authorization_reference"] == "AUTH-PILOT-2026-001"
+    assert row["authorization_reference"] in row["supporting_evidence"]
+    report = render_markdown(pack)
+    assert "- Authorization reference: AUTH-PILOT-2026-001" in report

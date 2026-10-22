@@ -1,0 +1,736 @@
+{
+  "schema_version": "m2g.1",
+  "as_of": "2026-10-15",
+  "company": "RETALLY",
+  "release_policy": "REVIEW_ONLY_NO_CUSTOMER_DATA",
+  "production": {
+    "hostname": "www.retallyrecovery.com",
+    "redirect_from": "retallyrecovery.com",
+    "pages_project": "retally-web",
+    "deployment_id": "da461b37-0805-4180-8acb-6ea6cdfdc4c3",
+    "deployment_status": "success",
+    "domain_status": "active",
+    "inquiry_get_status": 503,
+    "inquiry_get_body": {
+      "online": false
+    },
+    "public_fallback": "browser_prepared_email_draft",
+    "online_inquiry_status": "DISABLED_BY_POLICY",
+    "inbound_zoho_status": "OWNER_CONFIRMED_PHONE_SEND_RECEIPT_HUMAN_REPLY_20261012; NOT_INDEPENDENTLY_RETESTED",
+    "notes": "October 15 verification: public/manual site remains live; automated inquiry flags remain 0; no send token; D1 inquiry count 0. Zero Trust Free protects the future operator path, but no operator or financial mutation route was released.",
+    "deployment_commit": "c65aa50e22f332cd9a2f564a18c3c8985e0693dc"
+  },
+  "zero_spend_launch_profile": {
+    "id": "PUBLIC_INFORMATION_MANUAL_CONTACT_ONLY",
+    "decision": "GO_EXISTING_ALREADY_LIVE",
+    "new_external_spend_authorized_usd": "0.00",
+    "requires_new_deployment": false,
+    "permitted_capabilities": [
+      "public_information_website",
+      "browser_prepared_user_sent_email_draft"
+    ],
+    "prohibited_capabilities": [
+      "automatic_online_inquiry",
+      "customer_record_ingestion",
+      "confidential_file_processing",
+      "operator_case_mutation",
+      "carrier_or_customer_outreach",
+      "provider_financial_event_ingestion",
+      "payment_instruction_release",
+      "customer_billing",
+      "production_release_of_draft_329_or_332"
+    ],
+    "non_dependencies": {
+      "R28": "Automatic Cloudflare notification is not used by the user-sent manual email path.",
+      "R29": "The public/manual path has no operator mutation surface.",
+      "R30": "The public/manual path does not use the RecoveryOS financial database; isolated QA custody is separately remediated.",
+      "R31": "The public/manual path accepts no provider financial events.",
+      "R35": "The already-live public/manual site does not require either unreleased draft."
+    },
+    "full_production_authorized": false,
+    "customer_service_authorized": false,
+    "financial_operations_authorized": false
+  },
+  "pilot_workspace": {
+    "current_state": "OWNER_ONLY_WITH_ONE_MANUAL_POLICY; NO_CUSTOMER_FILES",
+    "provider": "Google Drive",
+    "mode": "single-tenant manual review only",
+    "policy_date": "2026-09-21",
+    "policy_source": "Freight Recovery Controlled Pilot Environment Policy - 2026-09-21",
+    "buyer_specific_permission": "NOT_VERIFIED",
+    "intake_status": "BLOCKED",
+    "notes": "A baseline manual environment does not authorize a buyer, confidential record, parser, API or general public file upload."
+  },
+  "published_synthetic_sample": {
+    "gross_recovered_usd": "14200.00",
+    "reversals_usd": "750.00",
+    "net_recovered_usd": "13450.00",
+    "published_fee_eligible_usd": "11800.00",
+    "unallocated_difference_usd": "1650.00",
+    "evidence_state": "UNVERIFIED",
+    "customer_result": false,
+    "billing_eligible": false,
+    "customer_economic_claim_eligible": false,
+    "classification": "ILLUSTRATIVE_ONLY_PERMANENT_NONBILLABLE"
+  },
+  "founding_offer": {
+    "max_slots": 3,
+    "available_count": "NOT_VERIFIED",
+    "eligible_initial_audit": "$0 upfront only for agreed bounded scope",
+    "actual_contingency_rate": "NOT_APPROVED",
+    "comparative_discount_claim": "NOT_SUBSTANTIATED",
+    "no_subscription_or_implementation_fee": "PUBLISHED_INTERNAL_PROGRAM_TERMS_NOT_SIGNED",
+    "rate_approval_required": true
+  },
+  "requirements": {
+    "legal_entity": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Business owner / qualified counsel"
+    },
+    "approved_recovery_contract": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Business owner / qualified counsel"
+    },
+    "verified_inbound_mail": {
+      "status": "OWNER_CONFIRMED",
+      "evidence_ref": "Issue #323 owner update 2026-10-12; chat confirmation at 16:26:05-04:00",
+      "reviewed_by": "Owner attestation; not independently observed",
+      "reviewed_at": "2026-10-12T16:26:05-04:00",
+      "owner": "Company mailbox owner",
+      "independently_verified": false
+    },
+    "confirmed_customer_contact_route": {
+      "status": "OWNER_CONFIRMED",
+      "evidence_ref": "Issue #323 owner update 2026-10-12; chat confirmation at 16:26:05-04:00",
+      "reviewed_by": "Owner attestation; not independently observed",
+      "reviewed_at": "2026-10-12T16:26:05-04:00",
+      "owner": "Website/mail owner",
+      "independently_verified": false
+    },
+    "approved_buyer_workspace": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Buyer IT + RETALLY verifier"
+    },
+    "buyer_signed_scope_and_confidentiality": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Buyer + RETALLY authorized signer"
+    },
+    "named_independent_reviewer": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "RETALLY operations owner",
+      "notes": "Ten AI simulated roles reviewed rehearsal; actual qualified human appointment remains separate."
+    },
+    "synthetic_fee_eligibility_reconciled": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Financial reviewer"
+    }
+  },
+  "readiness_gates": {
+    "contact": [
+      "verified_inbound_mail",
+      "confirmed_customer_contact_route"
+    ],
+    "qualified_proposal": [
+      "legal_entity",
+      "verified_inbound_mail",
+      "confirmed_customer_contact_route"
+    ],
+    "confidential_pilot": [
+      "legal_entity",
+      "approved_recovery_contract",
+      "approved_buyer_workspace",
+      "buyer_signed_scope_and_confidentiality",
+      "named_independent_reviewer"
+    ],
+    "claims_recovery": [
+      "legal_entity",
+      "approved_recovery_contract",
+      "approved_buyer_workspace",
+      "buyer_signed_scope_and_confidentiality",
+      "named_independent_reviewer"
+    ],
+    "sample_publication": [
+      "synthetic_fee_eligibility_reconciled"
+    ]
+  },
+  "mission_acceptance": {
+    "as_of": "2026-10-15",
+    "scorecard": {
+      "PASS": 23,
+      "BLOCKED": 14,
+      "FAIL": 0,
+      "total": 37,
+      "independently_verified_pass": 22,
+      "owner_confirmed_pass": 1
+    },
+    "simulation_scorecard": {
+      "classification": "FICTIONAL_REHEARSAL_ONLY",
+      "PASS": 37,
+      "BLOCKED": 0,
+      "FAIL": 0,
+      "total": 37,
+      "blockers_removed_in_simulation": 14,
+      "blockers_removed_in_real_world": 0,
+      "customer_pilot_decision": "FULL_GO_SIMULATED",
+      "all_simulated_pilot_stages_available": true,
+      "confidential_intake_authorized_in_simulation": true,
+      "customer_service_authorized_in_simulation": true,
+      "financial_operations_authorized_in_simulation": true,
+      "real_customer_authorization_created": false,
+      "real_financial_authorization_created": false,
+      "evidence_ref": "freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
+      "real_scorecard_unchanged": true
+    },
+    "requirements": [
+      {
+        "id": "R01",
+        "requirement": "Discovery: public homepage",
+        "status": "PASS",
+        "scope": "LIVE",
+        "evidence": "HTTP 200; public-http-evidence.json",
+        "tests": "GET canonical home; no submission",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "None"
+      },
+      {
+        "id": "R02",
+        "requirement": "Public pages, original brand and HTTPS isolation",
+        "status": "PASS",
+        "scope": "LIVE",
+        "evidence": "live-publication-evidence.json: 26 pages; original PNG SHA; HSTS/nosniff/CSP",
+        "tests": "Existing production auditor checked pages, media, redirects and headers",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "None"
+      },
+      {
+        "id": "R03",
+        "requirement": "Disabled automatic inquiry state is truthful",
+        "status": "PASS",
+        "scope": "LIVE",
+        "evidence": "Cloudflare flags both 0; GET /api/inquiry 503 {online:false}; D1 count 0",
+        "tests": "Read-only configuration, GET and aggregate SQL",
+        "defects_corrected": "Preserve OFF",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "None"
+      },
+      {
+        "id": "R04",
+        "requirement": "Prepared email is clearly unsent",
+        "status": "PASS",
+        "scope": "SOURCE",
+        "evidence": "Merged main fallback preserved in #329; 17 inquiry tests and 80 initial integration tests",
+        "tests": "Recipient copy/edit, direct gesture and unsent states",
+        "defects_corrected": "Integration conflicts resolved without losing main controls",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Release review only"
+      },
+      {
+        "id": "R05",
+        "requirement": "Source consent, read-only and secret flags",
+        "status": "PASS",
+        "scope": "SOURCE",
+        "evidence": "19 failing rate/source regressions -> 38 passing focused tests",
+        "tests": "String false, 0, 1, null and boolean retention refused",
+        "defects_corrected": "F2: strict source Booleans and integer retention",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Review/release #329"
+      },
+      {
+        "id": "R06",
+        "requirement": "Immutable source inventory and receipts",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "Source manifest and actual SHA-256 for fictional bytes",
+        "tests": "Read-only manifest scope and source permission checks",
+        "defects_corrected": "F2",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real buyer permission remains R27"
+      },
+      {
+        "id": "R07",
+        "requirement": "Invoice import and clean population",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "Eight invoices; five clean; three candidates; frozen run/population hashes",
+        "tests": "Actual CSV adapter -> workflow -> manifest",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Manual policy excludes real parser runtime"
+      },
+      {
+        "id": "R08",
+        "requirement": "Missing, duplicate and conflicting rates",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "adversarial_receipts: missing/duplicate BLOCKED; conflicting validated=0",
+        "tests": "Actual importer and rule/finding workflow negative inputs",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real source authority must be human-verified"
+      },
+      {
+        "id": "R09",
+        "requirement": "Independent-review proof mechanics",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "Two confirmed review objects; 30 simulated reviewer minutes; one unsupported candidate excluded Ten separately tasked simulated reviewers assessed the synthetic engagement; consolidated receipt in retally_ten_reviewer_acceptance_20261012.json.",
+        "tests": "Actual buyer review, routing and claim builder",
+        "defects_corrected": "Existing #326 consent controls restored to combined head",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "No real reviewer competence/identity established"
+      },
+      {
+        "id": "R10",
+        "requirement": "Separate financial reporting states",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "72500 candidate, 32500 supported, 27500 observed net, 7500 eligible cents",
+        "tests": "Current report, proof-bound fee and independent arithmetic",
+        "defects_corrected": "Preserved main attribution and duplicate controls",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "None"
+      },
+      {
+        "id": "R11",
+        "requirement": "Polished sample audit and customer report",
+        "status": "PASS",
+        "scope": "ARTIFACT",
+        "evidence": "Initial/final report and item-level reconciliation in delivered package",
+        "tests": "Source-to-report comparison; all amounts independently recomputed",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Actual report requires approved reviewer"
+      },
+      {
+        "id": "R12",
+        "requirement": "Claim-specific authority and negative gates",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "166 operations tests include external-action scope, expiry/revocation, store, input, backup and lifecycle tests",
+        "tests": "Actual authorization module rejects altered scope and missing approvals",
+        "defects_corrected": "Existing consent/fee-proof controls reused",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real authority remains R23/R27"
+      },
+      {
+        "id": "R13",
+        "requirement": "Carrier request, responses and receipt separation",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "Core action/delivery proof objects; fictional carrier narrative and credit documents",
+        "tests": "No network sends; submitted differs from delivered",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "No real carrier message or receipt verified"
+      },
+      {
+        "id": "R14",
+        "requirement": "Credits and exclusions reconciled once",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "30000 gross cents; 20000 incumbent exclusion; claims/events replay unchanged",
+        "tests": "Actual persistent store and claim allocation",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Actual posting remains R32"
+      },
+      {
+        "id": "R15",
+        "requirement": "Reversals invalidate report and reduce fee",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "2500 reversal cents; fee 3000 -> 2250; stale report rejected",
+        "tests": "Counter-event allocation plus current-snapshot fee proof",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real late fee credit needs R33"
+      },
+      {
+        "id": "R16",
+        "requirement": "Contractual 30% cents and rate precision",
+        "status": "PASS",
+        "scope": "SOURCE",
+        "evidence": "Exact 2250 cents; 0/1/5/199 cents tests; excess precision rejected",
+        "tests": "Decimal independent oracle and rate regression",
+        "defects_corrected": "F1: no silent contractual-rate rounding",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real signed fee remains R23"
+      },
+      {
+        "id": "R17",
+        "requirement": "Interruptions, duplicate imports and restarts",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "restart_and_replay: snapshot unchanged; 2 claims already present; identical fee hash",
+        "tests": "Reopen SQLite and replay credits/return/claim persistence",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real uncertain delivery must be checked before resend"
+      },
+      {
+        "id": "R18",
+        "requirement": "Backup and restore mechanics",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "166 operations tests; Lab 11 actual synthetic reliability path",
+        "tests": "Actual backup/restore semantic equivalence and tamper denials",
+        "defects_corrected": "None",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real workspace backup custody not certified"
+      },
+      {
+        "id": "R19",
+        "requirement": "Retention uncertainty remains explicit",
+        "status": "PASS",
+        "scope": "SIMULATED",
+        "evidence": "Lifecycle tests reject implicit erasure; closure procedure uses final-delivery date",
+        "tests": "Timeout/unknown versus confirmed-state tests",
+        "defects_corrected": "Documented ingestion timer cannot replace signed closure clock",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Real legal/provider evidence remains R34"
+      },
+      {
+        "id": "R20",
+        "requirement": "Customer onboarding and commercial document package",
+        "status": "PASS",
+        "scope": "ARTIFACT",
+        "evidence": "Eight completed templates plus sample report, authorization, invoice and closure records Ten separately tasked simulated reviewers assessed the synthetic engagement; consolidated receipt in retally_ten_reviewer_acceptance_20261012.json.",
+        "tests": "Completeness, financial wording, original brand and final PDF visual QA",
+        "defects_corrected": "Filled operational and legal-review documentation gaps",
+        "remaining_dependency": "See operational boundary and related blocked row",
+        "required_owner_action": "Binding fields await counsel/customer signatures"
+      },
+      {
+        "id": "R21",
+        "requirement": "Actual visitor send -> Zoho receipt -> human reply",
+        "status": "PASS",
+        "scope": "OWNER_CONFIRMED",
+        "evidence": "Owner confirmed prior action 3 (phone inquiry -> actual Zoho receipt -> human reply) on 2026-10-12 at 16:26 America/New_York; statement: \"3 this is done and confirmed\".",
+        "tests": "Owner attestation accepted; no new mailbox access, message or independently observed delivery test.",
+        "defects_corrected": "None",
+        "remaining_dependency": "Preserve actual receipt/headers privately; no repeat confirmation requested.",
+        "required_owner_action": "Completed per owner; retain private evidence.",
+        "independently_verified": false
+      },
+      {
+        "id": "R22",
+        "requirement": "Pennsylvania legal contracting identity",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Private filing worksheet NOT SUBMITTED; operating agreement UNSIGNED; no certificate inspected",
+        "tests": "Read existing private business documents and official PA requirements",
+        "defects_corrected": "None",
+        "remaining_dependency": "Owner/counsel supplies accepted state filing or confirms lawful actual contracting party",
+        "required_owner_action": "DEFERRED TO LAST by owner: Owner/counsel supplies accepted state filing or confirms lawful actual contracting party"
+      },
+      {
+        "id": "R23",
+        "requirement": "Counsel-reviewed executed 30% agreement",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Agreement draft prepared; no real signature, fee scope or authority supplied",
+        "tests": "Inspected fee definitions, exclusions, rounding, reversals, tax and legal fields",
+        "defects_corrected": "Existing nonboolean consent fix already in #329/#326; not live",
+        "remaining_dependency": "Owner/counsel completes legal terms; authorized parties execute exact schedules",
+        "required_owner_action": "DEFERRED TO LAST by owner: Owner/counsel completes legal terms; authorized parties execute exact schedules"
+      },
+      {
+        "id": "R24",
+        "requirement": "Insurance suitability and coverage",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "No policy/binder independently verified",
+        "tests": "Business readiness and document search; no purchase",
+        "defects_corrected": "None",
+        "remaining_dependency": "Owner obtains written broker/counsel advice and appropriate policy/binder or documented decision",
+        "required_owner_action": "DEFERRED TO LAST by owner: Owner obtains written broker/counsel advice and appropriate policy/binder or documented decision"
+      },
+      {
+        "id": "R25",
+        "requirement": "Qualified independent human reviewer",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Ten AI simulated reviewer roles completed; no actual human appointment or qualified customer-specific sign-off represented.",
+        "tests": "Simulation review proof cannot certify actual competence or separation",
+        "defects_corrected": "None",
+        "remaining_dependency": "Before any confidential pilot or substantive audit, name a qualified independent human reviewer and establish customer-specific review and access authority; simulated reviewers do not qualify.",
+        "required_owner_action": "DEFERRED UNTIL FIRST CREDIBLE CUSTOMER OPPORTUNITY: no recruitment, reviewer contact or paid review now. Before real confidential audit/service, name and verify a qualified independent reviewer and document approval. Keep R25 BLOCKED until proven."
+      },
+      {
+        "id": "R26",
+        "requirement": "Buyer workspace MFA and permitted/denied access",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Restricted Drive configuration inspected previously; ten simulated reviews cannot observe actual MFA or prove buyer-specific allowed/denied access.",
+        "tests": "Read actual permissions and policy; no sharing changed",
+        "defects_corrected": "None",
+        "remaining_dependency": "Named data owner validates MFA, restricted roster and allowed/denied identities",
+        "required_owner_action": "Named data owner validates MFA, restricted roster and allowed/denied identities"
+      },
+      {
+        "id": "R27",
+        "requirement": "Real customer confidentiality and file-processing authority",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "No real customer scope, NDA/data terms or document authorization",
+        "tests": "All rehearsal input is fictional; existing manual policy read",
+        "defects_corrected": "None",
+        "remaining_dependency": "Customer and verified provider sign scope/data terms before any confidential intake",
+        "required_owner_action": "Customer and verified provider sign scope/data terms before any confidential intake"
+      },
+      {
+        "id": "R28",
+        "requirement": "Cloudflare automatic notification delivery",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Email Sending requires an unapproved paid service; sending token absent; flags 0; manual user-sent email path remains available",
+        "tests": "Read sender eligibility/configuration and Zoho DNS",
+        "defects_corrected": "None",
+        "remaining_dependency": "None for zero-spend public/manual profile; full automation requires separately approved paid sender, least-privilege secret, provider proof and Zoho receipt",
+        "required_owner_action": "Do not purchase or enable for zero-spend profile; retain flags at 0"
+      },
+      {
+        "id": "R29",
+        "requirement": "Authenticated Cloudflare operator application",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Zero Trust Free active; future internal path protected by exact-admin MFA Access policy; unauthenticated request redirected; 0 active seats; migrations and endpoint remain unreleased",
+        "tests": "Read organization/application/policy state and unauthenticated HTTP behavior",
+        "defects_corrected": "Access perimeter configured at zero cost; end-user app creation disabled; 30-day inactive-seat expiry",
+        "remaining_dependency": "None for zero-spend public/manual profile; operator mutation requires a second real MFA identity, released endpoint/migration and two-person acceptance",
+        "required_owner_action": "Complete MFA and appoint a second independent operator only before enabling the operator route"
+      },
+      {
+        "id": "R30",
+        "requirement": "Hosted financial receipt INSERT/TRUNCATE custody",
+        "status": "PASS",
+        "scope": "HOSTED_QA",
+        "evidence": "Isolated Neon QA uses restricted identity/read/command roles; command login has zero direct financial DML/TRUNCATE; NOLOGIN writer owns three tenant-bound SECURITY DEFINER gateways; PUBLIC has zero execute; 0 provider events",
+        "tests": "Direct restricted SQL and hosted HTTP proved valid commands, idempotent replay, cross-tenant denial, mismatched-session denial, direct-write denial and provider-event hold",
+        "defects_corrected": "Removed privileged application fallback outside tests and installed independently owned function-only financial write gateway",
+        "remaining_dependency": "None for isolated custody control; production financial operation remains prohibited by R31 and external release gates",
+        "required_owner_action": "Keep RecoveryOS unpublished until provider authority and release approval exist"
+      },
+      {
+        "id": "R31",
+        "requirement": "Hosted positive auth and trusted provider enrollment",
+        "status": "BLOCKED",
+        "scope": "HOSTED",
+        "evidence": "M8 remains unpublished; real signed-session and tenant-isolation paths passed isolated hosted QA; payment-event append remains held; no enrolled recovery-evidence provider or bank authority",
+        "tests": "Hosted signed-session/tenant tests plus read-only inspection of dedicated RecoveryOS Stripe sandbox; no webhook endpoint and no live-mode action",
+        "defects_corrected": "Signed session, database membership, tenant selection and custody paths repaired and exercised; untrusted provider append still fails closed",
+        "remaining_dependency": "None for zero-spend public/manual profile; financial automation requires an approved recovery-evidence provider and independently controlled signing contract",
+        "required_owner_action": "Do not substitute merchant billing webhooks for freight-recovery evidence; keep provider-event posting unavailable"
+      },
+      {
+        "id": "R32",
+        "requirement": "Actual buyer-verified posted cash or applied credit",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "All credits, returns and AP confirmation are synthetic",
+        "tests": "Fictional posting reconciled; no real financial source accessed",
+        "defects_corrected": "None",
+        "remaining_dependency": "At recovery stage obtain original carrier/bank posting and customer AP confirmation",
+        "required_owner_action": "At recovery stage obtain original carrier/bank posting and customer AP confirmation"
+      },
+      {
+        "id": "R33",
+        "requirement": "Live fee invoice identity, prior-billed ledger and uniqueness",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Sample not payable; software billing_authorized=false; no real invoice ledger",
+        "tests": "Sample cumulative fee and late-reversal correction recomputed",
+        "defects_corrected": "F1 and existing proof-bound fee retained",
+        "remaining_dependency": "Reviewer checks legal/tax/remittance identity, unique invoice, prior balance and latest evidence before issuance",
+        "required_owner_action": "Reviewer checks legal/tax/remittance identity, unique invoice, prior balance and latest evidence before issuance"
+      },
+      {
+        "id": "R34",
+        "requirement": "Lawful retention, holds and provider-confirmed closure",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Procedure ready; no customer-specific lawful rule or provider deletion proof",
+        "tests": "No customer files deleted; simulated UNKNOWN states distinguished",
+        "defects_corrected": "Retention instructions now define final-delivery clock and scope",
+        "remaining_dependency": "Owner/counsel approves rule; independent reviewer verifies access revocation, return/deletion and remaining backups",
+        "required_owner_action": "Owner/counsel approves rule; independent reviewer verifies access revocation, return/deletion and remaining backups"
+      },
+      {
+        "id": "R35",
+        "requirement": "Production release approval of combined source",
+        "status": "BLOCKED",
+        "scope": "RELEASE",
+        "evidence": "Existing #329 kept draft and unmerged; current main preserved",
+        "tests": "Local suites and exact-head CI checked separately; no auto merge",
+        "defects_corrected": "Two website conflicts resolved; reuse existing consolidated PR",
+        "remaining_dependency": "Owner reviews exact final head, visual/CI evidence and explicitly approves permitted release scope",
+        "required_owner_action": "Owner reviews exact final head, visual/CI evidence and explicitly approves permitted release scope"
+      },
+      {
+        "id": "R36",
+        "requirement": "Older public sample's $1,650 fee-eligibility gap",
+        "status": "PASS",
+        "scope": "ARTIFACT",
+        "evidence": "Live sample discloses the unallocated/unverified difference and the canonical gate permanently classifies it illustrative-only, nonbillable and ineligible for customer economic claims",
+        "tests": "Machine gate rejects any customer-result, billing-eligible or customer-economic-claim designation while the sample remains unverified",
+        "defects_corrected": "No source allocation was invented; the old sample is permanently excluded from billing and customer economics while the new eight-invoice rehearsal retains its separate complete bridge",
+        "remaining_dependency": null,
+        "required_owner_action": "None; do not remove the permanent nonbillable/illustrative classification without original item-level evidence and independent review"
+      },
+      {
+        "id": "R37",
+        "requirement": "Owner-approved pilot effort and spending limits",
+        "status": "BLOCKED",
+        "scope": "EXTERNAL",
+        "evidence": "Prior underwriting/labs are modeled; no actual customer profitability evidence",
+        "tests": "Existing economics controls replayed; no spending occurred",
+        "defects_corrected": "None",
+        "remaining_dependency": "Owner reserves analyst/reviewer capacity, sets hour/cost cap and stops or amends scope when exceeded",
+        "required_owner_action": "Owner reserves analyst/reviewer capacity, sets hour/cost cap and stops or amends scope when exceeded"
+      }
+    ],
+    "operational_stages": [
+      {
+        "stage": "1",
+        "name": "Discovery",
+        "decision": "GO",
+        "simulation": "PASS",
+        "evidence": "26 public pages and brand/security checks"
+      },
+      {
+        "stage": "2",
+        "name": "Inquiry",
+        "decision": "GO (manual, non-sensitive)",
+        "simulation": "PASS",
+        "evidence": "Phone/Zoho send, receipt and human response confirmed by owner 2026-10-12; no independent retest or automated intake activation."
+      },
+      {
+        "stage": "3",
+        "name": "Professional response",
+        "decision": "GO (manual, non-sensitive)",
+        "simulation": "PASS",
+        "evidence": "Phone/Zoho send, receipt and human response confirmed by owner 2026-10-12; no independent retest or automated intake activation."
+      },
+      {
+        "stage": "4",
+        "name": "Agreement/signature",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Fictional receipt only; actual legal party/counsel/signatures required"
+      },
+      {
+        "stage": "5",
+        "name": "Secure submission",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Local fictional source manifest; buyer workspace/MFA/authority blocked"
+      },
+      {
+        "stage": "6",
+        "name": "Import/validation",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Actual synthetic CSV pipeline; real Drive policy manual only"
+      },
+      {
+        "stage": "7",
+        "name": "Discrepancy detection",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Eight-invoice workflow; source authority/reviewer required for live work"
+      },
+      {
+        "stage": "8",
+        "name": "Independent review",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Simulated review objects; real qualified reviewer not appointed"
+      },
+      {
+        "stage": "9",
+        "name": "Customer audit report",
+        "decision": "CONDITIONAL GO",
+        "simulation": "PASS",
+        "evidence": "Synthetic report ready; live report follows signed/approved manual process"
+      },
+      {
+        "stage": "10",
+        "name": "Recovery authorization",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Exact synthetic action scope; no real customer action approval"
+      },
+      {
+        "stage": "11",
+        "name": "Carrier disputes/responses",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Local fictional request/response; no message sent"
+      },
+      {
+        "stage": "12",
+        "name": "Credits/refunds/reversals",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Synthetic ledger reconciles; hosted custody defect and real posting proof open"
+      },
+      {
+        "stage": "13",
+        "name": "30% fee calculation",
+        "decision": "CONDITIONAL GO",
+        "simulation": "PASS",
+        "evidence": "$75 eligible -> $22.50 nonbillable proof; real signed/posted gates required"
+      },
+      {
+        "stage": "14",
+        "name": "Customer invoice",
+        "decision": "NO-GO",
+        "simulation": "PASS",
+        "evidence": "Sample only; real unique invoice/identity/tax/prior-balance approval required"
+      },
+      {
+        "stage": "15",
+        "name": "Closure/retention",
+        "decision": "CONDITIONAL GO",
+        "simulation": "PASS",
+        "evidence": "Procedure and simulated controls ready; lawful/provider evidence required"
+      }
+    ],
+    "decision": "NO-GO FOR FIRST PAYING CUSTOMER; REVIEWABLE MANUAL ROUTE PREPARED",
+    "authoritative_tracker": "https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/323",
+    "owner_steering": {
+      "at": "2026-10-12T16:26:05-04:00",
+      "item_1": "Legal identity, contracts and insurance deferred to final owner step",
+      "item_2": "Ten simulated reviewers authorized; no actual MFA or human appointment inferred",
+      "item_3": "Phone/Zoho end-to-end handoff owner-confirmed complete",
+      "literal": "1 save for last. 2 do this yourself with 10 simulated reviewers. 3 this is done and confirmed"
+    }
+  },
+  "owner_steering": {
+    "at": "2026-10-12T16:26:05-04:00",
+    "item_1": "Legal identity, contracts and insurance deferred to final owner step",
+    "item_2": "Ten simulated reviewers authorized; no actual MFA or human appointment inferred",
+    "item_3": "Phone/Zoho end-to-end handoff owner-confirmed complete",
+    "literal": "1 save for last. 2 do this yourself with 10 simulated reviewers. 3 this is done and confirmed"
+  }
+}

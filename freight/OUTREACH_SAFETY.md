@@ -21,18 +21,21 @@ Permanent suppression: opt-out, negative response, hard bounce, no-fit or sequen
 3. Qualify buyers under ICP_V1.md: U.S. distributors/multi-site shippers, target scale, material LTL/parcel, auditable history of at least six months, verified finance owner and cited evidence. Score 65 or higher is required. Unknown inputs stay unqualified. Logistics providers from legacy lists require fresh review; do not assume they are primary buyers. Referral/editorial/directory channels require their own explicit approval and share the same suppression/history checks.
 4. Select FIRST_LOOK or SECOND_LOOK. Mature controls require SECOND_LOOK. Render all variables and one evidenced personalization sentence.
 5. Include sender identity, the approved physical postal address, and the explicit opt-out in every newly authored MIME alternative. The established business address is in THREE_TOUCH_OUTBOUND_SEQUENCE.md; confirm it is valid and authorized before setting postal_approved=true in the private sender configuration.
-6. Run the CLI against private JSON inputs and a unique reservation ID:
+6. Obtain Jamison Perkins's approval for the exact rendered message. Store it in a separate private approval file with the approver, timestamp, unique approval ID and SHA-256 digest produced by `messageApprovalDigest(message)`. Approval for one rendering cannot authorize changed recipients, subjects, bodies, offers or routing, and an approval ID cannot be reused.
+7. Run the CLI against private JSON inputs and a unique reservation ID:
 
 ```sh
-node freight/outreach_preflight.mjs /private/message.json /private/ledger.json /private/sender.json unique-reservation-id
+node freight/outreach_preflight.mjs /private/message.json /private/ledger.json /private/sender.json /private/approval.json unique-reservation-id
 ```
 
-7. The CLI takes an exclusive lock, rechecks the ledger and writes RESERVED atomically. It outputs no recipient/body and sends nothing. Only an integrated sender may proceed after this durable reservation. A crash/timeout or uncertain transport result stays RESERVED/UNKNOWN; reconcile Sent before retrying. Never simply delete a lock or reservation and resend.
-8. After a confirmed send, record SENT with its actual message ID and timestamp privately. After a definite unsent cancellation, record CANCELLED. DRAFT does not increment touches. Stop cold sequences on substantive reply/referral. Follow-ups require a matching prior message, Day 5/Day 12 timing and at least four days between sends; maximum three touches. Same-day routing responses belong to a manually reviewed active conversation, not the cold sequence.
+8. The CLI takes an exclusive lock, rechecks the ledger and writes RESERVED atomically. It outputs no recipient/body and sends nothing. Only an integrated sender may proceed after this durable reservation. A crash/timeout or uncertain transport result stays RESERVED/UNKNOWN; reconcile Sent before retrying. Never simply delete a lock or reservation and resend.
+9. After a confirmed send, record SENT with its actual message ID and timestamp privately. After a definite unsent cancellation, record CANCELLED. DRAFT does not increment touches. Stop cold sequences on substantive reply/referral. Follow-ups require a matching prior message, Day 5/Day 12 timing and at least four days between sends; maximum three touches. Same-day routing responses belong to a manually reviewed active conversation, not the cold sequence.
 
 ## Input contract
 
-sender: identity, postal_approved boolean, postal_lines array (street/box plus city/state/ZIP).
+sender: identity, approval_identity, postal_approved boolean, postal_lines array (street/box plus city/state/ZIP), commercial_notice_text, and opt_out_text. The commercial notice must identify the message as an advertisement. The opt-out text must explicitly tell the recipient to reply `unsubscribe` to opt out.
+
+approval: schema_version=1, approved=true, approved_by matching sender.approval_identity, non-future approved_at ISO timestamp, unique approval_id and message_sha256 matching the exact canonical message. Missing, mismatched, changed or previously used approval fails closed.
 
 ledger: schema_version=1, audit_hold=false, mailbox_checked_at ISO timestamp, contacts array and events array. Each contact: recipient_key, account_id, route_verified, suppressed, hold, status. BUYER qualification: icp_version=ICP_V1, approved, integer score, us_distributor_or_multisite_shipper, target_scale_band, meaningful_ltl_or_parcel, numeric history_months, finance_owner_verified, disqualified=false, mature_controls and evidence URLs. Other channels use channel_approved. Every prior SENT event requires recipient_key, account_id, message_id and sent_at. Open reservations must remain in the same ledger across campaigns and workers.
 

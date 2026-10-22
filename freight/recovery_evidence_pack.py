@@ -91,6 +91,18 @@ def normalize_finding(row):
         raise ValueError(
             "validated supported finding authority cannot postdate invoice"
         )
+    authorization_reference = str(row.get("authorization_reference") or "").strip()
+    clean["authorization_reference"] = authorization_reference
+    if clean["customer_authorization_state"] == "AUTHORIZED":
+        if not authorization_reference:
+            raise ValueError(
+                "AUTHORIZED finding requires authorization_reference"
+            )
+        if authorization_reference not in evidence:
+            raise ValueError(
+                "AUTHORIZED finding requires authorization_reference "
+                "in supporting_evidence"
+            )
     clean["supporting_evidence"] = evidence
     for key in SUPPRESSION_FLAGS:
         clean[key] = bool(row.get(key, False))
@@ -106,6 +118,11 @@ def normalize_finding(row):
         if not clean["settlement_reference"]:
             raise ValueError(
                 "positive settled_credit_cents requires settlement_reference"
+            )
+        if clean["settlement_reference"] not in evidence:
+            raise ValueError(
+                "positive settled_credit_cents requires settlement_reference "
+                "in supporting_evidence"
             )
     clean["difference_cents"] = max(clean["billed_cents"] - clean["expected_cents"], 0)
     if clean["settled_credit_cents"] > clean["difference_cents"]:
@@ -133,6 +150,9 @@ def build_pack(payload):
     customer = require_text(payload, "customer")
     population_id = require_text(payload, "population_id")
     period = require_text(payload, "period")
+    synthetic = payload.get("synthetic")
+    if not isinstance(synthetic, bool):
+        raise ValueError("synthetic must be an explicit boolean")
     rows = payload.get("findings")
     if not isinstance(rows, list) or not rows:
         raise ValueError("findings must be a non-empty list")
@@ -187,8 +207,9 @@ def build_pack(payload):
         "customer": customer,
         "population_id": population_id,
         "period": period,
-        "synthetic": bool(payload.get("synthetic", False)),
+        "synthetic": synthetic,
         "claim_boundary": {
+            "synthetic_classification_is_explicit_boolean": True,
             "potential_is_not_recovered": True,
             "validated_is_not_settled": True,
             "preexisting_and_duplicate_value_excluded": True,
@@ -200,8 +221,11 @@ def build_pack(payload):
             "realized_requires_settled_claim_and_reference": True,
             "realized_cannot_exceed_candidate_difference": True,
             "positive_settlement_reference_is_unique": True,
+            "positive_settlement_reference_bound_to_evidence": True,
             "economic_opportunity_identity_is_unique": True,
             "buyer_visible_realized_excludes_suppressed_findings": True,
+            "authorized_findings_require_authorization_reference": True,
+            "authorization_reference_bound_to_evidence": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -241,6 +265,7 @@ def render_markdown(pack):
             f"- Confidence / reviewer: **{row['confidence']} / {row['reviewer_disposition']}**",
             f"- Unresolved issues: {row['unresolved_issues'] or 'None'}",
             f"- Customer authorization: **{row['customer_authorization_state']}**",
+            f"- Authorization reference: {row['authorization_reference'] or 'None'}",
             f"- Claim status / carrier response: **{row['claim_status']}** / {row['carrier_response'] or 'None recorded'}",
             f"- Settlement reference: {row['settlement_reference'] or 'None'}",
             f"- Credit / reversal / net realized: **{money(row['settled_credit_cents'])} / {money(row['reversal_cents'])} / {money(row['net_realized_cents'])}**",
@@ -256,13 +281,15 @@ def render_markdown(pack):
         "5. Reversals reduce realized recovery.",
         "6. Positive settled credits require an approved or closed claim and a settlement reference.",
         "7. Settled credit cannot exceed the candidate invoice difference.",
-        "8. One positive settlement reference can support only one finding in this pack.",
-        "9. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
-        "10. A validated supported finding requires at least one supporting-evidence reference.",
-        "11. Its exact authority reference must appear in supporting evidence.",
-        "12. A validated supported finding cannot rely on authority effective after its invoice date.",
-        "13. Buyer-visible attributable realized recovery excludes suppressed findings.",
-        "14. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "8. Each positive settlement reference must appear in supporting evidence.",
+        "9. One positive settlement reference can support only one finding in this pack.",
+        "10. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
+        "11. A validated supported finding requires at least one supporting-evidence reference.",
+        "12. Its exact authority reference must appear in supporting evidence.",
+        "13. A validated supported finding cannot rely on authority effective after its invoice date.",
+        "14. Buyer-visible attributable realized recovery excludes suppressed findings.",
+        "15. An AUTHORIZED finding requires an exact authorization reference in supporting evidence.",
+        "16. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 
