@@ -904,9 +904,25 @@ class SettlementStore:
                 "WHERE buyer_id=? AND business_unit=?",
                 self._scope,
             ).fetchall()}
+            # A registered return without a reconciled reversal is still a
+            # claim against the source credit. Quarantine the entire affected
+            # event's provisional fee base; do not fabricate claim-level
+            # attribution of an ambiguous event-wide pending return.
+            pending_return_event_ids = {
+                row[0] for row in conn.execute(
+                    """SELECT DISTINCT c.original_event_id FROM counter_events c
+                    WHERE c.buyer_id=? AND c.business_unit=?
+                      AND c.amount_cents > COALESCE((
+                        SELECT SUM(r.amount_cents) FROM reversal_edges r
+                        WHERE r.buyer_id=c.buyer_id AND r.business_unit=c.business_unit
+                          AND r.counter_id=c.counter_id
+                      ),0)""",
+                    self._scope,
+                ).fetchall()
+            }
             total = 0
             for a in rows:
-                if a["claim_id"] in held:
+                if a["claim_id"] in held or a["event_id"] in pending_return_event_ids:
                     continue
                 reversed_cents = int(conn.execute(
                     "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND allocation_id=?",

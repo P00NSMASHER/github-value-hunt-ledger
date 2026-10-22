@@ -6,8 +6,10 @@ on:
       - 'freight/settlement_store.py'
       - 'freight/payment_orchestration.py'
       - 'freight/recovery_resilience.py'
+      - 'freight/currency_reporting.py'
       - 'freight/priority4_adversarial_lab.py'
       - 'freight/test_redteam_round2_repairs.py'
+      - 'freight/test_pending_return_fee_quarantine.py'
       - 'freight/REDTEAM_ROUND2_REPAIR_ACCEPTANCE.md'
       - '.github/workflows/retally-redteam-round2-integrity.yml'
   push:
@@ -16,8 +18,10 @@ on:
       - 'freight/settlement_store.py'
       - 'freight/payment_orchestration.py'
       - 'freight/recovery_resilience.py'
+      - 'freight/currency_reporting.py'
       - 'freight/priority4_adversarial_lab.py'
       - 'freight/test_redteam_round2_repairs.py'
+      - 'freight/test_pending_return_fee_quarantine.py'
       - '.github/workflows/retally-redteam-round2-integrity.yml'
 
 permissions:
@@ -48,9 +52,9 @@ jobs:
       - name: Install bounded test dependencies
         run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2 tzdata==2025.2
       - name: Syntax check protected source and negative controls
-        run: python -m compileall -q freight/settlement_store.py freight/payment_orchestration.py freight/recovery_resilience.py freight/priority4_adversarial_lab.py freight/test_redteam_round2_repairs.py
+        run: python -m compileall -q freight/settlement_store.py freight/payment_orchestration.py freight/recovery_resilience.py freight/priority4_adversarial_lab.py freight/test_redteam_round2_repairs.py freight/test_pending_return_fee_quarantine.py
       - name: Run red-team failure-before/passing-after suite
-        run: python -m pytest -q freight/test_redteam_round2_repairs.py
+        run: python -m pytest -q freight/test_redteam_round2_repairs.py freight/test_pending_return_fee_quarantine.py
       - name: Preserve whitespace integrity
         run: git diff --check
 
