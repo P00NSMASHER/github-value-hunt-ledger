@@ -1,0 +1,73 @@
+name: RETALLY Priority 3 Synthetic Recovery Resilience
+
+on:
+  pull_request:
+    paths:
+      - 'freight/recovery_resilience.py'
+      - 'freight/test_priority3_recovery_resilience.py'
+      - 'freight/PRIORITY3_DIFFICULT_RECOVERY_ACCEPTANCE.md'
+      - '.github/workflows/retally-priority3-recovery.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freight/recovery_resilience.py'
+      - 'freight/test_priority3_recovery_resilience.py'
+      - '.github/workflows/retally-priority3-recovery.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-priority3-recovery-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  synthetic-recovery-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact frozen source without persisted credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Use pinned Python runtime
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned test runner
+        run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2
+      - name: Compile protected financial decision module
+        run: python -m compileall -q freight/recovery_resilience.py freight/test_priority3_recovery_resilience.py
+      - name: Run 120 adversarial scenarios plus original financial regressions
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_priority3_recovery_resilience.py \
+            freight/test_priority0_financial_integrity.py \
+            freight/test_priority1_financial_assurance.py \
+            freight/test_priority2_evidence.py \
+            freight/test_priority2_pipeline.py \
+            freight/test_recovery_claim_workflow.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_review_workflow.py \
+            freight/test_settlement_lifecycle_workflow.py \
+            freight/test_settlement_report.py \
+            freight/test_pilot_reporting.py \
+            freight/test_financial_integrity_r1.py
+      - name: Prove no customer money, privileged provider or private source fixture was introduced
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          code=Path('freight/recovery_resilience.py').read_text()
+          assert 'def evaluate_recovery_scenario(' in code
+          assert 'store.report_snapshot_json()' in code
+          assert 'source_authenticated_payment_cents: int = 0' in code
+          assert 'customer_fee_billable_cents: int' in code
+          assert 'carrier_contact_attempts: int' in code
+          assert 'NO_VERIFIED_CUSTOMER_RECOVERY_CONSENT' in code
+          assert 'model is synthetic-only' in code
+          print('Priority 3 synthetic-only financial custody controls are present')
+          PY
+      - name: Check changed source is whitespace-clean
+        run: git diff --check
