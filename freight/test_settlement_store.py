@@ -423,7 +423,12 @@ def test_review_reverse_enforces_allocation_and_counter_capacity(tmp_path):
             amount_cents=6000,created_at="2026-09-03T12:01:00Z",
         )
 
-    s.ingest_counter(R(rid="r2",amt=50000))
+    # The original test deliberately inserted returns totaling 65000
+    # against a 50000 credit. The new source-capacity gate rejects that
+    # invalid financial history before allocation/reversal calculations.
+    with pytest.raises(ValueError, match="total return exceeds"):
+        s.ingest_counter(R(rid="invalid-extra-return",amt=35001))
+    s.ingest_counter(R(rid="r2",amt=35000))
     with pytest.raises(ValueError,match="allocation reversal capacity exceeded"):
         s.review_reverse(
             reversal_id="rr3",counter_id="r2",allocation_id="auto:e1:c1",
