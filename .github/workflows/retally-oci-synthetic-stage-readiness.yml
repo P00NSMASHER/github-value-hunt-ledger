@@ -1,0 +1,90 @@
+name: RETALLY OCI Synthetic Stage Readiness
+
+on:
+  pull_request:
+    paths:
+      - 'deployment/oracle-always-free/stage_*.py'
+      - 'deployment/oracle-always-free/plan_synthetic_stage.py'
+      - 'deployment/oracle-always-free/OCI_RUNCOMMAND_ACCEPTANCE_20261022.md'
+      - 'tests/oci_synthetic_stage/**'
+      - '.github/workflows/retally-oci-synthetic-stage-readiness.yml'
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: 'Exact approved main commit, 40 hex characters'
+        required: true
+        type: string
+      canary_run_id:
+        description: 'Successful LIVE GitHub-initiated OCI canary run ID'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-oci-stage-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  offline-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Compile and test staging safety gates
+        run: |
+          python -m compileall -q deployment/oracle-always-free/stage_context.py deployment/oracle-always-free/stage_evidence.py deployment/oracle-always-free/stage_readiness.py deployment/oracle-always-free/plan_synthetic_stage.py
+          python -m unittest discover -s tests/oci_synthetic_stage -p 'test_*.py' -v
+
+  staging-disabled:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (github.ref != 'refs/heads/main' ||
+       vars.RETALLY_OCI_RUN_COMMAND_ENABLED != 'true' ||
+       vars.RETALLY_OCI_SYNTHETIC_STAGE_ENABLED != 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Explicit hold — no remote execution
+        run: |
+          echo '::error::Staging is disabled, wrong branch or unapproved. No OCI operation was performed.'
+          exit 1
+
+  verify-real-canary-before-staging:
+    needs: offline-unit-tests
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' &&
+      vars.RETALLY_OCI_RUN_COMMAND_ENABLED == 'true' &&
+      vars.RETALLY_OCI_SYNTHETIC_STAGE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_INPUT_EXPECTED_SHA: ${{ inputs.expected_sha }}
+      GITHUB_INPUT_CANARY_RUN_ID: ${{ inputs.canary_run_id }}
+      RETALLY_OCI_SYNTHETIC_STAGE_APPROVED_SHA: ${{ vars.RETALLY_OCI_SYNTHETIC_STAGE_APPROVED_SHA }}
+      RETALLY_OCI_SYNTHETIC_STAGE_ENABLED: ${{ vars.RETALLY_OCI_SYNTHETIC_STAGE_ENABLED }}
+      RETALLY_OCI_RUN_COMMAND_ENABLED: ${{ vars.RETALLY_OCI_RUN_COMMAND_ENABLED }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Check live manual GitHub OCI command and exact CI
+        run: python deployment/oracle-always-free/stage_readiness.py
+      - name: Render operator-only staging and rollback plan
+        run: >-
+          python deployment/oracle-always-free/plan_synthetic_stage.py
+          --receipt "$RUNNER_TEMP/retally-oci-stage/oci-synthetic-stage-readiness.json"
