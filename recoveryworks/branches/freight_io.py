@@ -14,11 +14,10 @@ from freight.contracts import (
     REVIEW,
     VALIDATED,
     canonical_hash as freight_hash,
-    make_finding,
 )
 
 from recoveryworks.engine import RecoveryObservation
-from .freight import from_freight_finding
+from .freight import from_freight_finding, verify_freight_finding
 
 
 @dataclass(frozen=True)
@@ -45,24 +44,7 @@ def _parse_json(raw: bytes, *, label: str) -> Mapping[str, Any]:
 
 
 def _verify_finding(raw: Mapping[str, Any]) -> Finding:
-    finding = Finding(**raw)
-    rebuilt = make_finding(
-        finding_id=finding.finding_id,
-        buyer_id=finding.buyer_id,
-        business_unit=finding.business_unit,
-        invoice_id=finding.invoice_id,
-        shipment_id=finding.shipment_id,
-        customer_id=finding.customer_id,
-        carrier_id=finding.carrier_id,
-        currency=finding.currency,
-        authority_id=finding.authority_id,
-        expected_cents=finding.expected_cents,
-        actual_cents=finding.actual_cents,
-        status=finding.status,
-    )
-    if rebuilt.proof_hash != finding.proof_hash:
-        raise ValueError(f"freight finding proof hash mismatch: {finding.finding_id}")
-    return finding
+    return verify_freight_finding(Finding(**raw))
 
 
 def parse_freight_truth_manifest(
@@ -94,7 +76,11 @@ def parse_freight_truth_manifest(
             raise ValueError("freight authority scope mismatch")
         authority_index[authority.authority_id] = authority
 
+    seen_finding_ids: set[str] = set()
     for finding in findings:
+        if finding.finding_id in seen_finding_ids:
+            raise ValueError(f"duplicate freight finding_id: {finding.finding_id}")
+        seen_finding_ids.add(finding.finding_id)
         if (finding.buyer_id, finding.business_unit) != (buyer_id, business_unit):
             raise ValueError("freight finding scope mismatch")
         if finding.status not in {VALIDATED, REVIEW}:
@@ -103,6 +89,14 @@ def parse_freight_truth_manifest(
             not finding.authority_id or finding.authority_id not in authority_index
         ):
             raise ValueError("validated freight finding missing authority")
+        if finding.authority_id and finding.authority_id in authority_index:
+            # Hash-valid manifests can still bind the wrong customer,
+            # carrier or currency. Enforce the producer's exact scope rules.
+            authority = authority_index[finding.authority_id]
+            if (authority.customer_id, authority.carrier_id, authority.currency) != (
+                finding.customer_id, finding.carrier_id, finding.currency
+            ):
+                raise ValueError("freight authority identity mismatch: customer/carrier/currency")
 
     body = {
         "schema": 3,
