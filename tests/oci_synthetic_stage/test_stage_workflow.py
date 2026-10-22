@@ -29,6 +29,7 @@ class WorkflowSafety(unittest.TestCase):
         self.assertNotIn('  schedule:',body)
         self.assertNotIn('  push:',body)
         self.assertIn('actions: read',body)
+        self.assertIn('checks: read',body)
         self.assertNotIn('id-token: write',body)
         self.assertNotIn('secrets.RETALLY_OCI',body)
         self.assertNotIn('oci instance-agent command create',body)
