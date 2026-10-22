@@ -45,6 +45,7 @@ EXPECTED_KEYS = {
 REQUIRED = (
     "RETALLY_OCI_RUN_DOMAIN_URL", "RETALLY_OCI_RUN_CLIENT_ID",
     "RETALLY_OCI_RUN_CLIENT_SECRET", "RETALLY_OCI_COMPARTMENT_OCID",
+    "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
     "RETALLY_OCI_VM_OCID", "ACTIONS_ID_TOKEN_REQUEST_URL",
     "ACTIONS_ID_TOKEN_REQUEST_TOKEN", "RETALLY_OCI_RUN_APPROVED_SHA",
     "GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT",
@@ -80,6 +81,9 @@ def check_context(env: dict[str, str]) -> None:
                  not oidc.fragment, "UNTRUSTED_GITHUB_OIDC_ENDPOINT")
     auth.require(re.fullmatch(r"ocid1\.(compartment|tenancy)\.oc1\.[a-z0-9.-]+",
                                   env["RETALLY_OCI_COMPARTMENT_OCID"]) is not None,
+                 "COMPARTMENT_INVALID")
+    auth.require(re.fullmatch(r"ocid1\.compartment\.oc1\.[a-z0-9.-]+",
+                                  env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"]) is not None,
                  "COMPARTMENT_INVALID")
     auth.require(re.fullmatch(r"ocid1\.instance\.oc1\.[a-z0-9.-]+",
                                   env["RETALLY_OCI_VM_OCID"]) is not None,
@@ -147,7 +151,7 @@ def check_plugin(plugins: list[object]) -> None:
 def make_command_details(oci, env: dict[str, str]):
     m = oci.compute_instance_agent.models
     return m.CreateInstanceAgentCommandDetails(
-        compartment_id=env["RETALLY_OCI_COMPARTMENT_OCID"],
+        compartment_id=env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
         execution_time_out_in_seconds=45,
         display_name="RETALLY synthetic no-write canary",
         target=m.InstanceAgentCommandTarget(instance_id=env["RETALLY_OCI_VM_OCID"]),

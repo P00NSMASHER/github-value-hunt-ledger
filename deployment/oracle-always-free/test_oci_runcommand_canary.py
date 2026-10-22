@@ -28,6 +28,7 @@ def fixture():
         "RETALLY_OCI_RUN_CLIENT_ID": "remote-only-client",
         "RETALLY_OCI_RUN_CLIENT_SECRET": "dummy-never-live",
         "RETALLY_OCI_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcompartment",
+        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testcommands",
         "RETALLY_OCI_VM_OCID": "ocid1.instance.oc1.iad.testinstance",
         "ACTIONS_ID_TOKEN_REQUEST_URL": "https://pipelines.actions.githubusercontent.com/oidc/token?a=b",
         "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "dummy-gh-job-token",
@@ -65,6 +66,7 @@ class ContextTests(unittest.TestCase):
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://evil.example/token"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://bad.actions.githubusercontent.com/token"),
             ("RETALLY_OCI_VM_OCID", "bad"), ("RETALLY_OCI_COMPARTMENT_OCID", "bad"),
+            ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID", "bad"),
             ("RETALLY_OCI_RUN_CLIENT_SECRET", ""),
         ]:
             with self.subTest(key=key):
@@ -333,6 +335,9 @@ class ProviderTests(unittest.TestCase):
         fake = SimpleNamespace(compute_instance_agent=SimpleNamespace(models=types))
         data = m.make_command_details(fake,fixture())
         self.assertEqual(data.execution_time_out_in_seconds,45)
+        self.assertEqual(data.compartment_id,
+                         fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"])
+        self.assertNotEqual(data.compartment_id, fixture()["RETALLY_OCI_COMPARTMENT_OCID"])
         self.assertEqual(data.target.instance_id,fixture()["RETALLY_OCI_VM_OCID"])
         self.assertEqual(data.content.source.text,m.CANARY)
         self.assertFalse(hasattr(data.content,"command_string"))
