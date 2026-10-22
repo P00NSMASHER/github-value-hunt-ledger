@@ -128,8 +128,6 @@ jobs:
           PY
       - name: Commit integrator updates
         id: persist
-        env:
-          PR_MODE: ${{ vars.RETALLY_INTEGRATOR_PR_ENABLED }}
         shell: bash
         run: |
           if [ ! -s .integrator_sync_changed ]; then
@@ -141,27 +139,23 @@ jobs:
           while IFS= read -r file || [ -n "$file" ]; do git add -- "$file"; done < .integrator_sync_changed
           git commit -m 'Integrator portfolio synthesis and search direction'
           git pull --rebase origin main
-          if [ "$PR_MODE" = "true" ]; then
-            BRANCH="automation/retally-integrator-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-            BASE_SHA="$(git rev-parse HEAD^)"
-            HEAD_SHA="$(git rev-parse HEAD)"
-            git push origin "HEAD:refs/heads/$BRANCH"
-            {
-              echo "proposal_ready=true"
-              echo "branch=$BRANCH"
-              echo "base_sha=$BASE_SHA"
-              echo "head_sha=$HEAD_SHA"
-            } >> "$GITHUB_OUTPUT"
-          else
-            git push
-          fi
+          BRANCH="automation/retally-integrator-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          BASE_SHA="$(git rev-parse HEAD^)"
+          HEAD_SHA="$(git rev-parse HEAD)"
+          git push origin "HEAD:refs/heads/$BRANCH"
+          {
+            echo "proposal_ready=true"
+            echo "branch=$BRANCH"
+            echo "base_sha=$BASE_SHA"
+            echo "head_sha=$HEAD_SHA"
+          } >> "$GITHUB_OUTPUT"
+
 
   submit-pr:
     needs: sync
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
-      vars.RETALLY_INTEGRATOR_PR_ENABLED == 'true' &&
       needs.sync.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5

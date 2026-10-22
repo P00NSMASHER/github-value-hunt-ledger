@@ -7,7 +7,7 @@ failure are not an empty ledger. This module neither discovers a live source nor
 binds source cases to customer identities or verifies payments.
 
 Pinned producer: P00NSMASHER/capturebrief @
-9449210bb8d2fbaf2c618e3ccdc6e993a8d1152de,
+9449210bb8d2fbaf2c618e3ccdc6e993a8d1152d,
 capturebrief_core/{model,ledger,outcomes}.py.
 """
 
@@ -110,9 +110,27 @@ def _clean_fields(value: Any, required: set[str], optional: set[str] | None = No
     _require(type(value) is dict and required <= set(value) and set(value) <= required | (optional or set()))
 
 
+def _contains_forbidden_outcome_key(value: Any) -> bool:
+    """Mirror CaptureBrief's recursive dictionary/list prohibited-field rule.
+
+    UNKNOWN or UNPAID payment references may contain JSON values not subject
+    to the scalar payment receipt rule. They must never carry prohibited fields
+    nested inside dictionaries or lists, even if the hash chain is consistent.
+    """
+    if isinstance(value, dict):
+        return any(
+            str(key).lower() in _FORBIDDEN or _contains_forbidden_outcome_key(child)
+            for key, child in value.items()
+        )
+    if isinstance(value, list):
+        return any(_contains_forbidden_outcome_key(child) for child in value)
+    return False
+
+
 def _event(event: Any, observed: datetime) -> tuple[str, str, str | None, datetime, datetime | None]:
     """Mirror the producer's controlled outcome types; retain no case/evidence refs."""
     _clean_fields(event, _EVENT_REQUIRED, _EVENT_OPTIONAL)
+    _require(not _contains_forbidden_outcome_key(event))
     _require(event["schema_version"] == "1.0")
     case = event["case_id"]
     _require(type(case) is str and 0 < len(case.strip()) <= 256)
@@ -125,7 +143,7 @@ def _event(event: Any, observed: datetime) -> tuple[str, str, str | None, dateti
     if kind in {"DELIVERY", "FEEDBACK", "RETRACTION", "REPEAT_REQUEST"}:
         _require(_digest(bundle))
     data = event["data"]
-    _require(type(data) is dict and not any(str(k).lower() in _FORBIDDEN for k in data))
+    _require(type(data) is dict)
     delivered_at = None
     if kind == "PAYMENT":
         _clean_fields(data, {"state"}, {"amount_cents", "currency", "payment_evidence_ref"})

@@ -162,3 +162,18 @@
 @media screen and (prefers-reduced-motion:reduce){
  .group-site a,.group-site button,.group-site summary{transition:none!important;transform:none!important}
 }
+
+
+/* Shared enquiry controls follow the existing porcelain contact card. */
+.enquiry-card fieldset{margin:0;padding:0;border:0;min-width:0}
+.enquiry-card input:not([type="checkbox"]){display:block;box-sizing:border-box;width:100%;max-width:100%;border:1px solid #8ba895;border-radius:7px;background:#fff;color:#173c2e;font:inherit;font-size:16px;padding:12px;min-height:48px;box-shadow:inset 0 2px 4px #163e2410}
+.enquiry-card .enquiry-optional{font-weight:400;font-size:13px}
+.enquiry-card .enquiry-consent{display:flex;align-items:flex-start;gap:11px;font-size:14px;font-weight:400;line-height:1.6}
+.enquiry-consent input{flex:0 0 auto;width:18px;height:18px;margin-top:3px;accent-color:#08744f}
+.enquiry-card .enquiry-alternatives{border-top:1px solid #c5ddcf;margin-top:22px;padding-top:10px}
+.enquiry-alternatives>a{display:inline-block;margin:5px 14px 8px 0}
+.enquiry-card #enquiry-turnstile{margin-top:18px;min-height:1px}
+.enquiry-card #enquiry-status{overflow-wrap:anywhere}
+.enquiry-card #enquiry-copy-text{margin-top:12px;font-size:14px}
+.enquiry-card [hidden]{display:none!important}
+.enquiry-card fieldset:disabled input,.enquiry-card fieldset:disabled select,.enquiry-card fieldset:disabled textarea{opacity:.75}
