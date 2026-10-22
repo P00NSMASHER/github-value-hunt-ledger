@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Callable, TypeVar
 
 from freight.financial_assurance import require_cent_currency, require_exact_cents
+from freight.contracts import canonical_hash
 
 AUTO, REVIEW = "AUTO", "REVIEW"
 ALLOCATED, ALREADY_ALLOCATED = "ALLOCATED", "ALREADY_ALLOCATED"
@@ -358,6 +359,93 @@ class SettlementStore:
 
         return self._write(op)
 
+    def place_claim_dispute_hold(
+        self,
+        *,
+        claim_id: str,
+        kind: str,
+        source_hash: str,
+        observed_at: str,
+        expected_claim_source_sha256: str,
+    ) -> bool:
+        """Durably quarantine disputed recovery attribution, not credit evidence.
+
+        Any source-declared denial may conservatively hold a claim, but is not
+        itself authenticated contractual, bank or customer consent. No release
+        path is supplied by an unauthenticated role string.
+        """
+        allowed = {
+            "CARRIER_DISPUTE", "CARRIER_DENIAL", "CUSTOMER_DISPUTE",
+            "CUSTOMER_WITHDRAWAL", "INSOLVENCY_NOTICE",
+            "CARRIER_OUT_OF_BUSINESS", "CLAIM_TIME_BAR_CONCERN",
+        }
+        claim_id = self._text("claim_id", claim_id)
+        if kind not in allowed:
+            raise ValueError("unsupported claim dispute hold kind")
+        source_hash = self._source_hash(source_hash)
+        expected_claim_source_sha256 = self._source_hash(
+            expected_claim_source_sha256
+        )
+        observed_at = self._timestamp("observed_at", observed_at)
+        hold_id = canonical_hash({
+            "schema": 1, "buyer": self.buyer_id, "unit": self.business_unit,
+            "claim_id": claim_id, "kind": kind, "source_hash": source_hash,
+            "observed_at": observed_at,
+        })
+
+        def op(conn: sqlite3.Connection) -> bool:
+            claim = conn.execute(
+                "SELECT issued_at,source_hash FROM recovery_claims "
+                "WHERE buyer_id=? AND business_unit=? AND claim_id=?",
+                (*self._scope, claim_id),
+            ).fetchone()
+            if claim is None:
+                raise ValueError("unknown claim for dispute hold")
+            if claim["source_hash"] != expected_claim_source_sha256:
+                raise ValueError("dispute hold claim source mismatch")
+            if source_hash == expected_claim_source_sha256:
+                raise ValueError("dispute notice must have independent source")
+            if observed_at < claim["issued_at"]:
+                raise ValueError("dispute hold cannot predate issued claim")
+            old = conn.execute(
+                "SELECT * FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND hold_id=?",
+                (*self._scope, hold_id),
+            ).fetchone()
+            if old:
+                if all(old[name] == value for name, value in {
+                    "claim_id": claim_id, "kind": kind,
+                    "source_hash": source_hash, "observed_at": observed_at,
+                }.items()):
+                    return False
+                raise ValueError("dispute hold replay conflicts with immutable evidence")
+            if conn.execute(
+                "SELECT 1 FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND source_hash=?",
+                (*self._scope, source_hash),
+            ).fetchone():
+                raise ValueError("dispute notice source already used for another hold")
+            conn.execute(
+                "INSERT INTO claim_dispute_holds "
+                "(buyer_id,business_unit,hold_id,claim_id,kind,observed_at,source_hash) "
+                "VALUES(?,?,?,?,?,?,?)",
+                (*self._scope, hold_id, claim_id, kind, observed_at, source_hash),
+            )
+            return True
+        return self._write(op)
+
+    def dispute_hold_active(self, claim_id: str) -> bool:
+        """Read an immutable active hold. No unauthenticated release exists."""
+        claim_id = self._text("claim_id", claim_id)
+        def read(conn: sqlite3.Connection) -> bool:
+            row = conn.execute(
+                "SELECT 1 FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND claim_id=? LIMIT 1",
+                (*self._scope, claim_id),
+            ).fetchone()
+            return row is not None
+        return self._read(read)
+
     def ingest_event(self, event: SettlementEventRecord) -> bool:
         v = dict(
             buyer_id=self.buyer_id,
@@ -526,6 +614,17 @@ class SettlementStore:
                 raise ValueError("unknown settlement event")
             if created_at < event["booked_at"]:
                 raise ValueError("allocation cannot predate settlement event")
+            if conn.execute(
+                "SELECT 1 FROM claim_dispute_holds h JOIN recovery_claims c "
+                "ON c.buyer_id=h.buyer_id AND c.business_unit=h.business_unit "
+                "AND c.claim_id=h.claim_id "
+                "WHERE h.buyer_id=? AND h.business_unit=? "
+                "AND c.reference=? AND c.payer_id=? AND c.payee_id=? "
+                "AND c.currency=? AND h.observed_at<=? LIMIT 1",
+                (*self._scope, event["reference"],event["payer_id"],
+                 event["payee_id"],event["currency"],created_at),
+            ).fetchone():
+                return Decision(REVIEW,reason="claim dispute hold prevents automatic recovery allocation")
             old = conn.execute(
                 "SELECT allocation_id FROM allocations WHERE buyer_id=? AND business_unit=? AND event_id=? ORDER BY allocation_id",
                 (*self._scope, event_id),
@@ -587,6 +686,12 @@ class SettlementStore:
             ).fetchone()
             if not claim or not event:
                 raise ValueError("review allocation requires existing claim and settlement event")
+            if conn.execute(
+                "SELECT 1 FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND claim_id=? LIMIT 1",
+                (*self._scope, claim_id),
+            ).fetchone():
+                raise ValueError("claim dispute hold prevents reviewed recovery allocation")
             if claim["currency"] != event["currency"]:
                 raise ValueError("allocation currency mismatch")
             if (claim["payer_id"], claim["payee_id"]) != (event["payer_id"], event["payee_id"]):
@@ -794,8 +899,15 @@ class SettlementStore:
                 "SELECT * FROM allocations WHERE buyer_id=? AND business_unit=?" + (" AND claim_id=?" if claim_id else ""),
                 params,
             ).fetchall()
+            held = {row[0] for row in conn.execute(
+                "SELECT DISTINCT claim_id FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=?",
+                self._scope,
+            ).fetchall()}
             total = 0
             for a in rows:
+                if a["claim_id"] in held:
+                    continue
                 reversed_cents = int(conn.execute(
                     "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND allocation_id=?",
                     (*self._scope, a["allocation_id"]),
@@ -806,7 +918,8 @@ class SettlementStore:
         return self._read(op)
 
     def count(self, table: str) -> int:
-        allowed = {"recovery_claims", "settlement_events", "allocations", "counter_events", "reversal_edges"}
+        allowed = {"recovery_claims", "settlement_events", "allocations",
+                   "counter_events", "reversal_edges", "claim_dispute_holds"}
         if table not in allowed:
             raise ValueError("unsupported count table")
         return self._read(lambda c: int(c.execute(
@@ -840,6 +953,15 @@ class SettlementStore:
                     )]
                     for table, key in tables
                 }
+                dispute_holds = [dict(row) for row in conn.execute(
+                    "SELECT * FROM claim_dispute_holds "
+                    "WHERE buyer_id=? AND business_unit=? ORDER BY hold_id",
+                    self._scope,
+                )]
+                # An empty hold ledger retains legacy no-dispute hashes.
+                # A newly registered hold changes every downstream snapshot.
+                if dispute_holds:
+                    rows["claim_dispute_holds"] = dispute_holds
                 return json.dumps({
                     "schema": 1,
                     "buyer_id": self.buyer_id,

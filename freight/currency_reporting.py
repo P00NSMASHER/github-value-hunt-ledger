@@ -49,6 +49,8 @@ def build_currency_settlement_report(store: SettlementStore) -> CurrencySettleme
     claims = {x["claim_id"]: x for x in tables["recovery_claims"]}
     events = {x["event_id"]: x for x in tables["settlement_events"]}
     allocations = {x["allocation_id"]: x for x in tables["allocations"]}
+    disputed_claim_ids = {x["claim_id"]
+                          for x in tables.get("claim_dispute_holds", ())}
     counters = {x["counter_id"]: x for x in tables["counter_events"]}
     rows = {}
     def bucket(currency: str) -> dict[str, int]:
@@ -78,7 +80,8 @@ def build_currency_settlement_report(store: SettlementStore) -> CurrencySettleme
             raise ValueError("allocation fee eligibility is inconsistent")
         target = bucket(claim["currency"])
         target["allocations"] += amt
-        target["fee_net"] += fee
+        if allocation["claim_id"] not in disputed_claim_ids:
+            target["fee_net"] += fee
     counter_applied = {}
     for reversal in tables["reversal_edges"]:
         allocation = allocations.get(reversal["allocation_id"])
@@ -93,7 +96,7 @@ def build_currency_settlement_report(store: SettlementStore) -> CurrencySettleme
         amt = require_exact_cents("reversed amount", reversal["amount_cents"], positive=True)
         row = bucket(event["currency"])
         row["reversals"] += amt
-        if allocation["fee_eligible_cents"]:
+        if allocation["fee_eligible_cents"] and allocation["claim_id"] not in disputed_claim_ids:
             row["fee_net"] -= amt
         counter_applied[counter["counter_id"]] = counter_applied.get(counter["counter_id"], 0) + amt
     for counter in counters.values():
