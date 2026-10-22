@@ -46,6 +46,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          company_sites/test_approved_brand.py
           freight/site/test_worksheet.py
           freight/site/test_home_worksheet_discovery.py
           freight/site/test_social_preview.py

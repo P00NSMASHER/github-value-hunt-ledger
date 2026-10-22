@@ -348,7 +348,7 @@ class PublicBuildTests(unittest.TestCase):
             production = (output / "index.html").read_text(encoding="utf-8")
             self.assertIn(f'<link rel="canonical" href="{NEW_BASE}">', production)
             self.assertIn(f'<meta property="og:url" content="{NEW_BASE}">', production)
-            image = NEW_BASE + "assets/images/terminal-blue-hour.webp"
+            image = NEW_BASE + "assets/brand/freightrecovery-social-20261022.png"
             self.assertIn(f'<meta property="og:image" content="{image}">', production)
             self.assertIn(f'<meta name="twitter:image" content="{image}">', production)
             self.assertTrue((output / "assets/images/terminal-blue-hour.webp").is_file())
