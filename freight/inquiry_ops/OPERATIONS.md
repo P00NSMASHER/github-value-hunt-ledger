@@ -123,6 +123,20 @@ rate limiter and fixed business inbox. Its notification subject is
 business and the visitor's message. The existing `/api/inquiry` route
 remains the freight-audit contract.
 
+The Group website is now `https://group.retallyrecovery.com/`; its secure form
+connects to `https://www.retallyrecovery.com/api/group-inquiry`. The server admits
+only that exact production Group origin for cross-origin access and verifies the
+Group hostname and `retally_group` challenge action. Preview origins cannot
+submit. Freight origin/challenge admission remains unchanged. No cookies or
+credentials are included in the Group browser request, and no API secret is
+published in the static Group site.
+
+New Group enquiries accept only `general`, `recovery`, `recoveryworks`,
+`permitplate` and `capturebrief`. These identify RETALLY Group, RETALLY Freight
+Recovery, RETALLY RecoveryWorks, PermitPlate and CaptureBrief respectively.
+Existing records for retired business choices remain private historical records;
+do not drop them from reconciliation or reinterpret them as a current service.
+
 The private case/response APIs record signed actions by reference only; they
 do not render raw inquiry contents or resend notifications.
 `reconcile.mjs` deliberately returns aggregate counts only and includes Group

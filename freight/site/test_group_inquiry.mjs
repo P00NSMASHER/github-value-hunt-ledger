@@ -54,20 +54,20 @@ function mockDb({failInsert=false,failNotificationUpdate=false}={}) {
     };}}; }
   };
 }
-function request(data=good(),{origin="https://www.retallyrecovery.com",host="www.retallyrecovery.com",contentType="application/json"}={}) {
-  return new Request("https://"+host+"/api/group-inquiry",{
-    method:"POST",headers:{"Origin":origin,"Content-Type":contentType,"CF-Connecting-IP":"198.51.100.4"},
-    body:JSON.stringify(data)
+function request(data=good(),{origin="https://group.retallyrecovery.com",host="www.retallyrecovery.com",contentType="application/json",method="POST",path="/api/group-inquiry"}={}) {
+  return new Request("https://"+host+path,{
+    method,headers:{"Origin":origin,"Content-Type":contentType,"CF-Connecting-IP":"198.51.100.4"},
+    body:method === "POST" ? JSON.stringify(data) : undefined
   });
 }
-function mockRemote({captcha=true,notify=true,providerResponse=null,providerStatus=null,transportThrows=false,action="retally_group"}={}) {
+function mockRemote({captcha=true,notify=true,providerResponse=null,providerStatus=null,transportThrows=false,action="retally_group",hostname="group.retallyrecovery.com"}={}) {
   const real=globalThis.fetch;
   let verifications=0,notifications=0;
   const sent=[];
   globalThis.fetch=async (url, options={}) => {
     if(String(url).includes("siteverify")) {
       verifications++;
-      return Response.json({success:captcha,action,hostname:"www.retallyrecovery.com"});
+      return Response.json({success:captcha,action,hostname});
     }
     if(String(url)==="https://api.resend.com/emails") {
       notifications++;
@@ -83,9 +83,19 @@ function mockRemote({captcha=true,notify=true,providerResponse=null,providerStat
   return { get verifications(){return verifications;},get notifications(){return notifications;},
     get sent(){return sent;},restore(){globalThis.fetch=real;} };
 }
+function assertCors(response, origin="https://group.retallyrecovery.com") {
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"),origin);
+  assert.ok(response.headers.get("Vary").split(/,\s*/).includes("Origin"));
+  assert.equal(response.headers.get("Access-Control-Allow-Credentials"),null);
+  assert.equal(response.headers.get("Cache-Control"),"no-store, private");
+  return response;
+}
 
 test("all published businesses and general enquiries use the same contact-only contract",()=>{
-  assert.equal(Object.keys(BUSINESSES).length,12);
+  assert.deepEqual(BUSINESSES,{
+    general:"RETALLY Group",recovery:"RETALLY Freight Recovery",recoveryworks:"RETALLY RecoveryWorks",
+    capturebrief:"CaptureBrief",permitplate:"PermitPlate"
+  });
   for(const business of Object.keys(BUSINESSES)){
     const p=normalize({...good(),business,companyName:""});
     assert.ok(p,business);assert.equal(p.inquiryKind,"group_contact");
@@ -93,6 +103,8 @@ test("all published businesses and general enquiries use the same contact-only c
     assert.match(notificationText("RA-20261022-12345678",p),/Contact request only/);
   }
   for(const patch of [{business:"__proto__"},{business:"constructor"},{business:"other"},
+    ...["rehabsignal","sheetharbor","app-factory","data-services","scopesignal",
+      "contractor-quote-recovery","resonance","market-surveillance"].map(business=>({business})),
     {consent:false},{consent:"true"},{website:"spam"},{message:""},
     {companyName:"bank account"},{message:"Here is an API key"},
     {workEmail:"bad@\nexample.org"},{files:["document"]},{recipient:"other@example.org"},
@@ -102,16 +114,16 @@ test("all published businesses and general enquiries use the same contact-only c
 });
 test("group transport is disabled when existing provider gates are incomplete",async()=>{
   const db=mockDb(),e=env(db);delete e.RESEND_API_KEY;
-  assert.equal((await onRequestGet({env:e})).status,503);
-  assert.equal((await onRequestPost({request:request(),env:e})).status,503);
+  assert.equal(assertCors(await onRequestGet({request:request(good(),{method:"GET"}),env:e})).status,503);
+  assert.equal(assertCors(await onRequestPost({request:request(),env:e})).status,503);
   assert.equal(db.sqlCalls.length,0);
 });
 test("origins, uploads and oversized requests fail before contacting providers",async()=>{
   const e=env(mockDb()),remote=mockRemote();
   try{
     assert.equal((await onRequestPost({request:request(good(),{origin:"https://another.example"}),env:e})).status,403);
-    assert.equal((await onRequestPost({request:request(good(),{contentType:"multipart/form-data"}),env:e})).status,415);
-    assert.equal((await onRequestPost({request:request({...good(),message:"x".repeat(9000)}),env:e})).status,413);
+    assert.equal(assertCors(await onRequestPost({request:request(good(),{contentType:"multipart/form-data"}),env:e})).status,415);
+    assert.equal(assertCors(await onRequestPost({request:request({...good(),message:"x".repeat(9000)}),env:e})).status,413);
     assert.equal(remote.verifications,0);assert.equal(remote.notifications,0);
     assert.equal(e.INQUIRY_DB.inquiries.size,0);
   }finally{remote.restore();}
@@ -119,14 +131,14 @@ test("origins, uploads and oversized requests fail before contacting providers",
 test("a freight Turnstile result cannot authorize a group submission",async()=>{
   const e=env(mockDb()),remote=mockRemote({action:"retally_audit"});
   try{
-    assert.equal((await onRequestPost({request:request(),env:e})).status,400);
+    assert.equal(assertCors(await onRequestPost({request:request(),env:e})).status,400);
     assert.equal(e.INQUIRY_DB.inquiries.size,0);assert.equal(remote.notifications,0);
   }finally{remote.restore();}
 });
 test("stores the selected business and returns a durable receipt with one fixed-inbox notification",async()=>{
   const db=mockDb(),e=env(db),remote=mockRemote();
   try{
-    const first=await onRequestPost({request:request(),env:e});
+    const first=assertCors(await onRequestPost({request:request(),env:e}));
     assert.equal(first.status,202);const body=await first.json();
     assert.equal(body.received,true);assert.equal(body.notificationPending,false);
     assert.match(body.reference,/^RA-\d{8}-[A-F0-9]{8}$/);
@@ -138,7 +150,7 @@ test("stores the selected business and returns a durable receipt with one fixed-
     assert.equal(sent.subject,"RETALLY Group Inquiry | "+body.reference);
     assert.match(sent.text,/Business: CaptureBrief/);assert.doesNotMatch(sent.text,/Annual freight spend/);
     assert.equal(sent.attachments,undefined);assert.equal(sent.reply_to,good().workEmail);
-    const again=await (await onRequestPost({request:request(),env:e})).json();
+    const again=await assertCors(await onRequestPost({request:request(),env:e})).json();
     assert.equal(again.reference,body.reference);assert.equal(again.duplicate,true);
     assert.equal(remote.notifications,1);assert.equal(remote.verifications,1);
   }finally{remote.restore();}
@@ -147,17 +159,17 @@ test("a reused request identifier cannot change business or cross into a freight
   const e=env(mockDb()),remote=mockRemote();
   try{
     assert.equal((await onRequestPost({request:request(),env:e})).status,202);
-    assert.equal((await onRequestPost({request:request({...good(),business:"permitplate"}),env:e})).status,409);
+    assert.equal(assertCors(await onRequestPost({request:request({...good(),business:"permitplate"}),env:e})).status,409);
     const freight={fullName:"Synthetic Test",workEmail:"qa@example.org",companyName:"Example Research",
       annualSpend:"Under $250k",modes:["LTL"],idempotencyKey:key,turnstileToken:"test-token"};
-    assert.equal((await freightPost({request:request(freight),env:e})).status,409);
+    assert.equal((await freightPost({request:request(freight,{origin:"https://www.retallyrecovery.com",path:"/api/inquiry"}),env:e})).status,409);
     assert.equal(remote.notifications,1);assert.equal(e.INQUIRY_DB.inquiries.size,1);
   }finally{remote.restore();}
 });
 test("provider failure preserves the saved inquiry and never claims mailbox delivery",async()=>{
   const e=env(mockDb()),remote=mockRemote({transportThrows:true});
   try{
-    const body=await (await onRequestPost({request:request(),env:e})).json();
+    const body=await assertCors(await onRequestPost({request:request(),env:e})).json();
     assert.equal(body.received,true);assert.equal(body.notificationPending,true);
     assert.equal(e.INQUIRY_DB.inquiries.size,1);
     const again=await (await onRequestPost({request:request(),env:e})).json();
@@ -169,7 +181,7 @@ test("provider failure preserves the saved inquiry and never claims mailbox deli
 test("a failed durable write sends no notification",async()=>{
   const e=env(mockDb({failInsert:true})),remote=mockRemote();
   try{
-    assert.equal((await onRequestPost({request:request(),env:e})).status,503);
+    assert.equal(assertCors(await onRequestPost({request:request(),env:e})).status,503);
     assert.equal(e.INQUIRY_DB.inquiries.size,0);assert.equal(remote.notifications,0);
   }finally{remote.restore();}
 });
@@ -180,9 +192,21 @@ test("group route shares the existing hashed rate limit and cannot purge old inq
       const data={...good(),idempotencyKey:key.replace("aaaaaaaa","aaaaaaa"+i)};
       assert.equal((await onRequestPost({request:request(data),env:e})).status,202);
     }
-    assert.equal((await onRequestPost({request:request({...good(),idempotencyKey:key.replace("aaaaaaaa","aaaaaaa5")}),env:e})).status,429);
+    assert.equal(assertCors(await onRequestPost({request:request({...good(),idempotencyKey:key.replace("aaaaaaaa","aaaaaaa5")}),env:e})).status,429);
     assert.equal(remote.notifications,5);assert.equal(remote.verifications,5);
     assert.ok(e.INQUIRY_DB.sqlCalls.every(sql=>!sql.startsWith("DELETE FROM inquiries")));
     assert.ok([...e.INQUIRY_DB.limits.keys()].every(k=>/^[a-f0-9]{64}$/.test(k)));
   }finally{remote.restore();}
+});
+test("legacy production Group forms keep exact same-origin receipts without widening freight",async()=>{
+  for(const hostname of ["www.retallyrecovery.com","retallyrecovery.com"]){
+    const e=env(mockDb()),remote=mockRemote({hostname});
+    try{
+      const origin="https://"+hostname;
+      const response=assertCors(await onRequestPost({request:request(good(),{origin,host:hostname}),env:e}),origin);
+      assert.equal(response.status,202);
+      assert.equal((await response.json()).received,true);
+      assert.equal(remote.notifications,1);
+    }finally{remote.restore();}
+  }
 });

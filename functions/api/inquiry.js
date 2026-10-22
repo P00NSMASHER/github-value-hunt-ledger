@@ -171,7 +171,7 @@ async function limitRequest(env, ip) {
   }
   return true;
 }
-async function verifyTurnstile(p, request, env, action) {
+async function verifyTurnstile(p, request, env, policy) {
   const form = new FormData();
   form.set("secret", env.TURNSTILE_SECRET);
   form.set("response", p.turnstileToken);
@@ -182,7 +182,10 @@ async function verifyTurnstile(p, request, env, action) {
   });
   if (!response.ok) return false;
   const r = await response.json();
-  return r.success === true && r.action === action && HOSTS.has(r.hostname);
+  return r.success === true && r.action === policy.turnstileAction &&
+    (policy.validTurnstileHostname
+      ? policy.validTurnstileHostname(r.hostname, request)
+      : HOSTS.has(r.hostname));
 }
 export function notificationText(reference, p) {
   const lines = [
@@ -239,7 +242,7 @@ const FREIGHT_POLICY = Object.freeze({
 export async function receiveInquiry({ request, env }, policy) {
   // A backend deployment alone does not enable this service for the public.
   if (!validEnv(env)) return answer(503, { ok: false, error: "Online submission is not available. Please use the email contact option." });
-  if (!validOrigin(request)) return answer(403, { ok: false, error: "Request origin was not accepted." });
+  if (!(policy.validOrigin || validOrigin)(request)) return answer(403, { ok: false, error: "Request origin was not accepted." });
   if (!/^application\/json(?:\s*;.*)?$/i.test(request.headers.get("content-type") || "")) {
     return answer(415, { ok: false, error: "Only the secure form is supported. No file attachments are accepted." });
   }
@@ -260,7 +263,7 @@ export async function receiveInquiry({ request, env }, policy) {
     if (!await limitRequest(env, request.headers.get("CF-Connecting-IP"))) {
       return answer(429, { ok: false, error: "Please try again later or contact RETALLY by email." });
     }
-    if (!await verifyTurnstile(p, request, env, policy.turnstileAction)) {
+    if (!await verifyTurnstile(p, request, env, policy)) {
       return invalid("Verification expired or failed. Refresh the verification and try again.");
     }
     const reference = "RA-" + new Date().toISOString().slice(0,10).replaceAll("-","") +

@@ -24,6 +24,7 @@ MIN_HSTS_SECONDS = 86400
 LTL_COMPARATOR_PAGE = CANONICAL + "ltl-reweigh-evidence-comparator"
 LTL_COMPARATOR_SCRIPT = CANONICAL + "ltl-evidence-comparator.js"
 EVIDENCE_LEDGER_RESOURCE = "freight-recovery-evidence-ledger.csv"
+RECOVERYWORKS_CANONICAL = "https://recoveryworks.retallyrecovery.com/"
 # Retries apply ONLY to transient public GET 504s. Other statuses (including
 # intentionally disabled inquiry GET 503) and content/security mismatches
 # remain fail-closed. This does not reinterpret Cloudflare internal cache logs.
@@ -106,6 +107,28 @@ def ensure_html(html: str, url: str) -> None:
         raise LiveAuditError(f"Private contact identifier exposed on {url}")
 
 
+def ensure_freight_home(html: str) -> None:
+    """The canonical root must remain the freight offer and working intake."""
+    for marker in ('class="home-simple"', 'id="auditForm"',
+                   'id="start-audit"', 'id="pricing"', 'Find it.'):
+        if marker not in html:
+            raise LiveAuditError(f"Freight homepage contract missing: {marker}")
+    if 'class="group-site"' in html or 'class="portfolio-bar"' in html:
+        raise LiveAuditError("The group catalogue replaced the freight homepage")
+
+
+def verify_recoveryworks_handoff(fetcher) -> None:
+    """Verify the exact approved successor without following arbitrary hosts."""
+    status, headers, _ = fetcher(CANONICAL + "recoveryos/")
+    if status not in (301, 308) or headers.get("Location") != RECOVERYWORKS_CANONICAL:
+        raise LiveAuditError("RecoveryOS legacy route must redirect to RecoveryWorks")
+    status, headers, body = fetcher(RECOVERYWORKS_CANONICAL)
+    if status != 200:
+        raise LiveAuditError(f"RecoveryWorks destination HTTP {status}")
+    ensure_security_headers(headers)
+    ensure_html(body.decode("utf-8"), RECOVERYWORKS_CANONICAL)
+
+
 
 def ensure_ltl_comparator(html: str, script: str) -> None:
     """Require the new free LTL comparison workflow, not just an old healthy site.
@@ -157,6 +180,7 @@ def inspect_live_site() -> dict[str, object]:
     ensure_security_headers(headers)
     html = homepage.decode("utf-8")
     ensure_html(html, CANONICAL)
+    ensure_freight_home(html)
     link_pages = {CANONICAL: html}
     known_good = {CANONICAL}
     for path in APPROVED_MEDIA:
@@ -172,11 +196,7 @@ def inspect_live_site() -> dict[str, object]:
         if code not in (301, 302, 307, 308) or response_headers.get("Location") != CANONICAL:
             raise LiveAuditError(f"HTTP/hostname redirect not canonical: {url}")
 
-    os_status, os_headers, os_body = fetch(CANONICAL + "recoveryos/")
-    if os_status != 200 or b"<html" not in os_body.lower():
-        raise LiveAuditError("RecoveryOS public information page missing")
-    ensure_security_headers(os_headers)
-    link_pages[CANONICAL + "recoveryos/"] = os_body.decode("utf-8")
+    verify_recoveryworks_handoff(fetch)
     known_good.add(CANONICAL + "recoveryos/")
 
     map_status, _, body = fetch(CANONICAL + "sitemap.xml")
@@ -233,6 +253,8 @@ def inspect_live_site() -> dict[str, object]:
 
     return {
         "production": "verified",
+        "freight_homepage": "verified",
+        "recoveryworks_handoff": "verified",
         "ltl_buyer_comparator": "verified",
         "blank_evidence_ledger": "verified",
         "pages": len(locs),
