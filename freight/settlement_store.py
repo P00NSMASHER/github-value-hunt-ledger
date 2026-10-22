@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, TypeVar
 
+from freight.financial_assurance import require_cent_currency, require_exact_cents
+
 AUTO, REVIEW = "AUTO", "REVIEW"
 ALLOCATED, ALREADY_ALLOCATED = "ALLOCATED", "ALREADY_ALLOCATED"
 REVERSED, ALREADY_REVERSED = "REVERSED", "ALREADY_REVERSED"
@@ -263,10 +265,7 @@ class SettlementStore:
 
     @staticmethod
     def _currency(value: str) -> str:
-        normalized = SettlementStore._text("currency", value).upper()
-        if _CURRENCY_RE.fullmatch(normalized) is None:
-            raise ValueError("currency must be a three-letter code")
-        return normalized
+        return require_cent_currency(SettlementStore._text("currency", value))
 
     @staticmethod
     def _timestamp(name: str, value: str) -> str:
@@ -286,11 +285,13 @@ class SettlementStore:
 
     @staticmethod
     def _positive_cents(name: str, value: int) -> int:
-        # Input adapters must perform any explicit, reviewed currency conversion.
-        # Silently truncating fractional cents here changes immutable evidence.
-        if type(value) is not int or not 0 < value <= 2**63 - 1:
-            raise ValueError(f"{name} must be positive integer cents within SQLite range")
-        return value
+        # This store is cent-denominated only; never accept fractional amounts
+        # or infer a conversion from a currency with different minor units.
+        try:
+            return require_exact_cents(name, value, positive=True)
+        except ValueError as exc:
+            # Preserve existing caller/error contract without loosening validation.
+            raise ValueError(f"{name} must be positive integer cents within SQLite range") from exc
 
     @staticmethod
     def _same(row: sqlite3.Row, values: dict[str, object]) -> bool:
