@@ -179,10 +179,14 @@ def _build_case_from_snapshot(
 
     residuals = _claim_residuals(tables)
     review_locked = {row["claim_id"] for row in tables["review_claims"]}
+    dispute_held = {row["claim_id"]
+                    for row in tables.get("claim_dispute_holds", ())}
 
     identity_claims = []
     exact_auto = []
     for claim in tables["recovery_claims"]:
+        if claim["claim_id"] in dispute_held:
+            continue  # No disputed claim may be an eligible allocation.
         residual = int(residuals[claim["claim_id"]])
         if residual <= 0:
             continue
