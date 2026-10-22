@@ -7,12 +7,14 @@ bank payment by grouping invoices into self-confirming settlement rows.
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from datetime import date
+import re
 from typing import Iterable
 
 from freight.contracts import canonical_hash
 from recoveryworks.reconciliation_kernel import (
-    ManyToOneConfig, ReconConfig, ReconTxn, reconcile,
+    ManyToOneConfig, ReconConfig, ReconTxn, parse_amount_to_minor, reconcile,
 )
 
 
@@ -51,6 +53,49 @@ class ScopeReconciliation:
     bank_labeled_counterpart_matches: int = 0
 
 
+def _validate_row_before_partitioning(row: ScopedTxn) -> None:
+    """Validate every source row, including missing/orphaned/oversized groups.
+
+    The native kernel only sees rows in groups with two available sides.
+    Its money and date validation must not be bypassed by that partition gate.
+    """
+    txn = row.txn
+    if not isinstance(txn, ReconTxn):
+        raise ValueError("scoped transaction must contain a ReconTxn")
+    if not isinstance(txn.id, str) or not txn.id.strip():
+        raise ValueError("scoped transaction id is required")
+    if any(ord(ch) < 32 for ch in txn.id):
+        raise ValueError("scoped transaction id contains control characters")
+    if not isinstance(txn.currency, str) or not txn.currency.strip():
+        raise ValueError("scoped transaction currency is required")
+    if txn.reference is not None and not isinstance(txn.reference, str):
+        raise ValueError("scoped reference must be text or None")
+    if isinstance(txn.amount, str) and not txn.amount.isascii():
+        raise ValueError("non-ASCII financial amount is not canonical")
+    parse_amount_to_minor(txn.amount, decimals=2)
+    raw_date = txn.date.strip() if isinstance(txn.date, str) else ""
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", raw_date):
+        raise ValueError("scoped transaction date must be YYYY-MM-DD")
+    try:
+        date.fromisoformat(raw_date)
+    except ValueError as exc:
+        raise ValueError("invalid scoped transaction date") from exc
+
+
+def _input_receipt(
+    a: tuple[ScopedTxn, ...], b: tuple[ScopedTxn, ...],
+    *, group_size_limit: int, date_window_days: int,
+) -> str:
+    """Bind all original rows and matching controls, even if no join occurs."""
+    return canonical_hash({
+        "schema": 1,
+        "internal": [asdict(row) for row in sorted(a, key=lambda x: x.txn.id)],
+        "counterpart": [asdict(row) for row in sorted(b, key=lambda x: x.txn.id)],
+        "group_size_limit": group_size_limit,
+        "date_window_days": date_window_days,
+    })
+
+
 def _group_key(row: ScopedTxn) -> tuple[str, ...] | None:
     ref = row.txn.reference
     if not isinstance(ref, str) or not ref.strip():
@@ -80,6 +125,12 @@ def reconcile_scoped(
     all_ids = [x.txn.id for x in (*a, *b)]
     if len(set(all_ids)) != len(all_ids):
         raise ValueError("duplicate transaction ID across population")
+    for row in (*a, *b):
+        _validate_row_before_partitioning(row)
+    original_input_receipt = _input_receipt(
+        a, b, group_size_limit=group_size_limit,
+        date_window_days=date_window_days,
+    )
     aa: dict[tuple[str, ...], list[ScopedTxn]] = defaultdict(list)
     bb: dict[tuple[str, ...], list[ScopedTxn]] = defaultdict(list)
     missing_a = missing_b = 0
@@ -143,7 +194,9 @@ def reconcile_scoped(
     if matched_a + missing_a > len(a) or matched_b + missing_b > len(b):
         raise ValueError("reconciliation population-count conservation violated")
     body = {
-        "schema": 1, "a": len(a), "b": len(b), "matched_a": matched_a,
+        "schema": 2,
+        "all_original_inputs_sha256": original_input_receipt,
+        "a": len(a), "b": len(b), "matched_a": matched_a,
         "matched_b": matched_b, "missing_a": missing_a, "missing_b": missing_b,
         "rules": by_rule, "review_groups": review_groups,
         "bound_groups": bound_groups, "errors": mismatches,
