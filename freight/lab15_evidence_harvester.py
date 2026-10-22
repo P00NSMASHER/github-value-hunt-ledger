@@ -71,6 +71,22 @@ def verify_url(url: object, *, api: bool = False) -> str:
     return url
 
 
+def source_identity(url: str) -> str:
+    """Deduplicate ASCII-case-equivalent DOIs; retain the exact original URL.
+
+    DOI names are ASCII-case-insensitive. Restrict collapsing to plain,
+    allowlisted DOI URLs with ASCII identifier syntax: never normalize an
+    unverified query, arbitrary URL path or non-ASCII identifier.
+    """
+    url = verify_url(url)
+    parsed = urlsplit(url)
+    if parsed.hostname == "doi.org" and not parsed.query:
+        doi = parsed.path.lstrip("/")
+        if re.fullmatch(r"10\.\d{4,9}/[-._;()/:A-Za-z0-9]+", doi):
+            return "doi:" + doi.lower()
+    return "url:" + url
+
+
 def sanitize_title(value: object) -> str:
     if not isinstance(value, str):
         return ""
@@ -208,6 +224,7 @@ def run(ledger: dict, seeds: object, *, network: bool = False, transport=None, n
         raise Rejected("BAD_SEEDS")
     seen_date = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).date().isoformat()
     existing = {entry["id"]: entry for entry in ledger["leads"]}
+    existing_sources = {source_identity(entry["url"]) for entry in existing.values()}
     new_count = 0
     errors = []
     fetch = transport or fetch_json
@@ -228,14 +245,19 @@ def run(ledger: dict, seeds: object, *, network: bool = False, transport=None, n
             except (Rejected, ValueError, TypeError, TimeoutError, OSError, json.JSONDecodeError):
                 errors.append(provider + ":FETCH_OR_PARSE_FAILED")
     for item in collected:
-        if item["id"] not in existing and new_count < MAX_NEW_PER_RUN and len(existing) < MAX_LEADS:
+        source_key = source_identity(item["url"])
+        if (item["id"] not in existing and source_key not in existing_sources
+                and new_count < MAX_NEW_PER_RUN and len(existing) < MAX_LEADS):
             existing[item["id"]] = item
+            existing_sources.add(source_key)
             new_count += 1
     base = {"schema_version": SCHEMA, "lab": 15, "scope": "PUBLIC_METADATA_ONLY_NO_CUSTOMER_DOCUMENTS", "leads": sorted(existing.values(), key=lambda r: r["id"])}
     result = {**base, "digest_sha256": digest(base)}
     report = {"status": "UNVERIFIED_PUBLIC_SOURCE_LEADS_ONLY", "scan_date": seen_date,
               "public_api_network_used": bool(network), "api_queries_attempted": len(SOURCES) if network else 0,
               "api_query_failures": errors, "new_leads": new_count, "total_leads": len(existing),
+              "unique_source_count": len(existing_sources),
+              "retained_doi_alias_records": len(existing) - len(existing_sources),
               "customer_documents_saved": 0, "confirmed_rate_errors": 0,
               "claims_or_marketing_approved": False, "source_manifest_digest": result["digest_sha256"]}
     return result, report

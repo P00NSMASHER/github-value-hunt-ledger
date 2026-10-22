@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from freight.lab15_evidence_harvester import (
     Rejected, SOURCES, blank_ledger, new_lead, run, sanitize_title, source_items,
-    validate_ledger, verify_url, NoRedirect, public_addresses,
+    source_identity, validate_ledger, verify_url, NoRedirect, public_addresses,
 )
 
 SEED_FILE = Path(__file__).parent / 'research' / 'lab15_public_seeds.json'
@@ -104,6 +104,57 @@ class Tests(unittest.TestCase):
         self.assertNotIn('555-123-4567', sanitize_title('Freight bill 555-123-4567'))
         self.assertFalse(source_items('github', {'items': [{'name': 'hello', 'description': 'random software', 'html_url': 'https://github.com/a/b'}]}))
         self.assertRaises(Rejected, source_items, 'untrusted', {})
+
+    def test_doi_case_aliases_do_not_inflate_distinct_source_counts(self):
+        # These two public metadata identifiers already coexisted in the
+        # research-branch candidate ledger. They identify ONE DOI.
+        low = 'https://doi.org/10.7910/dvn/9c0mus'
+        up = 'https://doi.org/10.7910/DVN/9C0MUS'
+        self.assertEqual(source_identity(low), source_identity(up))
+        seed = {'schema_version': 1, 'seeds': [
+            {'url': low, 'title': 'Freight invoice dataset metadata'},
+            {'url': up, 'title': 'Freight invoice dataset metadata'},
+        ]}
+        first, summary = run(blank_ledger(), seed, now=NOW)
+        self.assertEqual((summary['new_leads'], summary['total_leads'],
+                          summary['unique_source_count'], summary['retained_doi_alias_records']),
+                         (1, 1, 1, 0))
+        self.assertFalse(first['leads'][0]['customer_use_authorized'])
+        self.assertFalse(first['leads'][0]['rated_ground_truth_verified'])
+        self.assertEqual(run(first, seed, now=NOW)[0], first)
+
+        # Existing published candidate pointers are preserved byte-for-byte:
+        # provenance cannot be silently deleted to make counts look better.
+        from freight.lab15_evidence_harvester import digest
+        old_rows = sorted([
+            new_lead(low, 'Freight dataset metadata', 'datacite', '2026-10-17'),
+            new_lead(up, 'Freight dataset metadata', 'dataverse', '2026-10-17'),
+        ], key=lambda x: x['id'])
+        old_base = {**blank_ledger(), 'leads': old_rows}
+        old_base['digest_sha256'] = digest({k: v for k, v in old_base.items()
+                                           if k != 'digest_sha256'})
+        unchanged, legacy_summary = run(old_base, seed, now=NOW)
+        self.assertEqual(unchanged, old_base)
+        self.assertEqual(legacy_summary['new_leads'], 0)
+        self.assertEqual(legacy_summary['total_leads'], 2)
+        self.assertEqual(legacy_summary['unique_source_count'], 1)
+        self.assertEqual(legacy_summary['retained_doi_alias_records'], 1)
+        self.assertTrue(all(not x['actual_cash_recovery_verified']
+                            and not x['invoice_bytes_archived']
+                            for x in unchanged['leads']))
+
+    def test_doi_identity_is_narrow_not_arbitrary_url_casefolding(self):
+        x = 'https://doi.org/10.7910/DVN/9C0MUS'
+        self.assertNotEqual(source_identity(x), source_identity(
+            'https://doi.org/10.7910/DVN/9C0MUT'))
+        self.assertNotEqual(source_identity(x), source_identity(
+            'https://doi.org/10.7910/dvn/9c0mus?view=1'))
+        self.assertNotEqual(source_identity('https://github.com/Org/Repo'),
+                            source_identity('https://github.com/org/repo'))
+        self.assertNotEqual(source_identity('https://doi.org/10.7910/Ünicode'),
+                            source_identity('https://doi.org/10.7910/ünicode'))
+        with self.assertRaises(Rejected):
+            source_identity('https://github.com/org/repo?token=not-public')
 
     def test_private_dns_and_redirect_denied(self):
         with patch('freight.lab15_evidence_harvester.socket.getaddrinfo', return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, '', ('127.0.0.1', 443))]):
