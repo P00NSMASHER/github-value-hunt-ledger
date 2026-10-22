@@ -1,0 +1,70 @@
+name: RETALLY 100 Unique Synthetic Customer End-to-End Red Team
+
+on:
+  pull_request:
+    paths:
+      - 'freight/redteam_100_unique_e2e_20261022.py'
+      - '.github/workflows/retally-adversarial-100-realistic-20261022.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-100-realistic-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  realistic-freight-redteam:
+    name: 100-customer-isolated-observation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact code with no persisted token
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Use Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Validate synthetic harness syntax
+        run: python -m py_compile freight/redteam_100_unique_e2e_20261022.py
+      - name: Execute 100 fully isolated synthetic customer audit-to-settlement lifecycles and injected source faults
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          RETALLY_SYNTHETIC_REPORT_DIR: retally-100-redteam-output
+        run: python -m freight.redteam_100_unique_e2e_20261022
+      - name: Confirm report and source custody classification
+        if: always()
+        run: |
+          if [ -f retally-100-redteam-output/summary.json ]; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("retally-100-redteam-output/summary.json").read_text())
+          assert x["dataset_count"] == 100
+          assert x["unique_dataset_sources"] == 100
+          assert x["external_business_actions"] is False
+          assert x["real_customer_permissions"] is False
+          assert x["actual_bank_settlement"] is False
+          assert x["independently_adjudicated_real_freight_truth"] is False
+          print("Red-team execution complete; nonzero findings are NOT production acceptance")
+          print(json.dumps({k:v for k,v in x.items() if k!="findings"},sort_keys=True))
+          PY
+          else
+            echo "No complete report; the test environment blocked execution."
+            exit 1
+          fi
+      - name: Upload all 100 fictional source datasets and detailed failure ledger
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: RETALLY-100-different-synthetic-customer-datasets-20261022
+          path: |
+            retally-100-redteam-output/all_100_datasets.zip
+            retally-100-redteam-output/summary.json
+            retally-100-redteam-output/report.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Do not mutate tracked repository or original customer data
+        run: git diff --exit-code -- freight .github
