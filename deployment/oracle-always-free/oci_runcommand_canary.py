@@ -127,9 +127,14 @@ def check_vm(vm: object, env: dict[str, str]) -> None:
     auth.require(agent is not None and getattr(agent, "are_all_plugins_disabled", None) is False,
                  "AGENT_CONFIGURATION_UNVERIFIED")
     plugin_cfg = getattr(agent, "plugins_config", None)
-    auth.require(isinstance(plugin_cfg, list), "AGENT_CONFIGURATION_UNVERIFIED")
-    matches = [p for p in plugin_cfg if getattr(p, "name", None) == "Compute Instance Run Command"]
-    auth.require(len(matches) == 1 and getattr(matches[0], "desired_state", None) == "ENABLED",
+    # Oracle omits overrides when the platform default is in effect. This
+    # is not runtime proof: execute_canary still requires check_plugin(RUNNING).
+    auth.require(plugin_cfg is None or isinstance(plugin_cfg, list),
+                 "AGENT_CONFIGURATION_UNVERIFIED")
+    matches = [p for p in (plugin_cfg or [])
+               if getattr(p, "name", None) == "Compute Instance Run Command"]
+    auth.require(not matches or (len(matches) == 1 and
+                 getattr(matches[0], "desired_state", None) == "ENABLED"),
                  "RUN_PLUGIN_NOT_ENABLED")
 
 
