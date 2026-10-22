@@ -195,3 +195,10 @@ h1,h2,h3{font-family:var(--sans);font-weight:650;letter-spacing:-.035em;line-hei
 footer{background:var(--ink);font-size:.9375rem;color:#cfdded}footer small{font-size:.875rem;color:#b2c6de}footer .brand{font-family:var(--sans)}:focus-visible{outline:3px solid #5696ff;outline-offset:4px}
 @media(max-width:1050px){.hero-grid{grid-template-columns:1fr;padding-top:150px;min-height:0}.hero-card{max-width:550px}.proof-copy{padding-block:40px 56px}}
 @media(max-width:760px){.signal-bar{font-size:.875rem}.site-header{top:36px}.nav-cta{font-size:.875rem}.hero,.hero-grid{min-height:0}.hero-grid{padding:150px 20px 40px;gap:28px}h1{font-size:2.7rem;line-height:1.1}.hero-card{padding:22px}.section{padding:48px 20px}.section-heading h2,.coverage h2,.proof-copy h2,.control-banner h2,.contact-copy h2{font-size:2rem}.process-grid{margin-top:28px}.lane-grid{margin-top:28px}.lane-card{min-height:0}.lane-card h3{margin-top:24px}.image-story{min-height:0}.story-main{min-height:400px}.story-stack figure{min-height:250px}.proof-visual{min-height:360px}.contact-section,.control-banner{padding:48px 20px}.contact-form{padding:24px 20px}.hero-card-top,.finding-row{flex-wrap:wrap}.finding-row{grid-template-columns:auto 1fr}.finding-row strong{grid-column:2}.hero-assurance{gap:10px 16px}}
+
+/* RETALLY NATIVE WEB BRAND — emblem floats in the existing dark theme */
+.site-header a.brand img.native-os-logo,footer a.brand img.native-os-logo{display:block;width:60px;max-width:60px;height:auto;object-fit:contain;filter:drop-shadow(0 4px 7px rgba(0,190,126,.18))}
+.site-header a.brand{gap:12px}
+.native-os-hero{width:155px;max-width:40vw;margin-bottom:18px}
+.native-os-hero img{display:block;width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,198,124,.24))}
+@media(max-width:760px){.site-header a.brand img.native-os-logo{width:45px;max-width:45px}.native-os-hero{width:128px}}
