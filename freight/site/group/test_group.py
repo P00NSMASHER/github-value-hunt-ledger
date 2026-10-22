@@ -273,6 +273,9 @@ def test_contact_form_is_labelled_private_and_requires_a_saved_receipt(bundle):
     assert "checked" not in by_id["enquiry-consent"]
     assert "not confirm email delivery" in composer_copy
     assert "privately store" in composer_copy
+    security = next(attrs for tag, attrs, _ in page.elements if attrs.get("id") == "enquiry-turnstile")
+    assert security.get("role") == "group"
+    assert security.get("aria-label") == "Security verification"
     assert all(b["slug"] in (bundle / "contact/index.html").read_text() for b in BUSINESSES)
 
 
