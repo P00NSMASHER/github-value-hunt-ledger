@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "SYNTHETIC_BENCHMARK_DENOMINATOR_PROVENANCE",
+  "source_commit": "c2e1230098c29651db31de4511fd5577279f0bdb",
+  "gold_id": "recoveryos-phase3-accuracy-v1",
+  "gold_fixture_path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+  "gold_fixture_git_blob": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+  "gold_fixture_canonical_sha256": "6da44c566a8e7d495b2e7fce80508529fa598232077b690f60c4b1804b2274a7",
+  "census": {
+    "rating": 20,
+    "auto_rateable": 13,
+    "review_required": 7,
+    "positive": 7,
+    "negative": 6,
+    "authority": 4,
+    "attribution": 8,
+    "payment": 10,
+    "payment_valid": 7,
+    "payment_invalid": 3,
+    "total": 42
+  },
+  "denominator_policy": "When a metric's denominator is zero, its reported value is null (undefined), never 1.0 or a freight-detection accuracy assertion.",
+  "negative_controls": [
+    {
+      "case": "empty_rating",
+      "rating_cases": 0,
+      "undefined": [
+        "precision",
+        "recall",
+        "specificity",
+        "auto_classification_accuracy",
+        "review_routing_accuracy"
+      ]
+    },
+    {
+      "case": "review_only",
+      "auto_rateable": 0,
+      "undefined": [
+        "precision",
+        "recall",
+        "specificity",
+        "auto_classification_accuracy"
+      ]
+    },
+    {
+      "case": "empty_authority",
+      "authority_cases": 0,
+      "undefined": [
+        "authority_resolution.accuracy"
+      ]
+    },
+    {
+      "case": "empty_payment",
+      "payment_cases": 0,
+      "undefined": [
+        "payment_lifecycle.valid_state_and_money_accuracy",
+        "payment_lifecycle.invalid_transition_rejection_accuracy"
+      ]
+    }
+  ],
+  "source_accuracy_status": "SYNTHETIC_CONFORMANCE_ONLY",
+  "independent_held_out_freight_labels": "NOT_AVAILABLE",
+  "real_freight_detection_precision_recall": "NOT_ESTIMABLE",
+  "integration_status": "UNINTEGRATED_PROVENANCE_ONLY",
+  "notes": "A manifest is not a source-code repair or acceptance. Do not count as CI-verified until independent execution of actual evaluation logic."
+}
