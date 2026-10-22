@@ -134,13 +134,23 @@ def check_contact_composer(page, base):
     assert form.is_visible()
     business = form.locator("#enquiry-business")
     message = form.locator("#enquiry-message")
-    for control in (business, message):
+    name = form.locator("#enquiry-name")
+    email = form.locator("#enquiry-email")
+    company = form.locator("#enquiry-company")
+    consent = form.locator("#enquiry-consent")
+    for control in (business, message, name, email, company, consent):
         assert control.evaluate("element => [...element.labels].some(label => label.textContent.trim())"), "Enquiry field needs a visible label"
-    submit = form.get_by_role("button", name="Open email draft", exact=True)
+    submit = form.locator("#send-enquiry")
     assert submit.get_attribute("type") == "submit" and submit.is_visible()
     assert page.locator("#enquiry-status").evaluate("element => element.getAttribute('role') === 'status' || ['polite', 'assertive'].includes(element.getAttribute('aria-live'))")
+    assert message.get_attribute("maxlength") == "800"
+    assert email.get_attribute("type") == "email"
+    assert consent.get_attribute("required") is not None and not consent.is_checked()
+    assert form.locator('input[type="file"]').count() == 0
     sample = "QA preview only. Please do not send this draft."
     business.select_option(label="CaptureBrief")
+    name.fill("Example Person")
+    email.fill("person@example.test")
     message.fill(sample)
     page.wait_for_function("document.querySelector('#enquiry-draft')?.getAttribute('href')?.startsWith('mailto:')")
     draft = urlsplit(page.locator("#enquiry-draft").get_attribute("href"))
@@ -148,6 +158,8 @@ def check_contact_composer(page, base):
     assert draft.scheme == "mailto" and draft.path == "jay@retallyrecovery.com"
     assert "CaptureBrief" in fields.get("subject", [""])[0]
     assert sample in fields.get("body", [""])[0]
+    assert "Example Person" in fields.get("body", [""])[0]
+    assert "person@example.test" in fields.get("body", [""])[0]
     assert page.locator("#enquiry-status").inner_text().strip()
     business.select_option(label="PermitPlate NYC")
     updated = parse_qs(urlsplit(page.locator("#enquiry-draft").get_attribute("href")).query)
@@ -156,7 +168,8 @@ def check_contact_composer(page, base):
     assert urlsplit(page.url).path == "/contact/"
     # Deliberately do not click the submit button or the mailto anchor.
     return {"email_draft_updates": True, "labelled_fields": True,
-            "live_status": True, "submit_clicked": False, "mailto_navigation": False}
+            "live_status": True, "explicit_consent": True, "no_upload": True,
+            "submit_clicked": False, "mailto_navigation": False}
 
 
 def check_chat_clearance(page, base, output, width, height):
@@ -305,3 +318,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

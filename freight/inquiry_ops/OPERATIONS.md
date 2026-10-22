@@ -1,5 +1,5 @@
 # RETALLY — Lead response, retention and evidence operations
-Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries.
+Revision: 2026-10-22. Source of truth for **non-sensitive** freight-audit and RETALLY Group contact inquiries.
 
 ### Provenance and reporting accuracy
 - The owner-verified one-time live delivery test `RA-20261017-26F3BC58` is
@@ -40,7 +40,9 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
   It is not a real customer lead and **not** evidence of an actual staff reply.
 - No proposed commercial registration, insurance purchase, automated customer
   contact, freight-document transfer or recovery authority is created here.
-- D1 is restricted to non-sensitive contact + broad freight metadata. Do not put
+- D1 is restricted to non-sensitive contact, broad freight metadata, or the selected
+  RETALLY business and a short Group contact message. Group records do not grant
+  a paid service, document-upload or customer-workspace authorization. Do not put
   invoices, rates, contracts, banking data, customer access credentials or files
   into the form, chat, logs, GitHub or these proof receipts.
 
@@ -112,6 +114,61 @@ Revision: 2026-10-17. Source of truth for **non-sensitive** free-audit inquiries
   misreport a waiver as contact, conversion or recovery.
 - Never copy names, message bodies, secrets or customer data into GitHub CI
   artifacts, terminal reports, or public issue comments.
+
+## Group inquiries and pending-notification recovery
+
+The Group route `/api/group-inquiry` uses the same restricted D1 database,
+rate limiter and fixed business inbox. Its notification subject is
+`RETALLY Group Inquiry | <reference>`; the body labels the selected
+business and the visitor's message. The existing `/api/inquiry` route
+remains the freight-audit contract.
+
+The private case/response APIs record signed actions by reference only; they
+do not render raw inquiry contents or resend notifications.
+`reconcile.mjs` deliberately returns aggregate counts only and includes Group
+inquiries in the same notification, response and retention queues. A zero
+freight-spend field must never exclude a Group inquiry or classify it as QA.
+
+For a pending notification, an authorized operator must inspect the exact
+durable reference in the existing restricted D1 console and match it against
+Zoho and the provider's recorded outcome. Keep raw fields inside those
+restricted tools. Use a single-reference read, not a bulk content export:
+
+```sql
+SELECT reference, notification_status, full_name, work_email, company_name,
+       annual_spend, modes_json, details_json
+FROM inquiries
+WHERE reference = 'RA-YYYYMMDD-XXXXXXXX'
+LIMIT 1;
+```
+
+Replace the example reference only with the exact accepted receipt. Read
+`details_json` as a structured object before interpreting the qualification
+fields:
+
+| Stored contract | Operator interpretation |
+|---|---|
+| `inquiryKind: "group_contact"` | Group contact; show `business`, `message` and `consent` with the contact fields. |
+| Group `annual_spend: ""` and `modes_json: "[]"` | Intentionally not collected; never label this as zero freight spend, missing freight qualification or a freight-audit request. |
+| Existing freight fields without `inquiryKind` | Original freight-audit contract; inspect its existing qualification fields and notes. |
+| Unknown kind, unsupported business or malformed details | Preserve the record and escalate for restricted inspection; do not guess a business or silently omit it. |
+
+Use the allowlisted business labels in
+[`functions/api/group-inquiry.js`](../../functions/api/group-inquiry.js)
+when interpreting a Group record. A Group choice of `recovery` remains a
+Group contact request, not a completed freight-audit qualification.
+`consent: true` records the form consent only; it does not grant service,
+payment, file-transfer or automated outreach authority.
+
+Do not regenerate Group notifications using the freight
+`notificationText` formatter: it expects freight-only fields. There is no
+automatic notification retry or content-display endpoint in the existing
+operator tools. Reconcile uncertain provider acceptance before any separately
+authorized notification attempt, preserve the durable reference, and do not
+mark `delivery_verified` until the exact message is located in Zoho.
+Business and message must remain visible to the authorized operator during
+manual recovery; they must never enter the aggregate monitor output, public
+CI artifacts or issue comments.
 
 ## Monitoring and escalation
 - Read-only command (Node 22+): `node freight/inquiry_ops/reconcile.mjs --dry-run`
@@ -190,3 +247,4 @@ Passing synthetic signed JWTs, SQLite tests or a migrated schema establishes
 **technical enforcement only**. It does NOT demonstrate staffed response,
 independent real human approval, policy/legal review, automated SLA monitoring,
 production prospect communication authorization or actual data erasure.
+
