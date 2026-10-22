@@ -406,7 +406,7 @@ class SettlementStore:
         )
         def op(conn: sqlite3.Connection) -> bool:
             original = conn.execute(
-                "SELECT currency,booked_at FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+                "SELECT currency,booked_at,amount_cents FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
                 (*self._scope, v["original_event_id"]),
             ).fetchone()
             if not original:
@@ -428,6 +428,13 @@ class SettlementStore:
                 (*self._scope, v["source_hash"]),
             ).fetchone():
                 raise ValueError("counter source_hash already used")
+            already_returned = int(conn.execute(
+                "SELECT COALESCE(SUM(amount_cents),0) FROM counter_events "
+                "WHERE buyer_id=? AND business_unit=? AND original_event_id=?",
+                (*self._scope, v["original_event_id"]),
+            ).fetchone()[0])
+            if already_returned + v["amount_cents"] > int(original["amount_cents"]):
+                raise ValueError("total return exceeds the immutable original credit")
             conn.execute("""INSERT INTO counter_events
               (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
               VALUES(:buyer_id,:business_unit,:counter_id,:original_event_id,:currency,:amount_cents,:observed_at,:source_hash,:source_kind)""", v)
@@ -465,6 +472,47 @@ class SettlementStore:
         normalized = self._text("event_id", event_id)
         return self._read(lambda c: self._event_residual(c, normalized))
 
+
+
+    def _event_return_capacity(
+        self, conn: sqlite3.Connection, event_id: str,
+    ) -> tuple[int, int, int]:
+        """Conserve a credit's original value across allocations and returns.
+
+        Return (source-declared net remaining credit capacity, unapplied
+        counter cents, currently live allocated cents). All reads occur inside
+        the caller's existing SQLite write transaction.
+        """
+        source = conn.execute(
+            "SELECT amount_cents FROM settlement_events "
+            "WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()
+        if source is None:
+            raise ValueError("source settlement event missing")
+        counters = int(conn.execute(
+            "SELECT COALESCE(SUM(amount_cents),0) FROM counter_events "
+            "WHERE buyer_id=? AND business_unit=? AND original_event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()[0])
+        applied = int(conn.execute(
+            "SELECT COALESCE(SUM(r.amount_cents),0) FROM reversal_edges r "
+            "JOIN counter_events c ON c.buyer_id=r.buyer_id "
+            "AND c.business_unit=r.business_unit AND c.counter_id=r.counter_id "
+            "WHERE r.buyer_id=? AND r.business_unit=? AND c.original_event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()[0])
+        allocated = int(conn.execute(
+            "SELECT COALESCE(SUM(amount_cents),0) FROM allocations "
+            "WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()[0])
+        if not (0 <= applied <= counters <= int(source["amount_cents"])):
+            raise ValueError("source return evidence exceeds original credit")
+        if not (0 <= allocated - applied <= int(source["amount_cents"])):
+            raise ValueError("source allocation/return conservation violated")
+        return int(source["amount_cents"]) - counters, counters - applied, allocated - applied
+
     def auto_allocate(self, event_id: str, *, created_at: str) -> Decision:
         event_id = self._text("event_id", event_id)
         created_at = self._timestamp("created_at", created_at)
@@ -485,6 +533,13 @@ class SettlementStore:
             if old:
                 return Decision(ALREADY_ALLOCATED, tuple(r[0] for r in old), "event already consumed")
             remaining = self._event_residual(conn, event_id)
+            net_capacity, pending_return, live_allocated = self._event_return_capacity(
+                conn, event_id,
+            )
+            if pending_return:
+                return Decision(REVIEW, reason="unapplied counter-event return requires review")
+            if remaining > net_capacity - live_allocated:
+                return Decision(REVIEW, reason="source credit reduced by counter-event return")
             rows = conn.execute("""SELECT c.* FROM recovery_claims c
               LEFT JOIN review_claims r
                 ON r.buyer_id=c.buyer_id AND r.business_unit=c.business_unit AND r.claim_id=c.claim_id
@@ -544,6 +599,13 @@ class SettlementStore:
                 raise ValueError("recovery claim capacity exceeded")
             if amount_cents > self._event_residual(conn, event_id):
                 raise ValueError("settlement event capacity exceeded")
+            net_capacity, pending_return, live_allocated = self._event_return_capacity(
+                conn, event_id,
+            )
+            if pending_return:
+                raise ValueError("unapplied return evidence blocks reviewed allocation")
+            if amount_cents > net_capacity - live_allocated:
+                raise ValueError("reviewed allocation exceeds credit net of counter returns")
             fee = 0 if claim["fee_disqualified"] else amount_cents
             conn.execute("""INSERT INTO allocations
               (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
@@ -656,8 +718,17 @@ class SettlementStore:
                 "SELECT reversal_id FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND counter_id=? ORDER BY reversal_id",
                 (*self._scope, counter_id),
             ).fetchall()
-            if old:
-                return Decision(ALREADY_REVERSED, tuple(r[0] for r in old), "counter already applied")
+            consumed = int(conn.execute(
+                "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
+                "WHERE buyer_id=? AND business_unit=? AND counter_id=?",
+                (*self._scope, counter_id),
+            ).fetchone()[0])
+            remaining_counter = int(counter["amount_cents"]) - consumed
+            if remaining_counter < 0:
+                raise ValueError("counter return was applied beyond original amount")
+            if remaining_counter == 0:
+                return Decision(ALREADY_REVERSED, tuple(r[0] for r in old),
+                                "counter fully applied, no pending return")
             event = conn.execute(
                 "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
                 (*self._scope, counter["original_event_id"]),
@@ -673,14 +744,17 @@ class SettlementStore:
             if any(created_at < row["created_at"] for row in live):
                 raise ValueError("reversal cannot predate allocation")
             total = sum(int(r["live_cents"]) for r in live)
-            if counter["amount_cents"] in (event["amount_cents"], total):
+            if remaining_counter == total or int(counter["amount_cents"]) == int(event["amount_cents"]):
+                # A return for the whole source event may reverse every
+                # available live allocation, even when some amount remains
+                # unapplied and must stay explicitly under REVIEW.
                 plan = [(r, int(r["live_cents"])) for r in live]
-            elif len(live) == 1 and counter["amount_cents"] <= live[0]["live_cents"]:
-                plan = [(live[0], int(counter["amount_cents"]))]
+            elif len(live) == 1 and remaining_counter <= live[0]["live_cents"]:
+                plan = [(live[0], remaining_counter)]
             else:
-                return Decision(REVIEW, reason="partial return is ambiguous across live allocation edges")
+                return Decision(REVIEW, reason="unapplied partial return is ambiguous across live allocation edges")
             ids = []
-            for i, (alloc, amount) in enumerate(plan, 1):
+            for i, (alloc, amount) in enumerate(plan, len(old) + 1):
                 edge = f"reversal:{counter_id}:{i}:{alloc['allocation_id']}"
                 conn.execute("""INSERT INTO reversal_edges
                   (buyer_id,business_unit,reversal_id,counter_id,allocation_id,amount_cents,created_at)
