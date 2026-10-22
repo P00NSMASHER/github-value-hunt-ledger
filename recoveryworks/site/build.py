@@ -12,6 +12,7 @@ from pathlib import Path
 SITE_DIR = Path(__file__).resolve().parent
 TEXT_FILES = ("index.html", "site.css", "site.js", "_headers", "favicon.svg")
 ASSET_FILES = (
+    "recoveryos-emblem.webp",
     "analyst-review.webp",
     "construction-project.webp",
     "healthcare-operations.webp",

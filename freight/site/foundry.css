@@ -1218,3 +1218,16 @@ a.brand.approved-brand-header>img.approved-brand-image{display:block;width:100%;
 .approved-brand-header:focus-visible{outline:3px solid #30d295;outline-offset:5px}
 @media(max-width:600px){a.brand.approved-brand-header{width:202px;padding:7px 9px}.approved-brand-hero{width:min(100%,280px);padding:10px;margin-bottom:22px}}
 @media(max-width:360px){a.brand.approved-brand-header{width:176px;padding:6px 8px}}
+
+/* RETALLY NATIVE WEB BRAND / no pasted white tiles */
+.site-header a.brand.approved-brand-header.native-header{width:auto!important;max-width:min(265px,calc(100vw - 110px))!important;display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;border:0!important;border-radius:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;color:#fff;line-height:1.07;text-decoration:none;white-space:normal}
+.site-header a.brand.native-header img.native-brand-icon{display:block;width:72px;max-width:72px;min-width:72px;height:auto;max-height:68px;object-fit:contain;background:transparent;filter:drop-shadow(0 3px 6px rgba(4,211,143,.18))}
+.site-header a.brand.native-header .native-brand-text{display:flex;flex-direction:column;gap:4px;min-width:0;align-items:flex-start}
+.site-header a.brand.native-header .native-brand-text strong{font-family:Hanken,Arial,sans-serif;font-size:18px;line-height:1;font-weight:800;letter-spacing:-.06em;color:#f8fffb;white-space:nowrap}
+.site-header a.brand.native-header .native-brand-text strong span{color:#51e7a9}
+.site-header a.brand.native-header .native-brand-text small{font:700 9px/1 Hanken,Arial,sans-serif;letter-spacing:.12em;color:#cadbd3}
+.site-header a.brand.native-header .native-brand-text small b{color:#dafff0}
+.approved-brand-hero.native-hero{position:relative;display:flex;align-items:center;justify-content:flex-start;width:165px;max-width:42vw;height:auto;margin:0 0 19px;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;overflow:visible}
+.approved-brand-hero.native-hero img.native-hero-emblem{display:block;width:100%;height:auto;max-height:95px;object-fit:contain;object-position:left center;border:0!important;background:transparent;filter:drop-shadow(0 7px 14px rgba(0,173,116,.22))}
+@media(max-width:700px){.site-header a.brand.native-header img.native-brand-icon{width:56px;max-width:56px;min-width:56px}.site-header a.brand.native-header .native-brand-text strong{font-size:15px}.approved-brand-hero.native-hero{width:145px;max-width:40vw;margin-bottom:14px}}
+@media(max-width:410px){.site-header a.brand.native-header img.native-brand-icon{width:48px;max-width:48px;min-width:48px}.site-header a.brand.native-header .native-brand-text strong{font-size:13px}.site-header a.brand.native-header .native-brand-text small{font-size:8px}.site-header a.brand.approved-brand-header.native-header{gap:6px;max-width:195px!important}}

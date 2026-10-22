@@ -91,7 +91,7 @@ jobs:
           RECOVERYOS_CONTACT_VERIFIED: '1'
         run: |
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
-          test "$(find /tmp/recoveryos-public -type f | wc -l)" -eq 15
+          test "$(find /tmp/recoveryos-public -type f | wc -l)" -eq 16
           test "$(find /tmp/recoveryos-public -type l | wc -l)" -eq 0
       - name: Verify independent company publication boundaries
         working-directory: company_sites

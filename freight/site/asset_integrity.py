@@ -28,6 +28,8 @@ APPROVED_LOGOS = {
         (805, 776),
     ),
 }
+RECOVERYOS_EMBLEM_NAME = "recoveryos-emblem.webp"
+RECOVERYOS_EMBLEM_SHA256 = "ddcbc6488976b8a7646776452b96562c9837bb441fdd75a967618c063a78cd37"
 MIN_WEBP_BYTES = 25_000
 MAX_IMAGE_BYTES = 4_000_000
 
@@ -123,6 +125,10 @@ def validate_freight_media(site: Path) -> None:
 def validate_recoveryos_media(site: Path) -> None:
     image_dir = site / "assets"
     _registered({p.name for p in image_dir.glob("*.webp")},
-                set(RECOVERY_IMAGE_NAMES), "RecoveryOS")
+                set(RECOVERY_IMAGE_NAMES) | {RECOVERYOS_EMBLEM_NAME}, "RecoveryOS")
     for name in sorted(RECOVERY_IMAGE_NAMES):
         assert_webp(_read_safe(image_dir / name), name, 1000, 900)
+    emblem = _read_safe(image_dir / RECOVERYOS_EMBLEM_NAME)
+    assert_webp(emblem, RECOVERYOS_EMBLEM_NAME, 600, 300)
+    if hashlib.sha256(emblem).hexdigest() != RECOVERYOS_EMBLEM_SHA256:
+        raise AssetIntegrityError("RecoveryOS transparent emblem differs from reviewed source")
