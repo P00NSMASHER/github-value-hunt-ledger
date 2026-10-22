@@ -16,3 +16,11 @@
 .approved-brand-software p{margin:0;color:#52645d;font-size:16px;line-height:1.6}
 .approved-brand-software .eyebrow{margin-bottom:14px;color:#315d49;font-size:11px}
 @media(max-width:600px){.approved-brand-software{grid-template-columns:1fr;gap:20px;padding:22px}.approved-brand-software img{max-width:350px;margin:auto}.approved-brand-software h2{font-size:26px}}
+
+/* RETALLY NATIVE WEB BRAND — integrated company cards */
+.company-card>img.native-company-emblem{width:100%;height:228px;padding:24px 68px;object-fit:contain;object-position:center;border:0;background:radial-gradient(ellipse at 50% 47%,rgba(37,162,115,.22),transparent 66%),linear-gradient(145deg,#e7f2eb,#f9f9f4);filter:none}
+.company-card.recoveryworks>img{height:228px;object-fit:cover}
+.approved-brand-software{border-color:#cbded2;background:linear-gradient(117deg,#e3eee7,#f5f4ed);box-shadow:0 9px 24px #0c372114}
+.approved-brand-software img.native-software-emblem{width:min(100%,270px);max-width:270px;height:auto;margin:auto;object-fit:contain;object-position:center;background:transparent;filter:drop-shadow(0 9px 16px rgba(0,95,67,.13))}
+@media(max-width:800px){.company-card>img.native-company-emblem,.company-card.recoveryworks>img{height:190px}.company-card>img.native-company-emblem{padding:20px 39px}}
+@media(max-width:580px){.company-card>img.native-company-emblem,.company-card.recoveryworks>img{height:190px}.approved-brand-software img.native-software-emblem{width:min(88%,260px)}}

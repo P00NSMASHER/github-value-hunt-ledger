@@ -33,6 +33,11 @@ PROFILES = {
         "pages": ("index.html", "privacy/index.html"),
         "files": ("index.html", "privacy/index.html", "site.css", "enquiry.js", "_headers"),
         "assets": {
+            "assets/brand/retally-emblem-approved.png": "freight/site/assets/brand/retally-emblem-approved.png",
+            "assets/brand/freightrecovery-emblem.webp": "freight/site/assets/brand/freightrecovery-emblem.webp",
+            "assets/brand/recoveryos-emblem.webp": "freight/site/assets/brand/recoveryos-emblem.webp",
+            "assets/brand/permitplate-emblem.webp": "freight/site/assets/brand/permitplate-emblem.webp",
+            "assets/brand/capturebrief-emblem.webp": "freight/site/assets/brand/capturebrief-emblem.webp",
             "assets/brand/freightrecovery-600-20261022.webp": "freight/site/assets/brand/freightrecovery-600-20261022.webp",
             "assets/brand/freightrecovery-1200-20261022.webp": "freight/site/assets/brand/freightrecovery-1200-20261022.webp",
             "assets/brand/recoveryos-600-20261022.webp": "freight/site/assets/brand/recoveryos-600-20261022.webp",
@@ -59,6 +64,7 @@ PROFILES = {
         "pages": ("index.html", "engagement/index.html", "privacy/index.html"),
         "files": ("index.html", "engagement/index.html", "privacy/index.html", "site.css", "_headers"),
         "assets": {
+            "assets/brand/recoveryos-emblem.webp": "freight/site/assets/brand/recoveryos-emblem.webp",
             "assets/brand/recoveryos-600-20261022.webp": "freight/site/assets/brand/recoveryos-600-20261022.webp",
             "assets/brand/recoveryos-1200-20261022.webp": "freight/site/assets/brand/recoveryos-1200-20261022.webp",
             "assets/hero-industrial.webp": "recoveryworks/site/assets/hero-industrial.webp",

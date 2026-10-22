@@ -25,7 +25,7 @@ class ApprovedBrandTests(unittest.TestCase):
     if name.endswith('.webp'):self.assertLess(len(data),160000,name)
  def test_freight_brand_preserves_original_home_and_intake(self):
   html=(ROOT/'freight/site/index.html').read_text(encoding='utf-8')
-  for token in ['freightrecovery-wordmark-20261022.webp','freightrecovery-600-20261022.webp','FreightRecovery by RETALLY','id="auditForm"','id="hero-title"','Find it.','Prove it.','Recover it.']:
+  for token in ['freightrecovery-emblem.webp','native-brand-text','FreightRecovery by RETALLY','id="auditForm"','id="hero-title"','Find it.','Prove it.','Recover it.']:
    self.assertIn(token,html)
   self.assertIn('assets/brand/retally-wordmark-approved.png',html,'Parent footer identity remains intact')
  def test_four_companies_and_separate_software_identity(self):
@@ -33,9 +33,9 @@ class ApprovedBrandTests(unittest.TestCase):
   self.assertEqual(html.count('<article class="company-card '),4)
   self.assertIn('RETALLY RecoveryWorks',html)
   self.assertIn('Shared recovery software',html)
-  for key in EXPECTED:self.assertIn(key+'-600-20261022.webp',html)
+  for key in EXPECTED:self.assertIn(key+'-emblem.webp',html)
   recovery=(ROOT/'company_sites/recoveryworks/index.html').read_text(encoding='utf-8')
-  self.assertIn('recoveryos-600-20261022.webp',recovery)
+  self.assertIn('recoveryos-emblem.webp',recovery)
   for token in ['RecoveryWorks','Vendor overpayment review','Missed-credit reconciliation','Supporting recovery software']:
    self.assertIn(token,recovery)
  def test_company_publication_includes_exact_image_bytes(self):
@@ -43,8 +43,8 @@ class ApprovedBrandTests(unittest.TestCase):
    with self.subTest(company=company),tempfile.TemporaryDirectory() as tmp:
     out=Path(tmp)/'public';build(company,out)
     for key in keys:
-     for width in (600,1200):
-      name=f'{key}-{width}-20261022.webp'
+     for width in ('emblem',):
+      name=f'{key}-{width}.webp'
       self.assertEqual((out/'assets/brand'/name).read_bytes(),(ASSETS/name).read_bytes())
  def test_images_are_not_stretched_or_blended_into_dark_backdrops(self):
   for f in ['freight/site/foundry.css','company_sites/group/site.css','company_sites/recoveryworks/site.css']:
