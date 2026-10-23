@@ -322,3 +322,39 @@ Offline, read-only reproduction:
     python -m unittest -q freight.test_research_source_review
     python -m freight.research_source_review --output /tmp/retally-source-review-queue.json
     python -m freight.research_source_review --output /tmp/retally-source-review-queue.json --verify
+
+## Source-topic admission screening (v5)
+
+The independent Cloudflare scout and the GitHub discovery runner now use
+the **same conservative four-engine topic lists** to screen metadata from
+GitHub and Zenodo before accepting any *new* URL pointers. GitHub
+repository name/description and Zenodo record title are inspected in
+memory only, limited to 512 characters per field; the source catalog,
+D1 and action logs still contain **only canonical allowlisted URLs**,
+first-seen dates, engine names and fixed non-sensitive result codes.
+Raw titles, descriptions, authors, contacts, invoice contents and source
+document bytes are never persisted.
+
+For PermitPlate, the rules require DOB, building-permit or permit-issuance
+terms and reject restaurant-inspection context even when the word
+"permit" also appears. All lanes reject obviously unrelated catalog
+records and metadata lacking a useful topic signal. This does not inspect
+or silently erase previous unverified leads. Existing historical records,
+the PermitPlate wrong-topic quarantine fixture and their original
+first-seen dates remain unchanged.
+
+The **official NYC Socrata DOB catalog source filter is preserved**.
+The optional Data.gov v4 lookup remains subject to the original
+public-access-level check and production API-key requirement. No new
+APIs, additional provider calls, secrets, timers, workers or billing
+are introduced. Metadata-based similarity is a conservative
+*screening heuristic*, not a human-reviewed truth label, a guarantee
+that a document exists, or commercial-use permission. It can have
+false positives and false negatives. A zero-new-lead cycle is
+acceptable when requests and source safety checks succeed, not proof
+that further real data does not exist.
+
+Both collectors include adversarial regression cases for each of the four
+engines, with aligned positive/off-topic metadata fixtures, missing
+publisher titles, unsafe IDs and sensitive description text that must
+never be copied to the ledger.
