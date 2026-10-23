@@ -122,6 +122,8 @@ test("bounded catalogs rotate query terms and pages without extra network budget
     now.push(specs.map(x=>x.url).join("|"));
   }
   assert.ok(new Set(now).size>=12);
+  assert.ok(now.some(x=>x.includes("sort=updated")));
+  assert.ok(now.some(x=>x.includes("page=3")));
   assert.notDeepEqual(feedSpecs("capturebrief",start),feedSpecs("capturebrief",start+100*1200000));
   assert.throws(()=>feedSpecs("recoveryos",Number.NaN),/INVALID_SCHEDULE_TIME/);
   assert.equal(feedSpecs("permitplate",start).filter(x=>x.provider==="socrata").length,1);
