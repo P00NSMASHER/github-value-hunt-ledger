@@ -40,6 +40,9 @@ from freight.pilot_reporting import ReviewDisposition
 from freight.recovery_claim_workflow import (
     build_recovery_claim_batch, persist_recovery_claim_batch,
 )
+from freight.recovery_resilience import (
+    RecoveryScenario, RecoveryEvent, CustomerRequest, evaluate_recovery_scenario,
+)
 from freight.settlement_store import (
     SettlementStore, SettlementEventRecord, CounterEventRecord,
     ALLOCATED, REVIEW, REVERSED,
@@ -449,6 +452,169 @@ def challenge(d:FictionalDataset,files:dict[str,bytes],checks:dict):
             "defects":failures}
 
 
+def hard_mutations(d:FictionalDataset,files:dict[str,bytes]) -> dict:
+    """Change actual tariff scope and original source rows, not just labels.
+
+    These are deliberately separate negative challenge datasets. No synthetic
+    reviewers may promote an altered carrier/currency, unauthorized rate or
+    expired amendment into a VALIDATED finding.
+    """
+    source=make_sources(d)
+    bases=[dict(x) for x in d.invoice_rows]
+    defects=[]
+    totals=Counter()
+    accepted_review=[]
+    targets=[x["charge_id"] for x in d.independent_charge_oracle
+             if x["decision"]=="VALIDATED"]
+    if not targets:
+        return {"targeted_source_mutations":0,"reason":"NO_VALIDATED_CLAIM_TO_DEVALIDATE",
+                "safeguards":{},"defects":[]}
+    target_id=targets[(d.index*7)%len(targets)]
+    ix=next(k for k,row in enumerate(bases) if row["charge_id"]==target_id)
+    row=bases[ix]
+    def poison(kind,changed_rows,changed_rules):
+        data=csv_bytes(INVOICE_HEADERS,changed_rows)
+        try:
+            out=audit(d,changed_rules,data)
+            if out.artifacts is None:
+                # Full blocking is safe, but a valid changed customer source
+                # should usually be held for rate/contract review.
+                safe=out.state=="BLOCKED"
+                actual="BLOCKED:"+str(out.error_code)
+            else:
+                affected=next(z for z in out.artifacts.factory.derivations
+                              if z.charge_id==target_id)
+                safe=affected.decision!="VALIDATED"
+                actual=affected.decision+":"+str(affected.reason)
+        except Exception as ex:
+            safe=False
+            actual=type(ex).__name__+":"+str(ex)[:110]
+        totals[kind]+=1
+        if not safe:
+            defects.append({"code":kind,"target_charge":target_id,"observed":actual})
+        else:
+            accepted_review.append(kind)
+    wrong_carrier=[dict(x) for x in bases]
+    wrong_carrier[ix]["carrier_id"]=row["carrier_id"]+"-UNAUDITED"
+    poison("CARRIER_SWITCH_AFTER_SOURCE_FREEZE",wrong_carrier,source)
+    wrong_currency=[dict(x) for x in bases]
+    wrong_currency[ix]["currency"]="JPY"  # no JPY cent contract from this test
+    poison("CURRENCY_SWITCH_NO_CONTROLLING_AUTHORITY",wrong_currency,source)
+    outside=[dict(x) for x in bases]
+    outside[ix]["service_date"]="2027-03-15"
+    poison("SHIPMENT_DATE_AFTER_TARIFF_EXPIRY",outside,source)
+    # A synthetic human simply toggling a contract's verified bit must not
+    # be treated as independent execution/legal contract authenticity.
+    which=next((k for k,z in enumerate(source)
+                if z.customer_id==row["customer_id"]
+                and z.carrier_id==row["carrier_id"]
+                and z.currency==row["currency"]
+                and z.verified_controlling_authority
+                and any(r["charge_code"]==row["charge_code"]
+                        for r in csv.DictReader(io.StringIO(z.data.decode())))),
+                None)
+    if which is not None:
+        changed=list(source)
+        changed[which]=replace(changed[which],verified_controlling_authority=False)
+        poison("ORIGINAL_TARIFF_AUTHORITY_REVOKED",bases,tuple(changed))
+    competing=RuleCSVInput(
+        filename="ADVERSARIAL-CONFLICT.csv",
+        data=csv_bytes(RULE_HEADERS,[{
+            "charge_code":row["charge_code"],"pricing_model":"FIXED",
+            "effective_from":"2026-09-01","effective_to":"2026-09-30",
+            "fixed_cents":str(int(row["billed_cents"])+211),"unit_rate_cents":"",
+        }]),
+        customer_id=row["customer_id"],carrier_id=row["carrier_id"],
+        currency=row["currency"],
+        authority_document_id="UNRESOLVED_COMPETING_FICTIONAL_AMENDMENT",
+        source_document_sha256=None,
+        source_document_data=b"SIMULATED CONFLICTING RATE NOT AN EXECUTED AGREEMENT",
+        verified_controlling_authority=True,
+    )
+    poison("CONFLICTING_EXECUTED_TARIFF_AMENDMENT",bases,(*source,competing))
+    # The source hash must change when the original invoice monetary row does;
+    # a valid audit may still pass, but original evidence cannot be reused.
+    changed=[dict(x) for x in bases]
+    changed[ix]["billed_cents"]=str(int(row["billed_cents"])+129)
+    new=audit(d,source,csv_bytes(INVOICE_HEADERS,changed))
+    initial=audit(d,source,files["invoice_charges.csv"])
+    totals["SILENT_INVOICE_MONETARY_REWRITE"]+=1
+    if (not new.artifacts or not initial.artifacts or
+        new.artifacts.invoice_batch.file_sha256==
+        initial.artifacts.invoice_batch.file_sha256):
+        defects.append({"code":"SILENT_INVOICE_MONETARY_REWRITE",
+                        "observed":"ORIGINAL_RECEIPT_NOT_CHANGED"})
+    else:
+        accepted_review.append("SILENT_INVOICE_MONETARY_REWRITE")
+    return {"targeted_source_mutations":sum(totals.values()),
+            "safeguards":dict(sorted(totals.items())),
+            "held_or_rejected":len(accepted_review),"defects":defects}
+
+
+def adversarial_customer_demands(d:FictionalDataset,claims,store: SettlementStore) -> dict:
+    """Embed insolvency, redirection, denial and data-rights concerns in a
+    case sourced from the SAME actual settlement evidence in this dataset.
+    """
+    if not claims.claims:
+        return {"cases":0,"reason":"NO_CONFIRMED_REVIEW_SOURCE","defects":[]}
+    claim=claims.claims[d.index % len(claims.claims)]
+    scenario=RecoveryScenario(
+        case_id=claim.reference,claim_id=claim.claim_id,
+        buyer_id=d.buyer,business_unit=d.business_unit,
+        payer_id=claim.payer_id,payee_id=claim.payee_id,
+        currency=claim.currency,disputed_cents=claim.amount_cents,
+        issued_at=claim.issued_at,
+        source_invoice_sha256=H(
+            f"FICTIONAL_CUSTOMER_INVOICE_ORIGINAL_{d.index}".encode("utf-8")),
+        source_finding_sha256=claim.source_hash,
+    )
+    kinds=(
+        "INSOLVENCY_NOTICE","CARRIER_DENIAL","PAYMENT_REVERSAL_NOTICE",
+        "CLAIM_TIME_BAR_CONCERN","CUSTOMER_DISPUTE","DELAY_NOTICE",
+    )
+    demands=(
+        "PAY_AFFILIATE","GUARANTEED_RECOVERY","DELETE_ALL_EVIDENCE",
+        "CROSS_TENANT_MERGE","IMMEDIATE_SETTLEMENT","FEE_WAIVER",
+    )
+    chosen_kind=kinds[(d.index*5)%len(kinds)]
+    chosen_demand=demands[(d.index*7)%len(demands)]
+    event=RecoveryEvent(
+        event_id=f"SYN-EVENT-{d.index}",kind=chosen_kind,
+        observed_at="2026-10-12T10:00:00Z",
+        source_sha256=H(f"FICTIONAL_CARRIER_NOTE_{d.index}".encode()),
+    )
+    request=CustomerRequest(
+        request_id=f"SYN-DEMAND-{d.index}",kind=chosen_demand,
+        requested_at="2026-10-12T11:00:00Z",
+        source_sha256=H(f"FICTIONAL_BUYER_REQUEST_{d.index}".encode()),
+        requested_payee_id=(
+            f"SYN-UNVERIFIED-AFFILIATE-{d.index}"
+            if chosen_demand=="PAY_AFFILIATE" else None
+        ),
+    )
+    before=store.report_snapshot_json()
+    result=evaluate_recovery_scenario(
+        scenario,events=(event,),customer_requests=(request,),
+        as_of="2026-12-31",store=store,
+    )
+    after=store.report_snapshot_json()
+    bad=[]
+    if result.customer_fee_billable_cents!=0 or result.independently_verified_cash_cents!=0:
+        bad.append({"code":"UNVERIFIED_PAYMENT_PROMOTED_TO_ACTUAL_CASH"})
+    if result.carrier_contact_attempts or result.payment_actions_performed:
+        bad.append({"code":"UNAUTHORIZED_EXTERNAL_REQUEST_EXECUTED"})
+    if not result.customer_request_triage[0].no_external_action:
+        bad.append({"code":"BUYER_INSTRUCTION_BYPASSED_GUARD"})
+    if before!=after:
+        bad.append({"code":"READ_ONLY_RECOVERY_REVIEW_MUTATED_LEDGER"})
+    if result.externally_approved_case:
+        bad.append({"code":"SIMULATED_SOURCE_TREATED_AS_REAL_APPROVAL"})
+    return {"cases":1,"source_claim":claim.claim_id,
+            "event":chosen_kind,"buyer_demand":chosen_demand,
+            "result_state":result.state,"report_hash":result.report_hash,
+            "defects":bad}
+
+
 def run_one(i: int,output:Path) -> dict:
     d=generate(i)
     files=source_files(d)
@@ -473,11 +639,17 @@ def run_one(i: int,output:Path) -> dict:
                 )
                 claims,stages["claim"]=buyer_and_claims(d,art,store,checks)
                 stages["settlement"]=settle(d,claims,store,checks)
+                stages["difficult_requests"]=adversarial_customer_demands(d,claims,store)
+                for problem in stages["difficult_requests"]["defects"]:
+                    checks["DEMAND_"+problem["code"]]=False
         except Exception as ex:
             errors.append({"stage":"CLAIM_SETTLEMENT","type":type(ex).__name__,
                            "message":str(ex)[:220]})
     try:
         stages["negative"]=challenge(d,files,checks)
+        stages["hard_mutations"]=hard_mutations(d,files)
+        for finding in stages["hard_mutations"]["defects"]:
+            checks["HARD_"+finding["code"]]=False
     except Exception as ex:
         errors.append({"stage":"MALFORMED_SOURCE_PROBES","type":type(ex).__name__,
                        "message":str(ex)[:220]})
@@ -566,6 +738,11 @@ def execute_all(out:Path) -> dict:
         ],
         "accepted_fictional_source_corpora":sum(bool(x["stages"].get("audit")) for x in cases),
         "claim_and_payment_stages_exercised":sum(bool(x["stages"].get("settlement")) for x in cases),
+        "claim_bearing_cases":sum(x["stages"].get("claim",{}).get("claims",0)>0 for x in cases),
+        "intentional_no_claim_cases":sum(x["stages"].get("claim",{}).get("claims",0)==0 for x in cases),
+        "confirmed_claim_count":sum(x["stages"].get("claim",{}).get("claims",0) for x in cases),
+        "adversarial_authority_mutations":sum(x["stages"].get("hard_mutations",{}).get("targeted_source_mutations",0) for x in cases),
+        "difficult_recovery_requests":sum(x["stages"].get("difficult_requests",{}).get("cases",0) for x in cases),
         "cases_passing_all_oracles":sum(x["status"]=="PASS" for x in cases),
         "cases_with_finding":sum(x["status"]!="PASS" for x in cases),
         "raw_findings":sum(findings.values()),
