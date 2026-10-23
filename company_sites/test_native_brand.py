@@ -24,12 +24,22 @@ class NativeBrandTests(unittest.TestCase):
   for key in ('freightrecovery','permitplate','capturebrief','recoveryos'):self.assertIn(key+'-emblem.webp',html)
   self.assertIn('RETALLY RecoveryWorks',html)
   self.assertNotIn('freightrecovery-600-20261022.webp',html)
+ def test_recoveryworks_card_uses_approved_native_identity(self):
+  html=(R/'company_sites/group/index.html').read_text()
+  card=html.split('<article class="company-card recoveryworks">',1)[1].split('</article>',1)[0]
+  self.assertIn('class="approved-brand-image native-company-emblem"',card)
+  self.assertIn('src="/assets/brand/recoveryos-emblem.webp"',card)
+  self.assertIn('alt="RecoveryOS by RETALLY"',card)
+  self.assertNotIn('/assets/recoveryworks.webp',card)
+  css=(R/'company_sites/group/site.css').read_text()
+  self.assertNotIn('.company-card.recoveryworks>img{height:228px;object-fit:cover}',css)
  def test_independent_allowlists_publish_emblems(self):
   for company,keys in [('group',('freightrecovery','permitplate','capturebrief','recoveryos')),('recoveryworks',('recoveryos',))]:
    with tempfile.TemporaryDirectory() as tmp:
     out=Path(tmp)/'out'
     build(company,out)
     for key in keys:self.assertTrue((out/'assets/brand'/f'{key}-emblem.webp').is_file())
+    if company=='group':self.assertFalse((out/'assets/recoveryworks.webp').exists())
  def test_software_uses_transparent_emblem(self):
   self.assertIn('recoveryos-emblem.webp',(R/'recoveryworks/site/index.html').read_text())
 if __name__=='__main__':unittest.main()
