@@ -140,10 +140,10 @@ export async function fetchCatalog(spec) {
     reader.releaseLock();
   }
   if (!size) throw Error("EMPTY_RESPONSE");
-  const bytes = new Uint8Array(size);
+  const bodyBytes = new Uint8Array(size);
   let offset = 0;
-  for (const part of parts) { bytes.set(part, offset); offset += part.byteLength; }
-  const payload = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
+  for (const part of parts) { bodyBytes.set(part, offset); offset += part.byteLength; }
+  const payload = new TextDecoder("utf-8", {fatal:true}).decode(bodyBytes);
   return canonicalCandidates(spec.provider, JSON.parse(payload));
 }
 /**
