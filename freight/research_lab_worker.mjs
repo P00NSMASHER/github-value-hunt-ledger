@@ -10,7 +10,7 @@
 export const ENGINES = Object.freeze(["freightrecovery", "permitplate", "capturebrief", "recoveryos"]);
 const QUERIES = Object.freeze({
   freightrecovery: ["freight invoice dataset", "freight overcharge audit", "LTL shipping tariff"],
-  permitplate: ["NYC restaurant inspection", "restaurant permit dataset", "New York building license"],
+  permitplate: ["NYC DOB building permits", "DOB NOW approved permits", "NYC DOB permit issuance"],
   capturebrief: ["federal solicitation archive", "federal contract dataset", "government contract awards"],
   recoveryos: ["accounts payable dataset", "supplier payment invoices", "public sector vendor spend"],
 });
@@ -34,6 +34,10 @@ function queryUrl(base, params) {
   return url.toString();
 }
 
+export function permitplateCandidateInScope(url) {
+  return !/(restaurant|inspection|yelp|food[-_ ]?safety)/i.test(new URL(url).pathname);
+}
+
 export function canonicalCandidates(provider, data) {
   const out = [];
   if (!data || typeof data !== "object" || Array.isArray(data)) throw Error("INVALID_RESPONSE");
@@ -54,7 +58,12 @@ export function canonicalCandidates(provider, data) {
     if (!Array.isArray(data.results)) throw Error("INVALID_ITEMS");
     for (const v of data.results.slice(0, 15)) {
       const id = v && v.resource && v.resource.id;
-      if (typeof id === "string" && /^[a-z0-9]{4}-[a-z0-9]{4}$/.test(id)) {
+      const title = v && v.resource && v.resource.name;
+      if (typeof id === "string" && /^[a-z0-9]{4}-[a-z0-9]{4}$/.test(id)
+          && typeof title === "string"
+          && /\b(dob|building|construction)\b/i.test(title)
+          && /\b(permits?|filings?|applications?|certificates?)\b/i.test(title)
+          && !/\b(restaurant|inspection)\b/i.test(title)) {
         out.push("https://data.cityofnewyork.us/d/" + id);
       }
     }
@@ -75,7 +84,7 @@ export function feedSpecs(engine) {
   if (engine === "permitplate") {
     feeds.push({provider: "socrata", name: "nyc-official-catalog",
       url: queryUrl("https://api.us.socrata.com/api/catalog/v1",
-        {domains: "data.cityofnewyork.us", search_context: "data.cityofnewyork.us", q: "restaurant permit", limit: 15})});
+        {domains: "data.cityofnewyork.us", search_context: "data.cityofnewyork.us", q: "NYC DOB building permit", limit: 15})});
   }
   return feeds;
 }
@@ -165,7 +174,9 @@ export async function cycle(env, whenMs) {
   let added = 0;
   if (successfulFeeds > 0) {
     const today = new Date(now).toISOString().slice(0,10);
-    for (const url of selectCandidateWindow(candidates, now)) {
+    const scopedCandidates = lane === "permitplate"
+      ? [...candidates].filter(permitplateCandidateInScope) : candidates;
+    for (const url of selectCandidateWindow(scopedCandidates, now)) {
       const id = await sha256url(url);
       const result = await env.RESEARCH_DB.prepare(
         "INSERT OR IGNORE INTO sources(id,url,first_seen,rights_state,truth_state) VALUES(?,?,?,'UNVERIFIED_RIGHTS_HOLD','UNVERIFIED_TRUTH_HOLD')"
