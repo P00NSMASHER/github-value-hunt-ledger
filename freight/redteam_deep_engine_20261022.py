@@ -11,6 +11,8 @@ No actual customer or external provider action is performed or permitted.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+import csv
+import io
 from dataclasses import asdict, dataclass, replace
 from hashlib import sha256
 from pathlib import Path
@@ -498,7 +500,8 @@ def run_one(i: int,output:Path) -> dict:
             "customer_count":len({x["customer_id"] for x in d.invoice_rows}),
             "currencies":sorted({x["currency"] for x in d.invoice_rows}),
             "contract_document_count":len(d.contracts),
-            "pricing_models":sorted({c["pricing_model"] for c in d.contracts}),
+            "pricing_models": sorted({row["pricing_model"] for c in d.contracts
+                for row in csv.DictReader(io.StringIO(c["data"].decode("utf-8")))}),
             "authority_kinds":sorted({x["category"] for x in d.independent_charge_oracle}),
         },
         "stages":stages,
