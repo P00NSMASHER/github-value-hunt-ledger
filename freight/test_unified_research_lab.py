@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
 
 from freight.unified_research_lab import (
-    ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
+    ENGINES, SEARCHES, SEEDS, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
     mirror_scout_all, get_json, metadata_in_scope,
 )
@@ -20,6 +20,45 @@ NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 
 class UnifiedResearchLabTests(unittest.TestCase):
+    def test_gao_b215958_source_scope_dedup_and_unknowns(self):
+        fixture = Path(__file__).with_name("fixtures") / "gao_b215958_source_v1.json"
+        data = json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertEqual(data["schema_version"], "1.0.0")
+        self.assertEqual(data["status"], "SOURCE_BOUND_DECISION_LEVEL_CANDIDATE_NOT_HELD_OUT")
+        source = data["source"]
+        url = "https://www.gao.gov/products/b-215958"
+        self.assertEqual(source["original_record_url"], url)
+        self.assertEqual(source["original_report_url"],
+                         "https://www.gao.gov/assets/b-215958-125766.pdf")
+        self.assertEqual(source["decision_date"], "1984-12-05")
+        self.assertEqual(source["decision_page_for_disposition"], 3)
+        self.assertIsNone(source["source_bytes_sha256"])
+        self.assertFalse(source["source_bytes_acquired"])
+        self.assertFalse(source["commercial_use_of_engine_input_approved"])
+        population = data["population"]
+        self.assertEqual(population["challenged_government_bills_of_lading"], 55)
+        self.assertEqual(population["decision_reversals_with_recorded_numbered_seals"], 53)
+        self.assertEqual(population["remainder_cases_with_unresolved_disposition"], 2)
+        self.assertFalse(population["per_bill_of_lading_labels_available"])
+        self.assertIsNone(population["independently_confirmed_refunds_received"])
+        self.assertIsNone(population["independently_confirmed_carrier_overcharge_amount_cents"])
+        self.assertFalse(data["limits"]["independent_accuracy_scoring_permitted"])
+        self.assertEqual(data["limits"]["realized_retally_recovered_cash_cents"], 0)
+        self.assertEqual(len(data["controls"]), 2)
+        self.assertTrue(all(x["synthetic"] for x in data["controls"]))
+        self.assertTrue(all(x["actual_refund_received_cents"] is None
+                            and x["actual_customer_overcharge_cents"] is None
+                            for x in data["controls"]))
+        self.assertIn(url, SEEDS["freightrecovery"])
+        self.assertEqual(safe_url(url), url)
+        single, added = merge_sources(ledger_from([]), "freightrecovery",
+                                      [url, url], "2026-10-23")
+        self.assertEqual(added, 1)
+        self.assertEqual(len(single["entries"]), 1)
+        self.assertFalse(single["entries"][0]["independent_ground_truth"])
+        self.assertFalse(single["entries"][0]["commercial_reuse_authorized"])
+        self.assertFalse(single["entries"][0]["recovered_cash_verified"])
+
     def test_every_engine_scheduled_in_one_twenty_minute_cycle(self):
         selected = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(4)]
         self.assertEqual(set(selected), set(ENGINES))
