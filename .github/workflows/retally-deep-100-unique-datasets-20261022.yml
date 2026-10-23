@@ -1,0 +1,69 @@
+name: RETALLY Deep 100 Structurally Diverse Synthetic Buyers
+
+on:
+  pull_request:
+    paths:
+      - 'freight/redteam_deep_generator_20261022.py'
+      - 'freight/redteam_deep_engine_20261022.py'
+      - '.github/workflows/retally-deep-100-unique-datasets-20261022.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-deep-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deep-adversarial-100:
+    name: 100-structurally-different-buyers
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact scenario + engine revision without GitHub credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Use Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Validate code is parseable
+        run: python -m py_compile freight/redteam_deep_generator_20261022.py freight/redteam_deep_engine_20261022.py
+      - name: Execute 100 different customer structures and source-bound end-to-end models
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          RETALLY_DEEP_REPORT_DIR: retally-deep-100-output
+        run: python -m freight.redteam_deep_engine_20261022
+      - name: Verify run completeness, preserve negative findings rather than recasting as passes
+        if: always()
+        run: |
+          if [ ! -f retally-deep-100-output/summary.json ]; then
+            echo "No final summary artifact; test was blocked or crashed."
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          s=json.loads(Path("retally-deep-100-output/summary.json").read_text())
+          assert s["cases"]==100 and s["unique_source_manifests"]==100
+          assert s["real_customer_data"] is False
+          assert s["real_carrier_actions"] is False
+          assert s["bank_cleared_funds"] is False
+          assert s["contract_execution_verified"] is False
+          print("REDTEAM_SUMMARY",json.dumps(s,sort_keys=True))
+          print("TEST EXECUTION IS NOT ENGINE ACCEPTANCE, EVEN WHEN CI SUCCEEDS")
+          PY
+      - name: Upload exact fictional sources, per-case evidence, and failure summary
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-100-structurally-diverse-synthetic-freight-redteam-v2
+          path: |
+            retally-deep-100-output/fictional-datasets.zip
+            retally-deep-100-output/report.json
+            retally-deep-100-output/summary.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Ensure no protected engine source changed during run
+        run: git diff --exit-code -- freight .github
