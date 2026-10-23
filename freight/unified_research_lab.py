@@ -27,7 +27,7 @@ MAX_NEW_PER_RUN = 40
 MAX_BODY = 1_500_000
 SEARCHES = {
     "freightrecovery": ("freight invoice", "freight tariff", "freight invoice dataset"),
-    "permitplate": ("NYC restaurant inspection", "NYC building permits", "restaurant license open data"),
+    "permitplate": ("NYC building permit", "DOB NOW approved permit", "NYC DOB permit issuance"),
     "capturebrief": ("federal contract opportunities", "federal contract awards", "federal solicitations dataset"),
     "recoveryos": ("accounts payable invoice", "vendor payment transparency", "accounts payable invoice dataset"),
 }
@@ -160,6 +160,26 @@ def get_json(url: str) -> dict:
     return data
 
 
+PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
+
+
+def permitplate_url_in_scope(url: str) -> bool:
+    """Reject verified wrong-topic public source pointers from permit research."""
+    path = urlsplit(url).path.lower()
+    return (re.search(r"(?i)(restaurant|inspection|yelp|food[-_ ]?safety|dine[-_ ]?safe)", path) is None
+            and path.rstrip("/").rsplit("/", 1)[-1] not in PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS)
+
+
+def permitplate_catalog_in_scope(resource: dict) -> bool:
+    """Reject non-DOB catalogs; metadata is not independent permit issuance."""
+    title = resource.get("name") if type(resource) is dict else None
+    return bool(type(title) is str
+                and re.search(r"\b(dob|building|construction)\b", title, re.I)
+                and re.search(r"\b(permits?|filings?|applications?|certificates?)\b",
+                              title, re.I)
+                and not re.search(r"\b(restaurant|inspection)\b", title, re.I))
+
+
 def source_record(url: str, engine: str, seen: str) -> dict:
     safe_url(url)
     if engine not in ENGINES or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", seen):
@@ -223,6 +243,8 @@ def merge_sources(doc: dict, engine: str, urls: list[str], seen: str, *,
     added = 0
     for url in urls:
         candidate = source_record(url, engine, (first_seen_overrides or {}).get(url, seen))
+        if engine == "permitplate" and not permitplate_url_in_scope(candidate["url"]):
+            continue
         key = candidate["id"]
         if key in items:
             row = items[key]
@@ -306,7 +328,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                       "https://api.us.socrata.com/api/catalog/v1?" +
                       urlencode({"domains": "data.cityofnewyork.us",
                                  "search_context": "data.cityofnewyork.us",
-                                 "q": "restaurant license building permit",
+                                 "q": "NYC DOB building permit",
                                  "limit": "20"})))
     if os.environ.get("RETALLY_DATAGOV_API_KEY"):
         feeds.append(("data.gov-v4:" + q1, "datagov-v4",
@@ -352,7 +374,8 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                         continue
                     resource = item.get("resource")
                     ident = resource.get("id") if type(resource) is dict else None
-                    if type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident):
+                    if (type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident)
+                            and permitplate_catalog_in_scope(resource)):
                         urls.append("https://data.cityofnewyork.us/d/" + ident)
             else:
                 hits = data.get("hits", {}).get("hits", [])
