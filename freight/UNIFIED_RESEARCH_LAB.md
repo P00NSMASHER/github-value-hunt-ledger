@@ -258,3 +258,28 @@ rights, authority and outcome evidence before usage as a benchmark or
 commercial claim. This change does not change existing billing plans or
 permissions, nor introduce a deployment or API-secret requirement.
 
+## Cursor-paginated Cloudflare-to-GitHub publication (v3)
+
+Each GitHub discovery execution mirrors the four Cloudflare source lanes from
+the existing read-only endpoint \`/feed?engine=...\`, now with an opaque
+\`before\` cursor. Cloudflare continues to preserve newest-first source
+ordering while permitting older entries to be read across pages. Only the
+public URL and its original observed date are returned; the internal D1
+row ID is used for paging and is **not** returned as a source field.
+The previous unpaginated endpoint continues to work for clients.
+
+The GitHub publication worker reads up to **6 pages of 100 URL pointers per
+engine**, with fixed cursor validation and no new scheduled jobs. At most
+40 newly admitted pointers per engine are committed per GitHub execution,
+preserving the original source-branch write bound. Every candidate remains
+unverified for commercial rights, original-document custody and independent
+ground truth; old historical records are not discarded. If the page cap is
+reached, or a cursor is malformed, a bounded per-engine error is recorded.
+Wrong-engine responses and malformed dates fail closed without overwriting
+the existing ledger. Provider / mirror issues remain visible; a successful
+job is not a blanket guarantee of source suitability.
+
+This change is only for **public metadata readback and research branch
+publication**: the Cloudflare five-minute Cron, D1 schema and bindings,
+all production environments, external customer communications, and
+existing nightly original-document tests remain unchanged.

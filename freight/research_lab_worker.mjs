@@ -319,11 +319,26 @@ export default {
     if (url.pathname === "/feed") {
       const lane = url.searchParams.get("engine");
       if (!ENGINES.includes(lane)) return json({error:"INVALID_ENGINE"},400);
-      const lim = Math.min(100,Math.max(1,Number.parseInt(url.searchParams.get("limit") || "50",10)||50));
-      const rows = await env.RESEARCH_DB.prepare(
-        "SELECT s.url,s.first_seen FROM sources s INNER JOIN source_engines e ON e.source_id=s.id WHERE e.lane=? ORDER BY s.rowid DESC LIMIT ?"
-      ).bind(lane,lim).all();
-      return json({engine:lane,scope:"PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",sources:rows.results});
+      const limitRaw = url.searchParams.get("limit") || "50";
+      if (!/^[1-9]\d{0,2}$/.test(limitRaw)) return json({error:"INVALID_LIMIT"},400);
+      const lim = Math.min(100, Number(limitRaw));
+      const beforeRaw = url.searchParams.get("before");
+      // Source rowids are opaque cursor positions, never source contents.
+      if (beforeRaw !== null && !/^[1-9]\d{0,11}$/.test(beforeRaw))
+        return json({error:"INVALID_CURSOR"},400);
+      const before = beforeRaw === null ? null : Number(beforeRaw);
+      const sql = before === null
+        ? "SELECT s.rowid AS cursor_id,s.url,s.first_seen FROM sources s INNER JOIN source_engines e ON e.source_id=s.id WHERE e.lane=? ORDER BY s.rowid DESC LIMIT ?"
+        : "SELECT s.rowid AS cursor_id,s.url,s.first_seen FROM sources s INNER JOIN source_engines e ON e.source_id=s.id WHERE e.lane=? AND s.rowid < ? ORDER BY s.rowid DESC LIMIT ?";
+      const statement = env.RESEARCH_DB.prepare(sql);
+      const rows = await (before === null ? statement.bind(lane,lim) :
+                          statement.bind(lane,before,lim)).all();
+      const entries = rows.results || [];
+      const nextCursor = entries.length === lim
+        ? String(entries[entries.length - 1].cursor_id) : null;
+      return json({engine:lane,scope:"PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+        sources:entries.map(({url,first_seen})=>({url,first_seen})),
+        next_cursor:nextCursor});
     }
     return json({error:"NOT_FOUND"},404);
   },
