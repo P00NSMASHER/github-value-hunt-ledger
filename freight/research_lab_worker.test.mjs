@@ -80,24 +80,27 @@ test("rotation reaches all bounded candidate windows without repeating only the 
 });
 
 
-test("PermitPlate excludes restaurant inspection catalogs from its permit leads", () => {
+test("PermitPlate retains exact canonical DOHMH core but excludes unoriginal restaurant mirrors", () => {
   const q = feedSpecs("permitplate").map(s => new URL(s.url).searchParams.get("q") || "");
   assert.ok(q.every(x => !/restaurant|inspection/i.test(x)));
   assert.deepEqual(canonicalCandidates("socrata", {results: [
     {resource:{id:"abcd-1234",name:"DOHMH Restaurant Inspection"}},
+    {resource:{id:"43nn-pn8j",name:"DOHMH New York City Restaurant Inspection Results"}},
     {resource:{id:"rbx6-tga4",name:"DOB NOW: Build – Approved Permits"}},
     {resource:{id:"ipu4-2q9a",name:"DOB Permit Issuance"}},
     {resource:{id:"w9ak-ipjd",name:"DOB NOW: Job Application Filings"}},
   ]}), [
+    "https://data.cityofnewyork.us/d/43nn-pn8j",
     "https://data.cityofnewyork.us/d/ipu4-2q9a",
     "https://data.cityofnewyork.us/d/rbx6-tga4",
     "https://data.cityofnewyork.us/d/w9ak-ipjd",
   ]);
   assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-Restaurant-Inspection"), false);
+  assert.equal(permitplateCandidateInScope("https://data.cityofnewyork.us/d/43nn-pn8j"), true);
+  assert.equal(permitplateCandidateInScope("https://github.com/owner/43nn-pn8j"), false);
   assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-DOB-Building-Permits"), true);
   for (const url of [
     "https://github.com/gcivil-nyu-org/dine-safe-ly",
-    "https://data.cityofnewyork.us/d/43nn-pn8j",
     "https://data.cityofnewyork.us/d/pitm-atqc",
     "https://data.cityofnewyork.us/d/qcdj-rwhu",
     "https://data.cityofnewyork.us/d/fpeh-f7ci",
