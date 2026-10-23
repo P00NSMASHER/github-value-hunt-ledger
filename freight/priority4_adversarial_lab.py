@@ -256,7 +256,10 @@ def independent_oracle(plan: StressPlan) -> ReplayOracle:
     disqualified = plan.ordinal % 11 == 0
     return ReplayOracle(
         credit, net, reversed_cents, pending,
-        0 if disqualified else net,
+        # Independently hold the fee base when an event-level source return
+        # is registered but not yet fully applied. Do not infer bank cash or
+        # split a pending source return arbitrarily across claim allocations.
+        0 if disqualified or pending else net,
         plan.scenario.disputed_cents - net,
     )
 

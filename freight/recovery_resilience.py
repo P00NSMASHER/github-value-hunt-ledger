@@ -304,6 +304,7 @@ def _settlement_read_only(
         if edge["amount_cents"] <= 0:
             raise ValueError("nonpositive reversal in scoped immutable source")
     total = reverted = fee = 0
+    source_fee_by_event: dict[str, int] = {}
     linked_event_ids = set()
     for a in allocations:
         e = by_event.get(a["event_id"])
@@ -324,6 +325,9 @@ def _settlement_read_only(
         reverted += reverse
         if eligible and not active_dispute_hold:
             fee += amount - reverse
+            source_fee_by_event[a["event_id"]] = (
+                source_fee_by_event.get(a["event_id"], 0) + amount - reverse
+            )
         linked_event_ids.add(a["event_id"])
     if total > scenario.disputed_cents or reverted > total:
         raise ValueError("declared recovery exceeds frozen claim capacity")
@@ -331,6 +335,7 @@ def _settlement_read_only(
     # candidate amount; they must never quietly count as settled cash.
     pending = 0
     shared_event_return_ids = set()
+    unresolved_fee_event_ids = set()
     for counter in tables["counter_events"]:
         event_id = counter["original_event_id"]
         if event_id not in linked_event_ids:
@@ -342,6 +347,7 @@ def _settlement_read_only(
         residual = counter["amount_cents"] - used
         if not residual:
             continue
+        unresolved_fee_event_ids.add(event_id)
         # A counter funds the settlement event, NOT one particular claim. If
         # that event was allocated to multiple claims, showing its full
         # residual within each claim would make aggregate reports overstate
@@ -356,6 +362,9 @@ def _settlement_read_only(
             }))
         else:
             pending += residual
+    # A known but unapplied return cannot justify a provisional fee, even
+    # when its amount is not safely attributable to one of several claims.
+    fee -= sum(source_fee_by_event.get(event_id, 0) for event_id in unresolved_fee_event_ids)
     net = total - reverted
     return SettlementObservation(
         snapshot_sha, total, reverted, net,

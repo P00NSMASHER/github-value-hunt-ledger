@@ -31,6 +31,7 @@ def fixture():
         "RETALLY_OCI_CLIENT_SECRET": "confidential-client-secret",
         "RETALLY_OCI_NAMESPACE": "exampletenant",
         "RETALLY_OCI_COMPARTMENT_OCID": "ocid1.compartment.oc1..aaaaexample",
+        "RETALLY_OCI_VM_COMPARTMENT_OCID": "ocid1.compartment.oc1..aaaavmexample",
         "RETALLY_OCI_VM_OCID": "ocid1.instance.oc1.iad.aaaaexample",
         "ACTIONS_ID_TOKEN_REQUEST_URL": "https://pipelines.actions.githubusercontent.com/oidc/token?x=1",
         "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "opaque-gh-request-token",
@@ -84,7 +85,9 @@ class ContextTests(unittest.TestCase):
             ("RETALLY_OCI_DOMAIN_URL", "https://idcs-example.identity.oraclecloud.com/evil"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "http://pipelines.actions.githubusercontent.com/oidc/token"),
             ("ACTIONS_ID_TOKEN_REQUEST_URL", "https://evil.net/oidc/token"),
-            ("RETALLY_OCI_VM_OCID", "junk"), ("RETALLY_OCI_NAMESPACE", "a/../x"),
+            ("RETALLY_OCI_VM_OCID", "junk"),
+            ("RETALLY_OCI_VM_COMPARTMENT_OCID", "junk"),
+            ("RETALLY_OCI_NAMESPACE", "a/../x"),
         ]:
             with self.subTest(key=key):
                 s = fixture()
@@ -171,6 +174,7 @@ class ContextTests(unittest.TestCase):
             "GitHub OIDC request endpoint is not trusted",
             "Invalid OCI namespace",
             "Invalid OCI compartment/tenancy OCID",
+            "Invalid OCI VM compartment OCID",
             "Invalid expected VM OCID",
         )
         for reason in allowed:
@@ -275,7 +279,7 @@ class AccessTests(unittest.TestCase):
 
     def test_vm_expected_running_shape(self):
         vm = dict(id=fixture()["RETALLY_OCI_VM_OCID"],
-                  compartment_id=fixture()["RETALLY_OCI_COMPARTMENT_OCID"], shape=m.SHAPE,
+                  compartment_id=fixture()["RETALLY_OCI_VM_COMPARTMENT_OCID"], shape=m.SHAPE,
                   lifecycle_state="RUNNING")
         m.check_instance(SimpleNamespace(**vm), vm["id"], vm["compartment_id"])
         for field, value in [

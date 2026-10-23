@@ -83,7 +83,7 @@ For initial setup or controlled credential rotation, use https://github.com/P00N
 
 **Repository Secrets:** RETALLY_OCI_CLIENT_ID (dedicated client ID), RETALLY_OCI_CLIENT_SECRET (dedicated non-admin client secret).
 
-**Repository Variables:** RETALLY_OCI_DOMAIN_URL (identity domain HTTPS origin such as https://idcs-xxxx.identity.oraclecloud.com, no path); RETALLY_OCI_NAMESPACE (existing Object Storage namespace); RETALLY_OCI_COMPARTMENT_OCID (existing compartment OCID); RETALLY_OCI_VM_OCID (specific existing VM OCID).
+**Repository Variables:** RETALLY_OCI_DOMAIN_URL (identity domain HTTPS origin such as https://idcs-xxxx.identity.oraclecloud.com, no path); RETALLY_OCI_NAMESPACE (existing Object Storage namespace); RETALLY_OCI_COMPARTMENT_OCID (bucket compartment OCID); RETALLY_OCI_VM_COMPARTMENT_OCID (dedicated compartment containing the VM); RETALLY_OCI_VM_OCID (specific existing VM OCID).
 
 **Activation variable:** RETALLY_OCI_MONITOR_ENABLED was `true` in the October 21 live successful workflow. That proves the actual read-only check executed, not that all negative IAM controls were independently audited. The guard still skips provider calls when absent/false. For a fresh setup, credential replacement or re-enablement, leave this variable false until trust/effective permissions and denied-operation tests are verified; never silently broaden an already-enabled monitor.
 
