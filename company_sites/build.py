@@ -48,7 +48,6 @@ PROFILES = {
             "assets/brand/capturebrief-1200-20261022.webp": "freight/site/assets/brand/capturebrief-1200-20261022.webp",
             "assets/hero.webp": "freight/site/group/assets/hero-1536.webp",
             "assets/freight.webp": "freight/site/assets/images/terminal-blue-hour-800.webp",
-            "assets/recoveryworks.webp": "recoveryworks/site/assets/analyst-review.webp",
             "assets/permitplate.webp": "freight/site/group/assets/restaurant-768.webp",
             "assets/capturebrief.webp": "freight/site/group/assets/research-768.webp",
             "assets/hanken.woff2": "freight/site/assets/fonts/hanken-grotesk-latin.woff2",
