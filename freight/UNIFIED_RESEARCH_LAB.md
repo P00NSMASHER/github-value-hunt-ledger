@@ -157,8 +157,12 @@ never touches customer, production money, hosted RecoveryOS, or other Workers.
   plan. Worker subrequests and D1 writes are capped to fit included usage.
   The independent service stores pointers durably when GitHub cron is absent;
   GitHub's source branch remains the governed publication mirror when its
-  own runner executes. A separate read-only synchronization adapter must
-  be proven before claiming that the two catalogs are perfectly mirrored.
+  own runner executes. Each GitHub discovery first reads the Cloudflare
+  metadata-only `/feed` for its chosen engine, checks the exact scope/engine,
+  validates each URL against the source-host allowlist, and merges it into the
+  source-held ledger. No claim of real-time perfect mirroring: if GitHub
+  scheduling is absent, Cloudflare remains the durable live discovery store
+  until a main-branch or scheduled GitHub run resumes.
 
 ### Operational acceptance and recovery
 

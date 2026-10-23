@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
 
 from freight.unified_research_lab import (
@@ -93,6 +94,11 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
     def test_feed_parses_canonical_metadata_and_not_raw_rows(self):
         def fake(url):
+            if "retally-unified-research-scout" in url:
+                engine = parse_qs(urlsplit(url).query)["engine"][0]
+                return {"engine": engine,
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
             if "api.github.com" in url:
                 return {"items": [{"html_url": "https://github.com/owner/public-data",
                                    "description": "ignore copied PII"},
@@ -107,6 +113,11 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
     def test_nyc_official_catalog_uses_dataset_ids_only(self):
         def fake(url):
+            if "retally-unified-research-scout" in url:
+                engine = parse_qs(urlsplit(url).query)["engine"][0]
+                return {"engine": engine,
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
             if "api.us.socrata.com" in url:
                 return {"results": [
                     {"resource": {"id": "abcd-1234", "name": "DOHMH Inspection"},
@@ -124,6 +135,11 @@ class UnifiedResearchLabTests(unittest.TestCase):
     def test_data_gov_v4_is_not_used_without_a_production_api_key(self):
         seen = []
         def fake(url):
+            if "retally-unified-research-scout" in url:
+                engine = parse_qs(urlsplit(url).query)["engine"][0]
+                return {"engine": engine,
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
             seen.append(url)
             return {"items": []} if "api.github.com" in url else {"hits": {"hits": []}}
         with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
@@ -133,6 +149,11 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
     def test_data_gov_v4_only_admits_public_dataset_metadata(self):
         def fake(url):
+            if "retally-unified-research-scout" in url:
+                engine = parse_qs(urlsplit(url).query)["engine"][0]
+                return {"engine": engine,
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
             if "api.gsa.gov" in url:
                 return {"results": [
                     {"slug": "public-data-2026", "dcat": {"accessLevel": "public"},
@@ -148,6 +169,11 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
     def test_partial_provider_failure_is_disclosed_but_all_fail_closed(self):
         def partial(url):
+            if "retally-unified-research-scout" in url:
+                engine = parse_qs(urlsplit(url).query)["engine"][0]
+                return {"engine": engine,
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
             if "zenodo.org" in url:
                 raise ResearchError("HTTP_STATUS_503")
             if "api.us.socrata.com" in url:
@@ -163,6 +189,36 @@ class UnifiedResearchLabTests(unittest.TestCase):
         with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
             with self.assertRaisesRegex(ResearchError, "ALL_PUBLIC_FEEDS_UNAVAILABLE"):
                 scan("recoveryos", fetch=all_failed)
+
+    def test_independent_scout_validated_metadata_is_prioritized(self):
+        def fake(url):
+            if "retally-unified-research-scout" in url:
+                return {"engine": "recoveryos",
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": [
+                            {"url": "https://zenodo.org/records/12345",
+                             "private_account": "never copied"},
+                            {"url": "https://github.com/public/recon-dataset"},
+                        ]}
+            return {"items": []} if "api.github.com" in url else {"hits": {"hits": []}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            urls, errors = scan("recoveryos", fetch=fake)
+        self.assertEqual(errors, [])
+        self.assertEqual(urls, ["https://zenodo.org/records/12345",
+                                "https://github.com/public/recon-dataset"])
+        self.assertNotIn("private_account", str(urls))
+
+    def test_independent_scout_rejects_invalid_or_cross_engine_source(self):
+        def fake(url):
+            if "retally-unified-research-scout" in url:
+                return {"engine": "freightrecovery",
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": [{"url": "https://evil.invalid/private"}]}
+            return {"items": []} if "api.github.com" in url else {"hits": {"hits": []}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            urls, errors = scan("permitplate", fetch=fake)
+        self.assertEqual(urls, [])
+        self.assertTrue(any("UNTRUSTED_SCOUT_FEED" in e for e in errors))
 
     def test_corrupt_saved_ledger_is_not_overwritten(self):
         with tempfile.TemporaryDirectory() as root:
