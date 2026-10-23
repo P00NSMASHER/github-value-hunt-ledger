@@ -33,13 +33,24 @@ SEARCHES = {
 SOURCE_HOSTS = frozenset({
     "catalog.data.gov", "github.com", "zenodo.org", "www.gao.gov",
     "data.cityofnewyork.us", "sam.gov", "api.usaspending.gov",
-    "www.penninecare.nhs.uk",
+    "www.penninecare.nhs.uk", "media.cadc.uscourts.gov",
+    "www2.fmc.gov", "www.fmc.gov", "www.sec.gov", "www.stb.gov",
+    "www.eia.gov", "psc.ky.gov",
 })
 API_HOSTS = frozenset({"catalog.data.gov", "api.github.com", "zenodo.org"})
 SEEDS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
+        # Real-world evaluation v1 official references. No original bytes or
+        # buyer-specific invoice URLs enter the public research catalog.
+        "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+        "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+        "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
+        "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm",
+        "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
+        "https://www.stb.gov/reports-data/waybill/",
+        "https://www.eia.gov/petroleum/gasdiesel/",
     ),
     "permitplate": (
         "https://data.cityofnewyork.us/d/43nn-pn8j",
