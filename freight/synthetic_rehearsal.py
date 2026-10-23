@@ -97,6 +97,62 @@ COUNTER_CSV = (
 ).encode("utf-8")
 
 
+def _counter_reporting(snapshot: dict, counter_ids: tuple[str, ...]) -> dict:
+    """Derive return reporting from the immutable settlement snapshot.
+
+    Source-declared returns, applied reversals, and unresolved capacity are
+    deliberately separate.  None of these amounts proves bank-cleared cash.
+    """
+    tables = snapshot.get("tables") if isinstance(snapshot, dict) else None
+    if not isinstance(tables, dict):
+        raise AssertionError("settlement snapshot tables are required")
+    counter_rows = tables.get("counter_events")
+    reversal_rows = tables.get("reversal_edges")
+    if not isinstance(counter_rows, list) or not isinstance(reversal_rows, list):
+        raise AssertionError("settlement counter and reversal rows are required")
+    if not counter_ids or len(counter_ids) != len(set(counter_ids)):
+        raise AssertionError("counter lifecycle identities must be unique")
+
+    counters = {row.get("counter_id"): row for row in counter_rows
+                if isinstance(row, dict)}
+    events = []
+    for counter_id in counter_ids:
+        row = counters.get(counter_id)
+        if row is None:
+            raise AssertionError("counter lifecycle is missing immutable source row")
+        declared = row.get("amount_cents")
+        if type(declared) is not int or declared <= 0:
+            raise AssertionError("counter source amount must be positive integer cents")
+        applied = 0
+        for reversal in reversal_rows:
+            if not isinstance(reversal, dict) or reversal.get("counter_id") != counter_id:
+                continue
+            amount = reversal.get("amount_cents")
+            if type(amount) is not int or amount <= 0:
+                raise AssertionError("applied reversal must be positive integer cents")
+            applied += amount
+        if applied > declared:
+            raise AssertionError("applied reversal exceeds source-declared return")
+        events.append({
+            "counter_id": counter_id,
+            "source_declared_cents": declared,
+            "applied_reversal_cents": applied,
+            "unresolved_return_cents": declared - applied,
+        })
+
+    source_declared = sum(item["source_declared_cents"] for item in events)
+    applied_reversals = sum(item["applied_reversal_cents"] for item in events)
+    unresolved = sum(item["unresolved_return_cents"] for item in events)
+    return {
+        # Backward-compatible name, now source-derived instead of templated.
+        "return_cents": source_declared,
+        "source_declared_return_cents": source_declared,
+        "applied_reversal_cents": applied_reversals,
+        "unresolved_return_cents": unresolved,
+        "counter_events": events,
+    }
+
+
 def run_rehearsal() -> dict:
     readiness_input = PilotReadinessInput(
         authorization_documented=True,
@@ -408,6 +464,10 @@ def run_rehearsal() -> dict:
         metrics = report.metrics
         store_realized = store.realized_cents()
         store_fee = store.fee_eligible_cents()
+        counter_reporting = _counter_reporting(
+            json.loads(store.report_snapshot_json()),
+            tuple(item.counter_id for item in counter_lifecycle.counter_events),
+        )
 
     if store_realized != metrics.realized_cents:
         raise AssertionError("persistent settlement store disagrees with pilot report")
@@ -524,7 +584,7 @@ def run_rehearsal() -> dict:
             "pre_return_report_hash": before_return.report_hash,
             "pre_return_realized_cents": before_return.metrics.realized_cents,
             "pre_return_fee_eligible_cents": before_return.metrics.fee_eligible_realized_cents,
-            "return_cents": 500,
+            **counter_reporting,
             "stale_report_rejected": stale_report_rejected,
         },
         "report_markdown": render_persistent_markdown(report),
