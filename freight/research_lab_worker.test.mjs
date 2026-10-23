@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, cycle} from "./research_lab_worker.mjs";
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -102,4 +102,105 @@ test("PermitPlate excludes restaurant inspection catalogs from its permit leads"
     "https://data.cityofnewyork.us/d/qcdj-rwhu",
     "https://data.cityofnewyork.us/d/fpeh-f7ci",
   ]) assert.equal(permitplateCandidateInScope(url), false, url);
+});
+
+
+test("bounded catalogs rotate query terms and pages without extra network budget",()=>{
+  const start=Date.UTC(2026,9,23,0,0,0);
+  const now=[];
+  for(let lap=0;lap<15;lap++){
+    const specs=feedSpecs("freightrecovery",start+lap*1200000);
+    assert.equal(specs.length,3);
+    assert.equal(specs.filter(x=>x.provider==="github").length,2);
+    assert.equal(specs.filter(x=>x.provider==="zenodo").length,1);
+    for(const spec of specs){
+      const url=new URL(spec.url);
+      assert.ok(url.hostname==="api.github.com"||url.hostname==="zenodo.org");
+      assert.ok([1,2,3].includes(Number(url.searchParams.get("page"))));
+      assert.ok(!/[?&](?:api_?key|token|auth)=/i.test(url.search));
+    }
+    now.push(specs.map(x=>x.url).join("|"));
+  }
+  assert.ok(new Set(now).size>=12);
+  assert.notDeepEqual(feedSpecs("capturebrief",start),feedSpecs("capturebrief",start+100*1200000));
+  assert.throws(()=>feedSpecs("recoveryos",Number.NaN),/INVALID_SCHEDULE_TIME/);
+  assert.equal(feedSpecs("permitplate",start).filter(x=>x.provider==="socrata").length,1);
+});
+
+test("D1 source publication uses one bounded atomic batch with rights holds",async()=>{
+  const batched=[];
+  const db={
+    prepare(sql){return {bind(...args){return {sql,args}}};},
+    async batch(stmts){batched.push(stmts);return [{meta:{changes:2}},{meta:{changes:2}}];},
+  };
+  const before=Date.UTC(2026,9,23,12,0);
+  const input=["https://github.com/example/source-two","https://zenodo.org/records/1001"];
+  const out=await persistSourceWindow(db,"freightrecovery",input,before);
+  assert.deepEqual(out,{newSources:2,attempted:2});
+  assert.equal(batched.length,1);
+  assert.equal(batched[0].length,2);
+  assert.match(batched[0][0].sql,/INSERT OR IGNORE INTO sources/);
+  assert.match(batched[0][0].sql,/UNVERIFIED_RIGHTS_HOLD/);
+  assert.match(batched[0][0].sql,/UNVERIFIED_TRUTH_HOLD/);
+  assert.match(batched[0][1].sql,/INSERT OR IGNORE INTO source_engines/);
+  assert.equal(batched[0][0].args.length,6);
+  assert.equal(batched[0][1].args.length,4);
+  assert.ok(batched[0][0].args.includes("2026-10-23"));
+  assert.equal(batched[0][0].sql.includes("source-two"),false);
+  assert.deepEqual(await persistSourceWindow(db,"capturebrief",[],before),
+                   {newSources:0,attempted:0});
+  assert.equal(batched.length,1);
+  await assert.rejects(persistSourceWindow(
+    {prepare:db.prepare,batch:async()=>[{meta:{changes:99}},{meta:{changes:2}}]},
+    "freightrecovery",input,before),/INVALID_STORAGE_RECEIPT/);
+});
+
+test("provider errors are fixed bounded telemetry codes with no source disclosure",()=>{
+  assert.equal(providerErrorCode(new Error("HTTP_429")),"HTTP_429");
+  assert.equal(providerErrorCode(new Error("HTTP_503")),"HTTP_503");
+  assert.equal(providerErrorCode(new Error("REDIRECT_BLOCKED")),"REDIRECT_BLOCKED");
+  assert.equal(providerErrorCode(new Error("token=sensitive@example.com http://private.invalid")),"SOURCE_UNAVAILABLE");
+  const timeout=Object.assign(new Error("contains private customer info"),{name:"TimeoutError"});
+  assert.equal(providerErrorCode(timeout),"TIMEOUT");
+});
+
+test("oversized public catalog streaming is bounded by byte count",async()=>{
+  const original=globalThis.fetch;
+  try{
+    globalThis.fetch=async()=>new Response("x".repeat(1200001),
+      {status:200,headers:{"content-type":"application/json"}});
+    await assert.rejects(fetchCatalog(feedSpecs("capturebrief")[0]),/RESPONSE_LIMIT/);
+  }finally{globalThis.fetch=original;}
+});
+
+test("GitHub rate limit skips secondary request and writes a degraded receipt",async()=>{
+  const original=globalThis.fetch;
+  const seen=[],sql=[];
+  const db={
+    prepare(query){
+      sql.push(query);
+      return {
+        first:async()=>({name:"freightrecovery"}),
+        bind(...args){return {
+          async run(){return {meta:{changes:1}};},
+        };},
+      };
+    },
+    batch:async()=>[{meta:{changes:1}},{meta:{changes:1}}],
+  };
+  try{
+    globalThis.fetch=async url=>{
+      seen.push(String(url));
+      if(String(url).includes("api.github.com"))
+        return new Response("",{status:429});
+      return new Response(JSON.stringify({hits:{hits:[{id:12345}]}}),
+        {status:200,headers:{"content-type":"application/json"}});
+    };
+    const result=await cycle({RESEARCH_DB:db},Date.UTC(2026,9,23,12,0));
+    assert.equal(result.state,"DEGRADED");
+    assert.equal(result.added,1);
+    assert.equal(seen.filter(x=>x.includes("api.github.com")).length,1);
+    assert.equal(seen.filter(x=>x.includes("zenodo.org")).length,1);
+    assert.ok(sql.some(x=>x.includes("UPDATE runs SET status")));
+  }finally{globalThis.fetch=original;}
 });
