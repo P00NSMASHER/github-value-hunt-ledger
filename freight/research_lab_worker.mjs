@@ -79,14 +79,20 @@ export function feedSpecs(engine) {
   }
   return feeds;
 }
-async function fetchCatalog(spec) {
+export async function fetchCatalog(spec) {
   const response = await fetch(spec.url, {
     method: "GET",
-    redirect: "error",
+    redirect: "manual",
     headers: {"Accept": "application/json", "User-Agent": "RETALLY-UnifiedResearch/1.1 public catalog metadata only"},
     signal: AbortSignal.timeout(9000),
     cf: {cacheTtl: 0},
   });
+  // Cloudflare's fetch runtime rejects redirect:'error'. Manual mode never
+  // follows the Location header, and every redirect response fails closed.
+  if (response.type === "opaqueredirect" || response.status === 0 ||
+      (response.status >= 300 && response.status < 400)) {
+    throw Error("REDIRECT_BLOCKED");
+  }
   if (!response.ok) throw Error("HTTP_" + response.status);
   const type = (response.headers.get("content-type") || "").split(";")[0].toLowerCase();
   if (type !== "application/json" && type !== "application/vnd.github+json") throw Error("CONTENT_TYPE");
