@@ -50,6 +50,8 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python -m freight.public_freight_corpus
       - name: Assert original source bytes and private customer data not admitted
+        env:
+          PYTHONPATH: '.'
         shell: python
         run: |
           from freight.public_freight_corpus import SOURCES
