@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 from freight.unified_research_lab import (
     ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
+    permitplate_url_in_scope, permitplate_catalog_in_scope,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
     mirror_scout_all, get_json,
 )
@@ -351,6 +352,24 @@ class UnifiedResearchLabTests(unittest.TestCase):
                     get_json(url)
 
 
+
+    def test_canonical_dohmh_restaurant_source_is_not_globally_wrong_topic(self):
+        official = "https://data.cityofnewyork.us/d/43nn-pn8j"
+        canonical = {"id": "43nn-pn8j",
+                     "name": "DOHMH New York City Restaurant Inspection Results"}
+        self.assertTrue(permitplate_url_in_scope(official))
+        self.assertTrue(permitplate_catalog_in_scope(canonical))
+        self.assertFalse(permitplate_url_in_scope("https://github.com/owner/nyc-restaurant-inspections"))
+        self.assertFalse(permitplate_url_in_scope("https://github.com/owner/43nn-pn8j"))
+        self.assertFalse(permitplate_catalog_in_scope({
+            "id": "abcd-1234", "name": canonical["name"]}))
+        self.assertFalse(permitplate_catalog_in_scope({
+            "id": canonical["id"], "name": "DOHMH Restaurant Opening Ground Truth"}))
+        revised, added = merge_sources(ledger_from([]), "permitplate", [official], "2026-10-22")
+        self.assertEqual(added, 1)
+        self.assertEqual(revised["entries"][0]["url"], official)
+        self.assertFalse(revised["entries"][0]["commercial_reuse_authorized"])
+        self.assertFalse(revised["entries"][0]["independent_ground_truth"])
 
 if __name__ == "__main__":
     unittest.main()
