@@ -18,7 +18,10 @@ def evaluate(doc):
         dataset = registry[row['dataset_id']]
         claimed = row['untrusted_claim']
         observation = row['row_fields']
-        if dataset['event_type'] == 'JOB_APPLICATION':
+        if (observation.get('catalog_match') is False
+                and observation.get('work_type') in dataset.get('excluded_work_types', [])):
+            decision = 'UNKNOWN_OUT_OF_SCOPE_NOT_NO_PERMIT'
+        elif dataset['event_type'] == 'JOB_APPLICATION':
             decision = 'UNKNOWN_NO_ISSUANCE_EVIDENCE'
         elif dataset['event_type'] == 'PERMIT_RECORD' and observation.get('work_permit') == 'Permit is not yet issued':
             decision = 'NOT_ISSUED_ACCORDING_TO_SOURCE_FIELD'
@@ -40,13 +43,16 @@ class NYCDOBScopeTest(unittest.TestCase):
         self.assertEqual(d['schema_version'], 1)
         self.assertEqual(len(d['official_sources']), 3)
         self.assertEqual({s['dataset_id'] for s in d['official_sources']}, {'w9ak-ipjd', 'rbx6-tga4', 'ipu4-2q9a'})
-        self.assertEqual(len(d['synthetic_negative_controls']), 3)
+        self.assertEqual(len(d['synthetic_negative_controls']), 4)
+        self.assertEqual(d['acceptance_boundaries']['truth_unknown_count'], 4)
         self.assertEqual(d['manifest_sha256'], canonical_hash({k: v for k, v in d.items() if k != 'manifest_sha256'}))
 
     def test_source_scopes_and_authority_gates(self):
         d = self.doc
         s = {x['dataset_id']: x for x in d['official_sources']}
         self.assertEqual(s['w9ak-ipjd']['event_type'], 'JOB_APPLICATION')
+        self.assertEqual(s['w9ak-ipjd']['excluded_work_types'],
+                         ['ELECTRICAL', 'ELEVATOR', 'LIMITED_ALTERATION_APPLICATION'])
         self.assertEqual(s['rbx6-tga4']['event_type'], 'PERMIT_RECORD')
         self.assertEqual(s['ipu4-2q9a']['coverage'], 'BIS_ONLY_NOT_DOB_NOW')
         self.assertEqual(s['rbx6-tga4']['excluded_work_types'], ['ELECTRICAL', 'ELEVATOR', 'LIMITED_ALTERATION_APPLICATION'])
@@ -60,6 +66,7 @@ class NYCDOBScopeTest(unittest.TestCase):
             'filing_is_not_issuance': 'UNKNOWN_NO_ISSUANCE_EVIDENCE',
             'approved_permits_can_include_pending': 'NOT_ISSUED_ACCORDING_TO_SOURCE_FIELD',
             'bis_coverage_is_not_all_dob': 'INVALID_COVERAGE_CLAIM',
+            'job_applications_electrical_nonmatch_is_unknown': 'UNKNOWN_OUT_OF_SCOPE_NOT_NO_PERMIT',
         }
         self.assertEqual({x['id']: x['decision'] for x in evaluate(self.doc)}, expected)
         self.assertTrue(all(x['independent_truth'] is None for x in evaluate(self.doc)))
