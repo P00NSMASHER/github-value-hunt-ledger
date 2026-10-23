@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""RETALLY one-shot non-mutating Oracle Run Command proof from separate OIDC trust.
+"""RETALLY fixed Oracle Run Command operations from the separate OIDC trust.
 
 This is not a generic shell/deployment interface. The existing metadata-only
 OCI monitor and its OAuth client must never be granted Run Command rights.
@@ -27,6 +27,15 @@ AUDIENCE = auth.AUDIENCE
 REGION = auth.REGION
 VM_SHAPE = auth.SHAPE
 MARKER = "RETALLY_OCI_SYNTHETIC_CANARY_V1_OK"
+PREFLIGHT_MARKER = "RETALLY_OCI_HOST_PREFLIGHT_V1_OK"
+INSTALL_MARKER = "RETALLY_OCI_SYNTHETIC_STAGE_INSTALLED_V1_OK"
+AUTHORIZED_INSTALL_SHA = "bbd0588924662cda44359adcd93cc590b0e7efa4"
+AUTHORIZED_VM_OCID = (
+    "ocid1.instance.oc1.iad.anuwcljtxrbeaqace4i2bpvhoj7sq7slikstmkea5tw3c3vqfjujjg6pduqq"
+)
+AUTHORIZED_COMPARTMENT_OCID = (
+    "ocid1.compartment.oc1..aaaaaaaayttmwe7jtksd5ufgkpakktondl7ydy5rm67hicxbqaxonbjaklxa"
+)
 CANARY = """#!/bin/bash
 set -eu
 # No input, no packages, no credentials, no network calls, no disk writes.
@@ -35,6 +44,66 @@ test -r /proc/uptime
 test -r /proc/meminfo
 printf 'RETALLY_OCI_SYNTHETIC_CANARY_V1_OK\\n'
 """
+HOST_GUARD = f"""set -euo pipefail
+test "$(id -u)" -ne 0
+test "$(uname -m)" = x86_64
+command -v curl >/dev/null
+command -v git >/dev/null
+command -v python3 >/dev/null
+command -v sudo >/dev/null
+sudo -n true
+metadata="$(curl --noproxy '*' --fail --silent --show-error --max-time 3 \\
+  -H 'Authorization: Bearer Oracle' http://169.254.169.254/opc/v2/instance/)"
+printf '%s' "$metadata" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d.get("id") == "{AUTHORIZED_VM_OCID}"; assert d.get("shape") == "{VM_SHAPE}"'
+for path in \\
+  /opt/retally/releases/{AUTHORIZED_INSTALL_SHA} \\
+  /opt/retally/current \\
+  /var/lib/retally/synthetic-preview \\
+  /etc/systemd/system/retally-synthetic.service \\
+  /etc/systemd/system/retally-synthetic.service.d/oci-micro-memory.conf
+do
+  ! sudo -n test -e "$path"
+  ! sudo -n test -L "$path"
+done
+! systemctl is-active --quiet retally-synthetic.service
+! systemctl is-enabled --quiet retally-synthetic.service
+if command -v ss >/dev/null; then
+  ! sudo -n ss -ltnH | awk '{{print $4}}' | grep -Eq '(^|:)18765$'
+fi
+"""
+HOST_PREFLIGHT = "#!/bin/bash\n" + HOST_GUARD + f"""printf '{PREFLIGHT_MARKER}\\n'
+"""
+INSTALL_SYNTHETIC_STAGE = "#!/bin/bash\n" + HOST_GUARD + f"""sha={AUTHORIZED_INSTALL_SHA}
+tmp="$(mktemp -d /tmp/retally-host-install.XXXXXXXX)"
+cleanup() {{
+  case "$tmp" in /tmp/retally-host-install.*) rm -rf -- "$tmp" ;; esac
+}}
+trap cleanup EXIT
+git clone --filter=blob:none --no-checkout \\
+  https://github.com/P00NSMASHER/github-value-hunt-ledger.git "$tmp/repo"
+cd "$tmp/repo"
+git fetch --depth=1 origin "$sha"
+git checkout --detach "$sha"
+test "$(git rev-parse HEAD)" = "$sha"
+test -z "$(git status --porcelain)"
+RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/install-staging.sh "$sha"
+sudo -n test -d "/opt/retally/releases/$sha"
+test "$(readlink -f /opt/retally/current)" = "/opt/retally/releases/$sha"
+sudo -n test -d /var/lib/retally/synthetic-preview
+! systemctl is-active --quiet retally-synthetic.service
+! systemctl is-enabled --quiet retally-synthetic.service
+if command -v ss >/dev/null; then
+  ! sudo -n ss -ltnH | awk '{{print $4}}' | grep -Eq '(^|:)18765$'
+fi
+printf '{INSTALL_MARKER}\\n'
+"""
+OPERATIONS = {
+    "canary": (CANARY, MARKER, "RETALLY synthetic no-write canary", 45),
+    "host_preflight": (HOST_PREFLIGHT, PREFLIGHT_MARKER,
+                       "RETALLY authorized host preflight", 120),
+    "install_synthetic_stage": (INSTALL_SYNTHETIC_STAGE, INSTALL_MARKER,
+                                "RETALLY authorized synthetic staging install", 1200),
+}
 EXPECTED_KEYS = {
     "GITHUB_REPOSITORY": REPOSITORY,
     "GITHUB_REPOSITORY_ID": REPOSITORY_ID,
@@ -50,6 +119,7 @@ REQUIRED = (
     "RETALLY_OCI_VM_OCID", "ACTIONS_ID_TOKEN_REQUEST_URL",
     "ACTIONS_ID_TOKEN_REQUEST_TOKEN", "RETALLY_OCI_RUN_APPROVED_SHA",
     "GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT",
+    "RETALLY_OCI_RUN_OPERATION",
 )
 
 
@@ -88,9 +158,15 @@ def check_context(env: dict[str, str]) -> None:
                  "COMPARTMENT_INVALID")
     auth.require(env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"] ==
                  env["RETALLY_OCI_VM_COMPARTMENT_OCID"], "COMPARTMENT_INVALID")
+    auth.require(env["RETALLY_OCI_VM_COMPARTMENT_OCID"] == AUTHORIZED_COMPARTMENT_OCID,
+                 "COMPARTMENT_INVALID")
     auth.require(re.fullmatch(r"ocid1\.instance\.oc1\.[a-z0-9.-]+",
                                   env["RETALLY_OCI_VM_OCID"]) is not None,
                  "INSTANCE_INVALID")
+    auth.require(env["RETALLY_OCI_VM_OCID"] == AUTHORIZED_VM_OCID,
+                 "INSTANCE_INVALID")
+    auth.require(env["RETALLY_OCI_RUN_OPERATION"] in OPERATIONS,
+                 "OPERATION_NOT_AUTHORIZED")
     existing = env.get("GITHUB_INPUT_EXISTING_COMMAND_ID", "").strip()
     auth.require(not existing or re.fullmatch(
         r"ocid1\.instanceagentcommand\.oc1\.[a-z0-9.-]+", existing) is not None,
@@ -157,19 +233,20 @@ def check_plugin(plugins: list[object]) -> None:
 
 def make_command_details(oci, env: dict[str, str]):
     m = oci.compute_instance_agent.models
+    script, _, display_name, timeout = OPERATIONS[env["RETALLY_OCI_RUN_OPERATION"]]
     return m.CreateInstanceAgentCommandDetails(
         compartment_id=env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
-        execution_time_out_in_seconds=45,
-        display_name="RETALLY synthetic no-write canary",
+        execution_time_out_in_seconds=timeout,
+        display_name=display_name,
         target=m.InstanceAgentCommandTarget(instance_id=env["RETALLY_OCI_VM_OCID"]),
         content=m.InstanceAgentCommandContent(
-            source=m.InstanceAgentCommandSourceViaTextDetails(text=CANARY),
+            source=m.InstanceAgentCommandSourceViaTextDetails(text=script),
             output=m.InstanceAgentCommandOutputViaTextDetails(),
         ),
     )
 
 
-def check_execution(run: object, command_id: str, vm_id: str) -> bool:
+def check_execution(run: object, command_id: str, vm_id: str, marker: str = MARKER) -> bool:
     auth.require(getattr(run, "instance_agent_command_id", None) == command_id and
                  getattr(run, "instance_id", None) == vm_id,
                  "EXECUTION_IDENTITY_MISMATCH")
@@ -181,7 +258,7 @@ def check_execution(run: object, command_id: str, vm_id: str) -> bool:
     output = getattr(run, "content", None)
     auth.require(output is not None and getattr(output, "output_type", None) == "TEXT" and
                  type(getattr(output, "exit_code", None)) is int and
-                 output.exit_code == 0 and getattr(output, "text", None) == MARKER + "\n",
+                 output.exit_code == 0 and getattr(output, "text", None) == marker + "\n",
                  "EXECUTION_OUTPUT_REJECTED")
     return True
 
@@ -202,7 +279,8 @@ def list_exact_execution(command, compartment_id: str, command_id: str,
 
 
 def poll_existing_command(command, compartment_id: str, command_id: str, instance_id: str,
-                          max_attempts: int = 45, delay_seconds: int = 4) -> None:
+                          marker: str = MARKER, max_attempts: int = 45,
+                          delay_seconds: int = 4) -> None:
     """Poll the *same* accepted command. Never resubmit on lookup errors.
 
     OCI can return 404 for the per-command execution endpoint even after the
@@ -232,7 +310,7 @@ def poll_existing_command(command, compartment_id: str, command_id: str, instanc
                     raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
             else:
                 raise auth.Refused("EXECUTION_LOOKUP_UNVERIFIED") from None
-        if check_execution(result, command_id, instance_id):
+        if check_execution(result, command_id, instance_id, marker):
             return
         if attempt + 1 < max_attempts:
             time.sleep(delay_seconds)
@@ -241,17 +319,20 @@ def poll_existing_command(command, compartment_id: str, command_id: str, instanc
 
 def submit_or_reconcile(oci, command, env: dict[str, str]) -> bool:
     """Return True only when this invocation creates a command."""
+    operation = env["RETALLY_OCI_RUN_OPERATION"]
+    marker = OPERATIONS[operation][1]
     existing = env.get("GITHUB_INPUT_EXISTING_COMMAND_ID", "").strip()
     if existing:
         # Read once only. This mode exists to reconcile a known accepted
         # command without any chance of resubmission.
         poll_existing_command(command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
                               existing, env["RETALLY_OCI_VM_OCID"],
-                              max_attempts=1, delay_seconds=0)
+                              marker=marker, max_attempts=1, delay_seconds=0)
         return False
     details = make_command_details(oci, env)
     request_key = hashlib.sha256((
-        "retally-synthetic:" + env["GITHUB_RUN_ID"] + ":" + env["GITHUB_RUN_ATTEMPT"]
+        "retally-synthetic:" + operation + ":" + env["GITHUB_RUN_ID"] + ":" +
+        env["GITHUB_RUN_ATTEMPT"]
     ).encode()).hexdigest()
     try:
         created = command.create_instance_agent_command(
@@ -262,8 +343,10 @@ def submit_or_reconcile(oci, command, env: dict[str, str]) -> bool:
     auth.require(isinstance(command_id, str) and
                  command_id.startswith("ocid1.instanceagentcommand."),
                  "COMMAND_ACKNOWLEDGEMENT_INVALID")
+    print("RETALLY OCI COMMAND ID: " + command_id, flush=True)
     poll_existing_command(command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
-                          command_id, env["RETALLY_OCI_VM_OCID"])
+                          command_id, env["RETALLY_OCI_VM_OCID"], marker=marker,
+                          max_attempts=300 if operation == "install_synthetic_stage" else 45)
     return True
 
 
@@ -314,7 +397,7 @@ PUBLIC_CODES = {
     "INVALID_GITHUB_CONTEXT", "RUN_COMMAND_DISABLED", "MISSING_CONFIGURATION",
     "SOURCE_SHA_INVALID", "SOURCE_SHA_NOT_APPROVED", "UNTRUSTED_IDENTITY_DOMAIN",
     "UNTRUSTED_GITHUB_OIDC_ENDPOINT", "COMPARTMENT_INVALID", "INSTANCE_INVALID",
-    "COMMAND_ID_INVALID",
+    "COMMAND_ID_INVALID", "OPERATION_NOT_AUTHORIZED",
     "SHARED_MONITOR_CREDENTIAL_REFUSED", "OIDC_CLAIMS_REJECTED", "OIDC_TOKEN_EXPIRED",
     "INSTANCE_NOT_APPROVED", "AGENT_CONFIGURATION_UNVERIFIED", "RUN_PLUGIN_NOT_ENABLED",
     "RUN_PLUGIN_NOT_RUNNING", "EXECUTION_IDENTITY_MISMATCH",
@@ -333,8 +416,9 @@ def main() -> int:
             str(exc) if isinstance(exc, auth.Refused) and str(exc) in PUBLIC_CODES
             else "UNCLASSIFIED_FAILURE"))
         return 1
+    operation = os.environ.get("RETALLY_OCI_RUN_OPERATION", "")
     print("RETALLY OCI REMOTE: PASS (" + (
-        "one synthetic, no-write command on verified VM" if created else
+        "one fixed " + operation + " command on verified VM" if created else
         "existing accepted command reconciled; no command created") + ")")
     print("RETALLY CUSTOMER RELEASE: HOLD")
     return 0

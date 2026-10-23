@@ -9,6 +9,15 @@ on:
       - 'deployment/oracle-always-free/OCI_REMOTE_CANARY.md'
   workflow_dispatch:
     inputs:
+      operation:
+        description: 'Fixed authorized operation (no arbitrary command input)'
+        required: true
+        default: canary
+        type: choice
+        options:
+          - canary
+          - host_preflight
+          - install_synthetic_stage
       existing_command_id:
         description: 'Optional accepted command OCID to reconcile without creating a command'
         required: false
@@ -59,7 +68,7 @@ jobs:
       github.ref == 'refs/heads/main' &&
       vars.RETALLY_OCI_RUN_COMMAND_ENABLED == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 30
     permissions:
       contents: read
       id-token: write
@@ -70,6 +79,7 @@ jobs:
       RETALLY_OCI_VM_COMPARTMENT_OCID: ${{ vars.RETALLY_OCI_VM_COMPARTMENT_OCID }}
       RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID: ${{ vars.RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID }}
       RETALLY_OCI_VM_OCID: ${{ vars.RETALLY_OCI_VM_OCID }}
+      RETALLY_OCI_RUN_OPERATION: ${{ inputs.operation }}
       GITHUB_INPUT_EXISTING_COMMAND_ID: ${{ inputs.existing_command_id }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -80,7 +90,7 @@ jobs:
           python-version: '3.11'
       - name: Install pinned official OCI SDK
         run: python -m pip install --disable-pip-version-check 'oci==2.188.0'
-      - name: Execute one fixed no-write canary only on approved OCI Micro VM
+      - name: Execute one fixed authorized operation only on approved OCI Micro VM
         env:
           RETALLY_OCI_RUN_CLIENT_ID: ${{ secrets.RETALLY_OCI_RUN_CLIENT_ID }}
           RETALLY_OCI_RUN_CLIENT_SECRET: ${{ secrets.RETALLY_OCI_RUN_CLIENT_SECRET }}
