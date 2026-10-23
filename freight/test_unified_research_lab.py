@@ -13,6 +13,7 @@ from unittest.mock import patch
 from freight.unified_research_lab import (
     ENGINES, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
+    mirror_scout_all,
 )
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
@@ -228,6 +229,63 @@ class UnifiedResearchLabTests(unittest.TestCase):
             with self.assertRaises(ResearchError):
                 run(engine="capturebrief", live=False, ledger=path, now=NOW)
             self.assertEqual(path.read_bytes(), before)
+
+
+    def test_one_git_run_mirrors_all_four_lanes_and_preserves_scout_first_seen(self):
+        observed = []
+        urls = {
+            "freightrecovery": "https://www.gao.gov/products/b-160344",
+            "permitplate": "https://data.cityofnewyork.us/d/43nn-pn8j",
+            "capturebrief": "https://sam.gov/opportunities",
+            "recoveryos": "https://www.penninecare.nhs.uk/download_file/5855/277",
+        }
+        def fake(url):
+            self.assertTrue(url.startswith("https://retally-unified-research-scout."))
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            observed.append(engine)
+            return {"engine": engine, "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": [{"url": urls[engine], "first_seen": "2026-10-22",
+                                 "extra_personal_note": "never copied"}]}
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "leads.json"
+            now = NOW + timedelta(days=1)
+            out = mirror_scout_all(ledger=path, now=now, fetch=fake)
+            self.assertEqual(observed, list(ENGINES))
+            self.assertEqual(out["new_leads"], 4)
+            self.assertEqual(out["feed_errors"], [])
+            before = path.read_bytes()
+            again = mirror_scout_all(ledger=path, now=now, fetch=fake)
+            self.assertEqual(again["new_leads"], 0)
+            self.assertEqual(before, path.read_bytes())
+            records = read_ledger(path)["entries"]
+            self.assertEqual(len(records), 4)
+            self.assertTrue(all(row["first_seen"] == "2026-10-22" for row in records))
+            self.assertTrue(all(row["commercial_reuse_authorized"] is False for row in records))
+            self.assertTrue(all(row["independent_ground_truth"] is False for row in records))
+            self.assertNotIn("extra_personal_note", path.read_text())
+
+    def test_mirror_quarantines_failed_or_future_dated_lane_without_overwriting_ledger(self):
+        def fake(url):
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            if engine == "permitplate":
+                return {"engine": "recoveryos", "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
+            if engine == "capturebrief":
+                return {"engine": engine, "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": [{"url": "https://sam.gov/opportunities",
+                                     "first_seen": "2099-12-01"}]}
+            return {"engine": engine, "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "leads.json"
+            run(engine="freightrecovery", live=False, ledger=path, now=NOW)
+            before = path.read_bytes()
+            report = mirror_scout_all(ledger=path, now=NOW, fetch=fake)
+            self.assertEqual(report["new_leads"], 0)
+            self.assertEqual(len(report["feed_errors"]), 2)
+            self.assertTrue(any("UNTRUSTED_SCOUT_FEED" in e for e in report["feed_errors"]))
+            self.assertTrue(any("SCOUT_OBSERVATION_DATE_INVALID" in e for e in report["feed_errors"]))
+            self.assertEqual(before, path.read_bytes())
 
 
 if __name__ == "__main__":
