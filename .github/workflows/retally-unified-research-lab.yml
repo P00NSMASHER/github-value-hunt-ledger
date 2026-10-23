@@ -23,6 +23,7 @@ on:
     paths:
       - "freight/unified_research_lab.py"
       - "freight/test_unified_research_lab.py"
+      - "freight/research_lab_worker*"
       - "freight/research_lab_health.py"
       - "freight/test_research_lab_health.py"
       - "freight/test_unified_research_ci_contract.py"
