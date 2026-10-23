@@ -18,7 +18,7 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         self.assertEqual(m["pinned_input"]["entry_count"], 252)
         self.assertEqual(m["pinned_input"]["permitplate_assigned_pointers"], 42)
         self.assertEqual(m["partition"]["observed_wrong_topic_excluded"], 18)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 21)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 20)
         self.assertEqual(len(m["cases"]), 18)
         self.assertIn("UNVERIFIED", m["partition"]["remaining_status"])
 
@@ -60,8 +60,8 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         rows = m["context_only_candidates"]
         self.assertEqual(len(rows), 2)
         self.assertEqual(m["partition"]["context_only_unadjudicated"], 2)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 21)
-        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + len(rows) + m["partition"]["application_only_unadjudicated"] + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 20)
+        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + len(rows) + m["partition"]["application_only_unadjudicated"] + m["partition"]["restricted_context_rights_hold"] + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
         self.assertEqual({r["url"].split("/")[-1] for r in rows}, {"64uk-42ks", "5zyy-y8am"})
         self.assertTrue(set(r["id"] for r in rows).isdisjoint(r["id"] for r in m["cases"]))
         for r in rows:
@@ -85,8 +85,8 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         rows = m["application_only_candidates"]
         self.assertEqual(len(rows), 1)
         self.assertEqual(m["partition"]["application_only_unadjudicated"], 1)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 21)
-        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + m["partition"]["context_only_unadjudicated"] + m["partition"]["application_only_unadjudicated"] + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 20)
+        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + m["partition"]["context_only_unadjudicated"] + m["partition"]["application_only_unadjudicated"] + m["partition"]["restricted_context_rights_hold"] + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
         row = rows[0]
         self.assertEqual(row["id"], digest(row["url"]))
         self.assertEqual(row["first_seen"], "2026-10-22")
@@ -118,6 +118,41 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         for field in ("original_freight_invoice_extraction", "general_accounting_reconciliation",
                       "freight_error_detection", "recovery_outcomes"):
             self.assertEqual(m["accuracy_reporting"][field], "NOT_EVALUATED")
+
+    def test_zenodo_green_roof_rights_and_permit_truth_negative_control(self):
+        m = self.pack
+        self.assertEqual(m["partition"]["restricted_context_rights_hold"], 1)
+        self.assertEqual(len(m["restricted_context_candidates"]), 1)
+        r = m["restricted_context_candidates"][0]
+        self.assertEqual(r["id"], digest(r["url"]))
+        self.assertEqual(r["id"], "ac04744b499a25c9eb93d49cf432e5b7ba72e87b52f6028043aaefb04401d5c2")
+        self.assertEqual(r["url"], "https://zenodo.org/records/1469674")
+        self.assertEqual(r["first_seen"], "2026-10-23")
+        self.assertEqual(r["doi"], "10.5281/zenodo.1469674")
+        self.assertEqual(r["source_publication_date"], "2018-10-23")
+        self.assertIn("2016", r["source_observation_cohort"])
+        self.assertEqual(r["publisher_metadata_reference"], r["url"])
+        self.assertIn("written consent", r["rights_basis"])
+        self.assertEqual(r["source_rights_state"], "RIGHTS_RESTRICTED_WRITTEN_CONSENT_REQUIRED")
+        self.assertFalse(r["commercial_reuse_authorized"])
+        self.assertFalse(r["permit_issuance_ground_truth"])
+        self.assertFalse(r["independently_adjudicated"])
+        self.assertIsNone(r["original_source_bytes_sha256"])
+        self.assertIsNone(r["independent_permit_outcome_label"])
+        self.assertEqual(r["expected_evaluation"], "EXCLUDE_FROM_COMMERCIAL_PERMIT_SCORING_AND_ISSUANCE_GROUND_TRUTH")
+        neg = m["synthetic_restricted_context_negative_control"]
+        self.assertEqual(neg["kind"], "SYNTHETIC")
+        self.assertEqual(neg["dataset_url"], r["url"])
+        self.assertEqual(neg["expected_permit_issuance"], "UNKNOWN_NO_OFFICIAL_PERMIT_OR_INDEPENDENT_ISSUANCE_LABEL")
+        self.assertEqual(neg["expected_commercial_reuse"], "HOLD_WRITTEN_CONSENT_NOT_OBTAINED")
+        self.assertEqual(m["accuracy_reporting"]["permit_opportunity_scoring"], "UNKNOWN_NO_INDEPENDENT_HELD_OUT_OUTCOMES")
+        self.assertEqual(m["actual_document_or_permit_rows_ingested"], 0)
+        self.assertEqual(m["independent_issuance_labels"], 0)
+        self.assertEqual(18 + 2 + 1 + 1 + 20, m["pinned_input"]["permitplate_assigned_pointers"])
+        self.assertTrue(set(x["id"] for x in m["restricted_context_candidates"]).isdisjoint(x["id"] for x in m["cases"]))
+        self.assertTrue(set(x["id"] for x in m["restricted_context_candidates"]).isdisjoint(x["id"] for x in m["context_only_candidates"]))
+        self.assertTrue(set(x["id"] for x in m["restricted_context_candidates"]).isdisjoint(x["id"] for x in m["application_only_candidates"]))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,12 +14,14 @@
   },
   "partition": {
     "observed_wrong_topic_excluded": 18,
-    "remaining_unreviewed_permitplate_pointers": 21,
+    "remaining_unreviewed_permitplate_pointers": 20,
     "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW",
     "context_only_unadjudicated": 2,
     "context_only_status": "CANDIDATE_FOR_BUILDING_CONTEXT_ONLY_NOT_ISSUANCE_GROUND_TRUTH_RIGHTS_UNVERIFIED",
     "application_only_unadjudicated": 1,
-    "application_only_status": "DOB_NOW_JOB_APPLICATION_SCOPE_VERIFIED_ISSUANCE_AND_COMMERCIAL_RIGHTS_UNKNOWN"
+    "application_only_status": "DOB_NOW_JOB_APPLICATION_SCOPE_VERIFIED_ISSUANCE_AND_COMMERCIAL_RIGHTS_UNKNOWN",
+    "restricted_context_rights_hold": 1,
+    "restricted_context_status": "PUBLIC_METADATA_VERIFIED_COMMERCIAL_REUSE_RESTRICTED_WRITTEN_CONSENT_REQUIRED_NOT_ISSUED_PERMIT_TRUTH"
   },
   "cases": [
     {
@@ -237,7 +239,7 @@
   "publisher_reference": "https://data.cityofnewyork.us/d/rbx6-tga4",
   "publisher_rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
   "observed_at": "2026-10-23",
-  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified. Two existing official NYC pointers were separately source-scoped: PLUTO tax-lot land-use and LL84 building energy/water are candidate contextual fields, NOT DOB permit issuance/approved-permit truth. Rights and independently held-out outcomes remain unverified; no raw rows copied. One pre-existing DOB NOW w9ak-ipjd pointer is now publisher-metadata-verified as application filings only; issuance stays UNKNOWN. Synthetic filing state is explicitly not original data.",
+  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified. Two existing official NYC pointers were separately source-scoped: PLUTO tax-lot land-use and LL84 building energy/water are candidate contextual fields, NOT DOB permit issuance/approved-permit truth. Rights and independently held-out outcomes remain unverified; no raw rows copied. One pre-existing DOB NOW w9ak-ipjd pointer is now publisher-metadata-verified as application filings only; issuance stays UNKNOWN. Synthetic filing state is explicitly not original data. A historical green-roof footprint dataset (Zenodo 1469674) is separately held as context-only, not issuance, because its publisher record explicitly requires prior written consent for sale/distribution and for-profit GIS products/services. Original source files were not downloaded.",
   "context_only_candidates": [
     {
       "id": "0a560f06b0ac7d352d7247ff0a1015f3534c0b8c6351b2552da028b20be0ba90",
@@ -309,5 +311,41 @@
     "invented_filing_state": "FILED",
     "expected_issuance": "UNKNOWN_NO_INDEPENDENT_ISSUANCE_PROOF",
     "note": "Hypothetical filing state only; not a copied source row or real permit label"
+  },
+  "restricted_context_candidates": [
+    {
+      "id": "ac04744b499a25c9eb93d49cf432e5b7ba72e87b52f6028043aaefb04401d5c2",
+      "url": "https://zenodo.org/records/1469674",
+      "first_seen": "2026-10-23",
+      "publisher": "The Nature Conservancy and co-authors (record hosted by Zenodo)",
+      "publisher_metadata_title": "Green Roofs Footprints for New York City, Assembled from Available Data and Remote Sensing",
+      "publisher_metadata_reference": "https://zenodo.org/records/1469674",
+      "doi": "10.5281/zenodo.1469674",
+      "source_publication_date": "2018-10-23",
+      "source_observation_cohort": "2016 NYC aerial imagery / green-roof footprint estimates",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "HISTORICAL_GREEN_ROOF_BUILDING_CONTEXT_ONLY_RIGHTS_RESTRICTED",
+      "rights_basis": "Publisher record prohibits sale/distribution and for-profit GIS product or service reuse without prior written consent from The Nature Conservancy and co-authors.",
+      "source_rights_state": "RIGHTS_RESTRICTED_WRITTEN_CONSENT_REQUIRED",
+      "commercial_reuse_authorized": false,
+      "ground_truth_limitations": [
+        "Digitized and manually corrected 2016 green-roof imagery is not a DOB approved or issued permit record",
+        "Historical BIN/BBL links use 2017 building footprints and MapPLUTO 18v1; no current permit join proved"
+      ],
+      "permit_issuance_ground_truth": false,
+      "independently_adjudicated": false,
+      "original_source_bytes_sha256": null,
+      "independent_permit_outcome_label": null,
+      "expected_evaluation": "EXCLUDE_FROM_COMMERCIAL_PERMIT_SCORING_AND_ISSUANCE_GROUND_TRUTH"
+    }
+  ],
+  "synthetic_restricted_context_negative_control": {
+    "kind": "SYNTHETIC",
+    "dataset_url": "https://zenodo.org/records/1469674",
+    "hypothetical_observation": "2016 imagery indicates a green roof at a fictional NYC building",
+    "expected_permit_issuance": "UNKNOWN_NO_OFFICIAL_PERMIT_OR_INDEPENDENT_ISSUANCE_LABEL",
+    "expected_commercial_reuse": "HOLD_WRITTEN_CONSENT_NOT_OBTAINED",
+    "note": "No original green-roof rows, roof coordinates, permit identities or private records copied."
   }
 }
