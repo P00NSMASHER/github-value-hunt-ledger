@@ -62,3 +62,151 @@
 .approved-brand-software img.native-software-emblem{width:min(100%,270px);max-width:270px;height:auto;margin:auto;object-fit:contain;object-position:center;background:transparent;filter:drop-shadow(0 9px 16px rgba(0,95,67,.13))}
 @media(max-width:800px){.company-card>img.native-company-emblem,.company-card.recoveryworks>img{height:190px}.company-card>img.native-company-emblem{padding:20px 39px}}
 @media(max-width:580px){.company-card>img.native-company-emblem,.company-card.recoveryworks>img{height:190px}.approved-brand-software img.native-software-emblem{width:min(88%,260px)}}
+
+/* RETALLY Group — premium emerald/chrome visual system; no changes to form behavior. */
+:root{--pine:#07563f;--deep:#042e28;--paper:#edf5ed;--ink:#17342e;--muted:#47665a;--line:#ceded2;--gold:#ddf5e9}
+body.group-site{background:radial-gradient(ellipse at 50% 28%,#d9eadd 0%,transparent 48%),linear-gradient(180deg,#eff6ee 0%,#f7fbf6 48%,#e8f1e9 100%);color:var(--ink);font-family:Hanken,system-ui,-apple-system,sans-serif}
+.group-site h1,.group-site h2,.group-site h3{font-family:Hanken,system-ui,sans-serif;font-weight:790;line-height:1.08;letter-spacing:-.048em;text-wrap:balance}
+.group-site h1 em,.group-site h2 em{font:inherit;font-style:normal;color:#bff3db;background:linear-gradient(125deg,#fff 4%,#eafbf4 35%,#a3f0c7 83%,#fff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.group-site .section-heading h2 em,.group-site .contact-section h2 em,.group-site .document h1 em{color:#087b54;background:linear-gradient(110deg,#0b563c,#0db279 65%,#317f60);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.group-site .eyebrow{font-size:12px;font-weight:850;letter-spacing:.19em;line-height:1.5}
+.group-site .site-header{position:relative;z-index:6;background:linear-gradient(110deg,#021e1d 0%,#074a38 48%,#042b26 100%);border-bottom:1px solid #c5e7d231;box-shadow:0 10px 24px #001c1930}
+.group-site .header-inner{min-height:92px}
+.group-site .brand{font-size:25px;font-weight:900;letter-spacing:.06em;gap:10px;text-shadow:0 1px 12px #65f6ae26;white-space:nowrap}
+.group-site .brand>img{width:44px;height:44px;object-fit:contain;border-radius:12px;filter:drop-shadow(0 2px 8px #70ebba49)}
+.group-site .brand span{color:#b4f3d3;border-left:1px solid #b9dfcf6e;font-size:11px;letter-spacing:.2em}
+.group-site nav a{position:relative;color:#e6f8ee;font-weight:750;transition:color .2s}
+.group-site nav a:hover{color:#9cffc7;text-decoration:none}
+.group-site nav a:after{content:"";height:2px;position:absolute;left:0;right:100%;bottom:5px;background:#78e5ae;transition:right .2s}
+.group-site nav a:hover:after{right:0}
+.group-site .hero{min-height:540px;background:#052e29;border-bottom:1px solid #84eab269}
+.group-site .hero-photo{filter:saturate(1.2) contrast(1.07)}
+.group-site .hero:after{background:radial-gradient(ellipse at 75% 2%,#29ac7d35 0%,transparent 45%),linear-gradient(95deg,#031f1ff7 0%,#063e34ed 46%,#06352f9a 80%,#06352e78 100%)}
+.group-site .hero:before{content:"";position:absolute;z-index:1;left:0;bottom:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,#91f9c6,transparent);box-shadow:0 0 25px #4ddaa66b;pointer-events:none}
+.group-site .hero-content{padding-top:103px;padding-bottom:107px}
+.group-site .hero h1{font-size:clamp(48px,6.1vw,84px);font-weight:870;line-height:1.045;max-width:17ch;margin-bottom:28px;text-shadow:0 12px 28px #001b1873}
+.group-site .hero .eyebrow{color:#b2eecf}
+.group-site .lead{color:#e1f5e9;font-size:clamp(18px,1.7vw,21px);line-height:1.62;max-width:620px}
+.group-site .actions{gap:20px}
+.group-site .button,.group-site .card-end a{position:relative;isolation:isolate;overflow:hidden;border-radius:13px;font-family:Hanken,system-ui,sans-serif;font-weight:820;text-decoration:none;letter-spacing:-.005em;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.group-site .button{border:1px solid #e9fff784;min-height:54px;padding:12px 24px;box-shadow:inset 0 2px 1px #ffffff9c,inset 0 -2px 4px #153f3328,0 5px 0 #051c1b65,0 13px 26px #001f1e4d}
+.group-site .button:before,.group-site .card-end a:before{content:"";position:absolute;z-index:-1;inset:0 0 51%;background:linear-gradient(180deg,#ffffff61,#ffffff00);pointer-events:none}
+.group-site .button:hover,.group-site .card-end a:hover{transform:translateY(-3px);filter:saturate(1.08) brightness(1.025);box-shadow:inset 0 2px 1px #ffffffbd,0 7px 0 #06251b55,0 17px 28px #0238294d}
+.group-site .button:active,.group-site .card-end a:active{transform:translateY(2px);box-shadow:inset 0 1px 3px #103e3236,0 2px 0 #06251b57,0 6px 12px #0a31252c}
+.group-site .button-light{background:linear-gradient(130deg,#fff,#f1fff7 42%,#d9e9df 100%);color:#063d32}
+.group-site .button-green{background:linear-gradient(140deg,#198968 0%,#0c644b 48%,#063e32 100%);color:white}
+.group-site .text-link{color:#e0f9eb;font-weight:750}
+.group-site .text-link:hover{color:white}
+.group-site .section{padding-top:88px;padding-bottom:88px}
+.group-site .section-heading{margin-bottom:42px}
+.group-site .section-heading h2{font-size:clamp(39px,4.5vw,63px);margin-bottom:17px}
+.group-site .section-heading>.eyebrow{color:#117954}
+.group-site .section-heading>p:last-child{font-size:18px;max-width:650px}
+.group-site .company-grid{gap:28px;align-items:stretch}
+.group-site .company-card{position:relative;isolation:isolate;background:linear-gradient(150deg,#ffffff 0%,#fbfefb 46%,#f0f8f0 100%);border:1px solid #e5f3e6;border-radius:24px;box-shadow:0 4px 0 #a6c8b575,0 18px 38px #0b40321b,0 35px 65px #0d4a2b0d;transition:transform .25s ease,box-shadow .25s ease}
+.group-site .company-card:hover{transform:translateY(-6px);box-shadow:0 5px 0 #acd0b978,0 26px 54px #0b46322b,0 45px 74px #0d4a2b19}
+.group-site .company-card>.card-visual{height:245px;position:relative;isolation:isolate;overflow:hidden;border-bottom:1px solid #cde7d84f;background:radial-gradient(ellipse at 52% 32%,#fbfffd 1%,#ebf8f0 45%,#daeae0 100%)}
+.group-site .card-visual:before{content:"";position:absolute;inset:-120px 14% auto;height:230px;border-radius:50%;border:1px solid #ffffffdb;background:radial-gradient(ellipse,#ffffffa5,transparent 68%);box-shadow:0 3px 24px #ffffffbd;pointer-events:none}
+.group-site .card-visual:after{content:"";position:absolute;left:-35%;right:-35%;top:-92px;height:140px;transform:rotate(-10deg);background:linear-gradient(180deg,#ffffffa1,transparent);pointer-events:none}
+.group-site .card-visual>img.native-company-emblem{position:relative;z-index:1;display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center;padding:23px 52px 36px;background:transparent;border:0;mix-blend-mode:multiply;filter:contrast(1.03) saturate(1.13)}
+.group-site .card-visual .visual-caption{position:absolute;z-index:2;left:50%;bottom:13px;transform:translateX(-50%);border:1px solid #b5ddc6;padding:4px 11px;border-radius:99px;background:#f7fff8d9;color:#235a42;font-size:9px;line-height:1.4;font-weight:850;letter-spacing:.12em;white-space:nowrap}
+.group-site .company-content{padding:31px 32px 30px}
+.group-site .company-content .eyebrow{margin-bottom:12px;color:#347357}
+.group-site .company-content h3{font-size:clamp(25px,2.45vw,32px);font-weight:830;line-height:1.13;margin-bottom:15px;color:#123a31;overflow-wrap:anywhere}
+.group-site .company-card.recoveryworks h3{color:#23365b}
+.group-site .company-card.permitplate h3{color:#164d77}
+.group-site .company-card.capturebrief h3{color:#0b5962}
+.group-site .company-content>p:not(.eyebrow){font-size:17px;line-height:1.63;color:#476459;margin-bottom:27px}
+.group-site .card-end{border-top:1px solid #c8ddd0;padding-top:21px;gap:12px}
+.group-site .stage{color:#21513f;background:#e6f6e9;border:1px solid #d1e6d7;border-radius:100px;padding:8px 12px;font-size:12px;line-height:1.35;white-space:nowrap}
+.group-site .card-end a{display:inline-flex;justify-content:center;border:1px solid #27765b;padding:10px 14px;min-height:48px;background:linear-gradient(145deg,#14795d,#074a39);color:white;font-size:13px;box-shadow:inset 0 2px 1px #ffffff5c,0 4px 0 #034131aa,0 9px 17px #184e3c27}
+.group-site .card-end a span{font-size:18px;line-height:1}
+.group-site .approved-brand-software{position:relative;isolation:isolate;overflow:hidden;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:50px;margin-top:42px;margin-bottom:86px;padding:41px 50px;border:1px solid #b0e4c18e;border-radius:26px;background:radial-gradient(ellipse at 14% -15%,#1aa77960,transparent 50%),linear-gradient(125deg,#06342e,#075c43 65%,#033629);box-shadow:inset 0 2px 0 #b7ffcf58,0 5px 0 #103e3360,0 23px 50px #062f2640}
+.group-site .approved-brand-software:before{content:"";position:absolute;top:-40%;left:4%;width:95%;height:70%;border-radius:50%;background:radial-gradient(ellipse,#ffffff16,transparent 65%);pointer-events:none}
+.group-site .approved-brand-software img.native-software-emblem{display:block;position:relative;z-index:1;width:min(100%,330px);max-width:330px;height:auto;padding:16px;border:1px solid #b8e7c6b8;border-radius:22px;object-fit:contain;background:linear-gradient(145deg,#ffffff,#e2f1e9);filter:drop-shadow(0 8px 16px #041e1845);box-shadow:inset 0 2px 3px #ffffff,0 14px 27px #00241b3d}
+.group-site .approved-brand-software h2{font:800 clamp(27px,3vw,39px)/1.13 Hanken,system-ui,sans-serif;letter-spacing:-.045em;color:white;margin-bottom:18px}
+.group-site .approved-brand-software p{color:#d9f0e5;font-size:17px}
+.group-site .approved-brand-software .eyebrow{color:#a6f4d0;margin-bottom:15px;font-size:11px}
+.group-site .about-section{position:relative;background:radial-gradient(ellipse at 10% 20%,#1a956d70,transparent 48%),linear-gradient(115deg,#032823,#076246 60%,#043a30);border-top:1px solid #6ce6aa4b;border-bottom:1px solid #b5ffda32;box-shadow:inset 0 14px 26px #001a1829}
+.group-site .about-grid h2{font-size:clamp(37px,4.2vw,58px)}
+.group-site .about-grid h2 em{color:#aff2d3}
+.group-site .about-grid p{color:#dbf2e5}
+.group-site .about-grid .large-copy{color:#fff;font-weight:720;letter-spacing:-.02em}
+.group-site .about-grid .small{color:#c2e2d0}
+.group-site .contact-section{padding-top:96px;padding-bottom:100px}
+.group-site .contact-section h2{font-size:clamp(38px,4.4vw,61px)}
+.group-site .contact-intro>.eyebrow{color:#167451}
+.group-site .contact-section .contact-direct{border-top:1px solid #b8d5c4}
+.group-site .contact-direct .button{margin-top:5px}
+.group-site .contact-panel.enquiry-card{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#ffffff,#f6fcf7);border:1px solid #d8ebdd;border-radius:24px;box-shadow:inset 0 2px 0 #fff,0 5px 0 #c8e1ce,0 22px 42px #133e2927;padding:36px}
+.group-site .enquiry-card h3{font-size:clamp(27px,2.6vw,34px);font-weight:840;letter-spacing:-.04em;color:#183c30}
+.group-site .enquiry-card input:not([type="checkbox"]),.group-site .enquiry-card select,.group-site .enquiry-card textarea{border-radius:12px;border:1px solid #a0bca9;background:#fff;box-shadow:inset 0 3px 9px #245a3810,0 1px 0 #fff}
+.group-site .enquiry-card input:focus,.group-site .enquiry-card select:focus,.group-site .enquiry-card textarea:focus{border-color:#0d865b}
+.group-site .enquiry-alternatives .text-link{color:#075b44}
+.group-site .site-footer{background:linear-gradient(120deg,#021f1d,#064434 65%,#032924);border-top:1px solid #9feac947}
+.group-site .site-footer .footer-note{color:#bde4d0}
+@media(max-width:900px){
+ .group-site .section{padding-block:67px}
+ .group-site .hero-content{padding-top:79px;padding-bottom:82px}
+ .group-site .company-grid{gap:21px}
+ .group-site .company-content{padding:26px}
+ .group-site .company-content h3{font-size:25px}
+ .group-site .company-card>.card-visual{height:208px}
+ .group-site .card-visual>img.native-company-emblem{padding:19px 30px 34px}
+ .group-site .card-end{align-items:flex-start;flex-direction:column;gap:12px}
+ .group-site .approved-brand-software{gap:25px;padding:30px}
+ .group-site .contact-section{padding-block:70px}
+}
+@media(max-width:580px){
+ .group-site .header-inner{min-height:0;padding:15px 0 10px;gap:7px}
+ .group-site .brand{font-size:20px;gap:8px}
+ .group-site .brand>img{width:35px;height:35px}
+ .group-site .brand span{font-size:10px;padding-left:8px}
+ .group-site nav{gap:9px}
+ .group-site nav a{font-size:14px}
+ .group-site .hero{min-height:0}
+ .group-site .hero:after{background:linear-gradient(90deg,#042824ef,#064c3be3)}
+ .group-site .hero-content{padding-block:56px 62px}
+ .group-site .hero h1{font-size:clamp(42px,11vw,59px);max-width:13ch;line-height:1.07}
+ .group-site .lead{font-size:17px;line-height:1.56}
+ .group-site .actions{align-items:stretch;gap:10px}
+ .group-site .actions .button{min-height:52px}
+ .group-site .section{padding-block:55px}
+ .group-site .section-heading h2{font-size:clamp(36px,9.5vw,46px)}
+ .group-site .section-heading>p:last-child{font-size:16px}
+ .group-site .company-grid{gap:25px}
+ .group-site .company-card{border-radius:21px}
+ .group-site .company-card>.card-visual{height:212px}
+ .group-site .card-visual>img.native-company-emblem{padding:17px 28px 36px}
+ .group-site .company-content{padding:25px 24px 27px}
+ .group-site .company-content h3{font-size:26px}
+ .group-site .company-content>p:not(.eyebrow){font-size:16px}
+ .group-site .card-end a{font-size:14px}
+ .group-site .approved-brand-software{grid-template-columns:1fr;margin-top:34px;margin-bottom:56px;padding:27px 23px;gap:24px;border-radius:24px}
+ .group-site .approved-brand-software img.native-software-emblem{width:min(100%,300px);margin:auto}
+ .group-site .approved-brand-software h2{font-size:31px}
+ .group-site .about-section{padding-block:60px}
+ .group-site .contact-section{padding-block:64px}
+ .group-site .contact-panel.enquiry-card{padding:26px 22px}
+ .group-site .footer-inner{gap:18px}
+}
+@media(max-width:360px){
+ .group-site .brand{font-size:18px}
+ .group-site .brand>img{width:30px;height:30px}
+ .group-site .brand span{font-size:9px}
+ .group-site .card-visual>img.native-company-emblem{padding-left:20px;padding-right:20px}
+ .group-site .contact-panel.enquiry-card{padding:23px 19px}
+}
+@media(prefers-reduced-motion:reduce){
+ .group-site .button,.group-site .card-end a,.group-site .company-card,.group-site nav a,.group-site nav a:after{transition:none}
+ .group-site .button:hover,.group-site .card-end a:hover,.group-site .button:active,.group-site .card-end a:active,.group-site .company-card:hover{transform:none}
+}
+
+/* Opaque canvas fallback colors complement the gradients and enable stable
+   automated verification of section boundaries and header scroll behavior. */
+body.group-site{background-color:#edf5ed}
+.group-site .site-header{position:static;background-color:#042e28}
+.group-site .site-footer{background-color:#042e28}
+.group-site #businesses,.group-site #contact{background-color:#edf5ed;background-image:linear-gradient(180deg,#eff7ef,#f6fbf5 65%,#eaf5eb)}
+.group-site #about{background-color:#043a30}
+.group-site .company-card{background-color:#ffffff}
