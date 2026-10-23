@@ -108,11 +108,19 @@ jobs:
           for engine in freightrecovery permitplate capturebrief recoveryos; do
             python -m freight.unified_research_lab --engine "$engine" > /tmp/retally-seed-"$engine".json
           done
+          # Each infrequent GitHub run mirrors all four independent Cloudflare
+          # lanes before rotating its own live external search. This prevents
+          # GitHub cron gaps from starving any one engine's branch publication.
+          python -m freight.unified_research_lab --mirror-scout-all | tee /tmp/retally-scout-mirror.json
           python -m freight.unified_research_lab --live | tee /tmp/retally-research-run.json
           python - <<'PY'
           import json
           from freight.unified_research_lab import read_ledger
           summary = json.load(open('/tmp/retally-research-run.json', encoding='utf-8'))
+          mirror = json.load(open('/tmp/retally-scout-mirror.json', encoding='utf-8'))
+          assert mirror['third_party_documents_saved'] == 0
+          assert mirror['customer_contact_actions'] == 0
+          assert mirror['production_changes'] == 0
           ledger = read_ledger()
           assert summary['customer_contact_actions'] == 0
           assert summary['third_party_documents_saved'] == 0
@@ -126,15 +134,17 @@ jobs:
           summary_lines = [
               '## RETALLY Unified Research Lab — live discovery',
               f"- Engine scanned: {summary['engine']}",
-              f"- New real-world source references: {summary['new_leads']}",
+              f"- New real-world source references (rotated live lane): {summary['new_leads']}",
+              f"- New source references mirrored across four Cloudflare lanes: {mirror['new_leads']}",
               f"- Indexed source references: {summary['total_leads']}",
               f"- Public metadata provider errors: {len(summary['feed_errors'])}",
               '- External documents saved: 0',
               '- Financial truth or customer releases claimed: 0',
           ]
           summary_lines += [f"- {name}: {counts[name]} source references" for name in sorted(counts)]
-          if summary['feed_errors']:
-              summary_lines += ['### Provider warnings'] + ['- '+x for x in summary['feed_errors']]
+          if summary['feed_errors'] or mirror['feed_errors']:
+              summary_lines += ['### Provider warnings'] + [
+                  '- '+x for x in summary['feed_errors'] + mirror['feed_errors']]
           Path(__import__('os').environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(summary_lines) + '\n')
           print('Four-engine metadata-only ledger validated; source counts:', dict(counts))
           PY
