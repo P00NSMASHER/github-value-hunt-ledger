@@ -34,6 +34,10 @@ SOURCE_HOSTS = frozenset({
     "catalog.data.gov", "github.com", "zenodo.org", "www.gao.gov",
     "data.cityofnewyork.us", "sam.gov", "api.usaspending.gov",
     "www.penninecare.nhs.uk",
+    # Official public rate exhibits, maritime decisions, and federal data
+    # pages from the immutable FreightRecovery v1 evaluation manifest.
+    "www.sec.gov", "www.stb.gov", "www.eia.gov",
+    "www.fmc.gov", "www2.fmc.gov", "media.cadc.uscourts.gov",
 })
 API_HOSTS = frozenset({"catalog.data.gov", "api.github.com", "zenodo.org"})
 SEEDS = {
@@ -279,6 +283,14 @@ def run(*, engine: str, live: bool, ledger: Path, now: datetime,
         fetch=get_json) -> dict:
     original = read_ledger(ledger)
     urls = list(SEEDS[engine])
+    if engine == "freightrecovery":
+        # Register real official source anchors from the *fixed* evaluation
+        # corpus, not original customer invoices or evidence. They still
+        # enter only as unverified, metadata-only research leads.
+        from freight.real_world_eval_v1 import load_manifest, validate_manifest
+        cases = validate_manifest(load_manifest())
+        urls.extend(row["source_url"] for row in cases.values()
+                    if row["category"] != "PUBLIC_INVOICE_FACE")
     errors = []
     if live:
         candidates, errors = scan(engine, fetch=fetch)
