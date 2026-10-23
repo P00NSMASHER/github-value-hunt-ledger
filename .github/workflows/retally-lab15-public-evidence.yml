@@ -9,8 +9,6 @@ on:
       - 'freight/research/lab15_candidate_ledger.json'
       - 'freight/LAB15_EVIDENCE_ACQUISITION.md'
       - '.github/workflows/retally-lab15-public-evidence.yml'
-  schedule:
-    - cron: '17 9,21 * * *'
   workflow_dispatch:
 
 permissions:
