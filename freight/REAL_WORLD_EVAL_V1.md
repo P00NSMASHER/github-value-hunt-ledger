@@ -34,6 +34,23 @@ The suite has no external network or credentials. It validates the rights/payloa
 
 The replay is added to the pre-existing read-only public-freight GitHub Actions workflow (Ubuntu + Windows), without changing production, branch protection, contact preferences, settlements or customer-data processing.
 
+## Automatic unified research source feed
+
+The unified four-engine RETALLY research controller now derives a separate versioned
+**metadata-only candidate queue** from the canonical public source catalog and both
+existing legacy Lab 15 source ledgers. The research-only branch writes
+`freight/research_lab/evaluation_candidates.json`; the nightly evaluation
+replays this nine-case fixture unchanged, together with the original five
+public-source numerical studies, and reports how many newly discovered links
+remain without independently adjudicated invoice evidence.
+
+A source match to one of these nine references is *only a citation link*. The
+candidate feed cannot alter published fixture amounts, invoice truth states,
+external claims or verified recovery. Accessing research candidate metadata
+does not authorize downloading, retaining or distributing original private
+invoices. See `freight/UNIFIED_RESEARCH_LAB.md` and
+`freight/research_eval_bridge.py`.
+
 ## Acceptance tiers / interpretation
 
 1. **Tier 0 — public arithmetic, dates and legal-history facts:** validated here; never score as real invoice recovery precision.
