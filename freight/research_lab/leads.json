@@ -151,6 +151,22 @@
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
+      "id": "0caf1f167546ea44ff27d1742e0c4b7ad2f9e5fb8f4c1531391093f3d62a15ff",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/7895980"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
       "id": "0fdc9616b2cf40efe53838d8d9b7ad8ab64618c27d71ad07505e61793d248a8e",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -175,6 +191,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/fedmineusa/Federal-Government-Agency"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "12bd4935727dbbfc21f81033423f9b4b0247319c2ca8aa51e0407890deeeb5f2",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/7493690"
     },
     {
       "commercial_reuse_authorized": false,
@@ -502,6 +534,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "3c60866ffe3b444afb2a9af693586b5f311a95db65626d1c4b6c3a6deb917199",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/8019701"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-22",
@@ -745,6 +793,22 @@
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
+      "id": "4fa1c03c3a6d352ddc3ca3ccc2229b6f6db3afc9a68739596ea7f4392ef83d69",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/6410108"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
       "id": "50a5d934664917aa9dfb3aa42f407f26476067dcca2becbc6ff77c849482d274",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -945,6 +1009,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://www.penninecare.nhs.uk/download_file/5855/277"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "67aa0552605a30e44683c8cf19b1e0ad4d7987e04eaf9072e8ed72adc16c415c",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/22656776"
     },
     {
       "commercial_reuse_authorized": false,
@@ -1880,6 +1960,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "d773a43c1252350d5068fa499694ba41ed1ddb6bbdd3ab045d9ca50e1aba4acf",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/8185423"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -2150,6 +2246,6 @@
       "url": "https://zenodo.org/records/1122049"
     }
   ],
-  "entries_sha256": "41bb040b9709bd0fea579b436d5eaa60441c3b2d38f64d8b07afad6f3b262424",
+  "entries_sha256": "a2f49795f05cf0d9b664019a523f9e8d8a817116341bce7323e04723998e97f1",
   "schema_version": 1
 }
