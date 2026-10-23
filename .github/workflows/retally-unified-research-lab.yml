@@ -126,6 +126,9 @@ jobs:
             python -m freight.lab15_triage --out freight/lab15/triage_queue.json
             python -m freight.lab15_evidence_harvester --network --report /tmp/retally-lab15-discovery.json
           fi
+          # The legacy queue is a derived view and may not exist on fresh
+          # branches. Generate it deterministically before trying to stage.
+          python -m freight.lab15_triage --out freight/lab15/triage_queue.json
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -143,7 +146,10 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/lab15/evidence_ledger.json freight/lab15/triage_queue.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          if [ -f freight/lab15/triage_queue.json ]; then
+            git add -- freight/lab15/triage_queue.json
+          fi
           if ! git diff --cached --quiet; then
             git commit -m 'research: unified four-engine public evidence source refresh'
           fi
