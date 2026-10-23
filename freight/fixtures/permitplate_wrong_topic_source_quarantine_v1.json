@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_PERMITPLATE_WRONG_TOPIC_SOURCE_QUARANTINE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_SUITABILITY_ONLY",
+  "pinned_input": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "branch": "research/retally-unified-data-lab",
+    "commit_sha": "e155efa9b1aa44db5771d69633f8f30302d3f2f6",
+    "path": "freight/research_lab/leads.json",
+    "git_blob_sha": "49adf78e9468b739ecaae623dd6efe159d1d84e6",
+    "entries_sha256": "6759c4919c86264c6394ef3f0f04c07acdafaf9f72e68a9efc8a5b8b5df4a7e1",
+    "entry_count": 252,
+    "permitplate_assigned_pointers": 42
+  },
+  "partition": {
+    "observed_wrong_topic_excluded": 13,
+    "remaining_unreviewed_permitplate_pointers": 29,
+    "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW"
+  },
+  "cases": [
+    {
+      "id": "0b13bef20ee55e4da73e574abbdd7dc4002acfe3416cea51069a64bff2afd99f",
+      "url": "https://github.com/akilism/nyc-restaurant-inspection-extension",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "0f742810f7ee82bf71156873340a62ef2c25b92ddef10a1c6535687e4c300e62",
+      "url": "https://github.com/piyush-an/NYC-Restaurant-Inspection",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "1fbee3d850a8cbfe0e4874c981ebba9d515230089c73c982332c491ec24cd4ec",
+      "url": "https://github.com/rspiro9/NYC-Restaurant-Yelp-and-Inspection-Analysis",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "24ec1ba8aa7d352dc8db2e673e6c3dbdbc3e5f7b0f60679549f3f319ce55c40f",
+      "url": "https://github.com/gzsuyu/Data-Analysis-NYC-Restaurant-Inspection-Data",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "2e845518ab649aa06bc888a93e59f024f2a43bde93f7e34d8a112ed71d2b4688",
+      "url": "https://github.com/drjasondavis/Nyc-Restaurant-Inspection-Analysis",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "49db47604edae2ad15a7d732bb0ec8a951cb2ee2dfe98545b2016198a551005d",
+      "url": "https://github.com/ryankanno/archive-nyc-restaurant-inspections-api",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "6141383cac0f47cbed1b3701bc3749dce65b2c1ca75e4bb66bb5184d89a75578",
+      "url": "https://github.com/bswinnerton/nyc-restaurant-grades",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "a6119f47e13f398fa9813db36cf59480c53d039b6bee5a4c551dcea07adf8664",
+      "url": "https://github.com/umangkeshri/Predicting-Critical-Flag-NY-Restaurants",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "a93ff5ba7892e330b599a266c89c91e7da313b913345120e318650c7a7f06955",
+      "url": "https://github.com/jeiranj/NYC-Restaurant-Inspection-Data-Analysis",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "b435a3dac066a6bad358652004946d351f6743c65e286965167693fe7bdd6b4a",
+      "url": "https://github.com/Jack-Kaplan/nyc-restaurant-health-predictor",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "bb52d28056cdab5cb4aefdce18bf9610fe9fbd98abf0e2079ea65db27b6c029d",
+      "url": "https://github.com/Xiaoyang-Song/NYC-Restaurant-Inspection-Database",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "ceaa2e005ef42bafb21692d5be6dc2490807a3efbe455681199c4bb2b16abb1f",
+      "url": "https://github.com/CodeWritingCow/NYC-restaurant-inspection-records",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "db2620e282f6551e321f7289c56e9a74658a5cba90f2208b466a33f5e64d60f7",
+      "url": "https://github.com/eigenfoo/nyc-restaurant-inspections",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    }
+  ],
+  "source_rights": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+  "actual_document_or_permit_rows_ingested": 0,
+  "independent_issuance_labels": 0,
+  "original_document_sha256": null,
+  "commercial_reuse_approved": false,
+  "synthetic_negative_controls": [
+    {
+      "kind": "SYNTHETIC",
+      "url": "https://github.com/example/nyc-restaurant-inspection-demo",
+      "expected": "REJECT_WRONG_TOPIC"
+    },
+    {
+      "kind": "SYNTHETIC",
+      "url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+      "expected": "CANDIDATE_ONLY_RIGHTS_AND_ISSUANCE_LABELS_UNVERIFIED"
+    }
+  ],
+  "accuracy_reporting": {
+    "permit_opportunity_scoring": "UNKNOWN_NO_INDEPENDENT_HELD_OUT_OUTCOMES",
+    "original_freight_invoice_extraction": "NOT_EVALUATED",
+    "general_accounting_reconciliation": "NOT_EVALUATED",
+    "freight_error_detection": "NOT_EVALUATED",
+    "recovery_outcomes": "NOT_EVALUATED"
+  },
+  "publisher_reference": "https://data.cityofnewyork.us/d/rbx6-tga4",
+  "publisher_rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+  "observed_at": "2026-10-23",
+  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior."
+}
