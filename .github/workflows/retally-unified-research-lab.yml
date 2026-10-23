@@ -216,7 +216,12 @@ jobs:
           git push origin "HEAD:refs/heads/$DATA_BRANCH"
 
   nightly-real-data-replay:
-    if: github.event_name == 'push' || (github.event_name == 'schedule' && github.event.schedule == '19 3 * * *')
+    # On controller pushes, only replay after the source branch publication.
+    # A separate nightly cron must still execute when discover is skipped.
+    needs: [discover]
+    if: >-
+      always() && ((github.event_name == 'push' && needs.discover.result == 'success')
+      || (github.event_name == 'schedule' && github.event.schedule == '19 3 * * *'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
