@@ -284,7 +284,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                 for record in data["sources"][:100]:
                     if type(record) is not dict or type(record.get("url")) is not str:
                         raise ResearchError("INVALID_SCOUT_RECORD")
-                    urls.append(safe_url(record["url"], SOURCE_HOSTS))
+                    urls.append(safe_url(record["url"]))
             elif provider == "datagov-v4":
                 rows = data.get("results", [])
                 if type(rows) is not list:
