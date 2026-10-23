@@ -24,3 +24,23 @@
 .approved-brand-software img.native-software-emblem{width:min(100%,270px);max-width:270px;height:auto;margin:auto;object-fit:contain;object-position:center;background:transparent;filter:drop-shadow(0 9px 16px rgba(0,95,67,.13))}
 @media(max-width:800px){.company-card>img.native-company-emblem,.company-card.recoveryworks>img{height:190px}.company-card>img.native-company-emblem{padding:20px 39px}}
 @media(max-width:580px){.company-card>img.native-company-emblem,.company-card.recoveryworks>img{height:190px}.approved-brand-software img.native-software-emblem{width:min(88%,260px)}}
+
+
+/* Approved high-resolution RETALLY wordmark: preserve surrounding type scale. */
+img.retally-wordmark{
+  display:inline-block!important;
+  width:auto!important;
+  height:.79em!important;
+  max-width:min(100%,8em);
+  margin:0 .04em;
+  padding:.075em .12em;
+  box-sizing:content-box;
+  object-fit:contain;
+  vertical-align:-.035em;
+  background:#fff;
+  border:1px solid rgba(10,72,50,.12);
+  border-radius:.17em;
+  box-shadow:0 1px 4px rgba(0,31,26,.10);
+}
+a img.retally-wordmark{pointer-events:none}
+@media print{img.retally-wordmark{box-shadow:none}}
