@@ -232,10 +232,11 @@ The independent Cloudflare collector keeps the **same** existing
 `*/5 * * * *` Cron trigger, D1 database, approved read-only GET routes,
 three public metadata providers and maximum 24 processed links per cycle.
 
-- Public GitHub/Zenodo search terms and result pages are deterministically
-  rotated across 1/2/3 page windows. No additional HTTP request budget, new
-  provider, credential or source-document fetch is introduced. Partial search
-  misses still produce explicit provider warnings.
+- Public GitHub/Zenodo search terms and pages 1/2/3 rotate deterministically,
+  including one newest-first GitHub search per five lane attempts. This covers
+  12 bounded query/page/sort views without increasing the three core provider
+  requests, introducing any new credentials or fetching source-document bytes.
+  Partial search misses still produce explicit provider warnings.
 - A GitHub HTTP 429 skips the second same-origin GitHub call for that cycle,
   reducing pressure during a rate limit. Provider diagnostics consist only
   of bounded non-identifying status codes; raw exception text is never
