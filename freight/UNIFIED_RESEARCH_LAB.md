@@ -9,7 +9,7 @@ already-approved real-document and engine regression tests without user prompts.
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.
 - **One long-lived data branch:** research/retally-unified-data-lab, separate from protected main and production sites.
 - **One canonical cross-engine catalog:** freight/research_lab/leads.json; exact URL deduplication and engine tags preserve the source's original first-seen date.
-- **Four lanes, not four independent workers.** Every five minutes the scheduler rotates one engine's discovery queries. This gives each engine a planned 20-minute interval. GitHub cron can be delayed or skipped; there is **no guaranteed five-minute execution SLA**.
+- **Four lanes, not four independent workers.** Every five minutes the scheduler rotates one engine's discovery queries (4, 9, 14, etc. minutes past the hour, to avoid the hour-boundary queue). This gives each engine a planned 20-minute interval. GitHub cron can be delayed or skipped; there is **no guaranteed five-minute execution SLA**.
 - **One nightly read-only test campaign:** real original freight invoices, RecoveryOS general-AP disclosures, PermitPlate official-source adapter regressions, and CaptureBrief procurement-source regressions.
 - **Legacy Lab 15 source discovery preserved:** the two original metadata harvesters are run **inside the central controller** when FreightRecovery's periodic legacy refresh is due; their two legacy ledgers remain historical/compatibility views on the *same* data branch. Their independent scheduled triggers are retired, not their test code.
 - **Existing Labs 1–14 kept intact:** their research findings, adversarial cases and stacked draft PRs are not silently declared merged, green or production-authorized. The synthetic 14-domain test director in PR #297 is a separate unmerged draft with explicit non-merge limitations. Port each validated, read-only harness into the nightly controller only when it exists on approved main; never transplant unfinished stacked branches into production.
@@ -22,6 +22,13 @@ already-approved real-document and engine regression tests without user prompts.
 | PermitPlate | NYC restaurant inspections, DOHMH pre-permit events, DOB NOW building filings and SLA liquor-license applications; real-source adapter and V4-relevant engine regression. **Not parking-ticket analytics:** PermitPlate's current product concerns restaurant vendor opportunity signals. |
 | CaptureBrief | SAM.gov opportunity and amendment sources, federal procurement archives and USAspending award data; existing historical/current-source controls. Current SAM API access requiring a key is not assumed. |
 | RecoveryOS | Original published vendor-payment and invoice disclosures, especially Pennine Care NHS spending CSVs, plus public procurement/payment metadata; nightly replay through the existing RecoveryWorks reconciliation kernel. |
+
+### Verified public catalog APIs (October 2026)
+
+- The former Data.gov CKAN v3 endpoint is **retired**. The documented replacement is the GSA Data.gov v4 metadata API, which requires an API key in production. This worker uses it only if the optional `RETALLY_DATAGOV_API_KEY` GitHub Actions secret exists; it never uses `DEMO_KEY` for automation.
+- Without that key, continue unattended via public GitHub/Zenodo metadata search. PermitPlate also checks the official NYC Socrata public dataset catalog. Only public dataset links/IDs are stored, not records, titles, invoice rows, contacts or login details.
+- Per-provider errors are recorded as bounded local error codes (e.g., HTTP_STATUS_404) without exposing private API responses. Partial provider success is displayed as a warning, not falsified full coverage.
+- Rebuild the legacy Lab 15 triage queue on every run before git staging. It is a derived view and is absent on a fresh branch until first generated; treating an absent optional file as a mandatory git path caused the first real run to fail.
 
 ### Source promotion rules
 
@@ -64,6 +71,15 @@ failures, and wrong engine rotation. Source API outages must surface as workflow
 failures or explicit provider errors; zero new leads by itself is not success
 proof, accuracy evidence, nor an excuse to manufacture data. Research discovery
 may produce many **leads** while yielding zero independently labeled cases.
+
+### Operational acceptance and recovery
+
+- On first merge or subsequent updates to the controller, a main-branch push also performs **one real live discovery and one complete four-engine read-only replay**. A passing PR test alone does not prove the live lab is healthy.
+- Require a successful GitHub Actions **discover** job, a four-engine source coverage summary and a successful safe push to research/retally-unified-data-lab. Check for actual candidate changes; zero new leads can be a valid no-op but a stale job is not healthy.
+- Require the separate **nightly-real-data-replay** job to pass; a failed original-document URL, parser, official source change, or engine test is a genuine blocked acceptance gate, not a reason to suppress that test.
+- The 5-minute cron may be delayed or skipped by GitHub. The offset cron is intentionally changed in this repair to renew its associated scheduling actor; main push is an independently verifiable bootstrap, not a replacement for recurring cron proof.
+- Do not claim the lab is continuously healthy until at least one actual **schedule** event has succeeded; if that continues to be unavailable, another authorized independent scheduler is needed.
+- Every successful discovery emits an Actions job summary with counts per engine, new pointers, and public provider errors. Original documents, sensitive source details, and customer information never enter those summaries.
 
 ### Migration
 

@@ -19,7 +19,7 @@ on:
       - ".github/workflows/retally-unified-research-lab.yml"
   schedule:
     # Highest GitHub Actions cron frequency; rotates four research domains.
-    - cron: "3-58/5 * * * *"
+    - cron: "4-59/5 * * * *"
     # Expensive original-document and three-engine read-only replay.
     - cron: "19 3 * * *"
   workflow_dispatch:
@@ -45,7 +45,7 @@ jobs:
           python -m unittest -v freight.test_unified_research_lab
 
   discover:
-    if: (github.event_name == 'schedule' && github.event.schedule == '3-58/5 * * * *') || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.event.schedule == '4-59/5 * * * *')
     runs-on: ubuntu-latest
     timeout-minutes: 18
     permissions:
@@ -78,6 +78,9 @@ jobs:
       - name: Prove research safety properties before public network access
         run: python -m unittest -q freight.test_unified_research_lab
       - name: Discover real public-data source leads without storing source content
+        env:
+          # Optional official Data.gov v4 key; absent by default. No DEMO_KEY.
+          RETALLY_DATAGOV_API_KEY: ${{ secrets.RETALLY_DATAGOV_API_KEY }}
         run: |
           set -euo pipefail
           python -m freight.unified_research_lab --live | tee /tmp/retally-research-run.json
@@ -91,7 +94,24 @@ jobs:
           assert summary['approved_real_truth_cases'] == 0
           assert summary['production_changes'] == 0
           assert len(ledger['entries']) == summary['total_leads']
-          print('Four-engine metadata-only ledger validated')
+          from collections import Counter
+          from pathlib import Path
+          counts = Counter(engine for row in ledger['entries'] for engine in row['engines'])
+          assert all(counts.get(engine, 0) > 0 for engine in ('freightrecovery','permitplate','capturebrief','recoveryos'))
+          summary_lines = [
+              '## RETALLY Unified Research Lab — live discovery',
+              f"- Engine scanned: {summary['engine']}",
+              f"- New real-world source references: {summary['new_leads']}",
+              f"- Indexed source references: {summary['total_leads']}",
+              f"- Public metadata provider errors: {len(summary['feed_errors'])}",
+              '- External documents saved: 0',
+              '- Financial truth or customer releases claimed: 0',
+          ]
+          summary_lines += [f"- {name}: {counts[name]} source references" for name in sorted(counts)]
+          if summary['feed_errors']:
+              summary_lines += ['### Provider warnings'] + ['- '+x for x in summary['feed_errors']]
+          Path(__import__('os').environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(summary_lines) + '\n')
+          print('Four-engine metadata-only ledger validated; source counts:', dict(counts))
           PY
       - name: Preserve both existing Lab 15 collectors inside the unified branch
         env:
@@ -109,6 +129,9 @@ jobs:
             python -m freight.lab15_triage --out freight/lab15/triage_queue.json
             python -m freight.lab15_evidence_harvester --network --report /tmp/retally-lab15-discovery.json
           fi
+          # The legacy queue is a derived view and may not exist on fresh
+          # branches. Generate it deterministically before trying to stage.
+          python -m freight.lab15_triage --out freight/lab15/triage_queue.json
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -126,14 +149,17 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/lab15/evidence_ledger.json freight/lab15/triage_queue.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          if [ -f freight/lab15/triage_queue.json ]; then
+            git add -- freight/lab15/triage_queue.json
+          fi
           if ! git diff --cached --quiet; then
             git commit -m 'research: unified four-engine public evidence source refresh'
           fi
           git push origin "HEAD:refs/heads/$DATA_BRANCH"
 
   nightly-real-data-replay:
-    if: github.event_name == 'schedule' && github.event.schedule == '19 3 * * *'
+    if: github.event_name == 'push' || (github.event_name == 'schedule' && github.event.schedule == '19 3 * * *')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:

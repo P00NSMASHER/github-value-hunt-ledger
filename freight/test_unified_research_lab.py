@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 from freight.unified_research_lab import (
     ENGINES, ResearchError, current_engine, ledger_from, merge_sources,
@@ -91,36 +93,76 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
     def test_feed_parses_canonical_metadata_and_not_raw_rows(self):
         def fake(url):
-            if "catalog.data.gov" in url:
-                return {"result": {"results": [
-                    {"name": "shipping-invoice-2026", "title": "Hidden personal name",
-                     "notes": "private bill-to account", "email": "none@example.org"},
-                    {"name": "../secret", "title": "bad"},
-                ]}}
             if "api.github.com" in url:
                 return {"items": [{"html_url": "https://github.com/owner/public-data",
                                    "description": "ignore copied PII"},
                                   {"html_url": "https://internal.example/repo"}]}
             return {"hits": {"hits": [{"id": 12345, "metadata": {"creators": ["X"]}}]}}
-        urls, errors = scan("freightrecovery", fetch=fake)
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            urls, errors = scan("freightrecovery", fetch=fake)
         self.assertEqual(errors, [])
         self.assertIn("https://github.com/owner/public-data", urls)
-        self.assertIn("https://catalog.data.gov/dataset/shipping-invoice-2026", urls)
         self.assertIn("https://zenodo.org/records/12345", urls)
         self.assertTrue(all("@" not in x and "private" not in x for x in urls))
 
+    def test_nyc_official_catalog_uses_dataset_ids_only(self):
+        def fake(url):
+            if "api.us.socrata.com" in url:
+                return {"results": [
+                    {"resource": {"id": "abcd-1234", "name": "DOHMH Inspection"},
+                     "owner": {"email": "nobody@example.invalid"}},
+                    {"resource": {"id": "../secret"}},
+                ]}
+            if "api.github.com" in url:
+                return {"items": []}
+            return {"hits": {"hits": []}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            urls, errors = scan("permitplate", fetch=fake)
+        self.assertEqual(errors, [])
+        self.assertEqual(urls, ["https://data.cityofnewyork.us/d/abcd-1234"])
+
+    def test_data_gov_v4_is_not_used_without_a_production_api_key(self):
+        seen = []
+        def fake(url):
+            seen.append(url)
+            return {"items": []} if "api.github.com" in url else {"hits": {"hits": []}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            scan("capturebrief", fetch=fake)
+        self.assertFalse(any("api.gsa.gov" in url for url in seen))
+        self.assertFalse(any("catalog.data.gov/api/3/" in url for url in seen))
+
+    def test_data_gov_v4_only_admits_public_dataset_metadata(self):
+        def fake(url):
+            if "api.gsa.gov" in url:
+                return {"results": [
+                    {"slug": "public-data-2026", "dcat": {"accessLevel": "public"},
+                     "description": "contains arbitrary names and private details"},
+                    {"slug": "restricted-data-2026", "dcat": {"accessLevel": "restricted public"}},
+                    {"slug": "../unsafe", "dcat": {"accessLevel": "public"}},
+                ]}
+            return {"items": []} if "api.github.com" in url else {"hits": {"hits": []}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": "fake-test-key"}):
+            urls, errors = scan("recoveryos", fetch=fake)
+        self.assertEqual(errors, [])
+        self.assertEqual(urls, ["https://catalog.data.gov/dataset/public-data-2026"])
+
     def test_partial_provider_failure_is_disclosed_but_all_fail_closed(self):
         def partial(url):
-            if "catalog.data.gov" in url:
-                raise ResearchError("OFFLINE")
-            return {"items": []} if "github.com" in url else {"hits": {"hits": []}}
-        urls, errors = scan("permitplate", fetch=partial)
+            if "zenodo.org" in url:
+                raise ResearchError("HTTP_STATUS_503")
+            if "api.us.socrata.com" in url:
+                return {"results": []}
+            return {"items": []}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            urls, errors = scan("permitplate", fetch=partial)
         self.assertEqual(urls, [])
         self.assertEqual(len(errors), 2)
+        self.assertTrue(all("HTTP_STATUS_503" in x for x in errors))
         def all_failed(_):
             raise ResearchError("OFFLINE")
-        with self.assertRaisesRegex(ResearchError, "ALL_PUBLIC_FEEDS_UNAVAILABLE"):
-            scan("recoveryos", fetch=all_failed)
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            with self.assertRaisesRegex(ResearchError, "ALL_PUBLIC_FEEDS_UNAVAILABLE"):
+                scan("recoveryos", fetch=all_failed)
 
     def test_corrupt_saved_ledger_is_not_overwritten(self):
         with tempfile.TemporaryDirectory() as root:
