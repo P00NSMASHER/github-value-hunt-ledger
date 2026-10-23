@@ -20,8 +20,6 @@ on:
       - 'freight/lab15/**'
       - 'freight/LAB15_AUTONOMOUS_EVIDENCE_ACQUISITION.md'
       - '.github/workflows/retally-lab15-evidence-acquisition.yml'
-  schedule:
-    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
