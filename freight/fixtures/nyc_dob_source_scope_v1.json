@@ -20,7 +20,7 @@
   "evaluation_family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
   "evidence_records_downloaded": 0,
   "last_publisher_review_date": "2026-10-23",
-  "manifest_sha256": "40de5dde3024fe2cb732e682f61808954a6445c2905e6fed28cbe27613f2c606",
+  "manifest_sha256": "637481a48cddf47100aa2aeb3832aa4a2675786826f9001caad9a4d6e3a667cc",
   "official_sources": [
     {
       "authority_limit": "Application does not by itself establish an issued or currently valid permit. This application catalog excludes Electrical, Elevator and Limited Alteration Application jobs; a nonmatch does not prove no permit exists.",
@@ -47,7 +47,7 @@
       "publisher": "New York City Department of Buildings",
       "rights_class": "NYC_PORTAL_PUBLIC_TERMS_AND_DATASET_SUPPLEMENT_CHECK_REQUIRED",
       "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
-      "schema_descriptor_sha256": "9e4a82bc69cdab8985944d7fde37f8649500fbbea108e07af9773f08ebd19a9b"
+      "schema_descriptor_sha256": "e27ee7d096cbcee445ec4983c4693a6c5340df31c1c2736259e985629dd29678"
     },
     {
       "authority_limit": "An approved-permits dataset record can contain the literal placeholder Permit is not yet issued; do not infer issuance from dataset membership alone.",
@@ -75,7 +75,7 @@
       "publisher": "New York City Department of Buildings",
       "rights_class": "NYC_PORTAL_PUBLIC_TERMS_AND_DATASET_SUPPLEMENT_CHECK_REQUIRED",
       "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
-      "schema_descriptor_sha256": "f73f29ac514af462a11884fc0c04753d8aaa3602da4911c4d3b14b673ec6476e"
+      "schema_descriptor_sha256": "b37055eddeb71ac534a8e3c7203b151689e67a0b9f714e6dc0862dc25dc0b7b9"
     },
     {
       "authority_limit": "BIS-only permits are not a census of newer DOB NOW records; do not treat nonmatch as no permit.",
@@ -99,7 +99,7 @@
       "publisher": "New York City Department of Buildings",
       "rights_class": "NYC_PORTAL_PUBLIC_TERMS_AND_DATASET_SUPPLEMENT_CHECK_REQUIRED",
       "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
-      "schema_descriptor_sha256": "f47db57dd717f3787c6a6ed925ec0760851c0930525bdb5425e642bcf974cef5"
+      "schema_descriptor_sha256": "abdf38b142ad9eca36a769bdbe212c94151697f8a3e227159e13dbf177c55fb2"
     }
   ],
   "pack_generated_date": "2026-10-23",
@@ -107,6 +107,7 @@
   "real_issuance_cases_ingested": 0,
   "research_base_main_sha": "3f1a1357f2b744e897a60645b713d4b7a93c7112",
   "research_repository": "P00NSMASHER/github-value-hunt-ledger",
+  "schema_descriptor_hash_contract": "RESEARCH_AUTHORED_DESCRIPTOR_SHA256_OF_CANONICAL_JSON_EXCLUDING_SELF_NOT_ORIGINAL_SOURCE_BYTES",
   "schema_version": 1,
   "source_review_kind": "OFFICIAL_PUBLISHER_METADATA_AND_RESEARCH_AUTHORED_DESCRIPTORS_NOT_SOURCE_BYTES",
   "synthetic_negative_controls": [

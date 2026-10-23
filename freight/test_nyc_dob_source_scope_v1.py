@@ -47,6 +47,17 @@ class NYCDOBScopeTest(unittest.TestCase):
         self.assertEqual(d['acceptance_boundaries']['truth_unknown_count'], 4)
         self.assertEqual(d['manifest_sha256'], canonical_hash({k: v for k, v in d.items() if k != 'manifest_sha256'}))
 
+    def test_research_authored_descriptor_digests_match_exact_contents(self):
+        self.assertEqual(
+            self.doc['schema_descriptor_hash_contract'],
+            'RESEARCH_AUTHORED_DESCRIPTOR_SHA256_OF_CANONICAL_JSON_EXCLUDING_SELF_NOT_ORIGINAL_SOURCE_BYTES')
+        for source in self.doc['official_sources']:
+            self.assertEqual(
+                source['schema_descriptor_sha256'],
+                canonical_hash({k: v for k, v in source.items() if k != 'schema_descriptor_sha256'}),
+                msg=source['dataset_id'])
+            self.assertIsNone(source['original_source_bytes_sha256'])
+
     def test_source_scopes_and_authority_gates(self):
         d = self.doc
         s = {x['dataset_id']: x for x in d['official_sources']}
