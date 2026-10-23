@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+from collections import UserDict
 import importlib.util
 import io
 import json
@@ -277,6 +278,19 @@ class ProviderTests(unittest.TestCase):
             m.list_exact_execution(
                 command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
                 command_id, vm_id)
+
+    def test_execution_list_accepts_sdk_mapping_headers(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        terminal = SimpleNamespace(instance_agent_command_id=command_id)
+        command = Mock()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[terminal], headers=UserDict())
+        self.assertIs(
+            m.list_exact_execution(
+                command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                command_id, vm_id),
+            terminal)
 
     def test_existing_command_poll_exhausts_404_without_recreate(self):
         command_id = "ocid1.instanceagentcommand.oc1.dummy"

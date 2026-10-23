@@ -7,6 +7,7 @@ OCI monitor and its OAuth client must never be granted Run Command rights.
 from __future__ import annotations
 
 import base64
+from collections.abc import Mapping
 import hashlib
 import os
 import re
@@ -190,7 +191,7 @@ def list_exact_execution(command, compartment_id: str, command_id: str,
     response = command.list_instance_agent_command_executions(
         compartment_id, instance_id, limit=100)
     headers = getattr(response, "headers", {})
-    auth.require(isinstance(headers, dict) and not headers.get("opc-next-page"),
+    auth.require(isinstance(headers, Mapping) and not headers.get("opc-next-page"),
                  "EXECUTION_LOOKUP_UNVERIFIED")
     items = getattr(response, "data", None)
     auth.require(isinstance(items, list), "EXECUTION_LOOKUP_UNVERIFIED")
