@@ -828,7 +828,9 @@ class RetallySocialFooterTests(unittest.TestCase):
                 with self.subTest(page=name):
                     page = (output / name).read_text(encoding="utf-8")
                     self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
-                    self.assertIn("Follow RETALLY", page)
+                    self.assertIn("Follow ", page)
+                    self.assertIn('class="retally-wordmark"', page)
+                    self.assertIn('alt="RETALLY"', page)
                     self.assertEqual(page.count('class="retally-social__links"'), 1)
                     for url in verified:
                         self.assertEqual(page.count('href="' + url + '"'), 1)

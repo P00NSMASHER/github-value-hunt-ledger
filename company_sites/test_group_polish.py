@@ -24,7 +24,7 @@ class BusinessCards(HTMLParser):
             self.cards.append(self.current)
         if self.current and tag == "div" and "card-visual" in classes:
             self.visuals.append(self.current)
-        if self.current and tag == "img":
+        if self.current and tag == "img" and "native-company-emblem" in classes:
             self.images[self.current] = attrs
 
     def handle_endtag(self, tag):

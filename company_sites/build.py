@@ -18,6 +18,10 @@ from xml.etree import ElementTree as ET
 
 SOURCE_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = SOURCE_ROOT.parent
+import sys
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from freight.site.wordmark import embed_approved_wordmark
 CONTACT_EMAIL = "jay@retallyrecovery.com"  # Existing published business inbox.
 
 DEFAULT_URLS = {
@@ -34,6 +38,7 @@ PROFILES = {
         "files": ("index.html", "privacy/index.html", "site.css", "enquiry.js", "_headers"),
         "assets": {
             "assets/brand/retally-emblem-approved.png": "freight/site/assets/brand/retally-emblem-approved.png",
+            "assets/brand/retally-wordmark-approved.png": "freight/site/assets/brand/retally-wordmark-approved.png",
             "assets/brand/freightrecovery-emblem.webp": "freight/site/assets/brand/freightrecovery-emblem.webp",
             "assets/brand/recoveryos-emblem.webp": "freight/site/assets/brand/recoveryos-emblem.webp",
             "assets/brand/permitplate-emblem.webp": "freight/site/assets/brand/permitplate-emblem.webp",
@@ -63,6 +68,7 @@ PROFILES = {
         "pages": ("index.html", "engagement/index.html", "privacy/index.html"),
         "files": ("index.html", "engagement/index.html", "privacy/index.html", "site.css", "_headers"),
         "assets": {
+            "assets/brand/retally-wordmark-approved.png": "freight/site/assets/brand/retally-wordmark-approved.png",
             "assets/brand/recoveryos-emblem.webp": "freight/site/assets/brand/recoveryos-emblem.webp",
             "assets/brand/recoveryos-600-20261022.webp": "freight/site/assets/brand/recoveryos-600-20261022.webp",
             "assets/brand/recoveryos-1200-20261022.webp": "freight/site/assets/brand/recoveryos-1200-20261022.webp",
@@ -157,6 +163,7 @@ def build(company: str, output: Path, public_url: str | None = None) -> Path:
         if re.search(r"\{\{[^}]+\}\}", content):
             raise ValueError(f"Unresolved publication token in {name}")
         if name.endswith(".html"):
+            content = embed_approved_wordmark(content, "/assets/brand/retally-wordmark-approved.png")
             content = content.replace('href="/site.css"', f'href="/site.css?v={css_revision}"')
             for script, revision in script_revisions.items():
                 content = content.replace(f'src="/{script}"', f'src="/{script}?v={revision}"')
@@ -191,7 +198,7 @@ def build(company: str, output: Path, public_url: str | None = None) -> Path:
     }, indent=2) + "\n", encoding="utf-8")
     title = "RETALLY Group" if company == "group" else "RETALLY RecoveryWorks"
     not_found = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Page not found | {title}</title><link rel="stylesheet" href="/site.css?v={css_revision}"></head><body><main class="document wrap"><p class="eyebrow">{title}</p><h1>That page isn't here.</h1><p>Use the homepage to find the current service and contact details.</p><a href="/">Return to {title}</a></main></body></html>"""
-    (output / "404.html").write_text(not_found + "\n", encoding="utf-8")
+    (output / "404.html").write_text(embed_approved_wordmark(not_found, "/assets/brand/retally-wordmark-approved.png") + "\n", encoding="utf-8")
     expected = set(profile["files"]) | set(profile["assets"]) | set(GENERATED_FILES)
     actual = {file.relative_to(output).as_posix() for file in output.rglob("*") if file.is_file()}
     if actual != expected:

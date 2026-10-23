@@ -24,6 +24,7 @@ from freight.commercial_terms import (
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 from freight.site.asset_integrity import validate_freight_media
+from freight.site.wordmark import embed_approved_wordmark
 from freight.site.social_preview import embed as embed_social_preview, preview_images as social_preview_images
 
 PUBLIC_CONTACT_PAGES = (
@@ -412,6 +413,11 @@ def build(
         text_bundle[name] = _leave_published_business_email_links_unmodified_by_cloudflare(
             text_bundle[name], safe_contact
         )
+
+    # Apply only to short visible brand copy; programmatic names stay stable.
+    for name, page in tuple(text_bundle.items()):
+        if name.endswith(".html"):
+            text_bundle[name] = embed_approved_wordmark(page, "assets/brand/retally-wordmark-approved.png")
 
     # Fail closed before publishing any source text containing the removed private contact.
     # Log only the filename, never the discovered private value.
