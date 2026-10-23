@@ -5,7 +5,7 @@
     "independent_labels_count": 0,
     "money_actions_authorized": false,
     "source_url_evidence": "OFFICIAL_PUBLISHER_PAGES_WITH_CRAWL_DATE",
-    "truth_unknown_count": 3
+    "truth_unknown_count": 4
   },
   "accuracy_evaluation": "NOT_ESTIMABLE_WITHOUT_INDEPENDENT_LABELS",
   "caveats": [
@@ -20,10 +20,10 @@
   "evaluation_family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
   "evidence_records_downloaded": 0,
   "last_publisher_review_date": "2026-10-23",
-  "manifest_sha256": "19c6f0e95693db60a9c61bd1d9302f93ce4f49fc720de3d14ac23893eff4fabe",
+  "manifest_sha256": "40de5dde3024fe2cb732e682f61808954a6445c2905e6fed28cbe27613f2c606",
   "official_sources": [
     {
-      "authority_limit": "Application does not by itself establish an issued or currently valid permit.",
+      "authority_limit": "Application does not by itself establish an issued or currently valid permit. This application catalog excludes Electrical, Elevator and Limited Alteration Application jobs; a nonmatch does not prove no permit exists.",
       "commercial_reuse_authorized": false,
       "confirmed_fields": [
         "job_filing_number",
@@ -35,7 +35,11 @@
       "dataset_id": "w9ak-ipjd",
       "dataset_title": "DOB NOW: Build – Job Application Filings",
       "event_type": "JOB_APPLICATION",
-      "excluded_work_types": [],
+      "excluded_work_types": [
+        "ELECTRICAL",
+        "ELEVATOR",
+        "LIMITED_ALTERATION_APPLICATION"
+      ],
       "independent_outcome_adjudicated": false,
       "last_observed_publisher_update_date": null,
       "official_url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
@@ -140,6 +144,18 @@
         "job__": "SYNTHETIC-BIS-003"
       },
       "untrusted_claim": "DOB_NOW_COMPLETE_BY_BIS_ALONE"
+    },
+    {
+      "dataset_id": "w9ak-ipjd",
+      "expected_decision": "UNKNOWN_OUT_OF_SCOPE_NOT_NO_PERMIT",
+      "id": "job_applications_electrical_nonmatch_is_unknown",
+      "provenance_class": "SYNTHETIC_SCHEMA_NEGATIVE_CONTROL",
+      "real_world_accuracy_label": null,
+      "row_fields": {
+        "catalog_match": false,
+        "work_type": "ELECTRICAL"
+      },
+      "untrusted_claim": "NO_PERMIT_EXISTS_FROM_NONMATCH"
     }
   ]
 }
