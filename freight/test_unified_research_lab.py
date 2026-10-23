@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
 
 from freight.unified_research_lab import (
-    ENGINES, ResearchError, current_engine, ledger_from, merge_sources,
+    ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
     mirror_scout_all,
 )
@@ -121,8 +121,9 @@ class UnifiedResearchLabTests(unittest.TestCase):
                         "sources": []}
             if "api.us.socrata.com" in url:
                 return {"results": [
-                    {"resource": {"id": "abcd-1234", "name": "DOHMH Inspection"},
+                    {"resource": {"id": "abcd-1234", "name": "DOHMH Restaurant Inspection"},
                      "owner": {"email": "nobody@example.invalid"}},
+                    {"resource": {"id": "rbx6-tga4", "name": "DOB NOW: Build – Approved Permits"}},
                     {"resource": {"id": "../secret"}},
                 ]}
             if "api.github.com" in url:
@@ -131,7 +132,7 @@ class UnifiedResearchLabTests(unittest.TestCase):
         with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
             urls, errors = scan("permitplate", fetch=fake)
         self.assertEqual(errors, [])
-        self.assertEqual(urls, ["https://data.cityofnewyork.us/d/abcd-1234"])
+        self.assertEqual(urls, ["https://data.cityofnewyork.us/d/rbx6-tga4"])
 
     def test_data_gov_v4_is_not_used_without_a_production_api_key(self):
         seen = []
@@ -235,7 +236,7 @@ class UnifiedResearchLabTests(unittest.TestCase):
         observed = []
         urls = {
             "freightrecovery": "https://www.gao.gov/products/b-160344",
-            "permitplate": "https://data.cityofnewyork.us/d/43nn-pn8j",
+            "permitplate": "https://data.cityofnewyork.us/d/w9ak-ipjd",
             "capturebrief": "https://sam.gov/opportunities",
             "recoveryos": "https://www.penninecare.nhs.uk/download_file/5855/277",
         }
@@ -286,6 +287,26 @@ class UnifiedResearchLabTests(unittest.TestCase):
             self.assertTrue(any("UNTRUSTED_SCOUT_FEED" in e for e in report["feed_errors"]))
             self.assertTrue(any("SCOUT_OBSERVATION_DATE_INVALID" in e for e in report["feed_errors"]))
             self.assertEqual(before, path.read_bytes())
+
+
+    def test_permitplate_searches_are_construction_not_restaurant(self):
+        self.assertTrue(all("restaurant" not in q.lower() for q in SEARCHES["permitplate"]))
+        self.assertTrue(any("permit" in q.lower() for q in SEARCHES["permitplate"]))
+
+    def test_permitplate_obvious_wrong_topic_is_excluded_but_history_unchanged(self):
+        prior = source_record("https://github.com/owner/nyc-restaurant-inspections",
+                              "permitplate", "2026-10-22")
+        ledger = ledger_from([prior])
+        revised, added = merge_sources(
+            ledger, "permitplate",
+            ["https://github.com/owner/nyc-restaurant-inspections-2026",
+             "https://github.com/owner/NYC-DOB-Building-Permits"],
+            "2026-10-23")
+        self.assertEqual(added, 1)
+        self.assertEqual(len(revised["entries"]), 2)
+        self.assertIn(prior, revised["entries"])
+        self.assertTrue(any("NYC-DOB-Building-Permits" in row["url"]
+                            for row in revised["entries"]))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, selectCandidateWindow} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow} from "./research_lab_worker.mjs";
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -25,7 +25,7 @@ test("source IDs, not arbitrary metadata or private source rows, enter discovery
     {id:"../123"},
   ]}}),["https://zenodo.org/records/987654321"]);
   assert.deepEqual(canonicalCandidates("socrata",{results:[
-    {resource:{id:"abcd-1234",name:"Private Name"}},
+    {resource:{id:"abcd-1234",name:"DOB NOW: Build – Approved Permits"}},
     {resource:{id:"../../passwd"}},
   ]}),["https://data.cityofnewyork.us/d/abcd-1234"]);
 });
@@ -77,4 +77,29 @@ test("rotation reaches all bounded candidate windows without repeating only the 
   assert.deepEqual(selectCandidateWindow(["a","a","b"],0),["a","b"]);
   assert.deepEqual(selectCandidateWindow([],0),[]);
   assert.throws(()=>selectCandidateWindow([],NaN),/INVALID_SCHEDULE_TIME/);
+});
+
+
+test("PermitPlate excludes restaurant inspection catalogs from its permit leads", () => {
+  const q = feedSpecs("permitplate").map(s => new URL(s.url).searchParams.get("q") || "");
+  assert.ok(q.every(x => !/restaurant|inspection/i.test(x)));
+  assert.deepEqual(canonicalCandidates("socrata", {results: [
+    {resource:{id:"abcd-1234",name:"DOHMH Restaurant Inspection"}},
+    {resource:{id:"rbx6-tga4",name:"DOB NOW: Build – Approved Permits"}},
+    {resource:{id:"ipu4-2q9a",name:"DOB Permit Issuance"}},
+    {resource:{id:"w9ak-ipjd",name:"DOB NOW: Job Application Filings"}},
+  ]}), [
+    "https://data.cityofnewyork.us/d/ipu4-2q9a",
+    "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "https://data.cityofnewyork.us/d/w9ak-ipjd",
+  ]);
+  assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-Restaurant-Inspection"), false);
+  assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-DOB-Building-Permits"), true);
+  for (const url of [
+    "https://github.com/gcivil-nyu-org/dine-safe-ly",
+    "https://data.cityofnewyork.us/d/43nn-pn8j",
+    "https://data.cityofnewyork.us/d/pitm-atqc",
+    "https://data.cityofnewyork.us/d/qcdj-rwhu",
+    "https://data.cityofnewyork.us/d/fpeh-f7ci",
+  ]) assert.equal(permitplateCandidateInScope(url), false, url);
 });
