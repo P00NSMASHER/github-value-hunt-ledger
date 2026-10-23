@@ -198,7 +198,9 @@ def _observation(row: dict, probe: dict) -> dict:
     keys = frozenset(probe)
     if keys != {"probe_state", "head_http_status", "media_class", "content_sha256", "bytes_hashed"}:
         raise ResearchError("INVALID_PUBLIC_PROBE_RESPONSE")
-    if probe["probe_state"] not in STATES or probe["media_class"] not in CONTENT_CLASSES:
+    if (type(probe["probe_state"]) is not str or
+            type(probe["media_class"]) is not str or
+            probe["probe_state"] not in STATES or probe["media_class"] not in CONTENT_CLASSES):
         raise ResearchError("INVALID_PUBLIC_PROBE_RESPONSE")
     if type(probe["bytes_hashed"]) is not int or not 0 <= probe["bytes_hashed"] <= MAX_RESPONSE_BYTES:
         raise ResearchError("INVALID_PUBLIC_PROBE_RESPONSE")
@@ -270,6 +272,8 @@ def _validate_receipt(doc: dict, ledger: dict, today: date) -> dict:
     observed = _day(doc["as_of_utc_date"])
     if observed > today:
         raise ResearchError("FUTURE_PUBLISHER_RECEIPT")
+    if (today - observed).days > 2:
+        raise ResearchError("STALE_PUBLISHER_PROVENANCE_RECEIPT")
     anchors, missing = pinned_rows(ledger)
     if (doc["anchor_set_sha256"] != digest(anchors) or
             doc["pinned_anchors_not_in_ledger"] != missing or
@@ -279,13 +283,11 @@ def _validate_receipt(doc: dict, ledger: dict, today: date) -> dict:
         raise ResearchError("PUBLISHER_ANCHOR_CUSTODY_MISMATCH")
     if doc["limitations"] != list(LIMITATIONS):
         raise ResearchError("PUBLISHER_PROOF_LIMITATION_TAMPERED")
-    if (doc["source_document_bytes_stored"] != 0 or
-            doc["commercial_reuse_approved"] is not False or
-            doc["independent_outcome_labels_verified"] != 0 or
-            doc["independently_scored_benchmark_cases"] != 0 or
-            doc["verified_recovered_cash_cents"] != 0 or
-            doc["customer_contact_actions"] != 0 or
-            doc["production_changes"] != 0):
+    if (any(type(doc[key]) is not int or doc[key] != 0 for key in (
+            "source_document_bytes_stored", "independent_outcome_labels_verified",
+            "independently_scored_benchmark_cases", "verified_recovered_cash_cents",
+            "customer_contact_actions", "production_changes")) or
+            doc["commercial_reuse_approved"] is not False):
         raise ResearchError("UNAPPROVED_PUBLISHER_EVIDENCE_PROMOTION")
     expected_count = 0
     expected_fingerprints = 0
