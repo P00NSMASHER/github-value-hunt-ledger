@@ -352,5 +352,98 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
 
 
+
+    def test_pagination_mirrors_all_pages_and_respects_40_new_source_budget(self):
+        called = []
+        def fake(url):
+            query = parse_qs(urlsplit(url).query)
+            engine = query["engine"][0]
+            before = query.get("before", [None])[0]
+            called.append((engine, before))
+            data = {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+            if engine == "capturebrief":
+                if before is None:
+                    data["sources"] = [
+                        {"url": f"https://github.com/synthetic-fixture/capture-dataset-{i:03d}",
+                         "first_seen": "2026-10-22"}
+                        for i in range(100)]
+                    data["next_cursor"] = "250"
+                elif before == "250":
+                    data["sources"] = [
+                        {"url": f"https://github.com/synthetic-fixture/capture-dataset-{i:03d}",
+                         "first_seen": "2026-10-21"}
+                        for i in range(100, 102)]
+                    data["next_cursor"] = None
+                else:
+                    raise AssertionError("unexpected cursor")
+            return data
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Path(root) / "sources.json"
+            now = NOW + timedelta(days=1)
+            outputs = [mirror_scout_all(ledger=ledger, now=now, fetch=fake)
+                       for _ in range(3)]
+            self.assertEqual([x["new_leads"] for x in outputs], [40,40,22])
+            self.assertEqual(len(read_ledger(ledger)["entries"]), 102)
+            self.assertEqual(outputs[-1]["per_engine"]["capturebrief"]["available"], 102)
+            self.assertEqual(outputs[-1]["per_engine"]["capturebrief"]["pages_read"], 2)
+            self.assertEqual(outputs[-1]["feed_errors"], [])
+            self.assertEqual(called.count(("capturebrief", "250")), 3)
+            self.assertTrue(all(row["rights_state"].startswith("UNVERIFIED")
+                                for row in read_ledger(ledger)["entries"]))
+            self.assertEqual(
+                sorted({row["first_seen"] for row in read_ledger(ledger)["entries"]}),
+                ["2026-10-21", "2026-10-22"])
+
+    def test_pagination_invalid_cursor_quarantines_only_affected_lane(self):
+        def fake(url):
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            data = {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+            if engine == "capturebrief":
+                data["sources"] = [
+                    {"url": f"https://github.com/synthetic-fixture/invalid-cursor-{i:03d}",
+                     "first_seen": "2026-10-22"} for i in range(100)]
+                data["next_cursor"] = "1234bad"
+            return data
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "sources.json"
+            result = mirror_scout_all(ledger=path, now=NOW, fetch=fake)
+            self.assertEqual(result["new_leads"], 0)
+            self.assertEqual(result["feed_errors"], ["capturebrief:SCOUT_CURSOR_INVALID"])
+            self.assertEqual(result["per_engine"]["capturebrief"]["pages_read"], 0)
+            self.assertEqual(read_ledger(path)["entries"], [])
+
+    def test_pagination_six_page_ceiling_is_disclosed_not_silently_ignored(self):
+        def fake(url):
+            args = parse_qs(urlsplit(url).query)
+            engine = args["engine"][0]
+            before = args.get("before", [None])[0]
+            data = {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+            if engine == "recoveryos":
+                index = 0 if before is None else 601 - int(before)
+                if index < 0 or index >= 6:
+                    raise AssertionError("page beyond configured limit")
+                data["sources"] = [
+                    {"url": f"https://github.com/synthetic-fixture/recovery-source-{index:02d}-{i:03d}",
+                     "first_seen": "2026-10-22"} for i in range(100)]
+                data["next_cursor"] = str(600-index)
+            return data
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "sources.json"
+            report = mirror_scout_all(ledger=path, now=NOW, fetch=fake)
+            self.assertIn("recoveryos:SCOUT_PAGE_CAP_REACHED", report["feed_errors"])
+            self.assertTrue(report["per_engine"]["recoveryos"]["page_cap_reached"])
+            self.assertEqual(report["per_engine"]["recoveryos"]["pages_read"], 6)
+            self.assertEqual(report["per_engine"]["recoveryos"]["available"], 600)
+            self.assertEqual(report["per_engine"]["recoveryos"]["new"], 40)
+            self.assertEqual(len(read_ledger(path)["entries"]), 40)
+
+
+
 if __name__ == "__main__":
     unittest.main()
