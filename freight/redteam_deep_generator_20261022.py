@@ -122,7 +122,7 @@ def generate(i: int) -> FictionalDataset:
     for n in range(n_invoices):
         customer = buyers[(n*7 + i) % n_customers]
         carrier = carriers[(n*5 + i) % n_carriers]
-        currency = currencies[(n*3 + i) % n_currencies]
+        currency = currencies[(n*5 + i) % n_currencies]
         key = (customer, carrier, currency)
         invoice_id = f"SYN-INV-{i:03d}-{n:03d}"
         shipment_id = f"SYN-SHIP-{i:03d}-{n:03d}-{rng.randrange(100000,999999)}"
