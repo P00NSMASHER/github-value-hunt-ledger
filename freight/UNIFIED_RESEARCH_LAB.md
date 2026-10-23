@@ -14,6 +14,63 @@ already-approved real-document and engine regression tests without user prompts.
 - **Legacy Lab 15 source discovery preserved:** the two original metadata harvesters are run **inside the central controller** when FreightRecovery's periodic legacy refresh is due; their two legacy ledgers remain historical/compatibility views on the *same* data branch. Their independent scheduled triggers are retired, not their test code.
 - **Existing Labs 1–14 kept intact:** their research findings, adversarial cases and stacked draft PRs are not silently declared merged, green or production-authorized. The synthetic 14-domain test director in PR #297 is a separate unmerged draft with explicit non-merge limitations. Port each validated, read-only harness into the nightly controller only when it exists on approved main; never transplant unfinished stacked branches into production.
 
+## FreightRecovery evaluation-feed integration (v1.1)
+
+**Integrated with the existing research controller, not a 16th lab or separate scheduler.**
+
+On each five-minute discovery/dispatch run, the controller validates and
+deduplicates source links from **all three catalogs**:
+`freight/research_lab/leads.json` (four-engine canonical catalog),
+`freight/lab15/evidence_ledger.json` (original evidence finder), and
+`freight/research/lab15_candidate_ledger.json` (original source candidate lab).
+
+A deterministic bridge (`freight/research_eval_bridge.py`) builds
+`freight/research_lab/evaluation_feed_v1.json` **on the isolated research data
+branch only**. Sources remain versioned, exact-URL deduplicated, provenance
+tracked, first-seen-preserving, and rights-/truth-held. Rebuilding the same inputs
+produces unchanged bytes. Invalid or non-representable legacy URLs are counted
+as skipped; a bounded execution cap is reported, never silently treated as a
+complete population. No private invoice identifiers, source body text, titles,
+original public document bytes or payment records are copied into the feed.
+
+The frozen nine-case `freight/fixtures/real_world_eval_v1.json` remains an
+independent, reviewed fixture: seven **official** decision/SEC/STB/EIA pointers
+are deliberately seeded into the unified catalog and crosslinked by exact URL.
+Two private-party invoice faces remain in the frozen evaluation regression
+suite; their document-specific URLs are **not** harvested or republished.
+Additional candidate sources enter the **unlabeled source queue**, not the
+curated invoice/overcharge population.
+
+Every selected feed pointer is replayed through
+`freight.canonical_schema`, `freight.rating_engine`, and
+`freight.priority2_evidence` using a deliberately fabricated $1, no-authority,
+no-shipment-document record. A source pointer alone must produce
+`REVIEW_REQUIRED` and zero verified cash. This is a real **engine evidence-gate
+test** using real source locators, **not** a fresh numerical invoice
+extraction/rerate test. The fixed v1 pack separately retains original
+public-domain numerical anchors and actual invoice-face arithmetic.
+
+The existing read-only nightly four-engine runner now reads the **current
+source-data branch**, validates and regenerates the feed, and replays both the
+dynamic candidate proof gates and the frozen v1 tests. The first merge to
+protected main additionally **bootstraps the isolated feed branch offline**
+from official seeds; a successful push does not prove five-minute scheduled
+discovery has executed. Subsequent cron/live discovery is independent and may
+be delayed/skipped by GitHub.
+
+Run locally without credentials or live source acquisition:
+
+    python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge
+    python -m freight.research_eval_bridge --output /tmp/evaluation_feed_v1.json
+    python -m freight.research_eval_bridge --output /tmp/evaluation_feed_v1.json --verify
+    python -m freight.real_world_eval_v1
+
+**Research candidate != verified benchmark truth.** Promotion to a new
+curated numerical case requires authentic source custody, permission review,
+independent governing customer contracts, shipment support and payment/credit
+evidence. Real recovered cash, customer precision/recall and externally
+approved claims remain **zero or not estimable**, regardless of feed growth.
+
 ## Real-data research targets
 
 | Lane | Discovery and validation |
@@ -58,7 +115,7 @@ Stripe, private PermitPlate source state or CaptureBrief private archives.
 Writes use serialized GitHub Actions, no force push, no source document uploads,
 no customer/prospect/carrier outreach, and no paid API or paid infrastructure.
 
-Ten offline unit tests defend against ledger manipulation, forged rights and
+Offline adversarial unit tests defend against ledger manipulation, forged rights and
 cash assertions, injection URLs, duplicates, rerun drift, partial source
 failures, and wrong engine rotation. Source API outages must surface as workflow
 failures or explicit provider errors; zero new leads by itself is not success
