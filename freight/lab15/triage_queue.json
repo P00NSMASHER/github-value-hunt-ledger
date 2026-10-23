@@ -1,0 +1,319 @@
+{
+  "annotated_sources": 8,
+  "annotations_sha256": "f3a2974e9b365644844d745a2968367052bd8784bf48f2105824d48d65a549bb",
+  "entries": [
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 14,
+      "public_source_fingerprint": null,
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "original_carrier_invoice"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-897a415ec29a9d96caaed9d4",
+      "source_kind": "PUBLIC_BANKRUPTCY_EXHIBIT",
+      "source_url": "https://document.epiq11.com/document/getdocumentbycode?docId=4228494&projectCode=NHH&source=DM"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 8,
+      "public_source_fingerprint": "58183d63ab1bcdbc2c72bb594d5baf78b5a0d77abdae05559085b15c10513065",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "independent_adjudicated_decision",
+        "prior_auditor_finding"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-68660c9668093ba95fdd9460",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-143246"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 8,
+      "public_source_fingerprint": "e8fd186a13f83cd6b30bdbd427da1867586c39e3b952b94b100a7515b5ce03d4",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "independent_adjudicated_decision",
+        "prior_auditor_finding"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-a4131c53f76d7c85e290e848",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-148465"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 8,
+      "public_source_fingerprint": "1e8722a7c510c872ed9b949ccab664ff762c6ceba1ce6dae91fb00e67d40404d",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "independent_adjudicated_decision",
+        "prior_auditor_finding"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-fb9bf13c34be8981595ddf36",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-199805-0"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 6,
+      "public_source_fingerprint": null,
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "original_carrier_invoice"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-22a8e16a41eb3ab6e52aafe0",
+      "source_kind": "PUBLIC_REGULATORY_EXHIBIT",
+      "source_url": "https://psc.ky.gov/Case/ViewCaseFilings/2024-00200"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 6,
+      "public_source_fingerprint": null,
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "original_carrier_invoice"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-e75e9df9fc5c742fc9cf84f2",
+      "source_kind": "PUBLIC_REGULATORY_EXHIBIT",
+      "source_url": "https://psc.ky.gov/Case/ViewCaseFilings/2025-00354"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 6,
+      "public_source_fingerprint": null,
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "original_carrier_invoice"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-f82af687bd08064163ab3928",
+      "source_kind": "PUBLIC_BANKRUPTCY_EXHIBIT",
+      "source_url": "https://document.epiq11.com/document/getdocumentbycode?docId=3412364&projectCode=NRD&source=DM"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 4,
+      "public_source_fingerprint": "02688685612c8fbc58ecb65d1c31f35bc27a8074da95e7040b863f9c79cf9c35",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [
+        "independent_adjudicated_decision"
+      ],
+      "reuse_rights_cleared": false,
+      "review_state": "PREVIOUS_PUBLIC_RESEARCH_REPORTED_NOT_VERIFIED",
+      "source_id": "src-68b2dc928094407c76b16465",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-161664"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 0,
+      "public_source_fingerprint": null,
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [],
+      "reuse_rights_cleared": false,
+      "review_state": "METADATA_LEAD_NOT_INSPECTED",
+      "source_id": "src-37cb27dff0b8b6e1ad392ef1",
+      "source_kind": "DATASET_CATALOG_LEAD",
+      "source_url": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F9C0MUS"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 0,
+      "public_source_fingerprint": "3703605881b00c94e00592e328f876dc350e84db241fff7f5cca5119f7f7f39f",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [],
+      "reuse_rights_cleared": false,
+      "review_state": "METADATA_LEAD_NOT_INSPECTED",
+      "source_id": "src-48bbdbf852723fb514d33526",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-223311-0"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 0,
+      "public_source_fingerprint": "26553495c01ef0c0afafdc447276e9d22e3e2fe034bdc142ab12b4c90c809d94",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [],
+      "reuse_rights_cleared": false,
+      "review_state": "METADATA_LEAD_NOT_INSPECTED",
+      "source_id": "src-849bf6ffaadcd5e67cd274ec",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-195862"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 0,
+      "public_source_fingerprint": "017a8defeba010c21b0bd55f00b0d070d6e0e53036ced1fca9eb31654776dcc5",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [],
+      "reuse_rights_cleared": false,
+      "review_state": "METADATA_LEAD_NOT_INSPECTED",
+      "source_id": "src-a2fe6bfb402aa319f797e39e",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-221705"
+    },
+    {
+      "complete_original_document_chain_verified": false,
+      "customer_permission_verified": false,
+      "evidence_not_reported": [
+        "original_carrier_invoice",
+        "effective_customer_rate_quote",
+        "independent_shipment_document",
+        "independent_payment_or_credit_receipt",
+        "prior_auditor_finding",
+        "independent_adjudicated_decision"
+      ],
+      "first_seen": "2026-10-17T15:38:43Z",
+      "invoice_error_independently_verified": false,
+      "manual_review_priority_points": 0,
+      "public_source_fingerprint": "597e2d693e15ba07e072fd0e465b1a8d4d86a343297ad69daf2e4068500606a4",
+      "real_cash_recovery_verified": false,
+      "reported_evidence": [],
+      "reuse_rights_cleared": false,
+      "review_state": "METADATA_LEAD_NOT_INSPECTED",
+      "source_id": "src-e0acade169007fa1a455c9b1",
+      "source_kind": "GAO_DECISION",
+      "source_url": "https://www.gao.gov/products/b-221594-0"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "PUBLIC_METADATA_TRIAGE_ONLY_NO_AUDIT_TRUTH",
+  "source_count": 13,
+  "source_ledger_sha256": "e9cda822e365ad57a196159e981963979dab8a3777acf804d63555013da243e7",
+  "sources_pending_rights_and_independent_review": 13,
+  "sources_with_complete_approved_real_case": 0
+}
