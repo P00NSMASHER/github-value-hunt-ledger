@@ -130,6 +130,36 @@ failures or explicit provider errors; zero new leads by itself is not success
 proof, accuracy evidence, nor an excuse to manufacture data. Research discovery
 may produce many **leads** while yielding zero independently labeled cases.
 
+### Independent scheduler fallback (Cloudflare)
+
+GitHub Actions `schedule` events may be delayed or never emitted even when push CI
+passes. The same single RETALLY research operation therefore has an independent,
+bounded Cloudflare Cron collector. It is **not** a sixteenth research lab and
+never touches customer, production money, hosted RecoveryOS, or other Workers.
+
+- Worker source: `freight/research_lab_worker.mjs`; executable tests:
+  `freight/research_lab_worker.test.mjs`; dedicated D1 schema:
+  `freight/research_lab_worker.schema.sql`.
+- Every five minutes, Cloudflare chooses the least recently attempted one of
+  the four engines, avoiding missed-event starvation.
+- It fetches only public GitHub/Zenodo and official NYC Socrata *metadata*,
+  bounds response sizes and source count (24 per run), canonicalizes URLs,
+  and deduplicates them in its own D1 store. It does not fetch original invoice
+  bytes, scrape restricted sites, send messages, or use commercial data APIs.
+- D1 rights/truth-state fields are CHECK-locked to UNVERIFIED. Only public URL
+  pointers and per-engine counts can leave that store. No independent accuracy
+  or recovered cash assertions.
+- Cron invocation is idempotent per five-minute UTC slot and lane; duplicate
+  triggers cannot inflate source rows. HTTP endpoints are **read-only**:
+  `/health` reports aggregate status and `/feed?engine=...` reports bounded
+  metadata URLs. No public action can trigger a write.
+- Hosted within the existing Cloudflare account and without upgrading its
+  plan. Worker subrequests and D1 writes are capped to fit included usage.
+  The independent service stores pointers durably when GitHub cron is absent;
+  GitHub's source branch remains the governed publication mirror when its
+  own runner executes. A separate read-only synchronization adapter must
+  be proven before claiming that the two catalogs are perfectly mirrored.
+
 ### Operational acceptance and recovery
 
 - On first merge or subsequent updates to the controller, a main-branch push also performs **one real live discovery and one complete four-engine read-only replay**. A passing PR test alone does not prove the live lab is healthy.
