@@ -84,7 +84,8 @@ export function feedSpecs(engine, whenMs = 0) {
   // without increasing provider request volume or fetching original documents.
   const lap = Math.floor(whenMs / (300000 * ENGINES.length));
   const page = [1, 1, 2, 1, 3][lap % 5];
-  const offset = Math.floor(lap / 5) % 3;
+  // Coprime 3-term and 5-page cycles cover 15 distinct query/page plans.
+  const offset = lap % 3;
   const query = QUERIES[engine];
   const [q1, q2, q3] = [query[offset], query[(offset + 1) % 3], query[(offset + 2) % 3]];
   const feeds = [
