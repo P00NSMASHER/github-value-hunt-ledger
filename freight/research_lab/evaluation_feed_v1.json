@@ -1,0 +1,478 @@
+{
+  "candidate_sources": [
+    {
+      "case_id": "EIA_DIESEL_HISTORY",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "0a64fc868887fdb87525653b212af5afb1341fc3836c3517d4327e4202e162e7",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.eia.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://www.eia.gov/petroleum/gasdiesel/",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": "EVERGREEN_TCW_2026_COURT",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "225fa0627b37ba14e178b9abbe241e7ca2fe2f947c23526aac777a09e53412ec",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "media.cadc.uscourts.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": "GIBSON_FMC_2030I",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "43d6b19d5016f6e000709271cfbed51f43dd53bf946edf868e188be83a80385d",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www2.fmc.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": "MARATHON_2026_MARINE",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "ae7eebe6f443a28c45288fa3e0741a6844998b38d9d52d30106004d63fcff47a",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.sec.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": "STB_2024_WAYBILL",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "e314cb3bfa9a7ed441175c7345b4d00dd8cb8c1f783247992143405b1e1d4f51",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.stb.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://www.stb.gov/reports-data/waybill/",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": "BAKERLY_SEAFRIGO_FMC",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "ea8c19d80d25580407260cfddc10e5d474f2db7c3cf126e3b958b90481e2f212",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.fmc.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": "TESORO_2011_TRUCKING",
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-23",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "f3927d4044077c86716e0f96d39bc580b7565cf75a3e2a4b0fdf3cd3ddc7b2a4",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.sec.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "MATCHED_FROZEN_V1_REFERENCE",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-22",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "882ff7c1cd852aba866aa25ce751713c954753e93eb9c37917b72f295c26336c",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-160344",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "2687473a3d37b713cd67f452e09bb684191a3bf5a56d79e174929c55aa99f3af",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-148465",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "3f4e85181b8ac551ac0672c7c2775cb4509b253a3a0f1c0644f4b16bd30d1e54",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE",
+        "UNIFIED"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-143246",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "7559b8a589ce7a7004674e64aa27e0893f4980e93d7394d351e2d6424c9d3273",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "psc.ky.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_REGULATORY_OR_RATE_REFERENCE",
+      "source_url": "https://psc.ky.gov/Case/ViewCaseFilings/2025-00354",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "85f33da64d964406a78260bc9374f942d05650c336a9a780fceae0a0b506eb2e",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-223311-0",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "954681a73a2c173c7ebd0e8f71b6bc6e2cb6896f837e00dfda9a83d9f58559b9",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "psc.ky.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_REGULATORY_OR_RATE_REFERENCE",
+      "source_url": "https://psc.ky.gov/Case/ViewCaseFilings/2024-00200",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "a68ffd144ff2c136af2abc44d811b2f909449da5712575aae416a5b2df7c28bc",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-161664",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "d55c7ff95f2971fc73d37ce9c7d28b7e5a573a23480a171f17737ca511a2fe8d",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-199805-0",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "d98737c21e894b6653f37144221c8710d0d36e3660adbc8c0289e77062b4bdc0",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-195862",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "ecf5554f37bb2d30a515a7f037791e43b4727e48133a52cb14ba5e65a5dabd2d",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-221594-0",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-17",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "fa61c119cd084225585dc0ee0509f74d0341d3bf720abd0b7918b198f04ed2cb",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "LAB15_EVIDENCE"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-221705",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    }
+  ],
+  "commercial_recovery_allowed": false,
+  "customer_contacts_sent": 0,
+  "feed_sha256": "7a0bb1a6f53a090c27f869fc0a5fbf85908f3b40946a70ae4fbc44f0f71164ae",
+  "feed_version": "1.1.0",
+  "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
+  "frozen_v1_historical_cases": 9,
+  "frozen_v1_official_source_matches": 7,
+  "independently_scored_new_customer_cases": 0,
+  "new_customer_proven_overcharges": null,
+  "omitted_for_bounded_execution": 0,
+  "pack_id": "RETALLY_REAL_WORLD_FREIGHT_EVAL_V1",
+  "pack_version": "1.0.0",
+  "production_changes": 0,
+  "schema_version": 1,
+  "selected_for_synthetic_proof_gate": 18,
+  "source_pointers_total": 18,
+  "source_receipts": {
+    "lab15_candidate_metadata_sha256": "5ac994b499f565bfc5f74aa80f9751ef69c48a838b08fd188af33fd3f8ffd520",
+    "lab15_evidence_metadata_sha256": "e9cda822e365ad57a196159e981963979dab8a3777acf804d63555013da243e7",
+    "unified_entries_sha256": "ac16e574cfcdc94f1258e1276716e87894719a4b89e4423f4e4bd41235a61f05"
+  },
+  "unsafe_or_unrepresentable_legacy_pointers_skipped": 3,
+  "verified_recovered_cash_cents": 0
+}
