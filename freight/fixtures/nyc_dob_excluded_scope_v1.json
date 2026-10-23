@@ -101,5 +101,46 @@
       "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
     }
   ],
-  "manifest_sha256": "b3b95a4c6a8517c6b7996d871fe50c2f19e5ffbf5bc9f0d96c17e962e0b0ee9b"
+  "manifest_sha256": "0bb64e12c8dbc522b1816f0ecefcbeaa3f59c1e6b5d6c66e22ff971d39bc7209",
+  "source_join_cardinality_candidate": {
+    "dataset_id": "xmmq-y7za",
+    "dataset_title": "DOB NOW: Electrical Permit Details",
+    "official_url": "https://data.cityofnewyork.us/d/xmmq-y7za",
+    "metadata_url": "https://catalog.data.gov/dataset/dob-now-electrical-permit-details",
+    "publisher": "NYC Department of Buildings",
+    "dataset_first_published_date": "2019-04-30",
+    "last_observed_publisher_update_date": "2026-10-20",
+    "metadata_reviewed_date": "2026-10-23",
+    "row_grain": "ELECTRICAL_SCOPE_DETAIL_MULTIPLE_PER_JOB_FILING",
+    "join_key_name": "JOB_FILING_NUMBER",
+    "publisher_cardinality_statement": "Multiple detail rows may exist for one job filing, including different floors and switch types.",
+    "authority_limit": "Detail rows are not distinct permit issuances; cross-dataset joins and issued-permit counts are not independently adjudicated.",
+    "original_source_bytes_sha256": null,
+    "commercial_reuse_authorized": false,
+    "independent_issuance_adjudicated": false,
+    "independently_verified_join": false,
+    "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED",
+    "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/"
+  },
+  "synthetic_join_cardinality_negative_control": {
+    "case_id": "synthetic_electrical_detail_rows_one_job",
+    "provenance": "SYNTHETIC_JOIN_NEGATIVE_CONTROL",
+    "cohort": "SYNTHETIC_ELECTRICAL_DETAILS",
+    "untrusted_claim": "TWO_INDEPENDENTLY_ISSUED_PERMITS_FROM_TWO_DETAIL_ROWS",
+    "details": [
+      {
+        "job_filing_number": "SYNTHETIC-ELECTRICAL-001",
+        "work_location": "BASEMENT"
+      },
+      {
+        "job_filing_number": "SYNTHETIC-ELECTRICAL-001",
+        "work_location": "FOURTH_FLOOR"
+      }
+    ],
+    "expected_source_detail_rows": 2,
+    "expected_distinct_job_filings": 1,
+    "expected_issued_permit_count": null,
+    "independent_issuance_truth": null,
+    "expected_decision": "UNKNOWN_NO_ISSUANCE_ADJUDICATION"
+  }
 }
