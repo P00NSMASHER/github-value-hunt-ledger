@@ -14,8 +14,10 @@
   },
   "partition": {
     "observed_wrong_topic_excluded": 18,
-    "remaining_unreviewed_permitplate_pointers": 24,
-    "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW"
+    "remaining_unreviewed_permitplate_pointers": 22,
+    "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW",
+    "context_only_unadjudicated": 2,
+    "context_only_status": "CANDIDATE_FOR_BUILDING_CONTEXT_ONLY_NOT_ISSUANCE_GROUND_TRUTH_RIGHTS_UNVERIFIED"
   },
   "cases": [
     {
@@ -233,5 +235,43 @@
   "publisher_reference": "https://data.cityofnewyork.us/d/rbx6-tga4",
   "publisher_rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
   "observed_at": "2026-10-23",
-  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified."
+  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified. Two existing official NYC pointers were separately source-scoped: PLUTO tax-lot land-use and LL84 building energy/water are candidate contextual fields, NOT DOB permit issuance/approved-permit truth. Rights and independently held-out outcomes remain unverified; no raw rows copied.",
+  "context_only_candidates": [
+    {
+      "id": "0a560f06b0ac7d352d7247ff0a1015f3534c0b8c6351b2552da028b20be0ba90",
+      "url": "https://data.cityofnewyork.us/d/64uk-42ks",
+      "first_seen": "2026-10-23",
+      "publisher": "NYC Open Data",
+      "publisher_metadata_title": "Primary Land Use Tax Lot Output (PLUTO)",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/64uk-42ks",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "LOT_LAND_USE_CONTEXT_ONLY",
+      "permit_issuance_ground_truth": false,
+      "expected_evaluation": "CONTEXT_ONLY_NOT_PERMIT_ISSUANCE_GROUND_TRUTH",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "original_source_bytes_sha256": null,
+      "commercial_reuse_authorized": false,
+      "independent_permit_outcome_label": null
+    },
+    {
+      "id": "9479993f25c59de8cf0e4178a320b6018cf21a00c814d3e97c5b9425a208beb7",
+      "url": "https://data.cityofnewyork.us/d/5zyy-y8am",
+      "first_seen": "2026-10-23",
+      "publisher": "NYC Open Data",
+      "publisher_metadata_title": "NYC Building Energy and Water Data Disclosure for Local Law 84 2023 to Present (Data for Calendar Year 2022-Present)",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/5zyy-y8am",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "BUILDING_ENERGY_CONTEXT_ONLY",
+      "permit_issuance_ground_truth": false,
+      "expected_evaluation": "CONTEXT_ONLY_NOT_PERMIT_ISSUANCE_GROUND_TRUTH",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "original_source_bytes_sha256": null,
+      "commercial_reuse_authorized": false,
+      "independent_permit_outcome_label": null
+    }
+  ]
 }
