@@ -61,6 +61,28 @@ class TestNYCDOBExcludedScope(unittest.TestCase):
             self.assertIsNone(x['independent_issued_permit_truth'])
             self.assertEqual(x['expected_decision'], 'UNKNOWN_NOT_IN_CORE_SCOPE')
 
+    def test_electrical_detail_rows_are_not_distinct_issued_permits(self):
+        """Publisher-documented one-to-many detail grain is not permit truth."""
+        src = self.doc['source_join_cardinality_candidate']
+        ctrl = self.doc['synthetic_join_cardinality_negative_control']
+        self.assertEqual(src['dataset_id'], 'xmmq-y7za')
+        self.assertEqual(src['official_url'], 'https://data.cityofnewyork.us/d/xmmq-y7za')
+        self.assertEqual(src['row_grain'], 'ELECTRICAL_SCOPE_DETAIL_MULTIPLE_PER_JOB_FILING')
+        self.assertIsNone(src['original_source_bytes_sha256'])
+        self.assertFalse(src['commercial_reuse_authorized'])
+        self.assertFalse(src['independent_issuance_adjudicated'])
+        self.assertFalse(src['independently_verified_join'])
+        self.assertEqual(ctrl['provenance'], 'SYNTHETIC_JOIN_NEGATIVE_CONTROL')
+        rows = ctrl['details']
+        self.assertEqual(len(rows), ctrl['expected_source_detail_rows'])
+        self.assertEqual(len({row['job_filing_number'] for row in rows}),
+                         ctrl['expected_distinct_job_filings'])
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(ctrl['expected_distinct_job_filings'], 1)
+        self.assertIsNone(ctrl['expected_issued_permit_count'])
+        self.assertIsNone(ctrl['independent_issuance_truth'])
+        self.assertEqual(ctrl['expected_decision'], 'UNKNOWN_NO_ISSUANCE_ADJUDICATION')
+
     def test_no_cross_dataset_join_or_accuracy_claim(self):
         self.assertEqual(self.doc['cross_dataset_join'], 'UNVERIFIED')
         self.assertEqual(self.doc['freight_error_accuracy'], 'NOT_APPLICABLE')
