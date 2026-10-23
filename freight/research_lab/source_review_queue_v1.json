@@ -7,10 +7,10 @@
       "candidate_classes": {
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 2,
-        "third_party_path_topic_hints_only": 6,
-        "unclassified_third_party_catalogs_only": 65
+        "third_party_path_topic_hints_only": 12,
+        "unclassified_third_party_catalogs_only": 99
       },
-      "catalog_source_associations": 73,
+      "catalog_source_associations": 113,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -60,6 +60,23 @@
           "first_seen": "2026-10-23",
           "independent_ground_truth": false,
           "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/alivikar777-netizen/Government-Contract-Award-Winners",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "25de1406edebd36d173147a415ef7d4ad23c29650a4a294b380cee8c89ac9bf2",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
           "public_source_url": "https://github.com/BradleyBrewington/federal-contract-scanner",
           "publisher_host": "github.com",
           "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
@@ -69,6 +86,23 @@
             "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
           ],
           "source_id": "2613dd0299b6193e4333229f624656fd7f3f8295a650d79314c46a01faad61f7",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/nickshir21/Web-Scraper-Government-Contracts",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "45340eac4f9c90b5beea3b3434fcbffcd1682b59db6532eff4733f4e216e868d",
           "source_provenance_verified": false
         },
         {
@@ -111,7 +145,7 @@
           "first_seen": "2026-10-23",
           "independent_ground_truth": false,
           "original_document_bytes_copied": false,
-          "public_source_url": "https://github.com/fedmineusa/Federal-Government-Contracts",
+          "public_source_url": "https://github.com/VastHornet/government-contract-award-monitor",
           "publisher_host": "github.com",
           "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
           "review_gates": [
@@ -119,47 +153,13 @@
             "REUSE_RIGHTS_REVIEW_REQUIRED",
             "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
           ],
-          "source_id": "b8a6e47c5a9c0b1416f3342fe3b2927e829c25ef33d694fdf9d661a288e3fd81",
-          "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-23",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://github.com/cadmusjl/federal-contracting-monitor",
-          "publisher_host": "github.com",
-          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "d3c8ddb210358a4339fc204d08d10d1f14f79f2102cb62df3c9e48dfba780282",
-          "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-23",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://github.com/kdpglobalenterprises-ui/kdp-federal-contract-database",
-          "publisher_host": "github.com",
-          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "d6ccdd2c2fb1903b21cad39be98f79c0e0f595503b59b6f2dc683debf901e8da",
+          "source_id": "8e903e38d855b355d6e2c11fc756e2e6fa209c9180ddce362ba6784f7cd27446",
           "source_provenance_verified": false
         }
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 73,
+      "unverified_candidates_after_url_screen": 113,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "freightrecovery": {
@@ -167,9 +167,9 @@
         "official_publisher_host_url_only": 6,
         "pinned_public_anchor_url_only": 3,
         "third_party_path_topic_hints_only": 12,
-        "unclassified_third_party_catalogs_only": 74
+        "unclassified_third_party_catalogs_only": 109
       },
-      "catalog_source_associations": 95,
+      "catalog_source_associations": 130,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -319,7 +319,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 95,
+      "unverified_candidates_after_url_screen": 130,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "permitplate": {
@@ -327,9 +327,9 @@
         "official_publisher_host_url_only": 18,
         "pinned_public_anchor_url_only": 3,
         "third_party_path_topic_hints_only": 16,
-        "unclassified_third_party_catalogs_only": 105
+        "unclassified_third_party_catalogs_only": 123
       },
-      "catalog_source_associations": 160,
+      "catalog_source_associations": 178,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -478,17 +478,17 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 142,
+      "unverified_candidates_after_url_screen": 160,
       "url_only_topic_exclusions_not_deleted": 18
     },
     "recoveryos": {
       "candidate_classes": {
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 1,
-        "third_party_path_topic_hints_only": 21,
-        "unclassified_third_party_catalogs_only": 80
+        "third_party_path_topic_hints_only": 22,
+        "unclassified_third_party_catalogs_only": 101
       },
-      "catalog_source_associations": 102,
+      "catalog_source_associations": 124,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -637,7 +637,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 102,
+      "unverified_candidates_after_url_screen": 124,
       "url_only_topic_exclusions_not_deleted": 0
     }
   },
@@ -645,12 +645,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "2aefedd567d1a8f2a1e58f3d009654cffb795b19136f269bc77334acc27fc0cb",
+  "queue_sha256": "e7610704ca8a19b29e3b5826637a6be7b2a839b5f7bfd95051ff6bd64c277bdc",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "5d40d4938de927dc7092656c6a472052d7b76abe784dc78d2988affa80ed7c5e",
-  "unique_public_source_references": 422,
+  "source_ledger_entries_sha256": "f34934c85dc9ef7dd3fec1441f45d254ba960e39e64e205d22e42b16aabfbd84",
+  "unique_public_source_references": 537,
   "verified_recovered_cash_cents": 0
 }

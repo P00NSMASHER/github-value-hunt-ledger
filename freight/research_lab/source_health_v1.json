@@ -11,8 +11,8 @@
       "official_publisher_host_only": 2,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 73,
-      "third_party_catalog_host_only": 71,
+      "source_pointers": 113,
+      "third_party_catalog_host_only": 111,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -22,8 +22,8 @@
       "official_publisher_host_only": 9,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 95,
-      "third_party_catalog_host_only": 86,
+      "source_pointers": 130,
+      "third_party_catalog_host_only": 121,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -33,8 +33,8 @@
       "official_publisher_host_only": 25,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 160,
-      "third_party_catalog_host_only": 135,
+      "source_pointers": 178,
+      "third_party_catalog_host_only": 153,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 18
     },
@@ -44,13 +44,13 @@
       "official_publisher_host_only": 1,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 102,
-      "third_party_catalog_host_only": 101,
+      "source_pointers": 124,
+      "third_party_catalog_host_only": 123,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 422,
+  "first_seen_in_last_seven_calendar_days": 537,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-23",
   "limitations": [
@@ -63,7 +63,7 @@
   "publisher_host_counts": {
     "api.usaspending.gov": 1,
     "data.cityofnewyork.us": 25,
-    "github.com": 126,
+    "github.com": 150,
     "media.cadc.uscourts.gov": 1,
     "sam.gov": 1,
     "www.eia.gov": 1,
@@ -73,13 +73,13 @@
     "www.sec.gov": 2,
     "www.stb.gov": 1,
     "www2.fmc.gov": 1,
-    "zenodo.org": 259
+    "zenodo.org": 350
   },
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "5d40d4938de927dc7092656c6a472052d7b76abe784dc78d2988affa80ed7c5e",
-  "unique_source_pointers": 422,
+  "source_ledger_entries_sha256": "f34934c85dc9ef7dd3fec1441f45d254ba960e39e64e205d22e42b16aabfbd84",
+  "unique_source_pointers": 537,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }
