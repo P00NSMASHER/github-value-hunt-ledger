@@ -1,0 +1,212 @@
+"""Proof that autonomous discovery feeds freight tests without inventing truth."""
+from __future__ import annotations
+
+from copy import deepcopy
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+from freight.lab15_acquisition import source_record as evidence_record
+from freight.lab15_evidence_harvester import (
+    blank_ledger, digest as legacy_digest,
+    new_lead,
+)
+from freight.real_world_eval_v1 import load_manifest, validate_manifest
+from freight.research_eval_bridge import (
+    MAX_FEED_ROWS, VERSION, build_feed, read_inputs, run as bridge_run,
+    synthetic_proof_gate, validate_feed,
+)
+from freight.unified_research_lab import (
+    ResearchError, digest, ledger_from, merge_sources, run, source_record,
+)
+
+NOW = datetime(2026, 10, 23, 0, 0, tzinfo=timezone.utc)
+GAO = "https://www.gao.gov/products/b-160344"
+SEC = "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm"
+
+
+def legacy_evidence(rows=()):
+    return {"schema_version": 1, "records": list(rows)}
+
+
+def legacy_candidates(rows=()):
+    base = {"schema_version": 1, "lab": 15,
+            "scope": "PUBLIC_METADATA_ONLY_NO_CUSTOMER_DOCUMENTS",
+            "leads": list(rows)}
+    return {**base, "digest_sha256": legacy_digest(base)}
+
+
+def sample():
+    doc = ledger_from([])
+    doc, _ = merge_sources(doc, "freightrecovery",
+                           [GAO, SEC, "https://catalog.data.gov/dataset/freight-invoice-example"],
+                           "2026-10-22")
+    doc, _ = merge_sources(doc, "permitplate",
+                           ["https://data.cityofnewyork.us/d/43nn-pn8j"],
+                           "2026-10-22")
+    legacy = legacy_evidence([
+        evidence_record(GAO, "GAO_DECISION", "2026-10-17T00:00:00Z"),
+        evidence_record("https://psc.ky.gov/Case/ViewCaseFilings/2024-00200",
+                        "PUBLIC_REGULATORY_EXHIBIT", "2026-10-17T00:00:00Z"),
+    ])
+    candidates = legacy_candidates([
+        new_lead("https://github.com/demo/freight-invoices", "Public freight invoices",
+                 "github", "2026-10-19"),
+    ])
+    return doc, legacy, candidates
+
+
+class UnifiedEvaluationFeedTests(unittest.TestCase):
+    def test_frozen_v1_anchors_stay_distinct_from_new_unadjudicated_sources(self):
+        manifest = load_manifest()
+        self.assertEqual(len(validate_manifest(manifest)), 9)
+        doc, evidence, candidates = sample()
+        feed = build_feed(doc, evidence, candidates, manifest)
+        self.assertEqual(feed["feed_version"], VERSION)
+        self.assertEqual(feed["frozen_v1_historical_cases"], 9)
+        self.assertEqual(feed["frozen_v1_official_source_matches"], 2)
+        self.assertEqual(feed["source_pointers_total"], 5)
+        self.assertEqual(feed["selected_for_synthetic_proof_gate"], 5)
+        self.assertEqual(feed["verified_recovered_cash_cents"], 0)
+        self.assertIsNone(feed["new_customer_proven_overcharges"])
+        self.assertFalse(feed["commercial_recovery_allowed"])
+        self.assertTrue(all(
+            x["model"]["rating_status"] == "REVIEW_REQUIRED"
+            and x["model"]["evidence_status"] == "REVIEW_REQUIRED"
+            and x["model"]["verified_freight_error_cents"] is None
+            and x["model"]["verified_cash_recovered_cents"] == 0
+            and x["commercial_reuse_authorized"] is False
+            and x["independent_ground_truth"] is False
+            for x in feed["candidate_sources"]
+        ))
+
+    def test_cross_lab_dedupe_preserves_earliest_provenance_and_no_private_titles(self):
+        doc, evidence, candidates = sample()
+        feed = build_feed(doc, evidence, candidates, load_manifest())
+        match = next(x for x in feed["candidate_sources"] if x["source_url"] == GAO)
+        self.assertEqual(match["first_seen"], "2026-10-17")
+        self.assertEqual(match["origins"], ["LAB15_EVIDENCE", "UNIFIED"])
+        self.assertEqual(match["case_id"], None)  # separate frozen public source corpus
+        self.assertNotIn("title", match)
+        self.assertNotIn("sha256", match)  # legacy GAO fingerprint is not copied
+
+    def test_exact_frozen_reference_url_is_linked_not_unrelated_dataset(self):
+        doc, evidence, candidates = sample()
+        feed = build_feed(doc, evidence, candidates, load_manifest())
+        hit = next(x for x in feed["candidate_sources"] if x["source_url"] == SEC)
+        self.assertEqual(hit["case_id"], "TESORO_2011_TRUCKING")
+        self.assertEqual(hit["source_kind"], "MATCHED_FROZEN_V1_REFERENCE")
+        generic = next(x for x in feed["candidate_sources"]
+                       if x["source_url"].startswith("https://catalog.data.gov/"))
+        self.assertIsNone(generic["case_id"])
+        self.assertEqual(generic["source_kind"], "UNCLASSIFIED_PUBLIC_DATASET_LEAD")
+
+    def test_private_invoice_domains_are_excluded_even_when_in_manifest(self):
+        doc, evidence, candidates = sample()
+        extra = source_record("https://www.gao.gov/products/b-143246",
+                              "freightrecovery", "2026-10-22")
+        doc = ledger_from(doc["entries"] + [extra])
+        feed = build_feed(doc, evidence, candidates, load_manifest())
+        self.assertNotIn("BIG_G_2026_FACE", [x["case_id"] for x in feed["candidate_sources"]])
+        self.assertNotIn("PYLE_2021_FACE", [x["case_id"] for x in feed["candidate_sources"]])
+
+    def test_nonfreight_unified_source_does_not_appear_in_freight_feed(self):
+        doc, evidence, candidates = sample()
+        feed = build_feed(doc, evidence, candidates, load_manifest())
+        self.assertTrue(all("data.cityofnewyork.us" not in c["source_url"]
+                            for c in feed["candidate_sources"]))
+
+    def test_source_probe_uses_native_engine_but_has_no_original_invoice(self):
+        case = synthetic_proof_gate(digest(GAO))
+        self.assertEqual(case["rating_status"], "REVIEW_REQUIRED")
+        self.assertIsNone(case["verified_freight_error_cents"])
+        self.assertEqual(case["verified_cash_recovered_cents"], 0)
+        with self.assertRaises(ResearchError):
+            synthetic_proof_gate("source document")
+
+    def test_rehashed_fake_rights_are_rejected_before_feed(self):
+        doc, evidence, candidates = sample()
+        wrong = deepcopy(doc)
+        wrong["entries"][0]["commercial_reuse_authorized"] = True
+        wrong["entries_sha256"] = digest(wrong["entries"])
+        with self.assertRaises(ResearchError):
+            build_feed(wrong, evidence, candidates, load_manifest())
+        changed = deepcopy(evidence)
+        changed["records"][0]["actual_payment_verified"] = True
+        with self.assertRaises(Exception):
+            build_feed(doc, changed, candidates, load_manifest())
+
+    def test_rehashed_candidate_corruption_is_rejected(self):
+        doc, evidence, candidates = sample()
+        changed = deepcopy(candidates)
+        changed["leads"][0]["commercial_reuse_authorized"] = True
+        base = {k: v for k, v in changed.items() if k != "digest_sha256"}
+        changed["digest_sha256"] = legacy_digest(base)
+        with self.assertRaises(Exception):
+            build_feed(doc, evidence, changed, load_manifest())
+
+    def test_rehashed_omission_or_case_promotion_detected(self):
+        doc, evidence, candidates = sample()
+        normal = build_feed(doc, evidence, candidates, load_manifest())
+        for mutation in ("delete", "fake_truth", "new_case"):
+            altered = deepcopy(normal)
+            if mutation == "delete":
+                altered["candidate_sources"].pop()
+            if mutation == "fake_truth":
+                altered["candidate_sources"][0]["independent_ground_truth"] = True
+            if mutation == "new_case":
+                altered["candidate_sources"][-1]["case_id"] = "GIBSON_FMC_2030I"
+            body = {k: v for k, v in altered.items() if k != "feed_sha256"}
+            altered["feed_sha256"] = digest(body)
+            with self.subTest(mutation=mutation), self.assertRaises(ResearchError):
+                validate_feed(altered, doc, evidence, candidates, load_manifest())
+
+    def test_stale_or_tampered_baseline_manifest_rejected(self):
+        doc, evidence, candidates = sample()
+        altered = deepcopy(load_manifest())
+        altered["cases"][0]["real_customer_payment_verified"] = True
+        with self.assertRaises(ValueError):
+            build_feed(doc, evidence, candidates, altered)
+
+    def test_bounded_dataset_explains_denominator_not_silent_loss(self):
+        records = [
+            source_record("https://catalog.data.gov/dataset/freight-record-" + str(i),
+                          "freightrecovery", "2026-10-23")
+            for i in range(MAX_FEED_ROWS + 5)
+        ]
+        feed = build_feed(ledger_from(records), legacy_evidence(),
+                          legacy_candidates(), load_manifest())
+        self.assertEqual(feed["source_pointers_total"], MAX_FEED_ROWS + 5)
+        self.assertEqual(feed["selected_for_synthetic_proof_gate"], MAX_FEED_ROWS)
+        self.assertEqual(feed["omitted_for_bounded_execution"], 5)
+
+    def test_cli_writer_and_exact_readback_are_idempotent(self):
+        doc, evidence, candidates = sample()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            unified_file = root / "unified.json"
+            evidence_file = root / "evidence.json"
+            candidates_file = root / "candidates.json"
+            output = root / "feed.json"
+            for path, body in ((unified_file, doc), (evidence_file, evidence),
+                               (candidates_file, candidates)):
+                path.write_text(json.dumps(body), encoding="utf-8")
+            first = bridge_run(unified_file, evidence_file, candidates_file, output)
+            exact = output.read_bytes()
+            second = bridge_run(unified_file, evidence_file, candidates_file, output)
+            self.assertEqual(first, second)
+            self.assertEqual(exact, output.read_bytes())
+            bridge_run(unified_file, evidence_file, candidates_file, output,
+                       verify_only=True)
+            tampered = json.loads(output.read_text(encoding="utf-8"))
+            tampered["verified_recovered_cash_cents"] = 100
+            output.write_text(json.dumps(tampered), encoding="utf-8")
+            with self.assertRaises(ResearchError):
+                bridge_run(unified_file, evidence_file, candidates_file, output,
+                           verify_only=True)
+
+
+if __name__ == "__main__":
+    unittest.main()
