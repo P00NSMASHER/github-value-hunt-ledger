@@ -26,6 +26,7 @@ from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 from freight.site.asset_integrity import validate_freight_media
 from freight.site.wordmark import embed_approved_wordmark
 from freight.site.social_preview import embed as embed_social_preview, preview_images as social_preview_images
+from freight.site.article_schema import embed_article_schema
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -380,6 +381,7 @@ def build(
         text_bundle[name] = embed_social_preview(
             text_bundle[name], name, available_images=set(BINARY_SOURCE_FILES)
         )
+        text_bundle[name] = embed_article_schema(text_bundle[name], name)
 
     # Social profiles are informational, read-only outbound links. Inject the
     # same accessible component on every public marketing page at build time.
