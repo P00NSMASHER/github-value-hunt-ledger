@@ -213,3 +213,53 @@ test("GitHub rate limit skips secondary request and writes a degraded receipt",a
     assert.ok(sql.some(x=>x.includes("UPDATE runs SET status")));
   }finally{globalThis.fetch=original;}
 });
+
+
+test("read-only cursor paging preserves newest-first ordering and emits no D1 internal fields",async()=>{
+  const rows=[
+    {cursor_id:300,url:"https://github.com/example/newest-source",first_seen:"2026-10-23"},
+    {cursor_id:200,url:"https://github.com/example/older-source",first_seen:"2026-10-22"},
+    {cursor_id:100,url:"https://github.com/example/oldest-source",first_seen:"2026-10-21"},
+  ];
+  const calls=[];
+  const db={
+    prepare(sql){
+      assert.ok(sql.includes("SELECT s.rowid AS cursor_id"));
+      assert.ok(!/insert|update|delete/i.test(sql));
+      return {bind(...args){calls.push({sql,args});return {
+        async all(){
+          const lane=args[0],hasCursor=args.length===3;
+          const before=hasCursor?args[1]:Infinity;
+          const lim=args.at(-1);
+          assert.equal(lane,"freightrecovery");
+          return {results:rows.filter(x=>x.cursor_id<before).slice(0,lim)};
+        },
+      }}};
+    },
+  };
+  const root="https://research.invalid/feed?engine=freightrecovery&limit=2";
+  const first=await (await scout.fetch(new Request(root),{RESEARCH_DB:db})).json();
+  assert.equal(first.scope,"PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA");
+  assert.equal(first.next_cursor,"200");
+  assert.equal(first.sources.length,2);
+  assert.deepEqual(Object.keys(first.sources[0]).sort(),["first_seen","url"]);
+  const second=await (await scout.fetch(new Request(root+"&before="+first.next_cursor),{RESEARCH_DB:db})).json();
+  assert.equal(second.next_cursor,null);
+  assert.equal(second.sources.length,1);
+  assert.equal(new Set([...first.sources,...second.sources].map(x=>x.url)).size,3);
+  assert.equal(calls.length,2);
+  assert.equal(calls[0].args.length,2);
+  assert.deepEqual(calls[1].args,["freightrecovery",200,2]);
+});
+
+test("malformed feed pagination inputs reject before querying D1",async()=>{
+  for (const suffix of ["&before=-1","&before=0","&before=abc",
+      "&before=1%20or%201%3D1","&before=1234567890123",
+      "&limit=0","&limit=1000","&limit=2junk"]) {
+    const db={prepare(){throw Error("UNAUTHORIZED_D1_READ")}};
+    const result=await scout.fetch(
+      new Request("https://research.invalid/feed?engine=recoveryos"+suffix),{RESEARCH_DB:db}
+    );
+    assert.equal(result.status,400,suffix);
+  }
+});
