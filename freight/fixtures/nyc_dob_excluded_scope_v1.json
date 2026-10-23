@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_EXCLUDED_SCOPE_V1",
+  "family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
+  "publisher_reviewed_date": "2026-10-23",
+  "provenance": "OFFICIAL_NYC_DOB_PUBLISHER_METADATA_DESCRIPTIONS_ONLY",
+  "primary_scope_pack": "freight/fixtures/nyc_dob_source_scope_v1.json",
+  "core_dataset_id": "rbx6-tga4",
+  "excluded_work_types": [
+    "ELECTRICAL",
+    "ELEVATOR",
+    "LIMITED_ALTERATION_APPLICATION"
+  ],
+  "real_permit_records_ingested": 0,
+  "independent_outcome_labels": 0,
+  "cross_dataset_join": "UNVERIFIED",
+  "commercial_use": "UNVERIFIED_NOT_APPROVED",
+  "permit_score_accuracy": "UNKNOWN_NO_HELD_OUT_LABELS",
+  "freight_error_accuracy": "NOT_APPLICABLE",
+  "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+  "publisher_scope_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+  "companion_source_candidates": [
+    {
+      "work_type": "ELECTRICAL",
+      "dataset_id": "dm9a-ab7w",
+      "dataset_title": "DOB NOW: Electrical Permit Applications",
+      "official_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+      "publisher": "NYC Department of Buildings",
+      "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
+      "last_observed_publisher_update_date": "2026-10-21",
+      "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
+      "authority_limit": "Applications and amendments are not independently issued-permit determinations. Filing status and permit suffix must be validated in the appropriate official status source.",
+      "original_source_bytes_sha256": null,
+      "independent_outcome_label": null,
+      "commercial_reuse_authorized": false,
+      "independent_issuance_adjudicated": false,
+      "schema_or_join_certification": "UNVERIFIED_CANDIDATE",
+      "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED"
+    },
+    {
+      "work_type": "ELEVATOR",
+      "dataset_id": "kfp4-dz4h",
+      "dataset_title": "DOB NOW: Build Elevator Permit Applications",
+      "official_url": "https://data.cityofnewyork.us/d/kfp4-dz4h",
+      "publisher": "NYC Department of Buildings",
+      "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
+      "last_observed_publisher_update_date": "2026-10-21",
+      "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
+      "authority_limit": "ELV1 initial, subsequent and amendment filings are application records; do not infer issuance from a filing row.",
+      "original_source_bytes_sha256": null,
+      "independent_outcome_label": null,
+      "commercial_reuse_authorized": false,
+      "independent_issuance_adjudicated": false,
+      "schema_or_join_certification": "UNVERIFIED_CANDIDATE",
+      "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED"
+    },
+    {
+      "work_type": "LIMITED_ALTERATION_APPLICATION",
+      "dataset_id": "xxbr-ypig",
+      "dataset_title": "DOB NOW: Build – Limited Alteration Applications",
+      "official_url": "https://data.cityofnewyork.us/d/xxbr-ypig",
+      "publisher": "NYC Department of Buildings",
+      "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
+      "last_observed_publisher_update_date": "2026-10-05",
+      "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
+      "authority_limit": "LAA includes plumbing, fire-suppression piping and oil-burner work; application membership is not independent issuance adjudication.",
+      "original_source_bytes_sha256": null,
+      "independent_outcome_label": null,
+      "commercial_reuse_authorized": false,
+      "independent_issuance_adjudicated": false,
+      "schema_or_join_certification": "UNVERIFIED_CANDIDATE",
+      "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED"
+    }
+  ],
+  "synthetic_negative_controls": [
+    {
+      "case_id": "synthetic_core_nonmatch_electrical",
+      "work_type": "ELECTRICAL",
+      "core_catalog_match": false,
+      "untrusted_assertion": "NO_PERMIT_EXISTS",
+      "expected_decision": "UNKNOWN_NOT_IN_CORE_SCOPE",
+      "independent_issued_permit_truth": null,
+      "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
+    },
+    {
+      "case_id": "synthetic_core_nonmatch_elevator",
+      "work_type": "ELEVATOR",
+      "core_catalog_match": false,
+      "untrusted_assertion": "NO_PERMIT_EXISTS",
+      "expected_decision": "UNKNOWN_NOT_IN_CORE_SCOPE",
+      "independent_issued_permit_truth": null,
+      "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
+    },
+    {
+      "case_id": "synthetic_core_nonmatch_limited_alteration_application",
+      "work_type": "LIMITED_ALTERATION_APPLICATION",
+      "core_catalog_match": false,
+      "untrusted_assertion": "NO_PERMIT_EXISTS",
+      "expected_decision": "UNKNOWN_NOT_IN_CORE_SCOPE",
+      "independent_issued_permit_truth": null,
+      "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
+    }
+  ],
+  "manifest_sha256": "b3b95a4c6a8517c6b7996d871fe50c2f19e5ffbf5bc9f0d96c17e962e0b0ee9b"
+}
