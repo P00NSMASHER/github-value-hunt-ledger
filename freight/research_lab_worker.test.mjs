@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, selectCandidateWindow} from "./research_lab_worker.mjs";
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -66,4 +66,15 @@ test("public metadata fetch parses bounded valid JSON",async()=>{
     assert.deepEqual(await fetchCatalog(feedSpecs("freightrecovery")[0]),
       ["https://github.com/test/example"]);
   }finally{globalThis.fetch=original;}
+});
+
+test("rotation reaches all bounded candidate windows without repeating only the first 24", () => {
+  const input=Array.from({length:57},(_,i)=>"https://github.com/source/catalog-"+String(i).padStart(3,"0"));
+  const batches=[0,1200000,2400000].map(t=>selectCandidateWindow([...input].reverse(),t));
+  assert.deepEqual(batches.map(b=>b.length),[24,24,9]);
+  assert.equal(new Set(batches.flat()).size,57);
+  assert.deepEqual(batches[0],selectCandidateWindow([...input],0));
+  assert.deepEqual(selectCandidateWindow(["a","a","b"],0),["a","b"]);
+  assert.deepEqual(selectCandidateWindow([],0),[]);
+  assert.throws(()=>selectCandidateWindow([],NaN),/INVALID_SCHEDULE_TIME/);
 });

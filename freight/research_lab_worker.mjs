@@ -102,6 +102,21 @@ export async function fetchCatalog(spec) {
   if (payload.length > MAX_API_BYTES) throw Error("RESPONSE_LIMIT");
   return canonicalCandidates(spec.provider, JSON.parse(payload));
 }
+/**
+ * Rotate bounded discovery windows instead of permanently replaying the first
+ * 24 alphabetically sorted links. A stable 4-lane cycle advances a window
+ * every 20 minutes, eventually covering every candidate in a stable feed.
+ */
+export function selectCandidateWindow(candidates, whenMs) {
+  if (!Number.isFinite(whenMs) || whenMs < 0) throw Error("INVALID_SCHEDULE_TIME");
+  const unique = [...new Set(candidates)].sort();
+  if (unique.length === 0) return [];
+  const windowCount = Math.ceil(unique.length / MAX_NEW);
+  const cycle = Math.floor(whenMs / (300000 * ENGINES.length));
+  const window = cycle % windowCount;
+  return unique.slice(window * MAX_NEW, (window + 1) * MAX_NEW);
+}
+
 async function sha256url(url) {
   const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(url));
   return Array.from(new Uint8Array(bytes), x => x.toString(16).padStart(2, "0")).join("");
@@ -150,7 +165,7 @@ export async function cycle(env, whenMs) {
   let added = 0;
   if (successfulFeeds > 0) {
     const today = new Date(now).toISOString().slice(0,10);
-    for (const url of [...candidates].sort().slice(0, MAX_NEW)) {
+    for (const url of selectCandidateWindow(candidates, now)) {
       const id = await sha256url(url);
       const result = await env.RESEARCH_DB.prepare(
         "INSERT OR IGNORE INTO sources(id,url,first_seen,rights_state,truth_state) VALUES(?,?,?,'UNVERIFIED_RIGHTS_HOLD','UNVERIFIED_TRUTH_HOLD')"
