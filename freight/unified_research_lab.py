@@ -267,11 +267,20 @@ def current_engine(now: datetime) -> str:
     return ENGINES[int(now.timestamp() // 300) % len(ENGINES)]
 
 
-def scout_url(engine: str) -> str:
+MAX_SCOUT_MIRROR_PAGES = 6
+SCOUT_PAGE_SIZE = 100
+
+
+def scout_url(engine: str, *, before: str | None = None) -> str:
     if engine not in ENGINES:
         raise ResearchError("INVALID_ENGINE")
+    args = {"engine": engine, "limit": str(SCOUT_PAGE_SIZE)}
+    if before is not None:
+        if type(before) is not str or not re.fullmatch(r"[1-9]\d{0,11}", before):
+            raise ResearchError("SCOUT_CURSOR_INVALID")
+        args["before"] = before
     return ("https://retally-unified-research-scout.jayp19386.workers.dev/feed?" +
-            urlencode({"engine": engine, "limit": "100"}))
+            urlencode(args))
 
 
 def parse_scout_rows(engine: str, data: dict, now: datetime | None = None
@@ -283,9 +292,11 @@ def parse_scout_rows(engine: str, data: dict, now: datetime | None = None
         raise ResearchError("UNTRUSTED_SCOUT_FEED")
     if now is not None and now.tzinfo is None:
         raise ResearchError("TIMEZONE_REQUIRED")
+    if len(data["sources"]) > SCOUT_PAGE_SIZE:
+        raise ResearchError("SCOUT_PAGE_OVER_LIMIT")
     rows = []
     seen_urls = set()
-    for record in data["sources"][:100]:
+    for record in data["sources"]:
         if type(record) is not dict or type(record.get("url")) is not str:
             raise ResearchError("INVALID_SCOUT_RECORD")
         url = safe_url(record["url"])
@@ -414,21 +425,48 @@ def mirror_scout_all(*, ledger: Path, now: datetime, fetch=get_json) -> dict:
     errors = []
     for engine in ENGINES:
         try:
-            rows = parse_scout_rows(engine, fetch(scout_url(engine)), now)
-            # The remote feed carries source timestamps, not authorizations.
-            overrides = {url: seen for url, seen in rows}
+            observed = {}
+            cursor = None
+            pages = 0
+            reached_cap = False
+            for _ in range(MAX_SCOUT_MIRROR_PAGES):
+                data = fetch(scout_url(engine, before=cursor))
+                rows = parse_scout_rows(engine, data, now)
+                for url, seen in rows:
+                    if url in observed:
+                        raise ResearchError("SCOUT_OVERLAPPING_PAGES")
+                    observed[url] = seen
+                pages += 1
+                following = data.get("next_cursor")
+                if following is None:
+                    break
+                if (type(following) is not str
+                        or not re.fullmatch(r"[1-9]\d{0,11}", following)
+                        or len(rows) != SCOUT_PAGE_SIZE
+                        or (cursor is not None and int(following) >= int(cursor))):
+                    raise ResearchError("SCOUT_CURSOR_INVALID")
+                cursor = following
+            else:
+                if cursor is not None:
+                    reached_cap = True
+                    errors.append(engine + ":SCOUT_PAGE_CAP_REACHED")
+            # Only validated public URLs and observation dates enter the ledger.
+            # The existing forty-new-source cap applies per lane per GitHub run.
             revised, added = merge_sources(
-                revised, engine, list(overrides), now.date().isoformat(),
-                first_seen_overrides=overrides)
-            per_engine[engine] = {"available": len(rows), "new": added}
+                revised, engine, list(observed), now.date().isoformat(),
+                first_seen_overrides=observed)
+            per_engine[engine] = {
+                "available": len(observed), "new": added,
+                "pages_read": pages, "page_cap_reached": reached_cap,
+            }
         except ResearchError as exc:
             errors.append(engine + ":" + str(exc))
-            per_engine[engine] = {"available": 0, "new": 0}
+            per_engine[engine] = {"available": 0, "new": 0, "pages_read": 0, "page_cap_reached": False}
         except (ValueError, KeyError, TypeError, UnicodeDecodeError) as exc:
             # Keep a single unexpectedly malformed scout response isolated.
             # Diagnostics expose only a bounded, code-owned exception category.
             errors.append(engine + ":UNTRUSTED_SCOUT_RESPONSE_" + type(exc).__name__)
-            per_engine[engine] = {"available": 0, "new": 0}
+            per_engine[engine] = {"available": 0, "new": 0, "pages_read": 0, "page_cap_reached": False}
     if revised != original:
         ledger.parent.mkdir(parents=True, exist_ok=True)
         ledger.write_text(json.dumps(revised, indent=2, sort_keys=True) + "\n",
