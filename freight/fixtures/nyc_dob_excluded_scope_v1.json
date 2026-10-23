@@ -101,7 +101,6 @@
       "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
     }
   ],
-  "manifest_sha256": "0bb64e12c8dbc522b1816f0ecefcbeaa3f59c1e6b5d6c66e22ff971d39bc7209",
   "source_join_cardinality_candidate": {
     "dataset_id": "xmmq-y7za",
     "dataset_title": "DOB NOW: Electrical Permit Details",
@@ -142,5 +141,39 @@
     "expected_issued_permit_count": null,
     "independent_issuance_truth": null,
     "expected_decision": "UNKNOWN_NO_ISSUANCE_ADJUDICATION"
-  }
+  },
+  "source_filing_grain_candidate": {
+    "official_url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+    "publisher": "New York City Department of Buildings",
+    "publisher_metadata_reviewed_date": "2026-10-23",
+    "source_kind": "ORIGINAL_OFFICIAL_PUBLIC_DOB_FAQ_TEXT_DESCRIPTION_ONLY",
+    "authority_limit": "One base job can have multiple initial, subsequent and post-approval-amendment filings, each subject to separate approval and permit requirements. A base-job join is not a unique filing key; permit issuance remains unadjudicated.",
+    "join_grain": "BASE_JOB_NUMBER_ONE_TO_MANY_JOB_FILING_NUMBER",
+    "original_source_bytes_sha256": null,
+    "commercial_reuse_authorized": false,
+    "independent_issuance_adjudicated": false,
+    "independent_record_join_verified": false
+  },
+  "synthetic_base_job_multi_filing_negative_control": {
+    "case_id": "synthetic_base_job_collapses_distinct_filings",
+    "provenance": "SYNTHETIC_JOIN_NEGATIVE_CONTROL",
+    "cohort": "SYNTHETIC_DOB_NOW_FILING_SUFFIX_CARDINALITY",
+    "untrusted_claim": "ONE_FILING_BECAUSE_BASE_JOB_NUMBER_MATCHES",
+    "filings": [
+      {
+        "base_job_number": "SYNTHETIC-M00111111",
+        "job_filing_number": "SYNTHETIC-M00111111-S1",
+        "work_type": "PL"
+      },
+      {
+        "base_job_number": "SYNTHETIC-M00111111",
+        "job_filing_number": "SYNTHETIC-M00111111-S2",
+        "work_type": "EL"
+      }
+    ],
+    "expected_distinct_filing_count": 2,
+    "independent_issuance_truth": null,
+    "expected_decision": "DISTINCT_FILINGS_WITH_UNKNOWN_PERMIT_ISSUANCE"
+  },
+  "manifest_sha256": "dc9a97729dc6e92333b191d54b73e44767f5752960e45fd475a4b026d45a6eb3"
 }
