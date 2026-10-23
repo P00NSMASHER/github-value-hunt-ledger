@@ -66,7 +66,7 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
         feed = build_feed(doc, evidence, candidates, manifest)
         self.assertEqual(feed["feed_version"], VERSION)
         self.assertEqual(feed["frozen_v1_historical_cases"], 9)
-        self.assertEqual(feed["frozen_v1_official_source_matches"], 2)
+        self.assertEqual(feed["frozen_v1_official_source_matches"], 1)  # SEC matched; GAO is legacy corpus
         self.assertEqual(feed["source_pointers_total"], 5)
         self.assertEqual(feed["selected_for_synthetic_proof_gate"], 5)
         self.assertEqual(feed["verified_recovered_cash_cents"], 0)
