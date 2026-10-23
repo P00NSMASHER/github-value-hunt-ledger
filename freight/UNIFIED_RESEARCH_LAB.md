@@ -23,6 +23,13 @@ already-approved real-document and engine regression tests without user prompts.
 | CaptureBrief | SAM.gov opportunity and amendment sources, federal procurement archives and USAspending award data; existing historical/current-source controls. Current SAM API access requiring a key is not assumed. |
 | RecoveryOS | Original published vendor-payment and invoice disclosures, especially Pennine Care NHS spending CSVs, plus public procurement/payment metadata; nightly replay through the existing RecoveryWorks reconciliation kernel. |
 
+### Verified public catalog APIs (October 2026)
+
+- The former Data.gov CKAN v3 endpoint is **retired**. The documented replacement is the GSA Data.gov v4 metadata API, which requires an API key in production. This worker uses it only if the optional `RETALLY_DATAGOV_API_KEY` GitHub Actions secret exists; it never uses `DEMO_KEY` for automation.
+- Without that key, continue unattended via public GitHub/Zenodo metadata search. PermitPlate also checks the official NYC Socrata public dataset catalog. Only public dataset links/IDs are stored, not records, titles, invoice rows, contacts or login details.
+- Per-provider errors are recorded as bounded local error codes (e.g., HTTP_STATUS_404) without exposing private API responses. Partial provider success is displayed as a warning, not falsified full coverage.
+- Rebuild the legacy Lab 15 triage queue on every run before git staging. It is a derived view and is absent on a fresh branch until first generated; treating an absent optional file as a mandatory git path caused the first real run to fail.
+
 ### Source promotion rules
 
 A public link is only a **candidate**. Discovery itself does not fetch/save
