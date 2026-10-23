@@ -18,7 +18,7 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         self.assertEqual(m["pinned_input"]["entry_count"], 252)
         self.assertEqual(m["pinned_input"]["permitplate_assigned_pointers"], 42)
         self.assertEqual(m["partition"]["observed_wrong_topic_excluded"], 18)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 22)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 21)
         self.assertEqual(len(m["cases"]), 18)
         self.assertIn("UNVERIFIED", m["partition"]["remaining_status"])
 
@@ -60,8 +60,8 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         rows = m["context_only_candidates"]
         self.assertEqual(len(rows), 2)
         self.assertEqual(m["partition"]["context_only_unadjudicated"], 2)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 22)
-        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + len(rows) + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 21)
+        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + len(rows) + m["partition"]["application_only_unadjudicated"] + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
         self.assertEqual({r["url"].split("/")[-1] for r in rows}, {"64uk-42ks", "5zyy-y8am"})
         self.assertTrue(set(r["id"] for r in rows).isdisjoint(r["id"] for r in m["cases"]))
         for r in rows:
@@ -78,6 +78,35 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
                 self.assertIsNone(r["independent_permit_outcome_label"])
                 self.assertIn("UNVERIFIED", r["source_rights_state"])
                 self.assertIn("UNVERIFIED", r["source_truth_state"])
+
+
+    def test_official_dob_now_filing_application_is_not_issuance_truth(self):
+        m = self.pack
+        rows = m["application_only_candidates"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(m["partition"]["application_only_unadjudicated"], 1)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 21)
+        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + m["partition"]["context_only_unadjudicated"] + m["partition"]["application_only_unadjudicated"] + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
+        row = rows[0]
+        self.assertEqual(row["id"], digest(row["url"]))
+        self.assertEqual(row["first_seen"], "2026-10-22")
+        self.assertEqual(row["url"], "https://data.cityofnewyork.us/d/w9ak-ipjd")
+        self.assertTrue(permitplate_url_in_scope(row["url"]))  # topical candidate, not issued-permit proof
+        self.assertTrue(row["metadata_only"])
+        self.assertEqual(row["publisher_metadata_title"], "DOB NOW: Build – Job Application Filings")
+        self.assertTrue(row["publisher_catalog_reference"].startswith("https://catalog.data.gov/"))
+        self.assertEqual(row["expected_evaluation"], "DOB_NOW_APPLICATION_FILING_ONLY_ISSUANCE_UNKNOWN")
+        self.assertFalse(row["permit_issuance_ground_truth"])
+        self.assertFalse(row["independently_adjudicated"])
+        self.assertFalse(row["commercial_reuse_authorized"])
+        self.assertIsNone(row["original_source_bytes_sha256"])
+        self.assertIsNone(row["independent_permit_outcome_label"])
+        self.assertIn("UNVERIFIED", row["source_rights_state"])
+        self.assertIn("UNVERIFIED", row["source_truth_state"])
+        synthetic = m["synthetic_application_negative_control"]
+        self.assertEqual(synthetic["kind"], "SYNTHETIC")
+        self.assertEqual(synthetic["dataset_url"], row["url"])
+        self.assertEqual(synthetic["expected_issuance"], "UNKNOWN_NO_INDEPENDENT_ISSUANCE_PROOF")
 
     def test_never_promote_pointers_to_rights_accuracy_or_real_outcomes(self):
         m = self.pack
