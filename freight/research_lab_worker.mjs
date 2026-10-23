@@ -84,13 +84,17 @@ export function feedSpecs(engine, whenMs = 0) {
   // without increasing provider request volume or fetching original documents.
   const lap = Math.floor(whenMs / (300000 * ENGINES.length));
   const page = [1, 1, 2, 1, 3][lap % 5];
-  // Coprime 3-term and 5-page cycles cover 15 distinct query/page plans.
+  // One extra newest-first GitHub view per five runs; total request count stays fixed.
+  const newest = lap % 5 === 3;
+  // Three search topics x four distinct page/sort plans = 12 bounded views.
   const offset = lap % 3;
+  const githubOptions = (q) => ({q: q + " in:name,description", per_page:15, page,
+    ...(newest ? {sort:"updated", order:"desc"} : {})});
   const query = QUERIES[engine];
   const [q1, q2, q3] = [query[offset], query[(offset + 1) % 3], query[(offset + 2) % 3]];
   const feeds = [
-    {provider: "github", name: "github-primary", url: queryUrl("https://api.github.com/search/repositories", {q: q1 + " in:name,description", per_page: 15, page})},
-    {provider: "github", name: "github-secondary", url: queryUrl("https://api.github.com/search/repositories", {q: q2 + " in:name,description", per_page: 15, page})},
+    {provider: "github", name: "github-primary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q1))},
+    {provider: "github", name: "github-secondary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q2))},
     {provider: "zenodo", name: "zenodo-archive", url: queryUrl("https://zenodo.org/api/records", {q: q3, size: 15, page})},
   ];
   if (engine === "permitplate") {
