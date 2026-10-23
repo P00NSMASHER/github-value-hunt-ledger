@@ -34,9 +34,11 @@ function queryUrl(base, params) {
   return url.toString();
 }
 
-const PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = new Set(["43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"]);
+const PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = new Set(["pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"]);
+const PERMITPLATE_OFFICIAL_DOHMH_SOURCE = "https://data.cityofnewyork.us/d/43nn-pn8j";
 
 export function permitplateCandidateInScope(url) {
+  if (url === PERMITPLATE_OFFICIAL_DOHMH_SOURCE) return true;
   const path = new URL(url).pathname.toLowerCase().replace(/\/$/, "");
   return !/(restaurant|inspection|yelp|food[-_ ]?safety|dine[-_ ]?safe)/i.test(path)
     && !PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS.has(path.split("/").pop());
@@ -65,9 +67,10 @@ export function canonicalCandidates(provider, data) {
       const title = v && v.resource && v.resource.name;
       if (typeof id === "string" && /^[a-z0-9]{4}-[a-z0-9]{4}$/.test(id)
           && typeof title === "string"
-          && /\b(dob|building|construction)\b/i.test(title)
-          && /\b(permits?|filings?|applications?|certificates?)\b/i.test(title)
-          && !/\b(restaurant|inspection)\b/i.test(title)) {
+          && ((id === "43nn-pn8j" && title === "DOHMH New York City Restaurant Inspection Results")
+              || (/\b(dob|building|construction)\b/i.test(title)
+                  && /\b(permits?|filings?|applications?|certificates?)\b/i.test(title)
+                  && !/\b(restaurant|inspection)\b/i.test(title)))) {
         out.push("https://data.cityofnewyork.us/d/" + id);
       }
     }
