@@ -31,6 +31,7 @@ import zipfile
 from freight.canonical_schema import (
     ChargeLine, PackageFacts, build_record,
 )
+from freight import synthetic_rehearsal as legacy_rehearsal
 from freight.contracts import canonical_hash
 from freight.currency_reporting import (
     assert_currency_report_current, build_currency_settlement_report,
@@ -475,6 +476,50 @@ def concurrent_payment_sabotage(index:int) -> dict:
     return {"checks":checks,"accepted":accepted}
 
 
+def legacy_fullchain_variable_return(index:int) -> dict:
+    """Backstop the ORIGINAL all-stages commercial rehearsal to catch #647.
+
+    The v3 differential test must not disguise defects in the older public
+    3-invoice runner merely because new bespoke audit/ledger paths are green.
+    Synthetic 2000-cent carrier credit supports any exact return <= 2000.
+    """
+    cents=500 if index%17==0 else 1+(index*97)%1800
+    if index%17 and cents==500:
+        cents=501
+    csv_return=(
+        "counter_id,original_event_id,currency,amount_cents,observed_at,source_kind\n"
+        f"return-1,e-1,USD,{cents},2026-09-22T10:00:00Z,BANK-RETURN\n"
+    ).encode("ascii")
+    with patch.object(legacy_rehearsal,"COUNTER_CSV",csv_return):
+        outcome=legacy_rehearsal.run_rehearsal()
+    expected_net=4500-cents
+    expected_fee=2000-cents
+    observed_return=outcome["persistent_reporting"]["return_cents"]
+    return {
+        "checks":{
+            "source_report_return_cents":observed_return==cents,
+            "settlement_net_matches_independent_source":(
+                outcome["metrics"]["realized_cents"]==expected_net
+                and outcome["persistent_store"]["realized_cents"]==expected_net
+            ),
+            "eligible_fee_after_return_conserved":(
+                outcome["metrics"]["fee_eligible_realized_cents"]==expected_fee
+            ),
+            "source_only_not_real_customer_recovery":(
+                outcome["synthetic"] is True
+                and outcome["commercial_value_claimed"] is False
+                and outcome["carrier_action_external_action_performed"] is False
+            ),
+            "stale_snapshot_blocks_pre_return_metrics":(
+                outcome["persistent_reporting"]["stale_report_rejected"] is True
+            ),
+        },
+        "source_return_cents":cents,
+        "reported_return_cents":observed_return,
+        "known_legacy_issue":"#647" if observed_return!=cents else None,
+    }
+
+
 def run_one(index:int,out:Path) -> dict:
     base=run_v2_case(index,out)
     phases={"baseline_v2":base["status"]}
@@ -491,6 +536,7 @@ def run_one(index:int,out:Path) -> dict:
         ("forged_financial_receipts",lambda:forged_audit_receipt_probe(index)),
         ("two_claim_return_chaos",lambda:ledger_compound(index)),
         ("concurrent_provider_first_event",lambda:concurrent_payment_sabotage(index)),
+        ("legacy_original_report_variable_return",lambda:legacy_fullchain_variable_return(index)),
     ]
     counts=Counter()
     for name,fn in attacks:
@@ -567,6 +613,14 @@ def execute(out:Path):
         "failures_by_code":dict(sorted(findings.items())),
         "assertions_by_phase":dict(sorted(families.items())),
         "total_chaos_assertions":sum(families.values()),
+        "known_issue_647_reproductions":sum(
+            value for key,value in findings.items()
+            if key=="legacy_original_report_variable_return:source_report_return_cents"
+        ),
+        "distinct_new_failure_codes_excluding_647":len([
+            k for k in findings
+            if k!="legacy_original_report_variable_return:source_report_return_cents"
+        ]),
         "six_actual_native_rating_modes":list(MODES),
         "native_rate_variants_expected":100*len(MODES)*3,
         "customer_compound_invoice_mutations_expected_min":100*ATTACK_COUNT_TARGET,
