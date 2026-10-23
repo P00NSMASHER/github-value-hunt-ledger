@@ -166,7 +166,7 @@ def get_json(url: str) -> dict:
     return data
 
 
-PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
+PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
 PERMITPLATE_OFFICIAL_DOHMH_SOURCE = "https://data.cityofnewyork.us/d/43nn-pn8j"
 
 
