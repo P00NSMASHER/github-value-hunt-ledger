@@ -85,6 +85,37 @@ class NYCDOBScopeTest(unittest.TestCase):
             self.assertEqual(x['provenance_class'], 'SYNTHETIC_SCHEMA_NEGATIVE_CONTROL')
             self.assertIsNone(x['real_world_accuracy_label'])
 
+    def test_community_view_is_not_an_official_original_dataset(self):
+        """An NYC Open Data host/title does not establish DOB publisher endorsement."""
+        from freight.unified_research_lab import permitplate_catalog_in_scope, permitplate_url_in_scope
+        sample_path = FIXTURE.parent / 'nyc_dob_community_view_v1.json'
+        pack = json.loads(sample_path.read_text(encoding='utf-8'))
+        self.assertEqual(pack['evaluation_family'], 'GOVERNMENT_PERMIT_SOURCE_PROVENANCE_ONLY')
+        self.assertEqual(pack['real_record_count'], 0)
+        self.assertEqual(pack['independent_issuance_labels'], 0)
+        self.assertEqual(len(pack['synthetic_metadata_replays']), 2)
+        observed = {r['dataset_id']: r for r in pack['synthetic_metadata_replays']}
+        official = observed['rbx6-tga4']
+        community = observed['qnmk-7xra']
+        # Reproduce the precise limitation in the existing title-only scout.
+        for candidate in (official, community):
+            self.assertTrue(permitplate_catalog_in_scope(candidate['catalog_resource']))
+            self.assertTrue(permitplate_url_in_scope(candidate['source_url']))
+            self.assertFalse(candidate['commercial_reuse_authorized'])
+            self.assertIsNone(candidate['original_source_bytes_sha256'])
+            self.assertIsNone(candidate['independent_issuance_truth'])
+            self.assertEqual(candidate['provenance_class'], 'SYNTHETIC_CATALOG_METADATA_REPLAY')
+        self.assertFalse(community['portal_endorsed_view'])
+        self.assertEqual(community['catalog_kind'], 'COMMUNITY_CREATED_DERIVATIVE_VIEW')
+        self.assertEqual(community['parent_dataset_id'], 'rbx6-tga4')
+        self.assertEqual(community['expected_source_role'], 'DERIVED_VIEW_REVIEW_ONLY')
+        self.assertEqual(official['expected_source_role'], 'ORIGINAL_PUBLISHER_METADATA_RIGHTS_HELD')
+        self.assertEqual(official['catalog_kind'], 'ORIGINAL_DATASET')
+        # This is a fixture-level provenance gate, not a claim the scout was fixed.
+        self.assertEqual(
+            {r['dataset_id'] for r in observed.values() if r['catalog_kind'] == 'ORIGINAL_DATASET'
+             and r['portal_endorsed_view']}, {'rbx6-tga4'})
+
     def test_no_private_record_or_invented_commercial_evidence(self):
         dump = json.dumps(self.doc, sort_keys=True).lower()
         self.assertNotIn('customer_payment', dump)
