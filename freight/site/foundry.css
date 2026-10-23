@@ -1231,3 +1231,23 @@ a.brand.approved-brand-header>img.approved-brand-image{display:block;width:100%;
 .approved-brand-hero.native-hero img.native-hero-emblem{display:block;width:100%;height:auto;max-height:95px;object-fit:contain;object-position:left center;border:0!important;background:transparent;filter:drop-shadow(0 7px 14px rgba(0,173,116,.22))}
 @media(max-width:700px){.site-header a.brand.native-header img.native-brand-icon{width:56px;max-width:56px;min-width:56px}.site-header a.brand.native-header .native-brand-text strong{font-size:15px}.approved-brand-hero.native-hero{width:145px;max-width:40vw;margin-bottom:14px}}
 @media(max-width:410px){.site-header a.brand.native-header img.native-brand-icon{width:48px;max-width:48px;min-width:48px}.site-header a.brand.native-header .native-brand-text strong{font-size:13px}.site-header a.brand.native-header .native-brand-text small{font-size:8px}.site-header a.brand.approved-brand-header.native-header{gap:6px;max-width:195px!important}}
+
+
+/* Approved high-resolution RETALLY wordmark: preserve surrounding type scale. */
+img.retally-wordmark{
+  display:inline-block!important;
+  width:auto!important;
+  height:.79em!important;
+  max-width:min(100%,8em);
+  margin:0 .04em;
+  padding:.075em .12em;
+  box-sizing:content-box;
+  object-fit:contain;
+  vertical-align:-.035em;
+  background:#fff;
+  border:1px solid rgba(10,72,50,.12);
+  border-radius:.17em;
+  box-shadow:0 1px 4px rgba(0,31,26,.10);
+}
+a img.retally-wordmark{pointer-events:none}
+@media print{img.retally-wordmark{box-shadow:none}}
