@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from typing import Iterable
+import unicodedata
 
 from freight.contracts import canonical_hash
 
@@ -30,6 +31,14 @@ def _text(name: str, value: str) -> str:
     if any(ord(ch) < 32 for ch in value):
         raise ValueError(f"{name} contains control characters")
     return value
+
+
+def _economic_key(value: str) -> str:
+    """Reject aliases that could change incumbent matching or double-count value."""
+    checked = _text("economic_key", value)
+    if value != checked or not unicodedata.is_normalized("NFC", value):
+        raise ValueError("economic_key must be canonical (trimmed, NFC)")
+    return checked
 
 
 def _cents(name: str, value: int) -> int:
@@ -54,7 +63,7 @@ class IncumbentMatter:
 
     def __post_init__(self) -> None:
         _text("matter_id", self.matter_id)
-        _text("economic_key", self.economic_key)
+        _economic_key(self.economic_key)
         if self.state not in INCUMBENT_STATES:
             raise ValueError("unsupported incumbent state")
         _cents("amount_cents", self.amount_cents)
@@ -89,7 +98,7 @@ class ChallengeCandidate:
 
     def __post_init__(self) -> None:
         _text("candidate_id", self.candidate_id)
-        _text("economic_key", self.economic_key)
+        _economic_key(self.economic_key)
         _text("record_hash", self.record_hash)
         _text("category", self.category)
         _cents("billed_cents", self.billed_cents)
@@ -190,7 +199,18 @@ def challenge_incumbent(
         elif blockers:
             state = "REVIEW"
         elif matched:
-            state = "INCUMBENT_KNOWN"
+            # One incumbent credit or open claim might cover only part of the
+            # discrepancy. Multiple matters may overlap, so summing them can
+            # incorrectly hide a residual. Preserve REVIEW, not net-new dollars.
+            amounts = [
+                matter.amount_cents
+                for matter in incumbent_by_key[candidate.economic_key]
+            ]
+            if variance > max(amounts):
+                state = "REVIEW"
+                blockers.add("POTENTIAL_INCUMBENT_RESIDUAL")
+            else:
+                state = "INCUMBENT_KNOWN"
         else:
             state = "CHALLENGER_ONLY"
 
