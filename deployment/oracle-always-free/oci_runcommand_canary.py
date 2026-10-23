@@ -29,6 +29,7 @@ VM_SHAPE = auth.SHAPE
 MARKER = "RETALLY_OCI_SYNTHETIC_CANARY_V1_OK"
 PREFLIGHT_MARKER = "RETALLY_OCI_HOST_PREFLIGHT_V1_OK"
 INSTALL_MARKER = "RETALLY_OCI_SYNTHETIC_STAGE_INSTALLED_V1_OK"
+VERIFY_MARKER = "RETALLY_OCI_SYNTHETIC_STAGE_VERIFIED_V1_OK"
 AUTHORIZED_INSTALL_SHA = "bbd0588924662cda44359adcd93cc590b0e7efa4"
 AUTHORIZED_VM_OCID = (
     "ocid1.instance.oc1.iad.anuwcljtxrbeaqace4i2bpvhoj7sq7slikstmkea5tw3c3vqfjujjg6pduqq"
@@ -79,6 +80,8 @@ cleanup() {{
   case "$tmp" in /tmp/retally-host-install.*) rm -rf -- "$tmp" ;; esac
 }}
 trap cleanup EXIT
+log="$tmp/install.log"
+if ! (
 git clone --filter=blob:none --no-checkout \\
   https://github.com/P00NSMASHER/github-value-hunt-ledger.git "$tmp/repo"
 cd "$tmp/repo"
@@ -87,6 +90,10 @@ git checkout --detach "$sha"
 test "$(git rev-parse HEAD)" = "$sha"
 test -z "$(git status --porcelain)"
 RETALLY_MICRO_HOST=1 bash deployment/oracle-always-free/install-staging.sh "$sha"
+) >"$log" 2>&1; then
+  tail -c 900 "$log" >&2 || true
+  exit 1
+fi
 sudo -n test -d "/opt/retally/releases/$sha"
 test "$(readlink -f /opt/retally/current)" = "/opt/retally/releases/$sha"
 sudo -n test -d /var/lib/retally/synthetic-preview
@@ -97,12 +104,37 @@ if command -v ss >/dev/null; then
 fi
 printf '{INSTALL_MARKER}\\n'
 """
+VERIFY_SYNTHETIC_STAGE = f"""#!/bin/bash
+set -euo pipefail
+test "$(id -u)" -ne 0
+test "$(uname -m)" = x86_64
+command -v curl >/dev/null
+command -v python3 >/dev/null
+command -v sudo >/dev/null
+metadata="$(curl --noproxy '*' --fail --silent --show-error --max-time 3 \\
+  -H 'Authorization: Bearer Oracle' http://169.254.169.254/opc/v2/instance/)"
+printf '%s' "$metadata" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d.get("id") == "{AUTHORIZED_VM_OCID}"; assert d.get("shape") == "{VM_SHAPE}"'
+sha={AUTHORIZED_INSTALL_SHA}
+sudo -n test -d "/opt/retally/releases/$sha"
+test "$(readlink -f /opt/retally/current)" = "/opt/retally/releases/$sha"
+sudo -n test -d /var/lib/retally/synthetic-preview
+sudo -n test -f /etc/systemd/system/retally-synthetic.service
+sudo -n test -f /etc/systemd/system/retally-synthetic.service.d/oci-micro-memory.conf
+! systemctl is-active --quiet retally-synthetic.service
+! systemctl is-enabled --quiet retally-synthetic.service
+if command -v ss >/dev/null; then
+  ! sudo -n ss -ltnH | awk '{{print $4}}' | grep -Eq '(^|:)18765$'
+fi
+printf '{VERIFY_MARKER}\\n'
+"""
 OPERATIONS = {
     "canary": (CANARY, MARKER, "RETALLY synthetic no-write canary", 45),
     "host_preflight": (HOST_PREFLIGHT, PREFLIGHT_MARKER,
                        "RETALLY authorized host preflight", 120),
     "install_synthetic_stage": (INSTALL_SYNTHETIC_STAGE, INSTALL_MARKER,
                                 "RETALLY authorized synthetic staging install", 1200),
+    "verify_synthetic_stage": (VERIFY_SYNTHETIC_STAGE, VERIFY_MARKER,
+                               "RETALLY synthetic staging post-install verification", 120),
 }
 EXPECTED_KEYS = {
     "GITHUB_REPOSITORY": REPOSITORY,
