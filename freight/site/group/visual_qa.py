@@ -221,6 +221,10 @@ def check_company_cards(page, bases):
     found = {}
     for card in cards.all():
         title = " ".join(card.locator("h3").inner_text().split())
+        brand = card.locator("h3 img.retally-wordmark")
+        if brand.count():
+            assert brand.get_attribute("alt") == "RETALLY"
+            title = "RETALLY " + title
         link = card.locator(".card-end a")
         assert link.count() == 1
         check_keyboard_target(link)
