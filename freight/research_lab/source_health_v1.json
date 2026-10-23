@@ -1,0 +1,85 @@
+{
+  "as_of_utc_date": "2026-10-23",
+  "commercial_recovery_allowed": false,
+  "cross_engine_shared_pointers": 5,
+  "customer_communication_actions": 0,
+  "earliest_first_seen": "2026-10-22",
+  "engines": {
+    "capturebrief": {
+      "commercial_reuse_confirmed": false,
+      "independently_labeled_test_cases": 0,
+      "official_publisher_host_only": 2,
+      "other_allowlisted_host_only": 0,
+      "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
+      "source_pointers": 66,
+      "third_party_catalog_host_only": 64,
+      "usable_as_engine_ground_truth": false,
+      "wrong_topic_url_heuristic_review_only": 0
+    },
+    "freightrecovery": {
+      "commercial_reuse_confirmed": false,
+      "independently_labeled_test_cases": 0,
+      "official_publisher_host_only": 9,
+      "other_allowlisted_host_only": 0,
+      "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
+      "source_pointers": 78,
+      "third_party_catalog_host_only": 69,
+      "usable_as_engine_ground_truth": false,
+      "wrong_topic_url_heuristic_review_only": 0
+    },
+    "permitplate": {
+      "commercial_reuse_confirmed": false,
+      "independently_labeled_test_cases": 0,
+      "official_publisher_host_only": 22,
+      "other_allowlisted_host_only": 0,
+      "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
+      "source_pointers": 97,
+      "third_party_catalog_host_only": 75,
+      "usable_as_engine_ground_truth": false,
+      "wrong_topic_url_heuristic_review_only": 18
+    },
+    "recoveryos": {
+      "commercial_reuse_confirmed": false,
+      "independently_labeled_test_cases": 0,
+      "official_publisher_host_only": 1,
+      "other_allowlisted_host_only": 0,
+      "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
+      "source_pointers": 81,
+      "third_party_catalog_host_only": 80,
+      "usable_as_engine_ground_truth": false,
+      "wrong_topic_url_heuristic_review_only": 0
+    }
+  },
+  "first_seen_in_last_seven_calendar_days": 317,
+  "independent_payment_verification_cases": 0,
+  "latest_first_seen": "2026-10-23",
+  "limitations": [
+    "Publisher host identity does not establish source authenticity, rights, relevance or ground truth.",
+    "URL-only topic flags are screening heuristics, not verified classifications.",
+    "Newly discovered pointers are not new independently usable test cases."
+  ],
+  "permitplate_wrong_topic_heuristic_flags": 18,
+  "production_changes": 0,
+  "publisher_host_counts": {
+    "api.usaspending.gov": 1,
+    "data.cityofnewyork.us": 22,
+    "github.com": 97,
+    "media.cadc.uscourts.gov": 1,
+    "sam.gov": 1,
+    "www.eia.gov": 1,
+    "www.fmc.gov": 1,
+    "www.gao.gov": 2,
+    "www.penninecare.nhs.uk": 1,
+    "www.sec.gov": 2,
+    "www.stb.gov": 1,
+    "www2.fmc.gov": 1,
+    "zenodo.org": 186
+  },
+  "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
+  "schema_version": 1,
+  "source_document_bytes_stored": 0,
+  "source_ledger_entries_sha256": "0a67900f03675b857f1b169aeb02eff67df997ca4109f4fbda14b1985cb6cf5b",
+  "unique_source_pointers": 317,
+  "verified_original_document_benchmark_truth_cases": 0,
+  "verified_recovered_cash_cents": 0
+}

@@ -20,6 +20,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "00a82e9bfc0b879d1b571f827a38d1e76e9e257bcd13d9f6244f3c27da418734",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/21061248"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -918,6 +934,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "258bd9e57b37b0fd3ca41c7245b2aba996d1917ae6a43e35eb52468b364f52bc",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/22764740"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -1062,6 +1094,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "31c703b10000f8b93366ae9fe2b2e28654043da92a87fd752038d3186a809846",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/23033607"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -1137,6 +1185,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/10895226"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "346cba22b7a131ff7df406f5003c060a02afadc473e5510cb1fb5050de907df9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/3779542"
     },
     {
       "commercial_reuse_authorized": false,
@@ -3383,6 +3447,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "ae6da98cc9a1d8084d58ee665284702a222c448147e19e26e237989d3bacf904",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/15118177"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -3394,6 +3474,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "af4b40fd632f2379c85fb9d4f52cda8a4cb65a97f275fb6d94fcd9bf7f116230",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/11091029"
     },
     {
       "commercial_reuse_authorized": false,
@@ -3522,6 +3618,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/17288128"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "b8069318d0603f18490d1168c824e05826dd37adbda77ef3663ec8a0b5be2957",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/18754351"
     },
     {
       "commercial_reuse_authorized": false,
@@ -3799,6 +3911,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "caed9ab2f2f01c054e9fbd147f430473667e06a9c4cbe39e2323d6cd2d3cff35",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/16900668"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -3963,6 +4091,22 @@
         "permitplate"
       ],
       "first_seen": "2026-10-23",
+      "id": "cd977bb1eff6628e8e21528d72142cb31576c6bc78d95ab451b0c8cc7b285ee3",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/12527390"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
       "id": "cda2d701fd4759c405ba261088c9e06020363540b4b2719570184ff3f3795c01",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -4099,6 +4243,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/garyhe231/FreightInvoiceAgent"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "d5b28e5055e757758e7da0b001c09c90be1fafb48e224dfe05e382d8c4da2820",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/226871"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4377,6 +4537,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "e8647ba424f90cd924b32dad37a88e350a21120077f25a2e666daa5177c6eddf",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/3382984"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -4468,6 +4644,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/23470229"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "f05b509158d3e66b587c8837d393c2d559a89bc3c1dc335d9ec3ab96ce00475c",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/15629621"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4886,6 +5078,6 @@
       "url": "https://github.com/EdouardAndre/Hackathon-HEC"
     }
   ],
-  "entries_sha256": "a4b4b4552aa77950d6c5efe49c62699c96439c9b236965d774c48d0891677e1c",
+  "entries_sha256": "0a67900f03675b857f1b169aeb02eff67df997ca4109f4fbda14b1985cb6cf5b",
   "schema_version": 1
 }
