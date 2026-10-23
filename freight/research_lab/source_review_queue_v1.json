@@ -1,0 +1,656 @@
+{
+  "as_of_utc_date": "2026-10-23",
+  "commercial_recovery_allowed": false,
+  "customer_contact_actions": 0,
+  "engines": {
+    "capturebrief": {
+      "candidate_classes": {
+        "official_publisher_host_url_only": 0,
+        "pinned_public_anchor_url_only": 2,
+        "third_party_path_topic_hints_only": 6,
+        "unclassified_third_party_catalogs_only": 65
+      },
+      "catalog_source_associations": 73,
+      "commercial_use_approved": false,
+      "independent_benchmark_truth_cases_from_queue": 0,
+      "missing_benchmark_evidence": [
+        "ORIGINAL_SOLICITATION_AMENDMENT_CUSTODY_NOT_ESTABLISHED",
+        "RELEASE_TIME_AS_OF_HISTORY_NOT_VERIFIED",
+        "AWARD_OUTCOME_LINKAGE_NOT_ADJUDICATED",
+        "INDEPENDENT_POSITIVE_AND_NEGATIVE_LABELS_MISSING"
+      ],
+      "priority_review_queue": [
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-22",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://sam.gov/opportunities",
+          "publisher_host": "sam.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "0973a0fc47001c83e3cd7a9f495821a4398caaab469bc5907f719b8fd0b37e43",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-22",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://api.usaspending.gov/docs/endpoints",
+          "publisher_host": "api.usaspending.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "c95ab3d08065c413405b611483719c147a03d675d8d736ed2321a924f368421e",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/BradleyBrewington/federal-contract-scanner",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "2613dd0299b6193e4333229f624656fd7f3f8295a650d79314c46a01faad61f7",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/biborsz/Search-Federal-Contract-Opportunities",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "5b12c0b41bee275ef622129b4d87ce48c197ab6127a254a2f1f70f3a3268d549",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/clovrecich/federal-contract-awards-2026-sample",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "5c901785d2d5261256211c1a277c12190a9fd10facff5ad9b1a0c3627732a896",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/fedmineusa/Federal-Government-Contracts",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "b8a6e47c5a9c0b1416f3342fe3b2927e829c25ef33d694fdf9d661a288e3fd81",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/cadmusjl/federal-contracting-monitor",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "d3c8ddb210358a4339fc204d08d10d1f14f79f2102cb62df3c9e48dfba780282",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/kdpglobalenterprises-ui/kdp-federal-contract-database",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "d6ccdd2c2fb1903b21cad39be98f79c0e0f595503b59b6f2dc683debf901e8da",
+          "source_provenance_verified": false
+        }
+      ],
+      "ranked_for_manual_evidence_review": 8,
+      "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
+      "unverified_candidates_after_url_screen": 73,
+      "url_only_topic_exclusions_not_deleted": 0
+    },
+    "freightrecovery": {
+      "candidate_classes": {
+        "official_publisher_host_url_only": 6,
+        "pinned_public_anchor_url_only": 3,
+        "third_party_path_topic_hints_only": 12,
+        "unclassified_third_party_catalogs_only": 74
+      },
+      "catalog_source_associations": 95,
+      "commercial_use_approved": false,
+      "independent_benchmark_truth_cases_from_queue": 0,
+      "missing_benchmark_evidence": [
+        "ORIGINAL_INVOICE_CUSTODY_NOT_ESTABLISHED",
+        "BUYER_SPECIFIC_EFFECTIVE_RATE_AUTHORITY_MISSING",
+        "INDEPENDENT_SHIPMENT_AND_BOL_LINK_MISSING",
+        "PAYMENT_OR_CREDIT_CHAIN_MISSING",
+        "ADJUDICATED_POSITIVE_AND_NEGATIVE_LABELS_MISSING"
+      ],
+      "priority_review_queue": [
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-22",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.gao.gov/products/b-143246",
+          "publisher_host": "www.gao.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "3f4e85181b8ac551ac0672c7c2775cb4509b253a3a0f1c0644f4b16bd30d1e54",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-22",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.gao.gov/products/b-160344",
+          "publisher_host": "www.gao.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "882ff7c1cd852aba866aa25ce751713c954753e93eb9c37917b72f295c26336c",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.stb.gov/reports-data/waybill/",
+          "publisher_host": "www.stb.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "e314cb3bfa9a7ed441175c7345b4d00dd8cb8c1f783247992143405b1e1d4f51",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.eia.gov/petroleum/gasdiesel/",
+          "publisher_host": "www.eia.gov",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "0a64fc868887fdb87525653b212af5afb1341fc3836c3517d4327e4202e162e7",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+          "publisher_host": "media.cadc.uscourts.gov",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "225fa0627b37ba14e178b9abbe241e7ca2fe2f947c23526aac777a09e53412ec",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+          "publisher_host": "www2.fmc.gov",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "43d6b19d5016f6e000709271cfbed51f43dd53bf946edf868e188be83a80385d",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
+          "publisher_host": "www.sec.gov",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "ae7eebe6f443a28c45288fa3e0741a6844998b38d9d52d30106004d63fcff47a",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
+          "publisher_host": "www.fmc.gov",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "ea8c19d80d25580407260cfddc10e5d474f2db7c3cf126e3b958b90481e2f212",
+          "source_provenance_verified": false
+        }
+      ],
+      "ranked_for_manual_evidence_review": 8,
+      "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
+      "unverified_candidates_after_url_screen": 95,
+      "url_only_topic_exclusions_not_deleted": 0
+    },
+    "permitplate": {
+      "candidate_classes": {
+        "official_publisher_host_url_only": 18,
+        "pinned_public_anchor_url_only": 3,
+        "third_party_path_topic_hints_only": 16,
+        "unclassified_third_party_catalogs_only": 105
+      },
+      "catalog_source_associations": 160,
+      "commercial_use_approved": false,
+      "independent_benchmark_truth_cases_from_queue": 0,
+      "missing_benchmark_evidence": [
+        "ORIGINAL_PERMIT_RECORD_CUSTODY_NOT_ESTABLISHED",
+        "APPLICATION_VERSUS_ISSUANCE_SCOPE_NOT_ADJUDICATED",
+        "INDEPENDENT_PERMIT_STATUS_AND_JOIN_NOT_ESTABLISHED",
+        "HELD_OUT_OPPORTUNITY_OUTCOME_LABELS_MISSING"
+      ],
+      "priority_review_queue": [
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-22",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "4b0648ba1f0661d275ea86c01d2172930858dc7930fbec3ca62c0294d627fb20",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "9478df1e302b2ea8b8b1bd33fd42cbb3b0ca47e2d8ef9690212c8522909e0e0a",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/ipu4-2q9a",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "f397ef68e184160f1bf3636ffaf3c40cf3118290d6f3c152f0d958202c091416",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/e98g-f8hy",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "086420a3d6416cc53fecc27883272ec0efacaf42923379bc3dbd4d81c62a5af5",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/64uk-42ks",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "0a560f06b0ac7d352d7247ff0a1015f3534c0b8c6351b2552da028b20be0ba90",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "0bb03faa2772254ecf8e9a432b0f3706ada3abf84f8531906a9098b181683e27",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/xxbr-ypig",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "0e5c3dcf689926137cc2e000712633b65b87eecc4310d51b9bf367849adba130",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://data.cityofnewyork.us/d/4k4u-823g",
+          "publisher_host": "data.cityofnewyork.us",
+          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "1cc4aa15aad0dc99730e5eaf6237488a635ea03c38cad0cb9dec1148a372592c",
+          "source_provenance_verified": false
+        }
+      ],
+      "ranked_for_manual_evidence_review": 8,
+      "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
+      "unverified_candidates_after_url_screen": 142,
+      "url_only_topic_exclusions_not_deleted": 18
+    },
+    "recoveryos": {
+      "candidate_classes": {
+        "official_publisher_host_url_only": 0,
+        "pinned_public_anchor_url_only": 1,
+        "third_party_path_topic_hints_only": 21,
+        "unclassified_third_party_catalogs_only": 80
+      },
+      "catalog_source_associations": 102,
+      "commercial_use_approved": false,
+      "independent_benchmark_truth_cases_from_queue": 0,
+      "missing_benchmark_evidence": [
+        "ORIGINAL_INVOICE_PAYMENT_SOURCE_CUSTODY_NOT_ESTABLISHED",
+        "EFFECTIVE_VENDOR_CONTRACT_TERMS_MISSING",
+        "INDEPENDENT_PAYMENT_AND_CREDIT_CHAIN_MISSING",
+        "ADJUDICATED_OVERPAYMENT_AND_CLEAN_LABELS_MISSING"
+      ],
+      "priority_review_queue": [
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-22",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.penninecare.nhs.uk/download_file/5855/277",
+          "publisher_host": "www.penninecare.nhs.uk",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "66f4a379ccde1d6d6e71ff2ffc06df2d1e527aec5307600c1a67eaf1568d1dc6",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/tahasiddiquii/invoice-ap-agent",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "07967d4400ef5047586e39bb8e1c065ca2430be4451b2f4b31b6a36298fc1b5a",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/webdeveloperqumi-maker/supplier-invoice-audit-system",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "160d87244f7f007785792bbd8a09550a197ef33d5438a5b3471c869feb4f7d59",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/izabelalvares/accounts_payable_DRF",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "1a2f59c90d4aebe692ca7a094a3587f04089845653fcdcd8d2cfd8a151745755",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/HUGOOMP93/sap-project1-invoices",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "1d26c3ac320f5b62e2683ef7b56e5fc9cd59e380c574f78dc6e7accf5b54de6e",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/colinrisler-cortex/accounts-payable",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "3c0e95fafc925338121ace801c87ae0eec2b48218a7e73e10aa0ef1a4e010c26",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/calyaconsult/accounts-payable-receivable-forms",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "47c2e1a057964b31af33dd4de7849a60d7c4822e5000867950b86a053ebc4152",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-23",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/Jamieseah08/Payment-supplier-Invoices",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "49be147d394da3b53c2bfbd892ec31df6ad1a8115e0c07cf10864dcb552dccf7",
+          "source_provenance_verified": false
+        }
+      ],
+      "ranked_for_manual_evidence_review": 8,
+      "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
+      "unverified_candidates_after_url_screen": 102,
+      "url_only_topic_exclusions_not_deleted": 0
+    }
+  },
+  "external_document_bytes_saved": 0,
+  "independent_outcome_labels_promoted": 0,
+  "max_review_candidates_per_engine": 8,
+  "production_changes": 0,
+  "queue_sha256": "2aefedd567d1a8f2a1e58f3d009654cffb795b19136f269bc77334acc27fc0cb",
+  "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
+  "real_customer_cases_promoted": 0,
+  "schema_version": 1,
+  "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
+  "source_ledger_entries_sha256": "5d40d4938de927dc7092656c6a472052d7b76abe784dc78d2988affa80ed7c5e",
+  "unique_public_source_references": 422,
+  "verified_recovered_cash_cents": 0
+}
