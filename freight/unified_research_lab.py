@@ -154,7 +154,13 @@ def get_json(url: str) -> dict:
         raise ResearchError("PUBLIC_SOURCE_UNAVAILABLE") from exc
     if not body or len(body) > MAX_BODY:
         raise ResearchError("RESPONSE_SIZE_REJECTED")
-    data = json.loads(body)
+    try:
+        data = json.loads(body)
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        # A public metadata endpoint may serve malformed or incorrectly encoded
+        # JSON without preventing independent engine lanes from progressing.
+        # Never echo untrusted provider response text into run diagnostics.
+        raise ResearchError("SOURCE_JSON_INVALID") from exc
     if type(data) is not dict:
         raise ResearchError("SOURCE_JSON_INVALID")
     return data
@@ -417,6 +423,11 @@ def mirror_scout_all(*, ledger: Path, now: datetime, fetch=get_json) -> dict:
             per_engine[engine] = {"available": len(rows), "new": added}
         except ResearchError as exc:
             errors.append(engine + ":" + str(exc))
+            per_engine[engine] = {"available": 0, "new": 0}
+        except (ValueError, KeyError, TypeError, UnicodeDecodeError) as exc:
+            # Keep a single unexpectedly malformed scout response isolated.
+            # Diagnostics expose only a bounded, code-owned exception category.
+            errors.append(engine + ":UNTRUSTED_SCOUT_RESPONSE_" + type(exc).__name__)
             per_engine[engine] = {"available": 0, "new": 0}
     if revised != original:
         ledger.parent.mkdir(parents=True, exist_ok=True)

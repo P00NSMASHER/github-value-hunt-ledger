@@ -13,7 +13,7 @@ from unittest.mock import patch
 from freight.unified_research_lab import (
     ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
-    mirror_scout_all,
+    mirror_scout_all, get_json,
 )
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
@@ -307,6 +307,49 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertIn(prior, revised["entries"])
         self.assertTrue(any("NYC-DOB-Building-Permits" in row["url"]
                             for row in revised["entries"]))
+
+
+    def test_mirror_survives_one_malformed_provider_without_losing_other_lanes(self):
+        urls = {
+            "freightrecovery": "https://www.gao.gov/products/b-160344",
+            "permitplate": "https://data.cityofnewyork.us/d/rbx6-tga4",
+            "recoveryos": "https://www.penninecare.nhs.uk/download_file/5855/277",
+        }
+        def fetch(url):
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            if engine == "capturebrief":
+                raise ValueError("untrusted provider text must not leak")
+            return {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": [{"url": urls[engine], "first_seen": "2026-10-22"}]}
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Path(root) / "sources.json"
+            result = mirror_scout_all(ledger=ledger, now=NOW, fetch=fetch)
+            self.assertEqual(result["new_leads"], 3)
+            self.assertEqual(len(result["feed_errors"]), 1)
+            self.assertEqual(result["feed_errors"][0],
+                             "capturebrief:UNTRUSTED_SCOUT_RESPONSE_ValueError")
+            self.assertNotIn("untrusted provider text", str(result))
+            self.assertEqual(len(read_ledger(ledger)["entries"]), 3)
+            self.assertEqual(result["third_party_documents_saved"], 0)
+            self.assertEqual(result["customer_contact_actions"], 0)
+
+    def test_json_provider_invalid_response_is_bounded_error_not_raw_body(self):
+        from contextlib import nullcontext
+        url = "https://api.github.com/search/repositories?q=metadata"
+        class Response:
+            status = 200
+            headers = {"Content-Type": "application/json"}
+            def geturl(self):
+                return url
+            def read(self, limit):
+                return b'{"not-a-valid-object":'
+        with patch("freight.unified_research_lab.global_dns"):
+            with patch("freight.unified_research_lab.build_opener") as opener:
+                opener.return_value.open.return_value = nullcontext(Response())
+                with self.assertRaisesRegex(ResearchError, "SOURCE_JSON_INVALID"):
+                    get_json(url)
+
 
 
 if __name__ == "__main__":
