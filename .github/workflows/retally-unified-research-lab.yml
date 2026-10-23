@@ -78,6 +78,9 @@ jobs:
       - name: Prove research safety properties before public network access
         run: python -m unittest -q freight.test_unified_research_lab
       - name: Discover real public-data source leads without storing source content
+        env:
+          # Optional official Data.gov v4 key; absent by default. No DEMO_KEY.
+          RETALLY_DATAGOV_API_KEY: ${{ secrets.RETALLY_DATAGOV_API_KEY }}
         run: |
           set -euo pipefail
           python -m freight.unified_research_lab --live | tee /tmp/retally-research-run.json
