@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, cycle} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, providerMetadataInScope, cycle} from "./research_lab_worker.mjs";
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -16,24 +16,24 @@ test("all four engines have bounded catalog-only probes", () => {
 });
 test("source IDs, not arbitrary metadata or private source rows, enter discovery", ()=>{
   assert.deepEqual(canonicalCandidates("github",{items:[
-    {html_url:"https://github.com/owner/source-data",description:"PERSON@PRIVATE.COM"},
+    {html_url:"https://github.com/owner/source-data",name:"freight-invoice-data",description:"PERSON@PRIVATE.COM"},
     {html_url:"https://github.com/owner/repo?token=secret"},
     {html_url:"http://localhost/private"},
-  ]}),["https://github.com/owner/source-data"]);
+  ]},"freightrecovery"),["https://github.com/owner/source-data"]);
   assert.deepEqual(canonicalCandidates("zenodo",{hits:{hits:[
-    {id:987654321,files:[{key:"confidential-document.pdf"}]},
+    {id:987654321,metadata:{title:"LTL freight tariff dataset"},files:[{key:"confidential-document.pdf"}]},
     {id:"../123"},
-  ]}}),["https://zenodo.org/records/987654321"]);
+  ]}},"freightrecovery"),["https://zenodo.org/records/987654321"]);
   assert.deepEqual(canonicalCandidates("socrata",{results:[
     {resource:{id:"abcd-1234",name:"DOB NOW: Build – Approved Permits"}},
     {resource:{id:"../../passwd"}},
-  ]}),["https://data.cityofnewyork.us/d/abcd-1234"]);
+  ]},"permitplate"),["https://data.cityofnewyork.us/d/abcd-1234"]);
 });
 test("missing or malformed API responses fail closed", ()=>{
   for(const p of ["github","zenodo","socrata"]){
-    assert.throws(()=>canonicalCandidates(p,{bad:[]}),/INVALID_ITEMS/);
+    assert.throws(()=>canonicalCandidates(p,{bad:[]},p==="socrata"?"permitplate":"freightrecovery"),/INVALID_ITEMS/);
   }
-  assert.throws(()=>canonicalCandidates("wrong",{items:[]}),/UNSUPPORTED_PROVIDER/);
+  assert.throws(()=>canonicalCandidates("wrong",{items:[]}, "freightrecovery"),/UNSUPPORTED_PROVIDER/);
   assert.throws(()=>feedSpecs("unknown"),/INVALID_ENGINE/);
 });
 test("public HTTP interface has read-only GET handlers only",async()=>{
@@ -60,7 +60,7 @@ test("public metadata fetch parses bounded valid JSON",async()=>{
   try{
     globalThis.fetch=async(url,options)=>{
       assert.equal(options.redirect,"manual");
-      return new Response(JSON.stringify({items:[{html_url:"https://github.com/test/example"}]}),
+      return new Response(JSON.stringify({items:[{html_url:"https://github.com/test/example",name:"freight-invoice-data"}]}),
         {status:200,headers:{"content-type":"application/json"}});
     };
     assert.deepEqual(await fetchCatalog(feedSpecs("freightrecovery")[0]),
@@ -88,7 +88,7 @@ test("PermitPlate excludes restaurant inspection catalogs from its permit leads"
     {resource:{id:"rbx6-tga4",name:"DOB NOW: Build – Approved Permits"}},
     {resource:{id:"ipu4-2q9a",name:"DOB Permit Issuance"}},
     {resource:{id:"w9ak-ipjd",name:"DOB NOW: Job Application Filings"}},
-  ]}), [
+  ]},"permitplate"), [
     "https://data.cityofnewyork.us/d/ipu4-2q9a",
     "https://data.cityofnewyork.us/d/rbx6-tga4",
     "https://data.cityofnewyork.us/d/w9ak-ipjd",
@@ -202,7 +202,7 @@ test("GitHub rate limit skips secondary request and writes a degraded receipt",a
       seen.push(String(url));
       if(String(url).includes("api.github.com"))
         return new Response("",{status:429});
-      return new Response(JSON.stringify({hits:{hits:[{id:12345}]}}),
+      return new Response(JSON.stringify({hits:{hits:[{id:12345,metadata:{title:"Freight invoice dataset"}}]}}),
         {status:200,headers:{"content-type":"application/json"}});
     };
     const result=await cycle({RESEARCH_DB:db},Date.UTC(2026,9,23,12,0));
@@ -262,4 +262,49 @@ test("malformed feed pagination inputs reject before querying D1",async()=>{
     );
     assert.equal(result.status,400,suffix);
   }
+});
+
+
+test("all four engine lanes reject obviously off-topic public metadata without storing text",()=>{
+  const cases=[
+    ["freightrecovery", "Freight invoice tariff dataset", "Baking and dining recipes"],
+    ["permitplate", "NYC DOB NOW approved building permits", "NYC restaurant inspection permits"],
+    ["capturebrief", "Federal solicitation contract awards", "Professional basketball boxscores"],
+    ["recoveryos", "Accounts payable supplier invoice reconciliation", "Wildlife photography archive"],
+  ];
+  for(const [engine,good,bad] of cases){
+    for(const provider of ["github","zenodo"]){
+      const correct=provider==="github"?{name:"generic",description:good}:
+        {metadata:{title:good}};
+      const wrong=provider==="github"?{name:"generic",description:bad}:
+        {metadata:{title:bad}};
+      assert.equal(providerMetadataInScope(engine,provider,correct),true,engine+"/"+provider);
+      assert.equal(providerMetadataInScope(engine,provider,wrong),false,engine+"/"+provider);
+    }
+    const output=canonicalCandidates("github",{items:[
+      {html_url:"https://github.com/synthetic-fixture/public-evidence-1",
+        name:"generic-source",description:good+" PRIVATE@TEST.INVALID"},
+      {html_url:"https://github.com/synthetic-fixture/off-topic-2",
+        name:"generic-source",description:bad},
+      {html_url:"https://github.com/synthetic-fixture/unknown-3"},
+    ]},engine);
+    assert.deepEqual(output,["https://github.com/synthetic-fixture/public-evidence-1"]);
+    assert.ok(!JSON.stringify(output).includes("PRIVATE@TEST.INVALID"));
+  }
+  assert.equal(providerMetadataInScope("recoveryos","zenodo",{metadata:{creators:["Private"]}}),false);
+  assert.equal(providerMetadataInScope("recoveryos","github",{name:"",description:""}),false);
+  assert.throws(()=>providerMetadataInScope("bogus","github",{name:"freight"}),/INVALID_ENGINE/);
+  assert.throws(()=>providerMetadataInScope("freightrecovery","socrata",{}),/UNSUPPORTED_PROVIDER/);
+});
+
+test("Zenodo record IDs require bounded, engine-specific title evidence",()=>{
+  const response={hits:{hits:[
+    {id:55,metadata:{title:"Supplier payment invoice reconciliation"}},
+    {id:56,metadata:{title:"Biology reference photographs"}},
+    {id:57,metadata:{creators:["untrusted name"]}},
+    {id:"../99",metadata:{title:"Supplier invoice dataset"}},
+  ]}};
+  assert.deepEqual(canonicalCandidates("zenodo",response,"recoveryos"),[
+    "https://zenodo.org/records/55",
+  ]);
 });
