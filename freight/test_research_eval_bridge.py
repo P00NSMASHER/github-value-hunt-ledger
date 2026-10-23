@@ -181,6 +181,7 @@ class ResearchEvaluationBridgeTests(unittest.TestCase):
         old["records"][0]["title"] = "real customer name that stays in the legacy ledger"
         old["records"][0]["sha256"] = "a" * 64
         old["records"][0]["bytes_seen"] = 1000
+        old["records"][0]["content_version"] = 1
         old["records"][0]["state"] = "PUBLIC_SOURCE_FINGERPRINTED"
         document = build_feed(master, old, harvest)
         output = json.dumps(document)
