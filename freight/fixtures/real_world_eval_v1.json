@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "RETALLY_REAL_WORLD_FREIGHT_EVAL_V1",
+  "as_of": "2026-10-22",
+  "classification": "PUBLIC_SOURCE_NUMERIC_FACTS_AND_SYNTHETIC_ENGINE_PROBES",
+  "policies": {
+    "original_documents_included": false,
+    "customer_data_included": false,
+    "commercial_processing_authorized": false,
+    "external_action_authorized": false,
+    "verified_customer_recovered_cents": 0,
+    "source_byte_sha256_available": false,
+    "independent_accuracy_scoring_authorized": false
+  },
+  "cases": [
+    {
+      "id": "BIG_G_2026_FACE",
+      "category": "PUBLIC_INVOICE_FACE",
+      "publisher": "Big G Express",
+      "source_url": "https://extranet4.biggexpress.com/",
+      "locator_policy": "INVOICE_SPECIFIC_URL_WITHHELD_FROM_PUBLIC_REPO",
+      "rights": "UNVERIFIED_FOR_COMMERCIAL_REUSE",
+      "original_bytes_sha256": null,
+      "expected_action": "REVIEW_REQUIRED",
+      "facts": {
+        "invoice_date": "2026-02-18",
+        "shipment_date": "2026-02-27",
+        "mode": "TL",
+        "linehaul_cents": 38700,
+        "fuel_cents": 5016,
+        "total_cents": 43716,
+        "anomaly": "INVOICE_PREDATES_SHIPMENT"
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "PYLE_2021_FACE",
+      "category": "PUBLIC_INVOICE_FACE",
+      "publisher": "A. Duie Pyle",
+      "source_url": "https://cw.shipandsave.com/",
+      "locator_policy": "INVOICE_SPECIFIC_URL_WITHHELD_FROM_PUBLIC_REPO",
+      "rights": "UNVERIFIED_FOR_COMMERCIAL_REUSE",
+      "original_bytes_sha256": null,
+      "expected_action": "REVIEW_REQUIRED",
+      "facts": {
+        "invoice_date": "2021-09-21",
+        "shipment_date": "2021-09-08",
+        "mode": "LTL",
+        "linehaul_cents": 11859,
+        "liftgate_cents": 5913,
+        "fuel_cents": 1720,
+        "fuel_rate_bps": 1450,
+        "total_cents": 19492,
+        "anomaly": "NONE_ON_FACE_ARITHMETIC"
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "EVERGREEN_TCW_2026_COURT",
+      "category": "OFFICIAL_ADJUDICATION_REFERENCE",
+      "publisher": "U.S. Court of Appeals D.C. Circuit",
+      "source_url": "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+      "locator_policy": "OFFICIAL_PUBLIC_DECISION",
+      "rights": "GOVERNMENT_PUBLICATION_REFERENCE",
+      "original_bytes_sha256": null,
+      "expected_action": "LEGAL_REFERENCE_ONLY",
+      "facts": {
+        "decision_date": "2026-04-28",
+        "invoice_detention_cents": 149000,
+        "disputed_cents": 51000,
+        "container_daily_cents": 15000,
+        "chassis_daily_cents": 2000,
+        "port_closed_days": 3,
+        "disposition": "DISPUTED_CHARGES_HELD_UNREASONABLE"
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "GIBSON_FMC_2030I",
+      "category": "OFFICIAL_ADJUDICATION_REFERENCE",
+      "publisher": "Federal Maritime Commission",
+      "source_url": "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+      "locator_policy": "OFFICIAL_PUBLIC_DECISION",
+      "rights": "GOVERNMENT_PUBLICATION_REFERENCE",
+      "original_bytes_sha256": null,
+      "expected_action": "LEGAL_REFERENCE_ONLY",
+      "facts": {
+        "notice_date": "2026-04-28",
+        "reparations_cents": 866879,
+        "interest_cents": 98572,
+        "total_award_cents": 965451,
+        "disposition": "SMALL_CLAIMS_DECISION_ADMINISTRATIVELY_FINAL"
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "BAKERLY_SEAFRIGO_FMC",
+      "category": "OFFICIAL_ADJUDICATION_REFERENCE",
+      "publisher": "Federal Maritime Commission",
+      "source_url": "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
+      "locator_policy": "OFFICIAL_COMMISSION_DECISION_COLLECTION",
+      "rights": "GOVERNMENT_PUBLICATION_REFERENCE",
+      "original_bytes_sha256": null,
+      "expected_action": "LEGAL_NEGATIVE_CONTROL",
+      "facts": {
+        "approximate_disputed_cents": 277492342,
+        "disposition": "SHIPPING_ACT_CLAIMS_DISMISSED",
+        "meaning": "DO_NOT_INFER_OVERCHARGE_OR_EVERY_CHARGE_VALID"
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "TESORO_2011_TRUCKING",
+      "category": "PUBLISHED_RATE_TERMS",
+      "publisher": "SEC EDGAR",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm",
+      "locator_policy": "PUBLIC_SEC_FILING",
+      "rights": "PUBLIC_SEC_TERMS_FACTS_ONLY",
+      "original_bytes_sha256": null,
+      "expected_action": "SYNTHETIC_PRICE_MODEL_ONLY",
+      "facts": {
+        "mile_band_lower_exclusive": 40,
+        "mile_band_upper_inclusive": 45,
+        "mileage_rate_cents_per_barrel": 270,
+        "dispatch_first_threshold_barrels": 700000,
+        "dispatch_first_cents_per_barrel": 50,
+        "dispatch_excess_cents_per_barrel": 5,
+        "ambiguous_example_miles": 68
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "MARATHON_2026_MARINE",
+      "category": "PUBLISHED_RATE_TERMS",
+      "publisher": "SEC EDGAR",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
+      "locator_policy": "PUBLIC_SEC_FILING",
+      "rights": "PUBLIC_SEC_TERMS_FACTS_ONLY",
+      "original_bytes_sha256": null,
+      "expected_action": "SYNTHETIC_PRICE_MODEL_ONLY",
+      "facts": {
+        "effective_date": "2026-01-01",
+        "day_rate_c2_barge_cents": 100600,
+        "day_rate_h3_barge_cents": 240800,
+        "day_rate_b1_boat_cents": 609400
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "STB_2024_WAYBILL",
+      "category": "PUBLIC_SHIPMENT_SAMPLE_LEAD",
+      "publisher": "Surface Transportation Board",
+      "source_url": "https://www.stb.gov/reports-data/waybill/",
+      "locator_policy": "OFFICIAL_PUBLIC_DATA_PAGE",
+      "rights": "CHECK_DOWNLOAD_TERMS_BEFORE_ORIGINAL_REDISTRIBUTION",
+      "original_bytes_sha256": null,
+      "expected_action": "VOLUME_ONLY_NO_RATE_TRUTH",
+      "facts": {
+        "sample_year": 2024,
+        "real_shipments_ingested": 0,
+        "revenue_may_be_masked": true
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    },
+    {
+      "id": "EIA_DIESEL_HISTORY",
+      "category": "PUBLIC_RATE_CONTEXT_LEAD",
+      "publisher": "U.S. Energy Information Administration",
+      "source_url": "https://www.eia.gov/petroleum/gasdiesel/",
+      "locator_policy": "OFFICIAL_PUBLIC_DATA_PAGE",
+      "rights": "CHECK_SOURCE_TERMS_BEFORE_BULK_REDISTRIBUTION",
+      "original_bytes_sha256": null,
+      "expected_action": "CONTEXT_ONLY_NOT_A_BUYER_CONTRACT",
+      "facts": {
+        "raw_price_observations_ingested": 0,
+        "diesel_prices_do_not_prove_carrier_fuel_formula": true
+      },
+      "real_customer_payment_verified": false,
+      "controlling_customer_rate_verified": false
+    }
+  ]
+}
