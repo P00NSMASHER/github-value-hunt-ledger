@@ -23,6 +23,25 @@ already-approved real-document and engine regression tests without user prompts.
 | CaptureBrief | SAM.gov opportunity and amendment sources, federal procurement archives and USAspending award data; existing historical/current-source controls. Current SAM API access requiring a key is not assumed. |
 | RecoveryOS | Original published vendor-payment and invoice disclosures, especially Pennine Care NHS spending CSVs, plus public procurement/payment metadata; nightly replay through the existing RecoveryWorks reconciliation kernel. |
 
+### FreightRecovery dynamic evaluation feed (v1 integration)
+
+- The collector automatically includes the **seven non-invoice official reference URLs** from the already-frozen nine-case FreightRecovery evaluation pack. Direct third-party invoice-specific URLs and original files are **not** added to discovery.
+- After the unified controller and both existing Lab 15 collectors run, `freight.research_eval_bridge` independently validates their three ledgers and builds one deduplicated `freight/research_lab/evaluation_candidates.json` file, saved only on `research/retally-unified-data-lab`.
+- The queue retains only source locator metadata, publisher host, source-ledger provenance, earliest observation date, and exact matches to pre-existing fixed reference cases. Legacy source titles, original byte fingerprints, customer document text, and unapproved commercial-use assertions are not exported.
+- Every candidate remains **RIGHTS_AND_INDEPENDENT_EVIDENCE_PENDING**, including official legal precedents and sources matching existing published rate references. Unknown sources do not automatically become numerical truth or modify the frozen nine-case fixture.
+- The nightly read-only job checks the data branch's queue *against all three upstream ledgers*, replays the nine-case real-world pack and the earlier five-source official numeric reference suite through the existing native engine paths, and publishes aggregate hold-only counts. First-publish timing races use an explicitly logged temporary queue; they do not falsely claim that persistent publication happened.
+- No extra research service, repository, workflow schedule, contacts, customer-data path, payment permissions, or separate lab branch is created.
+
+Commands (run from repository root with the data branch ledgers accessible):
+
+```sh
+python -m unittest -v freight.test_research_eval_bridge
+python -m freight.research_eval_bridge build
+python -m freight.research_eval_bridge verify
+```
+
+**Candidate sources are not adjudicated invoices.** New numeric benchmark cases require approved original source custody, independent buyer-specific contracts, BOL/weight, bank/payment evidence, and independently sealed review outcomes. The existing original-document lab remains a separate research lane and is not silently assigned positive or negative freight-error labels.
+
 ### Source promotion rules
 
 A public link is only a **candidate**. Discovery itself does not fetch/save
