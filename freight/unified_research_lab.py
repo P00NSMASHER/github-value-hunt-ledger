@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import ipaddress
 import json
+import os
 import re
 import socket
 from datetime import datetime, timezone
@@ -37,13 +38,12 @@ SOURCE_HOSTS = frozenset({
     "www2.fmc.gov", "www.fmc.gov", "www.sec.gov", "www.stb.gov",
     "www.eia.gov", "psc.ky.gov",
 })
-API_HOSTS = frozenset({"catalog.data.gov", "api.github.com", "zenodo.org"})
+API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.socrata.com"})
 SEEDS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
-        # Real-world evaluation v1 official references. No original bytes or
-        # buyer-specific invoice URLs enter the public research catalog.
+        # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
         "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
@@ -128,11 +128,17 @@ def global_dns(host: str) -> None:
 def get_json(url: str) -> dict:
     safe_url(url, api=True)
     global_dns(urlsplit(url).hostname or "")
-    req = Request(url, headers={
+    headers = {
         "User-Agent": "RETALLY-UnifiedResearch/1.0 (metadata only)",
         "Accept": "application/json",
         "Accept-Encoding": "identity",
-    }, method="GET")
+    }
+    if urlsplit(url).hostname == "api.gsa.gov":
+        key = os.environ.get("RETALLY_DATAGOV_API_KEY", "")
+        if not key:
+            raise ResearchError("DATAGOV_V4_KEY_REQUIRED")
+        headers["X-Api-Key"] = key
+    req = Request(url, headers=headers, method="GET")
     try:
         with build_opener(NoRedirect).open(req, timeout=12) as response:
             if response.status != 200 or response.geturl() != url:
@@ -141,7 +147,9 @@ def get_json(url: str) -> dict:
             if mime not in ("application/json", "application/vnd.github+json"):
                 raise ResearchError("UNSUPPORTED_CONTENT_TYPE")
             body = response.read(MAX_BODY + 1)
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+    except HTTPError as exc:
+        raise ResearchError("HTTP_STATUS_" + str(exc.code)) from exc
+    except (URLError, TimeoutError, OSError) as exc:
         raise ResearchError("PUBLIC_SOURCE_UNAVAILABLE") from exc
     if not body or len(body) > MAX_BODY:
         raise ResearchError("RESPONSE_SIZE_REJECTED")
@@ -230,34 +238,51 @@ def current_engine(now: datetime) -> str:
 
 
 def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
-    """Return canonical public locators only. Never copy source titles/rows."""
+    """Return canonical source locators only. No source rows, titles, or PII."""
     if engine not in ENGINES:
         raise ResearchError("INVALID_ENGINE")
     q1, q2, q3 = SEARCHES[engine]
     urls, errors = [], []
+    # Use public metadata endpoints that work without credentials. The old
+    # Data.gov CKAN v3 endpoint was retired in 2026. The official v4 API
+    # requires an API key; never use its rate-limited DEMO_KEY in cron.
     feeds = [
-        ("data.gov:" + q1, "datagov", "https://catalog.data.gov/api/3/action/package_search?" +
-         urlencode({"q": q1, "rows": "25"})),
-        ("data.gov:" + q2, "datagov", "https://catalog.data.gov/api/3/action/package_search?" +
-         urlencode({"q": q2, "rows": "25"})),
+        ("github:" + q1, "github", "https://api.github.com/search/repositories?" +
+         urlencode({"q": q1 + " in:name,description", "per_page": "15"})),
         ("github:" + q3, "github", "https://api.github.com/search/repositories?" +
          urlencode({"q": q3 + " in:name,description", "per_page": "15"})),
-        ("zenodo:" + q3, "zenodo", "https://zenodo.org/api/records/?" +
+        ("zenodo:" + q2, "zenodo", "https://zenodo.org/api/records?" +
+         urlencode({"q": q2, "size": "15"})),
+        ("zenodo:" + q3, "zenodo", "https://zenodo.org/api/records?" +
          urlencode({"q": q3, "size": "15"})),
     ]
+    if engine == "permitplate":
+        feeds.append(("nyc-official-open-data", "socrata",
+                      "https://api.us.socrata.com/api/catalog/v1?" +
+                      urlencode({"domains": "data.cityofnewyork.us",
+                                 "search_context": "data.cityofnewyork.us",
+                                 "q": "restaurant license building permit",
+                                 "limit": "20"})))
+    if os.environ.get("RETALLY_DATAGOV_API_KEY"):
+        feeds.append(("data.gov-v4:" + q1, "datagov-v4",
+                      "https://api.gsa.gov/technology/datagov/v4/search?" +
+                      urlencode({"q": q1, "per_page": "20"})))
     successful = 0
     for label, provider, address in feeds:
         try:
             data = fetch(address)
-            if provider == "datagov":
-                rows = data.get("result", {}).get("results", [])
+            if provider == "datagov-v4":
+                rows = data.get("results", [])
                 if type(rows) is not list:
                     raise ResearchError("INVALID_PROVIDER_ROWS")
-                for item in rows[:25]:
+                for item in rows[:20]:
                     if type(item) is not dict:
                         continue
-                    slug = item.get("name")
-                    if type(slug) is str and re.fullmatch(r"[a-z0-9_-]{3,140}", slug):
+                    slug = item.get("slug")
+                    dcat = item.get("dcat")
+                    access = dcat.get("accessLevel") if type(dcat) is dict else None
+                    if (type(slug) is str and re.fullmatch(r"[a-z0-9_-]{3,140}", slug)
+                            and access == "public"):
                         urls.append("https://catalog.data.gov/dataset/" + slug)
             elif provider == "github":
                 rows = data.get("items", [])
@@ -271,6 +296,17 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                         r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", url
                     ):
                         urls.append(url)
+            elif provider == "socrata":
+                rows = data.get("results", [])
+                if type(rows) is not list:
+                    raise ResearchError("INVALID_PROVIDER_ROWS")
+                for item in rows[:20]:
+                    if type(item) is not dict:
+                        continue
+                    resource = item.get("resource")
+                    ident = resource.get("id") if type(resource) is dict else None
+                    if type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident):
+                        urls.append("https://data.cityofnewyork.us/d/" + ident)
             else:
                 hits = data.get("hits", {}).get("hits", [])
                 if type(hits) is not list:
@@ -279,7 +315,11 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                     if type(item) is dict and str(item.get("id", "")).isdigit():
                         urls.append("https://zenodo.org/records/" + str(item["id"]))
             successful += 1
-        except (ResearchError, ValueError, KeyError, TypeError) as exc:
+        except ResearchError as exc:
+            # These identifiers come from our own bounded error enum, never
+            # untrusted response content or credential-bearing request URLs.
+            errors.append(label + ":" + str(exc))
+        except (ValueError, KeyError, TypeError) as exc:
             errors.append(label + ":" + type(exc).__name__)
     if successful == 0:
         raise ResearchError("ALL_PUBLIC_FEEDS_UNAVAILABLE")

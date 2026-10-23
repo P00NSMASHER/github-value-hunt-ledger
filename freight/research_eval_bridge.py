@@ -175,8 +175,8 @@ def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict) -> d
     # Keep exact-match frozen references first. Newest other candidates next;
     # a bounded window prevents enormous/untrusted ledgers exhausting CI.
     ranked = sorted(all_rows, key=lambda r: (
-        0 if r["case_id"] else 1, "" if r["case_id"] else
-        "".join(chr(57 - int(c)) for c in r["first_seen"] if c.isdigit()),
+        0 if r["case_id"] else 1,
+        -int(r["first_seen"].replace("-", "")),
         r["lead_id"],
     ))
     selected = ranked[:MAX_FEED_ROWS]
