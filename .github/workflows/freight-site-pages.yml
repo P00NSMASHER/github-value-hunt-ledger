@@ -50,6 +50,7 @@ jobs:
           freight/site/test_worksheet.py
           freight/site/test_home_worksheet_discovery.py
           freight/site/test_social_preview.py
+          freight/site/test_article_schema.py
           freight/site/test_asset_integrity.py
           freight/site/test_live_audit_incident.py
           freight/site/test_verify_production_site.py

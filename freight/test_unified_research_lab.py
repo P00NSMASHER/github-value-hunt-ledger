@@ -11,8 +11,9 @@ from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
 
 from freight.unified_research_lab import (
-    ENGINES, ResearchError, current_engine, ledger_from, merge_sources,
+    ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
+    mirror_scout_all, get_json,
 )
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
@@ -120,8 +121,9 @@ class UnifiedResearchLabTests(unittest.TestCase):
                         "sources": []}
             if "api.us.socrata.com" in url:
                 return {"results": [
-                    {"resource": {"id": "abcd-1234", "name": "DOHMH Inspection"},
+                    {"resource": {"id": "abcd-1234", "name": "DOHMH Restaurant Inspection"},
                      "owner": {"email": "nobody@example.invalid"}},
+                    {"resource": {"id": "rbx6-tga4", "name": "DOB NOW: Build – Approved Permits"}},
                     {"resource": {"id": "../secret"}},
                 ]}
             if "api.github.com" in url:
@@ -130,7 +132,7 @@ class UnifiedResearchLabTests(unittest.TestCase):
         with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
             urls, errors = scan("permitplate", fetch=fake)
         self.assertEqual(errors, [])
-        self.assertEqual(urls, ["https://data.cityofnewyork.us/d/abcd-1234"])
+        self.assertEqual(urls, ["https://data.cityofnewyork.us/d/rbx6-tga4"])
 
     def test_data_gov_v4_is_not_used_without_a_production_api_key(self):
         seen = []
@@ -228,6 +230,219 @@ class UnifiedResearchLabTests(unittest.TestCase):
             with self.assertRaises(ResearchError):
                 run(engine="capturebrief", live=False, ledger=path, now=NOW)
             self.assertEqual(path.read_bytes(), before)
+
+
+    def test_one_git_run_mirrors_all_four_lanes_and_preserves_scout_first_seen(self):
+        observed = []
+        urls = {
+            "freightrecovery": "https://www.gao.gov/products/b-160344",
+            "permitplate": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+            "capturebrief": "https://sam.gov/opportunities",
+            "recoveryos": "https://www.penninecare.nhs.uk/download_file/5855/277",
+        }
+        def fake(url):
+            self.assertTrue(url.startswith("https://retally-unified-research-scout."))
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            observed.append(engine)
+            return {"engine": engine, "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": [{"url": urls[engine], "first_seen": "2026-10-22",
+                                 "extra_personal_note": "never copied"}]}
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "leads.json"
+            now = NOW + timedelta(days=1)
+            out = mirror_scout_all(ledger=path, now=now, fetch=fake)
+            self.assertEqual(observed, list(ENGINES))
+            self.assertEqual(out["new_leads"], 4)
+            self.assertEqual(out["feed_errors"], [])
+            before = path.read_bytes()
+            again = mirror_scout_all(ledger=path, now=now, fetch=fake)
+            self.assertEqual(again["new_leads"], 0)
+            self.assertEqual(before, path.read_bytes())
+            records = read_ledger(path)["entries"]
+            self.assertEqual(len(records), 4)
+            self.assertTrue(all(row["first_seen"] == "2026-10-22" for row in records))
+            self.assertTrue(all(row["commercial_reuse_authorized"] is False for row in records))
+            self.assertTrue(all(row["independent_ground_truth"] is False for row in records))
+            self.assertNotIn("extra_personal_note", path.read_text())
+
+    def test_mirror_quarantines_failed_or_future_dated_lane_without_overwriting_ledger(self):
+        def fake(url):
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            if engine == "permitplate":
+                return {"engine": "recoveryos", "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
+            if engine == "capturebrief":
+                return {"engine": engine, "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": [{"url": "https://sam.gov/opportunities",
+                                     "first_seen": "2099-12-01"}]}
+            return {"engine": engine, "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "leads.json"
+            run(engine="freightrecovery", live=False, ledger=path, now=NOW)
+            before = path.read_bytes()
+            report = mirror_scout_all(ledger=path, now=NOW, fetch=fake)
+            self.assertEqual(report["new_leads"], 0)
+            self.assertEqual(len(report["feed_errors"]), 2)
+            self.assertTrue(any("UNTRUSTED_SCOUT_FEED" in e for e in report["feed_errors"]))
+            self.assertTrue(any("SCOUT_OBSERVATION_DATE_INVALID" in e for e in report["feed_errors"]))
+            self.assertEqual(before, path.read_bytes())
+
+
+    def test_permitplate_searches_are_construction_not_restaurant(self):
+        self.assertTrue(all("restaurant" not in q.lower() for q in SEARCHES["permitplate"]))
+        self.assertTrue(any("permit" in q.lower() for q in SEARCHES["permitplate"]))
+
+    def test_permitplate_obvious_wrong_topic_is_excluded_but_history_unchanged(self):
+        prior = source_record("https://github.com/owner/nyc-restaurant-inspections",
+                              "permitplate", "2026-10-22")
+        ledger = ledger_from([prior])
+        revised, added = merge_sources(
+            ledger, "permitplate",
+            ["https://github.com/owner/nyc-restaurant-inspections-2026",
+             "https://github.com/owner/NYC-DOB-Building-Permits"],
+            "2026-10-23")
+        self.assertEqual(added, 1)
+        self.assertEqual(len(revised["entries"]), 2)
+        self.assertIn(prior, revised["entries"])
+        self.assertTrue(any("NYC-DOB-Building-Permits" in row["url"]
+                            for row in revised["entries"]))
+
+
+    def test_mirror_survives_one_malformed_provider_without_losing_other_lanes(self):
+        urls = {
+            "freightrecovery": "https://www.gao.gov/products/b-160344",
+            "permitplate": "https://data.cityofnewyork.us/d/rbx6-tga4",
+            "recoveryos": "https://www.penninecare.nhs.uk/download_file/5855/277",
+        }
+        def fetch(url):
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            if engine == "capturebrief":
+                raise ValueError("untrusted provider text must not leak")
+            return {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": [{"url": urls[engine], "first_seen": "2026-10-22"}]}
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Path(root) / "sources.json"
+            result = mirror_scout_all(ledger=ledger, now=NOW, fetch=fetch)
+            self.assertEqual(result["new_leads"], 3)
+            self.assertEqual(len(result["feed_errors"]), 1)
+            self.assertEqual(result["feed_errors"][0],
+                             "capturebrief:UNTRUSTED_SCOUT_RESPONSE_ValueError")
+            self.assertNotIn("untrusted provider text", str(result))
+            self.assertEqual(len(read_ledger(ledger)["entries"]), 3)
+            self.assertEqual(result["third_party_documents_saved"], 0)
+            self.assertEqual(result["customer_contact_actions"], 0)
+
+    def test_json_provider_invalid_response_is_bounded_error_not_raw_body(self):
+        from contextlib import nullcontext
+        url = "https://api.github.com/search/repositories?q=metadata"
+        class Response:
+            status = 200
+            headers = {"Content-Type": "application/json"}
+            def geturl(self):
+                return url
+            def read(self, limit):
+                return b'{"not-a-valid-object":'
+        with patch("freight.unified_research_lab.global_dns"):
+            with patch("freight.unified_research_lab.build_opener") as opener:
+                opener.return_value.open.return_value = nullcontext(Response())
+                with self.assertRaisesRegex(ResearchError, "SOURCE_JSON_INVALID"):
+                    get_json(url)
+
+
+
+
+    def test_pagination_mirrors_all_pages_and_respects_40_new_source_budget(self):
+        called = []
+        def fake(url):
+            query = parse_qs(urlsplit(url).query)
+            engine = query["engine"][0]
+            before = query.get("before", [None])[0]
+            called.append((engine, before))
+            data = {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+            if engine == "capturebrief":
+                if before is None:
+                    data["sources"] = [
+                        {"url": f"https://github.com/synthetic-fixture/capture-dataset-{i:03d}",
+                         "first_seen": "2026-10-22"}
+                        for i in range(100)]
+                    data["next_cursor"] = "250"
+                elif before == "250":
+                    data["sources"] = [
+                        {"url": f"https://github.com/synthetic-fixture/capture-dataset-{i:03d}",
+                         "first_seen": "2026-10-21"}
+                        for i in range(100, 102)]
+                    data["next_cursor"] = None
+                else:
+                    raise AssertionError("unexpected cursor")
+            return data
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Path(root) / "sources.json"
+            now = NOW + timedelta(days=1)
+            outputs = [mirror_scout_all(ledger=ledger, now=now, fetch=fake)
+                       for _ in range(3)]
+            self.assertEqual([x["new_leads"] for x in outputs], [40,40,22])
+            self.assertEqual(len(read_ledger(ledger)["entries"]), 102)
+            self.assertEqual(outputs[-1]["per_engine"]["capturebrief"]["available"], 102)
+            self.assertEqual(outputs[-1]["per_engine"]["capturebrief"]["pages_read"], 2)
+            self.assertEqual(outputs[-1]["feed_errors"], [])
+            self.assertEqual(called.count(("capturebrief", "250")), 3)
+            self.assertTrue(all(row["rights_state"].startswith("UNVERIFIED")
+                                for row in read_ledger(ledger)["entries"]))
+            self.assertEqual(
+                sorted({row["first_seen"] for row in read_ledger(ledger)["entries"]}),
+                ["2026-10-21", "2026-10-22"])
+
+    def test_pagination_invalid_cursor_quarantines_only_affected_lane(self):
+        def fake(url):
+            engine = parse_qs(urlsplit(url).query)["engine"][0]
+            data = {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+            if engine == "capturebrief":
+                data["sources"] = [
+                    {"url": f"https://github.com/synthetic-fixture/invalid-cursor-{i:03d}",
+                     "first_seen": "2026-10-22"} for i in range(100)]
+                data["next_cursor"] = "1234bad"
+            return data
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "sources.json"
+            result = mirror_scout_all(ledger=path, now=NOW, fetch=fake)
+            self.assertEqual(result["new_leads"], 0)
+            self.assertEqual(result["feed_errors"], ["capturebrief:SCOUT_CURSOR_INVALID"])
+            self.assertEqual(result["per_engine"]["capturebrief"]["pages_read"], 0)
+            self.assertEqual(read_ledger(path)["entries"], [])
+
+    def test_pagination_six_page_ceiling_is_disclosed_not_silently_ignored(self):
+        def fake(url):
+            args = parse_qs(urlsplit(url).query)
+            engine = args["engine"][0]
+            before = args.get("before", [None])[0]
+            data = {"engine": engine,
+                    "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                    "sources": []}
+            if engine == "recoveryos":
+                index = 0 if before is None else 601 - int(before)
+                if index < 0 or index >= 6:
+                    raise AssertionError("page beyond configured limit")
+                data["sources"] = [
+                    {"url": f"https://github.com/synthetic-fixture/recovery-source-{index:02d}-{i:03d}",
+                     "first_seen": "2026-10-22"} for i in range(100)]
+                data["next_cursor"] = str(600-index)
+            return data
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "sources.json"
+            report = mirror_scout_all(ledger=path, now=NOW, fetch=fake)
+            self.assertIn("recoveryos:SCOUT_PAGE_CAP_REACHED", report["feed_errors"])
+            self.assertTrue(report["per_engine"]["recoveryos"]["page_cap_reached"])
+            self.assertEqual(report["per_engine"]["recoveryos"]["pages_read"], 6)
+            self.assertEqual(report["per_engine"]["recoveryos"]["available"], 600)
+            self.assertEqual(report["per_engine"]["recoveryos"]["new"], 40)
+            self.assertEqual(len(read_ledger(path)["entries"]), 40)
+
 
 
 if __name__ == "__main__":

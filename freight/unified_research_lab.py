@@ -13,7 +13,7 @@ import json
 import os
 import re
 import socket
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
@@ -27,7 +27,7 @@ MAX_NEW_PER_RUN = 40
 MAX_BODY = 1_500_000
 SEARCHES = {
     "freightrecovery": ("freight invoice", "freight tariff", "freight invoice dataset"),
-    "permitplate": ("NYC restaurant inspection", "NYC building permits", "restaurant license open data"),
+    "permitplate": ("NYC building permit", "DOB NOW approved permit", "NYC DOB permit issuance"),
     "capturebrief": ("federal contract opportunities", "federal contract awards", "federal solicitations dataset"),
     "recoveryos": ("accounts payable invoice", "vendor payment transparency", "accounts payable invoice dataset"),
 }
@@ -154,10 +154,36 @@ def get_json(url: str) -> dict:
         raise ResearchError("PUBLIC_SOURCE_UNAVAILABLE") from exc
     if not body or len(body) > MAX_BODY:
         raise ResearchError("RESPONSE_SIZE_REJECTED")
-    data = json.loads(body)
+    try:
+        data = json.loads(body)
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        # A public metadata endpoint may serve malformed or incorrectly encoded
+        # JSON without preventing independent engine lanes from progressing.
+        # Never echo untrusted provider response text into run diagnostics.
+        raise ResearchError("SOURCE_JSON_INVALID") from exc
     if type(data) is not dict:
         raise ResearchError("SOURCE_JSON_INVALID")
     return data
+
+
+PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
+
+
+def permitplate_url_in_scope(url: str) -> bool:
+    """Reject verified wrong-topic public source pointers from permit research."""
+    path = urlsplit(url).path.lower()
+    return (re.search(r"(?i)(restaurant|inspection|yelp|food[-_ ]?safety|dine[-_ ]?safe)", path) is None
+            and path.rstrip("/").rsplit("/", 1)[-1] not in PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS)
+
+
+def permitplate_catalog_in_scope(resource: dict) -> bool:
+    """Reject non-DOB catalogs; metadata is not independent permit issuance."""
+    title = resource.get("name") if type(resource) is dict else None
+    return bool(type(title) is str
+                and re.search(r"\b(dob|building|construction)\b", title, re.I)
+                and re.search(r"\b(permits?|filings?|applications?|certificates?)\b",
+                              title, re.I)
+                and not re.search(r"\b(restaurant|inspection)\b", title, re.I))
 
 
 def source_record(url: str, engine: str, seen: str) -> dict:
@@ -214,14 +240,17 @@ def read_ledger(path: Path = LEDGER) -> dict:
     return doc
 
 
-def merge_sources(doc: dict, engine: str, urls: list[str], seen: str) -> tuple[dict, int]:
+def merge_sources(doc: dict, engine: str, urls: list[str], seen: str, *,
+                  first_seen_overrides: dict[str, str] | None = None) -> tuple[dict, int]:
     validate_ledger(doc)
     if engine not in ENGINES:
         raise ResearchError("INVALID_ENGINE")
     items = {r["id"]: dict(r) for r in doc["entries"]}
     added = 0
     for url in urls:
-        candidate = source_record(url, engine, seen)
+        candidate = source_record(url, engine, (first_seen_overrides or {}).get(url, seen))
+        if engine == "permitplate" and not permitplate_url_in_scope(candidate["url"]):
+            continue
         key = candidate["id"]
         if key in items:
             row = items[key]
@@ -238,6 +267,58 @@ def current_engine(now: datetime) -> str:
     return ENGINES[int(now.timestamp() // 300) % len(ENGINES)]
 
 
+MAX_SCOUT_MIRROR_PAGES = 6
+SCOUT_PAGE_SIZE = 100
+
+
+def scout_url(engine: str, *, before: str | None = None) -> str:
+    if engine not in ENGINES:
+        raise ResearchError("INVALID_ENGINE")
+    args = {"engine": engine, "limit": str(SCOUT_PAGE_SIZE)}
+    if before is not None:
+        if type(before) is not str or not re.fullmatch(r"[1-9]\d{0,11}", before):
+            raise ResearchError("SCOUT_CURSOR_INVALID")
+        args["before"] = before
+    return ("https://retally-unified-research-scout.jayp19386.workers.dev/feed?" +
+            urlencode(args))
+
+
+def parse_scout_rows(engine: str, data: dict, now: datetime | None = None
+                     ) -> list[tuple[str, str | None]]:
+    """Only accept lane-scoped public URLs; preserve D1 observation dates when mirroring."""
+    if (type(data) is not dict or data.get("engine") != engine
+            or data.get("scope") != "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA"
+            or type(data.get("sources")) is not list):
+        raise ResearchError("UNTRUSTED_SCOUT_FEED")
+    if now is not None and now.tzinfo is None:
+        raise ResearchError("TIMEZONE_REQUIRED")
+    if len(data["sources"]) > SCOUT_PAGE_SIZE:
+        raise ResearchError("SCOUT_PAGE_OVER_LIMIT")
+    rows = []
+    seen_urls = set()
+    for record in data["sources"]:
+        if type(record) is not dict or type(record.get("url")) is not str:
+            raise ResearchError("INVALID_SCOUT_RECORD")
+        url = safe_url(record["url"])
+        if url in seen_urls:
+            raise ResearchError("DUPLICATE_SCOUT_RECORD")
+        seen_urls.add(url)
+        first_seen = None
+        if now is not None:
+            first_seen = record.get("first_seen")
+            if (type(first_seen) is not str
+                    or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", first_seen)):
+                raise ResearchError("SCOUT_OBSERVATION_DATE_INVALID")
+            try:
+                day = date.fromisoformat(first_seen)
+            except ValueError as exc:
+                raise ResearchError("SCOUT_OBSERVATION_DATE_INVALID") from exc
+            if day > now.date() or day < date(2020, 1, 1):
+                raise ResearchError("SCOUT_OBSERVATION_DATE_INVALID")
+        rows.append((url, first_seen))
+    return rows
+
+
 def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
     """Return canonical source locators only. No source rows, titles, or PII."""
     if engine not in ENGINES:
@@ -249,9 +330,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
     # requires an API key; never use its rate-limited DEMO_KEY in cron.
     feeds = [
         # Durable metadata accumulated independently if GitHub cron is absent.
-        ("cloudflare-failover", "scout",
-         "https://retally-unified-research-scout.jayp19386.workers.dev/feed?" +
-         urlencode({"engine": engine, "limit": "100"})),
+        ("cloudflare-failover", "scout", scout_url(engine)),
         ("github:" + q1, "github", "https://api.github.com/search/repositories?" +
          urlencode({"q": q1 + " in:name,description", "per_page": "15"})),
         ("github:" + q3, "github", "https://api.github.com/search/repositories?" +
@@ -266,7 +345,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                       "https://api.us.socrata.com/api/catalog/v1?" +
                       urlencode({"domains": "data.cityofnewyork.us",
                                  "search_context": "data.cityofnewyork.us",
-                                 "q": "restaurant license building permit",
+                                 "q": "NYC DOB building permit",
                                  "limit": "20"})))
     if os.environ.get("RETALLY_DATAGOV_API_KEY"):
         feeds.append(("data.gov-v4:" + q1, "datagov-v4",
@@ -277,14 +356,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
         try:
             data = fetch(address)
             if provider == "scout":
-                if (data.get("engine") != engine
-                        or data.get("scope") != "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA"
-                        or type(data.get("sources")) is not list):
-                    raise ResearchError("UNTRUSTED_SCOUT_FEED")
-                for record in data["sources"][:100]:
-                    if type(record) is not dict or type(record.get("url")) is not str:
-                        raise ResearchError("INVALID_SCOUT_RECORD")
-                    urls.append(safe_url(record["url"]))
+                urls.extend(url for url, _ in parse_scout_rows(engine, data))
             elif provider == "datagov-v4":
                 rows = data.get("results", [])
                 if type(rows) is not list:
@@ -319,7 +391,8 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                         continue
                     resource = item.get("resource")
                     ident = resource.get("id") if type(resource) is dict else None
-                    if type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident):
+                    if (type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident)
+                            and permitplate_catalog_in_scope(resource)):
                         urls.append("https://data.cityofnewyork.us/d/" + ident)
             else:
                 hits = data.get("hits", {}).get("hits", [])
@@ -340,6 +413,68 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
     # Preserve trusted feed ordering: a late-running GitHub job should first
     # mirror the scout backlog, not repeatedly consume only search front pages.
     return list(dict.fromkeys(urls)), errors
+
+
+def mirror_scout_all(*, ledger: Path, now: datetime, fetch=get_json) -> dict:
+    """Read-only fetch from four independent scout lanes into one rights-held branch."""
+    if now.tzinfo is None:
+        raise ResearchError("TIMEZONE_REQUIRED")
+    original = read_ledger(ledger)
+    revised = original
+    per_engine = {}
+    errors = []
+    for engine in ENGINES:
+        try:
+            observed = {}
+            cursor = None
+            pages = 0
+            reached_cap = False
+            for _ in range(MAX_SCOUT_MIRROR_PAGES):
+                data = fetch(scout_url(engine, before=cursor))
+                rows = parse_scout_rows(engine, data, now)
+                for url, seen in rows:
+                    if url in observed:
+                        raise ResearchError("SCOUT_OVERLAPPING_PAGES")
+                    observed[url] = seen
+                pages += 1
+                following = data.get("next_cursor")
+                if following is None:
+                    break
+                if (type(following) is not str
+                        or not re.fullmatch(r"[1-9]\d{0,11}", following)
+                        or len(rows) != SCOUT_PAGE_SIZE
+                        or (cursor is not None and int(following) >= int(cursor))):
+                    raise ResearchError("SCOUT_CURSOR_INVALID")
+                cursor = following
+            else:
+                if cursor is not None:
+                    reached_cap = True
+                    errors.append(engine + ":SCOUT_PAGE_CAP_REACHED")
+            # Only validated public URLs and observation dates enter the ledger.
+            # The existing forty-new-source cap applies per lane per GitHub run.
+            revised, added = merge_sources(
+                revised, engine, list(observed), now.date().isoformat(),
+                first_seen_overrides=observed)
+            per_engine[engine] = {
+                "available": len(observed), "new": added,
+                "pages_read": pages, "page_cap_reached": reached_cap,
+            }
+        except ResearchError as exc:
+            errors.append(engine + ":" + str(exc))
+            per_engine[engine] = {"available": 0, "new": 0, "pages_read": 0, "page_cap_reached": False}
+        except (ValueError, KeyError, TypeError, UnicodeDecodeError) as exc:
+            # Keep a single unexpectedly malformed scout response isolated.
+            # Diagnostics expose only a bounded, code-owned exception category.
+            errors.append(engine + ":UNTRUSTED_SCOUT_RESPONSE_" + type(exc).__name__)
+            per_engine[engine] = {"available": 0, "new": 0, "pages_read": 0, "page_cap_reached": False}
+    if revised != original:
+        ledger.parent.mkdir(parents=True, exist_ok=True)
+        ledger.write_text(json.dumps(revised, indent=2, sort_keys=True) + "\n",
+                          encoding="utf-8")
+    return {"new_leads": sum(row["new"] for row in per_engine.values()),
+            "total_leads": len(revised["entries"]), "per_engine": per_engine,
+            "feed_errors": errors, "third_party_documents_saved": 0,
+            "customer_contact_actions": 0, "production_changes": 0}
 
 
 def run(*, engine: str, live: bool, ledger: Path, now: datetime,
@@ -366,12 +501,19 @@ def run(*, engine: str, live: bool, ledger: Path, now: datetime,
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--live", action="store_true", help="Fetch only fixed public metadata APIs")
+    parser.add_argument("--mirror-scout-all", action="store_true",
+                        help="Mirror all four public metadata lanes, no external source bytes")
     parser.add_argument("--engine", choices=ENGINES)
     parser.add_argument("--ledger", type=Path, default=LEDGER)
     args = parser.parse_args()
-    engine = args.engine or current_engine(datetime.now(timezone.utc))
-    report = run(engine=engine, live=args.live, ledger=args.ledger,
-                 now=datetime.now(timezone.utc))
+    now = datetime.now(timezone.utc)
+    if args.mirror_scout_all:
+        if args.live or args.engine:
+            parser.error("--mirror-scout-all must be used on its own")
+        print(json.dumps(mirror_scout_all(ledger=args.ledger, now=now), sort_keys=True))
+        return
+    engine = args.engine or current_engine(now)
+    report = run(engine=engine, live=args.live, ledger=args.ledger, now=now)
     print(json.dumps(report, sort_keys=True))
 
 
