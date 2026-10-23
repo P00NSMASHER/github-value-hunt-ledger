@@ -5,6 +5,7 @@ on:
     paths:
       - "freight/unified_research_lab.py"
       - "freight/test_unified_research_lab.py"
+      - "freight/test_unified_research_ci_contract.py"
       - "freight/research_lab_worker*"
       - "freight/research_lab/**"
       - "freight/UNIFIED_RESEARCH_LAB.md"
@@ -20,6 +21,7 @@ on:
     paths:
       - "freight/unified_research_lab.py"
       - "freight/test_unified_research_lab.py"
+      - "freight/test_unified_research_ci_contract.py"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
       - "freight/test_research_eval_bridge.py"
@@ -56,7 +58,10 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
-      - run: node --test freight/research_lab_worker.test.mjs freight.test_research_eval_bridge
+      - name: Execute Cloudflare tests, bridge regressions and frozen evaluation
+        run: |
+          node --test freight/research_lab_worker.test.mjs
+          python -m unittest -q freight.test_research_eval_bridge freight.test_unified_research_ci_contract
           python -m freight.real_world_eval_v1
 
   discover:
