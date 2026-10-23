@@ -164,7 +164,8 @@ def generate(i: int) -> FictionalDataset:
                         else "REVIEW")
             oracles.append({
                 "charge_id": charge_id, "decision": decision,
-                "category": category, "expected_cents": expected if category in
+                "category": category, "pricing_model": model,
+                "expected_cents": expected if category in
                 ("VERIFIED", "UNVERIFIED") else None,
                 "independent_expected_positive_cents": (
                     billed-expected if decision == "VALIDATED" else 0
