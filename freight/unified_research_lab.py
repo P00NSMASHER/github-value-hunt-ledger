@@ -166,11 +166,14 @@ def get_json(url: str) -> dict:
     return data
 
 
-PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
+PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
+PERMITPLATE_OFFICIAL_DOHMH_SOURCE = "https://data.cityofnewyork.us/d/43nn-pn8j"
 
 
 def permitplate_url_in_scope(url: str) -> bool:
-    """Reject verified wrong-topic public source pointers from permit research."""
+    """Keep the canonical restaurant core source; reject unrelated catalog leads."""
+    if url == PERMITPLATE_OFFICIAL_DOHMH_SOURCE:
+        return True
     path = urlsplit(url).path.lower()
     return (re.search(r"(?i)(restaurant|inspection|yelp|food[-_ ]?safety|dine[-_ ]?safe)", path) is None
             and path.rstrip("/").rsplit("/", 1)[-1] not in PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS)
@@ -179,11 +182,12 @@ def permitplate_url_in_scope(url: str) -> bool:
 def permitplate_catalog_in_scope(resource: dict) -> bool:
     """Reject non-DOB catalogs; metadata is not independent permit issuance."""
     title = resource.get("name") if type(resource) is dict else None
-    return bool(type(title) is str
-                and re.search(r"\b(dob|building|construction)\b", title, re.I)
-                and re.search(r"\b(permits?|filings?|applications?|certificates?)\b",
-                              title, re.I)
-                and not re.search(r"\b(restaurant|inspection)\b", title, re.I))
+    return bool(type(title) is str and (
+                (resource.get("id") == "43nn-pn8j"
+                 and title == "DOHMH New York City Restaurant Inspection Results")
+                or (re.search(r"\b(dob|building|construction)\b", title, re.I)
+                    and re.search(r"\b(permits?|filings?|applications?|certificates?)\b", title, re.I)
+                    and not re.search(r"\b(restaurant|inspection)\b", title, re.I))))
 
 
 def source_record(url: str, engine: str, seen: str) -> dict:
