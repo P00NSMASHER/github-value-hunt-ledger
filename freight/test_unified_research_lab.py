@@ -13,7 +13,7 @@ from unittest.mock import patch
 from freight.unified_research_lab import (
     ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
-    mirror_scout_all, get_json,
+    mirror_scout_all, get_json, metadata_in_scope,
 )
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
@@ -102,9 +102,10 @@ class UnifiedResearchLabTests(unittest.TestCase):
                         "sources": []}
             if "api.github.com" in url:
                 return {"items": [{"html_url": "https://github.com/owner/public-data",
+                                   "name": "freight-invoice-source",
                                    "description": "ignore copied PII"},
                                   {"html_url": "https://internal.example/repo"}]}
-            return {"hits": {"hits": [{"id": 12345, "metadata": {"creators": ["X"]}}]}}
+            return {"hits": {"hits": [{"id": 12345, "metadata": {"title": "LTL freight tariff dataset", "creators": ["X"]}}]}}
         with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
             urls, errors = scan("freightrecovery", fetch=fake)
         self.assertEqual(errors, [])
@@ -442,6 +443,65 @@ class UnifiedResearchLabTests(unittest.TestCase):
             self.assertEqual(report["per_engine"]["recoveryos"]["available"], 600)
             self.assertEqual(report["per_engine"]["recoveryos"]["new"], 40)
             self.assertEqual(len(read_ledger(path)["entries"]), 40)
+
+
+
+
+    def test_public_publisher_topic_filter_discards_off_topic_metadata_per_lane(self):
+        cases = (
+            ("freightrecovery", "Freight invoice tariff dataset", "Baking and dining recipes"),
+            ("permitplate", "NYC DOB NOW approved building permits",
+             "NYC restaurant inspection permits"),
+            ("capturebrief", "Federal solicitation contract awards",
+             "Professional basketball boxscores"),
+            ("recoveryos", "Accounts payable supplier invoice reconciliation",
+             "Wildlife photography archive"),
+        )
+        for engine, good, bad in cases:
+            for provider in ("github", "zenodo"):
+                with self.subTest(engine=engine, provider=provider):
+                    good_row = ({"name": "generic", "description": good}
+                                if provider == "github" else {"metadata": {"title": good}})
+                    bad_row = ({"name": "generic", "description": bad}
+                               if provider == "github" else {"metadata": {"title": bad}})
+                    self.assertTrue(metadata_in_scope(engine, provider, good_row))
+                    self.assertFalse(metadata_in_scope(engine, provider, bad_row))
+                    self.assertFalse(metadata_in_scope(engine, provider,
+                                                      {"metadata": {"creators": ["A"]}}))
+        with self.assertRaises(ResearchError):
+            metadata_in_scope("invalid", "github", {"name": "freight"})
+        with self.assertRaises(ResearchError):
+            metadata_in_scope("freightrecovery", "socrata", {})
+
+    def test_live_scan_rejects_wrong_topic_github_and_zenodo_without_private_metadata(self):
+        def fake(url):
+            if "retally-unified-research-scout" in url:
+                return {"engine": "recoveryos",
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
+            if "api.github.com" in url:
+                return {"items": [
+                    {"html_url": "https://github.com/synthetic-fixture/vendor-payment-dataset",
+                     "name": "unrelated-title",
+                     "description": "Accounts payable vendor payment dataset"},
+                    {"html_url": "https://github.com/synthetic-fixture/wildlife-project",
+                     "name": "not-relevant",
+                     "description": "Biology research bird species"},
+                ]}
+            return {"hits": {"hits": [
+                {"id": 345, "metadata": {"title": "Supplier invoice reconciliation research"}},
+                {"id": 999, "metadata": {"title": "Bird migration routes"}},
+                {"id": 2000, "metadata": {"creators": ["private author info"]}},
+            ]}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            sources, errors = scan("recoveryos", fetch=fake)
+        self.assertEqual(errors, [])
+        self.assertEqual(sources, [
+            "https://github.com/synthetic-fixture/vendor-payment-dataset",
+            "https://zenodo.org/records/345",
+        ])
+        self.assertNotIn("private author", str(sources))
+        self.assertNotIn("Bird", str(sources))
 
 
 
