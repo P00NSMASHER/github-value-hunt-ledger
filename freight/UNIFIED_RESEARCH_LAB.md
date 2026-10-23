@@ -76,7 +76,7 @@ approved claims remain **zero or not estimable**, regardless of feed growth.
 | Lane | Discovery and validation |
 | --- | --- |
 | FreightRecovery | Official GAO adjudications; public invoice exhibits; freight-rate documents; Data.gov, Zenodo and public GitHub dataset *catalogs*. Nightly original GlobalTranz and ArcBest document replay using existing ingestion, rating and reconciliation paths. |
-| PermitPlate | NYC restaurant inspections, DOHMH pre-permit events, DOB NOW building filings and SLA liquor-license applications; real-source adapter and V4-relevant engine regression. **Not parking-ticket analytics:** PermitPlate's current product concerns restaurant vendor opportunity signals. |
+| PermitPlate | NYC DOB NOW **job applications**, DOB NOW **approved permits**, and BIS-only **permit issuance** are separate official source families with distinct coverage and timing. Keep restaurant inspections and dining-out registrations out of the DOB permit-issuance evidence population; never treat an application as an issued permit. Replay the existing official NYC building-permit adapters without asserting independent issuance labels or commercial reuse rights. |
 | CaptureBrief | SAM.gov opportunity and amendment sources, federal procurement archives and USAspending award data; existing historical/current-source controls. Current SAM API access requiring a key is not assumed. |
 | RecoveryOS | Original published vendor-payment and invoice disclosures, especially Pennine Care NHS spending CSVs, plus public procurement/payment metadata; nightly replay through the existing RecoveryWorks reconciliation kernel. |
 
