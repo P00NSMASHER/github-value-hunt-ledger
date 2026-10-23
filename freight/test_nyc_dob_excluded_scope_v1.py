@@ -83,6 +83,27 @@ class TestNYCDOBExcludedScope(unittest.TestCase):
         self.assertIsNone(ctrl['independent_issuance_truth'])
         self.assertEqual(ctrl['expected_decision'], 'UNKNOWN_NO_ISSUANCE_ADJUDICATION')
 
+    def test_base_job_is_not_a_unique_filing_key(self):
+        """Synthetic counterexample: collapsing distinct filing suffixes loses work."""
+        scope = self.doc['source_filing_grain_candidate']
+        self.assertEqual(scope['official_url'],
+                         'https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page')
+        self.assertEqual(scope['independent_issuance_adjudicated'], False)
+        self.assertIsNone(scope['original_source_bytes_sha256'])
+        ctrl = self.doc['synthetic_base_job_multi_filing_negative_control']
+        filings = ctrl['filings']
+        base_only_count = len({r['base_job_number'] for r in filings})
+        distinct_filing_count = len({r['job_filing_number'] for r in filings})
+        self.assertEqual(base_only_count, 1)
+        self.assertEqual(distinct_filing_count, 2)
+        self.assertNotEqual(base_only_count, distinct_filing_count)
+        self.assertEqual({r['work_type'] for r in filings}, {'PL', 'EL'})
+        self.assertEqual(distinct_filing_count, ctrl['expected_distinct_filing_count'])
+        self.assertIsNone(ctrl['independent_issuance_truth'])
+        self.assertEqual(ctrl['expected_decision'],
+                         'DISTINCT_FILINGS_WITH_UNKNOWN_PERMIT_ISSUANCE')
+        self.assertEqual(ctrl['provenance'], 'SYNTHETIC_JOIN_NEGATIVE_CONTROL')
+
     def test_no_cross_dataset_join_or_accuracy_claim(self):
         self.assertEqual(self.doc['cross_dataset_join'], 'UNVERIFIED')
         self.assertEqual(self.doc['freight_error_accuracy'], 'NOT_APPLICABLE')
