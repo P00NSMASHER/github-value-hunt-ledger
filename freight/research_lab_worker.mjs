@@ -124,17 +124,19 @@ export async function fetchCatalog(spec) {
   const reader = response.body?.getReader?.();
   if (!reader) throw Error("RESPONSE_STREAM_REQUIRED");
   let size = 0;
+  let finished = false;
   const parts = [];
   try {
     for (;;) {
       const part = await reader.read();
-      if (part.done) break;
+      if (part.done) { finished = true; break; }
       if (!(part.value instanceof Uint8Array)) throw Error("RESPONSE_STREAM_INVALID");
       size += part.value.byteLength;
       if (size > MAX_API_BYTES) throw Error("RESPONSE_LIMIT");
       parts.push(part.value);
     }
   } finally {
+    if (!finished) await reader.cancel().catch(() => {});
     reader.releaseLock();
   }
   if (!size) throw Error("EMPTY_RESPONSE");
