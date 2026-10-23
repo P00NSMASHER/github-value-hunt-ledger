@@ -1,7 +1,7 @@
 {
   "as_of_utc_date": "2026-10-23",
   "commercial_recovery_allowed": false,
-  "cross_engine_shared_pointers": 5,
+  "cross_engine_shared_pointers": 6,
   "customer_communication_actions": 0,
   "earliest_first_seen": "2026-10-22",
   "engines": {
@@ -22,8 +22,8 @@
       "official_publisher_host_only": 9,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 78,
-      "third_party_catalog_host_only": 69,
+      "source_pointers": 82,
+      "third_party_catalog_host_only": 73,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -50,7 +50,7 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 318,
+  "first_seen_in_last_seven_calendar_days": 321,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-23",
   "limitations": [
@@ -63,7 +63,7 @@
   "publisher_host_counts": {
     "api.usaspending.gov": 1,
     "data.cityofnewyork.us": 22,
-    "github.com": 97,
+    "github.com": 98,
     "media.cadc.uscourts.gov": 1,
     "sam.gov": 1,
     "www.eia.gov": 1,
@@ -73,13 +73,13 @@
     "www.sec.gov": 2,
     "www.stb.gov": 1,
     "www2.fmc.gov": 1,
-    "zenodo.org": 187
+    "zenodo.org": 189
   },
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "c3981298a618f7939c0d56a86fd8d83052d65b611735c0c6b55e4b445a408ee8",
-  "unique_source_pointers": 318,
+  "source_ledger_entries_sha256": "94e41f0ce2a0460a1fea514f4e8d7a14abfa5d48207502ab652b8d1b9b59e04e",
+  "unique_source_pointers": 321,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }

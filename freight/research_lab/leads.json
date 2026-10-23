@@ -100,6 +100,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "047a5757f72ec3e11a3bf0268e8f979beeb4bd3195c8636ab1715f2b91336de1",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/7844409"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -993,6 +1009,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/7213544"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "285ad895b6783b1cb0c1331a51a8c7da169b38b78f9482eebc07a2dc43f4f631",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/8409861"
     },
     {
       "commercial_reuse_authorized": false,
@@ -3687,6 +3719,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "ba4eb6cb7757d450971fbaab7547d0dcc945535d7ccf3e68b59d1449c4a9ecf8",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/whaleydg/invex"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -5033,7 +5081,8 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
-        "capturebrief"
+        "capturebrief",
+        "freightrecovery"
       ],
       "first_seen": "2026-10-23",
       "id": "fcb78edd127a937d1dcb21440482e8885aa21bb12bc7381761e80f014f322d81",
@@ -5094,6 +5143,6 @@
       "url": "https://github.com/EdouardAndre/Hackathon-HEC"
     }
   ],
-  "entries_sha256": "c3981298a618f7939c0d56a86fd8d83052d65b611735c0c6b55e4b445a408ee8",
+  "entries_sha256": "94e41f0ce2a0460a1fea514f4e8d7a14abfa5d48207502ab652b8d1b9b59e04e",
   "schema_version": 1
 }
