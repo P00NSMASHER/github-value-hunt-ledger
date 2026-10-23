@@ -14,10 +14,12 @@
   },
   "partition": {
     "observed_wrong_topic_excluded": 18,
-    "remaining_unreviewed_permitplate_pointers": 22,
+    "remaining_unreviewed_permitplate_pointers": 21,
     "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW",
     "context_only_unadjudicated": 2,
-    "context_only_status": "CANDIDATE_FOR_BUILDING_CONTEXT_ONLY_NOT_ISSUANCE_GROUND_TRUTH_RIGHTS_UNVERIFIED"
+    "context_only_status": "CANDIDATE_FOR_BUILDING_CONTEXT_ONLY_NOT_ISSUANCE_GROUND_TRUTH_RIGHTS_UNVERIFIED",
+    "application_only_unadjudicated": 1,
+    "application_only_status": "DOB_NOW_JOB_APPLICATION_SCOPE_VERIFIED_ISSUANCE_AND_COMMERCIAL_RIGHTS_UNKNOWN"
   },
   "cases": [
     {
@@ -235,7 +237,7 @@
   "publisher_reference": "https://data.cityofnewyork.us/d/rbx6-tga4",
   "publisher_rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
   "observed_at": "2026-10-23",
-  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified. Two existing official NYC pointers were separately source-scoped: PLUTO tax-lot land-use and LL84 building energy/water are candidate contextual fields, NOT DOB permit issuance/approved-permit truth. Rights and independently held-out outcomes remain unverified; no raw rows copied.",
+  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified. Two existing official NYC pointers were separately source-scoped: PLUTO tax-lot land-use and LL84 building energy/water are candidate contextual fields, NOT DOB permit issuance/approved-permit truth. Rights and independently held-out outcomes remain unverified; no raw rows copied. One pre-existing DOB NOW w9ak-ipjd pointer is now publisher-metadata-verified as application filings only; issuance stays UNKNOWN. Synthetic filing state is explicitly not original data.",
   "context_only_candidates": [
     {
       "id": "0a560f06b0ac7d352d7247ff0a1015f3534c0b8c6351b2552da028b20be0ba90",
@@ -273,5 +275,39 @@
       "commercial_reuse_authorized": false,
       "independent_permit_outcome_label": null
     }
-  ]
+  ],
+  "application_only_candidates": [
+    {
+      "id": "4b0648ba1f0661d275ea86c01d2172930858dc7930fbec3ca62c0294d627fb20",
+      "url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+      "first_seen": "2026-10-22",
+      "publisher": "NYC Department of Buildings via NYC Open Data",
+      "publisher_metadata_title": "DOB NOW: Build – Job Application Filings",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+      "publisher_catalog_reference": "https://catalog.data.gov/dataset/dob-now-build-job-application-filings",
+      "publisher_dataset_last_updated_reported": "2026-10-20",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "DOB_NOW_JOB_APPLICATION_ONLY",
+      "source_scope_limitations": [
+        "Application filing is not independent proof of issued/approved permit",
+        "Electrical, elevator and LAA job applications excluded or published in separate datasets"
+      ],
+      "expected_evaluation": "DOB_NOW_APPLICATION_FILING_ONLY_ISSUANCE_UNKNOWN",
+      "permit_issuance_ground_truth": false,
+      "independently_adjudicated": false,
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "original_source_bytes_sha256": null,
+      "commercial_reuse_authorized": false,
+      "independent_permit_outcome_label": null
+    }
+  ],
+  "synthetic_application_negative_control": {
+    "kind": "SYNTHETIC",
+    "dataset_url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+    "invented_filing_state": "FILED",
+    "expected_issuance": "UNKNOWN_NO_INDEPENDENT_ISSUANCE_PROOF",
+    "note": "Hypothetical filing state only; not a copied source row or real permit label"
+  }
 }
