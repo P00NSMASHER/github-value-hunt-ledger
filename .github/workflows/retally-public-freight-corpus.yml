@@ -5,6 +5,10 @@ on:
     paths:
       - 'freight/public_freight_corpus.py'
       - 'freight/test_public_freight_corpus.py'
+      - 'freight/real_world_eval_v1.py'
+      - 'freight/test_real_world_eval_v1.py'
+      - 'freight/fixtures/real_world_eval_v1.json'
+      - 'freight/REAL_WORLD_EVAL_V1.md'
       - 'freight/PUBLIC_FREIGHT_SOURCE_LAB_2026-10-22.md'
       - '.github/workflows/retally-public-freight-corpus.yml'
   push:
@@ -12,6 +16,10 @@ on:
     paths:
       - 'freight/public_freight_corpus.py'
       - 'freight/test_public_freight_corpus.py'
+      - 'freight/real_world_eval_v1.py'
+      - 'freight/test_real_world_eval_v1.py'
+      - 'freight/fixtures/real_world_eval_v1.json'
+      - 'freight/REAL_WORLD_EVAL_V1.md'
       - '.github/workflows/retally-public-freight-corpus.yml'
 
 permissions:
@@ -42,19 +50,25 @@ jobs:
       - name: Install only the test runner
         run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2
       - name: Compile actual isolated study and test source
-        run: python -m compileall -q freight/public_freight_corpus.py freight/test_public_freight_corpus.py
+        run: python -m compileall -q freight/public_freight_corpus.py freight/test_public_freight_corpus.py freight/real_world_eval_v1.py freight/test_real_world_eval_v1.py
       - name: Replay official facts and exercise real freight engines
-        run: python -m pytest -q freight/test_public_freight_corpus.py
+        run: python -m pytest -q freight/test_public_freight_corpus.py freight/test_real_world_eval_v1.py
       - name: Emit de-identified source/scenario summary
         env:
           PYTHONDONTWRITEBYTECODE: '1'
-        run: python -m freight.public_freight_corpus
+        run: |
+          python -m freight.public_freight_corpus
+          python -m freight.real_world_eval_v1
       - name: Assert original source bytes and private customer data not admitted
         env:
           PYTHONPATH: '.'
         shell: python
         run: |
           from freight.public_freight_corpus import SOURCES
+          from freight.real_world_eval_v1 import load_manifest, validate_manifest
+          by_id = validate_manifest(load_manifest())
+          assert len(by_id) == 9
+          assert all(x['original_bytes_sha256'] is None for x in by_id.values())
           assert len(SOURCES) == 5
           assert all(s.original_bytes_sha256 is None for s in SOURCES)
           assert all(not s.verified_bank_source for s in SOURCES)

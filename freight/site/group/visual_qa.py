@@ -89,11 +89,12 @@ class QuietHandler(SimpleHTTPRequestHandler):
 def check_company_canvas(page, company, slug, output, width):
     """Check each company's own canvas and intentionally static navigation."""
     if company == "group":
-        expected = {"body": "rgb(245, 242, 233)", ".site-header": "rgb(6, 44, 37)",
-                    ".site-footer": "rgb(6, 44, 37)"}
+        # Opaque fallback colors underpin the new emerald/chrome gradients.
+        expected = {"body": "rgb(237, 245, 237)", ".site-header": "rgb(4, 46, 40)",
+                    ".site-footer": "rgb(4, 46, 40)"}
         if not slug:
-            expected.update({"#businesses": "rgb(245, 242, 233)",
-                             "#about": "rgb(7, 62, 50)", "#contact": "rgb(245, 242, 233)"})
+            expected.update({"#businesses": "rgb(237, 245, 237)",
+                             "#about": "rgb(4, 58, 48)", "#contact": "rgb(237, 245, 237)"})
     else:
         expected = {"body": "rgb(244, 241, 235)", ".site-header": "rgb(18, 26, 53)",
                     ".site-footer": "rgb(12, 18, 41)"}
@@ -220,6 +221,10 @@ def check_company_cards(page, bases):
     found = {}
     for card in cards.all():
         title = " ".join(card.locator("h3").inner_text().split())
+        brand = card.locator("h3 img.retally-wordmark")
+        if brand.count():
+            assert brand.get_attribute("alt") == "RETALLY"
+            title = "RETALLY " + title
         link = card.locator(".card-end a")
         assert link.count() == 1
         check_keyboard_target(link)

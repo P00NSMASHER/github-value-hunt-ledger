@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+from collections import UserDict
 import importlib.util
 import io
 import json
@@ -27,9 +28,10 @@ def fixture():
         "RETALLY_OCI_RUN_DOMAIN_URL": "https://idcs-example.identity.oraclecloud.com",
         "RETALLY_OCI_RUN_CLIENT_ID": "remote-only-client",
         "RETALLY_OCI_RUN_CLIENT_SECRET": "dummy-never-live",
-        "RETALLY_OCI_VM_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
-        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": "ocid1.compartment.oc1..testvmcompartment",
-        "RETALLY_OCI_VM_OCID": "ocid1.instance.oc1.iad.testinstance",
+        "RETALLY_OCI_VM_COMPARTMENT_OCID": m.AUTHORIZED_COMPARTMENT_OCID,
+        "RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID": m.AUTHORIZED_COMPARTMENT_OCID,
+        "RETALLY_OCI_VM_OCID": m.AUTHORIZED_VM_OCID,
+        "RETALLY_OCI_RUN_OPERATION": "canary",
         "ACTIONS_ID_TOKEN_REQUEST_URL": "https://pipelines.actions.githubusercontent.com/oidc/token?a=b",
         "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "dummy-gh-job-token",
         "RETALLY_OCI_RUN_APPROVED_SHA": "a" * 40,
@@ -70,6 +72,7 @@ class ContextTests(unittest.TestCase):
             ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID", "bad"),
             ("RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID",
              "ocid1.compartment.oc1..differentcompartment"),
+            ("RETALLY_OCI_RUN_OPERATION", "arbitrary_shell"),
             ("GITHUB_INPUT_EXISTING_COMMAND_ID", "bad"),
             ("RETALLY_OCI_RUN_CLIENT_SECRET", ""),
         ]:
@@ -236,7 +239,7 @@ class ProviderTests(unittest.TestCase):
         poll.assert_called_once_with(
             command, env["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
             command_id, env["RETALLY_OCI_VM_OCID"],
-            max_attempts=1, delay_seconds=0)
+            marker=m.MARKER, max_attempts=1, delay_seconds=0)
         command.create_instance_agent_command.assert_not_called()
 
     def test_get_404_uses_exact_bounded_execution_list_without_recreate(self):
@@ -277,6 +280,19 @@ class ProviderTests(unittest.TestCase):
             m.list_exact_execution(
                 command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
                 command_id, vm_id)
+
+    def test_execution_list_accepts_sdk_mapping_headers(self):
+        command_id = "ocid1.instanceagentcommand.oc1.iad.knownaccepted"
+        vm_id = fixture()["RETALLY_OCI_VM_OCID"]
+        terminal = SimpleNamespace(instance_agent_command_id=command_id)
+        command = Mock()
+        command.list_instance_agent_command_executions.return_value = SimpleNamespace(
+            data=[terminal], headers=UserDict())
+        self.assertIs(
+            m.list_exact_execution(
+                command, fixture()["RETALLY_OCI_RUN_COMMAND_COMPARTMENT_OCID"],
+                command_id, vm_id),
+            terminal)
 
     def test_existing_command_poll_exhausts_404_without_recreate(self):
         command_id = "ocid1.instanceagentcommand.oc1.dummy"
@@ -371,6 +387,46 @@ class ProviderTests(unittest.TestCase):
         for token in ("sudo", "rm ", "curl", "wget", "ssh", "git ", "oci ",
                       "apt ", "systemctl", "export ", "eval ", "base64"):
             self.assertNotIn(token, m.CANARY)
+
+    def test_host_operations_are_fixed_to_authorized_vm_and_accepted_sha(self):
+        self.assertEqual(set(m.OPERATIONS),
+                         {"canary", "host_preflight", "install_synthetic_stage",
+                          "verify_synthetic_stage"})
+        self.assertIn(m.AUTHORIZED_VM_OCID, m.HOST_PREFLIGHT)
+        self.assertIn(m.AUTHORIZED_INSTALL_SHA, m.INSTALL_SYNTHETIC_STAGE)
+        self.assertIn("RETALLY_MICRO_HOST=1", m.INSTALL_SYNTHETIC_STAGE)
+        self.assertIn("install-staging.sh", m.INSTALL_SYNTHETIC_STAGE)
+        self.assertNotIn("systemctl start", m.INSTALL_SYNTHETIC_STAGE)
+        self.assertNotIn("systemctl enable", m.INSTALL_SYNTHETIC_STAGE)
+        self.assertNotIn("customer", m.INSTALL_SYNTHETIC_STAGE.lower())
+        self.assertIn(m.AUTHORIZED_INSTALL_SHA, m.VERIFY_SYNTHETIC_STAGE)
+        self.assertIn(m.VERIFY_MARKER, m.VERIFY_SYNTHETIC_STAGE)
+        self.assertIn("synthetic-preview", m.VERIFY_SYNTHETIC_STAGE)
+        self.assertNotIn("systemctl start", m.VERIFY_SYNTHETIC_STAGE)
+        self.assertNotIn("systemctl enable", m.VERIFY_SYNTHETIC_STAGE)
+
+    def test_install_suppresses_success_chatter_before_exact_marker(self):
+        self.assertIn(') >"$log" 2>&1', m.INSTALL_SYNTHETIC_STAGE)
+        self.assertTrue(m.INSTALL_SYNTHETIC_STAGE.rstrip().endswith(
+            "printf '" + m.INSTALL_MARKER + "\\n'"))
+
+    def test_operation_selects_only_fixed_payload_marker_and_timeout(self):
+        class Model:
+            def __init__(self, **kw):
+                self.__dict__.update(kw)
+        types = SimpleNamespace(**{k: Model for k in (
+            "CreateInstanceAgentCommandDetails", "InstanceAgentCommandTarget",
+            "InstanceAgentCommandContent", "InstanceAgentCommandSourceViaTextDetails",
+            "InstanceAgentCommandOutputViaTextDetails")})
+        fake = SimpleNamespace(compute_instance_agent=SimpleNamespace(models=types))
+        for operation, (script, _, display_name, timeout) in m.OPERATIONS.items():
+            with self.subTest(operation=operation):
+                env = fixture()
+                env["RETALLY_OCI_RUN_OPERATION"] = operation
+                data = m.make_command_details(fake, env)
+                self.assertEqual(data.content.source.text, script)
+                self.assertEqual(data.display_name, display_name)
+                self.assertEqual(data.execution_time_out_in_seconds, timeout)
 
     def test_execution_requires_matching_target_terminal_success_exact_output(self):
         cmd = "ocid1.instanceagentcommand.oc1.dummy"
