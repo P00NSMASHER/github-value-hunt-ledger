@@ -76,7 +76,7 @@ approved claims remain **zero or not estimable**, regardless of feed growth.
 | Lane | Discovery and validation |
 | --- | --- |
 | FreightRecovery | Official GAO adjudications; public invoice exhibits; freight-rate documents; Data.gov, Zenodo and public GitHub dataset *catalogs*. Nightly original GlobalTranz and ArcBest document replay using existing ingestion, rating and reconciliation paths. |
-| PermitPlate | NYC restaurant inspections, DOHMH pre-permit events, DOB NOW building filings and SLA liquor-license applications; real-source adapter and V4-relevant engine regression. **Not parking-ticket analytics:** PermitPlate's current product concerns restaurant vendor opportunity signals. |
+| PermitPlate | NYC DOB NOW **job applications**, DOB NOW **approved permits**, and BIS-only **permit issuance** are separate official source families with distinct coverage and timing. Keep restaurant inspections and dining-out registrations out of the DOB permit-issuance evidence population; never treat an application as an issued permit. Replay the existing official NYC building-permit adapters without asserting independent issuance labels or commercial reuse rights. |
 | CaptureBrief | SAM.gov opportunity and amendment sources, federal procurement archives and USAspending award data; existing historical/current-source controls. Current SAM API access requiring a key is not assumed. |
 | RecoveryOS | Original published vendor-payment and invoice disclosures, especially Pennine Care NHS spending CSVs, plus public procurement/payment metadata; nightly replay through the existing RecoveryWorks reconciliation kernel. |
 
@@ -261,8 +261,8 @@ permissions, nor introduce a deployment or API-secret requirement.
 ## Cursor-paginated Cloudflare-to-GitHub publication (v3)
 
 Each GitHub discovery execution mirrors the four Cloudflare source lanes from
-the existing read-only endpoint \`/feed?engine=...\`, now with an opaque
-\`before\` cursor. Cloudflare continues to preserve newest-first source
+the existing read-only endpoint `/feed?engine=...`, now with an opaque
+`before` cursor. Cloudflare continues to preserve newest-first source
 ordering while permitting older entries to be read across pages. Only the
 public URL and its original observed date are returned; the internal D1
 row ID is used for paging and is **not** returned as a source field.
@@ -283,3 +283,42 @@ This change is only for **public metadata readback and research branch
 publication**: the Cloudflare five-minute Cron, D1 schema and bindings,
 all production environments, external customer communications, and
 existing nightly original-document tests remain unchanged.
+
+## Four-engine source review priorities (v4)
+
+The existing unified discovery job also writes
+`freight/research_lab/source_review_queue_v1.json` on its isolated
+`research/retally-unified-data-lab` branch. This is a **bounded source-review
+queue**, not a fifth engine, a new research controller, or a numerical
+benchmark. It adds no network requests, paid API dependencies, new Cron
+triggers, customer outreach, original-document downloads or engine writes.
+
+Each of the four lanes receives up to **8 ranked public URL references**,
+with stable source IDs, first-observed dates, a SHA-256 receipt pinned to the
+canonical source ledger, and explicit evidence gaps. The ranking is a
+conservative review order: previously identified official publisher URLs,
+then other official publisher hosts, then third-party repository names with
+a matching URL-only keyword, then unclassified archive pointers.
+**An official publisher host is not proof of source content, data rights,
+original source custody, buyer-specific rate authority, independent truth
+or available recovery dollars.** URL-only topic signals never become
+independent positive/negative test labels or commercial authorizations.
+
+Historical unrelated PermitPlate restaurant-inspection URLs are counted
+but excluded from the **review queue only**; the original immutable catalog
+and its first-observed dates are preserved. The current PermitPlate DOB
+application-versus-issued-permit caveat is not erased by this ranking.
+
+Nightly replay verifies the queue against the exact data-branch ledger
+after verifying the source-quality receipt, original freight source
+regression, and the other engines' adapter controls. A drifted hash,
+promoted permission, forged ground-truth flag or missing queue blocks
+acceptance. The queue describes **what evidence is missing** for valid
+engine accuracy tests; it does not pretend that references alone are
+reusable test cases.
+
+Offline, read-only reproduction:
+
+    python -m unittest -q freight.test_research_source_review
+    python -m freight.research_source_review --output /tmp/retally-source-review-queue.json
+    python -m freight.research_source_review --output /tmp/retally-source-review-queue.json --verify
