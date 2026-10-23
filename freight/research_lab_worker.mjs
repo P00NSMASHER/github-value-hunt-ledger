@@ -34,7 +34,7 @@ function queryUrl(base, params) {
   return url.toString();
 }
 
-const PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = new Set(["pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"]);
+const PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = new Set(["43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"]);
 const PERMITPLATE_OFFICIAL_DOHMH_SOURCE = "https://data.cityofnewyork.us/d/43nn-pn8j";
 
 export function permitplateCandidateInScope(url) {
