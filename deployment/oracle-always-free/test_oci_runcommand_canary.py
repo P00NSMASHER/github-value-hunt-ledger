@@ -390,7 +390,8 @@ class ProviderTests(unittest.TestCase):
 
     def test_host_operations_are_fixed_to_authorized_vm_and_accepted_sha(self):
         self.assertEqual(set(m.OPERATIONS),
-                         {"canary", "host_preflight", "install_synthetic_stage"})
+                         {"canary", "host_preflight", "install_synthetic_stage",
+                          "verify_synthetic_stage"})
         self.assertIn(m.AUTHORIZED_VM_OCID, m.HOST_PREFLIGHT)
         self.assertIn(m.AUTHORIZED_INSTALL_SHA, m.INSTALL_SYNTHETIC_STAGE)
         self.assertIn("RETALLY_MICRO_HOST=1", m.INSTALL_SYNTHETIC_STAGE)
@@ -398,6 +399,16 @@ class ProviderTests(unittest.TestCase):
         self.assertNotIn("systemctl start", m.INSTALL_SYNTHETIC_STAGE)
         self.assertNotIn("systemctl enable", m.INSTALL_SYNTHETIC_STAGE)
         self.assertNotIn("customer", m.INSTALL_SYNTHETIC_STAGE.lower())
+        self.assertIn(m.AUTHORIZED_INSTALL_SHA, m.VERIFY_SYNTHETIC_STAGE)
+        self.assertIn(m.VERIFY_MARKER, m.VERIFY_SYNTHETIC_STAGE)
+        self.assertIn("synthetic-preview", m.VERIFY_SYNTHETIC_STAGE)
+        self.assertNotIn("systemctl start", m.VERIFY_SYNTHETIC_STAGE)
+        self.assertNotIn("systemctl enable", m.VERIFY_SYNTHETIC_STAGE)
+
+    def test_install_suppresses_success_chatter_before_exact_marker(self):
+        self.assertIn(') >"$log" 2>&1', m.INSTALL_SYNTHETIC_STAGE)
+        self.assertTrue(m.INSTALL_SYNTHETIC_STAGE.rstrip().endswith(
+            "printf '" + m.INSTALL_MARKER + "\\n'"))
 
     def test_operation_selects_only_fixed_payload_marker_and_timeout(self):
         class Model:
