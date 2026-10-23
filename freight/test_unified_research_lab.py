@@ -236,7 +236,7 @@ class UnifiedResearchLabTests(unittest.TestCase):
         observed = []
         urls = {
             "freightrecovery": "https://www.gao.gov/products/b-160344",
-            "permitplate": "https://data.cityofnewyork.us/d/43nn-pn8j",
+            "permitplate": "https://data.cityofnewyork.us/d/w9ak-ipjd",
             "capturebrief": "https://sam.gov/opportunities",
             "recoveryos": "https://www.penninecare.nhs.uk/download_file/5855/277",
         }
