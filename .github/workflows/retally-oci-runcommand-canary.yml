@@ -18,6 +18,7 @@ on:
           - canary
           - host_preflight
           - install_synthetic_stage
+          - verify_synthetic_stage
       existing_command_id:
         description: 'Optional accepted command OCID to reconcile without creating a command'
         required: false
