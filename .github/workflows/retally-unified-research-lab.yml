@@ -5,6 +5,7 @@ on:
     paths:
       - "freight/unified_research_lab.py"
       - "freight/test_unified_research_lab.py"
+      - "freight/research_lab_worker*"
       - "freight/research_lab/**"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
@@ -50,7 +51,12 @@ jobs:
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
           python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_eval_bridge
+          python -m unittest -v freight.test_unified_research_lab
+      - name: Verify independent Cloudflare scheduler contract
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - run: node --test freight/research_lab_worker.test.mjs freight.test_research_eval_bridge
           python -m freight.real_world_eval_v1
 
   discover:
