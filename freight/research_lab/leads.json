@@ -820,6 +820,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "1090638aadf84ffcd947a0bbbc4a361c4ad89e2e85f2ca5f028d66bb6868a361",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/AdityaAg8/sovereign-ap-autopilot"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -2954,6 +2970,22 @@
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
+      "id": "44f49cb4be7dca5b44fc6c2b51aba9f81a93e9effb0a63de2892f3e2dce4a8ff",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/equivalentideas/westconnex_contracts"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
       "id": "45340eac4f9c90b5beea3b3434fcbffcd1682b59db6532eff4733f4e216e868d",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -3338,6 +3370,22 @@
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
+      "id": "4ff4a5c53790ae9477cf6f92d6d81f8f75aa62f86920ceda32a28095300b4041",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/api-evangelist/xepelin"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
       "id": "50a5d934664917aa9dfb3aa42f407f26476067dcca2becbc6ff77c849482d274",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -3458,6 +3506,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/5562412"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "53a22b587911138fb68dc0c66c2179c15d2714cb185537f20b4d699835ee3569",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/tobatony3-oss/public-procurement-system"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4103,6 +4167,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "62fe0c1220eae8ffc86722ccb75a8cc91b868515ce8d91b3c6120920b5c98be0",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/TanushReddy111/Defense_contracts_event_study"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -4386,6 +4466,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/22656776"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "6852e6b9c1b8b137c04690856614ccb7f3bd77996b8477e40002c24359a41e56",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/tefelix/Caravan"
     },
     {
       "commercial_reuse_authorized": false,
@@ -5307,6 +5403,22 @@
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
+      "id": "88a4cf7da6d373cf4e0137a64066d576898eb8a0c50f637003e4483764c44fd8",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/AloysiusTan2809/PayGuard---App-3"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
       "id": "88ad77d55b0f927c80b55a87524ac03f08494919194a68ba25b2a6547696a388",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -5315,6 +5427,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/8338274"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "88c5660308e6008294c5901a33b38d915046bbfe1ca27a8cbc69b8f1a635ca92",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/api-evangelist/avidxchange"
     },
     {
       "commercial_reuse_authorized": false,
@@ -5491,6 +5619,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://data.cityofnewyork.us/d/qcdj-rwhu"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "8fa55fc8487f1b3366ad7276c6f871e99d464ffa789885b4ec0ce7ac26304885",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/FrancisElendu/SamGovIntegration.Api"
     },
     {
       "commercial_reuse_authorized": false,
@@ -6051,6 +6195,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/MaxwellGrant90/MyConstructionStory_Data_Visual_Notebook"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "9bd32188a3520bdbb0cf3519f4188cafbfeb4bf6641bea987fd9d6d5dadd05c9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Shivangi-Samaymantri/Data-Driven-Insights-Government-Contracts-Analysis"
     },
     {
       "commercial_reuse_authorized": false,
@@ -7564,6 +7724,22 @@
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
+      "id": "c273f8d2d3e80ca869f255af6c2ba72fc2631b6877db1714375ce741ed69a632",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/DaisyS832/government-spending-analysis"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
       "id": "c30e8f0ef457b819b6796a5ab84881468daf7b16700f8bbe9035b1b98343c2d1",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -7796,6 +7972,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://api.usaspending.gov/docs/endpoints"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "ca07a6b87ed95ec6398733a06be0a6d9971999d1cced8d02e4bef9b4a0e8e6de",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/api-evangelist/monto"
     },
     {
       "commercial_reuse_authorized": false,
@@ -8934,6 +9126,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/adivai2001/logistics-audit-dashboard"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "dfa8b5673def836f680b944138dc448cf65757eabc0d3754bc8f2c8e86b358ea",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Nishanth3036/LEGAL-TECH"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10139,6 +10347,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "fba1985c645536b6b2c00ce3c082ec21886bd6409973e1f6f80a0011a1c75093",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/api-evangelist/tipalti"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -10329,6 +10553,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "c9adb44aac95ec56f96d05f05a256ef763079e3e20c9d689a7af2072396649c7",
+  "entries_sha256": "608c9ea4cf5851e81605f8204026ef199a06ff42df83f18f5474c750bd96da09",
   "schema_version": 1
 }

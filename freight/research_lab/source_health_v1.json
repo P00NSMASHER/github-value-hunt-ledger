@@ -11,8 +11,8 @@
       "official_publisher_host_only": 2,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 149,
-      "third_party_catalog_host_only": 147,
+      "source_pointers": 156,
+      "third_party_catalog_host_only": 154,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -44,13 +44,13 @@
       "official_publisher_host_only": 1,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 153,
-      "third_party_catalog_host_only": 152,
+      "source_pointers": 160,
+      "third_party_catalog_host_only": 159,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 645,
+  "first_seen_in_last_seven_calendar_days": 659,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-23",
   "limitations": [
@@ -63,7 +63,7 @@
   "publisher_host_counts": {
     "api.usaspending.gov": 1,
     "data.cityofnewyork.us": 25,
-    "github.com": 172,
+    "github.com": 186,
     "media.cadc.uscourts.gov": 1,
     "sam.gov": 1,
     "www.eia.gov": 1,
@@ -78,8 +78,8 @@
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "c9adb44aac95ec56f96d05f05a256ef763079e3e20c9d689a7af2072396649c7",
-  "unique_source_pointers": 645,
+  "source_ledger_entries_sha256": "608c9ea4cf5851e81605f8204026ef199a06ff42df83f18f5474c750bd96da09",
+  "unique_source_pointers": 659,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }
