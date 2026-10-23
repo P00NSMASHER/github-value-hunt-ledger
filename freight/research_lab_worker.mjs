@@ -127,9 +127,18 @@ export async function cycle(env, whenMs) {
     } catch (error) {
       // Never log untrusted response contents, URLs or tokens.
       const marker = String(error && error.message || "UNAVAILABLE");
+      const kind = String(error && error.name || "Error");
+      // For debugging a failing cron, keep the safe exception category and
+      // bounded reason. No raw provider documents or secrets are ever logged.
+      const safeReason = marker.slice(0, 100)
+        .replace(/https?:\/\/[^\s]+/g, "[public-endpoint]")
+        .replace(/(?:api_?key|token|secret|password)\s*[=:]\s*[^\s,;]*/gi, "[REDACTED]")
+        .replace(/[^A-Za-z0-9 _.,:()\/-]/g, "");
       const code = /^(HTTP_\d{3}|CONTENT_TYPE|RESPONSE_LIMIT|INVALID_ITEMS|INVALID_RESPONSE)$/.test(marker)
-        ? marker : "SOURCE_UNAVAILABLE";
-      errors.push(spec.name + ":" + code);
+        ? marker : (kind === "TimeoutError" || kind === "AbortError" ? "TIMEOUT"
+          : kind === "TypeError" ? "FETCH_TYPEERROR"
+          : kind === "SyntaxError" ? "JSON_INVALID" : "SOURCE_UNAVAILABLE");
+      errors.push(spec.name + ":" + code + (safeReason ? ":" + safeReason : ""));
     }
   }
   let added = 0;
@@ -187,7 +196,7 @@ export default {
       if (!ENGINES.includes(lane)) return json({error:"INVALID_ENGINE"},400);
       const lim = Math.min(100,Math.max(1,Number.parseInt(url.searchParams.get("limit") || "50",10)||50));
       const rows = await env.RESEARCH_DB.prepare(
-        "SELECT s.url,s.first_seen FROM sources s INNER JOIN source_engines e ON e.source_id=s.id WHERE e.lane=? ORDER BY s.id LIMIT ?"
+        "SELECT s.url,s.first_seen FROM sources s INNER JOIN source_engines e ON e.source_id=s.id WHERE e.lane=? ORDER BY s.rowid DESC LIMIT ?"
       ).bind(lane,lim).all();
       return json({engine:lane,scope:"PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",sources:rows.results});
     }
