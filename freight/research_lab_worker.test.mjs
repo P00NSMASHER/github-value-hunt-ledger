@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog} from "./research_lab_worker.mjs";
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -42,4 +42,28 @@ test("public HTTP interface has read-only GET handlers only",async()=>{
   const r=await scout.fetch(new Request("https://research.invalid/feed",{method:"POST"}),{});
   assert.equal(r.status,405);
   assert.deepEqual(await r.json(),{error:"READ_ONLY"});
+});
+
+test("Cloudflare-compatible manual redirect mode blocks all 3xx",async()=>{
+  const original=globalThis.fetch;
+  try {
+    globalThis.fetch=async(url,options)=>{
+      assert.equal(options.redirect,"manual");
+      assert.ok(!options.headers.Authorization);
+      return new Response("",{status:302,headers:{Location:"https://evil.invalid/private"}});
+    };
+    await assert.rejects(fetchCatalog(feedSpecs("recoveryos")[0]),/REDIRECT_BLOCKED/);
+  }finally{globalThis.fetch=original;}
+});
+test("public metadata fetch parses bounded valid JSON",async()=>{
+  const original=globalThis.fetch;
+  try{
+    globalThis.fetch=async(url,options)=>{
+      assert.equal(options.redirect,"manual");
+      return new Response(JSON.stringify({items:[{html_url:"https://github.com/test/example"}]}),
+        {status:200,headers:{"content-type":"application/json"}});
+    };
+    assert.deepEqual(await fetchCatalog(feedSpecs("freightrecovery")[0]),
+      ["https://github.com/test/example"]);
+  }finally{globalThis.fetch=original;}
 });
