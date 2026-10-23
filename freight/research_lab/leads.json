@@ -2634,6 +2634,22 @@
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
+      "id": "8659e147503dadabfde95cdd204aff9c415f36a0439ee3db9666c6bffc60fd1f",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/7134230"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-10-23",
       "id": "876e9810fd97c3aee5ddaec13c9a759772420d2509b0ca4d3e7547a8a360a778",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -5078,6 +5094,6 @@
       "url": "https://github.com/EdouardAndre/Hackathon-HEC"
     }
   ],
-  "entries_sha256": "0a67900f03675b857f1b169aeb02eff67df997ca4109f4fbda14b1985cb6cf5b",
+  "entries_sha256": "c3981298a618f7939c0d56a86fd8d83052d65b611735c0c6b55e4b445a408ee8",
   "schema_version": 1
 }
