@@ -160,10 +160,14 @@ def get_json(url: str) -> dict:
     return data
 
 
+PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = frozenset(("43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"))
+
+
 def permitplate_url_in_scope(url: str) -> bool:
-    """Reject plainly unrelated restaurant/inspection slugs from permit research."""
-    return re.search(r"(?i)(restaurant|inspection|yelp|food[-_ ]?safety)",
-                     urlsplit(url).path) is None
+    """Reject verified wrong-topic public source pointers from permit research."""
+    path = urlsplit(url).path.lower()
+    return (re.search(r"(?i)(restaurant|inspection|yelp|food[-_ ]?safety|dine[-_ ]?safe)", path) is None
+            and path.rstrip("/").rsplit("/", 1)[-1] not in PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS)
 
 
 def permitplate_catalog_in_scope(resource: dict) -> bool:

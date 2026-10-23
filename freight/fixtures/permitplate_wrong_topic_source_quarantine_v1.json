@@ -13,8 +13,8 @@
     "permitplate_assigned_pointers": 42
   },
   "partition": {
-    "observed_wrong_topic_excluded": 13,
-    "remaining_unreviewed_permitplate_pointers": 29,
+    "observed_wrong_topic_excluded": 18,
+    "remaining_unreviewed_permitplate_pointers": 24,
     "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW"
   },
   "cases": [
@@ -64,6 +64,34 @@
       "real_outcome_label": null
     },
     {
+      "id": "38ed2381b3da6fa842f1b26a523bb51ca57a9a7996790969a5a64de5f59ab566",
+      "url": "https://data.cityofnewyork.us/d/pitm-atqc",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "Open Restaurant Applications (Historic)",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/pitm-atqc",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "434fb6f356c2704ca5b56f3f96704dcf9d6e4647843741096a637d4432212854",
+      "url": "https://data.cityofnewyork.us/d/43nn-pn8j",
+      "first_seen": "2026-10-22",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "DOHMH New York City Restaurant Inspection Results",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/43nn-pn8j",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
       "id": "49db47604edae2ad15a7d732bb0ec8a951cb2ee2dfe98545b2016198a551005d",
       "url": "https://github.com/ryankanno/archive-nyc-restaurant-inspections-api",
       "first_seen": "2026-10-23",
@@ -80,6 +108,48 @@
       "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "expected_result": "QUARANTINE_WRONG_TOPIC",
       "real_outcome_label": null
+    },
+    {
+      "id": "8e60922d492462b1d973f82946a23e70323c111cd1af88d33c9e82da86978774",
+      "url": "https://data.cityofnewyork.us/d/fpeh-f7ci",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "Dining Out NYC Locations",
+      "publisher_metadata_reference": "https://catalog.data.gov/dataset/dining-out-nyc-locations",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "8f2438fbb256b07647937453082a12901dd17670c17b00d318149b3ab6c84b69",
+      "url": "https://data.cityofnewyork.us/d/qcdj-rwhu",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "HISTORICAL Sidewalk Café Licenses and Applications",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/qcdj-rwhu",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "9d68ebec6904e9acb4afa01f16ec8ea205ac748b21e4b64e69b0cd23ae287677",
+      "url": "https://github.com/gcivil-nyu-org/dine-safe-ly",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "A restaurant locator using COVID-19 restaurant inspection data",
+      "publisher_metadata_reference": "https://api.github.com/repos/gcivil-nyu-org/dine-safe-ly",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
     },
     {
       "id": "a6119f47e13f398fa9813db36cf59480c53d039b6bee5a4c551dcea07adf8664",
@@ -163,5 +233,5 @@
   "publisher_reference": "https://data.cityofnewyork.us/d/rbx6-tga4",
   "publisher_rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
   "observed_at": "2026-10-23",
-  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior."
+  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified."
 }

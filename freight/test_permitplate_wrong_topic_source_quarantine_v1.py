@@ -17,24 +17,34 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         self.assertEqual(m["pinned_input"]["entries_sha256"], "6759c4919c86264c6394ef3f0f04c07acdafaf9f72e68a9efc8a5b8b5df4a7e1")
         self.assertEqual(m["pinned_input"]["entry_count"], 252)
         self.assertEqual(m["pinned_input"]["permitplate_assigned_pointers"], 42)
-        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"], 13)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 29)
-        self.assertEqual(len(m["cases"]), 13)
+        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"], 18)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 24)
+        self.assertEqual(len(m["cases"]), 18)
         self.assertIn("UNVERIFIED", m["partition"]["remaining_status"])
 
-    def test_all_13_original_pointer_ids_first_seen_and_rejection(self):
+    def test_all_18_original_pointer_ids_first_seen_and_rejection(self):
         rows = self.pack["cases"]
-        self.assertEqual(len({r["id"] for r in rows}), 13)
-        self.assertEqual(len({r["url"] for r in rows}), 13)
+        self.assertEqual(len({r["id"] for r in rows}), 18)
+        self.assertEqual(len({r["url"] for r in rows}), 18)
         for r in rows:
             with self.subTest(url=r["url"]):
                 self.assertEqual(r["id"], digest(r["url"]))
-                self.assertEqual(r["first_seen"], "2026-10-23")
+                self.assertIn(r["first_seen"], ("2026-10-22", "2026-10-23"))
                 self.assertFalse(permitplate_url_in_scope(r["url"]))
                 self.assertEqual(r["expected_result"], "QUARANTINE_WRONG_TOPIC")
                 self.assertIsNone(r["real_outcome_label"])
                 self.assertIn("UNVERIFIED", r["source_rights_state"])
                 self.assertIn("UNVERIFIED", r["source_truth_state"])
+
+    def test_five_newly_verified_publisher_metadata_only_out_of_scope(self):
+        newest = [r for r in self.pack["cases"] if r.get("metadata_checked_on") == "2026-10-23"]
+        self.assertEqual(len(newest), 5)
+        self.assertEqual(next(r for r in newest if r["url"].endswith("43nn-pn8j"))["first_seen"], "2026-10-22")
+        for row in newest:
+            self.assertTrue(row["metadata_only"])
+            self.assertTrue(row["publisher_metadata_reference"].startswith("https://"))
+            self.assertFalse(permitplate_url_in_scope(row["url"]))
+            self.assertIsNone(row["real_outcome_label"])
 
     def test_synthetic_negative_and_official_candidate_still_unadjudicated(self):
         neg, candidate = self.pack["synthetic_negative_controls"]

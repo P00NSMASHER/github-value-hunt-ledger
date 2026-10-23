@@ -34,8 +34,12 @@ function queryUrl(base, params) {
   return url.toString();
 }
 
+const PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS = new Set(["43nn-pn8j", "pitm-atqc", "qcdj-rwhu", "fpeh-f7ci"]);
+
 export function permitplateCandidateInScope(url) {
-  return !/(restaurant|inspection|yelp|food[-_ ]?safety)/i.test(new URL(url).pathname);
+  const path = new URL(url).pathname.toLowerCase().replace(/\/$/, "");
+  return !/(restaurant|inspection|yelp|food[-_ ]?safety|dine[-_ ]?safe)/i.test(path)
+    && !PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS.has(path.split("/").pop());
 }
 
 export function canonicalCandidates(provider, data) {

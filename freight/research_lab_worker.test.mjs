@@ -95,4 +95,11 @@ test("PermitPlate excludes restaurant inspection catalogs from its permit leads"
   ]);
   assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-Restaurant-Inspection"), false);
   assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-DOB-Building-Permits"), true);
+  for (const url of [
+    "https://github.com/gcivil-nyu-org/dine-safe-ly",
+    "https://data.cityofnewyork.us/d/43nn-pn8j",
+    "https://data.cityofnewyork.us/d/pitm-atqc",
+    "https://data.cityofnewyork.us/d/qcdj-rwhu",
+    "https://data.cityofnewyork.us/d/fpeh-f7ci",
+  ]) assert.equal(permitplateCandidateInScope(url), false, url);
 });
