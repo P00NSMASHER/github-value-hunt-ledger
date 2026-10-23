@@ -38,7 +38,8 @@ SOURCE_HOSTS = frozenset({
     "www2.fmc.gov", "www.fmc.gov", "www.sec.gov", "www.stb.gov",
     "www.eia.gov", "psc.ky.gov",
 })
-API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.socrata.com"})
+API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.socrata.com",
+                       "retally-unified-research-scout.jayp19386.workers.dev"})
 SEEDS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
@@ -247,6 +248,10 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
     # Data.gov CKAN v3 endpoint was retired in 2026. The official v4 API
     # requires an API key; never use its rate-limited DEMO_KEY in cron.
     feeds = [
+        # Durable metadata accumulated independently if GitHub cron is absent.
+        ("cloudflare-failover", "scout",
+         "https://retally-unified-research-scout.jayp19386.workers.dev/feed?" +
+         urlencode({"engine": engine, "limit": "100"})),
         ("github:" + q1, "github", "https://api.github.com/search/repositories?" +
          urlencode({"q": q1 + " in:name,description", "per_page": "15"})),
         ("github:" + q3, "github", "https://api.github.com/search/repositories?" +
@@ -271,7 +276,16 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
     for label, provider, address in feeds:
         try:
             data = fetch(address)
-            if provider == "datagov-v4":
+            if provider == "scout":
+                if (data.get("engine") != engine
+                        or data.get("scope") != "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA"
+                        or type(data.get("sources")) is not list):
+                    raise ResearchError("UNTRUSTED_SCOUT_FEED")
+                for record in data["sources"][:100]:
+                    if type(record) is not dict or type(record.get("url")) is not str:
+                        raise ResearchError("INVALID_SCOUT_RECORD")
+                    urls.append(safe_url(record["url"], SOURCE_HOSTS))
+            elif provider == "datagov-v4":
                 rows = data.get("results", [])
                 if type(rows) is not list:
                     raise ResearchError("INVALID_PROVIDER_ROWS")
@@ -323,7 +337,9 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
             errors.append(label + ":" + type(exc).__name__)
     if successful == 0:
         raise ResearchError("ALL_PUBLIC_FEEDS_UNAVAILABLE")
-    return sorted(set(urls)), errors
+    # Preserve trusted feed ordering: a late-running GitHub job should first
+    # mirror the scout backlog, not repeatedly consume only search front pages.
+    return list(dict.fromkeys(urls)), errors
 
 
 def run(*, engine: str, live: bool, ledger: Path, now: datetime,
