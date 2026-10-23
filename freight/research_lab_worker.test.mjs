@@ -167,8 +167,15 @@ test("provider errors are fixed bounded telemetry codes with no source disclosur
 test("oversized public catalog streaming is bounded by byte count",async()=>{
   const original=globalThis.fetch;
   try{
-    globalThis.fetch=async()=>new Response("x".repeat(1200001),
-      {status:200,headers:{"content-type":"application/json"}});
+    globalThis.fetch=async()=>new Response(new ReadableStream({
+      start(controller){
+        controller.enqueue(new Uint8Array(600001));
+        controller.enqueue(new Uint8Array(600001));
+        controller.close();
+      },
+    }),{status:200,headers:{"content-type":"application/json"}});
+    // Streaming Response has no Content-Length header; the byte guard itself
+    // must reject the oversized source rather than relying on metadata.
     await assert.rejects(fetchCatalog(feedSpecs("capturebrief")[0]),/RESPONSE_LIMIT/);
   }finally{globalThis.fetch=original;}
 });
