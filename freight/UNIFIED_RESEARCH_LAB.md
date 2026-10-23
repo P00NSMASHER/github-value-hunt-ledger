@@ -226,3 +226,35 @@ Manual offline reproduction, **without network or paid services**:
     python -m freight.research_lab_health --output /tmp/retally-source-health-v1.json
     python -m freight.research_lab_health --output /tmp/retally-source-health-v1.json --verify
 
+## Independent scout resource efficiency (v2)
+
+The independent Cloudflare collector keeps the **same** existing
+`*/5 * * * *` Cron trigger, D1 database, approved read-only GET routes,
+three public metadata providers and maximum 24 processed links per cycle.
+
+- Public GitHub/Zenodo search terms and pages 1/2/3 rotate deterministically,
+  including one newest-first GitHub search per five lane attempts. This covers
+  12 bounded query/page/sort views without increasing the three core provider
+  requests, introducing any new credentials or fetching source-document bytes.
+  Partial search misses still produce explicit provider warnings.
+- A GitHub HTTP 429 skips the second same-origin GitHub call for that cycle,
+  reducing pressure during a rate limit. Provider diagnostics consist only
+  of bounded non-identifying status codes; raw exception text is never
+  persisted to D1.
+- A stream reader enforces the 1.2 MB provider response cap **in bytes**
+  even when `Content-Length` is absent; oversized responses are cancelled
+  rather than loaded as complete strings.
+- The up-to-24-rights-held public URL pointers and their engine associations
+  are inserted through one D1 `batch` transaction containing two prepared,
+  parameter-bound SQL statements instead of up to 48 separate round trips.
+  If either statement fails, no partial source/association pair is committed;
+  the Cron run records a failed storage state where D1 remains reachable.
+- `GET /health` additionally returns metadata-only 24-hour per-engine run,
+  error and discovery counts plus per-engine source associations. These are
+  operational counters, **not** verified benchmark evidence.
+
+All candidate URLs remain unverified and require independent original data,
+rights, authority and outcome evidence before usage as a benchmark or
+commercial claim. This change does not change existing billing plans or
+permissions, nor introduce a deployment or API-secret requirement.
+
