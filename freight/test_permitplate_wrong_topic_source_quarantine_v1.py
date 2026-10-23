@@ -18,7 +18,7 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         self.assertEqual(m["pinned_input"]["entry_count"], 252)
         self.assertEqual(m["pinned_input"]["permitplate_assigned_pointers"], 42)
         self.assertEqual(m["partition"]["observed_wrong_topic_excluded"], 18)
-        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 24)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 22)
         self.assertEqual(len(m["cases"]), 18)
         self.assertIn("UNVERIFIED", m["partition"]["remaining_status"])
 
@@ -54,6 +54,30 @@ class PermitPlateWrongTopicQuarantineTest(unittest.TestCase):
         self.assertEqual(candidate["kind"], "SYNTHETIC")
         self.assertTrue(permitplate_url_in_scope(candidate["url"]))
         self.assertEqual(candidate["expected"], "CANDIDATE_ONLY_RIGHTS_AND_ISSUANCE_LABELS_UNVERIFIED")
+
+    def test_official_nyc_context_is_not_permit_issuance_truth(self):
+        m = self.pack
+        rows = m["context_only_candidates"]
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(m["partition"]["context_only_unadjudicated"], 2)
+        self.assertEqual(m["partition"]["remaining_unreviewed_permitplate_pointers"], 22)
+        self.assertEqual(m["partition"]["observed_wrong_topic_excluded"] + len(rows) + m["partition"]["remaining_unreviewed_permitplate_pointers"], 42)
+        self.assertEqual({r["url"].split("/")[-1] for r in rows}, {"64uk-42ks", "5zyy-y8am"})
+        self.assertTrue(set(r["id"] for r in rows).isdisjoint(r["id"] for r in m["cases"]))
+        for r in rows:
+            with self.subTest(dataset=r["url"]):
+                self.assertEqual(r["id"], digest(r["url"]))
+                self.assertEqual(r["first_seen"], "2026-10-23")
+                self.assertTrue(r["metadata_only"])
+                self.assertTrue(r["publisher_metadata_title"])
+                self.assertEqual(r["publisher_metadata_reference"], r["url"])
+                self.assertEqual(r["expected_evaluation"], "CONTEXT_ONLY_NOT_PERMIT_ISSUANCE_GROUND_TRUTH")
+                self.assertFalse(r["permit_issuance_ground_truth"])
+                self.assertFalse(r["commercial_reuse_authorized"])
+                self.assertIsNone(r["original_source_bytes_sha256"])
+                self.assertIsNone(r["independent_permit_outcome_label"])
+                self.assertIn("UNVERIFIED", r["source_rights_state"])
+                self.assertIn("UNVERIFIED", r["source_truth_state"])
 
     def test_never_promote_pointers_to_rights_accuracy_or_real_outcomes(self):
         m = self.pack
