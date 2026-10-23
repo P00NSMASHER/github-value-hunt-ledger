@@ -5,6 +5,10 @@ on:
     paths:
       - "freight/unified_research_lab.py"
       - "freight/test_unified_research_lab.py"
+      - "freight/research_eval_bridge.py"
+      - "freight/test_research_eval_bridge.py"
+      - "freight/fixtures/real_world_eval_v1.json"
+      - "freight/real_world_eval_v1.py"
       - "freight/research_lab/**"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - ".github/workflows/retally-unified-research-lab.yml"
@@ -15,6 +19,9 @@ on:
     paths:
       - "freight/unified_research_lab.py"
       - "freight/test_unified_research_lab.py"
+      - "freight/research_eval_bridge.py"
+      - "freight/test_research_eval_bridge.py"
+      - "freight/real_world_eval_v1.py"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - ".github/workflows/retally-unified-research-lab.yml"
   schedule:
@@ -41,8 +48,10 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate all four lanes
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py
-          python -m unittest -v freight.test_unified_research_lab
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_eval_bridge
+          python -m freight.real_world_eval_v1 > /tmp/freight-real-evaluation-fixed.json
+          python -m freight.public_freight_corpus > /tmp/freight-public-sources-fixed.json
 
   discover:
     if: (github.event_name == 'schedule' && github.event.schedule == '3-58/5 * * * *') || github.event_name == 'workflow_dispatch'
@@ -109,6 +118,23 @@ jobs:
             python -m freight.lab15_triage --out freight/lab15/triage_queue.json
             python -m freight.lab15_evidence_harvester --network --report /tmp/retally-lab15-discovery.json
           fi
+      - name: Build and validate dynamic freight candidate queue from three verified ledgers
+        run: |
+          set -euo pipefail
+          python -m freight.research_eval_bridge build --report /tmp/retally-candidate-build.json
+          python -m freight.research_eval_bridge verify --report /tmp/retally-candidate-verified.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('/tmp/retally-candidate-verified.json').read_text())
+          assert r['fixed_v1_real_world_cases_replayed'] == 9
+          assert r['prior_official_source_case_families_replayed'] == 5
+          assert r['all_candidate_sources_on_rights_and_truth_hold'] is True
+          assert r['new_source_numeric_claims_evaluated'] == 0
+          assert r['verified_new_customer_recovery_cents'] == 0
+          assert r['real_precision'] is None
+          print('One candidate queue is bound to all three validated metadata ledgers.')
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -126,7 +152,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/lab15/evidence_ledger.json freight/lab15/triage_queue.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_candidates.json freight/lab15/evidence_ledger.json freight/lab15/triage_queue.json freight/research/lab15_candidate_ledger.json
           if ! git diff --cached --quiet; then
             git commit -m 'research: unified four-engine public evidence source refresh'
           fi
@@ -149,6 +175,43 @@ jobs:
           python-version: "3.11"
       - name: Install pinned isolated PDF adapter
         run: python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5 pytest==8.4.2
+      - name: Read latest research-only candidate branch without write credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: P00NSMASHER/github-value-hunt-ledger
+          ref: research/retally-unified-data-lab
+          path: research-data-src
+          persist-credentials: false
+      - name: Replay immutable freight pack and dynamically validate discovered candidates
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_research_eval_bridge
+          python -m pytest -q freight/test_public_freight_corpus.py freight/test_real_world_eval_v1.py
+          FEED="research-data-src/freight/research_lab/evaluation_candidates.json"
+          ARGS=(--unified research-data-src/freight/research_lab/leads.json --legacy research-data-src/freight/lab15/evidence_ledger.json --harvest research-data-src/freight/research/lab15_candidate_ledger.json)
+          if [ -f "$FEED" ]; then
+            python -m freight.research_eval_bridge verify "${ARGS[@]}" --feed "$FEED" --report /tmp/retally-eval-feed-report.json
+          else
+            # Initial main-branch publish may race the first data-branch writer.
+            # Replay from verified source ledgers without claiming persistence.
+            echo 'Candidate publication pending first discover run; temporary validation only.'
+            python -m freight.research_eval_bridge build "${ARGS[@]}" --feed /tmp/retally-eval-bootstrap.json
+            python -m freight.research_eval_bridge verify "${ARGS[@]}" --feed /tmp/retally-eval-bootstrap.json --report /tmp/retally-eval-feed-report.json
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-eval-feed-report.json').read_text())
+          assert r['fixed_v1_real_world_cases_replayed'] == 9
+          assert r['prior_official_source_case_families_replayed'] == 5
+          assert r['all_candidate_sources_on_rights_and_truth_hold'] is True
+          assert r['verified_new_customer_recovery_cents'] == 0
+          assert r['independently_adjudicated_new_invoices'] == 0
+          assert r['real_precision'] is None
+          print('Candidate feed:', r['discovered_candidate_sources'],
+                'sources,', r['references_matched_to_existing_fixed_cases'],
+                'fixed-case source references; no external claim approval.')
+          PY
       - name: Original freight and accounts-payable source regression
         run: |
           set -euo pipefail
