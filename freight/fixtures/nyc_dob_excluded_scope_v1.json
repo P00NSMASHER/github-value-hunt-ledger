@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_EXCLUDED_SCOPE_V1",
+  "family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
+  "publisher_reviewed_date": "2026-10-23",
+  "provenance": "OFFICIAL_NYC_DOB_PUBLISHER_METADATA_DESCRIPTIONS_ONLY",
+  "primary_scope_pack": "freight/fixtures/nyc_dob_source_scope_v1.json",
+  "core_dataset_id": "rbx6-tga4",
+  "excluded_work_types": [
+    "ELECTRICAL",
+    "ELEVATOR",
+    "LIMITED_ALTERATION_APPLICATION"
+  ],
+  "real_permit_records_ingested": 0,
+  "independent_outcome_labels": 0,
+  "cross_dataset_join": "UNVERIFIED",
+  "commercial_use": "UNVERIFIED_NOT_APPROVED",
+  "permit_score_accuracy": "UNKNOWN_NO_HELD_OUT_LABELS",
+  "freight_error_accuracy": "NOT_APPLICABLE",
+  "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+  "publisher_scope_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+  "companion_source_candidates": [
+    {
+      "work_type": "ELECTRICAL",
+      "dataset_id": "dm9a-ab7w",
+      "dataset_title": "DOB NOW: Electrical Permit Applications",
+      "official_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+      "publisher": "NYC Department of Buildings",
+      "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
+      "last_observed_publisher_update_date": "2026-10-21",
+      "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
+      "authority_limit": "Applications and amendments are not independently issued-permit determinations. Filing status and permit suffix must be validated in the appropriate official status source.",
+      "original_source_bytes_sha256": null,
+      "independent_outcome_label": null,
+      "commercial_reuse_authorized": false,
+      "independent_issuance_adjudicated": false,
+      "schema_or_join_certification": "UNVERIFIED_CANDIDATE",
+      "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED"
+    },
+    {
+      "work_type": "ELEVATOR",
+      "dataset_id": "kfp4-dz4h",
+      "dataset_title": "DOB NOW: Build Elevator Permit Applications",
+      "official_url": "https://data.cityofnewyork.us/d/kfp4-dz4h",
+      "publisher": "NYC Department of Buildings",
+      "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
+      "last_observed_publisher_update_date": "2026-10-21",
+      "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
+      "authority_limit": "ELV1 initial, subsequent and amendment filings are application records; do not infer issuance from a filing row.",
+      "original_source_bytes_sha256": null,
+      "independent_outcome_label": null,
+      "commercial_reuse_authorized": false,
+      "independent_issuance_adjudicated": false,
+      "schema_or_join_certification": "UNVERIFIED_CANDIDATE",
+      "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED"
+    },
+    {
+      "work_type": "LIMITED_ALTERATION_APPLICATION",
+      "dataset_id": "xxbr-ypig",
+      "dataset_title": "DOB NOW: Build – Limited Alteration Applications",
+      "official_url": "https://data.cityofnewyork.us/d/xxbr-ypig",
+      "publisher": "NYC Department of Buildings",
+      "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
+      "last_observed_publisher_update_date": "2026-10-05",
+      "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
+      "authority_limit": "LAA includes plumbing, fire-suppression piping and oil-burner work; application membership is not independent issuance adjudication.",
+      "original_source_bytes_sha256": null,
+      "independent_outcome_label": null,
+      "commercial_reuse_authorized": false,
+      "independent_issuance_adjudicated": false,
+      "schema_or_join_certification": "UNVERIFIED_CANDIDATE",
+      "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED"
+    }
+  ],
+  "synthetic_negative_controls": [
+    {
+      "case_id": "synthetic_core_nonmatch_electrical",
+      "work_type": "ELECTRICAL",
+      "core_catalog_match": false,
+      "untrusted_assertion": "NO_PERMIT_EXISTS",
+      "expected_decision": "UNKNOWN_NOT_IN_CORE_SCOPE",
+      "independent_issued_permit_truth": null,
+      "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
+    },
+    {
+      "case_id": "synthetic_core_nonmatch_elevator",
+      "work_type": "ELEVATOR",
+      "core_catalog_match": false,
+      "untrusted_assertion": "NO_PERMIT_EXISTS",
+      "expected_decision": "UNKNOWN_NOT_IN_CORE_SCOPE",
+      "independent_issued_permit_truth": null,
+      "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
+    },
+    {
+      "case_id": "synthetic_core_nonmatch_limited_alteration_application",
+      "work_type": "LIMITED_ALTERATION_APPLICATION",
+      "core_catalog_match": false,
+      "untrusted_assertion": "NO_PERMIT_EXISTS",
+      "expected_decision": "UNKNOWN_NOT_IN_CORE_SCOPE",
+      "independent_issued_permit_truth": null,
+      "provenance": "SYNTHETIC_NEGATIVE_CONTROL"
+    }
+  ],
+  "manifest_sha256": "0bb64e12c8dbc522b1816f0ecefcbeaa3f59c1e6b5d6c66e22ff971d39bc7209",
+  "source_join_cardinality_candidate": {
+    "dataset_id": "xmmq-y7za",
+    "dataset_title": "DOB NOW: Electrical Permit Details",
+    "official_url": "https://data.cityofnewyork.us/d/xmmq-y7za",
+    "metadata_url": "https://catalog.data.gov/dataset/dob-now-electrical-permit-details",
+    "publisher": "NYC Department of Buildings",
+    "dataset_first_published_date": "2019-04-30",
+    "last_observed_publisher_update_date": "2026-10-20",
+    "metadata_reviewed_date": "2026-10-23",
+    "row_grain": "ELECTRICAL_SCOPE_DETAIL_MULTIPLE_PER_JOB_FILING",
+    "join_key_name": "JOB_FILING_NUMBER",
+    "publisher_cardinality_statement": "Multiple detail rows may exist for one job filing, including different floors and switch types.",
+    "authority_limit": "Detail rows are not distinct permit issuances; cross-dataset joins and issued-permit counts are not independently adjudicated.",
+    "original_source_bytes_sha256": null,
+    "commercial_reuse_authorized": false,
+    "independent_issuance_adjudicated": false,
+    "independently_verified_join": false,
+    "rights_class": "NYC_PORTAL_TERMS_AND_AGENCY_SUPPLEMENTAL_TERMS_REVIEW_REQUIRED",
+    "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/"
+  },
+  "synthetic_join_cardinality_negative_control": {
+    "case_id": "synthetic_electrical_detail_rows_one_job",
+    "provenance": "SYNTHETIC_JOIN_NEGATIVE_CONTROL",
+    "cohort": "SYNTHETIC_ELECTRICAL_DETAILS",
+    "untrusted_claim": "TWO_INDEPENDENTLY_ISSUED_PERMITS_FROM_TWO_DETAIL_ROWS",
+    "details": [
+      {
+        "job_filing_number": "SYNTHETIC-ELECTRICAL-001",
+        "work_location": "BASEMENT"
+      },
+      {
+        "job_filing_number": "SYNTHETIC-ELECTRICAL-001",
+        "work_location": "FOURTH_FLOOR"
+      }
+    ],
+    "expected_source_detail_rows": 2,
+    "expected_distinct_job_filings": 1,
+    "expected_issued_permit_count": null,
+    "independent_issuance_truth": null,
+    "expected_decision": "UNKNOWN_NO_ISSUANCE_ADJUDICATION"
+  }
+}
