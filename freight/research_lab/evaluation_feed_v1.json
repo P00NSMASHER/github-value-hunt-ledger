@@ -1057,6 +1057,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "9de08305c5b371d1a41ffee97fe39dd8fd52aa9123c23e7636b34c8b4df9ec8e",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www.gao.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www.gao.gov/products/b-139340",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "a1e53447f523872c2c12cd11f8545041719c5ea15aa90a1a08495809af4a33b3",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -5709,7 +5734,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "d6594d96d7f64f44f2696488c412baf4c7a357c621c483863b93332b2e493a63",
+  "feed_sha256": "9b242f63b6195d2fa408f2baf5283b7783aee96d2c9794a5f9e45dfd65727b4e",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -5721,12 +5746,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 228,
-  "source_pointers_total": 228,
+  "selected_for_synthetic_proof_gate": 229,
+  "source_pointers_total": 229,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "d955db7b7ccf1be9c0360bb7eec17515143bd164b1446090fd55a2ec07a76d4e",
     "lab15_evidence_metadata_sha256": "da475a22485a99c58e0fdc9623e4e9e254d29114571ee9c7af98744880a51c7b",
-    "unified_entries_sha256": "8406b792f0b428b8270d686827026d47c025a2ff84a58ee83538e1ee5c809e32"
+    "unified_entries_sha256": "717e82832d2e460eab9d3b69aad41bc832fd4ee0114f99e1fc36f29702216a7c"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 10,
   "verified_recovered_cash_cents": 0

@@ -7370,6 +7370,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "9de08305c5b371d1a41ffee97fe39dd8fd52aa9123c23e7636b34c8b4df9ec8e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-139340"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "9ef62ad7473868509be897eee1afb19afbcb5a0454831d370ed8f52ac2a91d50",
       "independent_ground_truth": false,
@@ -12233,6 +12249,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "8406b792f0b428b8270d686827026d47c025a2ff84a58ee83538e1ee5c809e32",
+  "entries_sha256": "717e82832d2e460eab9d3b69aad41bc832fd4ee0114f99e1fc36f29702216a7c",
   "schema_version": 1
 }
