@@ -149,7 +149,9 @@ class LaboratoryTests(unittest.TestCase):
         sha = FROZEN_DOCUMENT_SHA256["globaltranz"]
         report = globaltranz_canonical_v2_adjustment_replay(
             faces, [signed, plain], sha)
-        self.assertEqual(report["canonical_v2_records_with_exact_net"], 2)
+        self.assertEqual(report["canonical_invoice_records_with_exact_source_net"], 2)
+        self.assertEqual(report["canonical_v2_adjustment_records_with_exact_source_net"], 1)
+        self.assertEqual(report["canonical_v1_charge_only_records_with_exact_source_net"], 1)
         self.assertEqual(report["canonical_records_built"], 2)
         self.assertEqual(report["discount_bearing_v2_records"], 1)
         self.assertEqual(report["rate_review_required"], 2)
