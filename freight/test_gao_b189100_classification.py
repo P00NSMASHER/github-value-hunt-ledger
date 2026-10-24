@@ -173,5 +173,152 @@ class GAOCargoClassificationEvidenceTests(unittest.TestCase):
             validate_feed(forged, ledger, evidence, candidates, manifest)
 
 
+
+# Companion classification control: a second pickup carrier is not, by itself,
+# evidence of an interline rate. Keep this in the already scheduled nightly lane.
+AGENT_URL = "https://www.gao.gov/products/b-221663-0"
+AGENT_PATH = Path(__file__).with_name("fixtures") / "gao_b221663_agent_interline_v1.json"
+AGENT_MANIFEST_SHA256 = "b79983f508686ba0250de0f77ef393fcef7289f6e4e9fbc47bac36c10dd38d0e"
+
+
+def agent_fixture():
+    return json.loads(AGENT_PATH.read_text(encoding="utf-8"))
+
+
+def validate_agent_fixture(doc):
+    if digest({k: v for k, v in doc.items() if k != "manifest_sha256"}) != doc.get("manifest_sha256"):
+        raise ResearchError("GAO_B221663_AUTHORED_MANIFEST_HASH_MISMATCH")
+    s, c, f, x, lim, quality = (doc["source"], doc["cohort"], doc["shipment"],
+                              doc["source_conflict"], doc["limits"], doc["data_quality"])
+    if not (
+        doc["schema_version"] == "1.0.0"
+        and doc["fixture_id"] == "GAO_B221663_AGENT_INTERLINE_DISPUTE_V1"
+        and doc["evidence_lane"] == "freight_error_adjudication"
+        and doc["status"] == "HISTORICAL_DECISION_LEVEL_AGENT_CLASSIFICATION_NOT_INVOICE_BENCHMARK"
+        and s["original_record_url"] == AGENT_URL
+        and s["case_number"] == "B-221663"
+        and s["decision_date"] == "1986-10-10"
+        and s["rights_url"] == "https://www.gao.gov/copyright"
+        and s["source_bytes_acquired"] is False
+        and s["original_source_bytes_sha256"] is None
+        and s["commercial_engine_use_approved"] is False
+        and c["independent_government_adjudication"] is True
+        and c["held_out_from_engine_training_verified"] is False
+        and c["original_gbl_or_carrier_invoice_bytes_available"] is False
+        and c["decision_level_label_scope"] == "GAO_SUSTAINED_GSA_RATE_DEDUCTION_ONLY"
+        and f["government_bill_of_lading"] == "S-5789267"
+        and f["shipment_date"] == "1982-12-17"
+        and f["pickup_carrier"] == "Merchants Fast Motor Lines"
+        and f["billing_delivering_carrier"] == "Yellow Freight System"
+        and f["historical_tender"] == "Yellow Freight Tender ICC 2094"
+        and f["tender_in_effect_on_shipment_date"] is True
+        and f["pickup_carrier_receipted_as_yellow_agent"] is True
+        and f["contract_rate_mode_adjudicated"] == "SINGLE_LINE_YELLOW_AGENT"
+        and f["joint_line_rate_claim_by_carrier"] is True
+        and f["gao_disposition"] == "GSA_LOWER_SINGLE_LINE_DEDUCTION_SUSTAINED"
+        and f["deduction_cents_from_original_decision"] is None
+        and f["invoice_line_amounts_available"] is False
+        and f["verified_retally_recovery_cents"] == 0
+        and f["actual_refund_received_cents"] is None
+        and f["independent_invoice_error_amount_cents"] is None
+        and x["specific_fort_sam_houston_letter_date"] == "1986-04-04"
+        and x["general_bay_city_letter_date"] == "1986-04-08"
+        and x["later_general_letter_may_conflict_with_specific_letter"] is True
+        and x["original_letters_in_custody"] is False
+        and x["new_independent_fact_verification"] is False
+        and lim["contemporaneous_carrier_contract_pages_available"] is False
+        and lim["original_bol_or_invoice_images_verified"] is False
+        and lim["commercial_engine_use_authorized"] is False
+        and lim["independent_invoice_accuracy_scoring_permitted"] is False
+        and lim["non_dod_shipments_same_result"] == "UNKNOWN"
+        and lim["other_shipments_same_rates"] == "UNKNOWN"
+        and lim["independent_customer_payment_chain_verified"] is False
+        and lim["verified_retally_recovered_cash_cents"] == 0
+        and quality["source_amount_absent"] is True
+        and quality["decision_level_label_complete"] is True
+        and quality["shipment_invoice_level_label_complete"] is False
+        and quality["original_publisher_source_bytes_hashed"] is False
+        and quality["private_customer_medical_student_data_used"] is False
+        and len(doc["synthetic_negative_controls"]) == 3
+        and all(v["synthetic"] is True and v["verified_invoice_error_cents"] is None
+                for v in doc["synthetic_negative_controls"])
+    ):
+        raise ResearchError("GAO_B221663_CLASSIFICATION_OR_TRUTH_SCOPE_MISMATCH")
+    return doc
+
+
+class GAOAgentVersusInterlineEvidenceTests(unittest.TestCase):
+    def test_official_source_and_exact_authored_manifest_hash(self):
+        doc = validate_agent_fixture(agent_fixture())
+        self.assertEqual(doc["manifest_sha256"], AGENT_MANIFEST_SHA256)
+        self.assertIn(AGENT_URL, SEEDS["freightrecovery"])
+        self.assertFalse(doc["source"]["commercial_engine_use_approved"])
+        self.assertIsNone(doc["source"]["original_source_bytes_sha256"])
+
+    def test_specific_shipment_evidence_controls_agent_classification_only(self):
+        doc = validate_agent_fixture(agent_fixture())
+        self.assertLess(doc["shipment"]["shipment_date"], doc["source"]["decision_date"])
+        self.assertLess(doc["source_conflict"]["specific_fort_sam_houston_letter_date"],
+                        doc["source_conflict"]["general_bay_city_letter_date"])
+        self.assertEqual(doc["shipment"]["contract_rate_mode_adjudicated"], "SINGLE_LINE_YELLOW_AGENT")
+        self.assertEqual(doc["shipment"]["gao_disposition"], "GSA_LOWER_SINGLE_LINE_DEDUCTION_SUSTAINED")
+        self.assertIsNone(doc["shipment"]["deduction_cents_from_original_decision"])
+        self.assertIsNone(doc["shipment"]["independent_invoice_error_amount_cents"])
+        self.assertFalse(doc["cohort"]["held_out_from_engine_training_verified"])
+        self.assertFalse(doc["limits"]["independent_invoice_accuracy_scoring_permitted"])
+
+    def test_missing_agency_evidence_and_modern_tariff_are_synthetic_unknown_or_reject(self):
+        doc = validate_agent_fixture(agent_fixture())
+        self.assertEqual([v["expected"] for v in doc["synthetic_negative_controls"]], [
+            "REJECT_PICKUP_CARRIER_ALONE_NOT_PROOF_OF_INTERLINE",
+            "UNKNOWN_DO_NOT_INFER_SINGLE_LINE_RATE",
+            "REJECT_HISTORICAL_TENDER_NOT_CURRENT_CONTRACT_AUTHORITY",
+        ])
+        self.assertFalse(doc["source_conflict"]["original_letters_in_custody"])
+
+    def test_rehashed_forgery_cannot_turn_historical_decision_into_invoice_or_cash_truth(self):
+        doc = validate_agent_fixture(agent_fixture())
+        for section, field, forbidden in (
+            ("source", "original_source_bytes_sha256", "f" * 64),
+            ("source", "source_bytes_acquired", True),
+            ("source", "commercial_engine_use_approved", True),
+            ("cohort", "held_out_from_engine_training_verified", True),
+            ("cohort", "original_gbl_or_carrier_invoice_bytes_available", True),
+            ("shipment", "deduction_cents_from_original_decision", 100),
+            ("shipment", "independent_invoice_error_amount_cents", 100),
+            ("shipment", "verified_retally_recovery_cents", 100),
+            ("shipment", "actual_refund_received_cents", 100),
+            ("limits", "commercial_engine_use_authorized", True),
+            ("limits", "independent_invoice_accuracy_scoring_permitted", True),
+            ("limits", "verified_retally_recovered_cash_cents", 100),
+            ("data_quality", "shipment_invoice_level_label_complete", True),
+        ):
+            changed = deepcopy(doc)
+            changed[section][field] = forbidden
+            changed["manifest_sha256"] = digest({
+                k: v for k, v in changed.items() if k != "manifest_sha256"
+            })
+            with self.subTest(section=section, field=field), self.assertRaises(ResearchError):
+                validate_agent_fixture(changed)
+
+    def test_public_url_enters_existing_feed_as_unscored_candidate(self):
+        validate_agent_fixture(agent_fixture())
+        ledger = ledger_from([source_record(AGENT_URL, "freightrecovery", "2026-10-24")])
+        evidence, candidates, manifest = legacy_evidence(), legacy_candidates(), load_manifest()
+        feed = build_feed(ledger, evidence, candidates, manifest)
+        self.assertEqual(feed["source_pointers_total"], 1)
+        row = feed["candidate_sources"][0]
+        self.assertEqual(row["source_url"], AGENT_URL)
+        self.assertIsNone(row["case_id"])
+        self.assertFalse(row["commercial_reuse_authorized"])
+        self.assertFalse(row["independent_ground_truth"])
+        self.assertFalse(row["source_document_ingested"])
+        self.assertIsNone(row["model"]["verified_freight_error_cents"])
+        self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+        self.assertEqual(feed["independently_scored_new_customer_cases"], 0)
+        validate_feed(feed, ledger, evidence, candidates, manifest)
+
+
+
 if __name__ == "__main__":
     unittest.main()
