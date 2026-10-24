@@ -325,7 +325,7 @@ class GAOAgentVersusInterlineEvidenceTests(unittest.TestCase):
 # This is decision-level evidence, NOT an independent modern invoice benchmark.
 EXCLUSIVE_URL = "https://www.gao.gov/products/b-139340"
 EXCLUSIVE_PATH = Path(__file__).with_name("fixtures") / "gao_b139340_exclusive_use_v1.json"
-EXCLUSIVE_MANIFEST_SHA256 = "a2f0f9275eab53fc8a60ceeb31083d07a275d62982c15ff3734d5a0e8b93bb6a"
+EXCLUSIVE_MANIFEST_SHA256 = "8487c75828809619344db8575a6d787c65eb55ddda24b441bb6b0d5da8e5e0bc"
 
 
 def exclusive_fixture():
@@ -369,6 +369,8 @@ def validate_exclusive_fixture(doc):
             and r["deduction_reported_collected_by_government"] is True
             and r["carrier_exclusive_use_argument"] == "SEALED_OR_AUTHORIZED_BUT_NOT_SHIPPER_ORDERED_WITH_SIGNATURE"
             and r["gao_reason"] == "TARIFF_REQUIRES_SHIPPER_ORDERED_EXCLUSIVE_USE_SIGNED_ON_GBL"
+            and r["gao_full_vehicle_inference_status"] == "SUGGESTED_BY_GAO_NOT_INDEPENDENTLY_MEASURED"
+            and r["gao_conditional_alternative_reason"] == "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT"
             and r["gao_disposition"] == "DISALLOWANCE_SUSTAINED"
             and r["further_litigation_outcome"] == "UNKNOWN"
             and g["independent_government_decision_published"] is True
@@ -376,6 +378,7 @@ def validate_exclusive_fixture(doc):
             and g["original_bill_of_lading_or_carrier_invoice_bytes_in_custody"] is False
             and g["contemporaneous_tariff_pages_in_custody"] is False
             and g["independent_customer_payment_or_credit_chain"] is False
+            and g["actual_vehicle_capacity_independently_verified"] is False
             and g["current_contract_rate_applicability"] == "UNKNOWN"
             and g["independent_original_invoice_error_cents"] is None
             and g["retally_verified_cash_recovered_cents"] == 0
@@ -385,11 +388,12 @@ def validate_exclusive_fixture(doc):
             and q["original_source_bytes_hash_available"] is False
             and q["source_independent_invoice_label_complete"] is False
             and q["private_customer_medical_student_data_used"] is False
-            and len(doc["synthetic_negative_controls"]) == 3
+            and len(doc["synthetic_negative_controls"]) == 4
             and [v["expected"] for v in doc["synthetic_negative_controls"]] == [
                 "REJECT_SEAL_OR_AUTHORIZATION_IS_NOT_ORDERED_AND_SIGNED",
                 "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_RATE_AUTHORITY",
                 "UNKNOWN_DO_NOT_INFER_VALID_EXCLUSIVE_USE",
+                "REJECT_SIGNED_ORDER_ALONE_DOES_NOT_OVERRIDE_FULL_LOAD_TRUCKLOAD_RATE",
             ]
             and all(v["synthetic"] is True and v["customer_error_cents"] is None
                     for v in doc["synthetic_negative_controls"])
@@ -421,12 +425,27 @@ class GAOExclusiveUseNumericalEvidenceTests(unittest.TestCase):
         self.assertIsNone(record["ground_truth"]["independent_original_invoice_error_cents"])
         self.assertEqual(record["ground_truth"]["retally_verified_cash_recovered_cents"], 0)
 
-    def test_three_negative_controls_are_explicitly_synthetic_or_unknown(self):
+    def test_four_negative_controls_are_explicitly_synthetic_or_unknown(self):
         record = validate_exclusive_fixture(exclusive_fixture())
         self.assertTrue(all(v["synthetic"] is True for v in record["synthetic_negative_controls"]))
         self.assertEqual(record["ground_truth"]["current_contract_rate_applicability"], "UNKNOWN")
         self.assertEqual(record["historical_rating"]["further_litigation_outcome"], "UNKNOWN")
         self.assertFalse(record["ground_truth"]["independently_held_out_from_engine_training_verified"])
+
+    def test_original_gao_distinguishes_missing_signature_from_conditional_full_truckload(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        r, g = record["historical_rating"], record["ground_truth"]
+        # GAO's observation that the vehicle appeared full is not measured vehicle custody.
+        self.assertEqual(r["gao_full_vehicle_inference_status"],
+                         "SUGGESTED_BY_GAO_NOT_INDEPENDENTLY_MEASURED")
+        self.assertFalse(g["actual_vehicle_capacity_independently_verified"])
+        # GAO separately reasons that even an assumed valid exclusive-use order adds
+        # no benefit where a vehicle is fully loaded; this is a conditional legal point.
+        self.assertEqual(r["gao_conditional_alternative_reason"],
+                         "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT")
+        self.assertIn("SYNTHETIC_VALID_SIGNED_ORDER_BUT_FULL_TRUCKLOAD",
+                      {x["id"] for x in record["synthetic_negative_controls"]})
+        self.assertIsNone(g["independent_original_invoice_error_cents"])
 
     def test_rehashed_tampering_cannot_promote_customer_truth_or_modern_rate(self):
         original = validate_exclusive_fixture(exclusive_fixture())
@@ -439,6 +458,9 @@ class GAOExclusiveUseNumericalEvidenceTests(unittest.TestCase):
             ("historical_rating", "carrier_paid_cents", 52361),
             ("historical_rating", "gao_setoff_cents", 7166),
             ("historical_rating", "gao_reason", "SEAL_ALONE_PROVES_EXCLUSIVE_USE"),
+            ("historical_rating", "gao_full_vehicle_inference_status", "VEHICLE_FULL_LOAD_PROVEN"),
+            ("historical_rating", "gao_conditional_alternative_reason", "SIGNED_ORDER_ALWAYS_AUTHORIZES_EXCLUSIVE_USE"),
+            ("ground_truth", "actual_vehicle_capacity_independently_verified", True),
             ("ground_truth", "independently_held_out_from_engine_training_verified", True),
             ("ground_truth", "independent_customer_payment_or_credit_chain", True),
             ("ground_truth", "independent_original_invoice_error_cents", 7165),
