@@ -287,10 +287,10 @@ export async function cycle(env, whenMs) {
   const candidates = new Set();
   const errors = [];
   let successfulFeeds = 0;
-  let githubRateLimited = false;
+  let githubRejected = false;
   for (const spec of feedSpecs(lane, now)) {
-    if (spec.provider === "github" && githubRateLimited) {
-      errors.push(spec.name + ":SKIPPED_RATE_LIMIT");
+    if (spec.provider === "github" && githubRejected) {
+      errors.push(spec.name + ":SKIPPED_AFTER_PROVIDER_REJECTION");
       continue;
     }
     try {
@@ -299,7 +299,7 @@ export async function cycle(env, whenMs) {
     } catch (error) {
       const code = providerErrorCode(error);
       errors.push(spec.name + ":" + code);
-      if (spec.provider === "github" && code === "HTTP_429") githubRateLimited = true;
+      if (spec.provider === "github" && (code === "HTTP_403" || code === "HTTP_429")) githubRejected = true;
     }
   }
   let added = 0;
@@ -358,9 +358,28 @@ export default {
       const associations = await env.RESEARCH_DB.prepare(
         "SELECT lane, COUNT(*) AS source_pointers FROM source_engines GROUP BY lane ORDER BY lane"
       ).all();
+      // Cron continuity is independent of provider success: classify stale lanes
+      // using their last successful run, and surface indefinitely unfinished jobs.
+      // Read-only D1 queries and fixed labels; no new schedule or external call.
+      const nowMs = Date.now();
+      const laneRows = status.results || [];
+      const staleLanes = ENGINES.filter(engine => {
+        const row = laneRows.find(candidate => candidate.name === engine);
+        return !row || !Number.isSafeInteger(row.last_success_ms) ||
+          row.last_success_ms <= 0 || nowMs - row.last_success_ms > 45 * 60000;
+      });
+      const unfinished = await env.RESEARCH_DB.prepare(
+        "SELECT COUNT(*) AS stuck_runs FROM runs WHERE status='RUNNING' AND started_ms < ?"
+      ).bind(nowMs - 30 * 60000).first();
+      const stuckRuns = Number(unfinished?.stuck_runs || 0);
+      const degraded = staleLanes.length > 0 || stuckRuns > 0 ||
+        laneRows.some(row => row.last_status !== "OK");
       return json({system:"RETALLY_UNIFIED_RESEARCH",scope:"PUBLIC_METADATA_ONLY",
-        total_source_references:total.total, lanes:status.results, recent_runs:runs.results,
+        total_source_references:total.total, lanes:laneRows, recent_runs:runs.results,
         last_24_hours:metrics.results, source_pointers_by_lane:associations.results,
+        operational_status:degraded?"DEGRADED":"OK",
+        stale_lanes:staleLanes, stale_threshold_minutes:45,
+        stuck_run_count:stuckRuns, stuck_threshold_minutes:30,
         commercial_approval:false, independent_truth_verified:false});
     }
     if (url.pathname === "/feed") {
