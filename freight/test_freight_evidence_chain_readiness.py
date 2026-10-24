@@ -219,6 +219,17 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertNotIn("invoice_id", encoded)
         self.assertIn("GSA_REFERENCE_ONLY", encoded)
 
+    def test_unsigned_observation_time_is_rejected_before_publication(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = Path(root) / "source.json"
+            out = Path(root) / "receipt.json"
+            fake = source_document_report()
+            fake["run_date_utc"] = "2026-10-24T15:48:32"
+            source.write_text(json.dumps(fake), encoding="utf-8")
+            with self.assertRaisesRegex(ResearchError, "OBSERVATION_DATE_INVALID"):
+                run(source=source, output=out)
+            self.assertFalse(out.exists())
+
     def test_written_receipt_reproduces_and_rejects_rehashed_forgery(self):
         with tempfile.TemporaryDirectory() as root:
             source = Path(root) / "input.json"
