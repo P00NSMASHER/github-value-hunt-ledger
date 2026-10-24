@@ -450,7 +450,15 @@ conflicts/missing records, non-issued placeholder counts, and SHA-256 of
 only the selected canonical sample fields. The source records and
 identifiers themselves remain ephemeral. Duplicate tracking numbers are
 not assumed to be unique permit IDs: multiple work permits and sequences
-may belong to one tracking number. A work-permit placeholder saying
+may belong to one tracking number. Furthermore, NYC can publish repeated
+rows with the **same full composite permit identity**. These are preserved
+in raw sampled-row counts but are never counted as distinct verified
+permits; their multiplicity is separately reported as a source-quality
+warning. Exact duplicate identities are excluded from individual
+readbacks and cause DEGRADED rather than a false-green or an entire
+lost discovery cycle. A saturated publisher readback page is explicitly
+AMBIGUOUS, while a second-query timeout preserves the original-row
+sample and records the error. A work-permit placeholder saying
 "Permit is not yet issued" does not become a positive issued-permit case
 simply because a source row has a date.
 

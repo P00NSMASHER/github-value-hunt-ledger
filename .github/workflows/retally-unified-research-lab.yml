@@ -266,8 +266,11 @@ jobs:
               out.write(
                   '### Original NYC DOB NOW public record readback\n'
                   f"- Publisher observation status: {x['status']}\n"
-                  f"- Original sampled rows: {x['source_rows_replayed']}\n"
+                  f"- Original sampled source rows: {x['source_rows_replayed']}\n"
+                  f"- Distinct row identities: {x['distinct_publisher_source_identities']}\n"
+                  f"- Repeated publisher source rows: {x['repeated_publisher_source_rows']}\n"
                   f"- Independent publisher re-read requests: {x['original_publisher_second_reads']}\n"
+                  f"- Ambiguous or unavailable re-reads: {x['ambiguous_or_unavailable_second_reads']}\n"
                   f"- Publisher-consistent row re-reads: {x['publisher_consistent_reads']}\n"
                   f"- Changed or conflicting record snapshots: {x['publisher_data_changed']}\n"
                   '- Customer opportunity outcomes and commercial-use rights: NOT independently verified\n'

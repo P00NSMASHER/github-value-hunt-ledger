@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import re
+from collections import Counter
 from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -51,7 +52,7 @@ KNOWN_NOT_ISSUED_TEXT = "permit is not yet issued"
 def query_url(*, tracking_number: str | int | None = None) -> str:
     args = {
         "$select": ",".join(FIELDS),
-        "$limit": str(MAX_ROWS if tracking_number is None else 5),
+        "$limit": str(MAX_ROWS),
     }
     if tracking_number is None:
         args["$where"] = QUERY_WHERE
@@ -89,7 +90,7 @@ def _validate_target(url: str) -> str:
             raise ResearchError("PUBLIC_DATASET_TARGET_INVALID")
     else:
         expression = query.get("$where", [""])[0]
-        if query.get("$limit") != ["5"]:
+        if query.get("$limit") != [str(MAX_ROWS)]:
             raise ResearchError("PUBLIC_DATASET_TARGET_INVALID")
         part = expression.removeprefix("tracking_number = ")
         if part.isdigit():
@@ -219,26 +220,31 @@ def _process(fetcher, as_of: date) -> dict:
     if type(rows) is not list or len(rows) > MAX_ROWS:
         raise ResearchError("SCHEMA_CHANGED")
     examples = [_minimal(row, as_of) for row in rows]
-    seen = set()
-    for row in examples:
-        key = _key(row)
-        if key in seen:
-            raise ResearchError("DUPLICATE_SAMPLE_KEY")
-        seen.add(key)
-    # For the first three stable tracking numbers, independently re-read
-    # the same original publisher record using strict source record filters.
-    matched = 0
-    missing = 0
-    changed = 0
-    checked = 0
-    for row in examples[:MAX_READBACK]:
+    # The live publisher can legitimately include repeated permit snapshots.
+    # They count as repeat rows, not independent permits or schema corruption.
+    key_counts = Counter(_key(row) for row in examples)
+    repeated = sum(n - 1 for n in key_counts.values())
+    distinct = len(key_counts)
+    unique_for_readback = [
+        row for row in examples if key_counts[_key(row)] == 1
+    ]
+    matched = missing = changed = ambiguous = unavailable = checked = 0
+    for row in unique_for_readback[:MAX_READBACK]:
         checked += 1
-        readback = fetcher(query_url(tracking_number=row["tracking_number"]))
-        if type(readback) is not list or len(readback) > 5:
+        try:
+            readback = fetcher(query_url(tracking_number=row["tracking_number"]))
+        except ResearchError:
+            unavailable += 1
+            continue
+        if type(readback) is not list or len(readback) > MAX_ROWS:
             raise ResearchError("SCHEMA_CHANGED")
         normalized = [_minimal(x, as_of) for x in readback]
         exact = [x for x in normalized if x == row]
-        if len(exact) == 1:
+        # Re-read pagination might be capped. Even an exact match is ambiguous
+        # when publisher records fill the whole window or repeat exactly.
+        if len(readback) == MAX_ROWS or len(exact) > 1:
+            ambiguous += 1
+        elif len(exact) == 1:
             matched += 1
         elif any(_key(x) == _key(row) for x in normalized):
             changed += 1
@@ -252,14 +258,17 @@ def _process(fetcher, as_of: date) -> dict:
     }
     return {
         "sample_count": len(examples),
+        "sample_unique_source_identities": distinct,
+        "sample_repeated_source_rows": repeated,
         "sample_canonical_sha256": digest(examples),
         "readback_checked": checked,
         "readback_exact_match": matched,
         "readback_changed": changed,
         "readback_missing": missing,
+        "readback_ambiguous": ambiguous,
+        "readback_unavailable": unavailable,
         "publisher_status_classifications": classifications,
     }
-
 
 def build_receipt(ledger: dict, *, as_of: date,
                   fetcher=fetch_rows) -> dict:
@@ -268,15 +277,17 @@ def build_receipt(ledger: dict, *, as_of: date,
     anchor = _source_anchor(ledger)
     try:
         proof = _process(fetcher, as_of)
-        status = ("PUBLISHER_REPLAY_OK" if proof["sample_count"] > 0
-                  and proof["readback_checked"] > 0
-                  and proof["readback_exact_match"] == proof["readback_checked"]
-                  else "PUBLISHER_REPLAY_DEGRADED")
         issues = []
-        if status != "PUBLISHER_REPLAY_OK":
+        if proof["sample_repeated_source_rows"] > 0:
+            issues.append("DUPLICATE_SOURCE_IDENTITIES")
+        if (proof["readback_checked"] == 0 or
+                proof["readback_exact_match"] != proof["readback_checked"]):
             issues.append("PUBLISHER_ROW_READBACK_INCOMPLETE")
+        status = ("PUBLISHER_REPLAY_OK"
+                  if proof["sample_count"] > 0 and not issues
+                  else "PUBLISHER_REPLAY_DEGRADED")
     except ResearchError as exc:
-        if str(exc) in {"SCHEMA_CHANGED", "DUPLICATE_SAMPLE_KEY"}:
+        if str(exc) in {"SCHEMA_CHANGED"}:
             raise
         issues = [str(exc) if str(exc) in {
             "PUBLISHER_UNAVAILABLE", "HTTP_STATUS", "REDIRECT_BLOCKED",
@@ -285,9 +296,11 @@ def build_receipt(ledger: dict, *, as_of: date,
         } else "PUBLIC_SOURCE_READBACK_UNAVAILABLE"]
         status = "PUBLISHER_REPLAY_DEGRADED"
         proof = {
-            "sample_count": 0, "sample_canonical_sha256": None,
+            "sample_count": 0, "sample_unique_source_identities": 0,
+            "sample_repeated_source_rows": 0, "sample_canonical_sha256": None,
             "readback_checked": 0, "readback_exact_match": 0,
             "readback_changed": 0, "readback_missing": 0,
+            "readback_ambiguous": 0, "readback_unavailable": 0,
             "publisher_status_classifications": {
                 "publisher_issue_date_present": 0,
                 "publisher_not_yet_issued_marker": 0,
@@ -354,15 +367,23 @@ def _check(receipt: dict, ledger: dict, now: date) -> None:
     observed = date.fromisoformat(receipt["as_of_utc_date"])
     if observed > now or (now - observed).days > 2:
         raise ResearchError("STALE_OR_FUTURE_READBACK_RECEIPT")
-    for x in ("sample_count", "readback_checked", "readback_exact_match",
-              "readback_changed", "readback_missing"):
+    for x in ("sample_count", "sample_unique_source_identities",
+              "sample_repeated_source_rows", "readback_checked",
+              "readback_exact_match", "readback_changed", "readback_missing",
+              "readback_ambiguous", "readback_unavailable"):
         if type(receipt[x]) is not int or not 0 <= receipt[x] <= MAX_ROWS:
             raise ResearchError("INVALID_READBACK_RECEIPT")
+    if (receipt["sample_unique_source_identities"] +
+            receipt["sample_repeated_source_rows"] != receipt["sample_count"]):
+        raise ResearchError("INVALID_READBACK_RECEIPT")
     if receipt["readback_checked"] != (
             receipt["readback_exact_match"] + receipt["readback_changed"]
-            + receipt["readback_missing"]):
+            + receipt["readback_missing"] + receipt["readback_ambiguous"]
+            + receipt["readback_unavailable"]):
         raise ResearchError("INVALID_READBACK_RECEIPT")
-    if receipt["readback_checked"] > min(MAX_READBACK, receipt["sample_count"]):
+    if receipt["readback_checked"] > min(
+            MAX_READBACK,
+            receipt["sample_unique_source_identities"]):
         raise ResearchError("INVALID_READBACK_RECEIPT")
     c = receipt["publisher_status_classifications"]
     if (type(c) is not dict or
@@ -376,6 +397,7 @@ def _check(receipt: dict, ledger: dict, now: date) -> None:
             receipt["sample_count"] < 1 or
             receipt["readback_checked"] < 1 or
             receipt["readback_checked"] != receipt["readback_exact_match"] or
+            receipt["sample_repeated_source_rows"] or
             receipt["source_errors"])):
         raise ResearchError("FALSE_GREEN_PUBLISHER_READBACK")
     if receipt["sample_count"] and (
@@ -392,6 +414,7 @@ def _check(receipt: dict, ledger: dict, now: date) -> None:
                 "DNS_UNAVAILABLE", "NONPUBLIC_NETWORK",
                 "PUBLIC_SOURCE_READBACK_UNAVAILABLE",
                 "PUBLISHER_ROW_READBACK_INCOMPLETE",
+                "DUPLICATE_SOURCE_IDENTITIES",
             } for x in receipt["source_errors"])):
         raise ResearchError("UNSAFE_READBACK_DIAGNOSTICS")
     if type(receipt["notes"]) is not str or not receipt["notes"].startswith(
@@ -408,8 +431,10 @@ def build_receipt_keys() -> tuple[str, ...]:
         "official_source_id", "official_source_url", "published_source_terms",
         "user_commercial_reuse_attestation",
         "source_specific_commercial_license_verified", "status", "source_errors",
-        "sample_count", "sample_canonical_sha256", "readback_checked",
-        "readback_exact_match", "readback_changed", "readback_missing",
+        "sample_count", "sample_unique_source_identities",
+        "sample_repeated_source_rows", "sample_canonical_sha256",
+        "readback_checked", "readback_exact_match", "readback_changed",
+        "readback_missing", "readback_ambiguous", "readback_unavailable",
         "publisher_status_classifications", "sample_original_rows_stored",
         "independent_issuance_outcome_labels", "buyer_opportunity_ground_truth",
         "external_customer_contacts", "new_paid_services", "production_changes",
@@ -455,7 +480,11 @@ def run(*, ledger_path: Path = LEDGER, output: Path = OUTPUT,
     return {
         "status": receipt["status"],
         "source_rows_replayed": receipt["sample_count"],
+        "distinct_publisher_source_identities": receipt["sample_unique_source_identities"],
+        "repeated_publisher_source_rows": receipt["sample_repeated_source_rows"],
         "original_publisher_second_reads": receipt["readback_checked"],
+        "ambiguous_or_unavailable_second_reads": (
+            receipt["readback_ambiguous"] + receipt["readback_unavailable"]),
         "publisher_consistent_reads": receipt["readback_exact_match"],
         "publisher_data_changed": receipt["readback_changed"],
         "source_specific_rights_verified": False,
