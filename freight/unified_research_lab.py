@@ -20,6 +20,14 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 ENGINES = ("freightrecovery", "permitplate", "capturebrief", "recoveryos")
+# GitHub discovery now prioritizes FreightRecovery 7/10 planned slots,
+# preserving bounded secondary discovery and all four nightly regressions.
+DISCOVERY_ROTATION = (
+    "freightrecovery", "freightrecovery", "permitplate",
+    "freightrecovery", "freightrecovery", "capturebrief",
+    "freightrecovery", "freightrecovery", "recoveryos",
+    "freightrecovery",
+)
 ROOT = Path(__file__).resolve().parent / "research_lab"
 LEDGER = ROOT / "leads.json"
 MAX_ENTRIES = 3000
@@ -337,7 +345,7 @@ def merge_sources(doc: dict, engine: str, urls: list[str], seen: str, *,
 def current_engine(now: datetime) -> str:
     if now.tzinfo is None:
         raise ResearchError("TIMEZONE_REQUIRED")
-    return ENGINES[int(now.timestamp() // 300) % len(ENGINES)]
+    return DISCOVERY_ROTATION[int(now.timestamp() // 300) % len(DISCOVERY_ROTATION)]
 
 
 MAX_SCOUT_MIRROR_PAGES = 6
