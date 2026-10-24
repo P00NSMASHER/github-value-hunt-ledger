@@ -83,8 +83,22 @@
     "amount_arithmetic_reconciles": true,
     "original_document_bytes_hashed": false,
     "rights_and_holdout_validation_pending": true,
-    "private_customer_medical_student_data_used": false
+    "private_customer_medical_student_data_used": false,
+    "second_gbl_footnote_verified_on_official_GAO_page": true
   },
   "manifest_hash_contract": "RESEARCH_AUTHORED_CANONICAL_JSON_EXCLUDING_SELF_NOT_ORIGINAL_GAO_SOURCE_BYTES",
-  "manifest_sha256": "992eb0cdd8011acd10892d40401b99937a1e15af8b2fa9a94772a6f9c7204028"
+  "manifest_sha256": "87da32abe9ec46640a33b8b3b3b9f940a15524732b5026ebbc580fbc45f6660c",
+  "documented_second_shipment": {
+    "source_section": "DECISION_FOOTNOTE_1",
+    "government_bill_of_lading": "S-5694340",
+    "received_by_carrier_date": "1983-08-23",
+    "synthetic": false,
+    "original_gbl_bytes_available": false,
+    "carrier_charges_cents": null,
+    "gsa_deduction_cents": null,
+    "independently_scored_invoice_error_cents": null,
+    "verified_actual_refund_cents": null,
+    "label_completeness": "IDENTIFIER_AND_DATE_ONLY",
+    "ground_truth_limit": "PUBLISHER_DECISION_SCOPE_NOT_INDEPENDENT_SHIPMENT_AUDIT"
+  }
 }

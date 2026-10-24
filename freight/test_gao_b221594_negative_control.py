@@ -14,7 +14,7 @@ from freight.unified_research_lab import ResearchError, SEEDS, digest, ledger_fr
 
 URL = "https://www.gao.gov/products/b-221594-0"
 PATH = Path(__file__).with_name("fixtures") / "gao_b221594_source_v1.json"
-SHA = "992eb0cdd8011acd10892d40401b99937a1e15af8b2fa9a94772a6f9c7204028"
+SHA = "87da32abe9ec46640a33b8b3b3b9f940a15524732b5026ebbc580fbc45f6660c"
 
 
 def fixture():
@@ -25,7 +25,7 @@ def verify_fixture(doc):
     computed = digest({k: v for k, v in doc.items() if k != "manifest_sha256"})
     if doc.get("manifest_sha256") != computed:
         raise ResearchError("GAO_NEGATIVE_MANIFEST_SHA_MISMATCH")
-    s, f, l = doc["source"], doc["facts"], doc["limits"]
+    s, f, l, second = doc["source"], doc["facts"], doc["limits"], doc["documented_second_shipment"]
     if not (
         doc["schema_version"] == "1.0.0"
         and doc["evidence_lane"] == "freight_error_adjudication_negative_control"
@@ -47,6 +47,18 @@ def verify_fixture(doc):
         and l["other_non_dod_agencies_same_tender_result"] == "UNKNOWN"
         and l["payer_credits_or_refunds_received"] == "UNKNOWN"
         and doc["cohort"]["independently_held_out_from_training_verified"] is False
+        and second["source_section"] == "DECISION_FOOTNOTE_1"
+        and second["government_bill_of_lading"] == "S-5694340"
+        and second["received_by_carrier_date"] == "1983-08-23"
+        and second["synthetic"] is False
+        and second["original_gbl_bytes_available"] is False
+        and second["carrier_charges_cents"] is None
+        and second["gsa_deduction_cents"] is None
+        and second["independently_scored_invoice_error_cents"] is None
+        and second["verified_actual_refund_cents"] is None
+        and second["label_completeness"] == "IDENTIFIER_AND_DATE_ONLY"
+        and second["ground_truth_limit"] == "PUBLISHER_DECISION_SCOPE_NOT_INDEPENDENT_SHIPMENT_AUDIT"
+        and doc["data_quality"]["second_gbl_footnote_verified_on_official_GAO_page"] is True
         and len(doc["synthetic_negative_controls"]) == 3
         and all(c["synthetic"] is True and c["real_invoice_error_cents"] is None
                 for c in doc["synthetic_negative_controls"])
@@ -63,6 +75,17 @@ class GAORejectedTenderEvidenceTests(unittest.TestCase):
         self.assertEqual(doc["source"]["rights_url"], "https://www.gao.gov/copyright")
         self.assertTrue(doc["data_quality"]["published_decision_has_OCR_L_1_ambiguity"])
         self.assertEqual(doc["facts"]["original_gbl_number"], "UNKNOWN_OCR_L_VS_1_AMBIGUITY")
+
+    def test_second_original_gbl_footnote_stays_unlabeled(self):
+        doc = verify_fixture(fixture())
+        second = doc["documented_second_shipment"]
+        self.assertFalse(second["synthetic"])
+        self.assertEqual(second["government_bill_of_lading"], "S-5694340")
+        self.assertEqual(second["received_by_carrier_date"], "1983-08-23")
+        self.assertIsNone(second["carrier_charges_cents"])
+        self.assertIsNone(second["gsa_deduction_cents"])
+        self.assertIsNone(second["independently_scored_invoice_error_cents"])
+        self.assertFalse(second["original_gbl_bytes_available"])
 
     def test_negative_1986_decision_does_not_transfer_to_other_agencies(self):
         doc = verify_fixture(fixture())
@@ -89,6 +112,10 @@ class GAORejectedTenderEvidenceTests(unittest.TestCase):
             ("facts", "independent_per_invoice_overcharge_amount_cents", 22075),
             ("limits", "independent_invoice_error_accuracy_scoring_permitted", True),
             ("limits", "other_non_dod_agencies_same_tender_result", "GSA_INVALID"),
+            ("documented_second_shipment", "gsa_deduction_cents", 22075),
+            ("documented_second_shipment", "independently_scored_invoice_error_cents", 22075),
+            ("documented_second_shipment", "original_gbl_bytes_available", True),
+            ("documented_second_shipment", "synthetic", True),
         ):
             altered = deepcopy(original)
             altered[first][field] = value
