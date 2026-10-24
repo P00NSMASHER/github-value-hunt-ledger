@@ -11,6 +11,8 @@ on:
       - "freight/test_research_source_review.py"
       - "freight/research_publisher_provenance.py"
       - "freight/test_research_publisher_provenance.py"
+      - "freight/official_nyc_issued_permit_lab.py"
+      - "freight/test_official_nyc_issued_permit_lab.py"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/research_lab_worker*"
       - "freight/research_lab/**"
@@ -34,6 +36,8 @@ on:
       - "freight/test_research_source_review.py"
       - "freight/research_publisher_provenance.py"
       - "freight/test_research_publisher_provenance.py"
+      - "freight/official_nyc_issued_permit_lab.py"
+      - "freight/test_official_nyc_issued_permit_lab.py"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
@@ -65,8 +69,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -242,6 +246,33 @@ jobs:
                   "- Commercial rights and independent outcome labels: unverified\n"
               )
           PY
+      - name: Replay bounded original NYC DOB NOW issued-permit publisher records
+        run: |
+          set -euo pipefail
+          # Only official permit records; bounded 20-row sample plus three
+          # exact publisher identity readbacks per UTC day; no body persisted.
+          python -m freight.official_nyc_issued_permit_lab \
+            --output freight/research_lab/official_nyc_issued_permit_replay_v1.json \
+            | tee /tmp/retally-real-permit-source-report.json
+          python -m freight.official_nyc_issued_permit_lab \
+            --verify --output freight/research_lab/official_nyc_issued_permit_replay_v1.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x = json.loads(Path('/tmp/retally-real-permit-source-report.json').read_text())
+          assert x['source_specific_rights_verified'] is False
+          assert x['independent_labels'] == 0
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### Original NYC DOB NOW public record readback\n'
+                  f"- Publisher observation status: {x['status']}\n"
+                  f"- Original sampled rows: {x['source_rows_replayed']}\n"
+                  f"- Independent publisher re-read requests: {x['original_publisher_second_reads']}\n"
+                  f"- Publisher-consistent row re-reads: {x['publisher_consistent_reads']}\n"
+                  f"- Changed or conflicting record snapshots: {x['publisher_data_changed']}\n"
+                  '- Customer opportunity outcomes and commercial-use rights: NOT independently verified\n'
+              )
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -263,7 +294,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
           if [ -f freight/lab15/triage_queue.json ]; then
             git add -- freight/lab15/triage_queue.json
           fi
@@ -322,6 +353,8 @@ jobs:
           python -m freight.research_source_review --ledger /tmp/retally-unified-leads.json --output /tmp/retally-review-queue-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/research_lab/publisher_provenance_v1.json > /tmp/retally-publisher-provenance-v1.json
           python -m freight.research_publisher_provenance --ledger /tmp/retally-unified-leads.json --output /tmp/retally-publisher-provenance-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/official_nyc_issued_permit_replay_v1.json > /tmp/retally-nyc-issued-permit-v1.json
+          python -m freight.official_nyc_issued_permit_lab --ledger /tmp/retally-unified-leads.json --output /tmp/retally-nyc-issued-permit-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/lab15/evidence_ledger.json > /tmp/retally-lab15-evidence.json
           git show origin/research/retally-unified-data-lab:freight/research/lab15_candidate_ledger.json > /tmp/retally-lab15-candidates.json
           python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge
