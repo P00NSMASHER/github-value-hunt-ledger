@@ -268,5 +268,39 @@ class OriginalUSAspendingAwardReadbackTests(unittest.TestCase):
         self.assertEqual(MAX_RESPONSE_BYTES, 220000)
 
 
+    def test_secondary_http_code_classes_are_redacted_aggregated_and_not_claimed_exact(self):
+        def reject_secondary(query):
+            if "award_ids" not in query["filters"]:
+                return fake_api(query)
+            raise ResearchError("HTTP_400")
+        receipt = build_receipt(ledger(), as_of=NOW, fetcher=reject_secondary)
+        self.assertEqual(receipt["sample_rows"], 3)
+        self.assertEqual(receipt["publisher_readbacks_unavailable"], 2)
+        self.assertEqual(receipt["publisher_readback_error_codes"], {"HTTP_400": 2})
+        self.assertEqual(receipt["source_errors"], ["READBACK_INCOMPLETE"])
+        self.assertEqual(receipt["status"], "PUBLISHER_AWARD_READBACK_DEGRADED")
+        validate_receipt(receipt, ledger(), NOW)
+        for bad in ({"HTTP_400": 3}, {"PRIVATE_AWARD_ID=123": 2}, {"HTTP_400": True}):
+            forged = copy.deepcopy(receipt)
+            forged["publisher_readback_error_codes"] = bad
+            forged["receipt_sha256"] = digest({
+                k: v for k, v in forged.items() if k != "receipt_sha256"})
+            with self.subTest(bad=bad), self.assertRaises(ResearchError):
+                validate_receipt(forged, ledger(), NOW)
+
+    def test_only_known_http_failure_codes_survive_publisher_transport(self):
+        from urllib.error import HTTPError
+        def throw_429(*_args, **_kwargs):
+            raise HTTPError(API, 429, "PRIVATE-ID=do-not-log", hdrs=None, fp=None)
+        class ErroringOpener:
+            open = staticmethod(throw_429)
+        with patch("freight.official_capturebrief_award_lab.global_dns",
+                   return_value=None), patch(
+                "freight.official_capturebrief_award_lab.build_opener",
+                return_value=ErroringOpener()):
+            with self.assertRaisesRegex(ResearchError, "^HTTP_429$"):
+                fetch_public_awards(_query())
+
+
 if __name__ == "__main__":
     unittest.main()

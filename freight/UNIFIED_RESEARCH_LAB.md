@@ -555,3 +555,20 @@ Reproduce only from the authorized isolated research branch:
 
     python -m freight.official_capturebrief_award_lab
     python -m freight.official_capturebrief_award_lab --verify
+
+### Fixed-code provenance for failed original award-ID readbacks
+
+The original issuer sample can succeed while a separately scoped award-ID
+re-query fails. The nightly receipt now stores strictly bounded **error code
+counts** for those second requests (e.g. HTTP_400, HTTP_429 or
+PUBLISHER_UNAVAILABLE) without logging any award ID, URL query content,
+publisher response body or recipient identity. A failed second read never
+becomes a matching original award or an independent award-outcome label.
+Counters are independently validated for consistency with the exact number
+of unavailable second reads, even when the receipt's own SHA-256 is recomputed
+by an adversarial source.
+
+This diagnostic does not perform additional public API calls, does not
+change the source population, and does not weaken fail-closed rules. The
+code categorization distinguishes malformed requests, upstream throttling
+and provider unavailability to enable a subsequent source-specific fix.

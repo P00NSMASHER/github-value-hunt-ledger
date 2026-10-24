@@ -35,11 +35,15 @@ FIXED_WINDOW = ("2025-10-01", "2026-09-30")
 AWARD_TYPES = ("A", "B", "C", "D")
 AWARD_FIELDS = ("Award ID", "Award Amount", "generated_internal_id",
                 "Base Obligation Date")
+HTTP_CODES = frozenset({
+    "HTTP_400", "HTTP_401", "HTTP_403", "HTTP_404", "HTTP_408",
+    "HTTP_429", "HTTP_500", "HTTP_502", "HTTP_503", "HTTP_504",
+})
 PROBE_ERROR_CODES = frozenset({
     "PUBLISHER_UNAVAILABLE", "HTTP_STATUS", "REDIRECT_BLOCKED",
     "SOURCE_JSON_INVALID", "SOURCE_TOO_LARGE", "INVALID_CONTENT_TYPE",
     "SOURCE_SCHEMA_CHANGED", "READBACK_INCOMPLETE",
-})
+}) | HTTP_CODES
 CONSISTENCY = frozenset({"PUBLISHER_AWARD_READBACK_OK",
                          "PUBLISHER_AWARD_READBACK_DEGRADED"})
 RECEIPT_FIELDS = frozenset({
@@ -52,7 +56,7 @@ RECEIPT_FIELDS = frozenset({
     "publisher_readbacks_attempted", "publisher_readbacks_exact",
     "publisher_readbacks_changed", "publisher_readbacks_ambiguous",
     "publisher_readbacks_missing", "publisher_readbacks_unavailable",
-    "source_payloads_stored", "recipient_identifiers_stored",
+    "publisher_readback_error_codes", "source_payloads_stored", "recipient_identifiers_stored",
     "independent_sam_solicitation_matches", "independent_award_outcome_labels",
     "buyer_opportunity_truth", "realized_recovery_cents",
     "customer_contacts_sent", "new_paid_services", "production_changes",
@@ -143,7 +147,8 @@ def fetch_public_awards(query: dict) -> list[dict]:
     except ResearchError:
         raise
     except HTTPError as exc:
-        raise ResearchError("HTTP_STATUS") from exc
+        code = "HTTP_" + str(exc.code)
+        raise ResearchError(code if code in HTTP_CODES else "HTTP_STATUS") from exc
     except (URLError, TimeoutError, OSError) as exc:
         raise ResearchError("PUBLISHER_UNAVAILABLE") from exc
     if not raw or len(raw) > MAX_RESPONSE_BYTES:
@@ -230,12 +235,16 @@ def _sample(fetcher) -> dict:
     repeat = sum(n - 1 for n in counts.values())
     unique_candidates = [v for v in data if counts[v["internal_id"]] == 1]
     exact = changed = ambiguous = missing = unavailable = checked = 0
+    unavailable_codes = Counter()
     for award in unique_candidates[:MAX_SECOND_READS]:
         checked += 1
         try:
             reread = fetcher(_query(exact_award_id=award["award_id"]))
-        except ResearchError:
+        except ResearchError as exc:
             unavailable += 1
+            code = str(exc)
+            unavailable_codes[code if code in PROBE_ERROR_CODES
+                              else "SOURCE_SCHEMA_CHANGED"] += 1
             continue
         if type(reread) is not list or len(reread) > MAX_BACKREAD_ROWS:
             raise ResearchError("SOURCE_SCHEMA_CHANGED")
@@ -261,6 +270,7 @@ def _sample(fetcher) -> dict:
         "publisher_readbacks_ambiguous": ambiguous,
         "publisher_readbacks_missing": missing,
         "publisher_readbacks_unavailable": unavailable,
+        "publisher_readback_error_codes": dict(sorted(unavailable_codes.items())),
     }
 
 
@@ -272,6 +282,7 @@ def _empty_sample() -> dict:
         "publisher_readbacks_attempted": 0, "publisher_readbacks_exact": 0,
         "publisher_readbacks_changed": 0, "publisher_readbacks_ambiguous": 0,
         "publisher_readbacks_missing": 0, "publisher_readbacks_unavailable": 0,
+        "publisher_readback_error_codes": {},
     }
 
 
@@ -368,6 +379,13 @@ def validate_receipt(doc: dict, ledger: dict, as_of: date) -> None:
             raise ResearchError("CAPTUREBRIEF_AWARD_FINGERPRINT_INVALID")
     elif fingerprint is not None or doc["sample_net_awarded_amount_minor"]:
         raise ResearchError("CAPTUREBRIEF_AWARD_FINGERPRINT_INVALID")
+    diagnostics = doc["publisher_readback_error_codes"]
+    if (type(diagnostics) is not dict or len(diagnostics) > MAX_SECOND_READS
+            or any(type(code) is not str or code not in PROBE_ERROR_CODES
+                   or type(count) is not int or count < 1
+                   for code, count in diagnostics.items())
+            or sum(diagnostics.values()) != doc["publisher_readbacks_unavailable"]):
+        raise ResearchError("UNSAFE_CAPTUREBRIEF_READBACK_TELEMETRY")
     if (type(doc["source_errors"]) is not list or len(doc["source_errors"]) > 3
             or any(type(code) is not str or code not in (
                 PROBE_ERROR_CODES | frozenset({"REPEATED_AWARD_SOURCE_ROWS"}))
@@ -429,6 +447,7 @@ def run(*, ledger_path: Path = LEDGER, output: Path = OUTPUT,
         "publisher_second_reads": doc["publisher_readbacks_attempted"],
         "publisher_second_reads_exact": doc["publisher_readbacks_exact"],
         "provider_error_codes": doc["source_errors"],
+        "publisher_readback_error_codes": doc["publisher_readback_error_codes"],
         "independently_verified_solicitation_outcomes": 0,
         "source_specific_commercial_reuse_verified": False,
         "verified": verify_only,
