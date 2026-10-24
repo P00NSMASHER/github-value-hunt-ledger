@@ -87,6 +87,8 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual(receipt["official_dataset_id"],DATASET_ID)
         self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_OK")
         self.assertEqual(receipt["sample_count"],4)
+        self.assertEqual(receipt["sample_unique_source_identities"],4)
+        self.assertEqual(receipt["sample_repeated_source_rows"],0)
         self.assertEqual(receipt["readback_checked"],3)
         self.assertEqual(receipt["readback_exact_match"],3)
         self.assertEqual(receipt["readback_changed"],0)
@@ -140,14 +142,66 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         with self.assertRaisesRegex(ResearchError,"APPROVED_PERMIT_SOURCE_NOT_IN_LEDGER"):
             build_receipt(other,as_of=DAY,fetcher=simulated_provider)
 
-    def test_duplicate_composite_key_is_schema_error_but_same_tracking_multiple_permits_ok(self):
+    def test_duplicate_source_snapshots_are_counted_not_misidentified_as_distinct_cases(self):
         self.assertNotEqual(_key(_minimal(rows[0],DAY)),_key(_minimal(rows[1],DAY)))
         def duplicate_provider(url):
             if parse_qs(urlsplit(url).query).get("$order"):
-                return rows[:1]+rows[:1]
-            return rows[:1]
-        with self.assertRaisesRegex(ResearchError,"DUPLICATE_SAMPLE_KEY"):
-            build_receipt(source_ledger(),as_of=DAY,fetcher=duplicate_provider)
+                return rows + [copy.deepcopy(rows[0])]
+            return simulated_provider(url)
+        receipt = build_receipt(source_ledger(),as_of=DAY,fetcher=duplicate_provider)
+        self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
+        self.assertEqual(receipt["sample_count"],5)
+        self.assertEqual(receipt["sample_unique_source_identities"],4)
+        self.assertEqual(receipt["sample_repeated_source_rows"],1)
+        self.assertEqual(receipt["readback_exact_match"],3)
+        self.assertEqual(receipt["readback_checked"],3)
+        self.assertEqual(receipt["source_errors"],["DUPLICATE_SOURCE_IDENTITIES"])
+        self.assertEqual(receipt["independent_issuance_outcome_labels"],0)
+        _check(receipt,source_ledger(),DAY)
+
+    def test_all_repeated_source_rows_cannot_become_false_green(self):
+        count=[]
+        def all_duplicates(url):
+            count.append(url)
+            if parse_qs(urlsplit(url).query).get("$order"):
+                return [copy.deepcopy(rows[0]) for _ in range(20)]
+            return [copy.deepcopy(rows[0])]
+        receipt=build_receipt(source_ledger(),as_of=DAY,fetcher=all_duplicates)
+        self.assertEqual(receipt["sample_count"],20)
+        self.assertEqual(receipt["sample_unique_source_identities"],1)
+        self.assertEqual(receipt["sample_repeated_source_rows"],19)
+        self.assertEqual(receipt["readback_checked"],0)
+        self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
+        self.assertIn("DUPLICATE_SOURCE_IDENTITIES",receipt["source_errors"])
+        self.assertIn("PUBLISHER_ROW_READBACK_INCOMPLETE",receipt["source_errors"])
+        self.assertEqual(len(count),1)
+        _check(receipt,source_ledger(),DAY)
+
+    def test_truncated_publisher_readbacks_are_ambiguous_not_exact_verified(self):
+        def provider(url):
+            if parse_qs(urlsplit(url).query).get("$order"):
+                return [rows[0]]
+            return [rows[0]]*MAX_ROWS
+        receipt=build_receipt(source_ledger(),as_of=DAY,fetcher=provider)
+        self.assertEqual(receipt["readback_ambiguous"],1)
+        self.assertEqual(receipt["readback_exact_match"],0)
+        self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
+        _check(receipt,source_ledger(),DAY)
+
+    def test_second_read_source_error_retains_original_sample_and_reports_unavailable(self):
+        def provider(url):
+            if parse_qs(urlsplit(url).query).get("$order"):
+                return [rows[0]]
+            raise ResearchError("HTTP_STATUS")
+        receipt=build_receipt(source_ledger(),as_of=DAY,fetcher=provider)
+        self.assertEqual(receipt["sample_count"],1)
+        self.assertEqual(receipt["readback_checked"],1)
+        self.assertEqual(receipt["readback_unavailable"],1)
+        self.assertEqual(receipt["readback_exact_match"],0)
+        self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
+        self.assertEqual(receipt["source_errors"],["PUBLISHER_ROW_READBACK_INCOMPLETE"])
+        _check(receipt,source_ledger(),DAY)
+
 
     def test_malformed_columns_and_future_or_impossible_dates_fail_closed(self):
         for mutation in (
@@ -205,6 +259,8 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
             ("official_dataset_id","other-dataset"),
             ("status","PUBLISHER_REPLAY_GREEN_BY_FORCE"),
             ("readback_exact_match",99),
+            ("sample_repeated_source_rows",99),
+            ("readback_ambiguous",1),
         ):
             receipt=copy.deepcopy(original)
             receipt[field]=val
