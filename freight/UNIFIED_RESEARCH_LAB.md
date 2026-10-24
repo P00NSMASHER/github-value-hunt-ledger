@@ -699,3 +699,50 @@ aggregate finding; the permanent workflow keeps just the fixed, validated
 quarantine counters and original-byte digest. This restores research
 observability without treating an intentionally held/unapproved archive
 as a production source or inventing retrospective award outcomes.
+
+## GAO B-215958 authority reversal and tariff isolation (v9)
+
+A new **immutable, rights-held historical decision chronology receipt**
+`freight/research_lab/gao_authority_chronology_v1.json` is generated on the
+existing research data branch from two research-authored GAO case manifests
+and three fixed *official* GAO URLs. The key chronology is:
+
+- December 5, 1984: [GAO B-215958 initial decision](https://www.gao.gov/products/b-215958).
+  The decision accepted the numbered-seal exclusive-use interpretation for
+  53 of the 55 GBLs (other two original dispositions not proved).
+- February 18, 1986: [GAO B-215958 reconsideration](https://www.gao.gov/products/b-215958-2).
+  **This decision explicitly OVERRULED the carrier-favorable 1984 ruling
+  and SUSTAINED the GSA audit/deduction.** Under the historic NASI 190-A
+  tariff, numbered seals and their bill-of-lading notation alone did not
+  entitle the carrier to exclusive-use charges without the prescribed
+  written request.
+- January 3, 1969: [GAO B-165091](https://www.gao.gov/products/b-165091)
+  separately sustained a $179.80 deduction under a **different** historic
+  517-V tariff written-order clause. Its other $393.24 claim was conditional
+  on further validation and is **not** a paid/refunded amount.
+
+The research test corpus previously included only the 1984 source and could
+therefore misleadingly appear to support that ruling as the *final* case
+disposition. It now preserves the original 1984 material **as a historical
+observation that was overruled** and explicitly tests the 1986 superseding
+outcome. An as-of query on January 1, 1985 returns only the original 1984
+decision, while an as-of query after February 18, 1986 returns the controlling
+historical reconsideration. This avoids *both* post-1986 stale legal labels
+and retroactive pre-1986 look-ahead.
+
+Tests also reject a forged 53-case invoice-accuracy numerator, transferring
+a deduction under tariff 517-V to 190-A, treating the 1984 GBL count as
+specific invoices or claiming any present-day rate authority, validated bank
+refunds, recovery revenue, private customer error detection or reusable
+rights. All original document bytes and real invoices remain outside this
+catalog. Authored manifest hashes are **not** GAO original document digests.
+
+The receipt is regenerated inside the **same unified controller**, staged
+only on `research/retally-unified-data-lab`, validated in the nightly
+four-engine source replay, and does not introduce a new Cron trigger, paid
+service, customer communication, production-engine mutation or permissive
+source-rights promotion.
+
+    python -m unittest -q freight.test_gao_adjudication_chronology
+    python -m freight.gao_adjudication_chronology
+    python -m freight.gao_adjudication_chronology --verify
