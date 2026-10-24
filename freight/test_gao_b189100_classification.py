@@ -13,7 +13,7 @@ from freight.unified_research_lab import ResearchError, SEEDS, digest, ledger_fr
 
 URL = "https://www.gao.gov/products/b-189100"
 PATH = Path(__file__).with_name("fixtures") / "gao_b189100_classification_v1.json"
-MANIFEST_SHA256 = "e8c45f1e0a1ab632219346995adcc85c61c918ed1a3acbc4be37a255fe7ef795"
+MANIFEST_SHA256 = "04ef581e072dfeb356bb6e914da33090a2b7eb717a2bf528ec96ebc364b64f1d"
 
 
 def fixture():
@@ -23,7 +23,7 @@ def fixture():
 def verify(doc):
     if digest({k: v for k, v in doc.items() if k != "manifest_sha256"}) != doc.get("manifest_sha256"):
         raise ResearchError("GAO_B189100_MANIFEST_TAMPER")
-    s, f, lim = doc["source"], doc["facts"], doc["limits"]
+    s, f, lim, cap = doc["source"], doc["facts"], doc["limits"]
     if not (
         doc["schema_version"] == "1.0.0"
         and doc["evidence_lane"] == "freight_error_adjudication"
@@ -44,6 +44,19 @@ def verify(doc):
         and f["implied_allowable_cents"] == 93280
         and f["billed_charges_cents"] - f["gao_overcharge_deduction_cents"] == f["implied_allowable_cents"]
         and f["implied_allowable_derivation"] == "BILLED_MINUS_REPORTED_DEDUCTION_NOT_INDEPENDENT_RATE_VALIDATION"
+        and cap["source_url"] == URL
+        and cap["source_section"] == "DECISION_CARRIER_RATING_AND_FINAL_GSA_ALTERNATIVE_REASON"
+        and cap["charged_item"] == f["charged_nmfc_item"] == 41050
+        and cap["published_item_41050_minimum_capacity_cuft"] == 135
+        and cap["published_container_capacity_cuft"] == 52
+        and cap["capacity_deficit_cuft"] == 83
+        and cap["published_item_41050_minimum_capacity_cuft"] - cap["published_container_capacity_cuft"] == cap["capacity_deficit_cuft"]
+        and cap["gao_excludes_item_41050_on_capacity_even_if_shape_disputed"] is True
+        and cap["final_paragraph_item_41060_reference_conflicts_with_earlier_41050_rating"] is True
+        and cap["item_41060_capacity_threshold_independently_verified"] is False
+        and cap["original_tariff_pages_in_custody"] is False
+        and cap["commercial_engine_use_authorized"] is False
+        and cap["independent_invoice_accuracy_label_permitted"] is False
         and f["shipper_photo_and_report_source_bytes_available"] is False
         and f["original_bol_description_contradicted_by_later_shipper_photo_report"] is True
         and f["gao_disposition"] == "GSA_DEDUCTION_SUSTAINED"
@@ -57,7 +70,7 @@ def verify(doc):
         and lim["original_photographic_corroboration_available"] is False
         and lim["verified_retally_recovery_cents"] == 0
         and doc["data_quality"]["third_party_image_rights_not_verified"] is True
-        and len(doc["synthetic_negative_controls"]) == 2
+        and len(doc["synthetic_negative_controls"]) == 3
         and all(x["synthetic"] is True and x["real_invoice_error_cents"] is None
                 for x in doc["synthetic_negative_controls"])
     ):
@@ -79,11 +92,27 @@ class GAOCargoClassificationEvidenceTests(unittest.TestCase):
         self.assertFalse(x["limits"]["original_photographic_corroboration_available"])
         self.assertFalse(x["limits"]["independent_invoice_accuracy_scoring_permitted"])
 
+    def test_capacity_threshold_conflicted_gao_prose_is_not_modern_tariff_truth(self):
+        x = verify(fixture())
+        cap = x["capacity_evidence"]
+        self.assertEqual(cap["charged_item"], 41050)
+        self.assertEqual(cap["published_item_41050_minimum_capacity_cuft"], 135)
+        self.assertEqual(cap["published_container_capacity_cuft"], 52)
+        self.assertEqual(cap["capacity_deficit_cuft"], 83)
+        self.assertTrue(cap["gao_excludes_item_41050_on_capacity_even_if_shape_disputed"])
+        self.assertTrue(cap["final_paragraph_item_41060_reference_conflicts_with_earlier_41050_rating"])
+        self.assertFalse(cap["item_41060_capacity_threshold_independently_verified"])
+        self.assertFalse(cap["original_tariff_pages_in_custody"])
+        self.assertFalse(cap["independent_invoice_accuracy_label_permitted"])
+        self.assertFalse(x["limits"]["independent_invoice_accuracy_scoring_permitted"])
+        self.assertIsNone(x["facts"]["independently_verified_original_invoice_error_cents"])
+
     def test_negative_controls_are_explicitly_synthetic(self):
         x = verify(fixture())
         self.assertEqual([c["expected"] for c in x["synthetic_negative_controls"]], [
             "REJECT_REQUIRE_CORROBORATING_CARGO_EVIDENCE",
             "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_AUTHORITY",
+            "UNKNOWN_DO_NOT_ATTRIBUTE_135_CUFT_MINIMUM_TO_41060_OR_MODERN_TARIFF",
         ])
 
     def test_rehashed_forgery_cannot_promote_deduction_to_customer_truth(self):
@@ -103,6 +132,12 @@ class GAOCargoClassificationEvidenceTests(unittest.TestCase):
             ("limits", "modern_tariff_applicability_verified", True),
             ("limits", "verified_retally_recovery_cents", 263438),
             ("data_quality", "third_party_image_rights_not_verified", False),
+            ("capacity_evidence", "published_item_41050_minimum_capacity_cuft", 52),
+            ("capacity_evidence", "published_container_capacity_cuft", 135),
+            ("capacity_evidence", "final_paragraph_item_41060_reference_conflicts_with_earlier_41050_rating", False),
+            ("capacity_evidence", "original_tariff_pages_in_custody", True),
+            ("capacity_evidence", "commercial_engine_use_authorized", True),
+            ("capacity_evidence", "independent_invoice_accuracy_label_permitted", True),
         ):
             changed = deepcopy(original)
             changed[section][field] = wrong

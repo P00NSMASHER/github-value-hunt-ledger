@@ -43,6 +43,20 @@
     "independently_verified_customer_refund_cents": null,
     "independently_verified_original_invoice_error_cents": null
   },
+  "capacity_evidence": {
+    "source_url": "https://www.gao.gov/products/b-189100",
+    "source_section": "DECISION_CARRIER_RATING_AND_FINAL_GSA_ALTERNATIVE_REASON",
+    "charged_item": 41050,
+    "published_item_41050_minimum_capacity_cuft": 135,
+    "published_container_capacity_cuft": 52,
+    "capacity_deficit_cuft": 83,
+    "gao_excludes_item_41050_on_capacity_even_if_shape_disputed": true,
+    "final_paragraph_item_41060_reference_conflicts_with_earlier_41050_rating": true,
+    "item_41060_capacity_threshold_independently_verified": false,
+    "original_tariff_pages_in_custody": false,
+    "commercial_engine_use_authorized": false,
+    "independent_invoice_accuracy_label_permitted": false
+  },
   "synthetic_negative_controls": [
     {
       "id": "SYNTHETIC_GBL_DESCRIPTION_ALWAYS_FINAL",
@@ -54,6 +68,13 @@
       "id": "SYNTHETIC_APPLY_1977_NMFC_TO_MODERN_SHIPMENT",
       "synthetic": true,
       "expected": "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_AUTHORITY",
+      "real_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_GAO_CONFLICTING_ITEM_NUMBER",
+      "synthetic": true,
+      "description": "Late GAO prose references 41060 for a 135-cubic-foot threshold although carrier billed under 41050.",
+      "expected": "UNKNOWN_DO_NOT_ATTRIBUTE_135_CUFT_MINIMUM_TO_41060_OR_MODERN_TARIFF",
       "real_invoice_error_cents": null
     }
   ],
@@ -74,5 +95,5 @@
     "confidential_customer_medical_student_data_used": false
   },
   "manifest_hash_contract": "AUTHORED_CANONICAL_JSON_SHA256_EXCLUDING_SELF_NOT_PUBLISHER_SOURCE_BYTES",
-  "manifest_sha256": "e8c45f1e0a1ab632219346995adcc85c61c918ed1a3acbc4be37a255fe7ef795"
+  "manifest_sha256": "04ef581e072dfeb356bb6e914da33090a2b7eb717a2bf528ec96ebc364b64f1d"
 }
