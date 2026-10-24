@@ -71,6 +71,39 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
             self.assertNotIn("url", observation)
             self.assertEqual(observation["content_sha256"], HASH)
 
+    def test_two_gao_anchors_denied_cannot_be_misreported_as_source_bytes(self):
+        # Reproduce real observer's 403 class without requesting GAO or claiming
+        # that an allowlisted source URL is a complete verified document.
+        gaos = {
+            "https://www.gao.gov/products/b-215958",
+            "https://www.gao.gov/products/b-215958-2",
+        }
+        self.assertTrue(gaos.issubset(set(PUBLIC_REVIEW_ANCHORS["freightrecovery"])))
+
+        def publisher(url):
+            if url in gaos:
+                return {"probe_state": "HTTP_NOT_AVAILABLE",
+                        "head_http_status": 403, "media_class": "UNKNOWN",
+                        "content_sha256": None, "bytes_hashed": 0}
+            return observed_http(url)
+
+        ledger = full_anchors()
+        receipt = build_receipt(ledger, TODAY, fetcher=publisher)
+        self.assertEqual(receipt["source_pointers_probed"], 11)
+        self.assertEqual(receipt["full_public_responses_fingerprinted"], 9)
+        unavailable = [row for row in receipt["observations"]
+                       if row["probe_state"] == "HTTP_NOT_AVAILABLE"]
+        self.assertEqual(len(unavailable), 2)
+        self.assertTrue(all(row["head_http_status"] == 403
+                            and row["content_sha256"] is None
+                            and row["bytes_hashed"] == 0
+                            and not row["benchmark_ready"]
+                            for row in unavailable))
+        self.assertEqual(receipt["independently_scored_benchmark_cases"], 0)
+        self.assertEqual(receipt["verified_recovered_cash_cents"], 0)
+        self.assertFalse(receipt["commercial_reuse_approved"])
+        self.assertEqual(_validate_receipt(receipt, ledger, TODAY), receipt)
+
     def test_missing_anchor_is_disclosed_not_fabricated(self):
         ledger = ledger_from([source_record(
             "https://www.gao.gov/products/b-160344",
