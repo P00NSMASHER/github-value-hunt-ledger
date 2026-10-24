@@ -485,10 +485,10 @@
       "candidate_classes": {
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 1,
-        "third_party_path_topic_hints_only": 23,
-        "unclassified_third_party_catalogs_only": 137
+        "third_party_path_topic_hints_only": 26,
+        "unclassified_third_party_catalogs_only": 140
       },
-      "catalog_source_associations": 161,
+      "catalog_source_associations": 167,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -586,6 +586,40 @@
         {
           "benchmark_ready": false,
           "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-24",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/tamdwin23-ux/AI-APGuard-Enterprise-Accounts-Payable-Invoice-Exception-Payment-Control",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "1d5c339f60b4c1440d8a8ecd13eb219efd24c414255655dc0c816b66add1afdf",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-24",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/jessicachuwn/vendor-payment-audit-analytics",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "37fee822df6fca821798737de64f11ab1e5a6fe82b51924057dea20a630fcd58",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
           "first_seen": "2026-10-23",
           "independent_ground_truth": false,
           "original_document_bytes_copied": false,
@@ -599,45 +633,11 @@
           ],
           "source_id": "3c0e95fafc925338121ace801c87ae0eec2b48218a7e73e10aa0ef1a4e010c26",
           "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-23",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://github.com/calyaconsult/accounts-payable-receivable-forms",
-          "publisher_host": "github.com",
-          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "47c2e1a057964b31af33dd4de7849a60d7c4822e5000867950b86a053ebc4152",
-          "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-23",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://github.com/Jamieseah08/Payment-supplier-Invoices",
-          "publisher_host": "github.com",
-          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "49be147d394da3b53c2bfbd892ec31df6ad1a8115e0c07cf10864dcb552dccf7",
-          "source_provenance_verified": false
         }
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 161,
+      "unverified_candidates_after_url_screen": 167,
       "url_only_topic_exclusions_not_deleted": 0
     }
   },
@@ -645,12 +645,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "353e37dedb4f1b68e4168057cea3dc0cc701b4013f156cd8c340c970d6d46897",
+  "queue_sha256": "bcd442df9d1bc6ded038e1f13f630289b87014cb2c62bb338e7d83ef765f760e",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "46f494fd2b6641cd65f7618b8bc8c034965e82437cbdb360f0d76b74e93610db",
-  "unique_public_source_references": 666,
+  "source_ledger_entries_sha256": "cb26772fc055669381c2c41ff15010615113848dd651f7ab122184ed3f51a8a8",
+  "unique_public_source_references": 672,
   "verified_recovered_cash_cents": 0
 }

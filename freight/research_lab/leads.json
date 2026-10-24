@@ -1365,6 +1365,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "1d5c339f60b4c1440d8a8ecd13eb219efd24c414255655dc0c816b66add1afdf",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/tamdwin23-ux/AI-APGuard-Enterprise-Accounts-Payable-Invoice-Exception-Payment-Control"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -2552,6 +2568,22 @@
       "engines": [
         "recoveryos"
       ],
+      "first_seen": "2026-10-24",
+      "id": "37fee822df6fca821798737de64f11ab1e5a6fe82b51924057dea20a630fcd58",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/jessicachuwn/vendor-payment-audit-analytics"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
       "first_seen": "2026-10-23",
       "id": "38c6b27c511f50952326988de823265ffb76ca36fb151cb4431ca15f78ba5cfa",
       "independent_ground_truth": false,
@@ -2999,6 +3031,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "446b1e6001ed081eca540dc44f526325ace0e0c05dd68922763d2a2158806dff",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/palak1124/Accounts-Payable-Management-System"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -3090,6 +3138,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/23279969"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "46a2cafe546738836afca3828fb2f56183614c435e0314f2480686199a668c57",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/JoeyvLiu/AI-3-Way-Match-Assistant"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4985,6 +5049,22 @@
       "engines": [
         "recoveryos"
       ],
+      "first_seen": "2026-10-24",
+      "id": "78bdfe1e026ffe62e468178d33f82b2852fdac49ce7125dd7ea99261974fd7f4",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/arpit2109/AI-AP-Employee"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
       "first_seen": "2026-10-23",
       "id": "794028c202c4d5c8654685f6c71ad8223fc67b293dfa52d5d7b9bf5619860c6b",
       "independent_ground_truth": false,
@@ -5315,6 +5395,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/tenzerodev/rdcruz-procurement-red-flags"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "8281fcc1c44a7d5183d4021c7a475ee468f97acb312951ce8801ec8cec7f2e5a",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Blaze-coder3/Zampify-AI"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10665,6 +10761,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "46f494fd2b6641cd65f7618b8bc8c034965e82437cbdb360f0d76b74e93610db",
+  "entries_sha256": "cb26772fc055669381c2c41ff15010615113848dd651f7ab122184ed3f51a8a8",
   "schema_version": 1
 }
