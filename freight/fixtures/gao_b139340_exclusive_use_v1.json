@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B139340_EXCLUSIVE_USE_RATE_DISPUTE_V1",
+  "evidence_lane": "freight_error_adjudication",
+  "status": "HISTORICAL_GAO_DECISION_LEVEL_NUMERIC_LABEL_NOT_CUSTOMER_INVOICE_BENCHMARK",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "case_number": "B-139340",
+    "original_record_url": "https://www.gao.gov/products/b-139340",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_date": "1959-07-29",
+    "original_source_bytes_sha256": null,
+    "original_source_bytes_acquired": false,
+    "rights_status": "US_GOVERNMENT_GAO_PUBLIC_DOMAIN_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_MATERIAL_CAUTION",
+    "commercial_engine_use_approved": false
+  },
+  "shipment": {
+    "gbl_id": "N-30864154",
+    "shipment_month": "1956-02",
+    "origin": "Providence, Rhode Island",
+    "destination": "Cincinnati, Ohio",
+    "carrier": "Commercial Motor Freight, Inc.",
+    "goods": "ordnance stores",
+    "units": 125,
+    "weight_pounds": 17250,
+    "tariff_name": "Eastern Central Motor Carriers Association Tariff 31-A",
+    "tariff_original_pages_available": false,
+    "tariff_effective_at_shipment_independently_verified": false
+  },
+  "historical_rating": {
+    "carrier_paid_cents": 52360,
+    "carrier_rate_cents_per_cwt": 374,
+    "carrier_minimum_weight_pounds": 14000,
+    "gao_allowable_cents": 45195,
+    "gao_rate_cents_per_cwt": 262,
+    "gao_applied_weight_pounds": 17250,
+    "gao_setoff_cents": 7165,
+    "deduction_reported_collected_by_government": true,
+    "carrier_exclusive_use_argument": "SEALED_OR_AUTHORIZED_BUT_NOT_SHIPPER_ORDERED_WITH_SIGNATURE",
+    "gao_reason": "TARIFF_REQUIRES_SHIPPER_ORDERED_EXCLUSIVE_USE_SIGNED_ON_GBL",
+    "gao_disposition": "DISALLOWANCE_SUSTAINED",
+    "further_litigation_outcome": "UNKNOWN"
+  },
+  "ground_truth": {
+    "independent_government_decision_published": true,
+    "independently_held_out_from_engine_training_verified": false,
+    "original_bill_of_lading_or_carrier_invoice_bytes_in_custody": false,
+    "contemporaneous_tariff_pages_in_custody": false,
+    "independent_customer_payment_or_credit_chain": false,
+    "current_contract_rate_applicability": "UNKNOWN",
+    "independent_original_invoice_error_cents": null,
+    "retally_verified_cash_recovered_cents": 0,
+    "independent_customer_invoice_accuracy_scoring_permitted": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_SEAL_MEANS_EXCLUSIVE_USE",
+      "synthetic": true,
+      "expected": "REJECT_SEAL_OR_AUTHORIZATION_IS_NOT_ORDERED_AND_SIGNED",
+      "customer_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_1956_RATE_APPLIED_TO_MODERN_SHIPMENT",
+      "synthetic": true,
+      "expected": "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_RATE_AUTHORITY",
+      "customer_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_MISSING_GBL_SIGNATURE",
+      "synthetic": true,
+      "expected": "UNKNOWN_DO_NOT_INFER_VALID_EXCLUSIVE_USE",
+      "customer_error_cents": null
+    }
+  ],
+  "data_quality": {
+    "first_reviewed": "2026-10-24",
+    "official_html_text_manually_verified": true,
+    "reported_number_math_complete": true,
+    "original_source_bytes_hash_available": false,
+    "source_independent_invoice_label_complete": false,
+    "private_customer_medical_student_data_used": false
+  },
+  "manifest_hash_contract": "AUTHORED_CANONICAL_JSON_SHA256_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
+  "manifest_sha256": "a2f0f9275eab53fc8a60ceeb31083d07a275d62982c15ff3734d5a0e8b93bb6a"
+}
