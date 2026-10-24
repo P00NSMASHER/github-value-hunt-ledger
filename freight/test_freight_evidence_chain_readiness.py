@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from datetime import date, datetime, timezone
 from pathlib import Path
-from unittest.mock import patch
 
 from freight.freight_evidence_chain_readiness import (
     EXPECTED_FACE_COUNTS, FROZEN_DOCUMENT_SHA256, GUIDANCE_APPLICABILITY,
@@ -224,28 +223,28 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             source = Path(root) / "input.json"
             output = Path(root) / "audit.json"
-            source.write_text(json.dumps(source_document_report()), encoding="utf-8")
-            with patch("freight.freight_evidence_chain_readiness.datetime") as clock:
-                clock.now.return_value = datetime(2026, 10, 24, 20, tzinfo=timezone.utc)
-                out = run(source=source, output=output)
-                self.assertEqual(out["source_invoice_faces"], 110)
-                self.assertEqual(out["signed_net_totals_reconciled"], 100)
-                self.assertEqual(out["missing_effective_rate_authority"], 110)
-                self.assertEqual(out["verified_recovered_cash_cents"], 0)
-                self.assertFalse(out["verified"])
-                before = output.read_bytes()
-                self.assertTrue(run(source=source, output=output, verify_only=True)["verified"])
-                self.assertEqual(before, output.read_bytes())
-                bad = json.loads(before)
-                bad["eligible_independently_scored_customer_invoices"] = 110
-                bad["receipt_sha256"] = digest({
-                    k: v for k, v in bad.items() if k != "receipt_sha256"
-                })
-                output.write_text(json.dumps(bad), encoding="utf-8")
-                with self.assertRaises(ResearchError):
-                    run(source=source, output=output, verify_only=True)
-                with self.assertRaises(ResearchError):
-                    make_receipt(source_document_report(), as_of=date(2099, 1, 1))
+            current = source_document_report()
+            current["run_date_utc"] = datetime.now(timezone.utc).isoformat()
+            source.write_text(json.dumps(current), encoding="utf-8")
+            out = run(source=source, output=output)
+            self.assertEqual(out["source_invoice_faces"], 110)
+            self.assertEqual(out["signed_net_totals_reconciled"], 100)
+            self.assertEqual(out["missing_effective_rate_authority"], 110)
+            self.assertEqual(out["verified_recovered_cash_cents"], 0)
+            self.assertFalse(out["verified"])
+            before = output.read_bytes()
+            self.assertTrue(run(source=source, output=output, verify_only=True)["verified"])
+            self.assertEqual(before, output.read_bytes())
+            bad = json.loads(before)
+            bad["eligible_independently_scored_customer_invoices"] = 110
+            bad["receipt_sha256"] = digest({
+                k: v for k, v in bad.items() if k != "receipt_sha256"
+            })
+            output.write_text(json.dumps(bad), encoding="utf-8")
+            with self.assertRaises(ResearchError):
+                run(source=source, output=output, verify_only=True)
+            with self.assertRaises(ResearchError):
+                make_receipt(source_document_report(), as_of=date(2099, 1, 1))
 
 
 if __name__ == "__main__":
