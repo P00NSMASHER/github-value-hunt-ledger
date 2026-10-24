@@ -109,7 +109,7 @@ test("public metadata fetch parses bounded valid JSON",async()=>{
 
 test("rotation reaches all bounded candidate windows without repeating only the first 24", () => {
   const input=Array.from({length:57},(_,i)=>"https://github.com/source/catalog-"+String(i).padStart(3,"0"));
-  const batches=[0,1200000,2400000].map(t=>selectCandidateWindow([...input].reverse(),t));
+  const batches=[0,300000,600000].map(t=>selectCandidateWindow([...input].reverse(),t));
   assert.deepEqual(batches.map(b=>b.length),[24,24,9]);
   assert.equal(new Set(batches.flat()).size,57);
   assert.deepEqual(batches[0],selectCandidateWindow([...input],0));
