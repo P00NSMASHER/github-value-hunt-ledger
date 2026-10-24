@@ -818,3 +818,161 @@ verification *and* the existing once-daily real-data replay.
 This change adds **no scheduler, provider requests, branch, production engine
 actions, contacts or paid services**. CI contract tests explicitly reject
 removing either regression from nightly execution without triggering a failure.
+
+
+## Original GlobalTranz invoice adjustments — canonical v2 lab replay
+
+The original-document lab verifies fixed SHA-256 source bytes from the
+public GlobalTranz PDF and extracts **100 distinct actual invoice faces**
+with original signed line components. The last confirmed source replay had
+**93 invoices with a negative adjustment token** (canonical v2), while the
+seven non-discounted original faces correctly remain canonical v1. The older positive-only
+ChargeLine-v1 check correctly blocked those negative tokens and represented
+just seven faces with charge lines alone. That does *not* mean that the
+existing canonical **v2** InvoiceAdjustment mechanism cannot represent them.
+
+The unified nightly lab now exercises the *existing* immutable v2
+InvoiceAdjustment data model: nonnegative ChargeLine entries plus positive
+magnitudes of original negative invoice components, each source-bound to the
+original frozen PDF SHA-256. It checks all source net totals exactly, executes
+the canonical v2 record-hash verifier, and rerates twice with an **empty**
+AuthorityBook. A structurally valid source record without an independently
+verified effective customer rate must always produce REVIEW_REQUIRED with
+no expected charge and no claimed variance. No product code or admission
+policy is modified.
+
+**Critical separation:** The replay constructs **synthetic lab-only
+shipment weight (1 g), postcodes, carrier and LTL mode** where the source
+invoice does not independently establish these facts. The v2
+kind=DISCOUNT is a provisional encoding of a negative *source component*,
+not independently authenticated discount semantics, a credit memo, a bank
+settlement or a refund. Only the signed source invoice net is conserved.
+
+The nightly acceptance gate tests an exact 100-face source reconciliation,
+including 93 adjustment-bearing records, 100 REVIEW_REQUIRED outcomes,
+zero reconstructed-source discrepancies and zero unsafe automated variance
+claims. All 110 total original GlobalTranz/ArcBest faces remain
+**UNKNOWN for real overcharge classification** until shipment-specific
+rate authority, original BOL/weight/contract evidence and independently
+adjudicated outcome or payment linkage exist.
+
+This is a deliberately bounded read-only amendment to
+freight/real_document_lab.py and its original-PDF regression tests; it
+adds no new Workers, GitHub schedule, data branch, customer communication,
+cost, production ingestion, live engine change or financial assertion.
+
+
+## Original freight document evidence-chain readiness (v11)
+
+The latest original-document research verifies **110 real freight-invoice faces**
+on two publisher-linked, frozen-hash public PDFs:
+
+- 100 GlobalTranz face amounts, including 100 source-net amounts exactly
+  reconstructed as 93 **v2 adjustment-bearing** records and seven original
+  **v1 positive-only** charge records. All 100 test-only rating attempts return
+  REVIEW_REQUIRED with no expected freight rate, computed variance or cash.
+- Ten ArcBest original invoice-face amounts, five of which can enter the
+  source-derived **lab-only** rating-proxy structure and all of which remain
+  subject to review. The other five fail source-completeness checks.
+- 100 GlobalTranz face identifiers also match original invoice amounts in a
+  separate **open** statement. This is *not* a verified bank-cleared payment;
+  the original document itself identifies it as an open-balance statement.
+
+The new ephemeral, privacy-safe
+freight/freight_evidence_chain_readiness.py collector summarizes these
+existing nightly results without copying individual invoice IDs, addresses,
+source PDF bytes or statements to Git. A fixed review-receipt SHA protects
+against reclassification even if the receipt's own digest is recomputed.
+Its CI test also pins **both original PDF SHA-256s**, the two reproducible
+invoice-face catalog SHA-256s and the current canonical v1/v2 source-record
+catalog SHA-256. Any altered source bytes, removed original faces, altered
+signed arithmetic, fake bank payments, fabricated independent outcomes,
+promoted rights or erroneous automatic rates fail before admission.
+
+**Evidence checklist basis:** The current U.S. GSA
+[Transportation Invoice Audit guidance](https://www.gsa.gov/policy-regulations/policy/transportation-management-policy/transportation-invoice-audit)
+and [Freight, Household Goods and Small Parcel Audit Handbook](https://www.gsa.gov/policy-regulations/policy/transportation-management-policy/transportation-handbook-freight-household-goods-and-small-parcel)
+describe federal checks against bill of lading, carrier rate/contract/tender,
+actual shipment details, performed service, invoice totals, related supporting
+documentation and when appropriate payment records. They are a **useful
+federal reference checklist, not a legal determination that 41 CFR 102-118
+governs a private RETALLY shipper/customer contract**.
+
+Current evidence-chain completeness for these 110 original invoice faces:
+
+| Evidence stage observed in isolated lab | Face count |
+| --- | ---: |
+| Original public source PDFs SHA-256 verified and face amounts extracted | 110 |
+| Original signed invoice line amounts conserved through canonical records | 100 |
+| Distinct independently custodied linked BOL for that invoice | 0 verified |
+| Shipment-specific effective buyer/carrier contract or tender | 0 verified |
+| Independent actual shipment weight/class and performed service | 0 verified |
+| Bank-cleared payment, credit or reimbursement proof | 0 verified |
+| Independently adjudicated customer invoice error outcome | 0 verified |
+| Cash recovered by RETALLY | $0 verified |
+
+These zeroes mean **not available in the current controlled lab input**.
+They do not prove the original shipper or carrier lacks the documents. The
+source-derived canonical proxies use synthetic shipment fields and lab-only
+discount classification: neither is legal or commercial rate truth.
+
+The new receipt is created and verified **only in an ephemeral nightly
+workspace** from the actual original-document benchmark, without additional
+schedule triggers, cloud workloads, original-source downloads beyond the
+existing two PDFs, third-party contacts, spending, hosted-product mutations,
+commercial approvals, or any persistent private source identifier.
+
+    python -m unittest -q freight.test_freight_evidence_chain_readiness
+    python -m freight.freight_evidence_chain_readiness --source /tmp/retally-real-lab.json --output /tmp/retally-freight-evidence-chain-readiness-v1.json
+
+
+## Original ArcBest invoice pricing/BOL header census (v12)
+
+To prioritize **actual original freight evidence** rather than URL counts,
+the existing isolated 74-page original ArcBest PDF's ten invoice faces are
+examined for the pricing and bill-of-lading **references printed on the invoices**.
+Only fixed categorical counts and an anonymous page/category SHA-256 enter
+the ephemeral research report; **no** invoice IDs, customer names, printed
+account/tender tokens, quote identifiers, or underlying PDF text are published
+to the research branch. The original PDF source SHA-256
+4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17
+remains the mandatory provenance gate.
+
+The October 24 verified original-document acceptance found:
+
+| Evidence category on original invoice face | Invoices |
+| --- | ---: |
+| ABF account-pricing code printed | 6 |
+| Volume pricing quotation indicator VPQ printed | 2 |
+| No readable tariff indicator in page text | 2 |
+| Bill-of-lading header prints an identifier | 2 |
+| Bill-of-lading header prints only a placeholder/indirect reference | 8 |
+
+All **ten** ArcBest source pages independently matched the original invoice
+face number when processed within the ephemeral lab. Source-category hash
+4915cce3465a44f7ea8c9bf0c50671f4766589ce9725e328875b34201c6a2af0
+and the source PDF's frozen byte hash are checked in nightly CI. Missing,
+cross-page, contradictory or altered references fail closed or remain labeled
+unreadable rather than being silently interpreted as a contract.
+
+**Source reference is not rate authority.** The carrier's current
+[ArcBest quote terms](https://arcb.com/quote-terms) and
+[volume pricing quote terms](https://arcb.com/volume-quote-terms-conditions)
+distinguish specific shipment quotes, applicable tariffs and signed bills of
+lading. These are useful directions for research, **not independent
+verification of 2024 invoice-specific effective versions**. The lab has not
+independently obtained a governing customer tariff exception, original signed
+quote or a separate original bill-of-lading artifact for any of the ten cases.
+An invoice saying "Tariff: VPQ" or printing a BOL number does not establish
+the existence, legal applicability or acceptance of a rate contract, nor
+independently prove delivery, weight, cash payment or a recoverable claim.
+
+The original-document readiness gate now enforces **0 independently verified
+rate/quote/BOL documents**, **0 verified customer invoice overcharge labels**
+and **$0 RETALLY recovered cash**. No additional scheduled workload, public
+provider requests, commercial permission, PDF downloads beyond the two
+previously approved source PDFs, production engine changes, outreach or
+spending are introduced. The next meaningful evidence goal is the actual
+2024 source quote/agreement and separate BOL/delivery record under an
+authorized and independently verifiable provenance chain, not blind rerating
+using a generic current tariff.
