@@ -166,12 +166,12 @@
     "freightrecovery": {
       "candidate_classes": {
         "known_nyc_community_derivative_views_review_only": 0,
-        "official_publisher_host_url_only": 9,
+        "official_publisher_host_url_only": 14,
         "pinned_public_anchor_url_only": 3,
         "third_party_path_topic_hints_only": 14,
-        "unclassified_third_party_catalogs_only": 143
+        "unclassified_third_party_catalogs_only": 144
       },
-      "catalog_source_associations": 169,
+      "catalog_source_associations": 175,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -304,24 +304,24 @@
         {
           "benchmark_ready": false,
           "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-23",
+          "first_seen": "2026-10-24",
           "independent_ground_truth": false,
           "original_document_bytes_copied": false,
-          "public_source_url": "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
-          "publisher_host": "www2.fmc.gov",
+          "public_source_url": "https://www.gao.gov/products/b-148465",
+          "publisher_host": "www.gao.gov",
           "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
           "review_gates": [
             "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
             "REUSE_RIGHTS_REVIEW_REQUIRED",
             "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
           ],
-          "source_id": "43d6b19d5016f6e000709271cfbed51f43dd53bf946edf868e188be83a80385d",
+          "source_id": "2687473a3d37b713cd67f452e09bb684191a3bf5a56d79e174929c55aa99f3af",
           "source_provenance_verified": false
         }
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 169,
+      "unverified_candidates_after_url_screen": 175,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "permitplate": {
@@ -649,12 +649,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "47c74c337a7e3aeb6c9814c0a5652013b2320134fb9bc458753e2079f0d1fecc",
+  "queue_sha256": "75d82030876000e8d6c070b82a24af580cbf4bdeefc15a165959a823efc96a45",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "18718feafbde16d8af837dd57a968f3536a624d5c36fad7fe7cd68b85fcbf6f4",
-  "unique_public_source_references": 680,
+  "source_ledger_entries_sha256": "5f0f03187251446374d551ca36bfe71a1bbf964cc18adc437e4d7f8b4083e87e",
+  "unique_public_source_references": 686,
   "verified_recovered_cash_cents": 0
 }
