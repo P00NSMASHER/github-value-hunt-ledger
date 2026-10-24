@@ -55,6 +55,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-215958",  # Initial 1984 53/55 decision OVERRULED in 1986.
         "https://www.gao.gov/products/b-215958-2",  # Controlling Feb 18 1986 GAO reconsideration; GSA deduction sustained.
         "https://www.gao.gov/products/b-165091",  # Distinct tariff; published $179.80 sustained deduction only.
+        "https://www.gao.gov/products/b-221594-0",  # GAO invalidated historical rejected-tender $220.75 deduction; negative only.
         # New source-bound reported numeric cases; original invoices not held.
         "https://www.gao.gov/products/b-191257",  # 1978 Yellow Freight $828 / $796 / $32.
         "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.
