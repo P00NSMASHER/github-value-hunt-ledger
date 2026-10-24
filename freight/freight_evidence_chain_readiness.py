@@ -315,6 +315,8 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
              "ARCBEST_QUOTES_ONLY_FROM_SAME_SOURCE_BUNDLE")
     _is_false(same_pdf.get("conditional_length_footage_is_independently_certified"),
               "ARCBEST_LENGTH_INTERPRETATION_IS_CONDITIONAL")
+    _is_false(same_pdf.get("commercial_reuse_authorized"),
+              "ARCBEST_EMBEDDED_QUOTE_COMMERCIAL_RIGHTS_UNVERIFIED")
 
     blind = _mapping(doc.get("blinded_freight_error_evaluation"), "BLIND_ASSESSMENT")
     for field in ("precision", "recall", "freight_detection_accuracy"):
