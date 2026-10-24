@@ -429,3 +429,182 @@ publisher access:
   outcomes; train/test leakage and as-of-date chronology must be excluded.
 - Keep unknown labels **UNKNOWN** and commercial authorization **FALSE**
   until each separate requirement is evidenced, not inferred by a model.
+
+## Official issued-permit original-row replay (v7)
+
+An additional **read-only real source replay inside the existing controller**
+uses the official NYC Open Data DOB NOW: Build – Approved Permits dataset
+`rbx6-tga4` (publisher:
+`https://data.cityofnewyork.us/d/rbx6-tga4`). It exercises the published
+JSON record schema using *only* job filing, tracking number, work permit,
+sequence, issue date and permit-status fields. No owner name, address,
+contractor identity, contact, original row or other sensitive source field
+is retained in the research branch.
+
+The daily sample is capped at 20 dated original published records. Three
+sampled tracking numbers are separately re-read from the **same original
+publisher source**, with URL/SoQL allowlisting, strict source identity,
+read-only HTTPS/redirect protection and a 160-KiB response cap. The derived
+source receipt records sampled count, exact second-read matches,
+conflicts/missing records, non-issued placeholder counts, and SHA-256 of
+only the selected canonical sample fields. The source records and
+identifiers themselves remain ephemeral. Duplicate tracking numbers are
+not assumed to be unique permit IDs: multiple work permits and sequences
+may belong to one tracking number. Furthermore, NYC can publish repeated
+rows with the **same full composite permit identity**. These are preserved
+in raw sampled-row counts but are never counted as distinct verified
+permits; their multiplicity is separately reported as a source-quality
+warning. Exact duplicate identities are excluded from individual
+readbacks and cause DEGRADED rather than a false-green or an entire
+lost discovery cycle. A saturated publisher readback page is explicitly
+AMBIGUOUS, while a second-query timeout preserves the original-row
+sample and records the error. A work-permit placeholder saying
+"Permit is not yet issued" does not become a positive issued-permit case
+simply because a source row has a date.
+
+This checks **publisher consistency**, not a separate independent
+government adjudication: issuance source records, historical filing
+status, operational demand, buyers' purchasing intent and awarded
+contracts are materially different facts. The source receipt therefore
+preserves all commercial source-rights and independent outcome gates.
+The user's asserted broad commercial reuse rights are recorded as
+`OWNER_ATTESTED_NOT_SOURCE_VERIFIED` without forging signed or
+source-specific permission evidence; source-specific rights remain
+unverified by this controller. The official NYC Open Data FAQ states
+that the open data is generally available for unrestricted use; individual
+dataset terms and non-public material are not retroactively cleared by
+that general statement:
+`https://www.nyc.gov/opendata/get-started/FAQs`.
+
+On source outages the replay records **DEGRADED**, not fake positives or
+no-records-found claims. Source schema changes, duplicate full source
+identity collisions, forged commercial rights or tampered receipts
+block the research workflow. A successful limited publisher readback
+remains separate from independently held-out opportunity accuracy.
+
+The output is staged **only** on
+`research/retally-unified-data-lab` as
+`freight/research_lab/official_nyc_issued_permit_replay_v1.json`.
+Every post-publish nightly replay verifies it against that exact source
+branch before exercising the four independent engines. No extra Cron,
+Worker, paid service, customer contact, billing or engine production
+mutation is introduced.
+
+Offline tests:
+
+    python -m unittest -q freight.test_official_nyc_issued_permit_lab
+
+Public read-only source probe (inside existing GitHub discovery only):
+
+    python -m freight.official_nyc_issued_permit_lab
+    python -m freight.official_nyc_issued_permit_lab --verify
+
+## CaptureBrief official USAspending award-row readback (v8)
+
+CaptureBrief now has an original federal contracting record readback inside the
+**existing unified controller**. It queries the public USAspending
+`/api/v2/search/spending_by_award/` publisher service using a strictly
+fixed original award type population (A/B/C/D), the completed federal
+FY2026 award period (2025-10-01 through 2026-09-30), bounded 12-row sample,
+and at most two separately scoped exact award-ID re-queries. Search POSTs
+are **read-only** to the official publisher, do not require credentials,
+and never contact contractors, agencies or private parties.
+
+The runner parses only original public publisher award ID/internal ID,
+published award amount, generated internal ID and base obligation date.
+It checks identity/amount/date consistency across re-reads, detects
+duplicate economic source IDs, rejects invalid money/date formats and
+distinguishes changed/missing/saturated publisher results from an exact
+match. A published dollar award **is not** an attainable future CaptureBrief
+customer contract, a currently open opportunity, bank-cleared payment,
+successful bid or independent original SAM.gov solicitation amendment.
+No recipient name, private source row or original award identifier is
+logged or included in the persisted report.
+
+The bounded cross-engine source branch now also publishes
+`freight/research_lab/official_capturebrief_award_readback_v1.json`,
+with the source-anchor hash, original award record counts, any repeated
+publisher rows, an aggregate source-only award amount (USD cents),
+up to two same-publisher readback outcomes and the canonical sample
+SHA-256. This is neither a signature on original bytes nor a model
+accuracy score. User-attested broad reuse rights remain distinguishable
+from independently verified source-specific terms, and independent
+solicitation outcome matches remain zero. The isolated data branch
+receives no individual award identifiers or recipient names.
+
+After the first live run the branch must report its **actual** sample
+size, readback outcomes and provider error codes. A blocked or changed
+publisher source is reported as DEGRADED, not silently turned into no
+awards or a passing truth label. The nightly four-engine evaluation
+tests its receipt integrity before claiming a healthy read-only replay.
+
+The integration reuses the current controller, protected main,
+metadata-only branch, required status checks and existing schedule.
+No added Worker, new paid account, direct customer message, unapproved
+API credentials or production CaptureBrief alteration is required.
+
+The source contract is published by USAspending:
+`https://api.usaspending.gov/docs/endpoints` and
+`https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/search/spending_by_award.md`.
+
+Run strictly offline regression tests:
+
+    python -m unittest -v freight.test_official_capturebrief_award_lab
+
+Reproduce only from the authorized isolated research branch:
+
+    python -m freight.official_capturebrief_award_lab
+    python -m freight.official_capturebrief_award_lab --verify
+
+### Fixed-code provenance for failed original award-ID readbacks
+
+The original issuer sample can succeed while a separately scoped award-ID
+re-query fails. The nightly receipt now stores strictly bounded **error code
+counts** for those second requests (e.g. HTTP_400, HTTP_429 or
+PUBLISHER_UNAVAILABLE) without logging any award ID, URL query content,
+publisher response body or recipient identity. A failed second read never
+becomes a matching original award or an independent award-outcome label.
+Counters are independently validated for consistency with the exact number
+of unavailable second reads, even when the receipt's own SHA-256 is recomputed
+by an adversarial source.
+
+This diagnostic does not perform additional public API calls, does not
+change the source population, and does not weaken fail-closed rules. The
+code categorization distinguishes malformed requests, upstream throttling
+and provider unavailability to enable a subsequent source-specific fix.
+
+### Independent publisher endpoint fallback for throttled exact award-ID queries
+
+The official USAspending award search returned actual contract rows in
+the first live test but responded with HTTP 503 for both quote-wrapped
+award-ID re-searches. Rather than falsely treating that as two failed
+contract awards, the controller now optionally checks the **documented
+separate original-publisher** award-detail GET endpoint:
+
+    https://api.usaspending.gov/api/v2/awards/{INTERNAL_AWARD_ID}/
+
+The URL is built only from a numeric `internal_id` already observed
+in the fixed-source award sample. Each read uses fixed-host HTTPS,
+no redirects, public-DNS precheck, a 12-second timeout and a strict
+440-KiB maximum. No other source or account is contacted.
+
+The fallbacks are attempted only after an initial second-read
+HTTP 429, 5xx, or network-unavailable result and only for the existing
+two bounded award cases. The source detail endpoint has a **different
+schema** from the search endpoint: a successful detail response may
+establish *same-issuer identifier and total-obligation consistency*
+(`id`, `piid`, `generated_unique_award_id`, `total_obligation`),
+but does **not** establish the base obligation date, original SAM.gov
+solicitation, bidder eligibility, independent award accuracy, or legal
+rights. Consequently the receipt stores separate detail consistency,
+mismatch and error counts; the missing exact award-ID search evidence
+continues to be disclosed as DEGRADED.
+
+The full original award detail response is ephemeral and can contain
+recipient information; only the above bounded publisher fact fields are
+inspected, and no award IDs, names, payloads, recipient identities or
+URL query values enter the research data branch or GitHub logs. Receipt
+fields and counts remain tamper-evident and commercially rights-held.
+
+Official endpoint documentation:
+`https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/awards/award_id.md`
