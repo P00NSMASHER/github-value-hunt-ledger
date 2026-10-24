@@ -608,3 +608,66 @@ fields and counts remain tamper-evident and commercially rights-held.
 
 Official endpoint documentation:
 `https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/awards/award_id.md`
+
+## CaptureBrief FY2027 original SAM archive and anti-lookahead receipt (v9)
+
+The existing research controller now has a **research-only** original public
+FY2027 Contract Opportunities archive source reader. The exact CSV object
+URL was previously observed as a public first-party-listed SAM Data
+Services file by CaptureBrief's October 19, 2026 automated source review:
+`https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv`.
+The earlier unreviewed observation reported 1,607,260 original bytes,
+1,104 data rows, and SHA-256
+`7b4e00e3156248db9dcca767431bb6c5d4168aeeb2abc707ab12c0f9e61d71ce`.
+These historical values are frozen as a *reference*, **not** a promise that
+the publisher still serves identical source bytes today.
+
+Within the **existing** research-only controller, one original fixed-host
+HTTPS GET is allowed per UTC day, subject to a public DNS check, a no-redirect
+policy, a 15-second timeout, a strict 2.5-MB maximum and complete
+Content-Length/Content-Encoding integrity checks. The complete source CSV
+is parsed in memory only. The reader verifies all first-party-required
+SAM Data Services columns (`NoticeId`, `Sol#`, `PostedDate`, `Type`,
+`Active`, `AAC Code`, `Office`, `Link`), source row shape, duplicate
+NoticeIds and cross-office/agency solicitation collisions. The source
+may evolve: new original-byte SHA-256 is recorded and **compared** to
+the historic Oct19 original fingerprint rather than falsely labeled
+unchanged.
+
+The digest-linked branch receipt
+`freight/research_lab/capturebrief_sam_fy2027_asof_v1.json`
+stores **only counts, fixed source URL, source digest, observation time,
+prior unreviewed provenance reference, and bounded error states**. It
+does not store any contract opportunity description, notice IDs,
+solicitation numbers, contacts, source CSV, or original rows. It never
+changes the protected CaptureBrief FY2027 production archive catalog,
+which remains explicitly **unapproved** for full-catalog release.
+
+A pure **SAM-to-USAspending temporal-join guard** is also tested:
+an exact matching `Sol#` and award solicitation identifier is
+insufficient without a separately anchored issuing agency and office.
+The original SAM issuer-reported `PostedDate` must precede the award
+signing date; crucially, the *actual archive source observation* must
+also precede that award date. A historical notice copied or obtained
+after signing can never backfill a false as-of capability. Source
+chronology therefore yields a **candidate only** when every guard
+passes; it never independently establishes that CaptureBrief could
+have known the opportunity, won a contract, or generated revenue.
+
+This upgrade does **not yet join** the first-party original SAM file
+to any individually verified USAspending award record. The current
+USAspending readback receipt deliberately stores no original award
+identifiers, and the research lab will not reconstruct identifiers
+from summary digests. Independent linked award labels remain **0**
+until a separate proven first-party agency/office/time association
+is available. No buyer/outbound communication, extra source API,
+new paid service, new scheduler, or production engine mutation
+has been authorized.
+
+Offline controls:
+
+    python -m unittest -q freight.test_capturebrief_sam_fy2027_asof
+
+Inspect exact-branch source receipt without public network:
+
+    python -m freight.capturebrief_sam_fy2027_asof --verify
