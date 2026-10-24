@@ -1025,3 +1025,53 @@ The initial published-document census does not justify selecting a claim
 or rerating either shipment. No new Cron trigger, cloud paid service,
 source data branch, original-source network call, production engine
 change, or external outreach is part of this repair.
+
+
+## Two original ArcBest VPQ quotation pages found in existing PDF (v14)
+
+**Material correction to v12/v13:** The public, frozen original **74-page**
+ArcBest court exhibit at
+https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408
+contains not only **ten original invoice faces**, but also **two actual
+shipment-specific ArcBest Volume Pricing Quotation form pages**. Earlier
+language implying no quotation document was present in the controlled
+source PDF was incomplete. The previous statement of **zero independently
+authenticated accepted rate agreements and zero original signed BOLs**
+remains correct.
+
+Actual original-page replay (isolated CI run #40143067211) validates:
+
+| Source-document relationship | Verified within SAME frozen public PDF |
+| --- | --- |
+| Invoice dated 2024-05-13, billed $2,132.83 | Matching original quotation ID; quote effective May 10-23, 2024; both print 2,610 lb; original quotation **minimum including fuel $2,132.83**. |
+| Invoice dated 2024-04-16, billed $606.00 | Matching original quotation ID; quote effective Apr 15-28, 2024; both print 12,573 lb; quote minimum **$270** including fuel covers 20 linear feet and additional charge **$14/foot**. |
+| Second invoice's reported LWH first dimension | **525 inches / 12 = 43.75 feet**. If that printed number reflects chargeable linear trailer footage and whole extra feet are rounded up, 44 - 20 = 24 additional feet and $270 + 24 × $14 = **$606**, matching the original invoice. |
+| Independently authenticated initial signed BOL bearing correct quote ID | **0**; no separate original accepted BOL artifact is possessed. |
+| Independently verified quote acceptance, final weight/space, payment, adjudicated errors or credits | **0**; two observations remain source-internal arithmetic cases, not independent freight-error truth. |
+
+The source-frozen lab joins the quote ID, shipment date/quote-effective
+window, printed weight, and face amount **in ephemeral runner memory**.
+These identifiers, quote details and source pages are **never written** to
+the research branch. A stable SHA-256 over *anonymous page/category tags*
+is pinned to the already-verified source PDF fingerprint. Wrong or
+duplicated quote IDs, date-window conflicts, mismatched printed weights
+and one-cent differences must leave the amount **unresolved**, rather than
+fabricate an overcharge.
+
+The second $606 check is a **conditional mathematical reading**, not a
+certified space/length measurement. The printed LWH first dimension
+need not be independently accepted billable space, and rounding policy
+has not been verified against a separate initial signed BOL. A matching
+contemporaneous quotation page supports the carrier's internal pricing
+explanation; it does **not** prove the original contract's legal
+applicability, shipper acceptance, correctness of billed accessorials
+or a customer's cleared payment.
+
+This corrects the source **completeness** question substantially:
+two matching contemporaneous source pricing documents were already in the
+approved corpus. It does not create verified customer overcharge labels,
+cash recoveries, BOL acceptance evidence, commercial reuse approval or
+an independently adjudicated accuracy rate. All ten original ArcBest
+invoices remain UNKNOWN for independent customer-level audit outcomes.
+The same nightly real-document job tests all counts without a new schedule,
+data branch, contact action, purchase, cloud permission or production change.
