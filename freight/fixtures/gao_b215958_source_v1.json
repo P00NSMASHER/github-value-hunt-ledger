@@ -18,7 +18,9 @@
     "source_bytes_sha256": null,
     "source_bytes_acquired": false,
     "rights_status": "GAO_US_PUBLIC_DOMAIN_WITH_ATTRIBUTION_AND_EMBEDDED_THIRD_PARTY_CAUTION",
-    "commercial_use_of_engine_input_approved": false
+    "commercial_use_of_engine_input_approved": false,
+    "superseding_reconsideration_url": "https://www.gao.gov/products/b-215958-2",
+    "superseding_reconsideration_date": "1986-02-18"
   },
   "population": {
     "challenged_government_bills_of_lading": 55,
@@ -27,7 +29,7 @@
     "outcome_label_scope": "DECISION_AGGREGATE_ONLY",
     "per_bill_of_lading_labels_available": false,
     "complete_original_invoice_or_bol_corpus_available": false,
-    "decision_outcome": "GAO_REVERSED_GSA_AUDIT_FOR_53_AND_INSTRUCTED_REFUND",
+    "decision_outcome": "GAO_1984_INITIAL_REVERSAL_SUBSEQUENTLY_OVERRULED_IN_1986",
     "independently_confirmed_refunds_received": null,
     "independently_confirmed_carrier_overcharge_amount_cents": null
   },
@@ -37,7 +39,7 @@
     "customer_contract_or_payment_chain_available": false,
     "independent_accuracy_scoring_permitted": false,
     "realized_retally_recovered_cash_cents": 0,
-    "independent_negative_control_scope": "Do not infer an overcharge solely from missing explicit exclusive-use request notation when shipper-authorized numbered seals satisfy this historical tariff's separate clause."
+    "independent_negative_control_scope": "Initial 1984 numbered-seal rationale was expressly overruled on February 18, 1986; the current final historical GAO decision rejects exclusive-use charges based on numbered seals without the required written request. Do not infer customer-specific invoice overcharge or refund without original source records."
   },
   "controls": [
     {
@@ -47,7 +49,7 @@
       "numbered_seals_applied_with_shipper_authority": true,
       "seal_numbers_recorded_on_shipping_document": true,
       "explicit_exclusive_use_request_annotation": false,
-      "expected": "DO_NOT_ASSERT_CONFIRMED_OVERCHARGE_FROM_MISSING_ANNOTATION_ALONE",
+      "expected": "1984_INITIAL_FAVORABLE_RULING_NOT_FINAL_1986_WRITTEN_REQUEST_REQUIRED",
       "actual_customer_overcharge_cents": null,
       "actual_refund_received_cents": null
     },
@@ -68,8 +70,9 @@
     "clinical_student_customer_private_material_used": false,
     "original_document_copied_into_repository": false,
     "no_independent_invoice_reconciliation_results": true,
-    "publisher_original_review_date": "2026-10-23"
+    "publisher_original_review_date": "2026-10-23",
+    "subsequent_history_checked_2026_10_24": true
   },
   "manifest_hash_contract": "RESEARCH_AUTHORED_MANIFEST_SHA256_CANONICAL_SORTED_JSON_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
-  "manifest_sha256": "05e7f954f33686b0ba48440a8b42c30b4da29a6a062abfa057f46f77a56d7489"
+  "manifest_sha256": "02320aba4915da14b2f05dc68233106b0bfdf1f163976cba5d3bdbf545da80fb"
 }
