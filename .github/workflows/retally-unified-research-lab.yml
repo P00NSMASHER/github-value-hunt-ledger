@@ -306,6 +306,9 @@ jobs:
                   f"- Official publisher second reads: {x['publisher_second_reads']}\n"
                   f"- Official second reads matching exactly: {x['publisher_second_reads_exact']}\n"
                   f"- Second-read HTTP/status error categories: {x['publisher_readback_error_codes']}\n"
+                  f"- Separate publisher award-detail GETs attempted: {x['publisher_detail_lookup_attempted']}\n"
+                  f"- Award-detail ID-and-amount matches (not date or outcome proof): {x['publisher_detail_identity_amount_matched']}\n"
+                  f"- Award-detail source failures: {x['publisher_detail_error_codes']}\n"
                   '- Independent live solicitations/award outcomes: NOT established\n'
               )
           PY
