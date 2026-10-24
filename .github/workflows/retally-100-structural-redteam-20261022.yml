@@ -1,0 +1,80 @@
+name: RETALLY Deep Structural 100-Customer Red Team (No Production)
+
+on:
+  pull_request:
+    paths:
+      - 'freight/redteam_deep_generator_20261022.py'
+      - 'freight/redteam_deep_engine_20261022.py'
+      - '.github/workflows/retally-100-structural-redteam-20261022.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-deep-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deep-100-customer-challenge:
+    name: 100-diverse-freight-clients-frozen-source
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact protected source with no saved credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Pinned Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Compile generator and audit harness
+        run: python -m py_compile freight/redteam_deep_generator_20261022.py freight/redteam_deep_engine_20261022.py
+      - name: Run 100 structurally different fictional customers against the REAL freight software
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          RETALLY_DEEP_REPORT_DIR: retally-deep-100-output
+        run: python -m freight.redteam_deep_engine_20261022
+      - name: Independently verify source variation and noncommercial boundaries
+        if: always()
+        run: |
+          if [ ! -f retally-deep-100-output/summary.json ]; then
+            echo "No evidence summary was generated; test was blocked."
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          summary=json.loads(Path("retally-deep-100-output/summary.json").read_text())
+          assert summary["cases"] == 100
+          assert summary["unique_source_manifests"] == 100
+          assert summary["unique_structure_signatures"] >= 40
+          assert summary["invoice_count_range"][0] == 1
+          assert summary["invoice_count_range"][1] == 40
+          assert all(summary["coverage"].get("pricing:"+m, 0)>0 for m in
+                     ("FIXED","PER_UNIT","INCLUDED"))
+          assert all(summary["coverage"].get("rule:"+m, 0)>0 for m in
+                     ("VERIFIED","UNVERIFIED","MISSING","OVERLAP","EXPIRED","WRONG_SCOPE"))
+          assert all(summary["coverage"].get("currency:"+m, 0)>0 for m in
+                     ("USD","EUR","GBP","CAD","AUD"))
+          assert summary["real_customer_data"] is False
+          assert summary["real_carrier_actions"] is False
+          assert summary["bank_cleared_funds"] is False
+          assert summary["contract_execution_verified"] is False
+          assert summary["real_world_detection_accuracy"] is None
+          print("100 fictional buyers, broad varying source structures, and honest outcome classifications checked")
+          print(json.dumps({k:v for k,v in summary.items() if k!="root_cause_failures"},sort_keys=True))
+          PY
+      - name: Upload evidence of all 100 actual customer-like datasets and every failed oracle
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: RETALLY-deep-100-structurally-different-fictional-customer-cases
+          path: |
+            retally-deep-100-output/fictional-datasets.zip
+            retally-deep-100-output/summary.json
+            retally-deep-100-output/report.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Source tree remains pristine
+        run: git diff --exit-code -- freight .github
