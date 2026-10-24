@@ -322,3 +322,427 @@ Offline, read-only reproduction:
     python -m unittest -q freight.test_research_source_review
     python -m freight.research_source_review --output /tmp/retally-source-review-queue.json
     python -m freight.research_source_review --output /tmp/retally-source-review-queue.json --verify
+
+## Source-topic admission screening (v5)
+
+The independent Cloudflare scout and the GitHub discovery runner now use
+the **same conservative four-engine topic lists** to screen metadata from
+GitHub and Zenodo before accepting any *new* URL pointers. GitHub
+repository name/description and Zenodo record title are inspected in
+memory only, limited to 512 characters per field; the source catalog,
+D1 and action logs still contain **only canonical allowlisted URLs**,
+first-seen dates, engine names and fixed non-sensitive result codes.
+Raw titles, descriptions, authors, contacts, invoice contents and source
+document bytes are never persisted.
+
+For PermitPlate, the rules require DOB, building-permit or permit-issuance
+terms and reject restaurant-inspection context even when the word
+"permit" also appears. All lanes reject obviously unrelated catalog
+records and metadata lacking a useful topic signal. This does not inspect
+or silently erase previous unverified leads. Existing historical records,
+the PermitPlate wrong-topic quarantine fixture and their original
+first-seen dates remain unchanged.
+
+The **official NYC Socrata DOB catalog source filter is preserved**.
+The optional Data.gov v4 lookup remains subject to the original
+public-access-level check and production API-key requirement. No new
+APIs, additional provider calls, secrets, timers, workers or billing
+are introduced. Metadata-based similarity is a conservative
+*screening heuristic*, not a human-reviewed truth label, a guarantee
+that a document exists, or commercial-use permission. It can have
+false positives and false negatives. A zero-new-lead cycle is
+acceptable when requests and source safety checks succeed, not proof
+that further real data does not exist.
+
+Both collectors include adversarial regression cases for each of the four
+engines, with aligned positive/off-topic metadata fixtures, missing
+publisher titles, unsafe IDs and sensitive description text that must
+never be copied to the ledger.
+
+## Publisher response and evidence provenance gate (v6)
+
+The existing unified controller now performs a **real read-only public-origin
+probe** of up to nine pinned official source URLs across all four engines.
+Its output, `freight/research_lab/publisher_provenance_v1.json`, is written
+only to the isolated `research/retally-unified-data-lab` branch alongside
+the previously versioned source review and evaluation receipts.
+
+A source is probed only when it appears in the validated canonical ledger,
+is associated with its original engine lane and is explicitly pinned by
+the existing `PUBLIC_REVIEW_ANCHORS` policy. Requests are HTTPS,
+public-DNS checked, redirect-blocked, bounded in time, and restricted to
+the pinned publisher URLs. **No GitHub or Zenodo third-party candidates
+are downloaded** by this provenance stage. For each fixed publisher URL,
+a HEAD observation records a status code and fixed media-class category.
+Only when HEAD succeeds, the content class is explicitly allowed and the
+declared source size is at most 256 KiB does an optional GET read at most
+256 KiB + one sentinel byte. A SHA-256 fingerprint is recorded **only**
+for the complete bounded original HTTP response. Oversized, redirected,
+unavailable or unsupported sources are reported with separate fixed
+reason codes, not truncated or falsely fingerprinted.
+
+All actual publisher content is ephemeral; never upload source bodies,
+invoice faces, contact information or arbitrary headers. The persistent
+receipt contains immutable source IDs, fixed publisher hosts, first-seen
+dates, observation outcome/status, an optional SHA-256, and bounded
+diagnostics. Its own digest and each observation are validated
+adversarially, including fail-closed rights, outcomes and cash assertions.
+For the same UTC date and unchanged pinned source set, the live process
+reuses its receipt without extra publisher requests; a changing unrelated
+catalog does not force a refetch. Receipts older than two days fail
+verification rather than claiming ongoing freshness.
+
+**Scope distinction:** HTTP 200 means the pinned public URL responded
+with metadata during this probe; a complete-response SHA-256 is a
+fingerprint of the bytes received, **not** an official digital signature,
+original-invoice chain of custody, legal reuse permission, customer-specific
+governing contract, independent positive/negative adjudication, or
+confirmed cash recovery. The engine evidence/benchmark readiness, rights
+and independent labels remain false/zero until actually supported.
+No source is automatically admitted as commercial benchmark truth.
+
+The existing nightly read-only four-engine replay now checks the exact
+publisher provenance receipt against the research data branch before
+evaluating original invoice/engine fixtures. There are no new Cron jobs,
+Workers, D1 mutations, paid services, outbound sales activity, or engine
+production changes. Offline adversarial tests simulate publisher errors,
+tampered proof flags, forged hashes, redirects and large responses; they
+perform no real public-network calls.
+
+Run without network access for safety testing:
+
+    python -m unittest -v freight.test_research_publisher_provenance
+
+Run only on the approved isolated research branch with existing public
+publisher access:
+
+    python -m freight.research_publisher_provenance --live
+    python -m freight.research_publisher_provenance --verify
+
+### Next required evidence before accuracy benchmarking
+
+- Confirm source terms and intended commercial reuse for **each specific
+  dataset**, not from host identity or HTTP accessibility.
+- Obtain/verify complete underlying original artifacts and governing source
+  authority appropriate to the engine and its original time window.
+- Link results to independently determined positive **and** negative
+  outcomes; train/test leakage and as-of-date chronology must be excluded.
+- Keep unknown labels **UNKNOWN** and commercial authorization **FALSE**
+  until each separate requirement is evidenced, not inferred by a model.
+
+## Official issued-permit original-row replay (v7)
+
+An additional **read-only real source replay inside the existing controller**
+uses the official NYC Open Data DOB NOW: Build – Approved Permits dataset
+`rbx6-tga4` (publisher:
+`https://data.cityofnewyork.us/d/rbx6-tga4`). It exercises the published
+JSON record schema using *only* job filing, tracking number, work permit,
+sequence, issue date and permit-status fields. No owner name, address,
+contractor identity, contact, original row or other sensitive source field
+is retained in the research branch.
+
+The daily sample is capped at 20 dated original published records. Three
+sampled tracking numbers are separately re-read from the **same original
+publisher source**, with URL/SoQL allowlisting, strict source identity,
+read-only HTTPS/redirect protection and a 160-KiB response cap. The derived
+source receipt records sampled count, exact second-read matches,
+conflicts/missing records, non-issued placeholder counts, and SHA-256 of
+only the selected canonical sample fields. The source records and
+identifiers themselves remain ephemeral. Duplicate tracking numbers are
+not assumed to be unique permit IDs: multiple work permits and sequences
+may belong to one tracking number. Furthermore, NYC can publish repeated
+rows with the **same full composite permit identity**. These are preserved
+in raw sampled-row counts but are never counted as distinct verified
+permits; their multiplicity is separately reported as a source-quality
+warning. Exact duplicate identities are excluded from individual
+readbacks and cause DEGRADED rather than a false-green or an entire
+lost discovery cycle. A saturated publisher readback page is explicitly
+AMBIGUOUS, while a second-query timeout preserves the original-row
+sample and records the error. A work-permit placeholder saying
+"Permit is not yet issued" does not become a positive issued-permit case
+simply because a source row has a date.
+
+This checks **publisher consistency**, not a separate independent
+government adjudication: issuance source records, historical filing
+status, operational demand, buyers' purchasing intent and awarded
+contracts are materially different facts. The source receipt therefore
+preserves all commercial source-rights and independent outcome gates.
+The user's asserted broad commercial reuse rights are recorded as
+`OWNER_ATTESTED_NOT_SOURCE_VERIFIED` without forging signed or
+source-specific permission evidence; source-specific rights remain
+unverified by this controller. The official NYC Open Data FAQ states
+that the open data is generally available for unrestricted use; individual
+dataset terms and non-public material are not retroactively cleared by
+that general statement:
+`https://www.nyc.gov/opendata/get-started/FAQs`.
+
+On source outages the replay records **DEGRADED**, not fake positives or
+no-records-found claims. Source schema changes, duplicate full source
+identity collisions, forged commercial rights or tampered receipts
+block the research workflow. A successful limited publisher readback
+remains separate from independently held-out opportunity accuracy.
+
+The output is staged **only** on
+`research/retally-unified-data-lab` as
+`freight/research_lab/official_nyc_issued_permit_replay_v1.json`.
+Every post-publish nightly replay verifies it against that exact source
+branch before exercising the four independent engines. No extra Cron,
+Worker, paid service, customer contact, billing or engine production
+mutation is introduced.
+
+Offline tests:
+
+    python -m unittest -q freight.test_official_nyc_issued_permit_lab
+
+Public read-only source probe (inside existing GitHub discovery only):
+
+    python -m freight.official_nyc_issued_permit_lab
+    python -m freight.official_nyc_issued_permit_lab --verify
+
+## CaptureBrief official USAspending award-row readback (v8)
+
+CaptureBrief now has an original federal contracting record readback inside the
+**existing unified controller**. It queries the public USAspending
+`/api/v2/search/spending_by_award/` publisher service using a strictly
+fixed original award type population (A/B/C/D), the completed federal
+FY2026 award period (2025-10-01 through 2026-09-30), bounded 12-row sample,
+and at most two separately scoped exact award-ID re-queries. Search POSTs
+are **read-only** to the official publisher, do not require credentials,
+and never contact contractors, agencies or private parties.
+
+The runner parses only original public publisher award ID/internal ID,
+published award amount, generated internal ID and base obligation date.
+It checks identity/amount/date consistency across re-reads, detects
+duplicate economic source IDs, rejects invalid money/date formats and
+distinguishes changed/missing/saturated publisher results from an exact
+match. A published dollar award **is not** an attainable future CaptureBrief
+customer contract, a currently open opportunity, bank-cleared payment,
+successful bid or independent original SAM.gov solicitation amendment.
+No recipient name, private source row or original award identifier is
+logged or included in the persisted report.
+
+The bounded cross-engine source branch now also publishes
+`freight/research_lab/official_capturebrief_award_readback_v1.json`,
+with the source-anchor hash, original award record counts, any repeated
+publisher rows, an aggregate source-only award amount (USD cents),
+up to two same-publisher readback outcomes and the canonical sample
+SHA-256. This is neither a signature on original bytes nor a model
+accuracy score. User-attested broad reuse rights remain distinguishable
+from independently verified source-specific terms, and independent
+solicitation outcome matches remain zero. The isolated data branch
+receives no individual award identifiers or recipient names.
+
+After the first live run the branch must report its **actual** sample
+size, readback outcomes and provider error codes. A blocked or changed
+publisher source is reported as DEGRADED, not silently turned into no
+awards or a passing truth label. The nightly four-engine evaluation
+tests its receipt integrity before claiming a healthy read-only replay.
+
+The integration reuses the current controller, protected main,
+metadata-only branch, required status checks and existing schedule.
+No added Worker, new paid account, direct customer message, unapproved
+API credentials or production CaptureBrief alteration is required.
+
+The source contract is published by USAspending:
+`https://api.usaspending.gov/docs/endpoints` and
+`https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/search/spending_by_award.md`.
+
+Run strictly offline regression tests:
+
+    python -m unittest -v freight.test_official_capturebrief_award_lab
+
+Reproduce only from the authorized isolated research branch:
+
+    python -m freight.official_capturebrief_award_lab
+    python -m freight.official_capturebrief_award_lab --verify
+
+### Fixed-code provenance for failed original award-ID readbacks
+
+The original issuer sample can succeed while a separately scoped award-ID
+re-query fails. The nightly receipt now stores strictly bounded **error code
+counts** for those second requests (e.g. HTTP_400, HTTP_429 or
+PUBLISHER_UNAVAILABLE) without logging any award ID, URL query content,
+publisher response body or recipient identity. A failed second read never
+becomes a matching original award or an independent award-outcome label.
+Counters are independently validated for consistency with the exact number
+of unavailable second reads, even when the receipt's own SHA-256 is recomputed
+by an adversarial source.
+
+This diagnostic does not perform additional public API calls, does not
+change the source population, and does not weaken fail-closed rules. The
+code categorization distinguishes malformed requests, upstream throttling
+and provider unavailability to enable a subsequent source-specific fix.
+
+### Independent publisher endpoint fallback for throttled exact award-ID queries
+
+The official USAspending award search returned actual contract rows in
+the first live test but responded with HTTP 503 for both quote-wrapped
+award-ID re-searches. Rather than falsely treating that as two failed
+contract awards, the controller now optionally checks the **documented
+separate original-publisher** award-detail GET endpoint:
+
+    https://api.usaspending.gov/api/v2/awards/{INTERNAL_AWARD_ID}/
+
+The URL is built only from a numeric `internal_id` already observed
+in the fixed-source award sample. Each read uses fixed-host HTTPS,
+no redirects, public-DNS precheck, a 12-second timeout and a strict
+440-KiB maximum. No other source or account is contacted.
+
+The fallbacks are attempted only after an initial second-read
+HTTP 429, 5xx, or network-unavailable result and only for the existing
+two bounded award cases. The source detail endpoint has a **different
+schema** from the search endpoint: a successful detail response may
+establish *same-issuer identifier and total-obligation consistency*
+(`id`, `piid`, `generated_unique_award_id`, `total_obligation`),
+but does **not** establish the base obligation date, original SAM.gov
+solicitation, bidder eligibility, independent award accuracy, or legal
+rights. Consequently the receipt stores separate detail consistency,
+mismatch and error counts; the missing exact award-ID search evidence
+continues to be disclosed as DEGRADED.
+
+The full original award detail response is ephemeral and can contain
+recipient information; only the above bounded publisher fact fields are
+inspected, and no award IDs, names, payloads, recipient identities or
+URL query values enter the research data branch or GitHub logs. Receipt
+fields and counts remain tamper-evident and commercially rights-held.
+
+Official endpoint documentation:
+`https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/awards/award_id.md`
+
+## CaptureBrief FY2027 original SAM archive and anti-lookahead receipt (v9)
+
+The existing research controller now has a **research-only** original public
+FY2027 Contract Opportunities archive source reader. The exact CSV object
+URL was previously observed as a public first-party-listed SAM Data
+Services file by CaptureBrief's October 19, 2026 automated source review:
+`https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv`.
+The earlier unreviewed observation reported 1,607,260 original bytes,
+1,104 data rows, and SHA-256
+`7b4e00e3156248db9dcca767431bb6c5d4168aeeb2abc707ab12c0f9e61d71ce`.
+These historical values are frozen as a *reference*, **not** a promise that
+the publisher still serves identical source bytes today.
+
+Within the **existing** research-only controller, one original fixed-host
+HTTPS GET is allowed per UTC day, subject to a public DNS check, a no-redirect
+policy, a 15-second timeout, a strict 2.5-MB maximum and complete
+Content-Length/Content-Encoding integrity checks. The complete source CSV
+is parsed in memory only. The reader verifies all first-party-required
+SAM Data Services columns (`NoticeId`, `Sol#`, `PostedDate`, `Type`,
+`Active`, `AAC Code`, `Office`, `Link`), source row shape, duplicate
+NoticeIds and cross-office/agency solicitation collisions. The source
+may evolve: new original-byte SHA-256 is recorded and **compared** to
+the historic Oct19 original fingerprint rather than falsely labeled
+unchanged.
+
+The digest-linked branch receipt
+`freight/research_lab/capturebrief_sam_fy2027_asof_v1.json`
+stores **only counts, fixed source URL, source digest, observation time,
+prior unreviewed provenance reference, and bounded error states**. It
+does not store any contract opportunity description, notice IDs,
+solicitation numbers, contacts, source CSV, or original rows. It never
+changes the protected CaptureBrief FY2027 production archive catalog,
+which remains explicitly **unapproved** for full-catalog release.
+
+A pure **SAM-to-USAspending temporal-join guard** is also tested:
+an exact matching `Sol#` and award solicitation identifier is
+insufficient without a separately anchored issuing agency and office.
+The original SAM issuer-reported `PostedDate` must precede the award
+signing date; crucially, the *actual archive source observation* must
+also precede that award date. A historical notice copied or obtained
+after signing can never backfill a false as-of capability. Source
+chronology therefore yields a **candidate only** when every guard
+passes; it never independently establishes that CaptureBrief could
+have known the opportunity, won a contract, or generated revenue.
+
+This upgrade does **not yet join** the first-party original SAM file
+to any individually verified USAspending award record. The current
+USAspending readback receipt deliberately stores no original award
+identifiers, and the research lab will not reconstruct identifiers
+from summary digests. Independent linked award labels remain **0**
+until a separate proven first-party agency/office/time association
+is available. No buyer/outbound communication, extra source API,
+new paid service, new scheduler, or production engine mutation
+has been authorized.
+
+Offline controls:
+
+    python -m unittest -q freight.test_capturebrief_sam_fy2027_asof
+
+Inspect exact-branch source receipt without public network:
+
+    python -m freight.capturebrief_sam_fy2027_asof --verify
+
+### Original FY2027 source-field quarantine (Oct 24, 2026)
+
+The first live research-stage implementation encountered
+`SOURCE_CSV_SCHEMA_INVALID` and did not publish source rows.
+A separate read-only CI diagnostic of the **exact public original
+1,607,260-byte CSV** established that the document has 47 headers,
+all eight required first-party fields and 1,104 source rows, but **one
+`Sol#` value contains a Unicode control character**.
+
+Rather than quietly normalizing an unknown source identity or discarding
+the entire authentic public file, the decoder now counts that row,
+quarantines only the offending solicitation identifier from candidate
+issuer/family matching, and preserves all original source bytes in the
+ephemeral file digest. The receipt discloses the fixed error category
+`SOURCE_SOLICITATION_CONTROL_QUARANTINED`, the quarantined source-row
+count, and `PUBLIC_ARCHIVE_WITH_QUARANTINED_SOLICITATION_FIELD`
+status. Only strictly validated, unambiguous solicitation keys are
+eligible for future research-only matching; the quarantined row
+cannot become an award-join match or independent outcome label.
+Source records, raw identifiers, issuer names, and source bytes still
+never enter the GitHub branch.
+
+The short-lived **PR-only public CSV diagnostic was removed** after its
+aggregate finding; the permanent workflow keeps just the fixed, validated
+quarantine counters and original-byte digest. This restores research
+observability without treating an intentionally held/unapproved archive
+as a production source or inventing retrospective award outcomes.
+
+## GAO B-215958 authority reversal and tariff isolation (v9)
+
+A new **immutable, rights-held historical decision chronology receipt**
+`freight/research_lab/gao_authority_chronology_v1.json` is generated on the
+existing research data branch from two research-authored GAO case manifests
+and three fixed *official* GAO URLs. The key chronology is:
+
+- December 5, 1984: [GAO B-215958 initial decision](https://www.gao.gov/products/b-215958).
+  The decision accepted the numbered-seal exclusive-use interpretation for
+  53 of the 55 GBLs (other two original dispositions not proved).
+- February 18, 1986: [GAO B-215958 reconsideration](https://www.gao.gov/products/b-215958-2).
+  **This decision explicitly OVERRULED the carrier-favorable 1984 ruling
+  and SUSTAINED the GSA audit/deduction.** Under the historic NASI 190-A
+  tariff, numbered seals and their bill-of-lading notation alone did not
+  entitle the carrier to exclusive-use charges without the prescribed
+  written request.
+- January 3, 1969: [GAO B-165091](https://www.gao.gov/products/b-165091)
+  separately sustained a $179.80 deduction under a **different** historic
+  517-V tariff written-order clause. Its other $393.24 claim was conditional
+  on further validation and is **not** a paid/refunded amount.
+
+The research test corpus previously included only the 1984 source and could
+therefore misleadingly appear to support that ruling as the *final* case
+disposition. It now preserves the original 1984 material **as a historical
+observation that was overruled** and explicitly tests the 1986 superseding
+outcome. An as-of query on January 1, 1985 returns only the original 1984
+decision, while an as-of query after February 18, 1986 returns the controlling
+historical reconsideration. This avoids *both* post-1986 stale legal labels
+and retroactive pre-1986 look-ahead.
+
+Tests also reject a forged 53-case invoice-accuracy numerator, transferring
+a deduction under tariff 517-V to 190-A, treating the 1984 GBL count as
+specific invoices or claiming any present-day rate authority, validated bank
+refunds, recovery revenue, private customer error detection or reusable
+rights. All original document bytes and real invoices remain outside this
+catalog. Authored manifest hashes are **not** GAO original document digests.
+
+The receipt is regenerated inside the **same unified controller**, staged
+only on `research/retally-unified-data-lab`, validated in the nightly
+four-engine source replay, and does not introduce a new Cron trigger, paid
+service, customer communication, production-engine mutation or permissive
+source-rights promotion.
+
+    python -m unittest -q freight.test_gao_adjudication_chronology
+    python -m freight.gao_adjudication_chronology
+    python -m freight.gao_adjudication_chronology --verify

@@ -42,21 +42,68 @@ export function permitplateCandidateInScope(url) {
     && !PERMITPLATE_KNOWN_NON_DOB_DATASET_IDS.has(path.split("/").pop());
 }
 
-export function canonicalCandidates(provider, data) {
+/**
+ * Conservative discovery topic hints: only ephemeral publisher-returned
+ * title/name/description fields are inspected, never stored or logged.
+ * A match is NOT authenticity, legal reuse approval, independent truth, or
+ * confirmation that any source contains usable original records.
+ */
+const TOPIC_TERMS = Object.freeze({
+  freightrecovery: ["freight", "trucking", "truckload", "ltl", "bill of lading",
+    "shipment invoice", "shipping cost", "carrier invoice", "carrier rate",
+    "transportation cost", "logistics invoice", "tariff"],
+  permitplate: ["dob now", "nyc dob", "nyc building permit",
+    "new york building permit", "building permit", "construction permit",
+    "permit issuance", "approved permits", "dob filing"],
+  capturebrief: ["sam gov", "usaspending", "federal contract", "federal procurement",
+    "federal solicitation", "government contract", "government procurement",
+    "public tender", "public procurement", "rfp", "contract awards"],
+  recoveryos: ["accounts payable", "account payable", "vendor payment",
+    "supplier payment", "supplier invoice", "invoice reconciliation",
+    "payment reconciliation", "invoice dataset", "duplicate invoice",
+    "public sector spending", "spending transparency"],
+});
+function normalizeTopic(s) {
+  return typeof s === "string" ? s.slice(0, 512).toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ").trim() : "";
+}
+export function providerMetadataInScope(engine, provider, row) {
+  if (!ENGINES.includes(engine)) throw Error("INVALID_ENGINE");
+  if (!["github", "zenodo"].includes(provider)) throw Error("UNSUPPORTED_PROVIDER");
+  if (!row || typeof row !== "object" || Array.isArray(row)) return false;
+  let fields = [];
+  if (provider === "github") {
+    fields = [row.name, row.description];
+  } else {
+    fields = [row.metadata?.title ?? row.title];
+  }
+  const normalized = fields.map(normalizeTopic).filter(Boolean).join(" ");
+  if (!normalized) return false;
+  const padded = " " + normalized + " ";
+  if (engine === "permitplate" &&
+      [" restaurant ", " inspection ", " food safety ", " yelp ",
+       " dining out "].some(term => padded.includes(term))) return false;
+  return TOPIC_TERMS[engine].some(term => padded.includes(" " + term + " "));
+}
+
+export function canonicalCandidates(provider, data, engine) {
   const out = [];
+  if (!ENGINES.includes(engine)) throw Error("INVALID_ENGINE");
   if (!data || typeof data !== "object" || Array.isArray(data)) throw Error("INVALID_RESPONSE");
   if (provider === "github") {
     if (!Array.isArray(data.items)) throw Error("INVALID_ITEMS");
     for (const v of data.items.slice(0, 15)) {
       const link = v && v.html_url;
-      if (typeof link === "string" && /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(link)) out.push(link);
+      if (typeof link === "string" && /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(link)
+          && providerMetadataInScope(engine, "github", v)) out.push(link);
     }
   } else if (provider === "zenodo") {
     const list = data.hits && data.hits.hits;
     if (!Array.isArray(list)) throw Error("INVALID_ITEMS");
     for (const v of list.slice(0, 15)) {
       const id = v && String(v.id);
-      if (/^[1-9]\d{0,14}$/.test(id)) out.push("https://zenodo.org/records/" + id);
+      if (/^[1-9]\d{0,14}$/.test(id) && providerMetadataInScope(engine, "zenodo", v))
+        out.push("https://zenodo.org/records/" + id);
     }
   } else if (provider === "socrata") {
     if (!Array.isArray(data.results)) throw Error("INVALID_ITEMS");
@@ -93,12 +140,12 @@ export function feedSpecs(engine, whenMs = 0) {
   const query = QUERIES[engine];
   const [q1, q2, q3] = [query[offset], query[(offset + 1) % 3], query[(offset + 2) % 3]];
   const feeds = [
-    {provider: "github", name: "github-primary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q1))},
-    {provider: "github", name: "github-secondary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q2))},
-    {provider: "zenodo", name: "zenodo-archive", url: queryUrl("https://zenodo.org/api/records", {q: q3, size: 15, page})},
+    {provider: "github", engine, name: "github-primary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q1))},
+    {provider: "github", engine, name: "github-secondary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q2))},
+    {provider: "zenodo", engine, name: "zenodo-archive", url: queryUrl("https://zenodo.org/api/records", {q: q3, size: 15, page})},
   ];
   if (engine === "permitplate") {
-    feeds.push({provider: "socrata", name: "nyc-official-catalog",
+    feeds.push({provider: "socrata", engine, name: "nyc-official-catalog",
       url: queryUrl("https://api.us.socrata.com/api/catalog/v1",
         {domains: "data.cityofnewyork.us", search_context: "data.cityofnewyork.us", q: "NYC DOB building permit", limit: 15})});
   }
@@ -149,7 +196,7 @@ export async function fetchCatalog(spec) {
   let offset = 0;
   for (const part of parts) { bodyBytes.set(part, offset); offset += part.byteLength; }
   const payload = new TextDecoder("utf-8", {fatal:true}).decode(bodyBytes);
-  return canonicalCandidates(spec.provider, JSON.parse(payload));
+  return canonicalCandidates(spec.provider, JSON.parse(payload), spec.engine);
 }
 /**
  * Rotate bounded discovery windows instead of permanently replaying the first
@@ -240,10 +287,10 @@ export async function cycle(env, whenMs) {
   const candidates = new Set();
   const errors = [];
   let successfulFeeds = 0;
-  let githubRateLimited = false;
+  let githubRejected = false;
   for (const spec of feedSpecs(lane, now)) {
-    if (spec.provider === "github" && githubRateLimited) {
-      errors.push(spec.name + ":SKIPPED_RATE_LIMIT");
+    if (spec.provider === "github" && githubRejected) {
+      errors.push(spec.name + ":SKIPPED_AFTER_PROVIDER_REJECTION");
       continue;
     }
     try {
@@ -252,7 +299,7 @@ export async function cycle(env, whenMs) {
     } catch (error) {
       const code = providerErrorCode(error);
       errors.push(spec.name + ":" + code);
-      if (spec.provider === "github" && code === "HTTP_429") githubRateLimited = true;
+      if (spec.provider === "github" && (code === "HTTP_403" || code === "HTTP_429")) githubRejected = true;
     }
   }
   let added = 0;
@@ -311,9 +358,28 @@ export default {
       const associations = await env.RESEARCH_DB.prepare(
         "SELECT lane, COUNT(*) AS source_pointers FROM source_engines GROUP BY lane ORDER BY lane"
       ).all();
+      // Cron continuity is independent of provider success: classify stale lanes
+      // using their last successful run, and surface indefinitely unfinished jobs.
+      // Read-only D1 queries and fixed labels; no new schedule or external call.
+      const nowMs = Date.now();
+      const laneRows = status.results || [];
+      const staleLanes = ENGINES.filter(engine => {
+        const row = laneRows.find(candidate => candidate.name === engine);
+        return !row || !Number.isSafeInteger(row.last_success_ms) ||
+          row.last_success_ms <= 0 || nowMs - row.last_success_ms > 45 * 60000;
+      });
+      const unfinished = await env.RESEARCH_DB.prepare(
+        "SELECT COUNT(*) AS stuck_runs FROM runs WHERE status='RUNNING' AND started_ms < ?"
+      ).bind(nowMs - 30 * 60000).first();
+      const stuckRuns = Number(unfinished?.stuck_runs || 0);
+      const degraded = staleLanes.length > 0 || stuckRuns > 0 ||
+        laneRows.some(row => row.last_status !== "OK");
       return json({system:"RETALLY_UNIFIED_RESEARCH",scope:"PUBLIC_METADATA_ONLY",
-        total_source_references:total.total, lanes:status.results, recent_runs:runs.results,
+        total_source_references:total.total, lanes:laneRows, recent_runs:runs.results,
         last_24_hours:metrics.results, source_pointers_by_lane:associations.results,
+        operational_status:degraded?"DEGRADED":"OK",
+        stale_lanes:staleLanes, stale_threshold_minutes:45,
+        stuck_run_count:stuckRuns, stuck_threshold_minutes:30,
         commercial_approval:false, independent_truth_verified:false});
     }
     if (url.pathname === "/feed") {

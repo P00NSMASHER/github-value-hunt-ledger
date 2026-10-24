@@ -9,14 +9,25 @@ on:
       - "freight/test_research_lab_health.py"
       - "freight/research_source_review.py"
       - "freight/test_research_source_review.py"
+      - "freight/research_publisher_provenance.py"
+      - "freight/test_research_publisher_provenance.py"
+      - "freight/official_nyc_issued_permit_lab.py"
+      - "freight/test_official_nyc_issued_permit_lab.py"
+      - "freight/official_capturebrief_award_lab.py"
+      - "freight/test_official_capturebrief_award_lab.py"
+      - "freight/capturebrief_sam_fy2027_asof.py"
+      - "freight/test_capturebrief_sam_fy2027_asof.py"
+      - "freight/gao_adjudication_chronology.py"
+      - "freight/test_gao_adjudication_chronology.py"
+      - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
+      - "freight/fixtures/nyc_dob_*_v1.json"
+      - "freight/test_nyc_dob_*_v1.py"
       - "freight/research_lab_worker*"
       - "freight/research_lab/**"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
       - "freight/test_research_eval_bridge.py"
-      - "freight/fixtures/nyc_dob_*_v1.json"
-      - "freight/test_nyc_dob_*_v1.py"
       - "freight/real_world_eval_v1.py"
       - "freight/fixtures/real_world_eval_v1.json"
       - ".github/workflows/retally-unified-research-lab.yml"
@@ -32,12 +43,23 @@ on:
       - "freight/test_research_lab_health.py"
       - "freight/research_source_review.py"
       - "freight/test_research_source_review.py"
+      - "freight/research_publisher_provenance.py"
+      - "freight/test_research_publisher_provenance.py"
+      - "freight/official_nyc_issued_permit_lab.py"
+      - "freight/test_official_nyc_issued_permit_lab.py"
+      - "freight/official_capturebrief_award_lab.py"
+      - "freight/test_official_capturebrief_award_lab.py"
+      - "freight/capturebrief_sam_fy2027_asof.py"
+      - "freight/test_capturebrief_sam_fy2027_asof.py"
+      - "freight/gao_adjudication_chronology.py"
+      - "freight/test_gao_adjudication_chronology.py"
+      - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
+      - "freight/fixtures/nyc_dob_*_v1.json"
+      - "freight/test_nyc_dob_*_v1.py"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
       - "freight/test_research_eval_bridge.py"
-      - "freight/fixtures/nyc_dob_*_v1.json"
-      - "freight/test_nyc_dob_*_v1.py"
       - "freight/real_world_eval_v1.py"
       - "freight/fixtures/real_world_eval_v1.json"
       - ".github/workflows/retally-unified-research-lab.yml"
@@ -65,8 +87,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -219,6 +241,148 @@ jobs:
           with Path(__import__('os').environ['GITHUB_STEP_SUMMARY']).open('a') as out:
               out.write('\n'.join(lines) + '\n')
           PY
+      - name: Observe pinned original publisher responses with bounded HEAD and SHA-256
+        run: |
+          set -euo pipefail
+          # Once per UTC day (cached when public anchor custody is unchanged).
+          # Never fetch unpinned repositories, source payloads over 256 KiB,
+          # customer material, or independently invent a rights/truth label.
+          python -m freight.research_publisher_provenance --live --output freight/research_lab/publisher_provenance_v1.json | tee /tmp/retally-publisher-status.json
+          python -m freight.research_publisher_provenance --verify --output freight/research_lab/publisher_provenance_v1.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x = json.loads(Path('/tmp/retally-publisher-status.json').read_text())
+          assert x['commercial_reuse_approved'] is False
+          assert x['independent_outcome_labels_verified'] == 0
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  "### Publisher provenance (NOT benchmark validation)\n"
+                  f"- Pinned public URLs checked: {x['pinned_public_sources_checked']}\n"
+                  f"- HTTP 200 HEAD observations: {x['publisher_http_responses_observed']}\n"
+                  f"- Complete responses SHA-256 fingerprinted (<=256 KiB): "
+                  f"{x['complete_bounded_public_responses_fingerprinted']}\n"
+                  "- Commercial rights and independent outcome labels: unverified\n"
+              )
+          PY
+      - name: Replay bounded original NYC DOB NOW issued-permit publisher records
+        run: |
+          set -euo pipefail
+          # Only official permit records; bounded 20-row sample plus three
+          # exact publisher identity readbacks per UTC day; no body persisted.
+          python -m freight.official_nyc_issued_permit_lab \
+            --output freight/research_lab/official_nyc_issued_permit_replay_v1.json \
+            | tee /tmp/retally-real-permit-source-report.json
+          python -m freight.official_nyc_issued_permit_lab \
+            --verify --output freight/research_lab/official_nyc_issued_permit_replay_v1.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x = json.loads(Path('/tmp/retally-real-permit-source-report.json').read_text())
+          assert x['source_specific_rights_verified'] is False
+          assert x['independent_labels'] == 0
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### Original NYC DOB NOW public record readback\n'
+                  f"- Publisher observation status: {x['status']}\n"
+                  f"- Original sampled source rows: {x['source_rows_replayed']}\n"
+                  f"- Distinct row identities: {x['distinct_publisher_source_identities']}\n"
+                  f"- Repeated publisher source rows: {x['repeated_publisher_source_rows']}\n"
+                  f"- Independent publisher re-read requests: {x['original_publisher_second_reads']}\n"
+                  f"- Ambiguous or unavailable re-reads: {x['ambiguous_or_unavailable_second_reads']}\n"
+                  f"- Publisher-consistent row re-reads: {x['publisher_consistent_reads']}\n"
+                  f"- Changed or conflicting record snapshots: {x['publisher_data_changed']}\n"
+                  '- Customer opportunity outcomes and commercial-use rights: NOT independently verified\n'
+              )
+          PY
+      - name: Replay bounded original USAspending contract award facts for CaptureBrief
+        run: |
+          set -euo pipefail
+          # Read-only public search: 12 max original award rows and two exact
+          # award-ID publisher readbacks per UTC day. No recipient records,
+          # source JSON body, contract contacts, or customer data persisted.
+          python -m freight.official_capturebrief_award_lab \
+            --output freight/research_lab/official_capturebrief_award_readback_v1.json \
+            | tee /tmp/retally-capturebrief-award-report.json
+          python -m freight.official_capturebrief_award_lab \
+            --verify --output freight/research_lab/official_capturebrief_award_readback_v1.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x = json.loads(Path('/tmp/retally-capturebrief-award-report.json').read_text())
+          assert x['source_specific_commercial_reuse_verified'] is False
+          assert x['independently_verified_solicitation_outcomes'] == 0
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### CaptureBrief original federal contract award readback\n'
+                  f"- Publisher readback status: {x['status']}\n"
+                  f"- Original USAspending contract awards sampled: {x['sample_contract_awards']}\n"
+                  f"- Distinct original internal award IDs: {x['distinct_publisher_award_ids']}\n"
+                  f"- Official publisher second reads: {x['publisher_second_reads']}\n"
+                  f"- Official second reads matching exactly: {x['publisher_second_reads_exact']}\n"
+                  f"- Second-read HTTP/status error categories: {x['publisher_readback_error_codes']}\n"
+                  f"- Separate publisher award-detail GETs attempted: {x['publisher_detail_lookup_attempted']}\n"
+                  f"- Award-detail ID-and-amount matches (not date or outcome proof): {x['publisher_detail_identity_amount_matched']}\n"
+                  f"- Award-detail source failures: {x['publisher_detail_error_codes']}\n"
+                  '- Independent live solicitations/award outcomes: NOT established\n'
+              )
+          PY
+      - name: Prove SAM FY2027 original public archive bytes and anti-lookahead scope
+        run: |
+          set -euo pipefail
+          # Research-only first-party-listed file, not an approved CaptureBrief
+          # production catalog. Only bounded source bytes in runner memory;
+          # file digest and aggregate source counts enter data branch.
+          python -m freight.capturebrief_sam_fy2027_asof \
+            --output freight/research_lab/capturebrief_sam_fy2027_asof_v1.json \
+            | tee /tmp/retally-sam-fy2027-public-replay.json
+          python -m freight.capturebrief_sam_fy2027_asof --verify \
+            --output freight/research_lab/capturebrief_sam_fy2027_asof_v1.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x = json.loads(Path('/tmp/retally-sam-fy2027-public-replay.json').read_text())
+          assert x['production_catalog_approved'] is False
+          assert x['real_cross_source_award_labels'] == 0
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### CaptureBrief SAM FY2027 archive research chronology (NOT release-approved)\n'
+                  f"- Original source state: {x['source_status']}\n"
+                  f"- Original archive rows parsed: {x['source_rows']}\n"
+                  f"- Distinct public original notice IDs: {x['unique_notice_ids']}\n"
+                  f"- Source rows quarantined for solicitation control characters: {x['source_rows_quarantined_solicitation_control']}\n"
+                  f"- Current original SHA matches archived Oct 19 digest: {x['source_digest_matches_historical_oct19']}\n"
+                  f"- Source failure categories: {x['source_error_codes']}\n"
+                  '- Independent as-of SAM-to-USAspending award outcomes: ZERO\n'
+              )
+          PY
+      - name: Enforce 1986 GAO reconsideration over superseded 1984 ruling
+        run: |
+          set -euo pipefail
+          # Historical legal sequence, not a customer invoice or paid case.
+          python -m freight.gao_adjudication_chronology \
+            --output freight/research_lab/gao_authority_chronology_v1.json \
+            | tee /tmp/retally-gao-supersession.json
+          python -m freight.gao_adjudication_chronology \
+            --output freight/research_lab/gao_authority_chronology_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads(Path('/tmp/retally-gao-supersession.json').read_text())
+          assert d['1984_favorable_decision_overruled'] is True
+          assert '1986_GAO_RECONSIDERATION' in d['final_historical_authority']
+          assert d['gbl_individual_labels_proven'] == 0
+          assert d['customer_cash_recovered_cents'] == 0
+          assert d['source_specific_commercial_rights_verified'] is False
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  "### FreightRecovery GAO superseding authority\n"
+                  "- The Dec 1984 B-215958 favorable decision was OVERruled on Feb 18, 1986.\n"
+                  "- Final 1986 GAO reconsideration sustained the GSA audit action.\n"
+                  "- The 1969 B-165091 $179.80 tariff ruling is a separate case.\n"
+                  "- No per-invoice truth labels, modern tariff authority, or customer cash proven.\n"
+              )
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -240,7 +404,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/research_lab/gao_authority_chronology_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
           if [ -f freight/lab15/triage_queue.json ]; then
             git add -- freight/lab15/triage_queue.json
           fi
@@ -297,6 +461,16 @@ jobs:
           python -m freight.research_lab_health --ledger /tmp/retally-unified-leads.json --output /tmp/retally-source-health-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/research_lab/source_review_queue_v1.json > /tmp/retally-review-queue-v1.json
           python -m freight.research_source_review --ledger /tmp/retally-unified-leads.json --output /tmp/retally-review-queue-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/publisher_provenance_v1.json > /tmp/retally-publisher-provenance-v1.json
+          python -m freight.research_publisher_provenance --ledger /tmp/retally-unified-leads.json --output /tmp/retally-publisher-provenance-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/official_nyc_issued_permit_replay_v1.json > /tmp/retally-nyc-issued-permit-v1.json
+          python -m freight.official_nyc_issued_permit_lab --ledger /tmp/retally-unified-leads.json --output /tmp/retally-nyc-issued-permit-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/official_capturebrief_award_readback_v1.json > /tmp/retally-capturebrief-awards-v1.json
+          python -m freight.official_capturebrief_award_lab --ledger /tmp/retally-unified-leads.json --output /tmp/retally-capturebrief-awards-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/capturebrief_sam_fy2027_asof_v1.json > /tmp/retally-sam-fy2027-asof-v1.json
+          python -m freight.capturebrief_sam_fy2027_asof --output /tmp/retally-sam-fy2027-asof-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/gao_authority_chronology_v1.json > /tmp/retally-gao-authority-v1.json
+          python -m freight.gao_adjudication_chronology --output /tmp/retally-gao-authority-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/lab15/evidence_ledger.json > /tmp/retally-lab15-evidence.json
           git show origin/research/retally-unified-data-lab:freight/research/lab15_candidate_ledger.json > /tmp/retally-lab15-candidates.json
           python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge

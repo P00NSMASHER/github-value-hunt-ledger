@@ -44,6 +44,9 @@ SEEDS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
+        "https://www.gao.gov/products/b-215958",  # Initial 1984 53/55 decision OVERRULED in 1986.
+        "https://www.gao.gov/products/b-215958-2",  # Controlling Feb 18 1986 GAO reconsideration; GSA deduction sustained.
+        "https://www.gao.gov/products/b-165091",  # Distinct tariff; published $179.80 sustained deduction only.
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
@@ -184,6 +187,59 @@ def permitplate_catalog_in_scope(resource: dict) -> bool:
                 and re.search(r"\b(permits?|filings?|applications?|certificates?)\b",
                               title, re.I)
                 and not re.search(r"\b(restaurant|inspection)\b", title, re.I))
+
+
+
+# Purely advisory public catalog **metadata** screening; no original source
+# bytes, scraped descriptions, identities, metadata titles or approvals persist.
+TOPIC_TERMS = {
+    "freightrecovery": ("freight", "trucking", "truckload", "ltl", "bill of lading",
+                        "shipment invoice", "shipping cost", "carrier invoice",
+                        "carrier rate", "transportation cost", "logistics invoice",
+                        "tariff"),
+    "permitplate": ("dob now", "nyc dob", "nyc building permit",
+                    "new york building permit", "building permit",
+                    "construction permit", "permit issuance", "approved permits",
+                    "dob filing"),
+    "capturebrief": ("sam gov", "usaspending", "federal contract",
+                     "federal procurement", "federal solicitation",
+                     "government contract", "government procurement",
+                     "public tender", "public procurement", "rfp",
+                     "contract awards"),
+    "recoveryos": ("accounts payable", "account payable", "vendor payment",
+                   "supplier payment", "supplier invoice",
+                   "invoice reconciliation", "payment reconciliation",
+                   "invoice dataset", "duplicate invoice",
+                   "public sector spending", "spending transparency"),
+}
+
+
+def metadata_in_scope(engine: str, provider: str, row: dict) -> bool:
+    """Search-result topic hint only; never rights, relevance or outcome proof."""
+    if engine not in ENGINES:
+        raise ResearchError("INVALID_ENGINE")
+    if provider not in ("github", "zenodo"):
+        raise ResearchError("UNSUPPORTED_PROVIDER")
+    if type(row) is not dict:
+        return False
+    if provider == "github":
+        fields = (row.get("name"), row.get("description"))
+    else:
+        metadata = row.get("metadata")
+        title = metadata.get("title") if type(metadata) is dict else None
+        fields = (title if title is not None else row.get("title"),)
+    def norm(value):
+        return re.sub(r"[^a-z0-9]+", " ", value[:512].lower()).strip() if type(value) is str else ""
+    body = " ".join(filter(None, map(norm, fields)))
+    if not body:
+        return False
+    padded = " " + body + " "
+    if engine == "permitplate" and any(
+            token in padded for token in (" restaurant ", " inspection ",
+                                           " food safety ", " yelp ",
+                                           " dining out ")):
+        return False
+    return any(" " + term + " " in padded for term in TOPIC_TERMS[engine])
 
 
 def source_record(url: str, engine: str, seen: str) -> dict:
@@ -378,9 +434,9 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                     if type(item) is not dict:
                         continue
                     url = item.get("html_url")
-                    if type(url) is str and re.fullmatch(
+                    if (type(url) is str and re.fullmatch(
                         r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", url
-                    ):
+                    ) and metadata_in_scope(engine, "github", item)):
                         urls.append(url)
             elif provider == "socrata":
                 rows = data.get("results", [])
@@ -399,7 +455,8 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                 if type(hits) is not list:
                     raise ResearchError("INVALID_PROVIDER_ROWS")
                 for item in hits[:15]:
-                    if type(item) is dict and str(item.get("id", "")).isdigit():
+                    if (type(item) is dict and re.fullmatch(r"[1-9][0-9]{0,14}", str(item.get("id", "")))
+                            and metadata_in_scope(engine, "zenodo", item)):
                         urls.append("https://zenodo.org/records/" + str(item["id"]))
             successful += 1
         except ResearchError as exc:
