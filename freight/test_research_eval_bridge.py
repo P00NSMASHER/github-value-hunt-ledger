@@ -82,6 +82,54 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
             for x in feed["candidate_sources"]
         ))
 
+    def test_gao_b215958_candidate_decision_stays_unscored(self):
+        """Real adjudication locator cannot become an invoice-level recovery label."""
+        from freight.research_eval_bridge import validate_feed
+
+        url = "https://www.gao.gov/products/b-215958"
+        source_fixture = json.loads(
+            (Path(__file__).with_name("fixtures") / "gao_b215958_source_v1.json")
+            .read_text(encoding="utf-8")
+        )
+        population = source_fixture["population"]
+        self.assertEqual(population["decision_reversals_with_recorded_numbered_seals"], 53)
+        self.assertEqual(population["remainder_cases_with_unresolved_disposition"], 2)
+        self.assertFalse(population["per_bill_of_lading_labels_available"])
+        self.assertFalse(source_fixture["limits"]["independent_accuracy_scoring_permitted"])
+
+        unified = ledger_from([source_record(url, "freightrecovery", "2026-10-23")])
+        evidence, candidates, manifest = (
+            legacy_evidence(), legacy_candidates(), load_manifest()
+        )
+        feed = build_feed(unified, evidence, candidates, manifest)
+        self.assertEqual(feed["source_pointers_total"], 1)
+        row = feed["candidate_sources"][0]
+        self.assertEqual(row["source_url"], url)
+        self.assertIsNone(row["case_id"])
+        self.assertEqual(row["source_kind"], "POTENTIAL_HISTORICAL_DECISION_REFERENCE")
+        self.assertEqual(row["evaluation_state"], "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY")
+        self.assertFalse(row["commercial_reuse_authorized"])
+        self.assertFalse(row["independent_ground_truth"])
+        self.assertFalse(row["independent_payment_verified"])
+        self.assertFalse(row["source_document_ingested"])
+        self.assertEqual(row["model"]["rating_status"], "REVIEW_REQUIRED")
+        self.assertEqual(row["model"]["evidence_status"], "REVIEW_REQUIRED")
+        self.assertIsNone(row["model"]["verified_freight_error_cents"])
+        self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+        self.assertEqual(feed["independently_scored_new_customer_cases"], 0)
+        self.assertIsNone(feed["new_customer_proven_overcharges"])
+
+        # Red control: even a recomputed receipt cannot launder an invented
+        # invoice-level dollar result into this rights-held source candidate.
+        corrupted = deepcopy(feed)
+        corrupted["candidate_sources"][0]["model"]["verified_freight_error_cents"] = 1
+        body = {k: v for k, v in corrupted.items() if k != "feed_sha256"}
+        corrupted["feed_sha256"] = digest(body)
+        with self.assertRaises(ResearchError):
+            validate_feed(corrupted, unified, evidence, candidates, manifest)
+        # Green control: the unchanged, conservative feed is reproducible.
+        validate_feed(feed, unified, evidence, candidates, manifest)
+
     def test_cross_lab_dedupe_preserves_earliest_provenance_and_no_private_titles(self):
         doc, evidence, candidates = sample()
         feed = build_feed(doc, evidence, candidates, load_manifest())
