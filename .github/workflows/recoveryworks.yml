@@ -38,7 +38,11 @@ jobs:
         run: python -m unittest discover -s recoveryworks -p "test_*.py" -v
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          node-version: "20"
+          node-version: "22.23.4"
+      - name: Verify October 2026 patched Node.js runtime
+        run: |
+          node --version
+          node -e 'const [major,minor,patch]=process.versions.node.split(".").map(Number); if(major!==22 || minor<23 || (minor===23 && patch<4)) process.exit(1)'
       - name: Synthetic seven-branch customer acceptance
         run: python -m recoveryworks.seven_branch_simulation --workspace "$RUNNER_TEMP/retally-acceptance" --exercise
       - name: Install isolated browser test tools
