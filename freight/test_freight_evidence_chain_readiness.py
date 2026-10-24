@@ -13,6 +13,7 @@ from freight.freight_evidence_chain_readiness import (
     SIGNED_RECORD_CATALOG_HASH, SOURCE_FACE_CATALOG_HASH, SCOPE,
     ARCBEST_PRINTED_REFERENCE_DIGEST, ARCBEST_PRINTED_TARIFF_CLASSES,
     ARCBEST_PRINTED_BOL_HEADER_CLASSES,
+    ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES,
     make_receipt, validate_receipt, run,
 )
 from freight.unified_research_lab import ResearchError, digest
@@ -95,6 +96,12 @@ def source_document_report() -> dict:
         "unbound_original_source_pages": 0,
         "printed_tariff_reference_class_counts": dict(ARCBEST_PRINTED_TARIFF_CLASSES),
         "printed_bol_header_class_counts": dict(ARCBEST_PRINTED_BOL_HEADER_CLASSES),
+        "printed_pricing_bol_joint_class_counts":
+            dict(ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES),
+        "printed_vpq_with_bol_header_identifier_only": 1,
+        "printed_vpq_without_bol_header_identifier": 1,
+        "original_bol_quote_id_correspondence_independently_verified": 0,
+        "printed_bol_header_is_not_original_bol_custody": True,
         "anonymous_page_category_digest_sha256": ARCBEST_PRINTED_REFERENCE_DIGEST,
         "source_pdf_printed_reference_not_executed_rate_contract": True,
         "original_customer_quote_documents_independently_verified": 0,
@@ -145,6 +152,11 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
                          ARCBEST_PRINTED_TARIFF_CLASSES)
         self.assertEqual(receipt["arcbest_source_printed_bol_header_classes"],
                          ARCBEST_PRINTED_BOL_HEADER_CLASSES)
+        self.assertEqual(receipt["arcbest_source_printed_pricing_bol_joint_classes"],
+                         ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES)
+        self.assertEqual(receipt["arcbest_source_vpq_header_with_bol_identifier_only"], 1)
+        self.assertEqual(receipt["arcbest_source_vpq_header_without_bol_identifier"], 1)
+        self.assertEqual(receipt["arcbest_original_bol_quote_id_correspondence_verified"], 0)
         self.assertEqual(receipt["arcbest_source_printed_category_sha256"],
                          ARCBEST_PRINTED_REFERENCE_DIGEST)
         self.assertEqual(receipt["arcbest_independently_verified_rate_and_original_bol_documents"], 0)
@@ -257,6 +269,45 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertNotIn("Bill of Lading No", text)
         self.assertNotIn("PRIVATE CUSTOMER", text)
         self.assertEqual(make_receipt(report, as_of=DAY)["accuracy"], None)
+
+    def test_arcbest_vpq_bol_joint_counts_and_quote_id_are_immutable(self):
+        base = source_document_report()
+        original = make_receipt(base, as_of=DAY)
+        cross = original["arcbest_source_printed_pricing_bol_joint_classes"]
+        self.assertEqual(sum(cross.values()), 10)
+        self.assertEqual(
+            cross["PRINTED_VOLUME_QUOTE_MARKER_ONLY|BOL_HEADER_IDENTIFIER_PRINTED_ONLY"], 1)
+        self.assertEqual(
+            cross["PRINTED_VOLUME_QUOTE_MARKER_ONLY|BOL_HEADER_PLACEHOLDER_ONLY"], 1)
+        self.assertEqual(original["arcbest_original_bol_quote_id_correspondence_verified"], 0)
+        for field, forged in (
+            ("printed_vpq_with_bol_header_identifier_only", 2),
+            ("printed_vpq_without_bol_header_identifier", 0),
+            ("original_bol_quote_id_correspondence_independently_verified", 1),
+            ("printed_bol_header_is_not_original_bol_custody", False),
+        ):
+            with self.subTest(field=field):
+                mutated = copy.deepcopy(base)
+                mutated["freight_original_document_benchmark"]["arcbest"][
+                    "source_printed_rate_bol_reference_census"][field] = forged
+                with self.assertRaises(ResearchError):
+                    make_receipt(mutated, as_of=DAY)
+        for key, replacement in (
+            ("PRINTED_VOLUME_QUOTE_MARKER_ONLY|BOL_HEADER_PLACEHOLDER_ONLY", 2),
+            ("PRINTED_ABF_ACCOUNT_REFERENCE_ONLY|BOL_HEADER_PLACEHOLDER_ONLY", 4),
+        ):
+            with self.subTest(category=key):
+                mutated = copy.deepcopy(base)
+                mutated["freight_original_document_benchmark"]["arcbest"][
+                    "source_printed_rate_bol_reference_census"][
+                    "printed_pricing_bol_joint_class_counts"][key] = replacement
+                with self.assertRaises(ResearchError):
+                    make_receipt(mutated, as_of=DAY)
+        self.assertEqual(original["eligible_independently_scored_customer_invoices"], 0)
+        self.assertEqual(original["verified_retally_recovered_cash_cents"], 0)
+        out = json.dumps(original)
+        self.assertNotIn("ABF80193", out)
+        self.assertNotIn("Bill of Lading No:", out)
 
     def test_statement_identity_is_not_bank_payment_or_refund(self):
         source = source_document_report()
