@@ -358,3 +358,74 @@ Both collectors include adversarial regression cases for each of the four
 engines, with aligned positive/off-topic metadata fixtures, missing
 publisher titles, unsafe IDs and sensitive description text that must
 never be copied to the ledger.
+
+## Publisher response and evidence provenance gate (v6)
+
+The existing unified controller now performs a **real read-only public-origin
+probe** of up to nine pinned official source URLs across all four engines.
+Its output, `freight/research_lab/publisher_provenance_v1.json`, is written
+only to the isolated `research/retally-unified-data-lab` branch alongside
+the previously versioned source review and evaluation receipts.
+
+A source is probed only when it appears in the validated canonical ledger,
+is associated with its original engine lane and is explicitly pinned by
+the existing `PUBLIC_REVIEW_ANCHORS` policy. Requests are HTTPS,
+public-DNS checked, redirect-blocked, bounded in time, and restricted to
+the pinned publisher URLs. **No GitHub or Zenodo third-party candidates
+are downloaded** by this provenance stage. For each fixed publisher URL,
+a HEAD observation records a status code and fixed media-class category.
+Only when HEAD succeeds, the content class is explicitly allowed and the
+declared source size is at most 256 KiB does an optional GET read at most
+256 KiB + one sentinel byte. A SHA-256 fingerprint is recorded **only**
+for the complete bounded original HTTP response. Oversized, redirected,
+unavailable or unsupported sources are reported with separate fixed
+reason codes, not truncated or falsely fingerprinted.
+
+All actual publisher content is ephemeral; never upload source bodies,
+invoice faces, contact information or arbitrary headers. The persistent
+receipt contains immutable source IDs, fixed publisher hosts, first-seen
+dates, observation outcome/status, an optional SHA-256, and bounded
+diagnostics. Its own digest and each observation are validated
+adversarially, including fail-closed rights, outcomes and cash assertions.
+For the same UTC date and unchanged pinned source set, the live process
+reuses its receipt without extra publisher requests; a changing unrelated
+catalog does not force a refetch. Receipts older than two days fail
+verification rather than claiming ongoing freshness.
+
+**Scope distinction:** HTTP 200 means the pinned public URL responded
+with metadata during this probe; a complete-response SHA-256 is a
+fingerprint of the bytes received, **not** an official digital signature,
+original-invoice chain of custody, legal reuse permission, customer-specific
+governing contract, independent positive/negative adjudication, or
+confirmed cash recovery. The engine evidence/benchmark readiness, rights
+and independent labels remain false/zero until actually supported.
+No source is automatically admitted as commercial benchmark truth.
+
+The existing nightly read-only four-engine replay now checks the exact
+publisher provenance receipt against the research data branch before
+evaluating original invoice/engine fixtures. There are no new Cron jobs,
+Workers, D1 mutations, paid services, outbound sales activity, or engine
+production changes. Offline adversarial tests simulate publisher errors,
+tampered proof flags, forged hashes, redirects and large responses; they
+perform no real public-network calls.
+
+Run without network access for safety testing:
+
+    python -m unittest -v freight.test_research_publisher_provenance
+
+Run only on the approved isolated research branch with existing public
+publisher access:
+
+    python -m freight.research_publisher_provenance --live
+    python -m freight.research_publisher_provenance --verify
+
+### Next required evidence before accuracy benchmarking
+
+- Confirm source terms and intended commercial reuse for **each specific
+  dataset**, not from host identity or HTTP accessibility.
+- Obtain/verify complete underlying original artifacts and governing source
+  authority appropriate to the engine and its original time window.
+- Link results to independently determined positive **and** negative
+  outcomes; train/test leakage and as-of-date chronology must be excluded.
+- Keep unknown labels **UNKNOWN** and commercial authorization **FALSE**
+  until each separate requirement is evidenced, not inferred by a model.
