@@ -54,6 +54,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "01b7e5f7328de7c8dbda731c88d3231819b123c3a9de8b13686a2ddc1578c062",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/freightdoclens/freightdoclens"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "01c5c7b0771d0b1520b1711185dd66cbcfa57107412cb732a070069fb2e7ec7a",
       "independent_ground_truth": false,
@@ -3353,6 +3369,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "4c3c994a0b0a0f5d2c65714fe128421ed413f4b871586685a2c78c391586b8a5",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Spring-ISYS-2026-Alpha-Team/Accessorial_Cost_Detection_Engine"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "4cd4eb6595a182aec6c9e2ff1403bedd20150c8d1ba5fbd5677a1e9503956484",
       "independent_ground_truth": false,
@@ -3922,6 +3954,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/5780045"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "5a06c324b375a4b1b6177fa51479b1397db882ce022a82b057a9f239feeae5a4",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/whistlenrye/customs-doc-extractor"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4610,6 +4658,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/12661870"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "69358e365eec759ccda4fc798f0e48061d47ad176c8c0a3b5a493044f4135f9b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/mthatipamula/freight-ai-analytics-platform"
     },
     {
       "commercial_reuse_authorized": false,
@@ -5907,6 +5971,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/dahabaaly/saudi-government-contracts-dataset"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "911be072283c29f466aaf9b183517abebc7af0c85129c57835d3591a7a7f4443",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/ksushkad/self-improving-doc-agent"
     },
     {
       "commercial_reuse_authorized": false,
@@ -8153,6 +8233,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "c796598983ac3aa0183e3c5bd14a7d44c467d969d9badf2043c72f3ae31c281f",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Pri04jain/Cargo-Co-pilot"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -9835,6 +9931,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "ecd07c474f29d5f5b760a61e35742a13b0d61cc565e3ff26bdf4916e21a359fe",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/fernandonavg/ParcelFlow-OCR"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -10761,6 +10873,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "cb26772fc055669381c2c41ff15010615113848dd651f7ab122184ed3f51a8a8",
+  "entries_sha256": "f7ca18c4061003866dabc6558d0a13f5499592d6b2204199260b40833e22df9b",
   "schema_version": 1
 }
