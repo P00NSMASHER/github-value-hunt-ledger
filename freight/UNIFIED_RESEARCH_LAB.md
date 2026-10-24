@@ -572,3 +572,39 @@ This diagnostic does not perform additional public API calls, does not
 change the source population, and does not weaken fail-closed rules. The
 code categorization distinguishes malformed requests, upstream throttling
 and provider unavailability to enable a subsequent source-specific fix.
+
+### Independent publisher endpoint fallback for throttled exact award-ID queries
+
+The official USAspending award search returned actual contract rows in
+the first live test but responded with HTTP 503 for both quote-wrapped
+award-ID re-searches. Rather than falsely treating that as two failed
+contract awards, the controller now optionally checks the **documented
+separate original-publisher** award-detail GET endpoint:
+
+    https://api.usaspending.gov/api/v2/awards/{INTERNAL_AWARD_ID}/
+
+The URL is built only from a numeric `internal_id` already observed
+in the fixed-source award sample. Each read uses fixed-host HTTPS,
+no redirects, public-DNS precheck, a 12-second timeout and a strict
+440-KiB maximum. No other source or account is contacted.
+
+The fallbacks are attempted only after an initial second-read
+HTTP 429, 5xx, or network-unavailable result and only for the existing
+two bounded award cases. The source detail endpoint has a **different
+schema** from the search endpoint: a successful detail response may
+establish *same-issuer identifier and total-obligation consistency*
+(`id`, `piid`, `generated_unique_award_id`, `total_obligation`),
+but does **not** establish the base obligation date, original SAM.gov
+solicitation, bidder eligibility, independent award accuracy, or legal
+rights. Consequently the receipt stores separate detail consistency,
+mismatch and error counts; the missing exact award-ID search evidence
+continues to be disclosed as DEGRADED.
+
+The full original award detail response is ephemeral and can contain
+recipient information; only the above bounded publisher fact fields are
+inspected, and no award IDs, names, payloads, recipient identities or
+URL query values enter the research data branch or GitHub logs. Receipt
+fields and counts remain tamper-evident and commercially rights-held.
+
+Official endpoint documentation:
+`https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/awards/award_id.md`
