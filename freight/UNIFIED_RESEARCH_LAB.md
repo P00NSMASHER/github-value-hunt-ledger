@@ -800,3 +800,21 @@ commercial-rate benchmark is claimed.
     python -m unittest -q freight.test_gao_motor_freight_numeric
     python -m freight.gao_motor_freight_numeric
     python -m freight.gao_motor_freight_numeric --verify
+
+## FreightRecovery adjudication controls in nightly replay
+
+The unified lab's existing nightly original-data replay now directly runs
+`freight.test_gao_b221594_negative_control` and
+`freight.test_gao_b189100_classification`, in addition to source-branch
+receipt checks and the original freight-document evaluation. These source-bound
+historical tests cover (a) an invalid $220.75 GSA deduction based on a
+rejected DOD rate tender and (b) a sustained $2,634.38 GSA deduction after a
+cargo-description/classification dispute. Each original-source fixture is
+rights-held and no source invoice bytes, independently adjudicated customer
+error metrics, modern tariff outcomes, customer credits or RETALLY revenue
+are inferred. The cases continue to be checked during ordinary PR/push
+verification *and* the existing once-daily real-data replay.
+
+This change adds **no scheduler, provider requests, branch, production engine
+actions, contacts or paid services**. CI contract tests explicitly reject
+removing either regression from nightly execution without triggering a failure.
