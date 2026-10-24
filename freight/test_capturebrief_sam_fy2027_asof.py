@@ -15,7 +15,7 @@ from unittest.mock import patch
 from freight.capturebrief_sam_fy2027_asof import (
     MAX_ORIGINAL_BYTES, MAX_ORIGINAL_ROWS, REQUIRED_COLUMNS,
     PREVIOUS_PUBLIC_REFERENCE_SHA256, SOURCE_URL, STATUS_OK,
-    STATUS_DEGRADED, assess_cross_source_chronology,
+    STATUS_DEGRADED, STATUS_PARTIAL, assess_cross_source_chronology,
     build_receipt, fetch_original, parse_archive, run, validate_receipt,
 )
 from freight.unified_research_lab import ResearchError, digest
@@ -113,6 +113,41 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertNotIn("GSA OFFICE 1",str(receipt))
         self.assertNotIn("https://sam.gov/x",str(receipt))
         validate_receipt(receipt,now=NOW)
+
+    def test_one_malformed_solicitation_control_is_quarantined_not_silently_cleaned(self):
+        rows=[
+            {"NoticeId":"notice-1010", "Sol#":"PAPER\nINJECTED-ISSUE",
+             "PostedDate":"2026-10-12", "Type":"Solicitation", "Active":"No",
+             "AAC Code":"GSA1", "Office":"TEST OFFICE", "Link":"https://sam.gov/x"},
+            {"NoticeId":"notice-1011", "Sol#":"47QTCA27R0032",
+             "PostedDate":"2026-10-12", "Type":"Solicitation", "Active":"No",
+             "AAC Code":"GSA1", "Office":"TEST OFFICE", "Link":"https://sam.gov/y"},
+        ]
+        original=archive(rows)
+        observed=parse_archive(original,observed_at=NOW)
+        self.assertEqual(observed["source_rows"],2)
+        self.assertEqual(observed["unique_original_notice_ids"],2)
+        self.assertEqual(observed["source_rows_quarantined_solicitation_control"],1)
+        self.assertEqual(observed["source_rows_with_solicitation"],1)
+        self.assertEqual(observed["current_source_sha256"],
+                         hashlib.sha256(original).hexdigest())
+        doc=build_receipt(observed_at=NOW,fetcher=lambda:original)
+        self.assertEqual(doc["source_status"],STATUS_PARTIAL)
+        self.assertEqual(doc["source_error_codes"],
+                         ["SOURCE_SOLICITATION_CONTROL_QUARANTINED"])
+        self.assertEqual(doc["source_rows"],2)
+        self.assertEqual(doc["source_rows_quarantined_solicitation_control"],1)
+        self.assertIsNotNone(doc["current_source_sha256"])
+        self.assertEqual(doc["original_opportunity_ids_persisted"],0)
+        self.assertEqual(doc["independent_cross_source_award_outcomes"],0)
+        self.assertNotIn("INJECTED-ISSUE",str(doc))
+        validate_receipt(doc,now=NOW)
+        tampered=copy.deepcopy(doc)
+        tampered["source_rows_quarantined_solicitation_control"]=0
+        tampered["receipt_sha256"]=digest({
+            k:v for k,v in tampered.items() if k!="receipt_sha256"})
+        with self.assertRaises(ResearchError):
+            validate_receipt(tampered,now=NOW)
 
     def test_source_data_invalid_schema_fails_as_degraded_without_false_zero_coverage(self):
         bad_cases=[
