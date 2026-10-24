@@ -32,6 +32,9 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertEqual(source["original_report_url"],
                          "https://www.gao.gov/assets/b-215958-125766.pdf")
         self.assertEqual(source["decision_date"], "1984-12-05")
+        self.assertEqual(source["superseding_reconsideration_url"],
+                         "https://www.gao.gov/products/b-215958-2")
+        self.assertEqual(source["superseding_reconsideration_date"], "1986-02-18")
         self.assertEqual(source["decision_page_for_disposition"], 3)
         self.assertIsNone(source["source_bytes_sha256"])
         self.assertFalse(source["source_bytes_acquired"])
@@ -40,12 +43,16 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertEqual(population["challenged_government_bills_of_lading"], 55)
         self.assertEqual(population["decision_reversals_with_recorded_numbered_seals"], 53)
         self.assertEqual(population["remainder_cases_with_unresolved_disposition"], 2)
+        self.assertEqual(population["decision_outcome"],
+                         "GAO_1984_INITIAL_REVERSAL_SUBSEQUENTLY_OVERRULED_IN_1986")
         self.assertFalse(population["per_bill_of_lading_labels_available"])
         self.assertIsNone(population["independently_confirmed_refunds_received"])
         self.assertIsNone(population["independently_confirmed_carrier_overcharge_amount_cents"])
         self.assertFalse(data["limits"]["independent_accuracy_scoring_permitted"])
         self.assertEqual(data["limits"]["realized_retally_recovered_cash_cents"], 0)
         self.assertEqual(len(data["controls"]), 2)
+        self.assertEqual(data["controls"][0]["expected"],
+                         "1984_INITIAL_FAVORABLE_RULING_NOT_FINAL_1986_WRITTEN_REQUEST_REQUIRED")
         self.assertTrue(all(x["synthetic"] for x in data["controls"]))
         self.assertTrue(all(x["actual_refund_received_cents"] is None
                             and x["actual_customer_overcharge_cents"] is None
