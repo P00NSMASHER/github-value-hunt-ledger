@@ -111,6 +111,20 @@ export function providerMetadataInScope(engine, provider, row) {
   return TOPIC_TERMS[engine].some(term => padded.includes(" " + term + " "));
 }
 
+/**
+ * Socrata Discovery distinguishes official source datasets from public users'
+ * community-created views. Portal hostname and DOB keywords do not establish
+ * provenance. Fail closed if publisher metadata is missing or inconsistent.
+ * This is source *identity* filtering, not an independent issuance or rights label.
+ */
+export function originalNYCPublisherDataset(entry) {
+  const r = entry?.resource;
+  return !!(r && typeof r === "object" && !Array.isArray(r)
+    && r.provenance === "official" && r.type === "dataset"
+    && Array.isArray(r.parent_fxf) && r.parent_fxf.length === 0
+    && entry?.metadata?.domain === "data.cityofnewyork.us");
+}
+
 export function canonicalCandidates(provider, data, engine) {
   const out = [];
   if (!ENGINES.includes(engine)) throw Error("INVALID_ENGINE");
@@ -135,7 +149,8 @@ export function canonicalCandidates(provider, data, engine) {
     for (const v of data.results.slice(0, 15)) {
       const id = v && v.resource && v.resource.id;
       const title = v && v.resource && v.resource.name;
-      if (typeof id === "string" && /^[a-z0-9]{4}-[a-z0-9]{4}$/.test(id)
+      if (originalNYCPublisherDataset(v)
+          && typeof id === "string" && /^[a-z0-9]{4}-[a-z0-9]{4}$/.test(id)
           && typeof title === "string"
           && /\b(dob|building|construction)\b/i.test(title)
           && /\b(permits?|filings?|applications?|certificates?)\b/i.test(title)
@@ -174,6 +189,7 @@ export function feedSpecs(engine, whenMs = 0) {
     feeds.push({provider: "socrata", engine, name: "nyc-official-catalog",
       url: queryUrl("https://api.us.socrata.com/api/catalog/v1",
         {domains: "data.cityofnewyork.us", search_context: "data.cityofnewyork.us",
+         provenance: "official", only: "dataset",
          q: OFFICIAL_PERMIT_QUERIES[lap % OFFICIAL_PERMIT_QUERIES.length],
          limit: 15, offset: [0, 15, 30][Math.floor(lap / OFFICIAL_PERMIT_QUERIES.length) % 3]})});
   }
