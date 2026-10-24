@@ -265,6 +265,79 @@ test("malformed feed pagination inputs reject before querying D1",async()=>{
 });
 
 
+test("GitHub 403 provider rejection skips secondary request and preserves Zenodo discovery",async()=>{
+  const original=globalThis.fetch;
+  const requested=[];
+  const db={
+    prepare(){
+      return {
+        first:async()=>({name:"capturebrief"}),
+        bind(){return {run:async()=>({meta:{changes:1}})};},
+      };
+    },
+    batch:async()=>[{meta:{changes:1}},{meta:{changes:1}}],
+  };
+  try{
+    globalThis.fetch=async url=>{
+      requested.push(String(url));
+      if(String(url).includes("api.github.com"))
+        return new Response("",{status:403});
+      return new Response(JSON.stringify({hits:{hits:[
+        {id:12345,metadata:{title:"Federal contract awards dataset"}}
+      ]}}),{status:200,headers:{"content-type":"application/json"}});
+    };
+    const result=await cycle({RESEARCH_DB:db},Date.UTC(2026,9,24,12,0));
+    assert.equal(result.state,"DEGRADED");
+    assert.equal(result.added,1);
+    assert.equal(requested.filter(url=>url.includes("api.github.com")).length,1);
+    assert.equal(requested.filter(url=>url.includes("zenodo.org")).length,1);
+  }finally{globalThis.fetch=original;}
+});
+
+test("health distinguishes stale lanes and unfinished runs from green latest activity",async()=>{
+  const now=Date.now();
+  const fresh=now-5*60000,old=now-75*60000;
+  const lanes=[
+    {name:"capturebrief",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
+    {name:"freightrecovery",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
+    {name:"permitplate",last_attempt_ms:old,last_success_ms:old,last_status:"OK"},
+    {name:"recoveryos",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
+  ];
+  const statements=[];
+  const db={prepare(sql){
+    statements.push(sql);
+    if(sql.startsWith("SELECT name,last_attempt_ms"))
+      return {all:async()=>({results:lanes})};
+    if(sql.startsWith("SELECT COUNT(*) AS total"))
+      return {first:async()=>({total:597})};
+    if(sql.startsWith("SELECT run_key"))
+      return {all:async()=>({results:[]})};
+    if(sql.startsWith("SELECT lane, COUNT(*) AS runs"))
+      return {bind(){return {all:async()=>({results:[]})};}};
+    if(sql.startsWith("SELECT lane, COUNT(*) AS source_pointers"))
+      return {all:async()=>({results:[]})};
+    if(sql.startsWith("SELECT COUNT(*) AS stuck_runs"))
+      return {bind(cutoff){
+        assert.ok(cutoff < now-29*60000 && cutoff > now-31*60000);
+        return {first:async()=>({stuck_runs:2})};
+      }};
+    throw Error("UNEXPECTED_D1_QUERY");
+  }};
+  const response=await scout.fetch(
+    new Request("https://research.invalid/health"),{RESEARCH_DB:db});
+  assert.equal(response.status,200);
+  const output=await response.json();
+  assert.equal(output.total_source_references,597);
+  assert.equal(output.operational_status,"DEGRADED");
+  assert.deepEqual(output.stale_lanes,["permitplate"]);
+  assert.equal(output.stale_threshold_minutes,45);
+  assert.equal(output.stuck_run_count,2);
+  assert.equal(output.stuck_threshold_minutes,30);
+  assert.equal(output.commercial_approval,false);
+  assert.equal(output.independent_truth_verified,false);
+  assert.ok(statements.every(sql=>/^(SELECT)/.test(sql)));
+});
+
 test("all four engine lanes reject obviously off-topic public metadata without storing text",()=>{
   const cases=[
     ["freightrecovery", "Freight invoice tariff dataset", "Baking and dining recipes"],
