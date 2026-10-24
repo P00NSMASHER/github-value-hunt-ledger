@@ -8,6 +8,15 @@
  * No public HTTP mutation routes; only scheduled() writes to storage.
  */
 export const ENGINES = Object.freeze(["freightrecovery", "permitplate", "capturebrief", "recoveryos"]);
+// Weighted, state-based fairness: about 70% FreightRecovery over sustained
+// five-minute cycles, with catch-up priority for neglected secondary lanes.
+// No extra calls, Workers, schedules, permissions, or D1 schema changes.
+export const LANE_PRIORITY = Object.freeze({
+  freightrecovery: 10, permitplate: 1, capturebrief: 1, recoveryos: 1,
+});
+const STALE_MINUTES = Object.freeze({
+  freightrecovery: 45, permitplate: 120, capturebrief: 120, recoveryos: 120,
+});
 // More distinct public-source queries without increasing API calls per cycle.
 // All results still pass the fixed per-engine topic filter and remain unverified.
 const QUERIES = Object.freeze({
@@ -167,10 +176,10 @@ export function canonicalCandidates(provider, data, engine) {
 export function feedSpecs(engine, whenMs = 0) {
   if (!ENGINES.includes(engine)) throw Error("INVALID_ENGINE");
   if (!Number.isFinite(whenMs) || whenMs < 0) throw Error("INVALID_SCHEDULE_TIME");
-  // One lane per 20 minutes. Nine scoped topic families rotate across two
-  // GitHub and one Zenodo query. The count, response sizes, and original-data
-  // exclusions are unchanged; the expanded windows reduce first-page reuse.
-  const lap = Math.floor(whenMs / (300000 * ENGINES.length));
+  // Every five-minute slot advances the bounded search plan: frequent
+  // FreightRecovery cycles must not re-query the same twenty-minute page.
+  // Provider request count and source byte caps do not change.
+  const lap = Math.floor(whenMs / 300000);
   const page = [1, 1, 2, 1, 3][lap % 5];
   const newest = lap % 5 === 3;
   const githubOptions = (q) => ({q: q + " in:name,description", per_page:15, page,
@@ -244,15 +253,15 @@ export async function fetchCatalog(spec) {
 }
 /**
  * Rotate bounded discovery windows instead of permanently replaying the first
- * 24 alphabetically sorted links. A stable 4-lane cycle advances a window
- * every 20 minutes, eventually covering every candidate in a stable feed.
+ * 24 alphabetically sorted links. Each five-minute slot advances a window,
+ * avoiding repeated FreightRecovery first pages under weighted scheduling.
  */
 export function selectCandidateWindow(candidates, whenMs) {
   if (!Number.isFinite(whenMs) || whenMs < 0) throw Error("INVALID_SCHEDULE_TIME");
   const unique = [...new Set(candidates)].sort();
   if (unique.length === 0) return [];
   const windowCount = Math.ceil(unique.length / MAX_NEW);
-  const cycle = Math.floor(whenMs / (300000 * ENGINES.length));
+  const cycle = Math.floor(whenMs / 300000);
   const window = cycle % windowCount;
   return unique.slice(window * MAX_NEW, (window + 1) * MAX_NEW);
 }
@@ -311,16 +320,35 @@ export async function persistSourceWindow(db, lane, candidates, now) {
   return {newSources: results[0].meta.changes, attempted: window.length};
 }
 
-async function chooseLane(db) {
-  const row = await db.prepare("SELECT name FROM lane_health ORDER BY last_attempt_ms ASC, name ASC LIMIT 1").first();
-  if (!row || !ENGINES.includes(row.name)) throw Error("UNINITIALIZED_DATABASE");
-  return row.name;
+export function selectPriorityLane(rows, whenMs) {
+  if (!Number.isSafeInteger(whenMs) || whenMs < 0) throw Error("INVALID_SCHEDULE_TIME");
+  if (!Array.isArray(rows) || rows.length !== ENGINES.length)
+    throw Error("UNINITIALIZED_DATABASE");
+  const seen = new Set();
+  const scored = rows.map(row => {
+    const name = row?.name, last = row?.last_attempt_ms;
+    if (!ENGINES.includes(name) || seen.has(name) ||
+        !Number.isSafeInteger(last) || last < 0)
+      throw Error("UNINITIALIZED_DATABASE");
+    seen.add(name);
+    // A stale secondary lane eventually outranks even frequent freight
+    // cycles. Prioritize elapsed time, not just a fixed clock slot.
+    return {name, last, score:Math.max(0, whenMs - last) * LANE_PRIORITY[name]};
+  });
+  scored.sort((a,b) => b.score-a.score || a.last-b.last ||
+    a.name.localeCompare(b.name));
+  return scored[0].name;
+}
+
+async function chooseLane(db, whenMs) {
+  const rows = await db.prepare("SELECT name,last_attempt_ms FROM lane_health").all();
+  return selectPriorityLane(rows?.results, whenMs);
 }
 
 export async function cycle(env, whenMs) {
   if (!env.RESEARCH_DB) throw Error("RESEARCH_D1_MISSING");
   const now = Number.isFinite(whenMs) ? whenMs : Date.now();
-  const lane = await chooseLane(env.RESEARCH_DB);
+  const lane = await chooseLane(env.RESEARCH_DB, now);
   const uniqueRun = String(Math.floor(now / 300000)) + ":" + lane;
   const claimed = await env.RESEARCH_DB.prepare(
     "INSERT OR IGNORE INTO runs (run_key,lane,started_ms,status,new_sources,feed_errors) VALUES (?,?,?,'RUNNING',0,'[]')"
@@ -410,7 +438,7 @@ export default {
       const staleLanes = ENGINES.filter(engine => {
         const row = laneRows.find(candidate => candidate.name === engine);
         return !row || !Number.isSafeInteger(row.last_success_ms) ||
-          row.last_success_ms <= 0 || nowMs - row.last_success_ms > 45 * 60000;
+          row.last_success_ms <= 0 || nowMs - row.last_success_ms > STALE_MINUTES[engine] * 60000;
       });
       const unfinished = await env.RESEARCH_DB.prepare(
         "SELECT COUNT(*) AS stuck_runs FROM runs WHERE status='RUNNING' AND started_ms < ?"
@@ -423,6 +451,8 @@ export default {
         last_24_hours:metrics.results, source_pointers_by_lane:associations.results,
         operational_status:degraded?"DEGRADED":"OK",
         stale_lanes:staleLanes, stale_threshold_minutes:45,
+        stale_threshold_minutes_by_lane:STALE_MINUTES,
+        research_priority:'FREIGHTRECOVERY_FIRST',
         stuck_run_count:stuckRuns, stuck_threshold_minutes:30,
         commercial_approval:false, independent_truth_verified:false});
     }

@@ -143,9 +143,19 @@ class UnifiedResearchLabTests(unittest.TestCase):
                             and not x["recovered_cash_verified"]
                             for x in doc["entries"]))
 
-    def test_every_engine_scheduled_in_one_twenty_minute_cycle(self):
-        selected = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(4)]
-        self.assertEqual(set(selected), set(ENGINES))
+    def test_freight_is_primary_over_ten_five_minute_discovery_slots(self):
+        selected = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(10)]
+        self.assertEqual(selected.count("freightrecovery"), 7)
+        self.assertEqual({name: selected.count(name) for name in ENGINES},
+                         {"freightrecovery": 7, "permitplate": 1,
+                          "capturebrief": 1, "recoveryos": 1})
+        # Consecutive primary research cycles are never separated by more
+        # than one secondary discovery cycle in the planned rotation.
+        twenty = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(20)]
+        self.assertTrue(all(a == "freightrecovery" or b == "freightrecovery"
+                            for a, b in zip(twenty, twenty[1:])))
+        with self.assertRaises(ResearchError):
+            current_engine(NOW.replace(tzinfo=None))
 
     def test_offline_populates_only_rights_held_real_source_pointers(self):
         with tempfile.TemporaryDirectory() as root:

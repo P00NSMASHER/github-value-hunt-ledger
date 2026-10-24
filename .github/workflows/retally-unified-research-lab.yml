@@ -64,7 +64,7 @@ on:
       - "freight/fixtures/real_world_eval_v1.json"
       - ".github/workflows/retally-unified-research-lab.yml"
   schedule:
-    # Highest GitHub Actions cron frequency; rotates four research domains.
+    # Frequent bounded controller; 7/10 planned discovery slots prioritize FreightRecovery.
     - cron: "4-59/5 * * * *"
     # Expensive original-document and three-engine read-only replay.
     - cron: "19 3 * * *"

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, providerMetadataInScope, originalNYCPublisherDataset, cycle} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, providerMetadataInScope, originalNYCPublisherDataset, LANE_PRIORITY, selectPriorityLane, cycle} from "./research_lab_worker.mjs";
 
 function officialNYC(id, name) {
   return {
@@ -8,6 +8,38 @@ function officialNYC(id, name) {
     metadata:{domain:"data.cityofnewyork.us"},
   };
 }
+
+test("FreightRecovery is primary without starving other engine lanes",()=>{
+  assert.equal(LANE_PRIORITY.freightrecovery,10);
+  for(const lane of ENGINES.filter(x=>x!=="freightrecovery"))
+    assert.equal(LANE_PRIORITY[lane],1);
+  const start=Date.UTC(2026,9,24,0,0,0);
+  let time=start;
+  const last=new Map(ENGINES.map((lane,i)=>[lane,start-(i+1)*300000]));
+  const count=Object.fromEntries(ENGINES.map(lane=>[lane,0]));
+  for(let i=0;i<1000;i++){
+    const row=ENGINES.map(name=>({name,last_attempt_ms:last.get(name)}));
+    const picked=selectPriorityLane(row,time);
+    count[picked]++;
+    last.set(picked,time);
+    time+=300000;
+  }
+  // Weighted overdue-first policy converges near 70/10/10/10 while
+  // allowing an overdue secondary lane to catch up after missed Cron events.
+  assert.ok(count.freightrecovery>=680 && count.freightrecovery<=720,
+    JSON.stringify(count));
+  for(const lane of ENGINES.filter(x=>x!=="freightrecovery"))
+    assert.ok(count[lane]>=90 && count[lane]<=110,JSON.stringify(count));
+  const overdue=ENGINES.map(lane=>({
+    name:lane,last_attempt_ms: lane==="permitplate"?time-180*60000:time-60000,
+  }));
+  assert.equal(selectPriorityLane(overdue,time),"permitplate");
+  assert.throws(()=>selectPriorityLane(overdue.slice(1),time),/UNINITIALIZED_DATABASE/);
+  assert.throws(()=>selectPriorityLane([
+    ...overdue.slice(0,3),{name:"permitplate",last_attempt_ms:0},
+  ],time),/UNINITIALIZED_DATABASE/);
+  assert.throws(()=>selectPriorityLane(overdue,NaN),/INVALID_SCHEDULE_TIME/);
+});
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -77,7 +109,7 @@ test("public metadata fetch parses bounded valid JSON",async()=>{
 
 test("rotation reaches all bounded candidate windows without repeating only the first 24", () => {
   const input=Array.from({length:57},(_,i)=>"https://github.com/source/catalog-"+String(i).padStart(3,"0"));
-  const batches=[0,1200000,2400000].map(t=>selectCandidateWindow([...input].reverse(),t));
+  const batches=[0,300000,600000].map(t=>selectCandidateWindow([...input].reverse(),t));
   assert.deepEqual(batches.map(b=>b.length),[24,24,9]);
   assert.equal(new Set(batches.flat()).size,57);
   assert.deepEqual(batches[0],selectCandidateWindow([...input],0));
@@ -266,6 +298,10 @@ test("GitHub rate limit skips secondary request and writes a degraded receipt",a
       sql.push(query);
       return {
         first:async()=>({name:"freightrecovery"}),
+        all:async()=>({results:ENGINES.map(name=>({
+          name,last_attempt_ms:name==="freightrecovery"?0:
+            Date.UTC(2026,9,23,12,0)-1000,
+        }))}),
         bind(...args){return {
           async run(){return {meta:{changes:1}};},
         };},
@@ -348,6 +384,10 @@ test("GitHub 403 provider rejection skips secondary request and preserves Zenodo
     prepare(){
       return {
         first:async()=>({name:"capturebrief"}),
+        all:async()=>({results:ENGINES.map(name=>({
+          name,last_attempt_ms:name==="capturebrief"?0:
+            Date.UTC(2026,9,24,12,0)-1000,
+        }))}),
         bind(){return {run:async()=>({meta:{changes:1}})};},
       };
     },
@@ -372,7 +412,7 @@ test("GitHub 403 provider rejection skips secondary request and preserves Zenodo
 
 test("health distinguishes stale lanes and unfinished runs from green latest activity",async()=>{
   const now=Date.now();
-  const fresh=now-5*60000,old=now-75*60000;
+  const fresh=now-5*60000,old=now-150*60000;
   const lanes=[
     {name:"capturebrief",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
     {name:"freightrecovery",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
@@ -407,6 +447,9 @@ test("health distinguishes stale lanes and unfinished runs from green latest act
   assert.equal(output.operational_status,"DEGRADED");
   assert.deepEqual(output.stale_lanes,["permitplate"]);
   assert.equal(output.stale_threshold_minutes,45);
+  assert.equal(output.stale_threshold_minutes_by_lane.freightrecovery,45);
+  assert.equal(output.stale_threshold_minutes_by_lane.permitplate,120);
+  assert.equal(output.research_priority,"FREIGHTRECOVERY_FIRST");
   assert.equal(output.stuck_run_count,2);
   assert.equal(output.stuck_threshold_minutes,30);
   assert.equal(output.commercial_approval,false);
