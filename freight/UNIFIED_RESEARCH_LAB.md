@@ -825,7 +825,8 @@ removing either regression from nightly execution without triggering a failure.
 The original-document lab verifies fixed SHA-256 source bytes from the
 public GlobalTranz PDF and extracts **100 distinct actual invoice faces**
 with original signed line components. The last confirmed source replay had
-**93 invoices with a negative adjustment token**. The older positive-only
+**93 invoices with a negative adjustment token** (canonical v2), while the
+seven non-discounted original faces correctly remain canonical v1. The older positive-only
 ChargeLine-v1 check correctly blocked those negative tokens and represented
 just seven faces with charge lines alone. That does *not* mean that the
 existing canonical **v2** InvoiceAdjustment mechanism cannot represent them.
