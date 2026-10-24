@@ -24,6 +24,8 @@ from freight.unified_research_lab import (
 
 SOURCE_ANCHOR = "https://api.usaspending.gov/docs/endpoints"
 API = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
+DETAIL_PREFIX = "https://api.usaspending.gov/api/v2/awards/"
+MAX_DETAIL_BYTES = 440000
 OUTPUT = ROOT / "official_capturebrief_award_readback_v1.json"
 SCOPE = "ORIGINAL_FEDERAL_CONTRACT_AWARD_SAME_PUBLISHER_READBACK_ONLY"
 SCHEMA_VERSION = 1
@@ -56,7 +58,10 @@ RECEIPT_FIELDS = frozenset({
     "publisher_readbacks_attempted", "publisher_readbacks_exact",
     "publisher_readbacks_changed", "publisher_readbacks_ambiguous",
     "publisher_readbacks_missing", "publisher_readbacks_unavailable",
-    "publisher_readback_error_codes", "source_payloads_stored", "recipient_identifiers_stored",
+    "publisher_readback_error_codes",
+    "publisher_detail_lookup_attempted", "publisher_detail_identity_amount_matched",
+    "publisher_detail_changed", "publisher_detail_unavailable",
+    "publisher_detail_error_codes", "source_payloads_stored", "recipient_identifiers_stored",
     "independent_sam_solicitation_matches", "independent_award_outcome_labels",
     "buyer_opportunity_truth", "realized_recovery_cents",
     "customer_contacts_sent", "new_paid_services", "production_changes",
@@ -164,6 +169,68 @@ def fetch_public_awards(query: dict) -> list[dict]:
     return payload["results"]
 
 
+
+def fetch_public_award_detail(internal_id: int) -> dict:
+    """Fixed USAspending award profile GET; no content, recipient or URL saved.
+
+    This endpoint is documented to accept the internal award ID. Its detail
+    schema differs from the award search, so date and pricing interpretations
+    not shared by the two endpoints are deliberately not cross-validated.
+    """
+    if type(internal_id) is not int or not 1 <= internal_id < 10**16:
+        raise ResearchError("UNSAFE_PUBLISHER_DETAIL_ID")
+    url = DETAIL_PREFIX + str(internal_id) + "/"
+    global_dns("api.usaspending.gov")
+    req = Request(url, method="GET", headers={
+        "Accept": "application/json",
+        "Accept-Encoding": "identity",
+        "User-Agent": "RETALLY-CaptureBrief-PublicResearch/1.0 publisher-detail-only",
+    })
+    try:
+        with build_opener(NoRedirect).open(req, timeout=12) as res:
+            if res.status != 200 or res.geturl() != url:
+                raise ResearchError("HTTP_STATUS")
+            if res.headers.get("Content-Type", "").split(";",1)[0].strip().lower() != "application/json":
+                raise ResearchError("INVALID_CONTENT_TYPE")
+            if res.headers.get("Content-Encoding", "identity").strip().lower() not in ("", "identity"):
+                raise ResearchError("INVALID_CONTENT_TYPE")
+            raw = res.read(MAX_DETAIL_BYTES + 1)
+    except ResearchError:
+        raise
+    except HTTPError as exc:
+        code = "HTTP_" + str(exc.code)
+        raise ResearchError(code if code in HTTP_CODES else "HTTP_STATUS") from exc
+    except (URLError, TimeoutError, OSError) as exc:
+        raise ResearchError("PUBLISHER_UNAVAILABLE") from exc
+    if not raw or len(raw) > MAX_DETAIL_BYTES:
+        raise ResearchError("SOURCE_TOO_LARGE")
+    try:
+        body = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ResearchError("SOURCE_JSON_INVALID") from exc
+    if type(body) is not dict:
+        raise ResearchError("SOURCE_SCHEMA_CHANGED")
+    return body
+
+
+def _detail_identity_and_amount_consistent(award: dict, detail: dict) -> bool:
+    """Only common publisher IDs and total obligation; never claim SAM truth."""
+    if type(detail) is not dict:
+        raise ResearchError("SOURCE_SCHEMA_CHANGED")
+    internal = detail.get("id")
+    piid = detail.get("piid")
+    value = detail.get("total_obligation")
+    generated = detail.get("generated_unique_award_id")
+    if type(internal) is not int or type(piid) is not str or value is None:
+        raise ResearchError("SOURCE_SCHEMA_CHANGED")
+    if generated is not None and type(generated) is not str:
+        raise ResearchError("SOURCE_SCHEMA_CHANGED")
+    return (internal == award["internal_id"] and piid == award["award_id"]
+            and _money_minor(value) == award["amount_minor"]
+            and (award["generated_internal_id"] is None
+                 or award["generated_internal_id"] == generated))
+
+
 def _date(value: object) -> str | None:
     if value is None:
         return None
@@ -226,7 +293,7 @@ def _source_id(ledger: dict) -> str:
     raise ResearchError("OFFICIAL_USASPENDING_ANCHOR_MISSING")
 
 
-def _sample(fetcher) -> dict:
+def _sample(fetcher, detail_fetcher=None) -> dict:
     raw = fetcher(_query())
     if type(raw) is not list or len(raw) > MAX_ROWS:
         raise ResearchError("SOURCE_SCHEMA_CHANGED")
@@ -236,6 +303,8 @@ def _sample(fetcher) -> dict:
     unique_candidates = [v for v in data if counts[v["internal_id"]] == 1]
     exact = changed = ambiguous = missing = unavailable = checked = 0
     unavailable_codes = Counter()
+    detail_attempted = detail_matched = detail_changed = detail_unavailable = 0
+    detail_errors = Counter()
     for award in unique_candidates[:MAX_SECOND_READS]:
         checked += 1
         try:
@@ -243,8 +312,27 @@ def _sample(fetcher) -> dict:
         except ResearchError as exc:
             unavailable += 1
             code = str(exc)
-            unavailable_codes[code if code in PROBE_ERROR_CODES
-                              else "SOURCE_SCHEMA_CHANGED"] += 1
+            safe_code = code if code in PROBE_ERROR_CODES else "SOURCE_SCHEMA_CHANGED"
+            unavailable_codes[safe_code] += 1
+            # Avoid repeated expensive search errors by using the issuer's
+            # documented award-detail GET for this *specific internal ID*.
+            # Its distinct schema can corroborate ID and amount only.
+            if (detail_fetcher is not None and safe_code in {
+                "HTTP_429", "HTTP_500", "HTTP_502", "HTTP_503", "HTTP_504",
+                "PUBLISHER_UNAVAILABLE",
+            }):
+                detail_attempted += 1
+                try:
+                    detail = detail_fetcher(award["internal_id"])
+                    if _detail_identity_and_amount_consistent(award, detail):
+                        detail_matched += 1
+                    else:
+                        detail_changed += 1
+                except ResearchError as detail_exc:
+                    detail_unavailable += 1
+                    detail_code = str(detail_exc)
+                    detail_errors[detail_code if detail_code in PROBE_ERROR_CODES
+                                  else "SOURCE_SCHEMA_CHANGED"] += 1
             continue
         if type(reread) is not list or len(reread) > MAX_BACKREAD_ROWS:
             raise ResearchError("SOURCE_SCHEMA_CHANGED")
@@ -271,8 +359,12 @@ def _sample(fetcher) -> dict:
         "publisher_readbacks_missing": missing,
         "publisher_readbacks_unavailable": unavailable,
         "publisher_readback_error_codes": dict(sorted(unavailable_codes.items())),
+        "publisher_detail_lookup_attempted": detail_attempted,
+        "publisher_detail_identity_amount_matched": detail_matched,
+        "publisher_detail_changed": detail_changed,
+        "publisher_detail_unavailable": detail_unavailable,
+        "publisher_detail_error_codes": dict(sorted(detail_errors.items())),
     }
-
 
 def _empty_sample() -> dict:
     return {
@@ -283,15 +375,21 @@ def _empty_sample() -> dict:
         "publisher_readbacks_changed": 0, "publisher_readbacks_ambiguous": 0,
         "publisher_readbacks_missing": 0, "publisher_readbacks_unavailable": 0,
         "publisher_readback_error_codes": {},
+        "publisher_detail_lookup_attempted": 0,
+        "publisher_detail_identity_amount_matched": 0,
+        "publisher_detail_changed": 0,
+        "publisher_detail_unavailable": 0,
+        "publisher_detail_error_codes": {},
     }
 
 
-def build_receipt(ledger: dict, *, as_of: date, fetcher=fetch_public_awards) -> dict:
+def build_receipt(ledger: dict, *, as_of: date, fetcher=fetch_public_awards,
+                  detail_fetcher=None) -> dict:
     if type(as_of) is not date or as_of > datetime.now(timezone.utc).date():
         raise ResearchError("READBACK_DATE_INVALID")
     source = _source_id(ledger)
     try:
-        result = _sample(fetcher)
+        result = _sample(fetcher, detail_fetcher)
         issue = []
         if result["repeated_source_rows"] > 0:
             issue.append("REPEATED_AWARD_SOURCE_ROWS")
@@ -358,7 +456,10 @@ def validate_receipt(doc: dict, ledger: dict, as_of: date) -> None:
     for k in ("sample_rows", "distinct_award_internal_ids", "repeated_source_rows",
               "publisher_readbacks_attempted", "publisher_readbacks_exact",
               "publisher_readbacks_changed", "publisher_readbacks_ambiguous",
-              "publisher_readbacks_missing", "publisher_readbacks_unavailable"):
+              "publisher_readbacks_missing", "publisher_readbacks_unavailable",
+              "publisher_detail_lookup_attempted",
+              "publisher_detail_identity_amount_matched", "publisher_detail_changed",
+              "publisher_detail_unavailable"):
         if type(doc[k]) is not int or not 0 <= doc[k] <= MAX_BACKREAD_ROWS:
             raise ResearchError("CAPTUREBRIEF_AWARD_POPULATION_INVALID")
     if (doc["sample_rows"] > MAX_ROWS
@@ -380,6 +481,19 @@ def validate_receipt(doc: dict, ledger: dict, as_of: date) -> None:
     elif fingerprint is not None or doc["sample_net_awarded_amount_minor"]:
         raise ResearchError("CAPTUREBRIEF_AWARD_FINGERPRINT_INVALID")
     diagnostics = doc["publisher_readback_error_codes"]
+    detail_diagnostics = doc["publisher_detail_error_codes"]
+    if (type(detail_diagnostics) is not dict or len(detail_diagnostics) > MAX_SECOND_READS
+            or any(type(code) is not str or code not in PROBE_ERROR_CODES
+                   or type(count) is not int or count < 1
+                   for code, count in detail_diagnostics.items())
+            or sum(detail_diagnostics.values()) != doc["publisher_detail_unavailable"]
+            or doc["publisher_detail_lookup_attempted"] >
+                doc["publisher_readbacks_unavailable"]
+            or doc["publisher_detail_lookup_attempted"] != (
+                doc["publisher_detail_identity_amount_matched"] +
+                doc["publisher_detail_changed"] +
+                doc["publisher_detail_unavailable"])):
+        raise ResearchError("UNSAFE_CAPTUREBRIEF_DETAIL_TELEMETRY")
     if (type(diagnostics) is not dict or len(diagnostics) > MAX_SECOND_READS
             or any(type(code) is not str or code not in PROBE_ERROR_CODES
                    or type(count) is not int or count < 1
@@ -404,7 +518,7 @@ def validate_receipt(doc: dict, ledger: dict, as_of: date) -> None:
 
 
 def run(*, ledger_path: Path = LEDGER, output: Path = OUTPUT,
-        fetcher=fetch_public_awards, verify_only: bool = False,
+        fetcher=fetch_public_awards, detail_fetcher=None, verify_only: bool = False,
         as_of: date | None = None) -> dict:
     ledger = read_ledger(ledger_path)
     today = datetime.now(timezone.utc).date()
@@ -431,7 +545,11 @@ def run(*, ledger_path: Path = LEDGER, output: Path = OUTPUT,
                     KeyError, TypeError, ValueError):
                 pass
         if doc is None:
-            doc = build_receipt(ledger, as_of=chosen, fetcher=fetcher)
+            effective_detail_fetcher = (fetch_public_award_detail
+                                        if detail_fetcher is None and fetcher is fetch_public_awards
+                                        else detail_fetcher)
+            doc = build_receipt(ledger, as_of=chosen, fetcher=fetcher,
+                                detail_fetcher=effective_detail_fetcher)
             validate_receipt(doc, ledger, today)
             output.parent.mkdir(parents=True, exist_ok=True)
             target = output.with_name(output.name + ".tmp")
@@ -448,6 +566,10 @@ def run(*, ledger_path: Path = LEDGER, output: Path = OUTPUT,
         "publisher_second_reads_exact": doc["publisher_readbacks_exact"],
         "provider_error_codes": doc["source_errors"],
         "publisher_readback_error_codes": doc["publisher_readback_error_codes"],
+        "publisher_detail_lookup_attempted": doc["publisher_detail_lookup_attempted"],
+        "publisher_detail_identity_amount_matched":
+            doc["publisher_detail_identity_amount_matched"],
+        "publisher_detail_error_codes": doc["publisher_detail_error_codes"],
         "independently_verified_solicitation_outcomes": 0,
         "source_specific_commercial_reuse_verified": False,
         "verified": verify_only,
