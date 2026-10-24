@@ -1557,6 +1557,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "2161b9718c4200d286a138f073298f3d70ce6491cda945cf92cc509b88f960e6",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-165091"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -1697,6 +1713,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/AccentsAMillion/iceberg-trino-lab"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "24420a8823047136a72dc00285b40dbc717f8e33d2b8cf1fa04aa1bfc8763024",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-215958"
     },
     {
       "commercial_reuse_authorized": false,
@@ -5331,6 +5363,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/qwertyuiop-coder/NYC-Permits"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "8659de030562093aee9ac5a4b989d0827139e709431310af4b8ee4ebc6fe4103",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-215958-2"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10601,6 +10649,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "f205a575825e4909dab6f92b569e18268548ece4c2fefc8dc0d2508a0e8e2ff7",
+  "entries_sha256": "3ab5abc02e63d3872fcd1f25a37b71dee38a44e87030d43af78682885b8a850f",
   "schema_version": 1
 }

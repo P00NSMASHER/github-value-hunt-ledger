@@ -1,0 +1,60 @@
+{
+  "b165_1969_manifest_digest": "b617550c268d53cd7d3cba82ad0c76242295156d478b0e97b0f329974be4ab64",
+  "b215_1984_manifest_digest": "02320aba4915da14b2f05dc68233106b0bfdf1f163976cba5d3bdbf545da80fb",
+  "case_family": "B-215958",
+  "current_customer_contract_applicability_proven": false,
+  "customer_contact_actions": 0,
+  "decision_chain_sources": [
+    {
+      "case_number": "B-215958",
+      "decision_date": "1984-12-05",
+      "official_url": "https://www.gao.gov/products/b-215958",
+      "outcome_class": "INITIAL_1984_CARRIER_FAVORABLE"
+    },
+    {
+      "case_number": "B-215958",
+      "decision_date": "1986-02-18",
+      "official_url": "https://www.gao.gov/products/b-215958-2",
+      "outcome_class": "1986_RECONSIDERATION_SUSTAINED_GSA"
+    },
+    {
+      "case_number": "B-165091",
+      "decision_date": "1969-01-03",
+      "official_url": "https://www.gao.gov/products/b-165091",
+      "outcome_class": "DISTINCT_517V_17980_DEDUCTION_SUSTAINED"
+    }
+  ],
+  "first_decision_date": "1984-12-05",
+  "first_decision_disposition": "GAO_1984_CARRIER_FAVORABLE_INITIAL_ONLY",
+  "first_decision_url": "https://www.gao.gov/products/b-215958",
+  "historical_tariff": "NASI_RULES_TARIFF_190_A_ITEM_470_B_C",
+  "independent_invoice_accuracy_cases": 0,
+  "latest_historical_case_disposition": "1986_GAO_RECONSIDERATION_OVERRULED_1984_AND_SUSTAINED_GSA_AUDIT",
+  "limitations": [
+    "The 1984 B-215958 carrier-favorable decision was explicitly overruled in 1986.",
+    "Historical case decisions do not create modern tariff/customer contract rights.",
+    "B-165091 used a separate 517-V tariff; it is not the 190-A sealed-vehicle case.",
+    "No original invoice-by-invoice rate reconstruction, bank-cleared refund or cash recovery is shown.",
+    "Research-authored manifest digests are not GAO original decision byte fingerprints."
+  ],
+  "observed_at_utc_date": "2026-10-24",
+  "original_gbls_in_initial_proceeding": 55,
+  "original_sealed_gbls_in_initial_proceeding": 53,
+  "owner_commercial_reuse_attestation": "OWNER_ATTESTED_NOT_SOURCE_VERIFIED",
+  "per_gbl_outcomes_independently_proven": 0,
+  "production_engine_changes": 0,
+  "receipt_sha256": "ec99ab9f9b687060bea1b99a8a9c0c1fcbe2b9086b8476b8d9895b28ad8b0503",
+  "reconsideration_date": "1986-02-18",
+  "reconsideration_url": "https://www.gao.gov/products/b-215958-2",
+  "schema_version": 1,
+  "scope": "PUBLIC_GAO_HISTORICAL_SUPERSESSION_ONLY_NO_INVOICE_LABELS",
+  "separate_contrast_actual_refund_cents": null,
+  "separate_contrast_adjudicated_deduction_cents": 17980,
+  "separate_contrast_case": "B-165091",
+  "separate_contrast_tariff": "517_V_ITEM_2400",
+  "source_document_bytes_stored": 0,
+  "source_specific_commercial_rights_verified": false,
+  "subsequent_history_overruled_1984": true,
+  "unresolved_1984_remainder": 2,
+  "verified_recovered_cash_cents": 0
+}
