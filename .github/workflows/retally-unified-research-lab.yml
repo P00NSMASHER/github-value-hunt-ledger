@@ -17,6 +17,9 @@ on:
       - "freight/test_official_capturebrief_award_lab.py"
       - "freight/capturebrief_sam_fy2027_asof.py"
       - "freight/test_capturebrief_sam_fy2027_asof.py"
+      - "freight/gao_adjudication_chronology.py"
+      - "freight/test_gao_adjudication_chronology.py"
+      - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/research_lab_worker*"
       - "freight/research_lab/**"
@@ -46,6 +49,9 @@ on:
       - "freight/test_official_capturebrief_award_lab.py"
       - "freight/capturebrief_sam_fy2027_asof.py"
       - "freight/test_capturebrief_sam_fy2027_asof.py"
+      - "freight/gao_adjudication_chronology.py"
+      - "freight/test_gao_adjudication_chronology.py"
+      - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
@@ -77,8 +83,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -345,6 +351,33 @@ jobs:
                   '- Independent as-of SAM-to-USAspending award outcomes: ZERO\n'
               )
           PY
+      - name: Enforce 1986 GAO reconsideration over superseded 1984 ruling
+        run: |
+          set -euo pipefail
+          # Historical legal sequence, not a customer invoice or paid case.
+          python -m freight.gao_adjudication_chronology \
+            --output freight/research_lab/gao_authority_chronology_v1.json \
+            | tee /tmp/retally-gao-supersession.json
+          python -m freight.gao_adjudication_chronology \
+            --output freight/research_lab/gao_authority_chronology_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads(Path('/tmp/retally-gao-supersession.json').read_text())
+          assert d['1984_favorable_decision_overruled'] is True
+          assert '1986_GAO_RECONSIDERATION' in d['final_historical_authority']
+          assert d['gbl_individual_labels_proven'] == 0
+          assert d['customer_cash_recovered_cents'] == 0
+          assert d['source_specific_commercial_rights_verified'] is False
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  "### FreightRecovery GAO superseding authority\n"
+                  "- The Dec 1984 B-215958 favorable decision was OVERruled on Feb 18, 1986.\n"
+                  "- Final 1986 GAO reconsideration sustained the GSA audit action.\n"
+                  "- The 1969 B-165091 $179.80 tariff ruling is a separate case.\n"
+                  "- No per-invoice truth labels, modern tariff authority, or customer cash proven.\n"
+              )
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -366,7 +399,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/research_lab/gao_authority_chronology_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
           if [ -f freight/lab15/triage_queue.json ]; then
             git add -- freight/lab15/triage_queue.json
           fi
@@ -431,6 +464,8 @@ jobs:
           python -m freight.official_capturebrief_award_lab --ledger /tmp/retally-unified-leads.json --output /tmp/retally-capturebrief-awards-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/research_lab/capturebrief_sam_fy2027_asof_v1.json > /tmp/retally-sam-fy2027-asof-v1.json
           python -m freight.capturebrief_sam_fy2027_asof --output /tmp/retally-sam-fy2027-asof-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/gao_authority_chronology_v1.json > /tmp/retally-gao-authority-v1.json
+          python -m freight.gao_adjudication_chronology --output /tmp/retally-gao-authority-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/lab15/evidence_ledger.json > /tmp/retally-lab15-evidence.json
           git show origin/research/retally-unified-data-lab:freight/research/lab15_candidate_ledger.json > /tmp/retally-lab15-candidates.json
           python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge
