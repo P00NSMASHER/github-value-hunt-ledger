@@ -56,8 +56,10 @@ ALLOWED_ERRORS = frozenset({
     "SOURCE_TOO_LARGE", "SOURCE_MEDIA_UNSUPPORTED", "SOURCE_ENCODING_UNSUPPORTED",
     "SOURCE_INCOMPLETE", "SOURCE_CSV_UNDECODABLE", "SOURCE_CSV_SCHEMA_INVALID",
     "SOURCE_UNKNOWN", "DNS_UNAVAILABLE", "NONPUBLIC_NETWORK",
+    "SOURCE_SOLICITATION_CONTROL_QUARANTINED",
 })
 STATUS_OK = "PUBLIC_ARCHIVE_ROWS_OBSERVED_NOT_PRODUCTION_APPROVED"
+STATUS_PARTIAL = "PUBLIC_ARCHIVE_WITH_QUARANTINED_SOLICITATION_FIELD"
 STATUS_DEGRADED = "PUBLIC_ARCHIVE_UNAVAILABLE_OR_INVALID"
 HOLD = "SOURCE_HISTORY_UNREVIEWED_NO_CUSTOMER_RELEASE"
 RECEIPT_KEYS = frozenset({
@@ -69,6 +71,7 @@ RECEIPT_KEYS = frozenset({
     "oct19_reference_original_sha256", "oct19_reference_observed_rows",
     "source_rows", "unique_original_notice_ids",
     "repeated_notice_identifiers", "source_rows_with_solicitation",
+    "source_rows_quarantined_solicitation_control",
     "source_rows_with_posted_date", "source_rows_posted_after_observation_day",
     "source_issuer_ambiguous_solicitation_families",
     "asof_award_join_candidates_count",
@@ -202,6 +205,7 @@ def parse_archive(raw: bytes, *, observed_at: datetime) -> dict:
         seen_notice: set[str] = set()
         duplicates = 0
         with_sol = 0
+        quarantined_solicitation = 0
         with_posted = 0
         posted_in_future = 0
         issuer_by_sol: dict[str, set[tuple[str, str]]] = defaultdict(set)
@@ -220,7 +224,13 @@ def parse_archive(raw: bytes, *, observed_at: datetime) -> dict:
                 duplicates += 1
             else:
                 seen_notice.add(notice)
-            solicitation = _source_token(row["Sol#"], max_len=180).upper()
+            try:
+                solicitation = _source_token(row["Sol#"], max_len=180).upper()
+            except ResearchError:
+                # Treat a control character in publisher data as an observed,
+                # counted source anomaly, never an independently usable key.
+                quarantined_solicitation += 1
+                solicitation = ""
             if solicitation:
                 with_sol += 1
                 agency = _source_token(row["AAC Code"], max_len=80).upper()
@@ -244,6 +254,7 @@ def parse_archive(raw: bytes, *, observed_at: datetime) -> dict:
         "unique_original_notice_ids": len(seen_notice),
         "repeated_notice_identifiers": duplicates,
         "source_rows_with_solicitation": with_sol,
+        "source_rows_quarantined_solicitation_control": quarantined_solicitation,
         "source_rows_with_posted_date": with_posted,
         "source_rows_posted_after_observation_day": posted_in_future,
         "source_issuer_ambiguous_solicitation_families": sum(
@@ -303,7 +314,11 @@ def build_receipt(*, observed_at: datetime, fetcher=fetch_original) -> dict:
     utc = _utc_at(observed_at)
     try:
         body = parse_archive(fetcher(), observed_at=observed_at)
-        status, errors = STATUS_OK, []
+        if body["source_rows_quarantined_solicitation_control"]:
+            status = STATUS_PARTIAL
+            errors = ["SOURCE_SOLICITATION_CONTROL_QUARANTINED"]
+        else:
+            status, errors = STATUS_OK, []
     except ResearchError as exc:
         status = STATUS_DEGRADED
         code = str(exc)
@@ -315,6 +330,7 @@ def build_receipt(*, observed_at: datetime, fetcher=fetch_original) -> dict:
             "unique_original_notice_ids": 0,
             "repeated_notice_identifiers": 0,
             "source_rows_with_solicitation": 0,
+            "source_rows_quarantined_solicitation_control": 0,
             "source_rows_with_posted_date": 0,
             "source_rows_posted_after_observation_day": 0,
             "source_issuer_ambiguous_solicitation_families": 0,
@@ -383,13 +399,15 @@ def validate_receipt(doc: dict, *, now: datetime) -> None:
             raise ResearchError("ARCHIVE_UNAPPROVED_EVIDENCE_PROMOTION")
     for k in ("source_rows", "unique_original_notice_ids",
               "repeated_notice_identifiers", "source_rows_with_solicitation",
+              "source_rows_quarantined_solicitation_control",
               "source_rows_with_posted_date", "source_rows_posted_after_observation_day",
               "source_issuer_ambiguous_solicitation_families"):
         if type(doc[k]) is not int or not 0 <= doc[k] <= MAX_ORIGINAL_ROWS:
             raise ResearchError("ARCHIVE_ROW_COUNT_INVALID")
     if (doc["unique_original_notice_ids"] + doc["repeated_notice_identifiers"]
             != doc["source_rows"]
-            or doc["source_rows_with_solicitation"] > doc["source_rows"]
+            or (doc["source_rows_with_solicitation"] +
+                doc["source_rows_quarantined_solicitation_control"]) > doc["source_rows"]
             or doc["source_rows_with_posted_date"] > doc["source_rows"]
             or doc["source_rows_posted_after_observation_day"] > doc["source_rows_with_posted_date"]
             or doc["source_issuer_ambiguous_solicitation_families"] >
@@ -399,16 +417,25 @@ def validate_receipt(doc: dict, *, now: datetime) -> None:
             type(x) is not str or x not in ALLOWED_ERRORS for x in doc["source_error_codes"]
     ) or len(doc["source_error_codes"]) > 1:
         raise ResearchError("ARCHIVE_SOURCE_ERROR_INVALID")
-    if doc["source_status"] == STATUS_OK:
-        if (doc["source_rows"] < 1 or doc["source_error_codes"]
+    if doc["source_status"] in (STATUS_OK, STATUS_PARTIAL):
+        if (doc["source_rows"] < 1
                 or type(doc["current_source_size_bytes"]) is not int
                 or not 1 <= doc["current_source_size_bytes"] <= MAX_ORIGINAL_BYTES
                 or type(doc["current_source_sha256"]) is not str
                 or not re.fullmatch(r"[0-9a-f]{64}", doc["current_source_sha256"])):
             raise ResearchError("ARCHIVE_FALSE_GREEN")
+        issues = doc["source_rows_quarantined_solicitation_control"]
+        if (doc["source_status"] == STATUS_OK and
+                (issues != 0 or doc["source_error_codes"])):
+            raise ResearchError("ARCHIVE_FALSE_GREEN")
+        if (doc["source_status"] == STATUS_PARTIAL and
+                (issues == 0 or doc["source_error_codes"] !=
+                 ["SOURCE_SOLICITATION_CONTROL_QUARANTINED"])):
+            raise ResearchError("ARCHIVE_FALSE_GREEN")
     elif doc["source_status"] == STATUS_DEGRADED:
         if (doc["source_rows"] != 0 or doc["current_source_sha256"] is not None
                 or doc["current_source_size_bytes"] != 0
+                or doc["source_rows_quarantined_solicitation_control"] != 0
                 or len(doc["source_error_codes"]) != 1):
             raise ResearchError("ARCHIVE_FALSE_GREEN")
     else:
@@ -457,6 +484,8 @@ def run(*, output: Path = OUTPUT, fetcher=fetch_original,
         "source_status": receipt["source_status"],
         "source_rows": receipt["source_rows"],
         "unique_notice_ids": receipt["unique_original_notice_ids"],
+        "source_rows_quarantined_solicitation_control":
+            receipt["source_rows_quarantined_solicitation_control"],
         "original_source_bytes": receipt["current_source_size_bytes"],
         "source_digest_matches_historical_oct19": receipt[
             "matches_oct19_full_original_byte_digest"
