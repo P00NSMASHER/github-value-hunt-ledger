@@ -14,6 +14,7 @@ from freight.freight_evidence_chain_readiness import (
     ARCBEST_PRINTED_REFERENCE_DIGEST, ARCBEST_PRINTED_TARIFF_CLASSES,
     ARCBEST_PRINTED_BOL_HEADER_CLASSES,
     ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES,
+    ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST,
     make_receipt, validate_receipt, run,
 )
 from freight.unified_research_lab import ResearchError, digest
@@ -112,6 +113,31 @@ def source_document_report() -> dict:
         "verified_retally_recovered_cash_cents": 0,
         "third_party_contacts": 0,
     }
+    abf["embedded_original_vpq_quote_source_replay"] = {
+        "scope": "ORIGINAL_ARCBEST_SAME_PDF_QUOTE_INVOICE_ARITHMETIC_NOT_CUSTOMER_RECOVERY",
+        "source_original_pdf_sha256": FROZEN_DOCUMENT_SHA256["arcbest"],
+        "embedded_original_vpq_quotation_pages": 2,
+        "vpq_original_invoice_faces": 2,
+        "same_pdf_exact_quotation_id_invoice_joins": 2,
+        "invoice_dates_within_printed_quote_effective_window": 2,
+        "printed_invoice_quoted_weights_agree": 2,
+        "invoice_amount_equals_printed_quote_minimum": 1,
+        "conditional_printed_length_formula_matches": 1,
+        "invoice_quote_money_unresolved": 0,
+        "anonymous_page_and_match_class_digest_sha256":
+            ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST,
+        "quote_and_invoice_documents_are_co_bundled_in_same_source_pdf": True,
+        "conditional_length_footage_is_independently_certified": False,
+        "original_signed_bol_quotes_independently_verified": 0,
+        "separate_quote_acceptance_independently_verified": 0,
+        "commercial_reuse_authorized": False,
+        "independent_customer_invoice_overcharge_labels": 0,
+        "bank_cleared_payments_verified": 0,
+        "verified_retally_recovered_cash_cents": 0,
+        "raw_invoice_quote_bol_identifiers_exported": 0,
+        "customer_contact_actions": 0,
+        "unresolved_reason_counts": {},
+    }
     blind = {
         "precision": None,
         "recall": None,
@@ -159,6 +185,16 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertEqual(receipt["arcbest_original_bol_quote_id_correspondence_verified"], 0)
         self.assertEqual(receipt["arcbest_source_printed_category_sha256"],
                          ARCBEST_PRINTED_REFERENCE_DIGEST)
+        self.assertEqual(receipt["arcbest_embedded_original_quote_pages"], 2)
+        self.assertEqual(receipt["arcbest_embedded_invoice_quote_id_joins"], 2)
+        self.assertEqual(receipt["arcbest_embedded_quote_effective_date_matches"], 2)
+        self.assertEqual(receipt["arcbest_embedded_quote_printed_weight_matches"], 2)
+        self.assertEqual(receipt["arcbest_embedded_quote_minimum_money_matches"], 1)
+        self.assertEqual(receipt["arcbest_embedded_conditional_length_formula_matches"], 1)
+        self.assertEqual(receipt["arcbest_embedded_quote_match_class_sha256"],
+                         ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST)
+        self.assertTrue(receipt[
+            "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization"])
         self.assertEqual(receipt["arcbest_independently_verified_rate_and_original_bol_documents"], 0)
         self.assertEqual(receipt["eligible_independently_scored_customer_invoices"], 0)
         self.assertEqual(receipt["verified_retally_recovered_cash_cents"], 0)
@@ -308,6 +344,48 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         out = json.dumps(original)
         self.assertNotIn("ABF80193", out)
         self.assertNotIn("Bill of Lading No:", out)
+
+
+    def test_two_embedded_quote_pages_are_real_source_but_not_independent_rate_truth(self):
+        receipt = make_receipt(source_document_report(), as_of=DAY)
+        self.assertEqual(receipt["arcbest_embedded_original_quote_pages"], 2)
+        self.assertEqual(receipt["arcbest_embedded_invoice_quote_id_joins"], 2)
+        self.assertEqual(receipt["arcbest_embedded_quote_minimum_money_matches"], 1)
+        self.assertEqual(receipt["arcbest_embedded_conditional_length_formula_matches"], 1)
+        self.assertTrue(receipt[
+            "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization"])
+        self.assertEqual(receipt["arcbest_original_bol_quote_id_correspondence_verified"], 0)
+        self.assertEqual(receipt["arcbest_independently_verified_rate_and_original_bol_documents"], 0)
+        self.assertEqual(receipt["eligible_independently_scored_customer_invoices"], 0)
+        self.assertEqual(receipt["verified_retally_recovered_cash_cents"], 0)
+        for field, forged in (
+            ("embedded_original_vpq_quotation_pages", 0),
+            ("same_pdf_exact_quotation_id_invoice_joins", 1),
+            ("invoice_dates_within_printed_quote_effective_window", 1),
+            ("printed_invoice_quoted_weights_agree", 1),
+            ("invoice_amount_equals_printed_quote_minimum", 2),
+            ("conditional_printed_length_formula_matches", 0),
+            ("invoice_quote_money_unresolved", 1),
+            ("anonymous_page_and_match_class_digest_sha256", "0" * 64),
+            ("original_signed_bol_quotes_independently_verified", 2),
+            ("separate_quote_acceptance_independently_verified", 2),
+            ("conditional_length_footage_is_independently_certified", True),
+            ("quote_and_invoice_documents_are_co_bundled_in_same_source_pdf", False),
+            ("commercial_reuse_authorized", True),
+            ("independent_customer_invoice_overcharge_labels", 2),
+            ("bank_cleared_payments_verified", 2),
+            ("verified_retally_recovered_cash_cents", 1),
+        ):
+            with self.subTest(field=field):
+                altered = source_document_report()
+                altered["freight_original_document_benchmark"]["arcbest"][
+                    "embedded_original_vpq_quote_source_replay"][field] = forged
+                with self.assertRaises(ResearchError):
+                    make_receipt(altered, as_of=DAY)
+        leaked = json.dumps(receipt)
+        for text in ("VPQ Quotation ID:", "PQ SCHEDULE NO", "V5WH1D1314",
+                     "VKQS7R1064", "086855061", "279818407"):
+            self.assertNotIn(text, leaked)
 
     def test_statement_identity_is_not_bank_payment_or_refund(self):
         source = source_document_report()
