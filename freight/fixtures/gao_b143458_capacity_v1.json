@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B143458_TARIFF_SPECIFIC_CAPACITY_CONTROL_V1",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "cohort": "US_GAO_GOVERNMENT_MOTOR_FREIGHT_1958_SHIPMENT_1961_DECISION",
+  "source": {
+    "official_url": "https://www.gao.gov/products/b-143458",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-143458",
+    "decision_date": "1961-03-30",
+    "reviewed_date": "2026-10-24",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_GOVERNMENT_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "customer_engine_commercial_reuse_approved": false,
+    "source_kind": "OFFICIAL_GAO_DECISION_HTML",
+    "original_publisher_bytes_acquired": false,
+    "original_publisher_bytes_sha256": null
+  },
+  "historical_facts": {
+    "shipment_year": 1958,
+    "goods": "EIGHT_AUTOMOBILE_TOWING_POLES",
+    "shipment_weight_pounds": 5744,
+    "full_visible_vehicle_capacity_noted_on_gbl": true,
+    "carrier_charged_and_paid_cents": 30590,
+    "gao_applicable_ltl_charge_cents": 15060,
+    "gao_overcharge_certificate_cents": 15530,
+    "ltl_rate_cents_per_cwt": 251,
+    "ltl_rate_minimum_weight_pounds": 6000,
+    "governing_rule": "MIDDLE_ATLANTIC_EXCEPTIONS_TARIFF_10_M_RULE_25_D_LOWEST_LTL_CHARGE",
+    "capacity_load_rule": "TARIFF_10_M_RULE_62_2",
+    "carrier_in_capacity_rule_eligible_list": false,
+    "gao_reason": "FULL_VISIBLE_CAPACITY_ALONE_DOES_NOT_MAKE_TRUCKLOAD_CHARGES_APPLICABLE_WITHOUT_GOVERNING_TARIFF_RULE",
+    "certificate_of_indebtedness_issued": true,
+    "refund_or_deduction_ordered": true,
+    "actual_refund_or_offset_collected": null,
+    "later_court_disposition": "UNKNOWN"
+  },
+  "truth_boundaries": {
+    "historical_gao_adjudication_published": true,
+    "original_paid_invoice_or_gbl_bytes_held": false,
+    "original_governing_tariff_pages_held": false,
+    "independently_held_out_training_separation_verified": false,
+    "modern_contract_applicability": "UNKNOWN",
+    "independent_private_customer_invoice_error_cents": null,
+    "customer_accuracy_scoring_permitted": false,
+    "retally_verified_cash_recovery_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_FULL_VEHICLE_IMPLIES_TRUCKLOAD",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "TRUCKLOAD_CHARGE_REQUIRED_FROM_FULL_CAPACITY_NOTATION",
+      "expected": "REJECT_WITHOUT_APPLICABLE_CARRIER_SPECIFIC_TARIFF_RULE"
+    },
+    {
+      "id": "SYNTHETIC_CARRIER_ROSTER_CHANGED",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "CAPACITY_RULE_APPLIES_WITHOUT_ACTUAL_CARRIER_MEMBERSHIP_EVIDENCE",
+      "expected": "UNKNOWN_REQUIRES_CONTEMPORANEOUS_TARIFF_AND_CARRIER_SCOPE"
+    },
+    {
+      "id": "SYNTHETIC_1961_TARIFF_AS_MODERN_RATE",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "USE_GAO_1961_RATE_AS_CURRENT_CUSTOMER_PRICING",
+      "expected": "REJECT_HISTORICAL_RATE_NOT_CURRENT_CONTRACT"
+    },
+    {
+      "id": "SYNTHETIC_CERTIFICATE_MEANS_RETALLY_CASH",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "CERTIFICATE_ISSUANCE_PROVES_RETALLY_RECOVERY",
+      "expected": "REJECT_NO_EVIDENCE_OF_CUSTOMER_SETTLEMENT_OR_RETALLY_RECOVERY"
+    }
+  ],
+  "quality": {
+    "published_decision_arithmetic_reconciles": true,
+    "publisher_full_decision_text_reviewed": true,
+    "original_publisher_byte_hash_available": false,
+    "independent_customer_ground_truth_complete": false,
+    "private_medical_student_customer_records_used": false
+  }
+}
