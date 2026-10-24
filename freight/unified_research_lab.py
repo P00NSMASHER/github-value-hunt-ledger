@@ -59,6 +59,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-189100",  # GAO 1977 original GBL A-6018184 classification; historical $2634.38 deduction only.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
+        "https://www.gao.gov/products/b-143458",  # GAO 1961 $305.90 / $150.60 / $155.30; full capacity not enough absent tariff scope.
         # New source-bound reported numeric cases; original invoices not held.
         "https://www.gao.gov/products/b-191257",  # 1978 Yellow Freight $828 / $796 / $32.
         "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.
