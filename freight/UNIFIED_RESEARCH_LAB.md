@@ -757,3 +757,46 @@ source-rights promotion.
     python -m unittest -q freight.test_gao_adjudication_chronology
     python -m freight.gao_adjudication_chronology
     python -m freight.gao_adjudication_chronology --verify
+
+## FreightRecovery historic GAO numerical adjudication evidence (v10)
+
+**This is not a new lab, scheduler, source repository or production engine.**
+The same unified controller now validates five additional original
+historical GAO motor-freight decisions through
+freight/gao_motor_freight_numeric.py and its source-bound fixture
+freight/fixtures/gao_motor_freight_numeric_v1.json. It generates only a bounded
+freight/research_lab/gao_motor_freight_numeric_v1.json receipt on the
+**existing isolated research data branch**. The nightly read-only four-engine
+replay verifies exactly the persisted receipt, including GAO decision dates,
+tariff scopes, published numerical facts and all safety limitations.
+
+Original primary GAO decision URLs and numerics:
+
+| GAO decision | Case-level published financial figures | Evidence limit |
+| --- | --- | --- |
+| [B-191257, 1978](https://www.gao.gov/products/b-191257) | Yellow Freight: $828.00 paid, $796.00 audited applicable charge, $32.00 GSA offset | Only one case whose two reported charges allow exact subtraction; not a modern tariff |
+| [B-152744, 1964](https://www.gao.gov/products/b-152744-0) | Strickland: $611.80 paid, $122.20 deducted | GAO reserved possible later reconsideration depending on litigation; original independent tariff-rate build missing |
+| [B-148465, 1962](https://www.gao.gov/products/b-148465) | Western Truck Lines: $546.88 paid, $61.22 deducted | Conditional future Supreme Court outcome caveat; no later disposition certified |
+| [B-143048, 1960](https://www.gao.gov/products/b-143048) | Cooper-Jarrett: $130.30 *aggregate* for two shipments; $10.69 vs $7.65 per cwt in the quoted route dispute | No independently verified per-shipment allocations or individually scored bill labels |
+| [B-146511, 1965](https://www.gao.gov/products/b-146511-2) | A. B. James: $152.05 paid, $20.74 deducted; the claim also appears as $20.70 and $20.76 | Conflicting numerical claim variants intentionally retained; never silently normalized |
+
+All amounts are *published historical decision-level observations*, not fresh
+shipper invoices, independent held-out engine classifications or RETALLY
+revenue. Of five cases, **one** has both publisher-stated paid and audited
+charges for exact subtraction. The others cannot be labelled with full
+source-reconstructed audited amounts. Tests forbid mixing tariffs, inventing
+per-shipment allocations, collapsing conflicting amounts, certifying
+1962/1964 decisions beyond reserved review, or converting a historical
+government offset into customer recoveries.
+
+Written fixtures and receipts store **no original invoice/GBL bytes, source
+HTML contents, customer records or credentials**. Authored JSON digests are
+*not original GAO page-byte fingerprints*. Official GAO
+[terms](https://www.gao.gov/copyright) request attribution, prohibit implied
+endorsement and caution about embedded third-party materials. Separate
+commercial engine input approval remains unverified. No current legal or
+commercial-rate benchmark is claimed.
+
+    python -m unittest -q freight.test_gao_motor_freight_numeric
+    python -m freight.gao_motor_freight_numeric
+    python -m freight.gao_motor_freight_numeric --verify
