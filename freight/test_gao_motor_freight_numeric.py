@@ -176,5 +176,99 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertTrue(FIXTURE.name.startswith("gao_motor_freight"))
 
 
+    def test_b143458_published_full_capacity_does_not_override_carrier_specific_tariff(self):
+        """Real GAO adjudication is NOT a modern invoice or customer recovery label."""
+        path = FIXTURE.parent / "gao_b143458_capacity_v1.json"
+        item = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(item["schema_version"], "1.0.0")
+        self.assertEqual(item["fixture_id"], "GAO_B143458_TARIFF_SPECIFIC_CAPACITY_CONTROL_V1")
+        self.assertEqual(item["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY")
+        source = item["source"]
+        self.assertEqual(source["official_url"], "https://www.gao.gov/products/b-143458")
+        self.assertIn(source["official_url"], SEEDS["freightrecovery"])
+        self.assertEqual(source["decision_date"], "1961-03-30")
+        self.assertEqual(source["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertFalse(source["original_publisher_bytes_acquired"])
+        self.assertIsNone(source["original_publisher_bytes_sha256"])
+        self.assertFalse(source["customer_engine_commercial_reuse_approved"])
+        facts = item["historical_facts"]
+        self.assertEqual(facts["shipment_weight_pounds"], 5744)
+        self.assertEqual(facts["carrier_charged_and_paid_cents"], 30590)
+        self.assertEqual(facts["gao_applicable_ltl_charge_cents"], 15060)
+        self.assertEqual(facts["gao_overcharge_certificate_cents"], 15530)
+        self.assertEqual(facts["ltl_rate_cents_per_cwt"], 251)
+        self.assertEqual(facts["ltl_rate_minimum_weight_pounds"], 6000)
+        self.assertEqual(facts["ltl_rate_cents_per_cwt"] *
+                         facts["ltl_rate_minimum_weight_pounds"] // 100, 15060)
+        self.assertEqual(facts["carrier_charged_and_paid_cents"] -
+                         facts["gao_applicable_ltl_charge_cents"], 15530)
+        self.assertTrue(facts["full_visible_vehicle_capacity_noted_on_gbl"])
+        self.assertFalse(facts["carrier_in_capacity_rule_eligible_list"])
+        self.assertEqual(facts["capacity_load_rule"], "TARIFF_10_M_RULE_62_2")
+        self.assertTrue(facts["certificate_of_indebtedness_issued"])
+        self.assertIsNone(facts["actual_refund_or_offset_collected"])
+        self.assertEqual(facts["later_court_disposition"], "UNKNOWN")
+        truth = item["truth_boundaries"]
+        self.assertTrue(truth["historical_gao_adjudication_published"])
+        self.assertFalse(truth["original_paid_invoice_or_gbl_bytes_held"])
+        self.assertFalse(truth["original_governing_tariff_pages_held"])
+        self.assertFalse(truth["independently_held_out_training_separation_verified"])
+        self.assertEqual(truth["modern_contract_applicability"], "UNKNOWN")
+        self.assertIsNone(truth["independent_private_customer_invoice_error_cents"])
+        self.assertFalse(truth["customer_accuracy_scoring_permitted"])
+        self.assertEqual(truth["retally_verified_cash_recovery_cents"], 0)
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 4)
+        self.assertEqual(len({c["id"] for c in controls}), 4)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTHETIC_") for c in controls))
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_WITHOUT_APPLICABLE_CARRIER_SPECIFIC_TARIFF_RULE",
+            "UNKNOWN_REQUIRES_CONTEMPORANEOUS_TARIFF_AND_CARRIER_SCOPE",
+            "REJECT_HISTORICAL_RATE_NOT_CURRENT_CONTRACT",
+            "REJECT_NO_EVIDENCE_OF_CUSTOMER_SETTLEMENT_OR_RETALLY_RECOVERY",
+        })
+        # B-152744 presents a DIFFERENT tariff and litigation caveat.
+        # The 1961 case is a counterexample to universal 'full truck => TL' rules.
+        other = PINNED["B-152744"]
+        self.assertNotEqual(other["historical_tariff"], facts["capacity_load_rule"])
+        self.assertTrue(other["further_review_explicitly_reserved"])
+        self.assertTrue(item["quality"]["published_decision_arithmetic_reconciles"])
+        self.assertFalse(item["quality"]["independent_customer_ground_truth_complete"])
+
+    def test_b143458_wrong_money_tariff_scope_and_cash_promotions_are_red(self):
+        """Reject altered authored evidence even when new data is self-consistent."""
+        item = json.loads((FIXTURE.parent / "gao_b143458_capacity_v1.json").read_text())
+        pinned = (
+            ("historical_facts", "carrier_charged_and_paid_cents", 30590),
+            ("historical_facts", "gao_applicable_ltl_charge_cents", 15060),
+            ("historical_facts", "gao_overcharge_certificate_cents", 15530),
+            ("historical_facts", "carrier_in_capacity_rule_eligible_list", False),
+            ("historical_facts", "actual_refund_or_offset_collected", None),
+            ("source", "original_publisher_bytes_sha256", None),
+            ("source", "customer_engine_commercial_reuse_approved", False),
+            ("truth_boundaries", "independently_held_out_training_separation_verified", False),
+            ("truth_boundaries", "customer_accuracy_scoring_permitted", False),
+            ("truth_boundaries", "retally_verified_cash_recovery_cents", 0),
+        )
+        def assert_pinned(row):
+            for section, field, value in pinned:
+                self.assertEqual(row[section][field], value)
+        assert_pinned(item)
+        for section, field, original in pinned:
+            with self.subTest(section=section, field=field):
+                forged = copy.deepcopy(item)
+                forged[section][field] = (
+                    True if original is False else
+                    1 if original is None or original == 0 else
+                    "FORGED" if isinstance(original, str) else original + 1
+                )
+                with self.assertRaises(AssertionError):
+                    assert_pinned(forged)
+        self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
+
+
+
 if __name__ == "__main__":
     unittest.main()
