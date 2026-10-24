@@ -129,6 +129,50 @@ test("bounded catalogs rotate query terms and pages without extra network budget
   assert.equal(feedSpecs("permitplate",start).filter(x=>x.provider==="socrata").length,1);
 });
 
+test("all lanes rotate nine distinct subject families without increasing provider calls",()=>{
+  const base=Date.UTC(2026,9,24,0,0,0);
+  for(const engine of ENGINES){
+    const githubQueries=new Set(), zenodoQueries=new Set(), plans=new Set();
+    const officialQueries=new Set(), officialOffsets=new Set();
+    for(let lap=0;lap<45;lap++){
+      const when=base+lap*1200000;
+      const specs=feedSpecs(engine,when);
+      assert.equal(specs.filter(s=>s.provider==="github").length,2);
+      assert.equal(specs.filter(s=>s.provider==="zenodo").length,1);
+      assert.equal(specs.length,engine==="permitplate"?4:3);
+      for(const spec of specs){
+        const u=new URL(spec.url);
+        if(spec.provider==="github"){
+          assert.equal(u.hostname,"api.github.com");
+          assert.equal(u.searchParams.get("per_page"),"15");
+          githubQueries.add(u.searchParams.get("q"));
+        }else if(spec.provider==="zenodo"){
+          assert.equal(u.hostname,"zenodo.org");
+          assert.equal(u.searchParams.get("size"),"15");
+          zenodoQueries.add(u.searchParams.get("q"));
+        }else if(spec.provider==="socrata"){
+          assert.equal(u.hostname,"api.us.socrata.com");
+          assert.equal(u.searchParams.get("domains"),"data.cityofnewyork.us");
+          assert.equal(u.searchParams.get("limit"),"15");
+          officialQueries.add(u.searchParams.get("q"));
+          officialOffsets.add(u.searchParams.get("offset"));
+        }
+      }
+      plans.add(specs.map(x=>x.url).join("|"));
+      assert.deepEqual(feedSpecs(engine,when),specs,"schedule must be deterministic");
+    }
+    assert.equal(githubQueries.size,9,engine+" GitHub query diversity");
+    assert.equal(zenodoQueries.size,9,engine+" Zenodo query diversity");
+    assert.ok(plans.size>=27,engine+" non-repeating bounded search windows");
+    if(engine==="permitplate"){
+      assert.equal(officialQueries.size,3);
+      assert.deepEqual([...officialOffsets].sort(),["0","15","30"]);
+    }else {
+      assert.equal(officialQueries.size,0);
+    }
+  }
+});
+
 test("D1 source publication uses one bounded atomic batch with rights holds",async()=>{
   const batched=[];
   const db={
