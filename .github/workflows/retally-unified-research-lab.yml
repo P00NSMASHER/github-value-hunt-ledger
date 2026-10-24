@@ -305,6 +305,7 @@ jobs:
                   f"- Distinct original internal award IDs: {x['distinct_publisher_award_ids']}\n"
                   f"- Official publisher second reads: {x['publisher_second_reads']}\n"
                   f"- Official second reads matching exactly: {x['publisher_second_reads_exact']}\n"
+                  f"- Second-read HTTP/status error categories: {x['publisher_readback_error_codes']}\n"
                   '- Independent live solicitations/award outcomes: NOT established\n'
               )
           PY
