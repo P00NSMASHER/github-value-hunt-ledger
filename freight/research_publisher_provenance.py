@@ -162,6 +162,7 @@ def _safe_head_and_digest(url: str) -> dict:
         return {**base, "probe_state": "UNSUPPORTED_SOURCE_ENCODING"}
     if media not in FINGERPRINT_MEDIA:
         return {**base, "probe_state": "UNSUPPORTED_SOURCE_MEDIA"}
+    expected_length = None
     if raw_length:
         try:
             length = int(raw_length)
@@ -171,6 +172,7 @@ def _safe_head_and_digest(url: str) -> dict:
             return {**base, "probe_state": "PUBLIC_HTTP_METADATA_ONLY"}
         if length > MAX_RESPONSE_BYTES:
             return {**base, "probe_state": "PUBLISHER_CONTENT_TOO_LARGE"}
+        expected_length = length
     try:
         req = Request(url, method="GET", headers=headers)
         with opener.open(req, timeout=GET_TIMEOUT_SECONDS) as response:
@@ -180,6 +182,17 @@ def _safe_head_and_digest(url: str) -> dict:
                 return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
             if response.headers.get("Content-Encoding", "identity").lower().strip() not in {"", "identity"}:
                 return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
+            get_length_header = response.headers.get("Content-Length")
+            get_length = None
+            if get_length_header:
+                try:
+                    get_length = int(get_length_header)
+                except ValueError:
+                    return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
+                if get_length < 0:
+                    return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
+                if get_length > MAX_RESPONSE_BYTES:
+                    return {**base, "probe_state": "PUBLISHER_CONTENT_TOO_LARGE"}
             content = response.read(MAX_RESPONSE_BYTES + 1)
     except (HTTPError, URLError, TimeoutError, OSError, ResearchError):
         return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
@@ -187,6 +200,9 @@ def _safe_head_and_digest(url: str) -> dict:
         return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
     if len(content) > MAX_RESPONSE_BYTES:
         return {**base, "probe_state": "PUBLISHER_CONTENT_TOO_LARGE"}
+    if (expected_length is not None and len(content) != expected_length) or (
+            get_length is not None and len(content) != get_length):
+        return {**base, "probe_state": "GET_NOT_VERIFIABLE"}
     return {**base, "probe_state": "PUBLIC_CONTENT_FINGERPRINTED",
             "content_sha256": hashlib.sha256(content).hexdigest(),
             "bytes_hashed": len(content)}
