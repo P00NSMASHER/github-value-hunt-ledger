@@ -325,7 +325,7 @@ class GAOAgentVersusInterlineEvidenceTests(unittest.TestCase):
 # This is decision-level evidence, NOT an independent modern invoice benchmark.
 EXCLUSIVE_URL = "https://www.gao.gov/products/b-139340"
 EXCLUSIVE_PATH = Path(__file__).with_name("fixtures") / "gao_b139340_exclusive_use_v1.json"
-EXCLUSIVE_MANIFEST_SHA256 = "8487c75828809619344db8575a6d787c65eb55ddda24b441bb6b0d5da8e5e0bc"
+EXCLUSIVE_MANIFEST_SHA256 = "71350173ef2a3d562ec58a05a80ab76bb4403ab08a0cbcd9f4b83c053e434252"
 
 
 def exclusive_fixture():
@@ -363,6 +363,14 @@ def validate_exclusive_fixture(doc):
             and r["gao_rate_cents_per_cwt"] == 262
             and r["gao_applied_weight_pounds"] == 17250
             and r["gao_setoff_cents"] == 7165
+            and r["gao_transcribed_gbl_truckload_notation"] == {
+                "rate_cents_per_cwt": 262,
+                "minimum_weight_pounds": 16000,
+                "class": 70,
+                "tariff": "ECM 31-A",
+                "underlying_gbl_image_available": False,
+            }
+            and r["gao_transcribed_gbl_truckload_notation"]["minimum_weight_pounds"] < r["gao_applied_weight_pounds"]
             and r["carrier_rate_cents_per_cwt"] * r["carrier_minimum_weight_pounds"] == r["carrier_paid_cents"] * 100
             and r["gao_rate_cents_per_cwt"] * r["gao_applied_weight_pounds"] == r["gao_allowable_cents"] * 100
             and r["carrier_paid_cents"] - r["gao_allowable_cents"] == r["gao_setoff_cents"]
@@ -388,12 +396,13 @@ def validate_exclusive_fixture(doc):
             and q["original_source_bytes_hash_available"] is False
             and q["source_independent_invoice_label_complete"] is False
             and q["private_customer_medical_student_data_used"] is False
-            and len(doc["synthetic_negative_controls"]) == 4
+            and len(doc["synthetic_negative_controls"]) == 5
             and [v["expected"] for v in doc["synthetic_negative_controls"]] == [
                 "REJECT_SEAL_OR_AUTHORIZATION_IS_NOT_ORDERED_AND_SIGNED",
                 "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_RATE_AUTHORITY",
                 "UNKNOWN_DO_NOT_INFER_VALID_EXCLUSIVE_USE",
                 "REJECT_SIGNED_ORDER_ALONE_DOES_NOT_OVERRIDE_FULL_LOAD_TRUCKLOAD_RATE",
+                "REJECT_MINIMUM_WEIGHT_DOES_NOT_REPLACE_HIGHER_ACTUAL_WEIGHT",
             ]
             and all(v["synthetic"] is True and v["customer_error_cents"] is None
                     for v in doc["synthetic_negative_controls"])
@@ -425,7 +434,44 @@ class GAOExclusiveUseNumericalEvidenceTests(unittest.TestCase):
         self.assertIsNone(record["ground_truth"]["independent_original_invoice_error_cents"])
         self.assertEqual(record["ground_truth"]["retally_verified_cash_recovered_cents"], 0)
 
-    def test_four_negative_controls_are_explicitly_synthetic_or_unknown(self):
+    def test_publisher_transcribed_gbl_truckload_note_uses_higher_actual_weight(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        r = record["historical_rating"]
+        note = r["gao_transcribed_gbl_truckload_notation"]
+        self.assertEqual(note, {
+            "rate_cents_per_cwt": 262,
+            "minimum_weight_pounds": 16000,
+            "class": 70,
+            "tariff": "ECM 31-A",
+            "underlying_gbl_image_available": False,
+        })
+        self.assertEqual(r["gao_applied_weight_pounds"], 17250)
+        self.assertGreater(r["gao_applied_weight_pounds"], note["minimum_weight_pounds"])
+        self.assertEqual(r["gao_allowable_cents"], 45195)
+        self.assertNotEqual(note["rate_cents_per_cwt"] * note["minimum_weight_pounds"] // 100,
+                            r["gao_allowable_cents"])
+        self.assertFalse(record["ground_truth"]["original_bill_of_lading_or_carrier_invoice_bytes_in_custody"])
+        self.assertIn("SYNTHETIC_USE_GBL_16000_MIN_WEIGHT_INSTEAD_OF_HIGHER_ACTUAL",
+                      {v["id"] for v in record["synthetic_negative_controls"]})
+
+    def test_rehashed_gbl_truckload_note_forgery_is_rejected(self):
+        original = validate_exclusive_fixture(exclusive_fixture())
+        for field, invalid in (
+            ("rate_cents_per_cwt", 374),
+            ("minimum_weight_pounds", 14000),
+            ("class", 100),
+            ("tariff", "CURRENT_TARIFF"),
+            ("underlying_gbl_image_available", True),
+        ):
+            changed = deepcopy(original)
+            changed["historical_rating"]["gao_transcribed_gbl_truckload_notation"][field] = invalid
+            changed["manifest_sha256"] = digest({
+                k: v for k, v in changed.items() if k != "manifest_sha256"
+            })
+            with self.subTest(field=field), self.assertRaises(ResearchError):
+                validate_exclusive_fixture(changed)
+
+    def test_five_negative_controls_are_explicitly_synthetic_or_unknown(self):
         record = validate_exclusive_fixture(exclusive_fixture())
         self.assertTrue(all(v["synthetic"] is True for v in record["synthetic_negative_controls"]))
         self.assertEqual(record["ground_truth"]["current_contract_rate_applicability"], "UNKNOWN")

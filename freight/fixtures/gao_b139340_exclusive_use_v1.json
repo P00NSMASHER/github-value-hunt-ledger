@@ -41,7 +41,14 @@
     "gao_disposition": "DISALLOWANCE_SUSTAINED",
     "further_litigation_outcome": "UNKNOWN",
     "gao_full_vehicle_inference_status": "SUGGESTED_BY_GAO_NOT_INDEPENDENTLY_MEASURED",
-    "gao_conditional_alternative_reason": "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT"
+    "gao_conditional_alternative_reason": "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT",
+    "gao_transcribed_gbl_truckload_notation": {
+      "rate_cents_per_cwt": 262,
+      "minimum_weight_pounds": 16000,
+      "class": 70,
+      "tariff": "ECM 31-A",
+      "underlying_gbl_image_available": false
+    }
   },
   "ground_truth": {
     "independent_government_decision_published": true,
@@ -79,6 +86,12 @@
       "synthetic": true,
       "expected": "REJECT_SIGNED_ORDER_ALONE_DOES_NOT_OVERRIDE_FULL_LOAD_TRUCKLOAD_RATE",
       "customer_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_USE_GBL_16000_MIN_WEIGHT_INSTEAD_OF_HIGHER_ACTUAL",
+      "synthetic": true,
+      "expected": "REJECT_MINIMUM_WEIGHT_DOES_NOT_REPLACE_HIGHER_ACTUAL_WEIGHT",
+      "customer_error_cents": null
     }
   ],
   "data_quality": {
@@ -90,5 +103,5 @@
     "private_customer_medical_student_data_used": false
   },
   "manifest_hash_contract": "AUTHORED_CANONICAL_JSON_SHA256_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
-  "manifest_sha256": "8487c75828809619344db8575a6d787c65eb55ddda24b441bb6b0d5da8e5e0bc"
+  "manifest_sha256": "71350173ef2a3d562ec58a05a80ab76bb4403ab08a0cbcd9f4b83c053e434252"
 }
