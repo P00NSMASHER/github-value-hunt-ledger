@@ -1,0 +1,180 @@
+"""FreightRecovery GAO publisher-decision numerical evidence negative controls."""
+from __future__ import annotations
+
+import copy
+import json
+import tempfile
+import unittest
+from datetime import date, timedelta
+from pathlib import Path
+from unittest.mock import patch
+
+from freight.gao_motor_freight_numeric import (
+    FIXTURE, PINNED, SCOPE, load_fixture, validate_fixture, make_receipt,
+    validate_receipt, run,
+)
+from freight.unified_research_lab import ResearchError, SEEDS, digest
+
+DAY = date(2026, 10, 24)
+
+
+class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
+    def test_five_distinct_official_historical_cases_are_only_decision_level(self):
+        data = load_fixture()
+        self.assertEqual(data["scope"], SCOPE)
+        self.assertEqual(len(data["cases"]), 5)
+        self.assertEqual(list(PINNED), [row["case_number"] for row in data["cases"]])
+        self.assertEqual(len({x["official_url"] for x in data["cases"]}), 5)
+        for entry in data["cases"]:
+            with self.subTest(case=entry["case_number"]):
+                self.assertIn(entry["official_url"], SEEDS["freightrecovery"])
+                self.assertFalse(entry["commercial_reuse_approved_for_customer_engine"])
+                self.assertFalse(entry["modern_rate_authority"])
+                self.assertFalse(entry["independent_original_invoice_custody"])
+                self.assertIsNone(entry["source_original_bytes_sha256"])
+        self.assertEqual(data["original_document_bytes_stored"], 0)
+        self.assertEqual(data["real_customer_invoice_records"], 0)
+        self.assertEqual(data["independent_invoice_outcome_labels"], 0)
+        self.assertEqual(data["verified_retally_recovered_cash_cents"], 0)
+
+    def test_only_1978_decision_has_publisher_reported_complete_arithmetic(self):
+        receipt = make_receipt(DAY)
+        self.assertEqual(receipt["case_count"], 5)
+        self.assertEqual(receipt["exact_publisher_stated_arithmetic_cases"], 1)
+        case = {c["case_number"]: c for c in receipt["case_receipts"]}
+        one = case["B-191257"]
+        self.assertEqual(one["reported_paid_cents"], 82800)
+        self.assertEqual(one["reported_audit_charge_cents"], 79600)
+        self.assertEqual(one["reported_offset_deduction_cents"], 3200)
+        self.assertEqual(one["reported_paid_cents"] -
+                         one["reported_audit_charge_cents"],
+                         one["reported_offset_deduction_cents"])
+        self.assertEqual(one["numeric_reconciliation"], "EXACT_PUBLISHER_REPORTED_CHARGES_MATCH")
+        for ident in set(case) - {"B-191257"}:
+            with self.subTest(case=ident):
+                self.assertIsNone(case[ident]["reported_audit_charge_cents"])
+                self.assertEqual(case[ident]["numeric_reconciliation"],
+                                 "NO_EXACT_AUDITED_CHARGE_RECONSTRUCTION")
+                self.assertEqual(case[ident]["customer_recovery_cents"], 0)
+        self.assertEqual(receipt["independent_customer_invoice_truth_cases"], 0)
+        self.assertEqual(receipt["verified_retally_recovered_cash_cents"], 0)
+        self.assertFalse(receipt["source_specific_commercial_rights_verified"])
+
+    def test_two_shipment_aggregate_and_conflicting_amounts_remain_uncertain(self):
+        source = {row["case_number"]: row for row in load_fixture()["cases"]}
+        joint = source["B-143048"]
+        self.assertEqual(joint["shipment_count"], 2)
+        self.assertEqual(joint["reported_offset_deduction_cents"], 13030)
+        self.assertEqual(joint["reported_paid_rate_cents_per_cwt"], 1069)
+        self.assertEqual(joint["reported_alternative_rate_cents_per_cwt"], 765)
+        self.assertIsNone(joint["reported_paid_cents"])
+        self.assertFalse(joint["per_shipment_deduction_allocation_known"])
+        conflict = source["B-146511"]
+        self.assertEqual(conflict["claim_amount_variants_cents"], [2070, 2074, 2076])
+        self.assertEqual(conflict["reported_offset_deduction_cents"], 2074)
+        self.assertEqual(make_receipt(DAY)["conflicting_amount_cases"], 1)
+        self.assertEqual(make_receipt(DAY)["multi_shipment_aggregate_cases"], 1)
+
+    def test_1962_and_1964_later_litigation_caveats_not_erased(self):
+        data = {row["case_number"]: row for row in load_fixture()["cases"]}
+        self.assertTrue(data["B-148465"]["further_review_explicitly_reserved"])
+        self.assertTrue(data["B-152744"]["further_review_explicitly_reserved"])
+        self.assertFalse(data["B-191257"]["further_review_explicitly_reserved"])
+        self.assertEqual(make_receipt(DAY)["explicit_later_review_caveat_cases"], 2)
+        self.assertNotIn("FINAL", data["B-152744"]["decision_as_published"])
+
+    def test_changed_amounts_or_authority_cannot_pass_rehashed_fixture(self):
+        original = load_fixture()
+        mutations = [
+            ("B-191257", "reported_paid_cents", 92800),
+            ("B-191257", "reported_audit_charge_cents", 80000),
+            ("B-152744", "further_review_explicitly_reserved", False),
+            ("B-143048", "shipment_count", 1),
+            ("B-143048", "per_shipment_deduction_allocation_known", True),
+            ("B-146511", "claim_amount_variants_cents", [2074]),
+            ("B-191257", "modern_rate_authority", True),
+            ("B-191257", "commercial_reuse_approved_for_customer_engine", True),
+            ("B-191257", "independent_original_invoice_custody", True),
+            ("B-191257", "official_url", "https://www.gao.gov/products/b-215958"),
+            ("B-191257", "historical_tariff", "NASI_RULES_TARIFF_190_A"),
+        ]
+        for ident, field, bogus in mutations:
+            with self.subTest(case=ident, field=field):
+                fake = copy.deepcopy(original)
+                target = next(row for row in fake["cases"] if row["case_number"] == ident)
+                target[field] = bogus
+                with self.assertRaises(ResearchError):
+                    validate_fixture(fake)
+                # A forged digest of altered local authored data is not authority.
+                self.assertNotEqual(digest(fake), digest(original))
+        forged = copy.deepcopy(original)
+        forged["verified_retally_recovered_cash_cents"] = 36646
+        with self.assertRaises(ResearchError):
+            validate_fixture(forged)
+
+    def test_deterministic_receipt_rejects_even_rehashed_financial_promotions(self):
+        original = make_receipt(DAY)
+        self.assertEqual(original["scope"], SCOPE)
+        validate_receipt(original, at_date=DAY)
+        mutations = [
+            ("historical_reported_deductions_sum_cents_not_retally_revenue", 50000),
+            ("verified_retally_recovered_cash_cents", 36646),
+            ("independent_customer_invoice_truth_cases", 5),
+            ("source_specific_commercial_rights_verified", True),
+            ("exact_publisher_stated_arithmetic_cases", 5),
+            ("source_original_document_bytes_stored", 5),
+            ("production_engine_changes", 1),
+            ("explicit_later_review_caveat_cases", 0),
+            ("conflicting_amount_cases", 0),
+        ]
+        for field, val in mutations:
+            with self.subTest(field=field):
+                fake = copy.deepcopy(original)
+                fake[field] = val
+                fake["receipt_sha256"] = digest({
+                    k: v for k, v in fake.items() if k != "receipt_sha256"
+                })
+                with self.assertRaises(ResearchError):
+                    validate_receipt(fake, at_date=DAY)
+        false_case = copy.deepcopy(original)
+        false_case["case_receipts"][0]["reported_offset_deduction_cents"] = 50000
+        false_case["receipt_sha256"] = digest({
+            k: v for k, v in false_case.items() if k != "receipt_sha256"
+        })
+        with self.assertRaises(ResearchError):
+            validate_receipt(false_case, at_date=DAY)
+
+    def test_one_branch_receipt_atomic_repeat_and_staleness_gate(self):
+        with tempfile.TemporaryDirectory() as root:
+            file = Path(root) / "gao.json"
+            data = run(output=file, at_date=DAY)
+            self.assertEqual(data["case_count"], 5)
+            self.assertFalse(data["commercial_reuse_approved_for_customer_engine"])
+            before = file.read_bytes()
+            self.assertTrue(run(output=file, at_date=DAY, verify_only=True)["verified"])
+            self.assertEqual(before, file.read_bytes())
+            run(output=file, at_date=DAY)
+            self.assertEqual(before, file.read_bytes())
+            changed = json.loads(before)
+            changed["verified_retally_recovered_cash_cents"] = 36646
+            file.write_text(json.dumps(changed), encoding="utf-8")
+            with self.assertRaises(ResearchError):
+                run(output=file, at_date=DAY, verify_only=True)
+            with self.assertRaisesRegex(ResearchError,
+                                        "GAO_NUMERIC_RECEIPT_STALE_OR_FUTURE"):
+                validate_receipt(json.loads(before), at_date=DAY + timedelta(days=3))
+
+    def test_missing_source_and_bad_date_are_explicit_failures(self):
+        with patch("freight.gao_motor_freight_numeric.FIXTURE",
+                   Path("/nonexistent/not-original-publisher-document")):
+            with self.assertRaises(ResearchError):
+                make_receipt(DAY)
+        with self.assertRaisesRegex(ResearchError, "GAO_NUMERIC_RECEIPT_DATE_INVALID"):
+            make_receipt(date(2026, 10, 23))
+        with self.assertRaisesRegex(ResearchError, "GAO_NUMERIC_RECEIPT_DATE_INVALID"):
+            make_receipt("2026-10-24")
+        self.assertTrue(FIXTURE.name.startswith("gao_motor_freight"))
+
+
+if __name__ == "__main__":
+    unittest.main()

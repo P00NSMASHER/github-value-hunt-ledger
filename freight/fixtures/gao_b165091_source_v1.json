@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B165091_ADJUDICATED_TARIFF_CONTRAST_V1",
+  "status": "HISTORICAL_INDEPENDENT_PUBLISHER_HOLDOUT_CANDIDATE_NOT_INVOICE_SCORING",
+  "evidence_lane": "freight_error_adjudication",
+  "cohort": {
+    "name": "GAO_HISTORICAL_TARIFF_CONTRAST",
+    "decision_records": 2,
+    "independent_publisher_decision": true,
+    "independent_holdout_against_engine_training_verified": false,
+    "case_by_case_original_invoice_validation_available": false
+  },
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "case_number": "B-165091",
+    "original_record_url": "https://www.gao.gov/products/b-165091",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_date": "1969-01-03",
+    "shipment_year": 1965,
+    "contested_settlement_year": 1968,
+    "historical_tariff": "Southern Motor Carriers Rate Conference Rules Tariff 517-V, item 2400",
+    "source_format": "PUBLISHER_HTML_DECISION_TEXT",
+    "source_bytes_sha256": null,
+    "source_bytes_acquired": false,
+    "rights_status": "GAO_US_PUBLIC_DOMAIN_WITH_ATTRIBUTION_AND_THIRD_PARTY_CAUTION",
+    "commercial_use_of_engine_input_approved": false
+  },
+  "adjudications": [
+    {
+      "id": "TK-868190",
+      "government_bol_id": "C-6534503",
+      "status": "FINAL_GAO_SUSTAINED_17980_OVERCHARGE_DEDUCTION",
+      "decision_complete": true,
+      "original_paid_exclusive_use_charge_cents": 45050,
+      "adjudicated_sustained_deduction_cents": 17980,
+      "shipper_seal_number_recorded": true,
+      "contemporaneous_written_exclusive_use_order_verified": false,
+      "postshipment_shipper_letter_cannot_cure_order": true,
+      "verified_retally_recovered_cash_cents": 0,
+      "independently_verified_refund_received_cents": null
+    },
+    {
+      "id": "TK-867598",
+      "government_bol_id": "C-4318196",
+      "status": "REOPEN_ALLOW_CLAIM_IF_OTHERWISE_CORRECT",
+      "decision_complete": false,
+      "original_claimed_additional_charges_cents": 39324,
+      "finally_allowed_amount_cents": null,
+      "independently_verified_refund_received_cents": null,
+      "verified_retally_recovered_cash_cents": 0
+    }
+  ],
+  "contrasting_source": {
+    "case_number": "B-215958",
+    "url": "https://www.gao.gov/products/b-215958",
+    "decision_date": "1984-12-05",
+    "historical_tariff": "NASI Rules Tariff 190-A, item 470(b)/(c)",
+    "scope": "NUMBERED_SEAL_CLAUSE_DISTINCT_FROM_517V_WRITTEN_ORDER_CLAUSE",
+    "per_gbl_labels_available": false
+  },
+  "controls": [
+    {
+      "id": "SYNTHETIC_SEAL_ALWAYS_OVERRIDES_WRITTEN_ORDER",
+      "synthetic": true,
+      "expected": "REJECT_CROSS_TARIFF_TRANSFER",
+      "real_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_39324_IMMEDIATELY_PAID",
+      "synthetic": true,
+      "expected": "UNKNOWN_CONDITIONAL_CLAIM_NOT_CONFIRMED_PAYMENT",
+      "real_invoice_error_cents": null
+    }
+  ],
+  "limits": {
+    "current_tariff_or_customer_contract_validity": false,
+    "complete_original_invoices_obtained": false,
+    "original_gbl_or_bill_bytes_obtained": false,
+    "decision_level_historical_ground_truth_only": true,
+    "independent_invoice_error_accuracy_scoring_permitted": false,
+    "independent_holdout_release_eligible": false,
+    "monetary_label_scope": "17980_CENTS_SUSTAINED_DEDUCTION_NOT_RETALLY_RECOVERY",
+    "retally_verified_recoveries_cents": 0
+  },
+  "data_quality": {
+    "review_date": "2026-10-24",
+    "publication_date": "1969-01-03",
+    "label_completeness": "ONE_FINAL_SUSTAINED_17980_DEDUCTION_ONE_CONDITIONAL_39324_CLAIM",
+    "decision_text_cross_checked_with_publisher_search_index": true,
+    "original_html_payload_hash_unavailable": true,
+    "original_invoice_or_gbl_images_unavailable": true,
+    "all_case_identifiers_from_published_government_decision": true,
+    "private_medical_student_customer_material_used": false
+  },
+  "manifest_hash_contract": "RESEARCH_AUTHORED_MANIFEST_SHA256_CANONICAL_SORTED_JSON_EXCLUDING_SELF_NOT_PUBLISHER_ORIGINAL_SOURCE_BYTES",
+  "manifest_sha256": "b617550c268d53cd7d3cba82ad0c76242295156d478b0e97b0f329974be4ab64"
+}

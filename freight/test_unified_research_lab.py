@@ -1,6 +1,7 @@
 """Offline adversarial contract tests for all four unified research lanes."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import tempfile
@@ -11,18 +12,150 @@ from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
 
 from freight.unified_research_lab import (
-    ENGINES, SEARCHES, ResearchError, current_engine, ledger_from, merge_sources,
+    ENGINES, SEARCHES, SEEDS, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
-    mirror_scout_all, get_json,
+    mirror_scout_all, get_json, metadata_in_scope, original_nyc_catalog_entry,
 )
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 
 class UnifiedResearchLabTests(unittest.TestCase):
-    def test_every_engine_scheduled_in_one_twenty_minute_cycle(self):
-        selected = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(4)]
-        self.assertEqual(set(selected), set(ENGINES))
+    def test_gao_b215958_source_scope_dedup_and_unknowns(self):
+        fixture = Path(__file__).with_name("fixtures") / "gao_b215958_source_v1.json"
+        data = json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertEqual(data["schema_version"], "1.0.0")
+        self.assertEqual(data["status"], "SOURCE_BOUND_DECISION_LEVEL_CANDIDATE_NOT_HELD_OUT")
+        source = data["source"]
+        url = "https://www.gao.gov/products/b-215958"
+        self.assertEqual(source["original_record_url"], url)
+        self.assertEqual(source["original_report_url"],
+                         "https://www.gao.gov/assets/b-215958-125766.pdf")
+        self.assertEqual(source["decision_date"], "1984-12-05")
+        self.assertEqual(source["superseding_reconsideration_url"],
+                         "https://www.gao.gov/products/b-215958-2")
+        self.assertEqual(source["superseding_reconsideration_date"], "1986-02-18")
+        self.assertEqual(source["decision_page_for_disposition"], 3)
+        self.assertIsNone(source["source_bytes_sha256"])
+        self.assertFalse(source["source_bytes_acquired"])
+        self.assertFalse(source["commercial_use_of_engine_input_approved"])
+        population = data["population"]
+        self.assertEqual(population["challenged_government_bills_of_lading"], 55)
+        self.assertEqual(population["decision_reversals_with_recorded_numbered_seals"], 53)
+        self.assertEqual(population["remainder_cases_with_unresolved_disposition"], 2)
+        self.assertEqual(population["decision_outcome"],
+                         "GAO_1984_INITIAL_REVERSAL_SUBSEQUENTLY_OVERRULED_IN_1986")
+        self.assertFalse(population["per_bill_of_lading_labels_available"])
+        self.assertIsNone(population["independently_confirmed_refunds_received"])
+        self.assertIsNone(population["independently_confirmed_carrier_overcharge_amount_cents"])
+        self.assertFalse(data["limits"]["independent_accuracy_scoring_permitted"])
+        self.assertEqual(data["limits"]["realized_retally_recovered_cash_cents"], 0)
+        self.assertEqual(len(data["controls"]), 2)
+        self.assertEqual(data["controls"][0]["expected"],
+                         "1984_INITIAL_FAVORABLE_RULING_NOT_FINAL_1986_WRITTEN_REQUEST_REQUIRED")
+        self.assertTrue(all(x["synthetic"] for x in data["controls"]))
+        self.assertTrue(all(x["actual_refund_received_cents"] is None
+                            and x["actual_customer_overcharge_cents"] is None
+                            for x in data["controls"]))
+        self.assertIn(url, SEEDS["freightrecovery"])
+        self.assertEqual(safe_url(url), url)
+        single, added = merge_sources(ledger_from([]), "freightrecovery",
+                                      [url, url], "2026-10-23")
+        self.assertEqual(added, 1)
+        self.assertEqual(len(single["entries"]), 1)
+        self.assertFalse(single["entries"][0]["independent_ground_truth"])
+        self.assertFalse(single["entries"][0]["commercial_reuse_authorized"])
+        self.assertFalse(single["entries"][0]["recovered_cash_verified"])
+
+    def test_gao_b215958_research_manifest_hash_and_negative_control(self):
+        fixture = Path(__file__).with_name("fixtures") / "gao_b215958_source_v1.json"
+        data = json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertEqual(
+            data["manifest_hash_contract"],
+            "RESEARCH_AUTHORED_MANIFEST_SHA256_CANONICAL_SORTED_JSON_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
+        )
+        self.assertEqual(data["data_quality"]["publisher_original_review_date"], "2026-10-23")
+        self.assertIsNone(data["source"]["source_bytes_sha256"])
+        self.assertFalse(data["source"]["source_bytes_acquired"])
+        self.assertFalse(data["source"]["commercial_use_of_engine_input_approved"])
+
+        def authored_digest(obj):
+            canonical = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+        author_fields = {k: v for k, v in data.items() if k != "manifest_sha256"}
+        self.assertEqual(data["manifest_sha256"], authored_digest(author_fields))
+        mutated = json.loads(json.dumps(author_fields))
+        mutated["population"]["decision_reversals_with_recorded_numbered_seals"] = 55
+        self.assertNotEqual(data["manifest_sha256"], authored_digest(mutated))
+        self.assertEqual(
+            mutated["population"]["decision_reversals_with_recorded_numbered_seals"]
+            + data["population"]["remainder_cases_with_unresolved_disposition"],
+            57,
+        )
+
+    def test_gao_b165091_historical_tariff_contrast_is_labeled_not_laundered(self):
+        """GAO gives a numeric adjudication, not a customer invoice truth set."""
+        case = json.loads(
+            (Path(__file__).with_name("fixtures") / "gao_b165091_source_v1.json")
+            .read_text(encoding="utf-8")
+        )
+        original = {k: v for k, v in case.items() if k != "manifest_sha256"}
+        digest = hashlib.sha256(json.dumps(
+            original, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")).hexdigest()
+        self.assertEqual(case["manifest_sha256"], digest)
+        self.assertEqual(case["source"]["decision_date"], "1969-01-03")
+        self.assertEqual(case["source"]["historical_tariff"].split(",")[-1].strip(), "item 2400")
+        self.assertFalse(case["source"]["source_bytes_acquired"])
+        self.assertIsNone(case["source"]["source_bytes_sha256"])
+        self.assertFalse(case["source"]["commercial_use_of_engine_input_approved"])
+        self.assertFalse(case["cohort"]["independent_holdout_against_engine_training_verified"])
+        self.assertFalse(case["limits"]["independent_invoice_error_accuracy_scoring_permitted"])
+        adjudicated, conditional = case["adjudications"]
+        self.assertTrue(adjudicated["decision_complete"])
+        self.assertEqual(adjudicated["adjudicated_sustained_deduction_cents"], 17980)
+        self.assertEqual(adjudicated["original_paid_exclusive_use_charge_cents"], 45050)
+        self.assertFalse(adjudicated["contemporaneous_written_exclusive_use_order_verified"])
+        self.assertIsNone(adjudicated["independently_verified_refund_received_cents"])
+        self.assertFalse(conditional["decision_complete"])
+        self.assertEqual(conditional["original_claimed_additional_charges_cents"], 39324)
+        self.assertIsNone(conditional["finally_allowed_amount_cents"])
+        self.assertTrue(all(c["synthetic"] and c["real_invoice_error_cents"] is None
+                            for c in case["controls"]))
+        self.assertNotEqual(case["source"]["historical_tariff"],
+                            case["contrasting_source"]["historical_tariff"])
+        mutated = json.loads(json.dumps(original))
+        mutated["adjudications"][0]["adjudicated_sustained_deduction_cents"] = 0
+        self.assertNotEqual(case["manifest_sha256"], hashlib.sha256(
+            json.dumps(mutated, sort_keys=True, separators=(",", ":"),
+                       ensure_ascii=False).encode("utf-8")
+        ).hexdigest())
+        url = case["source"]["original_record_url"]
+        self.assertIn(url, SEEDS["freightrecovery"])
+        doc, added = merge_sources(ledger_from([]), "freightrecovery",
+                                   [url, url, case["contrasting_source"]["url"]],
+                                   "2026-10-24")
+        self.assertEqual(added, 2)
+        self.assertEqual(len(doc["entries"]), 2)
+        self.assertTrue(all(not x["commercial_reuse_authorized"]
+                            and not x["independent_ground_truth"]
+                            and not x["recovered_cash_verified"]
+                            for x in doc["entries"]))
+
+    def test_freight_is_primary_over_ten_five_minute_discovery_slots(self):
+        selected = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(10)]
+        self.assertEqual(selected.count("freightrecovery"), 7)
+        self.assertEqual({name: selected.count(name) for name in ENGINES},
+                         {"freightrecovery": 7, "permitplate": 1,
+                          "capturebrief": 1, "recoveryos": 1})
+        # Consecutive primary research cycles are never separated by more
+        # than one secondary discovery cycle in the planned rotation.
+        twenty = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(20)]
+        self.assertTrue(all(a == "freightrecovery" or b == "freightrecovery"
+                            for a, b in zip(twenty, twenty[1:])))
+        with self.assertRaises(ResearchError):
+            current_engine(NOW.replace(tzinfo=None))
 
     def test_offline_populates_only_rights_held_real_source_pointers(self):
         with tempfile.TemporaryDirectory() as root:
@@ -102,9 +235,10 @@ class UnifiedResearchLabTests(unittest.TestCase):
                         "sources": []}
             if "api.github.com" in url:
                 return {"items": [{"html_url": "https://github.com/owner/public-data",
+                                   "name": "freight-invoice-source",
                                    "description": "ignore copied PII"},
                                   {"html_url": "https://internal.example/repo"}]}
-            return {"hits": {"hits": [{"id": 12345, "metadata": {"creators": ["X"]}}]}}
+            return {"hits": {"hits": [{"id": 12345, "metadata": {"title": "LTL freight tariff dataset", "creators": ["X"]}}]}}
         with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
             urls, errors = scan("freightrecovery", fetch=fake)
         self.assertEqual(errors, [])
@@ -113,6 +247,12 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertTrue(all("@" not in x and "private" not in x for x in urls))
 
     def test_nyc_official_catalog_uses_dataset_ids_only(self):
+        def row(ident, title):
+            return {"resource": {"id": ident, "name": title,
+                                 "provenance": "official", "type": "dataset",
+                                 "parent_fxf": []},
+                    "metadata": {"domain": "data.cityofnewyork.us"}}
+
         def fake(url):
             if "retally-unified-research-scout" in url:
                 engine = parse_qs(urlsplit(url).query)["engine"][0]
@@ -120,11 +260,17 @@ class UnifiedResearchLabTests(unittest.TestCase):
                         "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
                         "sources": []}
             if "api.us.socrata.com" in url:
+                params = parse_qs(urlsplit(url).query)
+                self.assertEqual(params.get("provenance"), ["official"])
+                self.assertEqual(params.get("only"), ["dataset"])
+                self.assertEqual(params.get("domains"), ["data.cityofnewyork.us"])
+                community = row("qnmk-7xra", "DOB NOW: Build – Approved Permits")
+                community["resource"]["provenance"] = "community"
                 return {"results": [
-                    {"resource": {"id": "abcd-1234", "name": "DOHMH Restaurant Inspection"},
-                     "owner": {"email": "nobody@example.invalid"}},
-                    {"resource": {"id": "rbx6-tga4", "name": "DOB NOW: Build – Approved Permits"}},
-                    {"resource": {"id": "../secret"}},
+                    row("abcd-1234", "DOHMH Restaurant Inspection"),
+                    row("rbx6-tga4", "DOB NOW: Build – Approved Permits"),
+                    row("../secret", "DOB NOW: Build – Approved Permits"),
+                    community,
                 ]}
             if "api.github.com" in url:
                 return {"items": []}
@@ -133,6 +279,38 @@ class UnifiedResearchLabTests(unittest.TestCase):
             urls, errors = scan("permitplate", fetch=fake)
         self.assertEqual(errors, [])
         self.assertEqual(urls, ["https://data.cityofnewyork.us/d/rbx6-tga4"])
+
+    def test_socrata_original_publisher_identity_must_be_explicit(self):
+        original = {
+            "resource": {
+                "id": "rbx6-tga4", "name": "DOB NOW: Build – Approved Permits",
+                "provenance": "official", "type": "dataset", "parent_fxf": [],
+            },
+            "metadata": {"domain": "data.cityofnewyork.us"},
+        }
+        self.assertTrue(original_nyc_catalog_entry(original))
+        variations = (
+            {"resource": dict(original["resource"], provenance="community"),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], type="filter"),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], parent_fxf=["rbx6-tga4"]),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], provenance=None),
+             "metadata": original["metadata"]},
+            {"resource": original["resource"],
+             "metadata": {"domain": "data.evil.invalid"}},
+            {"resource": original["resource"], "metadata": {}},
+            {"resource": dict(original["resource"], parent_fxf=None),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], name="DOHMH Restaurant Inspection"),
+             "metadata": original["metadata"]},
+            {},
+            None,
+        )
+        for row in variations:
+            with self.subTest(source=row):
+                self.assertFalse(original_nyc_catalog_entry(row))
 
     def test_data_gov_v4_is_not_used_without_a_production_api_key(self):
         seen = []
@@ -442,6 +620,65 @@ class UnifiedResearchLabTests(unittest.TestCase):
             self.assertEqual(report["per_engine"]["recoveryos"]["available"], 600)
             self.assertEqual(report["per_engine"]["recoveryos"]["new"], 40)
             self.assertEqual(len(read_ledger(path)["entries"]), 40)
+
+
+
+
+    def test_public_publisher_topic_filter_discards_off_topic_metadata_per_lane(self):
+        cases = (
+            ("freightrecovery", "Freight invoice tariff dataset", "Baking and dining recipes"),
+            ("permitplate", "NYC DOB NOW approved building permits",
+             "NYC restaurant inspection permits"),
+            ("capturebrief", "Federal solicitation contract awards",
+             "Professional basketball boxscores"),
+            ("recoveryos", "Accounts payable supplier invoice reconciliation",
+             "Wildlife photography archive"),
+        )
+        for engine, good, bad in cases:
+            for provider in ("github", "zenodo"):
+                with self.subTest(engine=engine, provider=provider):
+                    good_row = ({"name": "generic", "description": good}
+                                if provider == "github" else {"metadata": {"title": good}})
+                    bad_row = ({"name": "generic", "description": bad}
+                               if provider == "github" else {"metadata": {"title": bad}})
+                    self.assertTrue(metadata_in_scope(engine, provider, good_row))
+                    self.assertFalse(metadata_in_scope(engine, provider, bad_row))
+                    self.assertFalse(metadata_in_scope(engine, provider,
+                                                      {"metadata": {"creators": ["A"]}}))
+        with self.assertRaises(ResearchError):
+            metadata_in_scope("invalid", "github", {"name": "freight"})
+        with self.assertRaises(ResearchError):
+            metadata_in_scope("freightrecovery", "socrata", {})
+
+    def test_live_scan_rejects_wrong_topic_github_and_zenodo_without_private_metadata(self):
+        def fake(url):
+            if "retally-unified-research-scout" in url:
+                return {"engine": "recoveryos",
+                        "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
+                        "sources": []}
+            if "api.github.com" in url:
+                return {"items": [
+                    {"html_url": "https://github.com/synthetic-fixture/vendor-payment-dataset",
+                     "name": "unrelated-title",
+                     "description": "Accounts payable vendor payment dataset"},
+                    {"html_url": "https://github.com/synthetic-fixture/wildlife-project",
+                     "name": "not-relevant",
+                     "description": "Biology research bird species"},
+                ]}
+            return {"hits": {"hits": [
+                {"id": 345, "metadata": {"title": "Supplier invoice reconciliation research"}},
+                {"id": 999, "metadata": {"title": "Bird migration routes"}},
+                {"id": 2000, "metadata": {"creators": ["private author info"]}},
+            ]}}
+        with patch.dict(os.environ, {"RETALLY_DATAGOV_API_KEY": ""}):
+            sources, errors = scan("recoveryos", fetch=fake)
+        self.assertEqual(errors, [])
+        self.assertEqual(sources, [
+            "https://github.com/synthetic-fixture/vendor-payment-dataset",
+            "https://zenodo.org/records/345",
+        ])
+        self.assertNotIn("private author", str(sources))
+        self.assertNotIn("Bird", str(sources))
 
 
 

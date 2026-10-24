@@ -22,10 +22,17 @@ from freight.unified_research_lab import (
 OUTPUT = ROOT / "source_review_queue_v1.json"
 MAX_REVIEW_PER_ENGINE = 8
 SCOPE = "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED"
+# Verified community-created NYC Open Data derivatives (publisher portal, 2026-10-23).
+# Review-only provenance. The original NYC DOB dataset remains separately eligible.
+NYC_UNENDORSED_DERIVATIVE_VIEW_IDS = frozenset({"qnmk-7xra", "un34-bxqh"})
+
 PUBLIC_REVIEW_ANCHORS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
+        # Control against the overruled 1984 ruling and controlling 1986 reconsideration.
+        "https://www.gao.gov/products/b-215958",
+        "https://www.gao.gov/products/b-215958-2",
         "https://www.stb.gov/reports-data/waybill/",
     ),
     "permitplate": (
@@ -99,6 +106,9 @@ def _classify(engine: str, row: dict) -> tuple[int, str]:
     host = row["publisher"]
     url = row["url"]
     path = urlsplit(url).path
+    if (engine == "permitplate" and host == "data.cityofnewyork.us"
+            and path.rstrip("/").rsplit("/", 1)[-1] in NYC_UNENDORSED_DERIVATIVE_VIEW_IDS):
+        return 4, "NYC_COMMUNITY_CREATED_DERIVATIVE_VIEW_REVIEW_ONLY"
     if host in OFFICIAL_HOSTS:
         if url in PUBLIC_REVIEW_ANCHORS[engine]:
             return 0, "PINNED_PUBLIC_ANCHOR_URL_ONLY"
@@ -148,6 +158,7 @@ def build_queue(ledger: dict, as_of: date) -> dict:
             "official_publisher_host_url_only": sum(x[0] == 1 for x in choices),
             "third_party_path_topic_hints_only": sum(x[0] == 2 for x in choices),
             "unclassified_third_party_catalogs_only": sum(x[0] == 3 for x in choices),
+            "known_nyc_community_derivative_views_review_only": sum(x[0] == 4 for x in choices),
         }
         lanes[engine] = {
             "catalog_source_associations": len(choices) + exclusions[engine],

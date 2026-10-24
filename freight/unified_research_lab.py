@@ -20,6 +20,14 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 ENGINES = ("freightrecovery", "permitplate", "capturebrief", "recoveryos")
+# GitHub discovery now prioritizes FreightRecovery 7/10 planned slots,
+# preserving bounded secondary discovery and all four nightly regressions.
+DISCOVERY_ROTATION = (
+    "freightrecovery", "freightrecovery", "permitplate",
+    "freightrecovery", "freightrecovery", "capturebrief",
+    "freightrecovery", "freightrecovery", "recoveryos",
+    "freightrecovery",
+)
 ROOT = Path(__file__).resolve().parent / "research_lab"
 LEDGER = ROOT / "leads.json"
 MAX_ENTRIES = 3000
@@ -44,6 +52,18 @@ SEEDS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
+        "https://www.gao.gov/products/b-215958",  # Initial 1984 53/55 decision OVERRULED in 1986.
+        "https://www.gao.gov/products/b-215958-2",  # Controlling Feb 18 1986 GAO reconsideration; GSA deduction sustained.
+        "https://www.gao.gov/products/b-165091",  # Distinct tariff; published $179.80 sustained deduction only.
+        "https://www.gao.gov/products/b-221594-0",  # GAO invalidated historical rejected-tender $220.75 deduction; negative only.
+        "https://www.gao.gov/products/b-189100",  # GAO 1977 original GBL A-6018184 classification; historical $2634.38 deduction only.
+        "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
+        # New source-bound reported numeric cases; original invoices not held.
+        "https://www.gao.gov/products/b-191257",  # 1978 Yellow Freight $828 / $796 / $32.
+        "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.
+        "https://www.gao.gov/products/b-148465",  # 1962 $546.88 paid / $61.22; SCOTUS caveat.
+        "https://www.gao.gov/products/b-143048",  # 1960 two shipments; $130.30 aggregate only.
+        "https://www.gao.gov/products/b-146511-2",  # 1965 conflicting reclaim figures; offset $20.74.
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
@@ -186,6 +206,76 @@ def permitplate_catalog_in_scope(resource: dict) -> bool:
                 and not re.search(r"\b(restaurant|inspection)\b", title, re.I))
 
 
+def original_nyc_catalog_entry(item: dict) -> bool:
+    """Only accept original publisher datasets, not community-saved views.
+
+    A public NYC host and DOB title are insufficient for source provenance.
+    This remains unverified source metadata, not issuance truth or reuse rights.
+    """
+    if type(item) is not dict:
+        return False
+    resource, metadata = item.get("resource"), item.get("metadata")
+    return bool(type(resource) is dict and type(metadata) is dict
+                and resource.get("provenance") == "official"
+                and resource.get("type") == "dataset"
+                and type(resource.get("parent_fxf")) is list
+                and not resource["parent_fxf"]
+                and metadata.get("domain") == "data.cityofnewyork.us"
+                and permitplate_catalog_in_scope(resource))
+
+
+# Purely advisory public catalog **metadata** screening; no original source
+# bytes, scraped descriptions, identities, metadata titles or approvals persist.
+TOPIC_TERMS = {
+    "freightrecovery": ("freight", "trucking", "truckload", "ltl", "bill of lading",
+                        "shipment invoice", "shipping cost", "carrier invoice",
+                        "carrier rate", "transportation cost", "logistics invoice",
+                        "tariff"),
+    "permitplate": ("dob now", "nyc dob", "nyc building permit",
+                    "new york building permit", "building permit",
+                    "construction permit", "permit issuance", "approved permits",
+                    "dob filing"),
+    "capturebrief": ("sam gov", "usaspending", "federal contract",
+                     "federal procurement", "federal solicitation",
+                     "government contract", "government procurement",
+                     "public tender", "public procurement", "rfp",
+                     "contract awards"),
+    "recoveryos": ("accounts payable", "account payable", "vendor payment",
+                   "supplier payment", "supplier invoice",
+                   "invoice reconciliation", "payment reconciliation",
+                   "invoice dataset", "duplicate invoice",
+                   "public sector spending", "spending transparency"),
+}
+
+
+def metadata_in_scope(engine: str, provider: str, row: dict) -> bool:
+    """Search-result topic hint only; never rights, relevance or outcome proof."""
+    if engine not in ENGINES:
+        raise ResearchError("INVALID_ENGINE")
+    if provider not in ("github", "zenodo"):
+        raise ResearchError("UNSUPPORTED_PROVIDER")
+    if type(row) is not dict:
+        return False
+    if provider == "github":
+        fields = (row.get("name"), row.get("description"))
+    else:
+        metadata = row.get("metadata")
+        title = metadata.get("title") if type(metadata) is dict else None
+        fields = (title if title is not None else row.get("title"),)
+    def norm(value):
+        return re.sub(r"[^a-z0-9]+", " ", value[:512].lower()).strip() if type(value) is str else ""
+    body = " ".join(filter(None, map(norm, fields)))
+    if not body:
+        return False
+    padded = " " + body + " "
+    if engine == "permitplate" and any(
+            token in padded for token in (" restaurant ", " inspection ",
+                                           " food safety ", " yelp ",
+                                           " dining out ")):
+        return False
+    return any(" " + term + " " in padded for term in TOPIC_TERMS[engine])
+
+
 def source_record(url: str, engine: str, seen: str) -> dict:
     safe_url(url)
     if engine not in ENGINES or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", seen):
@@ -264,7 +354,7 @@ def merge_sources(doc: dict, engine: str, urls: list[str], seen: str, *,
 def current_engine(now: datetime) -> str:
     if now.tzinfo is None:
         raise ResearchError("TIMEZONE_REQUIRED")
-    return ENGINES[int(now.timestamp() // 300) % len(ENGINES)]
+    return DISCOVERY_ROTATION[int(now.timestamp() // 300) % len(DISCOVERY_ROTATION)]
 
 
 MAX_SCOUT_MIRROR_PAGES = 6
@@ -345,6 +435,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                       "https://api.us.socrata.com/api/catalog/v1?" +
                       urlencode({"domains": "data.cityofnewyork.us",
                                  "search_context": "data.cityofnewyork.us",
+                                 "provenance": "official", "only": "dataset",
                                  "q": "NYC DOB building permit",
                                  "limit": "20"})))
     if os.environ.get("RETALLY_DATAGOV_API_KEY"):
@@ -378,9 +469,9 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                     if type(item) is not dict:
                         continue
                     url = item.get("html_url")
-                    if type(url) is str and re.fullmatch(
+                    if (type(url) is str and re.fullmatch(
                         r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", url
-                    ):
+                    ) and metadata_in_scope(engine, "github", item)):
                         urls.append(url)
             elif provider == "socrata":
                 rows = data.get("results", [])
@@ -392,14 +483,15 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                     resource = item.get("resource")
                     ident = resource.get("id") if type(resource) is dict else None
                     if (type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident)
-                            and permitplate_catalog_in_scope(resource)):
+                            and original_nyc_catalog_entry(item)):
                         urls.append("https://data.cityofnewyork.us/d/" + ident)
             else:
                 hits = data.get("hits", {}).get("hits", [])
                 if type(hits) is not list:
                     raise ResearchError("INVALID_PROVIDER_ROWS")
                 for item in hits[:15]:
-                    if type(item) is dict and str(item.get("id", "")).isdigit():
+                    if (type(item) is dict and re.fullmatch(r"[1-9][0-9]{0,14}", str(item.get("id", "")))
+                            and metadata_in_scope(engine, "zenodo", item)):
                         urls.append("https://zenodo.org/records/" + str(item["id"]))
             successful += 1
         except ResearchError as exc:

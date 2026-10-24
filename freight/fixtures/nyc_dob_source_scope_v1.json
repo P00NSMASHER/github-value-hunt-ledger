@@ -1,0 +1,162 @@
+{
+  "acceptance_boundaries": {
+    "customer_outreach_authorized": false,
+    "fixture_test_pass": "SOURCE_SCOPE_CONTRACT_ONLY_NOT_ENGINE_INTEGRATION",
+    "independent_labels_count": 0,
+    "money_actions_authorized": false,
+    "source_url_evidence": "OFFICIAL_PUBLISHER_PAGES_WITH_CRAWL_DATE",
+    "truth_unknown_count": 4
+  },
+  "accuracy_evaluation": "NOT_ESTIMABLE_WITHOUT_INDEPENDENT_LABELS",
+  "caveats": [
+    "Source records are not ingested or redistributable from this review pack.",
+    "No actual permit status, property identity, external customer conversion or model precision/recall is independently adjudicated.",
+    "The PermitPlate production NYC DOB adapter currently uses application filings w9ak-ipjd; the approved-permits rbx6-tga4 source is only a candidate for separately owned suitability review."
+  ],
+  "commercial_rights": "UNVERIFIED_NOT_APPROVED",
+  "consumer_repository": "P00NSMASHER/permitplate-nyc",
+  "consumer_source_adapter_blob_sha": "10a917573ea9f58de11e904fdb11d475afd4b328",
+  "engine": "permitplate",
+  "evaluation_family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
+  "evidence_records_downloaded": 0,
+  "last_publisher_review_date": "2026-10-23",
+  "manifest_sha256": "637481a48cddf47100aa2aeb3832aa4a2675786826f9001caad9a4d6e3a667cc",
+  "official_sources": [
+    {
+      "authority_limit": "Application does not by itself establish an issued or currently valid permit. This application catalog excludes Electrical, Elevator and Limited Alteration Application jobs; a nonmatch does not prove no permit exists.",
+      "commercial_reuse_authorized": false,
+      "confirmed_fields": [
+        "job_filing_number",
+        "filing_status",
+        "filing_date",
+        "bin"
+      ],
+      "coverage": "DOB_NOW_APPLICATIONS_NOT_ISSUANCE",
+      "dataset_id": "w9ak-ipjd",
+      "dataset_title": "DOB NOW: Build – Job Application Filings",
+      "event_type": "JOB_APPLICATION",
+      "excluded_work_types": [
+        "ELECTRICAL",
+        "ELEVATOR",
+        "LIMITED_ALTERATION_APPLICATION"
+      ],
+      "independent_outcome_adjudicated": false,
+      "last_observed_publisher_update_date": null,
+      "official_url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+      "original_source_bytes_sha256": null,
+      "publisher": "New York City Department of Buildings",
+      "rights_class": "NYC_PORTAL_PUBLIC_TERMS_AND_DATASET_SUPPLEMENT_CHECK_REQUIRED",
+      "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+      "schema_descriptor_sha256": "e27ee7d096cbcee445ec4983c4693a6c5340df31c1c2736259e985629dd29678"
+    },
+    {
+      "authority_limit": "An approved-permits dataset record can contain the literal placeholder Permit is not yet issued; do not infer issuance from dataset membership alone.",
+      "commercial_reuse_authorized": false,
+      "confirmed_fields": [
+        "job_filing_number",
+        "work_permit",
+        "sequence_number",
+        "filing_reason",
+        "work_type"
+      ],
+      "coverage": "DOB_NOW_BUILD_EXCLUDING_ELECTRICAL_ELEVATOR_LAA",
+      "dataset_id": "rbx6-tga4",
+      "dataset_title": "DOB NOW: Build – Approved Permits",
+      "event_type": "PERMIT_RECORD",
+      "excluded_work_types": [
+        "ELECTRICAL",
+        "ELEVATOR",
+        "LIMITED_ALTERATION_APPLICATION"
+      ],
+      "independent_outcome_adjudicated": false,
+      "last_observed_publisher_update_date": "2026-10-21",
+      "official_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+      "original_source_bytes_sha256": null,
+      "publisher": "New York City Department of Buildings",
+      "rights_class": "NYC_PORTAL_PUBLIC_TERMS_AND_DATASET_SUPPLEMENT_CHECK_REQUIRED",
+      "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+      "schema_descriptor_sha256": "b37055eddeb71ac534a8e3c7203b151689e67a0b9f714e6dc0862dc25dc0b7b9"
+    },
+    {
+      "authority_limit": "BIS-only permits are not a census of newer DOB NOW records; do not treat nonmatch as no permit.",
+      "commercial_reuse_authorized": false,
+      "confirmed_fields": [
+        "permit_si_no",
+        "borough",
+        "job__",
+        "job_type",
+        "work_type"
+      ],
+      "coverage": "BIS_ONLY_NOT_DOB_NOW",
+      "dataset_id": "ipu4-2q9a",
+      "dataset_title": "DOB Permit Issuance",
+      "event_type": "PERMIT_RECORD",
+      "excluded_work_types": [],
+      "independent_outcome_adjudicated": false,
+      "last_observed_publisher_update_date": "2026-10-20",
+      "official_url": "https://data.cityofnewyork.us/d/ipu4-2q9a",
+      "original_source_bytes_sha256": null,
+      "publisher": "New York City Department of Buildings",
+      "rights_class": "NYC_PORTAL_PUBLIC_TERMS_AND_DATASET_SUPPLEMENT_CHECK_REQUIRED",
+      "rights_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+      "schema_descriptor_sha256": "abdf38b142ad9eca36a769bdbe212c94151697f8a3e227159e13dbf177c55fb2"
+    }
+  ],
+  "pack_generated_date": "2026-10-23",
+  "pack_id": "RETALLY_NYC_DOB_SOURCE_SCOPE_V1",
+  "real_issuance_cases_ingested": 0,
+  "research_base_main_sha": "3f1a1357f2b744e897a60645b713d4b7a93c7112",
+  "research_repository": "P00NSMASHER/github-value-hunt-ledger",
+  "schema_descriptor_hash_contract": "RESEARCH_AUTHORED_DESCRIPTOR_SHA256_OF_CANONICAL_JSON_EXCLUDING_SELF_NOT_ORIGINAL_SOURCE_BYTES",
+  "schema_version": 1,
+  "source_review_kind": "OFFICIAL_PUBLISHER_METADATA_AND_RESEARCH_AUTHORED_DESCRIPTORS_NOT_SOURCE_BYTES",
+  "synthetic_negative_controls": [
+    {
+      "dataset_id": "w9ak-ipjd",
+      "expected_decision": "UNKNOWN_NO_ISSUANCE_EVIDENCE",
+      "id": "filing_is_not_issuance",
+      "provenance_class": "SYNTHETIC_SCHEMA_NEGATIVE_CONTROL",
+      "real_world_accuracy_label": null,
+      "row_fields": {
+        "filing_status": "Approved",
+        "job_filing_number": "SYNTHETIC-FILING-001"
+      },
+      "untrusted_claim": "ISSUED_PERMIT"
+    },
+    {
+      "dataset_id": "rbx6-tga4",
+      "expected_decision": "NOT_ISSUED_ACCORDING_TO_SOURCE_FIELD",
+      "id": "approved_permits_can_include_pending",
+      "provenance_class": "SYNTHETIC_SCHEMA_NEGATIVE_CONTROL",
+      "real_world_accuracy_label": null,
+      "row_fields": {
+        "job_filing_number": "SYNTHETIC-FILING-002",
+        "work_permit": "Permit is not yet issued"
+      },
+      "untrusted_claim": "ISSUED_PERMIT"
+    },
+    {
+      "dataset_id": "ipu4-2q9a",
+      "expected_decision": "INVALID_COVERAGE_CLAIM",
+      "id": "bis_coverage_is_not_all_dob",
+      "provenance_class": "SYNTHETIC_SCHEMA_NEGATIVE_CONTROL",
+      "real_world_accuracy_label": null,
+      "row_fields": {
+        "job__": "SYNTHETIC-BIS-003"
+      },
+      "untrusted_claim": "DOB_NOW_COMPLETE_BY_BIS_ALONE"
+    },
+    {
+      "dataset_id": "w9ak-ipjd",
+      "expected_decision": "UNKNOWN_OUT_OF_SCOPE_NOT_NO_PERMIT",
+      "id": "job_applications_electrical_nonmatch_is_unknown",
+      "provenance_class": "SYNTHETIC_SCHEMA_NEGATIVE_CONTROL",
+      "real_world_accuracy_label": null,
+      "row_fields": {
+        "catalog_match": false,
+        "work_type": "ELECTRICAL"
+      },
+      "untrusted_claim": "NO_PERMIT_EXISTS_FROM_NONMATCH"
+    }
+  ]
+}
