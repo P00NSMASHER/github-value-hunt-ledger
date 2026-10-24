@@ -790,6 +790,22 @@
       "engines": [
         "permitplate"
       ],
+      "first_seen": "2026-10-24",
+      "id": "0eea2eb8c7a02e0cffedfc080b9ca7a7bc6e4e67becbc58fab4268d225b04eb2",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/gsgx-6efw"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
       "first_seen": "2026-10-23",
       "id": "0f742810f7ee82bf71156873340a62ef2c25b92ddef10a1c6535687e4c300e62",
       "independent_ground_truth": false,
@@ -975,6 +991,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/20715516"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "130890e025a23a8e38161daebaea6cabc9bebee5f3919f35e0a75fcaa63bae50",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/16941837"
     },
     {
       "commercial_reuse_authorized": false,
@@ -1220,6 +1252,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "18e30fda3ee596d483c1cb9f54f256494d5e9db3771a174d15ce59d48e771a14",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/20487872"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -1367,6 +1415,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "1c2b6c7bda3d0efaccdbc222d779cf857319d948a7fb861e1b40fdf533981b42",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/8386873"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "1c8b20a7793501788081b897a4e803c2f552c55c1cc6c08226cd9b543b953e97",
       "independent_ground_truth": false,
@@ -1440,6 +1504,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/tamdwin23-ux/AI-APGuard-Enterprise-Accounts-Payable-Invoice-Exception-Payment-Control"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "1d94e17a7922181366a05f54b0f6473b8229cb63826b164524229562de4ec3b9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/13890656"
     },
     {
       "commercial_reuse_authorized": false,
@@ -1814,6 +1894,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "24854e2b06b35015d45e30ca368aae7a6385a7c298bb46efe7ba9fec28cb1cc6",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/bhjadhav/Analyzing-Building-and-Safety-Permit-using-Big-Data"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -1857,6 +1953,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/19808968"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "2540446513ba7cd78fd73f88e6daf9f4c6018ce7b29c9548939ce24e2f2285fd",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/xmmq-y7za"
     },
     {
       "commercial_reuse_authorized": false,
@@ -2337,6 +2449,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/7943004"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "317cdc7a62f93d33fb47330309d8d27bc843cf7ef572acae051dc3ef061c0fd6",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/1491528"
     },
     {
       "commercial_reuse_authorized": false,
@@ -2870,6 +2998,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "3bd2dffa8d0522937cedc83a92f2afa37ee16d056c175af735d225e1847c3046",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/cj3v-xdpd"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -3009,6 +3153,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/15600923"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "402e39b6ee7edd2d14fabb8890f515427db3f15b45bc060bd1ab9ef63bb1076f",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/hcv3-zacv"
     },
     {
       "commercial_reuse_authorized": false,
@@ -3378,6 +3538,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://www.gao.gov/products/b-143048"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "491db36ef9ff1562b25c802e47c46c0b265e46fd676bb01731877f2f224a966a",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/18417960"
     },
     {
       "commercial_reuse_authorized": false,
@@ -3769,6 +3945,22 @@
       "engines": [
         "recoveryos"
       ],
+      "first_seen": "2026-10-24",
+      "id": "536a68a5d96b5fc8395152dfcae95937fcf3433e683cdb17897eff287165e554",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/RajaKumar785/AI-Invoice-Reconciliation-Platform"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
       "first_seen": "2026-10-23",
       "id": "5394ed35f7bced8d6f48e805346c0da13ad9e8a2ef9e7ed2575d321a1732ac60",
       "independent_ground_truth": false,
@@ -3858,6 +4050,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/Salomiairy11/VendorLite"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "55f6a568ddabacd6a8f6689cdf18ff382f500e5ab6c5ab0e43fa642e7819f12b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/6451698"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4146,6 +4354,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/biborsz/Search-Federal-Contract-Opportunities"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "5bd57af63a50c11a3fd4e546676e9f5126835d4aed33ee652fdfb6cc7805c909",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/21236962"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4777,6 +5001,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "685b057179e2b0bcc1a3eb5e0df79a1b0dac8290c021c0dad198416798dfa60a",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/3416567"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "692829dd3c665aa66cb1ea839e012d0330c04b45b0ea7ddcc44a5e47ddbffa77",
       "independent_ground_truth": false,
@@ -5271,6 +5511,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "784a2b7b9bae054c8807e50b9128036267f225e6b6405341fe3a63b7076ac381",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/xubg-57si"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-24",
@@ -5640,6 +5896,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "8399c4d883df96e776ee2aaa1de563ecd39c517a7d785f995b850b0a07aab388",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/8332903"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -5731,6 +6003,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/7134230"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "8678515373fe58dcff6c03ab01d812506e45f9d0160fa6ad2ae0a908a9ec2cbf",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/21476648"
     },
     {
       "commercial_reuse_authorized": false,
@@ -6330,6 +6618,22 @@
       "engines": [
         "permitplate"
       ],
+      "first_seen": "2026-10-24",
+      "id": "945468feac5ebfe423f55a70ddb46d6c16e1e0021524605b29454f71219fc1e6",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/tqtj-sjs8"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
       "first_seen": "2026-10-23",
       "id": "9478df1e302b2ea8b8b1bd33fd42cbb3b0ca47e2d8ef9690212c8522909e0e0a",
       "independent_ground_truth": false,
@@ -6506,6 +6810,22 @@
       "engines": [
         "recoveryos"
       ],
+      "first_seen": "2026-10-24",
+      "id": "97d9163088fb9e6cfd3affb6b7468f1250635d308ece5d46bf8393bf15d66a29",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Dharm3112/Odoo-x-KSV-Virtual-Round-"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
       "first_seen": "2026-10-23",
       "id": "98a358a6b2833d880f74a8addedba450785a2dd33556ccf52433c6dfae7815bc",
       "independent_ground_truth": false,
@@ -6563,6 +6883,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/timogashon-cloud/billship"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "994c4843d8a54bd54bce47ec06283852092f96253c119557e48dfdde89fcb90b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/kancharlavamshi/ai-invoice-reconciliation"
     },
     {
       "commercial_reuse_authorized": false,
@@ -7354,6 +7690,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "aa8e5ecfd43305676af74d13e5e3c8ae826f473ac343e1c6c790b2d564963db3",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/14736242"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "aadac3bf2f5bd56ae236d069cbc74d8310d73a8fb50ac18764e883d6377031d1",
       "independent_ground_truth": false,
@@ -7363,6 +7715,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/4836084"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "ab042ad78414dc6e4763ade7439c9948146fab94109fa040cb042cbe4adbe16e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/c9sj-fmsg"
     },
     {
       "commercial_reuse_authorized": false,
@@ -7640,6 +8008,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "b01fca3e83943341fc5e47c178b922ffcc228f1f712c32bebb7982d81c359a05",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/16941584"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -7747,6 +8131,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/7139621"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "b37a09156164d43362cc77b99ec3e684f872da612098c66ee8522870ceda1609",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/yogitachandok31-code/automated-ap-workflow"
     },
     {
       "commercial_reuse_authorized": false,
@@ -7923,6 +8323,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/18754351"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "b83083810c79aab6f508b61299f2947e1117d2cb7cfe7e3ce2c859972363fee3",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/9fnm-j6if"
     },
     {
       "commercial_reuse_authorized": false,
@@ -8505,6 +8921,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "c61ef1e9c171d98d619c8a95279b2b93b4b388e331f0d351d739e20bee7bdee3",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/AATHTHIPANDI/IntelliRecon-AI-Invoice-Reconciliation"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-24",
@@ -8596,6 +9028,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/api-evangelist/opereit"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "c8b330c493439212673ecd76282d8ff1e2efcbb09fe0c4add3db347265a3b483",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/1120159"
     },
     {
       "commercial_reuse_authorized": false,
@@ -9114,6 +9562,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "d27cb4b81135fef1f6ab1e5e6784fc1e091c392636f14aa9eae0ece52f80f99e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/SyedaUswaZahra/Invoice_Line-Item_Reconciliation_Assistant"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -9397,6 +9861,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/14516325"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "d6ca0949da6b3f56950d16945cc3512220ba721d4d2e2933ed76290ba144ead9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/applywizzgitprojects-png/Procurement-Supplier-Performance-Analytics-Platform"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10203,6 +10683,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "e80faa29bcd9f5e7da487349b8a7d3ad5de858eb8b365ecffaf97f319ef97220",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/arjun29G/Procurement-Supplier-Performance-Analytics-Platform"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -10310,6 +10806,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/6601088"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "eb3dc819981194ad6f6b49c578b316f71008b31102d9e72b92d626078cfd5596",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/3358470"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10454,6 +10966,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://data.cityofnewyork.us/d/ic3t-wcy2"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "ee62b1d31c1249f820b742a3abc6ce027136be9f72138cb9b624007223174b7a",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Asadmunir-dev/ADAMJEE-ENG-FREIGHT-INVOICE"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10662,6 +11190,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/alwxander922x/bvb-invoice"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "f23c517bafc18a945fb735fc1bca9ba2c7a28a849b62210d2970fbebfedc6a04",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/7857817"
     },
     {
       "commercial_reuse_authorized": false,
@@ -11308,6 +11852,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "ff5cc3c850475bd3cfffd0e2255aae81c952c5b433bfa1f7e79853fab08a8ac0",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/pbk5-6r7z"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -11337,6 +11897,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "4798a1769aa7cb6fa9ac89fd417064ad15b69ccc2789e6ec770e2696a6d72765",
+  "entries_sha256": "7cc1e3ade5a179c7ff3457bcc293901592c412baa6f0330f6885704493358570",
   "schema_version": 1
 }

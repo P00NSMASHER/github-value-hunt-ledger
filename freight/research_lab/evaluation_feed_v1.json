@@ -232,6 +232,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "130890e025a23a8e38161daebaea6cabc9bebee5f3919f35e0a75fcaa63bae50",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/16941837",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "15e71ca704a6156e070d5cc19bcce1648cb50abee94e98a600cab7cfc31cfc7b",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -257,6 +282,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "18e30fda3ee596d483c1cb9f54f256494d5e9db3771a174d15ce59d48e771a14",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/20487872",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "1bff448e0c42428ca9644817bdbfb4f457d19c95d21162e1a6ce56911348aa47",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -273,6 +323,56 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/dpk-rdy/ParcelLens",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "1c2b6c7bda3d0efaccdbc222d779cf857319d948a7fb861e1b40fdf533981b42",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/8386873",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "1d94e17a7922181366a05f54b0f6473b8229cb63826b164524229562de4ec3b9",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/13890656",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -407,6 +507,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "317cdc7a62f93d33fb47330309d8d27bc843cf7ef572acae051dc3ef061c0fd6",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/1491528",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "491543ed5115293741e70d01778a6d7b31185dfb02db1eb8f70a1688fffbf7bb",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -423,6 +548,31 @@
       "source_document_ingested": false,
       "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
       "source_url": "https://www.gao.gov/products/b-143048",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "491db36ef9ff1562b25c802e47c46c0b265e46fd676bb01731877f2f224a966a",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/18417960",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -457,6 +607,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "55f6a568ddabacd6a8f6689cdf18ff382f500e5ab6c5ab0e43fa642e7819f12b",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/6451698",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "5a06c324b375a4b1b6177fa51479b1397db882ce022a82b057a9f239feeae5a4",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -473,6 +648,56 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/whistlenrye/customs-doc-extractor",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "5bd57af63a50c11a3fd4e546676e9f5126835d4aed33ee652fdfb6cc7805c909",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/21236962",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "685b057179e2b0bcc1a3eb5e0df79a1b0dac8290c021c0dad198416798dfa60a",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/3416567",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -557,6 +782,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "8399c4d883df96e776ee2aaa1de563ecd39c517a7d785f995b850b0a07aab388",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/8332903",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "8659de030562093aee9ac5a4b989d0827139e709431310af4b8ee4ebc6fe4103",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -573,6 +823,31 @@
       "source_document_ingested": false,
       "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
       "source_url": "https://www.gao.gov/products/b-215958-2",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "8678515373fe58dcff6c03ab01d812506e45f9d0160fa6ad2ae0a908a9ec2cbf",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/21476648",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -698,6 +973,56 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/huncho-tensei/recovery-desk",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "aa8e5ecfd43305676af74d13e5e3c8ae826f473ac343e1c6c790b2d564963db3",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/14736242",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "b01fca3e83943341fc5e47c178b922ffcc228f1f712c32bebb7982d81c359a05",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/16941584",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -882,6 +1207,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "c8b330c493439212673ecd76282d8ff1e2efcbb09fe0c4add3db347265a3b483",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/1120159",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "d4dab4926003fbec3a7d1cb69e8cd6674ea5991989fe63cc646f4c9fb865df1c",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -982,6 +1332,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "eb3dc819981194ad6f6b49c578b316f71008b31102d9e72b92d626078cfd5596",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/3358470",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "ecd07c474f29d5f5b760a61e35742a13b0d61cc565e3ff26bdf4916e21a359fe",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -998,6 +1373,31 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/fernandonavg/ParcelFlow-OCR",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "ee62b1d31c1249f820b742a3abc6ce027136be9f72138cb9b624007223174b7a",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Asadmunir-dev/ADAMJEE-ENG-FREIGHT-INVOICE",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -1048,6 +1448,31 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/SarthakTallamraju1510/TallyR",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "f23c517bafc18a945fb735fc1bca9ba2c7a28a849b62210d2970fbebfedc6a04",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/7857817",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -5108,7 +5533,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "1717666500a50521449b9ebfa3cc072679aa323ee8dfd2134d0190840eaaa244",
+  "feed_sha256": "d103f1c67f0db98bdf82bd805bb5e771a9010a3ac69115e16ee516cbd5df3cb9",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -5120,12 +5545,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 204,
-  "source_pointers_total": 204,
+  "selected_for_synthetic_proof_gate": 221,
+  "source_pointers_total": 221,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "d955db7b7ccf1be9c0360bb7eec17515143bd164b1446090fd55a2ec07a76d4e",
     "lab15_evidence_metadata_sha256": "da475a22485a99c58e0fdc9623e4e9e254d29114571ee9c7af98744880a51c7b",
-    "unified_entries_sha256": "4798a1769aa7cb6fa9ac89fd417064ad15b69ccc2789e6ec770e2696a6d72765"
+    "unified_entries_sha256": "7cc1e3ade5a179c7ff3457bcc293901592c412baa6f0330f6885704493358570"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 10,
   "verified_recovered_cash_cents": 0
