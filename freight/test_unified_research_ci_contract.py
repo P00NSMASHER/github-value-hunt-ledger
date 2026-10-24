@@ -87,7 +87,9 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(verify.splitlines().count(command), 1)
         for key in (
             "canonical_v2_original_invoice_adjustment_lab",
-            "canonical_v2_records_with_exact_net",
+            "canonical_invoice_records_with_exact_source_net",
+            "canonical_v2_adjustment_records_with_exact_source_net",
+            "canonical_v1_charge_only_records_with_exact_source_net",
             "discount_bearing_v2_records",
             "rate_review_required",
             "independent_invoice_overcharge_labels",
