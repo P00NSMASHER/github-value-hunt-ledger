@@ -120,7 +120,8 @@ def fetch_original() -> bytes:
             if response.headers.get("Content-Encoding", "identity").strip().lower() != "identity":
                 raise _fail("SOURCE_ENCODING_UNSUPPORTED")
             media = response.headers.get("Content-Type", "").split(";", 1)[0].lower().strip()
-            if media not in {"text/csv", "text/plain", "application/octet-stream"}:
+            if media not in {"text/csv", "text/plain", "application/octet-stream",
+                             "application/vnd.ms-excel"}:
                 raise _fail("SOURCE_MEDIA_UNSUPPORTED")
             declared = response.headers.get("Content-Length")
             expected = None
@@ -234,6 +235,8 @@ def parse_archive(raw: bytes, *, observed_at: datetime) -> dict:
             # solicitation numbers and row bytes never escape this scope.
     except (csv.Error, UnicodeDecodeError, ValueError) as exc:
         raise _fail("SOURCE_CSV_SCHEMA_INVALID") from exc
+    if row_count == 0:
+        raise _fail("SOURCE_CSV_SCHEMA_INVALID")
     return {
         "current_source_size_bytes": len(raw),
         "current_source_sha256": hashlib.sha256(raw).hexdigest(),
@@ -284,9 +287,9 @@ def assess_cross_source_chronology(
     signed = _posted_date(award.get("award_date_signed"))
     if posted is None or signed is None:
         return "SOURCE_DATE_UNKNOWN"
-    if posted > signed:
+    if posted >= signed:
         return "FUTURE_POSTED_NOTICE_NOT_PREAWARD"
-    if source_day > signed:
+    if source_day >= signed:
         # Crucial anti-leakage guard: PostedDate is not proof the specific
         # archived source was captured before the award happened.
         return "ARCHIVE_OBSERVED_AFTER_AWARD_NOT_ASOF"
