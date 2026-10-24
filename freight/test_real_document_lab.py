@@ -133,6 +133,15 @@ class LaboratoryTests(unittest.TestCase):
             "BOL_HEADER_IDENTIFIER_PRINTED_ONLY": 1,
             "BOL_HEADER_PLACEHOLDER_ONLY": 2,
         })
+        self.assertEqual(inventory["printed_pricing_bol_joint_class_counts"], {
+            "CONFLICTING_PRINTED_TARIFF_REFERENCES|BOL_HEADER_PLACEHOLDER_ONLY": 1,
+            "PRINTED_ABF_ACCOUNT_REFERENCE_ONLY|BOL_HEADER_PLACEHOLDER_ONLY": 1,
+            "PRINTED_VOLUME_QUOTE_MARKER_ONLY|BOL_HEADER_IDENTIFIER_PRINTED_ONLY": 1,
+        })
+        self.assertEqual(inventory["printed_vpq_with_bol_header_identifier_only"], 1)
+        self.assertEqual(inventory["printed_vpq_without_bol_header_identifier"], 0)
+        self.assertEqual(inventory["original_bol_quote_id_correspondence_independently_verified"], 0)
+        self.assertTrue(inventory["printed_bol_header_is_not_original_bol_custody"])
         self.assertTrue(inventory["source_pdf_printed_reference_not_executed_rate_contract"])
         for k in (
             "original_customer_quote_documents_independently_verified",
@@ -151,6 +160,36 @@ class LaboratoryTests(unittest.TestCase):
             self.assertNotIn(forbidden, summary)
         again = arcbest_printed_rate_bol_reference_census(faces, pages, sha)
         self.assertEqual(inventory, again)
+
+    def test_vpq_two_invoice_headers_never_establish_quote_id_on_original_bol(self):
+        """One VPQ-printed BOL id and one placeholder: zero authoritative BOLs."""
+        pages = [
+            ("ORIGINAL INVOICE\nFreight bill No: 352112867\n"
+             "Tariff: VPQ\nBill of Lading No: SEE BELOW\n"),
+            ("ORIGINAL INVOICE\nFreight bill No: 051894063\n"
+             "Tariff: VPQ\nBill of Lading No: SAMPLE-ID-NOT-ORIGINAL\n"),
+        ]
+        faces = [
+            InvoiceFace("arcbest", "352112867", 1, 35178,
+                        None, "2024-05-07", "LTL"),
+            InvoiceFace("arcbest", "051894063", 2, 212379,
+                        None, "2024-05-02", "LTL"),
+        ]
+        q = arcbest_printed_rate_bol_reference_census(
+            faces, pages, FROZEN_DOCUMENT_SHA256["arcbest"])
+        self.assertEqual(q["printed_vpq_with_bol_header_identifier_only"], 1)
+        self.assertEqual(q["printed_vpq_without_bol_header_identifier"], 1)
+        self.assertEqual(sum(q["printed_pricing_bol_joint_class_counts"].values()), 2)
+        self.assertEqual(q["original_bol_quote_id_correspondence_independently_verified"], 0)
+        self.assertEqual(q["independently_custodied_original_bol_documents"], 0)
+        self.assertEqual(q["shipment_effective_customer_rate_authorities_verified"], 0)
+        self.assertEqual(q["independently_scored_customer_overcharges"], 0)
+        self.assertEqual(q["third_party_contacts"], 0)
+        import json
+        out = json.dumps(q)
+        self.assertNotIn("SAMPLE-ID-NOT-ORIGINAL", out)
+        self.assertNotIn("352112867", out)
+        self.assertNotIn("051894063", out)
 
     def test_arcbest_tariff_bol_reference_source_identity_is_fail_closed(self):
         sha = FROZEN_DOCUMENT_SHA256["arcbest"]
