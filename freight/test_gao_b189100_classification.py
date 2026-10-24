@@ -23,7 +23,7 @@ def fixture():
 def verify(doc):
     if digest({k: v for k, v in doc.items() if k != "manifest_sha256"}) != doc.get("manifest_sha256"):
         raise ResearchError("GAO_B189100_MANIFEST_TAMPER")
-    s, f, lim, cap = doc["source"], doc["facts"], doc["limits"]
+    s, f, lim, cap = doc["source"], doc["facts"], doc["limits"], doc["capacity_evidence"]
     if not (
         doc["schema_version"] == "1.0.0"
         and doc["evidence_lane"] == "freight_error_adjudication"
