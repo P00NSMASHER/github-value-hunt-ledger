@@ -1,6 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, providerMetadataInScope, cycle} from "./research_lab_worker.mjs";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, providerMetadataInScope, originalNYCPublisherDataset, cycle} from "./research_lab_worker.mjs";
+
+function officialNYC(id, name) {
+  return {
+    resource:{id,name,provenance:"official",type:"dataset",parent_fxf:[]},
+    metadata:{domain:"data.cityofnewyork.us"},
+  };
+}
 
 test("all four engines have bounded catalog-only probes", () => {
   assert.equal(ENGINES.length,4);
@@ -25,8 +32,8 @@ test("source IDs, not arbitrary metadata or private source rows, enter discovery
     {id:"../123"},
   ]}},"freightrecovery"),["https://zenodo.org/records/987654321"]);
   assert.deepEqual(canonicalCandidates("socrata",{results:[
-    {resource:{id:"abcd-1234",name:"DOB NOW: Build – Approved Permits"}},
-    {resource:{id:"../../passwd"}},
+    officialNYC("abcd-1234","DOB NOW: Build – Approved Permits"),
+    officialNYC("../../passwd","DOB NOW: Build – Approved Permits"),
   ]},"permitplate"),["https://data.cityofnewyork.us/d/abcd-1234"]);
 });
 test("missing or malformed API responses fail closed", ()=>{
@@ -84,10 +91,10 @@ test("PermitPlate excludes restaurant inspection catalogs from its permit leads"
   const q = feedSpecs("permitplate").map(s => new URL(s.url).searchParams.get("q") || "");
   assert.ok(q.every(x => !/restaurant|inspection/i.test(x)));
   assert.deepEqual(canonicalCandidates("socrata", {results: [
-    {resource:{id:"abcd-1234",name:"DOHMH Restaurant Inspection"}},
-    {resource:{id:"rbx6-tga4",name:"DOB NOW: Build – Approved Permits"}},
-    {resource:{id:"ipu4-2q9a",name:"DOB Permit Issuance"}},
-    {resource:{id:"w9ak-ipjd",name:"DOB NOW: Job Application Filings"}},
+    officialNYC("abcd-1234","DOHMH Restaurant Inspection"),
+    officialNYC("rbx6-tga4","DOB NOW: Build – Approved Permits"),
+    officialNYC("ipu4-2q9a","DOB Permit Issuance"),
+    officialNYC("w9ak-ipjd","DOB NOW: Job Application Filings"),
   ]},"permitplate"), [
     "https://data.cityofnewyork.us/d/ipu4-2q9a",
     "https://data.cityofnewyork.us/d/rbx6-tga4",
@@ -127,6 +134,75 @@ test("bounded catalogs rotate query terms and pages without extra network budget
   assert.notDeepEqual(feedSpecs("capturebrief",start),feedSpecs("capturebrief",start+100*1200000));
   assert.throws(()=>feedSpecs("recoveryos",Number.NaN),/INVALID_SCHEDULE_TIME/);
   assert.equal(feedSpecs("permitplate",start).filter(x=>x.provider==="socrata").length,1);
+});
+
+test("all lanes rotate nine distinct subject families without increasing provider calls",()=>{
+  const base=Date.UTC(2026,9,24,0,0,0);
+  for(const engine of ENGINES){
+    const githubQueries=new Set(), zenodoQueries=new Set(), plans=new Set();
+    const officialQueries=new Set(), officialOffsets=new Set();
+    for(let lap=0;lap<45;lap++){
+      const when=base+lap*1200000;
+      const specs=feedSpecs(engine,when);
+      assert.equal(specs.filter(s=>s.provider==="github").length,2);
+      assert.equal(specs.filter(s=>s.provider==="zenodo").length,1);
+      assert.equal(specs.length,engine==="permitplate"?4:3);
+      for(const spec of specs){
+        const u=new URL(spec.url);
+        if(spec.provider==="github"){
+          assert.equal(u.hostname,"api.github.com");
+          assert.equal(u.searchParams.get("per_page"),"15");
+          githubQueries.add(u.searchParams.get("q"));
+        }else if(spec.provider==="zenodo"){
+          assert.equal(u.hostname,"zenodo.org");
+          assert.equal(u.searchParams.get("size"),"15");
+          zenodoQueries.add(u.searchParams.get("q"));
+        }else if(spec.provider==="socrata"){
+          assert.equal(u.hostname,"api.us.socrata.com");
+          assert.equal(u.searchParams.get("domains"),"data.cityofnewyork.us");
+          assert.equal(u.searchParams.get("limit"),"15");
+          assert.equal(u.searchParams.get("provenance"),"official");
+          assert.equal(u.searchParams.get("only"),"dataset");
+          officialQueries.add(u.searchParams.get("q"));
+          officialOffsets.add(u.searchParams.get("offset"));
+        }
+      }
+      plans.add(specs.map(x=>x.url).join("|"));
+      assert.deepEqual(feedSpecs(engine,when),specs,"schedule must be deterministic");
+    }
+    assert.equal(githubQueries.size,9,engine+" GitHub query diversity");
+    assert.equal(zenodoQueries.size,9,engine+" Zenodo query diversity");
+    assert.ok(plans.size>=27,engine+" non-repeating bounded search windows");
+    if(engine==="permitplate"){
+      assert.equal(officialQueries.size,3);
+      assert.deepEqual([...officialOffsets].sort(),["0","15","30"]);
+    }else {
+      assert.equal(officialQueries.size,0);
+    }
+  }
+});
+
+test("official NYC provenance gate rejects community views, derived filters, and spoofed domains",()=>{
+  const official=officialNYC("rbx6-tga4","DOB NOW: Build – Approved Permits");
+  assert.equal(originalNYCPublisherDataset(official),true);
+  const candidates=[
+    official,
+    {...official,resource:{...official.resource,id:"qnmk-7xra",provenance:"community"}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrb",type:"filter",parent_fxf:["rbx6-tga4"]}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrc",parent_fxf:["rbx6-tga4"]}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrd",provenance:"unknown"}},
+    {...official,resource:{...official.resource,id:"qnmk-7xre",provenance:undefined}},
+    {...official,metadata:{domain:"data.evil.invalid"},resource:{...official.resource,id:"qnmk-7xrf"}},
+    {...official,metadata:{},resource:{...official.resource,id:"qnmk-7xrg"}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrh",parent_fxf:undefined}},
+  ];
+  const selected=canonicalCandidates("socrata",{results:candidates},"permitplate");
+  assert.deepEqual(selected,["https://data.cityofnewyork.us/d/rbx6-tga4"]);
+  for(const c of candidates.slice(1)){
+    assert.equal(originalNYCPublisherDataset(c),false,c.resource?.id);
+  }
+  assert.equal(originalNYCPublisherDataset(null),false);
+  assert.equal(originalNYCPublisherDataset({resource:null}),false);
 });
 
 test("D1 source publication uses one bounded atomic batch with rights holds",async()=>{
