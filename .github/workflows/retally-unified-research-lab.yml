@@ -23,6 +23,8 @@ on:
       - "freight/test_gao_motor_freight_numeric.py"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
+      - "freight/freight_evidence_chain_readiness.py"
+      - "freight/test_freight_evidence_chain_readiness.py"
       - "freight/test_gao_b221594_negative_control.py"
       - "freight/test_gao_b189100_classification.py"
       - "freight/fixtures/gao_motor_freight_numeric_v1.json"
@@ -64,6 +66,8 @@ on:
       - "freight/test_gao_motor_freight_numeric.py"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
+      - "freight/freight_evidence_chain_readiness.py"
+      - "freight/test_freight_evidence_chain_readiness.py"
       - "freight/test_gao_b221594_negative_control.py"
       - "freight/test_gao_b189100_classification.py"
       - "freight/fixtures/gao_motor_freight_numeric_v1.json"
@@ -103,6 +107,8 @@ jobs:
         run: |
           python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py freight/test_gao_b221594_negative_control.py freight/test_gao_b189100_classification.py
           python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
+          python -m py_compile freight/freight_evidence_chain_readiness.py freight/test_freight_evidence_chain_readiness.py
+          python -m unittest -q freight.test_freight_evidence_chain_readiness
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -483,9 +489,11 @@ jobs:
       - name: Original freight and accounts-payable source regression
         run: |
           set -euo pipefail
-          python -m unittest -q freight.test_real_document_lab
+          python -m unittest -q freight.test_real_document_lab freight.test_freight_evidence_chain_readiness
           python -m pytest -q freight/test_public_pennine_integration.py freight/test_pennine_republication_integrity.py
           python -m freight.real_document_lab --output /tmp/retally-real-lab.json
+          python -m freight.freight_evidence_chain_readiness --source /tmp/retally-real-lab.json --output /tmp/retally-freight-evidence-chain-readiness-v1.json
+          python -m freight.freight_evidence_chain_readiness --source /tmp/retally-real-lab.json --output /tmp/retally-freight-evidence-chain-readiness-v1.json --verify
           python - <<'PY'
           import json
           report=json.load(open('/tmp/retally-real-lab.json', encoding='utf-8'))
@@ -512,7 +520,27 @@ jobs:
           assert signed['independent_invoice_overcharge_labels'] == 0
           assert signed['recovered_cash_cents'] == 0
           assert report['blinded_freight_error_evaluation']['unknown_cases_preserved'] == 110
+          chain=json.load(open('/tmp/retally-freight-evidence-chain-readiness-v1.json', encoding='utf-8'))
+          assert chain['original_invoice_faces_observed'] == 110
+          assert chain['original_net_amounts_reconciled_to_signed_components'] == 100
+          assert chain['globaltranz_source_adjustment_v2_cases'] == 93
+          assert chain['globaltranz_positive_only_v1_cases'] == 7
+          assert chain['globaltranz_open_statement_identity_and_original_amount_matches'] == 100
+          assert chain['eligible_independently_scored_customer_invoices'] == 0
+          assert chain['verified_retally_recovered_cash_cents'] == 0
+          assert chain['modern_rate_authority_proven'] is False
+          assert chain['federal_guidance_scope'] == 'FEDERAL_GSA_REFERENCE_ONLY_NOT_PRIVATE_CUSTOMER_LEGAL_AUTHORITY'
+          assert set(chain['missing_chain_evidence_from_current_lab'].values()) == {110}
           print('Original GlobalTranz: 100 original invoice nets preserved (93 source-bound v2 adjustments + 7 v1 charge-only), all REVIEW_REQUIRED, zero scored overcharges')
+          print('Freight evidence chain: 110 source invoice faces; 0 independent rate/BOL/payment/outcome chains; source-verified arithmetic is not recovered cash')
+          import os
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('### FreightRecovery: original-document evidence readiness\n')
+              summary.write('- Two frozen original freight PDFs; 110 face amounts recovered.\n')
+              summary.write('- 100 signed original GlobalTranz nets conserved; 93 version-2 adjustment-bearing records.\n')
+              summary.write('- 0 verified shipment-specific rate + independent BOL + bank payment + outcome chains.\n')
+              summary.write('- GSA federal audit guidance used as a reference checklist, NOT private law.\n')
+              summary.write('- No real customer overcharges, licensed processing, or RETALLY cash proven.\n')
           PY
       - name: Replay live research branch and frozen FreightRecovery numerical cases
         run: |
