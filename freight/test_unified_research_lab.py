@@ -14,7 +14,7 @@ from unittest.mock import patch
 from freight.unified_research_lab import (
     ENGINES, SEARCHES, SEEDS, ResearchError, current_engine, ledger_from, merge_sources,
     read_ledger, run, safe_url, scan, source_record, validate_ledger,
-    mirror_scout_all, get_json, metadata_in_scope,
+    mirror_scout_all, get_json, metadata_in_scope, original_nyc_catalog_entry,
 )
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
@@ -237,6 +237,12 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertTrue(all("@" not in x and "private" not in x for x in urls))
 
     def test_nyc_official_catalog_uses_dataset_ids_only(self):
+        def row(ident, title):
+            return {"resource": {"id": ident, "name": title,
+                                 "provenance": "official", "type": "dataset",
+                                 "parent_fxf": []},
+                    "metadata": {"domain": "data.cityofnewyork.us"}}
+
         def fake(url):
             if "retally-unified-research-scout" in url:
                 engine = parse_qs(urlsplit(url).query)["engine"][0]
@@ -244,11 +250,17 @@ class UnifiedResearchLabTests(unittest.TestCase):
                         "scope": "PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA",
                         "sources": []}
             if "api.us.socrata.com" in url:
+                params = parse_qs(urlsplit(url).query)
+                self.assertEqual(params.get("provenance"), ["official"])
+                self.assertEqual(params.get("only"), ["dataset"])
+                self.assertEqual(params.get("domains"), ["data.cityofnewyork.us"])
+                community = row("qnmk-7xra", "DOB NOW: Build – Approved Permits")
+                community["resource"]["provenance"] = "community"
                 return {"results": [
-                    {"resource": {"id": "abcd-1234", "name": "DOHMH Restaurant Inspection"},
-                     "owner": {"email": "nobody@example.invalid"}},
-                    {"resource": {"id": "rbx6-tga4", "name": "DOB NOW: Build – Approved Permits"}},
-                    {"resource": {"id": "../secret"}},
+                    row("abcd-1234", "DOHMH Restaurant Inspection"),
+                    row("rbx6-tga4", "DOB NOW: Build – Approved Permits"),
+                    row("../secret", "DOB NOW: Build – Approved Permits"),
+                    community,
                 ]}
             if "api.github.com" in url:
                 return {"items": []}
@@ -257,6 +269,38 @@ class UnifiedResearchLabTests(unittest.TestCase):
             urls, errors = scan("permitplate", fetch=fake)
         self.assertEqual(errors, [])
         self.assertEqual(urls, ["https://data.cityofnewyork.us/d/rbx6-tga4"])
+
+    def test_socrata_original_publisher_identity_must_be_explicit(self):
+        original = {
+            "resource": {
+                "id": "rbx6-tga4", "name": "DOB NOW: Build – Approved Permits",
+                "provenance": "official", "type": "dataset", "parent_fxf": [],
+            },
+            "metadata": {"domain": "data.cityofnewyork.us"},
+        }
+        self.assertTrue(original_nyc_catalog_entry(original))
+        variations = (
+            {"resource": dict(original["resource"], provenance="community"),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], type="filter"),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], parent_fxf=["rbx6-tga4"]),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], provenance=None),
+             "metadata": original["metadata"]},
+            {"resource": original["resource"],
+             "metadata": {"domain": "data.evil.invalid"}},
+            {"resource": original["resource"], "metadata": {}},
+            {"resource": dict(original["resource"], parent_fxf=None),
+             "metadata": original["metadata"]},
+            {"resource": dict(original["resource"], name="DOHMH Restaurant Inspection"),
+             "metadata": original["metadata"]},
+            {},
+            None,
+        )
+        for row in variations:
+            with self.subTest(source=row):
+                self.assertFalse(original_nyc_catalog_entry(row))
 
     def test_data_gov_v4_is_not_used_without_a_production_api_key(self):
         seen = []

@@ -189,6 +189,23 @@ def permitplate_catalog_in_scope(resource: dict) -> bool:
                 and not re.search(r"\b(restaurant|inspection)\b", title, re.I))
 
 
+def original_nyc_catalog_entry(item: dict) -> bool:
+    """Only accept original publisher datasets, not community-saved views.
+
+    A public NYC host and DOB title are insufficient for source provenance.
+    This remains unverified source metadata, not issuance truth or reuse rights.
+    """
+    if type(item) is not dict:
+        return False
+    resource, metadata = item.get("resource"), item.get("metadata")
+    return bool(type(resource) is dict and type(metadata) is dict
+                and resource.get("provenance") == "official"
+                and resource.get("type") == "dataset"
+                and type(resource.get("parent_fxf")) is list
+                and not resource["parent_fxf"]
+                and metadata.get("domain") == "data.cityofnewyork.us"
+                and permitplate_catalog_in_scope(resource))
+
 
 # Purely advisory public catalog **metadata** screening; no original source
 # bytes, scraped descriptions, identities, metadata titles or approvals persist.
@@ -401,6 +418,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                       "https://api.us.socrata.com/api/catalog/v1?" +
                       urlencode({"domains": "data.cityofnewyork.us",
                                  "search_context": "data.cityofnewyork.us",
+                                 "provenance": "official", "only": "dataset",
                                  "q": "NYC DOB building permit",
                                  "limit": "20"})))
     if os.environ.get("RETALLY_DATAGOV_API_KEY"):
@@ -448,7 +466,7 @@ def scan(engine: str, fetch=get_json) -> tuple[list[str], list[str]]:
                     resource = item.get("resource")
                     ident = resource.get("id") if type(resource) is dict else None
                     if (type(ident) is str and re.fullmatch(r"[a-z0-9]{4}-[a-z0-9]{4}", ident)
-                            and permitplate_catalog_in_scope(resource)):
+                            and original_nyc_catalog_entry(item)):
                         urls.append("https://data.cityofnewyork.us/d/" + ident)
             else:
                 hits = data.get("hits", {}).get("hits", [])
