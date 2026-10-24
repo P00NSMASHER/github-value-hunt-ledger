@@ -79,6 +79,58 @@ jobs:
         run: |
           python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py
           python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof
+      - name: Diagnose public FY2027 CSV row shape using only aggregate counters
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv, io, json, unicodedata
+          from collections import Counter
+          from freight.capturebrief_sam_fy2027_asof import (
+              fetch_original, _decode_csv, REQUIRED_COLUMNS, _source_token
+          )
+          report = {"scope":"PUBLIC_SOURCE_SHAPE_COUNTS_ONLY"}
+          try:
+              data = fetch_original()
+              report["original_source_bytes"] = len(data)
+              reader = csv.DictReader(io.StringIO(_decode_csv(data),newline=""),restkey="_extra",strict=True)
+              columns = list(reader.fieldnames or [])
+              report["header_count"] = len(columns)
+              report["required_fields_present"] = {
+                  key:(key in columns) for key in sorted(REQUIRED_COLUMNS)
+              }
+              report["duplicated_header_count"] = len(columns)-len(set(columns))
+              report["blank_header_count"] = sum(not isinstance(x,str) or not x.strip() for x in columns)
+              issues = Counter()
+              total=0
+              for row in reader:
+                  total += 1
+                  if "_extra" in row: issues["extra_field_rows"] += 1
+                  if any(row.get(k) is None for k in columns):
+                      issues["missing_field_rows"] += 1
+                  for key,code in [
+                      ("NoticeId","notice"), ("Sol#","solicitation"),
+                      ("AAC Code","agency"), ("Office","office"),
+                  ]:
+                      value=row.get(key)
+                      if value is None:
+                          issues[code+"_missing"] += 1
+                      elif len(value)>180:
+                          issues[code+"_long"] += 1
+                      elif any(unicodedata.category(ch).startswith("C") for ch in value):
+                          issues[code+"_controls"] += 1
+                      if key=="NoticeId" and value is not None and not value.strip():
+                          issues["empty_notice"] += 1
+              report["parsed_source_rows"] = total
+              report["issue_count_by_fixed_type"] = dict(sorted(issues.items()))
+          except Exception as exc:
+              report["diagnostic_failure_class"] = (
+                  type(exc).__name__ if type(exc).__name__ in
+                  ("ResearchError","Error","UnicodeDecodeError","ValueError","TypeError")
+                  else "OTHER_FAILURE"
+              )
+          print(json.dumps(report,sort_keys=True))
+          PY
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
