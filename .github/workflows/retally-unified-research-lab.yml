@@ -500,7 +500,9 @@ jobs:
           source = gt['original_invoice_line_amount_reconciliation']
           assert signed['input_original_pdf_digest_matches_frozen_baseline'] is True
           assert signed['source_bound_adjustment_sha256'] == gt['sha256']
-          assert signed['canonical_v2_records_with_exact_net'] == gt['distinct_invoice_face_ids'] == 100
+          assert signed['canonical_invoice_records_with_exact_source_net'] == gt['distinct_invoice_face_ids'] == 100
+          assert signed['canonical_v2_adjustment_records_with_exact_source_net'] == 93
+          assert signed['canonical_v1_charge_only_records_with_exact_source_net'] == 7
           assert signed['discount_bearing_v2_records'] == source['invoice_faces_containing_negative_discounts'] == 93
           assert signed['rate_review_required'] == 100
           assert signed['unrepresentable_or_missing_source'] == 0
@@ -510,7 +512,7 @@ jobs:
           assert signed['independent_invoice_overcharge_labels'] == 0
           assert signed['recovered_cash_cents'] == 0
           assert report['blinded_freight_error_evaluation']['unknown_cases_preserved'] == 110
-          print('Original GlobalTranz signed invoice source replay: 100 exact v2 records, 93 source discounts, all REVIEW_REQUIRED, zero scored overcharges')
+          print('Original GlobalTranz: 100 original invoice nets preserved (93 source-bound v2 adjustments + 7 v1 charge-only), all REVIEW_REQUIRED, zero scored overcharges')
           PY
       - name: Replay live research branch and frozen FreightRecovery numerical cases
         run: |
