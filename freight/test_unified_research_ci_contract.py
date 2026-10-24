@@ -44,6 +44,40 @@ class ResearchCIVerificationContract(unittest.TestCase):
                 self.assertEqual(triggers.splitlines().count(pattern), 2)
 
 
+    def test_freight_gao_controls_run_in_verify_and_existing_nightly(self):
+        """Guard both decision-level positive and negative freight regressions.
+
+        These cases do not establish customer invoices, modern tariff authority,
+        verified overcharges, source-specific rights, or recovered cash.
+        """
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        verify = workflow.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        nightly = workflow.split("\n  nightly-real-data-replay:\n", 1)[1]
+        names = ("freight.test_gao_b221594_negative_control",
+                 "freight.test_gao_b189100_classification")
+        verify_line = next((line for line in verify.splitlines()
+                            if line.strip().startswith("python -m unittest -v ")), "")
+        nightly_line = (
+            "          python -m unittest -q "
+            "freight.test_gao_b221594_negative_control "
+            "freight.test_gao_b189100_classification"
+        )
+        for module in names:
+            with self.subTest(module=module):
+                self.assertIn(module, verify_line)
+                self.assertIn(module, nightly_line)
+        self.assertEqual(nightly.splitlines().count(nightly_line), 1)
+        self.assertIn("python -m pytest -q freight/test_real_world_eval_v1.py", nightly)
+        self.assertIn("python -m freight.research_eval_bridge", nightly)
+        triggers = workflow.split("\npermissions:\n", 1)[0]
+        for name in ("freight/test_gao_b221594_negative_control.py",
+                     "freight/test_gao_b189100_classification.py"):
+            self.assertEqual(triggers.splitlines().count('      - "' + name + '"'), 2)
+        # Still exactly two pre-existing Cron expressions: no new scheduler.
+        self.assertEqual(triggers.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(triggers.count('cron: "19 3 * * *"'), 1)
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,8 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
       - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/test_gao_b221594_negative_control.py"
+      - "freight/test_gao_b189100_classification.py"
       - "freight/fixtures/gao_motor_freight_numeric_v1.json"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
@@ -58,6 +60,8 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
       - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/test_gao_b221594_negative_control.py"
+      - "freight/test_gao_b189100_classification.py"
       - "freight/fixtures/gao_motor_freight_numeric_v1.json"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
@@ -93,8 +97,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py freight/test_gao_b221594_negative_control.py freight/test_gao_b189100_classification.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -512,6 +516,10 @@ jobs:
           git show origin/research/retally-unified-data-lab:freight/lab15/evidence_ledger.json > /tmp/retally-lab15-evidence.json
           git show origin/research/retally-unified-data-lab:freight/research/lab15_candidate_ledger.json > /tmp/retally-lab15-candidates.json
           python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge
+          # Replay the 1986 invalid-GSA-deduction negative control and 1977
+          # cargo-classification dispute on every nightly original-data run.
+          # They are historical evidence, never independent customer invoice truth.
+          python -m unittest -q freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
           python -m pytest -q freight/test_real_world_eval_v1.py
           python -m freight.research_eval_bridge \
             --ledger /tmp/retally-unified-leads.json \
