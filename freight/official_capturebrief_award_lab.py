@@ -76,6 +76,7 @@ def _query(*, exact_award_id: str | None = None) -> dict:
     if exact_award_id is not None:
         if (type(exact_award_id) is not str
                 or not re.fullmatch(r"[A-Za-z0-9_. /-]{1,90}", exact_award_id)
+                or ".." in exact_award_id
                 or exact_award_id.strip() != exact_award_id):
             raise ResearchError("UNSAFE_AWARD_ID_QUERY")
         # USAspending documents quote-wrapped award IDs for exact matching.
@@ -193,6 +194,7 @@ def _minimal(row: dict) -> dict:
     award = row.get("Award ID")
     if (type(award) is not str
             or not re.fullmatch(r"[A-Za-z0-9_. /-]{1,90}", award)
+            or ".." in award
             or award.strip() != award):
         raise ResearchError("SOURCE_SCHEMA_CHANGED")
     generated = row.get("generated_internal_id")
