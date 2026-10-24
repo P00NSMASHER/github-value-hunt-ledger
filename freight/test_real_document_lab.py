@@ -14,6 +14,7 @@ from freight.real_document_lab import (
     globaltranz_invoice_line_total_benchmark,
     globaltranz_canonical_v2_adjustment_replay, FROZEN_DOCUMENT_SHA256,
     arcbest_printed_rate_bol_reference_census,
+    arcbest_embedded_vpq_quote_reconciliation,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -210,6 +211,118 @@ class LaboratoryTests(unittest.TestCase):
             arcbest_printed_rate_bol_reference_census(
                 [InvoiceFace("arcbest", "352112867", 0, 35178,
                              None, "2024-05-07", "LTL")], [page], sha)
+
+
+    def test_two_co_bundled_original_quotes_match_invoice_math_but_not_bol_custody(self):
+        # All strings below are SYNTHETIC, not the original document's IDs.
+        invoice_min = (
+            "ORIGINAL INVOICE\nFreight bill No: 352112867\n"
+            "Tariff: VPQ\nPQ SCHEDULE NO: SAMPLEQ101A\n"
+            "ITEM 028160-01V 2,610 PPU 2,132.83\n"
+            "LWH: 50 X 45 X 85 INCHES\n"
+        )
+        quote_min = (
+            "Volume Pricing Quotation for Example\n"
+            "Effective Date: 10-MAY-2024\nExpiration Date: 23-MAY-2024\n"
+            "VPQ Quotation ID: SAMPLEQ101-\nA\n"
+            "Weight: 2,610 lbs\n"
+            "Minimum price including Fuel Surcharge* "
+            "(max 14,450 lbs/17 linear ft): $ 2132.83\n"
+            "*Charge per additional linear foot: $ 125.00\n"
+        )
+        invoice_length = (
+            "ORIGINAL INVOICE\nFreight bill No: 051894063\n"
+            "Tariff: VPQ\nPQ SCHEDULE NO: SAMPLEQ202B\n"
+            "ITEM 049880-04V 12,573 PPU 606.00\n"
+            "LWH: 525 X 80 X 72 INCHES\n"
+        )
+        quote_length = (
+            "Volume Pricing Quotation for Example\n"
+            "Effective Date: 15-APR-2024\nExpiration Date: 28-APR-2024\n"
+            "VPQ Quotation ID: SAMPLEQ202-B\n"
+            "Weight: 12,573 lbs\n"
+            "Minimum price including Fuel Surcharge* "
+            "(max 17,000 lbs/20 linear ft): $ 270.00\n"
+            "*Charge per additional linear foot: $ 14.00\n"
+        )
+        faces = [
+            InvoiceFace("arcbest", "352112867", 1, 213283,
+                        None, "2024-05-13", "LTL"),
+            InvoiceFace("arcbest", "051894063", 3, 60600,
+                        None, "2024-04-16", "LTL"),
+        ]
+        text = [invoice_min, quote_min, invoice_length, quote_length]
+        sha = FROZEN_DOCUMENT_SHA256["arcbest"]
+        r = arcbest_embedded_vpq_quote_reconciliation(faces, text, sha)
+        self.assertEqual(r["embedded_original_vpq_quotation_pages"], 2)
+        self.assertEqual(r["vpq_original_invoice_faces"], 2)
+        self.assertEqual(r["same_pdf_exact_quotation_id_invoice_joins"], 2)
+        self.assertEqual(r["invoice_dates_within_printed_quote_effective_window"], 2)
+        self.assertEqual(r["printed_invoice_quoted_weights_agree"], 2)
+        self.assertEqual(r["invoice_amount_equals_printed_quote_minimum"], 1)
+        self.assertEqual(r["conditional_printed_length_formula_matches"], 1)
+        self.assertEqual(r["invoice_quote_money_unresolved"], 0)
+        self.assertTrue(r["quote_and_invoice_documents_are_co_bundled_in_same_source_pdf"])
+        self.assertFalse(r["conditional_length_footage_is_independently_certified"])
+        for name in ("original_signed_bol_quotes_independently_verified",
+                     "separate_quote_acceptance_independently_verified",
+                     "independent_customer_invoice_overcharge_labels",
+                     "bank_cleared_payments_verified",
+                     "verified_retally_recovered_cash_cents",
+                     "raw_invoice_quote_bol_identifiers_exported",
+                     "customer_contact_actions"):
+            self.assertEqual(r[name], 0, name)
+        import json
+        public = json.dumps(r)
+        for forbidden in ("SAMPLEQ101", "SAMPLEQ202", "352112867", "051894063",
+                          "2,610", "12,573", "2132.83"):
+            self.assertNotIn(forbidden, public)
+        self.assertEqual(r, arcbest_embedded_vpq_quote_reconciliation(
+            faces, text, sha))
+
+    def test_embedded_quote_join_rejects_false_identity_or_inferred_footage(self):
+        invoice = (
+            "ORIGINAL INVOICE\nFreight Bill No: 352112867\n"
+            "Tariff: VPQ\nPQ SCHEDULE NO: SAMPLEQ101A\n"
+            "ITEM 028160-01V 2,610 PPU 2,132.83\n"
+        )
+        quote = (
+            "Volume Pricing Quotation\n"
+            "Effective Date: 10-MAY-2024\nExpiration Date: 23-MAY-2024\n"
+            "VPQ Quotation ID: SAMPLEQ101-A\nWeight: 2,610 lbs\n"
+            "Minimum price including Fuel Surcharge* "
+            "(max 14,450 lbs/17 linear ft): $ 2132.83\n"
+            "*Charge per additional linear foot: $ 125.00\n"
+        )
+        correct = InvoiceFace("arcbest", "352112867", 1, 213283,
+                              None, "2024-05-13", "LTL")
+        digest = FROZEN_DOCUMENT_SHA256["arcbest"]
+        with self.assertRaisesRegex(ValueError, "SOURCE_SHA256_MISMATCH"):
+            arcbest_embedded_vpq_quote_reconciliation([correct], [invoice, quote], "0"*64)
+        with self.assertRaisesRegex(ValueError, "DUPLICATE_INVOICE"):
+            arcbest_embedded_vpq_quote_reconciliation(
+                [correct, correct], [invoice, quote], digest)
+        changed = invoice.replace("SAMPLEQ101A", "DIFFERENTQUOTE")
+        m = arcbest_embedded_vpq_quote_reconciliation(
+            [correct], [changed, quote], digest)
+        self.assertEqual(m["same_pdf_exact_quotation_id_invoice_joins"], 0)
+        self.assertEqual(m["invoice_quote_money_unresolved"], 1)
+        dated = InvoiceFace("arcbest", "352112867", 1, 213283,
+                            None, "2024-06-13", "LTL")
+        m = arcbest_embedded_vpq_quote_reconciliation(
+            [dated], [invoice, quote], digest)
+        self.assertEqual(m["invoice_dates_within_printed_quote_effective_window"], 0)
+        self.assertEqual(m["invoice_quote_money_unresolved"], 1)
+        one_cent = InvoiceFace("arcbest", "352112867", 1, 213284,
+                               None, "2024-05-13", "LTL")
+        m = arcbest_embedded_vpq_quote_reconciliation(
+            [one_cent], [invoice, quote], digest)
+        self.assertEqual(m["invoice_amount_equals_printed_quote_minimum"], 0)
+        self.assertEqual(m["invoice_quote_money_unresolved"], 1)
+        duplicate_quote = [invoice, quote, quote]
+        with self.assertRaisesRegex(ValueError, "DUPLICATE_QUOTE_ID"):
+            arcbest_embedded_vpq_quote_reconciliation(
+                [correct], duplicate_quote, digest)
 
     def test_actual_invoice_component_sum_and_adversarial_one_cent(self):
         content = (

@@ -1011,10 +1011,224 @@ def benchmark_freight() -> dict:
             out["source_printed_rate_bol_reference_census"] = (
                 arcbest_printed_rate_bol_reference_census(
                     list(unique.values()), texts, source_hash))
+            out["embedded_original_vpq_quote_source_replay"] = (
+                arcbest_embedded_vpq_quote_reconciliation(
+                    list(unique.values()), texts, source_hash))
             out["retally_rating_engine"] = _rating_probe(faces, texts, digest(raw))
         results[issuer] = out
     return results
 
+
+
+
+def arcbest_embedded_vpq_quote_reconciliation(
+    faces: list[InvoiceFace], texts: list[str], pdf_sha256: str,
+) -> dict:
+    """Match co-bundled quote pages to original invoices without promoting rates.
+
+    The public bankruptcy-claim PDF contains source-printed original invoices
+    AND appended ArcBest volume-pricing quotation documents. Match by exact
+    normalized quotation code, shipment date, quoted weight and invoice face
+    money, entirely in ephemeral runner memory. Quote documents come from the
+    SAME frozen PDF as the invoice; they are not independent BOL acceptance,
+    payment, external issuer certification or independently adjudicated truth.
+    Original identifiers, customer details, source text, quote page numbers
+    and quote prices must NEVER enter the returned receipt or Git.
+    """
+    if pdf_sha256 != FROZEN_DOCUMENT_SHA256["arcbest"]:
+        raise ValueError("ARCBEST_EMBEDDED_QUOTE_SOURCE_SHA256_MISMATCH")
+    if len({(face.number, face.page) for face in faces}) != len(faces):
+        raise ValueError("ARCBEST_EMBEDDED_QUOTE_DUPLICATE_INVOICE")
+    if not isinstance(texts, list) or len(texts) > 100:
+        raise ValueError("ARCBEST_EMBEDDED_QUOTE_UNBOUNDED_SOURCE")
+
+    def quote_id(token: str) -> str:
+        if type(token) is not str:
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_ID_INVALID")
+        cleaned = re.sub(r"[-\s]", "", token).upper()
+        if not re.fullmatch(r"[A-Z0-9]{8,18}", cleaned):
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_ID_INVALID")
+        return cleaned
+
+    def quote_day(token: str) -> str:
+        try:
+            return datetime.strptime(token.strip(), "%d-%b-%Y").date().isoformat()
+        except (ValueError, TypeError) as exc:
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_DATE_INVALID") from exc
+
+    def dollars_to_cents(token: str) -> int:
+        # Strict original USD decimal text; no inferred or rounded floats.
+        raw = token.strip()
+        if not re.fullmatch(r"(?:\d+|\d{1,3}(?:,\d{3})+)\.\d{2}", raw):
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_MONEY_INVALID")
+        return int(raw.replace(",", "").replace(".", ""))
+
+    quote_pages = {}
+    for i, page in enumerate(texts, start=1):
+        if not re.search(r"\bVolume\s+Pricing\s+Quotation\b", page, re.I):
+            continue
+        code = re.search(
+            r"\bVPQ\s+Quotation\s+ID\s*:\s*"
+            r"([A-Z0-9]{8,18})(?:\s*-\s*([A-Z]))?\b",
+            page, re.I,
+        )
+        effective = re.search(r"\bEffective\s+Date\s*:\s*(\d{1,2}-[A-Z]{3}-\d{4})", page, re.I)
+        expires = re.search(r"\bExpiration\s+Date\s*:\s*(\d{1,2}-[A-Z]{3}-\d{4})", page, re.I)
+        minimum = re.search(
+            r"\bMinimum\s+price\s+including\s+Fuel\s+Surcharge\*?\s*"
+            r"\(max\s*([\d,]+)\s*lbs\s*/\s*(\d{1,3})\s*linear\s*ft\)"
+            r"\s*:\s*\$\s*([\d,]+\.\d{2})",
+            page, re.I,
+        )
+        extra = re.search(
+            r"\bCharge\s+per\s+additional\s+linear\s+foot\s*:\s*"
+            r"\$\s*([\d,]+\.\d{2})",
+            page, re.I,
+        )
+        weight = re.search(r"\bWeight\s*:\s*([\d,]+)\s*lbs\b", page, re.I)
+        if not all((code, effective, expires, minimum, extra, weight)):
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_PRIMARY_FIELDS_INCOMPLETE")
+        ident = quote_id(code.group(1) + (code.group(2) or ""))
+        if ident in quote_pages:
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_DUPLICATE_QUOTE_ID")
+        starts, ends = quote_day(effective.group(1)), quote_day(expires.group(1))
+        if starts > ends:
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_REVERSED_EFFECTIVE_WINDOW")
+        max_weight, max_feet = int(minimum.group(1).replace(",", "")), int(minimum.group(2))
+        quoted_weight = int(weight.group(1).replace(",", ""))
+        if min(max_weight, max_feet, quoted_weight) <= 0:
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_NONPOSITIVE_BASIS")
+        quote_pages[ident] = {
+            "page": i, "from": starts, "to": ends,
+            "max_weight": max_weight, "max_feet": max_feet,
+            "quoted_weight": quoted_weight,
+            "minimum_cents": dollars_to_cents(minimum.group(3)),
+            "per_extra_foot_cents": dollars_to_cents(extra.group(1)),
+        }
+
+    counts = Counter()
+    anonymous = []
+    seen_invoice_codes = set()
+    for face in faces:
+        if (face.issuer != "arcbest" or face.cents is None or face.cents < 0
+                or not face.shipment_date or face.page < 1
+                or face.page > len(texts) or not face.number):
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_INVOICE_FACE_INVALID")
+        page = texts[face.page - 1]
+        if not re.search(r"\bTariff\s*:\s*VPQ\b", page, re.I):
+            continue
+        counts["vpq_original_invoice_faces"] += 1
+        if (not re.search(r"\bORIGINAL\s+INVOICE\b", page, re.I)
+                or not re.search(r"\bFreight\s+bill\s+No\.?\s*:\s*" +
+                                 re.escape(face.number) + r"\b", page, re.I)):
+            counts["unbound_invoice_page"] += 1
+            continue
+        schedule = re.search(
+            r"\bPQ\s+SCHEDULE\s+NO\s*:\s*([A-Z0-9-]{8,20})\b",
+            page, re.I,
+        )
+        if not schedule:
+            counts["vpq_no_invoice_schedule_code"] += 1
+            continue
+        ident = quote_id(schedule.group(1))
+        if ident in seen_invoice_codes:
+            raise ValueError("ARCBEST_EMBEDDED_QUOTE_ID_REUSED_ACROSS_INVOICES")
+        seen_invoice_codes.add(ident)
+        quote = quote_pages.get(ident)
+        if quote is None:
+            counts["vpq_no_embedded_quote_id_match"] += 1
+            continue
+        counts["vpq_exact_id_matched_quote_documents_in_same_pdf"] += 1
+        if not quote["from"] <= face.shipment_date <= quote["to"]:
+            counts["vpq_outside_quote_date_window"] += 1
+            continue
+        counts["vpq_shipment_within_quoted_date_window"] += 1
+        # A weight printed on both the invoice and quote is cross-document
+        # corroboration inside ONE bankruptcy bundle, not independently
+        # measured actual loaded weight.
+        listed_weight = re.search(
+            r"\bITEM\s+[A-Z0-9-]{5,22}\s+([\d,]+)\s+PPU\b", page, re.I,
+        )
+        if listed_weight is None:
+            counts["vpq_invoice_weight_not_extracted"] += 1
+            continue
+        original_weight = int(listed_weight.group(1).replace(",", ""))
+        if original_weight != quote["quoted_weight"]:
+            counts["vpq_invoice_quote_weight_conflict"] += 1
+            continue
+        counts["vpq_co_bundled_printed_weight_agrees"] += 1
+
+        result = "INVOICE_QUOTE_AMOUNT_UNRESOLVED"
+        if face.cents == quote["minimum_cents"]:
+            result = "EXACT_PRINTED_QUOTE_MINIMUM_MATCH"
+            counts["vpq_exact_printed_quote_minimum_amount_matches"] += 1
+        else:
+            # This is a deliberately CONDITIONAL check: a printed LWH first
+            # dimension need not be independently confirmed trailer footage.
+            length = re.search(
+                r"\bLWH\s*:\s*([\d,]+)\s*[Xx]\s*[\d,]+\s*[Xx]\s*[\d,]+\s*INCHES\b",
+                page, re.I,
+            )
+            if length:
+                length_inches = int(length.group(1).replace(",", ""))
+                length_feet_rounded_up = (length_inches + 11) // 12
+                added_feet = max(0, length_feet_rounded_up - quote["max_feet"])
+                if (added_feet > 0 and
+                        quote["minimum_cents"] + added_feet *
+                        quote["per_extra_foot_cents"] == face.cents):
+                    result = "CONDITIONAL_PRINTED_LWH_LINEAR_FOOT_FORMULA_MATCH"
+                    counts["vpq_conditional_printed_length_formula_matches"] += 1
+        if result == "INVOICE_QUOTE_AMOUNT_UNRESOLVED":
+            counts["vpq_quoted_money_not_reconciled"] += 1
+        # Hash ONLY fixed public page indices and our finite internal enums;
+        # never print/persist quote ID, invoice ID or business names.
+        anonymous.append((face.page, quote["page"], result))
+
+    nfaces = counts["vpq_original_invoice_faces"]
+    successful_matches = (
+        counts["vpq_exact_printed_quote_minimum_amount_matches"]
+        + counts["vpq_conditional_printed_length_formula_matches"]
+    )
+    return {
+        "scope": "ORIGINAL_ARCBEST_SAME_PDF_QUOTE_INVOICE_ARITHMETIC_NOT_CUSTOMER_RECOVERY",
+        "source_original_pdf_sha256": pdf_sha256,
+        "embedded_original_vpq_quotation_pages": len(quote_pages),
+        "vpq_original_invoice_faces": nfaces,
+        "same_pdf_exact_quotation_id_invoice_joins":
+            counts["vpq_exact_id_matched_quote_documents_in_same_pdf"],
+        "invoice_dates_within_printed_quote_effective_window":
+            counts["vpq_shipment_within_quoted_date_window"],
+        "printed_invoice_quoted_weights_agree":
+            counts["vpq_co_bundled_printed_weight_agrees"],
+        "invoice_amount_equals_printed_quote_minimum":
+            counts["vpq_exact_printed_quote_minimum_amount_matches"],
+        "conditional_printed_length_formula_matches":
+            counts["vpq_conditional_printed_length_formula_matches"],
+        "invoice_quote_money_unresolved": nfaces - successful_matches,
+        "anonymous_page_and_match_class_digest_sha256": digest(json.dumps(
+            sorted(anonymous), separators=(",", ":")).encode("utf-8")),
+        "quote_and_invoice_documents_are_co_bundled_in_same_source_pdf": True,
+        "conditional_length_footage_is_independently_certified": False,
+        "original_signed_bol_quotes_independently_verified": 0,
+        "separate_quote_acceptance_independently_verified": 0,
+        "commercial_reuse_authorized": False,
+        "independent_customer_invoice_overcharge_labels": 0,
+        "bank_cleared_payments_verified": 0,
+        "verified_retally_recovered_cash_cents": 0,
+        "raw_invoice_quote_bol_identifiers_exported": 0,
+        "customer_contact_actions": 0,
+        "unresolved_reason_counts": {
+            key: counts[key] for key in sorted(counts)
+            if key in {
+                "unbound_invoice_page", "vpq_no_invoice_schedule_code",
+                "vpq_no_embedded_quote_id_match",
+                "vpq_outside_quote_date_window",
+                "vpq_invoice_weight_not_extracted",
+                "vpq_invoice_quote_weight_conflict",
+                "vpq_quoted_money_not_reconciled",
+            } and counts[key] > 0
+        },
+    }
 
 
 def arcbest_printed_rate_bol_reference_census(
