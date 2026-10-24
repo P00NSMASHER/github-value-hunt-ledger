@@ -143,6 +143,34 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(triggers.count('cron: "19 3 * * *"'), 1)
 
 
+    def test_arcbest_printed_rate_and_bol_census_cannot_earn_tariff_authority(self):
+        """Source-printed ABF/VPQ headers are classified, never rerated."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n", 1)[1]
+        for expected in (
+            "source_printed_rate_bol_reference_census",
+            "arc['source_page_identity_bound_count'] == 10",
+            "arc['unbound_original_source_pages'] == 0",
+            "arc['printed_tariff_reference_class_counts']",
+            "arc['printed_bol_header_class_counts']",
+            "chain['arcbest_source_printed_category_sha256']",
+            "arc['shipment_effective_customer_rate_authorities_verified'] == 0",
+            "arc['independently_custodied_original_bol_documents'] == 0",
+            "arc['independently_scored_customer_overcharges'] == 0",
+            "arc['original_source_identifiers_exported'] == 0",
+        ):
+            with self.subTest(line=expected):
+                self.assertIn(expected, nightly)
+        self.assertEqual(
+            verify.splitlines().count(
+                "          python -m unittest -q freight.test_real_document_lab"
+            ), 1,
+        )
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
+
+
 
 if __name__ == "__main__":
     unittest.main()

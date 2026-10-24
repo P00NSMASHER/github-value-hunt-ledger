@@ -529,16 +529,42 @@ jobs:
           assert chain['eligible_independently_scored_customer_invoices'] == 0
           assert chain['verified_retally_recovered_cash_cents'] == 0
           assert chain['modern_rate_authority_proven'] is False
+          arc=report['freight_original_document_benchmark']['arcbest']['source_printed_rate_bol_reference_census']
+          assert arc['source_original_pdf_sha256'] == report['freight_original_document_benchmark']['arcbest']['sha256']
+          assert arc['source_page_identity_bound_count'] == 10
+          assert arc['unbound_original_source_pages'] == 0
+          assert arc['anonymous_page_category_digest_sha256'] == '4915cce3465a44f7ea8c9bf0c50671f4766589ce9725e328875b34201c6a2af0'
+          assert arc['printed_tariff_reference_class_counts'] == {
+              'NO_PRINTED_TARIFF_REFERENCE': 2,
+              'PRINTED_ABF_ACCOUNT_REFERENCE_ONLY': 6,
+              'PRINTED_VOLUME_QUOTE_MARKER_ONLY': 2,
+          }
+          assert arc['printed_bol_header_class_counts'] == {
+              'BOL_HEADER_IDENTIFIER_PRINTED_ONLY': 2,
+              'BOL_HEADER_PLACEHOLDER_ONLY': 8,
+          }
+          assert arc['source_pdf_printed_reference_not_executed_rate_contract'] is True
+          assert arc['shipment_effective_customer_rate_authorities_verified'] == 0
+          assert arc['independently_custodied_original_bol_documents'] == 0
+          assert arc['independently_scored_customer_overcharges'] == 0
+          assert arc['original_source_identifiers_exported'] == 0
+          assert chain['arcbest_source_printed_tariff_reference_classes'] == arc['printed_tariff_reference_class_counts']
+          assert chain['arcbest_source_printed_bol_header_classes'] == arc['printed_bol_header_class_counts']
+          assert chain['arcbest_source_printed_category_sha256'] == arc['anonymous_page_category_digest_sha256']
+          assert chain['arcbest_independently_verified_rate_and_original_bol_documents'] == 0
           assert chain['federal_guidance_scope'] == 'FEDERAL_GSA_REFERENCE_ONLY_NOT_PRIVATE_CUSTOMER_LEGAL_AUTHORITY'
           assert set(chain['missing_chain_evidence_from_current_lab'].values()) == {110}
           print('Original GlobalTranz: 100 original invoice nets preserved (93 source-bound v2 adjustments + 7 v1 charge-only), all REVIEW_REQUIRED, zero scored overcharges')
           print('Freight evidence chain: 110 source invoice faces; 0 independent rate/BOL/payment/outcome chains; source-verified arithmetic is not recovered cash')
+          print('ArcBest source-only hints: 6 printed ABF codes; 2 volume quote markers; 2 unreadable tariff headers; 2 printed BOL IDs; 8 BOL placeholders; 0 validated governing-rate/quote/BOL documents')
           import os
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
               summary.write('### FreightRecovery: original-document evidence readiness\n')
               summary.write('- Two frozen original freight PDFs; 110 face amounts recovered.\n')
               summary.write('- 100 signed original GlobalTranz nets conserved; 93 version-2 adjustment-bearing records.\n')
               summary.write('- 0 verified shipment-specific rate + independent BOL + bank payment + outcome chains.\n')
+              summary.write('- ArcBest printed headers: 6 ABF code indicators, 2 VPQ markers, 2 without; 2 BOL IDs, 8 placeholders.\n')
+              summary.write('- Printed source text is NOT independently verified rate agreements or signed bills of lading.\n')
               summary.write('- GSA federal audit guidance used as a reference checklist, NOT private law.\n')
               summary.write('- No real customer overcharges, licensed processing, or RETALLY cash proven.\n')
           PY

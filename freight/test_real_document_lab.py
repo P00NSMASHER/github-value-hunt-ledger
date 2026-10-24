@@ -13,6 +13,7 @@ from freight.real_document_lab import (
     historical_reference_money_controls, globaltranz_charge_components,
     globaltranz_invoice_line_total_benchmark,
     globaltranz_canonical_v2_adjustment_replay, FROZEN_DOCUMENT_SHA256,
+    arcbest_printed_rate_bol_reference_census,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -98,6 +99,78 @@ class LaboratoryTests(unittest.TestCase):
         f = _arcbest_page(arc_text, 16)
         self.assertIsNotNone(f)
         self.assertEqual((f.number, f.cents, f.mode), ("051894063", 212379, "LTL"))
+
+    def test_arcbest_printed_tariff_and_bol_are_hints_not_rate_proof(self):
+        # All page text below is synthetic; source PDF original isn't embedded.
+        pages = [
+            ("ORIGINAL INVOICE\nFreight bill No: 352112867\n"
+             "Tariff: ABF80193 PAYMENT DUE DATE: 05/24/2024\n"
+             "Bill of Lading No: SEE BELOW AMOUNT DUE: $351.78\n"
+             "PRIVATE CUSTOMER NAME MUST NEVER BE IN THE SUMMARY\n"),
+            ("ORIGINAL INVOICE\nFreight Bill No: 051894063\n"
+             "Tariff: VPQ PAYMENT DUE DATE: 05/21/2024\n"
+             "Bill of Lading No: BOQ-123-PRIVATE AMOUNT DUE: $2,123.79\n"),
+            ("ORIGINAL INVOICE\nFreight bill No: 051886768\n"
+             "Tariff: ABF80193\nTariff: VPQ\n"
+             "Bill of Lading No: NS AMOUNT DUE: $244.77\n"),
+        ]
+        faces = [
+            InvoiceFace("arcbest", "352112867", 1, 35178, None, "2024-05-07", "LTL"),
+            InvoiceFace("arcbest", "051894063", 2, 212379, None, "2024-05-02", "LTL"),
+            InvoiceFace("arcbest", "051886768", 3, 24477, None, "2024-05-02", "LTL"),
+        ]
+        sha = FROZEN_DOCUMENT_SHA256["arcbest"]
+        inventory = arcbest_printed_rate_bol_reference_census(faces, pages, sha)
+        self.assertEqual(inventory["original_invoice_faces_considered"], 3)
+        self.assertEqual(inventory["source_page_identity_bound_count"], 3)
+        self.assertEqual(inventory["unbound_original_source_pages"], 0)
+        self.assertEqual(inventory["printed_tariff_reference_class_counts"], {
+            "CONFLICTING_PRINTED_TARIFF_REFERENCES": 1,
+            "PRINTED_ABF_ACCOUNT_REFERENCE_ONLY": 1,
+            "PRINTED_VOLUME_QUOTE_MARKER_ONLY": 1,
+        })
+        self.assertEqual(inventory["printed_bol_header_class_counts"], {
+            "BOL_HEADER_IDENTIFIER_PRINTED_ONLY": 1,
+            "BOL_HEADER_PLACEHOLDER_ONLY": 2,
+        })
+        self.assertTrue(inventory["source_pdf_printed_reference_not_executed_rate_contract"])
+        for k in (
+            "original_customer_quote_documents_independently_verified",
+            "independently_custodied_original_bol_documents",
+            "shipment_effective_customer_rate_authorities_verified",
+            "independently_scored_customer_overcharges",
+            "original_source_identifiers_exported",
+            "verified_retally_recovered_cash_cents",
+            "third_party_contacts",
+        ):
+            self.assertEqual(inventory[k], 0, k)
+        import json
+        summary = json.dumps(inventory, sort_keys=True)
+        for forbidden in ("BOQ-123-PRIVATE", "PRIVATE CUSTOMER", "352112867", "051894063",
+                          "ABF80193", "Tariff:"):
+            self.assertNotIn(forbidden, summary)
+        again = arcbest_printed_rate_bol_reference_census(faces, pages, sha)
+        self.assertEqual(inventory, again)
+
+    def test_arcbest_tariff_bol_reference_source_identity_is_fail_closed(self):
+        sha = FROZEN_DOCUMENT_SHA256["arcbest"]
+        f = InvoiceFace("arcbest", "352112867", 1, 35178,
+                        None, "2024-05-07", "LTL")
+        page = ("ORIGINAL INVOICE\nFreight Bill No: WRONG123\n"
+                "Tariff: ABF80193\nBill of Lading No: SEE BELOW\n")
+        missing = arcbest_printed_rate_bol_reference_census([f], [page], sha)
+        self.assertEqual(missing["unbound_original_source_pages"], 1)
+        self.assertEqual(missing["printed_tariff_reference_class_counts"],
+                         {"UNBOUND_SOURCE_PAGE": 1})
+        self.assertEqual(missing["shipment_effective_customer_rate_authorities_verified"], 0)
+        with self.assertRaisesRegex(ValueError, "ARCBEST_SOURCE_SHA256_MISMATCH"):
+            arcbest_printed_rate_bol_reference_census([f], [page], "a" * 64)
+        with self.assertRaisesRegex(ValueError, "ARCBEST_DUPLICATE_FACE_REFERENCE"):
+            arcbest_printed_rate_bol_reference_census([f, f], [page], sha)
+        with self.assertRaisesRegex(ValueError, "ARCBEST_INVALID_SOURCE_FACE"):
+            arcbest_printed_rate_bol_reference_census(
+                [InvoiceFace("arcbest", "352112867", 0, 35178,
+                             None, "2024-05-07", "LTL")], [page], sha)
 
     def test_actual_invoice_component_sum_and_adversarial_one_cent(self):
         content = (

@@ -11,6 +11,8 @@ from pathlib import Path
 from freight.freight_evidence_chain_readiness import (
     EXPECTED_FACE_COUNTS, FROZEN_DOCUMENT_SHA256, GUIDANCE_APPLICABILITY,
     SIGNED_RECORD_CATALOG_HASH, SOURCE_FACE_CATALOG_HASH, SCOPE,
+    ARCBEST_PRINTED_REFERENCE_DIGEST, ARCBEST_PRINTED_TARIFF_CLASSES,
+    ARCBEST_PRINTED_BOL_HEADER_CLASSES,
     make_receipt, validate_receipt, run,
 )
 from freight.unified_research_lab import ResearchError, digest
@@ -85,6 +87,24 @@ def source_document_report() -> dict:
         "unsafe_auto_money_or_nondeterministic": 0,
         "auto_overcharges_asserted": 0,
     }
+    abf["source_printed_rate_bol_reference_census"] = {
+        "scope": "ORIGINAL_ARCBEST_PDF_PRINTED_REFERENCE_HINTS_ONLY",
+        "source_original_pdf_sha256": FROZEN_DOCUMENT_SHA256["arcbest"],
+        "original_invoice_faces_considered": 10,
+        "source_page_identity_bound_count": 10,
+        "unbound_original_source_pages": 0,
+        "printed_tariff_reference_class_counts": dict(ARCBEST_PRINTED_TARIFF_CLASSES),
+        "printed_bol_header_class_counts": dict(ARCBEST_PRINTED_BOL_HEADER_CLASSES),
+        "anonymous_page_category_digest_sha256": ARCBEST_PRINTED_REFERENCE_DIGEST,
+        "source_pdf_printed_reference_not_executed_rate_contract": True,
+        "original_customer_quote_documents_independently_verified": 0,
+        "independently_custodied_original_bol_documents": 0,
+        "shipment_effective_customer_rate_authorities_verified": 0,
+        "independently_scored_customer_overcharges": 0,
+        "original_source_identifiers_exported": 0,
+        "verified_retally_recovered_cash_cents": 0,
+        "third_party_contacts": 0,
+    }
     blind = {
         "precision": None,
         "recall": None,
@@ -121,6 +141,13 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertEqual(receipt["globaltranz_positive_only_v1_cases"], 7)
         self.assertEqual(receipt["globaltranz_open_statement_identity_and_original_amount_matches"], 100)
         self.assertEqual(receipt["arcbest_source_proxy_rating_review_count"], 5)
+        self.assertEqual(receipt["arcbest_source_printed_tariff_reference_classes"],
+                         ARCBEST_PRINTED_TARIFF_CLASSES)
+        self.assertEqual(receipt["arcbest_source_printed_bol_header_classes"],
+                         ARCBEST_PRINTED_BOL_HEADER_CLASSES)
+        self.assertEqual(receipt["arcbest_source_printed_category_sha256"],
+                         ARCBEST_PRINTED_REFERENCE_DIGEST)
+        self.assertEqual(receipt["arcbest_independently_verified_rate_and_original_bol_documents"], 0)
         self.assertEqual(receipt["eligible_independently_scored_customer_invoices"], 0)
         self.assertEqual(receipt["verified_retally_recovered_cash_cents"], 0)
         self.assertIsNone(receipt["accuracy"])
@@ -191,6 +218,45 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
             "original_invoice_line_amount_reconciliation"]["invoice_face_exact_line_sum"] = 99
         with self.assertRaises(ResearchError):
             make_receipt(bad, as_of=DAY)
+
+    def test_arcbest_header_hints_do_not_create_governing_contract_or_original_bol(self):
+        report = source_document_report()
+        categories = report["freight_original_document_benchmark"]["arcbest"][
+            "source_printed_rate_bol_reference_census"]
+        self.assertEqual(categories["source_page_identity_bound_count"], 10)
+        for field, forged in (
+            ("shipment_effective_customer_rate_authorities_verified", 1),
+            ("original_customer_quote_documents_independently_verified", 2),
+            ("independently_custodied_original_bol_documents", 2),
+            ("independently_scored_customer_overcharges", 1),
+            ("original_source_identifiers_exported", 10),
+            ("source_page_identity_bound_count", 9),
+            ("anonymous_page_category_digest_sha256", "0" * 64),
+            ("source_original_pdf_sha256", "0" * 64),
+            ("source_pdf_printed_reference_not_executed_rate_contract", False),
+        ):
+            with self.subTest(field=field):
+                bad = copy.deepcopy(report)
+                bad["freight_original_document_benchmark"]["arcbest"][
+                    "source_printed_rate_bol_reference_census"][field] = forged
+                with self.assertRaises(ResearchError):
+                    make_receipt(bad, as_of=DAY)
+        for field, forged in (
+            ("printed_tariff_reference_class_counts",
+             {"PRINTED_ABF_ACCOUNT_REFERENCE_ONLY": 8, "PRINTED_VOLUME_QUOTE_MARKER_ONLY": 2}),
+            ("printed_bol_header_class_counts",
+             {"BOL_HEADER_IDENTIFIER_PRINTED_ONLY": 10}),
+        ):
+            bad = copy.deepcopy(report)
+            bad["freight_original_document_benchmark"]["arcbest"][
+                "source_printed_rate_bol_reference_census"][field] = forged
+            with self.assertRaises(ResearchError):
+                make_receipt(bad, as_of=DAY)
+        text = json.dumps(make_receipt(report, as_of=DAY))
+        self.assertNotIn("ABF80193", text)
+        self.assertNotIn("Bill of Lading No", text)
+        self.assertNotIn("PRIVATE CUSTOMER", text)
+        self.assertEqual(make_receipt(report, as_of=DAY)["accuracy"], None)
 
     def test_statement_identity_is_not_bank_payment_or_refund(self):
         source = source_document_report()
