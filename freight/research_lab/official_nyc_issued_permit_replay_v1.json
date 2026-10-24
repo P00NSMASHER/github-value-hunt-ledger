@@ -1,0 +1,37 @@
+{
+  "as_of_utc_date": "2026-10-24",
+  "buyer_opportunity_ground_truth": false,
+  "external_customer_contacts": 0,
+  "independent_issuance_outcome_labels": 0,
+  "new_paid_services": 0,
+  "notes": "Dated original publisher records and second reads are factual source-consistency checks, not commercial-use clearance, independently adjudicated permit truth or buyer demand.",
+  "official_dataset_id": "rbx6-tga4",
+  "official_source_id": "9478df1e302b2ea8b8b1bd33fd42cbb3b0ca47e2d8ef9690212c8522909e0e0a",
+  "official_source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+  "production_changes": 0,
+  "published_source_terms": "https://www.nyc.gov/opendata/get-started/FAQs",
+  "publisher_status_classifications": {
+    "publisher_issue_date_present": 20,
+    "publisher_not_yet_issued_marker": 0
+  },
+  "readback_ambiguous": 0,
+  "readback_changed": 0,
+  "readback_checked": 3,
+  "readback_exact_match": 3,
+  "readback_missing": 0,
+  "readback_unavailable": 0,
+  "receipt_sha256": "e7f43b8a59b2927e33d08b72f8d613e4dd322016e2c6e9806a59994bb3c1fa23",
+  "sample_canonical_sha256": "0a061766b357833c06319673fb5a649044ebfaeb5eff70896fab8427f0d15d2a",
+  "sample_count": 20,
+  "sample_original_rows_stored": 0,
+  "sample_repeated_source_rows": 3,
+  "sample_unique_source_identities": 17,
+  "schema_version": 1,
+  "scope": "ORIGINAL_NYC_PERMIT_SOURCE_READBACK_NOT_INDEPENDENT_OUTCOME",
+  "source_errors": [
+    "DUPLICATE_SOURCE_IDENTITIES"
+  ],
+  "source_specific_commercial_license_verified": false,
+  "status": "PUBLISHER_REPLAY_DEGRADED",
+  "user_commercial_reuse_attestation": "OWNER_ATTESTED_NOT_SOURCE_VERIFIED"
+}
