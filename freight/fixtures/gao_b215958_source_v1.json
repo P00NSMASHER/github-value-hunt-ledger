@@ -67,6 +67,9 @@
     "label_completeness": "53_OF_55_DECISION_AGGREGATE_ONLY_TWO_UNKNOWN",
     "clinical_student_customer_private_material_used": false,
     "original_document_copied_into_repository": false,
-    "no_independent_invoice_reconciliation_results": true
-  }
+    "no_independent_invoice_reconciliation_results": true,
+    "publisher_original_review_date": "2026-10-23"
+  },
+  "manifest_hash_contract": "RESEARCH_AUTHORED_MANIFEST_SHA256_CANONICAL_SORTED_JSON_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
+  "manifest_sha256": "05e7f954f33686b0ba48440a8b42c30b4da29a6a062abfa057f46f77a56d7489"
 }

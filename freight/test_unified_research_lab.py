@@ -1,6 +1,7 @@
 """Offline adversarial contract tests for all four unified research lanes."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import tempfile
@@ -58,6 +59,33 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertFalse(single["entries"][0]["independent_ground_truth"])
         self.assertFalse(single["entries"][0]["commercial_reuse_authorized"])
         self.assertFalse(single["entries"][0]["recovered_cash_verified"])
+
+    def test_gao_b215958_research_manifest_hash_and_negative_control(self):
+        fixture = Path(__file__).with_name("fixtures") / "gao_b215958_source_v1.json"
+        data = json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertEqual(
+            data["manifest_hash_contract"],
+            "RESEARCH_AUTHORED_MANIFEST_SHA256_CANONICAL_SORTED_JSON_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
+        )
+        self.assertEqual(data["data_quality"]["publisher_original_review_date"], "2026-10-23")
+        self.assertIsNone(data["source"]["source_bytes_sha256"])
+        self.assertFalse(data["source"]["source_bytes_acquired"])
+        self.assertFalse(data["source"]["commercial_use_of_engine_input_approved"])
+
+        def authored_digest(obj):
+            canonical = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+        author_fields = {k: v for k, v in data.items() if k != "manifest_sha256"}
+        self.assertEqual(data["manifest_sha256"], authored_digest(author_fields))
+        mutated = json.loads(json.dumps(author_fields))
+        mutated["population"]["decision_reversals_with_recorded_numbered_seals"] = 55
+        self.assertNotEqual(data["manifest_sha256"], authored_digest(mutated))
+        self.assertEqual(
+            mutated["population"]["decision_reversals_with_recorded_numbered_seals"]
+            + data["population"]["remainder_cases_with_unresolved_disposition"],
+            57,
+        )
 
     def test_every_engine_scheduled_in_one_twenty_minute_cycle(self):
         selected = [current_engine(NOW + timedelta(minutes=5 * i)) for i in range(4)]
