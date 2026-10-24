@@ -280,5 +280,63 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
             run(live=False, verify_only=False)
 
 
+    def test_incomplete_http_byte_range_is_never_reported_as_complete_hash(self):
+        url = "https://www.gao.gov/products/b-160344"
+        class Response:
+            status = 200
+            headers = {"Content-Type": "text/html", "Content-Length": "50"}
+            def __enter__(self):
+                return self
+            def __exit__(self, *_):
+                return None
+            def geturl(self):
+                return url
+            def read(self, n):
+                return b"<html>short</html>"
+        class Opener:
+            def open(self, request, timeout):
+                return Response()
+        with patch("freight.research_publisher_provenance.global_dns", return_value=None), \
+                patch("freight.research_publisher_provenance.build_opener", return_value=Opener()):
+            report = _safe_head_and_digest(url)
+        self.assertEqual(report["head_http_status"], 200)
+        self.assertEqual(report["probe_state"], "GET_NOT_VERIFIABLE")
+        self.assertIsNone(report["content_sha256"])
+        self.assertEqual(report["bytes_hashed"], 0)
+
+    def test_receipt_must_not_claim_fresh_verification_after_two_days(self):
+        ledger = full_anchors()
+        three_days_old = date(2026, 10, 20)
+        doc = build_receipt(ledger, three_days_old, fetcher=observed_http)
+        with self.assertRaisesRegex(ResearchError, "STALE_PUBLISHER_PROVENANCE_RECEIPT"):
+            _validate_receipt(doc, ledger, TODAY)
+
+    def test_mutated_provenance_receipt_is_not_reused_same_day(self):
+        ledger = full_anchors()
+        calls = []
+        def fake(url):
+            calls.append(url)
+            return unreachable(url)
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "ledger.json"
+            receipt = Path(tmp) / "provenance.json"
+            source.write_text(json.dumps(ledger))
+            run(ledger_path=source, output=receipt, as_of=TODAY,
+                live=True, fetcher=fake)
+            self.assertEqual(len(calls), 9)
+            malicious = json.loads(receipt.read_text())
+            malicious["observations"][0]["benchmark_ready"] = True
+            malicious["receipt_sha256"] = digest(
+                {k: v for k, v in malicious.items() if k != "receipt_sha256"})
+            receipt.write_text(json.dumps(malicious))
+            res = run(ledger_path=source, output=receipt, as_of=TODAY,
+                      live=True, fetcher=fake)
+            self.assertTrue(res["performed_new_network_probes"])
+            self.assertEqual(len(calls), 18)
+            self.assertFalse(json.loads(receipt.read_text())[
+                "observations"][0]["benchmark_ready"])
+
+
+
 if __name__ == "__main__":
     unittest.main()
