@@ -1,7 +1,7 @@
 {
   "asof_award_join_candidates_count": 0,
-  "current_source_sha256": null,
-  "current_source_size_bytes": 0,
+  "current_source_sha256": "7b4e00e3156248db9dcca767431bb6c5d4168aeeb2abc707ab12c0f9e61d71ce",
+  "current_source_size_bytes": 1607260,
   "customer_contact_actions": 0,
   "first_party_catalog_listing": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
   "fy2027_full_catalog_approved": false,
@@ -14,9 +14,9 @@
     "No SAM opportunity-to-USAspending award identity has been independently joined or adjudicated.",
     "Source-specific commercial permissions and third-party data contracts are not verified by this receipt."
   ],
-  "matches_oct19_full_original_byte_digest": false,
+  "matches_oct19_full_original_byte_digest": true,
   "new_paid_services": 0,
-  "observed_at_utc": "2026-10-24T05:21:48+00:00",
+  "observed_at_utc": "2026-10-24T05:28:37+00:00",
   "oct19_reference_observed_rows": 1104,
   "oct19_reference_original_sha256": "7b4e00e3156248db9dcca767431bb6c5d4168aeeb2abc707ab12c0f9e61d71ce",
   "original_archive_bytes_persisted": 0,
@@ -24,21 +24,22 @@
   "owner_rights_attestation": "OWNER_ATTESTED_NOT_SOURCE_VERIFIED",
   "prior_full_byte_observation_reference": "P00NSMASHER/capturebrief/research/fy2027_original_bytes_observation_20261019.json",
   "production_changes": 0,
-  "receipt_sha256": "f23a4b5a0e24f4a3c1c8d112801980dffcfea5ec81d96ae25cf52db5f2aecd25",
+  "receipt_sha256": "77e7d04edaaeeec34ec1d5203acfffbceb76ea96d8e22add48e5f9f7eb0b6ecd",
   "repeated_notice_identifiers": 0,
   "research_only_catalog_state": "SOURCE_HISTORY_UNREVIEWED_NO_CUSTOMER_RELEASE",
   "schema_version": 1,
   "scope": "PUBLIC_FY2027_ARCHIVE_SOURCE_CHRONOLOGY_NOT_AWARD_TRUTH",
   "source": "https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv",
   "source_error_codes": [
-    "SOURCE_CSV_SCHEMA_INVALID"
+    "SOURCE_SOLICITATION_CONTROL_QUARANTINED"
   ],
-  "source_issuer_ambiguous_solicitation_families": 0,
-  "source_rows": 0,
+  "source_issuer_ambiguous_solicitation_families": 4,
+  "source_rows": 1104,
   "source_rows_posted_after_observation_day": 0,
-  "source_rows_with_posted_date": 0,
-  "source_rows_with_solicitation": 0,
+  "source_rows_quarantined_solicitation_control": 1,
+  "source_rows_with_posted_date": 1104,
+  "source_rows_with_solicitation": 1096,
   "source_specific_reuse_rights_verified": false,
-  "source_status": "PUBLIC_ARCHIVE_UNAVAILABLE_OR_INVALID",
-  "unique_original_notice_ids": 0
+  "source_status": "PUBLIC_ARCHIVE_WITH_QUARANTINED_SOLICITATION_FIELD",
+  "unique_original_notice_ids": 1104
 }
