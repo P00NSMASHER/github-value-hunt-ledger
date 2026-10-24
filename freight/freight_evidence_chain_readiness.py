@@ -34,6 +34,20 @@ SOURCE_FACE_CATALOG_HASH = {
 SIGNED_RECORD_CATALOG_HASH = (
     "ecf6f9529909d5f1a3f031a0683c1eba4ca9ccabf9feaa6c445b208c468ef787"
 )
+# Source-only categories observed on the frozen original 74-page ArcBest PDF
+# in isolated real-document run 40140512216. Identifiers themselves excluded.
+ARCBEST_PRINTED_REFERENCE_DIGEST = (
+    "4915cce3465a44f7ea8c9bf0c50671f4766589ce9725e328875b34201c6a2af0"
+)
+ARCBEST_PRINTED_TARIFF_CLASSES = {
+    "NO_PRINTED_TARIFF_REFERENCE": 2,
+    "PRINTED_ABF_ACCOUNT_REFERENCE_ONLY": 6,
+    "PRINTED_VOLUME_QUOTE_MARKER_ONLY": 2,
+}
+ARCBEST_PRINTED_BOL_HEADER_CLASSES = {
+    "BOL_HEADER_IDENTIFIER_PRINTED_ONLY": 2,
+    "BOL_HEADER_PLACEHOLDER_ONLY": 8,
+}
 EXPECTED_FACE_COUNTS = {"globaltranz": 100, "arcbest": 10}
 EXPECTED_NET_COVERAGE = {"globaltranz": 100, "arcbest": 0}
 MISSING_CHAIN_STAGES = (
@@ -50,6 +64,7 @@ LIMITATIONS = (
     "Source invoice-to-open-statement matching does NOT establish a cleared bank payment.",
     "GlobalTranz v2 adjustments encode signed invoice components with provisional lab DISCOUNT semantics.",
     "ArcBest printed freight-bill weights, if present, are not independent certified shipment weights.",
+    "ArcBest invoice-printed tariff/VPQ codes and BOL headers do not prove an original accepted quote, contract rate or separately held original BOL.",
     "Lab canonical shipment location, carrier, freight mode and weight placeholders are SYNTHETIC.",
     "A missing document in this lab is not proof that a shipper or carrier cannot supply it elsewhere.",
     "No customer contacts, commercial input rights, production extraction, tariffs, actual claims or recovered cash.",
@@ -62,6 +77,10 @@ RECEIPT_KEYS = frozenset({
     "globaltranz_source_adjustment_v2_cases", "globaltranz_positive_only_v1_cases",
     "globaltranz_open_statement_identity_and_original_amount_matches",
     "arcbest_source_proxy_rating_review_count",
+    "arcbest_source_printed_tariff_reference_classes",
+    "arcbest_source_printed_bol_header_classes",
+    "arcbest_source_printed_category_sha256",
+    "arcbest_independently_verified_rate_and_original_bol_documents",
     "source_original_sha256", "original_invoice_catalog_sha256",
     "source_bound_canonical_signed_catalog_sha256",
     "independent_evidence_chain_stages", "missing_chain_evidence_from_current_lab",
@@ -179,6 +198,36 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
     _count(abf_rated.get("source_completeness_blocked"), "ARCBEST_PARTIAL", 5)
     _count(abf_rated.get("unsafe_auto_money_or_nondeterministic"), "ARCBEST_UNSAFE", 0)
     _count(abf_rated.get("auto_overcharges_asserted"), "ARCBEST_AUTO_OVERCHARGES", 0)
+    printed = _mapping(abf.get("source_printed_rate_bol_reference_census"),
+                       "ARCBEST_PRINTED_HEADER_REFERENCES")
+    if (printed.get("scope") != "ORIGINAL_ARCBEST_PDF_PRINTED_REFERENCE_HINTS_ONLY"
+            or printed.get("source_original_pdf_sha256") != FROZEN_DOCUMENT_SHA256["arcbest"]
+            or printed.get("anonymous_page_category_digest_sha256") != ARCBEST_PRINTED_REFERENCE_DIGEST):
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_PRINTED_SOURCE_IDENTITY_DRIFT")
+    for key, expected in (("original_invoice_faces_considered", 10),
+                          ("source_page_identity_bound_count", 10),
+                          ("unbound_original_source_pages", 0),
+                          ("original_customer_quote_documents_independently_verified", 0),
+                          ("independently_custodied_original_bol_documents", 0),
+                          ("shipment_effective_customer_rate_authorities_verified", 0),
+                          ("independently_scored_customer_overcharges", 0),
+                          ("original_source_identifiers_exported", 0),
+                          ("verified_retally_recovered_cash_cents", 0),
+                          ("third_party_contacts", 0)):
+        _count(printed.get(key), "ARCBEST_" + key.upper(), expected)
+    _is_true(printed.get("source_pdf_printed_reference_not_executed_rate_contract"),
+             "ARCBEST_PRINTED_CODE_NOT_EFFECTIVE_TARIFF")
+    tariff_classes = _mapping(printed.get("printed_tariff_reference_class_counts"),
+                              "ARCBEST_TARIFF_CATEGORIES")
+    bol_classes = _mapping(printed.get("printed_bol_header_class_counts"),
+                           "ARCBEST_BOL_CATEGORIES")
+    if (set(tariff_classes) != set(ARCBEST_PRINTED_TARIFF_CLASSES)
+            or set(bol_classes) != set(ARCBEST_PRINTED_BOL_HEADER_CLASSES)):
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_PRINTED_REFERENCE_SCOPE_DRIFT")
+    for name, target in ARCBEST_PRINTED_TARIFF_CLASSES.items():
+        _count(tariff_classes[name], "ARCBEST_PRINTED_" + name, target)
+    for name, target in ARCBEST_PRINTED_BOL_HEADER_CLASSES.items():
+        _count(bol_classes[name], "ARCBEST_PRINTED_" + name, target)
 
     blind = _mapping(doc.get("blinded_freight_error_evaluation"), "BLIND_ASSESSMENT")
     for field in ("precision", "recall", "freight_detection_accuracy"):
@@ -204,6 +253,12 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
         "globaltranz_positive_only_v1_cases": 7,
         "globaltranz_open_statement_identity_and_original_amount_matches": 100,
         "arcbest_source_proxy_rating_review_count": 5,
+        "arcbest_source_printed_tariff_reference_classes":
+            dict(ARCBEST_PRINTED_TARIFF_CLASSES),
+        "arcbest_source_printed_bol_header_classes":
+            dict(ARCBEST_PRINTED_BOL_HEADER_CLASSES),
+        "arcbest_source_printed_category_sha256": ARCBEST_PRINTED_REFERENCE_DIGEST,
+        "arcbest_independently_verified_rate_and_original_bol_documents": 0,
         "source_original_sha256": {k: FROZEN_DOCUMENT_SHA256[k] for k in sorted(FROZEN_DOCUMENT_SHA256)},
         "original_invoice_catalog_sha256": {k: SOURCE_FACE_CATALOG_HASH[k] for k in sorted(SOURCE_FACE_CATALOG_HASH)},
         "source_bound_canonical_signed_catalog_sha256": SIGNED_RECORD_CATALOG_HASH,

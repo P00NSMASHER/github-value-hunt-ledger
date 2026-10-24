@@ -924,3 +924,55 @@ commercial approvals, or any persistent private source identifier.
 
     python -m unittest -q freight.test_freight_evidence_chain_readiness
     python -m freight.freight_evidence_chain_readiness --source /tmp/retally-real-lab.json --output /tmp/retally-freight-evidence-chain-readiness-v1.json
+
+
+## Original ArcBest invoice pricing/BOL header census (v12)
+
+To prioritize **actual original freight evidence** rather than URL counts,
+the existing isolated 74-page original ArcBest PDF's ten invoice faces are
+examined for the pricing and bill-of-lading **references printed on the invoices**.
+Only fixed categorical counts and an anonymous page/category SHA-256 enter
+the ephemeral research report; **no** invoice IDs, customer names, printed
+account/tender tokens, quote identifiers, or underlying PDF text are published
+to the research branch. The original PDF source SHA-256
+4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17
+remains the mandatory provenance gate.
+
+The October 24 verified original-document acceptance found:
+
+| Evidence category on original invoice face | Invoices |
+| --- | ---: |
+| ABF account-pricing code printed | 6 |
+| Volume pricing quotation indicator VPQ printed | 2 |
+| No readable tariff indicator in page text | 2 |
+| Bill-of-lading header prints an identifier | 2 |
+| Bill-of-lading header prints only a placeholder/indirect reference | 8 |
+
+All **ten** ArcBest source pages independently matched the original invoice
+face number when processed within the ephemeral lab. Source-category hash
+4915cce3465a44f7ea8c9bf0c50671f4766589ce9725e328875b34201c6a2af0
+and the source PDF's frozen byte hash are checked in nightly CI. Missing,
+cross-page, contradictory or altered references fail closed or remain labeled
+unreadable rather than being silently interpreted as a contract.
+
+**Source reference is not rate authority.** The carrier's current
+[ArcBest quote terms](https://arcb.com/quote-terms) and
+[volume pricing quote terms](https://arcb.com/volume-quote-terms-conditions)
+distinguish specific shipment quotes, applicable tariffs and signed bills of
+lading. These are useful directions for research, **not independent
+verification of 2024 invoice-specific effective versions**. The lab has not
+independently obtained a governing customer tariff exception, original signed
+quote or a separate original bill-of-lading artifact for any of the ten cases.
+An invoice saying "Tariff: VPQ" or printing a BOL number does not establish
+the existence, legal applicability or acceptance of a rate contract, nor
+independently prove delivery, weight, cash payment or a recoverable claim.
+
+The original-document readiness gate now enforces **0 independently verified
+rate/quote/BOL documents**, **0 verified customer invoice overcharge labels**
+and **$0 RETALLY recovered cash**. No additional scheduled workload, public
+provider requests, commercial permission, PDF downloads beyond the two
+previously approved source PDFs, production engine changes, outreach or
+spending are introduced. The next meaningful evidence goal is the actual
+2024 source quote/agreement and separate BOL/delivery record under an
+authorized and independently verifiable provenance chain, not blind rerating
+using a generic current tariff.

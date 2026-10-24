@@ -1008,9 +1008,108 @@ def benchmark_freight() -> dict:
             # Source face amounts are not a bill-to-bank payment comparison.
             out["source_invoice_mode_ltl_count"] = sum(f.mode == "LTL" for f in unique.values())
             out["source_invoice_mode_tl_count"] = sum(f.mode == "TL" for f in unique.values())
+            out["source_printed_rate_bol_reference_census"] = (
+                arcbest_printed_rate_bol_reference_census(
+                    list(unique.values()), texts, source_hash))
             out["retally_rating_engine"] = _rating_probe(faces, texts, digest(raw))
         results[issuer] = out
     return results
+
+
+
+def arcbest_printed_rate_bol_reference_census(
+    faces: list[InvoiceFace], texts: list[str], pdf_sha256: str,
+) -> dict:
+    """Count source-printed *hints*, never prove an applicable customer rate.
+
+    Uses only the already-frozen public ArcBest PDF already fetched by the
+    isolated original-document lab. No raw invoice number, quote reference,
+    BOL identifier, contact, description or other source text is output.
+    A printed account tariff token or VPQ label is not the effective contract,
+    original signed quote or underlying bill of lading.
+    """
+    if pdf_sha256 != FROZEN_DOCUMENT_SHA256["arcbest"]:
+        raise ValueError("ARCBEST_SOURCE_SHA256_MISMATCH")
+    if len({(f.number, f.page) for f in faces}) != len(faces):
+        raise ValueError("ARCBEST_DUPLICATE_FACE_REFERENCE")
+    tariff_counts = Counter()
+    bol_counts = Counter()
+    observed = bound = missing_identity = 0
+    aggregate = []
+    for face in faces:
+        if (face.issuer != "arcbest" or face.cents is None or face.cents < 0
+                or face.page < 1 or face.page > len(texts) or not face.number):
+            raise ValueError("ARCBEST_INVALID_SOURCE_FACE")
+        observed += 1
+        page = texts[face.page - 1]
+        # The existing source extractor has already found the invoice face.
+        # Rebind its page and original freight-bill ID before accepting any
+        # nearby tariff/BOL tokens. Never export the identifier.
+        if (not re.search(r"\bORIGINAL\s+INVOICE\b", page, re.I)
+                or not re.search(r"\bFreight\s+bill\s+No\.?\s*:\s*" +
+                                 re.escape(face.number) + r"\b", page, re.I)):
+            missing_identity += 1
+            tariff_counts["UNBOUND_SOURCE_PAGE"] += 1
+            bol_counts["UNBOUND_SOURCE_PAGE"] += 1
+            continue
+        bound += 1
+        tariff_tokens = {
+            x.upper() for x in re.findall(
+                r"\bTariff\s*:\s*([A-Za-z0-9][A-Za-z0-9._-]{0,31})\b",
+                page, re.I)
+        }
+        if not tariff_tokens:
+            tariff = "NO_PRINTED_TARIFF_REFERENCE"
+        elif len(tariff_tokens) > 1:
+            tariff = "CONFLICTING_PRINTED_TARIFF_REFERENCES"
+        elif next(iter(tariff_tokens)) == "VPQ":
+            tariff = "PRINTED_VOLUME_QUOTE_MARKER_ONLY"
+        elif re.fullmatch(r"ABF[0-9]{3,10}", next(iter(tariff_tokens))):
+            tariff = "PRINTED_ABF_ACCOUNT_REFERENCE_ONLY"
+        else:
+            tariff = "OTHER_PRINTED_PRICING_REFERENCE_ONLY"
+        tariff_counts[tariff] += 1
+
+        bol_tokens = {
+            " ".join(x.upper().split()) for x in re.findall(
+                r"\bBill\s+of\s+Lading\s+No\.?\s*:\s*"
+                r"(SEE\s+BELOW|[A-Za-z0-9][A-Za-z0-9/.-]{0,31})",
+                page, re.I)
+        }
+        placeholders = {"SEE BELOW", "NS", "NONE", "N/A", "NA", "UNKNOWN",
+                        "TARIFF", "AMOUNT", "DUE", "PAYMENT", "SHIPPING",
+                        "SHIPMENT", "DATE", "SEE"}
+        if not bol_tokens:
+            bol = "BOL_HEADER_NOT_READABLE"
+        elif len(bol_tokens) > 1:
+            bol = "BOL_HEADER_CONFLICTING_REFERENCES"
+        elif next(iter(bol_tokens)) in placeholders:
+            bol = "BOL_HEADER_PLACEHOLDER_ONLY"
+        else:
+            bol = "BOL_HEADER_IDENTIFIER_PRINTED_ONLY"
+        bol_counts[bol] += 1
+        aggregate.append((face.page, tariff, bol))
+    # Anonymous category digest: only page number + fixed classification
+    # enums; no printed commercial identifiers or invoice details.
+    return {
+        "scope": "ORIGINAL_ARCBEST_PDF_PRINTED_REFERENCE_HINTS_ONLY",
+        "source_original_pdf_sha256": pdf_sha256,
+        "original_invoice_faces_considered": observed,
+        "source_page_identity_bound_count": bound,
+        "unbound_original_source_pages": missing_identity,
+        "printed_tariff_reference_class_counts": dict(sorted(tariff_counts.items())),
+        "printed_bol_header_class_counts": dict(sorted(bol_counts.items())),
+        "anonymous_page_category_digest_sha256": digest(json.dumps(
+            sorted(aggregate), separators=(",", ":")).encode("utf-8")),
+        "source_pdf_printed_reference_not_executed_rate_contract": True,
+        "original_customer_quote_documents_independently_verified": 0,
+        "independently_custodied_original_bol_documents": 0,
+        "shipment_effective_customer_rate_authorities_verified": 0,
+        "independently_scored_customer_overcharges": 0,
+        "original_source_identifiers_exported": 0,
+        "verified_retally_recovered_cash_cents": 0,
+        "third_party_contacts": 0,
+    }
 
 
 def _rating_probe(faces: list[InvoiceFace], texts: list[str], pdf_sha256: str) -> dict:
