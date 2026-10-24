@@ -47,16 +47,18 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
     def test_all_four_source_lanes_have_public_pinned_allowlisted_observations(self):
         ledger = full_anchors()
         anchors, missing = pinned_rows(ledger)
-        self.assertEqual(len(anchors), 9)
+        self.assertEqual(len(anchors), 11)
+        self.assertIn("https://www.gao.gov/products/b-215958", PUBLIC_REVIEW_ANCHORS["freightrecovery"])
+        self.assertIn("https://www.gao.gov/products/b-215958-2", PUBLIC_REVIEW_ANCHORS["freightrecovery"])
         self.assertEqual(set(missing), set(ENGINES))
         self.assertTrue(all(value == 0 for value in missing.values()))
         self.assertEqual(set(x["engine"] for x in anchors), set(ENGINES))
         doc = build_receipt(ledger, TODAY, fetcher=observed_http)
         self.assertEqual(doc["schema_version"], 1)
         self.assertEqual(doc["scope"], SCOPE)
-        self.assertEqual(doc["source_pointers_probed"], 9)
-        self.assertEqual(doc["publisher_http_responses_observed"], 9)
-        self.assertEqual(doc["full_public_responses_fingerprinted"], 9)
+        self.assertEqual(doc["source_pointers_probed"], 11)
+        self.assertEqual(doc["publisher_http_responses_observed"], 11)
+        self.assertEqual(doc["full_public_responses_fingerprinted"], 11)
         self.assertEqual(doc["anchor_set_sha256"], digest(anchors))
         self.assertEqual(doc["receipt_sha256"],
                          digest({k: v for k, v in doc.items() if k != "receipt_sha256"}))
@@ -76,7 +78,7 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
         )])
         anchors, missing = pinned_rows(ledger)
         self.assertEqual(len(anchors), 1)
-        self.assertEqual(missing["freightrecovery"], 2)
+        self.assertEqual(missing["freightrecovery"], 4)
         self.assertEqual(missing["capturebrief"], 2)
         doc = build_receipt(ledger, TODAY, fetcher=unreachable)
         self.assertEqual(doc["source_pointers_probed"], 1)
@@ -96,14 +98,14 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
             path.write_text(json.dumps(ledger), encoding="utf-8")
             first = run(ledger_path=path, output=receipt,
                         as_of=PAST, live=True, fetcher=fake)
-            self.assertEqual(first["pinned_public_sources_checked"], 9)
-            self.assertEqual(len(calls), 9)
+            self.assertEqual(first["pinned_public_sources_checked"], 11)
+            self.assertEqual(len(calls), 11)
             self.assertTrue(first["performed_new_network_probes"])
             saved = receipt.read_bytes()
             again = run(ledger_path=path, output=receipt,
                         as_of=PAST, live=True, fetcher=fake)
             self.assertFalse(again["performed_new_network_probes"])
-            self.assertEqual(len(calls), 9)
+            self.assertEqual(len(calls), 11)
             self.assertEqual(saved, receipt.read_bytes())
             verified = run(ledger_path=path, output=receipt,
                            as_of=TODAY, verify_only=True)
@@ -112,7 +114,7 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
             newer = run(ledger_path=path, output=receipt,
                         as_of=TODAY, live=True, fetcher=fake)
             self.assertTrue(newer["performed_new_network_probes"])
-            self.assertEqual(len(calls), 18)
+            self.assertEqual(len(calls), 22)
             self.assertNotEqual(saved, receipt.read_bytes())
 
     def test_tampering_rights_outcomes_fingerprints_or_anchor_ids_rejected(self):
@@ -323,7 +325,7 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
             source.write_text(json.dumps(ledger))
             run(ledger_path=source, output=receipt, as_of=TODAY,
                 live=True, fetcher=fake)
-            self.assertEqual(len(calls), 9)
+            self.assertEqual(len(calls), 11)
             malicious = json.loads(receipt.read_text())
             malicious["observations"][0]["benchmark_ready"] = True
             malicious["receipt_sha256"] = digest(
@@ -332,7 +334,7 @@ class PublisherEvidenceProvenanceTests(unittest.TestCase):
             res = run(ledger_path=source, output=receipt, as_of=TODAY,
                       live=True, fetcher=fake)
             self.assertTrue(res["performed_new_network_probes"])
-            self.assertEqual(len(calls), 18)
+            self.assertEqual(len(calls), 22)
             self.assertFalse(json.loads(receipt.read_text())[
                 "observations"][0]["benchmark_ready"])
 
