@@ -1,15 +1,17 @@
 # RETALLY Unified Research Lab
 
-**Mission:** continuously find authentic external data capable of stress-testing
-FreightRecovery, PermitPlate, CaptureBrief and RecoveryOS, and run the strongest
-already-approved real-document and engine regression tests without user prompts.
+**Mission:** concentrate discovery and evidence quality primarily on **FreightRecovery**
+(real freight invoices, tariffs, adjudicated rate rules and source-backed overcharge
+validation), while retaining bounded PermitPlate, CaptureBrief and RecoveryOS
+research and the strongest already-approved read-only regression suites.
+Source pointers alone never count as independently validated claims.
 
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.
 - **One long-lived data branch:** research/retally-unified-data-lab, separate from protected main and production sites.
 - **One canonical cross-engine catalog:** freight/research_lab/leads.json; exact URL deduplication and engine tags preserve the source's original first-seen date.
-- **Four lanes, not four independent workers.** Every five minutes the scheduler rotates one engine's discovery queries (4, 9, 14, etc. minutes past the hour, to avoid the hour-boundary queue). This gives each engine a planned 20-minute interval. GitHub cron can be delayed or skipped; there is **no guaranteed five-minute execution SLA**.
+- **FreightRecovery-first four-lane discovery, not four independent workers.** The nominal five-minute GitHub scheduler favors FreightRecovery for **7 of every 10 planned slots** and reserves one slot each for PermitPlate, CaptureBrief and RecoveryOS. The independent Cloudflare Worker weights FreightRecovery's elapsed-time priority to yield about **70% of sustained successful discovery cycles** while explicitly backfilling overdue secondary lanes. Actual proportions vary with missed triggers, provider failures and catch-up. Neither service guarantees a five-minute execution SLA or meaningful new evidence on each scan.
 - **One nightly read-only test campaign:** real original freight invoices, RecoveryOS general-AP disclosures, PermitPlate official-source adapter regressions, and CaptureBrief procurement-source regressions.
 - **Legacy Lab 15 source discovery preserved:** the two original metadata harvesters are run **inside the central controller** when FreightRecovery's periodic legacy refresh is due; their two legacy ledgers remain historical/compatibility views on the *same* data branch. Their independent scheduled triggers are retired, not their test code.
 - **Existing Labs 1–14 kept intact:** their research findings, adversarial cases and stacked draft PRs are not silently declared merged, green or production-authorized. The synthetic 14-domain test director in PR #297 is a separate unmerged draft with explicit non-merge limitations. Port each validated, read-only harness into the nightly controller only when it exists on approved main; never transplant unfinished stacked branches into production.
@@ -140,8 +142,14 @@ never touches customer, production money, hosted RecoveryOS, or other Workers.
 - Worker source: `freight/research_lab_worker.mjs`; executable tests:
   `freight/research_lab_worker.test.mjs`; dedicated D1 schema:
   `freight/research_lab_worker.schema.sql`.
-- Every five minutes, Cloudflare chooses the least recently attempted one of
-  the four engines, avoiding missed-event starvation.
+- Every five minutes, Cloudflare uses a **weighted elapsed-time** selector:
+  FreightRecovery receives priority 10 versus 1 each for the three secondary
+  engines. In sustained simulated operation this gives approximately 70%
+  FreightRecovery runs, while an overdue secondary lane eventually overrides
+  FreightRecovery to avoid starvation after missed triggers. Provider-search
+  plans and bounded candidate windows advance per five-minute slot rather
+  than repeating the same twenty-minute window during consecutive freight
+  cycles. No additional provider calls are made per cycle.
 - It fetches only public GitHub/Zenodo and official NYC Socrata *metadata*,
   bounds response sizes and source count (24 per run), canonicalizes URLs,
   and deduplicates them in its own D1 store. It does not fetch original invoice
@@ -150,7 +158,10 @@ never touches customer, production money, hosted RecoveryOS, or other Workers.
   pointers and per-engine counts can leave that store. No independent accuracy
   or recovered cash assertions.
 - Cron invocation is idempotent per five-minute UTC slot and lane; duplicate
-  triggers cannot inflate source rows. HTTP endpoints are **read-only**:
+  triggers cannot inflate source rows. Stale-data detection is weighted-policy
+  aware: 45 minutes without successful FreightRecovery discovery, or 120 minutes
+  for a lower-frequency secondary lane, is flagged as stale. HTTP endpoints
+  are **read-only**:
   `/health` reports aggregate status and `/feed?engine=...` reports bounded
   metadata URLs. No public action can trigger a write.
 - Hosted within the existing Cloudflare account and without upgrading its
