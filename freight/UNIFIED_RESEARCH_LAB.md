@@ -818,3 +818,44 @@ verification *and* the existing once-daily real-data replay.
 This change adds **no scheduler, provider requests, branch, production engine
 actions, contacts or paid services**. CI contract tests explicitly reject
 removing either regression from nightly execution without triggering a failure.
+
+
+## Original GlobalTranz invoice adjustments — canonical v2 lab replay
+
+The original-document lab verifies fixed SHA-256 source bytes from the
+public GlobalTranz PDF and extracts **100 distinct actual invoice faces**
+with original signed line components. The last confirmed source replay had
+**93 invoices with a negative adjustment token**. The older positive-only
+ChargeLine-v1 check correctly blocked those negative tokens and represented
+just seven faces with charge lines alone. That does *not* mean that the
+existing canonical **v2** InvoiceAdjustment mechanism cannot represent them.
+
+The unified nightly lab now exercises the *existing* immutable v2
+InvoiceAdjustment data model: nonnegative ChargeLine entries plus positive
+magnitudes of original negative invoice components, each source-bound to the
+original frozen PDF SHA-256. It checks all source net totals exactly, executes
+the canonical v2 record-hash verifier, and rerates twice with an **empty**
+AuthorityBook. A structurally valid source record without an independently
+verified effective customer rate must always produce REVIEW_REQUIRED with
+no expected charge and no claimed variance. No product code or admission
+policy is modified.
+
+**Critical separation:** The replay constructs **synthetic lab-only
+shipment weight (1 g), postcodes, carrier and LTL mode** where the source
+invoice does not independently establish these facts. The v2
+kind=DISCOUNT is a provisional encoding of a negative *source component*,
+not independently authenticated discount semantics, a credit memo, a bank
+settlement or a refund. Only the signed source invoice net is conserved.
+
+The nightly acceptance gate tests an exact 100-face source reconciliation,
+including 93 adjustment-bearing records, 100 REVIEW_REQUIRED outcomes,
+zero reconstructed-source discrepancies and zero unsafe automated variance
+claims. All 110 total original GlobalTranz/ArcBest faces remain
+**UNKNOWN for real overcharge classification** until shipment-specific
+rate authority, original BOL/weight/contract evidence and independently
+adjudicated outcome or payment linkage exist.
+
+This is a deliberately bounded read-only amendment to
+freight/real_document_lab.py and its original-PDF regression tests; it
+adds no new Workers, GitHub schedule, data branch, customer communication,
+cost, production ingestion, live engine change or financial assertion.
