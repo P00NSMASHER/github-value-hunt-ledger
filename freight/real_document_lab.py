@@ -475,6 +475,156 @@ def globaltranz_invoice_line_total_benchmark(
     }
 
 
+
+def globaltranz_canonical_v2_adjustment_replay(
+    faces: list[InvoiceFace], texts: list[str], pdf_sha256: str,
+) -> dict:
+    """Reconstruct original PDF *invoice math* in canonical v2, never rate truth.
+
+    ChargeLine rightly forbids negative charges. Canonical schema v2 already
+    provides separate positive-magnitude InvoiceAdjustment records bound to
+    the original PDF SHA. This test exercises that supported model without
+    changing production ingress, applying tariffs, or storing invoice IDs.
+
+    Synthetic shipment fields here exist ONLY to satisfy the canonical schema.
+    In particular, the placeholder weight, postcodes, carrier and LTL mode
+    are not facts extracted from source. This is never a rate accuracy test.
+    """
+    from freight.canonical_schema import (
+        ChargeLine, InvoiceAdjustment, SourceArtifact, ShipmentFacts,
+        SCHEMA_VERSION, SIGNED_INVOICE_SCHEMA_VERSION, build_record, verify_record,
+    )
+    from freight.rate_authority import AuthorityBook
+    from freight.rating_engine import REVIEW_REQUIRED, rate_record
+
+    if not re.fullmatch(r"[0-9a-f]{64}", pdf_sha256):
+        raise ValueError("LAB_SOURCE_SHA256_REQUIRED")
+
+    exact = built = discounted = charge_only = review = unsafe = blocked = 0
+    missing = Counter()
+    record_hashes = []
+    for face in faces:
+        if (face.issuer != "globaltranz" or face.page <= 0
+                or face.page > len(texts) or not face.invoice_date
+                or not face.shipment_date or face.cents is None
+                or face.cents < 0):
+            blocked += 1
+            missing["FACE_IDENTITY_DATE_OR_AMOUNT_INCOMPLETE"] += 1
+            continue
+        components = globaltranz_charge_components(texts[face.page - 1])
+        if not components or not any(amount > 0 for amount in components):
+            blocked += 1
+            missing["CHARGE_COMPONENTS_MISSING"] += 1
+            continue
+        if sum(components) != face.cents:
+            blocked += 1
+            missing["ORIGINAL_FACE_NET_NOT_RECONCILED"] += 1
+            continue
+        try:
+            charges = tuple(
+                ChargeLine(
+                    charge_id=f"lab-positive:{face.page}:{idx}",
+                    charge_code="PDF_ORIGINAL_POSITIVE_COMPONENT",
+                    billed_cents=amount,
+                )
+                for idx, amount in enumerate(components, 1) if amount >= 0
+            )
+            adjustments = tuple(
+                InvoiceAdjustment(
+                    adjustment_id=f"lab-negative:{face.page}:{idx}",
+                    kind="DISCOUNT",  # Provisional source sign, NOT verified credit type.
+                    amount_cents=-amount,
+                    source_sha256=pdf_sha256,
+                )
+                for idx, amount in enumerate(components, 1) if amount < 0
+            )
+            source = SourceArtifact(
+                source_id="lab:globaltranz:" + _safe_sha(face.number),
+                kind="PUBLIC_ORIGINAL_INVOICE_LAB_ONLY",
+                sha256=pdf_sha256,
+                observed_at="2026-10-20T00:00:00.000000Z",
+                transport="BATCH", filename="globaltranz.pdf",
+            )
+            # No original customer contract, validated weight, location or
+            # true freight mode is supplied. The deliberate lab placeholders
+            # must NEVER be sent to a rated production invoice workflow.
+            shipment = ShipmentFacts(
+                shipment_id="LAB_SYNTHETIC:" + _safe_sha(face.number),
+                carrier_id="LAB_CARRIER_UNKNOWN",
+                mode="LTL", service_date=face.shipment_date,
+                origin_postal="LAB_UNKNOWN_ORIGIN",
+                destination_postal="LAB_UNKNOWN_DESTINATION",
+                actual_weight_grams=1, package_count=1,
+            )
+            record = build_record(
+                buyer_id="ISOLATED_PUBLIC_RESEARCH_ONLY",
+                business_unit="LAB_SYNTHETIC_SHIPMENT",
+                invoice_id=face.number,
+                invoice_date=face.invoice_date,
+                customer_id="LAB_UNKNOWN_CUSTOMER",
+                currency="USD", shipment=shipment,
+                charges=charges, adjustments=adjustments, sources=(source,),
+            )
+            verify_record(record)
+            if record.billed_total_cents != face.cents:
+                blocked += 1
+                missing["V2_NET_TOTAL_CHANGED"] += 1
+                continue
+            if adjustments and record.schema_version != SIGNED_INVOICE_SCHEMA_VERSION:
+                blocked += 1
+                missing["V2_ADJUSTMENT_SCHEMA_NOT_USED"] += 1
+                continue
+            if not adjustments and record.schema_version != SCHEMA_VERSION:
+                blocked += 1
+                missing["V1_POSITIVE_CHARGE_SCHEMA_NOT_USED"] += 1
+                continue
+            first = rate_record(record, AuthorityBook(()))
+            second = rate_record(record, AuthorityBook(()))
+            if (first.status != REVIEW_REQUIRED or
+                    first.expected_total_cents is not None or
+                    first.variance_cents is not None or
+                    first.billed_total_cents != face.cents or
+                    first.rating_hash != second.rating_hash):
+                unsafe += 1
+                continue
+        except ValueError:
+            blocked += 1
+            missing["SCHEMA_REJECTED_LAB_PROXY"] += 1
+            continue
+        built += 1
+        exact += 1
+        discounted += int(bool(adjustments))
+        charge_only += int(not adjustments)
+        review += 1
+        record_hashes.append(record.record_hash)
+
+    return {
+        "scope": "ORIGINAL_PDF_SIGNED_MONEY_REPLAY_WITH_SYNTHETIC_SHIPMENT_NO_TARIFF",
+        "original_invoice_faces_considered": len(faces),
+        "canonical_invoice_records_with_exact_source_net": exact,
+        "canonical_v2_adjustment_records_with_exact_source_net": discounted,
+        "canonical_v1_charge_only_records_with_exact_source_net": charge_only,
+        "canonical_records_built": built,
+        "discount_bearing_v2_records": discounted,
+        "rate_review_required": review,
+        "unrepresentable_or_missing_source": blocked,
+        "unsafe_auto_money_or_nondeterministic": unsafe,
+        "incomplete_source_reason_counts": dict(sorted(missing.items())),
+        "input_original_pdf_digest_matches_frozen_baseline":
+            pdf_sha256 == FROZEN_DOCUMENT_SHA256["globaltranz"],
+        "source_bound_adjustment_sha256": pdf_sha256,
+        "stable_canonical_record_catalog_sha256": digest(
+            "".join(sorted(record_hashes)).encode("utf-8")),
+        "invoice_adjustment_kind_is_lab_hypothesis_not_adjudicated": True,
+        "shipment_fields_are_synthetic_lab_placeholders": True,
+        "production_pdf_extraction_completed": False,
+        "commercial_rate_authority_verified": False,
+        "independent_invoice_overcharge_labels": 0,
+        "recovered_cash_cents": 0,
+        "customer_contact_actions": 0,
+    }
+
+
 def _safe_sha(identifier: str) -> str:
     return hashlib.sha256(identifier.encode("utf-8")).hexdigest()[:20]
 
@@ -788,6 +938,9 @@ def benchmark_freight() -> dict:
         if issuer == "globaltranz":
             out["original_invoice_line_amount_reconciliation"] = (
                 globaltranz_invoice_line_total_benchmark(list(unique.values()), texts))
+            out["canonical_v2_original_invoice_adjustment_lab"] = (
+                globaltranz_canonical_v2_adjustment_replay(
+                    list(unique.values()), texts, source_hash))
             statements = statement_rows(texts)
             invoice_rows = []
             statement_txns = []
