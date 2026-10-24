@@ -11,9 +11,10 @@ from urllib.parse import urlparse
 from unittest.mock import patch
 
 from freight.official_capturebrief_award_lab import (
-    API, FIXED_WINDOW, MAX_ROWS, MAX_SECOND_READS, MAX_RESPONSE_BYTES,
+    API, DETAIL_PREFIX, MAX_DETAIL_BYTES, FIXED_WINDOW, MAX_ROWS, MAX_SECOND_READS, MAX_RESPONSE_BYTES,
     SOURCE_ANCHOR, SCOPE, _check_query, _minimal, _money_minor, _query,
-    build_receipt, fetch_public_awards, run, validate_receipt,
+    _detail_identity_and_amount_consistent, build_receipt,
+    fetch_public_awards, fetch_public_award_detail, run, validate_receipt,
 )
 from freight.unified_research_lab import (
     ResearchError, digest, ledger_from, source_record,
@@ -300,6 +301,121 @@ class OriginalUSAspendingAwardReadbackTests(unittest.TestCase):
                 return_value=ErroringOpener()):
             with self.assertRaisesRegex(ResearchError, "^HTTP_429$"):
                 fetch_public_awards(_query())
+
+
+    def test_503_exact_search_uses_documented_get_detail_as_separate_partial_evidence(self):
+        attempts = []
+        def throttled_secondary(query):
+            if "award_ids" not in query["filters"]:
+                return fake_api(query)
+            raise ResearchError("HTTP_503")
+        def detail_provider(internal):
+            attempts.append(internal)
+            row = next(x for x in FAKE_SOURCE if x["internal_id"] == internal)
+            return {
+                "id": internal,
+                "piid": row["Award ID"],
+                "generated_unique_award_id": row["generated_internal_id"],
+                "total_obligation": row["Award Amount"],
+                "date_signed": "2026-06-01",
+                "recipient": {"recipient_name": "NOT FOR STORAGE"},
+            }
+        receipt = build_receipt(ledger(), as_of=NOW, fetcher=throttled_secondary,
+                                detail_fetcher=detail_provider)
+        self.assertEqual(len(attempts), 2)
+        self.assertEqual(receipt["publisher_readbacks_unavailable"], 2)
+        self.assertEqual(receipt["publisher_readbacks_exact"], 0)
+        self.assertEqual(receipt["publisher_readback_error_codes"], {"HTTP_503": 2})
+        self.assertEqual(receipt["publisher_detail_lookup_attempted"], 2)
+        self.assertEqual(receipt["publisher_detail_identity_amount_matched"], 2)
+        self.assertEqual(receipt["publisher_detail_changed"], 0)
+        self.assertEqual(receipt["publisher_detail_unavailable"], 0)
+        self.assertEqual(receipt["publisher_detail_error_codes"], {})
+        self.assertEqual(receipt["status"], "PUBLISHER_AWARD_READBACK_DEGRADED")
+        self.assertNotIn("NOT FOR STORAGE", str(receipt))
+        self.assertNotIn("FA-2026-A013", str(receipt))
+        self.assertEqual(receipt["independent_award_outcome_labels"], 0)
+        validate_receipt(receipt, ledger(), NOW)
+
+    def test_detail_get_does_not_promote_different_amount_or_identity(self):
+        def throttled_secondary(query):
+            if "award_ids" not in query["filters"]:
+                return [FAKE_SOURCE[0]]
+            raise ResearchError("HTTP_503")
+        detail = {
+            "id": FAKE_SOURCE[0]["internal_id"],
+            "piid": FAKE_SOURCE[0]["Award ID"],
+            "generated_unique_award_id": FAKE_SOURCE[0]["generated_internal_id"],
+            "total_obligation": FAKE_SOURCE[0]["Award Amount"] + 1,
+        }
+        self.assertFalse(_detail_identity_and_amount_consistent(_minimal(FAKE_SOURCE[0]),detail))
+        receipt = build_receipt(ledger(), as_of=NOW, fetcher=throttled_secondary,
+                                detail_fetcher=lambda _: detail)
+        self.assertEqual(receipt["publisher_detail_lookup_attempted"], 1)
+        self.assertEqual(receipt["publisher_detail_changed"], 1)
+        self.assertEqual(receipt["publisher_detail_identity_amount_matched"], 0)
+        self.assertEqual(receipt["independent_sam_solicitation_matches"], 0)
+        validate_receipt(receipt,ledger(),NOW)
+
+    def test_detail_get_failure_cannot_suppress_503_or_forge_original_record(self):
+        def throttled(query):
+            if "award_ids" not in query["filters"]:
+                return [FAKE_SOURCE[0]]
+            raise ResearchError("HTTP_503")
+        receipt = build_receipt(ledger(),as_of=NOW,fetcher=throttled,
+                                detail_fetcher=lambda _: (_ for _ in ()).throw(
+                                    ResearchError("HTTP_429")))
+        self.assertEqual(receipt["publisher_readbacks_unavailable"],1)
+        self.assertEqual(receipt["publisher_detail_lookup_attempted"],1)
+        self.assertEqual(receipt["publisher_detail_unavailable"],1)
+        self.assertEqual(receipt["publisher_detail_error_codes"],{"HTTP_429":1})
+        self.assertEqual(receipt["source_errors"],["READBACK_INCOMPLETE"])
+        validate_receipt(receipt,ledger(),NOW)
+        for field,value in (
+            ("publisher_detail_identity_amount_matched",2),
+            ("publisher_detail_lookup_attempted",0),
+            ("publisher_detail_error_codes",{"SOURCE_SECRET":1}),
+        ):
+            tampered=copy.deepcopy(receipt)
+            tampered[field]=value
+            tampered["receipt_sha256"]=digest({
+                k:v for k,v in tampered.items() if k!="receipt_sha256"})
+            with self.subTest(field=field),self.assertRaises(ResearchError):
+                validate_receipt(tampered,ledger(),NOW)
+
+    def test_documented_detail_get_is_strict_fixed_origin_read_only_and_bounded(self):
+        from urllib.error import HTTPError
+        for bad in (0,-1,1.1,"123","1 OR 1=1",10**17):
+            with self.subTest(bad=bad),self.assertRaisesRegex(
+                    ResearchError,"UNSAFE_PUBLISHER_DETAIL_ID"):
+                fetch_public_award_detail(bad)
+        requested = []
+        class Response:
+            status=200
+            headers={"Content-Type":"application/json","Content-Encoding":"identity"}
+            def __enter__(self):return self
+            def __exit__(self,*_):return None
+            def geturl(self):return DETAIL_PREFIX+"10013/"
+            def read(self,n):
+                requested.append(n)
+                return json.dumps({
+                    "id":10013, "piid":"FA-2026-A013",
+                    "total_obligation":1500000.25,
+                    "recipient":{"recipient_name":"SENSITIVE NOT SAVED"}
+                }).encode("utf-8")
+        class Opener:
+            def open(self,request,timeout):
+                requested.append((request.get_method(),request.full_url,timeout))
+                return Response()
+        with patch("freight.official_capturebrief_award_lab.global_dns"),\
+             patch("freight.official_capturebrief_award_lab.build_opener",
+                   return_value=Opener()):
+            body=fetch_public_award_detail(10013)
+        self.assertEqual(body["id"],10013)
+        self.assertEqual(requested[0],("GET",DETAIL_PREFIX+"10013/",12))
+        self.assertEqual(requested[1],MAX_DETAIL_BYTES+1)
+        self.assertGreaterEqual(MAX_DETAIL_BYTES,220000)
+
 
 
 if __name__ == "__main__":
