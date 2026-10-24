@@ -78,6 +78,35 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(triggers.count('cron: "19 3 * * *"'), 1)
 
 
+    def test_real_original_signed_freight_replay_is_not_silently_removed(self):
+        """Prove v2 adjustment compatibility is actually tested, not claimed."""
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        verify = workflow.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        nightly = workflow.split("\n  nightly-real-data-replay:\n", 1)[1]
+        command = "          python -m unittest -q freight.test_real_document_lab"
+        self.assertEqual(verify.splitlines().count(command), 1)
+        for key in (
+            "canonical_v2_original_invoice_adjustment_lab",
+            "canonical_v2_records_with_exact_net",
+            "discount_bearing_v2_records",
+            "rate_review_required",
+            "independent_invoice_overcharge_labels",
+            "source_bound_adjustment_sha256",
+            "unknown_cases_preserved",
+        ):
+            with self.subTest(key=key):
+                self.assertIn(key, nightly)
+        self.assertIn("assert signed['unsafe_auto_money_or_nondeterministic'] == 0", nightly)
+        self.assertIn("assert signed['commercial_rate_authority_verified'] is False", nightly)
+        self.assertIn("assert signed['recovered_cash_cents'] == 0", nightly)
+        triggers = workflow.split("\npermissions:\n", 1)[0]
+        for path in ("freight/real_document_lab.py", "freight/test_real_document_lab.py"):
+            with self.subTest(path=path):
+                self.assertEqual(triggers.splitlines().count('      - "' + path + '"'), 2)
+        self.assertEqual(triggers.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(triggers.count('cron: "19 3 * * *"'), 1)
+
+
 
 if __name__ == "__main__":
     unittest.main()
