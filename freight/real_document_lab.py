@@ -492,7 +492,7 @@ def globaltranz_canonical_v2_adjustment_replay(
     """
     from freight.canonical_schema import (
         ChargeLine, InvoiceAdjustment, SourceArtifact, ShipmentFacts,
-        SIGNED_INVOICE_SCHEMA_VERSION, build_record, verify_record,
+        SCHEMA_VERSION, SIGNED_INVOICE_SCHEMA_VERSION, build_record, verify_record,
     )
     from freight.rate_authority import AuthorityBook
     from freight.rating_engine import REVIEW_REQUIRED, rate_record
@@ -500,7 +500,7 @@ def globaltranz_canonical_v2_adjustment_replay(
     if not re.fullmatch(r"[0-9a-f]{64}", pdf_sha256):
         raise ValueError("LAB_SOURCE_SHA256_REQUIRED")
 
-    exact = built = discounted = review = unsafe = blocked = 0
+    exact = built = discounted = charge_only = review = unsafe = blocked = 0
     missing = Counter()
     record_hashes = []
     for face in faces:
@@ -574,6 +574,10 @@ def globaltranz_canonical_v2_adjustment_replay(
                 blocked += 1
                 missing["V2_ADJUSTMENT_SCHEMA_NOT_USED"] += 1
                 continue
+            if not adjustments and record.schema_version != SCHEMA_VERSION:
+                blocked += 1
+                missing["V1_POSITIVE_CHARGE_SCHEMA_NOT_USED"] += 1
+                continue
             first = rate_record(record, AuthorityBook(()))
             second = rate_record(record, AuthorityBook(()))
             if (first.status != REVIEW_REQUIRED or
@@ -590,13 +594,16 @@ def globaltranz_canonical_v2_adjustment_replay(
         built += 1
         exact += 1
         discounted += int(bool(adjustments))
+        charge_only += int(not adjustments)
         review += 1
         record_hashes.append(record.record_hash)
 
     return {
         "scope": "ORIGINAL_PDF_SIGNED_MONEY_REPLAY_WITH_SYNTHETIC_SHIPMENT_NO_TARIFF",
         "original_invoice_faces_considered": len(faces),
-        "canonical_v2_records_with_exact_net": exact,
+        "canonical_invoice_records_with_exact_source_net": exact,
+        "canonical_v2_adjustment_records_with_exact_source_net": discounted,
+        "canonical_v1_charge_only_records_with_exact_source_net": charge_only,
         "canonical_records_built": built,
         "discount_bearing_v2_records": discounted,
         "rate_review_required": review,
