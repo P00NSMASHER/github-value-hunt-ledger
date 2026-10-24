@@ -429,3 +429,64 @@ publisher access:
   outcomes; train/test leakage and as-of-date chronology must be excluded.
 - Keep unknown labels **UNKNOWN** and commercial authorization **FALSE**
   until each separate requirement is evidenced, not inferred by a model.
+
+## Official issued-permit original-row replay (v7)
+
+An additional **read-only real source replay inside the existing controller**
+uses the official NYC Open Data DOB NOW: Build – Approved Permits dataset
+`rbx6-tga4` (publisher:
+`https://data.cityofnewyork.us/d/rbx6-tga4`). It exercises the published
+JSON record schema using *only* job filing, tracking number, work permit,
+sequence, issue date and permit-status fields. No owner name, address,
+contractor identity, contact, original row or other sensitive source field
+is retained in the research branch.
+
+The daily sample is capped at 20 dated original published records. Three
+sampled tracking numbers are separately re-read from the **same original
+publisher source**, with URL/SoQL allowlisting, strict source identity,
+read-only HTTPS/redirect protection and a 160-KiB response cap. The derived
+source receipt records sampled count, exact second-read matches,
+conflicts/missing records, non-issued placeholder counts, and SHA-256 of
+only the selected canonical sample fields. The source records and
+identifiers themselves remain ephemeral. Duplicate tracking numbers are
+not assumed to be unique permit IDs: multiple work permits and sequences
+may belong to one tracking number. A work-permit placeholder saying
+"Permit is not yet issued" does not become a positive issued-permit case
+simply because a source row has a date.
+
+This checks **publisher consistency**, not a separate independent
+government adjudication: issuance source records, historical filing
+status, operational demand, buyers' purchasing intent and awarded
+contracts are materially different facts. The source receipt therefore
+preserves all commercial source-rights and independent outcome gates.
+The user's asserted broad commercial reuse rights are recorded as
+`OWNER_ATTESTED_NOT_SOURCE_VERIFIED` without forging signed or
+source-specific permission evidence; source-specific rights remain
+unverified by this controller. The official NYC Open Data FAQ states
+that the open data is generally available for unrestricted use; individual
+dataset terms and non-public material are not retroactively cleared by
+that general statement:
+`https://www.nyc.gov/opendata/get-started/FAQs`.
+
+On source outages the replay records **DEGRADED**, not fake positives or
+no-records-found claims. Source schema changes, duplicate full source
+identity collisions, forged commercial rights or tampered receipts
+block the research workflow. A successful limited publisher readback
+remains separate from independently held-out opportunity accuracy.
+
+The output is staged **only** on
+`research/retally-unified-data-lab` as
+`freight/research_lab/official_nyc_issued_permit_replay_v1.json`.
+Every post-publish nightly replay verifies it against that exact source
+branch before exercising the four independent engines. No extra Cron,
+Worker, paid service, customer contact, billing or engine production
+mutation is introduced.
+
+Offline tests:
+
+    python -m unittest -q freight.test_official_nyc_issued_permit_lab
+
+Public read-only source probe (inside existing GitHub discovery only):
+
+    python -m freight.official_nyc_issued_permit_lab
+    python -m freight.official_nyc_issued_permit_lab --verify
