@@ -320,5 +320,226 @@ class GAOAgentVersusInterlineEvidenceTests(unittest.TestCase):
 
 
 
+
+# Companion original GAO decision: historical exclusive-use freight rating.
+# This is decision-level evidence, NOT an independent modern invoice benchmark.
+EXCLUSIVE_URL = "https://www.gao.gov/products/b-139340"
+EXCLUSIVE_PATH = Path(__file__).with_name("fixtures") / "gao_b139340_exclusive_use_v1.json"
+EXCLUSIVE_MANIFEST_SHA256 = "71350173ef2a3d562ec58a05a80ab76bb4403ab08a0cbcd9f4b83c053e434252"
+
+
+def exclusive_fixture():
+    return json.loads(EXCLUSIVE_PATH.read_text(encoding="utf-8"))
+
+
+def validate_exclusive_fixture(doc):
+    try:
+        if digest({k: v for k, v in doc.items() if k != "manifest_sha256"}) != doc.get("manifest_sha256"):
+            raise ResearchError("GAO_B139340_AUTHORED_HASH_MISMATCH")
+        s, sh, r, g, q = (doc["source"], doc["shipment"], doc["historical_rating"],
+                          doc["ground_truth"], doc["data_quality"])
+        checks = (
+            doc["schema_version"] == "1.0.0"
+            and doc["fixture_id"] == "GAO_B139340_EXCLUSIVE_USE_RATE_DISPUTE_V1"
+            and doc["evidence_lane"] == "freight_error_adjudication"
+            and doc["status"] == "HISTORICAL_GAO_DECISION_LEVEL_NUMERIC_LABEL_NOT_CUSTOMER_INVOICE_BENCHMARK"
+            and doc["manifest_hash_contract"] == "AUTHORED_CANONICAL_JSON_SHA256_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES"
+            and s["case_number"] == "B-139340"
+            and s["original_record_url"] == EXCLUSIVE_URL
+            and s["decision_date"] == "1959-07-29"
+            and s["rights_url"] == "https://www.gao.gov/copyright"
+            and s["original_source_bytes_sha256"] is None
+            and s["original_source_bytes_acquired"] is False
+            and s["commercial_engine_use_approved"] is False
+            and sh["gbl_id"] == "N-30864154"
+            and sh["shipment_month"] == "1956-02"
+            and sh["weight_pounds"] == 17250
+            and sh["tariff_original_pages_available"] is False
+            and sh["tariff_effective_at_shipment_independently_verified"] is False
+            and r["carrier_paid_cents"] == 52360
+            and r["carrier_rate_cents_per_cwt"] == 374
+            and r["carrier_minimum_weight_pounds"] == 14000
+            and r["gao_allowable_cents"] == 45195
+            and r["gao_rate_cents_per_cwt"] == 262
+            and r["gao_applied_weight_pounds"] == 17250
+            and r["gao_setoff_cents"] == 7165
+            and r["gao_transcribed_gbl_truckload_notation"] == {
+                "rate_cents_per_cwt": 262,
+                "minimum_weight_pounds": 16000,
+                "class": 70,
+                "tariff": "ECM 31-A",
+                "underlying_gbl_image_available": False,
+            }
+            and r["gao_transcribed_gbl_truckload_notation"]["minimum_weight_pounds"] < r["gao_applied_weight_pounds"]
+            and r["carrier_rate_cents_per_cwt"] * r["carrier_minimum_weight_pounds"] == r["carrier_paid_cents"] * 100
+            and r["gao_rate_cents_per_cwt"] * r["gao_applied_weight_pounds"] == r["gao_allowable_cents"] * 100
+            and r["carrier_paid_cents"] - r["gao_allowable_cents"] == r["gao_setoff_cents"]
+            and r["deduction_reported_collected_by_government"] is True
+            and r["carrier_exclusive_use_argument"] == "SEALED_OR_AUTHORIZED_BUT_NOT_SHIPPER_ORDERED_WITH_SIGNATURE"
+            and r["gao_reason"] == "TARIFF_REQUIRES_SHIPPER_ORDERED_EXCLUSIVE_USE_SIGNED_ON_GBL"
+            and r["gao_full_vehicle_inference_status"] == "SUGGESTED_BY_GAO_NOT_INDEPENDENTLY_MEASURED"
+            and r["gao_conditional_alternative_reason"] == "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT"
+            and r["gao_disposition"] == "DISALLOWANCE_SUSTAINED"
+            and r["further_litigation_outcome"] == "UNKNOWN"
+            and g["independent_government_decision_published"] is True
+            and g["independently_held_out_from_engine_training_verified"] is False
+            and g["original_bill_of_lading_or_carrier_invoice_bytes_in_custody"] is False
+            and g["contemporaneous_tariff_pages_in_custody"] is False
+            and g["independent_customer_payment_or_credit_chain"] is False
+            and g["actual_vehicle_capacity_independently_verified"] is False
+            and g["current_contract_rate_applicability"] == "UNKNOWN"
+            and g["independent_original_invoice_error_cents"] is None
+            and g["retally_verified_cash_recovered_cents"] == 0
+            and g["independent_customer_invoice_accuracy_scoring_permitted"] is False
+            and q["official_html_text_manually_verified"] is True
+            and q["reported_number_math_complete"] is True
+            and q["original_source_bytes_hash_available"] is False
+            and q["source_independent_invoice_label_complete"] is False
+            and q["private_customer_medical_student_data_used"] is False
+            and len(doc["synthetic_negative_controls"]) == 5
+            and [v["expected"] for v in doc["synthetic_negative_controls"]] == [
+                "REJECT_SEAL_OR_AUTHORIZATION_IS_NOT_ORDERED_AND_SIGNED",
+                "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_RATE_AUTHORITY",
+                "UNKNOWN_DO_NOT_INFER_VALID_EXCLUSIVE_USE",
+                "REJECT_SIGNED_ORDER_ALONE_DOES_NOT_OVERRIDE_FULL_LOAD_TRUCKLOAD_RATE",
+                "REJECT_MINIMUM_WEIGHT_DOES_NOT_REPLACE_HIGHER_ACTUAL_WEIGHT",
+            ]
+            and all(v["synthetic"] is True and v["customer_error_cents"] is None
+                    for v in doc["synthetic_negative_controls"])
+        )
+        if not checks:
+            raise ResearchError("GAO_B139340_SOURCE_OR_TRUTH_SCOPE_MISMATCH")
+    except (KeyError, TypeError, AttributeError) as exc:
+        raise ResearchError("GAO_B139340_FIXTURE_SCHEMA_INVALID") from exc
+    return doc
+
+
+class GAOExclusiveUseNumericalEvidenceTests(unittest.TestCase):
+    def test_official_source_and_pinned_manifest_enter_canonical_seed(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        self.assertEqual(record["manifest_sha256"], EXCLUSIVE_MANIFEST_SHA256)
+        self.assertIn(EXCLUSIVE_URL, SEEDS["freightrecovery"])
+        self.assertIsNone(record["source"]["original_source_bytes_sha256"])
+        self.assertFalse(record["source"]["commercial_engine_use_approved"])
+
+    def test_two_actual_historical_rate_formulas_reconcile_to_setoff(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        r = record["historical_rating"]
+        self.assertEqual((r["carrier_paid_cents"], r["gao_allowable_cents"], r["gao_setoff_cents"]),
+                         (52360, 45195, 7165))
+        self.assertEqual(r["carrier_rate_cents_per_cwt"] * r["carrier_minimum_weight_pounds"] // 100, 52360)
+        self.assertEqual(r["gao_rate_cents_per_cwt"] * r["gao_applied_weight_pounds"] // 100, 45195)
+        self.assertEqual(r["carrier_paid_cents"] - r["gao_allowable_cents"], 7165)
+        self.assertTrue(r["deduction_reported_collected_by_government"])
+        self.assertIsNone(record["ground_truth"]["independent_original_invoice_error_cents"])
+        self.assertEqual(record["ground_truth"]["retally_verified_cash_recovered_cents"], 0)
+
+    def test_publisher_transcribed_gbl_truckload_note_uses_higher_actual_weight(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        r = record["historical_rating"]
+        note = r["gao_transcribed_gbl_truckload_notation"]
+        self.assertEqual(note, {
+            "rate_cents_per_cwt": 262,
+            "minimum_weight_pounds": 16000,
+            "class": 70,
+            "tariff": "ECM 31-A",
+            "underlying_gbl_image_available": False,
+        })
+        self.assertEqual(r["gao_applied_weight_pounds"], 17250)
+        self.assertGreater(r["gao_applied_weight_pounds"], note["minimum_weight_pounds"])
+        self.assertEqual(r["gao_allowable_cents"], 45195)
+        self.assertNotEqual(note["rate_cents_per_cwt"] * note["minimum_weight_pounds"] // 100,
+                            r["gao_allowable_cents"])
+        self.assertFalse(record["ground_truth"]["original_bill_of_lading_or_carrier_invoice_bytes_in_custody"])
+        self.assertIn("SYNTHETIC_USE_GBL_16000_MIN_WEIGHT_INSTEAD_OF_HIGHER_ACTUAL",
+                      {v["id"] for v in record["synthetic_negative_controls"]})
+
+    def test_rehashed_gbl_truckload_note_forgery_is_rejected(self):
+        original = validate_exclusive_fixture(exclusive_fixture())
+        for field, invalid in (
+            ("rate_cents_per_cwt", 374),
+            ("minimum_weight_pounds", 14000),
+            ("class", 100),
+            ("tariff", "CURRENT_TARIFF"),
+            ("underlying_gbl_image_available", True),
+        ):
+            changed = deepcopy(original)
+            changed["historical_rating"]["gao_transcribed_gbl_truckload_notation"][field] = invalid
+            changed["manifest_sha256"] = digest({
+                k: v for k, v in changed.items() if k != "manifest_sha256"
+            })
+            with self.subTest(field=field), self.assertRaises(ResearchError):
+                validate_exclusive_fixture(changed)
+
+    def test_five_negative_controls_are_explicitly_synthetic_or_unknown(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        self.assertTrue(all(v["synthetic"] is True for v in record["synthetic_negative_controls"]))
+        self.assertEqual(record["ground_truth"]["current_contract_rate_applicability"], "UNKNOWN")
+        self.assertEqual(record["historical_rating"]["further_litigation_outcome"], "UNKNOWN")
+        self.assertFalse(record["ground_truth"]["independently_held_out_from_engine_training_verified"])
+
+    def test_original_gao_distinguishes_missing_signature_from_conditional_full_truckload(self):
+        record = validate_exclusive_fixture(exclusive_fixture())
+        r, g = record["historical_rating"], record["ground_truth"]
+        # GAO's observation that the vehicle appeared full is not measured vehicle custody.
+        self.assertEqual(r["gao_full_vehicle_inference_status"],
+                         "SUGGESTED_BY_GAO_NOT_INDEPENDENTLY_MEASURED")
+        self.assertFalse(g["actual_vehicle_capacity_independently_verified"])
+        # GAO separately reasons that even an assumed valid exclusive-use order adds
+        # no benefit where a vehicle is fully loaded; this is a conditional legal point.
+        self.assertEqual(r["gao_conditional_alternative_reason"],
+                         "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT")
+        self.assertIn("SYNTHETIC_VALID_SIGNED_ORDER_BUT_FULL_TRUCKLOAD",
+                      {x["id"] for x in record["synthetic_negative_controls"]})
+        self.assertIsNone(g["independent_original_invoice_error_cents"])
+
+    def test_rehashed_tampering_cannot_promote_customer_truth_or_modern_rate(self):
+        original = validate_exclusive_fixture(exclusive_fixture())
+        for section, field, invalid in (
+            ("source", "original_source_bytes_sha256", "f" * 64),
+            ("source", "original_source_bytes_acquired", True),
+            ("source", "commercial_engine_use_approved", True),
+            ("shipment", "tariff_original_pages_available", True),
+            ("shipment", "tariff_effective_at_shipment_independently_verified", True),
+            ("historical_rating", "carrier_paid_cents", 52361),
+            ("historical_rating", "gao_setoff_cents", 7166),
+            ("historical_rating", "gao_reason", "SEAL_ALONE_PROVES_EXCLUSIVE_USE"),
+            ("historical_rating", "gao_full_vehicle_inference_status", "VEHICLE_FULL_LOAD_PROVEN"),
+            ("historical_rating", "gao_conditional_alternative_reason", "SIGNED_ORDER_ALWAYS_AUTHORIZES_EXCLUSIVE_USE"),
+            ("ground_truth", "actual_vehicle_capacity_independently_verified", True),
+            ("ground_truth", "independently_held_out_from_engine_training_verified", True),
+            ("ground_truth", "independent_customer_payment_or_credit_chain", True),
+            ("ground_truth", "independent_original_invoice_error_cents", 7165),
+            ("ground_truth", "retally_verified_cash_recovered_cents", 7165),
+            ("ground_truth", "independent_customer_invoice_accuracy_scoring_permitted", True),
+            ("data_quality", "source_independent_invoice_label_complete", True),
+        ):
+            mutated = deepcopy(original)
+            mutated[section][field] = invalid
+            mutated["manifest_sha256"] = digest({
+                k: v for k, v in mutated.items() if k != "manifest_sha256"
+            })
+            with self.subTest(section=section, field=field), self.assertRaises(ResearchError):
+                validate_exclusive_fixture(mutated)
+
+    def test_public_source_enters_existing_feed_with_no_claimed_invoice_error(self):
+        validate_exclusive_fixture(exclusive_fixture())
+        ledger = ledger_from([source_record(EXCLUSIVE_URL, "freightrecovery", "2026-10-24")])
+        evidence, candidates, manifest = legacy_evidence(), legacy_candidates(), load_manifest()
+        feed = build_feed(ledger, evidence, candidates, manifest)
+        row = feed["candidate_sources"][0]
+        self.assertEqual(feed["source_pointers_total"], 1)
+        self.assertEqual(row["source_url"], EXCLUSIVE_URL)
+        self.assertIsNone(row["case_id"])
+        self.assertFalse(row["commercial_reuse_authorized"])
+        self.assertFalse(row["independent_ground_truth"])
+        self.assertFalse(row["independent_payment_verified"])
+        self.assertFalse(row["source_document_ingested"])
+        self.assertIsNone(row["model"]["verified_freight_error_cents"])
+        self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+        self.assertEqual(feed["independently_scored_new_customer_cases"], 0)
+        validate_feed(feed, ledger, evidence, candidates, manifest)
+
+
 if __name__ == "__main__":
     unittest.main()
