@@ -498,3 +498,60 @@ Public read-only source probe (inside existing GitHub discovery only):
 
     python -m freight.official_nyc_issued_permit_lab
     python -m freight.official_nyc_issued_permit_lab --verify
+
+## CaptureBrief official USAspending award-row readback (v8)
+
+CaptureBrief now has an original federal contracting record readback inside the
+**existing unified controller**. It queries the public USAspending
+`/api/v2/search/spending_by_award/` publisher service using a strictly
+fixed original award type population (A/B/C/D), the completed federal
+FY2026 award period (2025-10-01 through 2026-09-30), bounded 12-row sample,
+and at most two separately scoped exact award-ID re-queries. Search POSTs
+are **read-only** to the official publisher, do not require credentials,
+and never contact contractors, agencies or private parties.
+
+The runner parses only original public publisher award ID/internal ID,
+published award amount, generated internal ID and base obligation date.
+It checks identity/amount/date consistency across re-reads, detects
+duplicate economic source IDs, rejects invalid money/date formats and
+distinguishes changed/missing/saturated publisher results from an exact
+match. A published dollar award **is not** an attainable future CaptureBrief
+customer contract, a currently open opportunity, bank-cleared payment,
+successful bid or independent original SAM.gov solicitation amendment.
+No recipient name, private source row or original award identifier is
+logged or included in the persisted report.
+
+The bounded cross-engine source branch now also publishes
+`freight/research_lab/official_capturebrief_award_readback_v1.json`,
+with the source-anchor hash, original award record counts, any repeated
+publisher rows, an aggregate source-only award amount (USD cents),
+up to two same-publisher readback outcomes and the canonical sample
+SHA-256. This is neither a signature on original bytes nor a model
+accuracy score. User-attested broad reuse rights remain distinguishable
+from independently verified source-specific terms, and independent
+solicitation outcome matches remain zero. The isolated data branch
+receives no individual award identifiers or recipient names.
+
+After the first live run the branch must report its **actual** sample
+size, readback outcomes and provider error codes. A blocked or changed
+publisher source is reported as DEGRADED, not silently turned into no
+awards or a passing truth label. The nightly four-engine evaluation
+tests its receipt integrity before claiming a healthy read-only replay.
+
+The integration reuses the current controller, protected main,
+metadata-only branch, required status checks and existing schedule.
+No added Worker, new paid account, direct customer message, unapproved
+API credentials or production CaptureBrief alteration is required.
+
+The source contract is published by USAspending:
+`https://api.usaspending.gov/docs/endpoints` and
+`https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/search/spending_by_award.md`.
+
+Run strictly offline regression tests:
+
+    python -m unittest -v freight.test_official_capturebrief_award_lab
+
+Reproduce only from the authorized isolated research branch:
+
+    python -m freight.official_capturebrief_award_lab
+    python -m freight.official_capturebrief_award_lab --verify
