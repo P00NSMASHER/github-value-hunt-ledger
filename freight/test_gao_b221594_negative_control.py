@@ -14,7 +14,7 @@ from freight.unified_research_lab import ResearchError, SEEDS, digest, ledger_fr
 
 URL = "https://www.gao.gov/products/b-221594-0"
 PATH = Path(__file__).with_name("fixtures") / "gao_b221594_source_v1.json"
-SHA = "87da32abe9ec46640a33b8b3b3b9f940a15524732b5026ebbc580fbc45f6660c"
+SHA = "3764a91f78fdf94ed214eb2974127a720d1588aa69162c83a88e3a45146ba2d7"
 
 
 def fixture():
@@ -25,7 +25,9 @@ def verify_fixture(doc):
     computed = digest({k: v for k, v in doc.items() if k != "manifest_sha256"})
     if doc.get("manifest_sha256") != computed:
         raise ResearchError("GAO_NEGATIVE_MANIFEST_SHA_MISMATCH")
-    s, f, l, second = doc["source"], doc["facts"], doc["limits"], doc["documented_second_shipment"]
+    s, f, l, second, mirror = (doc["source"], doc["facts"], doc["limits"],
+                              doc["documented_second_shipment"],
+                              doc["corroborating_government_publication"])
     if not (
         doc["schema_version"] == "1.0.0"
         and doc["evidence_lane"] == "freight_error_adjudication_negative_control"
@@ -59,6 +61,23 @@ def verify_fixture(doc):
         and second["label_completeness"] == "IDENTIFIER_AND_DATE_ONLY"
         and second["ground_truth_limit"] == "PUBLISHER_DECISION_SCOPE_NOT_INDEPENDENT_SHIPMENT_AUDIT"
         and doc["data_quality"]["second_gbl_footnote_verified_on_official_GAO_page"] is True
+        and mirror["source_url"] == "https://www.marines.mil/portals/1/Publications/DCG%20Vol%2065%20Sept%201986.pdf?ver=2012-10-11-163349-687"
+        and mirror["host_agency"] == "U.S. Marine Corps"
+        and mirror["source_original_issuer"] == "U.S. GAO"
+        and mirror["decision_date"] == "1986-09-29"
+        and mirror["volume_page"] == 912
+        and mirror["pdf_zero_based_page_index"] == 93
+        and mirror["extraction_evidence"] == "INDEXED_PDF_TEXT_ONLY_VISUAL_AND_BYTES_UNVERIFIED"
+        and mirror["carrier_collected_cents"] == f["carrier_reported_charges_cents"]
+        and mirror["gsa_reported_applicable_cents"] == f["gsa_applied_lower_rate_cents"]
+        and mirror["deduction_cents"] == f["gsa_deduction_cents"]
+        and mirror["first_gbl_identifier"] == "UNKNOWN_NOT_VISUALLY_CONFIRMED"
+        and mirror["publisher_source_sha256"] is None
+        and mirror["source_bytes_acquired"] is False
+        and mirror["page_image_verified"] is False
+        and mirror["independent_invoice_truth_verified"] is False
+        and mirror["independent_holdout_verified"] is False
+        and mirror["reuse_approved_for_engine"] is False
         and len(doc["synthetic_negative_controls"]) == 3
         and all(c["synthetic"] is True and c["real_invoice_error_cents"] is None
                 for c in doc["synthetic_negative_controls"])
@@ -86,6 +105,18 @@ class GAORejectedTenderEvidenceTests(unittest.TestCase):
         self.assertIsNone(second["gsa_deduction_cents"])
         self.assertIsNone(second["independently_scored_invoice_error_cents"])
         self.assertFalse(second["original_gbl_bytes_available"])
+
+    def test_official_bound_volume_text_corroborates_amount_without_fabricating_pdf_custody(self):
+        doc = verify_fixture(fixture())
+        mirror = doc["corroborating_government_publication"]
+        self.assertEqual(mirror["volume_page"], 912)
+        self.assertEqual(mirror["gsa_reported_applicable_cents"], 72125)
+        self.assertEqual(mirror["deduction_cents"], 22075)
+        self.assertFalse(mirror["source_bytes_acquired"])
+        self.assertIsNone(mirror["publisher_source_sha256"])
+        self.assertFalse(mirror["page_image_verified"])
+        self.assertEqual(doc["facts"]["original_gbl_number"], "UNKNOWN_OCR_L_VS_1_AMBIGUITY")
+        self.assertFalse(mirror["independent_invoice_truth_verified"])
 
     def test_negative_1986_decision_does_not_transfer_to_other_agencies(self):
         doc = verify_fixture(fixture())
@@ -116,6 +147,12 @@ class GAORejectedTenderEvidenceTests(unittest.TestCase):
             ("documented_second_shipment", "independently_scored_invoice_error_cents", 22075),
             ("documented_second_shipment", "original_gbl_bytes_available", True),
             ("documented_second_shipment", "synthetic", True),
+            ("corroborating_government_publication", "source_bytes_acquired", True),
+            ("corroborating_government_publication", "page_image_verified", True),
+            ("corroborating_government_publication", "publisher_source_sha256", "FAKE"),
+            ("corroborating_government_publication", "reuse_approved_for_engine", True),
+            ("corroborating_government_publication", "independent_invoice_truth_verified", True),
+            ("corroborating_government_publication", "gsa_reported_applicable_cents", 72124),
         ):
             altered = deepcopy(original)
             altered[first][field] = value
