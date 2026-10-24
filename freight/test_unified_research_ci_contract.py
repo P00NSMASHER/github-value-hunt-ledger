@@ -109,6 +109,40 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(triggers.count('cron: "19 3 * * *"'), 1)
 
 
+    def test_gsa_reference_chain_readiness_runs_without_claim_promotion(self):
+        """Never silently remove the source-BOL-rate-payment readiness gate."""
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        triggers = workflow.split("\npermissions:\n", 1)[0]
+        verify = workflow.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        nightly = workflow.split("\n  nightly-real-data-replay:\n", 1)[1]
+        for source in (
+            "freight/freight_evidence_chain_readiness.py",
+            "freight/test_freight_evidence_chain_readiness.py",
+        ):
+            self.assertEqual(triggers.splitlines().count(f'      - "{source}"'), 2)
+        self.assertEqual(
+            verify.splitlines().count(
+                "          python -m unittest -q freight.test_freight_evidence_chain_readiness"),
+            1,
+        )
+        required = (
+            "python -m freight.frei"
+            "ght_evidence_chain_readiness --source /tmp/retally-real-lab.json",
+            "chain['original_invoice_faces_observed'] == 110",
+            "chain['original_net_amounts_reconciled_to_signed_components'] == 100",
+            "chain['eligible_independently_scored_customer_invoices'] == 0",
+            "chain['verified_retally_recovered_cash_cents'] == 0",
+            "chain['modern_rate_authority_proven'] is False",
+            "chain['federal_guidance_scope']",
+            "chain['missing_chain_evidence_from_current_lab']",
+        )
+        for item in required:
+            with self.subTest(item=item):
+                self.assertIn(item, nightly)
+        self.assertEqual(triggers.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(triggers.count('cron: "19 3 * * *"'), 1)
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -860,3 +860,67 @@ This is a deliberately bounded read-only amendment to
 freight/real_document_lab.py and its original-PDF regression tests; it
 adds no new Workers, GitHub schedule, data branch, customer communication,
 cost, production ingestion, live engine change or financial assertion.
+
+
+## Original freight document evidence-chain readiness (v11)
+
+The latest original-document research verifies **110 real freight-invoice faces**
+on two publisher-linked, frozen-hash public PDFs:
+
+- 100 GlobalTranz face amounts, including 100 source-net amounts exactly
+  reconstructed as 93 **v2 adjustment-bearing** records and seven original
+  **v1 positive-only** charge records. All 100 test-only rating attempts return
+  REVIEW_REQUIRED with no expected freight rate, computed variance or cash.
+- Ten ArcBest original invoice-face amounts, five of which can enter the
+  source-derived **lab-only** rating-proxy structure and all of which remain
+  subject to review. The other five fail source-completeness checks.
+- 100 GlobalTranz face identifiers also match original invoice amounts in a
+  separate **open** statement. This is *not* a verified bank-cleared payment;
+  the original document itself identifies it as an open-balance statement.
+
+The new ephemeral, privacy-safe
+freight/freight_evidence_chain_readiness.py collector summarizes these
+existing nightly results without copying individual invoice IDs, addresses,
+source PDF bytes or statements to Git. A fixed review-receipt SHA protects
+against reclassification even if the receipt's own digest is recomputed.
+Its CI test also pins **both original PDF SHA-256s**, the two reproducible
+invoice-face catalog SHA-256s and the current canonical v1/v2 source-record
+catalog SHA-256. Any altered source bytes, removed original faces, altered
+signed arithmetic, fake bank payments, fabricated independent outcomes,
+promoted rights or erroneous automatic rates fail before admission.
+
+**Evidence checklist basis:** The current U.S. GSA
+[Transportation Invoice Audit guidance](https://www.gsa.gov/policy-regulations/policy/transportation-management-policy/transportation-invoice-audit)
+and [Freight, Household Goods and Small Parcel Audit Handbook](https://www.gsa.gov/policy-regulations/policy/transportation-management-policy/transportation-handbook-freight-household-goods-and-small-parcel)
+describe federal checks against bill of lading, carrier rate/contract/tender,
+actual shipment details, performed service, invoice totals, related supporting
+documentation and when appropriate payment records. They are a **useful
+federal reference checklist, not a legal determination that 41 CFR 102-118
+governs a private RETALLY shipper/customer contract**.
+
+Current evidence-chain completeness for these 110 original invoice faces:
+
+| Evidence stage observed in isolated lab | Face count |
+| --- | ---: |
+| Original public source PDFs SHA-256 verified and face amounts extracted | 110 |
+| Original signed invoice line amounts conserved through canonical records | 100 |
+| Distinct independently custodied linked BOL for that invoice | 0 verified |
+| Shipment-specific effective buyer/carrier contract or tender | 0 verified |
+| Independent actual shipment weight/class and performed service | 0 verified |
+| Bank-cleared payment, credit or reimbursement proof | 0 verified |
+| Independently adjudicated customer invoice error outcome | 0 verified |
+| Cash recovered by RETALLY | $0 verified |
+
+These zeroes mean **not available in the current controlled lab input**.
+They do not prove the original shipper or carrier lacks the documents. The
+source-derived canonical proxies use synthetic shipment fields and lab-only
+discount classification: neither is legal or commercial rate truth.
+
+The new receipt is created and verified **only in an ephemeral nightly
+workspace** from the actual original-document benchmark, without additional
+schedule triggers, cloud workloads, original-source downloads beyond the
+existing two PDFs, third-party contacts, spending, hosted-product mutations,
+commercial approvals, or any persistent private source identifier.
+
+    python -m unittest -q freight.test_freight_evidence_chain_readiness
+    python -m freight.freight_evidence_chain_readiness --source /tmp/retally-real-lab.json --output /tmp/retally-freight-evidence-chain-readiness-v1.json
