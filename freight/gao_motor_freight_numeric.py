@@ -128,7 +128,8 @@ RECEIPT_KEYS = frozenset({
 })
 
 
-def load_fixture(path: Path = FIXTURE) -> dict:
+def load_fixture(path: Path | None = None) -> dict:
+    path = FIXTURE if path is None else path
     try:
         result = json.loads(path.read_text(encoding="utf-8"))
     except (FileNotFoundError, UnicodeDecodeError, json.JSONDecodeError) as exc:
