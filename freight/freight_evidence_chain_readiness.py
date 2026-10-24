@@ -248,6 +248,8 @@ def run(*, source: Path, output: Path, verify_only: bool = False) -> dict:
         raise ResearchError("FREIGHT_EVIDENCE_CHAIN_SOURCE_REPORT_UNAVAILABLE") from exc
     try:
         stamp = datetime.fromisoformat(report["run_date_utc"].replace("Z", "+00:00"))
+        if stamp.tzinfo is None or stamp.utcoffset() is None:
+            raise ValueError("source observation must be timezone aware")
         at_date = stamp.astimezone(timezone.utc).date()
     except (KeyError, AttributeError, ValueError, TypeError) as exc:
         raise ResearchError("FREIGHT_EVIDENCE_CHAIN_OBSERVATION_DATE_INVALID") from exc
