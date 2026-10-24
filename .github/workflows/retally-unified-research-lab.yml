@@ -19,6 +19,9 @@ on:
       - "freight/test_capturebrief_sam_fy2027_asof.py"
       - "freight/gao_adjudication_chronology.py"
       - "freight/test_gao_adjudication_chronology.py"
+      - "freight/gao_motor_freight_numeric.py"
+      - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/fixtures/gao_motor_freight_numeric_v1.json"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/fixtures/nyc_dob_*_v1.json"
@@ -53,6 +56,9 @@ on:
       - "freight/test_capturebrief_sam_fy2027_asof.py"
       - "freight/gao_adjudication_chronology.py"
       - "freight/test_gao_adjudication_chronology.py"
+      - "freight/gao_motor_freight_numeric.py"
+      - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/fixtures/gao_motor_freight_numeric_v1.json"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/fixtures/nyc_dob_*_v1.json"
@@ -87,8 +93,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -383,6 +389,36 @@ jobs:
                   "- No per-invoice truth labels, modern tariff authority, or customer cash proven.\n"
               )
           PY
+      - name: Pin official GAO numerical freight evidence without manufacturing invoice truth
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_gao_motor_freight_numeric
+          python -m freight.gao_motor_freight_numeric \
+            --output freight/research_lab/gao_motor_freight_numeric_v1.json \
+            | tee /tmp/retally-gao-motor-numeric.json
+          python -m freight.gao_motor_freight_numeric \
+            --output freight/research_lab/gao_motor_freight_numeric_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads(Path('/tmp/retally-gao-motor-numeric.json').read_text())
+          assert d['case_count'] == 5
+          assert d['reported_exact_arithmetic_cases'] == 1
+          assert d['multi_shipment_aggregate_cases'] == 1
+          assert d['reported_amount_conflict_cases'] == 1
+          assert d['explicit_future_review_caveat_cases'] == 2
+          assert d['independent_customer_invoice_truth_cases'] == 0
+          assert d['verified_retally_recovered_cash_cents'] == 0
+          assert d['commercial_reuse_approved_for_customer_engine'] is False
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### FreightRecovery original GAO adjudication numeric checks\n'
+                  '- 5 historical decisions; 1 directly reconciled reported charge pair.\n'
+                  '- 1 two-shipment aggregate is NOT per-shipment truth.\n'
+                  '- 1 conflicting-amount decision and 2 later-review caveats held.\n'
+                  '- 0 original customer invoices, modern tariffs, or RETALLY cash.\n'
+              )
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -404,7 +440,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/research_lab/gao_authority_chronology_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/research_lab/gao_authority_chronology_v1.json freight/research_lab/gao_motor_freight_numeric_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
           if [ -f freight/lab15/triage_queue.json ]; then
             git add -- freight/lab15/triage_queue.json
           fi
@@ -471,6 +507,8 @@ jobs:
           python -m freight.capturebrief_sam_fy2027_asof --output /tmp/retally-sam-fy2027-asof-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/research_lab/gao_authority_chronology_v1.json > /tmp/retally-gao-authority-v1.json
           python -m freight.gao_adjudication_chronology --output /tmp/retally-gao-authority-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/gao_motor_freight_numeric_v1.json > /tmp/retally-gao-motor-freight-numeric-v1.json
+          python -m freight.gao_motor_freight_numeric --output /tmp/retally-gao-motor-freight-numeric-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/lab15/evidence_ledger.json > /tmp/retally-lab15-evidence.json
           git show origin/research/retally-unified-data-lab:freight/research/lab15_candidate_ledger.json > /tmp/retally-lab15-candidates.json
           python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge
