@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B189100_CARGO_DESCRIPTION_DISPUTE_V1",
+  "evidence_lane": "freight_error_adjudication",
+  "status": "HISTORICAL_GAO_DECISION_LEVEL_LABEL_NOT_INDEPENDENT_INVOICE_BENCHMARK",
+  "cohort": {
+    "name": "NAVY_APRIL_1974_YELLOW_FREIGHT_CARGO_CLASSIFICATION",
+    "independent_publisher_decision": true,
+    "held_out_from_engine_training_verified": false,
+    "original_invoice_bytes_available": false
+  },
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "case_number": "B-189100",
+    "url": "https://www.gao.gov/products/b-189100",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_date": "1977-12-27",
+    "record_type": "PUBLISHER_HTML_DECISION",
+    "source_bytes_sha256": null,
+    "source_bytes_acquired": false,
+    "rights_status": "US_GOVERNMENT_GAO_PUBLIC_DOMAIN_WITH_ATTRIBUTION_NO_ENDORSEMENT_THIRD_PARTY_CAUTION",
+    "commercial_engine_reuse_approved": false
+  },
+  "facts": {
+    "gbl_id": "A-6018184",
+    "shipment_month": "1974-04",
+    "carrier": "Yellow Freight System",
+    "origin": "Naval Air Station Norfolk VA",
+    "destination": "Naval Air Station San Diego CA",
+    "weight_lb": 8750,
+    "units": 25,
+    "charged_nmfc_item": 41050,
+    "adjudicated_nmfc_item": 41060,
+    "billed_charges_cents": 356718,
+    "gao_overcharge_deduction_cents": 263438,
+    "implied_allowable_cents": 93280,
+    "implied_allowable_derivation": "BILLED_MINUS_REPORTED_DEDUCTION_NOT_INDEPENDENT_RATE_VALIDATION",
+    "original_bol_description_contradicted_by_later_shipper_photo_report": true,
+    "shipper_photo_and_report_source_bytes_available": false,
+    "gao_disposition": "GSA_DEDUCTION_SUSTAINED",
+    "historical_gsa_deduction_reported_collected": true,
+    "retally_cash_recovered_cents": 0,
+    "independently_verified_customer_refund_cents": null,
+    "independently_verified_original_invoice_error_cents": null
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_GBL_DESCRIPTION_ALWAYS_FINAL",
+      "synthetic": true,
+      "expected": "REJECT_REQUIRE_CORROBORATING_CARGO_EVIDENCE",
+      "real_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_APPLY_1977_NMFC_TO_MODERN_SHIPMENT",
+      "synthetic": true,
+      "expected": "REJECT_HISTORICAL_TARIFF_NOT_CURRENT_AUTHORITY",
+      "real_invoice_error_cents": null
+    }
+  ],
+  "limits": {
+    "independent_invoice_accuracy_scoring_permitted": false,
+    "modern_tariff_applicability_verified": false,
+    "original_invoice_or_bol_image_available": false,
+    "original_photographic_corroboration_available": false,
+    "ground_truth": "GAO_HISTORICAL_DECISION_ONLY",
+    "verified_retally_recovery_cents": 0
+  },
+  "data_quality": {
+    "observed_on": "2026-10-24",
+    "amount_arithmetic_reconciles": true,
+    "source_html_and_original_invoice_bytes_unavailable": true,
+    "third_party_image_rights_not_verified": true,
+    "individual_case_holdout_unverified": true,
+    "confidential_customer_medical_student_data_used": false
+  },
+  "manifest_hash_contract": "AUTHORED_CANONICAL_JSON_SHA256_EXCLUDING_SELF_NOT_PUBLISHER_SOURCE_BYTES",
+  "manifest_sha256": "e8c45f1e0a1ab632219346995adcc85c61c918ed1a3acbc4be37a255fe7ef795"
+}
