@@ -283,8 +283,11 @@ def assess_cross_source_chronology(
         return "ISSUER_NOT_INDEPENDENTLY_MATCHED"
     if agency != other_agency or office != other_office:
         return "ISSUER_CONFLICT"
-    posted = _posted_date(sam_action.get("posted_date"))
-    signed = _posted_date(award.get("award_date_signed"))
+    try:
+        posted = _posted_date(sam_action.get("posted_date"))
+        signed = _posted_date(award.get("award_date_signed"))
+    except ResearchError:
+        return "SOURCE_DATE_UNKNOWN"
     if posted is None or signed is None:
         return "SOURCE_DATE_UNKNOWN"
     if posted >= signed:
