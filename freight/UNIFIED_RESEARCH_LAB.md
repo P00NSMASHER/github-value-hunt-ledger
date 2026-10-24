@@ -671,3 +671,31 @@ Offline controls:
 Inspect exact-branch source receipt without public network:
 
     python -m freight.capturebrief_sam_fy2027_asof --verify
+
+### Original FY2027 source-field quarantine (Oct 24, 2026)
+
+The first live research-stage implementation encountered
+`SOURCE_CSV_SCHEMA_INVALID` and did not publish source rows.
+A separate read-only CI diagnostic of the **exact public original
+1,607,260-byte CSV** established that the document has 47 headers,
+all eight required first-party fields and 1,104 source rows, but **one
+`Sol#` value contains a Unicode control character**.
+
+Rather than quietly normalizing an unknown source identity or discarding
+the entire authentic public file, the decoder now counts that row,
+quarantines only the offending solicitation identifier from candidate
+issuer/family matching, and preserves all original source bytes in the
+ephemeral file digest. The receipt discloses the fixed error category
+`SOURCE_SOLICITATION_CONTROL_QUARANTINED`, the quarantined source-row
+count, and `PUBLIC_ARCHIVE_WITH_QUARANTINED_SOLICITATION_FIELD`
+status. Only strictly validated, unambiguous solicitation keys are
+eligible for future research-only matching; the quarantined row
+cannot become an award-join match or independent outcome label.
+Source records, raw identifiers, issuer names, and source bytes still
+never enter the GitHub branch.
+
+The short-lived **PR-only public CSV diagnostic was removed** after its
+aggregate finding; the permanent workflow keeps just the fixed, validated
+quarantine counters and original-byte digest. This restores research
+observability without treating an intentionally held/unapproved archive
+as a production source or inventing retrospective award outcomes.
