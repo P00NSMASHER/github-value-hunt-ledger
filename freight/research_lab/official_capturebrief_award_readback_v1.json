@@ -1,0 +1,46 @@
+{
+  "as_of_utc_date": "2026-10-24",
+  "buyer_opportunity_truth": false,
+  "contract_award_window": [
+    "2025-10-01",
+    "2026-09-30"
+  ],
+  "customer_contacts_sent": 0,
+  "distinct_award_internal_ids": 12,
+  "independent_award_outcome_labels": 0,
+  "independent_sam_solicitation_matches": 0,
+  "limitations": [
+    "Public USAspending contract awards are publisher-origin facts, not SAM.gov live opportunity snapshots.",
+    "A second query to the same publisher is a consistency check, not independent award adjudication.",
+    "Published award amount is not a contract prospect's attainable revenue or proven payment.",
+    "No original award identifiers, recipient identities, or response bodies are retained.",
+    "Owner's broad reuse attestation is not independently source-specific license validation."
+  ],
+  "new_paid_services": 0,
+  "production_changes": 0,
+  "publisher_host": "api.usaspending.gov",
+  "publisher_readbacks_ambiguous": 0,
+  "publisher_readbacks_attempted": 2,
+  "publisher_readbacks_changed": 0,
+  "publisher_readbacks_exact": 0,
+  "publisher_readbacks_missing": 0,
+  "publisher_readbacks_unavailable": 2,
+  "publisher_source_anchor_id": "c95ab3d08065c413405b611483719c147a03d675d8d736ed2321a924f368421e",
+  "realized_recovery_cents": 0,
+  "receipt_sha256": "3e1191a63f43ca3e77fd4fa4837750ef1f304ff73ca949c029b72d0545556814",
+  "recipient_identifiers_stored": 0,
+  "repeated_source_rows": 0,
+  "sample_net_awarded_amount_minor": 46679171398500,
+  "sample_rows": 12,
+  "schema_version": 1,
+  "scope": "ORIGINAL_FEDERAL_CONTRACT_AWARD_SAME_PUBLISHER_READBACK_ONLY",
+  "source_canonical_sample_sha256": "95b44cf192bfca220087cef69a63722308322b8d2e9d5b0cdf98507c6327412e",
+  "source_endpoint_type": "USA_SPENDING_V2_PUBLIC_AWARD_SEARCH",
+  "source_errors": [
+    "READBACK_INCOMPLETE"
+  ],
+  "source_payloads_stored": 0,
+  "source_specific_commercial_reuse_verified": false,
+  "status": "PUBLISHER_AWARD_READBACK_DEGRADED",
+  "user_commercial_reuse_attestation": "OWNER_ATTESTED_NOT_SOURCE_VERIFIED"
+}
