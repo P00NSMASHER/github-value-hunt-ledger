@@ -130,6 +130,47 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
         # Green control: the unchanged, conservative feed is reproducible.
         validate_feed(feed, unified, evidence, candidates, manifest)
 
+    def test_1986_overruling_1984_does_not_forge_invoice_accuracy_or_current_rights(self):
+        """A GAO reconsideration is the latest historical case outcome, not cash."""
+        from freight.gao_adjudication_chronology import (
+            LATEST_HISTORICAL, ruling_as_of,
+        )
+        from datetime import date
+
+        sources = (
+            "https://www.gao.gov/products/b-215958",
+            "https://www.gao.gov/products/b-215958-2",
+        )
+        self.assertEqual(
+            ruling_as_of("B-215958", date(1984, 12, 5)),
+            "GAO_1984_INITIAL_CARRIER_FAVORABLE_ONLY",
+        )
+        self.assertEqual(
+            ruling_as_of("B-215958", date(1986, 2, 18)),
+            LATEST_HISTORICAL,
+        )
+        doc = ledger_from([source_record(x, "freightrecovery", "2026-10-24")
+                           for x in sources])
+        evidence, candidates, manifest = (
+            legacy_evidence(), legacy_candidates(), load_manifest()
+        )
+        feed = build_feed(doc, evidence, candidates, manifest)
+        self.assertEqual(feed["source_pointers_total"], 2)
+        for row in feed["candidate_sources"]:
+            self.assertIn(row["source_url"], sources)
+            self.assertFalse(row["commercial_reuse_authorized"])
+            self.assertFalse(row["independent_ground_truth"])
+            self.assertIsNone(row["model"]["verified_freight_error_cents"])
+            self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+            self.assertEqual(row["model"]["rating_status"], "REVIEW_REQUIRED")
+        validate_feed(feed, doc, evidence, candidates, manifest)
+        forged = deepcopy(feed)
+        forged["candidate_sources"][1]["model"]["verified_freight_error_cents"] = 53
+        forged["feed_sha256"] = digest({k:v for k,v in forged.items()
+                                        if k != "feed_sha256"})
+        with self.assertRaises(ResearchError):
+            validate_feed(forged, doc, evidence, candidates, manifest)
+
     def test_gao_b165091_adjudicated_amount_never_becomes_unverified_freight_score(self):
         """The $179.80 official decision is not a verified customer recovery."""
         url = "https://www.gao.gov/products/b-165091"
