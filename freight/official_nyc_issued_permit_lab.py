@@ -141,6 +141,10 @@ def fetch_rows(url: str) -> list[dict]:
 def _date(value: object, as_of: date) -> str:
     if type(value) is not str or len(value) > 40:
         raise ResearchError("SCHEMA_CHANGED")
+    if not re.fullmatch(
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}(?:T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?Z?)?",
+            value):
+        raise ResearchError("SCHEMA_CHANGED")
     raw = value[:10]
     try:
         dt = date.fromisoformat(raw)
@@ -172,17 +176,25 @@ def _minimal(row: dict, as_of: date) -> dict:
     status = row.get("permit_status")
     if status is not None and (type(status) is not str or len(status) > 90):
         raise ResearchError("SCHEMA_CHANGED")
+    sequence = row.get("sequence_number")
+    if sequence is not None and (type(sequence) not in (str, int)
+                                 or len(str(sequence)) > 12
+                                 or not re.fullmatch(r"[A-Za-z0-9-]{1,12}", str(sequence))):
+        raise ResearchError("SCHEMA_CHANGED")
     return {
         "tracking_number": ident,
         "job_filing_number": job,
         "work_permit": permit,
+        "sequence_number": str(sequence) if sequence is not None else None,
         "issued_date": _date(row.get("issued_date"), as_of),
         "permit_status": status,
     }
 
 
-def _key(row: dict) -> str:
-    return str(row["tracking_number"])
+def _key(row: dict) -> tuple[str, str, str, str | None]:
+    # One tracking number can cover multiple work permits or sequences.
+    return (str(row["tracking_number"]), row["job_filing_number"],
+            row["work_permit"], row["sequence_number"])
 
 
 def _classification(row: dict) -> str:
@@ -316,7 +328,8 @@ def _check(receipt: dict, ledger: dict, now: date) -> None:
     required = set(build_receipt_keys())
     if set(receipt) != required:
         raise ResearchError("INVALID_READBACK_RECEIPT")
-    if (receipt["official_dataset_id"] != DATASET_ID or
+    if (type(receipt["schema_version"]) is not int or
+            receipt["official_dataset_id"] != DATASET_ID or
             receipt["official_source_id"] != anchor or
             receipt["official_source_url"] != SOURCE_URL or
             receipt["published_source_terms"] != NYC_SOURCE_TERMS or
