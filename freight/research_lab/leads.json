@@ -6,6 +6,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "001fef188e93a2c18a889db2d4ce6f9bcfd8fb79dfd677ce6c2b9f4fd205cfcf",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Bains1996/edge77"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "0053762f9c9d904cc8fc418e4ca412031b4083c5722200126eb02b79a7b132c8",
       "independent_ground_truth": false,
@@ -1108,6 +1124,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "15e71ca704a6156e070d5cc19bcce1648cb50abee94e98a600cab7cfc31cfc7b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/lamgiahansesc/lsp-shipment-invoice-reconciliation"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -1312,6 +1344,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/1456461"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "1bff448e0c42428ca9644817bdbfb4f457d19c95d21162e1a6ce56911348aa47",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/dpk-rdy/ParcelLens"
     },
     {
       "commercial_reuse_authorized": false,
@@ -1814,6 +1862,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "25855c2c219416da44156126a7a6d0c73322e5754be985e4c200efcb0c1e96fe",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/15493185"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -1969,6 +2033,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://www.gao.gov/products/b-148465"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "26f65155c6f0d4b57462f8e9d3152741d2549e550b439f6f669adcbf3d7f8e8d",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Stasnim99/TMS"
     },
     {
       "commercial_reuse_authorized": false,
@@ -4823,6 +4903,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "6e654c9862e6c38b6a70627d33b5edc8c41c3e09e864fd9670f385f685a063bf",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/aryaman-boop/carrier-audit"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -4946,6 +5042,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/17287732"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "73093b29412f04e618911586fb19ba88acbf47e4caf51937fb3d0048703a2fdb",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Mayur-Techs/Freight-invoice-ai-engine"
     },
     {
       "commercial_reuse_authorized": false,
@@ -6440,6 +6552,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "9904ee87998044d609a9a9751e37a90edec5fe892625c9b079354b3ae938d3a6",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/timogashon-cloud/billship"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -6803,6 +6931,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/8173352"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "a1e53447f523872c2c12cd11f8545041719c5ea15aa90a1a08495809af4a33b3",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/farid-richa/freight-invoice-auditor"
     },
     {
       "commercial_reuse_authorized": false,
@@ -7194,6 +7338,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-24",
+      "id": "a9ff1ca7fc9773aec79b3184c054a714a2a73239a88f6397477788eb46217638",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/huncho-tensei/recovery-desk"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "aadac3bf2f5bd56ae236d069cbc74d8310d73a8fb50ac18764e883d6377031d1",
       "independent_ground_truth": false,
@@ -7560,6 +7720,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "b22966e7b92dfdd0a89aca336ce61e092027c6c202fc80b9aeee9ada62182cc2",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Gravqc/Logistic-Audit-Agent"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -7651,6 +7827,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/6304227"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "b55ee6668be5fb65d9e4539519b1f40901adfe088a94da55b5a15b2458382822",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/11061862"
     },
     {
       "commercial_reuse_authorized": false,
@@ -7944,6 +8136,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "bc78a3f34010cf1e68a376c6ce3794ae16b9c064821d3ee6f0c330a48a513891",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/5821799"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -7955,6 +8163,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/zainulabideen5/Laravel-Inventory-System"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "bcdf91dc3902b6c076eed30f08c468f07669c8b837699979291edb92ad37fc08",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/22906006"
     },
     {
       "commercial_reuse_authorized": false,
@@ -8003,6 +8227,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/23048116"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "bef4ec9464267edd242c64c74533e2d003cac121101983593fb368ab80ac63a8",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/23356157"
     },
     {
       "commercial_reuse_authorized": false,
@@ -8233,6 +8473,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "c5e311d7ce0f3ef8fdb06fd1ab7b6a018d80ad42733f68b58ad2f416814f0ba9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/indy-viberr/stowaway"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -8324,6 +8580,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/21187281"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "c8236c82ff1b353d43d662557a925c62f309b76cd6c681e208a7345fd3a740cc",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/api-evangelist/opereit"
     },
     {
       "commercial_reuse_authorized": false,
@@ -9258,6 +9530,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "d957125f4459dba51000ee5dd291539b01ad72966e503b502568a87b33bbaf73",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Jacob-Met/workflow-checks"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -9835,6 +10123,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "e76a5b716d86cdea15f5aeb9e46b8cb4069e7ee07cde417d7cd9f6ac4afcc316",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Betachon02/Benefits-of-hiring-freight-invoice-auditors-for-your-enterprise"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -10219,6 +10523,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "f0398369d20c20bba54114322c24b56ebe2a7ff40a35a07f18341795957d35a9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/4553357"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -10246,6 +10566,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/6379184"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "f0b3db628a5bd722d99e84ca7708052987308e496183ce649c392667854ac152",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/SarthakTallamraju1510/TallyR"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10715,6 +11051,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "fa3022b349324bfb594efbc9bb2efbe865468fc9ac4e7dea54a2295b0c6bd306",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/5821652"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -10985,6 +11337,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "5f0f03187251446374d551ca36bfe71a1bbf964cc18adc437e4d7f8b4083e87e",
+  "entries_sha256": "4798a1769aa7cb6fa9ac89fd417064ad15b69ccc2789e6ec770e2696a6d72765",
   "schema_version": 1
 }

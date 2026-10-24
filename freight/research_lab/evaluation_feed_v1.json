@@ -182,6 +182,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "001fef188e93a2c18a889db2d4ce6f9bcfd8fb79dfd677ce6c2b9f4fd205cfcf",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Bains1996/edge77",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "01b7e5f7328de7c8dbda731c88d3231819b123c3a9de8b13686a2ddc1578c062",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -198,6 +223,56 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/freightdoclens/freightdoclens",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "15e71ca704a6156e070d5cc19bcce1648cb50abee94e98a600cab7cfc31cfc7b",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/lamgiahansesc/lsp-shipment-invoice-reconciliation",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "1bff448e0c42428ca9644817bdbfb4f457d19c95d21162e1a6ce56911348aa47",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/dpk-rdy/ParcelLens",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -248,6 +323,56 @@
       "source_document_ingested": false,
       "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
       "source_url": "https://www.gao.gov/products/b-215958",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "25855c2c219416da44156126a7a6d0c73322e5754be985e4c200efcb0c1e96fe",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/15493185",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "26f65155c6f0d4b57462f8e9d3152741d2549e550b439f6f669adcbf3d7f8e8d",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Stasnim99/TMS",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -382,6 +507,56 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "6e654c9862e6c38b6a70627d33b5edc8c41c3e09e864fd9670f385f685a063bf",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/aryaman-boop/carrier-audit",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "73093b29412f04e618911586fb19ba88acbf47e4caf51937fb3d0048703a2fdb",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Mayur-Techs/Freight-invoice-ai-engine",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "8659de030562093aee9ac5a4b989d0827139e709431310af4b8ee4ebc6fe4103",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -432,6 +607,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "9904ee87998044d609a9a9751e37a90edec5fe892625c9b079354b3ae938d3a6",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/timogashon-cloud/billship",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "99d17c730db7b39890608bc5db948b562986eb04426fdcc9733bb54414934cfc",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -448,6 +648,181 @@
       "source_document_ingested": false,
       "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
       "source_url": "https://www.gao.gov/products/b-191257",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "a1e53447f523872c2c12cd11f8545041719c5ea15aa90a1a08495809af4a33b3",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/farid-richa/freight-invoice-auditor",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "a9ff1ca7fc9773aec79b3184c054a714a2a73239a88f6397477788eb46217638",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/huncho-tensei/recovery-desk",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "b22966e7b92dfdd0a89aca336ce61e092027c6c202fc80b9aeee9ada62182cc2",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Gravqc/Logistic-Audit-Agent",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "b55ee6668be5fb65d9e4539519b1f40901adfe088a94da55b5a15b2458382822",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/11061862",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "bc78a3f34010cf1e68a376c6ce3794ae16b9c064821d3ee6f0c330a48a513891",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/5821799",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "bcdf91dc3902b6c076eed30f08c468f07669c8b837699979291edb92ad37fc08",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/22906006",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "c5e311d7ce0f3ef8fdb06fd1ab7b6a018d80ad42733f68b58ad2f416814f0ba9",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/indy-viberr/stowaway",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -482,6 +857,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "c8236c82ff1b353d43d662557a925c62f309b76cd6c681e208a7345fd3a740cc",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/api-evangelist/opereit",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "d4dab4926003fbec3a7d1cb69e8cd6674ea5991989fe63cc646f4c9fb865df1c",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -498,6 +898,31 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://zenodo.org/records/5890149",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "d957125f4459dba51000ee5dd291539b01ad72966e503b502568a87b33bbaf73",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Jacob-Met/workflow-checks",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -532,6 +957,31 @@
       "first_seen": "2026-10-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "e76a5b716d86cdea15f5aeb9e46b8cb4069e7ee07cde417d7cd9f6ac4afcc316",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Betachon02/Benefits-of-hiring-freight-invoice-auditors-for-your-enterprise",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "ecd07c474f29d5f5b760a61e35742a13b0d61cc565e3ff26bdf4916e21a359fe",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -548,6 +998,81 @@
       "source_document_ingested": false,
       "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
       "source_url": "https://github.com/fernandonavg/ParcelFlow-OCR",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "f0398369d20c20bba54114322c24b56ebe2a7ff40a35a07f18341795957d35a9",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/4553357",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "f0b3db628a5bd722d99e84ca7708052987308e496183ce649c392667854ac152",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/SarthakTallamraju1510/TallyR",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-24",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "fa3022b349324bfb594efbc9bb2efbe865468fc9ac4e7dea54a2295b0c6bd306",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/5821652",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -4583,7 +5108,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "2569006e84d7bfeb3336c9e35f059b33dbd3b5a4c840a567bcaeeedca107d528",
+  "feed_sha256": "1717666500a50521449b9ebfa3cc072679aa323ee8dfd2134d0190840eaaa244",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -4595,12 +5120,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 183,
-  "source_pointers_total": 183,
+  "selected_for_synthetic_proof_gate": 204,
+  "source_pointers_total": 204,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "d955db7b7ccf1be9c0360bb7eec17515143bd164b1446090fd55a2ec07a76d4e",
     "lab15_evidence_metadata_sha256": "da475a22485a99c58e0fdc9623e4e9e254d29114571ee9c7af98744880a51c7b",
-    "unified_entries_sha256": "5f0f03187251446374d551ca36bfe71a1bbf964cc18adc437e4d7f8b4083e87e"
+    "unified_entries_sha256": "4798a1769aa7cb6fa9ac89fd417064ad15b69ccc2789e6ec770e2696a6d72765"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 10,
   "verified_recovered_cash_cents": 0
