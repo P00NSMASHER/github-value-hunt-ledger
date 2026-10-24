@@ -80,6 +80,34 @@ class ReviewQueueTests(unittest.TestCase):
         self.assertEqual(before, json.dumps(doc, sort_keys=True))
         self.assertEqual(out["external_document_bytes_saved"], 0)
 
+    def test_city_portal_community_views_are_review_only_not_original_dob(self):
+        # Publisher's source pages explicitly call both derived DOB views
+        # community-created and unendorsed, despite their city.gov host.
+        urls = (
+            "https://data.cityofnewyork.us/d/rbx6-tga4",
+            "https://data.cityofnewyork.us/d/qnmk-7xra",
+            "https://data.cityofnewyork.us/d/un34-bxqh",
+        )
+        doc = ledger_from([source_record(url, "permitplate", "2026-10-23") for url in urls])
+        before = json.dumps(doc, sort_keys=True)
+        lane = build_queue(doc, NOW)["engines"]["permitplate"]
+        self.assertEqual(lane["catalog_source_associations"], 3)
+        self.assertEqual(lane["url_only_topic_exclusions_not_deleted"], 0)
+        self.assertEqual(lane["candidate_classes"]["pinned_public_anchor_url_only"], 1)
+        self.assertEqual(lane["candidate_classes"]["official_publisher_host_url_only"], 0)
+        self.assertEqual(lane["candidate_classes"]["known_nyc_community_derivative_views_review_only"], 2)
+        ranked = {row["public_source_url"]: row for row in lane["priority_review_queue"]}
+        self.assertEqual(ranked[urls[0]]["rank_reason"], "PINNED_PUBLIC_ANCHOR_URL_ONLY")
+        for url in urls[1:]:
+            self.assertEqual(ranked[url]["rank_reason"],
+                             "NYC_COMMUNITY_CREATED_DERIVATIVE_VIEW_REVIEW_ONLY")
+            self.assertFalse(ranked[url]["source_provenance_verified"])
+            self.assertFalse(ranked[url]["benchmark_ready"])
+            self.assertFalse(ranked[url]["commercial_reuse_authorized"])
+            self.assertFalse(ranked[url]["independent_ground_truth"])
+        self.assertEqual(before, json.dumps(doc, sort_keys=True))
+        self.assertEqual(lane["independent_benchmark_truth_cases_from_queue"], 0)
+
     def test_never_promote_forged_rights_truth_or_future_dated_source(self):
         doc = sample_ledger()
         doc["entries"][0]["commercial_reuse_authorized"] = True

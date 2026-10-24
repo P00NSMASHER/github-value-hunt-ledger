@@ -21,6 +21,8 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
+      - "freight/fixtures/nyc_dob_*_v1.json"
+      - "freight/test_nyc_dob_*_v1.py"
       - "freight/research_lab_worker*"
       - "freight/research_lab/**"
       - "freight/UNIFIED_RESEARCH_LAB.md"
@@ -53,6 +55,8 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
+      - "freight/fixtures/nyc_dob_*_v1.json"
+      - "freight/test_nyc_dob_*_v1.py"
       - "freight/UNIFIED_RESEARCH_LAB.md"
       - "freight/research_eval_bridge.py"
       - "freight/test_research_eval_bridge.py"
@@ -93,6 +97,7 @@ jobs:
         run: |
           node --test freight/research_lab_worker.test.mjs
           python -m unittest -q freight.test_research_eval_bridge freight.test_unified_research_ci_contract
+          python -m unittest -q freight.test_nyc_dob_source_scope_v1 freight.test_nyc_dob_excluded_scope_v1
           python -m freight.real_world_eval_v1
 
   discover:
