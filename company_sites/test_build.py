@@ -180,6 +180,13 @@ class PublicationTests(unittest.TestCase):
             self.assertIn("disabled", by_id["send-enquiry"])
             self.assertEqual("status", by_id["enquiry-status"]["role"])
             self.assertEqual("polite", by_id["enquiry-status"]["aria-live"])
+            status_copy = " ".join(text.strip() for text, parents in document.texts if text.strip() and any(
+                attrs.get("id") == "enquiry-status" for _, attrs in parents
+            ))
+            self.assertEqual(
+                "Complete the security verification to enable secure sending. Nothing has been sent.",
+                status_copy,
+            )
             self.assertEqual("group", by_id["enquiry-turnstile"]["role"])
             self.assertEqual("Security verification", by_id["enquiry-turnstile"]["aria-label"])
             self.assertEqual("mailto", urlsplit(by_id["enquiry-draft"]["href"]).scheme)
