@@ -58,6 +58,13 @@ ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES = {
     "PRINTED_VOLUME_QUOTE_MARKER_ONLY|BOL_HEADER_IDENTIFIER_PRINTED_ONLY": 1,
     "PRINTED_VOLUME_QUOTE_MARKER_ONLY|BOL_HEADER_PLACEHOLDER_ONLY": 1,
 }
+# Original-PDF-only evidence: two invoice–quotation pages matched by printed
+# quote code, shipment date, printed weight and amount on the same bankruptcy
+# PDF. Derived from 2026-10-24 isolated original-document run 40143067211.
+# No independently obtained initial BOL quote-ID acceptance or customer payment.
+ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST = (
+    "5b70fb8a86d2cd6da65d3d9956c7a71acc4cb026ba6795534defa926fee41fe4"
+)
 EXPECTED_FACE_COUNTS = {"globaltranz": 100, "arcbest": 10}
 EXPECTED_NET_COVERAGE = {"globaltranz": 100, "arcbest": 0}
 MISSING_CHAIN_STAGES = (
@@ -75,6 +82,8 @@ LIMITATIONS = (
     "GlobalTranz v2 adjustments encode signed invoice components with provisional lab DISCOUNT semantics.",
     "ArcBest printed freight-bill weights, if present, are not independent certified shipment weights.",
     "ArcBest invoice-printed tariff/VPQ codes and BOL headers do not prove an original accepted quote, contract rate or separately held original BOL.",
+    "Two same-PDF ArcBest quotation pages match invoice quote codes, dates and printed weight, but are not independent issuer or initial BOL acceptance evidence.",
+    "One source quotation minimum exactly matches its invoice; one additional-foot formula only matches if the printed LWH first dimension is billable trailer length rounded to whole feet.",
     "ArcBest VPQ printed on a billing document is not evidence that the quote ID appeared on the initial signed BOL, as ArcBest's published VPQ terms require.",
     "Lab canonical shipment location, carrier, freight mode and weight placeholders are SYNTHETIC.",
     "A missing document in this lab is not proof that a shipper or carrier cannot supply it elsewhere.",
@@ -94,6 +103,14 @@ RECEIPT_KEYS = frozenset({
     "arcbest_source_vpq_header_with_bol_identifier_only",
     "arcbest_source_vpq_header_without_bol_identifier",
     "arcbest_original_bol_quote_id_correspondence_verified",
+    "arcbest_embedded_original_quote_pages",
+    "arcbest_embedded_invoice_quote_id_joins",
+    "arcbest_embedded_quote_effective_date_matches",
+    "arcbest_embedded_quote_printed_weight_matches",
+    "arcbest_embedded_quote_minimum_money_matches",
+    "arcbest_embedded_conditional_length_formula_matches",
+    "arcbest_embedded_quote_match_class_sha256",
+    "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization",
     "arcbest_source_printed_category_sha256",
     "arcbest_independently_verified_rate_and_original_bol_documents",
     "source_original_sha256", "original_invoice_catalog_sha256",
@@ -266,6 +283,39 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
                if combined.split("|", 1)[1] == key) != expected:
             raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_BOL_JOINT_MISMATCH")
 
+    same_pdf = _mapping(abf.get("embedded_original_vpq_quote_source_replay"),
+                        "ARCBEST_EMBEDDED_ORIGINAL_QUOTATION_PAGES")
+    if (same_pdf.get("scope") !=
+            "ORIGINAL_ARCBEST_SAME_PDF_QUOTE_INVOICE_ARITHMETIC_NOT_CUSTOMER_RECOVERY"
+            or same_pdf.get("source_original_pdf_sha256") != FROZEN_DOCUMENT_SHA256["arcbest"]
+            or same_pdf.get("anonymous_page_and_match_class_digest_sha256")
+            != ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST):
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_ORIGINAL_QUOTE_SOURCE_DRIFT")
+    for field, expected in (
+        ("embedded_original_vpq_quotation_pages", 2),
+        ("vpq_original_invoice_faces", 2),
+        ("same_pdf_exact_quotation_id_invoice_joins", 2),
+        ("invoice_dates_within_printed_quote_effective_window", 2),
+        ("printed_invoice_quoted_weights_agree", 2),
+        ("invoice_amount_equals_printed_quote_minimum", 1),
+        ("conditional_printed_length_formula_matches", 1),
+        ("invoice_quote_money_unresolved", 0),
+        ("original_signed_bol_quotes_independently_verified", 0),
+        ("separate_quote_acceptance_independently_verified", 0),
+        ("independent_customer_invoice_overcharge_labels", 0),
+        ("bank_cleared_payments_verified", 0),
+        ("verified_retally_recovered_cash_cents", 0),
+        ("raw_invoice_quote_bol_identifiers_exported", 0),
+        ("customer_contact_actions", 0),
+    ):
+        _count(same_pdf.get(field), "ARCBEST_QUOTE_" + field.upper(), expected)
+    if same_pdf.get("unresolved_reason_counts") != {}:
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_QUOTE_UNRESOLVED")
+    _is_true(same_pdf.get("quote_and_invoice_documents_are_co_bundled_in_same_source_pdf"),
+             "ARCBEST_QUOTES_ONLY_FROM_SAME_SOURCE_BUNDLE")
+    _is_false(same_pdf.get("conditional_length_footage_is_independently_certified"),
+              "ARCBEST_LENGTH_INTERPRETATION_IS_CONDITIONAL")
+
     blind = _mapping(doc.get("blinded_freight_error_evaluation"), "BLIND_ASSESSMENT")
     for field in ("precision", "recall", "freight_detection_accuracy"):
         if blind.get(field) is not None:
@@ -299,6 +349,14 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
         "arcbest_source_vpq_header_with_bol_identifier_only": 1,
         "arcbest_source_vpq_header_without_bol_identifier": 1,
         "arcbest_original_bol_quote_id_correspondence_verified": 0,
+        "arcbest_embedded_original_quote_pages": 2,
+        "arcbest_embedded_invoice_quote_id_joins": 2,
+        "arcbest_embedded_quote_effective_date_matches": 2,
+        "arcbest_embedded_quote_printed_weight_matches": 2,
+        "arcbest_embedded_quote_minimum_money_matches": 1,
+        "arcbest_embedded_conditional_length_formula_matches": 1,
+        "arcbest_embedded_quote_match_class_sha256": ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST,
+        "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization": True,
         "arcbest_source_printed_category_sha256": ARCBEST_PRINTED_REFERENCE_DIGEST,
         "arcbest_independently_verified_rate_and_original_bol_documents": 0,
         "source_original_sha256": {k: FROZEN_DOCUMENT_SHA256[k] for k in sorted(FROZEN_DOCUMENT_SHA256)},
