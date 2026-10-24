@@ -1,7 +1,128 @@
 {
-  "digest_sha256": "5ac994b499f565bfc5f74aa80f9751ef69c48a838b08fd188af33fd3f8ffd520",
+  "digest_sha256": "d955db7b7ccf1be9c0360bb7eec17515143bd164b1446090fd55a2ec07a76d4e",
   "lab": 15,
-  "leads": [],
+  "leads": [
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "1108fe9a7d3db838bed635744b71d4b22e00bb143b541c619159ab3686da9bce",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.48550/arxiv.2203.02799"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "451e83ffa0f19b5d580679c4f0a378abc430eaacd32c4e34e05aca4642a7e5f5",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.7910/dvn/9c0mus"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "68660c9668093ba95fdd94603e870695990853c2f7e9cb60a0c35a220a292ece",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "GAO public LTL corrected freight-billing decision B-143246",
+      "url": "https://www.gao.gov/products/b-143246"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "6db7c9793082fb8594760db293d15be23572a369179ab7ea21b684c2c49c282d",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "Public bankruptcy exhibit: multiple historical LTL carrier invoices and dimensional adjustments",
+      "url": "https://document.epiq11.com/document/getdocumentbycode/?docId=3412364&projectCode=NRD&source=DM"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "7d18c8724235189708b79c8f821bcda6bbd54f6a55392f54d26553c33e1ab2b3",
+      "invoice_bytes_archived": false,
+      "provider": "github",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "github freight research candidate",
+      "url": "https://github.com/Salomiairy11/VendorLite"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "897a415ec29a9d96caaed9d4a7a0acd4de6fa3e9e246f1d99da27a459cf43929",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "Public bankruptcy exhibit: corrected LTL invoice and rate quotation",
+      "url": "https://document.epiq11.com/document/getdocumentbycode?docId=4228494&projectCode=NHH&source=DM"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "a4131c53f76d7c85e290e8485c6f5b24e7a115f2e03112f3ff7a775f3d3868fe",
+      "invoice_bytes_archived": false,
+      "provider": "previously_observed_public_url",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "GAO public LTL rate dispute decision B-148465",
+      "url": "https://www.gao.gov/products/b-148465"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "d0a30a825299372b73387832031f64013038bcbaeea1ed7d6d2b3532b162b1e7",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.22004/ag.econ.317427"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "df93242cda9874012440acf2212e808f98a0c77e8bd2898e6ca370418f213313",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.71548/8598"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-24",
+      "id": "eed3d2e0318df7b8f13dc3b32eee0bc831e63d34f90c0b88b559801405e1e8a1",
+      "invoice_bytes_archived": false,
+      "provider": "dataverse",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "dataverse freight research candidate",
+      "url": "https://doi.org/10.7910/DVN/9C0MUS"
+    }
+  ],
   "schema_version": 1,
   "scope": "PUBLIC_METADATA_ONLY_NO_CUSTOMER_DOCUMENTS"
 }

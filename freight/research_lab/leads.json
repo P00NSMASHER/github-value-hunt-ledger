@@ -1288,6 +1288,22 @@
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
+      "id": "1bf64e26c8321da591bb8201663ee31f5d05d93cb8253fbfd59ff387013b3702",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/1456461"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-23",
       "id": "1c8b20a7793501788081b897a4e803c2f552c55c1cc6c08226cd9b543b953e97",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -4946,6 +4962,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/ishaankothiyalpanwar/accounts-payable-automation"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-23",
+      "id": "7a0982bdf7dfe271ee7a93c760cdafcf686cb349ba4c8fd82762aba2382b6030",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/7798168"
     },
     {
       "commercial_reuse_authorized": false,
@@ -10553,6 +10585,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "608c9ea4cf5851e81605f8204026ef199a06ff42df83f18f5474c750bd96da09",
+  "entries_sha256": "72a9069d3738a97f6d9e29421bf56e1813b9f45d0147a9d022f5d92966bc07e7",
   "schema_version": 1
 }
