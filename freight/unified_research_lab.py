@@ -44,7 +44,8 @@ SEEDS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
-        "https://www.gao.gov/products/b-215958",  # Decision-level 53/55 GBL reversal; no paid refund proof.
+        "https://www.gao.gov/products/b-215958",  # Initial 1984 53/55 decision OVERRULED in 1986.
+        "https://www.gao.gov/products/b-215958-2",  # Controlling Feb 18 1986 GAO reconsideration; GSA deduction sustained.
         "https://www.gao.gov/products/b-165091",  # Distinct tariff; published $179.80 sustained deduction only.
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
