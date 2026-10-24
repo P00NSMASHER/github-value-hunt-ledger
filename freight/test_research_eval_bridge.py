@@ -130,6 +130,31 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
         # Green control: the unchanged, conservative feed is reproducible.
         validate_feed(feed, unified, evidence, candidates, manifest)
 
+    def test_gao_b165091_adjudicated_amount_never_becomes_unverified_freight_score(self):
+        """The $179.80 official decision is not a verified customer recovery."""
+        url = "https://www.gao.gov/products/b-165091"
+        unified = ledger_from([source_record(url, "freightrecovery", "2026-10-24")])
+        evidence, candidates, manifest = legacy_evidence(), legacy_candidates(), load_manifest()
+        feed = build_feed(unified, evidence, candidates, manifest)
+        self.assertEqual(feed["source_pointers_total"], 1)
+        row = feed["candidate_sources"][0]
+        self.assertEqual(row["source_url"], url)
+        self.assertIsNone(row["case_id"])
+        self.assertFalse(row["independent_ground_truth"])
+        self.assertFalse(row["commercial_reuse_authorized"])
+        self.assertFalse(row["source_document_ingested"])
+        self.assertIsNone(row["model"]["verified_freight_error_cents"])
+        self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+        self.assertEqual(feed["independently_scored_new_customer_cases"], 0)
+        validate_feed(feed, unified, evidence, candidates, manifest)
+        forged = deepcopy(feed)
+        forged["candidate_sources"][0]["model"]["verified_freight_error_cents"] = 17980
+        forged["feed_sha256"] = digest({
+            k: v for k, v in forged.items() if k != "feed_sha256"
+        })
+        with self.assertRaises(ResearchError):
+            validate_feed(forged, unified, evidence, candidates, manifest)
+
     def test_cross_lab_dedupe_preserves_earliest_provenance_and_no_private_titles(self):
         doc, evidence, candidates = sample()
         feed = build_feed(doc, evidence, candidates, load_manifest())
