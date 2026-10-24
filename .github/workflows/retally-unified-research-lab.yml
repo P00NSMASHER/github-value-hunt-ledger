@@ -535,12 +535,12 @@ jobs:
           print('Freight evidence chain: 110 source invoice faces; 0 independent rate/BOL/payment/outcome chains; source-verified arithmetic is not recovered cash')
           import os
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
-              summary.write('### FreightRecovery: original-document evidence readiness\\n')
-              summary.write('- Two frozen original freight PDFs; 110 face amounts recovered.\\n')
-              summary.write('- 100 signed original GlobalTranz nets conserved; 93 version-2 adjustment-bearing records.\\n')
-              summary.write('- 0 verified shipment-specific rate + independent BOL + bank payment + outcome chains.\\n')
-              summary.write('- GSA federal audit guidance used as a reference checklist, NOT private law.\\n')
-              summary.write('- No real customer overcharges, licensed processing, or RETALLY cash proven.\\n')
+              summary.write('### FreightRecovery: original-document evidence readiness\n')
+              summary.write('- Two frozen original freight PDFs; 110 face amounts recovered.\n')
+              summary.write('- 100 signed original GlobalTranz nets conserved; 93 version-2 adjustment-bearing records.\n')
+              summary.write('- 0 verified shipment-specific rate + independent BOL + bank payment + outcome chains.\n')
+              summary.write('- GSA federal audit guidance used as a reference checklist, NOT private law.\n')
+              summary.write('- No real customer overcharges, licensed processing, or RETALLY cash proven.\n')
           PY
       - name: Replay live research branch and frozen FreightRecovery numerical cases
         run: |
