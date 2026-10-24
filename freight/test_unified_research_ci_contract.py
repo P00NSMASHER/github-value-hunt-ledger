@@ -166,6 +166,22 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "arc['independently_custodied_original_bol_documents'] == 0",
             "arc['independently_scored_customer_overcharges'] == 0",
             "arc['original_source_identifiers_exported'] == 0",
+            "embedded_original_vpq_quote_source_replay",
+            "quotation['embedded_original_vpq_quotation_pages'] == 2",
+            "quotation['same_pdf_exact_quotation_id_invoice_joins'] == 2",
+            "quotation['invoice_dates_within_printed_quote_effective_window'] == 2",
+            "quotation['printed_invoice_quoted_weights_agree'] == 2",
+            "quotation['invoice_amount_equals_printed_quote_minimum'] == 1",
+            "quotation['conditional_printed_length_formula_matches'] == 1",
+            "quotation['invoice_quote_money_unresolved'] == 0",
+            "quotation['conditional_length_footage_is_independently_certified'] is False",
+            "quotation['original_signed_bol_quotes_independently_verified'] == 0",
+            "quotation['separate_quote_acceptance_independently_verified'] == 0",
+            "quotation['independent_customer_invoice_overcharge_labels'] == 0",
+            "quotation['verified_retally_recovered_cash_cents'] == 0",
+            "quotation['raw_invoice_quote_bol_identifiers_exported'] == 0",
+            "chain['arcbest_embedded_quote_match_class_sha256']",
+            "chain['arcbest_same_pdf_quotes_not_independent_customer_rate_authorization'] is True",
         ):
             with self.subTest(line=expected):
                 self.assertIn(expected, nightly)
