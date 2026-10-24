@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B221594_REJECTED_TENDER_NEGATIVE_CONTROL_V1",
+  "evidence_lane": "freight_error_adjudication_negative_control",
+  "status": "HISTORICAL_DECISION_LEVEL_NEGATIVE_LABEL_NOT_INVOICE_BENCHMARK",
+  "cohort": {
+    "name": "DOD_1983_REJECTED_TENDER_GAO_1986",
+    "independent_publisher_decision": true,
+    "independently_held_out_from_training_verified": false,
+    "original_bills_of_lading_available": false,
+    "case_by_case_original_invoice_validation_available": false
+  },
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "case_number": "B-221594",
+    "original_record_url": "https://www.gao.gov/products/b-221594-0",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_date": "1986-09-29",
+    "source_format": "PUBLISHER_HTML_DECISION_OCR_TEXT",
+    "original_source_bytes_sha256": null,
+    "source_bytes_acquired": false,
+    "rights_status": "GAO_US_PUBLIC_DOMAIN_ATTRIBUTION_NO_ENDORSEMENT_THIRD_PARTY_CAUTION",
+    "commercial_engine_use_independently_approved": false
+  },
+  "facts": {
+    "historical_tariff": "RISS International Tender ICC 1544",
+    "nominal_tender_effective_date": "1983-01-15",
+    "mtmc_tender_returned_date": "1983-02-17",
+    "tender_re_filed_and_approved_before_shipment": false,
+    "example_dod_shipment_date": "1983-09-07",
+    "original_gbl_number": "UNKNOWN_OCR_L_VS_1_AMBIGUITY",
+    "original_invoice_bytes_available": false,
+    "carrier_reported_charges_cents": 94200,
+    "gsa_applied_lower_rate_cents": 72125,
+    "gsa_deduction_cents": 22075,
+    "lower_rate_derived_by_arithmetic_due_to_html_OCR_L_VS_1": true,
+    "gaos_final_determination": "GSA_DEDUCTION_INVALID_FOR_DOD_REJECTED_TENDER",
+    "decision_level_ground_truth_label": "NEGATIVE_GSA_OVERCHARGE_DEDUCTION",
+    "verified_actual_refund_to_carrier_cents": null,
+    "verified_retally_recovered_cash_cents": 0,
+    "independent_per_invoice_overcharge_amount_cents": null
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_REJECTED_TENDER_DOD",
+      "synthetic": true,
+      "description": "DOD shipment after MTMC rejected tender; no approval before transportation",
+      "expected": "DO_NOT_ASSERT_OVERCHARGE_USING_REJECTED_TENDER",
+      "real_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_NON_DOD_TRANSFER",
+      "synthetic": true,
+      "description": "Non-DOD agency outside MTMC traffic jurisdiction",
+      "expected": "UNKNOWN_CANNOT_TRANSFER_DOD_REJECTION_AUTOMATICALLY",
+      "real_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_REFILING_UNKNOWN",
+      "synthetic": true,
+      "description": "Tender later refiled/accepted with effectiveness unverified",
+      "expected": "UNKNOWN_REQUIRE_ACCEPTANCE_AND_EFFECTIVE_DATE",
+      "real_invoice_error_cents": null
+    }
+  ],
+  "limits": {
+    "decided_historical_not_modern_tariff_authority": true,
+    "ruling_published_after_underlying_shipment": true,
+    "independent_invoice_error_accuracy_scoring_permitted": false,
+    "real_customer_recovery_verified": false,
+    "contemporaneous_shipment_document_custody_verified": false,
+    "per_shipment_ground_truth_completeness": "NOT_ESTABLISHED",
+    "other_non_dod_agencies_same_tender_result": "UNKNOWN",
+    "payer_credits_or_refunds_received": "UNKNOWN",
+    "historical_claim_scope": "GSA_DEDUCTION_INVALID_ABSENT_MTMC_REFILE_APPROVAL",
+    "case_amount_scope": "ILLUSTRATIVE_GAO_DEDUCTION_NOT_RETALLY_RECOVERY"
+  },
+  "data_quality": {
+    "review_date": "2026-10-24",
+    "source_date": "1986-09-29",
+    "case_number_verified_on_official_GAO_page": true,
+    "published_decision_has_OCR_L_1_ambiguity": true,
+    "amount_arithmetic_reconciles": true,
+    "original_document_bytes_hashed": false,
+    "rights_and_holdout_validation_pending": true,
+    "private_customer_medical_student_data_used": false
+  },
+  "manifest_hash_contract": "RESEARCH_AUTHORED_CANONICAL_JSON_EXCLUDING_SELF_NOT_ORIGINAL_GAO_SOURCE_BYTES",
+  "manifest_sha256": "992eb0cdd8011acd10892d40401b99937a1e15af8b2fa9a94772a6f9c7204028"
+}
