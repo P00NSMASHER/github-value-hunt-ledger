@@ -8,12 +8,37 @@
  * No public HTTP mutation routes; only scheduled() writes to storage.
  */
 export const ENGINES = Object.freeze(["freightrecovery", "permitplate", "capturebrief", "recoveryos"]);
+// More distinct public-source queries without increasing API calls per cycle.
+// All results still pass the fixed per-engine topic filter and remain unverified.
 const QUERIES = Object.freeze({
-  freightrecovery: ["freight invoice dataset", "freight overcharge audit", "LTL shipping tariff"],
-  permitplate: ["NYC DOB building permits", "DOB NOW approved permits", "NYC DOB permit issuance"],
-  capturebrief: ["federal solicitation archive", "federal contract dataset", "government contract awards"],
-  recoveryos: ["accounts payable dataset", "supplier payment invoices", "public sector vendor spend"],
+  freightrecovery: [
+    "freight invoice dataset", "freight overcharge audit", "LTL shipping tariff",
+    "freight bill of lading data", "carrier invoice audit", "transportation rate audit",
+    "detention accessorial freight charges", "LTL freight rate comparison",
+    "logistics invoice reconciliation",
+  ],
+  permitplate: [
+    "NYC DOB building permits", "DOB NOW approved permits", "NYC DOB permit issuance",
+    "NYC issued construction permits", "building permit issuance dataset",
+    "NYC DOB NOW permit status", "construction permit filing records",
+    "NYC DOB job application permits", "building permits NYC open data",
+  ],
+  capturebrief: [
+    "federal solicitation archive", "federal contract dataset", "government contract awards",
+    "SAM.gov contract opportunity archive", "federal award transaction dataset",
+    "agency procurement solicitations", "federal acquisition opportunities",
+    "RFP contract award data", "government procurement notice dataset",
+  ],
+  recoveryos: [
+    "accounts payable dataset", "supplier payment invoices", "public sector vendor spend",
+    "duplicate vendor payment audit", "invoice credit memo reconciliation",
+    "public accounts payable registers", "supplier invoice payment matching",
+    "vendor invoice contract terms", "purchase order invoice reconciliation",
+  ],
 });
+const OFFICIAL_PERMIT_QUERIES = Object.freeze([
+  "NYC DOB building permit", "DOB NOW approved permits", "NYC issued construction permit",
+]);
 const MAX_NEW = 24;
 const MAX_API_BYTES = 1200000;
 
@@ -127,18 +152,19 @@ export function canonicalCandidates(provider, data, engine) {
 export function feedSpecs(engine, whenMs = 0) {
   if (!ENGINES.includes(engine)) throw Error("INVALID_ENGINE");
   if (!Number.isFinite(whenMs) || whenMs < 0) throw Error("INVALID_SCHEDULE_TIME");
-  // One lane per 20 minutes; cycle public search terms and safe result pages
-  // without increasing provider request volume or fetching original documents.
+  // One lane per 20 minutes. Nine scoped topic families rotate across two
+  // GitHub and one Zenodo query. The count, response sizes, and original-data
+  // exclusions are unchanged; the expanded windows reduce first-page reuse.
   const lap = Math.floor(whenMs / (300000 * ENGINES.length));
   const page = [1, 1, 2, 1, 3][lap % 5];
-  // One extra newest-first GitHub view per five runs; total request count stays fixed.
   const newest = lap % 5 === 3;
-  // Three search topics x four distinct page/sort plans = 12 bounded views.
-  const offset = lap % 3;
   const githubOptions = (q) => ({q: q + " in:name,description", per_page:15, page,
     ...(newest ? {sort:"updated", order:"desc"} : {})});
   const query = QUERIES[engine];
-  const [q1, q2, q3] = [query[offset], query[(offset + 1) % 3], query[(offset + 2) % 3]];
+  const offset = lap % query.length;
+  const [q1, q2, q3] = [
+    query[offset], query[(offset + 3) % query.length], query[(offset + 6) % query.length],
+  ];
   const feeds = [
     {provider: "github", engine, name: "github-primary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q1))},
     {provider: "github", engine, name: "github-secondary", url: queryUrl("https://api.github.com/search/repositories", githubOptions(q2))},
@@ -147,7 +173,9 @@ export function feedSpecs(engine, whenMs = 0) {
   if (engine === "permitplate") {
     feeds.push({provider: "socrata", engine, name: "nyc-official-catalog",
       url: queryUrl("https://api.us.socrata.com/api/catalog/v1",
-        {domains: "data.cityofnewyork.us", search_context: "data.cityofnewyork.us", q: "NYC DOB building permit", limit: 15})});
+        {domains: "data.cityofnewyork.us", search_context: "data.cityofnewyork.us",
+         q: OFFICIAL_PERMIT_QUERIES[lap % OFFICIAL_PERMIT_QUERIES.length],
+         limit: 15, offset: [0, 15, 30][Math.floor(lap / OFFICIAL_PERMIT_QUERIES.length) % 3]})});
   }
   return feeds;
 }
