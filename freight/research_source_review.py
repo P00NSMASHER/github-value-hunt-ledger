@@ -30,6 +30,9 @@ PUBLIC_REVIEW_ANCHORS = {
     "freightrecovery": (
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
+        # Control against the overruled 1984 ruling and controlling 1986 reconsideration.
+        "https://www.gao.gov/products/b-215958",
+        "https://www.gao.gov/products/b-215958-2",
         "https://www.stb.gov/reports-data/waybill/",
     ),
     "permitplate": (
