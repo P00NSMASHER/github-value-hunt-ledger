@@ -1034,6 +1034,7 @@ def arcbest_printed_rate_bol_reference_census(
         raise ValueError("ARCBEST_DUPLICATE_FACE_REFERENCE")
     tariff_counts = Counter()
     bol_counts = Counter()
+    pricing_bol_joint = Counter()
     observed = bound = missing_identity = 0
     aggregate = []
     for face in faces:
@@ -1051,6 +1052,7 @@ def arcbest_printed_rate_bol_reference_census(
             missing_identity += 1
             tariff_counts["UNBOUND_SOURCE_PAGE"] += 1
             bol_counts["UNBOUND_SOURCE_PAGE"] += 1
+            pricing_bol_joint[("UNBOUND_SOURCE_PAGE", "UNBOUND_SOURCE_PAGE")] += 1
             continue
         bound += 1
         tariff_tokens = {
@@ -1088,6 +1090,7 @@ def arcbest_printed_rate_bol_reference_census(
         else:
             bol = "BOL_HEADER_IDENTIFIER_PRINTED_ONLY"
         bol_counts[bol] += 1
+        pricing_bol_joint[(tariff, bol)] += 1
         aggregate.append((face.page, tariff, bol))
     # Anonymous category digest: only page number + fixed classification
     # enums; no printed commercial identifiers or invoice details.
@@ -1099,6 +1102,23 @@ def arcbest_printed_rate_bol_reference_census(
         "unbound_original_source_pages": missing_identity,
         "printed_tariff_reference_class_counts": dict(sorted(tariff_counts.items())),
         "printed_bol_header_class_counts": dict(sorted(bol_counts.items())),
+        # Join the *same* invoice's printed pricing class to its printed BOL
+        # header class, exposing only fixed enum counts, never the BOL or
+        # quotation identifiers themselves. This is not original BOL custody.
+        "printed_pricing_bol_joint_class_counts": {
+            pricing + "|" + bol: count
+            for (pricing, bol), count in sorted(pricing_bol_joint.items())
+        },
+        "printed_vpq_with_bol_header_identifier_only": pricing_bol_joint[
+            ("PRINTED_VOLUME_QUOTE_MARKER_ONLY", "BOL_HEADER_IDENTIFIER_PRINTED_ONLY")
+        ],
+        "printed_vpq_without_bol_header_identifier": sum(
+            count for (pricing, bol), count in pricing_bol_joint.items()
+            if pricing == "PRINTED_VOLUME_QUOTE_MARKER_ONLY"
+            and bol != "BOL_HEADER_IDENTIFIER_PRINTED_ONLY"
+        ),
+        "original_bol_quote_id_correspondence_independently_verified": 0,
+        "printed_bol_header_is_not_original_bol_custody": True,
         "anonymous_page_category_digest_sha256": digest(json.dumps(
             sorted(aggregate), separators=(",", ":")).encode("utf-8")),
         "source_pdf_printed_reference_not_executed_rate_contract": True,
