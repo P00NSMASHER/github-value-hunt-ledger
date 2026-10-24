@@ -87,7 +87,7 @@
     "second_gbl_footnote_verified_on_official_GAO_page": true
   },
   "manifest_hash_contract": "RESEARCH_AUTHORED_CANONICAL_JSON_EXCLUDING_SELF_NOT_ORIGINAL_GAO_SOURCE_BYTES",
-  "manifest_sha256": "87da32abe9ec46640a33b8b3b3b9f940a15524732b5026ebbc580fbc45f6660c",
+  "manifest_sha256": "3764a91f78fdf94ed214eb2974127a720d1588aa69162c83a88e3a45146ba2d7",
   "documented_second_shipment": {
     "source_section": "DECISION_FOOTNOTE_1",
     "government_bill_of_lading": "S-5694340",
@@ -100,5 +100,26 @@
     "verified_actual_refund_cents": null,
     "label_completeness": "IDENTIFIER_AND_DATE_ONLY",
     "ground_truth_limit": "PUBLISHER_DECISION_SCOPE_NOT_INDEPENDENT_SHIPMENT_AUDIT"
+  },
+  "corroborating_government_publication": {
+    "source_url": "https://www.marines.mil/portals/1/Publications/DCG%20Vol%2065%20Sept%201986.pdf?ver=2012-10-11-163349-687",
+    "host_agency": "U.S. Marine Corps",
+    "source_original_issuer": "U.S. GAO",
+    "title": "Decisions of the Comptroller General, Vol. 65, September 1986",
+    "decision_date": "1986-09-29",
+    "volume_page": 912,
+    "pdf_zero_based_page_index": 93,
+    "extraction_evidence": "INDEXED_PDF_TEXT_ONLY_VISUAL_AND_BYTES_UNVERIFIED",
+    "carrier_collected_cents": 94200,
+    "gsa_reported_applicable_cents": 72125,
+    "deduction_cents": 22075,
+    "first_gbl_identifier": "UNKNOWN_NOT_VISUALLY_CONFIRMED",
+    "publisher_source_sha256": null,
+    "source_bytes_acquired": false,
+    "page_image_verified": false,
+    "independent_invoice_truth_verified": false,
+    "independent_holdout_verified": false,
+    "reuse_approved_for_engine": false,
+    "rights_status": "US_GOVERNMENT_GAO_PUBLIC_DOMAIN_WITH_ATTRIBUTION_NO_ENDORSEMENT_THIRD_PARTY_CAUTION"
   }
 }
