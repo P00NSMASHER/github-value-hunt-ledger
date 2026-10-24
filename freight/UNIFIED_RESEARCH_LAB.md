@@ -976,3 +976,52 @@ spending are introduced. The next meaningful evidence goal is the actual
 2024 source quote/agreement and separate BOL/delivery record under an
 authorized and independently verifiable provenance chain, not blind rerating
 using a generic current tariff.
+
+
+## VPQ quote marker and original BOL reference joint evidence (v13)
+
+The isolated original ArcBest document provides two invoice-printed "VPQ"
+volume-quote hints and two invoice-printed BOL identifiers **in total**.
+Those separate counts cannot answer whether the same shipment has *both*.
+The existing PDF lab now produces a per-invoice **anonymous joint class
+census**, without releasing invoice numbers, quote IDs, pricing codes, BOL
+numbers, source document text, or original PDF bytes.
+
+The 2026-10-24 genuine original-source replay
+[isolated run 40141542720](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/40141542720)
+verified the following fixed joint classes:
+
+| Original printed pricing indicator | Invoice prints a BOL identifier | Invoice BOL header is placeholder |
+| --- | ---: | ---: |
+| VPQ volume quote marker | **1** | **1** |
+| ABF account-pricing reference | 1 | 5 |
+| Tariff reference not readable | 0 | 2 |
+| **All ten original invoices** | **2** | **8** |
+
+The joint classes are pinned in the same isolated nightly acceptance
+and in the ephemeral original-document evidence-chain readiness receipt,
+which rejects altered marginal/joint totals or inaccurate rate, BOL,
+rights or cash assertions. A VPQ reference with a printed BOL header
+identifier is **not** proof that the carrier's original BOL actually bears
+the shipment's accepted volume-quote ID.
+
+[ArcBest's volume-pricing terms](https://arcb.com/volume-quote-terms-conditions)
+require showing the quote ID on the original bill of lading and describe
+pricing precedence and conditions. These currently published terms provide
+a research rule for deciding what primary evidence remains necessary;
+they do **not** by themselves establish the rate or terms effective on
+a specific historic 2024 invoice. The isolated lab possesses no
+independently verified executed volume-quote document, original signed
+BOL with accepted quote-ID correspondence, independent delivery/weight
+proof, or verified customer bank/credit record for any of these ten
+invoices. Accordingly, all recoverable-error labels remain UNKNOWN,
+**no** modern controlling rate is inferred, and verified RETALLY cash
+remains **$0**.
+
+Practical research priority is therefore to locate (without contacting
+anyone) independently verifiable original 2024 quote/BOL records for the
+one VPQ-with-header-identifier case and the one VPQ-with-placeholder case.
+The initial published-document census does not justify selecting a claim
+or rerating either shipment. No new Cron trigger, cloud paid service,
+source data branch, original-source network call, production engine
+change, or external outreach is part of this repair.
