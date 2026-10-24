@@ -39,7 +39,9 @@
     "carrier_exclusive_use_argument": "SEALED_OR_AUTHORIZED_BUT_NOT_SHIPPER_ORDERED_WITH_SIGNATURE",
     "gao_reason": "TARIFF_REQUIRES_SHIPPER_ORDERED_EXCLUSIVE_USE_SIGNED_ON_GBL",
     "gao_disposition": "DISALLOWANCE_SUSTAINED",
-    "further_litigation_outcome": "UNKNOWN"
+    "further_litigation_outcome": "UNKNOWN",
+    "gao_full_vehicle_inference_status": "SUGGESTED_BY_GAO_NOT_INDEPENDENTLY_MEASURED",
+    "gao_conditional_alternative_reason": "IF_FULL_VEHICLE_EXCLUSIVE_USE_ADDS_NO_BENEFIT_USE_TRUCKLOAD_ACTUAL_WEIGHT"
   },
   "ground_truth": {
     "independent_government_decision_published": true,
@@ -50,7 +52,8 @@
     "current_contract_rate_applicability": "UNKNOWN",
     "independent_original_invoice_error_cents": null,
     "retally_verified_cash_recovered_cents": 0,
-    "independent_customer_invoice_accuracy_scoring_permitted": false
+    "independent_customer_invoice_accuracy_scoring_permitted": false,
+    "actual_vehicle_capacity_independently_verified": false
   },
   "synthetic_negative_controls": [
     {
@@ -70,6 +73,12 @@
       "synthetic": true,
       "expected": "UNKNOWN_DO_NOT_INFER_VALID_EXCLUSIVE_USE",
       "customer_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_VALID_SIGNED_ORDER_BUT_FULL_TRUCKLOAD",
+      "synthetic": true,
+      "expected": "REJECT_SIGNED_ORDER_ALONE_DOES_NOT_OVERRIDE_FULL_LOAD_TRUCKLOAD_RATE",
+      "customer_error_cents": null
     }
   ],
   "data_quality": {
@@ -81,5 +90,5 @@
     "private_customer_medical_student_data_used": false
   },
   "manifest_hash_contract": "AUTHORED_CANONICAL_JSON_SHA256_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
-  "manifest_sha256": "a2f0f9275eab53fc8a60ceeb31083d07a275d62982c15ff3734d5a0e8b93bb6a"
+  "manifest_sha256": "8487c75828809619344db8575a6d787c65eb55ddda24b441bb6b0d5da8e5e0bc"
 }
