@@ -88,7 +88,13 @@ def validate_historical_inputs(p1984: dict, p1969: dict) -> None:
     if (a.get("case_number") != "B-215958"
             or a.get("decision_date") != DEC_1984.isoformat()
             or a.get("original_record_url") != PRIMARY_1984
+            or a.get("superseding_reconsideration_url") != PRIMARY_1986
+            or a.get("superseding_reconsideration_date") != DEC_1986.isoformat()
             or not "190-A" in a.get("historical_tariff", "")
+            or summary.get("decision_outcome") !=
+                "GAO_1984_INITIAL_REVERSAL_SUBSEQUENTLY_OVERRULED_IN_1986"
+            or p1984["controls"][0].get("expected") !=
+                "1984_INITIAL_FAVORABLE_RULING_NOT_FINAL_1986_WRITTEN_REQUEST_REQUIRED"
             or summary.get("challenged_government_bills_of_lading") != 55
             or summary.get("decision_reversals_with_recorded_numbered_seals") != 53
             or summary.get("remainder_cases_with_unresolved_disposition") != 2
