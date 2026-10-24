@@ -4807,6 +4807,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-24",
+      "id": "747e281ff319621748a7c466febbd2b896be13657df79361893c9673054cfc0b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/sanketagarwal/accounts-payable-invoice-processing"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -10649,6 +10665,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "3ab5abc02e63d3872fcd1f25a37b71dee38a44e87030d43af78682885b8a850f",
+  "entries_sha256": "46f494fd2b6641cd65f7618b8bc8c034965e82437cbdb360f0d76b74e93610db",
   "schema_version": 1
 }
