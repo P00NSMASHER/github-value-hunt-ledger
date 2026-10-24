@@ -9789,6 +9789,22 @@
       "engines": [
         "permitplate"
       ],
+      "first_seen": "2026-10-24",
+      "id": "e7f6055aafe3b7cc58381eb7fb28bc0d40d6bf3d6edcb5ce7d450d3f9230bec7",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/wye7-nyek"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "permitplate"
+      ],
       "first_seen": "2026-10-23",
       "id": "e82ca3d94dc8d8b762a63505d34606a21daec2db9c9235d82f26db47d5cab2ec",
       "independent_ground_truth": false,
@@ -10873,6 +10889,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "f7ca18c4061003866dabc6558d0a13f5499592d6b2204199260b40833e22df9b",
+  "entries_sha256": "18718feafbde16d8af837dd57a968f3536a624d5c36fad7fe7cd68b85fcbf6f4",
   "schema_version": 1
 }
