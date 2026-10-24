@@ -9,9 +9,9 @@
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 2,
         "third_party_path_topic_hints_only": 21,
-        "unclassified_third_party_catalogs_only": 134
+        "unclassified_third_party_catalogs_only": 143
       },
-      "catalog_source_associations": 157,
+      "catalog_source_associations": 166,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -160,18 +160,18 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 157,
+      "unverified_candidates_after_url_screen": 166,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "freightrecovery": {
       "candidate_classes": {
         "known_nyc_community_derivative_views_review_only": 0,
         "official_publisher_host_url_only": 14,
-        "pinned_public_anchor_url_only": 3,
+        "pinned_public_anchor_url_only": 5,
         "third_party_path_topic_hints_only": 20,
-        "unclassified_third_party_catalogs_only": 176
+        "unclassified_third_party_catalogs_only": 179
       },
-      "catalog_source_associations": 213,
+      "catalog_source_associations": 218,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -182,6 +182,23 @@
         "ADJUDICATED_POSITIVE_AND_NEGATIVE_LABELS_MISSING"
       ],
       "priority_review_queue": [
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-24",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.gao.gov/products/b-215958",
+          "publisher_host": "www.gao.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "24420a8823047136a72dc00285b40dbc717f8e33d2b8cf1fa04aa1bfc8763024",
+          "source_provenance_verified": false
+        },
         {
           "benchmark_ready": false,
           "commercial_reuse_authorized": false,
@@ -197,6 +214,23 @@
             "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
           ],
           "source_id": "3f4e85181b8ac551ac0672c7c2775cb4509b253a3a0f1c0644f4b16bd30d1e54",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-24",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://www.gao.gov/products/b-215958-2",
+          "publisher_host": "www.gao.gov",
+          "rank_reason": "PINNED_PUBLIC_ANCHOR_URL_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "8659de030562093aee9ac5a4b989d0827139e709431310af4b8ee4ebc6fe4103",
           "source_provenance_verified": false
         },
         {
@@ -283,45 +317,11 @@
           ],
           "source_id": "225fa0627b37ba14e178b9abbe241e7ca2fe2f947c23526aac777a09e53412ec",
           "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-24",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://www.gao.gov/products/b-215958",
-          "publisher_host": "www.gao.gov",
-          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "24420a8823047136a72dc00285b40dbc717f8e33d2b8cf1fa04aa1bfc8763024",
-          "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-24",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://www.gao.gov/products/b-148465",
-          "publisher_host": "www.gao.gov",
-          "rank_reason": "OFFICIAL_PUBLISHER_HOST_URL_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "2687473a3d37b713cd67f452e09bb684191a3bf5a56d79e174929c55aa99f3af",
-          "source_provenance_verified": false
         }
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 213,
+      "unverified_candidates_after_url_screen": 218,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "permitplate": {
@@ -330,9 +330,9 @@
         "official_publisher_host_url_only": 28,
         "pinned_public_anchor_url_only": 3,
         "third_party_path_topic_hints_only": 16,
-        "unclassified_third_party_catalogs_only": 141
+        "unclassified_third_party_catalogs_only": 145
       },
-      "catalog_source_associations": 206,
+      "catalog_source_associations": 210,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -481,7 +481,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 188,
+      "unverified_candidates_after_url_screen": 192,
       "url_only_topic_exclusions_not_deleted": 18
     },
     "recoveryos": {
@@ -649,12 +649,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "c636ed2135e75aff6a25a2bd392c65f6b91b61e189aa7b7c4fe310d5582332f0",
+  "queue_sha256": "e66a080eb0f46ebd93f222937b970f40a6e069414b17d4eb947cef6756c387bf",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "7cc1e3ade5a179c7ff3457bcc293901592c412baa6f0330f6885704493358570",
-  "unique_public_source_references": 743,
+  "source_ledger_entries_sha256": "897c72d85e73e7130a7f48e8db73797811bbd29479612c95d90766ab72219347",
+  "unique_public_source_references": 761,
   "verified_recovered_cash_cents": 0
 }

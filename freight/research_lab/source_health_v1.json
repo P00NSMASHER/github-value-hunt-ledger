@@ -11,19 +11,19 @@
       "official_publisher_host_only": 2,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 157,
-      "third_party_catalog_host_only": 155,
+      "source_pointers": 166,
+      "third_party_catalog_host_only": 164,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
     "freightrecovery": {
       "commercial_reuse_confirmed": false,
       "independently_labeled_test_cases": 0,
-      "official_publisher_host_only": 17,
+      "official_publisher_host_only": 19,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 213,
-      "third_party_catalog_host_only": 196,
+      "source_pointers": 218,
+      "third_party_catalog_host_only": 199,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -33,8 +33,8 @@
       "official_publisher_host_only": 35,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 206,
-      "third_party_catalog_host_only": 171,
+      "source_pointers": 210,
+      "third_party_catalog_host_only": 175,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 18
     },
@@ -50,7 +50,7 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 743,
+  "first_seen_in_last_seven_calendar_days": 761,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-24",
   "limitations": [
@@ -68,18 +68,18 @@
     "sam.gov": 1,
     "www.eia.gov": 1,
     "www.fmc.gov": 1,
-    "www.gao.gov": 10,
+    "www.gao.gov": 12,
     "www.penninecare.nhs.uk": 1,
     "www.sec.gov": 2,
     "www.stb.gov": 1,
     "www2.fmc.gov": 1,
-    "zenodo.org": 463
+    "zenodo.org": 479
   },
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "7cc1e3ade5a179c7ff3457bcc293901592c412baa6f0330f6885704493358570",
-  "unique_source_pointers": 743,
+  "source_ledger_entries_sha256": "897c72d85e73e7130a7f48e8db73797811bbd29479612c95d90766ab72219347",
+  "unique_source_pointers": 761,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }

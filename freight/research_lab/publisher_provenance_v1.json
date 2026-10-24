@@ -1,5 +1,5 @@
 {
-  "anchor_set_sha256": "94793ec71e15fa7cb07fc2023c6fffdd38e7efb28068f0aeccf906332d0d0666",
+  "anchor_set_sha256": "0d7a1f4c0a2ea605e74eddda92e4936ffad3fad2d3dc7e8d5cd31649314fde72",
   "as_of_utc_date": "2026-10-24",
   "commercial_reuse_approved": false,
   "customer_contact_actions": 0,
@@ -42,6 +42,36 @@
       "publisher_host": "www.gao.gov",
       "source_document_bytes_stored": false,
       "source_id": "3f4e85181b8ac551ac0672c7c2775cb4509b253a3a0f1c0644f4b16bd30d1e54"
+    },
+    {
+      "benchmark_ready": false,
+      "bytes_hashed": 0,
+      "commercial_reuse_approved": false,
+      "content_sha256": null,
+      "engine": "freightrecovery",
+      "first_seen": "2026-10-24",
+      "head_http_status": 403,
+      "independent_outcome_verified": false,
+      "media_class": "UNKNOWN",
+      "probe_state": "HTTP_NOT_AVAILABLE",
+      "publisher_host": "www.gao.gov",
+      "source_document_bytes_stored": false,
+      "source_id": "24420a8823047136a72dc00285b40dbc717f8e33d2b8cf1fa04aa1bfc8763024"
+    },
+    {
+      "benchmark_ready": false,
+      "bytes_hashed": 0,
+      "commercial_reuse_approved": false,
+      "content_sha256": null,
+      "engine": "freightrecovery",
+      "first_seen": "2026-10-24",
+      "head_http_status": 403,
+      "independent_outcome_verified": false,
+      "media_class": "UNKNOWN",
+      "probe_state": "HTTP_NOT_AVAILABLE",
+      "publisher_host": "www.gao.gov",
+      "source_document_bytes_stored": false,
+      "source_id": "8659de030562093aee9ac5a4b989d0827139e709431310af4b8ee4ebc6fe4103"
     },
     {
       "benchmark_ready": false,
@@ -157,10 +187,10 @@
   },
   "production_changes": 0,
   "publisher_http_responses_observed": 3,
-  "receipt_sha256": "5b653b4bf65e34960a813c85c74216bfcc81e9c82e4d63a14ff4bd58d69d029d",
+  "receipt_sha256": "fec8fbb164eaca0e26a777247aeb1664fbf81f4e169edc39d65942aa6296075d",
   "schema_version": 1,
   "scope": "PUBLIC_PUBLISHER_RESPONSE_OBSERVATIONS_NOT_BENCHMARK_TRUTH",
   "source_document_bytes_stored": 0,
-  "source_pointers_probed": 9,
+  "source_pointers_probed": 11,
   "verified_recovered_cash_cents": 0
 }
