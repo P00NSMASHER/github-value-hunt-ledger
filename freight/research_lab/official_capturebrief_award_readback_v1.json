@@ -19,6 +19,9 @@
   "new_paid_services": 0,
   "production_changes": 0,
   "publisher_host": "api.usaspending.gov",
+  "publisher_readback_error_codes": {
+    "HTTP_503": 2
+  },
   "publisher_readbacks_ambiguous": 0,
   "publisher_readbacks_attempted": 2,
   "publisher_readbacks_changed": 0,
@@ -27,7 +30,7 @@
   "publisher_readbacks_unavailable": 2,
   "publisher_source_anchor_id": "c95ab3d08065c413405b611483719c147a03d675d8d736ed2321a924f368421e",
   "realized_recovery_cents": 0,
-  "receipt_sha256": "3e1191a63f43ca3e77fd4fa4837750ef1f304ff73ca949c029b72d0545556814",
+  "receipt_sha256": "70ec882a1a2c5f0080db984390e2caf50d2cdad2559de9a1e66a215535773eaf",
   "recipient_identifiers_stored": 0,
   "repeated_source_rows": 0,
   "sample_net_awarded_amount_minor": 46679171398500,
