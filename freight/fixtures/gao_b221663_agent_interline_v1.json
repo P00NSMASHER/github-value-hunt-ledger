@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B221663_AGENT_INTERLINE_DISPUTE_V1",
+  "evidence_lane": "freight_error_adjudication",
+  "status": "HISTORICAL_DECISION_LEVEL_AGENT_CLASSIFICATION_NOT_INVOICE_BENCHMARK",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "case_number": "B-221663",
+    "original_record_url": "https://www.gao.gov/products/b-221663-0",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_date": "1986-10-10",
+    "source_format": "OFFICIAL_GAO_HTML_DECISION_TEXT",
+    "original_source_bytes_sha256": null,
+    "source_bytes_acquired": false,
+    "rights_status": "US_GOVERNMENT_GAO_PUBLIC_DOMAIN_ATTRIBUTION_NO_ENDORSEMENT",
+    "commercial_engine_use_approved": false
+  },
+  "cohort": {
+    "name": "DOD_1982_PICKUP_AGENT_V_INTERLINE_HISTORICAL_DISPUTE",
+    "independent_government_adjudication": true,
+    "held_out_from_engine_training_verified": false,
+    "original_gbl_or_carrier_invoice_bytes_available": false,
+    "decision_level_label_scope": "GAO_SUSTAINED_GSA_RATE_DEDUCTION_ONLY"
+  },
+  "shipment": {
+    "government_bill_of_lading": "S-5789267",
+    "shipment_date": "1982-12-17",
+    "origin": "Bay City, Texas",
+    "destination": "Bloomington, Illinois",
+    "pickup_carrier": "Merchants Fast Motor Lines",
+    "billing_delivering_carrier": "Yellow Freight System",
+    "transfer_point": "Houston, Texas",
+    "historical_tender": "Yellow Freight Tender ICC 2094",
+    "tender_in_effect_on_shipment_date": true,
+    "pickup_carrier_receipted_as_yellow_agent": true,
+    "contract_rate_mode_adjudicated": "SINGLE_LINE_YELLOW_AGENT",
+    "joint_line_rate_claim_by_carrier": true,
+    "gao_disposition": "GSA_LOWER_SINGLE_LINE_DEDUCTION_SUSTAINED",
+    "deduction_cents_from_original_decision": null,
+    "invoice_line_amounts_available": false,
+    "verified_retally_recovery_cents": 0,
+    "actual_refund_received_cents": null,
+    "independent_invoice_error_amount_cents": null
+  },
+  "source_conflict": {
+    "specific_fort_sam_houston_letter_date": "1986-04-04",
+    "general_bay_city_letter_date": "1986-04-08",
+    "later_general_letter_may_conflict_with_specific_letter": true,
+    "gao_reliance": "SPECIFIC_SHIPMENT_AND_DRIVER_AGENCY_RECEIPT_WEIGH_MORE_THAN_GENERAL_UNSUPPORTED_DENIAL",
+    "original_letters_in_custody": false,
+    "new_independent_fact_verification": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_SECOND_CARRIER_IMPLIES_INTERLINE",
+      "synthetic": true,
+      "expected": "REJECT_PICKUP_CARRIER_ALONE_NOT_PROOF_OF_INTERLINE",
+      "verified_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_NO_AGENCY_RECEIPT_OR_PRIOR_CONTACT",
+      "synthetic": true,
+      "expected": "UNKNOWN_DO_NOT_INFER_SINGLE_LINE_RATE",
+      "verified_invoice_error_cents": null
+    },
+    {
+      "id": "SYNTHETIC_MODERN_YELLOW_TENDER",
+      "synthetic": true,
+      "expected": "REJECT_HISTORICAL_TENDER_NOT_CURRENT_CONTRACT_AUTHORITY",
+      "verified_invoice_error_cents": null
+    }
+  ],
+  "limits": {
+    "contemporaneous_carrier_contract_pages_available": false,
+    "original_bol_or_invoice_images_verified": false,
+    "commercial_engine_use_authorized": false,
+    "independent_invoice_accuracy_scoring_permitted": false,
+    "non_dod_shipments_same_result": "UNKNOWN",
+    "other_shipments_same_rates": "UNKNOWN",
+    "independent_customer_payment_chain_verified": false,
+    "verified_retally_recovered_cash_cents": 0
+  },
+  "data_quality": {
+    "review_date": "2026-10-24",
+    "case_number_and_dates_verified_on_official_GAO_page": true,
+    "source_amount_absent": true,
+    "decision_level_label_complete": true,
+    "shipment_invoice_level_label_complete": false,
+    "original_publisher_source_bytes_hashed": false,
+    "private_customer_medical_student_data_used": false
+  },
+  "manifest_hash_contract": "CANONICAL_AUTHOR_CREATED_JSON_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
+  "manifest_sha256": "b79983f508686ba0250de0f77ef393fcef7289f6e4e9fbc47bac36c10dd38d0e"
+}
