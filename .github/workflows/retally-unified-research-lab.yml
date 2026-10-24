@@ -339,6 +339,7 @@ jobs:
                   f"- Original source state: {x['source_status']}\n"
                   f"- Original archive rows parsed: {x['source_rows']}\n"
                   f"- Distinct public original notice IDs: {x['unique_notice_ids']}\n"
+                  f"- Source rows quarantined for solicitation control characters: {x['source_rows_quarantined_solicitation_control']}\n"
                   f"- Current original SHA matches archived Oct 19 digest: {x['source_digest_matches_historical_oct19']}\n"
                   f"- Source failure categories: {x['source_error_codes']}\n"
                   '- Independent as-of SAM-to-USAspending award outcomes: ZERO\n'
