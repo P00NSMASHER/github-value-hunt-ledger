@@ -1025,3 +1025,173 @@ The initial published-document census does not justify selecting a claim
 or rerating either shipment. No new Cron trigger, cloud paid service,
 source data branch, original-source network call, production engine
 change, or external outreach is part of this repair.
+
+
+## Two original ArcBest VPQ quotation pages found in existing PDF (v14)
+
+**Material correction to v12/v13:** The public, frozen original **74-page**
+ArcBest court exhibit at
+https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408
+contains not only **ten original invoice faces**, but also **two actual
+shipment-specific ArcBest Volume Pricing Quotation form pages**. Earlier
+language implying no quotation document was present in the controlled
+source PDF was incomplete. The previous statement of **zero independently
+authenticated accepted rate agreements and zero original signed BOLs**
+remains correct.
+
+Actual original-page replay (isolated CI run #40143067211) validates:
+
+| Source-document relationship | Verified within SAME frozen public PDF |
+| --- | --- |
+| Invoice dated 2024-05-13, billed $2,132.83 | Matching original quotation ID; quote effective May 10-23, 2024; both print 2,610 lb; original quotation **minimum including fuel $2,132.83**. |
+| Invoice dated 2024-04-16, billed $606.00 | Matching original quotation ID; quote effective Apr 15-28, 2024; both print 12,573 lb; quote minimum **$270** including fuel covers 20 linear feet and additional charge **$14/foot**. |
+| Second invoice's reported LWH first dimension | **525 inches / 12 = 43.75 feet**. If that printed number reflects chargeable linear trailer footage and whole extra feet are rounded up, 44 - 20 = 24 additional feet and $270 + 24 × $14 = **$606**, matching the original invoice. |
+| Independently authenticated initial signed BOL bearing correct quote ID | **0**; no separate original accepted BOL artifact is possessed. |
+| Independently verified quote acceptance, final weight/space, payment, adjudicated errors or credits | **0**; two observations remain source-internal arithmetic cases, not independent freight-error truth. |
+
+The source-frozen lab joins the quote ID, shipment date/quote-effective
+window, printed weight, and face amount **in ephemeral runner memory**.
+These identifiers, quote details and source pages are **never written** to
+the research branch. A stable SHA-256 over *anonymous page/category tags*
+is pinned to the already-verified source PDF fingerprint. Wrong or
+duplicated quote IDs, date-window conflicts, mismatched printed weights
+and one-cent differences must leave the amount **unresolved**, rather than
+fabricate an overcharge.
+
+The second $606 check is a **conditional mathematical reading**, not a
+certified space/length measurement. The printed LWH first dimension
+need not be independently accepted billable space, and rounding policy
+has not been verified against a separate initial signed BOL. A matching
+contemporaneous quotation page supports the carrier's internal pricing
+explanation; it does **not** prove the original contract's legal
+applicability, shipper acceptance, correctness of billed accessorials
+or a customer's cleared payment.
+
+This corrects the source **completeness** question substantially:
+two matching contemporaneous source pricing documents were already in the
+approved corpus. It does not create verified customer overcharge labels,
+cash recoveries, BOL acceptance evidence, commercial reuse approval or
+an independently adjudicated accuracy rate. All ten original ArcBest
+invoices remain UNKNOWN for independent customer-level audit outcomes.
+The same nightly real-document job tests all counts without a new schedule,
+data branch, contact action, purchase, cloud permission or production change.
+
+
+## U.S. freight-source date-locale correction (v16, October 25, 2026)
+
+**High-severity original-source fidelity correction:** Previous original
+GlobalTranz and ArcBest invoice source parsing used a shared date helper's
+UK-first format. The helper's day/month-first default is correct for the
+separate Pennine Care UK accounting disclosures, but it silently swapped
+**ambiguous U.S. original invoice dates**. The earlier ArcBest BOL test
+incorrectly reported a pickup conflict for a May 1, 2024 shipment because
+the original U.S. invoice date became January 5. The original BOL Stop 1
+pickup date already used explicit U.S. month/day/year parsing.
+
+No original PDF byte, freight invoice amount, printed quote or BOL text
+changed. The repair explicitly parses only original U.S. freight invoice
+date fields in **month/day/year order**. UK source interpretation stays
+unchanged. An impossible U.S. date is rejected instead of silently
+falling back to UK. A BOL whose CRN load ID does not match the invoice
+now also stays **unlinked** even if its pro number matches.
+
+| Frozen original source cohort | Affected original invoice faces | Previously misparsed source date fields |
+| --- | ---: | ---: |
+| GlobalTranz original invoices | **59 of 100** | **70 of 200** |
+| ArcBest original invoices | **6 of 10** | **6 of 10** |
+| **Combined** | **65 of 110** | **76 of 210** |
+
+New evidence: GlobalTranz original invoice dates join the *same published
+open-balance statement* at **100/100 exact invoice-ID/date/amount pairs**,
+versus 98/100 previously; previous two gaps greater than 180 days and
+maximum 207-day gap were artifacts of locale parsing. Maximum source
+date gap is now **zero**, but this is still an **open statement, not a
+bank-cleared payment or independently authenticated settlement**.
+
+ArcBest's original truckload invoice and four co-bundled BOL first-page
+copies now produce **4/4 source pickup-date matches** (previously 3/4);
+the original load/printed-weight matches remain 4/4. The **30-versus-225
+printed piece-count conflict** on repeated versions of one original load
+remains unresolved and is **not** adjudicated as an overcharge. Four BOL
+first pages still represent only two unique invoice/load relationships.
+
+The source-readiness receipt and both original-document nightly pipelines
+now pin both frozen public-PDF source hashes, the corrected GlobalTranz
+canonical signed-record catalog digest, the updated anonymous ArcBest BOL
+source-category digest, and both independent U.S.-date-catalog digests.
+A fail-closed audit for each source reports **only aggregate impacted counts,
+normalized catalog SHA-256 and bounded classifications**, not invoice IDs,
+PII, source pages or raw dates. Actual original-PDF acceptance, not
+unit-test fixture assumptions, is required before changing a baseline.
+
+**Ground truth remains unavailable:** independently authenticated signed
+BOL acceptance, shipment-specific applicable rate contracts, cleared buyer
+payments, independently adjudicated customer freight errors and verified
+RETALLY recovered cash remain zero/unverified. Precision and recall cannot
+be calculated. No changes to the production rating engine, customer files,
+rights authorization, provider/network cadence, paid services, other
+research lanes or human outreach are authorized by this repair.
+
+## ArcBest co-bundled original motor-carrier bills of lading (v15)
+
+**Evidence correction:** The source-frozen original
+[74-page ArcBest bankruptcy exhibit](https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408)
+does contain printed original **Motor Carrier Bill of Lading** forms
+appended to its two **truckload** invoices. Earlier descriptions of
+“zero original BOL documents” meant **zero independently authenticated
+signed original BOLs in separate custody**; they must not be taken to
+mean there are no co-bundled BOL forms in the public exhibit.
+
+The existing source laboratory now binds each BOL form to its source
+truckload invoice by the exact nine-digit printed ArcBest freight-bill
+reference AND ten-digit invoice CRN load reference, then compares
+the printed load weight and source pickup date in ephemeral memory.
+The 2026-10-24 genuine 74-page original document acceptance established:
+
+| Scope of original co-bundled BOL evidence | Observed |
+| --- | ---: |
+| Original truckload invoices in frozen source | **2** |
+| Source BOL first pages (some duplicate copies) | **4** |
+| Unique truckload invoices linked to those BOL first pages | **2** |
+| BOL source pages matching the original invoice load reference | **4** |
+| BOL pages matching original invoice **printed** weight | **4** |
+| BOL pickup dates matching original invoices **after v16 correction** | **4** |
+| Previously reported pickup-date mismatch (corrected by v16) | **0** |
+| Extra repeated BOL first-page copies, **not additional shipments** | **2** |
+| Unique load groups with conflicting BOL printed piece totals | **1** |
+| Unique load groups with conflicting BOL printed weights | **0** |
+| Independently authenticated carrier/shipper signatures or delivery proof | **0** |
+| Independent freight overcharges, verified customer bank payments, RETALLY cash | **0** |
+
+Original amounts are the two $2,950 and $3,200 truckload invoices; the
+first BOL records **11,993 lb** and the second's copies **11,050 lb**.
+The second load's three printed BOL first-page versions contain
+**30 pieces in one version** versus **225 pieces in two other versions**;
+the $3,200 original invoice prints **225**. This is a genuine *source
+document contradiction*, **not an adjudicated billing error**, because
+the current source does not establish whether the earlier version was
+superseded, what unit conventions applied, or whether the discrepancy
+affected any rated charge. The first load's description also references
+473 cartons while its BOL “Total Pcs” is zero, a semantic difference
+that is not automatically classified as a mistake.
+
+A parser guard first fixed the U.S. BOL's month/day/year
+interpretation but initially missed the invoice's shared UK-first
+parser. The **v16 source-correction above supersedes** the previously
+reported one pickup-date mismatch. With corrected U.S. invoice dates,
+all four BOL source pickup dates match the original invoices.
+
+Only the anonymous source page/class aggregate SHA-256
+3d2876dc5cae232414e245d9c49531d726268a3ddab6bd7124d961e005ed274e
+and bounded counts enter the ephemeral nightly receipt, with original
+PDF byte hash 4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17.
+No load/PO/freight-bill identifiers, contacts, PDF bytes, signatures or
+raw rows enter the persistent GitHub research catalog. The old
+**110 UNKNOWN customer invoice outcomes** remain UNKNOWN, and no
+commercial rate or recovery rights are assumed.
+
+This strengthens original-document evidence without new schedules,
+paid providers, customer contact, deployments, protected-main bypass
+or a new data branch. Independently authenticated signed BOL pickup/
+delivery and applicable customer contract terms are still required to
+adjudicate an actual customer overcharge or recovered cash.

@@ -94,13 +94,47 @@ jobs:
           assert stmt['current_total_minor'] == 2595447
           assert stmt['balance_delta_minor'] == 7214
           assert stmt['face_to_statement_original_amount']['cross_reference_false_joins'] == 0
-          assert stmt['face_to_statement_original_amount']['matched_invoices'] == 98
+          assert stmt['face_to_statement_original_amount']['matched_invoices'] == 100
+          assert stmt['face_to_statement_original_amount']['by_rule']['exact'] == 100
+          assert stmt['face_to_statement_original_amount']['unmatched_invoices'] == 0
           identities = gt['face_statement_identity_diagnostic']
           assert identities['both_sources_share_identifier'] == 100
           assert identities['same_identifier_and_original_amount'] == 100
           assert identities['invoice_face_not_listed_on_statement'] == 0
           assert identities['statement_identifier_without_extracted_invoice_face'] == 2
-          assert identities['source_date_gaps_over_180_days'] == 2
+          assert identities['source_date_gaps_over_180_days'] == 0
+          assert identities['maximum_face_to_statement_recorded_date_gap_days'] == 0
+          # Both public PDF sources are U.S. MM/DD/YYYY. The generic date
+          # helper is UK-first for Pennine NHS and may NEVER define U.S.
+          # freight shipment chronology or mint independent payment proof.
+          from freight.freight_evidence_chain_readiness import (
+              US_SOURCE_DATE_LOCALE_BASELINE, SIGNED_RECORD_CATALOG_HASH,
+              ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST,
+          )
+          for issuer, expected in US_SOURCE_DATE_LOCALE_BASELINE.items():
+              audit = freight[issuer]['source_us_date_locale_audit']
+              assert audit['issuer'] == issuer
+              assert audit['original_invoice_faces_considered'] == expected['faces']
+              assert audit['date_fields_rebound_to_us_source'] == expected['date_fields']
+              assert audit['date_fields_legacy_uk_first_misparsed'] == expected['misparsed_fields']
+              assert audit['invoice_faces_affected_by_legacy_uk_first_parser'] == expected['affected_faces']
+              assert audit['normalized_invoice_date_catalog_sha256'] == expected['catalog_sha256']
+              assert audit['source_original_pdf_sha256'] == freight[issuer]['sha256']
+              assert audit['us_month_day_year_source_semantics_enforced'] is True
+              assert audit['independent_delivery_or_payment_proof_created'] is False
+              assert audit['customer_overcharge_labels'] == 0
+              assert audit['verified_retally_cash_recovered_cents'] == 0
+              assert audit['original_invoice_ids_exported'] == 0
+          signed = gt['canonical_v2_original_invoice_adjustment_lab']
+          assert signed['stable_canonical_record_catalog_sha256'] == SIGNED_RECORD_CATALOG_HASH
+          assert signed['canonical_invoice_records_with_exact_source_net'] == 100
+          bol = abf['co_bundled_motor_carrier_bol_source_replay']
+          assert bol['source_invoice_pickup_date_matches_on_bol_copies'] == 4
+          assert bol['unresolved_reason_counts'] == {}
+          assert bol['anonymous_page_class_sha256'] == ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST
+          assert bol['commercial_reuse_authorized'] is False
+          assert bol['independently_adjudicated_customer_overcharges'] == 0
+          assert bol['verified_retally_cash_recovered_cents'] == 0
           source_lines = gt['original_invoice_line_amount_reconciliation']
           assert source_lines['invoice_faces_considered'] == 100
           assert source_lines['component_tokens_extracted'] == 387
@@ -184,5 +218,6 @@ jobs:
               stream.write(f"- All four deliberate accounting-corruption controls detected; original public source bytes match seven frozen SHA-256 values.\n")
               stream.write(f"- Historical GAO decision references: 8; three adjudicated financial-arithmetic precedents checked; fully linked independent labels: 0. Freight precision/recall/accuracy **not calculable**.\n")
               stream.write('\n**Limits:** same-source payment declarations are not bank clearing; ArcBest rating probes use openly marked non-admissible proxies; no commercial or customer recovery claim.\n')
+          print('PASS: 65/110 original US freight invoices date-corrected; 100/100 GlobalTranz exact statement matches; 4/4 ArcBest source pickup dates; 0 settled cash or verified overcharges')
           print('PASS: original document lab remains research-only, no cash or accuracy claim')
           PY

@@ -166,6 +166,48 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "arc['independently_custodied_original_bol_documents'] == 0",
             "arc['independently_scored_customer_overcharges'] == 0",
             "arc['original_source_identifiers_exported'] == 0",
+            "embedded_original_vpq_quote_source_replay",
+            "quotation['embedded_original_vpq_quotation_pages'] == 2",
+            "quotation['same_pdf_exact_quotation_id_invoice_joins'] == 2",
+            "quotation['invoice_dates_within_printed_quote_effective_window'] == 2",
+            "quotation['printed_invoice_quoted_weights_agree'] == 2",
+            "quotation['invoice_amount_equals_printed_quote_minimum'] == 1",
+            "quotation['conditional_printed_length_formula_matches'] == 1",
+            "quotation['invoice_quote_money_unresolved'] == 0",
+            "quotation['conditional_length_footage_is_independently_certified'] is False",
+            "quotation['original_signed_bol_quotes_independently_verified'] == 0",
+            "quotation['separate_quote_acceptance_independently_verified'] == 0",
+            "quotation['independent_customer_invoice_overcharge_labels'] == 0",
+            "quotation['verified_retally_recovered_cash_cents'] == 0",
+            "quotation['raw_invoice_quote_bol_identifiers_exported'] == 0",
+            "chain['arcbest_embedded_quote_match_class_sha256']",
+            "chain['arcbest_same_pdf_quotes_not_independent_customer_rate_authorization'] is True",
+            "co_bundled_motor_carrier_bol_source_replay",
+            "bol['co_bundled_motor_carrier_bol_first_pages'] == 4",
+            "bol['original_truckload_invoice_faces'] == 2",
+            "bol['source_invoice_load_reference_matching_bol_pages'] == 4",
+            "bol['source_invoice_printed_weight_matches_on_bol_copies'] == 4",
+            "bol['source_invoice_pickup_date_matches_on_bol_copies'] == 4",
+            "bol['repeated_load_groups_with_piece_count_disagreements'] == 1",
+            "bol['duplicate_co_bundled_bol_copy_pages_not_new_shipments'] == 2",
+            "bol['unresolved_reason_counts'] == {}",
+            "bol['independently_authenticated_signed_bol_acceptances'] == 0",
+            "bol['independent_custody_original_bol_verified'] == 0",
+            "bol['independently_adjudicated_customer_overcharges'] == 0",
+            "bol['commercial_reuse_authorized'] is False",
+            "bol['verified_retally_cash_recovered_cents'] == 0",
+            "chain['arcbest_cobundled_bol_page_class_sha256']",
+            "chain['arcbest_original_bol_signatures_independently_authenticated'] == 0",
+            "chain['arcbest_cobundled_bol_copies_not_independent_custody'] is True",
+            "chain['arcbest_cobundled_pickup_date_copy_matches'] == 4",
+            "chain['original_globaltranz_invoice_to_statement_exact_date_matches'] == 100",
+            "chain['original_globaltranz_statement_max_date_gap_days'] == 0",
+            "chain['original_us_date_fixes_not_payment_or_delivery_proof'] is True",
+            "audit['date_fields_legacy_uk_first_misparsed'] == expected['misparsed_fields']",
+            "audit['invoice_faces_affected_by_legacy_uk_first_parser'] == expected['affected_faces']",
+            "audit['us_month_day_year_source_semantics_enforced'] is True",
+            "audit['independent_delivery_or_payment_proof_created'] is False",
+            "stmt['bank_payment_reconciliation'] == 'NOT_POSSIBLE_NO_BANK_RECORD'",
         ):
             with self.subTest(line=expected):
                 self.assertIn(expected, nightly)
@@ -177,6 +219,29 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
         self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
 
+
+
+    def test_original_real_document_ci_refuses_old_uk_first_us_freight_date_baselines(self):
+        """The separate original-PDF workflow must run the same US date gates."""
+        source = (WORKFLOW.parent / "retally-real-document-lab.yml").read_text(
+            encoding="utf-8")
+        for expected in (
+            "stmt['face_to_statement_original_amount']['matched_invoices'] == 100",
+            "stmt['face_to_statement_original_amount']['by_rule']['exact'] == 100",
+            "identities['source_date_gaps_over_180_days'] == 0",
+            "identities['maximum_face_to_statement_recorded_date_gap_days'] == 0",
+            "US_SOURCE_DATE_LOCALE_BASELINE",
+            "audit['date_fields_legacy_uk_first_misparsed'] == expected['misparsed_fields']",
+            "audit['invoice_faces_affected_by_legacy_uk_first_parser'] == expected['affected_faces']",
+            "audit['normalized_invoice_date_catalog_sha256'] == expected['catalog_sha256']",
+            "audit['independent_delivery_or_payment_proof_created'] is False",
+            "bol['source_invoice_pickup_date_matches_on_bol_copies'] == 4",
+            "bol['unresolved_reason_counts'] == {}",
+            "bol['commercial_reuse_authorized'] is False",
+            "bol['verified_retally_cash_recovered_cents'] == 0",
+        ):
+            with self.subTest(required=expected):
+                self.assertIn(expected, source)
 
 
 if __name__ == "__main__":

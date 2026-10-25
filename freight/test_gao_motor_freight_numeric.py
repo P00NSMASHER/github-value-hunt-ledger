@@ -215,6 +215,12 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertFalse(facts["carrier_in_capacity_rule_eligible_list"])
         self.assertEqual(facts["capacity_load_rule"], "TARIFF_10_M_RULE_62_2")
         self.assertTrue(facts["certificate_of_indebtedness_issued"])
+        # GAO directed a refund in 30 days; deduction/referral were contingent,
+        # not authenticated settlement or a completed collection event.
+        self.assertNotIn("refund_or_deduction_ordered", facts)
+        self.assertEqual(facts["gao_refund_directed_within_days"], 30)
+        self.assertTrue(facts["collection_by_deduction_or_justice_referral_contingent"])
+        self.assertIsNone(facts["deduction_or_justice_referral_observed"])
         self.assertIsNone(facts["actual_refund_or_offset_collected"])
         self.assertEqual(facts["later_court_disposition"], "UNKNOWN")
         truth = item["truth_boundaries"]
@@ -256,6 +262,9 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             ("historical_facts", "reported_gbl_date", "1958-03-07"),
             ("historical_facts", "reported_gao_claim_number", "TK-172387"),
             ("historical_facts", "reported_certificate_date", "1960-06-20"),
+            ("historical_facts", "gao_refund_directed_within_days", 30),
+            ("historical_facts", "collection_by_deduction_or_justice_referral_contingent", True),
+            ("historical_facts", "deduction_or_justice_referral_observed", None),
             ("historical_facts", "gao_applicable_ltl_charge_cents", 15060),
             ("historical_facts", "gao_overcharge_certificate_cents", 15530),
             ("historical_facts", "carrier_in_capacity_rule_eligible_list", False),
