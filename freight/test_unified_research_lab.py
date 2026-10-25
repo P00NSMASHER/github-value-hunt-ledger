@@ -471,18 +471,50 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertTrue(all("restaurant" not in q.lower() for q in SEARCHES["permitplate"]))
         self.assertTrue(any("permit" in q.lower() for q in SEARCHES["permitplate"]))
 
+    def test_permitplate_original_excluded_worktype_catalog_rejects_issuance_laundering(self):
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "nyc_dob_excluded_worktype_catalog_v1.json").read_text(encoding="utf-8"))
+        self.assertEqual(pack["schema_version"], "1.0.0")
+        self.assertEqual(pack["evaluation_family"], "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY")
+        self.assertEqual(pack["raw_application_or_permit_records_stored"], 0)
+        self.assertEqual(pack["independent_issuance_ground_truth_labels"], 0)
+        self.assertFalse(pack["source_bytes_retrieved"])
+        self.assertIsNone(pack["original_publisher_source_bytes_sha256"])
+        self.assertFalse(pack["commercial_customer_engine_reuse_approved"])
+        self.assertFalse(pack["held_out_from_model_training_verified"])
+        self.assertFalse(pack["accuracy_claim_allowed"])
+        by_type = {x["excluded_work_type"]: x for x in pack["coverage_scope"]}
+        self.assertEqual(set(by_type), {
+            "ELECTRICAL", "ELEVATOR", "LIMITED_ALTERATION_APPLICATION"})
+        self.assertEqual({x["dataset_id"] for x in by_type.values()},
+                         {"dm9a-ab7w", "kfp4-dz4h", "xxbr-ypig"})
+        for category, row in by_type.items():
+            with self.subTest(category=category):
+                self.assertIn(row["official_url"], SEEDS["permitplate"])
+                self.assertTrue(row["event_type"].endswith("NOT_ISSUANCE"))
+                self.assertEqual(row["issuance_without_separate_proof"], "UNKNOWN")
+                self.assertEqual(row["original_rows_ingested"], 0)
+        self.assertEqual(len(pack["synthetic_negative_controls"]), 4)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC"
+            and x["expected"].startswith("UNKNOWN")
+            for x in pack["synthetic_negative_controls"]))
+        altered = json.loads(json.dumps(pack))
+        altered["accuracy_claim_allowed"] = True
+        self.assertNotEqual(altered["accuracy_claim_allowed"],
+                            pack["accuracy_claim_allowed"])
+
     def test_permitplate_official_dob_seed_replaces_restaurant_and_stays_rights_held(self):
         # Official NYC DOB original source, not the DOHMH restaurant-inspection seed.
         official = "https://data.cityofnewyork.us/d/rbx6-tga4"
         applications = "https://data.cityofnewyork.us/d/w9ak-ipjd"
-        self.assertEqual(set(SEEDS["permitplate"]), {official, applications})
+        self.assertEqual(set(SEEDS["permitplate"]), {official, applications, "https://data.cityofnewyork.us/d/dm9a-ab7w", "https://data.cityofnewyork.us/d/kfp4-dz4h", "https://data.cityofnewyork.us/d/xxbr-ypig"})
         self.assertNotIn("https://data.cityofnewyork.us/d/43nn-pn8j", SEEDS["permitplate"])
         with tempfile.TemporaryDirectory() as root:
             ledger = Path(root) / "permit_sources.json"
             receipt = run(engine="permitplate", live=False, ledger=ledger, now=NOW)
             rows = read_ledger(ledger)["entries"]
-            self.assertEqual(receipt["new_leads"], 2)
-            self.assertEqual({r["url"] for r in rows}, {official, applications})
+            self.assertEqual(receipt["new_leads"], 5)
+            self.assertEqual({r["url"] for r in rows}, set(SEEDS["permitplate"]))
             self.assertEqual(receipt["approved_real_truth_cases"], 0)
             self.assertTrue(all(not r["commercial_reuse_authorized"]
                                 and not r["independent_ground_truth"]

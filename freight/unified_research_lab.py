@@ -83,6 +83,9 @@ SEEDS = {
     "permitplate": (
         "https://data.cityofnewyork.us/d/w9ak-ipjd",  # Original DOB NOW applications; not issuance proof.
         "https://data.cityofnewyork.us/d/rbx6-tga4",  # Original DOB NOW approved permits; excluded work types remain UNKNOWN.
+        "https://data.cityofnewyork.us/d/dm9a-ab7w",  # Electrical APPLICATIONS, not issued permits.
+        "https://data.cityofnewyork.us/d/kfp4-dz4h",  # Elevator APPLICATIONS, not issued permits.
+        "https://data.cityofnewyork.us/d/xxbr-ypig",  # LAA APPLICATIONS, not issued permits.
     ),
     "capturebrief": (
         "https://sam.gov/opportunities",

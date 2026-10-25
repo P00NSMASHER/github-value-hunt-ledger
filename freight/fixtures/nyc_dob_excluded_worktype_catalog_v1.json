@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "RETALLY_NYC_DOB_EXCLUDED_WORKTYPE_SCOPE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
+  "cohort": "NYC_DOB_NOW_2026_PUBLISHER_APPLICATION_METADATA_ONLY",
+  "source_review_date": "2026-10-25",
+  "parent_scope_pack": "freight/fixtures/nyc_dob_source_scope_v1.json",
+  "publisher": "New York City Department of Buildings via NYC Open Data",
+  "publisher_exclusion_evidence_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+  "federal_harvest_exclusion_evidence_url": "https://catalog.data.gov/dataset/dob-now-build-approved-permits",
+  "rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+  "rights_state": "PUBLIC_NYC_OPEN_DATA_PORTAL_GENERAL_REUSE_WITH_DATASET_SUPPLEMENT_AND_ATTRIBUTION_REVIEW",
+  "commercial_customer_engine_reuse_approved": false,
+  "source_bytes_retrieved": false,
+  "original_publisher_source_bytes_sha256": null,
+  "dataset_schema_bytes_retrieved": false,
+  "original_schema_bytes_sha256": null,
+  "raw_application_or_permit_records_stored": 0,
+  "independent_issuance_ground_truth_labels": 0,
+  "held_out_from_model_training_verified": false,
+  "accuracy_claim_allowed": false,
+  "modern_permit_issuance_status": "UNKNOWN",
+  "coverage_scope": [
+    {
+      "excluded_work_type": "ELECTRICAL",
+      "dataset_id": "dm9a-ab7w",
+      "dataset_title": "DOB NOW: Electrical Permit Applications",
+      "official_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+      "catalog_url": "https://catalog.data.gov/dataset/dob-now-electrical-permit-applications",
+      "event_type": "JOB_APPLICATION_OR_SUBSEQUENT_FILING_NOT_ISSUANCE",
+      "publisher_last_modified_observed": "2026-10-20",
+      "field_verified": "Filing_Type",
+      "issuance_without_separate_proof": "UNKNOWN",
+      "original_rows_ingested": 0
+    },
+    {
+      "excluded_work_type": "ELEVATOR",
+      "dataset_id": "kfp4-dz4h",
+      "dataset_title": "DOB NOW: Build Elevator Permit Applications",
+      "official_url": "https://data.cityofnewyork.us/d/kfp4-dz4h",
+      "catalog_url": "https://catalog.data.gov/dataset/dob-now-build-elevator-permit-applications",
+      "event_type": "ELV1_JOB_APPLICATION_OR_POST_APPROVAL_AMENDMENT_NOT_ISSUANCE",
+      "publisher_last_modified_observed": "2026-10-25",
+      "field_verified": "Filing_Type",
+      "issuance_without_separate_proof": "UNKNOWN",
+      "original_rows_ingested": 0
+    },
+    {
+      "excluded_work_type": "LIMITED_ALTERATION_APPLICATION",
+      "dataset_id": "xxbr-ypig",
+      "dataset_title": "DOB NOW: Build - Limited Alteration Applications",
+      "official_url": "https://data.cityofnewyork.us/d/xxbr-ypig",
+      "catalog_url": "https://catalog.data.gov/dataset/dob-now-build-limited-alteration-applications",
+      "event_type": "LIMITED_ALTERATION_APPLICATION_NOT_ISSUANCE",
+      "publisher_last_modified_observed": "2026-10-20",
+      "field_verified": null,
+      "issuance_without_separate_proof": "UNKNOWN",
+      "original_rows_ingested": 0
+    }
+  ],
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_ELECTRICAL_NONMATCH",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "NO_ELECTRICAL_PERMIT_FROM_APPROVED_BUILD_DATASET_NONMATCH",
+      "expected": "UNKNOWN_EXCLUDED_COVERAGE"
+    },
+    {
+      "id": "SYNTHETIC_ELEVATOR_APP_AS_ISSUED",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "ELV1_JOB_FILING_PROVES_ISSUED_PERMIT",
+      "expected": "UNKNOWN_APPLICATION_NOT_ISSUANCE"
+    },
+    {
+      "id": "SYNTHETIC_LAA_NONMATCH",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "NO_LAA_EXISTS_FROM_APPROVED_BUILD_DATASET_NONMATCH",
+      "expected": "UNKNOWN_EXCLUDED_COVERAGE"
+    },
+    {
+      "id": "SYNTHETIC_MULTIPLE_AMENDMENTS_MULTIPLE_PERMITS",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "EACH_APPLICATION_AMENDMENT_IS_A_NEW_ISSUED_PERMIT",
+      "expected": "UNKNOWN_NO_ISSUANCE_JOIN"
+    }
+  ],
+  "quality": {
+    "original_publisher_dataset_links_confirmed": true,
+    "federal_catalog_exclusion_crossreference": true,
+    "field_level_schema_data_fully_verified": false,
+    "original_data_row_validation_complete": false,
+    "no_private_customer_medical_student_data": true,
+    "consumer_engine_code_untouched": true,
+    "next_qa": "INDEPENDENT_ISSUANCE_STATUS_JOIN_COVERAGE_REVIEW_BEFORE_ENGINE_SCORING"
+  }
+}
