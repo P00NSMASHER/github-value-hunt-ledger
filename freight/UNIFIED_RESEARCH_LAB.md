@@ -1077,6 +1077,61 @@ The same nightly real-document job tests all counts without a new schedule,
 data branch, contact action, purchase, cloud permission or production change.
 
 
+## U.S. freight-source date-locale correction (v16, October 25, 2026)
+
+**High-severity original-source fidelity correction:** Previous original
+GlobalTranz and ArcBest invoice source parsing used a shared date helper's
+UK-first format. The helper's day/month-first default is correct for the
+separate Pennine Care UK accounting disclosures, but it silently swapped
+**ambiguous U.S. original invoice dates**. The earlier ArcBest BOL test
+incorrectly reported a pickup conflict for a May 1, 2024 shipment because
+the original U.S. invoice date became January 5. The original BOL Stop 1
+pickup date already used explicit U.S. month/day/year parsing.
+
+No original PDF byte, freight invoice amount, printed quote or BOL text
+changed. The repair explicitly parses only original U.S. freight invoice
+date fields in **month/day/year order**. UK source interpretation stays
+unchanged. An impossible U.S. date is rejected instead of silently
+falling back to UK. A BOL whose CRN load ID does not match the invoice
+now also stays **unlinked** even if its pro number matches.
+
+| Frozen original source cohort | Affected original invoice faces | Previously misparsed source date fields |
+| --- | ---: | ---: |
+| GlobalTranz original invoices | **59 of 100** | **70 of 200** |
+| ArcBest original invoices | **6 of 10** | **6 of 10** |
+| **Combined** | **65 of 110** | **76 of 210** |
+
+New evidence: GlobalTranz original invoice dates join the *same published
+open-balance statement* at **100/100 exact invoice-ID/date/amount pairs**,
+versus 98/100 previously; previous two gaps greater than 180 days and
+maximum 207-day gap were artifacts of locale parsing. Maximum source
+date gap is now **zero**, but this is still an **open statement, not a
+bank-cleared payment or independently authenticated settlement**.
+
+ArcBest's original truckload invoice and four co-bundled BOL first-page
+copies now produce **4/4 source pickup-date matches** (previously 3/4);
+the original load/printed-weight matches remain 4/4. The **30-versus-225
+printed piece-count conflict** on repeated versions of one original load
+remains unresolved and is **not** adjudicated as an overcharge. Four BOL
+first pages still represent only two unique invoice/load relationships.
+
+The source-readiness receipt and both original-document nightly pipelines
+now pin both frozen public-PDF source hashes, the corrected GlobalTranz
+canonical signed-record catalog digest, the updated anonymous ArcBest BOL
+source-category digest, and both independent U.S.-date-catalog digests.
+A fail-closed audit for each source reports **only aggregate impacted counts,
+normalized catalog SHA-256 and bounded classifications**, not invoice IDs,
+PII, source pages or raw dates. Actual original-PDF acceptance, not
+unit-test fixture assumptions, is required before changing a baseline.
+
+**Ground truth remains unavailable:** independently authenticated signed
+BOL acceptance, shipment-specific applicable rate contracts, cleared buyer
+payments, independently adjudicated customer freight errors and verified
+RETALLY recovered cash remain zero/unverified. Precision and recall cannot
+be calculated. No changes to the production rating engine, customer files,
+rights authorization, provider/network cadence, paid services, other
+research lanes or human outreach are authorized by this repair.
+
 ## ArcBest co-bundled original motor-carrier bills of lading (v15)
 
 **Evidence correction:** The source-frozen original
@@ -1100,8 +1155,8 @@ The 2026-10-24 genuine 74-page original document acceptance established:
 | Unique truckload invoices linked to those BOL first pages | **2** |
 | BOL source pages matching the original invoice load reference | **4** |
 | BOL pages matching original invoice **printed** weight | **4** |
-| BOL pickup dates successfully matching printed invoice ship date | **3** |
-| BOL pickup-date check still unresolved | **1** |
+| BOL pickup dates matching original invoices **after v16 correction** | **4** |
+| Previously reported pickup-date mismatch (corrected by v16) | **0** |
 | Extra repeated BOL first-page copies, **not additional shipments** | **2** |
 | Unique load groups with conflicting BOL printed piece totals | **1** |
 | Unique load groups with conflicting BOL printed weights | **0** |
@@ -1120,15 +1175,14 @@ affected any rated charge. The first load's description also references
 473 cartons while its BOL “Total Pcs” is zero, a semantic difference
 that is not automatically classified as a mistake.
 
-A parser guard came from a red synthetic test: the generic iso_date()
-helper parses ambiguous dates in UK day/month-first order for Pennine
-accounting. U.S. Motor Carrier BOLs use **month/day/year**; the new
-parser explicitly fixes this, preventing ambiguous May 1 from being
-misread as January 5. The real source replay still records one
-unmatched pickup-date check as UNKNOWN instead of claiming 4/4.
+A parser guard first fixed the U.S. BOL's month/day/year
+interpretation but initially missed the invoice's shared UK-first
+parser. The **v16 source-correction above supersedes** the previously
+reported one pickup-date mismatch. With corrected U.S. invoice dates,
+all four BOL source pickup dates match the original invoices.
 
 Only the anonymous source page/class aggregate SHA-256
-02fc64cd001e88db3e81d85c2d8c84b8b56c6dd609f90b309748c23e2e4dc4ca
+3d2876dc5cae232414e245d9c49531d726268a3ddab6bd7124d961e005ed274e
 and bounded counts enter the ephemeral nightly receipt, with original
 PDF byte hash 4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17.
 No load/PO/freight-bill identifiers, contacts, PDF bytes, signatures or

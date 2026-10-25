@@ -284,8 +284,11 @@ def _global_page(text: str, page: int) -> InvoiceFace | None:
     # Read invoice face, not credit, statement balance or amount enclosed.
     total = re.search(r"\bTotal:\s*[\d,.]+\s+([\d,.]+)\s+USD\b", text, re.I)
     amount = minor(total.group(1)) if total else None
+    # GlobalTranz is a U.S. invoice. Never use the UK-first default here:
+    # ambiguous 05/01/2025 is May 1, NOT January 5.
     return InvoiceFace("globaltranz", number, page, amount,
-                       iso_date(match.group(1)), iso_date(match.group(2)),
+                       iso_date(match.group(1), formats=("%m/%d/%Y",)),
+                       iso_date(match.group(2), formats=("%m/%d/%Y",)),
                        None, None if total else "FACE_TOTAL_UNREADABLE")
 
 
@@ -308,8 +311,83 @@ def _arcbest_page(text: str, page: int) -> InvoiceFace | None:
                    else "LTL" if mode else None)
     return InvoiceFace("arcbest", match.group(1), page,
                        minor(amount.group(1)) if amount else None,
-                       None, iso_date(shipment.group(1)) if shipment else None,
+                       None, (iso_date(shipment.group(1), formats=("%m/%d/%Y",))
+                              if shipment else None),
                        parsed_mode, None if amount else "FACE_AMOUNT_UNREADABLE")
+
+
+
+def us_invoice_face_date_locale_audit(
+    issuer: str, faces: list[InvoiceFace], texts: list[str], pdf_sha256: str,
+) -> dict:
+    """Prove original U.S. source-date semantics without exporting face IDs.
+
+    Compare old UK-first date interpretation to strict US month/day reading,
+    bound every observation to an original extracted invoice face and its
+    frozen public source bytes, and hash the normalized date catalog. A date
+    match in an open statement is not a bank-cleared payment or delivery.
+    """
+    if issuer not in ("globaltranz", "arcbest"):
+        raise ValueError("US_SOURCE_DATE_ISSUER_NOT_SUPPORTED")
+    if pdf_sha256 != FROZEN_DOCUMENT_SHA256[issuer]:
+        raise ValueError("US_SOURCE_DATE_ORIGINAL_PDF_HASH_MISMATCH")
+    if not isinstance(faces, list) or len(faces) > 150:
+        raise ValueError("US_SOURCE_DATE_FACE_COUNT_INVALID")
+    corrected_fields = affected_faces = total_fields = 0
+    date_catalog = []
+    for face in faces:
+        if (not isinstance(face, InvoiceFace) or face.issuer != issuer
+                or face.page < 1 or face.page > len(texts)):
+            raise ValueError("US_SOURCE_DATE_FACE_IDENTITY_INVALID")
+        text = texts[face.page - 1]
+        if issuer == "globaltranz":
+            m = re.search(
+                r"(\d{1,2}/\d{1,2}/\d{4})\s+(\d{1,2}/\d{1,2}/\d{4})\s+"
+                r"(\d{8}(?:\s*A)?)\b", text, re.I,
+            )
+            if not m or re.sub(r"\s+", " ", m.group(3)).upper() != face.number:
+                raise ValueError("US_SOURCE_DATE_FACE_REBIND_FAILED")
+            observations = ((m.group(1), face.invoice_date),
+                            (m.group(2), face.shipment_date))
+        else:
+            pro = re.search(r"\bFreight\s+bill\s+No:?\s*(\d{9})\b", text, re.I)
+            m = re.search(
+                r"\bShipment\s+Date:\s*(\d{1,2}/\d{1,2}/\d{4})\b",
+                text, re.I,
+            )
+            if not pro or pro.group(1) != face.number or not m:
+                raise ValueError("US_SOURCE_DATE_FACE_REBIND_FAILED")
+            observations = ((m.group(1), face.shipment_date),)
+        changed = False
+        for printed, normalized in observations:
+            us = iso_date(printed, formats=("%m/%d/%Y",))
+            if us != normalized:
+                raise ValueError("US_SOURCE_DATE_NORMALIZED_FACE_DRIFT")
+            if iso_date(printed) != us:
+                changed = True
+                corrected_fields += 1
+            total_fields += 1
+        affected_faces += int(changed)
+        # The original identifier is never exported; digest is bound to the
+        # frozen source PDF and exact normalized public face/date inventory.
+        date_catalog.append((
+            face.number, face.page, face.invoice_date, face.shipment_date))
+    return {
+        "scope": "ORIGINAL_US_FREIGHT_PDF_DATE_LOCALE_AUDIT_NOT_SETTLEMENT_OR_RATE_TRUTH",
+        "issuer": issuer,
+        "source_original_pdf_sha256": pdf_sha256,
+        "original_invoice_faces_considered": len(faces),
+        "date_fields_rebound_to_us_source": total_fields,
+        "date_fields_legacy_uk_first_misparsed": corrected_fields,
+        "invoice_faces_affected_by_legacy_uk_first_parser": affected_faces,
+        "normalized_invoice_date_catalog_sha256": digest(json.dumps(
+            sorted(date_catalog), separators=(",", ":")).encode("utf-8")),
+        "us_month_day_year_source_semantics_enforced": True,
+        "independent_delivery_or_payment_proof_created": False,
+        "customer_overcharge_labels": 0,
+        "verified_retally_cash_recovered_cents": 0,
+        "original_invoice_ids_exported": 0,
+    }
 
 
 def index_unique_invoice_faces(
@@ -920,6 +998,8 @@ def benchmark_freight() -> dict:
             "source_face_catalog_sha256": digest(json.dumps(
                 [(f.number, f.page, f.cents) for f in sorted(unique.values(), key=lambda row: row.number)],
                 separators=(",", ":"), ensure_ascii=True).encode()),
+            "source_us_date_locale_audit": us_invoice_face_date_locale_audit(
+                issuer, list(unique.values()), texts, source_hash),
             "pdf_bytes": len(raw),
             "pages": len(texts),
             "pages_with_text": sum(bool(t.strip()) for t in texts),
@@ -1104,13 +1184,15 @@ def arcbest_embedded_truckload_bol_reconciliation(
             anonymous.append((page_number, "NOT_BOUND_TO_ORIGINAL_INVOICE"))
             continue
         bound_pages += 1
-        groups = by_invoice.setdefault(pro.group(1), [])
+        # The actual load/CRN, not just the freight bill, must match to
+        # count the BOL copy as linked to this invoice.
         load_matches_invoice = load.group(1) in face_doc["load_refs"]
         if not load_matches_invoice:
             missing["BOL_LOAD_REFERENCE_NOT_ON_INVOICE"] += 1
             anonymous.append((page_number, "BOL_LOAD_NOT_ON_INVOICE"))
             continue
         matching_invoice_loads += 1
+        groups = by_invoice.setdefault(pro.group(1), [])
         pickup_start = re.search(r"\bStop\s+1\s*-\s*Pick\s*Up\b", page, re.I)
         delivery_start = re.search(r"\bStop\s+2\s*-\s*Delivery\b", page, re.I)
         pickup_region = (page[pickup_start.end():delivery_start.start()]

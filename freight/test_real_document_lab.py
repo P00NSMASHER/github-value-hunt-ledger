@@ -16,6 +16,7 @@ from freight.real_document_lab import (
     arcbest_printed_rate_bol_reference_census,
     arcbest_embedded_vpq_quote_reconciliation,
     arcbest_embedded_truckload_bol_reconciliation,
+    us_invoice_face_date_locale_audit,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -101,6 +102,81 @@ class LaboratoryTests(unittest.TestCase):
         f = _arcbest_page(arc_text, 16)
         self.assertIsNotNone(f)
         self.assertEqual((f.number, f.cents, f.mode), ("051894063", 212379, "LTL"))
+        # ArcBest's May 2 source date previously became February 5 because
+        # the shared generic parser tried British dates first.
+        self.assertEqual(f.shipment_date, "2024-05-02")
+
+    def test_us_freight_ambiguous_month_day_never_inherits_uk_parser(self):
+        self.assertEqual(iso_date("05/01/2024"), "2024-01-05")
+        arc = (
+            "ORIGINAL INVOICE\nService: Truckload\n"
+            "Freight bill No: 436380706\nShipment Date: 05/01/2024\n"
+            "AMOUNT DUE: $2,950.00\n"
+        )
+        face = _arcbest_page(arc, 61)
+        self.assertIsNotNone(face)
+        self.assertEqual(face.shipment_date, "2024-05-01")
+        gt = (
+            "Invoice Date Pick-Up Date Invoice No\n"
+            "05/01/2025 04/03/2025 30794056\n"
+            "Total: 200.00 341.08 USD\n"
+        )
+        f = _global_page(gt, 4)
+        self.assertIsNotNone(f)
+        self.assertEqual(f.invoice_date, "2025-05-01")
+        self.assertEqual(f.shipment_date, "2025-04-03")
+        # An impossible U.S. date must never be silently interpreted using
+        # UK day/month order or used for claim/settlement chronology.
+        malformed = arc.replace("05/01/2024", "13/05/2024")
+        with self.assertRaisesRegex(ValueError, "unparseable source date"):
+            _arcbest_page(malformed, 61)
+
+    def test_us_original_date_locale_audit_counts_legacy_misparse_without_cash(self):
+        gt = (
+            "Invoice Date Pick-Up Date Invoice No\n"
+            "05/01/2025 04/03/2025 30794056\n"
+            "Total: 200.00 341.08 USD\n"
+        )
+        arc = (
+            "ORIGINAL INVOICE\nService: Truckload\n"
+            "Freight bill No: 436380706\nShipment Date: 05/01/2024\n"
+            "AMOUNT DUE: $2,950.00\n"
+        )
+        g_face = _global_page(gt, 4)
+        a_face = _arcbest_page(arc, 61)
+        self.assertIsNotNone(g_face)
+        self.assertIsNotNone(a_face)
+        g = us_invoice_face_date_locale_audit(
+            "globaltranz", [g_face], ["", "", "", gt],
+            FROZEN_DOCUMENT_SHA256["globaltranz"])
+        a = us_invoice_face_date_locale_audit(
+            "arcbest", [a_face], [""] * 60 + [arc],
+            FROZEN_DOCUMENT_SHA256["arcbest"])
+        self.assertEqual(g["date_fields_rebound_to_us_source"], 2)
+        self.assertEqual(g["date_fields_legacy_uk_first_misparsed"], 2)
+        self.assertEqual(g["invoice_faces_affected_by_legacy_uk_first_parser"], 1)
+        self.assertEqual(a["date_fields_rebound_to_us_source"], 1)
+        self.assertEqual(a["date_fields_legacy_uk_first_misparsed"], 1)
+        self.assertEqual(a["invoice_faces_affected_by_legacy_uk_first_parser"], 1)
+        self.assertTrue(g["us_month_day_year_source_semantics_enforced"])
+        self.assertFalse(g["independent_delivery_or_payment_proof_created"])
+        self.assertEqual(a["customer_overcharge_labels"], 0)
+        self.assertEqual(a["verified_retally_cash_recovered_cents"], 0)
+        self.assertEqual(g, us_invoice_face_date_locale_audit(
+            "globaltranz", [g_face], ["", "", "", gt],
+            FROZEN_DOCUMENT_SHA256["globaltranz"]))
+        import json
+        self.assertNotIn("30794056", json.dumps(g))
+        self.assertNotIn("436380706", json.dumps(a))
+        with self.assertRaisesRegex(ValueError, "ORIGINAL_PDF_HASH_MISMATCH"):
+            us_invoice_face_date_locale_audit(
+                "arcbest", [a_face], [""] * 60 + [arc], "0" * 64)
+        invalid = InvoiceFace("arcbest", a_face.number, a_face.page, a_face.cents,
+                              None, "2024-01-05", "TL")
+        with self.assertRaisesRegex(ValueError, "NORMALIZED_FACE_DRIFT"):
+            us_invoice_face_date_locale_audit(
+                "arcbest", [invalid], [""] * 60 + [arc],
+                FROZEN_DOCUMENT_SHA256["arcbest"])
 
     def test_arcbest_printed_tariff_and_bol_are_hints_not_rate_proof(self):
         # All page text below is synthetic; source PDF original isn't embedded.
@@ -430,6 +506,15 @@ class LaboratoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "SOURCE_SHA256_MISMATCH"):
             arcbest_embedded_truckload_bol_reconciliation(
                 [face], [invoice, bol], "0" * 64)
+        # A matching invoice number with the wrong load must not create
+        # a phantom linked shipment group (previous setdefault bug).
+        wrong_load = bol.replace("6001438260", "6001488729")
+        invalid = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, wrong_load], sha)
+        self.assertEqual(invalid["unique_truckload_invoices_with_co_bundled_bol_copies"], 0)
+        self.assertEqual(invalid["source_invoice_load_reference_matching_bol_pages"], 0)
+        self.assertEqual(invalid["unresolved_reason_counts"],
+                         {"BOL_LOAD_REFERENCE_NOT_ON_INVOICE": 1})
         with self.assertRaisesRegex(ValueError, "DUPLICATE_INVOICE_FACE"):
             arcbest_embedded_truckload_bol_reconciliation(
                 [face, face], [invoice, bol], sha)
