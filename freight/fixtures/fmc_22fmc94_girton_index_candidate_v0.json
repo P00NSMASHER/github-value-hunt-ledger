@@ -1,0 +1,84 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "FMC_22FMC94_GIRTON_594I_INDEX_ONLY_V0",
+  "admission_state": "DISCOVERED_SOURCE_ONLY_NOT_EVALUATION_ADMITTED",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_MARITIME_DECISION_ONLY",
+  "cohort": "US_OCEAN_FREIGHT_1977_SHIPMENT_1979_FMC_DECISION",
+  "source": {
+    "publisher": "United States Federal Maritime Commission",
+    "official_pdf_url": "https://www.fmc.gov/wp-content/uploads/2019/04/vol22.pdf",
+    "official_index_url": "https://www.fmc.gov/proceedings/historical-federal-maritime-commission-reports/",
+    "citation": "22 F.M.C. 94",
+    "docket": "Informal Docket 594(I)",
+    "decision_title": "Girton Manufacturing Company v. Hellenic Lines Limited",
+    "commission_decision_date": "1979-09-05",
+    "settlement_officer_decision_served": "1979-07-13",
+    "historical_shipment_date": "1977-02-22",
+    "indexed_source_passage_locator": "22 F.M.C. 94; partial adoption of settlement officer decision",
+    "original_publisher_pdf_bytes_held": false,
+    "original_publisher_pdf_sha256": null,
+    "original_bill_of_lading_invoice_tariff_bytes_held": false,
+    "source_proof": "OFFICIAL_PUBLISHER_SEARCH_INDEX_EXCERPT_NOT_FULL_ORIGINAL_PDF_REPLAY",
+    "rights_or_customer_engine_commercial_reuse_verified": false,
+    "third_party_underlying_records_rights": "UNKNOWN",
+    "effective_tariff_document_verified": false
+  },
+  "historical_decision_only": {
+    "commission_reparation_award_cents": 40930,
+    "commission_interest_awarded": true,
+    "commission_interest_rate_basis_points_per_year": 600,
+    "interest_accrual_start": "1978-04-03",
+    "preliminary_settlement_officer_interest_denied": true,
+    "preliminary_officer_1979_claim_filing_date_corrected_by_commission": true,
+    "classification_issue": "MACHINERY_NOS_VERSUS_CARGO_NOS_NONHAZARDOUS",
+    "original_claimed_bill_or_rate_pages_available": false,
+    "commission_award_collected_cents": null,
+    "interest_actually_paid_cents": null,
+    "later_disposition": "UNKNOWN"
+  },
+  "truth_boundaries": {
+    "independently_replayable_original_invoice_truth": false,
+    "independently_held_out_from_training_verified": false,
+    "admitted_for_freight_error_accuracy": false,
+    "admitted_for_modern_rate_authority": false,
+    "customer_score_or_cash_promotion_allowed": false,
+    "independent_private_customer_error_cents": null,
+    "verified_retally_recovered_cash_cents": 0,
+    "negative_controls_are_synthetic_not_historical_cases": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_PRELIMINARY_INTEREST_DENIAL_AS_FINAL",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_FINAL_COMMISSION_AWARDED_INTEREST"
+    },
+    {
+      "id": "SYNTHETIC_AWARD_EQUALS_SETTLED_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SETTLEMENT_PAYMENT_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_OCEAN_RATE_APPLIED_TO_MODERN_MOTOR_FREIGHT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNRELATED_HISTORICAL_AUTHORITY"
+    },
+    {
+      "id": "SYNTHETIC_INDEXED_PDF_EXCERPT_EQUALS_ORIGINAL_PDF_CUSTODY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ORIGINAL_BYTES_SHA256_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_INTEREST_PAID_AS_OF_DECISION",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_INTEREST_SETTLEMENT_UNKNOWN"
+    }
+  ],
+  "quality": {
+    "first_party_index_excerpt_available": true,
+    "complete_publisher_pdf_byte_read_succeeded": false,
+    "source_original_sha256_known": false,
+    "independent_commercial_customer_labels": 0,
+    "original_customer_material_collected": false,
+    "allowed_next_step": "ORIGINAL_PUBLISHER_PDF_CUSTODY_AND_INDEPENDENT_QA_THEN_VERSIONED_ADMISSION_REVIEW"
+  }
+}

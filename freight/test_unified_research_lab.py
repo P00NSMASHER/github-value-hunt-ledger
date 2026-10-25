@@ -682,5 +682,67 @@ class UnifiedResearchLabTests(unittest.TestCase):
 
 
 
+
+class FMCIndexOnlySourceCandidateTests(unittest.TestCase):
+    """Original publisher indexed case is a held, not score-admitted source."""
+
+    def test_final_commission_interest_supersedes_preliminary_denial(self):
+        path = Path(__file__).with_name("fixtures") / "fmc_22fmc94_girton_index_candidate_v0.json"
+        item = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["admission_state"], "DISCOVERED_SOURCE_ONLY_NOT_EVALUATION_ADMITTED")
+        self.assertEqual(item["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_MARITIME_DECISION_ONLY")
+        source = item["source"]
+        self.assertIn(source["official_pdf_url"], SEEDS["freightrecovery"])
+        self.assertEqual(source["citation"], "22 F.M.C. 94")
+        self.assertEqual(source["docket"], "Informal Docket 594(I)")
+        self.assertEqual(source["commission_decision_date"], "1979-09-05")
+        self.assertFalse(source["original_publisher_pdf_bytes_held"])
+        self.assertIsNone(source["original_publisher_pdf_sha256"])
+        self.assertFalse(source["rights_or_customer_engine_commercial_reuse_verified"])
+        facts = item["historical_decision_only"]
+        self.assertEqual(facts["commission_reparation_award_cents"], 40930)
+        self.assertTrue(facts["commission_interest_awarded"])
+        self.assertEqual(facts["commission_interest_rate_basis_points_per_year"], 600)
+        self.assertEqual(facts["interest_accrual_start"], "1978-04-03")
+        self.assertTrue(facts["preliminary_settlement_officer_interest_denied"])
+        self.assertTrue(facts["preliminary_officer_1979_claim_filing_date_corrected_by_commission"])
+        self.assertIsNone(facts["commission_award_collected_cents"])
+        self.assertIsNone(facts["interest_actually_paid_cents"])
+        self.assertEqual(facts["later_disposition"], "UNKNOWN")
+        limits = item["truth_boundaries"]
+        self.assertFalse(limits["independently_replayable_original_invoice_truth"])
+        self.assertFalse(limits["independently_held_out_from_training_verified"])
+        self.assertFalse(limits["admitted_for_freight_error_accuracy"])
+        self.assertFalse(limits["admitted_for_modern_rate_authority"])
+        self.assertFalse(limits["customer_score_or_cash_promotion_allowed"])
+        self.assertIsNone(limits["independent_private_customer_error_cents"])
+        self.assertEqual(limits["verified_retally_recovered_cash_cents"], 0)
+
+    def test_fmc_index_candidate_negative_controls_remain_synthetic(self):
+        path = Path(__file__).with_name("fixtures") / "fmc_22fmc94_girton_index_candidate_v0.json"
+        item = json.loads(path.read_text(encoding="utf-8"))
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTHETIC_") for c in controls))
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_FINAL_COMMISSION_AWARDED_INTEREST",
+            "REJECT_SETTLEMENT_PAYMENT_UNKNOWN",
+            "REJECT_UNRELATED_HISTORICAL_AUTHORITY",
+            "REJECT_ORIGINAL_BYTES_SHA256_UNKNOWN",
+            "REJECT_INTEREST_SETTLEMENT_UNKNOWN",
+        })
+        self.assertFalse(item["quality"]["complete_publisher_pdf_byte_read_succeeded"])
+        self.assertFalse(item["quality"]["source_original_sha256_known"])
+        self.assertEqual(item["quality"]["independent_commercial_customer_labels"], 0)
+        bad = json.loads(json.dumps(item))
+        bad["historical_decision_only"]["commission_interest_awarded"] = False
+        self.assertNotEqual(bad["historical_decision_only"],
+                            item["historical_decision_only"])
+
+
 if __name__ == "__main__":
     unittest.main()

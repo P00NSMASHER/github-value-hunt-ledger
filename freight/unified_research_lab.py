@@ -70,6 +70,7 @@ SEEDS = {
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+        "https://www.fmc.gov/wp-content/uploads/2019/04/vol22.pdf",  # Official 22 F.M.C. 94; INDEX-ONLY, no original byte/hash, unadmitted.
         "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
         "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm",
         "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
