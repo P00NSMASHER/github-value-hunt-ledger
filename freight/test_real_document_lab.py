@@ -372,6 +372,10 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(r["source_invoice_bol_totals_readable_pages"], 4)
         self.assertEqual(r["source_invoice_printed_weight_matches_on_bol_copies"], 4)
         self.assertEqual(r["source_invoice_pickup_date_matches_on_bol_copies"], 4)
+        self.assertEqual(r["pickup_extraction_state_counts"],
+                         {"PICKUP_DATE_MATCHES_INVOICE": 4})
+        self.assertEqual(r["bol_header_vs_pickup_date_state_counts"],
+                         {"BOL_HEADER_DATE_NOT_READABLE": 4})
         self.assertEqual(r["unique_truckload_invoices_with_co_bundled_bol_copies"], 2)
         self.assertEqual(r["duplicate_co_bundled_bol_copy_pages_not_new_shipments"], 2)
         self.assertEqual(r["repeated_load_groups_with_piece_count_disagreements"], 1)
@@ -414,6 +418,8 @@ class LaboratoryTests(unittest.TestCase):
         correct = arcbest_embedded_truckload_bol_reconciliation(
             [face], [invoice, bol], sha)
         self.assertEqual(correct["source_invoice_printed_weight_matches_on_bol_copies"], 1)
+        self.assertEqual(correct["pickup_extraction_state_counts"],
+                         {"PICKUP_DATE_MATCHES_INVOICE": 1})
         for edited, expected in (
             (bol.replace("6001438260", "6001488729"),
              "BOL_LOAD_REFERENCE_NOT_ON_INVOICE"),
@@ -426,7 +432,41 @@ class LaboratoryTests(unittest.TestCase):
                 result = arcbest_embedded_truckload_bol_reconciliation(
                     [face], [invoice, edited], sha)
                 self.assertEqual(result["unresolved_reason_counts"][expected], 1)
+                if expected == "BOL_PICKUP_INVOICE_DATE_CONFLICT":
+                    self.assertEqual(result["pickup_extraction_state_counts"], {
+                        "EXPLICIT_PICKUP_DATE_DIFFERS_FROM_INVOICE": 1})
                 self.assertEqual(result["independently_adjudicated_customer_overcharges"], 0)
+        # The initial carrier BOL "Date" is the document date, not the
+        # stop-1 pickup date. A date created a day before loading is allowed.
+        header = bol.replace("Motor Carrier Bill of Lading\n",
+                             "Motor Carrier Bill of Lading\nDate: 4/30/2024\n")
+        r = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, header], sha)
+        self.assertEqual(r["source_invoice_pickup_date_matches_on_bol_copies"], 1)
+        self.assertEqual(r["bol_header_vs_pickup_date_state_counts"],
+                         {"DOCUMENT_HEADER_DATE_DIFFERS_FROM_PICKUP": 1})
+        self.assertEqual(r["pickup_extraction_state_counts"],
+                         {"PICKUP_DATE_MATCHES_INVOICE": 1})
+
+        missing_delimiter = bol.replace("Stop 2 - Delivery", "Delivery Stop 2")
+        r = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, missing_delimiter], sha)
+        self.assertEqual(r["source_invoice_pickup_date_matches_on_bol_copies"], 0)
+        self.assertEqual(r["pickup_extraction_state_counts"],
+                         {"DELIVERY_BOUNDARY_ABSENT": 1})
+        self.assertEqual(r["unresolved_reason_counts"],
+                         {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1})
+
+        # Matching freight-bill number but a wrong CRN load ID is NOT a
+        # linked shipment and must not enter unique-load denominators.
+        wrong_load = bol.replace("6001438260", "6001488729")
+        r = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, wrong_load], sha)
+        self.assertEqual(r["unique_truckload_invoices_with_co_bundled_bol_copies"], 0)
+        self.assertEqual(r["source_invoice_load_reference_matching_bol_pages"], 0)
+        self.assertEqual(r["unresolved_reason_counts"],
+                         {"BOL_LOAD_REFERENCE_NOT_ON_INVOICE": 1})
+
         with self.assertRaisesRegex(ValueError, "SOURCE_SHA256_MISMATCH"):
             arcbest_embedded_truckload_bol_reconciliation(
                 [face], [invoice, bol], "0" * 64)
