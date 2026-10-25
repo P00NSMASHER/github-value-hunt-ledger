@@ -16,6 +16,7 @@ from freight.real_document_lab import (
     arcbest_printed_rate_bol_reference_census,
     arcbest_embedded_vpq_quote_reconciliation,
     arcbest_embedded_truckload_bol_reconciliation,
+    bol_stop1_pickup_from_positioned_rows,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -518,6 +519,64 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(
             result["unresolved_reason_counts"]["BOL_NOT_LINKED_TO_TL_INVOICE_FACE"], 1)
         self.assertEqual(result["unique_truckload_invoices_with_co_bundled_bol_copies"], 0)
+
+    def test_geometric_stop_pickup_ignores_header_and_delivery_date(self):
+        # Artificial row coordinates, never the original case's source text.
+        rows = [
+            (10.0, "Motor Carrier Bill of Lading"),
+            (20.0, "Date: 4/30/2024"),
+            (100.0, "Stop 1 - Pick Up"),
+            (110.0, "SYNTHETIC SOURCE Date: 5/1/2024 - 5/1/2024"),
+            (220.0, "Total HU: 15 Total Pcs: 0 Total Wgt: 11993 lbs"),
+            (300.0, "Stop 2 - Delivery"),
+            (310.0, "SYNTHETIC DELIVERY Date: 5/3/2024 - 5/3/2024"),
+        ]
+        self.assertEqual(bol_stop1_pickup_from_positioned_rows(rows),
+                         ("2024-05-01", "GEOMETRIC_PICKUP_DATE_UNAMBIGUOUS"))
+        missing = [row for row in rows if row[0] != 100.0]
+        self.assertEqual(bol_stop1_pickup_from_positioned_rows(missing),
+                         (None, "GEOMETRIC_PICKUP_STOP_BOUNDARIES_UNRESOLVED"))
+        conflicts = rows[:4] + [(115.0, "Date: 5/2/2024")] + rows[4:]
+        self.assertEqual(bol_stop1_pickup_from_positioned_rows(conflicts),
+                         (None, "GEOMETRIC_PICKUP_DATES_CONFLICT"))
+        swapped = [(300.0 if y == 100.0 else
+                    100.0 if y == 300.0 else y, txt) for y, txt in rows]
+        self.assertEqual(bol_stop1_pickup_from_positioned_rows(swapped),
+                         (None, "GEOMETRIC_PICKUP_STOP_BOUNDARIES_UNRESOLVED"))
+
+    def test_geometric_bol_date_is_not_selected_to_match_invoice(self):
+        sha = FROZEN_DOCUMENT_SHA256["arcbest"]
+        inv = ("ORIGINAL INVOICE\nFreight bill No: 123456789\n"
+               "Total Pieces Total Weight TOTAL AMOUNT\n"
+               "$2,950.00 0 11,993\nCRN: 6001438260\n")
+        # Flat PDF order incorrectly points to DELIVERED date (May 3).
+        flat = ("Motor Carrier Bill of Lading\nLoad #: 6001438260\n"
+                "Order References: ArcBest Pronumber: 123456789\n"
+                "Stop 1 - Pick Up\nDate: 5/3/2024 - 5/3/2024\n"
+                "Total HU: 15 Total Pcs: 0 Total Cmdty: 1 Total Wgt: 11993 lbs\n"
+                "Stop 2 - Delivery\n")
+        physical_rows = [
+            (5.0, "Date: 4/30/2024"),
+            (10.0, "Stop 1 - Pick Up"),
+            (20.0, "Date: 5/1/2024 - 5/1/2024"),
+            (30.0, "Total HU: 15 Total Pcs: 0 Total Cmdty: 1 Total Wgt: 11993 lbs"),
+            (40.0, "Stop 2 - Delivery"),
+            (50.0, "Date: 5/3/2024 - 5/3/2024"),
+        ]
+        face = InvoiceFace("arcbest", "123456789", 1, 295000,
+                           None, "2024-05-01", "TL")
+        reported = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [inv, flat], sha,
+            positioned_rows=[[], physical_rows])
+        self.assertEqual(reported["source_invoice_pickup_date_matches_on_bol_copies"], 0)
+        self.assertEqual(reported["geometric_pickup_observation_state_counts"],
+                         {"GEOMETRIC_PICKUP_DATE_UNAMBIGUOUS": 1})
+        self.assertEqual(reported["geometric_pickup_dates_matching_original_invoice"], 1)
+        self.assertEqual(reported[
+            "geometric_pickup_date_disagreements_with_flattened_text"], 1)
+        self.assertTrue(reported["geometric_reading_is_not_independent_document_custody"])
+        self.assertEqual(reported["independently_adjudicated_customer_overcharges"], 0)
+        self.assertEqual(reported["verified_retally_cash_recovered_cents"], 0)
 
     def test_actual_invoice_component_sum_and_adversarial_one_cent(self):
         content = (
