@@ -1087,6 +1087,8 @@ def arcbest_embedded_truckload_bol_reconciliation(
     matching_pickup_dates = 0
     pickup_extraction_states = Counter()
     bol_header_date_states = Counter()
+    pickup_date_exception_copy_ordinals = []
+    pickup_date_relative_day_buckets = Counter()
     missing = Counter()
     by_invoice = {}
     anonymous = []
@@ -1205,6 +1207,21 @@ def arcbest_embedded_truckload_bol_reconciliation(
         if not weight_match:
             missing["BOL_INVOICE_PRINTED_WEIGHT_CONFLICT"] += 1
         if not date_match:
+            # Only the 1-based position among public BOL-first-pages and
+            # relative calendar day offset. No customer/invoice/load identity,
+            # raw source date, document content or shipment metadata exported.
+            pickup_date_exception_copy_ordinals.append(bol_pages)
+            if pickup_day is None:
+                pickup_date_relative_day_buckets["UNEXTRACTED"] += 1
+            else:
+                delta = (datetime.fromisoformat(pickup_day)
+                         - datetime.fromisoformat(face_doc["face"].shipment_date)).days
+                pickup_date_relative_day_buckets[
+                    "EARLIER_ONE_DAY" if delta == -1 else
+                    "LATER_ONE_DAY" if delta == 1 else
+                    "EARLIER_MULTIDAY" if delta < -1 else
+                    "LATER_MULTIDAY" if delta > 1 else "OTHER"
+                ] += 1
             missing["BOL_PICKUP_INVOICE_DATE_CONFLICT"] += 1
     conflict_piece_groups = 0
     conflict_weight_groups = 0
@@ -1228,6 +1245,8 @@ def arcbest_embedded_truckload_bol_reconciliation(
         "source_invoice_pickup_date_matches_on_bol_copies": matching_pickup_dates,
         "pickup_extraction_state_counts": dict(sorted(pickup_extraction_states.items())),
         "bol_header_vs_pickup_date_state_counts": dict(sorted(bol_header_date_states.items())),
+        "pickup_date_exception_copy_ordinals": pickup_date_exception_copy_ordinals,
+        "pickup_date_relative_day_buckets": dict(sorted(pickup_date_relative_day_buckets.items())),
         "unique_truckload_invoices_with_co_bundled_bol_copies": len(by_invoice),
         "duplicate_co_bundled_bol_copy_pages_not_new_shipments":
             sum(max(0, len(x) - 1) for x in by_invoice.values()),
