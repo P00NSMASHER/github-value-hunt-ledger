@@ -1,5 +1,5 @@
 {
-  "digest_sha256": "d955db7b7ccf1be9c0360bb7eec17515143bd164b1446090fd55a2ec07a76d4e",
+  "digest_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
   "lab": 15,
   "leads": [
     {
@@ -97,6 +97,18 @@
       "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
       "title": "datacite freight research candidate",
       "url": "https://doi.org/10.22004/ag.econ.317427"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-10-25",
+      "id": "d3cc5c963462db9d7b85bfce5c683f92ca7481a3eb815a51809cc2597cefe845",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.22004/ag.econ.317265"
     },
     {
       "actual_cash_recovery_verified": false,
