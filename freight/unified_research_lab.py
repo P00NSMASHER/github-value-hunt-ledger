@@ -50,6 +50,7 @@ API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.so
                        "retally-unified-research-scout.jayp19386.workers.dev"})
 SEEDS = {
     "freightrecovery": (
+        "https://www.gao.gov/products/b-168539",  # 1970 carrier dispute; promised $379.66 never received as of decision.
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
         "https://www.gao.gov/products/b-215958",  # Initial 1984 53/55 decision OVERRULED in 1986.

@@ -1,0 +1,106 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_B168539_PROMISED_REFUND_NOT_CASH_V0",
+  "admission_state": "OFFICIAL_GAO_DECISION_METADATA_NOT_ORIGINAL_INVOICE_OR_INDEPENDENT_PAYMENT_TRUTH",
+  "evaluation_family": "FREIGHT_SETTLEMENT_PROVENANCE_HISTORICAL_DECISION_ONLY",
+  "engine": "freightrecovery",
+  "cohort": "US_GAO_HOUSEHOLD_GOODS_CARRIER_PAYMENT_DISPUTE_1968_SHIPMENT_1970_DECISION",
+  "source": {
+    "official_url": "https://www.gao.gov/products/b-168539",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-168539",
+    "decision_date": "1970-09-29",
+    "reviewed_date": "2026-10-25",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "US_GAO_GOVERNMENT_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "customer_engine_commercial_reuse_approved": false,
+    "source_kind": "OFFICIAL_GAO_DECISION_HTML",
+    "original_publisher_response_bytes_acquired": false,
+    "original_publisher_response_sha256": null,
+    "original_gbl_freight_bill_voucher_bytes_acquired": false,
+    "source_passage_locators": [
+      "GAO decision: original carrier $989.70 claim and delivering carrier $951.20 Navy payment",
+      "GAO decision: promised $379.66 refund not received as of 1970-09-29",
+      "GAO decision: conflicting carrier claims and rejection of second government certification"
+    ]
+  },
+  "historically_reported_facts": {
+    "gbl_number_reported": "D 1783811",
+    "gbl_date_reported": "1968-06-07",
+    "original_competing_carrier_claim_cents": 98970,
+    "navy_payment_to_delivering_carrier_cents": 95120,
+    "navy_payment_reporting_month": "1969-01",
+    "navy_payment_reported_by_gao": true,
+    "independently_authenticated_navy_payment_receipt_held": false,
+    "competing_carrier_reduced_claim_cents": 37966,
+    "delivering_carrier_promised_refund_cents": 37966,
+    "gao_reported_refund_received_as_of_decision": false,
+    "refund_received_after_decision_cents": null,
+    "gao_certified_competing_carrier_claim": false,
+    "government_second_payment_to_competing_carrier_verified": false,
+    "waiver_forgery_alleged_by_claimant": true,
+    "waiver_forgery_independently_adjudicated": null,
+    "delivering_carrier_identity_disputed_in_receipt_but_gao_found_actual_delivery": true,
+    "final_intercarrier_allocation": "UNKNOWN",
+    "future_intercarrier_payment": "UNKNOWN",
+    "legal_scope": "HISTORICAL_GBL_CARRIER_PAYMENT_DISPUTE_NOT_MODERN_OVERCHARGE_TARIFF_PRECEDENT"
+  },
+  "truth_boundaries": {
+    "publisher_reported_nonreceipt_as_of_decision": true,
+    "prospective_future_nonreceipt_claim_allowed": false,
+    "original_carrier_bol_and_bank_evidence_held": false,
+    "independent_holdout_training_separation_verified": false,
+    "independent_customer_payment_labels": 0,
+    "modern_customer_freight_error_precision_recall_allowed": false,
+    "modern_accounting_reconciliation_accuracy_allowed": false,
+    "modern_contract_applicability": "UNKNOWN",
+    "retally_verified_recovered_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_PROMISE_MEANS_REFUND_COLLECTED",
+      "kind": "SYNTHETIC",
+      "false_claim": "PROMISE_TO_FORWARD_37966_CENTS_IS_A_COMPLETED_REFUND",
+      "expected": "REJECT_GAO_EXPLICITLY_REPORTS_NOT_RECEIVED_AS_OF_DECISION"
+    },
+    {
+      "id": "SYNTHETIC_REDUCED_CLAIM_MEANS_APPROVED",
+      "kind": "SYNTHETIC",
+      "false_claim": "REDUCED_37966_CENT_CLAIM_WAS_GAO_CERTIFIED",
+      "expected": "REJECT_GAO_DISALLOWED_COMPETING_CARRIER_CLAIM"
+    },
+    {
+      "id": "SYNTHETIC_PAID_FIRST_CARRIER_MEANS_PAID_SECOND",
+      "kind": "SYNTHETIC",
+      "false_claim": "NAVY_95120_CENT_PAYMENT_PROVES_SECOND_37966_CENT_PAYMENT",
+      "expected": "REJECT_DIFFERENT_PAYEES_AND_TRANSACTION_TYPES"
+    },
+    {
+      "id": "SYNTHETIC_ALLEGED_FORGERY_IS_PROVEN",
+      "kind": "SYNTHETIC",
+      "false_claim": "CLAIMANT_FORGERY_ALLEGATION_PROVES_FRAUD",
+      "expected": "UNKNOWN_NOT_ADJUDICATED_IN_GAO_DECISION"
+    },
+    {
+      "id": "SYNTHETIC_DELIVERY_RECEIPT_CONCLUSIVE",
+      "kind": "SYNTHETIC",
+      "false_claim": "GBL_LISTED_CARRIER_IS_IRREBUTTABLE_ACTUAL_DELIVERER",
+      "expected": "REJECT_GAO_CONSIDERED_CONTRARY_ACTUAL_DELIVERY_EVIDENCE"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_DISPUTE_IS_RETALLY_CASH",
+      "kind": "SYNTHETIC",
+      "false_claim": "1970_GAO_DISPUTE_IS_A_RETALLY_CUSTOMER_PAYMENT",
+      "expected": "REJECT_NO_MODERN_CUSTOMER_OR_RETALLY_SETTLEMENT"
+    }
+  ],
+  "quality": {
+    "official_publisher_full_decision_text_reviewed": true,
+    "original_publisher_byte_hash_available": false,
+    "independent_payment_bank_proof_available": false,
+    "later_after_decision_settlement_unknown": true,
+    "financial_claim_vs_received_funds_separated": true,
+    "private_customer_medical_student_records_used": false,
+    "independently_labeled_modern_errors": 0
+  }
+}

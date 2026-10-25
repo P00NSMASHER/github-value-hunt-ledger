@@ -766,5 +766,117 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                     verify(forged)
         self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
 
+
+    def test_b168539_promised_refund_is_not_received_payment_or_approved_claim(self):
+        """Official GAO original decision separates payees, promise, and cash."""
+        case = json.loads((FIXTURE.parent / "gao_b168539_promised_refund_candidate_v0.json")
+                          .read_text(encoding="utf-8"))
+        self.assertEqual(case["schema_version"], "0.1.0")
+        self.assertEqual(case["evaluation_family"],
+                         "FREIGHT_SETTLEMENT_PROVENANCE_HISTORICAL_DECISION_ONLY")
+        self.assertEqual(case["admission_state"],
+                         "OFFICIAL_GAO_DECISION_METADATA_NOT_ORIGINAL_INVOICE_OR_INDEPENDENT_PAYMENT_TRUTH")
+        src = case["source"]
+        self.assertEqual(src["official_url"], "https://www.gao.gov/products/b-168539")
+        self.assertIn(src["official_url"], SEEDS["freightrecovery"])
+        self.assertEqual(SEEDS["freightrecovery"].count(src["official_url"]), 1)
+        self.assertEqual(src["decision_date"], "1970-09-29")
+        self.assertEqual(src["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertFalse(src["customer_engine_commercial_reuse_approved"])
+        self.assertFalse(src["original_publisher_response_bytes_acquired"])
+        self.assertIsNone(src["original_publisher_response_sha256"])
+        self.assertFalse(src["original_gbl_freight_bill_voucher_bytes_acquired"])
+        h = case["historically_reported_facts"]
+        self.assertEqual(h["gbl_date_reported"], "1968-06-07")
+        self.assertEqual(h["original_competing_carrier_claim_cents"], 98970)
+        self.assertEqual(h["navy_payment_to_delivering_carrier_cents"], 95120)
+        self.assertEqual(h["competing_carrier_reduced_claim_cents"], 37966)
+        self.assertEqual(h["delivering_carrier_promised_refund_cents"], 37966)
+        self.assertTrue(h["navy_payment_reported_by_gao"])
+        self.assertFalse(h["independently_authenticated_navy_payment_receipt_held"])
+        self.assertFalse(h["gao_reported_refund_received_as_of_decision"])
+        self.assertIsNone(h["refund_received_after_decision_cents"])
+        self.assertFalse(h["gao_certified_competing_carrier_claim"])
+        self.assertFalse(h["government_second_payment_to_competing_carrier_verified"])
+        self.assertTrue(h["waiver_forgery_alleged_by_claimant"])
+        self.assertIsNone(h["waiver_forgery_independently_adjudicated"])
+        self.assertEqual(h["final_intercarrier_allocation"], "UNKNOWN")
+        b = case["truth_boundaries"]
+        self.assertFalse(b["independent_holdout_training_separation_verified"])
+        self.assertEqual(b["independent_customer_payment_labels"], 0)
+        self.assertFalse(b["modern_customer_freight_error_precision_recall_allowed"])
+        self.assertFalse(b["modern_accounting_reconciliation_accuracy_allowed"])
+        self.assertEqual(b["retally_verified_recovered_cash_cents"], 0)
+        self.assertTrue(case["quality"]["financial_claim_vs_received_funds_separated"])
+
+        from freight.unified_research_lab import ledger_from, merge_sources
+        entry, added = merge_sources(ledger_from([]), "freightrecovery",
+                                     [src["official_url"], src["official_url"]], "2026-10-25")
+        self.assertEqual(added, 1)
+        self.assertEqual(len(entry["entries"]), 1)
+        again, new = merge_sources(entry, "freightrecovery", [src["official_url"]], "2026-10-25")
+        self.assertEqual(new, 0)
+        self.assertEqual(again, entry)
+        self.assertFalse(entry["entries"][0]["commercial_reuse_authorized"])
+        self.assertFalse(entry["entries"][0]["recovered_cash_verified"])
+
+    def test_b168539_synthetic_counterfactuals_reject_promoted_cash_and_forgery(self):
+        """Adversarial mutations must fail the case-specific source contract."""
+        case = json.loads((FIXTURE.parent / "gao_b168539_promised_refund_candidate_v0.json")
+                          .read_text(encoding="utf-8"))
+        controls = case["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 6)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTHETIC_") for c in controls))
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_GAO_EXPLICITLY_REPORTS_NOT_RECEIVED_AS_OF_DECISION",
+            "REJECT_GAO_DISALLOWED_COMPETING_CARRIER_CLAIM",
+            "REJECT_DIFFERENT_PAYEES_AND_TRANSACTION_TYPES",
+            "UNKNOWN_NOT_ADJUDICATED_IN_GAO_DECISION",
+            "REJECT_GAO_CONSIDERED_CONTRARY_ACTUAL_DELIVERY_EVIDENCE",
+            "REJECT_NO_MODERN_CUSTOMER_OR_RETALLY_SETTLEMENT",
+        })
+
+        def verify(row):
+            src, h, truth = row["source"], row["historically_reported_facts"], row["truth_boundaries"]
+            self.assertFalse(src["customer_engine_commercial_reuse_approved"])
+            self.assertIsNone(src["original_publisher_response_sha256"])
+            self.assertEqual(h["navy_payment_to_delivering_carrier_cents"], 95120)
+            self.assertEqual(h["competing_carrier_reduced_claim_cents"], 37966)
+            self.assertEqual(h["delivering_carrier_promised_refund_cents"], 37966)
+            self.assertFalse(h["gao_reported_refund_received_as_of_decision"])
+            self.assertIsNone(h["refund_received_after_decision_cents"])
+            self.assertFalse(h["gao_certified_competing_carrier_claim"])
+            self.assertIsNone(h["waiver_forgery_independently_adjudicated"])
+            self.assertEqual(h["final_intercarrier_allocation"], "UNKNOWN")
+            self.assertEqual(truth["independent_customer_payment_labels"], 0)
+            self.assertFalse(truth["modern_customer_freight_error_precision_recall_allowed"])
+            self.assertEqual(truth["retally_verified_recovered_cash_cents"], 0)
+
+        verify(case)
+        alterations = (
+            ("source", "customer_engine_commercial_reuse_approved", True),
+            ("source", "original_publisher_response_sha256", "FORGED"),
+            ("historically_reported_facts", "navy_payment_to_delivering_carrier_cents", 37966),
+            ("historically_reported_facts", "competing_carrier_reduced_claim_cents", 95120),
+            ("historically_reported_facts", "delivering_carrier_promised_refund_cents", 0),
+            ("historically_reported_facts", "gao_reported_refund_received_as_of_decision", True),
+            ("historically_reported_facts", "refund_received_after_decision_cents", 37966),
+            ("historically_reported_facts", "gao_certified_competing_carrier_claim", True),
+            ("historically_reported_facts", "waiver_forgery_independently_adjudicated", True),
+            ("historically_reported_facts", "final_intercarrier_allocation", "FINAL_37966"),
+            ("truth_boundaries", "independent_customer_payment_labels", 1),
+            ("truth_boundaries", "modern_customer_freight_error_precision_recall_allowed", True),
+            ("truth_boundaries", "retally_verified_recovered_cash_cents", 37966),
+        )
+        for section, key, bogus in alterations:
+            with self.subTest(field=key):
+                forged = copy.deepcopy(case)
+                forged[section][key] = bogus
+                with self.assertRaises(AssertionError):
+                    verify(forged)
+                self.assertNotEqual(digest(forged), digest(case))
+
 if __name__ == "__main__":
     unittest.main()
