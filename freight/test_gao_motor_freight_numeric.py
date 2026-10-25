@@ -194,6 +194,14 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertFalse(source["customer_engine_commercial_reuse_approved"])
         facts = item["historical_facts"]
         self.assertEqual(facts["shipment_weight_pounds"], 5744)
+        # References are transcribed from the GAO decision, not original bill custody.
+        self.assertEqual(facts["reported_carrier_name"], "PENNSYLVANIA_TRANSFER_COMPANY")
+        self.assertEqual(facts["reported_carrier_bill_number"], "NC 23166")
+        self.assertEqual(facts["reported_gbl_number"], "AF-7611030")
+        self.assertEqual(facts["reported_gbl_date"], "1958-03-07")
+        self.assertEqual(facts["reported_gao_claim_number"], "TK-172387")
+        self.assertEqual(facts["reported_certificate_date"], "1960-06-20")
+        self.assertTrue(facts["reported_refund_unpaid_on_certificate_date"])
         self.assertEqual(facts["carrier_charged_and_paid_cents"], 30590)
         self.assertEqual(facts["gao_applicable_ltl_charge_cents"], 15060)
         self.assertEqual(facts["gao_overcharge_certificate_cents"], 15530)
@@ -219,7 +227,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertFalse(truth["customer_accuracy_scoring_permitted"])
         self.assertEqual(truth["retally_verified_cash_recovery_cents"], 0)
         controls = item["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 4)
+        self.assertEqual(len(controls), 5)
         self.assertEqual(len({c["id"] for c in controls}), 4)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" and
                             c["id"].startswith("SYNTHETIC_") for c in controls))
@@ -228,6 +236,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             "UNKNOWN_REQUIRES_CONTEMPORANEOUS_TARIFF_AND_CARRIER_SCOPE",
             "REJECT_HISTORICAL_RATE_NOT_CURRENT_CONTRACT",
             "REJECT_NO_EVIDENCE_OF_CUSTOMER_SETTLEMENT_OR_RETALLY_RECOVERY",
+            "REJECT_CITATION_IS_NOT_ORIGINAL_BILL_GBL_OR_PAYMENT_CUSTODY",
         })
         # B-152744 presents a DIFFERENT tariff and litigation caveat.
         # The 1961 case is a counterexample to universal 'full truck => TL' rules.
@@ -242,6 +251,11 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         item = json.loads((FIXTURE.parent / "gao_b143458_capacity_v1.json").read_text())
         pinned = (
             ("historical_facts", "carrier_charged_and_paid_cents", 30590),
+            ("historical_facts", "reported_carrier_bill_number", "NC 23166"),
+            ("historical_facts", "reported_gbl_number", "AF-7611030"),
+            ("historical_facts", "reported_gbl_date", "1958-03-07"),
+            ("historical_facts", "reported_gao_claim_number", "TK-172387"),
+            ("historical_facts", "reported_certificate_date", "1960-06-20"),
             ("historical_facts", "gao_applicable_ltl_charge_cents", 15060),
             ("historical_facts", "gao_overcharge_certificate_cents", 15530),
             ("historical_facts", "carrier_in_capacity_rule_eligible_list", False),
@@ -249,6 +263,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             ("source", "original_publisher_bytes_sha256", None),
             ("source", "customer_engine_commercial_reuse_approved", False),
             ("truth_boundaries", "independently_held_out_training_separation_verified", False),
+            ("truth_boundaries", "original_paid_invoice_or_gbl_bytes_held", False),
             ("truth_boundaries", "customer_accuracy_scoring_permitted", False),
             ("truth_boundaries", "retally_verified_cash_recovery_cents", 0),
         )

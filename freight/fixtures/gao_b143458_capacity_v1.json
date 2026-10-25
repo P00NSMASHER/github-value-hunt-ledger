@@ -33,7 +33,14 @@
     "certificate_of_indebtedness_issued": true,
     "refund_or_deduction_ordered": true,
     "actual_refund_or_offset_collected": null,
-    "later_court_disposition": "UNKNOWN"
+    "later_court_disposition": "UNKNOWN",
+    "reported_carrier_name": "PENNSYLVANIA_TRANSFER_COMPANY",
+    "reported_carrier_bill_number": "NC 23166",
+    "reported_gbl_number": "AF-7611030",
+    "reported_gbl_date": "1958-03-07",
+    "reported_gao_claim_number": "TK-172387",
+    "reported_certificate_date": "1960-06-20",
+    "reported_refund_unpaid_on_certificate_date": true
   },
   "truth_boundaries": {
     "historical_gao_adjudication_published": true,
@@ -69,6 +76,12 @@
       "kind": "SYNTHETIC",
       "proposed_inference": "CERTIFICATE_ISSUANCE_PROVES_RETALLY_RECOVERY",
       "expected": "REJECT_NO_EVIDENCE_OF_CUSTOMER_SETTLEMENT_OR_RETALLY_RECOVERY"
+    },
+    {
+      "id": "SYNTHETIC_PUBLISHED_BILL_REF_AS_ORIGINAL_CUSTODY",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "GAO_PUBLISHED_BILL_AND_GBL_IDENTIFIERS_PROVE_CUSTODY_OF_ORIGINAL_DOCUMENTS",
+      "expected": "REJECT_CITATION_IS_NOT_ORIGINAL_BILL_GBL_OR_PAYMENT_CUSTODY"
     }
   ],
   "quality": {
