@@ -485,7 +485,7 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
             ("co_bundled_motor_carrier_bol_first_pages", 0),
             ("unique_truckload_invoices_with_co_bundled_bol_copies", 4),
             ("source_invoice_printed_weight_matches_on_bol_copies", 3),
-            ("source_invoice_pickup_date_matches_on_bol_copies", 4),
+            ("source_invoice_pickup_date_matches_on_bol_copies", 3),
             ("repeated_load_groups_with_piece_count_disagreements", 0),
             ("duplicate_co_bundled_bol_copy_pages_not_new_shipments", 0),
             ("anonymous_page_class_sha256", "0" * 64),
@@ -498,7 +498,7 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
             ("commercial_reuse_authorized", True),
             ("verified_retally_cash_recovered_cents", 615000),
             ("original_source_customer_or_load_identifiers_exported", 1),
-            ("unresolved_reason_counts", {}),
+            ("unresolved_reason_counts", {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1}),
         ):
             with self.subTest(field=field):
                 altered = source_document_report()
