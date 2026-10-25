@@ -471,38 +471,6 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertTrue(all("restaurant" not in q.lower() for q in SEARCHES["permitplate"]))
         self.assertTrue(any("permit" in q.lower() for q in SEARCHES["permitplate"]))
 
-    def test_permitplate_original_excluded_worktype_catalog_rejects_issuance_laundering(self):
-        pack = json.loads((Path(__file__).with_name("fixtures") /
-            "nyc_dob_excluded_worktype_catalog_v1.json").read_text(encoding="utf-8"))
-        self.assertEqual(pack["schema_version"], "1.0.0")
-        self.assertEqual(pack["evaluation_family"], "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY")
-        self.assertEqual(pack["raw_application_or_permit_records_stored"], 0)
-        self.assertEqual(pack["independent_issuance_ground_truth_labels"], 0)
-        self.assertFalse(pack["source_bytes_retrieved"])
-        self.assertIsNone(pack["original_publisher_source_bytes_sha256"])
-        self.assertFalse(pack["commercial_customer_engine_reuse_approved"])
-        self.assertFalse(pack["held_out_from_model_training_verified"])
-        self.assertFalse(pack["accuracy_claim_allowed"])
-        by_type = {x["excluded_work_type"]: x for x in pack["coverage_scope"]}
-        self.assertEqual(set(by_type), {
-            "ELECTRICAL", "ELEVATOR", "LIMITED_ALTERATION_APPLICATION"})
-        self.assertEqual({x["dataset_id"] for x in by_type.values()},
-                         {"dm9a-ab7w", "kfp4-dz4h", "xxbr-ypig"})
-        for category, row in by_type.items():
-            with self.subTest(category=category):
-                self.assertIn(row["official_url"], SEEDS["permitplate"])
-                self.assertTrue(row["event_type"].endswith("NOT_ISSUANCE"))
-                self.assertEqual(row["issuance_without_separate_proof"], "UNKNOWN")
-                self.assertEqual(row["original_rows_ingested"], 0)
-        self.assertEqual(len(pack["synthetic_negative_controls"]), 4)
-        self.assertTrue(all(x["kind"] == "SYNTHETIC"
-            and x["expected"].startswith("UNKNOWN")
-            for x in pack["synthetic_negative_controls"]))
-        altered = json.loads(json.dumps(pack))
-        altered["accuracy_claim_allowed"] = True
-        self.assertNotEqual(altered["accuracy_claim_allowed"],
-                            pack["accuracy_claim_allowed"])
-
     def test_permitplate_official_dob_seed_replaces_restaurant_and_stays_rights_held(self):
         # Official NYC DOB original source, not the DOHMH restaurant-inspection seed.
         official = "https://data.cityofnewyork.us/d/rbx6-tga4"
@@ -532,6 +500,16 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertFalse(source["commercial_reuse_authorized"])
         self.assertFalse(source["independent_outcome_adjudicated"])
         self.assertIsNone(source["original_source_bytes_sha256"])
+        # Existing approved excluded-scope v1 pack remains the canonical
+        # evaluation pointer; this seed linkage does not create a second pack.
+        excluded = json.loads((Path(__file__).with_name("fixtures") /
+                              "nyc_dob_excluded_scope_v1.json").read_text(encoding="utf-8"))
+        self.assertEqual(excluded["real_permit_records_ingested"], 0)
+        self.assertEqual(excluded["independent_outcome_labels"], 0)
+        self.assertEqual(excluded["cross_dataset_join"], "UNVERIFIED")
+        self.assertEqual(excluded["commercial_use"], "UNVERIFIED_NOT_APPROVED")
+        self.assertEqual({s["official_url"] for s in excluded["companion_source_candidates"]},
+                         set(SEEDS["permitplate"]) - {official, applications})
         self.assertEqual(len(pack["synthetic_negative_controls"]), 4)
         self.assertTrue(all(c["provenance_class"].startswith("SYNTHETIC")
                             and c["real_world_accuracy_label"] is None
