@@ -15,6 +15,7 @@ from freight.freight_evidence_chain_readiness import (
     ARCBEST_PRINTED_BOL_HEADER_CLASSES,
     ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES,
     ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST, ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST,
+    US_SOURCE_DATE_LOCALE_BASELINE,
     make_receipt, validate_receipt, run,
 )
 from freight.unified_research_lab import ResearchError, digest
@@ -26,6 +27,7 @@ DAY = date(2026, 10, 24)
 def source_document_report() -> dict:
     """Synthetic report shape with pinned original-source aggregate fingerprints."""
     def original(issuer: str, faces: int) -> dict:
+        locale = US_SOURCE_DATE_LOCALE_BASELINE[issuer]
         return {
             "sha256": FROZEN_DOCUMENT_SHA256[issuer],
             "source_face_catalog_sha256": SOURCE_FACE_CATALOG_HASH[issuer],
@@ -41,6 +43,21 @@ def source_document_report() -> dict:
             "label_state": "UNKNOWN_NO_INDEPENDENT_RATE_OR_ADJUDICATION",
             "validated_overcharge_cents": 0,
             "realized_recovery_cents": 0,
+            "source_us_date_locale_audit": {
+                "scope": "ORIGINAL_US_FREIGHT_PDF_DATE_LOCALE_AUDIT_NOT_SETTLEMENT_OR_RATE_TRUTH",
+                "issuer": issuer,
+                "source_original_pdf_sha256": FROZEN_DOCUMENT_SHA256[issuer],
+                "original_invoice_faces_considered": locale["faces"],
+                "date_fields_rebound_to_us_source": locale["date_fields"],
+                "date_fields_legacy_uk_first_misparsed": locale["misparsed_fields"],
+                "invoice_faces_affected_by_legacy_uk_first_parser": locale["affected_faces"],
+                "normalized_invoice_date_catalog_sha256": locale["catalog_sha256"],
+                "us_month_day_year_source_semantics_enforced": True,
+                "independent_delivery_or_payment_proof_created": False,
+                "customer_overcharge_labels": 0,
+                "verified_retally_cash_recovered_cents": 0,
+                "original_invoice_ids_exported": 0,
+            },
         }
 
     gt = original("globaltranz", 100)
@@ -76,9 +93,17 @@ def source_document_report() -> dict:
         "production_pdf_extraction_completed": False,
         "commercial_rate_authority_verified": False,
     }
-    gt["statement"] = {"bank_payment_reconciliation": "NOT_POSSIBLE_NO_BANK_RECORD"}
+    gt["statement"] = {
+        "bank_payment_reconciliation": "NOT_POSSIBLE_NO_BANK_RECORD",
+        "face_to_statement_original_amount": {
+            "matched_invoices": 100, "unmatched_invoices": 0,
+            "by_rule": {"exact": 100},
+        },
+    }
     gt["face_statement_identity_diagnostic"] = {
         "same_identifier_and_original_amount": 100,
+        "maximum_face_to_statement_recorded_date_gap_days": 0,
+        "source_date_gaps_over_180_days": 0,
         "these_differences_are_not_payment_or_overcharge_findings": True,
     }
     abf = original("arcbest", 10)
@@ -147,7 +172,7 @@ def source_document_report() -> dict:
         "source_invoice_load_reference_matching_bol_pages": 4,
         "source_invoice_bol_totals_readable_pages": 4,
         "source_invoice_printed_weight_matches_on_bol_copies": 4,
-        "source_invoice_pickup_date_matches_on_bol_copies": 3,
+        "source_invoice_pickup_date_matches_on_bol_copies": 4,
         "unique_truckload_invoices_with_co_bundled_bol_copies": 2,
         "duplicate_co_bundled_bol_copy_pages_not_new_shipments": 2,
         "repeated_load_groups_with_piece_count_disagreements": 1,
@@ -170,7 +195,7 @@ def source_document_report() -> dict:
         "verified_retally_cash_recovered_cents": 0,
         "original_source_customer_or_load_identifiers_exported": 0,
         "external_contact_actions": 0,
-        "unresolved_reason_counts": {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1},
+        "unresolved_reason_counts": {},
     }
     blind = {
         "precision": None,
@@ -230,11 +255,18 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertEqual(receipt["arcbest_cobundled_original_truckload_bol_pages"], 4)
         self.assertEqual(receipt["arcbest_cobundled_unique_invoice_load_groups"], 2)
         self.assertEqual(receipt["arcbest_cobundled_original_bol_weight_copy_matches"], 4)
-        self.assertEqual(receipt["arcbest_cobundled_pickup_date_copy_matches"], 3)
+        self.assertEqual(receipt["arcbest_cobundled_pickup_date_copy_matches"], 4)
         self.assertEqual(receipt["arcbest_cobundled_same_load_piece_conflict_groups"], 1)
         self.assertEqual(receipt["arcbest_cobundled_duplicate_pages_not_new_shipments"], 2)
         self.assertEqual(receipt["arcbest_cobundled_bol_page_class_sha256"],
                          ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST)
+        self.assertEqual(receipt["original_globaltranz_invoice_to_statement_exact_date_matches"], 100)
+        self.assertEqual(receipt["original_globaltranz_statement_max_date_gap_days"], 0)
+        self.assertEqual(receipt["original_us_freight_date_locale_corrections"][
+            "globaltranz"]["legacy_affected_faces"], 59)
+        self.assertEqual(receipt["original_us_freight_date_locale_corrections"][
+            "arcbest"]["legacy_affected_faces"], 6)
+        self.assertTrue(receipt["original_us_date_fixes_not_payment_or_delivery_proof"])
         self.assertTrue(receipt["arcbest_cobundled_bol_copies_not_independent_custody"])
         self.assertEqual(receipt["arcbest_original_bol_signatures_independently_authenticated"], 0)
         self.assertTrue(receipt[
@@ -441,7 +473,7 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertEqual(receipt["arcbest_cobundled_duplicate_pages_not_new_shipments"], 2)
         self.assertEqual(receipt["arcbest_cobundled_same_load_piece_conflict_groups"], 1)
         self.assertEqual(receipt["arcbest_cobundled_original_bol_weight_copy_matches"], 4)
-        self.assertEqual(receipt["arcbest_cobundled_pickup_date_copy_matches"], 3)
+        self.assertEqual(receipt["arcbest_cobundled_pickup_date_copy_matches"], 4)
         self.assertEqual(receipt["arcbest_original_bol_signatures_independently_authenticated"], 0)
         self.assertEqual(receipt["independent_evidence_chain_stages"][
             "independent_bol_or_shipment_link_in_lab"], 0)
@@ -453,7 +485,7 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
             ("co_bundled_motor_carrier_bol_first_pages", 0),
             ("unique_truckload_invoices_with_co_bundled_bol_copies", 4),
             ("source_invoice_printed_weight_matches_on_bol_copies", 3),
-            ("source_invoice_pickup_date_matches_on_bol_copies", 4),
+            ("source_invoice_pickup_date_matches_on_bol_copies", 3),
             ("repeated_load_groups_with_piece_count_disagreements", 0),
             ("duplicate_co_bundled_bol_copy_pages_not_new_shipments", 0),
             ("anonymous_page_class_sha256", "0" * 64),
@@ -466,7 +498,7 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
             ("commercial_reuse_authorized", True),
             ("verified_retally_cash_recovered_cents", 615000),
             ("original_source_customer_or_load_identifiers_exported", 1),
-            ("unresolved_reason_counts", {}),
+            ("unresolved_reason_counts", {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1}),
         ):
             with self.subTest(field=field):
                 altered = source_document_report()
@@ -478,6 +510,46 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         for secret in ("Motor Carrier Bill of Lading", "6001438260", "6001488729",
                        "436430967", "436380706", "Crown Group"):
             self.assertNotIn(secret, leaked)
+
+    def test_us_date_locale_holds_reject_rehashed_fake_payment_and_wrong_dates(self):
+        receipt = make_receipt(source_document_report(), as_of=DAY)
+        self.assertEqual(
+            receipt["original_us_freight_date_locale_corrections"]["globaltranz"],
+            {"faces": 100, "date_fields": 200,
+             "legacy_misparsed_fields": 70, "legacy_affected_faces": 59})
+        self.assertEqual(
+            receipt["original_us_freight_date_locale_corrections"]["arcbest"],
+            {"faces": 10, "date_fields": 10,
+             "legacy_misparsed_fields": 6, "legacy_affected_faces": 6})
+        self.assertEqual(receipt["original_globaltranz_invoice_to_statement_exact_date_matches"], 100)
+        self.assertEqual(receipt["original_globaltranz_statement_max_date_gap_days"], 0)
+        self.assertTrue(receipt["original_us_date_fixes_not_payment_or_delivery_proof"])
+        for issuer in ("globaltranz", "arcbest"):
+            for field, forged in (
+                ("date_fields_legacy_uk_first_misparsed", 0),
+                ("invoice_faces_affected_by_legacy_uk_first_parser", 0),
+                ("normalized_invoice_date_catalog_sha256", "0" * 64),
+                ("us_month_day_year_source_semantics_enforced", False),
+                ("independent_delivery_or_payment_proof_created", True),
+                ("customer_overcharge_labels", 100),
+                ("verified_retally_cash_recovered_cents", 1),
+            ):
+                with self.subTest(issuer=issuer, field=field):
+                    fake = source_document_report()
+                    fake["freight_original_document_benchmark"][issuer][
+                        "source_us_date_locale_audit"][field] = forged
+                    with self.assertRaises(ResearchError):
+                        make_receipt(fake, as_of=DAY)
+        bad = source_document_report()
+        bad["freight_original_document_benchmark"]["globaltranz"][
+            "statement"]["face_to_statement_original_amount"]["matched_invoices"] = 98
+        with self.assertRaises(ResearchError):
+            make_receipt(bad, as_of=DAY)
+        bad = source_document_report()
+        bad["freight_original_document_benchmark"]["globaltranz"][
+            "face_statement_identity_diagnostic"]["source_date_gaps_over_180_days"] = 2
+        with self.assertRaises(ResearchError):
+            make_receipt(bad, as_of=DAY)
 
     def test_statement_identity_is_not_bank_payment_or_refund(self):
         source = source_document_report()
