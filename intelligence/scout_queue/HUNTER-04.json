@@ -1,53 +1,98 @@
 {
   "api_metrics": {
-    "api_requests": 8,
-    "known_revision_skips": 2,
+    "api_requests": 9,
+    "known_revision_skips": 1,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 1,
+  "candidate_count": 2,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
-      "description": "A modular framework for Roblox: boot order, guarded networking, state replication, and player data. Every module works on its own.",
-      "discovery_query": "Roblox networking replication framework Luau",
-      "exact_revision": "6e37fc8e2a21e27581fbe7c83ff86a5a29a26235",
+      "description": "Gameplay and AI systems for Roblox, written in Luau: an NPC AI suite (utility AI, HTN planning, perception, pathfinding, tactical queries), server-authoritative lag compensation, and exploit-resistant trading and pets. 16 standalone packages, 1,097 headless tests.",
+      "discovery_query": "Roblox server authoritative netcode Luau",
+      "exact_revision": "77a79f23745739590585c6114a1eb3f3b86ffd49",
       "forks": 0,
-      "primary_language": "MDX",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-11T11:32:58Z",
-      "repository": "andrian-syh/rblx-twill",
+      "primary_language": "Luau",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-10-14T01:38:03Z",
+      "repository": "pranav-bt/Systems",
       "root_code_signals": [
-        ".github"
+        "tests"
       ],
-      "size_kb": 805,
-      "stars": 2,
+      "size_kb": 658,
+      "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
-        "framework",
+        "anti-cheat",
+        "game-ai",
         "game-development",
+        "htn-planner",
+        "lag-compensation",
         "luau",
+        "lune",
+        "multiplayer",
+        "netcode",
+        "npc-ai",
+        "pathfinding",
         "roblox",
-        "roblox-development",
-        "roblox-studio"
+        "utility-ai"
       ],
       "triage_components": {
         "activity": 15,
         "description": 4,
         "forks": 0,
-        "license_metadata": 5,
+        "license_metadata": 1,
         "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 2,
+        "root_code_signals": 4,
+        "stars": 0,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 42,
-      "url": "https://github.com/andrian-syh/rblx-twill"
+      "triage_score": 38,
+      "url": "https://github.com/pranav-bt/Systems"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "server-authoritative visibility replication for roblox shooters. clients only receive positions they can actually see, so wallhacks have nothing to read.",
+      "discovery_query": "Roblox server authoritative netcode Luau",
+      "exact_revision": "58ace7ef35c2d72a66dd774aa81611f580d851f4",
+      "forks": 0,
+      "primary_language": "Luau",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-07-16T14:00:15Z",
+      "repository": "debugasync/FogWar",
+      "root_code_signals": [
+        "src"
+      ],
+      "size_kb": 15,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "anti-cheat",
+        "fog-of-war",
+        "luau",
+        "netcode",
+        "roblox"
+      ],
+      "triage_components": {
+        "activity": 12,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 3,
+        "stars": 0,
+        "substantive_size": 2,
+        "topics": 5
+      },
+      "triage_score": 36,
+      "url": "https://github.com/debugasync/FogWar"
     }
   ],
   "catalogs": [
@@ -56,7 +101,7 @@
     31,
     42
   ],
-  "generated_at": "2026-10-21T18:49:50.803279+00:00",
+  "generated_at": "2026-10-25T07:45:47.372463+00:00",
   "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
   "risk_review": [
     {
