@@ -522,8 +522,8 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         """Source typo, loss/damage, administrative report and late settlement fail closed."""
         item = json.loads((FIXTURE.parent / "gao_b190624_settlement_provenance_candidate_v0.json").read_text())
         controls = item["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 6)
-        self.assertEqual(len({x["id"] for x in controls}), 6)
+        self.assertEqual(len(controls), 7)
+        self.assertEqual(len({x["id"] for x in controls}), 7)
         self.assertTrue(all(x["kind"] == "SYNTHETIC" and x["id"].startswith("SYNTHETIC_")
                             for x in controls))
         self.assertEqual({x["expected"] for x in controls}, {
@@ -533,6 +533,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             "REJECT_TENDER_SCOPE_COLLISION",
             "REJECT_SILENT_SOURCE_CORRECTION",
             "REJECT_MODERN_CUSTOMER_CASH_CLAIM",
+            "REJECT_SOURCE_TOTAL_REWRITE",
         })
         def verify(row):
             first, second = row["historical_cases"]
@@ -568,6 +569,30 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     verify(forged)
         self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
+
+    def test_b190624_two_distinct_one_cent_disagreements_are_not_silently_fixed(self):
+        """Original PDF p1 reports $3,902.24; p2 two claims sum to $3,902.25."""
+        item = json.loads((FIXTURE.parent /
+                           "gao_b190624_settlement_provenance_candidate_v0.json").read_text())
+        total = item["claim_total_crosscheck"]
+        self.assertEqual(total["source_pages"], {"printed_total": 1, "component_claims": 2})
+        self.assertEqual(total["gao_printed_total_disallowed_claims_cents"], 390224)
+        self.assertEqual(total["sum_of_two_gao_reported_carrier_claims_cents"], 390225)
+        component_sum = sum(c["carrier_followup_claim_cents"] for c in item["historical_cases"])
+        self.assertEqual(component_sum, total["sum_of_two_gao_reported_carrier_claims_cents"])
+        self.assertEqual(total["difference_cents"],
+                         component_sum - total["gao_printed_total_disallowed_claims_cents"])
+        self.assertEqual(total["difference_cents"], 1)
+        self.assertEqual(item["quality"]["distinct_one_cent_publisher_disagreement_count"], 2)
+        self.assertTrue(total["requires_independent_reconciliation"])
+        self.assertFalse(total["customer_cash_proved"])
+        self.assertFalse(item["truth_boundaries"]["modern_customer_error_precision_recall_allowed"])
+
+        forged = json.loads(json.dumps(item))
+        forged["claim_total_crosscheck"]["gao_printed_total_disallowed_claims_cents"] = 390225
+        self.assertNotEqual(forged["claim_total_crosscheck"]["gao_printed_total_disallowed_claims_cents"],
+                            390224)
+        self.assertNotEqual(digest(forged), digest(item))
 
 if __name__ == "__main__":
     unittest.main()

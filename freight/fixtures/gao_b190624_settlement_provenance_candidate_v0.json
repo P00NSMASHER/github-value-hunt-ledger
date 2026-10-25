@@ -116,6 +116,11 @@
       "id": "SYNTHETIC_HISTORICAL_DEDUCTION_TREATED_AS_RETALLY_CASH",
       "kind": "SYNTHETIC",
       "expected": "REJECT_MODERN_CUSTOMER_CASH_CLAIM"
+    },
+    {
+      "id": "SYNTHETIC_SILENTLY_REPAIR_PUBLISHER_TOTAL_CLAIMS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SOURCE_TOTAL_REWRITE"
     }
   ],
   "quality": {
@@ -124,6 +129,18 @@
     "underlying_case_primary_documents_held": false,
     "explicit_reported_arithmetic_discrepancy_cents": 1,
     "original_customer_data_collected": false,
-    "independent_customer_accuracy_labels": 0
+    "independent_customer_accuracy_labels": 0,
+    "distinct_one_cent_publisher_disagreement_count": 2
+  },
+  "claim_total_crosscheck": {
+    "gao_printed_total_disallowed_claims_cents": 390224,
+    "sum_of_two_gao_reported_carrier_claims_cents": 390225,
+    "difference_cents": 1,
+    "source_pages": {
+      "printed_total": 1,
+      "component_claims": 2
+    },
+    "requires_independent_reconciliation": true,
+    "customer_cash_proved": false
   }
 }
