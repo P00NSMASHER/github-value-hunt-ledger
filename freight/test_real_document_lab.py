@@ -16,6 +16,7 @@ from freight.real_document_lab import (
     arcbest_printed_rate_bol_reference_census,
     arcbest_embedded_vpq_quote_reconciliation,
     arcbest_embedded_truckload_bol_reconciliation,
+    us_invoice_face_date_locale_audit,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -129,6 +130,53 @@ class LaboratoryTests(unittest.TestCase):
         malformed = arc.replace("05/01/2024", "13/05/2024")
         with self.assertRaisesRegex(ValueError, "unparseable source date"):
             _arcbest_page(malformed, 61)
+
+    def test_us_original_date_locale_audit_counts_legacy_misparse_without_cash(self):
+        gt = (
+            "Invoice Date Pick-Up Date Invoice No\n"
+            "05/01/2025 04/03/2025 30794056\n"
+            "Total: 200.00 341.08 USD\n"
+        )
+        arc = (
+            "ORIGINAL INVOICE\nService: Truckload\n"
+            "Freight bill No: 436380706\nShipment Date: 05/01/2024\n"
+            "AMOUNT DUE: $2,950.00\n"
+        )
+        g_face = _global_page(gt, 4)
+        a_face = _arcbest_page(arc, 61)
+        self.assertIsNotNone(g_face)
+        self.assertIsNotNone(a_face)
+        g = us_invoice_face_date_locale_audit(
+            "globaltranz", [g_face], ["", "", "", gt],
+            FROZEN_DOCUMENT_SHA256["globaltranz"])
+        a = us_invoice_face_date_locale_audit(
+            "arcbest", [a_face], [""] * 60 + [arc],
+            FROZEN_DOCUMENT_SHA256["arcbest"])
+        self.assertEqual(g["date_fields_rebound_to_us_source"], 2)
+        self.assertEqual(g["date_fields_legacy_uk_first_misparsed"], 2)
+        self.assertEqual(g["invoice_faces_affected_by_legacy_uk_first_parser"], 1)
+        self.assertEqual(a["date_fields_rebound_to_us_source"], 1)
+        self.assertEqual(a["date_fields_legacy_uk_first_misparsed"], 1)
+        self.assertEqual(a["invoice_faces_affected_by_legacy_uk_first_parser"], 1)
+        self.assertTrue(g["us_month_day_year_source_semantics_enforced"])
+        self.assertFalse(g["independent_delivery_or_payment_proof_created"])
+        self.assertEqual(a["customer_overcharge_labels"], 0)
+        self.assertEqual(a["verified_retally_cash_recovered_cents"], 0)
+        self.assertEqual(g, us_invoice_face_date_locale_audit(
+            "globaltranz", [g_face], ["", "", "", gt],
+            FROZEN_DOCUMENT_SHA256["globaltranz"]))
+        import json
+        self.assertNotIn("30794056", json.dumps(g))
+        self.assertNotIn("436380706", json.dumps(a))
+        with self.assertRaisesRegex(ValueError, "ORIGINAL_PDF_HASH_MISMATCH"):
+            us_invoice_face_date_locale_audit(
+                "arcbest", [a_face], [""] * 60 + [arc], "0" * 64)
+        invalid = InvoiceFace("arcbest", a_face.number, a_face.page, a_face.cents,
+                              None, "2024-01-05", "TL")
+        with self.assertRaisesRegex(ValueError, "NORMALIZED_FACE_DRIFT"):
+            us_invoice_face_date_locale_audit(
+                "arcbest", [invalid], [""] * 60 + [arc],
+                FROZEN_DOCUMENT_SHA256["arcbest"])
 
     def test_arcbest_printed_tariff_and_bol_are_hints_not_rate_proof(self):
         # All page text below is synthetic; source PDF original isn't embedded.
