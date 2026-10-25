@@ -228,7 +228,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertEqual(truth["retally_verified_cash_recovery_cents"], 0)
         controls = item["synthetic_negative_controls"]
         self.assertEqual(len(controls), 5)
-        self.assertEqual(len({c["id"] for c in controls}), 4)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" and
                             c["id"].startswith("SYNTHETIC_") for c in controls))
         self.assertEqual({c["expected"] for c in controls}, {
