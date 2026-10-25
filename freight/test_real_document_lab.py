@@ -420,6 +420,14 @@ class LaboratoryTests(unittest.TestCase):
         self.assertEqual(correct["source_invoice_printed_weight_matches_on_bol_copies"], 1)
         self.assertEqual(correct["pickup_extraction_state_counts"],
                          {"PICKUP_DATE_MATCHES_INVOICE": 1})
+        sorted_same = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, bol], sha, layout_texts=[invoice, bol])
+        self.assertTrue(sorted_same["layout_reading_order_used_on_same_frozen_pdf"])
+        self.assertEqual(sorted_same["layout_pickup_observation_state_counts"],
+                         {"LAYOUT_READING_PICKUP_DATE_UNAMBIGUOUS": 1})
+        self.assertEqual(sorted_same["layout_reading_pickup_dates_matching_invoice"], 1)
+        self.assertEqual(sorted_same[
+            "layout_reading_pickup_date_disagreements_with_primary"], 0)
         for edited, expected in (
             (bol.replace("6001438260", "6001488729"),
              "BOL_LOAD_REFERENCE_NOT_ON_INVOICE"),
@@ -436,6 +444,37 @@ class LaboratoryTests(unittest.TestCase):
                     self.assertEqual(result["pickup_extraction_state_counts"], {
                         "EXPLICIT_PICKUP_DATE_DIFFERS_FROM_INVOICE": 1})
                 self.assertEqual(result["independently_adjudicated_customer_overcharges"], 0)
+        # The *same frozen source* read in a different text order can
+        # disambiguate a mistakenly attributed delivery date. It is never
+        # external evidence, a new signed BOL, or verified recovery.
+        unsorted_misread = bol.replace(
+            "Date: 5/1/2024 - 5/1/2024",
+            "Date: 5/3/2024 - 5/3/2024")
+        crosscheck = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, unsorted_misread], sha,
+            layout_texts=[invoice, bol])
+        self.assertEqual(
+            crosscheck["source_invoice_pickup_date_matches_on_bol_copies"], 0)
+        self.assertEqual(
+            crosscheck["layout_reading_pickup_dates_matching_invoice"], 1)
+        self.assertEqual(
+            crosscheck["layout_reading_pickup_date_disagreements_with_primary"], 1)
+        self.assertEqual(
+            crosscheck["pickup_date_relative_day_buckets"], {"LATER_MULTIDAY": 1})
+        self.assertFalse(crosscheck["commercial_reuse_authorized"])
+        self.assertEqual(crosscheck["bank_cleared_payment_verified"], 0)
+
+        with self.assertRaisesRegex(ValueError, "LAYOUT_SOURCE_PAGES_INVALID"):
+            arcbest_embedded_truckload_bol_reconciliation(
+                [face], [invoice, bol], sha, layout_texts=[bol])
+        wrong_layout = bol.replace("ArcBest Pronumber: 123456789",
+                                   "ArcBest Pronumber: 000000000")
+        rejected = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, bol], sha, layout_texts=[invoice, wrong_layout])
+        self.assertEqual(rejected["layout_pickup_observation_state_counts"],
+                         {"LAYOUT_READING_SOURCE_IDENTITY_UNBOUND": 1})
+        self.assertEqual(rejected["layout_reading_pickup_dates_matching_invoice"], 0)
+
         # The initial carrier BOL "Date" is the document date, not the
         # stop-1 pickup date. A date created a day before loading is allowed.
         header = bol.replace("Motor Carrier Bill of Lading\n",
