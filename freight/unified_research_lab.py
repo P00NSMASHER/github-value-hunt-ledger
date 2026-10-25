@@ -62,6 +62,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-143458",  # GAO 1961 $305.90 / $150.60 / $155.30; full capacity not enough absent tariff scope.
         "https://www.gao.gov/products/b-145308",  # GAO 1961 actual $282.83 deduction; $496.50 further refund REQUESTED not paid.
         "https://www.gao.gov/products/b-148981",  # GAO 1962 reported actual refunds; prospective $391.74 credit is NOT paid.
+        "https://www.gao.gov/assets/b-190624.pdf",  # GAO 1978 two original decision-reported deductions; one-cent printed mismatch; not customer truth.
         # New source-bound reported numeric cases; original invoices not held.
         "https://www.gao.gov/products/b-191257",  # 1978 Yellow Freight $828 / $796 / $32.
         "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.

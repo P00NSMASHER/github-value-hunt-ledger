@@ -1,0 +1,129 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_B190624_TWO_SHIPMENT_DEDUCTION_PROVENANCE_CANDIDATE_V0",
+  "admission_state": "GAO_ORIGINAL_DECISION_VISUALLY_REVIEWED_NOT_INDEPENDENT_INVOICE_HOLDOUT",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "cohort": "US_GAO_MOTOR_FREIGHT_TWO_SHIPMENTS_1972_DECISION_1978",
+  "source": {
+    "publisher": "United States Government Accountability Office",
+    "official_pdf_url": "https://www.gao.gov/assets/b-190624.pdf",
+    "decision_id": "B-190624",
+    "decision_date": "1978-08-29",
+    "reviewed_date": "2026-10-25",
+    "official_pdf_pages": 5,
+    "visually_checked_original_pdf_pages": [
+      1,
+      2,
+      5
+    ],
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_GOVERNMENT_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_SEPARATE_THIRD_PARTY_RIGHTS",
+    "source_kind": "OFFICIAL_GAO_PDF_VISUAL_AND_TEXT_READ",
+    "original_publisher_pdf_bytes_retained": false,
+    "original_publisher_pdf_sha256": null,
+    "original_invoice_gbl_or_tender_bytes_held": false,
+    "customer_engine_commercial_reuse_approved": false,
+    "governing_tariff_effective_authority_verified": false
+  },
+  "historical_cases": [
+    {
+      "case_id": "H-1876085",
+      "shipment_date": "1972-08-17",
+      "cargo": "ELECTRICAL_EQUIPMENT",
+      "miles": 3081,
+      "delivery_date": "1972-08-25",
+      "gao_reported_carrier_paid_cents": 315390,
+      "gao_reported_payment_date": "1972-10-19",
+      "gao_reported_notice_overcharge_cents": 124264,
+      "gao_reports_deduction_collected": true,
+      "gao_reported_deduction_dates": [
+        "1974-11-08",
+        "1975-06-09"
+      ],
+      "independent_payment_provider_receipt": false,
+      "carrier_followup_claim_cents": 143375,
+      "carrier_claim_date": "1977-06-24",
+      "printed_excess_over_deduction_cents": 19110,
+      "arithmetic_excess_over_deduction_cents": 19111,
+      "one_cent_original_decision_numeric_disagreement": true,
+      "commissioned_final_settlement_amount_cents": null
+    },
+    {
+      "case_id": "F-8824363",
+      "shipment_date": "1972-06-29",
+      "cargo": "ACCOUNTING_CARD_MACHINES_AND_PARTS",
+      "miles": 3069,
+      "gao_reported_original_carrier_billed_cents": 715185,
+      "gao_reported_loss_and_damage_deduction_cents": 406140,
+      "gao_reported_net_carrier_paid_cents": 309045,
+      "gao_reported_payment_date": "1972-09-06",
+      "gao_reported_overcharge_deduction_cents_in_admin_report": 246850,
+      "overcharge_deduction_source_documents_held": false,
+      "overcharge_deduction_date": null,
+      "overcharge_deduction_independently_verified": false,
+      "carrier_followup_claim_cents": 246850,
+      "carrier_claim_date": "1977-06-24",
+      "commissioned_final_settlement_amount_cents": null
+    }
+  ],
+  "decision_scope": {
+    "carrier_tender": "ICC TENDER 150",
+    "other_referenced_tender": "GOVERNMENT RATE TENDER 1-W",
+    "tariff_rule_over_3000_miles": "NO_AUTOMATIC_IMPORT_OF_OTHER_TENDER_LINEHAUL_EXCESS_DISTANCE_RATE",
+    "gao_says_gsa_must_confirm_second_deduction_date": true,
+    "gao_directs_settlement_subject_to_authorized_deduction_and_three_year_limit": true,
+    "actual_gsa_later_settlement_receipt_held": false,
+    "modern_freight_rate_applicability": "UNKNOWN"
+  },
+  "truth_boundaries": {
+    "gao_reported_historical_deduction_not_independent_bank_clearing": true,
+    "administrative_report_not_primary_deduction_receipt": true,
+    "loss_damage_deduction_not_overcharge": true,
+    "observed_historical_overcharge_notice_not_customer_accurate_overcharge_label": true,
+    "unresolved_one_cent_published_arithmetic": true,
+    "original_bill_and_tariff_custody": false,
+    "independent_heldout_customer_freight_labels": 0,
+    "modern_customer_error_precision_recall_allowed": false,
+    "retally_verified_recovered_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_LOSS_DAMAGE_DEDUCTION_CALLED_FREIGHT_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MISMATCHED_DEDUCTION_CAUSE"
+    },
+    {
+      "id": "SYNTHETIC_ADMIN_REPORT_CALLED_INDEPENDENT_SETTLEMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SECOND_SHIPMENT_UNDATED_UNVERIFIED_COLLECTION"
+    },
+    {
+      "id": "SYNTHETIC_CARRIER_REQUEST_AUTOMATICALLY_PAID",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNKNOWN_POST_DECISION_SETTLEMENT"
+    },
+    {
+      "id": "SYNTHETIC_OVER_3000_RULE_IMPORTED_FROM_UNRELATED_TENDER",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_TENDER_SCOPE_COLLISION"
+    },
+    {
+      "id": "SYNTHETIC_REWRITE_PUBLISHED_19110_CENTS_TO_MATCH_ARITHMETIC",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SILENT_SOURCE_CORRECTION"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_DEDUCTION_TREATED_AS_RETALLY_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MODERN_CUSTOMER_CASH_CLAIM"
+    }
+  ],
+  "quality": {
+    "original_public_pdf_visually_reviewed": true,
+    "publisher_pdf_byte_hash_known": false,
+    "underlying_case_primary_documents_held": false,
+    "explicit_reported_arithmetic_discrepancy_cents": 1,
+    "original_customer_data_collected": false,
+    "independent_customer_accuracy_labels": 0
+  }
+}

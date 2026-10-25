@@ -473,5 +473,101 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
 
 
+
+    def test_b190624_original_gao_pdf_two_cases_and_reported_deduction_limits(self):
+        """Pin historically reported first deduction; never turn claims into cash truth."""
+        item = json.loads((FIXTURE.parent / "gao_b190624_settlement_provenance_candidate_v0.json").read_text())
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["admission_state"],
+                         "GAO_ORIGINAL_DECISION_VISUALLY_REVIEWED_NOT_INDEPENDENT_INVOICE_HOLDOUT")
+        self.assertEqual(item["source"]["official_pdf_url"],
+                         "https://www.gao.gov/assets/b-190624.pdf")
+        self.assertIn(item["source"]["official_pdf_url"], SEEDS["freightrecovery"])
+        self.assertEqual(item["source"]["decision_date"], "1978-08-29")
+        self.assertEqual(item["source"]["official_pdf_pages"], 5)
+        self.assertEqual(item["source"]["visually_checked_original_pdf_pages"], [1, 2, 5])
+        self.assertIsNone(item["source"]["original_publisher_pdf_sha256"])
+        self.assertFalse(item["source"]["original_publisher_pdf_bytes_retained"])
+        self.assertFalse(item["source"]["customer_engine_commercial_reuse_approved"])
+        self.assertEqual(len(item["historical_cases"]), 2)
+        first, second = item["historical_cases"]
+        self.assertEqual(first["case_id"], "H-1876085")
+        self.assertEqual(first["gao_reported_carrier_paid_cents"], 315390)
+        self.assertEqual(first["gao_reported_notice_overcharge_cents"], 124264)
+        self.assertTrue(first["gao_reports_deduction_collected"])
+        self.assertEqual(first["gao_reported_deduction_dates"], ["1974-11-08", "1975-06-09"])
+        self.assertFalse(first["independent_payment_provider_receipt"])
+        self.assertEqual(first["carrier_followup_claim_cents"], 143375)
+        self.assertEqual(first["printed_excess_over_deduction_cents"], 19110)
+        self.assertEqual(first["arithmetic_excess_over_deduction_cents"], 19111)
+        self.assertEqual(first["carrier_followup_claim_cents"] -
+                         first["gao_reported_notice_overcharge_cents"], 19111)
+        self.assertTrue(first["one_cent_original_decision_numeric_disagreement"])
+        self.assertIsNone(first["commissioned_final_settlement_amount_cents"])
+        self.assertEqual(second["case_id"], "F-8824363")
+        self.assertEqual(second["gao_reported_original_carrier_billed_cents"], 715185)
+        self.assertEqual(second["gao_reported_loss_and_damage_deduction_cents"], 406140)
+        self.assertEqual(second["gao_reported_net_carrier_paid_cents"], 309045)
+        self.assertEqual(715185 - 406140, 309045)
+        self.assertEqual(second["gao_reported_overcharge_deduction_cents_in_admin_report"], 246850)
+        self.assertIsNone(second["overcharge_deduction_date"])
+        self.assertFalse(second["overcharge_deduction_independently_verified"])
+        self.assertFalse(second["overcharge_deduction_source_documents_held"])
+        self.assertIsNone(second["commissioned_final_settlement_amount_cents"])
+        self.assertTrue(item["decision_scope"]["gao_directs_settlement_subject_to_authorized_deduction_and_three_year_limit"])
+        self.assertFalse(item["truth_boundaries"]["modern_customer_error_precision_recall_allowed"])
+        self.assertEqual(item["truth_boundaries"]["retally_verified_recovered_cash_cents"], 0)
+
+    def test_b190624_misclassification_one_cent_and_cash_negative_controls(self):
+        """Source typo, loss/damage, administrative report and late settlement fail closed."""
+        item = json.loads((FIXTURE.parent / "gao_b190624_settlement_provenance_candidate_v0.json").read_text())
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({x["id"] for x in controls}), 6)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" and x["id"].startswith("SYNTHETIC_")
+                            for x in controls))
+        self.assertEqual({x["expected"] for x in controls}, {
+            "REJECT_MISMATCHED_DEDUCTION_CAUSE",
+            "REJECT_SECOND_SHIPMENT_UNDATED_UNVERIFIED_COLLECTION",
+            "REJECT_UNKNOWN_POST_DECISION_SETTLEMENT",
+            "REJECT_TENDER_SCOPE_COLLISION",
+            "REJECT_SILENT_SOURCE_CORRECTION",
+            "REJECT_MODERN_CUSTOMER_CASH_CLAIM",
+        })
+        def verify(row):
+            first, second = row["historical_cases"]
+            self.assertEqual(first["gao_reported_notice_overcharge_cents"], 124264)
+            self.assertEqual(first["printed_excess_over_deduction_cents"], 19110)
+            self.assertEqual(first["arithmetic_excess_over_deduction_cents"], 19111)
+            self.assertTrue(first["one_cent_original_decision_numeric_disagreement"])
+            self.assertFalse(first["independent_payment_provider_receipt"])
+            self.assertIsNone(second["overcharge_deduction_date"])
+            self.assertFalse(second["overcharge_deduction_independently_verified"])
+            self.assertEqual(second["gao_reported_loss_and_damage_deduction_cents"], 406140)
+            self.assertIsNone(first["commissioned_final_settlement_amount_cents"])
+            self.assertIsNone(second["commissioned_final_settlement_amount_cents"])
+            self.assertIsNone(row["source"]["original_publisher_pdf_sha256"])
+            self.assertFalse(row["source"]["customer_engine_commercial_reuse_approved"])
+            self.assertEqual(row["truth_boundaries"]["retally_verified_recovered_cash_cents"], 0)
+        verify(item)
+        for key, field, bad in (
+            ("historical_cases.0", "printed_excess_over_deduction_cents", 19111),
+            ("historical_cases.0", "independent_payment_provider_receipt", True),
+            ("historical_cases.1", "overcharge_deduction_date", "1975-01-01"),
+            ("historical_cases.1", "overcharge_deduction_independently_verified", True),
+            ("historical_cases.1", "gao_reported_loss_and_damage_deduction_cents", 0),
+            ("source", "customer_engine_commercial_reuse_approved", True),
+            ("truth_boundaries", "retally_verified_recovered_cash_cents", 124264),
+        ):
+            with self.subTest(field=field):
+                forged = copy.deepcopy(item)
+                obj = forged
+                for part in key.split("."):
+                    obj = obj[int(part)] if part.isdigit() else obj[part]
+                obj[field] = bad
+                with self.assertRaises(AssertionError):
+                    verify(forged)
+        self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
+
 if __name__ == "__main__":
     unittest.main()
