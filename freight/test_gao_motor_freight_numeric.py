@@ -390,5 +390,88 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
 
 
 
+    def test_b148981_three_reported_historical_refunds_and_credit_are_not_modern_labels(self):
+        """Official decision's refunded amounts differ from unverified future credits."""
+        item = json.loads((FIXTURE.parent / "gao_b148981_refunded_adjustment_candidate_v0.json").read_text())
+        source = item["source"]
+        self.assertEqual(item["admission_state"],
+                         "OFFICIAL_DECISION_ONLY_NOT_INDEPENDENT_INVOICE_HOLDOUT")
+        self.assertEqual(item["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY")
+        self.assertEqual(source["official_url"], "https://www.gao.gov/products/b-148981")
+        self.assertIn(source["official_url"], SEEDS["freightrecovery"])
+        self.assertEqual(source["decision_date"], "1962-11-29")
+        self.assertEqual(source["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertIsNone(source["original_publisher_http_sha256"])
+        self.assertFalse(source["original_publisher_http_bytes_acquired"])
+        self.assertFalse(source["customer_engine_commercial_reuse_approved"])
+        cases = item["historical_case_groups"]
+        self.assertEqual([x["supplemental_bill"] for x in cases], ["5188", "5193", "5190"])
+        self.assertEqual([x["gao_reported_refund_cents"] for x in cases],
+                         [13444, 4602, 166154])
+        self.assertEqual([x["carrier_amended_supplemental_claim_cents"] for x in cases],
+                         [50944, 6429, 122405])
+        self.assertTrue(all(x["gao_says_refund_occurred"] for x in cases))
+        self.assertTrue(all(len(x["original_paid_by_bol_cents"]) == x["reported_bol_count"]
+                            for x in cases))
+        self.assertEqual(sum(x["gao_reported_refund_cents"] for x in cases), 184200)
+        self.assertEqual(item["reported_historical_refunds_total_cents"], 184200)
+        self.assertTrue(cases[1]["cross_referenced_volume_shipment_rate_group"])
+        self.assertTrue(cases[2]["credit_decision_is_future_direction_not_verified_posting"])
+        self.assertEqual(cases[2]["future_carrier_credit_allowed_cents"], 39174)
+        self.assertTrue(all(x["future_carrier_credit_paid_cents"] is None for x in cases))
+        truth = item["truth_boundaries"]
+        self.assertTrue(truth["historical_refunds_reported_by_gao_not_independently_bank_cleared"])
+        self.assertFalse(truth["independent_payment_provider_verification"])
+        self.assertFalse(truth["freight_error_precision_recall_scoring_allowed"])
+        self.assertEqual(truth["independently_held_out_customer_labels"], 0)
+        self.assertEqual(truth["contemporary_rate_applicability"], "UNKNOWN")
+        self.assertEqual(truth["retally_verified_customer_cash_cents"], 0)
+
+    def test_b148981_synthetic_refund_credit_and_volume_forgery_are_rejected(self):
+        """Adversarial edits cannot convert decision-only data into settlement truth."""
+        item = json.loads((FIXTURE.parent / "gao_b148981_refunded_adjustment_candidate_v0.json").read_text())
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({row["id"] for row in controls}), 6)
+        self.assertTrue(all(row["kind"] == "SYNTHETIC" and
+                            row["id"].startswith("SYNTHETIC_") for row in controls))
+        self.assertEqual({row["expected"] for row in controls}, {
+            "REJECT_INDEPENDENT_CASH_EVIDENCE_ABSENT",
+            "REJECT_CREDIT_POSTING_NOT_VERIFIED",
+            "REJECT_VOLUME_SHIPMENT_GROUPING_ERROR",
+            "REJECT_OPPOSING_PARTY_CLAIM_SEMANTICS",
+            "REJECT_HISTORICAL_RATE_APPLICABILITY",
+            "REJECT_CUSTOMER_AND_SETTLEMENT_PROVENANCE",
+        })
+        pinned = (
+            ("historical_case_groups", 0, "gao_reported_refund_cents", 13444),
+            ("historical_case_groups", 1, "gao_reported_refund_cents", 4602),
+            ("historical_case_groups", 2, "gao_reported_refund_cents", 166154),
+            ("historical_case_groups", 2, "future_carrier_credit_paid_cents", None),
+            ("source", None, "original_publisher_http_sha256", None),
+            ("source", None, "customer_engine_commercial_reuse_approved", False),
+            ("truth_boundaries", None, "freight_error_precision_recall_scoring_allowed", False),
+            ("truth_boundaries", None, "retally_verified_customer_cash_cents", 0),
+        )
+        def verify(row):
+            for key, index, field, value in pinned:
+                target = row[key] if index is None else row[key][index]
+                self.assertEqual(target[field], value)
+            self.assertEqual(sum(c["gao_reported_refund_cents"]
+                                 for c in row["historical_case_groups"]),
+                             row["reported_historical_refunds_total_cents"])
+        verify(item)
+        for key, index, field, value in pinned:
+            with self.subTest(field=field):
+                changed = copy.deepcopy(item)
+                target = changed[key] if index is None else changed[key][index]
+                target[field] = (True if value is False else
+                                 1 if value is None or value == 0 else value + 1)
+                with self.assertRaises(AssertionError):
+                    verify(changed)
+        self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
+
+
 if __name__ == "__main__":
     unittest.main()

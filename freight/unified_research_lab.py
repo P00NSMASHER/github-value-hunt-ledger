@@ -61,6 +61,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
         "https://www.gao.gov/products/b-143458",  # GAO 1961 $305.90 / $150.60 / $155.30; full capacity not enough absent tariff scope.
         "https://www.gao.gov/products/b-145308",  # GAO 1961 actual $282.83 deduction; $496.50 further refund REQUESTED not paid.
+        "https://www.gao.gov/products/b-148981",  # GAO 1962 reported actual refunds; prospective $391.74 credit is NOT paid.
         # New source-bound reported numeric cases; original invoices not held.
         "https://www.gao.gov/products/b-191257",  # 1978 Yellow Freight $828 / $796 / $32.
         "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.
