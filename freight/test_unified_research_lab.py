@@ -475,13 +475,17 @@ class UnifiedResearchLabTests(unittest.TestCase):
         # Official NYC DOB original source, not the DOHMH restaurant-inspection seed.
         official = "https://data.cityofnewyork.us/d/rbx6-tga4"
         applications = "https://data.cityofnewyork.us/d/w9ak-ipjd"
-        self.assertEqual(set(SEEDS["permitplate"]), {official, applications, "https://data.cityofnewyork.us/d/dm9a-ab7w", "https://data.cityofnewyork.us/d/kfp4-dz4h", "https://data.cityofnewyork.us/d/xxbr-ypig"})
+        bis_issued = "https://data.cityofnewyork.us/d/ipu4-2q9a"
+        self.assertEqual(set(SEEDS["permitplate"]), {official, applications, bis_issued, "https://data.cityofnewyork.us/d/dm9a-ab7w", "https://data.cityofnewyork.us/d/kfp4-dz4h", "https://data.cityofnewyork.us/d/xxbr-ypig"})
         self.assertNotIn("https://data.cityofnewyork.us/d/43nn-pn8j", SEEDS["permitplate"])
         with tempfile.TemporaryDirectory() as root:
             ledger = Path(root) / "permit_sources.json"
             receipt = run(engine="permitplate", live=False, ledger=ledger, now=NOW)
             rows = read_ledger(ledger)["entries"]
-            self.assertEqual(receipt["new_leads"], 5)
+            self.assertEqual(receipt["new_leads"], 6)
+            repeat = run(engine="permitplate", live=False, ledger=ledger,
+                         now=NOW + timedelta(hours=1))
+            self.assertEqual(repeat["new_leads"], 0)
             self.assertEqual({r["url"] for r in rows}, set(SEEDS["permitplate"]))
             self.assertEqual(receipt["approved_real_truth_cases"], 0)
             self.assertTrue(all(not r["commercial_reuse_authorized"]
@@ -500,6 +504,15 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertFalse(source["commercial_reuse_authorized"])
         self.assertFalse(source["independent_outcome_adjudicated"])
         self.assertIsNone(source["original_source_bytes_sha256"])
+        bis_source = next(x for x in pack["official_sources"]
+                          if x["dataset_id"] == "ipu4-2q9a")
+        self.assertEqual(bis_source["official_url"], bis_issued)
+        self.assertEqual(bis_source["coverage"], "BIS_ONLY_NOT_DOB_NOW")
+        self.assertFalse(bis_source["commercial_reuse_authorized"])
+        self.assertFalse(bis_source["independent_outcome_adjudicated"])
+        self.assertIsNone(bis_source["original_source_bytes_sha256"])
+        self.assertIn("bis_coverage_is_not_all_dob",
+                      {c["id"] for c in pack["synthetic_negative_controls"]})
         # Existing approved excluded-scope v1 pack remains the canonical
         # evaluation pointer; this seed linkage does not create a second pack.
         excluded = json.loads((Path(__file__).with_name("fixtures") /
@@ -509,7 +522,7 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertEqual(excluded["cross_dataset_join"], "UNVERIFIED")
         self.assertEqual(excluded["commercial_use"], "UNVERIFIED_NOT_APPROVED")
         self.assertEqual({s["official_url"] for s in excluded["companion_source_candidates"]},
-                         set(SEEDS["permitplate"]) - {official, applications})
+                         set(SEEDS["permitplate"]) - {official, applications, bis_issued})
         self.assertEqual(len(pack["synthetic_negative_controls"]), 4)
         self.assertTrue(all(c["provenance_class"].startswith("SYNTHETIC")
                             and c["real_world_accuracy_label"] is None
