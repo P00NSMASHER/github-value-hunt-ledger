@@ -249,11 +249,8 @@ def iso_date(raw: str, *, formats: tuple[str, ...] = ("%d/%m/%Y", "%Y-%m-%d", "%
     raise ValueError("unparseable source date")
 
 
-def pdf_texts(raw: bytes, *, sort: bool = False) -> list[str]:
+def pdf_texts(raw: bytes) -> list[str]:
     # PyMuPDF is only used to read original PDF text in the ephemeral runner.
-    # sort=True is ONLY a second layout-sensitive read of SAME frozen bytes.
-    if type(sort) is not bool:
-        raise ValueError("PDF_TEXT_READING_ORDER_FLAG_INVALID")
     import pymupdf
 
     if not raw.startswith(b"%PDF-"):
@@ -264,90 +261,13 @@ def pdf_texts(raw: bytes, *, sort: bool = False) -> list[str]:
             raise ValueError("document page limit exceeded")
         pages: list[str] = []
         for page in doc:
-            data = page.get_text("text", sort=sort)
+            data = page.get_text("text", sort=False)
             if len(data) > 200_000:
                 raise ValueError("excessive page text size")
             pages.append(data)
         return pages
     finally:
         doc.close()
-
-
-
-def pdf_positioned_rows(raw: bytes) -> list[list[tuple[float, str]]]:
-    """Read bounded geometric PDF text rows in memory from SAME source bytes.
-
-    Only the original isolated lab calls this: no user data, source text, y
-    coordinates or invoice IDs are persisted in its output JSON. Preserve
-    page indices to cross-check independently source-bound original invoices.
-    """
-    import pymupdf
-
-    if not isinstance(raw, bytes) or not raw.startswith(b"%PDF-"):
-        raise ValueError("PDF_POSITIONED_ROWS_EXPECTS_PDF")
-    doc = pymupdf.open(stream=raw, filetype="pdf")
-    try:
-        if len(doc) > 150:
-            raise ValueError("PDF_POSITIONED_ROWS_PAGE_LIMIT")
-        all_rows = []
-        for page in doc:
-            words = page.get_text("words", sort=False)
-            if len(words) > 20_000:
-                raise ValueError("PDF_POSITIONED_ROWS_WORD_LIMIT")
-            sorted_words = sorted(
-                ((float(word[1] + word[3]) / 2, float(word[0]),
-                  str(word[4])) for word in words if len(word) >= 5),
-                key=lambda row: (row[0], row[1]),
-            )
-            groups = []
-            for y, x, word in sorted_words:
-                if not groups or abs(y - groups[-1][0]) > 3.0:
-                    groups.append([y, [(x, word)]])
-                else:
-                    groups[-1][1].append((x, word))
-            all_rows.append([
-                (y, " ".join(word for _, word in sorted(members)))
-                for y, members in groups
-            ])
-        return all_rows
-    finally:
-        doc.close()
-
-
-def bol_stop1_pickup_from_positioned_rows(
-    rows: list[tuple[float, str]],
-) -> tuple[str | None, str]:
-    """Select an unambiguous US pickup *by visual stop section*, never amount.
-
-    The header Date, pickup Date and delivery Date are different concepts.
-    Do not choose whichever date happens to equal the original invoice.
-    """
-    if not isinstance(rows, list) or len(rows) > 2000 or any(
-            not isinstance(row, tuple) or len(row) != 2
-            or not isinstance(row[0], (int, float))
-            or not isinstance(row[1], str) or len(row[1]) > 1000
-            for row in rows):
-        raise ValueError("BOL_POSITIONED_ROWS_INVALID")
-    starts = [float(y) for y, line in rows
-              if re.search(r"\bStop\s+1\s*-\s*Pick\s*Up\b", line, re.I)]
-    ends = [float(y) for y, line in rows
-            if re.search(r"\bStop\s+2\s*-\s*Delivery\b", line, re.I)]
-    if len(starts) != 1 or len(ends) != 1 or starts[0] >= ends[0]:
-        return None, "GEOMETRIC_PICKUP_STOP_BOUNDARIES_UNRESOLVED"
-    tokens = []
-    for y, line in rows:
-        if starts[0] < float(y) < ends[0]:
-            tokens += re.findall(
-                r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b", line, re.I)
-    if not tokens:
-        return None, "GEOMETRIC_PICKUP_DATE_NOT_LOCATED"
-    try:
-        days = {iso_date(d, formats=("%m/%d/%Y",)) for d in tokens}
-    except ValueError:
-        return None, "GEOMETRIC_PICKUP_DATE_INVALID"
-    if len(days) != 1:
-        return None, "GEOMETRIC_PICKUP_DATES_CONFLICT"
-    return next(iter(days)), "GEOMETRIC_PICKUP_DATE_UNAMBIGUOUS"
 
 
 def _global_page(text: str, page: int) -> InvoiceFace | None:
@@ -364,8 +284,11 @@ def _global_page(text: str, page: int) -> InvoiceFace | None:
     # Read invoice face, not credit, statement balance or amount enclosed.
     total = re.search(r"\bTotal:\s*[\d,.]+\s+([\d,.]+)\s+USD\b", text, re.I)
     amount = minor(total.group(1)) if total else None
+    # GlobalTranz is a U.S. invoice. Never use the UK-first default here:
+    # ambiguous 05/01/2025 is May 1, NOT January 5.
     return InvoiceFace("globaltranz", number, page, amount,
-                       iso_date(match.group(1)), iso_date(match.group(2)),
+                       iso_date(match.group(1), formats=("%m/%d/%Y",)),
+                       iso_date(match.group(2), formats=("%m/%d/%Y",)),
                        None, None if total else "FACE_TOTAL_UNREADABLE")
 
 
@@ -388,7 +311,8 @@ def _arcbest_page(text: str, page: int) -> InvoiceFace | None:
                    else "LTL" if mode else None)
     return InvoiceFace("arcbest", match.group(1), page,
                        minor(amount.group(1)) if amount else None,
-                       None, iso_date(shipment.group(1)) if shipment else None,
+                       None, (iso_date(shipment.group(1), formats=("%m/%d/%Y",))
+                              if shipment else None),
                        parsed_mode, None if amount else "FACE_AMOUNT_UNREADABLE")
 
 
@@ -1096,9 +1020,7 @@ def benchmark_freight() -> dict:
                     list(unique.values()), texts, source_hash))
             out["co_bundled_motor_carrier_bol_source_replay"] = (
                 arcbest_embedded_truckload_bol_reconciliation(
-                    list(unique.values()), texts, source_hash,
-                    layout_texts=pdf_texts(raw, sort=True),
-                    positioned_rows=pdf_positioned_rows(raw)))
+                    list(unique.values()), texts, source_hash))
             out["retally_rating_engine"] = _rating_probe(faces, texts, digest(raw))
         results[issuer] = out
     return results
@@ -1108,9 +1030,7 @@ def benchmark_freight() -> dict:
 
 
 def arcbest_embedded_truckload_bol_reconciliation(
-    faces: list[InvoiceFace], texts: list[str], pdf_sha256: str, *,
-    layout_texts: list[str] | None = None,
-    positioned_rows: list[list[tuple[float, str]]] | None = None,
+    faces: list[InvoiceFace], texts: list[str], pdf_sha256: str,
 ) -> dict:
     """Link 2024 truckload invoice faces to co-bundled carrier BOL copies.
 
@@ -1126,14 +1046,6 @@ def arcbest_embedded_truckload_bol_reconciliation(
         raise ValueError("ARCBEST_BOL_SOURCE_SHA256_MISMATCH")
     if type(texts) is not list or len(texts) > 100:
         raise ValueError("ARCBEST_BOL_SOURCE_PAGE_LIMIT")
-    if layout_texts is not None and (
-            type(layout_texts) is not list or len(layout_texts) != len(texts)
-            or any(type(page) is not str or len(page) > 200_000 for page in layout_texts)):
-        raise ValueError("ARCBEST_BOL_LAYOUT_SOURCE_PAGES_INVALID")
-    if positioned_rows is not None and (
-            not isinstance(positioned_rows, list)
-            or len(positioned_rows) != len(texts)):
-        raise ValueError("ARCBEST_BOL_POSITIONED_SOURCE_PAGES_INVALID")
     if len({(f.number, f.page) for f in faces}) != len(faces):
         raise ValueError("ARCBEST_BOL_DUPLICATE_INVOICE_FACE")
 
@@ -1177,16 +1089,6 @@ def arcbest_embedded_truckload_bol_reconciliation(
     matching_invoice_loads = 0
     matching_weights = 0
     matching_pickup_dates = 0
-    pickup_extraction_states = Counter()
-    bol_header_date_states = Counter()
-    pickup_date_exception_copy_ordinals = []
-    pickup_date_relative_day_buckets = Counter()
-    layout_pickup_observation_states = Counter()
-    layout_pickup_matches_invoice = 0
-    layout_pickup_disagrees_primary = 0
-    geometric_pickup_states = Counter()
-    geometric_pickup_matches_invoice = 0
-    geometric_pickup_disagrees_primary = 0
     missing = Counter()
     by_invoice = {}
     anonymous = []
@@ -1206,9 +1108,8 @@ def arcbest_embedded_truckload_bol_reconciliation(
             anonymous.append((page_number, "NOT_BOUND_TO_ORIGINAL_INVOICE"))
             continue
         bound_pages += 1
-        # Do not create a *linked* load group until the original invoice
-        # itself proves the matching CRN load reference. A same-numbered
-        # freight bill with a wrong load is not a joined shipment.
+        # The actual load/CRN, not just the freight bill, must match to
+        # count the BOL copy as linked to this invoice.
         load_matches_invoice = load.group(1) in face_doc["load_refs"]
         if not load_matches_invoice:
             missing["BOL_LOAD_REFERENCE_NOT_ON_INVOICE"] += 1
@@ -1232,88 +1133,6 @@ def arcbest_embedded_truckload_bol_reconciliation(
                           if pickup else None)
         except ValueError:
             pickup_day = None
-        if pickup_start is None:
-            pickup_extract_state = "PICKUP_STOP_LABEL_ABSENT"
-        elif delivery_start is None:
-            pickup_extract_state = "DELIVERY_BOUNDARY_ABSENT"
-        elif pickup_start.end() >= delivery_start.start():
-            pickup_extract_state = "PICKUP_DELIVERY_ANCHORS_REVERSED"
-        elif pickup is None:
-            pickup_extract_state = "PICKUP_REGION_DATE_NOT_EXTRACTED"
-        elif pickup_day is None:
-            pickup_extract_state = "PICKUP_DATE_INVALID_US_FORMAT"
-        elif pickup_day == face_doc["face"].shipment_date:
-            pickup_extract_state = "PICKUP_DATE_MATCHES_INVOICE"
-        else:
-            pickup_extract_state = "EXPLICIT_PICKUP_DATE_DIFFERS_FROM_INVOICE"
-
-        # Document creation date is NOT the pickup date. In the real PDF
-        # May 30 headers coexist with May 31 pickup events. Track only
-        # a category, not the date, invoice, load, shipper or account.
-        header_fragment = page[:pickup_start.start()] if pickup_start else page[:350]
-        header_date_match = re.search(
-            r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b",
-            header_fragment, re.I,
-        )
-        header_day = None
-        if header_date_match is not None:
-            try:
-                header_day = iso_date(header_date_match.group(1), formats=("%m/%d/%Y",))
-            except ValueError:
-                pass
-        if header_day is None:
-            bol_header_state = "BOL_HEADER_DATE_NOT_READABLE"
-        elif pickup_day is None:
-            bol_header_state = "PICKUP_DATE_UNREADABLE_HEADER_NOT_SUBSTITUTE"
-        elif header_day == pickup_day:
-            bol_header_state = "DOCUMENT_HEADER_DATE_EQUALS_PICKUP"
-        else:
-            bol_header_state = "DOCUMENT_HEADER_DATE_DIFFERS_FROM_PICKUP"
-
-        layout_pickup_day = None
-        layout_state = None
-        if layout_texts is not None:
-            # Strict *independent reading order*, but the SAME PDF bytes.
-            # Require both original identity anchors on the same PDF page.
-            reading = layout_texts[page_number - 1]
-            if (not re.search(r"\bMotor\s+Carrier\s+Bill\s+of\s+Lading\b", reading, re.I)
-                    or not re.search(r"\bLoad\s*#\s*:\s*" +
-                                     re.escape(load.group(1)) + r"\b", reading, re.I)
-                    or not re.search(r"\bArcBest\s+Pronumber\s*:\s*" +
-                                     re.escape(pro.group(1)) + r"\b", reading, re.I)):
-                layout_state = "LAYOUT_READING_SOURCE_IDENTITY_UNBOUND"
-            else:
-                st = re.search(r"\bStop\s+1\s*-\s*Pick\s*Up\b", reading, re.I)
-                en = re.search(r"\bStop\s+2\s*-\s*Delivery\b", reading, re.I)
-                if not st or not en or st.end() >= en.start():
-                    layout_state = "LAYOUT_READING_STOP_ANCHORS_UNBOUND"
-                else:
-                    region = reading[st.end():en.start()]
-                    tokens = re.findall(
-                        r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b",
-                        region, re.I)
-                    try:
-                        dates = {
-                            iso_date(value, formats=("%m/%d/%Y",)) for value in tokens
-                        }
-                    except ValueError:
-                        dates = set()
-                    if not dates:
-                        layout_state = "LAYOUT_READING_PICKUP_DATE_NOT_READABLE"
-                    elif len(dates) > 1:
-                        layout_state = "LAYOUT_READING_CONFLICTING_PICKUP_DATES"
-                    else:
-                        layout_pickup_day = next(iter(dates))
-                        layout_state = "LAYOUT_READING_PICKUP_DATE_UNAMBIGUOUS"
-
-        geometric_pickup_day = None
-        geometric_state = None
-        if positioned_rows is not None:
-            geometric_pickup_day, geometric_state = (
-                bol_stop1_pickup_from_positioned_rows(
-                    positioned_rows[page_number - 1]))
-        if geometric_state is not None:
-            geometric_pickup_states[geometric_state] += 1
 
         summaries = re.findall(
             r"\bTotal\s+HU\s*:\s*(\d+)\s+Total\s+Pcs\s*:\s*(\d+)\s+"
@@ -1335,20 +1154,6 @@ def arcbest_embedded_truckload_bol_reconciliation(
         joined_pages += 1
         weight_match = weight == face_doc["weight"]
         date_match = pickup_day == face_doc["face"].shipment_date
-        pickup_extraction_states[pickup_extract_state] += 1
-        bol_header_date_states[bol_header_state] += 1
-        if layout_state is not None:
-            layout_pickup_observation_states[layout_state] += 1
-        if layout_pickup_day is not None:
-            layout_pickup_matches_invoice += int(
-                layout_pickup_day == face_doc["face"].shipment_date)
-            layout_pickup_disagrees_primary += int(
-                layout_pickup_day != pickup_day)
-        if geometric_pickup_day is not None:
-            geometric_pickup_matches_invoice += int(
-                geometric_pickup_day == face_doc["face"].shipment_date)
-            geometric_pickup_disagrees_primary += int(
-                geometric_pickup_day != pickup_day)
         matching_weights += int(weight_match)
         matching_pickup_dates += int(date_match)
         groups.append({
@@ -1362,21 +1167,6 @@ def arcbest_embedded_truckload_bol_reconciliation(
         if not weight_match:
             missing["BOL_INVOICE_PRINTED_WEIGHT_CONFLICT"] += 1
         if not date_match:
-            # Only the 1-based position among public BOL-first-pages and
-            # relative calendar day offset. No customer/invoice/load identity,
-            # raw source date, document content or shipment metadata exported.
-            pickup_date_exception_copy_ordinals.append(bol_pages)
-            if pickup_day is None:
-                pickup_date_relative_day_buckets["UNEXTRACTED"] += 1
-            else:
-                delta = (datetime.fromisoformat(pickup_day)
-                         - datetime.fromisoformat(face_doc["face"].shipment_date)).days
-                pickup_date_relative_day_buckets[
-                    "EARLIER_ONE_DAY" if delta == -1 else
-                    "LATER_ONE_DAY" if delta == 1 else
-                    "EARLIER_MULTIDAY" if delta < -1 else
-                    "LATER_MULTIDAY" if delta > 1 else "OTHER"
-                ] += 1
             missing["BOL_PICKUP_INVOICE_DATE_CONFLICT"] += 1
     conflict_piece_groups = 0
     conflict_weight_groups = 0
@@ -1398,20 +1188,6 @@ def arcbest_embedded_truckload_bol_reconciliation(
         "source_invoice_bol_totals_readable_pages": joined_pages,
         "source_invoice_printed_weight_matches_on_bol_copies": matching_weights,
         "source_invoice_pickup_date_matches_on_bol_copies": matching_pickup_dates,
-        "pickup_extraction_state_counts": dict(sorted(pickup_extraction_states.items())),
-        "bol_header_vs_pickup_date_state_counts": dict(sorted(bol_header_date_states.items())),
-        "pickup_date_exception_copy_ordinals": pickup_date_exception_copy_ordinals,
-        "pickup_date_relative_day_buckets": dict(sorted(pickup_date_relative_day_buckets.items())),
-        "layout_reading_order_used_on_same_frozen_pdf": layout_texts is not None,
-        "layout_pickup_observation_state_counts": dict(sorted(layout_pickup_observation_states.items())),
-        "layout_reading_pickup_dates_matching_invoice": layout_pickup_matches_invoice,
-        "layout_reading_pickup_date_disagreements_with_primary": layout_pickup_disagrees_primary,
-        "layout_reading_is_not_independent_document_custody": True,
-        "geometric_word_row_reading_used_on_same_frozen_pdf": positioned_rows is not None,
-        "geometric_pickup_observation_state_counts": dict(sorted(geometric_pickup_states.items())),
-        "geometric_pickup_dates_matching_original_invoice": geometric_pickup_matches_invoice,
-        "geometric_pickup_date_disagreements_with_flattened_text": geometric_pickup_disagrees_primary,
-        "geometric_reading_is_not_independent_document_custody": True,
         "unique_truckload_invoices_with_co_bundled_bol_copies": len(by_invoice),
         "duplicate_co_bundled_bol_copy_pages_not_new_shipments":
             sum(max(0, len(x) - 1) for x in by_invoice.values()),
