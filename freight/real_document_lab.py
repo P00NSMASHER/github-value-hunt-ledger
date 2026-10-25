@@ -1085,6 +1085,8 @@ def arcbest_embedded_truckload_bol_reconciliation(
     matching_invoice_loads = 0
     matching_weights = 0
     matching_pickup_dates = 0
+    pickup_extraction_states = Counter()
+    bol_header_date_states = Counter()
     missing = Counter()
     by_invoice = {}
     anonymous = []
@@ -1104,13 +1106,16 @@ def arcbest_embedded_truckload_bol_reconciliation(
             anonymous.append((page_number, "NOT_BOUND_TO_ORIGINAL_INVOICE"))
             continue
         bound_pages += 1
-        groups = by_invoice.setdefault(pro.group(1), [])
+        # Do not create a *linked* load group until the original invoice
+        # itself proves the matching CRN load reference. A same-numbered
+        # freight bill with a wrong load is not a joined shipment.
         load_matches_invoice = load.group(1) in face_doc["load_refs"]
         if not load_matches_invoice:
             missing["BOL_LOAD_REFERENCE_NOT_ON_INVOICE"] += 1
             anonymous.append((page_number, "BOL_LOAD_NOT_ON_INVOICE"))
             continue
         matching_invoice_loads += 1
+        groups = by_invoice.setdefault(pro.group(1), [])
         pickup_start = re.search(r"\bStop\s+1\s*-\s*Pick\s*Up\b", page, re.I)
         delivery_start = re.search(r"\bStop\s+2\s*-\s*Delivery\b", page, re.I)
         pickup_region = (page[pickup_start.end():delivery_start.start()]
@@ -1127,6 +1132,43 @@ def arcbest_embedded_truckload_bol_reconciliation(
                           if pickup else None)
         except ValueError:
             pickup_day = None
+        if pickup_start is None:
+            pickup_extract_state = "PICKUP_STOP_LABEL_ABSENT"
+        elif delivery_start is None:
+            pickup_extract_state = "DELIVERY_BOUNDARY_ABSENT"
+        elif pickup_start.end() >= delivery_start.start():
+            pickup_extract_state = "PICKUP_DELIVERY_ANCHORS_REVERSED"
+        elif pickup is None:
+            pickup_extract_state = "PICKUP_REGION_DATE_NOT_EXTRACTED"
+        elif pickup_day is None:
+            pickup_extract_state = "PICKUP_DATE_INVALID_US_FORMAT"
+        elif pickup_day == face_doc["face"].shipment_date:
+            pickup_extract_state = "PICKUP_DATE_MATCHES_INVOICE"
+        else:
+            pickup_extract_state = "EXPLICIT_PICKUP_DATE_DIFFERS_FROM_INVOICE"
+
+        # Document creation date is NOT the pickup date. In the real PDF
+        # May 30 headers coexist with May 31 pickup events. Track only
+        # a category, not the date, invoice, load, shipper or account.
+        header_fragment = page[:pickup_start.start()] if pickup_start else page[:350]
+        header_date_match = re.search(
+            r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b",
+            header_fragment, re.I,
+        )
+        header_day = None
+        if header_date_match is not None:
+            try:
+                header_day = iso_date(header_date_match.group(1), formats=("%m/%d/%Y",))
+            except ValueError:
+                pass
+        if header_day is None:
+            bol_header_state = "BOL_HEADER_DATE_NOT_READABLE"
+        elif pickup_day is None:
+            bol_header_state = "PICKUP_DATE_UNREADABLE_HEADER_NOT_SUBSTITUTE"
+        elif header_day == pickup_day:
+            bol_header_state = "DOCUMENT_HEADER_DATE_EQUALS_PICKUP"
+        else:
+            bol_header_state = "DOCUMENT_HEADER_DATE_DIFFERS_FROM_PICKUP"
 
         summaries = re.findall(
             r"\bTotal\s+HU\s*:\s*(\d+)\s+Total\s+Pcs\s*:\s*(\d+)\s+"
@@ -1148,6 +1190,8 @@ def arcbest_embedded_truckload_bol_reconciliation(
         joined_pages += 1
         weight_match = weight == face_doc["weight"]
         date_match = pickup_day == face_doc["face"].shipment_date
+        pickup_extraction_states[pickup_extract_state] += 1
+        bol_header_date_states[bol_header_state] += 1
         matching_weights += int(weight_match)
         matching_pickup_dates += int(date_match)
         groups.append({
@@ -1182,6 +1226,8 @@ def arcbest_embedded_truckload_bol_reconciliation(
         "source_invoice_bol_totals_readable_pages": joined_pages,
         "source_invoice_printed_weight_matches_on_bol_copies": matching_weights,
         "source_invoice_pickup_date_matches_on_bol_copies": matching_pickup_dates,
+        "pickup_extraction_state_counts": dict(sorted(pickup_extraction_states.items())),
+        "bol_header_vs_pickup_date_state_counts": dict(sorted(bol_header_date_states.items())),
         "unique_truckload_invoices_with_co_bundled_bol_copies": len(by_invoice),
         "duplicate_co_bundled_bol_copy_pages_not_new_shipments":
             sum(max(0, len(x) - 1) for x in by_invoice.values()),
