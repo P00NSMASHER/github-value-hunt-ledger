@@ -15,6 +15,7 @@ from freight.real_document_lab import (
     globaltranz_canonical_v2_adjustment_replay, FROZEN_DOCUMENT_SHA256,
     arcbest_printed_rate_bol_reference_census,
     arcbest_embedded_vpq_quote_reconciliation,
+    arcbest_embedded_truckload_bol_reconciliation,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 
@@ -323,6 +324,121 @@ class LaboratoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "DUPLICATE_QUOTE_ID"):
             arcbest_embedded_vpq_quote_reconciliation(
                 [correct], duplicate_quote, digest)
+
+
+    def test_co_bundled_truckload_bol_copies_match_both_source_invoices_but_conflict(self):
+        """Two shipments, four BOL first-pages: different piece totals on one."""
+        def invoice(pro, load, amount, printed_pieces, pounds, ship_date):
+            return (
+                f"ORIGINAL INVOICE\nService: Truckload\nFreight bill No: {pro}\n"
+                f"Shipment Date: {ship_date}\nAMOUNT DUE: $ {amount:.2f}\n"
+                f"CRN: 4001454894\nCRN: {load}\n"
+                "Total Pieces Total Weight TOTAL AMOUNT\n"
+                f"$" f"{amount:,.2f} {printed_pieces} {pounds:,}\n"
+            )
+
+        def bol(pro, load, pieces, pounds, pickup):
+            return (
+                f"Motor Carrier Bill of Lading\nLoad #: {load}\n"
+                f"Order References: ArcBest Pronumber: {pro}\n"
+                "Stop 1 - Pick Up\n"
+                f"SYNTHETIC SHIPPER Date: {pickup} - {pickup}\n"
+                "Total HU: 10 Total Pcs: "
+                f"{pieces} Total Cmdty: 1 Total Wgt: {pounds} lbs\n"
+                "Stop 2 - Delivery\n"
+                "Shipper Signature / Date\nConsignee Signature/Date\n"
+            )
+
+        a, b = "123456789", "987654321"
+        load_a, load_b = "6001438260", "6001488729"
+        pages = [
+            invoice(a, load_a, 2950, 0, 11993, "05/01/2024"),
+            invoice(b, load_b, 3200, 225, 11050, "05/31/2024"),
+            bol(a, load_a, 0, 11993, "5/1/2024"),
+            bol(b, load_b, 30, 11050, "5/31/2024"),
+            bol(b, load_b, 225, 11050, "5/31/2024"),
+            bol(b, load_b, 225, 11050, "5/31/2024"),
+        ]
+        faces = [
+            InvoiceFace("arcbest", a, 1, 295000, None, "2024-05-01", "TL"),
+            InvoiceFace("arcbest", b, 2, 320000, None, "2024-05-31", "TL"),
+        ]
+        sha = FROZEN_DOCUMENT_SHA256["arcbest"]
+        r = arcbest_embedded_truckload_bol_reconciliation(faces, pages, sha)
+        self.assertEqual(r["original_truckload_invoice_faces"], 2)
+        self.assertEqual(r["co_bundled_motor_carrier_bol_first_pages"], 4)
+        self.assertEqual(r["co_bundled_bol_pages_bound_to_source_invoice"], 4)
+        self.assertEqual(r["source_invoice_load_reference_matching_bol_pages"], 4)
+        self.assertEqual(r["source_invoice_bol_totals_readable_pages"], 4)
+        self.assertEqual(r["source_invoice_printed_weight_matches_on_bol_copies"], 4)
+        self.assertEqual(r["source_invoice_pickup_date_matches_on_bol_copies"], 4)
+        self.assertEqual(r["unique_truckload_invoices_with_co_bundled_bol_copies"], 2)
+        self.assertEqual(r["duplicate_co_bundled_bol_copy_pages_not_new_shipments"], 2)
+        self.assertEqual(r["repeated_load_groups_with_piece_count_disagreements"], 1)
+        self.assertEqual(r["repeated_load_groups_with_weight_disagreements"], 0)
+        self.assertEqual(r["repeated_load_groups_total"], 1)
+        for field in ("independently_authenticated_signed_bol_acceptances",
+                      "independent_custody_original_bol_verified",
+                      "customer_rate_authority_verified",
+                      "actual_delivery_proof_independently_verified",
+                      "bank_cleared_payment_verified",
+                      "independently_adjudicated_customer_overcharges",
+                      "verified_retally_cash_recovered_cents",
+                      "original_source_customer_or_load_identifiers_exported",
+                      "external_contact_actions"):
+            self.assertEqual(r[field], 0, field)
+        self.assertFalse(r["commercial_reuse_authorized"])
+        self.assertEqual(r["unresolved_reason_counts"], {})
+        import json
+        summary = json.dumps(r)
+        for secret in (a, b, load_a, load_b, "SYNTHETIC SHIPPER", "Stop 1"):
+            self.assertNotIn(secret, summary)
+        self.assertEqual(r, arcbest_embedded_truckload_bol_reconciliation(faces, pages, sha))
+
+    def test_bol_invoice_crosslink_detects_wrong_load_weight_and_pickup_day(self):
+        sha = FROZEN_DOCUMENT_SHA256["arcbest"]
+        invoice = (
+            "ORIGINAL INVOICE\nFreight bill No: 123456789\n"
+            "Total Pieces Total Weight TOTAL AMOUNT\n$2,950.00 0 11,993\n"
+            "CRN: 6001438260\n"
+        )
+        face = InvoiceFace("arcbest", "123456789", 1, 295000,
+                           None, "2024-05-01", "TL")
+        bol = (
+            "Motor Carrier Bill of Lading\nLoad #: 6001438260\n"
+            "Order References: ArcBest Pronumber: 123456789\n"
+            "Stop 1 - Pick Up\nSYNTHETIC Date: 5/1/2024 - 5/1/2024\n"
+            "Total HU: 15 Total Pcs: 0 Total Cmdty: 1 Total Wgt: 11993 lbs\n"
+            "Stop 2 - Delivery\n"
+        )
+        correct = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, bol], sha)
+        self.assertEqual(correct["source_invoice_printed_weight_matches_on_bol_copies"], 1)
+        for edited, expected in (
+            (bol.replace("6001438260", "6001488729"),
+             "BOL_LOAD_REFERENCE_NOT_ON_INVOICE"),
+            (bol.replace("11993", "11994"),
+             "BOL_INVOICE_PRINTED_WEIGHT_CONFLICT"),
+            (bol.replace("5/1/2024", "5/2/2024"),
+             "BOL_PICKUP_INVOICE_DATE_CONFLICT"),
+        ):
+            with self.subTest(expected=expected):
+                result = arcbest_embedded_truckload_bol_reconciliation(
+                    [face], [invoice, edited], sha)
+                self.assertEqual(result["unresolved_reason_counts"][expected], 1)
+                self.assertEqual(result["independently_adjudicated_customer_overcharges"], 0)
+        with self.assertRaisesRegex(ValueError, "SOURCE_SHA256_MISMATCH"):
+            arcbest_embedded_truckload_bol_reconciliation(
+                [face], [invoice, bol], "0" * 64)
+        with self.assertRaisesRegex(ValueError, "DUPLICATE_INVOICE_FACE"):
+            arcbest_embedded_truckload_bol_reconciliation(
+                [face, face], [invoice, bol], sha)
+        wrong_page = bol.replace("123456789", "000000001")
+        result = arcbest_embedded_truckload_bol_reconciliation(
+            [face], [invoice, wrong_page], sha)
+        self.assertEqual(
+            result["unresolved_reason_counts"]["BOL_NOT_LINKED_TO_TL_INVOICE_FACE"], 1)
+        self.assertEqual(result["unique_truckload_invoices_with_co_bundled_bol_copies"], 0)
 
     def test_actual_invoice_component_sum_and_adversarial_one_cent(self):
         content = (

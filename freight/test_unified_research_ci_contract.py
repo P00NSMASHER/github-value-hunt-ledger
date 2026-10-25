@@ -182,6 +182,23 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "quotation['raw_invoice_quote_bol_identifiers_exported'] == 0",
             "chain['arcbest_embedded_quote_match_class_sha256']",
             "chain['arcbest_same_pdf_quotes_not_independent_customer_rate_authorization'] is True",
+            "co_bundled_motor_carrier_bol_source_replay",
+            "bol['co_bundled_motor_carrier_bol_first_pages'] == 4",
+            "bol['original_truckload_invoice_faces'] == 2",
+            "bol['source_invoice_load_reference_matching_bol_pages'] == 4",
+            "bol['source_invoice_printed_weight_matches_on_bol_copies'] == 4",
+            "bol['source_invoice_pickup_date_matches_on_bol_copies'] == 3",
+            "bol['repeated_load_groups_with_piece_count_disagreements'] == 1",
+            "bol['duplicate_co_bundled_bol_copy_pages_not_new_shipments'] == 2",
+            "bol['unresolved_reason_counts'] == {'BOL_PICKUP_INVOICE_DATE_CONFLICT': 1}",
+            "bol['independently_authenticated_signed_bol_acceptances'] == 0",
+            "bol['independent_custody_original_bol_verified'] == 0",
+            "bol['independently_adjudicated_customer_overcharges'] == 0",
+            "bol['commercial_reuse_authorized'] is False",
+            "bol['verified_retally_cash_recovered_cents'] == 0",
+            "chain['arcbest_cobundled_bol_page_class_sha256']",
+            "chain['arcbest_original_bol_signatures_independently_authenticated'] == 0",
+            "chain['arcbest_cobundled_bol_copies_not_independent_custody'] is True",
         ):
             with self.subTest(line=expected):
                 self.assertIn(expected, nightly)
