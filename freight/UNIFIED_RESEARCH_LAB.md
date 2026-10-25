@@ -1075,3 +1075,69 @@ an independently adjudicated accuracy rate. All ten original ArcBest
 invoices remain UNKNOWN for independent customer-level audit outcomes.
 The same nightly real-document job tests all counts without a new schedule,
 data branch, contact action, purchase, cloud permission or production change.
+
+
+## ArcBest co-bundled original motor-carrier bills of lading (v15)
+
+**Evidence correction:** The source-frozen original
+[74-page ArcBest bankruptcy exhibit](https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408)
+does contain printed original **Motor Carrier Bill of Lading** forms
+appended to its two **truckload** invoices. Earlier descriptions of
+“zero original BOL documents” meant **zero independently authenticated
+signed original BOLs in separate custody**; they must not be taken to
+mean there are no co-bundled BOL forms in the public exhibit.
+
+The existing source laboratory now binds each BOL form to its source
+truckload invoice by the exact nine-digit printed ArcBest freight-bill
+reference AND ten-digit invoice CRN load reference, then compares
+the printed load weight and source pickup date in ephemeral memory.
+The 2026-10-24 genuine 74-page original document acceptance established:
+
+| Scope of original co-bundled BOL evidence | Observed |
+| --- | ---: |
+| Original truckload invoices in frozen source | **2** |
+| Source BOL first pages (some duplicate copies) | **4** |
+| Unique truckload invoices linked to those BOL first pages | **2** |
+| BOL source pages matching the original invoice load reference | **4** |
+| BOL pages matching original invoice **printed** weight | **4** |
+| BOL pickup dates successfully matching printed invoice ship date | **3** |
+| BOL pickup-date check still unresolved | **1** |
+| Extra repeated BOL first-page copies, **not additional shipments** | **2** |
+| Unique load groups with conflicting BOL printed piece totals | **1** |
+| Unique load groups with conflicting BOL printed weights | **0** |
+| Independently authenticated carrier/shipper signatures or delivery proof | **0** |
+| Independent freight overcharges, verified customer bank payments, RETALLY cash | **0** |
+
+Original amounts are the two $2,950 and $3,200 truckload invoices; the
+first BOL records **11,993 lb** and the second's copies **11,050 lb**.
+The second load's three printed BOL first-page versions contain
+**30 pieces in one version** versus **225 pieces in two other versions**;
+the $3,200 original invoice prints **225**. This is a genuine *source
+document contradiction*, **not an adjudicated billing error**, because
+the current source does not establish whether the earlier version was
+superseded, what unit conventions applied, or whether the discrepancy
+affected any rated charge. The first load's description also references
+473 cartons while its BOL “Total Pcs” is zero, a semantic difference
+that is not automatically classified as a mistake.
+
+A parser guard came from a red synthetic test: the generic iso_date()
+helper parses ambiguous dates in UK day/month-first order for Pennine
+accounting. U.S. Motor Carrier BOLs use **month/day/year**; the new
+parser explicitly fixes this, preventing ambiguous May 1 from being
+misread as January 5. The real source replay still records one
+unmatched pickup-date check as UNKNOWN instead of claiming 4/4.
+
+Only the anonymous source page/class aggregate SHA-256
+02fc64cd001e88db3e81d85c2d8c84b8b56c6dd609f90b309748c23e2e4dc4ca
+and bounded counts enter the ephemeral nightly receipt, with original
+PDF byte hash 4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17.
+No load/PO/freight-bill identifiers, contacts, PDF bytes, signatures or
+raw rows enter the persistent GitHub research catalog. The old
+**110 UNKNOWN customer invoice outcomes** remain UNKNOWN, and no
+commercial rate or recovery rights are assumed.
+
+This strengthens original-document evidence without new schedules,
+paid providers, customer contact, deployments, protected-main bypass
+or a new data branch. Independently authenticated signed BOL pickup/
+delivery and applicable customer contract terms are still required to
+adjudicate an actual customer overcharge or recovered cash.

@@ -14,7 +14,7 @@ from freight.freight_evidence_chain_readiness import (
     ARCBEST_PRINTED_REFERENCE_DIGEST, ARCBEST_PRINTED_TARIFF_CLASSES,
     ARCBEST_PRINTED_BOL_HEADER_CLASSES,
     ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES,
-    ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST,
+    ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST, ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST,
     make_receipt, validate_receipt, run,
 )
 from freight.unified_research_lab import ResearchError, digest
@@ -138,6 +138,40 @@ def source_document_report() -> dict:
         "customer_contact_actions": 0,
         "unresolved_reason_counts": {},
     }
+    abf["co_bundled_motor_carrier_bol_source_replay"] = {
+        "scope": "ARCBEST_PUBLIC_ORIGINAL_PDF_INVOICE_TO_COBUNDLED_MOTOR_CARRIER_BOL_REFERENCES",
+        "original_pdf_sha256": FROZEN_DOCUMENT_SHA256["arcbest"],
+        "original_truckload_invoice_faces": 2,
+        "co_bundled_motor_carrier_bol_first_pages": 4,
+        "co_bundled_bol_pages_bound_to_source_invoice": 4,
+        "source_invoice_load_reference_matching_bol_pages": 4,
+        "source_invoice_bol_totals_readable_pages": 4,
+        "source_invoice_printed_weight_matches_on_bol_copies": 4,
+        "source_invoice_pickup_date_matches_on_bol_copies": 3,
+        "unique_truckload_invoices_with_co_bundled_bol_copies": 2,
+        "duplicate_co_bundled_bol_copy_pages_not_new_shipments": 2,
+        "repeated_load_groups_with_piece_count_disagreements": 1,
+        "repeated_load_groups_with_weight_disagreements": 0,
+        "repeated_load_groups_total": 1,
+        "anonymous_page_class_sha256": ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST,
+        "source_notes": [
+            "Printed BOL copies in the SAME public bankruptcy exhibit are not independently custodied or authenticated.",
+            "Same load printed in several versions is ONE shipment; conflicting piece counts remain unresolved.",
+            "A printed invoice/BOL weight match is not certified actual loaded weight.",
+            "Visible signature field labels are not verified signatures or proof of delivery.",
+        ],
+        "independently_authenticated_signed_bol_acceptances": 0,
+        "independent_custody_original_bol_verified": 0,
+        "customer_rate_authority_verified": 0,
+        "actual_delivery_proof_independently_verified": 0,
+        "bank_cleared_payment_verified": 0,
+        "independently_adjudicated_customer_overcharges": 0,
+        "commercial_reuse_authorized": False,
+        "verified_retally_cash_recovered_cents": 0,
+        "original_source_customer_or_load_identifiers_exported": 0,
+        "external_contact_actions": 0,
+        "unresolved_reason_counts": {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1},
+    }
     blind = {
         "precision": None,
         "recall": None,
@@ -193,6 +227,16 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         self.assertEqual(receipt["arcbest_embedded_conditional_length_formula_matches"], 1)
         self.assertEqual(receipt["arcbest_embedded_quote_match_class_sha256"],
                          ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST)
+        self.assertEqual(receipt["arcbest_cobundled_original_truckload_bol_pages"], 4)
+        self.assertEqual(receipt["arcbest_cobundled_unique_invoice_load_groups"], 2)
+        self.assertEqual(receipt["arcbest_cobundled_original_bol_weight_copy_matches"], 4)
+        self.assertEqual(receipt["arcbest_cobundled_pickup_date_copy_matches"], 3)
+        self.assertEqual(receipt["arcbest_cobundled_same_load_piece_conflict_groups"], 1)
+        self.assertEqual(receipt["arcbest_cobundled_duplicate_pages_not_new_shipments"], 2)
+        self.assertEqual(receipt["arcbest_cobundled_bol_page_class_sha256"],
+                         ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST)
+        self.assertTrue(receipt["arcbest_cobundled_bol_copies_not_independent_custody"])
+        self.assertEqual(receipt["arcbest_original_bol_signatures_independently_authenticated"], 0)
         self.assertTrue(receipt[
             "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization"])
         self.assertEqual(receipt["arcbest_independently_verified_rate_and_original_bol_documents"], 0)
@@ -386,6 +430,54 @@ class FreightEvidenceChainReadinessTests(unittest.TestCase):
         for text in ("VPQ Quotation ID:", "PQ SCHEDULE NO", "V5WH1D1314",
                      "VKQS7R1064", "086855061", "279818407"):
             self.assertNotIn(text, leaked)
+
+
+    def test_bol_copies_do_not_create_three_distinct_shipments_or_recovery_truth(self):
+        """Real public PDF has 2 TL loads and 4 BOL first pages; 1 piece conflict."""
+        source = source_document_report()
+        receipt = make_receipt(source, as_of=DAY)
+        self.assertEqual(receipt["arcbest_cobundled_original_truckload_bol_pages"], 4)
+        self.assertEqual(receipt["arcbest_cobundled_unique_invoice_load_groups"], 2)
+        self.assertEqual(receipt["arcbest_cobundled_duplicate_pages_not_new_shipments"], 2)
+        self.assertEqual(receipt["arcbest_cobundled_same_load_piece_conflict_groups"], 1)
+        self.assertEqual(receipt["arcbest_cobundled_original_bol_weight_copy_matches"], 4)
+        self.assertEqual(receipt["arcbest_cobundled_pickup_date_copy_matches"], 3)
+        self.assertEqual(receipt["arcbest_original_bol_signatures_independently_authenticated"], 0)
+        self.assertEqual(receipt["independent_evidence_chain_stages"][
+            "independent_bol_or_shipment_link_in_lab"], 0)
+        self.assertTrue(receipt["arcbest_cobundled_bol_copies_not_independent_custody"])
+        self.assertEqual(receipt["eligible_independently_scored_customer_invoices"], 0)
+        self.assertEqual(receipt["verified_retally_recovered_cash_cents"], 0)
+
+        for field, forged in (
+            ("co_bundled_motor_carrier_bol_first_pages", 0),
+            ("unique_truckload_invoices_with_co_bundled_bol_copies", 4),
+            ("source_invoice_printed_weight_matches_on_bol_copies", 3),
+            ("source_invoice_pickup_date_matches_on_bol_copies", 4),
+            ("repeated_load_groups_with_piece_count_disagreements", 0),
+            ("duplicate_co_bundled_bol_copy_pages_not_new_shipments", 0),
+            ("anonymous_page_class_sha256", "0" * 64),
+            ("independently_authenticated_signed_bol_acceptances", 2),
+            ("independent_custody_original_bol_verified", 2),
+            ("customer_rate_authority_verified", 2),
+            ("actual_delivery_proof_independently_verified", 1),
+            ("bank_cleared_payment_verified", 1),
+            ("independently_adjudicated_customer_overcharges", 2),
+            ("commercial_reuse_authorized", True),
+            ("verified_retally_cash_recovered_cents", 615000),
+            ("original_source_customer_or_load_identifiers_exported", 1),
+            ("unresolved_reason_counts", {}),
+        ):
+            with self.subTest(field=field):
+                altered = source_document_report()
+                altered["freight_original_document_benchmark"]["arcbest"][
+                    "co_bundled_motor_carrier_bol_source_replay"][field] = forged
+                with self.assertRaises(ResearchError):
+                    make_receipt(altered, as_of=DAY)
+        leaked = json.dumps(receipt)
+        for secret in ("Motor Carrier Bill of Lading", "6001438260", "6001488729",
+                       "436430967", "436380706", "Crown Group"):
+            self.assertNotIn(secret, leaked)
 
     def test_statement_identity_is_not_bank_payment_or_refund(self):
         source = source_document_report()

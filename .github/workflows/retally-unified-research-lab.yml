@@ -597,6 +597,39 @@ jobs:
           assert chain['arcbest_embedded_conditional_length_formula_matches'] == 1
           assert chain['arcbest_embedded_quote_match_class_sha256'] == quotation['anonymous_page_and_match_class_digest_sha256']
           assert chain['arcbest_same_pdf_quotes_not_independent_customer_rate_authorization'] is True
+          bol=report['freight_original_document_benchmark']['arcbest']['co_bundled_motor_carrier_bol_source_replay']
+          assert bol['scope'] == 'ARCBEST_PUBLIC_ORIGINAL_PDF_INVOICE_TO_COBUNDLED_MOTOR_CARRIER_BOL_REFERENCES'
+          assert bol['original_pdf_sha256'] == report['freight_original_document_benchmark']['arcbest']['sha256']
+          assert bol['original_truckload_invoice_faces'] == 2
+          assert bol['co_bundled_motor_carrier_bol_first_pages'] == 4
+          assert bol['co_bundled_bol_pages_bound_to_source_invoice'] == 4
+          assert bol['source_invoice_load_reference_matching_bol_pages'] == 4
+          assert bol['source_invoice_bol_totals_readable_pages'] == 4
+          assert bol['source_invoice_printed_weight_matches_on_bol_copies'] == 4
+          assert bol['source_invoice_pickup_date_matches_on_bol_copies'] == 3
+          assert bol['unique_truckload_invoices_with_co_bundled_bol_copies'] == 2
+          assert bol['duplicate_co_bundled_bol_copy_pages_not_new_shipments'] == 2
+          assert bol['repeated_load_groups_with_piece_count_disagreements'] == 1
+          assert bol['repeated_load_groups_with_weight_disagreements'] == 0
+          assert bol['unresolved_reason_counts'] == {'BOL_PICKUP_INVOICE_DATE_CONFLICT': 1}
+          assert bol['anonymous_page_class_sha256'] == '02fc64cd001e88db3e81d85c2d8c84b8b56c6dd609f90b309748c23e2e4dc4ca'
+          assert bol['independently_authenticated_signed_bol_acceptances'] == 0
+          assert bol['independent_custody_original_bol_verified'] == 0
+          assert bol['actual_delivery_proof_independently_verified'] == 0
+          assert bol['bank_cleared_payment_verified'] == 0
+          assert bol['independently_adjudicated_customer_overcharges'] == 0
+          assert bol['commercial_reuse_authorized'] is False
+          assert bol['original_source_customer_or_load_identifiers_exported'] == 0
+          assert bol['verified_retally_cash_recovered_cents'] == 0
+          assert chain['arcbest_cobundled_original_truckload_bol_pages'] == 4
+          assert chain['arcbest_cobundled_unique_invoice_load_groups'] == 2
+          assert chain['arcbest_cobundled_original_bol_weight_copy_matches'] == 4
+          assert chain['arcbest_cobundled_pickup_date_copy_matches'] == 3
+          assert chain['arcbest_cobundled_same_load_piece_conflict_groups'] == 1
+          assert chain['arcbest_cobundled_duplicate_pages_not_new_shipments'] == 2
+          assert chain['arcbest_cobundled_bol_page_class_sha256'] == bol['anonymous_page_class_sha256']
+          assert chain['arcbest_original_bol_signatures_independently_authenticated'] == 0
+          assert chain['arcbest_cobundled_bol_copies_not_independent_custody'] is True
           assert chain['federal_guidance_scope'] == 'FEDERAL_GSA_REFERENCE_ONLY_NOT_PRIVATE_CUSTOMER_LEGAL_AUTHORITY'
           assert set(chain['missing_chain_evidence_from_current_lab'].values()) == {110}
           print('Original GlobalTranz: 100 original invoice nets preserved (93 source-bound v2 adjustments + 7 v1 charge-only), all REVIEW_REQUIRED, zero scored overcharges')
@@ -604,6 +637,7 @@ jobs:
           print('ArcBest source-only hints: 6 printed ABF codes; 2 volume quote markers; 2 unreadable tariff headers; 2 printed BOL IDs; 8 BOL placeholders; 0 validated governing-rate/quote/BOL documents')
           print('ArcBest VPQ/BOL same-invoice crosscheck: one VPQ has a printed BOL ID, one VPQ has a placeholder; 0 independently verified quote IDs on original BOLs')
           print('ArcBest two ORIGINAL co-bundled quote pages matched to two source invoices by quote ID, shipment date, printed weight; 1 exact minimum, 1 conditional linear-foot arithmetic; 0 separately verified accepted BOLs, no overcharges or cash')
+          print('ArcBest truckload BOL: 4 original co-bundled BOL first pages linked to 2 original invoices; 4 matching load/printed weights; 3 printed pickup dates match, 1 held unresolved; 1 same-load conflicting piece-count group; 0 independently certified signed deliveries or recoveries')
           import os
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
               summary.write('### FreightRecovery: original-document evidence readiness\n')
@@ -614,6 +648,9 @@ jobs:
               summary.write('- VPQ and BOL same-invoice: 1 VPQ with printed BOL ID; 1 VPQ with BOL placeholder.\n')
               summary.write('- Two ORIGINAL VPQ quotation pages in the same frozen ArcBest PDF match two invoice IDs, date windows and printed weight.\n')
               summary.write('- One invoice matches a quotation minimum; the other matches a CONDITIONAL LWH-based additional-foot formula.\n')
+              summary.write('- Co-bundled MOTOR CARRIER BOL: 4 first pages link to 2 unique truckload invoices, not 4 shipments.\n')
+              summary.write('- Four load/printed-weight matches, only 3 pickup-date matches; conflicting piece counts on repeated copies of 1 load.\n')
+              summary.write('- Original BOL text in the same source bundle is NOT independently authenticated signed pickup/delivery proof.\n')
               summary.write('- Co-bundled quote pages DO NOT prove independent executed quote acceptance or printed IDs on original signed BOLs.\n')
               summary.write('- Printed BOL identifiers are NOT verified quote IDs on original signed BOLs.\n')
               summary.write('- Printed source text is NOT independently verified rate agreements or signed bills of lading.\n')

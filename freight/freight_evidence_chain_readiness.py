@@ -65,6 +65,13 @@ ARCBEST_PRINTED_PRICING_BOL_JOINT_CLASSES = {
 ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST = (
     "5b70fb8a86d2cd6da65d3d9956c7a71acc4cb026ba6795534defa926fee41fe4"
 )
+# Genuine original court-exhibit PDF run 40149694625 verified four co-bundled
+# Motor Carrier BOL first pages for only TWO truckload invoice/load groups.
+# Two additional copies of one group disagree on printed piece count. These
+# are source-internal BOL forms, not independently authenticated signatures.
+ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST = (
+    "02fc64cd001e88db3e81d85c2d8c84b8b56c6dd609f90b309748c23e2e4dc4ca"
+)
 EXPECTED_FACE_COUNTS = {"globaltranz": 100, "arcbest": 10}
 EXPECTED_NET_COVERAGE = {"globaltranz": 100, "arcbest": 0}
 MISSING_CHAIN_STAGES = (
@@ -83,6 +90,9 @@ LIMITATIONS = (
     "ArcBest printed freight-bill weights, if present, are not independent certified shipment weights.",
     "ArcBest invoice-printed tariff/VPQ codes and BOL headers do not prove an original accepted quote, contract rate or separately held original BOL.",
     "Two same-PDF ArcBest quotation pages match invoice quote codes, dates and printed weight, but are not independent issuer or initial BOL acceptance evidence.",
+    "The same source PDF includes four carrier BOL first pages for two truckload loads, including duplicate versions with conflicting printed piece counts.",
+    "Three of four printed BOL pickup-date observations match invoices; the remaining observation is unresolved and not silently fixed.",
+    "Original forms in a court-filed PDF do not independently establish shipper/carrier signature authentication, delivery, bank clearance or paid freight-error outcomes.",
     "One source quotation minimum exactly matches its invoice; one additional-foot formula only matches if the printed LWH first dimension is billable trailer length rounded to whole feet.",
     "ArcBest VPQ printed on a billing document is not evidence that the quote ID appeared on the initial signed BOL, as ArcBest's published VPQ terms require.",
     "Lab canonical shipment location, carrier, freight mode and weight placeholders are SYNTHETIC.",
@@ -111,6 +121,15 @@ RECEIPT_KEYS = frozenset({
     "arcbest_embedded_conditional_length_formula_matches",
     "arcbest_embedded_quote_match_class_sha256",
     "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization",
+    "arcbest_cobundled_original_truckload_bol_pages",
+    "arcbest_cobundled_unique_invoice_load_groups",
+    "arcbest_cobundled_original_bol_weight_copy_matches",
+    "arcbest_cobundled_pickup_date_copy_matches",
+    "arcbest_cobundled_same_load_piece_conflict_groups",
+    "arcbest_cobundled_duplicate_pages_not_new_shipments",
+    "arcbest_cobundled_bol_page_class_sha256",
+    "arcbest_original_bol_signatures_independently_authenticated",
+    "arcbest_cobundled_bol_copies_not_independent_custody",
     "arcbest_source_printed_category_sha256",
     "arcbest_independently_verified_rate_and_original_bol_documents",
     "source_original_sha256", "original_invoice_catalog_sha256",
@@ -318,6 +337,44 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
     _is_false(same_pdf.get("commercial_reuse_authorized"),
               "ARCBEST_EMBEDDED_QUOTE_COMMERCIAL_RIGHTS_UNVERIFIED")
 
+    bol = _mapping(abf.get("co_bundled_motor_carrier_bol_source_replay"),
+                   "ARCBEST_ORIGINAL_COBUNDLED_MOTOR_CARRIER_BOL")
+    if (bol.get("scope") !=
+            "ARCBEST_PUBLIC_ORIGINAL_PDF_INVOICE_TO_COBUNDLED_MOTOR_CARRIER_BOL_REFERENCES"
+            or bol.get("original_pdf_sha256") != FROZEN_DOCUMENT_SHA256["arcbest"]
+            or bol.get("anonymous_page_class_sha256") != ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST):
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_COBUNDLED_BOL_SOURCE_DRIFT")
+    for name, amount in (
+            ("original_truckload_invoice_faces", 2),
+            ("co_bundled_motor_carrier_bol_first_pages", 4),
+            ("co_bundled_bol_pages_bound_to_source_invoice", 4),
+            ("source_invoice_load_reference_matching_bol_pages", 4),
+            ("source_invoice_bol_totals_readable_pages", 4),
+            ("source_invoice_printed_weight_matches_on_bol_copies", 4),
+            ("source_invoice_pickup_date_matches_on_bol_copies", 3),
+            ("unique_truckload_invoices_with_co_bundled_bol_copies", 2),
+            ("duplicate_co_bundled_bol_copy_pages_not_new_shipments", 2),
+            ("repeated_load_groups_with_piece_count_disagreements", 1),
+            ("repeated_load_groups_with_weight_disagreements", 0),
+            ("repeated_load_groups_total", 1),
+            ("independently_authenticated_signed_bol_acceptances", 0),
+            ("independent_custody_original_bol_verified", 0),
+            ("customer_rate_authority_verified", 0),
+            ("actual_delivery_proof_independently_verified", 0),
+            ("bank_cleared_payment_verified", 0),
+            ("independently_adjudicated_customer_overcharges", 0),
+            ("verified_retally_cash_recovered_cents", 0),
+            ("original_source_customer_or_load_identifiers_exported", 0),
+            ("external_contact_actions", 0)):
+        _count(bol.get(name), "ARCBEST_ORIGINAL_BOL_" + name.upper(), amount)
+    if bol.get("unresolved_reason_counts") != {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1}:
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_COBUNDLED_BOL_UNRESOLVED_DIAGNOSTIC_DRIFT")
+    _is_false(bol.get("commercial_reuse_authorized"),
+              "ARCBEST_BOL_COMMERCIAL_RIGHTS_NOT_VERIFIED")
+    if (not isinstance(bol.get("source_notes"), list)
+            or len(bol["source_notes"]) != 4):
+        raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_BOL_LIMITATIONS_LOST")
+
     blind = _mapping(doc.get("blinded_freight_error_evaluation"), "BLIND_ASSESSMENT")
     for field in ("precision", "recall", "freight_detection_accuracy"):
         if blind.get(field) is not None:
@@ -359,6 +416,15 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
         "arcbest_embedded_conditional_length_formula_matches": 1,
         "arcbest_embedded_quote_match_class_sha256": ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST,
         "arcbest_same_pdf_quotes_not_independent_customer_rate_authorization": True,
+        "arcbest_cobundled_original_truckload_bol_pages": 4,
+        "arcbest_cobundled_unique_invoice_load_groups": 2,
+        "arcbest_cobundled_original_bol_weight_copy_matches": 4,
+        "arcbest_cobundled_pickup_date_copy_matches": 3,
+        "arcbest_cobundled_same_load_piece_conflict_groups": 1,
+        "arcbest_cobundled_duplicate_pages_not_new_shipments": 2,
+        "arcbest_cobundled_bol_page_class_sha256": ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST,
+        "arcbest_original_bol_signatures_independently_authenticated": 0,
+        "arcbest_cobundled_bol_copies_not_independent_custody": True,
         "arcbest_source_printed_category_sha256": ARCBEST_PRINTED_REFERENCE_DIGEST,
         "arcbest_independently_verified_rate_and_original_bol_documents": 0,
         "source_original_sha256": {k: FROZEN_DOCUMENT_SHA256[k] for k in sorted(FROZEN_DOCUMENT_SHA256)},
