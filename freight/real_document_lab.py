@@ -1120,7 +1120,11 @@ def arcbest_embedded_truckload_bol_reconciliation(
             r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b", pickup_region, re.I
         )
         try:
-            pickup_day = iso_date(pickup.group(1)) if pickup else None
+            # The U.S. motor-carrier BOL uses MONTH/DAY/YEAR; the shared
+            # UK accounting parser starts day/month and silently swaps
+            # dates such as 5/1/2024. Never use that default for freight BOLs.
+            pickup_day = (iso_date(pickup.group(1), formats=("%m/%d/%Y",))
+                          if pickup else None)
         except ValueError:
             pickup_day = None
 
