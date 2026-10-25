@@ -594,5 +594,132 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                             390224)
         self.assertNotEqual(digest(forged), digest(item))
 
+
+    def test_b142112_original_decision_separates_request_service_and_reported_cash(self):
+        """GAO historical deduction is source-observed; original service proof is absent."""
+        item = json.loads((FIXTURE.parent /
+                           "gao_b142112_exclusive_use_proof_candidate_v0.json").read_text())
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["admission_state"],
+                         "OFFICIAL_GAO_DECISION_ONLY_NOT_ORIGINAL_INVOICE_OR_HELDOUT_TRUTH")
+        self.assertEqual(item["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY")
+        src = item["source"]
+        self.assertEqual(src["official_url"], "https://www.gao.gov/products/b-142112-1")
+        self.assertIn(src["official_url"], SEEDS["freightrecovery"])
+        self.assertEqual(src["decision_date"], "1960-11-23")
+        self.assertEqual(src["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertFalse(src["original_publisher_response_bytes_held"])
+        self.assertIsNone(src["original_publisher_response_sha256"])
+        self.assertFalse(src["original_carrier_invoice_gbl_tariff_bytes_held"])
+        self.assertIsNone(src["governing_tariff_effective_date"])
+        self.assertFalse(src["customer_engine_commercial_reuse_approved"])
+        scope = item["decision_scope"]
+        self.assertEqual(scope["carrier_requests_reviewed"], 19)
+        self.assertEqual(scope["claims_with_revised_settlements_authorized"], 12)
+        self.assertIsNone(scope["revised_settlements_observed_paid_count"])
+        self.assertTrue(scope["exclusive_use_entitlement_requires_shipper_request"])
+        self.assertTrue(scope["exclusive_use_entitlement_requires_proven_carrier_performance"])
+        self.assertEqual(len(item["historical_cases"]), 2)
+        first, second = item["historical_cases"]
+        self.assertEqual(first["gbl_number_reported"], "WY-4250601")
+        self.assertEqual(first["supplemental_bill"], "7854-A")
+        self.assertEqual(first["original_carrier_freight_paid_cents"], 45000)
+        self.assertEqual(first["gao_reported_truckload_charge_cents"], 35820)
+        self.assertEqual(first["gao_reported_overpayment_cents"], 9180)
+        self.assertEqual(45000 - 35820, 9180)
+        self.assertTrue(first["gao_reports_deduction_collected"])
+        self.assertFalse(first["independently_authenticated_bank_offset_receipt"])
+        self.assertTrue(first["exclusive_use_requested_on_bol"])
+        self.assertEqual(first["reported_origin_seal"], "1895936")
+        self.assertEqual(first["reported_destination_seal"], "40530")
+        self.assertNotEqual(first["reported_origin_seal"], first["reported_destination_seal"])
+        self.assertFalse(first["seals_match"])
+        self.assertFalse(first["exclusive_use_furnished_proven"])
+        self.assertTrue(first["carrier_reclaim_disallowed_and_sustained"])
+        self.assertEqual(second["gbl_number_reported"], "AF-6538038")
+        self.assertEqual(second["initial_reclaim_bill"], "9911-A")
+        self.assertEqual(second["later_reclaim_bill"], "7711-A")
+        self.assertEqual(second["initial_reclaim_requested_cents"], 29215)
+        self.assertEqual(second["later_reclaim_requested_cents"], 29275)
+        self.assertFalse(second["same_reclaim_bill_identity"])
+        self.assertEqual(second["original_carrier_freight_paid_cents"], 88740)
+        self.assertEqual(second["gao_first_audit_allowable_charge_cents"], 59465)
+        self.assertEqual(second["first_overcharge_deduction_collected_cents"], 29275)
+        self.assertEqual(second["later_audit_allowable_charge_cents"], 46421)
+        self.assertEqual(second["later_statement_additional_overcharge_cents"], 13044)
+        self.assertEqual(second["concluding_paragraph_refund_requested_cents"], 13040)
+        self.assertEqual(second["conflicting_published_refund_amount_cents"], 4)
+        self.assertEqual(88740 - 59465, 29275)
+        self.assertEqual(88740 - 46421, 42319)
+        self.assertEqual(29275 + 13044, 42319)
+        self.assertEqual(13044 - 13040, 4)
+        self.assertFalse(second["gao_reports_additional_refund_collected"])
+        self.assertIsNone(second["later_additional_refund_collected_cents"])
+        self.assertFalse(second["exclusive_use_furnished_proven"])
+        self.assertFalse(item["truth_boundaries"]["independent_holdout_verification"])
+        self.assertFalse(item["truth_boundaries"]["modern_customer_freight_error_accuracy_scoring_allowed"])
+        self.assertEqual(item["truth_boundaries"]["independently_held_out_customer_labels"], 0)
+        self.assertEqual(item["truth_boundaries"]["modern_applicability"], "UNKNOWN")
+        self.assertEqual(item["truth_boundaries"]["actual_retally_customer_recovered_cash_cents"], 0)
+
+    def test_b142112_negative_controls_reject_forged_proof_and_refund_normalization(self):
+        """Counterfactual edits must not erase published contradictions or mint payment."""
+        item = json.loads((FIXTURE.parent /
+                           "gao_b142112_exclusive_use_proof_candidate_v0.json").read_text())
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 7)
+        self.assertEqual(len({x["id"] for x in controls}), 7)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" and
+                            x["id"].startswith("SYNTHETIC_") for x in controls))
+        self.assertEqual({x["expected"] for x in controls}, {
+            "REJECT_PROOF_OF_PERFORMANCE_ABSENT",
+            "REJECT_SEAL_IDENTITY_CONTRADICTION",
+            "REJECT_SILENT_BILL_AND_AMOUNT_NORMALIZATION",
+            "REJECT_FOUR_CENT_SOURCE_DISAGREEMENT_ERASURE",
+            "REJECT_UNVERIFIED_ADDITIONAL_REFUND",
+            "REJECT_12_OF_19_IS_NOT_19_PAID",
+            "REJECT_NO_CONTEMPORARY_CUSTOMER_OR_PAYMENT_EVIDENCE",
+        })
+        def verify(row):
+            first, second = row["historical_cases"]
+            self.assertEqual(row["decision_scope"]["claims_with_revised_settlements_authorized"], 12)
+            self.assertIsNone(row["decision_scope"]["revised_settlements_observed_paid_count"])
+            self.assertNotEqual(first["reported_origin_seal"], first["reported_destination_seal"])
+            self.assertFalse(first["exclusive_use_furnished_proven"])
+            self.assertFalse(second["exclusive_use_furnished_proven"])
+            self.assertEqual(second["initial_reclaim_requested_cents"], 29215)
+            self.assertEqual(second["later_reclaim_requested_cents"], 29275)
+            self.assertEqual(second["later_statement_additional_overcharge_cents"], 13044)
+            self.assertEqual(second["concluding_paragraph_refund_requested_cents"], 13040)
+            self.assertEqual(second["later_statement_additional_overcharge_cents"] -
+                             second["concluding_paragraph_refund_requested_cents"], 4)
+            self.assertIsNone(second["later_additional_refund_collected_cents"])
+            self.assertIsNone(row["source"]["original_publisher_response_sha256"])
+            self.assertFalse(row["source"]["customer_engine_commercial_reuse_approved"])
+            self.assertFalse(row["truth_boundaries"]["modern_customer_freight_error_accuracy_scoring_allowed"])
+            self.assertEqual(row["truth_boundaries"]["actual_retally_customer_recovered_cash_cents"], 0)
+        verify(item)
+        mutations = (
+            ("decision_scope", None, "claims_with_revised_settlements_authorized", 19),
+            ("decision_scope", None, "revised_settlements_observed_paid_count", 12),
+            ("historical_cases", 0, "reported_destination_seal", "1895936"),
+            ("historical_cases", 0, "exclusive_use_furnished_proven", True),
+            ("historical_cases", 1, "initial_reclaim_requested_cents", 29275),
+            ("historical_cases", 1, "later_statement_additional_overcharge_cents", 13040),
+            ("historical_cases", 1, "later_additional_refund_collected_cents", 13040),
+            ("source", None, "original_publisher_response_sha256", "FORGED"),
+            ("source", None, "customer_engine_commercial_reuse_approved", True),
+            ("truth_boundaries", None, "modern_customer_freight_error_accuracy_scoring_allowed", True),
+            ("truth_boundaries", None, "actual_retally_customer_recovered_cash_cents", 13040),
+        )
+        for section, index, key, false_value in mutations:
+            with self.subTest(field=key):
+                forged = copy.deepcopy(item)
+                (forged[section] if index is None else forged[section][index])[key] = false_value
+                with self.assertRaises(AssertionError):
+                    verify(forged)
+        self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
+
 if __name__ == "__main__":
     unittest.main()
