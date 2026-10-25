@@ -432,8 +432,8 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         """Adversarial edits cannot convert decision-only data into settlement truth."""
         item = json.loads((FIXTURE.parent / "gao_b148981_refunded_adjustment_candidate_v0.json").read_text())
         controls = item["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 6)
-        self.assertEqual(len({row["id"] for row in controls}), 6)
+        self.assertEqual(len(controls), 7)
+        self.assertEqual(len({row["id"] for row in controls}), 7)
         self.assertTrue(all(row["kind"] == "SYNTHETIC" and
                             row["id"].startswith("SYNTHETIC_") for row in controls))
         self.assertEqual({row["expected"] for row in controls}, {
@@ -443,6 +443,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             "REJECT_OPPOSING_PARTY_CLAIM_SEMANTICS",
             "REJECT_HISTORICAL_RATE_APPLICABILITY",
             "REJECT_CUSTOMER_AND_SETTLEMENT_PROVENANCE",
+            "REJECT_GAO_TRANSCRIBED_BOL_LINEAGE_CONFLICT",
         })
         pinned = (
             ("historical_case_groups", 0, "gao_reported_refund_cents", 13444),
@@ -473,6 +474,50 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
 
 
+
+    def test_b148981_decision_transcribed_bol_lineage_blocks_cross_supplemental_join(self):
+        """Seven original payment references are GAO transcriptions, not seven held invoices."""
+        item = json.loads((FIXTURE.parent /
+                           "gao_b148981_refunded_adjustment_candidate_v0.json").read_text())
+        expected = [
+            [("WY 7616843", "1958-04-21", 175500)],
+            [("AF-6807627", "1956-10-15", 33833),
+             ("AF-6807626", "1956-10-15", 41438),
+             ("AF-6807628", "1956-10-16", 26432)],
+            [("WY-6564503", "1955-11-02", 132620),
+             ("WY-6564509", "1955-11-02", 107213),
+             ("WY-6564515", "1955-11-03", 132571)],
+        ]
+        self.assertEqual(item["schema_version"], "0.1.1")
+        self.assertEqual(item["source"]["bol_lineage_proof"],
+                         "GAO_DECISION_TRANSCRIPTION_NOT_ORIGINAL_BOL_CUSTODY")
+        self.assertFalse(item["source"]["original_bol_invoice_tariff_bytes_held"])
+        self.assertIsNone(item["source"]["original_publisher_http_sha256"])
+        def validate_bol_map(doc):
+            groups = doc["historical_case_groups"]
+            actual = [[(r["bol_reference"], r["bill_of_lading_date"],
+                        r["gao_reported_paid_cents"]) for r in group["gao_transcribed_bol_refs"]]
+                      for group in groups]
+            self.assertEqual(actual, expected)
+            refs = [ref[0] for group in actual for ref in group]
+            self.assertEqual(len(refs), 7)
+            self.assertEqual(len(refs), len(set(refs)))
+            for group in groups:
+                self.assertEqual([r["gao_reported_paid_cents"] for r in group["gao_transcribed_bol_refs"]],
+                                 group["original_paid_by_bol_cents"])
+                self.assertEqual(len(group["gao_transcribed_bol_refs"]), group["reported_bol_count"])
+        validate_bol_map(item)
+        # Both mutations are SYNTHETIC adversarial controls, not source facts.
+        forged_join = copy.deepcopy(item)
+        forged_join["historical_case_groups"][1]["gao_transcribed_bol_refs"][0]["bol_reference"] = "WY 7616843"
+        with self.assertRaises(AssertionError):
+            validate_bol_map(forged_join)
+        forged_charge = copy.deepcopy(item)
+        forged_charge["historical_case_groups"][2]["gao_transcribed_bol_refs"][0]["gao_reported_paid_cents"] += 1
+        with self.assertRaises(AssertionError):
+            validate_bol_map(forged_charge)
+        self.assertFalse(item["truth_boundaries"]["freight_error_precision_recall_scoring_allowed"])
+        self.assertEqual(item["truth_boundaries"]["independently_held_out_customer_labels"], 0)
 
     def test_b190624_original_gao_pdf_two_cases_and_reported_deduction_limits(self):
         """Pin historically reported first deduction; never turn claims into cash truth."""
