@@ -724,8 +724,8 @@ class FMCIndexOnlySourceCandidateTests(unittest.TestCase):
         path = Path(__file__).with_name("fixtures") / "fmc_22fmc94_girton_index_candidate_v0.json"
         item = json.loads(path.read_text(encoding="utf-8"))
         controls = item["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 5)
-        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 6)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" and
                             c["id"].startswith("SYNTHETIC_") for c in controls))
         self.assertEqual({c["expected"] for c in controls}, {
@@ -734,6 +734,7 @@ class FMCIndexOnlySourceCandidateTests(unittest.TestCase):
             "REJECT_UNRELATED_HISTORICAL_AUTHORITY",
             "REJECT_ORIGINAL_BYTES_SHA256_UNKNOWN",
             "REJECT_INTEREST_SETTLEMENT_UNKNOWN",
+            "REJECT_CROSS_DOCKET_CARRIER_AND_INTEREST_COLLISION",
         })
         self.assertFalse(item["quality"]["complete_publisher_pdf_byte_read_succeeded"])
         self.assertFalse(item["quality"]["source_original_sha256_known"])
@@ -742,6 +743,41 @@ class FMCIndexOnlySourceCandidateTests(unittest.TestCase):
         bad["historical_decision_only"]["commission_interest_awarded"] = False
         self.assertNotEqual(bad["historical_decision_only"],
                             item["historical_decision_only"])
+
+
+    def test_fmc_same_claimant_distinct_docket_interest_and_identity_hold(self):
+        path = Path(__file__).with_name("fixtures") / "fmc_22fmc94_girton_index_candidate_v0.json"
+        item = json.loads(path.read_text(encoding="utf-8"))
+        first = item["source"]
+        other = item["same_claimant_distinct_docket_counterexample"]
+        self.assertEqual(other["source_class"],
+                         "PUBLISHER_INDEX_EXCERPT_ONLY_SEPARATE_DECISION_NOT_PACK_ADMITTED")
+        self.assertEqual(other["official_pdf_url"],
+                         "https://www.fmc.gov/wp-content/uploads/2019/04/vol23.pdf")
+        self.assertEqual(other["citation"], "23 F.M.C. 78")
+        self.assertEqual(other["docket"], "Informal Docket 746(I)")
+        self.assertEqual(other["respondent"], "Prudential Lines, Inc.")
+        self.assertIn("Girton Manufacturing", first["decision_title"])
+        self.assertEqual(other["claimant"], "Girton Manufacturing Company")
+        self.assertEqual(other["commission_adoption_date"], "1980-07-30")
+        self.assertEqual(other["shipment_bill_date"], "1977-10-30")
+        self.assertEqual(other["reparation_claimed_cents"], 22476)
+        self.assertIsNone(other["reparation_amount_awarded_cents"])
+        self.assertTrue(other["adopted_officer_disposition_says_reparation_awarded"])
+        self.assertTrue(other["offsetting_claim_denied"])
+        self.assertFalse(other["final_interest_awarded"])
+        self.assertTrue(item["historical_decision_only"]["commission_interest_awarded"])
+        self.assertNotEqual((first["citation"], first["docket"]),
+                            (other["citation"], other["docket"]))
+        self.assertNotEqual(first["commission_decision_date"],
+                            other["commission_adoption_date"])
+        self.assertFalse(other["cross_case_join_allowed"])
+        self.assertIsNone(other["commission_award_collected_cents"])
+        self.assertIsNone(other["original_publisher_pdf_sha256"])
+        self.assertFalse(other["original_publisher_pdf_bytes_held"])
+        self.assertFalse(other["original_bill_of_lading_invoice_tariff_bytes_held"])
+        self.assertFalse(other["rights_for_customer_engine_commercial_use_verified"])
+        self.assertFalse(other["independently_adjudicated_invoice_ground_truth"])
 
 
 if __name__ == "__main__":

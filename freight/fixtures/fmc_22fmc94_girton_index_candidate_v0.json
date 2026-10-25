@@ -71,6 +71,11 @@
       "id": "SYNTHETIC_INTEREST_PAID_AS_OF_DECISION",
       "kind": "SYNTHETIC",
       "expected": "REJECT_INTEREST_SETTLEMENT_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_SAME_CLAIMANT_SAME_CASE_AND_INTEREST",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CROSS_DOCKET_CARRIER_AND_INTEREST_COLLISION"
     }
   ],
   "quality": {
@@ -80,5 +85,28 @@
     "independent_commercial_customer_labels": 0,
     "original_customer_material_collected": false,
     "allowed_next_step": "ORIGINAL_PUBLISHER_PDF_CUSTODY_AND_INDEPENDENT_QA_THEN_VERSIONED_ADMISSION_REVIEW"
+  },
+  "same_claimant_distinct_docket_counterexample": {
+    "source_class": "PUBLISHER_INDEX_EXCERPT_ONLY_SEPARATE_DECISION_NOT_PACK_ADMITTED",
+    "publisher": "United States Federal Maritime Commission",
+    "official_pdf_url": "https://www.fmc.gov/wp-content/uploads/2019/04/vol23.pdf",
+    "citation": "23 F.M.C. 78",
+    "docket": "Informal Docket 746(I)",
+    "claimant": "Girton Manufacturing Company",
+    "respondent": "Prudential Lines, Inc.",
+    "shipment_bill_date": "1977-10-30",
+    "commission_adoption_date": "1980-07-30",
+    "reparation_claimed_cents": 22476,
+    "reparation_amount_awarded_cents": null,
+    "adopted_officer_disposition_says_reparation_awarded": true,
+    "final_interest_awarded": false,
+    "offsetting_claim_denied": true,
+    "commission_award_collected_cents": null,
+    "original_publisher_pdf_bytes_held": false,
+    "original_publisher_pdf_sha256": null,
+    "original_bill_of_lading_invoice_tariff_bytes_held": false,
+    "rights_for_customer_engine_commercial_use_verified": false,
+    "independently_adjudicated_invoice_ground_truth": false,
+    "cross_case_join_allowed": false
   }
 }
