@@ -187,10 +187,10 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "bol['original_truckload_invoice_faces'] == 2",
             "bol['source_invoice_load_reference_matching_bol_pages'] == 4",
             "bol['source_invoice_printed_weight_matches_on_bol_copies'] == 4",
-            "bol['source_invoice_pickup_date_matches_on_bol_copies'] == 3",
+            "bol['source_invoice_pickup_date_matches_on_bol_copies'] == 4",
             "bol['repeated_load_groups_with_piece_count_disagreements'] == 1",
             "bol['duplicate_co_bundled_bol_copy_pages_not_new_shipments'] == 2",
-            "bol['unresolved_reason_counts'] == {'BOL_PICKUP_INVOICE_DATE_CONFLICT': 1}",
+            "bol['unresolved_reason_counts'] == {}",
             "bol['independently_authenticated_signed_bol_acceptances'] == 0",
             "bol['independent_custody_original_bol_verified'] == 0",
             "bol['independently_adjudicated_customer_overcharges'] == 0",
@@ -199,6 +199,15 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "chain['arcbest_cobundled_bol_page_class_sha256']",
             "chain['arcbest_original_bol_signatures_independently_authenticated'] == 0",
             "chain['arcbest_cobundled_bol_copies_not_independent_custody'] is True",
+            "chain['arcbest_cobundled_pickup_date_copy_matches'] == 4",
+            "chain['original_globaltranz_invoice_to_statement_exact_date_matches'] == 100",
+            "chain['original_globaltranz_statement_max_date_gap_days'] == 0",
+            "chain['original_us_date_fixes_not_payment_or_delivery_proof'] is True",
+            "audit['date_fields_legacy_uk_first_misparsed'] == expected['misparsed_fields']",
+            "audit['invoice_faces_affected_by_legacy_uk_first_parser'] == expected['affected_faces']",
+            "audit['us_month_day_year_source_semantics_enforced'] is True",
+            "audit['independent_delivery_or_payment_proof_created'] is False",
+            "stmt['bank_payment_reconciliation'] == 'NOT_POSSIBLE_NO_BANK_RECORD'",
         ):
             with self.subTest(line=expected):
                 self.assertIn(expected, nightly)
@@ -210,6 +219,29 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
         self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
 
+
+
+    def test_original_real_document_ci_refuses_old_uk_first_us_freight_date_baselines(self):
+        """The separate original-PDF workflow must run the same US date gates."""
+        source = (WORKFLOW.parent / "retally-real-document-lab.yml").read_text(
+            encoding="utf-8")
+        for expected in (
+            "stmt['face_to_statement_original_amount']['matched_invoices'] == 100",
+            "stmt['face_to_statement_original_amount']['by_rule']['exact'] == 100",
+            "identities['source_date_gaps_over_180_days'] == 0",
+            "identities['maximum_face_to_statement_recorded_date_gap_days'] == 0",
+            "US_SOURCE_DATE_LOCALE_BASELINE",
+            "audit['date_fields_legacy_uk_first_misparsed'] == expected['misparsed_fields']",
+            "audit['invoice_faces_affected_by_legacy_uk_first_parser'] == expected['affected_faces']",
+            "audit['normalized_invoice_date_catalog_sha256'] == expected['catalog_sha256']",
+            "audit['independent_delivery_or_payment_proof_created'] is False",
+            "bol['source_invoice_pickup_date_matches_on_bol_copies'] == 4",
+            "bol['unresolved_reason_counts'] == {}",
+            "bol['commercial_reuse_authorized'] is False",
+            "bol['verified_retally_cash_recovered_cents'] == 0",
+        ):
+            with self.subTest(required=expected):
+                self.assertIn(expected, source)
 
 
 if __name__ == "__main__":
