@@ -837,5 +837,66 @@ class FMCIndexOnlySourceCandidateTests(unittest.TestCase):
         self.assertFalse(other["independently_adjudicated_invoice_ground_truth"])
 
 
+
+class CaptureBriefSAMNoticeCandidateTests(unittest.TestCase):
+    """Research-only original government notice chronology, not an award truth set."""
+
+    def test_original_sam_notice_amendment_and_expired_deadline_are_not_award(self):
+        url = "https://sam.gov/opp/e4a54b2056164c7da290f5a04e60e047/view"
+        item = json.loads((Path(__file__).with_name("fixtures") /
+                           "capturebrief_sam_barda_2026_amendment_candidate_v0.json").read_text(encoding="utf-8"))
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["evaluation_family"],
+                         "GOVERNMENT_SOLICITATION_CHRONOLOGY_SOURCE_CANDIDATE_ONLY")
+        self.assertEqual(item["source"]["official_notice_url"], url)
+        self.assertEqual(item["source"]["notice_id"], "BARDA-27-100227")
+        self.assertIn(url, SEEDS["capturebrief"])
+        self.assertFalse(item["source"]["source_original_html_bytes_acquired"])
+        self.assertIsNone(item["source"]["source_original_html_sha256"])
+        self.assertFalse(item["source"]["commercial_engine_reuse_approved"])
+        self.assertFalse(item["source"]["automated_scraping_permitted"])
+        facts = item["published_notice_facts"]
+        self.assertEqual(facts["original_offers_due_local"], "2026-10-09T13:00:00-04:00")
+        self.assertEqual(facts["amended_offers_due_local"], "2026-10-21T13:00:00-04:00")
+        self.assertLess(facts["original_offers_due_local"], facts["amended_offers_due_local"])
+        self.assertEqual(facts["latest_visible_amendment_number"], "0002")
+        self.assertEqual(facts["latest_published_ui_status"], "ACTIVE")
+        self.assertEqual(facts["latest_published_inactive_date"], "2026-11-05")
+        self.assertTrue(facts["official_notice_date_offer_due_is_not_inactive_date"])
+        bound = item["asof_constraints"]
+        self.assertEqual(bound["date"], "2026-10-25")
+        self.assertTrue(bound["published_amended_due_date_precedes_asof"])
+        self.assertTrue(bound["page_ui_active_status_does_not_prove_bid_window_open"])
+        self.assertEqual(bound["independent_award_outcome"], "UNKNOWN")
+        self.assertEqual(bound["independently_held_out_labeled_cases"], 0)
+        self.assertFalse(bound["opportunity_to_award_identity_verified"])
+        self.assertFalse(item["quality"]["production_input_approved"])
+
+    def test_sam_notice_synthetic_controls_and_deduped_metadata_only(self):
+        item = json.loads((Path(__file__).with_name("fixtures") /
+                           "capturebrief_sam_barda_2026_amendment_candidate_v0.json").read_text(encoding="utf-8"))
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTHETIC_") for c in controls))
+        self.assertIn("REJECT_DUE_DATE_PASSED_UI_STATUS_NOT_OFFER_ELIGIBILITY",
+                      {c["expected"] for c in controls})
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Path(root) / "capturebrief.json"
+            first = run(engine="capturebrief", live=False, ledger=ledger,
+                        now=datetime(2026, 10, 25, tzinfo=timezone.utc))
+            second = run(engine="capturebrief", live=False, ledger=ledger,
+                         now=datetime(2026, 10, 25, 1, tzinfo=timezone.utc))
+            urls = [r for r in read_ledger(ledger)["entries"]
+                    if r["url"] == item["source"]["official_notice_url"]]
+            self.assertEqual(len(urls), 1)
+            self.assertEqual(second["new_leads"], 0)
+            self.assertGreaterEqual(first["new_leads"], 1)
+            self.assertFalse(urls[0]["commercial_reuse_authorized"])
+            self.assertFalse(urls[0]["independent_ground_truth"])
+            self.assertFalse(urls[0]["document_bytes_stored"])
+
+
 if __name__ == "__main__":
     unittest.main()

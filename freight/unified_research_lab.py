@@ -90,6 +90,7 @@ SEEDS = {
     ),
     "capturebrief": (
         "https://sam.gov/opportunities",
+        "https://sam.gov/opp/e4a54b2056164c7da290f5a04e60e047/view",  # Original 2026 BARDA amendment: UI active != bid deadline open.
         "https://api.usaspending.gov/docs/endpoints",
     ),
     "recoveryos": (
