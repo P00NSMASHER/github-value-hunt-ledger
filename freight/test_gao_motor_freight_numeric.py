@@ -294,5 +294,101 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
 
 
 
+    def test_b145308_real_gao_deduction_is_not_requested_refund_or_retally_cash(self):
+        """Pin 1961 decision-only evidence: paid, deducted, requested are distinct."""
+        item = json.loads((FIXTURE.parent / "gao_b145308_deduction_v1.json").read_text())
+        self.assertEqual(item["schema_version"], "1.0.0")
+        self.assertEqual(item["fixture_id"], "GAO_B145308_DEDUCTION_VS_REQUESTED_REFUND_V1")
+        self.assertEqual(item["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY")
+        source = item["source"]
+        self.assertEqual(source["official_url"], "https://www.gao.gov/products/b-145308")
+        self.assertIn(source["official_url"], SEEDS["freightrecovery"])
+        self.assertEqual(source["decision_date"], "1961-08-14")
+        self.assertEqual(source["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertFalse(source["original_publisher_bytes_acquired"])
+        self.assertIsNone(source["original_publisher_bytes_sha256"])
+        self.assertFalse(source["customer_engine_commercial_reuse_approved"])
+        facts = item["historical_facts"]
+        self.assertEqual(facts["shipment_date"], "1957-04-18")
+        self.assertEqual(facts["gbl_number_reported_by_gao"], "AF-7288198")
+        self.assertEqual(facts["original_payment_cents"], 130883)
+        self.assertEqual(facts["actual_gao_reported_deduction_cents"], 28283)
+        self.assertEqual(facts["net_payment_after_reported_deduction_cents"], 102600)
+        self.assertEqual(facts["gao_computed_applicable_charge_cents"], 52950)
+        self.assertEqual(facts["additional_refund_requested_cents"], 49650)
+        self.assertEqual(130883 - 28283, 102600)
+        self.assertEqual(102600 - 52950, 49650)
+        self.assertIsNone(facts["additional_refund_collected_cents"])
+        self.assertEqual(facts["separate_carrier_additional_charge_claim_cents"], 28263)
+        self.assertNotEqual(facts["separate_carrier_additional_charge_claim_cents"],
+                            facts["actual_gao_reported_deduction_cents"])
+        self.assertEqual(facts["regulation_effective_date"], "1959-10-12")
+        self.assertFalse(facts["regulation_applicable_to_1957_shipment"])
+        self.assertTrue(facts["receiving_signature_proved_goods_received_not_exclusive_use"])
+        self.assertFalse(facts["exclusive_use_furnished_proven"])
+        self.assertTrue(facts["possible_later_carrier_reconsideration_on_new_evidence"])
+        self.assertEqual(facts["outcome_after_decision"], "UNKNOWN")
+        truth = item["truth_boundaries"]
+        self.assertTrue(truth["actual_historical_deduction_is_published_gao_report"])
+        self.assertTrue(truth["additional_refund_is_request_not_verified_collection"])
+        self.assertFalse(truth["original_paid_invoice_or_gbl_bytes_held"])
+        self.assertFalse(truth["independently_held_out_training_separation_verified"])
+        self.assertIsNone(truth["independent_private_customer_invoice_error_cents"])
+        self.assertFalse(truth["customer_accuracy_scoring_permitted"])
+        self.assertEqual(truth["retally_verified_cash_recovery_cents"], 0)
+
+    def test_b145308_synthetic_adversarial_claims_and_forged_promotions_rejected(self):
+        """Counterfactual cases are synthetic; the original source claim stays bounded."""
+        item = json.loads((FIXTURE.parent / "gao_b145308_deduction_v1.json").read_text())
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and c["id"].startswith("SYNTHETIC_")
+                            for c in controls))
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_UNOBSERVED_COLLECTION",
+            "REJECT_DISTINCT_AMOUNTS_AND_OUTCOMES",
+            "REJECT_LATER_EFFECTIVE_DATE",
+            "REJECT_MISSING_EXCLUSIVE_USE_PROOF",
+            "REJECT_NO_MODERN_CUSTOMER_SETTLEMENT_EVIDENCE",
+        })
+        pinned = (
+            ("historical_facts", "actual_gao_reported_deduction_cents", 28283),
+            ("historical_facts", "separate_carrier_additional_charge_claim_cents", 28263),
+            ("historical_facts", "additional_refund_requested_cents", 49650),
+            ("historical_facts", "additional_refund_collected_cents", None),
+            ("historical_facts", "regulation_applicable_to_1957_shipment", False),
+            ("historical_facts", "exclusive_use_furnished_proven", False),
+            ("source", "original_publisher_bytes_sha256", None),
+            ("source", "customer_engine_commercial_reuse_approved", False),
+            ("truth_boundaries", "original_paid_invoice_or_gbl_bytes_held", False),
+            ("truth_boundaries", "customer_accuracy_scoring_permitted", False),
+            ("truth_boundaries", "retally_verified_cash_recovery_cents", 0),
+        )
+        def verify(values):
+            for section, field, expected in pinned:
+                self.assertEqual(values[section][field], expected)
+            x = values["historical_facts"]
+            self.assertEqual(x["original_payment_cents"] -
+                             x["actual_gao_reported_deduction_cents"],
+                             x["net_payment_after_reported_deduction_cents"])
+            self.assertEqual(x["net_payment_after_reported_deduction_cents"] -
+                             x["gao_computed_applicable_charge_cents"],
+                             x["additional_refund_requested_cents"])
+        verify(item)
+        for section, field, expected in pinned:
+            with self.subTest(field=field):
+                forged = copy.deepcopy(item)
+                forged[section][field] = (
+                    True if expected is False else
+                    1 if expected is None or expected == 0 else expected + 1
+                )
+                with self.assertRaises(AssertionError):
+                    verify(forged)
+        self.assertNotEqual(digest({**item, "fixture_id": "FORGED"}), digest(item))
+
+
+
 if __name__ == "__main__":
     unittest.main()
