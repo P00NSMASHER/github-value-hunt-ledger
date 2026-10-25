@@ -32,8 +32,23 @@ SOURCE_FACE_CATALOG_HASH = {
     "arcbest": "0ad7c4a290d23beea68f9d4c18757b5da8dd96c884dfe9a917593f130c841eb7",
 }
 SIGNED_RECORD_CATALOG_HASH = (
-    "ecf6f9529909d5f1a3f031a0683c1eba4ca9ccabf9feaa6c445b208c468ef787"
+    "a7447d980d23feb548cc387f204db293c5fbf46b0f00d20d4f1a4d70f9cd697f"
 )
+# Verified under frozen original-PDF source hashes in 2026-10-25 isolated
+# replay: original US dates were incorrectly parsed UK-first in 65/110 faces.
+# These are corrected DATE identifiers, NOT bank settlement/claim labels.
+US_SOURCE_DATE_LOCALE_BASELINE = {
+    "globaltranz": {
+        "faces": 100, "date_fields": 200, "misparsed_fields": 70,
+        "affected_faces": 59,
+        "catalog_sha256": "ac920a676eb8e43b12f2a4fa9c1e1b1a6bacb55ad554a74907179e7095767841",
+    },
+    "arcbest": {
+        "faces": 10, "date_fields": 10, "misparsed_fields": 6,
+        "affected_faces": 6,
+        "catalog_sha256": "6fc8f6149f52ccfe2a44cd158b73fa2a9dcdfb4e84a578efd6a394304fac0d24",
+    },
+}
 # Source-only categories observed on the frozen original 74-page ArcBest PDF
 # in isolated real-document run 40140512216. Identifiers themselves excluded.
 ARCBEST_PRINTED_REFERENCE_DIGEST = (
@@ -70,7 +85,7 @@ ARCBEST_EMBEDDED_QUOTE_MATCH_DIGEST = (
 # Two additional copies of one group disagree on printed piece count. These
 # are source-internal BOL forms, not independently authenticated signatures.
 ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST = (
-    "02fc64cd001e88db3e81d85c2d8c84b8b56c6dd609f90b309748c23e2e4dc4ca"
+    "3d2876dc5cae232414e245d9c49531d726268a3ddab6bd7124d961e005ed274e"
 )
 EXPECTED_FACE_COUNTS = {"globaltranz": 100, "arcbest": 10}
 EXPECTED_NET_COVERAGE = {"globaltranz": 100, "arcbest": 0}
@@ -91,7 +106,8 @@ LIMITATIONS = (
     "ArcBest invoice-printed tariff/VPQ codes and BOL headers do not prove an original accepted quote, contract rate or separately held original BOL.",
     "Two same-PDF ArcBest quotation pages match invoice quote codes, dates and printed weight, but are not independent issuer or initial BOL acceptance evidence.",
     "The same source PDF includes four carrier BOL first pages for two truckload loads, including duplicate versions with conflicting printed piece counts.",
-    "Three of four printed BOL pickup-date observations match invoices; the remaining observation is unresolved and not silently fixed.",
+    "US month/day/year parser correction eliminates a false ArcBest BOL pickup mismatch; all four co-bundled BOL pickup dates now align with source invoice dates.",
+    "GlobalTranz's original source dates now match 100/100 invoice/open-statement dates, not 98/100; open statements do not independently establish bank-cleared payments.",
     "Original forms in a court-filed PDF do not independently establish shipper/carrier signature authentication, delivery, bank clearance or paid freight-error outcomes.",
     "One source quotation minimum exactly matches its invoice; one additional-foot formula only matches if the printed LWH first dimension is billable trailer length rounded to whole feet.",
     "ArcBest VPQ printed on a billing document is not evidence that the quote ID appeared on the initial signed BOL, as ArcBest's published VPQ terms require.",
@@ -130,6 +146,11 @@ RECEIPT_KEYS = frozenset({
     "arcbest_cobundled_bol_page_class_sha256",
     "arcbest_original_bol_signatures_independently_authenticated",
     "arcbest_cobundled_bol_copies_not_independent_custody",
+    "original_us_freight_date_locale_corrections",
+    "original_us_freight_normalized_date_catalog_sha256",
+    "original_globaltranz_invoice_to_statement_exact_date_matches",
+    "original_globaltranz_statement_max_date_gap_days",
+    "original_us_date_fixes_not_payment_or_delivery_proof",
     "arcbest_source_printed_category_sha256",
     "arcbest_independently_verified_rate_and_original_bol_documents",
     "source_original_sha256", "original_invoice_catalog_sha256",
@@ -197,6 +218,30 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
             raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ORIGINAL_FACE_ANCHOR_DRIFT")
         _count(item.get("validated_overcharge_cents"), "INVALID_SOURCE_OVERCHARGE", 0)
         _count(item.get("realized_recovery_cents"), "INVALID_SOURCE_RECOVERY", 0)
+        us_locale = _mapping(item.get("source_us_date_locale_audit"),
+                             "ORIGINAL_US_DATE_LOCALE_" + issuer.upper())
+        baseline = US_SOURCE_DATE_LOCALE_BASELINE[issuer]
+        if (us_locale.get("scope") !=
+                "ORIGINAL_US_FREIGHT_PDF_DATE_LOCALE_AUDIT_NOT_SETTLEMENT_OR_RATE_TRUTH"
+                or us_locale.get("issuer") != issuer
+                or us_locale.get("source_original_pdf_sha256") != FROZEN_DOCUMENT_SHA256[issuer]
+                or us_locale.get("normalized_invoice_date_catalog_sha256")
+                != baseline["catalog_sha256"]):
+            raise ResearchError("FREIGHT_EVIDENCE_CHAIN_US_SOURCE_DATE_CATALOG_DRIFT")
+        for name, expected in (
+                ("original_invoice_faces_considered", baseline["faces"]),
+                ("date_fields_rebound_to_us_source", baseline["date_fields"]),
+                ("date_fields_legacy_uk_first_misparsed", baseline["misparsed_fields"]),
+                ("invoice_faces_affected_by_legacy_uk_first_parser",
+                 baseline["affected_faces"]),
+                ("customer_overcharge_labels", 0),
+                ("verified_retally_cash_recovered_cents", 0),
+                ("original_invoice_ids_exported", 0)):
+            _count(us_locale.get(name), "ORIGINAL_US_DATE_" + name.upper(), expected)
+        _is_true(us_locale.get("us_month_day_year_source_semantics_enforced"),
+                 "ORIGINAL_US_MONTH_DAY_YEAR_REQUIRED")
+        _is_false(us_locale.get("independent_delivery_or_payment_proof_created"),
+                  "ORIGINAL_US_DATE_NOT_A_BANK_OR_DELIVERY_RECORD")
         result[issuer] = item
 
     gt, abf = result["globaltranz"], result["arcbest"]
@@ -241,6 +286,16 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
         raise ResearchError("FREIGHT_EVIDENCE_CHAIN_PAYMENT_CANNOT_BE_INFERRED")
     statement_ids = _mapping(gt.get("face_statement_identity_diagnostic"), "STATEMENT_IDENTITIES")
     _count(statement_ids.get("same_identifier_and_original_amount"), "IDENTITY_AMOUNT_MATCH", 100)
+    _count(statement_ids.get("maximum_face_to_statement_recorded_date_gap_days"),
+           "MAX_ORIGINAL_INVOICE_STATEMENT_DATE_GAP", 0)
+    _count(statement_ids.get("source_date_gaps_over_180_days"),
+           "FALSE_180_DAY_US_DATE_GAP", 0)
+    statement_replay = _mapping(statement.get("face_to_statement_original_amount"),
+                                "ORIGINAL_INVOICE_STATEMENT_SAME_DOCUMENT_RECONCILIATION")
+    _count(statement_replay.get("matched_invoices"), "ORIGINAL_STATEMENT_MATCHED_INVOICES", 100)
+    _count(statement_replay.get("unmatched_invoices"), "ORIGINAL_STATEMENT_UNMATCHED_INVOICES", 0)
+    by_rule = _mapping(statement_replay.get("by_rule"), "ORIGINAL_STATEMENT_MATCH_KINDS")
+    _count(by_rule.get("exact"), "ORIGINAL_STATEMENT_EXACT_REFERENCE_MATCHES", 100)
     _is_true(statement_ids.get("these_differences_are_not_payment_or_overcharge_findings"),
              "STATEMENT_NOT_SETTLEMENT")
     abf_rated = _mapping(abf.get("retally_rating_engine"), "ARCBEST_RATE_REVIEW")
@@ -351,7 +406,7 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
             ("source_invoice_load_reference_matching_bol_pages", 4),
             ("source_invoice_bol_totals_readable_pages", 4),
             ("source_invoice_printed_weight_matches_on_bol_copies", 4),
-            ("source_invoice_pickup_date_matches_on_bol_copies", 3),
+            ("source_invoice_pickup_date_matches_on_bol_copies", 4),
             ("unique_truckload_invoices_with_co_bundled_bol_copies", 2),
             ("duplicate_co_bundled_bol_copy_pages_not_new_shipments", 2),
             ("repeated_load_groups_with_piece_count_disagreements", 1),
@@ -367,7 +422,7 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
             ("original_source_customer_or_load_identifiers_exported", 0),
             ("external_contact_actions", 0)):
         _count(bol.get(name), "ARCBEST_ORIGINAL_BOL_" + name.upper(), amount)
-    if bol.get("unresolved_reason_counts") != {"BOL_PICKUP_INVOICE_DATE_CONFLICT": 1}:
+    if bol.get("unresolved_reason_counts") != {}:
         raise ResearchError("FREIGHT_EVIDENCE_CHAIN_ARCBEST_COBUNDLED_BOL_UNRESOLVED_DIAGNOSTIC_DRIFT")
     _is_false(bol.get("commercial_reuse_authorized"),
               "ARCBEST_BOL_COMMERCIAL_RIGHTS_NOT_VERIFIED")
@@ -419,12 +474,26 @@ def make_receipt(report: dict, *, as_of: date) -> dict:
         "arcbest_cobundled_original_truckload_bol_pages": 4,
         "arcbest_cobundled_unique_invoice_load_groups": 2,
         "arcbest_cobundled_original_bol_weight_copy_matches": 4,
-        "arcbest_cobundled_pickup_date_copy_matches": 3,
+        "arcbest_cobundled_pickup_date_copy_matches": 4,
         "arcbest_cobundled_same_load_piece_conflict_groups": 1,
         "arcbest_cobundled_duplicate_pages_not_new_shipments": 2,
         "arcbest_cobundled_bol_page_class_sha256": ARCBEST_COBUNDLED_TL_BOL_PAGE_DIGEST,
         "arcbest_original_bol_signatures_independently_authenticated": 0,
         "arcbest_cobundled_bol_copies_not_independent_custody": True,
+        "original_us_freight_date_locale_corrections": {
+            issuer: {
+                "faces": baseline["faces"], "date_fields": baseline["date_fields"],
+                "legacy_misparsed_fields": baseline["misparsed_fields"],
+                "legacy_affected_faces": baseline["affected_faces"],
+            } for issuer, baseline in sorted(US_SOURCE_DATE_LOCALE_BASELINE.items())
+        },
+        "original_us_freight_normalized_date_catalog_sha256": {
+            issuer: baseline["catalog_sha256"]
+            for issuer, baseline in sorted(US_SOURCE_DATE_LOCALE_BASELINE.items())
+        },
+        "original_globaltranz_invoice_to_statement_exact_date_matches": 100,
+        "original_globaltranz_statement_max_date_gap_days": 0,
+        "original_us_date_fixes_not_payment_or_delivery_proof": True,
         "arcbest_source_printed_category_sha256": ARCBEST_PRINTED_REFERENCE_DIGEST,
         "arcbest_independently_verified_rate_and_original_bol_documents": 0,
         "source_original_sha256": {k: FROZEN_DOCUMENT_SHA256[k] for k in sorted(FROZEN_DOCUMENT_SHA256)},
