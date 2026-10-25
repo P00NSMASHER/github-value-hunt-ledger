@@ -68,6 +68,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.
         "https://www.gao.gov/products/b-148465",  # 1962 $546.88 paid / $61.22; SCOTUS caveat.
         "https://www.gao.gov/products/b-143048",  # 1960 two shipments; $130.30 aggregate only.
+        "https://www.gao.gov/products/b-142112-1",  # 1960 seal proof; $91.80 deducted; disputed $130.44/$130.40 future refund.
         "https://www.gao.gov/products/b-146511-2",  # 1965 conflicting reclaim figures; offset $20.74.
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
