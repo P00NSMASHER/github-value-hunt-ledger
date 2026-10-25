@@ -273,6 +273,83 @@ def pdf_texts(raw: bytes, *, sort: bool = False) -> list[str]:
         doc.close()
 
 
+
+def pdf_positioned_rows(raw: bytes) -> list[list[tuple[float, str]]]:
+    """Read bounded geometric PDF text rows in memory from SAME source bytes.
+
+    Only the original isolated lab calls this: no user data, source text, y
+    coordinates or invoice IDs are persisted in its output JSON. Preserve
+    page indices to cross-check independently source-bound original invoices.
+    """
+    import pymupdf
+
+    if not isinstance(raw, bytes) or not raw.startswith(b"%PDF-"):
+        raise ValueError("PDF_POSITIONED_ROWS_EXPECTS_PDF")
+    doc = pymupdf.open(stream=raw, filetype="pdf")
+    try:
+        if len(doc) > 150:
+            raise ValueError("PDF_POSITIONED_ROWS_PAGE_LIMIT")
+        all_rows = []
+        for page in doc:
+            words = page.get_text("words", sort=False)
+            if len(words) > 20_000:
+                raise ValueError("PDF_POSITIONED_ROWS_WORD_LIMIT")
+            sorted_words = sorted(
+                ((float(word[1] + word[3]) / 2, float(word[0]),
+                  str(word[4])) for word in words if len(word) >= 5),
+                key=lambda row: (row[0], row[1]),
+            )
+            groups = []
+            for y, x, word in sorted_words:
+                if not groups or abs(y - groups[-1][0]) > 3.0:
+                    groups.append([y, [(x, word)]])
+                else:
+                    groups[-1][1].append((x, word))
+            all_rows.append([
+                (y, " ".join(word for _, word in sorted(members)))
+                for y, members in groups
+            ])
+        return all_rows
+    finally:
+        doc.close()
+
+
+def bol_stop1_pickup_from_positioned_rows(
+    rows: list[tuple[float, str]],
+) -> tuple[str | None, str]:
+    """Select an unambiguous US pickup *by visual stop section*, never amount.
+
+    The header Date, pickup Date and delivery Date are different concepts.
+    Do not choose whichever date happens to equal the original invoice.
+    """
+    if not isinstance(rows, list) or len(rows) > 2000 or any(
+            not isinstance(row, tuple) or len(row) != 2
+            or not isinstance(row[0], (int, float))
+            or not isinstance(row[1], str) or len(row[1]) > 1000
+            for row in rows):
+        raise ValueError("BOL_POSITIONED_ROWS_INVALID")
+    starts = [float(y) for y, line in rows
+              if re.search(r"\bStop\s+1\s*-\s*Pick\s*Up\b", line, re.I)]
+    ends = [float(y) for y, line in rows
+            if re.search(r"\bStop\s+2\s*-\s*Delivery\b", line, re.I)]
+    if len(starts) != 1 or len(ends) != 1 or starts[0] >= ends[0]:
+        return None, "GEOMETRIC_PICKUP_STOP_BOUNDARIES_UNRESOLVED"
+    tokens = []
+    for y, line in rows:
+        if starts[0] < float(y) < ends[0]:
+            tokens += re.findall(
+                r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b", line, re.I)
+    if not tokens:
+        return None, "GEOMETRIC_PICKUP_DATE_NOT_LOCATED"
+    try:
+        days = {iso_date(d, formats=("%m/%d/%Y",)) for d in tokens}
+    except ValueError:
+        return None, "GEOMETRIC_PICKUP_DATE_INVALID"
+    if len(days) != 1:
+        return None, "GEOMETRIC_PICKUP_DATES_CONFLICT"
+    return next(iter(days)), "GEOMETRIC_PICKUP_DATE_UNAMBIGUOUS"
+
+
 def _global_page(text: str, page: int) -> InvoiceFace | None:
     if not re.search(r"\bInvoice\s+Date\b", text, re.I):
         return None
@@ -1020,7 +1097,8 @@ def benchmark_freight() -> dict:
             out["co_bundled_motor_carrier_bol_source_replay"] = (
                 arcbest_embedded_truckload_bol_reconciliation(
                     list(unique.values()), texts, source_hash,
-                    layout_texts=pdf_texts(raw, sort=True)))
+                    layout_texts=pdf_texts(raw, sort=True),
+                    positioned_rows=pdf_positioned_rows(raw)))
             out["retally_rating_engine"] = _rating_probe(faces, texts, digest(raw))
         results[issuer] = out
     return results
@@ -1032,6 +1110,7 @@ def benchmark_freight() -> dict:
 def arcbest_embedded_truckload_bol_reconciliation(
     faces: list[InvoiceFace], texts: list[str], pdf_sha256: str, *,
     layout_texts: list[str] | None = None,
+    positioned_rows: list[list[tuple[float, str]]] | None = None,
 ) -> dict:
     """Link 2024 truckload invoice faces to co-bundled carrier BOL copies.
 
@@ -1051,6 +1130,10 @@ def arcbest_embedded_truckload_bol_reconciliation(
             type(layout_texts) is not list or len(layout_texts) != len(texts)
             or any(type(page) is not str or len(page) > 200_000 for page in layout_texts)):
         raise ValueError("ARCBEST_BOL_LAYOUT_SOURCE_PAGES_INVALID")
+    if positioned_rows is not None and (
+            not isinstance(positioned_rows, list)
+            or len(positioned_rows) != len(texts)):
+        raise ValueError("ARCBEST_BOL_POSITIONED_SOURCE_PAGES_INVALID")
     if len({(f.number, f.page) for f in faces}) != len(faces):
         raise ValueError("ARCBEST_BOL_DUPLICATE_INVOICE_FACE")
 
@@ -1101,6 +1184,9 @@ def arcbest_embedded_truckload_bol_reconciliation(
     layout_pickup_observation_states = Counter()
     layout_pickup_matches_invoice = 0
     layout_pickup_disagrees_primary = 0
+    geometric_pickup_states = Counter()
+    geometric_pickup_matches_invoice = 0
+    geometric_pickup_disagrees_primary = 0
     missing = Counter()
     by_invoice = {}
     anonymous = []
@@ -1220,6 +1306,15 @@ def arcbest_embedded_truckload_bol_reconciliation(
                         layout_pickup_day = next(iter(dates))
                         layout_state = "LAYOUT_READING_PICKUP_DATE_UNAMBIGUOUS"
 
+        geometric_pickup_day = None
+        geometric_state = None
+        if positioned_rows is not None:
+            geometric_pickup_day, geometric_state = (
+                bol_stop1_pickup_from_positioned_rows(
+                    positioned_rows[page_number - 1]))
+        if geometric_state is not None:
+            geometric_pickup_states[geometric_state] += 1
+
         summaries = re.findall(
             r"\bTotal\s+HU\s*:\s*(\d+)\s+Total\s+Pcs\s*:\s*(\d+)\s+"
             r"Total\s+Cmdty\s*:\s*(\d+)\s+Total\s+Wgt\s*:\s*"
@@ -1249,6 +1344,11 @@ def arcbest_embedded_truckload_bol_reconciliation(
                 layout_pickup_day == face_doc["face"].shipment_date)
             layout_pickup_disagrees_primary += int(
                 layout_pickup_day != pickup_day)
+        if geometric_pickup_day is not None:
+            geometric_pickup_matches_invoice += int(
+                geometric_pickup_day == face_doc["face"].shipment_date)
+            geometric_pickup_disagrees_primary += int(
+                geometric_pickup_day != pickup_day)
         matching_weights += int(weight_match)
         matching_pickup_dates += int(date_match)
         groups.append({
@@ -1307,6 +1407,11 @@ def arcbest_embedded_truckload_bol_reconciliation(
         "layout_reading_pickup_dates_matching_invoice": layout_pickup_matches_invoice,
         "layout_reading_pickup_date_disagreements_with_primary": layout_pickup_disagrees_primary,
         "layout_reading_is_not_independent_document_custody": True,
+        "geometric_word_row_reading_used_on_same_frozen_pdf": positioned_rows is not None,
+        "geometric_pickup_observation_state_counts": dict(sorted(geometric_pickup_states.items())),
+        "geometric_pickup_dates_matching_original_invoice": geometric_pickup_matches_invoice,
+        "geometric_pickup_date_disagreements_with_flattened_text": geometric_pickup_disagrees_primary,
+        "geometric_reading_is_not_independent_document_custody": True,
         "unique_truckload_invoices_with_co_bundled_bol_copies": len(by_invoice),
         "duplicate_co_bundled_bol_copy_pages_not_new_shipments":
             sum(max(0, len(x) - 1) for x in by_invoice.values()),
