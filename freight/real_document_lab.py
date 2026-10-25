@@ -1190,21 +1190,21 @@ def arcbest_embedded_truckload_bol_reconciliation(
             # Strict *independent reading order*, but the SAME PDF bytes.
             # Require both original identity anchors on the same PDF page.
             reading = layout_texts[page_number - 1]
-            if (not re.search(r"\\bMotor\\s+Carrier\\s+Bill\\s+of\\s+Lading\\b", reading, re.I)
-                    or not re.search(r"\\bLoad\\s*#\\s*:\\s*" +
-                                     re.escape(load.group(1)) + r"\\b", reading, re.I)
-                    or not re.search(r"\\bArcBest\\s+Pronumber\\s*:\\s*" +
-                                     re.escape(pro.group(1)) + r"\\b", reading, re.I)):
+            if (not re.search(r"\bMotor\s+Carrier\s+Bill\s+of\s+Lading\b", reading, re.I)
+                    or not re.search(r"\bLoad\s*#\s*:\s*" +
+                                     re.escape(load.group(1)) + r"\b", reading, re.I)
+                    or not re.search(r"\bArcBest\s+Pronumber\s*:\s*" +
+                                     re.escape(pro.group(1)) + r"\b", reading, re.I)):
                 layout_state = "LAYOUT_READING_SOURCE_IDENTITY_UNBOUND"
             else:
-                st = re.search(r"\\bStop\\s+1\\s*-\\s*Pick\\s*Up\\b", reading, re.I)
-                en = re.search(r"\\bStop\\s+2\\s*-\\s*Delivery\\b", reading, re.I)
+                st = re.search(r"\bStop\s+1\s*-\s*Pick\s*Up\b", reading, re.I)
+                en = re.search(r"\bStop\s+2\s*-\s*Delivery\b", reading, re.I)
                 if not st or not en or st.end() >= en.start():
                     layout_state = "LAYOUT_READING_STOP_ANCHORS_UNBOUND"
                 else:
                     region = reading[st.end():en.start()]
                     tokens = re.findall(
-                        r"\\bDate\\s*:\\s*(\\d{1,2}/\\d{1,2}/\\d{4})\\b",
+                        r"\bDate\s*:\s*(\d{1,2}/\d{1,2}/\d{4})\b",
                         region, re.I)
                     try:
                         dates = {
