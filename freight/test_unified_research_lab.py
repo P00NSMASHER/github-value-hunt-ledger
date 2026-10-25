@@ -471,6 +471,40 @@ class UnifiedResearchLabTests(unittest.TestCase):
         self.assertTrue(all("restaurant" not in q.lower() for q in SEARCHES["permitplate"]))
         self.assertTrue(any("permit" in q.lower() for q in SEARCHES["permitplate"]))
 
+    def test_permitplate_official_dob_seed_replaces_restaurant_and_stays_rights_held(self):
+        # Official NYC DOB original source, not the DOHMH restaurant-inspection seed.
+        official = "https://data.cityofnewyork.us/d/rbx6-tga4"
+        applications = "https://data.cityofnewyork.us/d/w9ak-ipjd"
+        self.assertEqual(set(SEEDS["permitplate"]), {official, applications})
+        self.assertNotIn("https://data.cityofnewyork.us/d/43nn-pn8j", SEEDS["permitplate"])
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Path(root) / "permit_sources.json"
+            receipt = run(engine="permitplate", live=False, ledger=ledger, now=NOW)
+            rows = read_ledger(ledger)["entries"]
+            self.assertEqual(receipt["new_leads"], 2)
+            self.assertEqual({r["url"] for r in rows}, {official, applications})
+            self.assertEqual(receipt["approved_real_truth_cases"], 0)
+            self.assertTrue(all(not r["commercial_reuse_authorized"]
+                                and not r["independent_ground_truth"]
+                                and not r["document_bytes_stored"] for r in rows))
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_source_scope_v1.json").read_text(encoding="utf-8"))
+        self.assertEqual(pack["evaluation_family"],
+                         "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY")
+        self.assertEqual(pack["real_issuance_cases_ingested"], 0)
+        self.assertEqual(pack["acceptance_boundaries"]["independent_labels_count"], 0)
+        self.assertEqual(pack["accuracy_evaluation"],
+                         "NOT_ESTIMABLE_WITHOUT_INDEPENDENT_LABELS")
+        source = next(x for x in pack["official_sources"] if x["dataset_id"] == "rbx6-tga4")
+        self.assertEqual(source["official_url"], official)
+        self.assertFalse(source["commercial_reuse_authorized"])
+        self.assertFalse(source["independent_outcome_adjudicated"])
+        self.assertIsNone(source["original_source_bytes_sha256"])
+        self.assertEqual(len(pack["synthetic_negative_controls"]), 4)
+        self.assertTrue(all(c["provenance_class"].startswith("SYNTHETIC")
+                            and c["real_world_accuracy_label"] is None
+                            for c in pack["synthetic_negative_controls"]))
+
     def test_permitplate_obvious_wrong_topic_is_excluded_but_history_unchanged(self):
         prior = source_record("https://github.com/owner/nyc-restaurant-inspections",
                               "permitplate", "2026-10-22")

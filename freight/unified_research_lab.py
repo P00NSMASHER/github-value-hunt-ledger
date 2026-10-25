@@ -81,8 +81,8 @@ SEEDS = {
         "https://www.eia.gov/petroleum/gasdiesel/",
     ),
     "permitplate": (
-        "https://data.cityofnewyork.us/d/43nn-pn8j",
-        "https://data.cityofnewyork.us/d/w9ak-ipjd",
+        "https://data.cityofnewyork.us/d/w9ak-ipjd",  # Original DOB NOW applications; not issuance proof.
+        "https://data.cityofnewyork.us/d/rbx6-tga4",  # Original DOB NOW approved permits; excluded work types remain UNKNOWN.
     ),
     "capturebrief": (
         "https://sam.gov/opportunities",
