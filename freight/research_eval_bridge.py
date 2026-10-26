@@ -40,7 +40,7 @@ FORBIDDEN_SOURCE_HOSTS = frozenset({"extranet4.biggexpress.com", "cw.shipandsave
 HISTORICAL_GAO_CASEBOOK = (Path(__file__).with_name("fixtures")
                           / "gao_adjudicated_billing_cases_v1.json")
 # Exact pre-reviewed Git fixture bytes; NOT the original publisher HTTP bytes.
-HISTORICAL_GAO_CASEBOOK_BLOB_SHA1 = "fffc4198922892baf57bc3575ff0abe591db67b7"
+HISTORICAL_GAO_CASEBOOK_BLOB_SHA1 = "3e5addcab009e356fe7e1425b22473ec2019f742"
 MAX_HISTORICAL_GAO_BYTES = 64_000
 
 
@@ -70,7 +70,7 @@ def _historical_gao_references(
         and doc.get("rights_clearance_for_current_customer_engine") is False
         and doc.get("source_common", {}).get("commercial_customer_use_rights_verified") is False
         and doc.get("source_common", {}).get("original_invoice_gbl_tariff_bytes_in_custody") is False
-        and isinstance(doc.get("cases"), list) and len(doc["cases"]) == 5
+        and isinstance(doc.get("cases"), list) and len(doc["cases"]) == 7
     )
     if not controls:
         raise ResearchError("HISTORICAL_GAO_CASEBOOK_TRUTH_OR_RIGHTS_DRIFT")
