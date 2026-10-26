@@ -23,7 +23,6 @@
       "dispute_kind": "GSA_RETROSPECTIVE_OVERCHARGE_ASSESSMENT_AFTER_CARRIER_INVOICE_PAYMENT",
       "shipment_year": 2014,
       "gsa_notices_under_actual_adjudication": 7,
-      "gsa_total_notices_described_not_ALL_ADJUDICATED": 115,
       "appealed_carrier_repayment_to_gsa_cents_reported": 1554908,
       "board_disposition": "CARRIER_REIMBURSEMENT_CLAIM_GRANTED_AS_GSA_OVERCHARGE_ASSESSMENTS_UNSUPPORTED",
       "decision_label": "NEGATIVE_GSA_OVERCHARGE_ASSERTION_SEVEN_SHIPMENTS_ONLY",
@@ -31,7 +30,8 @@
       "original_governing_tender_pages_in_custody": false,
       "actual_carrier_refund_or_credit_received_cents": null,
       "actual_retally_recovered_cash_cents": 0,
-      "modern_customer_overcharge_amount_cents": null
+      "modern_customer_overcharge_amount_cents": null,
+      "gsa_total_notices_described": 115
     },
     {
       "case_id": "CBCA-8051-RATE",
@@ -44,13 +44,13 @@
       "prepayment_denial_date": "2018-10-02",
       "disputed_unpaid_invoice_cents_reported": 1459569,
       "missing_weight_ticket_on_initial_payment_review": true,
-      "documented_claim_challenge_first_recovered_year": 2023,
       "board_disposition": "UNPAID_CARRIER_CLAIM_DENIED_UNTIMELY_WITHOUT_PROVEN_NOTICE_PREJUDICE",
       "decision_label": "NEGATIVE_UNPAID_INVOICE_IS_NOT_VALID_OVERCHARGE_OR_RECOVERED_CASH",
       "original_invoice_weight_ticket_or_bank_record_bytes_in_custody": false,
       "independently_verified_customer_payment_cents": null,
       "actual_retally_recovered_cash_cents": 0,
-      "modern_customer_overcharge_amount_cents": null
+      "modern_customer_overcharge_amount_cents": null,
+      "earliest_documented_claim_response_year": 2023
     }
   ]
 }
