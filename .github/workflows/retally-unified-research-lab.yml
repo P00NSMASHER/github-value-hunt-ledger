@@ -21,6 +21,8 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
       - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/gao_adjudicated_billing_casebook.py"
+      - "freight/test_gao_adjudicated_billing_casebook.py"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
       - "freight/freight_evidence_chain_readiness.py"
@@ -28,6 +30,7 @@ on:
       - "freight/test_gao_b221594_negative_control.py"
       - "freight/test_gao_b189100_classification.py"
       - "freight/fixtures/gao_motor_freight_numeric_v1.json"
+      - "freight/fixtures/gao_adjudicated_billing_casebook_v1.json"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/fixtures/nyc_dob_*_v1.json"
@@ -64,6 +67,8 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
       - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/gao_adjudicated_billing_casebook.py"
+      - "freight/test_gao_adjudicated_billing_casebook.py"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
       - "freight/freight_evidence_chain_readiness.py"
@@ -71,6 +76,7 @@ on:
       - "freight/test_gao_b221594_negative_control.py"
       - "freight/test_gao_b189100_classification.py"
       - "freight/fixtures/gao_motor_freight_numeric_v1.json"
+      - "freight/fixtures/gao_adjudicated_billing_casebook_v1.json"
       - "freight/fixtures/gao_b*.json"
       - "freight/test_unified_research_ci_contract.py"
       - "freight/fixtures/nyc_dob_*_v1.json"
@@ -105,8 +111,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py freight/test_gao_b221594_negative_control.py freight/test_gao_b189100_classification.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py freight/test_gao_b221594_negative_control.py freight/test_gao_b189100_classification.py freight/gao_adjudicated_billing_casebook.py freight/test_gao_adjudicated_billing_casebook.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification freight.test_gao_adjudicated_billing_casebook
           python -m py_compile freight/freight_evidence_chain_readiness.py freight/test_freight_evidence_chain_readiness.py
           python -m unittest -q freight.test_freight_evidence_chain_readiness
       - name: Verify independent Cloudflare scheduler contract
@@ -438,6 +444,29 @@ jobs:
                   '- 0 original customer invoices, modern tariffs, or RETALLY cash.\n'
               )
           PY
+      - name: Verify published GAO billing dispositions without customer-truth promotion
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_gao_adjudicated_billing_casebook
+          python -m freight.gao_adjudicated_billing_casebook --output /tmp/retally-gao-adjudicated-casebook.json
+          python -m freight.gao_adjudicated_billing_casebook --output /tmp/retally-gao-adjudicated-casebook.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally-gao-adjudicated-casebook.json').read_text())
+          assert x['upheld_gsa_setoff_cases'] == 3
+          assert x['upheld_reported_setoff_cents_historical_only'] == 319169
+          assert x['invalidated_gsa_setoff_cases'] == 1
+          assert x['invalidated_reported_setoff_cents_not_overcharges'] == 22075
+          assert x['independent_modern_customer_error_labels'] == 0
+          assert x['verified_retally_recovered_cash_cents'] == 0
+          assert x['commercial_use_authorized'] is False
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write('### GAO historical billing decisions (not customer recoveries)\n'
+                        '- 3 independent GAO-adjudicated GSA setoffs: $3,191.69 historical only.\n'
+                        '- 1 $220.75 GSA deduction INVALIDATED by GAO: negative control.\n'
+                        '- Original invoices, tariff bytes, customer accuracy and RETALLY cash: unverified/zero.\n')
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -709,7 +738,9 @@ jobs:
           # Replay the 1986 invalid-GSA-deduction negative control and 1977
           # cargo-classification dispute on every nightly original-data run.
           # They are historical evidence, never independent customer invoice truth.
-          python -m unittest -q freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
+          python -m unittest -q freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification freight.test_gao_adjudicated_billing_casebook
+          python -m freight.gao_adjudicated_billing_casebook --output /tmp/retally-gao-adjudicated-nightly.json
+          python -m freight.gao_adjudicated_billing_casebook --output /tmp/retally-gao-adjudicated-nightly.json --verify
           python -m pytest -q freight/test_real_world_eval_v1.py
           python -m freight.research_eval_bridge \
             --ledger /tmp/retally-unified-leads.json \
