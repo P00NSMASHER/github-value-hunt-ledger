@@ -62,6 +62,8 @@ SEEDS = {
         "https://www.gao.gov/products/b-191258",  # 1978 GAO reversed $33.30 GSA setoff; later carrier repayment NOT verified.
         "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",  # CBCA seven GSA overcharge notices rejected, carrier refund not verified.
         "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",  # CBCA unpaid original invoice carrier claim time barred, NOT an overcharge.
+        "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",  # CBCA: 12 original public BOL-keyed Treasury offsets reversed for timeliness, carrier bank refund UNVERIFIED.
+        "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",  # CBCA: GSA's 70 paid-detention invoice recoupment demands invalid, conflicting 2-cent source totals.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
         # New source-bound reported numeric cases; original invoices not held.
