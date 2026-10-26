@@ -415,5 +415,46 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
                            verify_only=True)
 
 
+
+class GAOCasebookExpansionRegressionTests(unittest.TestCase):
+    """Reviewed source-book expansion must preserve historical false positives."""
+
+    def test_seven_source_bound_decisions_include_two_rejected_government_audits(self):
+        from freight.research_eval_bridge import (
+            HISTORICAL_GAO_CASEBOOK, _historical_gao_references,
+        )
+        source = json.loads(HISTORICAL_GAO_CASEBOOK.read_text(encoding="utf-8"))
+        refs, content_sha256 = _historical_gao_references()
+        self.assertEqual(len(content_sha256), 64)
+        self.assertEqual(len(source["cases"]), 7)
+        self.assertEqual(len(refs), 7)
+        rejected = {
+            row["id"]: row["source_url"] for row in source["cases"]
+            if row["adjudicated_historical_label"] == "HISTORICAL_AUDIT_FALSE_POSITIVE"
+        }
+        self.assertEqual(rejected, {
+            "B-221594": "https://www.gao.gov/products/b-221594-0",
+            "B-191258": "https://www.gao.gov/products/b-191258",
+        })
+        doc, _ = merge_sources(ledger_from([]), "freightrecovery",
+                               list(rejected.values()), "2026-10-26")
+        feed = build_feed(doc, legacy_evidence(), legacy_candidates(), load_manifest())
+        by_url = {r["source_url"]: r for r in feed["candidate_sources"]}
+        self.assertEqual(feed["historical_gao_decision_reference_matches"], 2)
+        for decision, url in rejected.items():
+            with self.subTest(decision=decision):
+                row = by_url[url]
+                self.assertEqual(row["historical_decision_reference"]["decision_id"], decision)
+                self.assertFalse(row["historical_decision_reference"]["independent_customer_ground_truth"])
+                self.assertFalse(row["commercial_reuse_authorized"])
+                self.assertFalse(row["independent_ground_truth"])
+                self.assertEqual(row["model"]["rating_status"], "REVIEW_REQUIRED")
+                self.assertIsNone(row["model"]["verified_freight_error_cents"])
+                self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+        self.assertEqual(feed["verified_recovered_cash_cents"], 0)
+        self.assertIsNone(feed["new_customer_proven_overcharges"])
+        self.assertFalse(feed["commercial_recovery_allowed"])
+
+
 if __name__ == "__main__":
     unittest.main()
