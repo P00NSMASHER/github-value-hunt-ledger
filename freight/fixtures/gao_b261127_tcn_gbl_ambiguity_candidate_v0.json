@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B261127_TCN_GBL_CONTRACT_AMBIGUITY_NEGATIVE_CONTROL_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "label_class": "ORIGINAL_PUBLISHER_ADJUDICATED_RATE_LOGIC_NOT_ORIGINAL_INVOICE_HOLDOUT",
+  "cohort": "US_GAO_GUARANTEED_TRAFFIC_TENDER_600029_1990_TO_1993_DISPUTE_DECIDED_1996",
+  "source": {
+    "official_decision_url": "https://www.gao.gov/products/b-261127",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-261127",
+    "decision_date": "1996-02-15",
+    "publisher_original_text_reviewed_date": "2026-10-26",
+    "original_source_html_response_bytes_acquired": false,
+    "original_source_response_sha256": null,
+    "original_invoice_or_gbl_image_acquired": false,
+    "original_tender_600029_full_pages_acquired": false,
+    "rights_url": "https://www.gao.gov/copyright",
+    "government_decision_reuse": "GAO_TEXT_PUBLIC_DOMAIN_US_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "customer_engine_specific_commercial_reuse_approved": false,
+    "source_record_kind": "OFFICIAL_GAO_WEB_PUBLISHED_DECISION_NOT_PAYMENT_RECEIPT",
+    "original_solicitation_date": "1990-03-26",
+    "relevant_contract_performance_period": "1990-08_THROUGH_LATE_1993"
+  },
+  "case": {
+    "carrier": "CANUPP_TRUCKING_INC",
+    "tender_reference": "600029",
+    "services": "CHARLESTON_AREA_LOCAL_PICKUP_DELIVERY_TERMINAL",
+    "note_12_minimum_charge_cents_per_shipment": 2500,
+    "note_12_rate_cents_per_cwt": 200,
+    "note_12_weight_breakpoint_lbs": 1250,
+    "note_12_scope": "HANDLING_CONSOLIDATION_BREAK_BULK_INCLUDED",
+    "note_14_scope": "TERMINAL_SERVICE_DUTIES_COST_ALREADY_PROVIDED_IN_NOTE_12",
+    "interpretation_dispute": "SHIPMENT_BILLING_UNIT_TCN_VERSUS_SINGLE_GBL",
+    "carrier_asserted_tcn_billed_gbls_before_objection": 1062,
+    "asserted_population_independently_verified": false,
+    "government_staff_prebilling_tcn_guidance_recorded_in_decision": true,
+    "over_three_years_tcn_billing_without_objection_recorded": true,
+    "external_standard_gbl_definition_incorporated_into_note_12": false,
+    "historical_note_12_disposition": "GAO_UPHELD_CARRIER_TCN_BILLING_UNDER_SPECIFIC_AMBIGUOUS_CONTRACT",
+    "historical_note_14_disposition": "GAO_DENIED_SEPARATE_ADDITIONAL_TERMINAL_CHARGES_AS_OVERLAPPING",
+    "final_actual_refund_or_offset_proved": null,
+    "carrier_note_14_claim_amount_cents": null,
+    "independent_postdecision_payment_or_collection_receipt": false
+  },
+  "numeric_example": {
+    "transcribed_gbl_reference": "C-8,141,261",
+    "shipment_year": 1992,
+    "tcn_minimum_charge_unit_count": 63,
+    "extra_tcn_charges_cents": [
+      2850,
+      5590
+    ],
+    "carrier_billed_tcn_total_cents": 165940,
+    "government_gbl_interpretation_total_weight_lbs": 14320,
+    "alternate_gbl_total_cents": 28640,
+    "unadjudicated_arithmetic_difference_cents": 137300,
+    "difference_is_final_overcharge_or_recovery": false,
+    "true_billed_unit_per_contract": "TCN_APPROVED_FOR_THIS_CONTRACT_AFTER_GAO_REVIEW",
+    "original_invoice_lines_custodied": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_1373_ARITHMETIC_AS_COLLECTIBLE_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MATH_CONTRAST_NOT_GAO_UPHELD_OVERCHARGE"
+    },
+    {
+      "id": "SYNTH_STANDARD_GBL_DEFINITION_OVERRIDES_SPECIFIC_CONTRACT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OMITTED_INCORPORATION_AND_PREBILLING_GUIDANCE"
+    },
+    {
+      "id": "SYNTH_NOTE14_TERMINAL_DUPLICATE_EXTRA_ALLOWED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ADDITIONAL_NOTE14_DENIED"
+    },
+    {
+      "id": "SYNTH_1062_GBLS_AS_HELDOUT_LABELED_BILL_IMAGES",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CARRIER_REPORTED_COUNT_NOT_ORIGINAL_BILL_CUSTODY"
+    },
+    {
+      "id": "SYNTH_GAO_DECISION_PROVES_CUSTOMER_REFUND_PAID",
+      "kind": "SYNTHETIC",
+      "expected": "UNKNOWN_NO_POSTDECISION_PAYMENT_RECEIPT"
+    },
+    {
+      "id": "SYNTH_HISTORICAL_NOTE12_RULE_AS_MODERN_RATE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_1990_TENDER_DOES_NOT_AUTHORIZE_CURRENT_CONTRACT"
+    }
+  ],
+  "evaluation": {
+    "separate_from_general_accounting_reconciliation": true,
+    "extraction_ground_truth": "GAO_DECISION_WEB_TEXT_ONLY",
+    "adjudicated_historical_contract_note12_label": "BILLING_UNIT_TCN_ALLOWED",
+    "adjudicated_historical_contract_note14_label": "ADDITIONAL_CHARGE_DENIED",
+    "independent_heldout_labeled_customer_invoices": 0,
+    "independently_verified_cash_recoveries": 0,
+    "synthetic_cases_count": 6,
+    "real_current_customer_error_precision_recall": null,
+    "real_current_customer_refund_amount_cents": null,
+    "original_invoice_extraction_accuracy": null,
+    "labels_currently_promotable_to_live_engine": false
+  },
+  "quality": {
+    "provenance_link_to_official_decision": true,
+    "mathematically_recomputed_bill_contrast": true,
+    "publisher_response_sha256": null,
+    "source_original_invoice_or_contract_pdf_present": false,
+    "historical_holding_complete_as_web_decision": true,
+    "possible_further_review_or_later_litigation": "UNKNOWN",
+    "independently_heldout_real_customer_labels": 0,
+    "known_scope_limit": "CONTRACT_DEPENDENT_DONT_GENERALIZE_TO_MODERN_LTL",
+    "publisher_source_byte_hash_status": "UNKNOWN_UNTIL_RAW_RESPONSE_ACQUIRED"
+  },
+  "consumer": {
+    "evaluation_pack_status": "DRAFT_ONLY_HISTORICAL_FALSE_POSITIVE_CONTROL",
+    "freight_engine_owner_required_for_code_changes": true,
+    "independent_qa_required": true,
+    "release_authorized": false
+  }
+}

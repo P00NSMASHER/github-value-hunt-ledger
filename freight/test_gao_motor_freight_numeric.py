@@ -897,5 +897,102 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                     verify(forged)
                 self.assertNotEqual(digest(forged), digest(case))
 
+
+    def test_b261127_original_gao_case_prevents_arithmetic_only_freight_false_positive(self):
+        """GAO held TCN billing valid: a numerical GBL contrast alone is not a debt."""
+        row = json.loads((FIXTURE.parent /
+                          "gao_b261127_tcn_gbl_ambiguity_candidate_v0.json").read_text())
+        src = row["source"]
+        ex = row["numeric_example"]
+        case = row["case"]
+        eval_scope = row["evaluation"]
+        self.assertEqual(row["schema_version"], "0.1.0")
+        self.assertEqual(row["evaluation_family"], "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY")
+        self.assertEqual(src["official_decision_url"], "https://www.gao.gov/products/b-261127")
+        self.assertIn(src["official_decision_url"], SEEDS["freightrecovery"])
+        self.assertEqual(src["decision_date"], "1996-02-15")
+        self.assertEqual(src["original_solicitation_date"], "1990-03-26")
+        self.assertFalse(src["original_source_html_response_bytes_acquired"])
+        self.assertIsNone(src["original_source_response_sha256"])
+        self.assertFalse(src["original_invoice_or_gbl_image_acquired"])
+        self.assertFalse(src["customer_engine_specific_commercial_reuse_approved"])
+        self.assertEqual(case["tender_reference"], "600029")
+        self.assertEqual(case["note_12_rate_cents_per_cwt"], 200)
+        self.assertEqual(case["note_12_minimum_charge_cents_per_shipment"], 2500)
+        self.assertEqual(case["carrier_asserted_tcn_billed_gbls_before_objection"], 1062)
+        self.assertFalse(case["asserted_population_independently_verified"])
+        self.assertFalse(case["external_standard_gbl_definition_incorporated_into_note_12"])
+        self.assertEqual(case["historical_note_12_disposition"],
+                         "GAO_UPHELD_CARRIER_TCN_BILLING_UNDER_SPECIFIC_AMBIGUOUS_CONTRACT")
+        self.assertEqual(case["historical_note_14_disposition"],
+                         "GAO_DENIED_SEPARATE_ADDITIONAL_TERMINAL_CHARGES_AS_OVERLAPPING")
+        self.assertEqual(ex["tcn_minimum_charge_unit_count"], 63)
+        self.assertEqual(ex["carrier_billed_tcn_total_cents"], 165940)
+        self.assertEqual(ex["carrier_billed_tcn_total_cents"],
+                         63 * case["note_12_minimum_charge_cents_per_shipment"] +
+                         sum(ex["extra_tcn_charges_cents"]))
+        self.assertEqual(ex["government_gbl_interpretation_total_weight_lbs"], 14320)
+        self.assertEqual(ex["alternate_gbl_total_cents"],
+                         14320 // 100 * case["note_12_rate_cents_per_cwt"])
+        self.assertEqual(ex["unadjudicated_arithmetic_difference_cents"], 137300)
+        self.assertEqual(ex["unadjudicated_arithmetic_difference_cents"],
+                         ex["carrier_billed_tcn_total_cents"] - ex["alternate_gbl_total_cents"])
+        self.assertFalse(ex["difference_is_final_overcharge_or_recovery"])
+        self.assertIsNone(case["final_actual_refund_or_offset_proved"])
+        self.assertIsNone(case["carrier_note_14_claim_amount_cents"])
+        self.assertFalse(case["independent_postdecision_payment_or_collection_receipt"])
+        self.assertEqual(eval_scope["independent_heldout_labeled_customer_invoices"], 0)
+        self.assertIsNone(eval_scope["real_current_customer_error_precision_recall"])
+        self.assertEqual(eval_scope["independently_verified_cash_recoveries"], 0)
+        self.assertFalse(eval_scope["labels_currently_promotable_to_live_engine"])
+
+    def test_b261127_adversarial_negative_controls_reject_scope_and_cash_promotion(self):
+        """A historical holding does not prove a modern rate or collected refund."""
+        row = json.loads((FIXTURE.parent /
+                          "gao_b261127_tcn_gbl_ambiguity_candidate_v0.json").read_text())
+        controls = row["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 6)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTH_") for c in controls))
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_MATH_CONTRAST_NOT_GAO_UPHELD_OVERCHARGE",
+            "REJECT_OMITTED_INCORPORATION_AND_PREBILLING_GUIDANCE",
+            "REJECT_ADDITIONAL_NOTE14_DENIED",
+            "REJECT_CARRIER_REPORTED_COUNT_NOT_ORIGINAL_BILL_CUSTODY",
+            "UNKNOWN_NO_POSTDECISION_PAYMENT_RECEIPT",
+            "REJECT_1990_TENDER_DOES_NOT_AUTHORIZE_CURRENT_CONTRACT",
+        })
+        def verify(value):
+            self.assertFalse(value["numeric_example"]["difference_is_final_overcharge_or_recovery"])
+            self.assertFalse(value["source"]["original_invoice_or_gbl_image_acquired"])
+            self.assertFalse(value["source"]["customer_engine_specific_commercial_reuse_approved"])
+            self.assertIsNone(value["source"]["original_source_response_sha256"])
+            self.assertFalse(value["case"]["external_standard_gbl_definition_incorporated_into_note_12"])
+            self.assertIsNone(value["case"]["final_actual_refund_or_offset_proved"])
+            self.assertIsNone(value["case"]["carrier_note_14_claim_amount_cents"])
+            self.assertEqual(value["evaluation"]["independent_heldout_labeled_customer_invoices"], 0)
+            self.assertEqual(value["evaluation"]["independently_verified_cash_recoveries"], 0)
+            self.assertFalse(value["evaluation"]["labels_currently_promotable_to_live_engine"])
+        verify(row)
+        for section, field, replacement in (
+            ("numeric_example", "difference_is_final_overcharge_or_recovery", True),
+            ("source", "original_invoice_or_gbl_image_acquired", True),
+            ("source", "customer_engine_specific_commercial_reuse_approved", True),
+            ("source", "original_source_response_sha256", "unverified-forged"),
+            ("case", "external_standard_gbl_definition_incorporated_into_note_12", True),
+            ("case", "final_actual_refund_or_offset_proved", 137300),
+            ("case", "carrier_note_14_claim_amount_cents", 137300),
+            ("evaluation", "independent_heldout_labeled_customer_invoices", 1062),
+            ("evaluation", "independently_verified_cash_recoveries", 137300),
+            ("evaluation", "labels_currently_promotable_to_live_engine", True),
+        ):
+            with self.subTest(field=field):
+                altered = copy.deepcopy(row)
+                altered[section][field] = replacement
+                with self.assertRaises(AssertionError):
+                    verify(altered)
+                self.assertNotEqual(digest(altered), digest(row))
+
 if __name__ == "__main__":
     unittest.main()
