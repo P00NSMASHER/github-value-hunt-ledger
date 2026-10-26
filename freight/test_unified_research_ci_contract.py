@@ -244,5 +244,39 @@ class ResearchCIVerificationContract(unittest.TestCase):
                 self.assertIn(expected, source)
 
 
+    def test_cbca_rate_decisions_are_executed_in_main_lab_and_nightly(self):
+        """No green CI if the CBCA negative/outcome control silently disappears."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n", 1)[1]
+        discovery = source.split("\n  discover:\n", 1)[1].split(
+            "\n  nightly-real-data-replay:\n", 1)[0]
+        executable = "          python -m unittest -q freight.test_cbca_rate_billing_controls"
+        for expected in (
+            "freight.test_cbca_rate_billing_controls",
+            "freight/cbca_rate_billing_controls.py",
+        ):
+            self.assertIn(expected, verify)
+        self.assertEqual(discovery.splitlines().count(executable), 1)
+        self.assertEqual(nightly.splitlines().count(executable), 1)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/cbca_rate_billing_controls_v1.json", nightly)
+        self.assertIn(
+            "python -m freight.cbca_rate_billing_controls "
+            "--output /tmp/retally-cbca-billing-v1.json --verify", nightly)
+        for path in (
+            "freight/cbca_rate_billing_controls.py",
+            "freight/test_cbca_rate_billing_controls.py",
+            "freight/fixtures/cbca_rate_billing_controls_v1.json",
+        ):
+            self.assertEqual(source.count('      - "' + path + '"'), 2)
+        self.assertIn("d['private_customer_invoice_truth_cases'] == 0", discovery)
+        self.assertIn("d['commercial_reuse_approved'] is False", discovery)
+        self.assertIn("d['verified_retally_cash_recovery_cents'] == 0", discovery)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

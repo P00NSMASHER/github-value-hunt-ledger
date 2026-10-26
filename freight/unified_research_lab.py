@@ -40,7 +40,7 @@ SEARCHES = {
     "recoveryos": ("accounts payable invoice", "vendor payment transparency", "accounts payable invoice dataset"),
 }
 SOURCE_HOSTS = frozenset({
-    "catalog.data.gov", "github.com", "zenodo.org", "www.gao.gov",
+    "catalog.data.gov", "github.com", "zenodo.org", "www.gao.gov", "www.cbca.gov",
     "data.cityofnewyork.us", "sam.gov", "api.usaspending.gov",
     "www.penninecare.nhs.uk", "media.cadc.uscourts.gov",
     "www2.fmc.gov", "www.fmc.gov", "www.sec.gov", "www.stb.gov",
@@ -58,6 +58,8 @@ SEEDS = {
         "https://www.gao.gov/products/b-221594-0",  # GAO invalidated historical rejected-tender $220.75 deduction; negative only.
         "https://www.gao.gov/products/b-189100",  # GAO 1977 original GBL A-6018184 classification; historical $2634.38 deduction only.
         "https://www.gao.gov/products/b-213717-0",  # GAO 1984 sustained $525.31 GSA classification deduction, historical-only.
+        "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",  # CBCA seven GSA overcharge notices rejected, carrier refund not verified.
+        "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",  # CBCA unpaid original invoice carrier claim time barred, NOT an overcharge.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
         # New source-bound reported numeric cases; original invoices not held.
