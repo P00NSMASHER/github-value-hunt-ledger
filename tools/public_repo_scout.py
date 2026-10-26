@@ -41,10 +41,11 @@ def corpus_text(root):
             except OSError: pass
     return "\n".join(chunks)
 def known(corpus,repo,sha): return repo.lower() in corpus and sha.lower() in corpus
-def queued_pairs(root):
+def queued_pairs(root, exclude_worker=None):
     pairs=set()
     if not root.exists(): return pairs
     for p in root.glob("HUNTER-*.json"):
+        if p.stem == exclude_worker: continue
         try: d=json.loads(p.read_text(encoding="utf-8"))
         except Exception: continue
         for c in d.get("candidates") or []:
@@ -137,12 +138,41 @@ def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None):
             c=candidate(gh,r,q,corp,own,prior_pairs)
             if not c: continue
             if c.get("status")=="RISK_REVIEW_ONLY": risks.append(c); continue
-            key=(c["repository"],c["exact_revision"])
-            if key not in seen or c["triage_score"]>seen[key]["triage_score"]: seen[key]=c
+            key=(c["repository"].lower(),c["exact_revision"].lower())
+            if (key not in seen or c["triage_score"]>seen[key]["triage_score"]
+                or (c["triage_score"]==seen[key]["triage_score"]
+                    and c["discovery_query"]<seen[key]["discovery_query"])):
+                seen[key]=c
             time.sleep(0.1)
-    cs=sorted(seen.values(),key=lambda x:(x["triage_score"],x["stars"]),reverse=True)[:max_candidates]
+    cs=sorted(seen.values(),key=lambda x:(-x["triage_score"],-x["stars"],
+                                          x["repository"].lower(),x["exact_revision"].lower()))[:max_candidates]
     api_metrics={k:int(gh.stats.get(k,0))-int(before.get(k,0)) for k in gh.stats}
+    risks.sort(key=lambda r:(str(r.get("repository") or "").lower(),
+                             str(r.get("discovery_query") or "")))
     return {"schema_version":2,"generated_at":now().isoformat(),"worker_id":w["id"],"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
+
+# Metrics, search response counts and the run clock are Actions-run telemetry, not
+# evidence. Source identity, changed rights/safety metadata, priority scores,
+# candidate additions and true removals remain material.
+SCOUT_RUNTIME_FIELDS=frozenset(("generated_at","api_metrics","search_diagnostics"))
+CANDIDATE_RUNTIME_FIELDS=frozenset(("pushed_at","size_kb","stars","forks"))
+
+def meaningful_snapshot(data):
+    result={k:v for k,v in data.items() if k not in SCOUT_RUNTIME_FIELDS}
+    result["candidates"]=[
+        {k:v for k,v in c.items() if k not in CANDIDATE_RUNTIME_FIELDS}
+        for c in result.get("candidates") or []
+    ]
+    return result
+
+def persist_snapshot(path,data):
+    if path.exists():
+        old=json.loads(path.read_text(encoding="utf-8"))
+        if meaningful_snapshot(old)==meaningful_snapshot(data):
+            return False
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(data,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+    return True
 
 def integrate(root,out):
     merged={}; workers={}; files=sorted(root.glob("HUNTER-*.json"))
@@ -155,13 +185,24 @@ def integrate(root,out):
             if not all(key): continue
             if key not in merged or int(c.get("triage_score") or 0)>int(merged[key].get("triage_score") or 0): merged[key]=c
             workers.setdefault(key,set()).add(wid)
-    ranked=sorted(merged.items(),key=lambda kv:(int(kv[1].get("triage_score") or 0),int(kv[1].get("stars") or 0)),reverse=True)
+    ranked=sorted(merged.items(),key=lambda kv:(-int(kv[1].get("triage_score") or 0),
+                                                 -int(kv[1].get("stars") or 0),
+                                                 kv[0][0].lower(),kv[0][1].lower()))
     lines=["# Automated Scout Digest","","**Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.","",f"Generated: {now().isoformat()}",f"Queue snapshots read: {len(files)}",f"Unique exact-revision candidates: {len(ranked)}","","| Triage | Repository | Exact revision | License | Workers | Description |","|---:|---|---|---|---|---|"]
     for key,c in ranked[:75]:
         repo,sha=key; desc=str(c.get("description") or "").replace("|","\\|").replace("\n"," ")[:180]; ws=", ".join(sorted(workers[key]))
         lines.append(f"| {c.get('triage_score',0)} | [{repo}]({c.get('url')}) | {sha[:12]} | {c.get('published_license_spdx','UNKNOWN')} | {ws} | {desc} |")
     lines += ["","## Promotion rule","","Candidates must still follow the existing worker runbook: exact-revision deep inspection, evidence beyond README where practical, safety/rights review, immutable run submission, verifier handling and integrator review.",""]
-    out.parent.mkdir(parents=True,exist_ok=True); out.write_text("\n".join(lines)); return len(ranked)
+    new_text="\n".join(lines)
+    if out.exists():
+        old_text=out.read_text(encoding="utf-8")
+        without_clock=lambda s:"\n".join(
+            line for line in s.splitlines() if not line.startswith("Generated: "))
+        if without_clock(old_text)==without_clock(new_text):
+            return len(ranked)
+    out.parent.mkdir(parents=True,exist_ok=True)
+    out.write_text(new_text,encoding="utf-8")
+    return len(ranked)
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--manifest",default="automation/hunter_schedule.json"); ap.add_argument("--worker"); ap.add_argument("--integrate",action="store_true"); ap.add_argument("--queue-root",default="intelligence/scout_queue"); ap.add_argument("--output",default="automation/SCOUT_DIGEST.md"); ap.add_argument("--per-query",type=int,default=8); ap.add_argument("--max-candidates",type=int,default=16); ap.add_argument("--own-repo",default=os.environ.get("GITHUB_REPOSITORY","P00NSMASHER/github-value-hunt-ledger")); a=ap.parse_args()
@@ -171,9 +212,19 @@ def main():
     m=json.loads((root/a.manifest).read_text()); ws=m.get("workers") or []
     if a.worker!="ALL": ws=[w for w in ws if w.get("id")==a.worker]
     if not ws: raise SystemExit(f"Unknown worker {a.worker}")
-    gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root); prior_pairs=queued_pairs(qr)
+    gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root)
     for w in ws:
+        # A worker's own pending candidates must NOT be treated as already
+        # handled; doing so falsely withdraws unreviewed evidence next run.
+        prior_pairs=queued_pairs(qr,exclude_worker=w["id"])
         d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)),prior_pairs)
-        p=qr/f"{w['id']}.json"; p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d,indent=2,sort_keys=True)+"\n"); print(f"{w['id']}: {d['candidate_count']} candidates")
+        if any("error" in diagnostic for diagnostic in d["search_diagnostics"]):
+            raise RuntimeError(f"Incomplete source discovery for {w['id']}; existing queue preserved")
+        p=qr/f"{w['id']}.json"
+        changed=persist_snapshot(p,d)
+        print(json.dumps({"worker":w["id"],"observed_at":d["generated_at"],
+                          "candidate_count":d["candidate_count"],"evidence_changed":changed,
+                          "api_metrics":d["api_metrics"],
+                          "search_diagnostics":d["search_diagnostics"]},sort_keys=True))
 
 if __name__=="__main__": main()
