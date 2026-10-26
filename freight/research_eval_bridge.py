@@ -54,7 +54,7 @@ def _historical_gao_references(
     if len(raw) > MAX_HISTORICAL_GAO_BYTES:
         raise ResearchError("HISTORICAL_GAO_CASEBOOK_TOO_LARGE")
     git_blob_sha1 = sha1(
-        b"blob " + str(len(raw)).encode("ascii") + b"\\0" + raw
+        b"blob " + str(len(raw)).encode("ascii") + b"\0" + raw
     ).hexdigest()
     if git_blob_sha1 != HISTORICAL_GAO_CASEBOOK_BLOB_SHA1:
         raise ResearchError("HISTORICAL_GAO_CASEBOOK_UNREVIEWED_DRIFT")

@@ -284,7 +284,7 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
                 len(good["source_receipts"]["reviewed_historical_gao_casebook_file_sha256"]),
                 64,
             )
-            path.write_bytes(path.read_bytes() + b"\\n")
+            path.write_bytes(path.read_bytes() + b"\n")
             with self.assertRaisesRegex(ResearchError,
                                         "HISTORICAL_GAO_CASEBOOK_UNREVIEWED_DRIFT"):
                 build_feed(source, evidence, candidates, manifest,
