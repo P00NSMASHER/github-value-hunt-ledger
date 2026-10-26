@@ -573,9 +573,13 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                          {"FO_OR_EA_ISSUANCE","ST_ISSUANCE_NB_NBEE_ALTCO",
                           "ST_ISSUANCE_ALT_ENLARGEMENT","ST_RENEWAL"})
         evaluation=candidate["evaluation"]
-        self.assertEqual(tuple(evaluation["current_collector_select"]),FIELDS)
-        self.assertNotIn("work_type",FIELDS)
-        self.assertNotIn("sequence_number",FIELDS)
+        historical_projection=tuple(evaluation["current_collector_select"])
+        self.assertEqual(historical_projection,
+                         ("tracking_number","job_filing_number","work_permit",
+                          "issued_date","permit_status"))
+        # This documents the captured source head, not a permanent owner contract.
+        # A later :48 collector fix adding fields must not break this evidence test.
+        self.assertNotIn("work_type",historical_projection)
         self.assertEqual(evaluation["independently_held_out_labeled_cases"],0)
         self.assertIsNone(evaluation["permitplate_precision_recall"])
         self.assertEqual(evaluation["current_permit_validity_truth"],"UNKNOWN")
