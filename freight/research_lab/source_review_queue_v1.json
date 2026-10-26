@@ -166,12 +166,12 @@
     "freightrecovery": {
       "candidate_classes": {
         "known_nyc_community_derivative_views_review_only": 0,
-        "official_publisher_host_url_only": 19,
+        "official_publisher_host_url_only": 20,
         "pinned_public_anchor_url_only": 5,
         "third_party_path_topic_hints_only": 21,
-        "unclassified_third_party_catalogs_only": 188
+        "unclassified_third_party_catalogs_only": 190
       },
-      "catalog_source_associations": 233,
+      "catalog_source_associations": 236,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -321,7 +321,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 233,
+      "unverified_candidates_after_url_screen": 236,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "permitplate": {
@@ -649,12 +649,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "e6dd0fc2b92213a2e2e1894a8fed2e24297fdc8f8ce86d19e3a38a770db1b3b3",
+  "queue_sha256": "33ba178170185348e758aefc8260cd02cf9e5c850f026515d88e5ec89d1c462d",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "14326be9835380c43e5de0acd82b4fa3e25aad2df6cf6497faed78a610557cf8",
-  "unique_public_source_references": 779,
+  "source_ledger_entries_sha256": "5a174459a219882a849d982e66cd5f16fd6724e1058fc7eb754330218b73022a",
+  "unique_public_source_references": 782,
   "verified_recovered_cash_cents": 0
 }

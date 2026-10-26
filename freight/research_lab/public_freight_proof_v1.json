@@ -1,0 +1,45 @@
+{
+  "DOJ_agreed_settlement_actual_paid_cents": null,
+  "DOJ_agreed_settlement_approximate_cents": 685000000,
+  "DOJ_settlement_liability_findings_cannot_be_inferred": true,
+  "DOJ_settlement_paid_NOT_customer_refund_or_overcharge_amount": true,
+  "DOJ_settlement_paid_original_bank_record_in_custody": false,
+  "DOJ_settlement_paid_public_report_cents": 1300000000,
+  "GAO_historic_case_reconstructed": true,
+  "GAO_historical_allowable_cents": 15060,
+  "GAO_historical_billable_weight_lb": 6000,
+  "GAO_historical_original_charge_cents": 30590,
+  "GAO_historical_overcharge_cents": 15530,
+  "GAO_historical_rate_cents_per_cwt": 251,
+  "GAO_later_refund_bank_cleared_verified": false,
+  "GAO_paid_voucher_reported_not_independent_custody": true,
+  "author_fixture_SHA256_NOT_original_publisher_hash": "65548905730f9ab7540308f948c8cf90bda801828bf531b84a397a497e526843",
+  "independent_original_transaction_bytes_held": false,
+  "modern_customer_independent_overcharge_labels": 0,
+  "modern_tariff_rights_verified": false,
+  "original_publisher_SHA256": null,
+  "public_records": [
+    {
+      "id": "GAO_B_143458",
+      "proof": "INDEPENDENT_GAO_HISTORICAL_RATE_DECISION",
+      "source": "https://www.gao.gov/products/b-143458",
+      "source_transaction_bytes_held": false
+    },
+    {
+      "id": "DOJ_MENLO_ESTES_2016",
+      "proof": "DOJ_PUBLIC_STATEMENT_GOVERNMENT_SETTLEMENT_ALREADY_PAID",
+      "source": "https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve",
+      "source_transaction_bytes_held": false
+    },
+    {
+      "id": "DOJ_YRC_ROADWAY_YELLOW_2022",
+      "proof": "DOJ_PUBLIC_STATEMENT_SETTLEMENT_AGREED_APPROXIMATELY_ONLY",
+      "source": "https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims",
+      "source_transaction_bytes_held": false
+    }
+  ],
+  "receipt_SHA256": "5a25c12f2d740ae0e005ba0f93bee009ff697218630cf816b08599cd7b9f2c8c",
+  "schema_version": 1,
+  "scope": "PUBLIC_HISTORICAL_GAO_ADJUDICATION_AND_DOJ_SETTLEMENT_DISCLOSURES_NOT_CUSTOMER_INVOICE_TRUTH",
+  "verified_RETALLY_cash_recovered_cents": 0
+}
