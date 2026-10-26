@@ -5993,6 +5993,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-26",
+      "id": "7cc9b3bfe50fa21272c137a5ace064b5c297cf99f9c6252d4a8079eadc4d196a",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-191258"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "7d13246c2138110f34123ba7e2409f8bc91d941ceba619678d7d10625634e3c2",
       "independent_ground_truth": false,
@@ -10140,6 +10156,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-26",
+      "id": "d4703570fba1c5db0129be818fb8e10de412a4a25434f6ae0ba0a545220bf27e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-192856"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-24",
       "id": "d4dab4926003fbec3a7d1cb69e8cd6674ea5991989fe63cc646f4c9fb865df1c",
       "independent_ground_truth": false,
@@ -12409,6 +12441,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "9cfc7dfda474e9f0ed538ae3043e2f423ca7f615502627275629294a074fa89e",
+  "entries_sha256": "651fed2631332ece0c1ff133142affce275e93a866106b88b87c88dc083c834b",
   "schema_version": 1
 }

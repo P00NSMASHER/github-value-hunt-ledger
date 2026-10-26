@@ -1,5 +1,5 @@
 {
-  "case_count": 5,
+  "case_count": 7,
   "case_outcomes": [
     {
       "amount_derived_from_gao_arithmetic": false,
@@ -35,25 +35,41 @@
     },
     {
       "amount_derived_from_gao_arithmetic": true,
+      "ga_review_outcome": "GSA_PHYSICAL_SAMPLE_CLASSIFICATION_DEDUCTION_SUSTAINED",
+      "historical_label": "HISTORICAL_OVERCHARGE_SUSTAINED",
+      "id": "B-192856",
+      "publisher_reported_deduction_cents": 93942,
+      "source_url": "https://www.gao.gov/products/b-192856"
+    },
+    {
+      "amount_derived_from_gao_arithmetic": true,
       "ga_review_outcome": "GSA_DEDUCTION_INVALID_REJECTED_TENDER",
       "historical_label": "HISTORICAL_AUDIT_FALSE_POSITIVE",
       "id": "B-221594",
       "publisher_reported_deduction_cents": 22075,
       "source_url": "https://www.gao.gov/products/b-221594-0"
+    },
+    {
+      "amount_derived_from_gao_arithmetic": true,
+      "ga_review_outcome": "GSA_DEDUCTION_INVALID_TRUCKLOAD_MINIMUM_WEIGHT_RULE",
+      "historical_label": "HISTORICAL_AUDIT_FALSE_POSITIVE",
+      "id": "B-191258",
+      "publisher_reported_deduction_cents": 3330,
+      "source_url": "https://www.gao.gov/products/b-191258"
     }
   ],
   "commercial_reuse_approved": false,
-  "external_gao_adjudicated_historical_cases": 5,
-  "fixture_authored_sha256": "a32023d919174aaaac4e69d22a1a84935bfb40ada9e2f07ee768ec0b5ad46327",
-  "historical_agency_deductions_total_cents_not_retally_cash": 354832,
-  "invalid_government_deductions_historical_cents": 22075,
+  "external_gao_adjudicated_historical_cases": 7,
+  "fixture_authored_sha256": "b9efb9d8f6bfe43303db5742c0fa35d75d1336a76f1100c9d5d6b636fe678795",
+  "historical_agency_deductions_total_cents_not_retally_cash": 452104,
+  "invalid_government_deductions_historical_cents": 25405,
   "private_customer_benchmark_truth_cases": 0,
   "production_rating_or_dispute_allowed": false,
-  "receipt_sha256": "990c5a28c31fd08739898d4da2f01a75e90dc1ba17c4190782b8439cb5b3bc29",
+  "receipt_sha256": "cd9468c2f8b5f169d17b3b782b4487d812b9994f91cade275a225b62263e53ea",
   "retally_recovered_cash_cents": 0,
   "schema_version": 1,
   "scope": "THIRD_PARTY_ADJUDICATED_HISTORICAL_GSA_CARRIER_BILLING_NOT_CURRENT_CUSTOMER_TRUTH",
   "source_original_gao_response_sha256": null,
   "source_original_invoice_rate_bank_chain_verified_cases": 0,
-  "sustained_overcharges_historical_cents": 332757
+  "sustained_overcharges_historical_cents": 426699
 }
