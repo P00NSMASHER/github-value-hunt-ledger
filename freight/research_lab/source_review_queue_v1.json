@@ -489,10 +489,10 @@
         "known_nyc_community_derivative_views_review_only": 0,
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 1,
-        "third_party_path_topic_hints_only": 30,
+        "third_party_path_topic_hints_only": 31,
         "unclassified_third_party_catalogs_only": 145
       },
-      "catalog_source_associations": 176,
+      "catalog_source_associations": 177,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -534,6 +534,23 @@
             "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
           ],
           "source_id": "07967d4400ef5047586e39bb8e1c065ca2430be4451b2f4b31b6a36298fc1b5a",
+          "source_provenance_verified": false
+        },
+        {
+          "benchmark_ready": false,
+          "commercial_reuse_authorized": false,
+          "first_seen": "2026-10-26",
+          "independent_ground_truth": false,
+          "original_document_bytes_copied": false,
+          "public_source_url": "https://github.com/practicalailab4-maker/atlas-ai-accounts-payable",
+          "publisher_host": "github.com",
+          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
+          "review_gates": [
+            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
+            "REUSE_RIGHTS_REVIEW_REQUIRED",
+            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
+          ],
+          "source_id": "10cbd6cc41584b0dc2e3d51322c5358b04303a32962f354238e611936fddfa6e",
           "source_provenance_verified": false
         },
         {
@@ -620,28 +637,11 @@
           ],
           "source_id": "37fee822df6fca821798737de64f11ab1e5a6fe82b51924057dea20a630fcd58",
           "source_provenance_verified": false
-        },
-        {
-          "benchmark_ready": false,
-          "commercial_reuse_authorized": false,
-          "first_seen": "2026-10-23",
-          "independent_ground_truth": false,
-          "original_document_bytes_copied": false,
-          "public_source_url": "https://github.com/colinrisler-cortex/accounts-payable",
-          "publisher_host": "github.com",
-          "rank_reason": "THIRD_PARTY_URL_TOPIC_HINT_ONLY",
-          "review_gates": [
-            "PUBLICATION_PROVENANCE_AND_DOCUMENT_TYPE_REVIEW_REQUIRED",
-            "REUSE_RIGHTS_REVIEW_REQUIRED",
-            "ENGINE_SPECIFIC_AUTHORITY_AND_OUTCOME_REVIEW_REQUIRED"
-          ],
-          "source_id": "3c0e95fafc925338121ace801c87ae0eec2b48218a7e73e10aa0ef1a4e010c26",
-          "source_provenance_verified": false
         }
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 176,
+      "unverified_candidates_after_url_screen": 177,
       "url_only_topic_exclusions_not_deleted": 0
     }
   },
@@ -649,12 +649,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "81ebfdf527acaef30ca399a7dc4a5e9f6d934ad870869b8d71047adb9a838130",
+  "queue_sha256": "1aaec13856354fe4000f9b7d67ff1a33dcdc515b4d18504a05f71108574ef4c8",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "88e309d829eecec1392fbdd9e5049e910880130fb1cfa185588f9795d55434ce",
-  "unique_public_source_references": 770,
+  "source_ledger_entries_sha256": "7c932554c2d288e2d0ef00f3c6004bec534557c89df40f0421a9a021c3fd7993",
+  "unique_public_source_references": 771,
   "verified_recovered_cash_cents": 0
 }

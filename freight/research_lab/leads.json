@@ -916,6 +916,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "10cbd6cc41584b0dc2e3d51322c5358b04303a32962f354238e611936fddfa6e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/practicalailab4-maker/atlas-ai-accounts-payable"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -12329,6 +12345,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "88e309d829eecec1392fbdd9e5049e910880130fb1cfa185588f9795d55434ce",
+  "entries_sha256": "7c932554c2d288e2d0ef00f3c6004bec534557c89df40f0421a9a021c3fd7993",
   "schema_version": 1
 }
