@@ -222,6 +222,15 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                     ResearchError,"SCHEMA_CHANGED"):
                 _minimal(invalid,DAY)
 
+    def test_receipt_freshness_rejects_future_and_expired_source_proof(self):
+        receipt=build_receipt(source_ledger(),as_of=DAY,fetcher=simulated_provider)
+        # Two-day evidence validity is a production safeguard, not a test timeout.
+        _check(receipt,source_ledger(),DAY+timedelta(days=2))
+        for checked_at in (DAY-timedelta(days=1),DAY+timedelta(days=3)):
+            with self.subTest(checked_at=checked_at),self.assertRaisesRegex(
+                    ResearchError,"STALE_OR_FUTURE_READBACK_RECEIPT"):
+                _check(receipt,source_ledger(),checked_at)
+
     @patch("freight.official_nyc_issued_permit_lab.datetime")
     def test_replay_snapshot_is_deterministic_cached_and_tamper_evident(self, test_clock):
         # Freeze only the unit-test clock; do not weaken production UTC freshness.
