@@ -254,6 +254,72 @@ Offline checks:
     python -m freight.public_freight_proof_ladder --output /tmp/public_freight_proof.json --verify
 
 
+## Modern FMC shipper payment evidence: Bridgewell / COSCO (2022–2026)
+
+**Stronger than a historical aggregate GSA deduction:** two independent FMC
+informal decisions document actual freight-invoice billing disputes.
+Bridgewell's 2022 ocean shipment demurrage/detention charges reached an
+administratively final reparations decision, followed by a **later payment
+reported in the regulator's October 2026 enforcement action**. A second
+initial decision illustrates why an invoice exceeding a tentative quote does
+**not** by itself establish entitlement to reparations. These are **third-party
+real shipper disputes**, NOT existing RETALLY customers or automatically
+reusable customer records.
+
+| Source state | Bridgewell Agribusiness v. COSCO, FMC 2022(I) |
+| --- | --- |
+| [FMC initial decision, Sept. 29, 2025](https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf) | FMC adjudicated invalid required information on detention/demurrage invoices for Bridgewell's paid 2022 ocean shipments; **$24,328.80 reparations principal**. Bridgewell originally sought $43,780, which was **not** the amount awarded. |
+| [FMC administrative finality notice, Jan. 5, 2026](https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf) | Commission declined review; formal amount due by **Jan. 20, 2026** was **$24,328.80 principal + $3,960.51 stated interest = $28,289.31**. Eight published award groups contain ten components after accounting for the three $544.50 cases. They are **not** ten independent source-invoice copies. |
+| 2026 enforcement, docket 26-13 | FMC served an **Oct. 2, 2026 order to show cause** for late compliance (official public document no. 145944, as indexed by a reproduction of the FMC docket); [Seatrade](https://www.seatrade-maritime.com/regulations/fmc-targets-cosco-with-millions-in-late-payment-fines) and [Splash247](https://splash247.com/fmc-threatens-cosco-with-16-7m-penalty-over-delayed-payment/) report that the Commission said **Bridgewell received payment Aug. 31, 2026**. Full original enforcement-order PDF bytes and original bank receipt are **not in RETALLY custody**. **Exact customer deposit and interest actually received are UNKNOWN**, as is any final civil penalty. Do not conflate the $28,289.31 *ordered in January* with precisely that much cash *cleared in August*. |
+
+**Negative parallel, [HP Logistics v. Citi Freight Logistics and Best
+International Cargo, FMC 2025(I), Aug. 7, 2025 initial decision](https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf):**
+The excavator freight arrangement began with $43,200 plus an additional
+$11,000 for parts ($54,200 asserted revised quote). The final invoice was
+$77,800, a **$23,600 gap**; claimant also sought $2,295 in demurrage,
+totaling **$25,895 sought**. Nevertheless the initial FMC decision
+awarded **$0 reparations**, found no violation of section 41102(c) and no
+violation by Citi Freight Logistics, while finding Best International Cargo
+violated tariff publication requirements under section 40501(a)(1).
+The initial decision's separate administrative finality and any later
+customer refund remain **unverified**. Quoted-rate arithmetic alone may
+signal a **review**, not an independently recoverable overcharge.
+
+### Proof-state boundaries
+
+- **Documented billing / carrier payment:** The government decision reports
+  underlying charges and payment exhibits, but RETALLY does not possess
+  original signed invoices, bills of lading, bank payment statements or the
+  official publisher PDF response bytes. No source-byte signature is claimed.
+- **Reparations adjudicated:** Actual FMC order states original principal and
+  interest. The principal **cannot** be inflated to the pre-decision amount
+  sought by the shipper, and interest **cannot** be discarded.
+- **Receipt reported by FMC via two independent secondary accounts:** Stronger
+  externally reported collection evidence than an unperformed settlement,
+  but **not independent access to a bank deposit or the amount actually
+  cleared**; no precise cash figure is assigned to the August event.
+- **RETALLY modern private customer:** ZERO. There is no customer
+  authorization, rights-verified reuse, domestic motor-carrier rating
+  authority, production dispute claim or RETALLY recovery revenue.
+  The FMC ocean-shipping remedy does not automatically apply to U.S. LTL.
+
+New research-only fixture, oracle and 10 red-team cases:
+freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json,
+freight/fmc_real_shipper_billing_lifecycle.py,
+freight/test_fmc_real_shipper_billing_lifecycle.py.
+The existing unified controller verifies the fixture and writes an
+**aggregate-only** receipt to the long-lived research branch; nightly
+original-document replay must validate its exact hash and hold gates.
+No new GitHub cron, provider, live customer data extraction or purchased
+service is introduced.
+
+Offline verification:
+
+    python -m unittest -q freight.test_fmc_real_shipper_billing_lifecycle
+    python -m freight.fmc_real_shipper_billing_lifecycle --output /tmp/fmc_lifecycle.json
+    python -m freight.fmc_real_shipper_billing_lifecycle --verify --output /tmp/fmc_lifecycle.json
+
+
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.
