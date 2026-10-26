@@ -9,7 +9,7 @@ Source pointers alone never count as independently validated claims.
 ## Agency-adjudicated historical billing cases (October 26 evidence review)
 
 This is a **historical billing-adjudication casebook**, not a new commercially
-authorized customer-accuracy dataset. Five original GAO decisions publish
+authorized customer-accuracy dataset. Seven original GAO decisions publish
 independent agency reviews of GSA/carrier freight billing disputes:
 
 | Official decision | Reported paid | GSA-audited | Reported GSA deduction | GAO outcome |
@@ -18,7 +18,9 @@ independent agency reviews of GSA/carrier freight billing disputes:
 | [B-160344 (1967)](https://www.gao.gov/products/b-160344) | $275.17 | $139.29 | $135.88 | Overcharge deduction upheld; freight classification. |
 | [B-189100 (1977)](https://www.gao.gov/products/b-189100) | $3,567.18 | $932.80** | $2,634.38 | Overcharge deduction upheld after commodity-classification dispute. |
 | [B-213717 (1984)](https://www.gao.gov/products/b-213717-0) | $1,212.09 | $686.78 | $525.31 | Overcharge deduction upheld; freight commodity classification. |
+| [B-192856 (1979)](https://www.gao.gov/products/b-192856) | $1,097.93 | $158.51*** | $939.42 | **GAO inspected an actual commodity sample**: upheld classification deduction; sample-linked cargo evidence (not in RETALLY custody). |
 | [B-221594 (1986)](https://www.gao.gov/products/b-221594-0) | $942.00 | $721.25* | $220.75 | GSA deduction INVALID because rate tender was rejected. |
+| [B-191258 (1978)](https://www.gao.gov/products/b-191258) | $1,497.60 | $1,464.30*** | $33.30 | GSA deduction INVALID: full-trailer shipment must use 24,000-lb truckload tariff minimum, not 6,910-lb actual weight; payment NOT confirmed. |
 
 *The original GAO public text has an OCR-ambiguous assessed amount, so $721.25
 is derived from its printed $942.00 paid and $220.75 deduction, not a separately
@@ -29,14 +31,25 @@ it is NOT an independently published applicable tariff charge. The decision
 provides no exact GBL shipment date. B-213717 does not publish a safely
 transcribable GBL identifier or shipment weight in the reviewed decision text.
 
-These are four independently **agency-adjudicated historical positive examples**
-($3,327.57 in government-reported deductions), plus one historical **false-positive
-control** ($220.75 improperly deducted by GSA). The latter is NOT a valid
-overcharge or RETALLY recovery. All money is old government transaction
+***B-192856's $158.51 figure and B-191258's $1,464.30 figure are
+published payment minus published deduction, NOT independently acquired
+original applicable tariff charge documents. GAO's 1979 decision directly
+reviewed a physical 13.6-ounce tile sample: 60 tiles per box (51 lb),
+40 boxes (2,040 lb); the government-rate determination was sustained.
+In B-191258 GAO applied a 24,000-lb truckload minimum to the capacity-load
+arbitrary rate; the $33.30 government setoff was incorrect. GAO reports
+that GSA would process a claim, but no later carrier bank receipt was found.
+GAO original scanned PDF texts were indexed; PDF byte hashes, original
+invoice/tariff pages and reliable page-image inspection remain unavailable.
+
+These are five independently **agency-adjudicated historical positive examples**
+($4,266.99 in government-reported deductions), plus two historical **false-positive
+controls** ($254.05 in GSA deductions found improper). Neither false positive
+is a valid shipper overcharge or RETALLY recovery. All money is old government transaction
 narrative, NOT private customer cash or modern rate truth.
 
 Source: official GAO public decisions manually checked October 26, 2026.
-Raw GAO HTML response bytes, original signed invoice/GBL/tariff files and bank
+Raw GAO HTML/PDF response bytes, original signed invoice/GBL/tariff files and bank
 clearing artifacts are **not in custody** and have no acquired source-byte SHA.
 An authored JSON digest is never an original publisher hash. A GAO ruling is
 independent external adjudication, but NOT independent custody of transaction
@@ -69,7 +82,7 @@ production actions and recovered cash remain explicitly held.
 
 The federal [CBCA official RATE-case index](https://www.cbca.gov/decisions/rate.html)
 contains adjudications of carrier/GSA disputes. These are distinct from
-the five historical GAO setoff cases and from RETALLY's 110 original
+the seven historical GAO setoff cases and from RETALLY's 110 original
 commercial invoice faces. This casebook is a *negative-claim proof pack*
 and **does not create modern RETALLY customer overcharge labels**.
 

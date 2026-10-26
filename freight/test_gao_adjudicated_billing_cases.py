@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+from decimal import Decimal, ROUND_HALF_UP
 from hashlib import sha256
 import json
 import tempfile
@@ -22,15 +23,15 @@ from freight.gao_adjudicated_billing_cases import (
 class IndependentlyAdjudicatedHistoricalBillingTests(unittest.TestCase):
     def test_official_gao_decision_population_and_money(self):
         fixture = load_fixture()
-        self.assertEqual(len(fixture["cases"]), 5)
+        self.assertEqual(len(fixture["cases"]), 7)
         self.assertEqual([r["id"] for r in fixture["cases"]], list(PINNED))
         receipt = make_receipt()
-        self.assertEqual(receipt["external_gao_adjudicated_historical_cases"], 5)
-        self.assertEqual(receipt["sustained_overcharges_historical_cents"], 332757)
-        self.assertEqual(receipt["invalid_government_deductions_historical_cents"], 22075)
-        self.assertEqual(receipt["historical_agency_deductions_total_cents_not_retally_cash"], 354832)
+        self.assertEqual(receipt["external_gao_adjudicated_historical_cases"], 7)
+        self.assertEqual(receipt["sustained_overcharges_historical_cents"], 426699)
+        self.assertEqual(receipt["invalid_government_deductions_historical_cents"], 25405)
+        self.assertEqual(receipt["historical_agency_deductions_total_cents_not_retally_cash"], 452104)
         self.assertEqual([r["historical_label"] for r in receipt["case_outcomes"]],
-                         [LABEL_POS, LABEL_POS, LABEL_POS, LABEL_POS, LABEL_NEG])
+                         [LABEL_POS, LABEL_POS, LABEL_POS, LABEL_POS, LABEL_POS, LABEL_NEG, LABEL_NEG])
         self.assertEqual(receipt["retally_recovered_cash_cents"], 0)
         self.assertEqual(receipt["private_customer_benchmark_truth_cases"], 0)
         self.assertEqual(receipt["source_original_invoice_rate_bank_chain_verified_cases"], 0)
@@ -72,9 +73,72 @@ class IndependentlyAdjudicatedHistoricalBillingTests(unittest.TestCase):
         self.assertEqual(receipt["private_customer_benchmark_truth_cases"],0)
         self.assertEqual(receipt["retally_recovered_cash_cents"],0)
 
+    def test_original_gao_b192856_physical_sample_confirms_cargo_not_bol_assumption(self):
+        """External adjudicator examined cargo, not an original invoice in our custody."""
+        from freight.unified_research_lab import SEEDS
+        rows={r["id"]:r for r in load_fixture()["cases"]}
+        row=rows["B-192856"]
+        self.assertEqual(row["decision_date"], "1979-03-15")
+        self.assertEqual(row["reported_gbl"], "P-7343114")
+        self.assertEqual(row["reported_weight_lb"], 2040)
+        self.assertIsNone(row["reported_gbl_date"])
+        self.assertEqual(Decimal("13.6")*60/16,Decimal("51"))
+        self.assertEqual(40*51,row["reported_weight_lb"])
+        audited=(Decimal("7.77")*Decimal("20.4")).quantize(
+            Decimal("0.01"),rounding=ROUND_HALF_UP)
+        self.assertEqual(audited,Decimal("158.51"))
+        self.assertEqual(109793-93942,15851)
+        self.assertEqual(row["reported_gsa_deducted_cents"],93942)
+        self.assertEqual(row["reported_gsa_audited_cents"],15851)
+        self.assertEqual(row["ga_review_outcome"],
+                         "GSA_PHYSICAL_SAMPLE_CLASSIFICATION_DEDUCTION_SUSTAINED")
+        self.assertEqual(row["money_calculation"],
+                         "DERIVED_FROM_GAO_PAID_MINUS_DEDUCTION")
+        self.assertIn("13.6-ounce",row["source_money_note"])
+        self.assertIn(row["source_url"],SEEDS["freightrecovery"])
+        self.assertFalse(load_fixture()["independent_original_invoice_and_bank_custody"])
+        self.assertEqual(make_receipt()["private_customer_benchmark_truth_cases"],0)
+
+    def test_original_gao_b191258_capacity_rule_reverses_false_setoff_not_cash_refund(self):
+        """A full trailer's tariff minimum is NOT an actual-weight arbitrary rate."""
+        from freight.unified_research_lab import SEEDS
+        rows={r["id"]:r for r in load_fixture()["cases"]}
+        row=rows["B-191258"]
+        self.assertEqual(row["decision_date"],"1978-07-07")
+        self.assertIsNone(row["reported_gbl"])  # Source OCR is ambiguous.
+        self.assertEqual(row["reported_weight_lb"],6910)
+        arbitrated=(Decimal("0.30")*(Decimal(24000)/100)).quantize(
+            Decimal("0.01"),rounding=ROUND_HALF_UP)
+        gsa=(Decimal("0.56")*(Decimal(6910)/100)).quantize(
+            Decimal("0.01"),rounding=ROUND_HALF_UP)
+        self.assertEqual(arbitrated,Decimal("72.00"))
+        self.assertEqual(gsa,Decimal("38.70"))
+        self.assertEqual(arbitrated-gsa,Decimal("33.30"))
+        self.assertEqual((row["reported_billed_and_paid_cents"],
+                          row["reported_gsa_audited_cents"],
+                          row["reported_gsa_deducted_cents"]),(149760,146430,3330))
+        self.assertEqual(row["adjudicated_historical_label"],LABEL_NEG)
+        self.assertEqual(row["ga_review_outcome"],
+                         "GSA_DEDUCTION_INVALID_TRUCKLOAD_MINIMUM_WEIGHT_RULE")
+        self.assertIn("not proof of a paid refund",row["source_money_note"])
+        self.assertIn(row["source_url"],SEEDS["freightrecovery"])
+        self.assertEqual(load_fixture()["verified_retally_cash_cents"],0)
+        labels={v["id"]:v for v in make_receipt()["case_outcomes"]}
+        self.assertEqual(labels["B-191258"]["historical_label"],LABEL_NEG)
+        self.assertTrue(labels["B-191258"]["amount_derived_from_gao_arithmetic"])
+        self.assertEqual(make_receipt()["retally_recovered_cash_cents"],0)
+
+    def test_unverified_source_notes_cannot_gain_authority_through_rehash(self):
+        for index in range(len(load_fixture()["cases"])):
+            altered=copy.deepcopy(load_fixture())
+            altered["cases"][index]["source_money_note"]+=(
+                " Independent customer bank refund and current tariff verified.")
+            with self.subTest(index=index), self.assertRaises(EvidenceError):
+                validate_fixture(altered)
+
     def test_negative_rejected_tender_never_becomes_positive_from_arithmetic(self):
         data = load_fixture()
-        bad = data["cases"][-1]
+        bad = next(row for row in data["cases"] if row["id"] == "B-221594")
         self.assertEqual(bad["reported_billed_and_paid_cents"], 94200)
         self.assertEqual(bad["reported_gsa_audited_cents"], 72125)
         self.assertEqual(bad["reported_gsa_deducted_cents"], 22075)
@@ -84,7 +148,7 @@ class IndependentlyAdjudicatedHistoricalBillingTests(unittest.TestCase):
         self.assertIsNone(bad["reported_gbl"])
 
     def test_positive_agency_collections_are_not_retally_revenue(self):
-        for row in load_fixture()["cases"][:4]:
+        for row in load_fixture()["cases"][:5]:
             with self.subTest(case=row["id"]):
                 self.assertEqual(row["reported_billed_and_paid_cents"]
                                  - row["reported_gsa_audited_cents"],
@@ -97,10 +161,10 @@ class IndependentlyAdjudicatedHistoricalBillingTests(unittest.TestCase):
         replacements = [
             ("cases", 0, "reported_billed_and_paid_cents", 82801),
             ("cases", 1, "reported_gsa_audited_cents", 13928),
-            ("cases", 4, "reported_gsa_deducted_cents", 22074),
-            ("cases", 4, "adjudicated_historical_label", LABEL_POS),
-            ("cases", 4, "ga_review_outcome", "GSA_OVERCHARGE_DEDUCTION_SUSTAINED"),
-            ("cases", 4, "money_calculation", "PUBLISHER_EXPLICIT"),
+            ("cases", 5, "reported_gsa_deducted_cents", 22074),
+            ("cases", 5, "adjudicated_historical_label", LABEL_POS),
+            ("cases", 5, "ga_review_outcome", "GSA_OVERCHARGE_DEDUCTION_SUSTAINED"),
+            ("cases", 5, "money_calculation", "PUBLISHER_EXPLICIT"),
             ("cases", 0, "source_url", "https://www.gao.gov/products/b-999999"),
         ]
         for _, index, key, new in replacements:
@@ -159,7 +223,7 @@ class IndependentlyAdjudicatedHistoricalBillingTests(unittest.TestCase):
             ("retally_recovered_cash_cents",3200),
             ("commercial_reuse_approved",True),
             ("external_gao_adjudicated_historical_cases",6),
-            ("sustained_overcharges_historical_cents",354832),
+            ("sustained_overcharges_historical_cents",452104),
         ):
             with self.subTest(key=key):
                 forged=copy.deepcopy(original)
