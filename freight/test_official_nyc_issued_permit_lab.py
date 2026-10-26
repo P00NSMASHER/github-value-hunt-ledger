@@ -46,10 +46,13 @@ def simulated_provider(url):
     query = parse_qs(urlsplit(url).query)
     assert query.get("$select") == [",".join(FIELDS)]
     if query.get("$order"):
-        return copy.deepcopy(rows)
-    where=query["$where"][0]
-    key=where.split(" = ",1)[1].strip("'")
-    return [copy.deepcopy(r) for r in rows if str(r["tracking_number"])==key]
+        candidates = rows
+    else:
+        where=query["$where"][0]
+        key=where.split(" = ",1)[1].strip("'")
+        candidates = [r for r in rows if str(r["tracking_number"]) == key]
+    # Honor Socrata $select; omitted columns cannot appear magically in mocked GETs.
+    return [{field: r[field] for field in FIELDS if field in r} for r in candidates]
 
 
 class OfficialNYCOriginalReadbackTests(unittest.TestCase):
@@ -308,6 +311,58 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         marker=_minimal(rows[2],DAY)
         self.assertEqual(_classification(marker),"PUBLISHER_NOT_YET_ISSUED_MARKER")
         self.assertNotEqual(_classification(marker),"PUBLISHER_ISSUE_DATE_PRESENT")
+
+
+    def test_official_sequence_projection_negative_control_and_rights_hold(self):
+        """Publisher-declared sequence is not a live identity unless selected."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(pack["schema_version"],"1.0.0")
+        self.assertEqual(pack["source"]["dataset_id"],DATASET_ID)
+        self.assertEqual(pack["source"]["publisher_field_verified"],"sequence_number")
+        self.assertIsNone(pack["source"]["original_publisher_response_bytes_sha256"])
+        self.assertIsNone(pack["source"]["publisher_metadata_response_bytes_sha256"])
+        self.assertFalse(pack["source"]["dataset_specific_commercial_reuse_authorized"])
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
+        self.assertFalse(pack["cohort"]["independent_holdout_verified"])
+        self.assertFalse(pack["inspected_source"]["live_collision_in_publisher_data_verified"])
+        self.assertEqual(len(pack["synthetic_negative_controls"]),3)
+        self.assertTrue(all(c["synthetic"] for c in pack["synthetic_negative_controls"]))
+        self.assertTrue(all(c["actual_real_world_error_label"] is None
+                            for c in pack["synthetic_negative_controls"]))
+        synthetic=pack["synthetic_negative_controls"][0]["rows"]
+        self.assertEqual(len(synthetic),2)
+        self.assertNotEqual(synthetic[0]["sequence_number"],synthetic[1]["sequence_number"])
+        self.assertEqual({key:val for key,val in synthetic[0].items()
+                          if key!="sequence_number"},
+                         {key:val for key,val in synthetic[1].items()
+                          if key!="sequence_number"})
+        def select_accurate_provider(url):
+            args=parse_qs(urlsplit(url).query)
+            sample=(synthetic if args.get("$order") else
+                    [r for r in synthetic if str(r["tracking_number"])==
+                     args["$where"][0].split(" = ",1)[1].strip("'")])
+            return [{f:r[f] for f in FIELDS if f in r} for r in sample]
+        sample=select_accurate_provider(query_url())
+        self.assertEqual(set(sample[0]),set(FIELDS))
+        receipt=build_receipt(source_ledger(),as_of=DAY,
+                              fetcher=select_accurate_provider)
+        self.assertEqual(receipt["sample_count"],2)
+        if "sequence_number" in FIELDS:
+            self.assertEqual(receipt["sample_unique_source_identities"],2)
+            self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_OK")
+            self.assertEqual(receipt["readback_exact_match"],2)
+        else:
+            self.assertEqual(receipt["sample_unique_source_identities"],1)
+            self.assertEqual(receipt["sample_repeated_source_rows"],1)
+            self.assertEqual(receipt["readback_checked"],0)
+            self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
+            self.assertIn("DUPLICATE_SOURCE_IDENTITIES",receipt["source_errors"])
+        self.assertFalse(receipt["source_specific_commercial_license_verified"])
+        self.assertEqual(receipt["independent_issuance_outcome_labels"],0)
+        self.assertFalse(receipt["buyer_opportunity_ground_truth"])
+        _check(receipt,source_ledger(),DAY)
+
 
 
 if __name__=="__main__":

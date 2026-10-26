@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "RETALLY_NYC_DOB_SEQUENCE_PROJECTION_V1",
+  "authored_utc_date": "2026-10-26",
+  "engine": "permitplate",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_ONLY_NOT_SCORING",
+  "source": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "official_source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "publisher_metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "source_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+    "original_publisher_metadata_review_utc_date": "2026-10-26",
+    "publisher_rows_last_updated_utc": "2026-10-23T18:42:42Z",
+    "publisher_field_verified": "sequence_number",
+    "dataset_specific_commercial_reuse_authorized": false,
+    "reuse_rights": "UNVERIFIED_NYC_PORTAL_AND_DATASET_TERMS_HOLD",
+    "original_publisher_response_bytes_sha256": null,
+    "publisher_metadata_response_bytes_sha256": null,
+    "actual_customer_invoice_or_permit_record_bytes_stored": 0,
+    "excluded_permit_categories": [
+      "Electrical",
+      "Elevator",
+      "Limited Alteration Application"
+    ]
+  },
+  "inspected_source": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "branch": "main",
+    "source_path": "freight/official_nyc_issued_permit_lab.py",
+    "source_blob_git_sha1": "8cf9a87b07b66d39c438ac1a8e01148f10c7b8f9",
+    "test_blob_git_sha1": "07b8b07c347c063fe28100ebf88262ba09827aaf",
+    "source_fields_at_inspection": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "issued_date",
+      "permit_status"
+    ],
+    "normalized_identity_fields": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "sequence_number"
+    ],
+    "finding": "Publisher exposes sequence_number; $select does not request it; earlier mocked provider returned unprojected sequence_number.",
+    "live_distinct_identity_count_verified": false,
+    "live_collision_in_publisher_data_verified": false
+  },
+  "cohort": {
+    "provenance_class": "SYNTHETIC_ONLY_NO_ACTUAL_ROWS",
+    "original_publisher_records_downloaded": 0,
+    "synthetic_sequence_collision_rows": 2,
+    "independent_held_out_labeled_cases": 0,
+    "independent_holdout_verified": false,
+    "labeled_real_permit_issuance_outcomes": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "two_sequences_same_projected_identity",
+      "synthetic": true,
+      "rows": [
+        {
+          "tracking_number": "SYNTH-5001",
+          "job_filing_number": "SYNTH-M100-I1",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "1",
+          "issued_date": "2026-10-21T00:00:00.000",
+          "permit_status": "Permit Issued"
+        },
+        {
+          "tracking_number": "SYNTH-5001",
+          "job_filing_number": "SYNTH-M100-I1",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "2",
+          "issued_date": "2026-10-21T00:00:00.000",
+          "permit_status": "Permit Issued"
+        }
+      ],
+      "expected_when_sequence_unselected": "DEGRADED_COLLAPSED_SOURCE_IDENTITY",
+      "expected_when_sequence_selected": "TWO_DISTINCT_PUBLISHER_ROW_IDENTITIES_NOT_INDEPENDENT_OUTCOMES",
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "unprojected_field_not_proof",
+      "synthetic": true,
+      "expected": "NO_FALSE_PUBLISHER_SEQUENCE_PROOF",
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "dataset_membership_not_independent_issuance",
+      "synthetic": true,
+      "expected": "UNKNOWN_INDEPENDENT_OUTCOME",
+      "actual_real_world_error_label": null
+    }
+  ],
+  "limits": {
+    "live_source_identity_completeness": "UNKNOWN_UNTIL_OWNER_CHANGES_QUERY_AND_REAL_READBACK",
+    "commercial_rights": "UNKNOWN_UNTIL_SOURCE_SPECIFIC_REVIEW",
+    "buyer_demand": "UNKNOWN",
+    "production_permit_status": "UNKNOWN",
+    "current_permit_validity": "UNKNOWN",
+    "permitplate_scoring_precision_recall": null,
+    "retally_recovered_cash_cents": 0,
+    "customer_outreach": false,
+    "payments": false,
+    "production_release": false
+  },
+  "consumption": {
+    "unified_lab_regression_module": "freight.test_official_nyc_issued_permit_lab",
+    "permitplate_owner_review_required": true,
+    "independent_qa_required": true,
+    "status": "DRAFT_SOURCE_PROJECTION_REGRESSION_ONLY_NO_ENGINE_CHANGE"
+  }
+}
