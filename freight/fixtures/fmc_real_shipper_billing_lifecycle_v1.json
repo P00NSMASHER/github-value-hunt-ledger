@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "fixture_id": "RETALLY_FMC_2022I_2025I_INDEPENDENT_REAL_SHIPPER_EVIDENCE_LIFECYCLE_V1",
+  "scope": "FMC_THIRD_PARTY_ADJUDICATED_REAL_SHIPPER_CHARGES_NOT_RETALLY_CUSTOMERS_OR_ORIGINAL_BANK_CUSTODY",
+  "review_utc_date": "2026-10-26",
+  "public_publisher": "U.S. Federal Maritime Commission",
+  "official_pdf_bytes_acquired": false,
+  "official_pdf_source_sha256": null,
+  "original_customer_invoice_and_bank_bytes_acquired": false,
+  "source_specific_commercial_reuse_verified": false,
+  "retally_independent_customer_invoice_truth_cases": 0,
+  "retally_cash_recovered_cents": 0,
+  "bridgewell_cosco": {
+    "case_id": "FMC_2022(I)",
+    "claimant": "AGRIBUSINESS_HOLDINGS_LP_DBA_BRIDGEWELL_AGRIBUSINESS",
+    "respondent": "COSCO_SHIPPING_LINES_CO_LTD",
+    "shipment_year": 2022,
+    "initial_claim_date": "2024-12-17",
+    "initial_decision_served": "2025-09-29",
+    "official_initial_decision_url": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",
+    "official_final_notice_served": "2026-01-05",
+    "official_final_notice_url": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+    "adjudication": "INVALID_DEMURRAGE_DETENTION_INVOICE_CONTENT_REPARATIONS_GRANTED",
+    "original_reparation_claim_cents": 4378000,
+    "reparations_principal_cents": 2432880,
+    "interest_through_january_5_2026_cents": 396051,
+    "administratively_final_amount_due_cents": 2828931,
+    "payment_due_date": "2026-01-20",
+    "reparation_award_groups": [
+      {
+        "multiplicity": 3,
+        "principal_cents_each": 54450,
+        "interest_cents_each": 9115
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 150750,
+        "interest_cents_each": 24994
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 193050,
+        "interest_cents_each": 31923
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 235350,
+        "interest_cents_each": 38712
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 235350,
+        "interest_cents_each": 38560
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 552600,
+        "interest_cents_each": 90540
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 21780,
+        "interest_cents_each": 3546
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 880650,
+        "interest_cents_each": 140431
+      }
+    ],
+    "later_enforcement_docket": "FMC_26-13",
+    "later_order_to_show_cause_date": "2026-10-02",
+    "fmc_original_enforcement_order_document_id": 145944,
+    "fmc_enforcement_record_index_publicnow": "https://www.publicnow.com/view/AEF607AD7C75FCEEFC7781A0221E6505C1BC79B9",
+    "reported_actual_customer_payment_received_date": "2026-08-31",
+    "reported_payment_lifecycle_source": "INDEPENDENT_MEDIA_REPORTS_OF_OCTOBER_2_2026_FMC_ORDER_NOT_ORIGINAL_BANK_OR_ORDER_PDF_BYTES",
+    "secondary_confirmation_source": "https://www.seatrade-maritime.com/regulations/fmc-targets-cosco-with-millions-in-late-payment-fines",
+    "second_secondary_confirmation_source": "https://splash247.com/fmc-threatens-cosco-with-16-7m-penalty-over-delayed-payment/",
+    "exact_customer_received_amount_cents_independently_bank_verified": null,
+    "interest_actually_received_cents_independently_verified": null,
+    "civil_penalty_assessed_cents_at_review_date": null,
+    "penalty_order_finalized_at_review_date": false,
+    "government_reported_late_reparation_payment": true,
+    "applicable_to_private_domestic_motor_freight_tariffs": false
+  },
+  "hp_logistics_quote_dispute": {
+    "case_id": "FMC_2025(I)",
+    "initial_decision_served": "2025-08-07",
+    "official_initial_decision_url": "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",
+    "claimant": "HP_LOGISTICS_CO_LTD",
+    "respondents": [
+      "CITI_FREIGHT_LOGISTICS_INC",
+      "BEST_INTERNATIONAL_CARGO_INC"
+    ],
+    "initial_quote_cents": 4320000,
+    "additional_parts_discussed_cents": 1100000,
+    "claimed_revised_quote_cents": 5420000,
+    "final_invoiced_amount_cents": 7780000,
+    "quote_vs_invoice_difference_cents": 2360000,
+    "additional_demurrage_detention_claim_cents": 229500,
+    "total_reparations_sought_cents": 2589500,
+    "initial_decision_section_41102_c_violated": false,
+    "initial_decision_BIC_40501_a_1_tariff_publication_violation": true,
+    "initial_decision_CFL_violation_found": false,
+    "initial_decision_reparations_awarded_cents": 0,
+    "administrative_finality_separately_verified": false,
+    "later_customer_refund_verified_cents": null,
+    "independent_full_original_quote_invoice_BOL_payment_chain_in_retally_custody": false
+  }
+}
