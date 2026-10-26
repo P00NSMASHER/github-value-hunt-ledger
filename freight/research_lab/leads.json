@@ -868,6 +868,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "1065cdfaaf379e15116003595f1c1fee5928f34beae77ba2c3ba08ab69370562",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-213717-0"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -3169,6 +3185,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/8019701"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "3d7f1e369ad400ada0738cc7b6e3c899666a58232023f0c09d935f700730cf15",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/BVB-FREIGHT/bvb-invoice"
     },
     {
       "commercial_reuse_authorized": false,
@@ -12345,6 +12377,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "7c932554c2d288e2d0ef00f3c6004bec534557c89df40f0421a9a021c3fd7993",
+  "entries_sha256": "c267620dfd8a63d839e957dfe999222ee61ae01cd202d28f004c39e751f05f1a",
   "schema_version": 1
 }
