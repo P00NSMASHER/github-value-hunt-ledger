@@ -780,5 +780,37 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
 
 
 
+
+    def test_general_nyc_open_data_reuse_does_not_clear_dataset_terms(self):
+        """Original city FAQ permits general use; extra terms and truth remain held."""
+        fixture = json.loads((Path(__file__).with_name("fixtures") /
+                              "nyc_dob_sequence_projection_v1.json").read_text(
+                                  encoding="utf-8"))
+        item = fixture["official_nyc_open_data_reuse_boundary_20261026"]
+        self.assertEqual(item["dataset_id"], DATASET_ID)
+        self.assertEqual(item["verification_utc_date"], "2026-10-26")
+        self.assertEqual(item["first_party_general_faq_url"],
+                         "https://www.nyc.gov/opendata/get-started/FAQs")
+        self.assertTrue(item["general_city_open_data_policy_says_unrestricted_use"])
+        self.assertTrue(item["additional_provider_terms_may_apply"])
+        self.assertFalse(item["publisher_data_accuracy_warranted"])
+        self.assertFalse(item["dataset_specific_extra_terms_verified_absent"])
+        self.assertFalse(item["dataset_specific_commercial_engine_admission_authorized"])
+        self.assertFalse(item["personal_record_or_lead_publication_authorized"])
+        self.assertIsNone(item["original_publisher_response_sha256"])
+        self.assertIsNone(item["original_attached_dictionary_sha256"])
+        self.assertEqual(item["real_person_customer_permit_rows_stored"], 0)
+        self.assertEqual(item["independent_held_out_current_validity_labels"], 0)
+        self.assertEqual(item["independent_held_out_buyer_lead_labels"], 0)
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 2)
+        self.assertEqual(len({c["id"] for c in controls}), 2)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+        self.assertIsNone(controls[0]["independent_rights_adjudication"])
+        self.assertIsNone(controls[1]["independent_current_validity_label"])
+        self.assertFalse(item["release_authorized"])
+        self.assertEqual((item["extra_provider_calls"], item["new_workflows"]), (0, 0))
+        self.assertFalse(item["engine_code_changed"])
+
 if __name__=="__main__":
     unittest.main()

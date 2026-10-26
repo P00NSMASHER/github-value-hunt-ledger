@@ -485,5 +485,49 @@
     "release_authorized": false,
     "extra_provider_calls": 0,
     "workflow_or_engine_code_changed": false
+  },
+  "official_nyc_open_data_reuse_boundary_20261026": {
+    "schema_version": "1.0.0",
+    "evidence_family": "NYC_OPEN_DATA_GENERAL_REUSE_POLICY_VERSUS_DATASET_SPECIFIC_ADMISSION",
+    "publisher": "NYC Open Data and NYC Department of Buildings",
+    "dataset_id": "rbx6-tga4",
+    "verification_utc_date": "2026-10-26",
+    "first_party_general_faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "first_party_portal_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "first_party_dataset_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "source_evidence": "NYC general FAQ says no restrictions on use of Open Data; portal terms separately require compliance with any additional terms from data providers, and disclaim dataset accuracy/fitness. General license is not a reviewed provider-specific release or independent permit truth.",
+    "general_city_open_data_policy_says_unrestricted_use": true,
+    "additional_provider_terms_may_apply": true,
+    "publisher_data_accuracy_warranted": false,
+    "dataset_specific_extra_terms_verified_absent": false,
+    "dataset_specific_commercial_engine_admission_authorized": false,
+    "personal_record_or_lead_publication_authorized": false,
+    "original_publisher_faq_response_bytes_acquired": false,
+    "original_publisher_portal_terms_response_bytes_acquired": false,
+    "original_publisher_response_sha256": null,
+    "original_attached_dataset_dictionary_bytes_acquired": false,
+    "original_attached_dictionary_sha256": null,
+    "real_person_customer_permit_rows_stored": 0,
+    "independent_held_out_current_validity_labels": 0,
+    "independent_held_out_buyer_lead_labels": 0,
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_GENERAL_FAQ_ERASES_DATA_PROVIDER_TERMS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_GENERAL_USE_STATEMENT_DOES_NOT_REMOVE_PROVIDER_SPECIFIC_TERMS",
+        "independent_rights_adjudication": null
+      },
+      {
+        "id": "SYNTH_PUBLIC_DATA_EQUALS_CONFIRMED_VALID_PERMIT_BUYER",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_SOURCE_PUBLICATION_IS_NOT_OUTCOME_OR_COMMERCIAL_LEAD_TRUTH",
+        "independent_current_validity_label": null
+      }
+    ],
+    "owner_handoff": "PermitPlate :48 may assess exact dataset-level extra terms separately; do not enable source/lead publication or engine rights solely from general FAQ. :44 independently verifies negative controls.",
+    "release_authorized": false,
+    "extra_provider_calls": 0,
+    "new_workflows": 0,
+    "engine_code_changed": false
   }
 }
