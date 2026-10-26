@@ -1195,3 +1195,54 @@ paid providers, customer contact, deployments, protected-main bypass
 or a new data branch. Independently authenticated signed BOL pickup/
 delivery and applicable customer contract terms are still required to
 adjudicate an actual customer overcharge or recovered cash.
+
+## Independent GAO historical billing adjudication casebook (October 26, 2026)
+
+Research-only, source-bound casebook:
+`freight/fixtures/gao_adjudicated_billing_casebook_v1.json`, verified by
+`freight.gao_adjudicated_billing_casebook` and
+`freight.test_gao_adjudicated_billing_casebook`. This joins **already
+recorded** B-191257, B-189100 and B-221594 controls to one additional
+official published 1984 decision; it does not create a second lab, run
+a new scheduler, rerate a modern customer or duplicate customer labels.
+
+| Official independent government reviewer | Historical monetary finding | Decision-level outcome |
+| --- | --- | --- |
+| [GAO B-191257](https://www.gao.gov/products/b-191257) | Yellow Freight $828.00 charged / $796.00 audited; $32.00 GSA deduction | GAO sustained GSA setoff |
+| [GAO B-189100](https://www.gao.gov/products/b-189100) | Yellow Freight $3,567.18 paid; $2,634.38 GSA deduction | GAO sustained setoff; $932.80 is *derived subtraction*, NOT an independently published applicable tariff charge |
+| [GAO B-213717](https://www.gao.gov/products/b-213717-0) | Yellow Freight $1,212.09 paid / $686.78 audited; $525.31 GSA deduction | GAO sustained classification-based setoff |
+| [GAO B-221594](https://www.gao.gov/products/b-221594-0) | Riss $942.00 charged / $721.25 claimed by GSA; $220.75 deducted | **GAO INVALIDATED** the GSA setoff because the tender had been rejected; this is a negative error control |
+
+The three **upheld** reported historical GSA deductions total **$3,191.69**;
+the $220.75 **invalidated** setoff is separately tracked and must NEVER
+enter the positive overcharge sum. Each decision is an *independent
+administrative adjudication of a historical government audit*, not a
+separately obtained copy of an original invoice or a certified present-day
+buyer-specific governing rate. The casebook contains no original invoice
+bytes, tariff pages, original GAO HTTP response hash, customer payments,
+bank credits, modern fee right or independently held-out customer
+accuracy labels. A GSA setoff cited in a 1977–1986 decision is never
+RETALLY recovered cash. The original source identifiers and the disposition
+are pinned and tested against one-cent money mutation, contradictory
+decision polarity, forged original-document custody, invented rights,
+fabricated customer recoveries and self-rehashed false receipts.
+
+The one canonical research workflow now executes this offline casebook
+during source discovery and nightly real-data replay. Existing U.S. freight
+original-PDF checks still independently handle ArcBest and GlobalTranz
+source pages; those original PDFs **do not share** the GAO cases'
+customer-specific authorizations. Verify locally:
+
+```bash
+python -m unittest -q freight.test_gao_adjudicated_billing_casebook
+python -m freight.gao_adjudicated_billing_casebook --output /tmp/gao-casebook-receipt.json
+python -m freight.gao_adjudicated_billing_casebook --output /tmp/gao-casebook-receipt.json --verify
+```
+
+**Unmet true customer benchmark gate:** new original invoice custody,
+applicable contemporaneous buyer-carrier rate authority, independent
+shipment documentation, payment/refund chain, an adjudicated outcome
+(including clean negatives) and held-out separation. Until all are
+independently established, current customer true-positive/false-positive
+performance and recoverable cash remain UNKNOWN / $0, not four newly
+scored customer cases.
