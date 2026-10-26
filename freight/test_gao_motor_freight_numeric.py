@@ -1086,5 +1086,99 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                     verify(forged)
                 self.assertNotEqual(digest(forged), digest(item))
 
+    def test_gao_1968_published_printout_arithmetic_is_not_invoice_truth(self):
+        """1968 GAO printed audit-form illustration: extraction only, no original invoice."""
+        item = json.loads((FIXTURE.parent /
+            "gao_review_1968_household_goods_audit_printout_candidate_v0.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["admission_state"],
+            "PUBLISHER_ILLUSTRATION_INDEXED_NOT_ORIGINAL_INVOICE_OR_SCORING_TRUTH")
+        source = item["source"]
+        self.assertEqual(source["official_pdf_url"], "https://www.gao.gov/assets/091196.pdf")
+        self.assertEqual(source["pdf_zero_based_page_index"], 39)
+        self.assertEqual(source["printed_page_number"], 38)
+        self.assertEqual(source["publication_year"], 1968)
+        self.assertEqual(source["printed_form_date_as_published"], "6 14 67")
+        self.assertEqual(source["governing_tariff_effective_date"], "UNKNOWN")
+        self.assertEqual(source["rights_url"], "https://www.gao.gov/copyright")
+        self.assertTrue(source["publisher_page_visited_and_visually_reviewed"])
+        self.assertFalse(source["source_pdf_bytes_acquired"])
+        self.assertIsNone(source["source_pdf_sha256"])
+        self.assertFalse(source["original_carrier_invoice_or_gbl_bytes_acquired"])
+        self.assertFalse(source["original_tariff_pages_acquired"])
+        self.assertFalse(source["customer_engine_commercial_source_admission"])
+        x = item["published_example"]
+        self.assertEqual(x["printed_mileage_miles"], 2133)
+        self.assertEqual(x["transport_weight_pounds"], 2960)
+        self.assertEqual(x["linehaul_cents_per_cwt"], 1660)
+        self.assertEqual(x["linehaul_charge_cents"], 49136)
+        self.assertEqual(x["accessorial_charge_cents"], 525)
+        self.assertEqual(x["gao_audit_should_be_cents"], 49661)
+        self.assertEqual(x["amount_paid_cents"], 50845)
+        self.assertEqual(x["printed_difference_due_us_cents"], 1184)
+        self.assertEqual(x["transport_weight_pounds"] *
+            x["linehaul_cents_per_cwt"], x["linehaul_charge_cents"] * 100)
+        self.assertEqual(x["linehaul_charge_cents"] +
+            x["accessorial_charge_cents"], x["gao_audit_should_be_cents"])
+        self.assertEqual(x["amount_paid_cents"] -
+            x["gao_audit_should_be_cents"], x["printed_difference_due_us_cents"])
+        q = item["data_quality"]
+        self.assertTrue(q["page_image_visually_checked"])
+        self.assertTrue(q["is_gao_published_printout_illustration"])
+        self.assertFalse(q["illustration_is_independently_authenticated_actual_paid_invoice"])
+        self.assertFalse(q["underlying_shipment_independently_verified"])
+        self.assertEqual(q["labeled_real_world_invoice_error_cases"], 0)
+        self.assertEqual(q["independently_held_out_labeled_cases"], 0)
+        self.assertIsNone(q["external_ground_truth_invoice_error_cents"])
+        self.assertEqual(q["customer_outcome"], "UNKNOWN")
+        self.assertEqual(q["final_refund_collection"], "UNKNOWN")
+        self.assertEqual(q["recovered_retally_cash_cents"], 0)
+
+    def test_gao_1968_printout_false_invoice_cash_and_heldout_controls(self):
+        item = json.loads((FIXTURE.parent /
+            "gao_review_1968_household_goods_audit_printout_candidate_v0.json"
+        ).read_text(encoding="utf-8"))
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+            c["id"].startswith("SYNTHETIC_") and c["expected"].startswith("REJECT_")
+            for c in controls))
+        pinned = [
+            ("published_example", "amount_paid_cents", 50845),
+            ("published_example", "gao_audit_should_be_cents", 49661),
+            ("published_example", "printed_difference_due_us_cents", 1184),
+            ("published_example", "transport_weight_pounds", 2960),
+            ("published_example", "linehaul_cents_per_cwt", 1660),
+            ("source", "source_pdf_bytes_acquired", False),
+            ("source", "source_pdf_sha256", None),
+            ("source", "customer_engine_commercial_source_admission", False),
+            ("data_quality", "illustration_is_independently_authenticated_actual_paid_invoice", False),
+            ("data_quality", "independently_held_out_labeled_cases", 0),
+            ("data_quality", "recovered_retally_cash_cents", 0),
+        ]
+        def bounded_check(candidate):
+            for section, field, expected in pinned:
+                self.assertEqual(candidate[section][field], expected)
+            x = candidate["published_example"]
+            self.assertEqual(x["amount_paid_cents"] -
+                x["gao_audit_should_be_cents"], x["printed_difference_due_us_cents"])
+            self.assertEqual(x["transport_weight_pounds"] *
+                x["linehaul_cents_per_cwt"], x["linehaul_charge_cents"] * 100)
+            self.assertEqual(x["linehaul_charge_cents"] +
+                x["accessorial_charge_cents"], x["gao_audit_should_be_cents"])
+        bounded_check(item)
+        for section, field, expected in pinned:
+            with self.subTest(field=field):
+                bogus = copy.deepcopy(item)
+                bogus[section][field] = (
+                    not expected if isinstance(expected, bool) else
+                    "FORGED_SOURCE_HASH" if expected is None else expected + 1
+                )
+                with self.assertRaises(AssertionError):
+                    bounded_check(bogus)
+                self.assertNotEqual(digest(bogus), digest(item))
+
 if __name__ == "__main__":
     unittest.main()
