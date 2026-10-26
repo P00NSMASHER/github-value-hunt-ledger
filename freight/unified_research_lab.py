@@ -80,6 +80,7 @@ SEEDS = {
         "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm",
         "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
         "https://www.stb.gov/reports-data/waybill/",
+        "https://www.stb.gov/reports-data/water-carrier-annual-certifications/",  # FY26-27 public tariff registry, rights held; 2026-11-01 Crowley rule not yet effective.
         "https://www.eia.gov/petroleum/gasdiesel/",
     ),
     "permitplate": (
