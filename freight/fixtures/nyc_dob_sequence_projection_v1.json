@@ -348,5 +348,62 @@
     "extra_provider_calls": 0,
     "new_workflows": 0,
     "release_authorized": false
+  },
+  "publisher_cached_sequence_reason_marginal_non_equivalence_20261026": {
+    "schema_version": "1.0.0",
+    "evidence_class": "FIRST_PARTY_PUBLISHER_CACHED_MARGINAL_COUNTS_ONLY_NOT_ROW_LEVEL_JOINS",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "source_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "original_publisher_metadata_observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "publisher_metadata_raw_bytes_acquired": false,
+    "publisher_metadata_sha256": null,
+    "attached_data_dictionary_original_bytes_acquired": false,
+    "attached_data_dictionary_sha256": null,
+    "source_license_status": "PUBLIC_DATA_NYC_GENERAL_FAQ_NO_RESTRICTIONS; DATASET_SPECIFIC_COMMERCIAL_USE_STILL_HELD",
+    "publisher_attachment_id": "9a9d025e-5bd0-437c-92ea-41e78c9e8d4c",
+    "source_schema": {
+      "sequence_number": "text",
+      "filing_reason": "text"
+    },
+    "cohort": "FULL_DATASET_CACHED_COLUMN_MARGINALS_1020152_ROWS_NOT_ISSUED_DATE_FILTERED_20_ROW_COHORT",
+    "counts": {
+      "total": 1020152,
+      "sequence_non_null": 1019801,
+      "sequence_null": 351,
+      "sequence_value_one": 698783,
+      "sequence_other_non_null": 321018,
+      "filing_renewal_without_changes": 263973,
+      "filing_renewal_with_changes": 57175,
+      "filing_renewal_total": 321148,
+      "minimum_non_equivalence_count": 130
+    },
+    "mathematical_boundary": "TWO_CACHED_MARGINAL_PARTITIONS_HAVE_DIFFERENT_TOTALS; SEQUENCE_NON_NULL_AND_NOT_ONE CANNOT BE A PERFECT BICONDITIONAL CLASSIFIER FOR BOTH RENEWAL FILING REASONS OVER THIS SAME DATASET SNAPSHOT. AT LEAST 130 ROW LABEL MEMBERSHIPS DIFFER IF CACHED COUNTS ARE INTERNALLY CONSISTENT.",
+    "actual_mismatch_rows_or_direction": "UNKNOWN_NOT_IDENTIFIED_BY_MARGINAL_COUNTS",
+    "quality_limits": "No row-level joint distribution, no original xlsx contents or hash, and 351 null sequence numbers. Cached marginal statistics may be stale. No proof of exact renewal iteration, active/current validity, new independently priced permit, or buyer demand.",
+    "independently_held_out_labeled_permit_or_lead_cases": 0,
+    "real_permit_rows_or_personal_identifiers_stored": 0,
+    "evaluation_family": "PERMIT_SOURCE_CLASSIFICATION_BOUNDARY_NOT_INDEPENDENT_GOVERNMENT_SCORING",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_RENEWAL_REASON_WITH_SEQUENCE_ONE",
+        "kind": "SYNTHETIC",
+        "sequence_number": "1",
+        "filing_reason": "Renewal Permit Without Changes",
+        "expected": "DO_NOT_INFER_ACTUAL_ROW_MISMATCH_OR_CURRENT_VALIDITY",
+        "independent_ground_truth": null
+      },
+      {
+        "id": "SYNTH_INITIAL_REASON_WITH_SEQUENCE_TWO",
+        "kind": "SYNTHETIC",
+        "sequence_number": "2",
+        "filing_reason": "Initial Permit",
+        "expected": "DO_NOT_INFER_ACTUAL_ROW_MISMATCH_OR_NEW_BUYER_OPPORTUNITY",
+        "independent_ground_truth": null
+      }
+    ],
+    "owner_handoff": "PermitPlate :48: independently inspect same-row filing_reason and sequence_number on the original 20-row issued-date cohort within existing query budget; :44 QA verifies; do not change collector/scorer from this fixture.",
+    "source_admission": "DRAFT_RIGHTS_HELD_GROUND_TRUTH_UNKNOWN_NO_RELEASE"
   }
 }
