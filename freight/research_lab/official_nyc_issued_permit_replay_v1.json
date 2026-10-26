@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-10-25",
+  "as_of_utc_date": "2026-10-26",
   "buyer_opportunity_ground_truth": false,
   "external_customer_contacts": 0,
   "independent_issuance_outcome_labels": 0,
@@ -20,12 +20,12 @@
   "readback_exact_match": 3,
   "readback_missing": 0,
   "readback_unavailable": 0,
-  "receipt_sha256": "06226fe5a0e91d98a3b091ea8935f93295972677b13b34e6e5dfc4e5437c8c68",
-  "sample_canonical_sha256": "0a061766b357833c06319673fb5a649044ebfaeb5eff70896fab8427f0d15d2a",
+  "receipt_sha256": "a889b091d7f834b95375cfd77a9a389ee0ee5306f7767def2ee6b4c300ff192e",
+  "sample_canonical_sha256": "d68bc6f3921427208de9708bd2ef4d2e68abe6c19e92c9154daf315a8a0c3f93",
   "sample_count": 20,
   "sample_original_rows_stored": 0,
-  "sample_repeated_source_rows": 3,
-  "sample_unique_source_identities": 17,
+  "sample_repeated_source_rows": 2,
+  "sample_unique_source_identities": 18,
   "schema_version": 1,
   "scope": "ORIGINAL_NYC_PERMIT_SOURCE_READBACK_NOT_INDEPENDENT_OUTCOME",
   "source_errors": [
