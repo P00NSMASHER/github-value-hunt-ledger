@@ -193,6 +193,67 @@ modern buyer validation. Never infer modern recoverable dollars from these
 federal 2004–2014 freight decisions.
 
 
+## Public freight proof ladder: beyond collecting URLs (October 26, 2026)
+
+**Different proof states must never be added together.** A historical government
+rate adjudication, a government-confirmed paid settlement, and an agreement
+to settle show three *different* kinds of proof. The independent official
+pages have been reviewed, but no original public HTTP response body
+was archived into this repository. All three records are **research only**.
+
+| Official original source | Strongest support | Hard limit |
+|---|---|---|
+| [GAO B-143458 (Mar. 30, 1961)](https://www.gao.gov/products/b-143458) | Government paid original carrier bill NC 23166 for BOL AF-7611030 of Mar. 7, 1958. Original $305.90 charge; 5,744 actual lb, 6,000-lb **LTL minimum**, $2.51 per 100 lb: **60 × $2.51 = $150.60**. GAO upheld the **$155.30** overcharge, ruling Pennsylvania Transfer Company **not** on tariff Rule 62-2's full-capacity exception carrier list despite a trailer-full BOL note. | Named original voucher/BOL/tariff *transcribed in independent GAO decision*, but RETALLY has **not acquired** their separate original bytes or SHA-256. The 1961 debt certificate ordered repayment within 30 days; **subsequent actual refund or offset unverified**. Not a current buyer-carrier rate. |
+| [DOJ Menlo/Estes (May 3, 2016)](https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve) | DOJ explicitly states Menlo **paid $10 million** and Estes **paid $3 million**, total **$13 million paid to U.S. government** in False Claims Act settlement. An *allegation* was invoicing for air freight actually transported on the ground. | DOJ statement supports *government-reported aggregate settlement payment*, not original Treasury bank remittance in custody, per-invoice damages, **liability finding**, or RETALLY recovered cash. |
+| [DOJ YRC/Roadway/Yellow (Mar. 14, 2022)](https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims) | DOJ says the companies **agreed to pay approximately $6.85 million** to resolve *allegations* of billing when shipment reweighs rose while withholding lower reweighs. | **Agreement only, approximate amount only**: independent cleared government cash, actual shipper invoice damages, and liability determination are **NOT established** by this release. No private refund or RETALLY cash. |
+
+**Engineering proof ladder:** a source URI is a discovery lead; an official
+decision with named BOL/bill/tariff arithmetic can earn a *historical
+adjudication* label; a DOJ statement saying payment "has been paid"
+can earn a *government-reported aggregate settlement payment* label;
+DOJ saying "agreed to pay" can earn **agreement only**.
+None can earn a **modern customer's collectible invoice error** without
+original buyer-specific accepted rate/contract, authentic shipment
+documents, independent cleared payment, applicable claim rights and
+external error-outcome proof. Frozen GlobalTranz/ArcBest documents are
+**unrelated** to these cases. GAO/DOJ numbers are never summed into
+RETALLY opportunities or recovered cash.
+
+**Two legal clocks, not interchangeable:** Under [49 U.S.C. §13710](https://uscode.ecfr.io/title/49/section/13710),
+certain interstate motor-carrier billing-dispute procedures require
+notice within **180 days** of receiving an original or supplemental bill.
+Under [49 U.S.C. §14705](https://uscode.ecfr.io/title/49/section/14705),
+a federal *civil overcharge action* generally has **18 months** from
+accrual; certain Board/Secretary complaints instead have **three years**.
+Subsections (d)–(g) separately address extensions, government
+transportation and claim accrual. These have scope exceptions and
+different treatment of household goods or noncontiguous trade; contract,
+venue, carrier mode, prior claim history and dates matter.
+**No legal deadline is automatically calculated from invoice date**
+or retroactively applied to this 1961 case. Without verified bill receipt,
+delivery/tender, contract, jurisdiction and exception history the
+appropriate result is LEGAL_TIMELINE_REVIEW_REQUIRED, not a definitive
+"claim expired" or "claim valid." This is legal issue-spotting, not advice.
+
+The new research-only source-bound oracle and adversarial tests are
+freight/fixtures/public_freight_rate_cash_proof_v1.json,
+freight/public_freight_proof_ladder.py, and
+freight/test_public_freight_proof_ladder.py. The existing unified
+controller runs them in PR verify, source-ledger discovery and nightly
+original-freight replay. Only an aggregate receipt is saved.
+This adds no schedule, provider, purchased data, customer contact,
+private processing, payment action or production rate modification.
+Negative tests reject one-cent forgeries, inapplicable capacity tariffs,
+invented later refunds, agreed-as-paid settlements, false liability,
+invented invoice-specific accuracy and RETALLY recovered cash.
+
+Offline checks:
+
+    python -m unittest -q freight.test_public_freight_proof_ladder
+    python -m freight.public_freight_proof_ladder --output /tmp/public_freight_proof.json
+    python -m freight.public_freight_proof_ladder --output /tmp/public_freight_proof.json --verify
+
+
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.

@@ -44,7 +44,7 @@ SOURCE_HOSTS = frozenset({
     "data.cityofnewyork.us", "sam.gov", "api.usaspending.gov",
     "www.penninecare.nhs.uk", "media.cadc.uscourts.gov",
     "www2.fmc.gov", "www.fmc.gov", "www.sec.gov", "www.stb.gov",
-    "www.eia.gov", "psc.ky.gov",
+    "www.eia.gov", "psc.ky.gov", "www.justice.gov",
 })
 API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.socrata.com",
                        "retally-unified-research-scout.jayp19386.workers.dev"})
@@ -60,6 +60,9 @@ SEEDS = {
         "https://www.gao.gov/products/b-213717-0",  # GAO 1984 sustained $525.31 GSA classification deduction, historical-only.
         "https://www.gao.gov/products/b-192856",  # 1979 GAO physically tested acoustic-tile sample; $939.42 upheld GSA setoff, historical only.
         "https://www.gao.gov/products/b-191258",  # 1978 GAO reversed $33.30 GSA setoff; later carrier repayment NOT verified.
+        "https://www.gao.gov/products/b-143458",  # 1961 adjudicated $155.30, exact historical 6000-lb minimum x $2.51/cwt; original tariff/invoice bytes NOT held.
+        "https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve",  # DOJ 2016 explicitly reports $13m PAID by Menlo/Estes, aggregate government settlement, NOT customer invoice truth.
+        "https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims",  # DOJ 2022 AGREED approx $6.85m YRC/Roadway/Yellow; cleared payment NOT verified.
         "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",  # CBCA seven GSA overcharge notices rejected, carrier refund not verified.
         "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",  # CBCA unpaid original invoice carrier claim time barred, NOT an overcharge.
         "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",  # CBCA: 12 original public BOL-keyed Treasury offsets reversed for timeliness, carrier bank refund UNVERIFIED.

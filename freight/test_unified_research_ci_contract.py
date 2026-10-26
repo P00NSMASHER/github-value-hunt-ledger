@@ -316,5 +316,44 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
 
 
+    def test_source_bound_gao_rate_and_doj_settlement_state_are_required(self):
+        """CI must exercise source-proof distinctions, never mere digest existence."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n",1)[1].split("\n  discover:\n",1)[0]
+        discovery = source.split("\n  discover:\n",1)[1].split(
+            "\n  nightly-real-data-replay:\n",1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n",1)[1]
+        test = "freight.test_public_freight_proof_ladder"
+        run = "          python -m unittest -q " + test
+        self.assertIn(test,verify)
+        self.assertEqual(discovery.splitlines().count(run),1)
+        self.assertEqual(nightly.splitlines().count(run),1)
+        for path in (
+            "freight/public_freight_proof_ladder.py",
+            "freight/test_public_freight_proof_ladder.py",
+            "freight/fixtures/public_freight_rate_cash_proof_v1.json",
+        ):
+            self.assertEqual(source.count('      - "'+path+'"'),2)
+        self.assertIn("freight/research_lab/public_freight_proof_v1.json",discovery)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/public_freight_proof_v1.json",nightly)
+        self.assertIn(
+            "python -m freight.public_freight_proof_ladder "
+            "--output /tmp/retally-public-freight-proof-v1.json --verify",nightly)
+        for gate in (
+            "p['GAO_historical_overcharge_cents'] == 15530",
+            "p['DOJ_settlement_paid_public_report_cents'] == 1300000000",
+            "p['DOJ_agreed_settlement_actual_paid_cents'] is None",
+            "p['modern_customer_independent_overcharge_labels'] == 0",
+            "p['verified_RETALLY_cash_recovered_cents'] == 0",
+            "p['original_publisher_SHA256'] is None",
+        ):
+            with self.subTest(gate=gate):
+                self.assertIn(gate,discovery)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'),1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'),1)
+
+
 if __name__ == "__main__":
     unittest.main()
