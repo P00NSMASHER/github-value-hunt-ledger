@@ -436,6 +436,43 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
 
 
 
+    def test_socrata_system_id_proposal_does_not_promote_api_rows_to_permit_labels(self):
+        """Documented :id and :updated_at are unprobed, rights-held identity aids."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_live_replay_quality_candidate_v0.json")
+                        .read_text(encoding="utf-8"))
+        probe=pack["publisher_platform_identity_validation_candidate"]
+        self.assertEqual(probe["documentation_url"],
+                         "https://dev.socrata.com/docs/system-fields")
+        self.assertEqual(probe["documented_system_select_fields"],
+                         [":id",":updated_at"])
+        self.assertEqual(probe["source_dataset_id"],DATASET_ID)
+        self.assertFalse(probe["current_collector_selects_system_fields"])
+        self.assertFalse(probe["original_publisher_dataset_specific_probe_executed"])
+        self.assertIsNone(probe["original_publisher_system_field_response_sha256"])
+        self.assertIsNone(probe["number_of_real_collisions_disambiguated"])
+        self.assertFalse(probe["cross_full_replacement_id_stability_verified"])
+        self.assertFalse(probe["source_specific_commercial_reuse_authorized"])
+        self.assertEqual(probe["independent_held_out_validity_labels"],0)
+        cases={c["id"]:c for c in pack["synthetic_negative_controls"]}
+        different=cases["SYNTH_PROJECTED_COLLISION_WITH_DISTINCT_SODA_ROW_IDS"]
+        self.assertEqual(different["kind"],"SYNTHETIC")
+        a,b=different["rows"]
+        self.assertEqual(a["projected_key"],b["projected_key"])
+        self.assertNotEqual(a["system_row_id"],b["system_row_id"])
+        self.assertIsNone(a["independent_permit_validity"])
+        self.assertIsNone(b["independent_permit_validity"])
+        updated=cases["SYNTH_UPDATED_API_ROW_IS_NOT_AN_INDEPENDENT_PERMIT"]
+        self.assertEqual(updated["kind"],"SYNTHETIC")
+        a,b=updated["rows"]
+        self.assertEqual(a["system_row_id"],b["system_row_id"])
+        self.assertNotEqual(a["system_updated_at"],b["system_updated_at"])
+        self.assertIsNone(a["independent_permit_validity"])
+        self.assertIsNone(b["independent_permit_validity"])
+        self.assertEqual(pack["observed"]["actual_distinct_original_records"],"UNKNOWN")
+        self.assertEqual(pack["observed"]["held_out_labeled_permits"],0)
+
+
     def test_live_20row_replay_has_repeated_identities_not_twenty_labels(self):
         """Freeze a real source-readback receipt; never promote it to scoring truth."""
         case=json.loads((Path(__file__).with_name("fixtures") /
@@ -479,7 +516,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         fabricated["observed"]["held_out_labeled_permits"]=20
         self.assertFalse(safely_degraded(fabricated))
         controls=case["synthetic_negative_controls"]
-        self.assertEqual(len(controls),4)
+        self.assertEqual(len(controls),6)
         self.assertTrue(all(x["kind"]=="SYNTHETIC" for x in controls))
         self.assertFalse(case["consumers"]["production_release_authorized"])
 

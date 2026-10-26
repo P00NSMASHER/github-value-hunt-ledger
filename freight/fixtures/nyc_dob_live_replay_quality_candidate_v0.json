@@ -67,6 +67,42 @@
       "id": "SYNTH_ISSUE_DATE_PROVES_ACTIVE_BUYER_OPPORTUNITY",
       "kind": "SYNTHETIC",
       "expected": "UNKNOWN_CURRENT_VALIDITY_AND_BUYER_DEMAND"
+    },
+    {
+      "id": "SYNTH_PROJECTED_COLLISION_WITH_DISTINCT_SODA_ROW_IDS",
+      "kind": "SYNTHETIC",
+      "rows": [
+        {
+          "projected_key": "SYNTH-KEY-A",
+          "system_row_id": "SYNTH-ROW-ID-1",
+          "independent_permit_validity": null
+        },
+        {
+          "projected_key": "SYNTH-KEY-A",
+          "system_row_id": "SYNTH-ROW-ID-2",
+          "independent_permit_validity": null
+        }
+      ],
+      "expected": "TWO_POSSIBLE_DISTINCT_API_ROWS_NOT_TWO_INDEPENDENT_REAL_PERMITS"
+    },
+    {
+      "id": "SYNTH_UPDATED_API_ROW_IS_NOT_AN_INDEPENDENT_PERMIT",
+      "kind": "SYNTHETIC",
+      "rows": [
+        {
+          "projected_key": "SYNTH-KEY-B",
+          "system_row_id": "SYNTH-ROW-ID-3",
+          "system_updated_at": "2026-10-24T00:00:00Z",
+          "independent_permit_validity": null
+        },
+        {
+          "projected_key": "SYNTH-KEY-B",
+          "system_row_id": "SYNTH-ROW-ID-3",
+          "system_updated_at": "2026-10-25T00:00:00Z",
+          "independent_permit_validity": null
+        }
+      ],
+      "expected": "ONE_API_ROW_REVISION_NOT_TWO_INDEPENDENT_REAL_PERMITS"
     }
   ],
   "consumers": {
@@ -74,5 +110,26 @@
     "independent_qa": ":44",
     "source_status": "EVIDENCE_ONLY_NO_ENGINE_CHANGE",
     "production_release_authorized": false
+  },
+  "publisher_platform_identity_validation_candidate": {
+    "documentation_url": "https://dev.socrata.com/docs/system-fields",
+    "documentation_owner": "Socrata / Tyler Technologies",
+    "documented_api_family": "SODA_2_1",
+    "documented_system_select_fields": [
+      ":id",
+      ":updated_at"
+    ],
+    "proposal_status": "DOCUMENTED_METHOD_ONLY_NOT_LIVE_PROBED",
+    "targeted_missing_test": "DISTINGUISH_SAME_PROJECTED_KEY_API_ROWS_FROM_ROW_REVISIONS_IN_20_ROW_DEGRADED_RECEIPT",
+    "source_dataset_id": "rbx6-tga4",
+    "current_collector_selects_system_fields": false,
+    "original_publisher_dataset_specific_probe_executed": false,
+    "original_publisher_system_field_response_sha256": null,
+    "number_of_real_collisions_disambiguated": null,
+    "cross_full_replacement_id_stability_verified": false,
+    "source_specific_commercial_reuse_authorized": false,
+    "independent_held_out_validity_labels": 0,
+    "safe_owner_handoff": "PermitPlate :48 may replace fields in existing bounded official readback after review; retain same provider budget and redacted receipts; :44 independently verifies.",
+    "truth_boundary": "Different :id values could separate two Socrata rows at one readback, but neither :id nor :updated_at independently proves two distinct real-world permits, current permit validity, customer lead outcome, or rights."
   }
 }
