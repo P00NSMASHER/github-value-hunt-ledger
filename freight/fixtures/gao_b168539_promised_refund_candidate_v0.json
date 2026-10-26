@@ -27,6 +27,10 @@
   "historically_reported_facts": {
     "gbl_number_reported": "D 1783811",
     "gbl_date_reported": "1968-06-07",
+    "competing_carrier_bill_reference_transcribed": "A-820099",
+    "delivering_carrier_paid_bill_reference_transcribed": "0069",
+    "navy_paid_voucher_reference_transcribed": "K-6740",
+    "cited_bill_and_voucher_originals_acquired": false,
     "original_competing_carrier_claim_cents": 98970,
     "navy_payment_to_delivering_carrier_cents": 95120,
     "navy_payment_reporting_month": "1969-01",
@@ -88,6 +92,18 @@
       "expected": "REJECT_GAO_CONSIDERED_CONTRARY_ACTUAL_DELIVERY_EVIDENCE"
     },
     {
+      "id": "SYNTHETIC_SAME_GBL_COLLAPSES_DIFFERENT_CARRIER_BILLS",
+      "kind": "SYNTHETIC",
+      "false_claim": "SHARED_GBL_MEANS_CARRIER_BILLS_A820099_AND_0069_ARE_ONE_PAID_INVOICE",
+      "expected": "REJECT_DISTINCT_CARRIER_PAYEES_AND_BILL_REFERENCES"
+    },
+    {
+      "id": "SYNTHETIC_TRANSCRIBED_VOUCHER_IS_ORIGINAL_CUSTODY",
+      "kind": "SYNTHETIC",
+      "false_claim": "PUBLISHED_VOUCHER_K6740_MEANS_ORIGINAL_VOUCHER_WAS_OBTAINED",
+      "expected": "REJECT_GAO_TRANSCRIPTION_IS_NOT_VOUCHER_CUSTODY"
+    },
+    {
       "id": "SYNTHETIC_HISTORICAL_DISPUTE_IS_RETALLY_CASH",
       "kind": "SYNTHETIC",
       "false_claim": "1970_GAO_DISPUTE_IS_A_RETALLY_CUSTOMER_PAYMENT",
@@ -100,6 +116,7 @@
     "independent_payment_bank_proof_available": false,
     "later_after_decision_settlement_unknown": true,
     "financial_claim_vs_received_funds_separated": true,
+    "competing_and_paid_bills_are_distinct_transactions": true,
     "private_customer_medical_student_records_used": false,
     "independently_labeled_modern_errors": 0
   }
