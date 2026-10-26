@@ -44,6 +44,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: starblox-roblox-accelerator-main-writer
@@ -56,6 +57,7 @@ jobs:
       branch: ${{ steps.persist.outputs.branch }}
       base_sha: ${{ steps.persist.outputs.base_sha }}
       head_sha: ${{ steps.persist.outputs.head_sha }}
+      semantic_fingerprint: ${{ steps.persist.outputs.semantic_fingerprint }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -91,7 +93,7 @@ jobs:
           [ -n "$worker" ] || worker="ALL"
           echo "worker=$worker" >> "$GITHUB_OUTPUT"
       - name: Tests
-        run: python -m unittest tests.test_public_repo_scout -v
+        run: python -m unittest tests.test_public_repo_scout tests.test_ti_scout_noop -v
       - name: Scout
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -121,7 +123,14 @@ jobs:
           if [ -f automation/SCOUT_DIGEST.md ]; then
             git add -- automation/SCOUT_DIGEST.md
           fi
+          # Compare actual evidence, not clocks/API telemetry. For a proposed
+          # material update, reuse the already-open equivalent PR if any.
           git diff --cached --quiet && exit 0
+          python -m tools.retally_scout_pr_dedupe
+          if [ "$(sed -n 's/^proposal_duplicate=//p' "$GITHUB_OUTPUT" | tail -1)" = "true" ]; then
+            echo "Existing pending Scout proposal already carries this evidence."
+            exit 0
+          fi
           git commit -m "automation: refresh ${WORKER} scout state"
           git pull --rebase origin main
           BRANCH="automation/retally-scout-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
@@ -162,6 +171,7 @@ jobs:
           PROPOSED_BRANCH: ${{ needs.scout.outputs.branch }}
           PROPOSED_BASE: ${{ needs.scout.outputs.base_sha }}
           PROPOSED_HEAD: ${{ needs.scout.outputs.head_sha }}
+          SCOUT_SEMANTIC_FINGERPRINT: ${{ needs.scout.outputs.semantic_fingerprint }}
         run: >-
           python -m tools.retally_automated_pr_proposal
           --lane scout
