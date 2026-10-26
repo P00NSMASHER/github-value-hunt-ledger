@@ -328,7 +328,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
         self.assertFalse(pack["cohort"]["independent_holdout_verified"])
         self.assertFalse(pack["inspected_source"]["live_collision_in_publisher_data_verified"])
-        self.assertEqual(len(pack["synthetic_negative_controls"]),3)
+        self.assertEqual(len(pack["synthetic_negative_controls"]),4)
         self.assertTrue(all(c["synthetic"] for c in pack["synthetic_negative_controls"]))
         self.assertTrue(all(c["actual_real_world_error_label"] is None
                             for c in pack["synthetic_negative_controls"]))
@@ -365,6 +365,38 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertFalse(receipt["buyer_opportunity_ground_truth"])
         _check(receipt,source_ledger(),DAY)
 
+
+
+    def test_official_metadata_declares_nullable_sequence_without_ground_truth(self):
+        """Cached first-party metadata shows nullable identity, not row-level truth."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        profile=pack["publisher_cached_sequence_profile"]
+        self.assertEqual(profile["observed_dataset_id"],DATASET_ID)
+        self.assertEqual(profile["field_name"],"sequence_number")
+        self.assertEqual(profile["publisher_rows_updated_at_utc"],
+                         "2026-10-25T18:41:35Z")
+        self.assertEqual(profile["publisher_cached_null_count"],351)
+        self.assertEqual(profile["publisher_cached_non_null_count"],1019801)
+        self.assertEqual(profile["publisher_cached_total_count"],
+                         profile["publisher_cached_null_count"]+
+                         profile["publisher_cached_non_null_count"])
+        self.assertIsNone(profile["publisher_original_metadata_response_sha256"])
+        self.assertFalse(profile["source_specific_commercial_reuse_authorized"])
+        self.assertFalse(profile["proves_nulls_within_current_live_query_cohort"])
+        self.assertFalse(profile["proves_distinct_real_identity_collisions"])
+        self.assertEqual(profile["actual_rows_read_or_stored"],0)
+        self.assertEqual(profile["independent_holdout_labeled_count"],0)
+        control=next(c for c in pack["synthetic_negative_controls"]
+                     if c["id"]=="nullable_sequence_cannot_prove_distinct_issuance")
+        self.assertTrue(control["synthetic"])
+        self.assertIsNone(control["actual_real_world_error_label"])
+        a,b=(_minimal(x,DAY) for x in control["rows"])
+        self.assertIsNone(a["sequence_number"])
+        self.assertIsNone(b["sequence_number"])
+        self.assertEqual(_key(a),_key(b))
+        self.assertNotEqual(a["issued_date"],b["issued_date"])
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
 
 
 if __name__=="__main__":

@@ -92,6 +92,30 @@
       "synthetic": true,
       "expected": "UNKNOWN_INDEPENDENT_OUTCOME",
       "actual_real_world_error_label": null
+    },
+    {
+      "id": "nullable_sequence_cannot_prove_distinct_issuance",
+      "synthetic": true,
+      "rows": [
+        {
+          "tracking_number": "SYNTH-NULL-01",
+          "job_filing_number": "SYNTH-M200-I1",
+          "work_permit": "SYNTH-M200-I1-GC",
+          "sequence_number": null,
+          "issued_date": "2026-10-20T00:00:00.000",
+          "permit_status": "Permit Issued"
+        },
+        {
+          "tracking_number": "SYNTH-NULL-01",
+          "job_filing_number": "SYNTH-M200-I1",
+          "work_permit": "SYNTH-M200-I1-GC",
+          "sequence_number": null,
+          "issued_date": "2026-10-21T00:00:00.000",
+          "permit_status": "Permit Issued"
+        }
+      ],
+      "expected": "SOURCE_IDENTITY_AMBIGUOUS_TEMPORAL_SNAPSHOTS_NOT_TWO_INDEPENDENT_ISSUANCE_OUTCOMES",
+      "actual_real_world_error_label": null
     }
   ],
   "limits": {
@@ -111,5 +135,28 @@
     "permitplate_owner_review_required": true,
     "independent_qa_required": true,
     "status": "DRAFT_SOURCE_PROJECTION_REGRESSION_ONLY_NO_ENGINE_CHANGE"
+  },
+  "evidence_revision": "2026-10-26-nyc-cached-sequence-nullability",
+  "publisher_cached_sequence_profile": {
+    "source_kind": "FIRST_PARTY_PUBLISHER_METADATA_CACHED_COLUMN_STATISTICS_NOT_ORIGINAL_RECORDS",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "observed_dataset_id": "rbx6-tga4",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "field_name": "sequence_number",
+    "column_data_type": "text",
+    "publisher_cached_non_null_count": 1019801,
+    "publisher_cached_null_count": 351,
+    "publisher_cached_total_count": 1020152,
+    "actual_rows_read_or_stored": 0,
+    "publisher_original_metadata_response_sha256": null,
+    "independent_holdout_labeled_count": 0,
+    "proves_nulls_within_current_live_query_cohort": false,
+    "proves_distinct_real_identity_collisions": false,
+    "source_specific_commercial_reuse_authorized": false,
+    "authorization_status": "NYC_OPEN_DATA_PUBLIC_TERMS_REVIEWED_ADDITIONAL_DATASET_TERMS_AND_ENGINE_USE_HELD",
+    "ground_truth_status": "SOURCE_METADATA_ONLY_NO_INDEPENDENT_ISSUANCE_OR_BUYER_OUTCOME",
+    "quality_limit": "Counts are cached publisher metadata, may change; 351 null sequence values are dataset-wide, not verified within the issued_date/tracking_number query cohort. Even adding sequence_number to $select cannot make an actually null field non-null."
   }
 }
