@@ -6,7 +6,7 @@ import hashlib
 import json
 import tempfile
 import unittest
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
@@ -217,12 +217,25 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                     ResearchError,"SCHEMA_CHANGED"):
                 _minimal(invalid,DAY)
 
+    def test_receipt_freshness_rejects_future_and_expired_source_proof(self):
+        receipt=build_receipt(source_ledger(),as_of=DAY,fetcher=simulated_provider)
+        # Two-day evidence validity is a production safeguard, not a test timeout.
+        _check(receipt,source_ledger(),DAY+timedelta(days=2))
+        for checked_at in (DAY-timedelta(days=1),DAY+timedelta(days=3)):
+            with self.subTest(checked_at=checked_at),self.assertRaisesRegex(
+                    ResearchError,"STALE_OR_FUTURE_READBACK_RECEIPT"):
+                _check(receipt,source_ledger(),checked_at)
+
     def test_replay_snapshot_is_deterministic_cached_and_tamper_evident(self):
         observed=[]
         def fetcher(url):
             observed.append(url)
             return simulated_provider(url)
-        with tempfile.TemporaryDirectory() as temp:
+        # This offline fixture is dated 2026-10-23; freeze only the test clock.
+        # Production must continue rejecting replay receipts older than two days.
+        with patch("freight.official_nyc_issued_permit_lab.datetime") as clock, \
+             tempfile.TemporaryDirectory() as temp:
+            clock.now.return_value=datetime(2026,10,23,tzinfo=timezone.utc)
             root=Path(temp)
             ledger_path=root/"leads.json"
             target=root/"readback.json"
