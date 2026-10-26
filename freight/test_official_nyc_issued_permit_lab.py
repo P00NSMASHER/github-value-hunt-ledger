@@ -553,5 +553,49 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertFalse(case["consumers"]["production_release_authorized"])
 
 
+    def test_structural_notice_conditions_do_not_promote_public_permit_rows(self):
+        """Official 2026 DOB conditional gates cannot be inferred from five-field readback."""
+        candidate=json.loads((Path(__file__).with_name("fixtures") /
+                              "nyc_dob_structural_gates_2026_candidate_v0.json")
+                             .read_text(encoding="utf-8"))
+        notice=candidate["source"]
+        self.assertEqual(notice["original_notice_url"],
+                         "https://www.nyc.gov/assets/buildings/pdf/stpermits_dn-sn.pdf")
+        self.assertEqual((notice["notice_date"],notice["policy_effective_date"]),
+                         ("2026-01-21","2026-02-02"))
+        self.assertIsNone(notice["original_pdf_sha256"])
+        self.assertFalse(notice["original_pdf_bytes_acquired"])
+        self.assertFalse(notice["dataset_specific_commercial_use_authorized"])
+        scope=candidate["scope"]
+        self.assertTrue(scope["notice_not_universal_for_all_permits"])
+        self.assertFalse(scope["historical_policy_retroactively_applied"])
+        self.assertEqual({x["rule"] for x in scope["gates"]},
+                         {"FO_OR_EA_ISSUANCE","ST_ISSUANCE_NB_NBEE_ALTCO",
+                          "ST_ISSUANCE_ALT_ENLARGEMENT","ST_RENEWAL"})
+        evaluation=candidate["evaluation"]
+        self.assertEqual(tuple(evaluation["current_collector_select"]),FIELDS)
+        self.assertNotIn("work_type",FIELDS)
+        self.assertNotIn("sequence_number",FIELDS)
+        self.assertEqual(evaluation["independently_held_out_labeled_cases"],0)
+        self.assertIsNone(evaluation["permitplate_precision_recall"])
+        self.assertEqual(evaluation["current_permit_validity_truth"],"UNKNOWN")
+        controls=candidate["synthetic_negative_controls"]
+        self.assertEqual(len(controls),evaluation["synthetic_control_count"])
+        self.assertEqual(len(controls),6)
+        self.assertEqual(len({c["id"] for c in controls}),len(controls))
+        self.assertTrue(all(c["kind"]=="SYNTHETIC" for c in controls))
+        for c in controls:
+            with self.subTest(control=c["id"]):
+                normalized=_minimal(c["projected_row"],date(2026,10,26))
+                self.assertEqual(_classification(normalized),"PUBLISHER_ISSUE_DATE_PRESENT")
+                self.assertIsNone(c["independent_issuance_label"])
+                self.assertIsNone(c["independent_current_validity_label"])
+                self.assertIsNone(c["independent_commercial_lead_label"])
+                self.assertNotIn("PERMIT_VALID",c["expected_truth_boundary"])
+        self.assertEqual(candidate["safety"]["private_customer_rows_stored"],0)
+        self.assertEqual(candidate["safety"]["new_provider_calls"],0)
+        self.assertFalse(candidate["consumers"]["release_authorized"])
+
+
 if __name__=="__main__":
     unittest.main()
