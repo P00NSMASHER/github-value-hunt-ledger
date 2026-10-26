@@ -601,5 +601,43 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertFalse(candidate["consumers"]["release_authorized"])
 
 
+    def test_publisher_unfiltered_same_row_status_placeholder_does_not_prove_issuance(self):
+        """One publisher-rendered unfiltered row is not an independent issued permit label."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        item=pack["publisher_unfiltered_placeholder_join_20261026"]
+        self.assertEqual(item["official_dataset_id"], DATASET_ID)
+        self.assertEqual(item["source_url"],
+                         "https://data.cityofnewyork.us/resource/rbx6-tga4.json")
+        self.assertIn("UNFILTERED", item["cohort"])
+        self.assertFalse(item["collector_filtered_cohort_inclusion_verified"])
+        self.assertFalse(item["original_publisher_http_body_acquired"])
+        self.assertIsNone(item["original_publisher_http_sha256"])
+        self.assertFalse(item["original_permit_row_or_personal_identifiers_stored"])
+        self.assertEqual(item["identifying_fields_copied"], [])
+        fields=item["material_fields_observed_together"]
+        self.assertEqual(fields["work_permit"],"Permit is not yet issued")
+        self.assertEqual(fields["permit_status"],"Signed-off")
+        self.assertFalse(fields["issued_date_present"])
+        self.assertEqual(item["independently_held_out_issuance_labels"],0)
+        self.assertIsNone(item["independent_validity_label"])
+        self.assertFalse(item["source_specific_commercial_reuse_authorized"])
+        case=item["synthetic_negative_control"]
+        self.assertEqual(case["kind"],"SYNTHETIC")
+        self.assertIsNone(case["issued_date"])
+        self.assertIsNone(case["independent_issuance_label"])
+        self.assertIsNone(case["independent_current_validity_label"])
+        self.assertEqual(case["expected"],
+                         "NO_ISSUANCE_OR_CURRENT_VALIDITY_PROMOTION_FROM_STATUS_ALONE")
+        # Even if status changes, no dated independent truth is supplied.
+        def can_promote(v):
+            return (v.get("issued_date") is not None
+                    and v.get("independent_issuance_label") is True)
+        self.assertFalse(can_promote(case))
+        altered=dict(case,permit_status="Permit Issued")
+        self.assertFalse(can_promote(altered))
+
+
 if __name__=="__main__":
     unittest.main()

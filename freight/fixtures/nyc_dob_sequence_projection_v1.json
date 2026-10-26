@@ -245,5 +245,42 @@
     "source_specific_commercial_reuse_approved": false,
     "permitplate_scoring_ground_truth": "UNKNOWN",
     "quality_limit": "Cached publisher column counts are dataset-wide, not row-level joins. 'No Work Permit', null work_permit, and 'Permit is not yet issued' do not prove an issued, currently valid permit or commercial lead. Overlap and filtered-cohort prevalence remain UNKNOWN."
+  },
+  "publisher_unfiltered_placeholder_join_20261026": {
+    "observation_type": "FIRST_PARTY_PUBLIC_SODA_JSON_RENDERED_SINGLE_ROW_NOT_ORIGINAL_HTTP_RESPONSE_BYTES",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "official_dataset_id": "rbx6-tga4",
+    "source_url": "https://data.cityofnewyork.us/resource/rbx6-tga4.json",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "cohort": "ONE_VISIBLE_ROW_UNFILTERED_DEFAULT_API_PAGE_NOT_THE_CURRENT_ISSUED_DATE_FILTERED_20_ROW_COLLECTOR_COHORT",
+    "material_fields_observed_together": {
+      "work_permit": "Permit is not yet issued",
+      "permit_status": "Signed-off",
+      "issued_date_present": false
+    },
+    "observation_limit": "Renderer first visible array entry, unordered default page and time-varying publisher. Absent issued_date key in visible entry, not proof of immutable historical permit state.",
+    "original_publisher_http_body_acquired": false,
+    "original_publisher_http_sha256": null,
+    "original_permit_row_or_personal_identifiers_stored": false,
+    "identifying_fields_copied": [],
+    "collector_filtered_cohort_inclusion_verified": false,
+    "independently_held_out_issuance_labels": 0,
+    "independent_validity_label": null,
+    "source_specific_commercial_reuse_authorized": false,
+    "rights": "NYC_OPEN_DATA_GENERAL_TERMS_REVIEWED_SOURCE_SPECIFIC_COMMERCIAL_ENGINE_APPROVAL_HELD",
+    "ground_truth_limit": "A single first-party same-row combination shows permit_status alone does not prove a dated issued permit. Neither current validity nor a buyer opportunity can be inferred; no matching to the live 20-row receipt.",
+    "owner_handoff": "PermitPlate :48 owns scope-sensitive filtering/identity and potential collector changes; independent :44 QA before source promotion.",
+    "synthetic_negative_control": {
+      "id": "SYNTH_SIGNED_OFF_WITH_NOT_YET_ISSUED_AND_NO_DATE",
+      "kind": "SYNTHETIC",
+      "permit_status": "Signed-off",
+      "work_permit": "Permit is not yet issued",
+      "issued_date": null,
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "expected": "NO_ISSUANCE_OR_CURRENT_VALIDITY_PROMOTION_FROM_STATUS_ALONE"
+    }
   }
 }
