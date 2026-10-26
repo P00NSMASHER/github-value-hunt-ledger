@@ -833,7 +833,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                           .read_text(encoding="utf-8"))
         controls = case["synthetic_negative_controls"]
         self.assertEqual(len(controls), 8)
-        self.assertEqual(len({c["id"] for c in controls}), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 8)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" and
                             c["id"].startswith("SYNTHETIC_") for c in controls))
         self.assertEqual({c["expected"] for c in controls}, {
