@@ -144,6 +144,28 @@ def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None):
     api_metrics={k:int(gh.stats.get(k,0))-int(before.get(k,0)) for k in gh.stats}
     return {"schema_version":2,"generated_at":now().isoformat(),"worker_id":w["id"],"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
 
+def _queue_evidence(snapshot):
+    """Ignore per-run telemetry, never substantive candidates or provider errors."""
+    return {k: v for k, v in snapshot.items()
+            if k not in ("generated_at", "api_metrics")}
+
+
+def persist_queue(path, snapshot):
+    """Do not create a source proposal when only the run clock/counters changed."""
+    if path.is_file():
+        try:
+            previous = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            previous = None
+        if (type(previous) is dict and
+                _queue_evidence(previous) == _queue_evidence(snapshot)):
+            return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8")
+    return True
+
+
 def integrate(root,out):
     merged={}; workers={}; files=sorted(root.glob("HUNTER-*.json"))
     for p in files:
@@ -156,7 +178,7 @@ def integrate(root,out):
             if key not in merged or int(c.get("triage_score") or 0)>int(merged[key].get("triage_score") or 0): merged[key]=c
             workers.setdefault(key,set()).add(wid)
     ranked=sorted(merged.items(),key=lambda kv:(int(kv[1].get("triage_score") or 0),int(kv[1].get("stars") or 0)),reverse=True)
-    lines=["# Automated Scout Digest","","**Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.","",f"Generated: {now().isoformat()}",f"Queue snapshots read: {len(files)}",f"Unique exact-revision candidates: {len(ranked)}","","| Triage | Repository | Exact revision | License | Workers | Description |","|---:|---|---|---|---|---|"]
+    lines=["# Automated Scout Digest","","**Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.","","Source: versioned HUNTER queue snapshots; Git history records material changes.",f"Queue snapshots read: {len(files)}",f"Unique exact-revision candidates: {len(ranked)}","","| Triage | Repository | Exact revision | License | Workers | Description |","|---:|---|---|---|---|---|"]
     for key,c in ranked[:75]:
         repo,sha=key; desc=str(c.get("description") or "").replace("|","\\|").replace("\n"," ")[:180]; ws=", ".join(sorted(workers[key]))
         lines.append(f"| {c.get('triage_score',0)} | [{repo}]({c.get('url')}) | {sha[:12]} | {c.get('published_license_spdx','UNKNOWN')} | {ws} | {desc} |")
@@ -174,6 +196,8 @@ def main():
     gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root); prior_pairs=queued_pairs(qr)
     for w in ws:
         d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)),prior_pairs)
-        p=qr/f"{w['id']}.json"; p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d,indent=2,sort_keys=True)+"\n"); print(f"{w['id']}: {d['candidate_count']} candidates")
+        p=qr/f"{w['id']}.json"
+        changed=persist_queue(p,d)
+        print(f"{w['id']}: {d['candidate_count']} candidates ({'changed' if changed else 'unchanged'})")
 
 if __name__=="__main__": main()
