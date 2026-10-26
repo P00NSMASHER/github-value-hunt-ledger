@@ -72,7 +72,7 @@ class CBCARealGovernmentBillingDecisionTests(unittest.TestCase):
     def test_receipt_separates_invalid_government_audit_from_unpaid_claim(self):
         r=make_receipt()
         self.assertEqual(r["case_count"],2)
-        self.assertEqual(r["government_overcharge_notices_invalidated_case_count"],7)
+        self.assertEqual(r["gsa_overcharge_notices_invalidated_count"],7)
         self.assertEqual(r["other_gsa_notices_not_adjudicated_here"],108)
         self.assertEqual(r["government_notice_assessment_cents_rejected_by_board_not_retally_cash"],
                          1554908)
@@ -132,7 +132,7 @@ class CBCARealGovernmentBillingDecisionTests(unittest.TestCase):
     def test_unknown_population_and_forged_source_receipts_fail_closed(self):
         base=make_receipt()
         tamper=[
-            ("government_overcharge_notices_invalidated_case_count",115),
+            ("gsa_overcharge_notices_invalidated_count",115),
             ("government_notice_assessment_cents_rejected_by_board_not_retally_cash",0),
             ("other_gsa_notices_not_adjudicated_here",0),
             ("time_barred_carrier_claim_cents_not_recoverable",0),
