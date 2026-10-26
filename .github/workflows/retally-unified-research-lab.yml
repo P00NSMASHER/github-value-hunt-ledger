@@ -738,7 +738,8 @@ jobs:
           # Replay the 1986 invalid-GSA-deduction negative control and 1977
           # cargo-classification dispute on every nightly original-data run.
           # They are historical evidence, never independent customer invoice truth.
-          python -m unittest -q freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification freight.test_gao_adjudicated_billing_casebook
+          python -m unittest -q freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
+          python -m unittest -q freight.test_gao_adjudicated_billing_casebook
           python -m freight.gao_adjudicated_billing_casebook --output /tmp/retally-gao-adjudicated-nightly.json
           python -m freight.gao_adjudicated_billing_casebook --output /tmp/retally-gao-adjudicated-nightly.json --verify
           python -m pytest -q freight/test_real_world_eval_v1.py
