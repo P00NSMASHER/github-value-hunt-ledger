@@ -1,0 +1,94 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_REVIEW_1968_HHG_TRANSPORT_AUDIT_PRINTOUT_CANDIDATE_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "PUBLISHED_DOCUMENT_FIELD_EXTRACTION_AND_ARITHMETIC_ONLY",
+  "admission_state": "PUBLISHER_ILLUSTRATION_INDEXED_NOT_ORIGINAL_INVOICE_OR_SCORING_TRUTH",
+  "cohort": "GAO_REVIEW_FALL_1968_HOUSEHOLD_GOODS_AUDIT_FORM_ILLUSTRATION",
+  "source": {
+    "publisher": "U.S. General Accounting Office (now Government Accountability Office)",
+    "publication": "The GAO Review, Fall 1968",
+    "article": "Computerized Audit of Transportation Bills",
+    "author": "John M. Loxton",
+    "official_pdf_url": "https://www.gao.gov/assets/091196.pdf",
+    "pdf_zero_based_page_index": 39,
+    "printed_page_number": 38,
+    "publication_year": 1968,
+    "printed_form_date_as_published": "6 14 67",
+    "governing_tariff_effective_date": "UNKNOWN",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_GOVERNMENT_MATERIAL_REUSABLE_WITH_ACKNOWLEDGMENT_NO_IMPLIED_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE",
+    "source_pdf_bytes_acquired": false,
+    "source_pdf_sha256": null,
+    "publisher_page_visited_and_visually_reviewed": true,
+    "source_kind": "OFFICIAL_GAO_PUBLISHED_ANONYMIZED_AUDIT_PRINTOUT_ILLUSTRATION",
+    "customer_engine_commercial_source_admission": false,
+    "original_carrier_invoice_or_gbl_bytes_acquired": false,
+    "original_tariff_pages_acquired": false,
+    "machine_reproducible_source_page_extraction_verified": false
+  },
+  "published_example": {
+    "amount_paid_cents": 50845,
+    "gao_audit_should_be_cents": 49661,
+    "printed_difference_due_us_cents": 1184,
+    "transport_weight_pounds": 2960,
+    "linehaul_cents_per_cwt": 1660,
+    "linehaul_charge_cents": 49136,
+    "accessorial_charge_cents": 525,
+    "printed_mileage_miles": 2133,
+    "person_name_and_document_identifier_intentionally_not_transcribed": true
+  },
+  "data_quality": {
+    "numeric_field_transcription_count": 8,
+    "arithmetic_consistency_checked": true,
+    "page_image_visually_checked": true,
+    "duplicate_of_other_gao_decision_casebook_verified": false,
+    "is_gao_published_printout_illustration": true,
+    "illustration_is_independently_authenticated_actual_paid_invoice": false,
+    "carrier_or_shipper_original_record_possessed": false,
+    "underlying_shipment_independently_verified": false,
+    "labeled_real_world_invoice_error_cases": 0,
+    "independently_held_out_labeled_cases": 0,
+    "external_ground_truth_invoice_error_cents": null,
+    "customer_outcome": "UNKNOWN",
+    "GAO_form_printed_difference_is_modern_legal_overcharge": false,
+    "recovered_retally_cash_cents": 0,
+    "final_refund_collection": "UNKNOWN",
+    "source_full_pdf_byte_custody_status": "UNKNOWN_NOT_ACQUIRED",
+    "extraction_scoring_not_yet_independently_replayed": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_PUBLISHED_PRINT_FORMAT_AS_ORIGINAL_CARRIER_INVOICE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ORIGINAL_INVOICE_OR_GBL_BYTES_NOT_HELD"
+    },
+    {
+      "id": "SYNTHETIC_PRINTED_DUE_US_EQUALS_CLEARED_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_REAL_PAYMENT_SETTLEMENT_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_GAO_1968_TARIFF_AS_MODERN_AUTHORITY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MODERN_RATE_AND_CUSTOMER_ERROR_INFERENCE"
+    },
+    {
+      "id": "SYNTHETIC_2960_POUNDS_AS_2960_CWT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_WEIGHT_UNIT_ARITHMETIC"
+    },
+    {
+      "id": "SYNTHETIC_GAO_PUBLICATION_EQUALS_INDEPENDENT_HELDOUT_CASE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNVERIFIED_HOLDOUT_LABEL"
+    }
+  ],
+  "downstream_owner_handoff": {
+    "freightrecovery": "REVIEW_FOR_EXTRACTION_SHAPE_ONLY_NO_ACCURACY_OR_CUSTOMER_PROMOTION",
+    "recoveryos": "DO_NOT_INFER_PAYMENT_OR_ACCOUNTING_RECEIPT_FROM_AUDIT_PRINTOUT",
+    "permitplate": "NOT_APPLICABLE",
+    "capturebrief": "NOT_APPLICABLE",
+    "independent_QA": "VERIFY_PAGE_INDEX_VISUAL_TRANSCRIPTION_ORIGINAL_BYTES_AND_REPLAY"
+  }
+}
