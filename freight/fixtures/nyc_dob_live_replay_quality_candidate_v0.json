@@ -1,0 +1,78 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
+  "engine": "permitplate",
+  "status": "DRAFT_FROZEN_REPOSITORY_REPLAY_RECEIPT_NOT_INDEPENDENT_LABELS",
+  "cohort": "NYC_DOB_NOW_APPROVED_PERMITS_2026_10_26_BOUNDED_20_ROWS",
+  "source": {
+    "original_publisher_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "publisher": "NYC Department of Buildings",
+    "terms_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "publisher_original_http_bytes_sha256": null,
+    "original_publisher_response_acquired": false,
+    "dataset_specific_commercial_reuse_authorized": false,
+    "reuse_rights": "UNVERIFIED_HOLD"
+  },
+  "provenance": {
+    "observation_kind": "MACHINE_GENERATED_FIRST_PARTY_QUERY_READBACK_RECEIPT_NOT_RAW_PUBLISHER_ROWS",
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "live_writer_branch": "research/retally-unified-data-lab",
+    "writer_commit": "9e1805f6e18fd6174f548e99d21bc0e5ee0b52be",
+    "writer_commit_utc": "2026-10-26T01:40:52Z",
+    "receipt_path": "freight/research_lab/official_nyc_issued_permit_replay_v1.json",
+    "receipt_blob_git_sha1": "519e03c3c24c1d8b5e72e9f2e87ecf921cd60525",
+    "receipt_sha256": "a889b091d7f834b95375cfd77a9a389ee0ee5306f7767def2ee6b4c300ff192e",
+    "sample_canonical_sha256": "d68bc6f3921427208de9708bd2ef4d2e68abe6c19e92c9154daf315a8a0c3f93",
+    "raw_source_byte_hash": null,
+    "raw_publisher_rows_stored": 0,
+    "independently_replayed_original_http_by_lab_coordinator": false
+  },
+  "observed": {
+    "as_of_utc_date": "2026-10-26",
+    "sample_count": 20,
+    "sample_unique_source_identities": 18,
+    "sample_repeated_source_rows": 2,
+    "second_read_checked": 3,
+    "second_read_exact_match": 3,
+    "receipt_status": "PUBLISHER_REPLAY_DEGRADED",
+    "error_codes": [
+      "DUPLICATE_SOURCE_IDENTITIES"
+    ],
+    "published_issue_dates_present": 20,
+    "actual_distinct_original_records": "UNKNOWN",
+    "held_out_labeled_permits": 0,
+    "independent_current_validity_labels": 0,
+    "permitplate_scoring_precision_recall": null,
+    "buyer_demand": "UNKNOWN",
+    "verified_customer_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_3_OF_3_SECOND_READS_PROVE_NO_COLLISIONS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_TWO_REPEATED_PROJECTED_SOURCE_IDENTITIES"
+    },
+    {
+      "id": "SYNTH_REPEATED_KEYS_PROVE_TWO_REAL_DUPLICATE_PERMITS",
+      "kind": "SYNTHETIC",
+      "expected": "UNKNOWN_PROJECTED_SEQUENCE_NOT_SELECTED_AND_RAW_ROW_TRUTH_NOT_HELD"
+    },
+    {
+      "id": "SYNTH_TWENTY_ROWS_AS_TWENTY_INDEPENDENT_PERMIT_LABELS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_HELD_OUT_LABELS"
+    },
+    {
+      "id": "SYNTH_ISSUE_DATE_PROVES_ACTIVE_BUYER_OPPORTUNITY",
+      "kind": "SYNTHETIC",
+      "expected": "UNKNOWN_CURRENT_VALIDITY_AND_BUYER_DEMAND"
+    }
+  ],
+  "consumers": {
+    "permitplate_owner": ":48",
+    "independent_qa": ":44",
+    "source_status": "EVIDENCE_ONLY_NO_ENGINE_CHANGE",
+    "production_release_authorized": false
+  }
+}

@@ -435,5 +435,54 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
 
 
+
+    def test_live_20row_replay_has_repeated_identities_not_twenty_labels(self):
+        """Freeze a real source-readback receipt; never promote it to scoring truth."""
+        case=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_live_replay_quality_candidate_v0.json")
+                        .read_text(encoding="utf-8"))
+        self.assertEqual(case["engine"],"permitplate")
+        self.assertEqual(case["source"]["original_publisher_url"],
+                         "https://data.cityofnewyork.us/d/rbx6-tga4")
+        self.assertIsNone(case["source"]["publisher_original_http_bytes_sha256"])
+        self.assertFalse(case["source"]["dataset_specific_commercial_reuse_authorized"])
+        provenance=case["provenance"]
+        self.assertEqual(provenance["writer_commit"],
+                         "9e1805f6e18fd6174f548e99d21bc0e5ee0b52be")
+        self.assertEqual(provenance["receipt_blob_git_sha1"],
+                         "519e03c3c24c1d8b5e72e9f2e87ecf921cd60525")
+        self.assertEqual(provenance["receipt_sha256"],
+                         "a889b091d7f834b95375cfd77a9a389ee0ee5306f7767def2ee6b4c300ff192e")
+        self.assertEqual(provenance["sample_canonical_sha256"],
+                         "d68bc6f3921427208de9708bd2ef4d2e68abe6c19e92c9154daf315a8a0c3f93")
+        self.assertEqual(provenance["raw_publisher_rows_stored"],0)
+        o=case["observed"]
+        def safely_degraded(p):
+            r=p["observed"]
+            return (r["sample_count"]-r["sample_unique_source_identities"]
+                    ==r["sample_repeated_source_rows"]
+                    and r["sample_repeated_source_rows"]>0
+                    and r["receipt_status"]=="PUBLISHER_REPLAY_DEGRADED"
+                    and r["error_codes"]==["DUPLICATE_SOURCE_IDENTITIES"]
+                    and r["second_read_exact_match"]<=r["second_read_checked"]
+                    and r["held_out_labeled_permits"]==0
+                    and r["independent_current_validity_labels"]==0
+                    and r["actual_distinct_original_records"]=="UNKNOWN")
+        self.assertTrue(safely_degraded(case))
+        self.assertEqual((o["sample_count"],o["sample_unique_source_identities"],
+                          o["sample_repeated_source_rows"]),(20,18,2))
+        self.assertEqual((o["second_read_checked"],o["second_read_exact_match"]),(3,3))
+        fabricated=json.loads(json.dumps(case))
+        fabricated["observed"]["sample_unique_source_identities"]=20
+        self.assertFalse(safely_degraded(fabricated))
+        fabricated["observed"]["sample_unique_source_identities"]=18
+        fabricated["observed"]["held_out_labeled_permits"]=20
+        self.assertFalse(safely_degraded(fabricated))
+        controls=case["synthetic_negative_controls"]
+        self.assertEqual(len(controls),4)
+        self.assertTrue(all(x["kind"]=="SYNTHETIC" for x in controls))
+        self.assertFalse(case["consumers"]["production_release_authorized"])
+
+
 if __name__=="__main__":
     unittest.main()
