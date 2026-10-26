@@ -684,5 +684,43 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertFalse(doc["release_authorized"])
 
 
+    def test_publisher_sequence_counts_do_not_define_renewal_labels(self):
+        """Dataset-wide source marginals disprove an exact renewal/sequence proxy."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        p=pack["publisher_cached_sequence_reason_marginal_non_equivalence_20261026"]
+        self.assertEqual(p["dataset_id"],DATASET_ID)
+        self.assertEqual(p["source_schema"],
+                         {"sequence_number":"text","filing_reason":"text"})
+        self.assertFalse(p["publisher_metadata_raw_bytes_acquired"])
+        self.assertIsNone(p["publisher_metadata_sha256"])
+        self.assertFalse(p["attached_data_dictionary_original_bytes_acquired"])
+        self.assertIsNone(p["attached_data_dictionary_sha256"])
+        self.assertIn("HELD",p["source_admission"])
+        n=p["counts"]
+        self.assertEqual(n["total"],1020152)
+        self.assertEqual(n["sequence_non_null"]+n["sequence_null"],n["total"])
+        not_one=n["sequence_non_null"]-n["sequence_value_one"]
+        renewals=(n["filing_renewal_without_changes"]
+                  +n["filing_renewal_with_changes"])
+        self.assertEqual(not_one,n["sequence_other_non_null"])
+        self.assertEqual(renewals,n["filing_renewal_total"])
+        self.assertEqual(renewals-not_one,n["minimum_non_equivalence_count"])
+        self.assertEqual(n["minimum_non_equivalence_count"],130)
+        self.assertGreater(renewals,not_one)
+        self.assertEqual(p["actual_mismatch_rows_or_direction"],
+                         "UNKNOWN_NOT_IDENTIFIED_BY_MARGINAL_COUNTS")
+        self.assertEqual(p["independently_held_out_labeled_permit_or_lead_cases"],0)
+        self.assertEqual(p["real_permit_rows_or_personal_identifiers_stored"],0)
+        cases=p["synthetic_negative_controls"]
+        self.assertEqual(len(cases),2)
+        self.assertEqual(len({x["id"] for x in cases}),len(cases))
+        self.assertTrue(all(x["kind"]=="SYNTHETIC" for x in cases))
+        self.assertTrue(all(x["independent_ground_truth"] is None for x in cases))
+        self.assertNotEqual(cases[0]["filing_reason"].startswith("Initial"),
+                            cases[1]["filing_reason"].startswith("Initial"))
+
+
 if __name__=="__main__":
     unittest.main()
