@@ -457,8 +457,9 @@ jobs:
           import json, os
           from pathlib import Path
           x=json.loads(Path('/tmp/retally-gao-billing-summary.json').read_text())
-          assert x['external_gao_adjudicated_historical_cases']==3
-          assert x['sustained_overcharges_historical_cents']==16788
+          assert x['external_gao_adjudicated_historical_cases']==5
+          assert x['sustained_overcharges_historical_cents']==332757
+          assert x['historical_agency_deductions_total_cents_not_retally_cash']==354832
           assert x['invalid_government_deductions_historical_cents']==22075
           assert x['private_customer_benchmark_truth_cases']==0
           assert x['source_original_invoice_rate_bank_chain_verified_cases']==0
@@ -468,7 +469,7 @@ jobs:
           with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
               out.write(
                   "### FreightRecovery external GAO billing adjudications (historic ONLY)\n"
-                  "- 2 sustained historical overcharges ($167.88 total GSA deductions reported).\n"
+                  "- 4 sustained historical overcharges ($3,327.57 total GSA deductions reported).\n"
                   "- 1 invalid historical GSA deduction ($220.75): essential false-positive control.\n"
                   "- Original invoice/rate/bank custody: 0; current customer labels: 0; RETALLY cash: $0.\n"
               )
