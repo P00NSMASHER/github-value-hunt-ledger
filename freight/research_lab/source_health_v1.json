@@ -20,9 +20,9 @@
       "commercial_reuse_confirmed": false,
       "independently_labeled_test_cases": 0,
       "official_publisher_host_only": 24,
-      "other_allowlisted_host_only": 2,
+      "other_allowlisted_host_only": 4,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 231,
+      "source_pointers": 233,
       "third_party_catalog_host_only": 205,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
@@ -50,7 +50,7 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 777,
+  "first_seen_in_last_seven_calendar_days": 779,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-26",
   "limitations": [
@@ -66,7 +66,7 @@
     "github.com": 228,
     "media.cadc.uscourts.gov": 1,
     "sam.gov": 1,
-    "www.cbca.gov": 2,
+    "www.cbca.gov": 4,
     "www.eia.gov": 1,
     "www.fmc.gov": 1,
     "www.gao.gov": 17,
@@ -79,8 +79,8 @@
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "651fed2631332ece0c1ff133142affce275e93a866106b88b87c88dc083c834b",
-  "unique_source_pointers": 777,
+  "source_ledger_entries_sha256": "14326be9835380c43e5de0acd82b4fa3e25aad2df6cf6497faed78a610557cf8",
+  "unique_source_pointers": 779,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }

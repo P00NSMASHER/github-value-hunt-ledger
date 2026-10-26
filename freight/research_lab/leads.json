@@ -5703,6 +5703,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "7706ee3a0556eefbd0d2dbd1f2a14a4b159437fdd5aff63141d433c0dba3446e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.cbca.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -10765,6 +10781,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-26",
+      "id": "df8d74688b4eee9e10327121f8280429cbb7f5393c0eb4fc47ddd6c4bbf7e3b4",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.cbca.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "df8da0ff3523d4768f624f188fb9b72268a9fe614fee394ad7adf1e0391f7dfa",
       "independent_ground_truth": false,
@@ -12441,6 +12473,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "651fed2631332ece0c1ff133142affce275e93a866106b88b87c88dc083c834b",
+  "entries_sha256": "14326be9835380c43e5de0acd82b4fa3e25aad2df6cf6497faed78a610557cf8",
   "schema_version": 1
 }
