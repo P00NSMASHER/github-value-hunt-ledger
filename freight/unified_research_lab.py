@@ -63,6 +63,9 @@ SEEDS = {
         "https://www.gao.gov/products/b-143458",  # 1961 adjudicated $155.30, exact historical 6000-lb minimum x $2.51/cwt; original tariff/invoice bytes NOT held.
         "https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve",  # DOJ 2016 explicitly reports $13m PAID by Menlo/Estes, aggregate government settlement, NOT customer invoice truth.
         "https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims",  # DOJ 2022 AGREED approx $6.85m YRC/Roadway/Yellow; cleared payment NOT verified.
+        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",  # FMC Bridgewell $24,328.80 adjudicated real 2022 shipper fee reparations principal; no original bank custody.
+        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",  # Jan 2026 administrative final $28,289.31 principal+interest due; receipt status separate.
+        "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",  # HPL $23,600 disputed quote/invoice gap but initial decision awards ZERO reparations.
         "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",  # CBCA seven GSA overcharge notices rejected, carrier refund not verified.
         "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",  # CBCA unpaid original invoice carrier claim time barred, NOT an overcharge.
         "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",  # CBCA: 12 original public BOL-keyed Treasury offsets reversed for timeliness, carrier bank refund UNVERIFIED.
