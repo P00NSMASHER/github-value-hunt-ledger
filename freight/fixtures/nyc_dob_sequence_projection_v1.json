@@ -132,6 +132,22 @@
       "expected": "ISSUED_DATE_PRESENT_FROM_CURRENT_PROJECTION_ONLY_CURRENT_VALIDITY_AND_EXPIRY_SEMANTICS_UNKNOWN",
       "independent_current_validity_label": null,
       "actual_real_world_error_label": null
+    },
+    {
+      "id": "filing_reason_no_work_permit_not_issued_truth",
+      "synthetic": true,
+      "row": {
+        "tracking_number": "SYNTH-FILING-001",
+        "job_filing_number": "SYNTH-M400-I1",
+        "work_permit": "Permit is not yet issued",
+        "sequence_number": null,
+        "issued_date": "2026-10-24T00:00:00.000",
+        "permit_status": "Permit Issued",
+        "filing_reason": "No Work Permit"
+      },
+      "expected": "PUBLISHER_NOT_YET_ISSUED_MARKER_NOT_CONFIRMED_ISSUANCE_OR_BUYER_LEAD",
+      "actual_real_world_error_label": null,
+      "independent_current_validity_label": null
     }
   ],
   "limits": {
@@ -152,7 +168,7 @@
     "independent_qa_required": true,
     "status": "DRAFT_SOURCE_PROJECTION_REGRESSION_ONLY_NO_ENGINE_CHANGE"
   },
-  "evidence_revision": "2026-10-26-nyc-cached-status-expiry-boundary",
+  "evidence_revision": "2026-10-26-nyc-filing-reason-placeholder-quality-boundary",
   "publisher_cached_sequence_profile": {
     "source_kind": "FIRST_PARTY_PUBLISHER_METADATA_CACHED_COLUMN_STATISTICS_NOT_ORIGINAL_RECORDS",
     "publisher": "NYC Department of Buildings via NYC Open Data",
@@ -201,5 +217,33 @@
     "dataset_specific_commercial_reuse_approved": false,
     "validity_and_buying_opportunity_ground_truth": "UNKNOWN",
     "quality_limit": "Cached counts are dataset-wide, not necessarily the filtered readback cohort. Signed-off is a distinct publisher state, not independent proof of current validity; anomalous 1899 minimum cannot be interpreted without row-level semantics. Original publisher bytes were not acquired."
+  },
+  "publisher_cached_filing_reason_profile": {
+    "source_kind": "FIRST_PARTY_PUBLISHER_CACHED_COLUMN_STATISTICS_NOT_ROW_LEVEL_JOIN",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "total_cached_records": 1020152,
+    "filing_reason_field": "filing_reason",
+    "filing_reason_cached_counts": {
+      "Initial Permit": 691825,
+      "Renewal Permit Without Changes": 263973,
+      "Renewal Permit with Changes": 57175,
+      "No Work Permit": 6764,
+      "None": 415
+    },
+    "work_permit_column_null_count": 212,
+    "work_permit_placeholder_text": "Permit is not yet issued",
+    "work_permit_placeholder_cached_top_count": 345,
+    "filing_reason_and_work_permit_joint_distribution_verified": false,
+    "these_counts_in_filtered_20_row_replay_verified": false,
+    "actual_publisher_rows_downloaded": 0,
+    "independent_permit_issuance_labels": 0,
+    "original_publisher_metadata_response_sha256": null,
+    "source_specific_commercial_reuse_approved": false,
+    "permitplate_scoring_ground_truth": "UNKNOWN",
+    "quality_limit": "Cached publisher column counts are dataset-wide, not row-level joins. 'No Work Permit', null work_permit, and 'Permit is not yet issued' do not prove an issued, currently valid permit or commercial lead. Overlap and filtered-cohort prevalence remain UNKNOWN."
   }
 }

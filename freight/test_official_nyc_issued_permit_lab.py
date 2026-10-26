@@ -328,7 +328,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
         self.assertFalse(pack["cohort"]["independent_holdout_verified"])
         self.assertFalse(pack["inspected_source"]["live_collision_in_publisher_data_verified"])
-        self.assertEqual(len(pack["synthetic_negative_controls"]),5)
+        self.assertEqual(len(pack["synthetic_negative_controls"]),6)
         self.assertTrue(all(c["synthetic"] for c in pack["synthetic_negative_controls"]))
         self.assertTrue(all(c["actual_real_world_error_label"] is None
                             for c in pack["synthetic_negative_controls"]))
@@ -434,6 +434,38 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertNotIn("expired_date",normalized)
         self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
 
+
+
+    def test_official_filing_reason_placeholder_profile_not_issuance_truth(self):
+        """Publisher category and placeholder counts cannot be issuer labels."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        profile=pack["publisher_cached_filing_reason_profile"]
+        self.assertEqual(profile["dataset_id"],DATASET_ID)
+        self.assertEqual(profile["publisher_rows_updated_at_utc"],
+                         "2026-10-25T18:41:35Z")
+        counts=profile["filing_reason_cached_counts"]
+        self.assertEqual(counts["No Work Permit"],6764)
+        self.assertEqual(counts["None"],415)
+        self.assertEqual(sum(counts.values()),profile["total_cached_records"])
+        self.assertEqual(profile["work_permit_column_null_count"],212)
+        self.assertEqual(profile["work_permit_placeholder_cached_top_count"],345)
+        self.assertEqual(profile["work_permit_placeholder_text"],
+                         "Permit is not yet issued")
+        self.assertFalse(profile["filing_reason_and_work_permit_joint_distribution_verified"])
+        self.assertFalse(profile["these_counts_in_filtered_20_row_replay_verified"])
+        self.assertIsNone(profile["original_publisher_metadata_response_sha256"])
+        self.assertFalse(profile["source_specific_commercial_reuse_approved"])
+        self.assertEqual(profile["independent_permit_issuance_labels"],0)
+        case=next(c for c in pack["synthetic_negative_controls"]
+                  if c["id"]=="filing_reason_no_work_permit_not_issued_truth")
+        self.assertTrue(case["synthetic"])
+        self.assertIsNone(case["actual_real_world_error_label"])
+        self.assertIsNone(case["independent_current_validity_label"])
+        normalized=_minimal(case["row"],DAY)
+        self.assertEqual(_classification(normalized),"PUBLISHER_NOT_YET_ISSUED_MARKER")
+        self.assertNotEqual(_classification(normalized),"PUBLISHER_ISSUE_DATE_PRESENT")
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
 
 
     def test_socrata_system_id_proposal_does_not_promote_api_rows_to_permit_labels(self):
