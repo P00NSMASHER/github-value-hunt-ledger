@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "fixture_id": "RETALLY_GAO_ADJUDICATED_HISTORICAL_BILLING_CASEBOOK_V1",
+  "reviewed_utc_date": "2026-10-26",
+  "publisher": "U.S. Government Accountability Office",
+  "scope": "INDEPENDENT_GAO_DECISION_REVIEW_OF_GSA_HISTORICAL_AUDITS_ONLY",
+  "source_authority": "GAO_OFFICIAL_DECISION_TRANSCRIPTION_NOT_ORIGINAL_INVOICE_BYTES",
+  "source_html_bytes_acquired": false,
+  "source_html_bytes_sha256": null,
+  "original_invoice_and_tariff_bytes_held": false,
+  "independent_customer_rate_and_payment_chain_verified": false,
+  "independent_training_holdout_verified": false,
+  "commercial_customer_engine_reuse_approved": false,
+  "verified_retally_customer_cases": 0,
+  "verified_retally_recovered_cash_cents": 0,
+  "cases": [
+    {
+      "case_id": "B-191257",
+      "decision_date": "1978-07-03",
+      "official_url": "https://www.gao.gov/products/b-191257",
+      "carrier": "Yellow Freight System, Inc.",
+      "gbl_reference": "K-3087713",
+      "reported_carrier_collected_cents": 82800,
+      "reported_gsa_audited_charge_cents": 79600,
+      "reported_gsa_deducted_cents": 3200,
+      "disposition": "GAO_SUSTAINED_GSA_DEDUCTION",
+      "issue": "HISTORICAL_ROUTE_TENDER_APPLICABILITY"
+    },
+    {
+      "case_id": "B-189100",
+      "decision_date": "1977-12-27",
+      "official_url": "https://www.gao.gov/products/b-189100",
+      "carrier": "Yellow Freight System, Inc.",
+      "gbl_reference": "A-6018184",
+      "reported_carrier_collected_cents": 356718,
+      "reported_gsa_audited_charge_cents": null,
+      "reported_gsa_deducted_cents": 263438,
+      "disposition": "GAO_SUSTAINED_GSA_DEDUCTION",
+      "issue": "HISTORICAL_COMMODITY_CLASSIFICATION_WITH_CARGO_PHOTO"
+    },
+    {
+      "case_id": "B-213717",
+      "decision_date": "1984-03-20",
+      "official_url": "https://www.gao.gov/products/b-213717-0",
+      "carrier": "Yellow Freight System, Inc.",
+      "gbl_reference": null,
+      "reported_carrier_collected_cents": 121209,
+      "reported_gsa_audited_charge_cents": 68678,
+      "reported_gsa_deducted_cents": 52531,
+      "disposition": "GAO_SUSTAINED_GSA_DEDUCTION",
+      "issue": "HISTORICAL_LAUNCHER_VS_AIRCRAFT_PARTS_NMFC_CLASSIFICATION"
+    },
+    {
+      "case_id": "B-221594",
+      "decision_date": "1986-09-29",
+      "official_url": "https://www.gao.gov/products/b-221594-0",
+      "carrier": "Riss International",
+      "gbl_reference": null,
+      "reported_carrier_collected_cents": 94200,
+      "reported_gsa_audited_charge_cents": 72125,
+      "reported_gsa_deducted_cents": 22075,
+      "disposition": "GAO_INVALIDATED_GSA_DEDUCTION",
+      "issue": "HISTORICAL_TENDER_REJECTED_BEFORE_DOD_SHIPMENT"
+    }
+  ]
+}
