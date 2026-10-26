@@ -113,6 +113,7 @@ jobs:
         id: persist
         env:
           WORKER: ${{ steps.route.outputs.worker }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
