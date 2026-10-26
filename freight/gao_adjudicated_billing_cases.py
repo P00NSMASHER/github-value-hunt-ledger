@@ -80,6 +80,21 @@ PINNED = {
         "rate_authority": "NMFC_146315_ROCKET_LAUNCHER_VS_11800_AIRCRAFT_PARTS",
         "money_calculation": "PUBLISHER_EXPLICIT",
     },
+    "B-192856": {
+        "source_url": "https://www.gao.gov/products/b-192856",
+        "decision_date": "1979-03-15",
+        "carrier": "YELLOW_FREIGHT_SYSTEM",
+        "reported_gbl": "P-7343114",
+        "reported_gbl_date": None,  # Only June 1976 available, not precise date.
+        "reported_weight_lb": 2040,
+        "reported_billed_and_paid_cents": 109793,
+        "reported_gsa_audited_cents": 15851,  # Difference, not original rate bytes.
+        "reported_gsa_deducted_cents": 93942,
+        "ga_review_outcome": "GSA_PHYSICAL_SAMPLE_CLASSIFICATION_DEDUCTION_SUSTAINED",
+        "adjudicated_historical_label": LABEL_POS,
+        "rate_authority": "RMBQ_17_B_ITEM_7521_NMFC_193820_NOT_103300",
+        "money_calculation": "DERIVED_FROM_GAO_PAID_MINUS_DEDUCTION",
+    },
     "B-221594": {
         "source_url": "https://www.gao.gov/products/b-221594-0",
         "decision_date": "1986-09-29",
@@ -93,6 +108,21 @@ PINNED = {
         "ga_review_outcome": "GSA_DEDUCTION_INVALID_REJECTED_TENDER",
         "adjudicated_historical_label": LABEL_NEG,
         "rate_authority": "ICC_TENDER_1544_REJECTED_BY_MTMC",
+        "money_calculation": "DERIVED_FROM_GAO_PAID_MINUS_DEDUCTION",
+    },
+    "B-191258": {
+        "source_url": "https://www.gao.gov/products/b-191258",
+        "decision_date": "1978-07-07",
+        "carrier": "YELLOW_FREIGHT_SYSTEM",
+        "reported_gbl": None,  # Source PDF index text has ambiguous bill prefix.
+        "reported_gbl_date": None,
+        "reported_weight_lb": 6910,
+        "reported_billed_and_paid_cents": 149760,
+        "reported_gsa_audited_cents": 146430,  # An invalid GSA deduction, NOT lawful rate.
+        "reported_gsa_deducted_cents": 3330,
+        "ga_review_outcome": "GSA_DEDUCTION_INVALID_TRUCKLOAD_MINIMUM_WEIGHT_RULE",
+        "adjudicated_historical_label": LABEL_NEG,
+        "rate_authority": "ICC_RMB_127_ITEM_997_RMB_120_ITEM_610_5_24000_LB_CAPACITY_MINIMUM",
         "money_calculation": "DERIVED_FROM_GAO_PAID_MINUS_DEDUCTION",
     },
 }
@@ -112,6 +142,15 @@ SOURCE_KEYS = frozenset({
     "source_link_is_original_transaction_document",
     "commercial_customer_use_rights_verified",
 })
+SOURCE_NOTES = {
+    "B-191257": "GAO reports $828 paid, $796 government rate and $32 deducted; upheld route authority and settlement.",
+    "B-160344": "GAO reports $275.17 paid, $139.29 allowable and $135.88 deducted in December 1965; carrier reclaim disallowed.",
+    "B-189100": "GAO reports $3,567.18 originally collected and $2,634.38 deducted. The $932.80 remainder is paid-minus-deduction arithmetic ONLY, not an independently published tariff charge.",
+    "B-213717": "GAO reports $1,212.09 paid, $686.78 audited and $525.31 deducted from carrier funds; GAO sustained classification based on shipper description and supporting records.",
+    "B-192856": "GAO sustained a $939.42 GSA setoff from $1,097.93 collected. GAO independently examined a 13.6-ounce acoustic tile sample: 60 tiles per box equal 51 pounds; 40 boxes equal 2,040 pounds. The implied $158.51 remainder is NOT a separately custodied invoice or original tariff page.",
+    "B-221594": "GAO reports $942 paid and $220.75 collected by GSA using rejected tender. Source renders audit amount with OCR ambiguity ('72L.25'); $721.25 is arithmetic implied by its stated difference. Original GBL transcription is OCR-ambiguous and deliberately omitted.",
+    "B-191258": "GAO found a $33.30 GSA setoff improper: full trailer weight 6,910 pounds, rated minimum 24,000 pounds. Original $1,497.60 billed and paid; $1,464.30 is subtraction from the erroneous GSA setoff, NOT an allowable audited charge. GSA said a claim would be processed, not proof of a paid refund."
+}
 CASE_KEYS = frozenset({"id", *next(iter(PINNED.values())).keys(), "source_money_note"})
 RECEIPT_KEYS = frozenset({
     "scope", "schema_version", "case_count", "case_outcomes",
@@ -183,6 +222,7 @@ def validate_fixture(data: object) -> dict:
                for k, value in PINNED[row["id"]].items()):
             raise EvidenceError("GAO_CASE_FACT_OR_DISPOSITION_TAMPERED")
         if (type(row["source_money_note"]) is not str
+            or row["source_money_note"] != SOURCE_NOTES[row["id"]]
             or not 50 <= len(row["source_money_note"]) <= 550):
             raise EvidenceError("INVALID_GAO_SOURCE_NOTE")
         if (type(row["reported_billed_and_paid_cents"]) is not int
@@ -193,7 +233,10 @@ def validate_fixture(data: object) -> dict:
                 != row["reported_gsa_deducted_cents"]):
             raise EvidenceError("GAO_BILLING_ARITHMETIC_INVALID")
         if row["adjudicated_historical_label"] == LABEL_NEG:
-            if row["ga_review_outcome"] != "GSA_DEDUCTION_INVALID_REJECTED_TENDER":
+            if row["ga_review_outcome"] not in (
+                "GSA_DEDUCTION_INVALID_REJECTED_TENDER",
+                "GSA_DEDUCTION_INVALID_TRUCKLOAD_MINIMUM_WEIGHT_RULE",
+            ):
                 raise EvidenceError("NEGATIVE_TENDER_DISPOSITION_NOT_PRESERVED")
             if row["money_calculation"] != "DERIVED_FROM_GAO_PAID_MINUS_DEDUCTION":
                 raise EvidenceError("GAO_OCR_AMOUNT_DERIVATION_NOT_DISCLOSED")
