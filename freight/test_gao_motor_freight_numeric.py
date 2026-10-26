@@ -788,6 +788,13 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertFalse(src["original_gbl_freight_bill_voucher_bytes_acquired"])
         h = case["historically_reported_facts"]
         self.assertEqual(h["gbl_date_reported"], "1968-06-07")
+        self.assertEqual(h["competing_carrier_bill_reference_transcribed"], "A-820099")
+        self.assertEqual(h["delivering_carrier_paid_bill_reference_transcribed"], "0069")
+        self.assertEqual(h["navy_paid_voucher_reference_transcribed"], "K-6740")
+        self.assertNotEqual(h["competing_carrier_bill_reference_transcribed"],
+                            h["delivering_carrier_paid_bill_reference_transcribed"])
+        self.assertFalse(h["cited_bill_and_voucher_originals_acquired"])
+        self.assertTrue(case["quality"]["competing_and_paid_bills_are_distinct_transactions"])
         self.assertEqual(h["original_competing_carrier_claim_cents"], 98970)
         self.assertEqual(h["navy_payment_to_delivering_carrier_cents"], 95120)
         self.assertEqual(h["competing_carrier_reduced_claim_cents"], 37966)
@@ -825,7 +832,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         case = json.loads((FIXTURE.parent / "gao_b168539_promised_refund_candidate_v0.json")
                           .read_text(encoding="utf-8"))
         controls = case["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 6)
+        self.assertEqual(len(controls), 8)
         self.assertEqual(len({c["id"] for c in controls}), 6)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" and
                             c["id"].startswith("SYNTHETIC_") for c in controls))
@@ -836,6 +843,8 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             "UNKNOWN_NOT_ADJUDICATED_IN_GAO_DECISION",
             "REJECT_GAO_CONSIDERED_CONTRARY_ACTUAL_DELIVERY_EVIDENCE",
             "REJECT_NO_MODERN_CUSTOMER_OR_RETALLY_SETTLEMENT",
+            "REJECT_DISTINCT_CARRIER_PAYEES_AND_BILL_REFERENCES",
+            "REJECT_GAO_TRANSCRIPTION_IS_NOT_VOUCHER_CUSTODY",
         })
 
         def verify(row):
@@ -843,6 +852,11 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             self.assertFalse(src["customer_engine_commercial_reuse_approved"])
             self.assertIsNone(src["original_publisher_response_sha256"])
             self.assertEqual(h["navy_payment_to_delivering_carrier_cents"], 95120)
+            self.assertEqual(h["competing_carrier_bill_reference_transcribed"], "A-820099")
+            self.assertEqual(h["delivering_carrier_paid_bill_reference_transcribed"], "0069")
+            self.assertEqual(h["navy_paid_voucher_reference_transcribed"], "K-6740")
+            self.assertFalse(h["cited_bill_and_voucher_originals_acquired"])
+            self.assertTrue(row["quality"]["competing_and_paid_bills_are_distinct_transactions"])
             self.assertEqual(h["competing_carrier_reduced_claim_cents"], 37966)
             self.assertEqual(h["delivering_carrier_promised_refund_cents"], 37966)
             self.assertFalse(h["gao_reported_refund_received_as_of_decision"])
@@ -859,6 +873,11 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
             ("source", "customer_engine_commercial_reuse_approved", True),
             ("source", "original_publisher_response_sha256", "FORGED"),
             ("historically_reported_facts", "navy_payment_to_delivering_carrier_cents", 37966),
+            ("historically_reported_facts", "competing_carrier_bill_reference_transcribed", "0069"),
+            ("historically_reported_facts", "delivering_carrier_paid_bill_reference_transcribed", "A-820099"),
+            ("historically_reported_facts", "navy_paid_voucher_reference_transcribed", "K-6740-FORGED"),
+            ("historically_reported_facts", "cited_bill_and_voucher_originals_acquired", True),
+            ("quality", "competing_and_paid_bills_are_distinct_transactions", False),
             ("historically_reported_facts", "competing_carrier_reduced_claim_cents", 95120),
             ("historically_reported_facts", "delivering_carrier_promised_refund_cents", 0),
             ("historically_reported_facts", "gao_reported_refund_received_as_of_decision", True),
