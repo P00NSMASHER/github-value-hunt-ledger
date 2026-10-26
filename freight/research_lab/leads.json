@@ -8440,6 +8440,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "af24da580122bcc251266008f5333653f54a5a49f02c9b1252d6f1d179d5bdb7",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -12059,6 +12075,38 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "f52179b926fd9b6662aed335b08d94a043dcc82e49d3ece8b9ea00b3176f12d4",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "f53d4ffba7d85f760be6387e4fd1ade1f8c40a496c7ead8505fc7ba7541314dd",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -12521,6 +12569,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "5a174459a219882a849d982e66cd5f16fd6724e1058fc7eb754330218b73022a",
+  "entries_sha256": "e327ab5af0493028a5672cff56d68f94ed08f59b760736b84bd24887c383a150",
   "schema_version": 1
 }

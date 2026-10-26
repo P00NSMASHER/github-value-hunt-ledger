@@ -1,0 +1,43 @@
+{
+  "bridgewell_award_components_not_invoice_count": 10,
+  "bridgewell_civil_penalties_imposed_cents": null,
+  "bridgewell_current_private_motor_freight_authority": false,
+  "bridgewell_exact_received_cash_and_interest_unverified": true,
+  "bridgewell_final_interest_as_of_notice_cents": 396051,
+  "bridgewell_final_ordered_total_cents": 2828931,
+  "bridgewell_final_principal_cents": 2432880,
+  "bridgewell_initial_claim_cents": 4378000,
+  "bridgewell_later_payment_reported_NOT_verified_bank_receipt": true,
+  "bridgewell_reported_late_customer_payment_date": "2026-08-31",
+  "commercial_customer_reuse_approved": false,
+  "fmc_cases": [
+    {
+      "administratively_final_notice": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+      "id": "FMC_2022(I)",
+      "initial_decision": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",
+      "status": "FMC_AWARDED_AND_ORDERED;_LATER_CUSTOMER_RECEIPT_AGENCY_REPORTED_SECONDARY_ONLY"
+    },
+    {
+      "id": "FMC_2025(I)",
+      "initial_decision": "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",
+      "status": "NO_REPARATIONS_IN_INITIAL_DECISION_FINALITY_UNVERIFIED"
+    }
+  ],
+  "hpl_claimed_amended_quote_cents": 5420000,
+  "hpl_claimed_reparations_cents": 2589500,
+  "hpl_final_invoice_cents": 7780000,
+  "hpl_final_status_independently_verified": false,
+  "hpl_initial_decision_reparations_awarded_cents": 0,
+  "hpl_initial_decision_section_41102_c_violation": false,
+  "hpl_initial_decision_tariff_publication_violation": true,
+  "hpl_initial_quote_cents": 4320000,
+  "hpl_invoice_vs_quote_difference_cents": 2360000,
+  "modern_retally_invoice_accuracy_labels": 0,
+  "original_fmc_pdf_bytes_and_private_invoices_held": false,
+  "original_official_pdf_sha256": null,
+  "receipt_sha256": "97c850710016646f5170d5984210cd7ddb3768ffa70eebe3d347d92197050ac3",
+  "retally_recovered_cash_cents": 0,
+  "schema_version": 1,
+  "scope": "FMC_THIRD_PARTY_ADJUDICATED_REAL_SHIPPER_CHARGES_NOT_RETALLY_CUSTOMERS_OR_ORIGINAL_BANK_CUSTODY",
+  "source_authored_fixture_SHA256_NOT_FMC_pdf_hash": "0e0a45814dfd384b0b8d3aba40806db2610dae29f3c9258489b82a5876511837"
+}

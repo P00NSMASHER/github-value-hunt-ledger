@@ -19,10 +19,10 @@
     "freightrecovery": {
       "commercial_reuse_confirmed": false,
       "independently_labeled_test_cases": 0,
-      "official_publisher_host_only": 25,
+      "official_publisher_host_only": 28,
       "other_allowlisted_host_only": 6,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 236,
+      "source_pointers": 239,
       "third_party_catalog_host_only": 205,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
@@ -50,7 +50,7 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 782,
+  "first_seen_in_last_seven_calendar_days": 785,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-26",
   "limitations": [
@@ -74,14 +74,14 @@
     "www.penninecare.nhs.uk": 1,
     "www.sec.gov": 2,
     "www.stb.gov": 1,
-    "www2.fmc.gov": 1,
+    "www2.fmc.gov": 4,
     "zenodo.org": 485
   },
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "5a174459a219882a849d982e66cd5f16fd6724e1058fc7eb754330218b73022a",
-  "unique_source_pointers": 782,
+  "source_ledger_entries_sha256": "e327ab5af0493028a5672cff56d68f94ed08f59b760736b84bd24887c383a150",
+  "unique_source_pointers": 785,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }
