@@ -355,5 +355,47 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(source.count('cron: "19 3 * * *"'),1)
 
 
+    def test_fmc_actual_shipper_award_and_paid_state_not_silently_omitted(self):
+        """No green lab when source-bound 2026 payment evidence disappears."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n",1)[1].split("\n  discover:\n",1)[0]
+        discover = source.split("\n  discover:\n",1)[1].split(
+            "\n  nightly-real-data-replay:\n",1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n",1)[1]
+        module="freight.test_fmc_real_shipper_billing_lifecycle"
+        command="          python -m unittest -q "+module
+        self.assertIn(module,verify)
+        self.assertEqual(discover.splitlines().count(command),1)
+        self.assertEqual(nightly.splitlines().count(command),1)
+        for file in (
+            "freight/fmc_real_shipper_billing_lifecycle.py",
+            "freight/test_fmc_real_shipper_billing_lifecycle.py",
+            "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json",
+        ):
+            self.assertEqual(source.count('      - "'+file+'"'),2)
+        self.assertIn("freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json",discover)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json",nightly)
+        self.assertIn(
+            "python -m freight.fmc_real_shipper_billing_lifecycle "
+            "--output /tmp/retally-fmc-real-shipper-v1.json --verify",nightly)
+        for gate in (
+            "x['bridgewell_final_principal_cents'] == 2432880",
+            "x['bridgewell_final_interest_as_of_notice_cents'] == 396051",
+            "x['bridgewell_final_ordered_total_cents'] == 2828931",
+            "x['bridgewell_reported_late_customer_payment_date'] == '2026-08-31'",
+            "x['bridgewell_exact_received_cash_and_interest_unverified'] is True",
+            "x['hpl_initial_decision_reparations_awarded_cents'] == 0",
+            "x['modern_retally_invoice_accuracy_labels'] == 0",
+            "x['retally_recovered_cash_cents'] == 0",
+            "x['original_official_pdf_sha256'] is None",
+        ):
+            with self.subTest(check=gate):
+                self.assertIn(gate,discover)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'),1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'),1)
+
+
 if __name__ == "__main__":
     unittest.main()
