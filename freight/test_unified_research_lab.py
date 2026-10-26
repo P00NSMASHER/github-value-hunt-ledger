@@ -898,5 +898,90 @@ class CaptureBriefSAMNoticeCandidateTests(unittest.TestCase):
             self.assertFalse(urls[0]["document_bytes_stored"])
 
 
+
+class STBCrowleyTariffSourceTests(unittest.TestCase):
+    """First-party 2026 tariff timing evidence, not an invoice-error outcome."""
+
+    @staticmethod
+    def _pack():
+        path = Path(__file__).with_name("fixtures") / "stb_crowley_fuel_surcharge_timing_candidate_v0.json"
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _assert_original_source_contract(self, pack):
+        source = pack["source"]
+        self.assertEqual(source["official_certification_registry_url"],
+                         "https://www.stb.gov/reports-data/water-carrier-annual-certifications/")
+        self.assertEqual(source["carrier_index_url"],
+                         "https://www.crowley.com/logistics/resources/rates-tariffs/stb/")
+        self.assertEqual(source["carrier_pdf_url"],
+                         "https://www.crowley.com/wp-content/uploads/sites/7/2026/10/"
+                         "STB-14.1-Intermodal-Fuel-Surcharge-AM-48.pdf")
+        self.assertEqual((source["carrier_tariff_org_number"],
+                          source["carrier_tariff_number"], source["rule"],
+                          source["revision"]), ("023286", "002", "14.1", 48))
+        self.assertEqual(source["filed_on"], "2026-10-08")
+        self.assertEqual(source["effective_on"], "2026-11-01")
+        self.assertEqual(source["publisher_stated_fuel_surcharge_percent"], 66)
+        self.assertLess(datetime.fromisoformat(source["filed_on"]),
+                        datetime.fromisoformat(source["effective_on"]))
+        self.assertLess(datetime.fromisoformat(pack["as_of_utc_date"]),
+                        datetime.fromisoformat(source["effective_on"]))
+        self.assertTrue(source["carrier_pdf_visual_page_reviewed"])
+        self.assertFalse(source["carrier_original_pdf_bytes_acquired"])
+        self.assertIsNone(source["carrier_original_pdf_sha256"])
+        self.assertFalse(pack["rights"]["carrier_tariff_commercial_machine_reuse_verified"])
+        self.assertFalse(pack["rights"]["carrier_tariff_redistribution_permission_verified"])
+        self.assertEqual(pack["rights"]["engine_production_admission"],
+                         "HOLD_UNTIL_SOURCE_SPECIFIC_RIGHTS_AND_AUTHORITY")
+        self.assertEqual(pack["cohort"]["independent_held_out_real_tariff_to_invoice_labels"], 0)
+        self.assertEqual(pack["ground_truth_limits"]["freight_overcharge_and_recoverability"],
+                         "UNKNOWN")
+        self.assertEqual(pack["ground_truth_limits"]["retally_verified_customer_recovery_cents"], 0)
+        self.assertFalse(pack["consumption"]["engine_code_modified"])
+        self.assertFalse(pack["consumption"]["release_authorized"])
+        self.assertIn(source["official_certification_registry_url"],
+                      SEEDS["freightrecovery"])
+
+    def test_original_2026_stb_crowley_rule_is_future_effective_not_customer_truth(self):
+        pack = self._pack()
+        self.assertEqual(pack["engine"], "freightrecovery")
+        self.assertEqual(pack["evaluation_family"],
+                         "PUBLIC_CARRIER_TARIFF_EFFECTIVE_DATE_PROVENANCE_NOT_INVOICE_ERROR_SCORING")
+        self._assert_original_source_contract(pack)
+
+    def test_synthetic_negative_controls_and_forged_source_mutations_rejected(self):
+        pack = self._pack()
+        self.assertEqual({x["id"] for x in pack["synthetic_negative_controls"]}, {
+            "SYNTH_PRE_EFFECTIVE_SHIPMENT", "SYNTH_UNRELATED_MOTOR_LTL",
+            "SYNTH_MISSING_INVOICE_BASE",
+        })
+        controls = {c["id"]: c for c in pack["synthetic_negative_controls"]}
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["independent_outcome"] is None for c in controls.values()))
+        self.assertEqual(controls["SYNTH_PRE_EFFECTIVE_SHIPMENT"]["expected"],
+                         "REJECT_PRE_EFFECTIVE_TARIFF_APPLICATION")
+        self.assertLess(controls["SYNTH_PRE_EFFECTIVE_SHIPMENT"]["shipment_date"],
+                        pack["source"]["effective_on"])
+        self.assertEqual(controls["SYNTH_UNRELATED_MOTOR_LTL"]["expected"],
+                         "REJECT_CROSS_MODE_SCOPE_PROMOTION")
+        self.assertEqual(controls["SYNTH_MISSING_INVOICE_BASE"]["expected"],
+                         "REJECT_UNGROUNDED_INVOICE_OVERCHARGE")
+        self.assertIsNone(controls["SYNTH_MISSING_INVOICE_BASE"]["base_charge_cents"])
+        for key, bad in (("effective_on", "2026-10-08"),
+                         ("publisher_stated_fuel_surcharge_percent", 86),
+                         ("revision", 47),
+                         ("carrier_original_pdf_sha256", "unverified-rehash")):
+            poisoned = json.loads(json.dumps(pack))
+            poisoned["source"][key] = bad
+            with self.subTest(forgery=key), self.assertRaises(AssertionError):
+                self._assert_original_source_contract(poisoned)
+        for key in ("carrier_tariff_commercial_machine_reuse_verified",
+                    "carrier_tariff_redistribution_permission_verified"):
+            poisoned = json.loads(json.dumps(pack))
+            poisoned["rights"][key] = True
+            with self.subTest(forgery=key), self.assertRaises(AssertionError):
+                self._assert_original_source_contract(poisoned)
+
+
 if __name__ == "__main__":
     unittest.main()
