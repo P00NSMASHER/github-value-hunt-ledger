@@ -9,21 +9,28 @@ Source pointers alone never count as independently validated claims.
 ## Agency-adjudicated historical billing cases (October 26 evidence review)
 
 This is a **historical billing-adjudication casebook**, not a new commercially
-authorized customer-accuracy dataset. Three original GAO decisions publish
+authorized customer-accuracy dataset. Five original GAO decisions publish
 independent agency reviews of GSA/carrier freight billing disputes:
 
 | Official decision | Reported paid | GSA-audited | Reported GSA deduction | GAO outcome |
 |---|---:|---:|---:|---|
 | [B-191257 (1978)](https://www.gao.gov/products/b-191257) | $828.00 | $796.00 | $32.00 | Overcharge deduction upheld; carrier route authority. |
 | [B-160344 (1967)](https://www.gao.gov/products/b-160344) | $275.17 | $139.29 | $135.88 | Overcharge deduction upheld; freight classification. |
+| [B-189100 (1977)](https://www.gao.gov/products/b-189100) | $3,567.18 | $932.80** | $2,634.38 | Overcharge deduction upheld after commodity-classification dispute. |
+| [B-213717 (1984)](https://www.gao.gov/products/b-213717-0) | $1,212.09 | $686.78 | $525.31 | Overcharge deduction upheld; freight commodity classification. |
 | [B-221594 (1986)](https://www.gao.gov/products/b-221594-0) | $942.00 | $721.25* | $220.75 | GSA deduction INVALID because rate tender was rejected. |
 
 *The original GAO public text has an OCR-ambiguous assessed amount, so $721.25
 is derived from its printed $942.00 paid and $220.75 deduction, not a separately
 authenticated tariff or source byte.*
 
-These are two independently **agency-adjudicated historical positive examples**
-($167.88 in government-reported deductions), plus one historical **false-positive
+**For B-189100, the $932.80 figure is paid minus reported GSA deduction;
+it is NOT an independently published applicable tariff charge. The decision
+provides no exact GBL shipment date. B-213717 does not publish a safely
+transcribable GBL identifier or shipment weight in the reviewed decision text.
+
+These are four independently **agency-adjudicated historical positive examples**
+($3,327.57 in government-reported deductions), plus one historical **false-positive
 control** ($220.75 improperly deducted by GSA). The latter is NOT a valid
 overcharge or RETALLY recovery. All money is old government transaction
 narrative, NOT private customer cash or modern rate truth.
