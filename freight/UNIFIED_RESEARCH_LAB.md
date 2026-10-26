@@ -114,6 +114,85 @@ Offline verification:
     python -m freight.cbca_rate_billing_controls --output /tmp/cbca-claims.json --verify
 
 
+## Original CBCA BOL-by-BOL government payment chronology (2009) and detention notice dispute (2014)
+
+Independent published decisions from the U.S. Civilian Board of Contract Appeals
+provide transaction identifiers and government-reported payment/offset events,
+**not separately held original invoices, applicable contracts, current private
+customer claims or bank refund receipts**. New research-only files:
+\`freight/fixtures/cbca_rail_detention_timeline_v1.json\`,
+\`freight/cbca_rail_detention_timeline.py\` and adversarial tests.
+
+**[CBCA 1317-RATE, Union Pacific Railroad, October 29, 2009](https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf)**
+
+The official decision's **PDF page 3, table (zero-based page 2)** publishes
+**12 distinct government BOL numbers**, amounts alleged as transportation
+overcharges, dates the original transportation bills were paid, amounts
+**actually deducted from the carrier's Treasury payments**, and deduction
+dates. Every deduction was more than THREE YEARS after the bill's payment,
+and the Board held the offsets untimely under the cited 31 U.S.C. § 3726(d).
+The Board ruled that they **must be refunded**, but **no separate later
+carrier bank receipt or actual repayment was obtained**.
+
+- The 12 government **alleged overcharges** total **$137,614.04**.
+  **This column is NOT original invoice billed charges.**
+- **Actual Treasury deductions reported by the Board** total **$137,356.75**.
+  These are government collections *from the carrier*, NOT REFUNDS and not
+  RETALLY recovered cash.
+- The two totals differ by **$257.29**. Two BOL rows have partial, not equal,
+  deduction amounts. These differences are **not** invoice/rate errors.
+- From 74 initial government notices, 67 claims were settled separately
+  before these proceedings, and five additional claims were added. Exactly
+  12 remained for decision. The 67 settlements are **not** included as
+  independently verified cash recovery outcomes or additional case labels.
+- The decision resolved the **timeliness** issue and expressly left
+  underlying rate/railcar substitution merits undecided. Never label the
+  carrier's original rates independently correct on that basis.
+
+**[CBCA 3467-RATE, Total Quality Logistics, May 14, 2014](https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf)**
+
+The Board independently established a **79-shipment** government detention
+invoice history (four in 2010 and 75 in 2011). GSA's transportation office
+authorized item-325 billing, required certified BOLs and itemized detention
+invoices, and paid the charges. GSA's later audit accepted nine payments
+and challenged **70**, then the Board held the challenged notices invalid.
+The decision cites **$339,895.73** in one factual paragraph but **$339,895.75**
+in its final ruling: a **two-cent discrepancy in the ORIGINAL PUBLISHER
+DECISION** that must be preserved as two variants. It must never be averaged,
+silently normalized, converted to a carrier payment, or scored as 70
+separately verified original invoice/rate outcomes. The Board's rejection
+of an attempted government recoupment also does **not** establish the
+government actually collected the disputed money.
+
+**Source restrictions:** Official decision *indexed text* reviewed; direct
+publisher PDF byte-download or independent visual original-page verification
+was unavailable. Original 12 BOLs, 79 TQL paid invoices, signed tariff
+authority, delivery copies and separate bank/payment refund records were
+not acquired into RETALLY's custody. The authored JSON/row-set digests
+are **not PDF bytes or official issuer signatures**. No current private
+customer invoice accuracy, refund, source-specific commercial-use
+permission or financial settlement is established.
+
+Existing unified research verification and nightly original-document replay
+generate/read an **aggregate-only** receipt. Public BOL identifiers are
+limited to the authored historical government-source fixture and are not
+exported into the dynamic research ledger/receipt. The two CBCA decisions
+are new official URL **source pointers**, not new billable customer leads.
+
+Offline exercise:
+
+    python -m unittest -q freight.test_cbca_rail_detention_timeline
+    python -m freight.cbca_rail_detention_timeline --output /tmp/cbca_timeline.json
+    python -m freight.cbca_rail_detention_timeline --output /tmp/cbca_timeline.json --verify
+
+**Ground-truth gate still required:** separate original invoice BOL/transport
+contract/accepted tender bytes, shipper or carrier rate authority,
+adjudicated positive and clean-negative outcome at the appropriate scope,
+cleared payment/refund chain, independent source/reuse permission and held-out
+modern buyer validation. Never infer modern recoverable dollars from these
+federal 2004–2014 freight decisions.
+
+
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.

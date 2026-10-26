@@ -278,5 +278,43 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
 
 
+    def test_cbca_bol_timeline_and_detention_conflict_are_required_in_unified_replay(self):
+        """Bounded negative chronology must execute without new cron or source promotion."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        discover = source.split("\n  discover:\n", 1)[1].split(
+            "\n  nightly-real-data-replay:\n", 1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n", 1)[1]
+        module = "freight.test_cbca_rail_detention_timeline"
+        command = "          python -m unittest -q " + module
+        self.assertIn(module, verify)
+        self.assertEqual(discover.splitlines().count(command), 1)
+        self.assertEqual(nightly.splitlines().count(command), 1)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/cbca_rail_detention_timeline_v1.json", nightly)
+        self.assertIn(
+            "python -m freight.cbca_rail_detention_timeline "
+            "--output /tmp/retally-cbca-timeline-v1.json --verify", nightly)
+        for name in (
+            "freight/cbca_rail_detention_timeline.py",
+            "freight/test_cbca_rail_detention_timeline.py",
+            "freight/fixtures/cbca_rail_detention_timeline_v1.json",
+        ):
+            self.assertEqual(source.count('      - "'+name+'"'), 2)
+        for gate in (
+            "d['up_public_bol_rows'] == 12",
+            "d['up_late_offset_rows'] == 12",
+            "d['tql_amount_variance_cents'] == 2",
+            "d['independent_carrier_refunds_bank_verified_cases'] == 0",
+            "d['retally_cash_recovered_cents'] == 0",
+            "d['commercial_use_approved'] is False",
+        ):
+            with self.subTest(gate=gate):
+                self.assertIn(gate, discover)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
