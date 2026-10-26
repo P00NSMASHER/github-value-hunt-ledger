@@ -65,6 +65,42 @@ shipment/BOL, independently cleared payment or credit, and externally resolved
 positive or clean-negative claim. Current customer pricing, rights, consent,
 production actions and recovered cash remain explicitly held.
 
+## Independent CBCA freight billing adjudication controls (2020/2024)
+
+The federal [CBCA official RATE-case index](https://www.cbca.gov/decisions/rate.html)
+contains adjudications of carrier/GSA disputes. These are distinct from
+the five historical GAO setoff cases and from RETALLY's 110 original
+commercial invoice faces. This casebook is a *negative-claim proof pack*
+and **does not create modern RETALLY customer overcharge labels**.
+
+| Original official administrative decision | Independently adjudicated outcome | What must NOT be inferred |
+| --- | --- | --- |
+| [AARE Logistics, CBCA 6578-RATE, Aug. 6, 2020](https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf) | CBCA rejected GSA's overcharge assessments on **7** 2014 household-goods freight shipments and granted the carrier's claim for **$15,549.08** it had paid against those assessments. | The other **108 of 115** GSA notices were *not adjudicated in this decision*. The later carrier refund/credit, if any, is NOT independently proved. The improper GSA assessment is not a shipper overcharge and is not RETALLY cash. |
+| [James Forwarding, CBCA 8051-RATE, Aug. 8, 2024](https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf) | CBCA **denied** a carrier's **$14,595.69** originally unpaid 2018 invoice claim as untimely; the Navy initially rejected payment for absent weight-ticket support. | Unpaid invoice does not prove rate overcharge, successful future collection, waived deadline, or a customer refund. The decision also held the lack of appeal-rights notice did not establish actual prejudice in this case. |
+
+The official indexed **decision text**, not physical PDF page imagery or
+issuer HTTP source bytes, was reviewed. CBCA PDF byte SHA-256, separately
+custodied signed original invoices, tender pages, weight tickets,
+customer bank records and independent refund settlement remain UNKNOWN.
+Any rights specific to third-party attached records and commercial engine
+reuse remain unverified. Exact source URLs, immutable fact constants and
+adversarial tests enforce the distinction between (a) an invalid
+government overcharge notice, (b) a carrier's unpaid claim barred by
+timeliness, and (c) a real modern buyer's independently verified freight
+overcharge. Only the first two categories are present.
+
+One existing GitHub research controller handles these in its verify,
+research-ledger, and nightly replay jobs. No new cron, provider, customer
+communication, production rating change, invoice upload, financial posting,
+revenue or retroactive legal generalization.
+
+Offline verification:
+
+    python -m unittest -q freight.test_cbca_rate_billing_controls
+    python -m freight.cbca_rate_billing_controls --output /tmp/cbca-claims.json
+    python -m freight.cbca_rate_billing_controls --output /tmp/cbca-claims.json --verify
+
+
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.
