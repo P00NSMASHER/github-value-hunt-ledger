@@ -254,7 +254,7 @@ class ResearchCIVerificationContract(unittest.TestCase):
         executable = "          python -m unittest -q freight.test_cbca_rate_billing_controls"
         for expected in (
             "freight.test_cbca_rate_billing_controls",
-            "freight.cbca_rate_billing_controls.py",
+            "freight/cbca_rate_billing_controls.py",
         ):
             self.assertIn(expected, verify)
         self.assertEqual(discovery.splitlines().count(executable), 1)
