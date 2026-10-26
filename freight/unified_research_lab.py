@@ -57,6 +57,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-165091",  # Distinct tariff; published $179.80 sustained deduction only.
         "https://www.gao.gov/products/b-221594-0",  # GAO invalidated historical rejected-tender $220.75 deduction; negative only.
         "https://www.gao.gov/products/b-189100",  # GAO 1977 original GBL A-6018184 classification; historical $2634.38 deduction only.
+        "https://www.gao.gov/products/b-213717-0",  # GAO 1984 $1212.09 paid / $686.78 allowed; $525.31 GSA offset sustained, historical only.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
         # New source-bound reported numeric cases; original invoices not held.
