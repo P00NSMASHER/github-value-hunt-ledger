@@ -994,5 +994,97 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                     verify(altered)
                 self.assertNotEqual(digest(altered), digest(row))
 
+
+    def test_b143246_multi_decision_netting_is_one_historical_case_not_customer_cash(self):
+        """A GAO-reported collected offset differs from allowance and bank-cash proof."""
+        item = json.loads((FIXTURE.parent / "gao_b143246_conex_netting_candidate_v0.json").read_text())
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["fixture_id"], "GAO_B143246_CONEX_CLASSIFICATION_AND_RECOUPMENT_NETTING_V0")
+        self.assertEqual(item["evaluation_families"], [
+            "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+            "GENERAL_ACCOUNTING_RECONCILIATION_OF_PUBLISHED_DECISION_EVENTS",
+        ])
+        self.assertEqual([x["official_url"] for x in item["sources"]], [
+            "https://www.gao.gov/products/b-143246",
+            "https://www.gao.gov/products/b-143246-0",
+        ])
+        self.assertEqual([x["decision_date"] for x in item["sources"]],
+                         ["1961-05-12", "1961-11-20"])
+        self.assertEqual(item["source_snapshot_case_count"], 1)
+        self.assertEqual(item["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertFalse(item["customer_engine_commercial_reuse_approved"])
+        self.assertFalse(item["original_publisher_http_bytes_acquired"])
+        self.assertIsNone(item["original_publisher_response_sha256"])
+        self.assertFalse(item["original_bill_voucher_gbl_tariff_pages_acquired"])
+        self.assertEqual(item["independently_held_out_real_customer_labels"], 0)
+        facts = item["historical_facts"]
+        controls = item["accounting_controls"]
+        self.assertEqual(facts["original_gbl_gao_transcription"], "AF-4940529")
+        self.assertEqual(facts["carrier_bill_gao_transcription"], "G-01678")
+        self.assertEqual(facts["original_carrier_paid_cents"], 62724)
+        self.assertEqual(facts["initially_deducted_as_overcharge_cents"], 34021)
+        self.assertTrue(facts["initial_deduction_reported_collected"])
+        self.assertEqual(facts["carrier_reclaim_allowed_cents"], 1181)
+        self.assertIsNone(facts["allowance_cash_posting_verified"])
+        self.assertEqual(facts["remaining_carrier_reclaim_disallowed_cents"], 32840)
+        self.assertEqual(facts["gao_reported_adjusted_charge_cents"], 29884)
+        self.assertEqual(62724 - 34021, controls["reported_paid_minus_reported_collected_deduction_cents"])
+        self.assertEqual(34021 - 1181, controls["reported_initial_deduction_less_allowed_reclaim_cents"])
+        self.assertEqual(62724 - 32840, facts["gao_reported_adjusted_charge_cents"])
+        self.assertEqual(28703 + 1181, controls[
+            "conditional_adjusted_charge_if_allowed_reclaim_were_cash_posted_cents"])
+        self.assertIsNone(facts["bank_cleared_net_after_allowance_cents"])
+        self.assertTrue(facts["two_decisions_are_one_shipment"])
+        self.assertFalse(facts["highest_class_package_rule_applies_to_whole_mixed_shipment"])
+        self.assertTrue(facts["further_reconsideration_conditioned_on_adverse_court_ruling"])
+        self.assertEqual(facts["actual_subsequent_court_disposition"], "UNKNOWN")
+        self.assertEqual(controls["modern_contract_tariff_applicability"], "UNKNOWN")
+        self.assertEqual(controls["modern_customer_recovery_cents"], 0)
+        self.assertFalse(controls["customer_freight_error_accuracy_scoring_permitted"])
+
+    def test_b143246_false_cash_package_and_duplicate_claims_fail_contract(self):
+        item = json.loads((FIXTURE.parent / "gao_b143246_conex_netting_candidate_v0.json").read_text())
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({x["id"] for x in controls}), 6)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" and
+                            x["id"].startswith("SYNTHETIC_") for x in controls))
+        pinned = [
+            ("historical_facts", "initial_deduction_reported_collected", True),
+            ("historical_facts", "allowance_cash_posting_verified", None),
+            ("historical_facts", "highest_class_package_rule_applies_to_whole_mixed_shipment", False),
+            ("historical_facts", "two_decisions_are_one_shipment", True),
+            ("historical_facts", "further_reconsideration_conditioned_on_adverse_court_ruling", True),
+            ("historical_facts", "original_carrier_paid_cents", 62724),
+            ("historical_facts", "initially_deducted_as_overcharge_cents", 34021),
+            ("historical_facts", "carrier_reclaim_allowed_cents", 1181),
+            ("historical_facts", "remaining_carrier_reclaim_disallowed_cents", 32840),
+            ("historical_facts", "gao_reported_adjusted_charge_cents", 29884),
+            ("historical_facts", "bank_cleared_net_after_allowance_cents", None),
+            ("accounting_controls", "modern_customer_recovery_cents", 0),
+            ("accounting_controls", "customer_freight_error_accuracy_scoring_permitted", False),
+        ]
+        def verify(row):
+            for section, field, expected in pinned:
+                self.assertEqual(row[section][field], expected)
+            x = row["historical_facts"]
+            self.assertEqual(x["original_carrier_paid_cents"] -
+                             x["initially_deducted_as_overcharge_cents"], 28703)
+            self.assertEqual(x["initially_deducted_as_overcharge_cents"] -
+                             x["carrier_reclaim_allowed_cents"], 32840)
+            self.assertEqual(x["original_carrier_paid_cents"] -
+                             x["remaining_carrier_reclaim_disallowed_cents"], 29884)
+        verify(item)
+        for section, field, expected in pinned:
+            with self.subTest(field=field):
+                forged = copy.deepcopy(item)
+                forged[section][field] = (
+                    (not expected) if isinstance(expected, bool)
+                    else 1 if expected is None else expected + 1
+                )
+                with self.assertRaises(AssertionError):
+                    verify(forged)
+                self.assertNotEqual(digest(forged), digest(item))
+
 if __name__ == "__main__":
     unittest.main()
