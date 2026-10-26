@@ -731,5 +731,54 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                             cases[1]["filing_reason"].startswith("Initial"))
 
 
+    def test_business_name_change_on_renewal_is_not_new_permit_truth(self):
+        """June 2026 official notice: business changes via renewal are not new leads."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        item=pack["notice_permit_business_renewal_20260624"]
+        self.assertEqual(item["evidence_family"],
+                         "NYC_PERMIT_SOURCE_IDENTITY_AND_BUSINESS_ATTRIBUTION_BOUNDARY")
+        self.assertEqual(item["source_url"],
+                         "https://www.nyc.gov/assets/buildings/pdf/permitrenewals_bizname-sn.pdf")
+        self.assertEqual(item["notice_published_date"],"2026-06-24")
+        self.assertEqual(item["effective_date"],"2026-06-29")
+        self.assertTrue(item["original_publisher_pdf_visual_page_verified"])
+        self.assertFalse(item["original_publisher_pdf_bytes_acquired"])
+        self.assertIsNone(item["original_publisher_pdf_sha256"])
+        self.assertIn("HOLD",item["source_specific_pdf_commercial_rights"])
+        self.assertEqual(tuple(item["current_collector_select"]),FIELDS)
+        self.assertEqual(set(item["missing_from_current_collector"]),
+                         {"sequence_number","filing_reason","business_name"})
+        self.assertEqual(item["application_to_live_rbx6_tga4_row_mapping"],
+                         "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED")
+        self.assertTrue(all(v==0 for v in item["label_completeness"].values()))
+        controls=item["synthetic_negative_controls"]
+        self.assertEqual(len(controls),2)
+        self.assertEqual(len({c["id"] for c in controls}),2)
+        self.assertTrue(all(c["kind"]=="SYNTHETIC" for c in controls))
+        self.assertTrue(all(c["independent_new_permit_label"] is None
+                            and c["independent_buyer_demand_label"] is None
+                            for c in controls))
+        changed,same=controls
+        self.assertEqual(changed["before"]["work_permit"],
+                         changed["after"]["work_permit"])
+        self.assertNotEqual(changed["before"]["listed_business"],
+                            changed["after"]["listed_business"])
+        self.assertEqual(int(changed["after"]["sequence_number"]),
+                         int(changed["before"]["sequence_number"])+1)
+        self.assertIn("DOES_NOT_PROVE_A_NEW_UNIQUE_WORK_PERMIT",
+                      changed["expected"])
+        self.assertEqual(same["before"]["listed_business"],
+                         same["after"]["listed_business"])
+        self.assertNotEqual(same["before"]["work_permit"],
+                            same["after"]["work_permit"])
+        self.assertIn("DOES_NOT_PROVE_IDENTICAL",same["expected"])
+        self.assertFalse(item["release_authorized"])
+        self.assertFalse(item["workflow_or_engine_code_changed"])
+        self.assertEqual(item["extra_provider_calls"],0)
+
+
+
 if __name__=="__main__":
     unittest.main()

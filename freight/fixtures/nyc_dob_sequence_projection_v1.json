@@ -405,5 +405,85 @@
     ],
     "owner_handoff": "PermitPlate :48: independently inspect same-row filing_reason and sequence_number on the original 20-row issued-date cohort within existing query budget; :44 QA verifies; do not change collector/scorer from this fixture.",
     "source_admission": "DRAFT_RIGHTS_HELD_GROUND_TRUTH_UNKNOWN_NO_RELEASE"
+  },
+  "notice_permit_business_renewal_20260624": {
+    "schema_version": "1.0.0",
+    "evidence_family": "NYC_PERMIT_SOURCE_IDENTITY_AND_BUSINESS_ATTRIBUTION_BOUNDARY",
+    "publisher": "NYC Department of Buildings",
+    "publisher_document": "Submit a Permit Renewal with Changes in DOB NOW to Update the Business Listed on the Permit",
+    "source_url": "https://www.nyc.gov/assets/buildings/pdf/permitrenewals_bizname-sn.pdf",
+    "additional_first_party_index": "https://www.nyc.gov/site/buildings/dob/service-updates.page",
+    "notice_published_date": "2026-06-24",
+    "effective_date": "2026-06-29",
+    "publisher_pdf_page_zero_based": 0,
+    "original_publisher_pdf_bytes_acquired": false,
+    "original_publisher_pdf_sha256": null,
+    "original_publisher_pdf_visual_page_verified": true,
+    "observed_date": "2026-10-26",
+    "first_party_policy_scope": "An applicant may update the business listed on an existing DOB NOW Build work permit via Permit Renewal with Changes if that business is associated with the applicant's license.",
+    "application_to_live_rbx6_tga4_row_mapping": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED",
+    "source_specific_pdf_commercial_rights": "UNKNOWN_HOLD_NO_DOCUMENT_REPUBLICATION_OR_CUSTOMER_COMMERCIAL_ADMISSION",
+    "data_use": "SANITIZED_METADATA_AND_SYNTHETIC_CONTROLS_ONLY",
+    "current_collector_select": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "issued_date",
+      "permit_status"
+    ],
+    "missing_from_current_collector": [
+      "sequence_number",
+      "filing_reason",
+      "business_name"
+    ],
+    "label_completeness": {
+      "independently_held_out_original_current_permit_labels": 0,
+      "independently_held_out_original_new_buyer_labels": 0,
+      "actual_changed_business_permit_pairs_verified": 0,
+      "real_source_permit_rows_or_personal_identifiers_stored": 0
+    },
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_CHANGE_BUSINESS_SAME_WORK_PERMIT",
+        "kind": "SYNTHETIC",
+        "before": {
+          "work_permit": "SYNTH-PERMIT-001",
+          "sequence_number": "1",
+          "filing_reason": "Initial Permit",
+          "listed_business": "SYNTH_ENTITY_ALPHA"
+        },
+        "after": {
+          "work_permit": "SYNTH-PERMIT-001",
+          "sequence_number": "2",
+          "filing_reason": "Renewal Permit with Changes",
+          "listed_business": "SYNTH_ENTITY_BETA"
+        },
+        "expected": "CHANGED_BUSINESS_ALONE_DOES_NOT_PROVE_A_NEW_UNIQUE_WORK_PERMIT_OR_BUYER_OPPORTUNITY",
+        "independent_new_permit_label": null,
+        "independent_buyer_demand_label": null
+      },
+      {
+        "id": "SYNTH_SAME_BUSINESS_DIFFERENT_WORK_PERMITS",
+        "kind": "SYNTHETIC",
+        "before": {
+          "work_permit": "SYNTH-PERMIT-001",
+          "sequence_number": "1",
+          "listed_business": "SYNTH_ENTITY_ALPHA"
+        },
+        "after": {
+          "work_permit": "SYNTH-PERMIT-002",
+          "sequence_number": "1",
+          "listed_business": "SYNTH_ENTITY_ALPHA"
+        },
+        "expected": "SAME_BUSINESS_NAME_ALONE_DOES_NOT_PROVE_IDENTICAL_UNDERLYING_WORK_PERMIT_OR_NEW_BUYER_DEMAND",
+        "independent_new_permit_label": null,
+        "independent_buyer_demand_label": null
+      }
+    ],
+    "negative_control_limits": "No original changed-business row pair was obtained. Synthetic examples prove a plausible false-positive/false-negative boundary, not actual engine accuracy or a new permit.",
+    "owner_handoff": "PermitPlate :48: review identity and business-attribution keys using authorized original same-cohort records; do not add a business change as a new permit without independent adjudication. :44 QA independently verifies.",
+    "release_authorized": false,
+    "extra_provider_calls": 0,
+    "workflow_or_engine_code_changed": false
   }
 }
