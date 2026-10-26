@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "CAPTUREBRIEF_SAM_FY2027_RENUMBERING_CANDIDATE_V0",
+  "engine": "capturebrief",
+  "evaluation_family": "GOVERNMENT_PROCUREMENT_NOTICE_IDENTITY_ASOF_NOT_AWARD_SCORING",
+  "cohort": "SAM_GOV_LPD17_SCS_2026_09_28_PRESOLICITATION_UPDATE",
+  "source": {
+    "publisher": "SAM.gov / U.S. Navy NAVSEA",
+    "official_notice_url": "https://sam.gov/opp/f62daacc86a04009b67fd9c9aeabb6b2/view",
+    "notice_record_uuid": "f62daacc86a04009b67fd9c9aeabb6b2",
+    "published_notice_number": "N00024-26-R-4444",
+    "reported_planned_fy2027_rfp_number": "N00024-27-R-4444",
+    "notice_type": "PRESOLICITATION",
+    "original_publication_date": "2026-06-30",
+    "publisher_administrative_update_date": "2026-09-28",
+    "indexed_publisher_metadata_reviewed_date": "2026-10-26",
+    "publisher_response_due_date": "2026-10-13",
+    "publisher_nominal_inactive_date": "2026-10-28",
+    "publisher_update_observation": "SAM_GOV_SEARCH_INDEXED_PUBLISHER_NOTICE_NOT_DIRECT_HTTP_RESPONSE",
+    "original_publisher_http_bytes_acquired": false,
+    "original_publisher_http_sha256": null,
+    "publisher_attachments_acquired": false,
+    "dataset_specific_commercial_reuse_rights_verified": false,
+    "source_admission": "HOLD_PENDING_ORIGINAL_RESPONSE_AND_PROVIDER_TERMS"
+  },
+  "published_update_facts": {
+    "fy2027_renumbering_described_by_publisher": true,
+    "formal_rfp_was_still_planned_as_of_publisher_update": true,
+    "planned_formal_rfp_release_window": "LATE_FALL_2026_OCTOBER_OR_NOVEMBER_ANTICIPATED",
+    "new_fy2027_rfp_posting_verified_as_of_research_date": false,
+    "current_formal_rfp_status": "UNKNOWN",
+    "two_independent_contract_awards_proven": false,
+    "award_date": null,
+    "independently_confirmed_current_response_acceptance": "UNKNOWN",
+    "procurement_scope": "LPD_17_SHIP_CONTROL_SYSTEM_HARDWARE",
+    "public_amendment_proposed_contract_types": ["FFP", "CPFF"],
+    "fy2027_rfp_is_not_a_second_published_award_from_this_notice": true
+  },
+  "quality_and_ground_truth": {
+    "original_publisher_notice_records_indexed": 1,
+    "independently_held_out_labeled_notice_lifecycle_cases": 0,
+    "independent_award_labels": 0,
+    "independent_bid_eligibility_labels": 0,
+    "later_new_number_status_checked_with_original_live_response": false,
+    "source_page_content_fingerprint": "UNKNOWN_NOT_ACQUIRED",
+    "historical_original_and_planned_ids_not_independent_awards": true,
+    "current_bid_eligibility": "UNKNOWN",
+    "commercial_capturebrief_scoring_validated": false,
+    "data_quality": "PUBLISHER_INDEXED_TEXT_ONLY_DIRECT_RESPONSE_AND_ATTACHMENTS_NOT_HELD"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_2027_PLANNED_NUMBER_IS_ALREADY_POSTED_RFP",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNVERIFIED_FORMAL_RFP_POSTING"
+    },
+    {
+      "id": "SYNTH_2026_NOTICE_AND_2027_RFP_ARE_TWO_AWARDS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NOTICE_RENUMBERING_AS_SEPARATE_AWARDS"
+    },
+    {
+      "id": "SYNTH_OLD_RESPONSE_DEADLINE_IS_NEW_RFP_DEADLINE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OLD_NOTICE_DATE_AS_NEW_RFP_DATE"
+    },
+    {
+      "id": "SYNTH_INDEXED_PAGE_GIVES_LIVE_ORIGINAL_SOURCE_HASH_AND_RIGHTS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNVERIFIED_BYTES_AND_COMMERCIAL_RIGHTS"
+    },
+    {
+      "id": "SYNTH_NOMINAL_INACTIVE_DATE_PROVES_CURRENT_BIDDING_STATUS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_INFERRED_CURRENT_OPPORTUNITY_STATUS"
+    }
+  ],
+  "handoff": {
+    "capturebrief_owner": ":52",
+    "independent_qa": ":44",
+    "retally_recoveryos_owner": ":12",
+    "consumer_scope": "VERSIONED_OFFLINE_ASOF_NOTICE_IDENTITY_REGRESSION_ONLY",
+    "engine_code_changed": false,
+    "provider_queries_or_schedules_changed": false,
+    "release_approved": false
+  }
+}
