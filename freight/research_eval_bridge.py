@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import date
-from hashlib import sha256
+from hashlib import sha1, sha256
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -32,11 +32,69 @@ from freight.unified_research_lab import (
 EVIDENCE_PATH = Path(__file__).with_name("lab15") / "evidence_ledger.json"
 CANDIDATE_PATH = Path(__file__).with_name("research") / "lab15_candidate_ledger.json"
 FEED_PATH = ROOT / "evaluation_feed_v1.json"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 MAX_FEED_ROWS = 300
 MAX_INPUT_ROWS = 24_000
 SYNTHETIC_EVENT_TIME = "2026-10-23T00:00:00.000000Z"
 FORBIDDEN_SOURCE_HOSTS = frozenset({"extranet4.biggexpress.com", "cw.shipandsave.com"})
+HISTORICAL_GAO_CASEBOOK = (Path(__file__).with_name("fixtures")
+                          / "gao_adjudicated_billing_cases_v1.json")
+# Exact pre-reviewed Git fixture bytes; NOT the original publisher HTTP bytes.
+HISTORICAL_GAO_CASEBOOK_BLOB_SHA1 = "fffc4198922892baf57bc3575ff0abe591db67b7"
+MAX_HISTORICAL_GAO_BYTES = 64_000
+
+
+def _historical_gao_references(
+    path: Path = HISTORICAL_GAO_CASEBOOK,
+) -> tuple[dict[str, dict], str]:
+    """Fail closed on fixture drift; join only exact original decision URLs."""
+    if not path.is_file():
+        raise ResearchError("HISTORICAL_GAO_CASEBOOK_MISSING")
+    raw = path.read_bytes()
+    if len(raw) > MAX_HISTORICAL_GAO_BYTES:
+        raise ResearchError("HISTORICAL_GAO_CASEBOOK_TOO_LARGE")
+    git_blob_sha1 = sha1(
+        b"blob " + str(len(raw)).encode("ascii") + b"\\0" + raw
+    ).hexdigest()
+    if git_blob_sha1 != HISTORICAL_GAO_CASEBOOK_BLOB_SHA1:
+        raise ResearchError("HISTORICAL_GAO_CASEBOOK_UNREVIEWED_DRIFT")
+    doc = json.loads(raw)
+    controls = (
+        doc.get("schema_version") == 1
+        and doc.get("fixture_id")
+            == "GAO_INDEPENDENT_HISTORICAL_FREIGHT_BILLING_ADJUDICATION_V1"
+        and doc.get("historical_government_deductions_are_retally_cash") is False
+        and doc.get("independent_original_invoice_and_bank_custody") is False
+        and doc.get("independent_current_customer_invoice_accuracy_cases") == 0
+        and doc.get("verified_retally_cash_cents") == 0
+        and doc.get("rights_clearance_for_current_customer_engine") is False
+        and doc.get("source_common", {}).get("commercial_customer_use_rights_verified") is False
+        and doc.get("source_common", {}).get("original_invoice_gbl_tariff_bytes_in_custody") is False
+        and isinstance(doc.get("cases"), list) and len(doc["cases"]) == 5
+    )
+    if not controls:
+        raise ResearchError("HISTORICAL_GAO_CASEBOOK_TRUTH_OR_RIGHTS_DRIFT")
+    refs: dict[str, dict] = {}
+    for record in doc["cases"]:
+        url = record["source_url"]
+        safe_url(url)
+        if (urlsplit(url).hostname != "www.gao.gov"
+                or url in refs
+                or not isinstance(record["id"], str)
+                or not record["id"].startswith("B-")
+                or date.fromisoformat(record["decision_date"]).isoformat()
+                    != record["decision_date"]):
+            raise ResearchError("HISTORICAL_GAO_CASEBOOK_INVALID_REFERENCE")
+        refs[url] = {
+            "decision_id": record["id"],
+            "decision_date": record["decision_date"],
+            "reference_scope": "HISTORICAL_GAO_DECISION_NOT_ORIGINAL_INVOICE_OR_CUSTOMER_TRUTH",
+            "original_publisher_response_sha256": None,
+            "commercial_rights_verified": False,
+            "independent_customer_ground_truth": False,
+        }
+    return refs, sha256(raw).hexdigest()
+
 
 
 def _legacy(path: Path, kind: str) -> dict:
@@ -142,7 +200,8 @@ def synthetic_proof_gate(lead_id: str) -> dict:
     }
 
 
-def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict) -> dict:
+def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict,
+               *, historical_casebook_path: Path = HISTORICAL_GAO_CASEBOOK) -> dict:
     """Deterministic projection from all three *validated* collectors."""
     validate_ledger(unified)
     from freight.lab15_acquisition import validate_ledger as check_evidence
@@ -153,6 +212,7 @@ def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict) -> d
                  if v["category"] != "PUBLIC_INVOICE_FACE"}
     if len(canonical) != 7:
         raise ResearchError("FROZEN_V1_OFFICIAL_REFERENCE_POPULATION_DRIFT")
+    historical_refs, casebook_sha256 = _historical_gao_references(historical_casebook_path)
     if len(unified["entries"]) + len(evidence["records"]) + len(legacy["leads"]) > MAX_INPUT_ROWS:
         raise ResearchError("RESEARCH_LEDGER_POPULATION_TOO_LARGE")
     rows = {}
@@ -171,11 +231,12 @@ def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict) -> d
     for row in all_rows:
         case_id = canonical.get(row["source_url"])
         row["case_id"] = case_id
+        row["historical_decision_reference"] = historical_refs.get(row["source_url"])
         row["source_kind"] = _source_kind(row["source_url"], case_id)
     # Keep exact-match frozen references first. Newest other candidates next;
     # a bounded window prevents enormous/untrusted ledgers exhausting CI.
     ranked = sorted(all_rows, key=lambda r: (
-        0 if r["case_id"] else 1,
+        0 if r["case_id"] else 1 if r["historical_decision_reference"] else 2,
         -int(r["first_seen"].replace("-", "")),
         r["lead_id"],
     ))
@@ -185,7 +246,8 @@ def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict) -> d
         probe = synthetic_proof_gate(row["lead_id"])
         output.append({
             **{k: row[k] for k in ("lead_id", "source_url", "publisher_host",
-                                  "first_seen", "case_id", "source_kind")},
+                                  "first_seen", "case_id", "source_kind",
+                                   "historical_decision_reference")},
             "origins": sorted(row["origins"]),
             "rights_state": RIGHTS, "truth_state": TRUTH,
             "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
@@ -206,12 +268,17 @@ def build_feed(unified: dict, evidence: dict, legacy: dict, manifest: dict) -> d
             "unified_entries_sha256": unified["entries_sha256"],
             "lab15_evidence_metadata_sha256": digest(evidence),
             "lab15_candidate_metadata_sha256": legacy["digest_sha256"],
+            "reviewed_historical_gao_casebook_file_sha256": casebook_sha256,
+            "reviewed_historical_gao_casebook_git_blob_sha1": HISTORICAL_GAO_CASEBOOK_BLOB_SHA1,
         },
         "source_pointers_total": len(all_rows),
         "selected_for_synthetic_proof_gate": len(output),
         "omitted_for_bounded_execution": max(0, len(all_rows) - len(output)),
         "unsafe_or_unrepresentable_legacy_pointers_skipped": skipped,
         "frozen_v1_official_source_matches": matched,
+        "historical_gao_decision_reference_matches": sum(
+            x["historical_decision_reference"] is not None for x in output
+        ),
         "frozen_v1_historical_cases": len(cases),
         "new_customer_proven_overcharges": None,
         "independently_scored_new_customer_cases": 0,
