@@ -217,7 +217,10 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                     ResearchError,"SCHEMA_CHANGED"):
                 _minimal(invalid,DAY)
 
-    def test_replay_snapshot_is_deterministic_cached_and_tamper_evident(self):
+    @patch("freight.official_nyc_issued_permit_lab.datetime")
+    def test_replay_snapshot_is_deterministic_cached_and_tamper_evident(self, test_clock):
+        # Freeze only the unit-test clock; do not weaken production UTC freshness.
+        test_clock.now.return_value.date.return_value = DAY
         observed=[]
         def fetcher(url):
             observed.append(url)
