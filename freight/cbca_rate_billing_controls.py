@@ -85,7 +85,7 @@ PINNED = (
 )
 RECEIPT_KEYS = frozenset({
     "schema_version", "scope", "case_count", "decision_outcomes",
-    "government_overcharge_notices_invalidated_case_count",
+    "gsa_overcharge_notices_invalidated_count",
     "government_notice_assessment_cents_rejected_by_board_not_retally_cash",
     "other_gsa_notices_not_adjudicated_here",
     "unpaid_original_invoices_denied_by_board_case_count",
@@ -152,7 +152,7 @@ def make_receipt(fixture: dict | None = None) -> dict:
              "verified_retally_recovered_cash_cents": 0}
             for item in source["cases"]
         ],
-        "government_overcharge_notices_invalidated_case_count": 7,
+        "gsa_overcharge_notices_invalidated_count": 7,
         "government_notice_assessment_cents_rejected_by_board_not_retally_cash":
             first["appealed_carrier_repayment_to_gsa_cents_reported"],
         "other_gsa_notices_not_adjudicated_here":
@@ -199,7 +199,7 @@ def main() -> None:
                                    encoding="utf-8")
     print(json.dumps({
         "cases": result["case_count"],
-        "rejected_overcharge_notices": result["government_overcharge_notices_invalidated_case_count"],
+        "rejected_overcharge_notices": result["gsa_overcharge_notices_invalidated_count"],
         "unpaid_carrier_claims_denied": result["unpaid_original_invoices_denied_by_board_case_count"],
         "private_customer_truth_cases": 0,
         "retally_cash_recovered_cents": 0,
