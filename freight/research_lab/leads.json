@@ -3193,6 +3193,22 @@
         "freightrecovery"
       ],
       "first_seen": "2026-10-26",
+      "id": "3d2ec3abea460fa886482a096d14c58290a9d3718816ef29b2fc1e5a7fd793a7",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.cbca.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
       "id": "3d7f1e369ad400ada0738cc7b6e3c899666a58232023f0c09d935f700730cf15",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -6147,6 +6163,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/7844745"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-26",
+      "id": "820b71555c52c2b09ea37d14c54cf607916a442b5e151d7118516e83a53cea31",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.cbca.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf"
     },
     {
       "commercial_reuse_authorized": false,
@@ -12377,6 +12409,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "c267620dfd8a63d839e957dfe999222ee61ae01cd202d28f004c39e751f05f1a",
+  "entries_sha256": "9cfc7dfda474e9f0ed538ae3043e2f423ca7f615502627275629294a074fa89e",
   "schema_version": 1
 }

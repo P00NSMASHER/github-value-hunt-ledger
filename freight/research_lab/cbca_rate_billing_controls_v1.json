@@ -1,0 +1,37 @@
+{
+  "case_count": 2,
+  "commercial_reuse_approved": false,
+  "decision_outcomes": [
+    {
+      "board_disposition": "CARRIER_REIMBURSEMENT_CLAIM_GRANTED_AS_GSA_OVERCHARGE_ASSESSMENTS_UNSUPPORTED",
+      "case_id": "CBCA-6578-RATE",
+      "decision_date": "2020-08-06",
+      "independent_adjudication_label": "NEGATIVE_GSA_OVERCHARGE_ASSERTION_SEVEN_SHIPMENTS_ONLY",
+      "official_decision_url": "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",
+      "verified_customer_overcharge_cents": null,
+      "verified_retally_recovered_cash_cents": 0
+    },
+    {
+      "board_disposition": "UNPAID_CARRIER_CLAIM_DENIED_UNTIMELY_WITHOUT_PROVEN_NOTICE_PREJUDICE",
+      "case_id": "CBCA-8051-RATE",
+      "decision_date": "2024-08-08",
+      "independent_adjudication_label": "NEGATIVE_UNPAID_INVOICE_IS_NOT_VALID_OVERCHARGE_OR_RECOVERED_CASH",
+      "official_decision_url": "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",
+      "verified_customer_overcharge_cents": null,
+      "verified_retally_recovered_cash_cents": 0
+    }
+  ],
+  "government_notice_assessment_cents_rejected_by_board_not_retally_cash": 1554908,
+  "gsa_overcharge_notices_invalidated_count": 7,
+  "other_gsa_notices_not_adjudicated_here": 108,
+  "private_customer_invoice_truth_cases": 0,
+  "receipt_sha256": "7e2f79596bd76c94b88f001ba20b7707f20a7ba5d969633cd1c1e0cb2303ef4e",
+  "schema_version": 1,
+  "scope": "INDEPENDENT_GOVERNMENT_CARRIER_RATE_CASE_DECISIONS_ONLY_NOT_CUSTOMER_INVOICE_TRUTH",
+  "source_fixture_authored_sha256_not_pdf_hash": "5d45e6e04dfa368f819820c02202c5f961ca4bdcd1c8bad8feb6d78a8269083f",
+  "source_original_pdf_sha256": null,
+  "time_barred_carrier_claim_cents_not_recoverable": 1459569,
+  "unpaid_original_invoices_denied_by_board_case_count": 1,
+  "verified_carrier_refund_received_cents": null,
+  "verified_retally_cash_recovery_cents": 0
+}
