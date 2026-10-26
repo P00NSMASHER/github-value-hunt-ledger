@@ -116,6 +116,22 @@
       ],
       "expected": "SOURCE_IDENTITY_AMBIGUOUS_TEMPORAL_SNAPSHOTS_NOT_TWO_INDEPENDENT_ISSUANCE_OUTCOMES",
       "actual_real_world_error_label": null
+    },
+    {
+      "id": "signed_off_or_1899_expiry_is_not_current_validity_proof",
+      "synthetic": true,
+      "row": {
+        "tracking_number": "SYNTH-STATUS-001",
+        "job_filing_number": "SYNTH-M300-I1",
+        "work_permit": "SYNTH-M300-I1-GC",
+        "sequence_number": "1",
+        "issued_date": "2026-10-23T00:00:00.000",
+        "permit_status": "Signed-off",
+        "expired_date": "1899-12-30T00:00:00.000"
+      },
+      "expected": "ISSUED_DATE_PRESENT_FROM_CURRENT_PROJECTION_ONLY_CURRENT_VALIDITY_AND_EXPIRY_SEMANTICS_UNKNOWN",
+      "independent_current_validity_label": null,
+      "actual_real_world_error_label": null
     }
   ],
   "limits": {
@@ -136,7 +152,7 @@
     "independent_qa_required": true,
     "status": "DRAFT_SOURCE_PROJECTION_REGRESSION_ONLY_NO_ENGINE_CHANGE"
   },
-  "evidence_revision": "2026-10-26-nyc-cached-sequence-nullability",
+  "evidence_revision": "2026-10-26-nyc-cached-status-expiry-boundary",
   "publisher_cached_sequence_profile": {
     "source_kind": "FIRST_PARTY_PUBLISHER_METADATA_CACHED_COLUMN_STATISTICS_NOT_ORIGINAL_RECORDS",
     "publisher": "NYC Department of Buildings via NYC Open Data",
@@ -158,5 +174,32 @@
     "authorization_status": "NYC_OPEN_DATA_PUBLIC_TERMS_REVIEWED_ADDITIONAL_DATASET_TERMS_AND_ENGINE_USE_HELD",
     "ground_truth_status": "SOURCE_METADATA_ONLY_NO_INDEPENDENT_ISSUANCE_OR_BUYER_OUTCOME",
     "quality_limit": "Counts are cached publisher metadata, may change; 351 null sequence values are dataset-wide, not verified within the issued_date/tracking_number query cohort. Even adding sequence_number to $select cannot make an actually null field non-null."
+  },
+  "publisher_cached_status_and_expiry_profile": {
+    "source_kind": "FIRST_PARTY_PUBLISHER_CACHED_COLUMN_STATISTICS_NOT_INDEPENDENT_VALIDITY_LABELS",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "total_cached_records": 1020152,
+    "permit_status_field": "permit_status",
+    "permit_status_column_null_count": 0,
+    "permit_status_cached_counts": {
+      "Signed-off": 652244,
+      "Permit Issued": 367908
+    },
+    "expired_date_field": "expired_date",
+    "expired_date_cached_non_null_count": 1018984,
+    "expired_date_cached_null_count": 1168,
+    "expired_date_cached_minimum": "1899-12-30T00:00:00.000",
+    "date_1899_is_sentinel_verified": false,
+    "status_and_expiry_joint_distribution_verified": false,
+    "actual_publisher_rows_downloaded": 0,
+    "independent_current_permit_validity_labels": 0,
+    "publisher_metadata_response_raw_sha256": null,
+    "dataset_specific_commercial_reuse_approved": false,
+    "validity_and_buying_opportunity_ground_truth": "UNKNOWN",
+    "quality_limit": "Cached counts are dataset-wide, not necessarily the filtered readback cohort. Signed-off is a distinct publisher state, not independent proof of current validity; anomalous 1899 minimum cannot be interpreted without row-level semantics. Original publisher bytes were not acquired."
   }
 }

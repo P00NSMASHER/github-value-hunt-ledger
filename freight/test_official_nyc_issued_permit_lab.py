@@ -328,7 +328,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
         self.assertFalse(pack["cohort"]["independent_holdout_verified"])
         self.assertFalse(pack["inspected_source"]["live_collision_in_publisher_data_verified"])
-        self.assertEqual(len(pack["synthetic_negative_controls"]),4)
+        self.assertEqual(len(pack["synthetic_negative_controls"]),5)
         self.assertTrue(all(c["synthetic"] for c in pack["synthetic_negative_controls"]))
         self.assertTrue(all(c["actual_real_world_error_label"] is None
                             for c in pack["synthetic_negative_controls"]))
@@ -396,6 +396,42 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertIsNone(b["sequence_number"])
         self.assertEqual(_key(a),_key(b))
         self.assertNotEqual(a["issued_date"],b["issued_date"])
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
+
+
+    def test_official_cached_status_expiry_profile_never_promotes_current_validity(self):
+        """Original NYC metadata is source-wide, not a live permit-validity label."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        profile=pack["publisher_cached_status_and_expiry_profile"]
+        self.assertEqual(profile["dataset_id"],DATASET_ID)
+        self.assertEqual(profile["publisher_rows_updated_at_utc"],
+                         "2026-10-25T18:41:35Z")
+        counts=profile["permit_status_cached_counts"]
+        self.assertEqual(counts,{"Signed-off":652244,"Permit Issued":367908})
+        self.assertEqual(sum(counts.values()),profile["total_cached_records"])
+        self.assertEqual(profile["permit_status_column_null_count"],0)
+        self.assertEqual(profile["expired_date_cached_non_null_count"]+
+                         profile["expired_date_cached_null_count"],
+                         profile["total_cached_records"])
+        self.assertEqual(profile["expired_date_cached_null_count"],1168)
+        self.assertEqual(profile["expired_date_cached_minimum"],
+                         "1899-12-30T00:00:00.000")
+        self.assertFalse(profile["date_1899_is_sentinel_verified"])
+        self.assertFalse(profile["status_and_expiry_joint_distribution_verified"])
+        self.assertIsNone(profile["publisher_metadata_response_raw_sha256"])
+        self.assertEqual(profile["actual_publisher_rows_downloaded"],0)
+        self.assertEqual(profile["independent_current_permit_validity_labels"],0)
+        self.assertFalse(profile["dataset_specific_commercial_reuse_approved"])
+        control=next(x for x in pack["synthetic_negative_controls"]
+                     if x["id"]=="signed_off_or_1899_expiry_is_not_current_validity_proof")
+        self.assertTrue(control["synthetic"])
+        self.assertIsNone(control["independent_current_validity_label"])
+        self.assertIsNone(control["actual_real_world_error_label"])
+        normalized=_minimal(control["row"],DAY)
+        self.assertEqual(normalized["permit_status"],"Signed-off")
+        self.assertEqual(_classification(normalized),"PUBLISHER_ISSUE_DATE_PRESENT")
+        self.assertNotIn("expired_date",normalized)
         self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
 
 
