@@ -6,6 +6,58 @@ validation), while retaining bounded PermitPlate, CaptureBrief and RecoveryOS
 research and the strongest already-approved read-only regression suites.
 Source pointers alone never count as independently validated claims.
 
+## Agency-adjudicated historical billing cases (October 26 evidence review)
+
+This is a **historical billing-adjudication casebook**, not a new commercially
+authorized customer-accuracy dataset. Three original GAO decisions publish
+independent agency reviews of GSA/carrier freight billing disputes:
+
+| Official decision | Reported paid | GSA-audited | Reported GSA deduction | GAO outcome |
+|---|---:|---:|---:|---|
+| [B-191257 (1978)](https://www.gao.gov/products/b-191257) | $828.00 | $796.00 | $32.00 | Overcharge deduction upheld; carrier route authority. |
+| [B-160344 (1967)](https://www.gao.gov/products/b-160344) | $275.17 | $139.29 | $135.88 | Overcharge deduction upheld; freight classification. |
+| [B-221594 (1986)](https://www.gao.gov/products/b-221594-0) | $942.00 | $721.25* | $220.75 | GSA deduction INVALID because rate tender was rejected. |
+
+*The original GAO public text has an OCR-ambiguous assessed amount, so $721.25
+is derived from its printed $942.00 paid and $220.75 deduction, not a separately
+authenticated tariff or source byte.*
+
+These are two independently **agency-adjudicated historical positive examples**
+($167.88 in government-reported deductions), plus one historical **false-positive
+control** ($220.75 improperly deducted by GSA). The latter is NOT a valid
+overcharge or RETALLY recovery. All money is old government transaction
+narrative, NOT private customer cash or modern rate truth.
+
+Source: official GAO public decisions manually checked October 26, 2026.
+Raw GAO HTML response bytes, original signed invoice/GBL/tariff files and bank
+clearing artifacts are **not in custody** and have no acquired source-byte SHA.
+An authored JSON digest is never an original publisher hash. A GAO ruling is
+independent external adjudication, but NOT independent custody of transaction
+documents. Later supersession has not been exhaustively checked.
+The existing 110 original public invoice faces still have zero independently
+adjudicated private customer errors, zero valid present-day customer
+precision/recall cases, and $0 RETALLY cash.
+
+The casebook runs through exact pinned GAO adjudication controls and adversarial
+tests. The actual native freight rating and evidence engines are also exercised
+on explicitly SYNTHETIC derivative records, ensuring they return REVIEW_REQUIRED
+without modern buyer-specific authority, shipment evidence or bank proof.
+Unified Lab verification, the single research branch and nightly real-data
+replay exercise the evidence package. No added cron, external contact, paid
+service, customer ingestion or production rating change.
+
+Offline verification commands:
+
+    python -m unittest -v freight.test_gao_adjudicated_billing_cases
+    python -m freight.gao_adjudicated_billing_cases --output /tmp/gao_billing_v1.json
+    python -m freight.gao_adjudicated_billing_cases --verify --output /tmp/gao_billing_v1.json
+
+For current independently verified overcharge labels, obtain a buyer-authorized
+original invoice, contemporaneous controlling contract/rate, authenticated
+shipment/BOL, independently cleared payment or credit, and externally resolved
+positive or clean-negative claim. Current customer pricing, rights, consent,
+production actions and recovered cash remain explicitly held.
+
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.
