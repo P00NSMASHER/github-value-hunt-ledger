@@ -639,5 +639,50 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertFalse(can_promote(altered))
 
 
+    def test_original_dob_renewal_sequences_are_not_independent_new_permits(self):
+        """The DOB 2020 training identifies sequence as renewal iteration, not a new permit."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        doc=pack["publisher_renewal_sequence_training_2020"]
+        self.assertEqual(doc["publisher"],"NYC Department of Buildings")
+        self.assertEqual(doc["original_document_url"],
+                         "https://www.nyc.gov/assets/buildings/pdf/contractor_training_presentation.pdf")
+        self.assertEqual((doc["pdf_page_index_zero_based"],doc["slide_number_one_based"]),(71,72))
+        self.assertEqual(doc["document_updated_date"],"2020-12-22")
+        facts=doc["historical_training_assertions"]
+        self.assertTrue(all(facts.values()))
+        self.assertFalse(doc["dataset_sequence_field_mapping_to_training_verified"])
+        self.assertFalse(doc["nyc_open_data_xlsx_dictionary_original_bytes_acquired"])
+        self.assertIsNone(doc["nyc_open_data_xlsx_dictionary_sha256"])
+        self.assertFalse(doc["original_publisher_pdf_bytes_acquired"])
+        self.assertIsNone(doc["original_publisher_pdf_sha256"])
+        self.assertFalse(doc["source_specific_commercial_reuse_authorized"])
+        self.assertFalse(doc["same_permit_repeated_renewal_rows_in_original_publisher_cohort_confirmed"])
+        self.assertEqual(doc["independently_held_out_new_permit_outcome_labels"],0)
+        self.assertEqual(doc["independently_held_out_current_validity_labels"],0)
+        self.assertIsNone(doc["permitplate_new_buyer_opportunity_accuracy"])
+        self.assertEqual(doc["buyer_demand"],"UNKNOWN")
+        controls=doc["synthetic_negative_controls"]
+        self.assertEqual(len(controls),2)
+        self.assertEqual(len({c["id"] for c in controls}),2)
+        self.assertTrue(all(c["kind"]=="SYNTHETIC" for c in controls))
+        first=controls[0]
+        self.assertEqual(first["initial"]["work_permit"],first["renewal"]["work_permit"])
+        self.assertNotEqual(first["initial"]["tracking_number"],first["renewal"]["tracking_number"])
+        self.assertEqual(int(first["renewal"]["sequence_number"]),
+                         int(first["initial"]["sequence_number"])+1)
+        self.assertIsNone(first["independent_new_permit_label"])
+        self.assertIsNone(first["independent_current_validity_label"])
+        self.assertIn("NOT_TWO_INDEPENDENT_NEW_PERMIT_OPPORTUNITIES",first["expected"])
+        second=controls[1]
+        self.assertFalse(second["projection"]["sequence_number_selected"])
+        self.assertIn("UNKNOWN",second["expected"])
+        self.assertIsNone(second["independent_current_validity_label"])
+        self.assertFalse(doc["engine_code_edited"])
+        self.assertEqual((doc["extra_provider_calls"],doc["new_workflows"]),(0,0))
+        self.assertFalse(doc["release_authorized"])
+
+
 if __name__=="__main__":
     unittest.main()

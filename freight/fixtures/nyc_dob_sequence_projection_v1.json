@@ -282,5 +282,71 @@
       "independent_current_validity_label": null,
       "expected": "NO_ISSUANCE_OR_CURRENT_VALIDITY_PROMOTION_FROM_STATUS_ALONE"
     }
+  },
+  "publisher_renewal_sequence_training_2020": {
+    "evidence_class": "FIRST_PARTY_NYC_DOB_TRAINING_SLIDE_VISUALLY_VERIFIED_NO_SOURCE_PDF_BYTES",
+    "publisher": "NYC Department of Buildings",
+    "original_document_url": "https://www.nyc.gov/assets/buildings/pdf/contractor_training_presentation.pdf",
+    "document_updated_date": "2020-12-22",
+    "pdf_page_index_zero_based": 71,
+    "slide_number_one_based": 72,
+    "observed_utc_date": "2026-10-26",
+    "historical_training_assertions": {
+      "work_permit_number_unchanged_on_renewal": true,
+      "sequence_number_increments_by_one_on_renewal": true,
+      "expiration_date_updated_upon_renewal": true,
+      "composite_permit_renewal_cannot_change_work_types": true
+    },
+    "interpretation": "Sequence identifies renewal iterations for a work permit in December 2020 DOB NOW training, not automatically independent NEW permits. The dataset mapping and present-day rules have not been independently confirmed.",
+    "document_age_limit": "HISTORICAL_2020_TRAINING_NOT_VERIFIED_AS_CURRENT_2026_RULE",
+    "dataset_sequence_field_mapping_to_training_verified": false,
+    "nyc_open_data_xlsx_dictionary_original_bytes_acquired": false,
+    "nyc_open_data_xlsx_dictionary_sha256": null,
+    "original_publisher_pdf_bytes_acquired": false,
+    "original_publisher_pdf_sha256": null,
+    "source_specific_commercial_reuse_authorized": false,
+    "source_rights": "MUNICIPAL_PUBLIC_TRAINING_INFORMATION_NO_SOURCE_SPECIFIC_COMMERCIAL_REUSE_CLEARANCE",
+    "current_collector_selects_sequence_number": false,
+    "same_permit_repeated_renewal_rows_in_original_publisher_cohort_confirmed": false,
+    "independently_held_out_new_permit_outcome_labels": 0,
+    "independently_held_out_current_validity_labels": 0,
+    "permitplate_new_buyer_opportunity_accuracy": null,
+    "buyer_demand": "UNKNOWN",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_RENEWAL_SAME_PERMIT_NUMBER_DIFFERENT_SEQUENCE_AND_TRACKING",
+        "kind": "SYNTHETIC",
+        "initial": {
+          "tracking_number": "SYNTH-TRACK-101",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "1"
+        },
+        "renewal": {
+          "tracking_number": "SYNTH-TRACK-102",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "2"
+        },
+        "expected": "TWO_RENEWAL_ITERATIONS_OF_ONE_SYNTHETIC_WORK_PERMIT_NOT_TWO_INDEPENDENT_NEW_PERMIT_OPPORTUNITIES",
+        "independent_new_permit_label": null,
+        "independent_current_validity_label": null
+      },
+      {
+        "id": "SYNTH_SAME_PERMIT_UNSELECTED_SEQUENCE_LOSES_RENEWAL_PROVENANCE",
+        "kind": "SYNTHETIC",
+        "projection": {
+          "work_permit": "SYNTH-M200-I1-PL",
+          "sequence_number_selected": false
+        },
+        "expected": "RENEWAL_ITERATION_UNKNOWN_WHEN_SEQUENCE_IS_NOT_SELECTED",
+        "independent_new_permit_label": null,
+        "independent_current_validity_label": null
+      }
+    ],
+    "owner_handoff": "PermitPlate :48 owns query and scoring fix; separately validate actual dataset dictionary and same-cohort sequence number, preserve publisher query budget.",
+    "independent_qa": ":44 replay with independent source and test, no automatic label promotion",
+    "engine_code_edited": false,
+    "extra_provider_calls": 0,
+    "new_workflows": 0,
+    "release_authorized": false
   }
 }
