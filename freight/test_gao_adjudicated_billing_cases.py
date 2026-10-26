@@ -2,11 +2,16 @@
 from __future__ import annotations
 
 import copy
+from hashlib import sha256
 import json
 import tempfile
 import unittest
 from pathlib import Path
 
+from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record
+from freight.rate_authority import AuthorityBook
+from freight.rating_engine import REVIEW_REQUIRED, rate_record
+from freight.priority2_evidence import review_freight_rate
 from freight.gao_adjudicated_billing_cases import (
     EvidenceError, FIXTURE, LABEL_NEG, LABEL_POS, PINNED,
     canonical_digest, load_fixture, make_receipt, validate_fixture,
@@ -141,6 +146,45 @@ class IndependentlyAdjudicatedHistoricalBillingTests(unittest.TestCase):
                 load_fixture(path)
             with self.assertRaises(EvidenceError):
                 load_fixture(Path(folder)/"missing.json")
+
+    def test_actual_rating_and_evidence_engines_refuse_historical_price_promotion(self):
+        # All transaction identifiers, shipments, and byte hashes below are
+        # fabricated for the test. GAO money facts are NEVER a customer invoice.
+        for i, row in enumerate(load_fixture()["cases"]):
+            with self.subTest(case=row["id"]):
+                fake_sha=sha256(("FABRICATED-GAO-REVIEW-"+row["id"]).encode()).hexdigest()
+                record=build_record(
+                    buyer_id="SYNTHETIC-BUYER",
+                    business_unit="SYNTHETIC-GAO-TEST-ONLY",
+                    invoice_id="SYNTHETIC-CASE-"+str(i),
+                    invoice_date="2026-10-26",
+                    customer_id="SYNTHETIC-BUYER",
+                    currency="USD",
+                    shipment=ShipmentFacts(
+                        shipment_id="SYNTHETIC-GAO-SHIPMENT-"+str(i),
+                        carrier_id="SYNTHETIC-CARRIER",
+                        mode="LTL", service_date="2026-10-26",
+                        origin_postal="SYN-ORIGIN", destination_postal="SYN-DESTINATION",
+                        actual_weight_grams=1000, package_count=1,
+                    ),
+                    charges=(ChargeLine("SYN-LINEHAUL","TRANSPORTATION",
+                                        row["reported_billed_and_paid_cents"]),),
+                    sources=(SourceArtifact(
+                        "SYNTHETIC-NOT-ORIGINAL", "NOT_AN_ORIGINAL_INVOICE",
+                        fake_sha, "2026-10-26T00:00:00.000000Z", "BATCH"),),
+                )
+                no_current_contract=AuthorityBook(())
+                rated=rate_record(record,no_current_contract)
+                strict=review_freight_rate(record,no_current_contract)
+                self.assertEqual(rated.status,REVIEW_REQUIRED)
+                self.assertIsNone(rated.expected_total_cents)
+                self.assertIsNone(rated.variance_cents)
+                self.assertFalse(rated.authority_verified)
+                self.assertEqual(strict.status,"REVIEW_REQUIRED")
+                self.assertFalse(strict.independent_accuracy_scored)
+                self.assertIsNone(strict.externally_verified_freight_error_cents)
+                self.assertEqual(strict.externally_verified_cash_recovered_cents,0)
+                self.assertIn("BANK_CLEARED_PAYMENT_NOT_INDEPENDENTLY_VERIFIED",strict.blockers)
 
     def test_receipt_is_deterministic_and_authored_hash_is_not_source_hash(self):
         a=make_receipt()
