@@ -2,7 +2,7 @@
 
 **Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.
 
-Generated: 2026-10-21T20:03:14.049679+00:00
+Source: versioned HUNTER queue snapshots; Git history records material changes.
 Queue snapshots read: 14
 Unique exact-revision candidates: 24
 
@@ -15,13 +15,13 @@ Unique exact-revision candidates: 24
 | 43 | [Daniel987654321/roblox-studio-agent-bridge](https://github.com/Daniel987654321/roblox-studio-agent-bridge) | 333b9eaaf1b3 | UNKNOWN | HUNTER-07 | Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits |
 | 43 | [IvanIvan09/Lua-Spatial-Farm-Assistant](https://github.com/IvanIvan09/Lua-Spatial-Farm-Assistant) | 0d6932061127 | UNKNOWN | HUNTER-01 | Roblox Lua Automation and Spatial Analytics Framework 2026 |
 | 43 | [manindesguise-source/net-lens-telemetry](https://github.com/manindesguise-source/net-lens-telemetry) | 279d126530e3 | UNKNOWN | HUNTER-13 | Roblox Remote Event Monitor 2026: Best Networking Analytics Tool for Developers |
-| 43 | [sahrul-rgb/typed-fish-framework](https://github.com/sahrul-rgb/typed-fish-framework) | 9cae3e80cded | UNKNOWN | HUNTER-01 | Best Typed Roblox Framework 2026: Fish-Inspired ECS Game Engine on GitHub |
 | 43 | [nahidgaming70/Roblox-QA-Sentinel](https://github.com/nahidgaming70/Roblox-QA-Sentinel) | ad20c52ecb3f | UNKNOWN | HUNTER-07 | Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs |
+| 43 | [sahrul-rgb/typed-fish-framework](https://github.com/sahrul-rgb/typed-fish-framework) | 9cae3e80cded | UNKNOWN | HUNTER-01 | Best Typed Roblox Framework 2026: Fish-Inspired ECS Game Engine on GitHub |
 | 42 | [narenkarthikeyanu999/charmed-recess](https://github.com/narenkarthikeyanu999/charmed-recess) | 80c74ad2df24 | UNKNOWN | HUNTER-01 | Cooperative Spell-Casting Game Framework 2026: Build Kid-Friendly Luau Worlds |
 | 42 | [andrian-syh/rblx-twill](https://github.com/andrian-syh/rblx-twill) | 6e37fc8e2a21 | MIT | HUNTER-04 | A modular framework for Roblox: boot order, guarded networking, state replication, and player data. Every module works on its own. |
 | 42 | [bigfootpp/sync](https://github.com/bigfootpp/sync) | ccc0255413da | MIT | HUNTER-01 | A lightweight animation and motion framework for Luau. |
-| 41 | [yahyaadraoui88-cell/Roblox-Project-Forge](https://github.com/yahyaadraoui88-cell/Roblox-Project-Forge) | 89b7adc008d0 | UNKNOWN | HUNTER-01 | Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers |
 | 41 | [bisameditor-cmd/Stag-Module-Forge](https://github.com/bisameditor-cmd/Stag-Module-Forge) | e9eb111e2b66 | UNKNOWN | HUNTER-01 | Pronghorn 2026: Fast Roblox Module Scripting Framework for Rapid Game Development |
+| 41 | [yahyaadraoui88-cell/Roblox-Project-Forge](https://github.com/yahyaadraoui88-cell/Roblox-Project-Forge) | 89b7adc008d0 | UNKNOWN | HUNTER-01 | Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers |
 | 40 | [AJAY94633/signal-run-relay](https://github.com/AJAY94633/signal-run-relay) | aaa0c1c0de06 | UNKNOWN | HUNTER-01 | Cooperative Luau Relay Game Framework for Cubacadabra Worlds 2026 |
 | 40 | [jetoxp/inventory-kit](https://github.com/jetoxp/inventory-kit) | 24324eb4958e | MIT | HUNTER-05 | A modular, server-authoritative inventory system for Roblox: metadata-aware stacking, session-locked persistence, and a tested core that runs without Studio. |
 | 36 | [gue-hub/roblox-tycoon-kit](https://github.com/gue-hub/roblox-tycoon-kit) | 13bbda651d36 | MIT | HUNTER-01 | Modular Roblox tycoon framework — plots, droppers, buyable buttons, server-authoritative purchases |
