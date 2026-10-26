@@ -102,5 +102,71 @@ class CBCADetentionNegativeControlTest(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     guard(poison)
 
+
+    def test_synthetic_locator_rights_and_negative_label_mutations(self):
+        """Reject forged source identity and unsupported source/truth promotion.
+
+        Fixture integrity only: does not approve engine scoring or commercial use.
+        """
+        pinned = {
+            "source": {
+                "official_decision_url": (
+                    "https://www.cbca.gov/files/decisions/2014/"
+                    "ZISCHKAU_05-14-14_CBCA%203467-RATE__"
+                    "IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf"
+                ),
+                "rights_state": (
+                    "OFFICIAL_FEDERAL_DECISION_PUBLICLY_READABLE_"
+                    "REPRODUCTION_AND_THIRD_PARTY_RIGHTS_NOT_SEPARATELY_CLEARED"
+                ),
+                "original_publisher_pdf_bytes_acquired": False,
+                "original_publisher_pdf_sha256": None,
+                "commercial_customer_engine_source_use_approved": False,
+                "government_endorsement_asserted": False,
+            },
+            "truth_boundaries": {
+                "adjudicated_case_level_label": (
+                    "NEGATIVE_GSA_ASSERTED_OVERCHARGE_FOR_DISPUTED_"
+                    "2010_2011_DETENTION_NOTICES"
+                ),
+                "independent_heldout_customer_invoice_error_labels": 0,
+                "source_document_original_bytes_sha256": None,
+                "commercial_scoring_admission": False,
+            },
+            "quality": {
+                "source_pdf_complete_response_bytes_hash_available": False,
+                "underlying_79_bills_lading_or_invoices_available": False,
+            },
+        }
+
+        def validate_pins(candidate):
+            for section, fields in pinned.items():
+                for key, expected in fields.items():
+                    observed = candidate[section][key]
+                    self.assertIs(type(observed), type(expected))
+                    self.assertEqual(observed, expected)
+
+        validate_pins(self.item)
+        mutated_count = 0
+        for section, fields in pinned.items():
+            for key, expected in fields.items():
+                forged = copy.deepcopy(self.item)
+                if key == "official_decision_url":
+                    injected = "https://www.cbca.gov/files/decisions/2014/UNRELATED.pdf"
+                elif expected is None:
+                    injected = "0" * 64  # invented original byte hash
+                elif type(expected) is bool:
+                    injected = not expected
+                elif type(expected) is int:
+                    injected = expected + 1
+                else:
+                    injected = "UNSUPPORTED_PROMOTION"
+                forged[section][key] = injected
+                with self.subTest(section=section, key=key):
+                    with self.assertRaises(AssertionError):
+                        validate_pins(forged)
+                mutated_count += 1
+        self.assertEqual(mutated_count, 12)
+
 if __name__ == "__main__":
     unittest.main()
