@@ -933,7 +933,7 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                          sum(ex["extra_tcn_charges_cents"]))
         self.assertEqual(ex["government_gbl_interpretation_total_weight_lbs"], 14320)
         self.assertEqual(ex["alternate_gbl_total_cents"],
-                         14320 // 100 * case["note_12_rate_cents_per_cwt"])
+                         14320 * case["note_12_rate_cents_per_cwt"] // 100)
         self.assertEqual(ex["unadjudicated_arithmetic_difference_cents"], 137300)
         self.assertEqual(ex["unadjudicated_arithmetic_difference_cents"],
                          ex["carrier_billed_tcn_total_cents"] - ex["alternate_gbl_total_cents"])
