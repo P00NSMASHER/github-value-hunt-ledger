@@ -149,7 +149,9 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertNotEqual(_key(_minimal(rows[0],DAY)),_key(_minimal(rows[1],DAY)))
         def duplicate_provider(url):
             if parse_qs(urlsplit(url).query).get("$order"):
-                return rows + [copy.deepcopy(rows[0])]
+                # Duplicate snapshot still obeys the original $select projection.
+                return [{field:r[field] for field in FIELDS if field in r}
+                        for r in rows + [copy.deepcopy(rows[0])]]
             return simulated_provider(url)
         receipt = build_receipt(source_ledger(),as_of=DAY,fetcher=duplicate_provider)
         self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
