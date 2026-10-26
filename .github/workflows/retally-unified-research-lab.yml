@@ -494,7 +494,7 @@ jobs:
           from pathlib import Path
           d=json.loads(Path('freight/research_lab/cbca_rate_billing_controls_v1.json').read_text())
           assert d['case_count'] == 2
-          assert d['government_overcharge_notices_invalidated_case_count'] == 7
+          assert d['gsa_overcharge_notices_invalidated_count'] == 7
           assert d['government_notice_assessment_cents_rejected_by_board_not_retally_cash'] == 1554908
           assert d['other_gsa_notices_not_adjudicated_here'] == 108
           assert d['unpaid_original_invoices_denied_by_board_case_count'] == 1
