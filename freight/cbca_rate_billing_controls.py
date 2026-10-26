@@ -106,7 +106,7 @@ def load_fixture(path: Path = FIXTURE) -> dict:
 
 
 def validate_fixture(doc: object) -> dict:
-    if type(doc) is not dict or frozenset(doc) != frozenset(ROOT_PINN) | {"cases"}:
+    if type(doc) is not dict or frozenset(doc) != frozenset(ROOT_PINNED) | {"cases"}:
         raise ResearchError("CBCA_CASEPACK_SCHEMA_INVALID")
     for field, value in ROOT_PINNED.items():
         if type(doc[field]) is not type(value) or doc[field] != value:
