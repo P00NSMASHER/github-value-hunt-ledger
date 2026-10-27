@@ -14,7 +14,10 @@
     "customer_engine_commercial_reuse_approved": false,
     "source_kind": "OFFICIAL_GAO_DECISION_HTML",
     "original_publisher_bytes_acquired": false,
-    "original_publisher_bytes_sha256": null
+    "original_publisher_bytes_sha256": null,
+    "publisher_html_text_crosschecked_on": "2026-10-27",
+    "original_historical_tariff_pages_acquired": false,
+    "original_historical_tariff_pages_sha256": null
   },
   "historical_facts": {
     "shipment_year": 1958,
@@ -42,7 +45,15 @@
     "reported_gbl_date": "1958-03-07",
     "reported_gao_claim_number": "TK-172387",
     "reported_certificate_date": "1960-06-20",
-    "reported_refund_unpaid_on_certificate_date": true
+    "reported_refund_unpaid_on_certificate_date": true,
+    "publisher_cited_tariff_references": [
+      "MIDDLE_ATLANTIC_CONFERENCE_FREIGHT_TARIFF_5_F_MF_ICC_A_845",
+      "MIDDLE_ATLANTIC_CONFERENCE_MASTER_TARIFF_18_MF_ICC_A_830_SUPPLEMENT_1_LINE_C",
+      "MIDDLE_ATLANTIC_CONFERENCE_EXCEPTIONS_TARIFF_10_M_MF_ICC_A_870_RULE_25_D",
+      "MIDDLE_ATLANTIC_CONFERENCE_EXCEPTIONS_TARIFF_10_M_RULE_62_2",
+      "NATIONAL_MOTOR_FREIGHT_CLASSIFICATION_A_4_MF_ICC_1_RULE_13_SECTION_2_D"
+    ],
+    "publisher_cited_tariff_publication_effective_dates": null
   },
   "truth_boundaries": {
     "historical_gao_adjudication_published": true,
