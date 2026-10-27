@@ -15,7 +15,8 @@
       "595-619",
       "601-604",
       "642-651",
-      "174-176"
+      "174-176",
+      "653-662"
     ],
     "report_published_date": "2002-05-30",
     "report_public_release_date": "2002-07-01",
@@ -90,6 +91,23 @@
       "publisher_reported_refund_cents": null,
       "label": "NO_SECOND_PAID_DUPLICATE_NO_RECOVERY_CASH_LABEL",
       "independent_bank_receipt_acquired": false
+    },
+    {
+      "case_id": "LOCKHEED_1997_2001_ACCOUNTING_LINE_DEBT_CANCELED",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "WRONG_ACCOUNTING_LINE_CONTRACT_MODIFICATION_DEBT_REVERSED",
+      "contract_modification_month": "1997-09",
+      "wrong_accounting_line_found_month": "1998-04",
+      "demand_issued_month": "2001-04",
+      "accounting_line_corrected_month": "2001-05",
+      "demand_face_amount_cents": 275524400,
+      "wrong_accounting_line_reported": true,
+      "corrective_modification_eliminated_debt": true,
+      "demand_canceled": true,
+      "publisher_reported_refund_cents": null,
+      "independently_verified_paid_debt_or_refund_cents": null,
+      "label": "GAO_REPORTS_DEMAND_CANCELED_AFTER_ACCOUNTING_LINE_CORRECTION_NOT_RECOVERY_CASH",
+      "independent_bank_receipt_acquired": false
     }
   ],
   "synthetic_negative_controls": [
@@ -122,10 +140,15 @@
       "id": "SYNTH_BOEING_TWO_INVOICES_TREATED_AS_ONE",
       "kind": "SYNTHETIC",
       "expected": "REJECT_GAO_REPORTS_TWO_DISTINCT_INVOICE_OVERCHARGE_COMPONENTS"
+    },
+    {
+      "id": "SYNTH_LOCKHEED_CANCELED_DEMAND_IS_RECOVERED_OVERPAYMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_REPORTS_ACCOUNTING_LINE_CORRECTION_ELIMINATED_DEBT_NOT_SETTLED_CASH"
     }
   ],
   "truth_boundaries": {
-    "publisher_reported_historical_cases": 4,
+    "publisher_reported_historical_cases": 5,
     "independent_heldout_original_customer_invoice_labels": 0,
     "independent_modern_general_accounting_accuracy_labels": 0,
     "freight_error_accuracy_labels": 0,
@@ -134,7 +157,7 @@
     "modern_engine_accuracy": "UNKNOWN",
     "admission_to_commercial_customer_scoring": false,
     "do_not_treat_publisher_reported_refund_as_user_cash": true,
-    "holdout_leakage_warning": "FOUR_CASES_FROM_ONE_PUBLISHER_REPORT_ONE_COHORT_NOT_FOUR_INDEPENDENT_WITNESSES"
+    "holdout_leakage_warning": "FIVE_CASES_FROM_ONE_PUBLISHER_REPORT_ONE_COHORT_NOT_FIVE_INDEPENDENT_WITNESSES"
   },
   "quality": {
     "original_publisher_text_visually_confirmed_in_web_reader": true,
@@ -142,7 +165,7 @@
     "publisher_report_explicitly_disclaims_full_underlying_DFAS_data_reliability_assessment": true,
     "source_does_not_provide_original_invoice_or_bank_receipt_images": true,
     "original_publisher_arithmetic_disagreement_preserved": true,
-    "case_label_completeness": "FOUR_HISTORICAL_REPORT_LEVEL_OUTCOMES_NO_INDEPENDENT_CUSTOMER_LEDGER_OR_HOLDOUT_LABELS",
+    "case_label_completeness": "FIVE_HISTORICAL_REPORT_LEVEL_OUTCOMES_NO_INDEPENDENT_CUSTOMER_LEDGER_OR_HOLDOUT_LABELS",
     "private_customer_medical_student_records_included": false
   },
   "handoff": {

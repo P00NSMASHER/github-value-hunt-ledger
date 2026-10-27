@@ -38,17 +38,18 @@ def verify_source_bound_candidate(doc):
     assert "THIRD_PARTY_RIGHTS_SEPARATE" in source["rights_state"]
 
     cases = doc["historical_cases"]
-    eq(len(cases), 4)
+    eq(len(cases), 5)
     eq([c["case_id"] for c in cases], [
         "TEXTRON_2000_PROGRESS_LIQUIDATION",
         "BOEING_2001_TWO_INVOICE_LIQUIDATION",
         "EAGLE_2001_CROSS_FORMAT_DUPLICATE",
         "LUCENT_2000_2001_DUPLICATE_PREVENTED",
+        "LOCKHEED_1997_2001_ACCOUNTING_LINE_DEBT_CANCELED",
     ])
     assert all(c["kind"] == "PUBLISHER_REPORTED_HISTORICAL_CASE"
                and c["independent_bank_receipt_acquired"] is False
                for c in cases)
-    textron, boeing, eagle, lucent = cases
+    textron, boeing, eagle, lucent, lockheed = cases
     eq(textron["contract_delivery_price_cents"], 1095720500)
     eq(textron["liquidation_should_cents"], 821790400)
     eq(textron["net_invoice_cents"], 273930100)
@@ -90,8 +91,25 @@ def verify_source_bound_candidate(doc):
     eq(lucent["publisher_reported_refund_cents"], None)
     eq(lucent["label"], "NO_SECOND_PAID_DUPLICATE_NO_RECOVERY_CASH_LABEL")
 
+    eq(lockheed["error_type"],
+       "WRONG_ACCOUNTING_LINE_CONTRACT_MODIFICATION_DEBT_REVERSED")
+    eq(lockheed["contract_modification_month"], "1997-09")
+    eq(lockheed["wrong_accounting_line_found_month"], "1998-04")
+    eq(lockheed["demand_issued_month"], "2001-04")
+    eq(lockheed["accounting_line_corrected_month"], "2001-05")
+    assert lockheed["contract_modification_month"] < lockheed["demand_issued_month"]
+    assert lockheed["wrong_accounting_line_found_month"] < lockheed["accounting_line_corrected_month"]
+    eq(lockheed["demand_face_amount_cents"], 275524400)
+    eq(lockheed["wrong_accounting_line_reported"], True)
+    eq(lockheed["corrective_modification_eliminated_debt"], True)
+    eq(lockheed["demand_canceled"], True)
+    eq(lockheed["publisher_reported_refund_cents"], None)
+    eq(lockheed["independently_verified_paid_debt_or_refund_cents"], None)
+    eq(lockheed["label"],
+       "GAO_REPORTS_DEMAND_CANCELED_AFTER_ACCOUNTING_LINE_CORRECTION_NOT_RECOVERY_CASH")
+
     boundary = doc["truth_boundaries"]
-    eq(boundary["publisher_reported_historical_cases"], 4)
+    eq(boundary["publisher_reported_historical_cases"], 5)
     for key in ("independent_heldout_original_customer_invoice_labels",
                 "independent_modern_general_accounting_accuracy_labels",
                 "freight_error_accuracy_labels",
@@ -108,8 +126,8 @@ def verify_source_bound_candidate(doc):
     eq(quality["private_customer_medical_student_records_included"], False)
 
     controls = doc["synthetic_negative_controls"]
-    eq(len(controls), 6)
-    eq(len({x["id"] for x in controls}), 6)
+    eq(len(controls), 7)
+    eq(len({x["id"] for x in controls}), 7)
     assert all(x["kind"] == "SYNTHETIC"
                and x["id"].startswith("SYNTH_")
                and x["expected"].startswith("REJECT_")
@@ -125,7 +143,7 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
         verify_source_bound_candidate(self.pack)
 
     def test_real_report_positive_negative_and_one_dollar_conflict(self):
-        textron, boeing, eagle, lucent = self.pack["historical_cases"]
+        textron, boeing, eagle, lucent, lockheed = self.pack["historical_cases"]
         self.assertEqual(textron["computed_overpayment_cents"], 819485700)
         self.assertEqual(textron["publisher_reported_refund_cents"], 819485600)
         self.assertEqual(textron["publisher_amount_disagreement_cents"], 100)
@@ -137,6 +155,11 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
         self.assertIsNone(lucent["publisher_reported_refund_cents"])
         self.assertTrue(lucent["duplicate_eft_canceled_before_bank"])
         self.assertFalse(lucent["second_duplicate_bank_payment_confirmed"])
+        self.assertTrue(lockheed["demand_canceled"])
+        self.assertTrue(lockheed["corrective_modification_eliminated_debt"])
+        self.assertEqual(lockheed["demand_face_amount_cents"], 275524400)
+        self.assertIsNone(lockheed["publisher_reported_refund_cents"])
+        self.assertIsNone(lockheed["independently_verified_paid_debt_or_refund_cents"])
 
     def test_synthetic_poisoned_source_money_and_truth_rejected(self):
         mutations = [
@@ -158,6 +181,11 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
             ("historical_cases", 2, "source_says_shipment_numbers_different", False),
             ("historical_cases", 3, "duplicate_eft_canceled_before_bank", False),
             ("historical_cases", 3, "publisher_reported_refund_cents", 139720000),
+            ("historical_cases", 4, "demand_face_amount_cents", 275524500),
+            ("historical_cases", 4, "demand_canceled", False),
+            ("historical_cases", 4, "corrective_modification_eliminated_debt", False),
+            ("historical_cases", 4, "publisher_reported_refund_cents", 275524400),
+            ("historical_cases", 4, "independently_verified_paid_debt_or_refund_cents", 275524400),
         ]
         for mutation in mutations:
             with self.subTest(mutation=mutation):
@@ -170,7 +198,7 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
                     poisoned[section][key] = fake
                 with self.assertRaises(AssertionError):
                     verify_source_bound_candidate(poisoned)
-        self.assertEqual(len(mutations), 17)
+        self.assertEqual(len(mutations), 22)
 
 
 if __name__ == "__main__":
