@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 import tempfile
 import unittest
@@ -244,7 +243,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
             self.assertEqual(res["source_rows_replayed"],4)
             self.assertEqual(len(observed),4)
             first=target.read_bytes()
-            res2=run(ledger_path=ledger_path,output=target,fetcher=fetcher,as_of=DAY)
+            run(ledger_path=ledger_path,output=target,fetcher=fetcher,as_of=DAY)
             self.assertEqual(first,target.read_bytes())
             self.assertEqual(len(observed),4)
             report=json.loads(target.read_text())

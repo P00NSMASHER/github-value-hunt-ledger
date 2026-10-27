@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 from freight.cbca_rate_billing_controls import (
-    FIXTURE, PINNED, ROOT_PINNED, load_fixture, make_receipt,
+    ROOT_PINNED, load_fixture, make_receipt,
     validate_fixture, verify_receipt,
 )
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record

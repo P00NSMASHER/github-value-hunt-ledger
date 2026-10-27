@@ -10,16 +10,16 @@ import unittest
 
 from freight.lab15_acquisition import source_record as evidence_record
 from freight.lab15_evidence_harvester import (
-    blank_ledger, digest as legacy_digest,
+    digest as legacy_digest,
     new_lead,
 )
 from freight.real_world_eval_v1 import load_manifest, validate_manifest
 from freight.research_eval_bridge import (
-    MAX_FEED_ROWS, VERSION, build_feed, read_inputs, run as bridge_run,
+    MAX_FEED_ROWS, VERSION, build_feed, run as bridge_run,
     synthetic_proof_gate, validate_feed,
 )
 from freight.unified_research_lab import (
-    ResearchError, digest, ledger_from, merge_sources, run, source_record,
+    ResearchError, digest, ledger_from, merge_sources, source_record,
 )
 
 NOW = datetime(2026, 10, 23, 0, 0, tzinfo=timezone.utc)

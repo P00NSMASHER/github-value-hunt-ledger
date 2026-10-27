@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 from freight.public_freight_proof_ladder import (
-    ROOT, GAO, PAID, AGREED, KEYS, validate_fixture,
+    ROOT, KEYS, validate_fixture,
     load_fixture, make_receipt, verify_receipt,
 )
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record

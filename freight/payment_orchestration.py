@@ -7,7 +7,7 @@ exists, and a later REVERSED event returns settled value to zero.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
 from threading import RLock

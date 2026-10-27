@@ -8,9 +8,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, replace
-from datetime import datetime, timezone
-from hashlib import sha256
+from dataclasses import replace
 from pathlib import Path
 import json
 import sqlite3
@@ -18,7 +16,6 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from freight.contracts import canonical_hash
 from freight.currency_reporting import (
     assert_currency_report_current, build_currency_settlement_report,
 )
@@ -27,20 +24,17 @@ from freight.payment_orchestration import (
     verify_payment_snapshot,
 )
 from freight.priority4_adversarial_lab import (
-    AS_OF, CREDIT_MODES, CURRENCIES, EVENT_COMBINATIONS, MODES, PERSONAS,
-    REQUEST_COMBINATIONS, SEED, ReplayOracle, CaseReceipt,
-    make_plan, independent_oracle, expected_state, execute_case,
+    CREDIT_MODES, CURRENCIES, EVENT_COMBINATIONS, MODES, REQUEST_COMBINATIONS, SEED, ReplayOracle, make_plan, independent_oracle, expected_state, execute_case,
     assert_independent_invariants, case_receipt, verify_receipt, digest, h,
 )
 from freight.recovery_resilience import (
-    CustomerRequest, RecoveryEvent, RecoveryScenario, FeasibilityAssumptions,
     evaluate_recovery_scenario,
 )
 from freight.scoped_reconciliation import ScopedTxn
 from freight.priority2_evidence import reconcile_invoice_evidence
 from freight.settlement_store import (
     SettlementStore, RecoveryClaim, SettlementEventRecord, CounterEventRecord,
-    ALLOCATED, ALREADY_ALLOCATED, REVERSED,
+    ALLOCATED, ALREADY_ALLOCATED,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 

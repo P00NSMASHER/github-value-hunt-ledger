@@ -15,7 +15,7 @@ import unittest
 
 from freight.settlement_store import (
     SettlementStore, RecoveryClaim, SettlementEventRecord, CounterEventRecord,
-    ALLOCATED, ALREADY_ALLOCATED, REVIEW, REVERSED, ALREADY_REVERSED,
+    ALLOCATED, REVIEW, REVERSED, ALREADY_REVERSED,
 )
 from freight.recovery_resilience import RecoveryScenario, evaluate_recovery_scenario
 from freight.priority4_adversarial_lab import make_plan, case_receipt, verify_receipt

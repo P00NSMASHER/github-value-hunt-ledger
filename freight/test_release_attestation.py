@@ -6,7 +6,6 @@ import pytest
 
 from freight.release_attestation import (
     PAYLOAD_TYPE,
-    build_statement,
     build_unsigned_dsse,
     verify_unsigned_dsse,
 )

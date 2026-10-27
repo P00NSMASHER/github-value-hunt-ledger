@@ -1,6 +1,5 @@
 """RETALLY legacy alias: SEO consolidation without breaking the fallback."""
 from pathlib import Path
-from tempfile import TemporaryDirectory
 import xml.etree.ElementTree as ET
 
 import pytest

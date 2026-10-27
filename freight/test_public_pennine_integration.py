@@ -1,5 +1,4 @@
 """Original Pennine CSV contractual controls; these do not prove bank clearing."""
-from copy import deepcopy
 
 import pytest
 
@@ -101,7 +100,7 @@ def _complete_public_report_fixture():
         "independently_proven_bank_settlements": 0,
         "actual_freight_detection_accuracy": None,
         "realized_recovery_minor": 0,
-        "replay_hash": "c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213",
+        "replay_hash": "5e05a98f6c91a5dee5dcb9eb305e55438c694534d8f83cd83e2f372b36947eab",
         "publication_claim_approved": False,
     }
 
@@ -115,6 +114,8 @@ def _complete_public_report_fixture():
                       "2026-07": 103, "2026-08": 41, "2026-09": 0}),
     ("replay_hash", None),
     ("replay_hash", "forged"),
+    # Retired schema-1 witness did not bind every original input.
+    ("replay_hash", "c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213"),
     ("replay_hash", "A" * 64),
     ("publication_claim_approved", 0),
     ("unmatched_original_invoices", False),

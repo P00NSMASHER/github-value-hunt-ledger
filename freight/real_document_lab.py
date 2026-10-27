@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 import csv
 import hashlib
 import io
@@ -2010,8 +2010,6 @@ def survey_historical_adjudications() -> dict:
     }
 
 def blind_freight_assessment(freight: dict) -> dict:
-    from freight.rate_authority import AuthorityBook
-    from freight.rating_engine import REVIEW_REQUIRED
 
     # Lock decisions before reference comparison: no approved controlling
     # customer rates, bank settlements or independently complete truth labels.

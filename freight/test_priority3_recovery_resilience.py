@@ -8,17 +8,15 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from hashlib import sha256
-import json
 
 import pytest
 
-from freight.contracts import canonical_hash
 from freight.recovery_resilience import (
     CustomerRequest, FeasibilityAssumptions, RecoveryEvent, RecoveryScenario,
     evaluate_recovery_scenario,
 )
 from freight.settlement_store import (
-    ALLOCATED, REVERSED, RecoveryClaim, SettlementEventRecord,
+    RecoveryClaim, SettlementEventRecord,
     CounterEventRecord, SettlementStore,
 )
 

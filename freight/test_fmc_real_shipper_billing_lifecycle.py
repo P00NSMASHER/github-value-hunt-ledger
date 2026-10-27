@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 from freight.fmc_real_shipper_billing_lifecycle import (
-    ROOT, BRIDGEWELL, AWARD_GROUPS, HPL, RECEIPT_KEYS,
+    ROOT, AWARD_GROUPS, RECEIPT_KEYS,
     load_fixture, make_receipt, validate_fixture, verify_receipt
 )
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record

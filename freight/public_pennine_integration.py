@@ -32,10 +32,11 @@ SOURCES = {
     "2026-07": ("5920/277", "ecb986bd0e33cf402f7cb86ff68bc91368d18a5dfc39410e4e2019c045c3de15", 103),
     "2026-08": ("5941/277", "4153ccbbbe27307afddba1d6651bfd9db8a774cc84e4fd23d62b3a2d1059d796", 41),
 }
-# Independently replayed on both Windows and the hosted Linux acceptance runner.
+# Schema-2 witness replayed from all five unchanged byte-pinned source files.
+# See ENGINE_CLEANUP_2026-10-26.md for the exact schema-1/schema-2 differential.
 # Regression fingerprint of pinned source bytes through the current scoped
 # reconciliation kernel; never a bank authentication or customer truth proof.
-EXPECTED_CENSUS_REPLAY_SHA256 = "c599d67a0887fa84aacb4bc91af28d3b72dfbadf6a552bb64ee76947d45ff213"
+EXPECTED_CENSUS_REPLAY_SHA256 = "5e05a98f6c91a5dee5dcb9eb305e55438c694534d8f83cd83e2f372b36947eab"
 MAX_CSV_BYTES = 250_000
 AMOUNT_RE = re.compile(r"^-?(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)(?:\.[0-9]{1,2})?$")
 REQUIRED = ("supplier number", "invoice number", "invoice date", "invoice amount",

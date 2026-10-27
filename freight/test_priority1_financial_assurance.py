@@ -1,14 +1,12 @@
 """Priority 1 financial invariants: synthetic fixtures, no real bank/contract rights."""
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
-from datetime import datetime, timezone
 from hashlib import sha256
 import hmac
-import json
 
 import pytest
 
-from freight.canonical_schema import ChargeLine, InvoiceAdjustment, build_record, verify_record
+from freight.canonical_schema import verify_record
 from freight.financial_assurance import (
     SourceAttestation, FeeTerms, quote_contingent_fee, parse_major_exact,
     require_exact_cents, require_cent_currency, receipt_message, verify_source_attestation,
@@ -17,14 +15,14 @@ from freight.currency_reporting import (
     build_currency_settlement_report, assert_currency_report_current, render_currency_report,
 )
 from freight.payment_orchestration import (
-    PaymentOrchestrator, prepare_payment_instruction, authorize_payment, verify_payment_snapshot,
+    PaymentOrchestrator, prepare_payment_instruction, authorize_payment,
 )
 from freight.settlement_store import (
     ALLOCATED, REVERSED, ALREADY_ALLOCATED, SettlementStore, RecoveryClaim,
     SettlementEventRecord, CounterEventRecord,
 )
 from freight.financial_integrity import replay_financial_movements
-from freight.test_financial_integrity_r1 import adjusted, movement
+from freight.test_financial_integrity_r1 import adjusted
 
 
 def H(s):

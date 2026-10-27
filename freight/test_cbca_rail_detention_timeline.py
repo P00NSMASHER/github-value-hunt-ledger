@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 from freight.cbca_rail_detention_timeline import (
-    UP_ROWS, TQL_FACTS, UP_FACTS, RECEIPT_KEYS, ROOT_PINNED, ROW_FIELDS,
+    UP_ROWS, RECEIPT_KEYS, ROOT_PINNED, ROW_FIELDS,
     make_receipt, load_fixture, validate_fixture, verify_receipt,
 )
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record

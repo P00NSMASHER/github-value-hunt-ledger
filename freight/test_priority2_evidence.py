@@ -8,8 +8,7 @@ from hashlib import sha256
 
 import pytest
 
-from freight.canonical_schema import build_record, verify_record
-from freight.contracts import canonical_hash
+from freight.canonical_schema import build_record
 from freight.original_pdf_extraction import _extract_page, KNOWN_ORIGINALS, bind_independent_shipment
 from freight.priority2_evidence import (
     review_freight_rate, reconcile_invoice_evidence, witness_shipment_source,
@@ -22,7 +21,7 @@ from freight.sealed_real_accuracy import (
     ModelCall, TruthCall, PredictionSeal, TruthSeal, score_sealed_freight,
     prediction_seal_hash, truth_seal_hash,
 )
-from freight.test_phase0_recoveryos import ltl_record, ltl_authority
+from freight.test_phase0_recoveryos import ltl_record
 from recoveryworks.reconciliation_kernel import ReconTxn
 
 

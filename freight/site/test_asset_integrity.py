@@ -1,5 +1,4 @@
 """The release must reject undersized/corrupt images before publication."""
-from pathlib import Path
 import unittest
 
 from freight.site.asset_integrity import (
