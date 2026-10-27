@@ -1542,6 +1542,141 @@ class FMC2015ISettlementBoundaryTests(unittest.TestCase):
                     self._assert_contract(altered)
 
 
+
+class NYCCatalogIdentityReconciliationTests(unittest.TestCase):
+    """Original NYC catalog IDs: reject restaurant-topic and unearned permit truth."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                          "nyc_dob_catalog_identity_reconciliation_candidate_v0.json"
+                          ).read_text(encoding="utf-8"))
+
+    def _assert_contract(self, data):
+        self.assertEqual(set(data), {
+            "schema_version", "pack_id", "evaluation_family", "asof_date",
+            "ownership", "publisher_sources", "source_identity_delta",
+            "rights_and_provenance", "cohort", "synthetic_negative_controls",
+            "acceptance",
+        })
+        self.assertEqual(data["schema_version"], "0.1.0")
+        self.assertEqual(data["pack_id"],
+                         "NYC_DOB_SOURCE_IDENTITY_MAIN_CANDIDATE_NEGATIVE_CONTROL_V0")
+        self.assertEqual(data["evaluation_family"],
+                         "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING")
+        owner = data["ownership"]
+        self.assertEqual(owner["canonical_repository"],
+                         "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(owner["protected_main_catalog_git_blob_sha1"],
+                         "3fd2c32284e27833ed90725c276af6d63a086190")
+        self.assertEqual(owner["candidate_catalog_git_blob_sha1"],
+                         "a52e50df2e273465d14ebda947fb3b3027acd6d3")
+        self.assertEqual(owner["existing_operational_writer_branch"],
+                         "research/retally-unified-data-lab")
+        self.assertFalse(owner["operational_writer_modified"])
+        self.assertFalse(owner["provider_or_host_rule_changed"])
+        roles = {
+            "43nn-pn8j": "RESTAURANT_INSPECTION_RESULTS_NOT_DOB",
+            "w9ak-ipjd": "DOB_NOW_JOB_APPLICATION_FILINGS_NOT_ISSUED_PERMITS",
+            "rbx6-tga4": "DOB_NOW_APPROVED_PERMITS_EXCLUDES_ELECTRICAL_ELEVATOR_LAA",
+            "ipu4-2q9a": "DOB_BIS_PERMIT_ISSUANCE_NOT_DOB_NOW",
+        }
+        sources = data["publisher_sources"]
+        self.assertEqual(len(sources), 4)
+        self.assertEqual({row["id"] for row in sources}, set(roles))
+        for row in sources:
+            self.assertEqual(set(row), {
+                "id", "publisher", "role", "url", "source_updated_on",
+                "original_http_bytes_custodied", "original_http_sha256",
+                "dataset_specific_commercial_reuse_verified",
+            })
+            self.assertEqual(row["url"],
+                             "https://data.cityofnewyork.us/d/" + row["id"])
+            self.assertEqual(row["role"], roles[row["id"]])
+            self.assertFalse(row["original_http_bytes_custodied"])
+            self.assertIsNone(row["original_http_sha256"])
+            self.assertFalse(row["dataset_specific_commercial_reuse_verified"])
+        delta = data["source_identity_delta"]
+        self.assertEqual(delta["main_only_wrong_topic_dataset_id"], "43nn-pn8j")
+        self.assertTrue(delta["candidate_excludes_wrong_topic"])
+        self.assertEqual(delta["correct_dob_now_approved_permit_id"], "rbx6-tga4")
+        self.assertEqual(delta["correct_historical_bis_issuance_id"], "ipu4-2q9a")
+        self.assertEqual(delta["job_application_filing_id_not_issuance"], "w9ak-ipjd")
+        self.assertTrue(delta["main_metadata_locator_is_not_live_customer_error_proof"])
+        self.assertNotIn("https://data.cityofnewyork.us/d/43nn-pn8j",
+                         SEEDS["permitplate"])
+        self.assertIn("https://data.cityofnewyork.us/d/rbx6-tga4",
+                      SEEDS["permitplate"])
+        self.assertIn("https://data.cityofnewyork.us/d/ipu4-2q9a",
+                      SEEDS["permitplate"])
+        self.assertIn("https://data.cityofnewyork.us/d/w9ak-ipjd",
+                      SEEDS["permitplate"])
+        rights = data["rights_and_provenance"]
+        self.assertTrue(rights["public_municipal_catalog_metadata_only"])
+        self.assertFalse(rights["source_specific_commercial_reuse_authorized"])
+        self.assertFalse(rights["original_publisher_http_bytes_acquired"])
+        self.assertIsNone(rights["original_publisher_http_sha256"])
+        self.assertEqual(rights["commercial_engine_admission"], "HOLD")
+        self.assertEqual(rights["raw_customer_or_original_permit_rows_stored"], 0)
+        self.assertTrue(rights["source_citations_not_original_response_byte_custody"])
+        cohort = data["cohort"]
+        for key in ("independently_held_out_issued_permit_labels",
+                    "independent_current_validity_labels",
+                    "independent_commercial_buyer_labels",
+                    "source_row_count_acquired",
+                    "verified_retally_customer_cash_cents"):
+            self.assertEqual(cohort[key], 0)
+        self.assertEqual(cohort["permit_scoring_precision_recall"], "UNKNOWN")
+        self.assertEqual(cohort["buyer_demand"], "UNKNOWN")
+        controls = data["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 3)
+        self.assertEqual({row["id"] for row in controls}, {
+            "SYNTH_RESTAURANT_INSPECTION_ID_PROMOTED_TO_DOB_PERMIT",
+            "SYNTH_JOB_APPLICATION_FILINGS_PROMOTED_TO_ISSUED_PERMITS",
+            "SYNTH_DOB_APPROVED_PERMITS_ROWS_PROMOTED_TO_ACTIVE_BUYER_LEADS",
+        })
+        self.assertEqual({row["expected"] for row in controls}, {
+            "REJECT_WRONG_TOPIC", "REJECT_APPLICATION_NOT_PERMIT_ISSUANCE",
+            "UNKNOWN_CURRENT_VALIDITY_AND_BUYER_DEMAND",
+        })
+        self.assertTrue(all(set(x) == {"id", "kind", "input_dataset_id", "expected"}
+                            and x["kind"] == "SYNTHETIC" for x in controls))
+        acceptance = data["acceptance"]
+        self.assertTrue(acceptance["existing_unified_lab_fixture_only"])
+        for key in ("original_source_byte_hash_verified", "independent_qa_complete",
+                    "original_row_level_labels_collected",
+                    "operational_main_source_catalog_corrected", "release_eligible"):
+            self.assertFalse(acceptance[key])
+        self.assertEqual(acceptance["owner_lane"], ":48")
+        self.assertEqual(acceptance["independent_qa_lane"], ":44")
+
+    def test_official_nyc_catalog_identities_held_not_scored(self):
+        self._assert_contract(self._pack())
+
+    def test_no_unverified_catalog_promotion_or_fake_provenance(self):
+        original = self._pack()
+        self._assert_contract(original)
+        mutations = (
+            ("publisher_sources", 0, "role", "DOB_ISSUED_PERMITS"),
+            ("publisher_sources", 1, "role", "DOB_ISSUED_PERMITS"),
+            ("publisher_sources", 2, "original_http_bytes_custodied", True),
+            ("publisher_sources", 2, "original_http_sha256", "not-a-source-hash"),
+            ("rights_and_provenance", None, "source_specific_commercial_reuse_authorized", True),
+            ("cohort", None, "independently_held_out_issued_permit_labels", 1),
+            ("cohort", None, "buyer_demand", "VERIFIED"),
+            ("acceptance", None, "operational_main_source_catalog_corrected", True),
+            ("acceptance", None, "independent_qa_complete", True),
+            ("synthetic_negative_controls", 0, "kind", "ORIGINAL"),
+        )
+        for section, index, key, fake in mutations:
+            with self.subTest(section=section, field=key):
+                modified = json.loads(json.dumps(original))
+                target = modified[section][index] if index is not None else modified[section]
+                target[key] = fake
+                with self.assertRaises(AssertionError):
+                    self._assert_contract(modified)
+
+
 def load_tests(loader, tests, pattern):
     """Include held GAO supersession regressions in the existing unified CI suite."""
     from freight import test_gao_b215958_supersession
