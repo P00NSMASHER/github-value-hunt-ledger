@@ -33,6 +33,11 @@
       "id": "FMC_2015(I)",
       "initial_decision": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
       "status": "BILATERAL_SETTLEMENT_APPROVED_AND_FINAL_UNPAID_DEBT_CANCELLED_AND_PREVIOUSLY_PAID_REFUND_CLAIMS_WAIVED_NO_NEW_CASH"
+    },
+    {
+      "id": "FMC_2036(I)",
+      "initial_decision": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+      "status": "FMC_INITIAL_PAID_INVOICE_CONTENT_AND_LATE_FEES_VIOLATIONS;_INITIAL_ORDER_NOT_VERIFIED_FINAL;_REFUND_BANK_UNVERIFIED"
     }
   ],
   "hpl_claimed_amended_quote_cents": 5420000,
@@ -44,6 +49,18 @@
   "hpl_initial_decision_tariff_publication_violation": true,
   "hpl_initial_quote_cents": 4320000,
   "hpl_invoice_vs_quote_difference_cents": 2360000,
+  "jimex_appendix_b_paid_detention_cents": 197500,
+  "jimex_appendix_b_paid_invoice_count": 5,
+  "jimex_current_customer_scoring_authorized": false,
+  "jimex_exact_interest_cents": null,
+  "jimex_initial_claim_requested_cents": 4460669,
+  "jimex_initial_decision_finality_verified": false,
+  "jimex_initial_detention_refund_cents": 197500,
+  "jimex_initial_late_fee_reparations_cents": 999707,
+  "jimex_initial_principal_NOT_actual_cash_received_cents": 1197207,
+  "jimex_later_bank_cleared_refund_cents": null,
+  "jimex_original_paid_invoice_ids_authored_digest_NOT_source_bytes": "3baec7b770c77e1a5d54af890667ab50aab3349b1c10dc9ef630e05effb6067b",
+  "jimex_unrelated_carrier_exhibits_must_not_join": true,
   "leader_actual_carrier_ledger_cancellation_verified": false,
   "leader_admin_final_notice_date": "2024-12-10",
   "leader_both_signatures_described_by_FMC_not_original_in_custody": true,
@@ -64,9 +81,9 @@
   "modern_retally_invoice_accuracy_labels": 0,
   "original_fmc_pdf_bytes_and_private_invoices_held": false,
   "original_official_pdf_sha256": null,
-  "receipt_sha256": "a014acd73976042142ba596d299d40feb5f846f667dbd04def4bf2dd83f280ac",
+  "receipt_sha256": "765e1f5ec8228cdb1e75db75ee81c8d64e99eb7b385b78506d383c2fcaa3887d",
   "retally_recovered_cash_cents": 0,
   "schema_version": 1,
   "scope": "FMC_THIRD_PARTY_ADJUDICATED_REAL_SHIPPER_CHARGES_NOT_RETALLY_CUSTOMERS_OR_ORIGINAL_BANK_CUSTODY",
-  "source_authored_fixture_SHA256_NOT_FMC_pdf_hash": "c98b0faaa80509d04c3aece21adc07024578192da78bf5806bef954d70661b67"
+  "source_authored_fixture_SHA256_NOT_FMC_pdf_hash": "b132e5a96c28e2293093c9bbffb7925ce8dc2913318157bc61189dd39022b319"
 }

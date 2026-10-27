@@ -5370,6 +5370,22 @@
         "freightrecovery"
       ],
       "first_seen": "2026-10-27",
+      "id": "6c7e238a942c7bce6a883cade9ebcb0a3dec4e77dd40c2c89d9e04ee3e96657e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-27",
       "id": "6cad8a06cffeecfd9d2c4fce49fc5927f19e33368e10f868974140454b1ee208",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -11211,6 +11227,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-27",
+      "id": "e69b94cb68ab4e5255605c499d4d3cbe1589976347c005378d2bedc7777f7809",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -12617,6 +12649,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "2e8fe273092346208803259ef7d535c38e6df1184ac96c90d3a9c68d418efe3a",
+  "entries_sha256": "3fe0bb2ae844941855e10a0126139f4fe2486f0654977e89f5a13793b2719445",
   "schema_version": 1
 }

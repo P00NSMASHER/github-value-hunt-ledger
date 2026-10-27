@@ -182,6 +182,31 @@
       "first_seen": "2026-10-27",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "6c7e238a942c7bce6a883cade9ebcb0a3dec4e77dd40c2c89d9e04ee3e96657e",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www2.fmc.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-27",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "6cad8a06cffeecfd9d2c4fce49fc5927f19e33368e10f868974140454b1ee208",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -223,6 +248,31 @@
       "source_document_ingested": false,
       "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
       "source_url": "https://www.gao.gov/products/b-121220-0",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-27",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "e69b94cb68ab4e5255605c499d4d3cbe1589976347c005378d2bedc7777f7809",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "www2.fmc.gov",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "POTENTIAL_HISTORICAL_DECISION_REFERENCE",
+      "source_url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
     },
     {
@@ -6234,7 +6284,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "fa24927c6eb80844e4ea3b7681a7ee921cc16e1d30f513c7684b2ef161622f59",
+  "feed_sha256": "917e7b09d3a404e2007803d25e4717a16f7071d89f9009a0674e02abb7d0d8b4",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -6246,12 +6296,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 249,
-  "source_pointers_total": 249,
+  "selected_for_synthetic_proof_gate": 251,
+  "source_pointers_total": 251,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
     "lab15_evidence_metadata_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4f7543e5d3edaa8cb038bf8",
-    "unified_entries_sha256": "2e8fe273092346208803259ef7d535c38e6df1184ac96c90d3a9c68d418efe3a"
+    "unified_entries_sha256": "3fe0bb2ae844941855e10a0126139f4fe2486f0654977e89f5a13793b2719445"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 11,
   "verified_recovered_cash_cents": 0
