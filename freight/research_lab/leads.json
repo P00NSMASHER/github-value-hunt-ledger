@@ -5369,6 +5369,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-27",
+      "id": "6cad8a06cffeecfd9d2c4fce49fc5927f19e33368e10f868974140454b1ee208",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "6ccd6d5244cfb3966abb07f7b1b8f24b5d1c0bf73eba6f632bbc3b6f6c48b8a1",
       "independent_ground_truth": false,
@@ -9916,6 +9932,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-27",
+      "id": "ce315e2e3f53da1a53eca7237667ebd6b11ee1fd740e82b34a13f115c9c7c7d2",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www.gao.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www.gao.gov/products/b-121220-0"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "ce990187b769edf2c4ef7368343b6dc8060bb321312f1bcd0bcce27b611b25f2",
       "independent_ground_truth": false,
@@ -12203,6 +12235,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-27",
+      "id": "f74d1c8b585a2e48a6b4ac47cfdd800b67ee8d4b5588b7ed2a2e93c0f1b14fbb",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "www2.fmc.gov",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -12569,6 +12617,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "e327ab5af0493028a5672cff56d68f94ed08f59b760736b84bd24887c383a150",
+  "entries_sha256": "2e8fe273092346208803259ef7d535c38e6df1184ac96c90d3a9c68d418efe3a",
   "schema_version": 1
 }
