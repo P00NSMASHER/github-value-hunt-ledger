@@ -766,6 +766,28 @@ class UnifiedResearchLabTests(unittest.TestCase):
 class FMCIndexOnlySourceCandidateTests(unittest.TestCase):
     """Original publisher indexed case is a held, not score-admitted source."""
 
+    def test_current_main_fmc_shipper_lifecycle_seeds_keep_truth_boundary(self):
+        # Existing protected-main original publisher locators, not new customer evidence.
+        sources = (
+            "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",
+            "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+            "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",
+        )
+        self.assertEqual(len(set(sources)), 3)
+        for url in sources:
+            self.assertIn(url, SEEDS["freightrecovery"])
+            self.assertEqual(safe_url(url), url)
+            ledger, added = merge_sources(
+                ledger_from([]), "freightrecovery", [url, url], "2026-10-26"
+            )
+            self.assertEqual(added, 1)
+            self.assertEqual(len(ledger["entries"]), 1)
+            recorded = ledger["entries"][0]
+            self.assertFalse(recorded["commercial_reuse_authorized"])
+            self.assertFalse(recorded["independent_ground_truth"])
+            self.assertFalse(recorded["independent_payment_verified"])
+            self.assertFalse(recorded["recovered_cash_verified"])
+
     def test_final_commission_interest_supersedes_preliminary_denial(self):
         path = Path(__file__).with_name("fixtures") / "fmc_22fmc94_girton_index_candidate_v0.json"
         item = json.loads(path.read_text(encoding="utf-8"))
