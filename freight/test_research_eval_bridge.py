@@ -44,7 +44,7 @@ def sample():
                            [GAO, SEC, "https://catalog.data.gov/dataset/freight-invoice-example"],
                            "2026-10-22")
     doc, _ = merge_sources(doc, "permitplate",
-                           ["https://data.cityofnewyork.us/d/43nn-pn8j"],
+                           ["https://data.cityofnewyork.us/d/rbx6-tga4"],
                            "2026-10-22")
     legacy = legacy_evidence([
         evidence_record(GAO, "GAO_DECISION", "2026-10-17T00:00:00Z"),
@@ -324,6 +324,30 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
         feed = build_feed(doc, evidence, candidates, load_manifest())
         self.assertTrue(all("data.cityofnewyork.us" not in c["source_url"]
                             for c in feed["candidate_sources"]))
+
+    def test_sample_permitplate_source_is_dob_issued_permits_not_other_catalogs(self):
+        """SYNTHETIC metadata sample must not launder wrong-topic source identities."""
+        doc, _, _ = sample()
+        permit_urls = {row["url"] for row in doc["entries"]
+                       if "permitplate" in row["engines"]}
+        identity = json.loads(
+            (Path(__file__).with_name("fixtures")
+             / "nyc_dob_catalog_identity_reconciliation_candidate_v0.json")
+            .read_text(encoding="utf-8")
+        )["source_identity_delta"]
+        self.assertEqual(
+            permit_urls,
+            {"https://data.cityofnewyork.us/d/"
+             + identity["correct_dob_now_approved_permit_id"]},
+        )
+        self.assertNotIn(
+            "https://data.cityofnewyork.us/d/"
+            + identity["main_only_wrong_topic_dataset_id"], permit_urls,
+        )
+        self.assertNotIn(
+            "https://data.cityofnewyork.us/d/"
+            + identity["job_application_filing_id_not_issuance"], permit_urls,
+        )
 
     def test_source_probe_uses_native_engine_but_has_no_original_invoice(self):
         case = synthetic_proof_gate(digest(GAO))
