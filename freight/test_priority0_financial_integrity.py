@@ -3,9 +3,8 @@
 All amounts, parties, events and authorities are explicitly synthetic.
 These tests cannot authorize an actual financial transaction or a release.
 """
-from dataclasses import asdict, replace
+from dataclasses import replace
 from hashlib import sha256
-from math import inf, nan
 import unittest
 
 from freight.payment_orchestration import (

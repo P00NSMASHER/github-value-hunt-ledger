@@ -8,7 +8,6 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from hashlib import sha256
-from pathlib import Path
 from threading import Barrier
 import json
 import sqlite3

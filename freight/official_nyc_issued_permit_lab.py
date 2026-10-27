@@ -8,7 +8,6 @@ only source-level counts and SHA-256 receipts enter the research branch.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 from collections import Counter

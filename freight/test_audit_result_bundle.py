@@ -1,6 +1,5 @@
 import json
 import zipfile
-from dataclasses import replace
 
 import pytest
 

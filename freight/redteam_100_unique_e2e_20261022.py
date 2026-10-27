@@ -8,7 +8,7 @@ rehearsal are simulated in-memory and *not commercially valid*.
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -20,7 +20,6 @@ import os
 import random
 import subprocess
 import sys
-import traceback
 import zipfile
 
 from freight import synthetic_rehearsal as rehearsal

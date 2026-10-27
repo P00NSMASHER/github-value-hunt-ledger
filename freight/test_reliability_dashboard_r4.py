@@ -1,5 +1,4 @@
 """R4 property and performance checks; never use private billing data."""
-from dataclasses import replace
 from random import Random
 
 import pytest

@@ -14,7 +14,7 @@ from freight.rate_authority import AuthorityBook
 from freight.rating_engine import REVIEW_REQUIRED, rate_record
 from freight.priority2_evidence import review_freight_rate
 from freight.gao_adjudicated_billing_cases import (
-    EvidenceError, FIXTURE, LABEL_NEG, LABEL_POS, PINNED,
+    EvidenceError, LABEL_NEG, LABEL_POS, PINNED,
     canonical_digest, load_fixture, make_receipt, validate_fixture,
     verify_receipt,
 )

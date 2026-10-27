@@ -76,7 +76,7 @@ def verify_email_handoff(browser, base: str) -> list[dict]:
     Synthetic values are confined to the isolated browser; the QA receipt saves
     only boolean assertions, not test addresses, references or request bodies.
     """
-    from urllib.parse import parse_qs, urlparse
+    from urllib.parse import parse_qs
 
     campaign = ("utm_source=facebook&utm_medium=organic_social&"
                 "utm_campaign=retally_oct2026_launch&"

@@ -205,7 +205,7 @@ class OriginalUSAspendingAwardReadbackTests(unittest.TestCase):
             self.assertEqual(first["sample_contract_awards"], 3)
             self.assertEqual(len(tracked), 3)
             original_bytes = dest.read_bytes()
-            again = run(ledger_path=source, output=dest,
+            run(ledger_path=source, output=dest,
                         fetcher=provider, as_of=NOW)
             self.assertEqual(original_bytes, dest.read_bytes())
             self.assertEqual(len(tracked), 3)
@@ -384,7 +384,6 @@ class OriginalUSAspendingAwardReadbackTests(unittest.TestCase):
                 validate_receipt(tampered,ledger(),NOW)
 
     def test_documented_detail_get_is_strict_fixed_origin_read_only_and_bounded(self):
-        from urllib.error import HTTPError
         for bad in (0,-1,1.1,"123","1 OR 1=1",10**17):
             with self.subTest(bad=bad),self.assertRaisesRegex(
                     ResearchError,"UNSAFE_PUBLISHER_DETAIL_ID"):

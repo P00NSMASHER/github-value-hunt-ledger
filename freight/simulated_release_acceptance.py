@@ -6,7 +6,6 @@ plausible-looking source strings cannot promote customer/recovery release.
 """
 from __future__ import annotations
 
-from dataclasses import asdict
 from hashlib import sha256
 import json
 
