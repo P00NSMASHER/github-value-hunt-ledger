@@ -131,7 +131,7 @@
       "published_on": "2009-10-29",
       "reported_amount_cents": 13735675,
       "publisher_outcome_scope": "TWELVE_RAIL_BOL_DEDUCTIONS_REVERSED_AS_UNTIMELY_NOT_VERIFIED_CARRIER_REFUND",
-      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_VISUAL_UNAVAILABLE_2026_10_27",
+      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_WEB_RENDER_VISUAL_PAGES_3_7_8_2026_10_27",
       "reported_amount_semantics": "ACTUAL_TREASURY_DEDUCTIONS_REPORTED_IN_DECISION_NOT_VALIDATED_OVERCHARGE_OR_REFUND",
       "original_publisher_response_bytes_acquired": false,
       "original_publisher_response_sha256": null,
@@ -156,7 +156,7 @@
         "underlying_rate_overcharge_merits_adjudicated": false,
         "carrier_refund_received_independently_verified": false,
         "original_twelve_bols_tariffs_or_bank_receipts_acquired": false,
-        "original_pdf_pages_visually_verified": [],
+        "original_pdf_pages_visually_verified": [3, 7, 8],
         "decision_reported_bol_rows": [
           {
             "bol_reference": "W45QQ90009822",

@@ -127,7 +127,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
         # original BOL custody or independently held-out customer truth.
         u = pack["sources"][4]
         self.assertEqual(u["source_review_status"],
-                         "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_VISUAL_UNAVAILABLE_2026_10_27")
+                         "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_WEB_RENDER_VISUAL_PAGES_3_7_8_2026_10_27")
         self.assertEqual(u["reported_amount_semantics"],
                          "ACTUAL_TREASURY_DEDUCTIONS_REPORTED_IN_DECISION_NOT_VALIDATED_OVERCHARGE_OR_REFUND")
         e = u["decision_evidence"]
@@ -154,7 +154,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
         self.assertIs(e["underlying_rate_overcharge_merits_adjudicated"], False)
         self.assertIs(e["carrier_refund_received_independently_verified"], False)
         self.assertIs(e["original_twelve_bols_tariffs_or_bank_receipts_acquired"], False)
-        self.assertEqual(e["original_pdf_pages_visually_verified"], [])
+        self.assertEqual(e["original_pdf_pages_visually_verified"], [3, 7, 8])
         expected_bols = [
             ("W45QQ90009822", 1793654, "2005-01-20", 1793654, "2008-06-16"),
             ("W45QQ90009825", 1314805, "2005-01-20", 1314805, "2008-06-16"),
@@ -306,7 +306,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
             ("underlying_rate_overcharge_merits_adjudicated", True),
             ("carrier_refund_received_independently_verified", True),
             ("original_twelve_bols_tariffs_or_bank_receipts_acquired", True),
-            ("original_pdf_pages_visually_verified", [1, 3, 8]),
+            ("original_pdf_pages_visually_verified", list(range(1, 9))),
         )
         for key, forged in changes:
             bad = json.loads(json.dumps(baseline))
