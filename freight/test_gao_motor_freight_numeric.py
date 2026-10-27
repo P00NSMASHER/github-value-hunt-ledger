@@ -294,6 +294,40 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
 
 
 
+    def test_b143458_tariff_sources_stay_transcriptions_not_original_tariffs(self):
+        """The GAO decision names tariffs; it does not supply tariff pages/dates."""
+        item = json.loads((FIXTURE.parent / "gao_b143458_capacity_v1.json").read_text())
+        source, facts, truth = (item["source"], item["historical_facts"],
+                                item["truth_boundaries"])
+        self.assertEqual(source["publisher_html_text_crosschecked_on"], "2026-10-27")
+        self.assertFalse(source["original_publisher_bytes_acquired"])
+        self.assertIsNone(source["original_publisher_bytes_sha256"])
+        self.assertFalse(source["original_historical_tariff_pages_acquired"])
+        self.assertIsNone(source["original_historical_tariff_pages_sha256"])
+        self.assertFalse(truth["original_governing_tariff_pages_held"])
+        self.assertFalse(truth["customer_accuracy_scoring_permitted"])
+        self.assertEqual(facts["publisher_cited_tariff_references"], [
+            "MIDDLE_ATLANTIC_CONFERENCE_FREIGHT_TARIFF_5_F_MF_ICC_A_845",
+            "MIDDLE_ATLANTIC_CONFERENCE_MASTER_TARIFF_18_MF_ICC_A_830_SUPPLEMENT_1_LINE_C",
+            "MIDDLE_ATLANTIC_CONFERENCE_EXCEPTIONS_TARIFF_10_M_MF_ICC_A_870_RULE_25_D",
+            "MIDDLE_ATLANTIC_CONFERENCE_EXCEPTIONS_TARIFF_10_M_RULE_62_2",
+            "NATIONAL_MOTOR_FREIGHT_CLASSIFICATION_A_4_MF_ICC_1_RULE_13_SECTION_2_D",
+        ])
+        self.assertIsNone(facts["publisher_cited_tariff_publication_effective_dates"])
+        for section, field, forged in (
+            ("source", "original_publisher_bytes_acquired", True),
+            ("source", "original_historical_tariff_pages_acquired", True),
+            ("source", "original_historical_tariff_pages_sha256", "forged"),
+            ("historical_facts", "publisher_cited_tariff_publication_effective_dates", "1961-03-30"),
+            ("truth_boundaries", "customer_accuracy_scoring_permitted", True),
+        ):
+            poisoned = copy.deepcopy(item)
+            poisoned[section][field] = forged
+            with self.subTest(section=section, field=field):
+                self.assertNotEqual(poisoned[section][field], item[section][field])
+                self.assertNotEqual(digest(poisoned), digest(item))
+
+
     def test_b145308_real_gao_deduction_is_not_requested_refund_or_retally_cash(self):
         """Pin 1961 decision-only evidence: paid, deducted, requested are distinct."""
         item = json.loads((FIXTURE.parent / "gao_b145308_deduction_v1.json").read_text())
