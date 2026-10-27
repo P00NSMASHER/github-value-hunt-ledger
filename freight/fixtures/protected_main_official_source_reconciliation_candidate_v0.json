@@ -23,7 +23,7 @@
   },
   "cohort": {
     "main_only_official_pointer_count": 6,
-    "primary_original_text_or_first_page_checked_this_run": 3,
+    "primary_original_text_or_first_page_checked_this_run": 4,
     "first_party_pdf_full_source_byte_replay_complete": false,
     "independent_held_out_invoice_labels": 0,
     "shipment_level_reliable_error_truth_labels": 0,
@@ -75,10 +75,10 @@
       "url": "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",
       "publisher": "CBCA",
       "published_on": "2020-08-06",
-      "reported_amount_cents": null,
-      "publisher_outcome_scope": "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING",
-      "source_review_status": "INHERITED_MAIN_SEED_NOT_REPLAYED",
-      "reported_amount_semantics": "UNKNOWN",
+      "reported_amount_cents": 1554908,
+      "publisher_outcome_scope": "CARRIER_PAID_GSA_SEVEN_NOTICES_CLAIM_GRANTED_REFUND_UNVERIFIED",
+      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_3_6_VISUAL_2026_10_27",
+      "reported_amount_semantics": "CARRIER_PAID_GSA_DISPUTED_NOTICES_NOT_VERIFIED_REFUND_RECEIVED",
       "original_publisher_response_bytes_acquired": false,
       "original_publisher_response_sha256": null,
       "original_invoice_tariff_bank_receipt_custody": false,
@@ -87,7 +87,23 @@
       "actual_customer_invoice_error_label": "UNKNOWN",
       "independent_actual_settlement_cash_receipt_verified": false,
       "verified_retally_customer_recovery_cents": 0,
-      "historical_tariff_effective_date": null
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 6,
+        "visually_reviewed_pages_one_based": [
+          1,
+          3,
+          6
+        ],
+        "shipment_year": 2014,
+        "government_notices_total": 115,
+        "appealed_notices": 7,
+        "other_notices_disposition": "UNKNOWN",
+        "carrier_paid_gsa_disputed_notices_cents": 1554908,
+        "board_disposition": "AARE_CLAIM_GRANTED_GSA_OVERCHARGE_PREMISE_REJECTED",
+        "carrier_refund_received_independently_verified": false,
+        "underlying_original_tenders_gbls_or_bank_receipts_acquired": false
+      }
     },
     {
       "id": "CBCA_8051_RATE_2024",
@@ -180,6 +196,12 @@
     },
     {
       "id": "SYNTH_PAID_GOVERNMENT_SETTLEMENT_CALLED_RETALLY_RECOVERY",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_AARE_CLAIM_GRANTED_CALLED_REFUND_RECEIVED",
       "kind": "SYNTHETIC",
       "actual_independent_customer_outcome": null,
       "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
