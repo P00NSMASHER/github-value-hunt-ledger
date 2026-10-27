@@ -434,6 +434,30 @@
     "provider_host_policy_change_authorized": false,
     "independent_qa_complete": false,
     "actual_current_main_integration_green": false,
-    "release_authorized": false
+    "release_authorized": false,
+    "protected_main_source_set_continuity_20261027": {
+      "observed_main_head": "ff4edaa6540d02cdddb4c04ef6ce224a434a3f8b",
+      "main_catalog_git_blob_sha1": "3fd2c32284e27833ed90725c276af6d63a086190",
+      "draft_head_before_snapshot": "49609760a7e2dd83d7686e5ae7852597639472a1",
+      "draft_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+      "original_main_only_seed_url_count": 9,
+      "original_official_freight_pointers_retained_as_held_metadata": 8,
+      "retained_in_six_source_manifest": 6,
+      "retained_in_fmc_2015i_pair_manifest": 2,
+      "excluded_nyc_restaurant_wrong_topic_count": 1,
+      "excluded_nyc_dataset_id": "43nn-pn8j",
+      "original_publisher_response_sha256": null,
+      "original_source_bytes_acquired": false,
+      "source_specific_commercial_use_admitted": false,
+      "independently_held_out_customer_truth_labels": 0,
+      "provider_host_or_rule_modified": false,
+      "executable_main_to_draft_source_merge_complete": false,
+      "protected_main_integration_verified": false,
+      "legacy_labs_consolidated": false,
+      "classification": "STATIC_PINNED_SEED_DIFF_EIGHT_HELD_ONE_EXCLUDED_NOT_ORIGINAL_SOURCE_BYTE_CUSTODY",
+      "cohort": "PROTECTED_MAIN_VS_DRAFT_SEED_IDENTITY_2026_10_27",
+      "owner_lane": "UNIFIED_RESEARCH_LAB",
+      "independent_qa_lane": ":44"
+    }
   }
 }
