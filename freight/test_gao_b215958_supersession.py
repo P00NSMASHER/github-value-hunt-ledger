@@ -18,7 +18,7 @@ class GAOB215958SupersessionTests(unittest.TestCase):
     def assert_contract(self, x):
         self.assertEqual(set(x), {"schema_version","evaluation_family","engines",
             "provenance","sources","decision_facts","rights","cohort",
-            "synthetic_negative_controls","acceptance"})
+            "synthetic_negative_controls","publisher_original_document","acceptance"})
         self.assertEqual(x["schema_version"],"0.1.0")
         self.assertEqual(x["evaluation_family"],
                          "GAO_FREIGHT_SUPERSEDED_DECISION_PAIR_HISTORICAL_NEGATIVE_CONTROL")
@@ -83,11 +83,56 @@ class GAOB215958SupersessionTests(unittest.TestCase):
             self.assertTrue(c["id"].startswith("SYNTH_B215958_"))
             self.assertEqual(c["kind"],"SYNTHETIC")
             self.assertIsNone(c["real_customer_ground_truth"])
+        q=x["publisher_original_document"]
+        self.assertEqual(set(q),{"publisher","original_1984_decision_pdf_url",
+            "publisher_pdf_page_count","visually_verified_pdf_pages_1_based",
+            "visual_inspection_date","publisher_pdf_response_bytes_acquired",
+            "publisher_pdf_response_sha256","publisher_pdf_custody_for_replay",
+            "decision_text_tariff_citation","decision_reported_tariff_issued_date",
+            "decision_reported_tariff_amended_date","underlying_original_tariff_pages_acquired",
+            "actual_tariff_effective_dates_independently_verified","evidence_tier"})
+        self.assertEqual(q["publisher"],"U.S. Government Accountability Office")
+        self.assertEqual(q["original_1984_decision_pdf_url"],
+                         "https://www.gao.gov/assets/b-215958-125766.pdf")
+        self.assertEqual(q["publisher_pdf_page_count"],3)
+        self.assertEqual(q["visually_verified_pdf_pages_1_based"],[1,3])
+        self.assertEqual(q["visual_inspection_date"],"2026-10-27")
+        self.assertEqual(q["decision_text_tariff_citation"],
+                         "NASI Rules Tariff 190-A, item 470")
+        self.assertEqual(q["decision_reported_tariff_issued_date"],"1981-10-01")
+        self.assertEqual(q["decision_reported_tariff_amended_date"],"1982-02-11")
+        for k in ("publisher_pdf_response_bytes_acquired",
+                  "publisher_pdf_custody_for_replay",
+                  "underlying_original_tariff_pages_acquired",
+                  "actual_tariff_effective_dates_independently_verified"):
+            self.assertIs(q[k],False)
+        self.assertIsNone(q["publisher_pdf_response_sha256"])
+        self.assertEqual(q["evidence_tier"],
+            "OFFICIAL_PDF_RENDER_VISUAL_CHECK_NOT_RAW_BYTES_OR_ORIGINAL_TARIFF_CUSTODY")
         a=x["acceptance"]
         self.assertIs(a["source_pointers_already_in_existing_candidate"],True)
         for k in ("independent_qa_passed","guarded_release_authorized",
                   "production_code_changed"):
             self.assertIs(a[k],False)
+
+    def test_primary_pdf_pointer_and_tariff_scope_reject_provenance_forgery(self):
+        original=self.read()
+        self.assert_contract(original)
+        attacks={
+            "original_1984_decision_pdf_url":"https://unverified.example.invalid/fake.pdf",
+            "publisher_pdf_response_bytes_acquired":True,
+            "publisher_pdf_response_sha256":"0"*64,
+            "publisher_pdf_custody_for_replay":True,
+            "decision_reported_tariff_issued_date":"2026-10-27",
+            "decision_reported_tariff_amended_date":"2026-10-27",
+            "underlying_original_tariff_pages_acquired":True,
+            "actual_tariff_effective_dates_independently_verified":True,
+        }
+        for k,v in attacks.items():
+            mutated=copy.deepcopy(original)
+            mutated["publisher_original_document"][k]=v
+            with self.subTest(key=k),self.assertRaises(AssertionError):
+                self.assert_contract(mutated)
 
     def test_real_publisher_refs_already_preserved_without_new_seeds(self):
         self.assert_contract(self.read())

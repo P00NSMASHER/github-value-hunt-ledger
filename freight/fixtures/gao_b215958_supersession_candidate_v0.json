@@ -14,6 +14,25 @@
     "provider_allowlist_changed": false,
     "original_publisher_byte_hash_verified": false
   },
+  "publisher_original_document": {
+    "publisher": "U.S. Government Accountability Office",
+    "original_1984_decision_pdf_url": "https://www.gao.gov/assets/b-215958-125766.pdf",
+    "publisher_pdf_page_count": 3,
+    "visually_verified_pdf_pages_1_based": [
+      1,
+      3
+    ],
+    "visual_inspection_date": "2026-10-27",
+    "publisher_pdf_response_bytes_acquired": false,
+    "publisher_pdf_response_sha256": null,
+    "publisher_pdf_custody_for_replay": false,
+    "decision_text_tariff_citation": "NASI Rules Tariff 190-A, item 470",
+    "decision_reported_tariff_issued_date": "1981-10-01",
+    "decision_reported_tariff_amended_date": "1982-02-11",
+    "underlying_original_tariff_pages_acquired": false,
+    "actual_tariff_effective_dates_independently_verified": false,
+    "evidence_tier": "OFFICIAL_PDF_RENDER_VISUAL_CHECK_NOT_RAW_BYTES_OR_ORIGINAL_TARIFF_CUSTODY"
+  },
   "sources": [
     {
       "id": "GAO_B215958_1984",
