@@ -1,5 +1,7 @@
 {
+  "bridgewell_actual_bank_receipt_cents": null,
   "bridgewell_award_components_not_invoice_count": 10,
+  "bridgewell_bank_receipt_confirmed": false,
   "bridgewell_civil_penalties_imposed_cents": null,
   "bridgewell_current_private_motor_freight_authority": false,
   "bridgewell_exact_received_cash_and_interest_unverified": true,
@@ -8,6 +10,10 @@
   "bridgewell_final_principal_cents": 2432880,
   "bridgewell_initial_claim_cents": 4378000,
   "bridgewell_later_payment_reported_NOT_verified_bank_receipt": true,
+  "bridgewell_official_order_late_days": 223,
+  "bridgewell_official_order_payment_made_index_excerpt_date": "2026-08-31",
+  "bridgewell_original_enforcement_order_pdf_in_custody": false,
+  "bridgewell_payment_evidence_tier": "OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED",
   "bridgewell_reported_late_customer_payment_date": "2026-08-31",
   "commercial_customer_reuse_approved": false,
   "fmc_cases": [
@@ -15,7 +21,7 @@
       "administratively_final_notice": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
       "id": "FMC_2022(I)",
       "initial_decision": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",
-      "status": "FMC_AWARDED_AND_ORDERED;_LATER_CUSTOMER_RECEIPT_AGENCY_REPORTED_SECONDARY_ONLY"
+      "status": "FMC_FINAL_AWARD;_AGENCY_ORDER_INDEX_EXCERPT_CARRIER_PAID;_CUSTOMER_RECEIPT_SECONDARY_ONLY;_BANK_UNVERIFIED"
     },
     {
       "id": "FMC_2025(I)",
@@ -35,9 +41,9 @@
   "modern_retally_invoice_accuracy_labels": 0,
   "original_fmc_pdf_bytes_and_private_invoices_held": false,
   "original_official_pdf_sha256": null,
-  "receipt_sha256": "97c850710016646f5170d5984210cd7ddb3768ffa70eebe3d347d92197050ac3",
+  "receipt_sha256": "a0aa7a37c9e727bd2db120399086e2ea03e665c3d7fabc00a845deaa98b4fcfd",
   "retally_recovered_cash_cents": 0,
   "schema_version": 1,
   "scope": "FMC_THIRD_PARTY_ADJUDICATED_REAL_SHIPPER_CHARGES_NOT_RETALLY_CUSTOMERS_OR_ORIGINAL_BANK_CUSTODY",
-  "source_authored_fixture_SHA256_NOT_FMC_pdf_hash": "0e0a45814dfd384b0b8d3aba40806db2610dae29f3c9258489b82a5876511837"
+  "source_authored_fixture_SHA256_NOT_FMC_pdf_hash": "d9293385c3aaf51c63717ae2ed0febfb1cb480f508854b2706c1e73a143e8e13"
 }
