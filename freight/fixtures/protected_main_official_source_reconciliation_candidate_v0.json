@@ -112,7 +112,7 @@
       "published_on": "2024-08-08",
       "reported_amount_cents": 1459569,
       "publisher_outcome_scope": "UNPAID_CARRIER_INVOICE_CLAIM_TIME_BARRED_NOT_OVERCHARGE",
-      "source_review_status": "FIRST_PARTY_PDF_PAGE_ZERO_VISUALLY_REVIEWED_2026_10_27",
+      "source_review_status": "ORIGINAL_CBCA_13_PAGE_PDF_TEXT_REVIEWED_PAGES_1_13_VISUALLY_CHECKED_2026_10_27",
       "reported_amount_semantics": "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE",
       "original_publisher_response_bytes_acquired": false,
       "original_publisher_response_sha256": null,
@@ -122,7 +122,38 @@
       "actual_customer_invoice_error_label": "UNKNOWN",
       "independent_actual_settlement_cash_receipt_verified": false,
       "verified_retally_customer_recovery_cents": 0,
-      "historical_tariff_effective_date": null
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 13,
+        "original_pdf_pages_visually_verified": [
+          1,
+          13
+        ],
+        "service_start_date": "2018-05-31",
+        "delivery_window": "JUNE_OR_JULY_2018",
+        "invoice_form": "SF_1113",
+        "original_invoice_submitted_on": "2018-09-26",
+        "dps_internal_approval_on": "2018-09-28",
+        "prepayment_audit_payment_denied_on": "2018-10-02",
+        "prepayment_denial_reason": "MISSING_WEIGHT_TICKET",
+        "initial_approval_equates_to_government_payment": false,
+        "notice_contained_regulatorily_required_appeal_rights": false,
+        "internal_weight_ticket_discussion_on": "2019-07-12",
+        "documented_government_receipt_of_2019_resubmission": false,
+        "first_documented_followup_on_denied_invoice": "2023-01-13",
+        "gsa_claim_denied_on": "2024-01-22",
+        "board_review_requested_on": "2024-03-19",
+        "board_review_within_six_months": true,
+        "separate_underlying_payment_denial_claim_timely": false,
+        "missing_appeal_notice_actual_prejudice_proven": false,
+        "accounting_record_issue": "UNPAID_INVOICE_LOST_IN_CARRIER_ACCOUNTING_SYSTEM",
+        "reported_unpaid_invoice_amount_cents": 1459569,
+        "board_decision": "CARRIER_UNPAID_CLAIM_DENIED_AS_UNTIMELY_NOT_RATE_ERROR_ADJUDICATION",
+        "actual_government_payment_independently_verified": false,
+        "original_invoice_ticket_bol_and_bank_bytes_acquired": false,
+        "applicable_historical_tariff_effective_date": null,
+        "current_customer_billing_error_ground_truth": "UNKNOWN"
+      }
     },
     {
       "id": "CBCA_1317_RATE_2009",
@@ -156,7 +187,11 @@
         "underlying_rate_overcharge_merits_adjudicated": false,
         "carrier_refund_received_independently_verified": false,
         "original_twelve_bols_tariffs_or_bank_receipts_acquired": false,
-        "original_pdf_pages_visually_verified": [3, 7, 8],
+        "original_pdf_pages_visually_verified": [
+          3,
+          7,
+          8
+        ],
         "decision_reported_bol_rows": [
           {
             "bol_reference": "W45QQ90009822",
@@ -358,6 +393,36 @@
     },
     {
       "id": "SYNTH_CBCA_TQYL_79_PAID_SHIPMENTS_CALLED_70_VERIFIED_CUSTOMER_ERRORS",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_DPS_INTERNAL_APPROVAL_PROMOTED_TO_GOVERNMENT_CASH_PAID",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_INTERNAL_2019_TICKET_DISCUSSION_PROMOTED_TO_AGENCY_RECEIPT",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_TIMELY_BOARD_REVIEW_PROMOTED_TO_TIMELY_PAYMENT_DENIAL_CLAIM",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_MISSING_APPEAL_RIGHTS_NOTICE_ASSUMED_AUTOMATIC_TOLL",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_TIME_BARRED_UNPAID_INVOICE_PROMOTED_TO_RATE_OVERCHARGE",
       "kind": "SYNTHETIC",
       "actual_independent_customer_outcome": null,
       "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"

@@ -81,7 +81,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                      "verified_retally_customer_recovery_cents", "historical_tariff_effective_date"}
         for row, should in zip(pack["sources"], expected):
             self.assertEqual(set(row), rows_keys | ({"decision_evidence"} if
-                             row["id"] in ("CBCA_6578_RATE_2020", "CBCA_1317_RATE_2009",
+                             row["id"] in ("CBCA_6578_RATE_2020", "CBCA_8051_RATE_2024",
+                                           "CBCA_1317_RATE_2009",
                                            "CBCA_3467_RATE_2014") else set()))  # Explicit nested whitelist.
             self.assertEqual((row["id"], row["published_on"], row["reported_amount_cents"],
                               row["publisher_outcome_scope"]), should)
@@ -106,6 +107,19 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                          "APPROXIMATE_AGREED_AGGREGATE_NOT_RECEIPT")
         self.assertEqual(pack["sources"][3]["reported_amount_semantics"],
                          "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE")
+        # First-party CBCA 8051-RATE: original 2018 invoice was timely,
+        # but the later denial challenge was not. DPS approval is not payment.
+        j = pack["sources"][3]
+        self.assertEqual(j["source_review_status"],
+                         "ORIGINAL_CBCA_13_PAGE_PDF_TEXT_REVIEWED_PAGES_1_13_VISUALLY_CHECKED_2026_10_27")
+        self.assertEqual(j["decision_evidence"], {"original_pdf_pages": 13, "original_pdf_pages_visually_verified": [1, 13], "service_start_date": "2018-05-31", "delivery_window": "JUNE_OR_JULY_2018", "invoice_form": "SF_1113", "original_invoice_submitted_on": "2018-09-26", "dps_internal_approval_on": "2018-09-28", "prepayment_audit_payment_denied_on": "2018-10-02", "prepayment_denial_reason": "MISSING_WEIGHT_TICKET", "initial_approval_equates_to_government_payment": False, "notice_contained_regulatorily_required_appeal_rights": False, "internal_weight_ticket_discussion_on": "2019-07-12", "documented_government_receipt_of_2019_resubmission": False, "first_documented_followup_on_denied_invoice": "2023-01-13", "gsa_claim_denied_on": "2024-01-22", "board_review_requested_on": "2024-03-19", "board_review_within_six_months": True, "separate_underlying_payment_denial_claim_timely": False, "missing_appeal_notice_actual_prejudice_proven": False, "accounting_record_issue": "UNPAID_INVOICE_LOST_IN_CARRIER_ACCOUNTING_SYSTEM", "reported_unpaid_invoice_amount_cents": 1459569, "board_decision": "CARRIER_UNPAID_CLAIM_DENIED_AS_UNTIMELY_NOT_RATE_ERROR_ADJUDICATION", "actual_government_payment_independently_verified": False, "original_invoice_ticket_bol_and_bank_bytes_acquired": False, "applicable_historical_tariff_effective_date": None, "current_customer_billing_error_ground_truth": "UNKNOWN"})
+        je = j["decision_evidence"]
+        self.assertLess(datetime.fromisoformat(je["original_invoice_submitted_on"]),
+                        datetime.fromisoformat(je["prepayment_audit_payment_denied_on"]))
+        self.assertLess(datetime.fromisoformat(je["prepayment_audit_payment_denied_on"]),
+                        datetime.fromisoformat(je["first_documented_followup_on_denied_invoice"]))
+        self.assertLess(datetime.fromisoformat(je["gsa_claim_denied_on"]),
+                        datetime.fromisoformat(je["board_review_requested_on"]))
         self.assertEqual(pack["cohort"]["primary_original_text_or_first_page_checked_this_run"], 6)
         self.assertEqual(pack["sources"][2]["source_review_status"],
                          "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_3_6_VISUAL_2026_10_27")
@@ -246,9 +260,9 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
         self.assertEqual(x["independently_scored_customer_invoice_error_count"], 0)
 
         controls = pack["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 12)
-        self.assertEqual(len({x["id"] for x in controls}), 12)
-        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_TQYL_79_PAID_SHIPMENTS_CALLED_70_VERIFIED_CUSTOMER_ERRORS")
+        self.assertEqual(len(controls), 17)
+        self.assertEqual(len({x["id"] for x in controls}), 17)
+        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_JFC_TIME_BARRED_UNPAID_INVOICE_PROMOTED_TO_RATE_OVERCHARGE")
         for control in controls:
             self.assertEqual(set(control), {"id", "kind", "actual_independent_customer_outcome",
                                             "expected"})
@@ -325,6 +339,41 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self._assert_contract(bad)
 
+
+    def test_cbca_8051_denial_accounting_timeline_and_no_cash_promotion(self):
+        original = self._pack()
+        for key, forged in (
+            ("initial_approval_equates_to_government_payment", True),
+            ("documented_government_receipt_of_2019_resubmission", True),
+            ("board_review_within_six_months", False),
+            ("separate_underlying_payment_denial_claim_timely", True),
+            ("missing_appeal_notice_actual_prejudice_proven", True),
+            ("actual_government_payment_independently_verified", True),
+            ("original_invoice_ticket_bol_and_bank_bytes_acquired", True),
+            ("reported_unpaid_invoice_amount_cents", 0),
+            ("original_pdf_pages", 6),
+            ("original_pdf_pages_visually_verified", [1, 2, 13]),
+            ("current_customer_billing_error_ground_truth", "VERIFIED_OVERCHARGE"),
+            ("applicable_historical_tariff_effective_date", "2018-05-31"),
+            ("prepayment_audit_payment_denied_on", "2023-10-02"),
+            ("board_decision", "CARRIER_CASH_RECOVERED"),
+            ("notice_contained_regulatorily_required_appeal_rights", True),
+        ):
+            bad = json.loads(json.dumps(original))
+            bad["sources"][3]["decision_evidence"][key] = forged
+            with self.subTest(field=key), self.assertRaises(AssertionError):
+                self._assert_contract(bad)
+        for key, forged in (("reported_amount_cents", 1459568),
+                            ("publisher_outcome_scope", "VERIFIED_SHIPPER_OVERCHARGE"),
+                            ("source_specific_commercial_rights_verified", True)):
+            bad = json.loads(json.dumps(original))
+            bad["sources"][3][key] = forged
+            with self.subTest(outside_field=key), self.assertRaises(AssertionError):
+                self._assert_contract(bad)
+        bad = json.loads(json.dumps(original))
+        bad["sources"][3]["decision_evidence"]["bank_receipt_sha256"] = "invented"
+        with self.assertRaises(AssertionError):
+            self._assert_contract(bad)
 
     def test_cbca_3467_conflicting_decision_amount_and_no_cash_promotion(self):
         original = self._pack()
