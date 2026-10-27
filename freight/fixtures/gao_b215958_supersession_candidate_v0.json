@@ -1,0 +1,114 @@
+{
+  "schema_version": "0.1.0",
+  "evaluation_family": "GAO_FREIGHT_SUPERSEDED_DECISION_PAIR_HISTORICAL_NEGATIVE_CONTROL",
+  "engines": [
+    "freightrecovery",
+    "recoveryos"
+  ],
+  "provenance": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "protected_main": true,
+    "existing_candidate_branch": "evidence/gao-b143458-capacity-tariff-scope-20261024",
+    "operational_writer": "research/retally-unified-data-lab",
+    "operational_writer_modified": false,
+    "provider_allowlist_changed": false,
+    "original_publisher_byte_hash_verified": false
+  },
+  "sources": [
+    {
+      "id": "GAO_B215958_1984",
+      "url": "https://www.gao.gov/products/b-215958",
+      "publisher": "U.S. Government Accountability Office",
+      "decision_date": "1984-12-05",
+      "decision_outcome": "INITIAL_REFUND_INSTRUCTION_LATER_OVERRULED",
+      "publisher_html_highlights_reviewed": "2026-10-27",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_gbl_or_governing_tariff_pages_custodied": false,
+      "tariff_effective_date": null,
+      "independent_cash_refund_receipt": "UNKNOWN"
+    },
+    {
+      "id": "GAO_B215958_1986",
+      "url": "https://www.gao.gov/products/b-215958-2",
+      "publisher": "U.S. Government Accountability Office",
+      "decision_date": "1986-02-18",
+      "decision_outcome": "RECONSIDERATION_OVERRULED_1984_SUSTAINED_GSA_DEDUCTIONS",
+      "publisher_html_highlights_reviewed": "2026-10-27",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_gbl_or_governing_tariff_pages_custodied": false,
+      "tariff_effective_date": null,
+      "independent_cash_refund_receipt": "UNKNOWN"
+    }
+  ],
+  "decision_facts": {
+    "gbls_initially_at_issue": 55,
+    "gbls_noting_seal_numbers": 53,
+    "other_gbls": 2,
+    "initial_decision_instructed_refund": true,
+    "initial_decision_overruled": true,
+    "gsa_deduction_sustained_on_reconsideration": true,
+    "seal_notation_alone_satisfies_written_exclusive_use_request": false,
+    "shipper_written_exclusive_use_request_established": false,
+    "initial_decision_final_binding_outcome": false,
+    "current_customer_freight_error_ground_truth": "UNKNOWN",
+    "actual_subsequent_refund_received": "UNKNOWN",
+    "contemporary_tariff_or_legal_applicability": "UNKNOWN"
+  },
+  "rights": {
+    "terms_url": "https://www.gao.gov/copyright",
+    "gao_authored_material_us_public_domain": true,
+    "publisher_attribution_required": true,
+    "no_implied_endorsement": true,
+    "third_party_material_cleared": false,
+    "commercial_customer_engine_use_approved": false
+  },
+  "cohort": {
+    "official_historical_decisions": 2,
+    "original_gbls_in_custody": 0,
+    "independent_held_out_real_customer_labels": 0,
+    "verified_current_customer_errors": 0,
+    "verified_retally_customer_cash_cents": 0,
+    "confidence": "GAO_PUBLISHED_DECISION_SUMMARIES_ONLY_NO_INVOICE_SPECIFIC_ERROR_LABELS",
+    "freight_error_scoring_eligible": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B215958_1984_INITIAL_RULING_AS_FINAL",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OVERRULED_DECISION",
+      "real_customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B215958_SEAL_NOTE_AS_WRITTEN_EXCLUSIVE_USE_REQUEST",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNSUPPORTED_TARIFF_SCOPE",
+      "real_customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B215958_53_GBLS_AS_53_INDEPENDENT_REAL_CUSTOMER_ERRORS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_FAKE_GROUND_TRUTH",
+      "real_customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B215958_REFUND_INSTRUCTION_AS_PAID_RECOVERY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNVERIFIED_CASH",
+      "real_customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B215958_1986_HISTORICAL_RULING_AS_2026_GENERAL_RULE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SCOPE_PROMOTION",
+      "real_customer_ground_truth": null
+    }
+  ],
+  "acceptance": {
+    "source_pointers_already_in_existing_candidate": true,
+    "independent_qa_passed": false,
+    "guarded_release_authorized": false,
+    "production_code_changed": false
+  }
+}
