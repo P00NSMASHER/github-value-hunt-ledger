@@ -615,6 +615,12 @@ jobs:
           assert x['bridgewell_final_ordered_total_cents'] == 2828931
           assert x['bridgewell_award_components_not_invoice_count'] == 10
           assert x['bridgewell_reported_late_customer_payment_date'] == '2026-08-31'
+          assert x['bridgewell_official_order_payment_made_index_excerpt_date'] == '2026-08-31'
+          assert x['bridgewell_official_order_late_days'] == 223
+          assert x['bridgewell_original_enforcement_order_pdf_in_custody'] is False
+          assert x['bridgewell_bank_receipt_confirmed'] is False
+          assert x['bridgewell_actual_bank_receipt_cents'] is None
+          assert x['bridgewell_payment_evidence_tier'] == 'OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED'
           assert x['bridgewell_later_payment_reported_NOT_verified_bank_receipt'] is True
           assert x['bridgewell_exact_received_cash_and_interest_unverified'] is True
           assert x['bridgewell_civil_penalties_imposed_cents'] is None
@@ -630,7 +636,7 @@ jobs:
               out.write(
                   '### FMC public shipper billing: real payment lifecycle, NOT RETALLY cash\n'
                   '- FMC 2022(I): $24,328.80 original reparations + $3,960.51 interest = $28,289.31 ordered due Jan 20, 2026.\n'
-                  '- Later customer payment Aug 31 is reported via Oct 2 FMC enforcement action and independent press, original bank receipt and exact paid amount UNKNOWN.\n'
+                  '- FMC Oct 2 order search-index excerpt says COSCO paid Aug 31 (223 days late); press reports Bridgewell received it. Original order PDF and actual bank-cleared amount UNKNOWN.\n'
                   '- FMC 2025(I): $23,600 quote/invoice gap, $25,895 requested, but initial decision awarded $0 reparations.\n'
                   '- Independent FMC PDF bytes and original customer bank records NOT held. Modern RETALLY case labels and cash are ZERO.\n'
               )
