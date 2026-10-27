@@ -232,6 +232,31 @@
       "first_seen": "2026-10-27",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "77ab7427d8a6d05fa1876f6632e632e088ee209d14e8d14d7cde070f9a848537",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/patelyashgokul-ops/freight_invoice_audit_recovery",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-27",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "ce315e2e3f53da1a53eca7237667ebd6b11ee1fd740e82b34a13f115c9c7c7d2",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -6284,7 +6309,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "917e7b09d3a404e2007803d25e4717a16f7071d89f9009a0674e02abb7d0d8b4",
+  "feed_sha256": "36d85056b2a607d1cef438dc68dd2718fe49099d4793e7ce7b0eaad95d4e22b5",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -6296,12 +6321,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 251,
-  "source_pointers_total": 251,
+  "selected_for_synthetic_proof_gate": 252,
+  "source_pointers_total": 252,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
     "lab15_evidence_metadata_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4f7543e5d3edaa8cb038bf8",
-    "unified_entries_sha256": "3fe0bb2ae844941855e10a0126139f4fe2486f0654977e89f5a13793b2719445"
+    "unified_entries_sha256": "dd0d2e56622da3b2feea9977439bfcef9aac4f862b4fb6e63f8683beed563c86"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 11,
   "verified_recovered_cash_cents": 0

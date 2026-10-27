@@ -5831,6 +5831,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-27",
+      "id": "77ab7427d8a6d05fa1876f6632e632e088ee209d14e8d14d7cde070f9a848537",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/patelyashgokul-ops/freight_invoice_audit_recovery"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -12649,6 +12665,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "3fe0bb2ae844941855e10a0126139f4fe2486f0654977e89f5a13793b2719445",
+  "entries_sha256": "dd0d2e56622da3b2feea9977439bfcef9aac4f862b4fb6e63f8683beed563c86",
   "schema_version": 1
 }
