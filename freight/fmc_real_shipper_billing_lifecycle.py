@@ -145,6 +145,58 @@ LEADER = {
     "third_party_contract_rights_for_retally_use": False,
 }
 
+
+# FMC initial July 2026 order and Appendix B indexed from the official
+# publisher. Source PDF bytes, original invoice/BOL/pass-through and bank
+# files are NOT independently in repository custody.
+JIMEX = {
+    "case_id": "FMC_2036(I)",
+    "claimant": "JIMEX_USA_INC",
+    "respondent": "UNITRANS_PRA_CO_INC",
+    "initial_decision_served": "2026-07-16",
+    "official_initial_decision_url":
+        "https://www2.fmc.gov/readingroom/docs/2036%28I%29/"
+        "%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+    "official_extension_denial_served": "2026-07-23",
+    "official_extension_denial_url":
+        "https://www2.fmc.gov/readingroom/docs/2036%28I%29/"
+        "2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",
+    "source_sections_indexed":
+        "OFFICIAL_FMC_INITIAL_DECISION_ORDER_AND_APPENDIX_B_INDEXED_TEXT_NOT_ORIGINAL_PDF_BYTES",
+    "initial_claim_reparations_requested_cents": 4460669,
+    "respondent_contested_unpaid_balance_claim_cents": 1113600,
+    "respondent_claimed_unpaid_balance_independently_adjudicated_due": False,
+    "initial_decision_41102_c_excess_late_fee_violation": True,
+    "initial_decision_41104_a15_missing_detention_invoice_information_violation": True,
+    "initial_decision_541_6_minimum_contents_violation": True,
+    "initial_late_fee_reparations_ordered_cents": 999707,
+    "initial_detention_refund_ordered_cents": 197500,
+    "initial_ordered_principal_cents_EXCLUDES_interest": 1197207,
+    "interest_awarded_but_exact_amount_unverified": True,
+    "initial_decision_granted_in_part_and_denied_in_part": True,
+    "actual_finality_notice_independently_verified": False,
+    "refund_received_by_claimant_independently_bank_verified_cents": None,
+    "appendix_b_claimant_paid_detention_invoice_count": 5,
+    "appendix_b_total_paid_detention_cents": 197500,
+    "unrelated_carrier_invoice_exhibits_not_linkable_to_these_five_shipments": True,
+    "third_party_pass_through_original_invoices_introduced_during_proceeding": True,
+    "underlying_paid_invoice_and_bank_bytes_held_by_RETALLY": False,
+    "contemporaneous_private_accepted_rate_authority_held_by_RETALLY": False,
+    "current_customer_scoring_authorized": False,
+}
+JIMEX_ROWS = (
+    ("90855", 65000, "2025-05-15"),
+    ("91146", 12500, "2025-05-15"),
+    ("91156", 37500, "2025-05-15"),
+    ("91692", 57500, "2025-06-05"),
+    ("91289-1", 25000, "2025-05-15"),
+)
+JIMEX_KEYS = frozenset((
+    "invoice_number_FMC_reported",
+    "detention_charged_paid_cents_FMC_reported",
+    "claimant_payment_date_FMC_reported",
+))
+
 AWARD_KEYS = frozenset({"multiplicity", "principal_cents_each", "interest_cents_each"})
 RECEIPT_KEYS = frozenset({
     "schema_version", "scope", "fmc_cases",
@@ -185,6 +237,18 @@ RECEIPT_KEYS = frozenset({
     "leader_original_settlement_and_customer_bank_docs_held",
     "leader_refund_rights_released_not_new_cash_awarded",
     "leader_fmc_order_adjudicated_illegal_billing_amount_cents",
+    "jimex_initial_claim_requested_cents",
+    "jimex_initial_late_fee_reparations_cents",
+    "jimex_initial_detention_refund_cents",
+    "jimex_initial_principal_NOT_actual_cash_received_cents",
+    "jimex_appendix_b_paid_invoice_count",
+    "jimex_appendix_b_paid_detention_cents",
+    "jimex_original_paid_invoice_ids_authored_digest_NOT_source_bytes",
+    "jimex_unrelated_carrier_exhibits_must_not_join",
+    "jimex_initial_decision_finality_verified",
+    "jimex_later_bank_cleared_refund_cents",
+    "jimex_exact_interest_cents",
+    "jimex_current_customer_scoring_authorized",
     "original_official_pdf_sha256", "receipt_sha256",
 })
 
@@ -200,7 +264,8 @@ def exact(item: object, expected: dict, kind: str) -> None:
 def validate_fixture(doc: object) -> dict:
     if type(doc) is not dict or set(doc) != set(ROOT) | {
         "bridgewell_cosco", "hp_logistics_quote_dispute",
-        "leader_commerce_msc_signed_settlement"
+        "leader_commerce_msc_signed_settlement",
+        "jimex_unitrans_initial_paid_detention"
     }:
         raise ResearchError("FMC_ROOT_SCHEMA_INVALID")
     for key, val in ROOT.items():
@@ -208,6 +273,7 @@ def validate_fixture(doc: object) -> dict:
             raise ResearchError("FMC_ROOT_FINANCIAL_OR_RIGHTS_FORGED")
     bridge, hp = doc["bridgewell_cosco"], doc["hp_logistics_quote_dispute"]
     leader = doc["leader_commerce_msc_signed_settlement"]
+    jimex = doc["jimex_unitrans_initial_paid_detention"]
     if type(bridge) is not dict or set(bridge) != set(BRIDGEWELL) | {
         "reparation_award_groups"
     }:
@@ -216,6 +282,29 @@ def validate_fixture(doc: object) -> dict:
           BRIDGEWELL, "BRIDGEWELL")
     exact(hp, HPL, "HPL")
     exact(leader, LEADER, "LEADER")
+    if type(jimex) is not dict or set(jimex) != set(JIMEX) | {"appendix_b_paid_invoice_rows"}:
+        raise ResearchError("FMC_JIMEX_SCHEMA_INVALID")
+    exact({k: v for k, v in jimex.items() if k != "appendix_b_paid_invoice_rows"},
+          JIMEX, "JIMEX")
+    rows = jimex["appendix_b_paid_invoice_rows"]
+    if type(rows) is not list or len(rows) != len(JIMEX_ROWS):
+        raise ResearchError("FMC_JIMEX_PAID_DETENTION_POPULATION_INVALID")
+    for row, expected in zip(rows, JIMEX_ROWS, strict=True):
+        if type(row) is not dict or set(row) != JIMEX_KEYS:
+            raise ResearchError("FMC_JIMEX_INVOICE_ROW_SCHEMA_INVALID")
+        expected_fields = dict(zip((
+            "invoice_number_FMC_reported",
+            "detention_charged_paid_cents_FMC_reported",
+            "claimant_payment_date_FMC_reported"), expected, strict=True))
+        if any(type(row[k]) is not type(v) or row[k] != v
+               for k, v in expected_fields.items()):
+            raise ResearchError("FMC_JIMEX_PAID_INVOICE_SOURCE_FACT_FORGED")
+    if (sum(x[1] for x in JIMEX_ROWS) != 197500
+            or jimex["initial_late_fee_reparations_ordered_cents"]
+                + jimex["initial_detention_refund_ordered_cents"]
+                != jimex["initial_ordered_principal_cents_EXCLUDES_interest"]
+            or any(date.fromisoformat(x[2]) <= date(2024, 5, 28) for x in JIMEX_ROWS)):
+        raise ResearchError("FMC_JIMEX_AWARD_OR_DATE_ARITHMETIC_INVALID")
     groups = bridge["reparation_award_groups"]
     if type(groups) is not list or len(groups) != len(AWARD_GROUPS):
         raise ResearchError("FMC_AWARD_GROUP_POPULATION_INVALID")
@@ -245,7 +334,9 @@ def validate_fixture(doc: object) -> dict:
                 bridge["official_enforcement_order_url"],
                 hp["official_initial_decision_url"],
                 leader["official_order_url"],
-                leader["official_final_notice_url"]):
+                leader["official_final_notice_url"],
+                jimex["official_initial_decision_url"],
+                jimex["official_extension_denial_url"]):
         if safe_url(url) != url:
             raise ResearchError("FMC_UNSAFE_OFFICIAL_DECISION_URL")
     if not (
@@ -275,6 +366,7 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
     d = load_fixture() if fixture is None else validate_fixture(fixture)
     bridge, hp = d["bridgewell_cosco"], d["hp_logistics_quote_dispute"]
     leader = d["leader_commerce_msc_signed_settlement"]
+    jimex = d["jimex_unitrans_initial_paid_detention"]
     body = {
         "schema_version": 1,
         "scope": SCOPE,
@@ -288,7 +380,10 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
             {"id": leader["case_id"],
              "initial_decision": leader["official_order_url"],
              "administratively_final_notice": leader["official_final_notice_url"],
-             "status": "BILATERAL_SETTLEMENT_APPROVED_AND_FINAL_UNPAID_DEBT_CANCELLED_AND_PREVIOUSLY_PAID_REFUND_CLAIMS_WAIVED_NO_NEW_CASH"}
+             "status": "BILATERAL_SETTLEMENT_APPROVED_AND_FINAL_UNPAID_DEBT_CANCELLED_AND_PREVIOUSLY_PAID_REFUND_CLAIMS_WAIVED_NO_NEW_CASH"},
+            {"id": jimex["case_id"],
+             "initial_decision": jimex["official_initial_decision_url"],
+             "status": "FMC_INITIAL_PAID_INVOICE_CONTENT_AND_LATE_FEES_VIOLATIONS;_INITIAL_ORDER_NOT_VERIFIED_FINAL;_REFUND_BANK_UNVERIFIED"}
         ],
         "bridgewell_initial_claim_cents": bridge["original_reparation_claim_cents"],
         "bridgewell_final_principal_cents": bridge["reparations_principal_cents"],
@@ -346,6 +441,27 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
         "leader_original_settlement_and_customer_bank_docs_held": False,
         "leader_refund_rights_released_not_new_cash_awarded": True,
         "leader_fmc_order_adjudicated_illegal_billing_amount_cents": None,
+        "jimex_initial_claim_requested_cents":
+            jimex["initial_claim_reparations_requested_cents"],
+        "jimex_initial_late_fee_reparations_cents":
+            jimex["initial_late_fee_reparations_ordered_cents"],
+        "jimex_initial_detention_refund_cents":
+            jimex["initial_detention_refund_ordered_cents"],
+        "jimex_initial_principal_NOT_actual_cash_received_cents":
+            jimex["initial_ordered_principal_cents_EXCLUDES_interest"],
+        "jimex_appendix_b_paid_invoice_count":
+            len(jimex["appendix_b_paid_invoice_rows"]),
+        "jimex_appendix_b_paid_detention_cents":
+            sum(row["detention_charged_paid_cents_FMC_reported"]
+                for row in jimex["appendix_b_paid_invoice_rows"]),
+        "jimex_original_paid_invoice_ids_authored_digest_NOT_source_bytes":
+            digest([row["invoice_number_FMC_reported"]
+                    for row in jimex["appendix_b_paid_invoice_rows"]]),
+        "jimex_unrelated_carrier_exhibits_must_not_join": True,
+        "jimex_initial_decision_finality_verified": False,
+        "jimex_later_bank_cleared_refund_cents": None,
+        "jimex_exact_interest_cents": None,
+        "jimex_current_customer_scoring_authorized": False,
         "original_fmc_pdf_bytes_and_private_invoices_held": False,
         "modern_retally_invoice_accuracy_labels": 0,
         "commercial_customer_reuse_approved": False,
