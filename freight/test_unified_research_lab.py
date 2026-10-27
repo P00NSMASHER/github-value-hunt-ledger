@@ -1927,6 +1927,15 @@ def load_tests(loader, tests, pattern):
     if additional.countTestCases() < 3:
         raise AssertionError("GAO B-215958 temporal provenance test coverage missing")
     tests.addTests(additional)
+    # Existing RecoveryOS GAO-02-635 publisher-level accounting controls
+    # are held tests only, never customer accuracy or cash recovery labels.
+    from freight import test_recoveryos_gao_ap_reconciliation_candidate
+    accounting_controls = loader.loadTestsFromModule(
+        test_recoveryos_gao_ap_reconciliation_candidate
+    )
+    if accounting_controls.countTestCases() != 4:
+        raise AssertionError("GAO-02-635 accounting boundary tests missing")
+    tests.addTests(accounting_controls)
     return tests
 
 
