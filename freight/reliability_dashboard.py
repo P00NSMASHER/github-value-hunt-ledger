@@ -6,15 +6,13 @@ unadjudicated money on a public surface. This module is for engineering CI.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from hashlib import sha256
 from html import escape
 import json
 from time import perf_counter
-from typing import Iterable
 
 from freight.contracts import canonical_hash
 from freight.scoped_reconciliation import (
-    ScopedTxn, ScopeReconciliation, reconcile_scoped,
+    ScopedTxn, reconcile_scoped,
 )
 from recoveryworks.reconciliation_kernel import ReconTxn
 

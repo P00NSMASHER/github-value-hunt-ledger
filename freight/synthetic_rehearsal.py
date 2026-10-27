@@ -269,9 +269,7 @@ def run_rehearsal() -> dict:
     invoice_batch = artifacts.invoice_batch
     population_build = artifacts.population_build
     population = population_build.population
-    charges = invoice_batch.charges
     verified_rule_batch, review_rule_batch = artifacts.rule_batches
-    rules = verified_rule_batch.rules + review_rule_batch.rules
     factory = artifacts.factory
     review_queue = artifacts.review_queue
     review_packet = artifacts.review_packet
@@ -284,7 +282,8 @@ def run_rehearsal() -> dict:
         for derivation in factory.derivations
         if derivation.finding is not None
     }
-    f1, f2, f3 = by_charge["charge-1"], by_charge["charge-2"], by_charge["charge-3"]
+    f1, f2 = by_charge["charge-1"], by_charge["charge-2"]
+    assert "charge-3" in by_charge
     sealed = seal_incumbent_submission(population, "synthetic-incumbent-source-hash")
     incumbent = open_incumbent_output(
         population=population,

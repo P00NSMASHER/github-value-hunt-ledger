@@ -12,7 +12,7 @@ from hashlib import sha256
 from typing import Iterable
 
 from freight.canonical_schema import (
-    CanonicalFreightRecord, ShipmentFacts, SourceArtifact, verify_record,
+    CanonicalFreightRecord, ShipmentFacts, verify_record,
 )
 from freight.contracts import canonical_hash
 from freight.rate_authority import AuthorityBook

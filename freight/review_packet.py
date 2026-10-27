@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
-from freight.contracts import REVIEW, VALIDATED, canonical_hash
+from freight.contracts import VALIDATED, canonical_hash
 from freight.finding_factory import ChargeRule, FindingFactoryBatch, InvoiceCharge
 from freight.review_queue import ReviewQueue, build_review_queue
 

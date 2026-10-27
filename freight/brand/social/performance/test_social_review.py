@@ -1,6 +1,5 @@
 """Deterministic, offline tests for RETALLY's read-only social verifier."""
 import unittest
-from datetime import datetime, timezone
 
 from social_review import markdown, parse_timestamp, review, scheduled_datetime
 

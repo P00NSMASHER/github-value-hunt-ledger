@@ -1,5 +1,4 @@
 """Original Pennine CSV contractual controls; these do not prove bank clearing."""
-from copy import deepcopy
 
 import pytest
 

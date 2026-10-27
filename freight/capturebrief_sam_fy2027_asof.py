@@ -15,7 +15,7 @@ import io
 import json
 import re
 import unicodedata
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
