@@ -153,7 +153,7 @@ class DDInvoiceAuditTests(unittest.TestCase):
                 self.assertEqual(r["asserted_recovery"], "0.00")
 
     def test_unverified_billed_party_scope_blocks_money_even_if_other_fields_fail(self):
-        for who in ("", "unrecognized-party"):
+        for who in ("", "other", "unrecognized-party"):
             with self.subTest(who=who):
                 r = dd.audit_invoice(self.base(
                     billed_party_type=who,
@@ -166,7 +166,7 @@ class DDInvoiceAuditTests(unittest.TestCase):
 
     def test_valid_external_billed_parties_remain_reviewable_not_5414_judgments(self):
         for party in ("shipper", "consignee", "cargo_owner",
-                      "freight_forwarder", "truck_operator", "other"):
+                      "freight_forwarder", "truck_operator"):
             with self.subTest(party=party):
                 r=dd.audit_invoice(self.base(billed_party_type=party))
                 self.assertEqual(r["status"], "COMPLIANT_ON_CHECKED_FIELDS")
