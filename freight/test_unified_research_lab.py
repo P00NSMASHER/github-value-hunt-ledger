@@ -1921,7 +1921,7 @@ class ProtectedMainSeedContinuityTests(unittest.TestCase):
 
 
 def load_tests(loader, tests, pattern):
-    """Include held GAO supersession regressions in the existing unified CI suite."""
+    """Route source-bound freight, accounting, and procurement safety tests to CI."""
     from freight import test_gao_b215958_supersession
     additional = loader.loadTestsFromModule(test_gao_b215958_supersession)
     if additional.countTestCases() < 3:
@@ -1936,6 +1936,15 @@ def load_tests(loader, tests, pattern):
     if accounting_controls.countTestCases() != 4:
         raise AssertionError("GAO-02-635 accounting boundary tests missing")
     tests.addTests(accounting_controls)
+    # Existing CaptureBrief FY2027 SAM.gov notice-identity controls remain
+    # as-of metadata only: no solicitation/award or commercial-use proof.
+    from freight import test_capturebrief_sam_fy2027_renumbering
+    procurement_controls = loader.loadTestsFromModule(
+        test_capturebrief_sam_fy2027_renumbering
+    )
+    if procurement_controls.countTestCases() != 3:
+        raise AssertionError("SAM FY2027 notice-identity tests missing")
+    tests.addTests(procurement_controls)
     return tests
 
 
