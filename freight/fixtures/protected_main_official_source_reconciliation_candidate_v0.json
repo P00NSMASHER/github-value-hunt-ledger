@@ -550,6 +550,41 @@
       "cohort": "PROTECTED_MAIN_VS_DRAFT_SEED_IDENTITY_2026_10_27",
       "owner_lane": "UNIFIED_RESEARCH_LAB",
       "independent_qa_lane": ":44"
+    },
+    "current_main_source_set_continuity_20261027": {
+      "schema_version": "1.0.0",
+      "observed_main_head": "b1c49b7ad6431d648325ba31b804ecd0542857d6",
+      "main_catalog_git_blob_sha1": "fe6faa9d85d002fcabf3f38b8c2836f1fbdb86fc",
+      "draft_head_before_snapshot": "58756ccd5f2fa14fafcba9006df7c4cb504ed582",
+      "draft_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+      "main_only_source_url_count": 11,
+      "unique_held_freight_source_pointers": 10,
+      "held_legacy_six_source_manifest": 6,
+      "held_fmc_2015_pair_manifest": 2,
+      "held_current_main_fmc_gap_manifest": 4,
+      "overlap_of_two_fmc_2015_pointers": 2,
+      "excluded_wrong_topic_nyc_restaurant": 1,
+      "excluded_wrong_topic_dataset_id": "43nn-pn8j",
+      "original_publisher_response_sha256": null,
+      "original_source_bytes_held": false,
+      "commercial_reuse_approved": false,
+      "independently_held_out_customer_invoice_labels": 0,
+      "verified_retally_cash_recovery_cents": 0,
+      "independent_qa_green": false,
+      "main_integration_complete": false,
+      "status": "MAIN_SOURCE_IDENTITY_RECONCILED_IN_HELD_METADATA_NOT_EXECUTABLE_OR_LICENSED",
+      "synthetic_negative_controls": [
+        {
+          "id": "SYNTHETIC_MAIN_9_ONLY_OMITS_TWO_JIMEX_FMC_POINTERS",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_INCOMPLETE_MAIN_ONLY_SOURCE_RECONCILIATION"
+        },
+        {
+          "id": "SYNTHETIC_FMC_DOCUMENT_POINTERS_EQUATED_TO_PAID_INVOICES",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_NO_CUSTOMER_INVOICE_OR_SETTLEMENT_CUSTODY"
+        }
+      ]
     }
   }
 }
