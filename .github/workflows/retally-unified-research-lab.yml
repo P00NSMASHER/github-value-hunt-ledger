@@ -609,7 +609,7 @@ jobs:
           import json, os
           from pathlib import Path
           x=json.loads(Path('freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json').read_text())
-          assert len(x['fmc_cases']) == 3
+          assert len(x['fmc_cases']) == 4
           assert x['leader_settlement_order_date'] == '2024-11-08'
           assert x['leader_admin_final_notice_date'] == '2024-12-10'
           assert x['leader_both_signatures_described_by_FMC_not_original_in_custody'] is True
@@ -638,6 +638,17 @@ jobs:
           assert x['bridgewell_civil_penalties_imposed_cents'] is None
           assert x['hpl_invoice_vs_quote_difference_cents'] == 2360000
           assert x['hpl_claimed_reparations_cents'] == 2589500
+          assert x['jimex_initial_claim_requested_cents'] == 4460669
+          assert x['jimex_initial_late_fee_reparations_cents'] == 999707
+          assert x['jimex_initial_detention_refund_cents'] == 197500
+          assert x['jimex_initial_principal_NOT_actual_cash_received_cents'] == 1197207
+          assert x['jimex_appendix_b_paid_invoice_count'] == 5
+          assert x['jimex_appendix_b_paid_detention_cents'] == 197500
+          assert x['jimex_unrelated_carrier_exhibits_must_not_join'] is True
+          assert x['jimex_initial_decision_finality_verified'] is False
+          assert x['jimex_later_bank_cleared_refund_cents'] is None
+          assert x['jimex_exact_interest_cents'] is None
+          assert x['jimex_current_customer_scoring_authorized'] is False
           assert x['hpl_initial_decision_reparations_awarded_cents'] == 0
           assert x['hpl_final_status_independently_verified'] is False
           assert x['modern_retally_invoice_accuracy_labels'] == 0

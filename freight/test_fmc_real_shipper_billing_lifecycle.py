@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 from freight.fmc_real_shipper_billing_lifecycle import (
-    ROOT, AWARD_GROUPS, RECEIPT_KEYS, LEADER,
+    ROOT, AWARD_GROUPS, RECEIPT_KEYS, LEADER, JIMEX, JIMEX_ROWS,
     load_fixture, make_receipt, validate_fixture, verify_receipt
 )
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record
@@ -24,7 +24,8 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
         d=load_fixture()
         self.assertEqual(set(d),set(ROOT)|{
             "bridgewell_cosco","hp_logistics_quote_dispute",
-            "leader_commerce_msc_signed_settlement"})
+            "leader_commerce_msc_signed_settlement",
+            "jimex_unitrans_initial_paid_detention"})
         for section in ("bridgewell_cosco","hp_logistics_quote_dispute"):
             self.assertIn(d[section]["official_initial_decision_url"],
                           SEEDS["freightrecovery"])
@@ -189,9 +190,120 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
         self.assertFalse(hp[
             "independent_full_original_quote_invoice_BOL_payment_chain_in_retally_custody"])
 
+
+    def test_jimex_modern_real_shipper_initial_reparations_vs_claim_amount(self):
+        from freight.unified_research_lab import SEEDS
+        case=load_fixture()["jimex_unitrans_initial_paid_detention"]
+        self.assertEqual(set(case),set(JIMEX)|{"appendix_b_paid_invoice_rows"})
+        self.assertEqual(case["initial_decision_served"],"2026-07-16")
+        self.assertEqual(case["official_extension_denial_served"],"2026-07-23")
+        self.assertIn(case["official_initial_decision_url"],SEEDS["freightrecovery"])
+        self.assertIn(case["official_extension_denial_url"],SEEDS["freightrecovery"])
+        self.assertEqual(case["initial_claim_reparations_requested_cents"],4460669)
+        self.assertEqual(case["respondent_contested_unpaid_balance_claim_cents"],1113600)
+        self.assertFalse(case["respondent_claimed_unpaid_balance_independently_adjudicated_due"])
+        self.assertTrue(case["initial_decision_41102_c_excess_late_fee_violation"])
+        self.assertTrue(case["initial_decision_41104_a15_missing_detention_invoice_information_violation"])
+        self.assertTrue(case["initial_decision_541_6_minimum_contents_violation"])
+        self.assertEqual(case["initial_late_fee_reparations_ordered_cents"],999707)
+        self.assertEqual(case["initial_detention_refund_ordered_cents"],197500)
+        self.assertEqual(case["initial_ordered_principal_cents_EXCLUDES_interest"],1197207)
+        self.assertEqual(999707+197500,1197207)
+        self.assertTrue(case["interest_awarded_but_exact_amount_unverified"])
+        self.assertTrue(case["initial_decision_granted_in_part_and_denied_in_part"])
+        self.assertFalse(case["actual_finality_notice_independently_verified"])
+        self.assertIsNone(case["refund_received_by_claimant_independently_bank_verified_cents"])
+        self.assertFalse(case["underlying_paid_invoice_and_bank_bytes_held_by_RETALLY"])
+        self.assertFalse(case["current_customer_scoring_authorized"])
+
+    def test_jimex_appendix_b_five_paid_invoices_have_exact_fmc_source_grain(self):
+        case=load_fixture()["jimex_unitrans_initial_paid_detention"]
+        values=[
+            (r["invoice_number_FMC_reported"],
+             r["detention_charged_paid_cents_FMC_reported"],
+             r["claimant_payment_date_FMC_reported"])
+            for r in case["appendix_b_paid_invoice_rows"]
+        ]
+        self.assertEqual(tuple(values),JIMEX_ROWS)
+        self.assertEqual([x[1] for x in values],[65000,12500,37500,57500,25000])
+        self.assertEqual(sum(x[1] for x in values),197500)
+        self.assertEqual(case["appendix_b_claimant_paid_detention_invoice_count"],5)
+        self.assertEqual(case["appendix_b_total_paid_detention_cents"],197500)
+        self.assertTrue(case["unrelated_carrier_invoice_exhibits_not_linkable_to_these_five_shipments"])
+        self.assertTrue(case["third_party_pass_through_original_invoices_introduced_during_proceeding"])
+        receipt=make_receipt()
+        self.assertEqual(receipt["jimex_initial_late_fee_reparations_cents"],999707)
+        self.assertEqual(receipt["jimex_initial_detention_refund_cents"],197500)
+        self.assertEqual(receipt["jimex_initial_principal_NOT_actual_cash_received_cents"],1197207)
+        self.assertEqual(receipt["jimex_appendix_b_paid_invoice_count"],5)
+        self.assertEqual(receipt["jimex_appendix_b_paid_detention_cents"],197500)
+        self.assertTrue(receipt["jimex_unrelated_carrier_exhibits_must_not_join"])
+        self.assertFalse(receipt["jimex_initial_decision_finality_verified"])
+        self.assertIsNone(receipt["jimex_later_bank_cleared_refund_cents"])
+        self.assertIsNone(receipt["jimex_exact_interest_cents"])
+        self.assertEqual(receipt["retally_recovered_cash_cents"],0)
+        self.assertFalse(receipt["jimex_current_customer_scoring_authorized"])
+
+    def test_jimex_appendix_b_case_custody_and_payment_forgery_fails_closed(self):
+        for scope,key,value in (
+            ("root","official_pdf_bytes_acquired",True),
+            ("jimex","initial_late_fee_reparations_ordered_cents",999708),
+            ("jimex","initial_detention_refund_ordered_cents",197499),
+            ("jimex","initial_claim_reparations_requested_cents",1197207),
+            ("jimex","respondent_contested_unpaid_balance_claim_cents",0),
+            ("jimex","respondent_claimed_unpaid_balance_independently_adjudicated_due",True),
+            ("jimex","actual_finality_notice_independently_verified",True),
+            ("jimex","refund_received_by_claimant_independently_bank_verified_cents",1197207),
+            ("jimex","underlying_paid_invoice_and_bank_bytes_held_by_RETALLY",True),
+            ("jimex","current_customer_scoring_authorized",True),
+        ):
+            d=deepcopy(load_fixture())
+            row=d if scope=="root" else d["jimex_unitrans_initial_paid_detention"]
+            row[key]=value
+            with self.subTest(field=key),self.assertRaises(ResearchError):
+                validate_fixture(d)
+        for i,key,value in (
+            (0,"detention_charged_paid_cents_FMC_reported",65001),
+            (1,"invoice_number_FMC_reported","90855"),
+            (3,"claimant_payment_date_FMC_reported","2025-05-15"),
+            (4,"source_claims_bank_recovery",25000),
+        ):
+            d=deepcopy(load_fixture())
+            d["jimex_unitrans_initial_paid_detention"]["appendix_b_paid_invoice_rows"][i][key]=value
+            with self.subTest(i=i,key=key),self.assertRaises(ResearchError):
+                validate_fixture(d)
+
+    def test_jimex_receipt_rehash_cannot_promote_initial_order_or_customer_cash(self):
+        from freight.unified_research_lab import digest
+        original=make_receipt()
+        changes=(
+            ("jimex_initial_claim_requested_cents",1197207),
+            ("jimex_initial_late_fee_reparations_cents",1197207),
+            ("jimex_initial_detention_refund_cents",0),
+            ("jimex_initial_principal_NOT_actual_cash_received_cents",4460669),
+            ("jimex_appendix_b_paid_invoice_count",11),
+            ("jimex_appendix_b_paid_detention_cents",1113600),
+            ("jimex_unrelated_carrier_exhibits_must_not_join",False),
+            ("jimex_initial_decision_finality_verified",True),
+            ("jimex_later_bank_cleared_refund_cents",1197207),
+            ("jimex_exact_interest_cents",10000),
+            ("jimex_current_customer_scoring_authorized",True),
+            ("retally_recovered_cash_cents",1197207),
+        )
+        for key,value in changes:
+            d=deepcopy(original)
+            d[key]=value
+            d["receipt_sha256"]=digest({k:v for k,v in d.items()
+                                        if k!="receipt_sha256"})
+            with self.subTest(key=key),self.assertRaises(ResearchError):
+                verify_receipt(d)
+        serialized=json.dumps(original)
+        for invoice_id in ("90855","91146","91156","91692","91289-1"):
+            self.assertNotIn('"'+invoice_id+'"',serialized)
+
     def test_separate_outcome_states_and_current_customer_nonpromotion(self):
         receipt=make_receipt()
-        self.assertEqual(len(receipt["fmc_cases"]),3)
+        self.assertEqual(len(receipt["fmc_cases"]),4)
         self.assertEqual(receipt["bridgewell_final_ordered_total_cents"],2828931)
         self.assertEqual(receipt["bridgewell_final_principal_cents"],2432880)
         self.assertEqual(receipt["bridgewell_final_interest_as_of_notice_cents"],396051)
