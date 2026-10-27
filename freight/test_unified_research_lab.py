@@ -1677,6 +1677,123 @@ class NYCCatalogIdentityReconciliationTests(unittest.TestCase):
                     self._assert_contract(modified)
 
 
+
+class ProtectedMainSeedContinuityTests(unittest.TestCase):
+    """Pinned main/draft source comparison: eight source locators held; one wrong topic rejected."""
+
+    @staticmethod
+    def _read(name):
+        return json.loads((Path(__file__).with_name("fixtures") / name).read_text(encoding="utf-8"))
+
+    def _check(self, official, fmc, nyc):
+        state = official["acceptance"]["protected_main_source_set_continuity_20261027"]
+        self.assertEqual(set(state), {
+            "observed_main_head", "main_catalog_git_blob_sha1",
+            "draft_head_before_snapshot", "draft_catalog_git_blob_sha1",
+            "original_main_only_seed_url_count",
+            "original_official_freight_pointers_retained_as_held_metadata",
+            "retained_in_six_source_manifest",
+            "retained_in_fmc_2015i_pair_manifest",
+            "excluded_nyc_restaurant_wrong_topic_count", "excluded_nyc_dataset_id",
+            "original_publisher_response_sha256", "original_source_bytes_acquired",
+            "source_specific_commercial_use_admitted",
+            "independently_held_out_customer_truth_labels",
+            "provider_host_or_rule_modified",
+            "executable_main_to_draft_source_merge_complete",
+            "protected_main_integration_verified",
+            "legacy_labs_consolidated", "classification", "cohort",
+            "owner_lane", "independent_qa_lane",
+        })
+        self.assertEqual(state["observed_main_head"], "ff4edaa6540d02cdddb4c04ef6ce224a434a3f8b")
+        self.assertEqual(state["main_catalog_git_blob_sha1"],
+                         "3fd2c32284e27833ed90725c276af6d63a086190")
+        self.assertEqual(state["draft_head_before_snapshot"],
+                         "49609760a7e2dd83d7686e5ae7852597639472a1")
+        self.assertEqual(state["draft_catalog_git_blob_sha1"],
+                         "a52e50df2e273465d14ebda947fb3b3027acd6d3")
+        self.assertEqual((state["original_main_only_seed_url_count"],
+                          state["original_official_freight_pointers_retained_as_held_metadata"],
+                          state["retained_in_six_source_manifest"],
+                          state["retained_in_fmc_2015i_pair_manifest"],
+                          state["excluded_nyc_restaurant_wrong_topic_count"]), (9, 8, 6, 2, 1))
+        self.assertEqual(state["excluded_nyc_dataset_id"], "43nn-pn8j")
+        self.assertEqual(state["classification"],
+                         "STATIC_PINNED_SEED_DIFF_EIGHT_HELD_ONE_EXCLUDED_NOT_ORIGINAL_SOURCE_BYTE_CUSTODY")
+        self.assertEqual(state["cohort"], "PROTECTED_MAIN_VS_DRAFT_SEED_IDENTITY_2026_10_27")
+        self.assertEqual(state["owner_lane"], "UNIFIED_RESEARCH_LAB")
+        self.assertEqual(state["independent_qa_lane"], ":44")
+        self.assertIsNone(state["original_publisher_response_sha256"])
+        self.assertEqual(state["independently_held_out_customer_truth_labels"], 0)
+        for field in ("original_source_bytes_acquired",
+                      "source_specific_commercial_use_admitted",
+                      "provider_host_or_rule_modified",
+                      "executable_main_to_draft_source_merge_complete",
+                      "protected_main_integration_verified",
+                      "legacy_labs_consolidated"):
+            self.assertFalse(state[field], field)
+
+        expected = {
+            "https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve",
+            "https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims",
+            "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",
+            "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",
+            "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",
+            "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",
+            "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
+            "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",
+        }
+        actual = {row["url"] for row in official["sources"]} | {
+            fmc["source"]["order_url"], fmc["source"]["nonreview_notice_url"],
+        }
+        self.assertEqual(len(official["sources"]), 6)
+        self.assertEqual(actual, expected)
+        self.assertTrue(all(url not in SEEDS["freightrecovery"] for url in expected))
+        self.assertTrue(all(not row["original_publisher_response_bytes_acquired"]
+                            and row["original_publisher_response_sha256"] is None
+                            and row["actual_customer_invoice_error_label"] == "UNKNOWN"
+                            for row in official["sources"]))
+        self.assertFalse(official["rights"]["commercial_engine_admission_authorized"])
+        self.assertFalse(fmc["rights"]["production_engine_commercial_ingest_approved"])
+        self.assertFalse(fmc["source"]["original_order_pdf_bytes_acquired"])
+        self.assertFalse(fmc["source"]["original_notice_pdf_bytes_acquired"])
+        self.assertIsNone(fmc["source"]["original_order_pdf_sha256"])
+        self.assertIsNone(fmc["source"]["original_notice_pdf_sha256"])
+        self.assertEqual(nyc["source_identity_delta"]["main_only_wrong_topic_dataset_id"],
+                         "43nn-pn8j")
+        self.assertNotIn("https://data.cityofnewyork.us/d/43nn-pn8j",
+                         SEEDS["permitplate"])
+        self.assertFalse(nyc["rights_and_provenance"]["source_specific_commercial_reuse_authorized"])
+        self.assertEqual(nyc["cohort"]["independently_held_out_issued_permit_labels"], 0)
+
+    def test_main_only_sources_preserved_as_held_or_explicitly_excluded(self):
+        self._check(
+            self._read("protected_main_official_source_reconciliation_candidate_v0.json"),
+            self._read("fmc_2015i_settlement_boundary_candidate_v0.json"),
+            self._read("nyc_dob_catalog_identity_reconciliation_candidate_v0.json"),
+        )
+
+    def test_reject_promoted_seed_parity_or_forged_source_truth(self):
+        original = self._read("protected_main_official_source_reconciliation_candidate_v0.json")
+        fmc = self._read("fmc_2015i_settlement_boundary_candidate_v0.json")
+        nyc = self._read("nyc_dob_catalog_identity_reconciliation_candidate_v0.json")
+        self._check(original, fmc, nyc)
+        mutations = (
+            ("original_main_only_seed_url_count", 8),
+            ("original_official_freight_pointers_retained_as_held_metadata", 9),
+            ("excluded_nyc_restaurant_wrong_topic_count", 0),
+            ("original_publisher_response_sha256", "UNVERIFIED"),
+            ("source_specific_commercial_use_admitted", True),
+            ("protected_main_integration_verified", True),
+            ("legacy_labs_consolidated", True),
+        )
+        for field, forged in mutations:
+            with self.subTest(field=field), self.assertRaises(AssertionError):
+                changed = json.loads(json.dumps(original))
+                changed["acceptance"]["protected_main_source_set_continuity_20261027"][field] = forged
+                self._check(changed, fmc, nyc)
+
+
+
 def load_tests(loader, tests, pattern):
     """Include held GAO supersession regressions in the existing unified CI suite."""
     from freight import test_gao_b215958_supersession
