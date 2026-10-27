@@ -132,6 +132,44 @@ pretend that an unlinked or authentication-gated historical revision was collect
 Those gaps remain first-class unresolved records until an authorized source or
 publisher-specific adapter supplies the bytes.
 
+## Demurrage/detention invoice audit: scope and input safety
+
+The read-only `audit_dd_invoice.py` screens 46 CFR Part 541 billing
+requirements effective May 28, 2024. It **does not apply the vacated
+§ 541.4 invoice-recipient rule** or decide whether an invoice is legally owed.
+
+For a reviewable in-scope invoice, CSV callers should include
+`billed_party_type` as one of: `shipper`, `consignee`, `cargo_owner`,
+`freight_forwarder`, or `truck_operator`. This field identifies the
+reported counterparty type; it **does not establish proper-party liability**.
+Unspecified, generic `other`, or unrecognized roles return
+`BILLING_RELATIONSHIP_UNVERIFIED_REVIEW` with zero potential relief.
+
+Invoicing between VOCCs, NVOCCs or marine terminal operators is held as
+`INTERCARRIER_TERMINAL_SCOPE_REVIEW`, not automatically scored, because
+46 CFR § 541.2(b) excludes certain such billing relationships and the
+actual relationship must be established from original records. Existing CSVs
+without this optional input column still parse, but default to the
+unverified-scope hold rather than assuming a private bill is covered.
+
+Invoice dollar amounts must be finite, nonnegative, and representable in
+**exact cents**. `NaN`, infinity, negative credit memos and sub-cent amounts
+are rejected instead of silently converted or rounded. Invalid ISO dates
+and non-numeric free-time day values also fail closed. Contradictory
+source chronologies (invoice issued before the charged event, invoice due
+before issue, free-time end before start) produce
+`SOURCE_TIMELINE_INCONSISTENCY_REVIEW` with **$0 potential relief**, never
+an automatic § 541.7 violation. Correct the source data first.
+
+Even with complete valid inputs, `potential_charge_relief_amount` is an
+**unverified review estimate only**, never a collectible error or recovered
+cash. A complete, legally applicable buyer-carrier contract, source invoice,
+shipment/timing documentation and approved commercial-use rights are still
+required. The FMC tariff crawl remains manual; this change schedules no
+network jobs or outside outreach. Reference:
+[Current 46 CFR Part 541](https://www.ecfr.gov/current/title-46/chapter-IV/subchapter-B/part-541);
+[FMC November 20, 2025 notice](https://www.fmc.gov/articles/u-s-court-of-appeals-issues-decision-in-case-on-demurrage-and-detention-billing-practices/).
+
 ## Evidence rules
 
 - Raw bytes are immutable and content-addressed.

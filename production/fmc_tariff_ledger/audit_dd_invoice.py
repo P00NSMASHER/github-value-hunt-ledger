@@ -91,6 +91,7 @@ class DDInvoiceInput:
 
     charge_last_incurred_date: str = ""
     upstream_invoice_date: str = ""
+    billed_party_type: str = ""  # shipper | consignee | cargo_owner | freight_forwarder | truck_operator; absent => HOLD
 
 
 def parse_date(value: str, *, required: bool = False) -> date | None:
@@ -112,7 +113,15 @@ def parse_decimal(value: str, *, required: bool = False) -> Decimal | None:
             raise ValueError("required decimal is blank")
         return None
     try:
-        return Decimal(value).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        amount = Decimal(value)
+        if not amount.is_finite():
+            raise ValueError("invoice amount must be finite")
+        if amount < 0:
+            raise ValueError("invoice amount must be non-negative; credit memos need separate review")
+        exact_cents = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        if amount != exact_cents:
+            raise ValueError("sub-cent precision would silently change the source invoice")
+        return Decimal("0.00") if amount == 0 else exact_cents
     except InvalidOperation as exc:
         raise ValueError(f"invalid decimal: {value!r}") from exc
 
@@ -186,6 +195,7 @@ def audit_invoice(item: DDInvoiceInput) -> dict[str, Any]:
     base = {
         "invoice_id": item.invoice_id,
         "billing_party_type": item.billing_party_type.lower().strip(),
+        "billed_party_type": (item.billed_party_type or "").lower().strip(),
         "charge_type": item.charge_type.lower().strip(),
         "invoice_date": invoice_date.isoformat(),
         "total_amount": str(total),
@@ -210,6 +220,44 @@ def audit_invoice(item: DDInvoiceInput) -> dict[str, Any]:
         return {**base, "status": "INVALID_BILLING_PARTY_TYPE"}
     if base["charge_type"] not in {"demurrage", "detention"}:
         return {**base, "status": "NOT_DEMURRAGE_OR_DETENTION"}
+
+    # 46 CFR 541.2(b) excludes billing relationships among and between
+    # ocean common carriers and MTOs. Merely knowing the party types cannot
+    # independently verify their legal relationship; hold rather than rate it.
+    # This is a scope question, NOT the vacated 541.4 proper-party rule.
+    billed_type = base["billed_party_type"]
+    if billed_type in {"vocc", "nvocc", "mto"}:
+        return {
+            **base,
+            "status": "INTERCARRIER_TERMINAL_SCOPE_REVIEW",
+            "scope_note": "Potential 46 CFR 541.2(b) exclusion; billing relationship evidence required.",
+        }
+    if billed_type not in {
+        "shipper", "consignee", "cargo_owner", "freight_forwarder",
+        "truck_operator",
+    }:
+        return {
+            **base,
+            "status": "BILLING_RELATIONSHIP_UNVERIFIED_REVIEW",
+            "scope_note": "Billed party category missing or unknown; cannot apply Part 541 or infer relief.",
+        }
+
+    # Numeric values and dates in a field must be valid, not merely nonblank.
+    # If contradictory source dates are present, route to source review
+    # without calculating an unsupported potential dollar recovery.
+    source_date_issues: list[str] = []
+    due = parse_date(item.invoice_due_date)
+    free_start = parse_date(item.free_time_start_date)
+    free_end = parse_date(item.free_time_end_date)
+    for date_value in (item.container_availability_date,
+                       item.earliest_return_date,
+                       item.later_resolution_date_agreed):
+        parse_date(date_value)
+    integer_days(item.allowed_free_time_days)
+    if due is not None and due < invoice_date:
+        source_date_issues.append("invoice_due_date_before_invoice_date")
+    if free_start is not None and free_end is not None and free_end < free_start:
+        source_date_issues.append("free_time_end_before_free_time_start")
 
     presence = required_content_fields(item)
     missing = sorted(field for field, present in presence.items() if not present)
@@ -241,6 +289,12 @@ def audit_invoice(item: DDInvoiceInput) -> dict[str, Any]:
     days_to_issue = None
     if timing_basis_date is not None:
         days_to_issue = (invoice_date - timing_basis_date).days
+        if days_to_issue < 0:
+            source_date_issues.append(
+                "invoice_date_before_upstream_invoice_date"
+                if base["billing_party_type"] == "nvocc"
+                else "invoice_date_before_charge_last_incurred_date"
+            )
         late_invoice = days_to_issue > 30
     elif base["billing_party_type"] == "nvocc":
         # A missing upstream invoice date prevents §541.7(b) timing verification;
@@ -266,7 +320,7 @@ def audit_invoice(item: DDInvoiceInput) -> dict[str, Any]:
                 "issues": dispute_issues,
             }
         )
-    if late_invoice is True:
+    if late_invoice is True and not source_date_issues:
         findings.append(
             {
                 "code": "LATE_INVOICE",
@@ -277,9 +331,17 @@ def audit_invoice(item: DDInvoiceInput) -> dict[str, Any]:
             }
         )
 
-    relief_trigger = bool(missing) or late_invoice is True
+    if source_date_issues:
+        findings.append({
+            "code": "SOURCE_DATE_INCONSISTENCY",
+            "citation": None,
+            "issues": source_date_issues,
+        })
+    relief_trigger = (bool(missing) or late_invoice is True) and not source_date_issues
     status = "COMPLIANT_ON_CHECKED_FIELDS"
-    if relief_trigger:
+    if source_date_issues:
+        status = "SOURCE_TIMELINE_INCONSISTENCY_REVIEW"
+    elif relief_trigger:
         status = "POTENTIAL_NO_PAYMENT_OBLIGATION_REVIEW"
     elif dispute_issues:
         status = "PROCESS_NONCOMPLIANCE_REVIEW"
@@ -291,6 +353,7 @@ def audit_invoice(item: DDInvoiceInput) -> dict[str, Any]:
         "status": status,
         "required_field_presence": presence,
         "missing_required_fields": missing,
+        "source_date_issues": source_date_issues,
         "timing_basis": timing_basis,
         "timing_basis_date": (
             timing_basis_date.isoformat() if timing_basis_date else None
