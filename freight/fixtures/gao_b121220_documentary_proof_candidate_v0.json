@@ -1,0 +1,100 @@
+{
+  "schema_version": "0.1.0",
+  "evaluation_family": "HISTORICAL_FREIGHT_DOCUMENTARY_PROOF_NEGATIVE_CONTROL_NOT_CUSTOMER_INVOICE_SCORING",
+  "engine": "freightrecovery",
+  "secondary_engine": "recoveryos",
+  "source": {
+    "url": "https://www.gao.gov/products/b-121220-0",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-121220",
+    "decision_date": "1964-02-13",
+    "earlier_modified_decision_date": "1957-08-02",
+    "reviewed_original_publisher_html_text_on": "2026-10-27",
+    "original_http_response_bytes_acquired": false,
+    "original_http_response_sha256": null,
+    "original_invoices_freight_bills_payment_vouchers_acquired": false,
+    "historical_freight_tariff_effective_date": null
+  },
+  "provenance": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "canonical_ref": "main",
+    "source_already_seeded_on_protected_main": true,
+    "existing_candidate_branch": "evidence/gao-b143458-capacity-tariff-scope-20261024",
+    "independent_original_document_custody": false,
+    "original_source_byte_hash_verified": false
+  },
+  "rights": {
+    "gao_government_authored_content_us_copyright_status": "NOT_PROTECTED_IN_US",
+    "official_terms_url": "https://www.gao.gov/copyright",
+    "acknowledge_publisher_required": true,
+    "no_implied_gao_endorsement": true,
+    "third_party_material_permission_checked": false,
+    "production_commercial_engine_use_authorized": false,
+    "redistribution_of_third_party_attachments_authorized": false
+  },
+  "historic_decision_facts": {
+    "historical_small_prepaid_freight_exception_threshold_cents": 2500,
+    "small_exception_comparison": "STRICTLY_LESS_THAN",
+    "threshold_applies_only_to": "LIMITED_1957_PREPAID_FREIGHT_WAIVER_NO_GENERAL_CURRENT_RULE",
+    "over_threshold_blanket_waiver_approved": false,
+    "unreceipted_carrier_freight_bill_alone_proves_payment": false,
+    "unreceipted_bill_may_be_combined_with": "CERTIFIED_CARRIER_INVOICE_PAYMENT_EVIDENCE_AND_GOVERNMENT_REIMBURSEMENT_VOUCHER",
+    "records_retention_alternative": "UNRECEIPTED_BILL_PLUS_PAYMENT_CERTIFICATION_WITH_EVIDENCE_AVAILABLE_ON_GOVERNMENT_REQUEST_WHEN_CONTRACT_RETAINS_RECORDS_AT_LEAST_THREE_YEARS",
+    "freight_bill_receipt_by_itself_proves_charges_correct": false,
+    "party_that_bore_freight_expense_must_be_established": true,
+    "case_rules_apply_to_modern_shipments": "UNKNOWN"
+  },
+  "cohort": {
+    "historical_decision_count": 1,
+    "independent_held_out_real_customer_labeled_invoices": 0,
+    "independently_verified_amount_overcharged_cents": null,
+    "verified_carrier_refund_received_cents": null,
+    "retally_customer_recovery_cents": 0,
+    "ground_truth_quality": "PUBLISHED_DECISION_ONLY_NOT_DOCUMENTARY_PAYMENT_PROOF"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B121220_UNRECEIPTED_BILL_ALONE_CALLED_PAYMENT_PROOF",
+      "kind": "SYNTHETIC",
+      "input_document_state": "UNRECEIPTED_CARRIER_BILL_ONLY",
+      "expected": "REJECT_PAYMENT_PROOF_PROMOTION",
+      "customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B121220_RECEIPT_CALLED_RATE_ACCURACY",
+      "kind": "SYNTHETIC",
+      "input_document_state": "RECEIPTED_BILL_PRICE_UNCHECKED",
+      "expected": "REJECT_RATE_ACCURACY_PROMOTION",
+      "customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B121220_OVER_25_DOLLAR_GENERAL_WAIVER",
+      "kind": "SYNTHETIC",
+      "input_document_state": "PREPAID_CHARGE_2501_CENTS_UNRECEIPTED_NO_PAYMENT_EVIDENCE",
+      "expected": "REJECT_HISTORICAL_SMALL_EXCEPTION_OVEREXTENSION",
+      "customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B121220_UNDOCUMENTED_PARTY_IN_INTEREST",
+      "kind": "SYNTHETIC",
+      "input_document_state": "FREIGHT_BILL_NO_REIMBURSEMENT_OR_PAYER_PROOF",
+      "expected": "REJECT_REAL_PARTY_IN_INTEREST_PROMOTION",
+      "customer_ground_truth": null
+    },
+    {
+      "id": "SYNTH_B121220_1964_RULE_APPLIED_TO_2026_INVOICE",
+      "kind": "SYNTHETIC",
+      "input_document_state": "MODERN_INVOICE_HISTORICAL_GAO_ONLY",
+      "expected": "REJECT_UNSUPPORTED_MODERN_LEGAL_APPLICATION",
+      "customer_ground_truth": null
+    }
+  ],
+  "acceptance": {
+    "main_only_pointer_reconciled_in_existing_draft_after_seed_update": true,
+    "provider_allowlist_changed": false,
+    "source_original_bytes_verified": false,
+    "source_rights_for_automated_commercial_engine_approved": false,
+    "independent_qa_passed": false,
+    "merge_authorized": false
+  }
+}
