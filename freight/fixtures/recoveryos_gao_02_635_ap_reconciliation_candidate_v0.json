@@ -13,6 +13,7 @@
     "original_publisher_accessible_text_url": "https://www.gao.gov/assets/a234797.html",
     "source_paragraph_line_ranges": [
       "595-619",
+      "601-604",
       "642-651",
       "174-176"
     ],
@@ -43,6 +44,24 @@
       "computed_overpayment_cents": 819485700,
       "publisher_amount_disagreement_cents": 100,
       "label": "GAO_REPORTS_REFUND_BUT_PUBLISHED_DOLLAR_ARITHMETIC_DIFFERS_BY_ONE_DOLLAR",
+      "independent_bank_receipt_acquired": false
+    },
+    {
+      "case_id": "BOEING_2001_TWO_INVOICE_LIQUIDATION",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "INCORRECT_PROGRESS_LIQUIDATION_RATE_TWO_INVOICES",
+      "invoice_count_reported": 2,
+      "refund_reported_month": "2001-07",
+      "two_invoice_overcharge_cents": [
+        207792200,
+        345000000
+      ],
+      "computed_component_sum_cents": 552792200,
+      "publisher_reported_refund_cents": 552792200,
+      "publisher_component_arithmetic_agrees": true,
+      "original_invoice_identifiers": "UNKNOWN",
+      "original_invoice_documents_acquired": false,
+      "label": "GAO_REPORTS_TWO_INVOICE_LIQUIDATION_REFUND_NO_ORIGINAL_INVOICE_CUSTODY",
       "independent_bank_receipt_acquired": false
     },
     {
@@ -98,10 +117,15 @@
       "id": "SYNTH_HISTORICAL_DFAS_AP_CASE_IS_MODERN_FREIGHT_ERROR_TRUTH",
       "kind": "SYNTHETIC",
       "expected": "REJECT_ACCOUNTING_RECONCILIATION_ONLY_NO_FREIGHT_ERROR_LABELS"
+    },
+    {
+      "id": "SYNTH_BOEING_TWO_INVOICES_TREATED_AS_ONE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_REPORTS_TWO_DISTINCT_INVOICE_OVERCHARGE_COMPONENTS"
     }
   ],
   "truth_boundaries": {
-    "publisher_reported_historical_cases": 3,
+    "publisher_reported_historical_cases": 4,
     "independent_heldout_original_customer_invoice_labels": 0,
     "independent_modern_general_accounting_accuracy_labels": 0,
     "freight_error_accuracy_labels": 0,
@@ -110,7 +134,7 @@
     "modern_engine_accuracy": "UNKNOWN",
     "admission_to_commercial_customer_scoring": false,
     "do_not_treat_publisher_reported_refund_as_user_cash": true,
-    "holdout_leakage_warning": "THREE_CASES_FROM_ONE_PUBLISHER_REPORT_ONE_COHORT_NOT_THREE_INDEPENDENT_WITNESSES"
+    "holdout_leakage_warning": "FOUR_CASES_FROM_ONE_PUBLISHER_REPORT_ONE_COHORT_NOT_FOUR_INDEPENDENT_WITNESSES"
   },
   "quality": {
     "original_publisher_text_visually_confirmed_in_web_reader": true,
@@ -118,11 +142,11 @@
     "publisher_report_explicitly_disclaims_full_underlying_DFAS_data_reliability_assessment": true,
     "source_does_not_provide_original_invoice_or_bank_receipt_images": true,
     "original_publisher_arithmetic_disagreement_preserved": true,
-    "case_label_completeness": "THREE_HISTORICAL_REPORT_LEVEL_OUTCOMES_NO_INDEPENDENT_CUSTOMER_LEDGER_OR_HOLDOUT_LABELS",
+    "case_label_completeness": "FOUR_HISTORICAL_REPORT_LEVEL_OUTCOMES_NO_INDEPENDENT_CUSTOMER_LEDGER_OR_HOLDOUT_LABELS",
     "private_customer_medical_student_records_included": false
   },
   "handoff": {
-    "engineering_12": "RECOVERYOS_ONLY_GAO_REPORTED_HISTORICAL_DUPLICATE_VS_PREVENTED_AND_DOLLAR_CONFLICT_NO_ENGINE_CHANGE",
+    "engineering_12": "RECOVERYOS_ONLY_GAO_REPORTED_TWO_INVOICE_ALLOCATION_DUPLICATE_VS_PREVENTED_AND_DOLLAR_CONFLICT_NO_ENGINE_CHANGE",
     "permitplate_48": "NOT_APPLICABLE",
     "capturebrief_52": "NOT_APPLICABLE",
     "qa_44": "INDEPENDENTLY_VERIFY_ORIGINAL_GAO_REPORT_FIGURES_RIGHTS_ORIGINAL_BYTE_HASH_AND_POSITIVE_NEGATIVE_OUTCOME_SEPARATION",
