@@ -58,8 +58,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
            "PUBLISHER_REPORTS_PAID_AGGREGATE_SETTLEMENT"),
           ("DOJ_2022_YRC", "2022-03-14", 685000000,
            "PUBLISHER_REPORTS_APPROXIMATE_AGREED_SETTLEMENT_NOT_PAID_PROOF"),
-          ("CBCA_6578_RATE_2020", "2020-08-06", None,
-           "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
+          ("CBCA_6578_RATE_2020", "2020-08-06", 1554908,
+           "CARRIER_PAID_GSA_SEVEN_NOTICES_CLAIM_GRANTED_REFUND_UNVERIFIED"),
           ("CBCA_8051_RATE_2024", "2024-08-08", 1459569,
            "UNPAID_CARRIER_INVOICE_CLAIM_TIME_BARRED_NOT_OVERCHARGE"),
           ("CBCA_1317_RATE_2009", "2009-10-29", None,
@@ -80,7 +80,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                      "independent_actual_settlement_cash_receipt_verified",
                      "verified_retally_customer_recovery_cents", "historical_tariff_effective_date"}
         for row, should in zip(pack["sources"], expected):
-            self.assertEqual(set(row), rows_keys)  # Reject nested claim spoofing.
+            self.assertEqual(set(row), rows_keys | ({"decision_evidence"} if
+                             row["id"] == "CBCA_6578_RATE_2020" else set()))  # Explicit nested whitelist.
             self.assertEqual((row["id"], row["published_on"], row["reported_amount_cents"],
                               row["publisher_outcome_scope"]), should)
             self.assertTrue(row["url"].startswith("https://www.justice.gov/" if
@@ -104,9 +105,27 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                          "APPROXIMATE_AGREED_AGGREGATE_NOT_RECEIPT")
         self.assertEqual(pack["sources"][3]["reported_amount_semantics"],
                          "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE")
+        self.assertEqual(pack["cohort"]["primary_original_text_or_first_page_checked_this_run"], 4)
+        self.assertEqual(pack["sources"][2]["source_review_status"],
+                         "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_3_6_VISUAL_2026_10_27")
+        self.assertEqual(pack["sources"][2]["reported_amount_semantics"],
+                         "CARRIER_PAID_GSA_DISPUTED_NOTICES_NOT_VERIFIED_REFUND_RECEIVED")
+        self.assertEqual(pack["sources"][2]["decision_evidence"], {
+            "original_pdf_pages": 6,
+            "visually_reviewed_pages_one_based": [1, 3, 6],
+            "shipment_year": 2014,
+            "government_notices_total": 115,
+            "appealed_notices": 7,
+            "other_notices_disposition": "UNKNOWN",
+            "carrier_paid_gsa_disputed_notices_cents": 1554908,
+            "board_disposition": "AARE_CLAIM_GRANTED_GSA_OVERCHARGE_PREMISE_REJECTED",
+            "carrier_refund_received_independently_verified": False,
+            "underlying_original_tenders_gbls_or_bank_receipts_acquired": False,
+        })
         controls = pack["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 6)
-        self.assertEqual(len({x["id"] for x in controls}), 6)
+        self.assertEqual(len(controls), 7)
+        self.assertEqual(len({x["id"] for x in controls}), 7)
+        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_AARE_CLAIM_GRANTED_CALLED_REFUND_RECEIVED")
         for control in controls:
             self.assertEqual(set(control), {"id", "kind", "actual_independent_customer_outcome",
                                             "expected"})
@@ -126,6 +145,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
             (1, "independent_actual_settlement_cash_receipt_verified", True),
             (3, "publisher_outcome_scope", "ADJUDICATED_CUSTOMER_OVERCHARGE"),
             (3, "reported_amount_cents", 0),
+            (2, "reported_amount_cents", 1554909),
+            (2, "publisher_outcome_scope", "CARRIER_REFUND_RECEIVED"),
             (0, "original_publisher_response_sha256", "fake-original-bytes"),
             (0, "source_specific_commercial_rights_verified", True),
             (0, "actual_customer_invoice_error_label", "TRUE_POSITIVE"),
@@ -136,6 +157,21 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
             bad["sources"][index][key] = spoofed
             with self.subTest(spoofed=key), self.assertRaises(AssertionError):
                 self._assert_contract(bad)
+
+    def test_cbca_6578_decision_unpaid_refund_and_unevaluated_108_controls(self):
+        baseline = self._pack()
+        for key, forged in (
+            ("government_notices_total", 7),
+            ("appealed_notices", 115),
+            ("other_notices_disposition", "ALL_108_REFUNDED"),
+            ("carrier_paid_gsa_disputed_notices_cents", 1554909),
+            ("carrier_refund_received_independently_verified", True),
+            ("underlying_original_tenders_gbls_or_bank_receipts_acquired", True),
+        ):
+            poisoned = json.loads(json.dumps(baseline))
+            poisoned["sources"][2]["decision_evidence"][key] = forged
+            with self.subTest(forged=key), self.assertRaises(AssertionError):
+                self._assert_contract(poisoned)
 
 
 class UnifiedResearchLabTests(unittest.TestCase):
