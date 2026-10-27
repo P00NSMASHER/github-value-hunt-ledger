@@ -38,16 +38,17 @@ def verify_source_bound_candidate(doc):
     assert "THIRD_PARTY_RIGHTS_SEPARATE" in source["rights_state"]
 
     cases = doc["historical_cases"]
-    eq(len(cases), 3)
+    eq(len(cases), 4)
     eq([c["case_id"] for c in cases], [
         "TEXTRON_2000_PROGRESS_LIQUIDATION",
+        "BOEING_2001_TWO_INVOICE_LIQUIDATION",
         "EAGLE_2001_CROSS_FORMAT_DUPLICATE",
         "LUCENT_2000_2001_DUPLICATE_PREVENTED",
     ])
     assert all(c["kind"] == "PUBLISHER_REPORTED_HISTORICAL_CASE"
                and c["independent_bank_receipt_acquired"] is False
                for c in cases)
-    textron, eagle, lucent = cases
+    textron, boeing, eagle, lucent = cases
     eq(textron["contract_delivery_price_cents"], 1095720500)
     eq(textron["liquidation_should_cents"], 821790400)
     eq(textron["net_invoice_cents"], 273930100)
@@ -62,6 +63,17 @@ def verify_source_bound_candidate(doc):
     eq(textron["computed_overpayment_cents"] -
        textron["publisher_reported_refund_cents"],
        textron["publisher_amount_disagreement_cents"])
+
+    eq(boeing["error_type"], "INCORRECT_PROGRESS_LIQUIDATION_RATE_TWO_INVOICES")
+    eq(boeing["invoice_count_reported"], 2)
+    eq(boeing["two_invoice_overcharge_cents"], [207792200, 345000000])
+    eq(boeing["computed_component_sum_cents"], 552792200)
+    eq(boeing["publisher_reported_refund_cents"], 552792200)
+    eq(boeing["publisher_component_arithmetic_agrees"], True)
+    eq(boeing["original_invoice_identifiers"], "UNKNOWN")
+    eq(boeing["original_invoice_documents_acquired"], False)
+    eq(boeing["label"], "GAO_REPORTS_TWO_INVOICE_LIQUIDATION_REFUND_NO_ORIGINAL_INVOICE_CUSTODY")
+    eq(sum(boeing["two_invoice_overcharge_cents"]), boeing["publisher_reported_refund_cents"])
 
     eq(eagle["publisher_reported_refund_cents"], 95833900)
     eq(eagle["source_says_same_invoice"], True)
@@ -79,7 +91,7 @@ def verify_source_bound_candidate(doc):
     eq(lucent["label"], "NO_SECOND_PAID_DUPLICATE_NO_RECOVERY_CASH_LABEL")
 
     boundary = doc["truth_boundaries"]
-    eq(boundary["publisher_reported_historical_cases"], 3)
+    eq(boundary["publisher_reported_historical_cases"], 4)
     for key in ("independent_heldout_original_customer_invoice_labels",
                 "independent_modern_general_accounting_accuracy_labels",
                 "freight_error_accuracy_labels",
@@ -96,8 +108,8 @@ def verify_source_bound_candidate(doc):
     eq(quality["private_customer_medical_student_records_included"], False)
 
     controls = doc["synthetic_negative_controls"]
-    eq(len(controls), 5)
-    eq(len({x["id"] for x in controls}), 5)
+    eq(len(controls), 6)
+    eq(len({x["id"] for x in controls}), 6)
     assert all(x["kind"] == "SYNTHETIC"
                and x["id"].startswith("SYNTH_")
                and x["expected"].startswith("REJECT_")
@@ -113,10 +125,13 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
         verify_source_bound_candidate(self.pack)
 
     def test_real_report_positive_negative_and_one_dollar_conflict(self):
-        textron, eagle, lucent = self.pack["historical_cases"]
+        textron, boeing, eagle, lucent = self.pack["historical_cases"]
         self.assertEqual(textron["computed_overpayment_cents"], 819485700)
         self.assertEqual(textron["publisher_reported_refund_cents"], 819485600)
         self.assertEqual(textron["publisher_amount_disagreement_cents"], 100)
+        self.assertEqual(boeing["invoice_count_reported"], 2)
+        self.assertEqual(sum(boeing["two_invoice_overcharge_cents"]), 552792200)
+        self.assertFalse(boeing["original_invoice_documents_acquired"])
         self.assertEqual(eagle["label"], "GAO_REPORTS_DUPLICATE_PAYMENT_AND_REFUND")
         self.assertEqual(eagle["publisher_reported_refund_cents"], 95833900)
         self.assertIsNone(lucent["publisher_reported_refund_cents"])
@@ -137,9 +152,12 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
             ("truth_boundaries", "verified_retally_recovered_cash_cents", 95833900),
             ("truth_boundaries", "modern_engine_accuracy", "100_PERCENT"),
             ("historical_cases", 0, "publisher_reported_refund_cents", 819485700),
-            ("historical_cases", 1, "source_says_shipment_numbers_different", False),
-            ("historical_cases", 2, "duplicate_eft_canceled_before_bank", False),
-            ("historical_cases", 2, "publisher_reported_refund_cents", 139720000),
+            ("historical_cases", 1, "invoice_count_reported", 1),
+            ("historical_cases", 1, "two_invoice_overcharge_cents", [207792200, 344999900]),
+            ("historical_cases", 1, "original_invoice_documents_acquired", True),
+            ("historical_cases", 2, "source_says_shipment_numbers_different", False),
+            ("historical_cases", 3, "duplicate_eft_canceled_before_bank", False),
+            ("historical_cases", 3, "publisher_reported_refund_cents", 139720000),
         ]
         for mutation in mutations:
             with self.subTest(mutation=mutation):
@@ -152,7 +170,7 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
                     poisoned[section][key] = fake
                 with self.assertRaises(AssertionError):
                     verify_source_bound_candidate(poisoned)
-        self.assertEqual(len(mutations), 14)
+        self.assertEqual(len(mutations), 17)
 
 
 if __name__ == "__main__":
