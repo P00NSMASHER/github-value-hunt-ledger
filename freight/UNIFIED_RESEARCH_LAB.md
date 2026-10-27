@@ -254,6 +254,65 @@ Offline checks:
     python -m freight.public_freight_proof_ladder --output /tmp/public_freight_proof.json --verify
 
 
+## FMC Jimex v. Unitrans: five paid detention invoices and partial initial award (2026)
+
+The [FMC July 16, 2026 original indexed **initial** decision, Docket
+2036(I)](https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf)
+found Unitrans-PRA violated 46 U.S.C. § 41102(c) through excessive late
+payment fees and § 41104(a)(15) through detention invoices missing the
+minimum source information required by § 41104(d)(2) and 46 CFR § 541.6.
+
+**Unusually strong evidence:** Appendix B reports five real detention
+invoices with individual charge amounts and the dates Jimex paid the charges:
+
+| FMC-reported original invoice | Detention Jimex paid | Payment date, FMC-reported |
+| --- | ---: | --- |
+| 90855 | $650.00 | 2025-05-15 |
+| 91146 | $125.00 | 2025-05-15 |
+| 91156 | $375.00 | 2025-05-15 |
+| 91692 | $575.00 | 2025-06-05 |
+| 91289-1 | $250.00 | 2025-05-15 |
+| **Total, five distinct invoices** | **$1,975.00** | |
+
+The decision's **initial** ruling ordered **$9,997.07** in late-fee
+reparations plus refund of **$1,975.00** in paid invalid detention
+charges, **$11,972.07 initial principal**, with interest calculated from
+each injury date (the exact interest amount is not independently known).
+This is NOT the **$44,606.69** Jimex originally demanded. Respondent
+also asserted a disputed **$11,136** outstanding balance, which is
+NOT established here as actually due or paid. Later administrative
+finality and bank-cleared actual reparations/refund remain **unverified**.
+
+**Critical original-source join trap:** Footnote 3 of the initial
+decision identifies a set of shipping-line detention invoices attached
+by respondent on March 14, 2025 that belonged to shipments **outside
+the five invoices at issue**. Actual source-looking documents may be
+completely authentic but still belong to the *wrong shipment*. A valid
+billing proof chain must validate invoice ID, relevant shipment/BOL,
+charge period and governing tariff together; a genuine unrelated
+shipping-line invoice must NOT become supporting customer-rate truth.
+The agency's record later describes underlying pass-through invoices,
+but RETALLY has not independently acquired those original attachment
+bytes, payment receipts or signed underlying BOLs.
+
+An [FMC July 23, 2026 order](https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf)
+denied an **extension request**; it is NOT itself a finality notice.
+The original decision PDF was indexed by the official publisher, but
+a direct PDF-byte fetch and independent visual page check were not
+available for this review. Consequently, original publisher PDF SHA,
+original invoice/BOL/tariff copies, independent customer bank-clearing
+and source-specific commercial reuse remain **unverified**.
+
+This case is added to the **existing** unified FMC real-shipper casebook.
+The source fixture pins all five public invoice IDs, values and dates
+in historical test context, while only an **aggregate and source-scoped**
+receipt enters the research branch (never raw invoice IDs). Adversarial
+tests reject forged initial awards, wrong invoice joins, made-up interest,
+premature administrative finality, paid refunds or RETALLY cash. Real
+current customer claim accuracy, modern buyer-specific authority and
+RETALLY recovered cash remain **0/unverified**. No contacts, new cron,
+paid sources or production invoice money automation.
+
 ## Modern FMC shipper payment evidence: Bridgewell / COSCO (2022–2026)
 
 **Stronger than a historical aggregate GSA deduction:** two independent FMC

@@ -142,5 +142,62 @@
     "liability_finding_original_fees_unlawful": false,
     "claimant_original_economic_loss_independently_verified": false,
     "third_party_contract_rights_for_retally_use": false
+  },
+  "jimex_unitrans_initial_paid_detention": {
+    "case_id": "FMC_2036(I)",
+    "claimant": "JIMEX_USA_INC",
+    "respondent": "UNITRANS_PRA_CO_INC",
+    "initial_decision_served": "2026-07-16",
+    "official_initial_decision_url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+    "official_extension_denial_served": "2026-07-23",
+    "official_extension_denial_url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",
+    "source_sections_indexed": "OFFICIAL_FMC_INITIAL_DECISION_ORDER_AND_APPENDIX_B_INDEXED_TEXT_NOT_ORIGINAL_PDF_BYTES",
+    "initial_claim_reparations_requested_cents": 4460669,
+    "respondent_contested_unpaid_balance_claim_cents": 1113600,
+    "respondent_claimed_unpaid_balance_independently_adjudicated_due": false,
+    "initial_decision_41102_c_excess_late_fee_violation": true,
+    "initial_decision_41104_a15_missing_detention_invoice_information_violation": true,
+    "initial_decision_541_6_minimum_contents_violation": true,
+    "initial_late_fee_reparations_ordered_cents": 999707,
+    "initial_detention_refund_ordered_cents": 197500,
+    "initial_ordered_principal_cents_EXCLUDES_interest": 1197207,
+    "interest_awarded_but_exact_amount_unverified": true,
+    "initial_decision_granted_in_part_and_denied_in_part": true,
+    "actual_finality_notice_independently_verified": false,
+    "refund_received_by_claimant_independently_bank_verified_cents": null,
+    "appendix_b_claimant_paid_detention_invoice_count": 5,
+    "appendix_b_total_paid_detention_cents": 197500,
+    "appendix_b_paid_invoice_rows": [
+      {
+        "invoice_number_FMC_reported": "90855",
+        "detention_charged_paid_cents_FMC_reported": 65000,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      },
+      {
+        "invoice_number_FMC_reported": "91146",
+        "detention_charged_paid_cents_FMC_reported": 12500,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      },
+      {
+        "invoice_number_FMC_reported": "91156",
+        "detention_charged_paid_cents_FMC_reported": 37500,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      },
+      {
+        "invoice_number_FMC_reported": "91692",
+        "detention_charged_paid_cents_FMC_reported": 57500,
+        "claimant_payment_date_FMC_reported": "2025-06-05"
+      },
+      {
+        "invoice_number_FMC_reported": "91289-1",
+        "detention_charged_paid_cents_FMC_reported": 25000,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      }
+    ],
+    "unrelated_carrier_invoice_exhibits_not_linkable_to_these_five_shipments": true,
+    "third_party_pass_through_original_invoices_introduced_during_proceeding": true,
+    "underlying_paid_invoice_and_bank_bytes_held_by_RETALLY": false,
+    "contemporaneous_private_accepted_rate_authority_held_by_RETALLY": false,
+    "current_customer_scoring_authorized": false
   }
 }
