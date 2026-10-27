@@ -1954,6 +1954,15 @@ def load_tests(loader, tests, pattern):
     if freight_negative_controls.countTestCases() != 4:
         raise AssertionError("CBCA 3467-RATE negative freight tests missing")
     tests.addTests(freight_negative_controls)
+    # Historical GAO B-121220 limits documentary/payment evidence claims.
+    # Register existing source-bound controls without admitting customer truth.
+    from freight import test_gao_b121220_documentary_proof
+    documentary_controls = loader.loadTestsFromModule(
+        test_gao_b121220_documentary_proof
+    )
+    if documentary_controls.countTestCases() != 3:
+        raise AssertionError("GAO B-121220 documentary-proof controls missing")
+    tests.addTests(documentary_controls)
     return tests
 
 
