@@ -74,6 +74,10 @@ SEEDS = {
         "https://www.gao.gov/products/b-146511-2",  # 1965 conflicting reclaim figures; offset $20.74.
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+        # Preserve current-main FMC shipper adjudication locators; no original bytes or paid recovery asserted.
+        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",  # 2022(I) initial principal decision only; source rights held.
+        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",  # 2022(I) notice of nonreview; paid status UNKNOWN; source rights held.
+        "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",  # 2025(I) rejected reparations negative control; source rights held.
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
         "https://www.fmc.gov/wp-content/uploads/2019/04/vol22.pdf",  # Official 22 F.M.C. 94; INDEX-ONLY, no original byte/hash, unadmitted.
         "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
