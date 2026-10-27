@@ -10,7 +10,38 @@ FIXTURE = (
 )
 
 
+
+# Strict v0 claim-field inventory from independently reviewed GAO-02-635 fixture.
+# An unmodeled nested key could otherwise embed unsupported bank, recovery,
+# commercial-rights, or independent-ground-truth assertions inside a valid pack.
+APPROVED_GAO_V0_FIELDS = {
+    "root": frozenset(["admission_state","cohort","engine","evaluation_family","handoff","historical_cases","pack_id","quality","schema_version","source","synthetic_negative_controls","truth_boundaries"]),
+    "source": frozenset(["commercial_customer_engine_admission","contract_effective_date","government_endorsement_claimed","landing_url","original_publisher_accessible_text_url","original_publisher_response_bytes_acquired","original_publisher_response_sha256","original_underlying_invoices_payment_ledgers_bank_statements_acquired","publisher","report_id","report_public_release_date","report_published_date","reviewed_date","rights_state","rights_url","source_paragraph_line_ranges","title"]),
+    "truth_boundaries": frozenset(["admission_to_commercial_customer_scoring","do_not_treat_publisher_reported_refund_as_user_cash","freight_error_accuracy_labels","holdout_leakage_warning","independent_heldout_original_customer_invoice_labels","independent_modern_general_accounting_accuracy_labels","independent_original_bank_settlement_receipts","modern_engine_accuracy","publisher_reported_historical_cases","verified_retally_recovered_cash_cents"]),
+    "quality": frozenset(["case_label_completeness","original_publisher_arithmetic_disagreement_preserved","original_publisher_text_visually_confirmed_in_web_reader","private_customer_medical_student_records_included","publisher_report_explicitly_disclaims_full_underlying_DFAS_data_reliability_assessment","source_body_hash_verified","source_does_not_provide_original_invoice_or_bank_receipt_images"]),
+    "historical_cases": tuple(
+        frozenset(fields) for fields in [["case_id","computed_overpayment_cents","contract_delivery_price_cents","dfas_payment_cents","error_type","independent_bank_receipt_acquired","invoice_month","kind","label","liquidation_should_cents","net_invoice_cents","publisher_amount_disagreement_cents","publisher_reported_refund_cents","refund_reported_month"],["case_id","computed_component_sum_cents","error_type","independent_bank_receipt_acquired","invoice_count_reported","kind","label","original_invoice_documents_acquired","original_invoice_identifiers","publisher_component_arithmetic_agrees","publisher_reported_refund_cents","refund_reported_month","two_invoice_overcharge_cents"],["case_id","electronic_invoice_paid","electronic_invoice_submitted","error_type","hardcopy_invoice_paid","hardcopy_invoice_submitted","independent_bank_receipt_acquired","kind","label","publisher_reported_refund_cents","refund_reported_month","source_says_same_invoice","source_says_shipment_numbers_different"],["attempted_duplicate_amount_cents","case_id","duplicate_eft_canceled_before_bank","error_type","first_payment_reported","independent_bank_receipt_acquired","kind","label","publisher_reported_refund_cents","second_duplicate_bank_payment_confirmed"],["accounting_line_corrected_month","case_id","contract_modification_month","corrective_modification_eliminated_debt","demand_canceled","demand_face_amount_cents","demand_issued_month","error_type","independent_bank_receipt_acquired","independently_verified_paid_debt_or_refund_cents","kind","label","publisher_reported_refund_cents","wrong_accounting_line_found_month","wrong_accounting_line_reported"]]
+    ),
+}
+
+
+def reject_unmodeled_gao_claims(doc):
+    if type(doc) is not dict or set(doc) != APPROVED_GAO_V0_FIELDS["root"]:
+        raise AssertionError("UNREVIEWED_TOP_LEVEL_GAO_CLAIM")
+    for section in ("source", "truth_boundaries", "quality"):
+        if type(doc[section]) is not dict or set(doc[section]) != APPROVED_GAO_V0_FIELDS[section]:
+            raise AssertionError("UNREVIEWED_GAO_" + section.upper() + "_CLAIM")
+    cases = doc["historical_cases"]
+    expected = APPROVED_GAO_V0_FIELDS["historical_cases"]
+    if type(cases) is not list or len(cases) != len(expected):
+        raise AssertionError("UNREVIEWED_GAO_CASE_COUNT")
+    for index, (case, allowed) in enumerate(zip(cases, expected)):
+        if type(case) is not dict or set(case) != allowed:
+            raise AssertionError("UNREVIEWED_GAO_CASE_FIELDS_" + str(index))
+
+
 def verify_source_bound_candidate(doc):
+    reject_unmodeled_gao_claims(doc)
     def eq(actual, expected):
         assert type(actual) is type(expected) and actual == expected
 
@@ -160,6 +191,26 @@ class GAOAccountingReconCandidateTest(unittest.TestCase):
         self.assertEqual(lockheed["demand_face_amount_cents"], 275524400)
         self.assertIsNone(lockheed["publisher_reported_refund_cents"])
         self.assertIsNone(lockheed["independently_verified_paid_debt_or_refund_cents"])
+
+    def test_synthetic_unmodeled_nested_provenance_claims_rejected(self):
+        # All four are SYNTHETIC forgeries, not publisher observations.
+        forged = [
+            ("source", "bank_statement_sha256", "0" * 64),
+            ("truth_boundaries", "independent_customer_recovery_verified", True),
+            ("quality", "customer_precision_recall_verified", "100_PERCENT"),
+            ("historical_cases", 1, "retally_received_bank_cash_cents", 552792200),
+        ]
+        for item in forged:
+            with self.subTest(synthetic_mutation=item):
+                poisoned = copy.deepcopy(self.pack)
+                if item[0] == "historical_cases":
+                    _, index, key, value = item
+                    poisoned["historical_cases"][index][key] = value
+                else:
+                    section, key, value = item
+                    poisoned[section][key] = value
+                with self.assertRaisesRegex(AssertionError, "UNREVIEWED_GAO"):
+                    verify_source_bound_candidate(poisoned)
 
     def test_synthetic_poisoned_source_money_and_truth_rejected(self):
         mutations = [
