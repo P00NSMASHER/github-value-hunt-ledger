@@ -29,6 +29,53 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                            "protected_main_official_source_reconciliation_candidate_v0.json"
                            ).read_text(encoding="utf-8"))
 
+    def test_current_main_four_fmc_pointers_cannot_be_promoted(self):
+        """Current upstream main-only sources stay held until independent review."""
+        data = self._pack()["ownership"]["current_main_fmc_source_gap"]
+        self.assertEqual(data["canonical_main_sha"],
+                         "b1c49b7ad6431d648325ba31b804ecd0542857d6")
+        self.assertEqual(data["canonical_main_catalog_git_blob_sha1"],
+                         "fe6faa9d85d002fcabf3f38b8c2836f1fbdb86fc")
+        self.assertEqual(data["candidate_before_sha"],
+                         "6c9447d1336a43e2ba8a9e6c47abedea372252b9")
+        self.assertEqual(data["candidate_before_catalog_git_blob_sha1"],
+                         "a52e50df2e273465d14ebda947fb3b3027acd6d3")
+        self.assertEqual(data["main_only_fmc_pointer_count"], 4)
+        self.assertEqual(data["evaluation_family"],
+                         "FREIGHT_PUBLIC_ADMINISTRATIVE_RECORD_SOURCE_IDENTITY_ONLY")
+        for gate in ("raw_publisher_pdf_bytes_held", "production_seed_promotion_authorized",
+                     "host_allowlist_change_authorized", "independent_qa_complete",
+                     "engine_changes_made"):
+            self.assertIs(data[gate], False)
+        self.assertEqual(data["rights_state"], "UNVERIFIED_HOLD")
+        self.assertEqual(data["independent_customer_ground_truth_cases"], 0)
+        expected = (
+            ("2015(I)", "SETTLEMENT_DISMISSAL_ORDER", "2024-11-08"),
+            ("2015(I)", "SETTLEMENT_NONREVIEW_NOTICE", "2024-12-10"),
+            ("2036(I)", "INITIAL_DECISION_WITH_APPENDICES", "2026-07-16"),
+            ("2036(I)", "EXTENSION_DENIAL_NOT_PROOF_OF_FINALITY", "2026-07-23"),
+        )
+        rows = data["sources"]
+        self.assertEqual(len(rows), 4)
+        self.assertEqual([(x["docket"], x["document_kind"], x["served_on"])
+                          for x in rows], list(expected))
+        self.assertEqual(len({x["url"] for x in rows}), 4)
+        for row in rows:
+            self.assertTrue(row["url"].startswith(
+                "https://www2.fmc.gov/readingroom/docs/"))
+            self.assertNotIn(row["url"], SEEDS["freightrecovery"])
+            self.assertIsNone(row["publisher_response_bytes_sha256"])
+            self.assertIs(row["independently_heldout_real_customer_label"], False)
+            self.assertIs(row["commercial_reuse_approved"], False)
+            self.assertIs(row["actual_cash_settlement_replayed"], False)
+            self.assertEqual(row["customer_invoice_ground_truth"], "UNKNOWN")
+        controls = data["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 4)
+        self.assertEqual(len({x["id"] for x in controls}), 4)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" for x in controls))
+        self.assertEqual(data["acceptance_state"],
+                         "HELD_REQUIRES_MAIN_TREE_RECONCILIATION_AND_INDEPENDENT_QA")
+
     def _assert_contract(self, pack):
         self.assertEqual(set(pack), {"schema_version", "evaluation_family",
                          "asof_date", "ownership", "rights", "cohort", "sources",
