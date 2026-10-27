@@ -175,11 +175,34 @@ class UnifiedResearchLabTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             ledger = Path(root) / "sources.json"
             a = run(engine="freightrecovery", live=False, ledger=ledger, now=NOW)
-            contents = ledger.read_bytes()
-            b = run(engine="freightrecovery", live=False, ledger=ledger,
-                    now=NOW + timedelta(days=1))
             self.assertGreater(a["new_leads"], 0)
-            self.assertEqual(b["new_leads"], 0)
+            original_first_seen = {
+                item["id"]: item["first_seen"]
+                for item in read_ledger(ledger)["entries"]
+            }
+            # Seeds can exceed the configured 40-new-lead safety cap. An
+            # immediate second offline run must not be mistaken for an
+            # idempotence failure while the remaining seed batch is pending.
+            # All calls here use live=False: zero external provider requests.
+            from freight.unified_research_lab import MAX_NEW_PER_RUN
+            max_cycles = (len(SEEDS["freightrecovery"]) // MAX_NEW_PER_RUN) + 2
+            for cycle in range(1, max_cycles + 1):
+                result = run(engine="freightrecovery", live=False, ledger=ledger,
+                             now=NOW + timedelta(days=cycle))
+                if result["new_leads"] == 0:
+                    break
+            else:
+                self.fail("BOUNDED_OFFLINE_SEED_REPLAY_NEVER_SETTLED")
+            contents = ledger.read_bytes()
+            final_first_seen = {
+                item["id"]: item["first_seen"]
+                for item in read_ledger(ledger)["entries"]
+            }
+            for source_id, first_seen in original_first_seen.items():
+                self.assertEqual(final_first_seen[source_id], first_seen)
+            again = run(engine="freightrecovery", live=False, ledger=ledger,
+                        now=NOW + timedelta(days=cycle + 1))
+            self.assertEqual(again["new_leads"], 0)
             self.assertEqual(ledger.read_bytes(), contents)
 
     def test_one_canonical_source_can_feed_multiple_engines(self):
