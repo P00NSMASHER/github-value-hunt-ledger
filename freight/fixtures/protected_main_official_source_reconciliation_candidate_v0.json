@@ -23,7 +23,7 @@
   },
   "cohort": {
     "main_only_official_pointer_count": 6,
-    "primary_original_text_or_first_page_checked_this_run": 4,
+    "primary_original_text_or_first_page_checked_this_run": 5,
     "first_party_pdf_full_source_byte_replay_complete": false,
     "independent_held_out_invoice_labels": 0,
     "shipment_level_reliable_error_truth_labels": 0,
@@ -129,10 +129,10 @@
       "url": "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",
       "publisher": "CBCA",
       "published_on": "2009-10-29",
-      "reported_amount_cents": null,
-      "publisher_outcome_scope": "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING",
-      "source_review_status": "INHERITED_MAIN_SEED_NOT_REPLAYED",
-      "reported_amount_semantics": "UNKNOWN",
+      "reported_amount_cents": 13735675,
+      "publisher_outcome_scope": "TWELVE_RAIL_BOL_DEDUCTIONS_REVERSED_AS_UNTIMELY_NOT_VERIFIED_CARRIER_REFUND",
+      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_VISUAL_UNAVAILABLE_2026_10_27",
+      "reported_amount_semantics": "ACTUAL_TREASURY_DEDUCTIONS_REPORTED_IN_DECISION_NOT_VALIDATED_OVERCHARGE_OR_REFUND",
       "original_publisher_response_bytes_acquired": false,
       "original_publisher_response_sha256": null,
       "original_invoice_tariff_bank_receipt_custody": false,
@@ -141,7 +141,109 @@
       "actual_customer_invoice_error_label": "UNKNOWN",
       "independent_actual_settlement_cash_receipt_verified": false,
       "verified_retally_customer_recovery_cents": 0,
-      "historical_tariff_effective_date": null
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 8,
+        "board_reported_initial_overcharge_notices": 74,
+        "original_claims_reportedly_resolved": 67,
+        "added_claims_in_same_proceeding": 5,
+        "remaining_appealed_bols": 12,
+        "decision_bol_table_one_based_page": 3,
+        "sum_reported_overcharge_notices_cents": 13761404,
+        "sum_treasury_deductions_cents": 13735675,
+        "gap_notice_vs_deduction_cents": 25729,
+        "board_disposition": "REVERSED_GOVERNMENT_OVERCHARGE_DEDUCTIONS_AS_UNTIMELY",
+        "underlying_rate_overcharge_merits_adjudicated": false,
+        "carrier_refund_received_independently_verified": false,
+        "original_twelve_bols_tariffs_or_bank_receipts_acquired": false,
+        "original_pdf_pages_visually_verified": [],
+        "decision_reported_bol_rows": [
+          {
+            "bol_reference": "W45QQ90009822",
+            "alleged_overcharge_cents": 1793654,
+            "bill_paid_on": "2005-01-20",
+            "treasury_deduction_cents": 1793654,
+            "treasury_deducted_on": "2008-06-16"
+          },
+          {
+            "bol_reference": "W45QQ90009825",
+            "alleged_overcharge_cents": 1314805,
+            "bill_paid_on": "2005-01-20",
+            "treasury_deduction_cents": 1314805,
+            "treasury_deducted_on": "2008-06-16"
+          },
+          {
+            "bol_reference": "W45QQ90009832",
+            "alleged_overcharge_cents": 2194247,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 2194247,
+            "treasury_deducted_on": "2008-10-15"
+          },
+          {
+            "bol_reference": "W45QQ90009833",
+            "alleged_overcharge_cents": 878744,
+            "bill_paid_on": "2005-02-02",
+            "treasury_deduction_cents": 878744,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W45QQ90009838",
+            "alleged_overcharge_cents": 438849,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 438849,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W45QQ90009856",
+            "alleged_overcharge_cents": 877698,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 877698,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W45QQ90009858",
+            "alleged_overcharge_cents": 436990,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 436990,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W67G230008416",
+            "alleged_overcharge_cents": 330460,
+            "bill_paid_on": "2004-01-27",
+            "treasury_deduction_cents": 330460,
+            "treasury_deducted_on": "2008-10-10"
+          },
+          {
+            "bol_reference": "W67G230008417",
+            "alleged_overcharge_cents": 479879,
+            "bill_paid_on": "2004-02-05",
+            "treasury_deduction_cents": 479879,
+            "treasury_deducted_on": "2008-10-10"
+          },
+          {
+            "bol_reference": "W5CQRF0017135",
+            "alleged_overcharge_cents": 466531,
+            "bill_paid_on": "2004-02-09",
+            "treasury_deduction_cents": 466531,
+            "treasury_deducted_on": "2008-10-10"
+          },
+          {
+            "bol_reference": "W45QQ90006106",
+            "alleged_overcharge_cents": 1207383,
+            "bill_paid_on": "2004-03-01",
+            "treasury_deduction_cents": 1197902,
+            "treasury_deducted_on": "2008-10-31"
+          },
+          {
+            "bol_reference": "W45QQ90006013",
+            "alleged_overcharge_cents": 3342164,
+            "bill_paid_on": "2004-02-06",
+            "treasury_deduction_cents": 3325916,
+            "treasury_deducted_on": "2008-10-31"
+          }
+        ]
+      }
     },
     {
       "id": "CBCA_3467_RATE_2014",
@@ -202,6 +304,18 @@
     },
     {
       "id": "SYNTH_CBCA_AARE_CLAIM_GRANTED_CALLED_REFUND_RECEIVED",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_UP_74_NOTICES_CALLED_74_ADJUDICATED_ERROR_LABELS",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_UP_REVERSED_DEDUCTIONS_PROMOTED_TO_VERIFIED_REFUND_CASH",
       "kind": "SYNTHETIC",
       "actual_independent_customer_outcome": null,
       "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"

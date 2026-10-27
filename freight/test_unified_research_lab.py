@@ -62,8 +62,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
            "CARRIER_PAID_GSA_SEVEN_NOTICES_CLAIM_GRANTED_REFUND_UNVERIFIED"),
           ("CBCA_8051_RATE_2024", "2024-08-08", 1459569,
            "UNPAID_CARRIER_INVOICE_CLAIM_TIME_BARRED_NOT_OVERCHARGE"),
-          ("CBCA_1317_RATE_2009", "2009-10-29", None,
-           "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
+          ("CBCA_1317_RATE_2009", "2009-10-29", 13735675,
+           "TWELVE_RAIL_BOL_DEDUCTIONS_REVERSED_AS_UNTIMELY_NOT_VERIFIED_CARRIER_REFUND"),
           ("CBCA_3467_RATE_2014", "2014-05-14", None,
            "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
         )
@@ -81,7 +81,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                      "verified_retally_customer_recovery_cents", "historical_tariff_effective_date"}
         for row, should in zip(pack["sources"], expected):
             self.assertEqual(set(row), rows_keys | ({"decision_evidence"} if
-                             row["id"] == "CBCA_6578_RATE_2020" else set()))  # Explicit nested whitelist.
+                             row["id"] in ("CBCA_6578_RATE_2020", "CBCA_1317_RATE_2009") else set()))  # Explicit nested whitelist.
             self.assertEqual((row["id"], row["published_on"], row["reported_amount_cents"],
                               row["publisher_outcome_scope"]), should)
             self.assertTrue(row["url"].startswith("https://www.justice.gov/" if
@@ -105,7 +105,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                          "APPROXIMATE_AGREED_AGGREGATE_NOT_RECEIPT")
         self.assertEqual(pack["sources"][3]["reported_amount_semantics"],
                          "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE")
-        self.assertEqual(pack["cohort"]["primary_original_text_or_first_page_checked_this_run"], 4)
+        self.assertEqual(pack["cohort"]["primary_original_text_or_first_page_checked_this_run"], 5)
         self.assertEqual(pack["sources"][2]["source_review_status"],
                          "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_3_6_VISUAL_2026_10_27")
         self.assertEqual(pack["sources"][2]["reported_amount_semantics"],
@@ -122,10 +122,76 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
             "carrier_refund_received_independently_verified": False,
             "underlying_original_tenders_gbls_or_bank_receipts_acquired": False,
         })
+        # Official CBCA 1317-RATE decision table: 12 reported BOL references, not
+        # original BOL custody or independently held-out customer truth.
+        u = pack["sources"][4]
+        self.assertEqual(u["source_review_status"],
+                         "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_VISUAL_UNAVAILABLE_2026_10_27")
+        self.assertEqual(u["reported_amount_semantics"],
+                         "ACTUAL_TREASURY_DEDUCTIONS_REPORTED_IN_DECISION_NOT_VALIDATED_OVERCHARGE_OR_REFUND")
+        e = u["decision_evidence"]
+        self.assertEqual(set(e), {
+            "original_pdf_pages", "board_reported_initial_overcharge_notices",
+            "original_claims_reportedly_resolved", "added_claims_in_same_proceeding",
+            "remaining_appealed_bols", "decision_bol_table_one_based_page",
+            "sum_reported_overcharge_notices_cents", "sum_treasury_deductions_cents",
+            "gap_notice_vs_deduction_cents", "board_disposition",
+            "underlying_rate_overcharge_merits_adjudicated",
+            "carrier_refund_received_independently_verified",
+            "original_twelve_bols_tariffs_or_bank_receipts_acquired",
+            "original_pdf_pages_visually_verified", "decision_reported_bol_rows",
+        })
+        self.assertEqual((e["original_pdf_pages"],
+                          e["board_reported_initial_overcharge_notices"],
+                          e["original_claims_reportedly_resolved"],
+                          e["added_claims_in_same_proceeding"],
+                          e["remaining_appealed_bols"],
+                          e["decision_bol_table_one_based_page"]), (8, 74, 67, 5, 12, 3))
+        self.assertEqual(74 - 67 + 5, e["remaining_appealed_bols"])
+        self.assertEqual(e["board_disposition"],
+                         "REVERSED_GOVERNMENT_OVERCHARGE_DEDUCTIONS_AS_UNTIMELY")
+        self.assertIs(e["underlying_rate_overcharge_merits_adjudicated"], False)
+        self.assertIs(e["carrier_refund_received_independently_verified"], False)
+        self.assertIs(e["original_twelve_bols_tariffs_or_bank_receipts_acquired"], False)
+        self.assertEqual(e["original_pdf_pages_visually_verified"], [])
+        expected_bols = [
+            ("W45QQ90009822", 1793654, "2005-01-20", 1793654, "2008-06-16"),
+            ("W45QQ90009825", 1314805, "2005-01-20", 1314805, "2008-06-16"),
+            ("W45QQ90009832", 2194247, "2005-02-11", 2194247, "2008-10-15"),
+            ("W45QQ90009833", 878744, "2005-02-02", 878744, "2008-04-15"),
+            ("W45QQ90009838", 438849, "2005-02-11", 438849, "2008-04-15"),
+            ("W45QQ90009856", 877698, "2005-02-11", 877698, "2008-04-15"),
+            ("W45QQ90009858", 436990, "2005-02-11", 436990, "2008-04-15"),
+            ("W67G230008416", 330460, "2004-01-27", 330460, "2008-10-10"),
+            ("W67G230008417", 479879, "2004-02-05", 479879, "2008-10-10"),
+            ("W5CQRF0017135", 466531, "2004-02-09", 466531, "2008-10-10"),
+            ("W45QQ90006106", 1207383, "2004-03-01", 1197902, "2008-10-31"),
+            ("W45QQ90006013", 3342164, "2004-02-06", 3325916, "2008-10-31"),
+        ]
+        rows = e["decision_reported_bol_rows"]
+        self.assertEqual(len(rows), 12)
+        for row in rows:
+            self.assertEqual(set(row), {"bol_reference", "alleged_overcharge_cents",
+                                        "bill_paid_on", "treasury_deduction_cents",
+                                        "treasury_deducted_on"})
+            paid, deducted = (datetime.fromisoformat(row["bill_paid_on"]),
+                              datetime.fromisoformat(row["treasury_deducted_on"]))
+            self.assertGreater(deducted, paid.replace(year=paid.year + 3))
+        self.assertEqual([
+            (r["bol_reference"], r["alleged_overcharge_cents"], r["bill_paid_on"],
+             r["treasury_deduction_cents"], r["treasury_deducted_on"]) for r in rows
+        ], expected_bols)
+        self.assertEqual(len({r["bol_reference"] for r in rows}), 12)
+        self.assertEqual(sum(r["alleged_overcharge_cents"] for r in rows), 13761404)
+        self.assertEqual(sum(r["treasury_deduction_cents"] for r in rows), 13735675)
+        self.assertEqual((e["sum_reported_overcharge_notices_cents"],
+                          e["sum_treasury_deductions_cents"],
+                          e["gap_notice_vs_deduction_cents"]), (13761404, 13735675, 25729))
+
         controls = pack["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 7)
-        self.assertEqual(len({x["id"] for x in controls}), 7)
-        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_AARE_CLAIM_GRANTED_CALLED_REFUND_RECEIVED")
+        self.assertEqual(len(controls), 9)
+        self.assertEqual(len({x["id"] for x in controls}), 9)
+        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_UP_REVERSED_DEDUCTIONS_PROMOTED_TO_VERIFIED_REFUND_CASH")
         for control in controls:
             self.assertEqual(set(control), {"id", "kind", "actual_independent_customer_outcome",
                                             "expected"})
@@ -172,6 +238,35 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
             poisoned["sources"][2]["decision_evidence"][key] = forged
             with self.subTest(forged=key), self.assertRaises(AssertionError):
                 self._assert_contract(poisoned)
+
+    def test_cbca_1317_rejects_bol_amount_count_merits_and_cash_spoofing(self):
+        baseline = self._pack()
+        changes = (
+            ("board_reported_initial_overcharge_notices", 12),
+            ("remaining_appealed_bols", 74),
+            ("sum_treasury_deductions_cents", 13761404),
+            ("gap_notice_vs_deduction_cents", 0),
+            ("underlying_rate_overcharge_merits_adjudicated", True),
+            ("carrier_refund_received_independently_verified", True),
+            ("original_twelve_bols_tariffs_or_bank_receipts_acquired", True),
+            ("original_pdf_pages_visually_verified", [1, 3, 8]),
+        )
+        for key, forged in changes:
+            bad = json.loads(json.dumps(baseline))
+            bad["sources"][4]["decision_evidence"][key] = forged
+            with self.subTest(key=key), self.assertRaises(AssertionError):
+                self._assert_contract(bad)
+        for key, forged in (("alleged_overcharge_cents", 0),
+                            ("treasury_deduction_cents", 1207383),
+                            ("treasury_deducted_on", "2006-10-31")):
+            bad = json.loads(json.dumps(baseline))
+            bad["sources"][4]["decision_evidence"]["decision_reported_bol_rows"][10][key] = forged
+            with self.subTest(table_cell=key), self.assertRaises(AssertionError):
+                self._assert_contract(bad)
+        bad = json.loads(json.dumps(baseline))
+        bad["sources"][4]["claim_paid_bank_receipt_sha256"] = "unsupported"
+        with self.assertRaises(AssertionError):
+            self._assert_contract(bad)
 
 
 class UnifiedResearchLabTests(unittest.TestCase):
