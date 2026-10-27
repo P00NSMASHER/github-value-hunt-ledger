@@ -12,7 +12,99 @@
     "candidate_before_catalog_git_blob_sha1": "8baff0999c4921e648977ed5f9ef2395d9ffa947",
     "original_main_seed_references_count": 6,
     "official_host_allowlist_or_provider_rule_change_applied": false,
-    "status": "BLOCKED_PENDING_EXISTING_OWNER_HOST_POLICY_AND_MAIN_TREE_RECONCILIATION"
+    "status": "BLOCKED_PENDING_EXISTING_OWNER_HOST_POLICY_AND_MAIN_TREE_RECONCILIATION",
+    "current_main_fmc_source_gap": {
+      "observation_date": "2026-10-27",
+      "canonical_main_sha": "b1c49b7ad6431d648325ba31b804ecd0542857d6",
+      "canonical_main_catalog_git_blob_sha1": "fe6faa9d85d002fcabf3f38b8c2836f1fbdb86fc",
+      "candidate_before_sha": "6c9447d1336a43e2ba8a9e6c47abedea372252b9",
+      "candidate_before_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+      "main_only_fmc_pointer_count": 4,
+      "publisher": "Federal Maritime Commission",
+      "evaluation_family": "FREIGHT_PUBLIC_ADMINISTRATIVE_RECORD_SOURCE_IDENTITY_ONLY",
+      "observed_source_ids": "2015(I);2036(I)",
+      "source_provenance": "EXACT_CURRENT_MAIN_SEED_URLS_CROSS_CHECKED_AGAINST_FIRST_PARTY_FMC_INDEXED_TEXT_AND_EXISTING_MAIN_VERSIONED_CASEBOOK_NOT_RAW_PDF",
+      "rights_state": "UNVERIFIED_HOLD",
+      "raw_publisher_pdf_bytes_held": false,
+      "independent_customer_ground_truth_cases": 0,
+      "production_seed_promotion_authorized": false,
+      "host_allowlist_change_authorized": false,
+      "independent_qa_complete": false,
+      "engine_changes_made": false,
+      "sources": [
+        {
+          "docket": "2015(I)",
+          "document_kind": "SETTLEMENT_DISMISSAL_ORDER",
+          "served_on": "2024-11-08",
+          "url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        },
+        {
+          "docket": "2015(I)",
+          "document_kind": "SETTLEMENT_NONREVIEW_NOTICE",
+          "served_on": "2024-12-10",
+          "url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        },
+        {
+          "docket": "2036(I)",
+          "document_kind": "INITIAL_DECISION_WITH_APPENDICES",
+          "served_on": "2026-07-16",
+          "url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        },
+        {
+          "docket": "2036(I)",
+          "document_kind": "EXTENSION_DENIAL_NOT_PROOF_OF_FINALITY",
+          "served_on": "2026-07-23",
+          "url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        }
+      ],
+      "synthetic_negative_controls": [
+        {
+          "id": "SYNTHETIC_FMC_2015_SETTLEMENT_CALLED_ADJUDICATED_OVERCHARGE",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_SETTLEMENT_WITHOUT_MERITS_LABEL"
+        },
+        {
+          "id": "SYNTHETIC_FMC_2036_EXTENSION_DENIAL_CALLED_FINAL_PAYMENT",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_ADMINISTRATIVE_MOTION_NOT_BANK_RECEIPT"
+        },
+        {
+          "id": "SYNTHETIC_FMC_SOURCE_URL_CALLED_ORIGINAL_INVOICE_CUSTODY",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_NO_ORIGINAL_INVOICE_BYTES"
+        },
+        {
+          "id": "SYNTHETIC_FMC_PUBLIC_DOCUMENT_CALLED_COMMERCIAL_LICENSE",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_UNVERIFIED_THIRD_PARTY_RIGHTS"
+        }
+      ],
+      "acceptance_state": "HELD_REQUIRES_MAIN_TREE_RECONCILIATION_AND_INDEPENDENT_QA"
+    }
   },
   "rights": {
     "government_published_sources": true,
