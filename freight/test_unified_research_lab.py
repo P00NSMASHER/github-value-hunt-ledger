@@ -1433,5 +1433,15 @@ class STBCrowleyTariffSourceTests(unittest.TestCase):
                 self._assert_original_source_contract(poisoned)
 
 
+def load_tests(loader, tests, pattern):
+    """Include held GAO supersession regressions in the existing unified CI suite."""
+    from freight import test_gao_b215958_supersession
+    additional = loader.loadTestsFromModule(test_gao_b215958_supersession)
+    if additional.countTestCases() < 3:
+        raise AssertionError("GAO B-215958 temporal provenance test coverage missing")
+    tests.addTests(additional)
+    return tests
+
+
 if __name__ == "__main__":
     unittest.main()
