@@ -1812,6 +1812,85 @@ class ProtectedMainSeedContinuityTests(unittest.TestCase):
         self.assertFalse(nyc["rights_and_provenance"]["source_specific_commercial_reuse_authorized"])
         self.assertEqual(nyc["cohort"]["independently_held_out_issued_permit_labels"], 0)
 
+    def _assert_latest_main_source_continuity(self, official, fmc, nyc):
+        """Compare pinned current-main source locators, not publisher bytes or invoice labels."""
+        recent = official["acceptance"]["current_main_source_set_continuity_20261027"]
+        self.assertEqual(recent["schema_version"], "1.0.0")
+        self.assertEqual(recent["observed_main_head"],
+                         official["ownership"]["current_main_fmc_source_gap"]["canonical_main_sha"])
+        self.assertEqual(recent["main_catalog_git_blob_sha1"],
+                         official["ownership"]["current_main_fmc_source_gap"]["canonical_main_catalog_git_blob_sha1"])
+        self.assertEqual(recent["draft_catalog_git_blob_sha1"],
+                         official["ownership"]["current_main_fmc_source_gap"]["candidate_before_catalog_git_blob_sha1"])
+        base_six = {row["url"] for row in official["sources"]}
+        fmc_pair = {fmc["source"]["order_url"], fmc["source"]["nonreview_notice_url"]}
+        fmc_four = {row["url"] for row in official["ownership"]["current_main_fmc_source_gap"]["sources"]}
+        retained = base_six | fmc_pair | fmc_four
+        restaurant = "https://data.cityofnewyork.us/d/43nn-pn8j"
+        self.assertEqual(len(base_six), 6)
+        self.assertEqual(len(fmc_pair), 2)
+        self.assertEqual(len(fmc_four), 4)
+        self.assertEqual(len(fmc_pair & fmc_four), 2)
+        self.assertEqual(len(retained), 10)
+        self.assertNotIn(restaurant, retained)
+        self.assertEqual((recent["main_only_source_url_count"],
+                          recent["unique_held_freight_source_pointers"],
+                          recent["held_legacy_six_source_manifest"],
+                          recent["held_fmc_2015_pair_manifest"],
+                          recent["held_current_main_fmc_gap_manifest"],
+                          recent["overlap_of_two_fmc_2015_pointers"],
+                          recent["excluded_wrong_topic_nyc_restaurant"]),
+                         (11, 10, 6, 2, 4, 2, 1))
+        self.assertEqual(recent["excluded_wrong_topic_dataset_id"], "43nn-pn8j")
+        self.assertEqual(len(retained | {restaurant}), 11)
+        self.assertTrue(all(url not in SEEDS["freightrecovery"] for url in retained))
+        self.assertNotIn(restaurant, SEEDS["permitplate"])
+        self.assertIsNone(recent["original_publisher_response_sha256"])
+        self.assertEqual(recent["independently_held_out_customer_invoice_labels"], 0)
+        self.assertEqual(recent["verified_retally_cash_recovery_cents"], 0)
+        for held in ("original_source_bytes_held", "commercial_reuse_approved",
+                     "independent_qa_green", "main_integration_complete"):
+            self.assertIs(recent[held], False)
+        self.assertEqual(recent["status"],
+                         "MAIN_SOURCE_IDENTITY_RECONCILED_IN_HELD_METADATA_NOT_EXECUTABLE_OR_LICENSED")
+        controls = recent["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 2)
+        self.assertEqual(len({row["id"] for row in controls}), 2)
+        self.assertTrue(all(row["kind"] == "SYNTHETIC" for row in controls))
+        self.assertEqual(nyc["source_identity_delta"]["main_only_wrong_topic_dataset_id"],
+                         "43nn-pn8j")
+
+    def test_current_main_eleven_seed_identity_reconciliation(self):
+        self._assert_latest_main_source_continuity(
+            self._read("protected_main_official_source_reconciliation_candidate_v0.json"),
+            self._read("fmc_2015i_settlement_boundary_candidate_v0.json"),
+            self._read("nyc_dob_catalog_identity_reconciliation_candidate_v0.json"),
+        )
+
+    def test_current_main_rejects_nine_only_snapshot_and_forged_promotions(self):
+        official = self._read("protected_main_official_source_reconciliation_candidate_v0.json")
+        fmc = self._read("fmc_2015i_settlement_boundary_candidate_v0.json")
+        nyc = self._read("nyc_dob_catalog_identity_reconciliation_candidate_v0.json")
+        self._assert_latest_main_source_continuity(official, fmc, nyc)
+        mutations = (
+            ("main_only_source_url_count", 9),
+            ("unique_held_freight_source_pointers", 8),
+            ("held_current_main_fmc_gap_manifest", 2),
+            ("overlap_of_two_fmc_2015_pointers", 0),
+            ("original_publisher_response_sha256", "FAKE"),
+            ("original_source_bytes_held", True),
+            ("commercial_reuse_approved", True),
+            ("independently_held_out_customer_invoice_labels", 1),
+            ("verified_retally_cash_recovery_cents", 1),
+            ("independent_qa_green", True),
+            ("main_integration_complete", True),
+        )
+        for field, forged in mutations:
+            with self.subTest(field=field), self.assertRaises(AssertionError):
+                mutated = json.loads(json.dumps(official))
+                mutated["acceptance"]["current_main_source_set_continuity_20261027"][field] = forged
+                self._assert_latest_main_source_continuity(mutated, fmc, nyc)
+
     def test_main_only_sources_preserved_as_held_or_explicitly_excluded(self):
         self._check(
             self._read("protected_main_official_source_reconciliation_candidate_v0.json"),
