@@ -1,0 +1,129 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "FMC_2015I_LEADER_COMMERCE_MSC_SETTLEMENT_BOUNDARY_V0",
+  "evaluation_family": "FREIGHT_SETTLEMENT_AND_ACCOUNTING_OUTCOME_SEPARATION_NOT_CUSTOMER_ERROR_SCORING",
+  "status": "HELD_SOURCE_BOUND_CANDIDATE_NOT_ENGINE_ADMITTED",
+  "asof_date": "2026-10-27",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "canonical_branch": "main",
+    "existing_lab_branch": "research/retally-unified-data-lab",
+    "existing_draft_pr": 766,
+    "main_head_verified": "ff4edaa6540d02cdddb4c04ef6ce224a434a3f8b",
+    "draft_parent_before_candidate": "fbe2f0f1fe661021732d29b9447a8f3e359f6629",
+    "operational_lab_changed": false
+  },
+  "source": {
+    "publisher": "Federal Maritime Commission",
+    "docket": "2015(I)",
+    "order_url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
+    "nonreview_notice_url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",
+    "publisher_activity_index_url": "https://www.fmc.gov/articles/fmc-december-2024-activity-report/",
+    "order_served_on": "2024-11-08",
+    "nonreview_notice_served_on": "2024-12-10",
+    "publisher_index_posted_on": "2025-01-17",
+    "source_review_status": "FIRST_PARTY_INDEXED_PDF_TEXT_ORDER_REVIEWED_NOTICE_INDEXED_TEXT_AND_FMC_ACTIVITY_CORROBORATED_VISUAL_PDF_403",
+    "original_order_pdf_bytes_acquired": false,
+    "original_order_pdf_sha256": null,
+    "original_notice_pdf_bytes_acquired": false,
+    "original_notice_pdf_sha256": null,
+    "original_bill_of_lading_or_invoice_bytes_acquired": false,
+    "original_settlement_and_bank_ledger_bytes_acquired": false,
+    "historical_tariff_effective_date": null,
+    "publisher_documents_actual_raw_custody": false
+  },
+  "rights": {
+    "public_federal_decision_facts_only": true,
+    "source_specific_commercial_reuse_permission_verified": false,
+    "third_party_material_reuse_verified": false,
+    "production_engine_commercial_ingest_approved": false,
+    "rights_status": "HOLD"
+  },
+  "cohort": {
+    "published_decision_count": 1,
+    "finality_notice_count": 1,
+    "transcribed_bill_of_lading_references": 1,
+    "independently_held_out_original_invoice_labels": 0,
+    "independently_adjudicated_freight_billing_error_cases": 0,
+    "independent_actual_payment_reconciliation_cases": 0,
+    "negative_controls_count": 6,
+    "customer_precision_recall_estimation_permitted": false
+  },
+  "publisher_reported_facts": {
+    "shipment_bill_of_lading_reference": "MEDUUP205245",
+    "origin": "BALTIMORE_US",
+    "destination": "MANAUS_BRAZIL",
+    "complaint_filed_year": 2024,
+    "alleged_low_water_fee_usd_cents": 300000,
+    "alleged_extra_fee_usd_cents": 14000,
+    "demurrage_alleged": true,
+    "settlement_submitted_on": "2024-10-17",
+    "settlement_fmc_approved_on": "2024-11-08",
+    "approved_settlement_outstanding_demurrage_cancelled_usd_cents": 465000,
+    "settlement_right_to_claim_previous_freight_refund_usd_cents_waived": 300000,
+    "settlement_waived_late_fee_claim_brl_cents": 70000,
+    "complaint_dismissed_with_prejudice": true,
+    "administratively_final_on": "2024-12-10",
+    "merits_freight_overcharge_adjudicated": false,
+    "independent_ledger_confirmation_of_demurrage_cancellation": null,
+    "verified_actual_cash_refund_received_usd_cents": null,
+    "verified_retally_recovered_cash_usd_cents": 0,
+    "reported_cash_settlement_paid_usd_cents": null
+  },
+  "truth_limits": {
+    "published_settlement_obligation_is_not_verified_cash_received": true,
+    "cancellation_of_outstanding_charge_is_not_a_cash_refund": true,
+    "waived_refund_claim_is_not_a_cash_payment": true,
+    "alleged_fees_are_not_proven_overcharges": true,
+    "administrative_finality_is_not_merits_adjudication": true,
+    "transcribed_bol_id_is_not_original_bol_custody": true,
+    "settlement_does_not_prove_modern_customer_contract_applicability": true,
+    "independently_held_out_ground_truth": "UNKNOWN",
+    "customer_error_accuracy": "UNKNOWN"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_FMC_2015I_CANCELLATION_MISLABELED_CASH_REFUND",
+      "kind": "SYNTHETIC",
+      "assertion": "USD 4650 cancelled outstanding charges equals USD 4650 recovered cash",
+      "expected": "REJECT_CANCELLATION_IS_NOT_CASH"
+    },
+    {
+      "id": "SYNTH_FMC_2015I_WAIVED_3000_CLAIM_COUNTED_AS_REFUND",
+      "kind": "SYNTHETIC",
+      "assertion": "USD 3000 waived future refund claim equals USD 3000 reimbursed to claimant",
+      "expected": "REJECT_WAIVED_CLAIM_IS_NOT_PAYMENT"
+    },
+    {
+      "id": "SYNTH_FMC_2015I_ALLEGED_140_FEE_SCORED_ADJUDICATED",
+      "kind": "SYNTHETIC",
+      "assertion": "USD 140 alleged fee has a judicially confirmed billing error label",
+      "expected": "REJECT_ALLEGATION_IS_NOT_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_FMC_2015I_DOCKET_2015_TREATED_AS_EVENT_YEAR",
+      "kind": "SYNTHETIC",
+      "assertion": "Docket 2015(I) establishes a 2015 settlement date",
+      "expected": "REJECT_DOCKET_IDENTIFIER_NOT_YEAR"
+    },
+    {
+      "id": "SYNTH_FMC_2015I_NOV_ORDER_ASSUMED_FINAL_BEFORE_NOTICE",
+      "kind": "SYNTHETIC",
+      "assertion": "November 8 order proves administrative finality before December 10 notice",
+      "expected": "REJECT_PREMATURE_FINALITY"
+    },
+    {
+      "id": "SYNTH_FMC_2015I_PDF_POINTER_LAUNDERED_TO_ORIGINAL_CUSTODY",
+      "kind": "SYNTHETIC",
+      "assertion": "Indexed PDF URL proves acquired original PDF bytes and bill of lading",
+      "expected": "REJECT_URL_NOT_SOURCE_OR_CUSTOMER_CUSTODY"
+    }
+  ],
+  "acceptance": {
+    "original_publisher_response_byte_hash_verified": false,
+    "independent_qa_complete": false,
+    "held_source_identifiers_reconciled_as_metadata_only": true,
+    "full_main_and_draft_seed_integration_verified": false,
+    "guarded_release_eligible": false
+  }
+}
