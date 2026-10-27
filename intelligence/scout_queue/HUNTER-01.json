@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 26,
+    "api_requests": 24,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -8,23 +8,23 @@
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 11,
+  "candidate_count": 10,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
       "description": "Roblox Lua Automation and Spatial Analytics Framework 2026",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "0d6932061127da7812234fa24b125ccdd24e5507",
+      "exact_revision": "68ae7d134abdd0abe1abc781143e79328c6181bb",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-21T16:29:15Z",
+      "pushed_at": "2026-10-27T05:51:07Z",
       "repository": "IvanIvan09/Lua-Spatial-Farm-Assistant",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 478,
+      "size_kb": 475,
       "stars": 70,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -99,16 +99,16 @@
       "default_branch": "main",
       "description": "Cooperative Spell-Casting Game Framework 2026: Build Kid-Friendly Luau Worlds",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "80c74ad2df24c7ae18c60a693ae0b5aad65bc483",
+      "exact_revision": "f322a35ac04dcd378abe4d4af487dcd977a4bef3",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-21T15:47:12Z",
+      "pushed_at": "2026-10-27T07:07:30Z",
       "repository": "narenkarthikeyanu999/charmed-recess",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 449,
+      "size_kb": 462,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -176,54 +176,18 @@
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers",
-      "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "89b7adc008d0102e3d0eb55fd54120e46ec409a6",
-      "forks": 0,
-      "primary_language": "HTML",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-21T18:22:53Z",
-      "repository": "yahyaadraoui88-cell/Roblox-Project-Forge",
-      "root_code_signals": [
-        ".github"
-      ],
-      "size_kb": 398,
-      "stars": 68,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "lua",
-        "luau",
-        "roblox"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 7,
-        "substantive_size": 4,
-        "topics": 3
-      },
-      "triage_score": 41,
-      "url": "https://github.com/yahyaadraoui88-cell/Roblox-Project-Forge"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
       "description": "Pronghorn 2026: Fast Roblox Module Scripting Framework for Rapid Game Development",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "e9eb111e2b66efb341d34e37fe0f5eec98bf6adf",
+      "exact_revision": "6772de94cf3ea7ea5a3092613d7cb3c7c22a12bd",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-21T16:27:46Z",
+      "pushed_at": "2026-10-27T07:03:25Z",
       "repository": "bisameditor-cmd/Stag-Module-Forge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 450,
+      "size_kb": 453,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -248,18 +212,54 @@
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Cooperative Luau Relay Game Framework for Cubacadabra Worlds 2026",
+      "description": "Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "aaa0c1c0de06ff60b04d2c2676f10eec4641ac12",
+      "exact_revision": "15a6ec2358da6c3a7c2de6d9d69008e4cafd7801",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-21T17:51:04Z",
+      "pushed_at": "2026-10-27T07:18:45Z",
+      "repository": "yahyaadraoui88-cell/Roblox-Project-Forge",
+      "root_code_signals": [
+        ".github"
+      ],
+      "size_kb": 389,
+      "stars": 68,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "lua",
+        "luau",
+        "roblox"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 2,
+        "stars": 7,
+        "substantive_size": 4,
+        "topics": 3
+      },
+      "triage_score": 41,
+      "url": "https://github.com/yahyaadraoui88-cell/Roblox-Project-Forge"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Cooperative Luau Relay Game Framework for Cubacadabra Worlds 2026",
+      "discovery_query": "Roblox game framework Luau stars:<3000",
+      "exact_revision": "49a65307bddf687d01e6391e92faaeee51884db4",
+      "forks": 0,
+      "primary_language": "HTML",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-10-27T05:54:51Z",
       "repository": "AJAY94633/signal-run-relay",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 419,
+      "size_kb": 429,
       "stars": 70,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -320,41 +320,6 @@
       },
       "triage_score": 36,
       "url": "https://github.com/gue-hub/roblox-tycoon-kit"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Rojo \"fork\", matching my workflow as roblox studio plugin",
-      "discovery_query": "Rojo plugin Roblox workflow stars:<3000",
-      "exact_revision": "3ca3a15cbc8b01b1f8396a34790f43d99b8c6c14",
-      "forks": 0,
-      "primary_language": "Lua",
-      "published_license_spdx": "MPL-2.0",
-      "pushed_at": "2024-08-04T16:56:18Z",
-      "repository": "AquaJo/Rojoo",
-      "root_code_signals": [
-        ".github",
-        "cargo.toml",
-        "src",
-        "tests"
-      ],
-      "size_kb": 3645,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 5,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 11,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 35,
-      "url": "https://github.com/AquaJo/Rojoo"
     },
     {
       "archived": false,
@@ -431,7 +396,7 @@
     41,
     44
   ],
-  "generated_at": "2026-10-21T18:33:35.733238+00:00",
+  "generated_at": "2026-10-27T07:42:43.985269+00:00",
   "mission": "Roblox/Luau production frameworks and dependency/tooling accelerators for StarBlox",
   "risk_review": [],
   "risk_review_count": 0,
@@ -447,7 +412,7 @@
     },
     {
       "query": "Rojo plugin Roblox workflow stars:<3000",
-      "returned": 1
+      "returned": 0
     },
     {
       "query": "Lune rbx-dom Roblox tooling",
