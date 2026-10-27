@@ -1945,6 +1945,15 @@ def load_tests(loader, tests, pattern):
     if procurement_controls.countTestCases() != 3:
         raise AssertionError("SAM FY2027 notice-identity tests missing")
     tests.addTests(procurement_controls)
+    # CBCA 3467-RATE is an adjudicated *negative* freight-overcharge case.
+    # Preserve the published two-cent amount conflict and no-cash/no-rights hold.
+    from freight import test_cbca_3467_detention_negative
+    freight_negative_controls = loader.loadTestsFromModule(
+        test_cbca_3467_detention_negative
+    )
+    if freight_negative_controls.countTestCases() != 4:
+        raise AssertionError("CBCA 3467-RATE negative freight tests missing")
+    tests.addTests(freight_negative_controls)
     return tests
 
 
