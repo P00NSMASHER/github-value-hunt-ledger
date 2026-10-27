@@ -609,7 +609,19 @@ jobs:
           import json, os
           from pathlib import Path
           x=json.loads(Path('freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json').read_text())
-          assert len(x['fmc_cases']) == 2
+          assert len(x['fmc_cases']) == 3
+          assert x['leader_settlement_order_date'] == '2024-11-08'
+          assert x['leader_admin_final_notice_date'] == '2024-12-10'
+          assert x['leader_both_signatures_described_by_FMC_not_original_in_custody'] is True
+          assert x['leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents'] == 465000
+          assert x['leader_actual_carrier_ledger_cancellation_verified'] is False
+          assert x['leader_previously_paid_freight_refund_rights_waived_usd_cents'] == 300000
+          assert x['leader_previously_paid_late_fee_refund_rights_waived_brl_centavos'] == 70000
+          assert x['leader_usd_brl_conversion_or_sum_allowed'] is False
+          assert x['leader_refund_received_bank_verified_usd_cents'] is None
+          assert x['leader_original_settlement_and_customer_bank_docs_held'] is False
+          assert x['leader_refund_rights_released_not_new_cash_awarded'] is True
+          assert x['leader_fmc_order_adjudicated_illegal_billing_amount_cents'] is None
           assert x['bridgewell_final_principal_cents'] == 2432880
           assert x['bridgewell_final_interest_as_of_notice_cents'] == 396051
           assert x['bridgewell_final_ordered_total_cents'] == 2828931
@@ -638,7 +650,7 @@ jobs:
                   '- FMC 2022(I): $24,328.80 original reparations + $3,960.51 interest = $28,289.31 ordered due Jan 20, 2026.\n'
                   '- FMC Oct 2 order search-index excerpt says COSCO paid Aug 31 (223 days late); press reports Bridgewell received it. Original order PDF and actual bank-cleared amount UNKNOWN.\n'
                   '- FMC 2025(I): $23,600 quote/invoice gap, $25,895 requested, but initial decision awarded $0 reparations.\n'
-                  '- Independent FMC PDF bytes and original customer bank records NOT held. Modern RETALLY case labels and cash are ZERO.\n'
+                  '- FMC 2015(I): signed settlement final December 2024; $4,650 outstanding demurrage to cancel, waived refund claims for USD $3,000 paid freight plus BRL 700 late fees. No verified cash or actual carrier ledger write-off.\\n'\n                  '- Independent FMC PDF bytes and original customer bank records NOT held. Modern RETALLY case labels and cash are ZERO.\n'
               )
           PY
       - name: Commit only metadata, never on protected main
