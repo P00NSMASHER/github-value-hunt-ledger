@@ -270,7 +270,7 @@ reusable customer records.
 | --- | --- |
 | [FMC initial decision, Sept. 29, 2025](https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf) | FMC adjudicated invalid required information on detention/demurrage invoices for Bridgewell's paid 2022 ocean shipments; **$24,328.80 reparations principal**. Bridgewell originally sought $43,780, which was **not** the amount awarded. |
 | [FMC administrative finality notice, Jan. 5, 2026](https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf) | Commission declined review; formal amount due by **Jan. 20, 2026** was **$24,328.80 principal + $3,960.51 stated interest = $28,289.31**. Eight published award groups contain ten components after accounting for the three $544.50 cases. They are **not** ten independent source-invoice copies. |
-| 2026 enforcement, docket 26-13 | FMC served an **Oct. 2, 2026 order to show cause** for late compliance (official public document no. 145944, as indexed by a reproduction of the FMC docket); [Seatrade](https://www.seatrade-maritime.com/regulations/fmc-targets-cosco-with-millions-in-late-payment-fines) and [Splash247](https://splash247.com/fmc-threatens-cosco-with-16-7m-penalty-over-delayed-payment/) report that the Commission said **Bridgewell received payment Aug. 31, 2026**. Full original enforcement-order PDF bytes and original bank receipt are **not in RETALLY custody**. **Exact customer deposit and interest actually received are UNKNOWN**, as is any final civil penalty. Do not conflate the $28,289.31 *ordered in January* with precisely that much cash *cleared in August*. |
+| [FMC Oct. 2, 2026 enforcement order, docket 26-13](https://www2.fmc.gov/readingroom/docs/26-13/%2801%29%2026-13%20Order%20to%20Show%20Cause%20%28public%29.pdf) | Official document no. **145944**. The **public search-index excerpt of this agency-authored PDF** says COSCO did **not pay the reparations award until Aug. 31, 2026** and describes **223 days** of lateness. This is a direct *agency-document attribution via an indexed excerpt*, **not an acquired or inspected original PDF**. [Seatrade](https://www.seatrade-maritime.com/regulations/fmc-targets-cosco-with-millions-in-late-payment-fines) separately reports that **Bridgewell received payment Aug. 31**, an account attributed to the Commission. A carrier making a payment is not necessarily proof of the date it cleared the customer bank. **Bank receipt, exact deposited amount, interest actually received and any final fine remain UNKNOWN**. The January **$28,289.31 ordered** is not a verified August deposit. |
 
 **Negative parallel, [HP Logistics v. Citi Freight Logistics and Best
 International Cargo, FMC 2025(I), Aug. 7, 2025 initial decision](https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf):**
@@ -294,16 +294,20 @@ signal a **review**, not an independently recoverable overcharge.
 - **Reparations adjudicated:** Actual FMC order states original principal and
   interest. The principal **cannot** be inflated to the pre-decision amount
   sought by the shipper, and interest **cannot** be discarded.
-- **Receipt reported by FMC via two independent secondary accounts:** Stronger
-  externally reported collection evidence than an unperformed settlement,
-  but **not independent access to a bank deposit or the amount actually
-  cleared**; no precise cash figure is assigned to the August event.
+- **Payment made, indexed agency evidence:** The FMC October order has a
+  publicly search-indexed excerpt identifying **Aug. 31, 2026** as the date
+  COSCO paid, **223 days after the deadline**. Full original order PDF bytes
+  remain unavailable for independent inspection or hashing.
+- **Customer receipt, secondary reporting:** Seatrade attributes an Aug. 31
+  customer-receipt date to the agency. Neither press attribution nor agency
+  language proves a bank deposit cleared or its exact amount. No August
+  monetary receipt is assigned without independently reconciled records.
 - **RETALLY modern private customer:** ZERO. There is no customer
   authorization, rights-verified reuse, domestic motor-carrier rating
   authority, production dispute claim or RETALLY recovery revenue.
   The FMC ocean-shipping remedy does not automatically apply to U.S. LTL.
 
-New research-only fixture, oracle and 10 red-team cases:
+The existing research-only fixture, oracle and adversarial tests:
 freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json,
 freight/fmc_real_shipper_billing_lifecycle.py,
 freight/test_fmc_real_shipper_billing_lifecycle.py.

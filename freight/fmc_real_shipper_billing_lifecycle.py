@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import date
 from pathlib import Path
 
 from freight.unified_research_lab import ResearchError, digest, safe_url
@@ -52,11 +53,17 @@ BRIDGEWELL = {
     "later_enforcement_docket": "FMC_26-13",
     "later_order_to_show_cause_date": "2026-10-02",
     "fmc_original_enforcement_order_document_id": 145944,
+    "official_enforcement_order_url":
+        "https://www2.fmc.gov/readingroom/docs/26-13/"
+        "%2801%29%2026-13%20Order%20to%20Show%20Cause%20%28public%29.pdf",
+    "official_order_payment_made_date_index_excerpt": "2026-08-31",
+    "official_order_late_payment_days_index_excerpt": 223,
+    "official_order_pdf_bytes_acquired": False,
     "fmc_enforcement_record_index_publicnow":
         "https://www.publicnow.com/view/AEF607AD7C75FCEEFC7781A0221E6505C1BC79B9",
     "reported_actual_customer_payment_received_date": "2026-08-31",
     "reported_payment_lifecycle_source":
-        "INDEPENDENT_MEDIA_REPORTS_OF_OCTOBER_2_2026_FMC_ORDER_NOT_ORIGINAL_BANK_OR_ORDER_PDF_BYTES",
+        "OFFICIAL_FMC_ORDER_SEARCH_INDEX_EXCERPT_PLUS_INDEPENDENT_MEDIA_REPORTS_NOT_ORIGINAL_ORDER_PDF_OR_BANK_BYTES",
     "secondary_confirmation_source":
         "https://www.seatrade-maritime.com/regulations/"
         "fmc-targets-cosco-with-millions-in-late-payment-fines",
@@ -109,6 +116,12 @@ RECEIPT_KEYS = frozenset({
     "bridgewell_final_interest_as_of_notice_cents",
     "bridgewell_final_ordered_total_cents", "bridgewell_award_components_not_invoice_count",
     "bridgewell_reported_late_customer_payment_date",
+    "bridgewell_official_order_payment_made_index_excerpt_date",
+    "bridgewell_official_order_late_days",
+    "bridgewell_original_enforcement_order_pdf_in_custody",
+    "bridgewell_bank_receipt_confirmed",
+    "bridgewell_actual_bank_receipt_cents",
+    "bridgewell_payment_evidence_tier",
     "bridgewell_later_payment_reported_NOT_verified_bank_receipt",
     "bridgewell_exact_received_cash_and_interest_unverified",
     "bridgewell_civil_penalties_imposed_cents",
@@ -165,6 +178,8 @@ def validate_fixture(doc: object) -> dict:
     interest = sum(r[0] * r[2] for r in AWARD_GROUPS)
     if (principal != 2432880 or interest != 396051
         or principal + interest != 2828931
+        or (date.fromisoformat(bridge["official_order_payment_made_date_index_excerpt"])
+            - date.fromisoformat(bridge["payment_due_date"])).days != 223
         or hp["initial_quote_cents"] + hp["additional_parts_discussed_cents"]
            != hp["claimed_revised_quote_cents"]
         or hp["final_invoiced_amount_cents"] - hp["claimed_revised_quote_cents"]
@@ -175,6 +190,7 @@ def validate_fixture(doc: object) -> dict:
         raise ResearchError("FMC_CHARGE_OR_INTEREST_ARITHMETIC_INVALID")
     for url in (bridge["official_initial_decision_url"],
                 bridge["official_final_notice_url"],
+                bridge["official_enforcement_order_url"],
                 hp["official_initial_decision_url"]):
         if safe_url(url) != url:
             raise ResearchError("FMC_UNSAFE_OFFICIAL_DECISION_URL")
@@ -199,7 +215,7 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
             {"id": bridge["case_id"],
              "initial_decision": bridge["official_initial_decision_url"],
              "administratively_final_notice": bridge["official_final_notice_url"],
-             "status": "FMC_AWARDED_AND_ORDERED;_LATER_CUSTOMER_RECEIPT_AGENCY_REPORTED_SECONDARY_ONLY"},
+             "status": "FMC_FINAL_AWARD;_AGENCY_ORDER_INDEX_EXCERPT_CARRIER_PAID;_CUSTOMER_RECEIPT_SECONDARY_ONLY;_BANK_UNVERIFIED"},
             {"id": hp["case_id"], "initial_decision": hp["official_initial_decision_url"],
              "status": "NO_REPARATIONS_IN_INITIAL_DECISION_FINALITY_UNVERIFIED"}
         ],
@@ -213,6 +229,15 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
             sum(row["multiplicity"] for row in bridge["reparation_award_groups"]),
         "bridgewell_reported_late_customer_payment_date":
             bridge["reported_actual_customer_payment_received_date"],
+        "bridgewell_official_order_payment_made_index_excerpt_date":
+            bridge["official_order_payment_made_date_index_excerpt"],
+        "bridgewell_official_order_late_days":
+            bridge["official_order_late_payment_days_index_excerpt"],
+        "bridgewell_original_enforcement_order_pdf_in_custody": False,
+        "bridgewell_bank_receipt_confirmed": False,
+        "bridgewell_actual_bank_receipt_cents": None,
+        "bridgewell_payment_evidence_tier":
+            "OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED",
         "bridgewell_later_payment_reported_NOT_verified_bank_receipt": True,
         "bridgewell_exact_received_cash_and_interest_unverified": True,
         "bridgewell_civil_penalties_imposed_cents": None,
