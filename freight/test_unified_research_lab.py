@@ -64,8 +64,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
            "UNPAID_CARRIER_INVOICE_CLAIM_TIME_BARRED_NOT_OVERCHARGE"),
           ("CBCA_1317_RATE_2009", "2009-10-29", 13735675,
            "TWELVE_RAIL_BOL_DEDUCTIONS_REVERSED_AS_UNTIMELY_NOT_VERIFIED_CARRIER_REFUND"),
-          ("CBCA_3467_RATE_2014", "2014-05-14", None,
-           "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
+          ("CBCA_3467_RATE_2014", "2014-05-14", 33989575,
+           "GSA_70_PAID_DETENTION_INVOICE_RECOUPMENT_NOTICES_INVALID_NO_REFUND_PROOF"),
         )
         self.assertEqual(len(pack["sources"]), 6)
         self.assertEqual(len({x["url"] for x in pack["sources"]}), 6)
@@ -81,7 +81,8 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                      "verified_retally_customer_recovery_cents", "historical_tariff_effective_date"}
         for row, should in zip(pack["sources"], expected):
             self.assertEqual(set(row), rows_keys | ({"decision_evidence"} if
-                             row["id"] in ("CBCA_6578_RATE_2020", "CBCA_1317_RATE_2009") else set()))  # Explicit nested whitelist.
+                             row["id"] in ("CBCA_6578_RATE_2020", "CBCA_1317_RATE_2009",
+                                           "CBCA_3467_RATE_2014") else set()))  # Explicit nested whitelist.
             self.assertEqual((row["id"], row["published_on"], row["reported_amount_cents"],
                               row["publisher_outcome_scope"]), should)
             self.assertTrue(row["url"].startswith("https://www.justice.gov/" if
@@ -105,7 +106,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                          "APPROXIMATE_AGREED_AGGREGATE_NOT_RECEIPT")
         self.assertEqual(pack["sources"][3]["reported_amount_semantics"],
                          "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE")
-        self.assertEqual(pack["cohort"]["primary_original_text_or_first_page_checked_this_run"], 5)
+        self.assertEqual(pack["cohort"]["primary_original_text_or_first_page_checked_this_run"], 6)
         self.assertEqual(pack["sources"][2]["source_review_status"],
                          "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_3_6_VISUAL_2026_10_27")
         self.assertEqual(pack["sources"][2]["reported_amount_semantics"],
@@ -188,10 +189,66 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                           e["sum_treasury_deductions_cents"],
                           e["gap_notice_vs_deduction_cents"]), (13761404, 13735675, 25729))
 
+        # CBCA 3467-RATE has conflicting amounts within its ORIGINAL decision:
+        # p.5 demand $339,895.73; p.6 operative no-indebtedness $339,895.75.
+        # Neither amount is a cash refund or verified current customer error.
+        t = pack["sources"][5]
+        self.assertEqual(t["source_review_status"],
+                         "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_4_5_6_VISUAL_2026_10_27")
+        self.assertEqual(t["reported_amount_semantics"],
+                         "BOARD_NO_INDEBTEDNESS_AMOUNT_NOT_CASH_AWARD_BODY_AND_DECISION_DIFFER_BY_2_CENTS")
+        x = t["decision_evidence"]
+        self.assertEqual(set(x), {
+            "original_pdf_pages", "visually_reviewed_pages_one_based",
+            "gsa_paid_detention_shipments_2010", "gsa_paid_detention_shipments_2011",
+            "gsa_paid_detention_shipments_total",
+            "gsa_retroactively_allowed_first_shipment_invoices",
+            "gsa_challenged_paid_invoice_count",
+            "government_repayment_demand_body_cents",
+            "board_no_indebtedness_decision_cents",
+            "within_original_decision_amount_discrepancy_cents",
+            "gsa_detention_rule", "gsa_detention_rule_historical_effective_date",
+            "board_disposition", "actual_prior_gsa_detention_payments_reported",
+            "government_collected_disputed_recoupment_verified",
+            "new_carrier_refund_received_verified",
+            "original_79_bols_invoices_tariff_and_payment_receipts_acquired",
+            "independently_scored_customer_invoice_error_count",
+        })
+        self.assertEqual(x["original_pdf_pages"], 6)
+        self.assertEqual(x["visually_reviewed_pages_one_based"], [4, 5, 6])
+        self.assertEqual((x["gsa_paid_detention_shipments_2010"],
+                          x["gsa_paid_detention_shipments_2011"],
+                          x["gsa_paid_detention_shipments_total"],
+                          x["gsa_retroactively_allowed_first_shipment_invoices"],
+                          x["gsa_challenged_paid_invoice_count"]), (4, 75, 79, 9, 70))
+        self.assertEqual(x["gsa_paid_detention_shipments_2010"] +
+                         x["gsa_paid_detention_shipments_2011"],
+                         x["gsa_paid_detention_shipments_total"])
+        self.assertEqual(x["gsa_retroactively_allowed_first_shipment_invoices"] +
+                         x["gsa_challenged_paid_invoice_count"],
+                         x["gsa_paid_detention_shipments_total"])
+        self.assertEqual((x["government_repayment_demand_body_cents"],
+                          x["board_no_indebtedness_decision_cents"],
+                          x["within_original_decision_amount_discrepancy_cents"]),
+                         (33989573, 33989575, 2))
+        self.assertEqual(x["board_no_indebtedness_decision_cents"] -
+                         x["government_repayment_demand_body_cents"],
+                         x["within_original_decision_amount_discrepancy_cents"])
+        self.assertEqual(x["gsa_detention_rule"], "STOS_100_D_ITEM_325")
+        self.assertIsNone(x["gsa_detention_rule_historical_effective_date"])
+        self.assertEqual(x["board_disposition"],
+                         "GSA_RECOUPMENT_NOTICES_INVALID_CARRIER_NOT_INDEBTED")
+        self.assertIs(x["actual_prior_gsa_detention_payments_reported"], True)
+        for field in ("government_collected_disputed_recoupment_verified",
+                      "new_carrier_refund_received_verified",
+                      "original_79_bols_invoices_tariff_and_payment_receipts_acquired"):
+            self.assertIs(x[field], False)
+        self.assertEqual(x["independently_scored_customer_invoice_error_count"], 0)
+
         controls = pack["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 9)
-        self.assertEqual(len({x["id"] for x in controls}), 9)
-        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_UP_REVERSED_DEDUCTIONS_PROMOTED_TO_VERIFIED_REFUND_CASH")
+        self.assertEqual(len(controls), 12)
+        self.assertEqual(len({x["id"] for x in controls}), 12)
+        self.assertEqual(controls[-1]["id"], "SYNTH_CBCA_TQYL_79_PAID_SHIPMENTS_CALLED_70_VERIFIED_CUSTOMER_ERRORS")
         for control in controls:
             self.assertEqual(set(control), {"id", "kind", "actual_independent_customer_outcome",
                                             "expected"})
@@ -267,6 +324,33 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
         bad["sources"][4]["claim_paid_bank_receipt_sha256"] = "unsupported"
         with self.assertRaises(AssertionError):
             self._assert_contract(bad)
+
+
+    def test_cbca_3467_conflicting_decision_amount_and_no_cash_promotion(self):
+        original = self._pack()
+        for key, replacement in (
+            ("gsa_paid_detention_shipments_total", 70),
+            ("gsa_challenged_paid_invoice_count", 79),
+            ("government_repayment_demand_body_cents", 33989575),
+            ("board_no_indebtedness_decision_cents", 33989573),
+            ("within_original_decision_amount_discrepancy_cents", 0),
+            ("new_carrier_refund_received_verified", True),
+            ("government_collected_disputed_recoupment_verified", True),
+            ("original_79_bols_invoices_tariff_and_payment_receipts_acquired", True),
+            ("independently_scored_customer_invoice_error_count", 70),
+            ("gsa_detention_rule_historical_effective_date", "2011-01-01"),
+        ):
+            poisoned = json.loads(json.dumps(original))
+            poisoned["sources"][5]["decision_evidence"][key] = replacement
+            with self.subTest(field=key), self.assertRaises(AssertionError):
+                self._assert_contract(poisoned)
+        for key, replacement in (("reported_amount_cents", 33989573),
+                                 ("publisher_outcome_scope", "CARRIER_REFUND_RECEIVED"),
+                                 ("verified_retally_customer_recovery_cents", 33989575)):
+            poisoned = json.loads(json.dumps(original))
+            poisoned["sources"][5][key] = replacement
+            with self.subTest(field=key), self.assertRaises(AssertionError):
+                self._assert_contract(poisoned)
 
 
 class UnifiedResearchLabTests(unittest.TestCase):
