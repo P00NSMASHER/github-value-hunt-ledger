@@ -1433,6 +1433,115 @@ class STBCrowleyTariffSourceTests(unittest.TestCase):
                 self._assert_original_source_contract(poisoned)
 
 
+
+class FMC2015ISettlementBoundaryTests(unittest.TestCase):
+    """Original FMC settlement/finality sources: cancellation is not cash recovery."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "fmc_2015i_settlement_boundary_candidate_v0.json").read_text(encoding="utf-8"))
+
+    def _assert_contract(self, item):
+        self.assertEqual(item["schema_version"], "0.1.0")
+        self.assertEqual(item["evaluation_family"],
+                         "FREIGHT_SETTLEMENT_AND_ACCOUNTING_OUTCOME_SEPARATION_NOT_CUSTOMER_ERROR_SCORING")
+        self.assertEqual(item["status"], "HELD_SOURCE_BOUND_CANDIDATE_NOT_ENGINE_ADMITTED")
+        self.assertEqual(item["ownership"]["canonical_repository"],
+                         "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(item["ownership"]["existing_draft_pr"], 766)
+        self.assertFalse(item["ownership"]["operational_lab_changed"])
+        source = item["source"]
+        self.assertEqual(source["docket"], "2015(I)")
+        self.assertEqual(source["order_url"],
+                         "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf")
+        self.assertEqual(source["nonreview_notice_url"],
+                         "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf")
+        self.assertEqual(source["order_served_on"], "2024-11-08")
+        self.assertEqual(source["nonreview_notice_served_on"], "2024-12-10")
+        self.assertFalse(source["original_order_pdf_bytes_acquired"])
+        self.assertIsNone(source["original_order_pdf_sha256"])
+        self.assertFalse(source["original_notice_pdf_bytes_acquired"])
+        self.assertIsNone(source["original_notice_pdf_sha256"])
+        self.assertFalse(source["original_bill_of_lading_or_invoice_bytes_acquired"])
+        self.assertFalse(source["original_settlement_and_bank_ledger_bytes_acquired"])
+        self.assertIsNone(source["historical_tariff_effective_date"])
+        self.assertFalse(item["rights"]["production_engine_commercial_ingest_approved"])
+        self.assertFalse(item["rights"]["source_specific_commercial_reuse_permission_verified"])
+        self.assertEqual(item["rights"]["rights_status"], "HOLD")
+        facts = item["publisher_reported_facts"]
+        self.assertEqual(facts["shipment_bill_of_lading_reference"], "MEDUUP205245")
+        self.assertEqual(facts["complaint_filed_year"], 2024)
+        self.assertEqual(facts["alleged_low_water_fee_usd_cents"], 300000)
+        self.assertEqual(facts["alleged_extra_fee_usd_cents"], 14000)
+        self.assertEqual(facts["approved_settlement_outstanding_demurrage_cancelled_usd_cents"], 465000)
+        self.assertEqual(facts["settlement_right_to_claim_previous_freight_refund_usd_cents_waived"], 300000)
+        self.assertEqual(facts["settlement_waived_late_fee_claim_brl_cents"], 70000)
+        self.assertEqual(facts["settlement_submitted_on"], "2024-10-17")
+        self.assertEqual(facts["settlement_fmc_approved_on"], "2024-11-08")
+        self.assertEqual(facts["administratively_final_on"], "2024-12-10")
+        self.assertTrue(facts["complaint_dismissed_with_prejudice"])
+        self.assertFalse(facts["merits_freight_overcharge_adjudicated"])
+        self.assertIsNone(facts["verified_actual_cash_refund_received_usd_cents"])
+        self.assertIsNone(facts["independent_ledger_confirmation_of_demurrage_cancellation"])
+        self.assertEqual(facts["verified_retally_recovered_cash_usd_cents"], 0)
+        self.assertIsNone(facts["reported_cash_settlement_paid_usd_cents"])
+        self.assertEqual(item["cohort"]["independently_held_out_original_invoice_labels"], 0)
+        self.assertEqual(item["cohort"]["independently_adjudicated_freight_billing_error_cases"], 0)
+        self.assertFalse(item["cohort"]["customer_precision_recall_estimation_permitted"])
+        self.assertEqual(item["truth_limits"]["customer_error_accuracy"], "UNKNOWN")
+        self.assertTrue(item["truth_limits"]["cancellation_of_outstanding_charge_is_not_a_cash_refund"])
+        self.assertTrue(item["truth_limits"]["waived_refund_claim_is_not_a_cash_payment"])
+        self.assertTrue(item["truth_limits"]["administrative_finality_is_not_merits_adjudication"])
+        self.assertFalse(item["acceptance"]["original_publisher_response_byte_hash_verified"])
+        self.assertFalse(item["acceptance"]["independent_qa_complete"])
+        self.assertFalse(item["acceptance"]["full_main_and_draft_seed_integration_verified"])
+        self.assertFalse(item["acceptance"]["guarded_release_eligible"])
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 6)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTH_") for c in controls))
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_CANCELLATION_IS_NOT_CASH",
+            "REJECT_WAIVED_CLAIM_IS_NOT_PAYMENT",
+            "REJECT_ALLEGATION_IS_NOT_ADJUDICATION",
+            "REJECT_DOCKET_IDENTIFIER_NOT_YEAR",
+            "REJECT_PREMATURE_FINALITY",
+            "REJECT_URL_NOT_SOURCE_OR_CUSTOMER_CUSTODY",
+        })
+
+    def test_fmc_settlement_facts_finality_and_truth_boundary(self):
+        item = self._pack()
+        self._assert_contract(item)
+        # These original main-only pointers remain held, never silently
+        # activated by this research-lab fixture on a diverged draft branch.
+        self.assertNotIn(item["source"]["order_url"], SEEDS["freightrecovery"])
+        self.assertNotIn(item["source"]["nonreview_notice_url"], SEEDS["freightrecovery"])
+
+    def test_fmc_settlement_forged_cancellation_cash_and_source_custody_are_red(self):
+        original = self._pack()
+        self._assert_contract(original)
+        attacks = (
+            ("publisher_reported_facts", "approved_settlement_outstanding_demurrage_cancelled_usd_cents", 765000),
+            ("publisher_reported_facts", "verified_retally_recovered_cash_usd_cents", 465000),
+            ("publisher_reported_facts", "merits_freight_overcharge_adjudicated", True),
+            ("publisher_reported_facts", "administratively_final_on", "2024-11-08"),
+            ("publisher_reported_facts", "settlement_right_to_claim_previous_freight_refund_usd_cents_waived", 0),
+            ("source", "original_order_pdf_bytes_acquired", True),
+            ("source", "original_notice_pdf_sha256", "unsupported-rehash"),
+            ("source", "original_bill_of_lading_or_invoice_bytes_acquired", True),
+            ("rights", "production_engine_commercial_ingest_approved", True),
+            ("cohort", "independently_held_out_original_invoice_labels", 1),
+        )
+        for section, key, fake in attacks:
+            with self.subTest(section=section, field=key):
+                altered = json.loads(json.dumps(original))
+                altered[section][key] = fake
+                with self.assertRaises(AssertionError):
+                    self._assert_contract(altered)
+
+
 def load_tests(loader, tests, pattern):
     """Include held GAO supersession regressions in the existing unified CI suite."""
     from freight import test_gao_b215958_supersession
