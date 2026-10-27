@@ -64,6 +64,7 @@ SEEDS = {
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
         "https://www.gao.gov/products/b-143458",
+        "https://www.gao.gov/products/b-121220-0",  # Main-preserved 1964 GAO documentary payment-proof boundary; metadata only.
         "https://www.gao.gov/products/b-261127",  # 1996 note-12 TCN units held valid; $1373 arithmetic contrast NOT proven overcharge.  # GAO 1961 $305.90 / $150.60 / $155.30; full capacity not enough absent tariff scope.
         "https://www.gao.gov/products/b-145308",  # GAO 1961 actual $282.83 deduction; $496.50 further refund REQUESTED not paid.
         "https://www.gao.gov/products/b-148981",  # GAO 1962 reported actual refunds; prospective $391.74 credit is NOT paid.
