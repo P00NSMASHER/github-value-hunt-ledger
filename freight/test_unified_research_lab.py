@@ -20,6 +20,124 @@ from freight.unified_research_lab import (
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 
+class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
+    """Hold six upstream source identities without admitting new provider hosts."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "protected_main_official_source_reconciliation_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_contract(self, pack):
+        self.assertEqual(set(pack), {"schema_version", "evaluation_family",
+                         "asof_date", "ownership", "rights", "cohort", "sources",
+                         "synthetic_negative_controls", "acceptance"})
+        self.assertEqual(pack["schema_version"], "0.1.0")
+        self.assertEqual(pack["evaluation_family"],
+                         "OFFICIAL_FREIGHT_SOURCE_RECONCILIATION_POINTER_HOLD_NOT_INVOICE_SCORING")
+        self.assertEqual(pack["ownership"]["canonical_repository"],
+                         "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(pack["ownership"]["candidate_before_commit"],
+                         "c62f6a1ce9c4587c606b2b39c4570e5dc1eac57e")
+        self.assertFalse(pack["ownership"]["official_host_allowlist_or_provider_rule_change_applied"])
+        self.assertEqual(pack["ownership"]["original_main_seed_references_count"], 6)
+        self.assertEqual(pack["rights"]["rights_status"], "HOLD")
+        self.assertFalse(pack["rights"]["commercial_engine_admission_authorized"])
+        self.assertEqual(pack["cohort"]["independent_held_out_invoice_labels"], 0)
+        self.assertEqual(pack["cohort"]["shipment_level_reliable_error_truth_labels"], 0)
+        self.assertEqual(pack["cohort"]["real_customer_invoice_or_receipt_documents_custodied"], 0)
+        self.assertFalse(pack["cohort"]["freight_error_scoring_eligible"])
+        for name in ("main_to_candidate_executable_seeds_reconciled",
+                     "provider_host_policy_change_authorized",
+                     "independent_qa_complete", "actual_current_main_integration_green",
+                     "release_authorized"):
+            self.assertFalse(pack["acceptance"][name])
+        expected = (
+          ("DOJ_2016_MENLO_ESTES", "2016-05-03", 1300000000,
+           "PUBLISHER_REPORTS_PAID_AGGREGATE_SETTLEMENT"),
+          ("DOJ_2022_YRC", "2022-03-14", 685000000,
+           "PUBLISHER_REPORTS_APPROXIMATE_AGREED_SETTLEMENT_NOT_PAID_PROOF"),
+          ("CBCA_6578_RATE_2020", "2020-08-06", None,
+           "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
+          ("CBCA_8051_RATE_2024", "2024-08-08", 1459569,
+           "UNPAID_CARRIER_INVOICE_CLAIM_TIME_BARRED_NOT_OVERCHARGE"),
+          ("CBCA_1317_RATE_2009", "2009-10-29", None,
+           "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
+          ("CBCA_3467_RATE_2014", "2014-05-14", None,
+           "PROTECTED_MAIN_POINTER_ONLY_DISPOSITION_REPLAY_PENDING"),
+        )
+        self.assertEqual(len(pack["sources"]), 6)
+        self.assertEqual(len({x["url"] for x in pack["sources"]}), 6)
+        rows_keys = {"id", "url", "publisher", "published_on", "reported_amount_cents",
+                     "publisher_outcome_scope", "source_review_status",
+                     "reported_amount_semantics", "original_publisher_response_bytes_acquired",
+                     "original_publisher_response_sha256",
+                     "original_invoice_tariff_bank_receipt_custody",
+                     "source_specific_commercial_rights_verified",
+                     "independent_held_out_customer_invoice_label",
+                     "actual_customer_invoice_error_label",
+                     "independent_actual_settlement_cash_receipt_verified",
+                     "verified_retally_customer_recovery_cents", "historical_tariff_effective_date"}
+        for row, should in zip(pack["sources"], expected):
+            self.assertEqual(set(row), rows_keys)  # Reject nested claim spoofing.
+            self.assertEqual((row["id"], row["published_on"], row["reported_amount_cents"],
+                              row["publisher_outcome_scope"]), should)
+            self.assertTrue(row["url"].startswith("https://www.justice.gov/" if
+                                                 row["publisher"] == "DOJ"
+                                                 else "https://www.cbca.gov/"))
+            self.assertFalse(row["original_publisher_response_bytes_acquired"])
+            self.assertIsNone(row["original_publisher_response_sha256"])
+            self.assertFalse(row["original_invoice_tariff_bank_receipt_custody"])
+            self.assertFalse(row["source_specific_commercial_rights_verified"])
+            self.assertFalse(row["independent_held_out_customer_invoice_label"])
+            self.assertFalse(row["independent_actual_settlement_cash_receipt_verified"])
+            self.assertEqual(row["actual_customer_invoice_error_label"], "UNKNOWN")
+            self.assertEqual(row["verified_retally_customer_recovery_cents"], 0)
+            self.assertIsNone(row["historical_tariff_effective_date"])
+            self.assertNotIn(row["url"], SEEDS["freightrecovery"])
+            with self.assertRaises(ResearchError):
+                safe_url(row["url"])  # Existing candidate does NOT permit these hosts.
+        self.assertEqual(pack["sources"][0]["reported_amount_semantics"],
+                         "EXACT_REPORTED_AGGREGATE_NOT_INVOICE_LABEL")
+        self.assertEqual(pack["sources"][1]["reported_amount_semantics"],
+                         "APPROXIMATE_AGREED_AGGREGATE_NOT_RECEIPT")
+        self.assertEqual(pack["sources"][3]["reported_amount_semantics"],
+                         "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE")
+        controls = pack["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({x["id"] for x in controls}), 6)
+        for control in controls:
+            self.assertEqual(set(control), {"id", "kind", "actual_independent_customer_outcome",
+                                            "expected"})
+            self.assertTrue(control["id"].startswith("SYNTH_"))
+            self.assertEqual(control["kind"], "SYNTHETIC")
+            self.assertIsNone(control["actual_independent_customer_outcome"])
+            self.assertEqual(control["expected"], "REJECT_UNSUPPORTED_SOURCE_PROMOTION")
+
+    def test_source_hold_scope_and_original_upstream_identity(self):
+        self._assert_contract(self._pack())
+
+    def test_poisoned_agreement_cash_invoice_rights_and_nested_claims_rejected(self):
+        pack = self._pack()
+        for index, key, spoofed in (
+            (0, "reported_amount_cents", 130000000000),
+            (1, "publisher_outcome_scope", "PUBLISHER_REPORTS_PAID_AGGREGATE_SETTLEMENT"),
+            (1, "independent_actual_settlement_cash_receipt_verified", True),
+            (3, "publisher_outcome_scope", "ADJUDICATED_CUSTOMER_OVERCHARGE"),
+            (3, "reported_amount_cents", 0),
+            (0, "original_publisher_response_sha256", "fake-original-bytes"),
+            (0, "source_specific_commercial_rights_verified", True),
+            (0, "actual_customer_invoice_error_label", "TRUE_POSITIVE"),
+            (0, "verified_retally_customer_recovery_cents", 1300000000),
+            (0, "bank_receipt_sha256", "unsupported-new-field"),
+        ):
+            bad = json.loads(json.dumps(pack))
+            bad["sources"][index][key] = spoofed
+            with self.subTest(spoofed=key), self.assertRaises(AssertionError):
+                self._assert_contract(bad)
+
+
 class UnifiedResearchLabTests(unittest.TestCase):
     def test_main_gao_adjudication_source_reconciliation_hold(self):
         # Pinned 2026-10-27 protected-main locators: historic rulings, NOT invoice custody.
