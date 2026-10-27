@@ -381,6 +381,17 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "python -m freight.fmc_real_shipper_billing_lifecycle "
             "--output /tmp/retally-fmc-real-shipper-v1.json --verify",nightly)
         for gate in (
+            "len(x['fmc_cases']) == 3",
+            "x['leader_settlement_order_date'] == '2024-11-08'",
+            "x['leader_admin_final_notice_date'] == '2024-12-10'",
+            "x['leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents'] == 465000",
+            "x['leader_actual_carrier_ledger_cancellation_verified'] is False",
+            "x['leader_previously_paid_freight_refund_rights_waived_usd_cents'] == 300000",
+            "x['leader_previously_paid_late_fee_refund_rights_waived_brl_centavos'] == 70000",
+            "x['leader_usd_brl_conversion_or_sum_allowed'] is False",
+            "x['leader_refund_received_bank_verified_usd_cents'] is None",
+            "x['leader_original_settlement_and_customer_bank_docs_held'] is False",
+            "x['leader_fmc_order_adjudicated_illegal_billing_amount_cents'] is None",
             "x['bridgewell_final_principal_cents'] == 2432880",
             "x['bridgewell_final_interest_as_of_notice_cents'] == 396051",
             "x['bridgewell_final_ordered_total_cents'] == 2828931",

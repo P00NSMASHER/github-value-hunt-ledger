@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 from freight.fmc_real_shipper_billing_lifecycle import (
-    ROOT, AWARD_GROUPS, RECEIPT_KEYS,
+    ROOT, AWARD_GROUPS, RECEIPT_KEYS, LEADER,
     load_fixture, make_receipt, validate_fixture, verify_receipt
 )
 from freight.canonical_schema import ChargeLine, ShipmentFacts, SourceArtifact, build_record
@@ -23,7 +23,8 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
     def test_official_case_identity_and_explicit_source_custody_limits(self):
         d=load_fixture()
         self.assertEqual(set(d),set(ROOT)|{
-            "bridgewell_cosco","hp_logistics_quote_dispute"})
+            "bridgewell_cosco","hp_logistics_quote_dispute",
+            "leader_commerce_msc_signed_settlement"})
         for section in ("bridgewell_cosco","hp_logistics_quote_dispute"):
             self.assertIn(d[section]["official_initial_decision_url"],
                           SEEDS["freightrecovery"])
@@ -35,6 +36,98 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
         self.assertFalse(d["source_specific_commercial_reuse_verified"])
         self.assertEqual(d["retally_independent_customer_invoice_truth_cases"],0)
         self.assertEqual(d["retally_cash_recovered_cents"],0)
+
+
+    def test_fmc_2015i_original_real_shipper_settlement_and_finality(self):
+        from freight.unified_research_lab import SEEDS
+        c=load_fixture()["leader_commerce_msc_signed_settlement"]
+        self.assertEqual(set(c),set(LEADER))
+        self.assertEqual(c["shipment_public_bill_of_lading"],"MEDUUP205245")
+        self.assertEqual(c["original_shipment_origin"],"BALTIMORE_USA")
+        self.assertEqual(c["original_shipment_destination"],"MANAUS_BRAZIL")
+        self.assertEqual(c["respondent_submitted_signed_settlement_date"],"2024-10-17")
+        self.assertEqual(c["original_order_served"],"2024-11-08")
+        self.assertEqual(c["final_notice_served"],"2024-12-10")
+        self.assertTrue(c["fmc_describes_both_parties_signed_settlement"])
+        self.assertFalse(c["signed_settlement_original_bytes_independently_held"])
+        self.assertFalse(c["original_invoice_bol_bank_and_tariff_bytes_in_retally_custody"])
+        self.assertIn("DISMISSED_WITH_PREJUDICE",c["settled_final_state"])
+        self.assertIn(c["official_order_url"],SEEDS["freightrecovery"])
+        self.assertIn(c["official_final_notice_url"],SEEDS["freightrecovery"])
+
+    def test_signed_ocean_settlement_non_cash_cancellation_and_waiver_in_two_currencies(self):
+        c=load_fixture()["leader_commerce_msc_signed_settlement"]
+        self.assertEqual(c["msc_settlement_promise_cancel_OUTSTANDING_UNPAID_demurrage_usd_cents"],465000)
+        self.assertTrue(c["msc_settlement_promise_end_collection"])
+        self.assertFalse(c["independent_msc_receivable_writeoff_ledger_confirmation"])
+        self.assertEqual(c["claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_freight_usd_cents"],300000)
+        self.assertEqual(c["claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_late_fee_brl_centavos"],70000)
+        self.assertFalse(c["cross_currency_addition_or_implicit_conversion_permitted"])
+        self.assertFalse(c["original_bank_evidence_of_previous_claimant_payments_in_retally_custody"])
+        self.assertIsNone(c["settlement_result_verified_cash_refund_usd_cents"])
+        self.assertFalse(c["independent_refund_or_tender_bank_receipt_verified"])
+        self.assertFalse(c["liability_finding_original_fees_unlawful"])
+        self.assertEqual(c["complaint_alleged_low_water_fee_usd_cents"],300000)
+        self.assertEqual(c["complaint_alleged_other_extra_fee_usd_cents"],14000)
+        r=make_receipt()
+        self.assertEqual(r["leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents"],465000)
+        self.assertEqual(r["leader_previously_paid_freight_refund_rights_waived_usd_cents"],300000)
+        self.assertEqual(r["leader_previously_paid_late_fee_refund_rights_waived_brl_centavos"],70000)
+        self.assertFalse(r["leader_actual_carrier_ledger_cancellation_verified"])
+        self.assertFalse(r["leader_usd_brl_conversion_or_sum_allowed"])
+        self.assertIsNone(r["leader_refund_received_bank_verified_usd_cents"])
+        self.assertTrue(r["leader_refund_rights_released_not_new_cash_awarded"])
+        self.assertIsNone(r["leader_fmc_order_adjudicated_illegal_billing_amount_cents"])
+        self.assertEqual(r["retally_recovered_cash_cents"],0)
+        self.assertEqual(r["modern_retally_invoice_accuracy_labels"],0)
+
+    def test_waived_refund_and_cancellation_cannot_be_promoted_to_customer_cash(self):
+        d=load_fixture()
+        changes=(
+            ("msc_settlement_promise_cancel_OUTSTANDING_UNPAID_demurrage_usd_cents",465001),
+            ("claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_freight_usd_cents",300001),
+            ("claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_late_fee_brl_centavos",70001),
+            ("independent_msc_receivable_writeoff_ledger_confirmation",True),
+            ("original_bank_evidence_of_previous_claimant_payments_in_retally_custody",True),
+            ("settlement_result_verified_cash_refund_usd_cents",465000),
+            ("liability_finding_original_fees_unlawful",True),
+            ("signed_settlement_original_bytes_independently_held",True),
+            ("cross_currency_addition_or_implicit_conversion_permitted",True),
+            ("claimant_original_economic_loss_independently_verified",True),
+            ("final_notice_served","2024-11-08"),
+            ("third_party_contract_rights_for_retally_use",True),
+        )
+        for name,value in changes:
+            with self.subTest(field=name):
+                tampered=deepcopy(d)
+                tampered["leader_commerce_msc_signed_settlement"][name]=value
+                with self.assertRaises(ResearchError):
+                    validate_fixture(tampered)
+        bad=deepcopy(d)
+        bad["leader_commerce_msc_signed_settlement"]["new_paid_refund"]=465000
+        with self.assertRaises(ResearchError):
+            validate_fixture(bad)
+
+    def test_even_rehashed_false_wrote_off_debt_or_refund_receipt_rejected(self):
+        original=make_receipt()
+        from freight.unified_research_lab import digest
+        changes=(
+            ("leader_actual_carrier_ledger_cancellation_verified",True),
+            ("leader_refund_received_bank_verified_usd_cents",465000),
+            ("leader_previously_paid_freight_refund_rights_waived_usd_cents",0),
+            ("leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents",0),
+            ("leader_usd_brl_conversion_or_sum_allowed",True),
+            ("leader_fmc_order_adjudicated_illegal_billing_amount_cents",465000),
+            ("retally_recovered_cash_cents",465000),
+        )
+        for name,value in changes:
+            with self.subTest(name=name):
+                tampered=deepcopy(original)
+                tampered[name]=value
+                tampered["receipt_sha256"]=digest({
+                    k:v for k,v in tampered.items() if k!="receipt_sha256"})
+                with self.assertRaises(ResearchError):
+                    verify_receipt(tampered)
 
     def test_january_2026_official_notice_principal_interest_and_due_date(self):
         case=load_fixture()["bridgewell_cosco"]
@@ -98,7 +191,7 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
 
     def test_separate_outcome_states_and_current_customer_nonpromotion(self):
         receipt=make_receipt()
-        self.assertEqual(len(receipt["fmc_cases"]),2)
+        self.assertEqual(len(receipt["fmc_cases"]),3)
         self.assertEqual(receipt["bridgewell_final_ordered_total_cents"],2828931)
         self.assertEqual(receipt["bridgewell_final_principal_cents"],2432880)
         self.assertEqual(receipt["bridgewell_final_interest_as_of_notice_cents"],396051)

@@ -109,6 +109,42 @@ HPL = {
     "later_customer_refund_verified_cents": None,
     "independent_full_original_quote_invoice_BOL_payment_chain_in_retally_custody": False,
 }
+# Official 2024 FMC decision and finality notice are independent original source
+# descriptions of the bilateral settlement, NOT original signed agreement
+# bytes or a carrier accounts-receivable writeoff readback.
+LEADER = {
+    "case_id": "FMC_2015(I)",
+    "claimant": "LEADER_COMMERCE_CORP_DBA_INFINITY_FREIGHT_AND_LOGISTICS",
+    "respondent": "MEDITERRANEAN_SHIPPING_COMPANY_USA_INC",
+    "shipment_public_bill_of_lading": "MEDUUP205245",
+    "original_shipment_origin": "BALTIMORE_USA",
+    "original_shipment_destination": "MANAUS_BRAZIL",
+    "small_claim_filed_notice_date": "2024-07-31",
+    "respondent_submitted_signed_settlement_date": "2024-10-17",
+    "original_order_served": "2024-11-08",
+    "official_order_url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
+    "final_notice_served": "2024-12-10",
+    "official_final_notice_url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",
+    "settled_final_state": "FMC_APPROVED_BILATERALLY_SIGNED_SETTLEMENT_AND_DISMISSED_WITH_PREJUDICE_ADMINISTRATIVELY_FINAL",
+    "fmc_describes_both_parties_signed_settlement": True,
+    "signed_settlement_original_bytes_independently_held": False,
+    "original_invoice_bol_bank_and_tariff_bytes_in_retally_custody": False,
+    "complaint_alleged_low_water_fee_usd_cents": 300000,
+    "complaint_alleged_other_extra_fee_usd_cents": 14000,
+    "msc_settlement_promise_cancel_OUTSTANDING_UNPAID_demurrage_usd_cents": 465000,
+    "msc_settlement_promise_end_collection": True,
+    "independent_msc_receivable_writeoff_ledger_confirmation": False,
+    "claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_freight_usd_cents": 300000,
+    "claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_late_fee_brl_centavos": 70000,
+    "cross_currency_addition_or_implicit_conversion_permitted": False,
+    "original_bank_evidence_of_previous_claimant_payments_in_retally_custody": False,
+    "settlement_result_verified_cash_refund_usd_cents": None,
+    "independent_refund_or_tender_bank_receipt_verified": False,
+    "liability_finding_original_fees_unlawful": False,
+    "claimant_original_economic_loss_independently_verified": False,
+    "third_party_contract_rights_for_retally_use": False,
+}
+
 AWARD_KEYS = frozenset({"multiplicity", "principal_cents_each", "interest_cents_each"})
 RECEIPT_KEYS = frozenset({
     "schema_version", "scope", "fmc_cases",
@@ -136,6 +172,19 @@ RECEIPT_KEYS = frozenset({
     "original_fmc_pdf_bytes_and_private_invoices_held",
     "modern_retally_invoice_accuracy_labels", "commercial_customer_reuse_approved",
     "retally_recovered_cash_cents", "source_authored_fixture_SHA256_NOT_FMC_pdf_hash",
+    "leader_public_bol_authored_digest_NOT_original_BOL_hash",
+    "leader_settlement_order_date", "leader_admin_final_notice_date",
+    "leader_both_signatures_described_by_FMC_not_original_in_custody",
+    "leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents",
+    "leader_actual_carrier_ledger_cancellation_verified",
+    "leader_previously_paid_freight_refund_rights_waived_usd_cents",
+    "leader_previously_paid_late_fee_refund_rights_waived_brl_centavos",
+    "leader_usd_brl_conversion_or_sum_allowed",
+    "leader_refund_received_bank_verified_usd_cents",
+    "leader_complaint_allegations_unadjudicated_usd_cents",
+    "leader_original_settlement_and_customer_bank_docs_held",
+    "leader_refund_rights_released_not_new_cash_awarded",
+    "leader_fmc_order_adjudicated_illegal_billing_amount_cents",
     "original_official_pdf_sha256", "receipt_sha256",
 })
 
@@ -150,13 +199,15 @@ def exact(item: object, expected: dict, kind: str) -> None:
 
 def validate_fixture(doc: object) -> dict:
     if type(doc) is not dict or set(doc) != set(ROOT) | {
-        "bridgewell_cosco", "hp_logistics_quote_dispute"
+        "bridgewell_cosco", "hp_logistics_quote_dispute",
+        "leader_commerce_msc_signed_settlement"
     }:
         raise ResearchError("FMC_ROOT_SCHEMA_INVALID")
     for key, val in ROOT.items():
         if type(doc[key]) is not type(val) or doc[key] != val:
             raise ResearchError("FMC_ROOT_FINANCIAL_OR_RIGHTS_FORGED")
     bridge, hp = doc["bridgewell_cosco"], doc["hp_logistics_quote_dispute"]
+    leader = doc["leader_commerce_msc_signed_settlement"]
     if type(bridge) is not dict or set(bridge) != set(BRIDGEWELL) | {
         "reparation_award_groups"
     }:
@@ -164,6 +215,7 @@ def validate_fixture(doc: object) -> dict:
     exact({k: v for k, v in bridge.items() if k != "reparation_award_groups"},
           BRIDGEWELL, "BRIDGEWELL")
     exact(hp, HPL, "HPL")
+    exact(leader, LEADER, "LEADER")
     groups = bridge["reparation_award_groups"]
     if type(groups) is not list or len(groups) != len(AWARD_GROUPS):
         raise ResearchError("FMC_AWARD_GROUP_POPULATION_INVALID")
@@ -191,9 +243,23 @@ def validate_fixture(doc: object) -> dict:
     for url in (bridge["official_initial_decision_url"],
                 bridge["official_final_notice_url"],
                 bridge["official_enforcement_order_url"],
-                hp["official_initial_decision_url"]):
+                hp["official_initial_decision_url"],
+                leader["official_order_url"],
+                leader["official_final_notice_url"]):
         if safe_url(url) != url:
             raise ResearchError("FMC_UNSAFE_OFFICIAL_DECISION_URL")
+    if not (
+        date.fromisoformat(leader["small_claim_filed_notice_date"])
+        < date.fromisoformat(leader["respondent_submitted_signed_settlement_date"])
+        < date.fromisoformat(leader["original_order_served"])
+        < date.fromisoformat(leader["final_notice_served"])
+    ):
+        raise ResearchError("FMC_SETTLEMENT_CHRONOLOGY_INVALID")
+    if (leader["msc_settlement_promise_cancel_OUTSTANDING_UNPAID_demurrage_usd_cents"] != 465000
+            or leader["claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_freight_usd_cents"] != 300000
+            or leader["claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_late_fee_brl_centavos"] != 70000
+            or leader["settlement_result_verified_cash_refund_usd_cents"] is not None):
+        raise ResearchError("FMC_WAIVER_CANCELLATION_OR_CASH_TAMPERED")
     return doc
 
 
@@ -208,6 +274,7 @@ def load_fixture(path: Path = FIXTURE) -> dict:
 def make_receipt(*, fixture: dict | None = None) -> dict:
     d = load_fixture() if fixture is None else validate_fixture(fixture)
     bridge, hp = d["bridgewell_cosco"], d["hp_logistics_quote_dispute"]
+    leader = d["leader_commerce_msc_signed_settlement"]
     body = {
         "schema_version": 1,
         "scope": SCOPE,
@@ -217,7 +284,11 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
              "administratively_final_notice": bridge["official_final_notice_url"],
              "status": "FMC_FINAL_AWARD;_AGENCY_ORDER_INDEX_EXCERPT_CARRIER_PAID;_CUSTOMER_RECEIPT_SECONDARY_ONLY;_BANK_UNVERIFIED"},
             {"id": hp["case_id"], "initial_decision": hp["official_initial_decision_url"],
-             "status": "NO_REPARATIONS_IN_INITIAL_DECISION_FINALITY_UNVERIFIED"}
+             "status": "NO_REPARATIONS_IN_INITIAL_DECISION_FINALITY_UNVERIFIED"},
+            {"id": leader["case_id"],
+             "initial_decision": leader["official_order_url"],
+             "administratively_final_notice": leader["official_final_notice_url"],
+             "status": "BILATERAL_SETTLEMENT_APPROVED_AND_FINAL_UNPAID_DEBT_CANCELLED_AND_PREVIOUSLY_PAID_REFUND_CLAIMS_WAIVED_NO_NEW_CASH"}
         ],
         "bridgewell_initial_claim_cents": bridge["original_reparation_claim_cents"],
         "bridgewell_final_principal_cents": bridge["reparations_principal_cents"],
@@ -254,6 +325,27 @@ def make_receipt(*, fixture: dict | None = None) -> dict:
         "hpl_initial_decision_section_41102_c_violation":
             hp["initial_decision_section_41102_c_violated"],
         "hpl_final_status_independently_verified": False,
+        "leader_public_bol_authored_digest_NOT_original_BOL_hash":
+            digest(leader["shipment_public_bill_of_lading"]),
+        "leader_settlement_order_date": leader["original_order_served"],
+        "leader_admin_final_notice_date": leader["final_notice_served"],
+        "leader_both_signatures_described_by_FMC_not_original_in_custody": True,
+        "leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents":
+            leader["msc_settlement_promise_cancel_OUTSTANDING_UNPAID_demurrage_usd_cents"],
+        "leader_actual_carrier_ledger_cancellation_verified": False,
+        "leader_previously_paid_freight_refund_rights_waived_usd_cents":
+            leader["claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_freight_usd_cents"],
+        "leader_previously_paid_late_fee_refund_rights_waived_brl_centavos":
+            leader["claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_late_fee_brl_centavos"],
+        "leader_usd_brl_conversion_or_sum_allowed": False,
+        "leader_refund_received_bank_verified_usd_cents": None,
+        "leader_complaint_allegations_unadjudicated_usd_cents": [
+            leader["complaint_alleged_low_water_fee_usd_cents"],
+            leader["complaint_alleged_other_extra_fee_usd_cents"],
+        ],
+        "leader_original_settlement_and_customer_bank_docs_held": False,
+        "leader_refund_rights_released_not_new_cash_awarded": True,
+        "leader_fmc_order_adjudicated_illegal_billing_amount_cents": None,
         "original_fmc_pdf_bytes_and_private_invoices_held": False,
         "modern_retally_invoice_accuracy_labels": 0,
         "commercial_customer_reuse_approved": False,

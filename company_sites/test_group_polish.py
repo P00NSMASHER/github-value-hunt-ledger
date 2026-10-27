@@ -77,6 +77,21 @@ class GroupPolishTests(unittest.TestCase):
                 self.assertIn(marker, css)
             self.assertNotIn("@import", css)
 
+    def test_old_direct_card_image_layout_is_not_reintroduced(self):
+        """All four cards use nested source-pinned emblems, not old photos."""
+        with tempfile.TemporaryDirectory() as tmp:
+            output = build("group", Path(tmp) / "group")
+            html = (output / "index.html").read_text(encoding="utf-8")
+            css = (output / "site.css").read_text(encoding="utf-8")
+            self.assertEqual(html.count('class="card-visual"'), 4)
+            self.assertIn(
+                '.group-site .card-visual>img.native-company-emblem', css
+            )
+            self.assertNotIn(".company-card>img", css)
+            self.assertNotIn(".company-card.recoveryworks>img", css)
+            self.assertNotIn('src="/assets/recoveryworks.webp"', html)
+            self.assertIn('src="/assets/brand/recoveryos-emblem.webp"', html)
+
 
 if __name__ == "__main__":
     unittest.main()

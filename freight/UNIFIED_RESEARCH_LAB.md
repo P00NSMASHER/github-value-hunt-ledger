@@ -285,6 +285,54 @@ The initial decision's separate administrative finality and any later
 customer refund remain **unverified**. Quoted-rate arithmetic alone may
 signal a **review**, not an independently recoverable overcharge.
 
+### Third case: an approved settlement can extinguish a refund claim (FMC 2015(I))
+
+The [November 8, 2024 FMC Order](https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf)
+records a real commercial ocean shipment, Baltimore to Manaus, Brazil,
+under published bill of lading **MEDUUP205245**. Leader Commerce
+Corp. d.b.a. Infinity Freight and Logistics Corp. disputed MSC's
+low-water surcharge ($3,000), another $140 fee, and demurrage. Those
+were **allegations**, not an adjudicated finding of illegal billing.
+
+The FMC officer reported a **bilaterally signed settlement** submitted
+October 17 and APPROVED November 8, 2024:
+
+| Official settlement terms | Actual proof state | NEVER count as |
+| --- | --- | --- |
+| MSC agrees to cancel **USD $4,650 in OUTSTANDING demurrage**, and end collection | **CONTRACTUAL UNPAID-DEBT CANCELLATION OBLIGATION**, not evidence of a separate post-order ledger write-off | Customer bank refund or confirmed payment |
+| Claimant waives refund rights on **USD $3,000 in previously-paid extra freight** | **PAID CHARGE WITH RELEASED REFUND RIGHTS** as described by FMC, not a reimbursed disputed charge | Another $3,000 customer refund |
+| Claimant waives refund rights on **BRL 700 in previously-paid late fees** | Separate **BRL**-denominated waiver, no currency exchange rate or USD conversion | Cash recovered in USD |
+| Both sides settle and withdraw with prejudice | **APPROVED AND DISMISSED WITH PREJUDICE**; a separate [December 10, 2024 FMC notice](https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf) confirms administrative finality | Judgment that original fees were unlawful |
+
+**Discovery consequence:** Seeing an original invoice, BOL number, and
+settlement does *not* establish a collectible overcharge. A canceled
+unpaid receivable is different from a cash refund; a release of claims
+may end potential recovery rights. Actual MSC ledger write-off,
+the original signed settlement attachment, separately authenticated
+invoice/BOL bytes, and customer bank payment/credit remain **unverified**.
+
+A second official evidence rule underscores the claimant issue:
+[GAO B-121220 (1964)](https://www.gao.gov/products/b-121220-0)
+distinguishes a party that *initially pays the carrier* from the party
+that *ultimately bore transportation costs*, and describes payment
+proof and carrier bill/voucher documentation. This is a historical
+federal-government reimbursement precedent, **NOT a blanket modern
+private-party rule**. The current claimant's legal standing,
+contract terms, settlement releases, beneficial cost bearer, and
+applicable claim deadlines all need separate review. No standing
+or deadline is automatically decided by this casebook.
+
+The canonical FMC source fixture now has **three** cases: a final
+reparations award with externally reported later payment (Bridgewell),
+an invoice/quote difference yielding no initial reparations (HPL),
+and an approved cancellation-plus-waiver settlement (Leader Commerce).
+Tests pin both original FMC decision and finality URLs; prevent
+BRL and USD from being summed; and reject forged cash, legal liability,
+original-document custody and rights. Only aggregate proof states
+are published into the existing unified lab, never the public BOL
+identifier or original transaction records. RETALLY recovered cash
+and verified customer cases remain **zero**.
+
 ### Proof-state boundaries
 
 - **Documented billing / carrier payment:** The government decision reports
