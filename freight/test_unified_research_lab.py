@@ -21,6 +21,29 @@ NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 
 class UnifiedResearchLabTests(unittest.TestCase):
+    def test_main_gao_adjudication_source_reconciliation_hold(self):
+        # Pinned 2026-10-27 protected-main locators: historic rulings, NOT invoice custody.
+        sources = (
+            "https://www.gao.gov/products/b-213717-0",
+            "https://www.gao.gov/products/b-192856",
+            "https://www.gao.gov/products/b-191258",
+        )
+        self.assertEqual(len(set(sources)), 3)
+        for url in sources:
+            self.assertIn(url, SEEDS["freightrecovery"])
+            self.assertEqual(safe_url(url), url)
+            ledger, added = merge_sources(
+                ledger_from([]), "freightrecovery", [url, url], "2026-10-27"
+            )
+            self.assertEqual(added, 1)
+            self.assertEqual(len(ledger["entries"]), 1)
+            for key in ("commercial_reuse_authorized", "independent_ground_truth",
+                        "independent_payment_verified", "recovered_cash_verified"):
+                self.assertFalse(ledger["entries"][0][key])
+        # Main's obsolete restaurant-inspection locator must not be reintroduced.
+        self.assertNotIn("https://data.cityofnewyork.us/d/43nn-pn8j",
+                         SEEDS["permitplate"])
+
     def test_gao_b215958_source_scope_dedup_and_unknowns(self):
         fixture = Path(__file__).with_name("fixtures") / "gao_b215958_source_v1.json"
         data = json.loads(fixture.read_text(encoding="utf-8"))
