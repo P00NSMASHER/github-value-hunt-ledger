@@ -63,6 +63,11 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
         self.assertEqual(case["later_order_to_show_cause_date"],"2026-10-02")
         self.assertEqual(case["fmc_original_enforcement_order_document_id"],145944)
         self.assertEqual(case["reported_actual_customer_payment_received_date"],"2026-08-31")
+        self.assertEqual(case["official_order_payment_made_date_index_excerpt"],"2026-08-31")
+        self.assertEqual(case["official_order_late_payment_days_index_excerpt"],223)
+        self.assertFalse(case["official_order_pdf_bytes_acquired"])
+        self.assertTrue(case["official_enforcement_order_url"].startswith("https://www2.fmc.gov/readingroom/docs/26-13/"))
+        self.assertIn("OFFICIAL_FMC_ORDER_SEARCH_INDEX_EXCERPT",case["reported_payment_lifecycle_source"])
         self.assertTrue(case["government_reported_late_reparation_payment"])
         self.assertIn("MEDIA_REPORTS",case["reported_payment_lifecycle_source"])
         self.assertIsNone(case["exact_customer_received_amount_cents_independently_bank_verified"])
@@ -100,6 +105,13 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
         self.assertEqual(receipt["bridgewell_award_components_not_invoice_count"],10)
         self.assertEqual(receipt["bridgewell_reported_late_customer_payment_date"],
                          "2026-08-31")
+        self.assertEqual(receipt["bridgewell_official_order_payment_made_index_excerpt_date"],"2026-08-31")
+        self.assertEqual(receipt["bridgewell_official_order_late_days"],223)
+        self.assertFalse(receipt["bridgewell_original_enforcement_order_pdf_in_custody"])
+        self.assertFalse(receipt["bridgewell_bank_receipt_confirmed"])
+        self.assertIsNone(receipt["bridgewell_actual_bank_receipt_cents"])
+        self.assertEqual(receipt["bridgewell_payment_evidence_tier"],
+            "OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED")
         self.assertTrue(receipt[
             "bridgewell_later_payment_reported_NOT_verified_bank_receipt"])
         self.assertTrue(receipt[
@@ -142,6 +154,12 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
             ("bridgewell_final_interest_as_of_notice_cents",0),
             ("bridgewell_final_ordered_total_cents",2432880),
             ("bridgewell_reported_late_customer_payment_date","2026-01-20"),
+            ("bridgewell_official_order_payment_made_index_excerpt_date","2026-01-20"),
+            ("bridgewell_official_order_late_days",0),
+            ("bridgewell_original_enforcement_order_pdf_in_custody",True),
+            ("bridgewell_bank_receipt_confirmed",True),
+            ("bridgewell_actual_bank_receipt_cents",2828931),
+            ("bridgewell_payment_evidence_tier","ORIGINAL_BANK_STATEMENT_VERIFIED"),
             ("bridgewell_exact_received_cash_and_interest_unverified",False),
             ("bridgewell_civil_penalties_imposed_cents",1670000000),
             ("hpl_initial_decision_reparations_awarded_cents",2360000),
@@ -178,6 +196,10 @@ class FMCPublicRealShipperBillingTests(unittest.TestCase):
             ("bridgewell_cosco","interest_actually_received_cents_independently_verified",396051),
             ("bridgewell_cosco","civil_penalty_assessed_cents_at_review_date",1670000000),
             ("bridgewell_cosco","government_reported_late_reparation_payment",False),
+            ("bridgewell_cosco","official_order_pdf_bytes_acquired",True),
+            ("bridgewell_cosco","official_order_payment_made_date_index_excerpt","2026-01-20"),
+            ("bridgewell_cosco","official_order_late_payment_days_index_excerpt",0),
+            ("bridgewell_cosco","reported_payment_lifecycle_source","BANK_SETTLEMENT_VERIFIED"),
             ("bridgewell_cosco","applicable_to_private_domestic_motor_freight_tariffs",True),
             ("hp_logistics_quote_dispute","administrative_finality_separately_verified",True),
             ("hp_logistics_quote_dispute","later_customer_refund_verified_cents",2589500),
