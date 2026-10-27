@@ -381,7 +381,7 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "python -m freight.fmc_real_shipper_billing_lifecycle "
             "--output /tmp/retally-fmc-real-shipper-v1.json --verify",nightly)
         for gate in (
-            "len(x['fmc_cases']) == 3",
+            "len(x['fmc_cases']) == 4",
             "x['leader_settlement_order_date'] == '2024-11-08'",
             "x['leader_admin_final_notice_date'] == '2024-12-10'",
             "x['leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents'] == 465000",
@@ -403,6 +403,17 @@ class ResearchCIVerificationContract(unittest.TestCase):
             "x['bridgewell_actual_bank_receipt_cents'] is None",
             "x['bridgewell_payment_evidence_tier'] == 'OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED'",
             "x['bridgewell_exact_received_cash_and_interest_unverified'] is True",
+            "x['jimex_initial_claim_requested_cents'] == 4460669",
+            "x['jimex_initial_late_fee_reparations_cents'] == 999707",
+            "x['jimex_initial_detention_refund_cents'] == 197500",
+            "x['jimex_initial_principal_NOT_actual_cash_received_cents'] == 1197207",
+            "x['jimex_appendix_b_paid_invoice_count'] == 5",
+            "x['jimex_appendix_b_paid_detention_cents'] == 197500",
+            "x['jimex_unrelated_carrier_exhibits_must_not_join'] is True",
+            "x['jimex_initial_decision_finality_verified'] is False",
+            "x['jimex_later_bank_cleared_refund_cents'] is None",
+            "x['jimex_exact_interest_cents'] is None",
+            "x['jimex_current_customer_scoring_authorized'] is False",
             "x['hpl_initial_decision_reparations_awarded_cents'] == 0",
             "x['modern_retally_invoice_accuracy_labels'] == 0",
             "x['retally_recovered_cash_cents'] == 0",
