@@ -812,5 +812,93 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual((item["extra_provider_calls"], item["new_workflows"]), (0, 0))
         self.assertFalse(item["engine_code_changed"])
 
+
+    def test_socrata_system_fields_are_docs_only_not_permit_labels(self):
+        """Original Socrata docs describe row IDs, not dataset-specific permit truth."""
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+        def assert_held(x):
+            self.assertEqual(x["source"]["original_publisher_url"], SOURCE_URL)
+            self.assertFalse(x["source"]["original_publisher_response_acquired"])
+            self.assertIsNone(x["source"]["publisher_original_http_bytes_sha256"])
+            self.assertFalse(x["source"]["dataset_specific_commercial_reuse_authorized"])
+            self.assertIsNone(x["provenance"]["raw_source_byte_hash"])
+            o = x["observed"]
+            self.assertEqual((o["sample_count"], o["sample_unique_source_identities"],
+                              o["sample_repeated_source_rows"]), (20, 18, 2))
+            self.assertEqual(o["receipt_status"], "PUBLISHER_REPLAY_DEGRADED")
+            self.assertEqual(o["held_out_labeled_permits"], 0)
+            self.assertEqual(o["independent_current_validity_labels"], 0)
+            self.assertEqual(o["actual_distinct_original_records"], "UNKNOWN")
+            self.assertIsNone(o["permitplate_scoring_precision_recall"])
+            d = x["publisher_platform_identity_validation_candidate"]
+            self.assertEqual(d["documentation_url"],
+                             "https://dev.socrata.com/docs/system-fields")
+            self.assertEqual(d["documented_api_family"], "SODA_2_1")
+            self.assertEqual(d["documented_system_select_fields"],
+                             [":id", ":updated_at"])
+            self.assertEqual(d["source_dataset_id"], DATASET_ID)
+            self.assertEqual(d["proposal_status"],
+                             "DOCUMENTED_METHOD_ONLY_NOT_LIVE_PROBED")
+            for key in ("current_collector_selects_system_fields",
+                        "original_publisher_dataset_specific_probe_executed",
+                        "cross_full_replacement_id_stability_verified",
+                        "source_specific_commercial_reuse_authorized"):
+                self.assertFalse(d[key], key)
+            for key in ("original_publisher_system_field_response_sha256",
+                        "number_of_real_collisions_disambiguated"):
+                self.assertIsNone(d[key], key)
+            self.assertEqual(d["independent_held_out_validity_labels"], 0)
+            controls = {c["id"]: c for c in x["synthetic_negative_controls"]}
+            self.assertEqual(len(controls), 6)
+            distinct = controls["SYNTH_PROJECTED_COLLISION_WITH_DISTINCT_SODA_ROW_IDS"]
+            revision = controls["SYNTH_UPDATED_API_ROW_IS_NOT_AN_INDEPENDENT_PERMIT"]
+            self.assertEqual((distinct["kind"], revision["kind"]),
+                             ("SYNTHETIC", "SYNTHETIC"))
+            self.assertEqual(len(distinct["rows"]), 2)
+            self.assertEqual(len(revision["rows"]), 2)
+            self.assertEqual(len({r["projected_key"] for r in distinct["rows"]}), 1)
+            self.assertEqual(len({r["system_row_id"] for r in distinct["rows"]}), 2)
+            self.assertEqual(len({r["projected_key"] for r in revision["rows"]}), 1)
+            self.assertEqual(len({r["system_row_id"] for r in revision["rows"]}), 1)
+            self.assertEqual(len({r["system_updated_at"] for r in revision["rows"]}), 2)
+            self.assertEqual(distinct["expected"],
+                             "TWO_POSSIBLE_DISTINCT_API_ROWS_NOT_TWO_INDEPENDENT_REAL_PERMITS")
+            self.assertEqual(revision["expected"],
+                             "ONE_API_ROW_REVISION_NOT_TWO_INDEPENDENT_REAL_PERMITS")
+            for control in (distinct, revision):
+                self.assertTrue(all(r["independent_permit_validity"] is None
+                                    for r in control["rows"]))
+
+        assert_held(pack)
+        # Offline adversarial controls: recomputed/forged metadata never
+        # upgrades unprobed system IDs into real permits or verified rights.
+        attacks = (
+            ("publisher_platform_identity_validation_candidate",
+             "original_publisher_dataset_specific_probe_executed", True),
+            ("publisher_platform_identity_validation_candidate",
+             "original_publisher_system_field_response_sha256", "0" * 64),
+            ("publisher_platform_identity_validation_candidate",
+             "number_of_real_collisions_disambiguated", 2),
+            ("publisher_platform_identity_validation_candidate",
+             "cross_full_replacement_id_stability_verified", True),
+            ("publisher_platform_identity_validation_candidate",
+             "source_specific_commercial_reuse_authorized", True),
+            ("publisher_platform_identity_validation_candidate",
+             "independent_held_out_validity_labels", 2),
+            ("observed", "receipt_status", "PUBLISHER_REPLAY_OK"),
+            ("observed", "sample_unique_source_identities", 20),
+            ("observed", "held_out_labeled_permits", 20),
+            ("source", "original_publisher_response_acquired", True),
+        )
+        for section, key, forged in attacks:
+            with self.subTest(section=section, field=key):
+                mutated = copy.deepcopy(pack)
+                mutated[section][key] = forged
+                with self.assertRaises(AssertionError):
+                    assert_held(mutated)
+
 if __name__=="__main__":
     unittest.main()
