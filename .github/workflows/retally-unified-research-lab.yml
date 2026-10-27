@@ -650,7 +650,8 @@ jobs:
                   '- FMC 2022(I): $24,328.80 original reparations + $3,960.51 interest = $28,289.31 ordered due Jan 20, 2026.\n'
                   '- FMC Oct 2 order search-index excerpt says COSCO paid Aug 31 (223 days late); press reports Bridgewell received it. Original order PDF and actual bank-cleared amount UNKNOWN.\n'
                   '- FMC 2025(I): $23,600 quote/invoice gap, $25,895 requested, but initial decision awarded $0 reparations.\n'
-                  '- FMC 2015(I): signed settlement final December 2024; $4,650 outstanding demurrage to cancel, waived refund claims for USD $3,000 paid freight plus BRL 700 late fees. No verified cash or actual carrier ledger write-off.\\n'\n                  '- Independent FMC PDF bytes and original customer bank records NOT held. Modern RETALLY case labels and cash are ZERO.\n'
+                  '- FMC 2015(I): signed settlement final December 2024; $4,650 outstanding demurrage to cancel, waived refund claims for USD $3,000 paid freight plus BRL 700 late fees. No verified cash or actual carrier ledger write-off.\n'
+                  '- Independent FMC PDF bytes and original customer bank records NOT held. Modern RETALLY case labels and cash are ZERO.\n'
               )
           PY
       - name: Commit only metadata, never on protected main
