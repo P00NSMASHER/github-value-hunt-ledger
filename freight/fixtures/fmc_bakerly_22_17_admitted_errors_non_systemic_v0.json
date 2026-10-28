@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "fixture_id": "FMC_22_17_ADMITTED_ERRORS_AND_NON_SYSTEMIC_DECISION_V0",
   "engine": "freightrecovery",
   "evaluation_family": "HISTORICAL_FMC_ADJUDICATED_FREIGHT_ERROR_ADMISSION_VS_SYSTEMIC_NEGATIVE",
@@ -24,7 +24,10 @@
     "commercial_engine_use_approved": false,
     "effective_conduct_start": "2020-12",
     "effective_conduct_end": "2022-03",
-    "later_osra_2022_invoice_rules_applied_retroactively": false
+    "later_osra_2022_invoice_rules_applied_retroactively": false,
+    "initial_decision_pdf_url": "https://www2.fmc.gov/readingroom/docs/22-17/22-17%20Initial%20Decision.pdf/",
+    "illustrative_reconciliation_source": "FMC 2024-01-03 INITIAL DECISION, printed page 34, numbered findings 160-164; indexed publisher text only, original PDF bytes and exhibit images not acquired",
+    "original_invoice_exhibits_cx736_cx737_cx738_downloaded": false
   },
   "published_record": {
     "commission_affirmed_initial_dismissal": true,
@@ -40,7 +43,28 @@
     "these_credits_prove_cash_refund": false,
     "cash_refund_amount_proven_cents": null,
     "carrier_not_seeking_some_charges": true,
-    "multiple_invoices_for_one_container_alone_establish_duplicate_charge": false
+    "multiple_invoices_for_one_container_alone_establish_duplicate_charge": false,
+    "illustrative_third_party_cost_reconciliation": {
+      "source_finding": 162,
+      "invoice_source_exhibit": "CX 736 (reported, not held)",
+      "paycargo_receipt_source_exhibit": "CX 737 (reported, not held)",
+      "terminal_invoice_source_exhibit": "CX 738 (reported, not held)",
+      "source_rows_in_custody": false,
+      "carrier_invoice_mills": 1073000,
+      "paycargo_base_mills": 808000,
+      "paycargo_shipper_fee_mills": 7500,
+      "paycargo_receipt_mills": 815500,
+      "terminal_invoice_mills": 250000,
+      "terminal_card_fee_percent": "3.99",
+      "terminal_card_fee_mills": 9975,
+      "total_illustrative_cost_mills": 1075475,
+      "invoice_minus_cost_mills": -2475,
+      "rounding_note": "1 mill = USD 0.001. USD 1075.475 source illustration retains sub-cent precision; no artificial cents-only rounding or refund inference.",
+      "classification": "SOURCE_REPORTED_ILLUSTRATIVE_COSTS_EXCEED_CARRIER_INVOICE_BY_USD_2_475_NOT_ADJUDICATED_OVERCHARGE",
+      "is_held_out_invoice_level_ground_truth": false,
+      "any_customer_cash_refund_or_recovered_amount": null,
+      "commercial_reuse_authorized": false
+    }
   },
   "truth_boundaries": {
     "case_level_outcome": "CLAIMANT_DID_NOT_ESTABLISH_SHIPPING_ACT_VIOLATION_AS_PLEADED",
@@ -52,7 +76,9 @@
     "commercial_customer_scoring": false,
     "retally_verified_recovered_cash_cents": 0,
     "customer_actual_refund_received": "UNKNOWN",
-    "difference_between_admitted_error_and_statutory_violation_preserved": true
+    "difference_between_admitted_error_and_statutory_violation_preserved": true,
+    "general_accounting_reconciliation_illustration_count": 1,
+    "independently_adjudicated_invoice_level_label_count": 0
   },
   "synthetic_negative_controls": [
     {
@@ -84,6 +110,11 @@
       "id": "SYNTH_OSRA_2022_NEW_INVOICE_RULES_AUTOMATICALLY_CONTROL_2020_2022_DISPUTE",
       "kind": "SYNTHETIC",
       "expected": "REJECT_TEMPORAL_AND_REGULATORY_SCOPE_MISMATCH"
+    },
+    {
+      "id": "SYNTH_FMC_22_17_COST_ABOVE_INVOICE_PROMOTED_TO_CUSTOMER_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SOURCE_REPORTED_UNDERBILL_ILLUSTRATION_IS_NOT_OVERCHARGE_OR_VERIFIED_REFUND"
     }
   ],
   "quality": {
