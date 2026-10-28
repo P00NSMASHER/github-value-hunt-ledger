@@ -2009,6 +2009,115 @@ class FMCMaerskFederalPenaltyNotCustomerCashTests(unittest.TestCase):
 
 
 
+class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
+    """2026 FMC first-party case: bounded NOR overbill percentage != buyer refund."""
+
+    @staticmethod
+    def _pack():
+        return json.loads(
+            (Path(__file__).with_name("fixtures") /
+             "fmc_msc_23_08_nor_adjudication_candidate_v0.json").read_text(
+                 encoding="utf-8"))
+
+    def _check(self, record):
+        src = record["source"]
+        case = record["publisher_reported_case"]
+        truth = record["ground_truth_limits"]
+        self.assertEqual(record["schema_version"], "0.1.0")
+        self.assertEqual(src["commission_docket"], "23-08")
+        self.assertEqual(src["original_fmc_release_published"], "2026-01-28")
+        self.assertEqual(src["testimony_published"], "2026-06-03")
+        self.assertEqual(record["cohort"],
+                         "MSC_NON_OPERATING_REEFER_DEMURRAGE_DETENTION_2021_ONLY")
+        self.assertEqual(case["approximate_nor_bill_overcharge_share_percent"], 23)
+        self.assertIs(case["percentage_is_approximate"], True)
+        self.assertIs(case["other_carriers_or_billing_years_extrapolation_permitted"],
+                      False)
+        self.assertEqual(case["civil_penalty_notify_party_cents"], 6500000)
+        self.assertEqual(case["civil_penalty_tariff_publication_cents"], 946000000)
+        self.assertEqual(case["civil_penalty_nor_overcharge_cents"], 1314500000)
+        self.assertEqual(case["civil_penalty_total_assessed_cents"], 2267000000)
+        self.assertEqual(
+            sum(case[key] for key in (
+                "civil_penalty_notify_party_cents",
+                "civil_penalty_tariff_publication_cents",
+                "civil_penalty_nor_overcharge_cents")),
+            case["civil_penalty_total_assessed_cents"])
+        self.assertEqual(case["reported_penalty_payment_recipient"],
+                         "UNITED_STATES_TREASURY")
+        self.assertIs(case["fmc_civil_penalty_is_customer_restitution"], False)
+        self.assertIsNone(case["shipper_refunds_paid_total_cents"])
+        self.assertEqual(case["payment_status_from_january_28_release"],
+                         "ASSESSED_NOT_INDEPENDENTLY_CONFIRMED_PAID")
+        self.assertIs(case["june_3_testimony_reports_penalty_paid_in_full_asof_may_2026"],
+                      True)
+        self.assertEqual(truth["independently_heldout_labeled_shipment_invoices"], 0)
+        self.assertIs(truth["current_freight_error_precision_recall_scoring_permitted"],
+                      False)
+        self.assertEqual(truth["exact_nor_invoice_population_size"], "UNKNOWN")
+        self.assertEqual(truth["exact_customer_refund_total"], "UNKNOWN")
+        self.assertEqual(truth["verified_retally_customer_recovery_cents"], 0)
+        self.assertIs(src["original_press_release_response_bytes_custodied"], False)
+        self.assertIsNone(src["original_press_release_response_sha256"])
+        self.assertIs(src["final_order_original_pdf_bytes_custodied"], False)
+        self.assertIsNone(src["final_order_original_pdf_sha256"])
+        self.assertIsNone(src["public_testimony_original_response_sha256"])
+        self.assertIs(src["commercial_scoring_authorized"], False)
+        self.assertEqual(record["admission_state"],
+                         "RESEARCH_ONLY_SOURCE_POINTERS_NOT_CURRENT_CUSTOMER_TRUTH_OR_COMMERCIAL_SCORING")
+
+    def test_fmc_reported_adjudication_not_all_freight_accuracy(self):
+        data = self._pack()
+        self._check(data)
+        self.assertNotIn(data["source"]["official_fmc_release_url"],
+                         SEEDS["freightrecovery"])
+        self.assertIn("2021", data["publisher_reported_case"]["overcharge_cohort"])
+        self.assertIs(data["quality"]["invoice_level_labeling_complete"], False)
+
+    def test_synthetic_controls_and_source_rights_stay_held(self):
+        data = self._pack()
+        controls = data["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({x["id"] for x in controls}), 5)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" and
+                            x["id"].startswith("SYNTHETIC_") for x in controls))
+        self.assertEqual(data["source"]["source_rights_status"],
+                         "NOT_INDEPENDENTLY_ATTESTED_COMMERCIAL_ENGINE_REUSE_HOLD")
+        self.assertFalse(data["quality"]["independent_original_order_and_invoice_custody"])
+
+    def test_ten_forged_promotion_attempts_rejected(self):
+        original = self._pack()
+        self._check(original)
+        mutations = (
+            ("cohort_share", lambda x: x["publisher_reported_case"].update(
+                approximate_nor_bill_overcharge_share_percent=100)),
+            ("generalization", lambda x: x["publisher_reported_case"].update(
+                other_carriers_or_billing_years_extrapolation_permitted=True)),
+            ("penalty_amount", lambda x: x["publisher_reported_case"].update(
+                civil_penalty_total_assessed_cents=22670000)),
+            ("treasury", lambda x: x["publisher_reported_case"].update(
+                reported_penalty_payment_recipient="RETALLY")),
+            ("paid_date", lambda x: x["publisher_reported_case"].update(
+                payment_status_from_january_28_release="PAID_IN_JANUARY")),
+            ("refund", lambda x: x["publisher_reported_case"].update(
+                shipper_refunds_paid_total_cents=2267000000)),
+            ("customer_labels", lambda x: x["ground_truth_limits"].update(
+                independently_heldout_labeled_shipment_invoices=2629)),
+            ("customer_recovery", lambda x: x["ground_truth_limits"].update(
+                verified_retally_customer_recovery_cents=2267000000)),
+            ("source_hash", lambda x: x["source"].update(
+                final_order_original_pdf_sha256="0" * 64)),
+            ("commercial_rights", lambda x: x["source"].update(
+                commercial_scoring_authorized=True)),
+        )
+        for name, mutation in mutations:
+            with self.subTest(forgery=name), self.assertRaises(AssertionError):
+                forged = json.loads(json.dumps(original))
+                mutation(forged)
+                self._check(forged)
+
+
+
 def load_tests(loader, tests, pattern):
     """Route source-bound freight, accounting, and procurement safety tests to CI."""
     from freight import test_gao_b215958_supersession
