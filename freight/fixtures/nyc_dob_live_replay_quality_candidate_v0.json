@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.4",
+  "schema_version": "0.1.5",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -277,6 +277,13 @@
       "ELEVATOR",
       "LIMITED_ALTERATION_APPLICATION_LAA"
     ],
+    "cached_job_filing_number_placeholder": "Permit is no",
+    "cached_job_filing_number_placeholder_frequency": 344,
+    "cached_job_filing_number_null_count": 212,
+    "cached_column_cardinality_is_distinct_filing_identity_count": false,
+    "placeholder_frequency_and_work_permit_sentinel_same_rows_verified": false,
+    "placeholder_value_proves_distinct_issued_permits": false,
+    "placeholder_truth_limit": "PUBLISHER_CACHED_FIELD_TOP_VALUE_AND_FREQUENCY_ONLY_NOT_ROW_LEVEL_JOIN_OR_REAL_PERMIT_IDENTITY",
     "publisher_cached_counts_verified_as_live_row_level_query": false,
     "source_tracking_number_globally_unique_verified": false,
     "source_cached_status_proves_current_permit_validity": false,
@@ -312,6 +319,11 @@
         "id": "SYNTH_APPROVED_PERMIT_DATASET_EQUALS_ALL_NYC_BUILDING_PERMITS",
         "kind": "SYNTHETIC",
         "expected": "REJECT_ELECTRICAL_ELEVATOR_AND_LAA_EXCLUSIONS"
+      },
+      {
+        "id": "SYNTH_TRUNCATED_JOB_FILING_PLACEHOLDER_IS_344_UNIQUE_ISSUED_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_PUBLISHER_CACHED_PLACEHOLDER_FREQUENCY_NOT_DISTINCT_ISSUED_PERMIT_IDENTITIES"
       }
     ],
     "consumer_lane": ":48 PermitPlate",
