@@ -90,13 +90,14 @@
     }
   ],
   "quality": {
-    "case_level_labeling_complete": true,
+    "case_level_labeling_complete": false,
     "invoice_level_labeling_complete": false,
     "publisher_reported_case_specific_error_share": true,
     "independent_original_order_and_invoice_custody": false,
     "publisher_response_sha256_provenance_complete": false,
     "synthetic_controls_tagged": true,
-    "private_medical_student_or_customer_records_used": false
+    "private_medical_student_or_customer_records_used": false,
+    "case_level_ground_truth_limit": "REGULATOR_SUMMARY_ONLY_FINAL_ORDER_AND_INDIVIDUAL_INVOICES_NOT_REPLAYED"
   },
   "admission_state": "RESEARCH_ONLY_SOURCE_POINTERS_NOT_CURRENT_CUSTOMER_TRUTH_OR_COMMERCIAL_SCORING"
 }
