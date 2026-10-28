@@ -2253,7 +2253,7 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     def _assert_held(self, p):
         src = p["source"]
         policy = src["citywide_open_data_policy"]
-        self.assertEqual(p["schema_version"], "0.1.2")
+        self.assertEqual(p["schema_version"], "0.1.3")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
         self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
@@ -2314,7 +2314,7 @@ class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.2")
+        self.assertEqual(p["schema_version"], "0.1.3")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
         self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
@@ -2393,5 +2393,66 @@ class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
             with self.subTest(name=name):
                 forged = json.loads(json.dumps(initial))
                 change(forged)
+                with self.assertRaises(AssertionError):
+                    self._assert_boundary(forged)
+
+
+
+class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
+    """Newest existing-writer readback is not original publisher custody or permit truth."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_boundary(self, p):
+        self.assertEqual(p["schema_version"], "0.1.3")
+        v = p["operational_writer_2026_10_28_readback_followup"]
+        self.assertEqual(v["source_dataset_id"], "rbx6-tga4")
+        self.assertEqual(v["observed_as_of_utc_date"], "2026-10-28")
+        self.assertEqual(v["live_writer_head_commit"], "824d896a04f5fcccbddc6cce0691407377038220")
+        self.assertEqual(v["live_writer_receipt_blob_git_sha1"], "f55dda41987641e74883964c544d0650ef256583")
+        self.assertEqual(v["sample_count"], 20)
+        self.assertEqual(v["projected_unique_source_identities"], 16)
+        self.assertEqual(v["projected_repeated_source_rows"], 4)
+        self.assertEqual(v["second_read_checked"], 3)
+        self.assertEqual(v["second_read_exact_match"], 3)
+        self.assertEqual(v["source_errors"], ["DUPLICATE_SOURCE_IDENTITIES"])
+        self.assertEqual(v["receipt_status"], "PUBLISHER_REPLAY_DEGRADED")
+        self.assertFalse(v["original_publisher_http_bytes_in_custody"])
+        self.assertIsNone(v["original_publisher_http_bytes_sha256"])
+        self.assertEqual(v["raw_permit_rows_copied"], 0)
+        self.assertIsNone(v["independently_verified_distinct_permit_count"])
+        self.assertEqual(v["independently_labeled_current_permit_validity"], 0)
+        self.assertEqual(v["independently_labeled_issuance_outcomes"], 0)
+        self.assertFalse(v["commercially_licensed_for_scoring"])
+        self.assertFalse(v["repeated_counts_form_a_comparable_time_series"])
+        self.assertEqual(v["production_admission"], "HOLD_REDACTED_WRITER_RECEIPT_ONLY")
+        self.assertEqual(v["synthetic_negative_control"]["kind"], "SYNTHETIC")
+        self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
+        self.assertFalse(p["source"]["original_publisher_response_acquired"])
+
+    def test_new_writer_readback_is_not_new_labeled_permit_truth(self):
+        self._assert_boundary(self._pack())
+
+    def test_forged_source_and_customer_promotions_rejected(self):
+        original = self._pack()
+        mutations = (
+            ("custody", lambda v: v.update(original_publisher_http_bytes_in_custody=True)),
+            ("raw_hash", lambda v: v.update(original_publisher_http_bytes_sha256="0" * 64)),
+            ("labels", lambda v: v.update(independently_labeled_current_permit_validity=4)),
+            ("duplicate_claim", lambda v: v.update(independently_verified_distinct_permit_count=20)),
+            ("commercial", lambda v: v.update(commercially_licensed_for_scoring=True)),
+            ("time_series", lambda v: v.update(repeated_counts_form_a_comparable_time_series=True)),
+            ("synthetic_promotion", lambda v: v["synthetic_negative_control"].update(kind="ORIGINAL")),
+            ("source_identity", lambda v: v.update(projected_unique_source_identities=20)),
+            ("readback", lambda v: v.update(second_read_exact_match=4)),
+        )
+        for name, mutation in mutations:
+            with self.subTest(synthetic_forgery=name):
+                forged = json.loads(json.dumps(original))
+                mutation(forged["operational_writer_2026_10_28_readback_followup"])
                 with self.assertRaises(AssertionError):
                     self._assert_boundary(forged)
