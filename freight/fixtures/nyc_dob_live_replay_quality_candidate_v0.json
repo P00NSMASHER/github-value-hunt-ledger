@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.2",
+  "schema_version": "0.1.3",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -210,5 +210,44 @@
     "consumer_lane": ":48 PermitPlate Engineering",
     "independent_qa_lane": ":44 QA",
     "production_admission": "HOLD_SOURCE_METADATA_ONLY_NO_CUSTOMER_LEAD_OR_PERMIT_SCORING"
+  },
+  "operational_writer_2026_10_28_readback_followup": {
+    "observation_id": "NYC_DOB_NOW_WRITER_READBACK_2026_10_28_V1",
+    "evidence_class": "EXISTING_WRITER_SUMMARY_NOT_ORIGINAL_PUBLISHER_BYTES",
+    "source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "source_dataset_id": "rbx6-tga4",
+    "source_terms_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "observed_as_of_utc_date": "2026-10-28",
+    "live_writer_branch": "research/retally-unified-data-lab",
+    "live_writer_head_commit": "824d896a04f5fcccbddc6cce0691407377038220",
+    "live_writer_receipt_blob_git_sha1": "f55dda41987641e74883964c544d0650ef256583",
+    "live_writer_receipt_sha256": "f164464fea21a9caf2c877069bcea373c6d0e753b75666ae52089baa0f959d13",
+    "live_writer_sample_canonical_sha256": "d7d4efc59a0c3249572f801f0b639326311b82566e2d7d8ec34c2db39200d162",
+    "sample_count": 20,
+    "projected_unique_source_identities": 16,
+    "projected_repeated_source_rows": 4,
+    "second_read_checked": 3,
+    "second_read_exact_match": 3,
+    "source_errors": [
+      "DUPLICATE_SOURCE_IDENTITIES"
+    ],
+    "receipt_status": "PUBLISHER_REPLAY_DEGRADED",
+    "original_publisher_http_bytes_in_custody": false,
+    "original_publisher_http_bytes_sha256": null,
+    "raw_permit_rows_copied": 0,
+    "independently_verified_distinct_permit_count": null,
+    "independently_labeled_current_permit_validity": 0,
+    "independently_labeled_issuance_outcomes": 0,
+    "commercially_licensed_for_scoring": false,
+    "prior_2026_10_26_receipt_projected_unique": 18,
+    "prior_2026_10_26_receipt_projected_repeated": 2,
+    "repeated_counts_form_a_comparable_time_series": false,
+    "quality_limit": "SAMPLES_ARE_UNFILTERED_UNSORTED_20_ROW_WRITER_READBACKS_NOT_IDENTITY_RESOLUTION_OR_GROUND_TRUTH",
+    "production_admission": "HOLD_REDACTED_WRITER_RECEIPT_ONLY",
+    "synthetic_negative_control": {
+      "id": "SYNTH_2026_10_28_FOUR_REPEATED_KEYS_PROVE_FOUR_DUPLICATE_REAL_PERMITS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PROJECTED_REPETITION_CANNOT_ESTABLISH_REAL_WORLD_DUPLICATE_PERMITS"
+    }
   }
 }
