@@ -7,7 +7,8 @@ from bounty_triage import dollars, evaluate, issue_key
 
 BASE = dict(listing_id='1', issue_url='https://github.com/example/thing/issues/5',
             advertised_usd='100.00', github_state='open', repo_archived=False,
-            external_contributors_allowed=True, recent_awards_verified=True, claim_count=0)
+            external_contributors_allowed=True, recent_awards_verified=True, claim_count=0, assignment_required=False,
+            assigned_to_us=False, assigned_to_other=False)
 
 
 def row(**kwargs):
@@ -81,8 +82,29 @@ class BountyTriageTests(unittest.TestCase):
         self.assertEqual(report['gross_advertised_usd'], '6750.00')
         self.assertEqual(report['collectible_usd_verified'], '0.00')
         self.assertEqual(report['review_ready_count'], 0)
-        self.assertTrue(all(r['status'] == 'UNVERIFIED_EXTERNAL_ELIGIBILITY'
+        self.assertTrue(all(r['status'] == 'BLOCKED_ASSIGNED_TO_OTHER'
                             for r in report['issues']))
+
+    def test_assigned_elsewhere_blocks_even_if_external_contributors_allowed(self):
+        result = evaluate([row(assignment_required=True, assigned_to_other=True)])
+        self.assertEqual(result['issues'][0]['status'], 'BLOCKED_ASSIGNED_TO_OTHER')
+
+    def test_assignment_required_without_our_assignment_is_unverified(self):
+        result = evaluate([row(assignment_required=True)])
+        self.assertEqual(result['issues'][0]['status'], 'UNVERIFIED_REQUIRED_ASSIGNMENT')
+
+    def test_missing_assignment_policy_never_passes(self):
+        result = evaluate([row(assignment_required=None)])
+        self.assertEqual(result['issues'][0]['status'], 'UNVERIFIED_ASSIGNMENT_POLICY')
+
+    def test_assignment_verified_still_not_payment_guarantee(self):
+        result = evaluate([row(assignment_required=True, assigned_to_us=True)])
+        self.assertEqual(result['issues'][0]['status'], 'REVIEW_READY_NOT_PAYMENT_GUARANTEE')
+
+    def test_conflicting_assignment_policies_never_pass(self):
+        result = evaluate([row(), row(listing_id='2', assignment_required=True,
+                                      assigned_to_us=True)])
+        self.assertEqual(result['issues'][0]['status'], 'UNVERIFIED_ASSIGNMENT_POLICY')
 
     def test_duplicate_listing_id_rejected(self):
         with self.assertRaises(ValueError):
