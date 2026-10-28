@@ -1309,7 +1309,7 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         self.assertEqual(len(controls), 12)
         self.assertIn("SYNTHETIC_UNRATED_499_LB_AS_ITEM_3860_ELIGIBLE",
                       {c["id"] for c in controls})
-        self.assertEqual(len({x["id"] for x in controls}), 11)
+        self.assertEqual(len({x["id"] for x in controls}), 12)
         self.assertTrue(all(x["kind"] == "SYNTHETIC" and
             x["id"].startswith("SYNTHETIC_") and
             (x["expected"].startswith("REJECT_") or
