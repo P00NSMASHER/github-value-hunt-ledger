@@ -36,3 +36,21 @@ cd research/golden_goose && python3 -m unittest -q test_bounty_triage.py
 Fifteen local unit tests passed prior to submitting this draft, including the recorded $417/10/6 census regression. That is a **local synthetic test**, not independent production acceptance.
 
 **Conclusion:** Do not pursue the sampled board as a first-$100 target. Continue the broader Golden Goose hunt, but require current GitHub issue status, nonarchived repo, outside-solver eligibility, reward credibility, recent awarded payouts, low competition, realistic implementation hours, and contributor authorization before coding for money. Even a row that passes remains review-ready rather than payable. Track alongside https://github.com/P00NSMASHER/github-value-hunt-ledger/issues/863 without promoting it to MASTER or claiming generated hunter leases.
+
+## Independent source check 2: verified open != eligible to earn (2026-10-28)
+
+A direct GitHub issue search on `tenstorrent/tt-metal` returned **three currently open** bounty-labelled issues in the checked result (not an exhaustive market census), totalling **$6,750** in advertised rewards:
+
+| Issue | Advertised | GitHub status | Current assignee | First-$100 eligibility for this account |
+| --- | ---: | --- | --- | --- |
+| [#62571 Qwen3-TTS predictor](https://github.com/tenstorrent/tt-metal/issues/62571) | $750 | OPEN | `bvdyvncqr5-commits` | BLOCKED, assigned elsewhere |
+| [#59732 Sampling distribution bias](https://github.com/tenstorrent/tt-metal/issues/59732) | $3,000 | OPEN | `samiyadev786` | BLOCKED, assigned elsewhere |
+| [#56908 Distributed normalization row stride](https://github.com/tenstorrent/tt-metal/issues/56908) | $3,000 | OPEN | `Adraca` | BLOCKED, assigned elsewhere |
+
+**Controlling terms:** [Tenstorrent Contribution Program Terms](https://docs.tenstorrent.com/bounty_terms.html), October 2026, sections 2 and 5: payment requires GitHub assignment **at PR submission time**; submitting to an issue already assigned to another is not eligible. Tenstorrent also reserves award discretion. All three tasks require specialized hardware validation. The figures are **advertised opportunity size only**: *verified earned, payable, or collected by us = $0*.
+
+The new [3-row synthetic-free read-only observation fixture](tenstorrent_open_assigned_2026-10-28.json) is source-bound as of 2026-10-28. The assignment-aware classifier now distinguishes `external_contributors_allowed=true` (eligible people can contribute to the program) from `assigned_to_other=true` (this particular bounty cannot be collected by us). It blocks the latter and fails closed on missing assignment policy, even when issue state is OPEN and value exceeds $100.
+
+**Validation status:** one observed negative-control dataset was committed, and six extra unit tests (one census regression, five adversarial assignment cases) were added. The original 15 tests had passed before this update; the enlarged 21-test suite has **not yet been independently executed or accepted**, so do not claim it passes. No bounty was claimed and no outside contributor contacted.
+
+**Updated decision:** demote coding bounties for near-term revenue unless a candidate has verified unassigned/authorized ownership, an enforceable enough payment route, available verification hardware, and a realistic short implementation. Next cheapest test: find a newly posted, unassigned, non-hardware $100+ task and confirm the controlling payment terms on the issuer's own page *before writing solution code*.
