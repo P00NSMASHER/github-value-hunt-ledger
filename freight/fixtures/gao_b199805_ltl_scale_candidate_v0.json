@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.1",
+  "schema_version": "0.1.2",
   "fixture_id": "GAO_B199805_1980_LTL_WEIGHT_SCALE_AGGREGATE_BOUNDARY_CANDIDATE_V0",
   "engines": [
     "freightrecovery",
@@ -58,6 +58,11 @@
     "original_tariff": "RMB_521_NINTH_REVISED_PAGE_472_TABLE_OMITTED_FROM_GAO_HTML",
     "current_2026_rate_applicability": "UNKNOWN",
     "original_tariff_effective_date": "UNKNOWN",
+    "quotation_item_3860_source_minimum_weight_pounds": 500,
+    "quotation_item_3860_source_first_eligible_scale": "5C",
+    "quotation_item_3860_source_last_eligible_scale": "20M",
+    "quotation_item_3860_under_500_unrated_shipment_eligible": false,
+    "source_boundary_is_general_modern_ltl_pricing_rule": false,
     "historical_government_deduction_is_private_customer_refund": false,
     "current_carrier_contract_authority_verified": false
   },
@@ -118,6 +123,11 @@
       "id": "SYNTHETIC_GAO_CITATION_AS_COMMERCIAL_LICENSE_AND_HELDOUT_TEST",
       "kind": "SYNTHETIC",
       "expected": "REJECT_RIGHTS_GROUND_TRUTH_AND_HOLDOUT_PROMOTION"
+    },
+    {
+      "id": "SYNTHETIC_UNRATED_499_LB_AS_ITEM_3860_ELIGIBLE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_QUOTATION_3860_500_POUND_FLOOR_NOT_GENERAL_LTL_CLASS"
     },
     {
       "id": "SYNTHETIC_GSA_SET_OFF_AS_PRIVATE_CUSTOMER_REFUND",
