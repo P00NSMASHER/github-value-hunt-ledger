@@ -10861,6 +10861,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-28",
+      "id": "dc3f084e9824021e663adcbff898a2bfcae3d7a7f14c6ab65ce0fe536964c657",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/ManchikaAbhiram/FreightIQ"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-24",
       "id": "dd209e60e6c3eccda5235d4b32b4c46779a0d6378ac88835d9d117efa0db9e19",
       "independent_ground_truth": false,
@@ -12697,6 +12713,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "801bd80723ca5dc66337be966bfc70778abee67482036f848b1d2ae840a3ffa8",
+  "entries_sha256": "e85adb3f6264518dcd6203cf0bde17ef7dd9f3fb106bda4e43aa3f53c71c0c00",
   "schema_version": 1
 }
