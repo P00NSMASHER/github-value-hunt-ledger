@@ -2250,7 +2250,7 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     def _assert_held(self, p):
         src = p["source"]
         policy = src["citywide_open_data_policy"]
-        self.assertEqual(p["schema_version"], "0.1.5")
+        self.assertEqual(p["schema_version"], "0.1.6")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
         self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
@@ -2311,7 +2311,7 @@ class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.5")
+        self.assertEqual(p["schema_version"], "0.1.6")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
         self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
@@ -2405,7 +2405,7 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.5")
+        self.assertEqual(p["schema_version"], "0.1.6")
         v = p["operational_writer_2026_10_28_readback_followup"]
         self.assertEqual(v["source_dataset_id"], "rbx6-tga4")
         self.assertEqual(v["observed_as_of_utc_date"], "2026-10-28")
@@ -2465,7 +2465,7 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_metadata_held(self, p):
-        self.assertEqual(p["schema_version"], "0.1.5")
+        self.assertEqual(p["schema_version"], "0.1.6")
         q = p["official_socrata_catalog_metadata_quality_2026_10_28"]
         self.assertEqual(q["dataset_id"], "rbx6-tga4")
         self.assertEqual(q["official_metadata_url"],
@@ -2549,6 +2549,76 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
                 mutate(poisoned[key])
                 with self.assertRaises(AssertionError):
                     self._assert_metadata_held(poisoned)
+
+
+    def _assert_current_catalog_update_boundary(self, p):
+        q = p["official_socrata_catalog_refresh_2026_10_28"]
+        prior = p["official_socrata_catalog_metadata_quality_2026_10_28"]
+        self.assertEqual(p["schema_version"], "0.1.6")
+        self.assertEqual(q["schema_version"], "0.1.0")
+        self.assertEqual(q["dataset_id"], "rbx6-tga4")
+        self.assertEqual(q["original_catalog_metadata_url"],
+                         "https://data.cityofnewyork.us/api/views/rbx6-tga4")
+        self.assertEqual(q["previous_catalog_rows_updated_at_utc"],
+                         prior["publisher_rows_updated_at_utc"])
+        self.assertEqual(q["publisher_rows_updated_at_epoch_seconds"], 1793213280)
+        self.assertEqual(q["publisher_rows_updated_at_utc"],
+                         "2026-10-28T18:48:00Z")
+        self.assertEqual(q["publisher_view_last_modified_epoch_seconds"], 1793212310)
+        self.assertEqual(q["publisher_view_last_modified_utc"],
+                         "2026-10-28T18:31:50Z")
+        self.assertTrue(q["new_catalog_timestamp_after_previous"])
+        self.assertTrue(q["source_reported_cached_counts_stable_across_two_metadata_views"])
+        self.assertEqual(q["compared_cached_fields"], {
+            "cached_total_row_count": 1020884,
+            "cached_permit_status_signed_off_count": 652613,
+            "cached_permit_status_permit_issued_count": 368271,
+            "cached_job_filing_number_placeholder_frequency": 344,
+        })
+        for k, v in q["compared_cached_fields"].items():
+            self.assertEqual(v, prior[k], k)
+        for field in ("original_publisher_http_response_bytes_custodied",
+                      "independently_replayed_row_level_api_in_this_run",
+                      "timestamp_change_proves_new_unique_permits",
+                      "same_cached_counts_prove_no_rows_changed",
+                      "timestamp_change_proves_current_permit_validity",
+                      "dataset_specific_extra_terms_and_customer_scoring_review_complete"):
+            self.assertIs(q[field], False, field)
+        self.assertIsNone(q["original_publisher_http_response_sha256"])
+        self.assertTrue(q["semantic_observation_not_raw_source_hash"])
+        self.assertTrue(q["citywide_general_open_data_reuse_allowed"])
+        self.assertEqual(q["commercial_scoring_authorization"], "HOLD")
+        self.assertEqual(q["production_admission"], "HOLD")
+        self.assertEqual(q["independent_held_out_current_validity_labels"], 0)
+        self.assertEqual(q["raw_personal_or_permit_rows_stored"], 0)
+        controls = q["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 2)
+        self.assertEqual(len({c["id"] for c in controls}), 2)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+
+    def test_catalog_clock_advanced_but_cached_counts_are_not_live_truth(self):
+        self._assert_current_catalog_update_boundary(self._pack())
+
+    def test_forged_catalog_refresh_claims_rejected(self):
+        original = self._pack()
+        attacks = (
+            ("false_timestamp", "publisher_rows_updated_at_utc", "2026-10-27T18:42:06Z"),
+            ("false_count", "compared_cached_fields", {"cached_total_row_count": 1}),
+            ("new_permits", "timestamp_change_proves_new_unique_permits", True),
+            ("no_row_changes", "same_cached_counts_prove_no_rows_changed", True),
+            ("permit_validity", "timestamp_change_proves_current_permit_validity", True),
+            ("fake_source_bytes", "original_publisher_http_response_bytes_custodied", True),
+            ("fake_source_hash", "original_publisher_http_response_sha256", "0"*64),
+            ("fake_labels", "independent_held_out_current_validity_labels", 1),
+            ("fake_commercial", "commercial_scoring_authorization", "APPROVED"),
+        )
+        for name, field, fake in attacks:
+            with self.subTest(forgery=name):
+                tampered = json.loads(json.dumps(original))
+                tampered["official_socrata_catalog_refresh_2026_10_28"][field] = fake
+                with self.assertRaises(AssertionError):
+                    self._assert_current_catalog_update_boundary(tampered)
+
 
 
 class FMCTCWEvergreenDocketCollisionBoundary(unittest.TestCase):
