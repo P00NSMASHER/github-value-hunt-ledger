@@ -2023,8 +2023,12 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
         src = record["source"]
         case = record["publisher_reported_case"]
         truth = record["ground_truth_limits"]
-        self.assertEqual(record["schema_version"], "0.1.1")
+        self.assertEqual(record["schema_version"], "0.1.2")
         self.assertEqual(src["commission_docket"], "23-08")
+        self.assertEqual(src["fmc_summary_temporal_boundaries_reviewed_on"],
+                         "2026-10-27")
+        self.assertEqual(src["temporal_scope_evidence_kind"],
+                         "FMC_FIRST_PARTY_2026_01_28_HTML_SUMMARY_ONLY_NOT_ORIGINAL_ORDER_BYTES")
         self.assertEqual(src["final_order_index_document_id"], 131865)
         self.assertEqual(src["official_fmc_final_order_document_locator_url"],
                          "https://www2.fmc.gov/readingroom/documents/131865")
@@ -2039,6 +2043,14 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
         self.assertEqual(record["cohort"],
                          "MSC_NON_OPERATING_REEFER_DEMURRAGE_DETENTION_2021_ONLY")
         self.assertEqual(case["approximate_nor_bill_overcharge_share_percent"], 23)
+        self.assertEqual(case["notify_party_merchant_clause_billing_years"],
+                         "2018_TO_2020")
+        self.assertEqual(case["nor_tariff_publication_violation_period"],
+                         "2021_TO_EARLY_2023")
+        self.assertEqual(case["nor_tariff_knowing_willful_start_month"],
+                         "2022-03")
+        self.assertEqual(case["nor_overcharge_unreasonable_practice_year"], 2021)
+        self.assertIs(case["cross_violation_invoice_error_inference_permitted"], False)
         self.assertIs(case["percentage_is_approximate"], True)
         self.assertIs(case["other_carriers_or_billing_years_extrapolation_permitted"],
                       False)
@@ -2064,6 +2076,8 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
         self.assertIs(truth["current_freight_error_precision_recall_scoring_permitted"],
                       False)
         self.assertEqual(truth["exact_nor_invoice_population_size"], "UNKNOWN")
+        self.assertEqual(truth["exact_day_of_march_2022_tariff_statement"], "UNKNOWN")
+        self.assertEqual(truth["exact_notify_party_billed_invoice_population"], "UNKNOWN")
         self.assertEqual(truth["exact_customer_refund_total"], "UNKNOWN")
         self.assertEqual(truth["verified_retally_customer_recovery_cents"], 0)
         self.assertIs(src["original_press_release_response_bytes_custodied"], False)
@@ -2111,13 +2125,36 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
     def test_synthetic_controls_and_source_rights_stay_held(self):
         data = self._pack()
         controls = data["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 5)
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(controls[-1]["id"],
+                         "SYNTHETIC_MSC_THREE_VIOLATION_COHORT_CONFLATION")
+        self.assertEqual(controls[-1]["expected"],
+                         "REJECT_DISTINCT_COHORTS_AND_MARCH_2022_WILLFULNESS_BOUNDARY")
+        self.assertEqual(data["quality"]["temporal_boundary_evidence_status"],
+                         "FIRST_PARTY_FMC_PRESS_SUMMARY_REVIEWED_ORDER_PDF_BYTES_NOT_ACQUIRED")
         self.assertEqual(len({x["id"] for x in controls}), 5)
         self.assertTrue(all(x["kind"] == "SYNTHETIC" and
                             x["id"].startswith("SYNTHETIC_") for x in controls))
         self.assertEqual(data["source"]["source_rights_status"],
                          "NOT_INDEPENDENTLY_ATTESTED_COMMERCIAL_ENGINE_REUSE_HOLD")
         self.assertFalse(data["quality"]["independent_original_order_and_invoice_custody"])
+
+    def test_three_violation_periods_not_conflated_or_backdated(self):
+        """FMC summary: 2018-20 notify, 2021 NOR; tariff willfulness only 2022-03."""
+        original = self._pack()
+        self._check(original)
+        for key, forged_value in (
+            ("notify_party_merchant_clause_billing_years", "2021_TO_2023"),
+            ("nor_tariff_publication_violation_period", "2018_TO_2020"),
+            ("nor_tariff_knowing_willful_start_month", "2021-01"),
+            ("nor_overcharge_unreasonable_practice_year", 2023),
+            ("cross_violation_invoice_error_inference_permitted", True),
+        ):
+            with self.subTest(synthetic_forgery=key):
+                altered = json.loads(json.dumps(original))
+                altered["publisher_reported_case"][key] = forged_value
+                with self.assertRaises(AssertionError):
+                    self._check(altered)
 
     def test_eleven_forged_promotion_attempts_rejected(self):
         original = self._pack()
