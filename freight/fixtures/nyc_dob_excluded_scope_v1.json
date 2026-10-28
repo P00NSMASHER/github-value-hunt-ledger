@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pack_id": "RETALLY_NYC_DOB_EXCLUDED_SCOPE_V1",
   "family": "GOVERNMENT_PERMIT_SCORING_SOURCE_COVERAGE_ONLY",
-  "publisher_reviewed_date": "2026-10-23",
+  "publisher_reviewed_date": "2026-10-28",
   "provenance": "OFFICIAL_NYC_DOB_PUBLISHER_METADATA_DESCRIPTIONS_ONLY",
   "primary_scope_pack": "freight/fixtures/nyc_dob_source_scope_v1.json",
   "core_dataset_id": "rbx6-tga4",
@@ -27,7 +27,7 @@
       "official_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
       "publisher": "NYC Department of Buildings",
       "event_type": "APPLICATION_NOT_ISSUANCE_ADJUDICATION",
-      "last_observed_publisher_update_date": "2026-10-21",
+      "last_observed_publisher_update_date": "2026-10-27",
       "effective_date_semantics": "ROLLING_PUBLISHER_DATASET_NOT_CONTRACT_RATE",
       "authority_limit": "Applications and amendments are not independently issued-permit determinations. Filing status and permit suffix must be validated in the appropriate official status source.",
       "original_source_bytes_sha256": null,
@@ -175,5 +175,60 @@
     "independent_issuance_truth": null,
     "expected_decision": "DISTINCT_FILINGS_WITH_UNKNOWN_PERMIT_ISSUANCE"
   },
-  "manifest_sha256": "dc9a97729dc6e92333b191d54b73e44767f5752960e45fd475a4b026d45a6eb3"
+  "manifest_sha256": "9acb0215d403f840b57ebc1d820f791b53abb1d102c65b26a8525075b34eb8bd",
+  "electrical_application_catalog_metadata_2026_10_28": {
+    "observation_version": "0.1.0",
+    "cohort": "NYC_DOB_NOW_ELECTRICAL_APPLICATION_PUBLISHER_CACHED_CATALOG_2026_10_27",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "official_dataset_id": "dm9a-ab7w",
+    "official_metadata_url": "https://data.cityofnewyork.us/api/views/dm9a-ab7w",
+    "official_dataset_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+    "rights_faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "observed_date_et": "2026-10-28",
+    "publisher_rows_updated_at_utc": "2026-10-27T21:44:12Z",
+    "publisher_view_last_modified_at_utc": "2026-10-27T21:30:46Z",
+    "row_identifier_column_id": 634408547,
+    "row_identifier_field": "job_filing_number",
+    "source_description_allows_one_base_job_many_filings": true,
+    "source_reported_cached_filing_rows": 596085,
+    "source_reported_cached_new_job_filings": 485091,
+    "source_reported_cached_post_approval_amendments": 96184,
+    "source_reported_cached_subsequent_filings": 14810,
+    "source_reported_cached_status_permit_issued": 151201,
+    "cached_filing_type_count_sum_matches_cached_rows": true,
+    "publisher_catalog_cached_stats_not_live_row_query": true,
+    "raw_original_http_bytes_in_custody": false,
+    "original_http_response_sha256": null,
+    "source_row_join_independently_validated": false,
+    "source_specific_terms_privacy_and_commercial_scoring_review_complete": false,
+    "citywide_general_open_data_reuse_allowed": true,
+    "commercial_customer_scoring_approved": false,
+    "independently_heldout_current_permit_labels": 0,
+    "independently_heldout_issuance_labels": 0,
+    "confirmed_distinct_real_permit_count": null,
+    "verified_retally_customer_recovery_cents": 0,
+    "data_quality_boundary": "CACHED_APPLICATION_FILING_COUNTS_NOT_DISTINCT_ACTIVE_PERMITS_OR_CUSTOMER_LEADS; NO_PERSONAL_ROWS_STORED",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_PAA_FILING_IS_NEW_ISSUED_PERMIT",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_AMENDMENT_NOT_INDEPENDENT_ISSUANCE_TRUTH"
+      },
+      {
+        "id": "SYNTH_CACHED_PERMIT_ISSUED_IS_ACTIVE",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_CURRENT_VALIDITY_UNKNOWN"
+      },
+      {
+        "id": "SYNTH_SAME_BASE_JOB_SINGLE_FILING",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_ONE_BASE_JOB_CAN_HAVE_MULTIPLE_FILINGS"
+      },
+      {
+        "id": "SYNTH_CACHED_CATALOG_IS_LICENSED_HTTP_CUSTODY",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_RAW_BYTES_AND_SCORING_APPROVAL_UNVERIFIED"
+      }
+    ]
+  }
 }
