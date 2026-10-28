@@ -1920,6 +1920,95 @@ class ProtectedMainSeedContinuityTests(unittest.TestCase):
 
 
 
+
+class FMCMaerskFederalPenaltyNotCustomerCashTests(unittest.TestCase):
+    """Original FMC release: paid federal penalty != delivered shipper refunds."""
+
+    @staticmethod
+    def _pack():
+        path = Path(__file__).with_name("fixtures") / (
+            "fmc_maersk_penalty_vs_refund_2026_candidate_v0.json")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _check(self, record):
+        src = record["source"]
+        facts = record["publisher_reported_facts"]
+        truth = record["ground_truth_limits"]
+        self.assertEqual(record["schema_version"], "0.1.0")
+        self.assertEqual(src["publication_date"], "2026-05-26")
+        self.assertEqual(src["original_official_url"],
+                         "https://www.fmc.gov/articles/"
+                         "fmc-collects-civil-penalty-payment-of-1900000-from-shipping-line/")
+        self.assertEqual(facts["civil_penalty_payment_received_by_government_cents"],
+                         190000000)
+        self.assertEqual(facts["civil_penalty_cash_destination"],
+                         "UNITED_STATES_GENERAL_FUND")
+        self.assertEqual(facts["fmc_received_penalty_payment_cents"], 0)
+        self.assertIs(facts["civil_penalty_violations_admitted"], False)
+        self.assertIsNone(facts["published_total_customer_refunds_paid_cents"])
+        self.assertEqual(truth["verified_retally_customer_recovery_cents"], 0)
+        self.assertIs(truth["independent_freight_error_accuracy_scoring_permitted"],
+                      False)
+        self.assertIsNone(src["original_publisher_response_sha256"])
+        self.assertIs(src["commercial_customer_engine_reuse_approved"], False)
+        self.assertEqual(record["admission_state"],
+                         "RESEARCH_ONLY_HELD_NOT_ENGINE_SCORING_OR_CUSTOMER_CASH")
+        self.assertEqual(truth["independently_held_out_private_invoice_labels"], 0)
+        self.assertEqual(truth["customer_refund_implementation"], "UNKNOWN")
+        self.assertIs(src["original_publisher_response_bytes_custodied"], False)
+
+    def test_original_regulator_release_keeps_distinct_cash_destinations(self):
+        pack = self._pack()
+        self._check(pack)
+        self.assertNotIn(pack["source"]["original_official_url"],
+                         SEEDS["freightrecovery"])
+        self.assertIs(pack["publisher_reported_facts"]
+                      ["carrier_agreed_to_refunds_and_waivers_for_affected_third_parties"],
+                      True)
+        self.assertIsNone(pack["publisher_reported_facts"]
+                          ["adjudicated_individual_freight_invoice_error_cents"])
+        self.assertIs(pack["ground_truth_limits"]
+                      ["independent_government_treasury_receipt_replayed"], False)
+        self.assertFalse(pack["quality"]["source_response_bytes_sha256_known"])
+
+    def test_five_proposed_unsafe_inferences_are_explicitly_synthetic(self):
+        cases = self._pack()["synthetic_negative_controls"]
+        self.assertEqual(len(cases), 5)
+        self.assertEqual(len({case["id"] for case in cases}), 5)
+        self.assertTrue(all(case["kind"] == "SYNTHETIC" and
+                            case["id"].startswith("SYNTHETIC_") for case in cases))
+
+    def test_nine_forged_money_rights_and_provenance_promotions_are_rejected(self):
+        original = self._pack()
+        self._check(original)
+        mutations = [
+            ("amount", lambda x: x["publisher_reported_facts"].update(
+                civil_penalty_payment_received_by_government_cents=190000)),
+            ("beneficiary", lambda x: x["publisher_reported_facts"].update(
+                civil_penalty_cash_destination="RETALLY")),
+            ("agency_cash", lambda x: x["publisher_reported_facts"].update(
+                fmc_received_penalty_payment_cents=190000000)),
+            ("admission", lambda x: x["publisher_reported_facts"].update(
+                civil_penalty_violations_admitted=True)),
+            ("refund", lambda x: x["publisher_reported_facts"].update(
+                published_total_customer_refunds_paid_cents=190000000)),
+            ("retally_cash", lambda x: x["ground_truth_limits"].update(
+                verified_retally_customer_recovery_cents=190000000)),
+            ("scoring", lambda x: x["ground_truth_limits"].update(
+                independent_freight_error_accuracy_scoring_permitted=True)),
+            ("publisher_hash", lambda x: x["source"].update(
+                original_publisher_response_sha256="0" * 64)),
+            ("rights", lambda x: x["source"].update(
+                commercial_customer_engine_reuse_approved=True)),
+        ]
+        for name, mutation in mutations:
+            with self.subTest(forged=name), self.assertRaises(AssertionError):
+                fake = json.loads(json.dumps(original))
+                mutation(fake)
+                self._check(fake)
+
+
+
 def load_tests(loader, tests, pattern):
     """Route source-bound freight, accounting, and procurement safety tests to CI."""
     from freight import test_gao_b215958_supersession
