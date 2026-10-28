@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import json
+from hashlib import sha256
 import tempfile
 import unittest
 from datetime import date, timedelta
@@ -1224,7 +1225,7 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         return json.loads(path.read_text(encoding="utf-8"))
 
     def _assert_boundary(self, pack):
-        self.assertEqual(pack["schema_version"], "0.1.0")
+        self.assertEqual(pack["schema_version"], "0.1.1")
         self.assertEqual(pack["fixture_id"],
             "GAO_B199805_1980_LTL_WEIGHT_SCALE_AGGREGATE_BOUNDARY_CANDIDATE_V0")
         self.assertEqual(pack["engines"], ["freightrecovery", "recoveryos"])
@@ -1265,6 +1266,23 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         # Integer cents, round half-up: 3,312 lb * $10.32/cwt -> $341.80.
         self.assertEqual((sample["adjusted_class55_rate_cents_per_cwt"] *
             sample["weight_pounds"] + 50) // 100, sample["GSA_applicable_cents"])
+        g = pack["government_setoff_boundary"]
+        self.assertEqual(g["excerpt_type"], "GAO_WEB_RENDERED_VISIBLE_TEXT_NOT_ORIGINAL_PUBLISHER_HTTP_RESPONSE")
+        self.assertEqual(g["publisher_decision_paragraph_anchor"], "THE RECORD SHOWS THAT YELLOW FREIGHT COLLECTED")
+        self.assertEqual(g["verbatim_visible_excerpt"], "WHEN THE CARRIER DECLINED TO PAY THE OVERCHARGE, THE GSA CAUSED THE DEDUCTION TO BE MADE.")
+        self.assertEqual(sha256(g["verbatim_visible_excerpt"].encode("utf-8")).hexdigest(),
+            "7032507369ed3356b754f0881e4cda6a59c7fc76cf2578410d0d3dbfa56f16e8")
+        self.assertEqual(g["visible_excerpt_utf8_sha256_not_http_sha256"],
+            "7032507369ed3356b754f0881e4cda6a59c7fc76cf2578410d0d3dbfa56f16e8")
+        self.assertEqual(g["excerpt_reviewed_utc_date"], "2026-10-28")
+        self.assertEqual(g["notice_of_overcharge_cents"], sample["GSA_overcharge_deduction_cents"])
+        self.assertTrue(g["carrier_declined_direct_payment"])
+        self.assertTrue(g["GSA_caused_deduction_according_to_decision"])
+        self.assertFalse(g["GSA_setoff_is_private_customer_refund"])
+        self.assertFalse(g["original_GSA_offset_bank_receipt_custodied"])
+        self.assertFalse(g["modern_customer_refund_bank_receipt_custodied"])
+        self.assertEqual(g["independently_reconciled_customer_invoice_cases"], 0)
+        self.assertEqual(g["current_customer_refund_legal_eligibility"], "UNKNOWN")
         h = pack["historical_interpretation"]
         self.assertTrue(h["source_definition_LTL_extends_beyond_less_than_500_pounds"])
         self.assertTrue(h["class55_LTL_rate_does_not_force_first_500_pound_scale"])
@@ -1281,12 +1299,16 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         self.assertFalse(q["tariff_full_rate_table_verified_from_original_bytes"])
         self.assertFalse(q["raw_publisher_response_integrity_verified"])
         controls = pack["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 9)
-        self.assertEqual(len({x["id"] for x in controls}), 9)
+        self.assertEqual(len(controls), 11)
+        self.assertEqual(len({x["id"] for x in controls}), 11)
         self.assertTrue(all(x["kind"] == "SYNTHETIC" and
             x["id"].startswith("SYNTHETIC_") and
             (x["expected"].startswith("REJECT_") or
              x["expected"].startswith("UNKNOWN_")) for x in controls))
+        self.assertEqual([c["id"] for c in controls[-2:]], [
+            "SYNTHETIC_GSA_SET_OFF_AS_PRIVATE_CUSTOMER_REFUND",
+            "SYNTHETIC_NOTICE_AS_INDEPENDENT_BANK_SETTLEMENT",
+        ])
         self.assertFalse(pack["handoff"]["engine_code_changed"])
         self.assertFalse(pack["handoff"]["release_approved"])
 
@@ -1306,6 +1328,11 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
             ("publisher_reported_sample", "chosen_weight_scale_minimum_pounds", 500),
             ("publisher_reported_sample", "GSA_applicable_cents", 36035),
             ("publisher_reported_sample", "GSA_overcharge_deduction_cents", 329642),
+            ("government_setoff_boundary", "GSA_caused_deduction_according_to_decision", False),
+            ("government_setoff_boundary", "GSA_setoff_is_private_customer_refund", True),
+            ("government_setoff_boundary", "original_GSA_offset_bank_receipt_custodied", True),
+            ("government_setoff_boundary", "independently_reconciled_customer_invoice_cases", 1),
+            ("government_setoff_boundary", "visible_excerpt_utf8_sha256_not_http_sha256", "0" * 64),
             ("historical_interpretation", "current_2026_rate_applicability", "VALID"),
             ("truth_and_quality", "independently_heldout_real_invoice_labels", 124),
             ("truth_and_quality", "retally_verified_recovered_customer_cash_cents", 1855),
