@@ -2875,6 +2875,75 @@ class GAOB221594AgencyTenderScopeHeldTests(unittest.TestCase):
                     self._assert_scope(forged)
 
 
+
+class NYCDOBMetadataDriftClockInvariantTests(unittest.TestCase):
+    """Publisher cached totals changed while two catalog update clocks did not."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json").read_text(
+                               encoding="utf-8"))
+
+    @staticmethod
+    def _assert_quality(p):
+        assert p["schema_version"] == "0.1.7"
+        q = p["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"]
+        assert q["publisher_rows_updated_at_epoch_seconds_in_both_views"] == 1793213280
+        assert q["publisher_view_last_modified_epoch_seconds_in_both_views"] == 1793212310
+        previous = {"total": 1020884, "signed": 652613, "issued": 368271, "no_work": 6765}
+        current = {"total": 1021662, "signed": 653292, "issued": 368370, "no_work": 6766}
+        assert q["earlier_cached_counts"] == previous
+        assert q["later_cached_counts"] == current
+        assert q["source_reported_cached_count_deltas"] == {
+            k: current[k] - previous[k] for k in previous}
+        assert q["source_reported_cached_count_deltas"]["total"] == (
+            q["source_reported_cached_count_deltas"]["signed"] +
+            q["source_reported_cached_count_deltas"]["issued"])
+        for field in ("clock_fields_unchanged_across_views",
+                      "cached_counts_changed_across_views",
+                      "status_count_deltas_balance_total"):
+            assert q[field] is True, field
+        for field in ("clock_fields_sufficient_cache_fingerprint",
+                      "original_publisher_http_bytes_acquired",
+                      "raw_live_row_replay_executed"):
+            assert q[field] is False, field
+        assert q["original_publisher_http_sha256"] is None
+        assert q["independent_held_out_permit_labels"] == 0
+        assert q["commercial_use_approval"] == "HOLD"
+        assert q["production_admission"] == "HOLD"
+        assert len(q["synthetic_negative_controls"]) == 4
+        assert all(v["kind"] == "SYNTHETIC" for v in q["synthetic_negative_controls"])
+
+    def test_first_party_catalog_metadata_count_drift_boundary(self):
+        self._assert_quality(self._pack())
+
+    def test_forged_active_validity_hash_and_commercial_rights_rejected(self):
+        import copy
+        for field, value in (
+            ("clock_fields_sufficient_cache_fingerprint", True),
+            ("original_publisher_http_sha256", "0" * 64),
+            ("independent_held_out_permit_labels", 1),
+            ("commercial_use_approval", "APPROVED"),
+            ("publisher_rows_updated_at_epoch_seconds_in_both_views", 1),
+        ):
+            with self.subTest(field=field):
+                forged = copy.deepcopy(self._pack())
+                forged["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"][field] = value
+                with self.assertRaises(AssertionError):
+                    self._assert_quality(forged)
+        for field, value in (("total", 1), ("issued", 778)):
+            with self.subTest(field=field):
+                forged = copy.deepcopy(self._pack())
+                row = "later_cached_counts" if field == "total" else "source_reported_cached_count_deltas"
+                forged["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"][row][field] = value
+                with self.assertRaises(AssertionError):
+                    self._assert_quality(forged)
+        forged = copy.deepcopy(self._pack())
+        forged["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"]["synthetic_negative_controls"][0]["kind"] = "ORIGINAL"
+        with self.assertRaises(AssertionError):
+            self._assert_quality(forged)
+
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
 if __name__ == "__main__":
     unittest.main()
