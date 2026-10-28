@@ -2250,7 +2250,7 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     def _assert_held(self, p):
         src = p["source"]
         policy = src["citywide_open_data_policy"]
-        self.assertEqual(p["schema_version"], "0.1.4")
+        self.assertEqual(p["schema_version"], "0.1.5")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
         self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
@@ -2311,7 +2311,7 @@ class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.4")
+        self.assertEqual(p["schema_version"], "0.1.5")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
         self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
@@ -2405,7 +2405,7 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.4")
+        self.assertEqual(p["schema_version"], "0.1.5")
         v = p["operational_writer_2026_10_28_readback_followup"]
         self.assertEqual(v["source_dataset_id"], "rbx6-tga4")
         self.assertEqual(v["observed_as_of_utc_date"], "2026-10-28")
@@ -2465,7 +2465,7 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_metadata_held(self, p):
-        self.assertEqual(p["schema_version"], "0.1.4")
+        self.assertEqual(p["schema_version"], "0.1.5")
         q = p["official_socrata_catalog_metadata_quality_2026_10_28"]
         self.assertEqual(q["dataset_id"], "rbx6-tga4")
         self.assertEqual(q["official_metadata_url"],
@@ -2484,6 +2484,11 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
         self.assertEqual(q["cached_sequence_number_null_count"], 351)
         self.assertEqual(q["cached_tracking_number_null_count"], 1)
         self.assertEqual(q["cached_top_tracking_number_frequency"], 8)
+        self.assertEqual(q["cached_job_filing_number_placeholder"], "Permit is no")
+        self.assertEqual(q["cached_job_filing_number_placeholder_frequency"], 344)
+        self.assertEqual(q["cached_job_filing_number_null_count"], 212)
+        self.assertEqual(q["cached_job_filing_number_placeholder_frequency"],
+                         q["cached_work_permit_not_yet_issued_count"])
         self.assertEqual(q["source_scope_excludes"],
                          ["ELECTRICAL", "ELEVATOR", "LIMITED_ALTERATION_APPLICATION_LAA"])
         self.assertTrue(q["cached_statistics_snapshot_not_independent_row_labels"])
@@ -2491,6 +2496,9 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
             "original_catalog_http_response_bytes_custodied",
             "publisher_cached_counts_verified_as_live_row_level_query",
             "source_tracking_number_globally_unique_verified",
+            "cached_column_cardinality_is_distinct_filing_identity_count",
+            "placeholder_frequency_and_work_permit_sentinel_same_rows_verified",
+            "placeholder_value_proves_distinct_issued_permits",
             "source_cached_status_proves_current_permit_validity",
             "source_covers_all_nyc_building_permits",
             "source_specific_commercial_scoring_authorized",
@@ -2504,8 +2512,8 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
         ):
             self.assertEqual(q[key], 0, key)
         controls = q["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 5)
-        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 6)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
         self.assertEqual(q["production_admission"],
                          "HOLD_PUBLISHER_CACHED_CATALOG_METADATA_ONLY")
@@ -2522,6 +2530,12 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
             ("all_categories", lambda q: q.update(source_covers_all_nyc_building_permits=True)),
             ("live_counts", lambda q: q.update(publisher_cached_counts_verified_as_live_row_level_query=True)),
             ("cached_frequency", lambda q: q.update(cached_top_tracking_number_frequency=1)),
+            ("truncated_placeholder", lambda q: q.update(cached_job_filing_number_placeholder="B01234567-I1")),
+            ("placeholder_frequency", lambda q: q.update(cached_job_filing_number_placeholder_frequency=0)),
+            ("placeholder_null", lambda q: q.update(cached_job_filing_number_null_count=0)),
+            ("placeholder_promoted", lambda q: q.update(placeholder_value_proves_distinct_issued_permits=True)),
+            ("false_row_join", lambda q: q.update(placeholder_frequency_and_work_permit_sentinel_same_rows_verified=True)),
+            ("false_cardinality", lambda q: q.update(cached_column_cardinality_is_distinct_filing_identity_count=True)),
             ("no_work_rows", lambda q: q.update(cached_filing_reason_no_work_permit_count=0)),
             ("fake_labels", lambda q: q.update(independently_held_out_labeled_current_permits=1)),
             ("fake_rights", lambda q: q.update(source_specific_commercial_scoring_authorized=True)),
