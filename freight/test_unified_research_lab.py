@@ -2237,9 +2237,6 @@ def load_tests(loader, tests, pattern):
     return tests
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     """First-party NYC use policy does not create permit/customer truth or bypass source terms."""
@@ -2456,3 +2453,8 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                 mutation(forged["operational_writer_2026_10_28_readback_followup"])
                 with self.assertRaises(AssertionError):
                     self._assert_boundary(forged)
+
+
+# Must follow every TestCase class; direct script execution otherwise skips late tests.
+if __name__ == "__main__":
+    unittest.main()
