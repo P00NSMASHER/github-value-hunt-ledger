@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "fixture_id": "FMC_MSC_23_08_NOR_OVERBILLING_GOVERNMENT_PENALTY_BOUNDARY_2026_V0",
   "engine": "freightrecovery",
   "evaluation_family": "FREIGHT_ADJUDICATED_CASE_LEVEL_BILLING_COHORT_NEGATIVE_CONTROLS_NOT_INVOICE_ACCURACY",
@@ -22,7 +22,13 @@
     "final_order_original_pdf_sha256": null,
     "public_testimony_original_response_bytes_custodied": false,
     "public_testimony_original_response_sha256": null,
-    "provenance": "FIRST_PARTY_FMC_PUBLISHER_ASSERTIONS_AND_INDEX_REFERENCE_NO_ORDER_BYTES_OR_PRIVATE_INVOICES"
+    "provenance": "FIRST_PARTY_FMC_RELEASE_TESTIMONY_AND_OFFICIAL_FINAL_ORDER_INDEX_LOCATOR_ONLY_NO_ORIGINAL_ORDER_PDF_BYTES_OR_PRIVATE_INVOICES",
+    "final_order_index_document_id": 131865,
+    "official_fmc_final_order_document_locator_url": "https://www2.fmc.gov/readingroom/documents/131865",
+    "official_fmc_final_order_indexed_pdf_url": "https://www2.fmc.gov/readingroom/docs/23-08/%2832%29%2023-08%20Order%20on%20Initial%20Decision%20%28public%29.pdf/",
+    "final_order_source_locator_crosschecked_on": "2026-10-27",
+    "final_order_link_is_raw_document_custody": false,
+    "final_order_pdf_content_independently_examined": false
   },
   "publisher_reported_case": {
     "carrier": "Mediterranean Shipping Company S.A.",
