@@ -1,0 +1,102 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "FMC_22_17_ADMITTED_ERRORS_AND_NON_SYSTEMIC_DECISION_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "HISTORICAL_FMC_ADJUDICATED_FREIGHT_ERROR_ADMISSION_VS_SYSTEMIC_NEGATIVE",
+  "cohort": "US_OCEAN_DEMURRAGE_DETENTION_DEC_2020_MAR_2022_DECIDED_2024",
+  "source": {
+    "publisher": "U.S. Federal Maritime Commission",
+    "docket": "22-17",
+    "case_name": "Bakerly, LLC v. Seafrigo USA, Inc.",
+    "docket_index_url": "https://www2.fmc.gov/readingroom/proceeding/22-17/",
+    "reporter_pdf_url": "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
+    "final_order_pdf_url": "https://www2.fmc.gov/readingroom/docs/22-17/22-17%20Order%20Denying%20Exceptions%20and%20Affirming%20Initial%20Decision%20%28ns%29.pdf",
+    "initial_decision_date": "2024-01-03",
+    "commission_affirmance_date": "2024-10-30",
+    "review_date": "2026-10-28",
+    "original_document_downloaded": false,
+    "original_document_pdf_sha256": null,
+    "source_http_sha256": null,
+    "original_invoice_exhibits_downloaded": false,
+    "pdf_visual_review_completed": false,
+    "evidence_method": "FIRST_PARTY_FMC_DOCKET_INDEX_AND_SEARCH_INDEXED_REPORTER_EXCERPTS_ONLY",
+    "rights": "OFFICIAL_DECISION_PUBLIC; THIRD_PARTY_EXHIBITS_AND_COMMERCIAL_REPURPOSING_NOT_CLEARED",
+    "commercial_engine_use_approved": false,
+    "effective_conduct_start": "2020-12",
+    "effective_conduct_end": "2022-03",
+    "later_osra_2022_invoice_rules_applied_retroactively": false
+  },
+  "published_record": {
+    "commission_affirmed_initial_dismissal": true,
+    "systemic_unreasonable_invoicing_practice_proven": false,
+    "isolated_overcharge_admitted_by_carrier_cents": 887955,
+    "isolated_double_billing_admitted_record_cents": 365950,
+    "isolated_double_billing_quote_cents": 365000,
+    "quoted_amount_conflict_cents": 950,
+    "confirmed_exact_overlap_between_two_admissions": null,
+    "aggregate_nonoverlapping_invoice_errors_cents": null,
+    "carrier_accepted_responsibility_for_charges_cents": 15984908,
+    "reported_credits_total_cents": 6000000,
+    "these_credits_prove_cash_refund": false,
+    "cash_refund_amount_proven_cents": null,
+    "carrier_not_seeking_some_charges": true,
+    "multiple_invoices_for_one_container_alone_establish_duplicate_charge": false
+  },
+  "truth_boundaries": {
+    "case_level_outcome": "CLAIMANT_DID_NOT_ESTABLISH_SHIPPING_ACT_VIOLATION_AS_PLEADED",
+    "individual_admissions_status": "SOURCE_REPORTED_ISOLATED_ERRORS_NOT_HELD_OUT_INVOICE_LEVEL_LABELS",
+    "independent_original_invoice_label_count": 0,
+    "original_invoices_or_payments_held": false,
+    "independent_current_customer_invoice_error_cents": null,
+    "modern_shipping_contract_authority": "UNKNOWN",
+    "commercial_customer_scoring": false,
+    "retally_verified_recovered_cash_cents": 0,
+    "customer_actual_refund_received": "UNKNOWN",
+    "difference_between_admitted_error_and_statutory_violation_preserved": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_MULTIPLE_BILLS_SAME_CONTAINER_ALWAYS_DUPLICATE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SUPPLEMENTAL_BILLING_MAY_REFLECT_DISTINCT_ACCRUAL_PERIODS"
+    },
+    {
+      "id": "SYNTH_ISOLATED_ADMISSION_ESTABLISHES_SYSTEMIC_UNREASONABLE_PRACTICE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_FMC_FOUND_CLAIMS_UNPROVEN"
+    },
+    {
+      "id": "SYNTH_CREDIT_OR_NONCOLLECTION_PROVES_CUSTOMER_REFUND_RECEIVED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_INDEPENDENT_CASH_RECEIPT"
+    },
+    {
+      "id": "SYNTH_365950_AND_365000_SILENTLY_EQUIVALENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PRESERVE_950_CENT_SOURCE_TEXT_CONFLICT"
+    },
+    {
+      "id": "SYNTH_ADD_ADMISSIONS_AS_DISTINCT_CASES_OR_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OVERLAP_AND_FINAL_BANK_OUTCOME_UNKNOWN"
+    },
+    {
+      "id": "SYNTH_OSRA_2022_NEW_INVOICE_RULES_AUTOMATICALLY_CONTROL_2020_2022_DISPUTE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_TEMPORAL_AND_REGULATORY_SCOPE_MISMATCH"
+    }
+  ],
+  "quality": {
+    "decision_level_positive_and_negative_evidence": true,
+    "independent_invoice_holding_count": 0,
+    "publisher_byte_hash_available": false,
+    "invoice_ground_truth_complete": false,
+    "source_content_excerpt_not_original_pdf_custody": true,
+    "private_medical_student_or_customer_records_copied": false
+  },
+  "handoff": {
+    "engineering": ":12 RETALLY/RecoveryOS extraction and general accounting vs freight-error semantics",
+    "qa": ":44 independent source and citation validation",
+    "release": "DRAFT_HOLD_NO_ENGINE_CHANGE"
+  }
+}
