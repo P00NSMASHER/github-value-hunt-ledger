@@ -71,6 +71,19 @@ class BountyTriageTests(unittest.TestCase):
         blocked = sum(Decimal(issue['advertised_usd']) for issue in report['issues'] if issue['status'] in ('BLOCKED_CLOSED', 'BLOCKED_ARCHIVED'))
         self.assertEqual(blocked, Decimal('417.00'))
 
+    def test_open_assigned_bounties_are_not_claimable(self):
+        """Open high-dollar issue != eligible first-$100 payout."""
+        data = json.loads(Path(__file__).with_name(
+            'tenstorrent_open_assigned_2026-10-28.json').read_text())
+        report = evaluate(data)
+        self.assertEqual(report['listings'], 3)
+        self.assertEqual(report['unique_issues'], 3)
+        self.assertEqual(report['gross_advertised_usd'], '6750.00')
+        self.assertEqual(report['collectible_usd_verified'], '0.00')
+        self.assertEqual(report['review_ready_count'], 0)
+        self.assertTrue(all(r['status'] == 'UNVERIFIED_EXTERNAL_ELIGIBILITY'
+                            for r in report['issues']))
+
     def test_duplicate_listing_id_rejected(self):
         with self.assertRaises(ValueError):
             evaluate([row(), row()])
