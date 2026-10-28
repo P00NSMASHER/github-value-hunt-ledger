@@ -2455,6 +2455,99 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                     self._assert_boundary(forged)
 
 
+class FMCTCWEvergreenDocketCollisionBoundary(unittest.TestCase):
+    """Publisher typo must not split one adjudicated case into two labels."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "fmc_tcw_1966i_docket_collision_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_boundary(self, p):
+        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["fixture_id"],
+                         "FMC_TCW_EVERGREEN_1966I_APPELLATE_DOCKET_IDENTITY_COLLISION_HELD_V0")
+        s = p["source"]
+        f = p["published_case_facts"]
+        q = p["truth_and_quality"]
+        self.assertEqual(s["court_docket"], "25-1104")
+        self.assertEqual(s["fmc_correct_proceeding_docket"], "1966(I)")
+        self.assertEqual(s["fmc_2023_press_body_docket"], "1996(I)")
+        self.assertEqual(s["fmc_2023_press_link_target_docket"], "1966(I)")
+        self.assertEqual(s["fmc_2026_press_docket"], "1966(I)")
+        self.assertEqual(s["docket_resolution"],
+                         "1966(I)_PER_FIRST_PARTY_INDEX_AND_2023_LINK_TARGET_NOT_PRESS_BODY_1996(I)")
+        self.assertEqual(s["proceeding_index_http_access"],
+                         "INDEXED_PUBLIC_TEXT_DIRECT_OPEN_403")
+        self.assertEqual(s["court_decision_pdf_pages_checked"], [3, 5])
+        self.assertTrue(s["court_pdf_visually_checked_via_public_view"])
+        self.assertFalse(s["original_court_pdf_http_bytes_in_custody"])
+        self.assertIsNone(s["original_court_pdf_http_sha256"])
+        self.assertFalse(s["raw_publisher_response_integrity_verified"])
+        self.assertFalse(s["commercial_invoice_scoring_rights_verified"])
+        self.assertEqual(f["port_closed_dates"],
+                         ["2020-05-23", "2020-05-24", "2020-05-25"])
+        self.assertEqual(f["port_closed_days"] *
+                         (f["container_daily_rate_cents"] +
+                          f["chassis_daily_rate_cents"]), 51000)
+        self.assertEqual(f["court_reported_total_detention_invoice_cents"], 149000)
+        self.assertEqual(f["court_reported_disputed_detention_cents"], 51000)
+        self.assertTrue(f["court_reports_invoice_paid_before_complaint"])
+        self.assertFalse(f["original_invoice_or_bank_payment_bytes_held"])
+        self.assertFalse(f["all_original_invoice_charges_held_invalid"])
+        self.assertFalse(f["final_customer_refund_bank_verified"])
+        self.assertIsNone(f["actual_customer_refund_amount_cents"])
+        self.assertEqual(f["automatic_modern_claim_eligibility"], "UNKNOWN")
+        self.assertEqual(q["published_adjudicated_historical_case_count"], 1)
+        self.assertEqual(q["independent_heldout_invoice_labels"], 0)
+        self.assertFalse(q["sample_is_independent_from_existing_real_world_eval_v1"])
+        self.assertFalse(q["additional_unique_invoice_case_created"])
+        self.assertEqual(q["existing_casebook_reference"], "EVERGREEN_TCW_2026_COURT")
+        self.assertEqual(q["verified_retally_customer_cash_recovery_cents"], 0)
+        self.assertEqual(q["commercial_admission"], "HOLD")
+        self.assertEqual(len(p["synthetic_negative_controls"]), 5)
+        self.assertEqual(len({x["id"] for x in p["synthetic_negative_controls"]}), 5)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC"
+                            for x in p["synthetic_negative_controls"]))
+
+    def test_docket_identity_and_historical_invoice_boundary(self):
+        self._assert_boundary(self._pack())
+
+    def test_forged_identity_custody_rights_and_cash_are_rejected(self):
+        source = self._pack()
+        mutations = (
+            ("press_typo_promoted", lambda d: d["source"].update(
+                fmc_correct_proceeding_docket="1996(I)")),
+            ("collision_hidden", lambda d: d["source"].update(
+                fmc_2023_press_body_docket="1966(I)")),
+            ("court_docket_forged", lambda d: d["source"].update(
+                court_docket="1996(I)")),
+            ("pdf_custody_forged", lambda d: d["source"].update(
+                original_court_pdf_http_bytes_in_custody=True)),
+            ("publisher_hash_forged", lambda d: d["source"].update(
+                original_court_pdf_http_sha256="0" * 64)),
+            ("commercial_rights_forged", lambda d: d["source"].update(
+                commercial_invoice_scoring_rights_verified=True)),
+            ("whole_invoice_false_positive", lambda d: d["published_case_facts"].update(
+                court_reported_disputed_detention_cents=149000)),
+            ("bank_receipt_forged", lambda d: d["published_case_facts"].update(
+                original_invoice_or_bank_payment_bytes_held=True)),
+            ("customer_cash_forged", lambda d: d["truth_and_quality"].update(
+                verified_retally_customer_cash_recovery_cents=51000)),
+            ("duplicate_case_mislabelled_holdout", lambda d: d["truth_and_quality"].update(
+                independent_heldout_invoice_labels=1)),
+            ("synthetic_mislabelled_real", lambda d: d["synthetic_negative_controls"][0].update(
+                kind="ORIGINAL")),
+        )
+        for name, mutation in mutations:
+            with self.subTest(forgery=name):
+                forged = json.loads(json.dumps(source))
+                mutation(forged)
+                with self.assertRaises(AssertionError):
+                    self._assert_boundary(forged)
+
+
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
 if __name__ == "__main__":
     unittest.main()
