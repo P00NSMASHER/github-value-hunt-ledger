@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.1",
+  "schema_version": "0.1.2",
   "fixture_id": "FMC_22_17_ADMITTED_ERRORS_AND_NON_SYSTEMIC_DECISION_V0",
   "engine": "freightrecovery",
   "evaluation_family": "HISTORICAL_FMC_ADJUDICATED_FREIGHT_ERROR_ADMISSION_VS_SYSTEMIC_NEGATIVE",
@@ -63,7 +63,13 @@
       "classification": "SOURCE_REPORTED_ILLUSTRATIVE_COSTS_EXCEED_CARRIER_INVOICE_BY_USD_2_475_NOT_ADJUDICATED_OVERCHARGE",
       "is_held_out_invoice_level_ground_truth": false,
       "any_customer_cash_refund_or_recovered_amount": null,
-      "commercial_reuse_authorized": false
+      "commercial_reuse_authorized": false,
+      "fee_calculation_is_conditional_not_paid_receipt": true,
+      "actual_processing_fee_paid_mills": null,
+      "actual_combined_costs_paid_mills": null,
+      "independent_underbilling_label": false,
+      "is_held_out_actual_payment_reconciliation": false,
+      "conditional_source_limit": "Finding 162 says respondent ASSERTS a fee often applies, and $1,075.475 WOULD equal the illustrated costs. CX 736/737/738 are not held here; neither 3.99% actually charged/paid nor a full reconciled payment was independently verified."
     }
   },
   "truth_boundaries": {
@@ -115,6 +121,11 @@
       "id": "SYNTH_FMC_22_17_COST_ABOVE_INVOICE_PROMOTED_TO_CUSTOMER_OVERCHARGE",
       "kind": "SYNTHETIC",
       "expected": "REJECT_SOURCE_REPORTED_UNDERBILL_ILLUSTRATION_IS_NOT_OVERCHARGE_OR_VERIFIED_REFUND"
+    },
+    {
+      "id": "SYNTH_CONDITIONAL_FMC_FEE_IS_VERIFIED_PAID_COST",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HYPOTHETICAL_CARD_FEE_AND_COST_TOTAL_ARE_NOT_PROVEN_PAYMENTS"
     }
   ],
   "quality": {
