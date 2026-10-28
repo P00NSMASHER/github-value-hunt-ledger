@@ -2023,8 +2023,17 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
         src = record["source"]
         case = record["publisher_reported_case"]
         truth = record["ground_truth_limits"]
-        self.assertEqual(record["schema_version"], "0.1.0")
+        self.assertEqual(record["schema_version"], "0.1.1")
         self.assertEqual(src["commission_docket"], "23-08")
+        self.assertEqual(src["final_order_index_document_id"], 131865)
+        self.assertEqual(src["official_fmc_final_order_document_locator_url"],
+                         "https://www2.fmc.gov/readingroom/documents/131865")
+        self.assertEqual(src["official_fmc_final_order_indexed_pdf_url"],
+                         "https://www2.fmc.gov/readingroom/docs/23-08/%2832%29%2023-08%20Order%20on%20Initial%20Decision%20%28public%29.pdf/")
+        self.assertEqual(src["final_order_source_locator_crosschecked_on"],
+                         "2026-10-27")
+        self.assertIs(src["final_order_link_is_raw_document_custody"], False)
+        self.assertIs(src["final_order_pdf_content_independently_examined"], False)
         self.assertEqual(src["original_fmc_release_published"], "2026-01-28")
         self.assertEqual(src["testimony_published"], "2026-06-03")
         self.assertEqual(record["cohort"],
@@ -2074,6 +2083,30 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
         self.assertIn("2021", data["publisher_reported_case"]["overcharge_cohort"])
         self.assertIs(data["quality"]["invoice_level_labeling_complete"], False)
         self.assertIs(data["quality"]["case_level_labeling_complete"], False)
+
+    def test_fmc_original_order_locator_is_not_custodied_pdf(self):
+        """Official 23-08 decision index and PDF link are not byte custody."""
+        item = self._pack()
+        self._check(item)
+        self.assertEqual(item["source"]["final_order_index_served"], "2026-01-06")
+        self.assertFalse(item["source"]["final_order_original_pdf_bytes_custodied"])
+        self.assertIsNone(item["source"]["final_order_original_pdf_sha256"])
+        # Each scenario is deliberately SYNTHETIC, not a source assertion.
+        for key, replacement in (
+            ("final_order_index_document_id", 131866),
+            ("official_fmc_final_order_document_locator_url",
+             "https://www2.fmc.gov/readingroom/documents/131866"),
+            ("official_fmc_final_order_indexed_pdf_url",
+             "https://www2.fmc.gov/readingroom/docs/23-01/WRONG.pdf"),
+            ("final_order_link_is_raw_document_custody", True),
+            ("final_order_pdf_content_independently_examined", True),
+            ("final_order_original_pdf_bytes_custodied", True),
+            ("final_order_original_pdf_sha256", "0" * 64),
+        ):
+            with self.subTest(synthetic_forgery=key), self.assertRaises(AssertionError):
+                forged = json.loads(json.dumps(item))
+                forged["source"][key] = replacement
+                self._check(forged)
 
     def test_synthetic_controls_and_source_rights_stay_held(self):
         data = self._pack()
