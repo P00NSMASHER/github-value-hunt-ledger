@@ -2570,6 +2570,43 @@ class GAOB221594AgencyTenderScopeHeldTests(unittest.TestCase):
         s = p["source"]
         h = p["historical_facts"]
         q = p["ground_truth"]
+        self.assertEqual(set(p), {
+            "schema_version", "fixture_id", "engine", "evaluation_family",
+            "cohort", "source", "historical_facts", "ground_truth",
+            "synthetic_negative_controls"})
+        self.assertEqual(set(s), {
+            "official_url", "rights_reference", "publisher", "decision_date",
+            "verified_public_text_date", "source_format", "rights_scope",
+            "commercial_customer_scoring_admission",
+            "original_publisher_response_bytes_acquired",
+            "original_publisher_response_sha256",
+            "original_invoice_gbl_tender_bank_bytes_acquired"})
+        self.assertEqual(set(h), {
+            "carrier", "tender_id", "tender_stated_effective_date",
+            "mtmc_return_date", "tender_refiled_and_approved_before_dod_shipment",
+            "illustrative_dod_shipper", "illustrative_service_date",
+            "reported_shipment_weight_lb", "reported_paid_cents",
+            "gsa_setoff_collected_cents", "gao_source_ocr_lower_charge",
+            "gsa_implied_lower_charge_cents", "lower_charge_provenance",
+            "gao_dod_audit_disposition", "dod_similar_claims_scope",
+            "gaos_footnote_non_dod_boundary", "non_dod_tender_validity",
+            "actual_carrier_refund_or_repayment_confirmed"})
+        self.assertEqual(set(q), {
+            "original_publisher_adjudicated_historical_case_count",
+            "independently_heldout_original_invoice_labels",
+            "original_buyer_specific_rate_chain_complete",
+            "modern_customer_contract_applicability",
+            "automatic_current_customer_error_scoring_allowed",
+            "commercial_reuse_authorized",
+            "verified_retally_customer_recovery_cents"})
+        self.assertEqual(p["cohort"],
+                         "US_GSA_DOD_MOTOR_FREIGHT_SEPTEMBER_1983_ADJUDICATED_1986")
+        self.assertEqual(s["publisher"], "U.S. Government Accountability Office")
+        self.assertEqual(s["verified_public_text_date"], "2026-10-28")
+        self.assertEqual(s["source_format"], "OFFICIAL_PUBLISHED_DECISION_HTML")
+        self.assertEqual(s["rights_scope"],
+                         "GAO_TEXT_US_PUBLIC_DOMAIN_WITH_ACKNOWLEDGMENT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE")
+        self.assertEqual(h["carrier"], "RISS_INTERNATIONAL")
         self.assertEqual(s["official_url"],
                          "https://www.gao.gov/products/b-221594-0")
         self.assertEqual(s["rights_reference"], "https://www.gao.gov/copyright")
@@ -2612,7 +2649,15 @@ class GAOB221594AgencyTenderScopeHeldTests(unittest.TestCase):
         controls = p["synthetic_negative_controls"]
         self.assertEqual(len(controls), 5)
         self.assertEqual(len({x["id"] for x in controls}), 5)
+        self.assertTrue(all(set(x) == {"id", "kind", "inference", "expected"}
+                            for x in controls))
         self.assertTrue(all(x["kind"] == "SYNTHETIC" for x in controls))
+        self.assertEqual([x["id"] for x in controls], [
+            "SYNTHETIC_MTMc_REJECTION_INVALID_FOR_ALL_AGENCIES",
+            "SYNTHETIC_NON_DOD_TENDER_ALWAYS_VALID",
+            "SYNTHETIC_GSA_DEDUCTION_COUNTS_AS_CUSTOMER_CASH",
+            "SYNTHETIC_OCR_72125_PUBLISHER_EXPLICIT",
+            "SYNTHETIC_GAO_PAGE_IS_ORIGINAL_INVOICE"])
         self.assertEqual(
             [x["expected"] for x in controls],
             ["REJECT_NON_DOD_SCOPE_MUST_BE_EVALUATED_SEPARATELY",
@@ -2649,6 +2694,12 @@ class GAOB221594AgencyTenderScopeHeldTests(unittest.TestCase):
             lambda x: x["ground_truth"].update(
                 verified_retally_customer_recovery_cents=22075),
             lambda x: x["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+            lambda x: x["source"].update(unverified_customer_refund=True),
+            lambda x: x["ground_truth"].update(independent_bank_receipt=True),
+            lambda x: x["synthetic_negative_controls"][0].update(
+                {"independent_original_invoice": True}),
+            lambda x: x["source"].update(
+                rights_scope="AUTOMATED_CUSTOMER_SCORING_APPROVED"),
         )
         for index, mutation in enumerate(mutations):
             with self.subTest(forgery=index):
