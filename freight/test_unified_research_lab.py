@@ -2073,6 +2073,7 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
                          SEEDS["freightrecovery"])
         self.assertIn("2021", data["publisher_reported_case"]["overcharge_cohort"])
         self.assertIs(data["quality"]["invoice_level_labeling_complete"], False)
+        self.assertIs(data["quality"]["case_level_labeling_complete"], False)
 
     def test_synthetic_controls_and_source_rights_stay_held(self):
         data = self._pack()
@@ -2085,7 +2086,7 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
                          "NOT_INDEPENDENTLY_ATTESTED_COMMERCIAL_ENGINE_REUSE_HOLD")
         self.assertFalse(data["quality"]["independent_original_order_and_invoice_custody"])
 
-    def test_ten_forged_promotion_attempts_rejected(self):
+    def test_eleven_forged_promotion_attempts_rejected(self):
         original = self._pack()
         self._check(original)
         mutations = (
@@ -2107,6 +2108,8 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
                 verified_retally_customer_recovery_cents=2267000000)),
             ("source_hash", lambda x: x["source"].update(
                 final_order_original_pdf_sha256="0" * 64)),
+            ("completeness", lambda x: x["quality"].update(
+                case_level_labeling_complete=True)),
             ("commercial_rights", lambda x: x["source"].update(
                 commercial_scoring_authorized=True)),
         )
