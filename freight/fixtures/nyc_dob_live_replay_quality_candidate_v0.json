@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.5",
+  "schema_version": "0.1.6",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -329,5 +329,54 @@
     "consumer_lane": ":48 PermitPlate",
     "independent_qa_lane": ":44 QA",
     "production_admission": "HOLD_PUBLISHER_CACHED_CATALOG_METADATA_ONLY"
+  },
+  "official_socrata_catalog_refresh_2026_10_28": {
+    "schema_version": "0.1.0",
+    "observation_id": "NYC_DOB_NOW_CATALOG_UPDATE_CLOCK_ADVANCED_CACHED_COUNTS_STABLE_2026_10_28",
+    "publisher": "NYC Department of Buildings via NYC Open Data/Socrata",
+    "original_catalog_metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "dataset_id": "rbx6-tga4",
+    "observed_date_utc": "2026-10-28",
+    "previous_catalog_rows_updated_at_utc": "2026-10-27T18:42:06Z",
+    "publisher_rows_updated_at_epoch_seconds": 1793213280,
+    "publisher_rows_updated_at_utc": "2026-10-28T18:48:00Z",
+    "publisher_view_last_modified_epoch_seconds": 1793212310,
+    "publisher_view_last_modified_utc": "2026-10-28T18:31:50Z",
+    "new_catalog_timestamp_after_previous": true,
+    "source_reported_cached_counts_stable_across_two_metadata_views": true,
+    "compared_cached_fields": {
+      "cached_total_row_count": 1020884,
+      "cached_permit_status_signed_off_count": 652613,
+      "cached_permit_status_permit_issued_count": 368271,
+      "cached_job_filing_number_placeholder_frequency": 344
+    },
+    "original_publisher_http_response_bytes_custodied": false,
+    "original_publisher_http_response_sha256": null,
+    "semantic_observation_not_raw_source_hash": true,
+    "independently_replayed_row_level_api_in_this_run": false,
+    "timestamp_change_proves_new_unique_permits": false,
+    "same_cached_counts_prove_no_rows_changed": false,
+    "timestamp_change_proves_current_permit_validity": false,
+    "citywide_general_open_data_reuse_allowed": true,
+    "dataset_specific_extra_terms_and_customer_scoring_review_complete": false,
+    "commercial_scoring_authorization": "HOLD",
+    "independent_held_out_current_validity_labels": 0,
+    "raw_personal_or_permit_rows_stored": 0,
+    "data_quality_limitation": "CATALOG_TIME_FIELDS_AND_CACHED_FIELD_TOP_COUNTS_ONLY; NOT_A_STABLE_ROW_REPLAY_OR_INDEPENDENT_ACTIVE_PERMIT_LABEL; NO_ORIGINAL_HTTP_BYTE_CUSTODY",
+    "owner_lane": ":48 PermitPlate",
+    "qa_lane": ":44 independent QA",
+    "production_admission": "HOLD",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_ADVANCED_ROWSUPDATED_PROVES_NEW_ACTIVE_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_TIMESTAMP_IS_NOT_PERMIT_VALIDITY_OR_NEW_UNIQUE_ROW_EVIDENCE"
+      },
+      {
+        "id": "SYNTH_UNCHANGED_CACHED_TOTAL_PROVES_NO_ROW_CHANGES",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_METADATA_COUNTS_MAY_STAY_SAME_WHILE_ROWS_ARE_REPLACED_OR_CORRECTED"
+      }
+    ]
   }
 }
