@@ -13,7 +13,7 @@ class FMCBakerlyBoundaryTests(unittest.TestCase):
 
     @staticmethod
     def contract(row):
-        assert row["schema_version"] == "0.1.1"
+        assert row["schema_version"] == "0.1.2"
         assert row["source"]["docket"] == "22-17"
         assert row["source"]["commission_affirmance_date"] == "2024-10-30"
         assert row["source"]["original_document_pdf_sha256"] is None
@@ -45,6 +45,12 @@ class FMCBakerlyBoundaryTests(unittest.TestCase):
         assert r["terminal_invoice_mills"] == 250000
         assert r["terminal_card_fee_percent"] == "3.99"
         assert r["terminal_card_fee_mills"] == 9975
+        assert r["fee_calculation_is_conditional_not_paid_receipt"] is True
+        assert r["actual_processing_fee_paid_mills"] is None
+        assert r["actual_combined_costs_paid_mills"] is None
+        assert r["independent_underbilling_label"] is False
+        assert r["is_held_out_actual_payment_reconciliation"] is False
+        assert "WOULD equal" in r["conditional_source_limit"]
         assert r["total_illustrative_cost_mills"] == 1075475
         assert r["invoice_minus_cost_mills"] == -2475
         assert r["paycargo_base_mills"] + r["paycargo_shipper_fee_mills"] == r["paycargo_receipt_mills"]
@@ -63,7 +69,8 @@ class FMCBakerlyBoundaryTests(unittest.TestCase):
         assert b["commercial_customer_scoring"] is False
         assert b["retally_verified_recovered_cash_cents"] == 0
         controls = row["synthetic_negative_controls"]
-        assert len(controls) == len({x["id"] for x in controls}) == 7
+        assert len(controls) == len({x["id"] for x in controls}) == 8
+        assert any(x["id"] == "SYNTH_CONDITIONAL_FMC_FEE_IS_VERIFIED_PAID_COST" for x in controls)
         assert all(x["kind"] == "SYNTHETIC" and x["expected"].startswith("REJECT_") for x in controls)
 
     def test_source_bound_record_and_nonpromotion(self):
@@ -96,6 +103,11 @@ class FMCBakerlyBoundaryTests(unittest.TestCase):
             ("carrier_invoice_mills", 1073001),
             ("paycargo_receipt_mills", 815501),
             ("terminal_card_fee_mills", 9980),
+            ("fee_calculation_is_conditional_not_paid_receipt", False),
+            ("actual_processing_fee_paid_mills", 9975),
+            ("actual_combined_costs_paid_mills", 1075475),
+            ("independent_underbilling_label", True),
+            ("is_held_out_actual_payment_reconciliation", True),
             ("total_illustrative_cost_mills", 1075474),
             ("invoice_minus_cost_mills", 2475),
             ("is_held_out_invoice_level_ground_truth", True),
