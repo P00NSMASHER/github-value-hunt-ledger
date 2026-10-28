@@ -1,0 +1,102 @@
+[
+  {
+    "listing_id": "tscircuit-jlcsearch-92-1",
+    "issue_url": "https://github.com/tscircuit/jlcsearch/issues/92",
+    "advertised_usd": "1",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 103
+  },
+  {
+    "listing_id": "tscircuit-dsn-54-1",
+    "issue_url": "https://github.com/tscircuit/dsn-converter/issues/54",
+    "advertised_usd": "1",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 236
+  },
+  {
+    "listing_id": "tscircuit-dsn-54-170",
+    "issue_url": "https://github.com/tscircuit/dsn-converter/issues/54",
+    "advertised_usd": "170",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 236
+  },
+  {
+    "listing_id": "tscircuit-dsn-54-30",
+    "issue_url": "https://github.com/tscircuit/dsn-converter/issues/54",
+    "advertised_usd": "30",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 236
+  },
+  {
+    "listing_id": "tscircuit-dsn-54-70a",
+    "issue_url": "https://github.com/tscircuit/dsn-converter/issues/54",
+    "advertised_usd": "70",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 236
+  },
+  {
+    "listing_id": "tscircuit-dsn-54-70b",
+    "issue_url": "https://github.com/tscircuit/dsn-converter/issues/54",
+    "advertised_usd": "70",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 236
+  },
+  {
+    "listing_id": "tscircuit-main-1130-25",
+    "issue_url": "https://github.com/tscircuit/tscircuit/issues/1130",
+    "advertised_usd": "25",
+    "github_state": "closed",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 19
+  },
+  {
+    "listing_id": "tscircuit-pcb-viewer-163-3",
+    "issue_url": "https://github.com/tscircuit/pcb-viewer/issues/163",
+    "advertised_usd": "3",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 39
+  },
+  {
+    "listing_id": "tscircuit-pgstrap-2-30",
+    "issue_url": "https://github.com/tscircuit/pgstrap/issues/2",
+    "advertised_usd": "30",
+    "github_state": null,
+    "repo_archived": null,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": null
+  },
+  {
+    "listing_id": "tscircuit-autorouting-92-50",
+    "issue_url": "https://github.com/tscircuit/autorouting/issues/92",
+    "advertised_usd": "50",
+    "github_state": "open",
+    "repo_archived": true,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": null
+  }
+]
