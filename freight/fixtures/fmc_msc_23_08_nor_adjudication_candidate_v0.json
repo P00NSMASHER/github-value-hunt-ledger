@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.1",
+  "schema_version": "0.1.2",
   "fixture_id": "FMC_MSC_23_08_NOR_OVERBILLING_GOVERNMENT_PENALTY_BOUNDARY_2026_V0",
   "engine": "freightrecovery",
   "evaluation_family": "FREIGHT_ADJUDICATED_CASE_LEVEL_BILLING_COHORT_NEGATIVE_CONTROLS_NOT_INVOICE_ACCURACY",
@@ -28,7 +28,9 @@
     "official_fmc_final_order_indexed_pdf_url": "https://www2.fmc.gov/readingroom/docs/23-08/%2832%29%2023-08%20Order%20on%20Initial%20Decision%20%28public%29.pdf/",
     "final_order_source_locator_crosschecked_on": "2026-10-27",
     "final_order_link_is_raw_document_custody": false,
-    "final_order_pdf_content_independently_examined": false
+    "final_order_pdf_content_independently_examined": false,
+    "fmc_summary_temporal_boundaries_reviewed_on": "2026-10-27",
+    "temporal_scope_evidence_kind": "FMC_FIRST_PARTY_2026_01_28_HTML_SUMMARY_ONLY_NOT_ORIGINAL_ORDER_BYTES"
   },
   "publisher_reported_case": {
     "carrier": "Mediterranean Shipping Company S.A.",
@@ -48,7 +50,12 @@
     "june_3_testimony_reports_penalty_paid_in_full_asof_may_2026": true,
     "reported_penalty_payment_recipient": "UNITED_STATES_TREASURY",
     "fmc_civil_penalty_is_customer_restitution": false,
-    "shipper_refunds_paid_total_cents": null
+    "shipper_refunds_paid_total_cents": null,
+    "notify_party_merchant_clause_billing_years": "2018_TO_2020",
+    "nor_tariff_publication_violation_period": "2021_TO_EARLY_2023",
+    "nor_tariff_knowing_willful_start_month": "2022-03",
+    "nor_overcharge_unreasonable_practice_year": 2021,
+    "cross_violation_invoice_error_inference_permitted": false
   },
   "ground_truth_limits": {
     "regulator_case_level_adjudication_reported": true,
@@ -61,7 +68,9 @@
     "exact_nor_invoice_population_size": "UNKNOWN",
     "exact_customer_refund_total": "UNKNOWN",
     "original_tariff_applicability_for_other_customers": "UNKNOWN",
-    "public_release_cannot_establish_individual_billing_error_ground_truth": true
+    "public_release_cannot_establish_individual_billing_error_ground_truth": true,
+    "exact_day_of_march_2022_tariff_statement": "UNKNOWN",
+    "exact_notify_party_billed_invoice_population": "UNKNOWN"
   },
   "synthetic_negative_controls": [
     {
@@ -93,6 +102,12 @@
       "kind": "SYNTHETIC",
       "proposed": "LINKED_FMC_READING_ROOM_INDEX_EQUALS_ACQUIRED_HASHED_FINAL_ORDER_PDF",
       "expected": "REJECT_ORIGINAL_ORDER_BYTES_AND_SOURCE_SHA256_UNAVAILABLE"
+    },
+    {
+      "id": "SYNTHETIC_MSC_THREE_VIOLATION_COHORT_CONFLATION",
+      "kind": "SYNTHETIC",
+      "proposed": "MERGE_2018_2020_NOTIFY_PARTY_WITH_2021_NOR_OVERCHARGE_AND_BACKDATE_TARIFF_WILLFULNESS_TO_2021",
+      "expected": "REJECT_DISTINCT_COHORTS_AND_MARCH_2022_WILLFULNESS_BOUNDARY"
     }
   ],
   "quality": {
@@ -103,7 +118,8 @@
     "publisher_response_sha256_provenance_complete": false,
     "synthetic_controls_tagged": true,
     "private_medical_student_or_customer_records_used": false,
-    "case_level_ground_truth_limit": "REGULATOR_SUMMARY_ONLY_FINAL_ORDER_AND_INDIVIDUAL_INVOICES_NOT_REPLAYED"
+    "case_level_ground_truth_limit": "REGULATOR_SUMMARY_ONLY_FINAL_ORDER_AND_INDIVIDUAL_INVOICES_NOT_REPLAYED",
+    "temporal_boundary_evidence_status": "FIRST_PARTY_FMC_PRESS_SUMMARY_REVIEWED_ORDER_PDF_BYTES_NOT_ACQUIRED"
   },
   "admission_state": "RESEARCH_ONLY_SOURCE_POINTERS_NOT_CURRENT_CUSTOMER_TRUTH_OR_COMMERCIAL_SCORING"
 }
