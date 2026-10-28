@@ -1,0 +1,133 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_B199805_1980_LTL_WEIGHT_SCALE_AGGREGATE_BOUNDARY_CANDIDATE_V0",
+  "engines": [
+    "freightrecovery",
+    "recoveryos"
+  ],
+  "evaluation_family": "HISTORICAL_FREIGHT_TARIFF_CLASSIFICATION_AND_ACCOUNTING_AGGREGATE_BOUNDARY_NOT_CUSTOMER_INVOICE_SCORING",
+  "source": {
+    "official_url": "https://www.gao.gov/products/b-199805-0",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-199805",
+    "decision_date": "1980-12-29",
+    "reviewed_first_party_html_text_on": "2026-10-28",
+    "official_rights_url": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_GOVERNMENT_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_TARIFF_RIGHTS_SEPARATE",
+    "original_publisher_http_bytes_acquired": false,
+    "original_publisher_http_sha256": null,
+    "original_tariff_table_pages_acquired": false,
+    "original_tariff_page_sha256": null,
+    "publisher_text_omits_original_tariff_rate_table": true,
+    "commercial_customer_invoice_scoring_approved": false,
+    "source_passage_locator": "View Decision: paragraphs beginning YELLOW FREIGHT SYSTEM, 36 LTL SHIPMENTS; GBL K-4495333; CLASS 55 LTL RATE; ACCORDINGLY GSA'S SETTLEMENT ACTION IS SUSTAINED"
+  },
+  "historical_cohorts": {
+    "government_shipments_in_initial_GSA_audit": 36,
+    "GSA_reported_initial_overcharge_total_cents": 329642,
+    "carrier_reported_additional_bill_count": 88,
+    "carrier_claimed_additional_deductions_cents": 1157063,
+    "additional_bill_amount_is_carrier_statement_not_independently_replayed": true,
+    "initial_and_added_individual_invoice_documents_custodied": 0,
+    "unique_independent_invoice_truth_count": null,
+    "all_124_are_distinct_or_comparable": "UNKNOWN",
+    "aggregation_applied_as_per_bill_error_label": false
+  },
+  "publisher_reported_sample": {
+    "government_bill_of_lading": "K-4495333",
+    "article": "BOOKS_NOI",
+    "shipment_received_date": "1978-07-25",
+    "carrier_collected_month": "1978-08",
+    "weight_pounds": 3312,
+    "carrier_collected_cents": 36035,
+    "GSA_applicable_cents": 34180,
+    "GSA_overcharge_deduction_cents": 1855,
+    "base_class55_rate_cents_per_cwt": 960,
+    "adjusted_class55_rate_cents_per_cwt": 1032,
+    "chosen_weight_scale_minimum_pounds": 2000,
+    "alternative_rejected_LTL_scale_upper_weight_pounds": 500,
+    "governing_NMFC_books_truckload_minimum_pounds": 30000,
+    "decision_on_GSA_settlement": "SUSTAINED",
+    "exact_paid_to_applicable_arithmetic_reconciles": true,
+    "detailed_original_invoice_tariff_or_bol_custody": false
+  },
+  "historical_interpretation": {
+    "source_definition_LTL_extends_beyond_less_than_500_pounds": true,
+    "class55_LTL_rate_does_not_force_first_500_pound_scale": true,
+    "tariff_quotation": "RMB_15_ITEM_3860",
+    "original_tariff": "RMB_521_NINTH_REVISED_PAGE_472_TABLE_OMITTED_FROM_GAO_HTML",
+    "current_2026_rate_applicability": "UNKNOWN",
+    "original_tariff_effective_date": "UNKNOWN",
+    "historical_government_deduction_is_private_customer_refund": false,
+    "current_carrier_contract_authority_verified": false
+  },
+  "truth_and_quality": {
+    "publisher_reported_historical_case_level_classification": 1,
+    "independently_heldout_real_invoice_labels": 0,
+    "source_bill_or_bank_independently_replayed": false,
+    "live_customer_scoring_permitted": false,
+    "retally_verified_recovered_customer_cash_cents": 0,
+    "per_bill_population_coverage": "UNKNOWN",
+    "tariff_full_rate_table_verified_from_original_bytes": false,
+    "raw_publisher_response_integrity_verified": false,
+    "training_evaluation_independence_verified": false,
+    "privacy_sensitive_customer_student_medical_records_used": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_500_LB_TIER_EQUATED_WITH_ALL_LTL",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_LTL_CLASS_IS_NOT_FIRST_WEIGHT_SCALE_ONLY"
+    },
+    {
+      "id": "SYNTHETIC_USE_960_RATE_WITHOUT_ADJUSTMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_RATE_VINTAGE_1032_CENTS_PER_CWT"
+    },
+    {
+      "id": "SYNTHETIC_USE_500_LB_TIER_FOR_3312_LBS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_2000_LB_SCALE_APPLIES"
+    },
+    {
+      "id": "SYNTHETIC_329642_CENTS_IS_ONE_BILL_ERROR",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_36_BILL_AGGREGATE_NOT_SAMPLE"
+    },
+    {
+      "id": "SYNTHETIC_CARRIER_88_BILLS_AS_VERIFIED_INVOICE_LABELS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CARRIER_REPORTED_UNREPLAYED_POPULATION"
+    },
+    {
+      "id": "SYNTHETIC_ALL_124_BILLS_UNIQUE_PROVEN",
+      "kind": "SYNTHETIC",
+      "expected": "UNKNOWN_NO_INDEPENDENT_DEDUPLICATED_BILL_CUSTODY"
+    },
+    {
+      "id": "SYNTHETIC_TABLE_OMITTED_AS_ORIGINAL_TARIFF_HELD",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MISSING_ORIGINAL_TARIFF_PAGES"
+    },
+    {
+      "id": "SYNTHETIC_HISTORIC_DEDUCTION_AS_RETALLY_CUSTOMER_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_CUSTOMER_BANK_OR_MODERN_SETTLEMENT"
+    },
+    {
+      "id": "SYNTHETIC_GAO_CITATION_AS_COMMERCIAL_LICENSE_AND_HELDOUT_TEST",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_RIGHTS_GROUND_TRUTH_AND_HOLDOUT_PROMOTION"
+    }
+  ],
+  "handoff": {
+    "retally_recoveryos_engineering": ":12",
+    "independent_QA": ":44",
+    "permitplate": ":48",
+    "capturebrief": ":52",
+    "candidate_fixture_only": true,
+    "engine_code_changed": false,
+    "CI_exact_head_verified": false,
+    "release_approved": false
+  }
+}
