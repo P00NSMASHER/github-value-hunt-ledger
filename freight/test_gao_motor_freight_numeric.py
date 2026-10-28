@@ -253,6 +253,109 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
         self.assertTrue(item["quality"]["published_decision_arithmetic_reconciles"])
         self.assertFalse(item["quality"]["independent_customer_ground_truth_complete"])
 
+    def test_b143458_vs_b191258_tariff_scoped_full_capacity_historical_pair(self):
+        """Two official GAO decisions refute BOTH universal capacity shortcuts.
+
+        The decisions are independent historical adjudications, not verified
+        current invoices, held-out model labels, tariff books or paid recoveries.
+        """
+        candidate = json.loads((FIXTURE.parent /
+            "gao_capacity_tariff_scope_contrast_candidate_v0.json"
+        ).read_text(encoding="utf-8"))
+
+        def assert_admitted(doc):
+            self.assertEqual(doc["schema_version"], "0.1.0")
+            self.assertEqual(doc["fixture_id"],
+                             "GAO_CAPACITY_TARIFF_SCOPE_CONTRAST_CANDIDATE_V0")
+            self.assertEqual(doc["evaluation_family"],
+                             "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY")
+            self.assertEqual([s["decision_id"] for s in doc["sources"]],
+                             ["B-143458", "B-191258"])
+            self.assertEqual([s["official_url"] for s in doc["sources"]], [
+                "https://www.gao.gov/products/b-143458",
+                "https://www.gao.gov/assets/b-191258.pdf"])
+            self.assertEqual([s["decision_date"] for s in doc["sources"]],
+                             ["1961-03-30", "1978-07-07"])
+            for src in doc["sources"]:
+                self.assertFalse(src["original_response_bytes_acquired"])
+                self.assertIsNone(src["original_response_sha256"])
+                self.assertFalse(src["original_invoice_or_tariff_bytes_acquired"])
+            self.assertFalse(doc["rights"]["customer_engine_commercial_scoring_approved"])
+            self.assertEqual(doc["rights"]["source_url"], "https://www.gao.gov/copyright")
+            first, second = doc["historical_decision_labels"]
+            self.assertEqual([first["decision_id"], second["decision_id"]],
+                             ["B-143458", "B-191258"])
+            self.assertTrue(first["full_visible_capacity"])
+            self.assertTrue(second["full_visible_capacity"])
+            self.assertFalse(first["governing_capacity_rule_applies_to_carrier"])
+            self.assertTrue(second["governing_capacity_rule_applies_to_carrier"])
+            self.assertEqual(first["applicability_basis"],
+                             "EXCEPTIONS_TARIFF_10_M_RULE_62_2_CARRIER_NOT_LISTED")
+            self.assertEqual(second["applicability_basis"],
+                             "RMB_120_ITEM_610_5_AND_RMB_127_ITEM_997")
+            expected = ["TRUCKLOAD_MINIMUM_NOT_APPLICABLE",
+                        "TRUCKLOAD_MINIMUM_APPLICABLE"]
+            self.assertEqual([x["expected_tariff_scoped_result"]
+                              for x in (first, second)], expected)
+            self.assertEqual(first["carrier_paid_cents"], 30590)
+            self.assertEqual(first["gao_allowable_cents"], 15060)
+            self.assertEqual(first["gao_overcharge_certificate_cents"], 15530)
+            self.assertEqual(first["carrier_paid_cents"] -
+                             first["gao_allowable_cents"], 15530)
+            self.assertEqual(second["shipment_weight_lb"], 6910)
+            self.assertEqual(second["truckload_minimum_lb"], 24000)
+            self.assertEqual(second["arbitrary_rate_cents_per_cwt"], 30)
+            self.assertEqual(second["gaoreported_correct_arbitrary_charge_cents"], 7200)
+            self.assertEqual(second["truckload_minimum_lb"] *
+                             second["arbitrary_rate_cents_per_cwt"] // 100, 7200)
+            self.assertEqual(second["gaoreported_gsa_deduction_invalid_cents"], 3330)
+            self.assertIsNone(first["deduction_or_refund_collected"])
+            self.assertIsNone(second["subsequent_reimbursement_paid"])
+            self.assertFalse(first["customer_invoice_truth"])
+            self.assertFalse(second["customer_invoice_truth"])
+            self.assertEqual(doc["contrast_guard"],
+                             "FULL_CAPACITY_ALONE_CANNOT_DETERMINE_TRUCKLOAD_MINIMUM_WITHOUT_TARIFF_APPLICABILITY")
+            for universal in expected:
+                self.assertFalse(all(x["expected_tariff_scoped_result"] == universal
+                                     for x in (first, second)))
+            synthetic = doc["synthetic_negative_controls"]
+            self.assertEqual(len(synthetic), 4)
+            self.assertEqual(len({s["id"] for s in synthetic}), 4)
+            self.assertTrue(all(s["kind"] == "SYNTHETIC" and
+                                s["id"].startswith("SYNTHETIC_") for s in synthetic))
+            self.assertEqual(synthetic[0]["must_fail_decision_id"], "B-143458")
+            self.assertEqual(synthetic[1]["must_fail_decision_id"], "B-191258")
+            truth = doc["truth_boundaries"]
+            self.assertEqual(truth["independent_publisher_decision_level_labels"], 2)
+            self.assertEqual(truth["independently_held_out_real_customer_invoice_labels"], 0)
+            self.assertFalse(truth["train_test_contamination_exclusion_verified"])
+            self.assertFalse(truth["historical_tariff_pages_held"])
+            self.assertFalse(truth["current_customer_invoice_accuracy_scoring_allowed"])
+            self.assertEqual(truth["modern_tariff_applicability"], "UNKNOWN")
+            self.assertEqual(truth["reimbursement_or_refund_settlement"], "UNKNOWN")
+            self.assertEqual(truth["verified_retally_recovered_cash_cents"], 0)
+
+        assert_admitted(candidate)
+        mutations = (
+            ("historical_decision_labels", 0, "governing_capacity_rule_applies_to_carrier", True),
+            ("historical_decision_labels", 1, "governing_capacity_rule_applies_to_carrier", False),
+            ("historical_decision_labels", 0, "carrier_paid_cents", 30591),
+            ("historical_decision_labels", 1, "arbitrary_rate_cents_per_cwt", 31),
+            ("historical_decision_labels", 0, "deduction_or_refund_collected", 15530),
+            ("historical_decision_labels", 1, "subsequent_reimbursement_paid", 3330),
+            ("sources", 0, "original_response_sha256", "UNVERIFIED_FAKE_HASH"),
+            ("truth_boundaries", None, "independently_held_out_real_customer_invoice_labels", 2),
+            ("truth_boundaries", None, "verified_retally_recovered_cash_cents", 3330),
+            ("rights", None, "customer_engine_commercial_scoring_approved", True),
+        )
+        for group, index, key, forged in mutations:
+            with self.subTest(group=group, key=key, index=index):
+                wrong = copy.deepcopy(candidate)
+                target = wrong[group] if index is None else wrong[group][index]
+                target[key] = forged
+                with self.assertRaises(AssertionError):
+                    assert_admitted(wrong)
+
     def test_b143458_wrong_money_tariff_scope_and_cash_promotions_are_red(self):
         """Reject altered authored evidence even when new data is self-consistent."""
         item = json.loads((FIXTURE.parent / "gao_b143458_capacity_v1.json").read_text())
