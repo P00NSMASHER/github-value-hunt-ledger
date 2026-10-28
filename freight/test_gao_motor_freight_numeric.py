@@ -1214,5 +1214,118 @@ class GAOMotorFreightNumericalEvidenceTests(unittest.TestCase):
                     bounded_check(bogus)
                 self.assertNotEqual(digest(bogus), digest(item))
 
+
+class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
+    """First-party GAO classification is a historical decision, not invoice truth."""
+
+    @staticmethod
+    def _pack():
+        path = FIXTURE.parent / "gao_b199805_ltl_scale_candidate_v0.json"
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _assert_boundary(self, pack):
+        self.assertEqual(pack["schema_version"], "0.1.0")
+        self.assertEqual(pack["fixture_id"],
+            "GAO_B199805_1980_LTL_WEIGHT_SCALE_AGGREGATE_BOUNDARY_CANDIDATE_V0")
+        self.assertEqual(pack["engines"], ["freightrecovery", "recoveryos"])
+        s = pack["source"]
+        self.assertEqual(s["official_url"], "https://www.gao.gov/products/b-199805-0")
+        self.assertEqual(s["decision_date"], "1980-12-29")
+        self.assertEqual(s["official_rights_url"], "https://www.gao.gov/copyright")
+        self.assertFalse(s["original_publisher_http_bytes_acquired"])
+        self.assertIsNone(s["original_publisher_http_sha256"])
+        self.assertFalse(s["original_tariff_table_pages_acquired"])
+        self.assertIsNone(s["original_tariff_page_sha256"])
+        self.assertTrue(s["publisher_text_omits_original_tariff_rate_table"])
+        self.assertFalse(s["commercial_customer_invoice_scoring_approved"])
+        c = pack["historical_cohorts"]
+        self.assertEqual(c["government_shipments_in_initial_GSA_audit"], 36)
+        self.assertEqual(c["GSA_reported_initial_overcharge_total_cents"], 329642)
+        self.assertEqual(c["carrier_reported_additional_bill_count"], 88)
+        self.assertEqual(c["carrier_claimed_additional_deductions_cents"], 1157063)
+        self.assertTrue(c["additional_bill_amount_is_carrier_statement_not_independently_replayed"])
+        self.assertEqual(c["initial_and_added_individual_invoice_documents_custodied"], 0)
+        self.assertIsNone(c["unique_independent_invoice_truth_count"])
+        self.assertEqual(c["all_124_are_distinct_or_comparable"], "UNKNOWN")
+        self.assertFalse(c["aggregation_applied_as_per_bill_error_label"])
+        sample = pack["publisher_reported_sample"]
+        self.assertEqual(sample["government_bill_of_lading"], "K-4495333")
+        self.assertEqual(sample["weight_pounds"], 3312)
+        self.assertEqual(sample["carrier_collected_cents"], 36035)
+        self.assertEqual(sample["GSA_applicable_cents"], 34180)
+        self.assertEqual(sample["GSA_overcharge_deduction_cents"], 1855)
+        self.assertEqual(sample["base_class55_rate_cents_per_cwt"], 960)
+        self.assertEqual(sample["adjusted_class55_rate_cents_per_cwt"], 1032)
+        self.assertEqual(sample["chosen_weight_scale_minimum_pounds"], 2000)
+        self.assertEqual(sample["alternative_rejected_LTL_scale_upper_weight_pounds"], 500)
+        self.assertEqual(sample["governing_NMFC_books_truckload_minimum_pounds"], 30000)
+        self.assertEqual(sample["decision_on_GSA_settlement"], "SUSTAINED")
+        self.assertEqual(sample["carrier_collected_cents"] -
+            sample["GSA_applicable_cents"], sample["GSA_overcharge_deduction_cents"])
+        # Integer cents, round half-up: 3,312 lb * $10.32/cwt -> $341.80.
+        self.assertEqual((sample["adjusted_class55_rate_cents_per_cwt"] *
+            sample["weight_pounds"] + 50) // 100, sample["GSA_applicable_cents"])
+        h = pack["historical_interpretation"]
+        self.assertTrue(h["source_definition_LTL_extends_beyond_less_than_500_pounds"])
+        self.assertTrue(h["class55_LTL_rate_does_not_force_first_500_pound_scale"])
+        self.assertEqual(h["current_2026_rate_applicability"], "UNKNOWN")
+        self.assertEqual(h["original_tariff_effective_date"], "UNKNOWN")
+        self.assertFalse(h["historical_government_deduction_is_private_customer_refund"])
+        self.assertFalse(h["current_carrier_contract_authority_verified"])
+        q = pack["truth_and_quality"]
+        self.assertEqual(q["publisher_reported_historical_case_level_classification"], 1)
+        self.assertEqual(q["independently_heldout_real_invoice_labels"], 0)
+        self.assertFalse(q["training_evaluation_independence_verified"])
+        self.assertFalse(q["live_customer_scoring_permitted"])
+        self.assertEqual(q["retally_verified_recovered_customer_cash_cents"], 0)
+        self.assertFalse(q["tariff_full_rate_table_verified_from_original_bytes"])
+        self.assertFalse(q["raw_publisher_response_integrity_verified"])
+        controls = pack["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 9)
+        self.assertEqual(len({x["id"] for x in controls}), 9)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" and
+            x["id"].startswith("SYNTHETIC_") and
+            (x["expected"].startswith("REJECT_") or
+             x["expected"].startswith("UNKNOWN_")) for x in controls))
+        self.assertFalse(pack["handoff"]["engine_code_changed"])
+        self.assertFalse(pack["handoff"]["release_approved"])
+
+    def test_official_ltl_rate_scale_and_multiple_amount_cohorts(self):
+        self._assert_boundary(self._pack())
+
+    def test_forged_invoice_money_tariff_and_provenance_promotion_rejected(self):
+        original = self._pack()
+        fields = (
+            ("source", "original_publisher_http_bytes_acquired", True),
+            ("source", "original_publisher_http_sha256", "forged"),
+            ("source", "original_tariff_table_pages_acquired", True),
+            ("source", "commercial_customer_invoice_scoring_approved", True),
+            ("historical_cohorts", "government_shipments_in_initial_GSA_audit", 1),
+            ("historical_cohorts", "unique_independent_invoice_truth_count", 124),
+            ("historical_cohorts", "carrier_claimed_additional_deductions_cents", 329642),
+            ("publisher_reported_sample", "chosen_weight_scale_minimum_pounds", 500),
+            ("publisher_reported_sample", "GSA_applicable_cents", 36035),
+            ("publisher_reported_sample", "GSA_overcharge_deduction_cents", 329642),
+            ("historical_interpretation", "current_2026_rate_applicability", "VALID"),
+            ("truth_and_quality", "independently_heldout_real_invoice_labels", 124),
+            ("truth_and_quality", "retally_verified_recovered_customer_cash_cents", 1855),
+        )
+        self._assert_boundary(original)
+        for section, field, invalid in fields:
+            with self.subTest(section=section, field=field):
+                forged = copy.deepcopy(original)
+                forged[section][field] = invalid
+                with self.assertRaises(AssertionError):
+                    self._assert_boundary(forged)
+                self.assertNotEqual(digest(forged), digest(original))
+
+    def test_synthetic_controls_cannot_be_promoted_to_original(self):
+        original = self._pack()
+        forged = copy.deepcopy(original)
+        forged["synthetic_negative_controls"][0]["kind"] = "ORIGINAL"
+        with self.assertRaises(AssertionError):
+            self._assert_boundary(forged)
+
+
 if __name__ == "__main__":
     unittest.main()
