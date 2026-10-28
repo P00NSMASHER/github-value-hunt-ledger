@@ -1,0 +1,118 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_CAPACITY_TARIFF_SCOPE_CONTRAST_CANDIDATE_V0",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "cohort": "US_GAO_HISTORICAL_GOVERNMENT_MOTOR_FREIGHT_1958_AND_1975",
+  "sources": [
+    {
+      "decision_id": "B-143458",
+      "official_url": "https://www.gao.gov/products/b-143458",
+      "publisher": "US_GAO",
+      "decision_date": "1961-03-30",
+      "shipment_date": "1958-03-07",
+      "source_format": "OFFICIAL_GAO_HTML_FULL_DECISION",
+      "reviewed_on": "2026-10-28",
+      "original_response_bytes_acquired": false,
+      "original_response_sha256": null,
+      "original_invoice_or_tariff_bytes_acquired": false
+    },
+    {
+      "decision_id": "B-191258",
+      "official_url": "https://www.gao.gov/assets/b-191258.pdf",
+      "summary_url": "https://www.gao.gov/products/b-191258",
+      "publisher": "US_GAO",
+      "decision_date": "1978-07-07",
+      "shipment_date": "1975-11-06",
+      "source_format": "OFFICIAL_GAO_SCANNED_PDF_THREE_PAGES_VISUALLY_REVIEWED",
+      "reviewed_on": "2026-10-28",
+      "original_response_bytes_acquired": false,
+      "original_response_sha256": null,
+      "original_invoice_or_tariff_bytes_acquired": false
+    }
+  ],
+  "rights": {
+    "source_url": "https://www.gao.gov/copyright",
+    "gao_us_federal_text_may_be_copied": true,
+    "attribution_required_no_endorsement": true,
+    "third_party_material_rights_separate": true,
+    "customer_engine_commercial_scoring_approved": false
+  },
+  "historical_decision_labels": [
+    {
+      "decision_id": "B-143458",
+      "case_kind": "OFFICIAL_INDEPENDENT_HISTORICAL_ADJUDICATION",
+      "carrier": "PENNSYLVANIA_TRANSFER_COMPANY",
+      "shipment_weight_lb": 5744,
+      "full_visible_capacity": true,
+      "governing_capacity_rule_applies_to_carrier": false,
+      "applicability_basis": "EXCEPTIONS_TARIFF_10_M_RULE_62_2_CARRIER_NOT_LISTED",
+      "expected_tariff_scoped_result": "TRUCKLOAD_MINIMUM_NOT_APPLICABLE",
+      "carrier_paid_cents": 30590,
+      "gao_allowable_cents": 15060,
+      "gao_overcharge_certificate_cents": 15530,
+      "deduction_or_refund_collected": null,
+      "customer_invoice_truth": false
+    },
+    {
+      "decision_id": "B-191258",
+      "case_kind": "OFFICIAL_INDEPENDENT_HISTORICAL_ADJUDICATION",
+      "carrier": "YELLOW_FREIGHT_SYSTEM",
+      "shipment_weight_lb": 6910,
+      "full_visible_capacity": true,
+      "governing_capacity_rule_applies_to_carrier": true,
+      "applicability_basis": "RMB_120_ITEM_610_5_AND_RMB_127_ITEM_997",
+      "expected_tariff_scoped_result": "TRUCKLOAD_MINIMUM_APPLICABLE",
+      "truckload_minimum_lb": 24000,
+      "arbitrary_rate_cents_per_cwt": 30,
+      "gaoreported_correct_arbitrary_charge_cents": 7200,
+      "gaoreported_gsa_deduction_invalid_cents": 3330,
+      "subsequent_reimbursement_paid": null,
+      "customer_invoice_truth": false
+    }
+  ],
+  "contrast_guard": "FULL_CAPACITY_ALONE_CANNOT_DETERMINE_TRUCKLOAD_MINIMUM_WITHOUT_TARIFF_APPLICABILITY",
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_FULL_ALWAYS_REQUIRES_TRUCKLOAD",
+      "kind": "SYNTHETIC",
+      "forged_universal_prediction": "TRUCKLOAD_MINIMUM_APPLICABLE",
+      "must_fail_decision_id": "B-143458"
+    },
+    {
+      "id": "SYNTHETIC_FULL_NEVER_REQUIRES_TRUCKLOAD",
+      "kind": "SYNTHETIC",
+      "forged_universal_prediction": "TRUCKLOAD_MINIMUM_NOT_APPLICABLE",
+      "must_fail_decision_id": "B-191258"
+    },
+    {
+      "id": "SYNTHETIC_ORDER_EQUALS_SETTLED_CASH",
+      "kind": "SYNTHETIC",
+      "forged_claim": "ORDER_PROVES_REFUND_OR_REIMBURSEMENT_PAID",
+      "expected": "REJECT_PAID_STATUS_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_TARIFF_EQUALS_MODERN_PRICE",
+      "kind": "SYNTHETIC",
+      "forged_claim": "HISTORICAL_TARIFF_VALID_FOR_CURRENT_CUSTOMER",
+      "expected": "REJECT_MODERN_CONTRACT_APPLICABILITY_UNKNOWN"
+    }
+  ],
+  "truth_boundaries": {
+    "independent_publisher_decision_level_labels": 2,
+    "independently_held_out_real_customer_invoice_labels": 0,
+    "train_test_contamination_exclusion_verified": false,
+    "historical_tariff_pages_held": false,
+    "independent_original_customer_invoice_bytes_held": false,
+    "current_customer_invoice_accuracy_scoring_allowed": false,
+    "modern_tariff_applicability": "UNKNOWN",
+    "reimbursement_or_refund_settlement": "UNKNOWN",
+    "verified_retally_recovered_cash_cents": 0
+  },
+  "quality": {
+    "original_source_response_sha256_status": "UNKNOWN_DIRECT_GET_DNS_UNAVAILABLE",
+    "page_visual_review": "B-191258_PDF_3_OF_3_PAGES",
+    "source_is_official_and_non_synthetic": true,
+    "case_oriented_pair_is_not_a_statistical_error_rate": true,
+    "no_private_customer_medical_or_student_data": true
+  }
+}
