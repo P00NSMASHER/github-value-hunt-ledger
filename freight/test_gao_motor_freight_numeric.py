@@ -1225,7 +1225,7 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         return json.loads(path.read_text(encoding="utf-8"))
 
     def _assert_boundary(self, pack):
-        self.assertEqual(pack["schema_version"], "0.1.1")
+        self.assertEqual(pack["schema_version"], "0.1.2")
         self.assertEqual(pack["fixture_id"],
             "GAO_B199805_1980_LTL_WEIGHT_SCALE_AGGREGATE_BOUNDARY_CANDIDATE_V0")
         self.assertEqual(pack["engines"], ["freightrecovery", "recoveryos"])
@@ -1286,6 +1286,13 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         h = pack["historical_interpretation"]
         self.assertTrue(h["source_definition_LTL_extends_beyond_less_than_500_pounds"])
         self.assertTrue(h["class55_LTL_rate_does_not_force_first_500_pound_scale"])
+        # Historical Note 1 restricts this quotation to 5C..20M,
+        # not unrated sub-500-lb loads or modern LTL pricing.
+        self.assertEqual(h["quotation_item_3860_source_minimum_weight_pounds"], 500)
+        self.assertEqual(h["quotation_item_3860_source_first_eligible_scale"], "5C")
+        self.assertEqual(h["quotation_item_3860_source_last_eligible_scale"], "20M")
+        self.assertFalse(h["quotation_item_3860_under_500_unrated_shipment_eligible"])
+        self.assertFalse(h["source_boundary_is_general_modern_ltl_pricing_rule"])
         self.assertEqual(h["current_2026_rate_applicability"], "UNKNOWN")
         self.assertEqual(h["original_tariff_effective_date"], "UNKNOWN")
         self.assertFalse(h["historical_government_deduction_is_private_customer_refund"])
@@ -1299,7 +1306,9 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
         self.assertFalse(q["tariff_full_rate_table_verified_from_original_bytes"])
         self.assertFalse(q["raw_publisher_response_integrity_verified"])
         controls = pack["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 11)
+        self.assertEqual(len(controls), 12)
+        self.assertIn("SYNTHETIC_UNRATED_499_LB_AS_ITEM_3860_ELIGIBLE",
+                      {c["id"] for c in controls})
         self.assertEqual(len({x["id"] for x in controls}), 11)
         self.assertTrue(all(x["kind"] == "SYNTHETIC" and
             x["id"].startswith("SYNTHETIC_") and
@@ -1326,6 +1335,9 @@ class GAOB199805TariffScaleBoundaryTests(unittest.TestCase):
             ("historical_cohorts", "unique_independent_invoice_truth_count", 124),
             ("historical_cohorts", "carrier_claimed_additional_deductions_cents", 329642),
             ("publisher_reported_sample", "chosen_weight_scale_minimum_pounds", 500),
+            ("historical_interpretation", "quotation_item_3860_source_minimum_weight_pounds", 499),
+            ("historical_interpretation", "quotation_item_3860_under_500_unrated_shipment_eligible", True),
+            ("historical_interpretation", "source_boundary_is_general_modern_ltl_pricing_rule", True),
             ("publisher_reported_sample", "GSA_applicable_cents", 36035),
             ("publisher_reported_sample", "GSA_overcharge_deduction_cents", 329642),
             ("government_setoff_boundary", "GSA_caused_deduction_according_to_decision", False),
