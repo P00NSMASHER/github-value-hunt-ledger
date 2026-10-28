@@ -2239,3 +2239,66 @@ def load_tests(loader, tests, pattern):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
+    """First-party NYC use policy does not create permit/customer truth or bypass source terms."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_held(self, p):
+        src = p["source"]
+        policy = src["citywide_open_data_policy"]
+        self.assertEqual(p["schema_version"], "0.1.1")
+        self.assertEqual(p["engine"], "permitplate")
+        self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
+        self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
+        self.assertFalse(src["original_publisher_response_acquired"])
+        self.assertIsNone(src["publisher_original_http_bytes_sha256"])
+        self.assertEqual(policy["official_faq_url"],
+                         "https://www.nyc.gov/opendata/get-started/FAQs")
+        self.assertEqual(policy["official_technical_standards_url"],
+                         "https://cityofnewyork.github.io/opendatatsm/publicpolicies.html")
+        self.assertTrue(policy["citywide_general_open_data_use_unrestricted"])
+        self.assertTrue(policy["source_and_version_disclosure_can_be_required_for_republication"])
+        self.assertTrue(policy["additional_dataset_provider_terms_can_apply"])
+        self.assertTrue(policy["publisher_does_not_warrant_completeness_or_accuracy"])
+        self.assertTrue(policy["older_portal_dataset_versions_not_retained"])
+        self.assertFalse(policy["dataset_specific_extra_terms_and_sensitive_field_review_completed"])
+        self.assertFalse(policy["citywide_policy_is_customer_data_or_permit_validity_authorization"])
+        self.assertFalse(policy["dataset_specific_commercial_scoring_approved"])
+        self.assertIsNone(policy["source_original_response_sha256"])
+        self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
+        self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
+        controls=p["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 7)
+        self.assertTrue(all(row["kind"] == "SYNTHETIC" for row in controls))
+        self.assertEqual(controls[-1]["id"],
+                         "SYNTH_CITYWIDE_OPEN_DATA_USE_EQUALS_AUTOMATIC_PERMIT_SCORING")
+
+    def test_citywide_permission_but_dataset_specific_and_scoring_holds(self):
+        self._assert_held(self._pack())
+
+    def test_forged_rights_and_labels_are_rejected(self):
+        pack = self._pack()
+        mutants = [
+            ("unrestricted", lambda q: q["source"]["citywide_open_data_policy"].update(
+                citywide_general_open_data_use_unrestricted=False)),
+            ("extra_terms", lambda q: q["source"]["citywide_open_data_policy"].update(
+                additional_dataset_provider_terms_can_apply=False)),
+            ("commercial", lambda q: q["source"].update(
+                dataset_specific_commercial_reuse_authorized=True)),
+            ("real_labels", lambda q: q["observed"].update(held_out_labeled_permits=1)),
+            ("synthetic_tag", lambda q: q["synthetic_negative_controls"][-1].update(
+                kind="REAL")),
+        ]
+        for name, mutate in mutants:
+            with self.subTest(name=name):
+                forged=json.loads(json.dumps(pack))
+                mutate(forged)
+                with self.assertRaises(AssertionError):
+                    self._assert_held(forged)
