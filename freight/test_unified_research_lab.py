@@ -2253,7 +2253,7 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     def _assert_held(self, p):
         src = p["source"]
         policy = src["citywide_open_data_policy"]
-        self.assertEqual(p["schema_version"], "0.1.1")
+        self.assertEqual(p["schema_version"], "0.1.2")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
         self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
@@ -2302,3 +2302,96 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
                 mutate(forged)
                 with self.assertRaises(AssertionError):
                     self._assert_held(forged)
+
+
+class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
+    """Original public permit fields are not independent current-validity labels."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_boundary(self, p):
+        self.assertEqual(p["schema_version"], "0.1.2")
+        self.assertEqual(p["engine"], "permitplate")
+        self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
+        self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
+        o = p["public_api_status_vs_expiration_observation"]
+        self.assertEqual(o["source_url"],
+                         "https://data.cityofnewyork.us/resource/rbx6-tga4.json")
+        self.assertEqual(o["observed_date_et"], "2026-10-27")
+        self.assertFalse(o["publisher_original_http_response_bytes_custodied"])
+        self.assertIsNone(o["publisher_http_response_sha256"])
+        self.assertFalse(o["upstream_snapshot_reproducible"])
+        self.assertFalse(o["source_row_identity_stability_independently_verified"])
+        self.assertTrue(o["source_excerpts_are_not_independent_permit_truth"])
+        self.assertEqual(o["independently_held_out_labeled_permits_added"], 0)
+        self.assertEqual(o["real_customer_outcome_labels_added"], 0)
+        self.assertFalse(o["source_specific_commercial_scoring_authorized"])
+        self.assertEqual(o["production_admission"],
+                         "HOLD_SOURCE_METADATA_ONLY_NO_CUSTOMER_LEAD_OR_PERMIT_SCORING")
+        rows = o["original_public_api_field_excerpts"]
+        self.assertEqual(len(rows), 2)
+        expired, unissued = rows
+        self.assertEqual(expired["source_tracking_number"], "969875523")
+        self.assertEqual(expired["source_reported_permit_status"], "Permit Issued")
+        self.assertLess(expired["source_reported_expired_date"][:10],
+                        o["observed_date_et"])
+        self.assertIsNone(expired["independent_current_validity_label"])
+        self.assertEqual(expired["expected_evaluation_boundary"],
+                         "REJECT_PERMIT_ISSUED_STATUS_ALONE_AS_ACTIVE_ASOF_2026_10_27")
+        self.assertEqual(unissued["source_tracking_number"], "593832799")
+        self.assertEqual(unissued["source_reported_permit_status"], "Signed-off")
+        self.assertEqual(unissued["source_reported_work_permit"],
+                         "Permit is not yet issued")
+        self.assertIsNone(unissued["source_reported_issued_date"])
+        self.assertIsNone(unissued["independent_issued_permit_label"])
+        self.assertEqual(unissued["expected_evaluation_boundary"],
+                         "REJECT_SIGNED_OFF_STATUS_AS_PROOF_OF_AN_ISSUED_WORK_PERMIT")
+        for row in rows:
+            self.assertFalse(row["source_excerpt_is_independently_held_out_label"])
+            for private in ("owner_name", "applicant_first_name",
+                            "applicant_last_name", "house_no",
+                            "street_name", "applicant_business_address"):
+                self.assertNotIn(private, row)
+        controls = o["retained_synthetic_negative_controls"]
+        self.assertEqual(len(controls), 2)
+        self.assertEqual(
+            [c["id"] for c in controls],
+            ["SYNTH_PUBLIC_STATUS_ISSUED_OVERRIDES_2025_EXPIRATION",
+             "SYNTH_PUBLIC_SIGNED_OFF_BUT_NOT_ISSUED_IS_ISSUED"],
+        )
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+
+    def test_official_row_status_and_expiration_are_not_current_truth(self):
+        self._assert_boundary(self._pack())
+
+    def test_forged_issued_validity_rights_and_hash_promotions_rejected(self):
+        initial = self._pack()
+        okey = "public_api_status_vs_expiration_observation"
+        changes = [
+            ("raw_bytes", lambda q: q[okey].update(
+                publisher_original_http_response_bytes_custodied=True)),
+            ("fake_sha", lambda q: q[okey].update(
+                publisher_http_response_sha256="unverified")),
+            ("fake_labels", lambda q: q[okey].update(
+                independently_held_out_labeled_permits_added=2)),
+            ("fake_rights", lambda q: q[okey].update(
+                source_specific_commercial_scoring_authorized=True)),
+            ("future_expiration", lambda q: q[okey][
+                "original_public_api_field_excerpts"][0].update(
+                    source_reported_expired_date="2027-10-05T04:00:00.000")),
+            ("fake_issuance", lambda q: q[okey][
+                "original_public_api_field_excerpts"][1].update(
+                    source_reported_issued_date="2026-10-27T00:00:00.000")),
+            ("synthetic_as_real", lambda q: q[okey][
+                "retained_synthetic_negative_controls"][0].update(kind="REAL")),
+        ]
+        for name, change in changes:
+            with self.subTest(name=name):
+                forged = json.loads(json.dumps(initial))
+                change(forged)
+                with self.assertRaises(AssertionError):
+                    self._assert_boundary(forged)
