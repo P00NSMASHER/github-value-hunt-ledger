@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.3",
+  "schema_version": "0.1.4",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -249,5 +249,73 @@
       "kind": "SYNTHETIC",
       "expected": "REJECT_PROJECTED_REPETITION_CANNOT_ESTABLISH_REAL_WORLD_DUPLICATE_PERMITS"
     }
+  },
+  "official_socrata_catalog_metadata_quality_2026_10_28": {
+    "observation_id": "NYC_DOB_NOW_OFFICIAL_PUBLISHER_CACHED_METADATA_TRUTH_BOUNDARY_2026_10_28_V0",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "official_metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "source_dataset_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "observed_date_et": "2026-10-28",
+    "publisher_rows_updated_at_utc": "2026-10-27T18:42:06Z",
+    "publisher_view_modified_at_utc": "2026-10-27T18:32:00Z",
+    "provenance_kind": "FIRST_PARTY_PUBLIC_DATASET_CATALOG_METADATA_RENDERED_READ_ONLY_NOT_RAW_HTTP_BYTES_OR_CURRENT_ROW_REPLAY",
+    "original_catalog_http_response_bytes_custodied": false,
+    "original_catalog_http_response_sha256": null,
+    "cached_statistics_snapshot_not_independent_row_labels": true,
+    "cached_total_row_count": 1020884,
+    "cached_permit_status_signed_off_count": 652613,
+    "cached_permit_status_permit_issued_count": 368271,
+    "cached_filing_reason_no_work_permit_count": 6765,
+    "cached_work_permit_not_yet_issued_count": 344,
+    "cached_issued_date_null_count": 343,
+    "cached_sequence_number_null_count": 351,
+    "cached_tracking_number_null_count": 1,
+    "cached_top_tracking_number_frequency": 8,
+    "source_scope_excludes": [
+      "ELECTRICAL",
+      "ELEVATOR",
+      "LIMITED_ALTERATION_APPLICATION_LAA"
+    ],
+    "publisher_cached_counts_verified_as_live_row_level_query": false,
+    "source_tracking_number_globally_unique_verified": false,
+    "source_cached_status_proves_current_permit_validity": false,
+    "source_covers_all_nyc_building_permits": false,
+    "independently_held_out_labeled_current_permits": 0,
+    "independently_held_out_labeled_customer_outcomes": 0,
+    "source_specific_commercial_scoring_authorized": false,
+    "customer_proven_lead_count": 0,
+    "original_raw_permit_or_personal_records_stored": 0,
+    "methodological_limit": "CATALOG_CACHED_VALUE_FREQUENCIES_ARE_SOURCE_REPORTED_METADATA_ONLY; REPETITION OR NULLS DO_NOT_ESTABLISH_DUPLICATE_REAL_PERMITS, CURRENT_STATUS, INDEPENDENT_TRUTH OR FRESH_COUNTS",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_CACHED_368271_PERMIT_ISSUED_ALL_CURRENTLY_ACTIVE",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_CACHED_HISTORICAL_STATUS_NOT_INDEPENDENT_CURRENT_VALIDITY"
+      },
+      {
+        "id": "SYNTH_TRACKING_NUMBER_FREQUENCY_EIGHT_PROVES_EIGHT_DUPLICATE_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_VALUE_REPETITION_NOT_STABLE_REAL_PERMIT_IDENTITY"
+      },
+      {
+        "id": "SYNTH_NO_WORK_PERMIT_ROWS_ARE_ISSUED_ACTIVE_LEADS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_NO_WORK_PERMIT_IS_NOT_ISSUED_PERMIT_TRUTH"
+      },
+      {
+        "id": "SYNTH_PUBLISHER_CACHED_METADATA_EQUALS_ORIGINAL_HTTP_CUSTODY",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_RAW_HTTP_BYTES_AND_SHA256_NOT_CUSTODIED"
+      },
+      {
+        "id": "SYNTH_APPROVED_PERMIT_DATASET_EQUALS_ALL_NYC_BUILDING_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_ELECTRICAL_ELEVATOR_AND_LAA_EXCLUSIONS"
+      }
+    ],
+    "consumer_lane": ":48 PermitPlate",
+    "independent_qa_lane": ":44 QA",
+    "production_admission": "HOLD_PUBLISHER_CACHED_CATALOG_METADATA_ONLY"
   }
 }
