@@ -2548,6 +2548,116 @@ class FMCTCWEvergreenDocketCollisionBoundary(unittest.TestCase):
                     self._assert_boundary(forged)
 
 
+
+class GAOB221594AgencyTenderScopeHeldTests(unittest.TestCase):
+    """A rejected DOD tender cannot be assumed invalid for unrelated agencies."""
+
+    @staticmethod
+    def _pack():
+        return json.loads(
+            (Path(__file__).with_name("fixtures") /
+             "gao_b221594_dod_tender_scope_candidate_v0.json").read_text(
+                 encoding="utf-8")
+        )
+
+    def _assert_scope(self, p):
+        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["fixture_id"],
+                         "GAO_B221594_MTMC_REJECTED_TENDER_DOD_SCOPE_NEGATIVE_HELD_V0")
+        self.assertEqual(p["engine"], "freightrecovery")
+        self.assertEqual(p["evaluation_family"],
+                         "HISTORICAL_GAO_FREIGHT_ERROR_FALSE_POSITIVE_SCOPE_ONLY")
+        s = p["source"]
+        h = p["historical_facts"]
+        q = p["ground_truth"]
+        self.assertEqual(s["official_url"],
+                         "https://www.gao.gov/products/b-221594-0")
+        self.assertEqual(s["rights_reference"], "https://www.gao.gov/copyright")
+        self.assertEqual(s["decision_date"], "1986-09-29")
+        self.assertEqual(s["commercial_customer_scoring_admission"], "HOLD")
+        self.assertFalse(s["original_publisher_response_bytes_acquired"])
+        self.assertIsNone(s["original_publisher_response_sha256"])
+        self.assertFalse(s["original_invoice_gbl_tender_bank_bytes_acquired"])
+        self.assertEqual(h["tender_id"], "ICC_TENDER_1544")
+        self.assertEqual(h["tender_stated_effective_date"], "1983-01-15")
+        self.assertEqual(h["mtmc_return_date"], "1983-02-17")
+        self.assertFalse(h["tender_refiled_and_approved_before_dod_shipment"])
+        self.assertEqual(h["illustrative_dod_shipper"], "US_ARMY")
+        self.assertEqual(h["illustrative_service_date"], "1983-09-07")
+        self.assertEqual(h["reported_shipment_weight_lb"], 27792)
+        self.assertEqual(h["reported_paid_cents"], 94200)
+        self.assertEqual(h["gsa_setoff_collected_cents"], 22075)
+        self.assertEqual(h["gao_source_ocr_lower_charge"], "$72L.25")
+        self.assertEqual(h["gsa_implied_lower_charge_cents"], 72125)
+        self.assertEqual(h["reported_paid_cents"] - h["gsa_setoff_collected_cents"],
+                         h["gsa_implied_lower_charge_cents"])
+        self.assertEqual(h["lower_charge_provenance"],
+                         "ARITHMETIC_94200_MINUS_22075_NOT_EXACT_OCR_EXTRACTION")
+        self.assertEqual(h["gao_dod_audit_disposition"],
+                         "SET_OFF_INVALID_TENDER_REJECTED_BEFORE_DOD_SHIPMENT")
+        self.assertEqual(h["dod_similar_claims_scope"],
+                         "SETTLE_CONSISTENTLY_ABSENT_PROOF_REFILED_AND_MTMC_APPROVED")
+        self.assertEqual(h["gaos_footnote_non_dod_boundary"],
+                         "MTMC_REJECTION_ALONE_DOES_NOT_BLOCK_AGENCIES_OUTSIDE_MTMC_JURISDICTION_UNLESS_THEY_ALSO_REJECTED")
+        self.assertEqual(h["non_dod_tender_validity"],
+                         "UNKNOWN_AGENCY_SPECIFIC_REJECTION_AND_ACCEPTANCE_REQUIRED")
+        self.assertIsNone(h["actual_carrier_refund_or_repayment_confirmed"])
+        self.assertEqual(q["original_publisher_adjudicated_historical_case_count"], 1)
+        self.assertEqual(q["independently_heldout_original_invoice_labels"], 0)
+        self.assertFalse(q["original_buyer_specific_rate_chain_complete"])
+        self.assertEqual(q["modern_customer_contract_applicability"], "UNKNOWN")
+        self.assertFalse(q["automatic_current_customer_error_scoring_allowed"])
+        self.assertFalse(q["commercial_reuse_authorized"])
+        self.assertEqual(q["verified_retally_customer_recovery_cents"], 0)
+        controls = p["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({x["id"] for x in controls}), 5)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" for x in controls))
+        self.assertEqual(
+            [x["expected"] for x in controls],
+            ["REJECT_NON_DOD_SCOPE_MUST_BE_EVALUATED_SEPARATELY",
+             "UNKNOWN_OTHER_AGENCY_REJECTION_OR_ACCEPTANCE_NOT_ESTABLISHED",
+             "REJECT_GSA_HISTORY_NOT_CUSTOMER_BANK_CREDIT",
+             "REJECT_72125_DERIVED_FROM_DIFFERENCE_ONLY",
+             "REJECT_NO_ORIGINAL_DOCUMENT_CUSTODY"]
+        )
+
+    def test_dod_rejection_is_not_blanket_non_dod_invalidity(self):
+        self._assert_scope(self._pack())
+
+    def test_forged_cross_agency_custody_cash_and_labels_rejected(self):
+        p = self._pack()
+        mutations = (
+            lambda x: x["historical_facts"].update(
+                non_dod_tender_validity="INVALID_FOR_ALL_AGENCIES"),
+            lambda x: x["historical_facts"].update(
+                gaos_footnote_non_dod_boundary="MTMC_REJECTION_APPLIES_EVERYWHERE"),
+            lambda x: x["historical_facts"].update(mtmc_return_date="1983-09-08"),
+            lambda x: x["historical_facts"].update(
+                tender_refiled_and_approved_before_dod_shipment=True),
+            lambda x: x["historical_facts"].update(
+                lower_charge_provenance="PUBLISHER_EXPLICIT"),
+            lambda x: x["historical_facts"].update(gsa_implied_lower_charge_cents=72124),
+            lambda x: x["source"].update(
+                original_publisher_response_sha256="0" * 64),
+            lambda x: x["source"].update(
+                original_invoice_gbl_tender_bank_bytes_acquired=True),
+            lambda x: x["source"].update(
+                commercial_customer_scoring_admission="APPROVED"),
+            lambda x: x["ground_truth"].update(
+                independently_heldout_original_invoice_labels=1),
+            lambda x: x["ground_truth"].update(
+                verified_retally_customer_recovery_cents=22075),
+            lambda x: x["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        for index, mutation in enumerate(mutations):
+            with self.subTest(forgery=index):
+                forged = json.loads(json.dumps(p))
+                mutation(forged)
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(forged)
+
+
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
 if __name__ == "__main__":
     unittest.main()
