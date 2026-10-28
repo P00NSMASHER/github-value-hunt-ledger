@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "FMC_MAERSK_PAID_FEDERAL_PENALTY_NOT_CUSTOMER_REFUND_2026_V0",
+  "evaluation_family": "FREIGHT_REGULATORY_SETTLEMENT_CASH_DESTINATION_SOURCE_BOUND_NEGATIVE_CONTROL",
+  "cohort": "US_FMC_PUBLIC_SHIPPING_ACT_CIVIL_PENALTY_2026_NON_CUSTOMER_INVOICE",
+  "source": {
+    "original_official_url": "https://www.fmc.gov/articles/fmc-collects-civil-penalty-payment-of-1900000-from-shipping-line/",
+    "publisher": "Federal Maritime Commission",
+    "publication_date": "2026-05-26",
+    "review_date": "2026-10-27",
+    "source_kind": "ORIGINAL_FIRST_PARTY_AGENCY_PRESS_RELEASE_NOT_PAYMENT_RECEIPT",
+    "source_effective_agreement_date": "UNKNOWN",
+    "rights_reference_url": "https://www.fmc.gov/site-policies/",
+    "rights_and_automated_reuse_status": "NOT_INDEPENDENTLY_VERIFIED_HOLD",
+    "commercial_customer_engine_reuse_approved": false,
+    "original_publisher_response_bytes_custodied": false,
+    "original_publisher_response_sha256": null,
+    "independent_settlement_agreement_bytes_custodied": false,
+    "original_private_invoices_or_payment_receipts_custodied": false,
+    "provenance_scope": "FMC_PUBLIC_PUBLISHER_ASSERTION_ONLY_NOT_INDEPENDENT_BANK_REPLAY"
+  },
+  "publisher_reported_facts": {
+    "named_carrier": "Maersk A/S",
+    "civil_penalty_payment_received_by_government_cents": 190000000,
+    "civil_penalty_cash_destination": "UNITED_STATES_GENERAL_FUND",
+    "fmc_received_penalty_payment_cents": 0,
+    "civil_penalty_violations_admitted": false,
+    "allegations_resolved_through_compromise": true,
+    "allegation_kind": "DETENTION_CHARGES_TO_THIRD_PARTIES_WITHOUT_CONSENT_TO_CARRIER_CONTRACT_TARIFF_OR_BILL_OF_LADING",
+    "carrier_agreed_to_refunds_and_waivers_for_affected_third_parties": true,
+    "published_total_customer_refunds_paid_cents": null,
+    "published_total_customer_waivers_performed_cents": null,
+    "independent_customer_refund_bank_receipts_held": false,
+    "adjudicated_individual_freight_invoice_error_cents": null,
+    "adjudicated_customer_shipment_count": null
+  },
+  "ground_truth_limits": {
+    "publisher_level_federal_penalty_payment_reported": true,
+    "independent_government_treasury_receipt_replayed": false,
+    "independently_held_out_private_invoice_labels": 0,
+    "independent_freight_error_accuracy_scoring_permitted": false,
+    "general_ap_reconciliation_scoring_permitted": false,
+    "customer_refund_implementation": "UNKNOWN",
+    "verified_retally_customer_recovery_cents": 0,
+    "retally_customer_revenue_attributable_to_federal_penalty_cents": 0,
+    "commercial_scoring_admission": "HOLD_PENDING_RIGHTS_ORIGINAL_DOCUMENTS_INDEPENDENT_QA"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_TREASURY_PENALTY_AS_RETALLY_REVENUE",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "FMC_COLLECTED_1900000_MEANS_RETALLY_RECOVERED_1900000",
+      "expected": "REJECT_PENALTY_PAID_TO_US_GENERAL_FUND_NOT_RETALLY"
+    },
+    {
+      "id": "SYNTHETIC_PROMISED_THIRD_PARTY_REFUND_AS_PAID",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "AGREED_TO_REFUNDS_MEANS_ALL_REFUNDS_ALREADY_PAID",
+      "expected": "UNKNOWN_REFUND_EXECUTION_NOT_DOCUMENTED"
+    },
+    {
+      "id": "SYNTHETIC_PENALTY_AS_INVOICE_ERROR",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "SETTLEMENT_PENALTY_AMOUNT_PROVES_INDIVIDUAL_OVERCHARGES",
+      "expected": "REJECT_NO_ORIGINAL_INVOICE_LEVEL_ERROR_TRUTH"
+    },
+    {
+      "id": "SYNTHETIC_COMPROMISE_AS_ADMISSION",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "CIVIL_PENALTY_PAYMENT_IS_AN_ADMISSION_OF_SHIPPING_ACT_VIOLATION",
+      "expected": "REJECT_FMC_SAYS_NO_ADMISSION"
+    },
+    {
+      "id": "SYNTHETIC_PRESS_RELEASE_AS_SOURCE_RECEIPT",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "READING_PUBLISHER_HTML_PROVES_BANK_RECEIPT_AND_ORIGINAL_WEB_BYTES_HASH",
+      "expected": "REJECT_ORIGINAL_RECEIPT_AND_SOURCE_BYTE_HASH_NOT_CUSTODIED"
+    }
+  ],
+  "quality": {
+    "publisher_rendered_release_text_rechecked": true,
+    "publisher_publication_day_verifiable": true,
+    "source_response_bytes_sha256_known": false,
+    "payment_truth_at_publisher_assertion_level": true,
+    "original_document_or_independent_payment_truth_replayable": false,
+    "independent_private_customer_freight_error_labels": 0,
+    "synthetic_controls_explicitly_tagged": true,
+    "private_medical_student_customer_material_used": false
+  },
+  "admission_state": "RESEARCH_ONLY_HELD_NOT_ENGINE_SCORING_OR_CUSTOMER_CASH"
+}
