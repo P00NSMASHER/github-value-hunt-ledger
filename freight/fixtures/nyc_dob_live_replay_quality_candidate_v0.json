@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.1",
+  "schema_version": "0.1.2",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -152,5 +152,63 @@
     "independent_held_out_validity_labels": 0,
     "safe_owner_handoff": "PermitPlate :48 may replace fields in existing bounded official readback after review; retain same provider budget and redacted receipts; :44 independently verifies.",
     "truth_boundary": "Different :id values could separate two Socrata rows at one readback, but neither :id nor :updated_at independently proves two distinct real-world permits, current permit validity, customer lead outcome, or rights."
+  },
+  "public_api_status_vs_expiration_observation": {
+    "observation_id": "NYC_DOB_NOW_PUBLIC_API_STATUS_EXPIRY_ASOF_2026_10_27_V0",
+    "source_url": "https://data.cityofnewyork.us/resource/rbx6-tga4.json",
+    "dataset_catalog_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "first_party_publisher": "NYC Department of Buildings via NYC Open Data / Socrata",
+    "observed_date_et": "2026-10-27",
+    "cohort": "BOUNDED_UNFILTERED_PUBLIC_SODA_API_FIRST_PAGE_EXCERPT_NOT_STABLE_SORT",
+    "provenance_method": "FIRST_PARTY_PUBLIC_JSON_RENDERED_THROUGH_READ_ONLY_WEB_TOOL; TWO_REDACTED_FIELD_EXCERPTS; NO_RAW_HTTP_RESPONSE_BYTES_OR_STABLE_PAGE_SNAPSHOT",
+    "publisher_original_http_response_bytes_custodied": false,
+    "publisher_http_response_sha256": null,
+    "upstream_snapshot_reproducible": false,
+    "source_row_identity_stability_independently_verified": false,
+    "privacy_minimization": "STORE_ONLY_PUBLIC_PERMIT_TRACKING_NUMBER_STATUS_AND_DATES; OMIT_OWNER_APPLICANT_CONTACT_ADDRESS_AND_JOB_DESCRIPTION",
+    "original_public_api_field_excerpts": [
+      {
+        "source_tracking_number": "969875523",
+        "source_reported_permit_status": "Permit Issued",
+        "source_reported_issued_date": "2025-01-08T00:00:00.000",
+        "source_reported_expired_date": "2025-10-05T04:00:00.000",
+        "independently_verified_current_permit_validity": "UNKNOWN",
+        "independent_current_validity_label": null,
+        "expected_evaluation_boundary": "REJECT_PERMIT_ISSUED_STATUS_ALONE_AS_ACTIVE_ASOF_2026_10_27",
+        "source_excerpt_is_independently_held_out_label": false
+      },
+      {
+        "source_tracking_number": "593832799",
+        "source_reported_permit_status": "Signed-off",
+        "source_reported_work_permit": "Permit is not yet issued",
+        "source_reported_issued_date": null,
+        "source_reported_expired_date": null,
+        "independently_verified_issued_permit_truth": "UNKNOWN",
+        "independent_issued_permit_label": null,
+        "expected_evaluation_boundary": "REJECT_SIGNED_OFF_STATUS_AS_PROOF_OF_AN_ISSUED_WORK_PERMIT",
+        "source_excerpt_is_independently_held_out_label": false
+      }
+    ],
+    "source_excerpts_are_not_independent_permit_truth": true,
+    "independently_held_out_labeled_permits_added": 0,
+    "real_customer_outcome_labels_added": 0,
+    "source_specific_commercial_scoring_authorized": false,
+    "retained_synthetic_negative_controls": [
+      {
+        "id": "SYNTH_PUBLIC_STATUS_ISSUED_OVERRIDES_2025_EXPIRATION",
+        "kind": "SYNTHETIC",
+        "proposed": "MARK_CURRENTLY_ACTIVE_WHEN_STATUS_IS_PERMIT_ISSUED_BUT_REPORTED_EXPIRED_DATE_IS_IN_2025",
+        "expected": "REJECT_CURRENT_VALIDITY_NOT_INDEPENDENTLY_VERIFIED"
+      },
+      {
+        "id": "SYNTH_PUBLIC_SIGNED_OFF_BUT_NOT_ISSUED_IS_ISSUED",
+        "kind": "SYNTHETIC",
+        "proposed": "TREAT_SIGNED_OFF_AS_ISSUED_DESPITE_WORK_PERMIT_NOT_YET_ISSUED_AND_NO_ISSUE_DATE",
+        "expected": "REJECT_STATUS_ALONE_NOT_ISSUANCE_GROUND_TRUTH"
+      }
+    ],
+    "consumer_lane": ":48 PermitPlate Engineering",
+    "independent_qa_lane": ":44 QA",
+    "production_admission": "HOLD_SOURCE_METADATA_ONLY_NO_CUSTOMER_LEAD_OR_PERMIT_SCORING"
   }
 }
