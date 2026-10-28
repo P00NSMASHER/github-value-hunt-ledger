@@ -2250,7 +2250,7 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     def _assert_held(self, p):
         src = p["source"]
         policy = src["citywide_open_data_policy"]
-        self.assertEqual(p["schema_version"], "0.1.3")
+        self.assertEqual(p["schema_version"], "0.1.4")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
         self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
@@ -2311,7 +2311,7 @@ class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.3")
+        self.assertEqual(p["schema_version"], "0.1.4")
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
         self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
@@ -2405,7 +2405,7 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.3")
+        self.assertEqual(p["schema_version"], "0.1.4")
         v = p["operational_writer_2026_10_28_readback_followup"]
         self.assertEqual(v["source_dataset_id"], "rbx6-tga4")
         self.assertEqual(v["observed_as_of_utc_date"], "2026-10-28")
@@ -2453,6 +2453,88 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                 mutation(forged["operational_writer_2026_10_28_readback_followup"])
                 with self.assertRaises(AssertionError):
                     self._assert_boundary(forged)
+
+
+class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
+    """First-party cached counts must not become real permit IDs, labels or current leads."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_metadata_held(self, p):
+        self.assertEqual(p["schema_version"], "0.1.4")
+        q = p["official_socrata_catalog_metadata_quality_2026_10_28"]
+        self.assertEqual(q["dataset_id"], "rbx6-tga4")
+        self.assertEqual(q["official_metadata_url"],
+                         "https://data.cityofnewyork.us/api/views/rbx6-tga4")
+        self.assertEqual(q["publisher_rows_updated_at_utc"], "2026-10-27T18:42:06Z")
+        self.assertEqual(q["cached_total_row_count"], 1020884)
+        self.assertEqual(q["cached_permit_status_signed_off_count"], 652613)
+        self.assertEqual(q["cached_permit_status_permit_issued_count"], 368271)
+        self.assertEqual(
+            q["cached_permit_status_signed_off_count"] +
+            q["cached_permit_status_permit_issued_count"],
+            q["cached_total_row_count"])
+        self.assertEqual(q["cached_filing_reason_no_work_permit_count"], 6765)
+        self.assertEqual(q["cached_work_permit_not_yet_issued_count"], 344)
+        self.assertEqual(q["cached_issued_date_null_count"], 343)
+        self.assertEqual(q["cached_sequence_number_null_count"], 351)
+        self.assertEqual(q["cached_tracking_number_null_count"], 1)
+        self.assertEqual(q["cached_top_tracking_number_frequency"], 8)
+        self.assertEqual(q["source_scope_excludes"],
+                         ["ELECTRICAL", "ELEVATOR", "LIMITED_ALTERATION_APPLICATION_LAA"])
+        self.assertTrue(q["cached_statistics_snapshot_not_independent_row_labels"])
+        for key in (
+            "original_catalog_http_response_bytes_custodied",
+            "publisher_cached_counts_verified_as_live_row_level_query",
+            "source_tracking_number_globally_unique_verified",
+            "source_cached_status_proves_current_permit_validity",
+            "source_covers_all_nyc_building_permits",
+            "source_specific_commercial_scoring_authorized",
+        ):
+            self.assertFalse(q[key], key)
+        self.assertIsNone(q["original_catalog_http_response_sha256"])
+        for key in (
+            "independently_held_out_labeled_current_permits",
+            "independently_held_out_labeled_customer_outcomes",
+            "customer_proven_lead_count", "original_raw_permit_or_personal_records_stored",
+        ):
+            self.assertEqual(q[key], 0, key)
+        controls = q["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+        self.assertEqual(q["production_admission"],
+                         "HOLD_PUBLISHER_CACHED_CATALOG_METADATA_ONLY")
+
+    def test_cached_publisher_status_counts_are_not_independent_permit_truth(self):
+        self._assert_metadata_held(self._pack())
+
+    def test_forged_counts_identity_custody_rights_and_labels_rejected(self):
+        original = self._pack()
+        key = "official_socrata_catalog_metadata_quality_2026_10_28"
+        mutations = (
+            ("active_status", lambda q: q.update(source_cached_status_proves_current_permit_validity=True)),
+            ("tracking_unique", lambda q: q.update(source_tracking_number_globally_unique_verified=True)),
+            ("all_categories", lambda q: q.update(source_covers_all_nyc_building_permits=True)),
+            ("live_counts", lambda q: q.update(publisher_cached_counts_verified_as_live_row_level_query=True)),
+            ("cached_frequency", lambda q: q.update(cached_top_tracking_number_frequency=1)),
+            ("no_work_rows", lambda q: q.update(cached_filing_reason_no_work_permit_count=0)),
+            ("fake_labels", lambda q: q.update(independently_held_out_labeled_current_permits=1)),
+            ("fake_rights", lambda q: q.update(source_specific_commercial_scoring_authorized=True)),
+            ("fake_bytes", lambda q: q.update(original_catalog_http_response_bytes_custodied=True)),
+            ("fake_sha", lambda q: q.update(original_catalog_http_response_sha256="0"*64)),
+            ("synthetic_to_real", lambda q: q["synthetic_negative_controls"][0].update(kind="ORIGINAL")),
+        )
+        for label, mutate in mutations:
+            with self.subTest(forgery=label):
+                poisoned = json.loads(json.dumps(original))
+                mutate(poisoned[key])
+                with self.assertRaises(AssertionError):
+                    self._assert_metadata_held(poisoned)
 
 
 class FMCTCWEvergreenDocketCollisionBoundary(unittest.TestCase):
