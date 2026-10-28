@@ -57,6 +57,9 @@ def evaluate(rows: list[dict], min_reward: Decimal = Decimal('100')) -> dict:
         states = {r.get('github_state') for r in items}
         archived = {r.get('repo_archived') for r in items}
         external_allowed = {r.get('external_contributors_allowed') for r in items}
+        assignment_required = {r.get('assignment_required') for r in items}
+        assigned_to_us = {r.get('assigned_to_us') for r in items}
+        assigned_to_other = {r.get('assigned_to_other') for r in items}
         payouts = {r.get('recent_awards_verified') for r in items}
         claims = [r.get('claim_count') for r in items]
         if 'closed' in states:
@@ -69,6 +72,12 @@ def evaluate(rows: list[dict], min_reward: Decimal = Decimal('100')) -> dict:
             status = 'TOO_SMALL_FOR_FIRST_100'
         elif len(external_allowed) != 1 or external_allowed != {True}:
             status = 'UNVERIFIED_EXTERNAL_ELIGIBILITY'
+        elif True in assigned_to_other:
+            status = 'BLOCKED_ASSIGNED_TO_OTHER'
+        elif assignment_required not in ({True}, {False}):
+            status = 'UNVERIFIED_ASSIGNMENT_POLICY'
+        elif assignment_required == {True} and assigned_to_us != {True}:
+            status = 'UNVERIFIED_REQUIRED_ASSIGNMENT'
         elif any(not isinstance(c, int) or isinstance(c, bool) or c > 3 or c < 0 for c in claims):
             status = 'UNVERIFIED_OR_HIGH_COMPETITION'
         elif payouts != {True}:
