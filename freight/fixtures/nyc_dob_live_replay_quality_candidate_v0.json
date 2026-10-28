@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -12,7 +12,23 @@
     "publisher_original_http_bytes_sha256": null,
     "original_publisher_response_acquired": false,
     "dataset_specific_commercial_reuse_authorized": false,
-    "reuse_rights": "UNVERIFIED_HOLD"
+    "reuse_rights": "UNVERIFIED_HOLD",
+    "citywide_open_data_policy": {
+      "official_faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+      "official_technical_standards_url": "https://cityofnewyork.github.io/opendatatsm/publicpolicies.html",
+      "official_portal_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+      "first_party_policy_review_date": "2026-10-27",
+      "citywide_general_open_data_use_unrestricted": true,
+      "source_and_version_disclosure_can_be_required_for_republication": true,
+      "additional_dataset_provider_terms_can_apply": true,
+      "publisher_does_not_warrant_completeness_or_accuracy": true,
+      "older_portal_dataset_versions_not_retained": true,
+      "dataset_specific_extra_terms_and_sensitive_field_review_completed": false,
+      "citywide_policy_is_customer_data_or_permit_validity_authorization": false,
+      "dataset_specific_commercial_scoring_approved": false,
+      "source_original_response_sha256": null,
+      "interpretation": "CITYWIDE_OPEN_DATA_USE_IS_BROAD_BUT_DOES_NOT_ESTABLISH_DATASET_SPECIFIC_EXTRA_TERMS_PRIVACY_CURRENT_PERMIT_VALIDITY_OR_CUSTOMER_SCORING_RIGHTS"
+    }
   },
   "provenance": {
     "observation_kind": "MACHINE_GENERATED_FIRST_PARTY_QUERY_READBACK_RECEIPT_NOT_RAW_PUBLISHER_ROWS",
@@ -103,6 +119,11 @@
         }
       ],
       "expected": "ONE_API_ROW_REVISION_NOT_TWO_INDEPENDENT_REAL_PERMITS"
+    },
+    {
+      "id": "SYNTH_CITYWIDE_OPEN_DATA_USE_EQUALS_AUTOMATIC_PERMIT_SCORING",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CITYWIDE_REUSE_POLICY_DOES_NOT_ESTABLISH_CUSTOMER_RIGHTS_CURRENT_PERMIT_VALIDITY_OR_DATASET_SPECIFIC_TERMS"
     }
   ],
   "consumers": {
