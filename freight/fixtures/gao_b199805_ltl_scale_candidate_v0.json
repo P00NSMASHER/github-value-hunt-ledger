@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "fixture_id": "GAO_B199805_1980_LTL_WEIGHT_SCALE_AGGREGATE_BOUNDARY_CANDIDATE_V0",
   "engines": [
     "freightrecovery",
@@ -118,6 +118,16 @@
       "id": "SYNTHETIC_GAO_CITATION_AS_COMMERCIAL_LICENSE_AND_HELDOUT_TEST",
       "kind": "SYNTHETIC",
       "expected": "REJECT_RIGHTS_GROUND_TRUTH_AND_HOLDOUT_PROMOTION"
+    },
+    {
+      "id": "SYNTHETIC_GSA_SET_OFF_AS_PRIVATE_CUSTOMER_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GOVERNMENT_OFFSET_IS_NOT_PRIVATE_CUSTOMER_RECOVERY"
+    },
+    {
+      "id": "SYNTHETIC_NOTICE_AS_INDEPENDENT_BANK_SETTLEMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_ORIGINAL_PAYMENT_OR_BANK_RECEIPT"
     }
   ],
   "handoff": {
@@ -129,5 +139,20 @@
     "engine_code_changed": false,
     "CI_exact_head_verified": false,
     "release_approved": false
+  },
+  "government_setoff_boundary": {
+    "publisher_decision_paragraph_anchor": "THE RECORD SHOWS THAT YELLOW FREIGHT COLLECTED",
+    "excerpt_type": "GAO_WEB_RENDERED_VISIBLE_TEXT_NOT_ORIGINAL_PUBLISHER_HTTP_RESPONSE",
+    "verbatim_visible_excerpt": "WHEN THE CARRIER DECLINED TO PAY THE OVERCHARGE, THE GSA CAUSED THE DEDUCTION TO BE MADE.",
+    "visible_excerpt_utf8_sha256_not_http_sha256": "7032507369ed3356b754f0881e4cda6a59c7fc76cf2578410d0d3dbfa56f16e8",
+    "excerpt_reviewed_utc_date": "2026-10-28",
+    "notice_of_overcharge_cents": 1855,
+    "carrier_declined_direct_payment": true,
+    "GSA_caused_deduction_according_to_decision": true,
+    "GSA_setoff_is_private_customer_refund": false,
+    "original_GSA_offset_bank_receipt_custodied": false,
+    "modern_customer_refund_bank_receipt_custodied": false,
+    "independently_reconciled_customer_invoice_cases": 0,
+    "current_customer_refund_legal_eligibility": "UNKNOWN"
   }
 }
