@@ -28,7 +28,7 @@ def _d(v):
 
 
 def inspect(job, *, as_of='2026-10-29', grace_days=30):
-    """Fail closed, with only review/clear results. `gross_variance_usd` is *not collectible*."""
+    """Fail closed, with only review/clear results. gross_variance_usd is not collectible."""
     ident = str(job.get('job_id', 'UNKNOWN'))
 
     def verdict(code, value='0.00'):
@@ -41,11 +41,19 @@ def inspect(job, *, as_of='2026-10-29', grace_days=30):
             return verdict('REVIEW_INVALID_GRACE')
         if work > today:
             return verdict('REVIEW_FUTURE_EVIDENCE')
+        # Optional ERP identifiers must be usable when supplied. Absence is
+        # tolerated only for the legacy synthetic fixtures, not production proof.
+        if 'ticket_id' in job and (not isinstance(job['ticket_id'], str) or not job['ticket_id'].strip()):
+            return verdict('REVIEW_INVALID_TICKET_ID')
         all_invoices = job.get('invoices', [])
         if not isinstance(all_invoices, list):
             return verdict('REVIEW_BAD_INVOICES')
         if any(_day(x['issued_on']) > today for x in all_invoices):
             return verdict('REVIEW_FUTURE_EVIDENCE')
+        # A posted invoice with a later adjustment is not an authoritative net
+        # receivable until that adjustment has been reconciled independently.
+        if any(x.get(k) for x in all_invoices for k in ('credit_memo_id', 'voided_on', 'reversed_on')):
+            return verdict('REVIEW_POST_ISSUE_ADJUSTMENT')
         ids = [x['invoice_line_id'] for x in all_invoices]
         if len(ids) != len(set(ids)):
             return verdict('REVIEW_DUPLICATE_INVOICE_LINE')
@@ -54,6 +62,10 @@ def inspect(job, *, as_of='2026-10-29', grace_days=30):
         card = job.get('rate_card')
         if card and card.get('effective_on') and _day(card['effective_on']) > today:
             return verdict('REVIEW_FUTURE_EVIDENCE')
+        # More than a single rate authority requires version/precedence proof.
+        # Do not pick a conveniently higher old price from overlapping terms.
+        if job.get('rate_history') not in (None, []):
+            return verdict('REVIEW_RATE_HISTORY_UNRESOLVED')
         if job.get('waiver'):
             return verdict('REVIEW_WAIVER')
         if job.get('credit'):
@@ -97,7 +109,35 @@ def inspect(job, *, as_of='2026-10-29', grace_days=30):
 
 
 def summarize(jobs, *, as_of='2026-10-29'):
+    """Cohort summary with cross-job identity-collision guards.
+
+    Duplicate ticket or invoice-line identifiers are not two collectible jobs.
+    A collision suppresses any monetary candidate for all affected rows.
+    """
     results = [inspect(j, as_of=as_of) for j in jobs]
+    seen_tickets, seen_lines, collisions = {}, {}, {}
+
+    def record(index, ident, seen, reason):
+        prior = seen.get(ident)
+        if prior is not None and prior != index:
+            collisions.setdefault(prior, set()).add(reason)
+            collisions.setdefault(index, set()).add(reason)
+        else:
+            seen[ident] = index
+
+    for index, job in enumerate(jobs):
+        ticket = job.get('ticket_id')
+        if isinstance(ticket, str) and ticket.strip():
+            record(index, ticket.strip().casefold(), seen_tickets,
+                   'REVIEW_CROSS_JOB_TICKET_COLLISION')
+        for row in job.get('invoices', []) if isinstance(job.get('invoices', []), list) else []:
+            if isinstance(row, dict) and isinstance(row.get('invoice_line_id'), str) and row['invoice_line_id'].strip():
+                record(index, row['invoice_line_id'].strip().casefold(), seen_lines,
+                       'REVIEW_CROSS_JOB_INVOICE_LINE_COLLISION')
+    for index, reasons in collisions.items():
+        if results[index]['status'].startswith('POTENTIAL_') or results[index]['status'] == 'CLEAR_RECONCILED':
+            results[index] = {**results[index], 'status': sorted(reasons)[0],
+                              'gross_variance_usd': '0.00', 'collectible_usd': None}
     candidate = [x for x in results if x['status'].startswith('POTENTIAL_')]
     return {'total_jobs': len(jobs), 'candidate_discrepancies': len(candidate),
             'review_only': sum(x['status'].startswith('REVIEW_') for x in results),
