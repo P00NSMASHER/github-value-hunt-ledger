@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'freight/real_document_lab.py'
+      - 'freight/original_invoice_blind_benchmark.py'
+      - 'freight/test_original_invoice_blind_benchmark.py'
+      - 'freight/ORIGINAL_INVOICE_BLIND_BENCHMARK.md'
+      - 'freight/requirements-ci.txt'
       - 'freight/public_pennine_integration.py'
       - 'freight/pennine_publication_integrity.py'
       - 'freight/test_real_document_lab.py'
@@ -35,11 +39,12 @@ jobs:
           python-version: '3.11'
       - name: Install isolated original-PDF text extractor
         run: |
-          python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5 pytest==8.4.2
+          python -m pip install --disable-pip-version-check --no-input pymupdf==1.26.5 pytest==8.4.2 cryptography==46.0.4
       - name: Compile and adversarially test lab contracts
         run: |
-          python -m py_compile freight/real_document_lab.py freight/public_pennine_integration.py freight/pennine_publication_integrity.py freight/test_real_document_lab.py
+          python -m py_compile freight/real_document_lab.py freight/public_pennine_integration.py freight/pennine_publication_integrity.py freight/test_real_document_lab.py freight/original_invoice_blind_benchmark.py freight/test_original_invoice_blind_benchmark.py
           python -m unittest -v freight.test_real_document_lab
+          python -m pytest -q freight/test_original_invoice_blind_benchmark.py
           python -m pytest -q freight/test_public_pennine_integration.py freight/test_pennine_republication_integrity.py
       - name: Replay original public invoices and Pennine disclosures
         env:
@@ -51,6 +56,29 @@ jobs:
           # are printed; there is intentionally NO artifact upload or git push.
           umask 077
           python -m freight.real_document_lab --output /tmp/retally-real-document-report.json
+      - name: Bind original freight source census without inventing accuracy
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          umask 077
+          python -m freight.original_invoice_blind_benchmark --baseline --lab-report /tmp/retally-real-document-report.json > /tmp/retally-original-blind-baseline.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          b=json.loads(Path('/tmp/retally-original-blind-baseline.json').read_text())
+          assert b['source_pdfs_pinned'] == 2
+          assert b['original_invoice_faces'] == 110
+          assert b['original_face_arithmetic_verified'] == 100
+          assert b['unresolved_unscored_cases'] == 110
+          assert b['independently_linked_rate_shipment_payment_adjudication_cases'] == 0
+          assert b['precision'] is None and b['recall'] is None
+          assert b['blinded_independent_review_completed'] is False
+          assert b['recovered_cash_cents'] == 0 and b['billable_fees_cents'] == 0
+          assert b['commercial_release_approved'] is False
+          assert len(b['receipt_sha256']) == 64
+          print('PASS: original 110-case census pinned; 0 independent truth labels; metrics null')
+          PY
       - name: Enforce evidence and publication boundary
         run: |
           python - <<'PY'
