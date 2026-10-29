@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.8",
+  "schema_version": "0.1.9",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -509,6 +509,58 @@
         "id": "SYNTH_WRITER_RECEIPT_SHA256_IS_ORIGINAL_PUBLISHER_HTTP_SHA256",
         "kind": "SYNTHETIC",
         "expected": "REJECT_NO_ORIGINAL_PUBLISHER_BYTES_IN_CUSTODY"
+      }
+    ]
+  },
+  "official_socrata_cached_cardinality_counterexample_2026_10_29": {
+    "schema_version": "0.1.0",
+    "source_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "rights_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "dataset_id": "rbx6-tga4",
+    "publisher": "NYC Department of Buildings via Socrata",
+    "cohort": "PUBLISHER_CACHED_CATALOG_METADATA_2026_10_28_NO_RAW_ROWS",
+    "observed_utc_date": "2026-10-29",
+    "source_rows_updated_at_epoch_seconds": 1793213280,
+    "provenance": "FIRST_PARTY_CACHED_COLUMN_AGGREGATES_NOT_RAW_SOURCE_RESPONSE",
+    "publisher_response_bytes_custodied": false,
+    "publisher_response_sha256": null,
+    "permit_status_column": {
+      "non_null": 1021662,
+      "null": 0,
+      "cached_cardinality": 1021662,
+      "cached_top_values": {
+        "Signed-off": 653292,
+        "Permit Issued": 368370
+      },
+      "top_values_exhaust_reported_non_null": true,
+      "distinct_status_categories_supported_by_cached_top": 2
+    },
+    "owner_city_column": {
+      "non_null": 0,
+      "null": 1021662,
+      "cached_cardinality": 1021662
+    },
+    "cached_cardinality_is_distinct_permit_identity_count": false,
+    "cached_cardinality_proves_source_row_uniqueness": false,
+    "current_validity_labels_from_this_probe": 0,
+    "independently_held_out_permit_labels_from_this_probe": 0,
+    "buyer_outcome_labels_from_this_probe": 0,
+    "source_specific_customer_scoring_approval": "UNVERIFIED_HOLD",
+    "real_permit_identity_and_actual_distinct_count": "UNKNOWN",
+    "source_truth_limit": "PUBLISHER_CACHED_CARDINALITY_REPEATS_TOTAL_EVEN_FOR_TWO_STATUS_VALUES_AND_ALL_NULL_OWNER_CITY; CANNOT_TREAT_AS_DISTINCT_ROW_OR_PERMIT_IDENTITY",
+    "production_admission": "HOLD",
+    "owner": ":48 PermitPlate",
+    "independent_qa": ":44",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_CACHED_CARDINALITY_1021662_PROVES_DISTINCT_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_CARDINALITY_NOT_DISTINCT_IDENTITY"
+      },
+      {
+        "id": "SYNTH_ALL_NULL_COLUMN_CARDINALITY_PROVES_SOURCE_UNIQUENESS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_CACHED_METADATA_SEMANTICS_NOT_ROW_TRUTH"
       }
     ]
   }
