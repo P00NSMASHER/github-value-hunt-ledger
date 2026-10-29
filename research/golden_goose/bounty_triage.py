@@ -70,12 +70,14 @@ def evaluate(rows: list[dict], min_reward: Decimal = Decimal('100')) -> dict:
             status = 'UNVERIFIED_STATE'
         elif amount < min_reward:
             status = 'TOO_SMALL_FOR_FIRST_100'
-        elif external_allowed == {False}:
-            status = 'BLOCKED_EXTERNAL_RESTRICTION'
-        elif external_allowed != {True}:
-            status = 'UNVERIFIED_EXTERNAL_ELIGIBILITY'
         elif True in assigned_to_other:
             status = 'BLOCKED_ASSIGNED_TO_OTHER'
+        elif external_allowed == {False}:
+            status = 'BLOCKED_EXTERNAL_RESTRICTION'
+        elif any(isinstance(c, int) and not isinstance(c, bool) and c > 3 for c in claims):
+            status = 'UNVERIFIED_OR_HIGH_COMPETITION'
+        elif external_allowed != {True}:
+            status = 'UNVERIFIED_EXTERNAL_ELIGIBILITY'
         elif assignment_required not in ({True}, {False}):
             status = 'UNVERIFIED_ASSIGNMENT_POLICY'
         elif assignment_required == {True} and assigned_to_us != {True}:
