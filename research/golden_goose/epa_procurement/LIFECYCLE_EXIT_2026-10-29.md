@@ -22,7 +22,7 @@ The dated JSON fixture and offline lifecycle_guard.py pin one manually verified 
 
 Run: cd research/golden_goose/epa_procurement && python -m unittest -v test_lifecycle_guard.py
 
-**Local result: 9 Python test methods passed, with 18 synthetic tampering variants.** These local tests are not independent CI or live content authentication. The remaining existing EPA procurement PR suite was not rerun for this increment.
+**Local result: 9 Python test methods passed, with 20 synthetic tampering variants.** These local tests are not independent CI or live content authentication. The remaining existing EPA procurement PR suite was not rerun for this increment.
 
 ## Next falsifiable experiment
 
