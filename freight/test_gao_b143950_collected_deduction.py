@@ -136,5 +136,109 @@ class GAOB143950CollectedDeductionEvidenceTests(unittest.TestCase):
                 self.assertFalse(safe_contract(forged))
 
 
+    def test_b221615_merger_does_not_override_original_government_tender(self):
+        """New official GAO source, historical deduction only, not customer truth."""
+        d = json.loads((PACK.parent / "gao_b221615_merged_carrier_tender_candidate_v0.json"
+                        ).read_text(encoding="utf-8"))
+        self._assert_b221615_scope(d)
+
+    def _assert_b221615_scope(self, d):
+        s, h, g, q = (d["source"], d["historical_reported"],
+                      d["ground_truth"], d["quality"])
+        self.assertEqual(d["schema_version"], "0.1.0")
+        self.assertEqual(d["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_NOT_ACCOUNTING_OR_EXTRACTION")
+        self.assertEqual(d["cohort"],
+                         "US_GAO_GOVERNMENT_MOTOR_FREIGHT_1982_SHIPMENT_1986_DECISION")
+        self.assertEqual(s["publisher"], "U.S. Government Accountability Office")
+        self.assertEqual(s["official_url"], "https://www.gao.gov/products/b-221615-0")
+        self.assertEqual(s["decision_date"], "1986-06-24")
+        self.assertEqual(s["rights_url"], "https://www.gao.gov/copyright")
+        self.assertIn("NO_ENDORSEMENT", s["rights"])
+        self.assertFalse(s["commercial_customer_invoice_scoring_approved"])
+        self.assertFalse(s["public_decision_http_bytes_custodied"])
+        self.assertIsNone(s["original_decision_http_sha256"])
+        for key in ("carrier_invoice_bytes_custodied", "original_gbl_bytes_custodied",
+                    "original_tender_pages_custodied",
+                    "bank_or_gsa_offsets_original_receipts_custodied",
+                    "original_tender_effective_dates_custodied"):
+            self.assertFalse(s[key])
+        self.assertEqual(s["original_source_byte_provenance"],
+                         "UNKNOWN_NO_RAW_PUBLISHER_RESPONSE")
+        self.assertEqual(h["billed_carrier"], "ABF_FREIGHT_SYSTEMS")
+        self.assertEqual(h["government_contract_carrier"],
+                         "EAST_TEXAS_MOTOR_FREIGHT_SYSTEM")
+        self.assertEqual(h["gbl"], "S4270096")
+        self.assertEqual(h["gbl_date"], "1982-09-09")
+        self.assertEqual(h["merged_into_billing_carrier_date"], "1982-09-12")
+        self.assertEqual(h["delivered_by_billing_carrier_date"], "1982-09-17")
+        self.assertEqual(h["shipment_piece_count"], 3)
+        self.assertEqual(h["tender"], "ETMF_ICC_691")
+        self.assertTrue(h["tender_in_effect_when_gbl_issued"])
+        self.assertTrue(h["billed_and_collected_by_abf"])
+        self.assertIsNone(h["original_carrier_bill_total_cents"])
+        self.assertEqual(h["gsa_reported_deduction_cents"], 15604)
+        self.assertTrue(h["gsa_reported_offset_from_other_abf_monies"])
+        self.assertFalse(h["abf_tender_adoption_proven_by_gao"])
+        self.assertTrue(h["gao_sustained_gsa_deduction"])
+        self.assertEqual(h["carrier_reclaim_result"], "DISALLOWED")
+        self.assertTrue(h["ruling_depends_on_contract_carrier_and_tender_effective_on_shipment_date"])
+        self.assertEqual(h["modern_rate_applicability"], "UNKNOWN")
+        self.assertEqual(g["historical_collection_label"],
+                         "GAO_REPORTS_15604_CENTS_DEDUCTED_FROM_OTHER_CARRIER_MONIES")
+        self.assertEqual(g["official_historical_adjudication_label"],
+                         "GAO_SUSTAINED_GSA_TENDER_BASED_OVERCHARGE_DEDUCTION")
+        self.assertFalse(g["independent_original_invoice_tender_bank_reconciliation_complete"])
+        self.assertEqual(g["independently_held_out_from_models"], "UNKNOWN")
+        self.assertEqual(g["independently_labeled_modern_customer_cases"], 0)
+        self.assertIsNone(g["customer_ground_truth_amount_cents"])
+        self.assertEqual(g["verified_retally_customer_recovered_cents"], 0)
+        self.assertEqual(g["actual_gsa_bank_settlement_proof"], "UNKNOWN")
+        self.assertEqual(g["original_invoice_bill_total_cents"], "UNKNOWN")
+        self.assertFalse(g["production_accuracy_scoring_admitted"])
+        self.assertFalse(g["independent_qa_complete"])
+        self.assertFalse(q["original_carrier_total_reported"])
+        self.assertFalse(q["original_transaction_ground_truth_complete"])
+        controls = d["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 6)
+        self.assertEqual(len({c["id"] for c in controls}), 6)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and
+                            c["id"].startswith("SYNTHETIC_") and
+                            c["expected"].startswith("REJECT_") for c in controls))
+
+    def test_b221615_forged_original_cash_rights_and_rate_labels_rejected(self):
+        original = json.loads((PACK.parent /
+                         "gao_b221615_merged_carrier_tender_candidate_v0.json"
+                         ).read_text(encoding="utf-8"))
+        mutations = (
+            ("source", "public_decision_http_bytes_custodied", True),
+            ("source", "original_decision_http_sha256", "f" * 64),
+            ("source", "carrier_invoice_bytes_custodied", True),
+            ("source", "original_gbl_bytes_custodied", True),
+            ("source", "original_tender_pages_custodied", True),
+            ("source", "bank_or_gsa_offsets_original_receipts_custodied", True),
+            ("source", "commercial_customer_invoice_scoring_approved", True),
+            ("historical_reported", "gsa_reported_deduction_cents", 15605),
+            ("historical_reported", "abf_tender_adoption_proven_by_gao", True),
+            ("historical_reported", "gsa_reported_offset_from_other_abf_monies", False),
+            ("historical_reported", "original_carrier_bill_total_cents", 15604),
+            ("historical_reported", "tender", "SYNTHETIC_ABF_2026_TENDER"),
+            ("historical_reported", "carrier_reclaim_result", "ALLOWED"),
+            ("historical_reported", "modern_rate_applicability", "CURRENT"),
+            ("ground_truth", "independently_held_out_from_models", "YES"),
+            ("ground_truth", "verified_retally_customer_recovered_cents", 15604),
+            ("ground_truth", "production_accuracy_scoring_admitted", True),
+            ("ground_truth", "independent_qa_complete", True),
+        )
+        self._assert_b221615_scope(original)
+        for section, key, bogus in mutations:
+            with self.subTest(section=section, key=key):
+                forged = copy.deepcopy(original)
+                forged[section][key] = bogus
+                with self.assertRaises(AssertionError):
+                    self._assert_b221615_scope(forged)
+
+
+
 if __name__ == "__main__":
     unittest.main()
