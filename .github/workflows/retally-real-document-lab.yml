@@ -79,6 +79,32 @@ jobs:
           assert len(b['receipt_sha256']) == 64
           print('PASS: original 110-case census pinned; 0 independent truth labels; metrics null')
           PY
+      - name: Privately replay all 110 original source cases in ephemeral memory
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import secrets
+          from collections import Counter
+          from freight.original_invoice_blind_benchmark import (
+              SCOPE, collect_private_population, verify_population,
+          )
+          key = secrets.token_bytes(32)
+          census = collect_private_population(key)
+          verify_population(census, key)
+          assert census['scope'] == SCOPE
+          assert census['original_byte_checks_executed'] is True
+          assert len(census['casebook']) == 110
+          assert Counter(x['issuer'] for x in census['casebook']) == {
+              'globaltranz': 100, 'arcbest': 10,
+          }
+          assert len({x['case_id'] for x in census['casebook']}) == 110
+          assert census['population_hmac_sha256']
+          # No private case identities, original invoices, or HMAC key persist
+          # in files, logs, Actions artifacts, or repository history.
+          print('PASS: 110 original invoice faces privately bound in-memory; 0 truth labels')
+          PY
       - name: Enforce evidence and publication boundary
         run: |
           python - <<'PY'
