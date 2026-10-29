@@ -7,10 +7,16 @@ function verifyPublicBidRates(data) {
     return n;
   }
   if(data.minimum_call_hours!==4||data.bidder_prices.length!==4||data.rate_categories.length!==5) throw Error('Wrong cohort');
+  const expectedNames=['Phoenix Communications, Inc.','R.H. White Construction Co., Inc.','New England Vacuum Excavation','Champion Environmental Services'];
+  const expectedTiers=['urgent_weekday_day','urgent_weekday_evening','urgent_weekday_overnight','urgent_weekend_holiday','standard_weekday_day'];
+  if(data.source?.official_page!=='https://www.worcesterma.gov/finance/purchasing-bids/bids/cr-8693-j6'||
+     data.source?.pdf!=='https://www.worcesterma.gov/sites/default/files/bids/CR-8693-J6%20-%20Bid%20Results%20%28Unit%20Pricing%20Pages%29.pdf'||
+     data.source?.bid!=='CR-8693-J6')throw Error('Unverified primary source identity');
+  for(let i=0;i<5;i++)if(data.rate_categories[i].id!==expectedTiers[i])throw Error('Pricing tier identity changed');
   const totals=[37530000,37549600,45210000,285049200], qty=[100,40,24,24,1000];
   const names=new Set();let lineChecks=0,bidChecks=0;
   for(const [i,b] of data.bidder_prices.entries()){
-    if(names.has(b.name)||b.pdf_page!==i+1||b.listed_awardee!==(i<2)||b.unit_hourly_usd.length!==5)throw Error('Bidders/awardees/pages mismatch');
+    if(b.name!==expectedNames[i]||names.has(b.name)||b.pdf_page!==i+1||b.listed_awardee!==(i<2)||b.unit_hourly_usd.length!==5)throw Error('Bidders/awardees/pages mismatch');
     names.add(b.name);let computed=0;
     for(let j=0;j<5;j++){
       if(data.rate_categories[j].annual_estimated_hours!==qty[j])throw Error('Incorrect quantities');
