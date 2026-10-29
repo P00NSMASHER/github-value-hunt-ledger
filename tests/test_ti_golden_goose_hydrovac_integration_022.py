@@ -63,5 +63,20 @@ class TestSyntheticGoldenGooseHydrovac(unittest.TestCase):
         self.assertEqual(result["incumbent_vendor_comparison"], "NOT_RUN")
 
 
+    def test_duplicate_id_review_amplification_is_not_collectible(self):
+        result = self.run_js("test_blast_radius_023.js")
+        self.assertEqual(result["cases"], 100)
+        self.assertEqual(result["unaffected_arithmetic_before"], 100)
+        self.assertEqual(result["duplicate_invoice_id_pairs"], 1)
+        self.assertEqual(result["directly_touched_jobs"], 2)
+        self.assertEqual(result["cohort_review_after"], 100)
+        self.assertEqual(result["other_jobs_conservatively_held"], 98)
+        self.assertEqual(result["review_amplification_ratio"], 50)
+        self.assertEqual(result["hypothetical_other_job_review_cost_usd"], 285.83)
+        self.assertEqual(result["real_customer_invoices"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+
+
 if __name__ == "__main__":
     unittest.main()
