@@ -92,6 +92,14 @@ class BountyTriageTests(unittest.TestCase):
         self.assertTrue(all(r['status'] == 'BLOCKED_ASSIGNED_TO_OTHER'
                             for r in report['issues']))
 
+    def test_known_assignment_overrides_unknown_external_permission(self):
+        result = evaluate([row(external_contributors_allowed=None, assigned_to_other=True)])
+        self.assertEqual(result['issues'][0]['status'], 'BLOCKED_ASSIGNED_TO_OTHER')
+
+    def test_known_competition_overrides_unknown_external_permission(self):
+        result = evaluate([row(external_contributors_allowed=None, claim_count=4)])
+        self.assertEqual(result['issues'][0]['status'], 'UNVERIFIED_OR_HIGH_COMPETITION')
+
     def test_assigned_elsewhere_blocks_even_if_external_contributors_allowed(self):
         result = evaluate([row(assignment_required=True, assigned_to_other=True)])
         self.assertEqual(result['issues'][0]['status'], 'BLOCKED_ASSIGNED_TO_OTHER')
