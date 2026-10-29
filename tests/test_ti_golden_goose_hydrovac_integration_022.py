@@ -93,5 +93,22 @@ class TestSyntheticGoldenGooseHydrovac(unittest.TestCase):
         self.assertFalse(result["commercially_validated"])
 
 
+    def test_unverified_invoice_document_scope_is_diagnostic_only(self):
+        result = self.run_js("test_invoice_scope_holdout_025.js")
+        self.assertEqual(result["passed"], 18)
+        self.assertEqual(result["synthetic_jobs"], 100)
+        self.assertEqual(result["distinct_supplied_docs"], 100)
+        self.assertEqual(result["scoped_suspected_collisions"], 0)
+        # The original amount bridge MUST still hold every record in review.
+        self.assertEqual(result["original_bridge_review"], 100)
+        self.assertEqual(result["hypothetical_full_review_usd"], 291.67)
+        self.assertEqual(result["hypothetical_break_even_hours"], 2.571)
+        self.assertEqual(result["actual_customer_invoices_reviewed"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertFalse(result["release_ready"])
+        self.assertFalse(result["commercially_validated"])
+
+
 if __name__ == "__main__":
     unittest.main()
