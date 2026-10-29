@@ -20,11 +20,11 @@ class CrossBoardTests(unittest.TestCase):
         self.assertEqual(actual["https://github.com/coollabsio/coolify/issues/2378"],
                          "BLOCKED_EXTERNAL_RESTRICTION")
         self.assertEqual(actual["https://github.com/revertinc/revert/issues/372"],
-                         "UNVERIFIED_EXTERNAL_ELIGIBILITY")
+                         "BLOCKED_ASSIGNED_TO_OTHER")
         self.assertEqual(actual["https://github.com/javelin-anticheat/py-workedtask/issues/4"],
-                         "UNVERIFIED_EXTERNAL_ELIGIBILITY")
+                         "UNVERIFIED_OR_HIGH_COMPETITION")
         self.assertEqual(actual["https://github.com/gyroflow/gyroflow/issues/742"],
-                         "UNVERIFIED_EXTERNAL_ELIGIBILITY")
+                         "UNVERIFIED_OR_HIGH_COMPETITION")
 
     def test_competition_still_blocks_if_external_eligibility_proved(self):
         """Grant hypothetical outside eligibility; competing attempts still prevent promotion."""
