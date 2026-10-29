@@ -230,5 +230,65 @@
         "expected": "REJECT_RAW_BYTES_AND_SCORING_APPROVAL_UNVERIFIED"
       }
     ]
+  },
+  "electrical_application_catalog_cached_marginal_reconciliation_2026_10_29": {
+    "observation_version": "0.1.0",
+    "evaluation_family": "GOVERNMENT_PERMIT_CATALOG_MARGINAL_RECONCILIATION_NOT_PERMIT_SCORING",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "official_metadata_url": "https://data.cityofnewyork.us/api/views/dm9a-ab7w",
+    "official_dataset_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+    "source_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+    "source_dataset_id": "dm9a-ab7w",
+    "as_of_utc_date": "2026-10-29",
+    "publisher_rows_updated_at_utc": "2026-10-28T21:43:32Z",
+    "publisher_view_last_modified_at_utc": "2026-10-28T21:30:54Z",
+    "source_metadata_kind": "OFFICIAL_CACHED_COLUMN_MARGINALS_NOT_ROW_LEVEL_SNAPSHOT",
+    "cohort": "DOB_NOW_ELECTRICAL_PERMIT_APPLICATIONS_CACHED_CATALOG_AS_OF_2026_10_29",
+    "cached_filing_rows": 596371,
+    "cached_filing_type_counts": {
+      "New Job Filing": 485310,
+      "PAA": 96230,
+      "Subsequent Filing": 14831
+    },
+    "cached_filing_number_i1_count": 485311,
+    "cross_field_marginal_delta": 1,
+    "source_marginals_do_not_independently_prove_row_level_error": true,
+    "row_level_causal_record_identified": false,
+    "raw_permit_person_or_applicant_rows_stored": 0,
+    "original_http_bytes_custodied": false,
+    "original_publisher_http_response_sha256": null,
+    "original_source_schema_fields": [
+      "filing_type",
+      "filing_number",
+      "job_filing_number",
+      "filing_status"
+    ],
+    "ground_truth_limit": "The cached I1 filing-number frequency exceeds cached New Job Filing count by one; independent row-level cause, join correctness, permit issuance, active status and buyer outcome remain UNKNOWN.",
+    "independently_held_out_issued_permit_labels": 0,
+    "independent_validity_labels": 0,
+    "buyer_outcome_labels": 0,
+    "source_specific_commercial_scoring_approved": false,
+    "commercial_scoring_gate": "HOLD",
+    "producer_owner": ":16 unified evidence lab (draft only)",
+    "consumer_owner": ":48 PermitPlate",
+    "independent_qa_owner": ":44 QA",
+    "production_collector_modified": false,
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_I1_MARGINAL_EQUALS_NEW_JOB_MARGINAL",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_OFFICIAL_CACHED_MARGINALS_DIFFER_BY_ONE"
+      },
+      {
+        "id": "SYNTH_ONE_COUNT_DIFFERENCE_PROVES_ONE_MISLABELED_REAL_PERMIT",
+        "kind": "SYNTHETIC",
+        "expected": "UNKNOWN_ROW_LEVEL_CAUSE_NOT_IDENTIFIED"
+      },
+      {
+        "id": "SYNTH_ELECTRICAL_APPLICATION_COUNTS_ARE_ACTIVE_PERMITS_OR_LICENSED_CUSTOMER_LEADS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_APPLICATION_COUNTS_NOT_INDEPENDENT_PERMIT_VALIDITY_OR_COMMERCIAL_RIGHTS"
+      }
+    ]
   }
 }
