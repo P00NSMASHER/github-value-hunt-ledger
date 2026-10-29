@@ -110,5 +110,20 @@ class TestSyntheticGoldenGooseHydrovac(unittest.TestCase):
         self.assertFalse(result["commercially_validated"])
 
 
+    def test_synthetic_source_fingerprint_conflicts_fail_closed(self):
+        result = self.run_js("test_source_fingerprint_026.js")
+        self.assertEqual(result["passed"], 28)
+        self.assertEqual(result["synthetic_jobs"], 100)
+        self.assertTrue(result["sha256_valid_for_supplied_bytes"])
+        self.assertFalse(result["document_identity_authenticated"])
+        self.assertEqual(result["hypothetical_full_review_usd"], 291.67)
+        self.assertEqual(result["hypothetical_break_even_hours"], 2.571)
+        self.assertEqual(result["actual_customer_invoices_reviewed"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertFalse(result["release_ready"])
+        self.assertFalse(result["commercially_validated"])
+
+
 if __name__ == "__main__":
     unittest.main()
