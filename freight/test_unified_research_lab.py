@@ -19,6 +19,9 @@ from freight.unified_research_lab import (
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
+# Pin the evolving NYC source-evidence pack once; historical receipt fields stay frozen.
+NYC_DOB_REPLAY_PACK_SCHEMA_VERSION = "0.1.8"
+
 
 class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
     """Hold six upstream source identities without admitting new provider hosts."""
@@ -2250,7 +2253,7 @@ class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
     def _assert_held(self, p):
         src = p["source"]
         policy = src["citywide_open_data_policy"]
-        self.assertEqual(p["schema_version"], "0.1.6")
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(src["reuse_rights"], "UNVERIFIED_HOLD")
         self.assertFalse(src["dataset_specific_commercial_reuse_authorized"])
@@ -2311,7 +2314,7 @@ class NYCDOBPublicAPIStatusExpiryBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.6")
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
         self.assertEqual(p["engine"], "permitplate")
         self.assertEqual(p["observed"]["held_out_labeled_permits"], 0)
         self.assertIsNone(p["observed"]["permitplate_scoring_precision_recall"])
@@ -2405,7 +2408,7 @@ class NYCDOBFreshWriterReceiptBoundaryContract(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_boundary(self, p):
-        self.assertEqual(p["schema_version"], "0.1.6")
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
         v = p["operational_writer_2026_10_28_readback_followup"]
         self.assertEqual(v["source_dataset_id"], "rbx6-tga4")
         self.assertEqual(v["observed_as_of_utc_date"], "2026-10-28")
@@ -2465,7 +2468,7 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_metadata_held(self, p):
-        self.assertEqual(p["schema_version"], "0.1.6")
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
         q = p["official_socrata_catalog_metadata_quality_2026_10_28"]
         self.assertEqual(q["dataset_id"], "rbx6-tga4")
         self.assertEqual(q["official_metadata_url"],
@@ -2554,7 +2557,7 @@ class NYCDOBPublisherCatalogMetadataQualityBoundary(unittest.TestCase):
     def _assert_current_catalog_update_boundary(self, p):
         q = p["official_socrata_catalog_refresh_2026_10_28"]
         prior = p["official_socrata_catalog_metadata_quality_2026_10_28"]
-        self.assertEqual(p["schema_version"], "0.1.6")
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
         self.assertEqual(q["schema_version"], "0.1.0")
         self.assertEqual(q["dataset_id"], "rbx6-tga4")
         self.assertEqual(q["original_catalog_metadata_url"],
@@ -2887,7 +2890,7 @@ class NYCDOBMetadataDriftClockInvariantTests(unittest.TestCase):
 
     @staticmethod
     def _assert_quality(p):
-        assert p["schema_version"] == "0.1.8"
+        assert p["schema_version"] == NYC_DOB_REPLAY_PACK_SCHEMA_VERSION
         q = p["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"]
         assert q["publisher_rows_updated_at_epoch_seconds_in_both_views"] == 1793213280
         assert q["publisher_view_last_modified_epoch_seconds_in_both_views"] == 1793212310
@@ -2956,7 +2959,7 @@ class NYCDOBUnsortedReadbackChurnBoundaryTests(unittest.TestCase):
 
     @staticmethod
     def _assert_scope(p):
-        assert p["schema_version"] == "0.1.8"
+        assert p["schema_version"] == NYC_DOB_REPLAY_PACK_SCHEMA_VERSION
         q = p["operational_writer_unsorted_identity_churn_2026_10_29"]
         assert q["source_dataset_id"] == "rbx6-tga4"
         a = q["previous_writer_snapshot"]
