@@ -34,7 +34,14 @@ class BountyTriageTests(unittest.TestCase):
         self.assertEqual(evaluate([row(advertised_usd='3')])['issues'][0]['status'], 'TOO_SMALL_FOR_FIRST_100')
 
     def test_restricted_contributors(self):
-        self.assertEqual(evaluate([row(external_contributors_allowed=False)])['issues'][0]['status'], 'UNVERIFIED_EXTERNAL_ELIGIBILITY')
+        self.assertEqual(evaluate([row(external_contributors_allowed=False)])['issues'][0]['status'], 'BLOCKED_EXTERNAL_RESTRICTION')
+
+    def test_unknown_external_permission_is_not_explicitly_blocked(self):
+        self.assertEqual(evaluate([row(external_contributors_allowed=None)])['issues'][0]['status'], 'UNVERIFIED_EXTERNAL_ELIGIBILITY')
+
+    def test_conflicting_external_permission_is_not_accepted(self):
+        result = evaluate([row(), row(listing_id='2', external_contributors_allowed=False)])
+        self.assertEqual(result['issues'][0]['status'], 'UNVERIFIED_EXTERNAL_ELIGIBILITY')
 
     def test_no_recent_award_evidence(self):
         self.assertEqual(evaluate([row(recent_awards_verified=None)])['issues'][0]['status'], 'UNVERIFIED_RECENT_PAYOUT')
