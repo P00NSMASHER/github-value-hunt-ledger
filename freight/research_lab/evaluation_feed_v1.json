@@ -179,6 +179,81 @@
       "case_id": null,
       "commercial_reuse_authorized": false,
       "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-29",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "76c555480ee317ae68504a43469d9d9589780dd25251956194052bd8842ded16",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/Abhijeet-SP/Invoice-Intelligence-Machine-Learning-System",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-29",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "970d5d546adad3bee5e35eea8e02e666a9ddeb56af3f109e1c08dbe3de0fc693",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/deepu1965/Freight-invoice",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-10-29",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "9940a5b53caa3b329d6314d134f04601fd447a4a75c0f4ffd7d387effeb68620",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/aniskudachi/freight-invoice",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
       "first_seen": "2026-10-28",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -6359,7 +6434,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "4b826ad15469be34152f3503654814fea40de1d34dc7927d560a7aa0db201a66",
+  "feed_sha256": "aa811366e9714f1b0688178a6c601e3691be1787b44f28bb4f0e94719316e65f",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -6371,12 +6446,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 254,
-  "source_pointers_total": 254,
+  "selected_for_synthetic_proof_gate": 257,
+  "source_pointers_total": 257,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
     "lab15_evidence_metadata_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4f7543e5d3edaa8cb038bf8",
-    "unified_entries_sha256": "e85adb3f6264518dcd6203cf0bde17ef7dd9f3fb106bda4e43aa3f53c71c0c00"
+    "unified_entries_sha256": "74322c9fe3682f2d91ba55a05f421923b26417a691f7fee3b6e2ccf4120ce3a1"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 11,
   "verified_recovered_cash_cents": 0

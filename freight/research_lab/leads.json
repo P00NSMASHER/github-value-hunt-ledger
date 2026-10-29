@@ -5783,6 +5783,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-29",
+      "id": "76c555480ee317ae68504a43469d9d9589780dd25251956194052bd8842ded16",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Abhijeet-SP/Invoice-Intelligence-Machine-Learning-System"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -7240,6 +7256,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-29",
+      "id": "970d5d546adad3bee5e35eea8e02e666a9ddeb56af3f109e1c08dbe3de0fc693",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/deepu1965/Freight-invoice"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -7395,6 +7427,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/4939280"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-29",
+      "id": "9940a5b53caa3b329d6314d134f04601fd447a4a75c0f4ffd7d387effeb68620",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/aniskudachi/freight-invoice"
     },
     {
       "commercial_reuse_authorized": false,
@@ -12713,6 +12761,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "e85adb3f6264518dcd6203cf0bde17ef7dd9f3fb106bda4e43aa3f53c71c0c00",
+  "entries_sha256": "74322c9fe3682f2d91ba55a05f421923b26417a691f7fee3b6e2ccf4120ce3a1",
   "schema_version": 1
 }
