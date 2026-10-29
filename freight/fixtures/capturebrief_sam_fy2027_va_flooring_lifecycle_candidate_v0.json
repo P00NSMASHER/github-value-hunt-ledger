@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "CAPTUREBRIEF_SAM_FY2027_VA_FLOORING_NOTICE_LIFECYCLE_CANDIDATE_V0",
+  "evaluation_family": "GOVERNMENT_NOTICE_ASOF_LIFECYCLE_AND_ELIGIBILITY_NOT_AWARD_SCORING",
+  "engine": "capturebrief",
+  "cohort": "SAM_FY27_VA_MCCLELLAN_MARKET_RESEARCH_TO_SOLICITATION_2026_09_TO_10",
+  "research_asof_utc_date": "2026-10-29",
+  "source": {
+    "publisher": "SAM.gov / U.S. Department of Veterans Affairs",
+    "published_notice_number": "36C26127Q0047",
+    "original_sources_sought_url": "https://sam.gov/opp/ce12814b985b4908ae57248813c085b3/view",
+    "updated_sources_sought_url": "https://sam.gov/opp/16e70df741c94882979fd9e6824ef1ff/view",
+    "later_solicitation_url": "https://sam.gov/opp/b8205e6e69db41bc85611de60bbe9566/view",
+    "site_terms_url": "https://sam.gov/about/terms-of-use",
+    "source_access_evidence": "PUBLIC_PUBLISHER_NOTICES_INDEXED_BY_SEARCH_NOT_ORIGINAL_DIRECT_HTTP_RESPONSE",
+    "original_publisher_http_response_bytes_custodied": false,
+    "original_publisher_http_sha256": null,
+    "publisher_attachment_bytes_custodied": false,
+    "source_specific_commercial_scoring_rights_verified": false,
+    "automated_sam_web_scraping_authorized": false,
+    "rights_review": "GSA_SITE_TERMS_PUBLIC_MATERIAL_REUSE_MAY_BE_POSSIBLE_BUT_SAM_AUTOMATED_WEB_SCRAPING_PROHIBITED_AUTHORIZED_PUBLIC_APIS_AND_THIRD_PARTY_RIGHTS_SEPARATE",
+    "permission_state": "HOLD_SOURCE_SPECIFIC_API_PERMISSION_AND_ATTACHMENT_RIGHTS_NOT_PROVEN"
+  },
+  "notice_chronology": {
+    "market_research_original": {
+      "notice_record_uuid": "ce12814b985b4908ae57248813c085b3",
+      "type": "SOURCES_SOUGHT_ORIGINAL",
+      "original_publication_date": "2026-09-14",
+      "original_response_due_local": "2026-10-30T16:00:00-07:00"
+    },
+    "market_research_amended": {
+      "notice_record_uuid": "16e70df741c94882979fd9e6824ef1ff",
+      "type": "SOURCES_SOUGHT_UPDATED",
+      "updated_publication_date": "2026-09-14",
+      "updated_response_due_local": "2026-09-22T16:00:00-07:00",
+      "updated_inactive_date": "2026-10-07",
+      "old_original_response_due_local": "2026-10-30T16:00:00-07:00"
+    },
+    "subsequent_solicitation": {
+      "notice_record_uuid": "b8205e6e69db41bc85611de60bbe9566",
+      "type": "SOLICITATION_ORIGINAL",
+      "publication_date": "2026-10-19",
+      "date_offers_due_local": "2026-11-17T15:00:00-08:00",
+      "inactive_date": "2026-12-31",
+      "set_aside": "SERVICE_DISABLED_VETERAN_OWNED_SMALL_BUSINESS",
+      "published_requirement": "VA_MCCLELLAN_FLOORING_REPLACEMENT_PROJECT_612A4_27_020"
+    }
+  },
+  "ground_truth_boundaries": {
+    "same_notice_number_is_not_same_notice_record_uuid": true,
+    "three_notice_record_uuids_do_not_prove_three_contract_awards": true,
+    "original_sources_sought_deadline_is_not_current_solicitation_offer_deadline": true,
+    "amended_sources_sought_deadline_is_not_current_solicitation_offer_deadline": true,
+    "last_indexed_publisher_stage_asof_2026_10_29": "SOLICITATION_ORIGINAL",
+    "later_solicitation_posting_independently_supported_by_indexed_official_page": true,
+    "bidder_sdvobs_eligibility": "UNKNOWN_NO_BIDDER_DATA",
+    "current_bid_acceptance_from_live_publisher_response": "UNKNOWN",
+    "subsequent_changes_after_latest_indexed_source": "UNKNOWN",
+    "original_supplier_attachments_read_and_verified": false,
+    "solicitation_award_outcome": "UNKNOWN",
+    "independent_heldout_lifecycle_labels": 0,
+    "independent_award_labels": 0,
+    "verified_customer_eligible_bids": 0,
+    "customer_contact_actions": 0,
+    "commercial_capturebrief_scoring_admitted": false,
+    "production_input_state": "HOLD"
+  },
+  "quality": {
+    "publisher_notice_pages_located": 3,
+    "complete_original_notice_snapshots_acquired": 0,
+    "public_metadata_source_identifiers_transcribed": 3,
+    "original_attachment_files_acquired": 0,
+    "source_content_sha256": "UNKNOWN_NO_ORIGINAL_PUBLISHER_HTTP_BYTES",
+    "confidence": "OFFICIAL_PUBLISHER_INDEXED_METADATA_ONLY_NO_DIRECT_SOURCE_CUSTODY",
+    "evaluation_label": "HISTORICAL_NOTICE_LIFECYCLE_COUNTEREXAMPLE_NOT_INDEPENDENT_CUSTOMER_GROUND_TRUTH",
+    "no_private_customer_student_or_medical_records_used": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_OLD_OCT30_SOURCES_SOUGHT_DATE_AS_OFFER_DEADLINE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OLD_MARKET_RESEARCH_DATE_NOT_NOV17_SOLICITATION"
+    },
+    {
+      "id": "SYNTHETIC_AMENDED_SEP22_SOURCES_SOUGHT_DATE_AS_OFFER_DEADLINE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OLD_MARKET_RESEARCH_DATE_NOT_NOV17_SOLICITATION"
+    },
+    {
+      "id": "SYNTHETIC_SOURCES_SOUGHT_ARE_CURRENT_SOLICITATION",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_STAGE_CHRONOLOGY"
+    },
+    {
+      "id": "SYNTHETIC_THREE_PUBLISHER_RECORD_UUIDS_ARE_THREE_AWARDS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_AWARD_GROUND_TRUTH"
+    },
+    {
+      "id": "SYNTHETIC_ANY_BIDDER_ELIGIBLE_IGNORES_SDVOSB",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SET_ASIDE_ELIGIBILITY_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_PUBLIC_INDEX_IS_RAW_HTTP_SHA256",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_ORIGINAL_PUBLISHER_RESPONSE_CUSTODY"
+    },
+    {
+      "id": "SYNTHETIC_PUBLIC_NOTICE_PERMITS_SCRAPING_AND_COMMERCIAL_SCORING",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SOURCE_SPECIFIC_RIGHTS_UNVERIFIED"
+    }
+  ],
+  "handoff": {
+    "consumer": ":52 CaptureBrief",
+    "independent_qa": ":44 QA",
+    "retally_recoveryos": ":12 RETALLY/RecoveryOS",
+    "release_approved": false,
+    "engine_code_modified": false,
+    "provider_rules_modified": false,
+    "scheduled_jobs_modified": false
+  }
+}
