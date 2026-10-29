@@ -1,0 +1,111 @@
+{
+  "as_of": "2026-10-29",
+  "sample": "purposefully_selected_nonrepresentative",
+  "portfolio_priority": "WATCH_NOT_PROMOTED",
+  "customer_revenue_usd": 0,
+  "signals": [
+    {
+      "id": "GWA_2024",
+      "agency": "guam-waterworks-authority",
+      "facility": "hagatna-wwtp",
+      "scope": "secondary-treatment-feasibility-study",
+      "date": "2024-01-30",
+      "stage": "proposed settlement announcement",
+      "estimated_program_budget_usd": 400000000,
+      "url": "https://www.epa.gov/enforcement/guam-waterworks-authority-clean-water-act-settlement-information-sheet"
+    },
+    {
+      "id": "NTUA_2024",
+      "agency": "navajo-tribal-utility-authority",
+      "facility": "tuba-city-wwtp",
+      "scope": "new-plant-construction",
+      "date": "2024-01-10",
+      "stage": "proposed partial consent decree announcement",
+      "estimated_program_budget_usd": 100000000,
+      "url": "https://www.epa.gov/newsreleases/navajo-tribal-utility-authority-agrees-100-million-wastewater-treatment-improvements-0"
+    }
+  ],
+  "procurement": [
+    {
+      "id": "GWA_RFP_02_ENG_2025",
+      "agency": "guam-waterworks-authority",
+      "facility": "hagatna-wwtp",
+      "scope": "secondary-treatment-feasibility-study",
+      "issue_date": "2025-11-25",
+      "date_authority": "issuer",
+      "state": "CLOSED",
+      "url": "https://guamwaterworks.org/bids/",
+      "bid_number": "RFP-02-ENG-2025",
+      "bid_title": "RFP-02-ENG-2025 Hagatna Wastewater Treatment Plant Secondary Treatment Feasibility Study, GWA Project No. 22603",
+      "issuer_notice": {
+        "source_kind": "issuer_public_notice",
+        "url": "https://notices.guam.gov/notice_detail/7837",
+        "title": "RFP-02-ENG-2025 Hagatna Wastewater Treatment Plant Secondary Treatment Feasibility Study, GWA Project No. 22603",
+        "published_on": "2025-11-25",
+        "observed_on": "2026-10-29"
+      }
+    },
+    {
+      "id": "NTUA_TUBA_2026",
+      "agency": "navajo-tribal-utility-authority",
+      "facility": "tuba-city-wwtp",
+      "scope": "new-plant-construction",
+      "issue_date": "2026-10-15",
+      "date_authority": "third_party_not_issuer_verified",
+      "state": "LISTED_DUE_2026-11-24",
+      "url": "https://www.ntua.com/rfp.html",
+      "date_source": "https://www.noticeregistry.com/arizona/notice/bid-notice-fort-defiance-295904"
+    },
+    {
+      "id": "GWA_CLARIFIER_PARTS_2024",
+      "agency": "guam-waterworks-authority",
+      "facility": "hagatna-wwtp",
+      "scope": "clarifier-parts",
+      "issue_date": "2024-12-16",
+      "date_authority": "issuer",
+      "state": "CLOSED",
+      "url": "https://guamwaterworks.org/bids/"
+    },
+    {
+      "id": "GWA_REHAB_2026",
+      "agency": "guam-waterworks-authority",
+      "facility": "hagatna-wwtp",
+      "scope": "rehabilitation-ambiguous",
+      "issue_date": "2026-06-09",
+      "date_authority": "issuer",
+      "state": "CLOSED",
+      "url": "https://guamwaterworks.org/bids/"
+    },
+    {
+      "id": "GWA_GROUNDS_2026",
+      "agency": "guam-waterworks-authority",
+      "facility": "multiple-districts",
+      "scope": "grounds-maintenance",
+      "issue_date": "2026-09-25",
+      "date_authority": "issuer",
+      "state": "LISTED",
+      "url": "https://guamwaterworks.org/bids/"
+    }
+  ],
+  "matched_pair": {
+    "signal_id": "GWA_2024",
+    "bid_id": "GWA_RFP_02_ENG_2025",
+    "lead_days": 665,
+    "classification": "SOURCE_MATCH_NOT_CAUSAL_PROOF"
+  },
+  "review_pair": {
+    "signal_id": "NTUA_2024",
+    "bid_id": "NTUA_TUBA_2026",
+    "lead_days_from_secondary_publication": 1009,
+    "classification": "REVIEW_DATE_PROVENANCE"
+  },
+  "verified_customer_payment_usd": 0,
+  "warnings": [
+    "Only two hand-picked government programs: no statistically valid precision/recall or prospective lead-time estimate.",
+    "Program budgets are NOT bid prices, awarded values, or obtainable revenue.",
+    "Generic EPA wastewater sales intelligence already has competitors.",
+    "Do not treat other same-issuer bids as mandate-linked on keyword alone; exact scope and dates required.",
+    "An issuer listing is not evidence of successful bid or bidder entitlement.",
+    "Offline review can confirm receipt completeness only, not independently fetch or authenticate page contents."
+  ]
+}

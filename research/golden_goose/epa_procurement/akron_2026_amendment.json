@@ -1,0 +1,25 @@
+{
+  "as_of": "2026-10-29",
+  "case": "United States v. City of Akron, Ohio, et al., 09-cv-00272",
+  "project_id": "akron_ehrt_facility",
+  "project_description": "Enhanced High Rate Treatment (EHRT) facility, prior 2014 decree project requirement",
+  "event": {
+    "project_id": "akron_ehrt_facility",
+    "kind": "proposed_replacement",
+    "source_kind": "federal_register_notice",
+    "published_on": "2026-10-14",
+    "observed_on": "2026-10-29",
+    "source_url": "https://www.govinfo.gov/content/pkg/FR-2026-10-14/html/2026-21003.htm",
+    "legal_posture": "PROPOSED; public comment through 2026-11-13; final court approval not established",
+    "replaces": "new construction facility requirement with CSO performance criteria, monitoring and extended disinfection"
+  },
+  "issuer_explanation": "https://www.akronwaterwaysrenewed.com/news/city-akron-reaches-agreement-us-epa-and-ohio-epa-eliminate-300-million-sewer-project",
+  "doj_case": "https://www.justice.gov/enrd/consent-decree/us-v-city-akron-ohio-et-al",
+  "estimate_source": "City of Akron October 7, 2026 announcement",
+  "city_estimate_of_project_cost_usd": 300000000,
+  "estimate_interpretation": "approximately $300m proposed project investment avoided if court approves; not a contract value or collectible revenue",
+  "verified_open_bid": false,
+  "verified_owner_revenue_usd": 0,
+  "review_status_expected": "REVIEW",
+  "review_reason_expected": "pending_scope_replacement_not_court_final"
+}
