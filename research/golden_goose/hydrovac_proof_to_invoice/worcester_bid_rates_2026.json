@@ -1,0 +1,114 @@
+{
+  "experiment": "Golden Goose #015; 2026-10-29; public bid arithmetic not contract or customer audit",
+  "source": {
+    "official_page": "https://www.worcesterma.gov/finance/purchasing-bids/bids/cr-8693-j6",
+    "pdf": "https://www.worcesterma.gov/sites/default/files/bids/CR-8693-J6%20-%20Bid%20Results%20%28Unit%20Pricing%20Pages%29.pdf",
+    "bid": "CR-8693-J6",
+    "opened": "2026-04-16",
+    "closed": "2026-05-13",
+    "period": "2026-07-01 to 2027-06-30"
+  },
+  "limitations": "Hand-transcribed 4-page published bids. Bid totals are estimates for comparison, NOT paid awards, signed customer terms, contract claims, receivables or our revenue. No customer invoices were inspected.",
+  "minimum_call_hours": 4,
+  "rate_categories": [
+    {
+      "id": "urgent_weekday_day",
+      "annual_estimated_hours": 100
+    },
+    {
+      "id": "urgent_weekday_evening",
+      "annual_estimated_hours": 40
+    },
+    {
+      "id": "urgent_weekday_overnight",
+      "annual_estimated_hours": 24
+    },
+    {
+      "id": "urgent_weekend_holiday",
+      "annual_estimated_hours": 24
+    },
+    {
+      "id": "standard_weekday_day",
+      "annual_estimated_hours": 1000
+    }
+  ],
+  "bidder_prices": [
+    {
+      "name": "Phoenix Communications, Inc.",
+      "listed_awardee": true,
+      "pdf_page": 1,
+      "unit_hourly_usd": [
+        "315.00",
+        "315.00",
+        "315.00",
+        "360.00",
+        "315.00"
+      ],
+      "published_total_usd": "375300.00"
+    },
+    {
+      "name": "R.H. White Construction Co., Inc.",
+      "listed_awardee": true,
+      "pdf_page": 2,
+      "unit_hourly_usd": [
+        "312.00",
+        "367.00",
+        "367.00",
+        "367.00",
+        "312.00"
+      ],
+      "published_total_usd": "375496.00"
+    },
+    {
+      "name": "New England Vacuum Excavation",
+      "listed_awardee": false,
+      "pdf_page": 3,
+      "unit_hourly_usd": [
+        "375.00",
+        "450.00",
+        "450.00",
+        "450.00",
+        "375.00"
+      ],
+      "published_total_usd": "452100.00"
+    },
+    {
+      "name": "Champion Environmental Services",
+      "listed_awardee": false,
+      "pdf_page": 4,
+      "unit_hourly_usd": [
+        "2365.00",
+        "2665.00",
+        "2765.00",
+        "3168.00",
+        "2365.00"
+      ],
+      "published_total_usd": "2850492.00"
+    }
+  ],
+  "scenarios": [
+    {
+      "bidder": 0,
+      "tier": 4,
+      "worked_hours": 1
+    },
+    {
+      "bidder": 1,
+      "tier": 4,
+      "worked_hours": 1
+    },
+    {
+      "bidder": 0,
+      "tier": 3,
+      "worked_hours": 2
+    },
+    {
+      "bidder": 1,
+      "tier": 3,
+      "worked_hours": 2
+    }
+  ],
+  "verified_owner_revenue_usd": "0.00",
+  "verified_collectible_usd": null,
+  "actual_customers": 0
+}
