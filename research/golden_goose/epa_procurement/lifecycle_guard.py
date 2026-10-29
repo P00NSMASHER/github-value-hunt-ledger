@@ -13,6 +13,7 @@ PINNED_RECEIPTS = {
         'source_kind': 'epa_newsrelease',
         'source_url': 'https://www.epa.gov/newsreleases/epa-and-ohio-epa-terminate-settlement-after-port-clinton-ohio-completed-required',
         'published_on': '2026-06-01',
+        'observed_on': '2026-10-29',
         'reported_state': 'agency_reports_required_work_complete_and_agreed_termination',
     }
 }
@@ -52,7 +53,10 @@ def screen(project_id, as_of, events):
             continue  # Future knowledge must never alter historical backtests.
         if published > observed:
             return 'REVIEW', 'publication_after_observation'
-        expected = PINNED_RECEIPTS.get(event.get('receipt_id'))
+        receipt_id = event.get('receipt_id')
+        if not isinstance(receipt_id, str):
+            return 'REVIEW', 'unsupported_lifecycle_evidence'
+        expected = PINNED_RECEIPTS.get(receipt_id)
         if expected is None or any(event.get(k) != v for k, v in expected.items()):
             return 'REVIEW', 'unsupported_lifecycle_evidence'
         matched.append(event)
