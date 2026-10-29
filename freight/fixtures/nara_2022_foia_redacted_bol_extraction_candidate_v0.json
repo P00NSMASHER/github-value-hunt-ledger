@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "fixture_id": "NARA_FOIA_2022_REDACTED_ORIGINAL_GOVERNMENT_BOL_EXTRACTION_CANDIDATE_V0",
   "status": "DRAFT_SOURCE_BOUND_HOLD_UNRELEASED",
   "evaluation_family": "FREIGHT_DOCUMENT_EXTRACTION_PUBLIC_REDACTED_ORIGINAL_BOL_NOT_FREIGHT_ERROR_OR_PAYMENT_SCORING",
@@ -73,7 +73,9 @@
     "possible_multiple_financial_semantics": "UNKNOWN_WITHOUT_TENDER_INVOICE_AND_PAYMENT",
     "actual_valid_tender_rate_usd_cents": null,
     "freight_amount_overcharged_usd_cents": null,
-    "carrier_payment_amount_usd_cents": null
+    "carrier_payment_amount_usd_cents": null,
+    "printed_billing_direction_not_payment_evidence": true,
+    "consignee_is_not_verified_accounts_payable_debtor": true
   },
   "ground_truth": {
     "source_documents_publicly_viewed": 1,
@@ -137,6 +139,30 @@
       "kind": "SYNTHETIC",
       "assertion": "SOURCE_DOC_IS_INDEPENDENT_CUSTOMER_ACCURACY_LABEL",
       "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-008",
+      "kind": "SYNTHETIC",
+      "assertion": "BILL_CHARGES_TO_US_BANK_PROVES_THIRD_PARTY_BANK_PAID",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-009",
+      "kind": "SYNTHETIC",
+      "assertion": "PRINTED_CERTIFICATE_PROVES_CONSIGNEE_ACCOUNTS_PAYABLE",
+      "expected": "REJECT"
     }
-  ]
+  ],
+  "billing_direction_observation": {
+    "source_grounding": "PAGE_1_BOX_9_BILL_CHARGES_TO_AND_PAGE_2_PRINTED_TSP_BILLING_CERTIFICATE_HEADING",
+    "printed_bill_charges_to": "THIRD_PARTY_BILLING_SERVICE_AT_US_BANK",
+    "printed_tsp_billing_certificate_scope": "CONSIGNEE_MUST_NOT_PAY_ANY_CHARGES",
+    "original_label_kind": "VISUAL_PUBLIC_FORM_TEXT_NOT_LEDGER_ENTRY_OR_INDEPENDENT_PAYMENT_LABEL",
+    "printed_instruction_is_validated_account_payable_liability": false,
+    "printed_instruction_proves_payment_was_made": false,
+    "consignee_is_verified_debtor": false,
+    "actual_payer_identity": "UNKNOWN",
+    "verified_payment_status": "UNKNOWN",
+    "recoveryos_reconciliation_label": "UNKNOWN_DO_NOT_POST_CONSIGNEE_PAYABLE_OR_ASSUME_THIRD_PARTY_PAYMENT"
+  }
 }
