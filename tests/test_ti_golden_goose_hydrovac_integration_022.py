@@ -78,5 +78,20 @@ class TestSyntheticGoldenGooseHydrovac(unittest.TestCase):
         self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
 
 
+    def test_diagnostic_only_collision_scope_never_clears_invoices(self):
+        result = self.run_js("test_collision_diagnostic_024.js")
+        self.assertEqual(result["passed"], 18)
+        self.assertTrue(result["bridge_checked"])
+        self.assertEqual(result["global_bridge_review"], 100)
+        self.assertEqual(result["diagnostic_not_flagged"], 98)
+        self.assertEqual(result["hypothetical_global_review_cost_usd"], 291.67)
+        self.assertEqual(result["hypothetical_two_job_triage_cost_usd"], 5.83)
+        self.assertEqual(result["actual_customer_invoices_reviewed"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertFalse(result["release_ready"])
+        self.assertFalse(result["commercially_validated"])
+
+
 if __name__ == "__main__":
     unittest.main()
