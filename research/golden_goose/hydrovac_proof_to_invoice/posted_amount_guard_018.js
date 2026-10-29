@@ -24,6 +24,14 @@ function postedAmountGuard(r) {
   const review = reason => answer('REVIEW',reason);
   if (!r || typeof r !== 'object' || Array.isArray(r) ||
     r.legacy_quantity_status !== 'CLEAR_RECONCILED') return review('NO_PRIOR_QUANTITY_RECONCILIATION');
+  // Unknown fields might hide discounts, withheld fees or adjustments.
+  // This deliberately strict research schema fails closed until a mapping is reviewed.
+  const rowKeys=new Set(['legacy_quantity_status','job_id','signed_rate_reviewed',
+    'rate_versions_reviewed','full_ledger_verified','credits_reviewed','discounts_reviewed',
+    'waivers_reviewed','no_dispute','job_identity_reviewed','has_credit_memo',
+    'has_waiver','has_unapplied_cash','approved_hours','approved_dumps',
+    'signed_hourly_usd','signed_dump_usd','ledger_total_usd','posted']);
+  if (Object.keys(r).some(k=>!rowKeys.has(k))) return review('UNMODELED_JOB_FIELD');
   const required = ['signed_rate_reviewed','rate_versions_reviewed','full_ledger_verified',
     'credits_reviewed','discounts_reviewed','waivers_reviewed','no_dispute','job_identity_reviewed'];
   if (required.some(k => r[k] !== true) ||
@@ -45,6 +53,10 @@ function postedAmountGuard(r) {
         l.state!=='ISSUED' || l.job_id!==r.job_id ||
         typeof l.invoice_line_id!=='string' || !l.invoice_line_id.trim())
       return review('INVALID_POSTED_LINE');
+    const lineKeys=new Set(['job_id','invoice_line_id','state','hours_qty','dumps_qty',
+      'hourly_unit_usd','dump_unit_usd','hours_extended_usd','dump_extended_usd',
+      'line_total_usd']);
+    if (Object.keys(l).some(k=>!lineKeys.has(k))) return review('UNMODELED_INVOICE_FIELD');
     const id=l.invoice_line_id.trim().toLowerCase();
     if (seen.has(id)) return review('DUPLICATE_POSTED_LINE');
     seen.add(id);
@@ -101,7 +113,10 @@ function runHoldout() {
     ['invalid_currency',r=>{r.ledger_total_usd='Infinity'},'REVIEW'],
     ['incorrect_original_status',r=>{r.legacy_quantity_status='POTENTIAL_HOURS_GAP'},'REVIEW'],
     ['string_proof',r=>{r.credits_reviewed='true'},'REVIEW'],
-    ['unsafe_money',r=>{r.signed_hourly_usd='99999999999999.99'},'REVIEW']
+    ['unsafe_money',r=>{r.signed_hourly_usd='99999999999999.99'},'REVIEW'],
+    ['unmodeled_line_discount',r=>{r.posted[0].discount_usd='100.00'},'REVIEW'],
+    ['unmodeled_line_fee',r=>{r.posted[0].environmental_fee_usd='25.00'},'REVIEW'],
+    ['unmodeled_job_adjustment',r=>{r.discount_total_usd='100.00'},'REVIEW']
   ];
   let pass=0,review=0,arithmetic=0;
   for(const [name,mutate,want] of mutations){
