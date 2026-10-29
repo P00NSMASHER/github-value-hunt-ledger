@@ -1,0 +1,99 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B143950_COLLECTED_HISTORICAL_OVERCHARGE_CANDIDATE_V0",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_NOT_CUSTOMER_RECONCILIATION",
+  "cohort": "US_GAO_MOTOR_FREIGHT_1956_SHIPMENT_1960_DECISION",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "official_url": "https://www.gao.gov/products/b-143950-0",
+    "decision_id": "B-143950",
+    "decision_date": "1960-11-25",
+    "reviewed_utc_date": "2026-10-29",
+    "source_format": "OFFICIAL_GAO_PUBLIC_DECISION_HTML",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_GOVERNMENT_TEXT_US_PUBLIC_DOMAIN_WITH_CREDIT_NO_IMPLIED_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE",
+    "raw_original_http_bytes_custodied": false,
+    "original_http_sha256": null,
+    "original_bill_of_lading_bytes_custodied": false,
+    "original_carrier_invoice_bytes_custodied": false,
+    "original_tariff_pages_custodied": false,
+    "tariff_effective_date": "UNKNOWN_HISTORICAL_TARIFF_PAGES_NOT_HELD"
+  },
+  "historical_reported": {
+    "carrier": "CAROLINA_FREIGHT_CARRIERS_CORPORATION",
+    "reported_bill": "396C-57JW",
+    "reported_government_bill_of_lading": "AF-6614902",
+    "shipment_date": "1956-12-01",
+    "reported_original_payment_cents": 75000,
+    "exclusive_use_class_100_rate_cents_per_cwt": 500,
+    "exclusive_use_minimum_weight_lb": 15000,
+    "gao_applicable_class_55_rate_cents_per_cwt": 276,
+    "gao_applicable_truckload_minimum_weight_lb": 20000,
+    "gao_audited_applicable_charge_cents": 55200,
+    "gao_reported_overcharge_cents": 19800,
+    "gao_reported_deduction_collected_cents": 19800,
+    "carrier_supplemental_reclaim_cents": 19800,
+    "carrier_reclaim_disallowed": true,
+    "gao_sustained_disallowance_on_present_record": true,
+    "tariff": "SOUTHERN_MOTOR_CARRIERS_RATE_CONFERENCE_504_SUPPLEMENT_88_ITEM_10020_A",
+    "legal_reason": "FULL_CAPACITY_TRUCKLOAD_NOT_ENTITLED_TO_EXCLUSIVE_USE_PREMIUM_ON_THIS_RECORD",
+    "evidence_caveat": "GAO reports a government deduction from funds otherwise due; no original bank settlement or invoice/tariff bytes were independently acquired."
+  },
+  "ground_truth": {
+    "historical_adjudicated_error_label": "GAO_SUSTAINED_HISTORICAL_GOVERNMENT_OVERCHARGE",
+    "historical_collection_label": "GAO_REPORTS_ACTUAL_SET_OFF_DEDUCTION",
+    "independently_heldout_from_engine_training": "UNKNOWN",
+    "independent_original_invoice_rate_and_payment_replay": false,
+    "original_tariff_effective_date_verified": false,
+    "current_customer_ground_truth_cases": 0,
+    "verified_retally_customer_recovered_cash_cents": 0,
+    "modern_tariff_applicability": "UNKNOWN",
+    "commercial_customer_scoring_approved": false,
+    "independent_qa_complete": false
+  },
+  "schema_fields": [
+    "decision_id",
+    "decision_date",
+    "reported_bill",
+    "reported_government_bill_of_lading",
+    "shipment_date",
+    "reported_original_payment_cents",
+    "gao_audited_applicable_charge_cents",
+    "gao_reported_overcharge_cents",
+    "gao_reported_deduction_collected_cents",
+    "carrier_supplemental_reclaim_cents",
+    "carrier_reclaim_disallowed"
+  ],
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_DEDUCTION_EQUALS_RETALLY_REVENUE",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "HISTORICAL_GAO_19800_DEDUCTION_IS_RETALLY_CUSTOMER_CASH",
+      "expected": "REJECT_NO_RETALLY_CUSTOMER"
+    },
+    {
+      "id": "SYNTHETIC_RECLAIM_ALLOWED",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "CARRIER_19800_RECLAIM_SUCCESSFULLY_RECOVERED",
+      "expected": "REJECT_GAO_SUSTAINED_DISALLOWANCE"
+    },
+    {
+      "id": "SYNTHETIC_EXCLUSIVE_USE_ALWAYS_APPLIES",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "FULL_CAPACITY_TRAILER_CAN_ALWAYS_USE_EXCLUSIVE_USE_MINIMUM",
+      "expected": "REJECT_TARIFF_AND_FACT_DEPENDENT"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_TARIFF_IS_CURRENT",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "1960_DECISION_PROVES_2026_CONTRACT_RATE",
+      "expected": "REJECT_MODERN_RATE_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_PUBLISHER_TEXT_IS_ORIGINAL_INVOICE_CUSTODY",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "GAO_HTML_PROVES_ORIGINAL_INVOICE_BANK_AND_TARIFF_BYTES_HELD",
+      "expected": "REJECT_NO_ORIGINAL_DOCUMENT_CUSTODY"
+    }
+  ]
+}
