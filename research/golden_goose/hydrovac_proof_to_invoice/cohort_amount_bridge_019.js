@@ -22,6 +22,47 @@ function bridge(quantitySummary,postedProofRows){
   if(quantitySummary.verified_customer_revenue_usd!==0||
      quantitySummary.verified_collectible_usd!==null)
     return fail(rows,'UNSUPPORTED_MONEY_ASSERTION');
+  // Close the upstream quantity-summary trust boundary before accepting even
+  // a synthetic arithmetic-clear label. The Python summary has a fixed shape:
+  // unknown money/adjustment fields or contradictory aggregate counters must
+  // NOT be silently discarded during the JS bridge.
+  const summaryKeys=new Set(['total_jobs','rows','candidate_discrepancies',
+    'review_only','clear','illustrative_candidate_gross_usd',
+    'verified_collectible_usd','verified_customer_revenue_usd']);
+  const rowKeys=new Set(['job_id','status','gross_variance_usd','collectible_usd']);
+  const amount=/^(?:0|[1-9][0-9]*)\.[0-9]{2}$/;
+  if(Object.keys(quantitySummary).some(k=>!summaryKeys.has(k)))
+    return fail(rows,'UNMODELED_QUANTITY_SUMMARY_FIELD');
+  let candidateCount=0,reviewCount=0,clearCount=0,grossCents=0n;
+  for(const r of rows){
+    if(!r||typeof r!=='object'||Array.isArray(r)||
+       Object.keys(r).some(k=>!rowKeys.has(k))||
+       typeof r.job_id!=='string'||!r.job_id.trim()||
+       typeof r.status!=='string'||!amount.test(r.gross_variance_usd)||
+       r.collectible_usd!==null)
+      return fail(rows,'UNMODELED_OR_INVALID_QUANTITY_ROW');
+    if(r.status==='CLEAR_RECONCILED'){
+      clearCount++;
+      if(r.gross_variance_usd!=='0.00')
+        return fail(rows,'CONTRADICTORY_QUANTITY_CLEAR');
+    }else if(r.status.startsWith('REVIEW_')){
+      reviewCount++;
+      if(r.gross_variance_usd!=='0.00')
+        return fail(rows,'CONTRADICTORY_QUANTITY_REVIEW');
+    }else if(r.status.startsWith('POTENTIAL_')){
+      candidateCount++;
+      grossCents+=BigInt(r.gross_variance_usd.replace('.',''));
+    }else return fail(rows,'UNKNOWN_QUANTITY_STATUS');
+  }
+  for(const [key,want] of [['candidate_discrepancies',candidateCount],
+                            ['review_only',reviewCount],['clear',clearCount]])
+    if(Object.prototype.hasOwnProperty.call(quantitySummary,key)&&quantitySummary[key]!==want)
+      return fail(rows,'CONTRADICTORY_QUANTITY_SUMMARY_COUNTER');
+  if(Object.prototype.hasOwnProperty.call(quantitySummary,'illustrative_candidate_gross_usd')){
+    const provided=quantitySummary.illustrative_candidate_gross_usd;
+    if(!amount.test(provided)||BigInt(provided.replace('.',''))!==grossCents)
+      return fail(rows,'CONTRADICTORY_QUANTITY_GROSS');
+  }
   const ids=new Set(),proofIds=new Set(),lineIds=new Set(),proofs=new Map();
   for(const r of rows){
     const id=norm(r&&r.job_id);
