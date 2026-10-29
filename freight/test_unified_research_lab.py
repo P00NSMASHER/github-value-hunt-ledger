@@ -23,6 +23,16 @@ from freight.unified_research_lab import (
 from freight.test_gao_b143950_collected_deduction import GAOB143950CollectedDeductionEvidenceTests
 from freight.test_gao_b143491_adjusted_deduction import GAOB143491TariffCorrectionTests
 
+# Keep independently authored offline evidence tests discoverable by the existing
+# unified PR verify command. These imports do not fetch providers or admit labels.
+# Do not infer full Python CI success until the exact head is actually executed.
+from freight.test_capturebrief_sam_fy2027_renumbering import SAMFY2027RenumberingEvidenceTests
+from freight.test_cbca_3467_detention_negative import CBCADetentionNegativeControlTest
+from freight.test_fmc_bakerly_22_17_admitted_errors import FMCBakerlyBoundaryTests
+from freight.test_gao_b121220_documentary_proof import GAOB121220DocumentaryProofTests
+from freight.test_gao_b215958_supersession import GAOB215958SupersessionTests
+from freight.test_recoveryos_gao_ap_reconciliation_candidate import GAOAccountingReconCandidateTest
+
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 # Pin the evolving NYC source-evidence pack once; historical receipt fields stay frozen.
