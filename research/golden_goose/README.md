@@ -54,3 +54,26 @@ The new [3-row synthetic-free read-only observation fixture](tenstorrent_open_as
 **Validation status:** one observed negative-control dataset was committed, and six extra unit tests (one census regression, five adversarial assignment cases) were added. The original 15 tests had passed before this update; the enlarged 21-test suite has **not yet been independently executed or accepted**, so do not claim it passes. No bounty was claimed and no outside contributor contacted.
 
 **Updated decision:** demote coding bounties for near-term revenue unless a candidate has verified unassigned/authorized ownership, an enforceable enough payment route, available verification hardware, and a realistic short implementation. Next cheapest test: find a newly posted, unassigned, non-hardware $100+ task and confirm the controlling payment terms on the issuer's own page *before writing solution code*.
+
+
+## Independent source check 3: cross-board listed rewards versus actual contributor opportunity (2026-10-28)
+
+**Sample design:** four **purposively chosen** advertised Algora/Jobbi rewards in four different GitHub repositories, each >=$100. This is an adversarial negative-control sample, **not random or a bounty-market prevalence estimate**. Cross-checked the repository issue state, labels, assignment and visible competing PRs through first-party GitHub issue and repository readbacks. The **$800** sum is advertised gross, **not** an offer to this contributor, escrow proof, receivable or revenue.
+
+| GitHub issue | Listed | Primary-source counterevidence | Conservative disposition |
+| --- | ---: | --- | --- |
+| [coolify#2378](https://github.com/coollabsio/coolify/issues/2378) | $100 | Explicit current `👥 Core Team Only` label; public index misleading for outside developers | `BLOCKED_EXTERNAL_RESTRICTION` |
+| [revert#372](https://github.com/revertinc/revert/issues/372) | $100 | Open but assigned to `ezhil56x`; no right to assume another solver's payout | `BLOCKED_ASSIGNED_TO_OTHER` |
+| [py-workedtask#4](https://github.com/javelin-anticheat/py-workedtask/issues/4) | $100 | Nine-or-more visible historical attempts/claims; substantial competition and no verified fresh award authority | `UNVERIFIED_OR_HIGH_COMPETITION` |
+| [gyroflow#742](https://github.com/gyroflow/gyroflow/issues/742) | $500 | Multiple overlapping open PRs (at least #1118, #1214, #1218, #1221); current GitHub labels do not themselves verify active paid award | `UNVERIFIED_OR_HIGH_COMPETITION` |
+
+**Denominators:** four examined / four still OPEN on GitHub / four no independently proven review-ready first-$100 tasks. **$800 advertised, $0 independently collectible or earned.** These observations cannot establish that the four bounties will never pay an eligible solver; they show no present authority for *our* action. Jobbi's broader Oct. 28 index advertises **742 open gigs, $49,183 total priced value and $20 median reward**, but its index is not a payment ledger and spans different boards. [Jobbi market report](https://jobbi.org/gigs/report); [Jobbi Algora listings](https://jobbi.org/gigs/boards/algora). [BountyOS](https://bountyos.rovidev.com/en/github-bounty-board/) already markets stricter verification (with paid access to issue identities), so a generic paid bounty curator is **not an unoccupied market**; no independent customer/payment evidence for such a competing service was established.
+
+**New reusable artifacts:** `bounty_cross_board_2026-10-28.json` records the four issue URLs, listing sources, observed labels/assignees, explicit confidence limitations and competing-PR references. `test_bounty_cross_board.py` contains four adversarial regression tests, and the existing classifier distinguishes **explicit prohibition** from **unknown eligibility**, and treats observed assignment or high competition as a negative even if other fields are unknown. The existing unit-test file gained four new boundary tests. This research branch and test files have been written/read back from GitHub; **tests have not been executed or independently accepted in this iteration**. Run from `research/golden_goose/`:
+
+```sh
+python3 -m unittest -q test_bounty_triage.py test_bounty_cross_board.py
+python3 bounty_triage.py bounty_cross_board_2026-10-28.json
+```
+
+**Decision:** **deprioritize generic GitHub bounty-hunting as a near-term first-$100 strategy**. Sampled sources are stale/restricted/assigned/contested and require unapproved contributor claims, external submissions and eventual discretionary award. Do not extrapolate a market-wide failure rate from a targeted negative sample. Maintain the fail-closed screen as a reusable component only. The next research iteration should pursue a materially different first-dollar source (e.g. validated customer-backed service demand) rather than adding more static bounty-listing aggregators. Preserve PR as DRAFT, all protected-branch controls and the portfolio's existing ranked priorities.
