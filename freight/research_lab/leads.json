@@ -5223,6 +5223,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-10-29",
+      "id": "66c26021889dcd922bd284524536cf6c703130ed4dec6a3beb3fe7e2752c5716",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "data.cityofnewyork.us",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://data.cityofnewyork.us/d/9ycp-w8r6"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-22",
@@ -12761,6 +12777,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "74322c9fe3682f2d91ba55a05f421923b26417a691f7fee3b6e2ccf4120ce3a1",
+  "entries_sha256": "f8890e2767c3ddf1be3b022c64e31c3cad02a8e1ec8c160d789ac630acec3cdf",
   "schema_version": 1
 }
