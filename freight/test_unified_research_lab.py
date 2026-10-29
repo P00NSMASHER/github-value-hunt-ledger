@@ -3396,5 +3396,93 @@ class GAOB221609SixGBLCorrelatedEvidenceTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     self._assert_scope(bad)
 
+
+class NYCDOBCommunityViewAuthorityTests(unittest.TestCase):
+    """Official BIS and DOB NOW cohorts are not an unendorsed community view."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_community_view_authority_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_scope(self, p):
+        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["evaluation_family"],
+                         "GOVERNMENT_PERMIT_SOURCE_AUTHORITY_AND_COHORT_DISAMBIGUATION_NOT_SCORING")
+        self.assertEqual(p["status"], "DRAFT_HELD_UNRELEASED")
+        sources = {x["dataset_id"]: x for x in p["sources"]}
+        self.assertEqual(len(p["sources"]), 3)
+        self.assertEqual(set(sources), {"ipu4-2q9a", "rbx6-tga4", "cwwt-dc2f"})
+        bis, now, view = sources["ipu4-2q9a"], sources["rbx6-tga4"], sources["cwwt-dc2f"]
+        self.assertEqual(bis["cohort"], "BIS_PER_WORK_TYPE_PERMIT_LIFECYCLE_NOT_DOB_NOW")
+        self.assertEqual(now["cohort"], "DOB_NOW_APPROVED_EXCLUDES_ELECTRICAL_ELEVATOR_LAA")
+        self.assertEqual(view["cohort"], "COMMUNITY_VIEW_OF_BIS_UNVERIFIED_FILTERS")
+        self.assertTrue(bis["agency_original"])
+        self.assertTrue(now["agency_original"])
+        self.assertFalse(view["agency_original"])
+        self.assertTrue(view["community_created_view"])
+        self.assertEqual(view["upstream_dataset_id"], "ipu4-2q9a")
+        self.assertEqual(view["official_catalog_url"],
+                         "https://data.cityofnewyork.us/d/cwwt-dc2f")
+        for row in sources.values():
+            self.assertFalse(row["raw_publisher_http_bytes_acquired"])
+            self.assertIsNone(row["original_publisher_response_sha256"])
+            self.assertEqual(row["personal_permit_applicant_rows_saved"], 0)
+        a, r, q, g = p["source_authority"], p["rights"], p["source_quality"], p["ground_truth"]
+        self.assertFalse(a["community_view_city_endorsed"])
+        self.assertFalse(a["community_view_predicate_and_row_lineage_replayed"])
+        self.assertEqual(a["dob_now_excluded_application_families"],
+                         ["ELECTRICAL", "ELEVATOR", "LIMITED_ALTERATION_APPLICATION"])
+        self.assertFalse(a["bis_issuance_is_current_dob_now_issuance"])
+        self.assertFalse(a["community_view_title_proves_permit_issuance_or_validity"])
+        self.assertTrue(r["general_nyc_open_data_reuse_without_use_restrictions"])
+        self.assertFalse(r["additional_dataset_specific_terms_review_complete"])
+        self.assertFalse(r["commercial_scoring_or_customer_contact_approved"])
+        self.assertFalse(r["pii_customer_or_private_record_entitlement"])
+        self.assertFalse(q["original_api_export_or_row_replay_performed"])
+        self.assertTrue(q["city_catalog_last_updated_is_not_live_active_permit_truth"])
+        self.assertTrue(q["no_applicant_contact_or_address_rows_saved"])
+        for key in ("independently_held_out_labeled_issued_permit_cases",
+                    "independently_held_out_current_validity_labels",
+                    "independently_held_out_customer_outcome_labels"):
+            self.assertEqual(g[key], 0)
+        for key in ("cross_system_unique_real_permit_count", "community_filtered_row_count",
+                    "production_permit_precision_recall"):
+            self.assertEqual(g[key], "UNKNOWN")
+        self.assertFalse(g["real_permit_or_customer_truth_admitted"])
+        controls = p["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 8)
+        self.assertEqual(len(set(x["id"] for x in controls)), 8)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" for x in controls))
+
+    def test_original_agency_and_community_view_cohorts_are_distinct(self):
+        self._assert_scope(self._pack())
+
+    def test_synthetic_authority_rights_and_truth_promotions_are_rejected(self):
+        import copy
+        edits = (
+            lambda p: p["source_authority"].update(community_view_city_endorsed=True),
+            lambda p: p["sources"][2].update(agency_original=True),
+            lambda p: p["sources"][2].update(upstream_dataset_id="rbx6-tga4"),
+            lambda p: p["sources"][0].update(cohort="CURRENT_DOB_NOW"),
+            lambda p: p["source_authority"].update(dob_now_excluded_application_families=[]),
+            lambda p: p["source_authority"].update(bis_issuance_is_current_dob_now_issuance=True),
+            lambda p: p["rights"].update(additional_dataset_specific_terms_review_complete=True),
+            lambda p: p["rights"].update(commercial_scoring_or_customer_contact_approved=True),
+            lambda p: p["source_quality"].update(original_api_export_or_row_replay_performed=True),
+            lambda p: p["sources"][1].update(original_publisher_response_sha256="e" * 64),
+            lambda p: p["ground_truth"].update(independently_held_out_current_validity_labels=1),
+            lambda p: p["ground_truth"].update(cross_system_unique_real_permit_count="3990000"),
+            lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        for i, edit in enumerate(edits):
+            with self.subTest(synthetic_mutation=i):
+                mutated = copy.deepcopy(self._pack())
+                edit(mutated)
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(mutated)
+
+
 if __name__ == "__main__":
     unittest.main()
