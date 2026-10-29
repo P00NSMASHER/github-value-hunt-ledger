@@ -2887,7 +2887,7 @@ class NYCDOBMetadataDriftClockInvariantTests(unittest.TestCase):
 
     @staticmethod
     def _assert_quality(p):
-        assert p["schema_version"] == "0.1.7"
+        assert p["schema_version"] == "0.1.8"
         q = p["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"]
         assert q["publisher_rows_updated_at_epoch_seconds_in_both_views"] == 1793213280
         assert q["publisher_view_last_modified_epoch_seconds_in_both_views"] == 1793212310
@@ -2943,6 +2943,76 @@ class NYCDOBMetadataDriftClockInvariantTests(unittest.TestCase):
         forged["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"]["synthetic_negative_controls"][0]["kind"] = "ORIGINAL"
         with self.assertRaises(AssertionError):
             self._assert_quality(forged)
+
+
+class NYCDOBUnsortedReadbackChurnBoundaryTests(unittest.TestCase):
+    """Two changing unsorted writer receipts are not independent permit identities."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json").read_text(
+                               encoding="utf-8"))
+
+    @staticmethod
+    def _assert_scope(p):
+        assert p["schema_version"] == "0.1.8"
+        q = p["operational_writer_unsorted_identity_churn_2026_10_29"]
+        assert q["source_dataset_id"] == "rbx6-tga4"
+        a = q["previous_writer_snapshot"]
+        b = q["current_writer_snapshot"]
+        assert (a["sample_rows"], a["projected_unique_identities"],
+                a["projected_repeated_rows"]) == (20, 16, 4)
+        assert (b["sample_rows"], b["projected_unique_identities"],
+                b["projected_repeated_rows"]) == (20, 18, 2)
+        assert a["projected_unique_identities"] + a["projected_repeated_rows"] == 20
+        assert b["projected_unique_identities"] + b["projected_repeated_rows"] == 20
+        assert a["receipt_sha256"] == "f164464fea21a9caf2c877069bcea373c6d0e753b75666ae52089baa0f959d13"
+        assert b["receipt_sha256"] == "906d194881c63532fedc8259db825f839a622529a978ad61442946d116f69c7e"
+        assert b["canonical_sample_sha256"] == "7b01fb5ae962e8808bb9f66e5cf47ed95a488c8494915bee880df7f39b39ae6b"
+        assert b["receipt_git_blob_sha1"] == "89b59eb304f0f17a506c47a2cf0d63beca84f8ec"
+        assert b["writer_commit"] == "4543f5f35ab30baffe9be32bbc2e82d00405e1fd"
+        for field in ("sample_sequence_stably_sorted",
+                      "sampled_identities_change_is_independent_real_permit_count",
+                      "projected_repeat_count_change_proves_dedupe_repair",
+                      "original_publisher_http_bytes_acquired",
+                      "socrata_system_id_probe_executed"):
+            assert q[field] is False, field
+        assert q["original_publisher_http_sha256"] is None
+        assert q["distinct_source_api_rows_independently_verified"] == 0
+        assert q["independent_current_issuance_or_validity_labels"] == 0
+        assert q["verified_buyer_outcomes"] == 0
+        assert q["commercial_scoring_rights"] == "UNVERIFIED_HOLD"
+        assert q["production_admission"] == "HOLD"
+        assert len(q["synthetic_negative_controls"]) == 3
+        assert all(x["kind"] == "SYNTHETIC" for x in q["synthetic_negative_controls"])
+
+    def test_two_writer_receipts_do_not_establish_permit_identity(self):
+        self._assert_scope(self._pack())
+
+    def test_forged_identity_hash_labels_and_rights_are_rejected(self):
+        import copy
+        attacks = (
+            lambda q: q["current_writer_snapshot"].update(projected_repeated_rows=0),
+            lambda q: q["current_writer_snapshot"].update(projected_unique_identities=20),
+            lambda q: q["previous_writer_snapshot"].update(projected_unique_identities=20),
+            lambda q: q["current_writer_snapshot"].update(receipt_git_blob_sha1="0" * 40),
+            lambda q: q["current_writer_snapshot"].update(receipt_sha256="0" * 64),
+            lambda q: q["current_writer_snapshot"].update(canonical_sample_sha256="0" * 64),
+            lambda q: q.update(original_publisher_http_bytes_acquired=True),
+            lambda q: q.update(original_publisher_http_sha256="0" * 64),
+            lambda q: q.update(sample_sequence_stably_sorted=True),
+            lambda q: q.update(projected_repeat_count_change_proves_dedupe_repair=True),
+            lambda q: q.update(independent_current_issuance_or_validity_labels=18),
+            lambda q: q.update(commercial_scoring_rights="APPROVED"),
+            lambda q: q["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        for index, attack in enumerate(attacks):
+            with self.subTest(forged=index):
+                forged = copy.deepcopy(self._pack())
+                attack(forged["operational_writer_unsorted_identity_churn_2026_10_29"])
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(forged)
 
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
 if __name__ == "__main__":
