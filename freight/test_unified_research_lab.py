@@ -3184,12 +3184,46 @@ class CaptureBriefFY27VAFlooringLifecycleEvidenceTests(unittest.TestCase):
                            ).read_text(encoding="utf-8"))
 
     def _assert_scope(self, p):
-        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["schema_version"], "0.1.1")
         self.assertEqual(p["evaluation_family"],
                          "GOVERNMENT_NOTICE_ASOF_LIFECYCLE_AND_ELIGIBILITY_NOT_AWARD_SCORING")
         s, n, g, q = (p["source"], p["notice_chronology"],
                        p["ground_truth_boundaries"], p["quality"])
         self.assertEqual(s["published_notice_number"], "36C26127Q0047")
+        # Each historical SAM version has a distinct indexed publisher identity.
+        expected_versions = (
+            ("market_research_original", "ce12814b985b4908ae57248813c085b3",
+             "https://sam.gov/opp/ce12814b985b4908ae57248813c085b3/view",
+             "original_sources_sought_url"),
+            ("market_research_amended", "16e70df741c94882979fd9e6824ef1ff",
+             "https://sam.gov/opp/16e70df741c94882979fd9e6824ef1ff/view",
+             "updated_sources_sought_url"),
+            ("subsequent_solicitation", "b8205e6e69db41bc85611de60bbe9566",
+             "https://sam.gov/opp/b8205e6e69db41bc85611de60bbe9566/view",
+             "later_solicitation_url"),
+        )
+        for stage, uuid, url, source_key in expected_versions:
+            self.assertEqual(n[stage]["notice_record_uuid"], uuid)
+            self.assertEqual(s[source_key], url)
+        # Secondary indexes indicate a later Oct 23 amendment. Do not mark the
+        # Oct 19 record as the latest or claim unheld SAM bytes/roster custody.
+        amendment = s["secondary_oct23_amendment_index"]
+        self.assertEqual(amendment["candidate_notice_record_uuid"],
+                         "bfc14294001d4d5dbb20fe49a288b687")
+        self.assertEqual(amendment["candidate_official_url"],
+                         "https://sam.gov/opp/bfc14294001d4d5dbb20fe49a288b687/view")
+        self.assertEqual(amendment["secondary_indexes_report_posted_on"], "2026-10-23")
+        self.assertEqual(amendment["reported_version"],
+                         "SOLICITATION_UPDATED_AMENDMENT_P0001")
+        self.assertEqual(amendment["evidence_class"],
+                         "SECONDARY_PUBLIC_INDEX_ONLY_NOT_ORIGINAL_SAM_BYTES")
+        self.assertEqual(len(amendment["independent_secondary_indexes"]), 2)
+        for key in ("original_sam_record_http_bytes_verified",
+                    "amendment_pdf_or_roster_attachment_read",
+                    "commercial_reuse_approved"):
+            self.assertFalse(amendment[key])
+        self.assertIsNone(amendment["original_sam_record_http_sha256"])
+        self.assertTrue(amendment["primary_source_reverification_required"])
         self.assertEqual(s["later_solicitation_url"],
                          "https://sam.gov/opp/b8205e6e69db41bc85611de60bbe9566/view")
         self.assertEqual(s["site_terms_url"], "https://sam.gov/about/terms-of-use")
@@ -3216,7 +3250,11 @@ class CaptureBriefFY27VAFlooringLifecycleEvidenceTests(unittest.TestCase):
                       "amended_sources_sought_deadline_is_not_current_solicitation_offer_deadline"):
             self.assertTrue(g[label], label)
         self.assertEqual(g["last_indexed_publisher_stage_asof_2026_10_29"],
-                         "SOLICITATION_ORIGINAL")
+                         "UNKNOWN_SECONDARY_INDEX_REPORTS_OCT23_AMENDMENT_ORIGINAL_NOT_VERIFIED")
+        self.assertTrue(g["oct19_original_not_safe_as_latest_without_oct23_review"])
+        self.assertFalse(g["oct23_amendment_source_verified_from_original_publisher"])
+        self.assertEqual(g["oct23_amendment_changed_deadline_or_set_aside"],
+                         "UNKNOWN_NO_ORIGINAL_AMENDMENT_PDF_REPLAY")
         for key in ("bidder_sdvobs_eligibility",
                     "current_bid_acceptance_from_live_publisher_response",
                     "subsequent_changes_after_latest_indexed_source",
@@ -3230,17 +3268,21 @@ class CaptureBriefFY27VAFlooringLifecycleEvidenceTests(unittest.TestCase):
         self.assertEqual(q["source_content_sha256"],
                          "UNKNOWN_NO_ORIGINAL_PUBLISHER_HTTP_BYTES")
         self.assertEqual(q["original_attachment_files_acquired"], 0)
+        self.assertEqual(q["secondary_indexed_later_amendment_candidates"], 1)
+        self.assertEqual(q["primary_verified_later_amendment_documents"], 0)
+        self.assertIsNone(q["later_amendment_original_http_sha256"])
+        self.assertFalse(q["amendment_may_be_used_for_customer_scoring"])
         self.assertTrue(q["no_private_customer_student_or_medical_records_used"])
         controls = p["synthetic_negative_controls"]
-        self.assertEqual(len(controls), 7)
-        self.assertEqual(len({c["id"] for c in controls}), 7)
+        self.assertEqual(len(controls), 10)
+        self.assertEqual(len({c["id"] for c in controls}), 10)
         self.assertTrue(all(c["kind"] == "SYNTHETIC" and c["id"].startswith("SYNTHETIC_")
                             for c in controls))
 
     def test_september_market_research_is_not_october_live_solicitation(self):
         self._assert_scope(self._pack())
 
-    def test_seven_synthetic_stale_date_rights_and_award_promotions_rejected(self):
+    def test_synthetic_stale_date_identity_rights_and_award_promotions_rejected(self):
         import copy
         edits = (
             lambda p: p["notice_chronology"]["market_research_amended"].update(
@@ -3253,6 +3295,24 @@ class CaptureBriefFY27VAFlooringLifecycleEvidenceTests(unittest.TestCase):
             lambda p: p["source"].update(automated_sam_web_scraping_authorized=True),
             lambda p: p["ground_truth_boundaries"].update(independent_award_labels=1),
             lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+            lambda p: p["source"].update(original_sources_sought_url="https://sam.gov/opp/FAKE/view"),
+            lambda p: p["source"].update(updated_sources_sought_url="https://sam.gov/opp/FAKE/view"),
+            lambda p: p["notice_chronology"]["market_research_original"].update(
+                notice_record_uuid="SYNTHETIC_WRONG_RECORD"),
+            lambda p: p["notice_chronology"]["market_research_amended"].update(
+                notice_record_uuid="SYNTHETIC_WRONG_RECORD"),
+            lambda p: p["notice_chronology"]["subsequent_solicitation"].update(
+                notice_record_uuid="SYNTHETIC_WRONG_RECORD"),
+            lambda p: p["source"]["secondary_oct23_amendment_index"].update(
+                original_sam_record_http_bytes_verified=True),
+            lambda p: p["source"]["secondary_oct23_amendment_index"].update(
+                amendment_pdf_or_roster_attachment_read=True),
+            lambda p: p["source"]["secondary_oct23_amendment_index"].update(
+                candidate_notice_record_uuid="SYNTHETIC_WRONG_AMENDMENT"),
+            lambda p: p["ground_truth_boundaries"].update(
+                last_indexed_publisher_stage_asof_2026_10_29="SOLICITATION_ORIGINAL"),
+            lambda p: p["quality"].update(
+                amendment_may_be_used_for_customer_scoring=True),
         )
         for i, edit in enumerate(edits):
             with self.subTest(synthetic_mutation=i):
