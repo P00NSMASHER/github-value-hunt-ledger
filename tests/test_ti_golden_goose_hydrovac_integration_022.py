@@ -1,0 +1,145 @@
+"""PR-only research safety acceptance for synthetic Golden Goose invoice audit.
+
+Runs existing Node/Python fixtures in the Technology Intelligence release lane.
+No network, credentials, customer data, collections or monetization assertions.
+"""
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+RESEARCH = ROOT / "research" / "golden_goose" / "hydrovac_proof_to_invoice"
+
+
+class TestSyntheticGoldenGooseHydrovac(unittest.TestCase):
+    def run_js(self, filename):
+        node = shutil.which("node")
+        self.assertIsNotNone(node, "Node is required for Golden Goose JS acceptance")
+        env = dict(os.environ, PYTHON=sys.executable)
+        process = subprocess.run(
+            [node, str(RESEARCH / filename)],
+            cwd=str(RESEARCH),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(process.returncode, 0, process.stdout + "\n" + process.stderr)
+        try:
+            return json.loads(process.stdout.strip().splitlines()[-1])
+        except (ValueError, IndexError) as exc:
+            self.fail(f"Expected machine-readable JS acceptance, got {process.stdout!r}: {exc}")
+
+    def test_guard_requires_verified_posted_amounts(self):
+        result = self.run_js("posted_amount_guard_018.js")
+        self.assertEqual(result["passed"], 28)
+        self.assertEqual(result["review"], 25)
+        self.assertEqual(result["real_invoices"], 0)
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+
+    def test_summary_bridge_preserves_review_state(self):
+        result = self.run_js("cohort_amount_bridge_019.js")
+        self.assertEqual(result["passed"], 28)
+        self.assertEqual(result["review_cases"], 25)
+        self.assertEqual(result["real_customer_records"], 0)
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+
+    def test_real_python_to_js_100_job_cohort(self):
+        result = self.run_js("test_100_job_python_to_js_021.js")
+        self.assertEqual(result["cases"], 100)
+        self.assertEqual(result["quantity_only_clears"], 70)
+        self.assertEqual(result["hidden_posted_issues"], 10)
+        self.assertEqual(result["strict_arithmetic_only"], 60)
+        self.assertEqual(result["strict_needs_review"], 40)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertEqual(result["real_customer_invoices"], 0)
+        self.assertEqual(result["incumbent_vendor_comparison"], "NOT_RUN")
+
+
+    def test_duplicate_id_review_amplification_is_not_collectible(self):
+        result = self.run_js("test_blast_radius_023.js")
+        self.assertEqual(result["cases"], 100)
+        self.assertEqual(result["unaffected_arithmetic_before"], 100)
+        self.assertEqual(result["duplicate_invoice_id_pairs"], 1)
+        self.assertEqual(result["directly_touched_jobs"], 2)
+        self.assertEqual(result["cohort_review_after"], 100)
+        self.assertEqual(result["other_jobs_conservatively_held"], 98)
+        self.assertEqual(result["review_amplification_ratio"], 50)
+        self.assertEqual(result["hypothetical_other_job_review_cost_usd"], 285.83)
+        self.assertEqual(result["real_customer_invoices"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+
+
+    def test_diagnostic_only_collision_scope_never_clears_invoices(self):
+        result = self.run_js("test_collision_diagnostic_024.js")
+        self.assertEqual(result["passed"], 18)
+        self.assertTrue(result["bridge_checked"])
+        self.assertEqual(result["global_bridge_review"], 100)
+        self.assertEqual(result["diagnostic_not_flagged"], 98)
+        self.assertEqual(result["hypothetical_global_review_cost_usd"], 291.67)
+        self.assertEqual(result["hypothetical_two_job_triage_cost_usd"], 5.83)
+        self.assertEqual(result["actual_customer_invoices_reviewed"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertFalse(result["release_ready"])
+        self.assertFalse(result["commercially_validated"])
+
+
+    def test_unverified_invoice_document_scope_is_diagnostic_only(self):
+        result = self.run_js("test_invoice_scope_holdout_025.js")
+        self.assertEqual(result["passed"], 18)
+        self.assertEqual(result["synthetic_jobs"], 100)
+        self.assertEqual(result["distinct_supplied_docs"], 100)
+        self.assertEqual(result["scoped_suspected_collisions"], 0)
+        # The original amount bridge MUST still hold every record in review.
+        self.assertEqual(result["original_bridge_review"], 100)
+        self.assertEqual(result["hypothetical_full_review_usd"], 291.67)
+        self.assertEqual(result["hypothetical_break_even_hours"], 2.571)
+        self.assertEqual(result["actual_customer_invoices_reviewed"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertFalse(result["release_ready"])
+        self.assertFalse(result["commercially_validated"])
+
+
+    def test_synthetic_source_fingerprint_conflicts_fail_closed(self):
+        result = self.run_js("test_source_fingerprint_026.js")
+        self.assertEqual(result["passed"], 28)
+        self.assertEqual(result["synthetic_jobs"], 100)
+        self.assertTrue(result["sha256_valid_for_supplied_bytes"])
+        self.assertFalse(result["document_identity_authenticated"])
+        self.assertEqual(result["hypothetical_full_review_usd"], 291.67)
+        self.assertEqual(result["hypothetical_break_even_hours"], 2.571)
+        self.assertEqual(result["actual_customer_invoices_reviewed"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["verified_owner_revenue_usd"], "0.00")
+        self.assertFalse(result["release_ready"])
+        self.assertFalse(result["commercially_validated"])
+
+
+    def test_synthetic_audit_review_economics_stop_gate(self):
+        result = self.run_js("test_review_economics_gate_027.js")
+        self.assertEqual(result["passed"], 16)
+        self.assertEqual(result["cohort_jobs"], 100)
+        self.assertEqual(result["full_review_assumed_labor_usd"], "291.67")
+        self.assertEqual(result["full_review_assumed_contribution_usd"], "-201.67")
+        self.assertEqual(result["max_model_review_seconds_per_job"], 92.57)
+        self.assertEqual(result["triage_only_unreviewed_held"], 98)
+        self.assertTrue(result["vendor_price_comparison_not_like_for_like"])
+        self.assertEqual(result["actual_customers"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["owner_revenue_usd"], "0.00")
+        self.assertFalse(result["real_head_to_head_comparison"])
+        self.assertFalse(result["commercially_validated"])
+
+
+if __name__ == "__main__":
+    unittest.main()

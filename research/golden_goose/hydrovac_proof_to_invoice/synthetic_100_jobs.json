@@ -1,0 +1,2660 @@
+{
+  "generated": "2026-10-29",
+  "synthetic_only": true,
+  "methods": "70 clear, 12 planted gaps, 18 ambiguity/exception controls",
+  "jobs": [
+    {
+      "job_id": "SYN-HV-001",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-001",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-002",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-002",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-003",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-003",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-004",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-004",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-005",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-005",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-006",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-006",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-007",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-007",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-008",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-008",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-009",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-009",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-010",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-010",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-011",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-011",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-012",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-012",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-013",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-013",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-014",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-014",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-015",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-015",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-016",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-016",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-017",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-017",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-018",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-018",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-019",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-019",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-020",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-020",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-021",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-021",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-022",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-022",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-023",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-023",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-024",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-024",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-025",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-025",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-026",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-026",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-027",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-027",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-028",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-028",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-029",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-029",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-030",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-030",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-031",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-031",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-032",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-032",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-033",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-033",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-034",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-034",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-035",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-035",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-036",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-036",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-037",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-037",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-038",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-038",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-039",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-039",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-040",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-040",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-041",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-041",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-042",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-042",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-043",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-043",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-044",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-044",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-045",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-045",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-046",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-046",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-047",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-047",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-048",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-048",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-049",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-049",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-050",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-050",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-051",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-051",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-052",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-052",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-053",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-053",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-054",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-054",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-055",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-055",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-056",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-056",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-057",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-057",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-058",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-058",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-059",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-059",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-060",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-060",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-061",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-061",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-062",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-062",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-063",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-063",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-064",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-064",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-065",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-065",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-066",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-066",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-067",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-067",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-068",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-068",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-069",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-069",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-070",
+      "fixture_category": "clean",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-070",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-071",
+      "fixture_category": "missing_invoice",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-072",
+      "fixture_category": "missing_invoice",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-073",
+      "fixture_category": "missing_invoice",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-074",
+      "fixture_category": "missing_invoice",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-075",
+      "fixture_category": "missing_hours",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-075",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "3",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-076",
+      "fixture_category": "missing_hours",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-076",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "3",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-077",
+      "fixture_category": "missing_hours",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-077",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "3",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-078",
+      "fixture_category": "missing_hours",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-078",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "3",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-079",
+      "fixture_category": "missing_dump",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-079",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "0"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-080",
+      "fixture_category": "missing_dump",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-080",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "0"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-081",
+      "fixture_category": "missing_dump",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-081",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "0"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-082",
+      "fixture_category": "missing_dump",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-082",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "0"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-083",
+      "fixture_category": "no_signoff",
+      "service_date": "2026-09-15",
+      "approved_at": null,
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-083",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-084",
+      "fixture_category": "no_signoff",
+      "service_date": "2026-09-15",
+      "approved_at": null,
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-084",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-085",
+      "fixture_category": "no_signoff",
+      "service_date": "2026-09-15",
+      "approved_at": null,
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-085",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-086",
+      "fixture_category": "no_contract",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": null,
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-086",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-087",
+      "fixture_category": "no_contract",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": null,
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-087",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-088",
+      "fixture_category": "no_contract",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": null,
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-088",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-089",
+      "fixture_category": "recent",
+      "service_date": "2026-10-20",
+      "approved_at": "2026-10-21",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-089",
+          "issued_on": "2026-10-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-090",
+      "fixture_category": "recent",
+      "service_date": "2026-10-20",
+      "approved_at": "2026-10-21",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-090",
+          "issued_on": "2026-10-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-091",
+      "fixture_category": "recent",
+      "service_date": "2026-10-20",
+      "approved_at": "2026-10-21",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-091",
+          "issued_on": "2026-10-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-092",
+      "fixture_category": "waiver",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-092",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": true,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-093",
+      "fixture_category": "waiver",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-093",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": true,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-094",
+      "fixture_category": "waiver",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-094",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": true,
+      "credit": false,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-095",
+      "fixture_category": "credit",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-095",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": true,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-096",
+      "fixture_category": "credit",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-096",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": true,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-097",
+      "fixture_category": "credit",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-097",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": true,
+      "scope_dispute": false
+    },
+    {
+      "job_id": "SYN-HV-098",
+      "fixture_category": "dispute",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-098",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": true
+    },
+    {
+      "job_id": "SYN-HV-099",
+      "fixture_category": "dispute",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-099",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": true
+    },
+    {
+      "job_id": "SYN-HV-100",
+      "fixture_category": "dispute",
+      "service_date": "2026-09-15",
+      "approved_at": "2026-09-16",
+      "manifest_approved": true,
+      "approved_billable_hours": "4",
+      "approved_dump_loads": "1",
+      "rate_card": {
+        "signed": true,
+        "effective_on": "2026-01-01",
+        "hourly_rate": "175",
+        "dump_fee": "180"
+      },
+      "invoices": [
+        {
+          "invoice_line_id": "INV-SYN-100",
+          "issued_on": "2026-09-22",
+          "state": "ISSUED",
+          "hours_qty": "4",
+          "dump_qty": "1"
+        }
+      ],
+      "waiver": false,
+      "credit": false,
+      "scope_dispute": true
+    }
+  ]
+}
