@@ -32,6 +32,7 @@ from freight.test_fmc_bakerly_22_17_admitted_errors import FMCBakerlyBoundaryTes
 from freight.test_gao_b121220_documentary_proof import GAOB121220DocumentaryProofTests
 from freight.test_gao_b215958_supersession import GAOB215958SupersessionTests
 from freight.test_recoveryos_gao_ap_reconciliation_candidate import GAOAccountingReconCandidateTest
+from freight.test_nara_2022_foia_bol_extraction import NARAOriginalBOLExtractionTests
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
