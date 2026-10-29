@@ -34,7 +34,16 @@
       "issue_date": "2025-11-25",
       "date_authority": "issuer",
       "state": "CLOSED",
-      "url": "https://guamwaterworks.org/bids/"
+      "url": "https://guamwaterworks.org/bids/",
+      "bid_number": "RFP-02-ENG-2025",
+      "bid_title": "RFP-02-ENG-2025 Hagatna Wastewater Treatment Plant Secondary Treatment Feasibility Study, GWA Project No. 22603",
+      "issuer_notice": {
+        "source_kind": "issuer_public_notice",
+        "url": "https://notices.guam.gov/notice_detail/7837",
+        "title": "RFP-02-ENG-2025 Hagatna Wastewater Treatment Plant Secondary Treatment Feasibility Study, GWA Project No. 22603",
+        "published_on": "2025-11-25",
+        "observed_on": "2026-10-29"
+      }
     },
     {
       "id": "NTUA_TUBA_2026",
@@ -96,6 +105,7 @@
     "Program budgets are NOT bid prices, awarded values, or obtainable revenue.",
     "Generic EPA wastewater sales intelligence already has competitors.",
     "Do not treat other same-issuer bids as mandate-linked on keyword alone; exact scope and dates required.",
-    "An issuer listing is not evidence of successful bid or bidder entitlement."
+    "An issuer listing is not evidence of successful bid or bidder entitlement.",
+    "Offline review can confirm receipt completeness only, not independently fetch or authenticate page contents."
   ]
 }
