@@ -37,6 +37,12 @@ def inspect(job, *, as_of='2026-10-29', grace_days=30):
     try:
         today = _day(as_of)
         work = _day(job['service_date'])
+        # A missing job identity or missing invoice-ledger export cannot prove
+        # that the job was omitted from the actual billing system.
+        if not isinstance(job.get('job_id'), str) or not job['job_id'].strip():
+            return verdict('REVIEW_INVALID_JOB_ID')
+        if 'invoices' not in job:
+            return verdict('REVIEW_MISSING_INVOICE_LEDGER')
         if grace_days < 0 or isinstance(grace_days, bool) or not isinstance(grace_days, int):
             return verdict('REVIEW_INVALID_GRACE')
         if work > today:
@@ -50,11 +56,19 @@ def inspect(job, *, as_of='2026-10-29', grace_days=30):
             return verdict('REVIEW_BAD_INVOICES')
         if any(_day(x['issued_on']) > today for x in all_invoices):
             return verdict('REVIEW_FUTURE_EVIDENCE')
+        # An advance invoice can be legitimate but needs explicit documentary
+        # reconciliation; do not infer an unpaid shortfall from it.
+        if any(_day(x['issued_on']) < work for x in all_invoices):
+            return verdict('REVIEW_PRE_SERVICE_INVOICE')
         # A posted invoice with a later adjustment is not an authoritative net
         # receivable until that adjustment has been reconciled independently.
         if any(x.get(k) for x in all_invoices for k in ('credit_memo_id', 'voided_on', 'reversed_on')):
             return verdict('REVIEW_POST_ISSUE_ADJUSTMENT')
-        ids = [x['invoice_line_id'] for x in all_invoices]
+        # Invoice line identifiers are case/whitespace-normalized within a job
+        # as well as across jobs. Never sum the same line twice.
+        if any(not isinstance(x['invoice_line_id'], str) or not x['invoice_line_id'].strip() for x in all_invoices):
+            return verdict('REVIEW_INVALID_INVOICE_LINE_ID')
+        ids = [x['invoice_line_id'].strip().casefold() for x in all_invoices]
         if len(ids) != len(set(ids)):
             return verdict('REVIEW_DUPLICATE_INVOICE_LINE')
         if job.get('approved_at') and _day(job['approved_at']) > today:
@@ -85,6 +99,10 @@ def inspect(job, *, as_of='2026-10-29', grace_days=30):
         if (today - work).days < grace_days:
             return verdict('REVIEW_WITHIN_GRACE')
         issued = [x for x in all_invoices if x['state'] == 'ISSUED']
+        # Other line states may represent pending supplements, voids or partial
+        # billing. They cannot be silently excluded from an alleged shortfall.
+        if issued and len(issued) != len(all_invoices):
+            return verdict('REVIEW_MIXED_INVOICE_STATES')
         if not issued and all_invoices:
             return verdict('REVIEW_DRAFT_ONLY')
         expected = expected_hours * rate + expected_dumps * dump
@@ -115,7 +133,7 @@ def summarize(jobs, *, as_of='2026-10-29'):
     A collision suppresses any monetary candidate for all affected rows.
     """
     results = [inspect(j, as_of=as_of) for j in jobs]
-    seen_tickets, seen_lines, collisions = {}, {}, {}
+    seen_jobs, seen_tickets, seen_lines, collisions = {}, {}, {}, {}
 
     def record(index, ident, seen, reason):
         prior = seen.get(ident)
@@ -126,6 +144,10 @@ def summarize(jobs, *, as_of='2026-10-29'):
             seen[ident] = index
 
     for index, job in enumerate(jobs):
+        ident = job.get('job_id')
+        if isinstance(ident, str) and ident.strip():
+            record(index, ident.strip().casefold(), seen_jobs,
+                   'REVIEW_CROSS_JOB_ID_COLLISION')
         ticket = job.get('ticket_id')
         if isinstance(ticket, str) and ticket.strip():
             record(index, ticket.strip().casefold(), seen_tickets,
