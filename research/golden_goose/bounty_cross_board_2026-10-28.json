@@ -1,0 +1,85 @@
+[
+  {
+    "listing_id": "jobbi-coolify-2378-20261028",
+    "issue_url": "https://github.com/coollabsio/coolify/issues/2378",
+    "advertised_usd": "100.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": false,
+    "recent_awards_verified": null,
+    "claim_count": null,
+    "assignment_required": null,
+    "assigned_to_us": false,
+    "assigned_to_other": false,
+    "observed_at": "2026-10-28",
+    "reason": "Current GitHub issue has explicit Core Team Only label; does not establish outside contributor entitlement even though an aggregator advertises $100.",
+    "primary_url": "https://github.com/coollabsio/coolify/issues/2378",
+    "listing_url": "https://jobbi.org/gigs/boards/algora",
+    "observed_labels": [
+      "🛠️ Feature",
+      "👥 Core Team Only"
+    ]
+  },
+  {
+    "listing_id": "algora-revert-372-20261028",
+    "issue_url": "https://github.com/revertinc/revert/issues/372",
+    "advertised_usd": "100.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": null,
+    "assignment_required": null,
+    "assigned_to_us": false,
+    "assigned_to_other": true,
+    "observed_at": "2026-10-28",
+    "observed_assignees": [
+      "ezhil56x"
+    ],
+    "reason": "GitHub issue assigned to another contributor; assignment and ongoing bounty discretion prevent our assuming eligibility or payout.",
+    "primary_url": "https://github.com/revertinc/revert/issues/372",
+    "listing_url": "https://algora.io/revertinc/bounties?status=open"
+  },
+  {
+    "listing_id": "jobbi-javelin-4-20261028",
+    "issue_url": "https://github.com/javelin-anticheat/py-workedtask/issues/4",
+    "advertised_usd": "100.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 9,
+    "assignment_required": null,
+    "assigned_to_us": false,
+    "assigned_to_other": false,
+    "observed_at": "2026-10-28",
+    "reason": "At least nine publicly visible prior /attempt, /claim, and PR attempts; current issue has a $100 label but acceptance/payment to a new solver remain unverified.",
+    "primary_url": "https://github.com/javelin-anticheat/py-workedtask/issues/4",
+    "listing_url": "https://jobbi.org/gigs/top-paying/",
+    "claim_count_is_lower_bound": true
+  },
+  {
+    "listing_id": "algora-gyroflow-742-20261028",
+    "issue_url": "https://github.com/gyroflow/gyroflow/issues/742",
+    "advertised_usd": "500.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": null,
+    "recent_awards_verified": null,
+    "claim_count": 4,
+    "assignment_required": null,
+    "assigned_to_us": false,
+    "assigned_to_other": false,
+    "observed_at": "2026-10-28",
+    "reason": "At least four competing PRs identified (1118,1214,1218,1221). Current GitHub issue readback only shows enhancement label, not a monetary bounty label; Algora board is not proof of current award terms.",
+    "primary_url": "https://github.com/gyroflow/gyroflow/issues/742",
+    "listing_url": "https://algora.io/gyroflow/bounties/community?fund=gyroflow%2Fgyroflow%2344",
+    "competing_pr_urls": [
+      "https://github.com/gyroflow/gyroflow/pull/1118",
+      "https://github.com/gyroflow/gyroflow/pull/1214",
+      "https://github.com/gyroflow/gyroflow/pull/1218",
+      "https://github.com/gyroflow/gyroflow/pull/1221"
+    ],
+    "claim_count_is_lower_bound": true
+  }
+]
