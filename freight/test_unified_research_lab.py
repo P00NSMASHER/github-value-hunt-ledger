@@ -3494,5 +3494,102 @@ class NYCDOBCommunityViewAuthorityTests(unittest.TestCase):
                     self._assert_scope(mutated)
 
 
+
+class GAOB253541ConflictingOriginalGBLTests(unittest.TestCase):
+    """Original GAO decision's conflicting document values are not modern invoice truth."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "gao_b253541_conflicting_gbl_original_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_scope(self, p):
+        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["evaluation_family"],
+                         "FREIGHT_DOCUMENT_EXTRACTION_ORIGINAL_VS_SHIPPING_ORDER_CONFLICT_NOT_MODERN_RATE_SCORING")
+        self.assertEqual(p["status"], "DRAFT_SOURCE_BOUND_HOLD")
+        s = p["source"]
+        self.assertEqual((s["decision_id"], s["decision_date"], s["publisher"]),
+                         ("GAO_B_253541", "1993-10-18", "US_GAO"))
+        self.assertEqual(s["official_url"], "https://www.gao.gov/products/b-253541")
+        self.assertEqual(s["rights_url"], "https://www.gao.gov/copyright")
+        self.assertTrue(s["published_agency_decision_text_reviewed"])
+        for key in ("third_party_attached_material_rights_checked",
+                    "publisher_http_response_bytes_acquired",
+                    "original_sf1103_microfiche_bytes_acquired",
+                    "original_sf1104_shipping_order_bytes_acquired",
+                    "signed_original_gbl_independently_in_lab_custody"):
+            self.assertFalse(s[key])
+        self.assertIsNone(s["publisher_http_body_sha256"])
+        d = p["historical_discrepancy"]
+        self.assertEqual(d["gbl_identifier"], "D-0,521,277")
+        self.assertEqual((d["shipping_order_form"], d["shipping_order_valuation_string"]),
+                         ("SF_1104", "$2150"))
+        self.assertEqual((d["signed_original_gbl_form"], d["signed_original_gbl_valuation_string"]),
+                         ("SF_1103", "$2.50"))
+        self.assertEqual(d["valuation_basis"], "USD_PER_POUND_PER_ARTICLE")
+        self.assertTrue(d["gao_reports_original_carrier_representative_signature"])
+        self.assertEqual(d["gao_resolution"],
+                         "GSA_AUDIT_SETTLEMENT_AFFIRMED_USING_ORIGINAL_GBL_VALUATION")
+        self.assertFalse(d["same_released_value_on_both_forms"])
+        self.assertTrue(d["original_vs_shipping_order_inference_is_case_specific"])
+        self.assertFalse(d["released_value_is_freight_transportation_charge"])
+        self.assertEqual(d["actual_original_tariff_rate"], "UNKNOWN")
+        self.assertEqual(d["actual_claim_dollar_amount"], "UNKNOWN")
+        self.assertFalse(d["original_microfiche_independently_replayed"])
+        r, g, h = p["rights"], p["ground_truth"], p["handoff"]
+        self.assertTrue(r["gao_text_reuse_with_credit_and_no_implied_endorsement"])
+        for key in ("separate_third_party_invoice_and_image_rights_verified",
+                    "commercial_customer_scoring_authorized", "private_data_acquired"):
+            self.assertFalse(r[key])
+        self.assertEqual(g["published_adjudication_decision_labels"], 1)
+        for key in ("independently_heldout_original_gbl_document_pairs",
+                    "independently_heldout_customer_invoice_rate_labels",
+                    "independent_current_customer_cash_receipts",
+                    "verified_retally_customer_recovery_cents"):
+            self.assertEqual(g[key], 0)
+        self.assertEqual(g["freight_error_precision_recall"], "UNKNOWN")
+        self.assertEqual(g["customer_rate_error_label"], "UNKNOWN")
+        self.assertEqual(g["document_conflict_source_scope"],
+                         "ONE_AGENCY_DECISION_NOT_TWO_INDEPENDENT_DOCUMENT_EXAMPLES")
+        self.assertEqual(len(p["synthetic_negative_controls"]), 5)
+        self.assertEqual(len({x["id"] for x in p["synthetic_negative_controls"]}), 5)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC"
+                            for x in p["synthetic_negative_controls"]))
+        self.assertEqual(h["intended_lane"],
+                         "FREIGHTRECOVERY_DOCUMENT_EXTRACTION_CONFLICT_REGRESSION_CANDIDATE")
+        for key in ("engine_implementation_changes_made", "operational_writer_changed",
+                    "independent_qa_completed", "production_release_authorized"):
+            self.assertFalse(h[key])
+
+    def test_historical_signed_original_not_shipping_order_is_decision_scope_only(self):
+        self._assert_scope(self._pack())
+
+    def test_synthetic_document_custody_rights_and_money_claims_rejected(self):
+        import copy
+        edits = (
+            lambda p: p["historical_discrepancy"].update(shipping_order_valuation_string="$2.50"),
+            lambda p: p["historical_discrepancy"].update(signed_original_gbl_valuation_string="$2150"),
+            lambda p: p["historical_discrepancy"].update(signed_original_gbl_form="SF_1104"),
+            lambda p: p["historical_discrepancy"].update(original_vs_shipping_order_inference_is_case_specific=False),
+            lambda p: p["historical_discrepancy"].update(released_value_is_freight_transportation_charge=True),
+            lambda p: p["historical_discrepancy"].update(actual_claim_dollar_amount="$2150"),
+            lambda p: p["source"].update(original_sf1103_microfiche_bytes_acquired=True),
+            lambda p: p["source"].update(publisher_http_body_sha256="a" * 64),
+            lambda p: p["rights"].update(commercial_customer_scoring_authorized=True),
+            lambda p: p["ground_truth"].update(independently_heldout_original_gbl_document_pairs=1),
+            lambda p: p["ground_truth"].update(verified_retally_customer_recovery_cents=215000),
+            lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+            lambda p: p["handoff"].update(production_release_authorized=True),
+        )
+        for i, edit in enumerate(edits):
+            with self.subTest(synthetic_mutation=i):
+                forged = copy.deepcopy(self._pack())
+                edit(forged)
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(forged)
+
+
 if __name__ == "__main__":
     unittest.main()
