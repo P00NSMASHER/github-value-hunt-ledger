@@ -125,5 +125,21 @@ class TestSyntheticGoldenGooseHydrovac(unittest.TestCase):
         self.assertFalse(result["commercially_validated"])
 
 
+    def test_synthetic_audit_review_economics_stop_gate(self):
+        result = self.run_js("test_review_economics_gate_027.js")
+        self.assertEqual(result["passed"], 16)
+        self.assertEqual(result["cohort_jobs"], 100)
+        self.assertEqual(result["full_review_assumed_labor_usd"], "291.67")
+        self.assertEqual(result["full_review_assumed_contribution_usd"], "-201.67")
+        self.assertEqual(result["max_model_review_seconds_per_job"], 92.57)
+        self.assertEqual(result["triage_only_unreviewed_held"], 98)
+        self.assertTrue(result["vendor_price_comparison_not_like_for_like"])
+        self.assertEqual(result["actual_customers"], 0)
+        self.assertIsNone(result["verified_collectible_usd"])
+        self.assertEqual(result["owner_revenue_usd"], "0.00")
+        self.assertFalse(result["real_head_to_head_comparison"])
+        self.assertFalse(result["commercially_validated"])
+
+
 if __name__ == "__main__":
     unittest.main()
