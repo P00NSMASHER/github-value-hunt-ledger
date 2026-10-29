@@ -63,8 +63,10 @@ class LifecycleGuardTests(unittest.TestCase):
             'missing_date': ('observed_on', None),
             'prepublication_observation': ('observed_on', '2026-05-31'),
             'wrong_observation_type': ('observed_on', 20261029),
+            'backdated_observation': ('observed_on', '2026-06-02'),
+            'unhashable_receipt_id': ('receipt_id', []),
         }
-        self.assertEqual(len(variations), 18)
+        self.assertEqual(len(variations), 20)
         for label, (key, val) in variations.items():
             with self.subTest(label=label):
                 event = copy.deepcopy(BASE)
