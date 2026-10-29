@@ -18,7 +18,7 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
         return json.loads(PACK.read_text(encoding="utf-8"))
 
     def _assert_scope(self, p):
-        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["schema_version"], "0.1.1")
         self.assertEqual(p["fixture_id"],
                          "NARA_FOIA_2022_REDACTED_ORIGINAL_GOVERNMENT_BOL_EXTRACTION_CANDIDATE_V0")
         self.assertEqual(p["status"], "DRAFT_SOURCE_BOUND_HOLD_UNRELEASED")
@@ -90,6 +90,26 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
                     "public_bol_is_not_carrier_invoice_or_bank_payment",
                     "redacted_identifiers_not_reconstructed"):
             self.assertTrue(q[key], key)
+        b = p["billing_direction_observation"]
+        self.assertEqual(b["source_grounding"],
+                         "PAGE_1_BOX_9_BILL_CHARGES_TO_AND_PAGE_2_PRINTED_TSP_BILLING_CERTIFICATE_HEADING")
+        self.assertEqual(b["printed_bill_charges_to"],
+                         "THIRD_PARTY_BILLING_SERVICE_AT_US_BANK")
+        self.assertEqual(b["printed_tsp_billing_certificate_scope"],
+                         "CONSIGNEE_MUST_NOT_PAY_ANY_CHARGES")
+        self.assertEqual(b["original_label_kind"],
+                         "VISUAL_PUBLIC_FORM_TEXT_NOT_LEDGER_ENTRY_OR_INDEPENDENT_PAYMENT_LABEL")
+        for key in ("printed_instruction_is_validated_account_payable_liability",
+                    "printed_instruction_proves_payment_was_made",
+                    "consignee_is_verified_debtor"):
+            self.assertIs(b[key], False, key)
+        self.assertEqual(b["actual_payer_identity"], "UNKNOWN")
+        self.assertEqual(b["verified_payment_status"], "UNKNOWN")
+        self.assertEqual(b["recoveryos_reconciliation_label"],
+                         "UNKNOWN_DO_NOT_POST_CONSIGNEE_PAYABLE_OR_ASSUME_THIRD_PARTY_PAYMENT")
+        self.assertTrue(q["printed_billing_direction_not_payment_evidence"])
+        self.assertTrue(q["consignee_is_not_verified_accounts_payable_debtor"])
+
         for key in ("actual_valid_tender_rate_usd_cents",
                     "freight_amount_overcharged_usd_cents",
                     "carrier_payment_amount_usd_cents"):
@@ -108,7 +128,7 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
         self.assertEqual(p["consumers"]["qa_44"],
                          "INDEPENDENT_PDF_CUSTODY_LABELS_RIGHTS_AND_PYTHON_CI_PENDING")
         c = p["synthetic_negative_controls"]
-        self.assertEqual(len(c), 7)
+        self.assertEqual(len(c), 9)
         self.assertEqual(len({row["id"] for row in c}), 7)
         self.assertTrue(all(row["id"].startswith("SYNTHETIC-NARA-")
                             and row["kind"] == "SYNTHETIC"
@@ -146,6 +166,13 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
             lambda p: p["ground_truth"].update(independently_heldout_labeled_original_bols=1),
             lambda p: p["ground_truth"].update(verified_retally_customer_recovered_usd_cents=499020),
             lambda p: p["ground_truth"].update(production_acceptance=True),
+            lambda p: p["billing_direction_observation"].update(printed_instruction_proves_payment_was_made=True),
+            lambda p: p["billing_direction_observation"].update(consignee_is_verified_debtor=True),
+            lambda p: p["billing_direction_observation"].update(actual_payer_identity="US_BANK_CONFIRMED_PAID"),
+            lambda p: p["billing_direction_observation"].update(verified_payment_status="PAID"),
+            lambda p: p["billing_direction_observation"].update(printed_tsp_billing_certificate_scope="CONSIGNEE_MUST_PAY"),
+            lambda p: p["quality"].update(printed_billing_direction_not_payment_evidence=False),
+            lambda p: p["quality"].update(consignee_is_not_verified_accounts_payable_debtor=False),
             lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
         )
         for i, edit in enumerate(changes):
