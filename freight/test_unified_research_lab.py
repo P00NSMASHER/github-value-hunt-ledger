@@ -3173,5 +3173,93 @@ class NYCElectricalCatalogMarginalReconciliationTests(unittest.TestCase):
 
 
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
+
+class CaptureBriefFY27VAFlooringLifecycleEvidenceTests(unittest.TestCase):
+    """Officially indexed FY27 notices: market research is not a live solicitation."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "capturebrief_sam_fy2027_va_flooring_lifecycle_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_scope(self, p):
+        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["evaluation_family"],
+                         "GOVERNMENT_NOTICE_ASOF_LIFECYCLE_AND_ELIGIBILITY_NOT_AWARD_SCORING")
+        s, n, g, q = (p["source"], p["notice_chronology"],
+                       p["ground_truth_boundaries"], p["quality"])
+        self.assertEqual(s["published_notice_number"], "36C26127Q0047")
+        self.assertEqual(s["later_solicitation_url"],
+                         "https://sam.gov/opp/b8205e6e69db41bc85611de60bbe9566/view")
+        self.assertEqual(s["site_terms_url"], "https://sam.gov/about/terms-of-use")
+        self.assertFalse(s["original_publisher_http_response_bytes_custodied"])
+        self.assertIsNone(s["original_publisher_http_sha256"])
+        self.assertFalse(s["publisher_attachment_bytes_custodied"])
+        self.assertFalse(s["source_specific_commercial_scoring_rights_verified"])
+        self.assertFalse(s["automated_sam_web_scraping_authorized"])
+        self.assertEqual(s["permission_state"],
+                         "HOLD_SOURCE_SPECIFIC_API_PERMISSION_AND_ATTACHMENT_RIGHTS_NOT_PROVEN")
+        self.assertEqual(n["market_research_original"]["original_response_due_local"],
+                         "2026-10-30T16:00:00-07:00")
+        self.assertEqual(n["market_research_amended"]["updated_response_due_local"],
+                         "2026-09-22T16:00:00-07:00")
+        self.assertEqual(n["subsequent_solicitation"]["publication_date"], "2026-10-19")
+        self.assertEqual(n["subsequent_solicitation"]["date_offers_due_local"],
+                         "2026-11-17T15:00:00-08:00")
+        self.assertEqual(n["subsequent_solicitation"]["set_aside"],
+                         "SERVICE_DISABLED_VETERAN_OWNED_SMALL_BUSINESS")
+        self.assertEqual(len({x["notice_record_uuid"] for x in n.values()}), 3)
+        for label in ("same_notice_number_is_not_same_notice_record_uuid",
+                      "three_notice_record_uuids_do_not_prove_three_contract_awards",
+                      "original_sources_sought_deadline_is_not_current_solicitation_offer_deadline",
+                      "amended_sources_sought_deadline_is_not_current_solicitation_offer_deadline"):
+            self.assertTrue(g[label], label)
+        self.assertEqual(g["last_indexed_publisher_stage_asof_2026_10_29"],
+                         "SOLICITATION_ORIGINAL")
+        for key in ("bidder_sdvobs_eligibility",
+                    "current_bid_acceptance_from_live_publisher_response",
+                    "subsequent_changes_after_latest_indexed_source",
+                    "solicitation_award_outcome"):
+            self.assertIn("UNKNOWN", g[key], key)
+        for key in ("independent_heldout_lifecycle_labels", "independent_award_labels",
+                    "verified_customer_eligible_bids", "customer_contact_actions"):
+            self.assertEqual(g[key], 0, key)
+        self.assertFalse(g["commercial_capturebrief_scoring_admitted"])
+        self.assertEqual(g["production_input_state"], "HOLD")
+        self.assertEqual(q["source_content_sha256"],
+                         "UNKNOWN_NO_ORIGINAL_PUBLISHER_HTTP_BYTES")
+        self.assertEqual(q["original_attachment_files_acquired"], 0)
+        self.assertTrue(q["no_private_customer_student_or_medical_records_used"])
+        controls = p["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 7)
+        self.assertEqual(len({c["id"] for c in controls}), 7)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and c["id"].startswith("SYNTHETIC_")
+                            for c in controls))
+
+    def test_september_market_research_is_not_october_live_solicitation(self):
+        self._assert_scope(self._pack())
+
+    def test_seven_synthetic_stale_date_rights_and_award_promotions_rejected(self):
+        import copy
+        edits = (
+            lambda p: p["notice_chronology"]["market_research_amended"].update(
+                updated_response_due_local="2026-11-17T15:00:00-08:00"),
+            lambda p: p["notice_chronology"]["subsequent_solicitation"].update(
+                date_offers_due_local="2026-10-30T16:00:00-07:00"),
+            lambda p: p["notice_chronology"]["subsequent_solicitation"].update(
+                set_aside="UNRESTRICTED"),
+            lambda p: p["source"].update(original_publisher_http_sha256="f" * 64),
+            lambda p: p["source"].update(automated_sam_web_scraping_authorized=True),
+            lambda p: p["ground_truth_boundaries"].update(independent_award_labels=1),
+            lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        for i, edit in enumerate(edits):
+            with self.subTest(synthetic_mutation=i):
+                bad = copy.deepcopy(self._pack())
+                edit(bad)
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(bad)
+
 if __name__ == "__main__":
     unittest.main()
