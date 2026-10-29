@@ -70,7 +70,9 @@ def evaluate(rows: list[dict], min_reward: Decimal = Decimal('100')) -> dict:
             status = 'UNVERIFIED_STATE'
         elif amount < min_reward:
             status = 'TOO_SMALL_FOR_FIRST_100'
-        elif len(external_allowed) != 1 or external_allowed != {True}:
+        elif external_allowed == {False}:
+            status = 'BLOCKED_EXTERNAL_RESTRICTION'
+        elif external_allowed != {True}:
             status = 'UNVERIFIED_EXTERNAL_ELIGIBILITY'
         elif True in assigned_to_other:
             status = 'BLOCKED_ASSIGNED_TO_OTHER'
