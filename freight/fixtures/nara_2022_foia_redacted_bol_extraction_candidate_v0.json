@@ -1,0 +1,142 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "NARA_FOIA_2022_REDACTED_ORIGINAL_GOVERNMENT_BOL_EXTRACTION_CANDIDATE_V0",
+  "status": "DRAFT_SOURCE_BOUND_HOLD_UNRELEASED",
+  "evaluation_family": "FREIGHT_DOCUMENT_EXTRACTION_PUBLIC_REDACTED_ORIGINAL_BOL_NOT_FREIGHT_ERROR_OR_PAYMENT_SCORING",
+  "engine": "freightrecovery",
+  "secondary_engine": "recoveryos",
+  "source": {
+    "publisher": "U.S. National Archives and Records Administration",
+    "official_url": "https://www.archives.gov/files/foia/category-4-final.pdf",
+    "format": "PDF",
+    "page_count": 3,
+    "public_release": "FOIA_REDACTED_PUBLIC_PDF",
+    "document_title": "Freight Bill of Lading — ORIGINAL",
+    "document_issue_date": "2022-01-12",
+    "source_release_date": "UNKNOWN",
+    "source_retrieved_for_visual_review_utc_date": "2026-10-29",
+    "public_pages_visually_reviewed": 3,
+    "raw_publisher_pdf_bytes_acquired": false,
+    "original_publisher_pdf_sha256": null,
+    "publisher_http_status_and_headers_archived": false,
+    "original_signed_document_independently_verified": false,
+    "invoice_face_acquired": false,
+    "tariff_or_tender_original_document_acquired": false,
+    "carrier_payment_receipt_acquired": false
+  },
+  "rights": {
+    "policy_url": "https://www.archives.gov/research/still-pictures/permissions",
+    "general_us_government_created_records_us_public_domain_guidance": true,
+    "source_specific_third_party_or_restriction_clearance_complete": false,
+    "automated_commercial_customer_scoring_approved": false,
+    "redistribution_of_original_document_authorized_by_lab": false,
+    "public_foia_redactions_preserved": true,
+    "confidential_or_unredacted_rows_retained": 0
+  },
+  "extraction": {
+    "label_origin": "MANUAL_VISIBLE_FIELD_TRANSCRIPTION_FROM_NARA_PUBLIC_REDACTED_RENDERED_PAGES_NOT_INDEPENDENT_HOLDOUT",
+    "bol_number": "F0004196",
+    "agency_shipment_id": "NAR22GBL032",
+    "bol_issue_date": "2022-01-12",
+    "bol_print_date": "2022-01-12",
+    "requested_pickup_date": "2022-01-17",
+    "required_delivery_date": "2022-01-19",
+    "actual_pickup_date_field": "BLANK",
+    "delivered_on_date_field": "BLANK",
+    "annotation_pickup_date_time": "2022-01-17 14:00",
+    "annotation_delivery_date_time": "2022-01-19 09:00",
+    "total_packages": 1,
+    "total_weight_reported_number": 500,
+    "total_weight_unit": "UNKNOWN_NOT_LABELED_IN_VISIBLE_BOX",
+    "mode": "Motor",
+    "item_description_category": "Government Records",
+    "rate_authority_reference_printed": "Tender ID OTO $4990.2 ON 01/12/2022",
+    "estimate_box_usd_cents": 499020,
+    "continuation_page_total_usd_cents": 499020,
+    "linehaul_displayed_usd_cents": 0,
+    "fuel_displayed_usd_cents": 0,
+    "accessorial_displayed_usd_cents": 0,
+    "shipper_signature_field": "BLANK",
+    "carrier_signature_field": "BLANK",
+    "carrier_name": "REDACTED_NOT_REPLICATED"
+  },
+  "quality": {
+    "page_1_header_and_tender_reference_reviewed": true,
+    "page_2_charge_summary_reviewed": true,
+    "page_3_blank_continuation_reviewed": true,
+    "document_total_is_not_sum_of_displayed_zero_itemization": true,
+    "zero_component_rows_are_not_proof_of_499020_cent_overcharge": true,
+    "estimate_and_total_agree": true,
+    "all_visible_dates_are_not_proof_of_actual_service": true,
+    "public_bol_is_not_carrier_invoice_or_bank_payment": true,
+    "redacted_identifiers_not_reconstructed": true,
+    "possible_multiple_financial_semantics": "UNKNOWN_WITHOUT_TENDER_INVOICE_AND_PAYMENT",
+    "actual_valid_tender_rate_usd_cents": null,
+    "freight_amount_overcharged_usd_cents": null,
+    "carrier_payment_amount_usd_cents": null
+  },
+  "ground_truth": {
+    "source_documents_publicly_viewed": 1,
+    "original_bol_images_in_lab_custody": 0,
+    "independently_heldout_labeled_original_bols": 0,
+    "independent_invoice_face_error_labels": 0,
+    "verified_carrier_invoice_payments": 0,
+    "verified_retally_customer_recovered_usd_cents": 0,
+    "document_extraction_accuracy": "UNKNOWN_NOT_INDEPENDENTLY_SCORED",
+    "rate_accuracy": "UNKNOWN",
+    "real_overcharge": "UNKNOWN",
+    "carrier_refund": "UNKNOWN",
+    "production_acceptance": false
+  },
+  "consumers": {
+    "freightrecovery_12": "DOCUMENT_EXTRACTION_REGRESSION_CANDIDATE_NOT_BILLING_RULE",
+    "recoveryos_12": "ACCOUNTING_PAYMENT_UNKNOWN_NEGATIVE_CONTROL_ONLY",
+    "permitplate_48": "NOT_APPLICABLE_SEPARATE_PERMIT_COHORT",
+    "capturebrief_52": "NOT_APPLICABLE_SEPARATE_SAM_COHORT",
+    "qa_44": "INDEPENDENT_PDF_CUSTODY_LABELS_RIGHTS_AND_PYTHON_CI_PENDING"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC-NARA-001",
+      "kind": "SYNTHETIC",
+      "assertion": "ZERO_VISIBLE_LINE_ITEMS_PROVE_OVERCHARGE",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-002",
+      "kind": "SYNTHETIC",
+      "assertion": "PRINTED_ESTIMATE_PROVES_CARRIER_PAYMENT",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-003",
+      "kind": "SYNTHETIC",
+      "assertion": "SIGNED_ORIGINAL_WITH_COMPLETED_SIGNATURE_FIELDS",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-004",
+      "kind": "SYNTHETIC",
+      "assertion": "TENDER_REFERENCE_PROVES_GOVERNING_RATE_AUTHORITY",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-005",
+      "kind": "SYNTHETIC",
+      "assertion": "REDACTED_CARRIER_IDENTITY_INFERRED",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-006",
+      "kind": "SYNTHETIC",
+      "assertion": "VISUAL_RENDER_IS_RAW_SOURCE_BYTE_CUSTODY",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-007",
+      "kind": "SYNTHETIC",
+      "assertion": "SOURCE_DOC_IS_INDEPENDENT_CUSTOMER_ACCURACY_LABEL",
+      "expected": "REJECT"
+    }
+  ]
+}
