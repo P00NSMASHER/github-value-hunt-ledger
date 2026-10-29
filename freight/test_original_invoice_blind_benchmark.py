@@ -100,7 +100,8 @@ def evidence_files(tmp_path: Path, unique="0"):
         payload = ("%s-%s: controlled fake original document bytes" % (role, unique)).encode()
         p.write_bytes(payload)
         result[role] = {"sha256": sha(payload), "path": str(p),
-                        "issuer": "TEST_EXTERNAL_%s" % role.upper()}
+                        "issuer": "TEST_EXTERNAL_%s" % role.upper(),
+                        "source_locator": "test-document-line:%s:%s" % (role, unique)}
     return result
 
 
@@ -111,6 +112,8 @@ def packets(population, keys, tmp_path, *, labels=None, predictions=None):
         pred = predictions[index] if predictions else "REVIEW"
         golds.append({
             "case_id": c["case_id"], "label": label,
+            "source_pdf_sha256": c["source_pdf_sha256"],
+            "original_invoice_total_cents": c["invoice_total_cents"],
             "variance_cents": 100 if label == "POSITIVE" else 0,
             "reviewer_a_label": label if label != "UNRESOLVED" else None,
             "reviewer_b_label": label if label != "UNRESOLVED" else None,
@@ -302,3 +305,42 @@ def test_private_population_file_refuses_repo_and_permissions(tmp_path):
     with pytest.raises(BenchmarkError, match="OUTSIDE_REPOSITORY"):
         _save_new_private(
             Path(__file__).parent / "MUST_NOT_WRITE_SOURCE_MANIFEST.json", pop)
+
+
+def test_trust_packet_cannot_assign_positive_against_both_negative_reviews(tmp_path):
+    pop = toy_population()
+    keys, trust = identities()
+    model, truth = packets(
+        pop, keys, tmp_path, labels=["POSITIVE", "NEGATIVE", "UNRESOLVED"])
+    truth["body"]["cases"][0]["reviewer_a_label"] = "NEGATIVE"
+    truth["body"]["cases"][0]["reviewer_b_label"] = "NEGATIVE"
+    truth = signed(truth["body"], keys,
+                   "truth_owner", "reviewer_a", "reviewer_b")
+    with pytest.raises(BenchmarkError, match="REVIEWER_CONSENSUS"):
+        score(pop, model, truth, trust)
+
+
+def test_reviewed_case_must_match_original_invoice_money(tmp_path):
+    pop = toy_population()
+    keys, trust = identities()
+    model, truth = packets(pop, keys, tmp_path,
+                           labels=["POSITIVE", "NEGATIVE", "UNRESOLVED"])
+    truth["body"]["cases"][0]["original_invoice_total_cents"] += 1
+    truth = signed(truth["body"], keys,
+                   "truth_owner", "reviewer_a", "reviewer_b")
+    with pytest.raises(BenchmarkError, match="ORIGINAL_FACE_MONEY"):
+        score(pop, model, truth, trust)
+
+
+def test_same_bank_payment_line_cannot_count_for_two_cases(tmp_path):
+    pop = toy_population()
+    keys, trust = identities()
+    model, truth = packets(pop, keys, tmp_path,
+                           labels=["POSITIVE", "NEGATIVE", "UNRESOLVED"])
+    first = truth["body"]["cases"][0]["artifacts"]["payment"]
+    second = truth["body"]["cases"][1]["artifacts"]["payment"]
+    second.update(first)
+    truth = signed(truth["body"], keys,
+                   "truth_owner", "reviewer_a", "reviewer_b")
+    with pytest.raises(BenchmarkError, match="DUPLICATE_INDEPENDENT"):
+        score(pop, model, truth, trust)
