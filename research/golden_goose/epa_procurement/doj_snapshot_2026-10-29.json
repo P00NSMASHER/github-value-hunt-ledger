@@ -1,0 +1,45 @@
+{
+  "as_of": "2026-10-29",
+  "source": "https://www.justice.gov/enrd/consent-decrees",
+  "sampling_rule": "all five entries visible in DOJ proposed-consent-decree index on observation date, in displayed order; no outcome-based exclusions",
+  "count": 5,
+  "entries": [
+    {
+      "title": "U.S., et al., v. Renergy, Inc., et al.",
+      "url": "https://www.justice.gov/enrd/consent-decree/us-et-al-v-renergy-inc-et-al",
+      "comment_period_start": "2026-10-19",
+      "comment_period_end": "2026-11-18",
+      "issue": "do_not_infer_municipal_wastewater_from_name"
+    },
+    {
+      "title": "U.S. v. City of Akron, Ohio, et al.",
+      "url": "https://www.justice.gov/enrd/consent-decree/us-v-city-akron-ohio-et-al",
+      "comment_period_start": "2026-10-14",
+      "comment_period_end": "2026-11-13",
+      "issue": "proposed_amendment_replaces_specific_construction_scope"
+    },
+    {
+      "title": "U.S. v. Sherwin-Williams Company",
+      "url": "https://www.justice.gov/enrd/consent-decree/us-v-sherwin-williams-company",
+      "comment_period_start": "2026-10-01",
+      "comment_period_end": "2026-11-02",
+      "issue": "OU3_modification_not_new_municipal_bid"
+    },
+    {
+      "title": "U.S., et al., v. Nucor Steel Louisiana, LLC.",
+      "url": "https://www.justice.gov/enrd/consent-decree/us-et-al-v-nucor-steel-louisiana-llc",
+      "comment_period_start": "2026-10-01",
+      "comment_period_end": "2026-11-16",
+      "issue": "industrial_respondent_not_municipal_bid_assertion"
+    },
+    {
+      "title": "U.S. v. Environmental Resource Holdings, LLC.",
+      "url": "https://www.justice.gov/enrd/consent-decree/us-v-environmental-resource-holdings-llc",
+      "comment_period_start": "2026-09-15",
+      "comment_period_end": "2026-11-14",
+      "issue": "superfund_private_redevelopment_not_new_municipal_bid_assertion"
+    }
+  ],
+  "verified_new_actionable_municipal_wastewater_bids": 0,
+  "note": "Zero proven bids in THIS listed set does not establish zero procurement opportunity; bid and contract searches were not exhaustively performed."
+}
