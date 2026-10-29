@@ -3094,6 +3094,78 @@ class NYCDOBCachedCardinalityCounterexampleTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     self._assert_scope(bad)
 
+class NYCElectricalCatalogMarginalReconciliationTests(unittest.TestCase):
+    """One official cached-field count gap is not one adjudicated permit error."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_excluded_scope_v1.json").read_text(encoding="utf-8"))
+
+    def _assert_scope(self, data):
+        self.assertEqual(data["schema_version"], 1)
+        self.assertEqual(data["real_permit_records_ingested"], 0)
+        q = data["electrical_application_catalog_cached_marginal_reconciliation_2026_10_29"]
+        self.assertEqual(q["observation_version"], "0.1.0")
+        self.assertEqual(q["source_dataset_id"], "dm9a-ab7w")
+        self.assertEqual(q["official_metadata_url"],
+                         "https://data.cityofnewyork.us/api/views/dm9a-ab7w")
+        self.assertEqual(q["publisher_rows_updated_at_utc"], "2026-10-28T21:43:32Z")
+        self.assertEqual(q["cached_filing_rows"], 596371)
+        self.assertEqual(q["cached_filing_type_counts"], {
+            "New Job Filing": 485310, "PAA": 96230, "Subsequent Filing": 14831,
+        })
+        self.assertEqual(sum(q["cached_filing_type_counts"].values()),
+                         q["cached_filing_rows"])
+        self.assertEqual(q["cached_filing_number_i1_count"], 485311)
+        self.assertEqual(q["cross_field_marginal_delta"], 1)
+        self.assertEqual(
+            q["cached_filing_number_i1_count"] -
+            q["cached_filing_type_counts"]["New Job Filing"],
+            q["cross_field_marginal_delta"])
+        self.assertTrue(q["source_marginals_do_not_independently_prove_row_level_error"])
+        for field in ("row_level_causal_record_identified", "original_http_bytes_custodied",
+                      "source_specific_commercial_scoring_approved",
+                      "production_collector_modified"):
+            self.assertIs(q[field], False, field)
+        self.assertIsNone(q["original_publisher_http_response_sha256"])
+        self.assertEqual(q["raw_permit_person_or_applicant_rows_stored"], 0)
+        self.assertEqual(q["independently_held_out_issued_permit_labels"], 0)
+        self.assertEqual(q["independent_validity_labels"], 0)
+        self.assertEqual(q["buyer_outcome_labels"], 0)
+        self.assertEqual(q["commercial_scoring_gate"], "HOLD")
+        self.assertEqual(q["consumer_owner"], ":48 PermitPlate")
+        self.assertEqual(q["independent_qa_owner"], ":44 QA")
+        negatives = q["synthetic_negative_controls"]
+        self.assertEqual(len(negatives), 3)
+        self.assertEqual(len({x["id"] for x in negatives}), 3)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" for x in negatives))
+
+    def test_official_electrical_catalog_marginals_are_not_permit_truth(self):
+        self._assert_scope(self._pack())
+
+    def test_forged_electrical_marginal_rights_custody_and_labels_rejected(self):
+        import copy
+        attacks = (
+            lambda q: q.update(cached_filing_number_i1_count=485310),
+            lambda q: q["cached_filing_type_counts"].update({"New Job Filing": 485311}),
+            lambda q: q.update(cross_field_marginal_delta=0),
+            lambda q: q.update(row_level_causal_record_identified=True),
+            lambda q: q.update(original_http_bytes_custodied=True),
+            lambda q: q.update(original_publisher_http_response_sha256="0" * 64),
+            lambda q: q.update(source_specific_commercial_scoring_approved=True),
+            lambda q: q.update(independently_held_out_issued_permit_labels=1),
+            lambda q: q["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        key = "electrical_application_catalog_cached_marginal_reconciliation_2026_10_29"
+        for index, attack in enumerate(attacks):
+            with self.subTest(forged=index):
+                changed = copy.deepcopy(self._pack())
+                attack(changed[key])
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(changed)
+
+
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
 if __name__ == "__main__":
     unittest.main()
