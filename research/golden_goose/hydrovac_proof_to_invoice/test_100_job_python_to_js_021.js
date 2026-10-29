@@ -83,9 +83,14 @@ for(const r of checked.rows){
   assert.equal(r.collectible_usd,null);
 }
 // Each predeclared mutation must fail closed, not create money.
-const missing=bridge(summary,sidecars.slice(1));
+// An absent arithmetic-clean proof must decrease arithmetic clears; removing
+// a deliberately poisoned proof must not change the clear count.
+const missing=bridge(summary,sidecars.filter(r=>r.job_id!=='SYN-HV-011'));
 assert.equal(missing.arithmetic_only,59);
 assert.equal(missing.needs_review,41);
+const missingAlreadyReviewed=bridge(summary,sidecars.slice(1));
+assert.equal(missingAlreadyReviewed.arithmetic_only,60);
+assert.equal(missingAlreadyReviewed.needs_review,40);
 const duplicated=JSON.parse(JSON.stringify(sidecars));
 duplicated[1].posted[0].invoice_line_id=duplicated[0].posted[0].invoice_line_id;
 const collision=bridge(summary,duplicated);
@@ -103,6 +108,6 @@ console.log(JSON.stringify({test:'GG-021 Python->JS synthetic cohort',
   gross_candidate_fictional_usd:summary.illustrative_candidate_gross_usd,
   verified_collectible_usd:null,verified_owner_revenue_usd:'0.00',
   real_customer_invoices:0,
-  cohort_mutation_checks:4,
+  cohort_mutation_checks:5,
   incumbent_vendor_comparison:'NOT_RUN',
   customer_willingness_to_pay:'UNKNOWN'}));
