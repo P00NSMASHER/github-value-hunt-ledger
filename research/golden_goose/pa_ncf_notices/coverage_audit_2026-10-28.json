@@ -1,0 +1,40 @@
+{
+  "audit_date": "2026-10-28",
+  "status": "EVIDENCE_INSUFFICIENT_NOT_COMMERCIALLY_VALIDATED",
+  "pa_source": "https://sais.health.pa.gov/CommonPOC/Licensing/IPA-NCF/PublicReviewFacList.aspx",
+  "cms_source": "https://catalog.data.gov/dataset/skilled-nursing-facility-change-of-ownership-2026-06-01",
+  "cohort": {
+    "pa_rows_total": 3,
+    "pending_initial": 1,
+    "mixed_initial_or_chow_approved": 2,
+    "independently_verified_chow": 0,
+    "pa_notice_dates": [
+      "2026-09-09",
+      "2026-09-09",
+      "2026-10-23"
+    ],
+    "cms_coverage_end": "2026-06-30",
+    "cms_catalog_last_updated_on": "2026-08-24",
+    "pa_postings_after_cms_coverage_end": 3,
+    "independently_matched_same_event_pairs": 0
+  },
+  "lead_time_days": null,
+  "measured_positive_predictive_value": null,
+  "actual_receipts_usd": 0,
+  "collectible_attributable_revenue_usd": 0,
+  "adversarial_result": "15/15 local standard-library unit tests passed for the offline comparison gate. The live dataset is a manually transcribed 3-row observation, not 15 real-world validations.",
+  "unsupported_claims": [
+    "These approvals prove a nursing home was sold",
+    "A current state notice already beats CMS for the same facility event",
+    "The CMS catalogue update date is the exact first-publication of a CHOW record",
+    "Observed 0 matches means precision is 0"
+  ],
+  "competition": [
+    "https://nursinghomechecker.com/reports/ownership-changes/",
+    "https://apify.com/jserle/snf-change-of-ownership-tracker"
+  ],
+  "disposition": "DEPRIORITIZE_PEND_HISTORICAL_MATCHED_EVIDENCE_AND_WTP",
+  "next_gate": "Collect >=10 archived public notices each linked by independent identity/event evidence to a historical CMS CHOW release; measure first-observed timestamps and sample completeness. If no verifiable public archives, stop.",
+  "code_review": "Draft PR #865; source modified in research branch only; CI and independent review not evidenced.",
+  "caveat": "A CMS snapshot covering through June 30 can still contain older events at the same facility. The screen does not establish absence of any such event; it establishes that this PA posting-date cohort does not support the claimed timing advantage."
+}
