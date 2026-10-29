@@ -26,12 +26,20 @@ def safe_contract(d):
             d["schema_version"] == "0.1.0"
             and d["evaluation_family"] == "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_NOT_CUSTOMER_RECONCILIATION"
             and s["official_url"] == "https://www.gao.gov/products/b-143950-0"
+            and s["publisher"] == "U.S. Government Accountability Office"
+            and s["rights_reference"] == "https://www.gao.gov/copyright"
+            and s["rights_scope"] == "GAO_GOVERNMENT_TEXT_US_PUBLIC_DOMAIN_WITH_CREDIT_NO_IMPLIED_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE"
             and s["decision_id"] == "B-143950"
             and s["decision_date"] == "1960-11-25"
             and s["original_http_sha256"] is None
             and s["raw_original_http_bytes_custodied"] is False
             and s["original_carrier_invoice_bytes_custodied"] is False
+            and s["original_bill_of_lading_bytes_custodied"] is False
             and s["original_tariff_pages_custodied"] is False
+            and h["reported_bill"] == "396C-57JW"
+            and h["reported_government_bill_of_lading"] == "AF-6614902"
+            and h["shipment_date"] == "1956-12-01"
+            and h["tariff"] == "SOUTHERN_MOTOR_CARRIERS_RATE_CONFERENCE_504_SUPPLEMENT_88_ITEM_10020_A"
             and h["reported_original_payment_cents"] == 75000
             and h["gao_audited_applicable_charge_cents"] == 55200
             and h["gao_reported_overcharge_cents"] == 19800
@@ -98,6 +106,14 @@ class GAOB143950CollectedDeductionEvidenceTests(unittest.TestCase):
             ("historical_reported", "carrier_reclaim_disallowed", False),
             ("source", "original_http_sha256", "fabricated"),
             ("source", "original_carrier_invoice_bytes_custodied", True),
+            ("source", "publisher", "UNVERIFIED_PRIVATE_DATA_VENDOR"),
+            ("source", "rights_reference", "https://example.com/unverified"),
+            ("source", "rights_scope", "UNRESTRICTED_COMMERCIAL_REUSE"),
+            ("source", "original_bill_of_lading_bytes_custodied", True),
+            ("historical_reported", "reported_bill", "SYNTHETIC-FORGED-BILL"),
+            ("historical_reported", "reported_government_bill_of_lading", "SYNTHETIC-FORGED-GBL"),
+            ("historical_reported", "shipment_date", "2026-10-29"),
+            ("historical_reported", "tariff", "SYNTHETIC_MODERN_TARIFF"),
             ("source", "original_tariff_pages_custodied", True),
             ("ground_truth", "independently_heldout_from_engine_training", "YES"),
             ("ground_truth", "verified_retally_customer_recovered_cash_cents", 19800),
