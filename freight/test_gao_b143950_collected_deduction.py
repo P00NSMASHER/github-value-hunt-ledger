@@ -29,6 +29,8 @@ def safe_contract(d):
             and s["publisher"] == "U.S. Government Accountability Office"
             and s["rights_reference"] == "https://www.gao.gov/copyright"
             and s["rights_scope"] == "GAO_GOVERNMENT_TEXT_US_PUBLIC_DOMAIN_WITH_CREDIT_NO_IMPLIED_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE"
+            and s["source_format"] == "OFFICIAL_GAO_PUBLIC_DECISION_HTML"
+            and s["tariff_effective_date"] == "UNKNOWN_HISTORICAL_TARIFF_PAGES_NOT_HELD"
             and s["decision_id"] == "B-143950"
             and s["decision_date"] == "1960-11-25"
             and s["original_http_sha256"] is None
@@ -51,6 +53,8 @@ def safe_contract(d):
             and h["carrier_reclaim_disallowed"] is True
             and h["gao_sustained_disallowance_on_present_record"] is True
             and g["historical_collection_label"] == "GAO_REPORTS_ACTUAL_SET_OFF_DEDUCTION"
+            and g["historical_adjudicated_error_label"] == "GAO_SUSTAINED_HISTORICAL_GOVERNMENT_OVERCHARGE"
+            and g["original_tariff_effective_date_verified"] is False
             and g["independently_heldout_from_engine_training"] == "UNKNOWN"
             and g["current_customer_ground_truth_cases"] == 0
             and g["verified_retally_customer_recovered_cash_cents"] == 0
@@ -110,6 +114,8 @@ class GAOB143950CollectedDeductionEvidenceTests(unittest.TestCase):
             ("source", "rights_reference", "https://example.com/unverified"),
             ("source", "rights_scope", "UNRESTRICTED_COMMERCIAL_REUSE"),
             ("source", "original_bill_of_lading_bytes_custodied", True),
+            ("source", "source_format", "SYNTHETIC_FALSIFIED_ORIGINAL_INVOICE_SCAN"),
+            ("source", "tariff_effective_date", "2026-10-29"),
             ("historical_reported", "reported_bill", "SYNTHETIC-FORGED-BILL"),
             ("historical_reported", "reported_government_bill_of_lading", "SYNTHETIC-FORGED-GBL"),
             ("historical_reported", "shipment_date", "2026-10-29"),
@@ -120,6 +126,8 @@ class GAOB143950CollectedDeductionEvidenceTests(unittest.TestCase):
             ("ground_truth", "commercial_customer_scoring_approved", True),
             ("ground_truth", "independent_qa_complete", True),
             ("ground_truth", "modern_tariff_applicability", "CURRENT"),
+            ("ground_truth", "historical_adjudicated_error_label", "INDEPENDENT_2026_CUSTOMER_PAYMENT_VERIFIED"),
+            ("ground_truth", "original_tariff_effective_date_verified", True),
         )
         for section, key, invalid in mutations:
             with self.subTest(section=section, key=key):
