@@ -38,7 +38,7 @@
   "durable_evidence_path": "research/golden_goose/hydrovac_proof_to_invoice/POSTED_AMOUNT_FALSIFIER_018_2026-10-29.md",
   "notes": "UNCLAIMED, manual synthetic fixture not live hunter assignment. Zero discoveries/promotion. Existing draft PR #870 only, no protected main. 0 customer records, $0 collectible/revenue, Node CLI/Python CI not independently executed. No claim of canonical ingestion.",
   "query_family_id": "QF:contract-to-posted-invoice-money-lineage",
-  "search_objective_id": null,
+  "search_objective_id": "OBJ:completeness-proof",
   "benchmark_task_ids": [],
   "seed_mode": "manual_hypothesis",
   "seed_ids": [],
