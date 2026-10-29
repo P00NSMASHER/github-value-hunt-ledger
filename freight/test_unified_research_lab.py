@@ -21,6 +21,7 @@ from freight.unified_research_lab import (
 # A standalone test file is not selected by the workflow's fixed unittest list.
 # The imported TestCase is discovered by unittest without any new provider call.
 from freight.test_gao_b143950_collected_deduction import GAOB143950CollectedDeductionEvidenceTests
+from freight.test_gao_b143491_adjusted_deduction import GAOB143491TariffCorrectionTests
 
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
