@@ -157,7 +157,6 @@ def baseline_receipt(lab_report: dict) -> dict:
     receipt = {
         "schema_version": SCHEMA_VERSION,
         "scope": SCOPE,
-        "source_original_pdf_sha256": dict(sorted(FROZEN_DOCUMENT_SHA256.items())) if False else None,
         # Hashes of original PDFs and source-face catalogs bind the published
         # aggregate without releasing page-level invoice IDs.
         "source_bindings": {
@@ -184,7 +183,8 @@ def baseline_receipt(lab_report: dict) -> dict:
         "billable_fees_cents": 0,
     }
     # Do not serialize or expose individual invoice identities in receipts.
-    receipt.pop("source_original_pdf_sha256")
+    if receipt["original_face_arithmetic_verified"] != 100:
+        raise BenchmarkError("ORIGINAL_SIGNED_COMPONENT_RECONCILIATION_DRIFT")
     receipt["receipt_sha256"] = sha(canonical(receipt))
     return receipt
 
@@ -381,11 +381,16 @@ def _signature(body: dict, signature_b64: str, public_key_b64: str) -> None:
 
 
 def _read_artifact(artifact: dict) -> str:
-    if not isinstance(artifact, dict) or set(artifact) != {"sha256", "path", "issuer"}:
+    if not isinstance(artifact, dict) or set(artifact) != {
+            "sha256", "path", "issuer", "source_locator"}:
         raise BenchmarkError("ORIGINAL_PROOF_DOCUMENT_METADATA_REQUIRED")
     digest = _exact_sha(artifact["sha256"])
     if not isinstance(artifact.get("issuer"), str) or not artifact["issuer"].strip():
         raise BenchmarkError("EVIDENCE_ORIGIN_REQUIRED")
+    locator = artifact.get("source_locator")
+    if (not isinstance(locator, str) or not locator.strip()
+            or len(locator) > 256 or any(ord(c) < 32 for c in locator)):
+        raise BenchmarkError("SOURCE_SPECIFIC_PROOF_LOCATOR_REQUIRED")
     p = _private_path(artifact["path"])
     if not p.is_file() or p.is_symlink() or p.stat().st_size > 20_000_000:
         raise BenchmarkError("ORIGINAL_PROOF_DOCUMENT_NOT_PRESENT")
@@ -453,8 +458,25 @@ def score_private_population(population: dict, secret: bytes,
     tp = tn = fp = fn = positive_review = negative_review = 0
     unsigned = unsupported = 0
     false_positive_cents = missed_positive_cents = absolute_error_cents = 0
+    # Reusing one independently issued clearing/decision line to support
+    # different invoice case IDs would double-count financial proof.
+    used_payment_lines: set[tuple[str, str]] = set()
+    used_adjudication_lines: set[tuple[str, str]] = set()
+    source_counts: dict[str, dict[str, int]] = {
+        issuer: {"population": 0, "scored": 0, "unresolved": 0,
+                 "tp": 0, "fp": 0, "tn": 0, "fn": 0, "review": 0}
+        for issuer in EXPECTED_FACE_COUNTS
+    }
+    source_by_id = {row["case_id"]: row for row in population["casebook"]}
     for case_id in sorted(expected_ids):
         prediction, gold = mi[case_id], ti[case_id]
+        original = source_by_id[case_id]
+        per_source = source_counts[original["issuer"]]
+        per_source["population"] += 1
+        if gold.get("source_pdf_sha256") != original["source_pdf_sha256"]:
+            raise BenchmarkError("TRUTH_NOT_BOUND_TO_ORIGINAL_PDF")
+        if gold.get("original_invoice_total_cents") != original["invoice_total_cents"]:
+            raise BenchmarkError("TRUTH_NOT_BOUND_TO_ORIGINAL_FACE_MONEY")
         p_label, t_label = prediction.get("label"), gold.get("label")
         p_cents, t_cents = prediction.get("variance_cents"), gold.get("variance_cents")
         if p_label not in PRED_TYPES or t_label not in CASE_TYPES:
@@ -475,11 +497,15 @@ def score_private_population(population: dict, secret: bytes,
             if gold.get("artifacts") not in (None, {}):
                 raise BenchmarkError("UNKNOWN_CASE_CANNOT_CERTIFY_PROOF")
             unsigned += 1
+            per_source["unresolved"] += 1
             unsupported += int(p_label != "REVIEW")
             continue
         if (gold.get("reviewer_a_label") not in {"POSITIVE", "NEGATIVE"}
                 or gold.get("reviewer_b_label") not in {"POSITIVE", "NEGATIVE"}):
             raise BenchmarkError("INDEPENDENT_DUAL_REVIEW_MISSING")
+        if (gold["reviewer_a_label"] == gold["reviewer_b_label"]
+                and gold["reviewer_a_label"] != t_label):
+            raise BenchmarkError("TRUTH_CONFLICTS_WITH_REVIEWER_CONSENSUS")
         if (gold["reviewer_a_label"] != gold["reviewer_b_label"]
                 and len(str(gold.get("adjudication_note") or "").strip()) < 15):
             raise BenchmarkError("INDEPENDENT_REVIEW_DISAGREEMENT_NOT_RESOLVED")
@@ -487,30 +513,42 @@ def score_private_population(population: dict, secret: bytes,
         if not isinstance(proof, dict) or set(proof) != set(ARTIFACTS):
             raise BenchmarkError("ORIGINAL_RATE_SHIPMENT_PAYMENT_ADJUDICATION_REQUIRED")
         proof_shas = [_read_artifact(proof[k]) for k in ARTIFACTS]
-        source_sha = next(row["source_pdf_sha256"] for row in population["casebook"]
-                          if row["case_id"] == case_id)
+        source_sha = original["source_pdf_sha256"]
+        for role, used in (("payment", used_payment_lines),
+                           ("adjudication", used_adjudication_lines)):
+            evidence_line = (proof[role]["sha256"], proof[role]["source_locator"])
+            if evidence_line in used:
+                raise BenchmarkError("DUPLICATE_INDEPENDENT_FINANCIAL_PROOF_LINE")
+            used.add(evidence_line)
+        per_source["scored"] += 1
         if len(set([source_sha, *proof_shas])) != 5:
             raise BenchmarkError("CORRELATED_OR_REUSED_PROOF_SOURCE")
         if p_label == "REVIEW":
             if t_label == "POSITIVE":
                 positive_review += 1
+                per_source["review"] += 1
                 missed_positive_cents += t_cents
             else:
                 negative_review += 1
+                per_source["review"] += 1
         elif p_label == "POSITIVE":
             absolute_error_cents += abs(p_cents - t_cents)
             if t_label == "POSITIVE":
                 tp += 1
+                per_source["tp"] += 1
             else:
                 fp += 1
+                per_source["fp"] += 1
                 false_positive_cents += p_cents
         else:
             absolute_error_cents += t_cents
             if t_label == "POSITIVE":
                 fn += 1
+                per_source["fn"] += 1
                 missed_positive_cents += t_cents
             else:
                 tn += 1
+                per_source["tn"] += 1
     reviewed = tp + tn + fp + fn + positive_review + negative_review
     if population["scope"] != SCOPE:
         status = "SYNTHETIC_REHEARSAL_NOT_REAL_ACCURACY"
@@ -541,6 +579,9 @@ def score_private_population(population: dict, secret: bytes,
         "false_positive_dollars_cents": false_positive_cents,
         "missed_positive_dollars_cents": missed_positive_cents,
         "automatic_exact_money_absolute_error_cents": absolute_error_cents,
+        "issuer_strata": source_counts,
+        "recall_wilson_95_including_review": _wilson(
+            tp, tp + fn + positive_review),
         "method_status": status,
         "signed_payload_digests": {
             "operator": sha(canonical(model)),
