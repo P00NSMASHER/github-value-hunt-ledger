@@ -17,6 +17,11 @@ from freight.unified_research_lab import (
     mirror_scout_all, get_json, metadata_in_scope, original_nyc_catalog_entry,
 )
 
+# Reuse the existing unified CI lane for source-bound historical GAO deduction tests.
+# A standalone test file is not selected by the workflow's fixed unittest list.
+# The imported TestCase is discovered by unittest without any new provider call.
+from freight.test_gao_b143950_collected_deduction import GAOB143950CollectedDeductionEvidenceTests
+
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 # Pin the evolving NYC source-evidence pack once; historical receipt fields stay frozen.
