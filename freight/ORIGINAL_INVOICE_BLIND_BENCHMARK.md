@@ -76,8 +76,10 @@ declarations, pre-unseal chronology, monetary semantics and documentary proof.
 Each scored POSITIVE or NEGATIVE case must link ORIGINAL distinct source files
 for (1) the accepted shipment-specific rate/contract, (2) BOL/delivery,
 (3) independently cleared payment/credit, and (4) independent adjudication
-of an overcharge or a clean negative. Artifact fields are sha256, path, issuer.
-The original files must be locally present with matching hashes. Model
+of an overcharge or a clean negative. Artifact fields are sha256, path,
+issuer, source_locator. The original files must be locally present with
+matching hashes. The same payment or adjudication evidence line cannot be
+reused to support two invoices. Model
 predictions and incomplete-source cases do not count as ground truth.
 Reviewer disagreements require an explicit adjudication note.
 
@@ -89,7 +91,8 @@ Illustrative private signed packet fields:
 
     truth.body = {population_sha256, truth_owner_id, reviewer_a_id,
        reviewer_b_id, frozen_at,
-       cases: [{case_id, label, variance_cents, reviewer_a_label,
+       cases: [{case_id, label, variance_cents, source_pdf_sha256,
+          original_invoice_total_cents, reviewer_a_label,
           reviewer_b_label, adjudication_note,
           artifacts: {rate, shipment, payment, adjudication}}, ...]}
     truth.signatures = {truth_owner: "...", reviewer_a: "...", reviewer_b: "..."}
@@ -106,7 +109,8 @@ Scoring is strictly local and read-only:
       --trusted-public-keys /private/trust.json \
       --unseal-at '2026-11-05T14:00:00Z'
 
-Outputs are aggregate TP, FP, TN, FN, REVIEW/abstentions, Wilson uncertainty,
+Outputs are aggregate TP, FP, TN, FN, REVIEW/abstentions, issuer-stratum coverage,
+Wilson uncertainty,
 precision, recall including abstentions, false-positive dollars, missed
 positive dollars, missing labels and unsupported automatic decisions.
 The report does not export IDs, issuer-specific evidence rows or source bytes.
