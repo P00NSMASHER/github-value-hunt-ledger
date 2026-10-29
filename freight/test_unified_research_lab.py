@@ -20,7 +20,7 @@ from freight.unified_research_lab import (
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 # Pin the evolving NYC source-evidence pack once; historical receipt fields stay frozen.
-NYC_DOB_REPLAY_PACK_SCHEMA_VERSION = "0.1.8"
+NYC_DOB_REPLAY_PACK_SCHEMA_VERSION = "0.1.9"
 
 
 class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
@@ -3016,6 +3016,83 @@ class NYCDOBUnsortedReadbackChurnBoundaryTests(unittest.TestCase):
                 attack(forged["operational_writer_unsorted_identity_churn_2026_10_29"])
                 with self.assertRaises(AssertionError):
                     self._assert_scope(forged)
+
+
+class NYCDOBCachedCardinalityCounterexampleTests(unittest.TestCase):
+    """Cached cardinality is not a distinct permit or even distinct status count."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_scope(self, p):
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
+        q = p["official_socrata_cached_cardinality_counterexample_2026_10_29"]
+        total = p["official_socrata_catalog_cached_count_drift_same_clock_2026_10_28"]["later_cached_counts"]
+        self.assertEqual(q["schema_version"], "0.1.0")
+        self.assertEqual(q["dataset_id"], "rbx6-tga4")
+        self.assertEqual(q["source_url"], "https://data.cityofnewyork.us/api/views/rbx6-tga4")
+        self.assertEqual(q["source_rows_updated_at_epoch_seconds"], 1793213280)
+        status = q["permit_status_column"]
+        self.assertEqual(status["non_null"], total["total"])
+        self.assertEqual(status["null"], 0)
+        self.assertEqual(status["cached_cardinality"], 1021662)
+        self.assertEqual(status["cached_top_values"], {
+            "Signed-off": total["signed"], "Permit Issued": total["issued"],
+        })
+        self.assertEqual(sum(status["cached_top_values"].values()), status["non_null"])
+        self.assertTrue(status["top_values_exhaust_reported_non_null"])
+        self.assertEqual(status["distinct_status_categories_supported_by_cached_top"], 2)
+        self.assertNotEqual(status["cached_cardinality"],
+                            status["distinct_status_categories_supported_by_cached_top"])
+        city = q["owner_city_column"]
+        self.assertEqual(city, {
+            "non_null": 0, "null": total["total"], "cached_cardinality": total["total"],
+        })
+        for field in ("publisher_response_bytes_custodied",
+                      "cached_cardinality_is_distinct_permit_identity_count",
+                      "cached_cardinality_proves_source_row_uniqueness"):
+            self.assertIs(q[field], False, field)
+        self.assertIsNone(q["publisher_response_sha256"])
+        self.assertEqual(q["real_permit_identity_and_actual_distinct_count"], "UNKNOWN")
+        self.assertEqual(q["source_specific_customer_scoring_approval"], "UNVERIFIED_HOLD")
+        self.assertEqual(q["production_admission"], "HOLD")
+        for field in ("current_validity_labels_from_this_probe",
+                      "independently_held_out_permit_labels_from_this_probe",
+                      "buyer_outcome_labels_from_this_probe"):
+            self.assertEqual(q[field], 0, field)
+        controls = q["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 2)
+        self.assertEqual(len({x["id"] for x in controls}), 2)
+        self.assertTrue(all(x["kind"] == "SYNTHETIC" for x in controls))
+
+    def test_official_cached_column_cardinality_not_unique_row_truth(self):
+        self._assert_scope(self._pack())
+
+    def test_forged_cached_identity_rights_hash_and_labels_rejected(self):
+        import copy
+        edits = [
+            lambda q: q["permit_status_column"].update(cached_cardinality=2),
+            lambda q: q["permit_status_column"]["cached_top_values"].update(
+                {"Permit Issued": 368371}),
+            lambda q: q["owner_city_column"].update(non_null=1),
+            lambda q: q.update(cached_cardinality_is_distinct_permit_identity_count=True),
+            lambda q: q.update(cached_cardinality_proves_source_row_uniqueness=True),
+            lambda q: q.update(real_permit_identity_and_actual_distinct_count="1021662"),
+            lambda q: q.update(source_specific_customer_scoring_approval="APPROVED"),
+            lambda q: q.update(publisher_response_bytes_custodied=True),
+            lambda q: q.update(publisher_response_sha256="0" * 64),
+            lambda q: q.update(independently_held_out_permit_labels_from_this_probe=1),
+            lambda q: q["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        ]
+        for index, edit in enumerate(edits):
+            with self.subTest(forged=index):
+                bad = copy.deepcopy(self._pack())
+                edit(bad["official_socrata_cached_cardinality_counterexample_2026_10_29"])
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(bad)
 
 # Must follow every TestCase class; direct script execution otherwise skips late tests.
 if __name__ == "__main__":
