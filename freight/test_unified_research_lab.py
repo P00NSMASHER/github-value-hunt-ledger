@@ -3321,5 +3321,80 @@ class CaptureBriefFY27VAFlooringLifecycleEvidenceTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     self._assert_scope(bad)
 
+
+class GAOB221609SixGBLCorrelatedEvidenceTests(unittest.TestCase):
+    """A GAO opinion citing six GBLs is not six held-out labeled invoices."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "gao_b221609_six_gbl_cluster_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    def _assert_scope(self, p):
+        self.assertEqual(p["schema_version"], "0.1.0")
+        self.assertEqual(p["evaluation_family"],
+                         "FREIGHT_ERROR_ADJUDICATION_CORRELATED_CASE_CLUSTER_NOT_EXTRACTION_OR_AP_RECONCILIATION")
+        s, d, g = p["source"], p["reported_decision"], p["ground_truth"]
+        self.assertEqual(s["official_url"], "https://www.gao.gov/products/b-221609-0")
+        self.assertEqual(s["decision_date"], "1986-02-28")
+        self.assertEqual(s["commercial_scoring_permission"],
+                         "HOLD_NO_ORIGINAL_INVOICE_OR_CUSTOMER_RIGHTS")
+        self.assertFalse(s["raw_publisher_http_bytes_acquired"])
+        self.assertIsNone(s["original_publisher_response_sha256"])
+        for key in ("original_gbl_bytes_custodied", "original_carrier_invoices_custodied",
+                    "underlying_tender_pages_custodied", "original_payment_deduction_receipts_custodied"):
+            self.assertFalse(s[key])
+        self.assertEqual(d["reviewed_gsa_deduction_actions"], 6)
+        self.assertTrue(d["gao_sustained_all_reviewed_actions"])
+        self.assertTrue(d["carrier_higher_joint_line_position_rejected"])
+        self.assertIsNone(d["source_aggregate_recovery_amount_cents"])
+        self.assertIsNone(d["source_per_gbl_overcharge_amounts_cents"])
+        expected = ("APO743634", "S4283162", "M6361307", "M6361264",
+                    "M6357146", "BPO392232")
+        self.assertEqual(tuple(p["reported_gbl_numbers"]), expected)
+        self.assertEqual(len(set(expected)), 6)
+        self.assertEqual(g["published_adjudication_decision_labels"], 1)
+        self.assertEqual(g["reported_referenced_gbls"], 6)
+        for key in ("independent_invoice_face_labels",
+                    "independently_held_out_labeled_invoice_cases",
+                    "independent_shipment_deduction_receipt_labels",
+                    "independent_modern_customer_cases", "verified_retally_customer_recovered_cents"):
+            self.assertEqual(g[key], 0)
+        self.assertTrue(g["publisher_decision_count_is_not_independent_invoice_count"])
+        self.assertTrue(g["shared_opinion_and_referenced_precedent_create_correlated_examples"])
+        self.assertFalse(g["production_accuracy_admitted"])
+        self.assertFalse(g["customer_inference_permitted"])
+        self.assertEqual(g["per_shipment_amount"], "UNKNOWN_NOT_REPORTED_IN_DECISION")
+        controls = p["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+
+    def test_one_adjudication_not_six_independently_scored_invoices(self):
+        self._assert_scope(self._pack())
+
+    def test_synthetic_label_money_custody_and_rights_promotions_rejected(self):
+        import copy
+        edits = (
+            lambda p: p["ground_truth"].update(independently_held_out_labeled_invoice_cases=6),
+            lambda p: p["ground_truth"].update(published_adjudication_decision_labels=6),
+            lambda p: p["reported_decision"].update(gao_sustained_all_reviewed_actions=False),
+            lambda p: p["reported_decision"].update(carrier_higher_joint_line_position_rejected=False),
+            lambda p: p["source"].update(raw_publisher_http_bytes_acquired=True),
+            lambda p: p["source"].update(original_publisher_response_sha256="a" * 64),
+            lambda p: p["source"].update(commercial_scoring_permission="APPROVED"),
+            lambda p: p["reported_decision"].update(source_aggregate_recovery_amount_cents=100),
+            lambda p: p["ground_truth"].update(verified_retally_customer_recovered_cents=15604),
+            lambda p: p["reported_gbl_numbers"].__setitem__(0, "SYNTHETIC"),
+            lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        for i, edit in enumerate(edits):
+            with self.subTest(synthetic_mutation=i):
+                bad = copy.deepcopy(self._pack())
+                edit(bad)
+                with self.assertRaises(AssertionError):
+                    self._assert_scope(bad)
+
 if __name__ == "__main__":
     unittest.main()
