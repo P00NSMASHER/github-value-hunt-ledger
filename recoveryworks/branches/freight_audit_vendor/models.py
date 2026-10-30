@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from enum import Enum
 from typing import Optional
 
@@ -39,16 +40,17 @@ def to_cents(value) -> int:
         return 0
     if isinstance(value, bool):  # guard: bool is a subclass of int
         return 0
-    if isinstance(value, (int, float)):
-        return int(round(value * 100))
     s = str(value).strip().replace("$", "").replace(",", "").replace(" ", "")
     if s == "":
         return 0
     neg = s.startswith("(") and s.endswith(")")
     s = s.strip("()")
     try:
-        cents = int(round(float(s) * 100))
-    except ValueError:
+        amount = Decimal(s)
+        if not amount.is_finite():
+            return 0
+        cents = int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    except (InvalidOperation, ValueError):
         return 0
     return -cents if neg else cents
 
