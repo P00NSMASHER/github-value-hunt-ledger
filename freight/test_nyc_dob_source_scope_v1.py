@@ -124,5 +124,77 @@ class NYCDOBScopeTest(unittest.TestCase):
         self.assertEqual(self.doc['accuracy_evaluation'], 'NOT_ESTIMABLE_WITHOUT_INDEPENDENT_LABELS')
 
 
+
+class NYCDOBOccupancyBoundaryTest(unittest.TestCase):
+    """Official NYC source metadata, with four SYNTHETIC non-scoring probes."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (FIXTURE.parent / 'nyc_dob_occupancy_boundary_v1.json')
+            .read_text(encoding='utf-8'))
+
+    @staticmethod
+    def classify(case):
+        facts = case['facts']
+        if case['claim'] == 'CO_ISSUED':
+            if facts.get('c_of_o_status') != 'Issued' or not facts.get('c_of_o_issuance_date'):
+                return 'UNKNOWN_CO_ISSUANCE_NOT_ESTABLISHED'
+            return 'CO_ISSUANCE_SOURCE_METADATA_NOT_INDEPENDENT_TRUTH'
+        if case['claim'] == 'CURRENT_BUILD_PERMIT_FROM_CO':
+            return 'UNKNOWN_NOT_PERMIT_ISSUANCE_EVIDENCE'
+        if case['claim'] == 'NO_CO_EVER_FROM_NO_NOW_MATCH':
+            if (facts.get('checked_dataset') == 'pkdm-hqz6'
+                    and facts.get('event_date', '') < '2021-03-01'):
+                return 'UNKNOWN_PRE_DOB_NOW_COHORT'
+            return 'UNKNOWN_NO_COMPLETE_NEGATIVE'
+        if case['claim'] == 'TWO_PERMITS_FROM_SAME_BIN':
+            return 'UNKNOWN_JOIN_CARDINALITY_NOT_PERMITS'
+        return 'UNKNOWN_UNSUPPORTED_CLAIM'
+
+    def test_primary_and_historic_source_are_disjoint_coverage_semantics(self):
+        p = self.pack
+        self.assertEqual(p['schema_version'], 1)
+        self.assertEqual(p['primary_source']['dataset_id'], 'pkdm-hqz6')
+        self.assertEqual(p['historic_comparison_source']['dataset_id'], 'bs8b-p36w')
+        self.assertEqual(p['primary_source']['event_type'],
+                         'CERTIFICATE_OF_OCCUPANCY_NOT_WORK_PERMIT')
+        self.assertIn('MARCH_2021', p['primary_source']['event_coverage'])
+        self.assertIn('MARCH_2021', p['historic_comparison_source']['temporal_coverage'])
+        self.assertEqual(p['primary_source']['original_rows_retrieved'], 0)
+        self.assertEqual(p['historic_comparison_source']['original_rows_retrieved'], 0)
+        self.assertIsNone(p['primary_source']['original_source_bytes_sha256'])
+        self.assertIsNone(p['historic_comparison_source']['original_source_bytes_sha256'])
+
+    def test_all_four_synthetic_negatives_and_heldout_trust_boundary(self):
+        p = self.pack
+        self.assertEqual(p['evaluation']['negative_controls_synthetic'], 4)
+        self.assertEqual(len(p['synthetic_controls']), 4)
+        self.assertEqual(len(set(x['id'] for x in p['synthetic_controls'])), 4)
+        for row in p['synthetic_controls']:
+            with self.subTest(case=row['id']):
+                self.assertEqual(self.classify(row), row['expected'])
+                self.assertEqual(row['provenance'], 'SYNTHETIC_NOT_REAL_RECORD')
+                self.assertIsNone(row['independent_real_label'])
+        self.assertEqual(p['evaluation']['held_out_real_world_cases'], 0)
+        self.assertEqual(p['evaluation']['independently_labeled_issued_build_permits'], 0)
+        self.assertEqual(p['evaluation']['measured_accuracy'],
+                         'UNKNOWN_ZERO_REAL_INDEPENDENT_LABELS')
+
+    def test_rights_provenance_dedupe_and_separate_engine_handoffs(self):
+        p = self.pack
+        self.assertEqual(p['primary_source']['source_last_updated_as_reported'], '2026-10-28')
+        self.assertEqual(p['rights']['primary_dataset_license_field'], 'UNSPECIFIED')
+        self.assertFalse(p['rights']['permitplate_product_commercial_reuse_certified'])
+        self.assertFalse(p['rights']['supplemental_dataset_or_third_party_terms_checked'])
+        self.assertFalse(p['evaluation']['allowed_scoring'])
+        self.assertTrue(p['provenance']['original_publisher_metadata_review_only'])
+        self.assertEqual(p['provenance']['current_catalog_content_hash'], 'UNKNOWN_NOT_ACQUIRED')
+        self.assertTrue(p['provenance']['entity_join_requires_multiple_independent_keys'])
+        self.assertEqual(len(p['consumers']), 5)
+        self.assertTrue(p['no_product_code_changes'])
+        self.assertTrue(p['no_new_data_services'])
+
+
 if __name__ == '__main__':
     unittest.main()

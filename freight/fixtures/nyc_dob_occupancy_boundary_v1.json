@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_NOW_OCCUPANCY_BOUNDARY_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_COVERAGE_NEGATIVE_CONTROLS_NOT_PERMIT_SCORING",
+  "reviewed_at_utc": "2026-10-30",
+  "primary_source": {
+    "publisher": "NYC Department of Buildings through NYC Open Data",
+    "dataset_id": "pkdm-hqz6",
+    "official_url": "https://data.cityofnewyork.us/d/pkdm-hqz6",
+    "metadata_url": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Certificate-of-Occupancy/pkdm-hqz6/data",
+    "dataset_title": "DOB NOW: Certificate of Occupancy",
+    "catalog_created_date": "2022-05-17",
+    "source_last_updated_as_reported": "2026-10-28",
+    "publisher_update_frequency": "DAILY",
+    "event_coverage": "DOB_NOW_CERTIFICATE_OF_OCCUPANCY_FROM_MARCH_2021",
+    "event_type": "CERTIFICATE_OF_OCCUPANCY_NOT_WORK_PERMIT",
+    "public_api_field_names": [
+      "job_filing_name",
+      "job_type",
+      "bin",
+      "c_of_o_status",
+      "c_of_o_sequence",
+      "c_of_o_filing_type",
+      "c_of_o_issuance_date"
+    ],
+    "original_rows_retrieved": 0,
+    "original_source_bytes_sha256": null,
+    "schema_full_response_sha256": null,
+    "metadata_full_response_sha256": null,
+    "issuer_independent_outcomes": 0
+  },
+  "historic_comparison_source": {
+    "publisher": "NYC Department of Buildings through NYC Open Data",
+    "dataset_id": "bs8b-p36w",
+    "official_url": "https://data.cityofnewyork.us/d/bs8b-p36w",
+    "dataset_title": "DOB Certificate Of Occupancy",
+    "temporal_coverage": "2012-07-12_THROUGH_MARCH_2021_AS_DESCRIBED_BY_PUBLISHER",
+    "event_type": "LEGACY_BIS_CERTIFICATE_OF_OCCUPANCY_NOT_WORK_PERMIT",
+    "public_api_field_names": [
+      "job_number",
+      "c_o_issue_date",
+      "bin_number",
+      "application_status_raw",
+      "filing_status_raw"
+    ],
+    "original_rows_retrieved": 0,
+    "original_source_bytes_sha256": null,
+    "independent_join_or_version_truth": "UNKNOWN"
+  },
+  "rights": {
+    "portal_terms": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "city_open_data_faq": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "city_technical_standards": "https://cityofnewyork.github.io/opendatatsm/publicpolicies.html",
+    "city_general_public_use": "GENERAL_OPEN_DATA_USE_UNRESTRICTED_SUBJECT_TO_PORTAL_AND_PROVIDER_TERMS",
+    "primary_dataset_license_field": "UNSPECIFIED",
+    "supplemental_dataset_or_third_party_terms_checked": false,
+    "permitplate_product_commercial_reuse_certified": false,
+    "no_private_records_collected": true
+  },
+  "provenance": {
+    "original_publisher_metadata_review_only": true,
+    "current_catalog_content_hash": "UNKNOWN_NOT_ACQUIRED",
+    "immutable_fixture_git_blob_sha1": "RECORDED_EXTERNALLY_AT_COMMIT_NOT_ORIGINAL_SOURCE_HASH",
+    "metadata_asof_is_not_historical_replay": true,
+    "entity_join_requires_multiple_independent_keys": true,
+    "observed_city_catalog_approximate_row_count": "NOT_A_ROW_LEVEL_SNAPSHOT"
+  },
+  "evaluation": {
+    "read_case_count": 0,
+    "independently_labeled_issued_build_permits": 0,
+    "independently_labeled_occupancy_outcomes": 0,
+    "held_out_real_world_cases": 0,
+    "measured_accuracy": "UNKNOWN_ZERO_REAL_INDEPENDENT_LABELS",
+    "allowed_scoring": false,
+    "negative_controls_synthetic": 4,
+    "source_gap": "A certificate of occupancy can be an official occupancy outcome but cannot independently adjudicate a current work-permit issuance, absence, or customer opportunity."
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTHETIC_PENDING_CO",
+      "provenance": "SYNTHETIC_NOT_REAL_RECORD",
+      "claim": "CO_ISSUED",
+      "facts": {
+        "checked_dataset": "pkdm-hqz6",
+        "c_of_o_status": "In Process",
+        "c_of_o_issuance_date": null
+      },
+      "expected": "UNKNOWN_CO_ISSUANCE_NOT_ESTABLISHED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_CO_ISSUED_NOT_PERMIT",
+      "provenance": "SYNTHETIC_NOT_REAL_RECORD",
+      "claim": "CURRENT_BUILD_PERMIT_FROM_CO",
+      "facts": {
+        "checked_dataset": "pkdm-hqz6",
+        "c_of_o_status": "Issued",
+        "c_of_o_issuance_date": "2026-10-01"
+      },
+      "expected": "UNKNOWN_NOT_PERMIT_ISSUANCE_EVIDENCE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_PRE_NOW_NONMATCH",
+      "provenance": "SYNTHETIC_NOT_REAL_RECORD",
+      "claim": "NO_CO_EVER_FROM_NO_NOW_MATCH",
+      "facts": {
+        "checked_dataset": "pkdm-hqz6",
+        "event_date": "2020-06-15",
+        "co_record_found": false
+      },
+      "expected": "UNKNOWN_PRE_DOB_NOW_COHORT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_MULTIPLE_CO_SAME_BIN",
+      "provenance": "SYNTHETIC_NOT_REAL_RECORD",
+      "claim": "TWO_PERMITS_FROM_SAME_BIN",
+      "facts": {
+        "checked_dataset": "pkdm-hqz6",
+        "bin": "SYNTHETIC-BIN",
+        "c_of_o_sequence_values": [
+          1,
+          2
+        ]
+      },
+      "expected": "UNKNOWN_JOIN_CARDINALITY_NOT_PERMITS",
+      "independent_real_label": null
+    }
+  ],
+  "consumers": {
+    "permitplate": "P00NSMASHER/permitplate-nyc | :48 owner; independent permit issuance/offer scoring NOT approved",
+    "recoveryos": "RETALLY/RecoveryOS :12 | no accounting reconciliation labels from this pack",
+    "freightrecovery": "FreightRecovery :12 | no freight-error labels from this pack",
+    "capturebrief": "CaptureBrief :52 | no government award labels from this pack",
+    "independent_qa": ":44 | exact-head fixture metadata and negative-control verification"
+  },
+  "no_new_data_services": true,
+  "no_product_code_changes": true
+}
