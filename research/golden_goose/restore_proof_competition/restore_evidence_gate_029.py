@@ -71,10 +71,15 @@ def classify(case):
 
 
 def evaluate(data):
+    root_fields = {'dataset_id', 'snapshot_date', 'verified_owner_revenue_usd',
+                   'verified_collectible_usd', 'real_customer_restore_tests', 'cases'}
     if (not isinstance(data, dict)
+        or set(data) != root_fields
         or data.get('dataset_id') != 'golden-goose-029-synthetic-restore-evidence'
+        or data.get('snapshot_date') != '2026-10-29'
         or data.get('verified_owner_revenue_usd') != '0.00'
         or data.get('verified_collectible_usd') != '0.00'
+        or type(data.get('real_customer_restore_tests')) is not int
         or data.get('real_customer_restore_tests') != 0):
         raise ValueError('Non-frozen synthetic study or unverified real-world claims')
     cases = data.get('cases')
