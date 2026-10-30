@@ -18,7 +18,7 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
         return json.loads(PACK.read_text(encoding="utf-8"))
 
     def _assert_scope(self, p):
-        self.assertEqual(p["schema_version"], "0.1.1")
+        self.assertEqual(p["schema_version"], "0.1.2")
         self.assertEqual(p["fixture_id"],
                          "NARA_FOIA_2022_REDACTED_ORIGINAL_GOVERNMENT_BOL_EXTRACTION_CANDIDATE_V0")
         self.assertEqual(p["status"], "DRAFT_SOURCE_BOUND_HOLD_UNRELEASED")
@@ -75,6 +75,9 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
                          "Tender ID OTO $4990.2 ON 01/12/2022")
         self.assertEqual(x["estimate_box_usd_cents"], 499020)
         self.assertEqual(x["continuation_page_total_usd_cents"], 499020)
+        self.assertEqual(x["printed_total_footnote"],
+                         "Does not include any accessorials cost added after booking")
+        self.assertEqual(x["printed_total_footnote_page"], 2)
         for key in ("linehaul_displayed_usd_cents", "fuel_displayed_usd_cents",
                     "accessorial_displayed_usd_cents"):
             self.assertEqual(x[key], 0)
@@ -83,6 +86,10 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
         self.assertEqual(x["carrier_name"], "REDACTED_NOT_REPLICATED")
 
         q, g = p["quality"], p["ground_truth"]
+        self.assertIs(q["post_booking_accessorials_are_excluded_from_printed_total"], True)
+        self.assertIsNone(q["post_booking_accessorials_amount_usd_cents"])
+        self.assertIsNone(q["final_carrier_invoice_amount_usd_cents"])
+        self.assertIs(q["printed_total_is_proof_of_final_amount_due"], False)
         for key in ("document_total_is_not_sum_of_displayed_zero_itemization",
                     "zero_component_rows_are_not_proof_of_499020_cent_overcharge",
                     "estimate_and_total_agree",
@@ -128,7 +135,7 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
         self.assertEqual(p["consumers"]["qa_44"],
                          "INDEPENDENT_PDF_CUSTODY_LABELS_RIGHTS_AND_PYTHON_CI_PENDING")
         c = p["synthetic_negative_controls"]
-        self.assertEqual(len(c), 9)
+        self.assertEqual(len(c), 10)
         self.assertEqual(len({row["id"] for row in c}), 9)
         self.assertTrue(all(row["id"].startswith("SYNTHETIC-NARA-")
                             and row["kind"] == "SYNTHETIC"
@@ -147,6 +154,15 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
         self.assertEqual(x["continuation_page_total_usd_cents"], 499020)
         self.assertIsNone(p["quality"]["freight_amount_overcharged_usd_cents"])
         self.assertEqual(p["ground_truth"]["rate_accuracy"], "UNKNOWN")
+
+    def test_booking_total_does_not_prove_final_invoice_amount(self):
+        p = self._pack()
+        self._assert_scope(p)
+        self.assertEqual(p["extraction"]["continuation_page_total_usd_cents"], 499020)
+        self.assertIsNone(p["quality"]["post_booking_accessorials_amount_usd_cents"])
+        self.assertIsNone(p["quality"]["final_carrier_invoice_amount_usd_cents"])
+        self.assertFalse(p["quality"]["printed_total_is_proof_of_final_amount_due"])
+        self.assertEqual(p["ground_truth"]["real_overcharge"], "UNKNOWN")
 
     def test_synthetic_false_ownership_custody_payment_and_rate_claims_rejected(self):
         changes = (
@@ -172,6 +188,10 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
             lambda p: p["billing_direction_observation"].update(verified_payment_status="PAID"),
             lambda p: p["billing_direction_observation"].update(printed_tsp_billing_certificate_scope="CONSIGNEE_MUST_PAY"),
             lambda p: p["quality"].update(printed_billing_direction_not_payment_evidence=False),
+            lambda p: p["quality"].update(post_booking_accessorials_are_excluded_from_printed_total=False),
+            lambda p: p["quality"].update(post_booking_accessorials_amount_usd_cents=2500),
+            lambda p: p["quality"].update(final_carrier_invoice_amount_usd_cents=499020),
+            lambda p: p["quality"].update(printed_total_is_proof_of_final_amount_due=True),
             lambda p: p["quality"].update(consignee_is_not_verified_accounts_payable_debtor=False),
             lambda p: p["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
         )
