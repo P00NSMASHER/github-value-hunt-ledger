@@ -4210,5 +4210,94 @@ class SourceByteReplayIntegrityReceiptTests(unittest.TestCase):
                 x=copy.deepcopy(original);attack(x);self.check(x)
 
 
+class RetallyLegacySourceTreeCompletenessTests(unittest.TestCase):
+    """Second-pass read-only Git-tree inventory for branches exceeding compare limits."""
+
+    _root = Path(__file__).with_name("research_lab") / "legacy_archive"
+
+    @staticmethod
+    def _git_blob_sha(raw):
+        return hashlib.sha1(b"blob " + str(len(raw)).encode("ascii") + b"\x00" + raw).hexdigest()
+
+    def _load(self):
+        root = self._root
+        receipt = json.loads((root / "subtree_inventory_v1.json").read_text(encoding="utf-8"))
+        anchors = []
+        for meta in receipt["anchored_groups"]:
+            raw = (root / meta["path"]).read_bytes()
+            self.assertEqual(self._git_blob_sha(raw), meta["git_blob_sha1"])
+            anchors.extend(json.loads(raw)["records"])
+        subtrees = []
+        for meta in receipt["complete_tree_groups"]:
+            raw = (root / meta["path"]).read_bytes()
+            self.assertEqual(self._git_blob_sha(raw), meta["git_blob_sha1"])
+            subtrees.extend(json.loads(raw)["records"])
+        return receipt, anchors, subtrees
+
+    def _check(self, receipt, anchors, subtrees):
+        self.assertEqual(receipt["inventory_id"], "RETALLY_LEGACY_COMPLETE_SOURCE_SUBTREE_CENSUS_2026_10_30")
+        self.assertEqual(receipt["branches_with_capped_compare_fallback"], 8)
+        self.assertEqual(receipt["unique_source_directory_trees"], 10)
+        self.assertEqual(receipt["total_entries_across_unique_trees"], 209)
+        self.assertTrue(receipt["all_selected_source_directory_tree_reads_complete"])
+        self.assertTrue(receipt["branches_no_code_or_schedule_migration"])
+        self.assertFalse(receipt["original_publisher_sha256_available_for_these_git_trees"])
+        self.assertEqual(receipt["newly_cleared_commercial_customer_source_rights"], 0)
+        self.assertFalse(receipt["fully_migrated_historical_contents"])
+        self.assertEqual(len(anchors), 8)
+        self.assertEqual(len({a["ref"] for a in anchors}), 8)
+        self.assertTrue(all(a["status"] == "NESTED_TREE_ONLY_PENDING_READ" for a in anchors))
+        self.assertEqual(len(subtrees), 10)
+        sha_map = {x["tree_sha"]: x for x in subtrees}
+        self.assertEqual(len(sha_map), 10)
+        self.assertEqual(sum(x["file_count"] for x in subtrees), 209)
+        selected_dirs = set(receipt["selected_directory_names"])
+        self.assertEqual(selected_dirs, {"freight/research", "freight/fixtures", "freight/evidence", "freight/lab_archive_repairs"})
+        for tree in subtrees:
+            self.assertTrue(tree["complete"])
+            self.assertIn(tree["prefix"], selected_dirs)
+            self.assertRegex(tree["tree_sha"], r"^[a-f0-9]{40}$")
+            self.assertEqual(tree["file_count"], len(tree["paths"]))
+            self.assertEqual(len({x["path"] for x in tree["paths"]}), tree["file_count"])
+            for x in tree["paths"]:
+                self.assertTrue(x["path"].startswith(tree["prefix"] + "/"))
+                self.assertRegex(x["sha"], r"^[a-f0-9]{40}$")
+        for a in anchors:
+            self.assertEqual(a["entries"] > 0, True)
+            self.assertEqual({x["path"] for x in a["dirs"]}, selected_dirs)
+            for d in a["dirs"]:
+                self.assertIn(d["sha"], sha_map)
+                self.assertEqual(sha_map[d["sha"]]["prefix"], d["path"])
+        self.assertTrue(receipt["caveats"])
+        self.assertIn("GIT_TREE_METADATA_ONLY", receipt["scope"])
+
+    def test_capped_compare_cases_are_recovered_from_complete_subtree_trees(self):
+        self._check(*self._load())
+
+    def test_synthetic_false_complete_migration_and_source_claims_fail_closed(self):
+        receipt, anchors, subtrees = self._load()
+        self._check(receipt, anchors, subtrees)
+        for key, forged in (
+            ("fully_migrated_historical_contents", True),
+            ("newly_cleared_commercial_customer_source_rights", 1),
+            ("original_publisher_sha256_available_for_these_git_trees", True),
+            ("unique_source_directory_trees", 9),
+            ("total_entries_across_unique_trees", 210),
+        ):
+            with self.subTest(synthetic_forgery=key), self.assertRaises(AssertionError):
+                x = json.loads(json.dumps(receipt))
+                x[key] = forged
+                self._check(x, anchors, subtrees)
+        with self.assertRaises(AssertionError):
+            mutated = json.loads(json.dumps(subtrees))
+            mutated[0]["paths"].pop()
+            self._check(receipt, anchors, mutated)
+        with self.assertRaises(AssertionError):
+            mutated = json.loads(json.dumps(anchors))
+            mutated[0]["dirs"][0]["sha"] = "0" * 40
+            self._check(receipt, mutated, subtrees)
+
+
+
 if __name__ == "__main__":
     unittest.main()

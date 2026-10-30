@@ -1,0 +1,549 @@
+{
+  "kind": "SOURCE_SUBTREE_BLOB_INVENTORY",
+  "version": 1,
+  "part": 1,
+  "records": [
+    {
+      "prefix": "freight/fixtures",
+      "tree_sha": "a408fc16f6576da133f8fea03827587660ae3bb2",
+      "complete": true,
+      "file_count": 26,
+      "paths": [
+        {
+          "path": "freight/fixtures/client_status_dashboard_synthetic.json",
+          "sha": "364014045820128866eed25166671ad1264cd9b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/free_growth_day0.json",
+          "sha": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+          "sha": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_amendment_prelaunch.json",
+          "sha": "e11c52829da304d59718191008e09d923635b48d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_charter_prelaunch.json",
+          "sha": "858b64c16af84726cfc04798f3972b9bd1a06616",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json",
+          "sha": "3849a7e4db00a1b81d92a1d839a35463b2408216",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+          "sha": "120888cb5146cbb6804d7707b2378c6268779c71",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+          "sha": "87edacae515728c27fa7760fe57037c2df496d66",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+          "sha": "ae64ce09cd6618db8935401c28fbf260ccb3e384",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+          "sha": "53dd0271505c9b07bdd31d0a4b8db7a63b2d3dac",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cfs2022_official_maryland_example.json",
+          "sha": "e8df8c7e45ff043fd23a8872e5fb5cbb9860646f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+          "sha": "e3fb80bb4dccf9ec2a38b82d551c00e70ea8c782",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+          "sha": "c824073eab4925764484c0befcb59a89479ce4dd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+          "sha": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_fmc_17_05_invoice_image_candidate_20261018.json",
+          "sha": "e588aef280ed92e64652b47b126c025008737082",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+          "sha": "5373234c04049fb68a8683e05e59674d5ce76a68",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json",
+          "sha": "70d371bb572fbaf63409c437baced091907e1841",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+          "sha": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_rate_reclassification_and_origin_rebuttal_20261018.json",
+          "sha": "8bbb0ed7b912840916c49c7c73655c12a313c6ba",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json",
+          "sha": "4aded8b9d9491b2d82f24a746a1c356c7332c134",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json",
+          "sha": "edc300696d2183c56fc415e9a0d984fd99dbe8a7",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+          "sha": "dd93c272d31bfe0aff67d1854364758188dd5bfa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+          "sha": "e71dcc8f5da1a735efcd347340d4b5af252278fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/readiness_ready.json",
+          "sha": "ef1601c12c376a2eff8cc58610465348a79007f8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+          "sha": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/synthetic_blind_pilot.json",
+          "sha": "12b751520ae492c55dcb341d13c3554e13e84942",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/fixtures",
+      "tree_sha": "69440313800b36e548bd168512c01056daaf3cb2",
+      "complete": true,
+      "file_count": 26,
+      "paths": [
+        {
+          "path": "freight/fixtures/client_status_dashboard_synthetic.json",
+          "sha": "364014045820128866eed25166671ad1264cd9b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/free_growth_day0.json",
+          "sha": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+          "sha": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_amendment_prelaunch.json",
+          "sha": "e11c52829da304d59718191008e09d923635b48d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_charter_prelaunch.json",
+          "sha": "858b64c16af84726cfc04798f3972b9bd1a06616",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json",
+          "sha": "3849a7e4db00a1b81d92a1d839a35463b2408216",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+          "sha": "120888cb5146cbb6804d7707b2378c6268779c71",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+          "sha": "87edacae515728c27fa7760fe57037c2df496d66",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+          "sha": "ae64ce09cd6618db8935401c28fbf260ccb3e384",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+          "sha": "53dd0271505c9b07bdd31d0a4b8db7a63b2d3dac",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cfs2022_official_maryland_example.json",
+          "sha": "e8df8c7e45ff043fd23a8872e5fb5cbb9860646f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+          "sha": "e3fb80bb4dccf9ec2a38b82d551c00e70ea8c782",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+          "sha": "c824073eab4925764484c0befcb59a89479ce4dd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+          "sha": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+          "sha": "5373234c04049fb68a8683e05e59674d5ce76a68",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b186603_wrong_gbl_origin_1976.json",
+          "sha": "83bcd10ee0b623fff1f2c4cd274f14e10c977234",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json",
+          "sha": "70d371bb572fbaf63409c437baced091907e1841",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json",
+          "sha": "2c0a20df8b7088cfc46ef03ae4cb2fd1b30d56b4",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+          "sha": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json",
+          "sha": "4aded8b9d9491b2d82f24a746a1c356c7332c134",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json",
+          "sha": "edc300696d2183c56fc415e9a0d984fd99dbe8a7",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+          "sha": "dd93c272d31bfe0aff67d1854364758188dd5bfa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+          "sha": "e71dcc8f5da1a735efcd347340d4b5af252278fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/readiness_ready.json",
+          "sha": "ef1601c12c376a2eff8cc58610465348a79007f8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+          "sha": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/synthetic_blind_pilot.json",
+          "sha": "12b751520ae492c55dcb341d13c3554e13e84942",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/fixtures",
+      "tree_sha": "0a95ebc97253de3becab5e002a9b6629895ddbea",
+      "complete": true,
+      "file_count": 25,
+      "paths": [
+        {
+          "path": "freight/fixtures/client_status_dashboard_synthetic.json",
+          "sha": "364014045820128866eed25166671ad1264cd9b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/free_growth_day0.json",
+          "sha": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+          "sha": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_amendment_prelaunch.json",
+          "sha": "e11c52829da304d59718191008e09d923635b48d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_charter_prelaunch.json",
+          "sha": "858b64c16af84726cfc04798f3972b9bd1a06616",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json",
+          "sha": "3849a7e4db00a1b81d92a1d839a35463b2408216",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+          "sha": "120888cb5146cbb6804d7707b2378c6268779c71",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+          "sha": "87edacae515728c27fa7760fe57037c2df496d66",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+          "sha": "ae64ce09cd6618db8935401c28fbf260ccb3e384",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+          "sha": "53dd0271505c9b07bdd31d0a4b8db7a63b2d3dac",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cfs2022_official_maryland_example.json",
+          "sha": "e8df8c7e45ff043fd23a8872e5fb5cbb9860646f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+          "sha": "e3fb80bb4dccf9ec2a38b82d551c00e70ea8c782",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+          "sha": "c824073eab4925764484c0befcb59a89479ce4dd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+          "sha": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+          "sha": "5373234c04049fb68a8683e05e59674d5ce76a68",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json",
+          "sha": "70d371bb572fbaf63409c437baced091907e1841",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b197184_improper_deduction_1980.json",
+          "sha": "b152da3242de6ed49bf3619d7d57e5b73cb44592",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+          "sha": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json",
+          "sha": "4aded8b9d9491b2d82f24a746a1c356c7332c134",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json",
+          "sha": "edc300696d2183c56fc415e9a0d984fd99dbe8a7",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+          "sha": "dd93c272d31bfe0aff67d1854364758188dd5bfa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+          "sha": "e71dcc8f5da1a735efcd347340d4b5af252278fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/readiness_ready.json",
+          "sha": "ef1601c12c376a2eff8cc58610465348a79007f8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+          "sha": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/synthetic_blind_pilot.json",
+          "sha": "12b751520ae492c55dcb341d13c3554e13e84942",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/fixtures",
+      "tree_sha": "47f6a37f9d8a28cbbdccbd51038962e958939a80",
+      "complete": true,
+      "file_count": 25,
+      "paths": [
+        {
+          "path": "freight/fixtures/client_status_dashboard_synthetic.json",
+          "sha": "364014045820128866eed25166671ad1264cd9b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/free_growth_day0.json",
+          "sha": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+          "sha": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_amendment_prelaunch.json",
+          "sha": "e11c52829da304d59718191008e09d923635b48d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_charter_prelaunch.json",
+          "sha": "858b64c16af84726cfc04798f3972b9bd1a06616",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json",
+          "sha": "3849a7e4db00a1b81d92a1d839a35463b2408216",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+          "sha": "120888cb5146cbb6804d7707b2378c6268779c71",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+          "sha": "87edacae515728c27fa7760fe57037c2df496d66",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+          "sha": "ae64ce09cd6618db8935401c28fbf260ccb3e384",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+          "sha": "53dd0271505c9b07bdd31d0a4b8db7a63b2d3dac",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cfs2022_official_maryland_example.json",
+          "sha": "e8df8c7e45ff043fd23a8872e5fb5cbb9860646f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+          "sha": "e3fb80bb4dccf9ec2a38b82d551c00e70ea8c782",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+          "sha": "c824073eab4925764484c0befcb59a89479ce4dd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+          "sha": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+          "sha": "5373234c04049fb68a8683e05e59674d5ce76a68",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json",
+          "sha": "70d371bb572fbaf63409c437baced091907e1841",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+          "sha": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gao_rate_reclassification_and_origin_rebuttal_20261018.json",
+          "sha": "8bbb0ed7b912840916c49c7c73655c12a313c6ba",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json",
+          "sha": "4aded8b9d9491b2d82f24a746a1c356c7332c134",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json",
+          "sha": "edc300696d2183c56fc415e9a0d984fd99dbe8a7",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+          "sha": "dd93c272d31bfe0aff67d1854364758188dd5bfa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+          "sha": "e71dcc8f5da1a735efcd347340d4b5af252278fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/readiness_ready.json",
+          "sha": "ef1601c12c376a2eff8cc58610465348a79007f8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+          "sha": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/synthetic_blind_pilot.json",
+          "sha": "12b751520ae492c55dcb341d13c3554e13e84942",
+          "mode": "100644"
+        }
+      ]
+    }
+  ]
+}
