@@ -3984,6 +3984,9 @@ class HistoricalArchiveLineageIntegrityTests(unittest.TestCase):
                 self.assertTrue(b["original_bytes_not_copied"])
                 full.add(b["ref"])
                 for folder in b["folders"]:
+                    if folder.get("missing"):
+                        self.assertEqual(folder["files"], [])
+                        continue
                     self.assertIs(folder["truncated"],False)
                     for f in folder["files"]:
                         self.assertTrue(f["p"].startswith("freight/"))
