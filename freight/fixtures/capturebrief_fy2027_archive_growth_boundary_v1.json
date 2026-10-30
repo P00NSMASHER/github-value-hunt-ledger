@@ -58,6 +58,13 @@
       "description": "Optional SAM.gov public search award metadata belongs to the same source system and is not independent USAspending award/settlement ground truth.",
       "expected": "SAME_ORIGIN_METADATA_IS_NOT_INDEPENDENT_CROSS_SOURCE_TRUTH",
       "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_UNFRAMED_COMPLETE_CSV_PREFIX",
+      "description": "Synthetic HTTP 200 with neither Content-Length nor verified transfer framing returns a valid CSV prefix of a larger original. Byte completeness must remain UNKNOWN.",
+      "expected": "SOURCE_INCOMPLETE",
+      "candidate_state": "OPEN_KNOWN_UNSAFE_ACCEPTANCE",
+      "true_independent_award_label": null
     }
   ],
   "rights_and_truth": {
@@ -78,7 +85,8 @@
     "Live research/retally-unified-data-lab writer branch and workflows are unchanged.",
     "GSA public opportunity search is latest-active-version scoped and key-limited; optional award metadata is not an independent award source.",
     "GSA opportunity-management history calls require authorized contracting roles/system credentials; this pack does not use that API.",
-    "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized."
+    "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized.",
+    "New unframed-prefix synthetic negative is documented but source reader remains unchanged; standalone executed RED/GREEN not yet shown. QA HOLD."
   ],
   "documentation_controls": {
     "verified_date_utc": "2026-10-30",
@@ -89,6 +97,8 @@
     "public_api_award_field": "OPTIONAL_SAME_PUBLISHER_DATA_NOT_INDEPENDENT_AWARD_TRUTH",
     "documentation_full_byte_sha256": null,
     "original_notice_version_history_completeness": "UNKNOWN_NOT_VERIFIED",
-    "original_source_bytes_retrieved_by_this_update": false
+    "original_source_bytes_retrieved_by_this_update": false,
+    "transport_standard": "https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3",
+    "current_source_framing": "UNKNOWN_NO_NEW_SOURCE_READ"
   }
 }
