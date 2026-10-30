@@ -468,6 +468,61 @@ class SamArchiveAsOfTests(unittest.TestCase):
             with self.assertRaisesRegex(ResearchError, "SOURCE_INCOMPLETE"):
                 fetch_original()
 
+    def test_complete_chunked_http11_transfer_remains_accepted(self):
+        # Real HTTP/1.1 framing semantics, wholly SYNTHETIC bytes, no network.
+        # Positive compatibility guard for the two unresolved completeness xfails.
+        from http.client import HTTPResponse
+        from urllib.response import addinfourl
+
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        case = next(x for x in pack["synthetic_controls"]
+                    if x["id"] == "SYNTHETIC_COMPLETE_CHUNKED_TRANSFER")
+        self.assertEqual(case["expected"], STATUS_OK)
+        self.assertIsNone(case["true_independent_award_label"])
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+
+        source = archive()
+        wire = (
+            b"HTTP/1.1 200 OK\r\n"
+            b"Content-Type: text/csv\r\n"
+            b"Content-Encoding: identity\r\n"
+            b"Transfer-Encoding: chunked\r\n\r\n"
+            + f"{len(source):X}\r\n".encode("ascii")
+            + source + b"\r\n0\r\n\r\n"
+        )
+        self_outer = self
+
+        class Socket:
+            def makefile(self, mode):
+                self_outer.assertEqual(mode, "rb")
+                return io.BytesIO(wire)
+
+        raw_http = HTTPResponse(Socket())
+        raw_http.begin()
+        self.assertTrue(raw_http.chunked)
+        self.assertIsNone(raw_http.length)
+
+        class Opener:
+            def open(self, req, timeout):
+                self_outer.assertEqual(req.full_url, SOURCE_URL)
+                self_outer.assertEqual(req.get_method(), "GET")
+                return addinfourl(raw_http, raw_http.headers, SOURCE_URL,
+                                   raw_http.status)
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener()):
+            self.assertEqual(fetch_original(), source)
+
+        observed = build_receipt(observed_at=NOW, fetcher=lambda: source)
+        self.assertEqual(observed["source_status"], STATUS_OK)
+        self.assertEqual(observed["source_rows"], 3)
+        self.assertEqual(observed["independent_cross_source_award_outcomes"], 0)
+        self.assertEqual(observed["original_opportunity_ids_persisted"], 0)
+
     @unittest.expectedFailure
     def test_chunked_incomplete_read_must_be_degraded_not_uncaught(self):
         # SYNTHETIC interrupted HTTP/1.1 chunked body: no publisher GET.
