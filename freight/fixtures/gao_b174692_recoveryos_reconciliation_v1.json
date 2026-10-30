@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B174692_HISTORICAL_ACCOUNTING_RECONCILIATION_V1",
+  "evaluation_family": "GENERAL_ACCOUNTING_RECONCILIATION_NOT_FREIGHT_RATE_ACCURACY",
+  "observed_at_utc_date": "2026-10-30",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "original_public_decision_url": "https://www.gao.gov/products/b-174692",
+    "original_decision_id": "B-174692",
+    "decision_effective_date": "1972-02-14",
+    "underlying_voucher_payment_date": "1969-09-11",
+    "underlying_expense_period": "1968-1969",
+    "cohort": "HISTORICAL_US_GOVERNMENT_RELOCATION_EXPENSE_REIMBURSEMENT",
+    "type": "ORIGINAL_FIRST_PARTY_OFFICIAL_ADJUDICATED_DECISION_NOT_ORIGINAL_VOUCHER",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_US_GOVERNMENT_WORK_REUSABLE_WITH_ATTRIBUTION_AND_NO_ENDORSEMENT",
+    "third_party_embedded_material_rights": "NOT_AUTOMATICALLY_CLEARED",
+    "publisher_response_bytes_sha256": null,
+    "publisher_response_byte_length": null,
+    "publisher_bytes_independently_custodied": false,
+    "original_voucher_and_bank_statement_custodied": false,
+    "regulatory_relevance_to_2026_customer": "UNKNOWN_NOT_ESTABLISHED",
+    "original_publisher_decision_count": 1
+  },
+  "voucher": {
+    "claim_group_id": "GAO_B174692_RELOCATION_SEVEN_ITEMS",
+    "voucher_paid_cents": 265148,
+    "questioned_item_cents": 122979,
+    "number_of_questioned_items": 7,
+    "gaos_final_recoverable_on_present_record_cents": 100529,
+    "gaos_nonrecoverable_item_on_present_record_cents": 22450,
+    "bank_cleared_actual_recovery_cents": null,
+    "dedup_key": "GAO/B-174692/RELOCATION_SEVEN_ITEMS/ITEM_NUMBER",
+    "scope": "SEVEN_LINE_ITEMS_ONLY_NOT_FULL_VOUCHER_OR_OTHER_EMPLOYEE",
+    "claim_status": "PUBLIC_ADJUDICATION_NOT_REALIZED_RECOVERY"
+  },
+  "original_adjudicated_items": [
+    {
+      "item_number": 1,
+      "amount_cents": 11945,
+      "decision_on_present_record": "RECOVERABLE_DUPLICATE_SUBMISSION",
+      "accounting_flag": "DUPLICATE_PAYMENT",
+      "label_source": "GAO_DECISION_ITEM_1",
+      "split": "calibration"
+    },
+    {
+      "item_number": 2,
+      "amount_cents": 7755,
+      "decision_on_present_record": "RECOVERABLE_PROHIBITED_INTEREST",
+      "accounting_flag": "INELIGIBLE_EXPENSE_NOT_DUPLICATE",
+      "label_source": "GAO_DECISION_ITEM_2",
+      "split": "calibration"
+    },
+    {
+      "item_number": 3,
+      "amount_cents": 22450,
+      "decision_on_present_record": "NOT_RECOVERABLE_AUTHORIZED_TITLE_INSURANCE",
+      "accounting_flag": "FALSE_POSITIVE_NEGATIVE_LABEL",
+      "label_source": "GAO_DECISION_ITEM_3",
+      "split": "holdout_within_single_decision"
+    },
+    {
+      "item_number": 4,
+      "amount_cents": 19627,
+      "decision_on_present_record": "RECOVERABLE_PROHIBITED_PROPERTY_TAX",
+      "accounting_flag": "INELIGIBLE_EXPENSE_NOT_DUPLICATE",
+      "label_source": "GAO_DECISION_ITEM_4",
+      "split": "calibration"
+    },
+    {
+      "item_number": 5,
+      "amount_cents": 46830,
+      "decision_on_present_record": "RECOVERABLE_PROHIBITED_MORTGAGE_PAYMENT",
+      "accounting_flag": "INELIGIBLE_EXPENSE_NOT_DUPLICATE",
+      "label_source": "GAO_DECISION_ITEM_5",
+      "split": "calibration"
+    },
+    {
+      "item_number": 6,
+      "amount_cents": 12636,
+      "decision_on_present_record": "RECOVERABLE_ON_PRESENT_RECORD_SUBJECT_TO_FUTURE_PROOF",
+      "accounting_flag": "FUTURE_RECONSIDERATION_UNKNOWN_SPOUSE_COST_NOT_SPLIT",
+      "label_source": "GAO_DECISION_ITEM_6",
+      "split": "calibration"
+    },
+    {
+      "item_number": 7,
+      "amount_cents": 1736,
+      "decision_on_present_record": "RECOVERABLE_INELIGIBLE_FAMILY_TRAVEL",
+      "accounting_flag": "INELIGIBLE_EXPENSE_NOT_DUPLICATE",
+      "label_source": "GAO_DECISION_ITEM_7",
+      "split": "calibration"
+    }
+  ],
+  "out_of_group_control": {
+    "description": "Separate advertising reimbursement in same GAO decision is not part of seven-item voucher",
+    "other_claim_cents": 72413,
+    "recoverable_as_adjudicated": true,
+    "separate_original_source": false,
+    "dedup_group": "OTHER_EMPLOYEE_ADVERTISING_NOT_SAME_VOUCHER"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_ALL_QUESTIONED_RECOVERABLE",
+      "kind": "SYNTHETIC_NOT_REAL_TRANSACTION",
+      "expected": "REJECT_FALSE_POSITIVE_ITEM_3",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_DUPLICATE_LINE_TWICE",
+      "kind": "SYNTHETIC_NOT_REAL_TRANSACTION",
+      "expected": "DEDUP_BY_DECISION_GROUP_AND_ITEM",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_ALL_ISSUES_ARE_DUPLICATES",
+      "kind": "SYNTHETIC_NOT_REAL_TRANSACTION",
+      "expected": "REJECT_ERROR_TYPE_CONFUSION",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_HOUSEHUNTING_ALWAYS_INELIGIBLE",
+      "kind": "SYNTHETIC_NOT_REAL_TRANSACTION",
+      "expected": "UNKNOWN_SUBSEQUENT_AUTHORIZATION_AND_AMOUNT",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_RECOVERY_EQUALS_CASH",
+      "kind": "SYNTHETIC_NOT_REAL_TRANSACTION",
+      "expected": "UNKNOWN_NO_BANK_SETTLEMENT",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_CROSS_CLAIM_CONTAMINATION",
+      "kind": "SYNTHETIC_NOT_REAL_TRANSACTION",
+      "expected": "REJECT_CROSS_CLAIM_SCOPE",
+      "independently_verified_real_label": null
+    }
+  ],
+  "held_out_quality": {
+    "calibration_cases": 6,
+    "heldout_cases_within_same_decision": 1,
+    "independent_publisher_holdout_count": 0,
+    "true_out_of_sample_reconciliation_accuracy": null,
+    "separate_bank_settlement_documents": 0,
+    "independent_2026_customer_cash_recovery_events": 0,
+    "historical_decision_covers_freight_tariffs": false,
+    "freight_rate_error_labels": 0,
+    "original_paid_voucher_line_extraction_validated": false,
+    "unknowns": [
+      "PUBLISHER_BODY_BYTE_HASH",
+      "ORIGINAL_VOUCHER_BYTES",
+      "BANK_CLEARED_RECOVERY",
+      "SPOUSE_TRAVEL_ITEM_6_SUBSEQUENT_AUTHORIZATION",
+      "MODERN_CUSTOMER_PERFORMANCE"
+    ]
+  },
+  "consumers": {
+    "recoveryos_12": "Historic adjudicated accounting reconciliation; preserve one nonrecoverable item, conditional future claim, no bank-cleared cash.",
+    "freightrecovery_12": "Generic duplicate classification only; not present-day freight tariff error accuracy.",
+    "permitplate_48": "No permit scoring labels.",
+    "capturebrief_52": "No procurement scoring labels.",
+    "independent_qa_44": "Verify original GAO text, rights, fixture hashes, heldout limits and arithmetic; no customer claims."
+  },
+  "customer_records_downloaded": 0,
+  "additional_provider_requests_by_ci": 0,
+  "new_schedules": 0,
+  "product_code_modified": false,
+  "commercial_scoring_or_customer_delivery_approved": false,
+  "historical_15_labs_fully_consolidated": false
+}
