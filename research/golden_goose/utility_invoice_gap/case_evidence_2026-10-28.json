@@ -1,0 +1,68 @@
+{
+  "observed_on": "2026-10-28",
+  "candidate": "Municipal recurring utility invoice continuity / two-sided audit",
+  "status": "WATCH_RESEARCH_NOT_VALIDATED",
+  "verified_user_earnings_usd": 0,
+  "first_party_or_reported_events": [
+    {
+      "date": "2017-12-05",
+      "source": "City of Buffalo Comptroller's Office",
+      "url": "https://buffalocomptrollerny.gov/169/National-Grid-Refunds-Buffalo-1-Million",
+      "claim": "City reports more than $1M refunded by National Grid after streetlight audit identified billing for nonexistent fixtures; interest was substantial.",
+      "economic_direction": "REFUND_TO_CITY",
+      "qualifier": "Historical third-party outcome; not user's revenue."
+    },
+    {
+      "date": "2026-04-17",
+      "source": "Times Union reporting on City of Hudson, New York",
+      "url": "https://www.timesunion.com/hudsonvalley/news/article/hudson-national-grid-streetlight-billing-fiasco-22210542.php",
+      "claim": "Hudson received a roughly $105,000 unpaid streetlight bill after LED conversion; 891 lights; disputed documentation timeline and previous billing interruption.",
+      "economic_direction": "BACK_BILL_LIABILITY_POTENTIAL",
+      "qualifier": "Reported amount, not a recovered customer saving; exact legal liability/final reconciliation unverified."
+    }
+  ],
+  "competitor_examples": [
+    {
+      "name": "Troy & Banks",
+      "url": "https://www.troybanks.com/services/streetlight-audit/",
+      "evidence": "Incumbent explicitly audits GIS inventory, billed fixtures, tariffs and LED rates.",
+      "caveat": "Service provider's own claims."
+    },
+    {
+      "name": "Huckleberry",
+      "url": "https://huckleberryservices.com/platform/utility-bill-management",
+      "evidence": "Markets automated utility bill retrieval and accounting; potentially overlaps invoice continuity.",
+      "caveat": "Does not establish coverage of municipal streetlight accounts."
+    },
+    {
+      "name": "Discovery Energy",
+      "url": "https://deaudits.com/pricing/",
+      "evidence": "Contingency audit firm advertises 15%–50% of recovered amounts and verified savings.",
+      "caveat": "Pricing is vendor published, no market share inference."
+    }
+  ],
+  "quantification": {
+    "historical_buffalo_city_refund_usd_lower_bound": 1000000,
+    "reported_hudson_backbill_usd": 105000,
+    "verified_recoverable_user_revenue_usd": 0,
+    "verified_customer_count": 0,
+    "verified_qualified_sales_leads": 0,
+    "potential_revenue_forecast": null,
+    "purchased_buyer_validation": null
+  },
+  "next_falsifier": "On customer-authorized or fully public aggregate statements, measure detection of missing account-month invoices relative to a finance-team baseline, counting source interruptions vs actual backbill surprises; verify existing vendor capabilities, municipal procurement requirements, and willingness-to-pay before sale.",
+  "guardrails": [
+    "Do not assert recovery or liability from a missing invoice.",
+    "No outreach or invoice/customer-data collection.",
+    "No new paid tools or subscriptions.",
+    "No claim filings or vendor disputes.",
+    "No publication/production deployment."
+  ],
+  "prototype_assumptions": [
+    "Monthly calendar-period accounts only.",
+    "Complete known service start/end boundaries.",
+    "45-day billing grace period is an illustrative user-configurable assumption, NOT a tariff rule.",
+    "CSV/ERP parsing and provider-specific document authority not implemented.",
+    "False positives likely for delayed utility billing, consolidated bills, partial-period accounts, or new account IDs."
+  ]
+}
