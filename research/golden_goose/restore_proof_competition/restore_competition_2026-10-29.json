@@ -1,0 +1,135 @@
+{
+  "id": "golden-goose-028-restore-proof-competitive-falsifier",
+  "snapshot_date": "2026-10-29",
+  "scope": "Official vendor offer/pricing pages as observed; NOT verified customer purchases, buyer willingness to pay, or owner revenue.",
+  "offers": [
+    {
+      "name": "AWS Backup restore testing",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2023/11/aws-backup-restore-testing/",
+      "price_url": "https://aws.amazon.com/backup/pricing/",
+      "product_type": "provider_restore_testing",
+      "capabilities": [
+        "periodic_resource_restoration",
+        "restore_duration_tracking",
+        "governance_evidence"
+      ],
+      "advertised_price_usd": null,
+      "price_basis": "usage_based",
+      "value_evidence": "vendor_documentation_only",
+      "independently_verified_customers": null,
+      "notes": "AWS automates restore tests and measures duration; restore-test pricing usage-based, not free."
+    },
+    {
+      "name": "Veeam SureBackup",
+      "url": "https://helpcenter.veeam.com/docs/vbr/userguide/surebackup_job_hv.html",
+      "price_url": null,
+      "product_type": "provider_restore_testing",
+      "capabilities": [
+        "virtual_lab_recovery",
+        "application_tests",
+        "integrity_scan",
+        "scheduled_tests"
+      ],
+      "advertised_price_usd": null,
+      "price_basis": "license_dependent_unknown",
+      "value_evidence": "vendor_documentation_only",
+      "independently_verified_customers": null,
+      "notes": "Official guide updated April 20, 2026; VM and application checks on supported systems."
+    },
+    {
+      "name": "Salvage Team",
+      "url": "https://salvage.sh/pricing",
+      "price_url": "https://salvage.sh/pricing",
+      "product_type": "signed_restore_attestation",
+      "capabilities": [
+        "restore_test_cli",
+        "independent_hosted_attestation",
+        "signed_evidence",
+        "multi_engine"
+      ],
+      "advertised_price_usd": "29.00",
+      "price_basis": "per_month",
+      "value_evidence": "vendor_price_list_only",
+      "independently_verified_customers": null,
+      "notes": "Advertised free CLI and hosted Team attestations $29/mo; not verified purchases."
+    },
+    {
+      "name": "Dokaz Starter",
+      "url": "https://dokaz.net/pricing",
+      "price_url": "https://dokaz.net/pricing",
+      "product_type": "signed_database_restore_attestation",
+      "capabilities": [
+        "postgres_restore_drills",
+        "signed_evidence",
+        "daily_drills",
+        "auditor_links"
+      ],
+      "advertised_price_usd": "100.00",
+      "price_basis": "per_month",
+      "value_evidence": "vendor_price_list_only",
+      "independently_verified_customers": null,
+      "notes": "Published Starter $100/mo; PostgreSQL only."
+    },
+    {
+      "name": "SafetyOnCloud optional restore test",
+      "url": "https://www.safetyoncloud.com/plans.html",
+      "price_url": "https://www.safetyoncloud.com/plans.html",
+      "product_type": "managed_restore_service",
+      "capabilities": [
+        "assisted_restore_test"
+      ],
+      "advertised_price_usd": "199.00",
+      "price_basis": "one_time",
+      "value_evidence": "vendor_price_list_only",
+      "independently_verified_customers": null,
+      "notes": "Published $199 optional test and separately $149 evidence report; scope may differ."
+    },
+    {
+      "name": "NorthFirn scoped restore test",
+      "url": "https://northfirn.com/services/pricing/",
+      "price_url": "https://northfirn.com/services/pricing/",
+      "product_type": "independent_restore_service",
+      "capabilities": [
+        "scoped_restore_test",
+        "dated_pass_fail_report"
+      ],
+      "advertised_price_usd": "950.00",
+      "price_basis": "starting_at_one_time",
+      "value_evidence": "vendor_price_list_only",
+      "independently_verified_customers": null,
+      "notes": "Starting price, not a confirmed typical realized contract price."
+    },
+    {
+      "name": "Valen Systems recovery runbook",
+      "url": "https://www.valen-systems.com/offers/backup-recovery-runbook",
+      "price_url": "https://www.valen-systems.com/offers/backup-recovery-runbook",
+      "product_type": "documentation_only_runbook",
+      "capabilities": [
+        "recovery_dependency_inventory",
+        "restore_test_checklist"
+      ],
+      "advertised_price_usd": "495.00",
+      "price_basis": "one_time",
+      "value_evidence": "vendor_price_list_only",
+      "independently_verified_customers": null,
+      "notes": "Runbook only, not an actual restore test."
+    }
+  ],
+  "hypothetical_own_offer": {
+    "name": "Independent multi-provider single-path restore evidence audit",
+    "fee_usd": "199.00",
+    "overhead_usd": "20.00",
+    "reviewer_hourly_cost_usd": "45.00",
+    "assumed_review_hours": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "gross_revenue_received_usd": "0.00",
+    "verified_collectible_usd": "0.00",
+    "real_customer_count": 0,
+    "authorized_real_customer_backups": 0,
+    "scope_constraint": "No live systems/backups/credentials; hypothetical math only"
+  }
+}
