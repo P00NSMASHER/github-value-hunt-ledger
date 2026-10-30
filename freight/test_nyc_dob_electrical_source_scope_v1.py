@@ -92,5 +92,86 @@ class ElectricalOriginalSourceScopeTest(unittest.TestCase):
         self.assertEqual(self.doc["source_data_labels"]["cross_source_verified_issuance_labels"], 0)
 
 
+class ElectricalDetailsFanoutResearchTest(unittest.TestCase):
+    """Metadata-only publisher join boundary, not a production adapter or real benchmark."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (PATH.parent / "nyc_dob_electrical_details_fanout_v1.json")
+            .read_text(encoding="utf-8")
+        )
+        cls.controls = {c["id"]: c for c in cls.pack["synthetic_controls"]}
+
+    def test_original_dob_detail_source_and_schema_have_no_fabricated_bytes(self):
+        p = self.pack
+        s = p["source"]
+        self.assertEqual(s["dataset_id"], "xmmq-y7za")
+        self.assertEqual(s["catalog_last_updated_reported"], "2026-10-20")
+        self.assertEqual(s["original_schema_metadata_url"],
+                         "https://data.cityofnewyork.us/api/views/xmmq-y7za/columns.json")
+        self.assertEqual(s["documented_public_api_fields"],
+                         ["unique_id", "work_id", "floor_id", "sign_id",
+                          "job_filing_number", "work_description", "item"])
+        self.assertTrue(s["publisher_describes_multiple_rows_per_job_filing"])
+        self.assertEqual(s["original_source_rows_custodied"], 0)
+        self.assertIsNone(s["original_http_response_bytes_sha256"])
+        self.assertIsNone(s["original_schema_response_bytes_sha256"])
+        self.assertIsNone(s["original_content_length_bytes"])
+
+    def test_synthetic_naive_row_count_red_and_filing_dedup_green(self):
+        c = self.controls["SYNTHETIC_DETAIL_FANOUT_3_TO_1"]
+        rows = c["synthetic_detail_rows"]
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(len({x["unique_id"] for x in rows}), 3)
+        self.assertEqual(len({x["job_filing_number"] for x in rows}), 1)
+        self.assertEqual(len({x["work_id"] for x in rows}), 2)
+        self.assertEqual(c["naive_detail_row_count"], len(rows))
+        self.assertEqual(c["deduped_filing_group_count"], 1)
+        self.assertEqual(c["deduped_work_scope_count"], 2)
+        self.assertNotEqual(c["naive_detail_row_count"],
+                            c["deduped_filing_group_count"])
+        self.assertEqual(c["expected"], "UNKNOWN_ONE_FILING_NOT_THREE_ISSUED_PERMITS")
+        self.assertIsNone(c["independently_verified_real_label"])
+
+    def test_synthetic_holdouts_block_join_miss_and_filing_multiplicity(self):
+        self.assertEqual(
+            {x["id"] for x in self.pack["synthetic_controls"]
+             if x["split"] == "synthetic_holdout"},
+            {"SYNTHETIC_DETAILS_WITHOUT_APPLICATION_JOIN",
+             "SYNTHETIC_TWO_FILINGS_ONE_JOB"}
+        )
+        missing = self.controls["SYNTHETIC_DETAILS_WITHOUT_APPLICATION_JOIN"]
+        self.assertFalse(missing["synthetic_facts"]["application_join_found"])
+        self.assertEqual(missing["expected"],
+                         "UNKNOWN_JOIN_MISS_NOT_NEGATIVE_ISSUANCE_LABEL")
+        multiple = self.controls["SYNTHETIC_TWO_FILINGS_ONE_JOB"]
+        self.assertEqual(len(multiple["synthetic_facts"]["synthetic_filing_numbers"]), 2)
+        self.assertEqual(multiple["expected"],
+                         "UNKNOWN_FILING_MULTIPLICITY_NOT_PERMIT_COUNT")
+        self.assertEqual(self.controls[
+            "SYNTHETIC_EL_SUFFIX_WITHOUT_AWARD_TRUTH"]["expected"],
+            "UNKNOWN_NO_HISTORIC_ASOF_OR_INDEPENDENT_ISSUANCE")
+
+    def test_rights_scoring_dedup_and_noncustomer_limits_hold(self):
+        p = self.pack
+        self.assertEqual(p["join_contract"]["shared_field"], "job_filing_number")
+        self.assertEqual(p["join_contract"]["expected_cardinality"],
+                         "ONE_FILING_TO_MANY_SCOPE_DETAIL_ROWS")
+        self.assertEqual(p["quality"]["dedup_key"], "dataset_id/unique_id_FOR_DETAILS_ONLY")
+        self.assertEqual(p["quality"]["synthetic_heldout_cases"], 2)
+        self.assertEqual(p["quality"]["real_heldout_cases"], 0)
+        self.assertIsNone(p["quality"]["independent_scoring_accuracy"])
+        self.assertEqual(p["rights"]["dataset_specific_license"], "UNVERIFIED")
+        self.assertFalse(p["rights"]["permitplate_commercial_scoring_cleared"])
+        self.assertTrue(p["rights"]["city_open_data_faq_describes_unrestricted_general_use"])
+        self.assertTrue(all(c["provenance"] == "SYNTHETIC_NO_REAL_PUBLISHER_RECORD"
+                            and c["independently_verified_real_label"] is None
+                            for c in p["synthetic_controls"]))
+        self.assertFalse(p["product_code_modified"])
+        self.assertEqual(p["provider_gets_added_to_ci"], 0)
+        self.assertFalse(p["legacy_15_lab_consolidation_certified"])
+
+
 if __name__ == "__main__":
     unittest.main()
