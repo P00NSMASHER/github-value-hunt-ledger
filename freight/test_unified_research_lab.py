@@ -4149,5 +4149,66 @@ class RetallyLegacyArchiveInventoryTests(unittest.TestCase):
 
 
 
+
+class SourceByteReplayIntegrityReceiptTests(unittest.TestCase):
+    """Pin historical runner checks without making a fresh live publisher claim."""
+
+    @staticmethod
+    def receipt():
+        return json.loads((Path(__file__).with_name("fixtures") / "legacy_branch_archive" /
+            "source_byte_replay_v1.json").read_text(encoding="utf-8"))
+
+    def check(self, r):
+        from freight.real_document_lab import FROZEN_DOCUMENT_SHA256, FROZEN_PENNINE_SHA256
+        self.assertEqual(r["receipt_id"],"RETALLY_PINNED_ORIGINAL_PUBLISHER_BYTE_REPLAY_2026_10_30")
+        self.assertEqual(r["existing_read_only_workflow_run_id"],40990993765)
+        self.assertEqual(r["existing_workflow_job_id"],123853092328)
+        self.assertEqual(r["source_code_commit"],"1ddef8e0955e20bda658a1f73b810f2ae5c13812")
+        self.assertTrue(r["source_hosted_file_sha256_verified_in_ci"])
+        self.assertEqual((r["verified_original_hosted_files_count"],
+                          r["freight_invoice_pdf_count"],r["public_accounting_csv_count"]),(7,2,5))
+        rows=r["verified_sources"]
+        self.assertEqual(len(rows),7)
+        self.assertEqual(len(set(x["id"] for x in rows)),7)
+        for x in rows:
+            want=(FROZEN_DOCUMENT_SHA256 if x["kind"]=="ORIGINAL_PUBLIC_INVOICE_PDF"
+                  else FROZEN_PENNINE_SHA256)
+            self.assertEqual(x["sha256"],want[x["id"]])
+            self.assertEqual(len(x["sha256"]),64)
+            self.assertTrue(x["url"].startswith("https://"))
+        self.assertEqual(len(r["source_authority_gaps"]),3)
+        for gap in r["source_authority_gaps"]:
+            self.assertIsNone(gap["original_publisher_response_sha256"])
+            self.assertFalse(gap["source_bytes_reacquired_this_turn"])
+            self.assertTrue(gap["metric"].startswith("UNKNOWN"))
+        self.assertFalse(r["original_transaction_issuer_authenticity_independently_attested"])
+        self.assertFalse(r["commercial_customer_use_rights_approved"])
+        self.assertFalse(r["independent_human_qa_completed"])
+        self.assertTrue(r["qa_simulation_not_human_signoff"])
+        self.assertEqual(r["real_customer_freight_error_labels"],0)
+        self.assertEqual(r["verified_retally_cash_cents"],0)
+        self.assertEqual(r["hold_state"],"PARTIAL_PUBLISHER_BYTE_VERIFICATION_NOT_FULL_CUSTOMER_BENCHMARK")
+
+    def test_accepted_source_hashes_are_exact_existing_run_receipts(self):
+        self.check(self.receipt())
+
+    def test_synthetic_publisher_authority_and_cash_forgery_is_rejected(self):
+        import copy
+        original=self.receipt()
+        attacks=[
+            lambda x:x["verified_sources"][0].update(sha256="a"*64),
+            lambda x:x["source_authority_gaps"][0].update(original_publisher_response_sha256="b"*64),
+            lambda x:x.update(verified_original_hosted_files_count=8),
+            lambda x:x.update(real_customer_freight_error_labels=1),
+            lambda x:x.update(verified_retally_cash_cents=1),
+            lambda x:x.update(independent_human_qa_completed=True),
+            lambda x:x.update(commercial_customer_use_rights_approved=True),
+            lambda x:x.update(hold_state="FULL_CUSTOMER_ACCURACY_VERIFIED"),
+        ]
+        for n,attack in enumerate(attacks):
+            with self.subTest(synthetic_attack=n),self.assertRaises(AssertionError):
+                x=copy.deepcopy(original);attack(x);self.check(x)
+
+
 if __name__ == "__main__":
     unittest.main()

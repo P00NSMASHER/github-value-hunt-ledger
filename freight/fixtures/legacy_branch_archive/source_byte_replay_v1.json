@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "receipt_id": "RETALLY_PINNED_ORIGINAL_PUBLISHER_BYTE_REPLAY_2026_10_30",
+  "as_of_utc": "2026-10-30T02:19:40Z",
+  "existing_read_only_workflow_run_id": 40990993765,
+  "existing_workflow_job_id": 123853092328,
+  "source_code_commit": "1ddef8e0955e20bda658a1f73b810f2ae5c13812",
+  "workflow_name": "RETALLY Isolated Real-Document Research Laboratory",
+  "verified_original_hosted_files_count": 7,
+  "freight_invoice_pdf_count": 2,
+  "public_accounting_csv_count": 5,
+  "source_hosted_file_sha256_verified_in_ci": true,
+  "original_transaction_issuer_authenticity_independently_attested": false,
+  "private_customer_invoice_records_saved": false,
+  "commercial_customer_use_rights_approved": false,
+  "real_customer_freight_error_labels": 0,
+  "verified_retally_cash_cents": 0,
+  "verified_sources": [
+    {
+      "id": "globaltranz",
+      "kind": "ORIGINAL_PUBLIC_INVOICE_PDF",
+      "url": "https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/10247",
+      "sha256": "45d4b8fae33234d3b9efe087e60a10dc5f6fc45f8cc9f5099560c6c63bfb33b4"
+    },
+    {
+      "id": "arcbest",
+      "kind": "ORIGINAL_PUBLIC_INVOICE_PDF",
+      "url": "https://ec-p-cus-ewf-ecb-sync-fnc.azurewebsites.net/api/GetImage/408",
+      "sha256": "4c3e2f69ae7414bcebacd7d74f31320c2dad37d18f5e85370f46f00aca0bbb17"
+    },
+    {
+      "id": "2026-04",
+      "kind": "ORIGINAL_PUBLISHER_DISCLOSURE_CSV",
+      "url": "https://www.penninecare.nhs.uk/download_file/5855/277",
+      "sha256": "314cd0c021f137b43b94e81bb93f26aece5b3b0a021e99c42d43546a640c3d90"
+    },
+    {
+      "id": "2026-05",
+      "kind": "ORIGINAL_PUBLISHER_DISCLOSURE_CSV",
+      "url": "https://www.penninecare.nhs.uk/download_file/5874/277",
+      "sha256": "5957ead9c23d57039e267dc18076c7b8d711a14b97cbea6d9a9ff0629aeb5028"
+    },
+    {
+      "id": "2026-06",
+      "kind": "ORIGINAL_PUBLISHER_DISCLOSURE_CSV",
+      "url": "https://www.penninecare.nhs.uk/download_file/5910/277",
+      "sha256": "318aeeedbf55d05bcffce5076ac893a84bdb6ebe5e7c851bb3f3c45dbbdea8fc"
+    },
+    {
+      "id": "2026-07",
+      "kind": "ORIGINAL_PUBLISHER_DISCLOSURE_CSV",
+      "url": "https://www.penninecare.nhs.uk/download_file/5920/277",
+      "sha256": "ecb986bd0e33cf402f7cb86ff68bc91368d18a5dfc39410e4e2019c045c3de15"
+    },
+    {
+      "id": "2026-08",
+      "kind": "ORIGINAL_PUBLISHER_DISCLOSURE_CSV",
+      "url": "https://www.penninecare.nhs.uk/download_file/5941/277",
+      "sha256": "4153ccbbbe27307afddba1d6651bfd9db8a774cc84e4fd23d62b3a2d1059d796"
+    }
+  ],
+  "source_authority_gaps": [
+    {
+      "cohort": "GAO_HISTORICAL_ADJUDICATION_PDFS",
+      "original_publisher_response_sha256": null,
+      "source_bytes_reacquired_this_turn": false,
+      "cause": "PUBLISHER_HTTP_403_OR_EXACT_BYTE_FETCH_UNAVAILABLE",
+      "metric": "UNKNOWN_NOT_SOURCE_BYTE_VERIFIED"
+    },
+    {
+      "cohort": "NYC_ELECTRICAL_AND_DOB_OPEN_DATA",
+      "original_publisher_response_sha256": null,
+      "source_bytes_reacquired_this_turn": false,
+      "cause": "PUBLISHER_REDIRECT_OR_EXACT_BYTE_FETCH_UNAVAILABLE",
+      "metric": "UNKNOWN_NOT_SOURCE_BYTE_VERIFIED"
+    },
+    {
+      "cohort": "ORIGINAL_CARRIER_BOL_RATE_CONTRACT_BANK_CHAIN",
+      "original_publisher_response_sha256": null,
+      "source_bytes_reacquired_this_turn": false,
+      "cause": "ORIGINAL_MATCHED_INVOICE_RATE_CONTRACT_SETTLEMENT_CHAIN_NOT_IN_CUSTODY",
+      "metric": "UNKNOWN_NO_INDEPENDENT_FREIGHT_RATE_ACCURACY"
+    }
+  ],
+  "independent_human_qa_completed": false,
+  "qa_simulation_not_human_signoff": true,
+  "hold_state": "PARTIAL_PUBLISHER_BYTE_VERIFICATION_NOT_FULL_CUSTOMER_BENCHMARK"
+}
