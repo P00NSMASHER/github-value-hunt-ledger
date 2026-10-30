@@ -34,6 +34,7 @@ from freight.test_gao_b215958_supersession import GAOB215958SupersessionTests
 from freight.test_recoveryos_gao_ap_reconciliation_candidate import GAOAccountingReconCandidateTest
 from freight.test_nara_2022_foia_bol_extraction import NARAOriginalBOLExtractionTests as NARAOriginalBOLExtractionTests
 from freight.test_gao_b192872_weight_corrected_adjudication import GAOB192872AdjustedWeightEvidenceTests as GAOB192872AdjustedWeightEvidenceTests
+from freight.test_gao_b2039292_tender_seal_negative import GAOB2039292TenderSealNegativeTests as GAOB2039292TenderSealNegativeTests
 
 class GAOB166882DamagedFreightExclusionTests(unittest.TestCase):
     """Historical unearned-freight category must never be sold as tariff accuracy."""

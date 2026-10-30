@@ -1,0 +1,113 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B2039292_TENDER_SEAL_NEGATIVE_CANDIDATE_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "FREIGHT_HISTORICAL_INDEPENDENT_ADJUDICATION_NEGATIVE_NOT_ACCOUNTING_RECONCILIATION",
+  "admission_status": "HISTORICAL_PUBLIC_NEGATIVE_CONTROL_ONLY_NO_MODERN_CUSTOMER_ACCURACY_LABEL",
+  "source": {
+    "official_decision_url": "https://www.gao.gov/products/b-203929.2",
+    "official_pdf_url": "https://www.gao.gov/assets/b-203929.2.pdf",
+    "rights_url": "https://www.gao.gov/copyright",
+    "publisher": "US_GAO",
+    "decision_id": "B-203929.2",
+    "decision_date": "1982-04-09",
+    "inspected_original_pdf_pages": [
+      1,
+      2,
+      3
+    ],
+    "inspection_method": "OFFICIAL_GAO_HTML_AND_OFFICIAL_THREE_PAGE_PDF_VISUALLY_INSPECTED",
+    "original_publisher_pdf_http_bytes_held": false,
+    "original_publisher_pdf_sha256": null,
+    "original_signed_gbl_or_full_tender_266_pages_held": false,
+    "decision_source_copyright_status": "GAO_GOVERNMENT_MATERIAL_PUBLIC_DOMAIN_US_CREDIT_NO_ENDORSEMENT",
+    "third_party_tender_reproduction_rights": "UNVERIFIED_HOLD",
+    "commercial_modern_rating_authority": "UNKNOWN"
+  },
+  "cohort": {
+    "category": "ONE_HISTORICAL_US_GOVERNMENT_FREIGHT_SHIPMENT",
+    "exact_shipment_date": "UNKNOWN",
+    "effective_rate_rule": "HISTORICAL_TENDER_266_ITEMS_179_130_AS_INTERPRETED_IN_1982_GAO_DECISION",
+    "original_tender_effective_dates_independently_verified": false,
+    "heldout_from_private_commercial_invoice_corpus": true,
+    "modern_customer_invoice_records": 0
+  },
+  "adjudicated_facts": {
+    "carrier": "American Farm Lines Inc.",
+    "government_bol": "S-0,551,728",
+    "exclusive_use_requested_and_furnished": true,
+    "shipper_applied_numbered_seals": false,
+    "paid_initial_charge_based_on_tariff": true,
+    "gsa_lower_tender_rate_claimed": true,
+    "tender_number": 266,
+    "tender_item_179_requires_shipper_seals_for_discount": true,
+    "tender_item_130_optional_exclusive_use_seal_does_not_waive_item_179": true,
+    "adjudicated_outcome": "GAO_REVERSED_GSA_OVERCHARGE_AUDIT",
+    "valid_historical_gsa_deduction": false,
+    "original_paid_charge_cents": null,
+    "original_gsa_deduction_cents": null,
+    "final_refund_or_cash_receipt_cents": null,
+    "contemporaneous_gbl_or_tender_originals_independently_custodied": false
+  },
+  "labels": {
+    "independently_adjudicated_historical_negative_cases": 1,
+    "independently_adjudicated_historical_positive_cases": 0,
+    "independently_scored_present_day_invoice_error_cases": 0,
+    "independently_scored_present_day_clean_invoice_cases": 0,
+    "independently_verified_exact_dollar_labels": 0,
+    "original_publisher_bytes_sha256": "UNKNOWN",
+    "unknown_dollar_amount": "UNKNOWN",
+    "independent_recovery_and_settlement": "UNKNOWN",
+    "freight_customer_precision_recall": "UNKNOWN",
+    "verified_retally_customer_recovery_cents": 0
+  },
+  "quality": {
+    "historical_agency_adjudication_ground_truth": "INDEPENDENT_NEGATIVE_GSA_AUDIT_ACTION_REVERSED",
+    "documented_partial_transcription_only": true,
+    "original_bol_and_tender_rate_table_missing": true,
+    "contemporaneous_tender_and_shipment_supercession_checked": false,
+    "commercial_customer_scoring_rights": "UNVERIFIED_HOLD",
+    "source_data_quality": "OFFICIAL_DECISION_PAGES_VISUALLY_VERIFIED_NO_ISSUER_BYTES_OR_PRIVATE_TRANSACTION_CHAIN",
+    "no_network_provider_calls_or_production_changes": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_REVERSED_GSA_AUDIT_IS_VALID_CUSTOMER_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_POSITIVE_FREIGHT_ERROR_LABEL"
+    },
+    {
+      "id": "SYNTH_OPTIONAL_EXCLUSIVE_SEAL_EXEMPTS_REQUIRED_SHIPPER_SEAL",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_TENDER_179_APPLICABILITY_INVERSION"
+    },
+    {
+      "id": "SYNTH_PDF_LINK_PROVES_ORIGINAL_BYTES_HASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NONCUSTODIED_PUBLISHER_BYTES"
+    },
+    {
+      "id": "SYNTH_UNKNOWN_DEDUCTION_EQUALS_PROVEN_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNSUPPORTED_DOLLAR_TRUTH"
+    },
+    {
+      "id": "SYNTH_1982_TENDER_DECISION_VALIDATES_2026_SHIPPER_TARIFF",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MODERN_RATE_AUTHORITY"
+    },
+    {
+      "id": "SYNTH_GAO_REVERSED_AUDIT_MEANS_RETALLY_RECOVERED_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HISTORICAL_GOVERNMENT_ACTION_NOT_BUYER_CASH"
+    }
+  ],
+  "consumer_handoffs": {
+    "retally_recoveryos_engineering": ":12",
+    "permitplate_source_provenance_policy": ":48",
+    "capturebrief_source_provenance_policy": ":52",
+    "independent_qa": ":44",
+    "engine_code_modified": false,
+    "production_release_authorized": false
+  }
+}
