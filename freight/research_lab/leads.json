@@ -5255,6 +5255,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-30",
+      "id": "66d9d3e2f57b6148fdcbf472d80c957e3d493b41b3bd197e03722e3fe5c4bbf0",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/alphaparkinc/genpark-agentic-commerce-automated-carrier-invoice-parcel-audit-skill"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-22",
@@ -12825,6 +12841,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "651b27d26d60e7012c7cadfd13fcab31d6fd9094f7bd48ec09534d11abb09a95",
+  "entries_sha256": "d2bdcc0487be200673d203a1b79479c193226ad7412b114cf7559d5def4d94c4",
   "schema_version": 1
 }
