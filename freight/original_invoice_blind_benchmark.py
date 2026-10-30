@@ -458,8 +458,9 @@ def score_private_population(population: dict, secret: bytes,
     tp = tn = fp = fn = positive_review = negative_review = 0
     unsigned = unsupported = 0
     false_positive_cents = missed_positive_cents = absolute_error_cents = 0
-    # Reusing one independently issued clearing/decision line to support
-    # different invoice case IDs would double-count financial proof.
+    # Reusing one independently issued shipment, clearing, or decision line
+    # for different invoice case IDs would double-count case-level proof.
+    used_shipment_lines: set[tuple[str, str]] = set()
     used_payment_lines: set[tuple[str, str]] = set()
     used_adjudication_lines: set[tuple[str, str]] = set()
     source_counts: dict[str, dict[str, int]] = {
@@ -514,11 +515,12 @@ def score_private_population(population: dict, secret: bytes,
             raise BenchmarkError("ORIGINAL_RATE_SHIPMENT_PAYMENT_ADJUDICATION_REQUIRED")
         proof_shas = [_read_artifact(proof[k]) for k in ARTIFACTS]
         source_sha = original["source_pdf_sha256"]
-        for role, used in (("payment", used_payment_lines),
+        for role, used in (("shipment", used_shipment_lines),
+                           ("payment", used_payment_lines),
                            ("adjudication", used_adjudication_lines)):
             evidence_line = (proof[role]["sha256"], proof[role]["source_locator"])
             if evidence_line in used:
-                raise BenchmarkError("DUPLICATE_INDEPENDENT_FINANCIAL_PROOF_LINE")
+                raise BenchmarkError("DUPLICATE_INDEPENDENT_CASE_PROOF_LINE")
             used.add(evidence_line)
         per_source["scored"] += 1
         if len(set([source_sha, *proof_shas])) != 5:
