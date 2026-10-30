@@ -1,8 +1,70 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "evaluation_family": "OFFICIAL_FREIGHT_SOURCE_RECONCILIATION_POINTER_HOLD_NOT_INVOICE_SCORING",
   "asof_date": "2026-10-27",
   "ownership": {
+    "private_original_invoice_blind_census_bridge": {
+      "evaluation_family": "ORIGINAL_INVOICE_CENSUS_ONLY_NOT_FREIGHT_ERROR_ACCURACY",
+      "authoritative_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "authoritative_main_commit": "02752be8074d3f08e9b2b2b8b5da9495da0381c7",
+      "merged_pr_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/872",
+      "public_documentation_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/02752be8074d3f08e9b2b2b8b5da9495da0381c7/freight/ORIGINAL_INVOICE_BLIND_BENCHMARK.md",
+      "public_documentation_git_blob_sha1": "51b49867abd34233888cb9410f5b4e33595c9e1a",
+      "source_observed_on": "2026-10-29",
+      "original_invoice_faces_total": 110,
+      "globaltranz_faces": 100,
+      "arcbest_faces": 10,
+      "source_pdf_hashes_controlled_by": "EXISTING_ORIGINAL_DOCUMENT_LAB_NOT_THIS_PUBLIC_EVIDENCE_PACK",
+      "source_documents_newly_harvested_by_unified_lab": 0,
+      "private_original_pdf_bytes_in_unified_lab_custody": false,
+      "independent_buyer_rate_bol_payment_adjudication_complete_cases": 0,
+      "independently_adjudicated_positive_negative_truth_labels": 0,
+      "accuracy_precision_recall": "UNKNOWN_NOT_ESTIMABLE",
+      "required_independent_artifact_types": [
+        "rate",
+        "shipment",
+        "payment",
+        "adjudication"
+      ],
+      "buyer_specific_commercial_use_rights_cleared_by_unified_lab": false,
+      "commercial_or_production_scoring_authorized": false,
+      "verified_retally_recovery_cents": 0,
+      "new_research_writer_or_provider_runs": 0,
+      "handoff_freightrecovery_recoveryos_12": "USE_EXISTING_SOURCE_CENSUS_BRIDGE_NO_DUPLICATE_PDF_COLLECTION",
+      "handoff_qa_44": "INDEPENDENT_BUYER_TRUTH_SOURCE_RIGHTS_CASE_SIGNATURES_AND_EXACT_HEAD_PYTHON_CI_PENDING",
+      "synthetic_negative_controls": [
+        {
+          "id": "SYNTHETIC_BLIND_001",
+          "kind": "SYNTHETIC",
+          "assertion": "110_INVOICE_FACES_ARE_110_INDEPENDENT_RATE_ERROR_LABELS",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_002",
+          "kind": "SYNTHETIC",
+          "assertion": "SAME_SOURCE_CHARGE_ARITHMETIC_PROVES_OVERBILLING",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_003",
+          "kind": "SYNTHETIC",
+          "assertion": "SOURCE_CENSUS_PROVES_CARRIER_PAYMENT_OR_BUYER_REFUND",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_004",
+          "kind": "SYNTHETIC",
+          "assertion": "PUBLIC_LAB_MAY_COPY_PRIVATE_ORIGINALS",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_005",
+          "kind": "SYNTHETIC",
+          "assertion": "A_SIGNED_PACKET_ALONE_CONFERS_COMMERCIALLY_AUTHORIZED_TRUTH",
+          "expected": "REJECT"
+        }
+      ]
+    },
     "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
     "canonical_branch": "main",
     "operational_research_data_writer": "research/retally-unified-data-lab",
