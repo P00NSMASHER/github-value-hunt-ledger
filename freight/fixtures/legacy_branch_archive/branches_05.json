@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "group": 5,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "fix/retally-unified-lab-malformed-provider-isolation-20261023",
+      "head_sha": "149e4ca9a5a4b6a1f63aadcd2f7770c9717022ce",
+      "ahead": 0,
+      "behind": 140,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/retally-unified-lab-quality-observability-20261023",
+      "head_sha": "edca8381c981f395b68a6f97b371db4b17187116",
+      "ahead": 0,
+      "behind": 155,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/unified-lab-health-provider-403-20261024",
+      "head_sha": "6259aea8d086d095fd52de2a52d585474c4cf5ba",
+      "ahead": 2,
+      "behind": 41,
+      "file_count": 2,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/unified-lab-permit-source-topic-20261023",
+      "head_sha": "b8977e9af047aa3da627ebc51f26f67683d71b89",
+      "ahead": 0,
+      "behind": 143,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

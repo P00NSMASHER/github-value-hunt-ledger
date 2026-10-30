@@ -3911,5 +3911,118 @@ class NYCDOB20261030CachedRefreshTests(unittest.TestCase):
                 self._assert_scope(altered)
 
 
+
+class HistoricalArchiveLineageIntegrityTests(unittest.TestCase):
+    """Independently falsifiable Git-tree inventory; NOT publisher-byte/rights approval."""
+
+    ROOT = Path(__file__).with_name("fixtures") / "legacy_branch_archive"
+
+    @classmethod
+    def index(cls):
+        return json.loads((cls.ROOT / "index_v1.json").read_text(encoding="utf-8"))
+
+    @staticmethod
+    def git_sha1(raw):
+        import hashlib
+        return hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+
+    def validate(self, doc):
+        self.assertEqual(doc["index_id"], "RETALLY_HISTORICAL_LAB_LINEAGE_20261030")
+        self.assertEqual(doc["canonical_repo"], "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(doc["single_operational_writer"], "research/retally-unified-data-lab")
+        self.assertEqual(doc["historical_refs_inventoried"], 40)
+        self.assertEqual(doc["refs_with_material_content_deltas"], 33)
+        self.assertEqual(doc["refs_already_ancestor_of_main"], 7)
+        self.assertEqual(doc["complete_tree_snapshots"], 15)
+        self.assertEqual(doc["complete_tree_file_references"], 554)
+        self.assertEqual(doc["distinct_legacy_paths"], 113)
+        self.assertEqual(doc["distinct_legacy_git_blob_sha1"], 118)
+        self.assertEqual(len(doc["branch_groups"]), 10)
+        self.assertEqual(len(doc["full_tree_groups"]), 5)
+        self.assertEqual(sum(x["expected_refs"] for x in doc["branch_groups"]), 40)
+        self.assertEqual(sum(x["expected_refs"] for x in doc["full_tree_groups"]), 15)
+        self.assertEqual(doc["primary_unified_ledger_references"], 801)
+        self.assertEqual(doc["bounded_evaluation_feed_source_candidates"], 260)
+        self.assertEqual(doc["unified_metadata_ledger_entries_sha256"],
+                         "651b27d26d60e7012c7cadfd13fcab31d6fd9094f7bd48ec09534d11abb09a95")
+        for key in ("new_scheduled_workflows", "provider_queries_from_archive",
+                    "privacy_sensitive_source_bytes_copied", "private_invoice_bol_bank_documents_copied",
+                    "independently_labeled_new_freight_invoices", "verified_retally_cash_cents",
+                    "legacy_branches_deleted"):
+            self.assertEqual(doc[key], 0, key)
+        for key in ("commercial_reuse_approved", "original_gao_html_or_pdf_bytes_cryptographically_rechecked_this_run",
+                    "nyc_live_response_bytes_cryptographically_rechecked_this_run",
+                    "real_independent_qa_approved", "full_legacy_source_material_migration_approved"):
+            self.assertIs(doc[key], False, key)
+        self.assertEqual(doc["migration_state"], "ALL_40_BRANCH_REFS_INDEXED_LEGACY_SOURCE_GIT_BLOBS_PINNED_TWO_INSPECTED_PUBLIC_META_FILES_IMPORTED_UNREVIEWED_SOURCE_BYTES_HELD")
+
+    def test_complete_40_branch_git_provenance_and_dedup(self):
+        x=self.index(); self.validate(x)
+        refs=[];paths=set();blobs=set();entries=0;full=set()
+        for group in x["branch_groups"]:
+            p=self.ROOT / Path(group["path"]).name; raw=p.read_bytes()
+            self.assertEqual(self.git_sha1(raw),group["git_blob_sha1"])
+            obj=json.loads(raw)
+            self.assertEqual(len(obj["records"]), group["expected_refs"])
+            for b in obj["records"]:
+                self.assertNotIn("error",b)
+                self.assertEqual(len(b["head_sha"]),40)
+                self.assertEqual(b["rights"],"UNKNOWN_HOLD")
+                self.assertTrue(b["git_only"])
+                refs.append(b["ref"])
+        self.assertEqual(len(refs),40)
+        self.assertEqual(len(set(refs)),40)
+        for group in x["full_tree_groups"]:
+            p=self.ROOT / Path(group["path"]).name; raw=p.read_bytes()
+            self.assertEqual(self.git_sha1(raw),group["git_blob_sha1"])
+            obj=json.loads(raw)
+            self.assertEqual(len(obj["records"]),group["expected_refs"])
+            for b in obj["records"]:
+                self.assertNotIn("error",b)
+                self.assertIn(b["ref"],refs)
+                self.assertEqual(b["rights"],"UNKNOWN_HOLD")
+                self.assertTrue(b["original_bytes_not_copied"])
+                full.add(b["ref"])
+                for folder in b["folders"]:
+                    self.assertIs(folder["truncated"],False)
+                    for f in folder["files"]:
+                        self.assertTrue(f["p"].startswith("freight/"))
+                        self.assertEqual(len(f["sha1"]),40)
+                        self.assertGreater(f["bytes"],0)
+                        paths.add(f["p"]);blobs.add(f["sha1"]);entries+=1
+        self.assertEqual(len(full),15)
+        self.assertEqual((entries,len(paths),len(blobs)),(554,113,118))
+
+    def test_inspected_public_source_metadata_not_invoice_truth(self):
+        x=self.index()
+        self.assertEqual(len(x["directly_archived_inspected_source_metadata"]),2)
+        for item in x["directly_archived_inspected_source_metadata"]:
+            raw=(self.ROOT / Path(item["path"]).name).read_bytes()
+            self.assertEqual(self.git_sha1(raw),item["git_blob_sha1"])
+            self.assertFalse(item["publisher_body_reverified_this_run"])
+            obj=json.loads(raw)
+            if "faf6" in item["path"]:
+                self.assertIn("actual_customer_invoice",obj["prohibited_conclusions"])
+                self.assertIn("recoverable_cents",obj["prohibited_conclusions"])
+            else:
+                self.assertEqual(obj["actual_retally_client_invoices"],0)
+                self.assertEqual(obj["actual_retally_customer_recoveries_cents"],0)
+                self.assertEqual(obj["independent_Treasury_or_carrier_bank_transaction_statements_examined"],0)
+
+    def test_simulated_adversarial_qa_rejects_false_releases(self):
+        import copy
+        obj=self.index()
+        for key,value in (("new_scheduled_workflows",1),
+                          ("privacy_sensitive_source_bytes_copied",1),
+                          ("independently_labeled_new_freight_invoices",1),
+                          ("verified_retally_cash_cents",1),
+                          ("commercial_reuse_approved",True),
+                          ("real_independent_qa_approved",True),
+                          ("legacy_branches_deleted",40),
+                          ("original_gao_html_or_pdf_bytes_cryptographically_rechecked_this_run",True)):
+            with self.subTest(synthetic_forgery=key),self.assertRaises(AssertionError):
+                y=copy.deepcopy(obj);y[key]=value;self.validate(y)
+
+
 if __name__ == "__main__":
     unittest.main()

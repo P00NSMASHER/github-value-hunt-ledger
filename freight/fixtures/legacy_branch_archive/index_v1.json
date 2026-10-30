@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "index_id": "RETALLY_HISTORICAL_LAB_LINEAGE_20261030",
+  "index_kind": "GIT_SOURCE_METADATA_ARCHIVE_NOT_ORIGINAL_PUBLISHER_DOCUMENT_CUSTODY",
+  "as_of_utc": "2026-10-30",
+  "canonical_repo": "P00NSMASHER/github-value-hunt-ledger",
+  "canonical_main_observed": "02752be8074d3f08e9b2b2b8b5da9495da0381c7",
+  "single_operational_writer": "research/retally-unified-data-lab",
+  "single_controller": ".github/workflows/retally-unified-research-lab.yml",
+  "historical_refs_inventoried": 40,
+  "refs_with_material_content_deltas": 33,
+  "refs_already_ancestor_of_main": 7,
+  "complete_tree_snapshots": 15,
+  "complete_tree_file_references": 554,
+  "distinct_legacy_paths": 113,
+  "distinct_legacy_git_blob_sha1": 118,
+  "branch_groups": [
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_00.json",
+      "git_blob_sha1": "5544c5187ba60cd0f87a025005163aa10cd89e53",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_01.json",
+      "git_blob_sha1": "e78d310eb7e377abbb13188b093a771d265e138a",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_02.json",
+      "git_blob_sha1": "56e397aa4cba211f292b67677f0b710f3af6a776",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_03.json",
+      "git_blob_sha1": "46425dc2a42fb997c3b18dcf95b106b385a5ab3d",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_04.json",
+      "git_blob_sha1": "6b04d88cd336bee4fb55a4b17e80f518b3f1a8b5",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_05.json",
+      "git_blob_sha1": "34db85c4bb21fe95bbf8eb0a7403eb3c74de3245",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_06.json",
+      "git_blob_sha1": "3a0481200bc9106f1c2f0693e9c29da17fd8d258",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_07.json",
+      "git_blob_sha1": "9f4e19a9ecf0c3be0782cb2a652fdd8b68e5f3e3",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_08.json",
+      "git_blob_sha1": "4ec561e5554ae4251f0987009d760c01ebe32631",
+      "expected_refs": 4
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/branches_09.json",
+      "git_blob_sha1": "a0c96efcd8b2fd93ce61023b936d96594b8213ed",
+      "expected_refs": 4
+    }
+  ],
+  "full_tree_groups": [
+    {
+      "path": "freight/fixtures/legacy_branch_archive/source_trees_A.json",
+      "git_blob_sha1": "24c89c0696ca7c057ed0f4ff13acb3c5e91669ed",
+      "expected_refs": 3
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/source_trees_B.json",
+      "git_blob_sha1": "98ddb119530a796106e5b8d04e54f849d70acfba",
+      "expected_refs": 3
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/source_trees_C.json",
+      "git_blob_sha1": "cb353dab221becae63c85202a8e85f0a5eab35b6",
+      "expected_refs": 3
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/source_trees_D.json",
+      "git_blob_sha1": "50f246c4c198f8ef4567e5e90083c9da11fcadf9",
+      "expected_refs": 3
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/source_trees_E.json",
+      "git_blob_sha1": "89f500b7e3f0e9ee976d9b35c117b17b10cad1dc",
+      "expected_refs": 3
+    }
+  ],
+  "directly_archived_inspected_source_metadata": [
+    {
+      "path": "freight/fixtures/legacy_branch_archive/inspected_faf6_eia_source_manifest.json",
+      "git_blob_sha1": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+      "origin": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "content_class": "PUBLIC_AGGREGATE_TRANSPORT_MARKET_CONTEXT_ONLY",
+      "publisher_body_reverified_this_run": false
+    },
+    {
+      "path": "freight/fixtures/legacy_branch_archive/inspected_gao_historical_setoff_manifest.json",
+      "git_blob_sha1": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+      "origin": "research/retally-lab14-gao-actual-collections-20261018",
+      "content_class": "HISTORICAL_GAO_ADJUDICATION_NOT_CURRENT_CUSTOMER_RECOVERY",
+      "publisher_body_reverified_this_run": false
+    }
+  ],
+  "primary_unified_ledger_references": 801,
+  "bounded_evaluation_feed_source_candidates": 260,
+  "unified_metadata_ledger_entries_sha256": "651b27d26d60e7012c7cadfd13fcab31d6fd9094f7bd48ec09534d11abb09a95",
+  "new_scheduled_workflows": 0,
+  "provider_queries_from_archive": 0,
+  "privacy_sensitive_source_bytes_copied": 0,
+  "private_invoice_bol_bank_documents_copied": 0,
+  "independently_labeled_new_freight_invoices": 0,
+  "verified_retally_cash_cents": 0,
+  "commercial_reuse_approved": false,
+  "original_gao_html_or_pdf_bytes_cryptographically_rechecked_this_run": false,
+  "nyc_live_response_bytes_cryptographically_rechecked_this_run": false,
+  "real_independent_qa_approved": false,
+  "full_legacy_source_material_migration_approved": false,
+  "legacy_branches_deleted": 0,
+  "migration_state": "ALL_40_BRANCH_REFS_INDEXED_LEGACY_SOURCE_GIT_BLOBS_PINNED_TWO_INSPECTED_PUBLIC_META_FILES_IMPORTED_UNREVIEWED_SOURCE_BYTES_HELD",
+  "limits": [
+    "Git blob SHA-1 authenticates repository content, not original publisher bytes or license rights.",
+    "Historical refs include divergent code not safely mergeable into the current engine.",
+    "All data that might contain third-party/customer material remains referenced rather than recopied.",
+    "No actual independent reviewer signed or reviewed this collection."
+  ]
+}

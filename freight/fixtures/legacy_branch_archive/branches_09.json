@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "group": 9,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "research/retally-lab15-source-ledger",
+      "head_sha": "19a17070862a8c71b63c68b9f4bb50501a9efd9a",
+      "ahead": 28,
+      "behind": 214,
+      "file_count": 2,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/lab15/evidence_ledger.json",
+        "freight/lab15/triage_queue.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-lab-intelligence-v1-20261008",
+      "head_sha": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "ahead": 19,
+      "behind": 1182,
+      "file_count": 14,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+        "freight/research/LAB_FINDINGS_CUMULATIVE.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-lab-phase2-financial-v1-20261008",
+      "head_sha": "27d7c301753bfee24152f950ac48002ef5774236",
+      "ahead": 29,
+      "behind": 1182,
+      "file_count": 20,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+        "freight/research/LAB_FINDINGS_CUMULATIVE.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-unified-data-lab",
+      "head_sha": "51fbab58a56ff092b54d7eee9ac099fc66c4cd4f",
+      "ahead": 115,
+      "behind": 0,
+      "file_count": 18,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/lab15/evidence_ledger.json",
+        "freight/lab15/triage_queue.json",
+        "freight/research/lab15_candidate_ledger.json",
+        "freight/research_lab/capturebrief_sam_fy2027_asof_v1.json",
+        "freight/research_lab/cbca_rail_detention_timeline_v1.json",
+        "freight/research_lab/cbca_rate_billing_controls_v1.json",
+        "freight/research_lab/evaluation_feed_v1.json",
+        "freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json",
+        "freight/research_lab/gao_adjudicated_billing_cases_v1.json",
+        "freight/research_lab/gao_authority_chronology_v1.json",
+        "freight/research_lab/gao_motor_freight_numeric_v1.json",
+        "freight/research_lab/leads.json",
+        "freight/research_lab/official_capturebrief_award_readback_v1.json",
+        "freight/research_lab/official_nyc_issued_permit_replay_v1.json",
+        "freight/research_lab/public_freight_proof_v1.json",
+        "freight/research_lab/publisher_provenance_v1.json",
+        "freight/research_lab/source_health_v1.json",
+        "freight/research_lab/source_review_queue_v1.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}
