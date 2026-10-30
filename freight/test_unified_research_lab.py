@@ -3637,5 +3637,68 @@ class GAOB253541ConflictingOriginalGBLTests(unittest.TestCase):
                     self._assert_scope(forged)
 
 
+
+class UnifiedResearchConsolidationSnapshotTests(unittest.TestCase):
+    """Freeze actual single-writer and cross-engine metadata census, without truth promotion."""
+
+    @staticmethod
+    def _snapshot():
+        return json.loads((Path(__file__).with_name("fixtures") /
+            "unified_legacy_lab_consolidation_snapshot_20261030.json").read_text(encoding="utf-8"))
+
+    def _assert_held(self, x):
+        self.assertEqual(x["fixture_id"], "RETALLY_UNIFIED_LEGACY_RESEARCH_SNAPSHOT_2026_10_30")
+        self.assertEqual(x["canonical_repository"], "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(x["single_writer_branch"], "research/retally-unified-data-lab")
+        self.assertEqual(x["active_operational_controller"], ".github/workflows/retally-unified-research-lab.yml")
+        self.assertTrue(x["operational_one_writer_consolidated_in_existing_flow"])
+        self.assertEqual(x["unique_source_urls"], 801)
+        self.assertEqual(sum(x["engine_reference_counts"].values())-x["cross_engine_shared_pointers"], x["unique_source_urls"])
+        self.assertEqual(x["ledger_entries_sha256"], x["bounded_evaluation_feed"]["lab15_candidate_metadata_sha256"] if False else "651b27d26d60e7012c7cadfd13fcab31d6fd9094f7bd48ec09534d11abb09a95")
+        self.assertEqual(x["bounded_evaluation_feed"]["selected_source_pointers"], 260)
+        self.assertLess(x["bounded_evaluation_feed"]["selected_source_pointers"], x["unique_source_urls"])
+        self.assertEqual(len(x["legacy_source_ledgers_considered"]), 3)
+        self.assertEqual(len(x["historical_lab15_workflows_with_no_active_cron_observed"]), 2)
+        self.assertFalse(x["all_historical_legacy_branches_physically_retired"])
+        self.assertFalse(x["all_historical_legacy_labs_exhaustively_audited"])
+        self.assertFalse(x["new_cron_or_provider_calls_added"])
+        self.assertEqual(x["original_external_document_bytes_saved"], 0)
+        self.assertEqual(x["publisher_response_full_bounded_sha256_count"], 3)
+        self.assertIsNone(x["original_nyc_electrical_metadata_response_sha256"])
+        self.assertEqual(x["independent_new_freight_error_labels"], 0)
+        self.assertEqual(x["independent_permit_outcome_labels"], 0)
+        self.assertEqual(x["verified_customer_recoveries_cents"], 0)
+        self.assertFalse(x["commercial_reuse_approved"])
+        self.assertFalse(x["fully_approved_customer_release"])
+        self.assertFalse(x["simulated_independent_qa_passed"])
+        self.assertFalse(x["real_independent_qa_completed"])
+        self.assertEqual(x["source_accuracy"], "UNKNOWN")
+        self.assertEqual(x["commercial_accuracy"], "UNKNOWN")
+        self.assertEqual(len(set(x["evaluation_lanes"])), 5)
+
+    def test_current_single_writer_snapshot_preserves_provenance_and_unknowns(self):
+        self._assert_held(self._snapshot())
+
+    def test_synthetic_forged_consolidation_and_revenue_claims_rejected(self):
+        original=self._snapshot()
+        attacks=(
+            ("all_historical_legacy_branches_physically_retired", True),
+            ("all_historical_legacy_labs_exhaustively_audited", True),
+            ("new_cron_or_provider_calls_added", True),
+            ("original_nyc_electrical_metadata_response_sha256", "0"*64),
+            ("independent_new_freight_error_labels", 1),
+            ("independent_permit_outcome_labels", 1),
+            ("verified_customer_recoveries_cents", 100),
+            ("commercial_reuse_approved", True),
+            ("fully_approved_customer_release", True),
+            ("real_independent_qa_completed", True),
+        )
+        for key, forged in attacks:
+            with self.subTest(synthetic_attack=key), self.assertRaises(AssertionError):
+                altered=json.loads(json.dumps(original))
+                altered[key]=forged
+                self._assert_held(altered)
+
+
 if __name__ == "__main__":
     unittest.main()
