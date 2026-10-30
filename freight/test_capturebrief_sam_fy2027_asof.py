@@ -367,6 +367,65 @@ class SamArchiveAsOfTests(unittest.TestCase):
             with self.assertRaisesRegex(ResearchError, "SOURCE_TOO_LARGE"):
                 fetch_original()
 
+    def test_degraded_same_day_cache_and_next_utc_day_replay_are_source_bounded(self):
+        # Wholly SYNTHETIC controls. Never contacts SAM.gov or persists raw IDs.
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        controls = {case["id"]: case for case in pack["synthetic_controls"]}
+        self.assertEqual(
+            controls["SYNTHETIC_DEGRADED_RECEIPT_SAME_UTC_DAY"]["expected"],
+            "CACHE_DEGRADED_SAME_UTC_DAY_NEXT_DAY_BOUNDED_FETCH_ELIGIBLE",
+        )
+        self.assertIsNone(
+            controls["SYNTHETIC_SAM_SAME_ORIGIN_AWARD_METADATA"]["true_independent_award_label"]
+        )
+        self.assertEqual(
+            pack["documentation_controls"]["original_notice_version_history_completeness"],
+            "UNKNOWN_NOT_VERIFIED",
+        )
+        self.assertFalse(
+            pack["documentation_controls"]["original_source_bytes_retrieved_by_this_update"]
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "synthetic-failed-receipt.json"
+            calls = []
+
+            def unavailable():
+                calls.append("SYNTHETIC-GET")
+                raise ResearchError("SOURCE_TOO_LARGE")
+
+            first_at = datetime(2026, 10, 30, 2, 11, 33, tzinfo=timezone.utc)
+            first = run(output=target, fetcher=unavailable, now=first_at)
+            self.assertEqual(first["source_status"], STATUS_DEGRADED)
+            self.assertEqual(first["source_error_codes"], ["SOURCE_TOO_LARGE"])
+            original_receipt = target.read_bytes()
+
+            def unexpected_fetch():
+                raise AssertionError("same UTC day must not refetch valid degraded receipt")
+
+            same_day = datetime(2026, 10, 30, 23, 59, 59, tzinfo=timezone.utc)
+            cached = run(output=target, fetcher=unexpected_fetch, now=same_day)
+            self.assertEqual(cached["source_error_codes"], ["SOURCE_TOO_LARGE"])
+            self.assertEqual(target.read_bytes(), original_receipt)
+            self.assertEqual(calls, ["SYNTHETIC-GET"])
+
+            def next_day_synthetic_fetch():
+                calls.append("SYNTHETIC-GET")
+                return archive()
+
+            next_utc_day = datetime(2026, 10, 31, 0, 0, 1, tzinfo=timezone.utc)
+            new_receipt = run(output=target, fetcher=next_day_synthetic_fetch,
+                              now=next_utc_day)
+            self.assertEqual(new_receipt["source_status"], STATUS_OK)
+            self.assertEqual(new_receipt["source_rows"], 3)
+            self.assertEqual(calls, ["SYNTHETIC-GET", "SYNTHETIC-GET"])
+            self.assertEqual(
+                json.loads(target.read_text(encoding="utf-8"))[
+                    "independent_cross_source_award_outcomes"], 0,
+            )
+
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
         class Response:

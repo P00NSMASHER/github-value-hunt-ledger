@@ -46,6 +46,18 @@
       "description": "Advertised content length exceeds received bytes",
       "expected": "SOURCE_INCOMPLETE",
       "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_DEGRADED_RECEIPT_SAME_UTC_DAY",
+      "description": "An intact valid same-UTC-day SOURCE_TOO_LARGE failure receipt suppresses another source request until the next UTC date; eligibility then does not certify success.",
+      "expected": "CACHE_DEGRADED_SAME_UTC_DAY_NEXT_DAY_BOUNDED_FETCH_ELIGIBLE",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_SAM_SAME_ORIGIN_AWARD_METADATA",
+      "description": "Optional SAM.gov public search award metadata belongs to the same source system and is not independent USAspending award/settlement ground truth.",
+      "expected": "SAME_ORIGIN_METADATA_IS_NOT_INDEPENDENT_CROSS_SOURCE_TRUTH",
+      "true_independent_award_label": null
     }
   ],
   "rights_and_truth": {
@@ -63,6 +75,20 @@
   "notes": [
     "Publisher original-size and original-byte hash remain UNKNOWN until an authorized bounded source replay succeeds.",
     "No newly evaluated SAM.gov notices, award judgments, production integrations or customer output are claimed.",
-    "Live research/retally-unified-data-lab writer branch and workflows are unchanged."
-  ]
+    "Live research/retally-unified-data-lab writer branch and workflows are unchanged.",
+    "GSA public opportunity search is latest-active-version scoped and key-limited; optional award metadata is not an independent award source.",
+    "GSA opportunity-management history calls require authorized contracting roles/system credentials; this pack does not use that API.",
+    "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized."
+  ],
+  "documentation_controls": {
+    "verified_date_utc": "2026-10-30",
+    "public_api_documentation": "https://open.gsa.gov/api/get-opportunities-public-api/",
+    "management_api_documentation": "https://open.gsa.gov/api/opportunities-api/",
+    "public_api_scope": "LATEST_ACTIVE_VERSION_ONLY_API_KEY_AND_DAILY_LIMITS_APPLY",
+    "management_history_endpoint_access": "PRIVILEGED_ROLE_AND_SYSTEM_ACCOUNT_API_KEY_REQUIRED_NOT_A_PUBLIC_FALLBACK",
+    "public_api_award_field": "OPTIONAL_SAME_PUBLISHER_DATA_NOT_INDEPENDENT_AWARD_TRUTH",
+    "documentation_full_byte_sha256": null,
+    "original_notice_version_history_completeness": "UNKNOWN_NOT_VERIFIED",
+    "original_source_bytes_retrieved_by_this_update": false
+  }
 }
