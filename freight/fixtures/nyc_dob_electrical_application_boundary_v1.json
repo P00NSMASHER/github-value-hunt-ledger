@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_NOW_ELECTRICAL_APPLICATION_SCOPE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_SCOPE_NOT_SCORING",
+  "observation_date_utc": "2026-10-30",
+  "original_public_source": {
+    "publisher": "New York City Department of Buildings (DOB) through NYC Open Data",
+    "dataset_id": "dm9a-ab7w",
+    "catalog_kind": "OFFICIAL_ORIGINAL_DATASET",
+    "official_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+    "federal_catalog_cross_reference": "https://catalog.data.gov/dataset/dob-now-electrical-permit-applications",
+    "public_metadata_url": "https://data.cityofnewyork.us/City-Government/DOB-NOW-Electrical-Permit-Applications/dm9a-ab7w",
+    "official_public_preview_url": "https://data.cityofnewyork.us/widgets/dm9a-ab7w",
+    "event_type": "ELECTRICAL_PERMIT_APPLICATION_LIFECYCLE",
+    "event_start": "2017-12-04",
+    "catalog_created": "2019-04-17",
+    "catalog_last_updated_reported": "2026-10-21",
+    "update_frequency": "DAILY_REPORTED_BY_PUBLISHER",
+    "catalog_row_count": "APPROX_595K_UNSTABLE_METADATA_NOT_CAPTURED_ROWS",
+    "catalog_columns_reported": 83,
+    "documented_api_field_names": [
+      "job_filing_number",
+      "job_number",
+      "filing_number",
+      "filing_date",
+      "filing_type",
+      "filing_status",
+      "job_status"
+    ],
+    "original_rows_read_into_pack": 0,
+    "original_response_sha256": null,
+    "original_response_content_length": null,
+    "original_metadata_response_sha256": null,
+    "label_completeness": "UNKNOWN_NO_ORIGINAL_ROW_CAPTURE",
+    "data_quality": "APPLICATION_STATUS_MUTABLE_MULTIPLE_FILINGS_PER_JOB",
+    "provenance_limits": [
+      "The public source describes applications, amendments, and subsequent filings, not a verified as-of permit issuance history.",
+      "A JOB_FILING_NUMBER -EL suffix cannot independently prove issuance; official public preview includes a pending-payment row with that suffix.",
+      "Latest-row status is not an archived historical as-of record; portal says older dataset versions are not retained.",
+      "Catalog update time, row count and source description are metadata, not independently held-out issuance labels."
+    ]
+  },
+  "related_original_boundary": {
+    "dataset_id": "rbx6-tga4",
+    "official_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "excluded_category": "ELECTRICAL",
+    "note": "No match in DOB NOW Build Approved Permits cannot imply no electrical permit; electrical applications reside in separate original DOB dataset."
+  },
+  "derived_community_view": {
+    "dataset_id": "vh4j-4npc",
+    "official_host_url": "https://data.cityofnewyork.us/City-Government/Electrical-permits/vh4j-4npc",
+    "parent_dataset_id": "dm9a-ab7w",
+    "city_endorsed": false,
+    "source_role": "DO_NOT_USE_AS_ORIGINAL_GROUND_TRUTH"
+  },
+  "rights": {
+    "general_city_open_data_faq": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "nyc_general_open_data_use_unrestricted_faq": true,
+    "portal_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "portal_and_provider_additional_terms_apply": true,
+    "dataset_specific_license": "UNSPECIFIED_REQUIRES_CHECK",
+    "permitplate_commercial_product_clearance": false,
+    "private_applicant_rows_acquired": false,
+    "raw_customer_or_person_data_persisted": false
+  },
+  "source_data_labels": {
+    "real_issued_permit_holdout": 0,
+    "independently_adjudicated_permit_outcomes": 0,
+    "cross_source_verified_issuance_labels": 0,
+    "synthetic_control_count": 4,
+    "real_scoring_allowed": false,
+    "accuracy": "UNKNOWN_NO_REAL_HELD_OUT_LABELS",
+    "denominator": "ZERO_INDEPENDENT_REAL_OUTCOME_LABELS"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "electrical_excluded_build_nonmatch",
+      "provenance": "SYNTHETIC_NOT_REAL_PERMIT",
+      "untrusted_claim": "NO_ELECTRICAL_PERMIT_FROM_BUILD_NONMATCH",
+      "facts": {
+        "catalog_id": "rbx6-tga4",
+        "catalog_match": false,
+        "work_type": "ELECTRICAL"
+      },
+      "expected": "UNKNOWN_OUT_OF_SCOPE_NOT_ABSENT",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "el_suffix_pending_payment",
+      "provenance": "SYNTHETIC_NOT_REAL_PERMIT",
+      "untrusted_claim": "ISSUED_PERMIT_FROM_EL_IDENTIFIER",
+      "facts": {
+        "job_filing_number": "SYNTHETIC-B00000000-I1-EL",
+        "filing_status": "Pending Payment"
+      },
+      "expected": "UNKNOWN_SUFFIX_NOT_ISSUANCE",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "job_filing_multiplicity",
+      "provenance": "SYNTHETIC_NOT_REAL_PERMIT",
+      "untrusted_claim": "TWO_DISTINCT_PERMITS_FROM_TWO_FILINGS",
+      "facts": {
+        "job_numbers": [
+          "SYNTHETIC-JOB-A",
+          "SYNTHETIC-JOB-A"
+        ],
+        "job_filing_numbers": [
+          "SYNTHETIC-JOB-A-I1",
+          "SYNTHETIC-JOB-A-P1"
+        ],
+        "filing_types": [
+          "New Job Filing",
+          "PAA"
+        ]
+      },
+      "expected": "UNKNOWN_MULTIFILING_NOT_PERMIT_COUNT",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "current_status_historic_lookahead",
+      "provenance": "SYNTHETIC_NOT_REAL_PERMIT",
+      "untrusted_claim": "ISSUED_ON_HISTORIC_DATE_FROM_CURRENT_STATUS",
+      "facts": {
+        "claimed_historic_date": "2025-06-01",
+        "metadata_last_updated": "2026-10-21",
+        "historical_source_snapshot_exists": false,
+        "current_status": "Permit Issued"
+      },
+      "expected": "UNKNOWN_NO_ASOF_VERSION_HISTORY",
+      "independent_real_world_label": null
+    }
+  ],
+  "handoffs": {
+    "permitplate": "P00NSMASHER/permitplate-nyc :48 source-adapter owner; include original electrical application coverage only after independent suitability, rights and issuance-label review; no score gate cleared.",
+    "recoveryos": ":12 no accounting reconciliation labels",
+    "freightrecovery": ":12 no adjudicated freight error labels",
+    "capturebrief": ":52 no government procurement/award truth",
+    "independent_qa": ":44 verify exact fixture blob, expected negatives, public provenance and preserved rights hold"
+  },
+  "research_writer_unchanged": true,
+  "product_code_unchanged": true,
+  "scheduled_fetches_added": 0,
+  "original_person_records_retained": 0,
+  "historical_15_lab_consolidation_certified": false
+}
