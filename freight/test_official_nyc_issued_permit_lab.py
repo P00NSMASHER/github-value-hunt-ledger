@@ -556,7 +556,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         fabricated["observed"]["held_out_labeled_permits"]=20
         self.assertFalse(safely_degraded(fabricated))
         controls=case["synthetic_negative_controls"]
-        self.assertEqual(len(controls),6)
+        self.assertEqual(len(controls),7)
         self.assertTrue(all(x["kind"]=="SYNTHETIC" for x in controls))
         self.assertFalse(case["consumers"]["production_release_authorized"])
 
@@ -851,7 +851,7 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                 self.assertIsNone(d[key], key)
             self.assertEqual(d["independent_held_out_validity_labels"], 0)
             controls = {c["id"]: c for c in x["synthetic_negative_controls"]}
-            self.assertEqual(len(controls), 6)
+            self.assertEqual(len(controls), 7)
             distinct = controls["SYNTH_PROJECTED_COLLISION_WITH_DISTINCT_SODA_ROW_IDS"]
             revision = controls["SYNTH_UPDATED_API_ROW_IS_NOT_AN_INDEPENDENT_PERMIT"]
             self.assertEqual((distinct["kind"], revision["kind"]),

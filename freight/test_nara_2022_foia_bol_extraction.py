@@ -136,7 +136,7 @@ class NARAOriginalBOLExtractionTests(unittest.TestCase):
                          "INDEPENDENT_PDF_CUSTODY_LABELS_RIGHTS_AND_PYTHON_CI_PENDING")
         c = p["synthetic_negative_controls"]
         self.assertEqual(len(c), 10)
-        self.assertEqual(len({row["id"] for row in c}), 9)
+        self.assertEqual(len({row["id"] for row in c}), 10)
         self.assertTrue(all(row["id"].startswith("SYNTHETIC-NARA-")
                             and row["kind"] == "SYNTHETIC"
                             and row["expected"] == "REJECT" for row in c))

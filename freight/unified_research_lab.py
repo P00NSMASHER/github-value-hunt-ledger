@@ -78,8 +78,6 @@ SEEDS = {
         "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",  # CBCA: GSA's 70 paid-detention invoice recoupment demands invalid, conflicting 2-cent source totals.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
-        "https://www.gao.gov/products/b-143458",
-        "https://www.gao.gov/products/b-121220-0",  # Main-preserved 1964 GAO documentary payment-proof boundary; metadata only.
         "https://www.gao.gov/products/b-261127",  # 1996 note-12 TCN units held valid; $1373 arithmetic contrast NOT proven overcharge.  # GAO 1961 $305.90 / $150.60 / $155.30; full capacity not enough absent tariff scope.
         "https://www.gao.gov/products/b-145308",  # GAO 1961 actual $282.83 deduction; $496.50 further refund REQUESTED not paid.
         "https://www.gao.gov/products/b-148981",  # GAO 1962 reported actual refunds; prospective $391.74 credit is NOT paid.
@@ -94,9 +92,6 @@ SEEDS = {
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
         # Preserve current-main FMC shipper adjudication locators; no original bytes or paid recovery asserted.
-        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",  # 2022(I) initial principal decision only; source rights held.
-        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",  # 2022(I) notice of nonreview; paid status UNKNOWN; source rights held.
-        "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",  # 2025(I) rejected reparations negative control; source rights held.
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
         "https://www.fmc.gov/wp-content/uploads/2019/04/vol22.pdf",  # Official 22 F.M.C. 94; INDEX-ONLY, no original byte/hash, unadmitted.
         "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
