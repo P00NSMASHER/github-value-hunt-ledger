@@ -36,6 +36,8 @@ on:
       - "freight/fmc_real_shipper_billing_lifecycle.py"
       - "freight/test_fmc_real_shipper_billing_lifecycle.py"
       - "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json"
+      - "freight/fixtures/fmc_charge_complaint_procedural_v1.json"
+      - "freight/test_fmc_charge_complaint_procedural_v1.py"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
       - "freight/freight_evidence_chain_readiness.py"
@@ -94,6 +96,8 @@ on:
       - "freight/fmc_real_shipper_billing_lifecycle.py"
       - "freight/test_fmc_real_shipper_billing_lifecycle.py"
       - "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json"
+      - "freight/fixtures/fmc_charge_complaint_procedural_v1.json"
+      - "freight/test_fmc_charge_complaint_procedural_v1.py"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
       - "freight/freight_evidence_chain_readiness.py"
@@ -139,6 +143,7 @@ jobs:
           python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_adjudicated_billing_cases freight.test_cbca_rate_billing_controls freight.test_cbca_rail_detention_timeline freight.test_public_freight_proof_ladder freight.test_fmc_real_shipper_billing_lifecycle freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
           python -m py_compile freight/freight_evidence_chain_readiness.py freight/test_freight_evidence_chain_readiness.py
           python -m unittest -q freight.test_freight_evidence_chain_readiness
+          python -m unittest -q freight.test_fmc_charge_complaint_procedural_v1
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -952,6 +957,7 @@ jobs:
           python -m unittest -q freight.test_cbca_rail_detention_timeline
           python -m unittest -q freight.test_public_freight_proof_ladder
           python -m unittest -q freight.test_fmc_real_shipper_billing_lifecycle
+          python -m unittest -q freight.test_fmc_charge_complaint_procedural_v1
           python -m pytest -q freight/test_real_world_eval_v1.py
           python -m freight.research_eval_bridge \
             --ledger /tmp/retally-unified-leads.json \
