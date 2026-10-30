@@ -72,7 +72,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(x["current_source_sha256"],hashlib.sha256(data).hexdigest())
         self.assertEqual(len(REQUIRED_COLUMNS),8)
         self.assertEqual(MAX_ORIGINAL_ROWS,8000)
-        self.assertEqual(MAX_ORIGINAL_BYTES,2_500_000)
+        self.assertEqual(MAX_ORIGINAL_BYTES,8_000_000)
         self.assertEqual(len(PREVIOUS_PUBLIC_REFERENCE_SHA256),64)
 
     def test_issuer_family_and_duplicate_notice_evidence_is_counted_not_promoted(self):
