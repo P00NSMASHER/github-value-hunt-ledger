@@ -2212,50 +2212,23 @@ class FMCMSC23_08CaseCohortAndCashBoundaryTests(unittest.TestCase):
 
 
 def load_tests(loader, tests, pattern):
-    """Route source-bound freight, accounting, and procurement safety tests to CI."""
-    from freight import test_gao_b215958_supersession
-    additional = loader.loadTestsFromModule(test_gao_b215958_supersession)
-    if additional.countTestCases() < 3:
-        raise AssertionError("GAO B-215958 temporal provenance test coverage missing")
-    tests.addTests(additional)
-    # Existing RecoveryOS GAO-02-635 publisher-level accounting controls
-    # are held tests only, never customer accuracy or cash recovery labels.
-    from freight import test_recoveryos_gao_ap_reconciliation_candidate
-    accounting_controls = loader.loadTestsFromModule(
-        test_recoveryos_gao_ap_reconciliation_candidate
-    )
-    if accounting_controls.countTestCases() != 4:
-        raise AssertionError("GAO-02-635 accounting boundary tests missing")
-    tests.addTests(accounting_controls)
-    # Existing CaptureBrief FY2027 SAM.gov notice-identity controls remain
-    # as-of metadata only: no solicitation/award or commercial-use proof.
-    from freight import test_capturebrief_sam_fy2027_renumbering
-    procurement_controls = loader.loadTestsFromModule(
-        test_capturebrief_sam_fy2027_renumbering
-    )
-    if procurement_controls.countTestCases() != 3:
-        raise AssertionError("SAM FY2027 notice-identity tests missing")
-    tests.addTests(procurement_controls)
-    # CBCA 3467-RATE is an adjudicated *negative* freight-overcharge case.
-    # Preserve the published two-cent amount conflict and no-cash/no-rights hold.
-    from freight import test_cbca_3467_detention_negative
-    freight_negative_controls = loader.loadTestsFromModule(
-        test_cbca_3467_detention_negative
-    )
-    if freight_negative_controls.countTestCases() != 4:
-        raise AssertionError("CBCA 3467-RATE negative freight tests missing")
-    tests.addTests(freight_negative_controls)
-    # Historical GAO B-121220 limits documentary/payment evidence claims.
-    # Register existing source-bound controls without admitting customer truth.
-    from freight import test_gao_b121220_documentary_proof
-    documentary_controls = loader.loadTestsFromModule(
-        test_gao_b121220_documentary_proof
-    )
-    if documentary_controls.countTestCases() != 3:
-        raise AssertionError("GAO B-121220 documentary-proof controls missing")
-    tests.addTests(documentary_controls)
-    return tests
+    """Require all five existing evidence cohorts without running them twice.
 
+    unittest already discovers the imported TestCase classes above. Appending
+    the same modules here executed 17 offline controls twice; retain exact
+    cohort counts while letting the standard loader execute each test once.
+    """
+    required = (
+        (GAOB215958SupersessionTests, 3),
+        (GAOAccountingReconCandidateTest, 4),
+        (SAMFY2027RenumberingEvidenceTests, 3),
+        (CBCADetentionNegativeControlTest, 4),
+        (GAOB121220DocumentaryProofTests, 3),
+    )
+    for case, expected in required:
+        if loader.loadTestsFromTestCase(case).countTestCases() != expected:
+            raise AssertionError(f"Evidence coverage drift: {case.__name__}")
+    return tests
 
 
 class NYCDOBGeneralRightsBoundaryContract(unittest.TestCase):
