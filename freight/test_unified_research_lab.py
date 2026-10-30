@@ -156,7 +156,7 @@ class GAOB166882DamagedFreightExclusionTests(unittest.TestCase):
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 # Pin the evolving NYC source-evidence pack once; historical receipt fields stay frozen.
-NYC_DOB_REPLAY_PACK_SCHEMA_VERSION = "0.1.9"
+NYC_DOB_REPLAY_PACK_SCHEMA_VERSION = "0.1.10"
 
 
 class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
@@ -3817,6 +3817,98 @@ class UnifiedResearchConsolidationSnapshotTests(unittest.TestCase):
                 altered=json.loads(json.dumps(original))
                 altered[key]=forged
                 self._assert_held(altered)
+
+
+
+class NYCDOB20261030CachedRefreshTests(unittest.TestCase):
+    """Original publisher cached aggregates are not independent current permit labels."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+            "nyc_dob_live_replay_quality_candidate_v0.json").read_text(encoding="utf-8"))
+
+    def _assert_scope(self, p):
+        import hashlib
+        self.assertEqual(p["schema_version"], NYC_DOB_REPLAY_PACK_SCHEMA_VERSION)
+        q = p["official_socrata_catalog_cached_refresh_2026_10_30"]
+        self.assertEqual(q["schema_version"], "0.1.0")
+        self.assertEqual(q["evaluation_family"],
+                         "GOVERNMENT_PERMIT_SOURCE_METADATA_QUALITY_NOT_PERMIT_SCORING")
+        self.assertEqual(q["source_url"], "https://data.cityofnewyork.us/api/views/rbx6-tga4")
+        self.assertEqual(q["publisher_rows_updated_at_utc"], "2026-10-29T18:46:11Z")
+        self.assertEqual(q["publisher_view_last_modified_at_utc"], "2026-10-29T18:32:11Z")
+        prior, current, delta = (q["previous_cached_counts"],
+                                 q["current_cached_counts"], q["cached_deltas"])
+        self.assertEqual(prior, {"total":1021662, "signed_off":653292, "permit_issued":368370})
+        self.assertEqual(current, {"total":1022310, "signed_off":653898, "permit_issued":368412})
+        self.assertEqual(delta, {"total":648, "signed_off":606, "permit_issued":42})
+        self.assertEqual(current["total"], current["signed_off"]+current["permit_issued"])
+        for key in delta:
+            self.assertEqual(current[key]-prior[key], delta[key])
+        s = q["source_semantic_input"]
+        self.assertEqual(s["dataset_id"], "rbx6-tga4")
+        self.assertEqual(s["cached_total_count"], current["total"])
+        self.assertEqual(s["cached_signed_off_count"], current["signed_off"])
+        self.assertEqual(s["cached_permit_issued_count"], current["permit_issued"])
+        self.assertEqual(s["cached_status_column_cardinality"], current["total"])
+        self.assertEqual(s["cached_work_permit_not_yet_issued"], 346)
+        self.assertEqual((s["owner_city_cached_non_null"], s["owner_city_cached_null"],
+                          s["owner_city_cached_cardinality"]), (0, current["total"], current["total"]))
+        self.assertEqual(s["rows_updated_at_epoch_seconds"], 1793299571)
+        self.assertEqual(s["view_last_modified_epoch_seconds"], 1793298731)
+        digest = hashlib.sha256(json.dumps(
+            s, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")).hexdigest()
+        self.assertEqual(digest, "4e4cc38a25e6ee2578ac9591c4100239890882f3695f263421fc055bafcb8513")
+        self.assertEqual(q["normalized_semantic_snapshot_sha256_not_original_http_bytes"], digest)
+        self.assertFalse(q["original_publisher_response_bytes_custodied"])
+        self.assertIsNone(q["publisher_http_bytes_sha256"])
+        self.assertFalse(q["system_field_identity_probe_executed"])
+        self.assertFalse(q["cached_field_cardinality_is_distinct_identity_count"])
+        self.assertFalse(q["cached_row_changes_establish_new_active_permits"])
+        self.assertEqual(q["source_distinct_permit_count"], "UNKNOWN")
+        self.assertEqual(q["source_specific_commercial_scoring_rights"], "UNVERIFIED_HOLD")
+        self.assertEqual(q["dataset_specific_extra_terms_review"], "UNKNOWN")
+        self.assertEqual(q["independently_heldout_permit_validity_labels"], 0)
+        self.assertEqual(q["independent_buyer_outcomes"], 0)
+        self.assertEqual(q["private_rows_stored"], 0)
+        self.assertEqual(q["production_admission"], "HOLD_NO_INDEPENDENT_LABELS")
+        w = q["operational_writer_receipt"]
+        self.assertEqual(w["git_blob_sha1"], "cd8c4e1bdbb8e5a478c5a670f6c9b02988bd89a1")
+        self.assertEqual(w["as_of_utc_date"], "2026-10-30")
+        self.assertEqual((w["bounded_unsorted_sample_count"],
+                          w["projected_unique_identities"], w["projected_repeated_rows"]), (20,19,1))
+        self.assertEqual(w["status"], "PUBLISHER_REPLAY_DEGRADED")
+        self.assertFalse(w["identity_repair_proven"])
+        controls = q["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({a["id"] for a in controls}), 5)
+        self.assertTrue(all(a["kind"] == "SYNTHETIC" for a in controls))
+
+    def test_publisher_cached_refresh_preserves_ground_truth_boundaries(self):
+        self._assert_scope(self._pack())
+
+    def test_synthetic_false_promotions_rejected(self):
+        import copy
+        changes = (
+            lambda q: q["cached_deltas"].update(total=649),
+            lambda q: q["current_cached_counts"].update(permit_issued=368413),
+            lambda q: q["source_semantic_input"].update(cached_status_column_cardinality=2),
+            lambda q: q["source_semantic_input"].update(owner_city_cached_non_null=1),
+            lambda q: q["source_semantic_input"].update(cached_work_permit_not_yet_issued=345),
+            lambda q: q.update(original_publisher_response_bytes_custodied=True),
+            lambda q: q.update(publisher_http_bytes_sha256="0"*64),
+            lambda q: q.update(independently_heldout_permit_validity_labels=1),
+            lambda q: q.update(source_specific_commercial_scoring_rights="APPROVED"),
+            lambda q: q["operational_writer_receipt"].update(projected_unique_identities=20),
+            lambda q: q["synthetic_negative_controls"][0].update(kind="ORIGINAL"),
+        )
+        for n, change in enumerate(changes):
+            with self.subTest(synthetic_mutation=n), self.assertRaises(AssertionError):
+                altered = copy.deepcopy(self._pack())
+                change(altered["official_socrata_catalog_cached_refresh_2026_10_30"])
+                self._assert_scope(altered)
 
 
 if __name__ == "__main__":
