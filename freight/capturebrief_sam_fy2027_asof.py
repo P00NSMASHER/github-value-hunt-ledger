@@ -45,7 +45,9 @@ PREVIOUS_PUBLIC_REFERENCE_SIZE = 1607260
 PREVIOUS_PUBLIC_REFERENCE_ROWS = 1104
 OUTPUT = ROOT / "capturebrief_sam_fy2027_asof_v1.json"
 SCOPE = "PUBLIC_FY2027_ARCHIVE_SOURCE_CHRONOLOGY_NOT_AWARD_TRUTH"
-MAX_ORIGINAL_BYTES = 2_500_000
+# Bounded FY2027 archive growth; original publisher size may still exceed this cap.
+# Fail closed on oversize, row overflow, truncation, redirects and schema drift.
+MAX_ORIGINAL_BYTES = 8_000_000
 MAX_ORIGINAL_ROWS = 8000
 REQUIRED_COLUMNS = frozenset({
     "NoticeId", "Sol#", "PostedDate", "Type", "Active",
