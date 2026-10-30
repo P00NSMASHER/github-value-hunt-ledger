@@ -34,6 +34,125 @@ from freight.test_gao_b215958_supersession import GAOB215958SupersessionTests
 from freight.test_recoveryos_gao_ap_reconciliation_candidate import GAOAccountingReconCandidateTest
 from freight.test_nara_2022_foia_bol_extraction import NARAOriginalBOLExtractionTests as NARAOriginalBOLExtractionTests
 
+class GAOB166882DamagedFreightExclusionTests(unittest.TestCase):
+    """Historical unearned-freight category must never be sold as tariff accuracy."""
+
+    @staticmethod
+    def pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+                           "gao_b166882_damaged_delivery_unearned_freight_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+    @staticmethod
+    def held(d):
+        try:
+            s, p, h, t, q = (d["source"], d["published_decision"],
+                             d["historical_shipments"], d["truth_boundaries"],
+                             d["quality"])
+            return (
+                d["schema_version"] == "0.1.0"
+                and d["pack_id"] == "GAO_B166882_DAMAGED_DELIVERY_UNEARNED_FREIGHT_CANDIDATE_V0"
+                and d["evaluation_family"] == "FREIGHT_CHARGE_CATEGORY_EXCLUSION_NOT_TARIFF_RATE_ACCURACY"
+                and d["admission_state"] == "PUBLIC_GAO_HISTORICAL_DECISION_FIXTURE_ONLY_NOT_CUSTOMER_EVALUATION"
+                and s["official_url"] == "https://www.gao.gov/products/b-166882"
+                and s["decision_id"] == "B-166882"
+                and s["decision_date"] == "1969-11-18"
+                and s["rights_url"] == "https://www.gao.gov/copyright"
+                and "NO_IMPLIED_ENDORSEMENT" in s["rights_scope"]
+                and s["original_publisher_http_sha256"] is None
+                and s["original_publisher_http_bytes_held"] is False
+                and s["original_signed_gbl_freight_bill_or_bank_bytes_held"] is False
+                and s["controlling_historical_gbl_contract_pages_independently_acquired"] is False
+                and s["historical_gbl_terms_effective_date_independently_verified"] is False
+                and s["customer_commercial_evaluation_authorized"] is False
+                and s["modern_contract_application"] == "UNKNOWN"
+                and p["freight_charges_demanded_back_cents"] == 247468
+                and p["separately_reported_shipments"] == 2
+                and p["paid_to_carrier_reported_for_both_shipments"] is True
+                and p["decision_freight_refund_demanded"] is True
+                and p["refund_instruction_days"] == 60
+                and p["refund_collected_cents"] is None
+                and p["rate_overcharge_cents"] is None
+                and p["independent_bank_refund_receipt_held"] is False
+                and p["later_court_or_payment_outcome"] == "UNKNOWN"
+                and p["physical_property_value_compensation_not_freight_refund"] is True
+                and len(h) == 2
+                and [x["source_published_gbl"] for x in h] == ["A-6242431", "B-7961821"]
+                and [x["source_gbl_signed_date"] for x in h] == ["1967-05-09", "1966-09-19"]
+                and [x["collected_freight_cents"] for x in h] == [207241, 40227]
+                and sum(x["collected_freight_cents"] for x in h) == p["freight_charges_demanded_back_cents"]
+                and len({x["case_key"] for x in h}) == 2
+                and all(x["consignee_signed_delivery_certificate"] is True
+                        and x["original_signed_paperwork_acquired"] is False
+                        and x["refund_settlement_confirmed"] == "UNKNOWN" for x in h)
+                and [x["damage_exception"] for x in h] == [
+                    "DESTROYED_ON_GBL_REVERSE", "TOTAL_LOSS_ON_CARRIER_COMBINATION_BILL"]
+                and h[0]["trailer_value_reportedly_paid_by_carrier_cents"] == 345000
+                and h[0]["carrier_reported_salvage_proceeds_cents"] == 79200
+                and h[1]["trailer_value_reportedly_paid_by_carrier_cents"] is None
+                and h[1]["carrier_reported_salvage_proceeds_cents"] is None
+                and t["historical_charge_category"] == "UNEARNED_FREIGHT_DAMAGED_DELIVERY_NOT_RERATING"
+                and t["is_independently_verified_modern_tariff_rate_error"] is False
+                and t["independently_heldout_modern_invoice_labels"] == 0
+                and t["independently_complete_original_invoice_rate_shipment_payment_adjudication_cases"] == 0
+                and t["independent_actual_freight_refund_receipts"] == 0
+                and t["verified_retally_cash_cents"] == 0
+                and t["customer_precision_recall"] == "UNKNOWN"
+                and t["current_freight_case_truth"] == "UNKNOWN"
+                and t["customer_admission_approved"] is False
+                and t["supersession_exhaustively_checked"] is False
+                and q["original_publisher_html_sha256_available"] is False
+                and q["independent_original_customer_invoice_level_holdout_complete"] is False
+                and q["cash_recovery_or_commercial_accuracy_certified"] is False
+                and len(d["synthetic_negative_controls"]) == 7
+                and len({x["id"] for x in d["synthetic_negative_controls"]}) == 7
+                and all(x["kind"] == "SYNTHETIC"
+                        and x["expected"].startswith("REJECT_")
+                        for x in d["synthetic_negative_controls"])
+                and d["handoff"]["engine_code_changed"] is False
+                and d["handoff"]["release_approved"] is False
+                and d["handoff"]["provider_requests_added"] == 0
+            )
+        except (KeyError, TypeError, ValueError):
+            return False
+
+    def test_original_gao_two_shipment_negative_category_is_held(self):
+        self.assertTrue(self.held(self.pack()))
+
+    def test_historical_freight_refund_demand_not_rate_or_recovered_cash(self):
+        d = self.pack()
+        self.assertEqual(d["published_decision"]["freight_charges_demanded_back_cents"],
+                         207241 + 40227)
+        self.assertIsNone(d["published_decision"]["refund_collected_cents"])
+        self.assertIsNone(d["published_decision"]["rate_overcharge_cents"])
+        self.assertEqual(d["truth_boundaries"]["verified_retally_cash_cents"], 0)
+
+    def test_synthetic_forged_proof_or_rate_reclassification_fails_closed(self):
+        original = self.pack()
+        attacks = [
+            (("source", "original_publisher_http_sha256"), "0" * 64),
+            (("source", "original_signed_gbl_freight_bill_or_bank_bytes_held"), True),
+            (("source", "customer_commercial_evaluation_authorized"), True),
+            (("published_decision", "refund_collected_cents"), 247468),
+            (("published_decision", "rate_overcharge_cents"), 247468),
+            (("historical_shipments", 1, "collected_freight_cents"), 207241),
+            (("historical_shipments", 0, "damage_exception"), "NO_DAMAGE_NOTED"),
+            (("truth_boundaries", "independently_heldout_modern_invoice_labels"), 2),
+            (("truth_boundaries", "verified_retally_cash_cents"), 247468),
+            (("truth_boundaries", "historical_charge_category"), "TARIFF_RATE_OVERCHARGE"),
+            (("quality", "cash_recovery_or_commercial_accuracy_certified"), True),
+        ]
+        for path, forged in attacks:
+            with self.subTest(synthetic_forgery=str(path)):
+                d = json.loads(json.dumps(original))
+                target = d
+                for key in path[:-1]:
+                    target = target[key]
+                target[path[-1]] = forged
+                self.assertFalse(self.held(d))
+        self.assertTrue(self.held(original))
+
+
 NOW = datetime(2026, 10, 22, 20, 0, tzinfo=timezone.utc)
 
 # Pin the evolving NYC source-evidence pack once; historical receipt fields stay frozen.
