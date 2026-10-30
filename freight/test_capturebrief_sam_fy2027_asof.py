@@ -302,7 +302,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
         columns = ["NoticeId", "Sol#", "PostedDate", "Type", "Active",
                    "AAC Code", "Office", "Link", "Description"]
         buf = io.StringIO(newline="")
-        writer = csv.DictWriter(buf, fieldnames=columns, lineterminator="\\n")
+        writer = csv.DictWriter(buf, fieldnames=columns, lineterminator="\n")
         writer.writeheader()
         for i in range(256):
             writer.writerow({
@@ -349,7 +349,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
                 self_outer.assertEqual(req.full_url, SOURCE_URL)
                 return self.response
 
-        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \\
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
              patch("freight.capturebrief_sam_fy2027_asof.build_opener",
                    return_value=Opener(CompleteResponse())):
             self.assertEqual(fetch_original(), fabricated)
@@ -361,7 +361,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(receipt["independent_cross_source_award_outcomes"], 0)
         self.assertEqual(receipt["original_archive_bytes_persisted"], 0)
         validate_receipt(receipt, now=NOW)
-        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \\
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
              patch("freight.capturebrief_sam_fy2027_asof.build_opener",
                    return_value=Opener(TooLargeResponse())):
             with self.assertRaisesRegex(ResearchError, "SOURCE_TOO_LARGE"):
