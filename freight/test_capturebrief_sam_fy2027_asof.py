@@ -426,6 +426,48 @@ class SamArchiveAsOfTests(unittest.TestCase):
                     "independent_cross_source_award_outcomes"], 0,
             )
 
+    def test_unframed_csv_prefix_metadata_is_not_promoted_to_verified_truth(self):
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        controls = {x["id"]: x for x in pack["synthetic_controls"]}
+        case = controls["SYNTHETIC_UNFRAMED_COMPLETE_CSV_PREFIX"]
+        self.assertEqual(case["expected"], "SOURCE_INCOMPLETE")
+        self.assertEqual(case["candidate_state"], "OPEN_KNOWN_UNSAFE_ACCEPTANCE")
+        self.assertIsNone(case["true_independent_award_label"])
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+        self.assertEqual(pack["documentation_controls"]["current_source_framing"],
+                         "UNKNOWN_NO_NEW_SOURCE_READ")
+
+    @unittest.expectedFailure
+    def test_unframed_csv_prefix_is_an_open_known_failure(self):
+        # This synthetic negative deliberately fails against current reader.
+        # Source-reader owner must fix it, remove expectedFailure, and show
+        # exact-head RED/GREEN before independent QA accepts real readback.
+        full = archive()
+        prefix = b"".join(full.splitlines(keepends=True)[:-1])
+        self.assertLess(len(prefix), len(full))
+        self.assertEqual(parse_archive(prefix, observed_at=NOW)["source_rows"], 2)
+
+        class Response:
+            status = 200
+            headers = {"Content-Type": "text/csv",
+                       "Content-Encoding": "identity"}
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def geturl(self): return SOURCE_URL
+            def read(self, n): return prefix
+
+        class Opener:
+            def open(self, req, timeout): return Response()
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener()):
+            with self.assertRaisesRegex(ResearchError, "SOURCE_INCOMPLETE"):
+                fetch_original()
+
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
         class Response:
