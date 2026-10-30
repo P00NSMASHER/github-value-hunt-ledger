@@ -468,6 +468,47 @@ class SamArchiveAsOfTests(unittest.TestCase):
             with self.assertRaisesRegex(ResearchError, "SOURCE_INCOMPLETE"):
                 fetch_original()
 
+    @unittest.expectedFailure
+    def test_chunked_incomplete_read_must_be_degraded_not_uncaught(self):
+        # SYNTHETIC interrupted HTTP/1.1 chunked body: no publisher GET.
+        # Pending source-reader owner correction; an unexpected success
+        # should force this decorator and the fixture's HOLD to be retired.
+        from http.client import IncompleteRead
+
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        control = next(x for x in pack["synthetic_controls"]
+                       if x["id"] == "SYNTHETIC_TRUNCATED_CHUNKED_TRANSFER")
+        self.assertEqual(control["expected"], "SOURCE_INCOMPLETE")
+        self.assertEqual(control["candidate_state"],
+                         "OPEN_UNHANDLED_HTTP_INCOMPLETE_READ")
+        self.assertIsNone(control["true_independent_award_label"])
+
+        class Response:
+            status = 200
+            headers = {"Content-Type": "text/csv",
+                       "Content-Encoding": "identity",
+                       "Transfer-Encoding": "chunked"}
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def geturl(self): return SOURCE_URL
+            def read(self, n):
+                self_outer.assertEqual(n, MAX_ORIGINAL_BYTES + 1)
+                raise IncompleteRead(b"SYNTHETIC-TRUNCATED-BODY", 50)
+
+        self_outer = self
+        class Opener:
+            def open(self, req, timeout): return Response()
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener()):
+            receipt = build_receipt(observed_at=NOW)
+        self.assertEqual(receipt["source_status"], STATUS_DEGRADED)
+        self.assertEqual(receipt["source_error_codes"], ["SOURCE_INCOMPLETE"])
+
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
         class Response:
