@@ -1,0 +1,100 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "RETALLY_STB_CROWLEY_INTERMODAL_FUEL_PUBLICATION_2026_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "PUBLIC_CARRIER_TARIFF_EFFECTIVE_DATE_PROVENANCE_NOT_INVOICE_ERROR_SCORING",
+  "admission_state": "ORIGINAL_PUBLISHER_INDEXED_METADATA_ONLY_RIGHTS_HELD_NO_RATE_ENGINE_ADMISSION",
+  "as_of_utc_date": "2026-10-26",
+  "source": {
+    "official_regulator": "U.S. Surface Transportation Board",
+    "official_certification_registry_url": "https://www.stb.gov/reports-data/water-carrier-annual-certifications/",
+    "official_registry_period_start": "2026-10-01",
+    "official_registry_period_end": "2027-09-30",
+    "carrier": "Crowley Liner",
+    "carrier_index_url": "https://www.crowley.com/logistics/resources/rates-tariffs/stb/",
+    "carrier_pdf_url": "https://www.crowley.com/wp-content/uploads/sites/7/2026/10/STB-14.1-Intermodal-Fuel-Surcharge-AM-48.pdf",
+    "carrier_tariff_org_number": "023286",
+    "carrier_tariff_number": "002",
+    "rule": "14.1",
+    "revision": 48,
+    "filed_on": "2026-10-08",
+    "effective_on": "2026-11-01",
+    "publisher_stated_fuel_surcharge_percent": 66,
+    "carrier_pdf_page_count": 1,
+    "carrier_original_pdf_bytes_acquired": false,
+    "carrier_original_pdf_sha256": null,
+    "regulator_original_html_bytes_acquired": false,
+    "regulator_original_html_sha256": null,
+    "carrier_pdf_visual_page_reviewed": true,
+    "carrier_index_live_dates_reviewed": true,
+    "public_tariff_rate_table_republished": false
+  },
+  "rights": {
+    "regulator_index_public_access": true,
+    "carrier_pdf_publicly_viewable": true,
+    "carrier_tariff_commercial_machine_reuse_verified": false,
+    "carrier_tariff_redistribution_permission_verified": false,
+    "provider_rules_or_paid_scraping_changes_allowed": false,
+    "engine_production_admission": "HOLD_UNTIL_SOURCE_SPECIFIC_RIGHTS_AND_AUTHORITY"
+  },
+  "cohort": {
+    "mode": "U.S._NON_CONTIGUOUS_DOMESTIC_WATER_CARRIER_WITH_INLAND_RULE",
+    "document_scope": "INTERMODAL_INLAND_MOVES_VIA_US_PORT_SUBJECT_TO_APPLICABLE_CARRIER_RULES",
+    "original_documents_retained": 0,
+    "original_customer_invoices_retained": 0,
+    "independent_held_out_real_tariff_to_invoice_labels": 0,
+    "actual_shipments_with_verified_applicable_contract": 0,
+    "source_label_completeness": "RULE_ID_REVISION_FILED_DATE_EFFECTIVE_DATE_PUBLISHED_PERCENT_ONLY"
+  },
+  "ground_truth_limits": {
+    "filing_date_does_not_establish_current_effectiveness": true,
+    "applies_to_every_freight_mode": false,
+    "applies_to_every_carrier": false,
+    "invoice_base_charge_verified": false,
+    "shipment_route_and_contract_terms_verified": false,
+    "diesel_index_receipt_verified": false,
+    "correct_shipment_specific_fuel_percent": "UNKNOWN",
+    "freight_overcharge_and_recoverability": "UNKNOWN",
+    "customer_bank_recovery": "UNKNOWN",
+    "original_customer_error_labels": 0,
+    "retally_verified_customer_recovery_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_PRE_EFFECTIVE_SHIPMENT",
+      "kind": "SYNTHETIC",
+      "shipment_date": "2026-10-26",
+      "attempted_percent": 66,
+      "expected": "REJECT_PRE_EFFECTIVE_TARIFF_APPLICATION",
+      "independent_outcome": null
+    },
+    {
+      "id": "SYNTH_UNRELATED_MOTOR_LTL",
+      "kind": "SYNTHETIC",
+      "shipment_date": "2026-11-02",
+      "mode": "MOTOR_LTL_ONLY",
+      "attempted_percent": 66,
+      "expected": "REJECT_CROSS_MODE_SCOPE_PROMOTION",
+      "independent_outcome": null
+    },
+    {
+      "id": "SYNTH_MISSING_INVOICE_BASE",
+      "kind": "SYNTHETIC",
+      "shipment_date": "2026-11-02",
+      "applicable_tariff_authority_verified": false,
+      "base_charge_cents": null,
+      "attempted_overcharge_cents": 6600,
+      "expected": "REJECT_UNGROUNDED_INVOICE_OVERCHARGE",
+      "independent_outcome": null
+    }
+  ],
+  "consumption": {
+    "existing_unified_lab_source_seed": "OFFICIAL_STB_REGISTRY_REFERENCE_ONLY",
+    "regression": "freight.test_unified_research_lab",
+    "freight_recovery_owner": ":12",
+    "independent_qa": ":44",
+    "engine_code_modified": false,
+    "release_authorized": false,
+    "new_lab_or_workflow_created": false
+  }
+}

@@ -5,7 +5,7 @@ import copy
 import json
 import tempfile
 import unittest
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
@@ -45,10 +45,13 @@ def simulated_provider(url):
     query = parse_qs(urlsplit(url).query)
     assert query.get("$select") == [",".join(FIELDS)]
     if query.get("$order"):
-        return copy.deepcopy(rows)
-    where=query["$where"][0]
-    key=where.split(" = ",1)[1].strip("'")
-    return [copy.deepcopy(r) for r in rows if str(r["tracking_number"])==key]
+        candidates = rows
+    else:
+        where=query["$where"][0]
+        key=where.split(" = ",1)[1].strip("'")
+        candidates = [r for r in rows if str(r["tracking_number"]) == key]
+    # Honor Socrata $select; omitted columns cannot appear magically in mocked GETs.
+    return [{field: r[field] for field in FIELDS if field in r} for r in candidates]
 
 
 class OfficialNYCOriginalReadbackTests(unittest.TestCase):
@@ -145,7 +148,9 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertNotEqual(_key(_minimal(rows[0],DAY)),_key(_minimal(rows[1],DAY)))
         def duplicate_provider(url):
             if parse_qs(urlsplit(url).query).get("$order"):
-                return rows + [copy.deepcopy(rows[0])]
+                # Duplicate snapshot still obeys the original $select projection.
+                return [{field:r[field] for field in FIELDS if field in r}
+                        for r in rows + [copy.deepcopy(rows[0])]]
             return simulated_provider(url)
         receipt = build_receipt(source_ledger(),as_of=DAY,fetcher=duplicate_provider)
         self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
@@ -225,16 +230,15 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
                     ResearchError,"STALE_OR_FUTURE_READBACK_RECEIPT"):
                 _check(receipt,source_ledger(),checked_at)
 
-    def test_replay_snapshot_is_deterministic_cached_and_tamper_evident(self):
+    @patch("freight.official_nyc_issued_permit_lab.datetime")
+    def test_replay_snapshot_is_deterministic_cached_and_tamper_evident(self, test_clock):
+        # Freeze only the unit-test clock; do not weaken production UTC freshness.
+        test_clock.now.return_value.date.return_value = DAY
         observed=[]
         def fetcher(url):
             observed.append(url)
             return simulated_provider(url)
-        # This offline fixture is dated 2026-10-23; freeze only the test clock.
-        # Production must continue rejecting replay receipts older than two days.
-        with patch("freight.official_nyc_issued_permit_lab.datetime") as clock, \
-             tempfile.TemporaryDirectory() as temp:
-            clock.now.return_value=datetime(2026,10,23,tzinfo=timezone.utc)
+        with tempfile.TemporaryDirectory() as temp:
             root=Path(temp)
             ledger_path=root/"leads.json"
             target=root/"readback.json"
@@ -318,6 +322,582 @@ class OfficialNYCOriginalReadbackTests(unittest.TestCase):
         self.assertEqual(_classification(marker),"PUBLISHER_NOT_YET_ISSUED_MARKER")
         self.assertNotEqual(_classification(marker),"PUBLISHER_ISSUE_DATE_PRESENT")
 
+
+    def test_official_sequence_projection_negative_control_and_rights_hold(self):
+        """Publisher-declared sequence is not a live identity unless selected."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(pack["schema_version"],"1.0.0")
+        self.assertEqual(pack["source"]["dataset_id"],DATASET_ID)
+        self.assertEqual(pack["source"]["publisher_field_verified"],"sequence_number")
+        self.assertIsNone(pack["source"]["original_publisher_response_bytes_sha256"])
+        self.assertIsNone(pack["source"]["publisher_metadata_response_bytes_sha256"])
+        self.assertFalse(pack["source"]["dataset_specific_commercial_reuse_authorized"])
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
+        self.assertFalse(pack["cohort"]["independent_holdout_verified"])
+        self.assertFalse(pack["inspected_source"]["live_collision_in_publisher_data_verified"])
+        self.assertEqual(len(pack["synthetic_negative_controls"]),6)
+        self.assertTrue(all(c["synthetic"] for c in pack["synthetic_negative_controls"]))
+        self.assertTrue(all(c["actual_real_world_error_label"] is None
+                            for c in pack["synthetic_negative_controls"]))
+        synthetic=pack["synthetic_negative_controls"][0]["rows"]
+        self.assertEqual(len(synthetic),2)
+        self.assertNotEqual(synthetic[0]["sequence_number"],synthetic[1]["sequence_number"])
+        self.assertEqual({key:val for key,val in synthetic[0].items()
+                          if key!="sequence_number"},
+                         {key:val for key,val in synthetic[1].items()
+                          if key!="sequence_number"})
+        def select_accurate_provider(url):
+            args=parse_qs(urlsplit(url).query)
+            sample=(synthetic if args.get("$order") else
+                    [r for r in synthetic if str(r["tracking_number"])==
+                     args["$where"][0].split(" = ",1)[1].strip("'")])
+            return [{f:r[f] for f in FIELDS if f in r} for r in sample]
+        sample=select_accurate_provider(query_url())
+        self.assertEqual(set(sample[0]),set(FIELDS))
+        receipt=build_receipt(source_ledger(),as_of=DAY,
+                              fetcher=select_accurate_provider)
+        self.assertEqual(receipt["sample_count"],2)
+        if "sequence_number" in FIELDS:
+            self.assertEqual(receipt["sample_unique_source_identities"],2)
+            self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_OK")
+            self.assertEqual(receipt["readback_exact_match"],2)
+        else:
+            self.assertEqual(receipt["sample_unique_source_identities"],1)
+            self.assertEqual(receipt["sample_repeated_source_rows"],1)
+            self.assertEqual(receipt["readback_checked"],0)
+            self.assertEqual(receipt["status"],"PUBLISHER_REPLAY_DEGRADED")
+            self.assertIn("DUPLICATE_SOURCE_IDENTITIES",receipt["source_errors"])
+        self.assertFalse(receipt["source_specific_commercial_license_verified"])
+        self.assertEqual(receipt["independent_issuance_outcome_labels"],0)
+        self.assertFalse(receipt["buyer_opportunity_ground_truth"])
+        _check(receipt,source_ledger(),DAY)
+
+
+
+    def test_official_metadata_declares_nullable_sequence_without_ground_truth(self):
+        """Cached first-party metadata shows nullable identity, not row-level truth."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        profile=pack["publisher_cached_sequence_profile"]
+        self.assertEqual(profile["observed_dataset_id"],DATASET_ID)
+        self.assertEqual(profile["field_name"],"sequence_number")
+        self.assertEqual(profile["publisher_rows_updated_at_utc"],
+                         "2026-10-25T18:41:35Z")
+        self.assertEqual(profile["publisher_cached_null_count"],351)
+        self.assertEqual(profile["publisher_cached_non_null_count"],1019801)
+        self.assertEqual(profile["publisher_cached_total_count"],
+                         profile["publisher_cached_null_count"]+
+                         profile["publisher_cached_non_null_count"])
+        self.assertIsNone(profile["publisher_original_metadata_response_sha256"])
+        self.assertFalse(profile["source_specific_commercial_reuse_authorized"])
+        self.assertFalse(profile["proves_nulls_within_current_live_query_cohort"])
+        self.assertFalse(profile["proves_distinct_real_identity_collisions"])
+        self.assertEqual(profile["actual_rows_read_or_stored"],0)
+        self.assertEqual(profile["independent_holdout_labeled_count"],0)
+        control=next(c for c in pack["synthetic_negative_controls"]
+                     if c["id"]=="nullable_sequence_cannot_prove_distinct_issuance")
+        self.assertTrue(control["synthetic"])
+        self.assertIsNone(control["actual_real_world_error_label"])
+        a,b=(_minimal(x,DAY) for x in control["rows"])
+        self.assertIsNone(a["sequence_number"])
+        self.assertIsNone(b["sequence_number"])
+        self.assertEqual(_key(a),_key(b))
+        self.assertNotEqual(a["issued_date"],b["issued_date"])
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
+
+
+    def test_official_cached_status_expiry_profile_never_promotes_current_validity(self):
+        """Original NYC metadata is source-wide, not a live permit-validity label."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        profile=pack["publisher_cached_status_and_expiry_profile"]
+        self.assertEqual(profile["dataset_id"],DATASET_ID)
+        self.assertEqual(profile["publisher_rows_updated_at_utc"],
+                         "2026-10-25T18:41:35Z")
+        counts=profile["permit_status_cached_counts"]
+        self.assertEqual(counts,{"Signed-off":652244,"Permit Issued":367908})
+        self.assertEqual(sum(counts.values()),profile["total_cached_records"])
+        self.assertEqual(profile["permit_status_column_null_count"],0)
+        self.assertEqual(profile["expired_date_cached_non_null_count"]+
+                         profile["expired_date_cached_null_count"],
+                         profile["total_cached_records"])
+        self.assertEqual(profile["expired_date_cached_null_count"],1168)
+        self.assertEqual(profile["expired_date_cached_minimum"],
+                         "1899-12-30T00:00:00.000")
+        self.assertFalse(profile["date_1899_is_sentinel_verified"])
+        self.assertFalse(profile["status_and_expiry_joint_distribution_verified"])
+        self.assertIsNone(profile["publisher_metadata_response_raw_sha256"])
+        self.assertEqual(profile["actual_publisher_rows_downloaded"],0)
+        self.assertEqual(profile["independent_current_permit_validity_labels"],0)
+        self.assertFalse(profile["dataset_specific_commercial_reuse_approved"])
+        control=next(x for x in pack["synthetic_negative_controls"]
+                     if x["id"]=="signed_off_or_1899_expiry_is_not_current_validity_proof")
+        self.assertTrue(control["synthetic"])
+        self.assertIsNone(control["independent_current_validity_label"])
+        self.assertIsNone(control["actual_real_world_error_label"])
+        normalized=_minimal(control["row"],DAY)
+        self.assertEqual(normalized["permit_status"],"Signed-off")
+        self.assertEqual(_classification(normalized),"PUBLISHER_ISSUE_DATE_PRESENT")
+        self.assertNotIn("expired_date",normalized)
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
+
+
+
+    def test_official_filing_reason_placeholder_profile_not_issuance_truth(self):
+        """Publisher category and placeholder counts cannot be issuer labels."""
+        path=Path(__file__).with_name("fixtures") / "nyc_dob_sequence_projection_v1.json"
+        pack=json.loads(path.read_text(encoding="utf-8"))
+        profile=pack["publisher_cached_filing_reason_profile"]
+        self.assertEqual(profile["dataset_id"],DATASET_ID)
+        self.assertEqual(profile["publisher_rows_updated_at_utc"],
+                         "2026-10-25T18:41:35Z")
+        counts=profile["filing_reason_cached_counts"]
+        self.assertEqual(counts["No Work Permit"],6764)
+        self.assertEqual(counts["None"],415)
+        self.assertEqual(sum(counts.values()),profile["total_cached_records"])
+        self.assertEqual(profile["work_permit_column_null_count"],212)
+        self.assertEqual(profile["work_permit_placeholder_cached_top_count"],345)
+        self.assertEqual(profile["work_permit_placeholder_text"],
+                         "Permit is not yet issued")
+        self.assertFalse(profile["filing_reason_and_work_permit_joint_distribution_verified"])
+        self.assertFalse(profile["these_counts_in_filtered_20_row_replay_verified"])
+        self.assertIsNone(profile["original_publisher_metadata_response_sha256"])
+        self.assertFalse(profile["source_specific_commercial_reuse_approved"])
+        self.assertEqual(profile["independent_permit_issuance_labels"],0)
+        case=next(c for c in pack["synthetic_negative_controls"]
+                  if c["id"]=="filing_reason_no_work_permit_not_issued_truth")
+        self.assertTrue(case["synthetic"])
+        self.assertIsNone(case["actual_real_world_error_label"])
+        self.assertIsNone(case["independent_current_validity_label"])
+        normalized=_minimal(case["row"],DAY)
+        self.assertEqual(_classification(normalized),"PUBLISHER_NOT_YET_ISSUED_MARKER")
+        self.assertNotEqual(_classification(normalized),"PUBLISHER_ISSUE_DATE_PRESENT")
+        self.assertEqual(pack["cohort"]["independent_held_out_labeled_cases"],0)
+
+
+    def test_socrata_system_id_proposal_does_not_promote_api_rows_to_permit_labels(self):
+        """Documented :id and :updated_at are unprobed, rights-held identity aids."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_live_replay_quality_candidate_v0.json")
+                        .read_text(encoding="utf-8"))
+        probe=pack["publisher_platform_identity_validation_candidate"]
+        self.assertEqual(probe["documentation_url"],
+                         "https://dev.socrata.com/docs/system-fields")
+        self.assertEqual(probe["documented_system_select_fields"],
+                         [":id",":updated_at"])
+        self.assertEqual(probe["source_dataset_id"],DATASET_ID)
+        self.assertFalse(probe["current_collector_selects_system_fields"])
+        self.assertFalse(probe["original_publisher_dataset_specific_probe_executed"])
+        self.assertIsNone(probe["original_publisher_system_field_response_sha256"])
+        self.assertIsNone(probe["number_of_real_collisions_disambiguated"])
+        self.assertFalse(probe["cross_full_replacement_id_stability_verified"])
+        self.assertFalse(probe["source_specific_commercial_reuse_authorized"])
+        self.assertEqual(probe["independent_held_out_validity_labels"],0)
+        cases={c["id"]:c for c in pack["synthetic_negative_controls"]}
+        different=cases["SYNTH_PROJECTED_COLLISION_WITH_DISTINCT_SODA_ROW_IDS"]
+        self.assertEqual(different["kind"],"SYNTHETIC")
+        a,b=different["rows"]
+        self.assertEqual(a["projected_key"],b["projected_key"])
+        self.assertNotEqual(a["system_row_id"],b["system_row_id"])
+        self.assertIsNone(a["independent_permit_validity"])
+        self.assertIsNone(b["independent_permit_validity"])
+        updated=cases["SYNTH_UPDATED_API_ROW_IS_NOT_AN_INDEPENDENT_PERMIT"]
+        self.assertEqual(updated["kind"],"SYNTHETIC")
+        a,b=updated["rows"]
+        self.assertEqual(a["system_row_id"],b["system_row_id"])
+        self.assertNotEqual(a["system_updated_at"],b["system_updated_at"])
+        self.assertIsNone(a["independent_permit_validity"])
+        self.assertIsNone(b["independent_permit_validity"])
+        self.assertEqual(pack["observed"]["actual_distinct_original_records"],"UNKNOWN")
+        self.assertEqual(pack["observed"]["held_out_labeled_permits"],0)
+
+
+    def test_live_20row_replay_has_repeated_identities_not_twenty_labels(self):
+        """Freeze a real source-readback receipt; never promote it to scoring truth."""
+        case=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_live_replay_quality_candidate_v0.json")
+                        .read_text(encoding="utf-8"))
+        self.assertEqual(case["engine"],"permitplate")
+        self.assertEqual(case["source"]["original_publisher_url"],
+                         "https://data.cityofnewyork.us/d/rbx6-tga4")
+        self.assertIsNone(case["source"]["publisher_original_http_bytes_sha256"])
+        self.assertFalse(case["source"]["dataset_specific_commercial_reuse_authorized"])
+        provenance=case["provenance"]
+        self.assertEqual(provenance["writer_commit"],
+                         "9e1805f6e18fd6174f548e99d21bc0e5ee0b52be")
+        self.assertEqual(provenance["receipt_blob_git_sha1"],
+                         "519e03c3c24c1d8b5e72e9f2e87ecf921cd60525")
+        self.assertEqual(provenance["receipt_sha256"],
+                         "a889b091d7f834b95375cfd77a9a389ee0ee5306f7767def2ee6b4c300ff192e")
+        self.assertEqual(provenance["sample_canonical_sha256"],
+                         "d68bc6f3921427208de9708bd2ef4d2e68abe6c19e92c9154daf315a8a0c3f93")
+        self.assertEqual(provenance["raw_publisher_rows_stored"],0)
+        o=case["observed"]
+        def safely_degraded(p):
+            r=p["observed"]
+            return (r["sample_count"]-r["sample_unique_source_identities"]
+                    ==r["sample_repeated_source_rows"]
+                    and r["sample_repeated_source_rows"]>0
+                    and r["receipt_status"]=="PUBLISHER_REPLAY_DEGRADED"
+                    and r["error_codes"]==["DUPLICATE_SOURCE_IDENTITIES"]
+                    and r["second_read_exact_match"]<=r["second_read_checked"]
+                    and r["held_out_labeled_permits"]==0
+                    and r["independent_current_validity_labels"]==0
+                    and r["actual_distinct_original_records"]=="UNKNOWN")
+        self.assertTrue(safely_degraded(case))
+        self.assertEqual((o["sample_count"],o["sample_unique_source_identities"],
+                          o["sample_repeated_source_rows"]),(20,18,2))
+        self.assertEqual((o["second_read_checked"],o["second_read_exact_match"]),(3,3))
+        fabricated=json.loads(json.dumps(case))
+        fabricated["observed"]["sample_unique_source_identities"]=20
+        self.assertFalse(safely_degraded(fabricated))
+        fabricated["observed"]["sample_unique_source_identities"]=18
+        fabricated["observed"]["held_out_labeled_permits"]=20
+        self.assertFalse(safely_degraded(fabricated))
+        controls=case["synthetic_negative_controls"]
+        self.assertEqual(len(controls),7)
+        self.assertTrue(all(x["kind"]=="SYNTHETIC" for x in controls))
+        self.assertFalse(case["consumers"]["production_release_authorized"])
+
+
+    def test_structural_notice_conditions_do_not_promote_public_permit_rows(self):
+        """Official 2026 DOB conditional gates cannot be inferred from five-field readback."""
+        candidate=json.loads((Path(__file__).with_name("fixtures") /
+                              "nyc_dob_structural_gates_2026_candidate_v0.json")
+                             .read_text(encoding="utf-8"))
+        notice=candidate["source"]
+        self.assertEqual(notice["original_notice_url"],
+                         "https://www.nyc.gov/assets/buildings/pdf/stpermits_dn-sn.pdf")
+        self.assertEqual((notice["notice_date"],notice["policy_effective_date"]),
+                         ("2026-01-21","2026-02-02"))
+        self.assertIsNone(notice["original_pdf_sha256"])
+        self.assertFalse(notice["original_pdf_bytes_acquired"])
+        self.assertFalse(notice["dataset_specific_commercial_use_authorized"])
+        scope=candidate["scope"]
+        self.assertTrue(scope["notice_not_universal_for_all_permits"])
+        self.assertFalse(scope["historical_policy_retroactively_applied"])
+        self.assertEqual({x["rule"] for x in scope["gates"]},
+                         {"FO_OR_EA_ISSUANCE","ST_ISSUANCE_NB_NBEE_ALTCO",
+                          "ST_ISSUANCE_ALT_ENLARGEMENT","ST_RENEWAL"})
+        evaluation=candidate["evaluation"]
+        historical_projection=tuple(evaluation["current_collector_select"])
+        self.assertEqual(historical_projection,
+                         ("tracking_number","job_filing_number","work_permit",
+                          "issued_date","permit_status"))
+        # This documents the captured source head, not a permanent owner contract.
+        # A later :48 collector fix adding fields must not break this evidence test.
+        self.assertNotIn("work_type",historical_projection)
+        self.assertEqual(evaluation["independently_held_out_labeled_cases"],0)
+        self.assertIsNone(evaluation["permitplate_precision_recall"])
+        self.assertEqual(evaluation["current_permit_validity_truth"],"UNKNOWN")
+        controls=candidate["synthetic_negative_controls"]
+        self.assertEqual(len(controls),evaluation["synthetic_control_count"])
+        self.assertEqual(len(controls),6)
+        self.assertEqual(len({c["id"] for c in controls}),len(controls))
+        self.assertTrue(all(c["kind"]=="SYNTHETIC" for c in controls))
+        for c in controls:
+            with self.subTest(control=c["id"]):
+                normalized=_minimal(c["projected_row"],date(2026,10,26))
+                self.assertEqual(_classification(normalized),"PUBLISHER_ISSUE_DATE_PRESENT")
+                self.assertIsNone(c["independent_issuance_label"])
+                self.assertIsNone(c["independent_current_validity_label"])
+                self.assertIsNone(c["independent_commercial_lead_label"])
+                self.assertNotIn("PERMIT_VALID",c["expected_truth_boundary"])
+        self.assertEqual(candidate["safety"]["private_customer_rows_stored"],0)
+        self.assertEqual(candidate["safety"]["new_provider_calls"],0)
+        self.assertFalse(candidate["consumers"]["release_authorized"])
+
+
+    def test_publisher_unfiltered_same_row_status_placeholder_does_not_prove_issuance(self):
+        """One publisher-rendered unfiltered row is not an independent issued permit label."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        item=pack["publisher_unfiltered_placeholder_join_20261026"]
+        self.assertEqual(item["official_dataset_id"], DATASET_ID)
+        self.assertEqual(item["source_url"],
+                         "https://data.cityofnewyork.us/resource/rbx6-tga4.json")
+        self.assertIn("UNFILTERED", item["cohort"])
+        self.assertFalse(item["collector_filtered_cohort_inclusion_verified"])
+        self.assertFalse(item["original_publisher_http_body_acquired"])
+        self.assertIsNone(item["original_publisher_http_sha256"])
+        self.assertFalse(item["original_permit_row_or_personal_identifiers_stored"])
+        self.assertEqual(item["identifying_fields_copied"], [])
+        fields=item["material_fields_observed_together"]
+        self.assertEqual(fields["work_permit"],"Permit is not yet issued")
+        self.assertEqual(fields["permit_status"],"Signed-off")
+        self.assertFalse(fields["issued_date_present"])
+        self.assertEqual(item["independently_held_out_issuance_labels"],0)
+        self.assertIsNone(item["independent_validity_label"])
+        self.assertFalse(item["source_specific_commercial_reuse_authorized"])
+        case=item["synthetic_negative_control"]
+        self.assertEqual(case["kind"],"SYNTHETIC")
+        self.assertIsNone(case["issued_date"])
+        self.assertIsNone(case["independent_issuance_label"])
+        self.assertIsNone(case["independent_current_validity_label"])
+        self.assertEqual(case["expected"],
+                         "NO_ISSUANCE_OR_CURRENT_VALIDITY_PROMOTION_FROM_STATUS_ALONE")
+        # Even if status changes, no dated independent truth is supplied.
+        def can_promote(v):
+            return (v.get("issued_date") is not None
+                    and v.get("independent_issuance_label") is True)
+        self.assertFalse(can_promote(case))
+        altered=dict(case,permit_status="Permit Issued")
+        self.assertFalse(can_promote(altered))
+
+
+    def test_original_dob_renewal_sequences_are_not_independent_new_permits(self):
+        """The DOB 2020 training identifies sequence as renewal iteration, not a new permit."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        doc=pack["publisher_renewal_sequence_training_2020"]
+        self.assertEqual(doc["publisher"],"NYC Department of Buildings")
+        self.assertEqual(doc["original_document_url"],
+                         "https://www.nyc.gov/assets/buildings/pdf/contractor_training_presentation.pdf")
+        self.assertEqual((doc["pdf_page_index_zero_based"],doc["slide_number_one_based"]),(71,72))
+        self.assertEqual(doc["document_updated_date"],"2020-12-22")
+        facts=doc["historical_training_assertions"]
+        self.assertTrue(all(facts.values()))
+        self.assertFalse(doc["dataset_sequence_field_mapping_to_training_verified"])
+        self.assertFalse(doc["nyc_open_data_xlsx_dictionary_original_bytes_acquired"])
+        self.assertIsNone(doc["nyc_open_data_xlsx_dictionary_sha256"])
+        self.assertFalse(doc["original_publisher_pdf_bytes_acquired"])
+        self.assertIsNone(doc["original_publisher_pdf_sha256"])
+        self.assertFalse(doc["source_specific_commercial_reuse_authorized"])
+        self.assertFalse(doc["same_permit_repeated_renewal_rows_in_original_publisher_cohort_confirmed"])
+        self.assertEqual(doc["independently_held_out_new_permit_outcome_labels"],0)
+        self.assertEqual(doc["independently_held_out_current_validity_labels"],0)
+        self.assertIsNone(doc["permitplate_new_buyer_opportunity_accuracy"])
+        self.assertEqual(doc["buyer_demand"],"UNKNOWN")
+        controls=doc["synthetic_negative_controls"]
+        self.assertEqual(len(controls),2)
+        self.assertEqual(len({c["id"] for c in controls}),2)
+        self.assertTrue(all(c["kind"]=="SYNTHETIC" for c in controls))
+        first=controls[0]
+        self.assertEqual(first["initial"]["work_permit"],first["renewal"]["work_permit"])
+        self.assertNotEqual(first["initial"]["tracking_number"],first["renewal"]["tracking_number"])
+        self.assertEqual(int(first["renewal"]["sequence_number"]),
+                         int(first["initial"]["sequence_number"])+1)
+        self.assertIsNone(first["independent_new_permit_label"])
+        self.assertIsNone(first["independent_current_validity_label"])
+        self.assertIn("NOT_TWO_INDEPENDENT_NEW_PERMIT_OPPORTUNITIES",first["expected"])
+        second=controls[1]
+        self.assertFalse(second["projection"]["sequence_number_selected"])
+        self.assertIn("UNKNOWN",second["expected"])
+        self.assertIsNone(second["independent_current_validity_label"])
+        self.assertFalse(doc["engine_code_edited"])
+        self.assertEqual((doc["extra_provider_calls"],doc["new_workflows"]),(0,0))
+        self.assertFalse(doc["release_authorized"])
+
+
+    def test_publisher_sequence_counts_do_not_define_renewal_labels(self):
+        """Dataset-wide source marginals disprove an exact renewal/sequence proxy."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        p=pack["publisher_cached_sequence_reason_marginal_non_equivalence_20261026"]
+        self.assertEqual(p["dataset_id"],DATASET_ID)
+        self.assertEqual(p["source_schema"],
+                         {"sequence_number":"text","filing_reason":"text"})
+        self.assertFalse(p["publisher_metadata_raw_bytes_acquired"])
+        self.assertIsNone(p["publisher_metadata_sha256"])
+        self.assertFalse(p["attached_data_dictionary_original_bytes_acquired"])
+        self.assertIsNone(p["attached_data_dictionary_sha256"])
+        self.assertIn("HELD",p["source_admission"])
+        n=p["counts"]
+        self.assertEqual(n["total"],1020152)
+        self.assertEqual(n["sequence_non_null"]+n["sequence_null"],n["total"])
+        not_one=n["sequence_non_null"]-n["sequence_value_one"]
+        renewals=(n["filing_renewal_without_changes"]
+                  +n["filing_renewal_with_changes"])
+        self.assertEqual(not_one,n["sequence_other_non_null"])
+        self.assertEqual(renewals,n["filing_renewal_total"])
+        self.assertEqual(renewals-not_one,n["minimum_non_equivalence_count"])
+        self.assertEqual(n["minimum_non_equivalence_count"],130)
+        self.assertGreater(renewals,not_one)
+        self.assertEqual(p["actual_mismatch_rows_or_direction"],
+                         "UNKNOWN_NOT_IDENTIFIED_BY_MARGINAL_COUNTS")
+        self.assertEqual(p["independently_held_out_labeled_permit_or_lead_cases"],0)
+        self.assertEqual(p["real_permit_rows_or_personal_identifiers_stored"],0)
+        cases=p["synthetic_negative_controls"]
+        self.assertEqual(len(cases),2)
+        self.assertEqual(len({x["id"] for x in cases}),len(cases))
+        self.assertTrue(all(x["kind"]=="SYNTHETIC" for x in cases))
+        self.assertTrue(all(x["independent_ground_truth"] is None for x in cases))
+        self.assertNotEqual(cases[0]["filing_reason"].startswith("Initial"),
+                            cases[1]["filing_reason"].startswith("Initial"))
+
+
+    def test_business_name_change_on_renewal_is_not_new_permit_truth(self):
+        """June 2026 official notice: business changes via renewal are not new leads."""
+        pack=json.loads((Path(__file__).with_name("fixtures") /
+                         "nyc_dob_sequence_projection_v1.json")
+                        .read_text(encoding="utf-8"))
+        item=pack["notice_permit_business_renewal_20260624"]
+        self.assertEqual(item["evidence_family"],
+                         "NYC_PERMIT_SOURCE_IDENTITY_AND_BUSINESS_ATTRIBUTION_BOUNDARY")
+        self.assertEqual(item["source_url"],
+                         "https://www.nyc.gov/assets/buildings/pdf/permitrenewals_bizname-sn.pdf")
+        self.assertEqual(item["notice_published_date"],"2026-06-24")
+        self.assertEqual(item["effective_date"],"2026-06-29")
+        self.assertTrue(item["original_publisher_pdf_visual_page_verified"])
+        self.assertFalse(item["original_publisher_pdf_bytes_acquired"])
+        self.assertIsNone(item["original_publisher_pdf_sha256"])
+        self.assertIn("HOLD",item["source_specific_pdf_commercial_rights"])
+        self.assertEqual(tuple(item["current_collector_select"]),FIELDS)
+        self.assertEqual(set(item["missing_from_current_collector"]),
+                         {"sequence_number","filing_reason","business_name"})
+        self.assertEqual(item["application_to_live_rbx6_tga4_row_mapping"],
+                         "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED")
+        self.assertTrue(all(v==0 for v in item["label_completeness"].values()))
+        controls=item["synthetic_negative_controls"]
+        self.assertEqual(len(controls),2)
+        self.assertEqual(len({c["id"] for c in controls}),2)
+        self.assertTrue(all(c["kind"]=="SYNTHETIC" for c in controls))
+        self.assertTrue(all(c["independent_new_permit_label"] is None
+                            and c["independent_buyer_demand_label"] is None
+                            for c in controls))
+        changed,same=controls
+        self.assertEqual(changed["before"]["work_permit"],
+                         changed["after"]["work_permit"])
+        self.assertNotEqual(changed["before"]["listed_business"],
+                            changed["after"]["listed_business"])
+        self.assertEqual(int(changed["after"]["sequence_number"]),
+                         int(changed["before"]["sequence_number"])+1)
+        self.assertIn("DOES_NOT_PROVE_A_NEW_UNIQUE_WORK_PERMIT",
+                      changed["expected"])
+        self.assertEqual(same["before"]["listed_business"],
+                         same["after"]["listed_business"])
+        self.assertNotEqual(same["before"]["work_permit"],
+                            same["after"]["work_permit"])
+        self.assertIn("DOES_NOT_PROVE_IDENTICAL",same["expected"])
+        self.assertFalse(item["release_authorized"])
+        self.assertFalse(item["workflow_or_engine_code_changed"])
+        self.assertEqual(item["extra_provider_calls"],0)
+
+
+
+
+    def test_general_nyc_open_data_reuse_does_not_clear_dataset_terms(self):
+        """Original city FAQ permits general use; extra terms and truth remain held."""
+        fixture = json.loads((Path(__file__).with_name("fixtures") /
+                              "nyc_dob_sequence_projection_v1.json").read_text(
+                                  encoding="utf-8"))
+        item = fixture["official_nyc_open_data_reuse_boundary_20261026"]
+        self.assertEqual(item["dataset_id"], DATASET_ID)
+        self.assertEqual(item["verification_utc_date"], "2026-10-26")
+        self.assertEqual(item["first_party_general_faq_url"],
+                         "https://www.nyc.gov/opendata/get-started/FAQs")
+        self.assertTrue(item["general_city_open_data_policy_says_unrestricted_use"])
+        self.assertTrue(item["additional_provider_terms_may_apply"])
+        self.assertFalse(item["publisher_data_accuracy_warranted"])
+        self.assertFalse(item["dataset_specific_extra_terms_verified_absent"])
+        self.assertFalse(item["dataset_specific_commercial_engine_admission_authorized"])
+        self.assertFalse(item["personal_record_or_lead_publication_authorized"])
+        self.assertIsNone(item["original_publisher_response_sha256"])
+        self.assertIsNone(item["original_attached_dictionary_sha256"])
+        self.assertEqual(item["real_person_customer_permit_rows_stored"], 0)
+        self.assertEqual(item["independent_held_out_current_validity_labels"], 0)
+        self.assertEqual(item["independent_held_out_buyer_lead_labels"], 0)
+        controls = item["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 2)
+        self.assertEqual(len({c["id"] for c in controls}), 2)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+        self.assertIsNone(controls[0]["independent_rights_adjudication"])
+        self.assertIsNone(controls[1]["independent_current_validity_label"])
+        self.assertFalse(item["release_authorized"])
+        self.assertEqual((item["extra_provider_calls"], item["new_workflows"]), (0, 0))
+        self.assertFalse(item["engine_code_changed"])
+
+
+    def test_socrata_system_fields_are_docs_only_not_permit_labels(self):
+        """Original Socrata docs describe row IDs, not dataset-specific permit truth."""
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+                           "nyc_dob_live_replay_quality_candidate_v0.json"
+                           ).read_text(encoding="utf-8"))
+
+        def assert_held(x):
+            self.assertEqual(x["source"]["original_publisher_url"], SOURCE_URL)
+            self.assertFalse(x["source"]["original_publisher_response_acquired"])
+            self.assertIsNone(x["source"]["publisher_original_http_bytes_sha256"])
+            self.assertFalse(x["source"]["dataset_specific_commercial_reuse_authorized"])
+            self.assertIsNone(x["provenance"]["raw_source_byte_hash"])
+            o = x["observed"]
+            self.assertEqual((o["sample_count"], o["sample_unique_source_identities"],
+                              o["sample_repeated_source_rows"]), (20, 18, 2))
+            self.assertEqual(o["receipt_status"], "PUBLISHER_REPLAY_DEGRADED")
+            self.assertEqual(o["held_out_labeled_permits"], 0)
+            self.assertEqual(o["independent_current_validity_labels"], 0)
+            self.assertEqual(o["actual_distinct_original_records"], "UNKNOWN")
+            self.assertIsNone(o["permitplate_scoring_precision_recall"])
+            d = x["publisher_platform_identity_validation_candidate"]
+            self.assertEqual(d["documentation_url"],
+                             "https://dev.socrata.com/docs/system-fields")
+            self.assertEqual(d["documented_api_family"], "SODA_2_1")
+            self.assertEqual(d["documented_system_select_fields"],
+                             [":id", ":updated_at"])
+            self.assertEqual(d["source_dataset_id"], DATASET_ID)
+            self.assertEqual(d["proposal_status"],
+                             "DOCUMENTED_METHOD_ONLY_NOT_LIVE_PROBED")
+            for key in ("current_collector_selects_system_fields",
+                        "original_publisher_dataset_specific_probe_executed",
+                        "cross_full_replacement_id_stability_verified",
+                        "source_specific_commercial_reuse_authorized"):
+                self.assertFalse(d[key], key)
+            for key in ("original_publisher_system_field_response_sha256",
+                        "number_of_real_collisions_disambiguated"):
+                self.assertIsNone(d[key], key)
+            self.assertEqual(d["independent_held_out_validity_labels"], 0)
+            controls = {c["id"]: c for c in x["synthetic_negative_controls"]}
+            self.assertEqual(len(controls), 7)
+            distinct = controls["SYNTH_PROJECTED_COLLISION_WITH_DISTINCT_SODA_ROW_IDS"]
+            revision = controls["SYNTH_UPDATED_API_ROW_IS_NOT_AN_INDEPENDENT_PERMIT"]
+            self.assertEqual((distinct["kind"], revision["kind"]),
+                             ("SYNTHETIC", "SYNTHETIC"))
+            self.assertEqual(len(distinct["rows"]), 2)
+            self.assertEqual(len(revision["rows"]), 2)
+            self.assertEqual(len({r["projected_key"] for r in distinct["rows"]}), 1)
+            self.assertEqual(len({r["system_row_id"] for r in distinct["rows"]}), 2)
+            self.assertEqual(len({r["projected_key"] for r in revision["rows"]}), 1)
+            self.assertEqual(len({r["system_row_id"] for r in revision["rows"]}), 1)
+            self.assertEqual(len({r["system_updated_at"] for r in revision["rows"]}), 2)
+            self.assertEqual(distinct["expected"],
+                             "TWO_POSSIBLE_DISTINCT_API_ROWS_NOT_TWO_INDEPENDENT_REAL_PERMITS")
+            self.assertEqual(revision["expected"],
+                             "ONE_API_ROW_REVISION_NOT_TWO_INDEPENDENT_REAL_PERMITS")
+            for control in (distinct, revision):
+                self.assertTrue(all(r["independent_permit_validity"] is None
+                                    for r in control["rows"]))
+
+        assert_held(pack)
+        # Offline adversarial controls: recomputed/forged metadata never
+        # upgrades unprobed system IDs into real permits or verified rights.
+        attacks = (
+            ("publisher_platform_identity_validation_candidate",
+             "original_publisher_dataset_specific_probe_executed", True),
+            ("publisher_platform_identity_validation_candidate",
+             "original_publisher_system_field_response_sha256", "0" * 64),
+            ("publisher_platform_identity_validation_candidate",
+             "number_of_real_collisions_disambiguated", 2),
+            ("publisher_platform_identity_validation_candidate",
+             "cross_full_replacement_id_stability_verified", True),
+            ("publisher_platform_identity_validation_candidate",
+             "source_specific_commercial_reuse_authorized", True),
+            ("publisher_platform_identity_validation_candidate",
+             "independent_held_out_validity_labels", 2),
+            ("observed", "receipt_status", "PUBLISHER_REPLAY_OK"),
+            ("observed", "sample_unique_source_identities", 20),
+            ("observed", "held_out_labeled_permits", 20),
+            ("source", "original_publisher_response_acquired", True),
+        )
+        for section, key, forged in attacks:
+            with self.subTest(section=section, field=key):
+                mutated = copy.deepcopy(pack)
+                mutated[section][key] = forged
+                with self.assertRaises(AssertionError):
+                    assert_held(mutated)
 
 if __name__=="__main__":
     unittest.main()

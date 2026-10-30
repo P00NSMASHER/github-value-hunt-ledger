@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.1.0",
+  "evaluation_family": "FREIGHT_DOCUMENT_EXTRACTION_ORIGINAL_VS_SHIPPING_ORDER_CONFLICT_NOT_MODERN_RATE_SCORING",
+  "status": "DRAFT_SOURCE_BOUND_HOLD",
+  "asof_date": "2026-10-29",
+  "source": {
+    "decision_id": "GAO_B_253541",
+    "decision_date": "1993-10-18",
+    "publisher": "US_GAO",
+    "official_url": "https://www.gao.gov/products/b-253541",
+    "rights_url": "https://www.gao.gov/copyright",
+    "reuse_scope": "GAO_US_GOVERNMENT_TEXT_REUSABLE_CREDIT_SOURCE_NO_IMPLIED_ENDORSEMENT",
+    "third_party_attached_material_rights_checked": false,
+    "published_agency_decision_text_reviewed": true,
+    "publisher_http_response_bytes_acquired": false,
+    "publisher_http_body_sha256": null,
+    "original_sf1103_microfiche_bytes_acquired": false,
+    "original_sf1104_shipping_order_bytes_acquired": false,
+    "signed_original_gbl_independently_in_lab_custody": false
+  },
+  "historical_discrepancy": {
+    "gbl_identifier": "D-0,521,277",
+    "shipping_order_form": "SF_1104",
+    "shipping_order_valuation_string": "$2150",
+    "signed_original_gbl_form": "SF_1103",
+    "signed_original_gbl_valuation_string": "$2.50",
+    "valuation_basis": "USD_PER_POUND_PER_ARTICLE",
+    "gao_reports_original_carrier_representative_signature": true,
+    "gao_resolution": "GSA_AUDIT_SETTLEMENT_AFFIRMED_USING_ORIGINAL_GBL_VALUATION",
+    "same_released_value_on_both_forms": false,
+    "original_vs_shipping_order_inference_is_case_specific": true,
+    "released_value_is_freight_transportation_charge": false,
+    "actual_original_tariff_rate": "UNKNOWN",
+    "actual_claim_dollar_amount": "UNKNOWN",
+    "original_microfiche_independently_replayed": false
+  },
+  "rights": {
+    "gao_text_reuse_with_credit_and_no_implied_endorsement": true,
+    "separate_third_party_invoice_and_image_rights_verified": false,
+    "commercial_customer_scoring_authorized": false,
+    "private_data_acquired": false
+  },
+  "ground_truth": {
+    "published_adjudication_decision_labels": 1,
+    "independently_heldout_original_gbl_document_pairs": 0,
+    "independently_heldout_customer_invoice_rate_labels": 0,
+    "independent_current_customer_cash_receipts": 0,
+    "verified_retally_customer_recovery_cents": 0,
+    "freight_error_precision_recall": "UNKNOWN",
+    "customer_rate_error_label": "UNKNOWN",
+    "document_conflict_source_scope": "ONE_AGENCY_DECISION_NOT_TWO_INDEPENDENT_DOCUMENT_EXAMPLES"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_PREFER_SHIPPING_ORDER",
+      "kind": "SYNTHETIC",
+      "target": "PREFER_SF_1104_UNDER_THIS_DECISION"
+    },
+    {
+      "id": "SYNTHETIC_NORMALIZE_2150_TO_2_50",
+      "kind": "SYNTHETIC",
+      "target": "SILENTLY_REWRITE_SOURCE_LITERAL"
+    },
+    {
+      "id": "SYNTHETIC_ASSUME_ORIGINAL_IN_CUSTODY",
+      "kind": "SYNTHETIC",
+      "target": "FORGE_ORIGINAL_GBL_MICROFICHE_CUSTODY"
+    },
+    {
+      "id": "SYNTHETIC_CASH_RECOVERY",
+      "kind": "SYNTHETIC",
+      "target": "FORGE_RETALLY_CUSTOMER_CASH"
+    },
+    {
+      "id": "SYNTHETIC_GENERALIZE",
+      "kind": "SYNTHETIC",
+      "target": "UNIVERSALLY_PRIORITIZE_ALL_ORIGINALS"
+    }
+  ],
+  "handoff": {
+    "intended_lane": "FREIGHTRECOVERY_DOCUMENT_EXTRACTION_CONFLICT_REGRESSION_CANDIDATE",
+    "engine_implementation_changes_made": false,
+    "operational_writer_changed": false,
+    "independent_qa_completed": false,
+    "production_release_authorized": false
+  }
+}

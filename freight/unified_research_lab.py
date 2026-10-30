@@ -50,6 +50,7 @@ API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.so
                        "retally-unified-research-scout.jayp19386.workers.dev"})
 SEEDS = {
     "freightrecovery": (
+        "https://www.gao.gov/products/b-168539",  # 1970 carrier dispute; promised $379.66 never received as of decision.
         "https://www.gao.gov/products/b-160344",
         "https://www.gao.gov/products/b-143246",
         "https://www.gao.gov/products/b-215958",  # Initial 1984 53/55 decision OVERRULED in 1986.
@@ -77,27 +78,40 @@ SEEDS = {
         "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",  # CBCA: GSA's 70 paid-detention invoice recoupment demands invalid, conflicting 2-cent source totals.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
+        "https://www.gao.gov/products/b-261127",  # 1996 note-12 TCN units held valid; $1373 arithmetic contrast NOT proven overcharge.  # GAO 1961 $305.90 / $150.60 / $155.30; full capacity not enough absent tariff scope.
+        "https://www.gao.gov/products/b-145308",  # GAO 1961 actual $282.83 deduction; $496.50 further refund REQUESTED not paid.
+        "https://www.gao.gov/products/b-148981",  # GAO 1962 reported actual refunds; prospective $391.74 credit is NOT paid.
+        "https://www.gao.gov/assets/b-190624.pdf",  # GAO 1978 two original decision-reported deductions; one-cent printed mismatch; not customer truth.
         # New source-bound reported numeric cases; original invoices not held.
         "https://www.gao.gov/products/b-191257",  # 1978 Yellow Freight $828 / $796 / $32.
         "https://www.gao.gov/products/b-152744-0",  # 1964 $611.80 paid / $122.20; conditional review.
         "https://www.gao.gov/products/b-148465",  # 1962 $546.88 paid / $61.22; SCOTUS caveat.
         "https://www.gao.gov/products/b-143048",  # 1960 two shipments; $130.30 aggregate only.
+        "https://www.gao.gov/products/b-142112-1",  # 1960 seal proof; $91.80 deducted; disputed $130.44/$130.40 future refund.
         "https://www.gao.gov/products/b-146511-2",  # 1965 conflicting reclaim figures; offset $20.74.
         # Published v1 official decision and price-source locators only.
         "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+        # Preserve current-main FMC shipper adjudication locators; no original bytes or paid recovery asserted.
         "https://www2.fmc.gov/readingroom/docs/2030%28I%29/%2815%29%202030%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+        "https://www.fmc.gov/wp-content/uploads/2019/04/vol22.pdf",  # Official 22 F.M.C. 94; INDEX-ONLY, no original byte/hash, unadmitted.
         "https://www.fmc.gov/wp-content/uploads/2025/06/8-F.M.C.2d.pdf",
         "https://www.sec.gov/Archives/edgar/data/1507615/000150761511000033/exhibit101.htm",
         "https://www.sec.gov/Archives/edgar/data/1552000/000155200026000009/mplx-20251231xex1056.htm",
         "https://www.stb.gov/reports-data/waybill/",
+        "https://www.stb.gov/reports-data/water-carrier-annual-certifications/",  # FY26-27 public tariff registry, rights held; 2026-11-01 Crowley rule not yet effective.
         "https://www.eia.gov/petroleum/gasdiesel/",
     ),
     "permitplate": (
-        "https://data.cityofnewyork.us/d/43nn-pn8j",
-        "https://data.cityofnewyork.us/d/w9ak-ipjd",
+        "https://data.cityofnewyork.us/d/w9ak-ipjd",  # Original DOB NOW applications; not issuance proof.
+        "https://data.cityofnewyork.us/d/rbx6-tga4",  # Original DOB NOW approved permits; excluded work types remain UNKNOWN.
+        "https://data.cityofnewyork.us/d/ipu4-2q9a",  # Original BIS permit issuance; does NOT cover DOB NOW.
+        "https://data.cityofnewyork.us/d/dm9a-ab7w",  # Electrical APPLICATIONS, not issued permits.
+        "https://data.cityofnewyork.us/d/kfp4-dz4h",  # Elevator APPLICATIONS, not issued permits.
+        "https://data.cityofnewyork.us/d/xxbr-ypig",  # LAA APPLICATIONS, not issued permits.
     ),
     "capturebrief": (
         "https://sam.gov/opportunities",
+        "https://sam.gov/opp/e4a54b2056164c7da290f5a04e60e047/view",  # Original 2026 BARDA amendment: UI active != bid deadline open.
         "https://api.usaspending.gov/docs/endpoints",
     ),
     "recoveryos": (

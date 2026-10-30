@@ -1,0 +1,178 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "RECOVERYOS_GAO_02_635_AP_RECONCILIATION_CANDIDATE_V0",
+  "engine": "recoveryos",
+  "evaluation_family": "GENERAL_ACCOUNTING_RECONCILIATION_ONLY",
+  "admission_state": "HISTORICAL_GAO_REPORT_CANDIDATE_NOT_CUSTOMER_EVALUATION_ADMITTED",
+  "cohort": "US_DOD_DFAS_ACCOUNTS_PAYABLE_1999_2001_REPORTED_2002",
+  "source": {
+    "publisher": "U.S. General Accounting Office (now Government Accountability Office)",
+    "report_id": "GAO-02-635",
+    "title": "DOD Contract Management: Overpayments Continue and Management and Accounting Issues Remain",
+    "landing_url": "https://www.gao.gov/products/gao-02-635",
+    "original_publisher_accessible_text_url": "https://www.gao.gov/assets/a234797.html",
+    "source_paragraph_line_ranges": [
+      "595-619",
+      "601-604",
+      "642-651",
+      "174-176",
+      "653-662"
+    ],
+    "report_published_date": "2002-05-30",
+    "report_public_release_date": "2002-07-01",
+    "reviewed_date": "2026-10-26",
+    "original_publisher_response_bytes_acquired": false,
+    "original_publisher_response_sha256": null,
+    "original_underlying_invoices_payment_ledgers_bank_statements_acquired": false,
+    "contract_effective_date": "UNKNOWN",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights_state": "GAO_GOVERNMENT_TEXT_CAN_BE_COPIED_WITH_SOURCE_CREDIT_AND_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "commercial_customer_engine_admission": false,
+    "government_endorsement_claimed": false
+  },
+  "historical_cases": [
+    {
+      "case_id": "TEXTRON_2000_PROGRESS_LIQUIDATION",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "PROGRESS_PAYMENT_LIQUIDATION_ERROR",
+      "invoice_month": "2000-08",
+      "refund_reported_month": "2000-09",
+      "contract_delivery_price_cents": 1095720500,
+      "liquidation_should_cents": 821790400,
+      "net_invoice_cents": 273930100,
+      "dfas_payment_cents": 1093415800,
+      "publisher_reported_refund_cents": 819485600,
+      "computed_overpayment_cents": 819485700,
+      "publisher_amount_disagreement_cents": 100,
+      "label": "GAO_REPORTS_REFUND_BUT_PUBLISHED_DOLLAR_ARITHMETIC_DIFFERS_BY_ONE_DOLLAR",
+      "independent_bank_receipt_acquired": false
+    },
+    {
+      "case_id": "BOEING_2001_TWO_INVOICE_LIQUIDATION",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "INCORRECT_PROGRESS_LIQUIDATION_RATE_TWO_INVOICES",
+      "invoice_count_reported": 2,
+      "refund_reported_month": "2001-07",
+      "two_invoice_overcharge_cents": [
+        207792200,
+        345000000
+      ],
+      "computed_component_sum_cents": 552792200,
+      "publisher_reported_refund_cents": 552792200,
+      "publisher_component_arithmetic_agrees": true,
+      "original_invoice_identifiers": "UNKNOWN",
+      "original_invoice_documents_acquired": false,
+      "label": "GAO_REPORTS_TWO_INVOICE_LIQUIDATION_REFUND_NO_ORIGINAL_INVOICE_CUSTODY",
+      "independent_bank_receipt_acquired": false
+    },
+    {
+      "case_id": "EAGLE_2001_CROSS_FORMAT_DUPLICATE",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "DUPLICATE_PAYMENT_DIFFERENT_SHIPMENT_IDS",
+      "hardcopy_invoice_submitted": "2001-06-11",
+      "electronic_invoice_submitted": "2001-06-28",
+      "electronic_invoice_paid": "2001-07-10",
+      "hardcopy_invoice_paid": "2001-07-18",
+      "refund_reported_month": "2001-08",
+      "publisher_reported_refund_cents": 95833900,
+      "source_says_same_invoice": true,
+      "source_says_shipment_numbers_different": true,
+      "label": "GAO_REPORTS_DUPLICATE_PAYMENT_AND_REFUND",
+      "independent_bank_receipt_acquired": false
+    },
+    {
+      "case_id": "LUCENT_2000_2001_DUPLICATE_PREVENTED",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "DUPLICATE_PAYMENT_PREVENTED_BEFORE_BANK_PROCESSING",
+      "first_payment_reported": true,
+      "attempted_duplicate_amount_cents": 139720000,
+      "duplicate_eft_canceled_before_bank": true,
+      "second_duplicate_bank_payment_confirmed": false,
+      "publisher_reported_refund_cents": null,
+      "label": "NO_SECOND_PAID_DUPLICATE_NO_RECOVERY_CASH_LABEL",
+      "independent_bank_receipt_acquired": false
+    },
+    {
+      "case_id": "LOCKHEED_1997_2001_ACCOUNTING_LINE_DEBT_CANCELED",
+      "kind": "PUBLISHER_REPORTED_HISTORICAL_CASE",
+      "error_type": "WRONG_ACCOUNTING_LINE_CONTRACT_MODIFICATION_DEBT_REVERSED",
+      "contract_modification_month": "1997-09",
+      "wrong_accounting_line_found_month": "1998-04",
+      "demand_issued_month": "2001-04",
+      "accounting_line_corrected_month": "2001-05",
+      "demand_face_amount_cents": 275524400,
+      "wrong_accounting_line_reported": true,
+      "corrective_modification_eliminated_debt": true,
+      "demand_canceled": true,
+      "publisher_reported_refund_cents": null,
+      "independently_verified_paid_debt_or_refund_cents": null,
+      "label": "GAO_REPORTS_DEMAND_CANCELED_AFTER_ACCOUNTING_LINE_CORRECTION_NOT_RECOVERY_CASH",
+      "independent_bank_receipt_acquired": false
+    }
+  ],
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_TEXTRON_REPORT_REFUND_EQUALS_ARITHMETIC",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PRESERVE_8194856_REPORTED_VS_8194857_COMPUTED_DOLLAR_CONFLICT"
+    },
+    {
+      "id": "SYNTH_EAGLE_DIFFERENT_SHIPMENT_NUMBERS_PROVE_DISTINCT_INVOICES",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_REPORTS_SAME_INVOICE_CROSS_FORMAT_DUPLICATE"
+    },
+    {
+      "id": "SYNTH_LUCENT_DEMAND_LETTER_EQUALS_SECOND_SETTLED_PAYMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_DUPLICATE_EFT_STOPPED_BEFORE_BANK_PROCESSING"
+    },
+    {
+      "id": "SYNTH_GAO_REPORTED_REFUND_IS_RETALLY_CLEARED_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_RETALLY_BANK_CUSTODY_OR_CUSTOMER_TRANSACTION"
+    },
+    {
+      "id": "SYNTH_HISTORICAL_DFAS_AP_CASE_IS_MODERN_FREIGHT_ERROR_TRUTH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ACCOUNTING_RECONCILIATION_ONLY_NO_FREIGHT_ERROR_LABELS"
+    },
+    {
+      "id": "SYNTH_BOEING_TWO_INVOICES_TREATED_AS_ONE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_REPORTS_TWO_DISTINCT_INVOICE_OVERCHARGE_COMPONENTS"
+    },
+    {
+      "id": "SYNTH_LOCKHEED_CANCELED_DEMAND_IS_RECOVERED_OVERPAYMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_REPORTS_ACCOUNTING_LINE_CORRECTION_ELIMINATED_DEBT_NOT_SETTLED_CASH"
+    }
+  ],
+  "truth_boundaries": {
+    "publisher_reported_historical_cases": 5,
+    "independent_heldout_original_customer_invoice_labels": 0,
+    "independent_modern_general_accounting_accuracy_labels": 0,
+    "freight_error_accuracy_labels": 0,
+    "independent_original_bank_settlement_receipts": 0,
+    "verified_retally_recovered_cash_cents": 0,
+    "modern_engine_accuracy": "UNKNOWN",
+    "admission_to_commercial_customer_scoring": false,
+    "do_not_treat_publisher_reported_refund_as_user_cash": true,
+    "holdout_leakage_warning": "FIVE_CASES_FROM_ONE_PUBLISHER_REPORT_ONE_COHORT_NOT_FIVE_INDEPENDENT_WITNESSES"
+  },
+  "quality": {
+    "original_publisher_text_visually_confirmed_in_web_reader": true,
+    "source_body_hash_verified": false,
+    "publisher_report_explicitly_disclaims_full_underlying_DFAS_data_reliability_assessment": true,
+    "source_does_not_provide_original_invoice_or_bank_receipt_images": true,
+    "original_publisher_arithmetic_disagreement_preserved": true,
+    "case_label_completeness": "FIVE_HISTORICAL_REPORT_LEVEL_OUTCOMES_NO_INDEPENDENT_CUSTOMER_LEDGER_OR_HOLDOUT_LABELS",
+    "private_customer_medical_student_records_included": false
+  },
+  "handoff": {
+    "engineering_12": "RECOVERYOS_ONLY_GAO_REPORTED_TWO_INVOICE_ALLOCATION_DUPLICATE_VS_PREVENTED_AND_DOLLAR_CONFLICT_NO_ENGINE_CHANGE",
+    "permitplate_48": "NOT_APPLICABLE",
+    "capturebrief_52": "NOT_APPLICABLE",
+    "qa_44": "INDEPENDENTLY_VERIFY_ORIGINAL_GAO_REPORT_FIGURES_RIGHTS_ORIGINAL_BYTE_HASH_AND_POSITIVE_NEGATIVE_OUTCOME_SEPARATION",
+    "status": "DRAFT_FIXTURE_ONLY_NOT_DEPLOYED"
+  }
+}

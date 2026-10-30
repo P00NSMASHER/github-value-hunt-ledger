@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "CAPTUREBRIEF_SAM_BARDA_2026_AMENDMENT_CHRONOLOGY_CANDIDATE_V0",
+  "engine": "capturebrief",
+  "evaluation_family": "GOVERNMENT_SOLICITATION_CHRONOLOGY_SOURCE_CANDIDATE_ONLY",
+  "admission_state": "INDEXED_OFFICIAL_PUBLISHER_NOTICE_ONLY_NOT_EVALUATION_ADMITTED",
+  "cohort": "SAM_GOV_FY2027_PUBLIC_CONTRACT_OPPORTUNITIES_AMENDMENTS_2026_10",
+  "source": {
+    "official_notice_url": "https://sam.gov/opp/e4a54b2056164c7da290f5a04e60e047/view",
+    "official_publisher": "U.S. General Services Administration, SAM.gov",
+    "notice_id": "BARDA-27-100227",
+    "publisher_notice_uuid": "e4a54b2056164c7da290f5a04e60e047",
+    "publisher_notice_type": "SOLICITATION_UPDATED",
+    "source_original_html_bytes_acquired": false,
+    "source_original_html_sha256": null,
+    "official_notice_attachments_acquired": false,
+    "official_terms_url": "https://sam.gov/about/terms-of-use",
+    "first_party_public_notice_discovery_date": "2026-10-25",
+    "commercial_engine_reuse_approved": false,
+    "automated_scraping_permitted": false,
+    "rights_state": "PUBLIC_NOTICE_METADATA_POINTER_ONLY_SITE_TERMS_AND_DATASET_RIGHTS_NOT_ATTESTED",
+    "source_content_labeling_completeness": "BASIC_NOTICE_VERSION_AND_DUE_DATE_METADATA_ONLY"
+  },
+  "published_notice_facts": {
+    "agency": "HHS_ASPR",
+    "original_published_date": "2026-10-02",
+    "latest_visible_amendment_published_date": "2026-10-14",
+    "latest_visible_amendment_number": "0002",
+    "original_offers_due_local": "2026-10-09T13:00:00-04:00",
+    "amended_offers_due_local": "2026-10-21T13:00:00-04:00",
+    "amendment_0001_due_date_extension_date": "2026-10-08",
+    "latest_published_ui_status": "ACTIVE",
+    "latest_published_inactive_date": "2026-11-05",
+    "official_notice_date_offer_due_is_not_inactive_date": true,
+    "latest_visible_page_indicates_revised_rfq_pws_and_answers": true
+  },
+  "asof_constraints": {
+    "date": "2026-10-25",
+    "published_amended_due_date_precedes_asof": true,
+    "page_ui_active_status_does_not_prove_bid_window_open": true,
+    "latest_version_revalidation_required": true,
+    "independent_post_deadline_bid_acceptance": "UNKNOWN",
+    "independent_award_outcome": "UNKNOWN",
+    "independently_held_out_labeled_cases": 0,
+    "opportunity_to_award_identity_verified": false,
+    "original_publisher_pdf_attachment_bytes_sha256": null,
+    "source_status_asof": "PUBLISHED_DEADLINE_ELAPSED_AS_OF_DATE_NOT_CONFIRMED_AWARD"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_ORIGINAL_DUE_AS_LATEST",
+      "kind": "SYNTHETIC",
+      "false_claim": "OCT_09_IS_STILL_THE_LAST_VISIBLE_QUOTE_DEADLINE",
+      "expected": "REJECT_SUPERSEDED_BY_OCT_21_AMENDED_DEADLINE"
+    },
+    {
+      "id": "SYNTHETIC_UI_ACTIVE_MEANS_BIDS_STILL_OPEN",
+      "kind": "SYNTHETIC",
+      "false_claim": "ACTIVE_UI_ON_OCT_25_PROVES_QUOTES_ACCEPTED",
+      "expected": "REJECT_DUE_DATE_PASSED_UI_STATUS_NOT_OFFER_ELIGIBILITY"
+    },
+    {
+      "id": "SYNTHETIC_AMENDMENT_PROVES_AWARD",
+      "kind": "SYNTHETIC",
+      "false_claim": "AMENDMENT_0002_PROVES_SUCCESSFUL_AWARD",
+      "expected": "UNKNOWN_NO_INDEPENDENT_AWARD_ADJUDICATION"
+    },
+    {
+      "id": "SYNTHETIC_NOTICE_MEANS_ORIGINAL_PDFS_HELD",
+      "kind": "SYNTHETIC",
+      "false_claim": "PUBLISHED_ATTACHMENT_NAMES_PROVE_ORIGINAL_PDFS_ACQUIRED",
+      "expected": "REJECT_ORIGINAL_ATTACHMENT_BYTES_NOT_ACQUIRED"
+    },
+    {
+      "id": "SYNTHETIC_NOTICE_METADATA_COMMERCIAL_RIGHTS",
+      "kind": "SYNTHETIC",
+      "false_claim": "PUBLIC_NOTICE_URL_PROVES_UNRESTRICTED_CUSTOMER_ENGINE_COPY",
+      "expected": "UNKNOWN_FOLLOW_GSA_ACCESS_TERMS_NO_SCRAPING_OR_BULK_REUSE_ASSUMPTION"
+    }
+  ],
+  "quality": {
+    "original_publisher_page_located": true,
+    "original_publisher_byte_hash_verified": false,
+    "all_amendment_version_bytes_acquired": false,
+    "offer_deadline_calendar_comparison_valid": true,
+    "later_actions_beyond_latest_visible_page": "UNKNOWN",
+    "private_customer_medical_student_material_used": false,
+    "scored_capturebrief_customer_precision_recall": false,
+    "production_input_approved": false
+  }
+}

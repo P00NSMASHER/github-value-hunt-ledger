@@ -1,0 +1,106 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "FMC_TCW_EVERGREEN_1966I_APPELLATE_DOCKET_IDENTITY_COLLISION_HELD_V0",
+  "evaluation_family": "FREIGHT_HISTORICAL_ADJUDICATED_DETENTION_AND_SOURCE_IDENTITY_NOT_CUSTOMER_ERROR_SCORING",
+  "cohort": "US_OCEAN_CONTAINER_DETENTION_MAY_2020_APPELLATE_DECISION_2026",
+  "source": {
+    "court_decision_url": "https://media.cadc.uscourts.gov/opinions/docs/2026/04/25-1104-2170734.pdf",
+    "court_decision_date": "2026-04-28",
+    "court_docket": "25-1104",
+    "court_decision_pdf_pages_checked": [
+      3,
+      5
+    ],
+    "fmc_official_proceeding_index_url": "https://www2.fmc.gov/readingroom/proceeding/1966%28I%29/",
+    "fmc_correct_proceeding_docket": "1966(I)",
+    "fmc_2023_press_url": "https://www.fmc.gov/articles/fmc-checking-ocean-carrier-mto-compliance-with-recent-ruling-on-per-diem-charges/",
+    "fmc_2023_press_date": "2023-03-23",
+    "fmc_2023_press_body_docket": "1996(I)",
+    "fmc_2023_press_link_target_docket": "1966(I)",
+    "fmc_2026_press_url": "https://www.fmc.gov/articles/u-s-court-of-appeals-upholds-fmc-decision-that-detention-fees-must-promote-freight-fluidity/",
+    "fmc_2026_press_date": "2026-07-08",
+    "fmc_2026_press_docket": "1966(I)",
+    "docket_resolution": "1966(I)_PER_FIRST_PARTY_INDEX_AND_2023_LINK_TARGET_NOT_PRESS_BODY_1996(I)",
+    "proceeding_index_http_access": "INDEXED_PUBLIC_TEXT_DIRECT_OPEN_403",
+    "court_pdf_visually_checked_via_public_view": true,
+    "original_court_pdf_http_bytes_in_custody": false,
+    "original_court_pdf_http_sha256": null,
+    "original_fmc_proceeding_pdf_http_bytes_in_custody": false,
+    "original_fmc_proceeding_pdf_http_sha256": null,
+    "raw_publisher_response_integrity_verified": false,
+    "rights_scope": "PUBLIC_US_GOVERNMENT_OPINION_REFERENCE_THIRD_PARTY_MATERIAL_REVIEW_SEPARATE",
+    "commercial_invoice_scoring_rights_verified": false
+  },
+  "published_case_facts": {
+    "port_closed_dates": [
+      "2020-05-23",
+      "2020-05-24",
+      "2020-05-25"
+    ],
+    "port_closed_days": 3,
+    "container_daily_rate_cents": 15000,
+    "chassis_daily_rate_cents": 2000,
+    "court_reported_total_detention_invoice_cents": 149000,
+    "court_reported_disputed_detention_cents": 51000,
+    "court_reports_invoice_paid_before_complaint": true,
+    "original_invoice_or_bank_payment_bytes_held": false,
+    "fmc_order_on_remand_date": "2025-02-13",
+    "appeals_court_denied_petition_on": "2026-04-28",
+    "historical_disputed_charge_held_unreasonable": true,
+    "all_original_invoice_charges_held_invalid": false,
+    "final_customer_refund_bank_verified": false,
+    "actual_customer_refund_amount_cents": null,
+    "automatic_modern_claim_eligibility": "UNKNOWN"
+  },
+  "truth_and_quality": {
+    "published_adjudicated_historical_case_count": 1,
+    "independent_heldout_invoice_labels": 0,
+    "complete_raw_invoice_and_payment_records": 0,
+    "source_specific_current_rate_table_verified": false,
+    "sample_is_independent_from_existing_real_world_eval_v1": false,
+    "existing_casebook_reference": "EVERGREEN_TCW_2026_COURT",
+    "additional_unique_invoice_case_created": false,
+    "verified_retally_customer_cash_recovery_cents": 0,
+    "government_decision_is_customer_recovery_receipt": false,
+    "commercial_admission": "HOLD"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_1996_AS_ACTUAL_TCW_PROCEEDING",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_USE_OFFICIAL_1966I_INDEX_NOT_2023_PRESS_TYPO"
+    },
+    {
+      "id": "SYNTHETIC_INVOICE_1490_ALL_INVALID",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ONLY_510_DOLLARS_AT_ISSUE"
+    },
+    {
+      "id": "SYNTHETIC_REPORTED_PAID_MEANS_INDEPENDENT_BANK_CUSTODY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_ORIGINAL_PAYMENT_RECORD"
+    },
+    {
+      "id": "SYNTHETIC_ADJUDICATION_MEANS_RETALLY_RECOVERED_510",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_RETALLY_CUSTOMER_REFUND"
+    },
+    {
+      "id": "SYNTHETIC_REPEAT_EXISTING_COURT_CASE_AS_NEW_INVOICE_HOLDOUT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_DUPLICATE_EVALUATION_REFERENCE"
+    }
+  ],
+  "handoff": {
+    "unified_lab_only": true,
+    "freightrecovery_recoveryos_engineering": ":12",
+    "independent_qa": ":44",
+    "permitplate": ":48",
+    "capturebrief": ":52",
+    "engine_code_changed": false,
+    "provider_rules_changed": false,
+    "operational_writer_changed": false,
+    "hosted_ci_verified": false,
+    "release_approved": false
+  }
+}

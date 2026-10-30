@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "group": 1,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "feat/freight-customer-lifecycle-lab-20261007",
+      "head_sha": "4ccc7526ccbf2c2988eea66ce21103299c47f03b",
+      "ahead": 10,
+      "behind": 1191,
+      "file_count": 8,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "feat/freight-lab03-first-customer-pilot-20261007",
+      "head_sha": "75f145b635b47ea959c038483209818f354f68e2",
+      "ahead": 4,
+      "behind": 1185,
+      "file_count": 4,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "feat/freight-labs-04-10-integrated-20261007",
+      "head_sha": "b0e805401527deca9fb279bcd74b7ed416153d21",
+      "ahead": 3,
+      "behind": 1184,
+      "file_count": 2,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "feat/freight-labs-11-14-20261007",
+      "head_sha": "5fad0a87e9cb54f8c4ba2222f59f0e60a9ecd571",
+      "ahead": 6,
+      "behind": 1184,
+      "file_count": 5,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

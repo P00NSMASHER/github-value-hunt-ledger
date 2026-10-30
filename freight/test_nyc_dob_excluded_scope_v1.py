@@ -104,6 +104,74 @@ class TestNYCDOBExcludedScope(unittest.TestCase):
                          'DISTINCT_FILINGS_WITH_UNKNOWN_PERMIT_ISSUANCE')
         self.assertEqual(ctrl['provenance'], 'SYNTHETIC_JOIN_NEGATIVE_CONTROL')
 
+
+    def _assert_electrical_application_catalog_contract(self, d):
+        x = d["electrical_application_catalog_metadata_2026_10_28"]
+        self.assertEqual(x["official_dataset_id"], "dm9a-ab7w")
+        self.assertEqual(x["official_metadata_url"],
+                         "https://data.cityofnewyork.us/api/views/dm9a-ab7w")
+        self.assertEqual(x["publisher_rows_updated_at_utc"],
+                         "2026-10-27T21:44:12Z")
+        self.assertEqual(x["row_identifier_column_id"], 634408547)
+        self.assertEqual(x["row_identifier_field"], "job_filing_number")
+        self.assertEqual(x["source_reported_cached_filing_rows"], 596085)
+        self.assertEqual(x["source_reported_cached_new_job_filings"], 485091)
+        self.assertEqual(x["source_reported_cached_post_approval_amendments"], 96184)
+        self.assertEqual(x["source_reported_cached_subsequent_filings"], 14810)
+        self.assertEqual(x["source_reported_cached_status_permit_issued"], 151201)
+        self.assertEqual(
+            x["source_reported_cached_new_job_filings"]
+            + x["source_reported_cached_post_approval_amendments"]
+            + x["source_reported_cached_subsequent_filings"],
+            x["source_reported_cached_filing_rows"])
+        self.assertTrue(x["cached_filing_type_count_sum_matches_cached_rows"])
+        self.assertTrue(x["source_description_allows_one_base_job_many_filings"])
+        self.assertTrue(x["publisher_catalog_cached_stats_not_live_row_query"])
+        self.assertFalse(x["raw_original_http_bytes_in_custody"])
+        self.assertIsNone(x["original_http_response_sha256"])
+        self.assertFalse(x["source_row_join_independently_validated"])
+        self.assertTrue(x["citywide_general_open_data_reuse_allowed"])
+        self.assertFalse(
+            x["source_specific_terms_privacy_and_commercial_scoring_review_complete"])
+        self.assertFalse(x["commercial_customer_scoring_approved"])
+        self.assertEqual(x["independently_heldout_current_permit_labels"], 0)
+        self.assertEqual(x["independently_heldout_issuance_labels"], 0)
+        self.assertIsNone(x["confirmed_distinct_real_permit_count"])
+        self.assertEqual(x["verified_retally_customer_recovery_cents"], 0)
+        controls = x["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 4)
+        self.assertEqual(len({c["id"] for c in controls}), 4)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" for c in controls))
+
+    def test_electrical_application_cached_metadata_truth(self):
+        """First-party cached filing cohorts cannot become independent permits."""
+        self._assert_electrical_application_catalog_contract(self.doc)
+
+    def test_forged_electrical_catalog_claims_rejected(self):
+        changes = (
+            ("source_reported_cached_filing_rows", 596084),
+            ("source_reported_cached_post_approval_amendments", 96185),
+            ("source_reported_cached_status_permit_issued", 151202),
+            ("raw_original_http_bytes_in_custody", True),
+            ("original_http_response_sha256", "f" * 64),
+            ("source_row_join_independently_validated", True),
+            ("commercial_customer_scoring_approved", True),
+            ("independently_heldout_issuance_labels", 1),
+            ("confirmed_distinct_real_permit_count", 596085),
+            ("verified_retally_customer_recovery_cents", 1),
+            ("publisher_rows_updated_at_utc", "2026-10-28T21:44:12Z"),
+        )
+        for field, forged in changes:
+            with self.subTest(field=field):
+                bad = json.loads(json.dumps(self.doc))
+                bad["electrical_application_catalog_metadata_2026_10_28"][field] = forged
+                with self.assertRaises(AssertionError):
+                    self._assert_electrical_application_catalog_contract(bad)
+        bad = json.loads(json.dumps(self.doc))
+        bad["electrical_application_catalog_metadata_2026_10_28"]["synthetic_negative_controls"][0]["kind"] = "ORIGINAL"
+        with self.assertRaises(AssertionError):
+            self._assert_electrical_application_catalog_contract(bad)
+
     def test_no_cross_dataset_join_or_accuracy_claim(self):
         self.assertEqual(self.doc['cross_dataset_join'], 'UNVERIFIED')
         self.assertEqual(self.doc['freight_error_accuracy'], 'NOT_APPLICABLE')

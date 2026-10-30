@@ -1,0 +1,109 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "CBCA_3467_RATE_DETENTION_FALSE_OVERCHARGE_CANDIDATE_V0",
+  "engine": "freightrecovery",
+  "evaluation_families": [
+    "HISTORICAL_ADJUDICATED_FREIGHT_ERROR_NEGATIVE_CONTROL",
+    "GENERAL_ACCOUNTING_CONFLICTING_SOURCE_AMOUNTS"
+  ],
+  "cohort": "US_CBCA_GSA_GOVERNMENT_FREIGHT_DETENTION_2010_2011_2014_DECISION",
+  "source": {
+    "publisher": "U.S. Civilian Board of Contract Appeals",
+    "official_decision_url": "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",
+    "official_index_url": "https://www.cbca.gov/decisions/rate.html",
+    "case_id": "CBCA 3467-RATE",
+    "decision_date": "2014-05-14",
+    "reviewed_utc_date": "2026-10-26",
+    "decision_pdf_zero_based_pages_consulted": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "original_publisher_pdf_bytes_acquired": false,
+    "original_publisher_pdf_sha256": null,
+    "original_carrier_invoice_bol_or_tariff_bytes_acquired": false,
+    "governing_tender": "GSA STOS 100-D Item 325",
+    "governing_tender_effective_date": "UNKNOWN",
+    "rights_state": "OFFICIAL_FEDERAL_DECISION_PUBLICLY_READABLE_REPRODUCTION_AND_THIRD_PARTY_RIGHTS_NOT_SEPARATELY_CLEARED",
+    "commercial_customer_engine_source_use_approved": false,
+    "government_endorsement_asserted": false
+  },
+  "historical_adjudication": {
+    "reported_shipments_2010": 4,
+    "reported_shipments_2011": 75,
+    "reported_paid_detention_shipment_total": 79,
+    "gsa_initially_treated_as_authorized_count": 9,
+    "gsa_postpayment_overcharge_notices_disputed_count": 70,
+    "initial_payment_by_gsa_reported": true,
+    "carrier_claim_held_valid_by_board": true,
+    "gsa_overcharge_notices_held_invalid": true,
+    "gsa_claimed_repayment_body_cents": 33989573,
+    "gsa_claimed_repayment_disposition_cents": 33989575,
+    "conflicting_quoted_cents_difference": 2,
+    "board_basis": "GSA_TRANSPORTATION_DIVISION_AUTHORIZED_DETENTION_INVOICING_AND_PAID_WITH_SUPPLIED_SUPPORT;_LATER_AUDIT_NOTICES_INVALID",
+    "post_disposition_carrier_refund_received_cents": null,
+    "gsa_recoupment_from_carrier_actually_collected_cents": null,
+    "actual_recoveryos_cleared_bank_receipt_cents": null,
+    "retally_verified_recovered_cash_cents": 0
+  },
+  "truth_boundaries": {
+    "adjudicated_case_level_label": "NEGATIVE_GSA_ASSERTED_OVERCHARGE_FOR_DISPUTED_2010_2011_DETENTION_NOTICES",
+    "adjudicated_decision_case_count": 1,
+    "original_underlying_invoices_independently_possessed": 0,
+    "independent_heldout_customer_invoice_error_labels": 0,
+    "modern_customer_overcharge_ground_truth_cents": null,
+    "modern_customer_contract_authority": "UNKNOWN",
+    "source_document_original_bytes_sha256": null,
+    "final_customer_or_carrier_bank_outcome": "UNKNOWN",
+    "commercial_scoring_admission": false,
+    "print_dollar_conflict_should_not_be_silently_resolved": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_GSA_NOTICE_ALWAYS_PROVES_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_BOARD_HELD_DISPUTED_GSA_OVERCHARGE_NOTICES_INVALID"
+    },
+    {
+      "id": "SYNTH_2014_DISPUTE_IS_70_INDEPENDENT_CUSTOMER_TRUTH_CASES",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ONE_PUBLISHED_CASE_NOT_70_HELDOUT_INVOICE_LABELS"
+    },
+    {
+      "id": "SYNTH_TWOCENT_CONFLICT_SILENTLY_NORMALIZED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PRESERVE_33989573_AND_33989575_AND_FLAG_CONFLICT"
+    },
+    {
+      "id": "SYNTH_INVALIDATED_GSA_NOTICE_IS_RETALLY_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_CURRENT_RETALLY_BANK_SETTLEMENT_EVIDENCE"
+    },
+    {
+      "id": "SYNTH_HISTORICAL_GSA_ITEM325_AUTHORIZES_MODERN_CHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HISTORICAL_GSA_SPECIFIC_AUTHORIZATION_NOT_CURRENT_CONTRACT"
+    }
+  ],
+  "quality": {
+    "official_publisher_pdf_pages_visually_verified": true,
+    "decision_body_vs_disposition_amounts_conflict": true,
+    "source_pdf_complete_response_bytes_hash_available": false,
+    "underlying_79_bills_lading_or_invoices_available": false,
+    "adjudicated_board_result_available": true,
+    "independent_real_customer_scoring_case_count": 0,
+    "source_ledger_pointer_already_present_in_sole_operational_writer": true,
+    "source_ledger_first_seen_utc_date": "2026-10-26",
+    "private_customer_medical_or_student_records_included": false
+  },
+  "handoff": {
+    "retally_recoveryos_engineering": ":12 extraction/accounting semantics only; no engine code changed",
+    "permitplate": ":48 not applicable",
+    "capturebrief": ":52 not applicable",
+    "independent_qa": ":44 verify original PDF p4-p6 and 2-cent ambiguity before promotion",
+    "release": "DRAFT_FIXTURE_ONLY_NO_PRODUCTION_OR_CUSTOMER_TRUTH"
+  }
+}

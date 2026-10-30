@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B145308_DEDUCTION_VS_REQUESTED_REFUND_V1",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "cohort": "US_GAO_GOVERNMENT_MOTOR_FREIGHT_1957_SHIPMENT_1961_DECISION",
+  "source": {
+    "official_url": "https://www.gao.gov/products/b-145308",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-145308",
+    "decision_date": "1961-08-14",
+    "reviewed_date": "2026-10-25",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_US_GOVERNMENT_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "customer_engine_commercial_reuse_approved": false,
+    "source_kind": "OFFICIAL_GAO_DECISION_HTML",
+    "original_publisher_bytes_acquired": false,
+    "original_publisher_bytes_sha256": null,
+    "source_passage_locators": [
+      "Full decision: paragraphs mentioning $1,308.83, $282.83, $529.50 and $496.50",
+      "Full decision: paragraph on 5 GAO 3065.10 effective October 12, 1959 and April 18, 1957 GBL"
+    ]
+  },
+  "historical_facts": {
+    "shipment_date": "1957-04-18",
+    "decision_date": "1961-08-14",
+    "gbl_number_reported_by_gao": "AF-7288198",
+    "carrier_name_reported_by_gao": "GILLETTE_MOTOR_TRANSPORT_INC",
+    "original_payment_cents": 130883,
+    "actual_gao_reported_deduction_cents": 28283,
+    "net_payment_after_reported_deduction_cents": 102600,
+    "gao_computed_applicable_charge_cents": 52950,
+    "additional_refund_requested_cents": 49650,
+    "additional_refund_collected_cents": null,
+    "separate_carrier_additional_charge_claim_cents": 28263,
+    "carrier_additional_charge_claim_disallowed": true,
+    "source_regulation": "5_GAO_3065_10",
+    "regulation_effective_date": "1959-10-12",
+    "regulation_applicable_to_1957_shipment": false,
+    "exclusive_use_requested": true,
+    "exclusive_use_furnished_proven": false,
+    "receiving_signature_proved_goods_received_not_exclusive_use": true,
+    "possible_later_carrier_reconsideration_on_new_evidence": true,
+    "outcome_after_decision": "UNKNOWN"
+  },
+  "truth_boundaries": {
+    "actual_historical_deduction_is_published_gao_report": true,
+    "additional_refund_is_request_not_verified_collection": true,
+    "original_paid_invoice_or_gbl_bytes_held": false,
+    "original_governing_tariff_and_carrier_logs_held": false,
+    "independently_held_out_training_separation_verified": false,
+    "modern_contract_applicability": "UNKNOWN",
+    "independent_private_customer_invoice_error_cents": null,
+    "customer_accuracy_scoring_permitted": false,
+    "retally_verified_cash_recovery_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_REFUND_REQUEST_AS_COLLECTED",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "49650_REQUESTED_MEANS_PAID",
+      "expected": "REJECT_UNOBSERVED_COLLECTION"
+    },
+    {
+      "id": "SYNTHETIC_CLAIM_AND_DEDUCTION_CONFLATED",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "28263_ADDITIONAL_CLAIM_EQUALS_28283_DEDUCTION",
+      "expected": "REJECT_DISTINCT_AMOUNTS_AND_OUTCOMES"
+    },
+    {
+      "id": "SYNTHETIC_POST_SHIPMENT_POLICY",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "1959_REGULATION_CONTROLS_1957_SHIPMENT",
+      "expected": "REJECT_LATER_EFFECTIVE_DATE"
+    },
+    {
+      "id": "SYNTHETIC_RECEIPT_PROVES_EXCLUSIVE_USE",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "GOODS_RECEIVED_PROVES_NO_OTHER_FREIGHT_LOADED",
+      "expected": "REJECT_MISSING_EXCLUSIVE_USE_PROOF"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_GAO_CASH_AS_RETALLY",
+      "kind": "SYNTHETIC",
+      "proposed_inference": "US_GOVERNMENT_HISTORICAL_DEDUCTION_IS_CUSTOMER_RETALLY_RECOVERY",
+      "expected": "REJECT_NO_MODERN_CUSTOMER_SETTLEMENT_EVIDENCE"
+    }
+  ],
+  "quality": {
+    "published_decision_arithmetic_reconciles": true,
+    "official_full_decision_read": true,
+    "original_publisher_byte_hash_available": false,
+    "independently_held_out_customer_ground_truth_complete": false,
+    "historical_adjudication_has_later_evidence_reopening_caveat": true,
+    "private_medical_student_customer_records_used": false
+  }
+}

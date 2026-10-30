@@ -1,0 +1,125 @@
+{
+  "schema_version": "0.1.2",
+  "fixture_id": "FMC_MSC_23_08_NOR_OVERBILLING_GOVERNMENT_PENALTY_BOUNDARY_2026_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "FREIGHT_ADJUDICATED_CASE_LEVEL_BILLING_COHORT_NEGATIVE_CONTROLS_NOT_INVOICE_ACCURACY",
+  "cohort": "MSC_NON_OPERATING_REEFER_DEMURRAGE_DETENTION_2021_ONLY",
+  "source": {
+    "official_fmc_release_url": "https://www.fmc.gov/articles/msc-assessed-civil-penalties-totaling-22-67-million/",
+    "original_fmc_release_published": "2026-01-28",
+    "official_fmc_decision_registry_url": "https://www2.fmc.gov/readingroom/proceeding/23-08/",
+    "commission_docket": "23-08",
+    "final_order_index_description": "(32) 23-08 Order on Initial Decision (public).pdf",
+    "final_order_index_served": "2026-01-06",
+    "official_fmc_testimony_url": "https://www.fmc.gov/ftdo/testimony-of-chairman-dibella-before-congress-future-of-united-states-maritime-review-of-fiscal-year-2027-maritime-administration-and-federal-maritime-commission-budget-requests/",
+    "testimony_published": "2026-06-03",
+    "official_fmc_site_policies_url": "https://www.fmc.gov/site-policies/",
+    "source_rights_status": "NOT_INDEPENDENTLY_ATTESTED_COMMERCIAL_ENGINE_REUSE_HOLD",
+    "commercial_scoring_authorized": false,
+    "original_press_release_response_bytes_custodied": false,
+    "original_press_release_response_sha256": null,
+    "final_order_original_pdf_bytes_custodied": false,
+    "final_order_original_pdf_sha256": null,
+    "public_testimony_original_response_bytes_custodied": false,
+    "public_testimony_original_response_sha256": null,
+    "provenance": "FIRST_PARTY_FMC_RELEASE_TESTIMONY_AND_OFFICIAL_FINAL_ORDER_INDEX_LOCATOR_ONLY_NO_ORIGINAL_ORDER_PDF_BYTES_OR_PRIVATE_INVOICES",
+    "final_order_index_document_id": 131865,
+    "official_fmc_final_order_document_locator_url": "https://www2.fmc.gov/readingroom/documents/131865",
+    "official_fmc_final_order_indexed_pdf_url": "https://www2.fmc.gov/readingroom/docs/23-08/%2832%29%2023-08%20Order%20on%20Initial%20Decision%20%28public%29.pdf/",
+    "final_order_source_locator_crosschecked_on": "2026-10-27",
+    "final_order_link_is_raw_document_custody": false,
+    "final_order_pdf_content_independently_examined": false,
+    "fmc_summary_temporal_boundaries_reviewed_on": "2026-10-27",
+    "temporal_scope_evidence_kind": "FMC_FIRST_PARTY_2026_01_28_HTML_SUMMARY_ONLY_NOT_ORIGINAL_ORDER_BYTES"
+  },
+  "publisher_reported_case": {
+    "carrier": "Mediterranean Shipping Company S.A.",
+    "overcharge_cohort": "NON_OPERATING_REEFER_NOR_BILLS_DURING_CALENDAR_2021",
+    "approximate_nor_bill_overcharge_share_percent": 23,
+    "percentage_is_approximate": true,
+    "other_carriers_or_billing_years_extrapolation_permitted": false,
+    "commission_found_unreasonable_practice": true,
+    "civil_penalty_notify_party_cents": 6500000,
+    "civil_penalty_tariff_publication_cents": 946000000,
+    "civil_penalty_nor_overcharge_cents": 1314500000,
+    "civil_penalty_total_assessed_cents": 2267000000,
+    "penalty_per_nor_overcharge_violation_cents": 500000,
+    "original_individual_invoice_count_verified": null,
+    "original_customer_overcharge_dollars_verified": null,
+    "payment_status_from_january_28_release": "ASSESSED_NOT_INDEPENDENTLY_CONFIRMED_PAID",
+    "june_3_testimony_reports_penalty_paid_in_full_asof_may_2026": true,
+    "reported_penalty_payment_recipient": "UNITED_STATES_TREASURY",
+    "fmc_civil_penalty_is_customer_restitution": false,
+    "shipper_refunds_paid_total_cents": null,
+    "notify_party_merchant_clause_billing_years": "2018_TO_2020",
+    "nor_tariff_publication_violation_period": "2021_TO_EARLY_2023",
+    "nor_tariff_knowing_willful_start_month": "2022-03",
+    "nor_overcharge_unreasonable_practice_year": 2021,
+    "cross_violation_invoice_error_inference_permitted": false
+  },
+  "ground_truth_limits": {
+    "regulator_case_level_adjudication_reported": true,
+    "original_adjudication_order_pdf_replayed": false,
+    "source_is_independent_customer_invoice_set": false,
+    "independently_heldout_labeled_shipment_invoices": 0,
+    "independently_heldout_real_invoice_negative_controls": 0,
+    "verified_retally_customer_recovery_cents": 0,
+    "current_freight_error_precision_recall_scoring_permitted": false,
+    "exact_nor_invoice_population_size": "UNKNOWN",
+    "exact_customer_refund_total": "UNKNOWN",
+    "original_tariff_applicability_for_other_customers": "UNKNOWN",
+    "public_release_cannot_establish_individual_billing_error_ground_truth": true,
+    "exact_day_of_march_2022_tariff_statement": "UNKNOWN",
+    "exact_notify_party_billed_invoice_population": "UNKNOWN"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_MSC_NOR_23_PERCENT_TO_ALL_FREIGHT",
+      "kind": "SYNTHETIC",
+      "proposed": "TREAT_APPROX_23_PERCENT_OF_2021_MSC_NOR_BILLS_AS_ALL_FREIGHT_ERROR_RATE",
+      "expected": "REJECT_OUT_OF_COHORT_EXTRAPOLATION"
+    },
+    {
+      "id": "SYNTHETIC_MSC_PENALTY_AS_SHIPPER_REFUNDS",
+      "kind": "SYNTHETIC",
+      "proposed": "TREAT_22670000_DOLLAR_CIVIL_PENALTY_AS_VERIFIED_SHIPPER_RECOVERY",
+      "expected": "REJECT_TREASURY_PENALTY_NOT_CUSTOMER_RESTITUTION"
+    },
+    {
+      "id": "SYNTHETIC_MSC_ASSESSED_JANUARY_AS_PAID_JANUARY",
+      "kind": "SYNTHETIC",
+      "proposed": "JAN_2026_ASSESSED_AMOUNT_PROVES_PAID_IN_JAN_2026",
+      "expected": "REJECT_PAYMENT_DATE_NOT_ESTABLISHED_TESTIMONY_REPORTS_PAID_ASOF_MAY"
+    },
+    {
+      "id": "SYNTHETIC_MSC_VIOLATIONS_AS_UNIQUE_INVOICES",
+      "kind": "SYNTHETIC",
+      "proposed": "DERIVED_5000_DOLLAR_VIOLATION_COUNT_EQUALS_INDEPENDENT_PRIVATE_INVOICE_COUNT",
+      "expected": "REJECT_NO_UNIQUE_INVOICE_LEVEL_CUSTODY_OR_LABELS"
+    },
+    {
+      "id": "SYNTHETIC_MSC_FMC_RELEASE_AS_ORIGINAL_ORDER_CUSTODY",
+      "kind": "SYNTHETIC",
+      "proposed": "LINKED_FMC_READING_ROOM_INDEX_EQUALS_ACQUIRED_HASHED_FINAL_ORDER_PDF",
+      "expected": "REJECT_ORIGINAL_ORDER_BYTES_AND_SOURCE_SHA256_UNAVAILABLE"
+    },
+    {
+      "id": "SYNTHETIC_MSC_THREE_VIOLATION_COHORT_CONFLATION",
+      "kind": "SYNTHETIC",
+      "proposed": "MERGE_2018_2020_NOTIFY_PARTY_WITH_2021_NOR_OVERCHARGE_AND_BACKDATE_TARIFF_WILLFULNESS_TO_2021",
+      "expected": "REJECT_DISTINCT_COHORTS_AND_MARCH_2022_WILLFULNESS_BOUNDARY"
+    }
+  ],
+  "quality": {
+    "case_level_labeling_complete": false,
+    "invoice_level_labeling_complete": false,
+    "publisher_reported_case_specific_error_share": true,
+    "independent_original_order_and_invoice_custody": false,
+    "publisher_response_sha256_provenance_complete": false,
+    "synthetic_controls_tagged": true,
+    "private_medical_student_or_customer_records_used": false,
+    "case_level_ground_truth_limit": "REGULATOR_SUMMARY_ONLY_FINAL_ORDER_AND_INDIVIDUAL_INVOICES_NOT_REPLAYED",
+    "temporal_boundary_evidence_status": "FIRST_PARTY_FMC_PRESS_SUMMARY_REVIEWED_ORDER_PDF_BYTES_NOT_ACQUIRED"
+  },
+  "admission_state": "RESEARCH_ONLY_SOURCE_POINTERS_NOT_CURRENT_CUSTOMER_TRUTH_OR_COMMERCIAL_SCORING"
+}

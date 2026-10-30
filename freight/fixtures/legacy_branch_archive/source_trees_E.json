@@ -1,0 +1,489 @@
+{
+  "schema_version": 1,
+  "kind": "HISTORICAL_SOURCE_FILE_BLOB_REFERENCE_ONLY",
+  "batch": "E",
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "research/retally-lab15-candidate-ledger",
+      "folders": [
+        {
+          "dir": "research",
+          "tree_sha": "205a16d63f998167add6ad8e79f78128ae5506be",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research/lab15_candidate_ledger.json",
+              "sha1": "bb9daee070471cd02d685943859f2a5683cf7720",
+              "bytes": 5473
+            },
+            {
+              "p": "freight/research/lab15_public_seeds.json",
+              "sha1": "dc9386166dc076ddc8c06cae13c97783be2aff2f",
+              "bytes": 763
+            }
+          ]
+        },
+        {
+          "dir": "fixtures",
+          "tree_sha": "6db8e9e9e5619f8dcbde228748c628ab54592e28",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/fixtures/client_status_dashboard_synthetic.json",
+              "sha1": "364014045820128866eed25166671ad1264cd9b3",
+              "bytes": 915
+            },
+            {
+              "p": "freight/fixtures/free_growth_day0.json",
+              "sha1": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+              "bytes": 353
+            },
+            {
+              "p": "freight/fixtures/phase3_accuracy_gold_v1.json",
+              "sha1": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+              "bytes": 30178
+            },
+            {
+              "p": "freight/fixtures/pilot_amendment_prelaunch.json",
+              "sha1": "e11c52829da304d59718191008e09d923635b48d",
+              "bytes": 243
+            },
+            {
+              "p": "freight/fixtures/pilot_charter_prelaunch.json",
+              "sha1": "858b64c16af84726cfc04798f3972b9bd1a06616",
+              "bytes": 799
+            },
+            {
+              "p": "freight/fixtures/priority4_synthetic_stress_baseline_v1.json",
+              "sha1": "7f2f20a44003104e8f0f8b4edea45f9d86f5d182",
+              "bytes": 1144
+            },
+            {
+              "p": "freight/fixtures/readiness_ready.json",
+              "sha1": "ef1601c12c376a2eff8cc58610465348a79007f8",
+              "bytes": 453
+            },
+            {
+              "p": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+              "sha1": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+              "bytes": 4355
+            },
+            {
+              "p": "freight/fixtures/synthetic_blind_pilot.json",
+              "sha1": "12b751520ae492c55dcb341d13c3554e13e84942",
+              "bytes": 1063
+            }
+          ]
+        },
+        {
+          "dir": "lab15",
+          "tree_sha": "ab2349c9abcbcecc9baeb1c11f65c39330faed34",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/lab15/evidence_annotations.json",
+              "sha1": "abd909ffc435bdaf7fff3f0f64f942949674a9ca",
+              "bytes": 2092
+            },
+            {
+              "p": "freight/lab15/evidence_ledger.json",
+              "sha1": "2eb9f1cbe0173bbed0049b0a88b43cc209e48b86",
+              "bytes": 9678
+            },
+            {
+              "p": "freight/lab15/sources.json",
+              "sha1": "a905b85413f7d5b003681f45e6ed2e0b53b19ce0",
+              "bytes": 2290
+            }
+          ]
+        },
+        {
+          "dir": "research_lab",
+          "files": [],
+          "missing": true
+        }
+      ],
+      "original_bytes_not_copied": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-lab15-source-ledger",
+      "folders": [
+        {
+          "dir": "research",
+          "tree_sha": "9a339c90ffa0fce97a932cf43d3d654ecdc2272b",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research/lab15_candidate_ledger.json",
+              "sha1": "9ce3efb7001227b5036c638524756fc6ac52708d",
+              "bytes": 198
+            },
+            {
+              "p": "freight/research/lab15_public_seeds.json",
+              "sha1": "dc9386166dc076ddc8c06cae13c97783be2aff2f",
+              "bytes": 763
+            }
+          ]
+        },
+        {
+          "dir": "fixtures",
+          "tree_sha": "6db8e9e9e5619f8dcbde228748c628ab54592e28",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/fixtures/client_status_dashboard_synthetic.json",
+              "sha1": "364014045820128866eed25166671ad1264cd9b3",
+              "bytes": 915
+            },
+            {
+              "p": "freight/fixtures/free_growth_day0.json",
+              "sha1": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+              "bytes": 353
+            },
+            {
+              "p": "freight/fixtures/phase3_accuracy_gold_v1.json",
+              "sha1": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+              "bytes": 30178
+            },
+            {
+              "p": "freight/fixtures/pilot_amendment_prelaunch.json",
+              "sha1": "e11c52829da304d59718191008e09d923635b48d",
+              "bytes": 243
+            },
+            {
+              "p": "freight/fixtures/pilot_charter_prelaunch.json",
+              "sha1": "858b64c16af84726cfc04798f3972b9bd1a06616",
+              "bytes": 799
+            },
+            {
+              "p": "freight/fixtures/priority4_synthetic_stress_baseline_v1.json",
+              "sha1": "7f2f20a44003104e8f0f8b4edea45f9d86f5d182",
+              "bytes": 1144
+            },
+            {
+              "p": "freight/fixtures/readiness_ready.json",
+              "sha1": "ef1601c12c376a2eff8cc58610465348a79007f8",
+              "bytes": 453
+            },
+            {
+              "p": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+              "sha1": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+              "bytes": 4355
+            },
+            {
+              "p": "freight/fixtures/synthetic_blind_pilot.json",
+              "sha1": "12b751520ae492c55dcb341d13c3554e13e84942",
+              "bytes": 1063
+            }
+          ]
+        },
+        {
+          "dir": "lab15",
+          "tree_sha": "2642a2445583ccc47c58412a5835050076d01d8a",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/lab15/evidence_annotations.json",
+              "sha1": "abd909ffc435bdaf7fff3f0f64f942949674a9ca",
+              "bytes": 2092
+            },
+            {
+              "p": "freight/lab15/evidence_ledger.json",
+              "sha1": "1b2a6008602af31e52da0f6d1aa2159894f4a58e",
+              "bytes": 9686
+            },
+            {
+              "p": "freight/lab15/sources.json",
+              "sha1": "a905b85413f7d5b003681f45e6ed2e0b53b19ce0",
+              "bytes": 2290
+            },
+            {
+              "p": "freight/lab15/triage_queue.json",
+              "sha1": "844a0230e52f826902be528c9ff1015fa492090a",
+              "bytes": 13013
+            }
+          ]
+        },
+        {
+          "dir": "research_lab",
+          "files": [],
+          "missing": true
+        }
+      ],
+      "original_bytes_not_copied": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-unified-data-lab",
+      "folders": [
+        {
+          "dir": "research",
+          "tree_sha": "d410c335d3777a55c6f5f941807263d8ed99c97b",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research/lab15_candidate_ledger.json",
+              "sha1": "f60c627530f023e8c11f50d577e1c3f76ab640de",
+              "bytes": 5970
+            },
+            {
+              "p": "freight/research/lab15_public_seeds.json",
+              "sha1": "dc9386166dc076ddc8c06cae13c97783be2aff2f",
+              "bytes": 763
+            }
+          ]
+        },
+        {
+          "dir": "fixtures",
+          "tree_sha": "90aec530d0a4294bdcb24ce9998b51a373ea6da8",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/fixtures/cbca_rail_detention_timeline_v1.json",
+              "sha1": "0ebbadce4bd1aa8e767db5fa7bb970743032040d",
+              "bytes": 6650
+            },
+            {
+              "p": "freight/fixtures/cbca_rate_billing_controls_v1.json",
+              "sha1": "4bebff9f52aaef5217004390fb583f7a4136bae1",
+              "bytes": 3062
+            },
+            {
+              "p": "freight/fixtures/client_status_dashboard_synthetic.json",
+              "sha1": "364014045820128866eed25166671ad1264cd9b3",
+              "bytes": 915
+            },
+            {
+              "p": "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json",
+              "sha1": "29f113797de5e9edade77aefe07bf6b3d592c975",
+              "bytes": 10378
+            },
+            {
+              "p": "freight/fixtures/free_growth_day0.json",
+              "sha1": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+              "bytes": 353
+            },
+            {
+              "p": "freight/fixtures/gao_adjudicated_billing_cases_v1.json",
+              "sha1": "3e5addcab009e356fe7e1425b22473ec2019f742",
+              "bytes": 7769
+            },
+            {
+              "p": "freight/fixtures/gao_b139340_exclusive_use_v1.json",
+              "sha1": "46d8b5587e83b53b57bb9338210f245a4daad4de",
+              "bytes": 4467
+            },
+            {
+              "p": "freight/fixtures/gao_b165091_source_v1.json",
+              "sha1": "64a711739aad333859185132d9cfbfdc32d17c5d",
+              "bytes": 4098
+            },
+            {
+              "p": "freight/fixtures/gao_b189100_classification_v1.json",
+              "sha1": "dc0fbf18afb0a8259d703ce8f127334437018d54",
+              "bytes": 4275
+            },
+            {
+              "p": "freight/fixtures/gao_b215958_source_v1.json",
+              "sha1": "7b1dcebe1cbac76f8b80a0628f9fa9e8e8811b33",
+              "bytes": 3890
+            },
+            {
+              "p": "freight/fixtures/gao_b221594_source_v1.json",
+              "sha1": "273f43783c9819fe0e71bbc6ae092e827b563154",
+              "bytes": 5722
+            },
+            {
+              "p": "freight/fixtures/gao_b221663_agent_interline_v1.json",
+              "sha1": "a9e4e78810907d346f7a386eef0a32ad6660e53d",
+              "bytes": 4030
+            },
+            {
+              "p": "freight/fixtures/gao_motor_freight_numeric_v1.json",
+              "sha1": "d92a88e01f0a31457594da2d65b338a2b08b17ba",
+              "bytes": 6901
+            },
+            {
+              "p": "freight/fixtures/nyc_dob_community_view_v1.json",
+              "sha1": "580c2b8c344c010317e9a066bdb1fb6963df30d7",
+              "bytes": 3474
+            },
+            {
+              "p": "freight/fixtures/nyc_dob_excluded_scope_v1.json",
+              "sha1": "d74ba062dec8649966a0b133a1320f786099ebb6",
+              "bytes": 8595
+            },
+            {
+              "p": "freight/fixtures/nyc_dob_source_scope_v1.json",
+              "sha1": "51248dc8d33ef231483c8df39380fe0460cb01f9",
+              "bytes": 7169
+            },
+            {
+              "p": "freight/fixtures/permitplate_wrong_topic_source_quarantine_v1.json",
+              "sha1": "c82df0001552b5a4d03be71f4f34f7479b85ccb2",
+              "bytes": 18866
+            },
+            {
+              "p": "freight/fixtures/phase3_accuracy_gold_v1.json",
+              "sha1": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+              "bytes": 30178
+            },
+            {
+              "p": "freight/fixtures/pilot_amendment_prelaunch.json",
+              "sha1": "e11c52829da304d59718191008e09d923635b48d",
+              "bytes": 243
+            },
+            {
+              "p": "freight/fixtures/pilot_charter_prelaunch.json",
+              "sha1": "858b64c16af84726cfc04798f3972b9bd1a06616",
+              "bytes": 799
+            },
+            {
+              "p": "freight/fixtures/priority4_synthetic_stress_baseline_v1.json",
+              "sha1": "7f2f20a44003104e8f0f8b4edea45f9d86f5d182",
+              "bytes": 1144
+            },
+            {
+              "p": "freight/fixtures/public_freight_rate_cash_proof_v1.json",
+              "sha1": "dabf9edd1ba93d50093c89ca238e430933e2efe5",
+              "bytes": 3642
+            },
+            {
+              "p": "freight/fixtures/readiness_ready.json",
+              "sha1": "ef1601c12c376a2eff8cc58610465348a79007f8",
+              "bytes": 453
+            },
+            {
+              "p": "freight/fixtures/real_world_eval_v1.json",
+              "sha1": "4121ad8e8d9212334ca0d409312709731d423a02",
+              "bytes": 7369
+            },
+            {
+              "p": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+              "sha1": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+              "bytes": 4355
+            },
+            {
+              "p": "freight/fixtures/synthetic_blind_pilot.json",
+              "sha1": "12b751520ae492c55dcb341d13c3554e13e84942",
+              "bytes": 1063
+            }
+          ]
+        },
+        {
+          "dir": "lab15",
+          "tree_sha": "96d25626c3a826053202259b4b2933cc35f1da06",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/lab15/evidence_annotations.json",
+              "sha1": "abd909ffc435bdaf7fff3f0f64f942949674a9ca",
+              "bytes": 2092
+            },
+            {
+              "p": "freight/lab15/evidence_ledger.json",
+              "sha1": "2d0b18e36c5c3fc7e12f70e5392901bb6f1ce91c",
+              "bytes": 9678
+            },
+            {
+              "p": "freight/lab15/sources.json",
+              "sha1": "a905b85413f7d5b003681f45e6ed2e0b53b19ce0",
+              "bytes": 2290
+            },
+            {
+              "p": "freight/lab15/triage_queue.json",
+              "sha1": "e22f23a9c1ce74717fd7f53d494f072396733488",
+              "bytes": 13013
+            }
+          ]
+        },
+        {
+          "dir": "research_lab",
+          "tree_sha": "9eba6f5250f6afc4a93b93b9c1f99e405b9d9c50",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research_lab/capturebrief_sam_fy2027_asof_v1.json",
+              "sha1": "9838d340879483f88f1f5c293e3d42acdffeaaae",
+              "bytes": 2416
+            },
+            {
+              "p": "freight/research_lab/cbca_rail_detention_timeline_v1.json",
+              "sha1": "2c4e6b955ae3e3b0688bbfaa49b4d9885451667b",
+              "bytes": 1672
+            },
+            {
+              "p": "freight/research_lab/cbca_rate_billing_controls_v1.json",
+              "sha1": "edd10d36105b9e36351fa5262afa659baac3d224",
+              "bytes": 1979
+            },
+            {
+              "p": "freight/research_lab/evaluation_feed_v1.json",
+              "sha1": "ad7bbff5be283d28d26661224801ff6dcc2aeb58",
+              "bytes": 257427
+            },
+            {
+              "p": "freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json",
+              "sha1": "b8428c34535eabe5916de7e8f9b6fae214e83770",
+              "bytes": 5177
+            },
+            {
+              "p": "freight/research_lab/gao_adjudicated_billing_cases_v1.json",
+              "sha1": "2bde48594a9bf0015ee201a3c28d49064fb1559f",
+              "bytes": 3190
+            },
+            {
+              "p": "freight/research_lab/gao_authority_chronology_v1.json",
+              "sha1": "3205b8c09ffac6a5e896ab77a346295f7bf0de62",
+              "bytes": 2840
+            },
+            {
+              "p": "freight/research_lab/gao_motor_freight_numeric_v1.json",
+              "sha1": "3032cd25c6abb66fe12c54ccb6fa0305ade17fe9",
+              "bytes": 5704
+            },
+            {
+              "p": "freight/research_lab/leads.json",
+              "sha1": "be95cff7efaaa9dc58a3ee804bdf5288c7b6fa95",
+              "bytes": 486170
+            },
+            {
+              "p": "freight/research_lab/official_capturebrief_award_readback_v1.json",
+              "sha1": "63906a1f262718617e5c1396a8fb9494b25db2c7",
+              "bytes": 2287
+            },
+            {
+              "p": "freight/research_lab/official_nyc_issued_permit_replay_v1.json",
+              "sha1": "cd8c4e1bdbb8e5a478c5a670f6c9b02988bd89a1",
+              "bytes": 1615
+            },
+            {
+              "p": "freight/research_lab/public_freight_proof_v1.json",
+              "sha1": "d88bc6dbb5e0713d140269941eccc31e46aea9bb",
+              "bytes": 2187
+            },
+            {
+              "p": "freight/research_lab/publisher_provenance_v1.json",
+              "sha1": "2ecfaf349d94e3d8ef0ae4c58cac79d7318def76",
+              "bytes": 7369
+            },
+            {
+              "p": "freight/research_lab/source_health_v1.json",
+              "sha1": "6f69518690bf6425e96a93c28f875177aa016db2",
+              "bytes": 3162
+            },
+            {
+              "p": "freight/research_lab/source_review_queue_v1.json",
+              "sha1": "ce072fcf6511fe2be0b1725bcd1096eed0a622c0",
+              "bytes": 30133
+            }
+          ]
+        }
+      ],
+      "original_bytes_not_copied": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

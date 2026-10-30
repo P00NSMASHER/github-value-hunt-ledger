@@ -1,0 +1,494 @@
+{
+  "kind": "SOURCE_SUBTREE_BLOB_INVENTORY",
+  "version": 1,
+  "part": 0,
+  "records": [
+    {
+      "prefix": "freight/research",
+      "tree_sha": "f15cc94aa5cfd486c1de4739151de48d9734f600",
+      "complete": true,
+      "file_count": 33,
+      "paths": [
+        {
+          "path": "freight/research/AIES_2022_LEGACY_LINEAGE_20261011.json",
+          "sha": "d4c5d7b23151d08fbb42f03480dd63be6eeee815",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/AIES_HISTORICAL_LINEAGE_20261011.json",
+          "sha": "28c42b6f17e300bac28b1bd11c828aa233bc901b",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/AIES_LTL_CARRIER_REVENUE_20261011.json",
+          "sha": "5c0a38eb5fea967c93d96049262fbc04586af275",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BEA_GROSS_OUTPUT_M32_20261012.json",
+          "sha": "d19779679bfa793876dc2464a75e4b0f85fd2235",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BEA_ORIGINAL_ACCESS_M33_20261012.json",
+          "sha": "501ec6d18cdc29b7ac6b7c718c1d85d5f520fafd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BEA_TRUCKING_MEASURE_COMPATIBILITY_M30_20261012.json",
+          "sha": "384217f53378d75fb80dc29ec608bfa545cafc92",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_PARENT_ORIGIN_M28_20261012.json",
+          "sha": "e2b0addfecae922924a324498c11c54db3f3e705",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_PPI_TRUCKING_2017_2024_20261012.json",
+          "sha": "e507d9adf49244527e59e0a4eaa141fa6192a3ad",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_SECTORAL_OUTPUT_M31_20261012.json",
+          "sha": "63031e5795efe37eedb7c8f69aeb789c7f9885cb",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_TRUCKING_UNIFIED_SOURCE_POLICY_M29_20261012.json",
+          "sha": "885d48630dc912bbb959fbdd1180b1a9c81299b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_2022_SOURCE_AUDIT_20261011.json",
+          "sha": "64f091bd63477b695b680d9086dbd99df285b2b8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json",
+          "sha": "3d8896fc208e10b84a546bb0e27793f855bc13e9",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json",
+          "sha": "455c08b944c6c2c125ea7bc4cdfcdf139f47e3ca",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json",
+          "sha": "4b2b3265b1ee8eeaf200ec7fa2fcce84a45f4979",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json",
+          "sha": "f433ea77903596501ac51dc3baad99e40ce8db84",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json",
+          "sha": "919ede0c4cd6c5512208bb5a03a1facd239cf73f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CLAIM_CLEARANCE_M35_20261012.json",
+          "sha": "752ae34f4bc2b6e1baa329b8955efd35dd826f38",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/FRED_PARENT_484_PPI_2017_2024_20261012.json",
+          "sha": "fe9219597bd0fd19cca688825a66aca8c6972dcb",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+          "sha": "aa203bc54b1a5c6521d3425c7db34315dff7e995",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/LAB_FINDINGS_CUMULATIVE.json",
+          "sha": "8a97b74432b82b34468bbb57cbc14d869258b77c",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/PILOT_PREFLIGHT_20261011.json",
+          "sha": "fee980a6fb4325a6821976aee3860e10f1d7d035",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json",
+          "sha": "238e855a154d5d67ec4e14b14645860bcebeb8fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+          "sha": "cd5260a4ef978c8b2c2b76c725bfe281cd019f0d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_AIES_CARRIER_BRIDGE_2017_2024_20261012.json",
+          "sha": "0df081d41cb519b142c1ccfcbaf9d14bd82af3d0",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json",
+          "sha": "c4bc01fc38d4b204b300b5ed0390b320f2245fe8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_TEMPORAL_2017_2022_20261011.json",
+          "sha": "386a6c07f2e2cd18ed89a08859ff52b6019c0c88",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_TRUCKING_PEER_BENCHMARK_20261011.json",
+          "sha": "e7e22e510cecae95e10f4bb1c35cf523b64bb1a4",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SOURCE_ANCHORS_20261010.json",
+          "sha": "d8b042e33a62001c9fde89e54e5cd5a5cdcc95d3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SYNTHETIC_REHEARSALS_20261010.json",
+          "sha": "f4c21471467ec40e294ced458875742e45e3f118",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json",
+          "sha": "1745511aaf5b95b9ad61824ae46f4596c705fdf0",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/VALIDATION_PROTOCOLS_20261010.json",
+          "sha": "0eca962106130f4cb604f831a67f512e4c6248a4",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/lab15_candidate_ledger.json",
+          "sha": "9ce3efb7001227b5036c638524756fc6ac52708d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/lab15_public_seeds.json",
+          "sha": "dc9386166dc076ddc8c06cae13c97783be2aff2f",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/research",
+      "tree_sha": "350e98d62c37afeeb2a5df233d4686f12c1ed79a",
+      "complete": true,
+      "file_count": 31,
+      "paths": [
+        {
+          "path": "freight/research/AIES_2022_LEGACY_LINEAGE_20261011.json",
+          "sha": "d4c5d7b23151d08fbb42f03480dd63be6eeee815",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/AIES_HISTORICAL_LINEAGE_20261011.json",
+          "sha": "28c42b6f17e300bac28b1bd11c828aa233bc901b",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/AIES_LTL_CARRIER_REVENUE_20261011.json",
+          "sha": "5c0a38eb5fea967c93d96049262fbc04586af275",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BEA_GROSS_OUTPUT_M32_20261012.json",
+          "sha": "d19779679bfa793876dc2464a75e4b0f85fd2235",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BEA_ORIGINAL_ACCESS_M33_20261012.json",
+          "sha": "501ec6d18cdc29b7ac6b7c718c1d85d5f520fafd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BEA_TRUCKING_MEASURE_COMPATIBILITY_M30_20261012.json",
+          "sha": "384217f53378d75fb80dc29ec608bfa545cafc92",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_PARENT_ORIGIN_M28_20261012.json",
+          "sha": "e2b0addfecae922924a324498c11c54db3f3e705",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_PPI_TRUCKING_2017_2024_20261012.json",
+          "sha": "e507d9adf49244527e59e0a4eaa141fa6192a3ad",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_SECTORAL_OUTPUT_M31_20261012.json",
+          "sha": "63031e5795efe37eedb7c8f69aeb789c7f9885cb",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/BLS_TRUCKING_UNIFIED_SOURCE_POLICY_M29_20261012.json",
+          "sha": "885d48630dc912bbb959fbdd1180b1a9c81299b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_2022_SOURCE_AUDIT_20261011.json",
+          "sha": "64f091bd63477b695b680d9086dbd99df285b2b8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json",
+          "sha": "3d8896fc208e10b84a546bb0e27793f855bc13e9",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json",
+          "sha": "455c08b944c6c2c125ea7bc4cdfcdf139f47e3ca",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json",
+          "sha": "4b2b3265b1ee8eeaf200ec7fa2fcce84a45f4979",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json",
+          "sha": "f433ea77903596501ac51dc3baad99e40ce8db84",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json",
+          "sha": "919ede0c4cd6c5512208bb5a03a1facd239cf73f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/CLAIM_CLEARANCE_M35_20261012.json",
+          "sha": "752ae34f4bc2b6e1baa329b8955efd35dd826f38",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/FRED_PARENT_484_PPI_2017_2024_20261012.json",
+          "sha": "fe9219597bd0fd19cca688825a66aca8c6972dcb",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+          "sha": "aa203bc54b1a5c6521d3425c7db34315dff7e995",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/LAB_FINDINGS_CUMULATIVE.json",
+          "sha": "8a97b74432b82b34468bbb57cbc14d869258b77c",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/PILOT_PREFLIGHT_20261011.json",
+          "sha": "fee980a6fb4325a6821976aee3860e10f1d7d035",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json",
+          "sha": "238e855a154d5d67ec4e14b14645860bcebeb8fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+          "sha": "cd5260a4ef978c8b2c2b76c725bfe281cd019f0d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_AIES_CARRIER_BRIDGE_2017_2024_20261012.json",
+          "sha": "0df081d41cb519b142c1ccfcbaf9d14bd82af3d0",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json",
+          "sha": "c4bc01fc38d4b204b300b5ed0390b320f2245fe8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_TEMPORAL_2017_2022_20261011.json",
+          "sha": "386a6c07f2e2cd18ed89a08859ff52b6019c0c88",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SAS_TRUCKING_PEER_BENCHMARK_20261011.json",
+          "sha": "e7e22e510cecae95e10f4bb1c35cf523b64bb1a4",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SOURCE_ANCHORS_20261010.json",
+          "sha": "d8b042e33a62001c9fde89e54e5cd5a5cdcc95d3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/SYNTHETIC_REHEARSALS_20261010.json",
+          "sha": "f4c21471467ec40e294ced458875742e45e3f118",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json",
+          "sha": "1745511aaf5b95b9ad61824ae46f4596c705fdf0",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/research/VALIDATION_PROTOCOLS_20261010.json",
+          "sha": "0eca962106130f4cb604f831a67f512e4c6248a4",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/fixtures",
+      "tree_sha": "52373351fa0624dc78134aa56c807c06d4d4a334",
+      "complete": true,
+      "file_count": 8,
+      "paths": [
+        {
+          "path": "freight/fixtures/client_status_dashboard_synthetic.json",
+          "sha": "364014045820128866eed25166671ad1264cd9b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/free_growth_day0.json",
+          "sha": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+          "sha": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_amendment_prelaunch.json",
+          "sha": "e11c52829da304d59718191008e09d923635b48d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_charter_prelaunch.json",
+          "sha": "858b64c16af84726cfc04798f3972b9bd1a06616",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/readiness_ready.json",
+          "sha": "ef1601c12c376a2eff8cc58610465348a79007f8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+          "sha": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/synthetic_blind_pilot.json",
+          "sha": "12b751520ae492c55dcb341d13c3554e13e84942",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/fixtures",
+      "tree_sha": "60d052f71fe912866f4fa2598b462489ea8ff0c7",
+      "complete": true,
+      "file_count": 19,
+      "paths": [
+        {
+          "path": "freight/fixtures/client_status_dashboard_synthetic.json",
+          "sha": "364014045820128866eed25166671ad1264cd9b3",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/free_growth_day0.json",
+          "sha": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/phase3_accuracy_gold_v1.json",
+          "sha": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_amendment_prelaunch.json",
+          "sha": "e11c52829da304d59718191008e09d923635b48d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/pilot_charter_prelaunch.json",
+          "sha": "858b64c16af84726cfc04798f3972b9bd1a06616",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+          "sha": "120888cb5146cbb6804d7707b2378c6268779c71",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+          "sha": "87edacae515728c27fa7760fe57037c2df496d66",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+          "sha": "ae64ce09cd6618db8935401c28fbf260ccb3e384",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+          "sha": "53dd0271505c9b07bdd31d0a4b8db7a63b2d3dac",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_cfs2022_official_maryland_example.json",
+          "sha": "e8df8c7e45ff043fd23a8872e5fb5cbb9860646f",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+          "sha": "e3fb80bb4dccf9ec2a38b82d551c00e70ea8c782",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+          "sha": "c824073eab4925764484c0befcb59a89479ce4dd",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+          "sha": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+          "sha": "5373234c04049fb68a8683e05e59674d5ce76a68",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+          "sha": "dd93c272d31bfe0aff67d1854364758188dd5bfa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+          "sha": "e71dcc8f5da1a735efcd347340d4b5af252278fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/readiness_ready.json",
+          "sha": "ef1601c12c376a2eff8cc58610465348a79007f8",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+          "sha": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/fixtures/synthetic_blind_pilot.json",
+          "sha": "12b751520ae492c55dcb341d13c3554e13e84942",
+          "mode": "100644"
+        }
+      ]
+    }
+  ]
+}

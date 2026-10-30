@@ -1,0 +1,116 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "NYC_DOB_SOURCE_IDENTITY_MAIN_CANDIDATE_NEGATIVE_CONTROL_V0",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
+  "asof_date": "2026-10-27",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "protected_main_head_observed": "ff4edaa6540d02cdddb4c04ef6ce224a434a3f8b",
+    "protected_main_catalog_git_blob_sha1": "3fd2c32284e27833ed90725c276af6d63a086190",
+    "candidate_head_before_fixture": "68479cb8051ea4eeef70c61cd5b115a9abf7ed84",
+    "candidate_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+    "existing_operational_writer_branch": "research/retally-unified-data-lab",
+    "operational_writer_modified": false,
+    "provider_or_host_rule_changed": false
+  },
+  "publisher_sources": [
+    {
+      "id": "43nn-pn8j",
+      "publisher": "NYC Department of Health and Mental Hygiene",
+      "role": "RESTAURANT_INSPECTION_RESULTS_NOT_DOB",
+      "url": "https://data.cityofnewyork.us/d/43nn-pn8j",
+      "source_updated_on": null,
+      "original_http_bytes_custodied": false,
+      "original_http_sha256": null,
+      "dataset_specific_commercial_reuse_verified": false
+    },
+    {
+      "id": "w9ak-ipjd",
+      "publisher": "NYC Department of Buildings",
+      "role": "DOB_NOW_JOB_APPLICATION_FILINGS_NOT_ISSUED_PERMITS",
+      "url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+      "source_updated_on": null,
+      "original_http_bytes_custodied": false,
+      "original_http_sha256": null,
+      "dataset_specific_commercial_reuse_verified": false
+    },
+    {
+      "id": "rbx6-tga4",
+      "publisher": "NYC Department of Buildings",
+      "role": "DOB_NOW_APPROVED_PERMITS_EXCLUDES_ELECTRICAL_ELEVATOR_LAA",
+      "url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+      "source_updated_on": "2026-10-22",
+      "original_http_bytes_custodied": false,
+      "original_http_sha256": null,
+      "dataset_specific_commercial_reuse_verified": false
+    },
+    {
+      "id": "ipu4-2q9a",
+      "publisher": "NYC Department of Buildings",
+      "role": "DOB_BIS_PERMIT_ISSUANCE_NOT_DOB_NOW",
+      "url": "https://data.cityofnewyork.us/d/ipu4-2q9a",
+      "source_updated_on": "2026-10-22",
+      "original_http_bytes_custodied": false,
+      "original_http_sha256": null,
+      "dataset_specific_commercial_reuse_verified": false
+    }
+  ],
+  "source_identity_delta": {
+    "main_only_wrong_topic_dataset_id": "43nn-pn8j",
+    "candidate_excludes_wrong_topic": true,
+    "correct_dob_now_approved_permit_id": "rbx6-tga4",
+    "correct_historical_bis_issuance_id": "ipu4-2q9a",
+    "job_application_filing_id_not_issuance": "w9ak-ipjd",
+    "main_metadata_locator_is_not_live_customer_error_proof": true
+  },
+  "rights_and_provenance": {
+    "public_municipal_catalog_metadata_only": true,
+    "source_specific_commercial_reuse_authorized": false,
+    "original_publisher_http_bytes_acquired": false,
+    "original_publisher_http_sha256": null,
+    "commercial_engine_admission": "HOLD",
+    "source_titles_checked_against_original_city_catalog_pages_on": "2026-10-27",
+    "raw_customer_or_original_permit_rows_stored": 0,
+    "source_citations_not_original_response_byte_custody": true
+  },
+  "cohort": {
+    "independently_held_out_issued_permit_labels": 0,
+    "independent_current_validity_labels": 0,
+    "independent_commercial_buyer_labels": 0,
+    "source_row_count_acquired": 0,
+    "permit_scoring_precision_recall": "UNKNOWN",
+    "buyer_demand": "UNKNOWN",
+    "verified_retally_customer_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_RESTAURANT_INSPECTION_ID_PROMOTED_TO_DOB_PERMIT",
+      "kind": "SYNTHETIC",
+      "input_dataset_id": "43nn-pn8j",
+      "expected": "REJECT_WRONG_TOPIC"
+    },
+    {
+      "id": "SYNTH_JOB_APPLICATION_FILINGS_PROMOTED_TO_ISSUED_PERMITS",
+      "kind": "SYNTHETIC",
+      "input_dataset_id": "w9ak-ipjd",
+      "expected": "REJECT_APPLICATION_NOT_PERMIT_ISSUANCE"
+    },
+    {
+      "id": "SYNTH_DOB_APPROVED_PERMITS_ROWS_PROMOTED_TO_ACTIVE_BUYER_LEADS",
+      "kind": "SYNTHETIC",
+      "input_dataset_id": "rbx6-tga4",
+      "expected": "UNKNOWN_CURRENT_VALIDITY_AND_BUYER_DEMAND"
+    }
+  ],
+  "acceptance": {
+    "existing_unified_lab_fixture_only": true,
+    "original_source_byte_hash_verified": false,
+    "independent_qa_complete": false,
+    "original_row_level_labels_collected": false,
+    "operational_main_source_catalog_corrected": false,
+    "release_eligible": false,
+    "consumer_engine": "PermitPlate",
+    "owner_lane": ":48",
+    "independent_qa_lane": ":44"
+  }
+}

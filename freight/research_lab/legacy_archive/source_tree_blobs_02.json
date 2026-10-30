@@ -1,0 +1,103 @@
+{
+  "kind": "SOURCE_SUBTREE_BLOB_INVENTORY",
+  "version": 1,
+  "part": 2,
+  "records": [
+    {
+      "prefix": "freight/evidence",
+      "tree_sha": "ff91ef1eb4e0c290e1e078f12f20327380cfed0a",
+      "complete": true,
+      "file_count": 8,
+      "paths": [
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/EVIDENCE_INDEX.json",
+          "sha": "22612f509c704ea638cff6f9114f8657fb5bcb38",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/EVIDENCE_INDEX_VERIFIED.json",
+          "sha": "b98bb2f7ca30619df0ab663e0c3ea3d828b79c24",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/account_authentication_redacted.md",
+          "sha": "e03482adec582c6136ba400ff4b2f08da26c7619",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/configuration_snapshot.json",
+          "sha": "a3e87035c48cf1b841e933d8dbc2b6aeb8e11973",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/drive_workspace_snapshot.json",
+          "sha": "207bc33f2a9f3da51b4e701665c02cd5de246d50",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/mfa_evidence_2026-09-21.md",
+          "sha": "c2ff206e316c8f55fb1ac0f159dfb815e3b75ba2",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/policy_snapshot.md",
+          "sha": "f14dba4b993cc55f9f45487a32267c8d1cc769fa",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/evidence/separate_environment_2026-09-21/provider_encryption.md",
+          "sha": "96372b7c5540e49e8fc99b205364e8436a4e184d",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "prefix": "freight/lab_archive_repairs",
+      "tree_sha": "cfe7a335c031b64deb6d1a5fdc9499c7ccd8a570",
+      "complete": true,
+      "file_count": 8,
+      "paths": [
+        {
+          "path": "freight/lab_archive_repairs/README.md",
+          "sha": "d53da44a9e32a87d1add1277d8be7c149a767d94",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/STAGING_ENTRYPOINT.patch",
+          "sha": "50930165df31a69465dac51b42b4ef50a0b3c5d5",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/phase2/PHASE2_UNIFIED_LAB.patch",
+          "sha": "6f84c323dfeb38548540a371a00491c54968d137",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/phase2/PHASE2_VERIFY_RECEIPT.json",
+          "sha": "5a738b89973c943e596ced2688a269d67b333a53",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/phase2/README.md",
+          "sha": "00dfd781ee7354c6146e4b7e338588ac145fbcb1",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/phase2/phase2_audit_probe.py",
+          "sha": "48342c8012fe07184ed275baf1a5878ba4ee9376",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/tests/test_semantic_repair.py",
+          "sha": "86f45316a1a3e520997f3e1968362ddb4d5d1d03",
+          "mode": "100644"
+        },
+        {
+          "path": "freight/lab_archive_repairs/unified/semantic_verify.py",
+          "sha": "c39988a64ab01d40beab8c8057cec62812c75cd8",
+          "mode": "100644"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_B221594_MTMC_REJECTED_TENDER_DOD_SCOPE_NEGATIVE_HELD_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "HISTORICAL_GAO_FREIGHT_ERROR_FALSE_POSITIVE_SCOPE_ONLY",
+  "cohort": "US_GSA_DOD_MOTOR_FREIGHT_SEPTEMBER_1983_ADJUDICATED_1986",
+  "source": {
+    "official_url": "https://www.gao.gov/products/b-221594-0",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_date": "1986-09-29",
+    "verified_public_text_date": "2026-10-28",
+    "source_format": "OFFICIAL_PUBLISHED_DECISION_HTML",
+    "rights_scope": "GAO_TEXT_US_PUBLIC_DOMAIN_WITH_ACKNOWLEDGMENT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "commercial_customer_scoring_admission": "HOLD",
+    "original_publisher_response_bytes_acquired": false,
+    "original_publisher_response_sha256": null,
+    "original_invoice_gbl_tender_bank_bytes_acquired": false
+  },
+  "historical_facts": {
+    "carrier": "RISS_INTERNATIONAL",
+    "tender_id": "ICC_TENDER_1544",
+    "tender_stated_effective_date": "1983-01-15",
+    "mtmc_return_date": "1983-02-17",
+    "tender_refiled_and_approved_before_dod_shipment": false,
+    "illustrative_dod_shipper": "US_ARMY",
+    "illustrative_service_date": "1983-09-07",
+    "reported_shipment_weight_lb": 27792,
+    "reported_paid_cents": 94200,
+    "gsa_setoff_collected_cents": 22075,
+    "gao_source_ocr_lower_charge": "$72L.25",
+    "gsa_implied_lower_charge_cents": 72125,
+    "lower_charge_provenance": "ARITHMETIC_94200_MINUS_22075_NOT_EXACT_OCR_EXTRACTION",
+    "gao_dod_audit_disposition": "SET_OFF_INVALID_TENDER_REJECTED_BEFORE_DOD_SHIPMENT",
+    "dod_similar_claims_scope": "SETTLE_CONSISTENTLY_ABSENT_PROOF_REFILED_AND_MTMC_APPROVED",
+    "gaos_footnote_non_dod_boundary": "MTMC_REJECTION_ALONE_DOES_NOT_BLOCK_AGENCIES_OUTSIDE_MTMC_JURISDICTION_UNLESS_THEY_ALSO_REJECTED",
+    "non_dod_tender_validity": "UNKNOWN_AGENCY_SPECIFIC_REJECTION_AND_ACCEPTANCE_REQUIRED",
+    "actual_carrier_refund_or_repayment_confirmed": null
+  },
+  "ground_truth": {
+    "original_publisher_adjudicated_historical_case_count": 1,
+    "independently_heldout_original_invoice_labels": 0,
+    "original_buyer_specific_rate_chain_complete": false,
+    "modern_customer_contract_applicability": "UNKNOWN",
+    "automatic_current_customer_error_scoring_allowed": false,
+    "commercial_reuse_authorized": false,
+    "verified_retally_customer_recovery_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_MTMc_REJECTION_INVALID_FOR_ALL_AGENCIES",
+      "kind": "SYNTHETIC",
+      "inference": "MTMC_RETURN_ALWAYS_INVALIDATES_TENDER_FOR_NON_DOD",
+      "expected": "REJECT_NON_DOD_SCOPE_MUST_BE_EVALUATED_SEPARATELY"
+    },
+    {
+      "id": "SYNTHETIC_NON_DOD_TENDER_ALWAYS_VALID",
+      "kind": "SYNTHETIC",
+      "inference": "TENDER_AUTOMATICALLY_VALID_FOR_NON_DOD_AFTER_MTMC_RETURN",
+      "expected": "UNKNOWN_OTHER_AGENCY_REJECTION_OR_ACCEPTANCE_NOT_ESTABLISHED"
+    },
+    {
+      "id": "SYNTHETIC_GSA_DEDUCTION_COUNTS_AS_CUSTOMER_CASH",
+      "kind": "SYNTHETIC",
+      "inference": "GSA_SET_OFF_22075_IS_RETALLY_CASH_RECOVERED",
+      "expected": "REJECT_GSA_HISTORY_NOT_CUSTOMER_BANK_CREDIT"
+    },
+    {
+      "id": "SYNTHETIC_OCR_72125_PUBLISHER_EXPLICIT",
+      "kind": "SYNTHETIC",
+      "inference": "RENDERED_72L_25_PROVES_ORIGINAL_RATE_72125",
+      "expected": "REJECT_72125_DERIVED_FROM_DIFFERENCE_ONLY"
+    },
+    {
+      "id": "SYNTHETIC_GAO_PAGE_IS_ORIGINAL_INVOICE",
+      "kind": "SYNTHETIC",
+      "inference": "GAO_REPORT_ESTABLISHES_ORIGINAL_INVOICE_TENDER_AND_PAYMENT_BYTES_HELD",
+      "expected": "REJECT_NO_ORIGINAL_DOCUMENT_CUSTODY"
+    }
+  ]
+}

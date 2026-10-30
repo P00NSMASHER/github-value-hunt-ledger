@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "group": 4,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "fix/retally-lab15-ledger-isolated-20261017",
+      "head_sha": "775d4653bd90c198584ce19c1d80eb8f5674106c",
+      "ahead": 3,
+      "behind": 768,
+      "file_count": 3,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/retally-lab15-provider-health-20261017",
+      "head_sha": "1f1c287b46e155e84f139d203c4b8a12b3b11c06",
+      "ahead": 0,
+      "behind": 768,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/retally-lab-scout-churn-nyc-clock-20261026",
+      "head_sha": "6fac7b00543272af96536711104cd14c37bde01b",
+      "ahead": 4,
+      "behind": 22,
+      "file_count": 4,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/retally-labs04-14-source-bound-replay-v2-20261008",
+      "head_sha": "504cda49bdb9fa80f6e86ff44eeb40566024f0a6",
+      "ahead": 7,
+      "behind": 1176,
+      "file_count": 6,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

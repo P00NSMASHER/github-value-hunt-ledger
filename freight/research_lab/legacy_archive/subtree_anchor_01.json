@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "kind": "HISTORICAL_SOURCE_SUBTREE_ANCHORS",
+  "group": 1,
+  "records": [
+    {
+      "ref": "research/retally-lab14-gao-actual-collections-20261018",
+      "entries": 522,
+      "dirs": [
+        {
+          "path": "freight/evidence",
+          "sha": "ff91ef1eb4e0c290e1e078f12f20327380cfed0a",
+          "type": "dir"
+        },
+        {
+          "path": "freight/fixtures",
+          "sha": "69440313800b36e548bd168512c01056daaf3cb2",
+          "type": "dir"
+        },
+        {
+          "path": "freight/lab_archive_repairs",
+          "sha": "cfe7a335c031b64deb6d1a5fdc9499c7ccd8a570",
+          "type": "dir"
+        },
+        {
+          "path": "freight/research",
+          "sha": "350e98d62c37afeeb2a5df233d4686f12c1ed79a",
+          "type": "dir"
+        }
+      ],
+      "status": "NESTED_TREE_ONLY_PENDING_READ"
+    },
+    {
+      "ref": "research/retally-lab14-gao-b197184-wrongful-setoff-20261018",
+      "entries": 521,
+      "dirs": [
+        {
+          "path": "freight/evidence",
+          "sha": "ff91ef1eb4e0c290e1e078f12f20327380cfed0a",
+          "type": "dir"
+        },
+        {
+          "path": "freight/fixtures",
+          "sha": "0a95ebc97253de3becab5e002a9b6629895ddbea",
+          "type": "dir"
+        },
+        {
+          "path": "freight/lab_archive_repairs",
+          "sha": "cfe7a335c031b64deb6d1a5fdc9499c7ccd8a570",
+          "type": "dir"
+        },
+        {
+          "path": "freight/research",
+          "sha": "350e98d62c37afeeb2a5df233d4686f12c1ed79a",
+          "type": "dir"
+        }
+      ],
+      "status": "NESTED_TREE_ONLY_PENDING_READ"
+    },
+    {
+      "ref": "research/retally-lab14-m55-unified-20261017",
+      "entries": 492,
+      "dirs": [
+        {
+          "path": "freight/evidence",
+          "sha": "ff91ef1eb4e0c290e1e078f12f20327380cfed0a",
+          "type": "dir"
+        },
+        {
+          "path": "freight/fixtures",
+          "sha": "52373351fa0624dc78134aa56c807c06d4d4a334",
+          "type": "dir"
+        },
+        {
+          "path": "freight/lab_archive_repairs",
+          "sha": "cfe7a335c031b64deb6d1a5fdc9499c7ccd8a570",
+          "type": "dir"
+        },
+        {
+          "path": "freight/research",
+          "sha": "350e98d62c37afeeb2a5df233d4686f12c1ed79a",
+          "type": "dir"
+        }
+      ],
+      "status": "NESTED_TREE_ONLY_PENDING_READ"
+    },
+    {
+      "ref": "research/retally-lab14-original-freight-lineitem-replay-20261018",
+      "entries": 521,
+      "dirs": [
+        {
+          "path": "freight/evidence",
+          "sha": "ff91ef1eb4e0c290e1e078f12f20327380cfed0a",
+          "type": "dir"
+        },
+        {
+          "path": "freight/fixtures",
+          "sha": "47f6a37f9d8a28cbbdccbd51038962e958939a80",
+          "type": "dir"
+        },
+        {
+          "path": "freight/lab_archive_repairs",
+          "sha": "cfe7a335c031b64deb6d1a5fdc9499c7ccd8a570",
+          "type": "dir"
+        },
+        {
+          "path": "freight/research",
+          "sha": "350e98d62c37afeeb2a5df233d4686f12c1ed79a",
+          "type": "dir"
+        }
+      ],
+      "status": "NESTED_TREE_ONLY_PENDING_READ"
+    }
+  ]
+}

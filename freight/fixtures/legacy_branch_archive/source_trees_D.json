@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "kind": "HISTORICAL_SOURCE_FILE_BLOB_REFERENCE_ONLY",
+  "batch": "D",
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "lab/retally-real-document-engines-20261019",
+      "folders": [
+        {
+          "dir": "research",
+          "tree_sha": "24dc46fc9f8ee7745125ad87c30ab0c651979fc4",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research/AUTHORIZED_ORIGINAL_PDF_ACQUISITION_20261019.md",
+              "sha1": "fbc37bbfb59e39c201e7c3f98b81bdd62930324a",
+              "bytes": 6883
+            },
+            {
+              "p": "freight/research/COMPLETE_FREIGHT_RECOVERY_CHAIN_20261019.md",
+              "sha1": "f8ab860bfb17d0814807b5334d32f41473d25fd9",
+              "bytes": 12254
+            },
+            {
+              "p": "freight/research/FOUR_DOCUMENT_CHAIN_FMC_EVIDENCE_AUDIT_20261019.md",
+              "sha1": "6916ff2eafb066d2c20ad3a1c0d8190793fbdb5b",
+              "bytes": 9494
+            },
+            {
+              "p": "freight/research/GSA_CBCA_ORIGINAL_CASE_PACKAGE_TARGETS_20261019.md",
+              "sha1": "6f606b4c68b74be65a371e0259e430681ead4f40",
+              "bytes": 10623
+            },
+            {
+              "p": "freight/research/PENNINE_OGL_INVOICE_PAYMENT_REPLAY_20261019.md",
+              "sha1": "7e117289e8f6b07d566586247df1ca5e2d75725b",
+              "bytes": 7847
+            },
+            {
+              "p": "freight/research/REAL_DOCUMENT_ENGINE_LAB_RESULTS_20261019.md",
+              "sha1": "161de8f8cd6e804b1c5a484b7ba4f75b911f477a",
+              "bytes": 6669
+            },
+            {
+              "p": "freight/research/SAME_SHIPMENT_CLOSED_LOOP_EVIDENCE_SEARCH_20261019.md",
+              "sha1": "7b54b4fb872eeb7c15aeff5e10deed38e35c81d3",
+              "bytes": 10677
+            },
+            {
+              "p": "freight/research/SUNGOLD_2022_DETENTION_ORIGINAL_TARIFF_RETRIEVAL_20261019.md",
+              "sha1": "8adb9a65cc017092fb6e7e14bf1bf644d4cf55d5",
+              "bytes": 7640
+            },
+            {
+              "p": "freight/research/SUNGOLD_CHEVISANCE_CMA_CGM_DOCUMENT_CHAIN_20261019.md",
+              "sha1": "ce972521a2e5ccff163ebc158291a9dece329314",
+              "bytes": 12346
+            },
+            {
+              "p": "freight/research/SUNGOLD_ORIGINAL_EXHIBITS_PUBLIC_DOWNLOAD_ATTEMPT_20261019.md",
+              "sha1": "8eecbe7b89bae8cd954ae12142443e163d1a2cf4",
+              "bytes": 6669
+            },
+            {
+              "p": "freight/research/SUNGOLD_ORIGINAL_EXHIBITS_TARIFF_SETTLEMENT_ACCESS_AUDIT_20261019.md",
+              "sha1": "c5afbd030a29b926a9230fbc2d57bac62feac052",
+              "bytes": 12059
+            },
+            {
+              "p": "freight/research/UNSENT_GSA_TAMS_SOURCE_RECORD_REQUEST_20261019.md",
+              "sha1": "704a0d3d5f2215db225ac5102ee1f6393f5bf87d",
+              "bytes": 5670
+            },
+            {
+              "p": "freight/research/UNSENT_SPECIFIC_FREIGHT_CASE_FILE_REQUEST_20261019.md",
+              "sha1": "a1b43eb07f6ec5dae78581e7953671dd5937e114",
+              "bytes": 10257
+            },
+            {
+              "p": "freight/research/lab15_candidate_ledger.json",
+              "sha1": "9ce3efb7001227b5036c638524756fc6ac52708d",
+              "bytes": 198
+            },
+            {
+              "p": "freight/research/lab15_public_seeds.json",
+              "sha1": "dc9386166dc076ddc8c06cae13c97783be2aff2f",
+              "bytes": 763
+            },
+            {
+              "p": "freight/research/sungold_same_shipment_admission_manifest.json",
+              "sha1": "e33ad108989b32eb28a5c595a3ce132d98109dd5",
+              "bytes": 4882
+            }
+          ]
+        },
+        {
+          "dir": "fixtures",
+          "tree_sha": "52373351fa0624dc78134aa56c807c06d4d4a334",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/fixtures/client_status_dashboard_synthetic.json",
+              "sha1": "364014045820128866eed25166671ad1264cd9b3",
+              "bytes": 915
+            },
+            {
+              "p": "freight/fixtures/free_growth_day0.json",
+              "sha1": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+              "bytes": 353
+            },
+            {
+              "p": "freight/fixtures/phase3_accuracy_gold_v1.json",
+              "sha1": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+              "bytes": 30178
+            },
+            {
+              "p": "freight/fixtures/pilot_amendment_prelaunch.json",
+              "sha1": "e11c52829da304d59718191008e09d923635b48d",
+              "bytes": 243
+            },
+            {
+              "p": "freight/fixtures/pilot_charter_prelaunch.json",
+              "sha1": "858b64c16af84726cfc04798f3972b9bd1a06616",
+              "bytes": 799
+            },
+            {
+              "p": "freight/fixtures/readiness_ready.json",
+              "sha1": "ef1601c12c376a2eff8cc58610465348a79007f8",
+              "bytes": 453
+            },
+            {
+              "p": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+              "sha1": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+              "bytes": 4355
+            },
+            {
+              "p": "freight/fixtures/synthetic_blind_pilot.json",
+              "sha1": "12b751520ae492c55dcb341d13c3554e13e84942",
+              "bytes": 1063
+            }
+          ]
+        }
+      ],
+      "original_bytes_not_copied": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-lab-intelligence-v1-20261008",
+      "folders": [
+        {
+          "dir": "research",
+          "tree_sha": "13cb7cc668e3374c8da87effa8ef078447ad8979",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+              "sha1": "aa203bc54b1a5c6521d3425c7db34315dff7e995",
+              "bytes": 10073
+            },
+            {
+              "p": "freight/research/LAB_FINDINGS_CUMULATIVE.json",
+              "sha1": "8a97b74432b82b34468bbb57cbc14d869258b77c",
+              "bytes": 15929
+            }
+          ]
+        },
+        {
+          "dir": "fixtures",
+          "tree_sha": "52373351fa0624dc78134aa56c807c06d4d4a334",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/fixtures/client_status_dashboard_synthetic.json",
+              "sha1": "364014045820128866eed25166671ad1264cd9b3",
+              "bytes": 915
+            },
+            {
+              "p": "freight/fixtures/free_growth_day0.json",
+              "sha1": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+              "bytes": 353
+            },
+            {
+              "p": "freight/fixtures/phase3_accuracy_gold_v1.json",
+              "sha1": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+              "bytes": 30178
+            },
+            {
+              "p": "freight/fixtures/pilot_amendment_prelaunch.json",
+              "sha1": "e11c52829da304d59718191008e09d923635b48d",
+              "bytes": 243
+            },
+            {
+              "p": "freight/fixtures/pilot_charter_prelaunch.json",
+              "sha1": "858b64c16af84726cfc04798f3972b9bd1a06616",
+              "bytes": 799
+            },
+            {
+              "p": "freight/fixtures/readiness_ready.json",
+              "sha1": "ef1601c12c376a2eff8cc58610465348a79007f8",
+              "bytes": 453
+            },
+            {
+              "p": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+              "sha1": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+              "bytes": 4355
+            },
+            {
+              "p": "freight/fixtures/synthetic_blind_pilot.json",
+              "sha1": "12b751520ae492c55dcb341d13c3554e13e84942",
+              "bytes": 1063
+            }
+          ]
+        }
+      ],
+      "original_bytes_not_copied": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/retally-lab-phase2-financial-v1-20261008",
+      "folders": [
+        {
+          "dir": "research",
+          "tree_sha": "13cb7cc668e3374c8da87effa8ef078447ad8979",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+              "sha1": "aa203bc54b1a5c6521d3425c7db34315dff7e995",
+              "bytes": 10073
+            },
+            {
+              "p": "freight/research/LAB_FINDINGS_CUMULATIVE.json",
+              "sha1": "8a97b74432b82b34468bbb57cbc14d869258b77c",
+              "bytes": 15929
+            }
+          ]
+        },
+        {
+          "dir": "fixtures",
+          "tree_sha": "52373351fa0624dc78134aa56c807c06d4d4a334",
+          "truncated": false,
+          "files": [
+            {
+              "p": "freight/fixtures/client_status_dashboard_synthetic.json",
+              "sha1": "364014045820128866eed25166671ad1264cd9b3",
+              "bytes": 915
+            },
+            {
+              "p": "freight/fixtures/free_growth_day0.json",
+              "sha1": "b3c0212bd5493bc9cfc95868f5b34d37c94fa98d",
+              "bytes": 353
+            },
+            {
+              "p": "freight/fixtures/phase3_accuracy_gold_v1.json",
+              "sha1": "859493245eb4a346d1d1c140bbfc2e35bca4932e",
+              "bytes": 30178
+            },
+            {
+              "p": "freight/fixtures/pilot_amendment_prelaunch.json",
+              "sha1": "e11c52829da304d59718191008e09d923635b48d",
+              "bytes": 243
+            },
+            {
+              "p": "freight/fixtures/pilot_charter_prelaunch.json",
+              "sha1": "858b64c16af84726cfc04798f3972b9bd1a06616",
+              "bytes": 799
+            },
+            {
+              "p": "freight/fixtures/readiness_ready.json",
+              "sha1": "ef1601c12c376a2eff8cc58610465348a79007f8",
+              "bytes": 453
+            },
+            {
+              "p": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+              "sha1": "a7727d0d1243104ffe1a32cda8fbf141f580abce",
+              "bytes": 4355
+            },
+            {
+              "p": "freight/fixtures/synthetic_blind_pilot.json",
+              "sha1": "12b751520ae492c55dcb341d13c3554e13e84942",
+              "bytes": 1063
+            }
+          ]
+        }
+      ],
+      "original_bytes_not_copied": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

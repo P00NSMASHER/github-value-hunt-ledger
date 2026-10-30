@@ -1,0 +1,100 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B143491_TWO_SHIPMENT_ADJUSTED_DEDUCTION_CANDIDATE_V0",
+  "evaluation_family": "FREIGHT_ERROR_HISTORICAL_ADJUDICATION_NOT_GENERAL_AP_RECONCILIATION",
+  "cohort": "US_GAO_1957_TWO_SHIPMENTS_1960_CORRECTED_AUDIT",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "official_url": "https://www.gao.gov/products/b-143491",
+    "decision_id": "B-143491",
+    "decision_date": "1960-11-25",
+    "reviewed_utc_date": "2026-10-29",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "US_PUBLIC_DOMAIN_GAO_TEXT_CITE_GAO_NO_IMPLIED_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "format": "OFFICIAL_PUBLIC_DECISION_HTML_TEXT",
+    "original_publisher_http_bytes_custodied": false,
+    "original_publisher_http_sha256": null,
+    "original_invoices_bols_tariffs_vouchers_custodied": false,
+    "original_source_documents_independently_replayed": false,
+    "rate_sheet_840_stated_effective_date": "1956-08-29",
+    "rate_sheet_846_supplement_6_effective_date": "UNKNOWN"
+  },
+  "historical_reported": {
+    "carrier": "MASTEN_TRANSPORTATION_INC",
+    "gbl_first": "AF-5116591",
+    "gbl_first_date": "1957-02-14",
+    "gbl_second": "AF-5116516",
+    "gbl_second_date": "1957-02-11",
+    "voucher_number": "328012",
+    "voucher_date": "1957-03-14",
+    "paid_per_shipment_cents": 17040,
+    "paid_total_cents": 34080,
+    "initial_audited_first_cents": 12344,
+    "initial_audited_second_cents": 10856,
+    "initial_audited_total_cents": 23200,
+    "original_overpayment_deducted_cents": 10880,
+    "original_overpayment_deduction_reported_collected": true,
+    "elevator_weight_initial_lb": 2790,
+    "elevator_weight_corrected_lb": 3280,
+    "revised_audited_second_cents": 10932,
+    "revised_audited_total_cents": 23276,
+    "arithmetic_implied_overpayment_after_adjustment_cents": 10804,
+    "adjustment_authorized_cents": 76,
+    "adjustment_already_paid": "UNKNOWN_NOT_PROVEN",
+    "decision": "INITIAL_SETTLEMENT_SUSTAINED_EXCEPT_76_CENT_CONDITIONAL_ADJUSTMENT",
+    "legal_reason": "AMBIGUOUS_AIRCRAFT_ENGINE_PARTS_RATE_INTERPRETED_IN_FAVOR_OF_SHIPPER",
+    "tariff_840_rate_cents_per_cwt": 71,
+    "tariff_840_min_weight_lb": 24000,
+    "tariff_846_aircraft_rate_cents_per_cwt": 40
+  },
+  "ground_truth": {
+    "original_decision_is_publisher_reported": true,
+    "historical_collection_label": "GAO_REPORTS_10880_ADMINISTRATIVE_DEDUCTION_COLLECTED",
+    "correction_label": "GAO_RECOGNIZES_76_CENT_ALLOWED_CHARGE_INCREASE_CONDITIONAL_SETTLEMENT",
+    "independent_heldout_original_invoice_labels": 0,
+    "modern_freight_error_ground_truth": "UNKNOWN",
+    "modern_rate_applicability": "UNKNOWN",
+    "actual_76_cent_adjustment_payment": "UNKNOWN",
+    "verified_retally_customer_recovered_cash_cents": 0,
+    "commercial_engine_scoring_approved": false,
+    "independent_qa_complete": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_ADJUSTMENT_WAS_PAID",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "GAO_76_CENTS_ALREADY_REFUNDED",
+      "expected": "REJECT_PAYMENT_NOT_PROVEN"
+    },
+    {
+      "id": "SYNTHETIC_INITIAL_AUDIT_IS_FINAL",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "10856_SECOND_SHIPMENT_FINAL_ALLOWED_CHARGE",
+      "expected": "REJECT_GAO_CORRECTED_TO_10932"
+    },
+    {
+      "id": "SYNTHETIC_GAO_RECOVERY_IS_RETALLY_CASH",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "10880_REPRESENTS_RETALLY_CUSTOMER_CASH",
+      "expected": "REJECT_NO_RETALLY_CUSTOMER"
+    },
+    {
+      "id": "SYNTHETIC_RATE_ALWAYS_CURRENT",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "1956_RATE_DETERMINES_2026_PRICING",
+      "expected": "REJECT_MODERN_RATE_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_ORIGINAL_INVOICE_BYTES_HELD",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "GAO_HTML_EQUALS_ORIGINAL_INVOICE_AND_TARIFF_CUSTODY",
+      "expected": "REJECT_NO_ORIGINAL_DOCUMENT_BYTES"
+    },
+    {
+      "id": "SYNTHETIC_REVISED_NET_COLLECTED",
+      "kind": "SYNTHETIC",
+      "untrusted_claim": "10804_PROVES_FINAL_NET_CASH_COLLECTED",
+      "expected": "REJECT_76_CENT_PAYMENT_UNKNOWN"
+    }
+  ]
+}

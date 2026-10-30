@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "fixture_id": "RETALLY_UNIFIED_LEGACY_RESEARCH_SNAPSHOT_2026_10_30",
+  "as_of_utc_date": "2026-10-30",
+  "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+  "canonical_main_at_snapshot": "02752be8074d3f08e9b2b2b8b5da9495da0381c7",
+  "active_operational_controller": ".github/workflows/retally-unified-research-lab.yml",
+  "single_writer_branch": "research/retally-unified-data-lab",
+  "single_writer_head_at_snapshot": "51fbab58a56ff092b54d7eee9ac099fc66c4cd4f",
+  "unified_metadata_ledger": "freight/research_lab/leads.json",
+  "ledger_source_blob_sha1": "be95cff7efaaa9dc58a3ee804bdf5288c7b6fa95",
+  "ledger_entries_sha256": "651b27d26d60e7012c7cadfd13fcab31d6fd9094f7bd48ec09534d11abb09a95",
+  "unique_source_urls": 801,
+  "engine_reference_counts": {
+    "capturebrief": 166,
+    "freightrecovery": 253,
+    "permitplate": 213,
+    "recoveryos": 177
+  },
+  "cross_engine_shared_pointers": 8,
+  "source_rows_derived_from_ledger_not_original_invoices": true,
+  "bounded_evaluation_feed": {
+    "path": "freight/research_lab/evaluation_feed_v1.json",
+    "git_blob_sha1": "ad7bbff5be283d28d26661224801ff6dcc2aeb58",
+    "selected_source_pointers": 260,
+    "feed_sha256": "4f5166d1cbe24ac1368b6cfda5b9b4ea933952bee45ef6ef55e33e327b6adaec",
+    "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
+    "lab15_evidence_metadata_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4"
+  },
+  "legacy_source_ledgers_considered": [
+    "freight/lab15/evidence_ledger.json",
+    "freight/research/lab15_candidate_ledger.json",
+    "freight/research_lab/leads.json"
+  ],
+  "historical_lab15_workflows_with_no_active_cron_observed": [
+    ".github/workflows/retally-lab15-evidence-acquisition.yml",
+    ".github/workflows/retally-lab15-public-evidence.yml"
+  ],
+  "operational_one_writer_consolidated_in_existing_flow": true,
+  "all_historical_legacy_branches_physically_retired": false,
+  "all_historical_legacy_labs_exhaustively_audited": false,
+  "new_cron_or_provider_calls_added": false,
+  "original_external_document_bytes_saved": 0,
+  "publisher_response_full_bounded_sha256_count": 3,
+  "original_nyc_electrical_metadata_response_sha256": null,
+  "independent_new_freight_error_labels": 0,
+  "independent_permit_outcome_labels": 0,
+  "verified_customer_recoveries_cents": 0,
+  "commercial_reuse_approved": false,
+  "fully_approved_customer_release": false,
+  "simulated_independent_qa_passed": false,
+  "real_independent_qa_completed": false,
+  "source_accuracy": "UNKNOWN",
+  "commercial_accuracy": "UNKNOWN",
+  "evaluation_lanes": [
+    "freight_original_invoice_arithmetic",
+    "general_invoice_payment_reconciliation",
+    "freight_rate_error_accuracy",
+    "nyc_permit_source_scoring",
+    "government_notice_source_versioning"
+  ],
+  "note": "Legacy Lab 15 metadata input paths are incorporated into the existing deduplicating research feed. Only two named legacy workflow files were inspected for cron; historical refs remain and may not be deleted without a complete inventory. This is an operational consolidation snapshot, NOT all-lab retirement, original-document custody, source-rights clearance or independent QA."
+}

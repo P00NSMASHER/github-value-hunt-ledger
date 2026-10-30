@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "inventory_id": "RETALLY_HISTORICAL_RESEARCH_BRANCH_INVENTORY_2026_10_30",
+  "scope": "METADATA_ONLY_GIT_OBJECT_PROVENANCE_NOT_ORIGINAL_PUBLISHER_BODY_OR_RELEASE",
+  "observed_utc_date": "2026-10-30",
+  "canonical_repo": "P00NSMASHER/github-value-hunt-ledger",
+  "protected_main_observed": "02752be8074d3f08e9b2b2b8b5da9495da0381c7",
+  "single_live_metadata_writer": "research/retally-unified-data-lab",
+  "single_live_writer_observed_head": "51fbab58a56ff092b54d7eee9ac099fc66c4cd4f",
+  "preserved_preexisting_controller": ".github/workflows/retally-unified-research-lab.yml",
+  "branch_search_scope": "40 returned historical branch refs matching 'lab'; branch existence is not evidence of 40 active workers",
+  "historical_refs_indexed": 40,
+  "compare_groups": [
+    {
+      "ordinal": 0,
+      "path": "groups/00.json",
+      "git_blob_sha1": "5544c5187ba60cd0f87a025005163aa10cd89e53",
+      "refs": 4
+    },
+    {
+      "ordinal": 1,
+      "path": "groups/01.json",
+      "git_blob_sha1": "e78d310eb7e377abbb13188b093a771d265e138a",
+      "refs": 4
+    },
+    {
+      "ordinal": 2,
+      "path": "groups/02.json",
+      "git_blob_sha1": "56e397aa4cba211f292b67677f0b710f3af6a776",
+      "refs": 4
+    },
+    {
+      "ordinal": 3,
+      "path": "groups/03.json",
+      "git_blob_sha1": "46425dc2a42fb997c3b18dcf95b106b385a5ab3d",
+      "refs": 4
+    },
+    {
+      "ordinal": 4,
+      "path": "groups/04.json",
+      "git_blob_sha1": "6b04d88cd336bee4fb55a4b17e80f518b3f1a8b5",
+      "refs": 4
+    },
+    {
+      "ordinal": 5,
+      "path": "groups/05.json",
+      "git_blob_sha1": "34db85c4bb21fe95bbf8eb0a7403eb3c74de3245",
+      "refs": 4
+    },
+    {
+      "ordinal": 6,
+      "path": "groups/06.json",
+      "git_blob_sha1": "3a0481200bc9106f1c2f0693e9c29da17fd8d258",
+      "refs": 4
+    },
+    {
+      "ordinal": 7,
+      "path": "groups/07.json",
+      "git_blob_sha1": "9f4e19a9ecf0c3be0782cb2a652fdd8b68e5f3e3",
+      "refs": 4
+    },
+    {
+      "ordinal": 8,
+      "path": "groups/08.json",
+      "git_blob_sha1": "4ec561e5554ae4251f0987009d760c01ebe32631",
+      "refs": 4
+    },
+    {
+      "ordinal": 9,
+      "path": "groups/09.json",
+      "git_blob_sha1": "a0c96efcd8b2fd93ce61023b936d96594b8213ed",
+      "refs": 4
+    }
+  ],
+  "compare_file_cap_may_truncate": 300,
+  "historical_compare_results_with_possible_path_truncation": 8,
+  "full_historical_file_content_migration_completed": false,
+  "original_customer_invoice_or_contract_bytes_migrated": false,
+  "historical_source_reports_migrated": 3,
+  "historical_source_report_git_blobs_only": true,
+  "held_reports": [
+    {
+      "source_branch": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+      "archive_path": "held_public_metadata/gao_historical_freight_collections_20261018.json",
+      "git_blob_sha1": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+      "evaluation_lane": "HISTORICAL_GOVERNMENT_SETTLEMENT_CLASSIFICATION_ONLY",
+      "original_publisher_http_body_sha256": null,
+      "commercial_customer_benchmark_rights_verified": false
+    },
+    {
+      "source_branch": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+      "archive_path": "held_public_metadata/faf6_eia_manifest_20261017.json",
+      "git_blob_sha1": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+      "evaluation_lane": "HISTORICAL_FREIGHT_MARKET_CONTEXT_NOT_INVOICE_RATES",
+      "original_publisher_http_body_sha256": null,
+      "commercial_customer_benchmark_rights_verified": false
+    },
+    {
+      "source_branch": "lab/retally-real-document-engines-20261019",
+      "original_path": "freight/research/PENNINE_OGL_INVOICE_PAYMENT_REPLAY_20261019.md",
+      "archive_path": "held_public_metadata/pennine_ogl_invoice_payment_replay_20261019.md",
+      "git_blob_sha1": "7e117289e8f6b07d566586247df1ca5e2d75725b",
+      "evaluation_lane": "GENERAL_INVOICE_TO_PAYMENT_ACCOUNTING_NOT_FREIGHT_DETECTION",
+      "original_publisher_http_body_sha256": null,
+      "commercial_customer_benchmark_rights_verified": false
+    }
+  ],
+  "ref_claims": {
+    "real_independent_qa_completed": false,
+    "independent_customer_freight_error_labels": 0,
+    "independent_permit_buyer_outcome_labels": 0,
+    "verified_retally_cash_recovery_cents": 0,
+    "original_external_publisher_byte_sha256_for_new_manifests": null,
+    "commercial_customer_use_authorized": false,
+    "new_workflows_or_paid_providers_added": false,
+    "all_legacy_workflows_decommissioned": false
+  },
+  "limits": [
+    "Git SHA-1 identifies bytes in repository objects, not an independent publisher original SHA-256.",
+    "Compare results list at most 300 files; eight branches require deeper tree traversal to claim file-complete migration.",
+    "No legacy code, runner, source data or public/customer file was force-promoted. Three existing publicly documented research reports were copied only as held historical reference material.",
+    "Read-only source-rights and independently labeled outcomes remain distinct from metadata provenance."
+  ]
+}

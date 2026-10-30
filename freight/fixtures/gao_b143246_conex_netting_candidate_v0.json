@@ -1,0 +1,118 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_B143246_CONEX_CLASSIFICATION_AND_RECOUPMENT_NETTING_V0",
+  "engine": "freightrecovery",
+  "evaluation_families": [
+    "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+    "GENERAL_ACCOUNTING_RECONCILIATION_OF_PUBLISHED_DECISION_EVENTS"
+  ],
+  "admission_state": "TWO_LINKED_GAO_DECISIONS_NOT_ORIGINAL_BILL_TARIFF_OR_INDEPENDENT_CASH_PROOF",
+  "cohort": "US_GAO_MOTOR_FREIGHT_CONEX_1956_SHIPMENT_1961_TWO_REVIEW_DECISIONS",
+  "sources": [
+    {
+      "official_url": "https://www.gao.gov/products/b-143246",
+      "decision_id": "B-143246",
+      "decision_date": "1961-05-12",
+      "passage_locator": "May decision: paid $627.24, $340.21 deducted, $11.81 allowed, balance $328.40 denied; Rule 11 package scope"
+    },
+    {
+      "official_url": "https://www.gao.gov/products/b-143246-0",
+      "decision_id": "B-143246",
+      "decision_date": "1961-11-20",
+      "passage_locator": "November reconsideration: adjusted charge $298.84, tariff item 19986, contingent judicial-reconsideration caveat"
+    }
+  ],
+  "publisher": "U.S. Government Accountability Office",
+  "source_kind": "ORIGINAL_PUBLISHER_GAO_DECISION_PAGES",
+  "rights_reference": "https://www.gao.gov/copyright",
+  "reuse_rights": "GAO_GOVERNMENT_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE",
+  "customer_engine_commercial_reuse_approved": false,
+  "reviewed_date": "2026-10-26",
+  "original_publisher_http_bytes_acquired": false,
+  "original_publisher_response_sha256": null,
+  "original_bill_voucher_gbl_tariff_pages_acquired": false,
+  "independent_historical_bank_posting_acquired": false,
+  "source_snapshot_case_count": 1,
+  "independently_held_out_real_customer_labels": 0,
+  "historical_facts": {
+    "original_shipment_date": "1956-11-09",
+    "carrier": "WESTERN_TRUCK_LINES_LTD",
+    "original_gbl_gao_transcription": "AF-4940529",
+    "carrier_bill_gao_transcription": "G-01678",
+    "published_tariff": "NATIONAL_MOTOR_FREIGHT_CLASSIFICATION_NO_13_MF_ICC_NO_7",
+    "classification_item": "19986",
+    "original_carrier_paid_cents": 62724,
+    "initially_deducted_as_overcharge_cents": 34021,
+    "initial_deduction_reported_collected": true,
+    "carrier_reclaim_allowed_cents": 1181,
+    "allowance_cash_posting_verified": null,
+    "net_after_reported_deduction_before_any_allowance_cents": 28703,
+    "remaining_carrier_reclaim_disallowed_cents": 32840,
+    "gao_reported_adjusted_charge_cents": 29884,
+    "bank_cleared_net_after_allowance_cents": null,
+    "two_decisions_are_one_shipment": true,
+    "highest_class_package_rule_applies_to_whole_mixed_shipment": false,
+    "separately_packaged_articles_inside_conex": true,
+    "conex_container_not_treated_as_one_package": true,
+    "court_case_mentioned": "ILLINOIS_CENTRAL_RAILROAD_V_US_COURT_OF_CLAIMS_NO_296_59",
+    "further_reconsideration_conditioned_on_adverse_court_ruling": true,
+    "actual_subsequent_court_disposition": "UNKNOWN"
+  },
+  "accounting_controls": {
+    "reported_paid_minus_reported_collected_deduction_cents": 28703,
+    "reported_initial_deduction_less_allowed_reclaim_cents": 32840,
+    "published_adjusted_charge_not_bank_settlement_proof_cents": 29884,
+    "conditional_adjusted_charge_if_allowed_reclaim_were_cash_posted_cents": 29884,
+    "historical_collected_offset_is_not_retally_cash": true,
+    "modern_contract_tariff_applicability": "UNKNOWN",
+    "modern_customer_recovery_cents": 0,
+    "customer_freight_error_accuracy_scoring_permitted": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_RULE_11_APPLIES_TO_ENTIRE_MIXED_SHIPMENT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PACKAGE_NOT_SHIPMENT_SCOPE"
+    },
+    {
+      "id": "SYNTHETIC_IGNORE_ALLOWED_1181_AFTER_INITIAL_DEDUCTION",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GROSS_DEDUCTION_AS_FINAL_ADJUSTMENT"
+    },
+    {
+      "id": "SYNTHETIC_ALLOWED_RECLAIM_IS_BANK_POSTING",
+      "kind": "SYNTHETIC",
+      "expected": "UNKNOWN_ALLOWANCE_PAYMENT_UNVERIFIED"
+    },
+    {
+      "id": "SYNTHETIC_TWO_DECISIONS_TWO_INDEPENDENT_SHIPMENTS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_DUPLICATE_CASE_LABEL"
+    },
+    {
+      "id": "SYNTHETIC_PENDING_COURT_CAVEAT_IS_FINAL_MODERN_TARIFF",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HISTORICAL_SCOPE_AND_COURT_LIMIT"
+    },
+    {
+      "id": "SYNTHETIC_GAO_OFFSET_EQUALS_RETALLY_CUSTOMER_REVENUE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_CUSTOMER_SETTLEMENT_EVIDENCE"
+    }
+  ],
+  "quality": {
+    "official_original_publisher_decisions_reviewed": 2,
+    "source_hash_available": false,
+    "linked_decisions_same_case_not_independent_holdouts": true,
+    "historical_decision_amounts_reconcile": true,
+    "original_documents_linked_by_gao_transcription_only": true,
+    "independent_cash_clearing_and_customer_invoice_evidence": false,
+    "source_status": "HISTORICAL_ADJUDICATION_ONLY_RIGHTS_HOLD_MODERN_TRUTH_UNKNOWN"
+  },
+  "owners": {
+    "source_fixture": "UNIFIED_LAB",
+    "collector_and_engine": "FREIGHTRECOVERY_ENGINEERING",
+    "independent_qa": "QA_44",
+    "release": "PROTECTED_MAIN_GATES"
+  }
+}

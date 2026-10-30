@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "group": 3,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "feat/retally-lab15-public-evidence-acquisition-20261017",
+      "head_sha": "2fc221a0bdcf1e0ae377cd756614777a8c3d48a6",
+      "ahead": 3,
+      "behind": 806,
+      "file_count": 6,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/lab15/evidence_ledger.json",
+        "freight/lab15/sources.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "feat/retally-lab15-public-evidence-collector-20261017",
+      "head_sha": "aa2f170f8899c6c37ae05961a6895ae7976a1ead",
+      "ahead": 455,
+      "behind": 1182,
+      "file_count": 300,
+      "possible_truncated": true,
+      "evidence_paths": [
+        "freight/research/AIES_2022_LEGACY_LINEAGE_20261011.json",
+        "freight/research/AIES_HISTORICAL_LINEAGE_20261011.json",
+        "freight/research/AIES_LTL_CARRIER_REVENUE_20261011.json",
+        "freight/research/BEA_GROSS_OUTPUT_M32_20261012.json",
+        "freight/research/BEA_ORIGINAL_ACCESS_M33_20261012.json",
+        "freight/research/BEA_TRUCKING_MEASURE_COMPATIBILITY_M30_20261012.json",
+        "freight/research/BLS_PARENT_ORIGIN_M28_20261012.json",
+        "freight/research/BLS_PPI_TRUCKING_2017_2024_20261012.json",
+        "freight/research/BLS_SECTORAL_OUTPUT_M31_20261012.json",
+        "freight/research/BLS_TRUCKING_UNIFIED_SOURCE_POLICY_M29_20261012.json",
+        "freight/research/CFS_2022_SOURCE_AUDIT_20261011.json",
+        "freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json",
+        "freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json",
+        "freight/research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json",
+        "freight/research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json",
+        "freight/research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json",
+        "freight/research/CLAIM_CLEARANCE_M35_20261012.json",
+        "freight/research/FRED_PARENT_484_PPI_2017_2024_20261012.json",
+        "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+        "freight/research/LAB_FINDINGS_CUMULATIVE.json",
+        "freight/research/PILOT_PREFLIGHT_20261011.json",
+        "freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json",
+        "freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+        "freight/research/SAS_AIES_CARRIER_BRIDGE_2017_2024_20261012.json",
+        "freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json",
+        "freight/research/SAS_TEMPORAL_2017_2022_20261011.json",
+        "freight/research/SAS_TRUCKING_PEER_BENCHMARK_20261011.json",
+        "freight/research/SOURCE_ANCHORS_20261010.json",
+        "freight/research/SYNTHETIC_REHEARSALS_20261010.json",
+        "freight/research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json",
+        "freight/research/VALIDATION_PROTOCOLS_20261010.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "feat/retally-unified-research-lab-20261022",
+      "head_sha": "2c4bc9a2ce02a181515f016c15cfe6fcc6fd27d6",
+      "ahead": 7,
+      "behind": 206,
+      "file_count": 6,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "fix/retally-lab15-dedupe-provider-visibility-20261017",
+      "head_sha": "58192300aed5cdd9cc5db39a30d3316c04def6f1",
+      "ahead": 1,
+      "behind": 767,
+      "file_count": 2,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

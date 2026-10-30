@@ -1,0 +1,178 @@
+{
+  "schema_version": "0.1.1",
+  "fixture_id": "GAO_B148981_REPORTED_REFUNDS_AND_CREDIT_CANDIDATE_V0",
+  "admission_state": "OFFICIAL_DECISION_ONLY_NOT_INDEPENDENT_INVOICE_HOLDOUT",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "cohort": "US_GAO_MOTOR_FREIGHT_SHIPMENTS_1955_1958_DECISION_1962",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "official_url": "https://www.gao.gov/products/b-148981",
+    "decision_id": "B-148981",
+    "decision_date": "1962-11-29",
+    "reviewed_date": "2026-10-25",
+    "source_kind": "OFFICIAL_GAO_HTML_DECISION",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_TEXT_REUSABLE_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "publisher_html_decision_read": true,
+    "original_publisher_http_bytes_acquired": false,
+    "original_publisher_http_sha256": null,
+    "original_bol_invoice_tariff_bytes_held": false,
+    "customer_engine_commercial_reuse_approved": false,
+    "source_passage_locators": [
+      "Full decision: supplemental bill 5188, refunded $134.44 then disallowed new carrier claim",
+      "Full decision: supplemental bill 5193, refunded $46.02 on 3 cross-referenced volume BOLs",
+      "Full decision: supplemental bill 5190, refunded $1,661.54, later $391.74 carrier credit directed",
+      "Full decision: BOL reference, shipment date and original paid charges grouped by supplemental bill 5188, 5193 and 5190"
+    ],
+    "bol_lineage_proof": "GAO_DECISION_TRANSCRIPTION_NOT_ORIGINAL_BOL_CUSTODY"
+  },
+  "historical_case_groups": [
+    {
+      "supplemental_bill": "5188",
+      "shipment_year": 1958,
+      "reported_bol_count": 1,
+      "original_paid_by_bol_cents": [
+        175500
+      ],
+      "gao_reported_refund_cents": 13444,
+      "gao_says_refund_occurred": true,
+      "carrier_amended_supplemental_claim_cents": 50944,
+      "carrier_claim_disallowed": true,
+      "future_carrier_credit_allowed_cents": 0,
+      "future_carrier_credit_paid_cents": null,
+      "gao_transcribed_bol_refs": [
+        {
+          "bol_reference": "WY 7616843",
+          "bill_of_lading_date": "1958-04-21",
+          "gao_reported_paid_cents": 175500
+        }
+      ]
+    },
+    {
+      "supplemental_bill": "5193",
+      "shipment_year": 1956,
+      "reported_bol_count": 3,
+      "original_paid_by_bol_cents": [
+        33833,
+        41438,
+        26432
+      ],
+      "gao_reported_refund_cents": 4602,
+      "gao_says_refund_occurred": true,
+      "carrier_amended_supplemental_claim_cents": 6429,
+      "carrier_claim_disallowed": true,
+      "cross_referenced_volume_shipment_rate_group": true,
+      "future_carrier_credit_allowed_cents": 0,
+      "future_carrier_credit_paid_cents": null,
+      "gao_transcribed_bol_refs": [
+        {
+          "bol_reference": "AF-6807627",
+          "bill_of_lading_date": "1956-10-15",
+          "gao_reported_paid_cents": 33833
+        },
+        {
+          "bol_reference": "AF-6807626",
+          "bill_of_lading_date": "1956-10-15",
+          "gao_reported_paid_cents": 41438
+        },
+        {
+          "bol_reference": "AF-6807628",
+          "bill_of_lading_date": "1956-10-16",
+          "gao_reported_paid_cents": 26432
+        }
+      ]
+    },
+    {
+      "supplemental_bill": "5190",
+      "shipment_year": 1955,
+      "reported_bol_count": 3,
+      "original_paid_by_bol_cents": [
+        132620,
+        107213,
+        132571
+      ],
+      "gao_reported_refund_cents": 166154,
+      "gao_says_refund_occurred": true,
+      "carrier_amended_supplemental_claim_cents": 122405,
+      "carrier_claim_disallowed": null,
+      "future_carrier_credit_allowed_cents": 39174,
+      "future_carrier_credit_paid_cents": null,
+      "credit_decision_is_future_direction_not_verified_posting": true,
+      "gao_transcribed_bol_refs": [
+        {
+          "bol_reference": "WY-6564503",
+          "bill_of_lading_date": "1955-11-02",
+          "gao_reported_paid_cents": 132620
+        },
+        {
+          "bol_reference": "WY-6564509",
+          "bill_of_lading_date": "1955-11-02",
+          "gao_reported_paid_cents": 107213
+        },
+        {
+          "bol_reference": "WY-6564515",
+          "bill_of_lading_date": "1955-11-03",
+          "gao_reported_paid_cents": 132571
+        }
+      ]
+    }
+  ],
+  "reported_historical_refunds_total_cents": 184200,
+  "truth_boundaries": {
+    "historical_refunds_reported_by_gao_not_independently_bank_cleared": true,
+    "prospective_credit_not_observed_settled": true,
+    "independent_payment_provider_verification": false,
+    "original_governing_tariff_currently_held": false,
+    "contemporary_rate_applicability": "UNKNOWN",
+    "independently_held_out_customer_labels": 0,
+    "independent_holdout_verified": false,
+    "freight_error_precision_recall_scoring_allowed": false,
+    "downstream_cash_recovery_claim_allowed": false,
+    "retally_verified_customer_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_PUBLISHED_REFUND_EQUALS_BANK_CLEARING",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_INDEPENDENT_CASH_EVIDENCE_ABSENT"
+    },
+    {
+      "id": "SYNTHETIC_FUTURE_39174_CREDIT_ALREADY_POSTED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CREDIT_POSTING_NOT_VERIFIED"
+    },
+    {
+      "id": "SYNTHETIC_CROSS_REFERENCED_BOLS_SEPARATE_MINIMUMS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_VOLUME_SHIPMENT_GROUPING_ERROR"
+    },
+    {
+      "id": "SYNTHETIC_CARRIER_SUPPLEMENTAL_CLAIM_EQUALS_GOV_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_OPPOSING_PARTY_CLAIM_SEMANTICS"
+    },
+    {
+      "id": "SYNTHETIC_HISTORIC_TARIFF_CONTROLS_MODERN_RATE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HISTORICAL_RATE_APPLICABILITY"
+    },
+    {
+      "id": "SYNTHETIC_1962_REFUNDS_ARE_RETALLY_CUSTOMER_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CUSTOMER_AND_SETTLEMENT_PROVENANCE"
+    },
+    {
+      "id": "SYNTHETIC_CROSS_SUPPLEMENTAL_BOL_JOIN",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_TRANSCRIBED_BOL_LINEAGE_CONFLICT"
+    }
+  ],
+  "quality": {
+    "reviewed_original_publisher_html": true,
+    "original_response_bytes_sha256_known": false,
+    "original_bol_invoice_tariff_pages_custodied": false,
+    "modern_independently_labeled_invoices": 0,
+    "negative_controls_are_not_real_cases": true,
+    "private_customer_medical_student_records_used": false
+  }
+}

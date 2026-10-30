@@ -1,0 +1,104 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B221615_MERGED_CARRIER_GOVERNMENT_TENDER_DEDUCTION_CANDIDATE_V0",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_NOT_ACCOUNTING_OR_EXTRACTION",
+  "cohort": "US_GAO_GOVERNMENT_MOTOR_FREIGHT_1982_SHIPMENT_1986_DECISION",
+  "owner_lane": ":12 RETALLY/RecoveryOS Engineering (evaluation intake only; no engine change)",
+  "qa_lane": ":44 independent QA",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "official_url": "https://www.gao.gov/products/b-221615-0",
+    "decision_id": "B-221615",
+    "decision_date": "1986-06-24",
+    "reviewed_date_utc": "2026-10-29",
+    "format": "OFFICIAL_GAO_PUBLIC_ADJUDICATIVE_DECISION_HTML",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "US_GOVERNMENT_GAO_TEXT_COPY_DISTRIBUTE_WITH_SOURCE_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_SEPARATE",
+    "commercial_customer_invoice_scoring_approved": false,
+    "public_decision_http_bytes_custodied": false,
+    "original_decision_http_sha256": null,
+    "carrier_invoice_bytes_custodied": false,
+    "original_gbl_bytes_custodied": false,
+    "original_tender_pages_custodied": false,
+    "bank_or_gsa_offsets_original_receipts_custodied": false,
+    "original_tender_effective_dates_custodied": false,
+    "original_source_byte_provenance": "UNKNOWN_NO_RAW_PUBLISHER_RESPONSE",
+    "source_claim_basis": "GAO_PUBLISHED_DECISION_DIRECTLY_RECORDS_DEDUCTION_AND_ADJUDICATION_NOT_ORIGINAL_TRANSACTION_DOCUMENTS"
+  },
+  "historical_reported": {
+    "billed_carrier": "ABF_FREIGHT_SYSTEMS",
+    "government_contract_carrier": "EAST_TEXAS_MOTOR_FREIGHT_SYSTEM",
+    "gbl": "S4270096",
+    "gbl_date": "1982-09-09",
+    "destination": "CHERRY_POINT_NORTH_CAROLINA",
+    "tender": "ETMF_ICC_691",
+    "tender_in_effect_when_gbl_issued": true,
+    "merged_into_billing_carrier_date": "1982-09-12",
+    "delivered_by_billing_carrier_date": "1982-09-17",
+    "shipment_piece_count": 3,
+    "billed_and_collected_by_abf": true,
+    "original_carrier_bill_total_cents": null,
+    "gsa_reported_deduction_cents": 15604,
+    "gsa_reported_offset_from_other_abf_monies": true,
+    "abf_tender_adoption_proven_by_gao": false,
+    "gao_sustained_gsa_deduction": true,
+    "carrier_reclaim_result": "DISALLOWED",
+    "adjudication_reason": "GOVERNMENT_TENDERED_TO_ETMF_WHILE_ETMF_ICC_691_IN_EFFECT_CARRIER_OPERATIONAL_MERGER_DID_NOT_REPLACE_GBL_CONTRACT",
+    "ruling_depends_on_contract_carrier_and_tender_effective_on_shipment_date": true,
+    "modern_rate_applicability": "UNKNOWN"
+  },
+  "ground_truth": {
+    "official_historical_adjudication_label": "GAO_SUSTAINED_GSA_TENDER_BASED_OVERCHARGE_DEDUCTION",
+    "historical_collection_label": "GAO_REPORTS_15604_CENTS_DEDUCTED_FROM_OTHER_CARRIER_MONIES",
+    "independent_original_invoice_tender_bank_reconciliation_complete": false,
+    "independently_held_out_from_models": "UNKNOWN",
+    "independently_labeled_modern_customer_cases": 0,
+    "customer_ground_truth_amount_cents": null,
+    "verified_retally_customer_recovered_cents": 0,
+    "actual_gsa_bank_settlement_proof": "UNKNOWN",
+    "original_invoice_bill_total_cents": "UNKNOWN",
+    "production_accuracy_scoring_admitted": false,
+    "independent_qa_complete": false
+  },
+  "quality": {
+    "official_adjudication_outcome_readable": true,
+    "gbl_and_date_transcribed_from_publisher_not_original_custody": true,
+    "original_carrier_total_reported": false,
+    "tender_rate_and_original_invoice_line_items_complete": false,
+    "historical_case_comparability": "CONTRACT_PARTY_TENDER_APPLICABILITY_NOT_UNIVERSAL_CARRIER_MERGER_RULE",
+    "published_decision_label_complete": true,
+    "original_transaction_ground_truth_complete": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_PERFORMING_CARRIER_RATE_AUTO_APPLIES",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GBL_PARTY_AND_TENDER_CONTROL"
+    },
+    {
+      "id": "SYNTHETIC_GAO_FOUND_ABF_ADOPTED_TENDER",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_EXPLICIT_ADOPTION_NOT_ESTABLISHED"
+    },
+    {
+      "id": "SYNTHETIC_DEDUCTED_GSA_MONEY_EQUALS_RETALLY_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_RETALLY_CUSTOMER"
+    },
+    {
+      "id": "SYNTHETIC_GAO_DECISION_EQUALS_ORIGINAL_INVOICE_TENDER_BANK_BYTES",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_ORIGINAL_TRANSACTION_CUSTODY"
+    },
+    {
+      "id": "SYNTHETIC_1982_TENDER_PROVES_CURRENT_CONTRACT_PRICING",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MODERN_AUTHORITY_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_CASE_TREATED_AS_HELD_OUT_CUSTOMER",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HOLDOUT_UNVERIFIED"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "inventory_id": "RETALLY_LEGACY_COMPLETE_SOURCE_SUBTREE_CENSUS_2026_10_30",
+  "observed_date_utc": "2026-10-30",
+  "scope": "GIT_TREE_METADATA_ONLY_NOT_PUBLISHER_BODY_BYTES_OR_CUSTOMER_TRUTH",
+  "branches_with_capped_compare_fallback": 8,
+  "unique_source_directory_trees": 10,
+  "total_entries_across_unique_trees": 209,
+  "selected_directory_names": [
+    "freight/research",
+    "freight/fixtures",
+    "freight/evidence",
+    "freight/lab_archive_repairs"
+  ],
+  "all_selected_source_directory_tree_reads_complete": true,
+  "branches_no_code_or_schedule_migration": true,
+  "original_publisher_sha256_available_for_these_git_trees": false,
+  "newly_cleared_commercial_customer_source_rights": 0,
+  "fully_migrated_historical_contents": false,
+  "anchored_groups": [
+    {
+      "path": "subtree_anchor_00.json",
+      "git_blob_sha1": "3598116a5f15788184b31a2daec807c380fab242",
+      "records": 4
+    },
+    {
+      "path": "subtree_anchor_01.json",
+      "git_blob_sha1": "9a242cefa6ebf73861a720cc750e36811edef732",
+      "records": 4
+    }
+  ],
+  "complete_tree_groups": [
+    {
+      "path": "source_tree_blobs_00.json",
+      "git_blob_sha1": "72a377a08c5880dbb3335f368bff6e4d8ff80231",
+      "trees": 4
+    },
+    {
+      "path": "source_tree_blobs_01.json",
+      "git_blob_sha1": "7cafd0c62f0243016fa6b53c0cf8869051ca9ac7",
+      "trees": 4
+    },
+    {
+      "path": "source_tree_blobs_02.json",
+      "git_blob_sha1": "6105770a80de96e4422774898c9fe67bfadb3088",
+      "trees": 2
+    }
+  ],
+  "caveats": [
+    "This census covers four historical research-related directories for the eight large divergent branch refs, not every executable file in each repository tree.",
+    "Archive Git blob SHA-1 cannot authenticate remote publisher PDFs, API responses, original invoices or bank transactions.",
+    "No historical branch has been deleted, merged wholesale or assigned a new scheduled workflow.",
+    "Real independently adjudicated customer billing outcomes and commercial reuse approval remain UNKNOWN."
+  ]
+}

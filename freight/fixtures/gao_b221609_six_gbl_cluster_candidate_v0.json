@@ -1,0 +1,106 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B221609_SIX_GBL_SINGLE_ADJUDICATION_CLUSTER_CANDIDATE_V0",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_CORRELATED_CASE_CLUSTER_NOT_EXTRACTION_OR_AP_RECONCILIATION",
+  "engine": "freightrecovery",
+  "cohort": "US_GAO_DOD_MOTOR_FREIGHT_GBL_1985_GSA_DEDUCTIONS_1986_REVIEW",
+  "handoff": {
+    "engineering_owner": ":12 RETALLY/RecoveryOS evaluation intake; no engine changes",
+    "independent_qa_owner": ":44 QA",
+    "status": "DRAFT_UNRELEASED_EVIDENCE_ONLY"
+  },
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "official_url": "https://www.gao.gov/products/b-221609-0",
+    "decision_number": "B-221609",
+    "decision_date": "1986-02-28",
+    "last_reviewed_utc": "2026-10-29",
+    "format": "OFFICIAL_PUBLIC_GAO_HTML_DECISION",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_PUBLIC_US_GOVERNMENT_TEXT_COPY_ALLOWED_WITH_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE",
+    "commercial_scoring_permission": "HOLD_NO_ORIGINAL_INVOICE_OR_CUSTOMER_RIGHTS",
+    "raw_publisher_http_bytes_acquired": false,
+    "original_publisher_response_sha256": null,
+    "original_gbl_bytes_custodied": false,
+    "original_carrier_invoices_custodied": false,
+    "underlying_tender_pages_custodied": false,
+    "original_payment_deduction_receipts_custodied": false
+  },
+  "reported_decision": {
+    "claimant": "ABF_FREIGHT_SYSTEMS_OR_EAST_TEXAS_MOTOR_FREIGHT",
+    "reviewed_gsa_deduction_actions": 6,
+    "gao_sustained_all_reviewed_actions": true,
+    "rate_dispute": "CARRIER_CLAIMED_JOINT_LINE_GSA_APPLIED_LOWER_SINGLE_LINE",
+    "gao_agent_basis": "ORIGIN_PICKUP_CARRIERS_RECEIPTED_AS_AGENTS_OF_CONTRACTING_DELIVERY_CARRIER",
+    "carrier_higher_joint_line_position_rejected": true,
+    "source_aggregate_recovery_amount_cents": null,
+    "source_per_gbl_overcharge_amounts_cents": null,
+    "modern_rate_applicability": "UNKNOWN",
+    "case_dependency": "B218695_PRIOR_FACT_PATTERN_NOT_INDEPENDENT_LABELS",
+    "letter_dates": [
+      "1985-12-17",
+      "1985-12-18",
+      "1986-01-06"
+    ]
+  },
+  "reported_gbl_numbers": [
+    "APO743634",
+    "S4283162",
+    "M6361307",
+    "M6361264",
+    "M6357146",
+    "BPO392232"
+  ],
+  "ground_truth": {
+    "published_adjudication_decision_labels": 1,
+    "reported_referenced_gbls": 6,
+    "independent_invoice_face_labels": 0,
+    "independently_held_out_labeled_invoice_cases": 0,
+    "independent_shipment_deduction_receipt_labels": 0,
+    "independent_modern_customer_cases": 0,
+    "verified_retally_customer_recovered_cents": 0,
+    "publisher_decision_count_is_not_independent_invoice_count": true,
+    "shared_opinion_and_referenced_precedent_create_correlated_examples": true,
+    "per_shipment_amount": "UNKNOWN_NOT_REPORTED_IN_DECISION",
+    "original_invoice_amounts": "UNKNOWN_NOT_CUSTODIED",
+    "modern_contract_and_tender_validity": "UNKNOWN",
+    "customer_inference_permitted": false,
+    "production_accuracy_admitted": false
+  },
+  "quality": {
+    "decision_level_disposition_complete": true,
+    "per_gbl_record_level_labels_complete": false,
+    "original_document_byte_hash_complete": false,
+    "gbla_identifiers_transcribed_from_footnote_not_original_documents": true,
+    "statistical_independence_of_six_cases_proven": false,
+    "source_text_rights_reviewed": true,
+    "private_customer_medical_or_student_records_used": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_SIX_REFERENCES_EQUAL_SIX_INDEPENDENT_HELDOUT_INVOICE_LABELS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CLUSTER_LEAKAGE"
+    },
+    {
+      "id": "SYNTHETIC_JOINT_LINE_CARRIER_CLAIM_WAS_SUSTAINED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_INVERTED_ADJUDICATION"
+    },
+    {
+      "id": "SYNTHETIC_SIX_GBL_NUMBERS_PROVE_ORIGINAL_GBLS_IN_CUSTODY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_ORIGINAL_BYTES"
+    },
+    {
+      "id": "SYNTHETIC_GAO_DECISION_PROVES_SIX_SEPARATE_REFUND_DOLLAR_AMOUNTS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PER_BILL_MONEY_UNKNOWN"
+    },
+    {
+      "id": "SYNTHETIC_GSA_DEDUCTIONS_ARE_RETALLY_CUSTOMER_RECOVERIES",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_CUSTOMER_RECOVERY"
+    }
+  ]
+}

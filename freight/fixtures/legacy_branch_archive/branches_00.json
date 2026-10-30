@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "group": 0,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "lab/retally-real-doc-benchmark-20261019",
+      "head_sha": "456c0dce1614fcfe639bd19015db89992b3dbaba",
+      "ahead": 0,
+      "behind": 579,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "lab/retally-real-document-engines-20261019",
+      "head_sha": "00d9cbdc83ea99c9ad227aa8e8a1bb8f236707cf",
+      "ahead": 101,
+      "behind": 698,
+      "file_count": 36,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/research/AUTHORIZED_ORIGINAL_PDF_ACQUISITION_20261019.md",
+        "freight/research/COMPLETE_FREIGHT_RECOVERY_CHAIN_20261019.md",
+        "freight/research/FOUR_DOCUMENT_CHAIN_FMC_EVIDENCE_AUDIT_20261019.md",
+        "freight/research/GSA_CBCA_ORIGINAL_CASE_PACKAGE_TARGETS_20261019.md",
+        "freight/research/PENNINE_OGL_INVOICE_PAYMENT_REPLAY_20261019.md",
+        "freight/research/REAL_DOCUMENT_ENGINE_LAB_RESULTS_20261019.md",
+        "freight/research/SAME_SHIPMENT_CLOSED_LOOP_EVIDENCE_SEARCH_20261019.md",
+        "freight/research/SUNGOLD_2022_DETENTION_ORIGINAL_TARIFF_RETRIEVAL_20261019.md",
+        "freight/research/SUNGOLD_CHEVISANCE_CMA_CGM_DOCUMENT_CHAIN_20261019.md",
+        "freight/research/SUNGOLD_ORIGINAL_EXHIBITS_PUBLIC_DOWNLOAD_ATTEMPT_20261019.md",
+        "freight/research/SUNGOLD_ORIGINAL_EXHIBITS_TARIFF_SETTLEMENT_ACCESS_AUDIT_20261019.md",
+        "freight/research/UNSENT_GSA_TAMS_SOURCE_RECORD_REQUEST_20261019.md",
+        "freight/research/UNSENT_SPECIFIC_FREIGHT_CASE_FILE_REQUEST_20261019.md",
+        "freight/research/authorized_original_case_fetch.py",
+        "freight/research/cma_2022_tariff_discovery.py",
+        "freight/research/complete_case_gate.py",
+        "freight/research/public_invoice_payment_validation.py",
+        "freight/research/real_document_engine_lab.py",
+        "freight/research/statement_reconciliation.py",
+        "freight/research/sungold_court_link_probe.py",
+        "freight/research/sungold_same_shipment_admission_manifest.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "engineering/unified-lab-evaluation-feed-20261023",
+      "head_sha": "dd2d087789247349439746d21ed1b1cd5dc1fdeb",
+      "ahead": 7,
+      "behind": 188,
+      "file_count": 6,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "evidence/lab-ascii-money-20261022",
+      "head_sha": "7a43c19f0b298285a28b46ff1fd0f3d4349f4344",
+      "ahead": 0,
+      "behind": 253,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

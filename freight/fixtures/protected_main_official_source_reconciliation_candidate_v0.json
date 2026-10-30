@@ -1,0 +1,652 @@
+{
+  "schema_version": "0.1.1",
+  "evaluation_family": "OFFICIAL_FREIGHT_SOURCE_RECONCILIATION_POINTER_HOLD_NOT_INVOICE_SCORING",
+  "asof_date": "2026-10-27",
+  "ownership": {
+    "private_original_invoice_blind_census_bridge": {
+      "evaluation_family": "ORIGINAL_INVOICE_CENSUS_ONLY_NOT_FREIGHT_ERROR_ACCURACY",
+      "authoritative_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "authoritative_main_commit": "02752be8074d3f08e9b2b2b8b5da9495da0381c7",
+      "merged_pr_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/872",
+      "public_documentation_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/02752be8074d3f08e9b2b2b8b5da9495da0381c7/freight/ORIGINAL_INVOICE_BLIND_BENCHMARK.md",
+      "public_documentation_git_blob_sha1": "51b49867abd34233888cb9410f5b4e33595c9e1a",
+      "source_observed_on": "2026-10-29",
+      "original_invoice_faces_total": 110,
+      "globaltranz_faces": 100,
+      "arcbest_faces": 10,
+      "source_pdf_hashes_controlled_by": "EXISTING_ORIGINAL_DOCUMENT_LAB_NOT_THIS_PUBLIC_EVIDENCE_PACK",
+      "source_documents_newly_harvested_by_unified_lab": 0,
+      "private_original_pdf_bytes_in_unified_lab_custody": false,
+      "independent_buyer_rate_bol_payment_adjudication_complete_cases": 0,
+      "independently_adjudicated_positive_negative_truth_labels": 0,
+      "accuracy_precision_recall": "UNKNOWN_NOT_ESTIMABLE",
+      "required_independent_artifact_types": [
+        "rate",
+        "shipment",
+        "payment",
+        "adjudication"
+      ],
+      "buyer_specific_commercial_use_rights_cleared_by_unified_lab": false,
+      "commercial_or_production_scoring_authorized": false,
+      "verified_retally_recovery_cents": 0,
+      "new_research_writer_or_provider_runs": 0,
+      "handoff_freightrecovery_recoveryos_12": "USE_EXISTING_SOURCE_CENSUS_BRIDGE_NO_DUPLICATE_PDF_COLLECTION",
+      "handoff_qa_44": "INDEPENDENT_BUYER_TRUTH_SOURCE_RIGHTS_CASE_SIGNATURES_AND_EXACT_HEAD_PYTHON_CI_PENDING",
+      "synthetic_negative_controls": [
+        {
+          "id": "SYNTHETIC_BLIND_001",
+          "kind": "SYNTHETIC",
+          "assertion": "110_INVOICE_FACES_ARE_110_INDEPENDENT_RATE_ERROR_LABELS",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_002",
+          "kind": "SYNTHETIC",
+          "assertion": "SAME_SOURCE_CHARGE_ARITHMETIC_PROVES_OVERBILLING",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_003",
+          "kind": "SYNTHETIC",
+          "assertion": "SOURCE_CENSUS_PROVES_CARRIER_PAYMENT_OR_BUYER_REFUND",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_004",
+          "kind": "SYNTHETIC",
+          "assertion": "PUBLIC_LAB_MAY_COPY_PRIVATE_ORIGINALS",
+          "expected": "REJECT"
+        },
+        {
+          "id": "SYNTHETIC_BLIND_005",
+          "kind": "SYNTHETIC",
+          "assertion": "A_SIGNED_PACKET_ALONE_CONFERS_COMMERCIALLY_AUTHORIZED_TRUTH",
+          "expected": "REJECT"
+        }
+      ]
+    },
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "canonical_branch": "main",
+    "operational_research_data_writer": "research/retally-unified-data-lab",
+    "observed_main_commit": "fb0471623fca9f732fcba76352ffc9860cf2ba6b",
+    "observed_main_catalog_git_blob_sha1": "f608ca18f60eb2779a273f03aa110f954f6580e1",
+    "candidate_before_commit": "c62f6a1ce9c4587c606b2b39c4570e5dc1eac57e",
+    "candidate_before_catalog_git_blob_sha1": "8baff0999c4921e648977ed5f9ef2395d9ffa947",
+    "original_main_seed_references_count": 6,
+    "official_host_allowlist_or_provider_rule_change_applied": false,
+    "status": "BLOCKED_PENDING_EXISTING_OWNER_HOST_POLICY_AND_MAIN_TREE_RECONCILIATION",
+    "current_main_fmc_source_gap": {
+      "observation_date": "2026-10-27",
+      "canonical_main_sha": "b1c49b7ad6431d648325ba31b804ecd0542857d6",
+      "canonical_main_catalog_git_blob_sha1": "fe6faa9d85d002fcabf3f38b8c2836f1fbdb86fc",
+      "candidate_before_sha": "6c9447d1336a43e2ba8a9e6c47abedea372252b9",
+      "candidate_before_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+      "main_only_fmc_pointer_count": 4,
+      "publisher": "Federal Maritime Commission",
+      "evaluation_family": "FREIGHT_PUBLIC_ADMINISTRATIVE_RECORD_SOURCE_IDENTITY_ONLY",
+      "observed_source_ids": "2015(I);2036(I)",
+      "source_provenance": "EXACT_CURRENT_MAIN_SEED_URLS_CROSS_CHECKED_AGAINST_FIRST_PARTY_FMC_INDEXED_TEXT_AND_EXISTING_MAIN_VERSIONED_CASEBOOK_NOT_RAW_PDF",
+      "rights_state": "UNVERIFIED_HOLD",
+      "raw_publisher_pdf_bytes_held": false,
+      "independent_customer_ground_truth_cases": 0,
+      "production_seed_promotion_authorized": false,
+      "host_allowlist_change_authorized": false,
+      "independent_qa_complete": false,
+      "engine_changes_made": false,
+      "sources": [
+        {
+          "docket": "2015(I)",
+          "document_kind": "SETTLEMENT_DISMISSAL_ORDER",
+          "served_on": "2024-11-08",
+          "url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        },
+        {
+          "docket": "2015(I)",
+          "document_kind": "SETTLEMENT_NONREVIEW_NOTICE",
+          "served_on": "2024-12-10",
+          "url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        },
+        {
+          "docket": "2036(I)",
+          "document_kind": "INITIAL_DECISION_WITH_APPENDICES",
+          "served_on": "2026-07-16",
+          "url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        },
+        {
+          "docket": "2036(I)",
+          "document_kind": "EXTENSION_DENIAL_NOT_PROOF_OF_FINALITY",
+          "served_on": "2026-07-23",
+          "url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",
+          "publisher_response_bytes_sha256": null,
+          "official_url_unverified_original_bytes": true,
+          "customer_invoice_ground_truth": "UNKNOWN",
+          "independently_heldout_real_customer_label": false,
+          "actual_cash_settlement_replayed": false,
+          "commercial_reuse_approved": false
+        }
+      ],
+      "synthetic_negative_controls": [
+        {
+          "id": "SYNTHETIC_FMC_2015_SETTLEMENT_CALLED_ADJUDICATED_OVERCHARGE",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_SETTLEMENT_WITHOUT_MERITS_LABEL"
+        },
+        {
+          "id": "SYNTHETIC_FMC_2036_EXTENSION_DENIAL_CALLED_FINAL_PAYMENT",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_ADMINISTRATIVE_MOTION_NOT_BANK_RECEIPT"
+        },
+        {
+          "id": "SYNTHETIC_FMC_SOURCE_URL_CALLED_ORIGINAL_INVOICE_CUSTODY",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_NO_ORIGINAL_INVOICE_BYTES"
+        },
+        {
+          "id": "SYNTHETIC_FMC_PUBLIC_DOCUMENT_CALLED_COMMERCIAL_LICENSE",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_UNVERIFIED_THIRD_PARTY_RIGHTS"
+        }
+      ],
+      "acceptance_state": "HELD_REQUIRES_MAIN_TREE_RECONCILIATION_AND_INDEPENDENT_QA"
+    }
+  },
+  "rights": {
+    "government_published_sources": true,
+    "source_specific_rights_and_third_party_material_review_complete": false,
+    "commercial_engine_admission_authorized": false,
+    "production_redistribution_authorized": false,
+    "rights_status": "HOLD"
+  },
+  "cohort": {
+    "main_only_official_pointer_count": 6,
+    "primary_original_text_or_first_page_checked_this_run": 6,
+    "first_party_pdf_full_source_byte_replay_complete": false,
+    "independent_held_out_invoice_labels": 0,
+    "shipment_level_reliable_error_truth_labels": 0,
+    "real_customer_invoice_or_receipt_documents_custodied": 0,
+    "freight_error_scoring_eligible": false,
+    "paid_outcome_applies_only_to_2016_DOJ_report_not_retally": true
+  },
+  "sources": [
+    {
+      "id": "DOJ_2016_MENLO_ESTES",
+      "url": "https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve",
+      "publisher": "DOJ",
+      "published_on": "2016-05-03",
+      "reported_amount_cents": 1300000000,
+      "publisher_outcome_scope": "PUBLISHER_REPORTS_PAID_AGGREGATE_SETTLEMENT",
+      "source_review_status": "FIRST_PARTY_HTML_TEXT_REVIEWED_2026_10_27",
+      "reported_amount_semantics": "EXACT_REPORTED_AGGREGATE_NOT_INVOICE_LABEL",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_invoice_tariff_bank_receipt_custody": false,
+      "source_specific_commercial_rights_verified": false,
+      "independent_held_out_customer_invoice_label": false,
+      "actual_customer_invoice_error_label": "UNKNOWN",
+      "independent_actual_settlement_cash_receipt_verified": false,
+      "verified_retally_customer_recovery_cents": 0,
+      "historical_tariff_effective_date": null
+    },
+    {
+      "id": "DOJ_2022_YRC",
+      "url": "https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims",
+      "publisher": "DOJ",
+      "published_on": "2022-03-14",
+      "reported_amount_cents": 685000000,
+      "publisher_outcome_scope": "PUBLISHER_REPORTS_APPROXIMATE_AGREED_SETTLEMENT_NOT_PAID_PROOF",
+      "source_review_status": "FIRST_PARTY_HTML_TEXT_REVIEWED_2026_10_27",
+      "reported_amount_semantics": "APPROXIMATE_AGREED_AGGREGATE_NOT_RECEIPT",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_invoice_tariff_bank_receipt_custody": false,
+      "source_specific_commercial_rights_verified": false,
+      "independent_held_out_customer_invoice_label": false,
+      "actual_customer_invoice_error_label": "UNKNOWN",
+      "independent_actual_settlement_cash_receipt_verified": false,
+      "verified_retally_customer_recovery_cents": 0,
+      "historical_tariff_effective_date": null
+    },
+    {
+      "id": "CBCA_6578_RATE_2020",
+      "url": "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",
+      "publisher": "CBCA",
+      "published_on": "2020-08-06",
+      "reported_amount_cents": 1554908,
+      "publisher_outcome_scope": "CARRIER_PAID_GSA_SEVEN_NOTICES_CLAIM_GRANTED_REFUND_UNVERIFIED",
+      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_3_6_VISUAL_2026_10_27",
+      "reported_amount_semantics": "CARRIER_PAID_GSA_DISPUTED_NOTICES_NOT_VERIFIED_REFUND_RECEIVED",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_invoice_tariff_bank_receipt_custody": false,
+      "source_specific_commercial_rights_verified": false,
+      "independent_held_out_customer_invoice_label": false,
+      "actual_customer_invoice_error_label": "UNKNOWN",
+      "independent_actual_settlement_cash_receipt_verified": false,
+      "verified_retally_customer_recovery_cents": 0,
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 6,
+        "visually_reviewed_pages_one_based": [
+          1,
+          3,
+          6
+        ],
+        "shipment_year": 2014,
+        "government_notices_total": 115,
+        "appealed_notices": 7,
+        "other_notices_disposition": "UNKNOWN",
+        "carrier_paid_gsa_disputed_notices_cents": 1554908,
+        "board_disposition": "AARE_CLAIM_GRANTED_GSA_OVERCHARGE_PREMISE_REJECTED",
+        "carrier_refund_received_independently_verified": false,
+        "underlying_original_tenders_gbls_or_bank_receipts_acquired": false
+      }
+    },
+    {
+      "id": "CBCA_8051_RATE_2024",
+      "url": "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",
+      "publisher": "CBCA",
+      "published_on": "2024-08-08",
+      "reported_amount_cents": 1459569,
+      "publisher_outcome_scope": "UNPAID_CARRIER_INVOICE_CLAIM_TIME_BARRED_NOT_OVERCHARGE",
+      "source_review_status": "ORIGINAL_CBCA_13_PAGE_PDF_TEXT_REVIEWED_PAGES_1_13_VISUALLY_CHECKED_2026_10_27",
+      "reported_amount_semantics": "CLAIM_FACE_VALUE_NOT_PAYMENT_OR_OVERCHARGE",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_invoice_tariff_bank_receipt_custody": false,
+      "source_specific_commercial_rights_verified": false,
+      "independent_held_out_customer_invoice_label": false,
+      "actual_customer_invoice_error_label": "UNKNOWN",
+      "independent_actual_settlement_cash_receipt_verified": false,
+      "verified_retally_customer_recovery_cents": 0,
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 13,
+        "original_pdf_pages_visually_verified": [
+          1,
+          13
+        ],
+        "service_start_date": "2018-05-31",
+        "delivery_window": "JUNE_OR_JULY_2018",
+        "invoice_form": "SF_1113",
+        "original_invoice_submitted_on": "2018-09-26",
+        "dps_internal_approval_on": "2018-09-28",
+        "prepayment_audit_payment_denied_on": "2018-10-02",
+        "prepayment_denial_reason": "MISSING_WEIGHT_TICKET",
+        "initial_approval_equates_to_government_payment": false,
+        "notice_contained_regulatorily_required_appeal_rights": false,
+        "internal_weight_ticket_discussion_on": "2019-07-12",
+        "documented_government_receipt_of_2019_resubmission": false,
+        "first_documented_followup_on_denied_invoice": "2023-01-13",
+        "gsa_claim_denied_on": "2024-01-22",
+        "board_review_requested_on": "2024-03-19",
+        "board_review_within_six_months": true,
+        "separate_underlying_payment_denial_claim_timely": false,
+        "missing_appeal_notice_actual_prejudice_proven": false,
+        "accounting_record_issue": "UNPAID_INVOICE_LOST_IN_CARRIER_ACCOUNTING_SYSTEM",
+        "reported_unpaid_invoice_amount_cents": 1459569,
+        "board_decision": "CARRIER_UNPAID_CLAIM_DENIED_AS_UNTIMELY_NOT_RATE_ERROR_ADJUDICATION",
+        "actual_government_payment_independently_verified": false,
+        "original_invoice_ticket_bol_and_bank_bytes_acquired": false,
+        "applicable_historical_tariff_effective_date": null,
+        "current_customer_billing_error_ground_truth": "UNKNOWN"
+      }
+    },
+    {
+      "id": "CBCA_1317_RATE_2009",
+      "url": "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",
+      "publisher": "CBCA",
+      "published_on": "2009-10-29",
+      "reported_amount_cents": 13735675,
+      "publisher_outcome_scope": "TWELVE_RAIL_BOL_DEDUCTIONS_REVERSED_AS_UNTIMELY_NOT_VERIFIED_CARRIER_REFUND",
+      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_1_2_3_5_7_WEB_RENDER_VISUAL_PAGES_3_7_8_2026_10_27",
+      "reported_amount_semantics": "ACTUAL_TREASURY_DEDUCTIONS_REPORTED_IN_DECISION_NOT_VALIDATED_OVERCHARGE_OR_REFUND",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_invoice_tariff_bank_receipt_custody": false,
+      "source_specific_commercial_rights_verified": false,
+      "independent_held_out_customer_invoice_label": false,
+      "actual_customer_invoice_error_label": "UNKNOWN",
+      "independent_actual_settlement_cash_receipt_verified": false,
+      "verified_retally_customer_recovery_cents": 0,
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 8,
+        "board_reported_initial_overcharge_notices": 74,
+        "original_claims_reportedly_resolved": 67,
+        "added_claims_in_same_proceeding": 5,
+        "remaining_appealed_bols": 12,
+        "decision_bol_table_one_based_page": 3,
+        "sum_reported_overcharge_notices_cents": 13761404,
+        "sum_treasury_deductions_cents": 13735675,
+        "gap_notice_vs_deduction_cents": 25729,
+        "board_disposition": "REVERSED_GOVERNMENT_OVERCHARGE_DEDUCTIONS_AS_UNTIMELY",
+        "underlying_rate_overcharge_merits_adjudicated": false,
+        "carrier_refund_received_independently_verified": false,
+        "original_twelve_bols_tariffs_or_bank_receipts_acquired": false,
+        "original_pdf_pages_visually_verified": [
+          3,
+          7,
+          8
+        ],
+        "decision_reported_bol_rows": [
+          {
+            "bol_reference": "W45QQ90009822",
+            "alleged_overcharge_cents": 1793654,
+            "bill_paid_on": "2005-01-20",
+            "treasury_deduction_cents": 1793654,
+            "treasury_deducted_on": "2008-06-16"
+          },
+          {
+            "bol_reference": "W45QQ90009825",
+            "alleged_overcharge_cents": 1314805,
+            "bill_paid_on": "2005-01-20",
+            "treasury_deduction_cents": 1314805,
+            "treasury_deducted_on": "2008-06-16"
+          },
+          {
+            "bol_reference": "W45QQ90009832",
+            "alleged_overcharge_cents": 2194247,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 2194247,
+            "treasury_deducted_on": "2008-10-15"
+          },
+          {
+            "bol_reference": "W45QQ90009833",
+            "alleged_overcharge_cents": 878744,
+            "bill_paid_on": "2005-02-02",
+            "treasury_deduction_cents": 878744,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W45QQ90009838",
+            "alleged_overcharge_cents": 438849,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 438849,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W45QQ90009856",
+            "alleged_overcharge_cents": 877698,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 877698,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W45QQ90009858",
+            "alleged_overcharge_cents": 436990,
+            "bill_paid_on": "2005-02-11",
+            "treasury_deduction_cents": 436990,
+            "treasury_deducted_on": "2008-04-15"
+          },
+          {
+            "bol_reference": "W67G230008416",
+            "alleged_overcharge_cents": 330460,
+            "bill_paid_on": "2004-01-27",
+            "treasury_deduction_cents": 330460,
+            "treasury_deducted_on": "2008-10-10"
+          },
+          {
+            "bol_reference": "W67G230008417",
+            "alleged_overcharge_cents": 479879,
+            "bill_paid_on": "2004-02-05",
+            "treasury_deduction_cents": 479879,
+            "treasury_deducted_on": "2008-10-10"
+          },
+          {
+            "bol_reference": "W5CQRF0017135",
+            "alleged_overcharge_cents": 466531,
+            "bill_paid_on": "2004-02-09",
+            "treasury_deduction_cents": 466531,
+            "treasury_deducted_on": "2008-10-10"
+          },
+          {
+            "bol_reference": "W45QQ90006106",
+            "alleged_overcharge_cents": 1207383,
+            "bill_paid_on": "2004-03-01",
+            "treasury_deduction_cents": 1197902,
+            "treasury_deducted_on": "2008-10-31"
+          },
+          {
+            "bol_reference": "W45QQ90006013",
+            "alleged_overcharge_cents": 3342164,
+            "bill_paid_on": "2004-02-06",
+            "treasury_deduction_cents": 3325916,
+            "treasury_deducted_on": "2008-10-31"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CBCA_3467_RATE_2014",
+      "url": "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",
+      "publisher": "CBCA",
+      "published_on": "2014-05-14",
+      "reported_amount_cents": 33989575,
+      "publisher_outcome_scope": "GSA_70_PAID_DETENTION_INVOICE_RECOUPMENT_NOTICES_INVALID_NO_REFUND_PROOF",
+      "source_review_status": "ORIGINAL_CBCA_PDF_TEXT_REVIEWED_PAGES_4_5_6_VISUAL_2026_10_27",
+      "reported_amount_semantics": "BOARD_NO_INDEBTEDNESS_AMOUNT_NOT_CASH_AWARD_BODY_AND_DECISION_DIFFER_BY_2_CENTS",
+      "original_publisher_response_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "original_invoice_tariff_bank_receipt_custody": false,
+      "source_specific_commercial_rights_verified": false,
+      "independent_held_out_customer_invoice_label": false,
+      "actual_customer_invoice_error_label": "UNKNOWN",
+      "independent_actual_settlement_cash_receipt_verified": false,
+      "verified_retally_customer_recovery_cents": 0,
+      "historical_tariff_effective_date": null,
+      "decision_evidence": {
+        "original_pdf_pages": 6,
+        "visually_reviewed_pages_one_based": [
+          4,
+          5,
+          6
+        ],
+        "gsa_paid_detention_shipments_2010": 4,
+        "gsa_paid_detention_shipments_2011": 75,
+        "gsa_paid_detention_shipments_total": 79,
+        "gsa_retroactively_allowed_first_shipment_invoices": 9,
+        "gsa_challenged_paid_invoice_count": 70,
+        "government_repayment_demand_body_cents": 33989573,
+        "board_no_indebtedness_decision_cents": 33989575,
+        "within_original_decision_amount_discrepancy_cents": 2,
+        "gsa_detention_rule": "STOS_100_D_ITEM_325",
+        "gsa_detention_rule_historical_effective_date": null,
+        "board_disposition": "GSA_RECOUPMENT_NOTICES_INVALID_CARRIER_NOT_INDEBTED",
+        "actual_prior_gsa_detention_payments_reported": true,
+        "government_collected_disputed_recoupment_verified": false,
+        "new_carrier_refund_received_verified": false,
+        "original_79_bols_invoices_tariff_and_payment_receipts_acquired": false,
+        "independently_scored_customer_invoice_error_count": 0
+      }
+    }
+  ],
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_AGREED_SETTLEMENT_PROMOTED_TO_CASH_PAID",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_DOJ_AGGREGATE_LAUNDERED_TO_ORIGINAL_INVOICE",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_UNPAID_CLAIM_CALLED_FREIGHT_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_UPSTREAM_URL_IMPERSONATES_ORIGINAL_PDF_BYTES",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_PUBLIC_REPORT_PROMOTED_TO_COMMERCIAL_RIGHTS",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_PAID_GOVERNMENT_SETTLEMENT_CALLED_RETALLY_RECOVERY",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_AARE_CLAIM_GRANTED_CALLED_REFUND_RECEIVED",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_UP_74_NOTICES_CALLED_74_ADJUDICATED_ERROR_LABELS",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_UP_REVERSED_DEDUCTIONS_PROMOTED_TO_VERIFIED_REFUND_CASH",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_TQYL_DEMAND_CANCELLED_CALLED_NEW_CARRIER_CASH_REFUND",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_TQYL_33989573_AND_33989575_SILENTLY_COLLAPSED",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_TQYL_79_PAID_SHIPMENTS_CALLED_70_VERIFIED_CUSTOMER_ERRORS",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_DPS_INTERNAL_APPROVAL_PROMOTED_TO_GOVERNMENT_CASH_PAID",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_INTERNAL_2019_TICKET_DISCUSSION_PROMOTED_TO_AGENCY_RECEIPT",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_TIMELY_BOARD_REVIEW_PROMOTED_TO_TIMELY_PAYMENT_DENIAL_CLAIM",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_MISSING_APPEAL_RIGHTS_NOTICE_ASSUMED_AUTOMATIC_TOLL",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    },
+    {
+      "id": "SYNTH_CBCA_JFC_TIME_BARRED_UNPAID_INVOICE_PROMOTED_TO_RATE_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "actual_independent_customer_outcome": null,
+      "expected": "REJECT_UNSUPPORTED_SOURCE_PROMOTION"
+    }
+  ],
+  "acceptance": {
+    "source_identifier_reconciled_in_held_manifest": true,
+    "main_to_candidate_executable_seeds_reconciled": false,
+    "provider_host_policy_change_authorized": false,
+    "independent_qa_complete": false,
+    "actual_current_main_integration_green": false,
+    "release_authorized": false,
+    "protected_main_source_set_continuity_20261027": {
+      "observed_main_head": "ff4edaa6540d02cdddb4c04ef6ce224a434a3f8b",
+      "main_catalog_git_blob_sha1": "3fd2c32284e27833ed90725c276af6d63a086190",
+      "draft_head_before_snapshot": "49609760a7e2dd83d7686e5ae7852597639472a1",
+      "draft_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+      "original_main_only_seed_url_count": 9,
+      "original_official_freight_pointers_retained_as_held_metadata": 8,
+      "retained_in_six_source_manifest": 6,
+      "retained_in_fmc_2015i_pair_manifest": 2,
+      "excluded_nyc_restaurant_wrong_topic_count": 1,
+      "excluded_nyc_dataset_id": "43nn-pn8j",
+      "original_publisher_response_sha256": null,
+      "original_source_bytes_acquired": false,
+      "source_specific_commercial_use_admitted": false,
+      "independently_held_out_customer_truth_labels": 0,
+      "provider_host_or_rule_modified": false,
+      "executable_main_to_draft_source_merge_complete": false,
+      "protected_main_integration_verified": false,
+      "legacy_labs_consolidated": false,
+      "classification": "STATIC_PINNED_SEED_DIFF_EIGHT_HELD_ONE_EXCLUDED_NOT_ORIGINAL_SOURCE_BYTE_CUSTODY",
+      "cohort": "PROTECTED_MAIN_VS_DRAFT_SEED_IDENTITY_2026_10_27",
+      "owner_lane": "UNIFIED_RESEARCH_LAB",
+      "independent_qa_lane": ":44"
+    },
+    "current_main_source_set_continuity_20261027": {
+      "schema_version": "1.0.0",
+      "observed_main_head": "b1c49b7ad6431d648325ba31b804ecd0542857d6",
+      "main_catalog_git_blob_sha1": "fe6faa9d85d002fcabf3f38b8c2836f1fbdb86fc",
+      "draft_head_before_snapshot": "58756ccd5f2fa14fafcba9006df7c4cb504ed582",
+      "draft_catalog_git_blob_sha1": "a52e50df2e273465d14ebda947fb3b3027acd6d3",
+      "main_only_source_url_count": 11,
+      "unique_held_freight_source_pointers": 10,
+      "held_legacy_six_source_manifest": 6,
+      "held_fmc_2015_pair_manifest": 2,
+      "held_current_main_fmc_gap_manifest": 4,
+      "overlap_of_two_fmc_2015_pointers": 2,
+      "excluded_wrong_topic_nyc_restaurant": 1,
+      "excluded_wrong_topic_dataset_id": "43nn-pn8j",
+      "original_publisher_response_sha256": null,
+      "original_source_bytes_held": false,
+      "commercial_reuse_approved": false,
+      "independently_held_out_customer_invoice_labels": 0,
+      "verified_retally_cash_recovery_cents": 0,
+      "independent_qa_green": false,
+      "main_integration_complete": false,
+      "status": "MAIN_SOURCE_IDENTITY_RECONCILED_IN_HELD_METADATA_NOT_EXECUTABLE_OR_LICENSED",
+      "synthetic_negative_controls": [
+        {
+          "id": "SYNTHETIC_MAIN_9_ONLY_OMITS_TWO_JIMEX_FMC_POINTERS",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_INCOMPLETE_MAIN_ONLY_SOURCE_RECONCILIATION"
+        },
+        {
+          "id": "SYNTHETIC_FMC_DOCUMENT_POINTERS_EQUATED_TO_PAID_INVOICES",
+          "kind": "SYNTHETIC",
+          "expected": "REJECT_NO_CUSTOMER_INVOICE_OR_SETTLEMENT_CUSTODY"
+        }
+      ]
+    }
+  }
+}

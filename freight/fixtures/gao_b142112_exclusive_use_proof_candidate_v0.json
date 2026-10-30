@@ -1,0 +1,137 @@
+{
+  "schema_version": "0.1.0",
+  "fixture_id": "GAO_B142112_EXCLUSIVE_USE_PERFORMANCE_AND_AMOUNT_CONFLICT_CANDIDATE_V0",
+  "admission_state": "OFFICIAL_GAO_DECISION_ONLY_NOT_ORIGINAL_INVOICE_OR_HELDOUT_TRUTH",
+  "evaluation_family": "FREIGHT_ERROR_ADJUDICATION_HISTORICAL_DECISION_ONLY",
+  "cohort": "US_GAO_GOVERNMENT_MOTOR_FREIGHT_SHIPMENTS_1954_1956_DECISION_1960",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "official_url": "https://www.gao.gov/products/b-142112-1",
+    "decision_id": "B-142112",
+    "decision_date": "1960-11-23",
+    "reviewed_date": "2026-10-25",
+    "rights_reference": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_GOVERNMENT_DECISION_TEXT_REUSABLE_WITH_ACKNOWLEDGMENT_NO_ENDORSEMENT_THIRD_PARTY_RIGHTS_SEPARATE",
+    "source_kind": "OFFICIAL_GAO_PUBLISHED_HTML_DECISION_READ",
+    "original_publisher_response_bytes_held": false,
+    "original_publisher_response_sha256": null,
+    "original_carrier_invoice_gbl_tariff_bytes_held": false,
+    "governing_tariff_effective_date": null,
+    "customer_engine_commercial_reuse_approved": false,
+    "source_passages": [
+      "Decision paragraphs on 12 revised settlements and exclusive-use proof",
+      "Supplemental bill 7854-A; BOL WY-4250601",
+      "Supplemental bills 9911-A and 7711-A; BOL AF-6538038"
+    ]
+  },
+  "decision_scope": {
+    "carrier_requests_reviewed": 19,
+    "claims_with_revised_settlements_authorized": 12,
+    "revised_settlements_observed_paid_count": null,
+    "remaining_seven_claims_final_outcome": "UNKNOWN_OR_REVIEW_OPEN",
+    "exclusive_use_entitlement_requires_shipper_request": true,
+    "exclusive_use_entitlement_requires_proven_carrier_performance": true,
+    "carrier_performance_not_inferred_from_bol_request_alone": true
+  },
+  "historical_cases": [
+    {
+      "gbl_number_reported": "WY-4250601",
+      "supplemental_bill": "7854-A",
+      "shipment_year": 1954,
+      "original_carrier_freight_paid_cents": 45000,
+      "gao_reported_truckload_charge_cents": 35820,
+      "gao_reported_overpayment_cents": 9180,
+      "gao_reports_deduction_collected": true,
+      "independently_authenticated_bank_offset_receipt": false,
+      "exclusive_use_requested_on_bol": true,
+      "reported_origin_seal": "1895936",
+      "reported_destination_seal": "40530",
+      "seals_match": false,
+      "exclusive_use_furnished_proven": false,
+      "carrier_reclaim_disallowed_and_sustained": true,
+      "subsequent_settlement_unknown": true
+    },
+    {
+      "gbl_number_reported": "AF-6538038",
+      "original_carrier_freight_paid_cents": 88740,
+      "gao_first_audit_allowable_charge_cents": 59465,
+      "first_overcharge_deduction_collected_cents": 29275,
+      "first_overcharge_deduction_collected_reported_by_gao": true,
+      "initial_reclaim_bill": "9911-A",
+      "initial_reclaim_requested_cents": 29215,
+      "later_reclaim_bill": "7711-A",
+      "later_reclaim_requested_cents": 29275,
+      "same_reclaim_bill_identity": false,
+      "later_audit_allowable_charge_cents": 46421,
+      "later_statement_additional_overcharge_cents": 13044,
+      "concluding_paragraph_refund_requested_cents": 13040,
+      "conflicting_published_refund_amount_cents": 4,
+      "hypothetical_total_difference_cents": 42319,
+      "gao_reports_additional_refund_collected": false,
+      "later_additional_refund_collected_cents": null,
+      "exclusive_use_requested_on_bol": true,
+      "original_seal_or_performance_certification_present": false,
+      "exclusive_use_furnished_proven": false,
+      "carrier_reclaim_disallowed_and_sustained": true,
+      "subsequently_closed_payment_verified": false
+    }
+  ],
+  "truth_boundaries": {
+    "gaos_published_historical_decision_is_first_party": true,
+    "government_reported_initial_deductions_not_independently_bank_cleared": true,
+    "amount_conflicts_preserved_as_published": true,
+    "original_paid_invoices_and_bol_images_not_custodied": true,
+    "original_tariff_pages_not_custodied": true,
+    "independently_held_out_customer_labels": 0,
+    "independent_holdout_verification": false,
+    "modern_applicability": "UNKNOWN",
+    "modern_customer_freight_error_accuracy_scoring_allowed": false,
+    "actual_retally_customer_recovered_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_BOL_REQUEST_EQUALS_EXCLUSIVE_USE_PERFORMED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PROOF_OF_PERFORMANCE_ABSENT"
+    },
+    {
+      "id": "SYNTHETIC_DIFFERENT_ORIGIN_AND_DESTINATION_SEALS_MATCH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SEAL_IDENTITY_CONTRADICTION"
+    },
+    {
+      "id": "SYNTHETIC_9911_A_EQUALS_7711_A_AND_29215_EQUALS_29275",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SILENT_BILL_AND_AMOUNT_NORMALIZATION"
+    },
+    {
+      "id": "SYNTHETIC_13040_REPLACES_SOURCE_13044_WITHOUT_FLAG",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_FOUR_CENT_SOURCE_DISAGREEMENT_ERASURE"
+    },
+    {
+      "id": "SYNTHETIC_PROSPECTIVE_13040_REFUND_ALREADY_CASHED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNVERIFIED_ADDITIONAL_REFUND"
+    },
+    {
+      "id": "SYNTHETIC_ALL_19_SETTLEMENTS_REVISED_AND_PAID",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_12_OF_19_IS_NOT_19_PAID"
+    },
+    {
+      "id": "SYNTHETIC_HISTORICAL_GAO_DEDUCTION_IS_RETALLY_CUSTOMER_CASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_CONTEMPORARY_CUSTOMER_OR_PAYMENT_EVIDENCE"
+    }
+  ],
+  "quality": {
+    "official_publisher_full_decision_text_read": true,
+    "independent_original_publisher_byte_sha256_known": false,
+    "original_third_party_bill_tariff_custody": false,
+    "decision_reported_amounts_contain_distinct_disagreements": true,
+    "independent_accuracy_ground_truth_complete": false,
+    "private_student_medical_customer_data_used": false,
+    "evaluation_pack_use": "OFFLINE_HISTORICAL_DECISION_NEGATIVE_CONTROLS_ONLY"
+  }
+}

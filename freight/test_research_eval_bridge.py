@@ -44,7 +44,7 @@ def sample():
                            [GAO, SEC, "https://catalog.data.gov/dataset/freight-invoice-example"],
                            "2026-10-22")
     doc, _ = merge_sources(doc, "permitplate",
-                           ["https://data.cityofnewyork.us/d/43nn-pn8j"],
+                           ["https://data.cityofnewyork.us/d/rbx6-tga4"],
                            "2026-10-22")
     legacy = legacy_evidence([
         evidence_record(GAO, "GAO_DECISION", "2026-10-17T00:00:00Z"),
@@ -217,6 +217,99 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
         self.assertIsNone(generic["case_id"])
         self.assertEqual(generic["source_kind"], "UNCLASSIFIED_PUBLIC_DATASET_LEAD")
 
+    def test_exact_historical_gao_reference_stays_rights_held_and_unscored(self):
+        # Near-match and forged-money controls are SYNTHETIC, not source labels.
+        exact = "https://www.gao.gov/products/b-213717-0"
+        near = "https://www.gao.gov/products/b-213717"
+        forged = "https://www.gao.gov/products/b-213717-0-fake-cash"
+        source = ledger_from([
+            source_record(url, "freightrecovery", "2026-10-26")
+            for url in (exact, near, forged)
+        ])
+        evidence, candidates = legacy_evidence(), legacy_candidates()
+        manifest = load_manifest()
+        feed = build_feed(source, evidence, candidates, manifest)
+        rows = {r["source_url"]: r for r in feed["candidate_sources"]}
+        match = rows[exact]
+        self.assertIsNone(match["case_id"])  # frozen v1 never promoted
+        self.assertEqual(match["historical_decision_reference"]["decision_id"],
+                         "B-213717")
+        self.assertEqual(match["historical_decision_reference"]["decision_date"],
+                         "1984-03-20")
+        self.assertIsNone(match["historical_decision_reference"]
+                          ["original_publisher_response_sha256"])
+        self.assertFalse(match["historical_decision_reference"]
+                         ["commercial_rights_verified"])
+        self.assertEqual(feed["historical_gao_decision_reference_matches"], 1)
+        for row in rows.values():
+            self.assertFalse(row["commercial_reuse_authorized"])
+            self.assertFalse(row["independent_ground_truth"])
+            self.assertFalse(row["independent_payment_verified"])
+            self.assertFalse(row["source_document_ingested"])
+            self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+            self.assertIsNone(row["model"]["verified_freight_error_cents"])
+        self.assertIsNone(rows[near]["historical_decision_reference"])
+        self.assertIsNone(rows[forged]["historical_decision_reference"])
+        self.assertEqual(feed["frozen_v1_official_source_matches"], 0)
+        self.assertEqual(feed["independently_scored_new_customer_cases"], 0)
+        self.assertEqual(feed["verified_recovered_cash_cents"], 0)
+        self.assertFalse(feed["commercial_recovery_allowed"])
+
+        for mutation in ("forged_decision", "fake_money"):
+            invalid = deepcopy(feed)
+            target = next(r for r in invalid["candidate_sources"]
+                          if r["source_url"] == exact)
+            if mutation == "forged_decision":
+                target["historical_decision_reference"]["decision_id"] = "B-999999"
+            else:
+                target["model"]["verified_cash_recovered_cents"] = 52531
+            invalid["feed_sha256"] = digest({
+                key: value for key, value in invalid.items()
+                if key != "feed_sha256"
+            })
+            with self.subTest(mutation=mutation), self.assertRaises(ResearchError):
+                validate_feed(invalid, source, evidence, candidates, manifest)
+
+    def test_gao_crosswalk_pinned_source_fails_closed_on_missing_or_drift(self):
+        from freight.research_eval_bridge import HISTORICAL_GAO_CASEBOOK
+
+        source, evidence, candidates = sample()
+        manifest = load_manifest()
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "casebook.json"
+            path.write_bytes(HISTORICAL_GAO_CASEBOOK.read_bytes())
+            good = build_feed(source, evidence, candidates, manifest,
+                              historical_casebook_path=path)
+            self.assertEqual(
+                len(good["source_receipts"]["reviewed_historical_gao_casebook_file_sha256"]),
+                64,
+            )
+            path.write_bytes(path.read_bytes() + b"\n")
+            with self.assertRaisesRegex(ResearchError,
+                                        "HISTORICAL_GAO_CASEBOOK_UNREVIEWED_DRIFT"):
+                build_feed(source, evidence, candidates, manifest,
+                           historical_casebook_path=path)
+            path.unlink()
+            with self.assertRaisesRegex(ResearchError,
+                                        "HISTORICAL_GAO_CASEBOOK_MISSING"):
+                build_feed(source, evidence, candidates, manifest,
+                           historical_casebook_path=path)
+
+    def test_historical_crosswalk_is_bounded_without_losing_exact_reference(self):
+        exact = source_record("https://www.gao.gov/products/b-213717-0",
+                              "freightrecovery", "2026-01-01")
+        newer = [
+            source_record("https://catalog.data.gov/dataset/possible-freight-" + str(i),
+                          "freightrecovery", "2026-10-26")
+            for i in range(MAX_FEED_ROWS + 5)
+        ]
+        feed = build_feed(ledger_from([exact, *newer]), legacy_evidence(),
+                          legacy_candidates(), load_manifest())
+        self.assertEqual(feed["selected_for_synthetic_proof_gate"], MAX_FEED_ROWS)
+        self.assertEqual(feed["omitted_for_bounded_execution"], 6)
+        self.assertEqual(feed["historical_gao_decision_reference_matches"], 1)
+        self.assertEqual(feed["candidate_sources"][0]["source_url"], exact["url"])
+
     def test_private_invoice_domains_are_excluded_even_when_in_manifest(self):
         doc, evidence, candidates = sample()
         extra = source_record("https://www.gao.gov/products/b-143246",
@@ -231,6 +324,30 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
         feed = build_feed(doc, evidence, candidates, load_manifest())
         self.assertTrue(all("data.cityofnewyork.us" not in c["source_url"]
                             for c in feed["candidate_sources"]))
+
+    def test_sample_permitplate_source_is_dob_issued_permits_not_other_catalogs(self):
+        """SYNTHETIC metadata sample must not launder wrong-topic source identities."""
+        doc, _, _ = sample()
+        permit_urls = {row["url"] for row in doc["entries"]
+                       if "permitplate" in row["engines"]}
+        identity = json.loads(
+            (Path(__file__).with_name("fixtures")
+             / "nyc_dob_catalog_identity_reconciliation_candidate_v0.json")
+            .read_text(encoding="utf-8")
+        )["source_identity_delta"]
+        self.assertEqual(
+            permit_urls,
+            {"https://data.cityofnewyork.us/d/"
+             + identity["correct_dob_now_approved_permit_id"]},
+        )
+        self.assertNotIn(
+            "https://data.cityofnewyork.us/d/"
+            + identity["main_only_wrong_topic_dataset_id"], permit_urls,
+        )
+        self.assertNotIn(
+            "https://data.cityofnewyork.us/d/"
+            + identity["job_application_filing_id_not_issuance"], permit_urls,
+        )
 
     def test_source_probe_uses_native_engine_but_has_no_original_invoice(self):
         case = synthetic_proof_gate(digest(GAO))
@@ -320,6 +437,47 @@ class UnifiedEvaluationFeedTests(unittest.TestCase):
             with self.assertRaises(ResearchError):
                 bridge_run(unified_file, evidence_file, candidates_file, output,
                            verify_only=True)
+
+
+
+class GAOCasebookExpansionRegressionTests(unittest.TestCase):
+    """Reviewed source-book expansion must preserve historical false positives."""
+
+    def test_seven_source_bound_decisions_include_two_rejected_government_audits(self):
+        from freight.research_eval_bridge import (
+            HISTORICAL_GAO_CASEBOOK, _historical_gao_references,
+        )
+        source = json.loads(HISTORICAL_GAO_CASEBOOK.read_text(encoding="utf-8"))
+        refs, content_sha256 = _historical_gao_references()
+        self.assertEqual(len(content_sha256), 64)
+        self.assertEqual(len(source["cases"]), 7)
+        self.assertEqual(len(refs), 7)
+        rejected = {
+            row["id"]: row["source_url"] for row in source["cases"]
+            if row["adjudicated_historical_label"] == "HISTORICAL_AUDIT_FALSE_POSITIVE"
+        }
+        self.assertEqual(rejected, {
+            "B-221594": "https://www.gao.gov/products/b-221594-0",
+            "B-191258": "https://www.gao.gov/products/b-191258",
+        })
+        doc, _ = merge_sources(ledger_from([]), "freightrecovery",
+                               list(rejected.values()), "2026-10-26")
+        feed = build_feed(doc, legacy_evidence(), legacy_candidates(), load_manifest())
+        by_url = {r["source_url"]: r for r in feed["candidate_sources"]}
+        self.assertEqual(feed["historical_gao_decision_reference_matches"], 2)
+        for decision, url in rejected.items():
+            with self.subTest(decision=decision):
+                row = by_url[url]
+                self.assertEqual(row["historical_decision_reference"]["decision_id"], decision)
+                self.assertFalse(row["historical_decision_reference"]["independent_customer_ground_truth"])
+                self.assertFalse(row["commercial_reuse_authorized"])
+                self.assertFalse(row["independent_ground_truth"])
+                self.assertEqual(row["model"]["rating_status"], "REVIEW_REQUIRED")
+                self.assertIsNone(row["model"]["verified_freight_error_cents"])
+                self.assertEqual(row["model"]["verified_cash_recovered_cents"], 0)
+        self.assertEqual(feed["verified_recovered_cash_cents"], 0)
+        self.assertIsNone(feed["new_customer_proven_overcharges"])
+        self.assertFalse(feed["commercial_recovery_allowed"])
 
 
 if __name__ == "__main__":

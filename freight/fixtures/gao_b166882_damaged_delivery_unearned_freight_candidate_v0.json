@@ -1,0 +1,134 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B166882_DAMAGED_DELIVERY_UNEARNED_FREIGHT_CANDIDATE_V0",
+  "engine": "freightrecovery",
+  "evaluation_family": "FREIGHT_CHARGE_CATEGORY_EXCLUSION_NOT_TARIFF_RATE_ACCURACY",
+  "admission_state": "PUBLIC_GAO_HISTORICAL_DECISION_FIXTURE_ONLY_NOT_CUSTOMER_EVALUATION",
+  "cohort": "US_GAO_1966_1967_GBL_HOUSETRAILER_DAMAGE_1969_DECISION",
+  "source": {
+    "official_url": "https://www.gao.gov/products/b-166882",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-166882",
+    "decision_date": "1969-11-18",
+    "reviewed_date": "2026-10-30",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights_scope": "GAO_US_GOVERNMENT_TEXT_PUBLIC_DOMAIN_WITH_CREDIT_NO_IMPLIED_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE",
+    "original_publisher_http_bytes_held": false,
+    "original_publisher_http_sha256": null,
+    "original_signed_gbl_freight_bill_or_bank_bytes_held": false,
+    "controlling_historical_gbl_contract_pages_independently_acquired": false,
+    "historical_gbl_terms_effective_date_independently_verified": false,
+    "modern_contract_application": "UNKNOWN",
+    "customer_commercial_evaluation_authorized": false,
+    "public_decision_readable_text_checked": true
+  },
+  "published_decision": {
+    "freight_charges_demanded_back_cents": 247468,
+    "paid_to_carrier_reported_for_both_shipments": true,
+    "issue": "UNEARNT_FREIGHT_AFTER_ECONOMICALLY_VALUELESS_DELIVERY_UNDER_SPECIFIC_GOVERNMENT_BILLS_OF_LADING",
+    "delivered_with_signed_receipts_but_damage_exceptions": true,
+    "decision_freight_refund_demanded": true,
+    "refund_instruction_days": 60,
+    "refund_collected_cents": null,
+    "independent_bank_refund_receipt_held": false,
+    "rate_overcharge_cents": null,
+    "later_court_or_payment_outcome": "UNKNOWN",
+    "physical_property_value_compensation_not_freight_refund": true,
+    "separately_reported_shipments": 2
+  },
+  "historical_shipments": [
+    {
+      "case_key": "GAO_B166882_GBL_A6242431",
+      "source_published_gbl": "A-6242431",
+      "source_gbl_signed_date": "1967-05-09",
+      "collected_freight_cents": 207241,
+      "consignee_signed_delivery_certificate": true,
+      "damage_exception": "DESTROYED_ON_GBL_REVERSE",
+      "trailer_value_reportedly_paid_by_carrier_cents": 345000,
+      "carrier_reported_salvage_proceeds_cents": 79200,
+      "original_signed_paperwork_acquired": false,
+      "refund_settlement_confirmed": "UNKNOWN"
+    },
+    {
+      "case_key": "GAO_B166882_GBL_B7961821",
+      "source_published_gbl": "B-7961821",
+      "source_gbl_signed_date": "1966-09-19",
+      "collected_freight_cents": 40227,
+      "consignee_signed_delivery_certificate": true,
+      "damage_exception": "TOTAL_LOSS_ON_CARRIER_COMBINATION_BILL",
+      "trailer_value_reportedly_paid_by_carrier_cents": null,
+      "carrier_reported_salvage_proceeds_cents": null,
+      "original_signed_paperwork_acquired": false,
+      "refund_settlement_confirmed": "UNKNOWN"
+    }
+  ],
+  "truth_boundaries": {
+    "historical_gao_adjudication": "UNEARNT_FREIGHT_DEMAND_ON_FACT_SPECIFIC_GBL_DELIVERY_CONDITIONS",
+    "is_independently_verified_modern_tariff_rate_error": false,
+    "historical_charge_category": "UNEARNED_FREIGHT_DAMAGED_DELIVERY_NOT_RERATING",
+    "independently_heldout_modern_invoice_labels": 0,
+    "independently_complete_original_invoice_rate_shipment_payment_adjudication_cases": 0,
+    "original_rate_or_tariff_pages_acquired": 0,
+    "independent_actual_freight_refund_receipts": 0,
+    "verified_retally_cash_cents": 0,
+    "customer_precision_recall": "UNKNOWN",
+    "current_freight_case_truth": "UNKNOWN",
+    "customer_admission_approved": false,
+    "supersession_exhaustively_checked": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_SIGNED_DELIVERY_IMPLIES_FREIGHT_EARNED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_SIGNED_RECEIPT_MAY_HAVE_DAMAGE_EXCEPTION"
+    },
+    {
+      "id": "SYNTH_DAMAGE_COMPENSATION_IS_FREIGHT_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PROPERTY_DAMAGE_PAYMENT_DISTINCT_FROM_FREIGHT_REFUND"
+    },
+    {
+      "id": "SYNTH_SALVAGE_PROCEEDS_ARE_CUSTOMER_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_CARRIER_SALVAGE_NOT_GOVERNMENT_REFUND"
+    },
+    {
+      "id": "SYNTH_REFUND_DEMANDED_MEANS_COLLECTED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_COLLECTION_NOT_PROVEN_BY_ORDER"
+    },
+    {
+      "id": "SYNTH_TWO_SHIPMENTS_ONE_INVOICE_LABEL",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_TWO_SOURCE_GBL_CASE_IDENTITIES"
+    },
+    {
+      "id": "SYNTH_UNEARNED_FREIGHT_EQUALS_TARIFF_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_DIFFERENT_LEGAL_AND_EVIDENCE_CATEGORY"
+    },
+    {
+      "id": "SYNTH_1969_GBL_DECISION_AUTHORIZES_MODERN_AUTO_REFUNDS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HISTORICAL_GOVERNMENT_CONTRACT_NOT_CURRENT_PRIVATE_RATE"
+    }
+  ],
+  "quality": {
+    "original_official_publisher_decision_located": true,
+    "original_publisher_html_sha256_available": false,
+    "published_outcome_label_completeness": "TWO_HISTORICAL_GBL_CASES_WITH_REPORTED_CARRIER_RECEIPTS_AND_REFUND_DEMAND_NO_BANK_PROOF",
+    "independent_original_customer_invoice_level_holdout_complete": false,
+    "third_party_personal_information_reproduced": false,
+    "synthetic_examples_promoted_to_real_labels": false,
+    "cash_recovery_or_commercial_accuracy_certified": false
+  },
+  "handoff": {
+    "engineer_12": "FREIGHTRECOVERY_ONLY_OFFLINE_UNEARNED_FREIGHT_EXCLUSION_AND_REFUND_DEMAND_VS_COLLECTION",
+    "permitplate_48": "NOT_APPLICABLE",
+    "capturebrief_52": "NOT_APPLICABLE",
+    "independent_qa_44": "CONFIRM_GAO_ORIGINAL_DECISION_TWO_GBL_AMOUNTS_RIGHTS_AND_NO_LATER_SETTLEMENT_PROMOTION",
+    "engine_code_changed": false,
+    "release_approved": false,
+    "provider_requests_added": 0
+  }
+}

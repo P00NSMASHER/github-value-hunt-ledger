@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "group": 6,
+  "date_utc": "2026-10-30",
+  "records": [
+    {
+      "ref": "fix/unified-lab-verify-commands-20261023",
+      "head_sha": "6bdb75b4c38eb49954ec3f0adc294184e14c8049",
+      "ahead": 0,
+      "behind": 172,
+      "file_count": 0,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/freight-lab-audit-donor-ledger-20261008",
+      "head_sha": "b19c27668d0b60096bbe9b1049c32e5d5445dd1a",
+      "ahead": 7,
+      "behind": 1182,
+      "file_count": 4,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/research/HUNTED_CODE_REUSE_CANDIDATES.json",
+        "freight/research/LAB_FINDINGS_CUMULATIVE.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/lab15-doi-source-identity-20261021",
+      "head_sha": "6a69117fad026d43a989faa5a666f8c057df4983",
+      "ahead": 1,
+      "behind": 262,
+      "file_count": 2,
+      "possible_truncated": false,
+      "evidence_paths": [],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    },
+    {
+      "ref": "research/lab15-gao-fingerprint-churn-20261022",
+      "head_sha": "3b80dd44ebb8d25bd3457523973852b7c120fa3a",
+      "ahead": 1,
+      "behind": 253,
+      "file_count": 1,
+      "possible_truncated": false,
+      "evidence_paths": [
+        "freight/research/LAB15_GAO_FINGERPRINT_CHURN_20261022.json"
+      ],
+      "git_only": true,
+      "rights": "UNKNOWN_HOLD"
+    }
+  ]
+}

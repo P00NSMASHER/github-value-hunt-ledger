@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "run_date_utc": "2026-10-30",
+  "scope": "SEPARATE_JAVASCRIPT_ADVERSARIAL_REVIEW_SIMULATION_NOT_AUTHENTIC_INDEPENDENT_QA",
+  "checked_commit": "f9d3f98955a794eab2eca723abef984c37e602d0",
+  "source_files": [
+    {
+      "path": "freight/research_lab/legacy_archive/subtree_inventory_v1.json",
+      "git_blob_sha1": "1403bde1b99c5802fde26ca4c4151c87c6968dfd"
+    },
+    {
+      "path": "freight/research_lab/legacy_archive/subtree_anchor_00.json",
+      "git_blob_sha1": "3598116a5f15788184b31a2daec807c380fab242"
+    },
+    {
+      "path": "freight/research_lab/legacy_archive/subtree_anchor_01.json",
+      "git_blob_sha1": "9a242cefa6ebf73861a720cc750e36811edef732"
+    },
+    {
+      "path": "freight/research_lab/legacy_archive/source_tree_blobs_00.json",
+      "git_blob_sha1": "72a377a08c5880dbb3335f368bff6e4d8ff80231"
+    },
+    {
+      "path": "freight/research_lab/legacy_archive/source_tree_blobs_01.json",
+      "git_blob_sha1": "7cafd0c62f0243016fa6b53c0cf8869051ca9ac7"
+    },
+    {
+      "path": "freight/research_lab/legacy_archive/source_tree_blobs_02.json",
+      "git_blob_sha1": "6105770a80de96e4422774898c9fe67bfadb3088"
+    }
+  ],
+  "branch_refs_checked": 8,
+  "unique_git_trees_checked": 10,
+  "source_entries_checked": 209,
+  "original_publisher_http_body_sha256": null,
+  "source_rights_verified": false,
+  "independent_real_customer_outcome_labels": 0,
+  "verified_retally_cash_cents": 0,
+  "baseline_checks_passed": true,
+  "synthetic_attack_count": 10,
+  "synthetic_attack_rejections": 10,
+  "results": [
+    {
+      "synthetic": "fake_full_migration",
+      "rejected": true
+    },
+    {
+      "synthetic": "fake_new_rights",
+      "rejected": true
+    },
+    {
+      "synthetic": "fake_publisher_byte_sha",
+      "rejected": true
+    },
+    {
+      "synthetic": "fake_8_count",
+      "rejected": true
+    },
+    {
+      "synthetic": "fake_10_count",
+      "rejected": true
+    },
+    {
+      "synthetic": "fake_209",
+      "rejected": true
+    },
+    {
+      "synthetic": "duplicate_branch",
+      "rejected": true
+    },
+    {
+      "synthetic": "lost_file_entry",
+      "rejected": true
+    },
+    {
+      "synthetic": "bad_tree_ref",
+      "rejected": true
+    },
+    {
+      "synthetic": "forged_content_sha",
+      "rejected": true
+    }
+  ],
+  "independent_reviewer_identity_or_signoff": false,
+  "production_acceptance": false
+}

@@ -1,0 +1,201 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "NYC_DOB_2026_STRUCTURAL_GATES_ORIGINAL_NOTICE_CANDIDATE_V0",
+  "engine": "permitplate",
+  "evaluation_family": "GOVERNMENT_PERMIT_SCORING_POLICY_GATES_NOT_SOURCE_IDENTITY",
+  "status": "DRAFT_ORIGINAL_PUBLISHER_POLICY_WITH_SYNTHETIC_CONTROLS_NO_CUSTOMER_LABELS",
+  "source": {
+    "publisher": "New York City Department of Buildings",
+    "original_notice_url": "https://www.nyc.gov/assets/buildings/pdf/stpermits_dn-sn.pdf",
+    "notice_title": "New Restrictions on Structural Permits in DOB NOW",
+    "notice_date": "2026-01-21",
+    "policy_effective_date": "2026-02-02",
+    "publisher_document_pages": 1,
+    "original_pdf_bytes_acquired": false,
+    "original_pdf_sha256": null,
+    "method": "OFFICIAL_PUBLISHER_NOTICE_RENDERED_AND_VISUALLY_INSPECTED; RAW_DOCUMENT_BYTES_NOT_ACQUIRED",
+    "governing_bulletin_reference": "Buildings Bulletin 2025-011",
+    "bulletin_full_text_acquired": false,
+    "municipal_content_commercial_reuse_rights": "UNKNOWN_HOLD_NO_RIGHTS_PROMOTION",
+    "dataset_specific_commercial_use_authorized": false,
+    "provenance_review_date_utc": "2026-10-26"
+  },
+  "scope": {
+    "applicability": "DOB NOW separately filed Alteration in connection with development, enlargement or change in use, affirmative PW1 answer; conditional ST/FO/EA gates",
+    "notice_not_universal_for_all_permits": true,
+    "gates": [
+      {
+        "rule": "FO_OR_EA_ISSUANCE",
+        "when": "PW1 affirmative and work type Foundation (FO) or Earthwork (EA)",
+        "dependency": "related NB/NBEE/Alt-CO/Alteration-with-enlargement ZD1 accepted"
+      },
+      {
+        "rule": "ST_ISSUANCE_NB_NBEE_ALTCO",
+        "when": "PW1 affirmative and related NB, NBEE or Alt-CO with ZD1",
+        "dependency": "related Initial I1 GC permit issued"
+      },
+      {
+        "rule": "ST_ISSUANCE_ALT_ENLARGEMENT",
+        "when": "PW1 affirmative and related Alteration with enlargement",
+        "dependency": "related GC permit issued"
+      },
+      {
+        "rule": "ST_RENEWAL",
+        "when": "PW1 affirmative and renewing ST",
+        "dependency": "related GC permit active (not expired)"
+      }
+    ],
+    "historical_policy_retroactively_applied": false,
+    "no_claim_on_actual_permit_violation": true
+  },
+  "evaluation": {
+    "test_gap": "Existing 20-row $select cannot observe PW1 scope or dependent ZD1/GC status; cannot assert eligibility, current validity, or scoring precision from a dated permit listing.",
+    "current_collector_select": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "issued_date",
+      "permit_status"
+    ],
+    "required_but_unobserved_context": [
+      "PW1 related-development answer",
+      "separately filed Alteration context",
+      "work_type",
+      "related job family",
+      "related ZD1 acceptance",
+      "related GC permit issuance",
+      "related GC active/expired"
+    ],
+    "actual_case_records_acquired": 0,
+    "independently_held_out_labeled_cases": 0,
+    "permitplate_precision_recall": null,
+    "commercial_lead_truth": "UNKNOWN",
+    "current_permit_validity_truth": "UNKNOWN",
+    "source_notice_entitlement": "HOLD_PENDING_RIGHTS_REVIEW",
+    "synthetic_control_count": 6
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_FO_RELATED_ZD1_NOT_ACCEPTED",
+      "kind": "SYNTHETIC",
+      "work_type": "FO",
+      "filing_context": "SEPARATE_ALTERATION_PW1_YES",
+      "condition": "RELATED_ZD1_NOT_ACCEPTED",
+      "projected_row": {
+        "tracking_number": "SYNTH-GATE-1",
+        "job_filing_number": "SYNTH-JOB-1",
+        "work_permit": "SYNTH-WORK-1",
+        "issued_date": "2026-10-20T00:00:00.000",
+        "permit_status": "Permit Issued"
+      },
+      "expected_truth_boundary": "HOLD_ISSUANCE_NOT_CURRENT_PERMIT_TRUTH",
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "independent_commercial_lead_label": null
+    },
+    {
+      "id": "SYNTH_ST_NB_GC_I1_NOT_ISSUED",
+      "kind": "SYNTHETIC",
+      "work_type": "ST",
+      "filing_context": "SEPARATE_ALTERATION_PW1_YES_NB",
+      "condition": "GC_INITIAL_I1_NOT_ISSUED",
+      "projected_row": {
+        "tracking_number": "SYNTH-GATE-2",
+        "job_filing_number": "SYNTH-JOB-2",
+        "work_permit": "SYNTH-WORK-2",
+        "issued_date": "2026-10-20T00:00:00.000",
+        "permit_status": "Permit Issued"
+      },
+      "expected_truth_boundary": "HOLD_ISSUANCE_NOT_CURRENT_PERMIT_TRUTH",
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "independent_commercial_lead_label": null
+    },
+    {
+      "id": "SYNTH_ST_ENLARGEMENT_GC_NOT_ISSUED",
+      "kind": "SYNTHETIC",
+      "work_type": "ST",
+      "filing_context": "SEPARATE_ALTERATION_PW1_YES_ALT_ENLARGEMENT",
+      "condition": "RELATED_GC_NOT_ISSUED",
+      "projected_row": {
+        "tracking_number": "SYNTH-GATE-3",
+        "job_filing_number": "SYNTH-JOB-3",
+        "work_permit": "SYNTH-WORK-3",
+        "issued_date": "2026-10-20T00:00:00.000",
+        "permit_status": "Permit Issued"
+      },
+      "expected_truth_boundary": "HOLD_ISSUANCE_NOT_CURRENT_PERMIT_TRUTH",
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "independent_commercial_lead_label": null
+    },
+    {
+      "id": "SYNTH_ST_RENEWAL_GC_EXPIRED",
+      "kind": "SYNTHETIC",
+      "work_type": "ST",
+      "filing_context": "SEPARATE_ALTERATION_PW1_YES_RENEWAL",
+      "condition": "RELATED_GC_EXPIRED",
+      "projected_row": {
+        "tracking_number": "SYNTH-GATE-4",
+        "job_filing_number": "SYNTH-JOB-4",
+        "work_permit": "SYNTH-WORK-4",
+        "issued_date": "2026-10-20T00:00:00.000",
+        "permit_status": "Permit Issued"
+      },
+      "expected_truth_boundary": "HOLD_RENEWAL_NOT_CURRENT_VALIDITY_TRUTH",
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "independent_commercial_lead_label": null
+    },
+    {
+      "id": "SYNTH_BEFORE_2026_02_02_NO_RETROACTIVE_GATE",
+      "kind": "SYNTHETIC",
+      "work_type": "ST",
+      "filing_context": "SEPARATE_ALTERATION_PW1_YES_NB",
+      "condition": "BEFORE_POLICY_EFFECTIVE_DATE",
+      "projected_row": {
+        "tracking_number": "SYNTH-GATE-5",
+        "job_filing_number": "SYNTH-JOB-5",
+        "work_permit": "SYNTH-WORK-5",
+        "issued_date": "2026-01-31T00:00:00.000",
+        "permit_status": "Permit Issued"
+      },
+      "expected_truth_boundary": "DO_NOT_RETROACTIVELY_APPLY_RULE_OR_INFER_VALIDITY",
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "independent_commercial_lead_label": null
+    },
+    {
+      "id": "SYNTH_PW1_NO_NO_SCOPE_PROMOTION",
+      "kind": "SYNTHETIC",
+      "work_type": "EA",
+      "filing_context": "SEPARATE_ALTERATION_PW1_NO",
+      "condition": "PW1_CONNECTION_NO",
+      "projected_row": {
+        "tracking_number": "SYNTH-GATE-6",
+        "job_filing_number": "SYNTH-JOB-6",
+        "work_permit": "SYNTH-WORK-6",
+        "issued_date": "2026-10-20T00:00:00.000",
+        "permit_status": "Permit Issued"
+      },
+      "expected_truth_boundary": "DO_NOT_APPLY_YES_GATE_OR_INFER_VALIDITY",
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "independent_commercial_lead_label": null
+    }
+  ],
+  "consumers": {
+    "permitplate_owner": ":48",
+    "independent_qa": ":44",
+    "research_lab": "EXISTING_SINGLE_WORKSTREAM",
+    "release_authorized": false,
+    "engine_code_change_authorized_here": false
+  },
+  "safety": {
+    "private_customer_rows_stored": 0,
+    "new_provider_calls": 0,
+    "new_schedules": 0,
+    "new_paid_services": 0,
+    "contacts": 0
+  }
+}

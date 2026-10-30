@@ -1,0 +1,533 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "RETALLY_NYC_DOB_SEQUENCE_PROJECTION_V1",
+  "authored_utc_date": "2026-10-26",
+  "engine": "permitplate",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_ONLY_NOT_SCORING",
+  "source": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "official_source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "publisher_metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "source_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+    "original_publisher_metadata_review_utc_date": "2026-10-26",
+    "publisher_rows_last_updated_utc": "2026-10-23T18:42:42Z",
+    "publisher_field_verified": "sequence_number",
+    "dataset_specific_commercial_reuse_authorized": false,
+    "reuse_rights": "UNVERIFIED_NYC_PORTAL_AND_DATASET_TERMS_HOLD",
+    "original_publisher_response_bytes_sha256": null,
+    "publisher_metadata_response_bytes_sha256": null,
+    "actual_customer_invoice_or_permit_record_bytes_stored": 0,
+    "excluded_permit_categories": [
+      "Electrical",
+      "Elevator",
+      "Limited Alteration Application"
+    ]
+  },
+  "inspected_source": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "branch": "main",
+    "source_path": "freight/official_nyc_issued_permit_lab.py",
+    "source_blob_git_sha1": "8cf9a87b07b66d39c438ac1a8e01148f10c7b8f9",
+    "test_blob_git_sha1": "07b8b07c347c063fe28100ebf88262ba09827aaf",
+    "source_fields_at_inspection": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "issued_date",
+      "permit_status"
+    ],
+    "normalized_identity_fields": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "sequence_number"
+    ],
+    "finding": "Publisher exposes sequence_number; $select does not request it; earlier mocked provider returned unprojected sequence_number.",
+    "live_distinct_identity_count_verified": false,
+    "live_collision_in_publisher_data_verified": false
+  },
+  "cohort": {
+    "provenance_class": "SYNTHETIC_ONLY_NO_ACTUAL_ROWS",
+    "original_publisher_records_downloaded": 0,
+    "synthetic_sequence_collision_rows": 2,
+    "independent_held_out_labeled_cases": 0,
+    "independent_holdout_verified": false,
+    "labeled_real_permit_issuance_outcomes": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "two_sequences_same_projected_identity",
+      "synthetic": true,
+      "rows": [
+        {
+          "tracking_number": "SYNTH-5001",
+          "job_filing_number": "SYNTH-M100-I1",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "1",
+          "issued_date": "2026-10-21T00:00:00.000",
+          "permit_status": "Permit Issued"
+        },
+        {
+          "tracking_number": "SYNTH-5001",
+          "job_filing_number": "SYNTH-M100-I1",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "2",
+          "issued_date": "2026-10-21T00:00:00.000",
+          "permit_status": "Permit Issued"
+        }
+      ],
+      "expected_when_sequence_unselected": "DEGRADED_COLLAPSED_SOURCE_IDENTITY",
+      "expected_when_sequence_selected": "TWO_DISTINCT_PUBLISHER_ROW_IDENTITIES_NOT_INDEPENDENT_OUTCOMES",
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "unprojected_field_not_proof",
+      "synthetic": true,
+      "expected": "NO_FALSE_PUBLISHER_SEQUENCE_PROOF",
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "dataset_membership_not_independent_issuance",
+      "synthetic": true,
+      "expected": "UNKNOWN_INDEPENDENT_OUTCOME",
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "nullable_sequence_cannot_prove_distinct_issuance",
+      "synthetic": true,
+      "rows": [
+        {
+          "tracking_number": "SYNTH-NULL-01",
+          "job_filing_number": "SYNTH-M200-I1",
+          "work_permit": "SYNTH-M200-I1-GC",
+          "sequence_number": null,
+          "issued_date": "2026-10-20T00:00:00.000",
+          "permit_status": "Permit Issued"
+        },
+        {
+          "tracking_number": "SYNTH-NULL-01",
+          "job_filing_number": "SYNTH-M200-I1",
+          "work_permit": "SYNTH-M200-I1-GC",
+          "sequence_number": null,
+          "issued_date": "2026-10-21T00:00:00.000",
+          "permit_status": "Permit Issued"
+        }
+      ],
+      "expected": "SOURCE_IDENTITY_AMBIGUOUS_TEMPORAL_SNAPSHOTS_NOT_TWO_INDEPENDENT_ISSUANCE_OUTCOMES",
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "signed_off_or_1899_expiry_is_not_current_validity_proof",
+      "synthetic": true,
+      "row": {
+        "tracking_number": "SYNTH-STATUS-001",
+        "job_filing_number": "SYNTH-M300-I1",
+        "work_permit": "SYNTH-M300-I1-GC",
+        "sequence_number": "1",
+        "issued_date": "2026-10-23T00:00:00.000",
+        "permit_status": "Signed-off",
+        "expired_date": "1899-12-30T00:00:00.000"
+      },
+      "expected": "ISSUED_DATE_PRESENT_FROM_CURRENT_PROJECTION_ONLY_CURRENT_VALIDITY_AND_EXPIRY_SEMANTICS_UNKNOWN",
+      "independent_current_validity_label": null,
+      "actual_real_world_error_label": null
+    },
+    {
+      "id": "filing_reason_no_work_permit_not_issued_truth",
+      "synthetic": true,
+      "row": {
+        "tracking_number": "SYNTH-FILING-001",
+        "job_filing_number": "SYNTH-M400-I1",
+        "work_permit": "Permit is not yet issued",
+        "sequence_number": null,
+        "issued_date": "2026-10-22T00:00:00.000",
+        "permit_status": "Permit Issued",
+        "filing_reason": "No Work Permit"
+      },
+      "expected": "PUBLISHER_NOT_YET_ISSUED_MARKER_NOT_CONFIRMED_ISSUANCE_OR_BUYER_LEAD",
+      "actual_real_world_error_label": null,
+      "independent_current_validity_label": null
+    }
+  ],
+  "limits": {
+    "live_source_identity_completeness": "UNKNOWN_UNTIL_OWNER_CHANGES_QUERY_AND_REAL_READBACK",
+    "commercial_rights": "UNKNOWN_UNTIL_SOURCE_SPECIFIC_REVIEW",
+    "buyer_demand": "UNKNOWN",
+    "production_permit_status": "UNKNOWN",
+    "current_permit_validity": "UNKNOWN",
+    "permitplate_scoring_precision_recall": null,
+    "retally_recovered_cash_cents": 0,
+    "customer_outreach": false,
+    "payments": false,
+    "production_release": false
+  },
+  "consumption": {
+    "unified_lab_regression_module": "freight.test_official_nyc_issued_permit_lab",
+    "permitplate_owner_review_required": true,
+    "independent_qa_required": true,
+    "status": "DRAFT_SOURCE_PROJECTION_REGRESSION_ONLY_NO_ENGINE_CHANGE"
+  },
+  "evidence_revision": "2026-10-26-nyc-filing-reason-placeholder-quality-boundary",
+  "publisher_cached_sequence_profile": {
+    "source_kind": "FIRST_PARTY_PUBLISHER_METADATA_CACHED_COLUMN_STATISTICS_NOT_ORIGINAL_RECORDS",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "observed_dataset_id": "rbx6-tga4",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "field_name": "sequence_number",
+    "column_data_type": "text",
+    "publisher_cached_non_null_count": 1019801,
+    "publisher_cached_null_count": 351,
+    "publisher_cached_total_count": 1020152,
+    "actual_rows_read_or_stored": 0,
+    "publisher_original_metadata_response_sha256": null,
+    "independent_holdout_labeled_count": 0,
+    "proves_nulls_within_current_live_query_cohort": false,
+    "proves_distinct_real_identity_collisions": false,
+    "source_specific_commercial_reuse_authorized": false,
+    "authorization_status": "NYC_OPEN_DATA_PUBLIC_TERMS_REVIEWED_ADDITIONAL_DATASET_TERMS_AND_ENGINE_USE_HELD",
+    "ground_truth_status": "SOURCE_METADATA_ONLY_NO_INDEPENDENT_ISSUANCE_OR_BUYER_OUTCOME",
+    "quality_limit": "Counts are cached publisher metadata, may change; 351 null sequence values are dataset-wide, not verified within the issued_date/tracking_number query cohort. Even adding sequence_number to $select cannot make an actually null field non-null."
+  },
+  "publisher_cached_status_and_expiry_profile": {
+    "source_kind": "FIRST_PARTY_PUBLISHER_CACHED_COLUMN_STATISTICS_NOT_INDEPENDENT_VALIDITY_LABELS",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "total_cached_records": 1020152,
+    "permit_status_field": "permit_status",
+    "permit_status_column_null_count": 0,
+    "permit_status_cached_counts": {
+      "Signed-off": 652244,
+      "Permit Issued": 367908
+    },
+    "expired_date_field": "expired_date",
+    "expired_date_cached_non_null_count": 1018984,
+    "expired_date_cached_null_count": 1168,
+    "expired_date_cached_minimum": "1899-12-30T00:00:00.000",
+    "date_1899_is_sentinel_verified": false,
+    "status_and_expiry_joint_distribution_verified": false,
+    "actual_publisher_rows_downloaded": 0,
+    "independent_current_permit_validity_labels": 0,
+    "publisher_metadata_response_raw_sha256": null,
+    "dataset_specific_commercial_reuse_approved": false,
+    "validity_and_buying_opportunity_ground_truth": "UNKNOWN",
+    "quality_limit": "Cached counts are dataset-wide, not necessarily the filtered readback cohort. Signed-off is a distinct publisher state, not independent proof of current validity; anomalous 1899 minimum cannot be interpreted without row-level semantics. Original publisher bytes were not acquired."
+  },
+  "publisher_cached_filing_reason_profile": {
+    "source_kind": "FIRST_PARTY_PUBLISHER_CACHED_COLUMN_STATISTICS_NOT_ROW_LEVEL_JOIN",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "total_cached_records": 1020152,
+    "filing_reason_field": "filing_reason",
+    "filing_reason_cached_counts": {
+      "Initial Permit": 691825,
+      "Renewal Permit Without Changes": 263973,
+      "Renewal Permit with Changes": 57175,
+      "No Work Permit": 6764,
+      "None": 415
+    },
+    "work_permit_column_null_count": 212,
+    "work_permit_placeholder_text": "Permit is not yet issued",
+    "work_permit_placeholder_cached_top_count": 345,
+    "filing_reason_and_work_permit_joint_distribution_verified": false,
+    "these_counts_in_filtered_20_row_replay_verified": false,
+    "actual_publisher_rows_downloaded": 0,
+    "independent_permit_issuance_labels": 0,
+    "original_publisher_metadata_response_sha256": null,
+    "source_specific_commercial_reuse_approved": false,
+    "permitplate_scoring_ground_truth": "UNKNOWN",
+    "quality_limit": "Cached publisher column counts are dataset-wide, not row-level joins. 'No Work Permit', null work_permit, and 'Permit is not yet issued' do not prove an issued, currently valid permit or commercial lead. Overlap and filtered-cohort prevalence remain UNKNOWN."
+  },
+  "publisher_unfiltered_placeholder_join_20261026": {
+    "observation_type": "FIRST_PARTY_PUBLIC_SODA_JSON_RENDERED_SINGLE_ROW_NOT_ORIGINAL_HTTP_RESPONSE_BYTES",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "official_dataset_id": "rbx6-tga4",
+    "source_url": "https://data.cityofnewyork.us/resource/rbx6-tga4.json",
+    "metadata_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "cohort": "ONE_VISIBLE_ROW_UNFILTERED_DEFAULT_API_PAGE_NOT_THE_CURRENT_ISSUED_DATE_FILTERED_20_ROW_COLLECTOR_COHORT",
+    "material_fields_observed_together": {
+      "work_permit": "Permit is not yet issued",
+      "permit_status": "Signed-off",
+      "issued_date_present": false
+    },
+    "observation_limit": "Renderer first visible array entry, unordered default page and time-varying publisher. Absent issued_date key in visible entry, not proof of immutable historical permit state.",
+    "original_publisher_http_body_acquired": false,
+    "original_publisher_http_sha256": null,
+    "original_permit_row_or_personal_identifiers_stored": false,
+    "identifying_fields_copied": [],
+    "collector_filtered_cohort_inclusion_verified": false,
+    "independently_held_out_issuance_labels": 0,
+    "independent_validity_label": null,
+    "source_specific_commercial_reuse_authorized": false,
+    "rights": "NYC_OPEN_DATA_GENERAL_TERMS_REVIEWED_SOURCE_SPECIFIC_COMMERCIAL_ENGINE_APPROVAL_HELD",
+    "ground_truth_limit": "A single first-party same-row combination shows permit_status alone does not prove a dated issued permit. Neither current validity nor a buyer opportunity can be inferred; no matching to the live 20-row receipt.",
+    "owner_handoff": "PermitPlate :48 owns scope-sensitive filtering/identity and potential collector changes; independent :44 QA before source promotion.",
+    "synthetic_negative_control": {
+      "id": "SYNTH_SIGNED_OFF_WITH_NOT_YET_ISSUED_AND_NO_DATE",
+      "kind": "SYNTHETIC",
+      "permit_status": "Signed-off",
+      "work_permit": "Permit is not yet issued",
+      "issued_date": null,
+      "independent_issuance_label": null,
+      "independent_current_validity_label": null,
+      "expected": "NO_ISSUANCE_OR_CURRENT_VALIDITY_PROMOTION_FROM_STATUS_ALONE"
+    }
+  },
+  "publisher_renewal_sequence_training_2020": {
+    "evidence_class": "FIRST_PARTY_NYC_DOB_TRAINING_SLIDE_VISUALLY_VERIFIED_NO_SOURCE_PDF_BYTES",
+    "publisher": "NYC Department of Buildings",
+    "original_document_url": "https://www.nyc.gov/assets/buildings/pdf/contractor_training_presentation.pdf",
+    "document_updated_date": "2020-12-22",
+    "pdf_page_index_zero_based": 71,
+    "slide_number_one_based": 72,
+    "observed_utc_date": "2026-10-26",
+    "historical_training_assertions": {
+      "work_permit_number_unchanged_on_renewal": true,
+      "sequence_number_increments_by_one_on_renewal": true,
+      "expiration_date_updated_upon_renewal": true,
+      "composite_permit_renewal_cannot_change_work_types": true
+    },
+    "interpretation": "Sequence identifies renewal iterations for a work permit in December 2020 DOB NOW training, not automatically independent NEW permits. The dataset mapping and present-day rules have not been independently confirmed.",
+    "document_age_limit": "HISTORICAL_2020_TRAINING_NOT_VERIFIED_AS_CURRENT_2026_RULE",
+    "dataset_sequence_field_mapping_to_training_verified": false,
+    "nyc_open_data_xlsx_dictionary_original_bytes_acquired": false,
+    "nyc_open_data_xlsx_dictionary_sha256": null,
+    "original_publisher_pdf_bytes_acquired": false,
+    "original_publisher_pdf_sha256": null,
+    "source_specific_commercial_reuse_authorized": false,
+    "source_rights": "MUNICIPAL_PUBLIC_TRAINING_INFORMATION_NO_SOURCE_SPECIFIC_COMMERCIAL_REUSE_CLEARANCE",
+    "current_collector_selects_sequence_number": false,
+    "same_permit_repeated_renewal_rows_in_original_publisher_cohort_confirmed": false,
+    "independently_held_out_new_permit_outcome_labels": 0,
+    "independently_held_out_current_validity_labels": 0,
+    "permitplate_new_buyer_opportunity_accuracy": null,
+    "buyer_demand": "UNKNOWN",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_RENEWAL_SAME_PERMIT_NUMBER_DIFFERENT_SEQUENCE_AND_TRACKING",
+        "kind": "SYNTHETIC",
+        "initial": {
+          "tracking_number": "SYNTH-TRACK-101",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "1"
+        },
+        "renewal": {
+          "tracking_number": "SYNTH-TRACK-102",
+          "work_permit": "SYNTH-M100-I1-GC",
+          "sequence_number": "2"
+        },
+        "expected": "TWO_RENEWAL_ITERATIONS_OF_ONE_SYNTHETIC_WORK_PERMIT_NOT_TWO_INDEPENDENT_NEW_PERMIT_OPPORTUNITIES",
+        "independent_new_permit_label": null,
+        "independent_current_validity_label": null
+      },
+      {
+        "id": "SYNTH_SAME_PERMIT_UNSELECTED_SEQUENCE_LOSES_RENEWAL_PROVENANCE",
+        "kind": "SYNTHETIC",
+        "projection": {
+          "work_permit": "SYNTH-M200-I1-PL",
+          "sequence_number_selected": false
+        },
+        "expected": "RENEWAL_ITERATION_UNKNOWN_WHEN_SEQUENCE_IS_NOT_SELECTED",
+        "independent_new_permit_label": null,
+        "independent_current_validity_label": null
+      }
+    ],
+    "owner_handoff": "PermitPlate :48 owns query and scoring fix; separately validate actual dataset dictionary and same-cohort sequence number, preserve publisher query budget.",
+    "independent_qa": ":44 replay with independent source and test, no automatic label promotion",
+    "engine_code_edited": false,
+    "extra_provider_calls": 0,
+    "new_workflows": 0,
+    "release_authorized": false
+  },
+  "publisher_cached_sequence_reason_marginal_non_equivalence_20261026": {
+    "schema_version": "1.0.0",
+    "evidence_class": "FIRST_PARTY_PUBLISHER_CACHED_MARGINAL_COUNTS_ONLY_NOT_ROW_LEVEL_JOINS",
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "source_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "original_publisher_metadata_observed_utc_date": "2026-10-26",
+    "publisher_rows_updated_at_utc": "2026-10-25T18:41:35Z",
+    "publisher_metadata_raw_bytes_acquired": false,
+    "publisher_metadata_sha256": null,
+    "attached_data_dictionary_original_bytes_acquired": false,
+    "attached_data_dictionary_sha256": null,
+    "source_license_status": "PUBLIC_DATA_NYC_GENERAL_FAQ_NO_RESTRICTIONS; DATASET_SPECIFIC_COMMERCIAL_USE_STILL_HELD",
+    "publisher_attachment_id": "9a9d025e-5bd0-437c-92ea-41e78c9e8d4c",
+    "source_schema": {
+      "sequence_number": "text",
+      "filing_reason": "text"
+    },
+    "cohort": "FULL_DATASET_CACHED_COLUMN_MARGINALS_1020152_ROWS_NOT_ISSUED_DATE_FILTERED_20_ROW_COHORT",
+    "counts": {
+      "total": 1020152,
+      "sequence_non_null": 1019801,
+      "sequence_null": 351,
+      "sequence_value_one": 698783,
+      "sequence_other_non_null": 321018,
+      "filing_renewal_without_changes": 263973,
+      "filing_renewal_with_changes": 57175,
+      "filing_renewal_total": 321148,
+      "minimum_non_equivalence_count": 130
+    },
+    "mathematical_boundary": "TWO_CACHED_MARGINAL_PARTITIONS_HAVE_DIFFERENT_TOTALS; SEQUENCE_NON_NULL_AND_NOT_ONE CANNOT BE A PERFECT BICONDITIONAL CLASSIFIER FOR BOTH RENEWAL FILING REASONS OVER THIS SAME DATASET SNAPSHOT. AT LEAST 130 ROW LABEL MEMBERSHIPS DIFFER IF CACHED COUNTS ARE INTERNALLY CONSISTENT.",
+    "actual_mismatch_rows_or_direction": "UNKNOWN_NOT_IDENTIFIED_BY_MARGINAL_COUNTS",
+    "quality_limits": "No row-level joint distribution, no original xlsx contents or hash, and 351 null sequence numbers. Cached marginal statistics may be stale. No proof of exact renewal iteration, active/current validity, new independently priced permit, or buyer demand.",
+    "independently_held_out_labeled_permit_or_lead_cases": 0,
+    "real_permit_rows_or_personal_identifiers_stored": 0,
+    "evaluation_family": "PERMIT_SOURCE_CLASSIFICATION_BOUNDARY_NOT_INDEPENDENT_GOVERNMENT_SCORING",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_RENEWAL_REASON_WITH_SEQUENCE_ONE",
+        "kind": "SYNTHETIC",
+        "sequence_number": "1",
+        "filing_reason": "Renewal Permit Without Changes",
+        "expected": "DO_NOT_INFER_ACTUAL_ROW_MISMATCH_OR_CURRENT_VALIDITY",
+        "independent_ground_truth": null
+      },
+      {
+        "id": "SYNTH_INITIAL_REASON_WITH_SEQUENCE_TWO",
+        "kind": "SYNTHETIC",
+        "sequence_number": "2",
+        "filing_reason": "Initial Permit",
+        "expected": "DO_NOT_INFER_ACTUAL_ROW_MISMATCH_OR_NEW_BUYER_OPPORTUNITY",
+        "independent_ground_truth": null
+      }
+    ],
+    "owner_handoff": "PermitPlate :48: independently inspect same-row filing_reason and sequence_number on the original 20-row issued-date cohort within existing query budget; :44 QA verifies; do not change collector/scorer from this fixture.",
+    "source_admission": "DRAFT_RIGHTS_HELD_GROUND_TRUTH_UNKNOWN_NO_RELEASE"
+  },
+  "notice_permit_business_renewal_20260624": {
+    "schema_version": "1.0.0",
+    "evidence_family": "NYC_PERMIT_SOURCE_IDENTITY_AND_BUSINESS_ATTRIBUTION_BOUNDARY",
+    "publisher": "NYC Department of Buildings",
+    "publisher_document": "Submit a Permit Renewal with Changes in DOB NOW to Update the Business Listed on the Permit",
+    "source_url": "https://www.nyc.gov/assets/buildings/pdf/permitrenewals_bizname-sn.pdf",
+    "additional_first_party_index": "https://www.nyc.gov/site/buildings/dob/service-updates.page",
+    "notice_published_date": "2026-06-24",
+    "effective_date": "2026-06-29",
+    "publisher_pdf_page_zero_based": 0,
+    "original_publisher_pdf_bytes_acquired": false,
+    "original_publisher_pdf_sha256": null,
+    "original_publisher_pdf_visual_page_verified": true,
+    "observed_date": "2026-10-26",
+    "first_party_policy_scope": "An applicant may update the business listed on an existing DOB NOW Build work permit via Permit Renewal with Changes if that business is associated with the applicant's license.",
+    "application_to_live_rbx6_tga4_row_mapping": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED",
+    "source_specific_pdf_commercial_rights": "UNKNOWN_HOLD_NO_DOCUMENT_REPUBLICATION_OR_CUSTOMER_COMMERCIAL_ADMISSION",
+    "data_use": "SANITIZED_METADATA_AND_SYNTHETIC_CONTROLS_ONLY",
+    "current_collector_select": [
+      "tracking_number",
+      "job_filing_number",
+      "work_permit",
+      "issued_date",
+      "permit_status"
+    ],
+    "missing_from_current_collector": [
+      "sequence_number",
+      "filing_reason",
+      "business_name"
+    ],
+    "label_completeness": {
+      "independently_held_out_original_current_permit_labels": 0,
+      "independently_held_out_original_new_buyer_labels": 0,
+      "actual_changed_business_permit_pairs_verified": 0,
+      "real_source_permit_rows_or_personal_identifiers_stored": 0
+    },
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_CHANGE_BUSINESS_SAME_WORK_PERMIT",
+        "kind": "SYNTHETIC",
+        "before": {
+          "work_permit": "SYNTH-PERMIT-001",
+          "sequence_number": "1",
+          "filing_reason": "Initial Permit",
+          "listed_business": "SYNTH_ENTITY_ALPHA"
+        },
+        "after": {
+          "work_permit": "SYNTH-PERMIT-001",
+          "sequence_number": "2",
+          "filing_reason": "Renewal Permit with Changes",
+          "listed_business": "SYNTH_ENTITY_BETA"
+        },
+        "expected": "CHANGED_BUSINESS_ALONE_DOES_NOT_PROVE_A_NEW_UNIQUE_WORK_PERMIT_OR_BUYER_OPPORTUNITY",
+        "independent_new_permit_label": null,
+        "independent_buyer_demand_label": null
+      },
+      {
+        "id": "SYNTH_SAME_BUSINESS_DIFFERENT_WORK_PERMITS",
+        "kind": "SYNTHETIC",
+        "before": {
+          "work_permit": "SYNTH-PERMIT-001",
+          "sequence_number": "1",
+          "listed_business": "SYNTH_ENTITY_ALPHA"
+        },
+        "after": {
+          "work_permit": "SYNTH-PERMIT-002",
+          "sequence_number": "1",
+          "listed_business": "SYNTH_ENTITY_ALPHA"
+        },
+        "expected": "SAME_BUSINESS_NAME_ALONE_DOES_NOT_PROVE_IDENTICAL_UNDERLYING_WORK_PERMIT_OR_NEW_BUYER_DEMAND",
+        "independent_new_permit_label": null,
+        "independent_buyer_demand_label": null
+      }
+    ],
+    "negative_control_limits": "No original changed-business row pair was obtained. Synthetic examples prove a plausible false-positive/false-negative boundary, not actual engine accuracy or a new permit.",
+    "owner_handoff": "PermitPlate :48: review identity and business-attribution keys using authorized original same-cohort records; do not add a business change as a new permit without independent adjudication. :44 QA independently verifies.",
+    "release_authorized": false,
+    "extra_provider_calls": 0,
+    "workflow_or_engine_code_changed": false
+  },
+  "official_nyc_open_data_reuse_boundary_20261026": {
+    "schema_version": "1.0.0",
+    "evidence_family": "NYC_OPEN_DATA_GENERAL_REUSE_POLICY_VERSUS_DATASET_SPECIFIC_ADMISSION",
+    "publisher": "NYC Open Data and NYC Department of Buildings",
+    "dataset_id": "rbx6-tga4",
+    "verification_utc_date": "2026-10-26",
+    "first_party_general_faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "first_party_portal_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "first_party_dataset_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "source_evidence": "NYC general FAQ says no restrictions on use of Open Data; portal terms separately require compliance with any additional terms from data providers, and disclaim dataset accuracy/fitness. General license is not a reviewed provider-specific release or independent permit truth.",
+    "general_city_open_data_policy_says_unrestricted_use": true,
+    "additional_provider_terms_may_apply": true,
+    "publisher_data_accuracy_warranted": false,
+    "dataset_specific_extra_terms_verified_absent": false,
+    "dataset_specific_commercial_engine_admission_authorized": false,
+    "personal_record_or_lead_publication_authorized": false,
+    "original_publisher_faq_response_bytes_acquired": false,
+    "original_publisher_portal_terms_response_bytes_acquired": false,
+    "original_publisher_response_sha256": null,
+    "original_attached_dataset_dictionary_bytes_acquired": false,
+    "original_attached_dictionary_sha256": null,
+    "real_person_customer_permit_rows_stored": 0,
+    "independent_held_out_current_validity_labels": 0,
+    "independent_held_out_buyer_lead_labels": 0,
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_GENERAL_FAQ_ERASES_DATA_PROVIDER_TERMS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_GENERAL_USE_STATEMENT_DOES_NOT_REMOVE_PROVIDER_SPECIFIC_TERMS",
+        "independent_rights_adjudication": null
+      },
+      {
+        "id": "SYNTH_PUBLIC_DATA_EQUALS_CONFIRMED_VALID_PERMIT_BUYER",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_SOURCE_PUBLICATION_IS_NOT_OUTCOME_OR_COMMERCIAL_LEAD_TRUTH",
+        "independent_current_validity_label": null
+      }
+    ],
+    "owner_handoff": "PermitPlate :48 may assess exact dataset-level extra terms separately; do not enable source/lead publication or engine rights solely from general FAQ. :44 independently verifies negative controls.",
+    "release_authorized": false,
+    "extra_provider_calls": 0,
+    "new_workflows": 0,
+    "engine_code_changed": false
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "NYC_DOB_COMMUNITY_VIEW_VS_OFFICIAL_BIS_DOB_NOW_AUTHORITY_CANDIDATE_V0",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_AUTHORITY_AND_COHORT_DISAMBIGUATION_NOT_SCORING",
+  "engine": "permitplate",
+  "asof_date": "2026-10-29",
+  "status": "DRAFT_HELD_UNRELEASED",
+  "sources": [
+    {
+      "dataset_id": "ipu4-2q9a",
+      "official_catalog_url": "https://data.cityofnewyork.us/d/ipu4-2q9a",
+      "source_role": "CITY_DOB_ORIGINAL_BIS_PERMIT_ISSUANCE",
+      "cohort": "BIS_PER_WORK_TYPE_PERMIT_LIFECYCLE_NOT_DOB_NOW",
+      "agency_original": true,
+      "community_created_view": false,
+      "upstream_dataset_id": null,
+      "asof_last_updated_observed": "2026-10-20",
+      "raw_publisher_http_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "personal_permit_applicant_rows_saved": 0
+    },
+    {
+      "dataset_id": "rbx6-tga4",
+      "official_catalog_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+      "source_role": "CITY_DOB_ORIGINAL_DOB_NOW_APPROVED",
+      "cohort": "DOB_NOW_APPROVED_EXCLUDES_ELECTRICAL_ELEVATOR_LAA",
+      "agency_original": true,
+      "community_created_view": false,
+      "upstream_dataset_id": null,
+      "asof_last_updated_observed": "2026-10-23",
+      "raw_publisher_http_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "personal_permit_applicant_rows_saved": 0
+    },
+    {
+      "dataset_id": "cwwt-dc2f",
+      "official_catalog_url": "https://data.cityofnewyork.us/d/cwwt-dc2f",
+      "source_role": "UNENDORSED_COMMUNITY_VIEW_ON_BIS_ISSUANCE",
+      "cohort": "COMMUNITY_VIEW_OF_BIS_UNVERIFIED_FILTERS",
+      "agency_original": false,
+      "community_created_view": true,
+      "upstream_dataset_id": "ipu4-2q9a",
+      "asof_last_updated_observed": "2026-10-20",
+      "raw_publisher_http_bytes_acquired": false,
+      "original_publisher_response_sha256": null,
+      "personal_permit_applicant_rows_saved": 0
+    }
+  ],
+  "source_authority": {
+    "official_bis_dataset_id": "ipu4-2q9a",
+    "official_dob_now_dataset_id": "rbx6-tga4",
+    "unendorsed_community_view_id": "cwwt-dc2f",
+    "community_view_city_endorsed": false,
+    "community_view_page_can_display_dob_as_data_provider_without_being_agency_authored": true,
+    "community_view_predicate_and_row_lineage_replayed": false,
+    "dob_now_excluded_application_families": [
+      "ELECTRICAL",
+      "ELEVATOR",
+      "LIMITED_ALTERATION_APPLICATION"
+    ],
+    "bis_issuance_is_current_dob_now_issuance": false,
+    "community_view_title_proves_permit_issuance_or_validity": false
+  },
+  "rights": {
+    "nyc_open_data_faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "nyc_portal_terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "nyc_technical_manual_policy_url": "https://cityofnewyork.github.io/opendatatsm/publicpolicies.html",
+    "general_nyc_open_data_reuse_without_use_restrictions": true,
+    "attribution_source_version_and_modifications_may_be_required": true,
+    "additional_dataset_specific_terms_review_complete": false,
+    "commercial_scoring_or_customer_contact_approved": false,
+    "pii_customer_or_private_record_entitlement": false
+  },
+  "source_quality": {
+    "original_api_export_or_row_replay_performed": false,
+    "source_text_basis": "PUBLIC_OFFICIAL_CATALOG_DESCRIPTIONS_OBSERVED_NOT_PUBLISHER_RAW_HTTP_CUSTODY",
+    "city_catalog_last_updated_is_not_live_active_permit_truth": true,
+    "separate_bis_and_dob_now_record_schemas_require_identity_resolution": true,
+    "no_community_view_row_counts_promoted": true,
+    "no_applicant_contact_or_address_rows_saved": true
+  },
+  "ground_truth": {
+    "independently_held_out_labeled_issued_permit_cases": 0,
+    "independently_held_out_current_validity_labels": 0,
+    "independently_held_out_customer_outcome_labels": 0,
+    "cross_system_unique_real_permit_count": "UNKNOWN",
+    "community_filtered_row_count": "UNKNOWN",
+    "production_permit_precision_recall": "UNKNOWN",
+    "real_permit_or_customer_truth_admitted": false
+  },
+  "handoff": {
+    "engineering_owner": ":48 PermitPlate",
+    "independent_qa_owner": ":44 QA",
+    "other_owners": ":12 RETALLY/RecoveryOS; :52 CaptureBrief (unchanged)",
+    "approval": "HOLD"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_COMMUNITY_VIEW_IS_CITY_ENDORSED",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNENDORSED_VIEW"
+    },
+    {
+      "id": "SYNTH_COMMUNITY_VIEW_DOB_DATA_PROVIDED_BY_EQUALS_CITY_AUTHORSHIP",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_PROVIDER_VS_AUTHOR"
+    },
+    {
+      "id": "SYNTH_BIS_ISSUANCE_IS_CURRENT_DOB_NOW",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_COHORT_COLLAPSE"
+    },
+    {
+      "id": "SYNTH_COMMUNITY_VIEW_UPSTREAM_IS_DOB_NOW",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_BAD_LINEAGE"
+    },
+    {
+      "id": "SYNTH_DOB_NOW_DATASET_COVERS_ELECTRICAL_ELEVATOR_LAA",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_MISSING_SCOPE"
+    },
+    {
+      "id": "SYNTH_CATALOG_UPDATED_DATE_PROVES_ACTIVE_PERMIT",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_CURRENT_PERMIT_TRUTH"
+    },
+    {
+      "id": "SYNTH_OPEN_DATA_REUSE_POLICY_EQUALS_SCORING_AND_PRIVATE_CONTACT_RIGHTS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_UNVERIFIED_SPECIFIC_RIGHTS"
+    },
+    {
+      "id": "SYNTH_COMMUNITY_VIEW_ROWS_ARE_HELDOUT_CURRENT_PERMITS",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_INDEPENDENT_LABELS"
+    }
+  ]
+}
