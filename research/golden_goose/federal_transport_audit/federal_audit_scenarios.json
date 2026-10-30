@@ -1,0 +1,139 @@
+{
+  "observation_local_date": "2026-10-29",
+  "observation_basis": "read-only public first-party source examination; cases and price entirely fictional",
+  "sources": [
+    {
+      "type": "federal_authority",
+      "url": "https://www.gsa.gov/directives-library/gsa-delegation-of-authority-tts",
+      "finding": "July 2 2025 Order 5450.39D ADM CHGE 183 delegates federal transportation audit/deduction/adjudication authority to paying agency; no automatic contract or private audit access."
+    },
+    {
+      "type": "federal_guidance",
+      "url": "https://www.gsa.gov/policy-regulations/policy/transportation-management-policy/transportation-handbook-freight-household-goods-and-small-parcel",
+      "finding": "Government transportation invoicing audit requirement; pre/post audit alternatives, often outsourced post-payment auditing; not named external buyer demand."
+    },
+    {
+      "type": "statute",
+      "url": "https://uscode.house.gov/us/usc/119-120/t31/s3726/",
+      "finding": "31 USC 3726(e) covered postpayment contractor ceiling 50% of audit-identified overpayment; no entitlement to fee."
+    },
+    {
+      "type": "competition_vendor_claim",
+      "url": "https://eagleauditingllc.com/government",
+      "finding": "Vendor advertises an existing GSA MAS audit contract; active status not verified."
+    },
+    {
+      "type": "competition_vendor_claim",
+      "url": "https://www.businesswire.com/news/home/20241002210567/en/Cass-Information-Systems-Receives-GSA-Multiple-Award-Schedule-Contract-for-Freight-Audit-and-Payment",
+      "finding": "Cass self-announced GSA MAS in 2024; no actual customer baseline or fee verified."
+    }
+  ],
+  "commercial_readiness": {
+    "new_legal_demand_signal": "YES_INSTITUTIONAL_COMPLIANCE",
+    "new_open_bid_verified": false,
+    "federal_direct_vendor_ready": false,
+    "external_customer_award_verified": false,
+    "owner_revenue_usd": "0.00",
+    "statutory_cap_note": "covered federal postpayment contractor ceiling, not universal private-sector fee cap",
+    "integrator_priority_changed": false
+  },
+  "model_assumptions": "fictional identified $1000, 30%-of-collections contract, $45/hour review at 2 hours plus $10 overhead; no actual invoices, awards, paid audits or owner revenue",
+  "cases": [
+    {
+      "case": "recovery_zero",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "0.00",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "recovery_10pct",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "100.00",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "recovery_25pct",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "250.00",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "near_break_even_fail",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "333.33",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "break_even",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "333.34",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "near_100_contribution_fail",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "666.66",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "hypothetical_100_contribution",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "666.67",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    },
+    {
+      "case": "all_collected",
+      "identified_usd": "1000.00",
+      "modeled_collected_usd": "1000.00",
+      "hypothetical_fee_rate": "0.30",
+      "review_hours": "2",
+      "labor_usd_hour": "45.00",
+      "overhead_usd": "10.00",
+      "signed_contract": false,
+      "agency_buy_authority": false,
+      "independent_receipt": false
+    }
+  ]
+}
