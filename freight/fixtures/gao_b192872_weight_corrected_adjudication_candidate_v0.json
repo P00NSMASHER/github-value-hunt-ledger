@@ -1,0 +1,140 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "GAO_B192872_WEIGHT_CORRECTED_CLASSIFICATION_CANDIDATE_V0",
+  "evaluation_family": "FREIGHT_HISTORICAL_CLASSIFICATION_ADJUDICATION_AND_FINAL_AMOUNT_ABSTENTION",
+  "engine": "freightrecovery",
+  "status": "HISTORICAL_PUBLIC_ADJUDICATION_CONTROL_NOT_CUSTOMER_OVERCHARGE_ACCURACY",
+  "source": {
+    "official_decision_url": "https://www.gao.gov/products/b-192872",
+    "original_pdf_url": "https://www.gao.gov/assets/b-192872.pdf",
+    "rights_url": "https://www.gao.gov/copyright",
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-192872",
+    "decision_date": "1979-05-07",
+    "inspected_pdf_printed_pages": [
+      2,
+      5
+    ],
+    "inspection_method": "OFFICIAL_PUBLIC_GAO_PDF_INDEXED_TEXT_AND_PAGE_SCREENSHOTS",
+    "original_publisher_pdf_http_bytes_held": false,
+    "original_publisher_pdf_http_sha256": null,
+    "original_gbl_tariff_pages_diagrams_or_paid_invoice_bytes_held": false,
+    "copyright_posture": "GAO_GOVERNMENT_TEXT_PUBLIC_DOMAIN_SOURCE_CREDIT_NO_ENDORSEMENT_THIRD_PARTY_MATERIAL_SEPARATE",
+    "historical_nmfc_rate_table_commercial_reproduction_cleared": false,
+    "modern_customer_rate_authority": "UNKNOWN"
+  },
+  "cohort": {
+    "type": "ONE_HISTORICAL_US_GOVERNMENT_SHIPMENT",
+    "original_shipment_month": "1975-07",
+    "historical_effective_tariff": "NMFC_100_B_ITEM_178160_AS_REPORTED_BY_GAO",
+    "exact_shipment_day": "UNKNOWN",
+    "heldout_from_110_commercial_invoice_faces": true,
+    "no_modern_customer_invoice_or_payment_data": true
+  },
+  "government_bill_of_lading": {
+    "number": "M-0068206",
+    "carrier": "Yellow Freight System, Inc.",
+    "origin": "Peterson Field, Colorado",
+    "destination": "March Air Force Base, California",
+    "description_reported": "TWO_AIRCRAFT_MAINTENANCE_PLATFORMS_GBL_AMBIGUOUS_SET_UP_NOTATION_AND_SUB_2",
+    "originally_listed_weight_lb": 1700,
+    "corrected_actual_weight_lb_reported_by_GSA": 2200,
+    "invoice_charge_cents": null,
+    "contemporaneous_original_gbl_acquired": false,
+    "controlling_tender_tariff_pages_acquired": false
+  },
+  "initial_government_audit": {
+    "original_carrier_rated_class": 300,
+    "original_carrier_rated_condition": "SET_UP",
+    "gsa_alleged_overcharge_and_initial_setoff_cents": 50201,
+    "initial_setoff_reported_executed": true,
+    "amount_is_final_adjusted_freight_overcharge": false,
+    "independent_treasury_settlement_receipt_held": false
+  },
+  "published_adjudication": {
+    "agency": "GAO",
+    "published_classification_outcome": "GSA_LOWER_CLASSIFICATION_UPHELD_WITH_WEIGHT_ADJUSTMENT_REQUIRED",
+    "applicable_historical_class": 125,
+    "knocked_down_condition_accepted": true,
+    "banded_guardrails_satisfy_packages_condition": true,
+    "diagrammatic_cubage_as_set_up_cubic_ft": 440,
+    "diagrammatic_cubage_as_shipped_cubic_ft": 154,
+    "cubage_reduction_percent": 65,
+    "lower_rate_original_published_tariff_bytes_held": false,
+    "weight_correction_requires_upward_adjustment_to_carrier": true,
+    "revised_total_charge_cents": null,
+    "revised_correct_government_setoff_cents": null,
+    "adjustment_dollars_published": "UNKNOWN",
+    "actual_subsequent_refund_or_collection_cents": null
+  },
+  "labels": {
+    "independent_agency_adjudicated_historical_classification_cases": 1,
+    "independently_adjudicated_exact_final_adjusted_amount_cases": 0,
+    "independently_heldout_modern_private_overcharge_cases": 0,
+    "independently_cleared_private_payment_refund_cases": 0,
+    "verified_retally_customer_recovery_cents": 0,
+    "permitted_customer_precision_recall": "UNKNOWN",
+    "agency_classification_label_is_not_final_money_truth": true
+  },
+  "quality": {
+    "documentary_contradiction": "GBL_FREIGHT_DESCRIPTION_ORIGINAL_WEIGHT_VS_INDEPENDENT_AGENCY_DESCRIPTION_CORRECTED_WEIGHT",
+    "documentary_ambiguity_retained": true,
+    "rate_effective_date_and_original_source_terms_fully_verified": false,
+    "later_supersession_exhaustively_checked": false,
+    "original_issuer_source_byte_sha256": "UNKNOWN",
+    "independent_final_cash_label": "UNKNOWN",
+    "source_specific_commercial_customer_scoring_rights": "UNVERIFIED_HOLD",
+    "scope": "EVALUATE_DOCUMENTARY_EXTRACTION_AND_ABSTENTION_ONLY_NOT_PRODUCTION_RERATING",
+    "no_provider_queries_or_private_data_added": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_INITIAL_50201_IS_FINAL_SETTLED_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_FINAL_AMOUNT_UNKNOWN_AFTER_WEIGHT_ADJUSTMENT"
+    },
+    {
+      "id": "SYNTH_GBL_1700_LB_IS_INDEPENDENT_WEIGHT_TRUTH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_REPORTS_CORRECTED_2200_LB"
+    },
+    {
+      "id": "SYNTH_GBL_SET_UP_DESCRIPTION_OVERRIDES_AGENCY_CUBAGE",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_GAO_UPHELD_KNOCKED_DOWN_CLASSIFICATION"
+    },
+    {
+      "id": "SYNTH_GSA_SET_OFF_EQUALS_RETALLY_CASH_RECOVERY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_HISTORICAL_GOVERNMENT_SET_OFF_NOT_CUSTOMER_CASH"
+    },
+    {
+      "id": "SYNTH_GAO_PDF_LINK_EQUALS_CUSTODIED_PDF_HASH",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_RAW_PUBLISHER_HTTP_BYTES_NOT_HELD"
+    },
+    {
+      "id": "SYNTH_AGENCY_CLASSIFICATION_EQUALS_SIGNED_TARIFF_CUSTODY",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_ORIGINAL_TARIFF_NOT_ACQUIRED"
+    },
+    {
+      "id": "SYNTH_HISTORICAL_CLASS_125_CAN_PRICE_2026_CARRIER",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_NO_MODERN_RATE_AUTHORITY"
+    },
+    {
+      "id": "SYNTH_GSA_REQUIRED_ADJUSTMENT_IS_PAID_REFUND",
+      "kind": "SYNTHETIC",
+      "expected": "REJECT_FINAL_SETTLEMENT_AND_BANK_RECEIPT_UNKNOWN"
+    }
+  ],
+  "consumers": {
+    "retally_recoveryos_engineering": ":12",
+    "permitplate_cross_lane_source_policy": ":48",
+    "capturebrief_cross_lane_proof_policy": ":52",
+    "independent_qa": ":44",
+    "engine_code_changed": false,
+    "production_release_authorized": false
+  }
+}
