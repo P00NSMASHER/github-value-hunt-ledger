@@ -175,7 +175,7 @@
     "independent_issuance_truth": null,
     "expected_decision": "DISTINCT_FILINGS_WITH_UNKNOWN_PERMIT_ISSUANCE"
   },
-  "manifest_sha256": "9acb0215d403f840b57ebc1d820f791b53abb1d102c65b26a8525075b34eb8bd",
+  "manifest_sha256": "a88ff67b26e495c43c01bc4513a4b4214a2975dcbc3d902d5512257f15f672a8",
   "electrical_application_catalog_metadata_2026_10_28": {
     "observation_version": "0.1.0",
     "cohort": "NYC_DOB_NOW_ELECTRICAL_APPLICATION_PUBLISHER_CACHED_CATALOG_2026_10_27",
