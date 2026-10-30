@@ -4027,5 +4027,127 @@ class HistoricalArchiveLineageIntegrityTests(unittest.TestCase):
                 y=copy.deepcopy(obj);y[key]=value;self.validate(y)
 
 
+class RetallyLegacyArchiveInventoryTests(unittest.TestCase):
+    """Independent-contract-style offline QA for held historical source metadata."""
+
+    _archive = Path(__file__).with_name("research_lab") / "legacy_archive"
+
+    @staticmethod
+    def _git_blob_sha(raw):
+        return hashlib.sha1(b"blob " + str(len(raw)).encode("ascii") + b"\x00" + raw).hexdigest()
+
+    def _check_inventory(self, index, groups, held_bytes):
+        self.assertEqual(index["inventory_id"], "RETALLY_HISTORICAL_RESEARCH_BRANCH_INVENTORY_2026_10_30")
+        self.assertEqual(index["canonical_repo"], "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(index["historical_refs_indexed"], 40)
+        self.assertEqual(index["single_live_metadata_writer"], "research/retally-unified-data-lab")
+        self.assertEqual(len(index["compare_groups"]), 10)
+        self.assertEqual(index["historical_compare_results_with_possible_path_truncation"], 8)
+        self.assertIs(index["full_historical_file_content_migration_completed"], False)
+        self.assertIs(index["original_customer_invoice_or_contract_bytes_migrated"], False)
+        self.assertEqual(index["historical_source_reports_migrated"], 3)
+        all_refs = []
+        partial_count = 0
+        for i, meta in enumerate(index["compare_groups"]):
+            self.assertEqual(meta["ordinal"], i)
+            self.assertEqual(meta["refs"], 4)
+            self.assertEqual(meta["path"], f"groups/{i:02d}.json")
+            self.assertEqual(self._git_blob_sha(groups[i]), meta["git_blob_sha1"])
+            g = json.loads(groups[i])
+            self.assertEqual(g["group"], i)
+            self.assertEqual(g["schema_version"], 1)
+            self.assertEqual(len(g["records"]), 4)
+            for row in g["records"]:
+                self.assertTrue(row["ref"])
+                self.assertRegex(row["head_sha"], r"^[0-9a-f]{40}$")
+                self.assertGreaterEqual(row["ahead"], 0)
+                self.assertGreaterEqual(row["behind"], 0)
+                self.assertTrue(row["git_only"])
+                self.assertEqual(row["rights"], "UNKNOWN_HOLD")
+                self.assertFalse(row.get("error"))
+                for path in row["evidence_paths"]:
+                    self.assertTrue(path.startswith("freight/"))
+                    self.assertNotIn("..", path)
+                if row.get("possible_truncated"):
+                    partial_count += 1
+                all_refs.append(row["ref"])
+        self.assertEqual(len(all_refs), 40)
+        self.assertEqual(len(set(all_refs)), 40)
+        self.assertEqual(partial_count, 8)
+        for required in ("research/retally-unified-data-lab", "research/retally-lab15-source-ledger", "research/retally-lab15-candidate-ledger", "lab/retally-real-document-engines-20261019"):
+            self.assertIn(required, all_refs)
+        self.assertEqual(len(index["held_reports"]), 3)
+        self.assertEqual(len(held_bytes), 3)
+        self.assertEqual(set(held_bytes), {m["archive_path"] for m in index["held_reports"]})
+        lanes = []
+        for m in index["held_reports"]:
+            self.assertIn(m["source_branch"], all_refs)
+            self.assertIn(m["archive_path"], held_bytes)
+            self.assertEqual(self._git_blob_sha(held_bytes[m["archive_path"]]), m["git_blob_sha1"])
+            self.assertIsNone(m["original_publisher_http_body_sha256"])
+            self.assertFalse(m["commercial_customer_benchmark_rights_verified"])
+            lanes.append(m["evaluation_lane"])
+        self.assertEqual(len(set(lanes)), 3)
+        claims = index["ref_claims"]
+        self.assertFalse(claims["real_independent_qa_completed"])
+        self.assertEqual(claims["independent_customer_freight_error_labels"], 0)
+        self.assertEqual(claims["independent_permit_buyer_outcome_labels"], 0)
+        self.assertEqual(claims["verified_retally_cash_recovery_cents"], 0)
+        self.assertIsNone(claims["original_external_publisher_byte_sha256_for_new_manifests"])
+        for key in ("commercial_customer_use_authorized", "new_workflows_or_paid_providers_added", "all_legacy_workflows_decommissioned"):
+            self.assertFalse(claims[key], key)
+
+    def _load_all(self):
+        root = self._archive
+        index = json.loads((root / "inventory_v1.json").read_text(encoding="utf-8"))
+        groups = [(root / meta["path"]).read_bytes() for meta in index["compare_groups"]]
+        held = {m["archive_path"]: (root / m["archive_path"]).read_bytes() for m in index["held_reports"]}
+        return index, groups, held
+
+    def test_branch_and_source_bytes_preserve_rights_and_qa_holds(self):
+        self._check_inventory(*self._load_all())
+
+    def test_synthetic_reviewer_forged_migrations_and_cash_are_rejected(self):
+        index, groups, held = self._load_all()
+        self._check_inventory(index, groups, held)
+        cases = (
+            ("invented_complete_migration", "full_historical_file_content_migration_completed", True),
+            ("invented_user_contract", "original_customer_invoice_or_contract_bytes_migrated", True),
+            ("inflated_branch_census", "historical_refs_indexed", 41),
+        )
+        for label, key, value in cases:
+            with self.subTest(synthetic_mutation=label), self.assertRaises(AssertionError):
+                changed = json.loads(json.dumps(index))
+                changed[key] = value
+                self._check_inventory(changed, groups, held)
+        for key, value in (
+            ("real_independent_qa_completed", True),
+            ("independent_customer_freight_error_labels", 1),
+            ("independent_permit_buyer_outcome_labels", 1),
+            ("verified_retally_cash_recovery_cents", 100),
+            ("original_external_publisher_byte_sha256_for_new_manifests", "0"*64),
+            ("commercial_customer_use_authorized", True),
+            ("all_legacy_workflows_decommissioned", True),
+        ):
+            with self.subTest(synthetic_forgery=key), self.assertRaises(AssertionError):
+                changed = json.loads(json.dumps(index))
+                changed["ref_claims"][key] = value
+                self._check_inventory(changed, groups, held)
+        with self.assertRaises(AssertionError):
+            forged = list(groups)
+            forged[0] = forged[0] + b" "
+            self._check_inventory(index, forged, held)
+        with self.assertRaises(AssertionError):
+            forged = dict(held)
+            name = next(iter(forged))
+            forged[name] += b" "
+            self._check_inventory(index, groups, forged)
+        with self.assertRaises(AssertionError):
+            changed = json.loads(json.dumps(index))
+            changed["held_reports"][0]["commercial_customer_benchmark_rights_verified"] = True
+            self._check_inventory(changed, groups, held)
+
+
+
 if __name__ == "__main__":
     unittest.main()
