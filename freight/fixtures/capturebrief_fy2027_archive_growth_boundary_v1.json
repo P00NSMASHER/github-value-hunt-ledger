@@ -67,6 +67,13 @@
       "true_independent_award_label": null
     },
     {
+      "id": "SYNTHETIC_COMPLETE_CHUNKED_TRANSFER",
+      "description": "SYNTHETIC valid HTTP/1.1 identity-encoded chunked transfer with terminating zero-length chunk, no Content-Length, and complete CSV. A fail-closed unframed-prefix repair must preserve proven-complete chunked responses.",
+      "expected": "PUBLIC_ARCHIVE_ROWS_OBSERVED_NOT_PRODUCTION_APPROVED",
+      "candidate_state": "POSITIVE_FRAMED_SUCCESS_REQUIRED",
+      "true_independent_award_label": null
+    },
+    {
       "id": "SYNTHETIC_TRUNCATED_CHUNKED_TRANSFER",
       "description": "SYNTHETIC HTTP/1.1 identity-encoded chunked response ends before the terminating zero-length chunk. Python http.client emits IncompleteRead, which must become a bounded SOURCE_INCOMPLETE degraded receipt instead of escaping the reader.",
       "expected": "SOURCE_INCOMPLETE",
