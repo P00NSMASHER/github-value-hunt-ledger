@@ -65,6 +65,13 @@
       "expected": "SOURCE_INCOMPLETE",
       "candidate_state": "OPEN_KNOWN_UNSAFE_ACCEPTANCE",
       "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_TRUNCATED_CHUNKED_TRANSFER",
+      "description": "SYNTHETIC HTTP/1.1 identity-encoded chunked response ends before the terminating zero-length chunk. Python http.client emits IncompleteRead, which must become a bounded SOURCE_INCOMPLETE degraded receipt instead of escaping the reader.",
+      "expected": "SOURCE_INCOMPLETE",
+      "candidate_state": "OPEN_UNHANDLED_HTTP_INCOMPLETE_READ",
+      "true_independent_award_label": null
     }
   ],
   "rights_and_truth": {
@@ -86,7 +93,8 @@
     "GSA public opportunity search is latest-active-version scoped and key-limited; optional award metadata is not an independent award source.",
     "GSA opportunity-management history calls require authorized contracting roles/system credentials; this pack does not use that API.",
     "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized.",
-    "New unframed-prefix synthetic negative is documented but source reader remains unchanged; standalone executed RED/GREEN not yet shown. QA HOLD."
+    "New unframed-prefix synthetic negative is documented but source reader remains unchanged; standalone executed RED/GREEN not yet shown. QA HOLD.",
+    "A truncated chunked transfer raises http.client.IncompleteRead in Python; reader currently does not map that exception into SOURCE_INCOMPLETE. Owner correction and executed green remain open."
   ],
   "documentation_controls": {
     "verified_date_utc": "2026-10-30",
