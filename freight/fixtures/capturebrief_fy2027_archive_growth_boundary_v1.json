@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "pack_id": "CAPTUREBRIEF_FY2027_ARCHIVE_GROWTH_BOUNDARY_V1",
+  "evaluation_family": "GOVERNMENT_NOTICE_ORIGINAL_EXTRACTION_CAPACITY_NOT_AWARD_SCORING",
+  "publisher": "U.S. General Services Administration / SAM.gov",
+  "source_url": "https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv",
+  "catalog_url": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
+  "source_effective_scope": "FY2027_ARCHIVED_PUBLIC_OPPORTUNITY_METADATA",
+  "source_access": "PUBLIC_DATA_SERVICES_LISTING_ORIGINAL_BYTES_NOT_CUSTODIED_IN_THIS_PACK",
+  "source_specific_commercial_reuse": "UNKNOWN_NOT_APPROVED",
+  "observation": {
+    "observed_at_utc": "2026-10-30T02:11:33+00:00",
+    "research_branch": "research/retally-unified-data-lab",
+    "research_branch_head": "1197a4c17042d5c98786933121ffd7ba5c46c06a",
+    "research_receipt_path": "freight/research_lab/capturebrief_sam_fy2027_asof_v1.json",
+    "research_receipt_git_blob_sha1": "9838d340879483f88f1f5c293e3d42acdffeaaae",
+    "research_receipt_sha256": "920ab3401cfd65f1ed026f01044e034795169286445437edd08cbb9c8f075b8a",
+    "result": "SOURCE_TOO_LARGE",
+    "source_rows_scored": 0,
+    "source_byte_sha256": null,
+    "content_length_bytes": "UNKNOWN_NOT_CAPTURED",
+    "previous_bounded_limit_bytes": 2500000
+  },
+  "proposal": {
+    "bounded_limit_bytes": 8000000,
+    "maximum_csv_rows": 8000,
+    "failed_larger_or_truncated_source": "FAIL_CLOSED",
+    "original_source_full_byte_sha256": "COMPUTE_ONLY_ON_FULL_VALID_SOURCE_READBACK",
+    "source_ids_or_raw_bytes_persisted": false
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTHETIC_OLD_LIMIT_CROSSED",
+      "description": "Complete fabricated CSV between old and new byte bounds",
+      "expected": "SOURCE_PARSED_METADATA_ONLY_NOT_AWARD_TRUTH",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_NEW_BOUND_EXCEEDED",
+      "description": "Fabricated response declares size above new maximum",
+      "expected": "SOURCE_TOO_LARGE",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_TRUNCATED_ARCHIVE",
+      "description": "Advertised content length exceeds received bytes",
+      "expected": "SOURCE_INCOMPLETE",
+      "true_independent_award_label": null
+    }
+  ],
+  "rights_and_truth": {
+    "original_source_rights_clearance": false,
+    "independent_holdout_award_cases": 0,
+    "independent_cross_source_outcomes": 0,
+    "commercial_scoring_allowed": false,
+    "real_customer_records_included": false,
+    "verified_customer_cash_cents": 0
+  },
+  "consumers": [
+    "CaptureBrief source-quality coordination",
+    "RETALLY Unified Research Lab verify and nightly read-only replay"
+  ],
+  "notes": [
+    "Publisher original-size and original-byte hash remain UNKNOWN until an authorized bounded source replay succeeds.",
+    "No newly evaluated SAM.gov notices, award judgments, production integrations or customer output are claimed.",
+    "Live research/retally-unified-data-lab writer branch and workflows are unchanged."
+  ]
+}
