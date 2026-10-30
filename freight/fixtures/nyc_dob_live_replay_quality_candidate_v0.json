@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.9",
+  "schema_version": "0.1.10",
   "pack_id": "NYC_DOB_LIVE_IDENTITY_DEGRADED_RECEIPT_CANDIDATE_V0",
   "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_IDENTITY_NOT_PERMIT_SCORING",
   "engine": "permitplate",
@@ -561,6 +561,108 @@
         "id": "SYNTH_ALL_NULL_COLUMN_CARDINALITY_PROVES_SOURCE_UNIQUENESS",
         "kind": "SYNTHETIC",
         "expected": "REJECT_CACHED_METADATA_SEMANTICS_NOT_ROW_TRUTH"
+      }
+    ]
+  },
+  "official_socrata_catalog_cached_refresh_2026_10_30": {
+    "schema_version": "0.1.0",
+    "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_METADATA_QUALITY_NOT_PERMIT_SCORING",
+    "source_url": "https://data.cityofnewyork.us/api/views/rbx6-tga4",
+    "catalog_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "rights_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "dataset_id": "rbx6-tga4",
+    "publisher": "NYC Department of Buildings via NYC Open Data / Socrata",
+    "observation_date_utc": "2026-10-30",
+    "cohort": "TWO_FIRST_PARTY_CACHED_CATALOG_METADATA_OBSERVATIONS_NOT_STABLE_ROW_REPLAY",
+    "publisher_rows_updated_at_utc": "2026-10-29T18:46:11Z",
+    "publisher_view_last_modified_at_utc": "2026-10-29T18:32:11Z",
+    "previous_cached_counts": {
+      "total": 1021662,
+      "signed_off": 653292,
+      "permit_issued": 368370
+    },
+    "current_cached_counts": {
+      "total": 1022310,
+      "signed_off": 653898,
+      "permit_issued": 368412
+    },
+    "cached_deltas": {
+      "total": 648,
+      "signed_off": 606,
+      "permit_issued": 42
+    },
+    "source_semantic_input": {
+      "cached_permit_issued_count": 368412,
+      "cached_signed_off_count": 653898,
+      "cached_status_column_cardinality": 1022310,
+      "cached_total_count": 1022310,
+      "cached_work_permit_not_yet_issued": 346,
+      "dataset_id": "rbx6-tga4",
+      "owner_city_cached_cardinality": 1022310,
+      "owner_city_cached_non_null": 0,
+      "owner_city_cached_null": 1022310,
+      "rows_updated_at_epoch_seconds": 1793299571,
+      "view_last_modified_epoch_seconds": 1793298731
+    },
+    "normalized_semantic_snapshot_sha256_not_original_http_bytes": "4e4cc38a25e6ee2578ac9591c4100239890882f3695f263421fc055bafcb8513",
+    "provenance": "FIRST_PARTY_PUBLIC_API_METADATA_WEB_READ_ONLY; NO_ORIGINAL_HTTP_BYTES_OR_PRIVATE_OR_PERMIT_ROWS_COPIED",
+    "original_publisher_response_bytes_custodied": false,
+    "publisher_http_bytes_sha256": null,
+    "system_field_identity_probe_executed": false,
+    "cached_field_cardinality_is_distinct_identity_count": false,
+    "cached_row_changes_establish_new_active_permits": false,
+    "source_distinct_permit_count": "UNKNOWN",
+    "source_specific_commercial_scoring_rights": "UNVERIFIED_HOLD",
+    "citywide_general_open_data_use": "ALLOWED_PER_OFFICIAL_FAQ",
+    "dataset_specific_extra_terms_review": "UNKNOWN",
+    "independently_heldout_permit_validity_labels": 0,
+    "independent_buyer_outcomes": 0,
+    "private_rows_stored": 0,
+    "source_scope_excludes": [
+      "ELECTRICAL",
+      "ELEVATOR",
+      "LIMITED_ALTERATION_APPLICATION_LAA"
+    ],
+    "operational_writer_receipt": {
+      "source_branch": "research/retally-unified-data-lab",
+      "as_of_utc_date": "2026-10-30",
+      "git_blob_sha1": "cd8c4e1bdbb8e5a478c5a670f6c9b02988bd89a1",
+      "internal_receipt_sha256_not_publisher_bytes": "5465cc8574be033ad22c5618098784f03b4583ce6652e0de9b40e9313d69bb21",
+      "internal_sample_sha256_not_publisher_bytes": "7f025befaa63e04a9a797ac3e77f09e3f2b7ac668a8feacd43f2f284d6a3f581",
+      "bounded_unsorted_sample_count": 20,
+      "projected_unique_identities": 19,
+      "projected_repeated_rows": 1,
+      "status": "PUBLISHER_REPLAY_DEGRADED",
+      "identity_repair_proven": false
+    },
+    "production_admission": "HOLD_NO_INDEPENDENT_LABELS",
+    "consumer": ":48 PermitPlate",
+    "independent_qa": ":44",
+    "synthetic_negative_controls": [
+      {
+        "id": "SYNTH_648_CACHED_ROWS_EQUAL_648_ACTIVE_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_CACHED_COUNTS_NOT_INDEPENDENT_VALIDITY"
+      },
+      {
+        "id": "SYNTH_42_NEW_ISSUED_CATEGORY_EQUAL_42_BUYER_LEADS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_CATEGORY_NOT_BUYER_OUTCOME"
+      },
+      {
+        "id": "SYNTH_CACHE_CARDINALITY_EQUALS_DISTINCT_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_NULL_COLUMN_HAS_SAME_CARDINALITY"
+      },
+      {
+        "id": "SYNTH_WRITER_19_OF_20_EQUAL_19_ACTIVE_PERMITS",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_UNSORTED_PROJECTION_NOT_GROUND_TRUTH"
+      },
+      {
+        "id": "SYNTH_SEMANTIC_HASH_EQUALS_ORIGINAL_HTTP_HASH",
+        "kind": "SYNTHETIC",
+        "expected": "REJECT_NO_ORIGINAL_HTTP_BYTES_CUSTODIED"
       }
     ]
   }
