@@ -84,6 +84,18 @@ class StudyInvariants(unittest.TestCase):
         a=copy.deepcopy(DATA);a['real_customer_restore_tests']=1
         with self.assertRaises(ValueError):evaluate(a)
 
+    def test_unknown_top_level_revenue_claim_cannot_hide(self):
+        a=copy.deepcopy(DATA);a['unreviewed_receivable_usd']='500.00'
+        with self.assertRaises(ValueError):evaluate(a)
+
+    def test_boolean_customer_count_not_zero(self):
+        a=copy.deepcopy(DATA);a['real_customer_restore_tests']=False
+        with self.assertRaises(ValueError):evaluate(a)
+
+    def test_snapshot_date_is_fixed(self):
+        a=copy.deepcopy(DATA);a['snapshot_date']='2026-10-30'
+        with self.assertRaises(ValueError):evaluate(a)
+
     def test_duplicate_identifiers_block_cohort(self):
         a=copy.deepcopy(DATA);a['cases'][1]['id']=a['cases'][0]['id']
         with self.assertRaises(ValueError):evaluate(a)
