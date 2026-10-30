@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "case_id": "DELHI-DISTRICT-COMM-32-2026",
+  "cnr": "DLWT-01-014066-2025",
+  "court_judgment_date": "2026-09-17",
+  "shipment_ref": "AMC1912992",
+  "shipment_count_containers": 5,
+  "matter": "SUNGOLD_EQUIPMENT_DETENTION_CREDIT_TO_FORWARDER",
+  "source_opinion": "https://indiankanoon.org/doc/161666818/",
+  "source_disposition": "JUDGMENT_AWARDED_PASS_THROUGH_NOT_PAID_BENEFICIARY",
+  "currency": "INR",
+  "monetary_units": "paise",
+  "original_detention_invoice_minor_units": 68969585,
+  "original_credit_to_forwarder_minor_units": 61933926,
+  "no_original_credit_evidence_for_minor_units": 7035659,
+  "carrier": "CMA CGM Agencies (India) Pvt Ltd",
+  "forwarder": "Chevisance Shipping Pvt Ltd",
+  "shipper_and_original_payer": "Sungold Trade Pvt Ltd",
+  "original_carrier_credit_note_ref": "INEMH841112",
+  "original_carrier_credit_note_date": "2022-12-08",
+  "exhibits": [
+    {
+      "exhibit": "Ex.PW2/1",
+      "type": "ORIGINAL_CARRIER_BOOKING_CONFIRMATION",
+      "court_reported_pages": 3,
+      "original_pdf_sha256": null,
+      "bytes_ingested": false,
+      "status": "COURT_CITED_ORIGINAL_NOT_DOWNLOADED"
+    },
+    {
+      "exhibit": "Ex.PW2/2",
+      "type": "ORIGINAL_CARRIER_DETENTION_TAX_INVOICE",
+      "court_reported_pages": 3,
+      "original_pdf_sha256": null,
+      "bytes_ingested": false,
+      "status": "COURT_CITED_ORIGINAL_NOT_DOWNLOADED"
+    },
+    {
+      "exhibit": "Ex.PW2/3",
+      "type": "ORIGINAL_CARRIER_CREDIT_NOTE_TO_FORWARDER",
+      "court_reported_pages": 3,
+      "original_pdf_sha256": null,
+      "bytes_ingested": false,
+      "status": "COURT_CITED_ORIGINAL_NOT_DOWNLOADED"
+    },
+    {
+      "exhibit": "Ex.PW1/12",
+      "type": "ORIGINAL_CUSTOMER_ICICI_BANK_PAYMENT_STATEMENT",
+      "court_reported_pages": null,
+      "original_pdf_sha256": null,
+      "bytes_ingested": false,
+      "status": "COURT_CITED_ORIGINAL_NOT_DOWNLOADED"
+    }
+  ],
+  "original_2022_rate_sources": [
+    {
+      "source_id": "CMA-INDIA-2022-EXPORT-DET-ADVISORY",
+      "url": "https://www.cma-cgm.com/assets/public/pdf/Export%20Detention%20Charges%20-%2020%20Jan%202022.pdf",
+      "published_effective_date": "2022-01-20",
+      "charge_type": "DETENTION",
+      "source_byte_sha256": null,
+      "original_bytes_ingested": false,
+      "indexed_rate_source": true,
+      "shipment_specific_applicability_verified": false,
+      "fetch_status": "SOURCE_ORIGIN_UNAVAILABLE"
+    },
+    {
+      "source_id": "CMA-INDIA-2022-DET-ARCHIVE",
+      "url": "https://www.cma-cgm.com/assets/public/documents/DD_Tarifs_IN_2020-04-01%2028-7-23_1.pdf",
+      "published_effective_date": "2022-01-20",
+      "charge_type": "DETENTION",
+      "source_byte_sha256": null,
+      "original_bytes_ingested": false,
+      "indexed_rate_source": true,
+      "shipment_specific_applicability_verified": false,
+      "fetch_status": "SOURCE_ORIGIN_UNAVAILABLE"
+    },
+    {
+      "source_id": "ANL-INDIA-2022-SPLIT-DET",
+      "url": "https://www.cma-cgm.com/assets/public/dnd-documents/anl/DD_Tarifs_IN_2022-01-20%2021012022.pdf",
+      "published_effective_date": "2022-01-20",
+      "charge_type": "DETENTION",
+      "source_byte_sha256": null,
+      "original_bytes_ingested": false,
+      "indexed_rate_source": true,
+      "shipment_specific_applicability_verified": false,
+      "fetch_status": "SOURCE_ORIGIN_UNAVAILABLE"
+    }
+  ],
+  "original_payment": {
+    "from": "Sungold Trade Pvt Ltd",
+    "to": "Chevisance Shipping Pvt Ltd",
+    "amount_minor_units": 68969585,
+    "court_evidence": "Ex.PW1/12 and findings paragraphs 50-51",
+    "event_status": "COURT_ESTABLISHED_ORIGINAL_PAYMENT",
+    "independent_original_bank_statement_bytes_ingested": false,
+    "bank_clearing_receipt_sha256": null
+  },
+  "carrier_credit": {
+    "from": "CMA CGM Agencies (India) Pvt Ltd",
+    "to": "Chevisance Shipping Pvt Ltd",
+    "amount_minor_units": 61933926,
+    "credit_note_ref": "INEMH841112",
+    "court_evidence": "Ex.PW2/3 and findings paragraphs 51-59",
+    "event_status": "COURT_ESTABLISHED_CARRIER_CREDIT_TO_INTERMEDIARY",
+    "independent_carrier_credit_bank_clearing_bytes_ingested": false
+  },
+  "final_customer_recovery": {
+    "from": "Chevisance Shipping Pvt Ltd",
+    "to": "Sungold Trade Pvt Ltd",
+    "judgment_award_minor_units": 61933926,
+    "court_annual_simple_interest_pct": 9,
+    "event_status": "JUDGMENT_ORDER_NOT_BANK_SETTLEMENT",
+    "independent_bank_clearing_receipt_sha256": null,
+    "original_customer_bank_receipt_bytes_ingested": false,
+    "verified_settled_amount_minor_units": 0
+  },
+  "legal_source_user_authorized_download": true,
+  "third_party_commercial_redistribution_rights_verified": false,
+  "source_original_four_document_chain_complete": false,
+  "original_pdfs_republished_to_github": false,
+  "retally_verified_recovered_minor_units": 0,
+  "original_private_customer_files_imported": false
+}

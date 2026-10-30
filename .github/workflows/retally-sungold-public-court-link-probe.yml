@@ -1,0 +1,34 @@
+name: RETALLY Sungold Public Court Link Discovery (Read Only)
+
+on:
+  pull_request:
+    paths:
+      - 'freight/research/sungold_court_link_probe.py'
+      - 'freight/test_sungold_court_link_probe.py'
+      - '.github/workflows/retally-sungold-public-court-link-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  public-trial-exhibit-source-links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout only proposed read-only research
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Offline test public court URL safety and no form interactions
+        run: |
+          python -m py_compile freight/research/sungold_court_link_probe.py
+          PYTHONPATH=. python -m unittest -v freight.test_sungold_court_link_probe
+      - name: Fetch only public judgment HTML and list actual attachment links
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          # Strict GET only. No email/contact, login, CAPTCHA, forms or bills.
+          # Public URL paths/button labels only; source HTML discarded.
+          PYTHONPATH=. python -m freight.research.sungold_court_link_probe
