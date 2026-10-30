@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import date
-from typing import Iterable, Literal
+from typing import Iterable
 
 from freight.canonical_schema import CanonicalFreightRecord, verify_record
 from freight.contracts import canonical_hash

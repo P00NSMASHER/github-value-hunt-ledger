@@ -11,8 +11,7 @@ status string or internal approval cannot establish a real bank receipt.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import date, datetime, timezone
-from enum import Enum
+from datetime import date, datetime
 from typing import Iterable
 import json
 import re

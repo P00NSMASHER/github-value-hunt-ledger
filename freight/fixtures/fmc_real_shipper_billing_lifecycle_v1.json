@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "fixture_id": "RETALLY_FMC_2022I_2025I_INDEPENDENT_REAL_SHIPPER_EVIDENCE_LIFECYCLE_V1",
+  "scope": "FMC_THIRD_PARTY_ADJUDICATED_REAL_SHIPPER_CHARGES_NOT_RETALLY_CUSTOMERS_OR_ORIGINAL_BANK_CUSTODY",
+  "review_utc_date": "2026-10-26",
+  "public_publisher": "U.S. Federal Maritime Commission",
+  "official_pdf_bytes_acquired": false,
+  "official_pdf_source_sha256": null,
+  "original_customer_invoice_and_bank_bytes_acquired": false,
+  "source_specific_commercial_reuse_verified": false,
+  "retally_independent_customer_invoice_truth_cases": 0,
+  "retally_cash_recovered_cents": 0,
+  "bridgewell_cosco": {
+    "case_id": "FMC_2022(I)",
+    "claimant": "AGRIBUSINESS_HOLDINGS_LP_DBA_BRIDGEWELL_AGRIBUSINESS",
+    "respondent": "COSCO_SHIPPING_LINES_CO_LTD",
+    "shipment_year": 2022,
+    "initial_claim_date": "2024-12-17",
+    "initial_decision_served": "2025-09-29",
+    "official_initial_decision_url": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",
+    "official_final_notice_served": "2026-01-05",
+    "official_final_notice_url": "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",
+    "adjudication": "INVALID_DEMURRAGE_DETENTION_INVOICE_CONTENT_REPARATIONS_GRANTED",
+    "original_reparation_claim_cents": 4378000,
+    "reparations_principal_cents": 2432880,
+    "interest_through_january_5_2026_cents": 396051,
+    "administratively_final_amount_due_cents": 2828931,
+    "payment_due_date": "2026-01-20",
+    "reparation_award_groups": [
+      {
+        "multiplicity": 3,
+        "principal_cents_each": 54450,
+        "interest_cents_each": 9115
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 150750,
+        "interest_cents_each": 24994
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 193050,
+        "interest_cents_each": 31923
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 235350,
+        "interest_cents_each": 38712
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 235350,
+        "interest_cents_each": 38560
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 552600,
+        "interest_cents_each": 90540
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 21780,
+        "interest_cents_each": 3546
+      },
+      {
+        "multiplicity": 1,
+        "principal_cents_each": 880650,
+        "interest_cents_each": 140431
+      }
+    ],
+    "later_enforcement_docket": "FMC_26-13",
+    "later_order_to_show_cause_date": "2026-10-02",
+    "fmc_original_enforcement_order_document_id": 145944,
+    "official_enforcement_order_url": "https://www2.fmc.gov/readingroom/docs/26-13/%2801%29%2026-13%20Order%20to%20Show%20Cause%20%28public%29.pdf",
+    "official_order_payment_made_date_index_excerpt": "2026-08-31",
+    "official_order_late_payment_days_index_excerpt": 223,
+    "official_order_pdf_bytes_acquired": false,
+    "fmc_enforcement_record_index_publicnow": "https://www.publicnow.com/view/AEF607AD7C75FCEEFC7781A0221E6505C1BC79B9",
+    "reported_actual_customer_payment_received_date": "2026-08-31",
+    "reported_payment_lifecycle_source": "OFFICIAL_FMC_ORDER_SEARCH_INDEX_EXCERPT_PLUS_INDEPENDENT_MEDIA_REPORTS_NOT_ORIGINAL_ORDER_PDF_OR_BANK_BYTES",
+    "secondary_confirmation_source": "https://www.seatrade-maritime.com/regulations/fmc-targets-cosco-with-millions-in-late-payment-fines",
+    "second_secondary_confirmation_source": "https://splash247.com/fmc-threatens-cosco-with-16-7m-penalty-over-delayed-payment/",
+    "exact_customer_received_amount_cents_independently_bank_verified": null,
+    "interest_actually_received_cents_independently_verified": null,
+    "civil_penalty_assessed_cents_at_review_date": null,
+    "penalty_order_finalized_at_review_date": false,
+    "government_reported_late_reparation_payment": true,
+    "applicable_to_private_domestic_motor_freight_tariffs": false
+  },
+  "hp_logistics_quote_dispute": {
+    "case_id": "FMC_2025(I)",
+    "initial_decision_served": "2025-08-07",
+    "official_initial_decision_url": "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",
+    "claimant": "HP_LOGISTICS_CO_LTD",
+    "respondents": [
+      "CITI_FREIGHT_LOGISTICS_INC",
+      "BEST_INTERNATIONAL_CARGO_INC"
+    ],
+    "initial_quote_cents": 4320000,
+    "additional_parts_discussed_cents": 1100000,
+    "claimed_revised_quote_cents": 5420000,
+    "final_invoiced_amount_cents": 7780000,
+    "quote_vs_invoice_difference_cents": 2360000,
+    "additional_demurrage_detention_claim_cents": 229500,
+    "total_reparations_sought_cents": 2589500,
+    "initial_decision_section_41102_c_violated": false,
+    "initial_decision_BIC_40501_a_1_tariff_publication_violation": true,
+    "initial_decision_CFL_violation_found": false,
+    "initial_decision_reparations_awarded_cents": 0,
+    "administrative_finality_separately_verified": false,
+    "later_customer_refund_verified_cents": null,
+    "independent_full_original_quote_invoice_BOL_payment_chain_in_retally_custody": false
+  },
+  "leader_commerce_msc_signed_settlement": {
+    "case_id": "FMC_2015(I)",
+    "claimant": "LEADER_COMMERCE_CORP_DBA_INFINITY_FREIGHT_AND_LOGISTICS",
+    "respondent": "MEDITERRANEAN_SHIPPING_COMPANY_USA_INC",
+    "shipment_public_bill_of_lading": "MEDUUP205245",
+    "original_shipment_origin": "BALTIMORE_USA",
+    "original_shipment_destination": "MANAUS_BRAZIL",
+    "small_claim_filed_notice_date": "2024-07-31",
+    "respondent_submitted_signed_settlement_date": "2024-10-17",
+    "original_order_served": "2024-11-08",
+    "official_order_url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",
+    "final_notice_served": "2024-12-10",
+    "official_final_notice_url": "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",
+    "settled_final_state": "FMC_APPROVED_BILATERALLY_SIGNED_SETTLEMENT_AND_DISMISSED_WITH_PREJUDICE_ADMINISTRATIVELY_FINAL",
+    "fmc_describes_both_parties_signed_settlement": true,
+    "signed_settlement_original_bytes_independently_held": false,
+    "original_invoice_bol_bank_and_tariff_bytes_in_retally_custody": false,
+    "complaint_alleged_low_water_fee_usd_cents": 300000,
+    "complaint_alleged_other_extra_fee_usd_cents": 14000,
+    "msc_settlement_promise_cancel_OUTSTANDING_UNPAID_demurrage_usd_cents": 465000,
+    "msc_settlement_promise_end_collection": true,
+    "independent_msc_receivable_writeoff_ledger_confirmation": false,
+    "claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_freight_usd_cents": 300000,
+    "claimant_settlement_waives_refund_rights_on_PREVIOUSLY_PAID_late_fee_brl_centavos": 70000,
+    "cross_currency_addition_or_implicit_conversion_permitted": false,
+    "original_bank_evidence_of_previous_claimant_payments_in_retally_custody": false,
+    "settlement_result_verified_cash_refund_usd_cents": null,
+    "independent_refund_or_tender_bank_receipt_verified": false,
+    "liability_finding_original_fees_unlawful": false,
+    "claimant_original_economic_loss_independently_verified": false,
+    "third_party_contract_rights_for_retally_use": false
+  },
+  "jimex_unitrans_initial_paid_detention": {
+    "case_id": "FMC_2036(I)",
+    "claimant": "JIMEX_USA_INC",
+    "respondent": "UNITRANS_PRA_CO_INC",
+    "initial_decision_served": "2026-07-16",
+    "official_initial_decision_url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",
+    "official_extension_denial_served": "2026-07-23",
+    "official_extension_denial_url": "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",
+    "source_sections_indexed": "OFFICIAL_FMC_INITIAL_DECISION_ORDER_AND_APPENDIX_B_INDEXED_TEXT_NOT_ORIGINAL_PDF_BYTES",
+    "initial_claim_reparations_requested_cents": 4460669,
+    "respondent_contested_unpaid_balance_claim_cents": 1113600,
+    "respondent_claimed_unpaid_balance_independently_adjudicated_due": false,
+    "initial_decision_41102_c_excess_late_fee_violation": true,
+    "initial_decision_41104_a15_missing_detention_invoice_information_violation": true,
+    "initial_decision_541_6_minimum_contents_violation": true,
+    "initial_late_fee_reparations_ordered_cents": 999707,
+    "initial_detention_refund_ordered_cents": 197500,
+    "initial_ordered_principal_cents_EXCLUDES_interest": 1197207,
+    "interest_awarded_but_exact_amount_unverified": true,
+    "initial_decision_granted_in_part_and_denied_in_part": true,
+    "actual_finality_notice_independently_verified": false,
+    "refund_received_by_claimant_independently_bank_verified_cents": null,
+    "appendix_b_claimant_paid_detention_invoice_count": 5,
+    "appendix_b_total_paid_detention_cents": 197500,
+    "appendix_b_paid_invoice_rows": [
+      {
+        "invoice_number_FMC_reported": "90855",
+        "detention_charged_paid_cents_FMC_reported": 65000,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      },
+      {
+        "invoice_number_FMC_reported": "91146",
+        "detention_charged_paid_cents_FMC_reported": 12500,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      },
+      {
+        "invoice_number_FMC_reported": "91156",
+        "detention_charged_paid_cents_FMC_reported": 37500,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      },
+      {
+        "invoice_number_FMC_reported": "91692",
+        "detention_charged_paid_cents_FMC_reported": 57500,
+        "claimant_payment_date_FMC_reported": "2025-06-05"
+      },
+      {
+        "invoice_number_FMC_reported": "91289-1",
+        "detention_charged_paid_cents_FMC_reported": 25000,
+        "claimant_payment_date_FMC_reported": "2025-05-15"
+      }
+    ],
+    "unrelated_carrier_invoice_exhibits_not_linkable_to_these_five_shipments": true,
+    "third_party_pass_through_original_invoices_introduced_during_proceeding": true,
+    "underlying_paid_invoice_and_bank_bytes_held_by_RETALLY": false,
+    "contemporaneous_private_accepted_rate_authority_held_by_RETALLY": false,
+    "current_customer_scoring_authorized": false
+  }
+}

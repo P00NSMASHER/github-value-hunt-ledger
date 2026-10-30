@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import html
 import re
-from pathlib import Path
 
 LEGACY_ROOT = "https://p00nsmasher.github.io/github-value-hunt-ledger/"
 IMAGE_BY_TOPIC = {

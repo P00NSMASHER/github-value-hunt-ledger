@@ -5,7 +5,7 @@ that define one audit run and re-verifies their cross-object relationships.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Iterable
 
 from freight.contracts import canonical_hash

@@ -21,6 +21,21 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
       - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/gao_adjudicated_billing_cases.py"
+      - "freight/test_gao_adjudicated_billing_cases.py"
+      - "freight/fixtures/gao_adjudicated_billing_cases_v1.json"
+      - "freight/cbca_rate_billing_controls.py"
+      - "freight/test_cbca_rate_billing_controls.py"
+      - "freight/fixtures/cbca_rate_billing_controls_v1.json"
+      - "freight/cbca_rail_detention_timeline.py"
+      - "freight/test_cbca_rail_detention_timeline.py"
+      - "freight/fixtures/cbca_rail_detention_timeline_v1.json"
+      - "freight/public_freight_proof_ladder.py"
+      - "freight/test_public_freight_proof_ladder.py"
+      - "freight/fixtures/public_freight_rate_cash_proof_v1.json"
+      - "freight/fmc_real_shipper_billing_lifecycle.py"
+      - "freight/test_fmc_real_shipper_billing_lifecycle.py"
+      - "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
       - "freight/freight_evidence_chain_readiness.py"
@@ -65,6 +80,21 @@ on:
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
       - "freight/test_gao_motor_freight_numeric.py"
+      - "freight/gao_adjudicated_billing_cases.py"
+      - "freight/test_gao_adjudicated_billing_cases.py"
+      - "freight/fixtures/gao_adjudicated_billing_cases_v1.json"
+      - "freight/cbca_rate_billing_controls.py"
+      - "freight/test_cbca_rate_billing_controls.py"
+      - "freight/fixtures/cbca_rate_billing_controls_v1.json"
+      - "freight/cbca_rail_detention_timeline.py"
+      - "freight/test_cbca_rail_detention_timeline.py"
+      - "freight/fixtures/cbca_rail_detention_timeline_v1.json"
+      - "freight/public_freight_proof_ladder.py"
+      - "freight/test_public_freight_proof_ladder.py"
+      - "freight/fixtures/public_freight_rate_cash_proof_v1.json"
+      - "freight/fmc_real_shipper_billing_lifecycle.py"
+      - "freight/test_fmc_real_shipper_billing_lifecycle.py"
+      - "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json"
       - "freight/real_document_lab.py"
       - "freight/test_real_document_lab.py"
       - "freight/freight_evidence_chain_readiness.py"
@@ -107,8 +137,8 @@ jobs:
           python-version: "3.11"
       - name: Compile and adversarially validate four lanes plus FreightRecovery feed
         run: |
-          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py freight/test_gao_b221594_negative_control.py freight/test_gao_b189100_classification.py
-          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
+          python -m py_compile freight/unified_research_lab.py freight/test_unified_research_lab.py freight/research_eval_bridge.py freight/test_research_eval_bridge.py freight/research_lab_health.py freight/test_research_lab_health.py freight/research_source_review.py freight/test_research_source_review.py freight/research_publisher_provenance.py freight/test_research_publisher_provenance.py freight/official_nyc_issued_permit_lab.py freight/test_official_nyc_issued_permit_lab.py freight/official_capturebrief_award_lab.py freight/test_official_capturebrief_award_lab.py freight/capturebrief_sam_fy2027_asof.py freight/test_capturebrief_sam_fy2027_asof.py freight/gao_adjudication_chronology.py freight/test_gao_adjudication_chronology.py freight/gao_motor_freight_numeric.py freight/test_gao_motor_freight_numeric.py freight/gao_adjudicated_billing_cases.py freight/test_gao_adjudicated_billing_cases.py freight/cbca_rate_billing_controls.py freight/test_cbca_rate_billing_controls.py freight/cbca_rail_detention_timeline.py freight/test_cbca_rail_detention_timeline.py freight/public_freight_proof_ladder.py freight/test_public_freight_proof_ladder.py freight/fmc_real_shipper_billing_lifecycle.py freight/test_fmc_real_shipper_billing_lifecycle.py freight/test_gao_b221594_negative_control.py freight/test_gao_b189100_classification.py
+          python -m unittest -v freight.test_unified_research_lab freight.test_research_lab_health freight.test_research_source_review freight.test_research_publisher_provenance freight.test_official_nyc_issued_permit_lab freight.test_official_capturebrief_award_lab freight.test_capturebrief_sam_fy2027_asof freight.test_gao_adjudication_chronology freight.test_gao_motor_freight_numeric freight.test_gao_adjudicated_billing_cases freight.test_cbca_rate_billing_controls freight.test_cbca_rail_detention_timeline freight.test_public_freight_proof_ladder freight.test_fmc_real_shipper_billing_lifecycle freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
           python -m py_compile freight/freight_evidence_chain_readiness.py freight/test_freight_evidence_chain_readiness.py
           python -m unittest -q freight.test_freight_evidence_chain_readiness
       - name: Verify independent Cloudflare scheduler contract
@@ -440,6 +470,203 @@ jobs:
                   '- 0 original customer invoices, modern tariffs, or RETALLY cash.\n'
               )
           PY
+      - name: Pin externally adjudicated historical freight-billing cases
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_gao_adjudicated_billing_cases
+          python -m freight.gao_adjudicated_billing_cases \
+            --output freight/research_lab/gao_adjudicated_billing_cases_v1.json \
+            > /tmp/retally-gao-billing-summary.json
+          python -m freight.gao_adjudicated_billing_cases \
+            --verify --output freight/research_lab/gao_adjudicated_billing_cases_v1.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally-gao-billing-summary.json').read_text())
+          assert x['external_gao_adjudicated_historical_cases']==7
+          assert x['sustained_overcharges_historical_cents']==426699
+          assert x['historical_agency_deductions_total_cents_not_retally_cash']==452104
+          assert x['invalid_government_deductions_historical_cents']==25405
+          assert x['private_customer_benchmark_truth_cases']==0
+          assert x['source_original_invoice_rate_bank_chain_verified_cases']==0
+          assert x['retally_recovered_cash_cents']==0
+          assert x['production_rating_or_dispute_allowed'] is False
+          assert x['commercial_reuse_approved'] is False
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  "### FreightRecovery external GAO billing adjudications (historic ONLY)\n"
+                  "- 5 sustained historical overcharges ($4,266.99 total GSA deductions reported).\n"
+                  "- 2 invalid historical GSA deductions ($254.05): no carrier repayment verified.\n"
+                  "- Original invoice/rate/bank custody: 0; current customer labels: 0; RETALLY cash: $0.\n"
+              )
+          PY
+      - name: Pin CBCA historical freight audit false-positive and denied-claim controls
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_cbca_rate_billing_controls
+          python -m freight.cbca_rate_billing_controls \
+            --output freight/research_lab/cbca_rate_billing_controls_v1.json \
+            > /tmp/retally-cbca-billing-summary.json
+          python -m freight.cbca_rate_billing_controls \
+            --output freight/research_lab/cbca_rate_billing_controls_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          d=json.loads(Path('freight/research_lab/cbca_rate_billing_controls_v1.json').read_text())
+          assert d['case_count'] == 2
+          assert d['gsa_overcharge_notices_invalidated_count'] == 7
+          assert d['government_notice_assessment_cents_rejected_by_board_not_retally_cash'] == 1554908
+          assert d['other_gsa_notices_not_adjudicated_here'] == 108
+          assert d['unpaid_original_invoices_denied_by_board_case_count'] == 1
+          assert d['time_barred_carrier_claim_cents_not_recoverable'] == 1459569
+          assert d['verified_carrier_refund_received_cents'] is None
+          assert d['private_customer_invoice_truth_cases'] == 0
+          assert d['source_original_pdf_sha256'] is None
+          assert d['commercial_reuse_approved'] is False
+          assert d['verified_retally_cash_recovery_cents'] == 0
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write('### Independent CBCA historical rate-case controls\n'
+                        '- 2020: seven GSA overcharge assessments ($15,549.08) invalidated by CBCA, actual carrier refund UNKNOWN.\n'
+                        '- 2024: $14,595.69 unpaid carrier invoice claim denied as untimely, NOT an overcharge.\n'
+                        '- Original PDF/invoice/bank custody and RETALLY customer recovery: ZERO/UNVERIFIED.\n')
+          PY
+      - name: Verify CBCA paid rail BOL and detention source chronologies without recovery promotion
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_cbca_rail_detention_timeline
+          python -m freight.cbca_rail_detention_timeline \
+            --output freight/research_lab/cbca_rail_detention_timeline_v1.json \
+            > /tmp/retally-cbca-timeline-summary.json
+          python -m freight.cbca_rail_detention_timeline \
+            --output freight/research_lab/cbca_rail_detention_timeline_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          d=json.loads(Path('freight/research_lab/cbca_rail_detention_timeline_v1.json').read_text())
+          assert d['cbca_decision_count'] == 2
+          assert d['up_public_bol_rows'] == 12
+          assert d['up_late_offset_rows'] == 12
+          assert d['up_board_reported_alleged_overcharge_total_cents_NOT_invoice_total'] == 13761404
+          assert d['up_board_reported_treasury_offsets_taken_cents_NOT_retally_refund'] == 13735675
+          assert d['up_allegation_minus_offsets_cents'] == 25729
+          assert d['tql_paid_transport_invoice_shipments_reported'] == 79
+          assert d['tql_challenged_invoice_count'] == 70
+          assert d['tql_contradictory_notice_amounts_cents_NOT_normalized'] == [33989573, 33989575]
+          assert d['tql_amount_variance_cents'] == 2
+          assert d['independent_carrier_refunds_bank_verified_cases'] == 0
+          assert d['retally_cash_recovered_cents'] == 0
+          assert d['commercial_use_approved'] is False
+          assert d['original_official_pdf_source_sha256'] is None
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### FreightRecovery original CBCA government rail/detention chronology (historic ONLY)\n'
+                  '- Twelve published BOL rows, Treasury collected $137,356.75 in deductions, Board ordered reimbursement; actual carrier refund UNVERIFIED.\n'
+                  '- TQL 79 paid detention invoice shipments: 70 challenged, Board invalidated demands; official amount variants $339,895.73 / $339,895.75 (NOT normalized).\n'
+                  '- No original source PDF, signed private invoice or bank-cash proof in custody; modern customer truth and RETALLY cash remain ZERO.\n'
+              )
+          PY
+      - name: Separate GAO historic rate proof from DOJ paid and agreed settlements
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_public_freight_proof_ladder
+          python -m freight.public_freight_proof_ladder \
+            --output freight/research_lab/public_freight_proof_v1.json \
+            > /tmp/retally-public-freight-proof-summary.json
+          python -m freight.public_freight_proof_ladder \
+            --output freight/research_lab/public_freight_proof_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=json.loads(Path('freight/research_lab/public_freight_proof_v1.json').read_text())
+          assert len(p['public_records']) == 3
+          assert p['GAO_historical_billable_weight_lb'] == 6000
+          assert p['GAO_historical_allowable_cents'] == 15060
+          assert p['GAO_historical_overcharge_cents'] == 15530
+          assert p['GAO_later_refund_bank_cleared_verified'] is False
+          assert p['DOJ_settlement_paid_public_report_cents'] == 1300000000
+          assert p['DOJ_settlement_paid_original_bank_record_in_custody'] is False
+          assert p['DOJ_agreed_settlement_approximate_cents'] == 685000000
+          assert p['DOJ_agreed_settlement_actual_paid_cents'] is None
+          assert p['modern_customer_independent_overcharge_labels'] == 0
+          assert p['modern_tariff_rights_verified'] is False
+          assert p['verified_RETALLY_cash_recovered_cents'] == 0
+          assert p['original_publisher_SHA256'] is None
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write('### FreightRecovery public proof stages: NOT customer claims\n'
+                        '- GAO B-143458: $305.90 historically paid, $150.60 GAO allowed, $155.30 adjudicated 1961 overcharge; no separately held invoice or refund receipt.\n'
+                        '- DOJ 2016 explicitly confirms Menlo/Estes collectively PAID $13m US Government, settlement of disputed allegations; no liability finding or per-shipment proof.\n'
+                        '- DOJ 2022 says YRC/Roadway/Yellow AGREED TO PAY about $6.85m; independent actual payment UNKNOWN.\n'
+                        '- 0 privately rated customer cases, modern tariff authority, RETALLY recovered cash or approved commercial data reuse.\n')
+          PY
+      - name: Preserve original FMC real-shipper invoice, final award and payment lifecycle
+        run: |
+          set -euo pipefail
+          python -m unittest -q freight.test_fmc_real_shipper_billing_lifecycle
+          python -m freight.fmc_real_shipper_billing_lifecycle \
+            --output freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json \
+            > /tmp/retally-fmc-real-shipper-summary.json
+          python -m freight.fmc_real_shipper_billing_lifecycle \
+            --output freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json --verify
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          x=json.loads(Path('freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json').read_text())
+          assert len(x['fmc_cases']) == 4
+          assert x['leader_settlement_order_date'] == '2024-11-08'
+          assert x['leader_admin_final_notice_date'] == '2024-12-10'
+          assert x['leader_both_signatures_described_by_FMC_not_original_in_custody'] is True
+          assert x['leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents'] == 465000
+          assert x['leader_actual_carrier_ledger_cancellation_verified'] is False
+          assert x['leader_previously_paid_freight_refund_rights_waived_usd_cents'] == 300000
+          assert x['leader_previously_paid_late_fee_refund_rights_waived_brl_centavos'] == 70000
+          assert x['leader_usd_brl_conversion_or_sum_allowed'] is False
+          assert x['leader_refund_received_bank_verified_usd_cents'] is None
+          assert x['leader_original_settlement_and_customer_bank_docs_held'] is False
+          assert x['leader_refund_rights_released_not_new_cash_awarded'] is True
+          assert x['leader_fmc_order_adjudicated_illegal_billing_amount_cents'] is None
+          assert x['bridgewell_final_principal_cents'] == 2432880
+          assert x['bridgewell_final_interest_as_of_notice_cents'] == 396051
+          assert x['bridgewell_final_ordered_total_cents'] == 2828931
+          assert x['bridgewell_award_components_not_invoice_count'] == 10
+          assert x['bridgewell_reported_late_customer_payment_date'] == '2026-08-31'
+          assert x['bridgewell_official_order_payment_made_index_excerpt_date'] == '2026-08-31'
+          assert x['bridgewell_official_order_late_days'] == 223
+          assert x['bridgewell_original_enforcement_order_pdf_in_custody'] is False
+          assert x['bridgewell_bank_receipt_confirmed'] is False
+          assert x['bridgewell_actual_bank_receipt_cents'] is None
+          assert x['bridgewell_payment_evidence_tier'] == 'OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED'
+          assert x['bridgewell_later_payment_reported_NOT_verified_bank_receipt'] is True
+          assert x['bridgewell_exact_received_cash_and_interest_unverified'] is True
+          assert x['bridgewell_civil_penalties_imposed_cents'] is None
+          assert x['hpl_invoice_vs_quote_difference_cents'] == 2360000
+          assert x['hpl_claimed_reparations_cents'] == 2589500
+          assert x['jimex_initial_claim_requested_cents'] == 4460669
+          assert x['jimex_initial_late_fee_reparations_cents'] == 999707
+          assert x['jimex_initial_detention_refund_cents'] == 197500
+          assert x['jimex_initial_principal_NOT_actual_cash_received_cents'] == 1197207
+          assert x['jimex_appendix_b_paid_invoice_count'] == 5
+          assert x['jimex_appendix_b_paid_detention_cents'] == 197500
+          assert x['jimex_unrelated_carrier_exhibits_must_not_join'] is True
+          assert x['jimex_initial_decision_finality_verified'] is False
+          assert x['jimex_later_bank_cleared_refund_cents'] is None
+          assert x['jimex_exact_interest_cents'] is None
+          assert x['jimex_current_customer_scoring_authorized'] is False
+          assert x['hpl_initial_decision_reparations_awarded_cents'] == 0
+          assert x['hpl_final_status_independently_verified'] is False
+          assert x['modern_retally_invoice_accuracy_labels'] == 0
+          assert x['commercial_customer_reuse_approved'] is False
+          assert x['retally_recovered_cash_cents'] == 0
+          assert x['original_official_pdf_sha256'] is None
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
+              out.write(
+                  '### FMC public shipper billing: real payment lifecycle, NOT RETALLY cash\n'
+                  '- FMC 2022(I): $24,328.80 original reparations + $3,960.51 interest = $28,289.31 ordered due Jan 20, 2026.\n'
+                  '- FMC Oct 2 order search-index excerpt says COSCO paid Aug 31 (223 days late); press reports Bridgewell received it. Original order PDF and actual bank-cleared amount UNKNOWN.\n'
+                  '- FMC 2025(I): $23,600 quote/invoice gap, $25,895 requested, but initial decision awarded $0 reparations.\n'
+                  '- FMC 2015(I): signed settlement final December 2024; $4,650 outstanding demurrage to cancel, waived refund claims for USD $3,000 paid freight plus BRL 700 late fees. No verified cash or actual carrier ledger write-off.\n'
+                  '- Independent FMC PDF bytes and original customer bank records NOT held. Modern RETALLY case labels and cash are ZERO.\n'
+              )
+          PY
       - name: Commit only metadata, never on protected main
         env:
           DATA_BRANCH: research/retally-unified-data-lab
@@ -461,7 +688,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/research_lab/gao_authority_chronology_v1.json freight/research_lab/gao_motor_freight_numeric_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
+          git add -- freight/research_lab/leads.json freight/research_lab/evaluation_feed_v1.json freight/research_lab/source_health_v1.json freight/research_lab/source_review_queue_v1.json freight/research_lab/publisher_provenance_v1.json freight/research_lab/official_nyc_issued_permit_replay_v1.json freight/research_lab/official_capturebrief_award_readback_v1.json freight/research_lab/capturebrief_sam_fy2027_asof_v1.json freight/research_lab/gao_authority_chronology_v1.json freight/research_lab/gao_motor_freight_numeric_v1.json freight/research_lab/gao_adjudicated_billing_cases_v1.json freight/research_lab/cbca_rate_billing_controls_v1.json freight/research_lab/cbca_rail_detention_timeline_v1.json freight/research_lab/public_freight_proof_v1.json freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json freight/lab15/evidence_ledger.json freight/research/lab15_candidate_ledger.json
           if [ -f freight/lab15/triage_queue.json ]; then
             git add -- freight/lab15/triage_queue.json
           fi
@@ -705,6 +932,16 @@ jobs:
           python -m freight.gao_adjudication_chronology --output /tmp/retally-gao-authority-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/research_lab/gao_motor_freight_numeric_v1.json > /tmp/retally-gao-motor-freight-numeric-v1.json
           python -m freight.gao_motor_freight_numeric --output /tmp/retally-gao-motor-freight-numeric-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/gao_adjudicated_billing_cases_v1.json > /tmp/retally-gao-billing-v1.json
+          python -m freight.gao_adjudicated_billing_cases --output /tmp/retally-gao-billing-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/cbca_rate_billing_controls_v1.json > /tmp/retally-cbca-billing-v1.json
+          python -m freight.cbca_rate_billing_controls --output /tmp/retally-cbca-billing-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/cbca_rail_detention_timeline_v1.json > /tmp/retally-cbca-timeline-v1.json
+          python -m freight.cbca_rail_detention_timeline --output /tmp/retally-cbca-timeline-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/public_freight_proof_v1.json > /tmp/retally-public-freight-proof-v1.json
+          python -m freight.public_freight_proof_ladder --output /tmp/retally-public-freight-proof-v1.json --verify
+          git show origin/research/retally-unified-data-lab:freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json > /tmp/retally-fmc-real-shipper-v1.json
+          python -m freight.fmc_real_shipper_billing_lifecycle --output /tmp/retally-fmc-real-shipper-v1.json --verify
           git show origin/research/retally-unified-data-lab:freight/lab15/evidence_ledger.json > /tmp/retally-lab15-evidence.json
           git show origin/research/retally-unified-data-lab:freight/research/lab15_candidate_ledger.json > /tmp/retally-lab15-candidates.json
           python -m unittest -q freight.test_unified_research_lab freight.test_research_eval_bridge
@@ -712,6 +949,11 @@ jobs:
           # cargo-classification dispute on every nightly original-data run.
           # They are historical evidence, never independent customer invoice truth.
           python -m unittest -q freight.test_gao_b221594_negative_control freight.test_gao_b189100_classification
+          python -m unittest -q freight.test_gao_adjudicated_billing_cases
+          python -m unittest -q freight.test_cbca_rate_billing_controls
+          python -m unittest -q freight.test_cbca_rail_detention_timeline
+          python -m unittest -q freight.test_public_freight_proof_ladder
+          python -m unittest -q freight.test_fmc_real_shipper_billing_lifecycle
           python -m pytest -q freight/test_real_world_eval_v1.py
           python -m freight.research_eval_bridge \
             --ledger /tmp/retally-unified-leads.json \

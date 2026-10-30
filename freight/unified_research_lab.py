@@ -40,11 +40,11 @@ SEARCHES = {
     "recoveryos": ("accounts payable invoice", "vendor payment transparency", "accounts payable invoice dataset"),
 }
 SOURCE_HOSTS = frozenset({
-    "catalog.data.gov", "github.com", "zenodo.org", "www.gao.gov",
+    "catalog.data.gov", "github.com", "zenodo.org", "www.gao.gov", "www.cbca.gov",
     "data.cityofnewyork.us", "sam.gov", "api.usaspending.gov",
     "www.penninecare.nhs.uk", "media.cadc.uscourts.gov",
     "www2.fmc.gov", "www.fmc.gov", "www.sec.gov", "www.stb.gov",
-    "www.eia.gov", "psc.ky.gov",
+    "www.eia.gov", "psc.ky.gov", "www.justice.gov",
 })
 API_HOSTS = frozenset({"api.github.com", "zenodo.org", "api.gsa.gov", "api.us.socrata.com",
                        "retally-unified-research-scout.jayp19386.workers.dev"})
@@ -61,6 +61,21 @@ SEEDS = {
         "https://www.gao.gov/products/b-213717-0",  # GAO 1984 sustained $525.31 GSA classification deduction, historical-only.
         "https://www.gao.gov/products/b-192856",  # 1979 GAO physically tested acoustic-tile sample; $939.42 upheld GSA setoff, historical only.
         "https://www.gao.gov/products/b-191258",  # 1978 GAO reversed $33.30 GSA setoff; later carrier repayment NOT verified.
+        "https://www.gao.gov/products/b-143458",  # 1961 adjudicated $155.30, exact historical 6000-lb minimum x $2.51/cwt; original tariff/invoice bytes NOT held.
+        "https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve",  # DOJ 2016 explicitly reports $13m PAID by Menlo/Estes, aggregate government settlement, NOT customer invoice truth.
+        "https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims",  # DOJ 2022 AGREED approx $6.85m YRC/Roadway/Yellow; cleared payment NOT verified.
+        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf",  # FMC Bridgewell $24,328.80 adjudicated real 2022 shipper fee reparations principal; no original bank custody.
+        "https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf",  # Jan 2026 administrative final $28,289.31 principal+interest due; receipt status separate.
+        "https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf",  # HPL $23,600 disputed quote/invoice gap but initial decision awards ZERO reparations.
+        "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf",  # Nov 2024 official signed settlement: $4650 unpaid demurrage CANCEL obligation; previous paid charges refund right WAIVED, not cash.
+        "https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf",  # Dec 10 2024 FMC administratively final signed settlement, not original shipping invoice.
+        "https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf",  # Jul 2026 Jimex: five FMC-reported paid detention invoices $1975, INITIAL $11972.07 principal award plus interest, no finality/bank proof.
+        "https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf",  # Jul 23 request for deadline extension DENIED, not a finality notice.
+        "https://www.gao.gov/products/b-121220-0",  # Historical 1964 GAO: who bore transportation expense vs who initially paid is a separate documentary-proof question; NOT current private-law decree.
+        "https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf",  # CBCA seven GSA overcharge notices rejected, carrier refund not verified.
+        "https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf",  # CBCA unpaid original invoice carrier claim time barred, NOT an overcharge.
+        "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",  # CBCA: 12 original public BOL-keyed Treasury offsets reversed for timeliness, carrier bank refund UNVERIFIED.
+        "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",  # CBCA: GSA's 70 paid-detention invoice recoupment demands invalid, conflicting 2-cent source totals.
         "https://www.gao.gov/products/b-221663-0",  # GAO 1986 agent-versus-interline ruling; amount UNKNOWN, not invoice scoring.
         "https://www.gao.gov/products/b-139340",  # GAO 1959 exclusive-use GBL; historical $523.60/$451.95/$71.65, not modern truth.
         "https://www.gao.gov/products/b-143458",

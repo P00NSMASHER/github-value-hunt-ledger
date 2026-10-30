@@ -87,7 +87,9 @@ class ScoutTests(unittest.TestCase):
                         "candidate_count":2}
             self.assertTrue(persist_queue(path,meaningful))
             self.assertNotEqual(path.read_bytes(),original)
-            self.assertTrue(persist_queue(path,{**meaningful,
+            # Per-run provider diagnostics belong in job logs, not source
+            # identity. A provider error blocks the writer before this call.
+            self.assertFalse(persist_queue(path,{**meaningful,
                 "search_diagnostics":[{"error":"GITHUB_RATE_LIMIT"}]}))
 
     def test_digest_is_byte_stable_without_new_source_evidence(self):

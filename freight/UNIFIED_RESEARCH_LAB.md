@@ -6,6 +6,431 @@ validation), while retaining bounded PermitPlate, CaptureBrief and RecoveryOS
 research and the strongest already-approved read-only regression suites.
 Source pointers alone never count as independently validated claims.
 
+## Agency-adjudicated historical billing cases (October 26 evidence review)
+
+This is a **historical billing-adjudication casebook**, not a new commercially
+authorized customer-accuracy dataset. Seven original GAO decisions publish
+independent agency reviews of GSA/carrier freight billing disputes:
+
+| Official decision | Reported paid | GSA-audited | Reported GSA deduction | GAO outcome |
+|---|---:|---:|---:|---|
+| [B-191257 (1978)](https://www.gao.gov/products/b-191257) | $828.00 | $796.00 | $32.00 | Overcharge deduction upheld; carrier route authority. |
+| [B-160344 (1967)](https://www.gao.gov/products/b-160344) | $275.17 | $139.29 | $135.88 | Overcharge deduction upheld; freight classification. |
+| [B-189100 (1977)](https://www.gao.gov/products/b-189100) | $3,567.18 | $932.80** | $2,634.38 | Overcharge deduction upheld after commodity-classification dispute. |
+| [B-213717 (1984)](https://www.gao.gov/products/b-213717-0) | $1,212.09 | $686.78 | $525.31 | Overcharge deduction upheld; freight commodity classification. |
+| [B-192856 (1979)](https://www.gao.gov/products/b-192856) | $1,097.93 | $158.51*** | $939.42 | **GAO inspected an actual commodity sample**: upheld classification deduction; sample-linked cargo evidence (not in RETALLY custody). |
+| [B-221594 (1986)](https://www.gao.gov/products/b-221594-0) | $942.00 | $721.25* | $220.75 | GSA deduction INVALID because rate tender was rejected. |
+| [B-191258 (1978)](https://www.gao.gov/products/b-191258) | $1,497.60 | $1,464.30*** | $33.30 | GSA deduction INVALID: full-trailer shipment must use 24,000-lb truckload tariff minimum, not 6,910-lb actual weight; payment NOT confirmed. |
+
+*The original GAO public text has an OCR-ambiguous assessed amount, so $721.25
+is derived from its printed $942.00 paid and $220.75 deduction, not a separately
+authenticated tariff or source byte.*
+
+**For B-189100, the $932.80 figure is paid minus reported GSA deduction;
+it is NOT an independently published applicable tariff charge. The decision
+provides no exact GBL shipment date. B-213717 does not publish a safely
+transcribable GBL identifier or shipment weight in the reviewed decision text.
+
+***B-192856's $158.51 figure and B-191258's $1,464.30 figure are
+published payment minus published deduction, NOT independently acquired
+original applicable tariff charge documents. GAO's 1979 decision directly
+reviewed a physical 13.6-ounce tile sample: 60 tiles per box (51 lb),
+40 boxes (2,040 lb); the government-rate determination was sustained.
+In B-191258 GAO applied a 24,000-lb truckload minimum to the capacity-load
+arbitrary rate; the $33.30 government setoff was incorrect. GAO reports
+that GSA would process a claim, but no later carrier bank receipt was found.
+GAO original scanned PDF texts were indexed; PDF byte hashes, original
+invoice/tariff pages and reliable page-image inspection remain unavailable.
+
+These are five independently **agency-adjudicated historical positive examples**
+($4,266.99 in government-reported deductions), plus two historical **false-positive
+controls** ($254.05 in GSA deductions found improper). Neither false positive
+is a valid shipper overcharge or RETALLY recovery. All money is old government transaction
+narrative, NOT private customer cash or modern rate truth.
+
+Source: official GAO public decisions manually checked October 26, 2026.
+Raw GAO HTML/PDF response bytes, original signed invoice/GBL/tariff files and bank
+clearing artifacts are **not in custody** and have no acquired source-byte SHA.
+An authored JSON digest is never an original publisher hash. A GAO ruling is
+independent external adjudication, but NOT independent custody of transaction
+documents. Later supersession has not been exhaustively checked.
+The existing 110 original public invoice faces still have zero independently
+adjudicated private customer errors, zero valid present-day customer
+precision/recall cases, and $0 RETALLY cash.
+
+The casebook runs through exact pinned GAO adjudication controls and adversarial
+tests. The actual native freight rating and evidence engines are also exercised
+on explicitly SYNTHETIC derivative records, ensuring they return REVIEW_REQUIRED
+without modern buyer-specific authority, shipment evidence or bank proof.
+Unified Lab verification, the single research branch and nightly real-data
+replay exercise the evidence package. No added cron, external contact, paid
+service, customer ingestion or production rating change.
+
+Offline verification commands:
+
+    python -m unittest -v freight.test_gao_adjudicated_billing_cases
+    python -m freight.gao_adjudicated_billing_cases --output /tmp/gao_billing_v1.json
+    python -m freight.gao_adjudicated_billing_cases --verify --output /tmp/gao_billing_v1.json
+
+For current independently verified overcharge labels, obtain a buyer-authorized
+original invoice, contemporaneous controlling contract/rate, authenticated
+shipment/BOL, independently cleared payment or credit, and externally resolved
+positive or clean-negative claim. Current customer pricing, rights, consent,
+production actions and recovered cash remain explicitly held.
+
+## Independent CBCA freight billing adjudication controls (2020/2024)
+
+The federal [CBCA official RATE-case index](https://www.cbca.gov/decisions/rate.html)
+contains adjudications of carrier/GSA disputes. These are distinct from
+the seven historical GAO setoff cases and from RETALLY's 110 original
+commercial invoice faces. This casebook is a *negative-claim proof pack*
+and **does not create modern RETALLY customer overcharge labels**.
+
+| Original official administrative decision | Independently adjudicated outcome | What must NOT be inferred |
+| --- | --- | --- |
+| [AARE Logistics, CBCA 6578-RATE, Aug. 6, 2020](https://www.cbca.gov/files/decisions/2020/SULLIVAN_08-06-20_6578-RATE__AARE_LOGISTICS%2C_LLC%20%28Decision%29.pdf) | CBCA rejected GSA's overcharge assessments on **7** 2014 household-goods freight shipments and granted the carrier's claim for **$15,549.08** it had paid against those assessments. | The other **108 of 115** GSA notices were *not adjudicated in this decision*. The later carrier refund/credit, if any, is NOT independently proved. The improper GSA assessment is not a shipper overcharge and is not RETALLY cash. |
+| [James Forwarding, CBCA 8051-RATE, Aug. 8, 2024](https://www.cbca.gov/files/decisions/2024/LESTER_08-08-24_8051-RATE__JAMES_FORWARDING_COMPANY_INC%20%28DECISION%29.pdf) | CBCA **denied** a carrier's **$14,595.69** originally unpaid 2018 invoice claim as untimely; the Navy initially rejected payment for absent weight-ticket support. | Unpaid invoice does not prove rate overcharge, successful future collection, waived deadline, or a customer refund. The decision also held the lack of appeal-rights notice did not establish actual prejudice in this case. |
+
+The official indexed **decision text**, not physical PDF page imagery or
+issuer HTTP source bytes, was reviewed. CBCA PDF byte SHA-256, separately
+custodied signed original invoices, tender pages, weight tickets,
+customer bank records and independent refund settlement remain UNKNOWN.
+Any rights specific to third-party attached records and commercial engine
+reuse remain unverified. Exact source URLs, immutable fact constants and
+adversarial tests enforce the distinction between (a) an invalid
+government overcharge notice, (b) a carrier's unpaid claim barred by
+timeliness, and (c) a real modern buyer's independently verified freight
+overcharge. Only the first two categories are present.
+
+One existing GitHub research controller handles these in its verify,
+research-ledger, and nightly replay jobs. No new cron, provider, customer
+communication, production rating change, invoice upload, financial posting,
+revenue or retroactive legal generalization.
+
+Offline verification:
+
+    python -m unittest -q freight.test_cbca_rate_billing_controls
+    python -m freight.cbca_rate_billing_controls --output /tmp/cbca-claims.json
+    python -m freight.cbca_rate_billing_controls --output /tmp/cbca-claims.json --verify
+
+
+## Original CBCA BOL-by-BOL government payment chronology (2009) and detention notice dispute (2014)
+
+Independent published decisions from the U.S. Civilian Board of Contract Appeals
+provide transaction identifiers and government-reported payment/offset events,
+**not separately held original invoices, applicable contracts, current private
+customer claims or bank refund receipts**. New research-only files:
+\`freight/fixtures/cbca_rail_detention_timeline_v1.json\`,
+\`freight/cbca_rail_detention_timeline.py\` and adversarial tests.
+
+**[CBCA 1317-RATE, Union Pacific Railroad, October 29, 2009](https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf)**
+
+The official decision's **PDF page 3, table (zero-based page 2)** publishes
+**12 distinct government BOL numbers**, amounts alleged as transportation
+overcharges, dates the original transportation bills were paid, amounts
+**actually deducted from the carrier's Treasury payments**, and deduction
+dates. Every deduction was more than THREE YEARS after the bill's payment,
+and the Board held the offsets untimely under the cited 31 U.S.C. § 3726(d).
+The Board ruled that they **must be refunded**, but **no separate later
+carrier bank receipt or actual repayment was obtained**.
+
+- The 12 government **alleged overcharges** total **$137,614.04**.
+  **This column is NOT original invoice billed charges.**
+- **Actual Treasury deductions reported by the Board** total **$137,356.75**.
+  These are government collections *from the carrier*, NOT REFUNDS and not
+  RETALLY recovered cash.
+- The two totals differ by **$257.29**. Two BOL rows have partial, not equal,
+  deduction amounts. These differences are **not** invoice/rate errors.
+- From 74 initial government notices, 67 claims were settled separately
+  before these proceedings, and five additional claims were added. Exactly
+  12 remained for decision. The 67 settlements are **not** included as
+  independently verified cash recovery outcomes or additional case labels.
+- The decision resolved the **timeliness** issue and expressly left
+  underlying rate/railcar substitution merits undecided. Never label the
+  carrier's original rates independently correct on that basis.
+
+**[CBCA 3467-RATE, Total Quality Logistics, May 14, 2014](https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf)**
+
+The Board independently established a **79-shipment** government detention
+invoice history (four in 2010 and 75 in 2011). GSA's transportation office
+authorized item-325 billing, required certified BOLs and itemized detention
+invoices, and paid the charges. GSA's later audit accepted nine payments
+and challenged **70**, then the Board held the challenged notices invalid.
+The decision cites **$339,895.73** in one factual paragraph but **$339,895.75**
+in its final ruling: a **two-cent discrepancy in the ORIGINAL PUBLISHER
+DECISION** that must be preserved as two variants. It must never be averaged,
+silently normalized, converted to a carrier payment, or scored as 70
+separately verified original invoice/rate outcomes. The Board's rejection
+of an attempted government recoupment also does **not** establish the
+government actually collected the disputed money.
+
+**Source restrictions:** Official decision *indexed text* reviewed; direct
+publisher PDF byte-download or independent visual original-page verification
+was unavailable. Original 12 BOLs, 79 TQL paid invoices, signed tariff
+authority, delivery copies and separate bank/payment refund records were
+not acquired into RETALLY's custody. The authored JSON/row-set digests
+are **not PDF bytes or official issuer signatures**. No current private
+customer invoice accuracy, refund, source-specific commercial-use
+permission or financial settlement is established.
+
+Existing unified research verification and nightly original-document replay
+generate/read an **aggregate-only** receipt. Public BOL identifiers are
+limited to the authored historical government-source fixture and are not
+exported into the dynamic research ledger/receipt. The two CBCA decisions
+are new official URL **source pointers**, not new billable customer leads.
+
+Offline exercise:
+
+    python -m unittest -q freight.test_cbca_rail_detention_timeline
+    python -m freight.cbca_rail_detention_timeline --output /tmp/cbca_timeline.json
+    python -m freight.cbca_rail_detention_timeline --output /tmp/cbca_timeline.json --verify
+
+**Ground-truth gate still required:** separate original invoice BOL/transport
+contract/accepted tender bytes, shipper or carrier rate authority,
+adjudicated positive and clean-negative outcome at the appropriate scope,
+cleared payment/refund chain, independent source/reuse permission and held-out
+modern buyer validation. Never infer modern recoverable dollars from these
+federal 2004–2014 freight decisions.
+
+
+## Public freight proof ladder: beyond collecting URLs (October 26, 2026)
+
+**Different proof states must never be added together.** A historical government
+rate adjudication, a government-confirmed paid settlement, and an agreement
+to settle show three *different* kinds of proof. The independent official
+pages have been reviewed, but no original public HTTP response body
+was archived into this repository. All three records are **research only**.
+
+| Official original source | Strongest support | Hard limit |
+|---|---|---|
+| [GAO B-143458 (Mar. 30, 1961)](https://www.gao.gov/products/b-143458) | Government paid original carrier bill NC 23166 for BOL AF-7611030 of Mar. 7, 1958. Original $305.90 charge; 5,744 actual lb, 6,000-lb **LTL minimum**, $2.51 per 100 lb: **60 × $2.51 = $150.60**. GAO upheld the **$155.30** overcharge, ruling Pennsylvania Transfer Company **not** on tariff Rule 62-2's full-capacity exception carrier list despite a trailer-full BOL note. | Named original voucher/BOL/tariff *transcribed in independent GAO decision*, but RETALLY has **not acquired** their separate original bytes or SHA-256. The 1961 debt certificate ordered repayment within 30 days; **subsequent actual refund or offset unverified**. Not a current buyer-carrier rate. |
+| [DOJ Menlo/Estes (May 3, 2016)](https://www.justice.gov/usao-edca/pr/menlo-worldwide-services-inc-and-its-subcontractor-estes-pay-us-13-million-resolve) | DOJ explicitly states Menlo **paid $10 million** and Estes **paid $3 million**, total **$13 million paid to U.S. government** in False Claims Act settlement. An *allegation* was invoicing for air freight actually transported on the ground. | DOJ statement supports *government-reported aggregate settlement payment*, not original Treasury bank remittance in custody, per-invoice damages, **liability finding**, or RETALLY recovered cash. |
+| [DOJ YRC/Roadway/Yellow (Mar. 14, 2022)](https://www.justice.gov/archives/opa/pr/freight-carriers-agree-pay-685-million-resolve-allegations-knowingly-presenting-false-claims) | DOJ says the companies **agreed to pay approximately $6.85 million** to resolve *allegations* of billing when shipment reweighs rose while withholding lower reweighs. | **Agreement only, approximate amount only**: independent cleared government cash, actual shipper invoice damages, and liability determination are **NOT established** by this release. No private refund or RETALLY cash. |
+
+**Engineering proof ladder:** a source URI is a discovery lead; an official
+decision with named BOL/bill/tariff arithmetic can earn a *historical
+adjudication* label; a DOJ statement saying payment "has been paid"
+can earn a *government-reported aggregate settlement payment* label;
+DOJ saying "agreed to pay" can earn **agreement only**.
+None can earn a **modern customer's collectible invoice error** without
+original buyer-specific accepted rate/contract, authentic shipment
+documents, independent cleared payment, applicable claim rights and
+external error-outcome proof. Frozen GlobalTranz/ArcBest documents are
+**unrelated** to these cases. GAO/DOJ numbers are never summed into
+RETALLY opportunities or recovered cash.
+
+**Two legal clocks, not interchangeable:** Under [49 U.S.C. §13710](https://uscode.ecfr.io/title/49/section/13710),
+certain interstate motor-carrier billing-dispute procedures require
+notice within **180 days** of receiving an original or supplemental bill.
+Under [49 U.S.C. §14705](https://uscode.ecfr.io/title/49/section/14705),
+a federal *civil overcharge action* generally has **18 months** from
+accrual; certain Board/Secretary complaints instead have **three years**.
+Subsections (d)–(g) separately address extensions, government
+transportation and claim accrual. These have scope exceptions and
+different treatment of household goods or noncontiguous trade; contract,
+venue, carrier mode, prior claim history and dates matter.
+**No legal deadline is automatically calculated from invoice date**
+or retroactively applied to this 1961 case. Without verified bill receipt,
+delivery/tender, contract, jurisdiction and exception history the
+appropriate result is LEGAL_TIMELINE_REVIEW_REQUIRED, not a definitive
+"claim expired" or "claim valid." This is legal issue-spotting, not advice.
+
+The new research-only source-bound oracle and adversarial tests are
+freight/fixtures/public_freight_rate_cash_proof_v1.json,
+freight/public_freight_proof_ladder.py, and
+freight/test_public_freight_proof_ladder.py. The existing unified
+controller runs them in PR verify, source-ledger discovery and nightly
+original-freight replay. Only an aggregate receipt is saved.
+This adds no schedule, provider, purchased data, customer contact,
+private processing, payment action or production rate modification.
+Negative tests reject one-cent forgeries, inapplicable capacity tariffs,
+invented later refunds, agreed-as-paid settlements, false liability,
+invented invoice-specific accuracy and RETALLY recovered cash.
+
+Offline checks:
+
+    python -m unittest -q freight.test_public_freight_proof_ladder
+    python -m freight.public_freight_proof_ladder --output /tmp/public_freight_proof.json
+    python -m freight.public_freight_proof_ladder --output /tmp/public_freight_proof.json --verify
+
+
+## FMC Jimex v. Unitrans: five paid detention invoices and partial initial award (2026)
+
+The [FMC July 16, 2026 original indexed **initial** decision, Docket
+2036(I)](https://www2.fmc.gov/readingroom/docs/2036%28I%29/%2807%29%202036%28I%29%20Initial%20Decision%20%28with%20Appendices%20A-B%29.pdf)
+found Unitrans-PRA violated 46 U.S.C. § 41102(c) through excessive late
+payment fees and § 41104(a)(15) through detention invoices missing the
+minimum source information required by § 41104(d)(2) and 46 CFR § 541.6.
+
+**Unusually strong evidence:** Appendix B reports five real detention
+invoices with individual charge amounts and the dates Jimex paid the charges:
+
+| FMC-reported original invoice | Detention Jimex paid | Payment date, FMC-reported |
+| --- | ---: | --- |
+| 90855 | $650.00 | 2025-05-15 |
+| 91146 | $125.00 | 2025-05-15 |
+| 91156 | $375.00 | 2025-05-15 |
+| 91692 | $575.00 | 2025-06-05 |
+| 91289-1 | $250.00 | 2025-05-15 |
+| **Total, five distinct invoices** | **$1,975.00** | |
+
+The decision's **initial** ruling ordered **$9,997.07** in late-fee
+reparations plus refund of **$1,975.00** in paid invalid detention
+charges, **$11,972.07 initial principal**, with interest calculated from
+each injury date (the exact interest amount is not independently known).
+This is NOT the **$44,606.69** Jimex originally demanded. Respondent
+also asserted a disputed **$11,136** outstanding balance, which is
+NOT established here as actually due or paid. Later administrative
+finality and bank-cleared actual reparations/refund remain **unverified**.
+
+**Critical original-source join trap:** Footnote 3 of the initial
+decision identifies a set of shipping-line detention invoices attached
+by respondent on March 14, 2025 that belonged to shipments **outside
+the five invoices at issue**. Actual source-looking documents may be
+completely authentic but still belong to the *wrong shipment*. A valid
+billing proof chain must validate invoice ID, relevant shipment/BOL,
+charge period and governing tariff together; a genuine unrelated
+shipping-line invoice must NOT become supporting customer-rate truth.
+The agency's record later describes underlying pass-through invoices,
+but RETALLY has not independently acquired those original attachment
+bytes, payment receipts or signed underlying BOLs.
+
+An [FMC July 23, 2026 order](https://www2.fmc.gov/readingroom/docs/2036%28I%29/2036%28I%29%20Order%20Denying%20Respondent%27s%20Request%20for%20Extension%20of%20Time%20to%20File%20Petition%20for%20Reconsideration.pdf)
+denied an **extension request**; it is NOT itself a finality notice.
+The original decision PDF was indexed by the official publisher, but
+a direct PDF-byte fetch and independent visual page check were not
+available for this review. Consequently, original publisher PDF SHA,
+original invoice/BOL/tariff copies, independent customer bank-clearing
+and source-specific commercial reuse remain **unverified**.
+
+This case is added to the **existing** unified FMC real-shipper casebook.
+The source fixture pins all five public invoice IDs, values and dates
+in historical test context, while only an **aggregate and source-scoped**
+receipt enters the research branch (never raw invoice IDs). Adversarial
+tests reject forged initial awards, wrong invoice joins, made-up interest,
+premature administrative finality, paid refunds or RETALLY cash. Real
+current customer claim accuracy, modern buyer-specific authority and
+RETALLY recovered cash remain **0/unverified**. No contacts, new cron,
+paid sources or production invoice money automation.
+
+## Modern FMC shipper payment evidence: Bridgewell / COSCO (2022–2026)
+
+**Stronger than a historical aggregate GSA deduction:** two independent FMC
+informal decisions document actual freight-invoice billing disputes.
+Bridgewell's 2022 ocean shipment demurrage/detention charges reached an
+administratively final reparations decision, followed by a **later payment
+reported in the regulator's October 2026 enforcement action**. A second
+initial decision illustrates why an invoice exceeding a tentative quote does
+**not** by itself establish entitlement to reparations. These are **third-party
+real shipper disputes**, NOT existing RETALLY customers or automatically
+reusable customer records.
+
+| Source state | Bridgewell Agribusiness v. COSCO, FMC 2022(I) |
+| --- | --- |
+| [FMC initial decision, Sept. 29, 2025](https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2801%29%202022%28I%29%20Initial%20Decision.pdf) | FMC adjudicated invalid required information on detention/demurrage invoices for Bridgewell's paid 2022 ocean shipments; **$24,328.80 reparations principal**. Bridgewell originally sought $43,780, which was **not** the amount awarded. |
+| [FMC administrative finality notice, Jan. 5, 2026](https://www2.fmc.gov/readingroom/docs/2022%28I%29/%2802%29%202022%28I%29%20Notice%20Not%20to%20Review%20%28public%29.pdf) | Commission declined review; formal amount due by **Jan. 20, 2026** was **$24,328.80 principal + $3,960.51 stated interest = $28,289.31**. Eight published award groups contain ten components after accounting for the three $544.50 cases. They are **not** ten independent source-invoice copies. |
+| [FMC Oct. 2, 2026 enforcement order, docket 26-13](https://www2.fmc.gov/readingroom/docs/26-13/%2801%29%2026-13%20Order%20to%20Show%20Cause%20%28public%29.pdf) | Official document no. **145944**. The **public search-index excerpt of this agency-authored PDF** says COSCO did **not pay the reparations award until Aug. 31, 2026** and describes **223 days** of lateness. This is a direct *agency-document attribution via an indexed excerpt*, **not an acquired or inspected original PDF**. [Seatrade](https://www.seatrade-maritime.com/regulations/fmc-targets-cosco-with-millions-in-late-payment-fines) separately reports that **Bridgewell received payment Aug. 31**, an account attributed to the Commission. A carrier making a payment is not necessarily proof of the date it cleared the customer bank. **Bank receipt, exact deposited amount, interest actually received and any final fine remain UNKNOWN**. The January **$28,289.31 ordered** is not a verified August deposit. |
+
+**Negative parallel, [HP Logistics v. Citi Freight Logistics and Best
+International Cargo, FMC 2025(I), Aug. 7, 2025 initial decision](https://www2.fmc.gov/readingroom/docs/2025%28I%29/%2801%29%202025%28I%29%20Initial%20Decision.pdf):**
+The excavator freight arrangement began with $43,200 plus an additional
+$11,000 for parts ($54,200 asserted revised quote). The final invoice was
+$77,800, a **$23,600 gap**; claimant also sought $2,295 in demurrage,
+totaling **$25,895 sought**. Nevertheless the initial FMC decision
+awarded **$0 reparations**, found no violation of section 41102(c) and no
+violation by Citi Freight Logistics, while finding Best International Cargo
+violated tariff publication requirements under section 40501(a)(1).
+The initial decision's separate administrative finality and any later
+customer refund remain **unverified**. Quoted-rate arithmetic alone may
+signal a **review**, not an independently recoverable overcharge.
+
+### Third case: an approved settlement can extinguish a refund claim (FMC 2015(I))
+
+The [November 8, 2024 FMC Order](https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20-Order%20of%20Dismissal.pdf)
+records a real commercial ocean shipment, Baltimore to Manaus, Brazil,
+under published bill of lading **MEDUUP205245**. Leader Commerce
+Corp. d.b.a. Infinity Freight and Logistics Corp. disputed MSC's
+low-water surcharge ($3,000), another $140 fee, and demurrage. Those
+were **allegations**, not an adjudicated finding of illegal billing.
+
+The FMC officer reported a **bilaterally signed settlement** submitted
+October 17 and APPROVED November 8, 2024:
+
+| Official settlement terms | Actual proof state | NEVER count as |
+| --- | --- | --- |
+| MSC agrees to cancel **USD $4,650 in OUTSTANDING demurrage**, and end collection | **CONTRACTUAL UNPAID-DEBT CANCELLATION OBLIGATION**, not evidence of a separate post-order ledger write-off | Customer bank refund or confirmed payment |
+| Claimant waives refund rights on **USD $3,000 in previously-paid extra freight** | **PAID CHARGE WITH RELEASED REFUND RIGHTS** as described by FMC, not a reimbursed disputed charge | Another $3,000 customer refund |
+| Claimant waives refund rights on **BRL 700 in previously-paid late fees** | Separate **BRL**-denominated waiver, no currency exchange rate or USD conversion | Cash recovered in USD |
+| Both sides settle and withdraw with prejudice | **APPROVED AND DISMISSED WITH PREJUDICE**; a separate [December 10, 2024 FMC notice](https://www2.fmc.gov/readingroom/docs/2015%28I%29/2015%28I%29%20Not.%20Not%20Review.pdf) confirms administrative finality | Judgment that original fees were unlawful |
+
+**Discovery consequence:** Seeing an original invoice, BOL number, and
+settlement does *not* establish a collectible overcharge. A canceled
+unpaid receivable is different from a cash refund; a release of claims
+may end potential recovery rights. Actual MSC ledger write-off,
+the original signed settlement attachment, separately authenticated
+invoice/BOL bytes, and customer bank payment/credit remain **unverified**.
+
+A second official evidence rule underscores the claimant issue:
+[GAO B-121220 (1964)](https://www.gao.gov/products/b-121220-0)
+distinguishes a party that *initially pays the carrier* from the party
+that *ultimately bore transportation costs*, and describes payment
+proof and carrier bill/voucher documentation. This is a historical
+federal-government reimbursement precedent, **NOT a blanket modern
+private-party rule**. The current claimant's legal standing,
+contract terms, settlement releases, beneficial cost bearer, and
+applicable claim deadlines all need separate review. No standing
+or deadline is automatically decided by this casebook.
+
+The canonical FMC source fixture now has **three** cases: a final
+reparations award with externally reported later payment (Bridgewell),
+an invoice/quote difference yielding no initial reparations (HPL),
+and an approved cancellation-plus-waiver settlement (Leader Commerce).
+Tests pin both original FMC decision and finality URLs; prevent
+BRL and USD from being summed; and reject forged cash, legal liability,
+original-document custody and rights. Only aggregate proof states
+are published into the existing unified lab, never the public BOL
+identifier or original transaction records. RETALLY recovered cash
+and verified customer cases remain **zero**.
+
+### Proof-state boundaries
+
+- **Documented billing / carrier payment:** The government decision reports
+  underlying charges and payment exhibits, but RETALLY does not possess
+  original signed invoices, bills of lading, bank payment statements or the
+  official publisher PDF response bytes. No source-byte signature is claimed.
+- **Reparations adjudicated:** Actual FMC order states original principal and
+  interest. The principal **cannot** be inflated to the pre-decision amount
+  sought by the shipper, and interest **cannot** be discarded.
+- **Payment made, indexed agency evidence:** The FMC October order has a
+  publicly search-indexed excerpt identifying **Aug. 31, 2026** as the date
+  COSCO paid, **223 days after the deadline**. Full original order PDF bytes
+  remain unavailable for independent inspection or hashing.
+- **Customer receipt, secondary reporting:** Seatrade attributes an Aug. 31
+  customer-receipt date to the agency. Neither press attribution nor agency
+  language proves a bank deposit cleared or its exact amount. No August
+  monetary receipt is assigned without independently reconciled records.
+- **RETALLY modern private customer:** ZERO. There is no customer
+  authorization, rights-verified reuse, domestic motor-carrier rating
+  authority, production dispute claim or RETALLY recovery revenue.
+  The FMC ocean-shipping remedy does not automatically apply to U.S. LTL.
+
+The existing research-only fixture, oracle and adversarial tests:
+freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json,
+freight/fmc_real_shipper_billing_lifecycle.py,
+freight/test_fmc_real_shipper_billing_lifecycle.py.
+The existing unified controller verifies the fixture and writes an
+**aggregate-only** receipt to the long-lived research branch; nightly
+original-document replay must validate its exact hash and hold gates.
+No new GitHub cron, provider, live customer data extraction or purchased
+service is introduced.
+
+Offline verification:
+
+    python -m unittest -q freight.test_fmc_real_shipper_billing_lifecycle
+    python -m freight.fmc_real_shipper_billing_lifecycle --output /tmp/fmc_lifecycle.json
+    python -m freight.fmc_real_shipper_billing_lifecycle --verify --output /tmp/fmc_lifecycle.json
+
+
 ## One operating model
 
 - **One automatic research controller:** .github/workflows/retally-unified-research-lab.yml.

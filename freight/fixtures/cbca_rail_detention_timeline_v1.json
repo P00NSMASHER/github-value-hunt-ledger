@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "fixture_id": "RETALLY_CBCA_1317_3467_SHIPMENT_PAYMENT_TIMELINES_V1",
+  "scope": "OFFICIAL_CBCA_GOVERNMENT_FREIGHT_BILLING_AND_TIMELINESS_DECISIONS_NOT_CUSTOMER_BENCHMARK",
+  "publisher": "U.S. Civilian Board of Contract Appeals",
+  "as_of_source_review_date": "2026-10-26",
+  "original_official_pdf_bytes_acquired": false,
+  "original_official_pdf_sha256": null,
+  "original_bol_invoice_contract_or_tender_bytes_held": false,
+  "independent_bank_or_repayment_statement_held": false,
+  "independent_modern_customer_invoice_ground_truth_cases": 0,
+  "commercial_customer_engine_use_approved": false,
+  "retally_recovered_cash_cents": 0,
+  "union_pacific_2009": {
+    "case_id": "CBCA-1317-RATE",
+    "decision_date": "2009-10-29",
+    "official_url": "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",
+    "carrier": "UNION_PACIFIC_RAILROAD",
+    "government_shipper": "US_DEPARTMENT_OF_DEFENSE",
+    "source_table_zero_based_pdf_page": 2,
+    "original_legal_issue": "UNTIMELY_FEDERAL_GOVERNMENT_OVERCHARGE_DEDUCTIONS_ON_PAID_RAIL_TRANSPORTATION",
+    "statutory_rule_at_case_date": "31_USC_3726_D_THREE_YEARS_AFTER_BILL_PAID",
+    "source_document_table_header_money_type": "GOVERNMENT_ALLEGED_OVERCHARGE_NOT_ORIGINAL_INVOICE_FACE_AMOUNT",
+    "board_conclusion": "TWELVE_TREASURY_DEDUCTIONS_TOO_LATE_MUST_BE_REFUNDED",
+    "underlying_tariff_overcharge_merits_adjudicated": false,
+    "issued_refund_order_reported": true,
+    "actual_refund_cleared_bank_receipt_verified": false,
+    "initial_74_bol_notices_reported": 74,
+    "initial_claims_settled_by_parties_reported": 67,
+    "added_claims_during_proceedings": 5,
+    "rows": [
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009822",
+        "government_alleged_overcharge_cents": 1793654,
+        "carrier_bill_paid_date_board_reported": "2005-01-20",
+        "treasury_offset_collected_cents": 1793654,
+        "treasury_offset_date_board_reported": "2008-06-16"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009825",
+        "government_alleged_overcharge_cents": 1314805,
+        "carrier_bill_paid_date_board_reported": "2005-01-20",
+        "treasury_offset_collected_cents": 1314805,
+        "treasury_offset_date_board_reported": "2008-06-16"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009832",
+        "government_alleged_overcharge_cents": 2194247,
+        "carrier_bill_paid_date_board_reported": "2005-02-11",
+        "treasury_offset_collected_cents": 2194247,
+        "treasury_offset_date_board_reported": "2008-10-15"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009833",
+        "government_alleged_overcharge_cents": 878744,
+        "carrier_bill_paid_date_board_reported": "2005-02-02",
+        "treasury_offset_collected_cents": 878744,
+        "treasury_offset_date_board_reported": "2008-04-15"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009838",
+        "government_alleged_overcharge_cents": 438849,
+        "carrier_bill_paid_date_board_reported": "2005-02-11",
+        "treasury_offset_collected_cents": 438849,
+        "treasury_offset_date_board_reported": "2008-04-15"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009856",
+        "government_alleged_overcharge_cents": 877698,
+        "carrier_bill_paid_date_board_reported": "2005-02-11",
+        "treasury_offset_collected_cents": 877698,
+        "treasury_offset_date_board_reported": "2008-04-15"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90009858",
+        "government_alleged_overcharge_cents": 436990,
+        "carrier_bill_paid_date_board_reported": "2005-02-11",
+        "treasury_offset_collected_cents": 436990,
+        "treasury_offset_date_board_reported": "2008-04-15"
+      },
+      {
+        "public_gbl_id_from_board_table": "W67G230008416",
+        "government_alleged_overcharge_cents": 330460,
+        "carrier_bill_paid_date_board_reported": "2004-01-27",
+        "treasury_offset_collected_cents": 330460,
+        "treasury_offset_date_board_reported": "2008-10-10"
+      },
+      {
+        "public_gbl_id_from_board_table": "W67G230008417",
+        "government_alleged_overcharge_cents": 479879,
+        "carrier_bill_paid_date_board_reported": "2004-02-05",
+        "treasury_offset_collected_cents": 479879,
+        "treasury_offset_date_board_reported": "2008-10-10"
+      },
+      {
+        "public_gbl_id_from_board_table": "W5CQRF0017135",
+        "government_alleged_overcharge_cents": 466531,
+        "carrier_bill_paid_date_board_reported": "2004-02-09",
+        "treasury_offset_collected_cents": 466531,
+        "treasury_offset_date_board_reported": "2008-10-10"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90006106",
+        "government_alleged_overcharge_cents": 1207383,
+        "carrier_bill_paid_date_board_reported": "2004-03-01",
+        "treasury_offset_collected_cents": 1197902,
+        "treasury_offset_date_board_reported": "2008-10-31"
+      },
+      {
+        "public_gbl_id_from_board_table": "W45QQ90006013",
+        "government_alleged_overcharge_cents": 3342164,
+        "carrier_bill_paid_date_board_reported": "2004-02-06",
+        "treasury_offset_collected_cents": 3325916,
+        "treasury_offset_date_board_reported": "2008-10-31"
+      }
+    ]
+  },
+  "total_quality_logistics_2014": {
+    "case_id": "CBCA-3467-RATE",
+    "decision_date": "2014-05-14",
+    "official_url": "https://www.cbca.gov/files/decisions/2014/ZISCHKAU_05-14-14_CBCA%203467-RATE__IN_THE_MATTER_OF_TOTAL_QUALITY_LOGISTICS_LLC_.pdf",
+    "carrier": "TOTAL_QUALITY_LOGISTICS_LLC",
+    "historical_gsa_tender_reference": "GSA_STOS_100_D_ITEM_325",
+    "shipment_count_2010": 4,
+    "shipment_count_2011": 75,
+    "government_initially_accepted_paid_invoice_count": 9,
+    "government_later_challenged_paid_invoice_count": 70,
+    "government_original_paid_invoice_and_bol_support_acknowledged_in_board_record": true,
+    "original_signed_bol_and_itemized_invoice_bytes_in_retally_custody": false,
+    "reported_gsa_demand_variants_cents": [
+      33989573,
+      33989575
+    ],
+    "source_variance_locations": [
+      "PAGE_5_PARAGRAPH_CARRIER_PAYMENT_DEMAND",
+      "PAGE_6_FINAL_DECISION_PARAGRAPH"
+    ],
+    "amount_discrepancy_cents": 2,
+    "board_conclusion": "GSA_OVERCHARGE_NOTICES_INVALID_GSA_PREVIOUSLY_AUTHORIZED_AND_PAID_DETENTION",
+    "gsa_recoupment_actually_received_from_carrier_verified": false,
+    "later_carrier_refund_or_credit_verified": false,
+    "modern_customer_detention_authority_verified": false
+  }
+}

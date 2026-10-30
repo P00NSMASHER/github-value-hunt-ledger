@@ -1,9 +1,6 @@
 """Safety and deterministic verification for the source-quality receipt."""
-import json
-import tempfile
 import unittest
 from datetime import date
-from pathlib import Path
 
 from freight.research_lab_health import build_receipt, rendered_receipt
 from freight.unified_research_lab import (

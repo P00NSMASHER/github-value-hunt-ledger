@@ -244,5 +244,186 @@ class ResearchCIVerificationContract(unittest.TestCase):
                 self.assertIn(expected, source)
 
 
+    def test_cbca_rate_decisions_are_executed_in_main_lab_and_nightly(self):
+        """No green CI if the CBCA negative/outcome control silently disappears."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n", 1)[1]
+        discovery = source.split("\n  discover:\n", 1)[1].split(
+            "\n  nightly-real-data-replay:\n", 1)[0]
+        executable = "          python -m unittest -q freight.test_cbca_rate_billing_controls"
+        for expected in (
+            "freight.test_cbca_rate_billing_controls",
+            "freight/cbca_rate_billing_controls.py",
+        ):
+            self.assertIn(expected, verify)
+        self.assertEqual(discovery.splitlines().count(executable), 1)
+        self.assertEqual(nightly.splitlines().count(executable), 1)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/cbca_rate_billing_controls_v1.json", nightly)
+        self.assertIn(
+            "python -m freight.cbca_rate_billing_controls "
+            "--output /tmp/retally-cbca-billing-v1.json --verify", nightly)
+        for path in (
+            "freight/cbca_rate_billing_controls.py",
+            "freight/test_cbca_rate_billing_controls.py",
+            "freight/fixtures/cbca_rate_billing_controls_v1.json",
+        ):
+            self.assertEqual(source.count('      - "' + path + '"'), 2)
+        self.assertIn("d['private_customer_invoice_truth_cases'] == 0", discovery)
+        self.assertIn("d['commercial_reuse_approved'] is False", discovery)
+        self.assertIn("d['verified_retally_cash_recovery_cents'] == 0", discovery)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
+
+
+    def test_cbca_bol_timeline_and_detention_conflict_are_required_in_unified_replay(self):
+        """Bounded negative chronology must execute without new cron or source promotion."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n", 1)[1].split("\n  discover:\n", 1)[0]
+        discover = source.split("\n  discover:\n", 1)[1].split(
+            "\n  nightly-real-data-replay:\n", 1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n", 1)[1]
+        module = "freight.test_cbca_rail_detention_timeline"
+        command = "          python -m unittest -q " + module
+        self.assertIn(module, verify)
+        self.assertEqual(discover.splitlines().count(command), 1)
+        self.assertEqual(nightly.splitlines().count(command), 1)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/cbca_rail_detention_timeline_v1.json", nightly)
+        self.assertIn(
+            "python -m freight.cbca_rail_detention_timeline "
+            "--output /tmp/retally-cbca-timeline-v1.json --verify", nightly)
+        for name in (
+            "freight/cbca_rail_detention_timeline.py",
+            "freight/test_cbca_rail_detention_timeline.py",
+            "freight/fixtures/cbca_rail_detention_timeline_v1.json",
+        ):
+            self.assertEqual(source.count('      - "'+name+'"'), 2)
+        for gate in (
+            "d['up_public_bol_rows'] == 12",
+            "d['up_late_offset_rows'] == 12",
+            "d['tql_amount_variance_cents'] == 2",
+            "d['independent_carrier_refunds_bank_verified_cases'] == 0",
+            "d['retally_cash_recovered_cents'] == 0",
+            "d['commercial_use_approved'] is False",
+        ):
+            with self.subTest(gate=gate):
+                self.assertIn(gate, discover)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'), 1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'), 1)
+
+
+    def test_source_bound_gao_rate_and_doj_settlement_state_are_required(self):
+        """CI must exercise source-proof distinctions, never mere digest existence."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n",1)[1].split("\n  discover:\n",1)[0]
+        discovery = source.split("\n  discover:\n",1)[1].split(
+            "\n  nightly-real-data-replay:\n",1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n",1)[1]
+        test = "freight.test_public_freight_proof_ladder"
+        run = "          python -m unittest -q " + test
+        self.assertIn(test,verify)
+        self.assertEqual(discovery.splitlines().count(run),1)
+        self.assertEqual(nightly.splitlines().count(run),1)
+        for path in (
+            "freight/public_freight_proof_ladder.py",
+            "freight/test_public_freight_proof_ladder.py",
+            "freight/fixtures/public_freight_rate_cash_proof_v1.json",
+        ):
+            self.assertEqual(source.count('      - "'+path+'"'),2)
+        self.assertIn("freight/research_lab/public_freight_proof_v1.json",discovery)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/public_freight_proof_v1.json",nightly)
+        self.assertIn(
+            "python -m freight.public_freight_proof_ladder "
+            "--output /tmp/retally-public-freight-proof-v1.json --verify",nightly)
+        for gate in (
+            "p['GAO_historical_overcharge_cents'] == 15530",
+            "p['DOJ_settlement_paid_public_report_cents'] == 1300000000",
+            "p['DOJ_agreed_settlement_actual_paid_cents'] is None",
+            "p['modern_customer_independent_overcharge_labels'] == 0",
+            "p['verified_RETALLY_cash_recovered_cents'] == 0",
+            "p['original_publisher_SHA256'] is None",
+        ):
+            with self.subTest(gate=gate):
+                self.assertIn(gate,discovery)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'),1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'),1)
+
+
+    def test_fmc_actual_shipper_award_and_paid_state_not_silently_omitted(self):
+        """No green lab when source-bound 2026 payment evidence disappears."""
+        source = WORKFLOW.read_text(encoding="utf-8")
+        verify = source.split("\n  verify:\n",1)[1].split("\n  discover:\n",1)[0]
+        discover = source.split("\n  discover:\n",1)[1].split(
+            "\n  nightly-real-data-replay:\n",1)[0]
+        nightly = source.split("\n  nightly-real-data-replay:\n",1)[1]
+        module="freight.test_fmc_real_shipper_billing_lifecycle"
+        command="          python -m unittest -q "+module
+        self.assertIn(module,verify)
+        self.assertEqual(discover.splitlines().count(command),1)
+        self.assertEqual(nightly.splitlines().count(command),1)
+        for file in (
+            "freight/fmc_real_shipper_billing_lifecycle.py",
+            "freight/test_fmc_real_shipper_billing_lifecycle.py",
+            "freight/fixtures/fmc_real_shipper_billing_lifecycle_v1.json",
+        ):
+            self.assertEqual(source.count('      - "'+file+'"'),2)
+        self.assertIn("freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json",discover)
+        self.assertIn(
+            "git show origin/research/retally-unified-data-lab:"
+            "freight/research_lab/fmc_real_shipper_billing_lifecycle_v1.json",nightly)
+        self.assertIn(
+            "python -m freight.fmc_real_shipper_billing_lifecycle "
+            "--output /tmp/retally-fmc-real-shipper-v1.json --verify",nightly)
+        for gate in (
+            "len(x['fmc_cases']) == 4",
+            "x['leader_settlement_order_date'] == '2024-11-08'",
+            "x['leader_admin_final_notice_date'] == '2024-12-10'",
+            "x['leader_demurrage_UNPAID_cancelled_under_settlement_usd_cents'] == 465000",
+            "x['leader_actual_carrier_ledger_cancellation_verified'] is False",
+            "x['leader_previously_paid_freight_refund_rights_waived_usd_cents'] == 300000",
+            "x['leader_previously_paid_late_fee_refund_rights_waived_brl_centavos'] == 70000",
+            "x['leader_usd_brl_conversion_or_sum_allowed'] is False",
+            "x['leader_refund_received_bank_verified_usd_cents'] is None",
+            "x['leader_original_settlement_and_customer_bank_docs_held'] is False",
+            "x['leader_fmc_order_adjudicated_illegal_billing_amount_cents'] is None",
+            "x['bridgewell_final_principal_cents'] == 2432880",
+            "x['bridgewell_final_interest_as_of_notice_cents'] == 396051",
+            "x['bridgewell_final_ordered_total_cents'] == 2828931",
+            "x['bridgewell_reported_late_customer_payment_date'] == '2026-08-31'",
+            "x['bridgewell_official_order_payment_made_index_excerpt_date'] == '2026-08-31'",
+            "x['bridgewell_official_order_late_days'] == 223",
+            "x['bridgewell_original_enforcement_order_pdf_in_custody'] is False",
+            "x['bridgewell_bank_receipt_confirmed'] is False",
+            "x['bridgewell_actual_bank_receipt_cents'] is None",
+            "x['bridgewell_payment_evidence_tier'] == 'OFFICIAL_FMC_ORDER_INDEX_EXCERPT_CARRIER_PAID_SECONDARY_CUSTOMER_RECEIPT_BANK_UNVERIFIED'",
+            "x['bridgewell_exact_received_cash_and_interest_unverified'] is True",
+            "x['jimex_initial_claim_requested_cents'] == 4460669",
+            "x['jimex_initial_late_fee_reparations_cents'] == 999707",
+            "x['jimex_initial_detention_refund_cents'] == 197500",
+            "x['jimex_initial_principal_NOT_actual_cash_received_cents'] == 1197207",
+            "x['jimex_appendix_b_paid_invoice_count'] == 5",
+            "x['jimex_appendix_b_paid_detention_cents'] == 197500",
+            "x['jimex_unrelated_carrier_exhibits_must_not_join'] is True",
+            "x['jimex_initial_decision_finality_verified'] is False",
+            "x['jimex_later_bank_cleared_refund_cents'] is None",
+            "x['jimex_exact_interest_cents'] is None",
+            "x['jimex_current_customer_scoring_authorized'] is False",
+            "x['hpl_initial_decision_reparations_awarded_cents'] == 0",
+            "x['modern_retally_invoice_accuracy_labels'] == 0",
+            "x['retally_recovered_cash_cents'] == 0",
+            "x['original_official_pdf_sha256'] is None",
+        ):
+            with self.subTest(check=gate):
+                self.assertIn(gate,discover)
+        self.assertEqual(source.count('cron: "4-59/5 * * * *"'),1)
+        self.assertEqual(source.count('cron: "19 3 * * *"'),1)
+
+
 if __name__ == "__main__":
     unittest.main()

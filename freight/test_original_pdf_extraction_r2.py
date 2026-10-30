@@ -1,11 +1,10 @@
 """R2 document extraction: adversarial, witness-bound and no invented shipments."""
-from dataclasses import replace
 
 import pytest
 
 from freight.original_pdf_extraction import (
-    FieldWitness, KNOWN_ORIGINALS, _extract_page, _pennies,
-    bind_independent_shipment, parse_original_pdf, safe_summary,
+    KNOWN_ORIGINALS, _extract_page, _pennies,
+    bind_independent_shipment, parse_original_pdf,
 )
 from freight.canonical_schema import verify_record
 from freight.test_phase0_recoveryos import ltl_record

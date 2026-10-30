@@ -91,6 +91,9 @@ def checked_proposal_state(lane: str, branch: str, base: str, head: str):
 
 def propose(lane: str, branch: str, base: str, head: str):
     verified = checked_proposal_state(lane, branch, base, head)
+    fingerprint = os.environ.get("SCOUT_SEMANTIC_FINGERPRINT", "") if lane == "scout" else ""
+    if lane == "scout" and re.fullmatch(r"[a-f0-9]{64}", fingerprint) is None:
+        raise ProposalHold("Scout proposal lacks its validated semantic fingerprint")
     requests = gh("GET", "repos/" + REPO
                   + "/pulls?state=open&head=P00NSMASHER%3A"
                   + branch.replace("/", "%2F") + "&per_page=5")
@@ -105,10 +108,12 @@ def propose(lane: str, branch: str, base: str, head: str):
                 "head": branch, "base": "main",
                 "title": "Automated " + lane + " evidence refresh (GitHub run "
                          + os.environ["GITHUB_RUN_ID"] + ")",
-                "body": "A source-scoped generated proposal only. Automatic integration "
+                "body": ("A source-scoped generated proposal only. Automatic integration "
                         "requires independently executed exact-SHA repository release "
                         "CI via an explicit workflow dispatch. No independent human code "
-                        "review needed; no customer financial/source authority is implied.",
+                        "review needed; no customer financial/source authority is implied."
+                        + ("\n\n<!-- scout-semantic-sha256:" + fingerprint + " -->"
+                           if lane == "scout" else "")),
                 "draft": False,
             })
         except ProposalHold:

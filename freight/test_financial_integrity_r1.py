@@ -264,7 +264,6 @@ def test_reference_scoped_matching_for_real_pennine_distribution():
 
 def test_money_proof_cannot_be_reused_for_another_invoice():
     original = ltl_record()
-    altered = replace(original, record_hash="0" * 64)
     valid = movement("B1", "PAYMENT", 1000, True, record=original)
     replay = replay_financial_movements(original, (valid,))
     assert replay.verified_net_cash_cents == 0
