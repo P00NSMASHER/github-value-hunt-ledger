@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.1",
+  "schema_version": "0.1.2",
   "fixture_id": "NARA_FOIA_2022_REDACTED_ORIGINAL_GOVERNMENT_BOL_EXTRACTION_CANDIDATE_V0",
   "status": "DRAFT_SOURCE_BOUND_HOLD_UNRELEASED",
   "evaluation_family": "FREIGHT_DOCUMENT_EXTRACTION_PUBLIC_REDACTED_ORIGINAL_BOL_NOT_FREIGHT_ERROR_OR_PAYMENT_SCORING",
@@ -58,7 +58,9 @@
     "accessorial_displayed_usd_cents": 0,
     "shipper_signature_field": "BLANK",
     "carrier_signature_field": "BLANK",
-    "carrier_name": "REDACTED_NOT_REPLICATED"
+    "carrier_name": "REDACTED_NOT_REPLICATED",
+    "printed_total_footnote": "Does not include any accessorials cost added after booking",
+    "printed_total_footnote_page": 2
   },
   "quality": {
     "page_1_header_and_tender_reference_reviewed": true,
@@ -75,7 +77,11 @@
     "freight_amount_overcharged_usd_cents": null,
     "carrier_payment_amount_usd_cents": null,
     "printed_billing_direction_not_payment_evidence": true,
-    "consignee_is_not_verified_accounts_payable_debtor": true
+    "consignee_is_not_verified_accounts_payable_debtor": true,
+    "post_booking_accessorials_are_excluded_from_printed_total": true,
+    "post_booking_accessorials_amount_usd_cents": null,
+    "final_carrier_invoice_amount_usd_cents": null,
+    "printed_total_is_proof_of_final_amount_due": false
   },
   "ground_truth": {
     "source_documents_publicly_viewed": 1,
@@ -150,6 +156,12 @@
       "id": "SYNTHETIC-NARA-009",
       "kind": "SYNTHETIC",
       "assertion": "PRINTED_CERTIFICATE_PROVES_CONSIGNEE_ACCOUNTS_PAYABLE",
+      "expected": "REJECT"
+    },
+    {
+      "id": "SYNTHETIC-NARA-010",
+      "kind": "SYNTHETIC",
+      "assertion": "PRINTED_BOOKING_TOTAL_PROVES_FINAL_INVOICE_WITH_NO_LATER_ACCESSORIALS",
       "expected": "REJECT"
     }
   ],
