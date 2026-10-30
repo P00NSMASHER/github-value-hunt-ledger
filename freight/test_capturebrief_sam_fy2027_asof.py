@@ -284,6 +284,89 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(trace[0],("GET",SOURCE_URL,15))
         self.assertEqual(trace[1],MAX_ORIGINAL_BYTES+1)
 
+    def test_fy2027_archive_growth_is_bounded_not_silently_zeroed(self):
+        # Source-bound observed failure; generated rows below are SYNTHETIC.
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        self.assertEqual(pack["schema_version"], 1)
+        self.assertEqual(pack["observation"]["result"], "SOURCE_TOO_LARGE")
+        self.assertIsNone(pack["observation"]["source_byte_sha256"])
+        self.assertEqual(pack["observation"]["source_rows_scored"], 0)
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+        self.assertEqual(pack["rights_and_truth"]["independent_cross_source_outcomes"], 0)
+        self.assertEqual(MAX_ORIGINAL_BYTES, pack["proposal"]["bounded_limit_bytes"])
+        self.assertEqual(MAX_ORIGINAL_ROWS, pack["proposal"]["maximum_csv_rows"])
+
+        columns = ["NoticeId", "Sol#", "PostedDate", "Type", "Active",
+                   "AAC Code", "Office", "Link", "Description"]
+        buf = io.StringIO(newline="")
+        writer = csv.DictWriter(buf, fieldnames=columns, lineterminator="\\n")
+        writer.writeheader()
+        for i in range(256):
+            writer.writerow({
+                "NoticeId": f"SYNTHETIC-NOTICE-{i:04d}",
+                "Sol#": f"SYNTHETIC-SOL-{i:04d}",
+                "PostedDate": "2026-10-20",
+                "Type": "Solicitation", "Active": "No",
+                "AAC Code": "FAKE", "Office": "FAKE TEST OFFICE",
+                "Link": "https://sam.gov/synthetic-not-real",
+                "Description": "X" * 10500,
+            })
+        fabricated = buf.getvalue().encode("utf-8")
+        self.assertGreater(len(fabricated), pack["observation"]["previous_bounded_limit_bytes"])
+        self.assertLess(len(fabricated), MAX_ORIGINAL_BYTES)
+
+        class CompleteResponse:
+            status = 200
+            headers = {
+                "Content-Type": "text/csv",
+                "Content-Encoding": "identity",
+                "Content-Length": str(len(fabricated)),
+            }
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def geturl(self): return SOURCE_URL
+            def read(self, n):
+                self_outer.assertEqual(n, MAX_ORIGINAL_BYTES + 1)
+                return fabricated
+
+        self_outer = self
+        class TooLargeResponse(CompleteResponse):
+            headers = {
+                "Content-Type": "text/csv",
+                "Content-Encoding": "identity",
+                "Content-Length": str(MAX_ORIGINAL_BYTES + 1),
+            }
+            def read(self, n):
+                raise AssertionError("oversize response must fail before reading")
+
+        class Opener:
+            def __init__(self, response): self.response = response
+            def open(self, req, timeout):
+                self_outer.assertEqual(req.get_method(), "GET")
+                self_outer.assertEqual(req.full_url, SOURCE_URL)
+                return self.response
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \\
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener(CompleteResponse())):
+            self.assertEqual(fetch_original(), fabricated)
+        receipt = build_receipt(observed_at=NOW, fetcher=lambda: fabricated)
+        self.assertEqual(receipt["source_status"], STATUS_OK)
+        self.assertEqual(receipt["source_rows"], 256)
+        self.assertEqual(receipt["current_source_sha256"],
+                         hashlib.sha256(fabricated).hexdigest())
+        self.assertEqual(receipt["independent_cross_source_award_outcomes"], 0)
+        self.assertEqual(receipt["original_archive_bytes_persisted"], 0)
+        validate_receipt(receipt, now=NOW)
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \\
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener(TooLargeResponse())):
+            with self.assertRaisesRegex(ResearchError, "SOURCE_TOO_LARGE"):
+                fetch_original()
+
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
         class Response:
