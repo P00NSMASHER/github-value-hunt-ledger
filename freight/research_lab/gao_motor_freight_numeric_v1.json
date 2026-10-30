@@ -108,9 +108,9 @@
     "Conflicting claim figures in B-146511 must remain explicit, not silently averaged or normalized."
   ],
   "multi_shipment_aggregate_cases": 1,
-  "observed_at_utc_date": "2026-10-29",
+  "observed_at_utc_date": "2026-10-30",
   "production_engine_changes": 0,
-  "receipt_sha256": "3987eff3e640b7223e12c94352ec08343dfb8d2d38deeaddd91d3f39bfcc58f0",
+  "receipt_sha256": "03697abaa58c677972aff01f70650b04c2450c482c15d7df67c3a8b07a43c853",
   "schema_version": 1,
   "scope": "GAO_HISTORICAL_DECISION_LEVEL_NUMERIC_EVIDENCE_NOT_CUSTOMER_INVOICE_TRUTH",
   "source_fixture_authored_sha256_not_publisher_bytes": "590e52cd1a0f0c50d75a76cc74b293f823a0a1d321d29cdb5e086c165a36a06f",

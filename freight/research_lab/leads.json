@@ -614,6 +614,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-30",
+      "id": "0b6432b7728a2f294abe2f9ea947924be75b65475c7a6602afea0e1df3d336f4",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/alphaparkinc/genpark-agentic-commerce-freight-demurrage-dispute-generator-skill"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "0ba77602c4991979dcf9416b3badf9a95b5b02e403aebd7371f99d2ae221e985",
       "independent_ground_truth": false,
@@ -8248,6 +8264,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-10-30",
+      "id": "a92f065067f8078f2dc32567dd69f1160367c0b02117fe6ff325e91e6de4622a",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Alpha-Park/genpark-agentic-commerce-automated-carrier-invoice-parcel-audit-skill"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -10925,6 +10957,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-10-30",
+      "id": "dc1a8ef88c5a16b9ca90225c4d021d95c266ed2e7fd57e24741b11c9f708bcb9",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Alpha-Park/genpark-agentic-commerce-freight-demurrage-dispute-generator-skill"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-28",
       "id": "dc3f084e9824021e663adcbff898a2bfcae3d7a7f14c6ab65ce0fe536964c657",
       "independent_ground_truth": false,
@@ -12777,6 +12825,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "f8890e2767c3ddf1be3b022c64e31c3cad02a8e1ec8c160d789ac630acec3cdf",
+  "entries_sha256": "651b27d26d60e7012c7cadfd13fcab31d6fd9094f7bd48ec09534d11abb09a95",
   "schema_version": 1
 }
