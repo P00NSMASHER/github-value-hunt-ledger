@@ -49,6 +49,77 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
                            "protected_main_official_source_reconciliation_candidate_v0.json"
                            ).read_text(encoding="utf-8"))
 
+    def _assert_original_invoice_census_bridge(self, pack):
+        """Aggregate public source receipt only, never independent error truth."""
+        b = pack["ownership"]["private_original_invoice_blind_census_bridge"]
+        self.assertEqual(b["evaluation_family"],
+                         "ORIGINAL_INVOICE_CENSUS_ONLY_NOT_FREIGHT_ERROR_ACCURACY")
+        self.assertEqual(b["authoritative_repository"],
+                         "P00NSMASHER/github-value-hunt-ledger")
+        self.assertEqual(b["authoritative_main_commit"],
+                         "02752be8074d3f08e9b2b2b8b5da9495da0381c7")
+        self.assertEqual(b["merged_pr_url"],
+                         "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/872")
+        self.assertEqual(b["public_documentation_git_blob_sha1"],
+                         "51b49867abd34233888cb9410f5b4e33595c9e1a")
+        self.assertEqual((b["original_invoice_faces_total"],
+                          b["globaltranz_faces"], b["arcbest_faces"]), (110, 100, 10))
+        self.assertEqual(b["globaltranz_faces"] + b["arcbest_faces"],
+                         b["original_invoice_faces_total"])
+        self.assertEqual(b["source_pdf_hashes_controlled_by"],
+                         "EXISTING_ORIGINAL_DOCUMENT_LAB_NOT_THIS_PUBLIC_EVIDENCE_PACK")
+        for key in ("source_documents_newly_harvested_by_unified_lab",
+                    "independent_buyer_rate_bol_payment_adjudication_complete_cases",
+                    "independently_adjudicated_positive_negative_truth_labels",
+                    "verified_retally_recovery_cents",
+                    "new_research_writer_or_provider_runs"):
+            self.assertEqual(b[key], 0, key)
+        for key in ("private_original_pdf_bytes_in_unified_lab_custody",
+                    "buyer_specific_commercial_use_rights_cleared_by_unified_lab",
+                    "commercial_or_production_scoring_authorized"):
+            self.assertIs(b[key], False, key)
+        self.assertEqual(b["accuracy_precision_recall"], "UNKNOWN_NOT_ESTIMABLE")
+        self.assertEqual(b["required_independent_artifact_types"],
+                         ["rate", "shipment", "payment", "adjudication"])
+        self.assertEqual(b["handoff_freightrecovery_recoveryos_12"],
+                         "USE_EXISTING_SOURCE_CENSUS_BRIDGE_NO_DUPLICATE_PDF_COLLECTION")
+        controls = b["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC" and c["expected"] == "REJECT"
+                            for c in controls))
+
+    def test_main_110_original_invoice_faces_are_source_census_only(self):
+        self._assert_original_invoice_census_bridge(self._pack())
+
+    def test_main_110_original_invoice_false_promotions_rejected(self):
+        changes = (
+            ("original_invoice_faces_total", 109),
+            ("arcbest_faces", 11),
+            ("authoritative_main_commit", "0" * 40),
+            ("public_documentation_git_blob_sha1", "0" * 40),
+            ("source_documents_newly_harvested_by_unified_lab", 110),
+            ("private_original_pdf_bytes_in_unified_lab_custody", True),
+            ("independently_adjudicated_positive_negative_truth_labels", 110),
+            ("independent_buyer_rate_bol_payment_adjudication_complete_cases", 110),
+            ("commercial_or_production_scoring_authorized", True),
+            ("buyer_specific_commercial_use_rights_cleared_by_unified_lab", True),
+            ("verified_retally_recovery_cents", 1),
+            ("accuracy_precision_recall", "1.00"),
+            ("source_pdf_hashes_controlled_by", "UNIFIED_LAB"),
+        )
+        for key, bad in changes:
+            with self.subTest(synthetic_forgery=key):
+                p = json.loads(json.dumps(self._pack()))
+                p["ownership"]["private_original_invoice_blind_census_bridge"][key] = bad
+                with self.assertRaises(AssertionError):
+                    self._assert_original_invoice_census_bridge(p)
+        p = json.loads(json.dumps(self._pack()))
+        p["ownership"]["private_original_invoice_blind_census_bridge"][
+            "synthetic_negative_controls"][0]["kind"] = "ORIGINAL"
+        with self.assertRaises(AssertionError):
+            self._assert_original_invoice_census_bridge(p)
+
     def test_current_main_four_fmc_pointers_cannot_be_promoted(self):
         """Current upstream main-only sources stay held until independent review."""
         data = self._pack()["ownership"]["current_main_fmc_source_gap"]
@@ -100,7 +171,7 @@ class ProtectedMainOfficialSourceReconciliationTests(unittest.TestCase):
         self.assertEqual(set(pack), {"schema_version", "evaluation_family",
                          "asof_date", "ownership", "rights", "cohort", "sources",
                          "synthetic_negative_controls", "acceptance"})
-        self.assertEqual(pack["schema_version"], "0.1.0")
+        self.assertEqual(pack["schema_version"], "0.1.1")
         self.assertEqual(pack["evaluation_family"],
                          "OFFICIAL_FREIGHT_SOURCE_RECONCILIATION_POINTER_HOLD_NOT_INVOICE_SCORING")
         self.assertEqual(pack["ownership"]["canonical_repository"],
