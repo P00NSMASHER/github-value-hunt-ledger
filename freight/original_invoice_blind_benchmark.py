@@ -518,7 +518,7 @@ def score_private_population(population: dict, secret: bytes,
         for role, used in (("shipment", used_shipment_lines),
                            ("payment", used_payment_lines),
                            ("adjudication", used_adjudication_lines)):
-            evidence_line = (proof[role]["sha256"], proof[role]["source_locator"])
+            evidence_line = (proof[role]["sha256"], proof[role]["source_locator"].strip())
             if evidence_line in used:
                 raise BenchmarkError("DUPLICATE_INDEPENDENT_CASE_PROOF_LINE")
             used.add(evidence_line)
