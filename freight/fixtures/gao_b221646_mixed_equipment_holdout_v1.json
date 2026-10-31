@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B221646_MIXED_EQUIPMENT_DECISION_HOLDOUT_V1",
+  "evaluation_family": "HISTORICAL_ADJUDICATED_FREIGHT_MIXED_POSITIVE_NEGATIVE_EQUIPMENT_SCOPE_NOT_CUSTOMER_ACCURACY",
+  "observed_at_utc": "2026-10-31",
+  "canonical_owner": "Unified Engine Evidence Lab / draft PR #883; writer branch research/retally-unified-data-lab excluded",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-221646",
+    "original_public_decision_url": "https://www.gao.gov/assets/b-221646.pdf",
+    "decision_date": "1987-09-18",
+    "original_decision_pages": 6,
+    "observed_official_pages": [
+      1,
+      2,
+      4,
+      6
+    ],
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_PUBLIC_US_GOVERNMENT_DECISION_REUSABLE_WITH_CITATION_NO_ENDORSEMENT",
+    "commercial_reuse": "GAO_GOVERNMENT_PRODUCT_REUSE_WITH_SOURCE_CITATION_NOT_GAO_ENDORSEMENT",
+    "third_party_carrier_tender_rights": "UNKNOWN_NOT_CLEARED",
+    "original_pdf_response_sha256": null,
+    "original_pdf_response_byte_length": null,
+    "original_pdf_bytes_independently_custodied": false,
+    "original_GBL_invoice_and_tender_bytes_custodied": false,
+    "source_format": "OFFICIAL_PUBLISHER_PDF_PAGES_REVIEWED_NOT_SOURCE_BYTE_CUSTODY",
+    "source_data_quality": "PUBLISHED_DECISION_AGGREGATE_STRATA_NOT_ROW_LEVEL_GBLS",
+    "source_asof_snapshot": "IMMUTABLE_DECISION_DATE_NOT_PROOF_OF_LIVE_1982_1983_SOURCE_ACCESS"
+  },
+  "adjudication": {
+    "total_reported_shipments": 38,
+    "originating_contractors_count": 2,
+    "shipments_1982_1983": true,
+    "government_bill_of_lading_total": 38,
+    "protect_from_freezing_note_all": true,
+    "carrier": "ABF Freight System, Inc.",
+    "tenders": [
+      "ICC ABF 1097",
+      "ICC ABF 1097-A"
+    ],
+    "carrier_general_commodities_division_called": true,
+    "division_contact_mandatory_under_tender": false,
+    "individual_GBL_identifiers_published_in_this_pack": 0,
+    "tariff_basis_for_original_carrier_charges": "UNKNOWN_SOURCE_EXPLICITLY_NOT_DISCLOSED",
+    "deduction_from_other_monies_due_carrier_reported": true,
+    "individual_deduction_amounts": "UNKNOWN_NOT_INDIVIDUALLY_MAPPED",
+    "independent_bank_clearing_proof": false,
+    "observed_RETALLY_customer_recovery_cents": 0,
+    "adjudicated_cohorts": [
+      {
+        "cohort_key": "GAO/B-221646/AV",
+        "equipment_code": "AV",
+        "actual_equipment": "REGULAR_CLOSED_VAN_WITH_PORTABLE_HEATER",
+        "shipment_count": 13,
+        "rate_tenders_applicable": false,
+        "GAO_result": "GSA_OVERCHARGE_DEDUCTIONS_INCORRECT",
+        "evidence_pages": [
+          1,
+          4,
+          6
+        ],
+        "individually_adjudicated_GBL_bytes_custodied": 0
+      },
+      {
+        "cohort_key": "GAO/B-221646/AR",
+        "equipment_code": "AR",
+        "actual_equipment": "REFRIGERATOR_EQUIPMENT_OTHER_ITEMS",
+        "shipment_count": 25,
+        "rate_tenders_applicable": true,
+        "GAO_result": "GSA_OVERCHARGE_DEDUCTIONS_SUSTAINED",
+        "evidence_pages": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "individually_adjudicated_GBL_bytes_custodied": 0
+      }
+    ],
+    "footnote_deduction_range_dollars": {
+      "typical_reported_min": "638.20",
+      "typical_reported_max": "2248.69",
+      "single_exception": "130.00",
+      "per_cohort_assignment": "UNKNOWN",
+      "aggregate_total_cents": null,
+      "individual_amounts": null,
+      "source_page": 2
+    }
+  },
+  "heldout": {
+    "split": "GAO_DECISION_LEVEL_INDEPENDENTLY_ADJUDICATED_UNSEEN_BY_PRODUCT_ENGINE",
+    "decision_key": "GAO/B-221646",
+    "independent_decision_labels": 1,
+    "aggregate_equipment_strata_labels": 2,
+    "independent_per_shipment_original_GBL_labels": 0,
+    "independently_custodied_original_GBL_invoice_tender_triplets": 0,
+    "external_real_customer_cases": 0,
+    "product_engine_predictions_on_this_decision": 0,
+    "real_customer_error_precision": null,
+    "real_customer_error_recall": null,
+    "adjudicated_decision_contains_both_positive_and_negative_strata": true,
+    "rule_baseline_experiments_NOT_engine_scores": [
+      {
+        "id": "NAIVE_PROTECT_FROM_FREEZING_IMPLIES_TENDER",
+        "rule_prediction_on_all_38": "TENDER_APPLIES",
+        "GAO_reported_aggregate_mismatches": 13,
+        "metric_scope": "WITHIN_ONE_REVIEWED_GAO_DECISION_NOT_INDEPENDENT_38_SAMPLE"
+      },
+      {
+        "id": "NAIVE_NO_SCAT_CALL_IMPLIES_NO_TENDER",
+        "rule_prediction_on_all_38": "TENDER_NOT_APPLICABLE",
+        "GAO_reported_aggregate_mismatches": 25,
+        "metric_scope": "WITHIN_ONE_REVIEWED_GAO_DECISION_NOT_INDEPENDENT_38_SAMPLE"
+      }
+    ],
+    "money_amount_by_stratum": "UNKNOWN_NOT_IN_SOURCE",
+    "actual_customer_cash_cents": 0,
+    "modern_rate_authority": "UNKNOWN"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B221646_AV_PORTABLE_HEATER_IS_PERMANENT_REFRIGERATION",
+      "input": {
+        "equipment_code": "AV",
+        "portable_heater": true,
+        "division_called": "general"
+      },
+      "expected_tender_applies": false,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_AR_SERVED_BY_GENERAL_DIVISION",
+      "input": {
+        "equipment_code": "AR",
+        "portable_heater": false,
+        "division_called": "general"
+      },
+      "expected_tender_applies": true,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_AV_WITHOUT_HEATER",
+      "input": {
+        "equipment_code": "AV",
+        "portable_heater": false,
+        "division_called": "SCAT"
+      },
+      "expected_tender_applies": false,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_AR_WITH_SCAT_CALL",
+      "input": {
+        "equipment_code": "AR",
+        "portable_heater": false,
+        "division_called": "SCAT"
+      },
+      "expected_tender_applies": true,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_AK_UNKNOWN_UNLABLED_EQUIPMENT",
+      "input": {
+        "equipment_code": "AK",
+        "portable_heater": false,
+        "division_called": "general"
+      },
+      "expected_tender_applies": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_MISSING_EQUIPMENT_CODE",
+      "input": {
+        "equipment_code": null,
+        "portable_heater": true,
+        "division_called": "general"
+      },
+      "expected_tender_applies": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_UNSTATED_AGGREGATE_AMOUNT_AS_ZERO",
+      "input": {
+        "claimed_aggregate_deduction_cents": 0,
+        "source_supports_amount": false
+      },
+      "expected_guard": "UNKNOWN_NOT_ZERO",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_38_SHIPMENTS_AS_38_INDEPENDENT_LABELS",
+      "input": {
+        "independent_decision_count": 38,
+        "original_GBLs_custodied": 0
+      },
+      "expected_guard": "REJECT_ONE_DECISION_TWO_AGGREGATE_COHORT_LABELS",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    },
+    {
+      "id": "SYNTH_B221646_HISTORICAL_GSA_DEDUCTION_AS_RETALLY_CASH",
+      "input": {
+        "historical_GSA_deduction": true,
+        "customer_cash_receipt": false
+      },
+      "expected_guard": "REJECT_GSA_DEDUCTION_NOT_RETALLY_CUSTOMER_CASH",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL"
+    }
+  ],
+  "dedup": {
+    "primary_decision_key": "GAO/B-221646",
+    "labeled_cohort_keys": [
+      "GAO/B-221646/AV",
+      "GAO/B-221646/AR"
+    ],
+    "must_not_multiply_independent_decision_count_by_shipments": true,
+    "source_overlap_other_GAO_DECISIONS": "SAME_PUBLISHER_DIFFERENT_DECISION_NUMBER"
+  },
+  "downstream_handoffs": {
+    "freightrecovery_12": "MIXED_SUPERVISED_EQUIPMENT_SCOPE_HOLDOUT_NO_REAL_CARRIER_BILL_TRIPLETS",
+    "recoveryos_12": "GSA_DEDUCTIONS_FROM_OTHER_MONEY_NOT_INDEPENDENT_BANK_CASH",
+    "permitplate_48": "NO_PERMIT_OR_LICENSE_CASES",
+    "capturebrief_52": "NO_SAM_OR_AWARD_CASES",
+    "qa_44": "VERIFY_GAO_PDF_PAGES_1_2_4_5_6_AND_ONE_DECISION_TW0_COHORTS_NO_GBL_TRIPLETS"
+  },
+  "restrictions": {
+    "synthetic_controls_are_real_labels": false,
+    "private_customer_medical_student_data_persisted": false,
+    "production_code_modified": false,
+    "paid_provider_calls": 0,
+    "new_recurring_schedules": 0,
+    "release_authorized": false,
+    "legacy_15_lab_consolidation_certified": false
+  }
+}
