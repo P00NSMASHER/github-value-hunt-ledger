@@ -1,4 +1,5 @@
 """Original NYC OATH/DOB publisher metadata, safety-only synthetic controls."""
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -6,6 +7,10 @@ from pathlib import Path
 FILE = Path(__file__).parent / "fixtures" / "nyc_dob_oath_ecb_outcome_quality_v1.json"
 
 def guard(claim, facts):
+    if claim == "BIN_ALONE_UNIQUELY_IDENTIFIES_SAFETY_NOTICE":
+        return "REJECT" if facts.get("same_bin") and facts.get("distinct_violation_numbers") else "UNKNOWN"
+    if claim == "MISSING_VIOLATION_NUMBER_IS_VERIFIED_DISTINCT_EVENT":
+        return "UNKNOWN"
     if claim == "HEARING_STATUS_PROVES_FINAL_ADJUDICATION":
         return "UNKNOWN"
     if claim == "DISMISSED_REQUIRES_POSITIVE_PENALTY":
@@ -67,9 +72,9 @@ class OathOutcomeSourceQuality(unittest.TestCase):
 
     def test_synthetic_calibration_holdouts_and_negative_controls(self):
         cases = self.pack["synthetic_controls"]
-        self.assertEqual(len(cases), 16)
+        self.assertEqual(len(cases), 18)
         self.assertEqual([x["split"] for x in cases].count("calibration"), 4)
-        self.assertEqual([x["split"] for x in cases].count("synthetic_holdout"), 12)
+        self.assertEqual([x["split"] for x in cases].count("synthetic_holdout"), 14)
         self.assertEqual(len({x["id"] for x in cases}), len(cases))
         for case in cases:
             self.assertTrue(case["id"].startswith("SYNTH_"))
@@ -124,6 +129,50 @@ class OathOutcomeSourceQuality(unittest.TestCase):
                          {"permitplate", "capturebrief", "freightrecovery", "recoveryos", "qa"})
         self.assertTrue(all("NO_" in handoff[x] for x in
                             ("capturebrief", "freightrecovery", "recoveryos")))
+
+
+    def test_original_safety_pair_deidentified_projection_hash_and_custody_limit(self):
+        source = self.pack["original_public_api_observations"]
+        self.assertEqual(len(source), 1)
+        obs = source[0]
+        p = obs["deidentified_projection"]
+        self.assertEqual(obs["kind"], "ORIGINAL_PUBLISHER_API_ROW_PROJECTION_DEIDENTIFIED_NOT_GROUND_TRUTH")
+        self.assertEqual(obs["source_url"], "https://data.cityofnewyork.us/resource/855j-jady.json")
+        self.assertEqual(obs["source_page_positions_zero_based"], [15, 19])
+        self.assertEqual(p["source_issue_date"], "2026-10-21")
+        self.assertEqual(p["records_observed"], 2)
+        self.assertTrue(p["same_bin"])
+        self.assertTrue(p["distinct_violation_numbers"])
+        digest = hashlib.sha256(json.dumps(
+            p, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")).hexdigest()
+        self.assertEqual(digest, "820e568269352baba054f51f2fcd38504d3f1749d384a589906362c75b398563")
+        self.assertEqual(obs["deidentified_projection_sha256"], digest)
+        self.assertIsNone(obs["source_response_original_http_sha256"])
+        self.assertFalse(obs["source_response_complete"])
+        self.assertFalse(obs["original_raw_ids_addresses_or_coordinates_persisted"])
+        self.assertEqual(self.pack["source_labeling"]["original_safety_rows_projected_nonadjudicated"], 2)
+        self.assertEqual(self.pack["source_labeling"]["heldout_real_cases"], 0)
+
+    def test_source_pair_bin_dedup_red_green_and_missing_label_guard(self):
+        obs = self.pack["original_public_api_observations"][0]
+        p = obs["deidentified_projection"]
+        # RED baseline loses one distinct publisher *notice row* by BIN-only dedup.
+        self.assertEqual(obs["naive_bin_only_unique_count"], 1)
+        # GREEN source-record keying preserves two distinct publisher notice IDs.
+        self.assertEqual(obs["distinct_publisher_notice_ids_observed"], 2)
+        self.assertEqual(p["records_observed"], 2)
+        self.assertLess(obs["naive_bin_only_unique_count"], obs["distinct_publisher_notice_ids_observed"])
+        self.assertIsNone(obs["independently_validated_distinct_incidents"])
+        self.assertIsNone(obs["independent_adjudicated_case_label"])
+        self.assertIsNone(obs["independent_cash_label"])
+        self.assertFalse(obs["commercial_scoring_approved"])
+        extra = [x for x in self.pack["synthetic_controls"] if
+                 x["id"] in {"SYNTH_BIN_ONLY_UNIQUE_NOTICE", "SYNTH_MISSING_VIOLATION_NUMBER"}]
+        self.assertEqual(len(extra), 2)
+        self.assertEqual([guard(x["claim"], x["facts"]) for x in extra], ["REJECT", "UNKNOWN"])
+        self.assertTrue(all(x["independent_real_label"] is None and
+                            x["split"] == "synthetic_holdout" for x in extra))
 
 if __name__ == "__main__":
     unittest.main()

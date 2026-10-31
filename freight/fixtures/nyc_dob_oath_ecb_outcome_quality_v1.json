@@ -135,7 +135,8 @@
     "permit_issuance_truth": "UNKNOWN",
     "heldout_real_cases": 0,
     "benchmark_accuracy": null,
-    "benchmark_recall": null
+    "benchmark_recall": null,
+    "original_safety_rows_projected_nonadjudicated": 2
   },
   "privacy": {
     "person_names_persisted": false,
@@ -356,6 +357,34 @@
       "independent_real_label": null,
       "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
       "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_BIN_ONLY_UNIQUE_NOTICE",
+      "split": "synthetic_holdout",
+      "claim": "BIN_ALONE_UNIQUELY_IDENTIFIES_SAFETY_NOTICE",
+      "facts": {
+        "same_bin": true,
+        "distinct_violation_numbers": true,
+        "records_observed": 2
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_MISSING_VIOLATION_NUMBER",
+      "split": "synthetic_holdout",
+      "claim": "MISSING_VIOLATION_NUMBER_IS_VERIFIED_DISTINCT_EVENT",
+      "facts": {
+        "same_bin": true,
+        "distinct_violation_numbers": null,
+        "records_observed": 2
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
     }
   ],
   "benchmark_readiness": "SOURCE_SCHEMA_AND_RISK_ONLY_NO_ORIGINAL_CASE_ROW_CUSTODY_NO_INDEPENDENT_HOLDOUT",
@@ -368,7 +397,9 @@
     "No source-byte SHA-256, commercial scoring permission, identity join, genuine holdout accuracy or customer cash has been established.",
     "DOB Safety Violations (855j-jady) is a civil-penalty source, distinct from OATH/ECB summonses (6bgk-3dad); neither alone establishes current permit issuance, final adjudication or customer cash.",
     "DOB Safety Violations and legacy DOB Violations (3h2n-5cm9) may overlap. No case identifiers or row-level independent deduplication have been acquired.",
-    "Official 2026-10-23 dataset catalog metadata is not a live original-byte snapshot, authenticated historical as-of cohort, held-out real case or certified commercial scoring permission."
+    "Official 2026-10-23 dataset catalog metadata is not a live original-byte snapshot, authenticated historical as-of cohort, held-out real case or certified commercial scoring permission.",
+    "A limited first-page original API projection observed two source rows with the same BIN and distinct published violation numbers on 2026-10-21. A BIN-only dedup rule would collapse two publisher notice records into one; distinct underlying physical incidents, independent adjudications, complete original HTTP-body SHA-256, stable row order and scored commercial eligibility remain UNKNOWN.",
+    "The reviewed web index was approximately two days old on 2026-10-31. The de-identified projection digest is NOT an original publisher HTTP-byte digest; no identifiers, addresses or coordinates were persisted."
   ],
   "downstream_handoffs": {
     "permitplate": "RESEARCH_ONLY_DOB_SAFETY_VIOLATION_DEDUP_AND_OATH_SEPARATION_NO_PERMIT_SCORING",
@@ -415,6 +446,52 @@
       "publisher_statement": "CIVIL_PENALTY_RECORD_NOT_AN_INDEPENDENT_CUSTOMER_BANK_SETTLEMENT",
       "independent_cash_label_count": 0,
       "rule": "NO_RECOVERED_CASH_OR_PERMIT_SCORING"
+    }
+  ],
+  "original_public_api_observations": [
+    {
+      "observation_id": "DOB_SAFETY_SAME_BIN_DISTINCT_NOTICE_SOURCE_PAIR_V1",
+      "kind": "ORIGINAL_PUBLISHER_API_ROW_PROJECTION_DEIDENTIFIED_NOT_GROUND_TRUTH",
+      "publisher": "NYC Department of Buildings / NYC Open Data",
+      "source_url": "https://data.cityofnewyork.us/resource/855j-jady.json",
+      "source_catalog_url": "https://data.cityofnewyork.us/d/855j-jady",
+      "source_effective_issue_date": "2026-10-21",
+      "reviewed_date_utc": "2026-10-31",
+      "retrieval_scope": "FIRST_UNFILTERED_DEFAULT_API_PAGE_UNORDERED_UNREPRESENTATIVE",
+      "web_index_crawl_age_at_review": "ABOUT_TWO_DAYS_NOT_A_VERIFIED_LIVE_READ",
+      "source_page_positions_zero_based": [
+        15,
+        19
+      ],
+      "fields_checked": [
+        "bin",
+        "violation_issue_date",
+        "violation_number",
+        "violation_type",
+        "violation_status"
+      ],
+      "deidentified_projection": {
+        "dataset_id": "855j-jady",
+        "source_issue_date": "2026-10-21",
+        "records_observed": 2,
+        "same_bin": true,
+        "distinct_violation_numbers": true,
+        "same_violation_type": "FTC-AEU-HAZ",
+        "same_violation_status": "Active",
+        "distinct_physical_incidents": "UNKNOWN"
+      },
+      "deidentified_projection_sha256": "820e568269352baba054f51f2fcd38504d3f1749d384a589906362c75b398563",
+      "source_response_original_http_sha256": null,
+      "source_http_complete_content_length_bytes": null,
+      "source_response_complete": false,
+      "original_raw_ids_addresses_or_coordinates_persisted": false,
+      "naive_bin_only_unique_count": 1,
+      "distinct_publisher_notice_ids_observed": 2,
+      "independently_validated_distinct_incidents": null,
+      "independent_adjudicated_case_label": null,
+      "independent_cash_label": null,
+      "commercial_scoring_approved": false,
+      "publication_limit": "Two observed records are not an independent or representative holdout and cannot establish two distinct physical incidents; publisher API may change."
     }
   ]
 }
