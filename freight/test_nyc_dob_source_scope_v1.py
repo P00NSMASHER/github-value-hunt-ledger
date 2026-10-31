@@ -496,5 +496,100 @@ class NYCDOBLAAApplicationBoundaryTest(unittest.TestCase):
         self.assertEqual(p["safety"]["private_customer_medical_student_records"], 0)
 
 
+class NYCDOBComplaintBoundaryTest(unittest.TestCase):
+    """Original DOB complaints catalog + synthetic source-scope falsifiers only."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (FIXTURE.parent / 'nyc_dob_complaint_disposition_boundary_v1.json')
+            .read_text(encoding='utf-8'))
+
+    @staticmethod
+    def classify(case):
+        claim = case['claim']
+        facts = case['facts']
+        if claim == 'COMPLAINT_PROVES_VIOLATION':
+            return 'UNKNOWN_NO_INSPECTION_OR_ADJUDICATION'
+        if claim == 'CLOSED_PROVES_NO_VIOLATION':
+            return 'UNKNOWN_CLOSED_STATUS_NO_NEGATIVE_TRUTH'
+        if claim == 'A1_PROVES_FINAL_ADJUDICATION' and facts.get('disposition_code') == 'A1':
+            return 'SOURCE_REPORTS_VIOLATIONS_SERVED_NOT_FINAL_ADJUDICATION'
+        if claim == 'L1_PROVES_PERMIT_REVOKED' and facts.get('disposition_code') == 'L1':
+            return 'SOURCE_REPORTS_PARTIAL_STOP_WORK_ORDER_NOT_PERMIT_REVOCATION'
+        if claim == 'DOBRUNTIME_PROVES_FIRST_PUBLIC_ASOF':
+            return 'UNKNOWN_REPOST_TIME_NOT_ORIGINAL_NOTICE_ASOF'
+        if claim == 'TWO_COMPLAINTS_PROVE_TWO_INCIDENTS':
+            return 'UNKNOWN_INCIDENT_MULTIPLICITY'
+        if claim == 'COMPLAINT_ROW_PROVES_PERMIT':
+            return 'UNKNOWN_COMPLAINT_NOT_PERMIT_ISSUANCE'
+        return 'UNKNOWN_NOT_EVALUATED'
+
+    def test_complaint_original_publisher_identity_and_schema(self):
+        p = self.pack
+        s = p['original_publisher_catalog']
+        self.assertEqual(p['schema_version'], 1)
+        self.assertEqual(s['dataset_id'], 'eabe-havv')
+        self.assertEqual(s['date_first_public'], '2013-04-26')
+        self.assertEqual(s['last_updated_publisher_reported'], '2026-10-31')
+        self.assertEqual(s['publisher_column_count'], 15)
+        self.assertEqual(len(set(s['verified_public_api_fields'])), 15)
+        self.assertTrue({'disposition_code','inspection_date','dobrundate','complaint_number'}
+                        <= set(s['verified_public_api_fields']))
+        self.assertIn('NOT_VERIFIED_VIOLATION', s['event_type'])
+
+    def test_no_raw_rows_or_unearned_commercial_rights(self):
+        p = self.pack
+        r = p['provenance_and_quality']
+        self.assertEqual(r['raw_source_api_rows_retrieved'], 0)
+        self.assertIsNone(r['raw_source_api_http_body_sha256'])
+        self.assertIsNone(r['official_catalog_html_sha256'])
+        self.assertFalse(p['rights']['commercial_customer_scoring_cleared'])
+        self.assertFalse(p['rights']['dataset_or_third_party_supplement_reviewed'])
+        self.assertEqual(p['safety']['real_customer_medical_student_private_records_persisted'], 0)
+        self.assertEqual(p['safety']['provider_calls_added_to_ci'], 0)
+        self.assertFalse(p['ownership']['legacy_15_labs_consolidated'])
+
+    def test_synthetic_holdouts_and_dedup_are_not_real_labels(self):
+        p = self.pack
+        cases = p['synthetic_controls']
+        self.assertEqual(len(cases), 7)
+        self.assertEqual(len({x['id'] for x in cases}), 7)
+        self.assertEqual(sum(x['split'] == 'synthetic_calibration' for x in cases), 2)
+        self.assertEqual(sum(x['split'] == 'synthetic_holdout' for x in cases), 5)
+        for case in cases:
+            with self.subTest(case=case['id']):
+                self.assertEqual(self.classify(case), case['expected'])
+                self.assertNotEqual(case['claim'], case['expected'])
+                self.assertEqual(case['provenance'],
+                                 'RESEARCH_AUTHORED_SYNTHETIC_NOT_PUBLISHER_CASE')
+                self.assertIsNone(case['independent_real_label'])
+        self.assertIn('BIN_ALONE_NOT_UNIQUE', p['provenance_and_quality']['cross_source_join'])
+
+    def test_red_green_is_synthetic_policy_not_engine_accuracy(self):
+        p = self.pack
+        b = p['benchmark_readiness']
+        self.assertEqual(b['synthetic_holdout'], 5)
+        self.assertEqual(b['real_public_rows_in_pack'], 0)
+        self.assertEqual(b['real_independent_heldout_complaint_to_violation_labels'], 0)
+        self.assertEqual(b['real_independent_heldout_permit_labels'], 0)
+        self.assertEqual(b['production_model_predictions'], 0)
+        self.assertIsNone(b['measured_accuracy'])
+        self.assertIsNone(b['precision'])
+        self.assertIsNone(b['recall'])
+        self.assertEqual(len([c for c in p['synthetic_controls']
+                              if c['claim'] != self.classify(c)]), 7)
+
+    def test_handoffs_and_provenance_scope(self):
+        p = self.pack
+        self.assertEqual(set(p['handoffs']), {'permitplate_48', 'retally_recoveryos_12',
+                         'capturebrief_52', 'independent_qa_44', 'executive_director'})
+        self.assertTrue(p['provenance_and_quality']['publisher_maintains_mutable_rows'])
+        self.assertEqual(p['provenance_and_quality']['dedup_unit'],
+            'COMPLAINT_NUMBER_IS_A_COMPLAINT_RECORD_KEY_NOT_INDEPENDENT_INCIDENT_OR_PENALTY_PROOF')
+        self.assertEqual(p['safety']['engine_changes'], 0)
+        self.assertFalse(p['safety']['production_release'])
+
+
 if __name__ == '__main__':
     unittest.main()
