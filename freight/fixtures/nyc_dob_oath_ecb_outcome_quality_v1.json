@@ -50,6 +50,36 @@
       "rights": "NYC_ADMIN_CODE_23_502_D_OPEN_DATA_NO_GENERAL_USE_RESTRICTION_SUBJECT_TO_PORTAL_TERMS_AND_PRIVACY",
       "commercial_reuse": "GENERAL_PUBLIC_DATA_REUSE_ALLOWED_SOURCE_SPECIFIC_TERMS_SUBJECT_TO_REVIEW",
       "commercial_scoring_authorized": false
+    },
+    {
+      "dataset_id": "855j-jady",
+      "publisher": "NYC Department of Buildings (DOB), NYC Open Data original publisher",
+      "title": "DOB Safety Violations",
+      "landing_page": "https://data.cityofnewyork.us/d/855j-jady",
+      "official_catalog": "https://catalog.data.gov/dataset/dob-safety-violations",
+      "first_party_schema": "https://data.cityofnewyork.us/api/views/855j-jady/columns.json",
+      "first_published": "2023-11-22",
+      "publisher_page_last_updated_observed": "2026-10-23",
+      "federal_catalog_last_checked": "2026-10-20",
+      "source_category": "NEWER_DOB_NOW_CIVIL_PENALTIES_NOT_OATH_ECB_ADJUDICATION_NOT_PERMIT_ISSUANCE",
+      "record_schema_fields_verified": [
+        "bin",
+        "violation_issue_date",
+        "violation_number",
+        "violation_type"
+      ],
+      "catalog_approximate_row_count": "1.12M AS_REPORTED_NOT_RETRIEVED",
+      "publisher_update_frequency": "DAILY_MUTABLE",
+      "effective_record_time_span": "UNKNOWN_NOT_ROW_LEVEL_VERIFIED",
+      "original_json_bytes_sha256": null,
+      "original_case_rows_custodied": 0,
+      "original_content_length_bytes": null,
+      "original_http_status": null,
+      "privacy": "NO_RAW_VIOLATION_NUMBERS_ADDRESSES_NAMES_OR_LOCATION_DATA_PERSISTED",
+      "rights": "NYC_GENERAL_OPEN_DATA_UNRESTRICTED_USE_SUBJECT_TO_DATASET_AND_PORTAL_TERMS",
+      "commercial_reuse": "GENERAL_CITY_OPEN_DATA_USE_PERMITTED_DATASET_SPECIFIC_TERMS_UNVERIFIED",
+      "commercial_scoring_authorized": false,
+      "linkage_note": "Publisher warns newer Safety and older DOB Violations can duplicate; OATH/ECB summonses are separate records."
     }
   ],
   "rights_authorities": [
@@ -270,6 +300,62 @@
       "independent_real_label": null,
       "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
       "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_SAFETY_LEGACY_DOUBLE_COUNT",
+      "split": "synthetic_holdout",
+      "claim": "UNVERIFIED_SAFETY_LEGACY_PAIR_IS_DISTINCT_EVENTS",
+      "facts": {
+        "sources": [
+          "855j-jady",
+          "3h2n-5cm9"
+        ],
+        "independent_identity_verified": false
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_SAFETY_IS_NOT_OATH_OUTCOME",
+      "split": "synthetic_holdout",
+      "claim": "SAFETY_CIVIL_VIOLATION_IS_OATH_ADJUDICATION",
+      "facts": {
+        "dataset_id": "855j-jady",
+        "oath_decision": null
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_SAFETY_CIVIL_PENALTY_NOT_RECOVERY",
+      "split": "synthetic_holdout",
+      "claim": "DOB_ISSUED_CIVIL_PENALTY_IS_CUSTOMER_RECOVERY",
+      "facts": {
+        "dataset_id": "855j-jady",
+        "official_paid_amount": null,
+        "customer_bank_receipt": null
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_SAFETY_NO_ROW_NOT_PERMIT",
+      "split": "synthetic_holdout",
+      "claim": "ABSENT_SAFETY_ROW_PROVES_COMPLIANT_PERMIT",
+      "facts": {
+        "dataset_id": "855j-jady",
+        "row_match_found": false
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
     }
   ],
   "benchmark_readiness": "SOURCE_SCHEMA_AND_RISK_ONLY_NO_ORIGINAL_CASE_ROW_CUSTODY_NO_INDEPENDENT_HOLDOUT",
@@ -279,13 +365,56 @@
     "The public case-status dataset is mutable, with no guaranteed immutable historical as-of snapshot; prohibit look-ahead leakage.",
     "Publisher cached column statistics are not independently adjudicated row-level ground truth.",
     "A public dataset's general reuse rights do not establish customer consent, a lawful use for personal data or scoring suitability.",
-    "No source-byte SHA-256, commercial scoring permission, identity join, genuine holdout accuracy or customer cash has been established."
+    "No source-byte SHA-256, commercial scoring permission, identity join, genuine holdout accuracy or customer cash has been established.",
+    "DOB Safety Violations (855j-jady) is a civil-penalty source, distinct from OATH/ECB summonses (6bgk-3dad); neither alone establishes current permit issuance, final adjudication or customer cash.",
+    "DOB Safety Violations and legacy DOB Violations (3h2n-5cm9) may overlap. No case identifiers or row-level independent deduplication have been acquired.",
+    "Official 2026-10-23 dataset catalog metadata is not a live original-byte snapshot, authenticated historical as-of cohort, held-out real case or certified commercial scoring permission."
   ],
   "downstream_handoffs": {
-    "permitplate": "RESEARCH_ONLY_JOIN_AND_OUTCOME_QUALITY_CONTROLS_NOT_SCORING_APPROVAL",
+    "permitplate": "RESEARCH_ONLY_DOB_SAFETY_VIOLATION_DEDUP_AND_OATH_SEPARATION_NO_PERMIT_SCORING",
     "capturebrief": "NO_AWARD_OR_PREAWARD_LABELS",
     "freightrecovery": "NO_FREIGHT_BILLING_LABELS",
     "recoveryos": "NO_ACCOUNTING_CASH_TRUTH",
     "qa": "EXACT_HEAD_SOURCE_AND_SYNTHETIC_REGRESSION_REVIEW_HOLD"
-  }
+  },
+  "source_crosswalk_constraints": [
+    {
+      "id": "SAFETY_LEGACY_OVERLAP",
+      "source_ids": [
+        "855j-jady",
+        "3h2n-5cm9"
+      ],
+      "publisher_statement": "SOME_VIOLATIONS_DUPLICATED_IN_BOTH_DATASETS",
+      "dedup_truth": "UNKNOWN_NO_ROW_IDENTITY_VERIFIED",
+      "rule": "DO_NOT_COUNT_AS_INDEPENDENT_EVENTS"
+    },
+    {
+      "id": "SAFETY_ECB_SEPARATION",
+      "source_ids": [
+        "855j-jady",
+        "6bgk-3dad"
+      ],
+      "publisher_statement": "DOB_NOW_CIVIL_PENALTIES_DISTINCT_FROM_OATH_ECB_SUMMONSES",
+      "independent_case_join_count": 0,
+      "rule": "NO_ADJUDICATION_INFERENCE"
+    },
+    {
+      "id": "MUTABLE_ASOF_COHORT",
+      "source_ids": [
+        "855j-jady"
+      ],
+      "publisher_statement": "UPDATED_DAILY_SYSTEM_OF_RECORD_CHANGES_SECOND_TO_SECOND",
+      "historical_asof_snapshot": "UNKNOWN",
+      "rule": "DO_NOT_LOOK_AHEAD_OR_ASSUME_HISTORICAL_REPLAY"
+    },
+    {
+      "id": "ISSUANCE_NOT_RECOVERY",
+      "source_ids": [
+        "855j-jady"
+      ],
+      "publisher_statement": "CIVIL_PENALTY_RECORD_NOT_AN_INDEPENDENT_CUSTOMER_BANK_SETTLEMENT",
+      "independent_cash_label_count": 0,
+      "rule": "NO_RECOVERED_CASH_OR_PERMIT_SCORING"
+    }
+  ]
 }
