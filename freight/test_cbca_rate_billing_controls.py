@@ -318,5 +318,48 @@ class CBCA1317PublicOffsetsEvidence(unittest.TestCase):
         self.assertEqual(r["actual_customer_cash_collected_cents"], 0)
 
 
+    def test_2010_original_reconsideration_is_same_case_not_new_accuracy(self):
+        f = self.pack["reconsideration_followup"]
+        self.assertEqual(f["docket"], self.pack["original_source"]["docket"])
+        self.assertEqual(f["decision_date"], "2010-05-05")
+        self.assertEqual(f["source_url"],
+                         "https://www.cbca.gov/files/decisions/2010/GILMORE_05-05-10_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf")
+        self.assertEqual(f["visually_checked_pdf_pages_1_based"], [1, 3])
+        self.assertEqual(f["outcome"], "RECONSIDERATION_DENIED_ORIGINAL_DISPOSITION_RETAINED")
+        self.assertFalse(f["previous_outcome_reversed"])
+        self.assertEqual(f["relationship_key"], f["original_decision_key"])
+        self.assertEqual(f["total_official_decision_documents_in_cluster"], 2)
+        self.assertEqual(f["additional_distinct_bol_rows"], 0)
+        self.assertEqual(f["additional_independent_decision_clusters"], 0)
+        self.assertEqual(self.pack["quality_and_holdout"]["distinct_historical_decision_clusters"], 1)
+        self.assertEqual(self.pack["quality_and_holdout"]["reported_line_items"], 12)
+        self.assertEqual(f["independently_held_out_real_customer_cases"], 0)
+        self.assertEqual(f["blind_engine_predictions"], 0)
+        self.assertFalse(f["commercial_scoring_clearance"])
+
+    def test_2010_reconsideration_missing_cash_and_rejected_argument_controls(self):
+        f, controls = self.pack["reconsideration_followup"], self.pack["reconsideration_synthetic_controls"]
+        self.assertIn("ten years", f["gov_argument"])
+        self.assertFalse(f["establishes_actual_refund_paid"])
+        self.assertIsNone(f["actual_refund_paid_cents"])
+        self.assertFalse(f["original_invoice_merits_adjudicated"])
+        self.assertFalse(f["raw_pdf_bytes_custodied"])
+        self.assertIsNone(f["raw_pdf_sha256"])
+        self.assertIsNone(f["raw_pdf_byte_length"])
+        self.assertEqual(f["third_party_invoice_rights"], "UNKNOWN_NOT_CLEARED")
+        self.assertEqual(len(controls), 4)
+        self.assertEqual(len({c["id"] for c in controls}), 4)
+        for c in controls:
+            self.assertTrue(c["id"].startswith("SYN_"))
+            self.assertEqual(c["kind"], "SYNTHETIC")
+            self.assertIsNone(c["independent_original_truth"])
+        self.assertEqual({c["expected"] for c in controls}, {
+            "REJECT_CORRELATED_DUPLICATE_CLUSTER",
+            "REJECT_REJECTED_PARTY_ARGUMENT_AS_TRUTH",
+            "UNKNOWN_REFUND_PAID_UNVERIFIED",
+            "UNKNOWN_MODERN_APPLICABILITY",
+        })
+
+
 if __name__=="__main__":
     unittest.main()
