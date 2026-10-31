@@ -210,6 +210,21 @@ class PublicBuildTests(unittest.TestCase):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 build(output)
 
+    def test_v16_evidence_preflight_is_published_without_a_customer_action(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            home = (output / "index.html").read_text()
+            helper = (output / "v16-evidence-preflight.js").read_text()
+            self.assertIn('name="freight-product-version" content="16.0.0"', home)
+            self.assertIn('id="evidence-preflight"', home)
+            self.assertIn('data-v16-preflight hidden', home)
+            self.assertIn('src="v16-evidence-preflight.js?v=1"', home)
+            self.assertIn('href="v16-evidence-preflight.css?v=1"', home)
+            self.assertIn('NO ORIGINAL RECORDS WERE READ OR VERIFIED', helper)
+            self.assertNotIn('window.location.href', helper)
+            self.assertNotIn('localStorage', helper)
+            self.assertTrue((output / "v16-evidence-preflight.css").is_file())
+
     def test_output_contains_only_allowlisted_public_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
