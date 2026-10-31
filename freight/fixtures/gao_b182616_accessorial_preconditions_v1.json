@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B182616_ACCESSORIAL_CONDITIONS_V1",
+  "evaluation_family": "HISTORICAL_ADJUDICATED_FREIGHT_ACCESSORIAL_CONDITIONS_NOT_MODERN_RATE_PRECISION",
+  "checked_on_utc": "2026-10-31",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "existing_review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_writer_branch": "research/retally-unified-data-lab",
+    "live_writer_modified": false,
+    "owned_scope": "VERSIONED_RESEARCH_FIXTURE_AND_TEST_ONLY"
+  },
+  "original_source": {
+    "publisher": "United States Government Accountability Office",
+    "decision_id": "B-182616",
+    "decision_date": "1976-02-20",
+    "source_url": "https://www.gao.gov/products/b-182616-0",
+    "source_type": "OFFICIAL_PUBLIC_ADJUDICATIVE_HTML_DECISION",
+    "source_verified_sections": "GAO_DECISION_PARAGRAPHS_ON_COLLECTED_CHARGES_PERMIT_CUSTODY_ESCORT_LAYOVER_SURVEY_DETENTION_AND_GSA_REFERRAL",
+    "official_page_reviewed_on_utc": "2026-10-31",
+    "source_http_body_sha256": null,
+    "source_http_body_length": null,
+    "raw_html_or_pdf_bytes_custodied": false,
+    "source_content_hash_state": "UNKNOWN_NO_RAW_RESPONSE_BYTES",
+    "source_last_modified_header_utc": null,
+    "original_governing_1971_tariff_100_e_held": false,
+    "original_carrier_invoice_bol_pages_held": false,
+    "original_customer_recovery_receipts_held": false,
+    "source_access_cost_usd": 0,
+    "source_acquisition_method": "PUBLIC_FIRST_PARTY_HTML_PAGE_MANUAL_FACT_PROJECTION_NO_AUTOMATED_SCRAPING"
+  },
+  "rights": {
+    "gao_official_copyright_terms": "https://www.gao.gov/copyright",
+    "usa_gov_rights_context": "https://www.usa.gov/government-copyright",
+    "gao_authored_decision_reuse": "GAO_CONTENT_MAY_BE_COPIED_WITH_SOURCE_ATTRIBUTION_WITHOUT_PERMISSION_IN_US_NO_ENDORSEMENT",
+    "third_party_tariff_invoice_embedded_rights": "UNKNOWN_NOT_CLEARED",
+    "independent_customer_data_rights": "NOT_APPLICABLE_NO_CUSTOMER_RECORDS",
+    "retally_commercial_accuracy_scoring_approved": false
+  },
+  "historical_scope": {
+    "shipment_date": "1971-12-20",
+    "decision_date": "1976-02-20",
+    "tariff_board_identification": "HEAVY_AND_SPECIALIZED_CARRIERS_TARIFF_BUREAU_TARIFF_100_E_MF_ICC_26",
+    "quoted_tariff_amendment_effective": "1973-08-20",
+    "historical_law_not_current_rule": true,
+    "rate_merits_scope": "ADJUDICATED_CONDITIONS_BUT_NOT_FINAL_AGGREGATE_GSA_RECALCULATION",
+    "final_aggregate_revised_overcharge_cents": null,
+    "carrier_refund_received_cents": null,
+    "gsa_followup_adjustment_ledger_seen": false
+  },
+  "source_fact_projection": {
+    "carrier_conceded_overcharge_cents": 101230,
+    "carrier_reclaim_cents": 422210,
+    "custody_date": "1971-12-20",
+    "decision_date": "1976-02-20",
+    "delivery_date": "1972-01-03",
+    "escort_layover_nights_claimed": 18,
+    "escort_layover_nights_recognized": 15,
+    "original_audit_overcharge_cents": 795940,
+    "original_billing_cents": 1903557,
+    "revised_deduction_collected_cents": 523440,
+    "vehicle_one_detention_hours_recognized": 5,
+    "vehicle_two_detention_hours_minimum_supported": 4
+  },
+  "source_fact_projection_sha256": "b67b511a6b27c539161c0c6dd2dbcbc91a2957b0c0d9d32d9f6bca79ad944d85",
+  "projection_hash_contract": "SHA256_UTF8_PYTHON_JSON_DUMPS_SORT_KEYS_TRUE_SEPARATORS_COMMA_COLON_NO_WHITESPACE_THIS_IS_NOT_ORIGINAL_GAO_HTML_HASH",
+  "source_ground_truth_labels": [
+    {
+      "id": "WEEKEND_DRIVER_FLAGMAN",
+      "decision": "DISALLOWED_FOR_DECEMBER_18_19_1971",
+      "evidence": "MISSING_REQUIRED_EARLIER_HIGHWAY_PERMIT_AND_NO_CUSTODY_UNTIL_DECEMBER_20",
+      "official_page_lines": "22-25"
+    },
+    {
+      "id": "PREMIUM_ESCORT",
+      "decision": "DISALLOWED_ABSENT_SPECIFIC_SHIPPER_REQUEST",
+      "evidence": "1971_ITEM_1380_AND_ITEM_1450_SPECIFIC_REQUEST_REQUIRED",
+      "official_page_lines": "26-32"
+    },
+    {
+      "id": "ESCORT_PRE_CUSTODY",
+      "decision": "DISALLOWED_DECEMBER_17_1971",
+      "evidence": "NO_CARRIER_CUSTODY_UNTIL_DECEMBER_20",
+      "official_page_lines": "18-20,29"
+    },
+    {
+      "id": "ESCORT_LAYOVER_NIGHTS",
+      "decision": "FIFTEEN_RECOGNIZED_NOT_EIGHTEEN_CLAIMED",
+      "evidence": "BOARD_RECOGNIZED_DECEMBER_20_TO_JANUARY_3_CUSTODY_WINDOW",
+      "official_page_lines": "33"
+    },
+    {
+      "id": "ROUTE_SURVEY",
+      "decision": "DISALLOWED_ABSENT_SHIPPER_OR_CONSIGNEE_REQUEST",
+      "evidence": "1973_TARIFF_AMENDMENT_NOT_APPLICABLE_TO_1971_SHIPMENT",
+      "official_page_lines": "34-40"
+    },
+    {
+      "id": "VEHICLE_DETENTION",
+      "decision": "FIVE_HOURS_FIRST_FOUR_HOURS_SECOND_ON_RECORD",
+      "evidence": "TWO_FREE_HOURS_AND_UNKNOWN_EXACT_SECOND_LOADING_END",
+      "official_page_lines": "41-46"
+    }
+  ],
+  "adjudicated_source_outcome": {
+    "carrier_billed_cents": 1903557,
+    "original_notice_of_overcharge_cents": 795940,
+    "overcharge_reduced_before_collected_offset_cents": 523440,
+    "carrier_admitted_overcharge_cents": 101230,
+    "carrier_reclaimed_deduction_cents": 422210,
+    "referral_outcome": "GAO_TRANSFERRED_TO_GSA_AND_SUGGESTED_ADJUSTMENT_CONSISTENT_WITH_DECISION",
+    "actual_final_gsa_adjustment_cents": null,
+    "actual_carrier_refund_cents": null,
+    "actual_retally_customer_recovery_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_ROUTE_SURVEY_NO_REQUEST",
+      "kind": "route_survey",
+      "split": "synthetic_calibration",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "request_documented": false,
+        "on_shipment_date": "1971-12-20",
+        "tariff_amendment_effective": "1973-08-20"
+      },
+      "expected": "DISALLOW_NO_SHIPPER_REQUEST",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_ROUTE_SURVEY_1973_AMENDMENT_BACKDATED",
+      "kind": "route_survey",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "request_documented": null,
+        "on_shipment_date": "1971-12-20",
+        "tariff_amendment_effective": "1973-08-20"
+      },
+      "expected": "UNKNOWN_PRE_AMENDMENT_NO_REQUEST_EVIDENCE",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_PREMIUM_ESCORT_NO_SPECIFIC_SHIPPER_REQUEST",
+      "kind": "premium_escort",
+      "split": "synthetic_calibration",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "specific_request_documented": false
+      },
+      "expected": "DISALLOW_PREMIUM_NO_SPECIFIC_REQUEST",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_ESCORT_SERVICE_BEFORE_CUSTODY",
+      "kind": "escort_pre_custody",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "service_date": "1971-12-17",
+        "custody_date": "1971-12-20"
+      },
+      "expected": "DISALLOW_BEFORE_CUSTODY",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_WEEKEND_FLAGMAN_WITH_LATE_PERMIT",
+      "kind": "weekend_flagman",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "weekend_date": "1971-12-18",
+        "permit_effective_date": "1971-12-20"
+      },
+      "expected": "DISALLOW_WEEKEND_PRECONDITION_NOT_MET",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_ALL_EIGHTEEN_ESCORT_LAYOVER_NIGHTS_ALLOWED",
+      "kind": "layover_nights",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "claimed_nights": 18,
+        "adjudicated_allowed_nights": 15
+      },
+      "expected": "REJECT_THREE_UNSUPPORTED_NIGHTS",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_SECOND_TRAILER_COMPLETION_TIME_FABRICATED",
+      "kind": "detention_hours",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "vehicle": "SECOND",
+        "actual_loading_finished_at": null,
+        "board_evidence_hours": 4,
+        "claimed_proven_hours": 8
+      },
+      "expected": "UNKNOWN_EXACT_END_NO_MORE_THAN_BOARD_EVIDENCE",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_DEDUCTION_RECAST_AS_CARRIER_REFUND",
+      "kind": "settlement",
+      "split": "synthetic_calibration",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "deduction_cents": 523440,
+        "verified_customer_refund_cents": null,
+        "claim": "REFUND_PAID"
+      },
+      "expected": "UNKNOWN_NO_ACTUAL_REFUND_RECEIPT",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_GAO_REFERRED_EQUALS_FINAL_GSA_ACCOUNTING",
+      "kind": "agency_adjustment",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "gao_referred_to_gsa": true,
+        "subsequent_final_gsa_adjustment_cents": null
+      },
+      "expected": "UNKNOWN_GSA_FINAL_ADJUSTMENT",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_TWO_TRAILERS_TWO_INDEPENDENT_DECISIONS",
+      "kind": "dedup",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "trailers": 2,
+        "government_bill_of_lading_clusters": 1,
+        "decision_clusters": 1
+      },
+      "expected": "REJECT_CORRELATED_DUPLICATE_LABELS",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_CARRIER_CONCESSION_FINAL_OVERCHARGE",
+      "kind": "carrier_concession",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "conceded_cents": 101230,
+        "independent_final_rate_adjudication_cents": null
+      },
+      "expected": "UNKNOWN_FINAL_RATE_AMOUNT",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_1971_TARIFF_INTERPRETED_AS_CURRENT_RATE",
+      "kind": "modern_tariff",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "facts": {
+        "shipment_date": "1971-12-20",
+        "modern_tariff_source_custodied": false
+      },
+      "expected": "UNKNOWN_CURRENT_CONTRACT_RATE",
+      "independent_real_world_label": null
+    }
+  ],
+  "benchmark_readiness": {
+    "distinct_independent_gao_decision_clusters": 1,
+    "source_ground_truth_component_findings": 6,
+    "source_verified_documentary_claim_amounts": 5,
+    "independent_carrier_invoice_tariff_payment_triplets": 0,
+    "independent_modern_customer_heldout_cases": 0,
+    "blind_prior_product_predictions": 0,
+    "source_selected_for_this_lab_after_outcome_known": true,
+    "synthetic_calibration_controls": 3,
+    "synthetic_heldout_controls": 9,
+    "independent_modern_rate_precision": null,
+    "independent_modern_rate_recall": null,
+    "recoveryos_settlement_accuracy": null,
+    "freight_error_accuracy": null,
+    "source_only_outcome_evaluation": "GAO_DECISION_CORROBORATES_HISTORICAL_COMPONENT_LABELS_NOT_ANY_PRODUCT_ACCURACY",
+    "other_case_comparison": "CBCA_1317_RATE_REVERSAL_WAS_TIMELINESS_NOT_TARIFF_MERITS; GAO_B182616_EVALUATES_ACCESSORIAL_PRECONDITIONS_BUT_REFERS_FINAL_ACCOUNTING_TO_GSA; DISTINCT_CASES_NOT_POOLED_LABELS"
+  },
+  "handoffs": {
+    "freightrecovery_12": "Historical original GAO source gives six conditional accessorial findings; original 1971 tariff and invoice pages not in custody; never promote to modern rate-error precision.",
+    "recoveryos_12": "The $5,234.40 collection was an agency deduction, not a customer refund; $4,222.10 reclaim is claim only; no final GSA ledger or bank credit.",
+    "permitplate_48": "State highway oversize permits cited as shipment conditions, NOT NYC DOB construction permit events or scoring labels.",
+    "capturebrief_52": "This is not an FY2027 solicitation or government contract-award score.",
+    "independent_qa_44": "Verify GAO B-182616 source line facts and projection digest; run synthetic adversarial controls; reject 1973 amendment lookahead, duplicate two-trailer labels and cash claims."
+  },
+  "restrictions": {
+    "private_customer_student_medical_data_saved": 0,
+    "new_provider_calls_scheduled": 0,
+    "new_cron_added": 0,
+    "writer_branch_modified": false,
+    "product_engine_code_modified": false,
+    "legacy_15_lab_consolidation_certified": false,
+    "release_authorized": false
+  }
+}
