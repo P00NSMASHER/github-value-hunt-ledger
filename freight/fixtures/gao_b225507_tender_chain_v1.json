@@ -25,16 +25,16 @@
     "raw_http_bytes_custodied": false,
     "evidence_extraction": "MANUALLY_VERIFIED_FIRST_PARTY_HTML_FACT_PROJECTION_NOT_RAW_ORIGINAL_BYTE_HASH",
     "original_gbl_invoice_tender_scan_bytes_custodied": false,
-    "original_mtcm_tender_official_copy_custodied": false,
-    "source_last_modified_utc": null
+    "source_last_modified_utc": null,
+    "original_mtmc_tender_official_copy_custodied": false
   },
   "rights": {
     "terms_url": "https://www.gao.gov/copyright",
     "gao_government_authored_text": "US_REUSE_WITH_GAO_ATTRIBUTION_NO_PERMISSION_NEEDED",
-    "ga0_no_endorsement": "NO_GAO_ENDORSEMENT_OF_RETALLY_OR_ENGINE",
     "embedded_third_party_original_tender_rights": "UNKNOWN_UNREVIEWED_NO_TENDER_COPY_REPUBLISHED",
     "commercial_score_authorized": false,
-    "privacy": "ONLY_PUBLIC_DECISION_METADATA_NO_PRIVATE_CUSTOMER_MEDICAL_OR_STUDENT_RECORDS"
+    "privacy": "ONLY_PUBLIC_DECISION_METADATA_NO_PRIVATE_CUSTOMER_MEDICAL_OR_STUDENT_RECORDS",
+    "gao_no_endorsement": "NO_GAO_ENDORSEMENT_OF_RETALLY_OR_ENGINE"
   },
   "decision_reported_evidence": {
     "carrier": "Stevens Transport",
