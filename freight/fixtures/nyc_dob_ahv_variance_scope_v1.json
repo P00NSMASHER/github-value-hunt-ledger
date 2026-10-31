@@ -219,5 +219,98 @@
     "legacy_lab_consolidation_proved": false,
     "commercial_scoring_approved": false,
     "release_approved": false
+  },
+  "publisher_row_observation": {
+    "observation_version": "V1_PUBLIC_PARSED_SAMPLE_NO_RAW_ORIGINAL_HTTP_CUSTODY",
+    "observed_on_utc": "2026-10-31",
+    "source_url": "https://data.cityofnewyork.us/resource/g76y-dcqj.json",
+    "official_catalog_url": "https://data.cityofnewyork.us/Housing-Development/DOB-After-Hour-Variance-Permits/g76y-dcqj",
+    "source_kind": "NYC_DOB_ORIGINAL_PUBLIC_DATA_API_RESPONSE_TEXT_VIA_WEB_CACHED_VIEW",
+    "cache_caveat": "Source displayed from web cache crawled approximately 3 days before 2026-10-31; original live response NOT freshly downloaded. This is neither full-dataset nor historical-as-of validation.",
+    "sampling": "Five deliberately chosen categorical/time projections from the first 19 unsorted public response rows; nonrandom, unstable ordinal, not independent adjudicated cases.",
+    "projected_source_rows": [
+      {
+        "source_sample_position": 0,
+        "ahvpermitstatus": "AHV Permit Issued",
+        "variancetype": "Initial",
+        "variance_start_date_time": "2026-09-18T18:00:00.000",
+        "variance_end_date_time": "2026-09-18T22:00:00.000"
+      },
+      {
+        "source_sample_position": 3,
+        "ahvpermitstatus": "AHV Permit Issued",
+        "variancetype": "Initial",
+        "variance_start_date_time": "2026-09-19T07:00:00.000",
+        "variance_end_date_time": "2026-09-19T16:00:00.000"
+      },
+      {
+        "source_sample_position": 6,
+        "ahvpermitstatus": "AHV Permit Issued",
+        "variancetype": "Renewal",
+        "variance_start_date_time": "2026-11-17T18:00:00.000",
+        "variance_end_date_time": "2026-11-18T00:00:00.000"
+      },
+      {
+        "source_sample_position": 8,
+        "ahvpermitstatus": "AHV Permit Issued",
+        "variancetype": "Initial",
+        "variance_start_date_time": "2026-09-12T09:00:00.000",
+        "variance_end_date_time": "2026-09-12T17:00:00.000"
+      },
+      {
+        "source_sample_position": 12,
+        "ahvpermitstatus": "AHV Permit Issued",
+        "variancetype": "Renewal",
+        "variance_start_date_time": "2026-10-20T18:00:00.000",
+        "variance_end_date_time": "2026-10-21T00:00:00.000"
+      }
+    ],
+    "projection_columns": [
+      "source_sample_position",
+      "ahvpermitstatus",
+      "variancetype",
+      "variance_start_date_time",
+      "variance_end_date_time"
+    ],
+    "projection_sha256": "5c76701aea15501dd7d800e870f52ec3b75494a2c6274a15d5825657a1bb380d",
+    "projection_hash_method": "SHA256(UTF8(JSON(rows, sort_keys=True, separators=(',', ':'), ensure_ascii=False)))",
+    "raw_http_body_sha256": null,
+    "raw_http_byte_count": null,
+    "raw_http_body_custodied": false,
+    "original_publisher_record_ids_custodied": false,
+    "permit_ids_and_names_saved": 0,
+    "street_addresses_and_coordinates_saved": 0,
+    "record_identity_hashes": null,
+    "source_rows_projected": 5,
+    "asof_utc_date": "2026-10-31",
+    "source_issued_status_count": 5,
+    "selected_renewal_count": 2,
+    "date_window_expired_count": 4,
+    "date_window_future_count": 1,
+    "date_window_current_count": 0,
+    "record_level_dedup_verified": false,
+    "legally_active_permit_outcomes_labeled": 0,
+    "independent_real_world_customer_or_violation_labels": 0,
+    "original_historical_snapshot_verified": false,
+    "actual_commercial_lead_scoring_permitted": false,
+    "source_schema": "OFFICIAL_API_CATEGORICAL_TEMPORAL_PROJECTION_NOT_FULL_24_COLUMN_ROW_OR_CUSTODIED_BODY",
+    "rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "reuse_limitation": "General NYC Open Data reusable; third-party embedded rights and use as commercially scored customer leads remain NOT CLEARED.",
+    "explicit_unknowns": [
+      "UNVERIFIED_LIVE_DATA_FRESHNESS",
+      "ORIGINAL_HTTP_BODY_SHA256",
+      "FULL_ROW_IDENTITY_AND_DEDUP",
+      "EVENT_ASOF_PUBLIC_AVAILABILITY",
+      "ACTUAL_CURRENT_PERMIT_VALIDITY",
+      "INDEPENDENT_PERMIT_VIOLATION_OR_CUSTOMER_LABELS"
+    ],
+    "interpretation": "All five displayed public records have Issued status, but their scheduled windows are four past and one future as of 2026-10-31; this is a source-field timing check, NOT an independent legal status or lead-accuracy benchmark.",
+    "downstream_handoffs": {
+      "permitplate_48": "Treat AHV status and published start/end windows separately; no opportunity scoring until original identity/freshness and independent truth are verified.",
+      "capturebrief_52": "NO_SOLICITATION_OR_AWARD_LABELS",
+      "freightrecovery_12": "NO_FREIGHT_INVOICE_LABELS",
+      "recoveryos_12": "NO_FINANCIAL_RECONCILIATION_LABELS",
+      "qa_44": "Verify exact public API selected response fields and parsed projection digest, account for cached unsorted sample and missing raw HTTP bytes."
+    }
   }
 }
