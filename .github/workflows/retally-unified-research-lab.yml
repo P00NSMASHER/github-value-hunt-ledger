@@ -168,6 +168,7 @@ jobs:
           python -m unittest -q freight.test_research_eval_bridge freight.test_unified_research_ci_contract
           python -m unittest -q freight.test_nyc_dob_source_scope_v1 freight.test_nyc_dob_excluded_scope_v1
           python -m unittest -q freight.test_nyc_dob_oath_ecb_outcome_quality_v1
+          python -m unittest -q freight.test_nyc_dob_ahv_variance_scope_v1
           python -m unittest -q freight.test_treasury_dts_tga_reconciliation_v1
           python -m freight.real_world_eval_v1
           python -m unittest -q freight.test_real_document_lab
