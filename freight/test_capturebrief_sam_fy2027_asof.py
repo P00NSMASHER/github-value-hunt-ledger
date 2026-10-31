@@ -367,6 +367,24 @@ class SamArchiveAsOfTests(unittest.TestCase):
             with self.assertRaisesRegex(ResearchError, "SOURCE_TOO_LARGE"):
                 fetch_original()
 
+    def test_official_daily_public_extract_is_not_archived_fy2027_ground_truth(self):
+        pack = json.loads((Path(__file__).with_name('fixtures') /
+            'capturebrief_fy2027_archive_growth_boundary_v1.json').read_text())
+        lead = pack['adjacent_original_source_discovery']
+        self.assertEqual(lead['catalog_item'], 'ContractOpportunitiesFullCSV.csv')
+        self.assertTrue(lead['catalog_url'].startswith('https://sam.gov/data-services/'))
+        self.assertEqual(lead['cohort'], 'CURRENT_DAILY_PUBLIC_NOT_FY2027_ARCHIVED_HISTORY')
+        self.assertNotEqual(lead['cohort'], pack['source_effective_scope'])
+        self.assertFalse(lead['source_bytes_acquired'])
+        self.assertIsNone(lead['source_response_sha256'])
+        self.assertIsNone(lead['source_row_count'])
+        self.assertEqual(lead['independent_positive_labels'], 0)
+        self.assertEqual(lead['independent_negative_labels'], 0)
+        self.assertIn('COMMERCIAL_REUSE_NOT_CLEARED', lead['rights_classification'])
+        self.assertIn('NO_ACTIVE_DAILY_TO_ARCHIVE_CHRONOLOGY_SUBSTITUTION',
+                      lead['compliance_controls'])
+        self.assertFalse(pack['rights_and_truth']['commercial_scoring_allowed'])
+
     def test_degraded_same_day_cache_and_next_utc_day_replay_are_source_bounded(self):
         # Wholly SYNTHETIC controls. Never contacts SAM.gov or persists raw IDs.
         pack_path = Path(__file__).with_name("fixtures") / (
