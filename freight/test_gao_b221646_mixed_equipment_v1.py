@@ -1,5 +1,4 @@
 """Source-bound GAO B-221646 mixed-validity equipment holdout, no engine calls."""
-import copy
 import json
 import unittest
 from pathlib import Path
