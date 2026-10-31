@@ -562,6 +562,39 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(receipt["source_error_codes"], ["SOURCE_INCOMPLETE"])
         self.assertEqual(read_calls, [MAX_ORIGINAL_BYTES + 1])
 
+    def test_chunked_header_only_and_conflicting_length_fail_closed(self):
+        # Both transport attacks are SYNTHETIC: no original notice fetched.
+        pack = json.loads((Path(__file__).with_name('fixtures') /
+            'capturebrief_fy2027_archive_growth_boundary_v1.json').read_text())
+        control_ids = {c['id'] for c in pack['synthetic_controls']}
+        self.assertIn('SYNTHETIC_FORGED_CHUNKED_HEADER', control_ids)
+        self.assertIn('SYNTHETIC_DUAL_LENGTH_TRANSFER_FRAMING', control_ids)
+        data = archive()
+        for content_length, chunked_reader in ((None, False), (len(data), True)):
+            with self.subTest(content_length=content_length):
+                headers = {'Content-Type': 'text/csv',
+                           'Content-Encoding': 'identity',
+                           'Transfer-Encoding': 'chunked'}
+                if content_length is not None:
+                    headers['Content-Length'] = str(content_length)
+                class Response:
+                    status = 200
+                    chunked = chunked_reader
+                    def __enter__(self): return self
+                    def __exit__(self, *_): return None
+                    def geturl(self): return SOURCE_URL
+                    def read(self, n):
+                        raise AssertionError('must reject before read')
+                response = Response()
+                response.headers = headers
+                class Opener:
+                    def open(self, req, timeout): return response
+                with patch('freight.capturebrief_sam_fy2027_asof.global_dns'):
+                    with patch('freight.capturebrief_sam_fy2027_asof.build_opener',
+                               return_value=Opener()):
+                        with self.assertRaisesRegex(ResearchError, 'SOURCE_INCOMPLETE'):
+                            fetch_original()
+
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
         class Response:
