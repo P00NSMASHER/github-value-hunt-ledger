@@ -115,7 +115,8 @@
     "GSA opportunity-management history calls require authorized contracting roles/system credentials; this pack does not use that API.",
     "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized.",
     "Synthetic-only transport validation repaired two documented reader defects. Real FY2027 original archive readback and source-byte SHA-256 remain UNKNOWN until the existing bounded writer safely reads it; no extra source fetches performed.",
-    "This pack does not independently verify complete FY2027 solicitation/version history or give downstream engine scoring approval."
+    "This pack does not independently verify complete FY2027 solicitation/version history or give downstream engine scoring approval.",
+    "New official SAM.gov Data Services datagov daily-current extract listing is a separate prospective original-data lead; no direct original CSV fetched and no FY2027 archival as-of or award fact may be inferred."
   ],
   "documentation_controls": {
     "verified_date_utc": "2026-10-30",
@@ -150,5 +151,44 @@
     "synthetic_controls": 10,
     "commercial_scoring_allowed": false,
     "post_fix_green_ci": "PENDING_IMMUTABLE_FINAL_HEAD"
+  },
+  "adjacent_original_source_discovery": {
+    "publisher": "U.S. General Services Administration / SAM.gov",
+    "catalog_url": "https://sam.gov/data-services/Contract%20Opportunities/datagov?privacy=Public",
+    "catalog_item": "ContractOpportunitiesFullCSV.csv",
+    "data_type": "PUBLIC_DAILY_CONTRACT_OPPORTUNITIES_ORIGINAL_EXTRACT",
+    "cohort": "CURRENT_DAILY_PUBLIC_NOT_FY2027_ARCHIVED_HISTORY",
+    "schema_reference": "https://sam.gov/data-services",
+    "core_candidate_fields": [
+      "NoticeId",
+      "Sol#",
+      "PostedDate",
+      "Type",
+      "Active"
+    ],
+    "effective_dates": "ROW_SPECIFIC_ORIGINAL_DATES_UNKNOWN_NO_SOURCE_READ",
+    "last_publisher_record_update": "UNKNOWN_NO_SOURCE_READ",
+    "source_bytes_acquired": false,
+    "source_response_sha256": null,
+    "source_response_byte_length": null,
+    "source_row_count": null,
+    "record_id_hashes": null,
+    "license_terms_url": "https://sam.gov/about/terms-of-use",
+    "rights_classification": "PUBLIC_LISTING_ACCESSIBLE_BUT_CONTACT_THIRD_PARTY_AND_COMMERCIAL_REUSE_NOT_CLEARED",
+    "provenance_class": "FIRST_PARTY_PUBLISHER_LISTING_NOT_DIRECT_ORIGINAL_CSV_CUSTODY",
+    "schema_completeness": "UNKNOWN_NO_ACTUAL_ROW_OR_HEADER_READ",
+    "dedup_state": "UNKNOWN_ZERO_ORIGINAL_ROWS",
+    "labeling_completeness": "ZERO_INDEPENDENT_NOTICE_TO_AWARD_AND_ZERO_HISTORIC_ASOF_TRUTH",
+    "independent_positive_labels": 0,
+    "independent_negative_labels": 0,
+    "compliance_controls": [
+      "NO_SCRAPING_OR_LOGIN",
+      "NO_API_KEY_OR_PAID_PROVIDER",
+      "NO_CONTACT_OR_RECIPIENT_PERSONAL_DATA",
+      "NO_REPLAY_WHILE_ORIGINAL_WRITER_IS_SCHEDULED",
+      "NO_ACTIVE_DAILY_TO_ARCHIVE_CHRONOLOGY_SUBSTITUTION"
+    ],
+    "evaluation_eligibility": "SOURCE_LEAD_ONLY_REQUIRES_SCOPE_RIGHTS_AND_ORIGINAL_BYTE_CUSTODY_BEFORE_USE",
+    "discovered_in_research_on": "2026-10-31"
   }
 }
