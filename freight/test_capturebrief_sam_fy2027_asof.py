@@ -440,7 +440,6 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(pack["documentation_controls"]["current_source_framing"],
                          "UNKNOWN_NO_NEW_SOURCE_READ")
 
-    @unittest.expectedFailure
     def test_unframed_csv_prefix_is_an_open_known_failure(self):
         # This synthetic negative deliberately fails against current reader.
         # Source-reader owner must fix it, remove expectedFailure, and show
@@ -523,7 +522,6 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(observed["independent_cross_source_award_outcomes"], 0)
         self.assertEqual(observed["original_opportunity_ids_persisted"], 0)
 
-    @unittest.expectedFailure
     def test_chunked_incomplete_read_must_be_degraded_not_uncaught(self):
         # SYNTHETIC interrupted HTTP/1.1 chunked body: no publisher GET.
         # Pending source-reader owner correction; an unexpected success
