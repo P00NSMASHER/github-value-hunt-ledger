@@ -253,11 +253,11 @@
     }
   ],
   "handoffs": {
-    "freightrecovery_12": "Twelve public historical BOL-tied offsets reversed for TIMELINESS; rate merits NOT decided; do not train overcharge-rate truth.",
-    "recoveryos_12": "Reported Treasury offsets total $137,356.75, but ordered refund != verified bank credit; no customer cash.",
+    "freightrecovery_12": "Twelve public historical BOL-tied offsets reversed for TIMELINESS; rate merits NOT decided; do not train overcharge-rate truth. Official May 5 2010 same-docket reconsideration DENIED, 0 new independent BOLs; preserve 12 rows/1 case cluster.",
+    "recoveryos_12": "Reported Treasury offsets total $137,356.75, but ordered refund != verified bank credit; no customer cash. 2010 followup is not bank receipt or customer money.",
     "permitplate_48": "Not building permit data; never mix these labels.",
     "capturebrief_52": "Not SAM opportunity or government award-history truth.",
-    "independent_QA_44": "Audit original PDF page 3 table, page 8 disposition, row projection SHA256, 12 late intervals, two unequal amounts, same-decision dedup and unknown cash."
+    "independent_QA_44": "Audit original PDF page 3 table, page 8 disposition, row projection SHA256, 12 late intervals, two unequal amounts, same-decision dedup and unknown cash. Independently inspect May 5 2010 CBCA 1317-RATE pages 1 and 3; reject same-docket double-count and GSA rejected ten-year argument."
   },
   "restrictions": {
     "source_commercial_clearance": false,
@@ -269,5 +269,75 @@
     "new_cron_schedules": 0,
     "legacy_15_lab_consolidation_certified": false,
     "release_authorized": false
-  }
+  },
+  "reconsideration_followup": {
+    "publisher": "U.S. Civilian Board of Contract Appeals",
+    "docket": "CBCA 1317-RATE",
+    "decision_date": "2010-05-05",
+    "source_url": "https://www.cbca.gov/files/decisions/2010/GILMORE_05-05-10_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",
+    "official_index_url": "https://www.cbca.gov/decisions/rate.html",
+    "first_party_government_public_decision": true,
+    "source_document_page_count": 3,
+    "visually_checked_pdf_pages_1_based": [
+      1,
+      3
+    ],
+    "evidence_scope": "GSA_REQUEST_TO_RECONSIDER_2009_SAME_DOCKET_12_DEDUCTIONS",
+    "gov_argument": "GSA claimed internal administrative offset under 41 CFR 102-118.640(a) permitted ten years, unlike external deduction under 41 CFR 102-118.640(b)",
+    "outcome": "RECONSIDERATION_DENIED_ORIGINAL_DISPOSITION_RETAINED",
+    "outcome_label_kind": "ORIGINAL_PUBLIC_ADJUDICATION_RECONSIDERATION_ONLY",
+    "previous_outcome_reversed": false,
+    "establishes_actual_refund_paid": false,
+    "actual_refund_paid_cents": null,
+    "additional_distinct_bol_rows": 0,
+    "additional_independent_decision_clusters": 0,
+    "original_invoice_merits_adjudicated": false,
+    "independent_modern_error_label": false,
+    "effective_scope": "2010_RECONSIDERATION_OF_2009_RULING; NO_PRESENT_DAY_RULE_CLEARANCE",
+    "raw_pdf_bytes_custodied": false,
+    "raw_pdf_sha256": null,
+    "raw_pdf_byte_length": null,
+    "source_rights": "FEDERAL_GOVERNMENT_AUTHORED_DECISION_PRESUMPTIVELY_PUBLIC_DOMAIN_NO_ENDORSEMENT",
+    "rights_context_url": "https://www.usa.gov/government-copyright",
+    "third_party_invoice_rights": "UNKNOWN_NOT_CLEARED",
+    "commercial_scoring_clearance": false,
+    "source_quality": "OFFICIAL_INDEX_LINK_AND_WEB_PDF_PAGES_1_AND_3_VISUALLY_CHECKED; RAW_BYTES_NOT_CUSTODIED",
+    "relationship_key": "CBCA/1317-RATE",
+    "original_decision_key": "CBCA/1317-RATE",
+    "followup_document_count": 1,
+    "total_official_decision_documents_in_cluster": 2,
+    "independent_real_invoice_rate_tariff_triplets": 0,
+    "independently_held_out_real_customer_cases": 0,
+    "blind_engine_predictions": 0
+  },
+  "reconsideration_synthetic_controls": [
+    {
+      "id": "SYN_SAME_DOCKET_RECONSIDERATION_DOUBLE_COUNT",
+      "kind": "SYNTHETIC",
+      "scenario": "Count 2009 merits decision and 2010 reconsideration as two independent historical claim clusters or twenty-four BOLs.",
+      "expected": "REJECT_CORRELATED_DUPLICATE_CLUSTER",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_ADMIN_OFFSET_TEN_YEAR_AUTOMATIC_PASS",
+      "kind": "SYNTHETIC",
+      "scenario": "Interpret GSA's rejected ten-year administrative-offset argument as governing outcome for this case.",
+      "expected": "REJECT_REJECTED_PARTY_ARGUMENT_AS_TRUTH",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_RECONSIDERATION_DENIED_EQUALS_REFUND_RECEIVED",
+      "kind": "SYNTHETIC",
+      "scenario": "Treat 2010 reconsideration denial as proof that actual money was returned to carrier bank account.",
+      "expected": "UNKNOWN_REFUND_PAID_UNVERIFIED",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_HISTORICAL_CASE_AUTOMATIC_MODERN_APPLICABILITY",
+      "kind": "SYNTHETIC",
+      "scenario": "Apply old statutory analysis to present-day customer rates without verified legal authority and source contracts.",
+      "expected": "UNKNOWN_MODERN_APPLICABILITY",
+      "independent_original_truth": null
+    }
+  ]
 }
