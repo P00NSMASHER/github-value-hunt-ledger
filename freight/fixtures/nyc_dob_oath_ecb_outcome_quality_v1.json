@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "pack_id": "NYC_DOB_OATH_ECB_OUTCOME_QUALITY_V1",
+  "evaluation_family": "GOVERNMENT_VIOLATION_OUTCOME_SOURCE_QUALITY_NOT_PERMIT_SCORING",
+  "observed_date_utc": "2026-10-31",
+  "canonical_owner": "Unified Engine Evidence Lab / draft PR 883; research writer branch is out of scope",
+  "sources": [
+    {
+      "dataset_id": "jz4z-kudi",
+      "publisher": "NYC Office of Administrative Trials and Hearings (OATH)",
+      "title": "OATH Hearings Division Case Status",
+      "landing_page": "https://data.cityofnewyork.us/d/jz4z-kudi",
+      "official_catalog": "https://catalog.data.gov/dataset/oath-hearings-division-case-status",
+      "first_party_schema": "https://data.cityofnewyork.us/api/views/jz4z-kudi/columns.json",
+      "first_published": "2018-08-24",
+      "catalog_last_updated": "2026-10-27",
+      "source_category": "CASE_STATUS_AND_ADJUDICATION_METADATA",
+      "record_schema_fields_verified": [
+        "issuing_agency",
+        "violation_date",
+        "hearing_status",
+        "hearing_result",
+        "decision_date",
+        "penalty_imposed",
+        "paid_amount",
+        "balance_due"
+      ],
+      "original_json_bytes_sha256": null,
+      "original_case_rows_custodied": 0,
+      "privacy_change_effective": "2026-05-04",
+      "privacy_change": "Four respondent personal/address fields were removed by publisher; never reconstruct or persist identifiers",
+      "rights": "NYC_ADMIN_CODE_23_502_D_OPEN_DATA_NO_GENERAL_USE_RESTRICTION_SUBJECT_TO_PORTAL_TERMS_AND_PRIVACY",
+      "commercial_reuse": "GENERAL_PUBLIC_DATA_REUSE_ALLOWED_SOURCE_SPECIFIC_TERMS_SUBJECT_TO_REVIEW",
+      "commercial_scoring_authorized": false
+    },
+    {
+      "dataset_id": "6bgk-3dad",
+      "publisher": "NYC Department of Buildings (DOB)",
+      "title": "DOB ECB Violations",
+      "landing_page": "https://data.cityofnewyork.us/d/6bgk-3dad",
+      "official_catalog": "https://catalog.data.gov/dataset/dob-ecb-violations",
+      "first_party_schema": "https://data.cityofnewyork.us/api/views/6bgk-3dad/columns.json",
+      "first_published": "2015-12-11",
+      "publisher_page_last_updated": "2026-10-28",
+      "catalog_page_last_updated": "2026-10-20",
+      "source_category": "DOB_SUMMONS_REFERRED_TO_OATH_ECB_NOT_PERMIT_ISSUANCE",
+      "record_schema_fields_verified": [],
+      "original_json_bytes_sha256": null,
+      "original_case_rows_custodied": 0,
+      "rights": "NYC_ADMIN_CODE_23_502_D_OPEN_DATA_NO_GENERAL_USE_RESTRICTION_SUBJECT_TO_PORTAL_TERMS_AND_PRIVACY",
+      "commercial_reuse": "GENERAL_PUBLIC_DATA_REUSE_ALLOWED_SOURCE_SPECIFIC_TERMS_SUBJECT_TO_REVIEW",
+      "commercial_scoring_authorized": false
+    }
+  ],
+  "rights_authorities": [
+    "https://www.nyc.gov/opendata/get-started/FAQs",
+    "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-204577",
+    "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje"
+  ],
+  "metadata_quality_findings": [
+    {
+      "dataset_id": "jz4z-kudi",
+      "field": "violation_date",
+      "source_metadata_largest": "5201-05-12T00:00:00.000",
+      "finding": "PUBLISHER_CACHED_COLUMN_STATISTICS_SHOW_IMPLAUSIBLE_FUTURE_YEAR_NOT_A_VERIFIED_ROW",
+      "handling": "quarantine values later than observation date; raw case not fetched"
+    },
+    {
+      "dataset_id": "jz4z-kudi",
+      "field": "decision_date",
+      "source_metadata_largest": "9997-05-19T00:00:00.000",
+      "finding": "PUBLISHER_CACHED_COLUMN_STATISTICS_SHOW_IMPLAUSIBLE_FUTURE_YEAR_NOT_A_VERIFIED_ROW",
+      "handling": "quarantine values later than observation date; raw case not fetched"
+    },
+    {
+      "dataset_id": "jz4z-kudi",
+      "field": "hearing_result",
+      "source_metadata_examples": [
+        "SUSTAINED",
+        "Sustained",
+        "DISMISSED",
+        "IN VIOLATION"
+      ],
+      "finding": "CASE_VARIANT_AND_DECISION_TAXONOMY_REQUIRE_NORMALIZATION_AND_APPEAL_REVIEW"
+    },
+    {
+      "dataset_id": "jz4z-kudi",
+      "field": "hearing_status",
+      "source_metadata_examples": [
+        "PAID IN FULL",
+        "WRITTEN OFF",
+        "HEARING COMPLETED",
+        "APPEAL DECIS RENDERD"
+      ],
+      "finding": "STATUS_NOT_EQUIVALENT_TO_FINAL_JUDGMENT_OR_BANK_CASH"
+    }
+  ],
+  "source_labeling": {
+    "real_case_rows_examined": 0,
+    "real_joined_dob_oath_pairs": 0,
+    "real_independent_adjudication_labels": 0,
+    "real_independent_negative_labels": 0,
+    "independent_customer_cash_events": 0,
+    "source_availability_asof_truth": "UNKNOWN",
+    "permit_issuance_truth": "UNKNOWN",
+    "heldout_real_cases": 0,
+    "benchmark_accuracy": null,
+    "benchmark_recall": null
+  },
+  "privacy": {
+    "person_names_persisted": false,
+    "respondent_addresses_persisted": false,
+    "ticket_numbers_persisted": false,
+    "case_document_bytes_persisted": false,
+    "source_row_data_persisted": false
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTH_STATUS_ONLY",
+      "split": "calibration",
+      "claim": "HEARING_STATUS_PROVES_FINAL_ADJUDICATION",
+      "facts": {
+        "hearing_status": "HEARING COMPLETED",
+        "hearing_result": null
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_DISMISSAL",
+      "split": "calibration",
+      "claim": "DISMISSED_REQUIRES_POSITIVE_PENALTY",
+      "facts": {
+        "hearing_result": "DISMISSED",
+        "penalty_imposed": "500"
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_ASSESSMENT",
+      "split": "calibration",
+      "claim": "PENALTY_ASSESSMENT_IS_CLEARED_CASH",
+      "facts": {
+        "penalty_imposed": "700",
+        "paid_amount": "0"
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_SENTINEL_VIOLATION",
+      "split": "calibration",
+      "claim": "FUTURE_DATE_IS_VALID_HISTORICAL_CASE",
+      "facts": {
+        "field": "violation_date",
+        "date": "5201-05-12"
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_APPEAL_UNREVIEWED",
+      "split": "synthetic_holdout",
+      "claim": "UNREVIEWED_APPEAL_IS_FINAL_OUTCOME",
+      "facts": {
+        "hearing_status": "APPEAL DECIS RENDERD",
+        "hearing_result": "SUSTAINED"
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_PAID_AMOUNT",
+      "split": "synthetic_holdout",
+      "claim": "OFFICIAL_PAID_FIELD_IS_CUSTOMER_RECOVERY",
+      "facts": {
+        "paid_amount": "200",
+        "balance_due": "0"
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_REMOVED_PII",
+      "split": "synthetic_holdout",
+      "claim": "REMOVED_PII_FIELDS_ARE_STILL_AUTHORIZED",
+      "facts": {
+        "privacy_change_effective": "2026-05-04"
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_SENTINEL_DECISION",
+      "split": "synthetic_holdout",
+      "claim": "FUTURE_DATE_IS_VALID_HISTORICAL_CASE",
+      "facts": {
+        "field": "decision_date",
+        "date": "9997-05-19"
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_UNVERIFIED_JOIN",
+      "split": "synthetic_holdout",
+      "claim": "CROSS_DATASET_JOIN_PROVES_SAME_CASE",
+      "facts": {
+        "dob_source": "6bgk-3dad",
+        "oath_source": "jz4z-kudi",
+        "independent_join_verified": false
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_RESULT_CASE",
+      "split": "synthetic_holdout",
+      "claim": "CASE_VARIANTS_ARE_DIFFERENT_OUTCOMES",
+      "facts": {
+        "a": "SUSTAINED",
+        "b": "Sustained"
+      },
+      "expected_guard": "REJECT",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_ZERO_BALANCE",
+      "split": "synthetic_holdout",
+      "claim": "ZERO_BALANCE_PROVES_BANK_SETTLEMENT",
+      "facts": {
+        "balance_due": "0",
+        "paid_amount": null
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    },
+    {
+      "id": "SYNTH_NO_PERMIT_JOIN",
+      "split": "synthetic_holdout",
+      "claim": "NO_OATH_RECORD_MEANS_NO_PERMIT",
+      "facts": {
+        "cross_source_join": null,
+        "permit_record": null
+      },
+      "expected_guard": "UNKNOWN",
+      "independent_real_label": null,
+      "kind": "SYNTHETIC_NOT_ORIGINAL_CASE",
+      "truth_source": "RESEARCH_AUTHORED_SAFETY_EXPECTATION"
+    }
+  ],
+  "benchmark_readiness": "SOURCE_SCHEMA_AND_RISK_ONLY_NO_ORIGINAL_CASE_ROW_CUSTODY_NO_INDEPENDENT_HOLDOUT",
+  "limitations": [
+    "Official DOB-issued summonses and OATH dispositions are distinct event streams, not issued permit decisions.",
+    "OATH hearing_result, hearing_status, assessed penalty, paid_amount and bank settlement are different evidence types.",
+    "The public case-status dataset is mutable, with no guaranteed immutable historical as-of snapshot; prohibit look-ahead leakage.",
+    "Publisher cached column statistics are not independently adjudicated row-level ground truth.",
+    "A public dataset's general reuse rights do not establish customer consent, a lawful use for personal data or scoring suitability.",
+    "No source-byte SHA-256, commercial scoring permission, identity join, genuine holdout accuracy or customer cash has been established."
+  ],
+  "downstream_handoffs": {
+    "permitplate": "RESEARCH_ONLY_JOIN_AND_OUTCOME_QUALITY_CONTROLS_NOT_SCORING_APPROVAL",
+    "capturebrief": "NO_AWARD_OR_PREAWARD_LABELS",
+    "freightrecovery": "NO_FREIGHT_BILLING_LABELS",
+    "recoveryos": "NO_ACCOUNTING_CASH_TRUTH",
+    "qa": "EXACT_HEAD_SOURCE_AND_SYNTHETIC_REGRESSION_REVIEW_HOLD"
+  }
+}
