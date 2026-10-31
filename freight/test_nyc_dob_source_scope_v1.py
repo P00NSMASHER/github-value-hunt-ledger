@@ -196,5 +196,119 @@ class NYCDOBOccupancyBoundaryTest(unittest.TestCase):
         self.assertTrue(p['no_new_data_services'])
 
 
+class NYCDOBBISAndPublisherReadbackBoundaryTest(unittest.TestCase):
+    """One pinned real publisher receipt plus separate metadata-only BIS source."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (FIXTURE.parent / 'nyc_dob_bis_filing_and_now_replay_boundary_v1.json')
+            .read_text(encoding='utf-8'))
+
+    @staticmethod
+    def guarded_interpretation(case):
+        claim, facts = case['claim'], case['facts']
+        if claim == 'BIS_NONMATCH_PROVES_NO_NYC_JOB':
+            return ('UNKNOWN_SOURCE_EXCLUDES_DOB_NOW' if facts['dob_now_excluded']
+                    else 'UNKNOWN_NO_INDEPENDENT_CITYWIDE_NEGATIVE')
+        if claim == 'BIS_JOB_APPROVAL_PROVES_ISSUED_PERMIT':
+            return ('UNKNOWN_APPLICATION_NOT_PERMIT_ISSUANCE'
+                    if facts['event_type'] == 'BIS_JOB_APPLICATION'
+                    else 'UNKNOWN_SOURCE_EVENT_TYPE')
+        if claim == '20_ROWS_PROVE_20_UNIQUE_PERMITS':
+            if facts['published_sample_rows'] != facts['observed_distinct_source_identities']:
+                return 'REJECT_ROW_COUNT_AND_PERMIT_COUNT_CONFUSION'
+            return 'UNKNOWN_SOURCE_IDENTITIES_NOT_ISSUED_PERMITS'
+        if claim == 'THREE_MATCHING_SOURCE_READS_ARE_INDEPENDENT_ISSUANCE_LABELS':
+            return ('REJECT_SOURCE_READBACK_AS_INDEPENDENT_ADJUDICATION'
+                    if facts['repeat_gets_exact_match'] > 0 and facts['independent_labels'] == 0
+                    else 'UNKNOWN_INDEPENDENT_LABEL_VERIFICATION')
+        if claim == 'LATEST_ACTION_DATE_PROVES_PAST_ASOF_STATE':
+            return ('UNKNOWN_NO_IMMUTABLE_HISTORIC_ASOF'
+                    if facts['historic_immutable_snapshot_custodied'] is False
+                    else 'UNKNOWN_SNAPSHOT_NEEDS_SOURCE_TRUTH')
+        if claim == 'TWO_DOCUMENTS_SAME_JOB_ARE_TWO_ISSUED_PERMITS':
+            return ('UNKNOWN_JOB_DOCUMENT_MULTIPLICITY_NOT_PERMIT_COUNT'
+                    if len(facts['doc_keys']) > 1 and not facts['permit_registry_match']
+                    else 'UNKNOWN_NO_INDEPENDENT_PERMIT_IDENTITY')
+        raise ValueError('Unrecognized synthetic control: ' + claim)
+
+    def test_original_source_is_official_not_community_view_and_excludes_now(self):
+        p = self.pack
+        self.assertEqual(p['schema_version'], 1)
+        self.assertEqual(p['newly_reviewed_official_source']['official_dataset_id'], 'ic3t-wcy2')
+        s = p['newly_reviewed_official_source']
+        self.assertEqual(s['first_published_date'], '2013-04-18')
+        self.assertEqual(s['metadata_last_updated_as_reported'], '2026-10-25')
+        self.assertEqual(s['source_excludes'], 'ALL_DOB_NOW_JOBS')
+        self.assertEqual(s['event_type'], 'BIS_JOB_APPLICATION_NOT_ISSUED_PERMIT')
+        self.assertTrue({'job__', 'doc__', 'job_status', 'latest_action_date'}
+                        .issubset(set(s['publisher_documented_api_fields'])))
+        self.assertEqual(s['original_data_rows_downloaded'], 0)
+        self.assertIsNone(s['raw_http_source_bytes_sha256'])
+        self.assertIsNone(s['raw_http_response_byte_count'])
+        self.assertFalse(p['legal_and_rights']['commercial_scoring_authorized'])
+        self.assertFalse(p['legal_and_rights']['supplemental_dataset_or_provider_terms_individually_cleared'])
+
+    def test_original_publisher_receipt_pinned_and_arithmetic_not_accuracy(self):
+        r = self.pack['existing_original_publisher_readback']
+        self.assertEqual(r['immutable_producer_branch_snapshot_sha'],
+                         'c3eec27209b28003f1bedb92589901547784625b')
+        self.assertEqual(r['immutable_producer_receipt_git_blob_sha1'],
+                         '22ed65ca9c41057637598c19387a5d68b86f0657')
+        self.assertEqual(r['producer_receipt_sha256'],
+                         'fc60356829cc334280f31e8e0b8864bda561b1707ab3be934f18387e218e931b')
+        self.assertEqual(r['producer_canonical_sample_sha256'],
+                         '83ddeacca71e2034815021ca608b6ffc69fb2751eb16977d4e668698c529c9eb')
+        self.assertEqual(r['sampled_publisher_rows'], r['sample_unique_source_identities'] +
+                         r['sample_repeated_source_rows'])
+        self.assertEqual((r['sampled_publisher_rows'], r['sample_unique_source_identities'],
+                          r['sample_repeated_source_rows']), (20, 19, 1))
+        self.assertEqual((r['repeat_gets_checked'], r['repeat_gets_exact_match']), (3, 3))
+        self.assertEqual(r['publisher_sample_state'], 'PUBLISHER_REPLAY_DEGRADED')
+        self.assertIn('DUPLICATE_SOURCE_IDENTITIES', r['publisher_sample_error_codes'])
+        self.assertEqual(r['independent_permit_issuance_outcome_labels'], 0)
+        self.assertEqual(r['independent_buyer_opportunity_labels'], 0)
+        self.assertIsNone(r['raw_http_source_body_sha256'])
+        self.assertEqual(r['original_records_embedded_in_this_pack'], 0)
+        self.assertTrue(self.pack['benchmark_readiness']['repeat_source_identity_is_not_automatically_duplicate_legal_permit'])
+        self.assertIsNone(self.pack['benchmark_readiness']['permit_scoring_precision'])
+        self.assertIsNone(self.pack['benchmark_readiness']['permit_scoring_recall'])
+
+    def test_red_naive_inference_green_guard_on_six_synthetic_cases(self):
+        cases = self.pack['synthetic_negative_controls']
+        self.assertEqual(len(cases), 6)
+        self.assertEqual(len({x['id'] for x in cases}), len(cases))
+        self.assertEqual(sum(x['split'] == 'synthetic_holdout' for x in cases), 4)
+        for row in cases:
+            with self.subTest(control=row['id']):
+                # The naive baseline accepts the untrusted claim as proven.
+                naive = 'CLAIM_PROVED'
+                guarded = self.guarded_interpretation(row)
+                self.assertNotEqual(naive, row['expected'])  # red naive baseline
+                self.assertEqual(guarded, row['expected'])  # green fixture guard
+                self.assertEqual(row['provenance'], 'SYNTHETIC_NOT_REAL_PUBLISHER_ROW')
+                self.assertIsNone(row['real_independent_label'])
+
+    def test_publisher_data_quality_not_independent_or_commercial_proof(self):
+        b = self.pack['benchmark_readiness']
+        self.assertTrue(b['existing_publisher_sample_dedup_arithmetic_reconciles'])
+        self.assertFalse(b['underlying_source_receipt_independently_recollected_for_this_pack'])
+        self.assertEqual((b['synthetic_calibration_cases'], b['synthetic_heldout_cases']), (2, 4))
+        self.assertEqual((b['independent_real_world_heldout_positive_labels'],
+                          b['independent_real_world_heldout_negative_labels']), (0, 0))
+        self.assertIsNone(b['real_heldout_accuracy'])
+        self.assertIsNone(b['field_extraction_accuracy'])
+        self.assertEqual(set(self.pack['engine_handoffs']),
+                         {'permitplate_48', 'freightrecovery_12', 'recoveryos_12',
+                          'capturebrief_52', 'independent_qa_44'})
+        safety = self.pack['safety']
+        self.assertEqual(safety['official_source_access_requests_added_to_ci'], 0)
+        self.assertEqual(safety['customer_medical_student_private_records_saved'], 0)
+        self.assertFalse(safety['legacy_15_lab_consolidation_certified'])
+        self.assertFalse(safety['product_code_modified'])
+
+
+
 if __name__ == '__main__':
     unittest.main()
