@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-10-30",
+  "as_of_utc_date": "2026-10-31",
   "commercial_recovery_allowed": false,
   "cross_engine_shared_pointers": 8,
   "customer_communication_actions": 0,
@@ -50,7 +50,7 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 141,
+  "first_seen_in_last_seven_calendar_days": 37,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-10-30",
   "limitations": [

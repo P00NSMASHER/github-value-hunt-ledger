@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-10-30",
+  "as_of_utc_date": "2026-10-31",
   "buyer_opportunity_truth": false,
   "contract_award_window": [
     "2025-10-01",
@@ -35,14 +35,14 @@
   "publisher_readbacks_unavailable": 2,
   "publisher_source_anchor_id": "c95ab3d08065c413405b611483719c147a03d675d8d736ed2321a924f368421e",
   "realized_recovery_cents": 0,
-  "receipt_sha256": "6996793795cb2573d39fe55b925e79b72cd74a255f33952f6060ff7668d5c2c5",
+  "receipt_sha256": "a97b262cbe444d84c6970f3abf9058631b50e362c558bc97fc53a4d8d39076ff",
   "recipient_identifiers_stored": 0,
   "repeated_source_rows": 0,
-  "sample_net_awarded_amount_minor": 46679171398500,
+  "sample_net_awarded_amount_minor": 46766721169849,
   "sample_rows": 12,
   "schema_version": 1,
   "scope": "ORIGINAL_FEDERAL_CONTRACT_AWARD_SAME_PUBLISHER_READBACK_ONLY",
-  "source_canonical_sample_sha256": "95b44cf192bfca220087cef69a63722308322b8d2e9d5b0cdf98507c6327412e",
+  "source_canonical_sample_sha256": "1ca75cbe305bc8617d72ff7c482695ca62015b6bbad8143ee02959c02ad190f6",
   "source_endpoint_type": "USA_SPENDING_V2_PUBLIC_AWARD_SEARCH",
   "source_errors": [
     "READBACK_INCOMPLETE"
