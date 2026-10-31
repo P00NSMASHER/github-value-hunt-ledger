@@ -1,0 +1,28 @@
+/* Freight Recovery 16.0 local evidence preparation, responsive and accessible. */
+.v16-preflight-section{background:#eaf1ea;color:#16362c;padding:80px 0}
+.v16-preflight-grid{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1fr);gap:clamp(28px,5vw,90px);align-items:start}
+.v16-preflight-copy h2{font:400 clamp(37px,5vw,64px)/1.05 Instrument,Georgia,serif;max-width:14ch;margin:12px 0 23px}
+.v16-preflight-copy p{max-width:54ch;line-height:1.65;color:#37584a}
+.v16-preflight-copy .eyebrow{color:#15523c;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+.v16-preflight-copy .button{display:inline-flex;margin:17px 0}
+.v16-preflight-legal{font-size:.76rem!important;line-height:1.55!important;color:#4c6a58!important}
+.v16-preflight-panel{border:1px solid #b4ccb9;border-radius:22px;background:#fffdf7;box-shadow:0 28px 70px #18382923;padding:24px}
+.v16-preflight-panel[hidden],.v16-preflight-panel [hidden]{display:none!important}
+.v16-preflight-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #d4e0d4;padding:0 0 15px}
+.v16-preflight-top strong{color:#164731;font-weight:800}
+.v16-preflight-top span{font-size:12px;color:#597461}
+.v16-preflight-panel fieldset{border:0;padding:0;margin:17px 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v16-preflight-panel legend{grid-column:1/-1;font-size:1.08rem;font-weight:750;margin-bottom:14px;color:#174831}
+.v16-preflight-panel label{font-size:.8rem;line-height:1.38;font-weight:750;color:#23543d;min-width:0}
+.v16-preflight-panel select,.v16-preflight-panel textarea{width:100%;min-width:0;margin-top:7px;min-height:47px;padding:10px 12px;border:1px solid #aac1ad;border-radius:10px;background:#fff;color:#163c2e;font:inherit;font-size:.84rem}
+.v16-preflight-panel :is(select,textarea):focus-visible{outline:3px solid #78aa90;outline-offset:3px}
+.v16-preflight-result{margin:22px 0;padding:16px;background:#ecf4eb;border:1px solid #bdcfbf;border-radius:13px}
+.v16-preflight-result strong{font-size:.83rem;color:#20573f}
+.v16-preflight-result p{font-size:.81rem;color:#47654e;line-height:1.5;margin:8px 0 0}
+.v16-preflight-actions{display:flex;flex-wrap:wrap;gap:10px}
+.v16-preflight-actions button{min-height:44px;padding:11px 14px;font-size:.78rem}
+.v16-preflight-panel [data-v16-copy-status]{min-height:1.3em;margin:9px 0;font-size:.75rem;color:#26543e}
+.v16-preflight-panel [data-v16-fallback] textarea{min-height:155px;font:500 .75rem/1.5 monospace}
+.v16-preflight-noscript{padding:15px;background:#fff9e8;color:#293b2f}
+@media(max-width:900px){.v16-preflight-grid{grid-template-columns:1fr}.v16-preflight-copy h2{max-width:20ch}}
+@media(max-width:560px){.v16-preflight-section{padding:54px 0}.v16-preflight-panel{padding:17px 14px}.v16-preflight-panel fieldset{grid-template-columns:1fr}.v16-preflight-actions{display:grid;grid-template-columns:1fr}.v16-preflight-actions button{width:100%}}

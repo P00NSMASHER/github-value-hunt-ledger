@@ -92,6 +92,8 @@ TEXT_SOURCE_FILES = (
     "site.css",
     "foundry.css",
     "site.js",
+    "v16-evidence-preflight.js",
+    "v16-evidence-preflight.css",
     "worksheet.js",
     "ltl-evidence-comparator.js",
     "commercial-config.js",

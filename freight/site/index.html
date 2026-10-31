@@ -8,6 +8,8 @@
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="freight-contact-email" content="">
   <meta name="site-release" content="free-audit-contingency-v5">
+  <meta name="freight-product-version" content="16.0.0">
+  <meta name="freight-release-scope" content="public-evidence-preflight-only">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
   <title>Freight Invoice Audit &amp; Overcharge Recovery | RETALLY</title>
@@ -30,9 +32,11 @@
   <link rel="preload" href="assets/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" as="image" href="assets/images/terminal-blue-hour.webp" imagesrcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w" imagesizes="100vw" fetchpriority="high">
   <link rel="stylesheet" href="site.css?v=free-audit-contingency-v5">
+  <link rel="stylesheet" href="v16-evidence-preflight.css?v=1">
   <link rel="stylesheet" href="foundry.css?v=retally-type-20261008">
   <script src="commercial-config.js?v=free-audit-contingency-v5" defer></script>
   <script src="site.js?v=free-audit-contingency-v5" defer></script>
+  <script src="v16-evidence-preflight.js?v=1" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -108,7 +112,7 @@
         <p class="eyebrow light">Independent freight invoice review</p>
         <h1 id="hero-title"><span class="hero-phrase">Find it.</span> <span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em></h1>
         <p class="lead">Review historical freight charges against the rates, shipment records and credits that should govern them. RETALLY documents supportable findings and helps pursue recovery with your approval.</p>
-        <div class="actions"><a class="button button-signal" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a><a class="button button-ghost" href="freight-invoice-audit-checklist.html#worksheet" aria-label="Open the free printable 15-point freight invoice audit worksheet">Free 15-Point Worksheet</a></div>
+        <div class="actions"><a class="button button-signal" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a><a class="button button-ghost" href="freight-invoice-audit-checklist.html#worksheet" aria-label="Open the free printable 15-point freight invoice audit worksheet">Free 15-Point Worksheet</a><a class="text-link text-link-light" href="#evidence-preflight">Check evidence readiness →</a></div>
         <ul class="hero-proof" aria-label="Offer safeguards"><li><strong>$0</strong> upfront audit fee</li><li>Human-reviewed findings</li><li>No recovery, no recovery fee</li></ul>
       </div>
       <aside class="opportunity-card" aria-label="Sample audit">
@@ -128,6 +132,49 @@
         <li><span>02</span><h3>Review the findings</h3><p>See billing errors backed by invoices and rate terms.</p></li>
         <li><span>03</span><h3>Authorize recovery</h3><p>You approve claims. We track credits and refunds.</p></li>
       </ol>
+    </div>
+  </section>
+
+  <section class="section v16-preflight-section" id="evidence-preflight" aria-labelledby="v16-preflight-title">
+    <div class="wrap v16-preflight-grid">
+      <div class="v16-preflight-copy">
+        <p class="eyebrow">Freight Recovery 16.0 · Public evidence preparation</p>
+        <h2 id="v16-preflight-title">Can you trace the original bill to the right rate?</h2>
+        <p>Find out what proof an independent freight auditor will ask for before any secure data transfer. Six questions expose document gaps, disputed facts and prior credits.</p>
+        <p><strong>No files, names, amounts or private freight data belong here.</strong> This worksheet is local to your browser. It never reads your documents or produces a verified overcharge, recovery figure, fee or eligibility decision.</p>
+        <a class="button button-dark" href="#start-audit">Request a free, scoped audit</a>
+        <p class="v16-preflight-legal">RETALLY checks original invoices, effective contracts, shipment evidence and settlement records only after a governed private engagement. An unchecked box does not mean an error occurred.</p>
+      </div>
+      <div class="v16-preflight-panel" data-v16-preflight hidden aria-label="Local freight evidence checklist">
+        <div class="v16-preflight-top"><strong>Buyer-marked checklist</strong><span>Unverified · Local only</span></div>
+        <fieldset>
+          <legend>What original evidence do you have available?</legend>
+          <label>Original carrier invoice
+            <select data-v16-field="invoice"><option value="unchecked">Not checked</option><option value="located">Source available</option><option value="missing">Not available</option><option value="conflict">Conflicting copies</option></select>
+          </label>
+          <label>Effective signed tariff or contracted rate
+            <select data-v16-field="rate"><option value="unchecked">Not checked</option><option value="located">Source available</option><option value="missing">Not available</option><option value="conflict">Conflicting versions</option></select>
+          </label>
+          <label>Shipment facts (BOL, POD or accepted measurements)
+            <select data-v16-field="shipment"><option value="unchecked">Not checked</option><option value="located">Source available</option><option value="missing">Not available</option><option value="conflict">Conflicting facts</option></select>
+          </label>
+          <label>Evidence of what was actually paid or credited
+            <select data-v16-field="payment"><option value="unchecked">Not checked</option><option value="located">Source available</option><option value="missing">Not available</option><option value="conflict">Conflicting amounts</option></select>
+          </label>
+          <label>Prior incumbent claims, adjustments or refunds
+            <select data-v16-field="incumbent"><option value="unchecked">Not checked</option><option value="located">History accounted for</option><option value="missing">History not available</option><option value="conflict">Conflicting history</option></select>
+          </label>
+          <label>Identifiable invoice and shipment reference
+            <select data-v16-field="identity"><option value="unchecked">Not checked</option><option value="located">Source references available</option><option value="missing">References missing</option><option value="conflict">Conflicting identifiers</option></select>
+          </label>
+        </fieldset>
+        <div class="v16-preflight-result" role="status" aria-live="polite"><strong data-v16-state>DOCUMENT REVIEW REQUIRED</strong><p data-v16-explanation>No sources have been independently verified.</p></div>
+        <div class="v16-preflight-actions"><button type="button" class="button button-dark" data-v16-copy>Copy unverified checklist</button><button type="button" class="button button-outline" data-v16-reset>Reset</button></div>
+        <p data-v16-copy-status role="status" aria-live="polite"></p>
+        <div data-v16-fallback hidden><label for="v16-manual">Complete checklist for manual copying</label><textarea id="v16-manual" readonly rows="12"></textarea></div>
+        <p class="v16-preflight-legal">Even a complete buyer-marked checklist is not a validated rate error, accepted claim, independently verified recovery, or customer authorization.</p>
+      </div>
+      <noscript><p class="v16-preflight-noscript">JavaScript is off. Review the <a href="freight-invoice-audit-checklist.html">printable audit worksheet</a> or request a free audit below. Nothing is submitted by this checklist.</p></noscript>
     </div>
   </section>
 
