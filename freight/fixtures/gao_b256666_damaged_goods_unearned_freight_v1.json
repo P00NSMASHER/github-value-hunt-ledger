@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B256666_UNEARNED_FREIGHT_DAMAGE_CAUSE_V1",
+  "evaluation_family": "HISTORICAL_ADJUDICATED_FREIGHT_CHARGE_CAUSE_CLASSIFICATION_NOT_MODERN_RATE_RECOVERY",
+  "scope": "PUBLIC_GAO_DECISION_LEVEL_LABEL_AND_SYNTHETIC_CONTROLS_ONLY",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-256666",
+    "published_at": "1994-12-08",
+    "original_decision_url": "https://www.gao.gov/products/b-256666",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_US_PUBLIC_DOMAIN_MATERIAL_WITH_CITATION_AND_NO_ENDORSEMENT; THIRD_PARTY_CONTENT_REQUIRES_OWN_RIGHTS",
+    "commercial_research_reuse": "GAO_AUTHORED_DECISION_TEXT_REUSABLE_WITH_CITATION; NO_LICENSE_TO_ORIGINAL_CARRIER_DOCS_OR_COMMERCIAL_CUSTOMER_SCORING",
+    "case_year": 1991,
+    "source_schema": "GAO_HTML_LEGAL_DECISION_NARRATIVE; DECISION_LEVEL_NOT_ROW_LEVEL_INVOICE",
+    "source_document_response_sha256": null,
+    "source_document_response_length_bytes": null,
+    "source_original_http_bytes_custodied": false,
+    "original_GBL_or_invoice_or_carrier_tender_bytes_custodied": false,
+    "shipper_or_service_member_PII_copied": false,
+    "terms_checked_at_utc": "2026-10-31",
+    "decision_source_review": "OFFICIAL_PUBLISHER_HTML_DECISION_TEXT_LINES_259_280; NO_ORIGINAL_RESPONSE_BYTE_DIGEST",
+    "independent_original_document_readbacks": 0
+  },
+  "adjudication": {
+    "canonical_case_key": "GAO/B-256666",
+    "carrier": "Foremost Forwarders, Inc.",
+    "shipment_delivery_year": 1991,
+    "amount_freight_charges_setoff_cents": 9653,
+    "amount_independent_customer_bank_clearing_cents": null,
+    "amount_independently_settled_customer_recovery_cents": null,
+    "amount_loss_damage_claim_cents": null,
+    "governing_referenced_rule": "49 CFR 1056.15 AS INTERPRETED IN GAO 1994 DECISION; NOT A CURRENT LAW CERTIFICATION",
+    "observed_issue": "UNEARNT_FREIGHT_CHARGES_ON_IN_TRANSIT_DESTROYED_OR_USELESS_HOUSEHOLD_GOODS",
+    "finding": "GAO_AFFIRMED_DFAS_RECOUPMENT_BY_SETOFF_OF_9653_CENTS",
+    "adjudicated_charge_cause": "DAMAGE_RELATED_UNEARNED_FREIGHT_NOT_RATE_OR_TARIFF_MISAPPLICATION",
+    "carrier_refund_requested": "CARRIER_REFUND_OF_GOVERNMENT_SETOFF_DENIED",
+    "proof_available": "GAO_DECISION_NARRATIVE_AND_GAO_LEGAL_FINDING",
+    "proof_missing": [
+      "RAW_GBL",
+      "CARRIER_INVOICE",
+      "DELIVERY_DAMAGE_REPORT",
+      "DAMAGE_ESTIMATE",
+      "BANK_CLEARING",
+      "CURRENT_TARIFF_OR_TENDER"
+    ],
+    "rate_table_or_directional_tender_overcharge_proved": false,
+    "modern_rate_entitlement_proved": false
+  },
+  "contrast": {
+    "comparison_source_id": "GAO/B-238818",
+    "comparison_url": "https://www.gao.gov/products/b-238818",
+    "comparison_1991_rate_overcharge_cents": 166140,
+    "comparison_cause": "TENDER_ORIGIN_DESTINATION_DIRECTION_MISMATCH",
+    "this_decision_cause": "DAMAGE_RELATED_UNEARNED_FREIGHT_CHARGES",
+    "independent_decision_level_historical_labels": 2,
+    "distinct_original_publishers": 1,
+    "actual_independent_customer_invoice_rate_triplets": 0,
+    "independent_modern_heldout_samples": 0,
+    "product_engine_predictions_executed": 0,
+    "naive_all_setoffs_equal_rate_overcharge_wrong_causes_in_pair": 1,
+    "source_selected_convenience_pair_not_statistical_sample": true,
+    "real_customer_precision": null,
+    "real_customer_recall": null
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTH_TARIFF_FALSE_ATTRIBUTION",
+      "split": "calibration",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "TARIFF_RATE_ERROR",
+      "expected": "REJECT_WRONG_CAUSE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_CARRIER_DAMAGE_NOT_ANY_RATE_ERROR",
+      "split": "calibration",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "MERE_DAMAGE_IS_TARIFF_ERROR",
+      "expected": "REJECT_WRONG_CAUSE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_UNVERIFIED_CASH",
+      "split": "calibration",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "BANK_CLEARED_CASH",
+      "expected": "UNKNOWN_NO_BANK_PROOF",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_SETOFF_IS_NOT_CUSTOMER_RECEIPT",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "RETALLY_CUSTOMER_RECOVERY",
+      "expected": "UNKNOWN_NO_CUSTOMER_CASE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_NO_ORIGINAL_INVOICE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "ORIGINAL_INVOICE_CUSTODIED",
+      "expected": "UNKNOWN_NO_ORIGINAL_BYTES",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAW_REUSED_2026",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "CURRENT_2026_REGULATORY_ENTITLEMENT",
+      "expected": "UNKNOWN_HISTORICAL_SCOPE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_DUPLICATED_GAO_DECISION",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "TWO_INDEPENDENT_DECISIONS_FROM_DUPLICATE",
+      "expected": "REJECT_DUPLICATE_DECISION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_GAO_DECISION_MISSING",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "candidate_claim": "DEFINITIVE_UNEARNED_FREIGHT_WITHOUT_GAO_FINDING",
+      "expected": "UNKNOWN_NO_ADJUDICATION",
+      "independent_real_label": null
+    }
+  ],
+  "handoffs": {
+    "freightrecovery_12": "ONE_GAO_HISTORICAL_UNEARNED_FREIGHT_DAMAGE_CAUSE; NOT A TENDER_RATE_OVERCHARGE; RETAIN HISTORICAL_ONLY; NO ENGINE CHANGE",
+    "recoveryos_12": "DFAS_REPORTED_SETOFF_IS_NOT_BANK_CLEARED_RECOVERY_FOR_A_RETALLY_CUSTOMER",
+    "permitplate_48": "NO_PERMIT_DATA_OR_SCORING_LABEL",
+    "capturebrief_52": "NO_SAM_NOTICE_OR_AWARD_LABEL; SAME_SOURCE_ADJUDICATION_IS_NOT_GOVERNMENT_AWARD_PROOF",
+    "qa_44": "INDEPENDENTLY_RECHECK_GAO_TEXT_AND_AMOUNT, DE-DUP GAO/B-256666, PROVE 8 SYNTHETIC CONTROLS, VERIFY EXACT_HEAD_CI_AND_BLOB_HASH"
+  },
+  "restrictions": {
+    "no_personal_data": true,
+    "no_new_paid_calls": true,
+    "no_new_schedules": true,
+    "no_engine_code_changes": true,
+    "no_production_changes": true,
+    "no_writer_branch_changes": true,
+    "legacy_15_lab_consolidation_certified": false,
+    "commercial_customer_scoring_allowed": false,
+    "release_authorized": false
+  }
+}
