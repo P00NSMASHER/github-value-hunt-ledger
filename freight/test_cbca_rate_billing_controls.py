@@ -205,5 +205,118 @@ class CBCARealGovernmentBillingDecisionTests(unittest.TestCase):
                 self.assertEqual(strict.externally_verified_cash_recovered_cents,0)
 
 
+
+class CBCA1317PublicOffsetsEvidence(unittest.TestCase):
+    """One source-bound CBCA cluster with 12 correlated public table rows."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (Path(__file__).parent / "fixtures" /
+             "cbca_1317_rate_public_bol_offsets_v1.json").read_text(encoding="utf-8"))
+
+    @staticmethod
+    def timeliness(row):
+        from datetime import date
+        paid, deducted = row.get("bill_paid_on"), row.get("treasury_deducted_on")
+        if not paid or not deducted:
+            return "UNKNOWN_NO_TIMELINESS_LABEL"
+        paid_date, deducted_date = date.fromisoformat(paid), date.fromisoformat(deducted)
+        try:
+            deadline = paid_date.replace(year=paid_date.year + 3)
+        except ValueError:  # February 29, if a source extension later contains it
+            deadline = paid_date.replace(year=paid_date.year + 3, day=28)
+        return ("DEDUCTION_UNTIMELY" if deducted_date > deadline
+                else "NOT_UNTIMELY_ON_DATES_ALONE")
+
+    def test_exact_public_source_identity_and_rights_hold(self):
+        p, src = self.pack, self.pack["original_source"]
+        self.assertEqual(p["schema_version"], 1)
+        self.assertEqual(src["docket"], "CBCA 1317-RATE")
+        self.assertEqual(src["decision_date"], "2009-10-29")
+        self.assertIn("www.cbca.gov/files/decisions/2009/", src["source_url"])
+        self.assertEqual(src["source_pdf_pages_visually_checked"], [3, 8])
+        self.assertIsNone(src["source_http_byte_sha256"])
+        self.assertIsNone(src["source_http_byte_length"])
+        self.assertFalse(src["original_pdf_bytes_custodied"])
+        self.assertFalse(src["original_invoice_or_tariff_bytes_custodied"])
+        self.assertEqual(src["third_party_contract_invoice_rights"], "UNKNOWN_NOT_CLEARED")
+        self.assertEqual(src["commercial_scoring_rights"], "NOT_APPROVED")
+
+    def test_original_reported_twelve_rows_tamper_hash_and_dedup(self):
+        p, rows = self.pack, self.pack["rows"]
+        self.assertEqual(len(rows), 12)
+        self.assertEqual(len({r["row_id"] for r in rows}), 12)
+        self.assertEqual(len({r["public_bol_sha256"] for r in rows}), 12)
+        self.assertTrue(all(len(r["public_bol_sha256"]) == 64 for r in rows))
+        original_hash = sha256(json.dumps(rows, sort_keys=True,
+                             separators=(",", ":")).encode()).hexdigest()
+        self.assertEqual(original_hash, p["normalized_row_projection_sha256"])
+        tampered = deepcopy(rows)
+        tampered[0]["treasury_deducted_cents"] += 1
+        self.assertNotEqual(sha256(json.dumps(tampered, sort_keys=True,
+                            separators=(",", ":")).encode()).hexdigest(),
+                            p["normalized_row_projection_sha256"])
+        duplicate = deepcopy(rows)
+        duplicate[11]["public_bol_sha256"] = rows[0]["public_bol_sha256"]
+        self.assertNotEqual(len({r["public_bol_sha256"] for r in duplicate}), 12)
+
+    def test_each_reported_offset_late_on_bill_paid_date(self):
+        for row in self.pack["rows"]:
+            with self.subTest(row=row["row_id"]):
+                self.assertEqual(self.timeliness(row), "DEDUCTION_UNTIMELY")
+                self.assertEqual(row["board_disposition"],
+                                 "DEDUCTION_UNTIMELY_REFUND_ORDERED")
+                self.assertIsNone(row["actual_refund_paid_cents"])
+        altered = deepcopy(self.pack["rows"][0])
+        altered["treasury_deducted_on"] = "2007-01-20"
+        self.assertEqual(self.timeliness(altered), "NOT_UNTIMELY_ON_DATES_ALONE")
+        altered["bill_paid_on"] = None
+        self.assertEqual(self.timeliness(altered), "UNKNOWN_NO_TIMELINESS_LABEL")
+
+    def test_two_partial_deductions_do_not_inflate_cash_or_merits(self):
+        p, rows = self.pack, self.pack["rows"]
+        d = p["reported_decision"]
+        self.assertEqual(sum(r["alleged_overcharge_cents"] for r in rows), 13761404)
+        self.assertEqual(sum(r["treasury_deducted_cents"] for r in rows), 13735675)
+        self.assertEqual(d["publisher_reported_total_treasury_deductions_cents"], 13735675)
+        self.assertEqual(d["publisher_reported_total_alleged_overcharges_cents"], 13761404)
+        self.assertEqual(d["publisher_reported_difference_cents"], 25729)
+        self.assertEqual(sum(r["alleged_overcharge_cents"] !=
+                             r["treasury_deducted_cents"] for r in rows), 2)
+        self.assertIsNone(d["actual_board_ordered_refund_confirmed_as_paid_cents"])
+        self.assertEqual(d["actual_retally_customer_recovery_cents"], 0)
+        self.assertFalse(d["original_bill_overcharge_merits_adjudicated"])
+        self.assertTrue(d["merits_of_car_substitution_moot"])
+
+    def test_negative_controls_independence_and_no_label_leak(self):
+        p = self.pack
+        controls = p["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 8)
+        self.assertEqual(len({c["id"] for c in controls}), 8)
+        for c in controls:
+            with self.subTest(control=c["id"]):
+                self.assertTrue(c["id"].startswith("SYN_"))
+                self.assertEqual(c["kind"], "SYNTHETIC")
+                self.assertIsNone(c["independent_original_truth"])
+        q = p["quality_and_holdout"]
+        self.assertEqual(q["distinct_historical_decision_clusters"], 1)
+        self.assertEqual(q["reported_line_items"], 12)
+        self.assertEqual(q["independent_customer_holdout_cases"], 0)
+        self.assertEqual(q["blind_product_predictions"], 0)
+        self.assertEqual(q["independent_invoice_rate_tariff_triplets"], 0)
+        self.assertIsNone(q["original_invoice_level_precision"])
+        self.assertIsNone(q["original_invoice_level_recall"])
+        self.assertEqual(q["modern_tender_applicability"], "UNKNOWN")
+        self.assertFalse(q["money_settlement_proven"])
+        r = p["restrictions"]
+        self.assertFalse(r["source_commercial_clearance"])
+        self.assertFalse(r["product_engine_code_changed"])
+        self.assertFalse(r["legacy_15_lab_consolidation_certified"])
+        self.assertFalse(r["release_authorized"])
+        self.assertFalse(r["synthetic_cases_promoted_to_original"])
+        self.assertEqual(r["actual_customer_cash_collected_cents"], 0)
+
+
 if __name__=="__main__":
     unittest.main()
