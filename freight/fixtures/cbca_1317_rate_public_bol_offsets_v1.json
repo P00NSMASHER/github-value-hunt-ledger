@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_CBCA_1317_RATE_12_PUBLIC_BOL_OFFSETS_V1",
+  "evaluation_family": "HISTORICAL_PUBLIC_FREIGHT_OFFSET_TIMELINESS_NOT_TARIFF_ACCURACY",
+  "selected_for": "CROSS_ROW_RECONCILIATION_AND_NEGATIVE_CONTROL_NOT_BLIND_ENGINE_HELDOUT",
+  "checked_on_utc": "2026-10-31",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "owned_scope": "VERSIONED_FIXTURE_AND_TEST_ONLY",
+    "live_writer_branch": "research/retally-unified-data-lab",
+    "live_writer_unchanged": true
+  },
+  "original_source": {
+    "publisher": "U.S. Civilian Board of Contract Appeals",
+    "docket": "CBCA 1317-RATE",
+    "decision_date": "2009-10-29",
+    "source_url": "https://www.cbca.gov/files/decisions/2009/GILMORE_10-29-09_1317-RATE__UNION_PACIFIC_RAILROAD_508.pdf",
+    "decision_table_pdf_page_1_based": 3,
+    "disposition_pdf_page_1_based": 8,
+    "publication_type": "US_FEDERAL_GOVERNMENT_AUTHORED_ADJUDICATIVE_DECISION",
+    "public_source_rights": "FEDERAL_GOVERNMENT_AUTHORED_DECISION_TEXT_PRESUMPTIVELY_PUBLIC_DOMAIN_NO_ENDORSEMENT",
+    "rights_context_url": "https://www.usa.gov/government-copyright",
+    "third_party_contract_invoice_rights": "UNKNOWN_NOT_CLEARED",
+    "commercial_scoring_rights": "NOT_APPROVED",
+    "source_http_byte_sha256": null,
+    "source_http_byte_length": null,
+    "original_pdf_bytes_custodied": false,
+    "original_invoice_or_tariff_bytes_custodied": false,
+    "source_last_modified_utc": null,
+    "source_pdf_pages_visually_checked": [
+      3,
+      8
+    ],
+    "source_schema": "OFFICIAL_PDF_DECISION_PAGE_3_PUBLIC_TABLE_ROW_PROJECTION",
+    "source_document_retrieval_quality": "PUBLISHER_PDF_RENDER_AND_TEXT_VIEW; RAW_PDF_DOWNLOAD_UNAVAILABLE",
+    "schema_effective_dates": "2004-2005_BILLS_PAID_2008_OFFSETS_BOARD_RULING_2009"
+  },
+  "reported_decision": {
+    "claimed_overcharges_count": 12,
+    "treasury_offsets_reported_as_made_in_2008": 12,
+    "reported_original_74_BOL_controversy_not_74_INDEPENDENT_LABELS": true,
+    "reported_resolved_pre_hearing_67_from_original_74": true,
+    "reported_5_claims_added_later": true,
+    "under_adjudication_count": 12,
+    "board_outcome": "Deductions untimely under 31 U.S.C. 3726(d); amounts should be refunded",
+    "original_bill_overcharge_merits_adjudicated": false,
+    "merits_of_car_substitution_moot": true,
+    "publisher_reported_total_alleged_overcharges_cents": 13761404,
+    "publisher_reported_total_treasury_deductions_cents": 13735675,
+    "publisher_reported_difference_cents": 25729,
+    "actual_board_ordered_refund_confirmed_as_paid_cents": null,
+    "actual_retally_customer_recovery_cents": 0
+  },
+  "rows": [
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_01",
+      "public_bol_sha256": "db9eed01bdeca1f51a2c8665987a5dd564b3b2d8d5c8b0ce6469dafd7fbe0206",
+      "alleged_overcharge_cents": 1793654,
+      "bill_paid_on": "2005-01-20",
+      "treasury_deducted_cents": 1793654,
+      "treasury_deducted_on": "2008-06-16",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_02",
+      "public_bol_sha256": "775b84eaa2d2762f9c534b17dde5eae542fd4cd4e339b5f8b601b555e5570e95",
+      "alleged_overcharge_cents": 1314805,
+      "bill_paid_on": "2005-01-20",
+      "treasury_deducted_cents": 1314805,
+      "treasury_deducted_on": "2008-06-16",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_03",
+      "public_bol_sha256": "49758d371fb31017bc64bba8860337e95282674d026e7a24aee8ccd70d0dac4c",
+      "alleged_overcharge_cents": 2194247,
+      "bill_paid_on": "2005-02-11",
+      "treasury_deducted_cents": 2194247,
+      "treasury_deducted_on": "2008-10-15",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_04",
+      "public_bol_sha256": "335d6a094dcc936319bbe57a30de541fcc8faeff95639ee404f8c629e1aaf77b",
+      "alleged_overcharge_cents": 878744,
+      "bill_paid_on": "2005-02-02",
+      "treasury_deducted_cents": 878744,
+      "treasury_deducted_on": "2008-04-15",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_05",
+      "public_bol_sha256": "9e4409c3b123fc64e173b7de268cccfb35fb2a705e224bd129d9d4ab33544c09",
+      "alleged_overcharge_cents": 438849,
+      "bill_paid_on": "2005-02-11",
+      "treasury_deducted_cents": 438849,
+      "treasury_deducted_on": "2008-04-15",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_06",
+      "public_bol_sha256": "6ad135e4d84d66a8e7e8aedfa3a8d6a3b808c20a6502502e9814395af8fcbafe",
+      "alleged_overcharge_cents": 877698,
+      "bill_paid_on": "2005-02-11",
+      "treasury_deducted_cents": 877698,
+      "treasury_deducted_on": "2008-04-15",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_07",
+      "public_bol_sha256": "c230e13d624e4ccfdfda64dbc796dad55ecf50c0f38682cae0b2014fe4fb44ab",
+      "alleged_overcharge_cents": 436990,
+      "bill_paid_on": "2005-02-11",
+      "treasury_deducted_cents": 436990,
+      "treasury_deducted_on": "2008-04-15",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_08",
+      "public_bol_sha256": "c3856154047f79ba92e37be1fdb844879a766062d7007f4e227aed13ac54fbc0",
+      "alleged_overcharge_cents": 330460,
+      "bill_paid_on": "2004-01-27",
+      "treasury_deducted_cents": 330460,
+      "treasury_deducted_on": "2008-10-10",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_09",
+      "public_bol_sha256": "0b6d7b9cb4d46fb43355bebcf82ca2c20aaa4e6976fb5850ce3dd50a1aad04e0",
+      "alleged_overcharge_cents": 479879,
+      "bill_paid_on": "2004-02-05",
+      "treasury_deducted_cents": 479879,
+      "treasury_deducted_on": "2008-10-10",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_10",
+      "public_bol_sha256": "199a3af9ddb604fa6a3b9e208e1048c3f21d42fea525eb1e614c68c2f0aeebff",
+      "alleged_overcharge_cents": 466531,
+      "bill_paid_on": "2004-02-09",
+      "treasury_deducted_cents": 466531,
+      "treasury_deducted_on": "2008-10-10",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_11",
+      "public_bol_sha256": "3a78c7a63fea3f2a0ed9610c23c9e60e741a49bb987f296f72dd7b3527cad269",
+      "alleged_overcharge_cents": 1207383,
+      "bill_paid_on": "2004-03-01",
+      "treasury_deducted_cents": 1197902,
+      "treasury_deducted_on": "2008-10-31",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    },
+    {
+      "row_id": "CBCA_1317_TABLE_P3_ROW_12",
+      "public_bol_sha256": "71bfeae20fb7b21aff0a95ca8b40965091cb8953c3b4a1a7faa39b6295538716",
+      "alleged_overcharge_cents": 3342164,
+      "bill_paid_on": "2004-02-06",
+      "treasury_deducted_cents": 3325916,
+      "treasury_deducted_on": "2008-10-31",
+      "board_disposition": "DEDUCTION_UNTIMELY_REFUND_ORDERED",
+      "actual_refund_paid_cents": null
+    }
+  ],
+  "normalized_row_projection_sha256": "e9041bcb2c8fbdd9fede1521270b467bce6003be9f5ef6b7aa9341710578daac",
+  "provenance_rules": {
+    "public_bol_sha256_rule": "SHA256(UTF8('CBCA-1317-RATE/BOL/' + printed_public_BOL_identifier)); exact raw BOL identifiers omitted from fixture",
+    "source_row_projection_digest_rule": "SHA256(UTF8(json.dumps(rows,sort_keys=True,separators=(',',':'))))",
+    "hash_of_original_pdf_source": "UNKNOWN_NO_RAW_DOWNLOAD",
+    "page_based_extraction_is_not_independent_original_invoice_custody": true
+  },
+  "quality_and_holdout": {
+    "distinct_historical_decision_clusters": 1,
+    "reported_line_items": 12,
+    "independent_customer_holdout_cases": 0,
+    "blind_product_predictions": 0,
+    "independent_invoice_rate_tariff_triplets": 0,
+    "independent_modern_rate_error_labels": 0,
+    "original_invoice_level_precision": null,
+    "original_invoice_level_recall": null,
+    "modern_tender_applicability": "UNKNOWN",
+    "money_settlement_proven": false,
+    "as_of_test": "CANNOT_IMPORT_2009_RULING_AS_CURRENT_SETTLEMENT_OR_RATE_MERITS"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_EARLY_DEDUCTION",
+      "kind": "SYNTHETIC",
+      "scenario": "Deduction within three years after a known original payment date",
+      "expected": "NOT_UNTIMELY_ON_DATES_ALONE",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_MISSING_PAYMENT_DATE",
+      "kind": "SYNTHETIC",
+      "scenario": "Missing verified bill-paid date",
+      "expected": "UNKNOWN_NO_TIMELINESS_LABEL",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_FORGED_PAID_REFUND",
+      "kind": "SYNTHETIC",
+      "scenario": "An order to refund falsely asserted as received funds",
+      "expected": "REJECT_UNVERIFIED_PAYMENT",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_DUPLICATED_PUBLIC_BOL_HASH",
+      "kind": "SYNTHETIC",
+      "scenario": "A line duplicated in public-decision projection",
+      "expected": "REJECT_DUPLICATE_LINE",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_TWELVE_INDEPENDENT_DECISIONS",
+      "kind": "SYNTHETIC",
+      "scenario": "Twelve BOL lines incorrectly counted as twelve independent adjudications",
+      "expected": "REJECT_INDEPENDENCE_INFLATION",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_TARIFF_OVERCHARGE_MERITS",
+      "kind": "SYNTHETIC",
+      "scenario": "A procedural timeliness reversal used to certify original tariff amount was lawful",
+      "expected": "UNKNOWN_TARIFF_MERITS_MOOT",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_OFFSET_EQUALS_ASSERTED_OVERCHARGE",
+      "kind": "SYNTHETIC",
+      "scenario": "Claiming all reported offsets equal alleged overcharges despite two partial deductions",
+      "expected": "REJECT_AMOUNT_CONFLATION",
+      "independent_original_truth": null
+    },
+    {
+      "id": "SYN_OLD_DECISION_IS_MODERN_RULE",
+      "kind": "SYNTHETIC",
+      "scenario": "Applying 2009 decision to present customer contracts without legal scope review",
+      "expected": "UNKNOWN_CURRENT_LEGAL_APPLICABILITY",
+      "independent_original_truth": null
+    }
+  ],
+  "handoffs": {
+    "freightrecovery_12": "Twelve public historical BOL-tied offsets reversed for TIMELINESS; rate merits NOT decided; do not train overcharge-rate truth.",
+    "recoveryos_12": "Reported Treasury offsets total $137,356.75, but ordered refund != verified bank credit; no customer cash.",
+    "permitplate_48": "Not building permit data; never mix these labels.",
+    "capturebrief_52": "Not SAM opportunity or government award-history truth.",
+    "independent_QA_44": "Audit original PDF page 3 table, page 8 disposition, row projection SHA256, 12 late intervals, two unequal amounts, same-decision dedup and unknown cash."
+  },
+  "restrictions": {
+    "source_commercial_clearance": false,
+    "confidential_customer_data_included": false,
+    "actual_customer_cash_collected_cents": 0,
+    "synthetic_cases_promoted_to_original": false,
+    "product_engine_code_changed": false,
+    "new_provider_requests_scheduled": 0,
+    "new_cron_schedules": 0,
+    "legacy_15_lab_consolidation_certified": false,
+    "release_authorized": false
+  }
+}
