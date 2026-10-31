@@ -17,6 +17,7 @@ import re
 import unicodedata
 from collections import defaultdict
 from datetime import date, datetime, timezone
+from http.client import IncompleteRead
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -129,8 +130,12 @@ def fetch_original() -> bytes:
                              "application/vnd.ms-excel"}:
                 raise _fail("SOURCE_MEDIA_UNSUPPORTED")
             declared = response.headers.get("Content-Length")
+            transfer = response.headers.get("Transfer-Encoding", "").strip().lower()
             expected = None
             if declared not in (None, ""):
+                # Conflicting length and transfer coding is not safe framing.
+                if transfer:
+                    raise _fail("SOURCE_INCOMPLETE")
                 try:
                     expected = int(declared)
                 except ValueError as exc:
@@ -139,9 +144,18 @@ def fetch_original() -> bytes:
                     raise _fail("SOURCE_INCOMPLETE")
                 if expected > MAX_ORIGINAL_BYTES:
                     raise _fail("SOURCE_TOO_LARGE")
+            elif transfer != "chunked" or getattr(response, "chunked", False) is not True:
+                # A close-delimited response may be a valid CSV prefix of a
+                # longer archive. Only the transport's decoded chunked framing
+                # proves completion without Content-Length.
+                raise _fail("SOURCE_INCOMPLETE")
             original = response.read(MAX_ORIGINAL_BYTES + 1)
     except ResearchError:
         raise
+    except IncompleteRead as exc:
+        # http.client signals a missing final chunk or short transport here.
+        # Never allow partial original bytes to become a green source receipt.
+        raise _fail("SOURCE_INCOMPLETE") from exc
     except HTTPError as exc:
         raise _fail("SOURCE_HTTP_ERROR") from exc
     except (TimeoutError, URLError, OSError) as exc:
