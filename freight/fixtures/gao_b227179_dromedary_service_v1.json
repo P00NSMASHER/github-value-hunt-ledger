@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B227179_DROMEDARY_SERVICE_EVIDENCE_V1",
+  "lane": "HISTORICAL_ADJUDICATED_FREIGHT_SERVICE_AUTHORITY_NOT_MODERN_ERROR_ACCURACY",
+  "checked_on_utc": "2026-10-31",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "review_pr": 883,
+    "review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "existing_writer": "research/retally-unified-data-lab",
+    "writer_modified": false,
+    "engine_code_changed": false
+  },
+  "original_source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-227179",
+    "decision_title": "Coast Counties Express - Dispute over Applicable Rate Because of Conflicting Service Requests Annotated on Government Bills of Lading",
+    "decision_date": "1988-03-23",
+    "official_html_url": "https://www.gao.gov/products/b-227179-0",
+    "source_type": "FIRST_PARTY_PUBLIC_ADJUDICATIVE_GAO_HTML",
+    "original_http_body_sha256": null,
+    "original_http_body_byte_length": null,
+    "original_raw_bytes_custodied": false,
+    "verified_page_segments": [
+      "Highlights",
+      "Background",
+      "Analysis and Conclusion"
+    ],
+    "original_gbl_invoice_tender_bytes_custodied": false,
+    "source_last_modified_utc": null,
+    "first_party_research_text_inspected_on_utc": "2026-10-31"
+  },
+  "rights": {
+    "terms_url": "https://www.gao.gov/copyright",
+    "gao_text_reuse": "US_COPY_DISTRIBUTE_WITH_ATTRIBUTION_NO_ENDORSEMENT",
+    "third_party_underlying_bill_or_tender_rights": "UNKNOWN_NOT_REPUBLISHED",
+    "commercial_product_scoring_authorized": false,
+    "private_customer_material_custodied": false
+  },
+  "schema": {
+    "source_unit": "ONE_GAO_DECISION_CLUSTER",
+    "primary_key": "GAO/B-227179",
+    "cohort": "1988_HISTORICAL_US_DOD_FREIGHT_RATE_DISPUTE",
+    "numeric_unit": "counts_only",
+    "casewise_label_field": "gao_disposition",
+    "label_complete": "GAO_DECISION_OUTCOME_ONLY_NOT_SHIPMENT_LEVEL_RATE_TRUTH",
+    "modern_invoice_rate_truth": "UNKNOWN"
+  },
+  "reported_evidence": {
+    "carrier": "Coast Counties Express",
+    "agency": "U.S. General Services Administration",
+    "request_type": "DROMEDARY_SERVICE_VERBALLY_REQUESTED",
+    "requested_service": "DROMEDARY",
+    "equipment_used": "CLOSED_VAN_AS_CARRIER_OPERATING_CONVENIENCE",
+    "gbl_equipment_annotation": "AV",
+    "gbl_dromedary_rate_tender_reference": true,
+    "gbl_express_words_dromedary_request": false,
+    "original_carrier_billed_and_collected_lower_dromedary_rate": true,
+    "carrier_later_sought_higher_closed_van_supplement": true,
+    "disputed_supplemental_shipments_reported": 68,
+    "prior_similar_lower_rate_billed_shipments_reported_min": 337,
+    "overlap_between_groups": "UNKNOWN_DO_NOT_SUM_AS_DISJOINT",
+    "total_claimed_supplement_cents": null,
+    "amount_disallowed_cents": null,
+    "customer_recovery_cents": null,
+    "actual_retally_customer_cash_cents": 0,
+    "official_outcome": "GSA_DISALLOWANCE_OF_SUPPLEMENTAL_BILLS_SUSTAINED",
+    "outcome_mechanism": "DOCUMENTED_SERVICE_REQUEST_AND_TENDER_REFS_PLUS_PRIOR_CARRIER_BILLING_AND_DUTY_TO_CLARIFY_CONFLICT",
+    "evidence_scope": "OFFICIAL_DECISION_NARRATIVE_NOT_ORIGINAL_68_BILLS"
+  },
+  "source_quality": {
+    "review": "SINGLE_FIRST_PARTY_PUBLISHER_PAGE",
+    "limitations": [
+      "WEB_TEXT_EXTRACTION_NOT_ORIGINAL_HTTP_RESPONSE_BYTES",
+      "TRANSCRIBED_GAO_TEXT_HAS_OCR_STYLE_ERRORS_EG_OBL_VS_GBL_AND_OSA_VS_GSA",
+      "NO_ACTUAL_TENDER_OR_GBL_DOCUMENT_SCAN_BYTES",
+      "SINGLE_DECISION_CLUSTER_MANY_CORRELATED_SHIPMENTS",
+      "NO_INDEPENDENT_BANK_REFUND_OR_CUSTOMER_CASH_PROOF",
+      "NO_MODERN_RATE_INFERENCE"
+    ],
+    "original_html_sha256": "UNKNOWN_NO_RAW_BYTE_CUSTODY",
+    "content_hash_recorded": "GIT_BLOB_SHA1_AFTER_COMMIT_ONLY",
+    "fact_check_sections": [
+      "GAO/B-227179 lines 244-252",
+      "GAO/B-227179 lines 255-269",
+      "GAO/B-227179 lines 270-276"
+    ]
+  },
+  "real_original_label": {
+    "case_key": "GAO/B-227179",
+    "case_label": "GSA_SUPPLEMENTAL_CLOSED_VAN_CHARGES_DISALLOWED",
+    "split": "RESEARCH_RESERVED_CROSS_CASE_NOT_BLIND",
+    "independent_from": "GAO/B-225507",
+    "independent_adjudicative_case": true,
+    "independent_real_customer_holdout": false,
+    "shipment_level_independent_labels": 0,
+    "modern_freight_error_label": false
+  },
+  "historical_reference_guard": {
+    "claim": "HISTORICAL_DROMEDARY_SUPPLEMENT_DISALLOWANCE",
+    "facts": {
+      "shipper_dromedary_request": true,
+      "gbl_dromedary_tender_reference": true,
+      "carrier_prior_lower_rate_billing": true,
+      "substitution_for_carrier_convenience": true,
+      "carrier_timely_clarification": false
+    },
+    "expected": "SUPPORTED_ONLY_IN_GAO_B227179_CASE"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_B227179_MISSING_ORAL_REQUEST",
+      "claim": "HISTORICAL_DROMEDARY_SUPPLEMENT_DISALLOWANCE",
+      "mutation": {
+        "shipper_dromedary_request": null
+      },
+      "expected": "UNKNOWN_SHIPPER_REQUEST",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_NO_TENDER_REFERENCE",
+      "claim": "HISTORICAL_DROMEDARY_SUPPLEMENT_DISALLOWANCE",
+      "mutation": {
+        "gbl_dromedary_tender_reference": null
+      },
+      "expected": "UNKNOWN_TENDER_REFERENCE",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_UNKNOWN_INITIAL_RATE",
+      "claim": "HISTORICAL_DROMEDARY_SUPPLEMENT_DISALLOWANCE",
+      "mutation": {
+        "carrier_prior_lower_rate_billing": null
+      },
+      "expected": "UNKNOWN_PRIOR_BILLING",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_EQUIPMENT_SUBSTITUTION_UNKNOWN",
+      "claim": "HISTORICAL_DROMEDARY_SUPPLEMENT_DISALLOWANCE",
+      "mutation": {
+        "substitution_for_carrier_convenience": null
+      },
+      "expected": "UNKNOWN_REASON_FOR_SUBSTITUTION",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_TIMELY_PROTEST_DIFFERENT_PATTERN",
+      "claim": "HISTORICAL_DROMEDARY_SUPPLEMENT_DISALLOWANCE",
+      "mutation": {
+        "carrier_timely_clarification": true
+      },
+      "expected": "UNKNOWN_DIFFERENT_NOTICE_PATTERN",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_AV_IMPLIED_RATE",
+      "claim": "AV_ALONE_PROVES_HIGHER_VAN_RATE",
+      "mutation": {},
+      "expected": "REJECT_EQUIPMENT_CODE_ALONE",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_EXPRESS_WORDS_ALWAYS_NEEDED",
+      "claim": "NO_LITERAL_DROMEDARY_WORDS_INVALIDATE_TENDER",
+      "mutation": {},
+      "expected": "REJECT_AUTOMATIC_LITERALISM",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_68_AS_INDEPENDENT_CASES",
+      "claim": "68_SHIPMENTS_ARE_68_INDEPENDENT_ADJUDICATIONS",
+      "mutation": {},
+      "expected": "REJECT_CORRELATED_LABELS",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_337_68_DISJOINT",
+      "claim": "337_PLUS_68_ARE_PROVEN_DISJOINT",
+      "mutation": {},
+      "expected": "UNKNOWN_COHORT_OVERLAP",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_NO_CUSTOMER_BANK_PROOF",
+      "claim": "GAO_SUPPLEMENT_DISALLOWANCE_PROVES_CUSTOMER_REFUND",
+      "mutation": {},
+      "expected": "UNKNOWN_NO_BANK_CASH",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B227179_OCR_SILENT_FIX",
+      "claim": "OCR_STYLE_GAO_TEXT_IS_EXACT_ORIGINAL_PDF",
+      "mutation": {},
+      "expected": "UNKNOWN_ORIGINAL_BYTE_PROVENANCE",
+      "split": "synthetic_holdout",
+      "kind": "RESEARCH_AUTHORED_NOT_REAL_SHIPMENT",
+      "independent_real_label": null
+    }
+  ],
+  "benchmark_readiness": {
+    "contrast_id": "GAO/B-225507",
+    "contrast_factual_outcome": "GSA_TENDER_DEDUCTIONS_SUSTAINED_IN_DIFFERENT_CASE",
+    "this_case_outcome": "GSA_HIGHER_CLOSED_VAN_SUPPLEMENTS_DISALLOWED",
+    "compared_source_clusters": 2,
+    "independently_adjudicated_cases": 2,
+    "blind_model_predictions": 0,
+    "independent_modern_invoice_triplets": 0,
+    "real_customer_holdout_cases": 0,
+    "historical_clashes_tested": "REQUESTED_SERVICE_AND_TENDER_REFERENCE_VERSUS_EQUIPMENT_CODE",
+    "modern_precision": null,
+    "modern_recall": null,
+    "holdout_not_blind": true,
+    "synthetic_controls_do_not_count_as_accuracy": true
+  },
+  "handoffs": {
+    "freightrecovery_12": "B-227179 GAO rejected higher van-service supplements despite AV equipment code; actual request, tender reference, prior lower billing, and carrier convenience control; do not infer modern rates.",
+    "recoveryos_12": "Disallowed supplemental billing does not establish refund or bank settlement; dollar values absent.",
+    "permitplate_48": "Not an NYC DOB permit or score label; no cross-lane positives.",
+    "capturebrief_52": "Not SAM/FY2027 notice or award; no cross-lane positives.",
+    "qa_44": "Independently verify GAO 68 vs at least 337 non-disjoint cohorts and GBL AV vs tender references, no original HTTP checksum and no blind outcome score."
+  },
+  "restrictions": {
+    "privacy_leak": false,
+    "paid_provider_calls": 0,
+    "provider_rule_changes": false,
+    "new_schedules": false,
+    "product_code_changes": false,
+    "legacy_lab_consolidation_verified": false,
+    "release_authorized": false
+  }
+}
