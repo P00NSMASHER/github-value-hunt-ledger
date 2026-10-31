@@ -401,5 +401,100 @@ class NYCDOBElevatorFilingBoundaryTest(unittest.TestCase):
         self.assertEqual(p["safety"]["private_customer_medical_student_records"], 0)
         self.assertFalse(p["safety"]["legacy_15_lab_consolidation_certified"])
 
+class NYCDOBLAAApplicationBoundaryTest(unittest.TestCase):
+    """First-party NYC LAA source coverage with synthetic-only, non-scoring controls."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads((FIXTURE.parent /
+            "nyc_dob_laa_application_boundary_v1.json").read_text(encoding="utf-8"))
+        cls.cases = {x["id"]: x for x in cls.pack["synthetic_controls"]}
+
+    @staticmethod
+    def guarded_interpretation(case):
+        k, x = case["kind"], case["facts"]
+        if k == "general_nonmatch" and x["laa_excluded"]:
+            return "UNKNOWN_LAA_EXCLUDED_FROM_GENERAL_BUILD"
+        if k == "unissued_number" and not x["permit_issued_date"]:
+            return "UNKNOWN_ISSUANCE_WITHOUT_DATE_OR_INDEPENDENT_PROOF"
+        if k == "issued_expired" and x["permit_expiration_date"] < x["asof"]:
+            return "HISTORICAL_SOURCE_ISSUANCE_NOT_ACTIVE_NOW"
+        if k == "filing_fanout" and len({a["job_number"] for a in x["filings"]}) == 1:
+            return "UNKNOWN_TWO_FILINGS_NOT_TWO_BUYERS"
+        if k == "signoff" and x.get("laasign_off_date"):
+            return "UNKNOWN_SIGNOFF_NOT_NEW_DEMAND"
+        if k == "free_text" and x.get("proposed_work_summary"):
+            return "QUARANTINE_FREE_TEXT_FOR_PRIVACY_REVIEW"
+        if k == "historical_nonmatch" and not x["complete_history"]:
+            return "UNKNOWN_NO_COMPLETE_HISTORICAL_COVERAGE"
+        if k == "bin_only_join" and not x["matching_job_number"]:
+            return "UNKNOWN_BIN_ONLY_JOIN_NOT_PERMIT_IDENTITY"
+        return "UNKNOWN_UNADJUDICATED"
+
+    def test_new_official_laa_source_not_in_general_build(self):
+        p, s = self.pack, self.pack["publisher_source"]
+        self.assertEqual(p["schema_version"], 1)
+        self.assertEqual(s["dataset_id"], "xxbr-ypig")
+        self.assertEqual(s["catalog_last_updated_reported"], "2026-10-24")
+        self.assertEqual(s["catalog_column_count"], 26)
+        self.assertEqual(s["excluded_from_general_build_approved_permits"], "rbx6-tga4")
+        self.assertTrue({"job_number", "filing_number", "filing_status_name",
+                         "permit_number", "permit_issued_date", "permit_expiration_date",
+                         "laasign_off_date", "proposed_work_summary"}
+                        <= set(s["documented_public_api_fields"]))
+        self.assertEqual(s["original_dataset_rows_downloaded_this_increment"], 0)
+        self.assertIsNone(s["original_dataset_http_bytes_sha256"])
+        self.assertIsNone(s["original_dataset_metadata_http_body_sha256"])
+        self.assertIsNone(s["original_dataset_response_byte_count"])
+        self.assertEqual(s["personal_addresses_or_work_descriptions_retained"], 0)
+
+    def test_synthetic_holdouts_falsify_naive_buyer_scoring_without_real_labels(self):
+        p, controls = self.pack, self.pack["synthetic_controls"]
+        self.assertEqual(len(controls), 8)
+        self.assertEqual(len(self.cases), 8)
+        self.assertEqual(sum(c["split"] == "synthetic_calibration" for c in controls), 3)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 5)
+        for c in controls:
+            with self.subTest(case=c["id"]):
+                self.assertEqual(self.guarded_interpretation(c), c["expected"])
+                self.assertEqual(c["provenance"], "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW")
+                self.assertIsNone(c["independent_real_label"])
+                self.assertNotEqual(c["naive_claim"], c["expected"])
+        b = p["benchmark_readiness"]
+        self.assertEqual(b["synthetic_holdout_cases"], 5)
+        self.assertEqual(b["independent_real_holdout_cases"], 0)
+        self.assertEqual(b["independent_real_positive_labels"], 0)
+        self.assertEqual(b["independent_real_negative_labels"], 0)
+        self.assertIsNone(b["permit_precision"])
+        self.assertIsNone(b["permit_recall"])
+
+    def test_metadata_dedup_and_external_publisher_receipt_not_promoted_as_laa(self):
+        p = self.pack
+        r = p["existing_original_publisher_readback_reference"]
+        self.assertEqual(r["source_dataset_id"], "rbx6-tga4")
+        self.assertNotEqual(r["source_dataset_id"], p["publisher_source"]["dataset_id"])
+        self.assertEqual((r["source_sample_rows"], r["source_distinct_identities"]), (20, 19))
+        self.assertEqual(r["source_duplicate_identities"], 1)
+        self.assertEqual(r["usable_laa_examples_from_other_cohort"], 0)
+        self.assertEqual(r["independent_permit_truth_labels"], 0)
+        self.assertEqual(len(r["source_sample_canonical_sha256"]), 64)
+        self.assertEqual(len(r["receipt_git_blob_sha1"]), 40)
+        self.assertFalse(p["dedup_and_temporal_rules"]["BIN_only_cross_dataset_join_allowed"])
+        self.assertFalse(p["dedup_and_temporal_rules"]["complete_history_proven"])
+
+    def test_critical_unknowns_and_source_rights_do_not_open_commercial_gate(self):
+        p = self.pack
+        self.assertFalse(p["rights"]["dataset_specific_rights_checked"])
+        self.assertFalse(p["rights"]["commercial_permit_scoring_cleared"])
+        self.assertEqual(p["rights"]["separate_provider_or_embedded_third_party_rights"], "UNKNOWN")
+        self.assertFalse(p["benchmark_readiness"]["commercial_scoring_approved"])
+        self.assertEqual(set(p["handoffs"]), {"permitplate_48", "freightrecovery_12",
+            "recoveryos_12", "capturebrief_52", "independent_qa_44", "executive_director"})
+        self.assertFalse(p["safety"]["legacy_15_lab_consolidation_certified"])
+        self.assertTrue(p["safety"]["no_product_or_engine_code_changes"])
+        self.assertTrue(p["safety"]["no_new_provider_requests_in_test"])
+        self.assertEqual(p["safety"]["private_customer_medical_student_records"], 0)
+
+
 if __name__ == '__main__':
     unittest.main()
