@@ -583,5 +583,108 @@ class SamArchiveAsOfTests(unittest.TestCase):
                 fetch_original()
 
 
+
+class USASpendingPublisherAwardBoundaryV1Tests(unittest.TestCase):
+    """Two public publisher-page metadata examples, never an award accuracy benchmark."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+            "usaspending_reported_award_cross_source_boundary_v1.json").read_text(encoding="utf-8"))
+
+    def test_real_reported_awards_have_source_urls_but_no_original_bytes_or_ground_truth(self):
+        x=self._pack()
+        self.assertEqual(x["schema_version"],1)
+        self.assertEqual(x["publisher_scope"]["sample_count"],2)
+        self.assertEqual(x["publisher_scope"]["independently_matched_notice_award_pairs"],0)
+        self.assertEqual(x["publisher_scope"]["independently_adjudicated_award_outcomes"],0)
+        self.assertEqual(x["publisher_scope"]["independent_real_negative_labels"],0)
+        self.assertEqual(x["publisher_scope"]["independent_real_positive_labels"],0)
+        self.assertIsNone(x["publisher_scope"]["measured_precision"])
+        self.assertFalse(x["rights"]["commercial_scoring_allowed"])
+        self.assertFalse(x["original_http_response_bytes_collected"])
+        self.assertIsNone(x["original_publisher_http_body_sha256"])
+        self.assertIsNone(x["original_publisher_http_body_byte_length"])
+        self.assertEqual(len(x["real_publisher_page_observations"]),2)
+        for record in x["real_publisher_page_observations"]:
+            self.assertTrue(record["source_url"].startswith("https://www.usaspending.gov/award/"))
+            self.assertTrue(record["source_url"].endswith(record["award_unique_key"]))
+            self.assertIsNone(record["award_signed_date"])
+            self.assertIsNone(record["pre_award_source_observation_sha256"])
+            self.assertIsNone(record["independently_verified_sam_notice_id"])
+            self.assertIsNone(record["independent_adjudication_label"])
+            self.assertIsNone(record["independently_verified_cash"])
+
+    def test_obligation_outlay_and_period_dates_cannot_be_promoted_to_cash_or_fy2027_notice(self):
+        from decimal import Decimal
+        x=self._pack()
+        records={r["piid"]:r for r in x["real_publisher_page_observations"]}
+        doe=records["89703026FAR000022"]
+        faa=records["6973GH24F00956"]
+        self.assertEqual(doe["period_of_performance_start_date"],"2026-09-16")
+        self.assertEqual(doe["period_of_performance_current_end_date"],"2027-09-25")
+        self.assertEqual(Decimal(doe["obligated_amount_usd"]),Decimal("29000.00"))
+        self.assertEqual(Decimal(doe["outlayed_amount_usd"]),Decimal("0.00"))
+        self.assertEqual(faa["period_of_performance_start_date"],"2024-07-24")
+        self.assertEqual(faa["period_of_performance_current_end_date"],"2029-08-31")
+        self.assertEqual(Decimal(faa["obligated_amount_usd"]),Decimal("1454413.80"))
+        self.assertEqual(Decimal(faa["outlayed_amount_usd"]),Decimal("899473.19"))
+        for r in records.values():
+            self.assertNotEqual(Decimal(r["obligated_amount_usd"]),
+                                Decimal(r["outlayed_amount_usd"]))
+            self.assertIsNone(r["independently_verified_sam_notice_id"])
+            self.assertIsNone(r["independently_verified_cash"])
+
+    def test_synthetic_adversarial_controls_are_not_independent_holdout_cases(self):
+        x=self._pack()
+        controls=x["synthetic_controls"]
+        self.assertEqual(len(controls),8)
+        self.assertEqual(len({c["id"] for c in controls}),8)
+        self.assertEqual(sum(c["split"]=="synthetic_holdout" for c in controls),5)
+        self.assertEqual(sum(c["split"]=="calibration" for c in controls),3)
+        self.assertTrue(all(c["kind"]=="SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD"
+                            for c in controls))
+        self.assertTrue(all(c["independent_real_label"] is None for c in controls))
+        self.assertTrue(all(c["expected_guard_result"] in ("UNKNOWN","REJECT")
+                            for c in controls))
+        self.assertEqual(x["quality_and_dedup"]["independent_heldout_real_outcome_count"],0)
+        self.assertEqual(x["quality_and_dedup"]["synthetic_holdout_count"],5)
+        self.assertEqual(x["quality_and_dedup"]["original_publisher_byte_sha256_status"],
+                         "UNKNOWN_NOT_ACQUIRED")
+
+    def test_negative_controls_expose_naive_claim_as_proof_but_not_engine_accuracy(self):
+        x=self._pack()
+        controls=x["synthetic_controls"]
+        naive_claims=["CLAIM_PROVED" for _ in controls]  # SYNTHETIC counterfactual
+        guarded=[c["expected_guard_result"] for c in controls]
+        self.assertEqual(sum(a!=b for a,b in zip(naive_claims,guarded)),8)
+        self.assertEqual(sum(v not in ("UNKNOWN","REJECT") for v in guarded),0)
+        self.assertEqual(x["publisher_scope"]["independent_real_positive_labels"],0)
+        self.assertEqual(x["publisher_scope"]["independent_real_negative_labels"],0)
+        self.assertIsNone(x["publisher_scope"]["measured_recall"])
+
+    def test_publisher_key_dedup_and_malformed_cross_source_promotion_are_rejected(self):
+        x=self._pack()
+        records=x["real_publisher_page_observations"]
+        keys=[r["award_unique_key"] for r in records]
+        self.assertEqual(len(set(keys)),2)
+        self.assertEqual(len(set(keys + keys[:1])),2)
+        self.assertEqual(x["quality_and_dedup"]["observed_distinct_publisher_award_keys"],2)
+        self.assertEqual(len(set(r["source_url"].split("/")[2] for r in records)),1)
+        self.assertFalse(x["restrictions"]["legacy_15_lab_consolidation_certified"])
+        self.assertFalse(x["restrictions"]["no_engine_code_changes"] is False)
+        tampered=copy.deepcopy(x)
+        tampered["publisher_scope"]["independently_matched_notice_award_pairs"]=1
+        def is_eligible_for_real_award_benchmark(pack):
+            return (
+                pack["publisher_scope"]["independently_matched_notice_award_pairs"]>0
+                and all(r["pre_award_source_observation_sha256"] is not None
+                        and r["independent_adjudication_label"] is not None
+                        for r in pack["real_publisher_page_observations"])
+            )
+        self.assertFalse(is_eligible_for_real_award_benchmark(x))
+        self.assertFalse(is_eligible_for_real_award_benchmark(tampered))
+
+
 if __name__=="__main__":
     unittest.main()
