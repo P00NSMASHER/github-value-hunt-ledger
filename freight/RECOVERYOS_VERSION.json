@@ -16,5 +16,5 @@
   "customer_production": "HOLD",
   "independent_bank_cleared_recovery_verified": false,
   "outbound_dispute_or_payment_enabled_by_upgrade": false,
-  "release_notes": "recoveryworks/RECOVERYOS_4_0_RELEASE.md"
+  "release_notes": "freight/RECOVERYOS_V4_0_RELEASE.md"
 }
