@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B192872_CLASS_WEIGHT_AMBIGUITY_V1",
+  "evaluation_family": "HISTORICAL_ADJUDICATED_FREIGHT_CLASSIFICATION_AND_WEIGHT_CORRECTION",
+  "checked_on_utc": "2026-10-31",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "existing_review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_writer_branch": "research/retally-unified-data-lab",
+    "live_writer_modified": false,
+    "owned_scope": "VERSIONED_RESEARCH_FIXTURE_AND_TEST_ONLY"
+  },
+  "original_source": {
+    "publisher": "United States Government Accountability Office",
+    "decision_id": "B-192872",
+    "decision_date": "1979-05-07",
+    "report_page": "https://www.gao.gov/products/b-192872",
+    "source_pdf_url": "https://www.gao.gov/assets/b-192872.pdf",
+    "source_type": "OFFICIAL_SCANNED_FIVE_PAGE_GAO_ADJUDICATIVE_DECISION",
+    "source_review": "SOURCE_PDF_PAGES_1_TO_5_VISUALLY_INSPECTED_AND_MACHINE_TEXT_CROSS_CHECKED_2026_10_31",
+    "source_bytes_custodied": false,
+    "source_http_body_sha256": null,
+    "source_http_body_length": null,
+    "source_content_hash_status": "UNKNOWN_ORIGINAL_PDF_DOWNLOAD_UNAVAILABLE_PROJECTION_HASH_IS_NOT_PDF_HASH",
+    "original_gbl_or_carrier_invoice_bytes_custodied": false,
+    "original_nmfc_100_b_tariff_pages_custodied": false,
+    "independent_refund_receipt_custodied": false,
+    "acquisition_cost_usd": 0
+  },
+  "rights": {
+    "gao_reuse_url": "https://www.gao.gov/copyright",
+    "gao_authored_publication_reuse": "GAO_US_PUBLIC_DOMAIN_ATTRIBUTION_AND_NO_ENDORSEMENT",
+    "third_party_bol_tariff_material": "UNKNOWN_NOT_CLEARED",
+    "commercial_use_of_gao_authored_factual_projection": "ATTRIBUTION_NO_ENDORSEMENT",
+    "commercial_accuracy_scoring_approved": false
+  },
+  "historical_scope": {
+    "shipment_month": "1975-07",
+    "decision_date": "1979-05-07",
+    "nmfc_version": "100-B",
+    "original_tariff_effective_date": "UNKNOWN",
+    "present_day_tariff_relevance": "NOT_ESTABLISHED",
+    "rule_application": "HISTORICAL_SPECIFIC_RECORD_ONLY",
+    "ground_truth_label_scope": "GAO_DECISION_LEVEL_FINDINGS_NOT_FULL_INVOICE_RECONSTRUCTION"
+  },
+  "source_fact_projection": {
+    "bill_of_lading_reported_weight_lbs": 1700,
+    "class_if_knocked_down": 125,
+    "class_if_set_up": 300,
+    "decision_date": "1979-05-07",
+    "decision_id": "B-192872",
+    "final_net_settlement_cents": null,
+    "gao_ruling": "CLASS_125_APPLIES_WEIGHT_ADJUSTMENT_NEEDED",
+    "gsa_corrected_weight_lbs": 2200,
+    "knocked_down_cubage_ft3": 154,
+    "nmfc_item": "178160",
+    "original_gsa_deduction_cents": 50201,
+    "setup_cubage_ft3": 440,
+    "shipping_form": "LOWERED_GUARDRAILS_BANDED"
+  },
+  "source_fact_projection_sha256": "4a29abb68484658a6ae0e27a3a5986d3ca528f675b9d9b17759238d8358b2af0",
+  "projection_hash_contract": "SHA256_UTF8_PYTHON_JSON_DUMPS_SORT_KEYS_TRUE_SEPARATORS_COMMA_COLON_NO_WHITESPACE_NOT_ORIGINAL_PDF_HASH",
+  "adjudicated_ground_truth": [
+    {
+      "label_id": "BOL_DESCRIPTION_CONFLICT",
+      "outcome": "GBL_SU_TEXT_CONFLICTED_WITH_SUB_2_CLASSIFICATION",
+      "source_pages": [
+        1,
+        3
+      ],
+      "evidence": "Written setup/loose description was inconsistent with item 178160 sub 2; source BOL facsimile not held."
+    },
+    {
+      "label_id": "CLASSIFICATION",
+      "outcome": "CLASS_125_KNOCKED_DOWN_IN_PACKAGES_SUPPORTED",
+      "source_pages": [
+        2,
+        4,
+        5
+      ],
+      "evidence": "Physical-platform evidence: collapsed bulk 154 versus assembled 440 cubic feet; removed railings banded to platform counted as bundle."
+    },
+    {
+      "label_id": "WEIGHT_CORRECTION",
+      "outcome": "ACTUAL_WEIGHT_2200_NOT_GBL_1700",
+      "source_pages": [
+        1,
+        5
+      ],
+      "evidence": "GAO instructed GSA settlement adjustment to account for evidence of 2,200 pounds; exact additional dollars not given."
+    },
+    {
+      "label_id": "SETTLEMENT",
+      "outcome": "GSA_ORIGINAL_50201_CENT_DEDUCTION_NOT_VERIFIED_FINAL_AMOUNT",
+      "source_pages": [
+        2,
+        5
+      ],
+      "evidence": "Lower class accepted but adjustment for higher weight ordered if otherwise correct; actual adjusted amount and bank receipt not provided."
+    }
+  ],
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_BOL_SU_TEXT_CONTROLS",
+      "kind": "bol_conflict",
+      "split": "synthetic_calibration",
+      "facts": {
+        "written_description": "SU",
+        "item_subnumber": 2,
+        "independent_physical_evidence": "LOWERED_BANDED"
+      },
+      "claim": "CLASS_300_PROVEN_BY_GBL_TEXT",
+      "expected_guard": "REJECT_GBL_CONFLICT_NEEDS_PHYSICAL_EVIDENCE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_KD_33_THRESHOLD_FAIL",
+      "kind": "cubage",
+      "split": "synthetic_calibration",
+      "facts": {
+        "expanded_ft3": 440,
+        "collapsed_ft3": 154,
+        "threshold_fraction": 0.3333333333333333
+      },
+      "claim": "NOT_KNOCKED_DOWN",
+      "expected_guard": "REJECT_KD_BULK_REDUCTION_EXCEEDS_THRESHOLD",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_BOL_WEIGHT_WINS",
+      "kind": "weight",
+      "split": "synthetic_heldout",
+      "facts": {
+        "bol_lbs": 1700,
+        "agency_evidence_lbs": 2200
+      },
+      "claim": "SETTLE_ON_1700_LBS",
+      "expected_guard": "REJECT_BOL_WEIGHT_UNDERSTATED",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_FULL_DEDUCTION_FINAL_CASH",
+      "kind": "settlement",
+      "split": "synthetic_heldout",
+      "facts": {
+        "original_setoff_cents": 50201,
+        "final_adjusted_settlement_cents": null
+      },
+      "claim": "FINAL_NET_OVERCHARGE_50201",
+      "expected_guard": "UNKNOWN_FINAL_NET_AFTER_WEIGHT_ADJUSTMENT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_TWO_PLATFORMS_TWO_CASES",
+      "kind": "dedup",
+      "split": "synthetic_heldout",
+      "facts": {
+        "platforms": 2,
+        "gao_decisions": 1,
+        "bill_of_lading_clusters": 1
+      },
+      "claim": "TWO_INDEPENDENT_ADJUDICATIONS",
+      "expected_guard": "REJECT_CORRELATED_DUPLICATE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_1975_TARIFF_IS_CURRENT",
+      "kind": "temporal",
+      "split": "synthetic_heldout",
+      "facts": {
+        "shipment_year": 1975,
+        "modern_rate_in_custody": false
+      },
+      "claim": "VALID_2026_RATE",
+      "expected_guard": "UNKNOWN_CURRENT_RATE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_DEDUCTION_IS_CUSTOMER_REFUND",
+      "kind": "cash",
+      "split": "synthetic_heldout",
+      "facts": {
+        "gsa_setoff_occurred": true,
+        "actual_customer_refund_receipt": null
+      },
+      "claim": "CUSTOMER_CASH_PAID",
+      "expected_guard": "UNKNOWN_BANK_CASH",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_SOURCE_SELECTION_AS_BLIND_EVAL",
+      "kind": "benchmark",
+      "split": "synthetic_heldout",
+      "facts": {
+        "case_selected_after_outcome_known": true,
+        "blind_predictions": 0
+      },
+      "claim": "UNBIASED_RATE_ACCURACY",
+      "expected_guard": "REJECT_NO_BLIND_HELDOUT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_SOURCE_ROW",
+      "independent_real_label": null
+    }
+  ],
+  "independent_comparison": {
+    "case": "GAO B-195862",
+    "fixture": "freight/fixtures/gao_b195862_nested_packing_evidence_holdout_v1.json",
+    "distinct_docket": true,
+    "shared_question": "CONFLICT_BETWEEN_BOL_NOTATION_AND_PHYSICAL_PACKAGING_EVIDENCE",
+    "distinction": "B-195862 CONCERNS NESTED PACKING; B-192872 INVOLVES KNOCKED_DOWN CLASSIFICATION PLUS CORRECTED ACTUAL WEIGHT",
+    "dedup_rule": "ONE_B192872_ADJUDICATION_CLUSTER_NOT_TWO_SHIPMENTS_OR_MULTIPLE_LABELS",
+    "method_limit": "RESEARCH_SELECTED_AFTER_BOTH_OUTCOMES_KNOWN_NOT_AN_INDEPENDENT_BLIND_BENCHMARK"
+  },
+  "benchmark_readiness": {
+    "real_adjudication_clusters_added": 1,
+    "real_source_component_findings": 4,
+    "source_amount_claims_cents": [
+      50201
+    ],
+    "independently_verified_invoice_tariff_payment_triplets": 0,
+    "modern_customer_cases": 0,
+    "blind_pre_outcome_predictions": 0,
+    "real_blind_heldout_cases": 0,
+    "real_precision": null,
+    "real_recall": null,
+    "real_cash_recovered_cents": null,
+    "original_content_bytes_sha256": null,
+    "synthetic_calibration_controls": 2,
+    "synthetic_heldout_controls": 6,
+    "quality": "FIVE_PAGE_SCANNED_SOURCE_CROSS_CHECKED_NO_ORIGINAL_EXHIBITS_NO_FINAL_RECALCULATED_RATE"
+  },
+  "handoffs": {
+    "freightrecovery_12": "Use contradictory GBL vs verified physical state and weight correction as two distinct historical labels; 502.01 USD initial setoff is not final error amount.",
+    "recoveryos_12": "Do not book 502.01 USD as settled recovery or customer cash; adjustment and receipt UNKNOWN.",
+    "permitplate_48": "Not construction permitting evidence or NYC DOB labeled permit outcome.",
+    "capturebrief_52": "Not SAM.gov FY2027 solicitation or award outcome.",
+    "independent_qa_44": "Compare original scanned GAO pp 1-5 with projection, recompute projection SHA256, tamper all synthetic controls, require exact PR head and distinct docket; do not certify accuracy."
+  },
+  "restrictions": {
+    "private_customer_student_medical_data_saved": 0,
+    "personal_identifiers_saved": 0,
+    "original_gbl_identifiers_saved": 0,
+    "provider_calls_scheduled": 0,
+    "new_cron_added": 0,
+    "writer_branch_modified": false,
+    "product_code_modified": false,
+    "legacy_15_lab_consolidation_certified": false,
+    "release_authorized": false
+  }
+}
