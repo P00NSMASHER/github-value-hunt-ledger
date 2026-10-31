@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B225507_TENDER_AUTHORITY_EVIDENCE_V1",
+  "evaluation_family": "HISTORICAL_FREIGHT_TENDER_PROVENANCE_NOT_MODERN_RATE_ACCURACY",
+  "checked_on_utc": "2026-10-31",
+  "ownership": {
+    "canonical_repository": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_research_writer_branch": "research/retally-unified-data-lab",
+    "writer_modified": false
+  },
+  "original_source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-225507",
+    "title": "Stevens Transport: Carrier Denies Issuance of Apparently Valid Rate Tender",
+    "official_html_url": "https://www.gao.gov/products/b-225507-0",
+    "decision_date": "1987-09-23",
+    "reported_citation": "66 Comp. Gen. 670",
+    "source_publication_status": "FIRST_PARTY_PUBLIC_GAO_ADJUDICATIVE_HTML",
+    "source_verified_regions": "BACKGROUND, DISCUSSION, CONCLUSION",
+    "official_page_reviewed_on_utc": "2026-10-31",
+    "original_http_body_sha256": null,
+    "original_http_body_byte_length": null,
+    "raw_http_bytes_custodied": false,
+    "evidence_extraction": "MANUALLY_VERIFIED_FIRST_PARTY_HTML_FACT_PROJECTION_NOT_RAW_ORIGINAL_BYTE_HASH",
+    "original_gbl_invoice_tender_scan_bytes_custodied": false,
+    "original_mtcm_tender_official_copy_custodied": false,
+    "source_last_modified_utc": null
+  },
+  "rights": {
+    "terms_url": "https://www.gao.gov/copyright",
+    "gao_government_authored_text": "US_REUSE_WITH_GAO_ATTRIBUTION_NO_PERMISSION_NEEDED",
+    "ga0_no_endorsement": "NO_GAO_ENDORSEMENT_OF_RETALLY_OR_ENGINE",
+    "embedded_third_party_original_tender_rights": "UNKNOWN_UNREVIEWED_NO_TENDER_COPY_REPUBLISHED",
+    "commercial_score_authorized": false,
+    "privacy": "ONLY_PUBLIC_DECISION_METADATA_NO_PRIVATE_CUSTOMER_MEDICAL_OR_STUDENT_RECORDS"
+  },
+  "decision_reported_evidence": {
+    "carrier": "Stevens Transport",
+    "agency": "General Services Administration",
+    "tender_disputed": "ICC 1003",
+    "carrier_other_tenders": [
+      "ICC 1",
+      "ICC 100",
+      "ICC 1000"
+    ],
+    "purported_original_issue_date": "1984-11-06",
+    "purported_original_effective_date": "1984-12-06",
+    "handwritten_issue_and_effective_date": "1985-01-06",
+    "purported_expiry_date": "1986-12-06",
+    "mtmc_first_received_stamp": "1984-11-29",
+    "mtmc_second_received_stamp": "1985-01-07",
+    "mtmc_first_administrative_review": "1984-11-29",
+    "mtmc_second_administrative_review": "1985-01-09",
+    "mtmc_distribution_stamp": "1985-01-09",
+    "government_bill_of_lading_references_tender": true,
+    "sample_gbl_shipment_date": "1986-05-15",
+    "sample_gbl_tender_reference": "ICC 1003",
+    "company_official_affidavits_count": 5,
+    "carrier_issuing_officer_signature_authenticity_verified_by_mtmc": false,
+    "carrier_not_objected_until_notices_of_overcharge_as_reported": true,
+    "gsa_recovered_overcharge_deductions_as_reported": true,
+    "gsa_total_deduction_cents": null,
+    "individual_invoice_charge_cents": null,
+    "independent_bank_settlement_receipt_cents": null,
+    "actual_retally_customer_cash_cents": 0,
+    "official_outcome": "GAO_SUSTAINED_GSA_AUDIT_ACTION",
+    "outcome_explanation": "GAO_FOUND_LEGAL_DOUBT_AS_TO_CARRIER_CLAIM_DESPITE_DISPUTED_ISSUER_SIGNATURE; NOT_AN_AUTHENTIC_SIGNATURE_FINDING",
+    "evidence_caveat": "OFFICIAL_GAO_DESCRIBES_MULTIPLE_SHIPMENTS_WITH_ONE_SHARED_TENDER_DISPUTE; DO_NOT_MULTIPLY_DECISION_LABELS"
+  },
+  "original_outcome_labels": [
+    {
+      "source_key": "GAO/B-225507",
+      "split": "research_selected_after_decision_publication",
+      "label": "GSA_AUDIT_DEDUCTIONS_SUSTAINED",
+      "adjudicated_legal_question": "WHETHER_CARRIER_DENIAL_OVERCAME_GSA_TENDER_FILING_AND_NOTICE_EVIDENCE",
+      "independent_original_invoice_tariff_payment_triplets": 0,
+      "independently_verified_signatory_identity": false,
+      "modern_freight_error_label": false
+    }
+  ],
+  "reported_historical_baseline": {
+    "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+    "facts": {
+      "official_file_tender_present": true,
+      "gbl_tender_notice": true,
+      "tender_effective_on_shipment": true,
+      "timely_carrier_inquiry_before_notices": false
+    }
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_B225507_MISSING_OFFICIAL_TENDER_FILE",
+      "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+      "facts": {
+        "official_file_tender_present": null,
+        "gbl_tender_notice": true,
+        "tender_effective_on_shipment": true,
+        "timely_carrier_inquiry_before_notices": false
+      },
+      "expected": "UNKNOWN_OFFICIAL_TENDER_FILE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_NO_GBL_NOTICE",
+      "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+      "facts": {
+        "official_file_tender_present": true,
+        "gbl_tender_notice": null,
+        "tender_effective_on_shipment": true,
+        "timely_carrier_inquiry_before_notices": false
+      },
+      "expected": "UNKNOWN_GBL_NOTICE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_EFFECTIVE_DATE_UNKNOWN",
+      "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+      "facts": {
+        "official_file_tender_present": true,
+        "gbl_tender_notice": true,
+        "tender_effective_on_shipment": null,
+        "timely_carrier_inquiry_before_notices": false
+      },
+      "expected": "UNKNOWN_TENDER_EFFECTIVITY",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_PRE_EFFECTIVE_SHIPMENT",
+      "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+      "facts": {
+        "official_file_tender_present": true,
+        "gbl_tender_notice": true,
+        "tender_effective_on_shipment": false,
+        "timely_carrier_inquiry_before_notices": false
+      },
+      "expected": "REJECT_INEFFECTIVE_TENDER_NOT_GAO_CASE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_TIMELY_CARRIER_INQUIRY",
+      "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+      "facts": {
+        "official_file_tender_present": true,
+        "gbl_tender_notice": true,
+        "tender_effective_on_shipment": true,
+        "timely_carrier_inquiry_before_notices": true
+      },
+      "expected": "UNKNOWN_DIFFERENT_FACT_PATTERN",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_TIMING_NOT_PROVEN",
+      "claim": "HISTORICAL_GAO_DEDUCTION_SUPPORT",
+      "facts": {
+        "official_file_tender_present": true,
+        "gbl_tender_notice": true,
+        "tender_effective_on_shipment": true,
+        "timely_carrier_inquiry_before_notices": null
+      },
+      "expected": "UNKNOWN_TIMING",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_STAMPS_ARE_NOT_SIGNATURE_VALIDATION",
+      "claim": "MTMC_STAMPS_PROVE_SIGNATORY_AUTHENTIC",
+      "facts": {
+        "mtmc_received_and_reviewed": true,
+        "mtmc_signatory_identity_verified": false
+      },
+      "expected": "REJECT_UNVERIFIED_SIGNATURE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_AFFIDAVITS_NOT_FRAUD_FINDING",
+      "claim": "FIVE_CARRIER_AFFIDAVITS_PROVE_FORGED_TENDER",
+      "facts": {
+        "carrier_affidavits_count": 5,
+        "independent_fraud_judgment": null
+      },
+      "expected": "REJECT_UNADJUDICATED_FRAUD",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_BELOW_COST_NOT_PROOF",
+      "claim": "CARRIER_COST_ALONE_PROVES_TENDER_NOT_ISSUED",
+      "facts": {
+        "rates_below_carrier_reported_cost": true
+      },
+      "expected": "REJECT_COST_INFERENCE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_AGENCY_OFFSET_NOT_BANK_CASH",
+      "claim": "GSA_DEDUCTION_PROVES_RETALLY_CUSTOMER_RECOVERY",
+      "facts": {
+        "gsa_audit_sustained": true,
+        "bank_receipt": null
+      },
+      "expected": "UNKNOWN_NO_CUSTOMER_CASH",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_MULTIPLE_GBLS_ONE_DECISION",
+      "claim": "EACH_GBL_IS_INDEPENDENT_ADJUDICATED_LABEL",
+      "facts": {
+        "one_gao_decision": true,
+        "one_shared_tender_dispute": true,
+        "number_of_gbls": null
+      },
+      "expected": "REJECT_CORRELATED_LABELS",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_B225507_CURRENT_TARIFF_FROM_1987",
+      "claim": "HISTORICAL_TENDER_IS_MODERN_RATE_AUTHORITY",
+      "facts": {
+        "decision_date": "1987-09-23",
+        "modern_effective_tender": null
+      },
+      "expected": "UNKNOWN_MODERN_RATE_AUTHORITY",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_AUTHORED_NOT_A_REAL_SHIPMENT",
+      "independent_real_label": null
+    }
+  ],
+  "benchmark_readiness": {
+    "primary_key": "GAO/B-225507",
+    "contrast_key": "GAO/B-203929.2",
+    "comparison": "GAO_B225507_SUSTAINED_TENDER_DEDUCTIONS_WHILE_GAO_B203929_2_REVERSED_DIFFERENT_SEAL_PRECONDITION_DEDUCTION; DISTINCT_ADJUDICATION_THEMES_NOT_A_BLIND_PRODUCT_SCORE",
+    "selected_source_decision_clusters": 2,
+    "product_engine_predictions": 0,
+    "modern_independently_labeled_invoice_triplets": 0,
+    "independent_real_customer_holdout": 0,
+    "heldout_research_only_synthetic_controls": 12,
+    "original_rate_tender_authentic_signature_proved": false,
+    "historical_invoice_amount_accuracy": null,
+    "modern_precision": null,
+    "modern_recall": null,
+    "simulated_controls_not_counted_as_accuracy": true,
+    "synthetic_and_real_decision_clusters_never_combined": true
+  },
+  "handoffs": {
+    "freightrecovery_12": "GAO decision B-225507 presents disputed tender provenance, MTMC stamps and GBL notice; do not infer authenticated signature or present-day rate authority; actual bill/tender bytes absent.",
+    "recoveryos_12": "GSA deduction upheld is not customer cash receipt or bank settlement; amount unknown.",
+    "permitplate_48": "Freight tender dispute, not NYC building permit evidence.",
+    "capturebrief_52": "Historical government freight tender, not SAM.gov FY2027 solicitation or award history.",
+    "independent_qa_44": "Check dates/stamps/GAO reasoning against original official HTML; independently flag provenance uncertainty, no actual source byte SHA or authenticated tender, and no blind real customer accuracy."
+  },
+  "restrictions": {
+    "private_customer_data_persisted": false,
+    "product_code_changed": false,
+    "writer_branch_modified": false,
+    "new_paid_provider_calls": 0,
+    "new_cron_or_schedule": false,
+    "release_authorized": false,
+    "legacy_15_lab_consolidation_certified": false
+  }
+}
