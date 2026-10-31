@@ -157,5 +157,84 @@ class GaoB151387IndependentHistoricalRailHoldoutTest(unittest.TestCase):
         self.assertFalse(d["legacy_lab_consolidation_certified"])
 
 
+# A separate first-party GAO decision supplies one real held-out *negative*
+# rate-entitlement label, not 75 distinct invoice labels or modern buyer accuracy.
+B221705_FIXTURE = Path(__file__).parent / "fixtures" / "gao_b221705_negative_rate_holdout_v1.json"
+
+
+class GaoB221705FalsePositiveIndependentDecisionTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.d = json.loads(B221705_FIXTURE.read_text(encoding="utf-8"))
+
+    def test_official_original_decision_rights_provenance_and_unknown_bytes(self):
+        d = self.d
+        s = d["source"]
+        self.assertEqual(s["original_decision_id"], "B-221705")
+        self.assertEqual(s["original_decision_pdf_url"], "https://www.gao.gov/assets/b-221705.pdf")
+        self.assertEqual(s["rights_url"], "https://www.gao.gov/copyright")
+        self.assertEqual(s["decision_effective_date"], "1987-05-11")
+        self.assertEqual(s["original_decision_page_count"], 3)
+        self.assertIsNone(s["original_publisher_pdf_sha256"])
+        self.assertIsNone(s["original_publisher_pdf_byte_length"])
+        self.assertFalse(s["original_pdf_bytes_independently_custodied"])
+        self.assertFalse(s["original_carrier_invoice_bol_and_tariff_bytes_custodied"])
+        self.assertEqual(s["third_party_carrier_tariff_document_rights"], "UNKNOWN_NOT_CLEARED")
+
+    def test_one_independent_negative_decision_not_seventy_five_independent_invoices(self):
+        d = self.d
+        s = d["adjudicated_representative_shipment"]
+        p = d["case_population"]
+        self.assertEqual(s["government_bill_of_lading_number"], "FP-094063")
+        self.assertEqual(s["bill_of_lading_period"], "1983-03_EXACT_DAY_UNKNOWN")
+        self.assertEqual(s["merger_date"], "1982-09-12")
+        self.assertEqual(s["rate_tender"], "ABF Tender ICC 1188")
+        self.assertFalse(s["destination_listed_as_ABF_direct_service_in_section_2"])
+        self.assertTrue(s["post_merger_operating_authority_extended"])
+        self.assertFalse(s["tender_automatically_extended_through_merger"])
+        self.assertFalse(s["gao_upheld_GSA_approach"])
+        self.assertEqual(s["gao_final_holding"], "REDUCED_TENDER_RATE_NOT_APPLICABLE_TO_LEXINGTON_PARK")
+        self.assertEqual(p["minimum_shipments_in_GAO_review"], 75)
+        self.assertEqual(p["independent_adjudicated_decisions"], 1)
+        self.assertEqual(p["distinct_independently_labeled_negative_decisions"], 1)
+        self.assertEqual(p["individual_original_bol_files_custodied"], 0)
+        self.assertEqual(d["dedup"]["decision_key"], "GAO/B-221705")
+        self.assertEqual(d["dedup"]["do_not_multiply_by_population"], 75)
+
+    def test_naive_overcharge_heuristic_is_wrong_not_a_precision_benchmark(self):
+        d = self.d
+        c = d["heldout_comparison"]
+        self.assertEqual(c["naive_prediction"], "OVERCHARGE_RECOVERABLE")
+        self.assertEqual(c["actual_GAO_label"], "FALSE_POSITIVE_TENDER_SCOPE_NOT_EXTENDED")
+        self.assertEqual(c["mismatch_count_in_this_one_HISTORICAL_decision"], 1)
+        self.assertFalse(c["independently_tested_against_product_engine"])
+        self.assertEqual(c["source_original_invoice_tariff_or_payment_pair_count"], 0)
+        self.assertIsNone(c["modern_customer_freight_error_accuracy"])
+        self.assertIsNone(c["bank_cleared_customer_recovery_cents"])
+        self.assertEqual(c["observed_retally_recovery_cents"], 0)
+        shipment = d["adjudicated_representative_shipment"]
+        for field in ("claimed_tariff_rate_cents", "claimed_reduced_tender_rate_cents", "gsa_deduction_dollars"):
+            self.assertIsNone(shipment[field])
+        self.assertFalse(shipment["final_settlement_payment_proved"])
+
+    def test_synthetic_adversarial_labels_are_not_inflated_as_real_cases(self):
+        d = self.d
+        expected = {
+            "SYNTH_B221705_MERGER_AUTOMATIC_TENDER_EXTENSION": "REJECT_TENDER_SCOPE_OVER_OPERATING_AUTHORITY",
+            "SYNTH_B221705_CARRIER_AUTHORITY_IS_RATE_TENDER": "REJECT_DIFFERENT_LEGAL_FACTS",
+            "SYNTH_B221705_75_SHIPMENTS_ARE_75_INDEPENDENT_LABELS": "REJECT_ONE_DECISION_NOT_SEVENTY_FIVE_HOLDOUTS",
+            "SYNTH_B221705_DEDUCTION_AS_FINAL_RECOVERY": "REJECT_GAO_OVERRULED_GSA_THEORY",
+            "SYNTH_B221705_UNSTATED_AMOUNTS_EQUAL_ZERO": "UNKNOWN_NOT_ZERO",
+            "SYNTH_B221705_HISTORICAL_TARIFF_APPLIES_TO_2026": "UNKNOWN_NO_PRESENT_DAY_TARIFF",
+        }
+        controls = d["synthetic_negative_controls"]
+        self.assertEqual({c["id"]: c["expected"] for c in controls}, expected)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT" and
+                            c["independently_verified_customer_label"] is None for c in controls))
+        self.assertFalse(d["restrictions"]["release_authorized"])
+        self.assertFalse(d["restrictions"]["legacy_15_lab_consolidation_certified"])
+
+
+
 if __name__ == "__main__":
     unittest.main()
