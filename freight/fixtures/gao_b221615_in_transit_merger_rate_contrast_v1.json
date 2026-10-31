@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B221615_IN_TRANSIT_MERGER_RATE_CONTRAST_V1",
+  "evaluation_family": "FREIGHT_ADJUDICATED_HISTORICAL_RATE_ENTITLEMENT_CONTRAST_NOT_MODERN_ACCURACY",
+  "review_date_utc": "2026-10-31",
+  "sources": [
+    {
+      "decision_id": "B-221615",
+      "publisher": "U.S. Government Accountability Office",
+      "source_url": "https://www.gao.gov/products/b-221615-0",
+      "rights_url": "https://www.gao.gov/copyright",
+      "effective_decision_date": "1986-06-24",
+      "source_kind": "ORIGINAL_OFFICIAL_PUBLISHED_GAO_DECISION_HTML_TEXT",
+      "public_source_html_http_body_sha256": null,
+      "public_source_html_response_length_bytes": null,
+      "source_original_http_response_custodied": false,
+      "original_gbl_bytes_custodied": false,
+      "original_tender_bytes_custodied": false,
+      "original_carrier_invoice_and_bank_bytes_custodied": false,
+      "third_party_carrier_document_reuse_rights": "UNKNOWN_NOT_CLEARED"
+    },
+    {
+      "decision_id": "B-221705",
+      "publisher": "U.S. Government Accountability Office",
+      "source_url": "https://www.gao.gov/products/b-221705",
+      "rights_url": "https://www.gao.gov/copyright",
+      "effective_decision_date": "1987-05-11",
+      "source_kind": "EXISTING_PUBLIC_GAO_HOLDOUT_REFERENCE_NOT_A_SECOND_NEW_FIXTURE",
+      "public_source_html_http_body_sha256": null,
+      "public_source_html_response_length_bytes": null,
+      "source_original_http_response_custodied": false,
+      "original_gbl_bytes_custodied": false,
+      "original_tender_bytes_custodied": false,
+      "original_carrier_invoice_and_bank_bytes_custodied": false,
+      "third_party_carrier_document_reuse_rights": "UNKNOWN_NOT_CLEARED"
+    }
+  ],
+  "original_new_adjudicated_decision": {
+    "decision_id": "B-221615",
+    "dedup_key": "GAO/B-221615/GBL/S4270096",
+    "government_bill_of_lading": "S4270096",
+    "original_tendered_carrier": "East Texas Motor Freight System (ETMF)",
+    "performing_and_billing_carrier": "ABF Freight Systems",
+    "government_origin": "Naval Air Station Kingsville, Texas",
+    "government_destination": "Cherry Point, North Carolina",
+    "bill_of_lading_issued_date": "1982-09-09",
+    "original_tendered_carrier_agent_receipt_date": "1982-09-09",
+    "merger_effective_date": "1982-09-12",
+    "shipment_delivered_date": "1982-09-17",
+    "original_gbl_referenced_tender": "ETMF ICC 691",
+    "tender_691_effective_on_tendered_day": true,
+    "GBL_contract_party_is_original_tender_issuing_carrier": true,
+    "route_in_original_tender_scope_as_adjudicated": true,
+    "carrier_billed_and_collected_before_audit": true,
+    "carrier_initial_overcharge_cents_as_reported_by_GAO": 15604,
+    "GSA_overcharge_deduction_cents_as_reported_by_GAO": 15604,
+    "GAO_final_holding": "GSA_OVERCHARGE_AUDIT_SUSTAINED_ETMF_ORIGINAL_GBL_CONTRACT_GOVERNS",
+    "GAO_accepted_ABF_tender_adoption_proof": false,
+    "GSA_rate_basis_sustained_despite_absent_adoption_evidence": true,
+    "independent_bank_or_private_customer_cash_recovery_cents": null,
+    "underlying_rate_and_tariff_line_item_math_independently_recomputed": false,
+    "current_2026_commercial_contract_precedent_applicability": "UNKNOWN"
+  },
+  "existing_contrast_reference": {
+    "decision_id": "B-221705",
+    "dedup_key": "GAO/B-221705",
+    "existing_fixture_path": "freight/fixtures/gao_b221705_negative_rate_holdout_v1.json",
+    "representative_bill_of_lading": "FP-094063",
+    "shipment_period": "1983-03",
+    "merger_effective_date": "1982-09-12",
+    "proposed_rate_tender": "ABF ICC 1188",
+    "route_in_proposed_reduced_tender_scope_as_adjudicated": false,
+    "expanded_post_merger_operating_authority_is_not_tender_expansion": true,
+    "GAO_final_holding": "GSA_AUDIT_OVERRULED_REDUCED_TENDER_NOT_APPLICABLE_TO_LEXINGTON_PARK",
+    "source_dollar_amount": null,
+    "individual_label_count": 1,
+    "original_bol_bytes_custodied": false
+  },
+  "comparison": {
+    "source_bound_features": [
+      "GBL_party_at_original_tender_date",
+      "GBL_referenced_tender_in_effect",
+      "route_within_tender_geographic_scope",
+      "merger_timing"
+    ],
+    "new_decision_label": "HISTORICAL_OVERCHARGE_SUSTAINED",
+    "existing_decision_label": "HISTORICAL_OVERCHARGE_RATE_THEORY_REJECTED",
+    "naive_rule_merger_always_invalidates_original_tender": "REJECT_FALSE_NEGATIVE_FOR_B221615",
+    "naive_rule_merger_always_extends_lower_tender": "REJECT_FALSE_POSITIVE_FOR_B221705",
+    "independently_adjudicated_decisions_in_pair": 2,
+    "new_decisions_this_increment": 1,
+    "distinct_source_publishers": 1,
+    "modern_invoice_tariff_payment_adjudication_triplets": 0,
+    "product_engine_predictions_evaluated": 0,
+    "population_randomized": false,
+    "post_hoc_curated_comparison": true,
+    "true_independent_modern_holdout_count": 0,
+    "modern_freight_error_precision": null,
+    "modern_freight_error_recall": null,
+    "source_document_body_sha256_kind": "UNKNOWN_NOT_A_GIT_FIXTURE_BLOB",
+    "source_original_gbl_tender_and_rate_card_bytes_custodied": 0,
+    "retally_recovered_customer_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B221615_PERFORMING_CARRIER_OVERRIDES_ORIGINAL_GBL",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_calibration",
+      "expected": "REJECT_IN_TRANSIT_MERGER_DOES_NOT_REWRITE_ORIGINAL_GBL",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221615_NO_TENDER_ADOPTION_MEANS_AUTOMATIC_INVALIDITY",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_calibration",
+      "expected": "REJECT_GAO_SUSTAINED_ON_ORIGINAL_GBL_GROUNDS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221705_MERGER_EXTENDS_ALL_RATE_POINTS",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "expected": "REJECT_TENDER_GEOGRAPHIC_SCOPE_UNCHANGED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221615_FUTURE_MERGER_AUTOMATICALLY_REPRICES",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "expected": "REJECT_TENDER_EFFECTIVE_AT_BOOKING_CONTROLS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221615_DEDUCTION_EQUALS_PRIVATE_CUSTOMER_CASH",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "expected": "UNKNOWN_BANK_AND_CUSTOMER_SETTLEMENT_NOT_OBSERVED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221615_TWO_DECISIONS_ARE_TWO_INDEPENDENT_PUBLISHERS",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "expected": "REJECT_BOTH_GAO_ONE_PUBLISHER",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221615_WITHOUT_GBL_OR_TENDER_ASSUME_POSITIVE",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "expected": "UNKNOWN_MISSING_ORIGINAL_RATE_SCOPE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_B221615_TARIFF_1982_VALID_FOR_2026_CUSTOMER",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "split": "synthetic_holdout",
+      "expected": "UNKNOWN_NO_MODERN_CONTRACT_OR_RATE",
+      "independent_real_label": null
+    }
+  ],
+  "handoffs": {
+    "freightrecovery_12": "Add source-bound contrasts for original GBL party, merger timing, and tender geographic scope; do not treat one merger heuristic as entitlement proof.",
+    "recoveryos_12": "Separate 15604-cent reported government GSA deduction from unobserved independently bank-cleared customer cash.",
+    "permitplate_48": "NO_PERMIT_RECORDS_OR_POSITIVE_PERMIT_LABELS",
+    "capturebrief_52": "NO_PROCUREMENT_OR_AWARD_LABELS_SAM_FY2027_READER_DEFECTS_UNCHANGED",
+    "independent_qa_44": "Verify GAO B-221615 source lines 18-33, existing B-221705 1987 negative contrast, rights/UNKNOWN byte fields and exact-head regression."
+  },
+  "restrictions": {
+    "private_medical_student_customer_records_used": false,
+    "no_new_provider_calls_in_tests": true,
+    "engine_code_modified": false,
+    "writer_branch_modified": false,
+    "protected_main_modified": false,
+    "legacy_15_labs_consolidated": false,
+    "release_authorized": false
+  }
+}
