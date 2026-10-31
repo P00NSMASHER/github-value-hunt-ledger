@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B195862_CONTEMPORANEOUS_PACKING_PROOF_V1",
+  "evaluation_family": "ORIGINAL_HISTORICAL_GAO_DECISION_CLASSIFICATION_NOT_PRESENT_DAY_FREIGHT_ACCURACY",
+  "assembled_utc": "2026-10-31",
+  "ownership": {
+    "repo": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "sole_live_research_writer": "research/retally-unified-data-lab",
+    "writer_branch_modified": false,
+    "legacy_15_lab_consolidation_proved": false
+  },
+  "original_source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-195862",
+    "decision_date": "1980-02-07",
+    "original_highlights_url": "https://www.gao.gov/products/b-195862",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_AUTHORED_US_GOVERNMENT_TEXT_REUSABLE_WITH_ATTRIBUTION_AND_NO_IMPLIED_ENDORSEMENT",
+    "commercial_use": "GAO_AUTHORSHIP_PERMITS_TEXT_REUSE_WITH_ATTRIBUTION; ORIGINAL_THIRD_PARTY_BOL_TARIFF_PHOTOGRAPH_RIGHTS_UNKNOWN",
+    "third_party_document_rights": "UNKNOWN_NOT_CLEARED",
+    "observed_utc": "2026-10-31",
+    "source_content_sha256": null,
+    "source_bytes_custodied": false,
+    "source_hash_status": "UNKNOWN_ORIGINAL_HTTP_RESPONSE_NOT_RETRIEVED_NOT_REPLACED_WITH_FIXTURE_GIT_SHA",
+    "original_document_full_report_reviewed": false,
+    "original_highlights_reviewed": true,
+    "source_schema": "ONE_GAO_HIGHLIGHTS_NARRATIVE_NOT_CARRIER_INVOICE_TARIFF_OR_BOL_BYTES",
+    "original_shipment_or_invoice_documents_custodied": 0,
+    "carrier_tariff_effective_date": "UNKNOWN",
+    "source_update_frequency": "HISTORICAL_FIXED_DECISION_PAGE_HTTP_BYTES_NOT_FROZEN",
+    "extraction_quality": "OFFICIAL_PUBLISHER_HIGHLIGHTS_READ; NO_ORIGINAL_FULL_REPORT_OR_THIRD_PARTY_EXHIBITS_VERIFIED",
+    "label_completeness": "ONE_DECISION_LEVEL_SETTLEMENT_OUTCOME; NO_ITEMIZED_INVOICE_OR_VALID_RATE_RECONSTRUCTION",
+    "original_labeled_decision_count": 1
+  },
+  "adjudicated_case": {
+    "decision_id": "B-195862",
+    "cohort": "HISTORICAL_GSA_FREIGHT_OVERCHARGE_REVIEW",
+    "conflict": "GOVERNMENT_BOL_25_EACH_NOTATION_VERSUS_PACKAGE_NESTING_RATE",
+    "initially_paid_basis": "OTHER_THAN_NESTED_LOOSE",
+    "proposed_corrected_basis": "SET_UP_NESTED_IN_PACKAGES",
+    "shipment_piece_count_notation": 25,
+    "gov_bill_of_lading_alone_conclusively_proves_loose": false,
+    "same_day_signed_commercial_bol_describes_nested_packages": true,
+    "destination_official_history_of_similar_nesting": true,
+    "GSA_photos_show_at_least_one_third_space_reduction": true,
+    "GAO_found_original_GSA_initial_packaging_evidence_insufficient": true,
+    "GAO_found_supplemental_evidence_adequate": true,
+    "outcome": "GSA_OVERCHARGE_DEDUCTION_SUSTAINED",
+    "original_deduction_amount_cents": null,
+    "corrected_tariff_rate_cents": null,
+    "paid_invoice_amount_cents": null,
+    "original_carrier_invoice_bytes_custodied": false,
+    "actual_retally_customer_recovery_cents": 0,
+    "limitations": "ONE_ADJUDICATED_HISTORIC_OUTCOME_NOT_COMPLETE_RATE_REPLAY_NO_BANKED_RECOVERY_PROOF"
+  },
+  "independent_original_contrast": {
+    "source": "https://www.gao.gov/products/b-203929.2",
+    "decision_id": "B-203929.2",
+    "decision_date": "1982-04-09",
+    "outcome": "GSA_AUDIT_DEDUCTION_REVERSED",
+    "different_case_id": true,
+    "distinguishes": "ANOTHER_GAO_CASE_HAD_UNMET_MANDATORY_SHIPPER_SEAL_PRECONDITION; DO_NOT_ALWAYS_SUSTAIN_GSA",
+    "previously_registered_pack": "freight/fixtures/gao_b203929_seal_precondition_reversed_holdout_v1.json",
+    "heldout_split": "RESEARCH_RESERVED_NOT_PROVED_UNSEEN_BY_ENGINE"
+  },
+  "benchmark": {
+    "real_original_decision_labels": 2,
+    "independent_publishers": 1,
+    "original_shipments_with_full_rate_triplet": 0,
+    "present_day_customer_labeled_cases": 0,
+    "engine_predictions_recorded": 0,
+    "naive_always_sustain_gsa_errors_in_two_original_decisions": 1,
+    "naive_government_bol_25_each_means_loose_errors_in_primary_decision": 1,
+    "precision": null,
+    "recall": null,
+    "extraction_accuracy": null,
+    "commercial_recovery_truth": "UNKNOWN",
+    "warning": "TWO_RESEARCH_SELECTED_DECISIONS_NOT_RANDOM_INDEPENDENT_PROSPECTIVE_SAMPLE"
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYN_B195862_COMPLETE_CONTEMPORANEOUS_CORROBORATION",
+      "facts": {
+        "decision_id": "B-195862",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": true,
+        "same_date_and_shipment": true,
+        "one_third_space_reduction_photos": true
+      },
+      "expected": "HISTORICAL_NESTED_RATE_SUPPORTED_ONLY",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_GBL_ONLY",
+      "facts": {
+        "decision_id": "B-195862",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": null,
+        "same_date_and_shipment": null,
+        "one_third_space_reduction_photos": null
+      },
+      "expected": "UNKNOWN_CORROBORATION_MISSING",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_MISSING_PHOTOS",
+      "facts": {
+        "decision_id": "B-195862",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": true,
+        "same_date_and_shipment": true,
+        "one_third_space_reduction_photos": null
+      },
+      "expected": "UNKNOWN_CORROBORATION_MISSING",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_DIFFERENT_BOL_DATE",
+      "facts": {
+        "decision_id": "B-195862",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": true,
+        "same_date_and_shipment": false,
+        "one_third_space_reduction_photos": true
+      },
+      "expected": "UNKNOWN_CONFLICTING_SHIPMENT_IDENTITY",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_PHOTOS_DO_NOT_SHOW_REDUCTION",
+      "facts": {
+        "decision_id": "B-195862",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": true,
+        "same_date_and_shipment": true,
+        "one_third_space_reduction_photos": false
+      },
+      "expected": "UNKNOWN_CORROBORATION_CONFLICT",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_OTHER_DECISION",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": true,
+        "same_date_and_shipment": true,
+        "one_third_space_reduction_photos": true
+      },
+      "expected": "UNKNOWN_OTHER_DECISION",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_OTHER_BOL_DESCRIBES_LOOSE",
+      "facts": {
+        "decision_id": "B-195862",
+        "gbl_piece_count": 25,
+        "signed_commercial_bol_nested": false,
+        "same_date_and_shipment": true,
+        "one_third_space_reduction_photos": true
+      },
+      "expected": "UNKNOWN_CORROBORATION_CONFLICT",
+      "split": "synthetic_calibration",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_AMOUNT_UNKNOWN_NOT_ZERO",
+      "candidate_claim": "HISTORIC_OVERCHARGE_AMOUNT_IS_ZERO",
+      "expected": "UNKNOWN_AMOUNT_NOT_ZERO",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_PUBLISHER_NOTE_EQUALS_CUSTOMER_RECOVERY",
+      "candidate_claim": "GAO_SETTLEMENT_EQUALS_RETALLY_CASH",
+      "expected": "REJECT_NO_REAL_CUSTOMER_CASH",
+      "split": "synthetic_heldout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYN_B195862_PDF_PAGES_COUNT_AS_SEPARATE_CASES",
+      "candidate_claim": "FULL_REPORT_PAGES_ARE_INDEPENDENT_CASES",
+      "expected": "REJECT_DUPLICATE_DECISION",
+      "split": "synthetic_calibration",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_SHIPMENT",
+      "independent_real_customer_label": null
+    }
+  ],
+  "dedup": {
+    "primary": "GAO/B-195862",
+    "contrast": "GAO/B-203929.2",
+    "independent_decision_count": 2,
+    "never_count_web_versions_or_pages_as_independent_cases": true,
+    "synthetic_controls_never_real_labels": true
+  },
+  "handoffs": {
+    "freightrecovery_12": "TEST_ADJUDICATED_PACKING_EVIDENCE_HIERARCHY; NO_CURRENT_TARIFF_QUOTE_OR_RATE_CLAIM",
+    "recoveryos_12": "NO_CUSTOMER_INVOICE_SETTLEMENT_OR_BANK_PROOF; KEEP_ZERO_REAL_RECOVERIES",
+    "permitplate_48": "NOT_A_NYC_DOB_PERMIT_OR_REAL_LEAD_SCORING_LABEL",
+    "capturebrief_52": "NOT_AN_FY2027_SAM_NOTICE_OR_AWARD_LABEL",
+    "qa_44": "VERIFY_GAO_HIGHLIGHTS_AND_COPYRIGHT; ORIGINAL_BYTES_HASH_UNKNOWN; CONTRAST_B203929; CONTROL_IDS_AND_HOLDOUT_LABELS"
+  },
+  "controls": {
+    "no_engine_code_changes": true,
+    "no_new_schedule": true,
+    "no_provider_costs": true,
+    "no_private_records": true,
+    "no_customer_outreach": true,
+    "no_release_bypass": true,
+    "commercial_scoring_approved": false
+  }
+}
