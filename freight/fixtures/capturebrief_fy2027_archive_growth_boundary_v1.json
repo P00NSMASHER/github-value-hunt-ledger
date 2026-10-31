@@ -116,7 +116,8 @@
     "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized.",
     "Synthetic-only transport validation repaired two documented reader defects. Real FY2027 original archive readback and source-byte SHA-256 remain UNKNOWN until the existing bounded writer safely reads it; no extra source fetches performed.",
     "This pack does not independently verify complete FY2027 solicitation/version history or give downstream engine scoring approval.",
-    "New official SAM.gov Data Services datagov daily-current extract listing is a separate prospective original-data lead; no direct original CSV fetched and no FY2027 archival as-of or award fact may be inferred."
+    "New official SAM.gov Data Services datagov daily-current extract listing is a separate prospective original-data lead; no direct original CSV fetched and no FY2027 archival as-of or award fact may be inferred.",
+    "2026-10-31 first-party GSA opportunities v2 documentation confirms latest-active-only, daily active/weekly archive cadence, required posted date range, and status filter marked Coming Soon. Four SYNTHETIC history/absence guards added; no original notice rows or award labels acquired, commercial rights and source-byte SHA remain UNKNOWN."
   ],
   "documentation_controls": {
     "verified_date_utc": "2026-10-30",
@@ -190,5 +191,76 @@
     ],
     "evaluation_eligibility": "SOURCE_LEAD_ONLY_REQUIRES_SCOPE_RIGHTS_AND_ORIGINAL_BYTE_CUSTODY_BEFORE_USE",
     "discovered_in_research_on": "2026-10-31"
-  }
+  },
+  "opportunities_api_version_history_evidence": {
+    "publisher": "U.S. General Services Administration, SAM.gov / GSA Open Technology",
+    "first_party_documentation_url": "https://open.gsa.gov/api/get-opportunities-public-api/",
+    "linked_publisher_archived_data_url": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
+    "first_party_public_api_endpoint": "https://api.sam.gov/opportunities/v2/search",
+    "source_classification": "ORIGINAL_PUBLISHER_API_DOCUMENTATION_NOT_AN_ACQUIRED_NOTICE_ROW",
+    "documented_api_history_scope": "LATEST_ACTIVE_VERSION_ONLY_NOT_COMPLETE_VERSION_HISTORY",
+    "documented_active_notice_update_cadence": "DAILY",
+    "documented_archived_notice_update_cadence": "WEEKLY",
+    "documented_status_filter": "COMING_SOON_NOT_CONFIRMED_OPERATIONAL",
+    "documented_date_required": true,
+    "documented_posted_date_from_to_max_range": "ONE_YEAR",
+    "documented_api_key_required": true,
+    "observed_utc_date": "2026-10-31",
+    "publisher_effective_revision_date": "UNKNOWN_NOT_ATTESTED",
+    "documentation_raw_http_response_sha256": null,
+    "documentation_raw_response_bytes_retained": false,
+    "real_fy2027_notice_rows_from_this_source": 0,
+    "independently_heldout_real_notice_version_change_labels": 0,
+    "independent_preaward_notice_to_award_labels": 0,
+    "source_specific_data_reuse_and_third_party_commercial_rights": "UNKNOWN_NOT_APPROVED",
+    "scope_and_schema": [
+      "noticeid",
+      "solnum",
+      "postedFrom",
+      "postedTo",
+      "offset",
+      "limit"
+    ],
+    "quality": "FIRST_PARTY_DOCUMENTED_COVERAGE_NEGATIVE_ONLY_NOT_PERFORMANCE_BENCHMARK",
+    "downstream_handoff": "CaptureBrief_52 guard source version and weekly publication lag; QA_44 independently check documentation before scoring; other engines no positive labels",
+    "legacy_15_lab_consolidation_verified": false
+  },
+  "opportunities_api_history_synthetic_controls": [
+    {
+      "id": "SYN_SAM_API_LATEST_VERSION_ONLY",
+      "split": "synthetic_holdout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_NOTICE",
+      "scenario": "Only latest active API version returned; an earlier amendment is not retrieved.",
+      "unsafe_inference": "FULL_VERSION_HISTORY_CONFIRMED",
+      "expected_guard": "UNKNOWN_HISTORICAL_VERSIONS_NOT_IN_API",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_SAM_ARCHIVE_WEEKLY_PUBLICATION_LAG",
+      "split": "synthetic_holdout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_NOTICE",
+      "scenario": "Archive searched before next weekly publisher refresh; notice absent.",
+      "unsafe_inference": "NO_PRIOR_NOTICE_EXISTED",
+      "expected_guard": "UNKNOWN_ARCHIVE_PUBLICATION_LAG",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_SAM_API_STATUS_COMING_SOON",
+      "split": "synthetic_holdout",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_NOTICE",
+      "scenario": "An API query relies on an officially documented status parameter marked Coming Soon.",
+      "unsafe_inference": "FILTERED_COVERAGE_COMPLETE",
+      "expected_guard": "UNKNOWN_STATUS_FILTER_NOT_CERTIFIED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_SAM_API_DATE_WINDOW_MISSING",
+      "split": "synthetic_calibration",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_NOTICE",
+      "scenario": "Query has no postedFrom/postedTo dates although the API documents required dates.",
+      "unsafe_inference": "EMPTY_SEARCH_MEANS_NO_NOTICE",
+      "expected_guard": "UNKNOWN_REQUIRED_DATE_WINDOW_MISSING",
+      "independent_real_label": null
+    }
+  ]
 }
