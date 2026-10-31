@@ -632,6 +632,77 @@ class SamArchiveAsOfTests(unittest.TestCase):
                 fetch_original()
 
 
+    def test_gsa_public_opportunities_history_documentation_guard(self):
+        # GSA first-party documented coverage, NOT acquired SAM notices.
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json").read_text(encoding="utf-8"))
+        d = pack["opportunities_api_version_history_evidence"]
+        self.assertEqual(d["first_party_documentation_url"],
+                         "https://open.gsa.gov/api/get-opportunities-public-api/")
+        self.assertEqual(d["first_party_public_api_endpoint"],
+                         "https://api.sam.gov/opportunities/v2/search")
+        self.assertEqual(d["documented_api_history_scope"],
+                         "LATEST_ACTIVE_VERSION_ONLY_NOT_COMPLETE_VERSION_HISTORY")
+        self.assertEqual(d["documented_active_notice_update_cadence"], "DAILY")
+        self.assertEqual(d["documented_archived_notice_update_cadence"], "WEEKLY")
+        self.assertEqual(d["documented_status_filter"],
+                         "COMING_SOON_NOT_CONFIRMED_OPERATIONAL")
+        self.assertTrue(d["documented_date_required"])
+        self.assertEqual(d["documented_posted_date_from_to_max_range"], "ONE_YEAR")
+        self.assertIn("postedFrom", d["scope_and_schema"])
+        self.assertIn("postedTo", d["scope_and_schema"])
+        self.assertEqual(d["real_fy2027_notice_rows_from_this_source"], 0)
+        self.assertEqual(d["independently_heldout_real_notice_version_change_labels"], 0)
+        self.assertEqual(d["independent_preaward_notice_to_award_labels"], 0)
+        self.assertIsNone(d["documentation_raw_http_response_sha256"])
+        self.assertFalse(d["documentation_raw_response_bytes_retained"])
+        self.assertEqual(d["publisher_effective_revision_date"], "UNKNOWN_NOT_ATTESTED")
+        self.assertEqual(d["source_specific_data_reuse_and_third_party_commercial_rights"],
+                         "UNKNOWN_NOT_APPROVED")
+        self.assertFalse(d["legacy_15_lab_consolidation_verified"])
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+
+    def test_gsa_history_negative_controls_vs_unsafe_baseline(self):
+        # Benchmark readiness only: these are SYNTHETIC, not real outcomes.
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json").read_text(encoding="utf-8"))
+        controls = pack["opportunities_api_history_synthetic_controls"]
+        self.assertEqual(len(controls), 4)
+        ids = [c["id"] for c in controls]
+        self.assertEqual(len(set(ids)), 4)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 3)
+        self.assertEqual(sum(c["split"] == "synthetic_calibration" for c in controls), 1)
+        for control in controls:
+            with self.subTest(case=control["id"]):
+                self.assertTrue(control["id"].startswith("SYN_"))
+                self.assertEqual(control["provenance"],
+                                 "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_NOTICE")
+                self.assertIsNone(control["independent_real_label"])
+                self.assertTrue(control["expected_guard"].startswith("UNKNOWN_"))
+                # RED = naive certainty. GREEN = source-aware UNKNOWN.
+                self.assertNotEqual(control["unsafe_inference"], control["expected_guard"])
+        self.assertEqual(pack["rights_and_truth"]["independent_holdout_award_cases"], 0)
+        self.assertEqual(pack["rights_and_truth"]["independent_cross_source_outcomes"], 0)
+        self.assertIsNone(pack["observation"]["source_byte_sha256"])
+        self.assertEqual(pack["repair_evidence"]["new_original_source_calls"], 0)
+
+    def test_gsa_history_false_label_promotion_is_not_benchmark_ready(self):
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json").read_text(encoding="utf-8"))
+        def independent_truth_ready(d):
+            h = d["opportunities_api_version_history_evidence"]
+            return (h["real_fy2027_notice_rows_from_this_source"] > 0
+                    and h["independently_heldout_real_notice_version_change_labels"] > 0
+                    and h["documentation_raw_http_response_sha256"] is not None
+                    and d["rights_and_truth"]["commercial_scoring_allowed"])
+        self.assertFalse(independent_truth_ready(pack))
+        forged = copy.deepcopy(pack)
+        forged["opportunities_api_version_history_evidence"][
+            "independently_heldout_real_notice_version_change_labels"] = 5
+        # A fabricated positive label does not overcome missing original bytes/rights.
+        self.assertFalse(independent_truth_ready(forged))
+
+
 
 class USASpendingPublisherAwardBoundaryV1Tests(unittest.TestCase):
     """Two public publisher-page metadata examples, never an award accuracy benchmark."""
