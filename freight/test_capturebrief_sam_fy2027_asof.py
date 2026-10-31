@@ -434,16 +434,14 @@ class SamArchiveAsOfTests(unittest.TestCase):
         controls = {x["id"]: x for x in pack["synthetic_controls"]}
         case = controls["SYNTHETIC_UNFRAMED_COMPLETE_CSV_PREFIX"]
         self.assertEqual(case["expected"], "SOURCE_INCOMPLETE")
-        self.assertEqual(case["candidate_state"], "OPEN_KNOWN_UNSAFE_ACCEPTANCE")
+        self.assertEqual(case["candidate_state"], "REPAIRED_BY_EXPLICIT_TRANSPORT_FRAMING")
         self.assertIsNone(case["true_independent_award_label"])
         self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
         self.assertEqual(pack["documentation_controls"]["current_source_framing"],
                          "UNKNOWN_NO_NEW_SOURCE_READ")
 
-    def test_unframed_csv_prefix_is_an_open_known_failure(self):
-        # This synthetic negative deliberately fails against current reader.
-        # Source-reader owner must fix it, remove expectedFailure, and show
-        # exact-head RED/GREEN before independent QA accepts real readback.
+    def test_unframed_csv_prefix_is_rejected_even_if_csv_schema_parses(self):
+        # Synthetic valid CSV prefix with no HTTP completion proof.
         full = archive()
         prefix = b"".join(full.splitlines(keepends=True)[:-1])
         self.assertLess(len(prefix), len(full))
@@ -522,10 +520,8 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(observed["independent_cross_source_award_outcomes"], 0)
         self.assertEqual(observed["original_opportunity_ids_persisted"], 0)
 
-    def test_chunked_incomplete_read_must_be_degraded_not_uncaught(self):
+    def test_chunked_incomplete_read_degrades_not_uncaught(self):
         # SYNTHETIC interrupted HTTP/1.1 chunked body: no publisher GET.
-        # Pending source-reader owner correction; an unexpected success
-        # should force this decorator and the fixture's HOLD to be retired.
         from http.client import IncompleteRead
 
         pack_path = Path(__file__).with_name("fixtures") / (
@@ -536,11 +532,13 @@ class SamArchiveAsOfTests(unittest.TestCase):
                        if x["id"] == "SYNTHETIC_TRUNCATED_CHUNKED_TRANSFER")
         self.assertEqual(control["expected"], "SOURCE_INCOMPLETE")
         self.assertEqual(control["candidate_state"],
-                         "OPEN_UNHANDLED_HTTP_INCOMPLETE_READ")
+                         "REPAIRED_BY_INCOMPLETE_READ_MAPPING")
         self.assertIsNone(control["true_independent_award_label"])
 
+        read_calls = []
         class Response:
             status = 200
+            chunked = True
             headers = {"Content-Type": "text/csv",
                        "Content-Encoding": "identity",
                        "Transfer-Encoding": "chunked"}
@@ -548,6 +546,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
             def __exit__(self, *_): return None
             def geturl(self): return SOURCE_URL
             def read(self, n):
+                read_calls.append(n)
                 self_outer.assertEqual(n, MAX_ORIGINAL_BYTES + 1)
                 raise IncompleteRead(b"SYNTHETIC-TRUNCATED-BODY", 50)
 
@@ -561,6 +560,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
             receipt = build_receipt(observed_at=NOW)
         self.assertEqual(receipt["source_status"], STATUS_DEGRADED)
         self.assertEqual(receipt["source_error_codes"], ["SOURCE_INCOMPLETE"])
+        self.assertEqual(read_calls, [MAX_ORIGINAL_BYTES + 1])
 
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
