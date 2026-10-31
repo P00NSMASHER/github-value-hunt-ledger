@@ -17,6 +17,8 @@ on:
       - "freight/test_official_capturebrief_award_lab.py"
       - "freight/capturebrief_sam_fy2027_asof.py"
       - "freight/test_capturebrief_sam_fy2027_asof.py"
+      - "freight/test_sam_contract_awards_visibility_v1.py"
+      - "freight/fixtures/sam_contract_awards_public_visibility_v1.json"
       - "freight/gao_adjudication_chronology.py"
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
@@ -86,6 +88,8 @@ on:
       - "freight/test_official_capturebrief_award_lab.py"
       - "freight/capturebrief_sam_fy2027_asof.py"
       - "freight/test_capturebrief_sam_fy2027_asof.py"
+      - "freight/test_sam_contract_awards_visibility_v1.py"
+      - "freight/fixtures/sam_contract_awards_public_visibility_v1.json"
       - "freight/gao_adjudication_chronology.py"
       - "freight/test_gao_adjudication_chronology.py"
       - "freight/gao_motor_freight_numeric.py"
@@ -172,6 +176,7 @@ jobs:
         run: |
           node --test freight/research_lab_worker.test.mjs
           python -m unittest -q freight.test_research_eval_bridge freight.test_unified_research_ci_contract
+          python -m unittest -v freight.test_sam_contract_awards_visibility_v1
           python -m unittest -q freight.test_nyc_dob_source_scope_v1 freight.test_nyc_dob_excluded_scope_v1
           python -m unittest -q freight.test_nyc_dob_oath_ecb_outcome_quality_v1
           python -m unittest -q freight.test_nyc_dob_ahv_variance_scope_v1
