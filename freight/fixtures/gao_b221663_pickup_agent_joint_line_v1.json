@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B221663_PICKUP_AGENT_SINGLE_LINE_DECISION_HOLDOUT_V1",
+  "evaluation_family": "HISTORICAL_GAO_ADJUDICATED_FREIGHT_RATE_AGENCY_SCOPE_NOT_ORIGINAL_INVOICE_ACCURACY",
+  "reviewed_on_utc": "2026-10-31",
+  "ownership": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "lab_scope": "EVIDENCE_FIXTURE_AND_REGRESSIONS_ONLY",
+    "live_writer_branch_untouched": "research/retally-unified-data-lab"
+  },
+  "original_source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-221663",
+    "decision_date": "1986-10-10",
+    "official_html_url": "https://www.gao.gov/products/b-221663-0",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights_and_commercial_reuse": "GAO_US_GOVERNMENT_AUTHORED_PUBLIC_TEXT_REUSABLE_WITH_CITATION_NO_ENDORSEMENT",
+    "third_party_tender_rights": "UNKNOWN_NOT_CLEARED",
+    "original_http_body_sha256": null,
+    "original_http_body_byte_length": null,
+    "original_http_bytes_custodied": false,
+    "original_gbl_tender_invoice_bytes_custodied": false,
+    "source_schema": "OFFICIAL_GAO_HTML_DECISION_TEXT_NOT_INVOICE_OR_TARIFF_CSV",
+    "source_retrieval_quality": "PUBLISHER_TEXT_READ_THROUGH_PUBLIC_WEB_VIEW; RAW_HTTP_BODY_NOT_ACQUIRED",
+    "source_update_or_revision_clock": "UNKNOWN_NO_FIRST_PARTY_LAST_MODIFIED_CAPTURE",
+    "observed_text_sections": [
+      "BACKGROUND",
+      "FACTS",
+      "DISCUSSION",
+      "DIGEST"
+    ],
+    "publisher_snapshot_reproducibility": "UNKNOWN_PUBLISHER_PAGE_COULD_CHANGE",
+    "effective_reuse_scope": "GAO_AUTHORED_DECISION_TEXT_ONLY_NO_LOGOS_THIRD_PARTY_ATTACHMENTS_OR_ENDORSEMENT"
+  },
+  "adjudicated_decision": {
+    "shipment_date": "1982-12-17",
+    "referenced_tender": "ICC 2094",
+    "tender_in_effect_on_shipment_date_as_reported_by_GAO": true,
+    "billing_and_delivering_carrier": "Yellow Freight System, Inc.",
+    "pickup_carrier": "Merchants Fast Motor Lines, Inc.",
+    "gbl_issued_to_billing_carrier": true,
+    "pickup_receipt_identified_billing_carrier_as_principal": true,
+    "issuer_letter_date": "1986-04-04",
+    "issuer_letter_scope": "SHIPMENT_SPECIFIC_AGENT_CONFIRMATION",
+    "conflicting_general_letter_date": "1986-04-08",
+    "contradictory_general_letter_not_shipment_specific": true,
+    "claimed_higher_rate": "JOINT_LINE",
+    "GAO_supported_rate": "SINGLE_LINE_TENDER",
+    "finding": "PICKUP_AGENT_THROUGH_SINGLE_LINE_TENDER_NOT_JOINT_LINE",
+    "GAO_outcome": "GSA_DEDUCTION_SUSTAINED",
+    "deducted_overcharge_amount_cents": null,
+    "original_invoice_paid_cents": null,
+    "tariff_rate_difference_cents": null,
+    "original_GBL_and_tender_full_text_custodied": false,
+    "independently_custodied_rate_invoice_triplets": 0,
+    "independent_bank_clearing_proof": false,
+    "actual_RETALLY_customer_recovery_cents": 0,
+    "adjudication_unit": "ONE_HISTORICAL_GAO_DECISION_NOT_PER_SHIPMENT_INVOICE_ROWS",
+    "source_supported_1982_tender_effective_asof_date": true
+  },
+  "reported_evidence_fields": {
+    "tender_in_effect_on_shipment_date": true,
+    "gbl_issued_to_billing_carrier": true,
+    "pickup_signed_as_billing_carrier_agent": true,
+    "shipment_specific_issuer_letter_corrob_agent": true,
+    "physical_transfer_between_carriers": true,
+    "general_letter_conflict": true
+  },
+  "source_quality": {
+    "original_document_extraction": "HUMAN_REVIEW_OF_GAO_DECISION_TEXT_NOT_CUSTODY",
+    "source_bytes_sha256_state": "UNKNOWN_UNCUSTODIED",
+    "historical_tender_full_validity_range": "UNKNOWN",
+    "historical_rate_table": "UNKNOWN_NOT_CUSTODIED",
+    "source_independent_adjudication": "ONE_GAO_DECISION_LEVEL_LABEL",
+    "commercial_product_scoring": "HOLD_UNVERIFIED",
+    "generalization_to_current_carriers": "UNKNOWN_HISTORICAL_ONLY",
+    "labels_complete_for_original_invoice_level_scoring": false,
+    "source_validation_status": "REVIEW_ONLY_NOT_THIRD_PARTY_INVOICE_TRUTH",
+    "ground_truth_limits": "DECISION_LEVEL_RATE_BASIS_CONFIRMED; MONEY_AMOUNT, RAW_RATE_BYTES, BANK_RECEIPT_UNKNOWN"
+  },
+  "heldout_and_contrast": {
+    "split": "RESEARCH_SELECTED_DECISION_HOLDOUT_NOT_CONFIRMED_BLIND_FOR_PRODUCT",
+    "decision_key": "GAO/B-221663",
+    "contrast_key": "GAO/B-203929.2",
+    "contrast_source_url": "https://www.gao.gov/products/b-203929.2",
+    "contrast_GAO_outcome": "GSA_AUDIT_DEDUCTION_REVERSED",
+    "distinct_decision_keys": 2,
+    "same_publisher_independent_decisions": 2,
+    "reviewer_selected_original_decision_labels": 2,
+    "naive_always_uphold_GSA_errors_in_selected_pair": 1,
+    "naive_two_physical_carriers_implies_interline_errors_in_primary_decision": 1,
+    "metric_scope": "TWO_RESEARCH_SELECTED_OLDER_GAO_DECISIONS_NOT_SAMPLE_FROM_REAL_CUSTOMER_DISTRIBUTION",
+    "independent_original_invoice_tariff_payment_triplets": 0,
+    "product_engine_predictions": 0,
+    "modern_real_customer_heldouts": 0,
+    "blind_test_set_proved": false,
+    "real_world_precision": null,
+    "real_world_recall": null,
+    "historical_cash_settlement_verified": false,
+    "present_day_rate_authority": "UNKNOWN"
+  },
+  "dedup": {
+    "canonical_original_decision_key": "GAO/B-221663",
+    "cross_reference_not_extra_independent_label": true,
+    "do_not_expand_one_GAO_decision_to_many_invoices": true,
+    "additional_cross_reference_B218696_or_B221608": "REFERENCES_ONLY_NOT_SOURCE_LABELS_IN_THIS_PACK"
+  },
+  "handoffs": {
+    "freightrecovery_12": "TWO_CARRIERS_DO_NOT_PROVE_INTERLINE; REQUIRE_GBL_SIGNATURE_SHIPMENT_SPECIFIC_AGENCY_AND_EFFECTIVE_TENDER",
+    "recoveryos_12": "GSA_AUDIT_DEDUCTION_NOT_BANK_RECONCILIATION_OR_RETALLY_CUSTOMER_CASH",
+    "permitplate_48": "NOT_A_PERMIT_SOURCE_NO_PERMIT_SCORE",
+    "capturebrief_52": "NOT_SAM_AWARD_HISTORY_NO_PREAWARD_SCORE",
+    "independent_QA_44": "CHECK_GAO_B221663_OFFICIAL_FACTS_RIGHTS_UNKNOWN_RAW_SHA_AND_ONE_DECISION_LEVEL_LABEL"
+  },
+  "restrictions": {
+    "customer_private_data_persisted": false,
+    "product_code_changed": false,
+    "new_paid_provider_requests": 0,
+    "new_scheduled_jobs": 0,
+    "research_writer_modified": false,
+    "legacy_15_lab_consolidation_certified": false,
+    "release_authorized": false,
+    "synthetic_cases_promoted_as_real": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B221663_MISSING_GBL_PRINCIPAL",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": true,
+        "gbl_issued_to_billing_carrier": null,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_AGENCY_RELATIONSHIP",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_GBL_ISSUED_TO_OTHER_CARRIER",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": true,
+        "gbl_issued_to_billing_carrier": false,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_AGENCY_RELATIONSHIP",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_MISSING_PICKUP_SIGNATURE",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": true,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": null,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_AGENCY_RELATIONSHIP",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_SIGNATURE_DENIES_AGENT",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": true,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": false,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_AGENCY_RELATIONSHIP",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_ONLY_GENERAL_LETTER",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": true,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": null,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_AGENCY_RELATIONSHIP",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_AGENCY_LETTER_DISPUTES",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": true,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": false,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_AGENCY_RELATIONSHIP",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_TENDER_EFFECTIVE_DATE_UNKNOWN",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": null,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_RATE_AUTHORITY",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_TENDER_EFFECTIVE_AFTER_SHIPMENT",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": false,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "REJECT_INEFFECTIVE_TENDER",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    },
+    {
+      "id": "SYNTH_B221663_TRANSFER_NOT_PROOF_WITH_UNVERIFIED_TENDER",
+      "split": "synthetic_holdout",
+      "kind": "SYNTHETIC_RESEARCH_ONLY",
+      "facts": {
+        "tender_in_effect_on_shipment_date": null,
+        "gbl_issued_to_billing_carrier": true,
+        "pickup_signed_as_billing_carrier_agent": true,
+        "shipment_specific_issuer_letter_corrob_agent": true,
+        "physical_transfer_between_carriers": true,
+        "general_letter_conflict": true
+      },
+      "expected": "UNKNOWN_RATE_AUTHORITY",
+      "independent_real_customer_label": null,
+      "authoritative_real_GAO_decision_case": false
+    }
+  ]
+}
