@@ -81,7 +81,7 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
         d = self.pack
         controls = d["synthetic_controls"]
         self.assertEqual(len(controls), 11)
-        self.assertEqual(len({x["id"] for x in controls}), 9)
+        self.assertEqual(len({x["id"] for x in controls}), 11)
         base = d["real_reported_cases"][1]
         for c in controls:
             with self.subTest(c=c["id"]):
@@ -109,7 +109,7 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
         self.assertEqual(march["closing_today_musd"], 405786)
         self.assertEqual(residual(march), 0)
         self.assertEqual(cases[1]["closing_today_musd"], march["opening_this_month_musd"])
-        self.assertEqual(self.pack["tests_and_limitations"]["cross_month_residuals_musd"], [0, 0])
+        self.assertEqual(self.pack["tests_and_limitations"]["cross_month_residuals_musd"], [0, 0, 0])
         control = next(c for c in self.pack["synthetic_controls"] if c["id"] == "SYN_MARCH_CROSS_MONTH_OPEN_TAMPER")
         self.assertEqual(gate(control, march), "MISMATCH")
         self.assertEqual(control["independent_real_label"], None)
