@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B221705_INDEPENDENT_FREIGHT_FALSE_POSITIVE_HOLDOUT_V1",
+  "evaluation_family": "HISTORICAL_ADJUDICATED_FREIGHT_FALSE_POSITIVE_NOT_MODERN_ERROR_ACCURACY",
+  "observed_at_utc_date": "2026-10-30",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "original_decision_id": "B-221705",
+    "original_public_decision_url": "https://www.gao.gov/products/b-221705",
+    "original_decision_pdf_url": "https://www.gao.gov/assets/b-221705.pdf",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_ORIGINAL_US_GOVERNMENT_DECISION_REUSABLE_WITH_CITATION_NO_ENDORSEMENT",
+    "third_party_carrier_tariff_document_rights": "UNKNOWN_NOT_CLEARED",
+    "decision_effective_date": "1987-05-11",
+    "original_decision_page_count": 3,
+    "observed_official_pdf_pages": [
+      1,
+      2,
+      3
+    ],
+    "original_publisher_pdf_sha256": null,
+    "original_publisher_pdf_byte_length": null,
+    "original_pdf_bytes_independently_custodied": false,
+    "original_carrier_invoice_bol_and_tariff_bytes_custodied": false,
+    "source_format": "OFFICIAL_PUBLISHED_GAO_DECISION_PDF_REVIEWED_NOT_RAW_SOURCE_BYTES",
+    "case_cohort": "HISTORICAL_US_GOVERNMENT_MOTOR_FREIGHT_RATE_TENDER_SCOPE"
+  },
+  "adjudicated_representative_shipment": {
+    "sample_id": "GAO_B221705_REPRESENTATIVE_SHIPMENT",
+    "split": "independent_decision_holdout",
+    "government_bill_of_lading_number": "FP-094063",
+    "bill_of_lading_period": "1983-03_EXACT_DAY_UNKNOWN",
+    "origin": "Tinker Air Force Base, Oklahoma",
+    "destination": "Lexington Park, Maryland",
+    "carrier": "ABF Freight System, Inc.",
+    "other_carrier": "East Texas Motor Freight",
+    "merger_date": "1982-09-12",
+    "rate_tender": "ABF Tender ICC 1188",
+    "rate_reference": "Rocky Mountain Motor Tariff Bureau Tariff 118 Section 2",
+    "destination_listed_as_ABF_direct_service_in_section_2": false,
+    "post_merger_operating_authority_extended": true,
+    "tender_automatically_extended_through_merger": false,
+    "gsa_initial_determination": "REDUCED_TENDER_RATE_APPLIES_BY_MERGER",
+    "gao_final_holding": "REDUCED_TENDER_RATE_NOT_APPLICABLE_TO_LEXINGTON_PARK",
+    "historical_collection_by_GSA_reported": true,
+    "gao_upheld_GSA_approach": false,
+    "claimed_tariff_rate_cents": null,
+    "claimed_reduced_tender_rate_cents": null,
+    "gsa_deduction_dollars": null,
+    "final_settlement_payment_proved": false,
+    "present_day_customer_validity": "UNKNOWN_NO_CURRENT_TENDER_AUTHORITY"
+  },
+  "case_population": {
+    "minimum_shipments_in_GAO_review": 75,
+    "source_qualification": "AT_LEAST_75_AFFECTED_SHIPMENTS_NOT_75_ADJUDICATED_INDIVIDUAL_BOLS",
+    "independent_adjudicated_decisions": 1,
+    "individual_original_bol_files_custodied": 0,
+    "distinct_independently_labeled_positive_cases": 0,
+    "distinct_independently_labeled_negative_decisions": 1,
+    "source_money_amounts_complete": false
+  },
+  "heldout_comparison": {
+    "naive_rule": "MERGER_PLUS_NEW_OPERATING_AUTHORITY_IMPLIES_OLD_REDUCED_TENDER_RATE",
+    "naive_prediction": "OVERCHARGE_RECOVERABLE",
+    "actual_GAO_label": "FALSE_POSITIVE_TENDER_SCOPE_NOT_EXTENDED",
+    "mismatch_count_in_this_one_HISTORICAL_decision": 1,
+    "same_publisher_as_other_GAO_evidence": true,
+    "distinct_from_existing_GAO_B148981_B151387_B174692_decisions": true,
+    "independently_tested_against_product_engine": false,
+    "source_original_invoice_tariff_or_payment_pair_count": 0,
+    "modern_customer_freight_error_accuracy": null,
+    "bank_cleared_customer_recovery_cents": null,
+    "observed_retally_recovery_cents": 0,
+    "selection_bias": "ONE_HISTORICAL_APPEAL_NOT_RANDOM_SAMPLE",
+    "monetary_false_positive_size": "UNKNOWN_SOURCE_DID_NOT_STATE_AMOUNT"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B221705_MERGER_AUTOMATIC_TENDER_EXTENSION",
+      "kind": "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT",
+      "expected": "REJECT_TENDER_SCOPE_OVER_OPERATING_AUTHORITY",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B221705_CARRIER_AUTHORITY_IS_RATE_TENDER",
+      "kind": "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT",
+      "expected": "REJECT_DIFFERENT_LEGAL_FACTS",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B221705_75_SHIPMENTS_ARE_75_INDEPENDENT_LABELS",
+      "kind": "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT",
+      "expected": "REJECT_ONE_DECISION_NOT_SEVENTY_FIVE_HOLDOUTS",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B221705_DEDUCTION_AS_FINAL_RECOVERY",
+      "kind": "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT",
+      "expected": "REJECT_GAO_OVERRULED_GSA_THEORY",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B221705_UNSTATED_AMOUNTS_EQUAL_ZERO",
+      "kind": "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT",
+      "expected": "UNKNOWN_NOT_ZERO",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B221705_HISTORICAL_TARIFF_APPLIES_TO_2026",
+      "kind": "SYNTHETIC_NOT_AN_ADJUDICATED_SHIPMENT",
+      "expected": "UNKNOWN_NO_PRESENT_DAY_TARIFF",
+      "independently_verified_customer_label": null
+    }
+  ],
+  "dedup": {
+    "decision_key": "GAO/B-221705",
+    "representative_shipment_key": "GAO/B-221705/FP-094063",
+    "do_not_multiply_by_population": 75
+  },
+  "consumers": {
+    "freightrecovery_12": "One authentic historical denied-rate-deduction holdout; challenge merger-implies-tender heuristic; source labels are decision-level only.",
+    "recoveryos_12": "GSA deduction recorded but overruled; do not convert alleged charge differences to realized cash.",
+    "permitplate_48": "NO_PERMIT_CASES",
+    "capturebrief_52": "NO_SAM_NOTICE_OR_AWARD_CASES",
+    "independent_qa_44": "Review GAO original PDF pp 1-3, verify decision-level sample and all unknowns, no modern accuracy claims."
+  },
+  "restrictions": {
+    "private_customer_or_medical_or_student_records_included": false,
+    "real_customer_data_actions": 0,
+    "production_code_changes": 0,
+    "provider_paid_calls": 0,
+    "recurring_schedules_added": 0,
+    "release_authorized": false,
+    "legacy_15_lab_consolidation_certified": false
+  }
+}
