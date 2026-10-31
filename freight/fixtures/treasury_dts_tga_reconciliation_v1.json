@@ -55,14 +55,28 @@
       "closing_today_musd": 559582,
       "opening_this_month_musd": 793025,
       "closing_this_month_musd": 559582
+    },
+    {
+      "id": "TREASURY_DTS_2025_03_31_TABLE_I",
+      "split": "temporal_holdout_same_publisher",
+      "record_date": "2025-03-31",
+      "source_url": "https://fiscaldata.treasury.gov/static-data/published-reports/dts/DailyTreasuryStatement_20250331.pdf",
+      "document_page": 1,
+      "opening_today_musd": 301789,
+      "deposits_today_musd": 262527,
+      "withdrawals_today_musd": 158530,
+      "closing_today_musd": 405786,
+      "opening_this_month_musd": 559582,
+      "closing_this_month_musd": 405786
     }
   ],
   "source_identity": {
     "publisher_independent_count": 1,
-    "distinct_dated_reports": 2,
+    "distinct_dated_reports": 3,
     "exact_report_date_ids": [
       "TREASURY_DTS_2025_01_31_TABLE_I",
-      "TREASURY_DTS_2025_02_28_TABLE_I"
+      "TREASURY_DTS_2025_02_28_TABLE_I",
+      "TREASURY_DTS_2025_03_31_TABLE_I"
     ],
     "raw_invoice_or_bank_documents": 0,
     "independently_adjudicated_outcome_labels": 0,
@@ -72,20 +86,26 @@
     "identity": "closing_today = opening_today + deposits_today - withdrawals_today",
     "observed_residuals_musd": [
       0,
+      0,
       0
     ],
-    "cross_month_source_tie": "2025-01-31 closing today equals 2025-02-28 opening this month",
+    "cross_month_source_tie": "Jan 31 closing = Feb 28 opening-this-month; Feb 28 closing = Mar 31 opening-this-month. Both are same-publisher checks, not bank confirmation.",
     "cross_month_residual_musd": 0,
     "allowed_aggregate_rounding_tolerance_musd": 2,
     "reason": "Treasury warns details rounded to millions may not sum exactly; tolerance is a synthetic QA policy, not source-validated accuracy",
     "case_count_not_equal_bank_truth": true,
-    "real_reported_accounting_cases": 2,
-    "temporal_holdout_reported_cases": 1,
+    "real_reported_accounting_cases": 3,
+    "temporal_holdout_reported_cases": 2,
     "independent_real_world_heldout_cases": 0,
     "invoice_level_accuracy": null,
     "commercial_scoring_precision": null,
     "independent_recovery_accuracy": null,
-    "customer_cash_recovered_cents_observed": 0
+    "customer_cash_recovered_cents_observed": 0,
+    "cross_month_residuals_musd": [
+      0,
+      0
+    ],
+    "external_validation_march": "OFFICIAL_DATED_TREASURY_PDF_PAGE_1_VISUALLY_CHECKED_2026_10_31; NO_ORIGINAL_SOURCE_BODY_CUSTODY_OR_BANK_LABEL"
   },
   "synthetic_controls": [
     {
@@ -156,6 +176,16 @@
       "field": "closing_today_musd",
       "delta": 1,
       "expected": "UNKNOWN_ROUNDING_AMBIGUITY",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_REPORT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_MARCH_CROSS_MONTH_OPEN_TAMPER",
+      "split": "synthetic_holdout",
+      "kind": "cross_month_opening_mismatch",
+      "claimed_march_opening_musd": 559592,
+      "feb_closing_musd": 559582,
+      "expected": "MISMATCH",
       "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_REPORT",
       "independent_real_label": null
     }
