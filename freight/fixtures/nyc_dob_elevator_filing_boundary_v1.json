@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_ELEVATOR_APPLICATION_SOURCE_BOUNDARY_V1",
+  "evaluation_family": "PERMITPLATE_GOVERNMENT_SOURCE_COVERAGE_EXTRACTION_AND_DEDUP_ONLY_NOT_COMMERCIAL_SCORING",
+  "metadata_reviewed_date_utc": "2026-10-31",
+  "original_publisher_metadata": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "kfp4-dz4h",
+    "dataset_title": "DOB NOW: Build Elevator Permit Applications",
+    "source_url": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Build-Elevator-Permit-Applications/kfp4-dz4h",
+    "schema_url": "https://data.cityofnewyork.us/api/views/kfp4-dz4h/columns.json",
+    "first_public_date": "2019-10-31",
+    "metadata_last_updated_reported": "2026-10-21",
+    "update_frequency": "DAILY",
+    "catalog_row_count_approximate": "71.7K",
+    "catalog_columns_reported": 82,
+    "official_publisher_kind": "ORIGINAL_DOB_SOURCE_NOT_COMMUNITY_DERIVED_VIEW",
+    "event_type": "ELEVATOR_PERMIT_APPLICATION_FILING_NOT_INDEPENDENTLY_ADJUDICATED_ISSUANCE",
+    "coverage": "DOB_NOW_ELV1_ELEVATOR_NEW_SUBSEQUENT_AND_PAA_FILINGS",
+    "excluded_from": "DOB_NOW_BUILD_APPROVED_PERMITS_rbx6-tga4",
+    "documented_api_fields": [
+      "job_filing_number",
+      "job_number",
+      "filing_number",
+      "filing_date",
+      "filing_type",
+      "filing_status",
+      "elevatordevicetype",
+      "electrical_permit_number",
+      "bin"
+    ],
+    "source_documented_semantics": "Initial, subsequent and post-approval amendment filings can be separate rows for one elevator work instance; published -VT suffix can follow issuance.",
+    "source_row_bytes_downloaded_this_increment": 0,
+    "original_response_byte_count": null,
+    "original_response_sha256": null,
+    "schema_http_body_sha256": null,
+    "public_row_ids_retained": 0,
+    "person_or_address_values_retained": 0,
+    "publisher_independent_case_labels": 0
+  },
+  "source_rights": {
+    "city_faq": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "portal_terms": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "city_general_use": "FAQ_DESCRIBES_UNRESTRICTED_NYC_OPEN_DATA_USE",
+    "additional_provider_or_dataset_terms_review_complete": false,
+    "source_specific_commercial_scoring_certified": false,
+    "no_city_accuracy_warranty": true
+  },
+  "provenance": {
+    "source_type": "ORIGINAL_OFFICIAL_PUBLIC_CATALOG_METADATA_NOT_ORIGINAL_ROW_EXTRACT",
+    "source_metadata_observed_from_first_party_page": true,
+    "source_response_sha256_kind": "UNKNOWN_NO_RAW_HTTP_BODY_RECEIVED",
+    "authored_fixture_git_blob_sha1": "RETRIEVE_FROM_COMMIT_AFTER_WRITE_NOT_PUBLISHER_BYTES",
+    "data_quality": "PUBLIC_CATALOG_ROW_COUNT_IS_APPROXIMATE; LIVE_MUTABLE_STATUS_NOT_HISTORICAL_ASOF; NO_REAL_ROW_OR_INDEPENDENT_ISSUANCE_EVIDENCE",
+    "dedup_key_candidate": "dataset_id + canonical_job_filing_number_WITH_VT_SUFFIX_HANDLED_FOR_SOURCE_IDENTITY",
+    "dedup_hazard": "PAA_OR_SUBSEQUENT_FILING_IS_NOT_AN_INDEPENDENT_JOB_OR_BUYER_OPPORTUNITY",
+    "old_status_asof": "UNKNOWN_NO_IMMUTABLE_HISTORIC_SNAPSHOT",
+    "modern_buyer_outcome": "UNKNOWN"
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTH_OUT_OF_SCOPE_BUILD_NULL",
+      "split": "synthetic_calibration",
+      "kind": "general_build_miss",
+      "facts": {
+        "general_build_dataset_id": "rbx6-tga4",
+        "elevator_filing_present": false,
+        "excluded_elevator": true
+      },
+      "expected": "UNKNOWN_ELEVATOR_EXCLUDED_FROM_GENERAL_BUILD",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_INITIAL_PLUS_PAA_FANOUT",
+      "split": "synthetic_calibration",
+      "kind": "filing_fanout",
+      "facts": {
+        "one_underlying_job": true,
+        "filings": [
+          {
+            "job_number": "SYNTH-JOB-1",
+            "filing_type": "Initial"
+          },
+          {
+            "job_number": "SYNTH-JOB-1",
+            "filing_type": "PAA"
+          }
+        ],
+        "naive_opportunity_count": 2
+      },
+      "expected": "UNKNOWN_TWO_FILINGS_NOT_TWO_BUYER_OPPORTUNITIES",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_VT_SUFFIX_RETROACTIVE_ISSUANCE",
+      "split": "synthetic_calibration",
+      "kind": "retrospective_suffix",
+      "facts": {
+        "job_filing_number": "SYNTH-JOB-I1-VT",
+        "claim_date": "2026-10-01",
+        "source_observed_date": "2026-10-31",
+        "historic_snapshot_saved": false
+      },
+      "expected": "UNKNOWN_CURRENT_SUFFIX_NOT_HISTORIC_ASOF",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_PENDING_AS_ISSUED",
+      "split": "synthetic_holdout",
+      "kind": "pending_filing",
+      "facts": {
+        "filing_status": "Under Review",
+        "certified_independent_issuance": false
+      },
+      "expected": "NO_ISSUANCE_PROOF_PENDING_APPLICATION",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_ELECTRICAL_LINK_AS_EXTRA_BUYER",
+      "split": "synthetic_holdout",
+      "kind": "electrical_reference",
+      "facts": {
+        "electrical_permit_number": "SYNTH-ELECTRICAL-1",
+        "issuer_cross_reference_verified": false
+      },
+      "expected": "UNKNOWN_REFERENCE_IS_NOT_SECOND_ELEVATOR_BUYER",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_COMMUNITY_BA3_VIEW_AS_AUTHORITATIVE",
+      "split": "synthetic_holdout",
+      "kind": "community_view",
+      "facts": {
+        "candidate_dataset_id": "3azb-2vtx",
+        "community_created": true,
+        "source_parent_id": "kfp4-dz4h"
+      },
+      "expected": "REJECT_DERIVED_VIEW_NOT_OFFICIAL_ORIGINAL",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_MISSING_ELEVATOR_ROW_AS_NO_PERMIT",
+      "split": "synthetic_holdout",
+      "kind": "no_match",
+      "facts": {
+        "source_row_found": false,
+        "complete_global_elevator_history_proved": false
+      },
+      "expected": "UNKNOWN_NONMATCH_NOT_NEGATIVE_ISSUANCE_LABEL",
+      "provenance": "SYNTHETIC_NO_PUBLISHER_ROWS",
+      "independent_real_label": null
+    }
+  ],
+  "independent_benchmark": {
+    "synthetic_calibration_cases": 3,
+    "synthetic_heldout_cases": 4,
+    "original_publisher_metadata_sources": 1,
+    "original_publisher_row_cases": 0,
+    "independent_real_positive_labels": 0,
+    "independent_real_negative_labels": 0,
+    "true_real_holdout_cases": 0,
+    "real_extraction_accuracy": null,
+    "permit_precision": null,
+    "permit_recall": null,
+    "commercial_scoring_allowed": false,
+    "independent_issuance_ground_truth": "UNKNOWN",
+    "result": "ADDITIONAL_ORIGINAL_DOB_SOURCE_COVERAGE_IDENTIFIED; NEITHER_PERMIT_OUTCOME_NOR_BUYER_OPPORTUNITY_VALIDATED"
+  },
+  "handoffs": {
+    "permitplate_48": "Separate official elevator ELV1 application source from general Build permitted rows; PAA and -VT suffix cannot promote historic issuance or new buyer counts.",
+    "retally_recoveryos_12": "No accounting payments, claims, invoices, collections, or financial reconciliation truth.",
+    "freightrecovery_12": "No freight invoice, original carrier rate/tariff, adjudicated error or customer recovery.",
+    "capturebrief_52": "No procurement notice, amendment, funding, award or as-of solicitation truth.",
+    "independent_qa_44": "Recheck first-party publisher fields, rights qualifiers, exact new Git blob SHA, all 7 synthetic controls, and zero independent scored outcomes."
+  },
+  "safety": {
+    "new_provider_requests_in_ci": 0,
+    "source_rows_persisted": 0,
+    "private_customer_medical_student_records": 0,
+    "product_code_modified": false,
+    "writer_branch_modified": false,
+    "protected_main_modified": false,
+    "legacy_15_lab_consolidation_certified": false,
+    "release_or_outreach_authorized": false
+  }
+}

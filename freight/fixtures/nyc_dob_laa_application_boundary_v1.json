@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_NOW_LAA_SOURCE_GAP_HOLDOUT_V1",
+  "evaluation_family": "PERMITPLATE_GOVERNMENT_PERMIT_SOURCE_COVERAGE_AND_PROVENANCE_NOT_REAL_ACCURACY",
+  "reviewed_at_utc": "2026-10-31",
+  "publisher_source": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "xxbr-ypig",
+    "dataset_title": "DOB NOW: Build – Limited Alteration Applications",
+    "official_catalog_url": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Build-Limited-Alteration-Applications/xxbr-ypig",
+    "official_data_url": "https://data.cityofnewyork.us/d/xxbr-ypig",
+    "catalog_created_date": "2021-10-25",
+    "first_public_date": "2021-12-31",
+    "catalog_last_updated_reported": "2026-10-24",
+    "catalog_observed_on": "2026-10-31",
+    "declared_update_frequency": "DAILY",
+    "approximate_catalog_rows": "235K_NOT_A_RETRIEVED_SAMPLE",
+    "catalog_column_count": 26,
+    "event_type": "LAA_APPLICATION_RECORD_WITH_OPTIONAL_PERMIT_LIFECYCLE",
+    "scope": "PLUMBING_FIRE_SUPPRESSION_PIPING_REPAIRS_AND_OIL_BURNER_WORK_OUTSIDE_GENERAL_BUILD_PERMITS",
+    "excluded_from_general_build_approved_permits": "rbx6-tga4",
+    "documented_public_api_fields": [
+      "job_number",
+      "filing_type_name",
+      "filing_number",
+      "filing_status_name",
+      "permit_number",
+      "filing_date",
+      "permit_issued_date",
+      "permit_expiration_date",
+      "laasign_off_date",
+      "work_type_name",
+      "location_bin",
+      "proposed_work_summary"
+    ],
+    "original_dataset_rows_downloaded_this_increment": 0,
+    "original_dataset_http_bytes_sha256": null,
+    "original_dataset_metadata_http_body_sha256": null,
+    "original_dataset_response_byte_count": null,
+    "catalog_schema_snapshot_bytes_custodied": false,
+    "personal_addresses_or_work_descriptions_retained": 0
+  },
+  "rights": {
+    "nyc_public_use_faq": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "portal_terms": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "general_policy": "NYC_GENERAL_OPEN_DATA_USE_NO_USE_RESTRICTIONS_SUBJECT_TO_ADDITIONAL_PROVIDER_TERMS",
+    "dataset_specific_rights_checked": false,
+    "separate_provider_or_embedded_third_party_rights": "UNKNOWN",
+    "commercial_permit_scoring_cleared": false,
+    "no_confidential_records_acquired": true
+  },
+  "existing_original_publisher_readback_reference": {
+    "source_dataset_id": "rbx6-tga4",
+    "source_kind": "DIFFERENT_DOB_NOW_GENERAL_BUILD_PERMIT_COHORT_NOT_LAA",
+    "receipt_branch": "research/retally-unified-data-lab",
+    "receipt_path": "freight/research_lab/official_nyc_issued_permit_replay_v1.json",
+    "receipt_git_blob_sha1": "22ed65ca9c41057637598c19387a5d68b86f0657",
+    "receipt_embedded_sha256": "fc60356829cc334280f31e8e0b8864bda561b1707ab3be934f18387e218e931b",
+    "source_sample_canonical_sha256": "83ddeacca71e2034815021ca608b6ffc69fb2751eb16977d4e668698c529c9eb",
+    "receipt_asof_utc_date": "2026-10-31",
+    "source_sample_rows": 20,
+    "source_distinct_identities": 19,
+    "source_duplicate_identities": 1,
+    "source_readback_exact_matches": 3,
+    "receipt_status": "PUBLISHER_REPLAY_DEGRADED",
+    "independent_permit_truth_labels": 0,
+    "usable_laa_examples_from_other_cohort": 0,
+    "warning": "Hash is source-sample canonical digest in another cohort; neither source HTTP byte digest nor an LAA row hash."
+  },
+  "dedup_and_temporal_rules": {
+    "candidate_identity": "dataset_id + job_number + filing_number + permit_number when fields exist; never derive customer count from job_number alone",
+    "missing_permit_number": "UNKNOWN_NO_ISSUANCE_LABEL",
+    "filing_date_is_permit_issued_date": false,
+    "signoff_date_is_new_customer_demand": false,
+    "historical_row_visible_today_is_not_proof_of_2020_availability": true,
+    "BIN_only_cross_dataset_join_allowed": false,
+    "complete_history_proven": false
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTH_LAA_MISSING_FROM_GENERAL_BUILD",
+      "kind": "general_nonmatch",
+      "split": "synthetic_calibration",
+      "facts": {
+        "checked_dataset": "rbx6-tga4",
+        "laa_excluded": true,
+        "matched": false
+      },
+      "naive_claim": "NO_NYC_LAA_EXISTS",
+      "expected": "UNKNOWN_LAA_EXCLUDED_FROM_GENERAL_BUILD",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAA_NUMBER_WITHOUT_ISSUE_DATE",
+      "kind": "unissued_number",
+      "split": "synthetic_calibration",
+      "facts": {
+        "permit_number": "SYNTH-PERMIT-001",
+        "permit_issued_date": null,
+        "filing_status_name": "In Process"
+      },
+      "naive_claim": "ISSUED_PERMIT_FROM_NUMBER",
+      "expected": "UNKNOWN_ISSUANCE_WITHOUT_DATE_OR_INDEPENDENT_PROOF",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAA_EXPIRED_AFTER_ISSUANCE",
+      "kind": "issued_expired",
+      "split": "synthetic_calibration",
+      "facts": {
+        "permit_issued_date": "2026-10-05",
+        "permit_expiration_date": "2026-10-20",
+        "asof": "2026-10-31"
+      },
+      "naive_claim": "CURRENT_ACTIVE_PERMIT",
+      "expected": "HISTORICAL_SOURCE_ISSUANCE_NOT_ACTIVE_NOW",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAA_INITIAL_AND_AMENDMENT_SAME_JOB",
+      "kind": "filing_fanout",
+      "split": "synthetic_holdout",
+      "facts": {
+        "filings": [
+          {
+            "job_number": "SYNTH-JOB-1",
+            "filing_number": "001"
+          },
+          {
+            "job_number": "SYNTH-JOB-1",
+            "filing_number": "002"
+          }
+        ]
+      },
+      "naive_claim": "TWO_INDEPENDENT_BUYERS",
+      "expected": "UNKNOWN_TWO_FILINGS_NOT_TWO_BUYERS",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAA_SIGNOFF_IS_NOT_NEW_PURCHASE",
+      "kind": "signoff",
+      "split": "synthetic_holdout",
+      "facts": {
+        "laasign_off_date": "2026-10-10",
+        "permit_issued_date": "2026-09-01"
+      },
+      "naive_claim": "OPEN_NEW_BUYER_OPPORTUNITY",
+      "expected": "UNKNOWN_SIGNOFF_NOT_NEW_DEMAND",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAA_FREE_TEXT_CONTAINS_UNVETTED_CONTENT",
+      "kind": "free_text",
+      "split": "synthetic_holdout",
+      "facts": {
+        "proposed_work_summary": "[REDACTED SYNTHETIC PERSONAL TEXT]"
+      },
+      "naive_claim": "PERSIST_UNREDACTED_WORK_DESCRIPTION",
+      "expected": "QUARANTINE_FREE_TEXT_FOR_PRIVACY_REVIEW",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_LAA_2020_HISTORICAL_NONMATCH",
+      "kind": "historical_nonmatch",
+      "split": "synthetic_holdout",
+      "facts": {
+        "event_date": "2020-06-15",
+        "no_match": true,
+        "complete_history": false
+      },
+      "naive_claim": "PROVE_NO_HISTORICAL_LAA",
+      "expected": "UNKNOWN_NO_COMPLETE_HISTORICAL_COVERAGE",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_SHARED_BIN_NOT_SAME_PERMIT",
+      "kind": "bin_only_join",
+      "split": "synthetic_holdout",
+      "facts": {
+        "matching_bin": true,
+        "matching_filing_number": false,
+        "matching_job_number": false
+      },
+      "naive_claim": "SAME_PERMIT_AND_BUYER",
+      "expected": "UNKNOWN_BIN_ONLY_JOIN_NOT_PERMIT_IDENTITY",
+      "provenance": "SYNTHETIC_NOT_OFFICIAL_SOURCE_ROW",
+      "independent_real_label": null
+    }
+  ],
+  "benchmark_readiness": {
+    "synthetic_calibration_cases": 3,
+    "synthetic_holdout_cases": 5,
+    "independent_real_positive_labels": 0,
+    "independent_real_negative_labels": 0,
+    "independent_real_holdout_cases": 0,
+    "permit_precision": null,
+    "permit_recall": null,
+    "independent_cross_dataset_join_outcomes": 0,
+    "commercial_scoring_approved": false,
+    "source_descriptor_not_actual_permit_accuracy": true
+  },
+  "handoffs": {
+    "permitplate_48": "Include official LAA cohort xxbr-ypig in coverage gap; do not count filings, BIN links, missing general-build records, or permit numbers as independent buyers or issued permits.",
+    "freightrecovery_12": "No freight invoice or tariff labels.",
+    "recoveryos_12": "No accounting reconciliation or customer-cash truth.",
+    "capturebrief_52": "No procurement notices, solicitation-history or award-outcome labels.",
+    "independent_qa_44": "Verify official NYC published LAA schema/scope, public terms, synthetic-only tests and zero independent labels against exact reviewed PR SHA.",
+    "executive_director": "6ac64d2255848191945eb7c34c63765c"
+  },
+  "safety": {
+    "no_production_or_engine_code_changes": true,
+    "no_work_mode_or_paid_provider": true,
+    "no_new_scheduled_workflow": true,
+    "no_new_provider_requests_in_test": true,
+    "private_customer_medical_student_records": 0,
+    "legacy_15_lab_consolidation_certified": false,
+    "writer_branch_modified": false,
+    "protected_main_modified": false
+  }
+}

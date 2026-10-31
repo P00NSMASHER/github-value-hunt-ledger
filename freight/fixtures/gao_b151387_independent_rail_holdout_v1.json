@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B151387_INDEPENDENT_HISTORICAL_RAIL_FREIGHT_DECISION_HOLDOUT_V1",
+  "evaluation_family": "HISTORICAL_FREIGHT_RATE_ADJUDICATION_NOT_MODERN_CUSTOMER_ACCURACY",
+  "observed_at_utc_date": "2026-10-30",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-151387",
+    "original_public_decision_url": "https://www.gao.gov/products/b-151387",
+    "original_rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_PUBLISHED_US_GOVERNMENT_WORK_REPRODUCIBLE_WITH_GAO_CREDIT_NO_ENDORSEMENT",
+    "third_party_tariff_or_embedded_content_reuse_rights": "UNKNOWN_SEPARATE_RIGHTS_NOT_CLEARED",
+    "effective_decision_date": "1963-12-09",
+    "shipment_period": "1960-09_to_1960-10",
+    "cohort": "US_GOVERNMENT_RAIL_SHIPMENTS_SIX_FREIGHT_TRAILER_CARLOADS",
+    "origin": "Exeter, Pennsylvania",
+    "destination": "Decatur, Illinois",
+    "underlying_tariff_reference": "Trunk Line Territory Tariff Bureau E-180 ICC A-1059 Supplement 104 Item 4792",
+    "original_bol_identifiers_custodied": false,
+    "original_tariff_bytes_custodied": false,
+    "original_carrier_invoices_custodied": false,
+    "original_issuer_http_response_bytes_sha256": null,
+    "original_issuer_http_response_length_bytes": null,
+    "publisher_http_response_custodied": false,
+    "rendered_official_text_reviewed": true
+  },
+  "adjudicated_rail_shipment_groups": [
+    {
+      "group_id": "B151387_FOUR_20000_LB_RATED",
+      "shipment_count": 4,
+      "split": "independent_decision_holdout",
+      "reported_carrier_charged_per_shipment_cents": 70000,
+      "carrier_selected_minimum_weight_pounds": 20000,
+      "gao_applicable_minimum_weight_pounds": 10000,
+      "gao_applicable_per_shipment_cents": 35000,
+      "disputed_difference_per_shipment_cents": 35000,
+      "original_individual_bill_bytes_custodied": false
+    },
+    {
+      "group_id": "B151387_TWO_12500_LB_RATED",
+      "shipment_count": 2,
+      "split": "independent_decision_holdout",
+      "reported_carrier_charged_per_shipment_cents": 43750,
+      "carrier_selected_minimum_weight_pounds": 12500,
+      "gao_applicable_minimum_weight_pounds": 10000,
+      "gao_applicable_per_shipment_cents": 35000,
+      "disputed_difference_per_shipment_cents": 8750,
+      "original_individual_bill_bytes_custodied": false
+    }
+  ],
+  "source_explicit_facts": {
+    "agreed_actual_weight_each_shipment_pounds": 8400,
+    "shipper_ordered_car_length": "41 feet 6 inches",
+    "carrier_furnished_longer_car_for_carrier_convenience": true,
+    "rate_cents_per_100_pounds": 350,
+    "gao_held_minimum_weight_based_on_car_ordered": true,
+    "applicable_tariff_item_interpretation": "AMBIGUITY_RESOLVED_IN_FAVOR_OF_SHIPPER_FOR_RECORDED_CIRCUMSTANCES",
+    "carrier_supplemental_claims_disallowed_cents": [
+      35000,
+      113750
+    ],
+    "separately_collected_government_overcharge_by_deduction_cents": 8750,
+    "gao_decision_final_outcome": "1962_SETTLEMENTS_AND_OVERCHARGE_DEDUCTION_SUSTAINED",
+    "source_reports_deduction": "YES_8750_ONLY",
+    "other_settlements_original_payment_or_collection_proved": "UNKNOWN"
+  },
+  "derived_reconciliation": {
+    "claimed_initial_total_charges_cents": 367500,
+    "gao_applicable_total_charges_cents": 210000,
+    "difference_cents": 157500,
+    "independently_reported_claim_components_sum_cents": 157500,
+    "discrepancy_cents": 0,
+    "source_reports_all_157500_collected": false,
+    "customer_or_retally_recovered_cash_cents": 0,
+    "all_six_original_bol_files_custodied": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B151387_LONGER_CAR_ALWAYS_HIGHER_MINIMUM",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "claim": "Carrier provided larger car so use its minimum even when furnished for carrier convenience",
+      "expected": "REJECT_IN_THIS_HISTORICAL_ADJUDICATED_CASE",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B151387_ALL_DIFFERENCE_CASH_CLEARED",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "claim": "GAO upheld 157500 cents difference so 157500 cents are bank cleared",
+      "expected": "UNKNOWN_ONLY_8750_CENTS_DEDUCTION_REPORTED",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B151387_SIX_INDEPENDENT_DECISIONS",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "claim": "Six carloads are six independent decisions with authenticated original invoices",
+      "expected": "REJECT_ONE_GAO_DECISION_NO_ORIGINAL_BOLS",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B151387_1962_COMPARISON_EQUIVALENT",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "claim": "Earlier B-137104 involving unspecified ordered car size resolves this identical fact pattern",
+      "expected": "REJECT_GAO_DISTINGUISHED_PRECEDENT",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTH_B151387_1963_TARIFF_CURRENT",
+      "kind": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "claim": "A 1963 rail tariff ruling determines 2026 private motor carrier entitlement",
+      "expected": "UNKNOWN_NO_CURRENT_TARIFF_OR_CUSTOMER_AUTHORITY",
+      "independently_verified_customer_label": null
+    }
+  ],
+  "benchmark_quality": {
+    "decision_count": 1,
+    "described_original_rail_carloads": 6,
+    "group_level_labels": 2,
+    "independent_from_existing_B148981_decision": true,
+    "independent_from_GAO_publisher": false,
+    "independent_source_original_bol_bytes": 0,
+    "modern_buyer_authorized_invoice_rate_payment_and_adjudication_pairs": 0,
+    "modern_positive_and_negative_label_count": 0,
+    "current_freight_error_accuracy": null,
+    "current_customer_recovery_precision": null,
+    "original_source_byte_integrity": "UNKNOWN_NO_RAW_PUBLISHER_RESPONSE",
+    "source_only_aggregate_holdout": "SIX_CARLOADS_IN_ONE_SEPARATE_HISTORICAL_GAO_DECISION_NOT_SIX_INDEPENDENT_DOCUMENTS",
+    "commercial_reuse_of_embedded_tariff": "UNKNOWN",
+    "sampled_selection_bias": "HISTORICAL_APPEAL_NOT_RANDOM_MODERN_FREIGHT"
+  },
+  "dedup": {
+    "primary_key": "GAO/B-151387",
+    "group_key": "GAO/B-151387/carrier_charge_level",
+    "no_per_shipment_ids_invented": true
+  },
+  "consumers": {
+    "freightrecovery_12": "Rail car order-vs-supplied minimum-weight calculation controls; historical heldout only, not current accuracy",
+    "recoveryos_12": "Assert only separately reported 8750-cent deduction; do not assert all charge differences collected",
+    "permitplate_48": "NO_PERMIT_LABELS",
+    "capturebrief_52": "NO_SOLICITATION_OR_AWARD_LABELS",
+    "independent_qa_44": "Verify original decision lines, arithmetic, independent-decision-not-publisher split, original-byte UNKNOWNs, and five synthetic fail-closed controls"
+  },
+  "original_customer_records_downloaded": 0,
+  "product_code_modified": false,
+  "new_external_provider_calls_by_ci": 0,
+  "new_schedule_or_cron_added": false,
+  "production_release_authorized": false,
+  "legacy_lab_consolidation_certified": false
+}

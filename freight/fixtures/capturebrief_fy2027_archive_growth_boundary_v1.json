@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "pack_id": "CAPTUREBRIEF_FY2027_ARCHIVE_GROWTH_BOUNDARY_V1",
+  "evaluation_family": "GOVERNMENT_NOTICE_ORIGINAL_EXTRACTION_CAPACITY_NOT_AWARD_SCORING",
+  "publisher": "U.S. General Services Administration / SAM.gov",
+  "source_url": "https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv",
+  "catalog_url": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
+  "source_effective_scope": "FY2027_ARCHIVED_PUBLIC_OPPORTUNITY_METADATA",
+  "source_access": "PUBLIC_DATA_SERVICES_LISTING_ORIGINAL_BYTES_NOT_CUSTODIED_IN_THIS_PACK",
+  "source_specific_commercial_reuse": "UNKNOWN_NOT_APPROVED",
+  "observation": {
+    "observed_at_utc": "2026-10-30T02:11:33+00:00",
+    "research_branch": "research/retally-unified-data-lab",
+    "research_branch_head": "1197a4c17042d5c98786933121ffd7ba5c46c06a",
+    "research_receipt_path": "freight/research_lab/capturebrief_sam_fy2027_asof_v1.json",
+    "research_receipt_git_blob_sha1": "9838d340879483f88f1f5c293e3d42acdffeaaae",
+    "research_receipt_sha256": "920ab3401cfd65f1ed026f01044e034795169286445437edd08cbb9c8f075b8a",
+    "result": "SOURCE_TOO_LARGE",
+    "source_rows_scored": 0,
+    "source_byte_sha256": null,
+    "content_length_bytes": "UNKNOWN_NOT_CAPTURED",
+    "previous_bounded_limit_bytes": 2500000
+  },
+  "proposal": {
+    "bounded_limit_bytes": 8000000,
+    "maximum_csv_rows": 8000,
+    "failed_larger_or_truncated_source": "FAIL_CLOSED",
+    "original_source_full_byte_sha256": "COMPUTE_ONLY_ON_FULL_VALID_SOURCE_READBACK",
+    "source_ids_or_raw_bytes_persisted": false
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTHETIC_OLD_LIMIT_CROSSED",
+      "description": "Complete fabricated CSV between old and new byte bounds",
+      "expected": "SOURCE_PARSED_METADATA_ONLY_NOT_AWARD_TRUTH",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_NEW_BOUND_EXCEEDED",
+      "description": "Fabricated response declares size above new maximum",
+      "expected": "SOURCE_TOO_LARGE",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_TRUNCATED_ARCHIVE",
+      "description": "Advertised content length exceeds received bytes",
+      "expected": "SOURCE_INCOMPLETE",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_DEGRADED_RECEIPT_SAME_UTC_DAY",
+      "description": "An intact valid same-UTC-day SOURCE_TOO_LARGE failure receipt suppresses another source request until the next UTC date; eligibility then does not certify success.",
+      "expected": "CACHE_DEGRADED_SAME_UTC_DAY_NEXT_DAY_BOUNDED_FETCH_ELIGIBLE",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_SAM_SAME_ORIGIN_AWARD_METADATA",
+      "description": "Optional SAM.gov public search award metadata belongs to the same source system and is not independent USAspending award/settlement ground truth.",
+      "expected": "SAME_ORIGIN_METADATA_IS_NOT_INDEPENDENT_CROSS_SOURCE_TRUTH",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_UNFRAMED_COMPLETE_CSV_PREFIX",
+      "description": "Synthetic HTTP 200 with neither Content-Length nor verified transfer framing returns a valid CSV prefix of a larger original. Byte completeness must remain UNKNOWN.",
+      "expected": "SOURCE_INCOMPLETE",
+      "candidate_state": "REPAIRED_BY_EXPLICIT_TRANSPORT_FRAMING",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_COMPLETE_CHUNKED_TRANSFER",
+      "description": "SYNTHETIC valid HTTP/1.1 identity-encoded chunked transfer with terminating zero-length chunk, no Content-Length, and complete CSV. A fail-closed unframed-prefix repair must preserve proven-complete chunked responses.",
+      "expected": "PUBLIC_ARCHIVE_ROWS_OBSERVED_NOT_PRODUCTION_APPROVED",
+      "candidate_state": "POSITIVE_FRAMED_SUCCESS_REQUIRED",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_TRUNCATED_CHUNKED_TRANSFER",
+      "description": "SYNTHETIC HTTP/1.1 identity-encoded chunked response ends before the terminating zero-length chunk. Python http.client emits IncompleteRead, which must become a bounded SOURCE_INCOMPLETE degraded receipt instead of escaping the reader.",
+      "expected": "SOURCE_INCOMPLETE",
+      "candidate_state": "REPAIRED_BY_INCOMPLETE_READ_MAPPING",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_FORGED_CHUNKED_HEADER",
+      "description": "Fabricated CSV claims chunked Transfer-Encoding but the actual HTTP reader has not decoded authenticated complete chunk framing.",
+      "expected": "SOURCE_INCOMPLETE",
+      "candidate_state": "REPAIRED_BY_EXPLICIT_TRANSPORT_FRAMING",
+      "true_independent_award_label": null
+    },
+    {
+      "id": "SYNTHETIC_DUAL_LENGTH_TRANSFER_FRAMING",
+      "description": "Fabricated HTTP response supplies both Content-Length and Transfer-Encoding: chunked. Fail closed rather than accept ambiguous framing.",
+      "expected": "SOURCE_INCOMPLETE",
+      "candidate_state": "REPAIRED_BY_EXPLICIT_TRANSPORT_FRAMING",
+      "true_independent_award_label": null
+    }
+  ],
+  "rights_and_truth": {
+    "original_source_rights_clearance": false,
+    "independent_holdout_award_cases": 0,
+    "independent_cross_source_outcomes": 0,
+    "commercial_scoring_allowed": false,
+    "real_customer_records_included": false,
+    "verified_customer_cash_cents": 0
+  },
+  "consumers": [
+    "CaptureBrief source-quality coordination",
+    "RETALLY Unified Research Lab verify and nightly read-only replay"
+  ],
+  "notes": [
+    "Publisher original-size and original-byte hash remain UNKNOWN until an authorized bounded source replay succeeds.",
+    "No newly evaluated SAM.gov notices, award judgments, production integrations or customer output are claimed.",
+    "Live research/retally-unified-data-lab writer branch and workflows are unchanged.",
+    "GSA public opportunity search is latest-active-version scoped and key-limited; optional award metadata is not an independent award source.",
+    "GSA opportunity-management history calls require authorized contracting roles/system credentials; this pack does not use that API.",
+    "An intact same-UTC-day degraded receipt remains cached until the next UTC date; no additional provider request is authorized.",
+    "Synthetic-only transport validation repaired two documented reader defects. Real FY2027 original archive readback and source-byte SHA-256 remain UNKNOWN until the existing bounded writer safely reads it; no extra source fetches performed.",
+    "This pack does not independently verify complete FY2027 solicitation/version history or give downstream engine scoring approval.",
+    "New official SAM.gov Data Services datagov daily-current extract listing is a separate prospective original-data lead; no direct original CSV fetched and no FY2027 archival as-of or award fact may be inferred."
+  ],
+  "documentation_controls": {
+    "verified_date_utc": "2026-10-30",
+    "public_api_documentation": "https://open.gsa.gov/api/get-opportunities-public-api/",
+    "management_api_documentation": "https://open.gsa.gov/api/opportunities-api/",
+    "public_api_scope": "LATEST_ACTIVE_VERSION_ONLY_API_KEY_AND_DAILY_LIMITS_APPLY",
+    "management_history_endpoint_access": "PRIVILEGED_ROLE_AND_SYSTEM_ACCOUNT_API_KEY_REQUIRED_NOT_A_PUBLIC_FALLBACK",
+    "public_api_award_field": "OPTIONAL_SAME_PUBLISHER_DATA_NOT_INDEPENDENT_AWARD_TRUTH",
+    "documentation_full_byte_sha256": null,
+    "original_notice_version_history_completeness": "UNKNOWN_NOT_VERIFIED",
+    "original_source_bytes_retrieved_by_this_update": false,
+    "transport_standard": "https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3",
+    "current_source_framing": "UNKNOWN_NO_NEW_SOURCE_READ"
+  },
+  "repair_evidence": {
+    "scope": "RESEARCH_ONLY_SAM_ARCHIVE_READER_NO_ENGINE_OR_PROVIDER_RULE_CHANGES",
+    "original_publisher": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
+    "http_framing_standard": "https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3",
+    "reused_existing_writer_receipt": {
+      "observed_at_utc": "2026-10-31T02:41:52+00:00",
+      "git_blob_sha1": "f9a1be57244ce9e943bc7697c9db0fa9ff24272c",
+      "receipt_sha256": "4d87842e8779c7e52ceecb23715b78d3dbe7823b5cea1104cf1fcfee3bf400f9",
+      "status": "SOURCE_TOO_LARGE",
+      "original_source_byte_sha256": null
+    },
+    "failure_head_sha": "f47b8bda2e45fe614c4efd24eebf6e6e26c24a1a",
+    "failure_workflow_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/41196604547",
+    "fixed_reader_git_blob_sha1": "eaab65b52b28f40b7e6109601439010a23ecbcdf",
+    "new_original_source_calls": 0,
+    "new_original_source_rows": 0,
+    "independently_held_out_real_award_labels": 0,
+    "synthetic_controls": 10,
+    "commercial_scoring_allowed": false,
+    "post_fix_green_ci": "PENDING_IMMUTABLE_FINAL_HEAD"
+  },
+  "adjacent_original_source_discovery": {
+    "publisher": "U.S. General Services Administration / SAM.gov",
+    "catalog_url": "https://sam.gov/data-services/Contract%20Opportunities/datagov?privacy=Public",
+    "catalog_item": "ContractOpportunitiesFullCSV.csv",
+    "data_type": "PUBLIC_DAILY_CONTRACT_OPPORTUNITIES_ORIGINAL_EXTRACT",
+    "cohort": "CURRENT_DAILY_PUBLIC_NOT_FY2027_ARCHIVED_HISTORY",
+    "schema_reference": "https://sam.gov/data-services",
+    "core_candidate_fields": [
+      "NoticeId",
+      "Sol#",
+      "PostedDate",
+      "Type",
+      "Active"
+    ],
+    "effective_dates": "ROW_SPECIFIC_ORIGINAL_DATES_UNKNOWN_NO_SOURCE_READ",
+    "last_publisher_record_update": "UNKNOWN_NO_SOURCE_READ",
+    "source_bytes_acquired": false,
+    "source_response_sha256": null,
+    "source_response_byte_length": null,
+    "source_row_count": null,
+    "record_id_hashes": null,
+    "license_terms_url": "https://sam.gov/about/terms-of-use",
+    "rights_classification": "PUBLIC_LISTING_ACCESSIBLE_BUT_CONTACT_THIRD_PARTY_AND_COMMERCIAL_REUSE_NOT_CLEARED",
+    "provenance_class": "FIRST_PARTY_PUBLISHER_LISTING_NOT_DIRECT_ORIGINAL_CSV_CUSTODY",
+    "schema_completeness": "UNKNOWN_NO_ACTUAL_ROW_OR_HEADER_READ",
+    "dedup_state": "UNKNOWN_ZERO_ORIGINAL_ROWS",
+    "labeling_completeness": "ZERO_INDEPENDENT_NOTICE_TO_AWARD_AND_ZERO_HISTORIC_ASOF_TRUTH",
+    "independent_positive_labels": 0,
+    "independent_negative_labels": 0,
+    "compliance_controls": [
+      "NO_SCRAPING_OR_LOGIN",
+      "NO_API_KEY_OR_PAID_PROVIDER",
+      "NO_CONTACT_OR_RECIPIENT_PERSONAL_DATA",
+      "NO_REPLAY_WHILE_ORIGINAL_WRITER_IS_SCHEDULED",
+      "NO_ACTIVE_DAILY_TO_ARCHIVE_CHRONOLOGY_SUBSTITUTION"
+    ],
+    "evaluation_eligibility": "SOURCE_LEAD_ONLY_REQUIRES_SCOPE_RIGHTS_AND_ORIGINAL_BYTE_CUSTODY_BEFORE_USE",
+    "discovered_in_research_on": "2026-10-31"
+  }
+}

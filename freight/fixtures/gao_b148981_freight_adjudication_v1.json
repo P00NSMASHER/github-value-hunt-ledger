@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B148981_FREIGHT_ADJUDICATION_CORRECTION_V1",
+  "evaluation_family": "HISTORICAL_ORIGINAL_GAO_FREIGHT_RATE_ADJUDICATION_NOT_CURRENT_CUSTOMER_ACCURACY",
+  "observed_at_utc_date": "2026-10-30",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "original_public_decision_url": "https://www.gao.gov/products/b-148981",
+    "decision_id": "B-148981",
+    "decision_date": "1962-11-29",
+    "cohort": "GOVERNMENT_FREIGHT_1955_1958",
+    "source_kind": "ORIGINAL_OFFICIAL_GAO_DECISION_PUBLIC_HTML_INDEXED_TEXT",
+    "source_rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_GOVERNMENT_WORK_NOT_US_COPYRIGHTED_CITE_GAO_NO_ENDORSEMENT",
+    "third_party_embedded_material_rights": "NOT_AUTOMATICALLY_CLEARED",
+    "source_full_html_response_sha256": null,
+    "source_original_invoice_bytes_sha256": null,
+    "source_tariff_bytes_sha256": null,
+    "issuer_http_response_custodied": false,
+    "source_response_content_length_bytes": null,
+    "original_bol_or_payment_documents_custodied": false
+  },
+  "case_groups": [
+    {
+      "case_id": "B148981_BILL_5188",
+      "split": "calibration",
+      "carrier_bill_group": "5188",
+      "shipment_count": 1,
+      "shipment_years": [
+        1958
+      ],
+      "original_paid_cents": 175500,
+      "original_paid_components_cents": [
+        175500
+      ],
+      "initial_audit_overcharge_cents": 13444,
+      "carrier_refund_reported_by_gao": true,
+      "amended_supplement_requested_cents": 50944,
+      "gao_decision": "INITIAL_AUDIT_SUSTAINED",
+      "later_carrier_credit_authorized_cents": 0,
+      "credit_clearing_independently_proved": false
+    },
+    {
+      "case_id": "B148981_BILL_5193",
+      "split": "calibration",
+      "carrier_bill_group": "5193",
+      "shipment_count": 3,
+      "shipment_years": [
+        1956
+      ],
+      "original_paid_cents": 101703,
+      "original_paid_components_cents": [
+        33833,
+        41438,
+        26432
+      ],
+      "initial_audit_overcharge_cents": 4602,
+      "carrier_refund_reported_by_gao": true,
+      "amended_supplement_requested_cents": 6429,
+      "gao_decision": "INITIAL_AUDIT_SUSTAINED",
+      "later_carrier_credit_authorized_cents": 0,
+      "credit_clearing_independently_proved": false
+    },
+    {
+      "case_id": "B148981_BILL_5190",
+      "split": "holdout_within_single_publisher_decision",
+      "carrier_bill_group": "5190",
+      "shipment_count": 3,
+      "shipment_years": [
+        1955
+      ],
+      "original_paid_cents": 372404,
+      "original_paid_components_cents": [
+        132620,
+        107213,
+        132571
+      ],
+      "initial_audit_overcharge_cents": 166154,
+      "carrier_refund_reported_by_gao": true,
+      "amended_supplement_requested_cents": 122405,
+      "gao_decision": "INITIAL_AUDIT_MODIFIED_CARRIER_CREDIT_AUTHORIZED",
+      "later_carrier_credit_authorized_cents": 39174,
+      "credit_clearing_independently_proved": false
+    }
+  ],
+  "quality": {
+    "publisher_decisions": 1,
+    "real_historical_decision_case_groups": 3,
+    "calibration_groups": 2,
+    "within_source_holdout_groups": 1,
+    "split_independence": "HOLDOUT_GROUP_WITHIN_SAME_GAO_DECISION_NOT_SEPARATE_INDEPENDENT_PUBLISHER",
+    "initial_government_overcharge_assertions_cents": 184200,
+    "bank_cleared_refunds_independently_authenticated": 0,
+    "reported_historical_refunds_not_customer_cash": true,
+    "externally_linked_modern_invoice_tariff_payment_adjudications": 0,
+    "modern_independent_positives": 0,
+    "modern_independent_negatives": 0,
+    "modern_measured_freight_error_accuracy": null,
+    "original_invoice_extract_labels_not_equivalent_to_overcharge_labels": true,
+    "source_issued_outcome_label_status": "INDEPENDENT_HISTORICAL_GAO_PUBLIC_ADJUDICATION_WITHOUT_SEPARATE_ORIGINAL_DOCUMENT_CUSTODY",
+    "original_replay_sample_count": 0,
+    "legal_application_to_private_2026_customers": "UNKNOWN_NOT_ESTABLISHED",
+    "retally_recovered_cash_cents": 0
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_REFUNDS_AS_RETALLY_CASH",
+      "untrusted_claim": "historic government refunds are RETALLY realized cash",
+      "expected": "UNKNOWN_NO_RETALLY_CASH",
+      "provenance": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_5190_ORIGINAL_AUDIT_FINAL",
+      "untrusted_claim": "original 5190 claimed overcharge is fully upheld despite later correction",
+      "expected": "REJECT_GAO_MODIFIED_AUDIT",
+      "provenance": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_5190_CREDIT_PAID",
+      "untrusted_claim": "GAO instruction to credit carrier confirms independent payment",
+      "expected": "UNKNOWN_CREDIT_SETTLEMENT_NOT_VERIFIED",
+      "provenance": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_5193_TRIPLE_DECISION",
+      "untrusted_claim": "three bills of lading equal three independent GAO rulings",
+      "expected": "REJECT_GROUP_LEVEL_LABEL",
+      "provenance": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_MODERN_PRIVATE_TARIFF",
+      "untrusted_claim": "1955-58 government freight tariffs prove 2026 private customer rate",
+      "expected": "UNKNOWN_NO_PRESENT_DAY_RATE_AUTHORITY",
+      "provenance": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "independently_verified_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_GAO_REFUND_BANK_PROOF",
+      "untrusted_claim": "GAO's reported refund establishes authenticated bank-cleared event",
+      "expected": "UNKNOWN_NO_INDEPENDENT_BANK_PROOF",
+      "provenance": "SYNTHETIC_NOT_A_REAL_SHIPMENT",
+      "independently_verified_customer_label": null
+    }
+  ],
+  "data_quality": {
+    "source_dates_span": "1955_to_1962_only",
+    "group_vs_shipment_cardinality": "3_DECISION_GROUPS_7_SHIPMENTS",
+    "outcomes_are_billing_case_not_bank_clearing": "TRUE",
+    "source_byte_integrity": "UNKNOWN_WEB_RENDERED_TEXT_NOT_FULL_HTTP_BYTES",
+    "publication_after_shipment": "YES_HISTORICAL_NOT_CONTEMPORANEOUS_RATE_SNAPSHOT",
+    "decision_correction_preserved": "BILL_5190_GAO_AUTHORIZED_39174_CARRIER_CREDIT_NOT_VERIFIED_PAID",
+    "dedup_key": "publisher/decision_id/carrier_bill_group",
+    "no_person_identifiers_or_private_customer_records": true
+  },
+  "consumers": {
+    "freightrecovery_12": "historical freight-error adjudication and false gross-recovery controls only; no 2026 scoring approval",
+    "recoveryos_12": "refund-versus-credit-authorized-versus-bank-cleared accounting boundaries only",
+    "permitplate_48": "not a building or permit source; no scored cases",
+    "capturebrief_52": "not a procurement notice or award source; no scored cases",
+    "independent_qa_44": "inspect GAO original, exact Git blobs, grouped outcomes, rights limits and six synthetic negative controls; no current-customer claim"
+  },
+  "original_customer_records_downloaded": 0,
+  "engine_code_modified": false,
+  "product_release_authorized": false,
+  "provider_requests_added_by_ci": 0,
+  "scheduled_jobs_added": 0,
+  "legacy_15_lab_consolidation_certified": false
+}

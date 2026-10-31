@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_BIS_JOB_FILINGS_AND_NOW_READBACK_BOUNDARY_V1",
+  "evaluation_family": "ORIGINAL_PUBLIC_DATA_SOURCE_COVERAGE_AND_SAMPLE_KEY_INTEGRITY_NOT_PERMIT_SCORING",
+  "observed_at_utc_date": "2026-10-31",
+  "newly_reviewed_official_source": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "official_dataset_id": "ic3t-wcy2",
+    "official_source_url": "https://data.cityofnewyork.us/Housing-Development/DOB-Job-Application-Filings/ic3t-wcy2/data/",
+    "first_published_date": "2013-04-18",
+    "metadata_last_updated_as_reported": "2026-10-25",
+    "source_scope": "BOROUGH_OFFICES_EFILING_HUB_JOB_APPLICATION_LATEST_ACTION_DATE_SINCE_2000_01_01",
+    "source_excludes": "ALL_DOB_NOW_JOBS",
+    "event_type": "BIS_JOB_APPLICATION_NOT_ISSUED_PERMIT",
+    "publisher_documented_api_fields": [
+      "job__",
+      "doc__",
+      "job_type",
+      "job_status",
+      "job_status_descrp",
+      "latest_action_date"
+    ],
+    "asof_history": "LATEST_ACTION_DATE_IS_CURRENT_FIELD_NOT_INDEPENDENT_HISTORICAL_ASOF_SNAPSHOT",
+    "original_data_rows_downloaded": 0,
+    "raw_http_source_bytes_sha256": null,
+    "raw_http_response_byte_count": null,
+    "row_level_filing_identifiers_persisted": 0,
+    "identifiers_and_personal_details_collected": false
+  },
+  "existing_original_publisher_readback": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "official_dataset_id": "rbx6-tga4",
+    "official_source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "receipt_at_utc": "2026-10-31T02:41:52+00:00",
+    "immutable_producer_branch_snapshot_sha": "c3eec27209b28003f1bedb92589901547784625b",
+    "immutable_producer_receipt_path": "freight/research_lab/official_nyc_issued_permit_replay_v1.json",
+    "immutable_producer_receipt_git_blob_sha1": "22ed65ca9c41057637598c19387a5d68b86f0657",
+    "producer_receipt_sha256": "fc60356829cc334280f31e8e0b8864bda561b1707ab3be934f18387e218e931b",
+    "producer_canonical_sample_sha256": "83ddeacca71e2034815021ca608b6ffc69fb2751eb16977d4e668698c529c9eb",
+    "hash_semantics": "SAMPLE_CANONICAL_SHA256_NOT_ORIGINAL_HTTP_BODY_SHA256",
+    "raw_http_source_body_sha256": null,
+    "original_records_embedded_in_this_pack": 0,
+    "sampled_publisher_rows": 20,
+    "sample_unique_source_identities": 19,
+    "sample_repeated_source_rows": 1,
+    "repeat_gets_checked": 3,
+    "repeat_gets_exact_match": 3,
+    "publisher_sample_state": "PUBLISHER_REPLAY_DEGRADED",
+    "publisher_sample_error_codes": [
+      "DUPLICATE_SOURCE_IDENTITIES"
+    ],
+    "independent_permit_issuance_outcome_labels": 0,
+    "independent_buyer_opportunity_labels": 0,
+    "dedup_limit": "19_DISTINCT_SOURCE_IDENTITIES_IN_20_SAMPLED_ROWS_NOT_PROVEN_19_DISTINCT_LEGAL_PERMITS",
+    "source_mutability": "MOVING_PUBLIC_DATASET_SNAPSHOT_CANNOT_PROVE_PAST_STATES"
+  },
+  "legal_and_rights": {
+    "nyc_city_open_data_faq": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "nyc_portal_terms": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "nyc_technical_standards": "https://cityofnewyork.github.io/opendatatsm/publicpolicies.html",
+    "city_general_use": "CITY_FAQ_REPORTS_NO_USE_RESTRICTIONS_FOR_OPEN_DATA_IN_GENERAL",
+    "supplemental_dataset_or_provider_terms_individually_cleared": false,
+    "commercial_scoring_authorized": false,
+    "data_quality_warranty": "NONE_AS_CITY_PORTAL_TERMS_WARN",
+    "original_bis_job_filings_are_public_metadata_only_in_this_pack": true
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_NO_BIS_MATCH_MEANS_NO_NYC_JOB",
+      "split": "synthetic_calibration",
+      "provenance": "SYNTHETIC_NOT_REAL_PUBLISHER_ROW",
+      "claim": "BIS_NONMATCH_PROVES_NO_NYC_JOB",
+      "facts": {
+        "dataset_id": "ic3t-wcy2",
+        "dob_now_excluded": true,
+        "bis_row_found": false
+      },
+      "expected": "UNKNOWN_SOURCE_EXCLUDES_DOB_NOW",
+      "real_independent_label": null
+    },
+    {
+      "id": "SYNTH_BIS_JOB_APPROVAL_IS_PERMIT_ISSUANCE",
+      "split": "synthetic_calibration",
+      "provenance": "SYNTHETIC_NOT_REAL_PUBLISHER_ROW",
+      "claim": "BIS_JOB_APPROVAL_PROVES_ISSUED_PERMIT",
+      "facts": {
+        "dataset_id": "ic3t-wcy2",
+        "event_type": "BIS_JOB_APPLICATION",
+        "job_status": "P"
+      },
+      "expected": "UNKNOWN_APPLICATION_NOT_PERMIT_ISSUANCE",
+      "real_independent_label": null
+    },
+    {
+      "id": "SYNTH_20_ROWS_EQUAL_20_SOURCE_IDENTITIES",
+      "split": "synthetic_holdout",
+      "provenance": "SYNTHETIC_NOT_REAL_PUBLISHER_ROW",
+      "claim": "20_ROWS_PROVE_20_UNIQUE_PERMITS",
+      "facts": {
+        "published_sample_rows": 20,
+        "observed_distinct_source_identities": 19
+      },
+      "expected": "REJECT_ROW_COUNT_AND_PERMIT_COUNT_CONFUSION",
+      "real_independent_label": null
+    },
+    {
+      "id": "SYNTH_THREE_REPLAYS_ARE_THREE_LABELS",
+      "split": "synthetic_holdout",
+      "provenance": "SYNTHETIC_NOT_REAL_PUBLISHER_ROW",
+      "claim": "THREE_MATCHING_SOURCE_READS_ARE_INDEPENDENT_ISSUANCE_LABELS",
+      "facts": {
+        "repeat_gets_exact_match": 3,
+        "independent_labels": 0
+      },
+      "expected": "REJECT_SOURCE_READBACK_AS_INDEPENDENT_ADJUDICATION",
+      "real_independent_label": null
+    },
+    {
+      "id": "SYNTH_CURRENT_ACTION_DATE_IS_HISTORIC_SNAPSHOT",
+      "split": "synthetic_holdout",
+      "provenance": "SYNTHETIC_NOT_REAL_PUBLISHER_ROW",
+      "claim": "LATEST_ACTION_DATE_PROVES_PAST_ASOF_STATE",
+      "facts": {
+        "historic_immutable_snapshot_custodied": false
+      },
+      "expected": "UNKNOWN_NO_IMMUTABLE_HISTORIC_ASOF",
+      "real_independent_label": null
+    },
+    {
+      "id": "SYNTH_SAME_BIS_JOB_TWO_DOCS_TWO_PERMITS",
+      "split": "synthetic_holdout",
+      "provenance": "SYNTHETIC_NOT_REAL_PUBLISHER_ROW",
+      "claim": "TWO_DOCUMENTS_SAME_JOB_ARE_TWO_ISSUED_PERMITS",
+      "facts": {
+        "job_key": "SYNTH-JOB-1",
+        "doc_keys": [
+          "SYNTH-DOC-1",
+          "SYNTH-DOC-2"
+        ],
+        "permit_registry_match": false
+      },
+      "expected": "UNKNOWN_JOB_DOCUMENT_MULTIPLICITY_NOT_PERMIT_COUNT",
+      "real_independent_label": null
+    }
+  ],
+  "benchmark_readiness": {
+    "existing_publisher_sample_dedup_arithmetic_reconciles": true,
+    "underlying_source_receipt_independently_recollected_for_this_pack": false,
+    "new_source_metadata_verified_no_public_row_bytes": true,
+    "synthetic_calibration_cases": 2,
+    "synthetic_heldout_cases": 4,
+    "independent_real_world_heldout_positive_labels": 0,
+    "independent_real_world_heldout_negative_labels": 0,
+    "real_heldout_accuracy": null,
+    "field_extraction_accuracy": null,
+    "permit_scoring_precision": null,
+    "permit_scoring_recall": null,
+    "observed_customer_recovered_cash_cents": 0,
+    "source_limited_conclusion": "ONE_OFFICIAL_SAMPLE_REPORTED_ONE_REPEATED_SOURCE_KEY_BUT_CANNOT_ESTABLISH_ANY_CUSTOMER_OPPORTUNITY_OR_ANY_DEDUPLICATED_ISSUED_PERMIT_COUNT",
+    "repeat_source_identity_is_not_automatically_duplicate_legal_permit": true
+  },
+  "engine_handoffs": {
+    "permitplate_48": "Publisher duplicate source-key receipt + separate BIS/NOW coverage: require independent issuance record and real labels before scoring or claims.",
+    "freightrecovery_12": "NO_FREIGHT_INVOICE_OR_RATE_LABEL",
+    "recoveryos_12": "NO_ACCOUNTING_OR_BANK_SETTLEMENT_LABEL",
+    "capturebrief_52": "NO_PROCUREMENT_NOTICE_OR_AWARD_LABEL",
+    "independent_qa_44": "Re-read immutable producer receipt Git blob, pin exact SHA and counts; verify metadata/rights and reject 6 synthetic invalid inferences."
+  },
+  "safety": {
+    "official_source_access_requests_added_to_ci": 0,
+    "public_dataset_rows_saved": 0,
+    "customer_medical_student_private_records_saved": 0,
+    "product_code_modified": false,
+    "protected_main_modified": false,
+    "new_lab_or_cron_added": false,
+    "legacy_15_lab_consolidation_certified": false,
+    "customer_commercial_launch_authorized": false
+  }
+}

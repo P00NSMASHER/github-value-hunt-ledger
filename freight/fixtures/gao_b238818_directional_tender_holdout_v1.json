@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B238818_ORIGINAL_DIRECTIONAL_RATE_HOLDOUT_V1",
+  "evaluation_family": "HISTORICAL_FREIGHT_RATE_DIRECTIONAL_TENDER_ERROR_NOT_MODERN_RECOVERY_ACCURACY",
+  "observed_at_utc_date": "2026-10-31",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-238818",
+    "official_decision_url": "https://www.gao.gov/products/b-238818",
+    "decision_date": "1991-02-20",
+    "cohort": "1987_09_US_GOVERNMENT_MOTOR_FREIGHT_INTERSTATE_SHIPMENT",
+    "source_kind": "ORIGINAL_PUBLIC_GAO_DECISION_HTML_READ_NOT_RAW_GBL_OR_TENDER",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_US_GOVERNMENT_WORK_MAY_BE_REUSED_WITH_ATTRIBUTION_NO_ENDORSEMENT",
+    "third_party_carrier_rate_tender_rights": "UNKNOWN_NOT_CLEARED",
+    "publisher_full_response_sha256": null,
+    "publisher_full_response_byte_length": null,
+    "publisher_original_bytes_custodied": false,
+    "original_GBL_or_tender63_or_tender85_bytes_custodied": false,
+    "original_carrier_invoice_or_bank_record_bytes_custodied": false,
+    "evidence_scope": "GAO_ADJUDICATED_DECISION_TEXT_NOT_SEPARATELY_AUTHENTICATED_UNDERLYING_BILLING",
+    "source_url_is_a_versioned_original_byte_snapshot": false
+  },
+  "original_adjudicated_case": {
+    "case_id": "GAO_B238818_GBL_C1531302",
+    "split": "independent_GAO_decision_holdout_not_customer_validation",
+    "government_bill_of_lading": "C-1,531,302",
+    "shipment_period": "1987-09_EXACT_DAY_UNKNOWN",
+    "carrier": "Double M Transport",
+    "actual_origin": "Maryland",
+    "actual_destination": "California",
+    "wrong_billed_tender_id": "63",
+    "wrong_tender_authorized_origin": "California",
+    "wrong_tender_authorized_destination": "Maryland",
+    "adjudicated_applicable_tender_id": "85",
+    "applicable_tender_authorized_origin": "Maryland",
+    "applicable_tender_authorized_destination": "California",
+    "GBL_identified_a_rate_tender": false,
+    "carrier_claimed_oral_tender63_advice": true,
+    "GAO_accepted_oral_advice_as_authority": false,
+    "GAO_final_holding": "GSA_DIRECTIONAL_RATE_OVERCHARGE_ASSESSMENT_SUSTAINED",
+    "overcharge_cents": 166140,
+    "interest_cents": null,
+    "GAO_reported_GSA_deduction_collected": true,
+    "independent_bank_clearing_proof": false,
+    "RETALLY_customer_recovery_cents": 0,
+    "modern_tariff_applicability": "UNKNOWN_HISTORICAL_INTERSTATE_COMMERCE_ACT",
+    "adjudicated_money_label_kind": "HISTORICAL_GAO_DECISION_AMOUNT_NOT_RAW_INVOICE_REPLAY"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_REVERSED_ROUTE_ACCEPT_TENDER_85",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "Tender 85 works for a California to Maryland shipment",
+      "expected": "REJECT_WRONG_ORIGIN_DESTINATION",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_GBL_BLANK_IMPLIES_TENDER_63",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "Blank bill-of-lading tender permits any carrier-selected tender",
+      "expected": "REJECT_CARRIER_DUTY_TO_USE_APPLICABLE_TENDER",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_ORAL_ADVICE_SUPERSEDES_TENDER",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "Alleged oral advice legally changed Tender 63 direction",
+      "expected": "REJECT_GAO_DISMISSED_ORAL_ADVICE",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_UNKNOWN_INTEREST_IS_ZERO",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "Unquantified interest equals $0",
+      "expected": "UNKNOWN_INTEREST_AMOUNT",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_GSA_DEDUCTION_IS_RETALLY_CASH",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "Historical agency deduction proves modern private customer recovery",
+      "expected": "REJECT_GOVERNMENT_DEDUCTION_AS_CUSTOMER_CASH",
+      "independent_real_customer_label": null
+    },
+    {
+      "id": "SYNTHETIC_MISSING_ORIGINAL_TENDERS_EQUALS_INDEPENDENT_REPLAY",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "GAO decision alone authenticates carrier original Tender 63 and 85 documents",
+      "expected": "UNKNOWN_NO_SEPARATE_ORIGINAL_TENDER_BYTES",
+      "independent_real_customer_label": null
+    }
+  ],
+  "heldout": {
+    "GAO_publisher_decisions": 1,
+    "independently_adjudicated_historical_decision_labels": 1,
+    "separately_custodied_original_GBL_tender_invoice_triplets": 0,
+    "same_publisher_as_other_GAO_casebook": true,
+    "case_overlap_with_existing_B148981_B151387_B174692_B221705": false,
+    "distinct_independent_decision_not_independent_publisher": true,
+    "real_customer_truth_cases": 0,
+    "historical_holdout_is_decision_level_not_random_sample": true,
+    "engine_predictions_compared_against_this_holdout": 0,
+    "freight_error_precision": null,
+    "modern_customer_accuracy": null,
+    "recovered_customer_cash_cents": 0,
+    "unknowns": [
+      "FULL_PUBLISHER_RESPONSE_BYTE_SHA256",
+      "ORIGINAL_TENDER_63_85_BYTES",
+      "ORIGINAL_BILL_OF_LADING_BYTES",
+      "GAO_REPORTED_GSA_DEDUCTION_BANK_RECORD",
+      "INTEREST_AMOUNT",
+      "PRESENT_DAY_RATE_AUTHORITY"
+    ]
+  },
+  "dedup": {
+    "decision_key": "GAO/B-238818",
+    "adjudication_case_key": "GAO/B-238818/C-1,531,302",
+    "source_identifiers_are_historical_public_not_CUSTOMER_IDS": true,
+    "do_not_count_six_synthetic_cases_as_real_labels": true
+  },
+  "consumers": {
+    "freightrecovery_12": "One independent historical GAO decision-level positive label. Validate bidirectional tariff origin/destination; no modern-rate or customer-accuracy claim.",
+    "recoveryos_12": "Do not convert historical GSA deduction plus unknown interest into bank-cleared customer cash.",
+    "permitplate_48": "No real permit label, score, or rights clearance.",
+    "capturebrief_52": "No SAM.gov notice history or award ground truth.",
+    "independent_qa_44": "Read GAO B-238818 original §§ holding and amount, check exact fixture/workflow SHA, reject 2026 commercial inference."
+  },
+  "restrictions": {
+    "private_customer_medical_student_records": 0,
+    "paid_provider_calls": 0,
+    "new_scheduled_jobs": 0,
+    "product_code_modified": false,
+    "production_release_allowed": false,
+    "legacy_15_lab_consolidation_certified": false
+  }
+}

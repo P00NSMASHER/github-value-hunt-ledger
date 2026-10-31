@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "pack_id": "PERMITPLATE_NYC_DOB_AFTER_HOURS_VARIANCE_PROVENANCE_SCOPE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SCHEMA_COVERAGE_AND_TIME_WINDOW_NOT_CUSTOMER_LEAD_ACCURACY",
+  "reviewed_on_utc": "2026-10-31",
+  "publisher_source": {
+    "publisher": "New York City Department of Buildings via NYC Open Data",
+    "dataset_id": "g76y-dcqj",
+    "title": "DOB After Hour Variance Permits",
+    "catalog_url": "https://data.cityofnewyork.us/Housing-Development/DOB-After-Hour-Variance-Permits/g76y-dcqj",
+    "public_api_example": "https://data.cityofnewyork.us/resource/g76y-dcqj.json?$limit=2",
+    "catalog_created_date": "2020-09-17",
+    "first_public_date": "2020-11-30",
+    "last_dataset_updated_reported": "2026-10-24",
+    "declared_update_frequency": "DAILY",
+    "catalog_column_count": 24,
+    "approximate_catalog_rows": "1.13M_CATALOG_ESTIMATE_NOT_ACQUIRED_ROWS",
+    "event_kind": "AFTER_HOURS_VARIANCE_PERMIT_OR_RENEWAL_NOT_GENERAL_CONSTRUCTION_WORK_PERMIT",
+    "documented_api_fields": [
+      "bin",
+      "job_number",
+      "workpermitnumber",
+      "ahv_permit_number",
+      "ahvpermitstatus",
+      "variancetype",
+      "variance_start_date_time",
+      "variance_end_date_time",
+      "residence_200ft",
+      "enclosed_work"
+    ],
+    "catalog_data_source": "OFFICIAL_PUBLISHER_METADATA_NOT_ORIGINAL_ROW_READBACK",
+    "source_metadata_body_sha256": null,
+    "original_data_http_body_sha256": null,
+    "original_data_body_bytes": null,
+    "source_rows_acquired": 0,
+    "original_row_labels_acquired": 0,
+    "personal_street_or_applicant_fields_persisted": 0,
+    "schema_descriptor_provenance": "OFFICIAL_PUBLISHER_CATALOG_TEXT_FIELDS_NOT_CUSTODIED_SCHEMA_BYTES",
+    "source_mutable": true,
+    "observed_catalog_staleness_days": 7,
+    "caveat": "Catalog says last updated 2026-10-24 versus observed 2026-10-31; a cached page alone cannot prove the current live source is stale or down."
+  },
+  "rights": {
+    "city_open_data_technical_policy": "https://cityofnewyork.github.io/opendatatsm/publicpolicies.html",
+    "city_portal_terms": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "official_dob_guidance": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+    "public_data_reuse": "NYC_OPEN_DATA_GENERAL_NO_REGISTRATION_LICENSE_OR_USE_RESTRICTION_SUBJECT_TO_PORTAL_AND_AGENCY_TERMS",
+    "source_embedded_third_party_rights": "UNKNOWN",
+    "commercial_scored_leads_clearance": false,
+    "customer_or_person_data_acquired": false
+  },
+  "publisher_scope": {
+    "ahv_work_permit_distinction": "A work permit and its associated after-hours variance have different authorization periods; renewing a work permit does not extend the AHV.",
+    "renewal_fact": "An expired AHV cannot be renewed; the agency states a new AHV application is required.",
+    "general_dob_now_permit_dataset": "rbx6-tga4",
+    "general_permit_scope": "GENERAL_BUILD_PERMIT_LIST_EXCLUDES_SPECIAL_ELECTRICAL_ELEVATOR_LAA; AHV is an associated separate event and cannot be inferred from that source alone.",
+    "related_laa_dataset": "xxbr-ypig",
+    "entity_keys": [
+      "dataset_id",
+      "job_number",
+      "workpermitnumber",
+      "ahv_permit_number",
+      "variancetype",
+      "variance_start_date_time"
+    ],
+    "dedup_rule": "Never count each AHV renewal, work-permit link, or repeated BIN as a distinct buyer or project opportunity.",
+    "time_rule": "Cannot infer historical as-of awareness from a current mutable publisher dataset.",
+    "authoritativeness": "PUBLISHER_CATALOG_CONTRACT_ONLY_NOT_INDEPENDENT_LEGAL_OR_CUSTOMER_VERIFICATION"
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYN_AHV_EXPIRED_BUT_WORK_PERMIT_ACTIVE",
+      "kind": "variance_expiry",
+      "split": "synthetic_calibration",
+      "facts": {
+        "asof": "2026-10-31",
+        "ahv_expiry": "2026-10-22",
+        "work_permit_active": true,
+        "ahv_status": "Issued"
+      },
+      "expected": "AHV_EXPIRED_NOT_ACTIVE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_WORK_PERMIT_RENEWAL_NOT_AHV_RENEWAL",
+      "kind": "variance_expiry",
+      "split": "synthetic_heldout",
+      "facts": {
+        "asof": "2026-10-31",
+        "ahv_expiry": "2026-10-30",
+        "work_permit_renewed": "2026-10-31",
+        "ahv_status": "Issued"
+      },
+      "expected": "AHV_EXPIRED_NOT_ACTIVE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_INITIAL_AND_RENEWAL_SAME_JOB",
+      "kind": "repeat_event",
+      "split": "synthetic_heldout",
+      "facts": {
+        "same_job_number": true,
+        "variance_type": [
+          "Initial",
+          "Renewal"
+        ],
+        "distinct_project_independent": false
+      },
+      "expected": "REJECT_DUPLICATE_PROJECT_CLAIM",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_MISSING_GENERAL_PERMIT_ROW",
+      "kind": "general_dataset_nonmatch",
+      "split": "synthetic_calibration",
+      "facts": {
+        "general_approved_permits_match": false,
+        "source_separate_event": true
+      },
+      "expected": "UNKNOWN_AHV_OUTSIDE_GENERAL_SOURCE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_ISSUED_MEANS_WORK_PERMIT_ISSUED",
+      "kind": "base_work_permit_inference",
+      "split": "synthetic_heldout",
+      "facts": {
+        "ahv_status": "Issued",
+        "base_work_permit_verified": false
+      },
+      "expected": "UNKNOWN_BASE_PERMIT_ISSUANCE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_NO_EXPIRY",
+      "kind": "missing_expiry",
+      "split": "synthetic_heldout",
+      "facts": {
+        "ahv_status": "Issued",
+        "ahv_expiry": null
+      },
+      "expected": "UNKNOWN_MISSING_AHV_EXPIRY",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_FUTURE_START_LOOKAHEAD",
+      "kind": "asof_lookahead",
+      "split": "synthetic_heldout",
+      "facts": {
+        "asof": "2026-10-25",
+        "variance_start": "2026-11-01"
+      },
+      "expected": "REJECT_FUTURE_EVENT_LOOKAHEAD",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_CATALOG_GAP_PROVES_OUTAGE",
+      "kind": "catalog_freshness",
+      "split": "synthetic_calibration",
+      "facts": {
+        "observed": "2026-10-31",
+        "last_updated": "2026-10-24",
+        "declared_frequency": "DAILY"
+      },
+      "expected": "STALE_CATALOG_SNAPSHOT_NOT_LIVE_OUTAGE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    },
+    {
+      "id": "SYN_AHV_CURRENT_WINDOW_NOT_LEGAL_PROOF",
+      "kind": "bounded_window",
+      "split": "synthetic_heldout",
+      "facts": {
+        "asof": "2026-10-31",
+        "variance_start": "2026-10-29",
+        "ahv_expiry": "2026-11-02",
+        "ahv_status": "Issued",
+        "base_work_permit_verified": true
+      },
+      "expected": "PUBLISHER_TIME_WINDOW_ONLY_NOT_LEGAL_CLEARANCE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_SOURCE_ROW",
+      "independent_real_world_label": null
+    }
+  ],
+  "benchmarks": {
+    "real_publisher_reported_ahv_records": 0,
+    "source_catalogs_metadata_reviewed": 1,
+    "independent_real_world_heldout_ahv_cases": 0,
+    "synthetic_calibration_controls": 3,
+    "synthetic_heldout_controls": 6,
+    "independently_adjudicated_opportunity_labels": 0,
+    "precision": null,
+    "recall": null,
+    "commercial_customer_outcome_known": false,
+    "scope_comparison": "General DOB NOW permits, LAA applications and AHV variances are different event families, not three independent buyer/project labels.",
+    "negative_control_outcome": "A naive status-only classification falsely accepts expired AHV; guarded time/renewal distinction rejects it."
+  },
+  "handoffs": {
+    "permitplate_48": "ADD_AHV_AS_SEPARATE_SOURCE_COEVAL_FAMILY_NO_PROJECT_LEAD_SCORING; verify live source rows and status history before source use",
+    "capturebrief_52": "NOT_A_GOVERNMENT_SOLICITATION_OR_AWARD_LABEL",
+    "freightrecovery_12": "NOT_CARRIER_INVOICE_OR_TARIFF_EVIDENCE",
+    "recoveryos_12": "NOT_BANK_LEDGER_OR_SETTLEMENT",
+    "qa_44": "VERIFY_CATALOG_COLUMNS_SOURCE_SCOPE_RENEWAL_RULES_AND_CASES; independently confirm source bytes and no real row claims"
+  },
+  "controls": {
+    "branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "writer_branch_modified": false,
+    "engine_code_changed": false,
+    "additional_provider_calls": 0,
+    "scheduled_jobs_created": 0,
+    "private_records_saved": 0,
+    "legacy_lab_consolidation_proved": false,
+    "commercial_scoring_approved": false,
+    "release_approved": false
+  }
+}

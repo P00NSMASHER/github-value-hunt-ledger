@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_NOW_ELECTRICAL_DETAILS_FANOUT_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_JOIN_CARDINALITY_NOT_ISSUANCE_SCORING",
+  "observed_at_utc_date": "2026-10-30",
+  "source": {
+    "publisher": "NYC Department of Buildings through NYC Open Data",
+    "dataset_id": "xmmq-y7za",
+    "original_url": "https://data.cityofnewyork.us/d/xmmq-y7za",
+    "original_schema_metadata_url": "https://data.cityofnewyork.us/api/views/xmmq-y7za/columns.json",
+    "federal_catalog_url": "https://catalog.data.gov/dataset/dob-now-electrical-permit-details",
+    "first_published": "2019-04-30",
+    "catalog_last_updated_reported": "2026-10-20",
+    "catalog_last_checked_reported": "2026-10-20",
+    "event_type": "ELECTRICAL_SCOPE_DETAIL_ROW_NOT_PERMIT_ISSUANCE",
+    "documented_public_api_fields": [
+      "unique_id",
+      "work_id",
+      "floor_id",
+      "sign_id",
+      "job_filing_number",
+      "work_description",
+      "item"
+    ],
+    "publisher_describes_multiple_rows_per_job_filing": true,
+    "original_source_rows_custodied": 0,
+    "original_http_response_bytes_sha256": null,
+    "original_schema_response_bytes_sha256": null,
+    "original_content_length_bytes": null,
+    "field_types_observed_from_publisher_schema": "TEXT_FOR_LISTED_FIELDS",
+    "cached_field_stats_are_mutable_not_a_reproducible_source_snapshot": true
+  },
+  "join_contract": {
+    "related_official_application_dataset_id": "dm9a-ab7w",
+    "related_official_application_url": "https://data.cityofnewyork.us/d/dm9a-ab7w",
+    "shared_field": "job_filing_number",
+    "detail_row_identifier": "unique_id",
+    "work_scope_identifier": "work_id",
+    "floor_identifier": "floor_id",
+    "expected_cardinality": "ONE_FILING_TO_MANY_SCOPE_DETAIL_ROWS",
+    "uniqueness_limits": "DETAIL_ROW_AND_WORK_SCOPE_IDENTITIES_NOT_PERMIT_IDENTITIES",
+    "status_from_detail_rows": "UNKNOWN_NOT_AN_ISSUANCE_REGISTER",
+    "no_match_from_detail_rows": "UNKNOWN_PUBLISHER_COVERAGE_AND_SYNC",
+    "source_date_is_not_historic_status_snapshot": true
+  },
+  "rights": {
+    "city_general_faq": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "city_open_data_faq_describes_unrestricted_general_use": true,
+    "portal_terms": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "federal_catalog_access_level": "public",
+    "dataset_specific_license": "UNVERIFIED",
+    "supplemental_or_provider_terms_reviewed": false,
+    "permitplate_commercial_scoring_cleared": false,
+    "third_party_or_individual_records_custodied": false
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYNTHETIC_DETAIL_FANOUT_3_TO_1",
+      "split": "synthetic_calibration",
+      "provenance": "SYNTHETIC_NO_REAL_PUBLISHER_RECORD",
+      "claim": "THREE_DETAIL_ROWS_ARE_THREE_ISSUED_PERMITS",
+      "synthetic_detail_rows": [
+        {
+          "unique_id": "SYNTH-ROW-1",
+          "job_filing_number": "SYNTH-JOB-A-I1-EL",
+          "work_id": "SYNTH-WORK-A",
+          "floor_id": "SYNTH-FLOOR-1"
+        },
+        {
+          "unique_id": "SYNTH-ROW-2",
+          "job_filing_number": "SYNTH-JOB-A-I1-EL",
+          "work_id": "SYNTH-WORK-A",
+          "floor_id": "SYNTH-FLOOR-2"
+        },
+        {
+          "unique_id": "SYNTH-ROW-3",
+          "job_filing_number": "SYNTH-JOB-A-I1-EL",
+          "work_id": "SYNTH-WORK-B",
+          "floor_id": "SYNTH-FLOOR-2"
+        }
+      ],
+      "naive_detail_row_count": 3,
+      "deduped_filing_group_count": 1,
+      "deduped_work_scope_count": 2,
+      "expected": "UNKNOWN_ONE_FILING_NOT_THREE_ISSUED_PERMITS",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_DETAILS_WITHOUT_APPLICATION_JOIN",
+      "split": "synthetic_holdout",
+      "provenance": "SYNTHETIC_NO_REAL_PUBLISHER_RECORD",
+      "claim": "NO_APPLICATION_MATCH_MEANS_NO_ELECTRICAL_PERMIT",
+      "synthetic_facts": {
+        "detail_present": true,
+        "application_join_found": false
+      },
+      "expected": "UNKNOWN_JOIN_MISS_NOT_NEGATIVE_ISSUANCE_LABEL",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_TWO_FILINGS_ONE_JOB",
+      "split": "synthetic_holdout",
+      "provenance": "SYNTHETIC_NO_REAL_PUBLISHER_RECORD",
+      "claim": "TWO_FILING_REFERENCES_MEAN_TWO_ISSUED_PERMITS",
+      "synthetic_facts": {
+        "synthetic_job_number": "SYNTH-JOB-Z",
+        "synthetic_filing_numbers": [
+          "SYNTH-JOB-Z-I1",
+          "SYNTH-JOB-Z-P1"
+        ]
+      },
+      "expected": "UNKNOWN_FILING_MULTIPLICITY_NOT_PERMIT_COUNT",
+      "independently_verified_real_label": null
+    },
+    {
+      "id": "SYNTHETIC_EL_SUFFIX_WITHOUT_AWARD_TRUTH",
+      "split": "synthetic_calibration",
+      "provenance": "SYNTHETIC_NO_REAL_PUBLISHER_RECORD",
+      "claim": "DETAIL_ROW_EL_SUFFIX_ESTABLISHES_ISSUED_PERMIT_ON_PAST_DATE",
+      "synthetic_facts": {
+        "synthetic_filing_number": "SYNTH-JOB-B-I1-EL",
+        "historic_asof_snapshot_available": false
+      },
+      "expected": "UNKNOWN_NO_HISTORIC_ASOF_OR_INDEPENDENT_ISSUANCE",
+      "independently_verified_real_label": null
+    }
+  ],
+  "quality": {
+    "original_publisher_dataset_count": 1,
+    "original_publisher_row_samples": 0,
+    "independently_adjudicated_real_permit_issuance_labels": 0,
+    "real_heldout_cases": 0,
+    "synthetic_calibration_cases": 2,
+    "synthetic_heldout_cases": 2,
+    "original_full_schema_response_integrity": "UNKNOWN_NOT_HTTP_CUSTODIED",
+    "dedup_key": "dataset_id/unique_id_FOR_DETAILS_ONLY",
+    "cross_dataset_join_key": "job_filing_number_NOT_UNIQUE_DETAIL_ROW",
+    "independent_scoring_accuracy": null,
+    "benchmark_finding": "SYNTHETIC_THREE_TO_ONE_FANOUT_REJECTS_RAW_ROW_PERMIT_COUNT_BUT_DOES_NOT_PROVE_ANY_ISSUED_PERMIT"
+  },
+  "consumers": {
+    "permitplate_48": "Schema/join metadata only; no real permit issuance scoring, customer-opportunity claim, or commercial-license clearance.",
+    "freightrecovery_12": "No real freight rate, invoice, or refund labels.",
+    "recoveryos_12": "No general accounting or bank-cleared recovery labels.",
+    "capturebrief_52": "No government solicitation or award outcomes.",
+    "independent_qa_44": "Verify original DOB/data.gov metadata, exact fixture/test blob identities, fanout negative, missing join uncertainty and rights hold."
+  },
+  "product_code_modified": false,
+  "provider_gets_added_to_ci": 0,
+  "private_person_records_persisted": 0,
+  "new_crons_or_branches": 0,
+  "legacy_15_lab_consolidation_certified": false
+}
