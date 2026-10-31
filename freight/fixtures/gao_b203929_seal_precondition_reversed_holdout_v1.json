@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHTRECOVERY_GAO_B203929_2_EXCLUSIVE_USE_SEAL_PRECONDITION_REVERSED_V1",
+  "evaluation_family": "ORIGINAL_GAO_HISTORICAL_FREIGHT_RATE_PRECONDITION_NEGATIVE_HOLDOUT_NOT_MODERN_CUSTOMER_ACCURACY",
+  "reviewed_on_utc": "2026-10-31",
+  "ownership": {
+    "repo": "P00NSMASHER/github-value-hunt-ledger",
+    "existing_draft_pr": 883,
+    "branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "writer_branch_excluded": "research/retally-unified-data-lab",
+    "legacy_15_lab_consolidation_proved": false
+  },
+  "original_source": {
+    "publisher": "U.S. Government Accountability Office",
+    "decision_id": "B-203929.2",
+    "decision_date": "1982-04-09",
+    "original_publisher_pdf_url": "https://www.gao.gov/assets/b-203929.2.pdf",
+    "official_highlights_url": "https://www.gao.gov/products/b-203929.2",
+    "rights_url": "https://www.gao.gov/copyright",
+    "rights": "GAO_AUTHORED_US_GOVERNMENT_MATERIAL_REUSABLE_WITH_SOURCE_CITATION_AND_NO_ENDORSEMENT",
+    "commercial_use": "GAO_DECISION_TEXT_REUSE_WITH_ATTRIBUTION_NOT_SEPARATE_CARRIER_TENDER_LICENSE_OR_COMMERCIAL_SCORING_APPROVAL",
+    "third_party_tender_and_original_invoice_rights": "UNKNOWN_NOT_CLEARED",
+    "original_pdf_pages": 3,
+    "official_pdf_pages_visually_reviewed": [
+      1,
+      2,
+      3
+    ],
+    "original_pdf_response_sha256": null,
+    "original_pdf_response_bytes": null,
+    "original_pdf_http_bytes_custodied": false,
+    "document_sha256_status": "UNKNOWN_DOWNLOAD_UNAVAILABLE_DO_NOT_SUBSTITUTE_AUTHORED_FIXTURE_HASH",
+    "original_bill_of_lading_or_invoice_bytes_custodied": false,
+    "full_carrier_tender_pages_custodied": false,
+    "source_schema": "ORIGINAL_THREE_PAGE_GAO_DECISION_PDF_NOT_ROW_LEVEL_TARIFF_OR_INVOICE",
+    "extraction_quality": "GAO_PDF_VISUALLY_CHECKED_ALL_THREE_PAGES; SCANNED_TEXT_EXTRACTION_HAS_ERRORS; DECISION_CONCLUSION_CONFIRMED",
+    "original_decision_label_count": 1,
+    "original_invoice_rate_triplets": 0,
+    "carrier_tender_effective_dates": "UNKNOWN_FULL_TENDER_NOT_CUSTODIED",
+    "current_2026_applicability": "UNKNOWN_HISTORICAL_ONLY"
+  },
+  "original_decision": {
+    "carrier": "American Farm Lines, Inc.",
+    "subject": "EXCLUSIVE_USE_VEHICLE_SERVICE_AND_MANDATORY_SHIPPER_SEALS",
+    "referenced_tender": "AFL Tender 266",
+    "mandatory_tender_item": "179",
+    "optional_exclusive_use_item": "130",
+    "exclusive_use_requested_and_furnished": true,
+    "shipper_numbered_seals_applied": false,
+    "carrier_initial_billing_basis": "TARIFF_RATES",
+    "GSA_proposed_lower_rate_basis": "TENDER_266",
+    "GAO_outcome": "GSA_AUDIT_DEDUCTION_REVERSED",
+    "finding": "TENDER_266_LOWER_RATES_INAPPLICABLE_WHEN_SHIPPER_DID_NOT_APPLY_REQUIRED_NUMBERED_SEALS",
+    "optional_exclusive_use_seal_clause_overrides_mandatory_tender_condition": false,
+    "adjudicated_amount_cents": null,
+    "original_invoice_paid_amount_cents": null,
+    "exact_rate_difference_cents": null,
+    "historic_settlement_banking_verified": false,
+    "actual_RETALLY_customer_recovery_cents": 0,
+    "basis_pages": [
+      1,
+      2,
+      3
+    ],
+    "data_quality": "ONE_DECISION_LEVEL_FINDING_NOT_FULL_GBL_TENDER_INVOICE_TRIPLET; ORIGINAL_HISTORIC_MONEY_UNKNOWN"
+  },
+  "independent_contrast": {
+    "publisher": "U.S. Government Accountability Office",
+    "source_url": "https://www.gao.gov/products/b-192872",
+    "decision_id": "B-192872",
+    "decision_date": "1979-05-07",
+    "source_scope": "OFFICIAL_PUBLISHER_HIGHLIGHTS_ONLY_NOT_FULL_SECOND_DECISION_PDF",
+    "category": "COMMODITY_PLATFORM_SHIPMENT_CLASSIFICATION_EVIDENCE",
+    "GAO_outcome": "GSA_OVERCHARGE_DEDUCTION_UPHELD",
+    "core_difference": "AMBIGUOUS_BILL_OF_LADING_COMMODITY_PACKING_RESOLVED_BY_PROCURING_AGENCY_EVIDENCE_NOT_MISSING_SEAL_PRECONDITION",
+    "original_source_response_sha256": null,
+    "original_source_bytes_custodied": false,
+    "carrier_invoice_rows_custodied": 0,
+    "independent_decision_level_labels": 1
+  },
+  "heldout": {
+    "split": "RESEARCH_RESERVED_ORIGINAL_GAO_DECISION_LEVEL_HOLDOUT_NOT_MODEL_BLINDNESS_VERIFIED",
+    "primary_key": "GAO/B-203929.2",
+    "contrast_key": "GAO/B-192872",
+    "source_publisher_count": 1,
+    "distinct_original_decisions": 2,
+    "one_reversed_one_upheld": true,
+    "original_per_shipment_paid_invoice_and_tariff_triplets": 0,
+    "modern_customer_heldout_cases": 0,
+    "product_predictions_recorded": 0,
+    "source_selection": "RESEARCH_SELECTED_NOT_RANDOM_OR_UNSEEN_BY_PRODUCT_PROVEN",
+    "naive_always_sustain_GSA_errors_in_two_original_decisions": 1,
+    "naive_exclusive_use_implies_tender_applies_errors_in_primary_decision": 1,
+    "independent_real_world_error_precision": null,
+    "independent_real_world_error_recall": null,
+    "historical_error_cause": "TENDER_CONDITION_NOT_MET_NOT_PROOF_OF_CUSTOMER_CASH",
+    "present_day_entitlement": "UNKNOWN"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B203929_EXCLUSIVE_USE_NO_SEAL",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "tender": "266",
+        "mandatory_seals": true,
+        "shipper_sealed": false,
+        "exclusive_use": true
+      },
+      "expected": "TENDER_NOT_APPLICABLE_GAO_REVERSED",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_EXCLUSIVE_USE_OPTIONAL_SEAL_OVERRIDES",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "tender": "266",
+        "mandatory_seals": true,
+        "shipper_sealed": false,
+        "exclusive_use": false
+      },
+      "expected": "TENDER_NOT_APPLICABLE_GAO_REVERSED",
+      "split": "synthetic_calibration",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_SEAL_MISSING",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "tender": "266",
+        "mandatory_seals": true,
+        "shipper_sealed": null,
+        "exclusive_use": true
+      },
+      "expected": "UNKNOWN_MISSING_SEAL_FACT",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_TENDER_TERM_MISSING",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "tender": "266",
+        "mandatory_seals": null,
+        "shipper_sealed": false,
+        "exclusive_use": true
+      },
+      "expected": "UNKNOWN_TENDER_TERMS",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_SEALED_NOT_FULL_COMPLIANCE",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "tender": "266",
+        "mandatory_seals": true,
+        "shipper_sealed": true,
+        "exclusive_use": true
+      },
+      "expected": "UNKNOWN_OTHER_TENDER_CONDITIONS",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_OTHER_TENDER",
+      "facts": {
+        "decision_id": "B-203929.2",
+        "tender": "999",
+        "mandatory_seals": true,
+        "shipper_sealed": false,
+        "exclusive_use": true
+      },
+      "expected": "UNKNOWN_DIFFERENT_TENDER",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_OTHER_DECISION",
+      "facts": {
+        "decision_id": "B-192872",
+        "tender": "266",
+        "mandatory_seals": true,
+        "shipper_sealed": false,
+        "exclusive_use": true
+      },
+      "expected": "UNKNOWN_DIFFERENT_DECISION",
+      "split": "synthetic_calibration",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_NO_AMOUNT_TREATED_AS_ZERO",
+      "candidate_claim": "HISTORIC_DEDUCTION_AMOUNT_EQUALS_ZERO",
+      "expected": "UNKNOWN_AMOUNT_NOT_ZERO",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_GSA_REVERSED_AS_CUSTOMER_CASH",
+      "candidate_claim": "RETALLY_REAL_CUSTOMER_RECOVERY",
+      "expected": "REJECT_NOT_CUSTOMER_BANK_CASH",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    },
+    {
+      "id": "SYNTH_B203929_ONE_GAO_TREATED_AS_MULTIPLE_GBLS",
+      "candidate_claim": "THREE_PDF_PAGES_ARE_THREE_INDEPENDENT_INVOICES",
+      "expected": "REJECT_DUPLICATE_DECISION",
+      "split": "synthetic_heldout",
+      "kind": "SYNTHETIC_NOT_ORIGINAL_GAO_SHIPMENT",
+      "independent_real_customer_label": null,
+      "truth_source": "RESEARCH_AUTHORED_GUARDRAIL_NOT_GAO_ADJUDICATION"
+    }
+  ],
+  "dedup": {
+    "key": "GAO/B-203929.2",
+    "contrast_key": "GAO/B-192872",
+    "never_count_pdf_pages_as_cases": true,
+    "never_count_synthetic_negative_controls_as_real_labels": true
+  },
+  "downstream_handoffs": {
+    "freightrecovery_12": "HISTORICAL_REVERSED_GSA_DEDUCTION_EXCLUSIVE_USE_SEAL_PRECONDITION; RETAIN_ONE_DECISION_LABEL_ONLY",
+    "recoveryos_12": "REVERSED_AUDIT_ACTION_NOT_CUSTOMER_BANK_CASH_OR_SETTLEMENT_PROOF",
+    "permitplate_48": "NO_NYC_PERMIT_ROWS_OR_LEAD_SCORING_LABELS",
+    "capturebrief_52": "NO_SAM_FY2027_NOTICE_OR_AWARD_LABELS",
+    "qa_44": "INDEPENDENTLY_CONFIRM_GAO_B203929_2_PDF_PAGES_1_TO_3_AND_B192872_OFFICIAL_HIGHLIGHTS; CHECK_BLOB_SHA_NO_SOURCE_BYTES; RUN_SOURCE_GUARDS"
+  },
+  "restrictions": {
+    "publisher_original_bytes_custodied": false,
+    "synthetic_are_real": false,
+    "private_data_saved": false,
+    "provider_calls_added": 0,
+    "engine_code_changed": false,
+    "writer_branch_changed": false,
+    "commercial_scoring_approved": false,
+    "release_approved": false,
+    "consolidation_approved": false
+  }
+}
