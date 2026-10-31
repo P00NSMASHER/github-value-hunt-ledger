@@ -491,7 +491,7 @@ class NYCDOBLAAApplicationBoundaryTest(unittest.TestCase):
         self.assertEqual(set(p["handoffs"]), {"permitplate_48", "freightrecovery_12",
             "recoveryos_12", "capturebrief_52", "independent_qa_44", "executive_director"})
         self.assertFalse(p["safety"]["legacy_15_lab_consolidation_certified"])
-        self.assertTrue(p["safety"]["no_product_or_engine_code_changes"])
+        self.assertTrue(p["safety"]["no_production_or_engine_code_changes"])
         self.assertTrue(p["safety"]["no_new_provider_requests_in_test"])
         self.assertEqual(p["safety"]["private_customer_medical_student_records"], 0)
 
