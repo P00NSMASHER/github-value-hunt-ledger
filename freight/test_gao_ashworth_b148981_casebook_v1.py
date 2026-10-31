@@ -236,5 +236,108 @@ class GaoB221705FalsePositiveIndependentDecisionTest(unittest.TestCase):
 
 
 
+# One new adjudicated GAO historical holdout with opposite outcome to B-221705.
+# Both are GAO decisions, not independent original carrier invoices or modern accuracy.
+B221615_FIXTURE = Path(__file__).parent / "fixtures" / "gao_b221615_in_transit_merger_rate_contrast_v1.json"
+
+
+class GaoB221615InTransitMergerContrastTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.d = json.loads(B221615_FIXTURE.read_text(encoding="utf-8"))
+        cls.other = json.loads(B221705_FIXTURE.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def research_only_source_rule(*, gbl_party_match=None, tender_in_effect=None, route_in_scope=None):
+        if route_in_scope is False:
+            return "REDUCED_TENDER_RATE_NOT_APPLICABLE"
+        if gbl_party_match is True and tender_in_effect is True and route_in_scope is True:
+            return "ORIGINAL_GBL_TENDER_APPLICABLE"
+        return "UNKNOWN_MISSING_TENDER_OR_GBL_EVIDENCE"
+
+    def test_original_GAO_rights_date_and_unavailable_publisher_bytes(self):
+        d = self.d
+        self.assertEqual(d["schema_version"], 1)
+        a,b = d["sources"]
+        self.assertEqual(a["source_url"], "https://www.gao.gov/products/b-221615-0")
+        self.assertEqual(a["effective_decision_date"], "1986-06-24")
+        self.assertEqual(b["source_url"], "https://www.gao.gov/products/b-221705")
+        self.assertEqual(b["effective_decision_date"], "1987-05-11")
+        for s in (a,b):
+            self.assertEqual(s["rights_url"], "https://www.gao.gov/copyright")
+            self.assertIsNone(s["public_source_html_http_body_sha256"])
+            self.assertIsNone(s["public_source_html_response_length_bytes"])
+            self.assertFalse(s["source_original_http_response_custodied"])
+            self.assertFalse(s["original_gbl_bytes_custodied"])
+            self.assertFalse(s["original_tender_bytes_custodied"])
+            self.assertEqual(s["third_party_carrier_document_reuse_rights"], "UNKNOWN_NOT_CLEARED")
+
+    def test_historical_original_GBL_merger_order_and_deduction(self):
+        x = self.d["original_new_adjudicated_decision"]
+        self.assertEqual(x["government_bill_of_lading"], "S4270096")
+        self.assertLess(x["bill_of_lading_issued_date"], x["merger_effective_date"])
+        self.assertLess(x["merger_effective_date"], x["shipment_delivered_date"])
+        self.assertEqual(x["original_gbl_referenced_tender"], "ETMF ICC 691")
+        self.assertTrue(x["tender_691_effective_on_tendered_day"])
+        self.assertFalse(x["GAO_accepted_ABF_tender_adoption_proof"])
+        self.assertTrue(x["GSA_rate_basis_sustained_despite_absent_adoption_evidence"])
+        self.assertEqual(x["carrier_initial_overcharge_cents_as_reported_by_GAO"], 15604)
+        self.assertEqual(x["GSA_overcharge_deduction_cents_as_reported_by_GAO"], 15604)
+        self.assertIsNone(x["independent_bank_or_private_customer_cash_recovery_cents"])
+        self.assertFalse(x["underlying_rate_and_tariff_line_item_math_independently_recomputed"])
+
+    def test_two_real_decisions_have_opposite_outcomes_without_false_merger_rule(self):
+        new = self.d["original_new_adjudicated_decision"]
+        old = self.other["adjudicated_representative_shipment"]
+        self.assertEqual(old["gao_final_holding"], "REDUCED_TENDER_RATE_NOT_APPLICABLE_TO_LEXINGTON_PARK")
+        self.assertFalse(old["destination_listed_as_ABF_direct_service_in_section_2"])
+        self.assertEqual(new["merger_effective_date"], old["merger_date"])
+        self.assertEqual(
+            self.research_only_source_rule(gbl_party_match=new["GBL_contract_party_is_original_tender_issuing_carrier"],
+                tender_in_effect=new["tender_691_effective_on_tendered_day"],
+                route_in_scope=new["route_in_original_tender_scope_as_adjudicated"]),
+            "ORIGINAL_GBL_TENDER_APPLICABLE")
+        self.assertEqual(self.research_only_source_rule(route_in_scope=False), "REDUCED_TENDER_RATE_NOT_APPLICABLE")
+        # A merger-only 'never recover' rule misses the 1986 positive; an
+        # 'always recover' rule falsely flags the 1987 negative. Counterfactual
+        # RED logic, not a historical failing CI or a product-engine score.
+        naive_never_recover = ["REDUCED_TENDER_RATE_NOT_APPLICABLE"] * 2
+        naive_always_recover = ["ORIGINAL_GBL_TENDER_APPLICABLE"] * 2
+        truth = ["ORIGINAL_GBL_TENDER_APPLICABLE", "REDUCED_TENDER_RATE_NOT_APPLICABLE"]
+        self.assertEqual(sum(a != b for a,b in zip(naive_never_recover,truth)), 1)
+        self.assertEqual(sum(a != b for a,b in zip(naive_always_recover,truth)), 1)
+        self.assertEqual(sum(a != b for a,b in zip(truth,truth)), 0)
+
+    def test_missing_originals_are_unknown_not_negative_labels(self):
+        for missing in (
+            {"gbl_party_match":None,"tender_in_effect":True,"route_in_scope":True},
+            {"gbl_party_match":True,"tender_in_effect":None,"route_in_scope":True},
+            {"gbl_party_match":True,"tender_in_effect":True,"route_in_scope":None},
+            {"gbl_party_match":False,"tender_in_effect":True,"route_in_scope":True},
+        ):
+            self.assertEqual(self.research_only_source_rule(**missing), "UNKNOWN_MISSING_TENDER_OR_GBL_EVIDENCE")
+
+    def test_dedup_posthoc_holdout_synthetic_separation_and_no_customer_cash(self):
+        d = self.d
+        q = d["comparison"]
+        self.assertEqual(q["new_decisions_this_increment"], 1)
+        self.assertEqual(q["independently_adjudicated_decisions_in_pair"], 2)
+        self.assertEqual(q["distinct_source_publishers"], 1)
+        self.assertTrue(q["post_hoc_curated_comparison"])
+        self.assertEqual(len({s["decision_id"] for s in d["sources"]}), 2)
+        self.assertEqual(q["modern_invoice_tariff_payment_adjudication_triplets"], 0)
+        self.assertEqual(q["product_engine_predictions_evaluated"], 0)
+        self.assertEqual(q["true_independent_modern_holdout_count"], 0)
+        self.assertIsNone(q["modern_freight_error_precision"])
+        self.assertEqual(q["retally_recovered_customer_cash_cents"], 0)
+        cs = d["synthetic_negative_controls"]
+        self.assertEqual(len(cs), 8)
+        self.assertEqual(len({c["id"] for c in cs}), 8)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in cs), 6)
+        self.assertTrue(all(c["kind"] == "SYNTHETIC_NOT_A_REAL_SHIPMENT" and c["independent_real_label"] is None for c in cs))
+        self.assertFalse(d["restrictions"]["legacy_15_labs_consolidated"])
+        self.assertFalse(d["restrictions"]["release_authorized"])
+
+
 if __name__ == "__main__":
     unittest.main()
