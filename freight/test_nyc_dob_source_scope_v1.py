@@ -310,5 +310,96 @@ class NYCDOBBISAndPublisherReadbackBoundaryTest(unittest.TestCase):
 
 
 
+
+class NYCDOBElevatorFilingBoundaryTest(unittest.TestCase):
+    """Publisher metadata and SYNTHETIC elevator filing controls, not issuance truth."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads((FIXTURE.parent /
+            "nyc_dob_elevator_filing_boundary_v1.json").read_text(encoding="utf-8"))
+        cls.cases = {c["id"]: c for c in cls.pack["synthetic_controls"]}
+
+    @staticmethod
+    def guard(case):
+        k, x = case["kind"], case["facts"]
+        if k == "general_build_miss" and x["excluded_elevator"]:
+            return "UNKNOWN_ELEVATOR_EXCLUDED_FROM_GENERAL_BUILD"
+        if k == "filing_fanout" and x["one_underlying_job"]:
+            if len({v["job_number"] for v in x["filings"]}) == 1:
+                return "UNKNOWN_TWO_FILINGS_NOT_TWO_BUYER_OPPORTUNITIES"
+        if k == "retrospective_suffix" and x["claim_date"] < x["source_observed_date"]:
+            if x["job_filing_number"].endswith("-VT") and not x["historic_snapshot_saved"]:
+                return "UNKNOWN_CURRENT_SUFFIX_NOT_HISTORIC_ASOF"
+        if k == "pending_filing" and not x["certified_independent_issuance"]:
+            return "NO_ISSUANCE_PROOF_PENDING_APPLICATION"
+        if k == "electrical_reference" and not x["issuer_cross_reference_verified"]:
+            return "UNKNOWN_REFERENCE_IS_NOT_SECOND_ELEVATOR_BUYER"
+        if k == "community_view" and x["community_created"]:
+            return "REJECT_DERIVED_VIEW_NOT_OFFICIAL_ORIGINAL"
+        if k == "no_match" and not x["complete_global_elevator_history_proved"]:
+            return "UNKNOWN_NONMATCH_NOT_NEGATIVE_ISSUANCE_LABEL"
+        return "UNKNOWN_NOT_INDEPENDENTLY_ADJUDICATED"
+
+    def test_official_elevator_source_gap_without_fabricated_original_bytes(self):
+        s = self.pack["original_publisher_metadata"]
+        self.assertEqual(self.pack["schema_version"], 1)
+        self.assertEqual(s["dataset_id"], "kfp4-dz4h")
+        self.assertEqual(s["metadata_last_updated_reported"], "2026-10-21")
+        self.assertEqual(s["first_public_date"], "2019-10-31")
+        self.assertEqual(s["catalog_row_count_approximate"], "71.7K")
+        self.assertEqual(s["catalog_columns_reported"], 82)
+        self.assertEqual(s["excluded_from"], "DOB_NOW_BUILD_APPROVED_PERMITS_rbx6-tga4")
+        self.assertTrue({"job_filing_number", "filing_type", "filing_status",
+                         "electrical_permit_number", "elevatordevicetype"}
+                        <= set(s["documented_api_fields"]))
+        self.assertEqual(s["source_row_bytes_downloaded_this_increment"], 0)
+        self.assertIsNone(s["original_response_sha256"])
+        self.assertIsNone(s["schema_http_body_sha256"])
+        self.assertEqual(s["public_row_ids_retained"], 0)
+        self.assertEqual(s["person_or_address_values_retained"], 0)
+
+    def test_synthetic_heldout_labels_not_promoted_into_real_accuracy(self):
+        controls = self.pack["synthetic_controls"]
+        self.assertEqual(len(controls), 7)
+        self.assertEqual(len(self.cases), 7)
+        self.assertEqual(sum(x["split"] == "synthetic_calibration" for x in controls), 3)
+        self.assertEqual(sum(x["split"] == "synthetic_holdout" for x in controls), 4)
+        for c in controls:
+            with self.subTest(case=c["id"]):
+                self.assertEqual(c["provenance"], "SYNTHETIC_NO_PUBLISHER_ROWS")
+                self.assertIsNone(c["independent_real_label"])
+                self.assertEqual(self.guard(c), c["expected"])
+        b = self.pack["independent_benchmark"]
+        self.assertEqual((b["independent_real_positive_labels"],
+                          b["independent_real_negative_labels"]), (0, 0))
+        self.assertEqual(b["true_real_holdout_cases"], 0)
+        self.assertIsNone(b["permit_precision"])
+        self.assertIsNone(b["permit_recall"])
+
+    def test_naive_two_filings_and_retroactive_suffix_red_guard_green(self):
+        f = self.cases["SYNTH_INITIAL_PLUS_PAA_FANOUT"]
+        self.assertEqual(f["facts"]["naive_opportunity_count"], 2)
+        self.assertEqual(len({x["job_number"] for x in f["facts"]["filings"]}), 1)
+        self.assertNotEqual(self.guard(f), "TWO_BUYERS_CONFIRMED")
+        self.assertEqual(self.guard(f), "UNKNOWN_TWO_FILINGS_NOT_TWO_BUYER_OPPORTUNITIES")
+        s = self.cases["SYNTH_VT_SUFFIX_RETROACTIVE_ISSUANCE"]
+        self.assertTrue(s["facts"]["job_filing_number"].endswith("-VT"))
+        self.assertNotEqual(self.guard(s), "ISSUED_AT_HISTORIC_DATE")
+        self.assertEqual(self.guard(s), "UNKNOWN_CURRENT_SUFFIX_NOT_HISTORIC_ASOF")
+        self.assertEqual(self.guard(self.cases["SYNTH_COMMUNITY_BA3_VIEW_AS_AUTHORITATIVE"]),
+                         "REJECT_DERIVED_VIEW_NOT_OFFICIAL_ORIGINAL")
+
+    def test_rights_and_downstream_release_gates_remain_closed(self):
+        p = self.pack
+        self.assertFalse(p["source_rights"]["additional_provider_or_dataset_terms_review_complete"])
+        self.assertFalse(p["source_rights"]["source_specific_commercial_scoring_certified"])
+        self.assertFalse(p["independent_benchmark"]["commercial_scoring_allowed"])
+        self.assertEqual(set(p["handoffs"]), {"permitplate_48", "retally_recoveryos_12",
+                         "freightrecovery_12", "capturebrief_52", "independent_qa_44"})
+        self.assertEqual(p["safety"]["new_provider_requests_in_ci"], 0)
+        self.assertEqual(p["safety"]["private_customer_medical_student_records"], 0)
+        self.assertFalse(p["safety"]["legacy_15_lab_consolidation_certified"])
+
 if __name__ == '__main__':
     unittest.main()
