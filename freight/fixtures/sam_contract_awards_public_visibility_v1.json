@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "pack_id": "CAPTUREBRIEF_SAM_CONTRACT_AWARDS_VISIBILITY_ABSENCE_HOLDOUT_V1",
+  "evaluation_family": "GOVERNMENT_AWARD_PUBLIC_VISIBILITY_PROVENANCE_NOT_SAM_NOTICE_SCORING",
+  "reviewed_on_utc": "2026-10-31",
+  "source": {
+    "publisher": "U.S. General Services Administration / GSA Open Technology",
+    "first_party_documentation_url": "https://open.gsa.gov/api/contract-awards/",
+    "terms_url": "https://sam.gov/about/terms-of-use",
+    "source_type": "FIRST_PARTY_API_DOCUMENTATION_NOT_AWARD_ROWS",
+    "data_api_endpoint": "https://api.sam.gov/contract-awards/v1/search",
+    "account_required": true,
+    "api_key_required": true,
+    "original_api_calls": 0,
+    "original_award_records_collected": 0,
+    "original_document_response_sha256": null,
+    "original_document_response_byte_length": null,
+    "documentation_last_modified_at": "UNKNOWN_NOT_PUBLISHER_ATTESTED",
+    "documentation_observed_on": "2026-10-31",
+    "award_date_signed_effective_range": "UNKNOWN_NO_ACTUAL_AWARD_ROWS",
+    "schema_scope": "REVEALED_AWARDS_AND_IDVS_SEARCH_WITH_PAGINATION_AND_DATE_FIELDS",
+    "provenance_status": "OFFICIAL_GSA_DOCUMENTATION_TEXT_READ_NO_RAW_RESPONSE_BYTE_CUSTODY"
+  },
+  "documented_limits": {
+    "dod_funded_and_awarded_reveal_lag_days": 90,
+    "deleted_contracts_retrievable_lookback_months": 6,
+    "default_search_page_size": 10,
+    "maximum_search_page_size": 100,
+    "maximum_sync_search_rows": 400000,
+    "maximum_async_extract_rows": 1000000,
+    "default_nonfederal_no_role_personal_api_requests_per_day": 10,
+    "non_unique_piid_needs_referenced_idv_context": true,
+    "public_api_unrevealed_dod_early_awards_available_to_non_dod": false,
+    "missing_public_award_is_independent_negative_label": false,
+    "piid_aggregation_includes_base_and_modifications": true,
+    "obligation_does_not_establish_bank_settlement": true
+  },
+  "rights": {
+    "documentation_is_public": true,
+    "award_data_and_embedded_third_party_commercial_rights_verified": false,
+    "pre_2022_DNB_data_has_attribution_bulk_and_commercial_limits": true,
+    "allowed_use": "INTERNAL_DOCUMENTATION_POLICY_NEGATIVE_CONTROL_ONLY",
+    "commercial_customer_scoring_authorized": false,
+    "no_api_credentials_or_personal_fields_stored": true
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYN_DOD_30D_MISSING",
+      "split": "synthetic_calibration",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "award_absence",
+        "funded_and_awarded_dod": true,
+        "days_since_signed": 30,
+        "authenticated": true,
+        "pagination_complete": true
+      },
+      "expected_guard": "UNKNOWN_DOD_PUBLIC_REVEAL_WINDOW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_DOD_89D_MISSING",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "award_absence",
+        "funded_and_awarded_dod": true,
+        "days_since_signed": 89,
+        "authenticated": true,
+        "pagination_complete": true
+      },
+      "expected_guard": "UNKNOWN_DOD_PUBLIC_REVEAL_WINDOW",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_DOD_100D_MISSING",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "award_absence",
+        "funded_and_awarded_dod": true,
+        "days_since_signed": 100,
+        "authenticated": true,
+        "pagination_complete": true
+      },
+      "expected_guard": "UNKNOWN_ABSENCE_NOT_INDEPENDENT_NEGATIVE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_CIVILIAN_MISSING",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "award_absence",
+        "funded_and_awarded_dod": false,
+        "days_since_signed": 20,
+        "authenticated": true,
+        "pagination_complete": true
+      },
+      "expected_guard": "UNKNOWN_ABSENCE_NOT_INDEPENDENT_NEGATIVE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_UNAUTHENTICATED_API_MISS",
+      "split": "synthetic_calibration",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "award_absence",
+        "funded_and_awarded_dod": false,
+        "days_since_signed": 60,
+        "authenticated": false,
+        "pagination_complete": false
+      },
+      "expected_guard": "UNKNOWN_NO_AUTHORIZED_SOURCE_QUERY",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_INCOMPLETE_PAGE_MISS",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "award_absence",
+        "funded_and_awarded_dod": false,
+        "days_since_signed": 60,
+        "authenticated": true,
+        "pagination_complete": false
+      },
+      "expected_guard": "UNKNOWN_PARTIAL_PAGINATION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_DELETED_7_MONTHS_MISSING",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "deleted_absence",
+        "months_since_deleted": 7
+      },
+      "expected_guard": "UNKNOWN_DELETED_LOOKBACK_EXCEEDED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_PIID_MISSING_REFERENCED_IDV",
+      "split": "synthetic_calibration",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "piid_family",
+        "piid_can_be_nonunique": true,
+        "referenced_idv_present": false,
+        "modification_rows": 3
+      },
+      "expected_guard": "UNKNOWN_NONUNIQUE_PIID",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_PIID_THREE_MODIFICATIONS",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "piid_family",
+        "piid_can_be_nonunique": true,
+        "referenced_idv_present": true,
+        "modification_rows": 3
+      },
+      "expected_guard": "UNKNOWN_MODIFICATIONS_NOT_DISTINCT_BASE_AWARDS",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_FPDS_DERIVED_USASPENDING",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "cross_source",
+        "same_upstream_lineage_unexcluded": true
+      },
+      "expected_guard": "UNKNOWN_INDEPENDENCE_NOT_PROVED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_PERFORMANCE_START_AS_SIGNED",
+      "split": "synthetic_calibration",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "date_equivalence",
+        "performance_start_is_sole_date": true
+      },
+      "expected_guard": "UNKNOWN_DATE_SIGNED_UNVERIFIED",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_RESTRICTED_PRE_2022_DNB_FIELD",
+      "split": "synthetic_holdout",
+      "source": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_AWARD",
+      "probe": {
+        "type": "third_party_rights",
+        "contains_dnb_licensed_field": true
+      },
+      "expected_guard": "HOLD_THIRD_PARTY_DATA_REUSE",
+      "independent_real_label": null
+    }
+  ],
+  "quality_and_benchmark": {
+    "documentation_fact_count": 11,
+    "synthetic_cases": 12,
+    "synthetic_calibration": 4,
+    "synthetic_holdout": 8,
+    "true_independent_heldout_real_award_labels": 0,
+    "independently_matched_sam_fy2027_notice_to_award_pairs": 0,
+    "original_publisher_award_http_response_sha256": null,
+    "independent_negative_award_outcomes": 0,
+    "real_precision": null,
+    "real_recall": null,
+    "grouping_rule": "PIID_ALONE_NOT_UNIQUE; AGENCY_SUBTIER + REFERENCE_IDV + BASE/MODIFICATION AND DOCUMENTED_IDENTITY_REQUIRED",
+    "comparison": "NAIVE_ABSENT_FROM_PUBLIC_API=>NO_AWARD_CONTRADICTED_BY_SYNTHETIC_VISIBILITY_AND_COVERAGE_CONTROLS; NOT_MEASURED_MODEL_ACCURACY",
+    "source_freshness": "GSA_DOCUMENTATION_READ_2026_10_31; HISTORIC_API_VERSION_ASOF_UNKNOWN"
+  },
+  "handoffs": {
+    "CaptureBrief_52": "KEEP_MISSING_AWARD_UNKNOWN; REVEAL_LAG/DELETION_WINDOW/PIID_FAMILY/RIGHTS_GATES; PRODUCT_CODE_OWNED_DOWNSTREAM",
+    "PermitPlate_48": "NO_NYC_PERMIT_OR_ADJUDICATION_LABEL",
+    "FreightRecovery_12": "NO_FREIGHT_INVOICE_OR_TARIFF_ERROR_LABEL",
+    "RecoveryOS_12": "OBLIGATION_AND_AWARD_NOT_BUYER_BANK_CASH",
+    "Independent_QA_44": "RECHECK_OFFICIAL_GSA_DOC_VERSION_LIMITS_RIGHTS_AND_EXACT_HEAD_SYNTHETIC_ONLY_TESTS",
+    "Portfolio_Executive_Director": "6ac64d2255848191945eb7c34c63765c"
+  },
+  "restrictions": [
+    "REVIEW_ONLY_NO_API_CALL",
+    "NO_CUSTOMER_DATA",
+    "NO_RELEASE_OR_AWARD_SCORING",
+    "NO_CREDENTIALS",
+    "NO_NEW_PROVIDER_COSTS",
+    "NO_NEW_BRANCH_OR_SCHEDULE",
+    "DO_NOT_TOUCH_UNIFIED_WRITER_BRANCH",
+    "LEGACY_LABS_NOT_VERIFIED_CONSOLIDATED"
+  ]
+}
