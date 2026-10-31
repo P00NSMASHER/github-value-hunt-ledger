@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_GAO_B253541_RELEASED_VALUATION_CONFLICT_V1",
+  "evaluation_family": "HISTORICAL_FREIGHT_DOCUMENT_FIELD_EXTRACTION_AND_HIERARCHY_NOT_ERROR_RATE_ACCURACY",
+  "observed_at_utc_date": "2026-10-30",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "original_public_decision_url": "https://www.gao.gov/products/b-253541",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_id": "B-253541",
+    "effective_decision_date": "1993-10-18",
+    "cohort": "HISTORICAL_US_GOVERNMENT_FREIGHT_GBL_RELEASED_VALUATION_DISPUTE",
+    "rights": "GAO_US_GOVERNMENT_PUBLISHED_MATERIAL_MAY_BE_REUSED_WITH_GAO_ACKNOWLEDGMENT_NO_ENDORSEMENT",
+    "embedded_third_party_source_document_rights": "UNKNOWN_NOT_CLEARED",
+    "source_type": "OFFICIAL_GAO_HTML_RENDERED_DECISION_TEXT_NOT_ORIGINAL_GBL",
+    "original_publisher_response_sha256": null,
+    "original_publisher_response_byte_length": null,
+    "original_publisher_response_bytes_custodied": false,
+    "original_signed_GBL_SF1103_bytes_custodied": false,
+    "original_shipping_order_SF1104_bytes_custodied": false,
+    "original_freight_invoice_or_payment_bytes_custodied": false,
+    "original_original_document_signatures_independently_checked": false
+  },
+  "original_adjudicated_case": {
+    "case_id": "GAO_B253541_GBL_D0521277",
+    "dedup_key": "GAO/B-253541/GBL/D-0,521,277",
+    "government_bill_of_lading": "D-0,521,277",
+    "decision_count": 1,
+    "carrier": "Tri-State Motor Transit Company",
+    "split": "heldout_decision_different_from_prior_GAO_decisions_same_publisher",
+    "field_name": "RELEASED_VALUATION_USD_PER_POUND_PER_ARTICLE_NOT_FREIGHT_RATE",
+    "documents": [
+      {
+        "document_type": "GOVERNMENT_BILL_OF_LADING_ORIGINAL_SF1103",
+        "released_value_cents_per_pound_per_article": 250,
+        "source_status": "VALUE_REPORTED_IN_GAO_DECISION_ORIGINAL_NOT_CUSTODIED",
+        "carrier_representative_signed_original_reported_by_GAO": true
+      },
+      {
+        "document_type": "GOVERNMENT_BILL_OF_LADING_SHIPPING_ORDER_SF1104",
+        "released_value_cents_per_pound_per_article": 215000,
+        "source_status": "VALUE_REPORTED_IN_GAO_DECISION_SHIPPING_ORDER_NOT_CUSTODIED",
+        "carrier_representative_signed_original_reported_by_GAO": false
+      }
+    ],
+    "signed_original_controls_historical_discrepancy": true,
+    "gao_final_holding": "GSA_SETTLEMENT_AFFIRMED_BILLING_BASED_ON_ORIGINAL_GBL_VALUE",
+    "original_freight_charge_cents": null,
+    "extra_charges_requested_cents": null,
+    "overcharge_cents": null,
+    "actual_setoff_cents": null,
+    "actual_bank_cleared_recovery_cents": null,
+    "source_text_conflict_conclusion": "SHIP_ORDER_2150_VS_ORIGINAL_2_50_RESOLVED_TO_ORIGINAL_2_50",
+    "legal_rule_current_for_2026_private_contracts": "UNKNOWN_NOT_ESTABLISHED"
+  },
+  "heldout_quality": {
+    "adjudicated_GAO_decisions": 1,
+    "adjudicated_document_conflicts": 1,
+    "independent_from_other_decision_ids": true,
+    "independent_from_GAO_publisher": false,
+    "original_signed_GBL_pairs_custodied": 0,
+    "publicly_reviewed_original_GAO_decisions": 1,
+    "modern_buyer_authorized_invoice_payment_rate_and_appeal_triplets": 0,
+    "product_engine_predictions_compared_to_this_case": 0,
+    "independently_labeled_modern_positive_cases": 0,
+    "independently_labeled_modern_negative_cases": 0,
+    "freight_overcharge_precision": null,
+    "freight_overcharge_recall": null,
+    "released_value_is_not_a_freight_charge": true,
+    "comparison_wrong_to_governing_field_magnitude_factor": 860,
+    "customer_retally_recovered_cash_cents": 0,
+    "historic_decision_total_money_recovery": "UNKNOWN_NO_AMOUNT_STATED",
+    "split_bias": "ONE_PUBLISHED_HISTORICAL_GAO_APPEAL_NOT_RANDOM_MODERN_SHIPMENTS"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTH_B253541_SHIPPING_ORDER_PRIORITY",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "shipping order 2150 overrides conflicting signed original",
+      "expected": "REJECT_DOCUMENT_HIERARCHY",
+      "real_customer_label": null
+    },
+    {
+      "id": "SYNTH_B253541_RELEASED_VALUE_AS_FREIGHT_RATE",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "released valuation is a charged freight price",
+      "expected": "REJECT_FIELD_SEMANTIC_CONFUSION",
+      "real_customer_label": null
+    },
+    {
+      "id": "SYNTH_B253541_NO_ORIGINAL_AVAILABLE",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "shipping order alone proves governing valuation despite contradictory original in record",
+      "expected": "UNKNOWN_ORIGINAL_REQUIRED",
+      "real_customer_label": null
+    },
+    {
+      "id": "SYNTH_B253541_DUPLICATE_ORIGINAL",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "two contradictory original-labeled documents can be auto resolved",
+      "expected": "UNKNOWN_CONFLICTING_ORIGINALS",
+      "real_customer_label": null
+    },
+    {
+      "id": "SYNTH_B253541_MULTIPLY_TO_CUSTOMER_CASH",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "860x valuation typo establishes a monetary freight refund",
+      "expected": "UNKNOWN_NO_FREIGHT_CHARGE_OR_RECOVERY_AMOUNT",
+      "real_customer_label": null
+    },
+    {
+      "id": "SYNTH_B253541_APPLY_1993_CFR_TO_2026",
+      "kind": "SYNTHETIC_NOT_REAL_SHIPMENT",
+      "claim": "1993 government form precedence proves modern private tariffs or customer entitlement",
+      "expected": "UNKNOWN_NO_CURRENT_LEGAL_AUTHORITY",
+      "real_customer_label": null
+    }
+  ],
+  "consumers": {
+    "freightrecovery_12": "Historical adversarial extraction case; require original-vs-shipping-order released valuation hierarchy and field semantics; no freight error accuracy certified.",
+    "recoveryos_12": "Original document value does not establish invoice payment, overcharge or realized cash; all dollar recovery fields UNKNOWN.",
+    "permitplate_48": "NOT_A_PERMIT_SOURCE_NO_SCORED_CASES",
+    "capturebrief_52": "NOT_A_SOLICITATION_OR_AWARD_SOURCE_NO_SCORED_CASES",
+    "independent_qa_44": "Verify GAO exact original HTML, conflicting 2150 and 2.50 values, signed-original priority, source bytes UNKNOWN, independent decision/same publisher, six synthetic negative controls."
+  },
+  "restrictions": {
+    "public_first_party_decision_no_private_customer_data": true,
+    "clinical_student_customer_personal_data_used": false,
+    "original_source_bytes_downloaded_by_fixture": false,
+    "production_code_modified": false,
+    "protected_main_unchanged": true,
+    "no_new_provider_calls_in_regressions": true,
+    "new_schedules_added": false,
+    "legacy_15_lab_consolidation_certified": false,
+    "product_release_authorized": false
+  }
+}
