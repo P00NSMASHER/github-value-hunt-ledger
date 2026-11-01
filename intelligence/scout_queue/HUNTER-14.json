@@ -30,7 +30,7 @@
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
       "triage_components": {
-        "activity": 12,
+        "activity": 8,
         "description": 4,
         "forks": 0,
         "license_metadata": 5,
@@ -40,7 +40,7 @@
         "substantive_size": 4,
         "topics": 0
       },
-      "triage_score": 35,
+      "triage_score": 31,
       "url": "https://github.com/kevinswint/roblox-opencloud-mcp-server"
     },
     {
@@ -82,7 +82,7 @@
     46,
     47
   ],
-  "generated_at": "2026-10-21T08:53:45.682039+00:00",
+  "generated_at": "2026-10-26T20:45:53.290042+00:00",
   "mission": "Roblox Open Cloud, publishing, place deployment, release automation and wildcard StarBlox accelerators",
   "risk_review": [],
   "risk_review_count": 0,
