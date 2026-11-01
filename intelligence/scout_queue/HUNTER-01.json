@@ -55,16 +55,16 @@
       "default_branch": "main",
       "description": "Roblox Lua Automation and Spatial Analytics Framework 2026",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "4b5bfda540b7bf6e501de5712f76f7dd2e933d25",
+      "exact_revision": "324afc561f08531ee63677f9110ca5b832e195f7",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T09:31:41Z",
+      "pushed_at": "2026-11-01T15:39:44Z",
       "repository": "IvanIvan09/Lua-Spatial-Farm-Assistant",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 589,
+      "size_kb": 401,
       "stars": 70,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -139,16 +139,16 @@
       "default_branch": "main",
       "description": "Cooperative Spell-Casting Game Framework 2026: Build Kid-Friendly Luau Worlds",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "74cace21947f64450b1aee6ac7aabc24c7c257d4",
+      "exact_revision": "60370fc2ae09067cd4bf9b1d92798d1c6f91fdab",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T09:29:50Z",
+      "pushed_at": "2026-11-01T15:38:33Z",
       "repository": "narenkarthikeyanu999/charmed-recess",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 578,
+      "size_kb": 396,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -218,16 +218,16 @@
       "default_branch": "main",
       "description": "Pronghorn 2026: Fast Roblox Module Scripting Framework for Rapid Game Development",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "80f4e2c9d7bbf6f4f719659e62c9c0976c7394ae",
+      "exact_revision": "12bb9ed42a8b62919f849fc1e9ffb0918f41a1f3",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T09:25:43Z",
+      "pushed_at": "2026-11-01T15:36:34Z",
       "repository": "bisameditor-cmd/Stag-Module-Forge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 572,
+      "size_kb": 381,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -254,16 +254,16 @@
       "default_branch": "main",
       "description": "Clean Roblox Game Framework 2026: Scalable Module Architecture for Pro Developers",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "7cf0ef0eb17c75d66deae912246e70d397084f72",
+      "exact_revision": "af1edcd788a3da24fb4606fefee2962d8707b01d",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T09:42:48Z",
+      "pushed_at": "2026-11-01T15:45:14Z",
       "repository": "yahyaadraoui88-cell/Roblox-Project-Forge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 478,
+      "size_kb": 487,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -290,16 +290,16 @@
       "default_branch": "main",
       "description": "Cooperative Luau Relay Game Framework for Cubacadabra Worlds 2026",
       "discovery_query": "Roblox game framework Luau stars:<3000",
-      "exact_revision": "f65a44297ec4936e2ccce4e4d52d1d11cf0d6708",
+      "exact_revision": "08c64ca24e11c9c5f466c548422b67fd7312861c",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T02:01:45Z",
+      "pushed_at": "2026-11-01T16:41:15Z",
       "repository": "AJAY94633/signal-run-relay",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 521,
+      "size_kb": 375,
       "stars": 70,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -433,7 +433,7 @@
     41,
     44
   ],
-  "generated_at": "2026-11-01T09:06:41.613184+00:00",
+  "generated_at": "2026-11-01T18:52:26.701731+00:00",
   "mission": "Roblox/Luau production frameworks and dependency/tooling accelerators for StarBlox",
   "risk_review": [],
   "risk_review_count": 0,
