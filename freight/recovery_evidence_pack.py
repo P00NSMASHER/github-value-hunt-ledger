@@ -4,6 +4,7 @@ This module formats already-reviewed evidence. It does not discover findings,
 authorize claims, or manufacture settlement truth.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 import argparse, hashlib, json
 from datetime import date
 from pathlib import Path
@@ -16,7 +17,7 @@ SUPPRESSION_FLAGS = ("incumbent_known", "automatic_credit", "preexisting_claim",
 
 
 def money(cents):
-    return ("-" if cents < 0 else "") + "$" + f"{abs(cents) / 100:,.2f}"
+    return ("-" if cents < 0 else "") + "$" + format_cents(abs(cents))
 
 
 def require_text(row, key):
