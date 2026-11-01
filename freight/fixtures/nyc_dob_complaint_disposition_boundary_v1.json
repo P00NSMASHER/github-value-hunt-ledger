@@ -75,7 +75,122 @@
       "bin",
       "person_name"
     ],
-    "data_quality_status": "METADATA_VERIFIED_ROW_TRUTH_UNKNOWN"
+    "data_quality_status": "METADATA_VERIFIED_ROW_TRUTH_UNKNOWN",
+    "public_api_web_readback": {
+      "provenance_class": "OFFICIAL_PUBLISHER_PUBLIC_API_WEB_PARSED_EXCERPT_NOT_RAW_ORIGINAL_HTTP_BYTES",
+      "first_party_url": "https://data.cityofnewyork.us/resource/eabe-havv.json",
+      "local_observed_date": "2026-10-31",
+      "observed_utc_calendar_date": "2026-11-01",
+      "source_window": "FIRST_EIGHT_DISPLAYED_ROWS_UNSORTED_DEFAULT_API_RESPONSE;_NOT_STABLE_OR_REPRESENTATIVE",
+      "observed_dobrundate": "20261031000000",
+      "source_http_body_sha256": null,
+      "source_http_bytes_custodied": false,
+      "sanitized_projection_sha256": "afe6807621d05d3900af429d0d6d498a810906b4bee27be9758df3c856e8eb4e",
+      "projection_hash_scope": "SHA256_CANONICAL_JSON_SORTED_KEYS_COMPACT_EIGHT_SANITIZED_EXCERPT_ROWS_NOT_ORIGINAL_PUBLISHER_BYTES",
+      "retained_columns": [
+        "status",
+        "date_entered",
+        "disposition_code",
+        "disposition_date",
+        "inspection_date",
+        "dobrundate"
+      ],
+      "excluded_columns": [
+        "complaint_number",
+        "house_number",
+        "house_street",
+        "zip_code",
+        "bin",
+        "community_board",
+        "unit"
+      ],
+      "observed_rows": [
+        {
+          "status": "CLOSED",
+          "date_entered": "08/27/2025",
+          "disposition_date": "05/13/2026",
+          "disposition_code": "A8",
+          "inspection_date": "05/12/2026",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "09/16/2026",
+          "disposition_date": "09/17/2026",
+          "disposition_code": "I2",
+          "inspection_date": "09/17/2026",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "12/29/2022",
+          "disposition_date": "12/30/2022",
+          "disposition_code": "A8",
+          "inspection_date": "12/29/2022",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "08/31/2008",
+          "disposition_date": "09/22/2008",
+          "disposition_code": "I2",
+          "inspection_date": "09/12/2008",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "03/10/2026",
+          "disposition_date": "03/12/2026",
+          "disposition_code": "A8",
+          "inspection_date": "03/12/2026",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "08/09/2022",
+          "disposition_date": "08/09/2022",
+          "disposition_code": "I2",
+          "inspection_date": "08/09/2022",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "03/30/2020",
+          "disposition_date": "04/10/2020",
+          "disposition_code": "I2",
+          "inspection_date": "04/09/2020",
+          "dobrundate": "20261031000000"
+        },
+        {
+          "status": "CLOSED",
+          "date_entered": "07/20/2014",
+          "disposition_date": "12/03/2014",
+          "disposition_code": "I2",
+          "inspection_date": "12/02/2014",
+          "dobrundate": "20261031000000"
+        }
+      ],
+      "calibration_excerpts": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "heldout_excerpts_same_publisher_nonblind": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "source_observed_closed_rows": 8,
+      "source_observed_A8_rows": 3,
+      "source_observed_I2_rows": 5,
+      "independently_verified_negative_or_positive_outcome_labels": 0,
+      "original_complaint_level_deduplication": "UNKNOWN_KEYS_INTENTIONALLY_EXCLUDED_FOR_PRIVACY",
+      "historical_publication_time": "UNKNOWN_DOBRUNTIME_DOES_NOT_PROVE_FIRST_VISIBLE_DATE",
+      "readback_quality": "ONLY_FIELD_EXTRACTION_VERIFIED;_NO_VIOLATION_CASE_ADJUDICATION_OR_PERMIT_LINK",
+      "no_commercial_scoring_authorization": true
+    }
   },
   "synthetic_controls": [
     {
@@ -166,7 +281,7 @@
   "benchmark_readiness": {
     "synthetic_calibration": 2,
     "synthetic_holdout": 5,
-    "real_public_rows_in_pack": 0,
+    "real_public_rows_in_pack": 8,
     "real_independent_heldout_complaint_to_violation_labels": 0,
     "real_independent_heldout_permit_labels": 0,
     "real_customer_cash_cases": 0,
@@ -174,14 +289,16 @@
     "measured_accuracy": null,
     "precision": null,
     "recall": null,
-    "safe_readiness_claim": "SEVEN_SYNTHETIC_POLICY_CONTRASTS_ONLY_NOT_MEASURED_MODEL_SCORE"
+    "safe_readiness_claim": "EIGHT_SANITIZED_PUBLISHER_API_EXCERPT_ROWS_AND_SEVEN_SYNTHETIC_GUARDS;_NO_INDEPENDENT_TRUTH_OR_MODEL_ACCURACY",
+    "real_publisher_nonblind_heldout_excerpts": 4,
+    "verified_customer_issuance_or_violation_labels": 0
   },
   "handoffs": {
-    "permitplate_48": "COMPLAINT_INTAKE_DOES_NOT_PROVE_PERMIT_APPLICATION_ISSUANCE_VIOLATION_OR_SALEABLE_OPPORTUNITY",
+    "permitplate_48": "EIGHT_REAL_NONIDENTIFYING_COMPLAINT_FIELD_EXCERPTS; CLOSED/A8/I2_DO_NOT_PROVE_ISSUED_PERMITS_OR_INDEPENDENT_VIOLATION_OUTCOMES; NO_SCORING",
     "retally_recoveryos_12": "NO_FREIGHT_RATE_OR_ACCOUNTING_CASH_TRUTH",
     "capturebrief_52": "NO_SOLICITATION_OR_AWARD_LABEL",
-    "independent_qa_44": "CHECK_CATALOG_FIELDS_TERMS_MUTABILITY_AND_SEVEN_SYNTHETIC_CONTROLS;_NO_SOURCE_ROWS",
-    "executive_director": "REVIEW_ONLY_PR883;_LIVE_WRITER_UNCHANGED;_LEGACY_LAB_CONSOLIDATION_NOT_VERIFIED"
+    "independent_qa_44": "INDEPENDENTLY_CHECK_PUBLISHER_API_EXCERPT_20261031_DOBRUNTIME;_CANONICAL_PROJECTION_SHA256;_NO_IDENTIFIERS;_HOLDOUT_4_NONBLIND_AND_LABELS_ZERO",
+    "executive_director": "DRAFT_PR883_ADDS_8_SANITIZED_ORIGINAL_API_FIELD_READBACKS_AND_MUTATION_FALSIFIER;_SOURCE_HTTP_HASH_UNKNOWN;_NO_NEW_LABS_OR_WRITER_CHANGES"
   },
   "safety": {
     "real_customer_medical_student_private_records_persisted": 0,
