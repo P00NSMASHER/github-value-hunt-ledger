@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "pack_id": "NYC_DOB_NOW_BUILD_APPROVED_PERMITS_ISSUANCE_BOUNDARY_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_EXTRACTION_AND_LIFECYCLE_NOT_PROPERTY_RISK_OR_REVENUE_SCORING",
+  "observed_date_utc": "2026-11-01",
+  "ownership": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "review_pr": 883,
+    "review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_writer_unmodified": "research/retally-unified-data-lab",
+    "legacy_labs_consolidated": false,
+    "product_code_changed": false
+  },
+  "source": {
+    "publisher": "NYC Department of Buildings via NYC Open Data",
+    "dataset_id": "rbx6-tga4",
+    "title": "DOB NOW: Build – Approved Permits",
+    "catalog_url": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Build-Approved-Permits/rbx6-tga4",
+    "original_api_url": "https://data.cityofnewyork.us/resource/rbx6-tga4.json",
+    "created_date": "2016-05-26",
+    "first_public_date": "2016-06-28",
+    "publisher_last_updated_at_catalog_observed": "2026-10-31",
+    "update_frequency": "DAILY_MUTABLE",
+    "catalog_columns": 46,
+    "catalog_approximate_rows": "1.02M_UNDOWNLOADED",
+    "coverage_excludes": [
+      "ELECTRICAL_PERMITS",
+      "ELEVATOR_PERMITS",
+      "LAA_PERMITS"
+    ],
+    "source_epoch": "2016_ONWARD_MIXED_PERMIT_VINTAGES_NOT_POINT_IN_TIME"
+  },
+  "rights": {
+    "faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "faq_general_reuse": "NO_GENERAL_USE_RESTRICTIONS",
+    "terms_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje",
+    "dataset_specific_exceptions_reviewed": false,
+    "commercial_reuse": "GENERALLY_PERMITTED_SUBJECT_TO_PORTAL_AGENCY_AND_THIRD_PARTY_RIGHTS",
+    "commercial_customer_scoring_approved": false,
+    "no_city_endorsement": true
+  },
+  "provenance": {
+    "source_observation": "OFFICIAL_API_FIRST_EIGHT_UNSORTED_PUBLIC_ROWS_WEB_TEXT_READBACK_NOT_ORIGINAL_HTTP_CUSTODY",
+    "source_web_observed_date_utc": "2026-11-01",
+    "observed_source_rows": 8,
+    "sanitized_rows_retained": 8,
+    "raw_http_body_sha256": null,
+    "raw_http_byte_length": null,
+    "raw_http_bytes_custodied": false,
+    "source_etag": null,
+    "source_last_modified_header": null,
+    "projection_sha256": "1925a85e811bc5605b7e8e6ae912ce21ae19f85f7503598454495f55132f0afa",
+    "projection_hash_contract": "SHA256_SORT_KEYS_COMPACT_UTF8_JSON_ARRAY_OF_SANITIZED_ROWS_IN_ORIGINAL_EXCERPT_ORDER_NOT_SOURCE_HTTP_BODY",
+    "sample_selection": "DEFAULT_UNSORTED_FIRST_EIGHT_NON_RANDOM_NON_REPRESENTATIVE_NO_HISTORICAL_SNAPSHOT",
+    "retained_publisher_fields": [
+      "filing_reason",
+      "work_type",
+      "permit_status",
+      "approved_date",
+      "issued_date",
+      "expired_date",
+      "estimated_job_costs"
+    ],
+    "work_permit_redaction": "PRESENCE_OR_EXPLICIT_UNISSUED_PLACEHOLDER_ONLY_NO_IDENTIFIERS",
+    "omitted_fields": "ALL_NAMES_LOCATIONS_JOB_IDS_PERMIT_IDS_TRACKING_NUMBERS_BUSINESS_DETAILS_ADDRESSES_AND_DESCRIPTIONS",
+    "deduplicate_projected_rows": false,
+    "deduplication_limit": "REDACTED_IDENTIFIERS_PREVENT_RECORD_IDENTITY_VERIFICATION"
+  },
+  "observations": {
+    "real_original_publisher_projected_rows": 8,
+    "publisher_issued_date_nonnull": 7,
+    "publisher_status_permit_issued": 4,
+    "publisher_status_signed_off": 4,
+    "publisher_unissued_placeholder": 1,
+    "publisher_renewal_filing_reason": 3,
+    "estimated_job_costs_zero": 2,
+    "calibration_indices": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "nonblind_same_publisher_holdout_indices": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "independent_real_heldout_cases": 0,
+    "independently_verified_current_issued_permits": 0,
+    "independent_enforcement_or_compliance_labels": 0,
+    "verified_customer_leads": 0,
+    "cash_or_fee_settlements_verified": 0,
+    "rows": [
+      {
+        "filing_reason": "Initial Permit",
+        "work_type": "Construction Fence",
+        "permit_status": "Signed-off",
+        "approved_date": null,
+        "issued_date": null,
+        "expired_date": null,
+        "work_permit_field": "PUBLISHER_NOT_YET_ISSUED_PLACEHOLDER",
+        "estimated_job_costs_usd": "100"
+      },
+      {
+        "filing_reason": "Initial Permit",
+        "work_type": "General Construction",
+        "permit_status": "Permit Issued",
+        "approved_date": "2026-04-10",
+        "issued_date": "2026-05-18",
+        "expired_date": "2026-12-31",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "185040"
+      },
+      {
+        "filing_reason": "Initial Permit",
+        "work_type": "Sprinklers",
+        "permit_status": "Signed-off",
+        "approved_date": "2025-08-14",
+        "issued_date": "2025-09-19",
+        "expired_date": "2026-06-06",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "20000"
+      },
+      {
+        "filing_reason": "Initial Permit",
+        "work_type": "Plumbing",
+        "permit_status": "Permit Issued",
+        "approved_date": "2026-05-06",
+        "issued_date": "2026-07-28",
+        "expired_date": "2027-02-01",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "0"
+      },
+      {
+        "filing_reason": "Renewal Permit Without Changes",
+        "work_type": "Structural",
+        "permit_status": "Signed-off",
+        "approved_date": "2022-07-08",
+        "issued_date": "2025-01-23",
+        "expired_date": "2025-11-23",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "38520"
+      },
+      {
+        "filing_reason": "Renewal Permit Without Changes",
+        "work_type": "Sidewalk Shed",
+        "permit_status": "Permit Issued",
+        "approved_date": "2022-06-21",
+        "issued_date": "2026-03-10",
+        "expired_date": "2027-03-10",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "25000"
+      },
+      {
+        "filing_reason": "Initial Permit",
+        "work_type": "Curb Cut",
+        "permit_status": "Signed-off",
+        "approved_date": "2024-04-08",
+        "issued_date": "2025-08-20",
+        "expired_date": "2026-07-05",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "4000"
+      },
+      {
+        "filing_reason": "Renewal Permit Without Changes",
+        "work_type": "Structural",
+        "permit_status": "Permit Issued",
+        "approved_date": "2026-05-01",
+        "issued_date": "2026-07-28",
+        "expired_date": "2027-05-20",
+        "work_permit_field": "FORMATTED_ID_REDACTED",
+        "estimated_job_costs_usd": "0"
+      }
+    ]
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYN_SIGNOFF_WITH_UNISSUED_PLACEHOLDER",
+      "base_observation_index": 0,
+      "claim": "currently_issued_permit",
+      "expected": "UNKNOWN_CONFLICTING_PUBLISHER_FIELDS",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_HISTORIC_SIGNOFF_NOT_CURRENT",
+      "base_observation_index": 2,
+      "claim": "currently_issued_permit",
+      "expected": "UNKNOWN_NO_CURRENT_VALIDITY_CHECK",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_RENEWAL_NOT_NEW_JOB",
+      "base_observation_index": 4,
+      "claim": "new_work_authorized",
+      "expected": "UNKNOWN_NO_INDEPENDENT_WORK_AUTHORIZATION",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_ZERO_ESTIMATE_NOT_ZERO_FEES",
+      "base_observation_index": 3,
+      "claim": "fees_paid_or_no_fees",
+      "expected": "UNKNOWN_NO_FEE_LEDGER",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_ISSUED_NOT_ECONOMIC_LEAD",
+      "base_observation_index": 1,
+      "claim": "verified_customer_opportunity",
+      "expected": "UNKNOWN_NO_VERIFIED_LEAD",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_MISSING_APPROVED_DATE",
+      "base_observation_index": 0,
+      "claim": "publisher_approval_date",
+      "expected": "UNKNOWN_MISSING_DATE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_UNISSUED_PERMIT_NOT_NO_WORK",
+      "base_observation_index": 0,
+      "claim": "no_work_occurred",
+      "expected": "UNKNOWN_NO_WORK_OBSERVATION",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_NO_IDENTIFIER_DEDUPE",
+      "base_observation_index": 6,
+      "claim": "same_permit_as_another_row",
+      "expected": "UNKNOWN_IDENTIFIERS_REDACTED",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE"
+    },
+    {
+      "id": "SYN_DATE_INVERSION",
+      "base_observation_index": 1,
+      "claim": "publisher_date_order",
+      "expected": "SOURCE_DATE_ORDER_CONFLICT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_REAL_CASE",
+      "override_fields": {
+        "issued_date": "2026-03-01"
+      }
+    }
+  ],
+  "handoffs": {
+    "permitplate_48": "SANITIZED_REAL_ISSUANCE_FIELD_EXTRACTION_ONLY; NO_ACTIVE_PERMIT_COMPLIANCE_SCORE_OR_LEAD_TRUTH",
+    "freightrecovery_12": "NO_FREIGHT_RATE_INVOICE_TARIFF_OR_RECOVERED_CASH",
+    "recoveryos_12": "NO_LEDGER_BANK_CLEARING_OR_PAYMENT_RECONCILIATION",
+    "capturebrief_52": "NO_SAM_SOLICITATION_OR_FEDERAL_AWARD_GROUND_TRUTH",
+    "qa_44": "VERIFY_FIRST_EIGHT_SOURCE_FIELDS_AND_METADATA; RECOMPUTE_PROJECTION_HASH; VERIFY_NEGATIVE_CONTROLS; ORIGINAL_HTTP_DIGEST_AND_REAL_INDEPENDENT_LABELS_REMAIN_UNKNOWN",
+    "independent_qa_accepted": false
+  },
+  "restrictions": {
+    "provider_cost_increase": 0,
+    "customer_material_saved": 0,
+    "identifying_row_fields_saved": 0,
+    "credentials_saved": 0,
+    "scheduled_workflows_changed": false,
+    "engine_code_changed": false,
+    "production_changed": false,
+    "commercial_release_authorized": false
+  }
+}
