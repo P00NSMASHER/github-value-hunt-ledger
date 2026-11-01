@@ -1,4 +1,4 @@
-# Freight Recovery — Pilot Launch Brief
+# RETALLY — Pilot Launch Brief
 
 Updated: 2026-09-20
 

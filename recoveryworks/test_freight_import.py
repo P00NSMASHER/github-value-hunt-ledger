@@ -142,5 +142,63 @@ class FreightImportTests(unittest.TestCase):
                 load_freight_audit_result_bundle(bundle)
 
 
+    def test_import_rejects_authority_identity_mismatch_even_with_rehashed_manifest(self):
+        from freight.contracts import canonical_hash
+        for field, different in (
+            ("customer_id", "UNRELATED-CUSTOMER"),
+            ("carrier_id", "UNRELATED-CARRIER"),
+            ("currency", "EUR"),
+        ):
+            with self.subTest(field=field):
+                forged = truth_payload()
+                forged["authorities"][0][field] = different
+                # A manifest-level SHA is not a trusted identity proof: simulate
+                # a reserializing importer that recomputes its own truth hash.
+                forged["truth_hash"] = canonical_hash({
+                    "schema": 3,
+                    **{key: value for key, value in forged.items() if key != "truth_hash"}
+                })
+                with tempfile.TemporaryDirectory() as directory:
+                    source = Path(directory) / "truth-manifest.json"
+                    source.write_text(json.dumps(forged), encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "authority identity mismatch"):
+                        load_freight_truth_manifest(source)
+
+    def test_import_rejects_duplicate_finding_ids_even_when_manifest_rehashed(self):
+        from freight.contracts import canonical_hash
+        forged=truth_payload()
+        forged["findings"] = list(forged["findings"]) + [dict(forged["findings"][0])]
+        forged["truth_hash"]=canonical_hash({
+            "schema":3,
+            **{key:value for key,value in forged.items() if key!="truth_hash"}
+        })
+        with tempfile.TemporaryDirectory() as directory:
+            source=Path(directory)/"truth-manifest.json"
+            source.write_text(json.dumps(forged),encoding="utf-8")
+            with self.assertRaisesRegex(ValueError,"duplicate freight finding_id"):
+                load_freight_truth_manifest(source)
+
+    def test_direct_bridge_refuses_changed_amount_or_wrong_authority(self):
+        from dataclasses import replace
+        from recoveryworks.branches.freight import from_freight_finding
+        from freight.contracts import AuthorityRef
+        payload=truth_payload()
+        from freight.contracts import Finding
+        finding=Finding(**payload["findings"][0])
+        authority=AuthorityRef(**payload["authorities"][0])
+        valid=RecoveryEngine().evaluate(from_freight_finding(finding,authority))
+        self.assertIs(valid.state, FindingState.VALIDATED)
+        with self.assertRaisesRegex(ValueError,"proof hash mismatch"):
+            from_freight_finding(replace(finding,actual_cents=999999),authority)
+        for field,different in (("customer_id","DIFFERENT-CUSTOMER"),
+                                ("carrier_id","DIFFERENT-CARRIER"),
+                                ("currency","EUR")):
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,"authority identity mismatch"):
+                from_freight_finding(finding,replace(authority,**{field:different}))
+        # With no evidence reference, the consumer must HOLD, not imply a claim.
+        held=RecoveryEngine().evaluate(from_freight_finding(finding,None))
+        self.assertIs(held.state,FindingState.REVIEW)
+
+
 if __name__ == "__main__":
     unittest.main()

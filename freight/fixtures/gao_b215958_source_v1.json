@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "GAO_B215958_DECISION_SCOPE_V1",
+  "status": "SOURCE_BOUND_DECISION_LEVEL_CANDIDATE_NOT_HELD_OUT",
+  "evidence_lane": "freight_error_adjudication_negative_control",
+  "source": {
+    "publisher": "U.S. Government Accountability Office",
+    "case_number": "B-215958",
+    "title": "Request for Review of GSA Deduction Action",
+    "original_record_url": "https://www.gao.gov/products/b-215958",
+    "original_report_url": "https://www.gao.gov/assets/b-215958-125766.pdf",
+    "rights_url": "https://www.gao.gov/copyright",
+    "decision_date": "1984-12-05",
+    "historical_tariff": "NASI Rules Tariff 190-A, item 470(b) and 470(c)",
+    "tariff_issued": "1981-10-01",
+    "tariff_amended": "1982-02-11",
+    "decision_page_for_disposition": 3,
+    "source_bytes_sha256": null,
+    "source_bytes_acquired": false,
+    "rights_status": "GAO_US_PUBLIC_DOMAIN_WITH_ATTRIBUTION_AND_EMBEDDED_THIRD_PARTY_CAUTION",
+    "commercial_use_of_engine_input_approved": false,
+    "superseding_reconsideration_url": "https://www.gao.gov/products/b-215958-2",
+    "superseding_reconsideration_date": "1986-02-18"
+  },
+  "population": {
+    "challenged_government_bills_of_lading": 55,
+    "decision_reversals_with_recorded_numbered_seals": 53,
+    "remainder_cases_with_unresolved_disposition": 2,
+    "outcome_label_scope": "DECISION_AGGREGATE_ONLY",
+    "per_bill_of_lading_labels_available": false,
+    "complete_original_invoice_or_bol_corpus_available": false,
+    "decision_outcome": "GAO_1984_INITIAL_REVERSAL_SUBSEQUENTLY_OVERRULED_IN_1986",
+    "independently_confirmed_refunds_received": null,
+    "independently_confirmed_carrier_overcharge_amount_cents": null
+  },
+  "limits": {
+    "historical_not_current_tariff_authority": true,
+    "original_per_invoice_rate_basis_unknown": true,
+    "customer_contract_or_payment_chain_available": false,
+    "independent_accuracy_scoring_permitted": false,
+    "realized_retally_recovered_cash_cents": 0,
+    "independent_negative_control_scope": "Initial 1984 numbered-seal rationale was expressly overruled on February 18, 1986; the current final historical GAO decision rejects exclusive-use charges based on numbered seals without the required written request. Do not infer customer-specific invoice overcharge or refund without original source records."
+  },
+  "controls": [
+    {
+      "id": "SYNTHETIC_HISTORICAL_SEALED_GBL",
+      "synthetic": true,
+      "number_of_source_gbls_recreated": 0,
+      "numbered_seals_applied_with_shipper_authority": true,
+      "seal_numbers_recorded_on_shipping_document": true,
+      "explicit_exclusive_use_request_annotation": false,
+      "expected": "1984_INITIAL_FAVORABLE_RULING_NOT_FINAL_1986_WRITTEN_REQUEST_REQUIRED",
+      "actual_customer_overcharge_cents": null,
+      "actual_refund_received_cents": null
+    },
+    {
+      "id": "SYNTHETIC_REMAINDER_TWO_UNKNOWN",
+      "synthetic": true,
+      "number_of_source_gbls_recreated": 0,
+      "modeled_unresolved_count": 2,
+      "expected": "UNKNOWN_NOT_AUTOMATIC_REVERSE_AND_NOT_PROVEN_OVERCHARGE",
+      "actual_customer_overcharge_cents": null,
+      "actual_refund_received_cents": null
+    }
+  ],
+  "data_quality": {
+    "source_format": "THREE_PAGE_PAPER_SCAN_WITH_OCR_ERRORS",
+    "checked_against_page_image": true,
+    "label_completeness": "53_OF_55_DECISION_AGGREGATE_ONLY_TWO_UNKNOWN",
+    "clinical_student_customer_private_material_used": false,
+    "original_document_copied_into_repository": false,
+    "no_independent_invoice_reconciliation_results": true,
+    "publisher_original_review_date": "2026-10-23",
+    "subsequent_history_checked_2026_10_24": true
+  },
+  "manifest_hash_contract": "RESEARCH_AUTHORED_MANIFEST_SHA256_CANONICAL_SORTED_JSON_EXCLUDING_SELF_NOT_ORIGINAL_PUBLISHER_BYTES",
+  "manifest_sha256": "02320aba4915da14b2f05dc68233106b0bfdf1f163976cba5d3bdbf545da80fb"
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "url": "https://www.gao.gov/products/b-143246",
+      "kind": "GAO_DECISION",
+      "title": "Historical LTL classification and deduction review"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-148465",
+      "kind": "GAO_DECISION",
+      "title": "Historical overcharge collected by offset"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-161664",
+      "kind": "GAO_DECISION",
+      "title": "Historical LTL invoice overcharge and rate interpretation"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-199805-0",
+      "kind": "GAO_DECISION",
+      "title": "Yellow Freight historical disputed bill population"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-223311-0",
+      "kind": "GAO_DECISION",
+      "title": "Yellow Freight original class and reclassification dispute"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-221594-0",
+      "kind": "GAO_DECISION",
+      "title": "GSA overcharge decision reversed on tariff authority"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-195862",
+      "kind": "GAO_DECISION",
+      "title": "Government bill of lading classification and GSA deduction"
+    },
+    {
+      "url": "https://www.gao.gov/products/b-221705",
+      "kind": "GAO_DECISION",
+      "title": "Rate exception and overturned GSA audit determination"
+    },
+    {
+      "url": "https://psc.ky.gov/Case/ViewCaseFilings/2024-00200",
+      "kind": "PUBLIC_REGULATORY_EXHIBIT",
+      "title": "Kentucky public commission docket with LTL freight bill evidence"
+    },
+    {
+      "url": "https://psc.ky.gov/Case/ViewCaseFilings/2025-00354",
+      "kind": "PUBLIC_REGULATORY_EXHIBIT",
+      "title": "Kentucky public commission docket with FedEx Freight and expense evidence"
+    },
+    {
+      "url": "https://document.epiq11.com/document/getdocumentbycode?docId=3412364&projectCode=NRD&source=DM",
+      "kind": "PUBLIC_BANKRUPTCY_EXHIBIT",
+      "title": "Bankruptcy exhibit with eight ABF carrier bills"
+    },
+    {
+      "url": "https://document.epiq11.com/document/getdocumentbycode?docId=4228494&projectCode=NHH&source=DM",
+      "kind": "PUBLIC_BANKRUPTCY_EXHIBIT",
+      "title": "Bankruptcy exhibit with corrected ABF invoice and shipment quote"
+    }
+  ]
+}

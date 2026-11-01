@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "approval_date_local": "2026-10-12",
+  "approval_source": "User approved both generated visuals: 'They look great.'",
+  "metricool_brand_id": "7322512",
+  "approval_scope": "Only existing October 14 Facebook and October 15 Instagram post artwork, not additional posts or outreach",
+  "required_minimum_dimensions_px": [
+    1080,
+    1350
+  ],
+  "forbid_release_from_thumbnail": true,
+  "production_status": "NOT_DEPLOYED",
+  "canva_preview_limitation": "Canva's 161x200 signed public previews are inadequate. Rewriting signed thumbnail dimensions returns HTTP 403 Signature invalid.",
+  "provider_publication_verified": false,
+  "disclaimer": "A prior October 12 Facebook introduction was separately provider-reported published; this manifest addresses only the two future UUIDs.",
+  "posts": [
+    {
+      "uuid": "-7129364071318205444",
+      "network": "facebook",
+      "topic": "Independent second-look audit with already-known findings and credits excluded",
+      "canva_media_id": "MAHXy6EvN24",
+      "canva_natural_px": [
+        1136,
+        1408
+      ],
+      "last_checked_planner_id": 393040692,
+      "planned_local": {
+        "dateTime": "2026-10-14T15:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "original_media": "https://static.metricool.com/planner/202610/7322512-file-14283620392379791152.jpeg",
+      "original_media_alt": "Branded RETALLY audit-controls graphic: A discrepancy is not a recovery, with a four-stage evidence and authorization pathway.",
+      "original_caption": "Already have a freight auditor? That's not a problem. It's the starting point.\n\nA useful second look should find what's still unresolved—not take credit for somebody else's work.\n\nBefore calling an invoice issue \"new,\" reconcile:\n• Previous audit findings\n• Carrier corrections and automatic credits\n• Open disputes and approved claims\n• Rebill chains for the same shipment\n\nOnly a supported, unaddressed discrepancy belongs in the next conversation.\n\nRETALLY offers a $0-upfront initial Second-Look Recovery Audit for agreed eligible scope. Recovery work is separately authorized in writing; outcomes are not guaranteed.\n\nExplore the second-look process:\nhttps://www.retallyrecovery.com/second-look-freight-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=independent_second_look\n\n#FreightAudit #AccountsPayable",
+      "original_provider_status": "PENDING",
+      "original_draft": false,
+      "original_autoPublish": true,
+      "instagram_is_ai_generated": null,
+      "approved_full_resolution_public_media_url": null,
+      "stage": "WAITING_ORIGINAL_RESOLUTION_BYTES"
+    },
+    {
+      "uuid": "6484508306152771452",
+      "network": "instagram",
+      "topic": "Two invoices, one shipment; investigate corrections, credit-and-rebill",
+      "canva_media_id": "MAHXy245ZUs",
+      "canva_natural_px": [
+        1136,
+        1408
+      ],
+      "last_checked_planner_id": 393040701,
+      "planned_local": {
+        "dateTime": "2026-10-15T16:00:00",
+        "timezone": "Europe/Madrid"
+      },
+      "original_media": "https://static.metricool.com/planner/202610/7322512-file-14283620392379791152.jpeg",
+      "original_media_alt": "RETALLY evidence ledger separates a flagged discrepancy, supported evidence, customer authorization, and actual funds or credits received.",
+      "original_caption": "TWO INVOICES. ONE SHIPMENT.\n\nIs that duplicate billing?\n\nNot necessarily.\n\nA corrected invoice, credit-and-rebill, or replacement bill can look like a duplicate until you trace the actual charges and credits.\n\nBefore flagging it:\n01 / Match the shipment or PRO number\n02 / Check original versus corrected bills\n03 / Reconcile payments and credit memos\n\nA suspicious pattern isn't automatically an overpayment. An overpayment isn't automatically a recovery.\n\nSave this checklist for your next freight AP review. More through the link in our bio.\n\n#RETALLY #FreightAudit #AccountsPayable",
+      "original_provider_status": "PENDING",
+      "original_draft": false,
+      "original_autoPublish": true,
+      "instagram_is_ai_generated": true,
+      "approved_full_resolution_public_media_url": null,
+      "stage": "WAITING_ORIGINAL_RESOLUTION_BYTES"
+    }
+  ]
+}

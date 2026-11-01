@@ -1,4 +1,6 @@
-from freight.synthetic_rehearsal import run_rehearsal
+import pytest
+
+from freight.synthetic_rehearsal import _counter_reporting, run_rehearsal
 
 
 def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
@@ -113,10 +115,45 @@ def test_rehearsal_return_changes_provenance_and_blocks_old_report_reuse():
     assert proof["pre_return_realized_cents"] == 4500
     assert proof["pre_return_fee_eligible_cents"] == 2000
     assert proof["return_cents"] == 500
+    assert proof["source_declared_return_cents"] == 500
+    assert proof["applied_reversal_cents"] == 500
+    assert proof["unresolved_return_cents"] == 0
     assert proof["stale_report_rejected"] is True
     assert proof["settlement_snapshot_hash"] != proof["pre_return_snapshot_hash"]
     assert proof["report_hash"] != proof["pre_return_report_hash"]
     assert proof["settlement_snapshot_hash"] in out["report_markdown"]
+
+
+@pytest.mark.parametrize(
+    ("declared_cents", "applied_cents"),
+    ((1, 1), (500, 500), (1302, 1302), (4144, 1302), (5482, 0)),
+)
+def test_counter_reporting_uses_immutable_source_and_applied_edges(
+    declared_cents, applied_cents
+):
+    snapshot = {
+        "tables": {
+            "counter_events": [
+                {"counter_id": "return-1", "amount_cents": declared_cents}
+            ],
+            "reversal_edges": [
+                {"counter_id": "return-1", "amount_cents": applied_cents}
+            ] if applied_cents else [],
+        }
+    }
+
+    proof = _counter_reporting(snapshot, ("return-1",))
+
+    assert proof["return_cents"] == declared_cents
+    assert proof["source_declared_return_cents"] == declared_cents
+    assert proof["applied_reversal_cents"] == applied_cents
+    assert proof["unresolved_return_cents"] == declared_cents - applied_cents
+    assert proof["counter_events"] == [{
+        "counter_id": "return-1",
+        "source_declared_cents": declared_cents,
+        "applied_reversal_cents": applied_cents,
+        "unresolved_return_cents": declared_cents - applied_cents,
+    }]
 
 
 def test_persistent_rehearsal_report_is_deterministic():

@@ -1,0 +1,736 @@
+{
+  "catalog_version": 1,
+  "title": "RETALLY Group",
+  "mode": "PLANNING_PREVIEW",
+  "as_of": "2026-10-21",
+  "source_repository_revision": "9fc918eb61e2fbfc83af071cf16e0815431b4478",
+  "divisions": [
+    {
+      "id": "recovery",
+      "name": "RETALLY Recovery",
+      "purpose": "Audit and authorized financial recovery."
+    },
+    {
+      "id": "intelligence",
+      "name": "RETALLY Intelligence",
+      "purpose": "Specialized business research with source evidence."
+    },
+    {
+      "id": "tools-data",
+      "name": "RETALLY Tools & Data",
+      "purpose": "Practical software, spreadsheets and data services."
+    },
+    {
+      "id": "ventures",
+      "name": "RETALLY Ventures",
+      "purpose": "Bounded research and validation of future offers."
+    }
+  ],
+  "entries": [
+    {
+      "id": "retally-recovery",
+      "name": "RETALLY Recovery",
+      "division_id": "recovery",
+      "kind": "business",
+      "purpose": "Evidence-led audit and authorized recovery across freight and related business expenses.",
+      "stage": "Seven-branch rollout preparation",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Resolve private-host readiness and automated release checks; establish the first genuinely authorized customer delivery.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Recovery portfolio",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/recoveryworks/PORTFOLIO.md",
+          "observed_on": "2026-10-20"
+        },
+        {
+          "label": "Seven-branch workbench proposal",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/493",
+          "observed_on": "2026-10-20"
+        }
+      ],
+      "candidate_production_slugs": [
+        "freightrecovery",
+        "freight-recovery",
+        "recoveryworks",
+        "retally"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "capturebrief",
+      "name": "CaptureBrief",
+      "division_id": "intelligence",
+      "kind": "business",
+      "purpose": "Supervised Decision Evidence review for one existing public federal IT, cyber, or cloud pursuit.",
+      "stage": "Twelve private pilot feature heads integrated; customer operation unverified",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Use the integrated private intake, Stripe reconciliation and order registry; establish current approved source coverage, private-host recovery and real buyer scope before accepting delivery commitments. Keep first-pilot admission separate from a completed 14-day watch.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Business model v7",
+          "url": "https://github.com/P00NSMASHER/capturebrief/blob/12d90024f053a78ead7936abf092931fce240d3e/BUSINESS-MODEL-v7.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "94550041063722ee2cf582402cb958221ba29fb4"
+        },
+        {
+          "label": "Merged combined private pilot core: 706 local tests and hosted Linux/Windows acceptance",
+          "url": "https://github.com/P00NSMASHER/capturebrief/pull/69",
+          "observed_on": "2026-10-21"
+        }
+      ],
+      "candidate_production_slugs": [
+        "capturebrief"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "permitplate",
+      "name": "PermitPlate NYC",
+      "division_id": "intelligence",
+      "kind": "business",
+      "purpose": "Source-linked NYC restaurant applicant, licensing and buildout research for restaurant vendors.",
+      "stage": "Founder-curated offer available in source; paid scoring remains held",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Verify the NYC subscriber-specific private order, payment and delivery workflow for the founder-curated no-score offer. Keep internal V4 scoring separate from paid scored-feed promotion; current legacy benchmark overlap is insufficient.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Canonical product definition",
+          "url": "https://github.com/P00NSMASHER/permitplate-nyc/blob/7be09a82249ab1ef6b6a9de7402690dbefd47f5e/README.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "b15f7c60defa7b39dcf68311e2d5282b85e70a0e"
+        },
+        {
+          "label": "Declared Portfolio Brain project identity",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
+        },
+        {
+          "label": "Current internal V4 scoring and commercial boundary",
+          "url": "https://github.com/P00NSMASHER/permitplate-nyc/blob/d6547aac35036d8338c986707dc6002a33864276/operations/NYC_INTERNAL_V4_SCORING.md",
+          "observed_on": "2026-10-21"
+        }
+      ],
+      "candidate_production_slugs": [
+        "permitplate",
+        "permitplate-nyc"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "rehabsignal",
+      "name": "RehabSignal",
+      "division_id": "intelligence",
+      "kind": "venture",
+      "purpose": "Public-source Pennsylvania skilled-nursing account research for contract-therapy business-development teams.",
+      "stage": "Original offer and execution plan recovered; current readiness unverified",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Revalidate the September territory-brief scope, delivery economics and current owner before activation; retain the original sources as historical evidence.",
+      "evidence_status": "PRIVATE_ARTIFACT_DOCUMENTED",
+      "sources": [],
+      "candidate_production_slugs": [
+        "rehabsignal"
+      ],
+      "commercial_readiness": "NOT_ASSESSED",
+      "private_source_refs": [
+        {
+          "record_key": "retally-src-20261020-rehabsignal",
+          "label": "Original territory-brief offer, handoff and execution pack",
+          "source_as_of": "2026-09-12",
+          "reviewed_on": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "sheetharbor",
+      "name": "SheetHarbor",
+      "division_id": "tools-data",
+      "kind": "product_family",
+      "purpose": "Spreadsheet tools for maker economics, profitability and inventory decisions.",
+      "stage": "All four alpha workbooks cleared technical freeze gates",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Use the hash-pinned Maker Economics and Custom Apparel packages; finish the product release, checkout, support and customer terms before selling. Do not claim customer outcomes from compatibility tests.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Product release seed",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/handoffs/sheetharbor/product_repo_seed/README.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "3bcdb21d947a5c86d4926559205c939335e6f444"
+        },
+        {
+          "label": "Merged native Excel acceptance and release manifest",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/559",
+          "observed_on": "2026-10-21"
+        },
+        {
+          "label": "Exact native Excel receipt for all four canonical workbooks",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/9fc918eb61e2fbfc83af071cf16e0815431b4478/handoffs/sheetharbor/product_repo_seed/release/v0.2.0-alpha/excel-roundtrip-results-2026-10-21.json",
+          "observed_on": "2026-10-21"
+        }
+      ],
+      "candidate_production_slugs": [
+        "sheetharbor",
+        "sheetharborcreations"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "app-factory-products",
+      "name": "App Factory products",
+      "division_id": "tools-data",
+      "kind": "product_family",
+      "purpose": "Three application engines with nine default editions: document workflow, quote-to-order and inventory control; additional variants remain workflow hypotheses.",
+      "stage": "Nine private application editions built and accepted; production integration pending",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Promote the reviewed private source stack through its integration gates, then provision the actual customer runtime, recovery and support path before a paid hosted launch. Keep synthetic package acceptance separate from customer acceptance.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Supply Desk, Renewal Desk and Client Intake recipes",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/recipes.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "fd0135235c8644bc6be4f8b318181d0c38af924e"
+        },
+        {
+          "label": "Print, rental and field-service estimating recipes",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/quote-family/recipes.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "1638a532ccb321455eb167ed77d4f16d837e93ad"
+        },
+        {
+          "label": "MRO, rental and hospitality inventory recipes",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/inventory-family/recipes.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "5eb317f4449d415e1d40de4ad57b52f336c71eec"
+        },
+        {
+          "label": "Full local application manufacturing implementation",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/fc5ccb3ee3e31a7bfdb47a74d700b978efec2b88/packages/application-factory/manufacturing/README.md",
+          "observed_on": "2026-10-20"
+        },
+        {
+          "label": "Inspected draft candidate PR 60; open and unmerged at review",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/pull/60",
+          "observed_on": "2026-10-20"
+        },
+        {
+          "label": "Exact tested private candidate: nine packaged editions accepted locally",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/commit/38b2cf91d3022d4b0068391e0eb0df888cf7ed12",
+          "observed_on": "2026-10-21"
+        }
+      ],
+      "candidate_production_slugs": [],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "x402-services",
+      "name": "x402 data services",
+      "division_id": "tools-data",
+      "kind": "product_family",
+      "purpose": "PA entity tools and public-data APIs for filings, screening, geocoding, domains and Treasury rates.",
+      "stage": "Mixed production references and staging",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Reconcile the canonical product registry, deployed route map and independently verified payment evidence.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Canonical routing map",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/27293158aeda848f2bc68ce2c5f6aca71b57cb44/production-topology.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "882ed7fbcc5867f874b0e097e88191512dab4ebc"
+        },
+        {
+          "label": "Product registry",
+          "url": "https://github.com/P00NSMASHER/x402-product-factory/blob/27293158aeda848f2bc68ce2c5f6aca71b57cb44/product-registry.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "7c4045dc2282e966107a56ba3beb4c2acc234c08"
+        }
+      ],
+      "candidate_production_slugs": [
+        "x402-product-factory",
+        "pa-entity-x402"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "scopesignal",
+      "name": "ScopeSignal",
+      "division_id": "ventures",
+      "kind": "venture",
+      "purpose": "Construction scope and change-order evidence product thesis.",
+      "stage": "Research lane; coverage correction merged; canonical identity unresolved",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Preserve the merged Portfolio Brain PR #732 correction and keep ScopeSignal unbound. Establish a distinct source-backed canonical project identity and verified private business mapping before any operational integration; distinguish owned research from third-party references.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Construction research lane",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/lanes/04-construction-scopesignal.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "5f897f7e9e5a45c35f2094beefc3e536efc36912"
+        },
+        {
+          "label": "Historical conflicting coverage association",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/PORTFOLIO_COVERAGE.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "ba03a9709d799b4d2cc9f3feaa3c599d46290deb"
+        },
+        {
+          "label": "CaptureBrief PRJ-004 identity for conflict review",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
+        },
+        {
+          "label": "Merged unbound coverage correction (Portfolio Brain PR #732)",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/8f4117b8dc88cbd2fa51a62dcdbaa9c0fd83445c/registry/PORTFOLIO_COVERAGE.json",
+          "observed_on": "2026-10-21",
+          "git_blob_sha": "49886d0a96177c9eb40b164c64e4d8b9187582f4"
+        }
+      ],
+      "candidate_production_slugs": [
+        "scopesignal"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "contractor-quote-recovery",
+      "name": "Contractor Quote Recovery",
+      "division_id": "ventures",
+      "kind": "venture",
+      "purpose": "Historical Contractor Quote Recovery outreach experiment; the paid offer and fulfillment scope remain unverified.",
+      "stage": "Original experiment record recovered; offer and fulfillment unresolved",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Establish the buyer, bounded offer and repeatable delivery evidence before activation; keep the historical experiment separate from the App Factory quote tools.",
+      "evidence_status": "PRIVATE_ARTIFACT_DOCUMENTED",
+      "sources": [],
+      "candidate_production_slugs": [
+        "contractor-quote-recovery"
+      ],
+      "commercial_readiness": "NOT_ASSESSED",
+      "private_source_refs": [
+        {
+          "record_key": "retally-src-20261020-contractor-quote-recovery",
+          "label": "Original business-launch audit identifying the outreach experiment",
+          "source_as_of": "2026-09-21",
+          "reviewed_on": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "resonance",
+      "name": "Resonance",
+      "division_id": "ventures",
+      "kind": "venture",
+      "purpose": "Cultural activity planning for senior-living activity teams and families.",
+      "stage": "Demonstration documented; outcomes separate",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Define a supervised user evaluation and commercial buyer test without assuming demonstrated resident benefit.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Canonical product and evidence",
+          "url": "https://github.com/P00NSMASHER/resonance-qloo/blob/3b6e24ba8cdff2321924be12f8d0347b49b71d05/README.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "bfd54f9c9c934ec6ea086bc3268903d4c8e5ba1e"
+        }
+      ],
+      "candidate_production_slugs": [
+        "resonance",
+        "resonance-qloo"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "market-surveillance",
+      "name": "Market Surveillance Research Platform",
+      "division_id": "ventures",
+      "kind": "venture",
+      "purpose": "Historical surveillance research and evidence analysis.",
+      "stage": "Research prototype",
+      "owner_role": "CHIEF_OF_STAFF",
+      "next_action": "Identify an authorized research user and measurable need before considering a commercial offer.",
+      "evidence_status": "REPOSITORY_DOCUMENTED",
+      "sources": [
+        {
+          "label": "Research scope",
+          "url": "https://github.com/P00NSMASHER/trading-platform/blob/6f7710512e6ac2f86e8cb12ad233a08980cf0220/README.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "1857e25649c49c5ef4d3de58d336c8cf8c0a68ee"
+        },
+        {
+          "label": "Declared Portfolio Brain project identity",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/registry/projects.json",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "4800a6fcaac9ff210c94d0396815f8f0432197af"
+        }
+      ],
+      "candidate_production_slugs": [
+        "trading-platform"
+      ],
+      "commercial_readiness": "NOT_ASSESSED"
+    }
+  ],
+  "services": [
+    {
+      "id": "freight",
+      "name": "Freight",
+      "initial_rollout": true,
+      "scope": "Carrier invoices and controlling rates.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "accounts-payable",
+      "name": "Accounts payable",
+      "initial_rollout": true,
+      "scope": "Duplicate payments, supplier statements and unapplied credits.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "warranty-credit",
+      "name": "Warranty and supplier credits",
+      "initial_rollout": true,
+      "scope": "Reviewed credit entitlements and actual settlements.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "procurement",
+      "name": "Procurement",
+      "initial_rollout": true,
+      "scope": "Invoice prices and quantities against approved purchase terms.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "rebates",
+      "name": "Rebates",
+      "initial_rollout": true,
+      "scope": "Earned rebates against program terms and settlements.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "parcel",
+      "name": "Parcel",
+      "initial_rollout": true,
+      "scope": "Parcel invoice charges against reviewed rate assessments.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "utilities",
+      "name": "Utilities",
+      "initial_rollout": true,
+      "scope": "Business bills and usage against effective tariffs.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "payer",
+      "name": "Payer",
+      "initial_rollout": false,
+      "scope": "Professionally reviewed provider claim and remittance evidence.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "duty",
+      "name": "Duty",
+      "initial_rollout": false,
+      "scope": "Customs charges and professionally reviewed expected assessments.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "saas",
+      "name": "SaaS",
+      "initial_rollout": false,
+      "scope": "Subscription rates and independently evidenced billable units.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "telecom",
+      "name": "Telecom",
+      "initial_rollout": false,
+      "scope": "Contracted services and independently evidenced usage.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "lease",
+      "name": "Lease",
+      "initial_rollout": false,
+      "scope": "Effective lease terms and supported allocations.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "construction",
+      "name": "Construction",
+      "initial_rollout": false,
+      "scope": "Reviewed entitlement, scope and settlement evidence.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "tax",
+      "name": "Tax",
+      "initial_rollout": false,
+      "scope": "Professionally reviewed transaction-tax assessments.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "insurance",
+      "name": "Insurance",
+      "initial_rollout": false,
+      "scope": "Professionally reviewed claim and coverage assessments.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "cloud",
+      "name": "Cloud",
+      "initial_rollout": false,
+      "scope": "Effective contracts and independently evidenced metering.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "merchant-fees",
+      "name": "Merchant fees",
+      "initial_rollout": false,
+      "scope": "Processor-controlled fees and merchant agreements.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    },
+    {
+      "id": "payroll-benefits",
+      "name": "Payroll and benefit billing",
+      "initial_rollout": false,
+      "scope": "Employer vendor or carrier charges and billable units.",
+      "business_id": "retally-recovery",
+      "commercial_readiness": "NOT_ASSESSED"
+    }
+  ],
+  "shared_systems": [
+    {
+      "id": "portfolio-brain",
+      "name": "Portfolio Brain",
+      "purpose": "Authorized engineering, reliability and portfolio reporting across both commercial and noncommercial projects. Group reporting does not change its wider mission.",
+      "sources": [
+        {
+          "label": "Portfolio Brain scope",
+          "url": "https://github.com/P00NSMASHER/portfolio-brain/blob/35ad71868f74e6d4f749a35630a1b86802b91ed0/README.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "a6ba8bf831806879b6a2cc86076b94979bba2bb9"
+        }
+      ]
+    },
+    {
+      "id": "recoveryos",
+      "name": "RecoveryOS",
+      "purpose": "Recovery evidence, calculations, review and case lifecycle.",
+      "sources": [
+        {
+          "label": "Recovery platform",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/recoveryworks/README.md",
+          "observed_on": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "app-factory",
+      "name": "App Factory",
+      "purpose": "Reusable engineering components and governed product development.",
+      "sources": [
+        {
+          "label": "Canonical software factory",
+          "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/blob/04252c375e8abf8564dd42a5fd5524bf6635a4fa/ai_business_os/SOFTWARE_FACTORY_CONTRACT.md",
+          "observed_on": "2026-10-20",
+          "git_blob_sha": "b71a6c7b6efd907e900bbbe80e6c250939be24bf"
+        }
+      ]
+    }
+  ],
+  "workflow": [
+    {
+      "id": "inquiry",
+      "label": "Inquiry",
+      "owner_role": "GROWTH_SALES",
+      "required_evidence": [
+        "Private account reference",
+        "Service requested",
+        "Source and receipt timestamp"
+      ]
+    },
+    {
+      "id": "qualified",
+      "label": "Qualified",
+      "owner_role": "GROWTH_SALES",
+      "required_evidence": [
+        "Buyer fit review",
+        "Bounded need",
+        "Relevant service and owner"
+      ]
+    },
+    {
+      "id": "scoped",
+      "label": "Scoped",
+      "owner_role": "CHIEF_OF_STAFF",
+      "required_evidence": [
+        "Written deliverable and price basis",
+        "Scope and permitted sources",
+        "Applicable contracting-identity check"
+      ]
+    },
+    {
+      "id": "ready",
+      "label": "Ready for fulfillment",
+      "owner_role": "OPERATIONS",
+      "required_evidence": [
+        "Service-specific customer authorization",
+        "Applicable release approval",
+        "Secure delivery destination",
+        "Payment condition satisfied for this offer"
+      ]
+    },
+    {
+      "id": "fulfillment",
+      "label": "In fulfillment",
+      "owner_role": "OPERATIONS",
+      "required_evidence": [
+        "Immutable engagement reference",
+        "Authorized input references",
+        "Delivery plan and due date"
+      ]
+    },
+    {
+      "id": "quality-reviewed",
+      "label": "Quality reviewed",
+      "owner_role": "AUTOMATED_QUALITY_GATE",
+      "required_evidence": [
+        "Independent automated test and source-validity receipts bound to the exact artifact",
+        "Recorded current source revision and reproducible quality results",
+        "Resolved material defects and enforceable release checks"
+      ]
+    },
+    {
+      "id": "delivered",
+      "label": "Delivered",
+      "owner_role": "OPERATIONS",
+      "required_evidence": [
+        "Approved final artifact reference",
+        "Permitted delivery action",
+        "Provider-backed delivery receipt"
+      ]
+    },
+    {
+      "id": "closed",
+      "label": "Closed",
+      "owner_role": "FINANCE_ANALYTICS",
+      "required_evidence": [
+        "Outcome and corrections recorded",
+        "Fee/payment reconciliation or documented exception",
+        "Retention and deletion schedule"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "id": "group-foundation",
+      "title": "Publish the group operating foundation",
+      "owner_role": "ENGINEERING",
+      "timeframe": "Days 1\u201314",
+      "status": "IN_PROGRESS",
+      "done_when": "Versioned register, workflow and dashboard pass reproducible automated checks, with no mandatory human review."
+    },
+    {
+      "id": "identity-map",
+      "title": "Reconcile existing business identities",
+      "owner_role": "CHIEF_OF_STAFF",
+      "timeframe": "Days 1\u201314",
+      "status": "PLANNED",
+      "done_when": "Every retained venture maps to a canonical private identity or has a specific unresolved source gap."
+    },
+    {
+      "id": "private-register",
+      "title": "Connect the private customer register",
+      "owner_role": "ENGINEERING",
+      "timeframe": "Days 15\u201345",
+      "status": "PLANNED",
+      "done_when": "A reviewed adapter maps authorized records to the existing private source of truth; duplicates and access boundaries pass acceptance."
+    },
+    {
+      "id": "first-delivery",
+      "title": "Verify repeatable customer delivery",
+      "owner_role": "OPERATIONS",
+      "timeframe": "Days 15\u201345",
+      "status": "PLANNED",
+      "done_when": "Existing product-specific release checks and one genuine authorized delivery are evidenced for each active pilot."
+    },
+    {
+      "id": "financial-view",
+      "title": "Connect evidence-backed financial reporting",
+      "owner_role": "FINANCE_ANALYTICS",
+      "timeframe": "Days 15\u201345",
+      "status": "PLANNED",
+      "done_when": "Collected fees, costs, refunds and customer recoveries reconcile separately by business and currency."
+    },
+    {
+      "id": "referral-pilot",
+      "title": "Evaluate one relevant cross-service referral",
+      "owner_role": "GROWTH_SALES",
+      "timeframe": "Days 46\u201390",
+      "status": "PLANNED",
+      "done_when": "A customer-authorized referral has a tracked outcome and measured delivery effort; no duplicate revenue attribution."
+    },
+    {
+      "id": "brand-rollout",
+      "title": "Prepare the endorsed-brand rollout",
+      "owner_role": "PRODUCT",
+      "timeframe": "Days 46\u201390",
+      "status": "PLANNED",
+      "done_when": "Approved name/ownership checks and product-specific copy support the proposed group directory."
+    }
+  ],
+  "boundaries": {
+    "live_customer_state": "NOT_CONNECTED",
+    "legal_identity": "UNVERIFIED",
+    "public_brand_rollout": "PLANNED",
+    "new_external_spend_cents": 0
+  },
+  "financial_metrics": {
+    "qualified_leads": null,
+    "paying_customers": null,
+    "cash_collected": null,
+    "contribution_profit": null
+  },
+  "exclusions": [
+    {
+      "scope": "private-family-projects",
+      "reason": "Noncommercial and outside group customer operations."
+    },
+    {
+      "scope": "retired-products",
+      "reason": "Historical projects do not become active businesses through this catalog."
+    }
+  ],
+  "authority": {
+    "planning_only": true,
+    "external_actions_authorized": false,
+    "public_rebrand_authorized": false,
+    "production_state_mutation_authorized": false,
+    "registration_policy": "Deferred under existing owner policy; this package does not determine applicable legal obligations.",
+    "internal_human_review_required": false,
+    "internal_quality_gate": "AUTOMATED_EVIDENCE_QA"
+  }
+}

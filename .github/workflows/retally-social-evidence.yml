@@ -1,0 +1,169 @@
+name: RETALLY social evidence review
+
+on:
+  pull_request:
+    paths:
+      - 'freight/brand/social/performance/**'
+      - '.github/workflows/retally-social-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-review-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Check out reviewed commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Unit tests — zero social API calls
+        run: python3 -m unittest discover -s freight/brand/social/performance -p 'test_*.py' -v
+      - name: Exercise safe synthetic report
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/example_metricool_snapshot.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --output "$RUNNER_TEMP/retally-social-evidence.md" \
+            --json-output "$RUNNER_TEMP/retally-social-evidence.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-social-evidence.json').read_text())
+          assert d['counts']['DRAFT'] == 1
+          assert d['counts']['UPCOMING_NOT_YET_PUBLIC'] == 2
+          assert d['counts']['VERIFIED_PUBLIC'] == 0
+          assert all('SYNTHETIC_' in p['uuid'] for p in d['posts'])
+          print('Offline social evidence reporting PASS; no real posting side effects')
+          PY
+      - name: Exercise strict provider-row join (synthetic, read-only)
+        run: |
+          python3 freight/brand/social/performance/metricool_join.py \
+            --schedule freight/brand/social/performance/example_metricool_snapshot.json \
+            --facebook-export freight/brand/social/performance/fixture-facebook-metricool-SYNTHETIC.json \
+            --instagram-export freight/brand/social/performance/fixture-instagram-metricool-SYNTHETIC.json \
+            --as-of 2026-10-14T16:00:00Z \
+            --output "$RUNNER_TEMP/retally-provider-evidence.md" \
+            --json-output "$RUNNER_TEMP/retally-provider-evidence.json" \
+            --verified-metrics-output "$RUNNER_TEMP/retally-provider-verified-only.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          result=json.loads((root/'retally-provider-evidence.json').read_text())
+          verified=json.loads((root/'retally-provider-verified-only.json').read_text())
+          assert result['counts']['provider_matched'] == 2
+          assert result['counts']['independently_verified_matched'] == 0
+          assert result['counts']['unmatched_or_rejected'] == 0
+          assert not verified['posts']
+          assert all(c['evidence_state']=='PROVIDER_REPORTED_UNVERIFIED' for c in result['candidates'])
+          print('SYNTHETIC Metricool rows joined, publication unverified and no metric export PASS')
+          PY
+      - name: Check prelaunch queue drift detection (no network)
+        run: |
+          python3 freight/brand/social/performance/queue_preflight.py \
+            --baseline freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --current freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-preflight.json" \
+            --output "$RUNNER_TEMP/retally-preflight.md" \
+            --fail-on-risk
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-preflight.json').read_text())
+          assert result['baseline_active'] == result['current_active'] == 13
+          assert result['baseline_drafts'] == result['current_drafts'] == 4
+          assert result['severity_counts'] == {'HIGH':0, 'WARN':0, 'INFO':0}
+          assert result['publication_verification'] == 'NOT_CHECKED'
+          print('RETALLY frozen social queue preflight PASS; no external changes')
+          PY
+      - name: Validate frozen real launch-planner snapshot
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-11.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-launch-frozen.json" \
+            --output "$RUNNER_TEMP/retally-launch-frozen.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d = json.loads((Path(os.environ['RUNNER_TEMP']) / 'retally-launch-frozen.json').read_text())
+          assert d['counts']['DRAFT'] == 4
+          assert d['counts']['UPCOMING_NOT_YET_PUBLIC'] == 13
+          assert d['counts']['VERIFIED_PUBLIC'] == 0
+          assert len(d['posts']) == 17
+          assert not [p for p in d['posts'] if not p['draft'] and p['warnings']]
+          print('Frozen RETALLY campaign snapshot PASS: 13 active + 4 unpublished draft entries')
+          PY
+
+      - name: Verify approved master revision without changing historical snapshot
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-creative-approved.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-creative-revision.json" \
+            --output "$RUNNER_TEMP/retally-creative-revision.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          r = json.loads((Path(os.environ["RUNNER_TEMP"])/"retally-creative-revision.json").read_text())
+          assert r["counts"]["DRAFT"] == 4
+          assert r["counts"]["UPCOMING_NOT_YET_PUBLIC"] == 13
+          assert r["counts"]["VERIFIED_PUBLIC"] == 0
+          assert not [p for p in r["posts"] if not p["draft"] and p["warnings"]]
+          print("Premium creative revision PASS; historical baseline left untouched")
+          PY
+
+      - name: Validate second approved premium revision (no network)
+        run: |
+          python3 freight/brand/social/performance/social_review.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-oct14-15-creative-approved.json \
+            --as-of 2026-10-11T15:00:00Z \
+            --json-output "$RUNNER_TEMP/retally-oct14-15-accepted.json" \
+            --output "$RUNNER_TEMP/retally-oct14-15-accepted.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d=json.loads((Path(os.environ["RUNNER_TEMP"])/"retally-oct14-15-accepted.json").read_text())
+          assert d["counts"]["DRAFT"]==4
+          assert d["counts"]["UPCOMING_NOT_YET_PUBLIC"]==13
+          assert d["counts"]["VERIFIED_PUBLIC"]==0
+          assert len(d["posts"])==17
+          assert not [p for p in d["posts"] if not p["draft"] and p["warnings"]]
+          print("RETALLY Oct14/15 approved media revision PASS; original history preserved")
+          PY
+
+      - name: Build offline public URL manifest (zero external requests)
+        run: |
+          python3 freight/brand/social/performance/public_asset_preflight.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-oct14-15-creative-approved.json \
+            --json-output "$RUNNER_TEMP/retally-url-manifest.json" \
+            --output "$RUNNER_TEMP/retally-url-manifest.md"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          d=json.loads((Path(os.environ['RUNNER_TEMP'])/'retally-url-manifest.json').read_text())
+          assert d['counts']['NOT_CHECKED']==19
+          assert sum(t['kind']=='image' for t in d['targets'])==12
+          assert sum(t['kind']=='landing' for t in d['targets'])==7
+          assert d['publication_verified'] is False
+          print('Read-only manifest PASS: 12 unique public images + 7 campaign pages')
+          PY
+      - name: Inspect public URLs (manual dispatch only, GET-only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 freight/brand/social/performance/public_asset_preflight.py \
+            --schedule freight/brand/social/performance/baselines/retally-2026-10-12-oct14-15-creative-approved.json \
+            --live --output /tmp/retally-public-check.md \
+            --json-output /tmp/retally-public-check.json
+      - name: Upload manually requested public-check report
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-public-asset-landing-report
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            /tmp/retally-public-check.md
+            /tmp/retally-public-check.json

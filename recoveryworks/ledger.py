@@ -20,6 +20,8 @@ from .models import (
     canonical_hash,
     normalize_utc_timestamp,
 )
+from .financial_events import CashEvent
+from .models import normalize_sha256
 from .policies import assert_claim_authorizable
 from .readiness import (
     SevenFigureAuthorizationDossier,
@@ -61,10 +63,37 @@ class LedgerRecord:
         return canonical_hash(payload)
 
 
+class EconomicLossConflict(ValueError):
+    """A changed proof must be reconciled with its existing economic case."""
+
+    def __init__(self, finding_id: str):
+        self.finding_id = finding_id
+        super().__init__("economic loss already recorded as " + finding_id
+                         + "; reconcile changed evidence before adding another case")
+
+
+def economic_loss_key(finding: RecoveryFinding) -> tuple:
+    # Evidence hashes identify proof versions, not separate financial losses.
+    explicit = finding.metadata.get("economic_loss_id")
+    if explicit is not None:
+        if not isinstance(explicit, str) or not explicit.strip():
+            raise ValueError("economic_loss_id must be nonempty text")
+        return (finding.client_id, finding.currency, "explicit", explicit.strip())
+    return (finding.client_id, finding.currency, finding.branch.value,
+            finding.counterparty_id, finding.reference,
+            finding.metadata.get("account_id", ""),
+            finding.metadata.get("shipment_id", ""),
+            finding.metadata.get("business_unit", ""))
+
+
 class RecoveryLedger:
     def __init__(self) -> None:
         self._records: dict[str, LedgerRecord] = {}
         self._proof_index: dict[str, str] = {}
+        self._economic_index: dict[tuple, str] = {}
+        self._reconciliation_holds: dict[str, str] = {}
+        self._cash_events: dict[tuple[str, str], CashEvent] = {}
+        self._superseded: dict[str, str] = {}
         self._settlement_id_index: dict[tuple[str, str], str] = {}
         self._settlement_source_index: dict[tuple[str, str, str], str] = {}
 
@@ -123,6 +152,9 @@ class RecoveryLedger:
             return self._records[existing_id]
         if finding.finding_id in self._records:
             raise ValueError("finding_id already exists with different proof")
+        key = economic_loss_key(finding)
+        if key in self._economic_index:
+            raise EconomicLossConflict(self._economic_index[key])
         state = CaseState.VALIDATED if finding.state is FindingState.VALIDATED else CaseState.REVIEW
         record = LedgerRecord(
             finding=finding,
@@ -131,7 +163,139 @@ class RecoveryLedger:
         )
         self._records[finding.finding_id] = record
         self._proof_index[finding.proof_hash] = finding.finding_id
+        self._economic_index[key] = finding.finding_id
         return record
+
+    def hold_for_reconciliation(self, finding_id: str, reason: str, *, occurred_at=None):
+        record = self.get(finding_id)
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("reconciliation hold reason required")
+        self._transition_time(record, occurred_at)
+        self._reconciliation_holds[finding_id] = reason.strip()
+        return record
+
+    def resolve_reconciliation(self, finding_id: str, *, reviewer_id: str,
+                               independent_reviewer_id: str, evidence_hash: str,
+                               expected_record_hash: str, expected_hold_hash: str, note: str, occurred_at=None):
+        record = self.get(finding_id)
+        if finding_id not in self._reconciliation_holds:
+            raise ValueError("case has no reconciliation hold")
+        reviewer = self._text("reviewer_id", reviewer_id)
+        independent = self._text("independent_reviewer_id", independent_reviewer_id)
+        if reviewer == independent:
+            raise ValueError("reconciliation requires distinct reviewers")
+        normalize_sha256("evidence_hash", evidence_hash)
+        self._text("note", note)
+        if expected_hold_hash != self.reconciliation_hold_hash(finding_id):
+            raise ValueError("stale reconciliation hold review")
+        if expected_record_hash != record.record_hash:
+            raise ValueError("stale reconciliation review")
+        timestamp = self._transition_time(record, occurred_at)
+        if record.case_state in {CaseState.REVIEW, CaseState.VALIDATED, CaseState.AUTHORIZED}:
+            # Retaining the reviewed proof never retains stale claim permission.
+            record = replace(record, case_state=(CaseState.VALIDATED if
+                record.finding.state is FindingState.VALIDATED else CaseState.REVIEW),
+                reviewer_approved=False, reviewer_id=None, review_note=None,
+                independent_reviewer_id=None, independent_review_note=None,
+                authorization_id=None, customer_actor_id=None, case_bundle_hash=None,
+                authorization_hash=None, readiness_hash=None, readiness_dossier_hash=None,
+                external_action_envelope_hash=None, updated_at=timestamp)
+        else:
+            record = replace(record, updated_at=timestamp)
+        self._records[finding_id] = record
+        del self._reconciliation_holds[finding_id]
+        return record
+
+    def revise_held_case(self, finding_id: str, replacement: RecoveryFinding, *,
+                         reviewer_id: str, independent_reviewer_id: str, evidence_hash: str,
+                         expected_record_hash: str, expected_hold_hash: str, note: str, occurred_at=None):
+        record = self.get(finding_id)
+        self._require_state(record, {CaseState.REVIEW, CaseState.VALIDATED, CaseState.AUTHORIZED}, "case revision")
+        if record.recovered_cents or record.fee_cents:
+            raise ValueError("cash-bearing cases require settlement reconciliation, not revision")
+        if not isinstance(replacement, RecoveryFinding):
+            raise ValueError("replacement must be a RecoveryFinding")
+        if replacement.finding_id in self._records or replacement.proof_hash in self._proof_index:
+            raise ValueError("replacement already exists")
+        if replacement.branch != record.finding.branch or economic_loss_key(replacement) != economic_loss_key(record.finding):
+            raise ValueError("replacement must describe the same economic loss")
+        # This validates hold, distinct reviewers, current proof and evidence hash before mutation.
+        RecoveryLedger.resolve_reconciliation(self, finding_id, reviewer_id=reviewer_id,
+            independent_reviewer_id=independent_reviewer_id, evidence_hash=evidence_hash,
+            expected_record_hash=expected_record_hash, expected_hold_hash=expected_hold_hash, note=note, occurred_at=occurred_at)
+        timestamp = self.get(finding_id).updated_at
+        self._records[finding_id] = replace(self.get(finding_id), case_state=CaseState.REJECTED,
+                                            review_note="Superseded: " + note)
+        updated = LedgerRecord(finding=replacement, case_state=(CaseState.VALIDATED if
+            replacement.state is FindingState.VALIDATED else CaseState.REVIEW), updated_at=timestamp)
+        self._records[replacement.finding_id] = updated
+        self._proof_index[replacement.proof_hash] = replacement.finding_id
+        self._economic_index[economic_loss_key(replacement)] = replacement.finding_id
+        self._superseded[finding_id] = replacement.finding_id
+        return updated
+
+    def active_records(self):
+        return tuple(r for r in self.records() if r.finding.finding_id not in self._superseded)
+
+    def post_cash_event(self, event: CashEvent, *, occurred_at=None):
+        if not isinstance(event, CashEvent) or not event.verified:
+            raise ValueError("verified CashEvent required")
+        record = self.get(event.finding_id)
+        client = record.finding.client_id
+        key = (client, event.event_id)
+        previous = self._cash_events.get(key)
+        if previous is not None:
+            if previous != event:
+                raise ValueError("cash event identity reused with different evidence")
+            return record
+        self._check_reconciliation_hold(event.finding_id)
+        self._require_state(record, {CaseState.CLAIMED, CaseState.RECOVERED}, "cash posting")
+        if event.currency != record.finding.currency:
+            raise ValueError("cash currency mismatch")
+        if key in self._settlement_id_index:
+            raise ValueError("cash event identity already allocated")
+        source_key = (client, event.source_hash, event.source_locator)
+        if source_key in self._settlement_source_index:
+            raise ValueError("cash source line already allocated")
+        timestamp = self._transition_time(record, occurred_at)
+        if event.observed_at < record.updated_at or event.observed_at > timestamp:
+            raise ValueError("cash evidence date outside transition interval")
+        if event.amount_cents < 0:
+            original = self._cash_events.get((client, event.reverses_id))
+            if original is None or original.finding_id != event.finding_id or original.amount_cents <= 0:
+                raise ValueError("reversal requires original receipt in this case")
+            reversals = [e for (c, _), e in self._cash_events.items()
+                         if c == client and e.reverses_id == event.reverses_id]
+            if -sum(e.amount_cents for e in reversals) - event.amount_cents > original.amount_cents:
+                raise ValueError("reversal exceeds original receipt")
+            if -sum(e.fee_cents for e in reversals) - event.fee_cents > original.fee_cents:
+                raise ValueError("fee reversal exceeds original fee")
+        recovered = record.recovered_cents + event.amount_cents
+        fees = record.fee_cents + event.fee_cents
+        if not 0 <= fees <= recovered <= record.finding.potential_recovery_cents:
+            raise ValueError("cash or fee balance exceeds case bounds")
+        updated = replace(record, case_state=CaseState.RECOVERED, recovered_cents=recovered,
+                          fee_cents=fees, settlement_id=event.event_id,
+                          settlement_evidence_hash=event.proof_hash,
+                          settlement_observed_at=event.observed_at, updated_at=timestamp)
+        self._records[event.finding_id] = updated
+        self._cash_events[key] = event
+        self._settlement_id_index[key] = event.finding_id
+        self._settlement_source_index[source_key] = event.finding_id
+        return updated
+
+    def reconciliation_hold_hash(self, finding_id: str) -> str:
+        if finding_id not in self._reconciliation_holds:
+            raise ValueError("case has no reconciliation hold")
+        return canonical_hash({"finding_id": finding_id,
+                               "reason": self._reconciliation_holds[finding_id]})
+
+    def reconciliation_holds(self) -> dict[str, str]:
+        return dict(self._reconciliation_holds)
+
+    def _check_reconciliation_hold(self, finding_id: str) -> None:
+        if finding_id in self._reconciliation_holds:
+            raise ValueError("case is held for evidence reconciliation")
 
     def get(self, finding_id: str) -> LedgerRecord:
         try:
@@ -149,6 +313,7 @@ class RecoveryLedger:
     ) -> LedgerRecord:
         reviewer_id = self._text("reviewer_id", reviewer_id)
         note = self._text("review note", note)
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "approval")
         if record.reviewer_approved:
@@ -174,6 +339,7 @@ class RecoveryLedger:
     ) -> LedgerRecord:
         reviewer_id = self._text("independent reviewer_id", reviewer_id)
         note = self._text("independent review note", note)
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "independent approval")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -200,6 +366,7 @@ class RecoveryLedger:
         occurred_at: str | None = None,
     ) -> LedgerRecord:
         authorization_id = self._text("authorization_id", authorization_id)
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "authorization")
         if self._high_value(record):
@@ -226,6 +393,7 @@ class RecoveryLedger:
         *,
         occurred_at: str | None = None,
     ) -> LedgerRecord:
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         self._require_state(record, {CaseState.VALIDATED}, "case authorization")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -305,6 +473,7 @@ class RecoveryLedger:
         *,
         occurred_at: str | None = None,
     ) -> LedgerRecord:
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
             raise ValueError("claim action requires explicit authorization")
@@ -351,6 +520,7 @@ class RecoveryLedger:
         *,
         occurred_at: str | None = None,
     ) -> LedgerRecord:
+        self._check_reconciliation_hold(finding_id)
         record = self.get(finding_id)
         if record.case_state is not CaseState.CLAIMED:
             raise ValueError("only CLAIMED cases may be marked recovered")
@@ -393,6 +563,10 @@ class RecoveryLedger:
         self._records[finding_id] = updated
         self._settlement_id_index[settlement_key] = finding_id
         self._settlement_source_index[source_key] = finding_id
+        self._cash_events[settlement_key] = CashEvent(
+            settlement.settlement_id, finding_id, settlement.recovered_cents, fee_cents,
+            settlement.currency, settlement.source_hash, settlement.source_locator,
+            settlement.observed_at, settlement.verified)
         return updated
 
     def reject(
@@ -427,7 +601,7 @@ class RecoveryLedger:
     def rollup(self) -> dict:
         branches: dict[str, dict[str, int]] = {}
         total_potential = total_validated = total_recovered = total_fees = 0
-        for record in self.records():
+        for record in self.active_records():
             key = record.finding.branch.value
             bucket = branches.setdefault(key, {
                 "cases": 0,
@@ -450,7 +624,7 @@ class RecoveryLedger:
         return {
             "branches": branches,
             "totals": {
-                "cases": len(self._records),
+                "cases": len(self.active_records()),
                 "potential_cents": total_potential,
                 "validated_cents": total_validated,
                 "recovered_cents": total_recovered,

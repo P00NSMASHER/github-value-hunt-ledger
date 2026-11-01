@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, TypeVar
 
+from freight.financial_assurance import require_cent_currency, require_exact_cents
+from freight.contracts import canonical_hash
+
 AUTO, REVIEW = "AUTO", "REVIEW"
 ALLOCATED, ALREADY_ALLOCATED = "ALLOCATED", "ALREADY_ALLOCATED"
 REVERSED, ALREADY_REVERSED = "REVERSED", "ALREADY_REVERSED"
@@ -263,10 +266,7 @@ class SettlementStore:
 
     @staticmethod
     def _currency(value: str) -> str:
-        normalized = SettlementStore._text("currency", value).upper()
-        if _CURRENCY_RE.fullmatch(normalized) is None:
-            raise ValueError("currency must be a three-letter code")
-        return normalized
+        return require_cent_currency(SettlementStore._text("currency", value))
 
     @staticmethod
     def _timestamp(name: str, value: str) -> str:
@@ -286,11 +286,13 @@ class SettlementStore:
 
     @staticmethod
     def _positive_cents(name: str, value: int) -> int:
-        # Input adapters must perform any explicit, reviewed currency conversion.
-        # Silently truncating fractional cents here changes immutable evidence.
-        if type(value) is not int or not 0 < value <= 2**63 - 1:
-            raise ValueError(f"{name} must be positive integer cents within SQLite range")
-        return value
+        # This store is cent-denominated only; never accept fractional amounts
+        # or infer a conversion from a currency with different minor units.
+        try:
+            return require_exact_cents(name, value, positive=True)
+        except ValueError as exc:
+            # Preserve existing caller/error contract without loosening validation.
+            raise ValueError(f"{name} must be positive integer cents within SQLite range") from exc
 
     @staticmethod
     def _same(row: sqlite3.Row, values: dict[str, object]) -> bool:
@@ -357,6 +359,93 @@ class SettlementStore:
 
         return self._write(op)
 
+    def place_claim_dispute_hold(
+        self,
+        *,
+        claim_id: str,
+        kind: str,
+        source_hash: str,
+        observed_at: str,
+        expected_claim_source_sha256: str,
+    ) -> bool:
+        """Durably quarantine disputed recovery attribution, not credit evidence.
+
+        Any source-declared denial may conservatively hold a claim, but is not
+        itself authenticated contractual, bank or customer consent. No release
+        path is supplied by an unauthenticated role string.
+        """
+        allowed = {
+            "CARRIER_DISPUTE", "CARRIER_DENIAL", "CUSTOMER_DISPUTE",
+            "CUSTOMER_WITHDRAWAL", "INSOLVENCY_NOTICE",
+            "CARRIER_OUT_OF_BUSINESS", "CLAIM_TIME_BAR_CONCERN",
+        }
+        claim_id = self._text("claim_id", claim_id)
+        if kind not in allowed:
+            raise ValueError("unsupported claim dispute hold kind")
+        source_hash = self._source_hash(source_hash)
+        expected_claim_source_sha256 = self._source_hash(
+            expected_claim_source_sha256
+        )
+        observed_at = self._timestamp("observed_at", observed_at)
+        hold_id = canonical_hash({
+            "schema": 1, "buyer": self.buyer_id, "unit": self.business_unit,
+            "claim_id": claim_id, "kind": kind, "source_hash": source_hash,
+            "observed_at": observed_at,
+        })
+
+        def op(conn: sqlite3.Connection) -> bool:
+            claim = conn.execute(
+                "SELECT issued_at,source_hash FROM recovery_claims "
+                "WHERE buyer_id=? AND business_unit=? AND claim_id=?",
+                (*self._scope, claim_id),
+            ).fetchone()
+            if claim is None:
+                raise ValueError("unknown claim for dispute hold")
+            if claim["source_hash"] != expected_claim_source_sha256:
+                raise ValueError("dispute hold claim source mismatch")
+            if source_hash == expected_claim_source_sha256:
+                raise ValueError("dispute notice must have independent source")
+            if observed_at < claim["issued_at"]:
+                raise ValueError("dispute hold cannot predate issued claim")
+            old = conn.execute(
+                "SELECT * FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND hold_id=?",
+                (*self._scope, hold_id),
+            ).fetchone()
+            if old:
+                if all(old[name] == value for name, value in {
+                    "claim_id": claim_id, "kind": kind,
+                    "source_hash": source_hash, "observed_at": observed_at,
+                }.items()):
+                    return False
+                raise ValueError("dispute hold replay conflicts with immutable evidence")
+            if conn.execute(
+                "SELECT 1 FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND source_hash=?",
+                (*self._scope, source_hash),
+            ).fetchone():
+                raise ValueError("dispute notice source already used for another hold")
+            conn.execute(
+                "INSERT INTO claim_dispute_holds "
+                "(buyer_id,business_unit,hold_id,claim_id,kind,observed_at,source_hash) "
+                "VALUES(?,?,?,?,?,?,?)",
+                (*self._scope, hold_id, claim_id, kind, observed_at, source_hash),
+            )
+            return True
+        return self._write(op)
+
+    def dispute_hold_active(self, claim_id: str) -> bool:
+        """Read an immutable active hold. No unauthenticated release exists."""
+        claim_id = self._text("claim_id", claim_id)
+        def read(conn: sqlite3.Connection) -> bool:
+            row = conn.execute(
+                "SELECT 1 FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND claim_id=? LIMIT 1",
+                (*self._scope, claim_id),
+            ).fetchone()
+            return row is not None
+        return self._read(read)
+
     def ingest_event(self, event: SettlementEventRecord) -> bool:
         v = dict(
             buyer_id=self.buyer_id,
@@ -405,7 +494,7 @@ class SettlementStore:
         )
         def op(conn: sqlite3.Connection) -> bool:
             original = conn.execute(
-                "SELECT currency,booked_at FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+                "SELECT currency,booked_at,amount_cents FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
                 (*self._scope, v["original_event_id"]),
             ).fetchone()
             if not original:
@@ -427,6 +516,13 @@ class SettlementStore:
                 (*self._scope, v["source_hash"]),
             ).fetchone():
                 raise ValueError("counter source_hash already used")
+            already_returned = int(conn.execute(
+                "SELECT COALESCE(SUM(amount_cents),0) FROM counter_events "
+                "WHERE buyer_id=? AND business_unit=? AND original_event_id=?",
+                (*self._scope, v["original_event_id"]),
+            ).fetchone()[0])
+            if already_returned + v["amount_cents"] > int(original["amount_cents"]):
+                raise ValueError("total return exceeds the immutable original credit")
             conn.execute("""INSERT INTO counter_events
               (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
               VALUES(:buyer_id,:business_unit,:counter_id,:original_event_id,:currency,:amount_cents,:observed_at,:source_hash,:source_kind)""", v)
@@ -464,6 +560,47 @@ class SettlementStore:
         normalized = self._text("event_id", event_id)
         return self._read(lambda c: self._event_residual(c, normalized))
 
+
+
+    def _event_return_capacity(
+        self, conn: sqlite3.Connection, event_id: str,
+    ) -> tuple[int, int, int]:
+        """Conserve a credit's original value across allocations and returns.
+
+        Return (source-declared net remaining credit capacity, unapplied
+        counter cents, currently live allocated cents). All reads occur inside
+        the caller's existing SQLite write transaction.
+        """
+        source = conn.execute(
+            "SELECT amount_cents FROM settlement_events "
+            "WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()
+        if source is None:
+            raise ValueError("source settlement event missing")
+        counters = int(conn.execute(
+            "SELECT COALESCE(SUM(amount_cents),0) FROM counter_events "
+            "WHERE buyer_id=? AND business_unit=? AND original_event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()[0])
+        applied = int(conn.execute(
+            "SELECT COALESCE(SUM(r.amount_cents),0) FROM reversal_edges r "
+            "JOIN counter_events c ON c.buyer_id=r.buyer_id "
+            "AND c.business_unit=r.business_unit AND c.counter_id=r.counter_id "
+            "WHERE r.buyer_id=? AND r.business_unit=? AND c.original_event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()[0])
+        allocated = int(conn.execute(
+            "SELECT COALESCE(SUM(amount_cents),0) FROM allocations "
+            "WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()[0])
+        if not (0 <= applied <= counters <= int(source["amount_cents"])):
+            raise ValueError("source return evidence exceeds original credit")
+        if not (0 <= allocated - applied <= int(source["amount_cents"])):
+            raise ValueError("source allocation/return conservation violated")
+        return int(source["amount_cents"]) - counters, counters - applied, allocated - applied
+
     def auto_allocate(self, event_id: str, *, created_at: str) -> Decision:
         event_id = self._text("event_id", event_id)
         created_at = self._timestamp("created_at", created_at)
@@ -477,6 +614,17 @@ class SettlementStore:
                 raise ValueError("unknown settlement event")
             if created_at < event["booked_at"]:
                 raise ValueError("allocation cannot predate settlement event")
+            if conn.execute(
+                "SELECT 1 FROM claim_dispute_holds h JOIN recovery_claims c "
+                "ON c.buyer_id=h.buyer_id AND c.business_unit=h.business_unit "
+                "AND c.claim_id=h.claim_id "
+                "WHERE h.buyer_id=? AND h.business_unit=? "
+                "AND c.reference=? AND c.payer_id=? AND c.payee_id=? "
+                "AND c.currency=? LIMIT 1",
+                (*self._scope, event["reference"],event["payer_id"],
+                 event["payee_id"],event["currency"]),
+            ).fetchone():
+                return Decision(REVIEW,reason="claim dispute hold prevents automatic recovery allocation")
             old = conn.execute(
                 "SELECT allocation_id FROM allocations WHERE buyer_id=? AND business_unit=? AND event_id=? ORDER BY allocation_id",
                 (*self._scope, event_id),
@@ -484,6 +632,13 @@ class SettlementStore:
             if old:
                 return Decision(ALREADY_ALLOCATED, tuple(r[0] for r in old), "event already consumed")
             remaining = self._event_residual(conn, event_id)
+            net_capacity, pending_return, live_allocated = self._event_return_capacity(
+                conn, event_id,
+            )
+            if pending_return:
+                return Decision(REVIEW, reason="unapplied counter-event return requires review")
+            if remaining > net_capacity - live_allocated:
+                return Decision(REVIEW, reason="source credit reduced by counter-event return")
             rows = conn.execute("""SELECT c.* FROM recovery_claims c
               LEFT JOIN review_claims r
                 ON r.buyer_id=c.buyer_id AND r.business_unit=c.business_unit AND r.claim_id=c.claim_id
@@ -531,6 +686,12 @@ class SettlementStore:
             ).fetchone()
             if not claim or not event:
                 raise ValueError("review allocation requires existing claim and settlement event")
+            if conn.execute(
+                "SELECT 1 FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=? AND claim_id=? LIMIT 1",
+                (*self._scope, claim_id),
+            ).fetchone():
+                raise ValueError("claim dispute hold prevents reviewed recovery allocation")
             if claim["currency"] != event["currency"]:
                 raise ValueError("allocation currency mismatch")
             if (claim["payer_id"], claim["payee_id"]) != (event["payer_id"], event["payee_id"]):
@@ -543,6 +704,13 @@ class SettlementStore:
                 raise ValueError("recovery claim capacity exceeded")
             if amount_cents > self._event_residual(conn, event_id):
                 raise ValueError("settlement event capacity exceeded")
+            net_capacity, pending_return, live_allocated = self._event_return_capacity(
+                conn, event_id,
+            )
+            if pending_return:
+                raise ValueError("unapplied return evidence blocks reviewed allocation")
+            if amount_cents > net_capacity - live_allocated:
+                raise ValueError("reviewed allocation exceeds credit net of counter returns")
             fee = 0 if claim["fee_disqualified"] else amount_cents
             conn.execute("""INSERT INTO allocations
               (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
@@ -655,8 +823,17 @@ class SettlementStore:
                 "SELECT reversal_id FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND counter_id=? ORDER BY reversal_id",
                 (*self._scope, counter_id),
             ).fetchall()
-            if old:
-                return Decision(ALREADY_REVERSED, tuple(r[0] for r in old), "counter already applied")
+            consumed = int(conn.execute(
+                "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
+                "WHERE buyer_id=? AND business_unit=? AND counter_id=?",
+                (*self._scope, counter_id),
+            ).fetchone()[0])
+            remaining_counter = int(counter["amount_cents"]) - consumed
+            if remaining_counter < 0:
+                raise ValueError("counter return was applied beyond original amount")
+            if remaining_counter == 0:
+                return Decision(ALREADY_REVERSED, tuple(r[0] for r in old),
+                                "counter fully applied, no pending return")
             event = conn.execute(
                 "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
                 (*self._scope, counter["original_event_id"]),
@@ -672,14 +849,17 @@ class SettlementStore:
             if any(created_at < row["created_at"] for row in live):
                 raise ValueError("reversal cannot predate allocation")
             total = sum(int(r["live_cents"]) for r in live)
-            if counter["amount_cents"] in (event["amount_cents"], total):
+            if remaining_counter == total or int(counter["amount_cents"]) == int(event["amount_cents"]):
+                # A return for the whole source event may reverse every
+                # available live allocation, even when some amount remains
+                # unapplied and must stay explicitly under REVIEW.
                 plan = [(r, int(r["live_cents"])) for r in live]
-            elif len(live) == 1 and counter["amount_cents"] <= live[0]["live_cents"]:
-                plan = [(live[0], int(counter["amount_cents"]))]
+            elif len(live) == 1 and remaining_counter <= live[0]["live_cents"]:
+                plan = [(live[0], remaining_counter)]
             else:
-                return Decision(REVIEW, reason="partial return is ambiguous across live allocation edges")
+                return Decision(REVIEW, reason="unapplied partial return is ambiguous across live allocation edges")
             ids = []
-            for i, (alloc, amount) in enumerate(plan, 1):
+            for i, (alloc, amount) in enumerate(plan, len(old) + 1):
                 edge = f"reversal:{counter_id}:{i}:{alloc['allocation_id']}"
                 conn.execute("""INSERT INTO reversal_edges
                   (buyer_id,business_unit,reversal_id,counter_id,allocation_id,amount_cents,created_at)
@@ -719,8 +899,31 @@ class SettlementStore:
                 "SELECT * FROM allocations WHERE buyer_id=? AND business_unit=?" + (" AND claim_id=?" if claim_id else ""),
                 params,
             ).fetchall()
+            held = {row[0] for row in conn.execute(
+                "SELECT DISTINCT claim_id FROM claim_dispute_holds "
+                "WHERE buyer_id=? AND business_unit=?",
+                self._scope,
+            ).fetchall()}
+            # A registered return without a reconciled reversal is still a
+            # claim against the source credit. Quarantine the entire affected
+            # event's provisional fee base; do not fabricate claim-level
+            # attribution of an ambiguous event-wide pending return.
+            pending_return_event_ids = {
+                row[0] for row in conn.execute(
+                    """SELECT DISTINCT c.original_event_id FROM counter_events c
+                    WHERE c.buyer_id=? AND c.business_unit=?
+                      AND c.amount_cents > COALESCE((
+                        SELECT SUM(r.amount_cents) FROM reversal_edges r
+                        WHERE r.buyer_id=c.buyer_id AND r.business_unit=c.business_unit
+                          AND r.counter_id=c.counter_id
+                      ),0)""",
+                    self._scope,
+                ).fetchall()
+            }
             total = 0
             for a in rows:
+                if a["claim_id"] in held or a["event_id"] in pending_return_event_ids:
+                    continue
                 reversed_cents = int(conn.execute(
                     "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND allocation_id=?",
                     (*self._scope, a["allocation_id"]),
@@ -731,7 +934,8 @@ class SettlementStore:
         return self._read(op)
 
     def count(self, table: str) -> int:
-        allowed = {"recovery_claims", "settlement_events", "allocations", "counter_events", "reversal_edges"}
+        allowed = {"recovery_claims", "settlement_events", "allocations",
+                   "counter_events", "reversal_edges", "claim_dispute_holds"}
         if table not in allowed:
             raise ValueError("unsupported count table")
         return self._read(lambda c: int(c.execute(
@@ -765,6 +969,15 @@ class SettlementStore:
                     )]
                     for table, key in tables
                 }
+                dispute_holds = [dict(row) for row in conn.execute(
+                    "SELECT * FROM claim_dispute_holds "
+                    "WHERE buyer_id=? AND business_unit=? ORDER BY hold_id",
+                    self._scope,
+                )]
+                # An empty hold ledger retains legacy no-dispute hashes.
+                # A newly registered hold changes every downstream snapshot.
+                if dispute_holds:
+                    rows["claim_dispute_holds"] = dispute_holds
                 return json.dumps({
                     "schema": 1,
                     "buyer_id": self.buyer_id,

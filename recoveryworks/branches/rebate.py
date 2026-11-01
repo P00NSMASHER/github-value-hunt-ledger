@@ -7,13 +7,14 @@ different rebate amounts.
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from enum import Enum
 from typing import Any, Iterable, Mapping
 
 from recoveryworks.engine import RecoveryObservation
+from recoveryworks.financial_events import net_settlements
 from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
 
@@ -41,12 +42,14 @@ def _iso_date(name: str, value: str) -> date:
         raise ValueError(f"{name} must be YYYY-MM-DD") from exc
 
 
-def _decimal(name: str, value: str | int | float | Decimal) -> Decimal:
+def _decimal(name: str, value: str | int | float | Decimal, *, signed: bool = False) -> Decimal:
     try:
         result = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise ValueError(f"{name} must be numeric") from exc
-    if result < 0:
+    if not result.is_finite():
+        raise ValueError(f"{name} must be finite")
+    if result < 0 and not signed:
         raise ValueError(f"{name} must be non-negative")
     return result
 
@@ -92,9 +95,16 @@ class RebateProgram:
     verified: bool
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    return_policy: str | None = None
+    payment_due_date: str | None = None
+
     def __post_init__(self) -> None:
         for name in ("supplier_id", "program_id", "source_hash", "source_locator"):
             _required(name, getattr(self, name))
+        if self.return_policy not in {None, "restates_original_purchase"}:
+            raise ValueError("unsupported return policy")
+        if self.payment_due_date is not None:
+            _iso_date("payment_due_date", self.payment_due_date)
         start = _iso_date("period_start", self.period_start)
         end = _iso_date("period_end", self.period_end)
         if end < start:
@@ -138,6 +148,8 @@ class RebateProgram:
             "program_id": self.program_id,
             "period_start": self.period_start,
             "period_end": self.period_end,
+            "return_policy": self.return_policy,
+            "payment_due_date": self.payment_due_date,
             "tier_mode": self.tier_mode.value,
             "measurement_basis": self.measurement_basis.value,
             "tiers": [
@@ -181,6 +193,8 @@ class RebatePurchaseLine:
     verified: bool
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    return_of_purchase_id: str | None = None
+
     def __post_init__(self) -> None:
         for name in (
             "purchase_id", "supplier_id", "program_id", "purchase_date",
@@ -188,8 +202,14 @@ class RebatePurchaseLine:
         ):
             _required(name, getattr(self, name))
         _iso_date("purchase_date", self.purchase_date)
-        _decimal("quantity", self.quantity)
-        _cents("net_spend_cents", self.net_spend_cents)
+        qty = _decimal("quantity", self.quantity, signed=True)
+        if type(self.net_spend_cents) is not int:
+            raise ValueError("net spend must be integer cents")
+        if qty < 0 or self.net_spend_cents < 0:
+            if not self.return_of_purchase_id or qty > 0 or self.net_spend_cents > 0:
+                raise ValueError("negative purchase requires linked nonpositive return")
+        elif self.return_of_purchase_id:
+            raise ValueError("return must reduce quantity or spend")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
@@ -206,6 +226,7 @@ class RebatePurchaseLine:
                 "purchase_date": self.purchase_date,
                 "quantity": self.quantity,
                 "net_spend_cents": self.net_spend_cents,
+                "return_of_purchase_id": self.return_of_purchase_id,
                 **dict(self.metadata),
             },
         )
@@ -223,6 +244,8 @@ class RebateSettlement:
     verified: bool
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    reverses_id: str | None = None
+
     def __post_init__(self) -> None:
         for name in (
             "settlement_id", "supplier_id", "program_id", "settlement_date",
@@ -230,7 +253,10 @@ class RebateSettlement:
         ):
             _required(name, getattr(self, name))
         _iso_date("settlement_date", self.settlement_date)
-        _cents("amount_received_cents", self.amount_received_cents)
+        if type(self.amount_received_cents) is not int:
+            raise ValueError("settlement amount must be integer cents")
+        if self.amount_received_cents < 0 and not self.reverses_id:
+            raise ValueError("negative settlement requires reverses_id")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
@@ -245,6 +271,7 @@ class RebateSettlement:
                 "supplier_id": self.supplier_id,
                 "program_id": self.program_id,
                 "settlement_date": self.settlement_date,
+                "reverses_id": self.reverses_id,
                 "amount_received_cents": self.amount_received_cents,
                 **dict(self.metadata),
             },
@@ -425,6 +452,7 @@ def audit_rebates(
     purchases: Iterable[RebatePurchaseLine],
     settlements: Iterable[RebateSettlement],
     currency: str = "USD",
+    as_of_date: str | None = None,
 ) -> RebateAuditBatch:
     client_id = _required("client_id", client_id)
     currency = _required("currency", currency).upper()
@@ -464,6 +492,10 @@ def audit_rebates(
             ))
             continue
         program = versions[0]
+        if program.payment_due_date is not None:
+            if as_of_date is None or _iso_date("as_of_date", as_of_date) < _iso_date("payment_due_date", program.payment_due_date):
+                exceptions.append(RebateAuditException(program.program_id, "REBATE_NOT_YET_DUE_OR_ASOF_MISSING", "dated review required after contractual payment due date"))
+                continue
         group_purchases = purchases_by_key.get(key, [])
         group_settlements = settlements_by_key.get(key, [])
 
@@ -482,6 +514,26 @@ def audit_rebates(
             ))
             continue
 
+        original_purchases = list(group_purchases)
+        returns = [p for p in group_purchases if p.return_of_purchase_id]
+        if returns:
+            try:
+                if program.return_policy != "restates_original_purchase":
+                    raise ValueError("reviewed return restatement policy required")
+                originals = {p.purchase_id: p for p in group_purchases if not p.return_of_purchase_id}
+                for adjustment in returns:
+                    original = originals.get(adjustment.return_of_purchase_id)
+                    if original is None or adjustment.purchase_date < original.purchase_date:
+                        raise ValueError("return lacks original purchase or predates it")
+                    qty = _decimal("quantity", original.quantity) + _decimal("quantity", adjustment.quantity, signed=True)
+                    spend = original.net_spend_cents + adjustment.net_spend_cents
+                    if qty < 0 or spend < 0:
+                        raise ValueError("returns exceed original quantity or spend")
+                    originals[original.purchase_id] = replace(original, quantity=str(qty), net_spend_cents=spend)
+                group_purchases = list(originals.values())
+            except ValueError as exc:
+                exceptions.append(RebateAuditException(program.program_id, "INVALID_RETURN_LINEAGE", str(exc)))
+                continue
         in_period: list[RebatePurchaseLine] = []
         for purchase in group_purchases:
             if program.covers(purchase.purchase_date):
@@ -518,12 +570,16 @@ def audit_rebates(
             ))
             continue
 
-        actual_cents = sum(s.amount_received_cents for s in group_settlements)
+        try:
+            actual_cents = net_settlements(group_settlements, amount_field="amount_received_cents")
+        except ValueError as exc:
+            exceptions.append(RebateAuditException(program.program_id, "INVALID_SETTLEMENT_LINEAGE", str(exc)))
+            continue
         if calc.expected_cents <= actual_cents:
             continue
 
         evidence = tuple(
-            [p.evidence() for p in sorted(in_period, key=lambda p: p.purchase_id)]
+            [p.evidence() for p in sorted(original_purchases, key=lambda p: p.purchase_id) if p.return_of_purchase_id or program.covers(p.purchase_date)]
             + [s.evidence() for s in sorted(group_settlements, key=lambda s: s.settlement_id)]
         )
         observations.append(RecoveryObservation(

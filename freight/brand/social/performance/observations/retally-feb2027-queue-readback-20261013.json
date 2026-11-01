@@ -1,0 +1,304 @@
+{
+  "brand": "RETALLY",
+  "brandId": "7322512",
+  "observedDate": "2026-10-13",
+  "planBlobSha": "7b746a0373d78d81c16b7dcfdc1bfa6e88af4fbc",
+  "scope": "February 2027 connected Metricool scheduled-post readback only",
+  "evidence": "Two-phase independently requested scheduled planner lookup; no post-publishing/permalink evidence",
+  "networkReadOnly": true,
+  "recoveriesProven": 0,
+  "qualifiedLeadsProven": 0,
+  "independentlyPublishedProven": 0,
+  "notes": "Existing Q4/January posts retained; LinkedIn draft retained. February Facebook text-first link posts may receive website OG preview but not verified on Facebook.",
+  "count": 16,
+  "posts": [
+    {
+      "topic": "invoice_identity",
+      "network": "facebook",
+      "uuid": "8749799356248835851",
+      "idAtReceipt": "395388936",
+      "dateTime": "2027-02-02T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "invoice_identity",
+      "network": "instagram",
+      "uuid": "5523333243178732431",
+      "idAtReceipt": "395388955",
+      "dateTime": "2027-02-03T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "rebill_or_duplicate",
+      "network": "facebook",
+      "uuid": "-7722004680183953151",
+      "idAtReceipt": "395388972",
+      "dateTime": "2027-02-04T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 0,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "rebill_or_duplicate",
+      "network": "instagram",
+      "uuid": "4442099413580599044",
+      "idAtReceipt": "395388993",
+      "dateTime": "2027-02-05T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "liftgate_trigger",
+      "network": "facebook",
+      "uuid": "8801566053633246057",
+      "idAtReceipt": "395389126",
+      "dateTime": "2027-02-09T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 4,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "liftgate_trigger",
+      "network": "instagram",
+      "uuid": "3194645906555094958",
+      "idAtReceipt": "395389141",
+      "dateTime": "2027-02-10T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 4,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "fuel_index_window",
+      "network": "facebook",
+      "uuid": "-125163506504350690",
+      "idAtReceipt": "395389158",
+      "dateTime": "2027-02-11T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 4,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "fuel_index_window",
+      "network": "instagram",
+      "uuid": "6852672996037706865",
+      "idAtReceipt": "395389179",
+      "dateTime": "2027-02-12T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 4,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "free_audit_terms",
+      "network": "facebook",
+      "uuid": "4261847458170028874",
+      "idAtReceipt": "395389196",
+      "dateTime": "2027-02-16T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "free_audit_terms",
+      "network": "instagram",
+      "uuid": "5368310479248248099",
+      "idAtReceipt": "395389214",
+      "dateTime": "2027-02-17T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "dispute_packet",
+      "network": "facebook",
+      "uuid": "-580549273126025010",
+      "idAtReceipt": "395389237",
+      "dateTime": "2027-02-18T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "dispute_packet",
+      "network": "instagram",
+      "uuid": "-4961942303895501325",
+      "idAtReceipt": "395389256",
+      "dateTime": "2027-02-19T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "private_records",
+      "network": "facebook",
+      "uuid": "-5341804817688280729",
+      "idAtReceipt": "395389271",
+      "dateTime": "2027-02-23T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "private_records",
+      "network": "instagram",
+      "uuid": "2360369703257787079",
+      "idAtReceipt": "395389302",
+      "dateTime": "2027-02-24T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "net_credit_status",
+      "network": "facebook",
+      "uuid": "-888410433396912356",
+      "idAtReceipt": "395389323",
+      "dateTime": "2027-02-25T09:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 0,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    },
+    {
+      "topic": "net_credit_status",
+      "network": "instagram",
+      "uuid": "6908701243597603064",
+      "idAtReceipt": "395389341",
+      "dateTime": "2027-02-26T10:00:00",
+      "timezone": "America/New_York",
+      "autoPublish": true,
+      "draft": false,
+      "mediaCount": 1,
+      "providerStatus": [
+        "PENDING"
+      ],
+      "captionMatchesPlan": true,
+      "altMatchesPlan": true,
+      "mediaMatchesPlan": true,
+      "observedState": "SCHEDULED_NOT_VERIFIED_PUBLIC"
+    }
+  ]
+}

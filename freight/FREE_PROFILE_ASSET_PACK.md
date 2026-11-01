@@ -1,6 +1,6 @@
-# Freight Recovery — free business profile asset pack
+# RETALLY — free business profile asset pack
 
-Updated: 2026-10-07
+Updated: 2026-10-18
 Status: **APPLICATION-READY, NOT PUBLISHED OR VERIFIED**
 
 This file is an asset pack and eligibility checklist, not a claim that platform
@@ -9,16 +9,16 @@ customer results, meeting locations, or business contact details.
 
 ## Canonical identity
 
-- **Trading name:** Freight Recovery
-- **Website:** https://p00nsmasher.github.io/github-value-hunt-ledger/
-- **Published general-purpose inbox:** jayp19386@gmail.com
-- **Business mailing address on the public site:** 715 Yorktowne Road, Pottsville, PA 17901
+- **Trading name:** RETALLY
+- **Website:** https://www.retallyrecovery.com/
+- **Published business inbox:** jay@retallyrecovery.com
+- **Public mailing address:** Not published. Do not use a residential address for directory listings; where a platform requires a mailing address, provide an owner-authorized, verified business address or defer the listing.
 - **Where the service is offered:** United States, via remote-first qualification
   and a separately scoped historical freight audit and recovery engagement
 - **Primary buyer:** B2B shippers, distributors, manufacturers, finance/AP,
   transportation, procurement and logistics teams
 
-**Eligibility guard:** A published Pottsville mailing address is not proof of
+**Eligibility guard:** Being based in Pottsville is not proof of
 public walk-in hours, customer-facing premises, or staff traveling to customers.
 Do not identify this as an open storefront or publish extra residential/phone
 details. If in-person customer service becomes real and regular, re-check the
@@ -28,12 +28,12 @@ precise platform rules before changing map eligibility.
 
 **Tagline:** Evidence-first freight audit. Recovery you can prove.
 
-**Short (about 300 characters):** Freight Recovery helps U.S. businesses review
+**Short (about 300 characters):** RETALLY helps U.S. businesses review
 historical carrier invoices for supportable duplicates, rate discrepancies,
 accessorial errors and missed credits. Start with a $0-upfront audit. Recovery
 work is separately authorized; fees depend on eligible funds actually recovered.
 
-**Long:** Freight Recovery is a Pottsville, Pennsylvania-based B2B service for
+**Long:** RETALLY is a Pottsville, Pennsylvania-based B2B service for
 shippers, manufacturers, distributors and multi-site operators across the United
 States. We independently review historical parcel, LTL, truckload and related
 freight charges using invoice, shipment and controlling contract/rate evidence.
@@ -52,21 +52,21 @@ audit; duplicate charges; carrier rate review; accessorial charge audit.
 
 | Priority | Platform | Current eligibility conclusion | Free route | Registration state |
 | --- | --- | --- | --- | --- |
-| 1 | LinkedIn Company Page | Eligible for remote B2B organizations; an authorized real-person LinkedIn account is required | https://www.linkedin.com/help/linkedin/answer/a542801 | **NOT CONFIRMED**; search existing and claim first |
+| 1 | LinkedIn Company Page | **CONNECTED and verified for organic publishing** through RETALLY company account; not a paid page | https://www.linkedin.com/company/retallyrecovery/ | **LIVE**; published company posts confirmed via connected org 146751112 |
 | 2 | Schuylkill County Online | Free for independently owned and locally rooted Schuylkill businesses; Professional Services category available; confirm genuine local ownership | https://www.schuylkillcounty.online/suggest-business | **NOT FOUND IN VISIBLE 730-LISTING DIRECTORY**; suggest for editorial review, then owner-claim |
 | 3 | SchuylkillPA.com | Free Schuylkill County business registration advertised for local businesses; existing listings and category moderation require owner review | https://schuylkillpa.com/schuylkill-business/directory/add-listing/ | **NOT CONFIRMED**; authenticated signup required |
 | 4 | Alignable Free Guest | U.S. active business owner/authorized representative eligible; free Guest plan limited, Paid Basic is $29/month and unnecessary | https://www.alignable.com/ | **NOT CONFIRMED**; search previous business account and verify before signup |
-| 5 | Apple Business | Eligible for virtual and online-only business brand registration; a location/Maps place card has separate conditions | https://business.apple.com/ | **NOT CONFIRMED**; search existing presence |
+| 5 | Apple Business | Online-only businesses are supported, but sign-up requires a legal organization name; RETALLY has deferred forming a separate entity | https://business.apple.com/ | **HOLD** until an accurate applicant legal identity and account can be provided, without registering RETALLY prematurely |
 | 6 | Better Business Bureau | Free Business Profile claim/add request; publication subject to review, not accreditation | https://www.bbb.org/get-listed | **NOT CONFIRMED**; BBB lookup first |
-| 7 | Clutch Basic | Free B2B service-provider profile; only register if offered service taxonomy fits freight auditing honestly | https://clutch.co/get-listed | **CATEGORY FIT PENDING** |
+| 7 | Clutch Basic | **Conditional**: B2B category fit may qualify, but free Basic currently does **not** provide a website link from directory listings | https://clutch.co/get-listed | **DEFER** until true service taxonomy, staff/project fields and value are confirmed; no paid Verified upgrade |
 | 8 | Manta | Free Company Listing, but online-only/non-storefront acceptance must be confirmed at entry | https://www.manta.com/business-listings/free-business-listing | **ELIGIBILITY PENDING** |
 | HOLD | Google Business Profile | **Not eligible based on current remote-only evidence**; must meet customers face to face during stated hours | https://support.google.com/business/answer/13763036 | DO NOT REGISTER without real in-person basis |
 | HOLD | Bing Places for Business | **Not eligible based on current remote-only evidence**; requires customer-facing physical premises OR staff customer visits | https://www.bing.com/forbusiness/help/modernExperience | DO NOT REGISTER without real in-person basis |
 | NO | Yelp | Normally excludes businesses that primarily serve commercial customers | https://www.yelp-support.com/article/What-kinds-of-businesses-are-eligible-for-Yelp?l=en_US | NOT RECOMMENDED |
 | PAID | Schuylkill Chamber | Directory is a paid member-only benefit | https://www.schuylkillchamber.com/ | DEFER; no purchase |
 
-**Duplicate-screen state, 2026-10-07:** The visible 730-entry Schuylkill County Online directory contains no exact `Freight Recovery` entry (text search). Public web searches for the exact
-business name plus Pottsville and the published street address did not yield a
+**Duplicate-screen state, 2026-10-07:** The visible 730-entry Schuylkill County Online directory contains no exact `RETALLY` entry (text search). Public web searches for the exact
+business name plus Pottsville and the company domain did not yield a
 reliable matching LinkedIn, BBB, Manta, Bing, Apple or Google business profile;
 structured local-business discovery likewise surfaced unrelated companies.
 This is **NOT FOUND IN PUBLIC SEARCH**, *not* confirmed absence. Authenticated
@@ -79,18 +79,18 @@ if a matching profile exists.
 Use these only for a new or verified existing free profile; **do not publish
 unverified listings or falsely signal platform approval**.
 
-- LinkedIn: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=linkedin&utm_medium=organic&utm_campaign=free_growth_profiles
-- Schuylkill County Online: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=schuylkill_county_online&utm_medium=referral&utm_campaign=free_growth_profiles
-- SchuylkillPA.com: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=schuylkillpa&utm_medium=referral&utm_campaign=free_growth_profiles
-- Alignable Guest: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=alignable&utm_medium=referral&utm_campaign=free_growth_profiles
-- Apple Business: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=apple_business&utm_medium=organic&utm_campaign=free_growth_profiles
-- BBB: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=bbb&utm_medium=organic&utm_campaign=free_growth_profiles
-- Clutch: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=clutch&utm_medium=organic&utm_campaign=free_growth_profiles
-- Manta: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=manta&utm_medium=organic&utm_campaign=free_growth_profiles
+- LinkedIn: https://www.retallyrecovery.com/?utm_source=linkedin&utm_medium=organic&utm_campaign=free_growth_profiles
+- Schuylkill County Online: https://www.retallyrecovery.com/?utm_source=schuylkill_county_online&utm_medium=referral&utm_campaign=free_growth_profiles
+- SchuylkillPA.com: https://www.retallyrecovery.com/?utm_source=schuylkillpa&utm_medium=referral&utm_campaign=free_growth_profiles
+- Alignable Guest: https://www.retallyrecovery.com/?utm_source=alignable&utm_medium=referral&utm_campaign=free_growth_profiles
+- Apple Business: https://www.retallyrecovery.com/?utm_source=apple_business&utm_medium=organic&utm_campaign=free_growth_profiles
+- BBB: https://www.retallyrecovery.com/?utm_source=bbb&utm_medium=organic&utm_campaign=free_growth_profiles
+- Clutch: https://www.retallyrecovery.com/?utm_source=clutch&utm_medium=organic&utm_campaign=free_growth_profiles
+- Manta: https://www.retallyrecovery.com/?utm_source=manta&utm_medium=organic&utm_campaign=free_growth_profiles
 
 ## Before submission
 
-1. Search by **Freight Recovery**, **Pottsville**, and **715 Yorktowne Road** on
+1. Search by **RETALLY**, **Pottsville**, and **retallyrecovery.com** on
    the platform. Claim, correct or request access to the original if found.
 2. Confirm company identity, actual service category, ownership authority,
    disclosure of public business information, and any verification steps.

@@ -1,8 +1,8 @@
-# Freight Recovery Free Growth Content Bank
+# RETALLY Free Growth Content Bank
 
 Status: READY TO PUBLISH
 
-Use these as reusable organic posts, newsletter snippets, LinkedIn posts, Google Business Profile updates, and outreach follow-up material. Do not claim customer results until a verified case exists.
+Use these as reusable organic posts, newsletter snippets, LinkedIn posts, other eligible professional-platform updates, and outreach follow-up material. Do not claim customer results until a verified case exists.
 
 ## Post 1 — Freight audit checklist
 
@@ -16,10 +16,10 @@ Before calling a charge valid, finance/AP teams should be able to answer:
 - Has the carrier already issued an automatic credit?
 - Is the discrepancy genuinely new, or already known to an incumbent auditor?
 
-Freight Recovery offers a $0-upfront audit of a bounded historical population. No recovery fee applies unless eligible funds are actually recovered under an authorized engagement.
+RETALLY offers a $0-upfront audit of a bounded historical population. No recovery fee applies unless eligible funds are actually recovered under an authorized engagement.
 
 Read more:
-https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-services.html?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=checklist_post
+https://www.retallyrecovery.com/freight-audit-services?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=checklist_post
 
 ## Post 2 — Accessorial evidence
 
@@ -35,13 +35,13 @@ A defensible audit should keep these separate:
 When those layers get collapsed, false-positive recovery claims appear.
 
 Guide:
-https://p00nsmasher.github.io/github-value-hunt-ledger/accessorial-charge-audit.html?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=accessorial_post
+https://www.retallyrecovery.com/accessorial-charge-audit?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=accessorial_post
 
 ## Post 3 — Potential recovery is not recovered money
 
 **Hook:** A $25,000 billing discrepancy is not automatically a $25,000 recovery.
 
-Freight Recovery separates:
+RETALLY separates:
 - potential recovery;
 - validated finding;
 - approved claim;
@@ -52,7 +52,7 @@ Freight Recovery separates:
 That distinction protects both the buyer and the audit process from inflated savings claims.
 
 Guide:
-https://p00nsmasher.github.io/github-value-hunt-ledger/freight-overcharge-recovery.html?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=recovery_states_post
+https://www.retallyrecovery.com/freight-overcharge-recovery?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=recovery_states_post
 
 ## Post 4 — Duplicate freight invoices
 
@@ -69,7 +69,7 @@ Exact duplicates are only one case. Near-duplicates can involve:
 A clean audit should preserve the relationship between the original charge, correction, payment, credit, and final economic state.
 
 Guide:
-https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit.html?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=duplicate_invoice_post
+https://www.retallyrecovery.com/freight-invoice-audit?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=duplicate_invoice_post
 
 ## Post 5 — What to gather before an audit
 
@@ -85,7 +85,7 @@ If your finance or logistics team wants to review freight billing, start with:
 Do **not** send records to an unknown public form. Start with fit and scope, then use an approved secure intake route.
 
 Free audit:
-https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=records_post#start-audit
+https://www.retallyrecovery.com/?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=records_post#start-audit
 
 ## Publishing cadence
 

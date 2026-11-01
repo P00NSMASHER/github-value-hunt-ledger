@@ -1,4 +1,4 @@
-import { OPT_OUT, recipientKey, reserveOutreach } from "./outreach_guard.mjs";
+import { OPT_OUT, recipientKey, reserveOutreach, outreachApprovalDigest } from "./outreach_guard.mjs";
 function assert(v, msg) { if (!v) throw new Error(msg); }
 const now="2026-10-07T20:30:00Z";
 const sender={identity:"Synthetic Freight Audit",postal_approved:true,postal_lines:["123 Example Road","Exampletown, PA 19000"]};
@@ -11,9 +11,24 @@ function fixture() {
  return {m,s:{schema_version:1,audit_hold:false,mailbox_checked_at:now,contacts:[{recipient_key:m.to,account_id:m.account_id,
  route_verified:true,suppressed:false,hold:false,status:"NO_REPLY",qualification:q}],events:[]},a:structuredClone(sender)};
 }
+// Each synthetic positive path has an explicitly scoped, private owner receipt.
+// This helper models the reviewed receipt; it never sends anything.
+function grant(f) {
+ f.a.owner_approval={
+  confirmed_by_owner:true, approved_by:"OWNER",
+  approval_id:"synthetic-owner-approval-20261007",
+  evidence_ref:"private:synthetic-operator-review",
+  recipient_key:f.m.to.toLowerCase(), account_id:f.m.account_id,
+  channel:f.m.channel, touch:f.m.touch,
+  approved_at:now,
+  expires_at:new Date(Date.parse(now)+60*60*1000).toISOString(),
+  message_sha256:outreachApprovalDigest(f.m)
+ };
+}
 let count=0;
 function check(name, edit, reason) {
- const f=fixture(); edit(f); const r=reserveOutreach(f.m,f.s,f.a,now,"reservation-"+count++);
+ const f=fixture(); edit(f); if (!f.skipGrant) grant(f);
+ const r=reserveOutreach(f.m,f.s,f.a,now,"reservation-"+count++);
  assert(reason?(!r.ok && r.errors.includes(reason)):r.ok,name+" "+JSON.stringify(r.errors));
 }
 check("valid plain",()=>{},null);
@@ -31,7 +46,7 @@ check("missing opt out",f=>f.m.text=f.m.text.replace(OPT_OUT,""),"OPT_OUT_MISSIN
 check("HTML opt out missing",f=>f.m.html=f.m.text.replace(OPT_OUT,""),"OPT_OUT_MISSING_1");
 check("HTML script not footer",f=>f.m.html=f.m.text.replace(OPT_OUT,"<script>"+OPT_OUT+"</script>"),"OPT_OUT_MISSING_1");
 check("cc blocked",f=>f.m.cc="other@example.com","CC_BCC_NOT_ALLOWED");
-check("multi recipient blocked",f=>f.m.to+=",other@example.com","SINGLE_RECIPIENT_REQUIRED");
+check("multi recipient blocked",f=>{f.m.to+=",other@example.com";f.skipGrant=true;},"SINGLE_RECIPIENT_REQUIRED");
 check("stale mailbox",f=>f.s.mailbox_checked_at="2026-10-07T20:19:59Z","MAILBOX_RECHECK_REQUIRED");
 check("audit hold default",f=>delete f.s.audit_hold,"AUDIT_HOLD");
 check("unknown contact",f=>f.s.contacts=[],"RESEARCHED_CONTACT_REQUIRED");
@@ -57,11 +72,33 @@ check("follow up no thread",f=>{sent(f,"2026-10-03T20:30:00Z");f.m.touch=2;},"PR
 check("draft not send",f=>{sent(f);f.s.events[0].delivery="DRAFT";},null);
 check("unknown scale score",f=>f.s.contacts[0].qualification={...q,score:undefined},"ICP_QUALIFICATION_REQUIRED");
 check("unknown history",f=>f.s.contacts[0].qualification={...q,history_months:undefined},"ICP_QUALIFICATION_REQUIRED");
+check("no owner approval",f=>{f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval not confirmed",f=>{grant(f);f.a.owner_approval.confirmed_by_owner=false;f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval wrong recipient",f=>{grant(f);f.a.owner_approval.recipient_key="other@example.com";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval wrong account",f=>{grant(f);f.a.owner_approval.account_id="other-account";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval wrong channel",f=>{grant(f);f.a.owner_approval.channel="EDITORIAL";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval wrong touch",f=>{grant(f);f.a.owner_approval.touch=2;f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval subject changed",f=>{grant(f);f.m.subject="Changed after approval";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval body changed",f=>{grant(f);f.m.text+="\\nChanged after approval";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval expired",f=>{grant(f);f.a.owner_approval.expires_at=now;f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval future",f=>{grant(f);f.a.owner_approval.approved_at="2026-10-08T20:30:00Z";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval too long",f=>{grant(f);f.a.owner_approval.expires_at="2026-10-16T20:30:00Z";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval missing evidence",f=>{grant(f);delete f.a.owner_approval.evidence_ref;f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+check("owner approval wrong claimed actor",f=>{grant(f);f.a.owner_approval.approved_by="BOT";f.skipGrant=true;},"EXPLICIT_OWNER_APPROVAL_REQUIRED");
+
 check("hidden HTML footer",f=>f.m.html='<p style="display:none">'+f.m.text+'</p>',"HTML_HIDDEN_CONTENT");
-const f=fixture(), r=reserveOutreach(f.m,f.s,f.a,now,"atomic-first");
+const f=fixture(); grant(f);
+const r=reserveOutreach(f.m,f.s,f.a,now,"atomic-first");
 assert(r.ok && f.s.events.length===0,"input immutable");
 const r2=reserveOutreach({...f.m,to:"BUYER@EXAMPLE.COM"},r.state,f.a,now,"atomic-second");
 assert(!r2.ok && r2.errors.includes("UNRESOLVED_PRIOR_SEND"),"second worker/batch reservation blocked"); count++;
+// Approval IDs cannot be reused, even if the prior reservation was cancelled.
+const replayFixture=fixture(); grant(replayFixture);
+const first=reserveOutreach(replayFixture.m,replayFixture.s,replayFixture.a,now,"replay-first");
+assert(first.ok,"approved first reservation");
+first.state.events[0].delivery="CANCELLED";
+const replay=reserveOutreach(replayFixture.m,first.state,replayFixture.a,now,"replay-second");
+assert(!replay.ok && replay.errors.includes("OWNER_APPROVAL_ALREADY_USED"),"owner authorization cannot be reused");count++;
 assert(recipientKey("User.Name+campaign@googlemail.com")==="username@gmail.com","Gmail aliases"); count++;
 assert(recipientKey("a.b+tag@example.com")==="a.b+tag@example.com","corporate aliases preserved"); count++;
 console.log(count+" outreach safeguard checks passed");

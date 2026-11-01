@@ -1,0 +1,60 @@
+name: RETALLY Real Customer Evidence Truth Gate
+
+on:
+  pull_request:
+    paths:
+      - 'freight/**'
+      - '.github/workflows/retally-real-customer-evidence-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freight/**'
+      - '.github/workflows/retally-real-customer-evidence-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  no-fake-customer-approval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Enforce existing absence of independent customer proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from freight.reliability_dashboard import acceptance_snapshot
+          source = Path('freight/POSTMERGE_RELEASE_TRUTH_2026-10-19.json')
+          d=json.loads(source.read_text(encoding='utf-8'))
+          assert d['customer_production_acceptance'] == 'RELEASE_HOLD'
+          assert d['model_generated_reviewer_approvals_count_as_independent'] is False
+          assert d['independent_approving_github_reviews_observed'] == 0
+          assert d['bank_cleared_real_customer_settlements_verified'] == 0
+          assert d['shipment_specific_buyer_rates_independently_verified'] == 0
+          assert d['real_freight_truth_positive_cases_independently_complete'] == 0
+          assert d['real_freight_truth_negative_cases_independently_complete'] == 0
+          assert d['real_freight_truth_unknown_cases'] == 110
+          assert d['real_freight_detection_precision'] is None
+          assert d['independently_verified_cash_recovery_minor'] == 0
+          assert d['customer_rights_and_private_runtime_approved'] is False
+          assert d['pennine_same_source_reference_matches'] == 273
+          assert d['independent_payment_accuracy'] is None
+          s=acceptance_snapshot(
+              invoices_extracted=110, invoices_exact=110,
+              pinned_source_files=7, accounting_invoice_population=273,
+              accounting_matched=273, accounting_cross_scope_errors=0,
+              freight_labeled=0, freight_unknown=110, precision=None,
+          )
+          assert s.release_status == 'RELEASE_HOLD'
+          assert 'REAL_FREIGHT_ACCURACY_UNPROVEN' in s.blockers
+          assert 'INDEPENDENT_RELEASE_REVIEW_MISSING' not in s.blockers
+          assert 'EXISTING_FREIGHT_PILOT_ACCEPTANCE_REQUIRED' in s.blockers
+          print('PASS: owner source merge and simulated reviewers cannot grant customer release')
+          PY

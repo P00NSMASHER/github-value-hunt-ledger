@@ -2,8 +2,10 @@
 
 import hashlib
 from html.parser import HTMLParser
+from html import unescape
 import importlib.util
 import json
+import re
 from pathlib import Path
 import tempfile
 import unittest
@@ -42,6 +44,64 @@ class PageParser(HTMLParser):
 
 
 class PublicBuildTests(unittest.TestCase):
+    def test_live_growth_materials_use_canonical_domain_without_legacy_private_contacts(self):
+        """Current acquisition copy must not promote the GitHub Pages fallback or old residential contact."""
+        active = (
+            "README.md",
+            "freight/FREE_PROFILE_ASSET_PACK.md",
+            "freight/FREE_GROWTH_CONTENT_BANK.md",
+            "freight/FREE_GROWTH_REFERRAL_KIT.md",
+            "freight/REFERRAL_PARTNER_PROGRAM.md",
+            "freight/THREE_TOUCH_OUTBOUND_SEQUENCE.md",
+        )
+        for relative in active:
+            with self.subTest(file=relative):
+                content = (builder.REPOSITORY / relative).read_text(encoding="utf-8")
+                self.assertNotIn("https://p00nsmasher.github.io/github-value-hunt-ledger/", content)
+                self.assertNotIn("yorktowne", content.lower())
+                self.assertNotIn("jayp19386@", content.lower())
+        for relative in active[:4]:
+            with self.subTest(canonical=relative):
+                content = (builder.REPOSITORY / relative).read_text(encoding="utf-8")
+                self.assertIn("https://www.retallyrecovery.com/", content)
+        profile = (builder.REPOSITORY / "freight/FREE_PROFILE_ASSET_PACK.md").read_text(encoding="utf-8")
+        self.assertIn("jay@retallyrecovery.com", profile)
+        self.assertNotIn("Google Business Profile updates", (builder.REPOSITORY / "freight/FREE_GROWTH_CONTENT_BANK.md").read_text(encoding="utf-8"))
+        for relative in active[3:]:
+            self.assertIn(
+                "VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND",
+                (builder.REPOSITORY / relative).read_text(encoding="utf-8"),
+            )
+
+    def test_sample_report_and_trust_disclosures_are_mobile_safe_and_current(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            report = (output / "recovery-status-example.html").read_text()
+            trust = (output / "trust.html").read_text()
+            styles = (output / "foundry.css").read_text()
+
+            # Preserve the already-approved sample and accounting states.
+            self.assertIn("Sample Recovery Report", report)
+            self.assertIn("Northstar Industrial Supply", report)
+            self.assertIn("Sample Population</span>", report)
+            self.assertIn("2026-01-01 through 2026-03-31</span>", report)
+            self.assertIn('class="meta report-population"', report)
+            self.assertIn(".sample-report .report-population span{white-space:nowrap}", styles)
+            self.assertIn("$13,450.00", report)
+            self.assertIn("$11,800.00", report)
+            # This is a synthetic aggregate, not an itemized source ledger.
+            # Never silently attribute the unexplained fee-eligibility gap.
+            self.assertIn("$1,650.00 difference", report)
+            self.assertIn("unallocated and not independently verified", report)
+            self.assertIn("no fee is established by this example", report)
+
+            # Do not describe the new branded-domain online intake as email-only.
+            self.assertIn("Cloudflare Pages at www.retallyrecovery.com", trust)
+            self.assertIn("secure inquiry endpoint and required anti-abuse check", trust)
+            self.assertIn("opening a draft does not send an inquiry", trust)
+            self.assertIn("GitHub Pages edition remains publicly accessible", trust)
+            self.assertNotIn("The marketing site is hosted through GitHub Pages.", trust)
+
     def test_google_search_console_verification_file_is_exact(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
@@ -50,6 +110,28 @@ class PublicBuildTests(unittest.TestCase):
                 verification,
                 "google-site-verification: google738a4fc9a0997cd0.html\n",
             )
+
+    def test_published_metadata_is_complete_and_within_search_snippet_budget(self):
+        """Catch Ahrefs-style overly long/short descriptions before publication."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            pages = list(builder.PUBLIC_CONTACT_PAGES) + ["recovery-status-example.html"]
+            for name in pages:
+                with self.subTest(page=name):
+                    markup = (output / name).read_text(encoding="utf-8")
+                    titles = re.findall(r"<title>(.*?)</title>", markup, flags=re.I | re.S)
+                    descriptions = re.findall(
+                        r'<meta\s+name="description"\s+content="([^"]*)"\s*/?>',
+                        markup,
+                        flags=re.I,
+                    )
+                    self.assertEqual(len(titles), 1, f"{name}: expected one title")
+                    self.assertEqual(len(descriptions), 1, f"{name}: expected one description")
+                    title = unescape(titles[0]).strip()
+                    description = unescape(descriptions[0]).strip()
+                    self.assertLessEqual(len(title), 60, f"{name}: title exceeds 60 characters")
+                    self.assertGreaterEqual(len(description), 100, f"{name}: description is too short")
+                    self.assertLessEqual(len(description), 160, f"{name}: description is too long")
 
     def test_contact_must_be_present_and_verified(self):
         for email, verified in [
@@ -61,6 +143,52 @@ class PublicBuildTests(unittest.TestCase):
             with self.subTest(email=email, verified=verified):
                 with tempfile.TemporaryDirectory() as temporary, self.assertRaises(ValueError):
                     build(Path(temporary) / "public", email=email, contact_verified=verified)
+
+    def test_only_verified_public_business_mailto_links_are_exempt_from_cloudflare(self):
+        """Cloudflare must not inject /cdn-cgi/l/email-protection into public navigation."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            checked = 0
+            share_checked = 0
+            share_pattern = re.compile(
+                r'<a\b[^>]*\bhref="mailto:\?[^"]*"[^>]*>.*?</a>',
+                re.IGNORECASE | re.DOTALL,
+            )
+            pattern = re.compile(
+                r'<a\b[^>]*\bhref="mailto:sales@freightfixture\.com[^"]*"[^>]*>.*?</a>',
+                re.IGNORECASE | re.DOTALL,
+            )
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(name=name):
+                    page = (output / name).read_text(encoding="utf-8")
+                    self.assertNotIn("/cdn-cgi/l/email-protection", page)
+                    for match in pattern.finditer(page):
+                        checked += 1
+                        self.assertTrue(page[:match.start()].endswith("<!--email_off-->"))
+                        self.assertTrue(page[match.end():].startswith("<!--/email_off-->"))
+                    for match in share_pattern.finditer(page):
+                        share_checked += 1
+                        self.assertTrue(page[:match.start()].endswith("<!--email_off-->"), name)
+                        self.assertTrue(page[match.end():].startswith("<!--/email_off-->"), name)
+            self.assertGreater(checked, 0)
+            self.assertEqual(share_checked, 3, "All three free share drafts must be Cloudflare-safe")
+
+        untrusted = (
+            '<a href="mailto:sales@freightfixture.com">Public business address</a>'
+            '<a href="mailto:private@example.net">Private address</a>'
+        )
+        transformed = builder._leave_published_business_email_links_unmodified_by_cloudflare(
+            untrusted, "sales@freightfixture.com"
+        )
+        self.assertEqual(transformed.count("<!--email_off-->"), 1)
+        self.assertIn(
+            '<a href="mailto:private@example.net">Private address</a>',
+            transformed,
+        )
+        self.assertNotIn(
+            '<!--email_off--><a href="mailto:private@example.net"',
+            transformed,
+        )
 
     def test_contingency_rate_is_validated_and_configurable(self):
         for invalid in ("", "0", "1", "-0.1", "nan"):
@@ -82,6 +210,35 @@ class PublicBuildTests(unittest.TestCase):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 build(output)
 
+    def test_v16_evidence_preflight_is_published_without_a_customer_action(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            home = (output / "index.html").read_text()
+            helper = (output / "v16-evidence-preflight.js").read_text()
+            self.assertIn('name="freight-product-version" content="16.0.0"', home)
+            self.assertIn('id="evidence-preflight"', home)
+            self.assertIn('data-v16-preflight hidden', home)
+            self.assertIn('src="v16-evidence-preflight.js?v=1"', home)
+            self.assertIn('href="v16-evidence-preflight.css?v=1"', home)
+            self.assertIn('NO ORIGINAL RECORDS WERE READ OR VERIFIED', helper)
+            self.assertNotIn('window.location.href', helper)
+            self.assertNotIn('localStorage', helper)
+            self.assertTrue((output / "v16-evidence-preflight.css").is_file())
+
+    def test_public_browser_js_byte_fidelity_is_platform_independent(self):
+        """The builder must not convert LF into CRLF on Windows."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for name in ("site.js", "worksheet.js", "v16-evidence-preflight.js",
+                         "ltl-evidence-comparator.js", "commercial-config.js"):
+                with self.subTest(asset=name):
+                    expected = (output / name).read_text(encoding="utf-8").encode("utf-8")
+                    self.assertEqual((output / name).read_bytes(), expected,
+                                     "Browser source bytes must remain identical to encoded text")
+            for name in ("site.js", "worksheet.js", "v16-evidence-preflight.js"):
+                self.assertEqual((output / name).read_bytes(),
+                                 (builder.SOURCE / name).read_text(encoding="utf-8").encode("utf-8"))
+
     def test_output_contains_only_allowlisted_public_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
@@ -100,7 +257,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             config = (output / "commercial-config.js").read_text()
 
-            self.assertIn("Freight recovery <em>you can prove.</em>", page)
+            self.assertIn('<span class="hero-phrase">Find it.</span> <span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
             self.assertIn("Recovery Evidence Pack", page)
             self.assertIn('href="second-look-freight-audit.html"', page)
             self.assertIn('href="freight-recovery-evidence-standard.html"', page)
@@ -170,13 +327,65 @@ class PublicBuildTests(unittest.TestCase):
             by_type = {node["@type"]: node for node in graph}
             org = by_type["Organization"]
             service = by_type["Service"]
-            self.assertEqual(org["name"], "Freight Recovery")
-            self.assertEqual(org["address"]["addressLocality"], "Pottsville")
-            self.assertEqual(org["address"]["addressRegion"], "PA")
+            self.assertEqual(org["name"], "RETALLY")
+            # Confirmed Facebook and Instagram owner accounts, plus the
+            # RETALLY YouTube channel ID from connected Metricool/YouTube.
+            social = [
+                "https://www.facebook.com/p/Retally-61595467040747/",
+                "https://www.instagram.com/retallyrecovery/",
+                "https://www.linkedin.com/company/retallyrecovery/",
+                "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
+            ]
+            self.assertEqual(org.get("sameAs"), social)
+            for url in social:
+                self.assertEqual(index.count('href="' + url + '"'), 1)
+            for name in ("Facebook", "Instagram", "LinkedIn", "YouTube"):
+                self.assertIn('aria-label="RETALLY on ' + name + ' (opens in a new tab)"', index)
+            self.assertNotIn("amuhricaaa", index)
+            self.assertEqual(
+                org["logo"]["url"],
+                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem-approved.png",
+            )
+            self.assertIn("Freight Invoice Audit &amp; Overcharge Recovery | RETALLY", index)
+            self.assertIn("Freight invoice audit and overcharge recovery for U.S. businesses.", index)
+            self.assertNotIn("address", org)
             self.assertEqual(service["provider"]["@id"], org["@id"])
             self.assertEqual(service["areaServed"]["name"], "United States")
             self.assertNotIn("LocalBusiness", raw_json)
             self.assertIn("Start with a remote qualification request", about)
+
+    def test_retally_social_share_metadata_is_branded_on_both_public_hosts(self):
+        """Social share cards must identify the actual brand and public host."""
+        from freight.site.rebase_public_urls import NEW_BASE, OLD_BASE, rebase
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            legacy = (output / "index.html").read_text(encoding="utf-8")
+            expected_title = "RETALLY | Freight Invoice Audit &amp; Recovery"
+            self.assertIn(
+                f'<meta property="og:title" content="{expected_title}">', legacy
+            )
+            self.assertIn(
+                f'<meta name="twitter:title" content="{expected_title}">', legacy
+            )
+            self.assertIn('<meta property="og:site_name" content="RETALLY">', legacy)
+            self.assertIn(f'<meta property="og:url" content="{OLD_BASE}">', legacy)
+
+            # The production Cloudflare build rebases only its generated public
+            # bundle; the legacy GitHub Pages site retains its original URLs.
+            self.assertGreater(rebase(output), 0)
+            production = (output / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f'<link rel="canonical" href="{NEW_BASE}">', production)
+            self.assertIn(f'<meta property="og:url" content="{NEW_BASE}">', production)
+            image = NEW_BASE + "assets/brand/freightrecovery-social-20261022.png"
+            self.assertIn(f'<meta property="og:image" content="{image}">', production)
+            self.assertIn(f'<meta name="twitter:image" content="{image}">', production)
+            self.assertTrue((output / "assets/images/terminal-blue-hour.webp").is_file())
+            self.assertNotIn(OLD_BASE, production)
+            # Public identity was verified against the connected Instagram
+            # account, not inferred from the former personal-facing handle.
+            self.assertIn('https://www.instagram.com/retallyrecovery/', production)
+            self.assertNotIn("amuhricaaa", production)
 
     def test_contact_is_injected_without_enabling_file_submission(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -201,7 +410,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
-            self.assertIn("connect-src 'none'", index)
+            self.assertIn("connect-src https://www.bubblav.com", index)
+            self.assertIn("form-action 'none'", index)
+            self.assertNotIn("connect-src 'self'", index)
 
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -257,14 +468,24 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('utm_campaign: cleanCampaignValue("utm_campaign")', script)
             self.assertIn("Acquisition source:", script)
             self.assertIn("Review it, then press Send.", page)
+            self.assertIn("Email prepared — not sent", page)
+            self.assertIn('id="auditRecipient" href="#contact-pending"', page)
+            self.assertIn('id="copyAuditEmail" type="button"', page)
+            self.assertIn('id="editAuditRequest" type="button"', page)
+            self.assertIn("Your request has not been sent yet.", page)
+            self.assertIn('recipient.href = `mailto:${contactEmail}`', script)
+            self.assertIn('byId("copyAuditEmail")?.addEventListener', script)
             stylesheet = (output / "site.css").read_text()
             self.assertIn(".output-copy{min-width:0}", stylesheet)
             self.assertIn(".security-layout>*{min-width:0}", stylesheet)
             self.assertIn(".security-image{width:100%;margin:0;position:relative}", stylesheet)
             self.assertIn(".qualification-details{", stylesheet)
             self.assertIn(".navlinks{position:absolute;left:0;right:0;top:100%", stylesheet)
+            # The same JS is shipped to legacy GitHub Pages, whose strict CSP
+            # denies connections; network use is gated to the RETALLY host.
+            self.assertIn('["www.retallyrecovery.com", "retallyrecovery.com"].includes(window.location.hostname)', script)
+            self.assertIn('fetch("/api/inquiry"', script)
             for network_or_storage_api in (
-                "fetch(",
                 "XMLHttpRequest",
                 "sendBeacon",
                 "WebSocket",
@@ -273,13 +494,42 @@ class PublicBuildTests(unittest.TestCase):
             ):
                 self.assertNotIn(network_or_storage_api, script)
 
+    def test_durable_receipt_handles_provider_ack_and_pending_state(self):
+        """Only unnotified saved requests may offer an optional staff email alert."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            receipt = script.split('if (!response.ok || !result.received', 1)[1].split('} catch (error)', 1)[0]
+            self.assertIn('const notificationPending = result.notificationPending !== false;', receipt)
+            self.assertIn('ready.querySelector(".eyebrow").textContent = notificationPending', receipt)
+            self.assertIn('if (notificationPending) {', receipt)
+            self.assertIn("preparedSummary = buildSummary(result.reference);", receipt)
+            self.assertIn("sendLink.hidden = false;", receipt)
+            self.assertIn('deliveryConfirmed: false', receipt)
+            self.assertIn('["sendAuditRequest", "editAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]', receipt)
+            self.assertIn("if (emailOnly) emailOnly.hidden = true;", receipt)
+            self.assertIn('ready.querySelector(".audit-manual-fallback")', receipt)
+            self.assertIn("if (fallbackInstructions) fallbackInstructions.hidden = true;", receipt)
+            # The original manual email-draft path must remain available.
+            draft = script.split("const prepareEmailDraft = () => {", 1)[1].split("fallbackLink?.addEventListener", 1)[0]
+            self.assertIn("window.location.href = sendLink.href;", draft)
+            self.assertIn('track(EVENTS.auditRequestPrepared, { reference, deliveryConfirmed: false });', draft)
+            self.assertNotIn("track(EVENTS.auditFormCompleted", draft)
+            self.assertIn('method: "durable_intake"', receipt)
+            self.assertIn('byId("editAuditRequest")?.addEventListener("click"', script)
+            self.assertIn('sendLink.setAttribute("aria-disabled", "true")', script)
+            self.assertIn('if (ready) ready.hidden = true;', script)
+            self.assertIn('id="copyAuditEmail"', page)
+            self.assertIn("Email prepared — not sent", page)
+
     def test_controlled_demo_is_current_and_clearly_synthetic(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
             page = (output / "index.html").read_text()
             self.assertNotIn(builder.DEMO_MARKER, page)
             self.assertIn('href="synthetic-pilot-demo.zip"', page)
-            self.assertIn("Fictional data only", page)
+            self.assertIn("Sample data only", page)
             demo = output / builder.DEMO_FILE
             receipt = verify_synthetic_pilot_bundle(demo)
             self.assertEqual(11, receipt["entry_count"])
@@ -288,7 +538,27 @@ class PublicBuildTests(unittest.TestCase):
             )
             self.assertNotIn(receipt["bundle_sha256"], page)
             self.assertNotIn("SHA-256", page)
-            self.assertIn("Download a fictional audit example", page)
+            self.assertIn("Download a sample audit walkthrough", page)
+
+    def test_public_copy_and_private_address_are_safe(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for name in builder.TEXT_SOURCE_FILES:
+                page = (output / name).read_text(encoding="utf-8")
+                self.assertNotIn("yorktowne", page.lower(), name)
+                self.assertNotIn("17901", page, name)
+                self.assertNotIn("jayp19386@", page.lower(), name)
+            index = (output / "index.html").read_text()
+            report = (output / "recovery-status-example.html").read_text()
+            example = (output / "freight-audit-example.html").read_text()
+            self.assertIn("Northstar Industrial Supply", report)
+            self.assertIn("Sample Population</span><span>2026-01-01 through 2026-03-31</span>", report)
+            self.assertIn('class="button button-light report-back"', report)
+            self.assertNotIn('class="report-notice"', report)
+            self.assertIn("This scenario uses sample data only.", example)
+            self.assertIn("sample carrier Blue River Freight", example)
+            self.assertIn('content="jay@retallyrecovery.com"', index)
+            self.assertIn("Sample data", index)
 
     def test_fonts_and_images_retain_integrity(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -314,6 +584,48 @@ class PublicBuildTests(unittest.TestCase):
                 self.assertEqual(item["sha256"], hashlib.sha256(font.read_bytes()).hexdigest())
                 self.assertEqual("SIL Open Font License 1.1", item["license"])
 
+    def test_retally_mobile_brand_presentation_does_not_occlude_content(self):
+        css = (builder.SOURCE / "foundry.css").read_text(encoding="utf-8")
+        page = (builder.SOURCE / "index.html").read_text(encoding="utf-8")
+        # Explicit mobile regression guard: the former fixed CTA hid page
+        # content and inherited unreadable dark-green-on-dark-green colors.
+        self.assertIn(".mobile-cta{display:none!important}", css)
+        self.assertIn("body{padding-bottom:0}", css)
+        self.assertIn(".hero-phrase{display:inline-block;white-space:nowrap}", css)
+        self.assertIn("font-size:clamp(2.1rem,9vw,2.4rem)", css)
+        # Retain the approved type assets and primary conversion route.
+        self.assertIn('hanken-grotesk-latin.woff2', page)
+        self.assertIn('instrument-serif-italic-latin.woff2', page)
+        self.assertIn('class="button button-signal" href="#start-audit"', page)
+        self.assertIn('foundry.css?v=retally-type-20261008', page)
+        # Approved type hierarchy: one italic mint hero phrase, serif accents
+        # on dark and light sections, and legible light/dark body colors.
+        self.assertIn('<span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
+        self.assertIn('<h2 id="output-title">See what you <em>get.</em></h2>', page)
+        self.assertIn('<h2 id="pricing-title">Simple <em>pricing.</em></h2>', page)
+        self.assertIn('.home-simple .hero h1 em.hero-phrase{', css)
+        self.assertIn('font-family:Instrument,Georgia,serif;', css)
+        self.assertIn('color:#b7f0ce;', css)
+        self.assertIn('color:#087a50;', css)
+        self.assertIn('color:#f6faf7;', css)
+        self.assertIn('color:#40574d', css)
+
+    def test_manual_email_fallback_preserves_mobile_user_gesture(self):
+        # The fallback is the production contact path while online D1 intake
+        # is disabled. On iOS, a delayed navigation can be gesture-blocked.
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            self.assertIn('id="sendAuditRequest"', page)
+            self.assertIn('id="copyAuditSummary"', page)
+            self.assertIn('sendLink.href = `mailto:${contactEmail}', script)
+            self.assertIn('window.location.href = sendLink.href;', script)
+            self.assertNotIn(
+                'window.setTimeout(() => { window.location.href = sendLink.href; }, 80)',
+                script,
+            )
+
     def test_existing_files_are_preserved(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary)
@@ -323,6 +635,455 @@ class PublicBuildTests(unittest.TestCase):
                 build(output)
             self.assertEqual(marker.read_text(), "unchanged")
             self.assertEqual(["keep.txt"], [file.name for file in output.iterdir()])
+
+
+class RetallyOrganicAdvisorShareTests(unittest.TestCase):
+    """Referral material must not contact prospects or imply an accepted inquiry."""
+
+    def test_share_kit_is_customer_opt_in_and_never_sends_from_public_site(self):
+        from html import unescape as decode_html
+        with tempfile.TemporaryDirectory() as temporary:
+            out = build(Path(temporary) / "public")
+            page = (out / "referral-partners.html").read_text(encoding="utf-8")
+            readable = decode_html(page)
+            self.assertEqual(page.count('id="share"'), 1)
+            self.assertEqual(page.count('href="mailto:?subject='), 1)
+            self.assertIn("No account required", (out / "freight-credit-rebill-audit.html").read_text())
+            self.assertIn("utm_source=advisor_referral", readable)
+            self.assertIn("utm_campaign=retally_referral_kit_2026", readable)
+            self.assertIn("self-service audit-request form", page)
+            self.assertIn("nothing is sent automatically", page)
+            self.assertIn("do not need to share the client's identity", page.lower())
+            self.assertIn("freight-credit-rebill-audit.html", page)
+            self.assertIn("ltl-reweigh-reclass-checklist.html", page)
+            self.assertNotIn('type="file"', page)
+            self.assertNotIn("Guaranteed recovery", page)
+            self.assertIn("separately agreed", page)
+
+
+
+class PublicChatbotTests(unittest.TestCase):
+    """Prevent chat embedding from breaking the audited publication boundary."""
+
+    def test_widget_is_present_once_on_public_marketing_pages(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            expected_script = (
+                '<script src="https://www.bubblav.com/widget.js" '
+                'data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147" defer></script>'
+            )
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(page=name):
+                    html = (output / name).read_text()
+                    self.assertEqual(html.count(expected_script), 1)
+                    self.assertIn("script-src 'self' https://www.bubblav.com;", html)
+                    self.assertIn("connect-src https://www.bubblav.com", html)
+                    self.assertIn("frame-src https://www.bubblav.com", html)
+            for name in ("404.html", "recovery-status-example.html"):
+                self.assertNotIn(expected_script, (output / name).read_text())
+            self.assertIn("Optional AI chat assistant", (output / "privacy.html").read_text())
+            self.assertIn("https://www.bubblav.com", (output / "_headers").read_text())
+
+    def test_glossy_chat_launcher_keeps_native_widget_and_accessibility(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text()
+            js = (output / "site.js").read_text()
+            for page in builder.PUBLIC_CONTACT_PAGES:
+                html = (output / page).read_text()
+                with self.subTest(page=page):
+                    self.assertEqual(html.count('id="retallyChatLauncher"'), 1)
+                    self.assertIn('type="button" aria-label="Open RETALLY AI chat assistant"', html)
+                    self.assertIn('aria-haspopup="dialog"', html)
+                    self.assertIn('class="retally-chat-orb"', html)
+                    self.assertEqual(html.count('data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147"'), 1)
+                    self.assertLess(html.index('id="retallyChatLauncher"'), html.index('data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147"'))
+            self.assertIn('window.BubblaV', js)
+            self.assertIn('api.open()', js)
+            self.assertIn('retally-chat-fallback', js)
+            self.assertIn('retally-chat-open', js)
+            self.assertIn('window.setInterval(syncRetallyChat, 500)', js)
+            self.assertIn('.retally-chat-launcher:focus-visible', css)
+            self.assertIn('@media(prefers-reduced-motion:reduce)', css)
+            self.assertIn('#bv-chat-frame', css)
+            for name in ("recovery-status-example.html", "404.html"):
+                self.assertNotIn('id="retallyChatLauncher"', (output / name).read_text())
+
+    def test_cloudflare_turnstile_csp_coexists_with_chatbot(self):
+        from freight.site.cloudflare_build import allow_verified_pages_inquiry
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            allow_verified_pages_inquiry(output)
+            for name in ("index.html", "_headers"):
+                content = (output / name).read_text()
+                self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;", content)
+                self.assertIn("connect-src 'self' https://www.bubblav.com", content)
+                self.assertIn("frame-src https://www.bubblav.com", content)
+                self.assertIn("https://challenges.cloudflare.com;", content)
+                self.assertNotIn("connect-src 'none'", content)
+
+
+
+class SignatureFinishTests(unittest.TestCase):
+    """Selective visual tokens without marketing-content or intake changes."""
+
+    def test_white_primary_button_gradient_stops_meet_text_contrast(self):
+        # The button's label is white. Check every base and hover stop,
+        # rather than assuming a branded green is automatically legible.
+        def luminance(hexcolor):
+            channels = [int(hexcolor[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+            linear = [n / 12.92 if n <= 0.04045 else ((n + 0.055) / 1.055) ** 2.4
+                      for n in channels]
+            return sum(a * b for a, b in zip(linear, (0.2126, 0.7152, 0.0722)))
+
+        for color in ("#0b8055", "#086f4b", "#07553a",
+                      "#0c8758", "#087952", "#064b37"):
+            with self.subTest(color=color):
+                self.assertGreaterEqual(1.05 / (luminance(color) + 0.05), 4.5)
+
+
+    def test_premium_surfaces_are_present_and_bounded(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            bundle = build(Path(temporary) / "public")
+            css = (bundle / "foundry.css").read_text(encoding="utf-8")
+            home = (bundle / "index.html").read_text(encoding="utf-8")
+            report = (bundle / "recovery-status-example.html").read_text(encoding="utf-8")
+            self.assertEqual(css.count("RETALLY Signature Finish v1"), 1)
+            for selector in (
+                ".button-signal,.button-cobalt{",
+                ".site-header .navlinks>.button-light{",
+                ".home-simple .opportunity-card{",
+                ".home-simple .price-card-primary{",
+                ".home-simple .price-card-dark{",
+                ".home-simple .form-shell{",
+                ".home-simple .choice-grid input:checked+span{",
+                ".sample-report .report-card.net{",
+                "@media(prefers-reduced-motion:reduce){",
+            ):
+                with self.subTest(selector=selector):
+                    self.assertIn(selector, css)
+            # The published structure and approved claims remain unchanged.
+            self.assertIn('id="auditForm"', home)
+            self.assertIn('id="retallyChatLauncher"', home)
+            self.assertIn("Sample audit", home)
+            self.assertIn("Illustrative only. Not customer results.", home)
+            self.assertIn("No recovery, no recovery fee", home)
+            self.assertIn("Sample Recovery Report", report)
+            self.assertIn("$13,450.00", report)
+            self.assertNotIn("backdrop-filter:blur(", css[css.index("RETALLY Signature Finish v1"):])
+            self.assertNotIn("@keyframes", css[css.index("RETALLY Signature Finish v1"):])
+            self.assertEqual(set(builder.PUBLIC_FILES), {
+                p.relative_to(bundle).as_posix() for p in bundle.rglob("*") if p.is_file()
+            })
+
+
+class PremiumFinishV2Tests(unittest.TestCase):
+    def test_footer_contact_has_distinct_layout_and_measured_qa(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text()
+            html = (output / "index.html").read_text()
+            visual = Path(__file__).with_name("visual_acceptance.py").read_text()
+
+            self.assertEqual(html.count('data-contact-link href="mailto:'), 1)
+            self.assertIn("RETALLY Premium Finish V2: customer contact clarity", css)
+            self.assertIn(".home-simple .simple-footer > div:first-child{", css)
+            self.assertIn("flex-direction:column;", css[css.index("RETALLY Premium Finish V2:"):])
+            self.assertIn("min-height:44px;", css[css.index("RETALLY Premium Finish V2:"):])
+            self.assertIn("touchHeightPx", visual)
+            self.assertIn("nonOverlapping", visual)
+            self.assertIn("footerContact", visual)
+
+
+
+
+class RetallyApprovedBrandAssetTests(unittest.TestCase):
+    """The website must serve the exact binary master artwork approved by RETALLY."""
+
+    def test_exact_approved_master_hashes_and_no_unapproved_logo(self):
+        import hashlib
+        import struct
+
+        # SHA-256 values registered in freight/brand/RETALLY_ASSET_REGISTER_V4.md.
+        approved = {
+            "assets/brand/retally-wordmark-approved.png": (
+                "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd", (1619, 257)),
+            "assets/brand/retally-emblem-approved.png": (
+                "bb02ab4a468762f597c241199baeff61b485dd793f8fb746140ad33670b68043", (805, 776)),
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for relative, (digest, dimensions) in approved.items():
+                with self.subTest(asset=relative):
+                    data = (output / relative).read_bytes()
+                    self.assertEqual(hashlib.sha256(data).hexdigest(), digest)
+                    self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"))
+                    self.assertEqual(struct.unpack(">II", data[16:24]), dimensions)
+            manifest = json.loads((output / "site.webmanifest").read_text())
+            self.assertEqual(manifest["icons"], [{
+                "src": "assets/brand/retally-emblem-approved.png",
+                "sizes": "805x776", "type": "image/png", "purpose": "any"}])
+            self.assertFalse((output / "assets/brand/retally-emblem.webp").exists())
+            for rejected in ("assets/brand/retally-wordmark.svg",
+                             "assets/brand/retally-emblem.svg", "favicon.svg"):
+                self.assertFalse((output / rejected).exists())
+            for page in builder.TEXT_SOURCE_FILES:
+                if page.endswith(".html"):
+                    html = (output / page).read_text(encoding="utf-8")
+                    self.assertNotIn("assets/brand/retally-emblem.webp", html)
+                    self.assertNotIn("assets/brand/retally-wordmark.webp", html)
+                    self.assertNotIn("assets/brand/retally-wordmark.svg", html)
+                    self.assertNotIn("assets/brand/retally-emblem.svg", html)
+            index = (output / "index.html").read_text()
+            self.assertIn("assets/brand/retally-wordmark-approved.png", index)
+            self.assertIn("assets/brand/retally-emblem-approved.png", index)
+
+
+
+class RetallySocialFooterTests(unittest.TestCase):
+    """Official social links are site-wide, keyboard-usable and never duplicated."""
+
+    def test_verified_social_navigation_on_each_marketing_page(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            verified = (
+                "https://www.facebook.com/p/Retally-61595467040747/",
+                "https://www.instagram.com/retallyrecovery/",
+                "https://www.linkedin.com/company/retallyrecovery/",
+                "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
+            )
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(page=name):
+                    page = (output / name).read_text(encoding="utf-8")
+                    self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
+                    self.assertIn("Follow ", page)
+                    self.assertIn('class="retally-wordmark"', page)
+                    self.assertIn('alt="RETALLY"', page)
+                    self.assertEqual(page.count('class="retally-social__links"'), 1)
+                    for url in verified:
+                        self.assertEqual(page.count('href="' + url + '"'), 1)
+                    for network in ("Facebook", "Instagram", "LinkedIn", "YouTube"):
+                        self.assertIn(
+                            'aria-label="RETALLY on ' + network
+                            + ' (opens in a new tab)"', page
+                        )
+                    social = page.split('<nav class="wrap retally-social"', 1)[1].split("</nav>", 1)[0]
+                    self.assertEqual(social.count('target="_blank" rel="noopener noreferrer"'), 4)
+                    self.assertEqual(social.count('focusable="false"'), 4)
+                    self.assertEqual(social.count('class="retally-social__brandmark '), 4)
+                    self.assertEqual(social.count('class="retally-social__button '), 4)
+                    for slug, network, url, detail, official_path in builder.SOCIAL_CHANNELS:
+                        self.assertIn('retally-social__button--' + slug, social)
+                        self.assertIn('retally-social__brandmark--' + slug, social)
+                        self.assertIn('<path d="' + official_path + '"/>', social)
+                        self.assertIn('>' + network + '</strong>', social)
+                        self.assertIn('>' + detail + '</span>', social)
+                    self.assertIn('foundry.css?v=retally-all-buttons-3d-20261010', page)
+                    self.assertEqual(social.count('<svg '), 4)
+                    self.assertNotIn("linkedin.com/in/", page.lower())
+
+    def test_mobile_and_keyboard_presentation_are_not_icon_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text(encoding="utf-8")
+            for needle in (
+                "RETALLY SOCIAL | Signature Glass v2",
+                ".site-footer .retally-social__button:focus-visible",
+                ".site-footer .retally-social__brandmark--facebook",
+                ".site-footer .retally-social__brandmark--instagram",
+                ".site-footer .retally-social__brandmark--linkedin",
+                ".site-footer .retally-social__brandmark--youtube",
+                "fill:#0866ff",
+                "fill:#ff0033",
+                "fill:#fff",
+                "background:linear-gradient(38deg,#ffdc80",
+                "grid-template-columns:repeat(4,minmax(0,1fr))",
+                "grid-template-columns:repeat(2,minmax(0,1fr))",
+                "min-height:105px",
+                "@media(max-width:340px)",
+                "@media(prefers-reduced-motion:reduce)",
+            ):
+                self.assertIn(needle, css)
+            self.assertNotIn("RETALLY social footer v1", css)
+            self.assertNotIn("backdrop-filter:", css[css.index("RETALLY SOCIAL | Signature Glass v2"):])
+
+
+
+class RetallyAllButtonFinishTests(unittest.TestCase):
+    """All public CTA classes share one polished, accessible presentation."""
+
+    def test_global_button_tokens_cover_real_button_types(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text(encoding="utf-8")
+            end = css[css.index("RETALLY | Unified 3D Interaction Finish v1"):]
+            for selector in (
+                ".button{",
+                ".button::before{",
+                ".button::after{",
+                ".button:hover:not(:disabled):not([aria-disabled=\"true\"]){",
+                ".button:active:not(:disabled):not([aria-disabled=\"true\"]){",
+                ".button:focus-visible{",
+                ".button:disabled,.button[aria-disabled=\"true\"]{",
+                ".button.button-small{",
+                ".button.button-signal,.button.button-cobalt{",
+                ".button.button-light,.button.button-quiet{",
+                ".button.button-ghost{",
+                ".site-header .navlinks>.button.button-light{",
+                ".text-button{",
+                ".text-button:focus-visible{",
+                ".site-header .menu-toggle{",
+                ".site-header .menu-toggle:focus-visible{",
+                ".mobile-cta b{",
+                ".mobile-cta:focus-visible{",
+                "@media(hover:none){",
+                "@media(prefers-reduced-motion:reduce){",
+                "@media print{",
+            ):
+                with self.subTest(selector=selector):
+                    self.assertIn(selector, end)
+            self.assertNotIn("@keyframes", end)
+            self.assertNotIn("backdrop-filter", end)
+            self.assertNotIn("!important", end.split("@media(prefers-reduced-motion:reduce){")[0])
+            # Existing dedicated social identity and chat interaction stay separate.
+            self.assertIn("RETALLY SOCIAL | Signature Glass v2", css)
+            self.assertIn(".retally-chat-launcher:focus-visible", css)
+            self.assertIn(".mobile-cta{display:none!important}", css)
+
+    def test_fresh_css_cache_tag_is_on_every_styled_public_html_page(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            expected = 'href="foundry.css?v=retally-all-buttons-3d-20261010"'
+            for name in builder.TEXT_SOURCE_FILES:
+                if not name.endswith(".html"):
+                    continue
+                source = (builder.SOURCE / name).read_text(encoding="utf-8")
+                page = (output / name).read_text(encoding="utf-8")
+                if 'foundry.css?v=' in source:
+                    with self.subTest(page=name):
+                        self.assertEqual(page.count(expected), 1)
+                        self.assertNotIn("foundry.css?v=retally-social-gloss-20261010", page)
+                else:
+                    self.assertNotIn(expected, page)
+
+    def test_primary_cta_geometry_and_inquiry_contract_remain_intact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            self.assertIn('class="button button-signal" href="#start-audit"', page)
+            self.assertIn('class="button button-small button-light" href="#start-audit"', page)
+            self.assertIn('type="submit">Open My Free Audit Request</button>', page)
+            self.assertIn('id="retallyChatLauncher"', page)
+            self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
+            self.assertIn('href="https://www.linkedin.com/company/retallyrecovery/"', page)
+            self.assertNotIn("linkedin.com/in/", page.lower())
+
+
+class RetallyOrganicProofCardTests(unittest.TestCase):
+    """Original free buyer resources must be printable and never solicit customer files."""
+
+    def test_public_guides_are_discoverable_and_upload_free(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = build(Path(temp) / "site")
+            names = ("freight-credit-rebill-audit.html", "ltl-reweigh-reclass-checklist.html")
+            for name in names:
+                page = (root / name).read_text(encoding="utf-8")
+                self.assertIn('class="retally-fieldkit"', page)
+                self.assertIn("No account required", page)
+                self.assertIn('href="./#start-audit"', page)
+                self.assertNotIn('type="file"', page.lower())
+                self.assertIn('property="og:title"', page)
+            home = (root / "index.html").read_text(encoding="utf-8")
+            sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
+            for name in names:
+                self.assertIn('href="' + name + '"', home)
+                self.assertEqual(sitemap.count(name), 1)
+            self.assertIn('href="ltl-reweigh-reclass-checklist.html"', (root / names[0]).read_text())
+            self.assertIn('href="freight-credit-rebill-audit.html"', (root / names[1]).read_text())
+
+
+
+class RetallyLtlEvidenceComparatorTests(unittest.TestCase):
+    """Buyer source comparisons have no network, file uploads or class guesses."""
+
+    def test_public_comparator_is_bundled_and_discoverable_without_customer_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = build(Path(temp) / "public")
+            page = (out / "ltl-reweigh-evidence-comparator.html").read_text()
+            javascript = (out / "ltl-evidence-comparator.js").read_text()
+            for item in ('id="ltlCompareForm"', 'id="ltlCompareResults"',
+                         'src="ltl-evidence-comparator.js?v=20261018a"',
+                         'NMFTA', 'identical handling unit', 'property="og:title"'):
+                self.assertIn(item, page)
+            for item in ('type="file"', 'name="fullName"'):
+                self.assertNotIn(item, page)
+            for item in ('fetch(', 'XMLHttpRequest', 'localStorage', 'sessionStorage', 'sendBeacon'):
+                self.assertNotIn(item, javascript)
+            self.assertIn('href="ltl-reweigh-evidence-comparator.html"', (out / "index.html").read_text())
+            self.assertIn('href="ltl-reweigh-evidence-comparator.html"',
+                          (out / "ltl-reweigh-reclass-checklist.html").read_text())
+            self.assertIn('ltl-reweigh-evidence-comparator.html', (out / "sitemap.xml").read_text())
+            self.assertIn('ltl-evidence-comparator.js', builder.PUBLIC_FILES)
+            self.assertNotIn('test_ltl_evidence_comparator.cjs', builder.PUBLIC_FILES)
+
+
+
+class RetallyIndexNowPublicationTests(unittest.TestCase):
+    """Only the public ownership proof is published; the notifier stays private."""
+
+    def test_indexnow_public_key_exact_and_no_credential_or_customer_assets(self):
+        from freight.marketing.indexnow_notify import KEY
+        with tempfile.TemporaryDirectory() as temp:
+            public = build(Path(temp) / "public")
+            name = KEY + ".txt"
+            self.assertIn(name, builder.TEXT_SOURCE_FILES)
+            self.assertEqual((public / name).read_text(encoding="utf-8"), KEY + "\n")
+            self.assertEqual(len(KEY), 32)
+            self.assertNotIn("indexnow_notify.py", builder.PUBLIC_FILES)
+            self.assertNotIn("test_indexnow_notify.py", builder.PUBLIC_FILES)
+
+
+
+class RetallyBlankFreightEvidenceLedgerTests(unittest.TestCase):
+    """This buyer lead magnet is an empty local spreadsheet, never a recovery claim."""
+
+    def test_blank_template_columns_and_public_download_destinations(self):
+        import csv
+        from io import StringIO
+        with tempfile.TemporaryDirectory() as temp:
+            output = build(Path(temp) / "public")
+            name = "freight-recovery-evidence-ledger.csv"
+            self.assertIn(name, builder.TEXT_SOURCE_FILES)
+            source = (output / name).read_text(encoding="utf-8")
+            rows = list(csv.reader(StringIO(source)))
+            self.assertEqual(len(rows), 2, "One header and one blank starter row")
+            headers = rows[0]
+            self.assertEqual(len(headers), 24)
+            self.assertEqual(len(set(headers)), 24)
+            for heading in (
+                "Review_ID", "Governing_Rate_Terms_Source_Keep_Local",
+                "Candidate_Difference_Not_Savings",
+                "Previously_Applied_Credit_Or_Existing_Claim",
+                "Evidence_Status", "Human_Review_Outcome",
+                "Customer_Authorization", "Credit_Or_Refund_Actually_Posted",
+                "Reversal_Or_Offset",
+                "Net_Eligible_Realized_Value_Subject_To_Terms",
+                "Private_Evidence_Notes_Keep_Local",
+            ):
+                self.assertIn(heading, headers)
+            self.assertEqual(rows[1], [""] * len(headers))
+            self.assertNotIn("=", source)
+            self.assertNotIn("@", source)
+            for page in ("index.html", "freight-invoice-audit-checklist.html",
+                         "freight-recovery-evidence-standard.html", "referral-partners.html"):
+                markup = (output / page).read_text(encoding="utf-8")
+                self.assertIn('href="' + name + '" download', markup)
+            guide = (output / "freight-invoice-audit-checklist.html").read_text(encoding="utf-8")
+            self.assertIn('id="ledger"', guide)
+            self.assertIn("No macros or formulas", guide)
+            self.assertIn("candidate", guide.lower())
+            self.assertNotIn('type="file"', guide.lower())
 
 
 if __name__ == "__main__":

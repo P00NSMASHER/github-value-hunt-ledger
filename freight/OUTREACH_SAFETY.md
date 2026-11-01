@@ -8,6 +8,35 @@ The repository has outreach templates and an aggregate growth planner, but no Gm
 
 The growth planner defaults to PREP_OUTREACH_SAFETY (0 sends) when outreach_preflight_ready is absent or false. That flag reports readiness; it is not per-message authorization. A ready planner still requires the gate on every send.
 
+## Standing contact hold — 2026-10-19
+
+**Do not contact any buyer, prospect, partner, editor, directory operator, or other
+person without new, explicit approval from the owner.** Existing draft copy,
+old outreach campaigns, available SMTP/Gmail credentials, and the presence of
+scheduled content do not grant permission for another direct contact. Do not
+silently restart Day-5/Day-12 follow-ups or bypass this gate with a connector.
+Research, code/tests and offline editorial drafts may continue without sending.
+
+The private reservation gate now requires `sender.owner_approval` for **each
+specific proposed message**, with the following fields:
+
+- `confirmed_by_owner: true`, `approved_by: "OWNER"`, an externally reviewed
+  `evidence_ref`, and unique `approval_id` (at least eight safe characters);
+- exact normalized `recipient_key`, `account_id`, `channel`, and `touch`;
+- `message_sha256` computed via `outreachApprovalDigest(message)` over recipient,
+  channel, stage, subject, plain/HTML content, offer and personalization;
+- canonical UTC `approved_at` and `expires_at`, valid **no more than seven days**.
+
+Missing, expired, mismatched or previously consumed approvals fail closed; a
+reserved event binds its `owner_approval_id`. Keep the approval, message,
+recipient and evidence reference **outside the public checkout**. Never infer
+approval from a message digest or set `confirmed_by_owner` merely to pass CI.
+The digest and receipt fields **do not cryptographically prove the identity of
+the approver**, so a real operator must compare the receipt with the owner's
+actual decision. This safeguard only governs the repository preflight; direct
+Gmail, provider or social-media tools are separate paths and must independently
+respect the no-contact instruction. The preflight itself never sends anything.
+
 ## Private record
 
 Store company, account ID, normalized recipient, all sent dates/message IDs, response status, suppress/hold reason, route evidence, ICP qualification and current mailbox-check time in a private ledger outside the checkout. Never put prospect addresses, messages, or suppression lists in GitHub or Actions artifacts/logs. Use one account ID for all company recipient aliases. Treat Gmail DRAFT records as drafts, never as evidence of delivery. SENT is evidence of sending, not receipt by the buyer.
@@ -32,7 +61,7 @@ node freight/outreach_preflight.mjs /private/message.json /private/ledger.json /
 
 ## Input contract
 
-sender: identity, postal_approved boolean, postal_lines array (street/box plus city/state/ZIP).
+sender: identity, postal_approved boolean, postal_lines array (street/box plus city/state/ZIP), and a separately owner-approved, message-bound `owner_approval` receipt as specified above.
 
 ledger: schema_version=1, audit_hold=false, mailbox_checked_at ISO timestamp, contacts array and events array. Each contact: recipient_key, account_id, route_verified, suppressed, hold, status. BUYER qualification: icp_version=ICP_V1, approved, integer score, us_distributor_or_multisite_shipper, target_scale_band, meaningful_ltl_or_parcel, numeric history_months, finance_owner_verified, disqualified=false, mature_controls and evidence URLs. Other channels use channel_approved. Every prior SENT event requires recipient_key, account_id, message_id and sent_at. Open reservations must remain in the same ledger across campaigns and workers.
 

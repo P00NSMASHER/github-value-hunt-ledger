@@ -1,6 +1,5 @@
 import hashlib
 
-import pytest
 
 from freight.audit_workflow import (
     AuditWorkflowStage,

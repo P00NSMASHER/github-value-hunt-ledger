@@ -1,0 +1,38 @@
+name: Portfolio CI Main-Only Policy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'tests/ci-main-only-policy.test.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'tests/ci-main-only-policy.test.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: policy-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  main-only-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.4"
+      - name: Verify October 2026 patched Node.js runtime
+        run: |
+          node --version
+          node -e 'const [major,minor,patch]=process.versions.node.split(".").map(Number); if(major!==22 || minor<23 || (minor===23 && patch<4)) process.exit(1)'
+      - name: Assert all original CI lanes and no main cancellation
+        run: node --test tests/ci-main-only-policy.test.mjs

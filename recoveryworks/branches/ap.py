@@ -12,14 +12,13 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from datetime import date
-import re
 from typing import Any, Iterable, Mapping
 
 from recoveryworks.engine import RecoveryObservation
+from recoveryworks.financial_events import net_settlements
 from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
 
-_SUFFIX = re.compile(r"[-_]?(R|DUP|COPY|REV|REVERSAL)[-_]?$", re.IGNORECASE)
 
 
 def _required(name: str, value: str) -> str:
@@ -50,9 +49,9 @@ def _iso_date(name: str, value: str) -> str:
 
 
 def normalize_invoice_number(value: str) -> str:
-    """Normalize one known duplicate/reversal suffix without stripping digits."""
+    """Preserve invoice identity; suffix similarity never proves equivalence."""
     text = _required("invoice_number", value).upper().replace(" ", "")
-    return _SUFFIX.sub("", text)
+    return text
 
 
 @dataclass(frozen=True)
@@ -67,10 +66,16 @@ class APPayment:
     payment_date: str | None = None
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    reverses_id: str | None = None
+
     def __post_init__(self) -> None:
         for name in ("payment_id", "vendor_id", "invoice_number", "source_hash", "source_locator"):
             _required(name, getattr(self, name))
-        _positive_cents("amount_cents", self.amount_cents)
+        _signed_cents("amount_cents", self.amount_cents)
+        if self.amount_cents == 0 or (self.amount_cents < 0 and not self.reverses_id):
+            raise ValueError("payment must be positive or a linked negative reversal/refund")
+        if self.reverses_id and not self.payment_date:
+            raise ValueError("linked refund requires payment date")
         if self.payment_date is not None:
             _iso_date("payment_date", self.payment_date)
         if type(self.verified) is not bool:
@@ -95,6 +100,7 @@ class APPayment:
                 "vendor_id": self.vendor_id,
                 "invoice_number": self.invoice_number,
                 "payment_date": self.payment_date,
+                "reverses_id": self.reverses_id,
                 **dict(self.metadata),
             },
         )
@@ -309,7 +315,7 @@ def _dedupe_payment_ids(
             continue
 
         signatures = {
-            (item.amount_cents, item.payment_date, item.source_hash, item.verified)
+            (item.amount_cents, item.payment_date, item.source_hash, item.verified, item.reverses_id)
             for item in items
         }
         reference = f"{key[0]}/{key[1]}/{key[2]}"
@@ -387,6 +393,7 @@ def audit_ap_recovery(
     accepted_payments, payment_exceptions = _dedupe_payment_ids(payments)
     statement_by_key, statement_exceptions = _latest_statement_index(statements)
     exceptions = list(payment_exceptions) + list(statement_exceptions)
+    blocked_statements = {item.reference for item in statement_exceptions}
 
     payment_groups: dict[tuple[str, str], list[APPayment]] = defaultdict(list)
     for payment in accepted_payments:
@@ -398,12 +405,20 @@ def audit_ap_recovery(
 
     for key in sorted(payment_groups):
         vendor_id, normalized_invoice = key
+        if f"{vendor_id}/{normalized_invoice}" in blocked_statements:
+            continue
         items = sorted(payment_groups[key], key=lambda p: p.payment_id)
+        try:
+            net_paid = net_settlements(items, amount_field="amount_cents", id_field="payment_id", date_field="payment_date")
+        except (ValueError, TypeError) as exc:
+            exceptions.append(APRecoveryException(f"{vendor_id}/{normalized_invoice}", "INVALID_PAYMENT_LINEAGE", str(exc)))
+            represented_statement_keys.add(key)
+            continue
         obligation = obligation_by_key.get(key)
         statement = statement_by_key.get(key)
 
         if obligation is not None:
-            actual_cents = sum(p.amount_cents for p in items)
+            actual_cents = net_paid
             if actual_cents <= obligation.expected_cents:
                 continue
             recovery_cents = actual_cents - obligation.expected_cents
@@ -464,6 +479,10 @@ def audit_ap_recovery(
             ))
             continue
 
+        if any(p.amount_cents < 0 for p in items):
+            exceptions.append(APRecoveryException(f"{vendor_id}/{normalized_invoice}", "REFUND_WITHOUT_OBLIGATION", "net payments need a controlling obligation"))
+            represented_statement_keys.add(key)
+            continue
         by_amount: dict[int, list[APPayment]] = defaultdict(list)
         for payment in items:
             by_amount[payment.amount_cents].append(payment)

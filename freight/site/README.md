@@ -1,4 +1,4 @@
-# Freight Recovery public site
+# RETALLY public freight site
 
 This directory is the allowlisted source for the customer-facing GitHub Pages
 bundle at `https://p00nsmasher.github.io/github-value-hunt-ledger/`.
@@ -85,3 +85,7 @@ Run the site build tests, commercial-term tests, qualification tests, browser
 script syntax checks, and a rendered responsive pass before deployment. Search
 the built public directory for legacy checkout prices and links; none should be
 present.
+
+## Brand presentation
+
+The original website geometry, fonts, layout, intake and recovery logic are retained. Only the approved RETALLY logos and the emerald/deep-forest color system change. Published wordmark and emblem WebP assets are compact derivatives of the approved original raster artwork. Keep the full-resolution masters in the RETALLY brand starter package. Do not rename the `FreightRecoveryAnalytics` JavaScript API or existing public URLs without a separate migration.

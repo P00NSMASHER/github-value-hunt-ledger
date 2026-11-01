@@ -1,0 +1,146 @@
+name: RETALLY Inquiry CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - "functions/api/inquiry.js"
+      - "functions/api/group-inquiry.js"
+      - "functions/api/internal/**"
+      - "freight/site/operator_access_auth.js"
+      - "freight/inquiry_ops/**"
+      - "freight/site/test_inquiry_case.mjs"
+      - "freight/site/test_inquiry_retention.py"
+      - "freight/site/privacy.html"
+      - "freight/site/site.js"
+      - "freight/site/index.html"
+      - "freight/site/_headers"
+      - "freight/site/test_inquiry.mjs"
+      - "freight/site/test_group_inquiry.mjs"
+      - "freight/site/test_group_inquiry_cors.mjs"
+      - "freight/site/group/**"
+      - "company_sites/**"
+      - "freight/site/migrations/**"
+      - ".github/workflows/retally-inquiry.yml"
+  pull_request:
+    paths:
+      - "functions/api/inquiry.js"
+      - "functions/api/group-inquiry.js"
+      - "functions/api/internal/**"
+      - "freight/site/operator_access_auth.js"
+      - "freight/inquiry_ops/**"
+      - "freight/site/test_inquiry_case.mjs"
+      - "freight/site/test_inquiry_retention.py"
+      - "freight/site/privacy.html"
+      - "freight/site/site.js"
+      - "freight/site/index.html"
+      - "freight/site/_headers"
+      - "freight/site/test_inquiry.mjs"
+      - "freight/site/test_group_inquiry.mjs"
+      - "freight/site/test_group_inquiry_cors.mjs"
+      - "freight/site/group/**"
+      - "company_sites/**"
+      - "freight/site/migrations/**"
+      - ".github/workflows/retally-inquiry.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+
+# Avoid duplicate branch push + PR validation; superseded same-ref CI is cancelled.
+concurrency:
+  group: retally-inquiry-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  intake-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.4"
+      - name: Verify October 2026 patched Node.js runtime
+        run: |
+          node --version
+          node -e 'const [major,minor,patch]=process.versions.node.split(".").map(Number); if(major!==22 || minor<23 || (minor===23 && patch<4)) process.exit(1)'
+      - name: Browser JavaScript syntax
+        run: |
+          node --check freight/site/site.js
+          node --check company_sites/group/enquiry.js
+      - name: Pages API JavaScript syntax
+        run: |
+          node --experimental-default-type=module --check functions/api/inquiry.js
+          node --experimental-default-type=module --check functions/api/group-inquiry.js
+      - name: Secure inquiry unit and mocked integration tests
+        run: |
+          node --experimental-default-type=module --test freight/site/test_inquiry.mjs freight/site/test_group_inquiry.mjs freight/site/test_group_inquiry_cors.mjs
+          node --test company_sites/test_group_client.mjs
+      - name: Signed human response, privacy and retention policy tests
+        run: |
+          node --check functions/api/internal/inquiry-case.js
+          node --check functions/api/internal/inquiry-response.js
+          node --check freight/site/operator_access_auth.js
+          node --experimental-sqlite --test freight/site/test_inquiry_case.mjs freight/inquiry_ops/test_reconcile.mjs
+          python -m unittest freight.site.test_inquiry_retention
+      - name: Verify restored freight and independent Group Content Security Policy
+        env:
+          FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
+          FREIGHT_CONTACT_VERIFIED: "1"
+        run: |
+          python -m freight.site.cloudflare_build
+          python company_sites/build.py group --output cf-retally-group-inquiry
+          python - <<'PY'
+          from pathlib import Path
+          from freight.site.build import SOURCE
+          from freight.site.cloudflare_build import EXPECTED_FILES
+          public = Path('cf-retally-public')
+          recovery = (public / 'recovery/index.html').read_text()
+          home = (public / 'index.html').read_text()
+          group_public = Path('cf-retally-group-inquiry')
+          group = (group_public / 'index.html').read_text()
+          group_headers = (group_public / '_headers').read_text()
+          contact = (public / 'contact/index.html').read_text()
+          headers = (public / '_headers').read_text()
+          legacy = (SOURCE / 'index.html').read_text()
+          # Require the precise existing vendor and Turnstile allowlist. The
+          # BubblaV public-chat integration was merged independently; never
+          # weaken this test by accepting arbitrary script/connect hosts.
+          connect = ("connect-src 'self' https://www.bubblav.com "
+                     "https://bubblav.com https://*.bubblav.com "
+                     "https://challenges.cloudflare.com;")
+          frame = ("frame-src https://www.bubblav.com https://bubblav.com "
+                   "https://*.bubblav.com https://challenges.cloudflare.com;")
+          script = "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"
+          for published in (home, recovery, headers):
+              assert connect in published
+              assert frame in published
+              assert script in published
+          assert "connect-src 'none'" in legacy
+          assert "script-src 'self';" in legacy
+          assert '<link rel="canonical" href="https://www.retallyrecovery.com/">' in recovery
+          assert 'id="auditForm"' in recovery
+          assert '<link rel="canonical" href="https://www.retallyrecovery.com/">' in home
+          assert 'id="auditForm"' in home and 'id="group-enquiry"' not in home
+          assert 'group.js' not in home and 'group.css' not in home
+          assert '<link rel="canonical" href="https://group.retallyrecovery.com/">' in group
+          assert 'id="group-enquiry"' in group and 'id="auditForm"' not in group
+          assert 'http-equiv="Content-Security-Policy"' not in group
+          assert 'id="group-enquiry"' not in contact and '<form' not in contact
+          assert 'href="https://group.retallyrecovery.com/#contact"' in contact
+          assert '/contact/ https://group.retallyrecovery.com/#contact 301' in (public / '_redirects').read_text()
+          group_csp = ("default-src 'self'; script-src 'self' https://challenges.cloudflare.com; "
+                       "style-src 'self'; img-src 'self' data:; font-src 'self'; "
+                       "connect-src 'self' https://www.retallyrecovery.com https://challenges.cloudflare.com; "
+                       "frame-src https://challenges.cloudflare.com; object-src 'none'; "
+                       "base-uri 'none'; frame-ancestors 'none'; form-action 'none'; upgrade-insecure-requests")
+          assert [line.strip() for line in group_headers.splitlines() if 'Content-Security-Policy:' in line] == [
+              'Content-Security-Policy: ' + group_csp]
+          client = (group_public / 'enquiry.js').read_text()
+          assert 'https://www.retallyrecovery.com/api/group-inquiry' in client
+          assert 'credentials: "omit"' in client and 'mode: "cors"' in client and 'redirect: "error"' in client
+          assert 'window.location.replace' not in client
+          assert 'window.location.replace' not in (public / 'site.js').read_text()
+          assert '/*' in headers
+          assert len([x for x in public.rglob('*') if x.is_file()]) == EXPECTED_FILES
+          PY
+

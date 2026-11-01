@@ -1,4 +1,4 @@
-# Founding Freight Recovery Program
+# Founding RETALLY Program
 
 Version: 1.0
 Launch: 2026-10-06
@@ -6,7 +6,7 @@ Capacity: first 3 qualified customers
 
 ## Objective
 
-The Founding Freight Recovery Program is designed to convert the current evidence-first product into real customer outcomes without fabricating proof or maximizing early margin.
+The Founding RETALLY Program is designed to convert the current evidence-first product into real customer outcomes without fabricating proof or maximizing early margin.
 
 Primary outcome chain:
 
@@ -49,7 +49,7 @@ Preferred company profile:
 
 Case-study permission is never required to receive the founding offer.
 
-After a successful externally evidenced recovery, Freight Recovery may separately offer an additional commercial concession in exchange for written permission to publish an agreed case study.
+After a successful externally evidenced recovery, RETALLY may separately offer an additional commercial concession in exchange for written permission to publish an agreed case study.
 
 The customer controls:
 - whether its name is used;

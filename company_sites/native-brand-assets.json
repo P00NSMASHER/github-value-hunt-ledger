@@ -1,0 +1,82 @@
+{
+  "freightrecovery": {
+    "emblem": "freightrecovery-emblem.webp",
+    "lockup": "freightrecovery-lockup.webp",
+    "favicon": "freightrecovery-favicon.png",
+    "source_sha256": "7848b5c5ec83d38a829b1b514d79187321a35519c23cf3c05ed3f6804f2b96b1",
+    "sizes": {
+      "freightrecovery-emblem.webp": {
+        "bytes": 81006,
+        "sha256": "55ce8468b7b69761287951413a4f8932d02b003af73e07c70c4a54471b082fc3"
+      },
+      "freightrecovery-lockup.webp": {
+        "bytes": 151688,
+        "sha256": "68640f8f75eed80ecf294e17454924ba94f2e260abb4e51591202aefb455bb84"
+      },
+      "freightrecovery-favicon.png": {
+        "bytes": 42732,
+        "sha256": "66828108d79f7b62c88f3b83bb8f23a3b96394b413f3d950aabadfd620615ba5"
+      }
+    }
+  },
+  "recoveryos": {
+    "emblem": "recoveryos-emblem.webp",
+    "lockup": "recoveryos-lockup.webp",
+    "favicon": "recoveryos-favicon.png",
+    "source_sha256": "d16600b04a7a6d9156798cae811e093e7d0e25c226da37145fbcde061dcffca7",
+    "sizes": {
+      "recoveryos-emblem.webp": {
+        "bytes": 59240,
+        "sha256": "ddcbc6488976b8a7646776452b96562c9837bb441fdd75a967618c063a78cd37"
+      },
+      "recoveryos-lockup.webp": {
+        "bytes": 117294,
+        "sha256": "7538b25406d9a3c6cf9165815fa714cccd4e5ebddcef19ad5ce594d238031d20"
+      },
+      "recoveryos-favicon.png": {
+        "bytes": 34566,
+        "sha256": "60b4d781b30f3a542a0cfae9dde2ac4cdd8c7a8589146f54ce5b61a7196539ae"
+      }
+    }
+  },
+  "permitplate": {
+    "emblem": "permitplate-emblem.webp",
+    "lockup": "permitplate-lockup.webp",
+    "favicon": "permitplate-favicon.png",
+    "source_sha256": "ce03e217bee3045345719896ed5f82c9cddc9a834866eb7d62d42755661ea7db",
+    "sizes": {
+      "permitplate-emblem.webp": {
+        "bytes": 127608,
+        "sha256": "5be8d986556ef4837b175c80905314c6ab69635e5ee932ae22535a2fc5ecddc7"
+      },
+      "permitplate-lockup.webp": {
+        "bytes": 129802,
+        "sha256": "e3470e84a4a4a6880d9b2cd9787fb1afbd38c6f8101f06cea02c0ae8da19337c"
+      },
+      "permitplate-favicon.png": {
+        "bytes": 98464,
+        "sha256": "724819bdfca589a50747f8301e915ad92029cd746e6441707c6f347ae993a4da"
+      }
+    }
+  },
+  "capturebrief": {
+    "emblem": "capturebrief-emblem.webp",
+    "lockup": "capturebrief-lockup.webp",
+    "favicon": "capturebrief-favicon.png",
+    "source_sha256": "6511ff2c8d3d775b91a8fe349711b40c478c34ed044798a75ab07269095b5847",
+    "sizes": {
+      "capturebrief-emblem.webp": {
+        "bytes": 132520,
+        "sha256": "d7e600dc42447d1c793b4388ad8ee9495537dea6decf3d55341dd9a57fdc8681"
+      },
+      "capturebrief-lockup.webp": {
+        "bytes": 123480,
+        "sha256": "1ac26fcad68aacf44c5f6d434d6414d2d45a5cbe676ceb62efe2cce7774ac457"
+      },
+      "capturebrief-favicon.png": {
+        "bytes": 83118,
+        "sha256": "3d44d36cb620f7091892b2d4e6de3c0159f7730ab9efb593bdb01bde8d3f02c1"
+      }
+    }
+  }
+}

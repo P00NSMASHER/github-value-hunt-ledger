@@ -1,0 +1,75 @@
+name: RETALLY Official Public Freight Corpus (No External Bytes)
+
+on:
+  pull_request:
+    paths:
+      - 'freight/public_freight_corpus.py'
+      - 'freight/test_public_freight_corpus.py'
+      - 'freight/real_world_eval_v1.py'
+      - 'freight/test_real_world_eval_v1.py'
+      - 'freight/fixtures/real_world_eval_v1.json'
+      - 'freight/REAL_WORLD_EVAL_V1.md'
+      - 'freight/PUBLIC_FREIGHT_SOURCE_LAB_2026-10-22.md'
+      - '.github/workflows/retally-public-freight-corpus.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freight/public_freight_corpus.py'
+      - 'freight/test_public_freight_corpus.py'
+      - 'freight/real_world_eval_v1.py'
+      - 'freight/test_real_world_eval_v1.py'
+      - 'freight/fixtures/real_world_eval_v1.json'
+      - 'freight/REAL_WORLD_EVAL_V1.md'
+      - '.github/workflows/retally-public-freight-corpus.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retally-public-freight-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  public-freight-research:
+    name: public-freight-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Pin Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install only the test runner
+        run: python -m pip install --disable-pip-version-check --no-input pytest==8.4.2
+      - name: Compile actual isolated study and test source
+        run: python -m compileall -q freight/public_freight_corpus.py freight/test_public_freight_corpus.py freight/real_world_eval_v1.py freight/test_real_world_eval_v1.py
+      - name: Replay official facts and exercise real freight engines
+        run: python -m pytest -q freight/test_public_freight_corpus.py freight/test_real_world_eval_v1.py
+      - name: Emit de-identified source/scenario summary
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python -m freight.public_freight_corpus
+          python -m freight.real_world_eval_v1
+      - name: Assert original source bytes and private customer data not admitted
+        env:
+          PYTHONPATH: '.'
+        shell: python
+        run: |
+          from freight.public_freight_corpus import SOURCES
+          from freight.real_world_eval_v1 import load_manifest, validate_manifest
+          by_id = validate_manifest(load_manifest())
+          assert len(by_id) == 9
+          assert all(x['original_bytes_sha256'] is None for x in by_id.values())
+          assert len(SOURCES) == 5
+          assert all(s.original_bytes_sha256 is None for s in SOURCES)
+          assert all(not s.verified_bank_source for s in SOURCES)
+          assert all(not s.commercial_recovery_authorized for s in SOURCES)

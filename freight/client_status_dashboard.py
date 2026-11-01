@@ -64,6 +64,8 @@ def validate(payload):
         raise ValueError("validated difference cannot exceed candidate difference")
     if clean["approved_claim_cents"] > clean["validated_difference_cents"]:
         raise ValueError("approved claims cannot exceed validated difference")
+    if clean["gross_recovered_cents"] > clean["approved_claim_cents"]:
+        raise ValueError("gross recovered cannot exceed approved claim value")
     if clean["reversal_cents"] > clean["gross_recovered_cents"]:
         raise ValueError("reversal value cannot exceed gross recovered")
     if clean["net_recovered_cents"] != clean["gross_recovered_cents"] - clean["reversal_cents"]:

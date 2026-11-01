@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_PERMITPLATE_WRONG_TOPIC_SOURCE_QUARANTINE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_SUITABILITY_ONLY",
+  "pinned_input": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "branch": "research/retally-unified-data-lab",
+    "commit_sha": "e155efa9b1aa44db5771d69633f8f30302d3f2f6",
+    "path": "freight/research_lab/leads.json",
+    "git_blob_sha": "49adf78e9468b739ecaae623dd6efe159d1d84e6",
+    "entries_sha256": "6759c4919c86264c6394ef3f0f04c07acdafaf9f72e68a9efc8a5b8b5df4a7e1",
+    "entry_count": 252,
+    "permitplate_assigned_pointers": 42
+  },
+  "partition": {
+    "observed_wrong_topic_excluded": 18,
+    "remaining_unreviewed_permitplate_pointers": 20,
+    "remaining_status": "UNVERIFIED_NOT_ELIGIBLE_OR_INELIGIBLE_UNTIL_SEPARATE_SOURCE_RIGHTS_AND_LABEL_REVIEW",
+    "context_only_unadjudicated": 2,
+    "context_only_status": "CANDIDATE_FOR_BUILDING_CONTEXT_ONLY_NOT_ISSUANCE_GROUND_TRUTH_RIGHTS_UNVERIFIED",
+    "application_only_unadjudicated": 1,
+    "application_only_status": "DOB_NOW_JOB_APPLICATION_SCOPE_VERIFIED_ISSUANCE_AND_COMMERCIAL_RIGHTS_UNKNOWN",
+    "restricted_context_rights_hold": 1,
+    "restricted_context_status": "PUBLIC_METADATA_VERIFIED_COMMERCIAL_REUSE_RESTRICTED_WRITTEN_CONSENT_REQUIRED_NOT_ISSUED_PERMIT_TRUTH"
+  },
+  "cases": [
+    {
+      "id": "0b13bef20ee55e4da73e574abbdd7dc4002acfe3416cea51069a64bff2afd99f",
+      "url": "https://github.com/akilism/nyc-restaurant-inspection-extension",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "0f742810f7ee82bf71156873340a62ef2c25b92ddef10a1c6535687e4c300e62",
+      "url": "https://github.com/piyush-an/NYC-Restaurant-Inspection",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "1fbee3d850a8cbfe0e4874c981ebba9d515230089c73c982332c491ec24cd4ec",
+      "url": "https://github.com/rspiro9/NYC-Restaurant-Yelp-and-Inspection-Analysis",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "24ec1ba8aa7d352dc8db2e673e6c3dbdbc3e5f7b0f60679549f3f319ce55c40f",
+      "url": "https://github.com/gzsuyu/Data-Analysis-NYC-Restaurant-Inspection-Data",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "2e845518ab649aa06bc888a93e59f024f2a43bde93f7e34d8a112ed71d2b4688",
+      "url": "https://github.com/drjasondavis/Nyc-Restaurant-Inspection-Analysis",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "38ed2381b3da6fa842f1b26a523bb51ca57a9a7996790969a5a64de5f59ab566",
+      "url": "https://data.cityofnewyork.us/d/pitm-atqc",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "Open Restaurant Applications (Historic)",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/pitm-atqc",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "434fb6f356c2704ca5b56f3f96704dcf9d6e4647843741096a637d4432212854",
+      "url": "https://data.cityofnewyork.us/d/43nn-pn8j",
+      "first_seen": "2026-10-22",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "DOHMH New York City Restaurant Inspection Results",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/43nn-pn8j",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "49db47604edae2ad15a7d732bb0ec8a951cb2ee2dfe98545b2016198a551005d",
+      "url": "https://github.com/ryankanno/archive-nyc-restaurant-inspections-api",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "6141383cac0f47cbed1b3701bc3749dce65b2c1ca75e4bb66bb5184d89a75578",
+      "url": "https://github.com/bswinnerton/nyc-restaurant-grades",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "8e60922d492462b1d973f82946a23e70323c111cd1af88d33c9e82da86978774",
+      "url": "https://data.cityofnewyork.us/d/fpeh-f7ci",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "Dining Out NYC Locations",
+      "publisher_metadata_reference": "https://catalog.data.gov/dataset/dining-out-nyc-locations",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "8f2438fbb256b07647937453082a12901dd17670c17b00d318149b3ab6c84b69",
+      "url": "https://data.cityofnewyork.us/d/qcdj-rwhu",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "HISTORICAL Sidewalk Café Licenses and Applications",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/qcdj-rwhu",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "9d68ebec6904e9acb4afa01f16ec8ea205ac748b21e4b64e69b0cd23ae287677",
+      "url": "https://github.com/gcivil-nyu-org/dine-safe-ly",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null,
+      "publisher_metadata_title": "A restaurant locator using COVID-19 restaurant inspection data",
+      "publisher_metadata_reference": "https://api.github.com/repos/gcivil-nyu-org/dine-safe-ly",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "scope_note": "Not an original DOB building-permit application or issuance source"
+    },
+    {
+      "id": "a6119f47e13f398fa9813db36cf59480c53d039b6bee5a4c551dcea07adf8664",
+      "url": "https://github.com/umangkeshri/Predicting-Critical-Flag-NY-Restaurants",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "a93ff5ba7892e330b599a266c89c91e7da313b913345120e318650c7a7f06955",
+      "url": "https://github.com/jeiranj/NYC-Restaurant-Inspection-Data-Analysis",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "b435a3dac066a6bad358652004946d351f6743c65e286965167693fe7bdd6b4a",
+      "url": "https://github.com/Jack-Kaplan/nyc-restaurant-health-predictor",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "bb52d28056cdab5cb4aefdce18bf9610fe9fbd98abf0e2079ea65db27b6c029d",
+      "url": "https://github.com/Xiaoyang-Song/NYC-Restaurant-Inspection-Database",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "ceaa2e005ef42bafb21692d5be6dc2490807a3efbe455681199c4bb2b16abb1f",
+      "url": "https://github.com/CodeWritingCow/NYC-restaurant-inspection-records",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    },
+    {
+      "id": "db2620e282f6551e321f7289c56e9a74658a5cba90f2208b466a33f5e64d60f7",
+      "url": "https://github.com/eigenfoo/nyc-restaurant-inspections",
+      "first_seen": "2026-10-23",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "expected_result": "QUARANTINE_WRONG_TOPIC",
+      "real_outcome_label": null
+    }
+  ],
+  "source_rights": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+  "actual_document_or_permit_rows_ingested": 0,
+  "independent_issuance_labels": 0,
+  "original_document_sha256": null,
+  "commercial_reuse_approved": false,
+  "synthetic_negative_controls": [
+    {
+      "kind": "SYNTHETIC",
+      "url": "https://github.com/example/nyc-restaurant-inspection-demo",
+      "expected": "REJECT_WRONG_TOPIC"
+    },
+    {
+      "kind": "SYNTHETIC",
+      "url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+      "expected": "CANDIDATE_ONLY_RIGHTS_AND_ISSUANCE_LABELS_UNVERIFIED"
+    }
+  ],
+  "accuracy_reporting": {
+    "permit_opportunity_scoring": "UNKNOWN_NO_INDEPENDENT_HELD_OUT_OUTCOMES",
+    "original_freight_invoice_extraction": "NOT_EVALUATED",
+    "general_accounting_reconciliation": "NOT_EVALUATED",
+    "freight_error_detection": "NOT_EVALUATED",
+    "recovery_outcomes": "NOT_EVALUATED"
+  },
+  "publisher_reference": "https://data.cityofnewyork.us/d/rbx6-tga4",
+  "publisher_rights_reference": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+  "observed_at": "2026-10-23",
+  "notes": "Versioned exclusion classification of pre-existing metadata-only public URL pointers. Retains original source history and dates; does not delete rows, authorize reuse, ingest raw NYC records, or assert PermitPlate engine behavior. Public publisher/repository metadata separately confirms five more pre-existing mis-scoped pointers; no original rows were copied, commercial rights remain unverified. Two existing official NYC pointers were separately source-scoped: PLUTO tax-lot land-use and LL84 building energy/water are candidate contextual fields, NOT DOB permit issuance/approved-permit truth. Rights and independently held-out outcomes remain unverified; no raw rows copied. One pre-existing DOB NOW w9ak-ipjd pointer is now publisher-metadata-verified as application filings only; issuance stays UNKNOWN. Synthetic filing state is explicitly not original data. A historical green-roof footprint dataset (Zenodo 1469674) is separately held as context-only, not issuance, because its publisher record explicitly requires prior written consent for sale/distribution and for-profit GIS products/services. Original source files were not downloaded.",
+  "context_only_candidates": [
+    {
+      "id": "0a560f06b0ac7d352d7247ff0a1015f3534c0b8c6351b2552da028b20be0ba90",
+      "url": "https://data.cityofnewyork.us/d/64uk-42ks",
+      "first_seen": "2026-10-23",
+      "publisher": "NYC Open Data",
+      "publisher_metadata_title": "Primary Land Use Tax Lot Output (PLUTO)",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/64uk-42ks",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "LOT_LAND_USE_CONTEXT_ONLY",
+      "permit_issuance_ground_truth": false,
+      "expected_evaluation": "CONTEXT_ONLY_NOT_PERMIT_ISSUANCE_GROUND_TRUTH",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "original_source_bytes_sha256": null,
+      "commercial_reuse_authorized": false,
+      "independent_permit_outcome_label": null
+    },
+    {
+      "id": "9479993f25c59de8cf0e4178a320b6018cf21a00c814d3e97c5b9425a208beb7",
+      "url": "https://data.cityofnewyork.us/d/5zyy-y8am",
+      "first_seen": "2026-10-23",
+      "publisher": "NYC Open Data",
+      "publisher_metadata_title": "NYC Building Energy and Water Data Disclosure for Local Law 84 2023 to Present (Data for Calendar Year 2022-Present)",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/5zyy-y8am",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "BUILDING_ENERGY_CONTEXT_ONLY",
+      "permit_issuance_ground_truth": false,
+      "expected_evaluation": "CONTEXT_ONLY_NOT_PERMIT_ISSUANCE_GROUND_TRUTH",
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "original_source_bytes_sha256": null,
+      "commercial_reuse_authorized": false,
+      "independent_permit_outcome_label": null
+    }
+  ],
+  "application_only_candidates": [
+    {
+      "id": "4b0648ba1f0661d275ea86c01d2172930858dc7930fbec3ca62c0294d627fb20",
+      "url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+      "first_seen": "2026-10-22",
+      "publisher": "NYC Department of Buildings via NYC Open Data",
+      "publisher_metadata_title": "DOB NOW: Build – Job Application Filings",
+      "publisher_metadata_reference": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+      "publisher_catalog_reference": "https://catalog.data.gov/dataset/dob-now-build-job-application-filings",
+      "publisher_dataset_last_updated_reported": "2026-10-20",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "DOB_NOW_JOB_APPLICATION_ONLY",
+      "source_scope_limitations": [
+        "Application filing is not independent proof of issued/approved permit",
+        "Electrical, elevator and LAA job applications excluded or published in separate datasets"
+      ],
+      "expected_evaluation": "DOB_NOW_APPLICATION_FILING_ONLY_ISSUANCE_UNKNOWN",
+      "permit_issuance_ground_truth": false,
+      "independently_adjudicated": false,
+      "source_rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "original_source_bytes_sha256": null,
+      "commercial_reuse_authorized": false,
+      "independent_permit_outcome_label": null
+    }
+  ],
+  "synthetic_application_negative_control": {
+    "kind": "SYNTHETIC",
+    "dataset_url": "https://data.cityofnewyork.us/d/w9ak-ipjd",
+    "invented_filing_state": "FILED",
+    "expected_issuance": "UNKNOWN_NO_INDEPENDENT_ISSUANCE_PROOF",
+    "note": "Hypothetical filing state only; not a copied source row or real permit label"
+  },
+  "restricted_context_candidates": [
+    {
+      "id": "ac04744b499a25c9eb93d49cf432e5b7ba72e87b52f6028043aaefb04401d5c2",
+      "url": "https://zenodo.org/records/1469674",
+      "first_seen": "2026-10-23",
+      "publisher": "The Nature Conservancy and co-authors (record hosted by Zenodo)",
+      "publisher_metadata_title": "Green Roofs Footprints for New York City, Assembled from Available Data and Remote Sensing",
+      "publisher_metadata_reference": "https://zenodo.org/records/1469674",
+      "doi": "10.5281/zenodo.1469674",
+      "source_publication_date": "2018-10-23",
+      "source_observation_cohort": "2016 NYC aerial imagery / green-roof footprint estimates",
+      "metadata_checked_on": "2026-10-23",
+      "metadata_only": true,
+      "source_role": "HISTORICAL_GREEN_ROOF_BUILDING_CONTEXT_ONLY_RIGHTS_RESTRICTED",
+      "rights_basis": "Publisher record prohibits sale/distribution and for-profit GIS product or service reuse without prior written consent from The Nature Conservancy and co-authors.",
+      "source_rights_state": "RIGHTS_RESTRICTED_WRITTEN_CONSENT_REQUIRED",
+      "commercial_reuse_authorized": false,
+      "ground_truth_limitations": [
+        "Digitized and manually corrected 2016 green-roof imagery is not a DOB approved or issued permit record",
+        "Historical BIN/BBL links use 2017 building footprints and MapPLUTO 18v1; no current permit join proved"
+      ],
+      "permit_issuance_ground_truth": false,
+      "independently_adjudicated": false,
+      "original_source_bytes_sha256": null,
+      "independent_permit_outcome_label": null,
+      "expected_evaluation": "EXCLUDE_FROM_COMMERCIAL_PERMIT_SCORING_AND_ISSUANCE_GROUND_TRUTH"
+    }
+  ],
+  "synthetic_restricted_context_negative_control": {
+    "kind": "SYNTHETIC",
+    "dataset_url": "https://zenodo.org/records/1469674",
+    "hypothetical_observation": "2016 imagery indicates a green roof at a fictional NYC building",
+    "expected_permit_issuance": "UNKNOWN_NO_OFFICIAL_PERMIT_OR_INDEPENDENT_ISSUANCE_LABEL",
+    "expected_commercial_reuse": "HOLD_WRITTEN_CONSENT_NOT_OBTAINED",
+    "note": "No original green-roof rows, roof coordinates, permit identities or private records copied."
+  }
+}

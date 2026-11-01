@@ -2,7 +2,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from tools.public_repo_scout import GH, candidate, known, queued_pairs, risk_flags, root_score, recency, triage
+from unittest.mock import patch
+from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, risk_flags, root_score, recency, triage
 
 class ScoutTests(unittest.TestCase):
     def test_exact_revision_dedupe(self):
@@ -65,6 +66,54 @@ class ScoutTests(unittest.TestCase):
         self.assertEqual(2,len(calls))
         self.assertEqual(1,gh.stats["revision_cache_hits"])
         self.assertEqual(1,gh.stats["root_cache_hits"])
+
+    def test_queue_run_metadata_does_not_generate_another_change(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/"HUNTER-01.json"
+            snapshot={"worker_id":"HUNTER-01", "schema_version":2,
+                      "candidate_count":1, "candidates":[{"repository":"example/one",
+                      "exact_revision":"a"*40}], "search_diagnostics":[{"returned":1}],
+                      "generated_at":"2026-10-25T00:00:00+00:00",
+                      "api_metrics":{"api_requests":8}}
+            self.assertTrue(persist_queue(path,snapshot))
+            original=path.read_bytes()
+            telemetry_only={**snapshot, "generated_at":"2026-10-26T00:00:00+00:00",
+                            "api_metrics":{"api_requests":99}}
+            self.assertFalse(persist_queue(path,telemetry_only))
+            self.assertEqual(path.read_bytes(),original)
+            meaningful={**telemetry_only,
+                        "candidates":[*snapshot["candidates"],
+                                      {"repository":"example/two","exact_revision":"b"*40}],
+                        "candidate_count":2}
+            self.assertTrue(persist_queue(path,meaningful))
+            self.assertNotEqual(path.read_bytes(),original)
+            # Per-run provider diagnostics belong in job logs, not source
+            # identity. A provider error blocks the writer before this call.
+            self.assertFalse(persist_queue(path,{**meaningful,
+                "search_diagnostics":[{"error":"GITHUB_RATE_LIMIT"}]}))
+
+    def test_digest_is_byte_stable_without_new_source_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            queue=root/"HUNTER-01.json"
+            output=root/"SCOUT_DIGEST.md"
+            candidate={"repository":"example/one", "exact_revision":"a"*40,
+                       "triage_score":42, "stars":1, "url":"https://github.com/example/one",
+                       "published_license_spdx":"MIT", "description":"Fixture"}
+            queue.write_text(json.dumps({"worker_id":"HUNTER-01",
+                "candidates":[candidate], "generated_at":"2026-10-25T00:00:00Z"}))
+            with patch("tools.public_repo_scout.now",side_effect=AssertionError(
+                    "Digest must not depend on current wall clock")):
+                self.assertEqual(integrate(root,output),1)
+                before=output.read_bytes()
+                self.assertEqual(integrate(root,output),1)
+                self.assertEqual(output.read_bytes(),before)
+            queue.write_text(json.dumps({"worker_id":"HUNTER-01",
+                "candidates":[{**candidate,"triage_score":43}],
+                "generated_at":"2026-10-26T00:00:00Z"}))
+            self.assertEqual(integrate(root,output),1)
+            self.assertNotEqual(output.read_bytes(),before)
+
 
 if __name__=="__main__":
     unittest.main()

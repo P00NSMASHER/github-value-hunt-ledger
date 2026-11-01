@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_NYC_DOB_COMMUNITY_VIEW_PROVENANCE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_SOURCE_PROVENANCE_ONLY",
+  "review_date": "2026-10-23",
+  "evidence_basis": "ORIGINAL_NYC_OPEN_DATA_PUBLISHER_METADATA_ONLY_NO_DATA_ROWS",
+  "provenance_limitation": "A city.gov domain and DOB in a view title do not establish that the view is an original city-endorsed publisher dataset. Community-created views can filter or alter the canonical parent.",
+  "rights_reference_url": "https://data.cityofnewyork.us/stories/s/Terms-of-Use/k9k7-3cje/",
+  "real_record_count": 0,
+  "independent_issuance_labels": 0,
+  "verified_accuracy_denominator": 0,
+  "commercial_reuse_clearance": "UNKNOWN_NOT_APPROVED",
+  "unverified_permit_status": "UNKNOWN",
+  "synthetic_metadata_replays": [
+    {
+      "dataset_id": "rbx6-tga4",
+      "source_url": "https://data.cityofnewyork.us/d/rbx6-tga4",
+      "publisher_metadata_page": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Build-Approved-Permits/rbx6-tga4/25423",
+      "catalog_resource": {
+        "id": "rbx6-tga4",
+        "name": "DOB NOW: Build – Approved Permits"
+      },
+      "catalog_owner": "NYC OpenData",
+      "data_provided_by": "Department of Buildings (DOB)",
+      "catalog_kind": "ORIGINAL_DATASET",
+      "portal_endorsed_view": true,
+      "parent_dataset_id": null,
+      "reported_publisher_last_updated": "2026-10-21",
+      "effective_date_kind": "ROLLING_OPEN_DATA_REFRESH_NOT_PERMIT_EFFECTIVE_DATE",
+      "expected_source_role": "ORIGINAL_PUBLISHER_METADATA_RIGHTS_HELD",
+      "provenance_class": "SYNTHETIC_CATALOG_METADATA_REPLAY",
+      "commercial_reuse_authorized": false,
+      "original_source_bytes_sha256": null,
+      "independent_issuance_truth": null
+    },
+    {
+      "dataset_id": "qnmk-7xra",
+      "source_url": "https://data.cityofnewyork.us/d/qnmk-7xra",
+      "publisher_metadata_page": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Approved-Permits/qnmk-7xra",
+      "catalog_resource": {
+        "id": "qnmk-7xra",
+        "name": "DOB NOW Approved Permits"
+      },
+      "catalog_owner": "John",
+      "data_provided_by": "Department of Buildings (DOB) (underlying parent data only)",
+      "catalog_kind": "COMMUNITY_CREATED_DERIVATIVE_VIEW",
+      "portal_endorsed_view": false,
+      "parent_dataset_id": "rbx6-tga4",
+      "reported_publisher_last_updated": "2026-10-03",
+      "effective_date_kind": "DERIVED_VIEW_REFRESH_NOT_ORIGINAL_PERMIT_EFFECTIVE_DATE",
+      "expected_source_role": "DERIVED_VIEW_REVIEW_ONLY",
+      "publisher_notice": "NYC Open Data states the community-created view and changes are not reviewed or endorsed.",
+      "provenance_class": "SYNTHETIC_CATALOG_METADATA_REPLAY",
+      "commercial_reuse_authorized": false,
+      "original_source_bytes_sha256": null,
+      "independent_issuance_truth": null
+    }
+  ],
+  "scout_limitation": "The current title-only permitplate_catalog_in_scope screen accepts both catalogs; a metadata candidate cannot be called canonical publisher truth without separate original-dataset provenance checks.",
+  "recommended_owner": "Research Data & Provenance (source discovery/catalog filtering); Product Engineering owns actual PermitPlate adapter changes.",
+  "negative_control_acceptance": "Derived community view qnmk-7xra must not be treated as original NYC DOB publisher evidence, and neither candidate authorizes commercial reuse or real scoring labels."
+}

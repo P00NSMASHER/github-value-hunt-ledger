@@ -1,0 +1,502 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import scout, {ENGINES, canonicalCandidates, feedSpecs, fetchCatalog, permitplateCandidateInScope, selectCandidateWindow, persistSourceWindow, providerErrorCode, providerMetadataInScope, originalNYCPublisherDataset, LANE_PRIORITY, selectPriorityLane, cycle} from "./research_lab_worker.mjs";
+
+function officialNYC(id, name) {
+  return {
+    resource:{id,name,provenance:"official",type:"dataset",parent_fxf:[]},
+    metadata:{domain:"data.cityofnewyork.us"},
+  };
+}
+
+test("FreightRecovery is primary without starving other engine lanes",()=>{
+  assert.equal(LANE_PRIORITY.freightrecovery,10);
+  for(const lane of ENGINES.filter(x=>x!=="freightrecovery"))
+    assert.equal(LANE_PRIORITY[lane],1);
+  const start=Date.UTC(2026,9,24,0,0,0);
+  let time=start;
+  const last=new Map(ENGINES.map((lane,i)=>[lane,start-(i+1)*300000]));
+  const count=Object.fromEntries(ENGINES.map(lane=>[lane,0]));
+  for(let i=0;i<1000;i++){
+    const row=ENGINES.map(name=>({name,last_attempt_ms:last.get(name)}));
+    const picked=selectPriorityLane(row,time);
+    count[picked]++;
+    last.set(picked,time);
+    time+=300000;
+  }
+  // Weighted overdue-first policy converges near 70/10/10/10 while
+  // allowing an overdue secondary lane to catch up after missed Cron events.
+  assert.ok(count.freightrecovery>=680 && count.freightrecovery<=720,
+    JSON.stringify(count));
+  for(const lane of ENGINES.filter(x=>x!=="freightrecovery"))
+    assert.ok(count[lane]>=90 && count[lane]<=110,JSON.stringify(count));
+  const overdue=ENGINES.map(lane=>({
+    name:lane,last_attempt_ms: lane==="permitplate"?time-180*60000:time-60000,
+  }));
+  assert.equal(selectPriorityLane(overdue,time),"permitplate");
+  assert.throws(()=>selectPriorityLane(overdue.slice(1),time),/UNINITIALIZED_DATABASE/);
+  assert.throws(()=>selectPriorityLane([
+    ...overdue.slice(0,3),{name:"permitplate",last_attempt_ms:0},
+  ],time),/UNINITIALIZED_DATABASE/);
+  assert.throws(()=>selectPriorityLane(overdue,NaN),/INVALID_SCHEDULE_TIME/);
+});
+
+test("all four engines have bounded catalog-only probes", () => {
+  assert.equal(ENGINES.length,4);
+  for(const engine of ENGINES){
+    const feeds=feedSpecs(engine);
+    assert.ok(feeds.length>=3 && feeds.length<=4);
+    for(const f of feeds){
+      assert.match(f.url,/^https:\/\/(api.github.com|zenodo.org|api.us.socrata.com)\//);
+      assert.ok(!/token=|apikey=|password=/i.test(f.url));
+      assert.ok(["github","zenodo","socrata"].includes(f.provider));
+    }
+  }
+});
+test("source IDs, not arbitrary metadata or private source rows, enter discovery", ()=>{
+  assert.deepEqual(canonicalCandidates("github",{items:[
+    {html_url:"https://github.com/owner/source-data",name:"freight-invoice-data",description:"PERSON@PRIVATE.COM"},
+    {html_url:"https://github.com/owner/repo?token=secret"},
+    {html_url:"http://localhost/private"},
+  ]},"freightrecovery"),["https://github.com/owner/source-data"]);
+  assert.deepEqual(canonicalCandidates("zenodo",{hits:{hits:[
+    {id:987654321,metadata:{title:"LTL freight tariff dataset"},files:[{key:"confidential-document.pdf"}]},
+    {id:"../123"},
+  ]}},"freightrecovery"),["https://zenodo.org/records/987654321"]);
+  assert.deepEqual(canonicalCandidates("socrata",{results:[
+    officialNYC("abcd-1234","DOB NOW: Build – Approved Permits"),
+    officialNYC("../../passwd","DOB NOW: Build – Approved Permits"),
+  ]},"permitplate"),["https://data.cityofnewyork.us/d/abcd-1234"]);
+});
+test("missing or malformed API responses fail closed", ()=>{
+  for(const p of ["github","zenodo","socrata"]){
+    assert.throws(()=>canonicalCandidates(p,{bad:[]},p==="socrata"?"permitplate":"freightrecovery"),/INVALID_ITEMS/);
+  }
+  assert.throws(()=>canonicalCandidates("wrong",{items:[]}, "freightrecovery"),/UNSUPPORTED_PROVIDER/);
+  assert.throws(()=>feedSpecs("unknown"),/INVALID_ENGINE/);
+});
+test("public HTTP interface has read-only GET handlers only",async()=>{
+  assert.equal(typeof scout.fetch,"function");
+  assert.equal(typeof scout.scheduled,"function");
+  const r=await scout.fetch(new Request("https://research.invalid/feed",{method:"POST"}),{});
+  assert.equal(r.status,405);
+  assert.deepEqual(await r.json(),{error:"READ_ONLY"});
+});
+
+test("Cloudflare-compatible manual redirect mode blocks all 3xx",async()=>{
+  const original=globalThis.fetch;
+  try {
+    globalThis.fetch=async(url,options)=>{
+      assert.equal(options.redirect,"manual");
+      assert.ok(!options.headers.Authorization);
+      return new Response("",{status:302,headers:{Location:"https://evil.invalid/private"}});
+    };
+    await assert.rejects(fetchCatalog(feedSpecs("recoveryos")[0]),/REDIRECT_BLOCKED/);
+  }finally{globalThis.fetch=original;}
+});
+test("public metadata fetch parses bounded valid JSON",async()=>{
+  const original=globalThis.fetch;
+  try{
+    globalThis.fetch=async(url,options)=>{
+      assert.equal(options.redirect,"manual");
+      return new Response(JSON.stringify({items:[{html_url:"https://github.com/test/example",name:"freight-invoice-data"}]}),
+        {status:200,headers:{"content-type":"application/json"}});
+    };
+    assert.deepEqual(await fetchCatalog(feedSpecs("freightrecovery")[0]),
+      ["https://github.com/test/example"]);
+  }finally{globalThis.fetch=original;}
+});
+
+test("rotation reaches all bounded candidate windows without repeating only the first 24", () => {
+  const input=Array.from({length:57},(_,i)=>"https://github.com/source/catalog-"+String(i).padStart(3,"0"));
+  const batches=[0,300000,600000].map(t=>selectCandidateWindow([...input].reverse(),t));
+  assert.deepEqual(batches.map(b=>b.length),[24,24,9]);
+  assert.equal(new Set(batches.flat()).size,57);
+  assert.deepEqual(batches[0],selectCandidateWindow([...input],0));
+  assert.deepEqual(selectCandidateWindow(["a","a","b"],0),["a","b"]);
+  assert.deepEqual(selectCandidateWindow([],0),[]);
+  assert.throws(()=>selectCandidateWindow([],NaN),/INVALID_SCHEDULE_TIME/);
+});
+
+
+test("PermitPlate excludes restaurant inspection catalogs from its permit leads", () => {
+  const q = feedSpecs("permitplate").map(s => new URL(s.url).searchParams.get("q") || "");
+  assert.ok(q.every(x => !/restaurant|inspection/i.test(x)));
+  assert.deepEqual(canonicalCandidates("socrata", {results: [
+    officialNYC("abcd-1234","DOHMH Restaurant Inspection"),
+    officialNYC("rbx6-tga4","DOB NOW: Build – Approved Permits"),
+    officialNYC("ipu4-2q9a","DOB Permit Issuance"),
+    officialNYC("w9ak-ipjd","DOB NOW: Job Application Filings"),
+  ]},"permitplate"), [
+    "https://data.cityofnewyork.us/d/ipu4-2q9a",
+    "https://data.cityofnewyork.us/d/rbx6-tga4",
+    "https://data.cityofnewyork.us/d/w9ak-ipjd",
+  ]);
+  assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-Restaurant-Inspection"), false);
+  assert.equal(permitplateCandidateInScope("https://github.com/owner/NYC-DOB-Building-Permits"), true);
+  for (const url of [
+    "https://github.com/gcivil-nyu-org/dine-safe-ly",
+    "https://data.cityofnewyork.us/d/43nn-pn8j",
+    "https://data.cityofnewyork.us/d/pitm-atqc",
+    "https://data.cityofnewyork.us/d/qcdj-rwhu",
+    "https://data.cityofnewyork.us/d/fpeh-f7ci",
+  ]) assert.equal(permitplateCandidateInScope(url), false, url);
+});
+
+
+test("bounded catalogs rotate query terms and pages without extra network budget",()=>{
+  const start=Date.UTC(2026,9,23,0,0,0);
+  const now=[];
+  for(let lap=0;lap<15;lap++){
+    const specs=feedSpecs("freightrecovery",start+lap*1200000);
+    assert.equal(specs.length,3);
+    assert.equal(specs.filter(x=>x.provider==="github").length,2);
+    assert.equal(specs.filter(x=>x.provider==="zenodo").length,1);
+    for(const spec of specs){
+      const url=new URL(spec.url);
+      assert.ok(url.hostname==="api.github.com"||url.hostname==="zenodo.org");
+      assert.ok([1,2,3].includes(Number(url.searchParams.get("page"))));
+      assert.ok(!/[?&](?:api_?key|token|auth)=/i.test(url.search));
+    }
+    now.push(specs.map(x=>x.url).join("|"));
+  }
+  assert.ok(new Set(now).size>=12);
+  assert.ok(now.some(x=>x.includes("sort=updated")));
+  assert.ok(now.some(x=>x.includes("page=3")));
+  assert.notDeepEqual(feedSpecs("capturebrief",start),feedSpecs("capturebrief",start+100*1200000));
+  assert.throws(()=>feedSpecs("recoveryos",Number.NaN),/INVALID_SCHEDULE_TIME/);
+  assert.equal(feedSpecs("permitplate",start).filter(x=>x.provider==="socrata").length,1);
+});
+
+test("all lanes rotate nine distinct subject families without increasing provider calls",()=>{
+  const base=Date.UTC(2026,9,24,0,0,0);
+  for(const engine of ENGINES){
+    const githubQueries=new Set(), zenodoQueries=new Set(), plans=new Set();
+    const officialQueries=new Set(), officialOffsets=new Set();
+    for(let lap=0;lap<45;lap++){
+      const when=base+lap*1200000;
+      const specs=feedSpecs(engine,when);
+      assert.equal(specs.filter(s=>s.provider==="github").length,2);
+      assert.equal(specs.filter(s=>s.provider==="zenodo").length,1);
+      assert.equal(specs.length,engine==="permitplate"?4:3);
+      for(const spec of specs){
+        const u=new URL(spec.url);
+        if(spec.provider==="github"){
+          assert.equal(u.hostname,"api.github.com");
+          assert.equal(u.searchParams.get("per_page"),"15");
+          githubQueries.add(u.searchParams.get("q"));
+        }else if(spec.provider==="zenodo"){
+          assert.equal(u.hostname,"zenodo.org");
+          assert.equal(u.searchParams.get("size"),"15");
+          zenodoQueries.add(u.searchParams.get("q"));
+        }else if(spec.provider==="socrata"){
+          assert.equal(u.hostname,"api.us.socrata.com");
+          assert.equal(u.searchParams.get("domains"),"data.cityofnewyork.us");
+          assert.equal(u.searchParams.get("limit"),"15");
+          assert.equal(u.searchParams.get("provenance"),"official");
+          assert.equal(u.searchParams.get("only"),"dataset");
+          officialQueries.add(u.searchParams.get("q"));
+          officialOffsets.add(u.searchParams.get("offset"));
+        }
+      }
+      plans.add(specs.map(x=>x.url).join("|"));
+      assert.deepEqual(feedSpecs(engine,when),specs,"schedule must be deterministic");
+    }
+    assert.equal(githubQueries.size,9,engine+" GitHub query diversity");
+    assert.equal(zenodoQueries.size,9,engine+" Zenodo query diversity");
+    assert.ok(plans.size>=27,engine+" non-repeating bounded search windows");
+    if(engine==="permitplate"){
+      assert.equal(officialQueries.size,3);
+      assert.deepEqual([...officialOffsets].sort(),["0","15","30"]);
+    }else {
+      assert.equal(officialQueries.size,0);
+    }
+  }
+});
+
+test("official NYC provenance gate rejects community views, derived filters, and spoofed domains",()=>{
+  const official=officialNYC("rbx6-tga4","DOB NOW: Build – Approved Permits");
+  assert.equal(originalNYCPublisherDataset(official),true);
+  const candidates=[
+    official,
+    {...official,resource:{...official.resource,id:"qnmk-7xra",provenance:"community"}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrb",type:"filter",parent_fxf:["rbx6-tga4"]}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrc",parent_fxf:["rbx6-tga4"]}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrd",provenance:"unknown"}},
+    {...official,resource:{...official.resource,id:"qnmk-7xre",provenance:undefined}},
+    {...official,metadata:{domain:"data.evil.invalid"},resource:{...official.resource,id:"qnmk-7xrf"}},
+    {...official,metadata:{},resource:{...official.resource,id:"qnmk-7xrg"}},
+    {...official,resource:{...official.resource,id:"qnmk-7xrh",parent_fxf:undefined}},
+  ];
+  const selected=canonicalCandidates("socrata",{results:candidates},"permitplate");
+  assert.deepEqual(selected,["https://data.cityofnewyork.us/d/rbx6-tga4"]);
+  for(const c of candidates.slice(1)){
+    assert.equal(originalNYCPublisherDataset(c),false,c.resource?.id);
+  }
+  assert.equal(originalNYCPublisherDataset(null),false);
+  assert.equal(originalNYCPublisherDataset({resource:null}),false);
+});
+
+test("D1 source publication uses one bounded atomic batch with rights holds",async()=>{
+  const batched=[];
+  const db={
+    prepare(sql){return {bind(...args){return {sql,args}}};},
+    async batch(stmts){batched.push(stmts);return [{meta:{changes:2}},{meta:{changes:2}}];},
+  };
+  const before=Date.UTC(2026,9,23,12,0);
+  const input=["https://github.com/example/source-two","https://zenodo.org/records/1001"];
+  const out=await persistSourceWindow(db,"freightrecovery",input,before);
+  assert.deepEqual(out,{newSources:2,attempted:2});
+  assert.equal(batched.length,1);
+  assert.equal(batched[0].length,2);
+  assert.match(batched[0][0].sql,/INSERT OR IGNORE INTO sources/);
+  assert.match(batched[0][0].sql,/UNVERIFIED_RIGHTS_HOLD/);
+  assert.match(batched[0][0].sql,/UNVERIFIED_TRUTH_HOLD/);
+  assert.match(batched[0][1].sql,/INSERT OR IGNORE INTO source_engines/);
+  assert.equal(batched[0][0].args.length,6);
+  assert.equal(batched[0][1].args.length,4);
+  assert.ok(batched[0][0].args.includes("2026-10-23"));
+  assert.equal(batched[0][0].sql.includes("source-two"),false);
+  assert.deepEqual(await persistSourceWindow(db,"capturebrief",[],before),
+                   {newSources:0,attempted:0});
+  assert.equal(batched.length,1);
+  await assert.rejects(persistSourceWindow(
+    {prepare:db.prepare,batch:async()=>[{meta:{changes:99}},{meta:{changes:2}}]},
+    "freightrecovery",input,before),/INVALID_STORAGE_RECEIPT/);
+});
+
+test("provider errors are fixed bounded telemetry codes with no source disclosure",()=>{
+  assert.equal(providerErrorCode(new Error("HTTP_429")),"HTTP_429");
+  assert.equal(providerErrorCode(new Error("HTTP_503")),"HTTP_503");
+  assert.equal(providerErrorCode(new Error("REDIRECT_BLOCKED")),"REDIRECT_BLOCKED");
+  assert.equal(providerErrorCode(new Error("token=sensitive@example.com http://private.invalid")),"SOURCE_UNAVAILABLE");
+  const timeout=Object.assign(new Error("contains private customer info"),{name:"TimeoutError"});
+  assert.equal(providerErrorCode(timeout),"TIMEOUT");
+});
+
+test("oversized public catalog streaming is bounded by byte count",async()=>{
+  const original=globalThis.fetch;
+  try{
+    globalThis.fetch=async()=>new Response(new ReadableStream({
+      start(controller){
+        controller.enqueue(new Uint8Array(600001));
+        controller.enqueue(new Uint8Array(600001));
+        controller.close();
+      },
+    }),{status:200,headers:{"content-type":"application/json"}});
+    // Streaming Response has no Content-Length header; the byte guard itself
+    // must reject the oversized source rather than relying on metadata.
+    await assert.rejects(fetchCatalog(feedSpecs("capturebrief")[0]),/RESPONSE_LIMIT/);
+  }finally{globalThis.fetch=original;}
+});
+
+test("GitHub rate limit skips secondary request and writes a degraded receipt",async()=>{
+  const original=globalThis.fetch;
+  const seen=[],sql=[];
+  const db={
+    prepare(query){
+      sql.push(query);
+      return {
+        first:async()=>({name:"freightrecovery"}),
+        all:async()=>({results:ENGINES.map(name=>({
+          name,last_attempt_ms:name==="freightrecovery"?0:
+            Date.UTC(2026,9,23,12,0)-1000,
+        }))}),
+        bind(...args){return {
+          async run(){return {meta:{changes:1}};},
+        };},
+      };
+    },
+    batch:async()=>[{meta:{changes:1}},{meta:{changes:1}}],
+  };
+  try{
+    globalThis.fetch=async url=>{
+      seen.push(String(url));
+      if(String(url).includes("api.github.com"))
+        return new Response("",{status:429});
+      return new Response(JSON.stringify({hits:{hits:[{id:12345,metadata:{title:"Freight invoice dataset"}}]}}),
+        {status:200,headers:{"content-type":"application/json"}});
+    };
+    const result=await cycle({RESEARCH_DB:db},Date.UTC(2026,9,23,12,0));
+    assert.equal(result.state,"DEGRADED");
+    assert.equal(result.added,1);
+    assert.equal(seen.filter(x=>x.includes("api.github.com")).length,1);
+    assert.equal(seen.filter(x=>x.includes("zenodo.org")).length,1);
+    assert.ok(sql.some(x=>x.includes("UPDATE runs SET status")));
+  }finally{globalThis.fetch=original;}
+});
+
+
+test("read-only cursor paging preserves newest-first ordering and emits no D1 internal fields",async()=>{
+  const rows=[
+    {cursor_id:300,url:"https://github.com/example/newest-source",first_seen:"2026-10-23"},
+    {cursor_id:200,url:"https://github.com/example/older-source",first_seen:"2026-10-22"},
+    {cursor_id:100,url:"https://github.com/example/oldest-source",first_seen:"2026-10-21"},
+  ];
+  const calls=[];
+  const db={
+    prepare(sql){
+      assert.ok(sql.includes("SELECT s.rowid AS cursor_id"));
+      assert.ok(!/insert|update|delete/i.test(sql));
+      return {bind(...args){calls.push({sql,args});return {
+        async all(){
+          const lane=args[0],hasCursor=args.length===3;
+          const before=hasCursor?args[1]:Infinity;
+          const lim=args.at(-1);
+          assert.equal(lane,"freightrecovery");
+          return {results:rows.filter(x=>x.cursor_id<before).slice(0,lim)};
+        },
+      }}};
+    },
+  };
+  const root="https://research.invalid/feed?engine=freightrecovery&limit=2";
+  const first=await (await scout.fetch(new Request(root),{RESEARCH_DB:db})).json();
+  assert.equal(first.scope,"PUBLIC_SOURCE_POINTERS_NOT_APPROVED_TEST_DATA");
+  assert.equal(first.next_cursor,"200");
+  assert.equal(first.sources.length,2);
+  assert.deepEqual(Object.keys(first.sources[0]).sort(),["first_seen","url"]);
+  const second=await (await scout.fetch(new Request(root+"&before="+first.next_cursor),{RESEARCH_DB:db})).json();
+  assert.equal(second.next_cursor,null);
+  assert.equal(second.sources.length,1);
+  assert.equal(new Set([...first.sources,...second.sources].map(x=>x.url)).size,3);
+  assert.equal(calls.length,2);
+  assert.equal(calls[0].args.length,2);
+  assert.deepEqual(calls[1].args,["freightrecovery",200,2]);
+});
+
+test("malformed feed pagination inputs reject before querying D1",async()=>{
+  for (const suffix of ["&before=-1","&before=0","&before=abc",
+      "&before=1%20or%201%3D1","&before=1234567890123",
+      "&limit=0","&limit=1000","&limit=2junk"]) {
+    const db={prepare(){throw Error("UNAUTHORIZED_D1_READ")}};
+    const result=await scout.fetch(
+      new Request("https://research.invalid/feed?engine=recoveryos"+suffix),{RESEARCH_DB:db}
+    );
+    assert.equal(result.status,400,suffix);
+  }
+});
+
+
+test("GitHub 403 provider rejection skips secondary request and preserves Zenodo discovery",async()=>{
+  const original=globalThis.fetch;
+  const requested=[];
+  const db={
+    prepare(){
+      return {
+        first:async()=>({name:"capturebrief"}),
+        all:async()=>({results:ENGINES.map(name=>({
+          name,last_attempt_ms:name==="capturebrief"?0:
+            Date.UTC(2026,9,24,12,0)-1000,
+        }))}),
+        bind(){return {run:async()=>({meta:{changes:1}})};},
+      };
+    },
+    batch:async()=>[{meta:{changes:1}},{meta:{changes:1}}],
+  };
+  try{
+    globalThis.fetch=async url=>{
+      requested.push(String(url));
+      if(String(url).includes("api.github.com"))
+        return new Response("",{status:403});
+      return new Response(JSON.stringify({hits:{hits:[
+        {id:12345,metadata:{title:"Federal contract awards dataset"}}
+      ]}}),{status:200,headers:{"content-type":"application/json"}});
+    };
+    const result=await cycle({RESEARCH_DB:db},Date.UTC(2026,9,24,12,0));
+    assert.equal(result.state,"DEGRADED");
+    assert.equal(result.added,1);
+    assert.equal(requested.filter(url=>url.includes("api.github.com")).length,1);
+    assert.equal(requested.filter(url=>url.includes("zenodo.org")).length,1);
+  }finally{globalThis.fetch=original;}
+});
+
+test("health distinguishes stale lanes and unfinished runs from green latest activity",async()=>{
+  const now=Date.now();
+  const fresh=now-5*60000,old=now-150*60000;
+  const lanes=[
+    {name:"capturebrief",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
+    {name:"freightrecovery",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
+    {name:"permitplate",last_attempt_ms:old,last_success_ms:old,last_status:"OK"},
+    {name:"recoveryos",last_attempt_ms:fresh,last_success_ms:fresh,last_status:"OK"},
+  ];
+  const statements=[];
+  const db={prepare(sql){
+    statements.push(sql);
+    if(sql.startsWith("SELECT name,last_attempt_ms"))
+      return {all:async()=>({results:lanes})};
+    if(sql.startsWith("SELECT COUNT(*) AS total"))
+      return {first:async()=>({total:597})};
+    if(sql.startsWith("SELECT run_key"))
+      return {all:async()=>({results:[]})};
+    if(sql.startsWith("SELECT lane, COUNT(*) AS runs"))
+      return {bind(){return {all:async()=>({results:[]})};}};
+    if(sql.startsWith("SELECT lane, COUNT(*) AS source_pointers"))
+      return {all:async()=>({results:[]})};
+    if(sql.startsWith("SELECT COUNT(*) AS stuck_runs"))
+      return {bind(cutoff){
+        assert.ok(cutoff < now-29*60000 && cutoff > now-31*60000);
+        return {first:async()=>({stuck_runs:2})};
+      }};
+    throw Error("UNEXPECTED_D1_QUERY");
+  }};
+  const response=await scout.fetch(
+    new Request("https://research.invalid/health"),{RESEARCH_DB:db});
+  assert.equal(response.status,200);
+  const output=await response.json();
+  assert.equal(output.total_source_references,597);
+  assert.equal(output.operational_status,"DEGRADED");
+  assert.deepEqual(output.stale_lanes,["permitplate"]);
+  assert.equal(output.stale_threshold_minutes,45);
+  assert.equal(output.stale_threshold_minutes_by_lane.freightrecovery,45);
+  assert.equal(output.stale_threshold_minutes_by_lane.permitplate,120);
+  assert.equal(output.research_priority,"FREIGHTRECOVERY_FIRST");
+  assert.equal(output.stuck_run_count,2);
+  assert.equal(output.stuck_threshold_minutes,30);
+  assert.equal(output.commercial_approval,false);
+  assert.equal(output.independent_truth_verified,false);
+  assert.ok(statements.every(sql=>/^(SELECT)/.test(sql)));
+});
+
+test("all four engine lanes reject obviously off-topic public metadata without storing text",()=>{
+  const cases=[
+    ["freightrecovery", "Freight invoice tariff dataset", "Baking and dining recipes"],
+    ["permitplate", "NYC DOB NOW approved building permits", "NYC restaurant inspection permits"],
+    ["capturebrief", "Federal solicitation contract awards", "Professional basketball boxscores"],
+    ["recoveryos", "Accounts payable supplier invoice reconciliation", "Wildlife photography archive"],
+  ];
+  for(const [engine,good,bad] of cases){
+    for(const provider of ["github","zenodo"]){
+      const correct=provider==="github"?{name:"generic",description:good}:
+        {metadata:{title:good}};
+      const wrong=provider==="github"?{name:"generic",description:bad}:
+        {metadata:{title:bad}};
+      assert.equal(providerMetadataInScope(engine,provider,correct),true,engine+"/"+provider);
+      assert.equal(providerMetadataInScope(engine,provider,wrong),false,engine+"/"+provider);
+    }
+    const output=canonicalCandidates("github",{items:[
+      {html_url:"https://github.com/synthetic-fixture/public-evidence-1",
+        name:"generic-source",description:good+" PRIVATE@TEST.INVALID"},
+      {html_url:"https://github.com/synthetic-fixture/off-topic-2",
+        name:"generic-source",description:bad},
+      {html_url:"https://github.com/synthetic-fixture/unknown-3"},
+    ]},engine);
+    assert.deepEqual(output,["https://github.com/synthetic-fixture/public-evidence-1"]);
+    assert.ok(!JSON.stringify(output).includes("PRIVATE@TEST.INVALID"));
+  }
+  assert.equal(providerMetadataInScope("recoveryos","zenodo",{metadata:{creators:["Private"]}}),false);
+  assert.equal(providerMetadataInScope("recoveryos","github",{name:"",description:""}),false);
+  assert.throws(()=>providerMetadataInScope("bogus","github",{name:"freight"}),/INVALID_ENGINE/);
+  assert.throws(()=>providerMetadataInScope("freightrecovery","socrata",{}),/UNSUPPORTED_PROVIDER/);
+});
+
+test("Zenodo record IDs require bounded, engine-specific title evidence",()=>{
+  const response={hits:{hits:[
+    {id:55,metadata:{title:"Supplier payment invoice reconciliation"}},
+    {id:56,metadata:{title:"Biology reference photographs"}},
+    {id:57,metadata:{creators:["untrusted name"]}},
+    {id:"../99",metadata:{title:"Supplier invoice dataset"}},
+  ]}};
+  assert.deepEqual(canonicalCandidates("zenodo",response,"recoveryos"),[
+    "https://zenodo.org/records/55",
+  ]);
+});

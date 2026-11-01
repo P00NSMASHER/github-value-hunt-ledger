@@ -170,7 +170,7 @@ class DurableLedgerTests(unittest.TestCase):
 
     def test_global_journal_time_failure_does_not_mutate_an_older_case(self):
         first = verified_finding()
-        second = replace(first, finding_id=f"{first.finding_id}:second")
+        second = replace(first, finding_id=f"{first.finding_id}:second", reference=f"{first.reference}:second")
         ledger = DurableRecoveryLedger()
         ledger.add(first, occurred_at="2026-09-23T12:00:00Z")
         ledger.add(second, occurred_at="2026-09-23T13:00:00Z")

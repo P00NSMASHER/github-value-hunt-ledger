@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-import pytest
 
 from freight.security_readiness import (
     PENDING_EXTERNAL,

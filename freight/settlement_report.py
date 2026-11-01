@@ -119,6 +119,8 @@ def build_persistent_pilot_report(
 
     tables = snapshot["tables"]
     claims = {row["claim_id"]: row for row in tables["recovery_claims"]}
+    disputed_claim_ids = {x["claim_id"]
+                          for x in tables.get("claim_dispute_holds", ())}
     events = {row["event_id"]: row for row in tables["settlement_events"]}
     counters = {row["counter_id"]: row for row in tables["counter_events"]}
     findings = {finding.finding_id: finding for finding in truth.findings}
@@ -129,6 +131,8 @@ def build_persistent_pilot_report(
             raise ValueError("claim/finding bindings must be one-to-one")
         claim = claims.get(binding.claim_id)
         finding = findings.get(binding.finding_id)
+        if binding.claim_id in disputed_claim_ids:
+            raise ValueError("dispute hold prevents certified validated recovery or fee")
         if claim is None or finding is None:
             raise ValueError("binding references unknown claim or finding")
         if finding.status != VALIDATED or finding.validated_cents <= 0 or not finding.authority_id:

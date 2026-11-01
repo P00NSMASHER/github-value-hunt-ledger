@@ -1,7 +1,6 @@
 """Transport-agnostic, fail-closed ingestion receipts for RecoveryOS phase 0."""
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 
 from freight.contracts import canonical_hash

@@ -1,0 +1,37 @@
+name: Read-only Artifact Ledger Admission QA
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/tic-mrf-ledger.yml'
+      - '.github/workflows/urdb-ledger.yml'
+      - '.github/workflows/artifact-ledger-admission-qa.yml'
+      - 'tests/artifact-ledger-admission.test.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tic-mrf-ledger.yml'
+      - '.github/workflows/urdb-ledger.yml'
+      - '.github/workflows/artifact-ledger-admission-qa.yml'
+      - 'tests/artifact-ledger-admission.test.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.4"
+      - name: Verify October 2026 patched Node.js runtime
+        run: |
+          node --version
+          node -e 'const [major,minor,patch]=process.versions.node.split(".").map(Number); if(major!==22 || minor<23 || (minor===23 && patch<4)) process.exit(1)'
+      - run: node --test tests/artifact-ledger-admission.test.mjs

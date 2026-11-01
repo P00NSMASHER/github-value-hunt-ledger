@@ -5,6 +5,7 @@ authorize claims, or manufacture settlement truth.
 """
 from __future__ import annotations
 import argparse, hashlib, json
+from datetime import date
 from pathlib import Path
 
 VALID_DISPOSITIONS = {"VALIDATED", "REJECTED", "REVIEW"}
@@ -32,6 +33,17 @@ def require_cents(row, key):
     return value
 
 
+def require_iso_date(row, key):
+    value = require_text(row, key)
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"{key} must be a valid YYYY-MM-DD date") from exc
+    if parsed.isoformat() != value:
+        raise ValueError(f"{key} must be a valid YYYY-MM-DD date")
+    return parsed
+
+
 def normalize_finding(row):
     clean = dict(row)
     for key in (
@@ -41,6 +53,8 @@ def normalize_finding(row):
         "customer_authorization_state", "claim_status"
     ):
         clean[key] = require_text(row, key)
+    invoice_date = require_iso_date(row, "invoice_date")
+    authority_effective_date = require_iso_date(row, "authority_effective_date")
     for key in ("billed_cents", "expected_cents", "settled_credit_cents", "reversal_cents"):
         clean[key] = require_cents(row, key)
     if clean["reviewer_disposition"] not in VALID_DISPOSITIONS:
@@ -54,6 +68,29 @@ def normalize_finding(row):
     evidence = row.get("supporting_evidence") or []
     if not isinstance(evidence, list) or not all(isinstance(x, str) and x.strip() for x in evidence):
         raise ValueError("supporting_evidence must be a list of non-empty strings")
+    evidence = [value.strip() for value in evidence]
+    if (
+        clean["reviewer_disposition"] == "VALIDATED"
+        and clean["confidence"] == "SUPPORTED"
+        and not evidence
+    ):
+        raise ValueError("validated supported finding requires supporting evidence")
+    if (
+        clean["reviewer_disposition"] == "VALIDATED"
+        and clean["confidence"] == "SUPPORTED"
+        and clean["authority_reference"] not in evidence
+    ):
+        raise ValueError(
+            "validated supported finding requires authority_reference in supporting_evidence"
+        )
+    if (
+        clean["reviewer_disposition"] == "VALIDATED"
+        and clean["confidence"] == "SUPPORTED"
+        and authority_effective_date > invoice_date
+    ):
+        raise ValueError(
+            "validated supported finding authority cannot postdate invoice"
+        )
     clean["supporting_evidence"] = evidence
     for key in SUPPRESSION_FLAGS:
         clean[key] = bool(row.get(key, False))
@@ -61,8 +98,23 @@ def normalize_finding(row):
     clean["carrier_response"] = str(row.get("carrier_response") or "").strip()
     clean["settlement_reference"] = str(row.get("settlement_reference") or "").strip()
     clean["unresolved_issues"] = str(row.get("unresolved_issues") or "").strip()
+    if clean["settled_credit_cents"] > 0:
+        if clean["claim_status"] not in {"APPROVED", "CLOSED"}:
+            raise ValueError(
+                "positive settled_credit_cents requires APPROVED or CLOSED claim status"
+            )
+        if not clean["settlement_reference"]:
+            raise ValueError(
+                "positive settled_credit_cents requires settlement_reference"
+            )
     clean["difference_cents"] = max(clean["billed_cents"] - clean["expected_cents"], 0)
-    clean["net_realized_cents"] = max(clean["settled_credit_cents"] - clean["reversal_cents"], 0)
+    if clean["settled_credit_cents"] > clean["difference_cents"]:
+        raise ValueError(
+            "settled_credit_cents cannot exceed candidate difference"
+        )
+    if clean["reversal_cents"] > clean["settled_credit_cents"]:
+        raise ValueError("reversal_cents cannot exceed settled_credit_cents")
+    clean["net_realized_cents"] = clean["settled_credit_cents"] - clean["reversal_cents"]
     suppressed = (
         clean["reviewer_disposition"] != "VALIDATED"
         or clean["confidence"] != "SUPPORTED"
@@ -88,6 +140,28 @@ def build_pack(payload):
     ids = [row["finding_id"] for row in findings]
     if len(ids) != len(set(ids)):
         raise ValueError("finding_id must be unique")
+    economic_identities = [
+        (
+            row["carrier"],
+            row["invoice_id"],
+            row["shipment_id"],
+            row["finding_category"],
+        )
+        for row in findings
+    ]
+    if len(economic_identities) != len(set(economic_identities)):
+        raise ValueError(
+            "carrier, invoice_id, shipment_id, and finding_category "
+            "must identify one economic opportunity"
+        )
+    settlement_references = [
+        row["settlement_reference"] for row in findings
+        if row["settled_credit_cents"] > 0
+    ]
+    if len(settlement_references) != len(set(settlement_references)):
+        raise ValueError(
+            "positive settlement_reference must be unique across findings"
+        )
     totals = {
         "findings_count": len(findings),
         "validated_count": sum(row["reviewer_disposition"] == "VALIDATED" for row in findings),
@@ -96,9 +170,15 @@ def build_pack(payload):
         "candidate_difference_cents": sum(row["difference_cents"] for row in findings),
         "validated_difference_cents": sum(
             row["difference_cents"] for row in findings
-            if row["reviewer_disposition"] == "VALIDATED" and row["confidence"] == "SUPPORTED"
+            if row["attribution_state"] == "FREIGHT_RECOVERY_ORIGIN"
         ),
-        "net_realized_cents": sum(row["net_realized_cents"] for row in findings),
+        "observed_net_settlement_cents": sum(
+            row["net_realized_cents"] for row in findings
+        ),
+        "net_realized_cents": sum(
+            row["net_realized_cents"] for row in findings
+            if row["attribution_state"] == "FREIGHT_RECOVERY_ORIGIN"
+        ),
         "fee_eligible_realized_cents": sum(row["fee_eligible_realized_cents"] for row in findings),
         "suppressed_count": sum(row["attribution_state"] == "SUPPRESSED" for row in findings),
     }
@@ -112,7 +192,16 @@ def build_pack(payload):
             "potential_is_not_recovered": True,
             "validated_is_not_settled": True,
             "preexisting_and_duplicate_value_excluded": True,
+            "validated_difference_excludes_suppressed_findings": True,
+            "validated_supported_findings_require_evidence": True,
+            "validated_supported_findings_bind_authority_evidence": True,
+            "validated_supported_authority_not_after_invoice": True,
             "reversals_reduce_realized_value": True,
+            "realized_requires_settled_claim_and_reference": True,
+            "realized_cannot_exceed_candidate_difference": True,
+            "positive_settlement_reference_is_unique": True,
+            "economic_opportunity_identity_is_unique": True,
+            "buyer_visible_realized_excludes_suppressed_findings": True,
             "fee_eligibility_requires_authorized_supported_settlement": True,
         },
         "totals": totals,
@@ -134,8 +223,9 @@ def render_markdown(pack):
         f"- Validated findings: **{t['validated_count']}**",
         f"- Review / rejected: **{t['review_count']} / {t['rejected_count']}**",
         f"- Candidate difference: **{money(t['candidate_difference_cents'])}** — not recovered cash",
-        f"- Validated difference: **{money(t['validated_difference_cents'])}** — not necessarily recovered",
-        f"- Net realized recovery: **{money(t['net_realized_cents'])}**",
+        f"- Validated attributable difference: **{money(t['validated_difference_cents'])}** — not necessarily recovered",
+        f"- Observed net settlement across all findings: **{money(t['observed_net_settlement_cents'])}** — includes suppressed value and is not attributable recovery",
+        f"- Attributable net realized recovery: **{money(t['net_realized_cents'])}**",
         f"- Fee-eligible realized recovery: **{money(t['fee_eligible_realized_cents'])}**",
         f"- Suppressed from Freight Recovery attribution: **{t['suppressed_count']} finding(s)**", "",
         "## Finding evidence", ""
@@ -164,7 +254,15 @@ def render_markdown(pack):
         "3. An approved claim is not actual recovered funds.",
         "4. Existing, automatic, incumbent-known, duplicate, or unsupported value is suppressed from Freight Recovery attribution.",
         "5. Reversals reduce realized recovery.",
-        "6. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
+        "6. Positive settled credits require an approved or closed claim and a settlement reference.",
+        "7. Settled credit cannot exceed the candidate invoice difference.",
+        "8. One positive settlement reference can support only one finding in this pack.",
+        "9. One carrier/invoice/shipment/category identity can support only one economic opportunity in this pack.",
+        "10. A validated supported finding requires at least one supporting-evidence reference.",
+        "11. Its exact authority reference must appear in supporting evidence.",
+        "12. A validated supported finding cannot rely on authority effective after its invoice date.",
+        "13. Buyer-visible attributable realized recovery excludes suppressed findings.",
+        "14. Fee-eligible recovery requires supported evidence, customer authorization, and an eligible settled outcome under the engagement.", ""
     ])
     return "\n".join(lines)
 

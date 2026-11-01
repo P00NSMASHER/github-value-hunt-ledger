@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: repository-release-gate-${{ github.ref }}
-  cancel-in-progress: false
+  group: repository-release-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ai-business-os:
@@ -36,11 +36,15 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install pinned Freight test dependencies
-        run: python -m pip install --disable-pip-version-check -r production/requirements-ci.txt
+        run: python -m pip install --disable-pip-version-check -r freight/requirements-ci.txt
+      - name: Reject unused imports, dead assignments and undefined names
+        run: python -m ruff check freight --select F401,F811,F821,F841
       - name: Compile Freight
         run: python -m compileall -q freight
+      - name: Check public GitHub source for private contact data
+        run: python -m unittest freight.site.test_public_repo_privacy -v
       - name: Run Freight regression suite
-        run: python -m unittest discover -s freight -p "test_*.py" -v
+        run: python -m pytest -q freight
       - name: Verify pilot rights evidence consistency
         run: python -m freight.rights_evidence --stage pilot --expect CLEAR
 
@@ -69,6 +73,8 @@ jobs:
           python-version: "3.12"
       - name: Run Technology Intelligence regression suite
         run: python -m unittest discover -s tests -p "test_ti_*.py" -v
+      - name: Verify public repo scout idempotency and safety
+        run: python -m unittest tests.test_public_repo_scout -v
       - name: Validate canonical intelligence ledgers
         run: python tools/ti_validate.py
       - name: Check committed text integrity
