@@ -6,7 +6,6 @@ modules rather than misreporting the twin as the deployed product.
 """
 import hashlib
 import pytest
-from dataclasses import replace
 
 from freight.unified_labs_domain_bridge import (
     FictionalReleaseAuthorization, lab_reconciliation_manifest,
