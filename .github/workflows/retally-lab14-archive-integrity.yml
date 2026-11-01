@@ -38,7 +38,13 @@ jobs:
                   assert p.endswith(item["original_path"])
                   assert p not in seen_path,(p,item["pr"])
                   seen_path.add(p)
-                  blob=subprocess.check_output(["git","hash-object",p],text=True).strip()
+                  # Historical fixed-width data may contain CRLF bytes even though
+                  # the current .gitattributes checks it out with LF. Compare the
+                  # canonical committed Git blob, not a transformed worktree copy.
+                  file_path=pathlib.PurePosixPath(p)
+                  assert ".." not in file_path.parts and pathlib.Path(p).is_file(),p
+                  blob=subprocess.check_output(["git","rev-parse","HEAD:"+p],text=True).strip()
+                  assert subprocess.check_output(["git","cat-file","-t",blob],text=True).strip()=="blob"
                   assert blob==item["git_blob_sha"],(p,blob,item["git_blob_sha"])
                   total+=1
               seen_pr.update(m["source_prs"])

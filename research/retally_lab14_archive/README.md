@@ -9,3 +9,5 @@ Every archived file is mapped to its original PR head, original file path, chang
 **Do not merge this draft to production, promote archived claims, or delete original source branches.** The originals may be closed as source-superseded only after 54/54 source-PR integrity checks and exact-hash CI pass. All original PR discussions remain available. Retally backlog tracker #901.
 
 The fifth manifest preserves 11 later historical Lab14 drafts (#460, #476, #478, #485, #487, #492, #494–#497, #504), as inert, distinct PR-prefixed source revisions. Their dated research claims remain unvalidated for live commercialization. Archive source byte preservation does not imply legal rights, current external evidence, or acceptance for processing customer data.
+
+The integrity workflow compares **committed Git blob identities** (`git rev-parse HEAD:<path>`), not re-encoded working-tree text. This matters because older fixed-width `.txt` source objects may retain historical CRLF bytes while modern `.gitattributes` checks them out as LF. A checkout conversion must not be falsely called evidence corruption.
