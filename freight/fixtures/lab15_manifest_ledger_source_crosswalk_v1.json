@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_LAB15_SOURCE_POINTER_CROSSWALK_V1",
+  "scope": "PUBLIC_SOURCE_MANIFEST_LEDGER_DEDUP_RESEARCH_ONLY_NOT_INDEPENDENT_CUSTOMER_EVALUATION",
+  "inputs": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "canonical_main_sha_reviewed": "7111b0e25e8ee3660a4e8269de86636ba21185d9",
+    "source_manifest_path": "freight/lab15/sources.json",
+    "source_manifest_git_blob_sha1": "a905b85413f7d5b003681f45e6ed2e0b53b19ce0",
+    "evidence_ledger_path": "freight/lab15/evidence_ledger.json",
+    "evidence_ledger_git_blob_sha1": "2eb9f1cbe0173bbed0049b0a88b43cc209e48b86",
+    "source_original_http_sha256_this_cycle": null,
+    "raw_original_bytes_this_cycle": 0
+  },
+  "audit_counts": {
+    "source_manifest_rows": 12,
+    "evidence_ledger_rows": 13,
+    "shared_exact_source_url_keys": 12,
+    "source_manifest_only_keys": 0,
+    "ledger_only_keys": 1,
+    "unique_publisher_url_keys": 13,
+    "legacy_ledger_reported_fingerprints": 8,
+    "raw_original_documents_custodied": 0,
+    "commercially_approved_sources": 0,
+    "independently_verified_customer_invoice_errors": 0,
+    "verified_legacy_lab_retirements": 0
+  },
+  "ledger_only_unverified_lead": {
+    "url": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F9C0MUS",
+    "kind": "DATASET_CATALOG_LEAD",
+    "state": "DISCOVERED_METADATA_ONLY",
+    "original_http_body_sha256": null,
+    "commercial_reuse_rights": "UNKNOWN_NOT_CLEARED",
+    "ground_truth_label": null
+  },
+  "interpretation": {
+    "manifest_and_ledger_same_urls_are_not_independent_source_samples": true,
+    "source_sha_values_in_legacy_ledger_are_historic_reported_not_current_byte_rehashed": true,
+    "source_url_equivalence_does_not_establish_identical_document_versions": true,
+    "versioned_evaluation_pack_not_benchmark_score": true,
+    "legacy_lab_retirement_authorized": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_LAB15_DOUBLE_COUNT_MANIFEST_LEDGER",
+      "unsafe_claim": "25_INDEPENDENT_SOURCES",
+      "expected_guard": "REJECT_SOURCE_POINTER_DOUBLE_COUNT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_LAB15_HISTORIC_DIGEST_PROMOTED_TO_CURRENT_BYTES",
+      "unsafe_claim": "CURRENT_SOURCE_BYTES_VERIFIED",
+      "expected_guard": "UNKNOWN_ORIGINAL_HTTP_BYTES",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_LAB15_CATALOG_LEAD_PROMOTED_TO_REAL_ERROR",
+      "unsafe_claim": "REAL_CUSTOMER_ERROR_FOUND",
+      "expected_guard": "UNKNOWN_INDEPENDENT_CUSTOMER_LABEL",
+      "independent_real_label": null
+    }
+  ],
+  "handoffs": {
+    "freightrecovery": "12 legacy manifest links co-refer to ledger entries, not 12 extra independent evaluations; preserve source identity.",
+    "recoveryos": "Keep metadata and historical fingerprints separate from original-byte custody and real financial truth.",
+    "permitplate": "No new verified permit or adjudicated scoring labels.",
+    "capturebrief": "No FY2027 independently held-out notice/award labels.",
+    "qa": "Cross-check both exact Git blobs, 12 shared URLs, one ledger-only unverified catalog lead, and the zero-retirement boundary."
+  }
+}
