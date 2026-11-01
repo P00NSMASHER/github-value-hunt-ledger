@@ -92,7 +92,11 @@ class WorkbenchTests(unittest.TestCase):
             original=workspace.root/'sources'/(record['id']+'.original')
             original.write_bytes(original.read_bytes()+b' tampered')
             head=workspace.store.current_head_hash()
+            # The original readback and the onboarding scan reject the same
+            # tampering at different boundaries with different fail-closed errors.
             with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace._verified_evidence_bytes(record)
+            with self.assertRaisesRegex(ValueError,'source integrity failure|original evidence bytes changed'):
                 workspace.scan(tokens['operator'])
             self.assertEqual(workspace.store.current_head_hash(),head)
 
