@@ -185,14 +185,14 @@ jobs:
               print(json.dumps(stats, sort_keys=True))
               with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
                   summary.write(
-                      "### One-shot original FY2027 source integrity check (NOT award truth)\\n"
-                      f"- Source status: {receipt['source_status']}\\n"
-                      f"- Complete original bytes: {receipt['current_source_size_bytes']}\\n"
-                      f"- Original SHA-256: {receipt['current_source_sha256']}\\n"
-                      f"- Original CSV rows: {receipt['source_rows']}\\n"
-                      f"- Source errors: {receipt['source_error_codes']}\\n"
-                      "- Independently verified award outcomes: 0; commercial rights: UNKNOWN.\\n"
-                      "- No source row content, notice IDs or private customer records retained.\\n"
+                      "### One-shot original FY2027 source integrity check (NOT award truth)\n"
+                      f"- Source status: {receipt['source_status']}\n"
+                      f"- Complete original bytes: {receipt['current_source_size_bytes']}\n"
+                      f"- Original SHA-256: {receipt['current_source_sha256']}\n"
+                      f"- Original CSV rows: {receipt['source_rows']}\n"
+                      f"- Source errors: {receipt['source_error_codes']}\n"
+                      "- Independently verified award outcomes: 0; commercial rights: UNKNOWN.\n"
+                      "- No source row content, notice IDs or private customer records retained.\n"
                   )
               if (receipt["source_status"] not in (STATUS_OK, STATUS_PARTIAL)
                       or not receipt["current_source_sha256"]
