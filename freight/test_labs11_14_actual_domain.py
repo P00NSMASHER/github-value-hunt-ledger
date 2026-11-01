@@ -4,7 +4,6 @@ These execute real pre-existing RecoveryOS modules. They cannot prove a hosted
 application SLA, external pen test, real savings, actual competitor performance
 or buyer willingness to pay.
 """
-from copy import deepcopy
 from datetime import date
 from hashlib import sha256
 import json
@@ -13,7 +12,6 @@ import pytest
 
 from freight.audit_store import AuditStore
 from freight.audit_ledger import AuditEventType
-from freight.backup_restore import run_backup_restore_drill, workspace_summary, verify_backup_restore_result
 from freight.payment_orchestration import (
     prepare_payment_instruction, authorize_payment, PaymentOrchestrator, verify_payment_snapshot,
 )
@@ -58,7 +56,6 @@ def test_lab11_actual_restored_audit_semantically_equivalent(tmp_path):
     store.append(event_type=AuditEventType.SOURCE_PRESENT,object_id='FICTIONAL-SOURCE',
         occurred_at=TS,evidence_hash='a'*64)
     before=store.semantic_summary()
-    from shutil import copy2
     restored=tmp_path/'restored.sqlite3'
     import sqlite3
     with sqlite3.connect(str(store.path)) as src,sqlite3.connect(str(restored)) as dest:
