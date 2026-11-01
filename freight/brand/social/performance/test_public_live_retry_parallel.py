@@ -1,6 +1,6 @@
 """RETALLY live public URL probe concurrency and recovery safeguards."""
 import unittest
-from public_asset_preflight import run, inspect
+from public_asset_preflight import run
 
 LAND = ("https://www.retallyrecovery.com/freight-audit-methodology"
         "?utm_source=facebook&utm_medium=organic_social"
