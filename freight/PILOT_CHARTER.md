@@ -42,6 +42,27 @@ or other money-moving action.
 
 > SEPARATE_BUYER_APPROVAL_REQUIRED
 
+## Authorization-value validation
+
+Every required buyer/Freight acknowledgment must be a JSON boolean, never a
+string such as `"false"`, integer, null, or other truthy object. A correctly
+typed `false` means acknowledgment is pending. The validation applies both to
+JSON import and to directly constructed Python request objects.
+
+Carrier and freight-mode scopes must be non-empty arrays/lists of non-empty
+strings; a scalar string must never silently become a sequence of characters.
+The fixed fee for the **optional fixed-fee Charter workflow** must be a finite
+positive number. The flagship 30% contingency engagement is governed by the
+separate `freight.recovery_engagement` workflow, not by inventing a fixed fee.
+
+The downstream engagement resolver independently rejects rehashed records
+whose authorization flag, acknowledgment values, state or policy conflict.
+Hash recomputation detects accidental bytes changed after creation; it does
+**not** establish that buyer signatures, source permissions, or actual
+provider-owned authority were independently verified. The customer-data
+kickoff remains blocked until authentic authorization and other release gates
+are satisfied.
+
 ## Integrity
 
 Before building the charter, the product recomputes the Activation Packet hash.
