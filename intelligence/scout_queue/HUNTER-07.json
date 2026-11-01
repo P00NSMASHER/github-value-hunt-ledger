@@ -77,7 +77,7 @@
         "tests"
       ],
       "size_kb": 1299,
-      "stars": 73,
+      "stars": 74,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ai-skills",
@@ -96,11 +96,11 @@
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 6,
-        "stars": 7,
+        "stars": 8,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 53,
+      "triage_score": 54,
       "url": "https://github.com/MSayib/roblox-dev-skill"
     },
     {
@@ -112,7 +112,7 @@
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-01T04:25:35Z",
+      "pushed_at": "2026-11-01T18:54:09Z",
       "repository": "itzdexy/GraftCode",
       "root_code_signals": [
         ".github",
@@ -208,11 +208,11 @@
       "default_branch": "main",
       "description": "Framework-agnostic Roblox/Luau best-practices skill for AI agents. Performance, security, data, platform limits, Studio MCP safety, and 22 system blueprints. Installs to 62 agents including Claude Code, Cursor, and Windsurf.",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "c7f0459c5de9961d40bb5830298bbf4e988e8ef8",
+      "exact_revision": "5a193e9b22c94f2b80a6fa30cad7219b2003ec99",
       "forks": 0,
       "primary_language": "JavaScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-30T18:11:11Z",
+      "pushed_at": "2026-11-01T18:25:24Z",
       "repository": "andrian-syh/roblox-best-practices-skill",
       "root_code_signals": [
         ".github",
@@ -252,17 +252,17 @@
       "default_branch": "main",
       "description": "Evergreen skills for building Roblox games with AI coding agents (Claude Code, Codex, Cursor, Copilot): Studio MCP done safely, code on disk, Luau checks without Studio, Open Cloud, secure-code rules",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "ea13c23a1545e0836158d4942e12c54d7ef3915d",
+      "exact_revision": "176771f94d5463d472e20c7f1fe5aba3b8f5f763",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-10-30T13:46:35Z",
+      "pushed_at": "2026-11-01T17:33:43Z",
       "repository": "m4bwav/roblox-agent",
       "root_code_signals": [
         ".github",
         "tests"
       ],
-      "size_kb": 852,
+      "size_kb": 882,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -296,16 +296,16 @@
       "default_branch": "main",
       "description": "Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "dbcd2b4dd79ae2c5c50c7b12dbe2b555dc86cf92",
+      "exact_revision": "8e18fb0c96924cd473b4115f69a1f40749ee9692",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T09:48:14Z",
+      "pushed_at": "2026-11-01T15:49:34Z",
       "repository": "Daniel987654321/roblox-studio-agent-bridge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 520,
+      "size_kb": 530,
       "stars": 73,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -344,16 +344,16 @@
       "default_branch": "main",
       "description": "Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs",
       "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "d9dafa8e74b226b9e0387a8cf9b1598a057f59b3",
+      "exact_revision": "f9a9ec086ae0c9dc591b060471ac7141d0a19773",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T09:26:55Z",
+      "pushed_at": "2026-11-01T15:37:04Z",
       "repository": "nahidgaming70/Roblox-QA-Sentinel",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 400,
+      "size_kb": 405,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -457,7 +457,7 @@
     23,
     24
   ],
-  "generated_at": "2026-11-01T09:47:46.734635+00:00",
+  "generated_at": "2026-11-01T19:14:34.748106+00:00",
   "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
   "risk_review": [],
   "risk_review_count": 0,
