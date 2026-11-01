@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from creative_quality_gate import audit, local_time, site_link, unwrap
+from creative_quality_gate import audit, site_link
 
 MEDIA = "https://static.metricool.com/planner/202610/7322512-file-1234.png"
 VIDEO = "https://static.metricool.com/planner/202610/7322512-file-1234.mp4"
