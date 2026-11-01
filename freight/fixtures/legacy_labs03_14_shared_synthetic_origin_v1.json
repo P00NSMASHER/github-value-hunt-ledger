@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "pack_id": "RETALLY_LEGACY_LABS03_14_SYNTHETIC_ORIGIN_CROSSWALK_V1",
+  "repository": "P00NSMASHER/github-value-hunt-ledger",
+  "reviewed_head_sha": "8cf521e9d016cfdbdedf85afa7898f29e6d768b4",
+  "evidence_class": "REPOSITORY_DOCUMENT_REPORTED_LINEAGE_NOT_SOURCE_BYTE_REHASH",
+  "reported_fictional_source_sha256": "7c670a91a1a411480b35d054b821f483744267b9c07acda9fe974d910888ed81",
+  "source_byte_sha256_verified_this_run": null,
+  "source_raw_bytes_custodied_this_run": 0,
+  "groups": [
+    {
+      "lab_numbers": [
+        3
+      ],
+      "source_doc": "freight/LAB03_FIRST_CUSTOMER_EVIDENCE.md",
+      "source_git_blob_sha1": "1db00bef1db645fb090c684e2c3e5c50499e416d",
+      "observed_evidence": "Lab03 pilots reuse Lab1 fictional invoices"
+    },
+    {
+      "lab_numbers": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "source_doc": "freight/LABS_04_14_REPAIR_HANDOFF_20261008.md",
+      "source_git_blob_sha1": "23610ad18b2cf21518b3e1448d3f3d7e90608254",
+      "observed_evidence": "Labs04-10 repaired synthetic pilot uses same fictional invoice source anchor"
+    },
+    {
+      "lab_numbers": [
+        11,
+        12,
+        13,
+        14
+      ],
+      "source_doc": "freight/LABS11_14_EVIDENCE.md",
+      "source_git_blob_sha1": "4eaf0f8fa67bb58cc6568f4467d8ebd75718834a",
+      "observed_evidence": "Labs11-14 simulations reuse same frozen fictional invoice source"
+    }
+  ],
+  "counts": {
+    "distinct_logical_lab_ids": 12,
+    "distinct_reported_fictional_invoice_roots": 1,
+    "distinct_source_documents_checked": 3,
+    "independently_custodied_original_source_bytes": 0,
+    "independently_labeled_customer_freight_errors": 0,
+    "source_verified_legacy_lab_retirements": 0
+  },
+  "claims": {
+    "shared_document_reported_root_not_independent_real_world_samples": true,
+    "document_sha1_is_git_blob_hash_not_original_archive_sha256": true,
+    "source_original_binary_missing_so_root_not_independently_rehashed": true,
+    "packs_do_not_prove_consumer_accuracy": true,
+    "rights_for_commercial_customer_use": "UNKNOWN",
+    "all_15_labs_consolidated": false
+  },
+  "synthetic_negative_controls": [
+    {
+      "scenario": "SYN_DUPLICATE_LAB_NUMBER",
+      "expected": "REJECT_DUPLICATED_LINEAGE_MEMBER"
+    },
+    {
+      "scenario": "SYN_GROUP_REPORTS_DIFFERENT_FROZEN_ROOT",
+      "expected": "REJECT_UNEQUAL_ROOT_DIGEST"
+    },
+    {
+      "scenario": "SYN_DOC_HASH_AS_CUSTOMER_TRUTH",
+      "expected": "REJECT_REAL_WORLD_LABEL_PROMOTION"
+    }
+  ],
+  "handoff": {
+    "owner": "Unified Engine Evidence Lab 6ad6b2f587e481919c68a8b326e1e30f",
+    "product_integrator": "Hunters: GitHub Revenue Products 6ae5c1a1de908191a8a942e13153faa2",
+    "independent_qa": "Hunters: GitHub Core Engineering 6ae5c1bae9508191bd3be58a022b7b80",
+    "stage": "DOCUMENT_LINEAGE_RECONCILED_NOT_SOURCE_VERIFIED",
+    "next": "Independent QA pin-checks exact Git blobs and logical lab coverage; retain all historical artifacts until approved source-identical no-loss consolidation",
+    "production_release": false
+  }
+}
