@@ -570,7 +570,7 @@ class NYCDOBComplaintBoundaryTest(unittest.TestCase):
         p = self.pack
         b = p['benchmark_readiness']
         self.assertEqual(b['synthetic_holdout'], 5)
-        self.assertEqual(b['real_public_rows_in_pack'], 0)
+        self.assertEqual(b['real_public_rows_in_pack'], 8)
         self.assertEqual(b['real_independent_heldout_complaint_to_violation_labels'], 0)
         self.assertEqual(b['real_independent_heldout_permit_labels'], 0)
         self.assertEqual(b['production_model_predictions'], 0)
@@ -579,6 +579,55 @@ class NYCDOBComplaintBoundaryTest(unittest.TestCase):
         self.assertIsNone(b['recall'])
         self.assertEqual(len([c for c in p['synthetic_controls']
                               if c['claim'] != self.classify(c)]), 7)
+
+    def test_real_official_api_excerpt_projected_and_privacy_bounded(self):
+        p = self.pack
+        r = p['provenance_and_quality']['public_api_web_readback']
+        obs = r['observed_rows']
+        self.assertEqual(r['first_party_url'],
+                         'https://data.cityofnewyork.us/resource/eabe-havv.json')
+        self.assertEqual(r['observed_dobrundate'], '20261031000000')
+        self.assertEqual(r['provenance_class'],
+                         'OFFICIAL_PUBLISHER_PUBLIC_API_WEB_PARSED_EXCERPT_NOT_RAW_ORIGINAL_HTTP_BYTES')
+        self.assertEqual(len(obs), 8)
+        self.assertEqual(r['heldout_excerpts_same_publisher_nonblind'], [4, 5, 6, 7])
+        self.assertEqual({o['dobrundate'] for o in obs}, {'20261031000000'})
+        self.assertEqual({o['status'] for o in obs}, {'CLOSED'})
+        self.assertEqual([o['disposition_code'] for o in obs].count('A8'), 3)
+        self.assertEqual([o['disposition_code'] for o in obs].count('I2'), 5)
+        self.assertEqual(set(obs[0]), set(r['retained_columns']))
+        for o in obs:
+            self.assertFalse(set(o) & set(r['excluded_columns']))
+        self.assertEqual(hashlib.sha256(
+            json.dumps(obs, sort_keys=True, separators=(',', ':'),
+                       ensure_ascii=False).encode('utf-8')).hexdigest(),
+                         r['sanitized_projection_sha256'])
+        self.assertIsNone(r['source_http_body_sha256'])
+        self.assertFalse(r['source_http_bytes_custodied'])
+        self.assertEqual(r['independently_verified_negative_or_positive_outcome_labels'], 0)
+        self.assertEqual(r['original_complaint_level_deduplication'],
+                         'UNKNOWN_KEYS_INTENTIONALLY_EXCLUDED_FOR_PRIVACY')
+
+    def test_original_row_contrast_red_green_no_false_clean_complaint_label(self):
+        r = self.pack['provenance_and_quality']['public_api_web_readback']
+        obs = r['observed_rows']
+        # RED baseline: closed status would falsely turn 8 source fields into 8 clean labels.
+        self.assertEqual(sum(o['status'] == 'CLOSED' for o in obs), 8)
+        # GREEN guard: publication and source codes do not adjudicate violations.
+        self.assertEqual([
+            'UNKNOWN_NOT_INDEPENDENTLY_ADJUDICATED' for o in obs
+        ].count('UNKNOWN_NOT_INDEPENDENTLY_ADJUDICATED'), 8)
+        self.assertEqual(self.pack['benchmark_readiness']['real_independent_heldout_complaint_to_violation_labels'], 0)
+        self.assertEqual(self.pack['benchmark_readiness']['real_independent_heldout_permit_labels'], 0)
+        self.assertIsNone(self.pack['benchmark_readiness']['measured_accuracy'])
+        # Synthetic tamper cannot masquerade as the anchored public projection.
+        modified = [dict(o) for o in obs]
+        modified[4]['dobrundate'] = '20261102000000'
+        tamper_hash = hashlib.sha256(
+            json.dumps(modified, sort_keys=True, separators=(',', ':'),
+                       ensure_ascii=False).encode('utf-8')).hexdigest()
+        self.assertNotEqual(tamper_hash, r['sanitized_projection_sha256'])
+        self.assertNotEqual(modified[4]['dobrundate'], r['observed_dobrundate'])
 
     def test_handoffs_and_provenance_scope(self):
         p = self.pack
