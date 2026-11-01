@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "scope": "ISOLATED_FLOOT_QA_FINANCIAL_SIGNER_REVOCATION",
+  "observed_date": "2026-10-08",
+  "environments": {
+    "production": {
+      "id": "c719b60c-9b3b-4193-a543-0be9d3ceaef2",
+      "postgres_identifier": "7693746749463444100",
+      "write_operations": 0
+    },
+    "qa": {
+      "id": "7257eaf3-a4d7-43db-9136-fe81e5df35bf",
+      "postgres_identifier": "7694294930552894346",
+      "published": false
+    }
+  },
+  "original_reproduction": {
+    "scenario": "New fictionally signed document whose occurredAt predates an already revoked signer key",
+    "case_id": "SIM-P5E-REVOKED-BASE",
+    "document_id": "SIM-P5E-BACKDATED-BEFORE",
+    "document_date": "2026-10-03T14:00:00Z",
+    "revocation_date": "2026-10-06T00:00:00Z",
+    "observed_after_revocation": "HTTP 200, replay:false, accepted despite already revoked signer",
+    "authorization_scope": "EPHEMERAL_FICTIONAL_BUYER_KEY"
+  },
+  "repair": {
+    "qa_application_path": "endpoints/phase5c/financial_document_POST.ts",
+    "sql_path": "freight/phase5/phase5c_signed_reconciliation.sql",
+    "change": "On new signed record admission, reject if current admission time is at/after revocation or expiry. Keep existing exact signed record replay idempotent.",
+    "follow_up_new_record_id": "SIM-P5E-BACKDATED-AFTER",
+    "post_fix_new_record": "HTTP 400 SYNTHETIC_SIGNER_NO_LONGER_TRUSTED_FOR_NEW_ADMISSION",
+    "post_fix_original_exact_replay": "HTTP 200 replay:true, id SIM-P5E-BACKDATED-BEFORE",
+    "read_only_database_census": {
+      "accepted_baseline": 1,
+      "rejected_second_case": 0
+    },
+    "qa_db_trigger_admission_time_checks_present": true
+  },
+  "known_open_gap": {
+    "name": "DIRECT_OWNER_SQL_CAN_BYPASS_ED25519_APPLICATION_VERIFICATION",
+    "root_cause": "QA application connection and financial table ownership both use neondb_owner. PostgreSQL pgcrypto alone cannot verify Ed25519 and pgsodium/plv8 are unavailable. Database trigger checks economics but not cryptographic signature.",
+    "security_consequence": "A database writer with owner-level INSERT can construct apparently valid fictional records with an invalid Ed25519 signature, bypassing HTTP verification.",
+    "remediation_needed": "Provision independently controlled signing-verifier service and limited database writer credentials with audited admission/proof boundary. Must re-run app and SQL tests with actual restricted runtime credential.",
+    "defect_status": "OPEN_UNMITIGATED",
+    "production_impact": "NOT_ESTABLISHED"
+  },
+  "historical_findings_closed": 0,
+  "historical_findings_open": 26,
+  "real_customer_recovery_cents": 0,
+  "real_retally_fee_cents": 0,
+  "verified_signature_authority": "FICTIONAL_ONLY",
+  "qa_full_production_auth_parity": false,
+  "ci_live_floot_tests": false
+}

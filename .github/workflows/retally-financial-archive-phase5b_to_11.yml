@@ -1,0 +1,16 @@
+name: RETALLY financial research archive phase5b_to_11 verification
+on:
+  pull_request:
+    paths:
+      - 'research/retally_financial_archive/phase5b_to_11/**'
+      - '.github/workflows/retally-financial-archive-phase5b_to_11.yml'
+permissions:
+  contents: read
+jobs:
+  archived-source-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Read-only original blob SHA check, no legacy source execution
+        run: python3 research/retally_financial_archive/phase5b_to_11/verify_archive.py
