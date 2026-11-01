@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "pack_id": "FREIGHT_GAO_B223311_LEGACY_CANONICAL_CROSSWALK_V1",
+  "evaluation_family": "HISTORICAL_ADJUDICATED_FREIGHT_CLASSIFICATION_AND_LEGACY_DEDUP_NOT_MODERN_RATE_ACCURACY",
+  "publisher": "U.S. Government Accountability Office",
+  "original_source": {
+    "title": "B-223311, Aug. 3, 1987 (Yellow Freight System)",
+    "url": "https://www.gao.gov/products/b-223311-0",
+    "decision_id": "B-223311",
+    "decision_date": "1987-08-03",
+    "original_shipment_period": "1983-07",
+    "source_type": "FIRST_PARTY_PUBLIC_GAO_DECISION_TEXT",
+    "first_party_text_inspected_utc_date": "2026-11-01",
+    "original_http_body_sha256": null,
+    "original_http_body_bytes": null,
+    "original_source_raw_bytes_custodied": false,
+    "original_signed_gbl_invoice_tariff_files_custodied": false,
+    "source_last_modified_utc": null
+  },
+  "rights": {
+    "gao_policy": "https://www.gao.gov/copyright",
+    "govt_authored_text": "REUSABLE_WITH_ATTRIBUTION_NO_GAO_ENDORSEMENT",
+    "third_party_underlying_material": "UNKNOWN_NOT_REPRODUCED",
+    "commercial_customer_scoring_approved": false,
+    "private_customer_data_included": false
+  },
+  "origin_and_legacy_dedup": {
+    "canonical_evidence_key": "GAO/B-223311",
+    "canonical_source_url": "https://www.gao.gov/products/b-223311-0",
+    "same_decision_referenced_in": [
+      "freight/lab15/sources.json",
+      "freight/lab15/evidence_ledger.json",
+      "freight/real_document_lab.py"
+    ],
+    "all_references_one_source": true,
+    "sources_git_blob_sha1": "a905b85413f7d5b003681f45e6ed2e0b53b19ce0",
+    "ledger_git_blob_sha1": "2eb9f1cbe0173bbed0049b0a88b43cc209e48b86",
+    "real_document_lab_git_blob_sha1": "d2a1fda5b4e03b84b0d56d81c95467129cf31aeb",
+    "legacy_ledger_source_id": "src-48bbdbf852723fb514d33526",
+    "legacy_ledger_reported_sha256": "3703605881b00c94e00592e328f876dc350e84db241fff7f5cca5119f7f7f39f",
+    "legacy_ledger_reported_bytes_seen": 86258,
+    "legacy_ledger_raw_document_stored": false,
+    "legacy_sha256_independently_recomputed_this_run": false,
+    "legacy_digest_equivalent_to_current_original_http_response_sha256": "UNKNOWN_NOT_VERIFIED",
+    "duplicate_source_rows_collapsed_to_one": 3,
+    "legacy_15_labs_fully_consolidated": false
+  },
+  "actual_case_from_first_party": {
+    "original_shipment_description": "34 cartons / 2,890 pounds: Navy supplier GBL class 100 plastic articles",
+    "original_gbl_class": 100,
+    "carrier_supplement_class": 400,
+    "supplier_description_supports_original_gbl_class": true,
+    "original_class100_reported_charge_cents": 72753,
+    "subsequent_class400_supplement_paid_cents": 421763,
+    "gao_reported_collected_total_before_offset_cents": 494516,
+    "gsa_reported_overcharge_offset_cents": 421763,
+    "official_decision_outcome": "GSA_DEDUCTION_SUSTAINED",
+    "offset_performed_in_narrative": true,
+    "bank_refund_independently_custodied": false,
+    "third_party_tariff_verified": false,
+    "independent_original_invoice_triple_verified": false,
+    "modern_customer_overcharge_cents": null,
+    "retally_customer_recovery_cents": 0,
+    "source_precision": "GAO_DECISION_TEXT_ONLY_TARIFF_AND_CASH_NOT_INDEPENDENTLY_ACQUIRED"
+  },
+  "historical_reference_guard": {
+    "case_key": "GAO/B-223311",
+    "original_gbl_class": 100,
+    "carrier_supplement_class": 400,
+    "supplier_supports_original": true,
+    "supplemental_paid_cents": 421763,
+    "gao_decision_outcome": "GSA_DEDUCTION_SUSTAINED",
+    "expected": "HISTORICAL_GAO_OFFSET_ONLY"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYN_B223311_MISSING_GBL_CLASS",
+      "mutation": {
+        "original_gbl_class": null
+      },
+      "expected": "UNKNOWN_ORIGINAL_GBL_CLASS"
+    },
+    {
+      "id": "SYN_B223311_MISSING_SUPPLEMENT_CLASS",
+      "mutation": {
+        "carrier_supplement_class": null
+      },
+      "expected": "UNKNOWN_SUPPLEMENT_CLASS"
+    },
+    {
+      "id": "SYN_B223311_MISSING_PRODUCER_VERIFICATION",
+      "mutation": {
+        "supplier_supports_original": null
+      },
+      "expected": "UNKNOWN_PRODUCER_SUPPORT"
+    },
+    {
+      "id": "SYN_B223311_MISSING_GAO_OUTCOME",
+      "mutation": {
+        "gao_decision_outcome": null
+      },
+      "expected": "UNKNOWN_GAO_OUTCOME"
+    },
+    {
+      "id": "SYN_B223311_DIFFERENT_GBL_RATING",
+      "mutation": {
+        "original_gbl_class": 400
+      },
+      "expected": "UNKNOWN_DIFFERENT_CLASS_DISPUTE"
+    },
+    {
+      "id": "SYN_B223311_MISSTATED_OFFSET",
+      "mutation": {
+        "supplemental_paid_cents": 421764
+      },
+      "expected": "UNKNOWN_SUPPLEMENT_AMOUNT_MISMATCH"
+    },
+    {
+      "id": "SYN_B223311_DIFFERENT_DECISION",
+      "mutation": {
+        "case_key": "GAO/B-221594"
+      },
+      "expected": "UNKNOWN_OTHER_DECISION"
+    }
+  ],
+  "forbidden_promotions": [
+    {
+      "id": "SYN_B223311_REFERENCES_ARE_THREE_INDEPENDENT_CASES",
+      "expected": "REJECT_DUPLICATE_DECISION_COUNT"
+    },
+    {
+      "id": "SYN_B223311_34_CARTONS_ARE_34_INDEPENDENT_LABELS",
+      "expected": "REJECT_CORRELATED_SHIPMENT_UNITS"
+    },
+    {
+      "id": "SYN_B223311_GAO_OFFSET_IS_RETALLY_CASH",
+      "expected": "REJECT_CUSTOMER_CASH_PROMOTION"
+    },
+    {
+      "id": "SYN_B223311_LEGACY_SHA_PROVES_CURRENT_RAW_SOURCE",
+      "expected": "REJECT_UNVERIFIED_HASH_PROMOTION"
+    },
+    {
+      "id": "SYN_B223311_TARIFF_CLASS_PROVES_MODERN_PRICING",
+      "expected": "REJECT_HISTORICAL_TO_MODERN_RATE_PROMOTION"
+    }
+  ],
+  "label_and_holdout": {
+    "external_original_adjudication_cases": 1,
+    "independently_held_out_customer_invoice_cases": 0,
+    "independently_held_out_cleared_payment_cases": 0,
+    "real_world_heldout_model_predictions": 0,
+    "source_label": "HISTORICAL_GSA_DEDUCTION_SUSTAINED",
+    "true_modern_error_label": null,
+    "synthetic_cases_cannot_count_as_real_labels": true,
+    "comparison_case_key": "GAO/B-221594",
+    "comparison_source_url": "https://www.gao.gov/products/b-221594-0",
+    "comparison_legacy_description": "GSA overcharge decision reversed on tariff authority",
+    "comparison_outcome": "GOVERNMENT_OVERCHARGE_DETERMINATION_REVERSED",
+    "two_case_reference_contrast_not_blind": true,
+    "modern_precision": null,
+    "modern_recall": null
+  },
+  "handoffs": {
+    "freightrecovery_12": "Keep 1987 GAO sustained supplemental class-400 offset as historical documentary challenge, not buyer-specific tariff or error-accuracy label.",
+    "recoveryos_12": "Original class100 charge, subsequent paid supplement and GSA offset are different events; never infer customer bank cash or count supplement twice.",
+    "permitplate_48": "No building, permit, violation or prospect scoring evidence.",
+    "capturebrief_52": "No FY2027 notice, award or procurement scoring evidence.",
+    "independent_qa_44": "Reconcile GAO official decision text $727.53/$4,217.63, verify 3 legacy pointers dedupe to one source and check original bytes/third-party tariff/actual customer clearance UNKNOWN."
+  },
+  "scope": {
+    "owner_review_pr": 883,
+    "branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_research_writer_modified": false,
+    "production_code_modified": false,
+    "producer_cost_increase": false,
+    "new_schedule": false,
+    "release_authorized": false,
+    "actual_customer_cash_cents": 0,
+    "status": "REVIEW_ONLY_PENDING_INDEPENDENT_QA"
+  }
+}
