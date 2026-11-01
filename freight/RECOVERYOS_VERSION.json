@@ -1,20 +1,21 @@
 {
   "schema_version": 1,
   "product": "RecoveryOS",
-  "product_version": "4.0.0",
+  "product_version": "4.1.0",
   "preceding_program": "Phase 3 internal completion 2026-10-07",
   "source_platform": "Floot",
   "floot_project_id": "c719b60c-9b3b-4193-a543-0be9d3ceaef2",
-  "floot_project_version": 1793464725836,
-  "checkpoint_id": "01c8dd1e-b05a-4da0-a9dc-1370bc894e0f",
+  "floot_project_version": 1793500547437,
+  "checkpoint_id": "e01ddee5-c110-408a-9c99-fe3d63edbbdd",
   "deployment_url": "https://freight-recoveryos.floot.app",
-  "production_publish_job_id": "ec67287c-a767-4848-9e88-2b6a30066177",
+  "production_publish_job_id": "5a9bf623-ebe4-42a9-a912-345f480bceed",
   "publish_result": "succeeded",
-  "application_test_spec_files_passed": 16,
+  "application_test_spec_files_passed": 17,
   "application_typecheck": "clean",
-  "release_scope": "AUTHENTICATED_READ_ONLY_PROOF_LADDER",
+  "release_scope": "EXACT_CENT_MANUAL_CORRECTIONS_AND_FAIL_CLOSED_LINE_TOTAL_OVERFLOW",
   "customer_production": "HOLD",
   "independent_bank_cleared_recovery_verified": false,
   "outbound_dispute_or_payment_enabled_by_upgrade": false,
-  "release_notes": "freight/RECOVERYOS_V4_0_RELEASE.md"
+  "release_notes": "freight/RECOVERYOS_V4_1_RELEASE.md",
+  "preceding_release": "4.0.0 - authenticated proof ladder"
 }
