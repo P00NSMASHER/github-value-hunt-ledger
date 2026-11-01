@@ -22,7 +22,7 @@ def test_source_equivalence_and_release_hold():
         assert path.startswith("freight/") and path not in seen
         seen.add(path)
         raw = (ROOT / path).read_bytes()
-        actual = hashlib.sha1(f"blob {len(raw)}\\0".encode("ascii") + raw).hexdigest()
+        actual = hashlib.sha1(b"blob " + str(len(raw)).encode("ascii") + bytes([0]) + raw).hexdigest()
         assert actual == row["git_blob_sha"], (path, actual, row["git_blob_sha"])
     text = HOLD.read_text(encoding="utf-8")
     assert "NO-GO" in text and "not present-day certification" in text
