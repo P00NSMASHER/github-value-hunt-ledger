@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_id": "RETALLY_FMC_2026_17876_CHARGE_COMPLAINT_PROCESS_NEGATIVE_CONTROLS_V1",
+  "evaluation_lane": "FREIGHT_PROCESS_TRIAGE_SEPARATE_FROM_FREIGHT_ERROR_ACCURACY_AND_ACCOUNTING_RECONCILIATION",
+  "cohort": "FMC_FEDERAL_REGISTER_2026_09_01",
+  "source": {
+    "publisher": "U.S. Federal Maritime Commission / Federal Register",
+    "original_document_title": "Charge Complaint Procedures",
+    "document_number": "2026-17876",
+    "federal_register_citation": "91 FR 56053-56056",
+    "official_landing_url": "https://www.govinfo.gov/app/details/FR-2026-09-01/2026-17876",
+    "official_document_url": "https://www.govinfo.gov/content/pkg/FR-2026-09-01/pdf/2026-17876.pdf",
+    "publication_date": "2026-09-01",
+    "procedural_amendment_effective_date": "2026-09-01",
+    "OSRA_2022_effective_date": "2022-06-16",
+    "review_date": "2026-10-30",
+    "original_pdf_bytes_held": false,
+    "original_pdf_sha256": null,
+    "original_document_page_images_inspected": [
+      56055,
+      56056
+    ],
+    "rights": "U.S._federal_government_authored_rule_text_generally_public_domain_17_USC_105;_third_party_attachments_not_cleared",
+    "commercial_reuse_of_third_party_customer_records_verified": false,
+    "publisher_content_byte_hash_unavailable_reason": "Original HTTP response bytes cannot be acquired in this execution; web-rendered publisher PDF was visually inspected. This JSON digest is an authored fixture hash, not the PDF SHA-256."
+  },
+  "source_bound_procedural_controls": {
+    "charge_complaints_under_41310_cover_on_or_after": "2022-06-16",
+    "41310_statute_of_limitations": "NONE_STATED_FOR_CHARGE_COMPLAINTS",
+    "41301_reparations_filing_limit": "THREE_YEARS_AFTER_CLAIM_ACCRUES",
+    "traditional_charge_complaint_required_identifiers": [
+      "applicable_bill_of_lading_numbers",
+      "invoices"
+    ],
+    "interim_and_traditional_tracks_simultaneous": false,
+    "duplicative_claim_after_merits_decision_permitted": false,
+    "small_claims_both_parties_consent_required": true,
+    "small_claims_dollar_ceiling_cents": 5000000,
+    "small_claims_without_both_consent": "SUBPART_T_NOT_SUBPART_S",
+    "civil_penalties_payable_to": "US_TREASURY_NOT_CUSTOMER",
+    "demurrage_detention_carrier_reasonableness_burden_in_charge_complaint": true,
+    "burden_shift_is_general_proof_of_overcharge": false,
+    "interim_process_fee_as_reported_2026_09_01_cents": 0,
+    "interim_process_fee_future_is_known": false,
+    "traditional_formal_fee_as_reported_2026_09_01_cents": 38700,
+    "traditional_small_claims_fee_as_reported_2026_09_01_cents": 17600,
+    "procedural_rule_changes_substantive_carrier_billing_standards": false
+  },
+  "challenge_cases": [
+    {
+      "case_id": "SYN_HOLDOUT_001",
+      "scenario": "charge complaint for alleged detention billing, BOL/invoice available, after OSRA, both tracks not concurrent",
+      "expected": "PROCESS_ELIGIBLE_FOR_REVIEW_NOT_MERITS_WIN",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_002",
+      "scenario": "invoice charge accrued before 2022-06-16",
+      "expected": "NOT_IN_OSRA_2022_CHARGE_COMPLAINT_COHORT",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_003",
+      "scenario": "new traditional charge complaint has no invoice and no bill of lading identifiers",
+      "expected": "INSUFFICIENT_DOCUMENT_IDENTIFIERS_NOT_AUTOMATIC_VIOLATION",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_004",
+      "scenario": "same dispute pending simultaneously through interim and traditional FMC tracks",
+      "expected": "PROHIBITED_CONCURRENT_TRACKS",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_005",
+      "scenario": "duplicate claim already decided on merits",
+      "expected": "PROHIBITED_DUPLICATE_MERITS_CLAIM",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_006",
+      "scenario": "cargo fee not demurrage or detention and lawfulness is disputed",
+      "expected": "NO_AUTOMATIC_DEMURRAGE_BURDEN_SHIFT_OR_WIN",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_007",
+      "scenario": "traditional section 41301 reparations claim more than three years after accrual",
+      "expected": "41301_THREE_YEAR_BAR_NOT_41310_CLOCK",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_008",
+      "scenario": "sub-$50k informal small claims process without consent of both parties",
+      "expected": "SUBPART_T_NOT_AUTOMATIC_SMALL_CLAIMS",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_009",
+      "scenario": "government civil penalty issued after a charge complaint",
+      "expected": "TREASURY_PENALTY_NOT_CUSTOMER_CASH_RECOVERY",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    },
+    {
+      "case_id": "SYN_NEG_010",
+      "scenario": "quoted no-fee interim procedure from September 2026 assumed guaranteed for 2027",
+      "expected": "FUTURE_FEE_UNKNOWN_AS_OF_REVIEW",
+      "synthetic": true,
+      "held_out_from_engine_training": true,
+      "independently_adjudicated_invoice_outcome": "UNKNOWN"
+    }
+  ],
+  "case_label_authority": "LAB_AUTHORED_SYNTHETIC_PROCEDURAL_CONTROLS_NOT_THIRD_PARTY_OUTCOMES",
+  "independently_labeled_real_freight_error_cases": 0,
+  "independently_labeled_real_clean_invoice_cases": 0,
+  "actual_freight_recovery_cash_cents": 0,
+  "compliant_engine_or_release_authorized": false,
+  "source_content_sha256": null,
+  "authored_fixture_sha256": "df8e1da3ee0790f26963546a1f3ae6a76ea0281460d940a7b340bc95fd82517c"
+}
