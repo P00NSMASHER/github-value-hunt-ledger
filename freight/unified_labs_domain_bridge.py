@@ -6,7 +6,7 @@ Five existing laboratory PRs remain separate drafts and are never auto-merged.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 import re
