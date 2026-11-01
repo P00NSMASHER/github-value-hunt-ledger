@@ -1,0 +1,695 @@
+{
+  "schema_version": 1,
+  "batch": 2,
+  "authority": "ARCHIVE_ONLY_DO_NOT_RELEASE_OR_EXECUTE",
+  "source_prs": [
+    377,
+    379,
+    380,
+    382,
+    385,
+    388,
+    390,
+    391,
+    393,
+    396,
+    397
+  ],
+  "records": [
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "71cc591be8ece5a686b09ad2c56d61781d48d696",
+      "status": "modified"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/RESEARCH_CFS_SOURCE_ARCHIVE.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/RESEARCH_CFS_SOURCE_ARCHIVE.md",
+      "git_blob_sha": "d7fea023aa3aab1e25eb3aa4a97000b7b6ace9b1",
+      "status": "added"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "dff77ccefdf7c1dcefaba8b7cd0e2eb5ccedbea4",
+      "status": "modified"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/lab_phase4_director.py",
+      "git_blob_sha": "e8d6f0e8721c16dde5421d52143702dbae5726ec",
+      "status": "modified"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/research/CFS_A01_LOCAL_REPLAY_MAPPING_20261011.json",
+      "git_blob_sha": "3d8896fc208e10b84a546bb0e27793f855bc13e9",
+      "status": "added"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/research/CFS_A01_REMOTE_SOURCE_RECEIPT_20261011.json",
+      "git_blob_sha": "455c08b944c6c2c125ea7bc4cdfcdf139f47e3ca",
+      "status": "added"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/research_cfs_archive_verifier.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/research_cfs_archive_verifier.py",
+      "git_blob_sha": "386aefcda9396e1c73075e0a141409cb1ff32d0e",
+      "status": "added"
+    },
+    {
+      "pr": 377,
+      "pr_head": "3e20ddc53d4ad6d0a563b9def57bdffc7313da3b",
+      "pr_base": "research/retally-cfs-market-integrity-m12-20261011",
+      "original_path": "freight/test_research_cfs_archive_verifier.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-377/freight/test_research_cfs_archive_verifier.py",
+      "git_blob_sha": "086da6a436b7fd4440b025d83a567215404b27da",
+      "status": "added"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "702270220d2a32c15da5e9d96f13ab1756e6f1ef",
+      "status": "modified"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": "freight/RESEARCH_CFS_INDUSTRY_QUALITY.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/freight/RESEARCH_CFS_INDUSTRY_QUALITY.md",
+      "git_blob_sha": "c4a31462195ebab2801d821bc7f67f2d8e1895a3",
+      "status": "added"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "a16ae71cce2b2250232a6235f38010c2423403b4",
+      "status": "modified"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/freight/lab_phase4_director.py",
+      "git_blob_sha": "5065bad583696103d70e7b81f2127a4ce6450111",
+      "status": "modified"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": "freight/research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/freight/research/CFS_A18_A19_INDUSTRY_RECEIPT_20261011.json",
+      "git_blob_sha": "4b2b3265b1ee8eeaf200ec7fa2fcce84a45f4979",
+      "status": "added"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": "freight/research_cfs_industry_quality.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/freight/research_cfs_industry_quality.py",
+      "git_blob_sha": "e55cd0192cd8296616bd1d0d3aa09d30e2f372ba",
+      "status": "added"
+    },
+    {
+      "pr": 379,
+      "pr_head": "3aafda3074234e5f299850be03e21aecd49bfd4b",
+      "pr_base": "research/retally-cfs-primary-byte-gate-m13-20261011",
+      "original_path": "freight/test_research_cfs_industry_quality.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-379/freight/test_research_cfs_industry_quality.py",
+      "git_blob_sha": "8abe45467042aa3302a806e0828505f4b6d277d1",
+      "status": "added"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "0b5cc1a07235743324ae9714fedf9fd48dfc134a",
+      "status": "modified"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": "freight/RESEARCH_CFS_INDUSTRY_COMPARISON.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/freight/RESEARCH_CFS_INDUSTRY_COMPARISON.md",
+      "git_blob_sha": "d585d03db298bdd8baa127606415df98094c3db5",
+      "status": "added"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "64f832d2031c553b25f3f07e8ace42f72bd9ba5d",
+      "status": "modified"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/freight/lab_phase4_director.py",
+      "git_blob_sha": "dc25a640d6091d5b437e6e0316088d31cebac8a4",
+      "status": "modified"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": "freight/research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/freight/research/CFS_INDUSTRY_COMPARISON_PLAN_20261011.json",
+      "git_blob_sha": "919ede0c4cd6c5512208bb5a03a1facd239cf73f",
+      "status": "added"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": "freight/research_industry_comparison.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/freight/research_industry_comparison.py",
+      "git_blob_sha": "5bdc0fa01016ab4a3e92fccfe0e24a446c693744",
+      "status": "added"
+    },
+    {
+      "pr": 380,
+      "pr_head": "2d0f63b1c865b384b4e7c5d25b716a943df7f6d4",
+      "pr_base": "research/retally-cfs-industry-quality-m14-20261011",
+      "original_path": "freight/test_research_industry_comparison.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-380/freight/test_research_industry_comparison.py",
+      "git_blob_sha": "6fe9d08995105aca8b9d4f0134d323bb93653166",
+      "status": "added"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "264709d984aac1b10c2ab1f9c13ab7f9b917deaf",
+      "status": "modified"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/RESEARCH_CFS_FORHIRE_REPLAY.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/freight/RESEARCH_CFS_FORHIRE_REPLAY.md",
+      "git_blob_sha": "6af5f7790393ccc4de52b4967230a6109d16cdcf",
+      "status": "added"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "45550eb0dcadcac72e6f55bcbd560e27e953dff9",
+      "status": "modified"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/freight/lab_phase4_director.py",
+      "git_blob_sha": "d6ae566f8f14f8fd8c750e9b36aec9546211c5bc",
+      "status": "modified"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/research/CFS_FORHIRE_REPLAY_PLAN_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/freight/research/CFS_FORHIRE_REPLAY_PLAN_20261011.json",
+      "git_blob_sha": "9fbc8d84743f5f99e754cc020bc653afaea21e36",
+      "status": "added"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/research_cfs_forhire.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/freight/research_cfs_forhire.py",
+      "git_blob_sha": "22c51ae0c6f5f72a256129db730eeea4f581a2e2",
+      "status": "added"
+    },
+    {
+      "pr": 382,
+      "pr_head": "ca9fe5bb807d879ff1e0865deed26a7bd19fdb1a",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/test_research_cfs_forhire.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-382/freight/test_research_cfs_forhire.py",
+      "git_blob_sha": "be1ec2231265f51a66cc00c9e187f236d2649a3d",
+      "status": "added"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "79cdf46455407487190786c2092f8a483d9dfae2",
+      "status": "modified"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/RESEARCH_CFS_FORHIRE_EVIDENCE.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/RESEARCH_CFS_FORHIRE_EVIDENCE.md",
+      "git_blob_sha": "71890723f827ca7f3038d269007afb066a45ade4",
+      "status": "added"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "208fc82204d9943d07a9088d5fa8b08d825d00d5",
+      "status": "modified"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/lab_phase4_director.py",
+      "git_blob_sha": "22ba4d5fbd00bdc6bcc8816266b64fb6abbbc536",
+      "status": "modified"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/research/CFS_FORHIRE_NAICS_BUCKETS_20261011.json",
+      "git_blob_sha": "f433ea77903596501ac51dc3baad99e40ce8db84",
+      "status": "added"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/research_cfs_mode_hierarchy.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/research_cfs_mode_hierarchy.py",
+      "git_blob_sha": "341f27700510b7d278fd3acbf028a20bb440516a",
+      "status": "added"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/research_industry_comparison.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/research_industry_comparison.py",
+      "git_blob_sha": "75ff0ed869acc9afc656711648106aa244f7d6fb",
+      "status": "modified"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/test_research_cfs_mode_hierarchy.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/test_research_cfs_mode_hierarchy.py",
+      "git_blob_sha": "065a41894e4473c43923718d2eb57a13677acba9",
+      "status": "added"
+    },
+    {
+      "pr": 385,
+      "pr_head": "975f6a4d718e321394035d7e8d3dd623b087f6ff",
+      "pr_base": "research/retally-industry-quantitative-m15-20261011",
+      "original_path": "freight/test_research_industry_comparison.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-385/freight/test_research_industry_comparison.py",
+      "git_blob_sha": "4a82bf546ae40745ca34cd1c62e33215a7cd156c",
+      "status": "modified"
+    },
+    {
+      "pr": 388,
+      "pr_head": "bb5155bd63350225b327c800f98b93f29c03cefe",
+      "pr_base": "research/retally-cfs-mode-hierarchy-m16-20261011",
+      "original_path": ".github/workflows/retally-cfs-primary-replay.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-388/.github/workflows/retally-cfs-primary-replay.yml",
+      "git_blob_sha": "cae1d17c664b7f97957bec051c92406592728a08",
+      "status": "added"
+    },
+    {
+      "pr": 388,
+      "pr_head": "bb5155bd63350225b327c800f98b93f29c03cefe",
+      "pr_base": "research/retally-cfs-mode-hierarchy-m16-20261011",
+      "original_path": "freight/RESEARCH_CFS_PRIMARY_REPLAY.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-388/freight/RESEARCH_CFS_PRIMARY_REPLAY.md",
+      "git_blob_sha": "c5cb45efbee5130f676c16313f4ccbe65d2da5f7",
+      "status": "added"
+    },
+    {
+      "pr": 388,
+      "pr_head": "bb5155bd63350225b327c800f98b93f29c03cefe",
+      "pr_base": "research/retally-cfs-mode-hierarchy-m16-20261011",
+      "original_path": "freight/research_cfs_primary_replay.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-388/freight/research_cfs_primary_replay.py",
+      "git_blob_sha": "70d468146afb17e43130c26e51830dcb834737ba",
+      "status": "added"
+    },
+    {
+      "pr": 388,
+      "pr_head": "bb5155bd63350225b327c800f98b93f29c03cefe",
+      "pr_base": "research/retally-cfs-mode-hierarchy-m16-20261011",
+      "original_path": "freight/test_research_cfs_primary_replay.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-388/freight/test_research_cfs_primary_replay.py",
+      "git_blob_sha": "7cadfee0f9c833ebed7714a624b2187afba8f9e9",
+      "status": "added"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": ".github/workflows/retally-aies-ltl-revenue.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/.github/workflows/retally-aies-ltl-revenue.yml",
+      "git_blob_sha": "9008639138e2d77bf1f3be5995c1038ead078ada",
+      "status": "added"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": "freight/RESEARCH_AIES_LTL_CARRIER_REVENUE.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/freight/RESEARCH_AIES_LTL_CARRIER_REVENUE.md",
+      "git_blob_sha": "f5512f595498115964df170ea7b2401840601770",
+      "status": "added"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "95826f0035fd95cd0d9b9b716356ebd4a183f003",
+      "status": "modified"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/freight/lab_phase4_director.py",
+      "git_blob_sha": "9de609293eb484a61380fd5cb40c9b537550e994",
+      "status": "modified"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": "freight/research/AIES_LTL_CARRIER_REVENUE_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/freight/research/AIES_LTL_CARRIER_REVENUE_20261011.json",
+      "git_blob_sha": "5c0a38eb5fea967c93d96049262fbc04586af275",
+      "status": "added"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": "freight/research_ltl_revenue_bridge.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/freight/research_ltl_revenue_bridge.py",
+      "git_blob_sha": "f0d5309e887109f4354b7a8795d83d7ec8df08e4",
+      "status": "added"
+    },
+    {
+      "pr": 390,
+      "pr_head": "0171dd2a93d337e1d9c3964cb6a20cc52e6d5637",
+      "pr_base": "research/retally-cfs-primary-replay-m17-20261011",
+      "original_path": "freight/test_research_ltl_revenue_bridge.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-390/freight/test_research_ltl_revenue_bridge.py",
+      "git_blob_sha": "df144cf0f317612c59cdce3a23f403794e808cae",
+      "status": "added"
+    },
+    {
+      "pr": 391,
+      "pr_head": "9f4c1ed3814a3296fddf8934e629a79119be888c",
+      "pr_base": "research/retally-ltl-carrier-revenue-m18-20261011",
+      "original_path": ".github/workflows/retally-aies-original-ftp.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-391/.github/workflows/retally-aies-original-ftp.yml",
+      "git_blob_sha": "5ce27edbe160f9427f763a2a406f6e0a71ad8bc4",
+      "status": "added"
+    },
+    {
+      "pr": 391,
+      "pr_head": "9f4c1ed3814a3296fddf8934e629a79119be888c",
+      "pr_base": "research/retally-ltl-carrier-revenue-m18-20261011",
+      "original_path": "freight/RESEARCH_AIES_ORIGINAL_FTP.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-391/freight/RESEARCH_AIES_ORIGINAL_FTP.md",
+      "git_blob_sha": "9fd0ba287d3712e671e69a92ebb0223304a4ffb8",
+      "status": "added"
+    },
+    {
+      "pr": 391,
+      "pr_head": "9f4c1ed3814a3296fddf8934e629a79119be888c",
+      "pr_base": "research/retally-ltl-carrier-revenue-m18-20261011",
+      "original_path": "freight/research_aies_original_ftp.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-391/freight/research_aies_original_ftp.py",
+      "git_blob_sha": "4f36e49667a95fcc0a34961863caea55a00a6032",
+      "status": "added"
+    },
+    {
+      "pr": 391,
+      "pr_head": "9f4c1ed3814a3296fddf8934e629a79119be888c",
+      "pr_base": "research/retally-ltl-carrier-revenue-m18-20261011",
+      "original_path": "freight/test_research_aies_original_ftp.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-391/freight/test_research_aies_original_ftp.py",
+      "git_blob_sha": "1fab46715c1b96c78bc6d9968a11cf1b6e2c8c4a",
+      "status": "added"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": ".github/workflows/retally-aies-historical-lineage.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/.github/workflows/retally-aies-historical-lineage.yml",
+      "git_blob_sha": "7b1a1c49ac7ab4c65d633ea811120da8ecc94e4c",
+      "status": "added"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": "freight/RESEARCH_AIES_HISTORICAL_LINEAGE.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/freight/RESEARCH_AIES_HISTORICAL_LINEAGE.md",
+      "git_blob_sha": "b25c2b52674247e8059ab7d916420521d8bdf2a4",
+      "status": "added"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "b59e94072f155e7b69c0d44c7809cc154453adb7",
+      "status": "modified"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/freight/lab_phase4_director.py",
+      "git_blob_sha": "8bf4407562267eec8e4d4fd3e062b59caf3c0bc2",
+      "status": "modified"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": "freight/research/AIES_HISTORICAL_LINEAGE_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/freight/research/AIES_HISTORICAL_LINEAGE_20261011.json",
+      "git_blob_sha": "28c42b6f17e300bac28b1bd11c828aa233bc901b",
+      "status": "added"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": "freight/research_aies_historical_lineage.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/freight/research_aies_historical_lineage.py",
+      "git_blob_sha": "5f70b1824bb78d5e6ee567ab6cf663ee18b1c882",
+      "status": "added"
+    },
+    {
+      "pr": 393,
+      "pr_head": "f0e209657f4e67efcc5f0dbef21c67292cf59a23",
+      "pr_base": "research/retally-aies-original-ftp-m19-20261011",
+      "original_path": "freight/test_research_aies_historical_lineage.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-393/freight/test_research_aies_historical_lineage.py",
+      "git_blob_sha": "50c70e6d1e35cb286e792aa9f06e2d20c7e95c68",
+      "status": "added"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": ".github/workflows/retally-aies-2022-lineage.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/.github/workflows/retally-aies-2022-lineage.yml",
+      "git_blob_sha": "8dd19db59bade2597b9157c642c18d4f40066328",
+      "status": "added"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": "freight/RESEARCH_AIES_2022_LEGACY_LINEAGE.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/freight/RESEARCH_AIES_2022_LEGACY_LINEAGE.md",
+      "git_blob_sha": "e7cff1234eee21aa5bc73260630c50284633de2a",
+      "status": "added"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "0dab1751c9b442711b5116896dce940e4557a7ed",
+      "status": "modified"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/freight/lab_phase4_director.py",
+      "git_blob_sha": "e9361a218014338ca443206bd92a12b30220ae9f",
+      "status": "modified"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": "freight/research/AIES_2022_LEGACY_LINEAGE_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/freight/research/AIES_2022_LEGACY_LINEAGE_20261011.json",
+      "git_blob_sha": "d4c5d7b23151d08fbb42f03480dd63be6eeee815",
+      "status": "added"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": "freight/research_aies_2022_lineage.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/freight/research_aies_2022_lineage.py",
+      "git_blob_sha": "b1c98b277491525ac00ab1eba61befec49ecd71e",
+      "status": "added"
+    },
+    {
+      "pr": 396,
+      "pr_head": "637e5d8ef968583de3ddbd7bf5ee085ea580455a",
+      "pr_base": "research/retally-aies-historical-lineage-m20-20261011",
+      "original_path": "freight/test_research_aies_2022_lineage.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-396/freight/test_research_aies_2022_lineage.py",
+      "git_blob_sha": "89590f4fbdeed88d3797af3224201e989a83cf54",
+      "status": "added"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": ".github/workflows/retally-sas-benchmark.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/.github/workflows/retally-sas-benchmark.yml",
+      "git_blob_sha": "d9401675348cde489025952cdf98b4576a258b15",
+      "status": "added"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/RESEARCH_SAS_BENCHMARK_RECONCILIATION.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/RESEARCH_SAS_BENCHMARK_RECONCILIATION.md",
+      "git_blob_sha": "29383eabef8f9be1250bc995ce4f2cf0ba4b8bfa",
+      "status": "added"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "66d986b4a46f89f4fef3b3a6edcd0ef67e7603f2",
+      "status": "modified"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/lab_phase4_director.py",
+      "git_blob_sha": "a5584e019c70736d4cb30f0bac61d428e02304ef",
+      "status": "modified"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json",
+      "git_blob_sha": "c4bc01fc38d4b204b300b5ed0390b320f2245fe8",
+      "status": "added"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/research_sas_benchmark.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/research_sas_benchmark.py",
+      "git_blob_sha": "5406435d102315c8d0676c0736ea2858aa42e25d",
+      "status": "added"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/research_sas_xlsx_probe.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/research_sas_xlsx_probe.py",
+      "git_blob_sha": "f44a4950ed131b140c67f1a3b8f0c05f737abe87",
+      "status": "added"
+    },
+    {
+      "pr": 397,
+      "pr_head": "d902cc96adb394e610f5531ef7b862adfc3c137e",
+      "pr_base": "research/retally-aies-2022-historical-reconcile-m21-20261011",
+      "original_path": "freight/test_research_sas_benchmark.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-397/freight/test_research_sas_benchmark.py",
+      "git_blob_sha": "d79007aae801af2dbeb2b1339a061b4f70535cca",
+      "status": "added"
+    }
+  ]
+}

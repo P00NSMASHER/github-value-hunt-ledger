@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "scope": "RETALLY_LAB14_CFS_2022_FORHIRE_VERIFICATION_NOT_CI_REPLAYED",
+  "observed_on": "2026-10-11",
+  "year": "2022",
+  "universe": "US_CFS_2022_SURVEYED_ORIGIN_ESTABLISHMENTS",
+  "source_family": "SINGLE_CFS_2022_SURVEY_NOT_INDEPENDENT_VALIDATION",
+  "source_files": [
+    {
+      "id": "CF2200A18",
+      "url": "https://www2.census.gov/programs-surveys/cfs/data/2022/CF2200A18.zip",
+      "member": "CF2200A18.dat",
+      "sha256": "a18ce071599457572177dd56f8a6174594d1018da9b9024476c4e9832a357bf5",
+      "bytes": 93390,
+      "dimension": "SHIPDIST",
+      "total_stratum": "001",
+      "n_rows": 7312
+    },
+    {
+      "id": "CF2200A19",
+      "url": "https://www2.census.gov/programs-surveys/cfs/data/2022/CF2200A19.zip",
+      "member": "CF2200A19.dat",
+      "sha256": "fe3085d23a3c76704a0d86d9213bb38d3d341b2c228990a5ebf40b6b3f1b661d",
+      "bytes": 107682,
+      "dimension": "SHIPWT",
+      "total_stratum": "01",
+      "n_rows": 6782
+    }
+  ],
+  "geo": {
+    "geotype": "01",
+    "geo_id": "0100000US",
+    "state": "00"
+  },
+  "naics": [
+    "31-33",
+    "42",
+    "4931"
+  ],
+  "modes": [
+    "00",
+    "111"
+  ],
+  "distance_nonoverlapping_buckets": [
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10"
+  ],
+  "weight_nonoverlapping_buckets": [
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10"
+  ],
+  "original_data_bytes_stored_in_git": false,
+  "raw_original_sources_replayed_in_ci": false,
+  "industry_forhire_values_independently_reproduced_here": false,
+  "original_archive_publisher_digital_signature_verified": false,
+  "real_ltl_invoice_values_measured": false,
+  "real_ltl_buyer_or_recovery_claim_authorized": false,
+  "no_new_lab": true,
+  "exact_units": {
+    "value": "MILLIONS_USD_OF_GOODS_SHIPPED_NOT_INVOICE_SPEND",
+    "weight": "THOUSAND_TONS_OF_GOODS_SHIPPED_NOT_LTL_FEES",
+    "cv": "PERCENT_CFS_COEFFICIENT_OF_VARIATION_NOT_AUDIT_ERROR_RATE"
+  },
+  "release_rule": "Only original SHA-256-matched local public Census archives may produce official extracted industry-forhire cells; synthetic ZIPs remain test-only. Suppressed S/Z, duplicate keys, unknown CV, incompatible national geographies or mismatched totals prevent a verified numerical share. No claims about actual LTL billing, recoverable overcharges or prospective customer demand.",
+  "acquisition_backlog": [
+    "Secure a permitted local copy of each original public A18 and A19 ZIP and verify pinned SHA and byte count offline.",
+    "Reconcile all six selected national NAICS/DMODE total source cells across both original files, including VAL_F, TON_F, VAL_S_F, TON_S_F.",
+    "Evaluate independent distance- and weight-bucket values with non-overlap, missingness, suppression flags, Census rounding and actual CVs.",
+    "Preserve 18 unmet permissioned-customer pilot controls before deriving real paid LTL bill, pricing or recovery outcomes."
+  ]
+}

@@ -1,0 +1,145 @@
+name: RETALLY Lab 14 Census SAS Benchmark Reconciliation (Mission 22)
+on:
+  pull_request:
+    paths:
+      - 'freight/research_sas_xlsx_probe.py'
+      - 'freight/research_sas_benchmark.py'
+      - 'freight/test_research_sas_benchmark.py'
+      - 'freight/research/SAS_BENCHMARK_2022_EVIDENCE_20261011.json'
+      - 'freight/RESEARCH_SAS_BENCHMARK_RECONCILIATION.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+      - '.github/workflows/retally-sas-benchmark.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-vintage-falsification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original Lab 14 CI dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Adversarial source-vintage, previous Census evidence and fourteen-lab regression suite
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Generate bounded offline SAS reconciliation and original 14-lab Control Center
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_benchmark \
+            --offline --as-of-date "$(date -u +%F)" --out /tmp/retally-m22-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m22-operator
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-m22-offline')
+          r=json.loads((p/'sas_2022_reconciliation.json').read_text())
+          q=json.loads(Path('/tmp/retally-m22-operator/phase4_control.json').read_text())
+          assert r['status']=='OFFLINE_SAS_SOURCE_VINTAGE_MANIFEST_ONLY_NOT_FRESH_ZIP_REPLAY'
+          assert r['original_source_workbooks_replayed_this_run'] is False
+          assert r['source_vintages_replayed_this_run']==[]
+          assert r['vintage_2024_original_sas_million_usd']==68411
+          assert r['vintage_2026_benchmarked_sas_million_usd']==65688
+          assert r['revised_minus_old_sas_million_usd']==-2723
+          assert r['revised_vs_old_sas_pct_change']=='-3.98'
+          assert r['original_aies_2022_historical_million_usd']=='65688.461'
+          assert r['aies_minus_revised_sas_million_usd']=='0.461'
+          assert r['aies_reconciles_to_published_benchmarked_sas_nearest_million'] is True
+          assert r['exact_modified_sas_sample_and_carryforward_factor_verified'] is False
+          assert r['actual_customer_paid_invoices_observed']==0
+          assert r['recoverable_freight_audit_tam_usd'] is None
+          assert r['human_pilot_18_approval_requirements_unmet'] is True
+          assert len(q['lab_runs'])==14 and q['failed_or_blocked_labs']==[]
+          assert q['pilot_preflight']['unmet_requirements']==18
+          assert q['actual_revenue_cents']==0
+          assert q['sas_2022_benchmark_reconciliation']['receipt_sha256']==r['receipt_sha256']
+          assert 'sas_2022_reconciliation.html' in Path('/tmp/retally-m22-operator/index.html').read_text()
+          print('SAS vintage arithmetic and original 14-lab controls verified, no fresh workbook proof claimed.')
+          PY
+      - name: Retain read-only offline evidence report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-sas-benchmark-offline
+          path: |
+            /tmp/retally-m22-offline/sas_2022_reconciliation.json
+            /tmp/retally-m22-offline/sas_2022_reconciliation.html
+          if-no-files-found: error
+          retention-days: 14
+
+  verify-original-sas-publisher-workbooks:
+    needs: offline-vintage-falsification
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Retrieve and rehash exactly two official Census XLSX vintage publications
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_benchmark \
+            --fetch-publisher-workbooks --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m22-publisher
+      - name: Require published original cells and explicit non-commercial boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m22-publisher/sas_2022_reconciliation.json').read_text())
+          assert r['scope']=='LAB14_SAS_AUG2026_2022_REVISION_RECONCILIATION_NO_FREIGHT_RECOVERY'
+          assert r['aies_reconciles_to_published_benchmarked_sas_nearest_million'] is True
+          assert r['revision_explained_as_updated_census_benchmark_publication_vintage'] is True
+          assert r['exact_modified_sas_sample_and_carryforward_factor_verified'] is False
+          assert r['both_cvs_not_statistically_reconciled_or_independent_samples'] is True
+          assert r['actual_customer_paid_invoices_observed']==0
+          assert r['recoverable_freight_audit_tam_usd'] is None
+          assert r['cash_recoveries_proven'] is False if 'cash_recoveries_proven' in r else r['actual_cash_recoveries_usd'] is None
+          assert r['commercial_claims_and_carrier_contact_authorized'] is False
+          assert r['human_pilot_18_approval_requirements_unmet'] is True
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['status']=='CENSUS_2022_SAS_VINTAGE_REVISION_VERIFIED_AIES_ROUNDING_MATCH':
+            assert r['original_source_workbooks_replayed_this_run'] is True
+            proofs=r['source_vintages_replayed_this_run']
+            assert len(proofs)==2
+            byid={x['source_id']:x for x in proofs}
+            assert byid['revised_2026_sas']['source_xlsx_sha256']=='cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac'
+            assert byid['legacy_2024_sas']['source_xlsx_sha256']=='4aa1efe9533fb3b16f32806af4f0b1bd5c72e92f2db024e559f891e03f0bc33a'
+            assert byid['revised_2026_sas']['revenue_million_usd']==65688
+            assert byid['legacy_2024_sas']['revenue_million_usd']==68411
+            assert all(len(p['selected_source_rows'])==2 and
+                       p['two_tax_status_rows_same_survey_not_independent'] is True
+                       for p in proofs)
+            print('VERIFIED original Census 2022 SAS release vintages, no 2022 freight invoice recovery claims.')
+          elif r['status']=='BLOCKED_CENSUS_SAS_WORKBOOK_DOWNLOAD_NOT_VERIFIED':
+            assert r['original_source_workbooks_replayed_this_run'] is False
+            assert r['source_vintages_replayed_this_run']==[]
+            print('::warning::Census SAS publisher source blocked. No newly verified XLSX proof.')
+          else:
+            raise AssertionError('SAS_SOURCE_AUTHENTICATION_UNEXPECTED_STATUS')
+          PY
+      - name: Preserve only source receipts, never publisher spreadsheets
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-sas-benchmark-original-xlsx-replay
+          path: |
+            /tmp/retally-m22-publisher/sas_2022_reconciliation.json
+            /tmp/retally-m22-publisher/sas_2022_reconciliation.html
+          if-no-files-found: error
+          retention-days: 14

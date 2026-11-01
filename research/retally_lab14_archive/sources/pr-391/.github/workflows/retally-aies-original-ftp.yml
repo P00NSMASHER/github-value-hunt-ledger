@@ -1,0 +1,114 @@
+name: RETALLY Lab 14 AIES Census Original FTP (Mission 19)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-aies-original-ftp.yml'
+      - 'freight/research_aies_original_ftp.py'
+      - 'freight/test_research_aies_original_ftp.py'
+      - 'freight/RESEARCH_AIES_ORIGINAL_FTP.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-adversarial-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned existing Lab 14 test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run original Census ZIP falsification and preexisting Lab 14 regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Ensure original fourteen laboratory controls remain intact
+        run: |
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m19-original-labs
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/retally-m19-original-labs/phase4_control.json")
+          r=json.loads(p.read_text())
+          assert len(r['lab_runs'])==14
+          assert r['failed_or_blocked_labs']==[]
+          assert r['actual_revenue_cents']==0
+          assert r['pilot_preflight']['unmet_requirements']==18
+          assert r['aies_ltl_carrier_revenue']['ltl_freight_audit_recoverable_tam_usd'] is None
+          print('All 14 original labs retained; 18 human preflight controls still unmet.')
+          PY
+
+  verify-census-original-ftp:
+    needs: offline-adversarial-research
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Authenticate and replay only original Census 2024 AIES archive
+        run: |
+          PYTHONPATH=. python -m freight.research_aies_original_ftp \
+            --fetch-official --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m19-census-primary
+      - name: Enforce exact source status and prevent fraudulent billings claims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-m19-census-primary/aies_primary_source.json')
+          r=json.loads(p.read_text())
+          assert r['scope']=='LAB14_2024_AIES_ORIGINAL_CENSUS_FTP_THREE_NAICS_REVENUE_ROWS'
+          assert r['historical_2022_2023_original_ftp_replayed'] is False
+          assert r['pilot_18_independent_human_requirements_still_unverified'] is True
+          assert r['publisher_digitally_signed_archive_verified'] is False
+          assert r['actual_paid_customer_ltl_invoices_observed']==0
+          assert r['actual_recovered_usd'] is None
+          assert r['retally_audit_recoverable_tam_usd'] is None
+          assert r['public_commercial_claims_authorized'] is False
+          assert r['customer_or_carrier_records_processed'] is False
+          assert r['automated_carrier_or_customer_contact'] is False
+          assert r['new_lab_created'] is False and r['lab']==14
+          assert len(r['receipt_sha256'])==64
+          if r['status']=='ORIGINAL_CENSUS_2024_AIES_FTP_REVENUE_ROWS_REPRODUCED':
+              assert r['direct_original_census_ftp_replay_completed'] is True
+              assert r['reference_year_verified']==2024
+              assert r['source_archive_sha256']=='39c4235026672e7bffdbc36292ed976726df368f2ca435219aef1c84e8e4faa6'
+              assert r['source_zip_bytes']==340551
+              assert r['source_data_row_count']==8802
+              assert r['source_data_field_count']==35
+              assert r['matched_national_industry_source_rows']==3
+              assert [row['naics2017'] for row in r['source_estimates']]==['484','484121','484122']
+              assert [row['revenue_thousand_usd'] for row in r['source_estimates']]==[402827246,161329027,65096292]
+              assert all(row['published_flags_empty'] is True for row in r['source_estimates'])
+              print('OFFICIAL 2024 CENSUS FTP REPLAY: 3 national NAICS rows, original ZIP + DAT fingerprints.')
+          elif r['status']=='BLOCKED_CENSUS_FTP_UNREACHABLE_NOT_VERIFIED':
+              assert r['direct_original_census_ftp_replay_completed'] is False
+              assert r['source_archive_sha256'] is None
+              assert r['source_estimates']==[]
+              assert r['matched_national_industry_source_rows']==0
+              print('::warning::BLOCKED Census FTP network source, no primary source replay certified.')
+          else:
+              raise AssertionError('UNKNOWN_OR_UNAUTHORIZED_SOURCE_REPLAY_STATUS')
+          PY
+      - name: Retain evidence receipts only, never raw source archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-aies-original-source-m19
+          path: |
+            /tmp/retally-m19-census-primary/aies_primary_source.json
+            /tmp/retally-m19-census-primary/aies_primary_source.html
+          if-no-files-found: error
+          retention-days: 14

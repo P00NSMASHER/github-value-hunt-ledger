@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "scope": "CFS_A01_LOCAL_COLUMN_MAP_REVIEW_NOT_SOURCE_AUTHENTICATION",
+  "source_url": "https://www2.census.gov/programs-surveys/cfs/data/2022/CF2200A01.zip",
+  "table_id": "CF2200A01",
+  "member": "CF2200A01.dat",
+  "columns": {
+    "geography": "GEO_ID",
+    "mode": "DMODE",
+    "year": "YEAR",
+    "value_million_usd": "VAL",
+    "weight_thousand_tons": "TON",
+    "value_flag": "VAL_F",
+    "weight_flag": "TON_F",
+    "geotype": "#GEOTYPE",
+    "mode_flag": "DMODE_F",
+    "change_value_flag": "VALPCHG_F",
+    "change_weight_flag": "TONPCHG_F"
+  },
+  "selectors": [
+    {
+      "row_id": "us.allmodes.2022",
+      "geography": "0100000US",
+      "mode": "00",
+      "year": "2022"
+    },
+    {
+      "row_id": "us.truck.2022",
+      "geography": "0100000US",
+      "mode": "11",
+      "year": "2022"
+    },
+    {
+      "row_id": "us.forhire.2022",
+      "geography": "0100000US",
+      "mode": "111",
+      "year": "2022"
+    },
+    {
+      "row_id": "us.company.2022",
+      "geography": "0100000US",
+      "mode": "112",
+      "year": "2022"
+    },
+    {
+      "row_id": "us.customer.2022",
+      "geography": "0100000US",
+      "mode": "113",
+      "year": "2022"
+    },
+    {
+      "row_id": "south.allmodes.2022",
+      "geography": "0200000US3",
+      "mode": "00",
+      "year": "2022"
+    }
+  ],
+  "claims_of_external_approval": false
+}
