@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from public_asset_preflight import run, targets
+from public_asset_preflight import run
 
 MEDIA = "https://static.metricool.com/planner/202610/7322512-file-creative.png"
 SITE = "https://www.retallyrecovery.com/"
