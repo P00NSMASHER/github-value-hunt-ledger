@@ -425,5 +425,92 @@ class ResearchCIVerificationContract(unittest.TestCase):
         self.assertEqual(source.count('cron: "19 3 * * *"'),1)
 
 
+class LegacyFictionalSourceLineageContract(unittest.TestCase):
+    """Source-DOCUMENT identity guard, not original archive-byte attestation."""
+
+    @staticmethod
+    def _fixture():
+        import json
+        file = Path(__file__).resolve().parent / "fixtures" / (
+            "legacy_labs03_14_shared_synthetic_origin_v1.json"
+        )
+        return json.loads(file.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def _valid(source):
+        import hashlib
+        expected_root = (
+            "7c670a91a1a411480b35d054b821f483744267b9c07acda9fe974d910888ed81"
+        )
+        if (source.get("reported_fictional_source_sha256") != expected_root
+                or source.get("source_byte_sha256_verified_this_run") is not None
+                or source.get("source_raw_bytes_custodied_this_run") != 0):
+            return False
+        claims = source.get("claims", {})
+        if (claims.get("all_15_labs_consolidated") is not False
+                or claims.get("rights_for_commercial_customer_use") != "UNKNOWN"
+                or claims.get("source_original_binary_missing_so_root_not_independently_rehashed") is not True
+                or claims.get("shared_document_reported_root_not_independent_real_world_samples") is not True):
+            return False
+        counts = source.get("counts", {})
+        if (counts.get("distinct_logical_lab_ids") != 12
+                or counts.get("distinct_reported_fictional_invoice_roots") != 1
+                or counts.get("distinct_source_documents_checked") != 3
+                or counts.get("independently_custodied_original_source_bytes") != 0
+                or counts.get("independently_labeled_customer_freight_errors") != 0
+                or counts.get("source_verified_legacy_lab_retirements") != 0):
+            return False
+        groups = source.get("groups")
+        if type(groups) is not list or len(groups) != 3:
+            return False
+        unique = []
+        for group in groups:
+            labs = group.get("lab_numbers")
+            if type(labs) is not list or not all(type(n) is int for n in labs):
+                return False
+            unique.extend(labs)
+            docpath = group.get("source_doc")
+            if type(docpath) is not str or not docpath.startswith("freight/"):
+                return False
+            path = Path(__file__).resolve().parents[1] / docpath
+            if not path.is_file():
+                return False
+            raw = path.read_bytes()
+            digest = hashlib.sha1(
+                ("blob " + str(len(raw)) + "\0").encode("ascii") + raw
+            ).hexdigest()
+            if digest != group.get("source_git_blob_sha1"):
+                return False
+            text = raw.decode("utf-8")
+            if expected_root not in text or not (
+                "fictional" in text.lower() or "synthetic" in text.lower()
+            ):
+                return False
+        return sorted(unique) == list(range(3, 15))
+
+    def test_legacy_12_logical_labs_share_one_reported_fictional_origin(self):
+        self.assertTrue(self._valid(self._fixture()))
+
+    def test_synthetic_counterexamples_never_upgrade_to_independent_truth(self):
+        import copy
+        data = self._fixture()
+        cases = []
+        for change in (
+            lambda x: x["groups"][1]["lab_numbers"].append(3),
+            lambda x: x.update(reported_fictional_source_sha256="0" * 64),
+            lambda x: x.update(source_raw_bytes_custodied_this_run=1),
+            lambda x: x["counts"].update(independently_labeled_customer_freight_errors=1),
+            lambda x: x["counts"].update(source_verified_legacy_lab_retirements=1),
+            lambda x: x["claims"].update(all_15_labs_consolidated=True),
+            lambda x: x["groups"][0].update(source_git_blob_sha1="0" * 40),
+        ):
+            unsafe = copy.deepcopy(data)
+            change(unsafe)
+            cases.append(unsafe)
+        for i, unsafe in enumerate(cases):
+            with self.subTest(negative_case=i):
+                self.assertFalse(self._valid(unsafe))
+
+
 if __name__ == "__main__":
     unittest.main()
