@@ -2,3 +2,9 @@
 -r ../production/requirements-ci.txt
 ruff==0.17.3
 cryptography==46.0.4
+# Required by the source-verified Facebook cover tests in the full Freight suite.
+# Also pinned in the dedicated retally-facebook-assets workflow.
+Pillow==12.3.0
+# Pinned browser API for the real Freight creative rendering regressions.
+# The GitHub Ubuntu runner provides system Chromium; separate creative QA also installs its own browser.
+playwright==1.57.0

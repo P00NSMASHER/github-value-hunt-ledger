@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "product": "Freight Recovery",
+  "product_version": "16.0.0",
+  "component_version": "v16-evidence-preflight-1",
+  "website_marketing_release": "free-audit-contingency-v5",
+  "release_intent": "PUBLIC_RESEARCH_PREFLIGHT_ONLY",
+  "customer_production": "HOLD",
+  "independent_bank_cleared_recovery_verified": false,
+  "paid_customer_accuracy_verified": false,
+  "external_carrier_action_authorized": false,
+  "source_repository": "P00NSMASHER/github-value-hunt-ledger",
+  "source_branch": "main",
+  "requirements": "freight/V16_RELEASE_REQUIREMENTS.md"
+}

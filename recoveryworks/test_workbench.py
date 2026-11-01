@@ -40,6 +40,17 @@ class WorkbenchTests(unittest.TestCase):
                 workspace.review_source(tokens['customer'],'ap','payments_csv',record['normalized_sha256'],'self review')
             workspace.review_source(tokens['reviewer'],'ap','payments_csv',record['normalized_sha256'],'checked')
             self.assertTrue(workspace.read_source(tokens['customer'],record['id'])['content'].startswith('Payment_Number'))
+            original=workspace.root/'sources'/(record['id']+'.original')
+            preserved=original.read_bytes()
+            original.write_bytes(preserved+b' ')
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.read_source(tokens['customer'],record['id'])
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.review_source(tokens['reviewer'],'ap','payments_csv',record['normalized_sha256'],'recheck')
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.upload(tokens['customer'],'ap','payments_csv',content,mapping)
+            original.write_bytes(preserved)
+            self.assertTrue(workspace.read_source(tokens['customer'],record['id'])['content'].startswith('Payment_Number'))
             (workspace.root/record['path']).write_text('tampered')
             with self.assertRaises(ValueError):
                 workspace.read_source(tokens['customer'],record['id'])
@@ -73,6 +84,57 @@ class WorkbenchTests(unittest.TestCase):
                 self.assertEqual(caught.exception.code,404)
             finally:
                 server.shutdown();server.server_close();thread.join()
+
+    def test_scan_rejects_original_evidence_tampering_before_any_recovery_action(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workspace,tokens=seed(Path(directory)/'client')
+            record=next(iter(workspace._intake()['sources'].values()))
+            original=workspace.root/'sources'/(record['id']+'.original')
+            original.write_bytes(original.read_bytes()+b' tampered')
+            head=workspace.store.current_head_hash()
+            # The original readback and the onboarding scan reject the same
+            # tampering at different boundaries with different fail-closed errors.
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace._verified_evidence_bytes(record)
+            with self.assertRaisesRegex(ValueError,'source integrity failure|original evidence bytes changed'):
+                workspace.scan(tokens['operator'])
+            self.assertEqual(workspace.store.current_head_hash(),head)
+
+    def test_live_case_original_document_tamper_blocks_review_and_cash(self):
+        """Only synthetic documents: edited originals cannot inherit prior reviews."""
+        from recoveryworks.durable_ledger import DurableRecoveryLedger
+        from recoveryworks.test_durable_ledger import verified_finding
+        with tempfile.TemporaryDirectory() as directory:
+            workspace,tokens=Workspace.create(Path(directory)/'live','client-1',simulation=False)
+            finding=verified_finding()
+            ledger=DurableRecoveryLedger()
+            ledger.add(finding)
+            workspace.store.save(ledger)
+            content='{"synthetic_proof": "reviewed", "source": "no customer data"}'
+            record=workspace.upload_document(tokens['operator'],finding.finding_id,'cash_event',content)
+            original=workspace.root/'sources'/(record['id']+'.original')
+            preserved=original.read_bytes()
+            original.write_bytes(preserved+b' ')
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.review_document(tokens['reviewer'],record['id'],
+                    record['normalized_sha256'],'synthetic reviewer')
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.read_source(tokens['reviewer'],record['id'])
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.upload_document(tokens['operator'],finding.finding_id,'cash_event',content)
+            original.write_bytes(preserved)
+            workspace.review_document(tokens['reviewer'],record['id'],
+                record['normalized_sha256'],'synthetic reviewer')
+            self.assertEqual(workspace._reviewed_document(record['id'],finding.finding_id,
+                'cash_event')['synthetic_proof'],'reviewed')
+            original.write_bytes(preserved+b' ')
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace._reviewed_document(record['id'],finding.finding_id,'cash_event')
+            head=workspace.store.current_head_hash()
+            with self.assertRaisesRegex(ValueError,'original evidence bytes changed'):
+                workspace.action(tokens['operator'],'cash',finding.finding_id,head,
+                                 {'document_id':record['id']})
+            self.assertEqual(workspace.store.current_head_hash(),head)
 
     def test_live_workspace_cannot_use_simulated_claim_or_cash_actions(self):
         with tempfile.TemporaryDirectory() as directory:

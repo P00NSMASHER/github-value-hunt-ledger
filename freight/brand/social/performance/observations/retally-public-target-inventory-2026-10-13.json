@@ -1,0 +1,1062 @@
+{
+  "description": "Sanitized, immutable public URL and CDN media inventory of current RETALLY scheduled Facebook and Instagram campaign; source snapshot 2026-10-13. No unpublished captions, personal account names, customer records, or proofs of publication. Network probes check only reachable assets and educational routes.",
+  "metricool_brand_id": "7322512",
+  "generated_from": "Metricool getScheduledPosts 2026-10-13",
+  "evidence_state": "SCHEDULED_ONLY_NOT_PUBLICATION",
+  "data": [
+    {
+      "uuid": "-7860495589122225702",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-13T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black illustration explaining freight overcharge reviews in four steps: review invoices; check rates and shipment records; find billing errors; help pursue authorized recovery. Glossy black truck at a container port with an emerald network globe and raised glass step cards. Initial audit $0 upfront for agreed eligible scope."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "7811592469031895818",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-14T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-audit-methodology?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=human_review",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16571506407541194756.jpeg"
+      ],
+      "mediaAltText": [
+        "Four-step RETALLY evidence ledger: flagged variance, supported finding, separately customer-authorized action, and actual funds or credits received."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "2032289939949506170",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-16T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-overcharge-dispute-process?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=dispute_package",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17052938774463846946.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY evidence-first freight audit methodology, showing the billed charge, controlling rate authority, shipment and service record, and credit disposition."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-7129364071318205444",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-14T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/second-look-freight-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=independent_second_look",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black freight audit graphic. Headline: 'Already have a freight auditor? We check what's still unresolved.' Three glowing panels: Review prior findings; Check credits & corrections; Identify issues still open. A dark green truck at a port. 'Find it. Prove it. Recover it.' $0 upfront initial audit for agreed eligible scope."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "6484508306152771452",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-15T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium black-and-emerald freight billing graphic. Headline: 'TWO INVOICES. ONE SHIPMENT. NOT ALWAYS A DUPLICATE.' Explains that a corrected bill or credit can explain a second invoice, with three glowing cards: Match the shipment; Check corrected bills; Reconcile credits. Dark tractor-trailer at a port and reminder to investigate before claiming an overcharge."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "4515744888515085769",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-19T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=evidence_chain_controls",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16571506407541194756.jpeg"
+      ],
+      "mediaAltText": [
+        "Four-step RETALLY evidence ledger: flagged variance, supported finding, separately customer-authorized action, and actual funds or credits received."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "4856530522462570826",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-19T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2631313547745864893.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY's freight audit methodology: charge, controlling rate authority, shipment/service evidence and final disposition with credits."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-8389132711185331174",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-21T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=illustrative_detention_review",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-8451161266632424220.jpeg"
+      ],
+      "mediaAltText": [
+        "Branded RETALLY illustrative freight detention audit: gate record 08:30 to 11:00, 150 minutes on site, hypothetical 120 free minutes, 30 minutes excess; invoice bills 90, a 60-minute candidate discrepancy. Not an actual customer result."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-6636811547176385895",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-21T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9901621924668583582.jpeg"
+      ],
+      "mediaAltText": [
+        "Clearly labeled illustrative detention review. Gate record 08:30–11:00 is 150 minutes on site; 120 hypothetical free minutes leave 30 beyond free time versus 90 minutes billed. The 60-minute difference is only a candidate, not a realized recovery."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "2381321643741103769",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-23T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-audit-pricing?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct23_pricing",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2670847225706553496.png"
+      ],
+      "mediaAltText": [
+        "RETALLY branded no-upfront audit offer card, showing scope, evidence and separate recovery authorization. Fees relate only to eligible actual recoveries; no outcome is guaranteed."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "2593190408975893039",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-23T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9714268420423041954.png"
+      ],
+      "mediaAltText": [
+        "RETALLY green-and-cream pricing graphic: A $0 audit isn't a refund promise. Scope, evidence and written authorization come before recovery, with no guaranteed results."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-5093396272539350040",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-27T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-1778982742354561434.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY branded secure-inquiry instructions: start with a conversation about freight modes and scope, agree on next steps, and share sensitive records only through an approved transfer route."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "7792632698307233895",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-02T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_nov2026_fieldnotes&utm_content=liftgate_evidence",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-7153299043667698162.png",
+        "https://static.metricool.com/planner/202610/7322512-file-15650414007348035767.png",
+        "https://static.metricool.com/planner/202610/7322512-file-17505442653676752604.png",
+        "https://static.metricool.com/planner/202610/7322512-file-13497648435232926350.png"
+      ],
+      "mediaAltText": [
+        "RETALLY Field Notes carousel, slide one of four: Billed for a liftgate? The invoice line alone is not the service record; check evidence supporting the extra fee.",
+        "RETALLY accessorial proof slide two: verify the governing contract or tariff, the fee trigger, included services, and the effective version.",
+        "RETALLY accessorial proof slide three: match delivery record, service notation, and shipment identity before treating a liftgate charge as questionable.",
+        "RETALLY slide four: three questions before a dispute—what terms governed, what documents support the service, and whether a correction or credit already occurred."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "1799007890085400226",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-03T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-5383715596287589583.png",
+        "https://static.metricool.com/planner/202610/7322512-file-14757960404333438328.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11336803061927960596.png",
+        "https://static.metricool.com/planner/202610/7322512-file-4301373812253712825.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes asks what evidence supports a billed liftgate fee.",
+        "Slide 2: check the governing contract or tariff, included services, trigger conditions and effective terms.",
+        "Slide 3: verify the delivery record, service notation and shipment identity before flagging an accessorial fee.",
+        "Slide 4: saveable checklist: governing terms, service evidence and prior credits, with no automatic refund claim."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-3688059109071566415",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-04T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/carrier-rate-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_nov2026_fieldnotes&utm_content=rate_version",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9746827956131939835.png",
+        "https://static.metricool.com/planner/202610/7322512-file-7380222325715351658.png",
+        "https://static.metricool.com/planner/202610/7322512-file-6916016000142693938.png",
+        "https://static.metricool.com/planner/202610/7322512-file-12973848625873282339.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes highlights a shipment associated with two rate sheets and asks which version governed.",
+        "Slide 2: investigate the applicable date, effective date and signed amendments.",
+        "Slide 3: check the contract, incorporated tariff and any applicable exceptions rather than guessing which rate prevails.",
+        "Slide 4: saveable rate audit checklist: controlling version, relevant dates, exceptions and already-issued credits."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-5464319525184516120",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-05T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16995368350622866353.png",
+        "https://static.metricool.com/planner/202610/7322512-file-2827369008175147549.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11515298540851319582.png",
+        "https://static.metricool.com/planner/202610/7322512-file-3480295111158624296.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: one freight shipment, two rate sheets; which version applies?",
+        "Slide 2: review the shipment date, contract rate effective dates and signed amendments.",
+        "Slide 3: review governing contracts, referenced tariffs and exceptions before asserting a discrepancy.",
+        "Slide 4: saveable checklist of rate authority, controlling dates and credits."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "8716853707100473641",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-09T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black freight audit graphic. Headline: 'Already have a freight auditor? We check what's still unresolved.' Three glowing panels: Review prior findings; Check credits & corrections; Identify issues still open. A dark green truck at a port. 'Find it. Prove it. Recover it.' $0 upfront initial audit for agreed eligible scope."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-8846650007576096797",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-11T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17052938774463846946.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY evidence-first freight audit methodology, showing the billed charge, controlling rate authority, shipment and service record, and credit disposition."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "4303627388262499126",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-13T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16571506407541194756.jpeg"
+      ],
+      "mediaAltText": [
+        "Four-step RETALLY evidence ledger: flagged variance, supported finding, separately customer-authorized action, and actual funds or credits received."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-176179322964390142",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-16T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-8451161266632424220.jpeg"
+      ],
+      "mediaAltText": [
+        "Branded RETALLY illustrative freight detention audit: gate record 08:30 to 11:00, 150 minutes on site, hypothetical 120 free minutes, 30 minutes excess; invoice bills 90, a 60-minute candidate discrepancy. Not an actual customer result."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-8455468698886911739",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-18T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2670847225706553496.png"
+      ],
+      "mediaAltText": [
+        "RETALLY branded no-upfront audit offer card, showing scope, evidence and separate recovery authorization. Fees relate only to eligible actual recoveries; no outcome is guaranteed."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "3389335605660699518",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-20T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-530205963497938536.png"
+      ],
+      "mediaAltText": [
+        "RETALLY emerald-and-charcoal credit reconciliation graphic, asking 'Already credited?' and showing original charge, adjustments and credit confirmation."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "6276273323237001429",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-23T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-7153299043667698162.png",
+        "https://static.metricool.com/planner/202610/7322512-file-15650414007348035767.png",
+        "https://static.metricool.com/planner/202610/7322512-file-17505442653676752604.png",
+        "https://static.metricool.com/planner/202610/7322512-file-13497648435232926350.png"
+      ],
+      "mediaAltText": [
+        "RETALLY Field Notes carousel, slide one of four: Billed for a liftgate? The invoice line alone is not the service record; check evidence supporting the extra fee.",
+        "RETALLY accessorial proof slide two: verify the governing contract or tariff, the fee trigger, included services, and the effective version.",
+        "RETALLY accessorial proof slide three: match delivery record, service notation, and shipment identity before treating a liftgate charge as questionable.",
+        "RETALLY slide four: three questions before a dispute—what terms governed, what documents support the service, and whether a correction or credit already occurred."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-1440261078024830016",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-25T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "Public artwork inventory only; not a publication receipt.",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9746827956131939835.png",
+        "https://static.metricool.com/planner/202610/7322512-file-7380222325715351658.png",
+        "https://static.metricool.com/planner/202610/7322512-file-6916016000142693938.png",
+        "https://static.metricool.com/planner/202610/7322512-file-12973848625873282339.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes highlights a shipment associated with two rate sheets and asks which version governed.",
+        "Slide 2: investigate the applicable date, effective date and signed amendments.",
+        "Slide 3: check the contract, incorporated tariff and any applicable exceptions rather than guessing which rate prevails.",
+        "Slide 4: saveable rate audit checklist: controlling version, relevant dates, exceptions and already-issued credits."
+      ],
+      "instagramData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-9123081960720741284",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-16T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-audit-methodology?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct16_process",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17052938774463846946.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY evidence-first freight audit methodology, showing the billed charge, controlling rate authority, shipment and service record, and credit disposition."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "7206690026091331851",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-10-26T09:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_oct2026_launch&utm_content=oct26_credit_reconciliation",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-530205963497938536.png"
+      ],
+      "mediaAltText": [
+        "RETALLY emerald-and-charcoal credit reconciliation graphic, asking 'Already credited?' and showing original charge, adjustments and credit confirmation."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "8142222794317188567",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-10T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-invoice-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=invoice_totals",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-3987091251411167546.png"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black illustration explaining freight overcharge reviews in four steps: review invoices; check rates and shipment records; find billing errors; help pursue authorized recovery. Glossy black truck at a container port with an emerald network globe and raised glass step cards. Initial audit $0 upfront for agreed eligible scope."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-8565363955738653132",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-12T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/duplicate-freight-charges?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=duplicate_bills",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium black-and-emerald freight billing graphic. Headline: 'TWO INVOICES. ONE SHIPMENT. NOT ALWAYS A DUPLICATE.' Explains that a corrected bill or credit can explain a second invoice, with three glowing cards: Match the shipment; Check corrected bills; Reconcile credits. Dark tractor-trailer at a port and reminder to investigate before claiming an overcharge."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "1528415141613749553",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-17T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=source_check",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-2631313547745864893.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY's freight audit methodology: charge, controlling rate authority, shipment/service evidence and final disposition with credits."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-3909322918688832862",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-19T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=detention_example",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9901621924668583582.jpeg"
+      ],
+      "mediaAltText": [
+        "Clearly labeled illustrative detention review. Gate record 08:30–11:00 is 150 minutes on site; 120 hypothetical free minutes leave 30 beyond free time versus 90 minutes billed. The 60-minute difference is only a candidate, not a realized recovery."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "8015021466384810666",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-24T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-audit-pricing?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=upfront_fee",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9714268420423041954.png"
+      ],
+      "mediaAltText": [
+        "RETALLY green-and-cream pricing graphic: A $0 audit isn't a refund promise. Scope, evidence and written authorization come before recovery, with no guaranteed results."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "6404649486464402048",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-11-26T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/privacy?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=secure_scope",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-1778982742354561434.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY branded secure-inquiry instructions: start with a conversation about freight modes and scope, agree on next steps, and share sensitive records only through an approved transfer route."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "6742382620769799375",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-01T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/accessorial-charge-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=liftgate_checklist",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-5383715596287589583.png",
+        "https://static.metricool.com/planner/202610/7322512-file-14757960404333438328.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11336803061927960596.png",
+        "https://static.metricool.com/planner/202610/7322512-file-4301373812253712825.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes asks what evidence supports a billed liftgate fee.",
+        "Slide 2: check the governing contract or tariff, included services, trigger conditions and effective terms.",
+        "Slide 3: verify the delivery record, service notation and shipment identity before flagging an accessorial fee.",
+        "Slide 4: saveable checklist: governing terms, service evidence and prior credits, with no automatic refund claim."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "4658315571907150045",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-03T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/carrier-rate-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_fieldnotes_2026&utm_content=rate_version",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-16995368350622866353.png",
+        "https://static.metricool.com/planner/202610/7322512-file-2827369008175147549.png",
+        "https://static.metricool.com/planner/202610/7322512-file-11515298540851319582.png",
+        "https://static.metricool.com/planner/202610/7322512-file-3480295111158624296.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: one freight shipment, two rate sheets; which version applies?",
+        "Slide 2: review the shipment date, contract rate effective dates and signed amendments.",
+        "Slide 3: review governing contracts, referenced tariffs and exceptions before asserting a discrepancy.",
+        "Slide 4: saveable checklist of rate authority, controlling dates and credits."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "3194091495053149637",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-07T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-invoice-audit-checklist?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=population_freeze",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black freight audit graphic. Headline: 'Already have a freight auditor? We check what's still unresolved.' Three glowing panels: Review prior findings; Check credits & corrections; Identify issues still open. A dark green truck at a port. 'Find it. Prove it. Recover it.' $0 upfront initial audit for agreed eligible scope."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-5490860010807079787",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-09T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/duplicate-freight-charges?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=economic_identity",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-6419974974892061437.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium black-and-emerald freight billing graphic. Headline: 'TWO INVOICES. ONE SHIPMENT. NOT ALWAYS A DUPLICATE.' Explains that a corrected bill or credit can explain a second invoice, with three glowing cards: Match the shipment; Check corrected bills; Reconcile credits. Dark tractor-trailer at a port and reminder to investigate before claiming an overcharge."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-7889737033544938434",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-11T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/carrier-rate-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=fuel_inputs",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-9746827956131939835.png",
+        "https://static.metricool.com/planner/202610/7322512-file-7380222325715351658.png",
+        "https://static.metricool.com/planner/202610/7322512-file-6916016000142693938.png",
+        "https://static.metricool.com/planner/202610/7322512-file-12973848625873282339.png"
+      ],
+      "mediaAltText": [
+        "Slide 1: RETALLY Field Notes highlights a shipment associated with two rate sheets and asks which version governed.",
+        "Slide 2: investigate the applicable date, effective date and signed amendments.",
+        "Slide 3: check the contract, incorporated tariff and any applicable exceptions rather than guessing which rate prevails.",
+        "Slide 4: saveable rate audit checklist: controlling version, relevant dates, exceptions and already-issued credits."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-3552338083886446492",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-18T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=settlement_status",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-530205963497938536.png"
+      ],
+      "mediaAltText": [
+        "RETALLY emerald-and-charcoal credit reconciliation graphic, asking 'Already credited?' and showing original charge, adjustments and credit confirmation."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "6615609311904877901",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-21T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/second-look-freight-audit?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=year_end_scope",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-17668956900351564739.jpeg"
+      ],
+      "mediaAltText": [
+        "RETALLY premium emerald-and-black freight audit graphic. Headline: 'Already have a freight auditor? We check what's still unresolved.' Three glowing panels: Review prior findings; Check credits & corrections; Identify issues still open. A dark green truck at a port. 'Find it. Prove it. Recover it.' $0 upfront initial audit for agreed eligible scope."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    },
+    {
+      "uuid": "-7835007365387827486",
+      "providers": [
+        {
+          "network": "facebook",
+          "status": "PENDING"
+        }
+      ],
+      "draft": false,
+      "autoPublish": true,
+      "publicationDate": {
+        "dateTime": "2026-12-23T10:00:00",
+        "timezone": "America/New_York"
+      },
+      "text": "https://www.retallyrecovery.com/freight-recovery-evidence-standard?utm_source=facebook&utm_medium=organic_social&utm_campaign=retally_dec2026_fieldnotes&utm_content=credit_reversals",
+      "media": [
+        "https://static.metricool.com/planner/202610/7322512-file-530205963497938536.png"
+      ],
+      "mediaAltText": [
+        "RETALLY emerald-and-charcoal credit reconciliation graphic, asking 'Already credited?' and showing original charge, adjustments and credit confirmation."
+      ],
+      "facebookData": {
+        "type": "POST"
+      }
+    }
+  ]
+}

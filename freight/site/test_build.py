@@ -201,6 +201,17 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('contingencyRecoveryRate: "0.325"', config)
             self.assertIn('contingencyRecoveryRateLabel: "32.5%"', config)
 
+    def test_configured_rate_is_visible_in_static_html_without_javascript(self):
+        for rate, expected in (("0.30", "30%"), ("0.325", "32.5%")):
+            with self.subTest(rate=rate), tempfile.TemporaryDirectory() as temporary:
+                output = build(Path(temporary) / "public", rate=rate)
+                homepage = (output / "index.html").read_text()
+                terms = (output / "engagement-framework.html").read_text()
+                self.assertIn(f"<strong data-rate-label>{expected}</strong>", homepage)
+                self.assertIn(f"<b data-rate-label>{expected}</b>", terms)
+                self.assertNotIn("Rate confirmed before engagement", homepage)
+                self.assertNotIn("Rate confirmed in writing", terms)
+
     def test_private_repository_cannot_be_the_output(self):
         for output in (
             builder.REPOSITORY,
@@ -209,6 +220,35 @@ class PublicBuildTests(unittest.TestCase):
         ):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 build(output)
+
+    def test_v16_evidence_preflight_is_published_without_a_customer_action(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            home = (output / "index.html").read_text()
+            helper = (output / "v16-evidence-preflight.js").read_text()
+            self.assertIn('name="freight-product-version" content="16.0.0"', home)
+            self.assertIn('id="evidence-preflight"', home)
+            self.assertIn('data-v16-preflight hidden', home)
+            self.assertIn('src="v16-evidence-preflight.js?v=1"', home)
+            self.assertIn('href="v16-evidence-preflight.css?v=1"', home)
+            self.assertIn('NO ORIGINAL RECORDS WERE READ OR VERIFIED', helper)
+            self.assertNotIn('window.location.href', helper)
+            self.assertNotIn('localStorage', helper)
+            self.assertTrue((output / "v16-evidence-preflight.css").is_file())
+
+    def test_public_browser_js_byte_fidelity_is_platform_independent(self):
+        """The builder must not convert LF into CRLF on Windows."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for name in ("site.js", "worksheet.js", "v16-evidence-preflight.js",
+                         "ltl-evidence-comparator.js", "commercial-config.js"):
+                with self.subTest(asset=name):
+                    expected = (output / name).read_text(encoding="utf-8").encode("utf-8")
+                    self.assertEqual((output / name).read_bytes(), expected,
+                                     "Browser source bytes must remain identical to encoded text")
+            for name in ("site.js", "worksheet.js", "v16-evidence-preflight.js"):
+                self.assertEqual((output / name).read_bytes(),
+                                 (builder.SOURCE / name).read_text(encoding="utf-8").encode("utf-8"))
 
     def test_output_contains_only_allowlisted_public_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -248,7 +288,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Potential recovery", page)
             self.assertIn("Approved claim value", page)
             self.assertIn("Actual recovered funds", page)
-            self.assertIn("Rate confirmed before engagement", page)
+            self.assertIn("<strong data-rate-label>30%</strong>", page)
             self.assertIn('contingencyRecoveryRate: "0.3"', config)
             self.assertIn('contingencyRecoveryRateLabel: "30%"', config)
             self.assertIn('itemscope itemtype="https://schema.org/WebPage"', page)

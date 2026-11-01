@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 from dataclasses import asdict, dataclass
 from enum import Enum
@@ -78,12 +79,37 @@ def _verify_charter(charter:dict)->None:
         _required(key,charter.get(key))
     if charter.get("external_action_authorized") is not False:
         raise ValueError("base Charter external_action_authorized must be false")
+    authorized=charter.get("customer_data_authorized")
+    if type(authorized) is not bool:
+        raise ValueError("base Charter customer_data_authorized must be a boolean")
+    if authorized is not (charter.get("charter_state")=="KICKOFF_AUTHORIZED"):
+        raise ValueError("base Charter customer_data_authorized contradicts state")
 
 def _price_band(value:str)->tuple[float,float]|None:
     m=PRICE_RE.search(value or "")
     if not m:
         return None
     return float(m.group(1).replace(",","")),float(m.group(2).replace(",",""))
+
+def _validate_request(request:AmendmentRequest)->None:
+    if not isinstance(request,AmendmentRequest):
+        raise ValueError("AmendmentRequest is required")
+    for name in ("buyer_acknowledges_change","freight_acknowledges_change"):
+        if type(getattr(request,name)) is not bool:
+            raise ValueError(name+" must be a boolean")
+    for field in ("carrier_scope","mode_scope"):
+        values=getattr(request,field)
+        if values is not None and (
+            type(values) not in (tuple,list) or not values
+            or any(not isinstance(v,str) or not v.strip() for v in values)
+        ):
+            raise ValueError(field+" must contain at least one non-empty value")
+    fee=request.fixed_fee_usd
+    if fee is not None and (
+        type(fee) not in (int,float) or not math.isfinite(fee) or fee<=0
+    ):
+        raise ValueError("fixed_fee_usd must be a finite positive number")
+
 
 def from_dict(data:dict)->AmendmentRequest:
     fields=AmendmentRequest.__dataclass_fields__
@@ -94,11 +120,15 @@ def from_dict(data:dict)->AmendmentRequest:
     if extra:
         raise ValueError("unknown amendment fields: "+", ".join(extra))
     normalized=dict(data)
-    if "carrier_scope" in normalized and normalized["carrier_scope"] is not None:
-        normalized["carrier_scope"]=tuple(normalized["carrier_scope"])
-    if "mode_scope" in normalized and normalized["mode_scope"] is not None:
-        normalized["mode_scope"]=tuple(normalized["mode_scope"])
-    return AmendmentRequest(**normalized)
+    for field in ("carrier_scope","mode_scope"):
+        if field in normalized and normalized[field] is not None:
+            values=normalized[field]
+            if type(values) not in (list,tuple):
+                raise ValueError(field+" must be a list of values")
+            normalized[field]=tuple(values)
+    request=AmendmentRequest(**normalized)
+    _validate_request(request)
+    return request
 
 def _proposed(request:AmendmentRequest)->dict:
     return {
@@ -116,6 +146,7 @@ def _normalize(value):
     return value
 
 def build_amendment(base_charter:dict,request:AmendmentRequest,replacement_charter:dict|None=None)->PilotAmendment:
+    _validate_request(request)
     _verify_charter(base_charter)
     _required("amendment_id",request.amendment_id)
     _required("reason",request.reason)
@@ -147,7 +178,7 @@ def build_amendment(base_charter:dict,request:AmendmentRequest,replacement_chart
     requires_launch=material
     requires_new_activation=material or fee_outside_band
     requires_reack=material or role_change or fee_change
-    accepted=request.buyer_acknowledges_change and request.freight_acknowledges_change
+    accepted=request.buyer_acknowledges_change is True and request.freight_acknowledges_change is True
 
     replacement_hash=None
     customer_data_authorized=False
@@ -178,8 +209,8 @@ def build_amendment(base_charter:dict,request:AmendmentRequest,replacement_chart
             raise ValueError("out-of-band fee amendment requires a new published price band")
         replacement_hash=replacement_charter["charter_hash"]
         state=AmendmentState.SUPERSEDED_BY_REPLACEMENT
-        kickoff_suspended=not bool(replacement_charter.get("customer_data_authorized"))
-        customer_data_authorized=bool(replacement_charter.get("customer_data_authorized"))
+        customer_data_authorized=replacement_charter["customer_data_authorized"] is True
+        kickoff_suspended=not customer_data_authorized
 
     body={
         "amendment_state":state.value,

@@ -92,6 +92,8 @@ TEXT_SOURCE_FILES = (
     "site.css",
     "foundry.css",
     "site.js",
+    "v16-evidence-preflight.js",
+    "v16-evidence-preflight.css",
     "worksheet.js",
     "ltl-evidence-comparator.js",
     "commercial-config.js",
@@ -355,6 +357,19 @@ def build(
         raise ValueError("Commercial configuration must contain one rate and label token.")
     text_bundle["commercial-config.js"] = config.replace(RATE_TOKEN, format(rate, "f")).replace(RATE_LABEL_TOKEN, rate_label)
 
+    # The fee shown in static HTML must agree with the configured JavaScript
+    # rate, including for browsers with scripts disabled and crawler previews.
+    # Signed engagement terms remain authoritative for actual customer fees.
+    for name, tag, fallback in (
+        ("index.html", "strong", "Rate confirmed before engagement"),
+        ("engagement-framework.html", "b", "Rate confirmed in writing"),
+    ):
+        old_rate = f"<{tag} data-rate-label>{fallback}</{tag}>"
+        new_rate = f"<{tag} data-rate-label>{html.escape(rate_label)}</{tag}>"
+        if text_bundle[name].count(old_rate) != 1:
+            raise ValueError(f"Expected exactly one commercial-rate placeholder in {name}")
+        text_bundle[name] = text_bundle[name].replace(old_rate, new_rate)
+
     if text_bundle["index.html"].count(DEMO_MARKER) != 1:
         raise ValueError("The source must contain exactly one controlled-demo marker.")
     with tempfile.TemporaryDirectory() as temporary:
@@ -431,7 +446,8 @@ def build(
     for name, content in text_bundle.items():
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        # write_bytes prevents platform-dependent newline translation on Windows.
+        target.write_bytes(content.encode("utf-8"))
     for name, content in binary_bundle.items():
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)

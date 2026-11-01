@@ -9,7 +9,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Iterable
 
-from freight.contracts import canonical_hash
+from freight.contracts import PopulationManifest, canonical_hash, freeze_population
+from freight.finding_factory import InvoiceCharge
 
 DECISIONS = {"CONFIRM", "REJECT", "NEED_EVIDENCE", "MODIFY_RULE", "ESCALATE"}
 MAX_PPM = 1_000_000
@@ -197,3 +198,46 @@ def record_disposition(
 
 def export_disposition(disposition: HumanDisposition) -> dict:
     return asdict(disposition)
+
+
+def build_invoice_review_queue(
+    population: PopulationManifest, charges: Iterable[InvoiceCharge],
+) -> ReviewQueue:
+    """Connect existing invoice detectors to the existing human-review cockpit.
+
+    No payable amount, estimated savings or confidence is inferred from a
+    duplicate-looking reference. Zero scoring fields mean UNSCORED, not a
+    calibrated estimate. Legitimate consolidated invoices and rebills can
+    still enter this review queue; only separately authorized human evidence
+    can resolve them. This function performs no I/O or disposition recording.
+    """
+    from freight.duplicate_charge_review import (
+        review_duplicate_charges,
+        review_reused_invoice_references,
+    )
+
+    frozen = freeze_population(population.buyer_id, population.business_unit,
+                               population.selection_rule, population.rows)
+    if frozen != population:
+        raise ValueError("population proof or canonical ordering mismatch")
+    normalized = tuple(charges)
+    batches = (
+        review_duplicate_charges(population, normalized),
+        review_reused_invoice_references(population, normalized),
+    )
+    cases = []
+    for batch in batches:
+        for candidate in batch.candidates:
+            cases.append(make_case(
+                case_id=candidate.candidate_id,
+                record_hash=candidate.proof_hash,
+                amount_cents=0,
+                confidence_ppm=0,
+                novelty_ppm=0,
+                downstream_risk_ppm=0,
+                blocker_codes=(candidate.reason, "UNSCORED_REVIEW_ONLY",
+                               "NO_FINANCIAL_AUTHORITY", *candidate.unresolved_evidence),
+                evidence_hashes=(population.manifest_hash, batch.batch_hash,
+                                 candidate.proof_hash, *candidate.source_hashes),
+            ))
+    return build_queue(cases)

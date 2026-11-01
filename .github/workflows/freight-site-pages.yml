@@ -75,6 +75,8 @@ jobs:
           node --check freight/site/group/group.js
           node --check freight/site/worksheet.js
           node --check freight/site/ltl-evidence-comparator.js
+          node --check freight/site/v16-evidence-preflight.js
+          node --test freight/site/test_v16_evidence_preflight.cjs
           node --test freight/site/test_ltl_evidence_comparator.cjs
           node --test freight/site/test_worksheet.cjs
           node --test freight/site/test_worksheet_campaign.cjs
