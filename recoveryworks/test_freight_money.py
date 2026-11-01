@@ -9,6 +9,7 @@ class FreightMoneyConversionTests(unittest.TestCase):
         for token, expected in (
             ("1.005", 101), ("-1.005", -101), (1.005, 101),
             ("2.675", 268), ("$1,234.565", 123457),
+            ("$-12.34", -1234), ("-.50", -50), (".50", 50), ("-$.50", -50),
             ("(12.345)", -1235), (12, 1200),
         ):
             with self.subTest(token=token):
