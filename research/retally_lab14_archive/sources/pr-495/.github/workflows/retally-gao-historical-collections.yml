@@ -1,0 +1,172 @@
+name: RETALLY Lab 14 Original GAO Historical Freight Collections
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-gao-historical-collections.yml'
+      - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_crowley_appeal_scope_v1.py'
+      - 'freight/test_public_crowley_appeal_scope_v1.py'
+      - 'freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json'
+      - 'freight/public_gsa_transport_audit_fund_v1.py'
+      - 'freight/test_public_gsa_transport_audit_fund_v1.py'
+      - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
+      - 'freight/public_gao_setoff_reversal_v1.py'
+      - 'freight/public_gao_b197184_reversal_v1.py'
+      - 'freight/test_public_gao_b197184_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b197184_improper_deduction_1980.json'
+      - 'freight/RESEARCH_GAO_B197184_IMPROPER_SET_OFF_1980.md'
+      - 'freight/test_public_gao_setoff_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
+      - 'freight/public_gsa_false_positive_payment_v1.py'
+      - 'freight/test_public_gsa_false_positive_payment_v1.py'
+      - 'freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json'
+      - 'freight/test_public_gao_historical_collection_v1.py'
+      - 'freight/fixtures/public_gao_historical_freight_collections_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-historical-collection-and-negative-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Validate exact original GAO historical case figures and false-claim denials
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_b197184_reversal_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
+      - name: Reject erroneous overcharge deductions mistakenly treated as retained recoveries
+        run: |
+          PYTHONPATH=. python -m freight.public_gsa_false_positive_payment_v1 > /tmp/retally_gsa_refund.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally_gsa_refund.json').read_text())
+          assert x['publisher_reported_vendor_payment_approx_cents']==2960000000
+          assert x['reported_payment_FROM_government_TO_vendor'] is True
+          assert x['possible_additional_payment_limit_cents_NOT_PROVEN']==1180000000
+          assert x['possible_additional_payment_executed'] is False
+          assert x['notices_of_overcharge_declared_erroneous'] is True
+          assert x['is_recovered_overcharge_by_RETALLY'] is False
+          assert x['validated_RETALLY_customer_cash_cents']==0
+          assert x['commercial_recovery_claim']=='NO_GO'
+          print('Real GSA vendor repayment shows cost of erroneous audit notices; no RETALLY recoveries.')
+          PY
+      - name: Verify historically applied offset later found improper is NOT a valid retained recovery
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_setoff_reversal_v1 > /tmp/retally_lab14_gao_improper_offset.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally_lab14_gao_improper_offset.json').read_text())
+          assert r['original_decisions']==1
+          assert r['prepetition_allowable_setoff_cents_reported']==214759
+          assert r['postpetition_GOVERNMENT_applied_offset_LATER_DISALLOWED_cents']==514105
+          assert r['illegal_postpetition_offset_is_valid_permanent_recovery'] is False
+          assert r['GAO_said_allow_carrier_claim_if_otherwise_correct'] is True
+          assert r['independent_carrier_repayment_bank_receipt_obtained'] is False
+          assert r['government_final_net_collections_credible_cents'] is None
+          assert r['not_included_in_GAO_approved_historical_collection_tally'] is True
+          assert r['actual_RETALLY_cash_recovered_cents']==0
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('GAO B-192974: executed post-petition offset later held invalid; no verified returned cash, no client recovery.')
+          PY
+      - name: Confirm another original 1980 GAO already-executed deduction was found improper
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_b197184_reversal_v1 > /tmp/retally_b197184_improper_setoff.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally_b197184_improper_setoff.json').read_text())
+          assert x['original_decision_count']==1
+          assert x['original_offset_reported_applied_cents']==47536
+          assert x['GSA_later_admitted_setoff_wrong'] is True
+          assert x['GAO_review_closed_as_moot'] is True
+          assert x['GAO_claim_allowable_subject_to_other_propriety'] is True
+          assert x['carrier_actual_repayment_confirmed'] is False
+          assert x['confirmed_carrier_bank_disbursement_cents'] is None
+          assert x['permanent_legally_retained_government_collection_cents'] is None
+          assert x['distinct_from_GAO_B192974_larger_improper_setoff'] is True
+          assert x['real_RETALLY_cash_recovered_cents']==0
+          assert x['commercial_claim_clearance']=='NO_GO'
+          print('Original GAO 1980: applied $475.36 setoff was improper; no independently verified refund to carrier.')
+          PY
+      - name: Confirm actual versus planned GSA fund activity without inventing invoice recoveries
+        run: |
+          PYTHONPATH=. python -m freight.public_gsa_transport_audit_fund_v1 > /tmp/gsa_transport_audit_fund.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/gsa_transport_audit_fund.json').read_text())
+          assert r['accounting_fact_rows']==7
+          assert r['FY2023_ACTUAL_fund_receipts_thousand_USD']==12354
+          assert r['FY2024_PLAN_fund_receipts_thousand_USD']==4168
+          assert r['FY2025_PLAN_fund_receipts_thousand_USD']==12506
+          assert r['FY2023_ACTUAL_transfer_TO_suspense_thousand_USD']==-20674
+          assert r['FY2023_ACTUAL_annual_obligations_thousand_USD']==10960
+          assert r['FY2023_vendor_corrective_payment_APPROX_million_USD']=='29.6'
+          assert r['no_independent_bank_or_Treasury_receipt'] is True
+          assert r['no_actual_RETALLY_customer_cash_cents']==0
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('GSA FY2023 fund ACTUAL receipts, corrective transfer and later-year PLANS remain separate. No client recoveries.')
+          PY
+      - name: Hold original 2025 appellate source authority separate from alleged NOCs and unawarded claim
+        run: |
+          PYTHONPATH=. python -m freight.public_crowley_appeal_scope_v1 > /tmp/retally_lab14_crowley_2025_scope.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally_lab14_crowley_2025_scope.json').read_text())
+          assert r['official_opinion_date']=='2025-07-18'
+          assert r['court_reversed_lower_GSA_audit_scope_holding'] is True
+          assert r['court_remanded_for_further_proceedings'] is True
+          assert r['court_did_not_award_individual_damages'] is True
+          assert r['published_minimum_notices_of_overcharge_alleged_exceeds']==50000
+          assert r['published_alleged_gross_amount_approx_usd']==37000000
+          assert r['historical_notices_are_customer_errors_confirmed'] is False
+          assert r['contemporaneous_court_of_federal_claims_demand_usd_not_paid']==11800000
+          assert r['later_litigation_or_payment_2026_outcome_verified'] is False
+          assert r['retally_real_customer_invoice_count']==0
+          assert r['retally_recovered_cents']==0
+          assert r['commercial_claim_clearance']=='NO_GO'
+          print('2025 federal appellate authority was limited; alleged NOCs and $11.8m claim not RETALLY cash.')
+          PY
+      - name: Fail closed on any implication that GAO decisions prove RETALLY money recovered
+        run: |
+          PYTHONPATH=. python -m freight.public_gao_historical_collection_v1 > /tmp/retally_lab14_gao_historical.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally_lab14_gao_historical.json').read_text())
+          assert x['scope']=='LAB14_ORIGINAL_GAO_GOVERNMENT_COLLECTION_CASES_NOT_CUSTOMER_SAVINGS'
+          assert x['historical_distinct_decisions']==7
+          assert x['gao_reported_collection_events']==9
+          assert x['original_GAO_1980_rating_reconciled'] is True
+          assert x['original_GAO_1980_one_tender_correct_charge_cents']==617063
+          assert x['original_GAO_1980_carrier_multiple_BOL_competing_charge_cents']==671075
+          assert x['original_GAO_1980_carrier_partial_refund_cents']==110967
+          assert x['original_GAO_1980_remaining_government_setoff_cents']==54012
+          assert x['original_GAO_1980_full_PDF_original_SHA_unverified'] is True
+          assert x['original_GAO_1980_no_original_bill_or_tariff_scans'] is True
+          assert x['agency_reported_collection_modes']=={
+            'CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT':3,
+            'GOVERNMENT_APPLIED_SET_OFF':6,
+          }
+          assert x['cases_with_uncollected_future_deduction']==1
+          assert x['cases_with_carrier_refund_authorized_but_unverified_paid']==1
+          assert x['cases_with_disputed_amount_variants']==1
+          assert x['actual_carrier_account_bank_or_Treasury_posting_independently_verified'] is False
+          assert x['final_unreversed_net_government_recovery_total_cents'] is None
+          assert x['real_RETALLY_customer_invoices_examined']==0
+          assert x['real_RETALLY_customer_recoveries_cents']==0
+          assert x['commercial_claim_clearance']=='NO_GO'
+          print('Lab14 first-party GAO record review: seven historical dockets / nine collection events; zero verified RETALLY cash.')
+          PY

@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "reviewed_utc_date": "2026-10-18",
+  "subject": "CROWLEY_GOVERNMENT_SERVICES_DFTS_GSA_FREIGHT_AUDIT_CONTRACT_DISPUTE",
+  "scope": "PUBLIC_FIRST_PARTY_FEDERAL_COURT_DECISIONS_AND_GSA_BUDGET_REPORTS_NOT_RETALLY",
+  "contracts": {
+    "main": "DoD USTRANSCOM DFTS I",
+    "separate": "Ocean USC 9"
+  },
+  "source_documents": [
+    {
+      "id": "DCD_2023_DFTS_DISTRICT",
+      "publisher": "United States District Court for the District of Columbia via official govinfo",
+      "official_url": "https://www.govinfo.gov/content/pkg/USCOURTS-dcd-1_21-cv-02298/pdf/USCOURTS-dcd-1_21-cv-02298-2.pdf",
+      "case_docket": "21-cv-02298",
+      "decided": "2023-07-28",
+      "page_location": "Document 79, PDF page 17 (printed page 17)",
+      "full_original_source_pdf_downloaded_and_sha_verified": false
+    },
+    {
+      "id": "GSA_FY2025_CONGRESSIONAL",
+      "publisher": "U.S. General Services Administration",
+      "official_url": "https://www.gsa.gov/system/files/GSA%20FY%202025%20Congressional%20Justification.pdf",
+      "case_docket": "GSA FY2025 Congressional Justification, Transportation Audits P-2/P-5",
+      "page_location": "PDF pages 291–294: FY2023 program narrative and funding footnote",
+      "full_original_source_pdf_downloaded_and_sha_verified": false,
+      "document_fiscal_budget_year": 2025,
+      "exact_publisher_release_date_unverified": true
+    },
+    {
+      "id": "CADC_2025_CROWLEY_APPEAL",
+      "publisher": "United States Court of Appeals for the District of Columbia Circuit",
+      "official_url": "https://media.cadc.uscourts.gov/opinions/docs/2025/07/23-5183-2126136.pdf",
+      "case_docket": "23-5183",
+      "decided": "2025-07-18",
+      "page_location": "Opinion pages 8, 11 and 47: statutory audit authority and pending parallel money claim",
+      "full_original_source_pdf_downloaded_and_sha_verified": false
+    }
+  ],
+  "publisher_reported_events": [
+    {
+      "event_id": "APR2023_DFTS_PROMISE",
+      "basis_document": "DCD_2023_DFTS_DISTRICT",
+      "event_date": "2023-04-21",
+      "money_scope": "DFTS I contract",
+      "amount_cents": 2960000000,
+      "currency": "USD",
+      "state": "GSA_PROMISED_TO_REFUND_AFTER_AUDIT_ERROR",
+      "actual_payment_recovered_from_this_court_quote": false,
+      "remittance_verified_independently": false
+    },
+    {
+      "event_id": "FY2023_DFTS_REPORTED_PAYMENT",
+      "basis_document": "GSA_FY2025_CONGRESSIONAL",
+      "event_date": "2023-09-30",
+      "event_date_represents_fiscal_year_end_not_transaction_date": true,
+      "money_scope": "DFTS I contract / GSA DoD vendor transportation audit adjustment",
+      "amount_cents": 2960000000,
+      "currency": "USD",
+      "state": "GSA_FY2023_PUBLISHER_REPORTS_PAYMENT_MADE_TO_DOD_VENDOR",
+      "remittance_verified_independently": false
+    },
+    {
+      "event_id": "APR2023_OCEAN_SEPARATE_PROMISE",
+      "basis_document": "DCD_2023_DFTS_DISTRICT",
+      "event_date": "2023-04-21",
+      "money_scope": "Ocean USC 9 separate contract",
+      "amount_cents": 3584043,
+      "currency": "USD",
+      "state": "GSA_PROMISED_TO_REFUND_SEPARATE_CONTRACT",
+      "actual_payment_verified": false,
+      "remittance_verified_independently": false
+    },
+    {
+      "event_id": "JUL2025_11_8M_PARALLEL_MONEY_CLAIM",
+      "basis_document": "CADC_2025_CROWLEY_APPEAL",
+      "event_date": "2025-07-18",
+      "money_scope": "DFTS I disputed offset claim before Court of Federal Claims No. 21-1405",
+      "amount_cents": 1180000000,
+      "currency": "USD",
+      "state": "CROWLEY_CLAIMED_DAMAGES_NOT_MONEY_AWARDED",
+      "claim_paid_by_government_as_of_opinion_verified": false,
+      "independent_later_2026_case_resolution_checked": false
+    }
+  ],
+  "appellate_decision": {
+    "source_id": "CADC_2025_CROWLEY_APPEAL",
+    "decision_date": "2025-07-18",
+    "opinion_form": "SPLIT_PANEL_MAJORITY_WITH_DISSENT",
+    "holding_limited_to": "31 U.S.C. § 3726(b) permits GSA to audit transportation bills presented by carriers/freight forwarders; Crowley as intermediary was neither, so GSA could not use that authority for Crowley DFTS bills",
+    "lower_court_scope_ruling_reversed": true,
+    "remanded_for_further_proceedings": true,
+    "dollar_damages_awarded_in_this_appeal_cents": 0,
+    "parallel_11_8m_damages_claim_resolved_by_this_appeal": false,
+    "private_company_auditing_authority_granted": false,
+    "RETALLY_private_contract_remedies_established": false
+  },
+  "duplicate_and_netting_policy": {
+    "APR2023_promise_and_FY2023_reported_payment_same_underlying_29_6m": true,
+    "must_not_sum_these_two_as_59_2m": true,
+    "separately_promised_Ocean_35840_43_status_not_upgraded_to_paid": true,
+    "litigation_11_8m_not_recognized_as_paid_award": true,
+    "upstream_GSA_FY2023_amounts_rounded_millions_not_exact_cents": true,
+    "cannot_make_comprehensive_net_Crowley_restitution_total_without_external_records": true
+  },
+  "proof_limits": {
+    "original_court_pdf_full_bytes_sha_verified": false,
+    "original_GSA_pdf_full_bytes_sha_verified": false,
+    "actual_bank_or_Treasury_transfer_statement_examined": false,
+    "complete_2026_case_docket_checked": false,
+    "RETALLY_customer_source_invoices": 0,
+    "RETALLY_customer_verified_recovered_cents": 0,
+    "published_statutory_holding_does_not_authorize_private_carrier_offsets": true,
+    "true_customer_overpayment_claim_proven": false,
+    "commercial_claim_clearance": "NO_GO"
+  }
+}

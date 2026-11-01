@@ -1,0 +1,223 @@
+name: RETALLY Lab 14 Original Public Freight Evidence (BTS / EIA / Carrier)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-public-faf6-eia.yml'
+      - 'freight/public_faf6_eia_v1.py'
+      - 'freight/public_original_research_control.py'
+      - 'freight/public_gao_rating_lineitem_original_v1.py'
+      - 'freight/test_public_gao_rating_lineitem_original_v1.py'
+      - 'freight/fixtures/public_gao_rate_reclassification_and_origin_rebuttal_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_RATE_ORIGIN_20261018.md'
+      - 'freight/public_gao_historical_collection_v1.py'
+      - 'freight/public_crowley_appeal_scope_v1.py'
+      - 'freight/test_public_crowley_appeal_scope_v1.py'
+      - 'freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json'
+      - 'freight/public_gsa_transport_audit_fund_v1.py'
+      - 'freight/test_public_gsa_transport_audit_fund_v1.py'
+      - 'freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json'
+      - 'freight/public_gao_setoff_reversal_v1.py'
+      - 'freight/test_public_gao_setoff_reversal_v1.py'
+      - 'freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json'
+      - 'freight/public_gsa_false_positive_payment_v1.py'
+      - 'freight/test_public_gsa_false_positive_payment_v1.py'
+      - 'freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json'
+      - 'freight/test_public_gao_historical_collection_v1.py'
+      - 'freight/fixtures/public_gao_historical_freight_collections_20261018.json'
+      - 'freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md'
+      - 'freight/test_public_original_research_control.py'
+      - 'freight/public_carrier_schedules_v1.py'
+      - 'freight/public_cfs2022_prefix_v1.py'
+      - 'freight/public_cfs2022_official_example_v1.py'
+      - 'freight/public_fmc_adjudication_v1.py'
+      - 'freight/test_public_fmc_adjudication_v1.py'
+      - 'freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json'
+      - 'freight/test_public_cfs2022_official_example_v1.py'
+      - 'freight/fixtures/public_cfs2022_official_maryland_example.json'
+      - 'freight/public_stb_waybill_prefix_v1.py'
+      - 'freight/test_public_stb_waybill_prefix_v1.py'
+      - 'freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt'
+      - 'freight/fixtures/public_stb_waybill2024_first100_manifest.json'
+      - 'freight/test_public_cfs2022_prefix_v1.py'
+      - 'freight/fixtures/public_census_cfs2022_pums_first100.csv'
+      - 'freight/fixtures/public_census_cfs2022_pums_first100_manifest.json'
+      - 'freight/test_public_carrier_schedules_v1.py'
+      - 'freight/fixtures/public_carrier_fuel_schedule_20261017.csv'
+      - 'freight/fixtures/public_carrier_surcharge_manifest_20261017.json'
+      - 'freight/test_public_faf6_eia_v1.py'
+      - 'freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv'
+      - 'freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv'
+      - 'freight/fixtures/public_faf6_eia_manifest_20261017.json'
+      - 'freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-public-evidence-validity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify only exact publicly reported flow and price source records
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_faf6_eia_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_carrier_schedules_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_prefix_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_official_example_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_rating_lineitem_original_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_historical_collection_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_crowley_appeal_scope_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_transport_audit_fund_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gao_setoff_reversal_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_gsa_false_positive_payment_v1
+      - name: Reconcile all original public research source families in sanitized evidence report
+        run: |
+          PYTHONPATH=. python -m freight.public_original_research_control --out /tmp/retally-lab14-public-research
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/retally-lab14-public-research/public_evidence_census.json').read_text())
+          assert data['scope']=='RETALLY_EXISTING_LAB14_PUBLIC_SOURCE_CENSUS_RESEARCH_ONLY'
+          assert data['total_bounded_observations']==307
+          assert len(data['original_public_source_record_counts'])==5
+          assert data['standalone_official_publisher_examples']==1
+          assert data['standalone_external_adjudication_records']==1
+          assert data['separate_original_GAO_historical_collection_decisions']==7
+          assert data['distinct_original_GAO_rate_and_origin_correction_decisions_NOT_307_rows']==2
+          assert data['distinct_GAO_rate_and_origin_case_BOL_references']==3
+          assert data['GAO_1967_historical_cwt_original_bill_cents']==27517
+          assert data['GAO_1967_historical_cwt_allowable_bill_cents']==13929
+          assert data['GAO_1967_historical_federal_setoff_cents']==13588
+          assert data['GAO_1976_wrong_origin_13328_setoff_reimbursement_NOT_VERIFIED'] is True
+          assert data['GAO_1976_other_bol_settlement_certificate_NOT_VERIFIED_PAID'] is True
+          assert data['GAO_historical_rate_source_NOT_current_private_tariff'] is True
+          assert data['GAO_lineitem_government_reports_NOT_independent_bank_receipts'] is True
+          assert data['separate_GAO_reported_historical_collection_events']==9
+          assert data['GAO_original_reported_refunds']==3
+          assert data['GAO_original_reported_applied_setoffs']==6
+          assert data['GAO_1980_original_one_lot_vs_multiple_BOL_rate_reconciliation'] is True
+          assert data['GAO_1980_one_lot_allowed_charge_cents']==617063
+          assert data['GAO_1980_multiple_BOL_carrier_rate_cents']==671075
+          assert data['GAO_1980_voluntary_carrier_refund_cents']==110967
+          assert data['GAO_1980_remainder_setoff_cents']==54012
+          assert data['GAO_1980_no_original_tariff_or_Treasury_receipt_examined'] is True
+          assert data['GAO_decisions_are_external_historical_not_307_source_observations'] is True
+          assert data['GAO_reported_collections_not_independently_Treasury_bank_verified'] is True
+          assert data['GAO_final_unreversed_net_government_recovery_total_cents'] is None
+          assert data['separate_GSA_false_positive_correction_public_report_records']==1
+          assert data['GSA_historical_FY2023_VENDOR_REPAYMENT_approx_cents']==2960000000
+          assert data['GSA_payment_direction_government_to_vendor_NOT_RETALLY'] is True
+          assert data['GSA_potential_additional_11_8m_vendor_repayment_UNVERIFIED'] is True
+          assert data['government_NOCs_may_be_erroneous_and_collections_reversed'] is True
+          assert data['separate_GAO_1979_improper_setoff_decisions']==1
+          assert data['GAO_1979_applied_but_later_disallowed_offset_cents']==514105
+          assert data['GAO_1979_reversal_reimbursement_not_verified'] is True
+          assert data['GAO_1979_negative_case_not_approved_collection'] is True
+          assert data['GAO_1979_private_setoff_authority_not_established'] is True
+          assert data['GSA_FY2023_original_accounting_receipts_thousands_USD']==12354
+          assert data['GSA_FY2024_original_receipts_PLAN_thousands_USD']==4168
+          assert data['GSA_FY2025_original_receipts_PLAN_thousands_USD']==12506
+          assert data['GSA_FY2023_transfer_to_suspense_thousands_USD']==-20674
+          assert data['GSA_appropriation_table_rows_separately_verified']==7
+          assert data['GSA_FY2023_accounting_receipts_are_not_invoice_level_overcharge_proof'] is True
+          assert data['GSA_program_receipts_cannot_establish_RETALLY_recovery_rate'] is True
+          assert data['separate_2025_DC_Circuit_Crowley_original_decisions']==1
+          assert data['Crowley_2025_court_reversed_scope_to_audit_non_carrier'] is True
+          assert data['Crowley_alleged_nocs_more_than']==50000
+          assert data['Crowley_alleged_aggregated_dollars_APPROX_not_proven_cents']==3700000000
+          assert data['Crowley_parallel_11_8m_damages_DEMAND_NOT_AWARD_cents']==1180000000
+          assert data['Crowley_2026_final_claim_payment_not_verified'] is True
+          assert data['Crowley_federal_case_holding_not_private_RETALLY_authority'] is True
+          assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
+          assert data['stb_sample_accounting_year_histogram']=={'2024':100}
+          assert data['fmc_award_actual_cash_received_verified'] is False
+          assert data['real_RETALLY_customer_invoices_seen']==0
+          assert data['actual_RETALLY_cash_recovered_cents']==0
+          assert data['original_historical_findings_still_open']==26
+          assert data['independent_first_customer_human_gates_unmet']==18
+          assert data['commercial_claim_clearance']=='NO_GO'
+          page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
+          assert 'NOT verified customer invoices' in page
+          assert 'NO-GO' in page
+          print('Lab14 source census: 307 public rows, Census example, FMC unpaid award, seven positive GAO cases, one GAO legally disallowed setoff, one GSA vendor repayment. No customer recovery.')
+          PY
+      - name: Prohibit invoice and recovery claim promotion
+        run: |
+          PYTHONPATH=. python -m freight.public_faf6_eia_v1 > /tmp/public_benchmark_report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/public_benchmark_report.json').read_text())
+          assert data['scope']=='RETALLY_EXISTING_LAB14_PUBLIC_SOURCE_BENCHMARK_ONLY'
+          assert data['faf6_source_rows_in_snapshot']==78
+          assert data['eia_observations']==18
+          assert data['modeled_commodity_value_is_not_freight_spend'] is True
+          assert data['diesel_retail_price_is_not_customer_surcharge_authority'] is True
+          assert data['real_invoices_or_tariffs_examined'] is False
+          assert data['verified_overcharge_cents'] is None
+          assert data['validated_customer_recovery_cents']==0
+          assert data['automated_customer_contact_authorized'] is False
+          assert data['commercial_claim_clearance']=='NOT_ESTABLISHED'
+          assert data['all_26_historical_findings_still_open'] is True
+          assert data['human_pilot_approvals_met'] is False
+          assert data['faf6_state_pairs']['md_to_pa']['rows']==39
+          assert data['faf6_state_pairs']['pa_to_md']['rows']==39
+          print('Research-only acceptance: verified 78 BTS FAF6 source rows + 18 EIA observations. No invoice or money claims.')
+          PY
+      - name: Compare official full-PUMS Census Maryland example without inferring freight spending
+        run: |
+          PYTHONPATH=. python -m freight.public_cfs2022_official_example_v1 > /tmp/cfs_md_publisher_example.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/cfs_md_publisher_example.json').read_text())
+          assert r['pums_md_origin_unweighted_record_count']==612317
+          assert r['census_published_weighted_goods_value_usd']=='198598788295'
+          assert r['census_published_gvf_cv_percent']=='9.74'
+          assert r['country_or_route_total_freight_spend'] is None
+          assert r['100_prefix_rows_used_to_make_estimate'] is False
+          assert r['no_original_customer_tariff_invoice_or_recoveries'] is True
+          assert r['commercial_claim_clearance']=='NOT_ESTABLISHED'
+          print('Official Census MD goods-value example and CV verified; no customer invoice or recoveries.')
+          PY
+      - name: Hold adjudicated FMC third-party award separately from verified payment
+        run: |
+          PYTHONPATH=. python -m freight.public_fmc_adjudication_v1 > /tmp/fmc_public_award.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/fmc_public_award.json').read_text())
+          assert r['documented_final_reparations_order_cents']==965451
+          assert r['documented_reparations_cents']==866879
+          assert r['documented_interest_cents']==98572
+          assert r['administratively_final_as_of_2026_04_28'] is True
+          assert r['actual_payment_verified_cents'] is None
+          assert r['claimant_bank_or_payment_receipt_confirmed'] is False
+          assert r['retally_validated_recovery_cents']==0
+          assert r['customer_recovery_or_marketing_authority']=='NOT_ESTABLISHED'
+          print('Original FMC award verified as award only; no original customer settlement or RETALLY recovery.')
+          PY
+      - name: Verify carrier original date/index reference without asserting a customer tariff
+        run: |
+          PYTHONPATH=. python -m freight.public_carrier_schedules_v1 > /tmp/carrier_public_reference.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/carrier_public_reference.json').read_text())
+          assert report['source_rows']==11 and report['carrier_source_families']==3
+          assert report['fedex_freight_eia_weekly_pairs']==6
+          assert report['ups_domestic_ground_observations']==4
+          assert report['union_pacific_intermodal_announcements']==1
+          assert report['customer_agreement_still_controls'] is True
+          assert report['public_surcharge_is_not_billed_invoice_charge'] is True
+          assert report['verified_customer_invoice_count']==0
+          assert report['verified_overcharge_cents'] is None
+          assert report['financial_recovery_authorized'] is False
+          print('Research-only acceptance: eleven official carrier historical schedule facts. No customer tariff or recovery proof.')
+          PY

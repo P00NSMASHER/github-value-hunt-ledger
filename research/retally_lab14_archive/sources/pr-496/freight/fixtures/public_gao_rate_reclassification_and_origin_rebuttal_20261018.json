@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "reviewed_utc_date": "2026-10-18",
+  "publisher": "U.S. Government Accountability Office",
+  "research_scope": "TWO_GAO_PUBLISHED_HISTORICAL_RATE_AND_DOCUMENT_CORRECTION_CASES",
+  "sources": [
+    {
+      "decision_id": "B-160344",
+      "date": "1967-07-18",
+      "url": "https://www.gao.gov/products/b-160344",
+      "document_reference": "Government Bill of Lading B-5378637; carrier bill 141",
+      "shipment_origin_and_destination": "Akron, OH to Warner Robins Air Force Base, GA",
+      "source_shipment_date": "1962-12-19",
+      "freight_paid_month": "1963-03",
+      "freight_claimed_original_paid_cents": 27517,
+      "actual_reported_weight_pounds": 1485,
+      "original_claimed_nmfc_item": "14440",
+      "original_claimed_class": "400",
+      "original_claimed_rate_cents_per_100_pounds": 1853,
+      "government_accepted_nmfc_item": "12400",
+      "government_accepted_class": "200",
+      "government_accepted_rate_cents_per_100_pounds": 938,
+      "later_government_bill_of_lading_correction_month": "1964-02",
+      "later_document_correction_is_after_original_payment": true,
+      "government_audited_allowable_cents": 13929,
+      "determined_overcharge_cents": 13588,
+      "refund_voluntarily_made_for_selected_bill": false,
+      "government_applied_setoff_cents": 13588,
+      "setoff_date": "1965-12",
+      "carrier_reclaim_disallowed_in_source": true,
+      "authoritative_classification_reason": "Airframe nose essential to C-130 flight, not principally a ground radar antenna enclosure; contemporaneous Air Force technical statement",
+      "original_bol_scan_independently_inspected": false,
+      "contract_nmfc_original_page_independently_inspected": false,
+      "historical_federal_decision_not_current_tariff_authority": true
+    },
+    {
+      "decision_id": "B-186603",
+      "date": "1976-12-22",
+      "url": "https://www.gao.gov/products/b-186603",
+      "issues": [
+        {
+          "original_bill_of_lading": "D-8271398",
+          "shipment_date": "1972-06-23",
+          "freight_shipment": "1,624 lb blankets, Clearfield UT to Gallup NM",
+          "government_reported_offset_cents": 5765,
+          "subsequently_issued_carrier_settlement_certificate_cents": 2290,
+          "certificate_issue_date_stated_in_decision": "1976-02-29",
+          "certificate_actual_payment_or_carrier_receipt_verified": false,
+          "original_bill_of_lading_scan_independently_inspected": false,
+          "separate_transaction_not_part_of_chair_shipment": true
+        },
+        {
+          "original_bill_of_lading": "F-7349731",
+          "shipment_date": "1972-12-21",
+          "freight_shipment": "40 chairs, 2,800 lb, to Brooklyn VA hospital",
+          "government_reported_original_paid_cents": 39816,
+          "bill_of_lading_origin": "Washington DC",
+          "corroborated_actual_origin": "Canton Mississippi",
+          "original_bill_of_lading_origin_rebutted": true,
+          "manufacturer_corrob_scope": "Manufacturer stated DC was an ordering office, not a factory; Canton was a production point",
+          "government_reported_offset_cents": 13328,
+          "GAO_decision": "GSA SHOULD ALLOW carrier claim for $133.28 IF OTHERWISE CORRECT",
+          "carrier_repayment_bank_receipt_verified": false,
+          "original_bill_of_lading_scan_independently_inspected": false,
+          "government_claimed_overcharge_is_still_valid_after_ruling": false,
+          "origin_correction_does_not_prove_other_customer_rate": true
+        }
+      ],
+      "no_aggregate_recovery_claim_across_unrelated_bills": true,
+      "government_source_only_not_private_customer_contract": true
+    }
+  ],
+  "source_evidence_level": "ORIGINAL_GAO_PUBLIC_DECISION_TEXT_NOT_INDEPENDENT_ORIGINAL_BILL_TARIFF_OR_TREASURY",
+  "general_prohibitions": [
+    "Decisions apply to historical federal shipments; current private freight contracts and tariff terms are not proved",
+    "Original payment and setoff amounts come from published GAO decision texts, not independently obtained remittance or bank evidence",
+    "A post-payment bill-of-lading correction requires separately established source authority and cannot silently rewrite the original billing context",
+    "A GAO recommendation to allow a reclaimed amount does not independently prove repayment to the carrier",
+    "Shipments in the same GAO decision are not the same invoice and must never be summed into a recovery rate",
+    "No RETALLY customer invoices, actual recovered customer cash, commercial authority or private carrier adjustments were obtained"
+  ],
+  "retally_actual_customer_invoices": 0,
+  "retally_verified_recoveries_cents": 0,
+  "bank_or_treasury_receipts_independently_examined": 0,
+  "verified_commercial_recovery_clearance": false
+}
