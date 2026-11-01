@@ -16,7 +16,7 @@ from collections import Counter
 from pathlib import Path
 
 from freight.accuracy_benchmark import _book, _build_record
-from freight.rating_engine import rate_record, RATED, REVIEW_REQUIRED
+from freight.rating_engine import rate_record
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "phase3_accuracy_gold_v1.json"
 
