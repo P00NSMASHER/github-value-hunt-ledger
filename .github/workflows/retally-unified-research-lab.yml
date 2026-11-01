@@ -144,6 +144,63 @@ jobs:
           python -m py_compile freight/freight_evidence_chain_readiness.py freight/test_freight_evidence_chain_readiness.py
           python -m unittest -q freight.test_freight_evidence_chain_readiness
           python -m unittest -q freight.test_fmc_charge_complaint_procedural_v1
+      - name: Authenticate one bounded SAM FY2027 original CSV (review-only)
+        if: github.event_name == 'pull_request' && github.head_ref == 'fix/sam-fy2027-original-replay-gate-20261101'
+        timeout-minutes: 3
+        run: |
+          # PR-only proof: runner-temp receipt bypasses cached degraded branch receipts.
+          # Exactly one public S3 GET, max 8 MB plus sentinel; no D1 or customer reads.
+          python - <<'PY'
+          import json
+          import os
+          import tempfile
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from freight.capturebrief_sam_fy2027_asof import (
+              MAX_ORIGINAL_BYTES, MAX_ORIGINAL_ROWS, SOURCE_URL,
+              STATUS_OK, STATUS_PARTIAL, run, validate_receipt,
+          )
+
+          with tempfile.TemporaryDirectory(prefix="sam-fy2027-one-shot-") as directory:
+              path = Path(directory) / "fresh_original_receipt.json"
+              run(output=path)  # A nonexistent path guarantees no same-day cached failure.
+              receipt = json.loads(path.read_text(encoding="utf-8"))
+              validate_receipt(receipt, now=datetime.now(timezone.utc))
+              stats = {
+                  "source": SOURCE_URL,
+                  "source_status": receipt["source_status"],
+                  "original_bytes": receipt["current_source_size_bytes"],
+                  "original_sha256": receipt["current_source_sha256"],
+                  "original_rows": receipt["source_rows"],
+                  "distinct_notice_ids": receipt["unique_original_notice_ids"],
+                  "quarantined_solicitation_fields":
+                      receipt["source_rows_quarantined_solicitation_control"],
+                  "error_codes": receipt["source_error_codes"],
+                  "strict_byte_cap": MAX_ORIGINAL_BYTES,
+                  "strict_row_cap": MAX_ORIGINAL_ROWS,
+                  "independent_award_labels": 0,
+                  "commercial_reuse_approved": False,
+                  "original_source_bytes_persisted": 0,
+              }
+              print(json.dumps(stats, sort_keys=True))
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+                  summary.write(
+                      "### One-shot original FY2027 source integrity check (NOT award truth)\\n"
+                      f"- Source status: {receipt['source_status']}\\n"
+                      f"- Complete original bytes: {receipt['current_source_size_bytes']}\\n"
+                      f"- Original SHA-256: {receipt['current_source_sha256']}\\n"
+                      f"- Original CSV rows: {receipt['source_rows']}\\n"
+                      f"- Source errors: {receipt['source_error_codes']}\\n"
+                      "- Independently verified award outcomes: 0; commercial rights: UNKNOWN.\\n"
+                      "- No source row content, notice IDs or private customer records retained.\\n"
+                  )
+              if (receipt["source_status"] not in (STATUS_OK, STATUS_PARTIAL)
+                      or not receipt["current_source_sha256"]
+                      or receipt["source_rows"] < 1):
+                  raise SystemExit(
+                      "NO VALIDATED BENCHMARK: original source could not be fully authenticated."
+                  )
+          PY
       - name: Verify independent Cloudflare scheduler contract
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
