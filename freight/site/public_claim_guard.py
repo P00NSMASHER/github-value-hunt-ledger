@@ -248,9 +248,13 @@ def validate_public_text_bundle(files: Mapping[str,str], *,site: str)->dict:
         for label_number,phrase in enumerate(expected,1):
             if phrase not in normalized[name]:
                 # Only stable policy label index, never untrusted source text.
+                # Distinguish an absent source disclosure from markup that
+                # accidentally hides a present phrase from the visible parser.
+                # Only static diagnostic categories, never page text, are logged.
+                diagnostic = "parser" if phrase in files[name].lower() else "source"
                 raise PublicClaimViolation(
                     "M36_FICTIONAL_SAMPLE_OR_FEE_ILLUSTRATION_DISCLOSURE_MISSING:"+name+
-                    f":label-{label_number}"
+                    f":label-{label_number}:{diagnostic}"
                 )
     for name,text in normalized.items():
         for code,pattern in UNSUPPORTED:
