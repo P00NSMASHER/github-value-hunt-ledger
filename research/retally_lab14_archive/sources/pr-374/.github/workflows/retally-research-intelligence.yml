@@ -1,0 +1,338 @@
+name: RETALLY Research Intelligence (Existing Lab 14)
+on:
+  pull_request:
+    paths:
+      - 'freight/research_intelligence.py'
+      - 'freight/test_research_intelligence.py'
+      - 'freight/research_public_campaign.py'
+      - 'freight/test_research_public_campaign.py'
+      - 'freight/research_source_acquisition.py'
+      - 'freight/test_research_source_acquisition.py'
+      - 'freight/research_evidence_gate.py'
+      - 'freight/test_research_evidence_gate.py'
+      - 'freight/research_change_impact.py'
+      - 'freight/test_research_change_impact.py'
+      - 'freight/RESEARCH_SOURCE_CHANGE_RADAR.md'
+      - 'freight/research_validation_protocols.py'
+      - 'freight/test_research_validation_protocols.py'
+      - 'freight/research/VALIDATION_PROTOCOLS_20261010.json'
+      - 'freight/RESEARCH_VALIDATION_PROTOCOLS.md'
+      - 'freight/research_rehearsal.py'
+      - 'freight/test_research_rehearsal.py'
+      - 'freight/research/SYNTHETIC_REHEARSALS_20261010.json'
+      - 'freight/RESEARCH_SYNTHETIC_REHEARSAL.md'
+      - 'freight/research_data_readiness.py'
+      - 'freight/test_research_data_readiness.py'
+      - 'freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json'
+      - 'freight/RESEARCH_PUBLIC_DATA_READINESS.md'
+      - 'freight/research_ground_truth.py'
+      - 'freight/test_research_ground_truth.py'
+      - 'freight/RESEARCH_INVOICE_GROUND_TRUTH.md'
+      - 'freight/research/PILOT_PREFLIGHT_20261011.json'
+      - 'freight/research_pilot_preflight.py'
+      - 'freight/test_research_pilot_preflight.py'
+      - 'freight/RESEARCH_PILOT_PREFLIGHT.md'
+      - 'freight/research_market_audit.py'
+      - 'freight/test_research_market_audit.py'
+      - 'freight/research/CFS_2022_SOURCE_AUDIT_20261011.json'
+      - 'freight/RESEARCH_CFS_MARKET_AUDIT.md'
+      - 'freight/research/SOURCE_ANCHORS_20261010.json'
+      - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
+      - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
+      - 'freight/RESEARCH_SOURCE_ACQUISITION.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_INTELLIGENCE_LAB.md'
+      - 'freight/PHASE3_COMPETITOR_EVIDENCE_2026-10-07.json'
+      - 'freight/PHASE3_COMPETITIVE_MATRIX_2026-10-07.json'
+      - '.github/workflows/retally-research-intelligence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned existing lab test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Verify evidence integrity and adversarial cases
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_research_rehearsal.py freight/test_research_data_readiness.py freight/test_research_ground_truth.py freight/test_research_pilot_preflight.py freight/test_research_market_audit.py freight/test_lab_phase4_director.py
+      - name: Generate read-only research intelligence output
+        run: |
+          PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'research_intelligence.json').read_text())
+          assert r['status']=='RESEARCH_ONLY_NO_AUTONOMOUS_FETCH'
+          assert len(r['lanes'])==8
+          assert all(x['sourced_observations']>0 for x in r['lanes'])
+          assert 'retally:pricing:clarity' in r['contested_issues']
+          assert r['source_register_count']>=13
+          assert r['opposition_findings']>=5
+          assert r['no_independent_truth_certification'] is True
+          assert r['customer_claims_or_payment_execution'] is False
+          assert all(x['can_publish_as_verified'] is False for x in r['prioritized_findings'])
+          assert 'No automated searches performed' in (p/'research.html').read_text()
+          assert len(r['receipt_sha256'])==64
+          print('Eight sourced research lanes; unresolved pricing opposition; NO live fetch or production actions')
+          PY
+      - name: Generate independently bounded source-fidelity and opposition review artifacts
+        run: |
+          PYTHONPATH=. python -m freight.research_evidence_gate --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          proof=json.loads((p/'evidence_fidelity.json').read_text())
+          d=json.loads((p/'opposition_decisions.json').read_text())
+          assert proof['scope']=='RESEARCH_ONLY_NO_VERIFICATION_PROMOTION'
+          assert proof['anchor_count']==14
+          assert proof['anchored_claim_count']>=18
+          assert len(d['decisions'])==6
+          assert d['zero_automated_corporate_actions'] is True
+          assert all(row['public_marketing_permitted'] is False
+                     for row in proof['assessments'])
+          assert all(row['external_actions_allowed'] is False
+                     for row in d['decisions'])
+          assert any(a['review_status']=='CURRENT_ECFR_TEXT_OBSERVED_LEGAL_REVIEW_PENDING'
+                     and a['client_specific_legal_applicability_established'] is False
+                     for a in proof['assessments'])
+          assert len(proof['receipt_sha256'])==64
+          assert len(d['receipt_sha256'])==64
+          html=(p/'opposition.html').read_text()
+          assert 'What could prove us wrong?' in html
+          print('All quote receipts and oppositional choices are internal research only.')
+          PY
+      - name: Build dated source change and freshness research queue without network
+        run: |
+          PYTHONPATH=. python -m freight.research_change_impact --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          q=json.loads((p/'research_refresh_queue.json').read_text())
+          assert q['scope']=='READ_ONLY_MANUAL_REFRESH_BACKLOG'
+          assert q['source_count']>=12
+          assert q['automatic_fetch_or_schedule'] is False
+          assert q['external_actions_allowed'] is False
+          assert q['any_sources_independently_fact_checked'] is False
+          assert all(r['review_required_before_external_use'] for r in q['review_queue'])
+          assert all(r['independently_verified'] is False for r in q['review_queue'])
+          assert len(q['receipt_sha256'])==64
+          assert 'Source Change Radar' in (p/'research_refresh.html').read_text()
+          print('Source refresh work queue generated. No live capture, scheduler, or verification promotion.')
+          PY
+      - name: Produce blocked, source-bound falsifiable validation study designs
+        run: |
+          PYTHONPATH=. python -m freight.research_validation_protocols --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'validation_protocols.json').read_text())
+          assert r['scope']=='LAB14_INTERNAL_STUDY_DESIGN_REVIEW_ONLY'
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          assert r['protocol_count']==6
+          assert r['external_studies_executed']==0
+          assert r['observed_customer_outcomes']==0
+          assert r['approved_preregistrations']==0
+          assert r['external_actions_allowed'] is False
+          assert r['public_performance_claims_allowed'] is False
+          assert all(x['status']=='DESIGN_REVIEW_REQUIRED_NOT_EXECUTED'
+                     and x['actual_sample_count']==0
+                     and x['can_publish_customer_results'] is False
+                     for x in r['protocols'])
+          assert len(r['receipt_sha256'])==64
+          assert 'Zero independent customer outcomes' in (p/'validation_protocols.html').read_text()
+          print('Six research protocols, zero executed studies, no external operations.')
+          PY
+      - name: Rehearse six methods on invented data with no real outcome
+        run: |
+          PYTHONPATH=. python -m freight.research_rehearsal --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'synthetic_rehearsals.json').read_text())
+          assert r['scope']=='LAB14_SYNTHETIC_ARITHMETIC_AND_DATA_QUALITY_REHEARSAL_ONLY'
+          assert r['rehearsed_protocols']==6
+          assert r['invented_case_records']==35
+          assert r['external_studies_executed']==0
+          assert r['independent_customer_observations']==0
+          assert r['human_respondents']==0
+          assert r['verified_business_results'] is False
+          assert r['public_claims_authorized'] is False
+          assert r['external_actions_allowed'] is False
+          assert r['new_lab_created'] is False and r['lab_number']==14
+          p1=next(x['measure'] for x in r['rehearsals'] if x['protocol_id']=='M7-01')
+          p2=next(x['measure'] for x in r['rehearsals'] if x['protocol_id']=='M7-02')
+          p5=next(x['measure'] for x in r['rehearsals'] if x['protocol_id']=='M7-05')
+          p6=next(x['measure'] for x in r['rehearsals'] if x['protocol_id']=='M7-06')
+          assert p1['primary']['fraction']=='1/3'
+          assert p2['future_rule_leakage_case_ids']==['SIM-02-05']
+          assert p5['by_system']['OTHER_LICENSED_VENDOR']['not_tested']==1
+          assert p6['net_contribution_cents']==-6400
+          assert 'invented test cases' in (p/'synthetic_rehearsals.html').read_text()
+          assert len(r['receipt_sha256'])==64
+          print('35 invented negative-control rows, no real customer outcomes or activity')
+          PY
+      - name: Vet public freight source metadata and prohibit unsupported invoice claims
+        run: |
+          PYTHONPATH=. python -m freight.research_data_readiness --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'freight_data_readiness.json').read_text())
+          assert r['scope']=='LAB14_PUBLIC_DATA_DISCOVERY_AND_RIGHTS_HOLD'
+          assert r['source_leads']==7
+          assert r['datasets_imported']==0
+          assert r['invoice_ground_truth_benchmarks']==0
+          assert r['rights_cleared_reuse_count']==0
+          assert r['independently_verified_recovery_benchmarks']==0
+          assert r['live_customer_or_carrier_data_used'] is False
+          assert r['external_source_content_fetched'] is False
+          assert r['automated_network_or_schedule'] is False
+          assert r['public_performance_claims_allowed'] is False
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          assert r['lineage_family_counts']['CFS_FAF_2022_INTERDEPENDENT']==4
+          assert all(x['can_run_customer_accuracy_benchmark'] is False
+                     and x['import_or_republish_allowed'] is False
+                     for x in r['review_queue'])
+          assert len(r['receipt_sha256'])==64
+          assert 'Seven public source leads' in (p/'freight_data_readiness.html').read_text()
+          print('Seven public leads, zero admitted datasets, zero invoice-error truth labels.')
+          PY
+      - name: Rehearse independent mock invoice ground truth and money boundaries
+        run: |
+          PYTHONPATH=. python -m freight.research_ground_truth --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'invoice_ground_truth.json').read_text())
+          assert r['scope']=='LAB14_GROUND_TRUTH_INSTRUMENT_ONLY'
+          assert r['case_count']==10
+          assert r['verified_ground_truth_cases']==0
+          assert r['actual_cash_recovered_cents']==0
+          assert r['real_customer_cases']==0
+          assert r['synthetic_only'] is True
+          assert r['external_actions_allowed'] is False
+          assert r['approved_public_performance_benchmark'] is False
+          assert r['legal_applicability_established'] is False
+          assert r['new_lab_created'] is False and r['existing_lab_number']==14
+          s=r['case_status_counts']
+          assert s['HOLD_BLIND_REVIEW_DISAGREEMENT']==1
+          assert s['HOLD_RATE_EFFECTIVE_DATE']==1
+          assert s['HOLD_NO_CONTROLLING_AUTHORITY']==1
+          assert s['HOLD_CREDIT_NOT_CASH_RECONCILIATION']==1
+          assert s['SYNTHETIC_DUPLICATE_PAYMENT_CANDIDATE']==1
+          assert s['SYNTHETIC_PRIOR_REFUND_NO_REMAINING_CASH_EXCESS']==1
+          assert len(r['receipt_sha256'])==64
+          assert 'zero verified recoveries' in (p/'invoice_ground_truth.html').read_text().lower()
+          print('Ten fictitious evidence chains; zero real invoice results or cash actions.')
+          PY
+      - name: Build a blocked buyer-pilot preflight without receiving data
+        run: |
+          PYTHONPATH=. python -m freight.research_pilot_preflight --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'pilot_preflight.json').read_text())
+          assert r['scope']=='LAB14_PROSPECTIVE_PILOT_INTERNAL_READINESS_ONLY'
+          assert r['required_controls']==18 and r['unmet_requirements']==18
+          assert r['controls_with_independently_verified_external_evidence']==0
+          assert r['workflow_stage_count']==6
+          assert r['target_studies']==['M7-01','M7-06']
+          assert r['studies_with_pilot_data']==0
+          assert r['real_invoices_received']==0
+          assert r['actual_human_independent_reviewers']==0
+          assert r['verified_invoice_overcharges']==0
+          assert r['real_net_recovery_cents']==0
+          assert r['fictional_invoice_cases_used_as_design_tests']==10
+          a=r['fictional_test_case_reviewer_concordance']
+          assert a['agreement_fraction']=='9/10'
+          assert a['actual_independent_reviewer_reliability_established'] is False
+          assert all(x['real_world_evidence_observed'] is False
+                     and x['external_actions_permitted'] is False
+                     for x in r['evidence_preparation_queue'])
+          assert r['public_performance_claims_permitted'] is False
+          assert r['real_world_study_authorized'] is False
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          assert len(r['receipt_sha256'])==64
+          assert 'No customer consent' in (p/'pilot_preflight.html').read_text()
+          print('18 human evidence gaps, 0 real buyer pilots or authorized actions.')
+          PY
+      - name: Audit real published CFS truck-mode arithmetic and source contradiction
+        run: |
+          PYTHONPATH=. python -m freight.research_market_audit --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'market_source_audit.json').read_text())
+          assert r['scope']=='LAB14_SOURCE_LINKED_CFS_MARKET_AUDIT_RESEARCH_ONLY'
+          assert r['source_count']==3 and r['table_excerpt_rows']==6
+          assert r['raw_zip_data_downloaded'] is False
+          assert r['independent_full_table_replication_completed'] is False
+          t=r['published_estimate_measurements']
+          assert t['total_value_million_usd']==17996782
+          assert t['total_weight_thousand_tons']==12169793
+          assert t['all_single_mode_truck_value_million_usd']==13222965
+          assert t['for_hire_truck_value_million_usd']==8062541
+          assert t['truck_mode_value_components_equal_source_total'] is True
+          assert t['truck_mode_weight_components_equal_source_total'] is True
+          assert t['for_hire_is_not_ltl_only'] is True
+          assert t['actual_paid_ltl_freight_invoices_count'] is None
+          assert t['freight_audit_addressable_market_usd'] is None
+          flags=r['press_release_reconciliation']['regional_flagged_conflicts']
+          assert len(flags)==1
+          assert flags[0]['code']=='CFS_2022_SOUTH_TONNAGE_PRESS_VS_DETAILED_TABLE_CONFLICT'
+          assert flags[0]['press_number_cleared_for_use'] is False
+          assert flags[0]['automatic_correction_authorized'] is False
+          assert r['market_ranking_or_recovery_tam_established'] is False
+          assert r['buyer_demand_confirmed'] is False
+          assert r['performance_marketing_claims_allowed'] is False
+          assert r['new_lab_created'] is False and r['existing_lab_number']==14
+          assert len(r['receipt_sha256'])==64
+          assert 'not freight-recovery revenue' in (p/'market_source_audit.html').read_text()
+          print('Six published Census row excerpts reconciled; South press contradiction held, no LTL TAM or customer data.')
+          PY
+      - name: Preserve evidence reports for independent review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-existing-lab14-intelligence-review
+          path: |
+            /tmp/retally-research-intelligence/research.html
+            /tmp/retally-research-intelligence/research_intelligence.json
+            /tmp/retally-research-intelligence/evidence_fidelity.json
+            /tmp/retally-research-intelligence/opposition_decisions.json
+            /tmp/retally-research-intelligence/opposition.html
+            /tmp/retally-research-intelligence/research_refresh_queue.json
+            /tmp/retally-research-intelligence/research_refresh.html
+            /tmp/retally-research-intelligence/validation_protocols.json
+            /tmp/retally-research-intelligence/validation_protocols.html
+            /tmp/retally-research-intelligence/synthetic_rehearsals.json
+            /tmp/retally-research-intelligence/synthetic_rehearsals.html
+            /tmp/retally-research-intelligence/freight_data_readiness.json
+            /tmp/retally-research-intelligence/freight_data_readiness.html
+            /tmp/retally-research-intelligence/invoice_ground_truth.json
+            /tmp/retally-research-intelligence/invoice_ground_truth.html
+            /tmp/retally-research-intelligence/pilot_preflight.json
+            /tmp/retally-research-intelligence/pilot_preflight.html
+            /tmp/retally-research-intelligence/market_source_audit.json
+            /tmp/retally-research-intelligence/market_source_audit.html
+          if-no-files-found: error
+          retention-days: 14

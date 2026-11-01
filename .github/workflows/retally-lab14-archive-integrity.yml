@@ -1,0 +1,50 @@
+name: RETALLY Lab14 historical source archive integrity (review only)
+on:
+  pull_request:
+    paths:
+      - 'research/retally_lab14_archive/**'
+      - '.github/workflows/retally-lab14-archive-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Prove immutable original blobs and hold all archival authority
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          base=pathlib.Path("research/retally_lab14_archive")
+          files=sorted((base/"manifests").glob("part-*.json"))
+          assert len(files)==4, files
+          seen_pr=set(); seen_path=set(); total=0; removed=0
+          for manifest_path in files:
+              m=json.loads(manifest_path.read_text(encoding="utf-8"))
+              assert m["authority"]=="ARCHIVE_ONLY_DO_NOT_RELEASE_OR_EXECUTE"
+              for item in m["records"]:
+                  assert item["pr"] in m["source_prs"]
+                  assert len(item["pr_head"])==40
+                  if item["archived_path"] is None:
+                      assert item["status"]=="removed"
+                      removed+=1
+                      continue
+                  p=item["archived_path"]
+                  assert p.startswith(f"research/retally_lab14_archive/sources/pr-{item['pr']}/")
+                  assert p.endswith(item["original_path"])
+                  assert p not in seen_path,(p,item["pr"])
+                  seen_path.add(p)
+                  blob=subprocess.check_output(["git","hash-object",p],text=True).strip()
+                  assert blob==item["git_blob_sha"],(p,blob,item["git_blob_sha"])
+                  total+=1
+              seen_pr.update(m["source_prs"])
+          assert len(seen_pr)==43,sorted(seen_pr)
+          assert total>=300,total
+          hold=(base/"README.md").read_text(encoding="utf-8")
+          assert "ARCHIVE / RESEARCH HOLD" in hold and "NOT MERGED INTO MAIN" in hold
+          print(f"Verified {total} exact original Git blobs across {len(seen_pr)} historical PRs; {removed} removals recorded. Archive-only, no release.")
+          PY

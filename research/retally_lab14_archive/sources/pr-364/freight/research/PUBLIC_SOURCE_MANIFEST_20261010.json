@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "purpose": "ONE_SHOT_MANUAL_PUBLIC_RESEARCH_CAPTURE_ONLY_NO_SCHEDULE",
+  "sources": [
+    {
+      "id": "bts.cfs.2022",
+      "publisher": "U.S. Bureau of Transportation Statistics",
+      "lane": "market",
+      "url": "https://www.bts.gov/newsroom/commodity-flow-survey-2022-data-released"
+    },
+    {
+      "id": "bts.faf6.2026",
+      "publisher": "U.S. Bureau of Transportation Statistics",
+      "lane": "market",
+      "url": "https://www.bts.gov/faf"
+    },
+    {
+      "id": "recoveraudit.pricing",
+      "publisher": "RecoverAudit (vendor)",
+      "lane": "competitive",
+      "url": "https://recover-audit.com/pricing"
+    },
+    {
+      "id": "retally.offer",
+      "publisher": "RETALLY Recovery (own marketing)",
+      "lane": "opposition",
+      "url": "https://www.retallyrecovery.com/"
+    },
+    {
+      "id": "nmfta.timeline.2026",
+      "publisher": "National Motor Freight Traffic Association",
+      "lane": "carrier_regulatory",
+      "url": "https://help.nmfta.org/hc/en-us/articles/45360764355739-Upcoming-Key-Dates-for-the-NMFC-Data-Updates"
+    },
+    {
+      "id": "nmfta.bulletin.2026",
+      "publisher": "National Motor Freight Traffic Association",
+      "lane": "carrier_regulatory",
+      "url": "https://nmfta.org/news/2026-2-disposition-bulletin-density-nmfc-insights/"
+    },
+    {
+      "id": "uscode.13710",
+      "publisher": "Office of the Law Revision Counsel (US House)",
+      "lane": "carrier_regulatory",
+      "url": "https://usc-cdn.house.gov/view.xhtml?edition=prelim&num=0&req=granuleid%3AUSC-prelim-title49-section13710"
+    },
+    {
+      "id": "govinfo.3788",
+      "publisher": "Federal Register (U.S. Government Publishing Office)",
+      "lane": "carrier_regulatory",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2018-04-16/html/2018-07749.htm"
+    },
+    {
+      "id": "estes.tariff",
+      "publisher": "Estes Express Lines",
+      "lane": "carrier_regulatory",
+      "url": "https://www.estes-express.com/resources/fees-and-surcharges/rules-tariff"
+    },
+    {
+      "id": "x12.210",
+      "publisher": "X12 standards organization",
+      "lane": "technology",
+      "url": "https://x12.org/node/4210"
+    },
+    {
+      "id": "cass.sec.2026",
+      "publisher": "Cass Information Systems (issuer SEC exhibit)",
+      "lane": "economics",
+      "url": "https://www.sec.gov/Archives/edgar/data/708781/000070878126000020/investorpresentation2026.htm"
+    },
+    {
+      "id": "loop.auditbench",
+      "publisher": "Loop (vendor)",
+      "lane": "technology",
+      "url": "https://www.loop.com/article/introducing-the-long-horizon-auditbench-for-supply-chain-ai"
+    }
+  ]
+}

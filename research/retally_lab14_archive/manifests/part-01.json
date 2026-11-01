@@ -1,0 +1,767 @@
+{
+  "schema_version": 1,
+  "batch": 1,
+  "authority": "ARCHIVE_ONLY_DO_NOT_RELEASE_OR_EXECUTE",
+  "source_prs": [
+    363,
+    364,
+    365,
+    366,
+    367,
+    368,
+    369,
+    370,
+    371,
+    372,
+    374
+  ],
+  "records": [
+    {
+      "pr": 363,
+      "pr_head": "5f96298e0b2bb530f90479c78a36e35b063c491d",
+      "pr_base": "research/retally-phase4-experiment-director-20261008",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-363/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "93289cb598d525a0cda62f17248fa74e34d4b7ff",
+      "status": "added"
+    },
+    {
+      "pr": 363,
+      "pr_head": "5f96298e0b2bb530f90479c78a36e35b063c491d",
+      "pr_base": "research/retally-phase4-experiment-director-20261008",
+      "original_path": "freight/RESEARCH_INTELLIGENCE_LAB.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-363/freight/RESEARCH_INTELLIGENCE_LAB.md",
+      "git_blob_sha": "bdbe72fdcecf627860669446233041e121e95910",
+      "status": "added"
+    },
+    {
+      "pr": 363,
+      "pr_head": "5f96298e0b2bb530f90479c78a36e35b063c491d",
+      "pr_base": "research/retally-phase4-experiment-director-20261008",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-363/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "58e35782e831370544bb8b3544131467f1afc4d6",
+      "status": "modified"
+    },
+    {
+      "pr": 363,
+      "pr_head": "5f96298e0b2bb530f90479c78a36e35b063c491d",
+      "pr_base": "research/retally-phase4-experiment-director-20261008",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-363/freight/lab_phase4_director.py",
+      "git_blob_sha": "bf96ca48f582b1cd54a3925f5e41dbe57f238396",
+      "status": "modified"
+    },
+    {
+      "pr": 363,
+      "pr_head": "5f96298e0b2bb530f90479c78a36e35b063c491d",
+      "pr_base": "research/retally-phase4-experiment-director-20261008",
+      "original_path": "freight/research_intelligence.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-363/freight/research_intelligence.py",
+      "git_blob_sha": "0c5a5742fd267ffe4507675c4d544756e449e792",
+      "status": "added"
+    },
+    {
+      "pr": 363,
+      "pr_head": "5f96298e0b2bb530f90479c78a36e35b063c491d",
+      "pr_base": "research/retally-phase4-experiment-director-20261008",
+      "original_path": "freight/test_research_intelligence.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-363/freight/test_research_intelligence.py",
+      "git_blob_sha": "48969a6048affaac88c7573403f278253e15640d",
+      "status": "added"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "7cb7be4c8e14a9e47a571f4bebdab691baaa2ccb",
+      "status": "modified"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/RESEARCH_SOURCE_ACQUISITION.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/RESEARCH_SOURCE_ACQUISITION.md",
+      "git_blob_sha": "f603fbeb3eec80e8ea4a81e26fe7002f3d407b03",
+      "status": "added"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "2503c273aaa06480b511acda323b94863009730f",
+      "status": "modified"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/lab_phase4_director.py",
+      "git_blob_sha": "5b332fd8e2b8f602ae9350c32650942edf7d646a",
+      "status": "modified"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+      "git_blob_sha": "f0a2e3a8f17e6dd26358056a173dd57004804706",
+      "status": "added"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/research_intelligence.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/research_intelligence.py",
+      "git_blob_sha": "cc3628e9c616e9788d7eadab7e91289d238c09c7",
+      "status": "modified"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/research_public_campaign.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/research_public_campaign.py",
+      "git_blob_sha": "495eb14510585e56a08f79c6232ded3c0aa5f56c",
+      "status": "added"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/research_source_acquisition.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/research_source_acquisition.py",
+      "git_blob_sha": "bd9b6e767035244a6ee7dd6cfd1faa5b94dfae10",
+      "status": "added"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/test_research_public_campaign.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/test_research_public_campaign.py",
+      "git_blob_sha": "4d23575571105ae5a61eb57cbc80b9d6dc463473",
+      "status": "added"
+    },
+    {
+      "pr": 364,
+      "pr_head": "55c85ef5522fc204efd95311cdc13e42d50a59df",
+      "pr_base": "research/retally-market-opposition-workbench-20261010",
+      "original_path": "freight/test_research_source_acquisition.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-364/freight/test_research_source_acquisition.py",
+      "git_blob_sha": "b4e69fed5d40a1a75c2e846b7f64d4275525ded7",
+      "status": "added"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "53bbf2dfefbda9bff239becd88940a7df2678d4c",
+      "status": "modified"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": "freight/RESEARCH_EVIDENCE_OPPOSITION.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/freight/RESEARCH_EVIDENCE_OPPOSITION.md",
+      "git_blob_sha": "65fce29fbcbb931796fb84309c7fc0a886df525c",
+      "status": "added"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "9c30ba034ecc7437d033b4c6dd7d745b6e552c40",
+      "status": "modified"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/freight/lab_phase4_director.py",
+      "git_blob_sha": "be5e9075ea9e149c04ed43573fa38bb9ee38a844",
+      "status": "modified"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": "freight/research/SOURCE_ANCHORS_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/freight/research/SOURCE_ANCHORS_20261010.json",
+      "git_blob_sha": "e49f9e25c744cdd18fbb16898bd8eabe6d63ad0e",
+      "status": "added"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": "freight/research_evidence_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/freight/research_evidence_gate.py",
+      "git_blob_sha": "9453a1f1efef692fd7aa461b7ac6aaa27a612945",
+      "status": "added"
+    },
+    {
+      "pr": 365,
+      "pr_head": "ba7c9731445a138c1529e2c05b798716af48e73d",
+      "pr_base": "research/retally-public-intelligence-acquisition-20261010",
+      "original_path": "freight/test_research_evidence_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-365/freight/test_research_evidence_gate.py",
+      "git_blob_sha": "9ecce9731cf57db010dc9a4f87ec11df0c3281cf",
+      "status": "added"
+    },
+    {
+      "pr": 366,
+      "pr_head": "2dc3e606dd5ef8fd99274668c7dd2a60222aa033",
+      "pr_base": "research/retally-evidence-opposition-gate-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-366/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "e25e53936cfe686d67c6624238cc10e8ed9fff97",
+      "status": "modified"
+    },
+    {
+      "pr": 366,
+      "pr_head": "2dc3e606dd5ef8fd99274668c7dd2a60222aa033",
+      "pr_base": "research/retally-evidence-opposition-gate-20261010",
+      "original_path": "freight/RESEARCH_SOURCE_CHANGE_RADAR.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-366/freight/RESEARCH_SOURCE_CHANGE_RADAR.md",
+      "git_blob_sha": "4201759c02897b033f334c3db6a74e4853e9c775",
+      "status": "added"
+    },
+    {
+      "pr": 366,
+      "pr_head": "2dc3e606dd5ef8fd99274668c7dd2a60222aa033",
+      "pr_base": "research/retally-evidence-opposition-gate-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-366/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "441de7b454e98e50ff01ecfff5009b35f79b9d04",
+      "status": "modified"
+    },
+    {
+      "pr": 366,
+      "pr_head": "2dc3e606dd5ef8fd99274668c7dd2a60222aa033",
+      "pr_base": "research/retally-evidence-opposition-gate-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-366/freight/lab_phase4_director.py",
+      "git_blob_sha": "69b92a4a9d8b2ee2c02edc5579393c962f5dd09b",
+      "status": "modified"
+    },
+    {
+      "pr": 366,
+      "pr_head": "2dc3e606dd5ef8fd99274668c7dd2a60222aa033",
+      "pr_base": "research/retally-evidence-opposition-gate-20261010",
+      "original_path": "freight/research_change_impact.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-366/freight/research_change_impact.py",
+      "git_blob_sha": "44da67305c135d03b4db9558d2d18ae137e709a9",
+      "status": "added"
+    },
+    {
+      "pr": 366,
+      "pr_head": "2dc3e606dd5ef8fd99274668c7dd2a60222aa033",
+      "pr_base": "research/retally-evidence-opposition-gate-20261010",
+      "original_path": "freight/test_research_change_impact.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-366/freight/test_research_change_impact.py",
+      "git_blob_sha": "60e4e00cde919a0d46ec9980c6dd89f30679c1b3",
+      "status": "added"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "0a2fc3a0a0db1357582c8d2dfa9e6487870538e6",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/REGULATORY_SOURCE_RECHECK_20261010.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/REGULATORY_SOURCE_RECHECK_20261010.md",
+      "git_blob_sha": "f0737ca8d16af982f65a502cd0ff83704b8e6702",
+      "status": "added"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/lab_phase4_director.py",
+      "git_blob_sha": "289b648c7165ff9a96ccf3f7ee718b8c09e45a30",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json",
+      "git_blob_sha": "cd5260a4ef978c8b2c2b76c725bfe281cd019f0d",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/research/SOURCE_ANCHORS_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/research/SOURCE_ANCHORS_20261010.json",
+      "git_blob_sha": "d8b042e33a62001c9fde89e54e5cd5a5cdcc95d3",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/research_change_impact.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/research_change_impact.py",
+      "git_blob_sha": "a97deb24fe12e3badb5fe76fea346e6e8b0e9d7f",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/research_evidence_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/research_evidence_gate.py",
+      "git_blob_sha": "ed063bb3f7d31ba82b65a161e1c67d2426175703",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/research_public_campaign.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/research_public_campaign.py",
+      "git_blob_sha": "81dfbf74fea0249cc11143e4d5785a0936d8e045",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/research_source_acquisition.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/research_source_acquisition.py",
+      "git_blob_sha": "7152656bb6f4cddfea745f62d6c7e857d56aa99a",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/test_research_change_impact.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/test_research_change_impact.py",
+      "git_blob_sha": "08be5b280b5777cb1c0721064e5340405722bcdb",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/test_research_evidence_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/test_research_evidence_gate.py",
+      "git_blob_sha": "acfa2247e5469b03e72d05ecbbb8e735f62112a0",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/test_research_public_campaign.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/test_research_public_campaign.py",
+      "git_blob_sha": "a0d6f5c6e883da11cad357cdfdaa856539d768a9",
+      "status": "modified"
+    },
+    {
+      "pr": 367,
+      "pr_head": "45a40b0885c94152940164d5e66fed06b9279036",
+      "pr_base": "research/retally-source-change-radar-20261010",
+      "original_path": "freight/test_research_source_acquisition.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-367/freight/test_research_source_acquisition.py",
+      "git_blob_sha": "f765634448f9632f8b5a68bcc5adeaae5b557ce6",
+      "status": "modified"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "cde97124517dc8bfbe0d45aaad4108c3878690c0",
+      "status": "modified"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": "freight/RESEARCH_VALIDATION_PROTOCOLS.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/freight/RESEARCH_VALIDATION_PROTOCOLS.md",
+      "git_blob_sha": "5f327950ce5bb3ee30e767f09a61d1bda6640c9f",
+      "status": "added"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "8dd5c967373ae40b46f4496700c1b916b5494f12",
+      "status": "modified"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/freight/lab_phase4_director.py",
+      "git_blob_sha": "de458a176b64e2be56f13495115c88db754be047",
+      "status": "modified"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": "freight/research/VALIDATION_PROTOCOLS_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/freight/research/VALIDATION_PROTOCOLS_20261010.json",
+      "git_blob_sha": "0eca962106130f4cb604f831a67f512e4c6248a4",
+      "status": "added"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": "freight/research_validation_protocols.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/freight/research_validation_protocols.py",
+      "git_blob_sha": "eba0b05f6181771f62638c3314639312eda61fa3",
+      "status": "added"
+    },
+    {
+      "pr": 368,
+      "pr_head": "d4e68a5f5b45f9f58d77668ba9a22f53980724d9",
+      "pr_base": "research/retally-current-regulatory-source-20261010",
+      "original_path": "freight/test_research_validation_protocols.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-368/freight/test_research_validation_protocols.py",
+      "git_blob_sha": "ebaee78dfda5071bc318d51df8dfa6bf2f165363",
+      "status": "added"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "10f5eaa525005bcb213118c130fe07cff97a2e86",
+      "status": "modified"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": "freight/RESEARCH_SYNTHETIC_REHEARSAL.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/freight/RESEARCH_SYNTHETIC_REHEARSAL.md",
+      "git_blob_sha": "74873c503ae4871d23f1d2d3a8fc6735ae1730c7",
+      "status": "added"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "34098fc8e3ce4f5c7966b53ee8b9a400ea00a58e",
+      "status": "modified"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/freight/lab_phase4_director.py",
+      "git_blob_sha": "4423342e71ceaff5c1f3578613a6158489a47752",
+      "status": "modified"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": "freight/research/SYNTHETIC_REHEARSALS_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/freight/research/SYNTHETIC_REHEARSALS_20261010.json",
+      "git_blob_sha": "f4c21471467ec40e294ced458875742e45e3f118",
+      "status": "added"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": "freight/research_rehearsal.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/freight/research_rehearsal.py",
+      "git_blob_sha": "0c8801d2c1c53f147e820133a729fe47fd036188",
+      "status": "added"
+    },
+    {
+      "pr": 369,
+      "pr_head": "a4c4bc10309d5bec38a261712e4efbd47b213b30",
+      "pr_base": "research/retally-falsifiable-validation-m7-20261010",
+      "original_path": "freight/test_research_rehearsal.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-369/freight/test_research_rehearsal.py",
+      "git_blob_sha": "fc6bcc09109ea5f3ce27ad8e078651f24f795c6e",
+      "status": "added"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "36cd1b897118afdbdb83406dc61cc4f8ebf6651c",
+      "status": "modified"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": "freight/RESEARCH_PUBLIC_DATA_READINESS.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/freight/RESEARCH_PUBLIC_DATA_READINESS.md",
+      "git_blob_sha": "163d1a7ced23a64ab5d80463b281ded6a794a3cd",
+      "status": "added"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "fa49c909b48d463abdedcdcce57424ed4f6d788b",
+      "status": "modified"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/freight/lab_phase4_director.py",
+      "git_blob_sha": "45b9a851c3abf07fbe9f0c35f60334970ffc3b21",
+      "status": "modified"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": "freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/freight/research/PUBLIC_FREIGHT_DATA_CANDIDATES_20261010.json",
+      "git_blob_sha": "238e855a154d5d67ec4e14b14645860bcebeb8fa",
+      "status": "added"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": "freight/research_data_readiness.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/freight/research_data_readiness.py",
+      "git_blob_sha": "ee9a93735904eec86cf7ca382e56195380f395ba",
+      "status": "added"
+    },
+    {
+      "pr": 370,
+      "pr_head": "320a5afc3c04b930da91abac12f975858e1d7005",
+      "pr_base": "research/retally-synthetic-rehearsal-m8-20261010",
+      "original_path": "freight/test_research_data_readiness.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-370/freight/test_research_data_readiness.py",
+      "git_blob_sha": "9dc00a7cad108a578e60f40d9cbb9945ba24f8b9",
+      "status": "added"
+    },
+    {
+      "pr": 371,
+      "pr_head": "92af5cd86840875fa74dd869bf586b3327d79a8a",
+      "pr_base": "research/retally-dataset-provenance-m9-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-371/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "d4206b300050743ea2f875a9f923d000708db6c9",
+      "status": "modified"
+    },
+    {
+      "pr": 371,
+      "pr_head": "92af5cd86840875fa74dd869bf586b3327d79a8a",
+      "pr_base": "research/retally-dataset-provenance-m9-20261010",
+      "original_path": "freight/RESEARCH_INVOICE_GROUND_TRUTH.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-371/freight/RESEARCH_INVOICE_GROUND_TRUTH.md",
+      "git_blob_sha": "49b71dc2eb3786bc308831c812007443a72957ac",
+      "status": "added"
+    },
+    {
+      "pr": 371,
+      "pr_head": "92af5cd86840875fa74dd869bf586b3327d79a8a",
+      "pr_base": "research/retally-dataset-provenance-m9-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-371/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "faef87c6c51f9e5410aa1879da28ead3e4bec7db",
+      "status": "modified"
+    },
+    {
+      "pr": 371,
+      "pr_head": "92af5cd86840875fa74dd869bf586b3327d79a8a",
+      "pr_base": "research/retally-dataset-provenance-m9-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-371/freight/lab_phase4_director.py",
+      "git_blob_sha": "f09e8cc8f316a2050726b4a55591d2f9d2e5d06e",
+      "status": "modified"
+    },
+    {
+      "pr": 371,
+      "pr_head": "92af5cd86840875fa74dd869bf586b3327d79a8a",
+      "pr_base": "research/retally-dataset-provenance-m9-20261010",
+      "original_path": "freight/research_ground_truth.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-371/freight/research_ground_truth.py",
+      "git_blob_sha": "8606c157a93c5b6b0a0148be0bd8948c87870383",
+      "status": "added"
+    },
+    {
+      "pr": 371,
+      "pr_head": "92af5cd86840875fa74dd869bf586b3327d79a8a",
+      "pr_base": "research/retally-dataset-provenance-m9-20261010",
+      "original_path": "freight/test_research_ground_truth.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-371/freight/test_research_ground_truth.py",
+      "git_blob_sha": "3c4f26b2fec71a09cc80468addd67cc0713c8cd8",
+      "status": "added"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "7eeded64e6ff429d86eab0678b8ee8040e6889c9",
+      "status": "modified"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": "freight/RESEARCH_PILOT_PREFLIGHT.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/freight/RESEARCH_PILOT_PREFLIGHT.md",
+      "git_blob_sha": "57d610c3a8e894642dda606984ffee3b99692923",
+      "status": "added"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "7a4e9df345e8e8f124f53d1a95da80c2ebf1657f",
+      "status": "modified"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/freight/lab_phase4_director.py",
+      "git_blob_sha": "1b98e29cd5ab8768b40f2352db34084cf27a82c5",
+      "status": "modified"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": "freight/research/PILOT_PREFLIGHT_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/freight/research/PILOT_PREFLIGHT_20261011.json",
+      "git_blob_sha": "fee980a6fb4325a6821976aee3860e10f1d7d035",
+      "status": "added"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": "freight/research_pilot_preflight.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/freight/research_pilot_preflight.py",
+      "git_blob_sha": "4a0c80aa8a316c1dd0393a9f18086de486e4e52b",
+      "status": "added"
+    },
+    {
+      "pr": 372,
+      "pr_head": "920a64c7e484046cd0a13cc9d88dfb2750bab7a7",
+      "pr_base": "research/retally-ground-truth-m10-20261010",
+      "original_path": "freight/test_research_pilot_preflight.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-372/freight/test_research_pilot_preflight.py",
+      "git_blob_sha": "d1f64a1ae7854722ba3efeb71aa1d51c84d3518e",
+      "status": "added"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": ".github/workflows/retally-research-intelligence.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/.github/workflows/retally-research-intelligence.yml",
+      "git_blob_sha": "e59b0a39475c869d1b7959c79cbe9d962eec7bca",
+      "status": "modified"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": "freight/RESEARCH_CFS_MARKET_AUDIT.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/freight/RESEARCH_CFS_MARKET_AUDIT.md",
+      "git_blob_sha": "3309f5bfc799edeabcdd081d77f86688847da7bd",
+      "status": "added"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "754fce5dac195e8556f00ebb0a9693be0c45b022",
+      "status": "modified"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/freight/lab_phase4_director.py",
+      "git_blob_sha": "b25329daa77b42f1fd550715aa38ffa86a4750a4",
+      "status": "modified"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": "freight/research/CFS_2022_SOURCE_AUDIT_20261011.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/freight/research/CFS_2022_SOURCE_AUDIT_20261011.json",
+      "git_blob_sha": "64f091bd63477b695b680d9086dbd99df285b2b8",
+      "status": "added"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": "freight/research_market_audit.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/freight/research_market_audit.py",
+      "git_blob_sha": "3bc4cf71c36e37844164a46f2f4c6cd5c98a35d5",
+      "status": "added"
+    },
+    {
+      "pr": 374,
+      "pr_head": "6e0f2ad486dfd5a828789d0ea37bfaf548653f3a",
+      "pr_base": "research/retally-pilot-preflight-m11-20261011",
+      "original_path": "freight/test_research_market_audit.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-374/freight/test_research_market_audit.py",
+      "git_blob_sha": "71044cf9e65588dab2aa2476e69a6a0fe301844e",
+      "status": "added"
+    }
+  ]
+}

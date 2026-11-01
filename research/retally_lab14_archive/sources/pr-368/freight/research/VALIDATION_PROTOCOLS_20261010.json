@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "scope": "RETALLY_LAB14_PRE_REGISTERED_DESIGNS_RESEARCH_ONLY",
+  "created_on": "2026-10-10",
+  "intended_decisions": [
+    "M4-01",
+    "M4-02",
+    "M4-03",
+    "M4-04",
+    "M4-05",
+    "M4-06"
+  ],
+  "public_performance_claims_authorized": false,
+  "actual_external_experiments_run": 0,
+  "methodological_references": [
+    {
+      "organization": "AAPOR",
+      "url": "https://aapor.org/standards-and-ethics/best-practices/",
+      "role": "Sample frame, pretests, nonresponse, transparency; not endorsement"
+    },
+    {
+      "organization": "US Bureau of Transportation Statistics",
+      "url": "https://www.bts.gov/newsroom/commodity-flow-survey-2022-data-released",
+      "role": "Commodity-flow context, never recovery-market revenue"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "M7-01",
+      "decision_id": "M4-01",
+      "dependent_claim_ids": [
+        "gap.real_world_accuracy",
+        "gap.security_assurance",
+        "campaign.competitor.loop"
+      ],
+      "name": "Independent second-look pilot",
+      "study_type": "BLINDED_REFERENCE_ADJUDICATION",
+      "unit_of_analysis": "Unique invoice/contract/shipment/payment evidence package",
+      "population_frame": "Buyer-owned historical U.S. LTL invoices meeting written pilot eligibility, with independently checked inclusion and excluded carriers/time periods documented.",
+      "sample_selection": "Predeclare frame, random or consecutive selection, de-duplicate invoices and record inaccessible packages; do not select only invoices already known to be wrong.",
+      "comparison_group": "Blind independent reviewer of the identical source package before being shown RETALLY's alerts.",
+      "primary_metric": {
+        "name": "Evidence-supported alert precision",
+        "numerator": "RETALLY positive alerts independently adjudicated as substantiated overcharges under the controlling dated authority",
+        "denominator": "All RETALLY positive alerts for eligible invoices, including rejected and unresolved alerts",
+        "unit": "proportion",
+        "formula": "substantiated_positive_alerts / all_positive_alerts; undefined if denominator=0"
+      },
+      "positive_signal": "A prospective preapproved precision target is met, with denominators, uncertainty, disagreement and abstentions disclosed; this alone does not establish ROI or readiness.",
+      "negative_signal": "An unacceptably high adjudicated false-positive or unsupported-alert rate, missing authority, or unresolved adjudication.",
+      "independent_reviewer": "Reviewer has no access to RETALLY alert label when first assigning ground truth; conflicts go to a second documented adjudicator.",
+      "required_evidence": [
+        "Executed buyer authority and data-rights scope",
+        "Original invoice, BOL/proof-of-delivery, contract and date-applicable tariff",
+        "Payment and credit evidence, matched to invoice identity",
+        "Independent ground-truth adjudication log and operator effort"
+      ],
+      "confounders": [
+        "Case-selection bias",
+        "Missing or superseded rate authority",
+        "Disagreement between reviewers",
+        "Credit or refund occurring before pilot"
+      ],
+      "missingness_policy": "Retain eligible missing or indeterminate alerts in flow counts and sensitivity analyses; never silently recode unresolved as correct.",
+      "stop_rule": "Stop external processing on revoked buyer consent, cross-tenant leakage, unauthorized data, contractual ambiguity or rate-authority conflict.",
+      "next_internal_step": "Prepare a blank data-rights/labeling charter and synthetic reviewer disagreement examples; do not invite buyers automatically.",
+      "source_data_mode": "DESIGN_ONLY_NO_CUSTOMER_DATA",
+      "preregistration_approved": false,
+      "threshold_approved": false,
+      "decision_threshold": null,
+      "sample_size_approved": false,
+      "sample_size_target": null,
+      "protocol_execution_status": "NOT_RUN",
+      "observed_sample_count": 0,
+      "independently_verified_outcomes": 0,
+      "published_performance_claim": false,
+      "contact_or_carrier_action_authorized": false,
+      "financial_action_authorized": false
+    },
+    {
+      "experiment_id": "M7-02",
+      "decision_id": "M4-02",
+      "dependent_claim_ids": [
+        "campaign.carrier.timeline",
+        "campaign.carrier.bulletin",
+        "campaign.carrier.contract"
+      ],
+      "name": "Historical tariff and NMFC chronology",
+      "study_type": "TEMPORAL_BOUNDARY_REGRESSION",
+      "unit_of_analysis": "Dated contract/tariff/NMFC fixture and rated shipment outcome",
+      "population_frame": "Synthetic boundary fixtures surrounding documented issuance/effective dates and representative contract overrides; real claims excluded pending legal review.",
+      "sample_selection": "Predeclare pre-/post-effective dates, each side of midnight, supplements, withdrawn proposals and contract exceptions; include negative controls.",
+      "comparison_group": "Independent reviewer reconstruction using separately frozen dated authorities, not a live-only tariff lookup.",
+      "primary_metric": {
+        "name": "Boundary classification agreement",
+        "numerator": "Eligible boundary fixtures whose independently determined expected treatment matches engine output",
+        "denominator": "All preregistered eligible chronological fixtures, including abstentions and rejects",
+        "unit": "proportion",
+        "formula": "correctly_classified_fixtures / all_eligible_fixtures; undefined if denominator=0"
+      },
+      "positive_signal": "No future-effective rule applied to a prior shipment and agreement meets a separately approved fixture coverage and quality threshold.",
+      "negative_signal": "Any future-supplement retroactive application, unsupported contract-override assumption or silently accepted missing rule.",
+      "independent_reviewer": "Separate tariff reviewer checks actual text and precedence while the engine authors remain blinded to expected fixture labels.",
+      "required_evidence": [
+        "Dated source copies with retrieval timestamps and license scope",
+        "Published issuance and effective dates",
+        "Signed contract precedence where applicable or explicit absence",
+        "Expected outcome and reject/abstain trace per fixture"
+      ],
+      "confounders": [
+        "Issuance versus effective date",
+        "Location/carrier/commodity restrictions",
+        "Customer-specific negotiated exceptions"
+      ],
+      "missingness_policy": "Missing rule editions are indeterminate, never default to currently available edition.",
+      "stop_rule": "Block any customer-specific legal interpretation, unpublished tariff, unauthorized NMFC text or attempted carrier claim.",
+      "next_internal_step": "Generate source-pinned synthetic boundary matrix for the December 12 NMFC supplement without treating it as currently effective.",
+      "source_data_mode": "DESIGN_ONLY_NO_CUSTOMER_DATA",
+      "preregistration_approved": false,
+      "threshold_approved": false,
+      "decision_threshold": null,
+      "sample_size_approved": false,
+      "sample_size_target": null,
+      "protocol_execution_status": "NOT_RUN",
+      "observed_sample_count": 0,
+      "independently_verified_outcomes": 0,
+      "published_performance_claim": false,
+      "contact_or_carrier_action_authorized": false,
+      "financial_action_authorized": false
+    },
+    {
+      "experiment_id": "M7-03",
+      "decision_id": "M4-03",
+      "dependent_claim_ids": [
+        "campaign.competitor.price",
+        "campaign.opposition.own",
+        "campaign.opposition.comparator"
+      ],
+      "name": "Pricing comprehension and trust",
+      "study_type": "CONTROLLED_RANDOMIZED_SURVEY",
+      "unit_of_analysis": "Independent consented buyer respondent",
+      "population_frame": "People with documented U.S. LTL freight-budget or audit-buying responsibility; identity and recruitment frame documented independently.",
+      "sample_selection": "Randomly assign equally informative fictional fee explanations; pretest balanced wording, record nonresponse and retain assignment log.",
+      "comparison_group": "Posted-percentage offer versus engagement-confirmed percentage with identical hypothetical amounts, service scope and recovery exclusions.",
+      "primary_metric": {
+        "name": "Correct all-in fee comprehension",
+        "numerator": "Respondents correctly stating example fee, eligible-recovery base and exclusion after randomized exposure",
+        "denominator": "All eligible randomized respondents under prespecified missing-response policy",
+        "unit": "proportion",
+        "formula": "correct_comprehension_responses / eligible_randomized_respondents; undefined if denominator=0"
+      },
+      "positive_signal": "Difference in comprehension exceeds a preregistered meaningful threshold with uncertainty and nonresponse disclosed; no automatic pricing change.",
+      "negative_signal": "No meaningful improvement, reduced trust, confusion about no-recovery fees or evidence of leading wording.",
+      "independent_reviewer": "Survey analyst unaffiliated with copy design reviews item validity, assignment, balance and blind outcome coding.",
+      "required_evidence": [
+        "Consented recruitment and role-screening record",
+        "Exact stimulus wording and random-assignment recipe",
+        "All answer options including do-not-know",
+        "Response/nonresponse flow and preregistered inference plan"
+      ],
+      "confounders": [
+        "Existing fee-model familiarity",
+        "Survey-mode and sampling bias",
+        "Wording differences beyond disclosed rate",
+        "Conflation of savings found with cash recovered"
+      ],
+      "missingness_policy": "Report uncontacted, nonresponse and partial-response separately; no post-hoc deletion of confused respondents.",
+      "stop_rule": "Stop for unconsented contact, personal data overcollection or unauthorized comparative advertising.",
+      "next_internal_step": "Draft balanced fictional price-explanation variants and a comprehension question key; no outbound buyer contact.",
+      "source_data_mode": "DESIGN_ONLY_NO_CUSTOMER_DATA",
+      "preregistration_approved": false,
+      "threshold_approved": false,
+      "decision_threshold": null,
+      "sample_size_approved": false,
+      "sample_size_target": null,
+      "protocol_execution_status": "NOT_RUN",
+      "observed_sample_count": 0,
+      "independently_verified_outcomes": 0,
+      "published_performance_claim": false,
+      "contact_or_carrier_action_authorized": false,
+      "financial_action_authorized": false
+    },
+    {
+      "experiment_id": "M7-04",
+      "decision_id": "M4-04",
+      "dependent_claim_ids": [
+        "campaign.market.cfs",
+        "campaign.market.faf",
+        "campaign.buyer.coverage"
+      ],
+      "name": "Serviceable-account market falsification",
+      "study_type": "STRATIFIED_ACCOUNT_SAMPLE",
+      "unit_of_analysis": "Unique eligible shipper account, not commodity shipment dollar",
+      "population_frame": "Documented U.S. shipper firm frame with known mode, LTL use, invoice volume and permitted geographic/vertical strata.",
+      "sample_selection": "Document frame coverage, deduplicate legal entities, stratify by shipper size/mode/carrier access and report exclusions; pilot recruitment needs separate approval.",
+      "comparison_group": "Nonresponsive/ineligible frame entries and incumbent-processed accounts retained as explicit denominator groups.",
+      "primary_metric": {
+        "name": "Qualified reachable-account fraction",
+        "numerator": "Distinct sampled accounts satisfying scope, ability to authorize, historical data access and prespecified unit-economics screens",
+        "denominator": "All unique sampled candidate accounts in defined covered strata including ineligible/nonresponsive records",
+        "unit": "proportion",
+        "formula": "qualified_reachable_accounts / sampled_unique_candidate_accounts; undefined if denominator=0"
+      },
+      "positive_signal": "A bounded, transparent segment demonstrates favorable reachability under a documented sample design; no extrapolation without supported weighting.",
+      "negative_signal": "Unavailable data rights, dominant incumbent lock-in, low reachable fraction or uneconomic analyst costs.",
+      "independent_reviewer": "Sampling analyst audits frame provenance, inclusion/exclusion ledger, nonresponse and any permitted weighting assumptions.",
+      "required_evidence": [
+        "Licensed account frame and frame construction metadata",
+        "Shipper-level LTL usage confirmation under permitted methods",
+        "Documented data-access and buyer authority",
+        "Operating-cost assumptions and nonresponse table"
+      ],
+      "confounders": [
+        "Convenience-sample response bias",
+        "BTS commodity value mistaken for audit revenue",
+        "Firm versus establishment duplicates",
+        "Shippers using parcel or truckload rather than LTL"
+      ],
+      "missingness_policy": "Nonresponders remain in reported frame denominator; publish no population precision from a convenience sample.",
+      "stop_rule": "Stop at privacy/contract limits, unlicensed list acquisition or use of freight value as recovery revenue.",
+      "next_internal_step": "Specify candidate verticals and a deduplicated blank frame schema, with no speculative TAM dollar calculation.",
+      "source_data_mode": "DESIGN_ONLY_NO_CUSTOMER_DATA",
+      "preregistration_approved": false,
+      "threshold_approved": false,
+      "decision_threshold": null,
+      "sample_size_approved": false,
+      "sample_size_target": null,
+      "protocol_execution_status": "NOT_RUN",
+      "observed_sample_count": 0,
+      "independently_verified_outcomes": 0,
+      "published_performance_claim": false,
+      "contact_or_carrier_action_authorized": false,
+      "financial_action_authorized": false
+    },
+    {
+      "experiment_id": "M7-05",
+      "decision_id": "M4-05",
+      "dependent_claim_ids": [
+        "campaign.competitor.loop",
+        "gap.ingestion_extraction",
+        "gap.enterprise_integrations"
+      ],
+      "name": "Independent capability and negative-control comparison",
+      "study_type": "COMMON_FIXTURE_COMPARISON",
+      "unit_of_analysis": "Rights-cleared test case including source documents, target answers and expected evidence trail",
+      "population_frame": "Public/licensed synthetic freight invoices and negative controls covering missing terms, duplicates, bad OCR, ambiguous carriers and unsupported source.",
+      "sample_selection": "Predeclare complexity strata and include easy, difficult, tampered and ambiguous examples; avoid cherry-picking demos.",
+      "comparison_group": "Same frozen fixture labels and adjudication rubric across RETALLY and only legitimately accessible comparison systems; unavailable rivals are NOT marked failures.",
+      "primary_metric": {
+        "name": "Fully supported correct resolution rate",
+        "numerator": "Fixtures receiving independently confirmed correct resolution with traceable cited source and correct abstention when necessary",
+        "denominator": "All eligible fixtures assigned to each actually tested system, with abstentions and errors accounted for",
+        "unit": "proportion",
+        "formula": "correct_evidence_bound_resolutions / eligible_tested_fixtures; undefined if denominator=0"
+      },
+      "positive_signal": "Preregistered accuracy and traceability conditions met without material security failures; no competitor advantage inferred when rival access missing.",
+      "negative_signal": "Fabricated authority, wrong invoice associations, false positives or unsupported claims of rival inferiority.",
+      "independent_reviewer": "Blind evaluator inspects sealed expected labels and records disagreement, missing vendor access, and licensing constraints.",
+      "required_evidence": [
+        "Fixture provenance/redistribution rights",
+        "Sealed independent labels and exceptions rubric",
+        "System version, run identity and complete output traces",
+        "Capability access authorization for each compared system"
+      ],
+      "confounders": [
+        "Differing permissions and integration access",
+        "Unequal fixture preprocessing",
+        "Synthetic distribution unlike real-world invoices"
+      ],
+      "missingness_policy": "Missing competitor execution is NOT_TESTED, never score zero or not-supported.",
+      "stop_rule": "Never reverse engineer protected code, use private competitor data, scrape gated services or test without authorization.",
+      "next_internal_step": "Prepare common rights-cleared synthetic test manifest with adversarial negative controls.",
+      "source_data_mode": "DESIGN_ONLY_NO_CUSTOMER_DATA",
+      "preregistration_approved": false,
+      "threshold_approved": false,
+      "decision_threshold": null,
+      "sample_size_approved": false,
+      "sample_size_target": null,
+      "protocol_execution_status": "NOT_RUN",
+      "observed_sample_count": 0,
+      "independently_verified_outcomes": 0,
+      "published_performance_claim": false,
+      "contact_or_carrier_action_authorized": false,
+      "financial_action_authorized": false
+    },
+    {
+      "experiment_id": "M7-06",
+      "decision_id": "M4-06",
+      "dependent_claim_ids": [
+        "campaign.economics.sec",
+        "campaign.economics.offer",
+        "campaign.strategy.market"
+      ],
+      "name": "Realized recovery and contribution economics",
+      "study_type": "RECONCILED_COHORT_ACCOUNTING",
+      "unit_of_analysis": "Distinct contractually eligible paid recovery episode with linked source invoice and cash chronology",
+      "population_frame": "All eligible claims initiated in a consented cohort with a predefined follow-up window; settled, failed, open and reversed outcomes must remain visible.",
+      "sample_selection": "Consecutive consented cases with controls for duplicate invoices, split payments and inherited pre-RETALLY claims.",
+      "comparison_group": "All zero-recovery, rejected, disputed, reversed and still-open cases retained for conversion and contribution reconciliation.",
+      "primary_metric": {
+        "name": "Realized net contribution per initiated eligible case",
+        "numerator": "Cash-collected permitted RETALLY fees less attributable labor, acquisition, processor costs, write-offs and reversals in the defined period",
+        "denominator": "All initiated eligible claim episodes including zero-fee outcomes and unfinished cases",
+        "unit": "USD_per_case",
+        "formula": "actual_net_fee_contribution_usd / all_eligible_initiated_claim_episodes; undefined if denominator=0"
+      },
+      "positive_signal": "Independently reconciled positive contribution for the full inception cohort, with cash/credit attribution and remaining liabilities included; not guaranteed future ROI.",
+      "negative_signal": "Credits mistaken for cash, double recovery attribution, negative labor-adjusted contribution or uncovered reversals.",
+      "independent_reviewer": "Independent accountant reconstructs bank/credit traces and signed engagement terms from source systems without relying on RETALLY summaries.",
+      "required_evidence": [
+        "Signed fee basis and authority",
+        "Original invoices, net credits/refunds and carrier settlements",
+        "Dated bank cash receipts and reversal chains",
+        "Complete labor, processing and acquisition cost ledger"
+      ],
+      "confounders": [
+        "Recovery recognized before realized",
+        "Carrier credit after engagement but unrelated to RETALLY",
+        "Selection of only successful claims",
+        "Long tail of pending disputes/reversals"
+      ],
+      "missingness_policy": "Open claims, uncollected credits and unknown costs are separately disclosed; never impute them to cash collected.",
+      "stop_rule": "Stop on missing signed customer authority, bank proof mismatch, fee-eligibility uncertainty or double-attribution risk.",
+      "next_internal_step": "Define a blank audit-ready cash-event schema and test synthetic reversal math before any real-data handling.",
+      "source_data_mode": "DESIGN_ONLY_NO_CUSTOMER_DATA",
+      "preregistration_approved": false,
+      "threshold_approved": false,
+      "decision_threshold": null,
+      "sample_size_approved": false,
+      "sample_size_target": null,
+      "protocol_execution_status": "NOT_RUN",
+      "observed_sample_count": 0,
+      "independently_verified_outcomes": 0,
+      "published_performance_claim": false,
+      "contact_or_carrier_action_authorized": false,
+      "financial_action_authorized": false
+    }
+  ]
+}

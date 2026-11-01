@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "scope": "SHORT_PUBLIC_SOURCE_EXCERPTS_RESEARCH_ONLY",
+  "recorded_at": "2026-10-10",
+  "source_annotation": "Brief publicly visible excerpts recorded during direct page reviews or explicitly marked search-only; never independent legal, financial, customer or vendor certification.",
+  "anchors": [
+    {
+      "id": "source.bts.cfs.volume",
+      "source_id": "20261010.bts.cfs.2022",
+      "url": "https://www.bts.gov/newsroom/commodity-flow-survey-2022-data-released",
+      "quote": "The 2022 CFS measured nearly 12.2 billion tons of goods valued at $18.0 trillion",
+      "quote_sha256": "d38d86d322745d855e47592e0be0080ef1f16753014df5a58da69464402e296b",
+      "claim_ids": [
+        "campaign.market.cfs"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "DIRECT_SCOPE",
+      "observed_at": "2026-10-10",
+      "limitation": "Survey covered shipment value, not freight audit spend, carrier invoices, or recoverable freight overcharges.",
+      "literal_markers": [
+        "12.2",
+        "$18.0"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.bts.cfs.buyers",
+      "source_id": "20261010.bts.cfs.2022",
+      "url": "https://www.bts.gov/newsroom/commodity-flow-survey-2022-data-released",
+      "quote": "surveys approximately 165,000 establishments from the industries of mining, manufacturing, wholesale trade",
+      "quote_sha256": "458a9e7f6aeb115a240f7437e53e1df70db9fadfde6a338d141d27d6cf352156",
+      "claim_ids": [
+        "campaign.buyer.coverage"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "Industry sampling frame does not establish willingness to buy RETALLY or customer authorization.",
+      "literal_markers": [
+        "165,000"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.bts.faf.segmentation",
+      "source_id": "20261010.bts.faf6.2026",
+      "url": "https://www.bts.gov/faf",
+      "quote": "FAF 6 is the new benchmark of estimated U.S. commodity flows based on 2022 data.",
+      "quote_sha256": "f8a1a1ceab5d3ab95ba7d233c4673c292772ac6c00a6f5d540a82f68d45f42f7",
+      "claim_ids": [
+        "campaign.market.faf",
+        "campaign.strategy.market"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "Freight-flow estimates do not quantify invoice errors, rate savings, eligible claims or realizable margins.",
+      "literal_markers": [
+        "2022"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.recoveraudit.offer",
+      "source_id": "20261010.recoveraudit.pricing",
+      "url": "https://recover-audit.com/pricing",
+      "quote": "20% of what we recover. Nothing else.",
+      "quote_sha256": "e4e14b413ab907998176689c058fee3b2c4fc91abfad166c5211dbe5635e8144",
+      "claim_ids": [
+        "campaign.competitor.price",
+        "campaign.opposition.comparator",
+        "campaign.economics.offer"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "Public vendor price alone omits signed exclusions, commercial exceptions, performance, and a buyer's preferences.",
+      "literal_markers": [
+        "20%"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.retally.current.offer",
+      "source_id": "20261010.retally.offer",
+      "url": "https://www.retallyrecovery.com/",
+      "quote": "Rate confirmed before engagement of eligible funds actually recovered",
+      "quote_sha256": "6b0453d6c640b648b9547735a5b282b6f805d1bab817b6497d35b2b24e62a8d5",
+      "claim_ids": [
+        "campaign.opposition.own"
+      ],
+      "method": "SEARCH_RESULT_ONLY",
+      "support_scope": "UNVERIFIED_SNIPPET",
+      "observed_at": "2026-10-10",
+      "limitation": "Search-index text is not an independently fetched current page or signed customer commercial rate.",
+      "literal_markers": [],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.nmfta.future.2026",
+      "source_id": "20261010.nmfta.timeline.2026",
+      "url": "https://help.nmfta.org/hc/en-us/articles/45360764355739-Upcoming-Key-Dates-for-the-NMFC-Data-Updates",
+      "quote": "December 12, 2026 | Supplement 2026-2 Effective Date",
+      "quote_sha256": "734765968c18814fbfe117205475a51ac9ede773e3320cdf96c17e78e13d8e54",
+      "claim_ids": [
+        "campaign.carrier.timeline",
+        "campaign.strategy.classification"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "DIRECT_SCOPE",
+      "observed_at": "2026-10-10",
+      "limitation": "This is a scheduled future effective date; check the actual supplement, effective tariff and shipment date before applying.",
+      "literal_markers": [
+        "December 12, 2026"
+      ],
+      "effective_on": "2026-12-12",
+      "represents_current_rule": false,
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.nmfta.rule640.proposal",
+      "source_id": "20261010.nmfta.bulletin.2026",
+      "url": "https://nmfta.org/news/2026-2-disposition-bulletin-density-nmfc-insights/",
+      "quote": "The rewrite did not pass, but we are closer than we have ever been.",
+      "quote_sha256": "d9af6d1cb87416cd6b03aa80a6270374dbc9f271b1ee7e5d0c4035198ea89169",
+      "claim_ids": [
+        "campaign.carrier.bulletin"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "The surrounding page discusses proposed Rule 640; no new Rule 640 rewrite can be presumed adopted.",
+      "literal_markers": [],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.usc.13710.window",
+      "source_id": "20261010.uscode.13710",
+      "url": "https://usc-cdn.house.gov/view.xhtml?edition=prelim&num=0&req=granuleid%3AUSC-prelim-title49-section13710",
+      "quote": "A shipper must contest the original bill or subsequent bill within 180 days of receipt of the bill",
+      "quote_sha256": "b8fdd37260f8050f87d72a0a4f7dba22685af2d9c93c2a7e09b3efde1ed6f09d",
+      "claim_ids": [
+        "campaign.carrier.billcontest"
+      ],
+      "method": "SEARCH_RESULT_ONLY",
+      "support_scope": "UNVERIFIED_SNIPPET",
+      "observed_at": "2026-10-10",
+      "limitation": "The retrieved search result cannot resolve applicability, contract waiver, agency jurisdiction or other limitations.",
+      "literal_markers": [
+        "180 days"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.govinfo.3788.historical",
+      "source_id": "20261010.govinfo.3788",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2018-04-16/html/2018-07749.htm",
+      "quote": "The processing carrier shall pay, decline to pay, or settle each written claim within 60 days",
+      "quote_sha256": "81a29817976347b4c0c5a1720bd88203d84c14fe4466e895ebd5238b96c0d7d2",
+      "claim_ids": [
+        "campaign.carrier.response"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "HISTORICAL_TEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "Source is a 2018 publication. Applicable current codification and specific carrier contract still need verification.",
+      "literal_markers": [
+        "60 days"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.ecfr.3788.current",
+      "source_id": "20261010.ecfr.current.3788",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-378/section-378.8",
+      "quote": "The processing carrier shall pay, decline to pay, or settle each written claim within 60 days",
+      "quote_sha256": "81a29817976347b4c0c5a1720bd88203d84c14fe4466e895ebd5238b96c0d7d2",
+      "claim_ids": [
+        "campaign.carrier.response"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "DIRECT_SCOPE",
+      "observed_at": "2026-10-10",
+      "codification_as_of": "2026-10-01",
+      "regulatory_applicability_established": false,
+      "limitation": "Current eCFR text is observed as of October 1, 2026, but claim scope, contract terms, written extensions and client-specific legal applicability still require independent review.",
+      "literal_markers": [
+        "60 days"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.estes.contract.exception",
+      "source_id": "20261010.estes.tariff",
+      "url": "https://www.estes-express.com/resources/fees-and-surcharges/rules-tariff",
+      "quote": "Exceptions to these charges will be noted in your specific pricing agreement or contract.",
+      "quote_sha256": "e1bcef31f2f42d591b38627320867a8062b69387019bc36908a6925d1d513233",
+      "claim_ids": [
+        "campaign.carrier.contract"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "DIRECT_SCOPE",
+      "observed_at": "2026-10-10",
+      "limitation": "Carrier public summary is not the actual customer's executed commercial authority or shipment-date rules.",
+      "literal_markers": [],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.x12.210.definition",
+      "source_id": "20261010.x12.210",
+      "url": "https://x12.org/node/4210",
+      "quote": "Motor Carrier Freight Details and Invoice Transaction Set (210)",
+      "quote_sha256": "4e41de20c91fafbffb9ab44510ba31bc0f8f40acc155b984927bff4b04899d97",
+      "claim_ids": [
+        "campaign.technology.edi"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "Naming a standard does not license all transaction-set material or prove any specific parser implementation.",
+      "literal_markers": [
+        "210"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.cass.issuer.scale",
+      "source_id": "20261010.cass.sec.2026",
+      "url": "https://www.sec.gov/Archives/edgar/data/708781/000070878126000020/investorpresentation2026.htm",
+      "quote": "$37 billion Freight $24 billion Facilities $33 billion FinTech/Banking $94 billion 34 million freight",
+      "quote_sha256": "d4dd11b1ab5b0ff3573f931f0ccbda9aaec985062240b4c37eb60abbdf94561e",
+      "claim_ids": [
+        "campaign.economics.sec"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "Issuer presentation volume is marketing/issuer disclosure, not an independent measure of contingency fee revenue.",
+      "literal_markers": [
+        "$37 billion",
+        "34 million"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    },
+    {
+      "id": "source.loop.benchmark.claim",
+      "source_id": "20261010.loop.auditbench",
+      "url": "https://www.loop.com/article/introducing-the-long-horizon-auditbench-for-supply-chain-ai",
+      "quote": "Loop correctly audits 94.8% of our basic freight invoices (the Production Dataset), and it correctly audits 65% of our invoices",
+      "quote_sha256": "e4411daa7f052db506b9e2c88c91ccdf5ad889fcbe9dfe7946c181bb16a3b987",
+      "claim_ids": [
+        "campaign.competitor.loop",
+        "campaign.technology.benchmark"
+      ],
+      "method": "PUBLIC_WEB_VIEW",
+      "support_scope": "LIMITED_CONTEXT",
+      "observed_at": "2026-10-10",
+      "limitation": "These are vendor-published results on its own benchmark sets, not independently replicated real-world competitor accuracy.",
+      "literal_markers": [
+        "94.8%",
+        "65%"
+      ],
+      "verified_external_fact": false,
+      "customer_action_authorized": false
+    }
+  ]
+}

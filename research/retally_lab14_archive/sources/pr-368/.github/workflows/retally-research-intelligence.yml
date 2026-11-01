@@ -1,0 +1,156 @@
+name: RETALLY Research Intelligence (Existing Lab 14)
+on:
+  pull_request:
+    paths:
+      - 'freight/research_intelligence.py'
+      - 'freight/test_research_intelligence.py'
+      - 'freight/research_public_campaign.py'
+      - 'freight/test_research_public_campaign.py'
+      - 'freight/research_source_acquisition.py'
+      - 'freight/test_research_source_acquisition.py'
+      - 'freight/research_evidence_gate.py'
+      - 'freight/test_research_evidence_gate.py'
+      - 'freight/research_change_impact.py'
+      - 'freight/test_research_change_impact.py'
+      - 'freight/RESEARCH_SOURCE_CHANGE_RADAR.md'
+      - 'freight/research_validation_protocols.py'
+      - 'freight/test_research_validation_protocols.py'
+      - 'freight/research/VALIDATION_PROTOCOLS_20261010.json'
+      - 'freight/RESEARCH_VALIDATION_PROTOCOLS.md'
+      - 'freight/research/SOURCE_ANCHORS_20261010.json'
+      - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
+      - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
+      - 'freight/RESEARCH_SOURCE_ACQUISITION.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/RESEARCH_INTELLIGENCE_LAB.md'
+      - 'freight/PHASE3_COMPETITOR_EVIDENCE_2026-10-07.json'
+      - 'freight/PHASE3_COMPETITIVE_MATRIX_2026-10-07.json'
+      - '.github/workflows/retally-research-intelligence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install pinned existing lab test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Verify evidence integrity and adversarial cases
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_research_change_impact.py freight/test_research_validation_protocols.py freight/test_lab_phase4_director.py
+      - name: Generate read-only research intelligence output
+        run: |
+          PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'research_intelligence.json').read_text())
+          assert r['status']=='RESEARCH_ONLY_NO_AUTONOMOUS_FETCH'
+          assert len(r['lanes'])==8
+          assert all(x['sourced_observations']>0 for x in r['lanes'])
+          assert 'retally:pricing:clarity' in r['contested_issues']
+          assert r['source_register_count']>=13
+          assert r['opposition_findings']>=5
+          assert r['no_independent_truth_certification'] is True
+          assert r['customer_claims_or_payment_execution'] is False
+          assert all(x['can_publish_as_verified'] is False for x in r['prioritized_findings'])
+          assert 'No automated searches performed' in (p/'research.html').read_text()
+          assert len(r['receipt_sha256'])==64
+          print('Eight sourced research lanes; unresolved pricing opposition; NO live fetch or production actions')
+          PY
+      - name: Generate independently bounded source-fidelity and opposition review artifacts
+        run: |
+          PYTHONPATH=. python -m freight.research_evidence_gate --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          proof=json.loads((p/'evidence_fidelity.json').read_text())
+          d=json.loads((p/'opposition_decisions.json').read_text())
+          assert proof['scope']=='RESEARCH_ONLY_NO_VERIFICATION_PROMOTION'
+          assert proof['anchor_count']==14
+          assert proof['anchored_claim_count']>=18
+          assert len(d['decisions'])==6
+          assert d['zero_automated_corporate_actions'] is True
+          assert all(row['public_marketing_permitted'] is False
+                     for row in proof['assessments'])
+          assert all(row['external_actions_allowed'] is False
+                     for row in d['decisions'])
+          assert any(a['review_status']=='CURRENT_ECFR_TEXT_OBSERVED_LEGAL_REVIEW_PENDING'
+                     and a['client_specific_legal_applicability_established'] is False
+                     for a in proof['assessments'])
+          assert len(proof['receipt_sha256'])==64
+          assert len(d['receipt_sha256'])==64
+          html=(p/'opposition.html').read_text()
+          assert 'What could prove us wrong?' in html
+          print('All quote receipts and oppositional choices are internal research only.')
+          PY
+      - name: Build dated source change and freshness research queue without network
+        run: |
+          PYTHONPATH=. python -m freight.research_change_impact --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          q=json.loads((p/'research_refresh_queue.json').read_text())
+          assert q['scope']=='READ_ONLY_MANUAL_REFRESH_BACKLOG'
+          assert q['source_count']>=12
+          assert q['automatic_fetch_or_schedule'] is False
+          assert q['external_actions_allowed'] is False
+          assert q['any_sources_independently_fact_checked'] is False
+          assert all(r['review_required_before_external_use'] for r in q['review_queue'])
+          assert all(r['independently_verified'] is False for r in q['review_queue'])
+          assert len(q['receipt_sha256'])==64
+          assert 'Source Change Radar' in (p/'research_refresh.html').read_text()
+          print('Source refresh work queue generated. No live capture, scheduler, or verification promotion.')
+          PY
+      - name: Produce blocked, source-bound falsifiable validation study designs
+        run: |
+          PYTHONPATH=. python -m freight.research_validation_protocols --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          r=json.loads((p/'validation_protocols.json').read_text())
+          assert r['scope']=='LAB14_INTERNAL_STUDY_DESIGN_REVIEW_ONLY'
+          assert r['existing_lab_number']==14 and r['new_lab_created'] is False
+          assert r['protocol_count']==6
+          assert r['external_studies_executed']==0
+          assert r['observed_customer_outcomes']==0
+          assert r['approved_preregistrations']==0
+          assert r['external_actions_allowed'] is False
+          assert r['public_performance_claims_allowed'] is False
+          assert all(x['status']=='DESIGN_REVIEW_REQUIRED_NOT_EXECUTED'
+                     and x['actual_sample_count']==0
+                     and x['can_publish_customer_results'] is False
+                     for x in r['protocols'])
+          assert len(r['receipt_sha256'])==64
+          assert 'Zero independent customer outcomes' in (p/'validation_protocols.html').read_text()
+          print('Six research protocols, zero executed studies, no external operations.')
+          PY
+      - name: Preserve evidence reports for independent review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-existing-lab14-intelligence-review
+          path: |
+            /tmp/retally-research-intelligence/research.html
+            /tmp/retally-research-intelligence/research_intelligence.json
+            /tmp/retally-research-intelligence/evidence_fidelity.json
+            /tmp/retally-research-intelligence/opposition_decisions.json
+            /tmp/retally-research-intelligence/opposition.html
+            /tmp/retally-research-intelligence/research_refresh_queue.json
+            /tmp/retally-research-intelligence/research_refresh.html
+            /tmp/retally-research-intelligence/validation_protocols.json
+            /tmp/retally-research-intelligence/validation_protocols.html
+          if-no-files-found: error
+          retention-days: 14
