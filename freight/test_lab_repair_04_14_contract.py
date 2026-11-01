@@ -1,8 +1,5 @@
 """Safeguards against upgrading a narrow offline patch into an unearned PASS."""
-import copy
 import hashlib
-import json
-from pathlib import Path
 
 import pytest
 
