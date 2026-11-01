@@ -311,7 +311,7 @@ def validate_recoveryos_legacy_redirect(path: Path) -> dict:
     expected=(
         '<meta name="robots" content="noindex,follow">',
         f'<link rel="canonical" href="{target}">',
-        f'href="{target}"',
+        f'<a class="button button-signal" href="{target}">',
         '<h1>RETALLY RecoveryWorks</h1>',
         'This page has moved',
     )
