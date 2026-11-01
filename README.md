@@ -17,6 +17,10 @@ The current commercial launch is **RETALLY**, a $0-upfront freight-audit and rec
 - Freight audit companies buyer guide: https://www.retallyrecovery.com/freight-audit-companies
 - Downloadable provider evaluation scorecard: https://www.retallyrecovery.com/freight-audit-provider-scorecard.csv
 - Trust Center: https://www.retallyrecovery.com/trust
+- **Free LTL reweigh measurement comparator:** https://www.retallyrecovery.com/ltl-reweigh-evidence-comparator (browser-only measurements; not a freight-class or refund decision)
+- **Credit-and-rebill reconciliation guide:** https://www.retallyrecovery.com/freight-credit-rebill-audit
+- **Blank freight evidence ledger:** https://www.retallyrecovery.com/freight-recovery-evidence-ledger.csv (download and complete privately)
+- **Free advisor sharing kit:** https://www.retallyrecovery.com/referral-partners (opt-in; no referral-fee promise)
 
 The public marketing surface is intentionally separated from confidential customer-data processing. Do not send freight records, credentials, contracts, or payment data through ordinary email.
 

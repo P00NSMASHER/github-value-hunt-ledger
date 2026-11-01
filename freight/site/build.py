@@ -433,7 +433,8 @@ def build(
     for name, content in text_bundle.items():
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        # write_bytes prevents platform-dependent newline translation on Windows.
+        target.write_bytes(content.encode("utf-8"))
     for name, content in binary_bundle.items():
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)

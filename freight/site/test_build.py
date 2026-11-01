@@ -225,6 +225,20 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn('localStorage', helper)
             self.assertTrue((output / "v16-evidence-preflight.css").is_file())
 
+    def test_public_browser_js_byte_fidelity_is_platform_independent(self):
+        """The builder must not convert LF into CRLF on Windows."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for name in ("site.js", "worksheet.js", "v16-evidence-preflight.js",
+                         "ltl-evidence-comparator.js", "commercial-config.js"):
+                with self.subTest(asset=name):
+                    expected = (output / name).read_text(encoding="utf-8").encode("utf-8")
+                    self.assertEqual((output / name).read_bytes(), expected,
+                                     "Browser source bytes must remain identical to encoded text")
+            for name in ("site.js", "worksheet.js", "v16-evidence-preflight.js"):
+                self.assertEqual((output / name).read_bytes(),
+                                 (builder.SOURCE / name).read_text(encoding="utf-8").encode("utf-8"))
+
     def test_output_contains_only_allowlisted_public_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
