@@ -32,7 +32,7 @@ def run(args: list[str], *, timeout: int) -> dict:
         raise SystemExit("ERROR: synthetic test produced unexpected non-JSON output")
 
 
-def smoke_http(workspace: Path) -> None:
+def smoke_http(workspace: Path) -> dict:
     cmd = [sys.executable, "-m", "recoveryworks.workbench_server",
            "--workspace", str(workspace), "--port", "18765"]
     proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -67,6 +67,49 @@ def smoke_http(workspace: Path) -> None:
         response.read()
         connection.close()
         assert response.status == 403
+
+        # The prior checks proved unauthorized requests fail closed. Exercise
+        # the actual private four-role API repeatedly under the micro CPU cap.
+        roles = json.loads((workspace / "credentials.json").read_text(encoding="utf-8"))
+        assert set(roles) == {"customer", "reviewer", "independent", "operator"}
+        samples = []
+        for iteration in range(24):
+            for role, token in roles.items():
+                t0 = time.monotonic()
+                conn = http.client.HTTPConnection("127.0.0.1", 18765, timeout=12)
+                try:
+                    conn.request("GET", "/api/state",
+                                 headers={"Authorization": "Bearer " + token})
+                    result = conn.getresponse()
+                    raw = result.read()
+                    assert result.status == 200, (role, result.status)
+                    assert result.getheader("Cache-Control") == "no-store"
+                    state = json.loads(raw)
+                    assert state["simulation"] is True
+                    assert state["actor"]["role"] == role
+                    assert len(state["cases"]) == 7
+                    samples.append(time.monotonic() - t0)
+                finally:
+                    conn.close()
+            # Do not permit accidental CORS or authentication regression.
+            if iteration % 6 == 0:
+                conn = http.client.HTTPConnection("127.0.0.1", 18765, timeout=12)
+                try:
+                    conn.request("GET", "/api/state", headers={
+                        "Origin": "https://unauthorized.invalid",
+                        "Authorization": "Bearer " + roles["customer"]})
+                    response = conn.getresponse()
+                    response.read()
+                    assert response.status == 403
+                finally:
+                    conn.close()
+        ordered = sorted(samples)
+        return {
+            "authenticated_requests": len(samples),
+            "roles_verified": len(roles),
+            "request_p95_milliseconds": round(ordered[int((len(ordered)-1)*.95)]*1000, 1),
+            "request_max_milliseconds": round(max(samples)*1000, 1),
+        }
     finally:
         proc.terminate()
         try:
@@ -99,7 +142,7 @@ def main() -> int:
         assert health["healthy"] is True
         assert health["simulation"] is True
         assert health["production_certified"] is False
-        smoke_http(workspace)
+        role_checks = smoke_http(workspace)
         elapsed = time.monotonic() - started
         # Unix ru_maxrss is kilobytes on Linux; children were run sequentially.
         maximum_child_kib = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
@@ -110,6 +153,7 @@ def main() -> int:
             "memory_limit_mib": 768, "cpu_quota": 0.125,
             "measured_peak_child_rss_mib": round(maximum_child_kib / 1024, 1),
             "elapsed_seconds": round(elapsed, 1),
+            "private_role_api": role_checks,
             "real_customers": 0, "external_actions": 0,
             "production_certified": False, "off_device_backup_verified": False,
         }
