@@ -1,0 +1,649 @@
+{
+  "schema_version": 1,
+  "batch": 4,
+  "authority": "ARCHIVE_ONLY_DO_NOT_RELEASE_OR_EXECUTE",
+  "source_prs": [
+    425,
+    426,
+    427,
+    428,
+    430,
+    431,
+    432,
+    433,
+    434,
+    435
+  ],
+  "records": [
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": ".github/workflows/retally-economic-denominator-m34.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/.github/workflows/retally-economic-denominator-m34.yml",
+      "git_blob_sha": "fd19d47c078008bcae2bc11120d55b7399c4f58d",
+      "status": "added"
+    },
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": "freight/RESEARCH_ECONOMIC_DENOMINATOR_M34.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/freight/RESEARCH_ECONOMIC_DENOMINATOR_M34.md",
+      "git_blob_sha": "be6720162104264464763b0a3225da2d86b33250",
+      "status": "added"
+    },
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "b7dc97c730a2d2defbe1a7b10cb5a1a796fe1d67",
+      "status": "modified"
+    },
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/freight/lab_phase4_director.py",
+      "git_blob_sha": "03935b4a7cc7e7c56ecc3cfbeeae953676225511",
+      "status": "modified"
+    },
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": "freight/research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/freight/research/TRUCKING_MEASURE_DENOMINATOR_M34_20261012.json",
+      "git_blob_sha": "1745511aaf5b95b9ad61824ae46f4596c705fdf0",
+      "status": "added"
+    },
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": "freight/research_economic_denominator_m34.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/freight/research_economic_denominator_m34.py",
+      "git_blob_sha": "fd5fb4287497f00580e222b0cb588a9882fc777c",
+      "status": "added"
+    },
+    {
+      "pr": 425,
+      "pr_head": "53050bf1b945c428b7e3f12503e7373065d1b060",
+      "pr_base": "research/retally-bea-publisher-origin-m33-20261012",
+      "original_path": "freight/test_research_economic_denominator_m34.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-425/freight/test_research_economic_denominator_m34.py",
+      "git_blob_sha": "7d80b17410c66f761a188471729b0de02f3cf6bf",
+      "status": "added"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": ".github/workflows/retally-claim-clearance-m35.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/.github/workflows/retally-claim-clearance-m35.yml",
+      "git_blob_sha": "119dd8c55bd966ed13cc5995d08137d24640212a",
+      "status": "added"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": "freight/RESEARCH_CLAIM_CLEARANCE_M35.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/freight/RESEARCH_CLAIM_CLEARANCE_M35.md",
+      "git_blob_sha": "83550472dd7c28462cfd8187e31278e17511533b",
+      "status": "added"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "9777cb6d38ec83d0673857607e34bed735caa6a4",
+      "status": "modified"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/freight/lab_phase4_director.py",
+      "git_blob_sha": "d509cb96a9505991f299bcaa3a808b031382d821",
+      "status": "modified"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": "freight/research/CLAIM_CLEARANCE_M35_20261012.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/freight/research/CLAIM_CLEARANCE_M35_20261012.json",
+      "git_blob_sha": "752ae34f4bc2b6e1baa329b8955efd35dd826f38",
+      "status": "added"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": "freight/research_claim_clearance_m35.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/freight/research_claim_clearance_m35.py",
+      "git_blob_sha": "169dec97411f704ab8246c8ff84e0a4b24fbae15",
+      "status": "added"
+    },
+    {
+      "pr": 426,
+      "pr_head": "89a7898acda19bb42504cc6ac5f4730e867dc589",
+      "pr_base": "research/retally-trucking-measure-denominator-m34-20261012",
+      "original_path": "freight/test_research_claim_clearance_m35.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-426/freight/test_research_claim_clearance_m35.py",
+      "git_blob_sha": "b2e2e04f9cb0c39f6287e6428a9d5b0bc8e0ec9d",
+      "status": "added"
+    },
+    {
+      "pr": 427,
+      "pr_head": "4bab14cc7828eff5ff14a3f19d60e48eed89306d",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": ".github/workflows/freight-site-pages.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-427/.github/workflows/freight-site-pages.yml",
+      "git_blob_sha": "8d216adf3bb26f1c64f9f286cc3793905e0f180a",
+      "status": "modified"
+    },
+    {
+      "pr": 427,
+      "pr_head": "4bab14cc7828eff5ff14a3f19d60e48eed89306d",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": ".github/workflows/retally-site-claim-boundary-m36.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-427/.github/workflows/retally-site-claim-boundary-m36.yml",
+      "git_blob_sha": "089d3d882cc720d38d02ab7545d5a76b7ba19e31",
+      "status": "added"
+    },
+    {
+      "pr": 427,
+      "pr_head": "4bab14cc7828eff5ff14a3f19d60e48eed89306d",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/site/CLAIM_PUBLICATION_GATE_M36.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-427/freight/site/CLAIM_PUBLICATION_GATE_M36.md",
+      "git_blob_sha": "0acba8090201b06b08db3a0e044a1ccdf40d6190",
+      "status": "added"
+    },
+    {
+      "pr": 427,
+      "pr_head": "4bab14cc7828eff5ff14a3f19d60e48eed89306d",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/site/build.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-427/freight/site/build.py",
+      "git_blob_sha": "d77a7e2cbe56eb4a8b14a989cb6fbbfcdd136d88",
+      "status": "modified"
+    },
+    {
+      "pr": 427,
+      "pr_head": "4bab14cc7828eff5ff14a3f19d60e48eed89306d",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/site/public_claim_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-427/freight/site/public_claim_gate.py",
+      "git_blob_sha": "90db7424ef1771c4e60601cd2f2485810d1121fd",
+      "status": "added"
+    },
+    {
+      "pr": 427,
+      "pr_head": "4bab14cc7828eff5ff14a3f19d60e48eed89306d",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/site/test_public_claim_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-427/freight/site/test_public_claim_gate.py",
+      "git_blob_sha": "afa3ec4967f96e6bfa71528238bc7f2a090dae12",
+      "status": "added"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": ".github/workflows/freight-site-pages.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/.github/workflows/freight-site-pages.yml",
+      "git_blob_sha": "a3322ecde06819e9102d3218d91780e5f1ee393c",
+      "status": "modified"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": ".github/workflows/retally-public-copy-claim-gate-m36.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/.github/workflows/retally-public-copy-claim-gate-m36.yml",
+      "git_blob_sha": "2ee676eb0391345cc5e57e0ae03b262f9de92c8a",
+      "status": "added"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/PUBLIC_COPY_CLAIM_GATE_M36.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/freight/PUBLIC_COPY_CLAIM_GATE_M36.md",
+      "git_blob_sha": "79b14b9bf7bc0d3b28250680569b58b74dd0c74c",
+      "status": "added"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/public_claim_release_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/freight/public_claim_release_gate.py",
+      "git_blob_sha": "0e6f033b0be1a15ff84bbd92dbc9f6809d8db23d",
+      "status": "added"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/site/build.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/freight/site/build.py",
+      "git_blob_sha": "6d12a0378264ca9fc97b5a0020f8aad8fb0edac0",
+      "status": "modified"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/site/test_build.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/freight/site/test_build.py",
+      "git_blob_sha": "224b1c293da082c3d6f177ef32e920a8c4b36a33",
+      "status": "modified"
+    },
+    {
+      "pr": 428,
+      "pr_head": "abe9dde90103c78eacd68d5eda707b4009563410",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/test_public_claim_release_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-428/freight/test_public_claim_release_gate.py",
+      "git_blob_sha": "27449be9bf002157fa4b7f75a8e0c8ed6a3a9124",
+      "status": "added"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": ".github/workflows/freight-site-pages.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/.github/workflows/freight-site-pages.yml",
+      "git_blob_sha": "deb446574eeda3178c53219823a7a4951c505408",
+      "status": "modified"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": ".github/workflows/repository-release-gate.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/.github/workflows/repository-release-gate.yml",
+      "git_blob_sha": "c4e1a5d501dbaa9b58225a6983371a14b5662f40",
+      "status": "modified"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": "freight/site/README.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/freight/site/README.md",
+      "git_blob_sha": "dcf48e123a6db782d230fadeaed1c3462d128626",
+      "status": "modified"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": "freight/site/build.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/freight/site/build.py",
+      "git_blob_sha": "f0cc4b937b1db7c678824d0257ed299c443b7f57",
+      "status": "modified"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": "freight/site/cloudflare_build.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/freight/site/cloudflare_build.py",
+      "git_blob_sha": "fc4cea6ce09f932f0b9614a66fb64ea55a475718",
+      "status": "modified"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": "freight/site/public_claim_guard.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/freight/site/public_claim_guard.py",
+      "git_blob_sha": "c90f227e0921b4925522656ad54ff7944240a363",
+      "status": "added"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": "freight/site/test_public_claim_guard.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/freight/site/test_public_claim_guard.py",
+      "git_blob_sha": "337323dda23d41cfdf8f7d771a5f16d76d77344b",
+      "status": "added"
+    },
+    {
+      "pr": 430,
+      "pr_head": "421cf20f2c7d1adeb2672692287b2b385b1142a5",
+      "pr_base": "main",
+      "original_path": "recoveryworks/site/build.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-430/recoveryworks/site/build.py",
+      "git_blob_sha": "042c61434e7e3d99dfb45cde02a2d3f2d4547652",
+      "status": "modified"
+    },
+    {
+      "pr": 431,
+      "pr_head": "18356340e2ae37b317c3c4e80f29bcd63a7cbbda",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": ".github/workflows/retally-source-impact-m37.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-431/.github/workflows/retally-source-impact-m37.yml",
+      "git_blob_sha": "42579f08a55936dc6b943de50e30b0624a96097d",
+      "status": "added"
+    },
+    {
+      "pr": 431,
+      "pr_head": "18356340e2ae37b317c3c4e80f29bcd63a7cbbda",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/RESEARCH_SOURCE_IMPACT_M37.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-431/freight/RESEARCH_SOURCE_IMPACT_M37.md",
+      "git_blob_sha": "740d3bc8d55eefe0926f694680a2b84c99ef9ee4",
+      "status": "added"
+    },
+    {
+      "pr": 431,
+      "pr_head": "18356340e2ae37b317c3c4e80f29bcd63a7cbbda",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-431/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "f9b5e7c50aeeaaafcb1bd08d6e668a960ab4cc85",
+      "status": "modified"
+    },
+    {
+      "pr": 431,
+      "pr_head": "18356340e2ae37b317c3c4e80f29bcd63a7cbbda",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-431/freight/lab_phase4_director.py",
+      "git_blob_sha": "e3f009c845ca4fe232a716eca3f3a9c30553573e",
+      "status": "modified"
+    },
+    {
+      "pr": 431,
+      "pr_head": "18356340e2ae37b317c3c4e80f29bcd63a7cbbda",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/research_source_lineage_m37.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-431/freight/research_source_lineage_m37.py",
+      "git_blob_sha": "9141086d83b26ff7e0a4eb9355ecbc5e543418e9",
+      "status": "added"
+    },
+    {
+      "pr": 431,
+      "pr_head": "18356340e2ae37b317c3c4e80f29bcd63a7cbbda",
+      "pr_base": "research/retally-claim-clearance-m35-20261012",
+      "original_path": "freight/test_research_source_lineage_m37.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-431/freight/test_research_source_lineage_m37.py",
+      "git_blob_sha": "86fb3676a4eb03ea8d115d86ed706c9ca7fc6ad8",
+      "status": "added"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": ".github/workflows/retally-claim-quarantine-m38.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/.github/workflows/retally-claim-quarantine-m38.yml",
+      "git_blob_sha": "a4f62c8d7af3036c109cebc2cb06eae87bb36b15",
+      "status": "added"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/RESEARCH_CLAIM_QUARANTINE_M38.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/RESEARCH_CLAIM_QUARANTINE_M38.md",
+      "git_blob_sha": "e4edde1c039087e3ac60b9119af20dc2bc5c4f9f",
+      "status": "added"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "dddc2ddd2660c9765ce54573da925788017c589b",
+      "status": "modified"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/lab_phase4_director.py",
+      "git_blob_sha": "a562c10ee49e2f40ad5ae33169c641291a2f1398",
+      "status": "modified"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/research_claim_quarantine_m38.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/research_claim_quarantine_m38.py",
+      "git_blob_sha": "830c6965861049d4e7e622aeb8866d6c4e3915ce",
+      "status": "added"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/research_scenario_control_m38.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/research_scenario_control_m38.py",
+      "git_blob_sha": "b78ae56e9032bb20ae3cd6b0adafa430aba6a7b5",
+      "status": "added"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/research_source_lineage_m37.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/research_source_lineage_m37.py",
+      "git_blob_sha": "91d2d5f4b7bae486ebce26b9d2588c2680e0febd",
+      "status": "modified"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/test_research_claim_quarantine_m38.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/test_research_claim_quarantine_m38.py",
+      "git_blob_sha": "da690f7f69803f7f24f2225cc8dfe0ecda71bd7d",
+      "status": "added"
+    },
+    {
+      "pr": 432,
+      "pr_head": "af857962a7f70db1da5ae62eb067d90c9546cbf5",
+      "pr_base": "research/retally-source-impact-m37-20261012",
+      "original_path": "freight/test_research_scenario_control_m38.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-432/freight/test_research_scenario_control_m38.py",
+      "git_blob_sha": "fdcf09c6e76adc631d2ffe220c36c38d9d1b9e98",
+      "status": "added"
+    },
+    {
+      "pr": 433,
+      "pr_head": "ef48eabcd03ffaab29240a265b7eb707c490085e",
+      "pr_base": "research/retally-claim-quarantine-m38-20261013",
+      "original_path": ".github/workflows/retally-cross-lab-integrity-m39.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-433/.github/workflows/retally-cross-lab-integrity-m39.yml",
+      "git_blob_sha": "ceb1281e759cb22f6a40e2da1055a640adf4fad3",
+      "status": "added"
+    },
+    {
+      "pr": 433,
+      "pr_head": "ef48eabcd03ffaab29240a265b7eb707c490085e",
+      "pr_base": "research/retally-claim-quarantine-m38-20261013",
+      "original_path": "freight/RESEARCH_CROSS_LAB_ASSURANCE_M39.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-433/freight/RESEARCH_CROSS_LAB_ASSURANCE_M39.md",
+      "git_blob_sha": "d626809987be037fbedaa78c5e82807c45f08d7a",
+      "status": "added"
+    },
+    {
+      "pr": 433,
+      "pr_head": "ef48eabcd03ffaab29240a265b7eb707c490085e",
+      "pr_base": "research/retally-claim-quarantine-m38-20261013",
+      "original_path": "freight/lab_cross_lab_assurance_m39.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-433/freight/lab_cross_lab_assurance_m39.py",
+      "git_blob_sha": "2cee21f795e6f628718863306aaa92dd01816c4e",
+      "status": "added"
+    },
+    {
+      "pr": 433,
+      "pr_head": "ef48eabcd03ffaab29240a265b7eb707c490085e",
+      "pr_base": "research/retally-claim-quarantine-m38-20261013",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-433/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "33d87767a5ffacb3ddc5eb24f6e1f8b24db10d9d",
+      "status": "modified"
+    },
+    {
+      "pr": 433,
+      "pr_head": "ef48eabcd03ffaab29240a265b7eb707c490085e",
+      "pr_base": "research/retally-claim-quarantine-m38-20261013",
+      "original_path": "freight/lab_phase4_experiments.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-433/freight/lab_phase4_experiments.py",
+      "git_blob_sha": "ff9f5d22ed1deb5c32dfde536c1d82660a990d8a",
+      "status": "modified"
+    },
+    {
+      "pr": 433,
+      "pr_head": "ef48eabcd03ffaab29240a265b7eb707c490085e",
+      "pr_base": "research/retally-claim-quarantine-m38-20261013",
+      "original_path": "freight/test_lab_cross_lab_assurance_m39.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-433/freight/test_lab_cross_lab_assurance_m39.py",
+      "git_blob_sha": "f9e4dd2a03f4cb0782ab5f3b9eceba11819f1827",
+      "status": "added"
+    },
+    {
+      "pr": 434,
+      "pr_head": "8aa151baf46d9600a89a33ddbf3d75cca5a76218",
+      "pr_base": "research/retally-cross-lab-assurance-m39-20261013",
+      "original_path": ".github/workflows/retally-original-finding-ledger-m40.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-434/.github/workflows/retally-original-finding-ledger-m40.yml",
+      "git_blob_sha": "e20ef8f3a6797248425be85b5e1e68d4cf7c1551",
+      "status": "added"
+    },
+    {
+      "pr": 434,
+      "pr_head": "8aa151baf46d9600a89a33ddbf3d75cca5a76218",
+      "pr_base": "research/retally-cross-lab-assurance-m39-20261013",
+      "original_path": "freight/RESEARCH_HISTORICAL_FINDING_INTEGRITY_M40.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-434/freight/RESEARCH_HISTORICAL_FINDING_INTEGRITY_M40.md",
+      "git_blob_sha": "75bd35b88b9f387330fd188f1d2fa5fecc32d70d",
+      "status": "added"
+    },
+    {
+      "pr": 434,
+      "pr_head": "8aa151baf46d9600a89a33ddbf3d75cca5a76218",
+      "pr_base": "research/retally-cross-lab-assurance-m39-20261013",
+      "original_path": "freight/lab_experiment_ledger.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-434/freight/lab_experiment_ledger.py",
+      "git_blob_sha": "55e87c5e5337ca595770e03ff3185d40364d5fb2",
+      "status": "modified"
+    },
+    {
+      "pr": 434,
+      "pr_head": "8aa151baf46d9600a89a33ddbf3d75cca5a76218",
+      "pr_base": "research/retally-cross-lab-assurance-m39-20261013",
+      "original_path": "freight/lab_historical_disposition_m40.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-434/freight/lab_historical_disposition_m40.py",
+      "git_blob_sha": "e9e902e86a7b8c6a752f9eec1e73ec4da4c65bc4",
+      "status": "added"
+    },
+    {
+      "pr": 434,
+      "pr_head": "8aa151baf46d9600a89a33ddbf3d75cca5a76218",
+      "pr_base": "research/retally-cross-lab-assurance-m39-20261013",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-434/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "d3c82ed4d0af51293bd341b19b28072b0bc9c792",
+      "status": "modified"
+    },
+    {
+      "pr": 434,
+      "pr_head": "8aa151baf46d9600a89a33ddbf3d75cca5a76218",
+      "pr_base": "research/retally-cross-lab-assurance-m39-20261013",
+      "original_path": "freight/test_lab_historical_disposition_m40.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-434/freight/test_lab_historical_disposition_m40.py",
+      "git_blob_sha": "ecc1e4dfa5c14a433be447b4f2a2a6a4f5f81b8c",
+      "status": "added"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": ".github/workflows/retally-critical-counterexample-m41.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/.github/workflows/retally-critical-counterexample-m41.yml",
+      "git_blob_sha": "3075671313f36585aa5319355a212158d11b7f9f",
+      "status": "added"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/RESEARCH_CRITICAL_ANALOG_REPLAY_M41.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/RESEARCH_CRITICAL_ANALOG_REPLAY_M41.md",
+      "git_blob_sha": "f24016b73099b84dbd52434545e7773ace251fa6",
+      "status": "added"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/lab_critical_counterexample_replay_m41.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/lab_critical_counterexample_replay_m41.py",
+      "git_blob_sha": "1ebbd9379025d5848f5f3819428cce889d1627ab",
+      "status": "added"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/lab_cross_lab_assurance_m39.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/lab_cross_lab_assurance_m39.py",
+      "git_blob_sha": "29a1848764862c4fb2770122e69d1ada9846f2f8",
+      "status": "modified"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "7f2a909c85858fd28ad1330d9a2999077d1e2db0",
+      "status": "modified"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/lab_phase4_director.py",
+      "git_blob_sha": "d8d2b8debe0e81eb27d64ca0323b8857df8ffc6e",
+      "status": "modified"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/test_lab_critical_counterexample_replay_m41.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/test_lab_critical_counterexample_replay_m41.py",
+      "git_blob_sha": "3ed70d9f5d230430269ec8d1a727137deb4b2502",
+      "status": "added"
+    },
+    {
+      "pr": 435,
+      "pr_head": "9fe2a608096ffe9a010947386f5655ace4acd215",
+      "pr_base": "research/retally-experiment-ledger-integrity-m40-20261013",
+      "original_path": "freight/test_lab_cross_lab_assurance_m39.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-435/freight/test_lab_cross_lab_assurance_m39.py",
+      "git_blob_sha": "97b2a239404a4cedbd4c5145301e4227db9b086c",
+      "status": "modified"
+    }
+  ]
+}

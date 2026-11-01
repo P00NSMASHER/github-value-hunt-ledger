@@ -1,0 +1,69 @@
+name: RETALLY M36 Publication Claim Guard (Research Lab 14)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-site-claim-boundary-m36.yml'
+      - '.github/workflows/freight-site-pages.yml'
+      - 'freight/site/**'
+      - 'freight/brand/**'
+      - 'freight/research/CLAIM_CLEARANCE_M35_20261012.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-claim-guard-negative-testing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited website build test dependencies
+        run: python -m pip install -r production/requirements-ci.txt
+      - name: Test public claim false positives, forged outcomes, metadata and original site
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/site/test_public_claim_gate.py \
+            freight/site/test_build.py \
+            freight/test_synthetic_pilot_bundle.py \
+            freight/test_commercial_terms.py
+      - name: Verify exact rendered public copy without deploying it
+        env:
+          FREIGHT_CONTACT_EMAIL: sales@freightfixture.com
+          FREIGHT_CONTACT_VERIFIED: '1'
+          FREIGHT_CONTINGENCY_RECOVERY_RATE: '0.30'
+        run: |
+          PYTHONPATH=. python freight/site/build.py --output /tmp/retally-m36-public
+          PYTHONPATH=. python - <<'PY'
+          from pathlib import Path
+          from freight.site.build import TEXT_SOURCE_FILES
+          from freight.site.public_claim_gate import audit_public_bundle, POLICY_GIT_BLOB_SHA1
+          directory=Path("/tmp/retally-m36-public")
+          copy={name:(directory/name).read_text(encoding="utf-8")
+                for name in TEXT_SOURCE_FILES}
+          summary=audit_public_bundle(copy)
+          assert summary['source_registry']=='M35_PINNED_CLAIM_CLEARANCE'
+          assert summary['policy_git_blob_sha1']==POLICY_GIT_BLOB_SHA1
+          assert summary['registered_source_and_claim_cases']==16
+          assert summary['flagged_unsupported_claims']==0
+          assert summary['independent_real_customer_pilot_approvals_verified']==0
+          assert summary['independent_real_customer_pilot_requirements_unmet']==18
+          assert summary['legal_or_external_marketing_publication_approved'] is False
+          assert len(summary['scan_fingerprint_sha256'])==64
+          assert 'Not customer results.' in copy['index.html']
+          assert 'Fictional' in copy['recovery-status-example.html']
+          assert 'Fictional' in copy['freight-audit-example.html']
+          assert 'contingencyRecoveryRateLabel: "30%"' in copy['commercial-config.js']
+          assert 'Rate confirmed before engagement' in copy['index.html']
+          print('M36: original allowlisted publication boundary is clean for scoped false claims; 16 typed internal-source cases, 18 independent real pilot controls NOT satisfied, zero external legal/marketing approval.')
+          PY
+      - name: No scheduled checks, public claims promotion, deploy or customer data action
+        run: |
+          test ! -e /tmp/retally-m36-public/claim_clearance.json
+          test ! -e /tmp/retally-m36-public/research/CLAIM_CLEARANCE_M35_20261012.json
+          test ! -e /tmp/retally-m36-public/test_public_claim_gate.py
+          test ! -e /tmp/retally-m36-public/public_claim_gate.py
+          echo 'M36 boundary checked without deployment, customer data, production action or research-source leakage.'

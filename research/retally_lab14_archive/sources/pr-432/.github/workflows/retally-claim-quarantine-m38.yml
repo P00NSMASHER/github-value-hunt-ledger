@@ -1,0 +1,201 @@
+name: RETALLY Lab 14 Source-Claim Quarantine (Mission 38)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-claim-quarantine-m38.yml'
+      - 'freight/research_claim_quarantine_m38.py'
+      - 'freight/research_scenario_control_m38.py'
+      - 'freight/test_research_scenario_control_m38.py'
+      - 'freight/test_research_claim_quarantine_m38.py'
+      - 'freight/RESEARCH_CLAIM_QUARANTINE_M38.md'
+      - 'freight/research_source_lineage_m37.py'
+      - 'freight/research_claim_clearance_m35.py'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+      - 'freight/research/CLAIM_CLEARANCE_M35_20261012.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  source-claim-quarantine-and-frozen-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited research test dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Run inherited verified macroeconomic and new quarantine adversarial regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_claim_quarantine_m38.py \
+            freight/test_research_scenario_control_m38.py \
+            freight/test_research_source_lineage_m37.py \
+            freight/test_research_claim_clearance_m35.py \
+            freight/test_research_pilot_preflight.py \
+            freight/test_research_economic_denominator_m34.py \
+            freight/test_research_bea_original_m33.py \
+            freight/test_research_bls_sectoral_output_m31.py \
+            freight/test_research_unified_blspci.py \
+            freight/test_lab_phase4_director.py
+      - name: Generate real existing 14-lab report and source quarantine
+        run: |
+          PYTHONPATH=. python -m freight.research_claim_quarantine_m38 \
+            --as-of-date "$(date -u +%F)" --out /tmp/retally-m38
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m38-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('/tmp/retally-m38/claim_quarantine.json').read_text())
+          c=json.loads(Path('/tmp/retally-m38-control/phase4_control.json').read_text())
+          assert q['existing_lab_number']==14
+          assert q['qualified_historical_source_claims']==8
+          assert q['qualified_values_still_visible_for_internal_research_only']==8
+          assert q['qualified_values_withheld_pending_independent_replay']==0
+          assert q['prohibited_customer_market_claims_blocked']==8
+          assert q['independently_unverified_human_pilot_controls']==18
+          assert q['independent_original_publisher_replays_in_this_run']==0
+          assert q['external_claims_authorized']==0
+          assert len(q['claims'])==16
+          assert len(c['lab_runs'])==14 and c['failed_or_blocked_labs']==[]
+          assert c['research_claim_quarantine_m38']['receipt_sha256']==q['receipt_sha256']
+          assert 'claim_quarantine.html' in Path('/tmp/retally-m38-control/index.html').read_text()
+          assert c['actual_revenue_cents']==0
+          print('M38: 8 qualified prior internal values, 8 prohibited commercial inferences, 18 pilot controls unmet, 14 original labs.')
+          PY
+      - name: Independently run read-only Census hypothetical release quarantine
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import date
+          from pathlib import Path
+          from freight.research_source_lineage_m37 import candidate_template
+          p=Path('/tmp/retally-m38-census-candidate.json')
+          p.write_text(json.dumps(candidate_template(
+              as_of=date.today(),root='CENSUS',digest='0'*64)))
+          PY
+          PYTHONPATH=. python -m freight.research_claim_quarantine_m38 \
+            --as-of-date "$(date -u +%F)" \
+            --candidate /tmp/retally-m38-census-candidate.json \
+            --out /tmp/retally-m38-census-hypothetical
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('/tmp/retally-m38-census-hypothetical/claim_quarantine.json').read_text())
+          assert q['quarantined_claim_ids']==['M35-02','M35-03','M35-04','M35-07']
+          assert q['qualified_values_withheld_pending_independent_replay']==4
+          assert q['qualified_values_still_visible_for_internal_research_only']==4
+          assert q['independent_original_publisher_replays_in_this_run']==0
+          assert q['external_claims_authorized']==0
+          assert all(x['safe_internal_value'] is None for x in q['claims']
+                     if x['claim_id'] in q['quarantined_claim_ids'])
+          view=Path('/tmp/retally-m38-census-hypothetical/claim_quarantine.html').read_text()
+          for blocked in ['402827.246','142607.754','73.85','1.18']:
+              assert blocked not in view
+          print('M38 CENSUS what-if: exact four stale historical figures redacted; no source authentication or external authority.')
+          PY
+      - name: Independently verify the Control Center scenario cannot export old values
+        run: |
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --as-of-date "$(date -u +%F)" \
+            --candidate /tmp/retally-m38-census-candidate.json \
+            --out /tmp/retally-m38-control-census-scenario
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          folder=Path('/tmp/retally-m38-control-census-scenario')
+          expected={'phase4_control.json','index.html',
+                    'source_change_impact.json','source_change_impact.html',
+                    'claim_quarantine.json','claim_quarantine.html'}
+          assert {p.name for p in folder.iterdir()}==expected
+          master=json.loads((folder/'phase4_control.json').read_text())
+          impact=json.loads((folder/'source_change_impact.json').read_text())
+          q=json.loads((folder/'claim_quarantine.json').read_text())
+          held={'M35-02','M35-03','M35-04','M35-07'}
+          assert master['scenario_only'] is True
+          assert master['legacy_unquarantined_source_reports_exported'] is False
+          assert master['external_customer_marketing_or_recovery_claims_authorized']==0
+          assert master['independent_human_customer_pilot_controls_unmet']==18
+          assert set(impact['affected_internal_source_claim_ids'])==held
+          assert set(q['quarantined_claim_ids'])==held
+          assert q['qualified_values_still_visible_for_internal_research_only']==4
+          for case in q['claims']:
+              if case['claim_id'] in held:
+                  assert case['safe_internal_value'] is None
+          for case in impact['claims']:
+              if case['claim_id'] in held:
+                  assert case['prior_internal_value'] is None
+          for p in folder.iterdir():
+              for old_value in ('402827.246','142607.754','73.85','1.18'):
+                  assert old_value not in p.read_text(),(p.name,old_value)
+          assert '545435.000' in (folder/'index.html').read_text()
+          print('Control Center: source-sensitive scenario exports only safe M37/M38 values; 4 held, 4 retained.')
+          PY
+      - name: Retain only internal offline reviewed metadata receipts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-m38-read-only-claim-quarantine-receipts
+          path: |
+            /tmp/retally-m38/claim_quarantine.json
+            /tmp/retally-m38/claim_quarantine.html
+            /tmp/retally-m38-census-hypothetical/claim_quarantine.json
+            /tmp/retally-m38-census-hypothetical/claim_quarantine.html
+            /tmp/retally-m38-control-census-scenario/phase4_control.json
+            /tmp/retally-m38-control-census-scenario/index.html
+            /tmp/retally-m38-control-census-scenario/source_change_impact.json
+            /tmp/retally-m38-control-census-scenario/claim_quarantine.json
+          if-no-files-found: error
+          retention-days: 14
+
+  independent-negative-access-and-approval-proof:
+    needs: source-claim-quarantine-and-frozen-policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install inherited research dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Prove unverified source changes cannot permit external claim release
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          from datetime import date
+          from freight.research_source_lineage_m37 import ROOTS,candidate_template
+          from freight.research_claim_quarantine_m38 import (
+              report_shell, claim_view, EXTERNAL, INTERNAL
+          )
+          now=date.today()
+          impact={'BEA':5,'CENSUS':4,'BLS_PPI':2,'BLS_SECTORAL':1,'PILOT':0}
+          for source in ROOTS:
+              candidate=candidate_template(as_of=now,root=source,digest='0'*64)
+              report=report_shell(as_of=now,candidate=candidate)
+              assert report['qualified_values_withheld_pending_independent_replay']==impact[source]
+              assert report['external_claims_authorized']==0
+              assert report['independently_unverified_human_pilot_controls']==18
+              assert report['source_revision_independently_verified'] is False
+              for case in report['claims']:
+                  external=claim_view(
+                      as_of=now,claim_id=case['claim_id'],purpose=EXTERNAL,
+                      candidate=candidate)
+                  assert external['safe_value'] is None
+                  assert external['external_publication_authorized'] is False
+          candidate=candidate_template(as_of=now,root='CENSUS',digest='f'*64)
+          candidate['original_publisher_replay_verified']=True
+          try:
+              report_shell(as_of=now,candidate=candidate)
+          except ValueError:
+              pass
+          else:
+              raise AssertionError('Untrusted candidate promoted to publisher attestation')
+          print('Five hypothetical roots; all external claims denied; source changes cannot unquarantine without original replay.')
+          PY
