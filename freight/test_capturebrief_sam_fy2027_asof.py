@@ -806,5 +806,80 @@ class USASpendingPublisherAwardBoundaryV1Tests(unittest.TestCase):
         self.assertFalse(is_eligible_for_real_award_benchmark(tampered))
 
 
+
+class CaptureBriefPriorFullArchiveByteProvenanceTests(unittest.TestCase):
+    """Cross-repo ORIGINAL-byte receipt reuse without any new SAM download."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (Path(__file__).with_name("fixtures") /
+             "capturebrief_fy2027_archive_growth_boundary_v1.json")
+            .read_text(encoding="utf-8"))
+
+    def test_historical_original_byte_observation_has_pinned_custody_reference(self):
+        d = self.pack
+        h = d["historical_original_full_byte_receipt"]
+        self.assertEqual(h["first_party_source_url"], d["source_url"])
+        self.assertEqual(h["original_http_sha256_reported"], PREVIOUS_PUBLIC_REFERENCE_SHA256)
+        self.assertEqual(h["original_http_status"], 200)
+        self.assertEqual(h["original_http_byte_size_reported"], 1607260)
+        self.assertEqual(h["original_csv_data_rows_reported"], 1104)
+        self.assertTrue(h["original_required_headers_reported_present"])
+        self.assertEqual(h["receipt_blob_git_sha1"],
+                         "3975380b25b168398c6a7b0012f03bab90471f30")
+        self.assertEqual(h["gh_run_commit"],
+                         "7f4dad8de34eb1570e5f936664577c81bf7e451e")
+        self.assertIn("/capturebrief/actions/runs/39205786451", h["gh_run_url"])
+        self.assertEqual(h["publisher_last_modified_utc"], "2026-10-18T14:51:03Z")
+        self.assertEqual(h["observed_utc"][:10], "2026-10-19")
+        self.assertFalse(h["original_sha256_recomputed_by_unified_lab_this_cycle"])
+
+    def test_old_success_does_not_promote_current_writer_failure(self):
+        h = self.pack["historical_original_full_byte_receipt"]
+        current = self.pack["repair_evidence"]["reused_existing_writer_receipt"]
+        self.assertEqual(current["status"], "SOURCE_TOO_LARGE")
+        self.assertEqual(h["latest_unified_writer_state"], current["status"])
+        self.assertIsNone(current["original_source_byte_sha256"])
+        self.assertIsNone(h["current_2026_10_31_source_sha256"])
+        self.assertFalse(h["historical_original_bytes_are_current_source_bytes"])
+        self.assertFalse(h["raw_bytes_durably_retained"])
+        self.assertFalse(h["commercial_reuse_authorized"])
+        self.assertEqual(h["independently_heldout_real_award_labels"], 0)
+        self.assertEqual(h["independently_matched_award_outcomes"], 0)
+        self.assertFalse(self.pack["rights_and_truth"]["commercial_scoring_allowed"])
+
+    def test_five_synthetic_historical_claims_fail_closed(self):
+        controls = self.pack["historical_full_byte_synthetic_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 4)
+        for c in controls:
+            with self.subTest(c=c["id"]):
+                self.assertEqual(c["provenance"],
+                                 "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE")
+                self.assertIsNone(c["independent_real_label"])
+                self.assertTrue(c["expected_guard"].startswith("UNKNOWN_"))
+                self.assertNotEqual(c["unsafe_inference"], c["expected_guard"])
+        self.assertIsNone(self.pack["historical_full_byte_quality"]["real_test_accuracy"])
+
+    def test_false_byte_hash_promotion_and_label_forgery_are_not_benchmark_ready(self):
+        d = self.pack
+        h = d["historical_original_full_byte_receipt"]
+        def ready(pack):
+            x = pack["historical_original_full_byte_receipt"]
+            return (x["current_2026_10_31_source_sha256"] is not None
+                    and x["original_sha256_recomputed_by_unified_lab_this_cycle"]
+                    and x["raw_bytes_durably_retained"]
+                    and x["independently_heldout_real_award_labels"] > 0
+                    and x["commercial_reuse_authorized"])
+        self.assertFalse(ready(d))
+        forged = copy.deepcopy(d)
+        forged["historical_original_full_byte_receipt"]["current_2026_10_31_source_sha256"] = h["original_http_sha256_reported"]
+        forged["historical_original_full_byte_receipt"]["independently_heldout_real_award_labels"] = 10
+        self.assertFalse(ready(forged))
+        self.assertEqual(d["historical_full_byte_quality"]["original_csv_rows_new"], 0)
+        self.assertFalse(d["historical_full_byte_quality"]["fifteen_legacy_labs_consolidated"])
+
 if __name__=="__main__":
     unittest.main()

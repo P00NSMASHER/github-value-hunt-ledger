@@ -262,5 +262,100 @@
       "expected_guard": "UNKNOWN_REQUIRED_DATE_WINDOW_MISSING",
       "independent_real_label": null
     }
-  ]
+  ],
+  "historical_original_full_byte_receipt": {
+    "evidence_class": "PUBLISHED_CAPTUREBRIEF_AUTOMATED_RECEIPT_OF_FIRST_PARTY_FULL_BYTES_NOT_INDEPENDENT_BYTE_REPLAY",
+    "receipt_repo": "P00NSMASHER/capturebrief",
+    "receipt_path": "research/fy2027_original_bytes_observation_20261019.json",
+    "receipt_blob_git_sha1": "3975380b25b168398c6a7b0012f03bab90471f30",
+    "receipt_url": "https://github.com/P00NSMASHER/capturebrief/blob/main/research/fy2027_original_bytes_observation_20261019.json",
+    "first_party_source_url": "https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv",
+    "first_party_catalog_url": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
+    "publisher_last_modified_utc": "2026-10-18T14:51:03Z",
+    "observed_utc": "2026-10-19T05:40:45.569787+00:00",
+    "gh_run_url": "https://github.com/P00NSMASHER/capturebrief/actions/runs/39205786451",
+    "gh_run_commit": "7f4dad8de34eb1570e5f936664577c81bf7e451e",
+    "gh_run_reported_conclusion": "SUCCESS_VERIFIED_FROM_GITHUB_ACTIONS_RUN_METADATA",
+    "original_http_status": 200,
+    "original_http_byte_size_reported": 1607260,
+    "original_http_sha256_reported": "7b4e00e3156248db9dcca767431bb6c5d4168aeeb2abc707ab12c0f9e61d71ce",
+    "original_csv_data_rows_reported": 1104,
+    "original_required_headers_reported_present": true,
+    "original_s3_etag_reported": "342a9a79f252ba732c347376f4efa66f",
+    "raw_bytes_durably_retained": false,
+    "original_sha256_recomputed_by_unified_lab_this_cycle": false,
+    "observations_new_to_this_cycle": 0,
+    "historical_fy2027_snapshot_approved": false,
+    "current_2026_10_31_source_sha256": null,
+    "latest_unified_writer_state": "SOURCE_TOO_LARGE",
+    "latest_unified_writer_observation_utc": "2026-10-31T02:41:52+00:00",
+    "historical_original_bytes_are_current_source_bytes": false,
+    "independently_matched_award_outcomes": 0,
+    "independently_heldout_real_award_labels": 0,
+    "commercial_reuse_authorized": false,
+    "consumer_handoff": "CAPTUREBRIEF_52: historical complete-byte trace, but fresh FY2027 custody/current source/rights/independent awards UNKNOWN; QA_44 independently verifies both receipts"
+  },
+  "historical_full_byte_synthetic_controls": [
+    {
+      "id": "SYN_PRIOR_ORIGINAL_HASH_SUBSTITUTED_AS_CURRENT",
+      "split": "synthetic_holdout",
+      "scenario": "An Oct 19 complete source hash is substituted for Oct 31 SOURCE_TOO_LARGE.",
+      "unsafe_inference": "CLAIM_CURRENT_BYTES_HASH_VERIFIED",
+      "expected_guard": "UNKNOWN_CURRENT_ORIGINAL_BYTE_SHA256",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_PRIOR_ARCHIVE_READ_PROVES_PREADVERTISED_ASOF",
+      "split": "synthetic_holdout",
+      "scenario": "October 19 retrieval is substituted for evidence that a notice was publicly available on its PostedDate.",
+      "unsafe_inference": "CLAIM_PREAWARD_AVAILABILITY",
+      "expected_guard": "UNKNOWN_HISTORICAL_PUBLICATION_AVAILABILITY",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_RECEIPT_SHA_ASSUMED_TO_BE_DURABLE_SOURCE_CUSTODY",
+      "split": "synthetic_holdout",
+      "scenario": "A recorded SHA-256 and 1,607,260-byte length are mistaken for retained original CSV bytes.",
+      "unsafe_inference": "CLAIM_SOURCE_BYTES_DURABLY_RETAINED",
+      "expected_guard": "UNKNOWN_SOURCE_BYTES_NOT_RETAINED",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_PUBLIC_SOURCE_RECEIPT_ASSUMED_AWARD_LABEL_AND_LICENSE",
+      "split": "synthetic_calibration",
+      "scenario": "A successful original CSV read is treated as independently adjudicated award matching or commercial licensing.",
+      "unsafe_inference": "CLAIM_INDEPENDENT_AWARD_AND_COMMERCIAL_CLEARANCE",
+      "expected_guard": "UNKNOWN_AWARD_TRUTH_AND_COMMERCIAL_RIGHTS",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_OLD_FILE_SIZE_CAP_GUARANTEES_NEW_FETCH",
+      "split": "synthetic_holdout",
+      "scenario": "A 1.6MB October 19 full read is used to infer October 31 original is within 8MB and complete.",
+      "unsafe_inference": "CLAIM_NEW_SIZE_LIMIT_SUFFICIENT",
+      "expected_guard": "UNKNOWN_MUTABLE_ARCHIVE_GROWTH",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE",
+      "independent_real_label": null
+    }
+  ],
+  "historical_full_byte_quality": {
+    "source_kind": "FIRST_PARTY_SOURCE_BYTES_OBSERVED_BY_SIBLING_RECEIPT_NOT_RECOLLECTED_THIS_CYCLE",
+    "original_receipt_retrieved": true,
+    "original_csv_rows_new": 0,
+    "original_source_http_body_retrieved_this_cycle": false,
+    "independent_full_body_hash_reverification": false,
+    "current_fy2027_original_hash_status": "UNKNOWN_CURRENT_WRITER_DEGRADED",
+    "historical_complete_byte_observation_reported": true,
+    "rights_and_scope": "PUBLIC_DOWNLOAD_NOT_PER_SE_CERTIFIED_FOR_THIRD_PARTY_COMMERCIAL_SCORING",
+    "dataset_asof_and_award_truth": "UNKNOWN_ZERO_INDEPENDENT_LABELS",
+    "real_test_accuracy": null,
+    "source_dedup_new_cases": 0,
+    "five_synthetic_controls_all_tagged": true,
+    "single_unified_writer_unchanged": true,
+    "fifteen_legacy_labs_consolidated": false
+  }
 }
