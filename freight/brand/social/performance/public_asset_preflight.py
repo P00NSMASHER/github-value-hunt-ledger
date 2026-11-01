@@ -12,9 +12,11 @@ release/security), without duplicating their responsibilities.
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import json
 import re
 import struct
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -170,11 +172,37 @@ def fetch(url: str, kind: str) -> tuple[int, dict[str, str], bytes]:
         return response.status, dict(response.headers.items()), body
 
 
-def inspect(item: dict, *, fetcher=fetch) -> dict:
-    """Report what this network vantage point observed, never global guarantees."""
+def inspect(item: dict, *, fetcher=fetch, transient_retries: int = 0) -> dict:
+    """Report one vantage point; retry bounded transient HTTP/network failures.
+
+    A recovered 500 is recorded as an observed transient, NOT silently hidden.
+    404/410 and non-HTML responses never auto-retry. Retry counts are capped to
+    protect the public website/CDN and prevent unbounded background work.
+    """
+    if type(transient_retries) is not int or not 0 <= transient_retries <= 2:
+        raise ValueError("transient_retries must be between 0 and 2")
     result = dict(item)
+    observations = []
+    for attempt in range(transient_retries + 1):
+        try:
+            status, headers, blob = fetcher(item["url"], item["kind"])
+            observations.append(status)
+            if status in (429, 500, 502, 503, 504) and attempt < transient_retries:
+                time.sleep(0.2 * (attempt + 1))
+                continue
+            break
+        except (urllib.error.URLError, TimeoutError, OSError, ValueError) as error:
+            observations.append(type(error).__name__)
+            if attempt < transient_retries:
+                time.sleep(0.2 * (attempt + 1))
+                continue
+            result.update(state="RECHECK",
+                          reason=f"Unverified from this network: {type(error).__name__}",
+                          http_attempts=len(observations), http_history=observations)
+            return result
+    result["http_attempts"] = len(observations)
+    result["http_history"] = observations
     try:
-        status, headers, blob = fetcher(item["url"], item["kind"])
         mime = next((v for k, v in headers.items()
                      if k.lower() == "content-type"), "").lower().split(";")[0].strip()
         result["http_status"] = status
@@ -213,15 +241,65 @@ def inspect(item: dict, *, fetcher=fetch) -> dict:
 
 
 def run(snapshot: dict, *, live: bool = False, include_drafts: bool = False,
+        only_kind: str | None = None, one_per_route: bool = False,
+        workers: int = 1, transient_retries: int = 0,
         fetcher=fetch) -> dict:
+    """Optionally probe one representative URL per validated educational path.
+
+    All source URLs still pass the strict allowlist/UTM gate before the
+    representative route is selected. Distinct campaigns are not conflated
+    for attribution; only network HTTP reachability is deduplicated.
+    """
+    if type(workers) is not int or not 1 <= workers <= 6:
+        raise ValueError("workers must be between 1 and 6")
+    if type(transient_retries) is not int or not 0 <= transient_retries <= 2:
+        raise ValueError("transient_retries must be between 0 and 2")
+    if only_kind not in (None, "landing", "image"):
+        raise ValueError("Only landing or image kind is supported")
+    if one_per_route and only_kind != "landing":
+        raise ValueError("One-per-route requires only_kind='landing'")
     manifest = targets(snapshot, include_drafts=include_drafts)
-    inspected = [inspect(item, fetcher=fetcher) if live
-                 else {**item, "state": "NOT_CHECKED", "reason": "Network inspection not requested"}
-                 for item in manifest]
+    if only_kind is not None:
+        manifest = [item for item in manifest if item["kind"] == only_kind]
+    tracked_url_count = len(manifest)
+    if one_per_route:
+        grouped = {}
+        for item in manifest:
+            path = urlsplit(item["url"]).path
+            if path not in grouped:
+                grouped[path] = {**item, "uuids": list(item["uuids"]),
+                                 "networks": list(item["networks"]),
+                                 "tracked_url_count": 1, "canonical_path": path}
+            else:
+                representative = grouped[path]
+                representative["tracked_url_count"] += 1
+                for uid in item["uuids"]:
+                    if uid not in representative["uuids"]:
+                        representative["uuids"].append(uid)
+                for network in item["networks"]:
+                    if network not in representative["networks"]:
+                        representative["networks"].append(network)
+        manifest = sorted(grouped.values(), key=lambda row: row["canonical_path"])
+    if live and workers > 1:
+        # All URLs were validated before concurrency; map preserves report order.
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            inspected = list(executor.map(
+                lambda item: inspect(item, fetcher=fetcher,
+                                     transient_retries=transient_retries),
+                manifest))
+    else:
+        inspected = [inspect(item, fetcher=fetcher, transient_retries=transient_retries)
+                     if live else {**item, "state": "NOT_CHECKED",
+                                   "reason": "Network inspection not requested"}
+                     for item in manifest]
     counts = {k: sum(x["state"] == k for x in inspected)
               for k in ("PASS", "FAIL", "RECHECK", "NOT_CHECKED")}
     return {
         "mode": "public_https_get" if live else "offline_manifest",
+        "only_kind": only_kind,
+        "one_per_route": one_per_route,
+        "source_tracked_url_count": tracked_url_count,
+        "representative_probe_count": len(manifest),
         "publication_verified": False,
         "live_social_provider_checked": False,
         "counts": counts,
@@ -261,13 +339,23 @@ def main() -> None:
                     help="Opt-in public allowlisted HTTPS GET checks; no social API access")
     ap.add_argument("--include-drafts", action="store_true",
                     help="Also verify unpublished draft media; never publish them")
+    ap.add_argument("--only-kind", choices=("landing", "image"),
+                    help="Inspect only one category; still validate the complete source snapshot")
+    ap.add_argument("--one-per-route", action="store_true",
+                    help="With --only-kind landing, inspect one tracked URL per distinct canonical page")
+    ap.add_argument("--workers", type=int, default=1,
+                    help="Live GET concurrency, 1-6 only; defaults to sequential")
+    ap.add_argument("--retry-transient", type=int, default=0,
+                    help="Additional bounded attempts for 429/5xx/timeouts, max 2")
     ap.add_argument("--output", help="Optional Markdown destination")
     ap.add_argument("--json-output", help="Optional JSON destination")
     ap.add_argument("--fail-on-hard-errors", action="store_true",
                     help="Exit code 2 for an observed FAIL; RECHECK remains explicitly uncertain")
     args = ap.parse_args()
     result = run(read_json(args.schedule), live=args.live,
-                 include_drafts=args.include_drafts)
+                 include_drafts=args.include_drafts,
+                 only_kind=args.only_kind, one_per_route=args.one_per_route,
+                 workers=args.workers, transient_retries=args.retry_transient)
     if args.output:
         Path(args.output).write_text(markdown(result), encoding="utf-8")
     else:
