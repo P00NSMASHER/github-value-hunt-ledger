@@ -1,10 +1,8 @@
 """Labs 11-14: direct synthetic domain regression tests; no real API or money."""
-import copy
 import hashlib
 import unittest
 from freight.labs11_14 import (
- LAB_NAMES,FAMILIES,MODES,VENDOR_SOURCES,RELIABILITY_PERMANENT,
- RELIABILITY_EXHAUST,FRAUD_HIGH_RISK,SAVINGS_REVIEW,sha,simulate,
+ LAB_NAMES, FAMILIES, MODES, FRAUD_HIGH_RISK, sha, simulate,
 )
 
 def row(i,truth="POSITIVE",mode=None):
