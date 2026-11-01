@@ -18,7 +18,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from enum import Enum
+import re
 from typing import Optional
 
 
@@ -29,28 +31,46 @@ from typing import Optional
 #   to_cents(12.50) -> 1250   ($12.50)
 # If you ever need to pass cents directly, pass them already-converted.
 # ---------------------------------------------------------------------------
-def to_cents(value) -> int:
-    """Convert a dollar value (str like '$1,234.56', float, or int) to integer cents.
+# Currency inputs are dollars; public interoperability is limited to exact
+# JavaScript-safe integer cents. A failed parse returns zero for legacy callers;
+# NEVER treat a parsed zero as a verified carrier charge or cleared payment.
+_SAFE_CENTS = 9_007_199_254_740_991
+_MONEY_TOKEN = re.compile(
+    r"(?:-?\$?|\$-?)(?:(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)(?:\.[0-9]+)?|\.[0-9]+)\Z"
+)
 
-    Numeric values are always interpreted as dollars, e.g. 1234 -> $1,234.00.
-    Returns 0 for None / blank / unparseable input.
+
+def to_cents(value) -> int:
+    """Convert a dollar token to integer cents, rounding half-up without floats.
+
+    Supports numeric dollars, '$1,234.56', and '(12.34)' credit notation.
+    Invalid, nonfinite, oversized, or malformed tokens return legacy zero;
+    zero is NOT evidence that an invoice amount was verified.
     """
-    if value is None:
+    if value is None or isinstance(value, bool):
         return 0
-    if isinstance(value, bool):  # guard: bool is a subclass of int
+    s = str(value).strip()
+    if not s or len(s) > 64:
         return 0
-    if isinstance(value, (int, float)):
-        return int(round(value * 100))
-    s = str(value).strip().replace("$", "").replace(",", "").replace(" ", "")
-    if s == "":
+    parenthesized = s.startswith("(") and s.endswith(")")
+    if parenthesized:
+        s = s[1:-1].strip()
+        if s.startswith("-"):
+            return 0
+    if not _MONEY_TOKEN.fullmatch(s):
         return 0
-    neg = s.startswith("(") and s.endswith(")")
-    s = s.strip("()")
+    # A numeric string may have thousands separators or one leading dollar
+    # sign. Reject embedded/duplicate signs instead of guessing the amount.
     try:
-        cents = int(round(float(s) * 100))
-    except ValueError:
+        amount = Decimal(s.replace("$", "").replace(",", ""))
+        if not amount.is_finite() or abs(amount) > Decimal("90071992547409.915"):
+            return 0
+        cents = int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    except (InvalidOperation, ValueError, OverflowError):
         return 0
-    return -cents if neg else cents
+    if abs(cents) > _SAFE_CENTS:
+        return 0
+    return -abs(cents) if parenthesized else cents
 
 
 def cents_to_str(cents: int) -> str:
