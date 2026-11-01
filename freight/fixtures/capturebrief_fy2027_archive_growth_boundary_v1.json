@@ -22,7 +22,7 @@
     "previous_bounded_limit_bytes": 2500000
   },
   "proposal": {
-    "bounded_limit_bytes": 8000000,
+    "bounded_limit_bytes": 12000000,
     "maximum_csv_rows": 8000,
     "failed_larger_or_truncated_source": "FAIL_CLOSED",
     "original_source_full_byte_sha256": "COMPUTE_ONLY_ON_FULL_VALID_SOURCE_READBACK",
@@ -357,5 +357,20 @@
     "five_synthetic_controls_all_tagged": true,
     "single_unified_writer_unchanged": true,
     "fifteen_legacy_labs_consolidated": false
+  },
+  "current_public_head_observation": {
+    "http_method": "HEAD",
+    "http_status": 200,
+    "observed_at_utc": "2026-11-01T21:23:28+00:00",
+    "reported_content_length_bytes": 8833904,
+    "etag": "\"4f77c130a792a3d0cf28c3d6d6479b5e-2\"",
+    "etag_not_sha256": true,
+    "last_modified": "Sun, 01 Nov 2026 15:53:41 GMT",
+    "original_body_read": false,
+    "original_body_sha256": null,
+    "independently_verified_award_labels": 0,
+    "commercial_scoring_allowed": false,
+    "evidence_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/41351753422",
+    "limits_inferred_from_metadata_not_verified_original_rows": true
   }
 }
