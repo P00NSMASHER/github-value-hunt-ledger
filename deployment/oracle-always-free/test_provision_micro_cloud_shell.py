@@ -203,6 +203,12 @@ class MicroResourceTests(unittest.TestCase):
                              micro.MICRO_SHAPE)
         self.assertEqual([a[:3] for a in calls],
                          [("compute","instance","launch"),("compute","instance","get")])
+        self.assertTrue(self.attempt.is_file())
+        self.assertEqual(self.attempt.stat().st_mode & 0o777, 0o600)
+        marker = json.loads(self.attempt.read_text(encoding="utf-8"))
+        self.assertEqual(marker["status"], "LAUNCH_UNCERTAIN_UNTIL_VERIFIED")
+        self.assertEqual(marker["shape"], micro.MICRO_SHAPE)
+        self.assertEqual(marker["subnet_id"], self.original["subnet_id"])
 
     def test_wrong_shape_never_marked_verified(self):
         plan={"ad":AD1,"tenancy":TENANCY,"image_id":"ocid1.image.oc1.iad.fake",
@@ -275,9 +281,11 @@ class MicroResourceTests(unittest.TestCase):
               patch.object(micro.BASE, "read_tenancy", return_value=TENANCY),
               patch.object(micro.BASE, "home_region", return_value=REGION),
               patch.object(micro, "inventory", return_value=plan),
+              patch.object(micro, "launch_single_micro") as launch,
               patch("builtins.print") as printer):
             self.assertEqual(micro.main([]), 0)
         self.assertTrue(any("RETRY LOCKED" in str(c) for c in printer.call_args_list))
+        launch.assert_not_called()
 
     def test_prior_attempt_fails_before_new_confirmation_or_launch(self):
         self.attempt.write_text('{"status":"LAUNCH_UNCERTAIN_UNTIL_VERIFIED"}')
