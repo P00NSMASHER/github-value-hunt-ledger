@@ -13,3 +13,5 @@ python3 research/retally_first_customer_archive/verify_archive.py
 ```
 
 The manifest can be used to identify individual source-level opportunities for **separate** reviewed integration, never a blanket merge. Backlog #901.
+
+The additional historical drafts #327 (collateral) and #461 (stacked invoice-reference research) are preserved byte-for-byte under `sources/pr-327/` and `sources/pr-461/` with source-head receipts in `SOURCE_ADDENDUM.json`. The dedicated additional verifier checks committed Git object identities, including files transformed at checkout by text attributes. These sources are NOT modern production integrations, customer authorizations, or proof of collected cash.

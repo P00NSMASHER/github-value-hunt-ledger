@@ -1,0 +1,781 @@
+from dataclasses import asdict, replace
+
+import pytest
+
+from freight.audit_workflow import RuleCSVInput, run_audit_workflow
+from freight.buyer_review_workflow import (
+    BuyerReviewDecisionInput,
+    build_buyer_review_batch,
+)
+from freight.contracts import canonical_hash, open_incumbent_output, seal_incumbent_submission
+from freight.pilot_reporting import ReviewDisposition
+from freight.recovery_claim_workflow import (
+    RecoveryClaimBatchState,
+    build_recovery_claim_batch,
+    persist_recovery_claim_batch,
+    render_recovery_claim_batch_markdown,
+    verify_recovery_claim_batch,
+)
+from freight.settlement_store import SettlementStore
+
+
+INVOICE_HEADER = "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,charge_code,service_date,quantity_units,billed_cents\n"
+RULE_HEADER = "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
+
+
+def setup(dispositions=(ReviewDisposition.CONFIRMED, ReviewDisposition.CONFIRMED), decisions_complete=True):
+    result = run_audit_workflow(
+        invoice_filename="charges.csv",
+        invoice_data=(INVOICE_HEADER
+                      + "I1,S1,C,K,USD,X1,A,2026-09-10,1,12000\n"
+                      + "I2,S2,C,K,USD,X2,B,2026-09-10,1,13000\n").encode(),
+        buyer_id="buyer",
+        business_unit="unit",
+        selection_rule="period",
+        rule_inputs=(
+            RuleCSVInput("a.csv",(RULE_HEADER+"A,FIXED,2026-09-01,,10000,\n").encode(),"C","K","USD","a","a"*64,True),
+            RuleCSVInput("b.csv",(RULE_HEADER+"B,FIXED,2026-09-01,,10000,\n").encode(),"C","K","USD","b","b"*64,True),
+        ),
+    )
+    artifacts = result.artifacts
+    assert artifacts is not None
+    hashes = artifacts.review_routing.buyer_review_case_hashes
+    decisions = [
+        BuyerReviewDecisionInput(hashes[0], dispositions[0], 2, "2026-09-21T09:00:00Z"),
+    ]
+    if decisions_complete:
+        decisions.append(
+            BuyerReviewDecisionInput(hashes[1], dispositions[1], 3, "2026-09-21T09:01:00Z")
+        )
+    buyer_review = build_buyer_review_batch(
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        truth=artifacts.factory.truth,
+        reviewer_role="Buyer Controller",
+        decisions=tuple(decisions),
+    )
+    population = artifacts.population_build.population
+    sealed = seal_incumbent_submission(population, "incumbent-source")
+    incumbent = open_incumbent_output(
+        population=population,
+        truth=artifacts.factory.truth,
+        submission=sealed,
+        finding_ids=(buyer_review.records[1].finding_id,) if len(buyer_review.records) > 1 else (),
+    )
+    return artifacts, buyer_review, incumbent
+
+
+def test_confirmed_reviews_create_exact_claims_and_incumbent_fee_disqualification():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00-04:00",
+    )
+    assert batch.state == RecoveryClaimBatchState.CLAIMS_READY.value
+    assert batch.claim_count == 2
+    assert batch.confirmed_review_count == 2
+    assert batch.fee_disqualified_count == 1
+    assert [claim.fee_disqualified for claim in batch.claims] == [False, True]
+    assert {binding.finding_id for binding in batch.bindings} == {
+        record.finding_id for record in review.records
+    }
+    assert all(claim.source_hash == binding.finding_proof_hash
+               for claim, binding in zip(batch.claims, batch.bindings, strict=True))
+    assert all(claim.amount_cents > 0 for claim in batch.claims)
+    assert len(batch.batch_hash) == 64
+
+
+def test_false_positive_and_unresolved_reviews_never_create_recovery_claims():
+    artifacts, review, incumbent = setup(
+        dispositions=(ReviewDisposition.FALSE_POSITIVE, ReviewDisposition.UNRESOLVED)
+    )
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    assert batch.state == RecoveryClaimBatchState.NO_CONFIRMED_CLAIMS.value
+    assert batch.claim_count == 0
+    assert batch.claims == ()
+    assert batch.bindings == ()
+
+
+def test_partial_buyer_review_cannot_issue_claims():
+    artifacts, review, incumbent = setup(decisions_complete=False)
+    with pytest.raises(ValueError, match="must be COMPLETE"):
+        build_recovery_claim_batch(
+            truth=artifacts.factory.truth,
+            incumbent=incumbent,
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            buyer_review=review,
+            issued_at="2026-09-21T10:00:00Z",
+        )
+
+
+def test_claim_issue_time_cannot_precede_buyer_review():
+    artifacts, review, incumbent = setup()
+    with pytest.raises(ValueError, match="before buyer review"):
+        build_recovery_claim_batch(
+            truth=artifacts.factory.truth,
+            incumbent=incumbent,
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            buyer_review=review,
+            issued_at="2026-09-21T08:59:59Z",
+        )
+
+
+def test_tampered_buyer_review_batch_is_rejected():
+    artifacts, review, incumbent = setup()
+    bad = replace(review, batch_hash="0"*64)
+    with pytest.raises(ValueError, match="does not match current review proofs"):
+        build_recovery_claim_batch(
+            truth=artifacts.factory.truth,
+            incumbent=incumbent,
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            buyer_review=bad,
+            issued_at="2026-09-21T10:00:00Z",
+        )
+
+
+def test_tampered_incumbent_output_is_rejected():
+    artifacts, review, incumbent = setup()
+    bad = replace(incumbent, output_hash="0"*64)
+    with pytest.raises(ValueError, match="incumbent output hash mismatch"):
+        build_recovery_claim_batch(
+            truth=artifacts.factory.truth,
+            incumbent=bad,
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            buyer_review=review,
+            issued_at="2026-09-21T10:00:00Z",
+        )
+
+
+def test_claim_batch_is_deterministic_for_same_review_and_issue_time():
+    artifacts, review, incumbent = setup()
+    kwargs = dict(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    assert build_recovery_claim_batch(**kwargs) == build_recovery_claim_batch(**kwargs)
+
+
+def test_renderer_states_fee_and_settlement_boundaries():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    text = render_recovery_claim_batch_markdown(batch)
+    assert "Recovery Claim Batch" in text
+    assert "fee-disqualified automatically" in text
+    assert "does not prove settlement" in text
+
+
+def test_atomic_persistence_receipt_creates_all_then_replays_idempotently(tmp_path):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    store = SettlementStore(
+        tmp_path / "claims.sqlite3",
+        buyer_id=batch.buyer_id,
+        business_unit=batch.business_unit,
+    )
+    first = persist_recovery_claim_batch(store, batch)
+    assert first.attempted_claim_count == 2
+    assert first.created_claim_count == 2
+    assert first.already_present_count == 0
+    assert store.count("recovery_claims") == 2
+    assert len(first.receipt_hash) == 64
+
+    replay = persist_recovery_claim_batch(store, batch)
+    assert replay.attempted_claim_count == 2
+    assert replay.created_claim_count == 0
+    assert replay.already_present_count == 2
+    assert replay.claim_ids == first.claim_ids
+    assert store.count("recovery_claims") == 2
+
+
+def test_persistence_rejects_wrong_store_scope(tmp_path):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    store = SettlementStore(
+        tmp_path / "wrong.sqlite3",
+        buyer_id="other",
+        business_unit=batch.business_unit,
+    )
+    with pytest.raises(ValueError, match="scope mismatch"):
+        persist_recovery_claim_batch(store, batch)
+    assert store.count("recovery_claims") == 0
+
+
+def test_persistence_rejects_tampered_claim_before_writing(tmp_path):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    tampered_claim = replace(batch.claims[0], amount_cents=1)
+    bad = replace(batch, claims=(tampered_claim,) + batch.claims[1:])
+    store = SettlementStore(
+        tmp_path / "tampered.sqlite3",
+        buyer_id=batch.buyer_id,
+        business_unit=batch.business_unit,
+    )
+    with pytest.raises(ValueError, match="does not match persisted claim"):
+        persist_recovery_claim_batch(store, bad)
+    assert store.count("recovery_claims") == 0
+
+
+@pytest.mark.parametrize("amount_cents", [True, 0, -1])
+def test_self_hashed_claim_batch_rejects_invalid_money_semantics(amount_cents):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original_record = batch.records[0]
+    record = replace(original_record, amount_cents=amount_cents, record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[0], amount_cents=amount_cents)
+    forged = replace(
+        batch,
+        records=(record,) + batch.records[1:],
+        claims=(claim,) + batch.claims[1:],
+        batch_hash="",
+    )
+    batch_body = {
+        "schema": 1,
+        "buyer_id": forged.buyer_id,
+        "business_unit": forged.business_unit,
+        "truth_hash": forged.truth_hash,
+        "incumbent_output_hash": forged.incumbent_output_hash,
+        "buyer_review_batch_hash": forged.buyer_review_batch_hash,
+        "issued_at": forged.issued_at,
+        "state": forged.state,
+        "confirmed_review_count": forged.confirmed_review_count,
+        "claim_count": forged.claim_count,
+        "fee_disqualified_count": forged.fee_disqualified_count,
+        "records": [asdict(item) for item in forged.records],
+        "bindings": [asdict(item) for item in forged.bindings],
+    }
+    forged = replace(forged, batch_hash=canonical_hash(batch_body))
+
+    with pytest.raises(ValueError, match="positive integer cents"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_duplicate_claim_identity():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    record = batch.records[0]
+    claim = batch.claims[0]
+    binding = batch.bindings[0]
+    forged = replace(
+        batch,
+        records=(record, record),
+        claims=(claim, claim),
+        bindings=(binding, binding),
+        fee_disqualified_count=2 * int(record.fee_disqualified),
+        batch_hash="",
+    )
+    batch_body = {
+        "schema": 1,
+        "buyer_id": forged.buyer_id,
+        "business_unit": forged.business_unit,
+        "truth_hash": forged.truth_hash,
+        "incumbent_output_hash": forged.incumbent_output_hash,
+        "buyer_review_batch_hash": forged.buyer_review_batch_hash,
+        "issued_at": forged.issued_at,
+        "state": forged.state,
+        "confirmed_review_count": forged.confirmed_review_count,
+        "claim_count": forged.claim_count,
+        "fee_disqualified_count": forged.fee_disqualified_count,
+        "records": [asdict(item) for item in forged.records],
+        "bindings": [asdict(item) for item in forged.bindings],
+    }
+    forged = replace(forged, batch_hash=canonical_hash(batch_body))
+
+    with pytest.raises(ValueError, match="duplicate recovery claim identity"):
+        verify_recovery_claim_batch(forged)
+
+
+def _rehash_claim_batch_for_readback_test(batch):
+    body = {
+        "schema": 1,
+        "buyer_id": batch.buyer_id,
+        "business_unit": batch.business_unit,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        "issued_at": batch.issued_at,
+        "state": batch.state,
+        "confirmed_review_count": batch.confirmed_review_count,
+        "claim_count": batch.claim_count,
+        "fee_disqualified_count": batch.fee_disqualified_count,
+        "records": [asdict(item) for item in batch.records],
+        "bindings": [asdict(item) for item in batch.bindings],
+    }
+    return replace(batch, batch_hash=canonical_hash(body))
+
+
+def test_self_hashed_claim_batch_rejects_envelope_record_issue_time_mismatch():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, issued_at="2026-09-21T11:00:00.000000Z", batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="issued-at mismatch"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_inflated_confirmed_review_count():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            confirmed_review_count=batch.confirmed_review_count + 1,
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="confirmed review count mismatch"):
+        verify_recovery_claim_batch(forged)
+
+
+
+def test_self_hashed_claim_batch_rejects_boolean_claim_count():
+    artifacts, review, incumbent = setup(
+        dispositions=(ReviewDisposition.FALSE_POSITIVE, ReviewDisposition.UNRESOLVED)
+    )
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, claim_count=False, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="claim count must be a non-negative integer"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_boolean_fee_disqualified_count():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, fee_disqualified_count=True, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="fee-disqualified count must be a non-negative integer"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_non_boolean_fee_flags():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original_record = batch.records[1]
+    record = replace(
+        original_record,
+        incumbent_preidentified=1,
+        fee_disqualified=1,
+        record_hash="",
+    )
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[1], fee_disqualified=1)
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(batch.records[0], record),
+            claims=(batch.claims[0], claim),
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="fee-disqualification flags must be boolean"):
+        verify_recovery_claim_batch(forged)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (("buyer_id", ""), ("business_unit", "   ")),
+)
+def test_self_hashed_claim_batch_rejects_blank_scope_identity(field, value):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, **{field: value}, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="scope identifiers must be non-empty"):
+        verify_recovery_claim_batch(forged)
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("truth_hash", "incumbent_output_hash", "buyer_review_batch_hash"),
+)
+def test_self_hashed_claim_batch_rejects_invalid_provenance_digest(field):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    provenance = {
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+    }
+    provenance[field] = ""
+    records = []
+    for original in batch.records:
+        record = replace(original, record_hash="")
+        body = {
+            "schema": 1,
+            **provenance,
+            **asdict(record),
+        }
+        body.pop("record_hash")
+        records.append(replace(record, record_hash=canonical_hash(body)))
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            **{field: ""},
+            records=tuple(records),
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="provenance hashes must be SHA-256"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_blank_review_proof_digest():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original = batch.records[0]
+    record = replace(original, review_hash="", record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="record proof hashes must be SHA-256"):
+        verify_recovery_claim_batch(forged)
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("claim_id", "finding_id", "reference", "payer_id", "payee_id", "currency"),
+)
+def test_self_hashed_claim_batch_rejects_blank_claim_field(field):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original_record = batch.records[0]
+    record = replace(original_record, **{field: "   "}, record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+
+    claim_fields = {"claim_id", "reference", "payer_id", "payee_id", "currency"}
+    claim = (
+        replace(batch.claims[0], **{field: "   "})
+        if field in claim_fields
+        else batch.claims[0]
+    )
+    binding_fields = {"claim_id", "finding_id"}
+    binding = (
+        replace(batch.bindings[0], **{field: "   "})
+        if field in binding_fields
+        else batch.bindings[0]
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            claims=(claim,) + batch.claims[1:],
+            bindings=(binding,) + batch.bindings[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="claim text fields must be non-empty"):
+        verify_recovery_claim_batch(forged)
+
+
+
+def test_self_hashed_claim_batch_rejects_claim_id_detached_from_finding_proof():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged_claim_id = "claim:" + "f" * 64
+    original = batch.records[0]
+    record = replace(original, claim_id=forged_claim_id, record_hash="")
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[0], claim_id=forged_claim_id)
+    binding = replace(batch.bindings[0], claim_id=forged_claim_id)
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            claims=(claim,) + batch.claims[1:],
+            bindings=(binding,) + batch.bindings[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="claim id must derive from finding proof"):
+        verify_recovery_claim_batch(forged)
+
+
+
+def test_self_hashed_claim_batch_rejects_duplicate_review_proof_identity():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original = batch.records[1]
+    record = replace(
+        original,
+        review_hash=batch.records[0].review_hash,
+        record_hash="",
+    )
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(batch.records[0], record),
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="duplicate recovery review proof"):
+        verify_recovery_claim_batch(forged)
+
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (("buyer_id", "buyer\u200b"), ("business_unit", "freight\u202e")),
+)
+def test_self_hashed_claim_batch_rejects_invisible_scope_identity(field, value):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(batch, **{field: value}, batch_hash="")
+    )
+
+    with pytest.raises(ValueError, match="identity must be canonical text"):
+        verify_recovery_claim_batch(forged)
+
+
+def test_self_hashed_claim_batch_rejects_invisible_payer_identity():
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    original = batch.records[0]
+    record = replace(
+        original,
+        payer_id=original.payer_id + "\u200b",
+        record_hash="",
+    )
+    record_body = {
+        "schema": 1,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        **asdict(record),
+    }
+    record_body.pop("record_hash")
+    record = replace(record, record_hash=canonical_hash(record_body))
+    claim = replace(batch.claims[0], payer_id=record.payer_id)
+    forged = _rehash_claim_batch_for_readback_test(
+        replace(
+            batch,
+            records=(record,) + batch.records[1:],
+            claims=(claim,) + batch.claims[1:],
+            batch_hash="",
+        )
+    )
+
+    with pytest.raises(ValueError, match="identity must be canonical text"):
+        verify_recovery_claim_batch(forged)

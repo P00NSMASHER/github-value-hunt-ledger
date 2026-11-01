@@ -14,3 +14,5 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Verify 86 original blob bytes without importing legacy software
         run: python3 research/retally_first_customer_archive/verify_archive.py
+      - name: Verify #327 and #461 original Git blob archive without execution
+        run: python3 research/retally_first_customer_archive/verify_addendum.py
