@@ -21,7 +21,7 @@ jobs:
           import json, pathlib, subprocess
           base=pathlib.Path("research/retally_lab14_archive")
           files=sorted((base/"manifests").glob("part-*.json"))
-          assert len(files)==4, files
+          assert len(files)==5, files
           seen_pr=set(); seen_path=set(); total=0; removed=0
           for manifest_path in files:
               m=json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -42,8 +42,8 @@ jobs:
                   assert blob==item["git_blob_sha"],(p,blob,item["git_blob_sha"])
                   total+=1
               seen_pr.update(m["source_prs"])
-          assert len(seen_pr)==43,sorted(seen_pr)
-          assert total>=300,total
+          assert len(seen_pr)==54,sorted(seen_pr)
+          assert total>=449,total
           hold=(base/"README.md").read_text(encoding="utf-8")
           assert "ARCHIVE / RESEARCH HOLD" in hold and "NOT MERGED INTO MAIN" in hold
           print(f"Verified {total} exact original Git blobs across {len(seen_pr)} historical PRs; {removed} removals recorded. Archive-only, no release.")
