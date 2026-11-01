@@ -39,7 +39,8 @@ def _lead(**kw):
     args=dict(annual_freight_spend_usd=2000000,monthly_shipments=400,
        invoice_count=1000,history_months=12,carrier_count=4,mode_count=2,
        has_invoice_export=True,has_rate_authority=True,
-       has_shipment_records=True,has_payment_evidence=True)
+       has_shipment_records=True,has_payment_evidence=True,
+       previously_audited=False)
     args.update(kw)
     return AuditLeadProfile(**args)
 
@@ -146,6 +147,11 @@ def test_lab07_real_sales_qualification_requires_invoice_population():
 def test_lab07_real_sales_qualification_routes_valid_fictional_lead():
     r=qualify_free_audit(_lead())
     assert r.state is QualificationState.QUALIFIED
+
+
+def test_lab07_unknown_prior_audit_must_never_autoqualify():
+    r=qualify_free_audit(_lead(previously_audited=None))
+    assert r.state is QualificationState.NEEDS_REVIEW
 
 
 def test_lab07_prior_audit_without_authority_requires_review():
