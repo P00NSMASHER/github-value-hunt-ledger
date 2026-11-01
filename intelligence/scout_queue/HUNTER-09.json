@@ -1,21 +1,52 @@
 {
   "api_metrics": {
-    "api_requests": 7,
-    "known_revision_skips": 3,
+    "api_requests": 6,
+    "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 0,
-  "candidates": [],
+  "candidate_count": 1,
+  "candidates": [
+    {
+      "archived": false,
+      "default_branch": "master",
+      "description": "Unreal Project - Learning - Working through udemy \"Unreal Engine 4 Mastery: Create Multiplayer Games with C++\" course. Finished!",
+      "discovery_query": "mastery learning game engine",
+      "exact_revision": "991efc25d513b4cfb1704bcf0e42ce7b8d075722",
+      "forks": 0,
+      "primary_language": "C++",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2023-06-01T06:17:38Z",
+      "repository": "jacobmott/CPPMasteryMultiplayerGames",
+      "root_code_signals": [],
+      "size_kb": 45627,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 5,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 0,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 20,
+      "url": "https://github.com/jacobmott/CPPMasteryMultiplayerGames"
+    }
+  ],
   "catalogs": [
     14,
     15,
     35
   ],
-  "generated_at": "2026-10-21T19:17:28.117440+00:00",
+  "generated_at": "2026-10-27T08:55:53.023049+00:00",
   "mission": "Educational game systems, adaptive assessment, mastery learning and safe question generation useful to StarBlox",
   "risk_review": [],
   "risk_review_count": 0,
@@ -23,11 +54,11 @@
   "search_diagnostics": [
     {
       "query": "adaptive assessment game open source",
-      "returned": 1
+      "returned": 0
     },
     {
       "query": "mastery learning game engine",
-      "returned": 2
+      "returned": 1
     },
     {
       "query": "IRT adaptive quiz open source game",
