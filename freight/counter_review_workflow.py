@@ -11,6 +11,7 @@ counter amount. Splitting one counter-event across multiple allocation edges is
 not supported here.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 import json
 from dataclasses import asdict, dataclass
@@ -453,7 +454,7 @@ def render_counter_review_markdown(
         "",
         f"- Counter event: **{case.counter_id}**",
         f"- Original settlement event: **{case.original_event_id}**",
-        f"- Remaining return amount: **{case.currency} {case.counter_residual_cents / 100:,.2f}**",
+        f"- Remaining return amount: **{case.currency} {format_cents(case.counter_residual_cents)}**",
         f"- Auto-reversal result: **{case.auto_review_reason}**",
         f"- Live allocation edges: **{case.live_allocation_count}**",
         f"- Review case hash: `{case.case_hash}`",
@@ -465,7 +466,7 @@ def render_counter_review_markdown(
     else:
         for candidate in case.candidates:
             lines.extend([
-                f"- **{candidate.allocation_id}** — live {case.currency} {candidate.live_cents / 100:,.2f}",
+                f"- **{candidate.allocation_id}** — live {case.currency} {format_cents(candidate.live_cents)}",
                 f"  - Claim: {candidate.claim_id}",
                 f"  - Claim reference: {candidate.claim_reference}",
                 f"  - Allocation mode: {candidate.mode}",
@@ -482,7 +483,7 @@ def render_counter_review_markdown(
         lines.extend([
             "## Applied review",
             f"- Allocation: **{receipt.allocation_id}**",
-            f"- Reversed amount: **{case.currency} {receipt.amount_cents / 100:,.2f}**",
+            f"- Reversed amount: **{case.currency} {format_cents(receipt.amount_cents)}**",
             f"- Reviewer role: **{receipt.reviewer_role}**",
             f"- Reviewed at: **{receipt.reviewed_at}**",
             f"- Rationale: {receipt.rationale}",

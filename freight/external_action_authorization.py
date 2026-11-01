@@ -5,6 +5,7 @@ messages, move money, accept settlements, change accounts, or grant general
 carrier/vendor communication authority.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 import re
 from dataclasses import asdict, dataclass
@@ -511,7 +512,7 @@ def render_markdown(auth: ExternalActionAuthorization) -> str:
             f"**Action:** {auth.action_type}",
             f"**Target carrier:** `{auth.target_carrier_id}`",
             f"**Target customer:** `{auth.target_customer_id}`",
-            f"**Authorized maximum:** {auth.currency} {auth.authorized_cents / 100:,.2f}",
+            f"**Authorized maximum:** {auth.currency} {format_cents(auth.authorized_cents)}",
             f"**Issued / expires:** {auth.issued_on} / {auth.expires_on}",
             f"**Approver role:** {auth.approver_role}",
             f"**Authorization hash:** `{auth.authorization_hash}`",
