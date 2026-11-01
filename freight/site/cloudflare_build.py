@@ -89,8 +89,13 @@ def build(output: Path = OUTPUT_DIR) -> Path:
             ),
             encoding="utf-8",
         )
+        # Each composition stage must preserve the RecoveryOS illustration
+        # disclosure, including after Cloudflare email-link transformations.
+        validate_public_tree(bundle/'recoveryos',site='RECOVERYOS')
         rewrites = rebase(bundle)
+        validate_public_tree(bundle/'recoveryos',site='RECOVERYOS')
         build_group(bundle)
+        validate_public_tree(bundle/'recoveryos',site='RECOVERYOS')
         validated_sitemap_urls = validate_cloudflare_seo(bundle, extra_routes=ROUTES)
         validate_bundle_links(bundle)
         if validated_sitemap_urls < 1:
