@@ -1,4 +1,5 @@
 """Adversarial source-shape QA: entirely offline; no real carriers are queried."""
+import io
 import json
 from urllib.parse import parse_qs, urlparse
 

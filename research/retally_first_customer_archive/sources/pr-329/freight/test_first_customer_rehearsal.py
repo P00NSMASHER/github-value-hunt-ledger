@@ -1,7 +1,7 @@
 """Behavioral acceptance of the existing pipeline on a fictional first buyer."""
 from decimal import Decimal, ROUND_HALF_UP
 
-from freight.commercial import historical_first_customer_rehearsal as rehearsal
+from freight import synthetic_rehearsal as rehearsal
 
 
 def test_first_customer_runs_actual_proof_chain_and_current_thirty_percent_offer():

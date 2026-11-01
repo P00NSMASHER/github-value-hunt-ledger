@@ -1,0 +1,133 @@
+import json
+import pytest
+from dataclasses import asdict, replace
+
+from freight.pilot_activation_packet import build_packet
+from freight.pilot_charter import _canonical_hash, build_charter, from_dict as charter_from_dict
+from freight.pilot_amendment import AmendmentState, build_amendment, from_dict
+
+def ready_input():
+    return {"authorization_documented":True,"read_only_access":True,"population_reproducible":True,"incumbent_output_sealable":True,"settlement_observable":True,"material_authority_reconstructable":True,"customer_identity_stable":True,"carrier_identity_stable":True,"retention_defined":True,"deletion_defined":True,"invoice_source_coverage":1.0,"authority_source_coverage":1.0,"shipment_evidence_coverage":1.0}
+
+def activation(status="READY",route="CONTROLLED_MANUAL_BLIND_PILOT",warnings=None):
+    p=build_packet(ready_input(),{"status":status,"route":route,"blockers":[],"conditions":[],"warnings":warnings or []})
+    return json.loads(json.dumps(asdict(p)))
+
+def charter_request(**overrides):
+    d={"engagement_id":"ENG-001","buyer_id":"buyer-a","business_unit":"bu-1","population_rule":"August approved invoices","source_date_start":"2026-08-01","source_date_end":"2026-08-31","carrier_scope":["carrier-1","carrier-2"],"mode_scope":["parcel","LTL"],"fixed_fee_usd":20000,"buyer_truth_owner_role":"Director Transportation","buyer_action_approver_role":"VP Supply Chain","freight_engagement_owner_role":"Pilot Lead","buyer_acknowledges_scope":True,"buyer_acknowledges_blind_protocol":True,"buyer_acknowledges_report_totals_separate":True,"buyer_acknowledges_no_guaranteed_recovery":True,"freight_acknowledges_no_external_action_without_buyer_approval":True}
+    d.update(overrides)
+    return charter_from_dict(d)
+
+def historical_activation():
+    p=activation()
+    p["price_band_usd"]="$15,000–$25,000 fixed"
+    p["activation_hash"]=_canonical_hash({k:v for k,v in p.items() if k!="activation_hash"})
+    return p
+
+def base_charter(packet=None):
+    return json.loads(json.dumps(asdict(build_charter(packet or activation(),charter_request()))))
+
+def req(**overrides):
+    d={"amendment_id":"AMD-001","reason":"Buyer requested scope update","buyer_acknowledges_change":True,"freight_acknowledges_change":True,"buyer_action_approver_role":"CFO"}
+    d.update(overrides)
+    return from_dict(d)
+
+def test_accepted_role_change_requires_replacement_but_not_new_activation():
+    a=build_amendment(base_charter(),req())
+    assert a.amendment_state==AmendmentState.ACCEPTED_REPLACEMENT_REQUIRED.value
+    assert a.requires_reacknowledgment is True
+    assert a.requires_new_activation is False
+    assert a.requires_launch_revalidation is False
+    assert a.kickoff_suspended is True
+    assert a.customer_data_authorized is False
+
+def test_material_scope_change_requires_readiness_launch_and_new_activation():
+    a=build_amendment(base_charter(),req(population_rule="August and September approved invoices",buyer_action_approver_role=None))
+    assert a.requires_readiness_revalidation is True
+    assert a.requires_launch_revalidation is True
+    assert a.requires_new_activation is True
+
+def test_unacknowledged_change_stays_pending():
+    a=build_amendment(base_charter(),req(buyer_acknowledges_change=False))
+    assert a.amendment_state==AmendmentState.PENDING_ACKNOWLEDGMENT.value
+    assert a.kickoff_suspended is False
+
+def test_no_change_is_rejected():
+    with pytest.raises(ValueError,match="at least one Charter field"):
+        build_amendment(base_charter(),req(buyer_action_approver_role="VP Supply Chain"))
+
+def test_tampered_base_charter_is_rejected():
+    c=base_charter(); c["fixed_fee_usd"]=1
+    with pytest.raises(ValueError,match="charter hash mismatch"):
+        build_amendment(c,req())
+
+def test_scope_change_cannot_use_same_activation_hash():
+    base=base_charter()
+    replacement=json.loads(json.dumps(asdict(build_charter(activation(),charter_request(population_rule="Expanded scope")))))
+    with pytest.raises(ValueError,match="new Activation Packet"):
+        build_amendment(base,req(population_rule="Expanded scope",buyer_action_approver_role=None),replacement)
+
+def test_role_change_can_be_superseded_by_replacement_charter_same_activation():
+    base=base_charter()
+    replacement=json.loads(json.dumps(asdict(build_charter(activation(),charter_request(buyer_action_approver_role="CFO")))))
+    a=build_amendment(base,req(),replacement)
+    assert a.amendment_state==AmendmentState.SUPERSEDED_BY_REPLACEMENT.value
+    assert a.replacement_charter_hash==replacement["charter_hash"]
+    assert a.customer_data_authorized is True
+    assert a.external_action_authorized is False
+
+def test_material_scope_change_can_be_superseded_only_by_new_activation_and_matching_charter():
+    base=base_charter()
+    new_activation=activation(warnings=["scope-revalidated"])
+    replacement=json.loads(json.dumps(asdict(build_charter(new_activation,charter_request(population_rule="Expanded scope")))))
+    a=build_amendment(base,req(population_rule="Expanded scope",buyer_action_approver_role=None),replacement)
+    assert a.amendment_state==AmendmentState.SUPERSEDED_BY_REPLACEMENT.value
+    assert a.requires_new_activation is True
+    assert a.customer_data_authorized is True
+
+def test_custom_fee_change_requires_reacknowledgment_but_not_new_activation():
+    a=build_amendment(base_charter(),req(fixed_fee_usd=30000,buyer_action_approver_role=None))
+    assert a.requires_reacknowledgment is True
+    assert a.requires_new_activation is False
+
+
+def test_legacy_out_of_band_fee_still_requires_new_activation_and_band():
+    base=base_charter(historical_activation())
+    a=build_amendment(base,req(fixed_fee_usd=30000,buyer_action_approver_role=None))
+    assert a.requires_new_activation is True
+    replacement=json.loads(json.dumps(asdict(build_charter(historical_activation(),charter_request()))))
+    with pytest.raises(ValueError):
+        build_amendment(base,req(fixed_fee_usd=30000,buyer_action_approver_role=None),replacement)
+
+@pytest.mark.parametrize("name", ["buyer_acknowledges_change", "freight_acknowledges_change"])
+@pytest.mark.parametrize("forged", ["false","true",0,1,None,[],{}])
+def test_amendment_acknowledgments_reject_truthy_values(name, forged):
+    with pytest.raises(ValueError,match="must be a boolean"):
+        req(**{name: forged})
+
+
+def test_direct_amendment_dataclass_bypass_is_rejected():
+    forged=replace(req(), buyer_acknowledges_change="false")
+    with pytest.raises(ValueError,match="must be a boolean"):
+        build_amendment(base_charter(),forged)
+
+
+@pytest.mark.parametrize("name", ["carrier_scope","mode_scope"])
+@pytest.mark.parametrize("bad", ["LTL", {"a":1}, 123, [], [" "]])
+def test_amendment_scope_rejects_string_iteration(name, bad):
+    with pytest.raises(ValueError,match="must (?:be|contain)"):
+        req(**{name:bad})
+
+
+@pytest.mark.parametrize("bad", ["100", True, False, float("nan"), float("inf"), -1, 0])
+def test_amendment_fee_rejects_invalid_values(bad):
+    with pytest.raises(ValueError,match="fixed_fee_usd"):
+        req(fixed_fee_usd=bad, buyer_action_approver_role=None)
+
+
+def test_amendment_rejects_rehashed_false_string_in_base_authorization():
+    base=base_charter()
+    base["customer_data_authorized"]="false"
+    base["charter_hash"]=_canonical_hash({k:v for k,v in base.items() if k!="charter_hash"})
+    with pytest.raises(ValueError,match="must be a boolean"):
+        build_amendment(base,req())

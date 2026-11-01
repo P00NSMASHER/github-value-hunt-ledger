@@ -1,0 +1,16 @@
+name: RETALLY historical first-customer archive verification (read-only)
+on:
+  pull_request:
+    paths:
+      - 'research/retally_first_customer_archive/**'
+      - '.github/workflows/retally-first-customer-historical-archive.yml'
+permissions:
+  contents: read
+jobs:
+  archive-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Verify 86 original blob bytes without importing legacy software
+        run: python3 research/retally_first_customer_archive/verify_archive.py

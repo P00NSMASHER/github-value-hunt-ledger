@@ -9,7 +9,7 @@ import pytest
 
 from freight.engagement_state import _hash, resolve_engagement
 from freight.pilot_amendment import build_amendment, from_dict as amendment_request
-from freight.test_engagement_state import charter, amendment
+from freight.test_engagement_state import charter, amendment, activation, charter_req
 
 
 def seal(document, key):

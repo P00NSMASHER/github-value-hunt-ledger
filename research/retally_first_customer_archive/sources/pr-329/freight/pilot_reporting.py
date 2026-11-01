@@ -1,0 +1,306 @@
+"""Pilot reporting derived from frozen Freight Recovery proof objects."""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from enum import Enum
+import re
+from typing import Protocol
+
+from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, REVIEW, VALIDATED, canonical_hash
+
+
+class RecoveryCertificateSource(Protocol):
+    """Common read interface for in-memory and persistent proof snapshots."""
+
+    buyer_id: str
+    business_unit: str
+
+    def certificate(self, finding_id: str) -> RecoveryCertificate: ...
+
+
+class ReviewDisposition(str, Enum):
+    CONFIRMED = "CONFIRMED"
+    FALSE_POSITIVE = "FALSE_POSITIVE"
+    UNRESOLVED = "UNRESOLVED"
+
+
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+@dataclass(frozen=True)
+class FindingReview:
+    finding_id: str
+    disposition: ReviewDisposition
+    reviewer_minutes: int = 0
+    finding_proof_hash: str | None = None
+    reviewer_role: str | None = None
+    reviewed_at: str | None = None
+    review_hash: str | None = field(init=False, default=None)
+
+    def __post_init__(self):
+        if not isinstance(self.disposition, ReviewDisposition):
+            raise ValueError("disposition must be a ReviewDisposition")
+        if type(self.reviewer_minutes) is not int or self.reviewer_minutes < 0:
+            raise ValueError("reviewer_minutes must be a non-negative integer")
+        proof_fields = (self.finding_proof_hash, self.reviewer_role, self.reviewed_at)
+        if all(value is None for value in proof_fields):
+            return
+        if any(value is None for value in proof_fields):
+            raise ValueError("proof-bound review requires finding_proof_hash, reviewer_role and reviewed_at")
+        assert self.finding_proof_hash is not None
+        assert self.reviewer_role is not None
+        assert self.reviewed_at is not None
+        if not SHA256_RE.fullmatch(self.finding_proof_hash):
+            raise ValueError("finding_proof_hash must be lowercase SHA-256")
+        role = self.reviewer_role.strip()
+        if not role:
+            raise ValueError("reviewer_role is required")
+        timestamp = self.reviewed_at.strip()
+        normalized = timestamp[:-1] + "+00:00" if timestamp.endswith("Z") else timestamp
+        try:
+            parsed = datetime.fromisoformat(normalized)
+        except ValueError as exc:
+            raise ValueError("reviewed_at must be timezone-aware ISO-8601") from exc
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError("reviewed_at must be timezone-aware ISO-8601")
+        canonical_time = (
+            parsed.astimezone(timezone.utc)
+            .isoformat(timespec="microseconds")
+            .replace("+00:00", "Z")
+        )
+        object.__setattr__(self, "reviewer_role", role)
+        object.__setattr__(self, "reviewed_at", canonical_time)
+        body = {
+            "schema": 1,
+            "finding_id": self.finding_id,
+            "finding_proof_hash": self.finding_proof_hash,
+            "disposition": self.disposition.value,
+            "reviewer_minutes": self.reviewer_minutes,
+            "reviewer_role": role,
+            "reviewed_at": canonical_time,
+        }
+        object.__setattr__(self, "review_hash", canonical_hash(body))
+
+
+def make_finding_review(
+    finding,
+    disposition: ReviewDisposition,
+    *,
+    reviewer_role: str,
+    reviewed_at: str,
+    reviewer_minutes: int = 0,
+) -> FindingReview:
+    return FindingReview(
+        finding_id=finding.finding_id,
+        disposition=disposition,
+        reviewer_minutes=reviewer_minutes,
+        finding_proof_hash=finding.proof_hash,
+        reviewer_role=reviewer_role,
+        reviewed_at=reviewed_at,
+    )
+
+
+def verify_finding_review(
+    review: FindingReview,
+    finding,
+    *,
+    require_bound: bool = False,
+) -> None:
+    if review.finding_id != finding.finding_id:
+        raise ValueError("review finding_id mismatch")
+    if review.review_hash is None:
+        if require_bound:
+            raise ValueError("proof-bound finding review is required")
+        return
+    if review.finding_proof_hash != finding.proof_hash:
+        raise ValueError("finding review proof hash does not match current finding")
+    if review.reviewer_role is None or review.reviewed_at is None:
+        raise ValueError("proof-bound finding review metadata is incomplete")
+    body = {
+        "schema": 1,
+        "finding_id": review.finding_id,
+        "finding_proof_hash": review.finding_proof_hash,
+        "disposition": review.disposition.value,
+        "reviewer_minutes": review.reviewer_minutes,
+        "reviewer_role": review.reviewer_role,
+        "reviewed_at": review.reviewed_at,
+    }
+    if canonical_hash(body) != review.review_hash:
+        raise ValueError("finding review hash mismatch")
+
+
+@dataclass(frozen=True)
+class PilotMetrics:
+    buyer_id: str
+    business_unit: str
+    reviewed_discrepancy_cents: int
+    validated_finding_cents: int
+    challenger_only_validated_cents: int
+    realized_cents: int
+    fee_eligible_realized_cents: int
+    false_positive_cents: int
+    unresolved_validated_cents: int
+    finding_count: int
+    validated_finding_count: int
+    challenger_only_finding_count: int
+    false_positive_count: int
+    unresolved_review_count: int
+    reviewer_minutes: int
+    held_finding_count: int = 0
+    held_discrepancy_cents: int = 0
+    supported_unrealized_cents: int = 0
+
+    @property
+    def reviewer_hours(self) -> float:
+        return round(self.reviewer_minutes / 60, 2)
+
+
+def _positive_variance(finding) -> int:
+    return max(finding.actual_cents - finding.expected_cents, 0)
+
+
+def build_pilot_metrics(
+    truth: TruthManifest,
+    incumbent: IncumbentOutput,
+    ledger: RecoveryCertificateSource,
+    reviews: tuple[FindingReview, ...] = (),
+) -> PilotMetrics:
+    if (incumbent.buyer_id, incumbent.business_unit) != (
+        truth.buyer_id,
+        truth.business_unit,
+    ):
+        raise ValueError("incumbent output scope mismatch")
+    if (ledger.buyer_id, ledger.business_unit) != (
+        truth.buyer_id,
+        truth.business_unit,
+    ):
+        raise ValueError("recovery ledger scope mismatch")
+    if incumbent.truth_hash != truth.truth_hash:
+        raise ValueError("incumbent output truth hash mismatch")
+    if incumbent.population_hash != truth.population_hash:
+        raise ValueError("incumbent output population hash mismatch")
+
+    findings = {finding.finding_id: finding for finding in truth.findings}
+    # This report and downstream USD outcome fields have no FX conversion basis.
+    # Never add different currencies together or relabel foreign amounts as USD.
+    if any(finding.currency != "USD" for finding in findings.values()):
+        raise ValueError("USD pilot metrics require USD findings; report other currencies separately")
+    incumbent_ids = set(incumbent.finding_ids)
+
+    review_index: dict[str, FindingReview] = {}
+    for review in reviews:
+        if review.finding_id not in findings:
+            raise ValueError("review references unknown finding: " + review.finding_id)
+        if review.finding_id in review_index:
+            raise ValueError("duplicate review: " + review.finding_id)
+        verify_finding_review(review, findings[review.finding_id], require_bound=False)
+        review_index[review.finding_id] = review
+
+    reviewed_discrepancy = sum(_positive_variance(f) for f in findings.values())
+    validated = [f for f in findings.values() if f.status == VALIDATED]
+    challenger_only = [f for f in validated if f.finding_id not in incumbent_ids]
+
+    validated_cents = sum(f.validated_cents for f in validated)
+    challenger_cents = sum(f.validated_cents for f in challenger_only)
+
+    false_positive_cents = 0
+    unresolved_validated_cents = 0
+    false_positive_count = 0
+    unresolved_review_count = 0
+    reviewer_minutes = 0
+
+    for review in reviews:
+        reviewer_minutes += review.reviewer_minutes
+        finding = findings[review.finding_id]
+        if review.disposition is ReviewDisposition.FALSE_POSITIVE:
+            false_positive_count += 1
+            false_positive_cents += _positive_variance(finding)
+        elif review.disposition is ReviewDisposition.UNRESOLVED:
+            unresolved_review_count += 1
+            unresolved_validated_cents += finding.validated_cents
+
+    certs = [ledger.certificate(finding_id) for finding_id in sorted(findings)]
+    for cert in certs:
+        if (cert.buyer_id, cert.business_unit) != (
+            truth.buyer_id,
+            truth.business_unit,
+        ):
+            raise AssertionError("recovery certificate scope mismatch")
+        finding = findings[cert.finding_id]
+        if cert.finding_proof_hash != finding.proof_hash or cert.validated_cents != finding.validated_cents:
+            raise ValueError("recovery certificate does not match frozen finding proof")
+        if not 0 <= cert.realized_cents <= finding.validated_cents:
+            raise AssertionError("finding recovery cannot exceed its validated amount")
+        if not 0 <= cert.fee_eligible_cents <= cert.realized_cents:
+            raise AssertionError("finding fee-eligible recovery cannot exceed its realized amount")
+        if cert.finding_id in incumbent_ids and cert.fee_eligible_cents:
+            raise ValueError("incumbent finding cannot have fee-eligible recovery")
+
+    realized = sum(cert.realized_cents for cert in certs)
+    fee_eligible = sum(cert.fee_eligible_cents for cert in certs)
+
+    if realized > validated_cents:
+        raise AssertionError("realized recovery cannot exceed validated findings")
+    if fee_eligible > realized:
+        raise AssertionError("fee-eligible recovery cannot exceed realized recovery")
+    if fee_eligible > challenger_cents:
+        raise AssertionError(
+            "fee-eligible recovery cannot exceed challenger-only validated findings"
+        )
+
+    return PilotMetrics(
+        buyer_id=truth.buyer_id,
+        business_unit=truth.business_unit,
+        reviewed_discrepancy_cents=reviewed_discrepancy,
+        validated_finding_cents=validated_cents,
+        challenger_only_validated_cents=challenger_cents,
+        realized_cents=realized,
+        fee_eligible_realized_cents=fee_eligible,
+        false_positive_cents=false_positive_cents,
+        unresolved_validated_cents=unresolved_validated_cents,
+        finding_count=len(findings),
+        validated_finding_count=len(validated),
+        challenger_only_finding_count=len(challenger_only),
+        false_positive_count=false_positive_count,
+        unresolved_review_count=unresolved_review_count,
+        reviewer_minutes=reviewer_minutes,
+        held_finding_count=sum(f.status == REVIEW for f in findings.values()),
+        held_discrepancy_cents=sum(_positive_variance(f) for f in findings.values() if f.status == REVIEW),
+        supported_unrealized_cents=validated_cents - realized,
+    )
+
+
+def dollars(cents: int) -> str:
+    return "$" + format(cents / 100, ",.2f")
+
+
+def render_markdown(metrics: PilotMetrics) -> str:
+    return "\n".join(
+        [
+            "# Freight Audit Acceptance Test — Pilot Metrics",
+            "",
+            "- Buyer scope: **" + metrics.buyer_id + "**",
+            "- Business unit: **" + metrics.business_unit + "**",
+            "",
+            "## Financial totals",
+            "- Reviewed discrepancy: **" + dollars(metrics.reviewed_discrepancy_cents) + "**",
+            "- Validated finding: **" + dollars(metrics.validated_finding_cents) + "**",
+            "- Challenger-only validated: **" + dollars(metrics.challenger_only_validated_cents) + "**",
+            "- Settlement-proven realized: **" + dollars(metrics.realized_cents) + "**",
+            "- Fee-eligible realized: **" + dollars(metrics.fee_eligible_realized_cents) + "**",
+            "- Supported but unrealized: **" + dollars(metrics.supported_unrealized_cents) + "**",
+            "",
+            "These totals are intentionally non-interchangeable. Discrepancy and validated dollars are not realized savings. Settlement-proven realized includes non-fee-eligible credits; only fee-eligible realized is eligible for a recovery fee.",
+            "",
+            "## Review quality",
+            "- Findings: " + str(metrics.finding_count),
+            "- Validated findings: " + str(metrics.validated_finding_count),
+            "- Challenger-only findings: " + str(metrics.challenger_only_finding_count),
+            "- False-positive findings: " + str(metrics.false_positive_count) + " (" + dollars(metrics.false_positive_cents) + ")",
+            "- Reviews marked UNRESOLVED: " + str(metrics.unresolved_review_count) + " (" + dollars(metrics.unresolved_validated_cents) + " validated dollars only)",
+            "- Held source findings: " + str(metrics.held_finding_count) + " (" + dollars(metrics.held_discrepancy_cents) + " unverified candidate)",
+            "Held and supported totals describe the frozen source truth; review disposition counts do not clear evidence holds or establish recovery. Changes require a newly approved truth.",
+            "- Reviewer effort: " + str(metrics.reviewer_minutes) + " minutes (" + format(metrics.reviewer_hours, ".2f") + " hours)",
+        ]
+    ) + "\n"

@@ -1,0 +1,701 @@
+{
+  "schema_version": 1,
+  "authority": "HISTORICAL_SOURCE_ONLY_NOT_PRODUCTION_OR_CUSTOMER_APPROVAL",
+  "source_pr": 329,
+  "source_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+  "original_pr_file_count": 86,
+  "original_modified_file_count": 41,
+  "original_added_file_count": 45,
+  "archive_review_only": true,
+  "no_live_customer_or_cash_authority": true,
+  "records": [
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": ".github/workflows/freight-contracts.yml",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/.github/workflows/freight-contracts.yml",
+      "blob_sha": "f20f0423e1d8a2e8b9c0e5a619286e90aef2675d",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": ".github/workflows/repository-release-gate.yml",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/.github/workflows/repository-release-gate.yml",
+      "blob_sha": "0d87d84bdbc5f2fad3e4bf635701a37d913a1434",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "ai_business_os/test_release_gate_contract.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/ai_business_os/test_release_gate_contract.py",
+      "blob_sha": "c52f86049ac7574671db976e7ca3e614464db558",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/BTS_PUBLIC_EVALUATION.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/BTS_PUBLIC_EVALUATION.md",
+      "blob_sha": "b57b837ad7f06c4d4bdb4b2ce884259bc91c058c",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/COMMERCIAL_PLAYBOOK.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/COMMERCIAL_PLAYBOOK.md",
+      "blob_sha": "67ab54189f7adfc3512f50bc2be256d2ce0889ef",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/COMMERCIAL_QUALIFICATION.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/COMMERCIAL_QUALIFICATION.md",
+      "blob_sha": "c7e904515318cd7211d2f0a540544aa088f0418f",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/EIA_PUBLIC_DIESEL_REFERENCE.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/EIA_PUBLIC_DIESEL_REFERENCE.md",
+      "blob_sha": "bb169b2a277452622b249011d9030ddcb24363ba",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/FMCSA_PUBLIC_CARRIER_REFERENCE.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/FMCSA_PUBLIC_CARRIER_REFERENCE.md",
+      "blob_sha": "063b1887567546ab4ab8cbd63f02eb646fa7d5c6",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/OUTREACH_SAFETY.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/OUTREACH_SAFETY.md",
+      "blob_sha": "e940539e45e938fd58aa873844756912f297335b",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/PILOT_CHARTER.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/PILOT_CHARTER.md",
+      "blob_sha": "66bd07a3cb87bf6428f35d4bbeda5eaf089b4cb9",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/PILOT_DATA_ROOM.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/PILOT_DATA_ROOM.md",
+      "blob_sha": "8978b98943ff39c73ec18f52c1546dead1b91f4c",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/RETALLY_FINAL_LAUNCH_CONTROL_20261008.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/RETALLY_FINAL_LAUNCH_CONTROL_20261008.md",
+      "blob_sha": "fc2134e73e7657699e99d0070f611ff1ed8853da",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/RETALLY_FINAL_LAUNCH_HANDOFF_20261008.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/RETALLY_FINAL_LAUNCH_HANDOFF_20261008.md",
+      "blob_sha": "766bbbcb90c1c2118a54492ac0cad760f167550d",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/RETALLY_TEN_REVIEWER_ACCEPTANCE_20261012.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/RETALLY_TEN_REVIEWER_ACCEPTANCE_20261012.md",
+      "blob_sha": "0bd17307f5cef85d18c54fd44dfefb0866322130",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_AUDIT_ENGAGEMENT_AGREEMENT.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_AUDIT_ENGAGEMENT_AGREEMENT.md",
+      "blob_sha": "a31414a01a4d859375004b3b627ed41a564a804c",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_CLOSURE_RETENTION.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_CLOSURE_RETENTION.md",
+      "blob_sha": "b8f292991b2240107714c188dd23703ff549d7b1",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_CONTINGENCY_FEE_INVOICE.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_CONTINGENCY_FEE_INVOICE.md",
+      "blob_sha": "03979b570c90c343bc88e27c5e5199b4a801106e",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_CUSTOMER_EMAIL_TEMPLATES.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_CUSTOMER_EMAIL_TEMPLATES.md",
+      "blob_sha": "d9e56697d7e8605a9dd996fb3dc2cc6c2466b327",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_CUSTOMER_WELCOME.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_CUSTOMER_WELCOME.md",
+      "blob_sha": "5809495fc4bff482f8d3a105f749387744863152",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_INQUIRY_LAUNCH_RUNBOOK_20261008.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_INQUIRY_LAUNCH_RUNBOOK_20261008.md",
+      "blob_sha": "00a0622778f13c00e53735c40a7fae91bba2a515",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_RECOVERY_AUTHORIZATION.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_RECOVERY_AUTHORIZATION.md",
+      "blob_sha": "0d879ef4393c108f32e10f5ec1fd2f35abca91f3",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_RECOVERY_STATUS_UPDATE.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_RECOVERY_STATUS_UPDATE.md",
+      "blob_sha": "641df324dab554c4267196614c8ef52053d1f1be",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/brand/RETALLY_SECURE_SUBMISSION.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/brand/RETALLY_SECURE_SUBMISSION.md",
+      "blob_sha": "8aded197f99cc493e525022a30c89e9942285d0c",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/bts_public_evaluation.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/bts_public_evaluation.py",
+      "blob_sha": "3deb8a4dda8b181065c30fc4f4752bcb749f6607",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/FIRST_CUSTOMER_PREPARATION_RECEIPT_20261012.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/FIRST_CUSTOMER_PREPARATION_RECEIPT_20261012.md",
+      "blob_sha": "8fb9b5f7fd150216eedb97990f8220eb96c1ca99",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/FIRST_PILOT_ACTIVATION_PACKET.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/FIRST_PILOT_ACTIVATION_PACKET.md",
+      "blob_sha": "af7c3c5ca9cd6841b20a3339e76a594fb0129912",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/MISSION2G_OPERATOR_ACCEPTANCE.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/MISSION2G_OPERATOR_ACCEPTANCE.md",
+      "blob_sha": "d18654e8fc373b144f2fbb8062da94a48e576bc9",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/MISSION2H_ZERO_UPFRONT_ECONOMICS.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/MISSION2H_ZERO_UPFRONT_ECONOMICS.md",
+      "blob_sha": "7e0437b08c29581fa0b7e0ae3e785a049ac2d1bb",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/REMAINING_GATES_SYNTHETIC_REHEARSAL_20261015.md",
+      "blob_sha": "50e86cfe1dca5a2dd2502ab5a062bcfa4068f8be",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/first_customer_acceptance_m2g.json",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/first_customer_acceptance_m2g.json",
+      "blob_sha": "d00c12ded96ed73ad728c429b50acb4edadf61a2",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/first_customer_gate.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/first_customer_gate.py",
+      "blob_sha": "9267ba8a8a9d57189bf46b71dd3d3d55483eea19",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/first_pilot_preflight.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/first_pilot_preflight.py",
+      "blob_sha": "d5dfa6c3b4dcdbd8972b86f4c8a5afa6432189c5",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/fixtures/zero_upfront_synthetic_example.json",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/fixtures/zero_upfront_synthetic_example.json",
+      "blob_sha": "68ee7f3eff9cc032f8fde099865120eea0ced1e7",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/pre_revenue_readiness.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/pre_revenue_readiness.py",
+      "blob_sha": "2e646da9535d519a3fbbb8bc0ca4cc8e8d4bd8ca",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/remaining_gate_rehearsal.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/remaining_gate_rehearsal.py",
+      "blob_sha": "d9537c085770584f40da1e5314fd509d0cfcc398",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/retally_ten_reviewer_acceptance_20261012.json",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/retally_ten_reviewer_acceptance_20261012.json",
+      "blob_sha": "e52c4e76e5b5618f57568e2ff84c8b9c0110c87e",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/test_final_commercial_boundary.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/test_final_commercial_boundary.py",
+      "blob_sha": "bc8f96498b3c8e465a1bb7f2a0cbfeb6b5d49b6a",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/test_first_customer_gate.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/test_first_customer_gate.py",
+      "blob_sha": "960bf775f84cff2cf75895a4d1bdd60911c5c6ee",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/test_first_pilot_preflight.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/test_first_pilot_preflight.py",
+      "blob_sha": "a3bb1abec106680acf2a6e41fd2bb3d281d84f65",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/test_pre_revenue_readiness.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/test_pre_revenue_readiness.py",
+      "blob_sha": "6ebe0ad83612b7d79f52ff0fd0fb2e75e65ac513",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/test_remaining_gate_rehearsal.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/test_remaining_gate_rehearsal.py",
+      "blob_sha": "16c688e3d34e31620baf008dae6e4a4f26f8ef1d",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/test_zero_upfront_underwriting.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/test_zero_upfront_underwriting.py",
+      "blob_sha": "9eaf9cad2d0efae24a6e06e5a2c521cff742fc94",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial/zero_upfront_underwriting.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial/zero_upfront_underwriting.py",
+      "blob_sha": "df35e3b641fb9fb641927e3d7321ac10eecf3766",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/commercial_terms.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/commercial_terms.py",
+      "blob_sha": "b070a28abf379c5061f45ea94a76938546acc473",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/contracts.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/contracts.py",
+      "blob_sha": "cd82b12131b985c9450c30f456d46a9490892e31",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/data/bts_t100_airfreight_observed_subset_2013.csv",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/data/bts_t100_airfreight_observed_subset_2013.csv",
+      "blob_sha": "90de471b78ad61fced14d4436b33f392b533ee83",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/data/eia_on_highway_diesel_2026-10-06.csv",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/data/eia_on_highway_diesel_2026-10-06.csv",
+      "blob_sha": "e49629f7754186f33e4c95e95546e6a599d36254",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/engagement_resolution_guard.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/engagement_resolution_guard.py",
+      "blob_sha": "c3c022dc33025a7cc7117d5dedec8ed846d70707",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/engagement_state.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/engagement_state.py",
+      "blob_sha": "9f0fa369f3705221202f43781bbb0303ea1ee972",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/fixtures/recovery_evidence_pack_synthetic.json",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/fixtures/recovery_evidence_pack_synthetic.json",
+      "blob_sha": "624b01cfc63b8a6c5053882d5cbe73a0b2f9460c",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/fmcsa_public_carrier.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/fmcsa_public_carrier.py",
+      "blob_sha": "e17dfabb0cb14b8dd95b33d3b0e73b0b1efde8d9",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/lead_qualification.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/lead_qualification.py",
+      "blob_sha": "2f0c070991d60deb18a3fd2321d8c5bfbb50690c",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/outreach_guard.mjs",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/outreach_guard.mjs",
+      "blob_sha": "b14ec26d5c3f3fe7e16f89d3a56f1d3e5dc23416",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/outreach_guard.test.mjs",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/outreach_guard.test.mjs",
+      "blob_sha": "29caec5a02e60bd9f34b8923df64d0e10d464d6d",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/outreach_preflight.mjs",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/outreach_preflight.mjs",
+      "blob_sha": "749b877465c65e412036995edb4469c61eb66adf",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/outreach_preflight.test.mjs",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/outreach_preflight.test.mjs",
+      "blob_sha": "6dbb5ce3daf69eda9a66e3adc38e36460fca123d",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/pilot_amendment.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/pilot_amendment.py",
+      "blob_sha": "b3a494a2a8c85ab3899b619d3497d354052a9d7a",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/pilot_charter.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/pilot_charter.py",
+      "blob_sha": "2d21ce6e174c2194400335de38a4a98fcc2e79c8",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/pilot_package.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/pilot_package.py",
+      "blob_sha": "2b0a9716adcadb855396225b9fb05cf6e94fc21b",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/pilot_reporting.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/pilot_reporting.py",
+      "blob_sha": "99f9d98435b8d4e5ea0e30af7992c551c0256782",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/recovery_engagement.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/recovery_engagement.py",
+      "blob_sha": "f731b5086412015697439960029738c8bfb614f0",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/recovery_evidence_pack.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/recovery_evidence_pack.py",
+      "blob_sha": "192770f9cf97b846ea3613287c609e6ea89f54db",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/retally_eia_reference.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/retally_eia_reference.py",
+      "blob_sha": "616ff35438ba92b13e9d47dbe4e8f52557fcc807",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/review_packet.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/review_packet.py",
+      "blob_sha": "c7f6aef7930b9ad94001c6a73c125c4dc6057383",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/site/build.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/site/build.py",
+      "blob_sha": "b012c7cf4b872b59bb981dc58a5c76098b754cdd",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/site/index.html",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/site/index.html",
+      "blob_sha": "2e006afe912f8a93904fbcf889c86b528a7c8818",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/site/test_build.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/site/test_build.py",
+      "blob_sha": "c987bf2b88333b58e8875d068cfb879a2967f631",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/synthetic_rehearsal.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/synthetic_rehearsal.py",
+      "blob_sha": "5471098a062450653a75cc90ec2390281e029d02",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_bts_public_evaluation.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_bts_public_evaluation.py",
+      "blob_sha": "b1ff1964c50231d9245c6b6245ca0daaed9b95f5",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_commercial_terms.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_commercial_terms.py",
+      "blob_sha": "dd27250734151958a0ecd3da0392acba4ec53f3f",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_engagement_resolution_integrity.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_engagement_resolution_integrity.py",
+      "blob_sha": "7f1555694a904b7a9ed42f22da79ce2b5476173b",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_engagement_state.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_engagement_state.py",
+      "blob_sha": "657a29ba06c15e8ee5196e6728d0f1236f988795",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_first_customer_rehearsal.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_first_customer_rehearsal.py",
+      "blob_sha": "959cc47d0536c9e011f7faba1a6f83c686635d15",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_fmcsa_public_carrier.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_fmcsa_public_carrier.py",
+      "blob_sha": "eeb621158c73e28ff028f545a1d5d1d8201d7330",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_lead_qualification.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_lead_qualification.py",
+      "blob_sha": "4fa733ca9c569a9b199861f03047fdb29d8c9b00",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_pilot_amendment.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_pilot_amendment.py",
+      "blob_sha": "27865a2d70842966d071a22990d220386b37bcd0",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_pilot_charter.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_pilot_charter.py",
+      "blob_sha": "e7e79f45a23c3b0f954022eac8fe3882d4543ffd",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_pilot_package.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_pilot_package.py",
+      "blob_sha": "348c2e12da5c1be247691cb910c330ff267d77df",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_pilot_proof_chain.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_pilot_proof_chain.py",
+      "blob_sha": "3e75e2edf154b0dde75933fe72e8411c7eb7616e",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_recovery_engagement.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_recovery_engagement.py",
+      "blob_sha": "cb2868cae93093bf7c086a43e3979491da664ed4",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_recovery_evidence_pack.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_recovery_evidence_pack.py",
+      "blob_sha": "3b30bce7d9bfb897d81a32c68b6210d31f2a7fc1",
+      "status": "modified"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_recovery_ledger_integrity.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_recovery_ledger_integrity.py",
+      "blob_sha": "09fcf6fddb304e67bb7998e164d7ce6f6ed49af7",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_release_discovery.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_release_discovery.py",
+      "blob_sha": "5a9376f043293a09c68c3367d6f56a6807bb4346",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_release_workflow_integration.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_release_workflow_integration.py",
+      "blob_sha": "ee39f9ea866e11aab779d3154756b5d0e1e7eda1",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_retally_eia_reference.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_retally_eia_reference.py",
+      "blob_sha": "5cb410de19bbffb41497a397ed9e2ba75460e219",
+      "status": "added"
+    },
+    {
+      "pr": 329,
+      "pr_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
+      "original_path": "freight/test_review_packet.py",
+      "archived_path": "research/retally_first_customer_archive/sources/pr-329/freight/test_review_packet.py",
+      "blob_sha": "dca9b1d2901b37af537e7ea303dabeaa74f39831",
+      "status": "modified"
+    }
+  ]
+}

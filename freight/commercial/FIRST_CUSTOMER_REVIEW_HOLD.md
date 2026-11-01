@@ -1,9 +1,0 @@
-# RETALLY first-customer historical evidence | REVIEW HOLD (November 1, 2026)
-
-This branch preserves 40 **byte-exact**, 5 **source-documented compatibility-adapted**, previously unmerged first-customer preparation documents, synthetic fixtures, test suites and standalone analysis tools from historical PR #329 (`a77ecc03b45425a15e2cd3f1a49b14e229ad4f78`). Files from that older release are dated snapshots, not present-day certification.
-
-The existing protected-main production code, signed engagement terms, public website, RecoveryOS payment ledger and billing systems remain unchanged. The 30% fee model is valid only as separately agreed in an actual accepted engagement; no real recovery or collected funds are claimed.
-
-**NO-GO for any unsupervised customer financial use.** Original research tests and sample legal documents are not client consent, confidential data-receipt authorization, carrier dispute authority, professional legal advice, proof of externally verified money, production financial release or permission to contact providers/customers. The source manifest records all 45 original Git blob IDs and both original and adapted hashes for the five changes; a preserved historical synthetic-only runner avoids overwriting current main and is tested as part of the full Freight CI. A passing synthetic test alone does not override live deployment, security, rights, payment or customer evidence controls.
-
-A 717-line historical first-customer synthetic runner is preserved at a separate review-only module path. It does not replace newer live-domain code. No original #329 branch was rewritten; its remaining 41 changed-file paths include newer main versions and require independent reconciliation before closure. No paid services, website release, scheduled workflow, Stripe action, external messages or real customer documents are introduced here.
