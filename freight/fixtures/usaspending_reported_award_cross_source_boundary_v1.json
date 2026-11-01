@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "pack_id": "CAPTUREBRIEF_USASPENDING_REPORTED_AWARD_CROSS_SOURCE_BOUNDARY_V1",
+  "evaluation_family": "GOVERNMENT_AWARD_SOURCE_QUALITY_NOT_AWARD_PREDICTION",
+  "publisher": "USAspending.gov, U.S. Department of the Treasury",
+  "publisher_authority_url": "https://api.usaspending.gov/",
+  "publisher_award_api_documentation": "https://api.usaspending.gov/docs/endpoints",
+  "provenance_documentation": "https://www.usaspending.gov/data/about-the-data-download.pdf",
+  "research_observed_date_utc": "2026-10-31",
+  "capture_method": "PUBLIC_SEARCH_INDEX_OF_OFFICIAL_PUBLISHER_PAGES_NOT_DIRECT_RAW_HTTP_FETCH",
+  "original_http_response_bytes_collected": false,
+  "original_publisher_http_body_sha256": null,
+  "original_publisher_http_body_byte_length": null,
+  "underlying_award_report_source": "Agency-reported FPDS procurement data republished by USAspending; original contracting instrument not independently custodied",
+  "rights": {
+    "official_public_access": true,
+    "reuse_rights": "PUBLIC_FEDERAL_AWARD_DATA; PAGE_SPECIFIC_TERMS_AND_COMMERCIAL_SCORING_NOT_INDEPENDENTLY_CLEARED",
+    "commercial_scoring_allowed": false,
+    "privacy_restrictions": "NO_PERSON_NAMES_ADDRESSES_UEI_CONTACTS_OR_CUSTOMER_DATA_PERSISTED"
+  },
+  "publisher_scope": {
+    "new_original_publisher": "USAspending.gov public contract award pages",
+    "sample_selection": "CONVENIENCE_PUBLISHER_PAGE_EXAMPLES_NOT_RANDOM_HOLDOUT",
+    "sample_count": 2,
+    "real_reported_award_metadata_records": 2,
+    "original_award_contract_documents": 0,
+    "original_sam_fy2027_notices": 0,
+    "independently_matched_notice_award_pairs": 0,
+    "independently_adjudicated_award_outcomes": 0,
+    "independent_real_positive_labels": 0,
+    "independent_real_negative_labels": 0,
+    "independent_customer_cash_events": 0,
+    "source_reporting_lag": "POSSIBLE; USAspending documentation says FPDS-derived contract data may lag, including special agency delays",
+    "measured_precision": null,
+    "measured_recall": null
+  },
+  "real_publisher_page_observations": [
+    {
+      "evidence_id": "USAS_PENDING_DOE_BPA_CALL_2026",
+      "source_url": "https://www.usaspending.gov/award/CONT_AWD_89703026FAR000022_8900_89703025AAR000001_8900",
+      "source_kind": "OFFICIAL_USASPENDING_REPORTED_AWARD_METADATA",
+      "publisher_page_index_freshness": "WEB_INDEX_LAST_WEEK_AS_OBSERVED_2026_10_31",
+      "piid": "89703026FAR000022",
+      "award_unique_key": "CONT_AWD_89703026FAR000022_8900_89703025AAR000001_8900",
+      "awarding_agency": "DEPARTMENT_OF_ENERGY",
+      "award_type": "BPA_CALL",
+      "period_of_performance_start_date": "2026-09-16",
+      "period_of_performance_current_end_date": "2027-09-25",
+      "obligated_amount_usd": "29000.00",
+      "outlayed_amount_usd": "0.00",
+      "award_signed_date": null,
+      "independently_verified_sam_notice_id": null,
+      "pre_award_source_observation_sha256": null,
+      "independent_adjudication_label": null,
+      "independently_verified_cash": null
+    },
+    {
+      "evidence_id": "USAS_FAA_DELIVERY_ORDER_2024",
+      "source_url": "https://www.usaspending.gov/award/CONT_AWD_6973GH24F00956_6920_47QTCA19D008Y_4732",
+      "source_kind": "OFFICIAL_USASPENDING_REPORTED_AWARD_METADATA",
+      "publisher_page_index_freshness": "WEB_INDEX_LAST_WEEK_AS_OBSERVED_2026_10_31",
+      "piid": "6973GH24F00956",
+      "award_unique_key": "CONT_AWD_6973GH24F00956_6920_47QTCA19D008Y_4732",
+      "awarding_agency": "DEPARTMENT_OF_TRANSPORTATION_FAA",
+      "award_type": "DELIVERY_ORDER",
+      "period_of_performance_start_date": "2024-07-24",
+      "period_of_performance_current_end_date": "2029-08-31",
+      "obligated_amount_usd": "1454413.80",
+      "outlayed_amount_usd": "899473.19",
+      "award_signed_date": null,
+      "independently_verified_sam_notice_id": null,
+      "pre_award_source_observation_sha256": null,
+      "independent_adjudication_label": null,
+      "independently_verified_cash": null
+    }
+  ],
+  "synthetic_controls": [
+    {
+      "id": "SYNTH_USASPENDING_FUTURE_PERFORMANCE_END_MEANS_FY2027_NOTICE",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "calibration",
+      "expected_guard_result": "UNKNOWN",
+      "invalid_candidate_claim": "A public award page ending in 2027 proves an FY2027 SAM opportunity",
+      "unmet_proof": "No SAM FY2027 notice identity, original notice bytes, or preaward source-asof evidence",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_ZERO_OUTLAY_MEANS_NO_AWARD",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "calibration",
+      "expected_guard_result": "REJECT",
+      "invalid_candidate_claim": "A displayed $0 outlay proves the separately reported award does not exist",
+      "unmet_proof": "Official award page reports a nonzero obligation and PIID; outlay and obligation are distinct",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_PIID_IS_SOLICITATION_ID",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "calibration",
+      "expected_guard_result": "UNKNOWN",
+      "invalid_candidate_claim": "A procurement instrument identifier alone is an original solicitation number",
+      "unmet_proof": "No first-party SAM notice ID or solicitation crosswalk",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_OBLIGATION_EQUALS_CLEARED_CASH",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "synthetic_holdout",
+      "expected_guard_result": "UNKNOWN",
+      "invalid_candidate_claim": "Awarded/obligated dollars prove recipient bank settlement",
+      "unmet_proof": "No independently verified bank clearing or customer recovery evidence",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_START_DATE_IS_AWARD_SIGNED_DATE",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "synthetic_holdout",
+      "expected_guard_result": "UNKNOWN",
+      "invalid_candidate_claim": "Period-of-performance start is the signed contract award date",
+      "unmet_proof": "Award-signature timestamp is not verified from publisher page",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_TODAY_PAGE_PROVES_HISTORIC_PREAWARD_ACCESS",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "synthetic_holdout",
+      "expected_guard_result": "UNKNOWN",
+      "invalid_candidate_claim": "A later public page proves what was visible before contract award",
+      "unmet_proof": "No original time-stamped SAM pre-award snapshot or prior publisher source bytes",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_NO_JOIN_MEANS_NO_REAL_AWARD",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "synthetic_holdout",
+      "expected_guard_result": "UNKNOWN",
+      "invalid_candidate_claim": "Missing join or unreported award is a negative award-outcome label",
+      "unmet_proof": "Reporting delays, suppressed data, absent crosswalk, and completeness UNKNOWN",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYNTH_USASPENDING_TWO_AWARD_PAGES_TWO_INDEPENDENT_PUBLISHERS",
+      "kind": "SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD",
+      "split": "synthetic_holdout",
+      "expected_guard_result": "REJECT",
+      "invalid_candidate_claim": "Two USAspending award pages provide independent-publisher confirmation",
+      "unmet_proof": "Both pages are the same Treasury/FPDS reporting chain",
+      "independent_real_label": null
+    }
+  ],
+  "quality_and_dedup": {
+    "canonical_identity": "Publisher award unique key (PIID alone is not globally unique)",
+    "observed_distinct_publisher_award_keys": 2,
+    "original_publisher_byte_sha256_status": "UNKNOWN_NOT_ACQUIRED",
+    "record_field_values_from": "INDEXED_PUBLISHER_PAGE_DISPLAY_NOT_RAW_CSV_OR_API",
+    "first_party_document_contracts_verified": 0,
+    "award_signatures_verified": 0,
+    "synthetic_holdout_count": 5,
+    "independent_heldout_real_outcome_count": 0,
+    "original_notice_version_history_completeness": "UNKNOWN",
+    "FY2027_notice_to_USAS_award_join_accuracy": "UNKNOWN",
+    "effective_date_policy": "The published period-of-performance start/end is NOT a verified contract signature date or SAM original-posted timestamp"
+  },
+  "handoffs": {
+    "capturebrief_52": "Keep FY2027 archived notice as-of extraction separate from USAspending FPDS-derived award metadata; require original notice and observed-as-of proof plus disambiguated solicitation/agency crosswalk and independent adjudication before scoring.",
+    "permitplate_48": "NO_PERMIT_DATA_OR_LABELS",
+    "retally_freightrecovery_12": "NO_FREIGHT_RATE_ENTITLEMENT_LABELS",
+    "retally_recoveryos_12": "Obligated and outlayed federal accounting figures are not buyer bank-cleared recovery cash; NO_CUSTOMER_CASH_PROVED",
+    "independent_QA_44": "Verify both official source pages, indexed-data freshness limits, exact fixture and test SHA, two real source-reported records versus eight SYNTHETIC controls, no award truth or release."
+  },
+  "restrictions": {
+    "no_private_data": true,
+    "no_engine_code_changes": true,
+    "no_paid_provider_queries": true,
+    "no_new_schedule": true,
+    "no_product_release": true,
+    "no_writer_branch_changes": true,
+    "legacy_15_lab_consolidation_certified": false
+  }
+}
