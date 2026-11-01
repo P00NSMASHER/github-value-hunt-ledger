@@ -1,6 +1,5 @@
 """Regression tests for illustrative, no-upfront recovery economics."""
 from copy import deepcopy
-from decimal import Decimal
 from pathlib import Path
 import json
 import unittest

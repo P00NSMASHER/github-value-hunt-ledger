@@ -2,7 +2,7 @@
   "schema_version": 1,
   "source_pr": 329,
   "source_head": "a77ecc03b45425a15e2cd3f1a49b14e229ad4f78",
-  "source_provenance": "UNMODIFIED_ORIGINAL_GIT_BLOBS",
+  "source_provenance": "40_ORIGINAL_GIT_BLOBS_PLUS_5_EXPLICIT_SOURCE_BOUND_COMPATIBILITY_ADAPTATIONS",
   "scope": "REVIEW_ONLY_UNRELEASED_CUSTOMER_EVIDENCE",
   "launch_approved": false,
   "customer_data_authorized": false,
@@ -99,7 +99,9 @@
     },
     {
       "path": "freight/commercial/remaining_gate_rehearsal.py",
-      "git_blob_sha": "d9537c085770584f40da1e5314fd509d0cfcc398"
+      "git_blob_sha": "d9537c085770584f40da1e5314fd509d0cfcc398",
+      "integrated_git_blob_sha": "92b635ec65a98171b56786c1d4f2886c8e330339",
+      "compatibility_note": "Import historical first-customer synthetic runner from a separate review-only module; do not overwrite newer main implementation."
     },
     {
       "path": "freight/commercial/retally_ten_reviewer_acceptance_20261012.json",
@@ -127,7 +129,9 @@
     },
     {
       "path": "freight/commercial/test_zero_upfront_underwriting.py",
-      "git_blob_sha": "9eaf9cad2d0efae24a6e06e5a2c521cff742fc94"
+      "git_blob_sha": "9eaf9cad2d0efae24a6e06e5a2c521cff742fc94",
+      "integrated_git_blob_sha": "b45339b504ce632f13d8df4a8ace09f4f18c6be9",
+      "compatibility_note": "Removed unused Decimal import to satisfy current Ruff F401."
     },
     {
       "path": "freight/commercial/zero_upfront_underwriting.py",
@@ -159,15 +163,21 @@
     },
     {
       "path": "freight/test_engagement_resolution_integrity.py",
-      "git_blob_sha": "7f1555694a904b7a9ed42f22da79ce2b5476173b"
+      "git_blob_sha": "7f1555694a904b7a9ed42f22da79ce2b5476173b",
+      "integrated_git_blob_sha": "f3c6a875103396c50b7d6bcaa17221316819a8cb",
+      "compatibility_note": "Removed unused activation and charter_req imports to satisfy current Ruff F401."
     },
     {
       "path": "freight/test_first_customer_rehearsal.py",
-      "git_blob_sha": "959cc47d0536c9e011f7faba1a6f83c686635d15"
+      "git_blob_sha": "959cc47d0536c9e011f7faba1a6f83c686635d15",
+      "integrated_git_blob_sha": "882898596ca704f2bae4166ea6444c1aa908e34f",
+      "compatibility_note": "Route historical synthetic tests through separate frozen historical runner, leaving current production synthetic module untouched."
     },
     {
       "path": "freight/test_fmcsa_public_carrier.py",
-      "git_blob_sha": "eeb621158c73e28ff028f545a1d5d1d8201d7330"
+      "git_blob_sha": "eeb621158c73e28ff028f545a1d5d1d8201d7330",
+      "integrated_git_blob_sha": "e597bce33da6795d13ac30ee5aa2280cebeffaf9",
+      "compatibility_note": "Removed unused io import to satisfy current Ruff F401."
     },
     {
       "path": "freight/test_pilot_proof_chain.py",
@@ -189,5 +199,12 @@
       "path": "freight/test_retally_eia_reference.py",
       "git_blob_sha": "5cb410de19bbffb41497a397ed9e2ba75460e219"
     }
-  ]
+  ],
+  "supplemental_historical_module": {
+    "path": "freight/commercial/historical_first_customer_rehearsal.py",
+    "original_path": "freight/synthetic_rehearsal.py",
+    "source_pr": 329,
+    "git_blob_sha": "5471098a062450653a75cc90ec2390281e029d02",
+    "status": "HISTORICAL_SYNTHETIC_TEST_ONLY"
+  }
 }

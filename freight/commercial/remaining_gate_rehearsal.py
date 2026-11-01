@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 
 from freight.commercial.first_customer_gate import DEFAULT
-from freight.synthetic_rehearsal import run_first_customer_rehearsal
+from freight.commercial.historical_first_customer_rehearsal import run_first_customer_rehearsal
 
 
 EXPECTED_BLOCKED = (
