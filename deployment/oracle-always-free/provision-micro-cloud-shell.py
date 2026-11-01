@@ -8,9 +8,9 @@ a separate independently reviewed source checkout. Cloud Shell only.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import importlib.util
 import json
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 import re
@@ -219,7 +219,6 @@ def main(argv=None) -> int:
 
     BASE.ensure(not MICRO_ATTEMPT_MARKER.exists(),
                 "Prior Micro launch attempt is unresolved; do not retry.")
-
     BASE.ensure(sys.stdin.isatty(),
                 "Creation requires interactive confirmation in Oracle Cloud Shell.")
     print("This requests ONE fixed E2.1.Micro, 1 GB RAM, official Ubuntu, 50 GB boot.")

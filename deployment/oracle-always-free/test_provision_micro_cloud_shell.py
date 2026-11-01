@@ -203,12 +203,13 @@ class MicroResourceTests(unittest.TestCase):
                              micro.MICRO_SHAPE)
         self.assertEqual([a[:3] for a in calls],
                          [("compute","instance","launch"),("compute","instance","get")])
+
         self.assertTrue(self.attempt.is_file())
         self.assertEqual(self.attempt.stat().st_mode & 0o777, 0o600)
-        marker = json.loads(self.attempt.read_text(encoding="utf-8"))
-        self.assertEqual(marker["status"], "LAUNCH_UNCERTAIN_UNTIL_VERIFIED")
-        self.assertEqual(marker["shape"], micro.MICRO_SHAPE)
-        self.assertEqual(marker["subnet_id"], self.original["subnet_id"])
+        info=json.loads(self.attempt.read_text(encoding="utf-8"))
+        self.assertEqual(info["status"], "LAUNCH_UNCERTAIN_UNTIL_VERIFIED")
+        self.assertEqual(info["shape"], micro.MICRO_SHAPE)
+        self.assertEqual(info["subnet_id"], self.original["subnet_id"])
 
     def test_wrong_shape_never_marked_verified(self):
         plan={"ad":AD1,"tenancy":TENANCY,"image_id":"ocid1.image.oc1.iad.fake",
@@ -254,53 +255,51 @@ class MicroResourceTests(unittest.TestCase):
         self.assertEqual(self.archive.stat().st_mode & 0o777,0o600)
 
 
-    def test_ambiguous_api_error_leaves_persistent_exclusive_retry_lock(self):
-        plan = {"ad": AD1, "tenancy": TENANCY,
-                "image_id": "ocid1.image.oc1.iad.synthetic", "home_region": REGION}
-        attempts = []
-        def failed_api(*args, **kwargs):
+    def test_failed_launch_lock_prevents_automatic_second_api_attempt(self):
+        plan={"ad":AD1,"tenancy":TENANCY,
+              "image_id":"ocid1.image.oc1.iad.synthetic","home_region":REGION}
+        attempts=[]
+        def failed_api(*args,**kwargs):
             attempts.append(args[:3])
-            raise micro.BASE.Stop("OCI launch failed (InternalError)")
-        with self.bridge(), patch.object(micro.BASE, "cli", side_effect=failed_api):
-            with self.assertRaisesRegex(micro.BASE.Stop, "InternalError"):
-                micro.launch_single_micro(plan, self.original)
+            raise micro.BASE.Stop("OCI compute instance launch failed (InternalError)")
+        with self.bridge(),patch.object(micro.BASE,"cli",side_effect=failed_api):
+            with self.assertRaisesRegex(micro.BASE.Stop,"InternalError"):
+                micro.launch_single_micro(plan,self.original)
             self.assertTrue(self.attempt.is_file())
             self.assertEqual(self.attempt.stat().st_mode & 0o777, 0o600)
-            self.assertEqual(json.loads(self.attempt.read_text())["status"],
-                             "LAUNCH_UNCERTAIN_UNTIL_VERIFIED")
-            with self.assertRaisesRegex(micro.BASE.Stop, "prior Micro launch attempt"):
-                micro.launch_single_micro(plan, self.original)
-        self.assertEqual(attempts, [("compute", "instance", "launch")])
+            with self.assertRaisesRegex(micro.BASE.Stop,"prior Micro launch"):
+                micro.launch_single_micro(plan,self.original)
+        self.assertEqual(attempts,[("compute","instance","launch")])
 
-    def test_readonly_inventory_still_works_after_ambiguous_launch(self):
-        self.attempt.write_text('{"status":"LAUNCH_UNCERTAIN_UNTIL_VERIFIED"}')
+    def test_readonly_inspection_remains_available_after_failed_attempt(self):
+        self.attempt.write_text('{"status":"LAUNCH_UNCERTAIN_UNTIL_VERIFIED"}',
+                                encoding="ascii")
         self.attempt.chmod(0o600)
-        plan = {"ad": AD1, "image_name": "Synthetic Ubuntu",
-                "micro_instances_in_use": 0, "block_gb_in_use": 0}
+        plan={"ad":AD1,"image_name":"Ubuntu Fixture",
+              "micro_instances_in_use":0,"block_gb_in_use":0}
         with (self.bridge(),
-              patch.object(micro.BASE, "read_tenancy", return_value=TENANCY),
-              patch.object(micro.BASE, "home_region", return_value=REGION),
-              patch.object(micro, "inventory", return_value=plan),
-              patch.object(micro, "launch_single_micro") as launch,
+              patch.object(micro.BASE,"read_tenancy",return_value=TENANCY),
+              patch.object(micro.BASE,"home_region",return_value=REGION),
+              patch.object(micro,"inventory",return_value=plan),
+              patch.object(micro,"launch_single_micro") as launch,
               patch("builtins.print") as printer):
-            self.assertEqual(micro.main([]), 0)
-        self.assertTrue(any("RETRY LOCKED" in str(c) for c in printer.call_args_list))
+            self.assertEqual(micro.main([]),0)
         launch.assert_not_called()
+        self.assertTrue(any("RETRY LOCKED" in str(c) for c in printer.call_args_list))
 
-    def test_prior_attempt_fails_before_new_confirmation_or_launch(self):
-        self.attempt.write_text('{"status":"LAUNCH_UNCERTAIN_UNTIL_VERIFIED"}')
-        self.attempt.chmod(0o600)
-        plan = {"ad": AD1, "image_name": "Synthetic Ubuntu",
-                "micro_instances_in_use": 0, "block_gb_in_use": 0}
+    def test_ambiguous_previous_attempt_rejected_before_create_prompt(self):
+        self.attempt.write_text('{"status":"LAUNCH_UNCERTAIN_UNTIL_VERIFIED"}',
+                                encoding="ascii")
+        plan={"ad":AD1,"image_name":"Ubuntu Fixture",
+              "micro_instances_in_use":0,"block_gb_in_use":0}
         with (self.bridge(),
-              patch.object(micro.BASE, "read_tenancy", return_value=TENANCY),
-              patch.object(micro.BASE, "home_region", return_value=REGION),
-              patch.object(micro, "inventory", return_value=plan),
-              patch.object(micro.sys.stdin, "isatty", return_value=True),
+              patch.object(micro.BASE,"read_tenancy",return_value=TENANCY),
+              patch.object(micro.BASE,"home_region",return_value=REGION),
+              patch.object(micro,"inventory",return_value=plan),
               patch("builtins.input") as prompt,
-              patch.object(micro, "launch_single_micro") as launch,
+              patch.object(micro,"launch_single_micro") as launch,
               patch("builtins.print")):
-            with self.assertRaisesRegex(micro.BASE.Stop, "Prior Micro launch attempt"):
+            with self.assertRaisesRegex(micro.BASE.Stop,"Prior Micro launch"):
                 micro.main(["--create"])
         prompt.assert_not_called()
         launch.assert_not_called()
