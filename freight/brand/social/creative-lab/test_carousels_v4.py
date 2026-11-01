@@ -142,7 +142,6 @@ class V4CarouselTests(unittest.TestCase):
             v4.png_dimensions(b"not an image")
 
     def test_output_inside_checkout_denied(self):
-        repo=Path(__file__).resolve().parents[4]
         # Check fail-closed source contract without rendering.
         self.assertIn("Exports must be outside repository checkout",
                       Path(__file__).with_name("render_carousels_v4.py").read_text())
