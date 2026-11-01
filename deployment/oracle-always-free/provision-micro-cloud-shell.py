@@ -8,6 +8,7 @@ a separate independently reviewed source checkout. Cloud Shell only.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import importlib.util
 import json
 import os
@@ -27,6 +28,7 @@ MICRO_MEMORY_GB = 1
 MICRO_BOOT_GB = 50
 MAX_FREE_MICRO_INSTANCES = 2
 MICRO_RECEIPT_ARCHIVE = BASE.RESOURCE_DIR / "original-partial-after-micro.json"
+MICRO_ATTEMPT_MARKER = BASE.RESOURCE_DIR / "micro-launch-attempt.json"
 
 
 def inventory(tenancy: str, region: str, state: dict) -> dict:
@@ -109,6 +111,33 @@ def launch_single_micro(plan: dict, state: dict) -> dict:
                 "Cannot launch into a completed or unknown original network.")
     BASE.ensure(BASE.PARTIAL.exists() and not BASE.RECEIPT.exists(),
                 "Original partial receipt changed before launch.")
+    # Fail closed on an ambiguous HTTP 500, timeout or client interruption.
+    # An exclusive persistent marker is written BEFORE any create request.
+    # Subsequent invocations must not automatically retry or erase it.
+    BASE.ensure(not MICRO_ATTEMPT_MARKER.exists(),
+                "A prior Micro launch attempt must be reconciled in OCI before any retry.")
+    attempt = {
+        "schema": 1, "status": "LAUNCH_UNCERTAIN_UNTIL_VERIFIED",
+        "requested_utc": datetime.now(timezone.utc).isoformat(),
+        "shape": MICRO_SHAPE, "memory_gb": MICRO_MEMORY_GB,
+        "boot_gb": MICRO_BOOT_GB, "availability_domain": plan["ad"],
+        "home_region": plan["home_region"], "tenancy_id": plan["tenancy"],
+        "subnet_id": state["subnet_id"], "image_id": plan["image_id"],
+        "release_hold": True, "synthetic_only": True,
+    }
+    BASE.RESOURCE_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    try:
+        fd = os.open(MICRO_ATTEMPT_MARKER, flags, 0o600)
+    except FileExistsError as exc:
+        raise BASE.Stop("Concurrent or prior Micro launch attempt exists; stop.") from exc
+    with os.fdopen(fd, "w", encoding="utf-8") as stream:
+        json.dump(attempt, stream, sort_keys=True)
+        stream.write("\n")
+        stream.flush()
+        os.fsync(stream.fileno())
     # Exact fixed Always Free E2 Micro shape; DO NOT pass A1 flex shape-config.
     instance = BASE.cli(
         "compute", "instance", "launch",
@@ -184,7 +213,12 @@ def main(argv=None) -> int:
     }, sort_keys=True))
     if not args.create:
         print("READ ONLY; no resources created. Free host capacity not guaranteed.")
+        if MICRO_ATTEMPT_MARKER.exists():
+            print("RETRY LOCKED: reconcile the existing attempt in OCI before any create.")
         return 0
+
+    BASE.ensure(not MICRO_ATTEMPT_MARKER.exists(),
+                "Prior Micro launch attempt is unresolved; do not retry.")
 
     BASE.ensure(sys.stdin.isatty(),
                 "Creation requires interactive confirmation in Oracle Cloud Shell.")
@@ -196,6 +230,8 @@ def main(argv=None) -> int:
     # TOCTOU defense: reevaluate account inventory and complete network twice.
     BASE.ensure(not MICRO_RECEIPT_ARCHIVE.exists(),
                 "An earlier completed micro archive exists; refusing duplicate launch.")
+    BASE.ensure(not MICRO_ATTEMPT_MARKER.exists(),
+                "Prior Micro attempt remains unresolved; manual reconciliation required.")
     state = json.loads(BASE.PARTIAL.read_text(encoding="utf-8"))
     plan = inventory(tenancy, region, state)
     try:
