@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 from dataclasses import asdict, dataclass
 from datetime import date
@@ -108,6 +109,31 @@ def _parse_date(name:str,value:str)->date:
     except Exception as exc:
         raise ValueError(name+" must be ISO date YYYY-MM-DD") from exc
 
+def _validate_request(request:CharterRequest)->None:
+    if not isinstance(request,CharterRequest):
+        raise ValueError("CharterRequest is required")
+    # Python's bool annotations are not checked at runtime. Truthy strings
+    # such as "false" must never authorize confidential customer data.
+    for name in (
+        "buyer_acknowledges_scope",
+        "buyer_acknowledges_blind_protocol",
+        "buyer_acknowledges_report_totals_separate",
+        "buyer_acknowledges_no_guaranteed_recovery",
+        "freight_acknowledges_no_external_action_without_buyer_approval",
+    ):
+        if type(getattr(request,name)) is not bool:
+            raise ValueError(name+" must be a boolean")
+    for name in ("carrier_scope","mode_scope"):
+        values=getattr(request,name)
+        if type(values) not in (list,tuple) or not values or any(
+            not isinstance(value,str) or not value.strip() for value in values
+        ):
+            raise ValueError(name+" must contain at least one non-empty value")
+    fee=request.fixed_fee_usd
+    if type(fee) not in (int,float) or not math.isfinite(fee) or fee<=0:
+        raise ValueError("fixed_fee_usd must be a finite positive number")
+
+
 def from_dict(data:dict)->CharterRequest:
     fields=CharterRequest.__dataclass_fields__
     missing=[k for k in fields if k not in data]
@@ -117,11 +143,17 @@ def from_dict(data:dict)->CharterRequest:
     if extra:
         raise ValueError("unknown charter fields: "+", ".join(extra))
     normalized=dict(data)
-    normalized["carrier_scope"]=tuple(data["carrier_scope"])
-    normalized["mode_scope"]=tuple(data["mode_scope"])
-    return CharterRequest(**normalized)
+    for key in ("carrier_scope", "mode_scope"):
+        value=data[key]
+        if type(value) not in (list, tuple):
+            raise ValueError(key+" must be a list of non-empty values")
+        normalized[key]=tuple(value)
+    request=CharterRequest(**normalized)
+    _validate_request(request)
+    return request
 
 def build_charter(activation_packet:dict,request:CharterRequest)->PilotCharter:
+    _validate_request(request)
     _validate_activation_packet(activation_packet)
     for name in ("engagement_id","buyer_id","business_unit","population_rule","buyer_truth_owner_role","buyer_action_approver_role","freight_engagement_owner_role"):
         _required(name,getattr(request,name))
@@ -148,7 +180,7 @@ def build_charter(activation_packet:dict,request:CharterRequest)->PilotCharter:
         "buyer_acknowledges_no_guaranteed_recovery":request.buyer_acknowledges_no_guaranteed_recovery,
         "freight_acknowledges_no_external_action_without_buyer_approval":request.freight_acknowledges_no_external_action_without_buyer_approval,
     }
-    all_ack=all(acknowledgments.values())
+    all_ack=all(value is True for value in acknowledgments.values())
     launch_ready=activation_packet["launch_status"]=="READY"
     if all_ack and launch_ready:
         state=CharterState.KICKOFF_AUTHORIZED
