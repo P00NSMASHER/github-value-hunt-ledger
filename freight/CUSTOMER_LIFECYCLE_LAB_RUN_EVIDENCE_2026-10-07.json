@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-07",
+  "scope": "SYNTHETIC_LIFECYCLE_INDEPENDENTLY_VERIFIED_OFFLINE_PLUS_REAL_PAYMENT_DOMAIN_UNIT_TESTS",
+  "case_lifecycles_generated": 1000000,
+  "stable_fictional_profiles": 10000,
+  "scenarios_sha_manifest": "data/full_million/manifest.json inside downloadable toolkit",
+  "event_count": 35036764,
+  "communication_count": 7327572,
+  "balanced_ledger_postings_verified": 487743,
+  "observed_event_types": 84,
+  "shards": 200,
+  "streaming_generation_seconds": 310.15,
+  "independent_full_validation_seconds": 198.82,
+  "independent_full_validation_status": "PASS",
+  "local_acceptance_gate": "15/15 PASS_SYNTHETIC_LAB_ONLY",
+  "local_unit_suite": "39 unittest cases passed",
+  "adversarial_synthetic_controls": "48 of 48 rejected",
+  "local_html_dashboard_tabs": 12,
+  "browser_interactions": "PASS; no JavaScript errors",
+  "random_customer_id_replay": "SC-0999999; 54 events, 11 messages; loopback-only API",
+  "risk_register": "100 explicitly UNVERIFIED product risk hypotheses",
+  "customer_pdfs": "60 explicitly fictional PDFs",
+  "bench_truth_origin": "Previous separate six-mode synthetic freight invoice dataset, not adjudicated customer data",
+  "actual_repository_probe": {
+    "revision": "ddef7c9731270150f8b2a9b280abacbd8648f07d",
+    "module": "freight.payment_orchestration",
+    "tests": "13 PASS",
+    "scope": "Python provider-neutral payment state machine with completely fictional objects, not hosted app or rails"
+  },
+  "production_actions": "NONE - no mail, carrier claims, purchases, fees, live customers, published changes or actual payments",
+  "not_tested": [
+    "Authenticated Floot end-to-end customer lifecycle APIs",
+    "Real customer document OCR performance",
+    "Carrier portal/collections",
+    "Bank remittance or customer reconciliation",
+    "Commercial sales/retention/ROI outside explicitly hypothetical model",
+    "Production concurrent multi-tenant data isolation",
+    "Live refund or contingency fee collection"
+  ]
+}
