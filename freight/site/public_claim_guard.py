@@ -294,12 +294,48 @@ def validate_public_tree(path:Path, *,site:str)->dict:
     return validate_public_text_bundle(text,site=site)
 
 
+
+def validate_recoveryos_legacy_redirect(path: Path) -> dict:
+    """Verify the Group's intentional noncommercial noindex compatibility page.
+
+    The original RecoveryOS homepage must pass its cash-disclosure gate before
+    Group composition replaces /recoveryos/ with a redirect to a separate site.
+    """
+    root=Path(path)
+    page=root/"index.html"
+    if (root.name!="recoveryos" or root.is_symlink() or not root.is_dir()
+            or page.is_symlink() or not page.is_file()):
+        raise PublicClaimViolation("M36_LEGACY_REDIRECT_PAGE_MISSING")
+    raw=page.read_text(encoding="utf-8")
+    target="https://recoveryworks.retallyrecovery.com/"
+    expected=(
+        '<meta name="robots" content="noindex,follow">',
+        f'<link rel="canonical" href="{target}">',
+        f'href="{target}"',
+        '<h1>RETALLY RecoveryWorks</h1>',
+        'This page has moved',
+    )
+    if any(raw.count(token)!=1 for token in expected):
+        raise PublicClaimViolation("M36_LEGACY_REDIRECT_IDENTITY_OR_NOINDEX_CHANGED")
+    if re.search(r"<\s*(?:form|iframe|script)\b",raw,re.I):
+        raise PublicClaimViolation("M36_LEGACY_REDIRECT_INTERACTIVE_CONTENT_FORBIDDEN")
+    surface=_text_surface("index.html",raw)
+    for code,pattern in UNSUPPORTED:
+        if pattern.search(surface):
+            raise PublicClaimViolation(code+":recoveryos/index.html")
+    return {"site":"RECOVERYOS_LEGACY_REDIRECT","text_assets_checked":1,
+            "unsupported_real_customer_claims_detected":0,
+            "external_publication_authority_granted":False}
+
+
 def main() -> None:
     p=argparse.ArgumentParser(description="Non-deploying RETALLY/RecoveryOS public claim QA")
     p.add_argument("--freight-root",type=Path)
     p.add_argument("--recoveryos-root",type=Path)
+    p.add_argument("--recoveryos-redirect-root",type=Path)
     args=p.parse_args()
-    if args.freight_root is None and args.recoveryos_root is None:
+    if (args.freight_root is None and args.recoveryos_root is None
+            and args.recoveryos_redirect_root is None):
         p.error("Provide an existing public build directory to inspect")
     for name,root in (("RETALLY",args.freight_root),("RECOVERYOS",args.recoveryos_root)):
         if root is None:
@@ -309,6 +345,9 @@ def main() -> None:
               f"{checked['required_fictional_disclosures_checked']} demo/illustration labels; "
               "0 unsupported customer outcome / recoverable-market statements. "
               "Human content approval remains separate.")
+    if args.recoveryos_redirect_root is not None:
+        validate_recoveryos_legacy_redirect(args.recoveryos_redirect_root)
+        print("RECOVERYOS LEGACY REDIRECT CLAIM GATE PASSED: noindex, exact target, no unsupported commercial copy.")
 
 
 if __name__ == "__main__":

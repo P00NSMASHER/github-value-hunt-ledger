@@ -415,5 +415,35 @@ class PublicClaimPublicationGateTests(unittest.TestCase):
             self.assertFalse(target.exists())
 
 
+
+    def test_legacy_recoveryos_redirect_rejects_unapproved_claims_or_changes(self):
+        from freight.site.group import build as group_routes
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)/"recoveryos"
+            folder.mkdir()
+            destination="https://recoveryworks.retallyrecovery.com/"
+            original=group_routes._notice_page(
+                "RETALLY RecoveryWorks",destination,"This page has moved",
+                "Visit the dedicated website for this business's current scope, availability and terms.",
+                destination,"Continue to RETALLY RecoveryWorks",
+            )
+            page=folder/"index.html"
+            page.write_text(original,encoding="utf-8")
+            safe=gate.validate_recoveryos_legacy_redirect(folder)
+            self.assertFalse(safe["external_publication_authority_granted"])
+            self.assertEqual(safe["text_assets_checked"],1)
+            for modified in (
+                original.replace('noindex,follow','index,follow'),
+                original.replace(destination,'https://attacker.invalid/'),
+                original+"<h2>RecoveryOS has recovered $250,000 for customers</h2>",
+                original+"<form><input name='customer'></form>",
+            ):
+                page.write_text(modified,encoding="utf-8")
+                with self.assertRaises(gate.PublicClaimViolation):
+                    gate.validate_recoveryos_legacy_redirect(folder)
+            page.unlink()
+            with self.assertRaises(gate.PublicClaimViolation):
+                gate.validate_recoveryos_legacy_redirect(folder)
+
 if __name__=="__main__":
     unittest.main()

@@ -100,7 +100,12 @@ revalidates after URL rebasing and Group/RecoveryOS composition; GitHub Pages
 verifies the final pre-deploy bundle as well. CI exercises adversarial examples.
 
 After a local build, run
-`python -m freight.site.public_claim_guard --freight-root cf-retally-public --recoveryos-root cf-retally-public/recoveryos`.
+`python -m freight.site.public_claim_guard --freight-root cf-retally-public --recoveryos-redirect-root cf-retally-public/recoveryos`.
 Passing only means none of the specified high-risk patterns were detected.
 It does not certify actual customer outcomes or grant marketing/legal approval,
 payment authority, commercial launch readiness, or rights to social/email copy.
+
+Group routing intentionally changes `/recoveryos/` into a noindex redirect to the
+separately hosted RecoveryWorks page. The original RecoveryOS build is checked
+for its illustrative-cash disclaimer before Group composition; the final
+redirect is checked for exact identity, noindex and false commercial claims.
