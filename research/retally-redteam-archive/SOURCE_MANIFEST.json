@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "kind": "TEST_ONLY_HISTORICAL_SOURCE_ARCHIVE",
+  "authority": "REVIEW_ONLY_NOT_PRODUCTION_OR_VERIFIED_CUSTOMER_DATA",
+  "retally_main_base": "3702a75b22a549a64b3bcc958549454f025d796a",
+  "original_prs": [
+    646,
+    653,
+    656
+  ],
+  "record_count": 11,
+  "records": [
+    {
+      "origin_pr": 646,
+      "origin_head_sha": "b64f4f17f71c74446f668f13656321932f3a7823",
+      "original_path": ".github/workflows/retally-adversarial-100-realistic-20261022.yml",
+      "archived_path": "research/retally-redteam-archive/pr646/.github/workflows/retally-adversarial-100-realistic-20261022.yml",
+      "original_blob_sha": "227af0745ff1f863d64a4cdd7a1fb0ac383d6e17"
+    },
+    {
+      "origin_pr": 646,
+      "origin_head_sha": "b64f4f17f71c74446f668f13656321932f3a7823",
+      "original_path": "freight/redteam_100_unique_e2e_20261022.py",
+      "archived_path": "research/retally-redteam-archive/pr646/freight/redteam_100_unique_e2e_20261022.py",
+      "original_blob_sha": "b6bc00d4d5b8b78622cfd7607a912c459587a580"
+    },
+    {
+      "origin_pr": 653,
+      "origin_head_sha": "49175b22108917f58e817a8e5b21886681a82007",
+      "original_path": ".github/workflows/retally-100-structural-redteam-20261022.yml",
+      "archived_path": "research/retally-redteam-archive/pr653/.github/workflows/retally-100-structural-redteam-20261022.yml",
+      "original_blob_sha": "3d4d54c46be55a13e05d8ee759eb9416098b5ce3"
+    },
+    {
+      "origin_pr": 653,
+      "origin_head_sha": "49175b22108917f58e817a8e5b21886681a82007",
+      "original_path": ".github/workflows/retally-deep-100-unique-datasets-20261022.yml",
+      "archived_path": "research/retally-redteam-archive/pr653/.github/workflows/retally-deep-100-unique-datasets-20261022.yml",
+      "original_blob_sha": "2fca03890580b2d5390d384034dea50796decae0"
+    },
+    {
+      "origin_pr": 653,
+      "origin_head_sha": "49175b22108917f58e817a8e5b21886681a82007",
+      "original_path": "freight/redteam_deep_engine_20261022.py",
+      "archived_path": "research/retally-redteam-archive/pr653/freight/redteam_deep_engine_20261022.py",
+      "original_blob_sha": "b03cdabd7b87aa3801e10c8692d7562c699ddab4"
+    },
+    {
+      "origin_pr": 653,
+      "origin_head_sha": "49175b22108917f58e817a8e5b21886681a82007",
+      "original_path": "freight/redteam_deep_generator_20261022.py",
+      "archived_path": "research/retally-redteam-archive/pr653/freight/redteam_deep_generator_20261022.py",
+      "original_blob_sha": "dfb0477e2d91b5d30d9c81eb7c01e86391c10a38"
+    },
+    {
+      "origin_pr": 656,
+      "origin_head_sha": "33e84ddf668f558054093340d057c9125f63e12c",
+      "original_path": ".github/workflows/retally-100-compound-chaos-v3-20261023.yml",
+      "archived_path": "research/retally-redteam-archive/pr656/.github/workflows/retally-100-compound-chaos-v3-20261023.yml",
+      "original_blob_sha": "06504142ef21703638504d461761ece8d5bad26e"
+    },
+    {
+      "origin_pr": 656,
+      "origin_head_sha": "33e84ddf668f558054093340d057c9125f63e12c",
+      "original_path": ".github/workflows/retally-extreme-chaos-100-v3-20261023.yml",
+      "archived_path": "research/retally-redteam-archive/pr656/.github/workflows/retally-extreme-chaos-100-v3-20261023.yml",
+      "original_blob_sha": "1ed527d49bc2937bf2e160033106983267977883"
+    },
+    {
+      "origin_pr": 656,
+      "origin_head_sha": "33e84ddf668f558054093340d057c9125f63e12c",
+      "original_path": "freight/redteam_deep_engine_20261022.py",
+      "archived_path": "research/retally-redteam-archive/pr656/freight/redteam_deep_engine_20261022.py",
+      "original_blob_sha": "b03cdabd7b87aa3801e10c8692d7562c699ddab4"
+    },
+    {
+      "origin_pr": 656,
+      "origin_head_sha": "33e84ddf668f558054093340d057c9125f63e12c",
+      "original_path": "freight/redteam_deep_generator_20261022.py",
+      "archived_path": "research/retally-redteam-archive/pr656/freight/redteam_deep_generator_20261022.py",
+      "original_blob_sha": "dfb0477e2d91b5d30d9c81eb7c01e86391c10a38"
+    },
+    {
+      "origin_pr": 656,
+      "origin_head_sha": "33e84ddf668f558054093340d057c9125f63e12c",
+      "original_path": "freight/redteam_v3_compound_chaos_20261023.py",
+      "archived_path": "research/retally-redteam-archive/pr656/freight/redteam_v3_compound_chaos_20261023.py",
+      "original_blob_sha": "f5fa9422520f0d0263ca6d79fe4a4dab771643d3"
+    }
+  ]
+}
