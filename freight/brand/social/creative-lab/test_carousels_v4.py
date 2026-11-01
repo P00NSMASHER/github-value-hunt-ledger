@@ -4,7 +4,6 @@ These tests never publish or access social-network APIs.
 """
 from __future__ import annotations
 
-import base64
 import html
 import re
 import struct
@@ -13,7 +12,6 @@ import unittest
 from pathlib import Path
 
 import render_carousels_v4 as v4
-import render_social as base
 import render_social_v3 as v3
 
 
