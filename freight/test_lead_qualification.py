@@ -19,6 +19,7 @@ def profile(**overrides):
         has_rate_authority=True,
         has_shipment_records=True,
         has_payment_evidence=True,
+        previously_audited=False,  # Explicitly known not to have an incumbent audit.
     )
     values.update(overrides)
     return AuditLeadProfile(**values)
@@ -62,3 +63,117 @@ def test_uncertain_authority_requires_review():
 def test_profile_rejects_invalid_numbers():
     with pytest.raises(ValueError):
         profile(invoice_count=-1)
+
+
+@pytest.mark.parametrize("values", [
+    {"annual_freight_spend_usd": 2_000_000},
+    {"annual_freight_spend_usd": 8_000_000, "known_or_suspected_issue": True},
+    {"annual_freight_spend_usd": 100_000, "monthly_shipments": 20, "invoice_count": 40},
+])
+def test_prior_auditor_requires_human_overlap_review_at_any_scale(values):
+    decision = qualify_free_audit(profile(previously_audited=True, **values))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert "prior_audit_overlap_check" in decision.reasons
+    assert "prior audit" in decision.recommended_next_step
+
+
+def test_prior_audit_with_missing_population_remains_insufficient_data():
+    decision = qualify_free_audit(profile(previously_audited=True, invoice_count=0))
+    assert decision.state is QualificationState.INSUFFICIENT_DATA
+
+
+def test_prior_audit_flags_missing_authority_and_supporting_sources():
+    decision = qualify_free_audit(profile(
+        previously_audited=True,
+        has_rate_authority=False,
+        has_shipment_records=False,
+        has_payment_evidence=False,
+    ))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert set(decision.reasons) == {
+        "prior_audit_overlap_check",
+        "rate_authority_needs_review",
+        "supporting_records_need_review",
+    }
+
+
+@pytest.mark.parametrize("field", [
+    "has_invoice_export", "has_rate_authority", "has_shipment_records",
+    "has_payment_evidence", "previously_audited", "known_or_suspected_issue",
+])
+@pytest.mark.parametrize("bad", ["false", "true", 0, 1])
+def test_boolean_evidence_cannot_be_satisfied_by_truthy_strings_or_numbers(field, bad):
+    with pytest.raises(ValueError, match="must be a boolean"):
+        profile(**{field: bad})
+
+
+@pytest.mark.parametrize("missing", [
+    {"carrier_count": 0},
+    {"mode_count": 0},
+    {"carrier_count": 0, "mode_count": 0},
+])
+@pytest.mark.parametrize("high_value", [
+    {"annual_freight_spend_usd": 2_000_000, "monthly_shipments": 400},
+    {"annual_freight_spend_usd": 8_000_000, "known_or_suspected_issue": True},
+])
+def test_spending_cannot_qualify_missing_freight_scope(missing, high_value):
+    decision = qualify_free_audit(profile(**missing, **high_value))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    if "carrier_count" in missing:
+        assert "carrier_identity_unidentified" in decision.reasons
+    if "mode_count" in missing:
+        assert "freight_mode_unidentified" in decision.reasons
+
+
+def test_missing_freight_scope_does_not_hide_lack_of_rate_authority():
+    decision = qualify_free_audit(profile(
+        mode_count=0, carrier_count=0,
+        has_rate_authority=False, has_shipment_records=False,
+        has_payment_evidence=False,
+    ))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert set(decision.reasons) == {
+        "freight_mode_unidentified", "carrier_identity_unidentified",
+        "rate_authority_needs_review", "supporting_records_need_review",
+    }
+
+
+def test_missing_invoice_population_still_has_first_precedence():
+    decision = qualify_free_audit(profile(invoice_count=0, carrier_count=0, mode_count=0))
+    assert decision.state is QualificationState.INSUFFICIENT_DATA
+    assert "no_invoice_population" in decision.reasons
+
+
+def test_incumbent_overlap_still_precedes_missing_freight_scope():
+    decision = qualify_free_audit(profile(previously_audited=True, mode_count=0, carrier_count=0))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert "prior_audit_overlap_check" in decision.reasons
+
+
+def test_unreviewed_high_priority_candidate_still_routes_as_before():
+    decision = qualify_free_audit(profile(
+        annual_freight_spend_usd=8_000_000,
+        known_or_suspected_issue=True,
+        previously_audited=False,
+    ))
+    assert decision.state is QualificationState.HIGH_PRIORITY_RECOVERY_CANDIDATE
+
+
+def test_omitted_prior_audit_status_requires_human_review():
+    """Unknown must never become an implicit 'not previously audited'."""
+    fields = vars(profile()).copy()
+    fields.pop("previously_audited")
+    candidate = AuditLeadProfile(**fields)
+    assert candidate.previously_audited is None
+    decision = qualify_free_audit(candidate)
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert "prior_audit_status_unverified" in decision.reasons
+
+
+@pytest.mark.parametrize("field", [
+    "has_invoice_export", "has_rate_authority", "has_shipment_records",
+    "has_payment_evidence", "known_or_suspected_issue",
+])
+def test_missing_required_evidence_booleans_are_invalid(field):
+    with pytest.raises(ValueError, match="must be a boolean"):
+        profile(**{field: None})
