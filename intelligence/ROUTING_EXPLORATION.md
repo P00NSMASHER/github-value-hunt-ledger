@@ -1,8 +1,8 @@
 # CONTROLLED ROUTING EXPLORATION
 
-Generation: **ROUTEEXP:1b3ed02aafed**
-Routing generation: **ROUTING:afc565565c09**
-Gate: **0.0675 / 0.2500**
+Generation: **ROUTEEXP:3b14b9cdac19**
+Routing generation: **ROUTING:43db01a0bdd6**
+Gate: **0.2118 / 0.2500**
 Applied: **False**
 Reason: **no_eligible_low_regret_swap**
 
