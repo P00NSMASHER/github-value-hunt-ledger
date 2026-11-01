@@ -1,5 +1,6 @@
 """Official Treasury aggregate accounting identity, never customer cash or invoices."""
 import json
+import hashlib
 from pathlib import Path
 import unittest
 from datetime import date
@@ -33,6 +34,19 @@ def gate(control, base):
         return "UNKNOWN_ROUNDING_AMBIGUITY" if value is not None and 0 < abs(value) <= 2 else "MISMATCH"
     elif kind == "cross_month_opening_mismatch":
         return ("MISMATCH" if control["claimed_march_opening_musd"] != control["feb_closing_musd"] else "MATCH")
+    elif kind == "month_total_tamper":
+        if row.get(control["field"]) is None:
+            return "UNKNOWN_MISSING_FIELD"
+        row[control["field"]] += control["delta"]
+        fields = ("opening_this_month_musd", "deposits_month_musd", "withdrawals_month_musd", "closing_today_musd")
+        if any(row.get(k) is None for k in fields):
+            return "UNKNOWN_MISSING_FIELD"
+        month_residual = row["opening_this_month_musd"] + row["deposits_month_musd"] - row["withdrawals_month_musd"] - row["closing_today_musd"]
+        return "MISMATCH" if abs(month_residual) > 2 else "UNKNOWN_ROUNDING_AMBIGUITY"
+    elif kind == "month_total_missing":
+        row[control["field"]] = None
+        fields = ("opening_this_month_musd", "deposits_month_musd", "withdrawals_month_musd", "closing_today_musd")
+        return "UNKNOWN_MISSING_FIELD" if any(row.get(k) is None for k in fields) else "MISMATCH"
     elif kind == "lookahead":
         return ("REJECT_LOOKAHEAD" if date.fromisoformat(control["source_date"]) >
                 date.fromisoformat(control["asof_date"]) else "UNKNOWN")
@@ -54,9 +68,9 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
         d = self.pack
         self.assertEqual(d["schema_version"], 1)
         self.assertEqual(d["source"]["publisher"], "U.S. Treasury, Bureau of the Fiscal Service")
-        self.assertEqual(len(d["real_reported_cases"]), 4)
+        self.assertEqual(len(d["real_reported_cases"]), 5)
         self.assertEqual({r["record_date"] for r in d["real_reported_cases"]},
-                         {"2025-01-31", "2025-02-28", "2025-03-31", "2025-04-30"})
+                         {"2025-01-31", "2025-02-28", "2025-03-31", "2025-04-30", "2025-03-25"})
         self.assertEqual({r["split"] for r in d["real_reported_cases"]},
                          {"calibration", "temporal_holdout_same_publisher"})
         self.assertEqual(d["source_identity"]["publisher_independent_count"], 1)
@@ -68,11 +82,11 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
 
     def test_official_reported_cash_identity_and_time_bucket_join(self):
         rows = self.pack["real_reported_cases"]
-        self.assertEqual([residual(r) for r in rows], [0, 0, 0, -1])
+        self.assertEqual([residual(r) for r in rows], [0, 0, 0, -1, 0])
         self.assertEqual(rows[0]["closing_today_musd"], rows[1]["opening_this_month_musd"])
         self.assertEqual(rows[1]["closing_today_musd"], rows[2]["opening_this_month_musd"])
         self.assertEqual(rows[2]["closing_today_musd"], rows[3]["opening_this_month_musd"])
-        self.assertEqual(self.pack["tests_and_limitations"]["observed_residuals_musd"], [0, 0, 0, -1])
+        self.assertEqual(self.pack["tests_and_limitations"]["observed_residuals_musd"], [0, 0, 0, -1, 0])
         self.assertEqual(self.pack["tests_and_limitations"]["cross_month_residual_musd"], 0)
         self.assertTrue(all(r["source_url"].startswith("https://fiscaldata.treasury.gov/")
                             and r["document_page"] == 1 for r in rows))
@@ -80,8 +94,8 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
     def test_synthetic_mutations_reject_bad_arithmetic_and_unsupported_truth(self):
         d = self.pack
         controls = d["synthetic_controls"]
-        self.assertEqual(len(controls), 11)
-        self.assertEqual(len({x["id"] for x in controls}), 11)
+        self.assertEqual(len(controls), 13)
+        self.assertEqual(len({x["id"] for x in controls}), 13)
         base = d["real_reported_cases"][1]
         for c in controls:
             with self.subTest(c=c["id"]):
@@ -89,7 +103,7 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
                 self.assertEqual(gate(c, selected), c["expected"])
                 self.assertIsNone(c["independent_real_label"])
                 self.assertEqual(c["provenance"], "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_REPORT")
-        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 9)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 11)
 
     def test_mutation_detection_red_to_green_contract(self):
         base = dict(self.pack["real_reported_cases"][0])
@@ -148,11 +162,63 @@ class TreasuryDTSReconciliationTest(unittest.TestCase):
         self.assertEqual(gate(controls[1], rows[3]), "MISMATCH")
         self.assertIsNone(self.pack["tests_and_limitations"]["independent_recovery_accuracy"])
 
+
+    def test_march25_new_original_date_and_intra_month_cumulative_holdout(self):
+        by_date = {r["record_date"]: r for r in self.pack["real_reported_cases"]}
+        early, late = by_date["2025-03-25"], by_date["2025-03-31"]
+        self.assertEqual(residual(early), 0)
+        self.assertEqual((early["opening_today_musd"], early["deposits_today_musd"],
+                          early["withdrawals_today_musd"], early["closing_today_musd"]),
+                         (385686, 224427, 259615, 350498))
+        self.assertEqual((early["opening_this_month_musd"], early["deposits_month_musd"],
+                          early["withdrawals_month_musd"]), (559582, 2155471, 2364555))
+        self.assertEqual((late["opening_this_month_musd"], late["deposits_month_musd"],
+                          late["withdrawals_month_musd"], late["closing_today_musd"]),
+                         (559582, 2715704, 2869500, 405786))
+        for row in (early, late):
+            self.assertEqual(row["opening_this_month_musd"] + row["deposits_month_musd"]
+                             - row["withdrawals_month_musd"], row["closing_today_musd"])
+        deposits = late["deposits_month_musd"] - early["deposits_month_musd"]
+        withdrawals = late["withdrawals_month_musd"] - early["withdrawals_month_musd"]
+        self.assertEqual((deposits, withdrawals), (560233, 504945))
+        self.assertEqual(deposits - withdrawals, 55288)
+        self.assertEqual(late["closing_today_musd"] - early["closing_today_musd"], 55288)
+        benchmark = self.pack["tests_and_limitations"]["march25_march31_intra_month"]
+        self.assertTrue(benchmark["same_publisher_only"])
+        self.assertEqual(benchmark["arithmetic_residual_musd"], 0)
+        self.assertIsNone(benchmark["independent_third_party_cash_truth"])
+        self.assertIsNone(self.pack["source"]["new_report_original_source_bytes_sha256"])
+        self.assertFalse(self.pack["source"]["new_report_page_image_verified"])
+
+    def test_march25_source_projection_hash_and_missing_label_falsifiers(self):
+        by_id = {r["id"]: r for r in self.pack["real_reported_cases"]}
+        early = by_id["TREASURY_DTS_2025_03_25_TABLE_I"]
+        projected_fields = ("record_date", "opening_today_musd", "deposits_today_musd",
+                            "withdrawals_today_musd", "closing_today_musd",
+                            "opening_this_month_musd", "deposits_month_musd", "withdrawals_month_musd")
+        projection = {key: early[key] for key in projected_fields}
+        def digest(x):
+            return hashlib.sha256(json.dumps(x, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        self.assertEqual(digest(projection), early["projection_sha256"])
+        changed = dict(projection, deposits_month_musd=projection["deposits_month_musd"] + 10)
+        self.assertNotEqual(digest(changed), early["projection_sha256"])
+        controls = {c["id"]: c for c in self.pack["synthetic_controls"]}
+        tamper = controls["SYN_MARCH25_MTD_DEPOSIT_TAMPER_10M"]
+        missing = controls["SYN_MARCH31_MTD_WITHDRAWALS_MISSING"]
+        self.assertEqual(gate(tamper, early), "MISMATCH")
+        self.assertEqual(gate(missing, by_id["TREASURY_DTS_2025_03_31_TABLE_I"]), "UNKNOWN_MISSING_FIELD")
+        for control in (tamper, missing):
+            self.assertEqual(control["split"], "synthetic_holdout")
+            self.assertIsNone(control["independent_real_label"])
+        self.assertEqual(self.pack["source_identity"]["distinct_dated_reports"], 5)
+        self.assertEqual(self.pack["source_identity"]["independent_cross_publisher_cash_confirmation"], 0)
+        self.assertIsNone(self.pack["tests_and_limitations"]["invoice_level_accuracy"])
+
     def test_no_cash_recovery_claim_or_cross_engine_label_leak(self):
         d = self.pack
         e = d["tests_and_limitations"]
         self.assertEqual(e["independent_real_world_heldout_cases"], 0)
-        self.assertEqual(e["real_reported_accounting_cases"], 4)
+        self.assertEqual(e["real_reported_accounting_cases"], 5)
         self.assertIsNone(e["independent_recovery_accuracy"])
         self.assertIsNone(e["invoice_level_accuracy"])
         self.assertIsNone(e["commercial_scoring_precision"])

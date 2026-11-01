@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pack_id": "RECOVERYOS_US_TREASURY_DTS_TGA_CASH_ARITHMETIC_V1",
   "evaluation_family": "GENERAL_ACCOUNTING_PUBLIC_AGGREGATE_CASH_IDENTITY_NOT_INVOICE_RECONCILIATION_OR_RECOVERY_TRUTH",
-  "observed_date_utc": "2026-10-31",
+  "observed_date_utc": "2026-11-01",
   "repository": "P00NSMASHER/github-value-hunt-ledger",
   "review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
   "ownership": "Unified Engine Evidence Lab draft PR 883 only; research/retally-unified-data-lab writer remains untouched",
@@ -20,14 +20,18 @@
     "official_pdf_pages_visually_checked": [
       1
     ],
-    "source_values_provenance": "OFFICIAL_PDF_PAGE_1_TABLE_I_VISUAL_AND_TEXT_READBACK",
+    "source_values_provenance": "ORIGINAL_PREEXISTING_JAN_TO_APR_VISUAL_AND_TEXT_READBACK; NEW_MARCH25_AND_MARCH31_MTD_CELLS_OFFICIAL_INDEXED_PDF_TEXT_ONLY; IMAGE_SCREENSHOT_DENIED_403",
     "source_rights_basis": "US_FEDERAL_GOVERNMENT_AUTHORED_PUBLIC_DATA_PRESUMPTIVELY_US_PUBLIC_DOMAIN; NO_ENDORSEMENT_OR_TRADEMARK_RIGHTS",
     "rights_guidance_url": "https://www.usa.gov/government-copyright",
     "republication_of_source_aggregate_numbers": "REVIEW_ONLY_NO_LOGOS_OR_THIRD_PARTY_CONTENT",
     "third_party_rights_or_special_dataset_terms": "UNKNOWN_NOT_INDEPENDENTLY_CLEARED",
     "commercial_customer_scoring_authorized": false,
     "source_last_modified_utc": null,
-    "source_mutability": "HISTORIC_DATED_REPORT_PUBLISHED; AMENDMENTS_OR_CORRECTIONS_NOT_INDEPENDENTLY_AUDITED"
+    "source_mutability": "HISTORIC_DATED_REPORT_PUBLISHED; AMENDMENTS_OR_CORRECTIONS_NOT_INDEPENDENTLY_AUDITED",
+    "new_report_original_source_bytes_sha256": null,
+    "new_report_original_source_bytes_custodied": false,
+    "new_report_page_image_verified": false,
+    "new_report_rights_status": "U.S. FEDERAL GOVERNMENT-AUTHORED AGGREGATE DATA; SPECIAL THIRD-PARTY AND COMMERCIAL SCORING CLEARANCE UNKNOWN"
   },
   "real_reported_cases": [
     {
@@ -67,7 +71,10 @@
       "withdrawals_today_musd": 158530,
       "closing_today_musd": 405786,
       "opening_this_month_musd": 559582,
-      "closing_this_month_musd": 405786
+      "closing_this_month_musd": 405786,
+      "deposits_month_musd": 2715704,
+      "withdrawals_month_musd": 2869500,
+      "new_mtd_fields_readback": "OFFICIAL_2025_03_31_PUBLISHER_PDF_INDEXED_TEXT; IMAGE_SCREENSHOT_UNAVAILABLE"
     },
     {
       "id": "TREASURY_DTS_2025_04_30_TABLE_I",
@@ -81,16 +88,36 @@
       "closing_today_musd": 677657,
       "opening_this_month_musd": 405786,
       "closing_this_month_musd": 677657
+    },
+    {
+      "id": "TREASURY_DTS_2025_03_25_TABLE_I",
+      "split": "temporal_holdout_same_publisher",
+      "record_date": "2025-03-25",
+      "source_url": "https://fiscaldata.treasury.gov/static-data/published-reports/dts/DailyTreasuryStatement_20250325.pdf",
+      "document_page": 1,
+      "opening_today_musd": 385686,
+      "deposits_today_musd": 224427,
+      "withdrawals_today_musd": 259615,
+      "closing_today_musd": 350498,
+      "opening_this_month_musd": 559582,
+      "closing_this_month_musd": 350498,
+      "deposits_month_musd": 2155471,
+      "withdrawals_month_musd": 2364555,
+      "source_readback_class": "FIRST_PARTY_DATED_PDF_INDEXED_TEXT_NOT_SOURCE_BYTES_OR_VISUAL_PDF_VERIFICATION",
+      "projection_sha256": "10247147f969d8bb0d95ba433b3ef94de2f78d4d9cca7a2e60675ea8f879e279",
+      "projection_hash_contract": "SHA256_CANONICAL_SORTED_COMPACT_JSON_OF_RECORD_DATE_AND_EIGHT_NUMERIC_CELLS_NOT_ORIGINAL_PDF",
+      "independent_bank_or_invoice_truth": null
     }
   ],
   "source_identity": {
     "publisher_independent_count": 1,
-    "distinct_dated_reports": 4,
+    "distinct_dated_reports": 5,
     "exact_report_date_ids": [
       "TREASURY_DTS_2025_01_31_TABLE_I",
       "TREASURY_DTS_2025_02_28_TABLE_I",
       "TREASURY_DTS_2025_03_31_TABLE_I",
-      "TREASURY_DTS_2025_04_30_TABLE_I"
+      "TREASURY_DTS_2025_04_30_TABLE_I",
+      "TREASURY_DTS_2025_03_25_TABLE_I"
     ],
     "raw_invoice_or_bank_documents": 0,
     "independently_adjudicated_outcome_labels": 0,
@@ -102,15 +129,16 @@
       0,
       0,
       0,
-      -1
+      -1,
+      0
     ],
     "cross_month_source_tie": "Jan 31 closing = Feb 28 opening-this-month; Feb 28 closing = Mar 31 opening-this-month. Both are same-publisher checks, not bank confirmation. Mar 31 closing = Apr 30 opening-this-month; same publisher only.",
     "cross_month_residual_musd": 0,
     "allowed_aggregate_rounding_tolerance_musd": 2,
     "reason": "Treasury warns details rounded to millions may not sum exactly; tolerance is a synthetic QA policy, not source-validated accuracy",
     "case_count_not_equal_bank_truth": true,
-    "real_reported_accounting_cases": 4,
-    "temporal_holdout_reported_cases": 3,
+    "real_reported_accounting_cases": 5,
+    "temporal_holdout_reported_cases": 4,
     "independent_real_world_heldout_cases": 0,
     "invoice_level_accuracy": null,
     "commercial_scoring_precision": null,
@@ -124,7 +152,24 @@
     "external_validation_march": "OFFICIAL_DATED_TREASURY_PDF_PAGE_1_VISUALLY_CHECKED_2026_10_31; NO_ORIGINAL_SOURCE_BODY_CUSTODY_OR_BANK_LABEL",
     "april_heldout_observed_difference_musd": -1,
     "april_difference_interpretation": "ONE_MILLION_DIFFERENCE_WITHIN_PUBLISHED_ROUNDING; NOT_AN_INDEPENDENT_ACCOUNTING_ERROR_LABEL",
-    "external_validation_april": "OFFICIAL_2025_04_30_TREASURY_PDF_TABLE_I_PAGE_1_VISUALLY_CHECKED_2026_10_31; ORIGINAL_HTTP_BYTES_AND_SHA256_NOT_ACQUIRED"
+    "external_validation_april": "OFFICIAL_2025_04_30_TREASURY_PDF_TABLE_I_PAGE_1_VISUALLY_CHECKED_2026_10_31; ORIGINAL_HTTP_BYTES_AND_SHA256_NOT_ACQUIRED",
+    "march25_march31_intra_month": {
+      "earlier_record_date": "2025-03-25",
+      "later_record_date": "2025-03-31",
+      "same_publisher_only": true,
+      "opening_month_musd": 559582,
+      "deposits_delta_musd": 560233,
+      "withdrawals_delta_musd": 504945,
+      "closing_delta_musd": 55288,
+      "reconciled_intra_month_musd": 55288,
+      "arithmetic_residual_musd": 0,
+      "independent_third_party_cash_truth": null,
+      "first_public_asof_truth": null,
+      "original_pdf_sha256": null,
+      "producer_readback_class": "OFFICIAL_FIRST_PARTY_PDF_INDEXED_TEXT_NOT_RAW_BYTES_OR_VISUAL_VERIFICATION",
+      "rounding_tolerance_musd": 2,
+      "note": "Difference is not a carrier recovery, invoice payment, bank-confirmed transfer or independent validation; no daily attribution to unobserved dates."
+    }
   },
   "synthetic_controls": [
     {
@@ -227,14 +272,35 @@
       "base_case_id": "TREASURY_DTS_2025_04_30_TABLE_I",
       "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_REPORT",
       "independent_real_label": null
+    },
+    {
+      "id": "SYN_MARCH25_MTD_DEPOSIT_TAMPER_10M",
+      "split": "synthetic_holdout",
+      "kind": "month_total_tamper",
+      "base_case_id": "TREASURY_DTS_2025_03_25_TABLE_I",
+      "field": "deposits_month_musd",
+      "delta": 10,
+      "expected": "MISMATCH",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_REPORT",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_MARCH31_MTD_WITHDRAWALS_MISSING",
+      "split": "synthetic_holdout",
+      "kind": "month_total_missing",
+      "base_case_id": "TREASURY_DTS_2025_03_31_TABLE_I",
+      "field": "withdrawals_month_musd",
+      "expected": "UNKNOWN_MISSING_FIELD",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_ORIGINAL_REPORT",
+      "independent_real_label": null
     }
   ],
   "handoffs": {
-    "recoveryos_12": "FOUR_OFFICIAL_DATED_AGGREGATE_REPORTS; APRIL_IS_PUBLISHED_ROUNDING_AMBIGUITY_NOT_ONE_MILLION_RECOVERY_OR_BANK_PROOF",
-    "freightrecovery_12": "NO_CARRIER_INVOICE_TARIFF_PAYMENT_TRIPLET",
-    "permitplate_48": "NO_BUILDING_PERMIT_OUTCOMES",
-    "capturebrief_52": "NO_NOTICE_VERSION_OR_AWARD_LABEL",
-    "independent_qa_44": "INDEPENDENTLY_COMPARE_APR_30_TABLE_I_PDF_PAGE_1_AND_MAR_31_CLOSE; VERIFY_MINUS_ONE_MILLION_ROUNDING_TOLERANCE_AND_UNCUSTODIED_SOURCE_BYTE_HASH"
+    "recoveryos_12": "FIVE_DATED_OFFICIAL_TREASURY_AGGREGATES; MARCH25_TO_MARCH31_MTD_DELTA_55288_MUSD_SAME_PUBLISHER; NO_INDEPENDENT_BANK_OR_CUSTOMER_RECOVERY_TRUTH",
+    "freightrecovery_12": "NO_INVOICE_TARIFF_OR_CARRIER_SETTLEMENT_LABEL_FROM_TREASURY_AGGREGATE",
+    "permitplate_48": "NO_BUILDING_OR_PERMIT_LABEL_FROM_TREASURY_AGGREGATE",
+    "capturebrief_52": "NO_SOLICITATION_VERSION_OR_AWARD_LABEL_FROM_TREASURY_AGGREGATE",
+    "independent_qa_44": "VERIFY_MARCH25_AND_MARCH31_TABLE_I_PDF_MTD_CELLS_WITH_OWN_VISUAL_ORIGINAL_READ; PROJECTION_SHA256_10247147; PAIRWISE_DELTAS_560233_MINUS_504945_EQUALS_55288; 2_NEGATIVE_CONTROLS; SOURCE_BYTES_UNKNOWN"
   },
   "restrictions": {
     "saved_personal_customer_medical_student_rows": 0,
