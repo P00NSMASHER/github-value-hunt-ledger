@@ -67,7 +67,7 @@
       "description": "An agent skill that turns AI coding assistants into Roblox development experts: Luau, engine APIs, architecture, anti-exploit security, and how to drive Studio's built-in MCP server safely. Version-stamped against a specific Studio/Luau release. Works with Claude Code, Antigravity, Codex, and any Skills-format assistant.",
       "discovery_query": "Roblox AI coding agent Studio",
       "exact_revision": "8076c2aa56266610da8c83088c1030038d3760fd",
-      "forks": 4,
+      "forks": 5,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
       "pushed_at": "2026-10-29T04:48:51Z",
@@ -77,7 +77,7 @@
         "tests"
       ],
       "size_kb": 1299,
-      "stars": 72,
+      "stars": 73,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ai-skills",
@@ -92,7 +92,7 @@
       "triage_components": {
         "activity": 15,
         "description": 4,
-        "forks": 1,
+        "forks": 2,
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 6,
@@ -100,7 +100,7 @@
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 52,
+      "triage_score": 53,
       "url": "https://github.com/MSayib/roblox-dev-skill"
     },
     {
@@ -108,11 +108,11 @@
       "default_branch": "main",
       "description": "Open-source desktop coding agent and AI chat. Bring your own keys: 200+ providers, local models, MCP tools (Blender, Unity, Roblox Studio, GitHub\u2026), a Docker sandbox, browser testing and custom agents. Windows, macOS, Linux.",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "f5e720d612ba38d0afada610fcbf5b00d6d96ca0",
+      "exact_revision": "210d6dc1a8c962f85ebbaa8b57e5bb4b40cae75e",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-28T18:00:10Z",
+      "pushed_at": "2026-11-01T04:25:35Z",
       "repository": "itzdexy/GraftCode",
       "root_code_signals": [
         ".github",
@@ -120,7 +120,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 6426,
+      "size_kb": 7116,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -296,16 +296,16 @@
       "default_branch": "main",
       "description": "Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "da3bd8b2ce747dada95fda700a23a8c69ad0b819",
+      "exact_revision": "dbcd2b4dd79ae2c5c50c7b12dbe2b555dc86cf92",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-31T18:15:03Z",
+      "pushed_at": "2026-11-01T09:48:14Z",
       "repository": "Daniel987654321/roblox-studio-agent-bridge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 504,
+      "size_kb": 520,
       "stars": 73,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -344,16 +344,16 @@
       "default_branch": "main",
       "description": "Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs",
       "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "76cf512f4e8563265c24f202f53404752578f014",
+      "exact_revision": "d9dafa8e74b226b9e0387a8cf9b1598a057f59b3",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-31T14:04:07Z",
+      "pushed_at": "2026-11-01T09:26:55Z",
       "repository": "nahidgaming70/Roblox-QA-Sentinel",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 590,
+      "size_kb": 400,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -457,7 +457,7 @@
     23,
     24
   ],
-  "generated_at": "2026-10-31T18:51:26.470557+00:00",
+  "generated_at": "2026-11-01T09:47:46.734635+00:00",
   "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
   "risk_review": [],
   "risk_review_count": 0,
