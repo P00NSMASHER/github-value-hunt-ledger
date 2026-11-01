@@ -3,7 +3,6 @@
 Only fictional role claims and tariff figures are used; passing NEVER proves
 external buyer or customer-held real invoice accuracy.
 """
-from copy import deepcopy
 
 from freight.pilot_lab03_methodology_probe import (
     assess_fictional_methodology,make_fictional_pilot,rehash,
