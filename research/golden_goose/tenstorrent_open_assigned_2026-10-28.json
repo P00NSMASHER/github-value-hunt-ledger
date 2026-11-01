@@ -1,0 +1,59 @@
+[
+  {
+    "listing_id": "tenstorrent-tt-metal-62571-20261028",
+    "issue_url": "https://github.com/tenstorrent/tt-metal/issues/62571",
+    "advertised_usd": "750.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": true,
+    "recent_awards_verified": null,
+    "claim_count": 1,
+    "observed_assignees": [
+      "bvdyvncqr5-commits"
+    ],
+    "reason": "Existing assignee; published program terms forbid others from collecting until formally assigned",
+    "source_url": "https://github.com/tenstorrent/tt-metal/issues/62571",
+    "assignment_required": true,
+    "assigned_to_us": false,
+    "assigned_to_other": true,
+    "external_contributor_note": "Program permits eligible outside contributors but requires GitHub assignment for payment; issue is assigned to another contributor."
+  },
+  {
+    "listing_id": "tenstorrent-tt-metal-59732-20261028",
+    "issue_url": "https://github.com/tenstorrent/tt-metal/issues/59732",
+    "advertised_usd": "3000.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": true,
+    "recent_awards_verified": null,
+    "claim_count": 1,
+    "observed_assignees": [
+      "samiyadev786"
+    ],
+    "reason": "Already assigned under program; hardware validation required on Wormhole and Blackhole",
+    "source_url": "https://github.com/tenstorrent/tt-metal/issues/59732",
+    "assignment_required": true,
+    "assigned_to_us": false,
+    "assigned_to_other": true,
+    "external_contributor_note": "Program permits eligible outside contributors but requires GitHub assignment for payment; issue is assigned to another contributor."
+  },
+  {
+    "listing_id": "tenstorrent-tt-metal-56908-20261028",
+    "issue_url": "https://github.com/tenstorrent/tt-metal/issues/56908",
+    "advertised_usd": "3000.00",
+    "github_state": "open",
+    "repo_archived": false,
+    "external_contributors_allowed": true,
+    "recent_awards_verified": null,
+    "claim_count": 1,
+    "observed_assignees": [
+      "Adraca"
+    ],
+    "reason": "Already assigned; Wormhole hardware regression required",
+    "source_url": "https://github.com/tenstorrent/tt-metal/issues/56908",
+    "assignment_required": true,
+    "assigned_to_us": false,
+    "assigned_to_other": true,
+    "external_contributor_note": "Program permits eligible outside contributors but requires GitHub assignment for payment; issue is assigned to another contributor."
+  }
+]

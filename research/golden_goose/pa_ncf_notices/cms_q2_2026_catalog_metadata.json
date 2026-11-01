@@ -1,0 +1,9 @@
+{
+  "source_url": "https://catalog.data.gov/dataset/skilled-nursing-facility-change-of-ownership-2026-06-01",
+  "dataset_id": "f557a6ed-95b3-4a22-8433-4175db2dec1c",
+  "dataset_title": "Skilled Nursing Facility Change of Ownership : 2026-06-01",
+  "coverage_end": "2026-06-30",
+  "catalog_last_updated_on": "2026-08-24",
+  "access_url": "https://data.cms.gov/data-api/v1/dataset/f557a6ed-95b3-4a22-8433-4175db2dec1c/data",
+  "note": "Catalogue temporal metadata only; not a facility record, event first-published timestamp or CHOW confirmation."
+}

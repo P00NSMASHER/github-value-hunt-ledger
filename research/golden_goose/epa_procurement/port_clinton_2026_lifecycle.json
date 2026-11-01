@@ -1,0 +1,32 @@
+{
+  "case_id": "port-clinton-1999-cwa-consent-decree",
+  "project_id": "port_clinton_1999_cso_ltcp",
+  "as_of": "2026-10-29",
+  "event": {
+    "receipt_id": "epa_port_clinton_completion_2026_06_01",
+    "project_id": "port_clinton_1999_cso_ltcp",
+    "source_kind": "epa_newsrelease",
+    "source_url": "https://www.epa.gov/newsreleases/epa-and-ohio-epa-terminate-settlement-after-port-clinton-ohio-completed-required",
+    "published_on": "2026-06-01",
+    "observed_on": "2026-10-29",
+    "reported_state": "agency_reports_required_work_complete_and_agreed_termination"
+  },
+  "facts": {
+    "original_settlement_year": 1999,
+    "epa_reports_required_construction_complete": true,
+    "epa_reports_state_federal_agreement_to_terminate": true,
+    "independent_court_termination_order_verified": false,
+    "remaining_combined_sewer_outfalls_epa_reported": 1,
+    "reported_historical_upgrade_spend_usd_approximately": 15000000,
+    "ohio_epa_financing_usd_over": 15600000,
+    "verified_current_open_bid_for_original_project": false
+  },
+  "economics": {
+    "historical_public_spending_not_collectible_by_us_usd_approximately": 15000000,
+    "verified_user_revenue_usd": 0,
+    "verified_customer_count": 0,
+    "customer_willingness_to_pay": "UNKNOWN"
+  },
+  "expected_screen": ["PAUSE_PRE_RFP", "agency_reports_original_required_work_complete"],
+  "caveat": "Only the original 1999 decree work is in scope. Other Port Clinton projects may exist. This is an agency announcement, not independent court-docket verification."
+}

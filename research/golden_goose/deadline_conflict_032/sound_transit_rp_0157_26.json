@@ -1,0 +1,51 @@
+{
+  "solicitation_id": "Sound Transit RP 0157-26",
+  "captured_date": "2026-10-30",
+  "scope_note": "Manually recorded public mirror fields. Three assertions are from ONE syndicated mirror, not independent providers. Official Biddingo tender live date and amended PDFs were NOT readable. Actual effective deadline unknown. No supplier contact or site automation.",
+  "observations": [
+    {
+      "kind": "third_party_headline",
+      "close_local": "2026-11-04 15:00",
+      "tz": "America/Los_Angeles",
+      "url": "https://www.lightrfp.com/marketplace/bid/SOUND_TRANSIT-41787728/orca-on-call-transit-fare-collection-and-payment-industry-consulting-services",
+      "field": "page headline"
+    },
+    {
+      "kind": "third_party_embedded_description",
+      "close_local": "2026-10-21 15:00",
+      "tz": "America/Los_Angeles",
+      "url": "https://www.lightrfp.com/marketplace/bid/SOUND_TRANSIT-41787728/orca-on-call-transit-fare-collection-and-payment-industry-consulting-services",
+      "field": "scope text / older structured data"
+    },
+    {
+      "kind": "third_party_raw_snapshot",
+      "close_local": "2026-11-04 15:00",
+      "tz": "America/Los_Angeles",
+      "url": "https://www.lightrfp.com/marketplace/bid/SOUND_TRANSIT-41787728/orca-on-call-transit-fare-collection-and-payment-industry-consulting-services",
+      "field": "embedded listing snapshot"
+    },
+    {
+      "kind": "official_agency_portal_link",
+      "close_local": null,
+      "url": "https://www.biddingo.com/soundtransit/bid/1/41195253/41787728",
+      "field": "official link; actual live deadline not independently retrieved"
+    }
+  ],
+  "official_agency_policy_url": "https://www.soundtransit.org/get-to-know-us/doing-business-with-us/procurement-contracts-agreements",
+  "competitors": [
+    {
+      "name": "DemandStar",
+      "source": "https://network.demandstar.com/pricing-suppliers/",
+      "one_agency_free": true
+    },
+    {
+      "name": "Govly",
+      "source": "https://www.govly.com/pricing",
+      "recent_search_free": true
+    }
+  ],
+  "effective_bid_deadline": "unknown",
+  "buyer_willingness_to_pay": "unknown",
+  "verified_owner_revenue_usd": "0",
+  "verified_collectible_usd": "0"
+}

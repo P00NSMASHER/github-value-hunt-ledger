@@ -1,0 +1,49 @@
+name: RETALLY Golden Goose consolidated research QA (offline only)
+on:
+  pull_request:
+    paths:
+      - 'research/golden_goose/**'
+      - 'tests/test_ti_golden_goose_*.py'
+      - '.github/workflows/retally-golden-goose-research-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Enforce 94 exact original blobs and research-only release hold
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          m=json.loads(pathlib.Path("research/golden_goose/SOURCE_MANIFEST.json").read_text())
+          assert m["authority"]=="SOURCE_PRESERVATION_ONLY_NOT_RELEASE"
+          assert m["source_prs"]==[864,865,866,867,870,876,878,879]
+          assert len(m["artifacts"])==94
+          assert all(x["path"].startswith(("research/golden_goose/","tests/test_ti_golden_goose_")) for x in m["artifacts"])
+          for x in m["artifacts"]:
+              actual=subprocess.check_output(["git","hash-object",x["path"]],text=True).strip()
+              assert actual==x["sha"], (x["path"],actual,x["sha"])
+          assert len({x["path"] for x in m["artifacts"]})==94
+          assert m["research_only"] and m["no_customer_proof"] and m["no_verified_revenue"]
+          print("94 original source Git blobs verified; research artifacts not commercially cleared.")
+          PY
+      - name: Run all Python negative-control tests in a no-network read-only container
+        run: |
+          docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
+            --user 65534:65534 --memory 768m --pids-limit 128 \
+            --tmpfs /tmp:rw,nosuid,nodev,size=128m \
+            -e PYTHONDONTWRITEBYTECODE=1 -e PYTHONPATH=/repo \
+            -v "${PWD}:/repo:ro" -w /repo python:3.11-slim-bookworm \
+            python -c 'from pathlib import Path; import sys,subprocess; tests=sorted(Path("research/golden_goose").rglob("test_*.py"))+sorted(Path("tests").glob("test_ti_golden_goose_*.py")); assert len(tests)>=15,len(tests); [subprocess.run([sys.executable,str(p)],check=True) for p in tests]; print("Offline Python test files passed:",len(tests))'
+      - name: Run all Node negative-control tests in a no-network read-only container
+        run: |
+          docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
+            --user 65534:65534 --memory 768m --pids-limit 128 \
+            --tmpfs /tmp:rw,nosuid,nodev,size=128m \
+            -e NODE_OPTIONS=--no-warnings -v "${PWD}:/repo:ro" -w /repo node:22-bookworm-slim \
+            node -e 'const fs=require("fs"),cp=require("child_process"),p=require("path");function walk(d){return fs.readdirSync(d,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(p.join(d,x.name)):(/^(test_.*\\.js|.*\\.test\\.mjs)$/.test(x.name)?[p.join(d,x.name)]:[]))}const tests=walk("research/golden_goose").sort();if(tests.length<7)process.exit(2);for(const t of tests){console.log("Node test",t);cp.execFileSync(process.execPath,[t],{stdio:"inherit"})}console.log("Offline Node test files passed:",tests.length)'

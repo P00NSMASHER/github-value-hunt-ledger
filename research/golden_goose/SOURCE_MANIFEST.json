@@ -1,0 +1,490 @@
+{
+  "schema_version": 1,
+  "authority": "SOURCE_PRESERVATION_ONLY_NOT_RELEASE",
+  "source_prs": [
+    864,
+    865,
+    866,
+    867,
+    870,
+    876,
+    878,
+    879
+  ],
+  "source_commit_frozen": "2026-11-01",
+  "research_only": true,
+  "no_customer_proof": true,
+  "no_verified_revenue": true,
+  "artifacts": [
+    {
+      "pr": 864,
+      "path": "research/golden_goose/README.md",
+      "sha": "4b2dbf8f5eef2c3e53e3b9c86e9aa027e260f174"
+    },
+    {
+      "pr": 864,
+      "path": "research/golden_goose/bounty_census_2026-10-28.json",
+      "sha": "5cb51e38ac0237ae4a708c84d666d37a456fba58"
+    },
+    {
+      "pr": 864,
+      "path": "research/golden_goose/bounty_cross_board_2026-10-28.json",
+      "sha": "5a9c9c1a3a66a9d7316b2d74b61fe6f1f0ae15eb"
+    },
+    {
+      "pr": 864,
+      "path": "research/golden_goose/bounty_triage.py",
+      "sha": "2d3d5ffc8accfa22cbcd41ce88347a98994b9e1f"
+    },
+    {
+      "pr": 864,
+      "path": "research/golden_goose/tenstorrent_open_assigned_2026-10-28.json",
+      "sha": "a6a4f8069f7946a9747a5020b635305d5e5fcdf6"
+    },
+    {
+      "pr": 864,
+      "path": "research/golden_goose/test_bounty_cross_board.py",
+      "sha": "0a3fa7f3f2816db7d8dcd9209d812573b5bb71ce"
+    },
+    {
+      "pr": 864,
+      "path": "research/golden_goose/test_bounty_triage.py",
+      "sha": "8e05e577bd1f36adcd1cc37c486a2f0113929061"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/README.md",
+      "sha": "5a49dc91463f7a1331611ec8551fb9a65ed5126a"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/cms_coverage_gate.py",
+      "sha": "abf834b822afd84d9befba3f71747f39be0b5c86"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/cms_q2_2026_catalog_metadata.json",
+      "sha": "91f7718831700ddf3f0a058545e0e6da5c282b87"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/coverage_audit_2026-10-28.json",
+      "sha": "a380cb06fc2103b0b947af901b44f5a7d77a010b"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/notice_watch.py",
+      "sha": "48fa5f67b913e5a3a5bec9f2142cd2fd6b0fec65"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/pa_snapshot_2026-10-28.json",
+      "sha": "2ed1a341cc3fd74437c536419e8bc1f4dbddd711"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/test_cms_coverage_gate.py",
+      "sha": "4fa041140f0db392d689f254e12367da6e82b84b"
+    },
+    {
+      "pr": 865,
+      "path": "research/golden_goose/pa_ncf_notices/test_notice_watch.py",
+      "sha": "38096806bbf2166afe75a624a5f10cb902f38a2a"
+    },
+    {
+      "pr": 866,
+      "path": "research/golden_goose/utility_invoice_gap/README.md",
+      "sha": "a73b2b76fb41db01e0c935d82ff9e5c13e950a19"
+    },
+    {
+      "pr": 866,
+      "path": "research/golden_goose/utility_invoice_gap/case_evidence_2026-10-28.json",
+      "sha": "50db36d5ffb3c9a88320c2a2e38064d1946cfe9b"
+    },
+    {
+      "pr": 866,
+      "path": "research/golden_goose/utility_invoice_gap/invoice_gap.mjs",
+      "sha": "a4ed4c43b466373b23e8eeba0192f39e3db50705"
+    },
+    {
+      "pr": 866,
+      "path": "research/golden_goose/utility_invoice_gap/invoice_gap.test.mjs",
+      "sha": "ecf3ac42b1ef6daf94df9c3c95cec6ed51c40f74"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/2026-10-29_sample.json",
+      "sha": "52549932b3352134e0f0b070f3148480e43a2bd0"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/AMENDMENT_WATCH_2026-10-29.md",
+      "sha": "77eaee96e8d8b66d7b904ce17a9b663d5e7344de"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/LIFECYCLE_EXIT_2026-10-29.md",
+      "sha": "876be1e39ae67b5fbcd2a48a07535f6d9ce228c7"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/README.md",
+      "sha": "6c6956e13c5b3ef3b70b54c7d2ed9d014a3bc496"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/akron_2026_amendment.json",
+      "sha": "2cfe878073a726225a28b96032238013f67d5177"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/doj_snapshot_2026-10-29.json",
+      "sha": "e4ee3a834e0dde94b4f023bc5c36ea9f07fffc85"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/lifecycle_guard.py",
+      "sha": "14504bc7d14df9ad36a019197f1c1d2850cf665e"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/mandate_guard.py",
+      "sha": "1e5f720d5c304b1f290fc7fb00bb22486bebf53f"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/port_clinton_2026_lifecycle.json",
+      "sha": "13c87b8ce9c1273c990f2e98f02d5baedc49ad30"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/test_lifecycle_guard.py",
+      "sha": "ba69947de1e6c562ba4bba343fffd1fda27b2f56"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/test_mandate_guard.py",
+      "sha": "60a621c18ae1a0d14290d3de358bdba9decd04bf"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/test_verify_sample.py",
+      "sha": "56a03be0c4d7ec01a83286896ae9ebe29b65665e"
+    },
+    {
+      "pr": 867,
+      "path": "research/golden_goose/epa_procurement/verify_sample.py",
+      "sha": "0b2f179ea69dd1f67601b3894bc0ccb1520e4fd9"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/COHORT_AMOUNT_BRIDGE_019_2026-10-29.md",
+      "sha": "c6fc42851b1c970eda0ab5cc84f1c1836711c570"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/COLLISION_SCOPE_DIAGNOSTIC_024_2026-10-29.md",
+      "sha": "5e2f8181c682be7f406e41003996c2a6adf2cfc8"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/COMMERCIAL_MARGIN_STOP_GATE_027_2026-10-29.md",
+      "sha": "236a0e25cd4cb2b76a7e0cc880059c116bd417b1"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/DOCUMENT_NAMESPACE_FALSIFIER_025_2026-10-29.md",
+      "sha": "82c6cdedde2db791573803d9bcc05259e54ebecf"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/HOLDOUT_014_2026-10-29.md",
+      "sha": "5af3070317a6d28be7528a03a28cdec539ddf976"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/HOLDOUT_2026-10-29.md",
+      "sha": "028d2f53e8d0549d766539ca927047c233d56515"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/INTEGRATION_AND_COMPETITOR_FALSIFIER_022_2026-10-29.md",
+      "sha": "6db290cf4a400485bb250f32dd3139b6e83e95c3"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/MICHIGAN_CASH_TERMS_016_2026-10-29.md",
+      "sha": "f680d224b3289de8ddf600b01fc900f647042c09"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/POSTED_AMOUNT_FALSIFIER_018_2026-10-29.md",
+      "sha": "41c7b29d02ad6cd3815717ed3ecdfd36aaf6efbc"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/PUBLIC_BID_RATE_CHECK_015_2026-10-29.md",
+      "sha": "d50bd4fb0b77c89f35c8809d421cc46aa087d19c"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/PUBLIC_SCOPE_FALSIFIER_017_2026-10-29.md",
+      "sha": "a0936aacea8c92448f74416029e19fe50900d3e3"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/PYTHON_JS_100_JOB_COHORT_021_2026-10-29.md",
+      "sha": "405d96471a72b613291b4c42e00a32eb7ef6f356"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/README.md",
+      "sha": "7d5c23063c48aea32723ce63b33712b26c9c54b3"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/REVIEW_AMPLIFICATION_FALSIFIER_023_2026-10-29.md",
+      "sha": "6c6bf092d4788410ae34db07172b2d6b3b5482fc"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/SOURCE_CLOSURE_020_2026-10-29.md",
+      "sha": "c6fa527864f788288109ddbf39cd71f918e2ef34"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/SOURCE_FINGERPRINT_FALSIFIER_026_2026-10-29.md",
+      "sha": "1e412b4b2750a05e6490bb591da73ade4c8c4bad"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/cohort_amount_bridge_019.js",
+      "sha": "85c718960a314b2b9e2d4454ff918c2989fbf930"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/collision_diagnostic_024.js",
+      "sha": "1a5bb2c1437dd14d8a42ff7731329c7448de0d2b"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/hydrovac_reconcile.py",
+      "sha": "74082763b845c0f7a9fd3549790e04ae4db64fe4"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/invoice_scope_holdout_025.js",
+      "sha": "8745215bc7c22545b9148c549329b8cd78ae89aa"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/michigan_cash_terms_016.js",
+      "sha": "e84182b696e92c85bbb9c1f491af0c73cb24552d"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/posted_amount_guard_018.js",
+      "sha": "288f4281aba8d8a901362bcd1588a9da5143ecaf"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/public_contract_scope_017.js",
+      "sha": "e5bfce609645c486c03a6a4bac1cf808f197829a"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/review_economics_gate_027.js",
+      "sha": "a97f8a1d2e1c3c35129124bd45a0352c9f2dc733"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/source_fingerprint_026.js",
+      "sha": "7b58defa2d69cb8462f3a694c65a6038c6033dd3"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/synthetic_100_jobs.json",
+      "sha": "442ec267db817147412eab4ef556bb21e41e181f"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_100_job_python_to_js_021.js",
+      "sha": "28a845457c28bc2cee80e94ca9c9e570e181a07b"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_blast_radius_023.js",
+      "sha": "fdbcd986e28ef6e8a6be03a7e4bea003f249c54d"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_collision_diagnostic_024.js",
+      "sha": "95c1bf04f2bea66e3f2adefb36fcda68d4b63f54"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_hydrovac_reconcile.py",
+      "sha": "fab782ef0f1c2f79a5b9071014f4445f0e4619aa"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_independent_holdout.py",
+      "sha": "2a98090f25b78435fea3419502d00eaf583e93df"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_invoice_scope_holdout_025.js",
+      "sha": "980ef168ac363d8b03e3fb5160f527e6efc4bb0b"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_quantity_source_closure_020.js",
+      "sha": "8c200e7929527105f1079ef15b4c6fa8106f0637"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_review_economics_gate_027.js",
+      "sha": "02a165722a48d2edfbda85e673b58fe68cecb671"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_sealed_holdout_014.py",
+      "sha": "56459ca3dbd77f95c34a24c0f017c1814475ce05"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_source_fingerprint_026.js",
+      "sha": "3405533036a30b27e4975a1b3de417870d255b49"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/test_worcester_public_rate_audit.js",
+      "sha": "92bd9ef3d33412056f3fe42646a852e8bf2a2200"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/worcester_bid_rates_2026.json",
+      "sha": "7877372bb5187094e095f92ddb649af345c1b445"
+    },
+    {
+      "pr": 870,
+      "path": "research/golden_goose/hydrovac_proof_to_invoice/worcester_public_rate_audit.js",
+      "sha": "c45e465b5729624e0fe5b04ff7b36d1cd4d77668"
+    },
+    {
+      "pr": 870,
+      "path": "tests/test_ti_golden_goose_hydrovac_integration_022.py",
+      "sha": "24a02cbd36fafac3f1f6eeec218d13f867b0f7cc"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/RESTORE_EVIDENCE_FALSIFIER_029_2026-10-29.md",
+      "sha": "498e490c2ca5d0b9bf596ae5021040003fe645b6"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/RESTORE_PROOF_COMPETITIVE_GATE_028_2026-10-29.md",
+      "sha": "4cb7c8cd17beff23586a67e4e85060c972f6bbd2"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/restore_competition_2026-10-29.json",
+      "sha": "84f2cf0145660f3a3271b9c0356555aa29e58c72"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/restore_evidence_fixture_029.json",
+      "sha": "2abff322adfae490dc8277894bd7f2cb2f6eab9c"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/restore_evidence_gate_029.py",
+      "sha": "7b3578a155bfa2983799cab09e665308f590eaf8"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/restore_market_gate.py",
+      "sha": "8d9700f0dd8c615e6584f88102fddf28da074f2f"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/test_restore_evidence_gate_029.py",
+      "sha": "2c18a85eb6c613d3f9fb57c8b7cadb7eafcd77ea"
+    },
+    {
+      "pr": 876,
+      "path": "research/golden_goose/restore_proof_competition/test_restore_market_gate.py",
+      "sha": "dfd2f868a23f722188289be95fa0daddbe040897"
+    },
+    {
+      "pr": 876,
+      "path": "tests/test_ti_golden_goose_restore_evidence_029.py",
+      "sha": "af36d60accc305640c34dd7c77503f67e0b8e91f"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/federal_transport_audit/README.md",
+      "sha": "c8b53feffa3570cc4bdc8a3715a1cec79867586a"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/federal_transport_audit/federal_audit_economics.py",
+      "sha": "7f3cc989111571112402753479c39c40f4c3c2d9"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/federal_transport_audit/federal_audit_scenarios.json",
+      "sha": "27001ed671a4e6dff8aec95a7cf757332e13094d"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/federal_transport_audit/test_federal_audit_economics.py",
+      "sha": "9ef462d5a8eefe259f048cff3942af85e502ecc6"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/private_freight_cash_gate_031/PRIVATE_FREIGHT_PRICE_FALSIFIER_031_2026-10-29.md",
+      "sha": "c5d00888c09ae8f0b2fe0202676f21fc63fd6374"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/private_freight_cash_gate_031/private_freight_cash_gate_031.py",
+      "sha": "408881d06fa72a6c1cccef2e5e60c38ee69e292b"
+    },
+    {
+      "pr": 878,
+      "path": "research/golden_goose/private_freight_cash_gate_031/test_private_freight_cash_gate_031.py",
+      "sha": "2ccfde5eb8814ed89b833c5d4a6404a370e9a488"
+    },
+    {
+      "pr": 878,
+      "path": "tests/test_ti_golden_goose_private_freight_031.py",
+      "sha": "79c82d8565abf9e24ffc334b167a35ae04122457"
+    },
+    {
+      "pr": 879,
+      "path": "research/golden_goose/deadline_conflict_032/README.md",
+      "sha": "b9230a90d103e1ca22bcf7a601bfa0e39a598cd9"
+    },
+    {
+      "pr": 879,
+      "path": "research/golden_goose/deadline_conflict_032/deadline_conflict_gate.py",
+      "sha": "8ecb7dccd0e7d1cc6586ad238de9b2280a845248"
+    },
+    {
+      "pr": 879,
+      "path": "research/golden_goose/deadline_conflict_032/sound_transit_rp_0157_26.json",
+      "sha": "af55296d4b3d208c1102876f3af7b0f2555658b9"
+    },
+    {
+      "pr": 879,
+      "path": "research/golden_goose/deadline_conflict_032/test_deadline_conflict_gate.py",
+      "sha": "a551f56a7af9bb8e862949b3d0e19d585b45e632"
+    },
+    {
+      "pr": 879,
+      "path": "tests/test_ti_golden_goose_deadline_conflict_032.py",
+      "sha": "3904f65d95dca29b67dfdf5b2aa325bfc2544864"
+    }
+  ]
+}

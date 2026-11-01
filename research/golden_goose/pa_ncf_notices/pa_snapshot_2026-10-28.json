@@ -1,0 +1,33 @@
+{
+  "source_url": "https://sais.health.pa.gov/CommonPOC/Licensing/IPA-NCF/PublicReviewFacList.aspx",
+  "observed_on": "2026-10-28",
+  "method": "Manual transcription of portal public text; source categories preserved, not license ownership determinations",
+  "rows": [
+    {
+      "name": "Chandler Hall Health Services",
+      "address": "99 Barclay Street, Newtown, PA 18940",
+      "county": "Bucks",
+      "posted": "2026-10-23",
+      "category": "INITIAL_PROVIDER_APPLICATION_REVIEW",
+      "status": "PENDING_REVIEW"
+    },
+    {
+      "name": "Ivory Nursing & Rehabilitation",
+      "previous_name": "Ivory Wellness Center",
+      "address": "2004 Old Arch Road, Norristown, PA 19401",
+      "county": "Montgomery",
+      "posted": "2026-09-09",
+      "category": "INITIAL_OR_CHOW_DECISION",
+      "status": "APPROVED"
+    },
+    {
+      "name": "Onyx Nursing & Rehabilitation",
+      "previous_name": "Onyx Wellness Center",
+      "address": "205 East Johnson Highway, Norristown, PA 19401",
+      "county": "Montgomery",
+      "posted": "2026-09-09",
+      "category": "INITIAL_OR_CHOW_DECISION",
+      "status": "APPROVED"
+    }
+  ]
+}
