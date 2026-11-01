@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "pack_id": "NYC_DOB_SAFETY_BOILER_FIRST_PARTY_FILING_SCOPE_V1",
+  "evaluation_family": "GOVERNMENT_PERMIT_ADJACENT_FILING_EXTRACTION_NOT_PROPERTY_RISK_OR_ENFORCEMENT_SCORING",
+  "observed_utc_date": "2026-11-01",
+  "ownership": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "review_pr": 883,
+    "review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_writer_unmodified": "research/retally-unified-data-lab",
+    "legacy_lab_consolidation_proven": false,
+    "product_code_changed": false
+  },
+  "source": {
+    "publisher": "New York City Department of Buildings via NYC Open Data",
+    "dataset_id": "52dp-yji6",
+    "title": "DOB NOW: Safety Boiler",
+    "dataset_url": "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Safety-Boiler/52dp-yji6/about_data",
+    "original_public_api_url": "https://data.cityofnewyork.us/resource/52dp-yji6.json",
+    "schema_metadata_url": "https://data.cityofnewyork.us/api/views/52dp-yji6/columns.json",
+    "catalog_created_date": "2017-09-14",
+    "first_public_date": "2017-09-29",
+    "publisher_last_updated_observed": "2026-10-22",
+    "refresh_frequency": "DAILY_MUTABLE",
+    "publisher_catalog_column_count": 21,
+    "catalog_approximate_rows": "895K_AS_OF_OCTOBER_2026_NOT_DOWNLOADED",
+    "observed_schema_fields": [
+      "tracking_number",
+      "boiler_id",
+      "report_type",
+      "pressure_type",
+      "inspection_type",
+      "inspection_date",
+      "defects_exist",
+      "report_status"
+    ],
+    "catalog_field_interpretations": {
+      "report_type": "Initial is first filing; Subsequent can be a correction filing, not verified remediation",
+      "defects_exist": "Publisher filing indicates Yes or No; neither is independent enforcement outcome",
+      "report_status": "Workflow status; Accepted does not mean defect-free or no penalty"
+    },
+    "record_period": "2017_REPORTS_IN_FIRST_UNSORTED_API_EXCERPT_NOT_CURRENT_BUILDING_CONDITION"
+  },
+  "rights": {
+    "nyc_open_data_faq_url": "https://www.nyc.gov/opendata/get-started/FAQs",
+    "nyc_open_data_faq_stance": "NO_RESTRICTIONS_ON_USE_OF_OPEN_DATA",
+    "specific_dataset_licensing_exceptions_reviewed": false,
+    "commercial_reuse_policy": "GENERAL_NYC_OPEN_DATA_USE_PERMITTED_SUBJECT_TO_APPLICABLE_TERMS_AND_THIRD_PARTY_RIGHTS",
+    "permitplate_customer_scoring_authorized": false,
+    "no_endorsement": true
+  },
+  "provenance": {
+    "source_observation": "OFFICIAL_PUBLIC_API_WEB_PARSED_FIRST_EIGHT_DEFAULT_UNSORTED_ROWS_NOT_RAW_HTTP_CUSTODY",
+    "public_api_observed_date_utc": "2026-11-01",
+    "publisher_api_rows_observed": 8,
+    "sanitized_rows_retained": 8,
+    "raw_http_body_sha256": null,
+    "raw_http_byte_length": null,
+    "raw_original_source_custodied": false,
+    "source_last_modified_header": null,
+    "sanitized_projection_sha256": "33ca9b4a1374a55b6f3f3c64c0747579a5d8680e9b18842d295031115aa3e4a0",
+    "sanitized_projection_hash_contract": "SHA256_OF_SORT_KEYS_COMPACT_UTF8_JSON_ARRAY_OF_8_SANITIZED_ROWS_IN_ORDER_NOT_ORIGINAL_HTTP_BODY",
+    "excerpt_limitations": "FIRST_EIGHT_DEFAULT_ROWS_NOT_RANDOM_NOT_STABLE_NOT_REPRESENTATIVE_NOT_A_POINT_IN_TIME_ARCHIVE",
+    "retained_fields": [
+      "report_type",
+      "report_status",
+      "pressure_type",
+      "inspection_date",
+      "defects_exist"
+    ],
+    "excluded_sensitive_or_location_fields": [
+      "tracking_number",
+      "boiler_id",
+      "bin_number",
+      "applicantfirst_name",
+      "applicant_last_name",
+      "applicant_license_number",
+      "owner_first_name",
+      "owner_last_name",
+      "address",
+      "phone",
+      "email"
+    ],
+    "same_record_duplicate_dedup_permitted": false,
+    "dedup_reason": "IDENTIFIERS_INTENTIONALLY_NOT_RETAINED; SAME-LOOKING_ROWS_MAY_BE_DIFFERENT_BOILERS_OR_FILING_CYCLES",
+    "historical_publication_asof_date": null
+  },
+  "observations": {
+    "real_same_publisher_filing_rows": 8,
+    "calibration_indices": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "nonblind_same_publisher_holdout_indices": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "defects_exist_yes_source_reported": 2,
+    "defects_exist_no_source_reported": 6,
+    "accepted_status_source_reported": 8,
+    "subsequent_report_source_reported": 1,
+    "independent_final_violation_labels": 0,
+    "independent_repair_confirmation_labels": 0,
+    "independent_nonviolation_labels": 0,
+    "independent_real_heldout_cases": 0,
+    "verified_customer_leads": 0,
+    "penalty_or_fee_payment_evidence": 0,
+    "conclusion": "PUBLISHER_SELF_REPORTED_FILING_FIELDS_ONLY_NOT_INDEPENDENT_SAFETY_OR_ECONOMIC_OUTCOMES",
+    "rows": [
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "02/21/2017 00:00:00",
+        "defects_exist": "No"
+      },
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "03/17/2017 00:00:00",
+        "defects_exist": "No"
+      },
+      {
+        "report_type": "Subsequent",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "01/31/2017 00:00:00",
+        "defects_exist": "No"
+      },
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "03/23/2017 00:00:00",
+        "defects_exist": "No"
+      },
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "02/01/2017 00:00:00",
+        "defects_exist": "No"
+      },
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "07/05/2017 00:00:00",
+        "defects_exist": "No"
+      },
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "07/18/2017 00:00:00",
+        "defects_exist": "Yes"
+      },
+      {
+        "report_type": "Initial",
+        "report_status": "Accepted",
+        "pressure_type": "Low Pressure",
+        "inspection_date": "06/27/2017 00:00:00",
+        "defects_exist": "Yes"
+      }
+    ]
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYN_ACCEPTED_WITH_DEFECTS",
+      "claim": "defects_remediated",
+      "base_observation_index": 6,
+      "expected": "UNKNOWN_NO_VERIFIED_REMEDIATION",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_NO_DEFECTS_IS_NEGATIVE_LEGAL_TRUTH",
+      "claim": "independent_no_violation",
+      "base_observation_index": 0,
+      "expected": "UNKNOWN_NO_INDEPENDENT_NEGATIVE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_SUBSEQUENT_PROVES_REPAIRS",
+      "claim": "defects_remediated",
+      "base_observation_index": 2,
+      "expected": "UNKNOWN_NO_VERIFIED_REMEDIATION",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_ACCEPTED_MEANS_PENALTY_NONE",
+      "claim": "independent_penalty_or_violation",
+      "base_observation_index": 7,
+      "expected": "UNKNOWN_NO_INDEPENDENT_ADJUDICATION",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_MISSING_DEFECT_FLAG",
+      "claim": "publisher_defects_flag",
+      "base_observation_index": 7,
+      "remove_field": "defects_exist",
+      "expected": "UNKNOWN_MISSING_DEFECT_FLAG",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_REPORT_ACCEPTED_IMPLES_CASH",
+      "claim": "payment_completed",
+      "base_observation_index": 7,
+      "expected": "UNKNOWN_NO_PAYMENT_SOURCE",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_2017_INSPECTION_HISTORIC_ASOF",
+      "claim": "historical_publication_asof",
+      "base_observation_index": 1,
+      "expected": "UNKNOWN_NO_HISTORICAL_SOURCE_SNAPSHOT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_DUPLICATE_PROJECTED_ROWS_ARE_SAME_DEVICE",
+      "claim": "same_device_filing",
+      "base_observation_index": 4,
+      "expected": "UNKNOWN_NO_RETAINED_IDENTIFIERS",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    },
+    {
+      "id": "SYN_UNVERIFIED_HIGH_PRESSURE_SINGLE_INSPECTION",
+      "claim": "complete_high_pressure_inspection",
+      "base_observation_index": 0,
+      "override_fields": {
+        "pressure_type": "High Pressure",
+        "inspection_type": "External"
+      },
+      "expected": "UNKNOWN_OTHER_INSPECTION_NOT_VERIFIED",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC"
+    }
+  ],
+  "qa_and_handoffs": {
+    "permitplate_48": "EXCERPT_OF_8_OFFICIAL_2017_FILING_FIELDS_NOT_A_VALIDATED_PROPERTY_RISK_OR_REPAIR_OR_PENALTY_SCORE",
+    "freightrecovery_12": "NO_FREIGHT_BILL_OR_TARIFF_OR_CASH_RECOVERY_LABELS",
+    "recoveryos_12": "NO_PAYMENT_SETTLEMENT_OR_ACCOUNTING_LEDGER",
+    "capturebrief_52": "NO_FEDERAL_SOLICITATION_OR_AWARD_LABELS",
+    "independent_qa_44": "RECHECK_ORIGINAL_PUBLISHER_FIRST_EIGHT_ROWS_ON_IMMUTABLE_OR_ASOF_PUBLISHER_SNAPSHOT; VERIFY_SAFE_PROJECTION_DIGEST; PROVE_SYNTHETIC_CONTROLS_AND_ZERO_INDEPENDENT_LABELS",
+    "independent_qa_accepted": false
+  },
+  "restrictions": {
+    "new_scheduled_provider_calls": 0,
+    "customer_material_saved": 0,
+    "credential_values_saved": 0,
+    "engine_code_changed": false,
+    "writer_branch_changed": false,
+    "release_or_commercial_scoring_authorized": false
+  }
+}
