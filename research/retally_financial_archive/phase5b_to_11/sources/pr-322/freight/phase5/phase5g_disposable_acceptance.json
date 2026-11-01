@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "scope": "DISPOSABLE_POSTGRESQL_ONLY_NOT_FLOOT_RUNTIME",
+  "observed_date": "2026-10-08",
+  "observed_ci_run_id": 37813707798,
+  "ci_verifier_tests_passed": 11,
+  "principal_app": "retally_p5g_app_login",
+  "principal_verifier": "retally_p5g_verifier_login",
+  "connection_credentials": "TWO_INDEPENDENT_EPHEMERAL_LOGIN_PASSWORDS_GENERATED_AT_RUNTIME",
+  "staging_database": "retally_phase5_ci",
+  "production_database_used": false,
+  "qa_hosted_database_used": false,
+  "valid_contract_admitted": "PASS",
+  "same_actor_exact_replay": "PASS",
+  "concurrent_replays": "PASS",
+  "altered_signed_body_rejected": "PASS",
+  "unknown_issuer_rejected": "PASS",
+  "revoked_signer_rejected": "PASS",
+  "ordinary_app_insert_rejected": "PASS",
+  "restricted_verifier_can_insert_after_signature_verify": "PASS",
+  "signer_private_keys_persisted": false,
+  "db_owner_signature_bypass_fixed_in_hosted_floot": false,
+  "verifier_db_credential_direct_sql_bypass_closed": false,
+  "supported_signed_document_kinds": [
+    "CONTRACT"
+  ],
+  "restricted_financial_admission_hosted_in_floot": false,
+  "real_customer_revenue_cents": 0,
+  "historical_findings_closed": 0,
+  "historical_findings_open": 26,
+  "next_verified_requirement": "Separate hosted runtime application DB credential from verifier DB principal and prove real issuer identity/source authority; audit and rotate verifier login and retest full signed cash pathway."
+}

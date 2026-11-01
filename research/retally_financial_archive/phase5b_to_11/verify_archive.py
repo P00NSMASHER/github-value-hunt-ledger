@@ -10,9 +10,9 @@ def main():
     doc=json.loads((ROOT/PREFIX/"SOURCE_MANIFEST.json").read_text(encoding="utf-8"))
     assert doc["authority"]=="HISTORICAL_RESEARCH_ONLY_NO_CUSTOMER_OR_FINANCIAL_RELEASE"
     assert doc["batch"]=="phase5b_to_11" and doc["archive_draft_only"] is True
-    assert doc["source_file_count"]==66 and doc["source_pr_count"]==9
+    assert doc["source_file_count"]==112 and doc["source_pr_count"]==13
     originals={r["pr"]:r for r in doc["sources"]}
-    assert set(originals)==set([306,308,309,310,312,314,315,316,318])
+    assert set(originals)==set([306,308,309,310,312,314,315,316,318,322,325,328,331])
     assert len(doc["artifacts"])==len({r["archived_path"] for r in doc["artifacts"]})
     for item in doc["artifacts"]:
         assert item["pr"] in originals and item["head"]==originals[item["pr"]]["head"]
@@ -24,6 +24,6 @@ def main():
         digest=subprocess.run(["git","hash-object","--",str(source)],cwd=ROOT,check=True,
                               capture_output=True,text=True,timeout=15).stdout.strip()
         assert digest==item["sha"],name
-    print("PASS: 66 historical financial proof/staging blobs preserved inertly")
+    print("PASS: 112 historical financial proof/staging blobs preserved inertly from 13 drafts")
 if __name__=="__main__":
     main()
