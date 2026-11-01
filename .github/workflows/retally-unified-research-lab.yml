@@ -998,6 +998,7 @@ jobs:
           python -m unittest -q freight.test_cbca_rail_detention_timeline
           python -m unittest -q freight.test_public_freight_proof_ladder
           python -m unittest -q freight.test_fmc_real_shipper_billing_lifecycle
+          python -m unittest -q freight.test_fmc_charge_complaint_procedural_v1
           python -m pytest -q freight/test_real_world_eval_v1.py
           python -m freight.research_eval_bridge \
             --ledger /tmp/retally-unified-leads.json \
