@@ -1,12 +1,12 @@
 {
-  "as_of_utc_date": "2026-10-31",
+  "as_of_utc_date": "2026-11-01",
   "buyer_opportunity_truth": false,
   "contract_award_window": [
     "2025-10-01",
     "2026-09-30"
   ],
   "customer_contacts_sent": 0,
-  "distinct_award_internal_ids": 12,
+  "distinct_award_internal_ids": 0,
   "independent_award_outcome_labels": 0,
   "independent_sam_solicitation_matches": 0,
   "limitations": [
@@ -20,32 +20,30 @@
   "production_changes": 0,
   "publisher_detail_changed": 0,
   "publisher_detail_error_codes": {},
-  "publisher_detail_identity_amount_matched": 2,
-  "publisher_detail_lookup_attempted": 2,
+  "publisher_detail_identity_amount_matched": 0,
+  "publisher_detail_lookup_attempted": 0,
   "publisher_detail_unavailable": 0,
   "publisher_host": "api.usaspending.gov",
-  "publisher_readback_error_codes": {
-    "HTTP_503": 2
-  },
+  "publisher_readback_error_codes": {},
   "publisher_readbacks_ambiguous": 0,
-  "publisher_readbacks_attempted": 2,
+  "publisher_readbacks_attempted": 0,
   "publisher_readbacks_changed": 0,
   "publisher_readbacks_exact": 0,
   "publisher_readbacks_missing": 0,
-  "publisher_readbacks_unavailable": 2,
+  "publisher_readbacks_unavailable": 0,
   "publisher_source_anchor_id": "c95ab3d08065c413405b611483719c147a03d675d8d736ed2321a924f368421e",
   "realized_recovery_cents": 0,
-  "receipt_sha256": "a97b262cbe444d84c6970f3abf9058631b50e362c558bc97fc53a4d8d39076ff",
+  "receipt_sha256": "7ff4573ac8aa7b2147cf66bd9ba91dc63a06349eea70b808e25c5c0009f061ff",
   "recipient_identifiers_stored": 0,
   "repeated_source_rows": 0,
-  "sample_net_awarded_amount_minor": 46766721169849,
-  "sample_rows": 12,
+  "sample_net_awarded_amount_minor": 0,
+  "sample_rows": 0,
   "schema_version": 1,
   "scope": "ORIGINAL_FEDERAL_CONTRACT_AWARD_SAME_PUBLISHER_READBACK_ONLY",
-  "source_canonical_sample_sha256": "1ca75cbe305bc8617d72ff7c482695ca62015b6bbad8143ee02959c02ad190f6",
+  "source_canonical_sample_sha256": null,
   "source_endpoint_type": "USA_SPENDING_V2_PUBLIC_AWARD_SEARCH",
   "source_errors": [
-    "READBACK_INCOMPLETE"
+    "PUBLISHER_UNAVAILABLE"
   ],
   "source_payloads_stored": 0,
   "source_specific_commercial_reuse_verified": false,
