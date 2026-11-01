@@ -26,7 +26,7 @@ def main():
         assert r["status"] in ("added", "modified")
         assert re.fullmatch(r"[0-9a-f]{40}", r["blob_sha"])
         assert r["archived_path"] == PREFIX + r["original_path"]
-        assert r["original_path"].startswith(("freight/", ".github/"))
+        assert r["original_path"].startswith(("freight/", ".github/", "ai_business_os/"))
         assert all(part not in ("", ".", "..") for part in Path(r["archived_path"]).parts)
         file = ROOT / r["archived_path"]
         assert file.is_file(), r["archived_path"]
