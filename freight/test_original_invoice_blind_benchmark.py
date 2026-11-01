@@ -344,3 +344,32 @@ def test_same_bank_payment_line_cannot_count_for_two_cases(tmp_path):
                    "truth_owner", "reviewer_a", "reviewer_b")
     with pytest.raises(BenchmarkError, match="DUPLICATE_INDEPENDENT"):
         score(pop, model, truth, trust)
+
+
+def test_same_shipment_proof_line_cannot_count_for_two_cases(tmp_path):
+    pop = toy_population()
+    keys, trust = identities()
+    model, truth = packets(pop, keys, tmp_path,
+                           labels=["POSITIVE", "NEGATIVE", "UNRESOLVED"])
+    first = truth["body"]["cases"][0]["artifacts"]["shipment"]
+    second = truth["body"]["cases"][1]["artifacts"]["shipment"]
+    second.update(first)
+    truth = signed(truth["body"], keys,
+                   "truth_owner", "reviewer_a", "reviewer_b")
+    with pytest.raises(BenchmarkError, match="DUPLICATE_INDEPENDENT_CASE_PROOF_LINE"):
+        score(pop, model, truth, trust)
+
+
+def test_shipment_locator_whitespace_cannot_bypass_line_identity(tmp_path):
+    pop = toy_population()
+    keys, trust = identities()
+    model, truth = packets(pop, keys, tmp_path,
+                           labels=["POSITIVE", "NEGATIVE", "UNRESOLVED"])
+    first = truth["body"]["cases"][0]["artifacts"]["shipment"]
+    second = truth["body"]["cases"][1]["artifacts"]["shipment"]
+    second.update(first)
+    second["source_locator"] = "  %s  " % first["source_locator"]
+    truth = signed(truth["body"], keys,
+                   "truth_owner", "reviewer_a", "reviewer_b")
+    with pytest.raises(BenchmarkError, match="DUPLICATE_INDEPENDENT_CASE_PROOF_LINE"):
+        score(pop, model, truth, trust)
