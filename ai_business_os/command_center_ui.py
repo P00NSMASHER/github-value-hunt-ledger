@@ -8,6 +8,7 @@ server through the existing bounded gateway.
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import hmac
 import html
@@ -84,7 +85,7 @@ def validate_session(
         return None
     try:
         payload = json.loads(_b64d(encoded).decode("utf-8"))
-    except (ValueError, json.JSONDecodeError, UnicodeDecodeError):
+    except (ValueError, json.JSONDecodeError, UnicodeDecodeError, binascii.Error):
         return None
     if not isinstance(payload, dict) or payload.get("v") != 1:
         return None
@@ -265,7 +266,7 @@ def render_dashboard(
   <td><strong>{_e(row.get("display_name") or row.get("agent_id"))}</strong><div class="mono subtle">{_e(row.get("role_key"))}</div></td>
   <td><span class="pill {_status_class(row.get("status"))}">{_e(row.get("status"))}</span></td>
   <td>{_e((heartbeats_by_agent.get(str(row.get("agent_id"))) or {}).get("state", {}).get("phase") if isinstance((heartbeats_by_agent.get(str(row.get("agent_id"))) or {}).get("state"), Mapping) else "—")}</td>
-  <td class="mono">{_short((heartbeats_by_agent.get(str(row.get("agent_id"))) or {}).get("last_heartbeat_at"), 22)}</td>
+  <td class="mono">{_e(_short((heartbeats_by_agent.get(str(row.get("agent_id"))) or {}).get("last_heartbeat_at"), 22))}</td>
 </tr>"""
         for row in agents
         if isinstance(row, Mapping)
@@ -273,7 +274,7 @@ def render_dashboard(
 
     goal_rows = "".join(
         f"""<tr>
-  <td><strong>{_e(row.get("title"))}</strong><div class="mono subtle">{_short(row.get("id"), 20)}</div></td>
+  <td><strong>{_e(row.get("title"))}</strong><div class="mono subtle">{_e(_short(row.get("id"), 20))}</div></td>
   <td>{_e(row.get("agent_id"))}</td>
   <td>{_e(row.get("goal_type"))}</td>
   <td><span class="pill {_status_class(row.get("status"))}">{_e(row.get("status"))}</span></td>
@@ -300,7 +301,7 @@ def render_dashboard(
   <td>{_e(row.get("action_key"))}</td>
   <td><span class="pill {_status_class(row.get("predicted_risk"))}">{_e(row.get("predicted_risk"))}</span></td>
   <td>{_e(row.get("expected_money_cents")) if row.get("expected_money_cents") is not None else "—"}</td>
-  <td>{_short(row.get("expires_at"), 22)}</td>
+  <td>{_e(_short(row.get("expires_at"), 22))}</td>
 </tr>"""
         for row in list(approvals)[:12]
         if isinstance(row, Mapping)
@@ -311,8 +312,8 @@ def render_dashboard(
   <td>{_e(row.get("agent_id"))}</td>
   <td>{_e(row.get("status"))}</td>
   <td>{_e(row.get("outcome") or "—")}</td>
-  <td class="mono">{_short(row.get("goal_id"), 18)}</td>
-  <td class="mono">{_short(row.get("started_at"), 22)}</td>
+  <td class="mono">{_e(_short(row.get("goal_id"), 18))}</td>
+  <td class="mono">{_e(_short(row.get("started_at"), 22))}</td>
 </tr>"""
         for row in list(recent_runs)[:12]
         if isinstance(row, Mapping)

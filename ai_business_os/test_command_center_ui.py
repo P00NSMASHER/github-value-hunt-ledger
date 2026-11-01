@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import unittest
 
 from ai_business_os.command_center_ui import (
@@ -87,6 +88,50 @@ class CommandCenterUISecurityTests(unittest.TestCase):
         self.assertNotIn("/approval/decide", page)
         self.assertNotIn("AIBOS_RUNTIME_TOKEN", page)
 
+
+    def test_shortened_untrusted_fields_cannot_inject_html(self):
+        unsafe = "<b>X</b>"
+        token = issue_session("session-secret", "human:ceo-ui", now=1000)
+        content = render_dashboard(
+            {
+                "runtime": {"ok": True, "worker": {}},
+                "command_center": {
+                    "businesses": [],
+                    "planning": {"summary": {}},
+                    "pending_approvals": [{"expires_at": unsafe}],
+                },
+                "planning_inputs": {
+                    "agents": [{"agent_id": "a1", "status": "ACTIVE"}],
+                    "initiatives": [],
+                    "data_gaps": [],
+                    "open_goals": [{"id": unsafe, "title": "Test"}],
+                },
+                "worker_status": {
+                    "heartbeats": [{"agent_id": "a1", "last_heartbeat_at": unsafe}],
+                    "leases": [],
+                    "recent_runs": [{"goal_id": unsafe, "started_at": unsafe}],
+                },
+            },
+            principal="human:ceo-ui",
+            session_token=token,
+            session_secret="session-secret",
+        )
+        self.assertNotIn(unsafe, content)
+        self.assertEqual(content.count("&lt;b&gt;X&lt;/b&gt;"), 5)
+
+    def test_signed_malformed_base64_session_fails_closed(self):
+        encoded = "a"  # Invalid base64 length even with correct signature.
+        signature = hmac.new(
+            b"session-secret", encoded.encode("ascii"), hashlib.sha256
+        ).hexdigest()
+        self.assertIsNone(
+            validate_session(
+                encoded + "." + signature,
+                "session-secret",
+                "human:ceo-ui",
+                now=1000,
+            )
+        )
 
 if __name__ == "__main__":
     unittest.main()
