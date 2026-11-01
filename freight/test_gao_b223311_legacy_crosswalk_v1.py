@@ -115,6 +115,46 @@ class GAOB223311LegacyCrosswalk(unittest.TestCase):
         self.assertIsNone(h["modern_recall"])
         self.assertIsNone(h["true_modern_error_label"])
 
+    def test_lab15_legacy_manifest_ledger_pointer_census(self):
+        """Two metadata stores are 12 shared source URLs, not 25 independent labels."""
+        audit = json.loads(
+            (ROOT / "fixtures" / "lab15_manifest_ledger_source_crosswalk_v1.json")
+            .read_text(encoding="utf-8"))
+        self.assertEqual(audit["schema_version"], 1)
+        self.assertEqual(audit["inputs"]["source_manifest_git_blob_sha1"],
+                         "a905b85413f7d5b003681f45e6ed2e0b53b19ce0")
+        self.assertEqual(audit["inputs"]["evidence_ledger_git_blob_sha1"],
+                         "2eb9f1cbe0173bbed0049b0a88b43cc209e48b86")
+        s = {entry["url"] for entry in self.sources}
+        e = {entry["url"] for entry in self.ledger}
+        c = audit["audit_counts"]
+        self.assertEqual(len(self.sources), c["source_manifest_rows"])
+        self.assertEqual(len(self.ledger), c["evidence_ledger_rows"])
+        self.assertEqual(len(s & e), c["shared_exact_source_url_keys"])
+        self.assertEqual(len(s - e), c["source_manifest_only_keys"])
+        self.assertEqual(len(e - s), c["ledger_only_keys"])
+        self.assertEqual(len(s | e), c["unique_publisher_url_keys"])
+        self.assertEqual(e - s, {audit["ledger_only_unverified_lead"]["url"]})
+        self.assertEqual(sum(bool(x["sha256"]) for x in self.ledger),
+                         c["legacy_ledger_reported_fingerprints"])
+        self.assertEqual(sum(bool(x["raw_document_stored"]) for x in self.ledger),
+                         c["raw_original_documents_custodied"])
+        self.assertEqual(sum(bool(x["commercial_test_approved"]) for x in self.ledger),
+                         c["commercially_approved_sources"])
+        self.assertEqual(sum(bool(x["independent_invoice_error_verified"]) for x in self.ledger),
+                         c["independently_verified_customer_invoice_errors"])
+        self.assertEqual(c["verified_legacy_lab_retirements"], 0)
+        self.assertIsNone(audit["inputs"]["source_original_http_sha256_this_cycle"])
+        self.assertIsNone(audit["ledger_only_unverified_lead"]["ground_truth_label"])
+        self.assertFalse(audit["interpretation"]["legacy_lab_retirement_authorized"])
+        controls = audit["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 3)
+        self.assertEqual(len({x["id"] for x in controls}), len(controls))
+        for control in controls:
+            self.assertTrue(control["id"].startswith("SYN_"))
+            self.assertIsNone(control["independent_real_label"])
+            self.assertTrue(control["expected_guard"].startswith(("UNKNOWN_", "REJECT_")))
+
     def test_nonpromotion_controls_and_engine_boundaries(self):
         controls = self.p["forbidden_promotions"]
         self.assertEqual(len(controls), 5)
