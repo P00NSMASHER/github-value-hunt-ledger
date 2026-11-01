@@ -1,0 +1,152 @@
+name: RETALLY Lab 14 BEA Real Output Measurement and Vintage Gate (Mission 30)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-bea-measurement-gate.yml'
+      - 'freight/research_bea_measurement_gate.py'
+      - 'freight/test_research_bea_measurement_gate.py'
+      - 'freight/research/BEA_TRUCKING_MEASURE_COMPATIBILITY_M30_20261012.json'
+      - 'freight/RESEARCH_BEA_MEASUREMENT_GATE.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  offline-original-bea-compatibility-and-14-labs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing research and Lab 14 prerequisites
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Adversarial BEA real-output/value-added gates and earlier Census/BLS regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_bea_measurement_gate.py \
+            freight/test_research_unified_blspci.py \
+            freight/test_research_bls_parent_origin.py \
+            freight/test_research_fred_parent_ppi.py \
+            freight/test_research_bls_ppi_bridge.py \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Run offline BEA source gate and original 14-lab Control Center
+        run: |
+          PYTHONPATH=. python -m freight.research_bea_measurement_gate \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m30-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m30-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m30-offline/bea_measure_compatibility.json').read_text())
+          labs=json.loads(Path('/tmp/retally-m30-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_M30_BEA_MEASUREMENT_VINTAGE_COMPATIBILITY_GATE_NOT_REAL_GROSS_OUTPUT'
+          assert r['status']=='M30_OFFLINE_BEA_DEFINITIONS_PREVIOUSLY_VERIFIED_GROSS_OUTPUT_VALUES_HELD'
+          assert r['bea_original_measure_definitions_verified_in_this_run'] is False
+          assert r['bea_484_real_gross_output_2017_2024_available_for_validation'] is False
+          assert r['bea_gross_output_original_source_status']=='HOLD_PRIMARY_BEA_QUANTITY_INDEX_NOT_RETRIEVED'
+          assert r['fred_bea_numeric_source_replayed_in_this_ci'] is False
+          assert r['bea_gdp_value_added_secondary_source_provenance']=='FRED_ALFRED_WEB_OBSERVED_NOT_DIRECT_BEA_ORIGINAL_DATA_REPLAY'
+          assert r['bea_value_added_2025_vintage_2017_to_2024_growth_pct']=='1.41'
+          assert r['bea_value_added_2026_vintage_2017_to_2024_growth_pct']=='-2.42'
+          assert r['bea_real_value_added_2024_index_revision_points']=='-3.821'
+          assert r['census_bls_484_price_adjusted_revenue_proxy_2017_2024_pct']=='1.18'
+          assert r['proxy_vs_bea_value_added_difference_is_model_error'] is False
+          assert r['economic_measurement_compatibility_verdict']=='HOLD_BEA_REAL_GROSS_OUTPUT_NOT_AUTHENTICATED_NO_QUANTITATIVE_MODEL_VALIDATION'
+          assert r['real_invoice_rows_validated']==0
+          assert r['recoverable_freight_market_tam_usd'] is None
+          assert r['all_18_real_customer_pilot_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert len(labs['lab_runs'])==14 and labs['failed_or_blocked_labs']==[]
+          assert labs['pilot_preflight']['unmet_requirements']==18
+          assert labs['actual_revenue_cents']==0
+          assert labs['bea_measure_compatibility_gate']['receipt_sha256']==r['receipt_sha256']
+          assert 'bea_measure_compatibility.html' in Path('/tmp/retally-m30-control/index.html').read_text()
+          print('BEA GDP is not gross output, vintage revision confirmed, 14 labs pass, 18 real pilot holds preserved.')
+          PY
+      - name: Retain only derived BEA compatibility JSON and HTML
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-bea-compatibility-offline
+          path: |
+            /tmp/retally-m30-offline/bea_measure_compatibility.json
+            /tmp/retally-m30-offline/bea_measure_compatibility.html
+          if-no-files-found: error
+          retention-days: 14
+
+  replay-official-bea-measurement-definitions:
+    needs: offline-original-bea-compatibility-and-14-labs
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Retrieve two first-party BEA methods pages and validate correct gross output identity
+        run: |
+          PYTHONPATH=. python -m freight.research_bea_measurement_gate \
+            --fetch-bea-definitions --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m30-bea
+      - name: Require live BEA definition semantics and reject false real gross output source
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m30-bea/bea_measure_compatibility.json').read_text())
+          assert r['scope']=='LAB14_M30_BEA_MEASUREMENT_VINTAGE_COMPATIBILITY_GATE_NOT_REAL_GROSS_OUTPUT'
+          assert r['bea_484_real_gross_output_original_values_authenticated_this_run'] is False
+          assert r['bea_484_real_gross_output_2017_2024_available_for_validation'] is False
+          assert r['bea_gross_output_original_source_status']=='HOLD_PRIMARY_BEA_QUANTITY_INDEX_NOT_RETRIEVED'
+          assert r['bea_real_gdp_value_added_cannot_certify_gross_revenue_deflator'] is True
+          assert r['fred_bea_numeric_source_replayed_in_this_ci'] is False
+          assert r['proxy_vs_bea_value_added_difference_is_model_error'] is False
+          assert r['bea_value_added_2025_vintage_2017_to_2024_growth_pct']=='1.41'
+          assert r['bea_value_added_2026_vintage_2017_to_2024_growth_pct']=='-2.42'
+          assert r['real_invoice_rows_validated']==0
+          assert r['actual_adjudicated_customer_billing_errors']==0
+          assert r['recoverable_freight_market_tam_usd'] is None
+          assert r['cash_collected_from_recoveries_usd'] is None
+          assert r['external_marketing_or_carrier_contact_authorized'] is False
+          assert r['all_18_real_customer_pilot_requirements_unmet'] is True
+          assert r['scheduled_tasks_modified'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['status']=='M30_FIRST_PARTY_BEA_MEASURE_DEFINITIONS_REPLAYED_GROSS_OUTPUT_VALUES_STILL_HELD':
+              assert r['bea_original_measure_definitions_verified_in_this_run'] is True
+              assert len(r['bea_first_party_definitions_sha256_this_run'])==64
+              assert len(r['bea_first_party_gross_output_home_sha256_this_run'])==64
+              print('VERIFIED two BEA first-party measurement sources; official real gross output 484 data still NOT retrieved.')
+          elif r['status']=='M30_BEA_MEASURE_DEFINITIONS_PUBLISHER_NETWORK_UNAVAILABLE_GROSS_OUTPUT_HELD':
+              assert r['bea_original_measure_definitions_verified_in_this_run'] is False
+              assert r['bea_first_party_definitions_sha256_this_run'] is None
+              print('::warning::BEA first-party methods pages network unavailable; no new source authentication.')
+          else:
+              raise AssertionError('BEA_MEASUREMENT_DEFINITIONS_INVALID_OR_OUTPUT_EVIDENCE_FABRICATED')
+          PY
+      - name: Retain only source-verification receipts (not original publisher HTML)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-bea-first-party-definition-evidence
+          path: |
+            /tmp/retally-m30-bea/bea_measure_compatibility.json
+            /tmp/retally-m30-bea/bea_measure_compatibility.html
+          if-no-files-found: error
+          retention-days: 14

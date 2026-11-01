@@ -1,0 +1,165 @@
+name: RETALLY Lab 14 Census SAS AIES Eight-Year Bridge (Mission 25)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-sas-aies-bridge.yml'
+      - 'freight/research/SAS_AIES_CARRIER_BRIDGE_2017_2024_20261012.json'
+      - 'freight/research_sas_aies_bridge.py'
+      - 'freight/test_research_sas_aies_bridge.py'
+      - 'freight/RESEARCH_SAS_AIES_CARRIER_BRIDGE_2017_2024.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-bridge-falsification-and-existing-lab14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing research CI dependencies
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run SAS/AIES source-vintage adversarial and preceding source provenance regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_sas_aies_bridge.py \
+            freight/test_research_sas_temporal.py \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Execute offline evidence report and original fourteen-lab control center
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_aies_bridge \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m25-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m25-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-m25-offline')
+          r=json.loads((p/'sas_aies_revenue_bridge.json').read_text())
+          q=json.loads(Path('/tmp/retally-m25-control/phase4_control.json').read_text())
+          assert r['scope']=='LAB14_CENSUS_2017_2024_SOURCE_VERSIONED_EMPLOYER_REVENUE_NOT_LTL_RECOVERY'
+          assert r['source_status']=='OFFLINE_CENSUS_BRIDGE_PRIOR_VERIFIED_SNAPSHOTS_NO_NEW_SOURCE_REPLAY'
+          assert r['census_original_replay_completed_in_this_run'] is False
+          assert r['source_original_archive_receipts']==[]
+          assert r['original_source_archives_required']==3
+          assert r['distinct_industry_year_values']==24
+          assert r['benchmark_sas_revenue_years']==[2017,2018,2019,2020,2021]
+          assert r['aies_historical_revenue_years']==[2022,2023,2024]
+          assert r['source_family_not_independent_surveys'] is True
+          assert r['2022_aies_was_not_a_separately_fielded_2022_survey'] is True
+          assert r['naics_484_contains_484121_and_484122'] is True
+          assert len(r['overlap_2022'])==3
+          assert all(x['agrees_at_original_sas_nearest_million'] for x in r['overlap_2022'])
+          bycode={x['naics']:x for x in r['industry_series']}
+          assert [bycode[c]['2017_to_2024_nominal_cumulative_change_pct'] for c in ('484','484121','484122')]==['38.65','43.48','40.93']
+          assert bycode['484122']['2023_to_2024_aies_nominal_change_pct']=='0.69'
+          assert bycode['484122']['annual_revenue'][-1]['revenue_million_usd']=='65096.292'
+          assert r['real_ltl_freight_invoice_cases_observed']==0
+          assert r['recoverable_freight_audit_market_usd'] is None
+          assert r['actual_retally_collected_recovery_cash_usd'] is None
+          assert r['nominal_growth_is_inflation_adjusted'] is False
+          assert r['human_pilot_18_independent_requirements_unmet'] is True
+          assert r['new_lab_created'] is False and r['lab']==14
+          assert len(q['lab_runs'])==14 and q['failed_or_blocked_labs']==[]
+          assert q['pilot_preflight']['unmet_requirements']==18
+          assert q['actual_revenue_cents']==0
+          assert q['sas_aies_2017_2024_bridge']['receipt_sha256']==r['receipt_sha256']
+          assert 'sas_aies_revenue_bridge.html' in Path('/tmp/retally-m25-control/index.html').read_text()
+          assert (p/'sas_aies_revenue_bridge.html').is_file()
+          print('Offline SAS/AIES source handoff, 24 industry-year values, 14 labs and 18 human pilot holds: PASS.')
+          PY
+      - name: Retain bounded offline analysis receipts, not publisher archives
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-sas-aies-eight-year-offline
+          path: |
+            /tmp/retally-m25-offline/sas_aies_revenue_bridge.json
+            /tmp/retally-m25-offline/sas_aies_revenue_bridge.html
+          if-no-files-found: error
+          retention-days: 14
+
+  verify-three-original-census-sas-aies-archives:
+    needs: offline-bridge-falsification-and-existing-lab14
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Fetch the exact three Census archives and replay 2017–2024 source bridge
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_aies_bridge \
+            --fetch-originals --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m25-census
+      - name: Enforce archive fingerprints, 2022 handoff and business evidence vetoes
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m25-census/sas_aies_revenue_bridge.json').read_text())
+          assert r['scope']=='LAB14_CENSUS_2017_2024_SOURCE_VERSIONED_EMPLOYER_REVENUE_NOT_LTL_RECOVERY'
+          assert r['lab']==14 and r['new_lab_created'] is False
+          assert r['original_source_archives_required']==3
+          assert r['distinct_industry_year_values']==24
+          assert r['source_family_not_independent_surveys'] is True
+          assert r['2022_aies_was_not_a_separately_fielded_2022_survey'] is True
+          assert r['sas_aies_same_2022_population_to_published_precision'] is True
+          assert len(r['overlap_2022'])==3
+          assert all(x['agrees_at_original_sas_nearest_million'] for x in r['overlap_2022'])
+          assert r['real_ltl_freight_invoice_cases_observed']==0
+          assert r['customer_billing_error_rate_pct'] is None
+          assert r['contractually_eligible_refund_volume_usd'] is None
+          assert r['actual_retally_collected_recovery_cash_usd'] is None
+          assert r['recoverable_freight_audit_market_usd'] is None
+          assert r['carrier_or_customer_contact_authorized'] is False
+          assert r['buyer_demand_established'] is False
+          assert r['human_pilot_18_independent_requirements_unmet'] is True
+          assert r['automated_tasks_or_schedules_modified'] is False
+          assert len(r['receipt_sha256'])==64
+          if r['source_status']=='THREE_ORIGINAL_CENSUS_ARCHIVES_2017_2024_SOURCE_BRIDGE_REPRODUCED':
+              assert r['census_original_replay_completed_in_this_run'] is True
+              proof={x['id']:x for x in r['source_original_archive_receipts']}
+              assert set(proof)=={'revised_sas_2017_2022','linked_aies_2022_2024','aies_basic_2024'}
+              assert proof['revised_sas_2017_2022']['sha256']=='cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac'
+              assert proof['linked_aies_2022_2024']['sha256']=='1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4'
+              assert proof['aies_basic_2024']['sha256']=='39c4235026672e7bffdbc36292ed976726df368f2ca435219aef1c84e8e4faa6'
+              assert proof['revised_sas_2017_2022']['source_tax_year_cells']==36
+              assert proof['linked_aies_2022_2024']['national_industry_year_cells']==9
+              assert proof['aies_basic_2024']['national_industry_year_cells']==3
+              assert all(x['original_source_is_independent_audit'] is False for x in proof.values())
+              assert sum(x.get('source_tax_year_cells',0)+x.get('national_industry_year_cells',0) for x in proof.values())==48
+              print('VERIFIED three original Census archives, 48 source instances and 24 industry-year display figures.')
+          elif r['source_status']=='BLOCKED_CENSUS_SOURCE_NOT_REACHABLE_NO_NEW_REPLAY':
+              assert r['census_original_replay_completed_in_this_run'] is False
+              assert r['source_original_archive_receipts']==[]
+              print('::warning::Census original source network blocked; no new byte replay authenticated.')
+          else:
+              raise AssertionError('M25_SOURCE_STATUS_UNEXPECTED_OR_ORIGINAL_PUBLISHER_DATA_CHANGED')
+          PY
+      - name: Retain signed research receipts only, not raw XLSX, ZIP or client documents
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-sas-aies-eight-year-original-proof
+          path: |
+            /tmp/retally-m25-census/sas_aies_revenue_bridge.json
+            /tmp/retally-m25-census/sas_aies_revenue_bridge.html
+          if-no-files-found: error
+          retention-days: 14

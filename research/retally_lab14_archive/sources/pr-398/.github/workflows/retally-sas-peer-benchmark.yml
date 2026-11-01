@@ -1,0 +1,154 @@
+name: RETALLY Lab 14 Census SAS Peer Benchmark (Mission 23)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-sas-peer-benchmark.yml'
+      - 'freight/research_sas_peer_benchmark.py'
+      - 'freight/test_research_sas_peer_benchmark.py'
+      - 'freight/research/SAS_TRUCKING_PEER_BENCHMARK_20261011.json'
+      - 'freight/RESEARCH_SAS_PEER_BENCHMARK.md'
+      - 'freight/lab_phase4_director.py'
+      - 'freight/lab_phase4_control_center.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  offline-source-adversarial-and-existing-lab-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install existing research prerequisites
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4
+      - name: Run peer source, vintage, primary-Census and original Lab 14 regressions
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_research_sas_peer_benchmark.py \
+            freight/test_research_sas_benchmark.py \
+            freight/test_research_aies_2022_lineage.py \
+            freight/test_research_aies_historical_lineage.py \
+            freight/test_research_aies_original_ftp.py \
+            freight/test_research_ltl_revenue_bridge.py \
+            freight/test_research_cfs_primary_replay.py \
+            freight/test_research_cfs_mode_hierarchy.py \
+            freight/test_lab_phase4_director.py
+      - name: Reproduce peer comparison and original 14-lab research report
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_peer_benchmark \
+            --offline --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m23-offline
+          PYTHONPATH=. python -m freight.lab_phase4_control_center \
+            --out /tmp/retally-m23-control
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/retally-m23-offline')
+          r=json.loads((root/'sas_peer_benchmark.json').read_text())
+          labs=json.loads(Path('/tmp/retally-m23-control/phase4_control.json').read_text())
+          assert r['source_status']=='OFFLINE_SAS_PEER_MANIFEST_NOT_ORIGINAL_REPLAY'
+          assert r['original_workbooks_replayed_this_run'] is False
+          assert r['original_workbook_evidence']==[]
+          assert r['units']=='MILLIONS_OF_NOMINAL_US_DOLLARS'
+          peers={x['naics']:x for x in r['naics_peer_revisions']}
+          assert [peers[k]['signed_revision_million_usd'] for k in ('484','484121','484122')]==[-22238,-10765,-2723]
+          assert [peers[k]['signed_revision_pct_of_old'] for k in ('484','484121','484122')]==['-4.99','-5.87','-3.98']
+          assert all(x['aies_agrees_at_sas_nearest_million_precision'] is True for x in peers.values())
+          assert r['all_three_industries_downward_revised'] is True
+          assert r['ltl_revised_down_more_than_parent_or_tl_in_percentage_terms'] is False
+          assert r['other_trucking_residual_is_a_separate_surveyed_naics'] is False
+          assert r['ltl_original_parent_share_pct']=='15.36'
+          assert r['ltl_revised_parent_share_pct']=='15.52'
+          assert r['ltl_absolute_revision_share_of_parent_revision_pct']=='12.24'
+          assert r['actual_independently_adjudicated_freight_invoices']==0
+          assert r['freight_recovery_tam_usd'] is None
+          assert r['customer_paid_ltl_invoice_volume_usd'] is None
+          assert r['marketing_or_prospect_contact_authorized'] is False
+          assert r['pilot_18_external_requirements_unmet'] is True
+          assert len(labs['lab_runs'])==14 and labs['failed_or_blocked_labs']==[]
+          assert labs['actual_revenue_cents']==0
+          assert labs['pilot_preflight']['unmet_requirements']==18
+          assert labs['sas_peer_trucking_revisions']['receipt_sha256']==r['receipt_sha256']
+          assert 'sas_peer_benchmark.html' in Path('/tmp/retally-m23-control/index.html').read_text()
+          assert (root/'sas_peer_benchmark.html').is_file()
+          print('M23 source-vintage peer arithmetic passes; 14 labs and 18 real-pilot blockers preserved.')
+          PY
+      - name: Retain offline JSON/HTML, not Census XLSX or customer files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-sas-peer-offline
+          path: |
+            /tmp/retally-m23-offline/sas_peer_benchmark.json
+            /tmp/retally-m23-offline/sas_peer_benchmark.html
+          if-no-files-found: error
+          retention-days: 14
+
+  verify-two-original-census-sas-workbooks:
+    needs: offline-source-adversarial-and-existing-lab-proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Retrieve only two SHA-pinned Census source workbooks and replay peer rows
+        run: |
+          PYTHONPATH=. python -m freight.research_sas_peer_benchmark \
+            --fetch-publisher-workbooks --as-of-date "$(date -u +%F)" \
+            --out /tmp/retally-m23-original
+      - name: Enforce publisher-byte proof, peer hierarchy and no customer claims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/retally-m23-original/sas_peer_benchmark.json').read_text())
+          assert r['scope']=='LAB14_SAS_2022_TRUCKING_PEER_REVISIONS_NOT_FREIGHT_AUDIT_ERRORS'
+          assert r['source_grain']=='2022_NATIONAL_EMPLOYER_ESTABLISHMENT_2017_NAICS'
+          assert r['naics_industries_compared']==3
+          assert r['ltl_revised_down_more_than_parent_or_tl_in_percentage_terms'] is False
+          assert r['survey_revision_is_verified_carrier_overcharge_or_refund'] is False
+          assert r['census_same_survey_vintages_are_independent_market_estimates'] is False
+          assert r['industry_specific_sas_sample_adjustment_factors_calculated'] is False
+          assert r['publisher_digital_signatures_verified'] is False
+          assert r['actual_independently_adjudicated_freight_invoices']==0
+          assert r['ltl_invoice_error_rate_pct'] is None
+          assert r['freight_recovery_tam_usd'] is None
+          assert r['verified_retally_customer_recoveries_usd'] is None
+          assert r['pilots_approved']==0
+          assert r['pilot_18_external_requirements_unmet'] is True
+          assert r['new_lab_created'] is False and r['lab']==14
+          assert len(r['receipt_sha256'])==64
+          if r['source_status']=='CENSUS_SAS_THREE_TRUCKING_PEER_REVISIONS_PUBLISHER_XLSX_VERIFIED':
+            assert r['original_workbooks_replayed_this_run'] is True
+            assert len(r['original_workbook_evidence'])==2
+            byid={x['id']:x for x in r['original_workbook_evidence']}
+            assert byid['revised_2026_sas']['official_xlsx_sha256']=='cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac'
+            assert byid['legacy_2024_sas']['official_xlsx_sha256']=='4aa1efe9533fb3b16f32806af4f0b1bd5c72e92f2db024e559f891e03f0bc33a'
+            assert all(x['selected_row_count']==6 and
+                       x['published_census_rows']==839 and
+                       x['same_survey_two_tax_rows_not_independent_samples'] is True
+                       for x in byid.values())
+            assert sorted({a['naics'] for x in byid.values() for a in x['selected_source_rows']})==['484','484121','484122']
+            print('VERIFIED: all 12 Census NAICS/tax-status source cells in two original XLSX vintages, with no freight claim promotion.')
+          elif r['source_status']=='BLOCKED_CENSUS_PEER_WORKBOOKS_UNAVAILABLE_NOT_REPLAYED':
+            assert r['original_workbooks_replayed_this_run'] is False
+            assert r['original_workbook_evidence']==[]
+            print('::warning::Census source endpoint inaccessible. NO original workbook replay established.')
+          else:
+            raise AssertionError('SOURCE_REPLAY_NOT_APPROVED_OR_ORIGINAL_CENSUS_DATA_CHANGED')
+          PY
+      - name: Retain reproducibility receipts only, not raw government spreadsheets
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-lab14-sas-peer-census-original-evidence
+          path: |
+            /tmp/retally-m23-original/sas_peer_benchmark.json
+            /tmp/retally-m23-original/sas_peer_benchmark.html
+          if-no-files-found: error
+          retention-days: 14

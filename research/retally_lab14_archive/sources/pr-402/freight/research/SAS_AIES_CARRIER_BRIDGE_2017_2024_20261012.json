@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "scope": "LAB14_CENSUS_2017_2024_SOURCE_VERSIONED_CARRIER_REVENUE_CONTINUITY_NOT_LTL_RECOVERY_TAM",
+  "observed_on": "2026-10-12",
+  "publisher": "U.S. Census Bureau",
+  "measurement_definition": "US_EMPLOYER_INDUSTRY_ESTABLISHMENT_REVENUE_NOMINAL_USD_NOT_PAID_CUSTOMER_LTL_INVOICES",
+  "naics_basis": "2017_NAICS",
+  "geography": "US_0100000US_ALL_ESTABLISHMENTS",
+  "national_naics": [
+    "484",
+    "484121",
+    "484122"
+  ],
+  "selected_years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "aies_historical_release_date": "2026-09-10",
+  "benchmark_sas_release_date": "2026-08-31",
+  "sources": [
+    {
+      "id": "revised_sas_2017_2022",
+      "source_url": "https://www2.census.gov/programs-surveys/sas/tables/time-series/sas-latest/Table2.xlsx",
+      "original_sha256": "cdfaaec9375064517da18e81623308fe4d62ae3ad102a232413ec2a6299310ac",
+      "original_bytes": 128635,
+      "source_years": [
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "unit": "MILLION_NOMINAL_USD",
+      "naics_revenue": {
+        "484": [
+          290532,
+          310688,
+          314044,
+          308131,
+          361243,
+          423271
+        ],
+        "484121": [
+          112441,
+          122875,
+          121331,
+          121752,
+          145249,
+          172717
+        ],
+        "484122": [
+          46192,
+          49584,
+          51037,
+          49186,
+          58035,
+          65688
+        ]
+      },
+      "survey_role": "BENCHMARKED_2022_SAS_PREDECESSOR_HISTORY_REVISED_VINTAGE"
+    },
+    {
+      "id": "linked_aies_2022_2024",
+      "source_url": "https://www2.census.gov/programs-surveys/aies/data/2024/API_Datasets/AIESTIMESERIES.zip",
+      "original_sha256": "1487da6e619f2e9701635a7f6ad2ab282302d75921e33797060866142c0d94a4",
+      "original_bytes": 771290,
+      "source_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "unit": "THOUSAND_NOMINAL_USD",
+      "naics_revenue": {
+        "484": [
+          423270958,
+          406651010,
+          402827246
+        ],
+        "484121": [
+          172717339,
+          163025116,
+          161329027
+        ],
+        "484122": [
+          65688461,
+          64651167,
+          65096292
+        ]
+      },
+      "survey_role": "AIES_2024_HISTORICAL_LINKED_TO_LEGACY_SURVEYS_NOT_3_INDEPENDENT_AIES_SURVEYS"
+    },
+    {
+      "id": "aies_basic_2024",
+      "source_url": "https://www2.census.gov/programs-surveys/aies/data/2024/AIES00BASIC.zip",
+      "original_sha256": "39c4235026672e7bffdbc36292ed976726df368f2ca435219aef1c84e8e4faa6",
+      "original_bytes": 340551,
+      "source_years": [
+        2024
+      ],
+      "unit": "THOUSAND_NOMINAL_USD",
+      "naics_revenue": {
+        "484": [
+          402827246
+        ],
+        "484121": [
+          161329027
+        ],
+        "484122": [
+          65096292
+        ]
+      },
+      "survey_role": "DIRECT_2024_AIES_BASIC_SAME_CENSUS_SOURCE_POPULATION_NOT_INDEPENDENT_MARKET_STUDY"
+    }
+  ],
+  "source_year_2017_2021": "AUGUST_2026_BENCHMARKED_SAS_PUBLICATION",
+  "source_year_2022": "AIES_2024_LEGACY_LINKED_HISTORICAL_OBSERVATION_SAS_2022_ROUNDING_CROSSCHECK",
+  "source_year_2023_2024": "AIES_HISTORICAL_SERIES_WITH_INDEPENDENT_2024_BASIC_DISTRIBUTION_CROSSCHECK",
+  "source_family_continuity_described_by_census": true,
+  "year_2022_aies_was_standalone_original_aies_survey": false,
+  "different_source_distributions_are_statistically_independent_samples": false,
+  "summing_parent_484_and_children_484121_484122_allowed": false,
+  "legacy_prebenchmark_2022_sas_can_substitute_for_revised_sas": false,
+  "suppress_or_wrong_naics_data_can_be_accepted": false,
+  "source_vintage_crosswalk_gap_greater_than_half_million_allowed": false,
+  "historical_2022_raw_cv_zero_means_perfect_accuracy": false,
+  "adjusted_inflation_growth_in_this_report": false,
+  "statistical_significance_or_causal_growth_proven": false,
+  "transportation_services_revenue_equals_2022_cfs_shipped_goods_value": false,
+  "all_ltl_spending_is_measured_by_484122": false,
+  "real_paid_customer_invoices_verified": 0,
+  "invoice_error_rate_established": false,
+  "recoverable_market_tam_usd": null,
+  "actual_retally_cash_recovered_usd": null,
+  "buyers_interviewed_or_demand_verified": 0,
+  "commercial_claim_or_carrier_contact_authorized": false,
+  "customer_or_carrier_private_records_used": false,
+  "real_customer_pilot_18_requirements_satisfied": false,
+  "new_lab_created": false,
+  "scheduled_tasks_modified": false,
+  "source_caveat": "Eight-year nominal Census employer-establishment revenues use benchmarked Services Annual Survey estimates for reference years 2017–2021 and the Census 2024 AIES historical time series for reference years 2022–2024. The overlapping 2022 SAS figure is rounded to millions whereas AIES is in thousands, and the two are accepted only if the rounded values agree. AIES historical 2022 is linked to legacy surveys rather than an independently fielded 2022 AIES survey. The 2024 AIES Basic table is a separate distribution of the same Census source family, NOT an independent survey sample. Parent NAICS 484 contains 484121 and 484122; no figures may be summed as if separate market populations. Descriptive nominal growth does not establish inflation-adjusted real freight demand, buyer intent, invoice overcharge prevalence, recoverable market TAM or RETALLY collections."
+}
