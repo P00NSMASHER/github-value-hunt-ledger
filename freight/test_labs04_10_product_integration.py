@@ -4,7 +4,6 @@ These tests import actual repository implementation code. They do NOT connect to
 the hosted Floot application, send email, certify SOC2/MFA or collect real cash.
 """
 from __future__ import annotations
-import json
 from pathlib import Path
 import pytest
 from freight.input_guard import inspect_input, InputStatus, IngestPolicy, neutralize_spreadsheet_cell
