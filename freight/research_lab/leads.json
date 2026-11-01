@@ -7608,6 +7608,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-01",
+      "id": "99271cbe64fe5449ea28c51de82e16f19db59312bde2cffe363dd60755f49a87",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/19274446"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-29",
@@ -13017,6 +13033,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "01da00ed07012cfa5133b4966d4b99f4866da98011ddad3376a392c503e965bd",
+  "entries_sha256": "dfe934afc9aae308f6034e6f31020801bad0a4f68ad2e03431d5afbd95951c59",
   "schema_version": 1
 }
