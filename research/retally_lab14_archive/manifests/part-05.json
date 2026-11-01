@@ -1,0 +1,969 @@
+{
+  "schema_version": 1,
+  "batch": 5,
+  "authority": "ARCHIVE_ONLY_DO_NOT_RELEASE_OR_EXECUTE",
+  "source_prs": [
+    460,
+    476,
+    478,
+    485,
+    487,
+    492
+  ],
+  "records": [
+    {
+      "pr": 460,
+      "pr_head": "aa2f170f8899c6c37ae05961a6895ae7976a1ead",
+      "pr_base": "research/retally-checkpoint-mode-antidowngrade-m54-20261013",
+      "original_path": ".github/workflows/retally-journal-fork-m55.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-460/.github/workflows/retally-journal-fork-m55.yml",
+      "git_blob_sha": "66d72fc59f3a7df42aa078d73ec0b65b3254635e",
+      "status": "added"
+    },
+    {
+      "pr": 460,
+      "pr_head": "aa2f170f8899c6c37ae05961a6895ae7976a1ead",
+      "pr_base": "research/retally-checkpoint-mode-antidowngrade-m54-20261013",
+      "original_path": "freight/RESEARCH_JOURNAL_FORK_M55.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-460/freight/RESEARCH_JOURNAL_FORK_M55.md",
+      "git_blob_sha": "f0cdaa91ed47bd05c9d87448178afc9945c8954b",
+      "status": "added"
+    },
+    {
+      "pr": 460,
+      "pr_head": "aa2f170f8899c6c37ae05961a6895ae7976a1ead",
+      "pr_base": "research/retally-checkpoint-mode-antidowngrade-m54-20261013",
+      "original_path": "freight/recovery_checkpoint_m53.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-460/freight/recovery_checkpoint_m53.py",
+      "git_blob_sha": "7a8206f80bd301469a6bce66cc33ffa6162f847b",
+      "status": "modified"
+    },
+    {
+      "pr": 460,
+      "pr_head": "aa2f170f8899c6c37ae05961a6895ae7976a1ead",
+      "pr_base": "research/retally-checkpoint-mode-antidowngrade-m54-20261013",
+      "original_path": "freight/test_lab_journal_fork_m55.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-460/freight/test_lab_journal_fork_m55.py",
+      "git_blob_sha": "037de149ccd4a756522202693c3acef1a39406e4",
+      "status": "added"
+    },
+    {
+      "pr": 476,
+      "pr_head": "a74d2607167c05b2914d0106eec4b7dd2e60d669",
+      "pr_base": "research/retally-signed-crash-gap-reconciliation-m55-20261013",
+      "original_path": ".github/workflows/retally-journal-fork-m55.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-476/.github/workflows/retally-journal-fork-m55.yml",
+      "git_blob_sha": "8a1a6f3609fe212bc7a289b591228ae244fc35d7",
+      "status": "added"
+    },
+    {
+      "pr": 476,
+      "pr_head": "a74d2607167c05b2914d0106eec4b7dd2e60d669",
+      "pr_base": "research/retally-signed-crash-gap-reconciliation-m55-20261013",
+      "original_path": "freight/RESEARCH_CHECKPOINT_RECONCILIATION_M55.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-476/freight/RESEARCH_CHECKPOINT_RECONCILIATION_M55.md",
+      "git_blob_sha": "0750fa5c4806128fd8e71d3b9ee3e0cb939bdc28",
+      "status": "modified"
+    },
+    {
+      "pr": 476,
+      "pr_head": "a74d2607167c05b2914d0106eec4b7dd2e60d669",
+      "pr_base": "research/retally-signed-crash-gap-reconciliation-m55-20261013",
+      "original_path": "freight/RESEARCH_JOURNAL_FORK_M55.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-476/freight/RESEARCH_JOURNAL_FORK_M55.md",
+      "git_blob_sha": "c7a45088540bde085a8a468fa502cb5b2514d932",
+      "status": "added"
+    },
+    {
+      "pr": 476,
+      "pr_head": "a74d2607167c05b2914d0106eec4b7dd2e60d669",
+      "pr_base": "research/retally-signed-crash-gap-reconciliation-m55-20261013",
+      "original_path": "freight/recovery_checkpoint_m53.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-476/freight/recovery_checkpoint_m53.py",
+      "git_blob_sha": "8ee9730e6026ee30532380452966c92fbb8da453",
+      "status": "modified"
+    },
+    {
+      "pr": 476,
+      "pr_head": "a74d2607167c05b2914d0106eec4b7dd2e60d669",
+      "pr_base": "research/retally-signed-crash-gap-reconciliation-m55-20261013",
+      "original_path": "freight/recovery_reconcile_m55.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-476/freight/recovery_reconcile_m55.py",
+      "git_blob_sha": "2b4453e631c65280f8e02e04f81fe8200e476d6c",
+      "status": "modified"
+    },
+    {
+      "pr": 476,
+      "pr_head": "a74d2607167c05b2914d0106eec4b7dd2e60d669",
+      "pr_base": "research/retally-signed-crash-gap-reconciliation-m55-20261013",
+      "original_path": "freight/test_lab_journal_fork_m55.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-476/freight/test_lab_journal_fork_m55.py",
+      "git_blob_sha": "ece7bd53dfb1b9db5f7b1865c7fac875759ff5a0",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": ".github/workflows/retally-public-faf6-eia.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/.github/workflows/retally-public-faf6-eia.yml",
+      "git_blob_sha": "fd167ea30a06e6de303c50cbaaf842c00730ce07",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md",
+      "git_blob_sha": "7eb4e8753ade71786f48673c76fd96c3a2790767",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+      "git_blob_sha": "120888cb5146cbb6804d7707b2378c6268779c71",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_carrier_surcharge_manifest_20261017.json",
+      "git_blob_sha": "87edacae515728c27fa7760fe57037c2df496d66",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_census_cfs2022_pums_first100.csv",
+      "git_blob_sha": "ae64ce09cd6618db8935401c28fbf260ccb3e384",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_census_cfs2022_pums_first100_manifest.json",
+      "git_blob_sha": "53dd0271505c9b07bdd31d0a4b8db7a63b2d3dac",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_cfs2022_official_maryland_example.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_cfs2022_official_maryland_example.json",
+      "git_blob_sha": "e8df8c7e45ff043fd23a8872e5fb5cbb9860646f",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+      "git_blob_sha": "e3fb80bb4dccf9ec2a38b82d551c00e70ea8c782",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv",
+      "git_blob_sha": "c824073eab4925764484c0befcb59a89479ce4dd",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_faf6_eia_manifest_20261017.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_faf6_eia_manifest_20261017.json",
+      "git_blob_sha": "a5d1aae42d5e71357ae106523ad5e6504307bf5d",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json",
+      "git_blob_sha": "5373234c04049fb68a8683e05e59674d5ce76a68",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt",
+      "git_blob_sha": "dd93c272d31bfe0aff67d1854364758188dd5bfa",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/fixtures/public_stb_waybill2024_first100_manifest.json",
+      "git_blob_sha": "e71dcc8f5da1a735efcd347340d4b5af252278fa",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/lab_phase4_control_center.py",
+      "git_blob_sha": "17ff4b57d1406db1dc9ed003b279724507928960",
+      "status": "modified"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_carrier_schedules_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_carrier_schedules_v1.py",
+      "git_blob_sha": "ca09f9f19b0c6dd60153d94821750ab467601ec4",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_cfs2022_official_example_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_cfs2022_official_example_v1.py",
+      "git_blob_sha": "04352a20e7bfd85281ae147dfed8fed1830f57ce",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_cfs2022_prefix_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_cfs2022_prefix_v1.py",
+      "git_blob_sha": "7f901c544fed5835340be129782056a4d92fd9bd",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_faf6_eia_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_faf6_eia_v1.py",
+      "git_blob_sha": "e1da1f381b2c310d323b4cd290ec6011c5e5f7ae",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_fmc_adjudication_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_fmc_adjudication_v1.py",
+      "git_blob_sha": "6f321bf405b90b6f08c285c0045466df86081fe2",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_original_research_control.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_original_research_control.py",
+      "git_blob_sha": "12533138a83d33c0d76630e609893f690cc01ba1",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/public_stb_waybill_prefix_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/public_stb_waybill_prefix_v1.py",
+      "git_blob_sha": "0913b54240e8ba3430d173cfece6c77090541d20",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_carrier_schedules_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_carrier_schedules_v1.py",
+      "git_blob_sha": "3ce91914c714ad271705587dee559cd584fde923",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_cfs2022_official_example_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_cfs2022_official_example_v1.py",
+      "git_blob_sha": "185a7b8670bf12408b5cdf8903ffa020a572056b",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_cfs2022_prefix_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_cfs2022_prefix_v1.py",
+      "git_blob_sha": "b2ff2e857e0154948b2b599c78d4e7c2cc9b1c2e",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_faf6_eia_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_faf6_eia_v1.py",
+      "git_blob_sha": "cddfc65f421e6b253c0d9d4aeec815c15ca8aac8",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_fmc_adjudication_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_fmc_adjudication_v1.py",
+      "git_blob_sha": "b599b99d45ad7db1842f28613ce1b80bf1399a4f",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_original_research_control.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_original_research_control.py",
+      "git_blob_sha": "605473cabff65581ae9ae533420482a2a70587dd",
+      "status": "added"
+    },
+    {
+      "pr": 478,
+      "pr_head": "ddb507cf3a338817764261924fd718bf11cd102e",
+      "pr_base": "research/retally-lab14-m55-unified-20261017",
+      "original_path": "freight/test_public_stb_waybill_prefix_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-478/freight/test_public_stb_waybill_prefix_v1.py",
+      "git_blob_sha": "cc10f1e34891d3e1ca6b9bd6069543b26bd49899",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": ".github/workflows/retally-gao-historical-collections.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/.github/workflows/retally-gao-historical-collections.yml",
+      "git_blob_sha": "e49429c7b7735c0c58037e99d9128eeff7b5858d",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": ".github/workflows/retally-public-faf6-eia.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/.github/workflows/retally-public-faf6-eia.yml",
+      "git_blob_sha": "8f2a885a6f371a2ab6c64c1e7887a5fc9c320e5c",
+      "status": "modified"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md",
+      "git_blob_sha": "c753200b18388952a94f1cb9e345b96787e409cd",
+      "status": "modified"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/RESEARCH_PUBLIC_GAO_COLLECTIONS_20261018.md",
+      "git_blob_sha": "4eedb0791c7b55c82d0ab7aae2c1b705fc5c66e7",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_cadc_crowley_2025_transport_audit_authority.json",
+      "git_blob_sha": "3849a7e4db00a1b81d92a1d839a35463b2408216",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_gao_b186603_wrong_gbl_origin_1976.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_gao_b186603_wrong_gbl_origin_1976.json",
+      "git_blob_sha": "83bcd10ee0b623fff1f2c4cd274f14e10c977234",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_gao_b192974_wrongful_setoff_1979.json",
+      "git_blob_sha": "70d371bb572fbaf63409c437baced091907e1841",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_gao_b261127_canupp_tcn_gbl_1996.json",
+      "git_blob_sha": "2c0a20df8b7088cfc46ef03ae4cb2fd1b30d56b4",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_gao_historical_freight_collections_20261018.json",
+      "git_blob_sha": "1a0d1784fbeec1b2980add8d729ea3a167637083",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_gsa_2025_transport_audit_erroneous_nocs_payment.json",
+      "git_blob_sha": "4aded8b9d9491b2d82f24a746a1c356c7332c134",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/fixtures/public_gsa_transport_audit_fund_FY2025_report.json",
+      "git_blob_sha": "edc300696d2183c56fc415e9a0d984fd99dbe8a7",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_crowley_appeal_scope_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_crowley_appeal_scope_v1.py",
+      "git_blob_sha": "64851486cc827430797c278cf68323d1ebfa78ba",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_gao_b186603_wrong_bol_origin.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_gao_b186603_wrong_bol_origin.py",
+      "git_blob_sha": "f6b4fc8ffa2f4351d277086566d28764ac610ca1",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_gao_b261127_contract_counterexample.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_gao_b261127_contract_counterexample.py",
+      "git_blob_sha": "3b352c4e7ba37600f46d9359de946682812657b7",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_gao_historical_collection_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_gao_historical_collection_v1.py",
+      "git_blob_sha": "aa3b88ab15eb8ec046da34152effb7e08269e143",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_gao_setoff_reversal_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_gao_setoff_reversal_v1.py",
+      "git_blob_sha": "f1a8fd311267ad4ec7a0397c049d7ca6d15e277d",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_gsa_false_positive_payment_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_gsa_false_positive_payment_v1.py",
+      "git_blob_sha": "131a3b1d65b2e8a09100ab7e6dcc33f54de2c4ca",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_gsa_transport_audit_fund_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_gsa_transport_audit_fund_v1.py",
+      "git_blob_sha": "7ea50ded3ec6e0dbaf89517f7f8bf330d83e8151",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/public_original_research_control.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/public_original_research_control.py",
+      "git_blob_sha": "f06a694924bf9cb94f3e69253bb16bc709b56823",
+      "status": "modified"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_crowley_appeal_scope_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_crowley_appeal_scope_v1.py",
+      "git_blob_sha": "b12ed4ef6f25a1b03ce2db96518a6395db069a2a",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_gao_b186603_wrong_bol_origin.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_gao_b186603_wrong_bol_origin.py",
+      "git_blob_sha": "431b5779e05d0efd57b02dc8bd21719230abd163",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_gao_b261127_contract_counterexample.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_gao_b261127_contract_counterexample.py",
+      "git_blob_sha": "c10febb4c50d802f2fb93ce518a57f055ed70672",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_gao_historical_collection_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_gao_historical_collection_v1.py",
+      "git_blob_sha": "7037280d3f2eb6c602d5d2cc38451de124039ded",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_gao_setoff_reversal_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_gao_setoff_reversal_v1.py",
+      "git_blob_sha": "4e058b93018a6463c301a699d2d1f095bddeb311",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_gsa_false_positive_payment_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_gsa_false_positive_payment_v1.py",
+      "git_blob_sha": "6a38df92c916a68a06d952bc5182c25495efa5eb",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_gsa_transport_audit_fund_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_gsa_transport_audit_fund_v1.py",
+      "git_blob_sha": "2ec18dddd1b6cf879649752138ef28d415ff84f0",
+      "status": "added"
+    },
+    {
+      "pr": 485,
+      "pr_head": "c30b8be35139873986e0ed36bc0fe146d7e82440",
+      "pr_base": "research/retally-lab14-faf6-eia-real-public-20261017",
+      "original_path": "freight/test_public_original_research_control.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-485/freight/test_public_original_research_control.py",
+      "git_blob_sha": "fbfe2f0eb041dff620de02a1fb9db8b9efbe70ce",
+      "status": "modified"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": ".github/workflows/retally-authorized-original-case-acquisition.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/.github/workflows/retally-authorized-original-case-acquisition.yml",
+      "git_blob_sha": "523dcc53bf7c3f47b02f9e993a79caf2c4fc47a8",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": ".github/workflows/retally-cma-2022-det-tariff-verification.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/.github/workflows/retally-cma-2022-det-tariff-verification.yml",
+      "git_blob_sha": "cc47683559d86b07215efad09bc8d5276bfa5720",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": ".github/workflows/retally-public-invoice-payment-replay.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/.github/workflows/retally-public-invoice-payment-replay.yml",
+      "git_blob_sha": "37241560743b1db90624697c90adc3ee9b091e42",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": ".github/workflows/retally-sungold-public-court-link-probe.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/.github/workflows/retally-sungold-public-court-link-probe.yml",
+      "git_blob_sha": "49f135a57b3c69d39a2cb9aaedc45ae764413c04",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/GLOBALTRANZ_PUBLIC_RECONCILIATION_RESEARCH.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/GLOBALTRANZ_PUBLIC_RECONCILIATION_RESEARCH.md",
+      "git_blob_sha": "d0771726f263c0ac25fa6448b0ce37b5c9824ebb",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/PUBLIC_FREIGHT_RECOVERY_EVIDENCE_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/PUBLIC_FREIGHT_RECOVERY_EVIDENCE_20261019.md",
+      "git_blob_sha": "a658001e175474ec8b724761d9d1950189bc8535",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/RIGHTS_CLEARED_INVOICE_PAYMENT_DATASETS_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/RIGHTS_CLEARED_INVOICE_PAYMENT_DATASETS_20261019.md",
+      "git_blob_sha": "9bd78b29e9515f782ea782872999f230b540d660",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/AUTHORIZED_ORIGINAL_PDF_ACQUISITION_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/AUTHORIZED_ORIGINAL_PDF_ACQUISITION_20261019.md",
+      "git_blob_sha": "fbc37bbfb59e39c201e7c3f98b81bdd62930324a",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/COMPLETE_FREIGHT_RECOVERY_CHAIN_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/COMPLETE_FREIGHT_RECOVERY_CHAIN_20261019.md",
+      "git_blob_sha": "f8ab860bfb17d0814807b5334d32f41473d25fd9",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/FOUR_DOCUMENT_CHAIN_FMC_EVIDENCE_AUDIT_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/FOUR_DOCUMENT_CHAIN_FMC_EVIDENCE_AUDIT_20261019.md",
+      "git_blob_sha": "6916ff2eafb066d2c20ad3a1c0d8190793fbdb5b",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/GSA_CBCA_ORIGINAL_CASE_PACKAGE_TARGETS_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/GSA_CBCA_ORIGINAL_CASE_PACKAGE_TARGETS_20261019.md",
+      "git_blob_sha": "6f606b4c68b74be65a371e0259e430681ead4f40",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/PENNINE_OGL_INVOICE_PAYMENT_REPLAY_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/PENNINE_OGL_INVOICE_PAYMENT_REPLAY_20261019.md",
+      "git_blob_sha": "7e117289e8f6b07d566586247df1ca5e2d75725b",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/SAME_SHIPMENT_CLOSED_LOOP_EVIDENCE_SEARCH_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/SAME_SHIPMENT_CLOSED_LOOP_EVIDENCE_SEARCH_20261019.md",
+      "git_blob_sha": "7b54b4fb872eeb7c15aeff5e10deed38e35c81d3",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/SUNGOLD_2022_DETENTION_ORIGINAL_TARIFF_RETRIEVAL_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/SUNGOLD_2022_DETENTION_ORIGINAL_TARIFF_RETRIEVAL_20261019.md",
+      "git_blob_sha": "8adb9a65cc017092fb6e7e14bf1bf644d4cf55d5",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/SUNGOLD_CHEVISANCE_CMA_CGM_DOCUMENT_CHAIN_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/SUNGOLD_CHEVISANCE_CMA_CGM_DOCUMENT_CHAIN_20261019.md",
+      "git_blob_sha": "ce972521a2e5ccff163ebc158291a9dece329314",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/SUNGOLD_ORIGINAL_EXHIBITS_PUBLIC_DOWNLOAD_ATTEMPT_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/SUNGOLD_ORIGINAL_EXHIBITS_PUBLIC_DOWNLOAD_ATTEMPT_20261019.md",
+      "git_blob_sha": "8eecbe7b89bae8cd954ae12142443e163d1a2cf4",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/SUNGOLD_ORIGINAL_EXHIBITS_TARIFF_SETTLEMENT_ACCESS_AUDIT_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/SUNGOLD_ORIGINAL_EXHIBITS_TARIFF_SETTLEMENT_ACCESS_AUDIT_20261019.md",
+      "git_blob_sha": "c5afbd030a29b926a9230fbc2d57bac62feac052",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/UNSENT_GSA_TAMS_SOURCE_RECORD_REQUEST_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/UNSENT_GSA_TAMS_SOURCE_RECORD_REQUEST_20261019.md",
+      "git_blob_sha": "704a0d3d5f2215db225ac5102ee1f6393f5bf87d",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/UNSENT_SPECIFIC_FREIGHT_CASE_FILE_REQUEST_20261019.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/UNSENT_SPECIFIC_FREIGHT_CASE_FILE_REQUEST_20261019.md",
+      "git_blob_sha": "a1b43eb07f6ec5dae78581e7953671dd5937e114",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/authorized_original_case_fetch.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/authorized_original_case_fetch.py",
+      "git_blob_sha": "fe4833fcd3e5fcddaf8c858622a9cd80108cb877",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/cma_2022_tariff_discovery.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/cma_2022_tariff_discovery.py",
+      "git_blob_sha": "dc778828ae2a49c9aaf5068745dc68661fd6dfa3",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/complete_case_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/complete_case_gate.py",
+      "git_blob_sha": "de311169893d2590848c5ebe01db9a2c57dd369d",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/public_invoice_payment_validation.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/public_invoice_payment_validation.py",
+      "git_blob_sha": "04ab3b5bf2083ceb48f52c3f7620c9c370176e82",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/statement_reconciliation.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/statement_reconciliation.py",
+      "git_blob_sha": "152b83a981d9090854ef3d063975d560b607f31b",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/sungold_court_link_probe.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/sungold_court_link_probe.py",
+      "git_blob_sha": "a0b4318a0609b4f7d2b8f8886b26989d116dc658",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/research/sungold_same_shipment_admission_manifest.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/research/sungold_same_shipment_admission_manifest.json",
+      "git_blob_sha": "e33ad108989b32eb28a5c595a3ce132d98109dd5",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_authorized_original_case_fetch.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_authorized_original_case_fetch.py",
+      "git_blob_sha": "0e8e6ea44fdf8d7aeb5212efbcef31d833871dc2",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_cma_2022_tariff_discovery.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_cma_2022_tariff_discovery.py",
+      "git_blob_sha": "08acf900cb90a3e544d0171dab521a6a2ba076ba",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_complete_case_gate.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_complete_case_gate.py",
+      "git_blob_sha": "54ee6a1bc2335a095550a6552804366ddd3634e7",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_globaltranz_reconciliation.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_globaltranz_reconciliation.py",
+      "git_blob_sha": "4e574e1119365b7e2f7cefa7af7945f5e5ac5d12",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_public_invoice_payment_validation.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_public_invoice_payment_validation.py",
+      "git_blob_sha": "5f88c3d76ad1e644ed55f45860b7d98245337d67",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_sungold_admission_manifest.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_sungold_admission_manifest.py",
+      "git_blob_sha": "3b4e54ccedba39d6e7636503639cc72225d587cf",
+      "status": "added"
+    },
+    {
+      "pr": 487,
+      "pr_head": "0289e8843c08bc3bf924ef414e0f45df456935d1",
+      "pr_base": "main",
+      "original_path": "freight/test_sungold_court_link_probe.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-487/freight/test_sungold_court_link_probe.py",
+      "git_blob_sha": "11a0c82afc23d0bcc2324194e47e25885b33a7d8",
+      "status": "added"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": ".github/workflows/retally-sec-contract-authority.yml",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/.github/workflows/retally-sec-contract-authority.yml",
+      "git_blob_sha": "6825ea594146e693657eec2c3099240284e71a9c",
+      "status": "added"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md",
+      "git_blob_sha": "5774901a5a0f82f2f0e74f08c240821ea07957ab",
+      "status": "modified"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/RESEARCH_SEC_ORIGINAL_CONTRACT_RATES_20261018.md",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/RESEARCH_SEC_ORIGINAL_CONTRACT_RATES_20261018.md",
+      "git_blob_sha": "e97ece338769ddf3006c9b6d2cef757f3687ae7f",
+      "status": "added"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/fixtures/public_sec_2005_2007_original_carrier_rate_contracts.json",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/fixtures/public_sec_2005_2007_original_carrier_rate_contracts.json",
+      "git_blob_sha": "f6ce1f3d012a89d253e139d20d22967194f542bc",
+      "status": "added"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/public_original_research_control.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/public_original_research_control.py",
+      "git_blob_sha": "7e4594924e4017aff02f0914532d44e26cd462c7",
+      "status": "modified"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/public_sec_contract_authority_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/public_sec_contract_authority_v1.py",
+      "git_blob_sha": "645d176f11c3b063e728c0abd450a14eceb01efd",
+      "status": "added"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/test_public_original_research_control.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/test_public_original_research_control.py",
+      "git_blob_sha": "50a7123e469cc3cbf160c4e522396a1694c68736",
+      "status": "modified"
+    },
+    {
+      "pr": 492,
+      "pr_head": "fcdc16f445e08252185e3bb13b4755032e118f85",
+      "pr_base": "research/retally-lab14-gao-actual-collections-20261018",
+      "original_path": "freight/test_public_sec_contract_authority_v1.py",
+      "archived_path": "research/retally_lab14_archive/sources/pr-492/freight/test_public_sec_contract_authority_v1.py",
+      "git_blob_sha": "5e5d6a61464e4eb3170d888f85b06bd9a88d88f0",
+      "status": "added"
+    }
+  ]
+}

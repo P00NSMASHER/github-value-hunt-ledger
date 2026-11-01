@@ -1,0 +1,70 @@
+name: RETALLY Lab 14 Journal Fork Identity Gate (Mission 55)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-journal-fork-m55.yml'
+      - 'freight/recovery_checkpoint_m53.py'
+      - 'freight/test_lab_journal_fork_m55.py'
+      - 'freight/RESEARCH_JOURNAL_FORK_M55.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical-journal-fork-and-original-lab-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install original pinned offline requirements
+        run: |
+          python -m pip install -r production/requirements-ci.txt
+          python -m pip install cryptography==46.0.4 openpyxl==3.1.5
+      - name: Verify actual copied and swapped SQLite journal forks plus all inherited controls
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            freight/test_lab_journal_fork_m55.py \
+            freight/test_lab_checkpoint_mode_m54.py \
+            freight/test_lab_replay_checkpoint_m53.py \
+            freight/test_lab_recovery_replay_m52.py \
+            freight/test_lab_recovery_witness_m51.py \
+            freight/test_lab_recovery_admission_m50.py \
+            freight/test_lab_dual_ledger_backup_m49.py \
+            freight/test_backup_restore.py \
+            freight/test_lab_audit_trust_boundary_m48.py \
+            freight/test_audit_store.py \
+            freight/test_audit_ledger.py \
+            freight/test_lab_file_continuity_m47.py \
+            freight/test_lab_schema_integrity_m46.py \
+            freight/test_lab_atomic_financial_m45.py \
+            freight/test_lab_persistent_semantic_m44.py \
+            freight/test_settlement_store.py \
+            freight/test_settlement_report.py \
+            freight/test_lab_settlement_source_m43.py \
+            freight/test_lab_settlement_identity_m42.py \
+            freight/test_lab_critical_counterexample_replay_m41.py \
+            freight/test_lab_assurance.py \
+            freight/test_lab_phase3_real_chain.py \
+            freight/test_lab_phase4_director.py \
+            freight/test_lab_cross_lab_assurance_m39.py \
+            freight/test_lab_historical_disposition_m40.py \
+            freight/test_lab_phase4_experiments.py \
+            freight/test_lab_experiment_ledger.py \
+            freight/test_research_pilot_preflight.py
+      - name: Preserve 14 original labs and 26 unresolved findings
+        run: |
+          PYTHONPATH=. python -m freight.lab_phase4_control_center --out /tmp/retally-m55
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('/tmp/retally-m55/phase4_control.json').read_text())
+          assert c['executed_labs']==list(range(1,15))
+          assert len(c['lab_runs'])==14 and not c['failed_or_blocked_labs']
+          assert c['historical_finding_disposition_m40']['original_historical_findings_open']==26
+          assert c['actual_revenue_cents']==0
+          assert c['checkpoint_antidowngrade_m54']['current_exact_mode_or_checkpoint_negative_denials']==13
+          assert c['signed_replay_checkpoint_m53']['exact_current_checkpoint_denials']==19
+          print('M55: physical journal fork identity checks and all 14 original labs pass; no real external custodian or customer authorization.')
+          PY

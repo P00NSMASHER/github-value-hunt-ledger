@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-18",
+  "publisher": "U.S. Government Accountability Office",
+  "source_mode": "PRIMARY_GAO_PUBLISHED_ADMINISTRATIVE_DECISIONS_TEXT",
+  "settlement_proof_tier": "GAO_REPORTED_REFUND_OR_APPLIED_SET_OFF_NOT_INDEPENDENT_BANK_RECEIPT",
+  "scope": "HISTORICAL_US_GOVERNMENT_FREIGHT_AUDITS_NOT_RETALLY_CLIENTS",
+  "external_original_bills_of_lading_examined": 0,
+  "independent_Treasury_or_carrier_bank_transaction_statements_examined": 0,
+  "actual_retally_client_invoices": 0,
+  "actual_retally_customer_recoveries_cents": 0,
+  "cases": [
+    {
+      "case_id": "B-148465",
+      "decision_date": "1962-08-27",
+      "source_url": "https://www.gao.gov/products/b-148465",
+      "historical_context": "Motor freight, reported incorrect routing/rate on government LTL shipment",
+      "originally_paid_cents": 54688,
+      "final_agency_assessed_overcharge_cents": 6122,
+      "gao_reported_collection_events": [
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 6122
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "B-148981",
+      "decision_date": "1962-11-29",
+      "source_url": "https://www.gao.gov/products/b-148981",
+      "historical_context": "Motor freight, publicly reported original payment and carrier refund after combination-rate audit; one selected shipment only",
+      "originally_paid_cents": 175500,
+      "final_agency_assessed_overcharge_cents": 13444,
+      "gao_reported_collection_events": [
+        {
+          "kind": "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",
+          "amount_cents": 13444
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "B-152324",
+      "decision_date": "1964-04-21",
+      "source_url": "https://www.gao.gov/products/b-152324-0",
+      "historical_context": "Government motor freight tariff minimum-weight dispute; one documented shipment and two collection mechanisms",
+      "originally_paid_cents": 183525,
+      "final_agency_assessed_overcharge_cents": 125477,
+      "gao_reported_collection_events": [
+        {
+          "kind": "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",
+          "amount_cents": 51450
+        },
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 74027
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "A-14046",
+      "decision_date": "1926-04-23",
+      "source_url": "https://www.gao.gov/products/14046",
+      "historical_context": "Three government rail freight shipments, original setoff and separately proposed additional collection",
+      "originally_paid_cents": 88963,
+      "final_agency_assessed_overcharge_cents": 12775,
+      "gao_reported_collection_events": [
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 8358
+        }
+      ],
+      "outstanding_or_future_collection_cents": 4417,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "B-166167",
+      "decision_date": "1969-08-14",
+      "source_url": "https://www.gao.gov/products/b-166167",
+      "historical_context": "Government air-engine motor freight overcharge offset; later proposed reimbursement settlement to carrier not evidenced paid",
+      "originally_paid_cents": 423177,
+      "final_agency_assessed_overcharge_cents": 301632,
+      "gao_reported_collection_events": [
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 301632
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 105083,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "B-146511",
+      "decision_date": "1965-06-02",
+      "source_url": "https://www.gao.gov/products/b-146511-2",
+      "historical_context": "Government freight bill of lading tariff limitation, original 1951 deduction subsequently disputed, inconsistent supplemental claim variants",
+      "originally_paid_cents": 15205,
+      "final_agency_assessed_overcharge_cents": 2074,
+      "gao_reported_collection_events": [
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 2074
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [
+        2070,
+        2076
+      ],
+      "original_bill_of_lading_independently_examined": false
+    },
+    {
+      "case_id": "B-197658",
+      "decision_date": "1980-08-25",
+      "source_url": "https://www.gao.gov/assets/b-197658.pdf",
+      "historical_context": "Original GAO three-page decision: one steel-post consignment shipped using three bills of lading; carrier refunded part of assessed overcharge and government recovered remaining balance by offset.",
+      "originally_paid_cents": 782042,
+      "final_agency_assessed_overcharge_cents": 164979,
+      "gao_reported_collection_events": [
+        {
+          "kind": "CARRIER_VOLUNTARILY_REFUNDED_GOVERNMENT",
+          "amount_cents": 110967
+        },
+        {
+          "kind": "GOVERNMENT_APPLIED_SET_OFF",
+          "amount_cents": 54012
+        }
+      ],
+      "outstanding_or_future_collection_cents": 0,
+      "carrier_reimbursement_authorized_but_payment_unverified_cents": 0,
+      "supplemental_carrier_claim_amount_variants_cents": [],
+      "original_bill_of_lading_independently_examined": false
+    }
+  ],
+  "explicit_source_limits": [
+    "GAO's decision account reports an offset or refund; original private carrier statements, invoice images and Treasury bank settlement ledgers were not reviewed.",
+    "A proposed additional deduction is not a completed collection; a certificate authorizing reimbursement to the carrier is not verified as paid.",
+    "Amounts may refer to multiple shipment legs or government-specific tariff law. No generalization to present-day private commercial freight billing.",
+    "These are third-party federal-government historical collection reports, not recoveries performed by RETALLY.",
+    "This bounded purposive set of seven published cases is neither representative of freight invoices nor a recoverable-rate statistic."
+  ]
+}

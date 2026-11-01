@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "issuer": "U.S. Government Accountability Office",
+  "source_url": "https://www.gao.gov/products/b-186603",
+  "decision_id": "B-186603",
+  "decision_date": "1976-12-22",
+  "carrier": "Navajo Freight Lines, Inc.",
+  "historical_shipment_disputes": [
+    {
+      "GBL": "F-7349731",
+      "date": "1972-12-21",
+      "product": "40 arm chairs",
+      "units": 40,
+      "weight_lb": 2800,
+      "published_bill_of_lading_origin": "Washington, D.C.",
+      "agency_investigated_actual_origin": "Canton, Mississippi",
+      "destination": "Veterans Administration Hospital, Brooklyn, New York",
+      "original_freight_payment_cents": 39816,
+      "gsa_applied_setoff_cents": 13328,
+      "GAO_conclusion": "ORIGIN_PRESUMPTION_REBUTTED_ALLOW_CARRIER_CLAIM_IF_OTHERWISE_CORRECT",
+      "payment_back_to_carrier_proven": false,
+      "independent_original_BOL_or_carrier_PRO_scan_examined": false,
+      "carrier_original_PRO_mentioned": "75741955",
+      "documentation_evidence": [
+        "Manufacturer Shelby Williams stated chair factories in Morristown TN and Canton MS, not Washington DC",
+        "Veterans Administration had no warehouse in Washington DC for this shipment",
+        "Washington DC was order office only, not the departure point"
+      ],
+      "originally_typed_destination_and_origin_are_verified_same_document": false
+    },
+    {
+      "GBL": "D-8271398",
+      "date": "1972-06-23",
+      "product": "blankets NOI",
+      "units": null,
+      "weight_lb": 1624,
+      "published_bill_of_lading_origin": "Clearfield, Utah",
+      "agency_investigated_actual_origin": "NOT_REINVESTIGATED_IN_THIS_DECISION",
+      "destination": "Gallup, New Mexico",
+      "original_freight_payment_cents": null,
+      "gsa_applied_setoff_cents": 5765,
+      "GAO_conclusion": "GSA_ISSUED_SETTLEMENT_CERTIFICATE_FOR_22_90",
+      "settlement_certificate_issued_cents": 2290,
+      "settlement_certificate_paid_back_to_carrier_verified": false
+    }
+  ],
+  "max_original_overcharge_amount_proved_valid_per_decision_cents": null,
+  "actual_carrier_refunds_paid_verified_cents": null,
+  "RETALLY_original_customer_invoices_verified": 0,
+  "RETALLY_recoveries_cents": 0,
+  "legal_status": "GAO_1976_ORIGINAL_BOL_ORIGIN_REBUTTED_AND_REPAYMENT_ONLY_CONDITIONAL",
+  "note": "Carrier repayment of $133.28 was conditionally allowed; neither carrier settlement certificate nor separate bank statements were verified as paid. The two shipments are separate transactions.",
+  "two_distinct_GBLs_must_not_be_combined_as_a_single_recovered_balance": true
+}

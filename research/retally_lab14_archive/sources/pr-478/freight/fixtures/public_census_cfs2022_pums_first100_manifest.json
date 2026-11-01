@@ -1,0 +1,54 @@
+{
+  "publisher": "US Census Bureau",
+  "survey": "2022 Commodity Flow Survey Public Use Microdata",
+  "source_url": "https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums.zip",
+  "source_page": "https://www.census.gov/data/datasets/2022/econ/cfs/historical-datasets.html",
+  "compressed_archive_bytes": 677530696,
+  "zip_central_directory": {
+    "entry": "cfs_2022_pums.csv",
+    "method": "deflate",
+    "compressed_bytes": 677530492,
+    "uncompressed_bytes": 2824487751,
+    "crc32": "3a9fd854",
+    "entries": 1
+  },
+  "source_prefix_range": "bytes=0-131071",
+  "source_prefix_sha256": "d9f78acc810c1290712f87dc082debef801e8d0ef360cfb0521ea289b84b309f",
+  "first_complete_rows": 100,
+  "fixture": "freight/fixtures/public_census_cfs2022_pums_first100.csv",
+  "notes": [
+    "Publisher randomly assigned SHIPMT_ID after sorting records. Our first-100-file-prefix subset is not a documented independent probability sample and is not cleared for national estimates.",
+    "SHIPMT_VALUE denotes shipment goods value, not billed transportation.",
+    "WGT_FACTOR survey design weight; do not sum sample unweighted or claim national results.",
+    "No original actual customer invoice or carrier agreement.",
+    "Full 677MB source was not downloaded; ZIP central directory was independently read using byte-range requests."
+  ],
+  "fixture_sha256": "ab75a35ab109a8b2f2923c6a66b20712bc972aa968c09c3dd9f4286f6972a260",
+  "fixture_bytes": 7734,
+  "official_users_guide": "https://www2.census.gov/programs-surveys/cfs/datasets/2022/cfs_2022_pums_users_guide.pdf",
+  "official_methodology": "https://www.census.gov/programs-surveys/cfs/technical-documentation/methodology.html",
+  "original_2022_pums_source_population": {
+    "shipment_records": 37576546,
+    "approx_responding_establishments": 50000,
+    "privacy_modified": true,
+    "shipment_value_unit": "USD of goods shipped, not freight rate",
+    "shipment_weight_unit": "pounds",
+    "distance_unit": "great-circle miles"
+  },
+  "weight_policy": {
+    "field": "WGT_FACTOR",
+    "interpretation": "shipment tabulation weighting factor accounts for survey design, subsampling, poststratification and disclosure-avoidance adjustments",
+    "official_weight_cap": "3588000",
+    "precision": "one decimal",
+    "per_sample_100_row_extrapolation_authorized": false,
+    "published_CFS_estimates_take_precedence": true,
+    "variance_estimable_from_first_100_rows": false
+  },
+  "disclosure_policy": {
+    "description": "PUMS records may include topcoding, noise infusion, truncation, rounding and geographic/commodity collapsing",
+    "published_value_truncation": "30000000",
+    "privacy_modified_values_not_invoices": true
+  },
+  "source_ordering": "PUBLISHER_RANDOMLY_SORTED_SHIPMENT_IDS",
+  "qualification_of_extracted_prefix": "Deterministic first 100 records in the publisher's randomly ordered 37,576,546-row PUMS; not a new, independently designed sample suitable for weighted population estimates."
+}

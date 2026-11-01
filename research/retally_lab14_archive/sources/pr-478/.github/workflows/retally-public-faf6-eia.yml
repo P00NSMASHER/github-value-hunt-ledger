@@ -1,0 +1,151 @@
+name: RETALLY Lab 14 Original Public Freight Evidence (BTS / EIA / Carrier)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/retally-public-faf6-eia.yml'
+      - 'freight/public_faf6_eia_v1.py'
+      - 'freight/public_original_research_control.py'
+      - 'freight/test_public_original_research_control.py'
+      - 'freight/public_carrier_schedules_v1.py'
+      - 'freight/public_cfs2022_prefix_v1.py'
+      - 'freight/public_cfs2022_official_example_v1.py'
+      - 'freight/public_fmc_adjudication_v1.py'
+      - 'freight/test_public_fmc_adjudication_v1.py'
+      - 'freight/fixtures/public_fmc_2030i_reparations_final_notice_2026.json'
+      - 'freight/test_public_cfs2022_official_example_v1.py'
+      - 'freight/fixtures/public_cfs2022_official_maryland_example.json'
+      - 'freight/public_stb_waybill_prefix_v1.py'
+      - 'freight/test_public_stb_waybill_prefix_v1.py'
+      - 'freight/fixtures/public_stb_2024_waybill_first100_fixedwidth.txt'
+      - 'freight/fixtures/public_stb_waybill2024_first100_manifest.json'
+      - 'freight/test_public_cfs2022_prefix_v1.py'
+      - 'freight/fixtures/public_census_cfs2022_pums_first100.csv'
+      - 'freight/fixtures/public_census_cfs2022_pums_first100_manifest.json'
+      - 'freight/test_public_carrier_schedules_v1.py'
+      - 'freight/fixtures/public_carrier_fuel_schedule_20261017.csv'
+      - 'freight/fixtures/public_carrier_surcharge_manifest_20261017.json'
+      - 'freight/test_public_faf6_eia_v1.py'
+      - 'freight/fixtures/public_faf6_2022_md_pa_truck_domestic.csv'
+      - 'freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv'
+      - 'freight/fixtures/public_faf6_eia_manifest_20261017.json'
+      - 'freight/RESEARCH_PUBLIC_FAF6_EIA_20261017.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-public-evidence-validity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify only exact publicly reported flow and price source records
+        run: |
+          PYTHONPATH=. python -m unittest -v freight.test_public_faf6_eia_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_carrier_schedules_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_prefix_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_cfs2022_official_example_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_fmc_adjudication_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_stb_waybill_prefix_v1
+          PYTHONPATH=. python -m unittest -v freight.test_public_original_research_control
+      - name: Reconcile all original public research source families in sanitized evidence report
+        run: |
+          PYTHONPATH=. python -m freight.public_original_research_control --out /tmp/retally-lab14-public-research
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/retally-lab14-public-research/public_evidence_census.json').read_text())
+          assert data['scope']=='RETALLY_EXISTING_LAB14_PUBLIC_SOURCE_CENSUS_RESEARCH_ONLY'
+          assert data['total_bounded_observations']==307
+          assert len(data['original_public_source_record_counts'])==5
+          assert data['standalone_official_publisher_examples']==1
+          assert data['standalone_external_adjudication_records']==1
+          assert data['census_official_md_origin_weighted_GOODS_value_usd']=='198598788295'
+          assert data['stb_sample_accounting_year_histogram']=={'2024':100}
+          assert data['fmc_award_actual_cash_received_verified'] is False
+          assert data['real_RETALLY_customer_invoices_seen']==0
+          assert data['actual_RETALLY_cash_recovered_cents']==0
+          assert data['original_historical_findings_still_open']==26
+          assert data['independent_first_customer_human_gates_unmet']==18
+          assert data['commercial_claim_clearance']=='NO_GO'
+          page=Path('/tmp/retally-lab14-public-research/index.html').read_text()
+          assert 'NOT verified customer invoices' in page
+          assert 'NO-GO' in page
+          print('Lab14 source census: 307 bounded public facts/rows, one publisher example, one official award, no customer recoveries.')
+          PY
+      - name: Prohibit invoice and recovery claim promotion
+        run: |
+          PYTHONPATH=. python -m freight.public_faf6_eia_v1 > /tmp/public_benchmark_report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/public_benchmark_report.json').read_text())
+          assert data['scope']=='RETALLY_EXISTING_LAB14_PUBLIC_SOURCE_BENCHMARK_ONLY'
+          assert data['faf6_source_rows_in_snapshot']==78
+          assert data['eia_observations']==18
+          assert data['modeled_commodity_value_is_not_freight_spend'] is True
+          assert data['diesel_retail_price_is_not_customer_surcharge_authority'] is True
+          assert data['real_invoices_or_tariffs_examined'] is False
+          assert data['verified_overcharge_cents'] is None
+          assert data['validated_customer_recovery_cents']==0
+          assert data['automated_customer_contact_authorized'] is False
+          assert data['commercial_claim_clearance']=='NOT_ESTABLISHED'
+          assert data['all_26_historical_findings_still_open'] is True
+          assert data['human_pilot_approvals_met'] is False
+          assert data['faf6_state_pairs']['md_to_pa']['rows']==39
+          assert data['faf6_state_pairs']['pa_to_md']['rows']==39
+          print('Research-only acceptance: verified 78 BTS FAF6 source rows + 18 EIA observations. No invoice or money claims.')
+          PY
+      - name: Compare official full-PUMS Census Maryland example without inferring freight spending
+        run: |
+          PYTHONPATH=. python -m freight.public_cfs2022_official_example_v1 > /tmp/cfs_md_publisher_example.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/cfs_md_publisher_example.json').read_text())
+          assert r['pums_md_origin_unweighted_record_count']==612317
+          assert r['census_published_weighted_goods_value_usd']=='198598788295'
+          assert r['census_published_gvf_cv_percent']=='9.74'
+          assert r['country_or_route_total_freight_spend'] is None
+          assert r['100_prefix_rows_used_to_make_estimate'] is False
+          assert r['no_original_customer_tariff_invoice_or_recoveries'] is True
+          assert r['commercial_claim_clearance']=='NOT_ESTABLISHED'
+          print('Official Census MD goods-value example and CV verified; no customer invoice or recoveries.')
+          PY
+      - name: Hold adjudicated FMC third-party award separately from verified payment
+        run: |
+          PYTHONPATH=. python -m freight.public_fmc_adjudication_v1 > /tmp/fmc_public_award.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/fmc_public_award.json').read_text())
+          assert r['documented_final_reparations_order_cents']==965451
+          assert r['documented_reparations_cents']==866879
+          assert r['documented_interest_cents']==98572
+          assert r['administratively_final_as_of_2026_04_28'] is True
+          assert r['actual_payment_verified_cents'] is None
+          assert r['claimant_bank_or_payment_receipt_confirmed'] is False
+          assert r['retally_validated_recovery_cents']==0
+          assert r['customer_recovery_or_marketing_authority']=='NOT_ESTABLISHED'
+          print('Original FMC award verified as award only; no original customer settlement or RETALLY recovery.')
+          PY
+      - name: Verify carrier original date/index reference without asserting a customer tariff
+        run: |
+          PYTHONPATH=. python -m freight.public_carrier_schedules_v1 > /tmp/carrier_public_reference.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/carrier_public_reference.json').read_text())
+          assert report['source_rows']==11 and report['carrier_source_families']==3
+          assert report['fedex_freight_eia_weekly_pairs']==6
+          assert report['ups_domestic_ground_observations']==4
+          assert report['union_pacific_intermodal_announcements']==1
+          assert report['customer_agreement_still_controls'] is True
+          assert report['public_surcharge_is_not_billed_invoice_charge'] is True
+          assert report['verified_customer_invoice_count']==0
+          assert report['verified_overcharge_cents'] is None
+          assert report['financial_recovery_authorized'] is False
+          print('Research-only acceptance: eleven official carrier historical schedule facts. No customer tariff or recovery proof.')
+          PY

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "as_of_date": "2026-10-17",
+  "scope": "RETALLY_EXISTING_LAB14_PUBLIC_CARRIER_REFERENCE_FACTS_ONLY",
+  "data_classification": "publicly posted historical pricing reference, not customer agreement or invoice",
+  "source_collection": [
+    {
+      "carrier": "FedEx Freight",
+      "service": "US FedEx Freight LTL",
+      "urls": [
+        "https://www.fedexfreight.com/fragments/fuel-surcharge-table",
+        "https://www.fedexfreight.com/en-us/support-resources/tariffs-rates-information/fuel-surcharges"
+      ],
+      "effective_starts": [
+        "2026-09-09",
+        "2026-09-16",
+        "2026-09-23",
+        "2026-09-30",
+        "2026-10-07",
+        "2026-10-14"
+      ],
+      "original_weekly_rate_count": 6,
+      "evidence": "public weekly posted percent and EIA U.S. diesel index week; effective-date lag confirmed",
+      "scope_limit": "FedEx explicitly says customer agreement is final authority; Item 570 governs eligible charge base."
+    },
+    {
+      "carrier": "UPS",
+      "service": "Domestic Ground",
+      "urls": [
+        "https://www.ups.com/us/en/support/shipping-support/shipping-costs-rates/fuel-surcharges"
+      ],
+      "effective_starts": [
+        "2026-09-07",
+        "2026-09-14",
+        "2026-09-21",
+        "2026-09-28"
+      ],
+      "original_weekly_rate_count": 4,
+      "evidence": "public 90-day surcharge history snippet observed; no shipment-level applicability or customer terms verified"
+    },
+    {
+      "carrier": "Union Pacific",
+      "service": "Domestic Weekly Intermodal",
+      "urls": [
+        "https://www.up.com/announcements/intermodal/2026/PR2026-66"
+      ],
+      "effective_starts": [
+        "2026-10-12"
+      ],
+      "original_weekly_rate_count": 1,
+      "evidence": "official October 6 announcement PR2026-66 for Oct 12-18, 58.0%"
+    }
+  ],
+  "facts_frozen_rows": 11,
+  "fixture": "freight/fixtures/public_carrier_fuel_schedule_20261017.csv",
+  "eia_cross_index_fixture": "freight/fixtures/public_eia_diesel_onhighway_2026_09_07_to_10_12.csv",
+  "caveats": [
+    "Carrier public rates are mutable or archived; this is a bounded historical snapshot.",
+    "The FedEx index matches the observed U.S. EIA Monday price two days before the Wednesday effective date; this does not prove a billed account's exact surcharge.",
+    "UPS rate applicability may vary by service type and account-specific terms; no UPS index week is asserted in the excerpt.",
+    "Union Pacific announcement establishes the posted rate, not proof of a contractual charge to a particular shipper.",
+    "Some carrier publishing terms may constrain republication of full guides; this research retains only eleven factual numbers and links.",
+    "There is no customer consent, original invoice, payment evidence, tariff appendix or actual recovery in this research."
+  ],
+  "clearance": "RESEARCH_ONLY_NO_COMMERCIAL_RECOVERY_AUTHORIZATION",
+  "real_customer_invoices": 0,
+  "verified_recovery_cents": null
+}
