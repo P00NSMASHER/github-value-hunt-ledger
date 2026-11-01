@@ -68,14 +68,14 @@ def _fetch_visible_page(page: int, token: str) -> list[dict]:
             if response.status != 200:
                 raise CatalogError("GitHub authorized catalog unavailable")
             raw = response.read(_MAX_RESPONSE_BYTES + 1)
-    except (HTTPError, URLError, OSError) as exc:
+    except (HTTPError, URLError, OSError):
         # Never include HTTP response bodies, URLs or header/token values.
         raise CatalogError("GitHub authorization, catalog access or transport unavailable") from None
     if len(raw) > _MAX_RESPONSE_BYTES:
         raise CatalogError("GitHub catalog response exceeded size limit")
     try:
         rows = json.loads(raw)
-    except (ValueError, UnicodeDecodeError) as exc:
+    except (ValueError, UnicodeDecodeError):
         raise CatalogError("GitHub catalog response was invalid JSON") from None
     if not isinstance(rows, list) or len(rows) > _PER_PAGE:
         raise CatalogError("GitHub catalog response violated page contract")
