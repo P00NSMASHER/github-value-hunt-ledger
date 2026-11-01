@@ -2,3 +2,6 @@
 -r ../production/requirements-ci.txt
 ruff==0.17.3
 cryptography==46.0.4
+# Required by the source-verified Facebook cover tests in the full Freight suite.
+# Also pinned in the dedicated retally-facebook-assets workflow.
+Pillow==12.3.0
