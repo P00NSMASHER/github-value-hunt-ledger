@@ -19,6 +19,7 @@ from freight.site.rebase_public_urls import OLD_BASE, rebase, validate_cloudflar
 from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, SITE_DIR as RECOVERY_SOURCE, build as build_recoveryos
 from freight.site.asset_integrity import validate_recoveryos_media
 from freight.site.internal_links import validate_bundle_links
+from freight.site.public_claim_guard import validate_public_tree
 from freight.site.group.build import ADDED_FILES, ROUTES, build_group
 
 REPO = Path(__file__).resolve().parents[2]
@@ -111,6 +112,10 @@ def build(output: Path = OUTPUT_DIR) -> Path:
             content = path.read_text(encoding="utf-8").lower()
             if any(token in content for token in ("yorktowne", "17901", "jayp19386@")):
                 raise RuntimeError(f"Private contact data in public bundle: {path.relative_to(bundle)}")
+        # Validate the exact final public source AFTER URL/CSP and Group routing
+        # rewrites, BEFORE creating the production Pages artifact.
+        validate_public_tree(bundle,site='RETALLY')
+        validate_public_tree(bundle/'recoveryos',site='RECOVERYOS')
         shutil.copytree(bundle, output)
     return output
 

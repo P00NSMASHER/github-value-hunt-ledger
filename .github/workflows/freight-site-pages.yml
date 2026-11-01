@@ -53,6 +53,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/site/test_public_claim_guard.py
           company_sites/test_approved_brand.py
           freight/site/test_worksheet.py
           freight/site/test_home_worksheet_discovery.py
@@ -132,6 +133,7 @@ jobs:
           test "$(find cf-retally-public -type l | wc -l)" -eq 0
           grep -F 'https://www.retallyrecovery.com/' cf-retally-public/index.html
           grep -F 'jay@retallyrecovery.com' cf-retally-public/index.html
+          python -m freight.site.public_claim_guard --freight-root cf-retally-public --recoveryos-root cf-retally-public/recoveryos
 
   deploy:
     if: >-
@@ -168,6 +170,7 @@ jobs:
           mkdir /tmp/freight-recovery-public/recoveryos
           cp -R /tmp/recoveryos-public/. /tmp/freight-recovery-public/recoveryos/
           python -m freight.site.legacy_pages_canonical /tmp/freight-recovery-public
+          python -m freight.site.public_claim_guard --freight-root /tmp/freight-recovery-public --recoveryos-root /tmp/freight-recovery-public/recoveryos
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: /tmp/freight-recovery-public

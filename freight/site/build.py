@@ -24,6 +24,7 @@ from freight.commercial_terms import (
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 from freight.site.asset_integrity import validate_freight_media
+from freight.site.public_claim_guard import TEXT_EXTENSIONS, validate_public_text_bundle
 from freight.site.wordmark import embed_approved_wordmark
 from freight.site.social_preview import embed as embed_social_preview, preview_images as social_preview_images
 from freight.site.article_schema import embed_article_schema
@@ -441,6 +442,14 @@ def build(
     for name, page in text_bundle.items():
         if any(token in page.lower() for token in ("yorktowne", "17901", "jayp19386@")):
             raise ValueError(f"Nonbusiness contact information in public asset: {name}")
+
+    # High-confidence false customer-result/market assertions and lost demo
+    # disclosures stop artifact creation. This is not marketing approval.
+    validate_public_text_bundle(
+        {name: value for name, value in text_bundle.items()
+         if '/' not in name and Path(name).suffix.lower() in TEXT_EXTENSIONS},
+        site='RETALLY',
+    )
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():

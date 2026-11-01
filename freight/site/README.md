@@ -89,3 +89,18 @@ present.
 ## Brand presentation
 
 The original website geometry, fonts, layout, intake and recovery logic are retained. Only the approved RETALLY logos and the emerald/deep-forest color system change. Published wordmark and emblem WebP assets are compact derivatives of the approved original raster artwork. Keep the full-resolution masters in the RETALLY brand starter package. Do not rename the `FreightRecoveryAnalytics` JavaScript API or existing public URLs without a separate migration.
+
+## Public claims release safeguard
+
+Public RETALLY and RecoveryOS build pipelines reject nine narrow classes of
+unsupported customer recoveries, invoice-volume results, accuracy, market-size
+and refund guarantees, and removal of mandatory fictional-example labels.
+Checks run before public output is created. Cloudflare Pages independently
+revalidates after URL rebasing and Group/RecoveryOS composition; GitHub Pages
+verifies the final pre-deploy bundle as well. CI exercises adversarial examples.
+
+After a local build, run
+`python -m freight.site.public_claim_guard --freight-root cf-retally-public --recoveryos-root cf-retally-public/recoveryos`.
+Passing only means none of the specified high-risk patterns were detected.
+It does not certify actual customer outcomes or grant marketing/legal approval,
+payment authority, commercial launch readiness, or rights to social/email copy.
