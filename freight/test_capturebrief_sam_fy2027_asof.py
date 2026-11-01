@@ -72,7 +72,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(x["current_source_sha256"],hashlib.sha256(data).hexdigest())
         self.assertEqual(len(REQUIRED_COLUMNS),8)
         self.assertEqual(MAX_ORIGINAL_ROWS,8000)
-        self.assertEqual(MAX_ORIGINAL_BYTES,2_500_000)
+        self.assertEqual(MAX_ORIGINAL_BYTES,8_000_000)
         self.assertEqual(len(PREVIOUS_PUBLIC_REFERENCE_SHA256),64)
 
     def test_issuer_family_and_duplicate_notice_evidence_is_counted_not_promoted(self):
@@ -284,6 +284,335 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(trace[0],("GET",SOURCE_URL,15))
         self.assertEqual(trace[1],MAX_ORIGINAL_BYTES+1)
 
+    def test_fy2027_archive_growth_is_bounded_not_silently_zeroed(self):
+        # Source-bound observed failure; generated rows below are SYNTHETIC.
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        self.assertEqual(pack["schema_version"], 1)
+        self.assertEqual(pack["observation"]["result"], "SOURCE_TOO_LARGE")
+        self.assertIsNone(pack["observation"]["source_byte_sha256"])
+        self.assertEqual(pack["observation"]["source_rows_scored"], 0)
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+        self.assertEqual(pack["rights_and_truth"]["independent_cross_source_outcomes"], 0)
+        self.assertEqual(MAX_ORIGINAL_BYTES, pack["proposal"]["bounded_limit_bytes"])
+        self.assertEqual(MAX_ORIGINAL_ROWS, pack["proposal"]["maximum_csv_rows"])
+
+        columns = ["NoticeId", "Sol#", "PostedDate", "Type", "Active",
+                   "AAC Code", "Office", "Link", "Description"]
+        buf = io.StringIO(newline="")
+        writer = csv.DictWriter(buf, fieldnames=columns, lineterminator="\n")
+        writer.writeheader()
+        for i in range(256):
+            writer.writerow({
+                "NoticeId": f"SYNTHETIC-NOTICE-{i:04d}",
+                "Sol#": f"SYNTHETIC-SOL-{i:04d}",
+                "PostedDate": "2026-10-20",
+                "Type": "Solicitation", "Active": "No",
+                "AAC Code": "FAKE", "Office": "FAKE TEST OFFICE",
+                "Link": "https://sam.gov/synthetic-not-real",
+                "Description": "X" * 10500,
+            })
+        fabricated = buf.getvalue().encode("utf-8")
+        self.assertGreater(len(fabricated), pack["observation"]["previous_bounded_limit_bytes"])
+        self.assertLess(len(fabricated), MAX_ORIGINAL_BYTES)
+
+        class CompleteResponse:
+            status = 200
+            headers = {
+                "Content-Type": "text/csv",
+                "Content-Encoding": "identity",
+                "Content-Length": str(len(fabricated)),
+            }
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def geturl(self): return SOURCE_URL
+            def read(self, n):
+                self_outer.assertEqual(n, MAX_ORIGINAL_BYTES + 1)
+                return fabricated
+
+        self_outer = self
+        class TooLargeResponse(CompleteResponse):
+            headers = {
+                "Content-Type": "text/csv",
+                "Content-Encoding": "identity",
+                "Content-Length": str(MAX_ORIGINAL_BYTES + 1),
+            }
+            def read(self, n):
+                raise AssertionError("oversize response must fail before reading")
+
+        class Opener:
+            def __init__(self, response): self.response = response
+            def open(self, req, timeout):
+                self_outer.assertEqual(req.get_method(), "GET")
+                self_outer.assertEqual(req.full_url, SOURCE_URL)
+                return self.response
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener(CompleteResponse())):
+            self.assertEqual(fetch_original(), fabricated)
+        receipt = build_receipt(observed_at=NOW, fetcher=lambda: fabricated)
+        self.assertEqual(receipt["source_status"], STATUS_OK)
+        self.assertEqual(receipt["source_rows"], 256)
+        self.assertEqual(receipt["current_source_sha256"],
+                         hashlib.sha256(fabricated).hexdigest())
+        self.assertEqual(receipt["independent_cross_source_award_outcomes"], 0)
+        self.assertEqual(receipt["original_archive_bytes_persisted"], 0)
+        validate_receipt(receipt, now=NOW)
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener(TooLargeResponse())):
+            with self.assertRaisesRegex(ResearchError, "SOURCE_TOO_LARGE"):
+                fetch_original()
+
+    def test_official_daily_public_extract_is_not_archived_fy2027_ground_truth(self):
+        pack = json.loads((Path(__file__).with_name('fixtures') /
+            'capturebrief_fy2027_archive_growth_boundary_v1.json').read_text())
+        lead = pack['adjacent_original_source_discovery']
+        self.assertEqual(lead['catalog_item'], 'ContractOpportunitiesFullCSV.csv')
+        self.assertTrue(lead['catalog_url'].startswith('https://sam.gov/data-services/'))
+        self.assertEqual(lead['cohort'], 'CURRENT_DAILY_PUBLIC_NOT_FY2027_ARCHIVED_HISTORY')
+        self.assertNotEqual(lead['cohort'], pack['source_effective_scope'])
+        self.assertFalse(lead['source_bytes_acquired'])
+        self.assertIsNone(lead['source_response_sha256'])
+        self.assertIsNone(lead['source_row_count'])
+        self.assertEqual(lead['independent_positive_labels'], 0)
+        self.assertEqual(lead['independent_negative_labels'], 0)
+        self.assertIn('COMMERCIAL_REUSE_NOT_CLEARED', lead['rights_classification'])
+        self.assertIn('NO_ACTIVE_DAILY_TO_ARCHIVE_CHRONOLOGY_SUBSTITUTION',
+                      lead['compliance_controls'])
+        self.assertFalse(pack['rights_and_truth']['commercial_scoring_allowed'])
+
+    def test_degraded_same_day_cache_and_next_utc_day_replay_are_source_bounded(self):
+        # Wholly SYNTHETIC controls. Never contacts SAM.gov or persists raw IDs.
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        controls = {case["id"]: case for case in pack["synthetic_controls"]}
+        self.assertEqual(
+            controls["SYNTHETIC_DEGRADED_RECEIPT_SAME_UTC_DAY"]["expected"],
+            "CACHE_DEGRADED_SAME_UTC_DAY_NEXT_DAY_BOUNDED_FETCH_ELIGIBLE",
+        )
+        self.assertIsNone(
+            controls["SYNTHETIC_SAM_SAME_ORIGIN_AWARD_METADATA"]["true_independent_award_label"]
+        )
+        self.assertEqual(
+            pack["documentation_controls"]["original_notice_version_history_completeness"],
+            "UNKNOWN_NOT_VERIFIED",
+        )
+        self.assertFalse(
+            pack["documentation_controls"]["original_source_bytes_retrieved_by_this_update"]
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "synthetic-failed-receipt.json"
+            calls = []
+
+            def unavailable():
+                calls.append("SYNTHETIC-GET")
+                raise ResearchError("SOURCE_TOO_LARGE")
+
+            first_at = datetime(2026, 10, 30, 2, 11, 33, tzinfo=timezone.utc)
+            first = run(output=target, fetcher=unavailable, now=first_at)
+            self.assertEqual(first["source_status"], STATUS_DEGRADED)
+            self.assertEqual(first["source_error_codes"], ["SOURCE_TOO_LARGE"])
+            original_receipt = target.read_bytes()
+
+            def unexpected_fetch():
+                raise AssertionError("same UTC day must not refetch valid degraded receipt")
+
+            same_day = datetime(2026, 10, 30, 23, 59, 59, tzinfo=timezone.utc)
+            cached = run(output=target, fetcher=unexpected_fetch, now=same_day)
+            self.assertEqual(cached["source_error_codes"], ["SOURCE_TOO_LARGE"])
+            self.assertEqual(target.read_bytes(), original_receipt)
+            self.assertEqual(calls, ["SYNTHETIC-GET"])
+
+            def next_day_synthetic_fetch():
+                calls.append("SYNTHETIC-GET")
+                return archive()
+
+            next_utc_day = datetime(2026, 10, 31, 0, 0, 1, tzinfo=timezone.utc)
+            new_receipt = run(output=target, fetcher=next_day_synthetic_fetch,
+                              now=next_utc_day)
+            self.assertEqual(new_receipt["source_status"], STATUS_OK)
+            self.assertEqual(new_receipt["source_rows"], 3)
+            self.assertEqual(calls, ["SYNTHETIC-GET", "SYNTHETIC-GET"])
+            self.assertEqual(
+                json.loads(target.read_text(encoding="utf-8"))[
+                    "independent_cross_source_award_outcomes"], 0,
+            )
+
+    def test_unframed_csv_prefix_metadata_is_not_promoted_to_verified_truth(self):
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        controls = {x["id"]: x for x in pack["synthetic_controls"]}
+        case = controls["SYNTHETIC_UNFRAMED_COMPLETE_CSV_PREFIX"]
+        self.assertEqual(case["expected"], "SOURCE_INCOMPLETE")
+        self.assertEqual(case["candidate_state"], "REPAIRED_BY_EXPLICIT_TRANSPORT_FRAMING")
+        self.assertIsNone(case["true_independent_award_label"])
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+        self.assertEqual(pack["documentation_controls"]["current_source_framing"],
+                         "UNKNOWN_NO_NEW_SOURCE_READ")
+
+    def test_unframed_csv_prefix_is_rejected_even_if_csv_schema_parses(self):
+        # Synthetic valid CSV prefix with no HTTP completion proof.
+        full = archive()
+        prefix = b"".join(full.splitlines(keepends=True)[:-1])
+        self.assertLess(len(prefix), len(full))
+        self.assertEqual(parse_archive(prefix, observed_at=NOW)["source_rows"], 2)
+
+        class Response:
+            status = 200
+            headers = {"Content-Type": "text/csv",
+                       "Content-Encoding": "identity"}
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def geturl(self): return SOURCE_URL
+            def read(self, n): return prefix
+
+        class Opener:
+            def open(self, req, timeout): return Response()
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener()):
+            with self.assertRaisesRegex(ResearchError, "SOURCE_INCOMPLETE"):
+                fetch_original()
+
+    def test_complete_chunked_http11_transfer_remains_accepted(self):
+        # Real HTTP/1.1 framing semantics, wholly SYNTHETIC bytes, no network.
+        # Positive compatibility guard for the two unresolved completeness xfails.
+        from http.client import HTTPResponse
+        from urllib.response import addinfourl
+
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        case = next(x for x in pack["synthetic_controls"]
+                    if x["id"] == "SYNTHETIC_COMPLETE_CHUNKED_TRANSFER")
+        self.assertEqual(case["expected"], STATUS_OK)
+        self.assertIsNone(case["true_independent_award_label"])
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+
+        source = archive()
+        wire = (
+            b"HTTP/1.1 200 OK\r\n"
+            b"Content-Type: text/csv\r\n"
+            b"Content-Encoding: identity\r\n"
+            b"Transfer-Encoding: chunked\r\n\r\n"
+            + f"{len(source):X}\r\n".encode("ascii")
+            + source + b"\r\n0\r\n\r\n"
+        )
+        self_outer = self
+
+        class Socket:
+            def makefile(self, mode):
+                self_outer.assertEqual(mode, "rb")
+                return io.BytesIO(wire)
+
+        raw_http = HTTPResponse(Socket())
+        raw_http.begin()
+        self.assertTrue(raw_http.chunked)
+        self.assertIsNone(raw_http.length)
+
+        class Opener:
+            def open(self, req, timeout):
+                self_outer.assertEqual(req.full_url, SOURCE_URL)
+                self_outer.assertEqual(req.get_method(), "GET")
+                return addinfourl(raw_http, raw_http.headers, SOURCE_URL,
+                                   raw_http.status)
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener()):
+            self.assertEqual(fetch_original(), source)
+
+        observed = build_receipt(observed_at=NOW, fetcher=lambda: source)
+        self.assertEqual(observed["source_status"], STATUS_OK)
+        self.assertEqual(observed["source_rows"], 3)
+        self.assertEqual(observed["independent_cross_source_award_outcomes"], 0)
+        self.assertEqual(observed["original_opportunity_ids_persisted"], 0)
+
+    def test_chunked_incomplete_read_degrades_not_uncaught(self):
+        # SYNTHETIC interrupted HTTP/1.1 chunked body: no publisher GET.
+        from http.client import IncompleteRead
+
+        pack_path = Path(__file__).with_name("fixtures") / (
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        )
+        pack = json.loads(pack_path.read_text(encoding="utf-8"))
+        control = next(x for x in pack["synthetic_controls"]
+                       if x["id"] == "SYNTHETIC_TRUNCATED_CHUNKED_TRANSFER")
+        self.assertEqual(control["expected"], "SOURCE_INCOMPLETE")
+        self.assertEqual(control["candidate_state"],
+                         "REPAIRED_BY_INCOMPLETE_READ_MAPPING")
+        self.assertIsNone(control["true_independent_award_label"])
+
+        read_calls = []
+        class Response:
+            status = 200
+            chunked = True
+            headers = {"Content-Type": "text/csv",
+                       "Content-Encoding": "identity",
+                       "Transfer-Encoding": "chunked"}
+            def __enter__(self): return self
+            def __exit__(self, *_): return None
+            def geturl(self): return SOURCE_URL
+            def read(self, n):
+                read_calls.append(n)
+                self_outer.assertEqual(n, MAX_ORIGINAL_BYTES + 1)
+                raise IncompleteRead(b"SYNTHETIC-TRUNCATED-BODY", 50)
+
+        self_outer = self
+        class Opener:
+            def open(self, req, timeout): return Response()
+
+        with patch("freight.capturebrief_sam_fy2027_asof.global_dns"), \
+             patch("freight.capturebrief_sam_fy2027_asof.build_opener",
+                   return_value=Opener()):
+            receipt = build_receipt(observed_at=NOW)
+        self.assertEqual(receipt["source_status"], STATUS_DEGRADED)
+        self.assertEqual(receipt["source_error_codes"], ["SOURCE_INCOMPLETE"])
+        self.assertEqual(read_calls, [MAX_ORIGINAL_BYTES + 1])
+
+    def test_chunked_header_only_and_conflicting_length_fail_closed(self):
+        # Both transport attacks are SYNTHETIC: no original notice fetched.
+        pack = json.loads((Path(__file__).with_name('fixtures') /
+            'capturebrief_fy2027_archive_growth_boundary_v1.json').read_text())
+        control_ids = {c['id'] for c in pack['synthetic_controls']}
+        self.assertIn('SYNTHETIC_FORGED_CHUNKED_HEADER', control_ids)
+        self.assertIn('SYNTHETIC_DUAL_LENGTH_TRANSFER_FRAMING', control_ids)
+        data = archive()
+        for content_length, chunked_reader in ((None, False), (len(data), True)):
+            with self.subTest(content_length=content_length):
+                headers = {'Content-Type': 'text/csv',
+                           'Content-Encoding': 'identity',
+                           'Transfer-Encoding': 'chunked'}
+                if content_length is not None:
+                    headers['Content-Length'] = str(content_length)
+                class Response:
+                    status = 200
+                    chunked = chunked_reader
+                    def __enter__(self): return self
+                    def __exit__(self, *_): return None
+                    def geturl(self): return SOURCE_URL
+                    def read(self, n):
+                        raise AssertionError('must reject before read')
+                response = Response()
+                response.headers = headers
+                class Opener:
+                    def open(self, req, timeout): return response
+                with patch('freight.capturebrief_sam_fy2027_asof.global_dns'):
+                    with patch('freight.capturebrief_sam_fy2027_asof.build_opener',
+                               return_value=Opener()):
+                        with self.assertRaisesRegex(ResearchError, 'SOURCE_INCOMPLETE'):
+                            fetch_original()
+
     def test_truncated_response_cannot_be_treated_as_complete_bytes(self):
         data=archive()
         class Response:
@@ -302,6 +631,255 @@ class SamArchiveAsOfTests(unittest.TestCase):
             with self.assertRaisesRegex(ResearchError,"SOURCE_INCOMPLETE"):
                 fetch_original()
 
+
+    def test_gsa_public_opportunities_history_documentation_guard(self):
+        # GSA first-party documented coverage, NOT acquired SAM notices.
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json").read_text(encoding="utf-8"))
+        d = pack["opportunities_api_version_history_evidence"]
+        self.assertEqual(d["first_party_documentation_url"],
+                         "https://open.gsa.gov/api/get-opportunities-public-api/")
+        self.assertEqual(d["first_party_public_api_endpoint"],
+                         "https://api.sam.gov/opportunities/v2/search")
+        self.assertEqual(d["documented_api_history_scope"],
+                         "LATEST_ACTIVE_VERSION_ONLY_NOT_COMPLETE_VERSION_HISTORY")
+        self.assertEqual(d["documented_active_notice_update_cadence"], "DAILY")
+        self.assertEqual(d["documented_archived_notice_update_cadence"], "WEEKLY")
+        self.assertEqual(d["documented_status_filter"],
+                         "COMING_SOON_NOT_CONFIRMED_OPERATIONAL")
+        self.assertTrue(d["documented_date_required"])
+        self.assertEqual(d["documented_posted_date_from_to_max_range"], "ONE_YEAR")
+        self.assertIn("postedFrom", d["scope_and_schema"])
+        self.assertIn("postedTo", d["scope_and_schema"])
+        self.assertEqual(d["real_fy2027_notice_rows_from_this_source"], 0)
+        self.assertEqual(d["independently_heldout_real_notice_version_change_labels"], 0)
+        self.assertEqual(d["independent_preaward_notice_to_award_labels"], 0)
+        self.assertIsNone(d["documentation_raw_http_response_sha256"])
+        self.assertFalse(d["documentation_raw_response_bytes_retained"])
+        self.assertEqual(d["publisher_effective_revision_date"], "UNKNOWN_NOT_ATTESTED")
+        self.assertEqual(d["source_specific_data_reuse_and_third_party_commercial_rights"],
+                         "UNKNOWN_NOT_APPROVED")
+        self.assertFalse(d["legacy_15_lab_consolidation_verified"])
+        self.assertFalse(pack["rights_and_truth"]["commercial_scoring_allowed"])
+
+    def test_gsa_history_negative_controls_vs_unsafe_baseline(self):
+        # Benchmark readiness only: these are SYNTHETIC, not real outcomes.
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json").read_text(encoding="utf-8"))
+        controls = pack["opportunities_api_history_synthetic_controls"]
+        self.assertEqual(len(controls), 4)
+        ids = [c["id"] for c in controls]
+        self.assertEqual(len(set(ids)), 4)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 3)
+        self.assertEqual(sum(c["split"] == "synthetic_calibration" for c in controls), 1)
+        for control in controls:
+            with self.subTest(case=control["id"]):
+                self.assertTrue(control["id"].startswith("SYN_"))
+                self.assertEqual(control["provenance"],
+                                 "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_NOTICE")
+                self.assertIsNone(control["independent_real_label"])
+                self.assertTrue(control["expected_guard"].startswith("UNKNOWN_"))
+                # RED = naive certainty. GREEN = source-aware UNKNOWN.
+                self.assertNotEqual(control["unsafe_inference"], control["expected_guard"])
+        self.assertEqual(pack["rights_and_truth"]["independent_holdout_award_cases"], 0)
+        self.assertEqual(pack["rights_and_truth"]["independent_cross_source_outcomes"], 0)
+        self.assertIsNone(pack["observation"]["source_byte_sha256"])
+        self.assertEqual(pack["repair_evidence"]["new_original_source_calls"], 0)
+
+    def test_gsa_history_false_label_promotion_is_not_benchmark_ready(self):
+        pack = json.loads((Path(__file__).with_name("fixtures") /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json").read_text(encoding="utf-8"))
+        def independent_truth_ready(d):
+            h = d["opportunities_api_version_history_evidence"]
+            return (h["real_fy2027_notice_rows_from_this_source"] > 0
+                    and h["independently_heldout_real_notice_version_change_labels"] > 0
+                    and h["documentation_raw_http_response_sha256"] is not None
+                    and d["rights_and_truth"]["commercial_scoring_allowed"])
+        self.assertFalse(independent_truth_ready(pack))
+        forged = copy.deepcopy(pack)
+        forged["opportunities_api_version_history_evidence"][
+            "independently_heldout_real_notice_version_change_labels"] = 5
+        # A fabricated positive label does not overcome missing original bytes/rights.
+        self.assertFalse(independent_truth_ready(forged))
+
+
+
+class USASpendingPublisherAwardBoundaryV1Tests(unittest.TestCase):
+    """Two public publisher-page metadata examples, never an award accuracy benchmark."""
+
+    @staticmethod
+    def _pack():
+        return json.loads((Path(__file__).with_name("fixtures") /
+            "usaspending_reported_award_cross_source_boundary_v1.json").read_text(encoding="utf-8"))
+
+    def test_real_reported_awards_have_source_urls_but_no_original_bytes_or_ground_truth(self):
+        x=self._pack()
+        self.assertEqual(x["schema_version"],1)
+        self.assertEqual(x["publisher_scope"]["sample_count"],2)
+        self.assertEqual(x["publisher_scope"]["independently_matched_notice_award_pairs"],0)
+        self.assertEqual(x["publisher_scope"]["independently_adjudicated_award_outcomes"],0)
+        self.assertEqual(x["publisher_scope"]["independent_real_negative_labels"],0)
+        self.assertEqual(x["publisher_scope"]["independent_real_positive_labels"],0)
+        self.assertIsNone(x["publisher_scope"]["measured_precision"])
+        self.assertFalse(x["rights"]["commercial_scoring_allowed"])
+        self.assertFalse(x["original_http_response_bytes_collected"])
+        self.assertIsNone(x["original_publisher_http_body_sha256"])
+        self.assertIsNone(x["original_publisher_http_body_byte_length"])
+        self.assertEqual(len(x["real_publisher_page_observations"]),2)
+        for record in x["real_publisher_page_observations"]:
+            self.assertTrue(record["source_url"].startswith("https://www.usaspending.gov/award/"))
+            self.assertTrue(record["source_url"].endswith(record["award_unique_key"]))
+            self.assertIsNone(record["award_signed_date"])
+            self.assertIsNone(record["pre_award_source_observation_sha256"])
+            self.assertIsNone(record["independently_verified_sam_notice_id"])
+            self.assertIsNone(record["independent_adjudication_label"])
+            self.assertIsNone(record["independently_verified_cash"])
+
+    def test_obligation_outlay_and_period_dates_cannot_be_promoted_to_cash_or_fy2027_notice(self):
+        from decimal import Decimal
+        x=self._pack()
+        records={r["piid"]:r for r in x["real_publisher_page_observations"]}
+        doe=records["89703026FAR000022"]
+        faa=records["6973GH24F00956"]
+        self.assertEqual(doe["period_of_performance_start_date"],"2026-09-16")
+        self.assertEqual(doe["period_of_performance_current_end_date"],"2027-09-25")
+        self.assertEqual(Decimal(doe["obligated_amount_usd"]),Decimal("29000.00"))
+        self.assertEqual(Decimal(doe["outlayed_amount_usd"]),Decimal("0.00"))
+        self.assertEqual(faa["period_of_performance_start_date"],"2024-07-24")
+        self.assertEqual(faa["period_of_performance_current_end_date"],"2029-08-31")
+        self.assertEqual(Decimal(faa["obligated_amount_usd"]),Decimal("1454413.80"))
+        self.assertEqual(Decimal(faa["outlayed_amount_usd"]),Decimal("899473.19"))
+        for r in records.values():
+            self.assertNotEqual(Decimal(r["obligated_amount_usd"]),
+                                Decimal(r["outlayed_amount_usd"]))
+            self.assertIsNone(r["independently_verified_sam_notice_id"])
+            self.assertIsNone(r["independently_verified_cash"])
+
+    def test_synthetic_adversarial_controls_are_not_independent_holdout_cases(self):
+        x=self._pack()
+        controls=x["synthetic_controls"]
+        self.assertEqual(len(controls),8)
+        self.assertEqual(len({c["id"] for c in controls}),8)
+        self.assertEqual(sum(c["split"]=="synthetic_holdout" for c in controls),5)
+        self.assertEqual(sum(c["split"]=="calibration" for c in controls),3)
+        self.assertTrue(all(c["kind"]=="SYNTHETIC_NOT_AN_ORIGINAL_AWARD_RECORD"
+                            for c in controls))
+        self.assertTrue(all(c["independent_real_label"] is None for c in controls))
+        self.assertTrue(all(c["expected_guard_result"] in ("UNKNOWN","REJECT")
+                            for c in controls))
+        self.assertEqual(x["quality_and_dedup"]["independent_heldout_real_outcome_count"],0)
+        self.assertEqual(x["quality_and_dedup"]["synthetic_holdout_count"],5)
+        self.assertEqual(x["quality_and_dedup"]["original_publisher_byte_sha256_status"],
+                         "UNKNOWN_NOT_ACQUIRED")
+
+    def test_negative_controls_expose_naive_claim_as_proof_but_not_engine_accuracy(self):
+        x=self._pack()
+        controls=x["synthetic_controls"]
+        naive_claims=["CLAIM_PROVED" for _ in controls]  # SYNTHETIC counterfactual
+        guarded=[c["expected_guard_result"] for c in controls]
+        self.assertEqual(sum(a!=b for a,b in zip(naive_claims,guarded)),8)
+        self.assertEqual(sum(v not in ("UNKNOWN","REJECT") for v in guarded),0)
+        self.assertEqual(x["publisher_scope"]["independent_real_positive_labels"],0)
+        self.assertEqual(x["publisher_scope"]["independent_real_negative_labels"],0)
+        self.assertIsNone(x["publisher_scope"]["measured_recall"])
+
+    def test_publisher_key_dedup_and_malformed_cross_source_promotion_are_rejected(self):
+        x=self._pack()
+        records=x["real_publisher_page_observations"]
+        keys=[r["award_unique_key"] for r in records]
+        self.assertEqual(len(set(keys)),2)
+        self.assertEqual(len(set(keys + keys[:1])),2)
+        self.assertEqual(x["quality_and_dedup"]["observed_distinct_publisher_award_keys"],2)
+        self.assertEqual(len(set(r["source_url"].split("/")[2] for r in records)),1)
+        self.assertFalse(x["restrictions"]["legacy_15_lab_consolidation_certified"])
+        self.assertFalse(x["restrictions"]["no_engine_code_changes"] is False)
+        tampered=copy.deepcopy(x)
+        tampered["publisher_scope"]["independently_matched_notice_award_pairs"]=1
+        def is_eligible_for_real_award_benchmark(pack):
+            return (
+                pack["publisher_scope"]["independently_matched_notice_award_pairs"]>0
+                and all(r["pre_award_source_observation_sha256"] is not None
+                        and r["independent_adjudication_label"] is not None
+                        for r in pack["real_publisher_page_observations"])
+            )
+        self.assertFalse(is_eligible_for_real_award_benchmark(x))
+        self.assertFalse(is_eligible_for_real_award_benchmark(tampered))
+
+
+
+class CaptureBriefPriorFullArchiveByteProvenanceTests(unittest.TestCase):
+    """Cross-repo ORIGINAL-byte receipt reuse without any new SAM download."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(
+            (Path(__file__).with_name("fixtures") /
+             "capturebrief_fy2027_archive_growth_boundary_v1.json")
+            .read_text(encoding="utf-8"))
+
+    def test_historical_original_byte_observation_has_pinned_custody_reference(self):
+        d = self.pack
+        h = d["historical_original_full_byte_receipt"]
+        self.assertEqual(h["first_party_source_url"], d["source_url"])
+        self.assertEqual(h["original_http_sha256_reported"], PREVIOUS_PUBLIC_REFERENCE_SHA256)
+        self.assertEqual(h["original_http_status"], 200)
+        self.assertEqual(h["original_http_byte_size_reported"], 1607260)
+        self.assertEqual(h["original_csv_data_rows_reported"], 1104)
+        self.assertTrue(h["original_required_headers_reported_present"])
+        self.assertEqual(h["receipt_blob_git_sha1"],
+                         "3975380b25b168398c6a7b0012f03bab90471f30")
+        self.assertEqual(h["gh_run_commit"],
+                         "7f4dad8de34eb1570e5f936664577c81bf7e451e")
+        self.assertIn("/capturebrief/actions/runs/39205786451", h["gh_run_url"])
+        self.assertEqual(h["publisher_last_modified_utc"], "2026-10-18T14:51:03Z")
+        self.assertEqual(h["observed_utc"][:10], "2026-10-19")
+        self.assertFalse(h["original_sha256_recomputed_by_unified_lab_this_cycle"])
+
+    def test_old_success_does_not_promote_current_writer_failure(self):
+        h = self.pack["historical_original_full_byte_receipt"]
+        current = self.pack["repair_evidence"]["reused_existing_writer_receipt"]
+        self.assertEqual(current["status"], "SOURCE_TOO_LARGE")
+        self.assertEqual(h["latest_unified_writer_state"], current["status"])
+        self.assertIsNone(current["original_source_byte_sha256"])
+        self.assertIsNone(h["current_2026_10_31_source_sha256"])
+        self.assertFalse(h["historical_original_bytes_are_current_source_bytes"])
+        self.assertFalse(h["raw_bytes_durably_retained"])
+        self.assertFalse(h["commercial_reuse_authorized"])
+        self.assertEqual(h["independently_heldout_real_award_labels"], 0)
+        self.assertEqual(h["independently_matched_award_outcomes"], 0)
+        self.assertFalse(self.pack["rights_and_truth"]["commercial_scoring_allowed"])
+
+    def test_five_synthetic_historical_claims_fail_closed(self):
+        controls = self.pack["historical_full_byte_synthetic_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertEqual(sum(c["split"] == "synthetic_holdout" for c in controls), 4)
+        for c in controls:
+            with self.subTest(c=c["id"]):
+                self.assertEqual(c["provenance"],
+                                 "RESEARCH_AUTHORED_SYNTHETIC_NOT_AN_ORIGINAL_NOTICE")
+                self.assertIsNone(c["independent_real_label"])
+                self.assertTrue(c["expected_guard"].startswith("UNKNOWN_"))
+                self.assertNotEqual(c["unsafe_inference"], c["expected_guard"])
+        self.assertIsNone(self.pack["historical_full_byte_quality"]["real_test_accuracy"])
+
+    def test_false_byte_hash_promotion_and_label_forgery_are_not_benchmark_ready(self):
+        d = self.pack
+        h = d["historical_original_full_byte_receipt"]
+        def ready(pack):
+            x = pack["historical_original_full_byte_receipt"]
+            return (x["current_2026_10_31_source_sha256"] is not None
+                    and x["original_sha256_recomputed_by_unified_lab_this_cycle"]
+                    and x["raw_bytes_durably_retained"]
+                    and x["independently_heldout_real_award_labels"] > 0
+                    and x["commercial_reuse_authorized"])
+        self.assertFalse(ready(d))
+        forged = copy.deepcopy(d)
+        forged["historical_original_full_byte_receipt"]["current_2026_10_31_source_sha256"] = h["original_http_sha256_reported"]
+        forged["historical_original_full_byte_receipt"]["independently_heldout_real_award_labels"] = 10
+        self.assertFalse(ready(forged))
+        self.assertEqual(d["historical_full_byte_quality"]["original_csv_rows_new"], 0)
+        self.assertFalse(d["historical_full_byte_quality"]["fifteen_legacy_labs_consolidated"])
 
 if __name__=="__main__":
     unittest.main()
