@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Mapping
-from datetime import date
 from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -246,10 +245,12 @@ def validate_public_text_bundle(files: Mapping[str,str], *,site: str)->dict:
     for name,expected in REQUIRED_LABELS[site].items():
         if name not in normalized:
             raise PublicClaimViolation("M36_REQUIRED_SYNTHETIC_EXAMPLE_PAGE_MISSING:"+name)
-        for phrase in expected:
+        for label_number,phrase in enumerate(expected,1):
             if phrase not in normalized[name]:
+                # Only stable policy label index, never untrusted source text.
                 raise PublicClaimViolation(
-                    "M36_FICTIONAL_SAMPLE_OR_FEE_ILLUSTRATION_DISCLOSURE_MISSING:"+name
+                    "M36_FICTIONAL_SAMPLE_OR_FEE_ILLUSTRATION_DISCLOSURE_MISSING:"+name+
+                    f":label-{label_number}"
                 )
     for name,text in normalized.items():
         for code,pattern in UNSUPPORTED:
