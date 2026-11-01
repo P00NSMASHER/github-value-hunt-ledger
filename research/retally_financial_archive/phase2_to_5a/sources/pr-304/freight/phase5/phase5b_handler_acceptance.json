@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "observed_date": "2026-10-08",
+  "scope": "UNPUBLISHED_FLOOT_QA_REPLAY_ACCEPTANCE",
+  "source": "READ_ONLY_DB_INSPECTION_AND_SYNTHETIC_HTTP_REQUESTS",
+  "independent_signature_verified": false,
+  "environments": {
+    "production": {
+      "project_id": "c719b60c-9b3b-4193-a543-0be9d3ceaef2",
+      "postgres_system_id": "7693746749463444100",
+      "writes_performed": 0
+    },
+    "qa": {
+      "project_id": "7257eaf3-a4d7-43db-9136-fe81e5df35bf",
+      "postgres_system_id": "7694294930552894346",
+      "published": false,
+      "connection": "separate_postgres_cluster"
+    }
+  },
+  "implementation": {
+    "actual_handler": "endpoints/recovery/payment_event_POST.ts",
+    "production_source_version": "1791467756188",
+    "source_parity": [
+      "endpoints/recovery/payment_event_POST.ts",
+      "helpers/recoveryPaymentReplay.tsx",
+      "helpers/recoveryHash.tsx"
+    ],
+    "all_three_copied_sources_equal_after_normalizing_terminal_newline": true,
+    "qa_differences": [
+      "mock_authentication_in_helpers/recoveryTenant.tsx",
+      "synthetic_public_payment_schema",
+      "no real carrier/bank/accounting connectors"
+    ],
+    "hosted_production_equivalence": false
+  },
+  "observations": [
+    {
+      "id": "PG_SINGLE_AND_REPLAY",
+      "layer": "POSTGRESQL_QA",
+      "initial_event_id": "8",
+      "sequential_replay_same_id": true,
+      "parallel_retries": 8,
+      "parallel_retry_ids": [
+        "8"
+      ],
+      "db_rows_for_initial_ref": 1,
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "PG_CONCURRENT_INITIAL",
+      "layer": "POSTGRESQL_QA",
+      "requests": 16,
+      "insertions": 1,
+      "replays": 15,
+      "unique_event_ids": [
+        "10"
+      ],
+      "db_row_count": 1,
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "PG_CONCURRENT_CONFLICT",
+      "layer": "POSTGRESQL_QA",
+      "requests": 2,
+      "committed": 1,
+      "rejected_conflicting_reference": 1,
+      "observed_error": "CONFLICTING_PROVIDER_REFERENCE_REPLAY",
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "PG_HISTORICAL_REPLAY",
+      "layer": "POSTGRESQL_QA",
+      "sequence": [
+        "SUBMITTED",
+        "ACCEPTED",
+        "SETTLED",
+        "REVERSED"
+      ],
+      "original_submission_id": "8",
+      "replay_id": "8",
+      "event_count": 4,
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "PG_UNKNOWN_OUTCOME",
+      "layer": "POSTGRESQL_QA",
+      "sequence": [
+        "SUBMITTED",
+        "OUTCOME_UNKNOWN"
+      ],
+      "new_submission_rejected": true,
+      "observed_error": "INVALID_PAYMENT_STATE_TRANSITION",
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "PG_SCOPING_AND_TIME",
+      "layer": "POSTGRESQL_QA",
+      "cross_tenant_same_provider_reference_allowed_under_distinct_instruction": true,
+      "unauthorized_tenant_rejected": true,
+      "stale_event_rejected": true,
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "REAL_HANDLER_12_DUPLICATES",
+      "layer": "ACTUAL_TYPESCRIPT_HANDLER_IN_QA",
+      "requests": 12,
+      "http_200": 12,
+      "unique_event_ids": [
+        "pe_kxBPID4hg6Il4dBoxw"
+      ],
+      "unique_hash_count": 1,
+      "db_rows": 1,
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "REAL_HANDLER_FIRST_TRANSITION_RACE",
+      "layer": "ACTUAL_TYPESCRIPT_HANDLER_IN_QA",
+      "requests": 2,
+      "http_200": 1,
+      "http_400": 1,
+      "observed_rejection": "Invalid payment transition SUBMITTED -> SUBMITTED",
+      "unique_event_ids": [
+        "pe_dAMY0X3Xbp94o5eRpB"
+      ],
+      "db_rows": 1,
+      "status": "PASS_IN_SCOPE"
+    },
+    {
+      "id": "REAL_HANDLER_LIFECYCLE_AND_REPLAY",
+      "layer": "ACTUAL_TYPESCRIPT_HANDLER_IN_QA",
+      "states": [
+        "SUBMITTED",
+        "ACCEPTED",
+        "SETTLED",
+        "REVERSED"
+      ],
+      "durable_event_count": 4,
+      "original_submission_id": "pe_kxBPID4hg6Il4dBoxw",
+      "historical_replay_same_id": true,
+      "source_digest_conflict_http_status": 400,
+      "cross_tenant_lookup_http_status": 400,
+      "status": "PASS_IN_SCOPE"
+    }
+  ],
+  "resolved_test_harness_failures": [
+    {
+      "id": "INITIAL_20_CALLBACKS",
+      "finding": "JavaScript harness serialized an undefined helper return; follow-up then observed zero events at that checkpoint",
+      "resolution": "Use Floot execute_sql for mutation-bearing SELECT function calls and query database rows separately",
+      "classification": "HARNESS_FAILURE_NOT_DATABASE_PASS"
+    },
+    {
+      "id": "UNAUTHORIZED_16_CALLBACKS",
+      "finding": "16 requests failed after another worker introduced an actor authorization table",
+      "resolution": "Inspect live function, authorize SIM-only QA actor explicitly, rerun 16-request concurrency batch",
+      "classification": "FAIL_CLOSED_POLICY_WORKING"
+    }
+  ],
+  "limits": {
+    "source_assertions": "TEST_ONLY",
+    "qa_authentication": "STRICT_FAKE_QA_HEADERS",
+    "real_bank_carrier_evidence": false,
+    "verified_customer_realized_cash": false,
+    "hosted_exact_prod_auth_parity": false,
+    "hosted_exact_prod_schema_parity": false,
+    "production_deployed": false,
+    "real_customer_revenue_cents": 0,
+    "historical_open_findings": 26,
+    "historical_findings_closed_by_this_receipt": 0,
+    "external_attestation": false
+  },
+  "notes": "Manually observed connector results. This file is evidence inventory, not a signed external audit. Test outcomes are scoped to isolated synthetic QA at the observed project version. A provider SETTLED event is not customer received money."
+}

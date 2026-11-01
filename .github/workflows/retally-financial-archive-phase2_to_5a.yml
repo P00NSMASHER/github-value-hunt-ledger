@@ -1,0 +1,16 @@
+name: RETALLY historical financial archive phase2_to_5a integrity
+on:
+  pull_request:
+    paths:
+      - 'research/retally_financial_archive/phase2_to_5a/**'
+      - '.github/workflows/retally-financial-archive-phase2_to_5a.yml'
+permissions:
+  contents: read
+jobs:
+  archive-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify only historical Git blob integrity
+        run: python3 research/retally_financial_archive/phase2_to_5a/verify_archive.py

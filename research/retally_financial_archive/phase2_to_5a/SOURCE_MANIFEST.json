@@ -1,0 +1,642 @@
+{
+  "schema": 1,
+  "authority": "HISTORICAL_RESEARCH_ONLY_NO_CUSTOMER_OR_FINANCIAL_RELEASE",
+  "batch": "phase2_to_5a",
+  "archive_draft_only": true,
+  "source_pr_count": 9,
+  "source_file_count": 72,
+  "sources": [
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "base": "research/freight-lab-audit-donor-ledger-20261008",
+      "file_count": 10
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "base": "research/retally-lab-intelligence-v1-20261008",
+      "file_count": 6
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "base": "research/retally-lab-phase2-financial-v1-20261008",
+      "file_count": 14
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "base": "research/retally-phase2-authority-integration-20261008",
+      "file_count": 14
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "base": "research/retally-phase3-commercial-staging-execution-20261008",
+      "file_count": 9
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "base": "main",
+      "file_count": 6
+    },
+    {
+      "pr": 301,
+      "head": "38f8572410c5b788d39cb95fbf31869ae888ce65",
+      "base": "research/retally-phase4-experiment-director-20261008",
+      "file_count": 5
+    },
+    {
+      "pr": 302,
+      "head": "eae643ba0e36d368aec0624441f0219025fca20b",
+      "base": "research/retally-phase4-experiment-director-20261008",
+      "file_count": 3
+    },
+    {
+      "pr": 304,
+      "head": "ca04bae2faf6ea674182a08a226eb9b44a2331f0",
+      "base": "research/retally-phase5-pg-staging-20261008",
+      "file_count": 5
+    }
+  ],
+  "artifacts": [
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": ".github/workflows/freight-lab-intelligence.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/.github/workflows/freight-lab-intelligence.yml",
+      "sha": "16a7009287774da976045fc4513105fe5fe67988",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/LAB_INTELLIGENCE_V1.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/LAB_INTELLIGENCE_V1.md",
+      "sha": "d06c5931fda66419db599893fb38fcdc3cf312a4",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/lab_archive_repairs/README.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/lab_archive_repairs/README.md",
+      "sha": "d53da44a9e32a87d1add1277d8be7c149a767d94",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/lab_archive_repairs/STAGING_ENTRYPOINT.patch",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/lab_archive_repairs/STAGING_ENTRYPOINT.patch",
+      "sha": "50930165df31a69465dac51b42b4ef50a0b3c5d5",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/lab_archive_repairs/tests/test_semantic_repair.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/lab_archive_repairs/tests/test_semantic_repair.py",
+      "sha": "86f45316a1a3e520997f3e1968362ddb4d5d1d03",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/lab_archive_repairs/unified/semantic_verify.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/lab_archive_repairs/unified/semantic_verify.py",
+      "sha": "c39988a64ab01d40beab8c8057cec62812c75cd8",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/lab_intelligence.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/lab_intelligence.py",
+      "sha": "976e209a2de9e202d5325a8ef80c65a4bfe020f8",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/lab_intelligence_runner.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/lab_intelligence_runner.py",
+      "sha": "0a5bda205468b722465ca10dc6f8066b6c457d41",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/test_lab_intelligence.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/test_lab_intelligence.py",
+      "sha": "9b6bd0462ca2177f5f487da599df14aba9cf126d",
+      "status": "added"
+    },
+    {
+      "pr": 284,
+      "head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+      "original_path": "freight/test_lab_intelligence_runner.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-284/freight/test_lab_intelligence_runner.py",
+      "sha": "1690fe7e1de121f5eb0fb0fc9d0632096952fe00",
+      "status": "added"
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "original_path": ".github/workflows/freight-lab-phase2.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-286/.github/workflows/freight-lab-phase2.yml",
+      "sha": "adaf8a6f6f85faf1635c0a93fef8bcde134533bd",
+      "status": "added"
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "original_path": "freight/lab_archive_repairs/phase2/PHASE2_UNIFIED_LAB.patch",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-286/freight/lab_archive_repairs/phase2/PHASE2_UNIFIED_LAB.patch",
+      "sha": "6f84c323dfeb38548540a371a00491c54968d137",
+      "status": "added"
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "original_path": "freight/lab_archive_repairs/phase2/PHASE2_VERIFY_RECEIPT.json",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-286/freight/lab_archive_repairs/phase2/PHASE2_VERIFY_RECEIPT.json",
+      "sha": "5a738b89973c943e596ced2688a269d67b333a53",
+      "status": "added"
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "original_path": "freight/lab_archive_repairs/phase2/README.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-286/freight/lab_archive_repairs/phase2/README.md",
+      "sha": "00dfd781ee7354c6146e4b7e338588ac145fbcb1",
+      "status": "added"
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "original_path": "freight/lab_archive_repairs/phase2/phase2_audit_probe.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-286/freight/lab_archive_repairs/phase2/phase2_audit_probe.py",
+      "sha": "48342c8012fe07184ed275baf1a5878ba4ee9376",
+      "status": "added"
+    },
+    {
+      "pr": 286,
+      "head": "27d7c301753bfee24152f950ac48002ef5774236",
+      "original_path": "freight/test_lab_phase2_existing_settlement_bridge.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-286/freight/test_lab_phase2_existing_settlement_bridge.py",
+      "sha": "a462231e2c0e9251f4f75920084c7606de236ce8",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": ".github/workflows/freight-lab-phase2-authority.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/.github/workflows/freight-lab-phase2-authority.yml",
+      "sha": "a48dc1f9218c9d6fae7dda9841ff34bc6168a940",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/LAB_PHASE2_AUTHORITY_CONTINUATION.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/LAB_PHASE2_AUTHORITY_CONTINUATION.md",
+      "sha": "6ca7fd90d5a6377b59dd36a077196ac8c3864c23",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/lab_assurance.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/lab_assurance.py",
+      "sha": "6840a070b379053bfe89f1814e3749b5f8d132da",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/lab_customer_scenarios.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/lab_customer_scenarios.py",
+      "sha": "2cf6bd3c349e5c77eac8fb5458d935f2030908ac",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/lab_experiment_ledger.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/lab_experiment_ledger.py",
+      "sha": "5a930b7e9998d6e36ce74e0c2b079bfaad3947ef",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/lab_operations_intelligence.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/lab_operations_intelligence.py",
+      "sha": "4a4b9caa9b685ed0cc116bc53dcb2165c75e6b9c",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/lab_phase2_demo.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/lab_phase2_demo.py",
+      "sha": "7cd8b5303ead64d7b1822b68c84a6afe5bb0d88c",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/lab_phase2_pipeline.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/lab_phase2_pipeline.py",
+      "sha": "9dc3800dd2919eec8c65687252fe5dc19f9fdbff",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/test_lab_assurance.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/test_lab_assurance.py",
+      "sha": "e0bab39a036642b7b0637417adf8e6f971a34045",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/test_lab_assurance_real_store.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/test_lab_assurance_real_store.py",
+      "sha": "0b82c2c1238126fd0f832d2b4e2a0ad99be71572",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/test_lab_customer_scenarios.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/test_lab_customer_scenarios.py",
+      "sha": "f42ba48ed56e78ea1e190af8a34bbc121de706bd",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/test_lab_experiment_ledger.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/test_lab_experiment_ledger.py",
+      "sha": "e9745487851ccaad97f0037df82d390c269eeaa0",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/test_lab_operations_intelligence.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/test_lab_operations_intelligence.py",
+      "sha": "246d2b0bfa3084c57c3c81e79606826c04f0a1f3",
+      "status": "added"
+    },
+    {
+      "pr": 288,
+      "head": "e2cb4a4a5d97167bf274d15341fbecc102ae6d5c",
+      "original_path": "freight/test_lab_phase2_pipeline.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-288/freight/test_lab_phase2_pipeline.py",
+      "sha": "1e43b5c6eeabf76ad4ff1f81427eedb736655628",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": ".github/workflows/freight-lab-phase3.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/.github/workflows/freight-lab-phase3.yml",
+      "sha": "17dc9bf17ca472b46a738f5caa8958fff9abfead",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/LAB_PHASE3_EXECUTION.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/LAB_PHASE3_EXECUTION.md",
+      "sha": "c24d250a90600b7274c74258d1f3b448de34c4be",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/lab_phase3_console.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/lab_phase3_console.py",
+      "sha": "6f1b622119b1e2392ceb91950525dc33d20aad7b",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/lab_phase3_economics.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/lab_phase3_economics.py",
+      "sha": "9db3456275b7b08fa49aec2cd2984ea695547d2a",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/lab_phase3_integration.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/lab_phase3_integration.py",
+      "sha": "2ba2e7017bf825a76bb3dcaa050327043bd7fa58",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/lab_phase3_release_manifest.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/lab_phase3_release_manifest.py",
+      "sha": "8bbe1f1f54657500f502fb659b977404a3a97350",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/lab_phase3_simulated_pilot.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/lab_phase3_simulated_pilot.py",
+      "sha": "d00ad5aa2f9754b606686cba064c476009236df4",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/lab_phase3_trust.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/lab_phase3_trust.py",
+      "sha": "9e400101c639edc6e8f3b686b55e1f88563311b9",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/test_lab_phase3_console.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/test_lab_phase3_console.py",
+      "sha": "f1055c2d91d18eb50a8a182630a4f399f1c5aa35",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/test_lab_phase3_economics.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/test_lab_phase3_economics.py",
+      "sha": "299bfcbcd6f934c9e4c99114a0749ffba7a33d95",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/test_lab_phase3_real_chain.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/test_lab_phase3_real_chain.py",
+      "sha": "5c3b52d35b10480c589586f229de2de5c76c8e4c",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/test_lab_phase3_release_manifest.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/test_lab_phase3_release_manifest.py",
+      "sha": "546b6dd88af810c99bfb36342bca6cadefac7bac",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/test_lab_phase3_simulated_pilot.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/test_lab_phase3_simulated_pilot.py",
+      "sha": "1108e75d4837798304858aa76f71e387d0b3997a",
+      "status": "added"
+    },
+    {
+      "pr": 295,
+      "head": "c617fff9d9718b3b026d4f2b774a19b19b48b8e0",
+      "original_path": "freight/test_lab_phase3_trust.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-295/freight/test_lab_phase3_trust.py",
+      "sha": "a604e99a0ca44445e6bf72afcb7ccbf668ec0b1b",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": ".github/workflows/freight-phase4.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/.github/workflows/freight-phase4.yml",
+      "sha": "d1542c9761c8325235273fc91d824b40bf88467b",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/PHASE4_EXECUTION.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/PHASE4_EXECUTION.md",
+      "sha": "11f7da6303c1c5377518d1b9092edb7c6ff06e44",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/lab_phase4_control_center.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/lab_phase4_control_center.py",
+      "sha": "6674e7818ee60b566bbb006ee0c06d68a6526b52",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/lab_phase4_director.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/lab_phase4_director.py",
+      "sha": "205bae36eb91b46e95fb589c56595049155c775f",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/lab_phase4_experiments.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/lab_phase4_experiments.py",
+      "sha": "44aacc20eff9e8f89f3627614b5e4d138383c1f4",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/lab_phase4_mock_provider.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/lab_phase4_mock_provider.py",
+      "sha": "edeb0cad6407f06004e044f7de9a26b50e2342d6",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/test_lab_phase4_director.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/test_lab_phase4_director.py",
+      "sha": "87212ce7c8ea433e24a5f11f5f202def4e183398",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/test_lab_phase4_experiments.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/test_lab_phase4_experiments.py",
+      "sha": "70c6cfdbf42198bdcfe15413f671f25fee57c321",
+      "status": "added"
+    },
+    {
+      "pr": 297,
+      "head": "6e3b49c382763f907b4778f193651d3a297b6b52",
+      "original_path": "freight/test_lab_phase4_mock_provider.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-297/freight/test_lab_phase4_mock_provider.py",
+      "sha": "cc690b0a4ecc5418045e3052cbb76c0d74224eac",
+      "status": "added"
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "original_path": ".github/workflows/recoveryos-mission7-qa.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-299/.github/workflows/recoveryos-mission7-qa.yml",
+      "sha": "6b08aa13b11c9bb127ae32010a5046147b95ddd5",
+      "status": "added"
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "original_path": "freight/mission7/ACCEPTANCE_RECORD.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-299/freight/mission7/ACCEPTANCE_RECORD.md",
+      "sha": "03dc80fa968db2d9f71d120328981dc8d3dfd2e9",
+      "status": "added"
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "original_path": "freight/mission7/README.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-299/freight/mission7/README.md",
+      "sha": "9e64331daacaf07cd492b9a73f099dc9e048d75c",
+      "status": "added"
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "original_path": "freight/mission7/staging_acceptance.sql",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-299/freight/mission7/staging_acceptance.sql",
+      "sha": "3ab3e1a26b2194a8094f70afbb0633feefec9dcb",
+      "status": "added"
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "original_path": "freight/mission7/staging_race_setup.sql",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-299/freight/mission7/staging_race_setup.sql",
+      "sha": "80a2b6437e51abcd0f2f07c90caea708f791c12f",
+      "status": "added"
+    },
+    {
+      "pr": 299,
+      "head": "97a36e2b6803518c7075f72305557d6134b330cc",
+      "original_path": "freight/mission7/staging_schema.sql",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-299/freight/mission7/staging_schema.sql",
+      "sha": "770257f1de132fab020a478440ca42998b23f592",
+      "status": "added"
+    },
+    {
+      "pr": 301,
+      "head": "38f8572410c5b788d39cb95fbf31869ae888ce65",
+      "original_path": ".github/workflows/freight-phase5.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-301/.github/workflows/freight-phase5.yml",
+      "sha": "4932212357c086807496007e5451d6b9b4ec5488",
+      "status": "added"
+    },
+    {
+      "pr": 301,
+      "head": "38f8572410c5b788d39cb95fbf31869ae888ce65",
+      "original_path": "freight/phase5/PHASE5_VERIFICATION.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-301/freight/phase5/PHASE5_VERIFICATION.md",
+      "sha": "3f1a17ab91c428a89d2e44374476b35ec72d4430",
+      "status": "added"
+    },
+    {
+      "pr": 301,
+      "head": "38f8572410c5b788d39cb95fbf31869ae888ce65",
+      "original_path": "freight/phase5/QA_STAGING_RECEIPT.json",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-301/freight/phase5/QA_STAGING_RECEIPT.json",
+      "sha": "6b75383631edd5bf125ab38cbbaaec4835f4867b",
+      "status": "added"
+    },
+    {
+      "pr": 301,
+      "head": "38f8572410c5b788d39cb95fbf31869ae888ce65",
+      "original_path": "freight/phase5/isolated_postgres.sql",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-301/freight/phase5/isolated_postgres.sql",
+      "sha": "393fd5682ea12ce1c52aa421b9e9f69f0bcfd0d2",
+      "status": "added"
+    },
+    {
+      "pr": 301,
+      "head": "38f8572410c5b788d39cb95fbf31869ae888ce65",
+      "original_path": "freight/phase5/test_isolated_postgres.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-301/freight/phase5/test_isolated_postgres.py",
+      "sha": "efe2fc463999899e8b4a930af07743f54e4e6cbf",
+      "status": "added"
+    },
+    {
+      "pr": 302,
+      "head": "eae643ba0e36d368aec0624441f0219025fca20b",
+      "original_path": ".github/workflows/freight-phase4.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-302/.github/workflows/freight-phase4.yml",
+      "sha": "794f675045c4ab1c5d25acd103f3dc8e6378a401",
+      "status": "modified"
+    },
+    {
+      "pr": 302,
+      "head": "eae643ba0e36d368aec0624441f0219025fca20b",
+      "original_path": "freight/PHASE6_POSTGRESQL_ACCEPTANCE.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-302/freight/PHASE6_POSTGRESQL_ACCEPTANCE.md",
+      "sha": "d32536973933169ab008c03b5235a4d671fe6af7",
+      "status": "added"
+    },
+    {
+      "pr": 302,
+      "head": "eae643ba0e36d368aec0624441f0219025fca20b",
+      "original_path": "freight/test_lab_phase6_postgres.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-302/freight/test_lab_phase6_postgres.py",
+      "sha": "9ddb9ddda0fed4227c71483f1a7daafa0c266a1a",
+      "status": "added"
+    },
+    {
+      "pr": 304,
+      "head": "ca04bae2faf6ea674182a08a226eb9b44a2331f0",
+      "original_path": ".github/workflows/freight-phase5b.yml",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-304/.github/workflows/freight-phase5b.yml",
+      "sha": "114d2939c02da0d5f415b15d65fb8f2e393336af",
+      "status": "added"
+    },
+    {
+      "pr": 304,
+      "head": "ca04bae2faf6ea674182a08a226eb9b44a2331f0",
+      "original_path": "freight/phase5/PHASE5B_APPLICATION_ACCEPTANCE.md",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-304/freight/phase5/PHASE5B_APPLICATION_ACCEPTANCE.md",
+      "sha": "fb4f0b5de09b4c2b5bb130eed3bd3eb4b5dc0375",
+      "status": "added"
+    },
+    {
+      "pr": 304,
+      "head": "ca04bae2faf6ea674182a08a226eb9b44a2331f0",
+      "original_path": "freight/phase5/phase5b_handler_acceptance.json",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-304/freight/phase5/phase5b_handler_acceptance.json",
+      "sha": "c9b7a3d883fc06ec9d623d75d0e2a8a4d9e9d880",
+      "status": "added"
+    },
+    {
+      "pr": 304,
+      "head": "ca04bae2faf6ea674182a08a226eb9b44a2331f0",
+      "original_path": "freight/phase5/phase5b_independent_queries.sql",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-304/freight/phase5/phase5b_independent_queries.sql",
+      "sha": "8c717dde6027dd62246f0c37268c549d369b6a80",
+      "status": "added"
+    },
+    {
+      "pr": 304,
+      "head": "ca04bae2faf6ea674182a08a226eb9b44a2331f0",
+      "original_path": "freight/phase5/test_phase5b_handler_acceptance.py",
+      "archived_path": "research/retally_financial_archive/phase2_to_5a/sources/pr-304/freight/phase5/test_phase5b_handler_acceptance.py",
+      "sha": "a45c30e20e0638e7a52b4ee8f4800630f7134d42",
+      "status": "added"
+    }
+  ]
+}

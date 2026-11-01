@@ -1,0 +1,50 @@
+{
+  "baseline_legacy_and_phase1_tests_passed": 68,
+  "baseline_root": "Phase1 isolated repaired laboratory recovered from Library",
+  "date": "2026-10-08",
+  "five_original_audit_repro_after": {
+    "expected_tariff_values_in_benchmark_input": false,
+    "fictional_company_name_collisions": false,
+    "reversal_blocked_after_revocation": false,
+    "second_partial_credit_blocked": false,
+    "unbound_50_percent_fee_accepted": false
+  },
+  "five_original_audit_repro_before": {
+    "expected_tariff_values_in_benchmark_input": true,
+    "fictional_company_name_collisions": true,
+    "reversal_blocked_after_revocation": true,
+    "second_partial_credit_blocked": true,
+    "unbound_50_percent_fee_accepted": true
+  },
+  "limitations": [
+    "Research lab changes only, not actual hosted RecoveryOS",
+    "Synthetic HMAC key held in repo test fixtures is not buyer contract authentication",
+    "No independent real remittance or tariff source",
+    "First-writer tenant registry is not independently verified source ownership",
+    "Historical 26 findings remain OPEN_UNVERIFIED pending independent closure",
+    "Public CI cannot rerun full source archive unless access granted and installed"
+  ],
+  "new_independent_blind_detector_contract": "rejects hidden gold or derived tariff inputs instead of filtering after entry",
+  "original_archive_sha256": "2dcfd16296454689a391fb76ac57e4a9282091c25d85134334b3c7eeeeafc93b",
+  "patch_sha256": "25fa05a82409653c75bf2d20e29df93dfdca6c6f14ccd4a3fc6327b6239c9420",
+  "phase1_pinned_git_head": "b46828dd47486f0911dc040abab8e9ff1b05e170",
+  "phase2_focused_tests_passed": 21,
+  "prior_phase1_repair_base": "test_unified.py and original semantic_verify.py files frozen in local baseline git commit",
+  "repaired_zip_sha256": "8e0abb53632b82a6228bbf8fe5dc35da14b52ba9b4e1edfb985f62bf96c02e9d",
+  "scope": "ORIGINAL_UNIFIED_LAB_SYNTHETIC_LOCAL_ONLY",
+  "source_sha256": {
+    "tests/test_phase2_financial.py": "efa733049f83743d62425883174d3422cbe6d3c32e5011d398aa4ddd4da96714",
+    "tests/test_semantic_repair.py": "01109a642723377784021823fd15bca79313768d82619d3f2a88d216b36657ee",
+    "tests/test_unified.py": "57903881648b74aeceaf93f2311ca9ca5c6aa59271a2c5a6b14ed7d221f49b30",
+    "unified/adaptive.py": "fd60e3c6858dba3e24d1ef7025d68a9c7245cbb9242c04e79550ae90fbff3771",
+    "unified/core.py": "01b38383e4910948c81b4aa1caaae743a6ef71ff75099b71880baf1a9f2f4248",
+    "unified/customers.py": "1a2a9dcc81939185e4a632832fb264e8aa6a93b75a5959508ad0310ab6efa6e6",
+    "unified/demo_fixtures.py": "d7bc01d4b2a7a9612754a824feb9c15b5cf7f0ac3c435b3a84187e6b82c3b959",
+    "unified/fee_authority.py": "19d340fbd4ec55d74a1b1d5e2b0f884679da8134e4c4b2fdb593b77026298d2b",
+    "unified/oracle.py": "ab2c27789b35bbea254ea2c59b5bdf79ada2571062590cce79763b72beca79a6",
+    "unified/semantic_verify.py": "e70d3c1a66cb179e935dcc432eed406c524c9050caf8abc97efbfbf9f6f43fe8",
+    "unified/staging.py": "270efdac20ada376a7eacf65505e52f9edc60008582b3bcb9f4d725e99fd6347"
+  },
+  "test_command": "FREIGHT_ORIGINAL_SYNTHETIC_SOURCE_ZIP=/tmp/nonexistent.zip python -W error::ResourceWarning -m unittest -q tests.test_unified tests.test_semantic_repair tests.test_phase2_financial",
+  "total_test_suite_passed": 89
+}

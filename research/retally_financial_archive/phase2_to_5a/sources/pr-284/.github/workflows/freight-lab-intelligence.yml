@@ -1,0 +1,37 @@
+name: RETALLY Lab Intelligence Read-Only Checks
+on:
+  pull_request:
+    paths:
+      - 'freight/lab_intelligence.py'
+      - 'freight/test_lab_intelligence.py'
+      - 'freight/lab_intelligence_runner.py'
+      - 'freight/test_lab_intelligence_runner.py'
+      - 'freight/lab_archive_repairs/**'
+      - 'freight/LAB_INTELLIGENCE_V1.md'
+      - '.github/workflows/freight-lab-intelligence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-semantic-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact proposed revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Independent semantic regression and triage tests
+        run: PYTHONPATH=. python -W error::ResourceWarning -m unittest -v freight.test_lab_intelligence freight.test_lab_intelligence_runner
+      - name: Syntax check transplanted standalone repair modules
+        run: python -m py_compile freight/lab_archive_repairs/unified/semantic_verify.py freight/lab_archive_repairs/tests/test_semantic_repair.py
+      - name: Exercise actual cumulative 28-finding register
+        run: PYTHONPATH=. python -m freight.lab_intelligence_runner --limit 5
+      - name: Prevent accidental certification
+        run: |
+          echo 'Synthetic consistency only: no bank or customer source authentication.'
+          echo 'No historical findings closed; no product code changed or deployed.'
