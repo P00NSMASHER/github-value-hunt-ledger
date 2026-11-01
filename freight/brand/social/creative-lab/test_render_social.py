@@ -1,6 +1,5 @@
 """Offline correctness and visual geometry checks for RETALLY creative assets."""
 import base64
-import importlib.util
 import json
 import shutil
 import struct
