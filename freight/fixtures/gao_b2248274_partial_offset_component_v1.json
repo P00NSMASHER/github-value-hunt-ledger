@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "pack_id": "GAO_B2248274_OFFSET_AND_PARTIAL_REFUND_COMPONENT_RECONCILIATION_V1",
+  "evaluation_families": [
+    "GENERAL_ACCOUNTING_RECONCILIATION",
+    "FREIGHT_CLAIM_TYPE_BOUNDARY_NOT_TARIFF_ERROR_ACCURACY"
+  ],
+  "observed_utc_date": "2026-10-31",
+  "ownership": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "review_pr": 883,
+    "review_branch": "fix/unified-lab-fy2027-archive-growth-20261030",
+    "live_writer": "research/retally-unified-data-lab",
+    "writer_or_product_code_modified": false,
+    "legacy_15_labs_consolidated": false
+  },
+  "original_source": {
+    "publisher": "United States Government Accountability Office",
+    "decision_id": "B-224827.4",
+    "decision_date": "1990-11-21",
+    "url": "https://www.gao.gov/products/b-224827.4-0",
+    "case_kind": "FEDERAL_HOUSEHOLD_GOODS_CARRIER_LOSS_DAMAGE_LIABILITY_AND_PARTIAL_COMPONENT_ENTITLEMENT",
+    "first_party_source_class": "PUBLISHED_OFFICIAL_GAO_DECISION_HTML_TEXT",
+    "source_url_verified": "2026-10-31",
+    "official_publisher_original_response_custodied": false,
+    "original_http_body_sha256": null,
+    "original_http_body_byte_count": null,
+    "original_signed_gbl_or_tariff_bytes_custodied": false,
+    "raw_person_shipper_identifiers_saved": false,
+    "source_event_times": "HISTORICAL_1980S_SHIPMENT_DECISION_1990_NOT_2026_BUSINESS_COHORT",
+    "last_modified_http_header": null,
+    "extraction_limitation": "WEB_INDEXED_OFFICIAL_DECISION_TEXT_NOT_RAW_HTTP_BYTES_OR_SEPARATE_BILLS"
+  },
+  "rights": {
+    "publisher_policy": "https://www.gao.gov/copyright",
+    "government_work_reuse": "GAO_COPYING_AND_DISTRIBUTION_PERMITTED_WITH_SOURCE_ATTRIBUTION_NO_ENDORSEMENT",
+    "third_party_attachment_rights_reviewed": false,
+    "commercial_use_of_GAO_authored_text": "ALLOWED_SUBJECT_TO_GAO_NONENDORSEMENT_AND_THIRD_PARTY_MATERIAL_LIMITS",
+    "customer_reuse_or_production_scoring_authorized": false,
+    "attribution": "United States Government Accountability Office"
+  },
+  "published_historical_case_facts": {
+    "government_collected_damage_offset_cents": 1200000,
+    "government_collected_damage_offset_event": "REPORTED_COMPLETED_ADMINISTRATIVE_SETOFF",
+    "valuation_ceiling_cents": 1200000,
+    "government_member_initial_paid_cents": 613676,
+    "government_member_additional_reimbursement_cents": 586324,
+    "carrier_GBL_released_valuation_charge_cents": 6000,
+    "carrier_additional_unbilled_valuation_awarded_cents": 4300,
+    "carrier_freight_on_recovered_items_awarded_cents": 5187,
+    "carrier_total_refund_awarded_cents": 9487,
+    "carrier_total_refund_later_paid_cents": null,
+    "verified_2026_customer_cash_cents": 0,
+    "source_decision_components": "BOTH_ADDITIONAL_ENTITLEMENTS_FOUND_DUE_TO_CARRIER_WHILE_MAIN_DAMAGE_OFFSET_UPHELD",
+    "independent_agency_decision_on_main_damage_offset": "UPHELD",
+    "independent_agency_decision_on_two_carrier_entitlements": "AWARDED",
+    "tariff_or_invoice_overcharge_ground_truth": "UNKNOWN_NOT_AN_ADJUDICATED_RATE_ERROR",
+    "member_payment_receipt_custody": "UNKNOWN_BEYOND_GAO_NARRATIVE",
+    "carrier_refund_clearing_receipt_custody": "UNKNOWN"
+  },
+  "ledger_separation": {
+    "liability": "DAMAGE_LOSS_RECOUPMENT_NOT_BILLED_FREIGHT_OVERCHARGE",
+    "government_collected_offset": "GOVERNMENT_COLLECTION_FROM_CARRIER_NOT_CUSTOMER_RECOVERY",
+    "government_member_payments": "GOVERNMENT_REIMBURSEMENT_TO_SERVICE_MEMBER_NOT_A_SECOND_CARRIER_REFUND",
+    "carrier_refund_awarded": "ONE_GAO_AWARDED_94_87_USD_COMPOSED_OF_43_00_PLUS_51_87",
+    "carrier_refund_actual_paid": "UNKNOWN_NO_BANK_OR_PAYMENT_CLEARING_RECORD",
+    "sender_invoice_rate_error": "UNKNOWN_NO_INDEPENDENT_CONTROLLING_TARIFF_SHIPMENT_INVOICE_RECONCILIATION",
+    "case_dedup_key": "GAO_B-224827.4_ONE_CASE_MULTIPLE_SEPARATE_MONEY_EVENTS"
+  },
+  "synthetic_controls": [
+    {
+      "id": "SYN_FULL_OFFSET_REFUND",
+      "split": "synthetic_calibration",
+      "claim": "FULL_GOVERNMENT_OFFSET_IS_CARRIER_REFUND",
+      "facts": {
+        "government_collected_offset_cents": 1200000,
+        "carrier_refund_awarded_cents": 9487
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_MEMBER_CAP",
+      "split": "synthetic_calibration",
+      "claim": "MEMBER_INITIAL_PAYMENT_CAPS_CARRIER_LIABILITY",
+      "facts": {
+        "member_initial_payment_cents": 613676,
+        "carrier_liability_offset_cents": 1200000
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_MATH_9486",
+      "split": "synthetic_calibration",
+      "claim": "CLAIM_AWARD_COMPONENTS_SUM_TO_INCORRECT_CENTS",
+      "facts": {
+        "additional_valuation_cents": 4300,
+        "recovered_items_freight_cents": 5187,
+        "proposed_total_cents": 9486
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_RATE_VS_DAMAGE",
+      "split": "synthetic_calibration",
+      "claim": "DAMAGE_LIABILITY_PROVES_FREIGHT_TARIFF_OVERCHARGE",
+      "facts": {
+        "source_cause": "DAMAGE_AND_LOSS",
+        "controlling_modern_tariff_verified": false
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_AWARD_IS_CASH",
+      "split": "synthetic_holdout",
+      "claim": "REFUND_AWARD_EQUALS_CASH_RECEIVED",
+      "facts": {
+        "carrier_refund_awarded_cents": 9487,
+        "bank_receipt_cents": null
+      },
+      "expected_guard": "UNKNOWN",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_60_VS_43",
+      "split": "synthetic_holdout",
+      "claim": "GBL_VALUATION_CHARGE_IS_SAME_AS_ADDITIONAL_AWARD",
+      "facts": {
+        "valuation_charge_on_gbl_cents": 6000,
+        "additional_valuation_cents": 4300
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_TWO_MEMBER_PAYMENTS_TWO_CASES",
+      "split": "synthetic_holdout",
+      "claim": "TWO_MEMBER_PAYMENTS_ARE_TWO_INDEPENDENT_FREIGHT_CASES",
+      "facts": {
+        "decision_id": "B-224827.4",
+        "member_payment_events": 2,
+        "distinct_decisions": 1
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_1990_RULE_IS_CURRENT",
+      "split": "synthetic_holdout",
+      "claim": "HISTORICAL_OFFSET_HOLDING_APPLIES_TO_ALL_CURRENT_CARRIERS",
+      "facts": {
+        "holding_year": 1990,
+        "current_contract_verified": false
+      },
+      "expected_guard": "UNKNOWN",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_CARRIER_RECOVERY_AS_RETALLY_CASH",
+      "split": "synthetic_holdout",
+      "claim": "GOVERNMENT_CARRIER_CASE_PROVES_RETALLY_CASH",
+      "facts": {
+        "real_customer_receipts": 0
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    },
+    {
+      "id": "SYN_AWARD_IS_RATE_OVERCHARGE",
+      "split": "synthetic_holdout",
+      "claim": "CARRIER_COMPONENT_ENTITLEMENT_IS_FREIGHT_RATE_OVERCHARGE",
+      "facts": {
+        "award_components": [
+          "UNBILLED_VALUATION",
+          "RECOVERED_PROPERTY_FREIGHT"
+        ],
+        "original_invoice_rate_error_independent_label": false
+      },
+      "expected_guard": "REJECT",
+      "provenance": "RESEARCH_AUTHORED_SYNTHETIC_NOT_A_REAL_PUBLISHER_TRANSACTION",
+      "independent_real_label": null
+    }
+  ],
+  "benchmark_readiness": {
+    "independently_adjudicated_historical_government_decisions": 1,
+    "independent_modern_freight_rate_positive_labels": 0,
+    "independent_modern_freight_rate_clean_negative_labels": 0,
+    "heldout_real_2026_customer_cases": 0,
+    "synthetic_calibration_controls": 4,
+    "synthetic_holdout_controls": 6,
+    "production_model_predictions": 0,
+    "measured_accuracy": null,
+    "precision": null,
+    "recall": null,
+    "historical_case_legal_scope_heldout": "ONE_OFFICIAL_INDEPENDENT_AGENCY_DECISION_NOT_A_HELDOUT_MODEL_TEST",
+    "unsafe_baseline_full_offset_as_refund_cents": 1200000,
+    "guarded_awarded_refund_cents": 9487,
+    "observed_actual_refund_paid_cents": null,
+    "red_green_description": "NAIVE_FULL_OFFSET_IS_RECOVERABLE_12K_IS_FALSE; GUARDED_COMPONENT_ALLOCATION_LEAVES_ONLY_94_87_AWARDED_AND_CASH_UNKNOWN"
+  },
+  "consumers": {
+    "retally_recoveryos_12": "Test component-correct accounting events: 12000.00 government offset upheld, 94.87 carrier award due, no bank-settlement inference.",
+    "freightrecovery_12": "Damage liability and released valuation are not independently validated freight invoice or tariff overcharges.",
+    "permitplate_48": "NOT_NYC_PERMIT_OR_VIOLATION_SCORE_TRUTH",
+    "capturebrief_52": "NOT_SAM_NOTICE_OR_AWARD_TRUTH",
+    "independent_qa_44": "Recheck GAO primary text monetary clauses and no cash promotion, exact-head test result, original source URL and rights.",
+    "executive_director": "REVIEW_ONLY_PR_883; WRITER_UNCHANGED; LEGACY_LABS_NOT_CONSOLIDATED; NO_RELEASE"
+  },
+  "safety": {
+    "private_records_persisted": 0,
+    "new_provider_calls_in_workflow": 0,
+    "new_cron_or_schedules": 0,
+    "product_code_changes": 0,
+    "release_bypass": false
+  }
+}
