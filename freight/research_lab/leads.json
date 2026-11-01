@@ -6714,6 +6714,22 @@
       "engines": [
         "capturebrief"
       ],
+      "first_seen": "2026-11-01",
+      "id": "87154ac90f6e0664b79d2361dec2e3880706c2cb41d48ee0a19ee10e4f9d5ee1",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/835594"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
       "first_seen": "2026-10-23",
       "id": "876e9810fd97c3aee5ddaec13c9a759772420d2509b0ca4d3e7547a8a360a778",
       "independent_ground_truth": false,
@@ -10458,6 +10474,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-01",
+      "id": "d224ab6d4e6618acdfd4639fb372be0dd2c8736a2350e26b0652a2dcdff593cc",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/luffy-2601/Yottaflex-AI"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -13033,6 +13065,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "dfe934afc9aae308f6034e6f31020801bad0a4f68ad2e03431d5afbd95951c59",
+  "entries_sha256": "2a93bcdd5c79d9b328c0963607f5b29ad49bffa93d06363cf45b012a01746b51",
   "schema_version": 1
 }
