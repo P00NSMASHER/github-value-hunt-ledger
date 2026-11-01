@@ -15,17 +15,17 @@
       "default_branch": "main",
       "description": "A free, read-only Roblox Studio accessibility preflight plugin for UI contrast, text scaling, small text, and reduced-motion checks.",
       "discovery_query": "Roblox accessibility reduced motion UI",
-      "exact_revision": "f4ac926d9368369f01bdd4c392f11cf7d2740f7b",
+      "exact_revision": "8ecae94786204b91b61e514d18b19d657db62fe6",
       "forks": 0,
       "primary_language": "Luau",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-29T22:23:30Z",
+      "pushed_at": "2026-11-01T13:01:33Z",
       "repository": "KSAGlory/KSA-Accessibility-Preflight",
       "root_code_signals": [
         "src",
         "tests"
       ],
-      "size_kb": 33,
+      "size_kb": 35,
       "stars": 4,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -36,7 +36,7 @@
         "studio-plugin"
       ],
       "triage_components": {
-        "activity": 12,
+        "activity": 15,
         "description": 4,
         "forks": 0,
         "license_metadata": 5,
@@ -46,7 +46,7 @@
         "substantive_size": 2,
         "topics": 5
       },
-      "triage_score": 43,
+      "triage_score": 46,
       "url": "https://github.com/KSAGlory/KSA-Accessibility-Preflight"
     },
     {
@@ -85,7 +85,7 @@
     10,
     37
   ],
-  "generated_at": "2026-10-31T08:54:02.541552+00:00",
+  "generated_at": "2026-11-01T19:12:54.388534+00:00",
   "mission": "Roblox UI/mobile/input/accessibility systems and scalable player UX",
   "risk_review": [],
   "risk_review_count": 0,
