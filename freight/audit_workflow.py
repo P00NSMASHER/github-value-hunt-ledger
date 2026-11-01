@@ -7,6 +7,7 @@ invoice CSV -> frozen population -> rule CSVs -> Finding Factory -> review queue
 It does not perform buyer review, external carrier action, or settlement.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 import hashlib
 from dataclasses import dataclass
@@ -384,9 +385,9 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         *[
             "- " + item.currency
             + " — Validated discrepancy: **"
-            + item.currency + " " + format(item.validated_discrepancy_cents / 100, ",.2f")
+            + item.currency + " " + format_cents(item.validated_discrepancy_cents)
             + "**; review discrepancy with a calculable expected amount: **"
-            + item.currency + " " + format(item.review_discrepancy_cents / 100, ",.2f")
+            + item.currency + " " + format_cents(item.review_discrepancy_cents)
             + "**"
             for item in summary.currency_discrepancies
         ],

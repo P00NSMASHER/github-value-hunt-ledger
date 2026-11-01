@@ -10,6 +10,7 @@ remaining event amount. Split allocations across multiple claims remain
 unsupported here and must not be improvised through this workflow.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 import json
 from dataclasses import asdict, dataclass
@@ -456,7 +457,7 @@ def render_settlement_review_markdown(
         "",
         f"- Event: **{case.event_id}**",
         f"- Reference: **{case.event_reference}**",
-        f"- Remaining settlement amount: **{case.currency} {case.event_residual_cents / 100:,.2f}**",
+        f"- Remaining settlement amount: **{case.currency} {format_cents(case.event_residual_cents)}**",
         f"- Auto-allocation result: **{case.auto_review_reason}**",
         f"- Review case hash: `{case.case_hash}`",
         "",
@@ -467,7 +468,7 @@ def render_settlement_review_markdown(
     else:
         for candidate in case.candidates:
             lines.extend([
-                f"- **{candidate.claim_id}** — residual {candidate.currency} {candidate.residual_cents / 100:,.2f}",
+                f"- **{candidate.claim_id}** — residual {candidate.currency} {format_cents(candidate.residual_cents)}",
                 f"  - Reference: {candidate.reference}",
                 f"  - Reference matches event: {'yes' if candidate.reference_match else 'no'}",
                 f"  - Previously review-locked: {'yes' if candidate.review_locked else 'no'}",
@@ -484,7 +485,7 @@ def render_settlement_review_markdown(
         lines.extend([
             "## Applied review",
             f"- Claim: **{receipt.claim_id}**",
-            f"- Amount: **{case.currency} {receipt.amount_cents / 100:,.2f}**",
+            f"- Amount: **{case.currency} {format_cents(receipt.amount_cents)}**",
             f"- Reviewer role: **{receipt.reviewer_role}**",
             f"- Reviewed at: **{receipt.reviewed_at}**",
             f"- Rationale: {receipt.rationale}",

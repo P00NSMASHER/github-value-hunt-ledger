@@ -5,6 +5,7 @@ rule evidence a reviewer needs. It is descriptive only: it does not confirm a
 finding, authorize external action, or label discrepancies as savings.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 from dataclasses import asdict, dataclass
 from typing import Iterable
@@ -212,7 +213,7 @@ def build_review_packet(
 def _money(currency: str, cents: int | None) -> str:
     if cents is None:
         return "Not established"
-    return f"{currency} {cents / 100:,.2f}"
+    return f"{currency} {format_cents(cents)}"
 
 
 def render_review_packet_markdown(packet: ReviewPacket) -> str:
