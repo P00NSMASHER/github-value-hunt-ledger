@@ -133,7 +133,7 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/actions/workflows/fmc-tariff-recover-merge.yml/runs?per_page=100" > "$RUNNER_TEMP/fmc-recovery-runs.json"
           export MAIN_HEAD="$current_main"
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
+          import json, os, sys
           from pathlib import Path
 
           root = Path(os.environ['RUNNER_TEMP'])
