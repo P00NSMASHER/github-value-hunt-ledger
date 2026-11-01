@@ -36,7 +36,7 @@ from typing import Optional
 # NEVER treat a parsed zero as a verified carrier charge or cleared payment.
 _SAFE_CENTS = 9_007_199_254_740_991
 _MONEY_TOKEN = re.compile(
-    r"-?\\$?(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)(?:\\.[0-9]+)?\\Z"
+    r"-?\$?(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)(?:\.[0-9]+)?\Z"
 )
 
 
