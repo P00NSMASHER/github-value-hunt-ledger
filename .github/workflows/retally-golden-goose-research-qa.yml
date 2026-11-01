@@ -32,18 +32,30 @@ jobs:
           assert m["research_only"] and m["no_customer_proof"] and m["no_verified_revenue"]
           print("94 original source Git blobs verified; research artifacts not commercially cleared.")
           PY
+      - name: Build isolated Python and Node acceptance harness
+        run: |
+          # Official Debian Bookworm Python and Node runtimes; no project dependencies.
+          # Network is used only to obtain the test base images. Every test runs offline.
+          docker build -t retally-golden-goose-qa:20261101 - <<'DOCKERFILE'
+          FROM node:22-bookworm-slim AS js
+          FROM python:3.11-slim-bookworm
+          COPY --from=js /usr/local/bin/node /usr/local/bin/node
+          COPY --from=js /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+          COPY --from=js /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+          RUN python --version && node --version
+          DOCKERFILE
       - name: Run all Python negative-control tests in a no-network read-only container
         run: |
           docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
             --user 65534:65534 --memory 768m --pids-limit 128 \
             --tmpfs /tmp:rw,nosuid,nodev,size=128m \
             -e PYTHONDONTWRITEBYTECODE=1 -e PYTHONPATH=/repo \
-            -v "${PWD}:/repo:ro" -w /repo python:3.11-slim-bookworm \
+            -v "${PWD}:/repo:ro" -w /repo retally-golden-goose-qa:20261101 \
             python -c 'from pathlib import Path; import sys,subprocess; tests=sorted(Path("research/golden_goose").rglob("test_*.py"))+sorted(Path("tests").glob("test_ti_golden_goose_*.py")); assert len(tests)>=15,len(tests); [subprocess.run([sys.executable,str(p)],check=True) for p in tests]; print("Offline Python test files passed:",len(tests))'
       - name: Run all Node negative-control tests in a no-network read-only container
         run: |
           docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
             --user 65534:65534 --memory 768m --pids-limit 128 \
             --tmpfs /tmp:rw,nosuid,nodev,size=128m \
-            -e NODE_OPTIONS=--no-warnings -v "${PWD}:/repo:ro" -w /repo node:22-bookworm-slim \
+            -e NODE_OPTIONS=--no-warnings -v "${PWD}:/repo:ro" -w /repo retally-golden-goose-qa:20261101 \
             node -e 'const fs=require("fs"),cp=require("child_process"),p=require("path");function walk(d){return fs.readdirSync(d,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(p.join(d,x.name)):(((x.name.startsWith("test_")&&x.name.endsWith(".js"))||x.name.endsWith(".test.mjs"))?[p.join(d,x.name)]:[]))}const tests=walk("research/golden_goose").sort();if(tests.length<7)process.exit(2);for(const t of tests){console.log("Node test",t);cp.execFileSync(process.execPath,[t],{stdio:"inherit"})}console.log("Offline Node test files passed:",tests.length)'
