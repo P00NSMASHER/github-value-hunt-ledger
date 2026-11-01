@@ -143,7 +143,7 @@ def compare_vendor_study(study: dict, policy: dict) -> dict:
             raise ComparisonInvalid("full frozen Protocol-v2 pilot packet required")
         try:
             report = build_report(pilot, policy)
-        except (ValueError, KeyError, TypeError) as exc:
+        except (ValueError, KeyError, TypeError):
             # Never echo buyer IDs, case labels, private paths or packet content.
             raise ComparisonInvalid("invalid or unverified Protocol-v2 packet") from None
         signature = _same_study_signature(pilot)
