@@ -5,6 +5,7 @@ remediation. It never mutates or promotes a finding. Completing remediation
 requires corrected inputs and a fresh audit workflow run.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 from dataclasses import asdict, dataclass
 
@@ -170,7 +171,7 @@ def build_remediation_plan(
 def _money(cents: int | None) -> str:
     if cents is None:
         return "Not established"
-    return "$" + format(cents / 100, ",.2f")
+    return "$" + format_cents(cents)
 
 
 def render_remediation_plan_markdown(plan: RemediationPlan) -> str:

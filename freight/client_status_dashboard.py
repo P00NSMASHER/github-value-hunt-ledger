@@ -4,6 +4,7 @@ This is a presentation layer over governed audit/recovery state. It does not
 create findings, authorize claims, or establish settlement truth.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 import argparse, json
 from html import escape
 from pathlib import Path
@@ -81,7 +82,7 @@ def validate(payload):
 
 
 def money(cents):
-    return "$" + f"{cents / 100:,.2f}"
+    return "$" + format_cents(cents)
 
 
 def render_html(payload):

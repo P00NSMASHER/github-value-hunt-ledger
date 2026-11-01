@@ -5,6 +5,7 @@ review, authorized-action, settlement, reversal, and reporting path. It is not
 customer evidence, a production-control attestation, or permission to act.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 import argparse
 import hashlib
@@ -74,11 +75,11 @@ reversal, and a current report.
 
 ## Demonstrated totals
 
-- reviewed discrepancy: ${metrics['reviewed_discrepancy_cents'] / 100:,.2f}
-- validated findings: ${metrics['validated_finding_cents'] / 100:,.2f}
-- challenger-only validated: ${metrics['challenger_only_validated_cents'] / 100:,.2f}
-- net realized after the simulated return: ${metrics['realized_cents'] / 100:,.2f}
-- fee-eligible realized: ${metrics['fee_eligible_realized_cents'] / 100:,.2f}
+- reviewed discrepancy: ${format_cents(metrics['reviewed_discrepancy_cents'])}
+- validated findings: ${format_cents(metrics['validated_finding_cents'])}
+- challenger-only validated: ${format_cents(metrics['challenger_only_validated_cents'])}
+- net realized after the simulated return: ${format_cents(metrics['realized_cents'])}
+- fee-eligible realized: ${format_cents(metrics['fee_eligible_realized_cents'])}
 
 These amounts are invented test data. They do not predict a buyer result,
 recovery rate, conversion rate, or price acceptance. The SUBMITTED and delivery

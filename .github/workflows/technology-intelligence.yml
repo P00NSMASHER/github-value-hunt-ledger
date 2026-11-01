@@ -90,19 +90,31 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Prove whether this main push contains actual source changes
+        id: ti_source_gate
+        shell: bash
+        env:
+          TI_BEFORE_SHA: ${{ github.event.before }}
+          TI_AFTER_SHA: ${{ github.sha }}
+        run: python -m tools.ti_generated_source_gate --before "$TI_BEFORE_SHA" --after "$TI_AFTER_SHA"
       - name: Refresh main before generation
+        if: steps.ti_source_gate.outputs.refresh == 'true'
         shell: bash
         run: git pull --ff-only origin main
       - name: Test action routing, telemetry intake and run preparation
+        if: steps.ti_source_gate.outputs.refresh == 'true'
         run: python -m unittest discover -s tests -p 'test_ti_*.py'
       - name: Ingest, rebuild and validate technology intelligence
+        if: steps.ti_source_gate.outputs.refresh == 'true'
         env:
           TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
         run: python tools/ti_build.py
       - name: Check generated text for whitespace errors
+        if: steps.ti_source_gate.outputs.refresh == 'true'
         run: git diff --check
 
       - name: Persist generated intelligence using the active publishing mode
+        if: steps.ti_source_gate.outputs.refresh == 'true'
         id: persist
         env:
           TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}

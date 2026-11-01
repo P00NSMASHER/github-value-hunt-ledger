@@ -6,6 +6,7 @@ anything. A separate buyer approval must bind the resulting payload hash before
 the existing external-action authorization can become active.
 """
 from __future__ import annotations
+from freight.money_format import format_cents
 
 import unicodedata
 from dataclasses import asdict, dataclass
@@ -189,11 +190,11 @@ def build_carrier_action_payload(
     ]
     for line in lines:
         body_lines.append(
-            f"- Reference {line.reference}: {currency} {line.amount_cents / 100:,.2f}"
+            f"- Reference {line.reference}: {currency} {format_cents(line.amount_cents)}"
         )
     body_lines.extend([
         "",
-        f"Total amount in this request: {currency} {total / 100:,.2f}",
+        f"Total amount in this request: {currency} {format_cents(total)}",
         "",
         "This request does not accept settlement terms, authorize payment, or authorize account changes.",
     ])
@@ -297,7 +298,7 @@ def render_carrier_action_payload_markdown(payload: CarrierActionPayload) -> str
         f"- Action: **{payload.action_type}**",
         f"- Carrier: **{payload.target_carrier_id}**",
         f"- Customer/payee: **{payload.target_customer_id}**",
-        f"- Amount: **{payload.currency} {payload.requested_cents / 100:,.2f}**",
+        f"- Amount: **{payload.currency} {format_cents(payload.requested_cents)}**",
         f"- Payload hash: `{payload.payload_hash}`",
         "",
         "## Subject",

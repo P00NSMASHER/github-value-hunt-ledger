@@ -1,5 +1,6 @@
 """Pilot reporting derived from frozen Freight Recovery proof objects."""
 from __future__ import annotations
+from freight.money_format import format_cents
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -266,7 +267,7 @@ def build_pilot_metrics(
 
 
 def dollars(cents: int) -> str:
-    return "$" + format(cents / 100, ",.2f")
+    return "$" + format_cents(cents)
 
 
 def render_markdown(metrics: PilotMetrics) -> str:
