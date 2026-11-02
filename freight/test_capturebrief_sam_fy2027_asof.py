@@ -72,7 +72,7 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(x["current_source_sha256"],hashlib.sha256(data).hexdigest())
         self.assertEqual(len(REQUIRED_COLUMNS),8)
         self.assertEqual(MAX_ORIGINAL_ROWS,8000)
-        self.assertEqual(MAX_ORIGINAL_BYTES,8_000_000)
+        self.assertEqual(MAX_ORIGINAL_BYTES,12_000_000)
         self.assertEqual(len(PREVIOUS_PUBLIC_REFERENCE_SHA256),64)
 
     def test_issuer_family_and_duplicate_notice_evidence_is_counted_not_promoted(self):
@@ -298,6 +298,17 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertEqual(pack["rights_and_truth"]["independent_cross_source_outcomes"], 0)
         self.assertEqual(MAX_ORIGINAL_BYTES, pack["proposal"]["bounded_limit_bytes"])
         self.assertEqual(MAX_ORIGINAL_ROWS, pack["proposal"]["maximum_csv_rows"])
+        # Original publisher HEAD metadata, not an original-byte hash.
+        head = pack["current_public_head_observation"]
+        self.assertEqual(head["http_method"], "HEAD")
+        self.assertEqual(head["http_status"], 200)
+        self.assertEqual(head["reported_content_length_bytes"], 8_833_904)
+        self.assertGreater(head["reported_content_length_bytes"], 8_000_000)
+        self.assertLess(head["reported_content_length_bytes"], MAX_ORIGINAL_BYTES)
+        self.assertIsNone(head["original_body_sha256"])
+        self.assertFalse(head["original_body_read"])
+        self.assertEqual(head["independently_verified_award_labels"], 0)
+
 
         columns = ["NoticeId", "Sol#", "PostedDate", "Type", "Active",
                    "AAC Code", "Office", "Link", "Description"]
