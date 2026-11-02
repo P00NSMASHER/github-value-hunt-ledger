@@ -441,6 +441,32 @@ class SamArchiveAsOfTests(unittest.TestCase):
         self.assertTrue(all(c["id"].startswith("SYNTHETIC_")
                             and c["independent_ground_truth"] is False
                             for c in controls))
+        # The control descriptions must retain their exact fail-closed
+        # outcomes. Merely having five SYNTHETIC_ strings is not a gate.
+        expected_control_outcomes = {
+            "SYNTHETIC_BODY_HASH_IS_NOT_AWARD_LABEL":
+                "NO_VALIDATED_BENCHMARK",
+            "SYNTHETIC_ETAG_IS_NOT_SHA256":
+                "REJECT_ETAG_AS_BODY_DIGEST",
+            "SYNTHETIC_HEAD_LENGTH_IS_NOT_BODY_PROOF":
+                "REQUIRE_FULL_ORIGINAL_BODY_READ",
+            "SYNTHETIC_SINGLE_ARCHIVE_IS_NOT_ASOF_HISTORY":
+                "HISTORICAL_VISIBILITY_UNKNOWN",
+            "SYNTHETIC_QUARANTINED_FIELD_IS_NOT_CLEAN_LABEL":
+                "QUARANTINE_NOT_ADJUDICATION",
+        }
+        self.assertEqual(
+            {c["id"]: c["expected"] for c in controls},
+            expected_control_outcomes,
+        )
+        head_only = historical["current_public_head_observation"]
+        self.assertFalse(head_only["original_body_read"])
+        self.assertIsNone(head_only["original_body_sha256"])
+        self.assertEqual(labels["historical_version_completeness"],
+                         "UNKNOWN_NOT_ESTABLISHED")
+        self.assertGreater(
+            observation["quarantined_solicitation_control_fields"], 0
+        )
 
         # Tampering with original bytes or inventing positive labels makes
         # the pinned manifest digest fail, even if its source shape is valid.
