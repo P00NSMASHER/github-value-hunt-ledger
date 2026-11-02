@@ -378,6 +378,108 @@ class SamArchiveAsOfTests(unittest.TestCase):
             with self.assertRaisesRegex(ResearchError, "SOURCE_TOO_LARGE"):
                 fetch_original()
 
+    def test_one_shot_original_body_manifest_is_pinned_not_a_scoring_benchmark(self):
+        # The actual hosted original-source run is NOT a synthetic source row,
+        # an independent award adjudication or a current scheduled-writer receipt.
+        fixture_root = Path(__file__).with_name("fixtures")
+        manifest = json.loads((fixture_root /
+            "sam_fy2027_original_body_observation_20261101_v1.json"
+        ).read_text(encoding="utf-8"))
+        historical = json.loads((fixture_root /
+            "capturebrief_fy2027_archive_growth_boundary_v1.json"
+        ).read_text(encoding="utf-8"))
+
+        def canonical_checksum(document):
+            payload = {k: v for k, v in document.items()
+                       if k != "manifest_sha256"}
+            raw = json.dumps(payload, sort_keys=True, separators=(",", ":"),
+                             ensure_ascii=False).encode("utf-8")
+            return hashlib.sha256(raw).hexdigest()
+
+        self.assertEqual(manifest["schema_version"], 1)
+        self.assertEqual(manifest["manifest_sha256"],
+                         canonical_checksum(manifest))
+        self.assertEqual(manifest["source_url"], SOURCE_URL)
+        observation = manifest["observation"]
+        proof = manifest["proof"]
+        self.assertEqual(proof["actual_execution"],
+                         "GITHUB_ACTIONS_ONE_SHOT_FULL_ORIGINAL_READ")
+        self.assertEqual(proof["workflow_run_id"], 41351922492)
+        self.assertEqual(proof["workflow_job_id"], 124983775762)
+        self.assertEqual(proof["source_reader_git_blob_sha1"],
+                         "2a31d52b5feb2882f3a86c578e5e17299ee901b4")
+        self.assertEqual(observation["original_bytes"], 8_833_904)
+        self.assertEqual(observation["original_body_sha256"],
+                         "980840a8d53ad92caec672c35910c61908a96b5f17e9234c667294001479662b")
+        self.assertEqual(observation["original_bytes"],
+                         historical["current_public_head_observation"]
+                                   ["reported_content_length_bytes"])
+        self.assertEqual(observation["original_csv_rows"], 5_139)
+        self.assertEqual(observation["distinct_notice_ids"], 5_139)
+        self.assertEqual(observation["status"], STATUS_PARTIAL)
+        self.assertEqual(observation["quarantined_solicitation_control_fields"], 1)
+        self.assertFalse(observation["publisher_etag_is_sha256"])
+        self.assertNotEqual(observation["publisher_etag"].strip('"'),
+                            observation["original_body_sha256"])
+        self.assertFalse(proof["original_bytes_retained_in_repo"])
+        self.assertFalse(proof["original_notice_identifiers_retained_in_repo"])
+        self.assertFalse(proof["source_hash_independently_recomputed_this_checkpoint"])
+
+        labels = manifest["ground_truth"]
+        self.assertEqual(labels["independent_held_out_award_positive_cases"], 0)
+        self.assertEqual(labels["independent_held_out_award_negative_cases"], 0)
+        self.assertEqual(labels["verified_notice_to_award_cross_source_cases"], 0)
+        self.assertEqual(labels["scoring_benchmark"], "NO_VALIDATED_BENCHMARK")
+        self.assertFalse(labels["approved_for_customer_scoring"])
+        self.assertEqual(labels["source_specific_commercial_reuse"],
+                         "UNKNOWN_NOT_CLEARED")
+        self.assertEqual(labels["live_scheduled_writer_receipt"],
+                         "NOT_VERIFIED_BY_ONE_SHOT_PROOF")
+        controls = manifest["synthetic_negative_controls"]
+        self.assertEqual(len(controls), 5)
+        self.assertEqual(len({c["id"] for c in controls}), 5)
+        self.assertTrue(all(c["id"].startswith("SYNTHETIC_")
+                            and c["independent_ground_truth"] is False
+                            for c in controls))
+        # The control descriptions must retain their exact fail-closed
+        # outcomes. Merely having five SYNTHETIC_ strings is not a gate.
+        expected_control_outcomes = {
+            "SYNTHETIC_BODY_HASH_IS_NOT_AWARD_LABEL":
+                "NO_VALIDATED_BENCHMARK",
+            "SYNTHETIC_ETAG_IS_NOT_SHA256":
+                "REJECT_ETAG_AS_BODY_DIGEST",
+            "SYNTHETIC_HEAD_LENGTH_IS_NOT_BODY_PROOF":
+                "REQUIRE_FULL_ORIGINAL_BODY_READ",
+            "SYNTHETIC_SINGLE_ARCHIVE_IS_NOT_ASOF_HISTORY":
+                "HISTORICAL_VISIBILITY_UNKNOWN",
+            "SYNTHETIC_QUARANTINED_FIELD_IS_NOT_CLEAN_LABEL":
+                "QUARANTINE_NOT_ADJUDICATION",
+        }
+        self.assertEqual(
+            {c["id"]: c["expected"] for c in controls},
+            expected_control_outcomes,
+        )
+        head_only = historical["current_public_head_observation"]
+        self.assertFalse(head_only["original_body_read"])
+        self.assertIsNone(head_only["original_body_sha256"])
+        self.assertEqual(labels["historical_version_completeness"],
+                         "UNKNOWN_NOT_ESTABLISHED")
+        self.assertGreater(
+            observation["quarantined_solicitation_control_fields"], 0
+        )
+
+        # Tampering with original bytes or inventing positive labels makes
+        # the pinned manifest digest fail, even if its source shape is valid.
+        for section, field, replacement in (
+            ("observation", "original_body_sha256", "0" * 64),
+            ("ground_truth", "independent_held_out_award_positive_cases", 5_139),
+            ("ground_truth", "approved_for_customer_scoring", True),
+        ):
+            forged = copy.deepcopy(manifest)
+            forged[section][field] = replacement
+            self.assertNotEqual(canonical_checksum(forged),
+                                forged["manifest_sha256"])
+
     def test_official_daily_public_extract_is_not_archived_fy2027_ground_truth(self):
         pack = json.loads((Path(__file__).with_name('fixtures') /
             'capturebrief_fy2027_archive_growth_boundary_v1.json').read_text())

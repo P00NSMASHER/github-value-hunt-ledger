@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "manifest_id": "SAM_FY2027_ARCHIVED_ORIGINAL_BODY_2026_11_01_V1",
+  "classification": "FIRST_PARTY_FULL_BYTE_ARCHIVE_OBSERVATION_NOT_AWARD_GROUND_TRUTH",
+  "publisher": "U.S. General Services Administration / SAM.gov",
+  "catalog_url": "https://sam.gov/data-services/Contract%20Opportunities/Archived%20Data?privacy=Public",
+  "source_url": "https://s3.amazonaws.com/falextracts/Contract%20Opportunities/Archived%20Data/FY2027_archived_opportunities.csv",
+  "observation": {
+    "observed_at_utc": "2026-11-01T21:25:33Z",
+    "transport": "HTTPS_IDENTITY_COMPLETE_HTTP_200",
+    "original_bytes": 8833904,
+    "original_body_sha256": "980840a8d53ad92caec672c35910c61908a96b5f17e9234c667294001479662b",
+    "original_csv_rows": 5139,
+    "distinct_notice_ids": 5139,
+    "quarantined_solicitation_control_fields": 1,
+    "status": "PUBLIC_ARCHIVE_WITH_QUARANTINED_SOLICITATION_FIELD",
+    "publisher_etag": "\"4f77c130a792a3d0cf28c3d6d6479b5e-2\"",
+    "publisher_etag_is_sha256": false,
+    "publisher_last_modified_utc": "2026-11-01T15:53:41Z"
+  },
+  "proof": {
+    "actual_execution": "GITHUB_ACTIONS_ONE_SHOT_FULL_ORIGINAL_READ",
+    "workflow_run_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/41351922492",
+    "workflow_run_id": 41351922492,
+    "workflow_job_id": 124983775762,
+    "workflow_step": "Authenticate one bounded SAM FY2027 original CSV (review-only)",
+    "source_reader_commit": "b587811ffb3fd17ad62141e2d21a879761b209f5",
+    "source_reader_git_blob_sha1": "2a31d52b5feb2882f3a86c578e5e17299ee901b4",
+    "original_bytes_retained_in_repo": false,
+    "original_notice_identifiers_retained_in_repo": false,
+    "source_hash_independently_recomputed_this_checkpoint": false,
+    "source_body_evidence": "ACTUAL_HOSTED_JOB_LOG_NOT_LOCAL_FULL_BYTE_REHASH"
+  },
+  "ground_truth": {
+    "independent_held_out_award_positive_cases": 0,
+    "independent_held_out_award_negative_cases": 0,
+    "verified_notice_to_award_cross_source_cases": 0,
+    "historical_version_completeness": "UNKNOWN_NOT_ESTABLISHED",
+    "current_customer_recoveries": "UNKNOWN_NOT_MEASURED",
+    "source_specific_commercial_reuse": "UNKNOWN_NOT_CLEARED",
+    "automated_access_rights": "REVIEW_REQUIRED_PER_OFFICIAL_SAM_TERMS",
+    "scoring_benchmark": "NO_VALIDATED_BENCHMARK",
+    "approved_for_customer_scoring": false,
+    "live_scheduled_writer_receipt": "NOT_VERIFIED_BY_ONE_SHOT_PROOF"
+  },
+  "synthetic_negative_controls": [
+    {
+      "id": "SYNTHETIC_BODY_HASH_IS_NOT_AWARD_LABEL",
+      "expected": "NO_VALIDATED_BENCHMARK",
+      "independent_ground_truth": false
+    },
+    {
+      "id": "SYNTHETIC_ETAG_IS_NOT_SHA256",
+      "expected": "REJECT_ETAG_AS_BODY_DIGEST",
+      "independent_ground_truth": false
+    },
+    {
+      "id": "SYNTHETIC_HEAD_LENGTH_IS_NOT_BODY_PROOF",
+      "expected": "REQUIRE_FULL_ORIGINAL_BODY_READ",
+      "independent_ground_truth": false
+    },
+    {
+      "id": "SYNTHETIC_SINGLE_ARCHIVE_IS_NOT_ASOF_HISTORY",
+      "expected": "HISTORICAL_VISIBILITY_UNKNOWN",
+      "independent_ground_truth": false
+    },
+    {
+      "id": "SYNTHETIC_QUARANTINED_FIELD_IS_NOT_CLEAN_LABEL",
+      "expected": "QUARANTINE_NOT_ADJUDICATION",
+      "independent_ground_truth": false
+    }
+  ],
+  "provenance_limitations": [
+    "Original bytes were read ephemerally and not retained, so the source SHA-256 is traceable to the exact authenticated workflow log but cannot be independently recomputed here.",
+    "Single-publisher archive rows do not establish notice publication timing, full version histories, independent awards, settlements or recoverable overpayments.",
+    "SAM.gov terms restrict automated gathering; one official public extract observation grants no unattended refresh or commercial scoring authorization.",
+    "Research writer receipt may be cached degraded and requires separate permitted live readback before a current-writer freshness claim."
+  ],
+  "manifest_sha256": "6c65d81a80688ba3da194431faff18a29b23ce76d27840c9cc025c914b366edc"
+}
