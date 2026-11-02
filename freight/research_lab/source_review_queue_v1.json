@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-01",
+  "as_of_utc_date": "2026-11-02",
   "commercial_recovery_allowed": false,
   "customer_contact_actions": 0,
   "engines": {
@@ -649,7 +649,7 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "4c15e65b0d09c6f3c4f25065ae199577d6483b89a05f53c306eaaca26c690e07",
+  "queue_sha256": "ab4f31a2b7fbcc6046493b74d6eb423cb6633dcc3ef19b8b4a0c19596f77d5ab",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
