@@ -92,6 +92,51 @@ class ScoutTests(unittest.TestCase):
             self.assertFalse(persist_queue(path,{**meaningful,
                 "search_diagnostics":[{"error":"GITHUB_RATE_LIMIT"}]}))
 
+    def test_higher_ranked_unreviewed_candidate_cannot_silently_disappear(self):
+        # Regression: 55-point MIT lead was silently displaced by 31-point
+        # UNKNOWN lead in a generated ten-slot HUNTER-07 snapshot.
+        top = {"repository": "example/strong-mit", "exact_revision": "a" * 40,
+               "triage_score": 55, "status": "PRE_VERIFICATION_CANDIDATE",
+               "published_license_spdx": "MIT"}
+        low = {"repository": "example/weak", "exact_revision": "b" * 40,
+               "triage_score": 29, "status": "PRE_VERIFICATION_CANDIDATE"}
+        newcomer = {"repository": "example/new", "exact_revision": "c" * 40,
+                    "triage_score": 31, "status": "PRE_VERIFICATION_CANDIDATE",
+                    "published_license_spdx": "UNKNOWN"}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "HUNTER-07.json"
+            before = {"worker_id": "HUNTER-07", "candidate_count": 2,
+                      "candidates": [top, low]}
+            self.assertTrue(persist_queue(path, before))
+            old_bytes = path.read_bytes()
+            unsafe = {**before, "candidates": [newcomer, low]}
+            with self.assertRaisesRegex(ValueError, "source-quality HOLD"):
+                persist_queue(path, unsafe)
+            self.assertEqual(path.read_bytes(), old_bytes)
+
+            # Revised source head for the SAME repository is not a loss.
+            refreshed = {**before, "candidates": [
+                {**top, "exact_revision": "d" * 40}, low]}
+            self.assertTrue(persist_queue(path, refreshed))
+
+    def test_lower_ranked_candidate_can_rotate_out(self):
+        top = {"repository": "example/top", "exact_revision": "a" * 40,
+               "triage_score": 55, "status": "PRE_VERIFICATION_CANDIDATE"}
+        low = {"repository": "example/low", "exact_revision": "b" * 40,
+               "triage_score": 20, "status": "PRE_VERIFICATION_CANDIDATE"}
+        fresh = {"repository": "example/fresh", "exact_revision": "c" * 40,
+                 "triage_score": 35, "status": "PRE_VERIFICATION_CANDIDATE"}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "HUNTER-07.json"
+            before = {"worker_id": "HUNTER-07", "candidate_count": 2,
+                      "candidates": [top, low]}
+            self.assertTrue(persist_queue(path, before))
+            self.assertTrue(persist_queue(
+                path, {**before, "candidates": [top, fresh]}))
+            data = json.loads(path.read_text())
+            self.assertEqual([c["repository"] for c in data["candidates"]],
+                             ["example/top", "example/fresh"])
+
     def test_digest_is_byte_stable_without_new_source_evidence(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
