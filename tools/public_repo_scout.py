@@ -165,11 +165,48 @@ def meaningful_snapshot(data):
     ]
     return result
 
+def unexplained_rank_losses(old, data):
+    """Flag silent replacement of better unreviewed leads by worse-ranked leads.
+
+    A queue is a bounded triage snapshot, not a reviewed rejection ledger.
+    Candidate metadata can be refreshed or a lower-ranked lead can rotate
+    out, but a higher-ranked missing lead requires an explicit disposition.
+    Compare repository identities, not commit SHAs, to permit source updates.
+    """
+    previous = old.get("candidates") or []
+    incoming = data.get("candidates") or []
+    if not isinstance(previous, list) or not isinstance(incoming, list):
+        raise ValueError("Scout candidates must be lists")
+    new_repositories = {
+        str(c.get("repository") or "").casefold()
+        for c in incoming if isinstance(c, dict)
+    }
+    weakest_new_score = min(
+        (int(c.get("triage_score") or 0)
+         for c in incoming if isinstance(c, dict)), default=-1)
+    losses = {
+        (str(c.get("repository") or "").casefold(), int(c.get("triage_score") or 0))
+        for c in previous if isinstance(c, dict)
+        and c.get("status") == "PRE_VERIFICATION_CANDIDATE"
+        and c.get("repository")
+        and str(c["repository"]).casefold() not in new_repositories
+        and int(c.get("triage_score") or 0) > weakest_new_score
+    }
+    return sorted(losses)
+
+
 def persist_snapshot(path,data):
     if path.exists():
         old=json.loads(path.read_text(encoding="utf-8"))
         if meaningful_snapshot(old)==meaningful_snapshot(data):
             return False
+        losses = unexplained_rank_losses(old, data)
+        if losses:
+            detail = ", ".join(f"{repo} (score {score})" for repo, score in losses)
+            raise ValueError(
+                "Scout source-quality HOLD: high-ranked unreviewed candidate "
+                "would disappear while lower-ranked results remain: " + detail
+                + "; preserve the existing queue until reviewed and resolved")
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(data,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     return True
