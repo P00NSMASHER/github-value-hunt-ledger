@@ -5319,6 +5319,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-03",
+      "id": "6679664f8c15d67fadc21eabaf95181d82483fe2d403434d70f74a8d5225cf51",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/tidydata-dev/public-tenders-scraper"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -13113,6 +13129,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "23ef6a73e490b3ab562622e5f24dc9a32a3e86472862ad7aaa477335758c5cfe",
+  "entries_sha256": "c1746c722ea0d3bb1f03a330cea3fd16b682a2c5ef81f789ea786d0d864fad0d",
   "schema_version": 1
 }
