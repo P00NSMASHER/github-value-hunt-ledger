@@ -177,6 +177,10 @@ def unexplained_rank_losses(old, data):
     incoming = data.get("candidates") or []
     if not isinstance(previous, list) or not isinstance(incoming, list):
         raise ValueError("Scout candidates must be lists")
+    # A genuine empty result is a withdrawal, not a lower-quality
+    # replacement; existing material-evidence tests require recording it.
+    if not incoming:
+        return []
     new_repositories = {
         str(c.get("repository") or "").casefold()
         for c in incoming if isinstance(c, dict)
