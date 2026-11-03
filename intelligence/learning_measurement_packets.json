@@ -31,14 +31,14 @@
       "manual_work_can_complete_packet": false,
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 79.5,
-      "packet_id": "LMP:5120aca8e42fecf4",
-      "packet_sha256": "384efa1d3fe062a74ce90d90840709fc087e399d354ac5d729ed1e14895381a1",
+      "packet_id": "LMP:4f1c6e41c8e4651f",
+      "packet_sha256": "6138d4c4b36e2c21d5ddf7ba9316a36cfc8cf791974e5ddcf12169cea8845a54",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
       "provenance": {
         "learning_curriculum_sha": "43d6836c032742efd5c797a766e59946a872ef47912907d8e3a3a56c0e806eba",
-        "search_seeds_sha": "f541ea58b23885ccbf5bb64acd8c8fc576cd83acf09bcd06c2974477eb0db458"
+        "search_seeds_sha": "3d23f088f2fb5d794e27ea3426a9fae56ae778701d4761f430a5f1ecd33816e8"
       },
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
@@ -127,14 +127,14 @@
       "manual_work_can_complete_packet": false,
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 78.75,
-      "packet_id": "LMP:0766e26fc523679f",
-      "packet_sha256": "bbf65e6c2f5526de83dadca0b1208dbf08f5fee8c05b553a87da2ed9fab4e7ea",
+      "packet_id": "LMP:590c0a824c9c603d",
+      "packet_sha256": "d16175b5abff78b7fba91dcfbc0e339c559a2fcfc70e436a74965a417455a80b",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
       "provenance": {
         "learning_curriculum_sha": "43d6836c032742efd5c797a766e59946a872ef47912907d8e3a3a56c0e806eba",
-        "search_seeds_sha": "f541ea58b23885ccbf5bb64acd8c8fc576cd83acf09bcd06c2974477eb0db458"
+        "search_seeds_sha": "3d23f088f2fb5d794e27ea3426a9fae56ae778701d4761f430a5f1ecd33816e8"
       },
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
@@ -223,14 +223,14 @@
       "manual_work_can_complete_packet": false,
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 60.0,
-      "packet_id": "LMP:ef55e3fcb8e069a0",
-      "packet_sha256": "7168a7c9bff102107826790d5bb5dc5ab0e1fbebebbc00f379db64c166f19afd",
+      "packet_id": "LMP:0a434b24b3d1e1e9",
+      "packet_sha256": "31c4143241a01bdeb073ed74d0818d31525b612dc3989e844c45ef99a53dc059",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
       "provenance": {
         "learning_curriculum_sha": "43d6836c032742efd5c797a766e59946a872ef47912907d8e3a3a56c0e806eba",
-        "search_seeds_sha": "f541ea58b23885ccbf5bb64acd8c8fc576cd83acf09bcd06c2974477eb0db458"
+        "search_seeds_sha": "3d23f088f2fb5d794e27ea3426a9fae56ae778701d4761f430a5f1ecd33816e8"
       },
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",

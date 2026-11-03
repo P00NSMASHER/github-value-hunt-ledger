@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "response_learning_generation_id": "RESPLEARN:4615ed162555",
-  "clock_commit_sha": "d84ae828fd8cad8bdc020feac34aea62081edb66",
-  "clock_timestamp": "2026-11-01T21:22:45Z",
+  "response_learning_generation_id": "RESPLEARN:e2519905c185",
+  "clock_commit_sha": "4a429a15a46725728aac76991abd25f3351ef279",
+  "clock_timestamp": "2026-11-03T18:57:31Z",
   "mode": "measured_feedback",
   "activation_records": 37,
   "global_resolved_primary_activations": 37,
