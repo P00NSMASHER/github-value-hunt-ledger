@@ -77,7 +77,7 @@
         "tests"
       ],
       "size_kb": 1299,
-      "stars": 74,
+      "stars": 78,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ai-skills",
@@ -120,7 +120,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 7116,
+      "size_kb": 7015,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -218,8 +218,8 @@
         ".github",
         "package.json"
       ],
-      "size_kb": 1518,
-      "stars": 11,
+      "size_kb": 1530,
+      "stars": 12,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "agent-skills",
@@ -263,7 +263,7 @@
         "tests"
       ],
       "size_kb": 882,
-      "stars": 2,
+      "stars": 3,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "agent-skills",
@@ -296,16 +296,16 @@
       "default_branch": "main",
       "description": "Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "8e18fb0c96924cd473b4115f69a1f40749ee9692",
+      "exact_revision": "b37e359a499550958075f4b1a1a589197d91ba1d",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T15:49:34Z",
+      "pushed_at": "2026-11-03T07:37:57Z",
       "repository": "Daniel987654321/roblox-studio-agent-bridge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 530,
+      "size_kb": 561,
       "stars": 73,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -344,16 +344,16 @@
       "default_branch": "main",
       "description": "Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs",
       "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "f9a9ec086ae0c9dc591b060471ac7141d0a19773",
+      "exact_revision": "154a2fe0e25eaf4b955ec59f3e9228b142b195ef",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-01T15:37:04Z",
+      "pushed_at": "2026-11-03T03:12:14Z",
       "repository": "nahidgaming70/Roblox-QA-Sentinel",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 405,
+      "size_kb": 439,
       "stars": 68,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -424,16 +424,18 @@
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Agent HQ, the Roblox AI Studio Vault and a Roblox game quality gate for Claude Code",
+      "description": "A modular AI development toolkit for Roblox, built for coding agents, research workflows, Luau engineering, and Roblox Studio integration.",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "d2c0f1b0360bf39b3c912edf2dab149f5a2e9281",
+      "exact_revision": "284ae0e185b039ee592f8237a9cdb0d3dd884b5b",
       "forks": 0,
-      "primary_language": "JavaScript",
+      "primary_language": "Python",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-31T16:42:56Z",
-      "repository": "bendover19694-wq/agent-hq-studio",
-      "root_code_signals": [],
-      "size_kb": 311,
+      "pushed_at": "2026-11-03T01:23:35Z",
+      "repository": "IbraDecode/atlas",
+      "root_code_signals": [
+        "tests"
+      ],
+      "size_kb": 35,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -443,13 +445,13 @@
         "forks": 0,
         "license_metadata": 1,
         "not_archived": 5,
-        "root_code_signals": 0,
+        "root_code_signals": 4,
         "stars": 0,
-        "substantive_size": 4,
+        "substantive_size": 2,
         "topics": 0
       },
-      "triage_score": 29,
-      "url": "https://github.com/bendover19694-wq/agent-hq-studio"
+      "triage_score": 31,
+      "url": "https://github.com/IbraDecode/atlas"
     }
   ],
   "catalogs": [
@@ -457,7 +459,7 @@
     23,
     24
   ],
-  "generated_at": "2026-11-01T19:14:34.748106+00:00",
+  "generated_at": "2026-11-03T10:08:16.362026+00:00",
   "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
   "risk_review": [],
   "risk_review_count": 0,
