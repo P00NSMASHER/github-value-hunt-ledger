@@ -119,6 +119,18 @@ class ScoutTests(unittest.TestCase):
                 {**top, "exact_revision": "d" * 40}, low]}
             self.assertTrue(persist_queue(path, refreshed))
 
+    def test_empty_queue_is_a_real_withdrawal_not_a_bad_replacement(self):
+        top = {"repository": "example/strong", "exact_revision": "a" * 40,
+               "triage_score": 55, "status": "PRE_VERIFICATION_CANDIDATE"}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "HUNTER-07.json"
+            prior = {"worker_id": "HUNTER-07", "candidate_count": 1,
+                     "candidates": [top]}
+            self.assertTrue(persist_queue(path, prior))
+            self.assertTrue(persist_queue(
+                path, {**prior, "candidate_count": 0, "candidates": []}))
+            self.assertEqual(json.loads(path.read_text())["candidates"], [])
+
     def test_lower_ranked_candidate_can_rotate_out(self):
         top = {"repository": "example/top", "exact_revision": "a" * 40,
                "triage_score": 55, "status": "PRE_VERIFICATION_CANDIDATE"}
