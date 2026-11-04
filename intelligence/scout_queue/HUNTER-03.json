@@ -10,34 +10,33 @@
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 0,
   "candidates": [],
-  "catalogs": [
-    4,
-    6,
-    33,
-    38
-  ],
-  "generated_at": "2026-10-21T18:46:56.819742+00:00",
-  "mission": "Large-world/open-world structure, streaming, terrain, spatial partitioning and world optimization",
+  "catalogs": [],
+  "evidence_gate": "Verify lawful platform support, owner-controlled approval, attributable real engagement or inbound leads, and actual conversion; publishing requires separate authorization.",
+  "generated_at": "2026-11-04T09:32:12.033044+00:00",
+  "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
+  "project": "retally-social-media",
   "risk_review": [],
   "risk_review_count": 0,
   "schema_version": 2,
+  "scope_version": "active-projects-2026-11-v2",
   "search_diagnostics": [
     {
-      "query": "Roblox StreamingEnabled open world",
+      "query": "social media content scheduler approval workflow open source",
       "returned": 0
     },
     {
-      "query": "Roblox terrain streaming system Luau",
+      "query": "social media campaign conversion attribution UTM analytics",
       "returned": 0
     },
     {
-      "query": "Roblox spatial partition octree Luau",
+      "query": "social media content QA accessibility open source",
       "returned": 0
     },
     {
-      "query": "Roblox world optimization large map",
+      "query": "social media engagement analytics open source self hosted",
       "returned": 0
     }
   ],
+  "target_repository": "P00NSMASHER/github-value-hunt-ledger",
   "worker_id": "HUNTER-03"
 }
