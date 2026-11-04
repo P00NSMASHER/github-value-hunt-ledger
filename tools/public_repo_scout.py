@@ -223,48 +223,7 @@ def persist_snapshot(path,data):
 # Preserve compatibility with existing public scout CI and its tests.
 persist_queue = persist_snapshot
 
-def hunter_effectiveness(root, manifest, scope_version):
-    """Source-only view: queue snapshots are NOT proof of a live benefit."""
-    lines=["## Hunter effectiveness — evidence, not activity claims","",
-           "| Hunter | Assigned research | Current-scope queue | Candidates | Verified outcome |",
-           "|---|---|---|---:|---|"]
-    recorded=0
-    candidates=0
-    for worker in manifest.get("workers") or []:
-        name=worker["id"]
-        path=root/f"{name}.json"
-        status="NO_CURRENT_SCOPE_SNAPSHOT"
-        count=0
-        if path.exists():
-            try:
-                d=json.loads(path.read_text(encoding="utf-8"))
-                if (d.get("scope_version")==scope_version
-                        and d.get("worker_id")==name
-                        and d.get("project")==worker["project"]
-                        and d.get("target_repository")==worker["target_repository"]):
-                    items=d.get("candidates")
-                    if not isinstance(items,list):
-                        status="INVALID_CURRENT_SCOPE_SNAPSHOT"
-                    else:
-                        count=len(items)
-                        recorded+=1
-                        candidates+=count
-                        status="RECORDED_DISCOVERY_ONLY"
-                elif d.get("scope_version")==scope_version:
-                    status="INVALID_CURRENT_SCOPE_SNAPSHOT"
-            except (ValueError, OSError, TypeError, AttributeError):
-                status="INVALID_CURRENT_SCOPE_SNAPSHOT"
-        lines.append(f"| {name} | {worker['project']} | {status} | {count if status=='RECORDED_DISCOVERY_ONLY' else 'UNKNOWN'} | NOT_VERIFIED |")
-    lines += ["",
-              f"Current-scope evidence snapshots: {recorded}/{len(manifest.get('workers') or [])}",
-              f"Pre-verification candidates recorded: {candidates}",
-              "",
-              "**Outcome evidence:** UNKNOWN. Queue snapshots do not establish a profitable trade, collected payment, social conversion, novel scientific finding, code integration or engineer-hours saved.",
-              "Use the corresponding GitHub Actions run and a downstream independently checked receipt before claiming a real outcome.",
-              ""]
-    return lines
-
-def integrate(root,out,scope_version=None,manifest=None):
+def integrate(root,out,scope_version=None):
     merged={}; workers={}; projects={}; included=0
     files=sorted(root.glob("HUNTER-*.json"))
     for p in files:
@@ -291,8 +250,6 @@ def integrate(root,out,scope_version=None,manifest=None):
         repo,sha=key; desc=str(c.get("description") or "").replace("|","\\|").replace("\n"," ")[:180]; ws=", ".join(sorted(workers[key]))
         target=", ".join(sorted(projects[key]))
         lines.append(f"| {c.get('triage_score',0)} | {target} | [{repo}]({c.get('url')}) | {sha[:12]} | {c.get('published_license_spdx','UNKNOWN')} | {ws} | {desc} |")
-    if manifest is not None:
-        lines += ["", *hunter_effectiveness(root,manifest,scope_version)]
     lines += ["","## Promotion rule","","Candidates must still follow the existing worker runbook: exact-revision deep inspection, evidence beyond README where practical, safety/rights review, immutable run submission, verifier handling and integrator review.",""]
     new_text="\n".join(lines)
     if out.exists():
@@ -344,8 +301,7 @@ def main():
     m=json.loads((root/a.manifest).read_text(encoding="utf-8"))
     scope_version=validate_manifest(m)
     if a.integrate:
-        count=integrate(qr,root/a.output,scope_version=scope_version,manifest=m)
-        print(f"Integrated {count} current-scope pre-verification candidates; read actual worker evidence before claiming outcomes")
+        print(f"Integrated {integrate(qr,root/a.output,scope_version=scope_version)} current-scope candidates")
         return
     if not a.worker: ap.error("--worker required unless --integrate")
     ws=m.get("workers") or []
