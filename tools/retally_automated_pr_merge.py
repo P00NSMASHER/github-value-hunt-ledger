@@ -58,6 +58,9 @@ def guarded_target(lane: str, number: int, head_sha: str, base_sha: str,
     parents = commit.get("parents") if isinstance(commit, dict) else None
     if not isinstance(parents, list) or len(parents) != 1:
         raise ProposalHold("Generated commit is not a single-parent snapshot")
+    if "[skip ci]" in str(commit.get("message", "")).lower():
+        raise ProposalHold(f"PR #{number} head {head_sha} suppresses required pull_request CI "
+                           "with [skip ci]. Regenerate the proposal on a fresh branch.")
     first_parent = parents[0].get("sha")
     changes = gh("GET", f"repos/{REPO}/compare/{base_sha}...{head_sha}")
     if (not isinstance(changes, dict) or changes.get("status") != "ahead"
@@ -78,9 +81,61 @@ def guarded_target(lane: str, number: int, head_sha: str, base_sha: str,
 def completed_release_jobs(jobs: list[dict]) -> bool:
     if not isinstance(jobs, list):
         return False
-    found = {x.get("name"): x.get("conclusion") for x in jobs
-             if isinstance(x, dict)}
-    return all(found.get(x) == "success" for x in REQUIRED_JOBS)
+    required = [x for x in jobs if isinstance(x, dict) and x.get("name") in REQUIRED_JOBS]
+    return (len(required) == len(REQUIRED_JOBS)
+            and {x["name"] for x in required} == REQUIRED_JOBS
+            and all(x.get("conclusion") == "success" for x in required))
+
+
+def require_pr_gate(pr: dict, *, deadline: float) -> int:
+    """The main ruleset needs an eligible PR run in addition to exact-head dispatch CI."""
+    number, head = pr["number"], pr["head"]
+    branch, sha = head["ref"], head["sha"]
+    root = f"repos/{REPO}/actions"
+    path = (f"{root}/workflows/{GATE_WORKFLOW}/runs?event=pull_request"
+            f"&branch={quote(branch, safe='')}&head_sha={sha}&per_page=1")
+    for attempt in range(36):
+        listing = gh("GET", path)
+        runs = listing.get("workflow_runs") if isinstance(listing, dict) else None
+        if runs == []:
+            if attempt >= 2:
+                raise ProposalHold(f"PR #{number} at {sha} lacks a pull_request release-gate. "
+                                   "Check PR workflow approval and commit skip directives. "
+                                   "A workflow_dispatch pass cannot satisfy this ruleset.")
+        elif isinstance(runs, list) and len(runs) == 1:
+            run = runs[0]
+            if (not isinstance(run, dict) or type(run.get("id")) is not int
+                    or run["id"] <= 0 or run.get("event") != "pull_request"
+                    or run.get("path") != ".github/workflows/" + GATE_WORKFLOW
+                    or run.get("head_sha") != sha or run.get("head_branch") != branch
+                    or run.get("head_repository", {}).get("full_name") != REPO):
+                raise ProposalHold("PR-event release run has unverified source identity")
+            run_id = run["id"]
+            if run.get("status") == "completed":
+                conclusion = run.get("conclusion")
+                if conclusion != "success":
+                    reason = conclusion if conclusion in {"failure", "cancelled", "skipped",
+                                                          "timed_out", "action_required"} else "unknown"
+                    raise ProposalHold(f"PR #{number} release-gate run {run_id}: {reason}")
+                if not any(isinstance(p, dict) and p.get("number") == number
+                           and p.get("head", {}).get("sha") == sha
+                           and p.get("base", {}).get("ref") == "main"
+                           for p in (run.get("pull_requests") or [])):
+                    raise ProposalHold(f"Release run {run_id} lacks the exact PR association")
+                jobs = gh("GET", f"{root}/runs/{run_id}/jobs?per_page=100")
+                listed = jobs.get("jobs") if isinstance(jobs, dict) else None
+                if (not completed_release_jobs(listed)
+                        or jobs.get("total_count") != len(listed)):
+                    raise ProposalHold(f"PR #{number} release run {run_id} lacks five passing jobs")
+                return run_id
+            if run.get("status") == "action_required":
+                raise ProposalHold(f"PR #{number} release run {run_id} requires action in GitHub")
+        else:
+            raise ProposalHold("Cannot verify PR-event release run inventory")
+        if time.monotonic() + 10 >= deadline:
+            break
+        time.sleep(10)
+    raise ProposalHold(f"PR #{number} release-gate has not completed in the allotted time")
 
 
 def match_fresh_run(runs: list[dict], branch: str, sha: str, started: dt.datetime):
@@ -282,16 +337,18 @@ def integrate(lane: str, number: int, head_sha: str, base_sha: str):
     # another publisher has advanced main before this run starts.
     proposal, approved = guarded_target(
         lane, number, head_sha, base_sha, require_current_main=False)
+    deadline = started + MAX_TOTAL_PROOF_SECONDS
+    pr_run = require_pr_gate(proposal, deadline=deadline)
     if _current_main_sha() != base_sha:
-        return _prove_and_merge_updated_main(
+        return {**_prove_and_merge_updated_main(
             lane, number, head_sha, base_sha, approved.files,
-            start_time=started)
-    run_id = dispatch_and_verify(proposal["head"]["ref"], head_sha)
+            start_time=started), "pr_ci_run_id": pr_run}
+    run_id = dispatch_and_verify(proposal["head"]["ref"], head_sha, deadline=deadline)
     # Re-evaluate every mutable remote authority after a long-running CI.
     if _current_main_sha() != base_sha:
-        return _prove_and_merge_updated_main(
+        return {**_prove_and_merge_updated_main(
             lane, number, head_sha, base_sha, approved.files,
-            start_time=started)
+            start_time=started), "pr_ci_run_id": pr_run}
     guarded_target(lane, number, head_sha, base_sha)
     response = gh("PUT", f"repos/{REPO}/pulls/{number}/merge", {
         "sha": head_sha,
@@ -309,7 +366,7 @@ def integrate(lane: str, number: int, head_sha: str, base_sha: str):
     return {
         "result": "MERGED_WITH_ACTUAL_CI", "lane": lane,
         "pr_number": number, "head_sha": head_sha,
-        "merged_sha": result_sha, "ci_run_id": run_id,
+        "merged_sha": result_sha, "ci_run_id": run_id, "pr_ci_run_id": pr_run,
         "files": len(approved.files), "customer_release": "HOLD",
     }
 

@@ -27,6 +27,11 @@ def candidate_pr():
 
 
 def fake_authority_api(method, endpoint, payload=None):
+    if "/actions/workflows/repository-release-gate.yml/runs?event=pull_request" in endpoint:
+        return {"workflow_runs": [native_run(candidate_pr())]}
+    if endpoint.endswith("/actions/runs/312/jobs?per_page=100"):
+        return {"total_count": 5, "jobs": [{"name": name, "conclusion": "success"}
+                                            for name in merge.REQUIRED_JOBS]}
     if endpoint.endswith("/branches/main"):
         return {"commit": {"sha": BASE}}
     if endpoint.endswith("/git/commits/" + HEAD):
@@ -37,6 +42,13 @@ def fake_authority_api(method, endpoint, payload=None):
     if endpoint.endswith("/pulls/19"):
         return candidate_pr()
     raise AssertionError("Unexpected provider request: " + method + " " + endpoint)
+
+
+def native_run(pr):
+    return {"id": 312, "event": "pull_request", "status": "completed", "conclusion": "success",
+            "path": ".github/workflows/repository-release-gate.yml",
+            "head_sha": pr["head"]["sha"], "head_branch": pr["head"]["ref"],
+            "head_repository": {"full_name": proposal.REPO}, "pull_requests": [pr]}
 
 
 class GeneratedBotControllerTests(unittest.TestCase):
@@ -123,7 +135,9 @@ class GeneratedBotControllerTests(unittest.TestCase):
         with patch.object(merge, "gh", side_effect=api), \
              patch.object(merge, "dispatch_and_verify", return_value=991) as ci:
             result = merge.integrate("scout", 19, HEAD, BASE)
-        ci.assert_called_once_with(BRANCH, HEAD)
+        ci.assert_called_once()
+        self.assertEqual(ci.call_args.args, (BRANCH, HEAD))
+        self.assertEqual(result["pr_ci_run_id"], 312)
         self.assertEqual(result["result"], "MERGED_WITH_ACTUAL_CI")
         self.assertEqual(result["customer_release"], "HOLD")
         self.assertEqual(requests, [(
@@ -142,6 +156,45 @@ class GeneratedBotControllerTests(unittest.TestCase):
              patch.object(merge, "dispatch_and_verify", return_value=42):
             with self.assertRaises(ProposalHold):
                 merge.integrate("scout", 19, HEAD, BASE)
+
+    def test_skip_marker_blocks_before_dispatch_or_merge(self):
+        def original(method, path, payload=None):
+            if path.endswith("/git/commits/" + HEAD):
+                return {"parents": [{"sha": BASE}], "message": "chore: refresh technology intelligence [skip ci]"}
+            self.assertEqual(method, "GET")
+            return fake_authority_api(method, path, payload)
+        with patch.object(merge, "gh", side_effect=original), self.assertRaisesRegex(ProposalHold, "suppresses"):
+            merge.integrate("scout", 19, HEAD, BASE)
+
+    def test_dispatch_wrong_pr_fork_stale_or_failed_native_run_never_merges(self):
+        for change in ({"event": "workflow_dispatch"}, {"head_sha": BASE}, {"pull_requests": []},
+                       {"head_repository": {"full_name": "other/fork"}}, {"conclusion": "failure"}):
+            def provider(method, path, payload=None):
+                self.assertEqual(method, "GET")
+                if "runs?event=pull_request" in path:
+                    return {"workflow_runs": [{**native_run(candidate_pr()), **change}]}
+                return fake_authority_api(method, path, payload)
+            with self.subTest(change=change), patch.object(merge, "gh", side_effect=provider), \
+                 self.assertRaises(ProposalHold):
+                merge.integrate("scout", 19, HEAD, BASE)
+
+    def test_missing_native_gate_reports_action_and_never_writes(self):
+        with patch.object(merge, "gh", return_value={"workflow_runs": []}) as gh, \
+             patch.object(merge.time, "sleep"), self.assertRaisesRegex(ProposalHold, "lacks a pull_request"):
+            merge.require_pr_gate(candidate_pr(), deadline=float("inf"))
+        self.assertEqual({c.args[0] for c in gh.call_args_list}, {"GET"})
+
+    def test_duplicate_release_job_never_qualifies(self):
+        jobs = [{"name": name, "conclusion": "success"} for name in merge.REQUIRED_JOBS]
+        self.assertFalse(merge.completed_release_jobs([*jobs, jobs[0]]))
+
+    def test_provider_denial_only_exposes_fixed_diagnostics(self):
+        reason = proposal.merge_denial('{"message":"Required status check release-gate is expected. PRIVATE"}',
+                                       "gh: PRIVATE (HTTP 405)")
+        self.assertIn("HTTP 405", reason)
+        self.assertIn("release-gate", reason)
+        self.assertNotIn("PRIVATE", reason)
+        self.assertIn("unknown", proposal.merge_denial("private provider body", "private stderr"))
 
     def test_proposal_creation_requires_actual_pinned_single_parent(self):
         env = {"GITHUB_REPOSITORY": proposal.REPO,
