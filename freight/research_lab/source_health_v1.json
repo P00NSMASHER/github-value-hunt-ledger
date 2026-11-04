@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-03",
+  "as_of_utc_date": "2026-11-04",
   "commercial_recovery_allowed": false,
   "cross_engine_shared_pointers": 8,
   "customer_communication_actions": 0,
@@ -22,8 +22,8 @@
       "official_publisher_host_only": 33,
       "other_allowlisted_host_only": 6,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 255,
-      "third_party_catalog_host_only": 216,
+      "source_pointers": 256,
+      "third_party_catalog_host_only": 217,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -50,9 +50,9 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 29,
+  "first_seen_in_last_seven_calendar_days": 27,
   "independent_payment_verification_cases": 0,
-  "latest_first_seen": "2026-11-03",
+  "latest_first_seen": "2026-11-04",
   "limitations": [
     "Publisher host identity does not establish source authenticity, rights, relevance or ground truth.",
     "URL-only topic flags are screening heuristics, not verified classifications.",
@@ -75,13 +75,13 @@
     "www.sec.gov": 2,
     "www.stb.gov": 1,
     "www2.fmc.gov": 8,
-    "zenodo.org": 502
+    "zenodo.org": 503
   },
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "c1746c722ea0d3bb1f03a330cea3fd16b682a2c5ef81f789ea786d0d864fad0d",
-  "unique_source_pointers": 820,
+  "source_ledger_entries_sha256": "4e3a92536b89f90e61bd996e46c391997ded0d0fdddb8adaebb86b92140c75c9",
+  "unique_source_pointers": 821,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }
