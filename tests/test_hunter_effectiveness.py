@@ -115,7 +115,7 @@ class HunterOutcomeTruthTests(unittest.TestCase):
         self.assertTrue(allowed_path("scout", path, ti_paths=frozenset()))
         self.assertFalse(allowed_path("scout", "automation/secret.md",
                                       ti_paths=frozenset()))
-        report = "# Hunter effectiveness\\n\\nVerified integration: UNKNOWN\\n"
+        report = "# Hunter effectiveness\n\nVerified integration: UNKNOWN\n"
         self.assertEqual(evidence_value(path, report), report)
         self.assertNotEqual(semantic_fingerprint({path: report}),
                             semantic_fingerprint({path: report + "review needed\\n"}))
@@ -128,7 +128,7 @@ class HunterOutcomeTruthTests(unittest.TestCase):
         self.assertEqual(got, EXPECTED_CRONS)
         self.assertIn("branches: [main]", source)
         self.assertIn('if [ "$EVENT_NAME" = "push" ]; then worker="HUNTER-01"; fi', source)
-        self.assertIn("EVENT_NAME: \${{ github.event_name }}".replace("\\", ""), source)
+        self.assertIn('EVENT_NAME: ${{ github.event_name }}', source)
         self.assertIn("python -m tools.hunter_effectiveness", source)
         self.assertIn("automation/HUNTER_EFFECTIVENESS.md", source)
         self.assertNotIn("cancel-in-progress: true", source)
