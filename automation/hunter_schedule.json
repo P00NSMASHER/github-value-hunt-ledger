@@ -1,231 +1,202 @@
 {
   "schema_version": 2,
-  "focus": "StarBlox native Roblox release using the repository-authorized Brookhaven world structure as the world foundation.",
+  "focus": "Public open-source technology hunting for trading research, verified revenue, RETALLY social media, falsifiable novel discovery, engineering-time reduction and existing ABVM, PermitPlate, CaptureBrief and Portfolio Brain projects. No Genesis or retired StarBlox dedicated hunters.",
   "rules": [
-    "Search only for public, lawful, rights-clean or clean-room-useful technology that can materially accelerate P00NSMASHER/StarBlox.",
-    "Prioritize Roblox/Luau/Studio/Open Cloud/world-conversion/gameplay/testing/performance/education capabilities over unrelated commercial domains.",
-    "Public visibility is not public domain. Record exact revisions and rights constraints; no-license material is reference/clean-room only unless permission exists.",
-    "Never collect credentials, private data, leaked/confidential material, exploit kits, or unauthorized-access techniques."
+    "Search public repositories only for lawful rights-reviewable material. Discovery outputs are untrusted leads, not code execution or guaranteed outcomes.",
+    "Require explicit project assignment and direct applicability to active work; no dedicated Genesis or retired StarBlox research.",
+    "Keep exact revision, licensing, attribution, source provenance, security limitations, test evidence and remaining acceptance gates; never present a discovered repository as a deployed improvement.",
+    "Trading research is observational/simulated only: no brokerage orders, secrets, paid services, live positions or fabricated backtest performance.",
+    "Scientific novelty is UNKNOWN unless a reproducible finding survives independent experiments and serious human/AI literature/prior-art review; GitHub search alone cannot establish novelty.",
+    "Engineering-time savings are UNKNOWN until measured against a real before/after task on an active repository with working integration and independently verified behavior.",
+    "Social media research does not authorize posting, messaging, engagement automation, bypassing platform limits or scraping private content.",
+    "No live publishing, merging, spending, customer outreach, child/medical records, credentials, leaked/confidential material, or unsafe access techniques.",
+    "Unlicensed code is reference-only without proven rights. Private target code must never be copied or exposed in public scout output."
   ],
   "workers": [
     {
       "id": "HUNTER-01",
-      "catalogs": [
-        1,
-        2,
-        41,
-        44
-      ],
-      "mission": "Roblox/Luau production frameworks and dependency/tooling accelerators for StarBlox",
+      "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
       "queries": [
-        "Roblox Luau framework Rojo Wally",
-        "Roblox game framework Luau stars:<3000",
-        "Rojo plugin Roblox workflow stars:<3000",
-        "Lune rbx-dom Roblox tooling"
-      ]
+        "walk forward trading backtest python open source",
+        "Tradier API market data python open source",
+        "stock strategy backtest slippage fees reproducible",
+        "historical market data replay validation framework"
+      ],
+      "project": "trading",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims."
     },
     {
       "id": "HUNTER-02",
-      "catalogs": [
-        3,
-        13,
-        34,
-        36
-      ],
-      "mission": "Roblox place/model ingestion, world conversion, scene graph and migration tooling",
+      "mission": "Revenue hunt: find reusable B2B prospect discovery, customer conversion, billing/reconciliation and measured funnel tools that could help active RETALLY businesses achieve a first independently verified collected dollar.",
       "queries": [
-        "Roblox rbxl rbxlx rbxmx parser converter",
-        "rbx-dom Roblox model tooling",
-        "Roblox place file migration tooling",
-        "Roblox scene graph serializer Luau"
-      ]
+        "B2B lead qualification open source public data",
+        "self hosted CRM conversion reply tracking",
+        "Stripe webhook payment reconciliation open source",
+        "business prospect enrichment public records pipeline"
+      ],
+      "project": "revenue-hunt",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Success requires independently verified customer action or actual collected payment; a lead, mock purchase, generated invoice or GitHub candidate is not revenue."
     },
     {
       "id": "HUNTER-03",
-      "catalogs": [
-        4,
-        6,
-        33,
-        38
-      ],
-      "mission": "Large-world/open-world structure, streaming, terrain, spatial partitioning and world optimization",
+      "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
       "queries": [
-        "Roblox StreamingEnabled open world",
-        "Roblox terrain streaming system Luau",
-        "Roblox spatial partition octree Luau",
-        "Roblox world optimization large map"
-      ]
+        "social media content scheduler approval workflow open source",
+        "social media campaign conversion attribution UTM analytics",
+        "social media content QA accessibility open source",
+        "social media engagement analytics open source self hosted"
+      ],
+      "project": "retally-social-media",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Verify lawful platform support, owner-controlled approval, attributable real engagement or inbound leads, and actual conversion; publishing requires separate authorization."
     },
     {
       "id": "HUNTER-04",
-      "catalogs": [
-        5,
-        9,
-        31,
-        42
-      ],
-      "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
+      "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
       "queries": [
-        "Roblox server authoritative netcode Luau",
-        "Roblox RemoteEvent validation framework",
-        "Roblox networking replication framework Luau",
-        "Roblox anti exploit server validation open source"
-      ]
+        "scientific hypothesis generation open source automated",
+        "open scientific data anomaly detection discovery",
+        "symbolic regression scientific equation discovery",
+        "scientific literature prior art semantic search open source"
+      ],
+      "project": "novel-discovery",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists."
     },
     {
       "id": "HUNTER-05",
-      "catalogs": [
-        7,
-        28,
-        29,
-        30
-      ],
-      "mission": "Roblox persistence, inventory, economy, ProfileStore-style data safety and exactly-once transaction patterns",
+      "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
       "queries": [
-        "Roblox ProfileStore data persistence Luau",
-        "Roblox inventory system server authoritative",
-        "Roblox economy transaction ledger Luau",
-        "Roblox datastore retry session lock framework"
-      ]
+        "automated code migration codemod typescript python",
+        "test impact analysis selective CI github actions",
+        "automated bug reproduction regression test minimization",
+        "reproducible build dependency license audit automation"
+      ],
+      "project": "engineering-acceleration",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved."
     },
     {
       "id": "HUNTER-06",
-      "catalogs": [
-        8,
-        10,
-        37
-      ],
-      "mission": "Roblox UI/mobile/input/accessibility systems and scalable player UX",
+      "mission": "ABVM standards-aligned Grade-2 practice, formative assessment, misconception feedback and evidence-based progression",
       "queries": [
-        "Roblox responsive UI mobile Luau",
-        "Roblox UI framework Fusion React Lua",
-        "Roblox touch controls input framework",
-        "Roblox accessibility reduced motion UI"
-      ]
+        "adaptive learning quiz spaced repetition open source",
+        "formative assessment distractor feedback education",
+        "grade 2 math practice open source",
+        "mastery learning question bank javascript"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-07",
-      "catalogs": [
-        11,
-        23,
-        24
-      ],
-      "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
+      "mission": "ABVM public teacher-page ingestion with provenance, date accuracy, stale-source guards and safe curriculum refresh",
       "queries": [
-        "Roblox Studio automation plugin testing",
-        "Roblox AI coding agent Studio",
-        "Roblox plugin automated instance editing",
-        "Rojo Roblox automated playtest CI"
-      ]
+        "school website scraper provenance change detection",
+        "website change monitoring data validation python",
+        "structured education calendar extraction",
+        "web content change detection source citations"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-08",
-      "catalogs": [
-        12,
-        20,
-        21
-      ],
-      "mission": "Roblox testing, simulation, replay, deterministic verification and CI tooling",
+      "mission": "ABVM printable worksheets, test-shaped practice sheets and accessible mobile-first interactive quizzes",
       "queries": [
-        "Roblox Luau unit test framework",
-        "Roblox automated playtest framework",
-        "Roblox replay simulation deterministic Luau",
-        "Roblox CI testing Rojo Selene Stylua"
-      ]
+        "worksheet generator elementary math javascript",
+        "printable quiz PDF generator open source",
+        "browser interactive quiz grade school",
+        "document layout worksheet print CSS"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-09",
-      "catalogs": [
-        14,
-        15,
-        35
-      ],
-      "mission": "Educational game systems, adaptive assessment, mastery learning and safe question generation useful to StarBlox",
+      "mission": "ABVM offline-first PWA reliability, accessibility, iOS layout and real browser regression tests",
       "queries": [
-        "adaptive assessment game open source",
-        "mastery learning game engine",
-        "IRT adaptive quiz open source game",
-        "educational game question generator offline"
-      ]
+        "offline first progressive web app testing",
+        "service worker update reliability tests",
+        "playwright mobile accessibility PWA",
+        "javascript offline education app test"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-10",
-      "catalogs": [
-        16,
-        17,
-        18
-      ],
-      "mission": "Roblox NPCs, pathfinding, vehicles, interactables and open-world activity systems",
+      "mission": "PermitPlate public NYC permitting/licensing records, change detection, source-linked triage and actionable vendor signals",
       "queries": [
-        "Roblox NPC pathfinding Luau open source",
-        "Roblox vehicle chassis Luau open source",
-        "Roblox interaction system ProximityPrompt framework",
-        "Roblox house door teleport system Luau"
-      ]
+        "NYC open data permits restaurant API",
+        "public records change detection pipeline",
+        "restaurant license data NYC open source",
+        "data provenance evidence linked research pipeline"
+      ],
+      "project": "permitplate",
+      "target_repository": "P00NSMASHER/permitplate-nyc"
     },
     {
       "id": "HUNTER-11",
-      "catalogs": [
-        19,
-        39,
-        40
-      ],
-      "mission": "Game-asset pipelines, provenance, 3D/2D processing, optimization and content factories for StarBlox",
+      "mission": "CaptureBrief verified business research, grounded evidence briefs, ingestion accuracy and customer-facing report QA",
       "queries": [
-        "Roblox asset pipeline Blender Rojo",
-        "game asset provenance pipeline open source",
-        "Roblox mesh optimization pipeline",
-        "sprite icon batch generation game assets"
-      ]
+        "evidence backed research report generator",
+        "business intelligence source provenance open source",
+        "automated research brief report Python",
+        "web evidence citation validation pipeline"
+      ],
+      "project": "capturebrief",
+      "target_repository": "P00NSMASHER/capturebrief"
     },
     {
       "id": "HUNTER-12",
-      "catalogs": [
-        22,
-        25,
-        26,
-        27
-      ],
-      "mission": "Roblox performance, profiling, memory/network optimization and mobile scalability",
+      "mission": "Portfolio Brain autonomous repair reliability, protected PR execution, exact-head trust and independent release evidence",
       "queries": [
-        "Roblox performance profiler Luau",
-        "Roblox memory optimization streaming",
-        "Roblox network optimization replication",
-        "Roblox mobile performance open world"
-      ]
+        "github actions protected pull request verifier",
+        "autonomous software maintenance regression tests",
+        "CI supply chain provenance attestation",
+        "github PR merge gate security automation"
+      ],
+      "project": "portfolio-brain",
+      "target_repository": "P00NSMASHER/portfolio-brain"
     },
     {
       "id": "HUNTER-13",
-      "catalogs": [
-        32,
-        43,
-        45
-      ],
-      "mission": "Roblox liveops, telemetry, experimentation, privacy-minimized analytics and release observability",
+      "mission": "RETALLY first verified customer/revenue outcome: lead intake, source quality, attribution and audit-friendly evidence",
       "queries": [
-        "Roblox telemetry analytics Luau",
-        "Roblox liveops feature flags open source",
-        "Roblox game analytics privacy",
-        "Roblox observability logging framework Luau"
-      ]
+        "B2B lead qualification evidence pipeline open source",
+        "CRM lead intake deduplication validation",
+        "customer conversion attribution analytics open source",
+        "business event ledger reconciliation python"
+      ],
+      "project": "retally",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger"
     },
     {
       "id": "HUNTER-14",
-      "catalogs": [
-        46,
-        47
-      ],
-      "mission": "Roblox Open Cloud, publishing, place deployment, release automation and wildcard StarBlox accelerators",
+      "mission": "Reusable security, deterministic testing, deployment verification and rights-safe source inspection for active projects",
       "queries": [
-        "Roblox Open Cloud deployment GitHub Actions",
-        "Roblox publish place CI workflow",
-        "Roblox Open Cloud API tooling",
-        "Roblox game deployment automation Rojo"
-      ]
+        "github action post deployment smoke test",
+        "software bill materials license audit python",
+        "reproducible build artifact verification github",
+        "continuous integration flaky test root cause analyzer"
+      ],
+      "project": "shared-infra",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger"
     }
   ],
   "integrator": {
     "id": "HUNTER-15",
-    "mission": "Deduplicate exact revisions, rank only StarBlox/Roblox-relevant pre-verification candidates, and surface the highest build-time compression opportunities. Never promote directly to MASTER without rights and technical verification."
-  }
+    "mission": "Combine only new-scope active research snapshots; distinguish candidates from reproduced outcomes, preserve explicit project/evidence gates and rights provenance; classify novelty, trading edge, revenue and engineering-time savings as UNKNOWN until independently verified."
+  },
+  "scope_version": "active-projects-2026-11-v2",
+  "active_repositories": [
+    "P00NSMASHER/abvmschoolstarworld",
+    "P00NSMASHER/permitplate-nyc",
+    "P00NSMASHER/capturebrief",
+    "P00NSMASHER/portfolio-brain",
+    "P00NSMASHER/github-value-hunt-ledger"
+  ]
 }

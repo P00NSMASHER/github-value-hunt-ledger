@@ -1,6 +1,6 @@
 # DISPATCH BACKPRESSURE REPORT
 
-Clock: **2026-11-01T21:22:45Z**
+Clock: **2026-11-04T05:48:10Z**
 
 - Primary tickets: **14**
 - Pending: **14**

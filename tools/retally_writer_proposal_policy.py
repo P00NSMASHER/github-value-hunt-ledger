@@ -22,7 +22,7 @@ PROPOSAL_BRANCH = re.compile(
     r"automation/retally-(scout|catalog|integrator|technology)-"
     r"([1-9][0-9]{3,15})-([1-9][0-9]{0,3})\Z"
 )
-SCOUT_EXACT = {"automation/SCOUT_DIGEST.md"}
+SCOUT_EXACT = {"automation/SCOUT_DIGEST.md", "automation/HUNTER_EFFECTIVENESS.md"}
 SCOUT_PREFIXES = ("intelligence/scout_queue/",)
 CATALOG_EXACT = {
     "CAPABILITIES.md", "COMPONENTS.md", "DATASETS.md",
@@ -43,6 +43,13 @@ DATA_EXTENSIONS = {".md", ".json", ".jsonl", ".txt", ".csv"}
 
 class ProposalHold(ValueError):
     """Refuse integration; never silently skip or weaken a configured gate."""
+
+
+def approved_proposal_author(owner: dict) -> bool:
+    return owner.get("login") == "github-actions[bot]" or (
+        owner.get("login") == "portfolio-brain-v8-runtime[bot]"
+        and owner.get("type") == "Bot" and owner.get("id") == 343751880
+    )
 
 
 def safe_relative_file(path: str) -> bool:

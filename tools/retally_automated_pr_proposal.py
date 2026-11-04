@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Publish one generated RETALLY evidence snapshot as a guarded GitHub PR.
+"""Prepare the validated handoff for one App-authored RETALLY evidence PR.
 
 No direct push to main, no unreviewed financial claims and no privileged API
 surface outside the exact repository. An external trusted workflow_dispatch
-controller (not a GITHUB_TOKEN-created PR event) runs real CI before merge.
+controller verifies pull_request CI and independently dispatches exact-head CI.
 """
 from __future__ import annotations
 
@@ -20,8 +20,28 @@ from tools.retally_writer_proposal_policy import (
 )
 
 REPO = "P00NSMASHER/github-value-hunt-ledger"
-CONTROLLER = "retally-generated-pr-merge.yml"
 ALLOWED_EVENTS = frozenset({"schedule", "workflow_dispatch", "push"})
+
+
+def merge_denial(stdout: str, stderr: str) -> str:
+    # GitHub response bodies and CLI stderr may contain private values. Only
+    # expose the numeric HTTP status and fixed descriptions of recognized errors.
+    try:
+        error = json.loads(stdout)
+    except ValueError:
+        error = {}
+    status = re.search(r"\(HTTP ([45][0-9]{2})\)", stderr)
+    message = str(error.get("message", "")).lower() if isinstance(error, dict) else ""
+    reason = "unmet condition unknown"
+    if "required status check" in message and "release-gate" in message:
+        reason = "required release-gate was not accepted"
+    elif "resource not accessible by integration" in message:
+        reason = "GitHub denied this installation access"
+    elif "head branch was modified" in message or "head sha" in message and "match" in message:
+        reason = "PR head changed"
+    elif "review" in message and ("required" in message or "approving" in message):
+        reason = "required PR review is missing"
+    return f"Protected PR merge denied (HTTP {status[1] if status else 'unknown'}): {reason}"
 
 
 def gh(method: str, path: str, payload: dict | None = None):
@@ -40,6 +60,8 @@ def gh(method: str, path: str, payload: dict | None = None):
         raise ProposalHold("GitHub API did not respond safely") from None
     # Never print API stderr: it may contain auth headers or sensitive request details.
     if result.returncode:
+        if method == "PUT" and re.fullmatch(rf"repos/{re.escape(REPO)}/pulls/[1-9][0-9]*/merge", path):
+            raise ProposalHold(merge_denial(result.stdout, result.stderr))
         raise ProposalHold("GitHub API denied proposed operation: "
                            + method + " in scoped repository")
     if not result.stdout.strip():
@@ -94,60 +116,9 @@ def propose(lane: str, branch: str, base: str, head: str):
     fingerprint = os.environ.get("SCOUT_SEMANTIC_FINGERPRINT", "") if lane == "scout" else ""
     if lane == "scout" and re.fullmatch(r"[a-f0-9]{64}", fingerprint) is None:
         raise ProposalHold("Scout proposal lacks its validated semantic fingerprint")
-    requests = gh("GET", "repos/" + REPO
-                  + "/pulls?state=open&head=P00NSMASHER%3A"
-                  + branch.replace("/", "%2F") + "&per_page=5")
-    if not isinstance(requests, list) or len(requests) > 1:
-        raise ProposalHold("Cannot uniquely identify an existing generated PR")
-    if requests:
-        number = requests[0]["number"]
-        result = requests[0]
-    else:
-        try:
-            result = gh("POST", "repos/" + REPO + "/pulls", {
-                "head": branch, "base": "main",
-                "title": "Automated " + lane + " evidence refresh (GitHub run "
-                         + os.environ["GITHUB_RUN_ID"] + ")",
-                "body": ("A source-scoped generated proposal only. Automatic integration "
-                        "requires independently executed exact-SHA repository release "
-                        "CI via an explicit workflow dispatch. No independent human code "
-                        "review needed; no customer financial/source authority is implied."
-                        + ("\n\n<!-- scout-semantic-sha256:" + fingerprint + " -->"
-                           if lane == "scout" else "")),
-                "draft": False,
-            })
-        except ProposalHold:
-            raise ProposalHold("GitHub token could not open a PR; preserve the "
-                               "isolated evidence branch and check repository "
-                               "Actions PR permissions") from None
-        if not isinstance(result, dict):
-            raise ProposalHold("Created PR did not return a structured receipt")
-        number = result.get("number")
-    if type(number) is not int or number <= 0:
-        raise ProposalHold("PR identification is missing")
-    actual = gh("GET", f"repos/{REPO}/pulls/{number}")
-    if (not isinstance(actual, dict) or actual.get("state") != "open"
-        or actual.get("head", {}).get("sha") != head
-        or actual.get("head", {}).get("repo", {}).get("full_name") != REPO
-        or actual.get("base", {}).get("sha") != base
-        or actual.get("base", {}).get("ref") != "main"):
-        raise ProposalHold("Generated PR head/base changed before dispatch")
-
-    # GITHUB_TOKEN-created PRs do NOT trigger normal pull_request CI. Sending
-    # a trusted workflow_dispatch is an essential step, not optional fallback.
-    gh("POST", f"repos/{REPO}/actions/workflows/{CONTROLLER}/dispatches", {
-        "ref": "main",
-        "inputs": {
-            "pr_number": str(number), "lane": lane,
-            "head_sha": head, "base_sha": base,
-        },
-    })
     return {
-        "proposal_pr_number": number, "lane": lane,
-        "base_sha": base, "head_sha": head,
-        "changed_files": len(verified.files),
-        "merge_status": "PENDING_GUARDED_CI",
-        "customer_release": "HOLD",
+        "version": 1, "lane": lane, "branch": branch, "base": base, "head": head,
+        "file_count": len(verified.files), "scout_fingerprint": fingerprint,
     }
 
 
@@ -159,7 +130,9 @@ def main() -> int:
     ap.add_argument("--head-sha", required=True)
     args = ap.parse_args()
     result = propose(args.lane, args.branch, args.base_sha, args.head_sha)
-    print(json.dumps(result, sort_keys=True))
+    path = Path(os.environ["RUNNER_TEMP"]) / "retally-app-request.json"
+    path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"Validated {result['file_count']} files for App proposal {args.branch} at {args.head_sha}")
     return 0
 
 
