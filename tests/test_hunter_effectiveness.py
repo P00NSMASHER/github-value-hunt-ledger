@@ -157,5 +157,19 @@ class HunterOutcomeTruthTests(unittest.TestCase):
         self.assertNotIn("cancel-in-progress: true", source)
 
 
+    def test_scoped_evidence_is_uploaded_before_branch_persistence(self):
+        source = WORKFLOW.read_text(encoding="utf-8")
+        upload = "Preserve worker evidence independently of PR publication"
+        self.assertIn(upload, source)
+        self.assertLess(source.index(upload), source.index("Commit queue refresh"))
+        self.assertIn("hunter-evidence-${{ steps.route.outputs.worker }}-", source)
+        self.assertIn("intelligence/scout_queue/${{ steps.route.outputs.worker }}.json", source)
+        self.assertIn("automation/HUNTER_EFFECTIVENESS.md", source)
+        self.assertIn("if-no-files-found: error", source)
+        self.assertIn("steps.route.outputs.worker != 'INTEGRATOR'", source)
+        self.assertIn("steps.route.outputs.worker != 'ALL'", source)
+
+
+
 if __name__ == "__main__":
     unittest.main()
