@@ -6,10 +6,16 @@ on:
     paths:
       - '.github/workflows/**'
       - 'tests/ci-main-only-policy.test.mjs'
+      - 'tools/workflow_maintenance_guard.py'
+      - 'tests/test_workflow_maintenance.py'
+      - 'automation/WORKFLOW_MAINTENANCE_BASELINE.json'
   pull_request:
     paths:
       - '.github/workflows/**'
       - 'tests/ci-main-only-policy.test.mjs'
+      - 'tools/workflow_maintenance_guard.py'
+      - 'tests/test_workflow_maintenance.py'
+      - 'automation/WORKFLOW_MAINTENANCE_BASELINE.json'
 
 permissions:
   contents: read
