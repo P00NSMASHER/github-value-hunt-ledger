@@ -26,7 +26,7 @@ CANDIDATE_RUNTIME = frozenset({"pushed_at", "size_kb", "stars", "forks"})
 
 def evidence_value(path: str, content: str):
     """Canonical *material* evidence, not observed-at or API-cost telemetry."""
-    if path == "automation/SCOUT_DIGEST.md":
+    if path in ("automation/SCOUT_DIGEST.md", "automation/HUNTER_EFFECTIVENESS.md"):
         lines = [line for line in content.splitlines()
                  if not line.startswith("Generated: ")]
         return "\n".join(lines).rstrip() + "\n"
