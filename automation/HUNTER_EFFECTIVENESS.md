@@ -7,7 +7,7 @@ Only an actual GitHub Actions schedule-event run proves a scheduled invocation.
 A green CI check, research candidate, or PR is **not** a live integration,
 scientific novelty finding, trading edge, payment, or saved engineering time.
 
-Current-scope queues: 3/14; unreviewed candidates: 13
+Current-scope queues: 4/14; unreviewed candidates: 18
 
 | Hunter | Project | Latest recorded source state | Candidates | Last material snapshot (UTC) | Verified integration | Measured outcome |
 |---|---|---|---:|---|---|---|
@@ -22,7 +22,7 @@ Current-scope queues: 3/14; unreviewed candidates: 13
 | HUNTER-09 | abvm | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-09.json) | 11 | 2026-11-04T10:51:05.288131+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-10 | permitplate | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-11 | capturebrief | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
-| HUNTER-12 | portfolio-brain | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| HUNTER-12 | portfolio-brain | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-12.json) | 5 | 2026-11-04T11:25:53.515518+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-13 | retally | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-14 | shared-infra | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 
