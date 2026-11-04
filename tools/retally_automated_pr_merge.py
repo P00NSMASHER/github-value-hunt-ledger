@@ -18,7 +18,7 @@ from urllib.parse import quote
 
 from tools.retally_automated_pr_proposal import REPO, gh
 from tools.retally_writer_proposal_policy import (
-    COMMIT_SHA, PROPOSAL_BRANCH, ProposalHold, allowed_path, generated_manifest,
+    COMMIT_SHA, PROPOSAL_BRANCH, ProposalHold, allowed_path, approved_proposal_author, generated_manifest,
     verify_proposal,
 )
 
@@ -50,9 +50,7 @@ def guarded_target(lane: str, number: int, head_sha: str, base_sha: str,
         or pr.get("base", {}).get("sha") != base_sha):
         raise ProposalHold("Proposal head, repository, or target main changed")
     owner = pr.get("user") or {}
-    runtime_author = (owner.get("login") == "portfolio-brain-v8-runtime[bot]"
-                      and owner.get("type") == "Bot" and owner.get("id") == 343751880)
-    if owner.get("login") != "github-actions[bot]" and not runtime_author:
+    if not approved_proposal_author(owner):
         raise ProposalHold("Proposal author is outside the approved writer identities")
     if require_current_main and _current_main_sha() != base_sha:
         raise ProposalHold("Main advanced: leave proposal open for reconciliation")
