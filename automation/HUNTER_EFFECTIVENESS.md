@@ -7,12 +7,12 @@ Only an actual GitHub Actions schedule-event run proves a scheduled invocation.
 A green CI check, research candidate, or PR is **not** a live integration,
 scientific novelty finding, trading edge, payment, or saved engineering time.
 
-Current-scope queues: 7/14; unreviewed candidates: 65
+Current-scope queues: 8/14; unreviewed candidates: 81
 
 | Hunter | Project | Latest recorded source state | Candidates | Last material snapshot (UTC) | Verified integration | Measured outcome |
 |---|---|---|---:|---|---|---|
-| HUNTER-01 | trading | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-01.json) | 16 | 2026-11-04T09:54:07.167892+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-02 | revenue-hunt | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-02.json) | 0 | 2026-11-04T09:07:09.798150+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-01 | trading | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-01.json) | 16 | 2026-11-04T15:43:18.890133+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-02 | revenue-hunt | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-02.json) | 16 | 2026-11-04T20:49:17.668426+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-03 | retally-social-media | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-03.json) | 0 | 2026-11-04T09:32:12.033044+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-04 | novel-discovery | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-04.json) | 16 | 2026-11-04T13:59:46.395864+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-05 | engineering-acceleration | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-05.json) | 16 | 2026-11-04T14:58:07.416801+00:00 | UNKNOWN | UNKNOWN |
@@ -20,7 +20,7 @@ Current-scope queues: 7/14; unreviewed candidates: 65
 | HUNTER-07 | abvm | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-08 | abvm | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-09 | abvm | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-09.json) | 11 | 2026-11-04T10:51:05.288131+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-10 | permitplate | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| HUNTER-10 | permitplate | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-10.json) | 0 | 2026-11-04T21:21:46.045115+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-11 | capturebrief | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-12 | portfolio-brain | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-13 | retally | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
