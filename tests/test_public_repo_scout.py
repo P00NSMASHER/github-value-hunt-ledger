@@ -1,6 +1,8 @@
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, retain_unreviewed_candidates, risk_flags, root_score, recency, triage, validate_manifest
@@ -43,6 +45,46 @@ class ScoutTests(unittest.TestCase):
         repo={"full_name":"example/project","default_branch":"main","name":"project","description":"useful engine","topics":[]}
         self.assertIsNone(candidate(gh,repo,"q","example/project abcdef123456","owner/repo"))
         self.assertEqual(0,gh.root_calls)
+
+    def test_candidate_inspects_tree_at_recorded_revision(self):
+        gh = GH("test")
+        sha = "a" * 40
+        repo = {"full_name": "example/project", "default_branch": "main"}
+        with patch.object(gh, "revision", return_value=sha), patch.object(
+                gh, "root", return_value=["src"]) as root:
+            result = candidate(gh, repo, "source", "", "owner/repo")
+        root.assert_called_once_with("example/project", sha)
+        self.assertEqual(result["exact_revision"], sha)
+
+    def test_run_counts_describe_final_queue_after_retention(self):
+        from tools import public_repo_scout as scout
+
+        manifest_path = Path(__file__).resolve().parents[1] / "automation/hunter_schedule.json"
+        manifest = json.loads(manifest_path.read_text())
+        worker = manifest["workers"][0]
+        def source(name, score):
+            return {"repository": "example/" + name, "triage_score": score,
+                    "exact_revision": "a" * 40, "status": "PRE_VERIFICATION_CANDIDATE"}
+
+        fresh = {**worker, "worker_id": worker["id"], "scope_version": manifest["scope_version"],
+                 "candidates": [source("first", 50), source("second", 20)], "candidate_count": 2,
+                 "api_metrics": {}, "search_diagnostics": [], "generated_at": "2026-11-04T00:00:00Z"}
+        with tempfile.TemporaryDirectory() as tmp:
+            queue = Path(tmp) / (worker["id"] + ".json")
+            queue.write_text(json.dumps({**fresh, "candidates": [source("prior", 60)],
+                                         "candidate_count": 1}))
+            argv = ["scout", "--worker", worker["id"], "--manifest", str(manifest_path),
+                    "--queue-root", tmp, "--max-candidates", "2"]
+            stdout = io.StringIO()
+            with patch("sys.argv", argv), patch.object(scout, "GH"), patch.object(
+                    scout, "corpus_text", return_value=""), patch.object(
+                    scout, "worker_run", return_value=fresh), redirect_stdout(stdout):
+                scout.main()
+            summary = json.loads(stdout.getvalue())
+            saved = json.loads(queue.read_text())
+        self.assertEqual(summary["fresh_candidate_count"], 1)
+        self.assertEqual(summary["retained_unreviewed_count"], 1)
+        self.assertEqual(summary["candidate_count"], len(saved["candidates"]))
 
     def test_persisted_queue_pairs_are_loaded(self):
         with tempfile.TemporaryDirectory() as tmp:

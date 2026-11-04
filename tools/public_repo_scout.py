@@ -124,7 +124,7 @@ def candidate(gh,repo,q,corp,own,prior_pairs=None):
     if pair in (prior_pairs or set()) or known(corp,full,sha):
         if hasattr(gh,"stats"): gh.stats["known_revision_skips"]=int(gh.stats.get("known_revision_skips",0))+1
         return None
-    try: names=gh.root(full,branch)
+    try: names=gh.root(full,sha)
     except RuntimeError: return None
     score,parts,hits=triage(repo,names); lic=(repo.get("license") or {}).get("spdx_id") or "UNKNOWN"
     return {"repository":full,"url":repo.get("html_url"),"exact_revision":sha,"default_branch":branch,"description":repo.get("description"),"primary_language":repo.get("language"),"topics":repo.get("topics") or [],"published_license_spdx":lic,"stars":int(repo.get("stargazers_count") or 0),"forks":int(repo.get("forks_count") or 0),"archived":bool(repo.get("archived")),"pushed_at":repo.get("pushed_at"),"size_kb":int(repo.get("size") or 0),"root_code_signals":hits,"triage_score":score,"triage_components":parts,"discovery_query":q,"status":"PRE_VERIFICATION_CANDIDATE"}
@@ -366,14 +366,14 @@ def main():
         if any("error" in diagnostic for diagnostic in d["search_diagnostics"]):
             raise RuntimeError(f"Incomplete source discovery for {w['id']}; existing queue preserved")
         p=qr/f"{w['id']}.json"
-        fresh_count=d["candidate_count"]
         if p.exists():
             previous=json.loads(p.read_text(encoding="utf-8"))
             d=retain_unreviewed_candidates(previous,d,max(1,min(a.max_candidates,100)))
         changed=persist_snapshot(p,d)
+        retained_count = sum(1 for c in d["candidates"] if c.get("retained_unreviewed"))
         print(json.dumps({"worker":w["id"],"project":w["project"],"target_repository":w["target_repository"],"scope_version":scope_version,"observed_at":d["generated_at"],
-                          "candidate_count":d["candidate_count"],"fresh_candidate_count":fresh_count,
-                          "retained_unreviewed_count":sum(1 for c in d["candidates"] if c.get("retained_unreviewed")),
+                          "candidate_count":d["candidate_count"],"fresh_candidate_count":d["candidate_count"] - retained_count,
+                          "retained_unreviewed_count":retained_count,
                           "evidence_changed":changed,
                           "api_metrics":d["api_metrics"],
                           "search_diagnostics":d["search_diagnostics"]},sort_keys=True))
