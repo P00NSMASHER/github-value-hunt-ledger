@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 6,
+    "api_requests": 14,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -8,75 +8,251 @@
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 1,
+  "candidate_count": 5,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Roblox Remote Event Monitor 2026: Best Networking Analytics Tool for Developers",
-      "discovery_query": "Roblox telemetry analytics Luau",
-      "exact_revision": "f4f7c9c9f09273aa1102601d5284523e50c7b604",
+      "description": "Portfolio demo: lead intake automation with validation, deduplication, mock CRM/Slack sync, audit logs, failure details, and manual retry dashboard.",
+      "discovery_query": "CRM lead intake deduplication validation",
+      "exact_revision": "c59cbf12b919af5fdc6a82f95571cca80585716c",
       "forks": 0,
-      "primary_language": "HTML",
+      "primary_language": "TypeScript",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-03T15:55:46Z",
-      "repository": "manindesguise-source/net-lens-telemetry",
+      "pushed_at": "2026-07-21T14:50:39Z",
+      "repository": "0klochok/salesops-workflow-automation-hub",
       "root_code_signals": [
-        ".github"
+        "package.json",
+        "pyproject.toml",
+        "tests"
       ],
-      "size_kb": 511,
-      "stars": 70,
+      "size_kb": 3173,
+      "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
-        "luau",
-        "networking",
-        "roblox",
-        "rojo",
-        "telemetry",
-        "wally"
+        "alembic",
+        "crm-integration",
+        "docker-compose",
+        "fastapi",
+        "github-actions",
+        "lead-management",
+        "nextjs",
+        "playwright",
+        "postgresql",
+        "pydantic",
+        "pytest",
+        "python",
+        "sales-ops",
+        "slack",
+        "sqlalchemy",
+        "typescript",
+        "vitest",
+        "workflow-automation"
       ],
+      "triage_components": {
+        "activity": 12,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 39,
+      "url": "https://github.com/0klochok/salesops-workflow-automation-hub"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Production-ready n8n workflow for automated real estate lead intake, validation, deduplication, PostgreSQL persistence, and real-time email notifications.",
+      "discovery_query": "CRM lead intake deduplication validation",
+      "exact_revision": "6af8191cc8051be36ed6e700e838d8a81990514c",
+      "forks": 0,
+      "primary_language": "PLpgSQL",
+      "published_license_spdx": "NOASSERTION",
+      "pushed_at": "2026-09-02T21:29:13Z",
+      "repository": "waliidtlm/real-estate-lead-intake-system",
+      "root_code_signals": [
+        "docker-compose.yml"
+      ],
+      "size_kb": 446,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "automation",
+        "crm",
+        "hubspot",
+        "n8n",
+        "n8n-automation",
+        "n8n-workflow",
+        "postgresql",
+        "postgresql-database",
+        "postgresql-docker",
+        "real-estate",
+        "real-estate-automation",
+        "real-estate-management"
+      ],
+      "triage_components": {
+        "activity": 12,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 2,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 37,
+      "url": "https://github.com/waliidtlm/real-estate-lead-intake-system"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "End-to-end n8n webhook lead intake, normalization, email validation, deduplication, and stateful CRM sync service with repeatable test suite.",
+      "discovery_query": "CRM lead intake deduplication validation",
+      "exact_revision": "83d54179d2907510e6a9bfc0f815204a17fc4a8e",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-03T06:19:53Z",
+      "repository": "Rinodu/n8n-automated-lead-management",
+      "root_code_signals": [
+        "src",
+        "tests"
+      ],
+      "size_kb": 26,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
       "triage_components": {
         "activity": 15,
         "description": 4,
         "forks": 0,
         "license_metadata": 1,
         "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 7,
+        "root_code_signals": 7,
+        "stars": 0,
+        "substantive_size": 2,
+        "topics": 0
+      },
+      "triage_score": 34,
+      "url": "https://github.com/Rinodu/n8n-automated-lead-management"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "AI-assisted admissions workflow for lead intake, validation, deduplication, scoring, auto-reply, notifications, and task creation",
+      "discovery_query": "CRM lead intake deduplication validation",
+      "exact_revision": "73ae4800370c947dcc93b58af84420904e7cad65",
+      "forks": 0,
+      "primary_language": "JavaScript",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-01-10T19:45:22Z",
+      "repository": "Pokhyl/ai-admissions-desk-n8n",
+      "root_code_signals": [],
+      "size_kb": 324,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "ai",
+        "automation",
+        "crm",
+        "lead-management",
+        "n8n",
+        "openai",
+        "workflows"
+      ],
+      "triage_components": {
+        "activity": 8,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 0,
+        "stars": 0,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 43,
-      "url": "https://github.com/manindesguise-source/net-lens-telemetry"
+      "triage_score": 31,
+      "url": "https://github.com/Pokhyl/ai-admissions-desk-n8n"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "n8n + HubSpot CRM automation with OAuth 2.0, lead validation, deduplication, partial updates, and API error handling.",
+      "discovery_query": "CRM lead intake deduplication validation",
+      "exact_revision": "c30c0d993142c919b8a867ca003a70720215f1eb",
+      "forks": 0,
+      "primary_language": "JavaScript",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-09-05T01:24:17Z",
+      "repository": "youcefdr/lead-intake-crm-sync",
+      "root_code_signals": [],
+      "size_kb": 559,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "api-integration",
+        "automation",
+        "crm",
+        "hubspot",
+        "n8n",
+        "oauth2",
+        "rest-api",
+        "webhooks",
+        "workflow-automation"
+      ],
+      "triage_components": {
+        "activity": 12,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 0,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 31,
+      "url": "https://github.com/youcefdr/lead-intake-crm-sync"
     }
   ],
-  "catalogs": [
-    32,
-    43,
-    45
-  ],
-  "generated_at": "2026-11-03T21:16:06.897472+00:00",
-  "mission": "Roblox liveops, telemetry, experimentation, privacy-minimized analytics and release observability",
+  "catalogs": [],
+  "evidence_gate": null,
+  "generated_at": "2026-11-04T11:35:38.182101+00:00",
+  "mission": "RETALLY first verified customer/revenue outcome: lead intake, source quality, attribution and audit-friendly evidence",
+  "project": "retally",
   "risk_review": [],
   "risk_review_count": 0,
   "schema_version": 2,
+  "scope_version": "active-projects-2026-11-v2",
   "search_diagnostics": [
     {
-      "query": "Roblox telemetry analytics Luau",
-      "returned": 1
-    },
-    {
-      "query": "Roblox liveops feature flags open source",
+      "query": "B2B lead qualification evidence pipeline open source",
       "returned": 0
     },
     {
-      "query": "Roblox game analytics privacy",
+      "query": "CRM lead intake deduplication validation",
+      "returned": 5
+    },
+    {
+      "query": "customer conversion attribution analytics open source",
       "returned": 0
     },
     {
-      "query": "Roblox observability logging framework Luau",
+      "query": "business event ledger reconciliation python",
       "returned": 0
     }
   ],
+  "search_queries": [
+    "B2B lead qualification evidence pipeline open source",
+    "CRM lead intake deduplication validation",
+    "customer conversion attribution analytics open source",
+    "business event ledger reconciliation python"
+  ],
+  "target_repository": "P00NSMASHER/github-value-hunt-ledger",
   "worker_id": "HUNTER-13"
 }
