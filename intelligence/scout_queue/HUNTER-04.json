@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 10,
+    "api_requests": 67,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -8,32 +8,186 @@
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 3,
+  "candidate_count": 16,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
-      "description": "A modular framework for Roblox: boot order, guarded networking, state replication, and player data. Every module works on its own.",
-      "discovery_query": "Roblox networking replication framework Luau",
-      "exact_revision": "cd725d31d66d9f68ad1692254400363881b79353",
-      "forks": 0,
-      "primary_language": "MDX",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-26T14:22:29Z",
-      "repository": "andrian-syh/rblx-twill",
+      "description": "A Python toolkit/library for reality-centric machine/deep learning & data mining on partially-observed time series, with 50+ SOTA neural network models for scientific analysis tasks (imputation, classification, clustering, forecasting, anomaly detection, cleaning) on incomplete industrial irregularly-sampled multivariate TS with NaN missing values",
+      "discovery_query": "scientific anomaly detection",
+      "exact_revision": "2271533587bab250163437ed39cfe13cefd8b80a",
+      "forks": 195,
+      "primary_language": "Python",
+      "published_license_spdx": "BSD-3-Clause",
+      "pushed_at": "2026-10-31T04:31:23Z",
+      "repository": "WenjieDu/PyPOTS",
       "root_code_signals": [
-        ".github"
+        ".github",
+        "pyproject.toml",
+        "tests"
       ],
-      "size_kb": 880,
-      "stars": 2,
+      "size_kb": 4738,
+      "stars": 2090,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
-        "framework",
-        "game-development",
-        "luau",
-        "roblox",
-        "roblox-development",
-        "roblox-studio"
+        "anomaly-detection",
+        "classification",
+        "clustering",
+        "data-analysis",
+        "data-mining",
+        "data-science",
+        "deep-learning",
+        "forecasting",
+        "generation",
+        "imputation",
+        "machine-learning",
+        "missing-values",
+        "neural-networks",
+        "pytorch",
+        "time-series"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 5,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 13,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 64,
+      "url": "https://github.com/WenjieDu/PyPOTS"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Automatic parametric modeling with symbolic regression",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "55eb8785af86e63ea7a4ceee30ba937b1e3524ea",
+      "forks": 7,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-04T04:23:48Z",
+      "repository": "hftsoi/symbolfit",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 96159,
+      "stars": 75,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "curve-fitting",
+        "high-energy-physics",
+        "lmfit",
+        "machine-learning",
+        "nonlinear-optimization",
+        "parametric-modelling",
+        "pysr",
+        "python",
+        "symbolic-regression",
+        "uncertainty-estimations"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 2,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 8,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 56,
+      "url": "https://github.com/hftsoi/symbolfit"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Scientific literature search and project reference management",
+      "discovery_query": "scientific literature search",
+      "exact_revision": "1895a583fe6f6c79ce8eb39d55f41718e6c0576d",
+      "forks": 1,
+      "primary_language": "Python",
+      "published_license_spdx": "AGPL-3.0",
+      "pushed_at": "2026-11-04T09:13:22Z",
+      "repository": "scitex-ai/scitex-scholar",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 51295,
+      "stars": 6,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "bibliography",
+        "bibtex",
+        "citations",
+        "claude-code",
+        "crossref",
+        "doi",
+        "literature-management",
+        "literature-search",
+        "mcp",
+        "mcp-server",
+        "metadata-enrichment",
+        "open-science",
+        "openalex",
+        "pdf-download",
+        "python",
+        "reference-management",
+        "reproducible-research",
+        "scholar",
+        "scitex",
+        "scitex-ecosystem"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 3,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 53,
+      "url": "https://github.com/scitex-ai/scitex-scholar"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "CLI for scientific literature discovery: concurrent database search, citation networks, PDF evidence, BibTeX/RIS exports, and optional persistent research workflows.",
+      "discovery_query": "scientific literature search",
+      "exact_revision": "ba25720f500b34961b01afd27ee2afd9bc16b07a",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "Apache-2.0",
+      "pushed_at": "2026-11-01T21:20:33Z",
+      "repository": "rehan-hasnain/lit-discovery",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 2157,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "cli",
+        "information-retrieval",
+        "literature-search",
+        "materials-science",
+        "python",
+        "research-tools",
+        "scientific-computing"
       ],
       "triage_components": {
         "activity": 15,
@@ -41,146 +195,471 @@
         "forks": 0,
         "license_metadata": 5,
         "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 2,
+        "root_code_signals": 8,
+        "stars": 1,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 42,
-      "url": "https://github.com/andrian-syh/rblx-twill"
+      "triage_score": 47,
+      "url": "https://github.com/rehan-hasnain/lit-discovery"
     },
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Gameplay and AI systems for Roblox, written in Luau: an NPC AI suite (utility AI, HTN planning, perception, pathfinding, tactical queries), server-authoritative lag compensation, and exploit-resistant trading and pets. 16 standalone packages, 1,097 headless tests.",
-      "discovery_query": "Roblox server authoritative netcode Luau",
-      "exact_revision": "77a79f23745739590585c6114a1eb3f3b86ffd49",
-      "forks": 1,
-      "primary_language": "Luau",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-14T01:38:03Z",
-      "repository": "pranav-bt/Systems",
+      "description": "Leakage-aware comparison of supervised, unsupervised and neural anomaly detectors.",
+      "discovery_query": "scientific anomaly detection",
+      "exact_revision": "a0082325da62a2ae584f601535280464fe919aed",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-10-29T05:41:17Z",
+      "repository": "sebastroza1/scientific-anomaly-detection",
       "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "src",
         "tests"
       ],
-      "size_kb": 658,
+      "size_kb": 51,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 44,
+      "url": "https://github.com/sebastroza1/scientific-anomaly-detection"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "A curated list of awesome projects using AI to automate scientific research \u2014 AI Scientist, autonomous research agents, paper writing, hypothesis generation, and more.",
+      "discovery_query": "scientific hypothesis generation",
+      "exact_revision": "603452a016d76a3ab38aecd3d7986a71faafc9cf",
+      "forks": 9,
+      "primary_language": "Python",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-04T10:53:08Z",
+      "repository": "yenanjing/awesome-ai-for-science",
+      "root_code_signals": [
+        ".github"
+      ],
+      "size_kb": 903,
+      "stars": 13,
+      "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
-        "anti-cheat",
-        "game-ai",
-        "game-development",
-        "htn-planner",
-        "lag-compensation",
-        "luau",
-        "lune",
-        "multiplayer",
-        "netcode",
-        "npc-ai",
-        "pathfinding",
-        "roblox",
-        "utility-ai"
+        "ai-for-science",
+        "ai-scientist",
+        "autonomous-research",
+        "awesome",
+        "awesome-list",
+        "curated-list",
+        "deep-research",
+        "research-automation"
       ],
       "triage_components": {
         "activity": 15,
         "description": 4,
-        "forks": 1,
+        "forks": 2,
         "license_metadata": 1,
         "not_archived": 5,
-        "root_code_signals": 4,
-        "stars": 0,
+        "root_code_signals": 2,
+        "stars": 5,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 39,
-      "url": "https://github.com/pranav-bt/Systems"
+      "triage_score": 43,
+      "url": "https://github.com/yenanjing/awesome-ai-for-science"
     },
     {
       "archived": false,
       "default_branch": "main",
-      "description": "server-authoritative visibility replication for roblox shooters. clients only receive positions they can actually see, so wallhacks have nothing to read.",
-      "discovery_query": "Roblox server authoritative netcode Luau",
-      "exact_revision": "58ace7ef35c2d72a66dd774aa81611f580d851f4",
+      "description": "srbf: Symbolic Regression Benchmark Framework. Evaluate symbolic-regression models on shared benchmarks with shared metrics; interactive results at psaegert.github.io/srbf",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "59aeed2ccc39d3a013d8e2b9fddac67d31dc482a",
       "forks": 0,
-      "primary_language": "Luau",
+      "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-07-16T14:00:15Z",
-      "repository": "debugasync/FogWar",
+      "pushed_at": "2026-11-04T13:55:15Z",
+      "repository": "psaegert/srbf",
       "root_code_signals": [
-        "src"
+        ".github",
+        "pyproject.toml",
+        "src",
+        "tests"
       ],
-      "size_kb": 15,
+      "size_kb": 2701023,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 1,
+        "substantive_size": 2,
+        "topics": 0
+      },
+      "triage_score": 43,
+      "url": "https://github.com/psaegert/srbf"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Auditable symbolic regression and scientific hypothesis discovery with LLM-guided refinement, real-only data-role isolation, acquisition-driven active discovery, and a validated reusable structure library.",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "4c8b505e3dba3d4ba523e7238b5a4797baca8b98",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "NOASSERTION",
+      "pushed_at": "2026-11-04T10:52:29Z",
+      "repository": "grocksdf/symbolic-regression-llm-scientific-discovery-active-learning-machine-learning",
+      "root_code_signals": [
+        "pyproject.toml",
+        "schemas",
+        "tests"
+      ],
+      "size_kb": 5033,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "anti-cheat",
-        "fog-of-war",
-        "luau",
-        "netcode",
-        "roblox"
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 9,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 42,
+      "url": "https://github.com/grocksdf/symbolic-regression-llm-scientific-discovery-active-learning-machine-learning"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Cross-platform, CPU-first Astronomical Data Analysis & Discovery Platform for ZTF data, scientific feature generation, ML classification, anomaly detection, and automated discovery.",
+      "discovery_query": "scientific anomaly detection",
+      "exact_revision": "bc85f6c36b28f3c9ddc2b7b5aa00e0256148441c",
+      "forks": 0,
+      "primary_language": "Jupyter Notebook",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-04T13:51:32Z",
+      "repository": "saeed92m/ztf-classifier",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "src",
+        "tests"
       ],
+      "size_kb": 5185,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 41,
+      "url": "https://github.com/saeed92m/ztf-classifier"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Classical PIR (Physics Intermediate Representation) symbolic regression engine",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "e57f4bdf288619836693b72c3a4f1326b5fe7670",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-03T18:05:00Z",
+      "repository": "Qazi-pk/physics-engine",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 711,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 41,
+      "url": "https://github.com/Qazi-pk/physics-engine"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "QuantumOS is a topology-governed agentic research architecture for quantum-gravity discovery, combining hypothesis generation, mathematical formalization, adversarial criticism, simulation, verification, and scientific memory to pursue verified explanatory knowledge.",
+      "discovery_query": "scientific hypothesis generation",
+      "exact_revision": "9091df583ef704dca2179ab564258425ec1364ec",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "Apache-2.0",
+      "pushed_at": "2026-11-02T19:18:33Z",
+      "repository": "tltmgnt/QuantumOS",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 412,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 41,
+      "url": "https://github.com/tltmgnt/QuantumOS"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Awesome Time Series Anomaly Detection Scientific Research",
+      "discovery_query": "scientific anomaly detection",
+      "exact_revision": "f4d81eaa4fbfe1e07cf9a6dad98b17c1badf487e",
+      "forks": 0,
+      "primary_language": "TeX",
+      "published_license_spdx": "CC0-1.0",
+      "pushed_at": "2026-10-16T14:05:49Z",
+      "repository": "cybersecurity-dev/awesome-time-series-anomaly-detection-scientific-research",
+      "root_code_signals": [],
+      "size_kb": 87,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "anomaly-detection",
+        "anomalydetection",
+        "awesome",
+        "awesome-list",
+        "awesome-lists",
+        "network-traffic",
+        "time-series-analysis",
+        "time-series-classification",
+        "timeseries"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 0,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 39,
+      "url": "https://github.com/cybersecurity-dev/awesome-time-series-anomaly-detection-scientific-research"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "sigmaflow - cross-domain anomaly detection for scientific time-series that carries units, sample rates, and instrument metadata through the whole pipeline.",
+      "discovery_query": "scientific anomaly detection",
+      "exact_revision": "f0f6e533231e5bc7f0c69158a9fb5129e27825a2",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-09-14T04:09:56Z",
+      "repository": "xyzyl/opsad",
+      "root_code_signals": [
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 1828,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
       "triage_components": {
         "activity": 12,
         "description": 4,
         "forks": 0,
         "license_metadata": 5,
         "not_archived": 5,
-        "root_code_signals": 3,
+        "root_code_signals": 9,
         "stars": 0,
-        "substantive_size": 2,
-        "topics": 5
+        "substantive_size": 4,
+        "topics": 0
       },
-      "triage_score": 36,
-      "url": "https://github.com/debugasync/FogWar"
-    }
-  ],
-  "catalogs": [
-    5,
-    9,
-    31,
-    42
-  ],
-  "generated_at": "2026-11-01T19:04:40.979827+00:00",
-  "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
-  "risk_review": [
-    {
-      "discovery_query": "Roblox anti exploit server validation open source",
-      "repository": "Pannu2009/Aegis",
-      "risk_flags": [
-        "exploit kit"
-      ],
-      "status": "RISK_REVIEW_ONLY",
-      "url": "https://github.com/Pannu2009/Aegis"
+      "triage_score": 39,
+      "url": "https://github.com/xyzyl/opsad"
     },
     {
-      "discovery_query": "Roblox anti exploit server validation open source",
-      "repository": "Roegly66073-alt/Aegis-resocket",
-      "risk_flags": [
-        "exploit kit"
+      "archived": false,
+      "default_branch": "main",
+      "description": "An end-to-end AI Research Copilot powered by SPECTER/SciBERT embeddings and RAG. Automates scientific paper ingestion, contextual search, novelty scoring, citation impact prediction, and hypothesis generation.",
+      "discovery_query": "scientific hypothesis generation",
+      "exact_revision": "64a1a981bcdb57595d1fb4e040fd4c038321264a",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-10-28T17:44:11Z",
+      "repository": "dark-maj/Aurelium",
+      "root_code_signals": [
+        "schemas",
+        "tests"
       ],
-      "status": "RISK_REVIEW_ONLY",
-      "url": "https://github.com/Roegly66073-alt/Aegis-resocket"
+      "size_kb": 805,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 7,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 37,
+      "url": "https://github.com/dark-maj/Aurelium"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Equation discovery research and source data: symbolic regression, dynamical systems, PDEs, and LLM agents.",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "8e651062599419c1302eab0dc59a340342919bc1",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-04T12:31:04Z",
+      "repository": "liugangcode/equation-discovery-datahub",
+      "root_code_signals": [
+        ".github",
+        "package.json",
+        "tests"
+      ],
+      "size_kb": 9040,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 37,
+      "url": "https://github.com/liugangcode/equation-discovery-datahub"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Capela resolves a molecule, searches scientific literature, extracts reported findings, separates experiments from predictions, and returns a structured research dossier that keeps uncertainty visible.",
+      "discovery_query": "scientific literature search",
+      "exact_revision": "aa5ed14e7676460650e057eab1e03e34871b49c7",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-03T21:41:57Z",
+      "repository": "samscript18/capela",
+      "root_code_signals": [
+        ".github",
+        "package.json",
+        "tests"
+      ],
+      "size_kb": 1341,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 37,
+      "url": "https://github.com/samscript18/capela"
     }
   ],
-  "risk_review_count": 2,
+  "catalogs": [],
+  "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists.",
+  "generated_at": "2026-11-04T13:59:46.395864+00:00",
+  "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
+  "project": "novel-discovery",
+  "risk_review": [],
+  "risk_review_count": 0,
   "schema_version": 2,
+  "scope_version": "active-projects-2026-11-v2",
   "search_diagnostics": [
     {
-      "query": "Roblox server authoritative netcode Luau",
-      "returned": 2
+      "query": "scientific hypothesis generation",
+      "returned": 8
     },
     {
-      "query": "Roblox RemoteEvent validation framework",
-      "returned": 0
+      "query": "scientific anomaly detection",
+      "returned": 8
     },
     {
-      "query": "Roblox networking replication framework Luau",
-      "returned": 1
+      "query": "symbolic regression",
+      "returned": 8
     },
     {
-      "query": "Roblox anti exploit server validation open source",
-      "returned": 2
+      "query": "scientific literature search",
+      "returned": 8
     }
   ],
+  "search_queries": [
+    "scientific hypothesis generation",
+    "scientific anomaly detection",
+    "symbolic regression",
+    "scientific literature search"
+  ],
+  "target_repository": "P00NSMASHER/github-value-hunt-ledger",
   "worker_id": "HUNTER-04"
 }
