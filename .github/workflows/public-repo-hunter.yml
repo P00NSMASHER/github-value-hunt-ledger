@@ -1,10 +1,10 @@
-name: StarBlox Roblox Accelerator Scouts
+name: Active Project Technology Scouts
 
 on:
   workflow_dispatch:
     inputs:
       worker:
-        description: Worker to run
+        description: Active project research worker
         required: true
         default: ALL
         type: choice
@@ -47,6 +47,7 @@ permissions:
   pull-requests: read
 
 concurrency:
+  # Preserve this lock identifier so in-flight old and new jobs cannot overlap.
   group: starblox-roblox-accelerator-main-writer
   cancel-in-progress: false
 

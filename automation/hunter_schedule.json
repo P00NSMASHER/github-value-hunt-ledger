@@ -1,231 +1,194 @@
 {
   "schema_version": 2,
-  "focus": "StarBlox native Roblox release using the repository-authorized Brookhaven world structure as the world foundation.",
+  "focus": "Public open-source research for verified active projects: Genesis, ABVM, PermitPlate, CaptureBrief, Portfolio Brain and RETALLY. Retired project research is out of scope.",
   "rules": [
-    "Search only for public, lawful, rights-clean or clean-room-useful technology that can materially accelerate P00NSMASHER/StarBlox.",
-    "Prioritize Roblox/Luau/Studio/Open Cloud/world-conversion/gameplay/testing/performance/education capabilities over unrelated commercial domains.",
-    "Public visibility is not public domain. Record exact revisions and rights constraints; no-license material is reference/clean-room only unless permission exists.",
-    "Never collect credentials, private data, leaked/confidential material, exploit kits, or unauthorized-access techniques."
+    "Search only public repositories for relevant, lawful, rights-reviewable reusable technology; target repositories are context, not destinations for automated writes.",
+    "Prioritize direct usefulness to the assigned active project's known product and test surfaces; do not source changes for retired projects.",
+    "Preserve exact revisions, source provenance, license limitations, independent verification gaps and evidence of implementation; discovery is not delivery.",
+    "No live publishing, merging, spending, customer outreach, child records, medical records, credentials, leaked/private material or unsafe access techniques.",
+    "Unlicensed code is research/reference only until specific reuse rights are proven. Private target repositories must never be scraped or copied into public discovery output."
   ],
   "workers": [
     {
       "id": "HUNTER-01",
-      "catalogs": [
-        1,
-        2,
-        41,
-        44
-      ],
-      "mission": "Roblox/Luau production frameworks and dependency/tooling accelerators for StarBlox",
+      "mission": "Deterministic, reproducible simulation engine and replay correctness for Genesis civilization worlds",
       "queries": [
-        "Roblox Luau framework Rojo Wally",
-        "Roblox game framework Luau stars:<3000",
-        "Rojo plugin Roblox workflow stars:<3000",
-        "Lune rbx-dom Roblox tooling"
-      ]
+        "agent based modeling simulation javascript open source",
+        "deterministic simulation replay javascript",
+        "civilization simulator resource conservation",
+        "entity component simulation browser typescript"
+      ],
+      "project": "genesis",
+      "target_repository": "P00NSMASHER/project-genesis"
     },
     {
       "id": "HUNTER-02",
-      "catalogs": [
-        3,
-        13,
-        34,
-        36
-      ],
-      "mission": "Roblox place/model ingestion, world conversion, scene graph and migration tooling",
+      "mission": "Genesis citizen decision-making, relationships, pathfinding and behavior under bounded simulation",
       "queries": [
-        "Roblox rbxl rbxlx rbxmx parser converter",
-        "rbx-dom Roblox model tooling",
-        "Roblox place file migration tooling",
-        "Roblox scene graph serializer Luau"
-      ]
+        "agent based citizen behavior simulation javascript",
+        "crowd pathfinding steering threejs",
+        "social simulation agents relationships open source",
+        "autonomous NPC utility AI browser simulation"
+      ],
+      "project": "genesis",
+      "target_repository": "P00NSMASHER/project-genesis"
     },
     {
       "id": "HUNTER-03",
-      "catalogs": [
-        4,
-        6,
-        33,
-        38
-      ],
-      "mission": "Large-world/open-world structure, streaming, terrain, spatial partitioning and world optimization",
+      "mission": "Genesis economy, governance, manufacturing, scarcity and auditable world-event models",
       "queries": [
-        "Roblox StreamingEnabled open world",
-        "Roblox terrain streaming system Luau",
-        "Roblox spatial partition octree Luau",
-        "Roblox world optimization large map"
-      ]
+        "economic simulation market agents open source",
+        "city simulator economy javascript",
+        "agent based election voting simulation",
+        "resource conservation economy simulation game"
+      ],
+      "project": "genesis",
+      "target_repository": "P00NSMASHER/project-genesis"
     },
     {
       "id": "HUNTER-04",
-      "catalogs": [
-        5,
-        9,
-        31,
-        42
-      ],
-      "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
+      "mission": "Genesis Three.js WebGL rendering, large-world performance, mobile input and accessible game UX",
       "queries": [
-        "Roblox server authoritative netcode Luau",
-        "Roblox RemoteEvent validation framework",
-        "Roblox networking replication framework Luau",
-        "Roblox anti exploit server validation open source"
-      ]
+        "threejs instancing performance large scene",
+        "WebGL mobile game optimization threejs",
+        "threejs terrain level of detail open source",
+        "browser game touch controls accessibility"
+      ],
+      "project": "genesis",
+      "target_repository": "P00NSMASHER/project-genesis"
     },
     {
       "id": "HUNTER-05",
-      "catalogs": [
-        7,
-        28,
-        29,
-        30
-      ],
-      "mission": "Roblox persistence, inventory, economy, ProfileStore-style data safety and exactly-once transaction patterns",
+      "mission": "Genesis synthetic nursing-home simulation: staffing, therapy scheduling, resident flows and reproducible scenario validation",
       "queries": [
-        "Roblox ProfileStore data persistence Luau",
-        "Roblox inventory system server authoritative",
-        "Roblox economy transaction ledger Luau",
-        "Roblox datastore retry session lock framework"
-      ]
+        "nursing home staffing simulation open source",
+        "healthcare discrete event simulation python",
+        "patient flow queue simulation open source",
+        "care facility staffing scheduling simulator"
+      ],
+      "project": "genesis",
+      "target_repository": "P00NSMASHER/project-genesis"
     },
     {
       "id": "HUNTER-06",
-      "catalogs": [
-        8,
-        10,
-        37
-      ],
-      "mission": "Roblox UI/mobile/input/accessibility systems and scalable player UX",
+      "mission": "ABVM standards-aligned Grade-2 practice, formative assessment, misconception feedback and evidence-based progression",
       "queries": [
-        "Roblox responsive UI mobile Luau",
-        "Roblox UI framework Fusion React Lua",
-        "Roblox touch controls input framework",
-        "Roblox accessibility reduced motion UI"
-      ]
+        "adaptive learning quiz spaced repetition open source",
+        "formative assessment distractor feedback education",
+        "grade 2 math practice open source",
+        "mastery learning question bank javascript"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-07",
-      "catalogs": [
-        11,
-        23,
-        24
-      ],
-      "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
+      "mission": "ABVM public teacher-page ingestion with provenance, date accuracy, stale-source guards and safe curriculum refresh",
       "queries": [
-        "Roblox Studio automation plugin testing",
-        "Roblox AI coding agent Studio",
-        "Roblox plugin automated instance editing",
-        "Rojo Roblox automated playtest CI"
-      ]
+        "school website scraper provenance change detection",
+        "website change monitoring data validation python",
+        "structured education calendar extraction",
+        "web content change detection source citations"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-08",
-      "catalogs": [
-        12,
-        20,
-        21
-      ],
-      "mission": "Roblox testing, simulation, replay, deterministic verification and CI tooling",
+      "mission": "ABVM printable worksheets, test-shaped practice sheets and accessible mobile-first interactive quizzes",
       "queries": [
-        "Roblox Luau unit test framework",
-        "Roblox automated playtest framework",
-        "Roblox replay simulation deterministic Luau",
-        "Roblox CI testing Rojo Selene Stylua"
-      ]
+        "worksheet generator elementary math javascript",
+        "printable quiz PDF generator open source",
+        "browser interactive quiz grade school",
+        "document layout worksheet print CSS"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-09",
-      "catalogs": [
-        14,
-        15,
-        35
-      ],
-      "mission": "Educational game systems, adaptive assessment, mastery learning and safe question generation useful to StarBlox",
+      "mission": "ABVM offline-first PWA reliability, accessibility, iOS layout and real browser regression tests",
       "queries": [
-        "adaptive assessment game open source",
-        "mastery learning game engine",
-        "IRT adaptive quiz open source game",
-        "educational game question generator offline"
-      ]
+        "offline first progressive web app testing",
+        "service worker update reliability tests",
+        "playwright mobile accessibility PWA",
+        "javascript offline education app test"
+      ],
+      "project": "abvm",
+      "target_repository": "P00NSMASHER/abvmschoolstarworld"
     },
     {
       "id": "HUNTER-10",
-      "catalogs": [
-        16,
-        17,
-        18
-      ],
-      "mission": "Roblox NPCs, pathfinding, vehicles, interactables and open-world activity systems",
+      "mission": "PermitPlate public NYC permitting/licensing records, change detection, source-linked triage and actionable vendor signals",
       "queries": [
-        "Roblox NPC pathfinding Luau open source",
-        "Roblox vehicle chassis Luau open source",
-        "Roblox interaction system ProximityPrompt framework",
-        "Roblox house door teleport system Luau"
-      ]
+        "NYC open data permits restaurant API",
+        "public records change detection pipeline",
+        "restaurant license data NYC open source",
+        "data provenance evidence linked research pipeline"
+      ],
+      "project": "permitplate",
+      "target_repository": "P00NSMASHER/permitplate-nyc"
     },
     {
       "id": "HUNTER-11",
-      "catalogs": [
-        19,
-        39,
-        40
-      ],
-      "mission": "Game-asset pipelines, provenance, 3D/2D processing, optimization and content factories for StarBlox",
+      "mission": "CaptureBrief verified business research, grounded evidence briefs, ingestion accuracy and customer-facing report QA",
       "queries": [
-        "Roblox asset pipeline Blender Rojo",
-        "game asset provenance pipeline open source",
-        "Roblox mesh optimization pipeline",
-        "sprite icon batch generation game assets"
-      ]
+        "evidence backed research report generator",
+        "business intelligence source provenance open source",
+        "automated research brief report Python",
+        "web evidence citation validation pipeline"
+      ],
+      "project": "capturebrief",
+      "target_repository": "P00NSMASHER/capturebrief"
     },
     {
       "id": "HUNTER-12",
-      "catalogs": [
-        22,
-        25,
-        26,
-        27
-      ],
-      "mission": "Roblox performance, profiling, memory/network optimization and mobile scalability",
+      "mission": "Portfolio Brain autonomous repair reliability, protected PR execution, exact-head trust and independent release evidence",
       "queries": [
-        "Roblox performance profiler Luau",
-        "Roblox memory optimization streaming",
-        "Roblox network optimization replication",
-        "Roblox mobile performance open world"
-      ]
+        "github actions protected pull request verifier",
+        "autonomous software maintenance regression tests",
+        "CI supply chain provenance attestation",
+        "github PR merge gate security automation"
+      ],
+      "project": "portfolio-brain",
+      "target_repository": "P00NSMASHER/portfolio-brain"
     },
     {
       "id": "HUNTER-13",
-      "catalogs": [
-        32,
-        43,
-        45
-      ],
-      "mission": "Roblox liveops, telemetry, experimentation, privacy-minimized analytics and release observability",
+      "mission": "RETALLY first verified customer/revenue outcome: lead intake, source quality, attribution and audit-friendly evidence",
       "queries": [
-        "Roblox telemetry analytics Luau",
-        "Roblox liveops feature flags open source",
-        "Roblox game analytics privacy",
-        "Roblox observability logging framework Luau"
-      ]
+        "B2B lead qualification evidence pipeline open source",
+        "CRM lead intake deduplication validation",
+        "customer conversion attribution analytics open source",
+        "business event ledger reconciliation python"
+      ],
+      "project": "retally",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger"
     },
     {
       "id": "HUNTER-14",
-      "catalogs": [
-        46,
-        47
-      ],
-      "mission": "Roblox Open Cloud, publishing, place deployment, release automation and wildcard StarBlox accelerators",
+      "mission": "Reusable security, deterministic testing, deployment verification and rights-safe source inspection for active projects",
       "queries": [
-        "Roblox Open Cloud deployment GitHub Actions",
-        "Roblox publish place CI workflow",
-        "Roblox Open Cloud API tooling",
-        "Roblox game deployment automation Rojo"
-      ]
+        "github action post deployment smoke test",
+        "software bill materials license audit python",
+        "reproducible build artifact verification github",
+        "continuous integration flaky test root cause analyzer"
+      ],
+      "project": "shared-infra",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger"
     }
   ],
   "integrator": {
     "id": "HUNTER-15",
-    "mission": "Deduplicate exact revisions, rank only StarBlox/Roblox-relevant pre-verification candidates, and surface the highest build-time compression opportunities. Never promote directly to MASTER without rights and technical verification."
-  }
+    "mission": "Merge only current-scope active-project candidate queues, associate each discovery with its target repository, retain license/provenance boundaries, and never claim implementation or delivery from discovery alone."
+  },
+  "scope_version": "active-projects-2026-11-v1",
+  "active_repositories": [
+    "P00NSMASHER/project-genesis",
+    "P00NSMASHER/abvmschoolstarworld",
+    "P00NSMASHER/permitplate-nyc",
+    "P00NSMASHER/capturebrief",
+    "P00NSMASHER/portfolio-brain",
+    "P00NSMASHER/github-value-hunt-ledger"
+  ]
 }
