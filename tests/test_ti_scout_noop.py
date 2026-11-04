@@ -154,6 +154,9 @@ class ScoutMaterialEvidenceTests(unittest.TestCase):
             "number": 799,
         }
         self.assertEqual(matching_open_proposal(sha, [entry]), 799)
+        runtime = {"login":"portfolio-brain-v8-runtime[bot]", "type":"Bot", "id":343751880}
+        self.assertEqual(matching_open_proposal(sha, [{**entry, "user":runtime}]), 799)
+        self.assertIsNone(matching_open_proposal(sha, [{**entry, "user":{**runtime, "id":1}}]))
         spoof = json.loads(json.dumps(entry))
         spoof["head"]["repo"]["full_name"] = "other/project"
         self.assertIsNone(matching_open_proposal(sha, [spoof]))

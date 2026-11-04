@@ -17,6 +17,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from tools.retally_writer_proposal_policy import approved_proposal_author
+
 REPO = "P00NSMASHER/github-value-hunt-ledger"
 MARKER = re.compile(r"<!-- scout-semantic-sha256:([a-f0-9]{64}) -->")
 SCOUT_PATH = re.compile(r"intelligence/scout_queue/HUNTER-[0-9]{2}\.json\Z")
@@ -111,7 +113,7 @@ def matching_open_proposal(fingerprint: str, proposals) -> int | None:
             raise ValueError("Malformed open PR entry")
         head, base = proposal.get("head") or {}, proposal.get("base") or {}
         if (proposal.get("state") != "open"
-                or (proposal.get("user") or {}).get("login") != "github-actions[bot]"
+                or not approved_proposal_author(proposal.get("user") or {})
                 or base.get("ref") != "main"
                 or (head.get("repo") or {}).get("full_name") != REPO
                 or not re.fullmatch(r"automation/retally-scout-[0-9]+-[0-9]+",

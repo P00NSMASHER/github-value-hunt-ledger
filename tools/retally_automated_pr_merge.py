@@ -18,7 +18,7 @@ from urllib.parse import quote
 
 from tools.retally_automated_pr_proposal import REPO, gh
 from tools.retally_writer_proposal_policy import (
-    COMMIT_SHA, PROPOSAL_BRANCH, ProposalHold, allowed_path, generated_manifest,
+    COMMIT_SHA, PROPOSAL_BRANCH, ProposalHold, allowed_path, approved_proposal_author, generated_manifest,
     verify_proposal,
 )
 
@@ -50,8 +50,8 @@ def guarded_target(lane: str, number: int, head_sha: str, base_sha: str,
         or pr.get("base", {}).get("sha") != base_sha):
         raise ProposalHold("Proposal head, repository, or target main changed")
     owner = pr.get("user") or {}
-    if owner.get("login") != "github-actions[bot]":
-        raise ProposalHold("Only GitHub Actions-authored proposal PRs qualify")
+    if not approved_proposal_author(owner):
+        raise ProposalHold("Proposal author is outside the approved writer identities")
     if require_current_main and _current_main_sha() != base_sha:
         raise ProposalHold("Main advanced: leave proposal open for reconciliation")
     commit = gh("GET", f"repos/{REPO}/git/commits/{head_sha}")

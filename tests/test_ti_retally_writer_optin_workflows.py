@@ -23,8 +23,9 @@ class WriterModeTests(unittest.TestCase):
                 self.assertIn("  submit-pr:", workflow)
                 self.assertIn("--lane " + lane, workflow)
                 self.assertIn("proposal_ready == 'true'", workflow)
-                self.assertIn("pull-requests: write", workflow)
-                self.assertIn("actions: write", workflow)
+                submit = workflow.split("  submit-pr:", 1)[1]
+                self.assertNotIn(": write", submit)
+                self.assertIn("name: retally-app-request-v1", submit)
                 self.assertIn("persist-credentials: false", workflow)
                 self.assertIn("refs/heads/main", workflow)
                 self.assertNotIn("PR_MODE", workflow)

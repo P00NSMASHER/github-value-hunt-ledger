@@ -45,6 +45,13 @@ class ProposalHold(ValueError):
     """Refuse integration; never silently skip or weaken a configured gate."""
 
 
+def approved_proposal_author(owner: dict) -> bool:
+    return owner.get("login") == "github-actions[bot]" or (
+        owner.get("login") == "portfolio-brain-v8-runtime[bot]"
+        and owner.get("type") == "Bot" and owner.get("id") == 343751880
+    )
+
+
 def safe_relative_file(path: str) -> bool:
     if not isinstance(path, str) or SAFE_PATH.fullmatch(path) is None:
         return False
