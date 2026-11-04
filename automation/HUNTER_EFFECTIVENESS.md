@@ -7,7 +7,7 @@ Only an actual GitHub Actions schedule-event run proves a scheduled invocation.
 A green CI check, research candidate, or PR is **not** a live integration,
 scientific novelty finding, trading edge, payment, or saved engineering time.
 
-Current-scope queues: 3/14; unreviewed candidates: 13
+Current-scope queues: 4/14; unreviewed candidates: 19
 
 | Hunter | Project | Latest recorded source state | Candidates | Last material snapshot (UTC) | Verified integration | Measured outcome |
 |---|---|---|---:|---|---|---|
@@ -24,7 +24,7 @@ Current-scope queues: 3/14; unreviewed candidates: 13
 | HUNTER-11 | capturebrief | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-12 | portfolio-brain | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-13 | retally | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
-| HUNTER-14 | shared-infra | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| HUNTER-14 | shared-infra | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-14.json) | 6 | 2026-11-04T11:36:08.652803+00:00 | UNKNOWN | UNKNOWN |
 
 ## Independent outcome acceptance
 
