@@ -1,6 +1,13 @@
 name: Active Project Technology Scouts
 
 on:
+  # One bounded source-run when this workflow/manifest is changed on main.
+  # This is not a new schedule and cannot run for unrelated commits.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-repo-hunter.yml'
+      - 'automation/hunter_schedule.json'
   workflow_dispatch:
     inputs:
       worker:
@@ -72,6 +79,7 @@ jobs:
         env:
           SCHEDULE: ${{ github.event.schedule }}
           MANUAL: ${{ inputs.worker }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           worker="$MANUAL"
           case "$SCHEDULE" in
@@ -91,6 +99,8 @@ jobs:
             "51 3,15 * * *") worker="HUNTER-14";;
             "7 4,16 * * *") worker="INTEGRATOR";;
           esac
+          # Never fan out to 14 workers from a push health-check.
+          if [ "$EVENT_NAME" = "push" ]; then worker="HUNTER-01"; fi
           [ -n "$worker" ] || worker="ALL"
           echo "worker=$worker" >> "$GITHUB_OUTPUT"
       - name: Tests
@@ -110,6 +120,30 @@ jobs:
           else
             python tools/public_repo_scout.py --worker "$WORKER"
           fi
+          # A single-worker smoke produces an honest, scope-filtered digest too.
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            python tools/public_repo_scout.py --integrate
+          fi
+      - name: Publish evidence-only effectiveness report
+        shell: bash
+        env:
+          WORKER: ${{ steps.route.outputs.worker }}
+        run: |
+          set -euo pipefail
+          python -m tools.hunter_effectiveness --output automation/HUNTER_EFFECTIVENESS.md
+          {
+            echo "## Scout execution evidence"
+            echo "Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Event: ${GITHUB_EVENT_NAME}"
+            echo "Worker: ${WORKER}"
+            if [ "$GITHUB_EVENT_NAME" = schedule ]; then
+              echo "Invocation: GitHub schedule event confirmed for this run"
+            else
+              echo "Invocation: NOT a scheduled run; scheduled execution remains unproven"
+            fi
+            echo
+            cat automation/HUNTER_EFFECTIVENESS.md
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Commit queue refresh
         id: persist
         env:
@@ -124,6 +158,9 @@ jobs:
           fi
           if [ -f automation/SCOUT_DIGEST.md ]; then
             git add -- automation/SCOUT_DIGEST.md
+          fi
+          if [ -f automation/HUNTER_EFFECTIVENESS.md ]; then
+            git add -- automation/HUNTER_EFFECTIVENESS.md
           fi
           # Compare actual evidence, not clocks/API telemetry. For a proposed
           # material update, reuse the already-open equivalent PR if any.
@@ -150,7 +187,7 @@ jobs:
   submit-pr:
     needs: scout
     if: >-
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push') &&
       github.ref == 'refs/heads/main' &&
       needs.scout.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest
