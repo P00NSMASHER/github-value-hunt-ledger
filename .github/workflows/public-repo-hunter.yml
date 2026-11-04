@@ -32,6 +32,8 @@ on:
           - HUNTER-13
           - HUNTER-14
           - INTEGRATOR
+  repository_dispatch:
+    types: [retally-scout-recovery-v1]
   schedule:
     - cron: "7 2,14 * * *"
     - cron: "15 2,14 * * *"
@@ -60,6 +62,10 @@ concurrency:
 
 jobs:
   scout:
+    if: >-
+      github.event_name != 'repository_dispatch' ||
+      (github.actor == 'portfolio-brain-v8-runtime[bot]' &&
+       github.event.client_payload.expected_main == github.sha)
     outputs:
       proposal_ready: ${{ steps.persist.outputs.proposal_ready }}
       branch: ${{ steps.persist.outputs.branch }}
@@ -80,9 +86,19 @@ jobs:
           SCHEDULE: ${{ github.event.schedule }}
           MANUAL: ${{ inputs.worker }}
           EVENT_NAME: ${{ github.event_name }}
+          RECOVERY_WORKER: ${{ github.event.client_payload.worker }}
+          RECOVERY_MAIN: ${{ github.event.client_payload.expected_main }}
+          EVENT_SHA: ${{ github.sha }}
+          EVENT_ACTOR: ${{ github.actor }}
         run: |
           worker="$MANUAL"
           if [ "$EVENT_NAME" = "schedule" ]; then worker=""; fi
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            test "$EVENT_ACTOR" = "portfolio-brain-v8-runtime[bot]" || { echo "Unauthorized recovery actor" >&2; exit 1; }
+            test "$RECOVERY_MAIN" = "$EVENT_SHA" || { echo "Recovery main moved" >&2; exit 1; }
+            [[ "$RECOVERY_WORKER" =~ ^HUNTER-(0[1-9]|1[0-4])$ ]] || { echo "Invalid recovery worker" >&2; exit 1; }
+            worker="$RECOVERY_WORKER"
+          fi
           case "$SCHEDULE" in
             "7 2,14 * * *") worker="HUNTER-01";;
             "15 2,14 * * *") worker="HUNTER-02";;
@@ -203,7 +219,8 @@ jobs:
   submit-pr:
     needs: scout
     if: >-
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push') &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'repository_dispatch' || github.event_name == 'push') &&
       github.ref == 'refs/heads/main' &&
       needs.scout.outputs.proposal_ready == 'true'
     runs-on: ubuntu-latest

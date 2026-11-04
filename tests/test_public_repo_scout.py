@@ -8,6 +8,15 @@ from unittest.mock import patch
 from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, retain_unreviewed_candidates, risk_flags, root_score, recency, triage, validate_manifest
 
 class ScoutTests(unittest.TestCase):
+    def test_recovery_route_is_app_actor_and_exact_main_bound(self):
+        workflow=Path(".github/workflows/public-repo-hunter.yml").read_text(encoding="utf-8")
+        self.assertEqual(workflow.count("- cron:"),15)
+        self.assertIn("types: [retally-scout-recovery-v1]",workflow)
+        self.assertIn("github.actor == 'portfolio-brain-v8-runtime[bot]'",workflow)
+        self.assertIn("github.event.client_payload.expected_main == github.sha",workflow)
+        self.assertIn('test "$RECOVERY_MAIN" = "$EVENT_SHA"',workflow)
+        self.assertIn('^HUNTER-(0[1-9]|1[0-4])$',workflow)
+
     def test_exact_revision_dedupe(self):
         c="example/project abcdef123456"
         self.assertTrue(known(c,"example/project","abcdef123456"))
