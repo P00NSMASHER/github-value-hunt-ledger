@@ -175,9 +175,16 @@ class ScoutTests(unittest.TestCase):
     def test_active_manifest_is_complete_and_excludes_retired_research(self):
         manifest = json.loads((Path(__file__).resolve().parents[1] /
                                "automation/hunter_schedule.json").read_text())
-        self.assertEqual(validate_manifest(manifest), "active-projects-2026-11-v1")
+        self.assertEqual(validate_manifest(manifest), "active-projects-2026-11-v2")
         self.assertEqual(len(manifest["workers"]), 14)
-        self.assertEqual(len(set(manifest["active_repositories"])), 6)
+        self.assertEqual(len(set(manifest["active_repositories"])), 5)
+        self.assertEqual([w["project"] for w in manifest["workers"][:5]],
+                         ["trading", "revenue-hunt", "retally-social-media",
+                          "novel-discovery", "engineering-acceleration"])
+        self.assertNotIn("P00NSMASHER/project-genesis",
+                         manifest["active_repositories"])
+        self.assertFalse(any(w["project"] == "genesis"
+                             for w in manifest["workers"]))
         self.assertTrue(all(
             worker["target_repository"] in manifest["active_repositories"]
             for worker in manifest["workers"]))
@@ -185,19 +192,32 @@ class ScoutTests(unittest.TestCase):
         bad["workers"][0]["queries"][0] = "Roblox retired research"
         with self.assertRaisesRegex(ValueError, "Retired-project"):
             validate_manifest(bad)
+        bad = json.loads(json.dumps(manifest))
+        bad["workers"][0]["project"] = "genesis"
+        with self.assertRaisesRegex(ValueError, "Removed Genesis"):
+            validate_manifest(bad)
+        bad = json.loads(json.dumps(manifest))
+        bad["workers"][2].pop("evidence_gate")
+        with self.assertRaisesRegex(ValueError, "Research evidence gate"):
+            validate_manifest(bad)
+        bad = json.loads(json.dumps(manifest))
+        bad["workers"][0]["project"] = "engineering-acceleration"
+        with self.assertRaisesRegex(ValueError, "assignment drift"):
+            validate_manifest(bad)
 
     def test_integrator_ignores_historical_queues_but_keeps_current_results(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             prior = {"worker_id": "HUNTER-01",
-                     "project": "retired",
+                     "scope_version": "active-projects-2026-11-v1",
+                     "project": "genesis",
                      "candidates": [{"repository": "example/legacy",
                                      "exact_revision": "a" * 40,
                                      "triage_score": 99,
                                      "url": "https://github.com/example/legacy"}]}
             current = {"worker_id": "HUNTER-02",
-                       "scope_version": "active-projects-2026-11-v1",
-                       "project": "genesis",
+                       "scope_version": "active-projects-2026-11-v2",
+                       "project": "trading",
                        "candidates": [{"repository": "example/active",
                                        "exact_revision": "b" * 40,
                                        "triage_score": 42,
@@ -206,37 +226,40 @@ class ScoutTests(unittest.TestCase):
             (root / "HUNTER-02.json").write_text(json.dumps(current))
             output = root / "digest.md"
             self.assertEqual(integrate(root, output,
-                                       scope_version="active-projects-2026-11-v1"), 1)
+                                       scope_version="active-projects-2026-11-v2"), 1)
             digest = output.read_text()
             self.assertIn("example/active", digest)
-            self.assertIn("| genesis |", digest)
+            self.assertIn("| trading |", digest)
             self.assertNotIn("example/legacy", digest)
             self.assertIn("Queue snapshots read: 1", digest)
             self.assertEqual(integrate(root, output,
-                                       scope_version="active-projects-2026-11-v1"), 1)
+                                       scope_version="active-projects-2026-11-v2"), 1)
 
     def test_legacy_snapshots_do_not_consume_current_discovery_pairs(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "HUNTER-01.json").write_text(json.dumps({
+                "scope_version": "active-projects-2026-11-v1",
                 "candidates": [{"repository": "example/historical",
                                 "exact_revision": "a" * 40}]}))
             (root / "HUNTER-02.json").write_text(json.dumps({
-                "scope_version": "active-projects-2026-11-v1",
+                "scope_version": "active-projects-2026-11-v2",
                 "candidates": [{"repository": "example/current",
                                 "exact_revision": "b" * 40}]}))
-            pairs = queued_pairs(root, scope_version="active-projects-2026-11-v1")
+            pairs = queued_pairs(root, scope_version="active-projects-2026-11-v2")
             self.assertNotIn(("example/historical", "a" * 40), pairs)
             self.assertIn(("example/current", "b" * 40), pairs)
 
     def test_scope_migration_does_not_trigger_same_scope_rank_loss_hold(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "HUNTER-01.json"
-            previous = {"worker_id": "HUNTER-01", "candidates": [
+            previous = {"worker_id": "HUNTER-01",
+                        "scope_version": "active-projects-2026-11-v1",
+                        "candidates": [
                 {"repository": "example/old", "exact_revision": "a" * 40,
                  "triage_score": 99, "status": "PRE_VERIFICATION_CANDIDATE"}]}
             current = {"worker_id": "HUNTER-01",
-                       "scope_version": "active-projects-2026-11-v1",
+                       "scope_version": "active-projects-2026-11-v2",
                        "candidates": [{"repository": "example/new",
                                        "exact_revision": "b" * 40,
                                        "triage_score": 25,
@@ -244,7 +267,7 @@ class ScoutTests(unittest.TestCase):
             self.assertTrue(persist_queue(path, previous))
             self.assertTrue(persist_queue(path, current))
             self.assertEqual(json.loads(path.read_text())["scope_version"],
-                             "active-projects-2026-11-v1")
+                             "active-projects-2026-11-v2")
             replacement = {**current, "candidates": [
                 {"repository": "example/worse", "exact_revision": "c" * 40,
                  "triage_score": 10, "status": "PRE_VERIFICATION_CANDIDATE"}]}
@@ -252,6 +275,19 @@ class ScoutTests(unittest.TestCase):
                 persist_queue(path, replacement)
             self.assertEqual(json.loads(path.read_text())["candidates"],
                              current["candidates"])
+
+    def test_updated_research_objectives_have_verifiable_acceptance_gates(self):
+        manifest = json.loads((Path(__file__).resolve().parents[1] /
+                               "automation/hunter_schedule.json").read_text())
+        goals = manifest["workers"][:5]
+        self.assertTrue(all(len(w["queries"]) == 4 for w in goals))
+        self.assertTrue(all(w["evidence_gate"] for w in goals))
+        self.assertIn("out-of-sample", goals[0]["evidence_gate"])
+        self.assertIn("actual collected payment", goals[1]["evidence_gate"])
+        self.assertIn("publishing requires separate authorization",
+                      goals[2]["evidence_gate"])
+        self.assertIn("UNKNOWN", goals[3]["evidence_gate"])
+        self.assertIn("baseline-versus-after", goals[4]["evidence_gate"])
 
     def test_retired_repository_is_never_accepted_as_new_source(self):
         class NoNetwork:

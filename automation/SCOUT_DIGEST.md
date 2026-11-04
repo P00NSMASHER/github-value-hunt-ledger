@@ -3,8 +3,8 @@
 **Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.
 
 Source: versioned HUNTER queue snapshots; Git history records material changes.
-Active scope: active-projects-2026-11-v1
-Previous retired-project queue snapshots are excluded; their Git history is preserved.
+Active scope: active-projects-2026-11-v2
+Earlier StarBlox and Genesis project-scope queues are excluded; their historical evidence remains in Git history.
 Queue snapshots read: 0
 Unique exact-revision candidates: 0
 

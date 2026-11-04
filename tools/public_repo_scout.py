@@ -150,7 +150,7 @@ def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None,scope_ver
     api_metrics={k:int(gh.stats.get(k,0))-int(before.get(k,0)) for k in gh.stats}
     risks.sort(key=lambda r:(str(r.get("repository") or "").lower(),
                              str(r.get("discovery_query") or "")))
-    return {"schema_version":2,"scope_version":scope_version,"generated_at":now().isoformat(),"worker_id":w["id"],"project":w.get("project"),"target_repository":w.get("target_repository"),"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
+    return {"schema_version":2,"scope_version":scope_version,"generated_at":now().isoformat(),"worker_id":w["id"],"project":w.get("project"),"target_repository":w.get("target_repository"),"evidence_gate":w.get("evidence_gate"),"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
 
 # Metrics, search response counts and the run clock are Actions-run telemetry, not
 # evidence. Source identity, changed rights/safety metadata, priority scores,
@@ -269,8 +269,10 @@ def validate_manifest(m):
     workers=m.get("workers") or []
     if not scope.startswith("active-projects-"):
         raise ValueError("Expected a versioned active-projects scout scope")
-    if not allowed or any("starblox" in repo.casefold() for repo in allowed):
-        raise ValueError("Active target allowlist is missing or contains retired projects")
+    if not allowed or any("starblox" in repo.casefold() or
+                          "project-genesis" in repo.casefold()
+                          for repo in allowed):
+        raise ValueError("Target allowlist is empty or contains a retired/removed project")
     if len(workers)!=14 or len({w.get("id") for w in workers})!=14:
         raise ValueError("Expected all fourteen unique hunter IDs")
     for i,w in enumerate(workers,1):
@@ -278,10 +280,19 @@ def validate_manifest(m):
             raise ValueError("Worker IDs and schedule order must remain stable")
         if w.get("target_repository") not in allowed or not w.get("project"):
             raise ValueError(f"Missing allowed active target for {w.get('id')}")
+        if w.get("project") == "genesis" or "genesis" in w.get("target_repository", "").casefold():
+            raise ValueError(f"Removed Genesis assignment in {w.get('id')}")
+        if i <= 5 and (not w.get("evidence_gate") or
+                       w.get("target_repository") != "P00NSMASHER/github-value-hunt-ledger"):
+            raise ValueError(f"Research evidence gate missing for {w.get('id')}")
         if not w.get("mission") or len(w.get("queries") or [])!=4:
             raise ValueError(f"Missing scoped mission/searches for {w.get('id')}")
         if "starblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold() or "roblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold():
             raise ValueError(f"Retired-project search detected in {w.get('id')}")
+    required=("trading","revenue-hunt","retally-social-media",
+              "novel-discovery","engineering-acceleration")
+    if tuple(w["project"] for w in workers[:5]) != required:
+        raise ValueError("Outcome research assignment drift")
     return scope
 
 def main():
