@@ -1,0 +1,52 @@
+name: Active Scout Scope Guard
+
+on:
+  pull_request:
+    paths:
+      - 'automation/hunter_schedule.json'
+      - 'automation/SCOUT_DIGEST.md'
+      - 'tools/public_repo_scout.py'
+      - 'tests/test_public_repo_scout.py'
+      - '.github/workflows/public-repo-hunter.yml'
+      - '.github/workflows/active-scout-scope-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'automation/hunter_schedule.json'
+      - 'automation/SCOUT_DIGEST.md'
+      - 'tools/public_repo_scout.py'
+      - 'tests/test_public_repo_scout.py'
+      - '.github/workflows/public-repo-hunter.yml'
+      - '.github/workflows/active-scout-scope-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-active-scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact source without persistent credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Setup pinned Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Verify scope, safety and existing queue invariants
+        run: python -m unittest tests.test_public_repo_scout tests.test_ti_scout_noop -v
+      - name: Prove historical discoveries cannot enter the current digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/public_repo_scout.py --integrate --output /tmp/active-scout-scope-ci.md
+          grep -Fxq 'Active scope: active-projects-2026-11-v1' /tmp/active-scout-scope-ci.md
+          if grep -qi 'StarBlox' /tmp/active-scout-scope-ci.md; then
+            echo 'Retired project appears in active-scoped digest'
+            exit 1
+          fi
+          git diff --exit-code

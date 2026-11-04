@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, risk_flags, root_score, recency, triage
+from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, risk_flags, root_score, recency, triage, validate_manifest
 
 class ScoutTests(unittest.TestCase):
     def test_exact_revision_dedupe(self):
@@ -171,6 +171,95 @@ class ScoutTests(unittest.TestCase):
             self.assertEqual(integrate(root,output),1)
             self.assertNotEqual(output.read_bytes(),before)
 
+
+    def test_active_manifest_is_complete_and_excludes_retired_research(self):
+        manifest = json.loads((Path(__file__).resolve().parents[1] /
+                               "automation/hunter_schedule.json").read_text())
+        self.assertEqual(validate_manifest(manifest), "active-projects-2026-11-v1")
+        self.assertEqual(len(manifest["workers"]), 14)
+        self.assertEqual(len(set(manifest["active_repositories"])), 6)
+        self.assertTrue(all(
+            worker["target_repository"] in manifest["active_repositories"]
+            for worker in manifest["workers"]))
+        bad = json.loads(json.dumps(manifest))
+        bad["workers"][0]["queries"][0] = "Roblox retired research"
+        with self.assertRaisesRegex(ValueError, "Retired-project"):
+            validate_manifest(bad)
+
+    def test_integrator_ignores_historical_queues_but_keeps_current_results(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            prior = {"worker_id": "HUNTER-01",
+                     "project": "retired",
+                     "candidates": [{"repository": "example/legacy",
+                                     "exact_revision": "a" * 40,
+                                     "triage_score": 99,
+                                     "url": "https://github.com/example/legacy"}]}
+            current = {"worker_id": "HUNTER-02",
+                       "scope_version": "active-projects-2026-11-v1",
+                       "project": "genesis",
+                       "candidates": [{"repository": "example/active",
+                                       "exact_revision": "b" * 40,
+                                       "triage_score": 42,
+                                       "url": "https://github.com/example/active"}]}
+            (root / "HUNTER-01.json").write_text(json.dumps(prior))
+            (root / "HUNTER-02.json").write_text(json.dumps(current))
+            output = root / "digest.md"
+            self.assertEqual(integrate(root, output,
+                                       scope_version="active-projects-2026-11-v1"), 1)
+            digest = output.read_text()
+            self.assertIn("example/active", digest)
+            self.assertIn("| genesis |", digest)
+            self.assertNotIn("example/legacy", digest)
+            self.assertIn("Queue snapshots read: 1", digest)
+            self.assertEqual(integrate(root, output,
+                                       scope_version="active-projects-2026-11-v1"), 1)
+
+    def test_legacy_snapshots_do_not_consume_current_discovery_pairs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "HUNTER-01.json").write_text(json.dumps({
+                "candidates": [{"repository": "example/historical",
+                                "exact_revision": "a" * 40}]}))
+            (root / "HUNTER-02.json").write_text(json.dumps({
+                "scope_version": "active-projects-2026-11-v1",
+                "candidates": [{"repository": "example/current",
+                                "exact_revision": "b" * 40}]}))
+            pairs = queued_pairs(root, scope_version="active-projects-2026-11-v1")
+            self.assertNotIn(("example/historical", "a" * 40), pairs)
+            self.assertIn(("example/current", "b" * 40), pairs)
+
+    def test_scope_migration_does_not_trigger_same_scope_rank_loss_hold(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "HUNTER-01.json"
+            previous = {"worker_id": "HUNTER-01", "candidates": [
+                {"repository": "example/old", "exact_revision": "a" * 40,
+                 "triage_score": 99, "status": "PRE_VERIFICATION_CANDIDATE"}]}
+            current = {"worker_id": "HUNTER-01",
+                       "scope_version": "active-projects-2026-11-v1",
+                       "candidates": [{"repository": "example/new",
+                                       "exact_revision": "b" * 40,
+                                       "triage_score": 25,
+                                       "status": "PRE_VERIFICATION_CANDIDATE"}]}
+            self.assertTrue(persist_queue(path, previous))
+            self.assertTrue(persist_queue(path, current))
+            self.assertEqual(json.loads(path.read_text())["scope_version"],
+                             "active-projects-2026-11-v1")
+            replacement = {**current, "candidates": [
+                {"repository": "example/worse", "exact_revision": "c" * 40,
+                 "triage_score": 10, "status": "PRE_VERIFICATION_CANDIDATE"}]}
+            with self.assertRaisesRegex(ValueError, "source-quality HOLD"):
+                persist_queue(path, replacement)
+            self.assertEqual(json.loads(path.read_text())["candidates"],
+                             current["candidates"])
+
+    def test_retired_repository_is_never_accepted_as_new_source(self):
+        class NoNetwork:
+            def revision(self, *_args):
+                raise AssertionError("retired project must not be fetched")
+        self.assertIsNone(candidate(
+            NoNetwork(), {"full_name": "P00NSMASHER/StarBlox"}, "query",
+            "", "P00NSMASHER/github-value-hunt-ledger"))
 
 if __name__=="__main__":
     unittest.main()

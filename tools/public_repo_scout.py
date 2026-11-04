@@ -41,13 +41,14 @@ def corpus_text(root):
             except OSError: pass
     return "\n".join(chunks)
 def known(corpus,repo,sha): return repo.lower() in corpus and sha.lower() in corpus
-def queued_pairs(root, exclude_worker=None):
+def queued_pairs(root, exclude_worker=None, scope_version=None):
     pairs=set()
     if not root.exists(): return pairs
     for p in root.glob("HUNTER-*.json"):
         if p.stem == exclude_worker: continue
         try: d=json.loads(p.read_text(encoding="utf-8"))
         except Exception: continue
+        if scope_version is not None and d.get("scope_version") != scope_version: continue
         for c in d.get("candidates") or []:
             repo=str(c.get("repository") or "").lower()
             sha=str(c.get("exact_revision") or "").lower()
@@ -112,7 +113,7 @@ class GH:
 
 def candidate(gh,repo,q,corp,own,prior_pairs=None):
     full=str(repo.get("full_name") or "")
-    if not full or full.lower()==own.lower(): return None
+    if not full or full.lower()==own.lower() or full.casefold()=="p00nsmasher/starblox": return None
     rf=risk_flags(repo)
     if rf: return {"repository":full,"url":repo.get("html_url"),"status":"RISK_REVIEW_ONLY","risk_flags":rf,"discovery_query":q}
     branch=str(repo.get("default_branch") or "main")
@@ -128,7 +129,7 @@ def candidate(gh,repo,q,corp,own,prior_pairs=None):
     score,parts,hits=triage(repo,names); lic=(repo.get("license") or {}).get("spdx_id") or "UNKNOWN"
     return {"repository":full,"url":repo.get("html_url"),"exact_revision":sha,"default_branch":branch,"description":repo.get("description"),"primary_language":repo.get("language"),"topics":repo.get("topics") or [],"published_license_spdx":lic,"stars":int(repo.get("stargazers_count") or 0),"forks":int(repo.get("forks_count") or 0),"archived":bool(repo.get("archived")),"pushed_at":repo.get("pushed_at"),"size_kb":int(repo.get("size") or 0),"root_code_signals":hits,"triage_score":score,"triage_components":parts,"discovery_query":q,"status":"PRE_VERIFICATION_CANDIDATE"}
 
-def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None):
+def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None,scope_version=None):
     seen={}; risks=[]; diag=[]; before=dict(gh.stats)
     for q in w.get("queries") or []:
         try: repos=gh.search(q,per_page=per_query)
@@ -149,7 +150,7 @@ def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None):
     api_metrics={k:int(gh.stats.get(k,0))-int(before.get(k,0)) for k in gh.stats}
     risks.sort(key=lambda r:(str(r.get("repository") or "").lower(),
                              str(r.get("discovery_query") or "")))
-    return {"schema_version":2,"generated_at":now().isoformat(),"worker_id":w["id"],"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
+    return {"schema_version":2,"scope_version":scope_version,"generated_at":now().isoformat(),"worker_id":w["id"],"project":w.get("project"),"target_repository":w.get("target_repository"),"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
 
 # Metrics, search response counts and the run clock are Actions-run telemetry, not
 # evidence. Source identity, changed rights/safety metadata, priority scores,
@@ -204,7 +205,11 @@ def persist_snapshot(path,data):
         old=json.loads(path.read_text(encoding="utf-8"))
         if meaningful_snapshot(old)==meaningful_snapshot(data):
             return False
-        losses = unexplained_rank_losses(old, data)
+        # A changed approved mission is not a silent source-quality regression.
+        # Old candidates remain in Git history; new scope has its own queue.
+        losses = (unexplained_rank_losses(old, data)
+                  if old.get("scope_version") == data.get("scope_version")
+                  else [])
         if losses:
             detail = ", ".join(f"{repo} (score {score})" for repo, score in losses)
             raise ValueError(
@@ -218,24 +223,33 @@ def persist_snapshot(path,data):
 # Preserve compatibility with existing public scout CI and its tests.
 persist_queue = persist_snapshot
 
-def integrate(root,out):
-    merged={}; workers={}; files=sorted(root.glob("HUNTER-*.json"))
+def integrate(root,out,scope_version=None):
+    merged={}; workers={}; projects={}; included=0
+    files=sorted(root.glob("HUNTER-*.json"))
     for p in files:
         try: d=json.loads(p.read_text())
         except Exception: continue
+        if scope_version is not None and d.get("scope_version") != scope_version: continue
+        included+=1
         wid=str(d.get("worker_id") or p.stem)
         for c in d.get("candidates") or []:
             key=(str(c.get("repository") or ""),str(c.get("exact_revision") or ""))
             if not all(key): continue
             if key not in merged or int(c.get("triage_score") or 0)>int(merged[key].get("triage_score") or 0): merged[key]=c
             workers.setdefault(key,set()).add(wid)
+            projects.setdefault(key,set()).add(str(d.get("project") or "unspecified"))
     ranked=sorted(merged.items(),key=lambda kv:(-int(kv[1].get("triage_score") or 0),
                                                  -int(kv[1].get("stars") or 0),
                                                  kv[0][0].lower(),kv[0][1].lower()))
-    lines=["# Automated Scout Digest","","**Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.","","Source: versioned HUNTER queue snapshots; Git history records material changes.",f"Queue snapshots read: {len(files)}",f"Unique exact-revision candidates: {len(ranked)}","","| Triage | Repository | Exact revision | License | Workers | Description |","|---:|---|---|---|---|---|"]
+    lines=["# Active Project Scout Digest" if scope_version else "# Automated Scout Digest","","**Authority:** PRE-VERIFICATION DISCOVERY ONLY. This file never promotes directly to MASTER.","","Source: versioned HUNTER queue snapshots; Git history records material changes."]
+    if scope_version:
+        lines += [f"Active scope: {scope_version}",
+                  "Previous retired-project queue snapshots are excluded; their Git history is preserved."]
+    lines += [f"Queue snapshots read: {included}",f"Unique exact-revision candidates: {len(ranked)}","","| Triage | Target project | Repository | Exact revision | License | Workers | Description |","|---:|---|---|---|---|---|---|"]
     for key,c in ranked[:75]:
         repo,sha=key; desc=str(c.get("description") or "").replace("|","\\|").replace("\n"," ")[:180]; ws=", ".join(sorted(workers[key]))
-        lines.append(f"| {c.get('triage_score',0)} | [{repo}]({c.get('url')}) | {sha[:12]} | {c.get('published_license_spdx','UNKNOWN')} | {ws} | {desc} |")
+        target=", ".join(sorted(projects[key]))
+        lines.append(f"| {c.get('triage_score',0)} | {target} | [{repo}]({c.get('url')}) | {sha[:12]} | {c.get('published_license_spdx','UNKNOWN')} | {ws} | {desc} |")
     lines += ["","## Promotion rule","","Candidates must still follow the existing worker runbook: exact-revision deep inspection, evidence beyond README where practical, safety/rights review, immutable run submission, verifier handling and integrator review.",""]
     new_text="\n".join(lines)
     if out.exists():
@@ -248,25 +262,51 @@ def integrate(root,out):
     out.write_text(new_text,encoding="utf-8")
     return len(ranked)
 
+def validate_manifest(m):
+    """Fail closed if a retired, incomplete, or ambiguous mission is deployed."""
+    scope=str(m.get("scope_version") or "")
+    allowed=set(m.get("active_repositories") or [])
+    workers=m.get("workers") or []
+    if not scope.startswith("active-projects-"):
+        raise ValueError("Expected a versioned active-projects scout scope")
+    if not allowed or any("starblox" in repo.casefold() for repo in allowed):
+        raise ValueError("Active target allowlist is missing or contains retired projects")
+    if len(workers)!=14 or len({w.get("id") for w in workers})!=14:
+        raise ValueError("Expected all fourteen unique hunter IDs")
+    for i,w in enumerate(workers,1):
+        if w.get("id")!=f"HUNTER-{i:02d}":
+            raise ValueError("Worker IDs and schedule order must remain stable")
+        if w.get("target_repository") not in allowed or not w.get("project"):
+            raise ValueError(f"Missing allowed active target for {w.get('id')}")
+        if not w.get("mission") or len(w.get("queries") or [])!=4:
+            raise ValueError(f"Missing scoped mission/searches for {w.get('id')}")
+        if "starblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold() or "roblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold():
+            raise ValueError(f"Retired-project search detected in {w.get('id')}")
+    return scope
+
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--manifest",default="automation/hunter_schedule.json"); ap.add_argument("--worker"); ap.add_argument("--integrate",action="store_true"); ap.add_argument("--queue-root",default="intelligence/scout_queue"); ap.add_argument("--output",default="automation/SCOUT_DIGEST.md"); ap.add_argument("--per-query",type=int,default=8); ap.add_argument("--max-candidates",type=int,default=16); ap.add_argument("--own-repo",default=os.environ.get("GITHUB_REPOSITORY","P00NSMASHER/github-value-hunt-ledger")); a=ap.parse_args()
     root=pathlib.Path.cwd(); qr=root/a.queue_root
-    if a.integrate: print(f"Integrated {integrate(qr,root/a.output)} candidates"); return
+    m=json.loads((root/a.manifest).read_text(encoding="utf-8"))
+    scope_version=validate_manifest(m)
+    if a.integrate:
+        print(f"Integrated {integrate(qr,root/a.output,scope_version=scope_version)} current-scope candidates")
+        return
     if not a.worker: ap.error("--worker required unless --integrate")
-    m=json.loads((root/a.manifest).read_text()); ws=m.get("workers") or []
+    ws=m.get("workers") or []
     if a.worker!="ALL": ws=[w for w in ws if w.get("id")==a.worker]
     if not ws: raise SystemExit(f"Unknown worker {a.worker}")
     gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root)
     for w in ws:
         # A worker's own pending candidates must NOT be treated as already
         # handled; doing so falsely withdraws unreviewed evidence next run.
-        prior_pairs=queued_pairs(qr,exclude_worker=w["id"])
-        d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)),prior_pairs)
+        prior_pairs=queued_pairs(qr,exclude_worker=w["id"],scope_version=scope_version)
+        d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)),prior_pairs,scope_version=scope_version)
         if any("error" in diagnostic for diagnostic in d["search_diagnostics"]):
             raise RuntimeError(f"Incomplete source discovery for {w['id']}; existing queue preserved")
         p=qr/f"{w['id']}.json"
         changed=persist_snapshot(p,d)
-        print(json.dumps({"worker":w["id"],"observed_at":d["generated_at"],
+        print(json.dumps({"worker":w["id"],"project":w["project"],"target_repository":w["target_repository"],"scope_version":scope_version,"observed_at":d["generated_at"],
                           "candidate_count":d["candidate_count"],"evidence_changed":changed,
                           "api_metrics":d["api_metrics"],
                           "search_diagnostics":d["search_diagnostics"]},sort_keys=True))
