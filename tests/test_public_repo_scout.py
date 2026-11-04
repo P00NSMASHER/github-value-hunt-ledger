@@ -297,5 +297,35 @@ class ScoutTests(unittest.TestCase):
             NoNetwork(), {"full_name": "P00NSMASHER/StarBlox"}, "query",
             "", "P00NSMASHER/github-value-hunt-ledger"))
 
+
+    def test_same_scope_genesis_queue_cannot_enter_production_digest(self):
+        manifest = json.loads((Path(__file__).resolve().parents[1] /
+                               "automation/hunter_schedule.json").read_text())
+        worker = manifest["workers"][2]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bogus = {"worker_id": worker["id"],
+                     "scope_version": manifest["scope_version"],
+                     "project": "genesis",
+                     "target_repository": "P00NSMASHER/project-genesis",
+                     "mission": "Genesis",
+                     "evidence_gate": worker["evidence_gate"],
+                     "candidates": [{"repository": "example/poison",
+                                     "exact_revision": "a" * 40,
+                                     "triage_score": 100}]}
+            (root / "HUNTER-03.json").write_text(json.dumps(bogus))
+            output = root / "digest.md"
+            with self.assertRaisesRegex(ValueError, "Invalid current-scope scout assignment"):
+                integrate(root, output, scope_version=manifest["scope_version"],
+                          worker_index={w["id"]: w for w in manifest["workers"]})
+            self.assertFalse(output.exists())
+
+    def test_genesis_topic_drift_fails_first_five_manifest_validation(self):
+        manifest = json.loads((Path(__file__).resolve().parents[1] /
+                               "automation/hunter_schedule.json").read_text())
+        manifest["workers"][3]["queries"][0] = "Genesis simulator"
+        with self.assertRaisesRegex(ValueError, "Removed Genesis research topic"):
+            validate_manifest(manifest)
+
 if __name__=="__main__":
     unittest.main()

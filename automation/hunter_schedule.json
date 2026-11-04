@@ -17,10 +17,10 @@
       "id": "HUNTER-01",
       "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
       "queries": [
-        "walk forward trading backtest python open source",
-        "Tradier API market data python open source",
-        "stock strategy backtest slippage fees reproducible",
-        "historical market data replay validation framework"
+        "walk forward backtesting",
+        "tradier",
+        "slippage backtest",
+        "market data replay"
       ],
       "project": "trading",
       "target_repository": "P00NSMASHER/github-value-hunt-ledger",
@@ -30,10 +30,10 @@
       "id": "HUNTER-02",
       "mission": "Revenue hunt: find reusable B2B prospect discovery, customer conversion, billing/reconciliation and measured funnel tools that could help active RETALLY businesses achieve a first independently verified collected dollar.",
       "queries": [
-        "B2B lead qualification open source public data",
-        "self hosted CRM conversion reply tracking",
-        "Stripe webhook payment reconciliation open source",
-        "business prospect enrichment public records pipeline"
+        "B2B lead qualification",
+        "crm lead capture",
+        "stripe webhook reconciliation",
+        "open data business leads"
       ],
       "project": "revenue-hunt",
       "target_repository": "P00NSMASHER/github-value-hunt-ledger",
@@ -43,10 +43,10 @@
       "id": "HUNTER-03",
       "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
       "queries": [
-        "social media content scheduler approval workflow open source",
-        "social media campaign conversion attribution UTM analytics",
-        "social media content QA accessibility open source",
-        "social media engagement analytics open source self hosted"
+        "social media approval workflow",
+        "utm attribution",
+        "social media content accessibility",
+        "social media analytics"
       ],
       "project": "retally-social-media",
       "target_repository": "P00NSMASHER/github-value-hunt-ledger",
@@ -56,10 +56,10 @@
       "id": "HUNTER-04",
       "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
       "queries": [
-        "scientific hypothesis generation open source automated",
-        "open scientific data anomaly detection discovery",
-        "symbolic regression scientific equation discovery",
-        "scientific literature prior art semantic search open source"
+        "scientific hypothesis generation",
+        "scientific anomaly detection",
+        "symbolic regression",
+        "scientific literature search"
       ],
       "project": "novel-discovery",
       "target_repository": "P00NSMASHER/github-value-hunt-ledger",
@@ -69,10 +69,10 @@
       "id": "HUNTER-05",
       "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
       "queries": [
-        "automated code migration codemod typescript python",
-        "test impact analysis selective CI github actions",
-        "automated bug reproduction regression test minimization",
-        "reproducible build dependency license audit automation"
+        "typescript codemod",
+        "test impact analysis",
+        "automated bug reproduction",
+        "dependency license audit"
       ],
       "project": "engineering-acceleration",
       "target_repository": "P00NSMASHER/github-value-hunt-ledger",

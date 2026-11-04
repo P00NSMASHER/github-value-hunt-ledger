@@ -223,13 +223,21 @@ def persist_snapshot(path,data):
 # Preserve compatibility with existing public scout CI and its tests.
 persist_queue = persist_snapshot
 
-def integrate(root,out,scope_version=None):
+def integrate(root,out,scope_version=None,worker_index=None):
     merged={}; workers={}; projects={}; included=0
     files=sorted(root.glob("HUNTER-*.json"))
     for p in files:
         try: d=json.loads(p.read_text())
         except Exception: continue
         if scope_version is not None and d.get("scope_version") != scope_version: continue
+        if worker_index is not None:
+            expected=worker_index.get(p.stem)
+            if (expected is None or d.get("worker_id") != p.stem or
+                d.get("project") != expected.get("project") or
+                d.get("target_repository") != expected.get("target_repository") or
+                d.get("mission") != expected.get("mission") or
+                d.get("evidence_gate") != expected.get("evidence_gate")):
+                raise ValueError(f"Invalid current-scope scout assignment in {p.name}")
         included+=1
         wid=str(d.get("worker_id") or p.stem)
         for c in d.get("candidates") or []:
@@ -285,6 +293,8 @@ def validate_manifest(m):
         if i <= 5 and (not w.get("evidence_gate") or
                        w.get("target_repository") != "P00NSMASHER/github-value-hunt-ledger"):
             raise ValueError(f"Research evidence gate missing for {w.get('id')}")
+        if i <= 5 and "genesis" in (w.get("mission","") + " " + " ".join(w.get("queries") or [])).casefold():
+            raise ValueError(f"Removed Genesis research topic in {w.get('id')}")
         if not w.get("mission") or len(w.get("queries") or [])!=4:
             raise ValueError(f"Missing scoped mission/searches for {w.get('id')}")
         if "starblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold() or "roblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold():
@@ -301,7 +311,7 @@ def main():
     m=json.loads((root/a.manifest).read_text(encoding="utf-8"))
     scope_version=validate_manifest(m)
     if a.integrate:
-        print(f"Integrated {integrate(qr,root/a.output,scope_version=scope_version)} current-scope candidates")
+        print(f"Integrated {integrate(qr,root/a.output,scope_version=scope_version,worker_index={w['id']: w for w in m['workers']})} current-scope candidates")
         return
     if not a.worker: ap.error("--worker required unless --integrate")
     ws=m.get("workers") or []

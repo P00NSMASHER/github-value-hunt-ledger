@@ -82,6 +82,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
         run: |
           worker="$MANUAL"
+          if [ "$EVENT_NAME" = "schedule" ]; then worker=""; fi
           case "$SCHEDULE" in
             "7 2,14 * * *") worker="HUNTER-01";;
             "15 2,14 * * *") worker="HUNTER-02";;
@@ -99,6 +100,10 @@ jobs:
             "51 3,15 * * *") worker="HUNTER-14";;
             "7 4,16 * * *") worker="INTEGRATOR";;
           esac
+          if [ "$EVENT_NAME" = "schedule" ] && [ -z "$worker" ]; then
+            echo "Unrecognized scheduled hunter route: $SCHEDULE" >&2
+            exit 1
+          fi
           # Never fan out to 14 workers from a push health-check.
           if [ "$EVENT_NAME" = "push" ]; then worker="HUNTER-01"; fi
           [ -n "$worker" ] || worker="ALL"
