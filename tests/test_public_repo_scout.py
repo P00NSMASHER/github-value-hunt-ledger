@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, risk_flags, root_score, recency, triage, validate_manifest
+from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, retain_unreviewed_candidates, risk_flags, root_score, recency, triage, validate_manifest
 
 class ScoutTests(unittest.TestCase):
     def test_exact_revision_dedupe(self):
@@ -326,6 +326,58 @@ class ScoutTests(unittest.TestCase):
         manifest["workers"][3]["queries"][0] = "Genesis simulator"
         with self.assertRaisesRegex(ValueError, "Removed Genesis research topic"):
             validate_manifest(manifest)
+
+
+    def test_query_refresh_retains_higher_ranked_unreviewed_evidence(self):
+        keys = {"scope_version": "active-projects-2026-11-v2",
+                "worker_id": "HUNTER-01", "project": "trading",
+                "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+                "mission": "Trading research", "evidence_gate": "verify"}
+        prior = {**keys, "candidate_count": 2,
+                 "candidates": [
+                     {"repository": "example/strong", "exact_revision": "a"*40,
+                      "triage_score": 46, "stars": 1,
+                      "status": "PRE_VERIFICATION_CANDIDATE"},
+                     {"repository": "example/weak", "exact_revision": "b"*40,
+                      "triage_score": 10, "stars": 1,
+                      "status": "PRE_VERIFICATION_CANDIDATE"}]}
+        fresh = {**keys, "search_queries": ["tradier"],
+                 "risk_review_count": 0, "risk_review": [], "candidate_count": 1,
+                 "candidates": [{"repository": "example/new", "exact_revision": "c"*40,
+                                 "triage_score": 35, "stars": 1,
+                                 "status": "PRE_VERIFICATION_CANDIDATE"}]}
+        combined = retain_unreviewed_candidates(prior, fresh, limit=2)
+        self.assertEqual([c["repository"] for c in combined["candidates"]],
+                         ["example/strong", "example/new"])
+        self.assertTrue(combined["candidates"][0]["retained_unreviewed"])
+        self.assertNotIn("retained_unreviewed", combined["candidates"][1])
+        self.assertEqual(combined["candidate_count"], 2)
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "HUNTER-01.json"
+            self.assertTrue(persist_queue(p, prior))
+            self.assertTrue(persist_queue(p, combined))
+            self.assertEqual(json.loads(p.read_text())["candidates"], combined["candidates"])
+
+    def test_continuity_does_not_revive_legacy_genesis_or_risky_leads(self):
+        keys = {"scope_version": "active-projects-2026-11-v2",
+                "worker_id": "HUNTER-01", "project": "trading",
+                "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+                "mission": "Trading", "evidence_gate": "proof"}
+        old = {**keys, "candidates": [
+            {"repository": "example/unsafe", "exact_revision": "a"*40,
+             "triage_score": 42, "status": "PRE_VERIFICATION_CANDIDATE"}]}
+        fresh = {**keys, "candidates": [], "risk_review": [],
+                 "risk_review_count": 0}
+        legacy = {**old, "scope_version": "active-projects-2026-11-v1",
+                  "project": "genesis"}
+        self.assertEqual(retain_unreviewed_candidates(legacy, dict(fresh), 16)["candidates"], [])
+        flagged = {**fresh, "risk_review": [{"repository": "example/unsafe"}],
+                   "risk_review_count": 1}
+        with self.assertRaisesRegex(ValueError, "risk-review HOLD"):
+            retain_unreviewed_candidates(old, flagged, 16)
+        retained = retain_unreviewed_candidates(old, dict(fresh), 16)
+        self.assertEqual(retained["candidate_count"], 1)
+        self.assertTrue(retained["candidates"][0]["retained_unreviewed"])
 
 if __name__=="__main__":
     unittest.main()
