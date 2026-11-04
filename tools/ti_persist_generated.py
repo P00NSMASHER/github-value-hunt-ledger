@@ -167,7 +167,8 @@ def persist_generated(
             repo,
             "commit",
             "-m",
-            "chore: refresh technology intelligence [skip ci]",
+            "chore: refresh technology intelligence"
+            + (" [skip ci]" if proposal_branch is None else ""),
         )
 
         if before_push is not None:

@@ -293,6 +293,8 @@ class PersistGeneratedTests(unittest.TestCase):
         self.assertEqual(result["branch"], branch)
         self.assertEqual(result["base_sha"], original_main)
         self.assertEqual(result["attempts"], 1)
+        subject = git(self.worker, "show", "-s", "--format=%s", result["head_sha"]).stdout
+        self.assertNotIn("[skip ci]", subject.lower(), "proposal suppressed required pull_request CI")
         # No implicit fallback or mirror push to main.
         after_main = git(self.worker, "ls-remote", "--heads", "origin", "main")
         self.assertEqual(after_main.stdout.split()[0], original_main)
