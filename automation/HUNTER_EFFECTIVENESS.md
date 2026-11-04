@@ -7,16 +7,16 @@ Only an actual GitHub Actions schedule-event run proves a scheduled invocation.
 A green CI check, research candidate, or PR is **not** a live integration,
 scientific novelty finding, trading edge, payment, or saved engineering time.
 
-Current-scope queues: 2/14; unreviewed candidates: 2
+Current-scope queues: 3/14; unreviewed candidates: 2
 
 | Hunter | Project | Latest recorded source state | Candidates | Last material snapshot (UTC) | Verified integration | Measured outcome |
 |---|---|---|---:|---|---|---|
 | HUNTER-01 | trading | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-01.json) | 2 | 2026-11-04T05:37:03.696307+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-02 | revenue-hunt | [NO_NEW_CANDIDATES](../intelligence/scout_queue/HUNTER-02.json) | 0 | 2026-11-04T09:07:09.798150+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-02 | revenue-hunt | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-02.json) | 0 | 2026-11-04T09:07:09.798150+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-03 | retally-social-media | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-04 | novel-discovery | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-05 | engineering-acceleration | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
-| HUNTER-06 | abvm | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| HUNTER-06 | abvm | [NO_NEW_CANDIDATES](../intelligence/scout_queue/HUNTER-06.json) | 0 | 2026-11-04T09:52:41.584350+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-07 | abvm | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-08 | abvm | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
 | HUNTER-09 | abvm | NOT_OBSERVED_IN_SCOPE | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
