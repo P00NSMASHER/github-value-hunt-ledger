@@ -7,6 +7,8 @@ import unittest
 from pathlib import Path
 
 from tools.hunter_effectiveness import collect, describe_worker, render
+from tools.retally_writer_proposal_policy import allowed_path
+from tools.retally_scout_pr_dedupe import evidence_value, semantic_fingerprint
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -107,6 +109,18 @@ class HunterOutcomeTruthTests(unittest.TestCase):
         self.assertEqual(before, after)
         self.assertNotIn("INTEGRATED_OK", before)
         self.assertNotIn("VERIFIED_PROFIT", before)
+
+    def test_only_the_new_evidence_report_is_added_to_proposal_allowlist(self):
+        path = "automation/HUNTER_EFFECTIVENESS.md"
+        self.assertTrue(allowed_path("scout", path, ti_paths=frozenset()))
+        self.assertFalse(allowed_path("scout", "automation/secret.md",
+                                      ti_paths=frozenset()))
+        report = "# Hunter effectiveness\\n\\nVerified integration: UNKNOWN\\n"
+        self.assertEqual(evidence_value(path, report), report)
+        self.assertNotEqual(semantic_fingerprint({path: report}),
+                            semantic_fingerprint({path: report + "review needed\\n"}))
+        with self.assertRaises(ValueError):
+            evidence_value("automation/arbitrary.md", "fake")
 
     def test_existing_schedule_is_preserved_and_smoke_is_one_worker(self):
         source = WORKFLOW.read_text(encoding="utf-8")
