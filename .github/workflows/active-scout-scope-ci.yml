@@ -45,7 +45,7 @@ jobs:
           set -euo pipefail
           python tools/public_repo_scout.py --integrate --output /tmp/active-scout-scope-ci.md
           grep -Fxq 'Active scope: active-projects-2026-11-v2' /tmp/active-scout-scope-ci.md
-          if grep -Eqi '^\\|[^|]*\\|[[:space:]]*(genesis|starblox)[[:space:]]*\\|' /tmp/active-scout-scope-ci.md; then
+          if grep -Eqi '^[|][^|]*[|][[:space:]]*(genesis|starblox)[[:space:]]*[|]' /tmp/active-scout-scope-ci.md; then
             echo 'Removed project appears in active-scoped digest'
             exit 1
           fi
