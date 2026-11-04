@@ -5,6 +5,11 @@ on:
     paths:
       - 'automation/hunter_schedule.json'
       - 'automation/SCOUT_DIGEST.md'
+      - 'automation/HUNTER_EFFECTIVENESS.md'
+      - 'tools/hunter_effectiveness.py'
+      - 'tests/test_hunter_effectiveness.py'
+      - 'tools/retally_scout_pr_dedupe.py'
+      - 'tools/retally_writer_proposal_policy.py'
       - 'tools/public_repo_scout.py'
       - 'tests/test_public_repo_scout.py'
       - '.github/workflows/public-repo-hunter.yml'
@@ -14,6 +19,11 @@ on:
     paths:
       - 'automation/hunter_schedule.json'
       - 'automation/SCOUT_DIGEST.md'
+      - 'automation/HUNTER_EFFECTIVENESS.md'
+      - 'tools/hunter_effectiveness.py'
+      - 'tests/test_hunter_effectiveness.py'
+      - 'tools/retally_scout_pr_dedupe.py'
+      - 'tools/retally_writer_proposal_policy.py'
       - 'tools/public_repo_scout.py'
       - 'tests/test_public_repo_scout.py'
       - '.github/workflows/public-repo-hunter.yml'
@@ -38,12 +48,15 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify scope, safety and existing queue invariants
-        run: python -m unittest tests.test_public_repo_scout tests.test_ti_scout_noop -v
+        run: python -m unittest tests.test_public_repo_scout tests.test_ti_scout_noop tests.test_hunter_effectiveness -v
       - name: Prove historical discoveries cannot enter the current digest
         shell: bash
         run: |
           set -euo pipefail
           python tools/public_repo_scout.py --integrate --output /tmp/active-scout-scope-ci.md
+          python -m tools.hunter_effectiveness --output /tmp/hunter-effectiveness-ci.md
+          grep -Fq 'Verified integration | Measured outcome' /tmp/hunter-effectiveness-ci.md
+          grep -Fq '**UNKNOWN**' /tmp/hunter-effectiveness-ci.md
           grep -Fxq 'Active scope: active-projects-2026-11-v2' /tmp/active-scout-scope-ci.md
           if grep -Eqi '^[|][^|]*[|][[:space:]]*(genesis|starblox)[[:space:]]*[|]' /tmp/active-scout-scope-ci.md; then
             echo 'Removed project appears in active-scoped digest'
