@@ -50,8 +50,10 @@ def guarded_target(lane: str, number: int, head_sha: str, base_sha: str,
         or pr.get("base", {}).get("sha") != base_sha):
         raise ProposalHold("Proposal head, repository, or target main changed")
     owner = pr.get("user") or {}
-    if owner.get("login") != "github-actions[bot]":
-        raise ProposalHold("Only GitHub Actions-authored proposal PRs qualify")
+    runtime_author = (owner.get("login") == "portfolio-brain-v8-runtime[bot]"
+                      and owner.get("type") == "Bot" and owner.get("id") == 343751880)
+    if owner.get("login") != "github-actions[bot]" and not runtime_author:
+        raise ProposalHold("Proposal author is outside the approved writer identities")
     if require_current_main and _current_main_sha() != base_sha:
         raise ProposalHold("Main advanced: leave proposal open for reconciliation")
     commit = gh("GET", f"repos/{REPO}/git/commits/{head_sha}")

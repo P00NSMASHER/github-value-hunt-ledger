@@ -77,6 +77,20 @@ class GeneratedBotControllerTests(unittest.TestCase):
                 with self.assertRaises(ProposalHold):
                     merge.guarded_target("scout", 19, HEAD, BASE)
 
+    def test_runtime_proposal_requires_exact_provider_account(self):
+        author = {"login": "portfolio-brain-v8-runtime[bot]", "id": 343751880, "type": "Bot"}
+        for mutate in ({}, {"type":"User"}, {"id":123}, {"login":"other[bot]"}):
+            def api(method, path, payload=None):
+                if path.endswith("/pulls/19"):
+                    return {**candidate_pr(), "user": {**author, **mutate}}
+                return fake_authority_api(method, path, payload)
+            with self.subTest(mutate=mutate), patch.object(merge,"gh",side_effect=api):
+                if mutate:
+                    with self.assertRaises(ProposalHold):
+                        merge.guarded_target("scout",19,HEAD,BASE)
+                else:
+                    self.assertEqual(merge.guarded_target("scout",19,HEAD,BASE)[0]["user"],author)
+
     def test_changed_main_wrong_parent_or_cross_scope_never_pass(self):
         for case in ("stale", "second_parent", "workflow_path",
                      "deletion", "many_commits", "truncated"):
