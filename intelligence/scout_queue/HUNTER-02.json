@@ -10,34 +10,33 @@
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 0,
   "candidates": [],
-  "catalogs": [
-    3,
-    13,
-    34,
-    36
-  ],
-  "generated_at": "2026-10-21T18:35:49.225897+00:00",
-  "mission": "Roblox place/model ingestion, world conversion, scene graph and migration tooling",
+  "catalogs": [],
+  "evidence_gate": "Success requires independently verified customer action or actual collected payment; a lead, mock purchase, generated invoice or GitHub candidate is not revenue.",
+  "generated_at": "2026-11-04T09:07:09.798150+00:00",
+  "mission": "Revenue hunt: find reusable B2B prospect discovery, customer conversion, billing/reconciliation and measured funnel tools that could help active RETALLY businesses achieve a first independently verified collected dollar.",
+  "project": "revenue-hunt",
   "risk_review": [],
   "risk_review_count": 0,
   "schema_version": 2,
+  "scope_version": "active-projects-2026-11-v2",
   "search_diagnostics": [
     {
-      "query": "Roblox rbxl rbxlx rbxmx parser converter",
+      "query": "B2B lead qualification open source public data",
       "returned": 0
     },
     {
-      "query": "rbx-dom Roblox model tooling",
+      "query": "self hosted CRM conversion reply tracking",
       "returned": 0
     },
     {
-      "query": "Roblox place file migration tooling",
+      "query": "Stripe webhook payment reconciliation open source",
       "returned": 0
     },
     {
-      "query": "Roblox scene graph serializer Luau",
+      "query": "business prospect enrichment public records pipeline",
       "returned": 0
     }
   ],
+  "target_repository": "P00NSMASHER/github-value-hunt-ledger",
   "worker_id": "HUNTER-02"
 }

@@ -1,11 +1,22 @@
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
-from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, risk_flags, root_score, recency, triage, validate_manifest
+from tools.public_repo_scout import GH, candidate, integrate, known, persist_queue, queued_pairs, retain_unreviewed_candidates, risk_flags, root_score, recency, triage, validate_manifest
 
 class ScoutTests(unittest.TestCase):
+    def test_recovery_route_is_app_actor_and_exact_main_bound(self):
+        workflow=Path(".github/workflows/public-repo-hunter.yml").read_text(encoding="utf-8")
+        self.assertEqual(workflow.count("- cron:"),15)
+        self.assertIn("types: [retally-scout-recovery-v1]",workflow)
+        self.assertIn("github.actor == 'portfolio-brain-v8-runtime[bot]'",workflow)
+        self.assertIn("github.event.client_payload.expected_main == github.sha",workflow)
+        self.assertIn('test "$RECOVERY_MAIN" = "$EVENT_SHA"',workflow)
+        self.assertIn('^HUNTER-(0[1-9]|1[0-4])$',workflow)
+
     def test_exact_revision_dedupe(self):
         c="example/project abcdef123456"
         self.assertTrue(known(c,"example/project","abcdef123456"))
@@ -43,6 +54,46 @@ class ScoutTests(unittest.TestCase):
         repo={"full_name":"example/project","default_branch":"main","name":"project","description":"useful engine","topics":[]}
         self.assertIsNone(candidate(gh,repo,"q","example/project abcdef123456","owner/repo"))
         self.assertEqual(0,gh.root_calls)
+
+    def test_candidate_inspects_tree_at_recorded_revision(self):
+        gh = GH("test")
+        sha = "a" * 40
+        repo = {"full_name": "example/project", "default_branch": "main"}
+        with patch.object(gh, "revision", return_value=sha), patch.object(
+                gh, "root", return_value=["src"]) as root:
+            result = candidate(gh, repo, "source", "", "owner/repo")
+        root.assert_called_once_with("example/project", sha)
+        self.assertEqual(result["exact_revision"], sha)
+
+    def test_run_counts_describe_final_queue_after_retention(self):
+        from tools import public_repo_scout as scout
+
+        manifest_path = Path(__file__).resolve().parents[1] / "automation/hunter_schedule.json"
+        manifest = json.loads(manifest_path.read_text())
+        worker = manifest["workers"][0]
+        def source(name, score):
+            return {"repository": "example/" + name, "triage_score": score,
+                    "exact_revision": "a" * 40, "status": "PRE_VERIFICATION_CANDIDATE"}
+
+        fresh = {**worker, "worker_id": worker["id"], "scope_version": manifest["scope_version"],
+                 "candidates": [source("first", 50), source("second", 20)], "candidate_count": 2,
+                 "api_metrics": {}, "search_diagnostics": [], "generated_at": "2026-11-04T00:00:00Z"}
+        with tempfile.TemporaryDirectory() as tmp:
+            queue = Path(tmp) / (worker["id"] + ".json")
+            queue.write_text(json.dumps({**fresh, "candidates": [source("prior", 60)],
+                                         "candidate_count": 1}))
+            argv = ["scout", "--worker", worker["id"], "--manifest", str(manifest_path),
+                    "--queue-root", tmp, "--max-candidates", "2"]
+            stdout = io.StringIO()
+            with patch("sys.argv", argv), patch.object(scout, "GH"), patch.object(
+                    scout, "corpus_text", return_value=""), patch.object(
+                    scout, "worker_run", return_value=fresh), redirect_stdout(stdout):
+                scout.main()
+            summary = json.loads(stdout.getvalue())
+            saved = json.loads(queue.read_text())
+        self.assertEqual(summary["fresh_candidate_count"], 1)
+        self.assertEqual(summary["retained_unreviewed_count"], 1)
+        self.assertEqual(summary["candidate_count"], len(saved["candidates"]))
 
     def test_persisted_queue_pairs_are_loaded(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -296,6 +347,88 @@ class ScoutTests(unittest.TestCase):
         self.assertIsNone(candidate(
             NoNetwork(), {"full_name": "P00NSMASHER/StarBlox"}, "query",
             "", "P00NSMASHER/github-value-hunt-ledger"))
+
+
+    def test_same_scope_genesis_queue_cannot_enter_production_digest(self):
+        manifest = json.loads((Path(__file__).resolve().parents[1] /
+                               "automation/hunter_schedule.json").read_text())
+        worker = manifest["workers"][2]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bogus = {"worker_id": worker["id"],
+                     "scope_version": manifest["scope_version"],
+                     "project": "genesis",
+                     "target_repository": "P00NSMASHER/project-genesis",
+                     "mission": "Genesis",
+                     "evidence_gate": worker["evidence_gate"],
+                     "candidates": [{"repository": "example/poison",
+                                     "exact_revision": "a" * 40,
+                                     "triage_score": 100}]}
+            (root / "HUNTER-03.json").write_text(json.dumps(bogus))
+            output = root / "digest.md"
+            with self.assertRaisesRegex(ValueError, "Invalid current-scope scout assignment"):
+                integrate(root, output, scope_version=manifest["scope_version"],
+                          worker_index={w["id"]: w for w in manifest["workers"]})
+            self.assertFalse(output.exists())
+
+    def test_genesis_topic_drift_fails_first_five_manifest_validation(self):
+        manifest = json.loads((Path(__file__).resolve().parents[1] /
+                               "automation/hunter_schedule.json").read_text())
+        manifest["workers"][3]["queries"][0] = "Genesis simulator"
+        with self.assertRaisesRegex(ValueError, "Removed Genesis research topic"):
+            validate_manifest(manifest)
+
+
+    def test_query_refresh_retains_higher_ranked_unreviewed_evidence(self):
+        keys = {"scope_version": "active-projects-2026-11-v2",
+                "worker_id": "HUNTER-01", "project": "trading",
+                "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+                "mission": "Trading research", "evidence_gate": "verify"}
+        prior = {**keys, "candidate_count": 2,
+                 "candidates": [
+                     {"repository": "example/strong", "exact_revision": "a"*40,
+                      "triage_score": 46, "stars": 1,
+                      "status": "PRE_VERIFICATION_CANDIDATE"},
+                     {"repository": "example/weak", "exact_revision": "b"*40,
+                      "triage_score": 10, "stars": 1,
+                      "status": "PRE_VERIFICATION_CANDIDATE"}]}
+        fresh = {**keys, "search_queries": ["tradier"],
+                 "risk_review_count": 0, "risk_review": [], "candidate_count": 1,
+                 "candidates": [{"repository": "example/new", "exact_revision": "c"*40,
+                                 "triage_score": 35, "stars": 1,
+                                 "status": "PRE_VERIFICATION_CANDIDATE"}]}
+        combined = retain_unreviewed_candidates(prior, fresh, limit=2)
+        self.assertEqual([c["repository"] for c in combined["candidates"]],
+                         ["example/strong", "example/new"])
+        self.assertTrue(combined["candidates"][0]["retained_unreviewed"])
+        self.assertNotIn("retained_unreviewed", combined["candidates"][1])
+        self.assertEqual(combined["candidate_count"], 2)
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "HUNTER-01.json"
+            self.assertTrue(persist_queue(p, prior))
+            self.assertTrue(persist_queue(p, combined))
+            self.assertEqual(json.loads(p.read_text())["candidates"], combined["candidates"])
+
+    def test_continuity_does_not_revive_legacy_genesis_or_risky_leads(self):
+        keys = {"scope_version": "active-projects-2026-11-v2",
+                "worker_id": "HUNTER-01", "project": "trading",
+                "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+                "mission": "Trading", "evidence_gate": "proof"}
+        old = {**keys, "candidates": [
+            {"repository": "example/unsafe", "exact_revision": "a"*40,
+             "triage_score": 42, "status": "PRE_VERIFICATION_CANDIDATE"}]}
+        fresh = {**keys, "candidates": [], "risk_review": [],
+                 "risk_review_count": 0}
+        legacy = {**old, "scope_version": "active-projects-2026-11-v1",
+                  "project": "genesis"}
+        self.assertEqual(retain_unreviewed_candidates(legacy, dict(fresh), 16)["candidates"], [])
+        flagged = {**fresh, "risk_review": [{"repository": "example/unsafe"}],
+                   "risk_review_count": 1}
+        with self.assertRaisesRegex(ValueError, "risk-review HOLD"):
+            retain_unreviewed_candidates(old, flagged, 16)
+        retained = retain_unreviewed_candidates(old, dict(fresh), 16)
+        self.assertEqual(retained["candidate_count"], 1)
+        self.assertTrue(retained["candidates"][0]["retained_unreviewed"])
 
 if __name__=="__main__":
     unittest.main()

@@ -124,7 +124,7 @@ def candidate(gh,repo,q,corp,own,prior_pairs=None):
     if pair in (prior_pairs or set()) or known(corp,full,sha):
         if hasattr(gh,"stats"): gh.stats["known_revision_skips"]=int(gh.stats.get("known_revision_skips",0))+1
         return None
-    try: names=gh.root(full,branch)
+    try: names=gh.root(full,sha)
     except RuntimeError: return None
     score,parts,hits=triage(repo,names); lic=(repo.get("license") or {}).get("spdx_id") or "UNKNOWN"
     return {"repository":full,"url":repo.get("html_url"),"exact_revision":sha,"default_branch":branch,"description":repo.get("description"),"primary_language":repo.get("language"),"topics":repo.get("topics") or [],"published_license_spdx":lic,"stars":int(repo.get("stargazers_count") or 0),"forks":int(repo.get("forks_count") or 0),"archived":bool(repo.get("archived")),"pushed_at":repo.get("pushed_at"),"size_kb":int(repo.get("size") or 0),"root_code_signals":hits,"triage_score":score,"triage_components":parts,"discovery_query":q,"status":"PRE_VERIFICATION_CANDIDATE"}
@@ -150,7 +150,7 @@ def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None,scope_ver
     api_metrics={k:int(gh.stats.get(k,0))-int(before.get(k,0)) for k in gh.stats}
     risks.sort(key=lambda r:(str(r.get("repository") or "").lower(),
                              str(r.get("discovery_query") or "")))
-    return {"schema_version":2,"scope_version":scope_version,"generated_at":now().isoformat(),"worker_id":w["id"],"project":w.get("project"),"target_repository":w.get("target_repository"),"evidence_gate":w.get("evidence_gate"),"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
+    return {"schema_version":2,"scope_version":scope_version,"generated_at":now().isoformat(),"worker_id":w["id"],"search_queries":list(w.get("queries") or []),"project":w.get("project"),"target_repository":w.get("target_repository"),"evidence_gate":w.get("evidence_gate"),"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
 
 # Metrics, search response counts and the run clock are Actions-run telemetry, not
 # evidence. Source identity, changed rights/safety metadata, priority scores,
@@ -200,6 +200,46 @@ def unexplained_rank_losses(old, data):
     return sorted(losses)
 
 
+
+def retain_unreviewed_candidates(previous, fresh, limit):
+    """Bounded continuity across scans without calling old leads fresh results.
+
+    Retain unresolved source revisions under the *same* approved worker
+    assignment. Rank fresh and carried leads together; do not bypass the
+    existing source-quality hold or resurrect retired-scope candidates.
+    """
+    keys=("scope_version","worker_id","project","target_repository",
+          "mission","evidence_gate")
+    if any(previous.get(k) != fresh.get(k) for k in keys):
+        return fresh
+    old=previous.get("candidates") or []
+    if not isinstance(old,list) or not isinstance(fresh.get("candidates"),list):
+        raise ValueError("Scout continuity requires candidate lists")
+    risks=fresh.get("risk_review") or []
+    if int(fresh.get("risk_review_count") or 0)>len(risks):
+        raise ValueError("Scout risk-review HOLD: risk list incomplete")
+    flagged={str(c.get("repository") or "").casefold() for c in risks
+             if isinstance(c,dict)}
+    candidates=list(fresh["candidates"])
+    seen={str(c.get("repository") or "").casefold() for c in candidates}
+    for c in old:
+        if not isinstance(c,dict) or c.get("status")!="PRE_VERIFICATION_CANDIDATE":
+            continue
+        name=str(c.get("repository") or "").casefold()
+        if not name or name in seen:
+            continue
+        if name in flagged:
+            raise ValueError("Scout risk-review HOLD: prior unreviewed source now flagged")
+        candidates.append({**c,"retained_unreviewed":True})
+        seen.add(name)
+    candidates.sort(key=lambda c:(-int(c.get("triage_score") or 0),
+                                  -int(c.get("stars") or 0),
+                                  str(c.get("repository") or "").casefold(),
+                                  str(c.get("exact_revision") or "").casefold()))
+    fresh["candidates"]=candidates[:max(1,limit)]
+    fresh["candidate_count"]=len(fresh["candidates"])
+    return fresh
+
 def persist_snapshot(path,data):
     if path.exists():
         old=json.loads(path.read_text(encoding="utf-8"))
@@ -223,13 +263,21 @@ def persist_snapshot(path,data):
 # Preserve compatibility with existing public scout CI and its tests.
 persist_queue = persist_snapshot
 
-def integrate(root,out,scope_version=None):
+def integrate(root,out,scope_version=None,worker_index=None):
     merged={}; workers={}; projects={}; included=0
     files=sorted(root.glob("HUNTER-*.json"))
     for p in files:
         try: d=json.loads(p.read_text())
         except Exception: continue
         if scope_version is not None and d.get("scope_version") != scope_version: continue
+        if worker_index is not None:
+            expected=worker_index.get(p.stem)
+            if (expected is None or d.get("worker_id") != p.stem or
+                d.get("project") != expected.get("project") or
+                d.get("target_repository") != expected.get("target_repository") or
+                d.get("mission") != expected.get("mission") or
+                d.get("evidence_gate") != expected.get("evidence_gate")):
+                raise ValueError(f"Invalid current-scope scout assignment in {p.name}")
         included+=1
         wid=str(d.get("worker_id") or p.stem)
         for c in d.get("candidates") or []:
@@ -285,6 +333,8 @@ def validate_manifest(m):
         if i <= 5 and (not w.get("evidence_gate") or
                        w.get("target_repository") != "P00NSMASHER/github-value-hunt-ledger"):
             raise ValueError(f"Research evidence gate missing for {w.get('id')}")
+        if i <= 5 and "genesis" in (w.get("mission","") + " " + " ".join(w.get("queries") or [])).casefold():
+            raise ValueError(f"Removed Genesis research topic in {w.get('id')}")
         if not w.get("mission") or len(w.get("queries") or [])!=4:
             raise ValueError(f"Missing scoped mission/searches for {w.get('id')}")
         if "starblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold() or "roblox" in (w["mission"]+" "+" ".join(w["queries"])).casefold():
@@ -301,7 +351,7 @@ def main():
     m=json.loads((root/a.manifest).read_text(encoding="utf-8"))
     scope_version=validate_manifest(m)
     if a.integrate:
-        print(f"Integrated {integrate(qr,root/a.output,scope_version=scope_version)} current-scope candidates")
+        print(f"Integrated {integrate(qr,root/a.output,scope_version=scope_version,worker_index={w['id']: w for w in m['workers']})} current-scope candidates")
         return
     if not a.worker: ap.error("--worker required unless --integrate")
     ws=m.get("workers") or []
@@ -316,9 +366,15 @@ def main():
         if any("error" in diagnostic for diagnostic in d["search_diagnostics"]):
             raise RuntimeError(f"Incomplete source discovery for {w['id']}; existing queue preserved")
         p=qr/f"{w['id']}.json"
+        if p.exists():
+            previous=json.loads(p.read_text(encoding="utf-8"))
+            d=retain_unreviewed_candidates(previous,d,max(1,min(a.max_candidates,100)))
         changed=persist_snapshot(p,d)
+        retained_count = sum(1 for c in d["candidates"] if c.get("retained_unreviewed"))
         print(json.dumps({"worker":w["id"],"project":w["project"],"target_repository":w["target_repository"],"scope_version":scope_version,"observed_at":d["generated_at"],
-                          "candidate_count":d["candidate_count"],"evidence_changed":changed,
+                          "candidate_count":d["candidate_count"],"fresh_candidate_count":d["candidate_count"] - retained_count,
+                          "retained_unreviewed_count":retained_count,
+                          "evidence_changed":changed,
                           "api_metrics":d["api_metrics"],
                           "search_diagnostics":d["search_diagnostics"]},sort_keys=True))
 

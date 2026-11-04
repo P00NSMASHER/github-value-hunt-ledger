@@ -32,7 +32,11 @@ def describe_worker(worker: dict, queue_root: Path, scope: str) -> dict:
         return record
     if saved.get("scope_version") != scope:
         return record
-    if saved.get("worker_id") != worker["id"] or saved.get("project") != worker["project"]:
+    if (saved.get("worker_id") != worker["id"] or
+        saved.get("project") != worker["project"] or
+        saved.get("target_repository") != worker["target_repository"] or
+        saved.get("mission") != worker["mission"] or
+        saved.get("evidence_gate") != worker.get("evidence_gate")):
         record["status"] = "INVALID_QUEUE"
         return record
     candidates = saved.get("candidates")
@@ -61,6 +65,9 @@ def describe_worker(worker: dict, queue_root: Path, scope: str) -> dict:
              not item.get("repository") or
              not item.get("exact_revision") for item in candidates):
         record["status"] = "INVALID_QUEUE"
+    elif not candidates and diagnostics and all(isinstance(item, dict) and
+                                                item.get("returned") == 0 for item in diagnostics):
+        record["status"] = "NO_SEARCH_MATCHES"
     else:
         record["status"] = ("UNREVIEWED_CANDIDATES" if candidates
                             else "NO_NEW_CANDIDATES")

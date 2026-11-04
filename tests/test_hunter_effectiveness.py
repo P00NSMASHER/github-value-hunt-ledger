@@ -63,6 +63,9 @@ class HunterOutcomeTruthTests(unittest.TestCase):
             q = Path(tmp)
             current = {"scope_version": manifest["scope_version"],
                        "worker_id": worker["id"], "project": worker["project"],
+                       "target_repository": worker["target_repository"],
+                       "mission": worker["mission"],
+                       "evidence_gate": worker.get("evidence_gate"),
                        "candidate_count": 1,
                        "generated_at": "2026-11-04T01:00:00+00:00",
                        "search_diagnostics": [{"query": "test", "returned": 1}],
@@ -86,6 +89,9 @@ class HunterOutcomeTruthTests(unittest.TestCase):
             p = root / "HUNTER-01.json"
             base = {"scope_version": manifest["scope_version"],
                     "worker_id": worker["id"], "project": worker["project"],
+                    "target_repository": worker["target_repository"],
+                    "mission": worker["mission"],
+                    "evidence_gate": worker.get("evidence_gate"),
                     "candidate_count": 1,
                     "generated_at": "2026-11-04T01:00:00+00:00",
                     "search_diagnostics": [],
@@ -98,6 +104,17 @@ class HunterOutcomeTruthTests(unittest.TestCase):
             self.assertEqual(describe_worker(worker, root, manifest["scope_version"])["status"],
                              "SOURCE_ERROR")
             p.write_text("{bad json")
+            self.assertEqual(describe_worker(worker, root, manifest["scope_version"])["status"],
+                             "INVALID_QUEUE")
+            p.write_text(json.dumps({**base, "candidate_count": 0,
+                                     "search_diagnostics": [{"query": "a", "returned": 0}],
+                                     "candidates": []}))
+            self.assertEqual(describe_worker(worker, root, manifest["scope_version"])["status"],
+                             "NO_SEARCH_MATCHES")
+            p.write_text(json.dumps({**base, "candidate_count": 0,
+                                     "search_diagnostics": [{"query": "a", "returned": 1}],
+                                     "target_repository": "P00NSMASHER/project-genesis",
+                                     "candidates": []}))
             self.assertEqual(describe_worker(worker, root, manifest["scope_version"])["status"],
                              "INVALID_QUEUE")
 
@@ -126,12 +143,32 @@ class HunterOutcomeTruthTests(unittest.TestCase):
         source = WORKFLOW.read_text(encoding="utf-8")
         got = tuple(re.findall(r'^\s*-\s*cron:\s*"([^"]+)"', source, re.M))
         self.assertEqual(got, EXPECTED_CRONS)
+        for i, cron in enumerate(EXPECTED_CRONS[:5], 1):
+            self.assertIn(f'"{cron}") worker="HUNTER-{i:02d}";;', source)
+        self.assertIn('if [ "$EVENT_NAME" = "schedule" ]; then worker=""; fi', source)
+        self.assertIn("Unrecognized scheduled hunter route", source)
+        for w in self.manifest()["workers"][:5]:
+            self.assertTrue(all(1 <= len(q.split()) <= 4 for q in w["queries"]), w["id"])
         self.assertIn("branches: [main]", source)
         self.assertIn('if [ "$EVENT_NAME" = "push" ]; then worker="HUNTER-01"; fi', source)
         self.assertIn('EVENT_NAME: ${{ github.event_name }}', source)
         self.assertIn("python -m tools.hunter_effectiveness", source)
         self.assertIn("automation/HUNTER_EFFECTIVENESS.md", source)
         self.assertNotIn("cancel-in-progress: true", source)
+
+
+    def test_scoped_evidence_is_uploaded_before_branch_persistence(self):
+        source = WORKFLOW.read_text(encoding="utf-8")
+        upload = "Preserve worker evidence independently of PR publication"
+        self.assertIn(upload, source)
+        self.assertLess(source.index(upload), source.index("Commit queue refresh"))
+        self.assertIn("hunter-evidence-${{ steps.route.outputs.worker }}-", source)
+        self.assertIn("intelligence/scout_queue/${{ steps.route.outputs.worker }}.json", source)
+        self.assertIn("automation/HUNTER_EFFECTIVENESS.md", source)
+        self.assertIn("if-no-files-found: error", source)
+        self.assertIn("steps.route.outputs.worker != 'INTEGRATOR'", source)
+        self.assertIn("steps.route.outputs.worker != 'ALL'", source)
+
 
 
 if __name__ == "__main__":
