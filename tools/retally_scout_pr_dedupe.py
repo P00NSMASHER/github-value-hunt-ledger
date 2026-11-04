@@ -71,7 +71,7 @@ def staged_contents() -> dict[str, str]:
         raise ValueError("Duplicate staged paths")
     contents = {}
     for path in paths:
-        if path != "automation/SCOUT_DIGEST.md" and not SCOUT_PATH.fullmatch(path):
+        if path not in ("automation/SCOUT_DIGEST.md", "automation/HUNTER_EFFECTIVENESS.md") and not SCOUT_PATH.fullmatch(path):
             raise ValueError("Unexpected staged Scout file")
         contents[path] = subprocess.run(
             ["git", "show", ":" + path], check=True,
