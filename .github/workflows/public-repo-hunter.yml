@@ -149,6 +149,17 @@ jobs:
             echo
             cat automation/HUNTER_EFFECTIVENESS.md
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve worker evidence independently of PR publication
+        if: ${{ steps.route.outputs.worker != 'INTEGRATOR' && steps.route.outputs.worker != 'ALL' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hunter-evidence-${{ steps.route.outputs.worker }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            intelligence/scout_queue/${{ steps.route.outputs.worker }}.json
+            automation/HUNTER_EFFECTIVENESS.md
+          retention-days: 7
+          if-no-files-found: error
+
       - name: Commit queue refresh
         id: persist
         env:
