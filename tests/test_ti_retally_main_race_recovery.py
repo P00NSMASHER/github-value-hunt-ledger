@@ -35,6 +35,12 @@ def proposal():
 
 
 def fake_api(method: str, path: str, payload: dict | None = None):
+    if method == "GET" and "/runs?event=pull_request" in path:
+        from tests.test_ti_retally_generated_pr_controller import native_run
+        return {"workflow_runs": [native_run(proposal())]}
+    if method == "GET" and path.endswith("/actions/runs/312/jobs?per_page=100"):
+        return {"jobs": [{"name": name, "conclusion": "success"} for name in merge.REQUIRED_JOBS],
+                "total_count": len(merge.REQUIRED_JOBS)}
     repo = "repos/" + merge.REPO
     if method == "GET":
         if path == repo + "/pulls/99":
