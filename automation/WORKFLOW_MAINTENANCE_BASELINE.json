@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "scope": "P00NSMASHER/github-value-hunt-ledger",
+  "as_of": "2026-11-04",
+  "source_main_commit": "969181907c097fd55fef65937c6034438010d061",
+  "workflows": [
+    "active-scout-scope-ci.yml",
+    "ai-business-os.yml",
+    "artifact-ledger-admission-qa.yml",
+    "catalog-append.yml",
+    "exp008-dreamine-real-hsms.yml",
+    "fmc-tariff-ledger.yml",
+    "fmc-tariff-quality.yml",
+    "fmc-tariff-recover-merge.yml",
+    "fmc-tariff-tests.yml",
+    "freight-audit-methodology.yml",
+    "freight-contracts.yml",
+    "freight-customer-lifecycle-smoke.yml",
+    "freight-lab-ci.yml",
+    "freight-lab-hunt-reuse-audit.yml",
+    "freight-lab-integrity.yml",
+    "freight-lab03-pilot-smoke.yml",
+    "freight-labs04-10-domain-smoke.yml",
+    "freight-labs11-14-smoke.yml",
+    "freight-outreach-safety.yml",
+    "freight-phase3-accuracy.yml",
+    "freight-phase3-performance.yml",
+    "freight-site-pages.yml",
+    "freight-unified-five-step.yml",
+    "hospital-mrf-ledger.yml",
+    "integrator-sync.yml",
+    "portfolio-ci-policy.yml",
+    "production-contracts.yml",
+    "public-repo-hunter.yml",
+    "recoveryworks.yml",
+    "repository-release-gate.yml",
+    "retally-app-proposal-ci.yml",
+    "retally-creative-studio-qa.yml",
+    "retally-facebook-assets.yml",
+    "retally-four-release-acceptance-replay.yml",
+    "retally-generated-pr-merge.yml",
+    "retally-guarded-pr-canary.yml",
+    "retally-indexnow.yml",
+    "retally-inquiry.yml",
+    "retally-lab15-evidence-acquisition.yml",
+    "retally-lab15-public-evidence.yml",
+    "retally-labs04-14-repair-scope.yml",
+    "retally-live-publication-audit.yml",
+    "retally-live-publication-incident-alert.yml",
+    "retally-oci-readonly.yml",
+    "retally-oci-runcommand-canary.yml",
+    "retally-oci-synthetic-stage-readiness.yml",
+    "retally-priority3-recovery.yml",
+    "retally-priority4-adversarial.yml",
+    "retally-public-freight-corpus.yml",
+    "retally-r1-financial-integrity.yml",
+    "retally-r2-documents.yml",
+    "retally-r3-independent-accuracy.yml",
+    "retally-r4-deterministic-qa.yml",
+    "retally-real-customer-evidence-gate.yml",
+    "retally-real-document-lab.yml",
+    "retally-redteam-round2-integrity.yml",
+    "retally-return-source-100-regression.yml",
+    "retally-rt05-dispute-gate.yml",
+    "retally-social-evidence.yml",
+    "retally-unified-research-lab.yml",
+    "retally-visual-acceptance.yml",
+    "shaq-detail-probe.yml",
+    "shaq-mcp-sample-probe.yml",
+    "shaq-mcp-schema-probe.yml",
+    "shaq-route-archive.yml",
+    "shaq-route-pilot.yml",
+    "shaq-sitemap-probe.yml",
+    "technology-intelligence.yml",
+    "tic-mrf-ledger.yml",
+    "tic-targeted-extract.yml",
+    "urdb-ledger.yml"
+  ],
+  "approved_scheduled_workflows": {
+    "public-repo-hunter.yml": [
+      "7 2,14 * * *",
+      "15 2,14 * * *",
+      "23 2,14 * * *",
+      "31 2,14 * * *",
+      "39 2,14 * * *",
+      "47 2,14 * * *",
+      "55 2,14 * * *",
+      "3 3,15 * * *",
+      "11 3,15 * * *",
+      "19 3,15 * * *",
+      "27 3,15 * * *",
+      "35 3,15 * * *",
+      "43 3,15 * * *",
+      "51 3,15 * * *",
+      "7 4,16 * * *"
+    ],
+    "retally-live-publication-audit.yml": [
+      "17 12 * * *"
+    ],
+    "retally-oci-readonly.yml": [
+      "23 12 * * *"
+    ],
+    "retally-unified-research-lab.yml": [
+      "4-59/5 * * * *",
+      "19 3 * * *"
+    ]
+  },
+  "approved_write_scopes": {
+    "catalog-append.yml": [
+      "contents"
+    ],
+    "freight-site-pages.yml": [
+      "pages"
+    ],
+    "integrator-sync.yml": [
+      "contents"
+    ],
+    "public-repo-hunter.yml": [
+      "contents"
+    ],
+    "retally-app-proposal-ci.yml": [
+      "actions"
+    ],
+    "retally-generated-pr-merge.yml": [
+      "actions",
+      "contents",
+      "pull-requests"
+    ],
+    "retally-guarded-pr-canary.yml": [
+      "actions",
+      "contents",
+      "pull-requests"
+    ],
+    "retally-lab15-evidence-acquisition.yml": [
+      "contents"
+    ],
+    "retally-lab15-public-evidence.yml": [
+      "contents"
+    ],
+    "retally-live-publication-incident-alert.yml": [
+      "issues"
+    ],
+    "retally-unified-research-lab.yml": [
+      "contents"
+    ],
+    "technology-intelligence.yml": [
+      "contents"
+    ]
+  },
+  "disallowed_pull_request_target": true,
+  "notes": "This allowlist governs only workflows in this repository. Changes require a reviewed PR and passing exact-source release-gate; it does not protect other repositories or replace branch rulesets."
+}
