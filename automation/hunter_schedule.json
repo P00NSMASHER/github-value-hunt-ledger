@@ -1,73 +1,82 @@
 {
   "schema_version": 2,
-  "focus": "Public open-source research for verified active projects: Genesis, ABVM, PermitPlate, CaptureBrief, Portfolio Brain and RETALLY. Retired project research is out of scope.",
+  "focus": "Public open-source technology hunting for trading research, verified revenue, RETALLY social media, falsifiable novel discovery, engineering-time reduction and existing ABVM, PermitPlate, CaptureBrief and Portfolio Brain projects. No Genesis or retired StarBlox dedicated hunters.",
   "rules": [
-    "Search only public repositories for relevant, lawful, rights-reviewable reusable technology; target repositories are context, not destinations for automated writes.",
-    "Prioritize direct usefulness to the assigned active project's known product and test surfaces; do not source changes for retired projects.",
-    "Preserve exact revisions, source provenance, license limitations, independent verification gaps and evidence of implementation; discovery is not delivery.",
-    "No live publishing, merging, spending, customer outreach, child records, medical records, credentials, leaked/private material or unsafe access techniques.",
-    "Unlicensed code is research/reference only until specific reuse rights are proven. Private target repositories must never be scraped or copied into public discovery output."
+    "Search public repositories only for lawful rights-reviewable material. Discovery outputs are untrusted leads, not code execution or guaranteed outcomes.",
+    "Require explicit project assignment and direct applicability to active work; no dedicated Genesis or retired StarBlox research.",
+    "Keep exact revision, licensing, attribution, source provenance, security limitations, test evidence and remaining acceptance gates; never present a discovered repository as a deployed improvement.",
+    "Trading research is observational/simulated only: no brokerage orders, secrets, paid services, live positions or fabricated backtest performance.",
+    "Scientific novelty is UNKNOWN unless a reproducible finding survives independent experiments and serious human/AI literature/prior-art review; GitHub search alone cannot establish novelty.",
+    "Engineering-time savings are UNKNOWN until measured against a real before/after task on an active repository with working integration and independently verified behavior.",
+    "Social media research does not authorize posting, messaging, engagement automation, bypassing platform limits or scraping private content.",
+    "No live publishing, merging, spending, customer outreach, child/medical records, credentials, leaked/confidential material, or unsafe access techniques.",
+    "Unlicensed code is reference-only without proven rights. Private target code must never be copied or exposed in public scout output."
   ],
   "workers": [
     {
       "id": "HUNTER-01",
-      "mission": "Deterministic, reproducible simulation engine and replay correctness for Genesis civilization worlds",
+      "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
       "queries": [
-        "agent based modeling simulation javascript open source",
-        "deterministic simulation replay javascript",
-        "civilization simulator resource conservation",
-        "entity component simulation browser typescript"
+        "walk forward trading backtest python open source",
+        "Tradier API market data python open source",
+        "stock strategy backtest slippage fees reproducible",
+        "historical market data replay validation framework"
       ],
-      "project": "genesis",
-      "target_repository": "P00NSMASHER/project-genesis"
+      "project": "trading",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims."
     },
     {
       "id": "HUNTER-02",
-      "mission": "Genesis citizen decision-making, relationships, pathfinding and behavior under bounded simulation",
+      "mission": "Revenue hunt: find reusable B2B prospect discovery, customer conversion, billing/reconciliation and measured funnel tools that could help active RETALLY businesses achieve a first independently verified collected dollar.",
       "queries": [
-        "agent based citizen behavior simulation javascript",
-        "crowd pathfinding steering threejs",
-        "social simulation agents relationships open source",
-        "autonomous NPC utility AI browser simulation"
+        "B2B lead qualification open source public data",
+        "self hosted CRM conversion reply tracking",
+        "Stripe webhook payment reconciliation open source",
+        "business prospect enrichment public records pipeline"
       ],
-      "project": "genesis",
-      "target_repository": "P00NSMASHER/project-genesis"
+      "project": "revenue-hunt",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Success requires independently verified customer action or actual collected payment; a lead, mock purchase, generated invoice or GitHub candidate is not revenue."
     },
     {
       "id": "HUNTER-03",
-      "mission": "Genesis economy, governance, manufacturing, scarcity and auditable world-event models",
+      "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
       "queries": [
-        "economic simulation market agents open source",
-        "city simulator economy javascript",
-        "agent based election voting simulation",
-        "resource conservation economy simulation game"
+        "social media content scheduler approval workflow open source",
+        "social media campaign conversion attribution UTM analytics",
+        "social media content QA accessibility open source",
+        "social media engagement analytics open source self hosted"
       ],
-      "project": "genesis",
-      "target_repository": "P00NSMASHER/project-genesis"
+      "project": "retally-social-media",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Verify lawful platform support, owner-controlled approval, attributable real engagement or inbound leads, and actual conversion; publishing requires separate authorization."
     },
     {
       "id": "HUNTER-04",
-      "mission": "Genesis Three.js WebGL rendering, large-world performance, mobile input and accessible game UX",
+      "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
       "queries": [
-        "threejs instancing performance large scene",
-        "WebGL mobile game optimization threejs",
-        "threejs terrain level of detail open source",
-        "browser game touch controls accessibility"
+        "scientific hypothesis generation open source automated",
+        "open scientific data anomaly detection discovery",
+        "symbolic regression scientific equation discovery",
+        "scientific literature prior art semantic search open source"
       ],
-      "project": "genesis",
-      "target_repository": "P00NSMASHER/project-genesis"
+      "project": "novel-discovery",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists."
     },
     {
       "id": "HUNTER-05",
-      "mission": "Genesis synthetic nursing-home simulation: staffing, therapy scheduling, resident flows and reproducible scenario validation",
+      "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
       "queries": [
-        "nursing home staffing simulation open source",
-        "healthcare discrete event simulation python",
-        "patient flow queue simulation open source",
-        "care facility staffing scheduling simulator"
+        "automated code migration codemod typescript python",
+        "test impact analysis selective CI github actions",
+        "automated bug reproduction regression test minimization",
+        "reproducible build dependency license audit automation"
       ],
-      "project": "genesis",
-      "target_repository": "P00NSMASHER/project-genesis"
+      "project": "engineering-acceleration",
+      "target_repository": "P00NSMASHER/github-value-hunt-ledger",
+      "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved."
     },
     {
       "id": "HUNTER-06",
@@ -180,11 +189,10 @@
   ],
   "integrator": {
     "id": "HUNTER-15",
-    "mission": "Merge only current-scope active-project candidate queues, associate each discovery with its target repository, retain license/provenance boundaries, and never claim implementation or delivery from discovery alone."
+    "mission": "Combine only new-scope active research snapshots; distinguish candidates from reproduced outcomes, preserve explicit project/evidence gates and rights provenance; classify novelty, trading edge, revenue and engineering-time savings as UNKNOWN until independently verified."
   },
-  "scope_version": "active-projects-2026-11-v1",
+  "scope_version": "active-projects-2026-11-v2",
   "active_repositories": [
-    "P00NSMASHER/project-genesis",
     "P00NSMASHER/abvmschoolstarworld",
     "P00NSMASHER/permitplate-nyc",
     "P00NSMASHER/capturebrief",
