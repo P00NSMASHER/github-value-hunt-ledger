@@ -315,3 +315,54 @@ VALUE HANDOFF:
 - COMMERCIAL IMPACT: managed validation/update operations embedded in ERP/access-point flows are the shortest paid path; raw validation is not the moat.
 - NEGATIVE KNOWLEDGE: skipped semantics do not establish correct rule selection; matching Schematron sources do not prove compiled parity; XML validation does not validate a hybrid PDF container.
 
+---
+
+TASK: 07 — Construction drawing revision registration and changed-region detection
+CONDITION: EXPERIMENT
+STARTING HYPOTHESIS: The qualifying system will estimate a geometric transform between revisions from drawing structure or features, warp both revisions into a common coordinate system, tolerate rendering residuals, and then segment changed regions. A tool that merely rasterizes PDFs and subtracts pixels will fail under translation, rotation, scale drift or moved views.
+DISCOVERY METHODS:
+- Direct domain search: construction drawing revision alignment/homography/change-region and blueprint compare/registration queries.
+- Code-signature search: estimateAffinePartial2D, RANSAC, homography, ECC and changed-region signatures scoped to architectural/CAD drawing comparison.
+- Low-attention repository and comparator graph: inspected a small engineering-drawing desktop tool, a one-commit architectural-drawing prototype, and a mature DXF-native revision engine.
+- Exact-fit invariant comparison: required arbitrary scale estimation, confidence/failure behavior and changed-region output, rather than accepting generic overlay or unit conversion claims. SEARCH_SKILLS procedures were used without private-ledger answer discovery; BENCHMARK_GOLD.md and sibling-arm answers were not read.
+CANDIDATE: DrawingContrast
+CANONICAL URL: https://github.com/ayumilove/DrawingContrast
+EXACT REVISION: 2d7112dfb61d91806fc37e60a0dd1f0873202209; tag v0.5.1; commit dated 2026-08-10T12:52:14+08:00.
+VERDICT: WATCH
+A-F SCORE: A 3 / B 4 / C 4 / D 4 / E 2 / F 3 = 20/30. The source implements the defining geometry and region pipeline, but absent tests and fail-open paths prevent STRONG.
+EVIDENCE INSPECTED:
+- Code inspector: [generate_diff_layers.py](https://github.com/ayumilove/DrawingContrast/blob/2d7112dfb61d91806fc37e60a0dd1f0873202209/src/drawing_contrast/core/generate_diff_layers.py), [view_blocks.py](https://github.com/ayumilove/DrawingContrast/blob/2d7112dfb61d91806fc37e60a0dd1f0873202209/src/drawing_contrast/core/view_blocks.py), and [vlm_analyzer.py](https://github.com/ayumilove/DrawingContrast/blob/2d7112dfb61d91806fc37e60a0dd1f0873202209/src/drawing_contrast/core/vlm_analyzer.py).
+- Registration source: global feature mode uses AKAZE descriptors, Lowe-ratio matches, RANSAC estimateAffinePartial2D, explicit translation/rotation/scale diagnostics and transform bounds; ECC mode also uses an affine model. The production run_comparison path selects feature mode.
+- Change source: aligned linework is compared with distance-transform tolerance, morphological cleanup and a focus mask; added/removed masks are clustered into connected changed-region bounding boxes. Per-view block matching performs additional affine registration and records moved views.
+- Schema/output: meta.json records focus area, added/removed pixel counts, different_drawings, bounded regions, moved_views, view statistics, low_confidence, summary and analysis status. This is a file schema rather than a versioned database schema.
+- Tests/history: no tests directory or CI test workflow exists at the exact revision. The repository is tagged v0.5.1 and has a short four-commit public history; the inspected head commit is a desktop-server shutdown fix, so history does not independently validate comparison accuracy.
+- Provenance/deployment: MIT license; Python 3.11 desktop application using OpenCV, PyMuPDF and optional external VLM calls. No construction deployment, dataset, benchmark, release adoption or customer evidence was found.
+- Deep comparators: Mirdula18/AI-Based-Image-Difference-Detection at d8818d79788c72dd9c0df824872cd0caa9d58b59 implements border/SIFT/ORB homography and fail-closed pipeline behavior, but 2 of 9 focused local tests failed, including its own 1.03x scale-plus-offset registration case. jeremylongshore/cad-ai-agent at 3215dc0b0b706e5b280798e00bf8b512dbb9cfbc is mature and DXF-native but only estimates rigid translation/rotation plus known-unit normalization.
+- Independent RED-TEAM/VERIFIER: a separate skeptical agent inspected and executed the strongest mature comparator at its exact revision. It returned WATCH after 75 focused tests passed, then falsified general scale correction with a same-unit 1.10x adversarial grid: alignment confidence was 0.0, comparison continued, and all 12 entities were classified MODIFIED. This pass independently guarded against promoting unit normalization or rigid alignment as arbitrary scale-drift correction.
+CLAIMS VERIFIED:
+- IMPLEMENTED: global affine registration estimates translation, rotation and uniform scale from drawing features; it is not a naive PDF pixel overlay.
+- IMPLEMENTED: RANSAC inlier count/ratio, translation and scale bounds reject some implausible feature transforms; view-block alignment uses similar affine matching and scale bounds.
+- IMPLEMENTED: distance-tolerant linework differencing suppresses small registration/rendering jitter, creates separate added/removed overlays and clusters differences into up to 20 bounding-box regions.
+- IMPLEMENTED: view-block segmentation/matching can align moved drawing views separately and report them as movements instead of treating every displaced pixel as a change.
+- TESTED COUNTEREVIDENCE: the architectural homography comparator's own focused suite produced 7 passed / 2 failed. Its defining scale-plus-offset fixture was rejected at 0.754 confidence, and the blank-image test expected a returned failure object while source now raises RegistrationError.
+- INDEPENDENTLY TESTED COUNTEREVIDENCE: the mature DXF comparator does not estimate arbitrary scale and can continue after failed alignment, producing sheet-wide false changes.
+CLAIMS NOT VERIFIED:
+- DrawingContrast has no automated tests. Affine recovery accuracy, changed-region precision/recall, moved-view correctness and performance were source-inspected only; the desktop/VLM application was not run end to end.
+- Global feature alignment can return the original unregistered image when features are insufficient or matching fails. run_comparison may continue to difference it; ECC failure likewise falls back to translation. A failed registration is therefore not consistently quarantined.
+- The default focus rectangle can exclude legitimate title-block, note or lower-sheet changes. Optional AI focus and VLM descriptions depend on external model behavior and do not establish deterministic recall.
+- Sheet pairing/version provenance, multipage matching, raster/vector fidelity, construction-standard semantics, reviewer sign-off, immutable evidence, production deployment and realized savings are unverified.
+STRONGEST OBJECTION: The best task-fit code has no tests and can continue into region extraction after unsuccessful registration. On repetitive or low-feature drawings, a scale/registration failure could become an authoritative-looking field of changed regions; the most explicitly architectural alternative fails its own scale-drift example.
+COMMERCIAL WEDGE: Analyst-assisted revision review for subcontractor estimators, fabrication/detailing teams and document controllers: compare issued drawing revisions, surface registered added/removed/moved regions, and require a reviewer to confirm scope before pricing or release. The money path is faster addendum/change-order review and fewer missed-scope or rework events. A paid pilot needs a real paired-revision corpus, sheet/version matching, measured recall and a fail-closed review queue.
+SEARCH EFFORT: 8 distinct queries across direct-domain and code-signature modes, plus low-attention repository/comparator and history graphs; exactly 3 deep inspections; specialist code, commercial/comparator and independent skeptical-verifier passes. No BENCHMARK_GOLD, sibling CONTROL answer, SCOREBOARD scoring or private-ledger answer discovery.
+FALSE-PROMOTION RISK: High if affine code presence, an AI summary, or red/blue overlays are mistaken for validated construction revision recall. WATCH retained; no SEARCH_SKILLS promotion.
+LESSON: Task 07 adds one-task evidence for a registration-first search signature: require an estimated transform with explicit scale, warp into common coordinates, tolerant differencing and region extraction. It also adds a concrete promotion gate: registration failure must suppress or quarantine downstream change claims, and a synthetic scale-plus-offset fixture must pass. Evidence set {07}; do not promote centrally.
+COMPLETED_AT: 2026-11-05T20:09:07Z
+
+VALUE HANDOFF:
+- CAPABILITY DELTA: reusable affine registration, tolerant engineering-linework differencing, moved-view handling and changed-region extraction, qualified by missing tests and fail-open paths.
+- GRAPH EDGE: old/new drawing revisions → geometric registration → added/removed/moved regions → analyst review. No central CAP/OPP/EXP identifiers asserted because benchmark discovery remained isolated.
+- RADAR SIGNAL: three independent implementations converge on registration-aware drawing revision comparison, but evidence is too thin to establish commercial acceleration.
+- EXPERIMENT IMPACT: the next falsifiable experiment is a labeled construction corpus with translation/rotation/scale perturbations, sheet pairing and required quarantine below registration confidence.
+- COMMERCIAL IMPACT: a human-reviewed change-order/addendum triage product is plausible; unattended scope determination is not supported.
+- NEGATIVE KNOWLEDGE: known-unit conversion is not arbitrary scale correction; affine code without an executed fixture is weak evidence; a changed-region overlay is unsafe when registration failure does not halt the pipeline.
+
