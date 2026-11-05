@@ -104,7 +104,7 @@ class HunterFleetHealthTests(unittest.TestCase):
             self.assertIn("Scouting operational gates: 100.0%", report)
             self.assertIn("Adaptive-worker readiness (separate", report)
             self.assertIn("02/EXPERIMENT", report)
-            self.assertIn("NOT_OBSERVABLE from GitHub alone", report)
+            self.assertIn("NOT OBSERVABLE from GitHub alone", report)
 
     def test_live_provenance_is_not_a_claim_of_full_autonomy(self):
         root = Path(__file__).resolve().parents[1]
