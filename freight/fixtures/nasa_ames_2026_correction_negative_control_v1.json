@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "case_id": "NASA_AMES_80ARC026R0008_20261020_CORRECTED_CAPABILITY_STATEMENT",
+  "kind": "PUBLIC_PRIMARY_AGENCY_NOTICE_CORRECTION_NEGATIVE_CONTROL_NOT_AWARD_BENCHMARK",
+  "source": {
+    "publisher": "NASA Ames Research Center via SAM.gov",
+    "official_notice_url": "https://sam.gov/workspace/contract/opp/86750493376a45dfa7fe2b92b6cc3e5d/view",
+    "source_notice_type": "Justification",
+    "notice_updated_date": "2026-10-20",
+    "source_read_date": "2026-11-05",
+    "raw_notice_bytes_retained": false,
+    "raw_notice_sha256": null,
+    "independent_award_transaction_retrieved": false,
+    "source_specific_reuse_approved": false
+  },
+  "identity": {
+    "agency": "National Aeronautics and Space Administration",
+    "office": "NASA Ames Research Center",
+    "solicitation_identifier_referenced": "80ARC026R0008",
+    "current_justification_notice_identifier": "80ARC026C0006",
+    "contract_award_identifier": "80ARC026C0006",
+    "awardee": "EraDrive, Inc.",
+    "awardee_uei": "PLUQPL2X6CN3",
+    "award_date": "2026-09-22",
+    "agency_noticed_award_amount_usd": 11925000,
+    "agency_noticed_total_including_options_usd": 13000000,
+    "award_modification_number": null
+  },
+  "correction": {
+    "prior_justification_published_date": "2026-09-29",
+    "official_correction_date": "2026-10-20",
+    "earlier_claim_capability_statements_received": 0,
+    "corrected_capability_statements_received": 1,
+    "capability_statement_received_date": "2026-06-30",
+    "statement_submitter": "Rhea Space Activity, Inc.",
+    "evaluation_said_alternative_capable_within_schedule": false,
+    "sole_source_decision_changed": false,
+    "notice_revision_is_contract_modification": false
+  },
+  "boundaries": {
+    "case_is_in_fy2027_archive": false,
+    "verified_preaward_opportunity_at_original_2026_06_16": false,
+    "independently_validated_notice_to_award_transaction": false,
+    "verified_contract_modification_count": null,
+    "independently_adjudicated_award_outcome": false,
+    "verified_recovery_amount_usd": null,
+    "official_correction_retroactively_proves_notice_public_at_prior_date": false,
+    "classification": "AUTHENTIC_CORRECTION_FALSIFIES_ZERO_STATEMENTS_ONLY"
+  }
+}
