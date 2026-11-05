@@ -28,8 +28,114 @@ def api(path: str):
         return json.load(reply)
 
 
+
+def inspect_workflow_receipt(run: dict, read_api=api) -> dict:
+    """Inspect actual Actions job AND uploaded artifact, not the parent green badge."""
+    run_id = run.get("id")
+    evidence = {"run_id": run_id, "event": run.get("event"),
+                "status": "NOT_PROVEN", "verified": False}
+    if type(run_id) is not int or run_id < 1:
+        evidence["status"] = "INVALID_RUN_ID"
+        return evidence
+    try:
+        jobs_result = read_api(
+            f"/repos/{REPO}/actions/runs/{run_id}/jobs?per_page=100")
+        jobs = jobs_result.get("jobs")
+        if not isinstance(jobs, list):
+            raise ValueError("Job listing unavailable")
+        job = next((job for job in jobs
+                    if job.get("name") == "candidate-inspection"), None)
+        if job is None:
+            evidence["status"] = "INSPECTION_JOB_MISSING"
+            return evidence
+        if job.get("conclusion") == "skipped":
+            evidence["status"] = "INSPECTION_SKIPPED"
+            return evidence
+        if (run.get("status") != "completed" or
+            run.get("conclusion") != "success" or
+            job.get("conclusion") != "success"):
+            evidence["status"] = "INSPECTION_JOB_FAILED"
+            return evidence
+        artifacts_result = read_api(
+            f"/repos/{REPO}/actions/runs/{run_id}/artifacts?per_page=100")
+        artifacts = artifacts_result.get("artifacts")
+        if not isinstance(artifacts, list):
+            raise ValueError("Artifact listing unavailable")
+        attempt = run.get("run_attempt") or 1
+        expected_name = f"hunter-inspection-{run_id}-{attempt}"
+        artifact = next(
+            (a for a in artifacts
+             if a.get("name") == expected_name and
+             a.get("expired") is False and
+             type(a.get("size_in_bytes")) is int and
+             a["size_in_bytes"] > 0), None
+        )
+        if artifact is None:
+            evidence["status"] = "INSPECTION_ARTIFACT_MISSING"
+            return evidence
+        evidence.update({
+            "status": "INSPECTION_JOB_AND_ARTIFACT_VERIFIED",
+            "verified": True,
+            "artifact_id": artifact.get("id"),
+            "artifact_name": expected_name,
+            "job_id": job.get("id"),
+            "run_url": run.get("html_url"),
+        })
+    except Exception:
+        # API outages or malformed responses cannot manufacture green evidence.
+        evidence["status"] = "INSPECTION_READBACK_FAILED"
+    return evidence
+
+
+def inspect_recent_scout_delivery(runs: list[dict], now: dt.datetime,
+                                  read_api=api) -> dict:
+    """Sample 2 scheduled workers and the latest recovery, with bounded API reads.
+
+    The integrator's scheduled scout deliberately skips the inspection job.
+    Sample results are evidence of these runs only, never the whole 14-worker
+    population or independently accepted downstream work.
+    """
+    recent = []
+    for run in runs:
+        try:
+            created = dt.datetime.fromisoformat(
+                run["created_at"].replace("Z", "+00:00"))
+        except (KeyError, TypeError, ValueError):
+            continue
+        age = (now - created).total_seconds()
+        if 0 <= age <= 18 * 3600 and run.get("status") == "completed":
+            recent.append(run)
+    recent.sort(key=lambda run: run["created_at"], reverse=True)
+    result = {}
+    for event, required, max_review in (
+        ("schedule", 2, 12),
+        ("repository_dispatch", 1, 4),
+    ):
+        receipts = []
+        scanned = 0
+        for run in recent:
+            if run.get("event") != event or scanned >= max_review:
+                continue
+            scanned += 1
+            proof = inspect_workflow_receipt(run, read_api)
+            if event == "schedule" and proof["status"] == "INSPECTION_SKIPPED":
+                continue  # Integrator is intentionally not a source inspector.
+            receipts.append(proof)
+            if len(receipts) >= required:
+                break
+        result[event] = {
+            "required": required,
+            "scanned": scanned,
+            "proofs": receipts,
+            "verified": len(receipts) == required and all(
+                proof["verified"] for proof in receipts),
+        }
+    return result
+
+
 def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
-             now: dt.datetime, open_prs: list[dict], inject_failure=False) -> dict:
+             now: dt.datetime, open_prs: list[dict], inject_failure=False,
+             inspections: dict | None = None) -> dict:
     current = {w for w, q in queues.items()
                if w in WORKERS and q.get("scope_version") == "active-projects-2026-11-v2"}
     recent = [r for r in runs if (now - dt.datetime.fromisoformat(
@@ -53,6 +159,11 @@ def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
         "integrator_count_present": bool(digest_candidates),
         "generated_pr_backlog_clear": not generated,
     }
+    if inspections is not None:
+        checks["scheduled_inspection_delivery"] = bool(
+            (inspections.get("schedule") or {}).get("verified"))
+        checks["recovery_inspection_delivery"] = bool(
+            (inspections.get("repository_dispatch") or {}).get("verified"))
     if inject_failure:
         checks["injected_failure_detected"] = False
     return {
@@ -63,6 +174,7 @@ def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
         "recent_recovery_success": sum(r.get("conclusion") == "success" for r in recovery),
         "generated_open_prs": [p.get("number") for p in generated],
         "digest_candidates": int(digest_candidates.group(1)) if digest_candidates else None,
+        "inspection_delivery": inspections,
     }
 
 
@@ -140,6 +252,24 @@ def render(report: dict) -> str:
              f"Recent scheduled runs: {report['recent_scheduled']}",
              f"Recent recovery successes: {report['recent_recovery_success']}/{report['recent_recovery']}",
              "", "A candidate or green run is not a verified real-world outcome.", ""]
+    inspections = report.get("inspection_delivery")
+    if inspections:
+        rows += ["## Inspected execution proof (bounded samples)", ""]
+        for event, label in (
+            ("schedule", "Scheduled scouts"),
+            ("repository_dispatch", "Recovery dispatches"),
+        ):
+            item = inspections.get(event) or {}
+            rows.append(
+                f"- {label}: **{'PASS' if item.get('verified') else 'FAIL'}** "
+                f"({len(item.get('proofs') or [])}/{item.get('required', 0)} sampled)"
+            )
+            for proof in item.get("proofs") or []:
+                rows.append(
+                    f"  - Run {proof.get('run_id')}: {proof.get('status')}; "
+                    f"artifact {proof.get('artifact_id', 'none')}"
+                )
+        rows += ["", "Sampled proof is not comprehensive coverage or a target integration.", ""]
     runtime = report.get("governed_runtime")
     if runtime:
         rows += [
@@ -176,8 +306,10 @@ def main() -> int:
     for path in Path("intelligence/scout_queue").glob("HUNTER-*.json"):
         queues[path.stem] = json.loads(path.read_text(encoding="utf-8"))
     digest = Path("automation/SCOUT_DIGEST.md").read_text(encoding="utf-8")
-    report = evaluate(runs, queues, digest, dt.datetime.now(dt.timezone.utc), prs,
-                      args.inject_failure)
+    observed_now = dt.datetime.now(dt.timezone.utc)
+    inspections = inspect_recent_scout_delivery(runs, observed_now)
+    report = evaluate(runs, queues, digest, observed_now, prs,
+                      args.inject_failure, inspections=inspections)
     report["governed_runtime"] = governed_runtime_truth(Path.cwd())
     Path(args.output_json).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     Path(args.output_md).write_text(render(report), encoding="utf-8")
