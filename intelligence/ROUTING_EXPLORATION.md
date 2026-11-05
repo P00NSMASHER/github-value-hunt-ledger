@@ -1,10 +1,10 @@
 # CONTROLLED ROUTING EXPLORATION
 
-Generation: **ROUTEEXP:232986bededc**
-Routing generation: **ROUTING:d4c342b083b3**
-Gate: **0.5446 / 0.2500**
+Generation: **ROUTEEXP:8e0418047fb7**
+Routing generation: **ROUTING:db4d0b8103ee**
+Gate: **0.1742 / 0.2500**
 Applied: **False**
-Reason: **gate_closed**
+Reason: **no_eligible_low_regret_swap**
 
 V18 may alter at most one two-worker pairing per routing generation. It never changes the assignment portfolio itself.
 
