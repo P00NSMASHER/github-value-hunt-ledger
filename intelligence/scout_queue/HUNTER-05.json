@@ -15,11 +15,11 @@
       "default_branch": "main",
       "description": "\u26a1A CLI tool for code structural search, lint and rewriting. Written in Rust",
       "discovery_query": "typescript codemod",
-      "exact_revision": "12ffa2f56bab275efd8dcad115e3cc50ae1cee55",
-      "forks": 493,
+      "exact_revision": "d710f3e929e6adaa2590979c3b9207bba43cbdea",
+      "forks": 495,
       "primary_language": "Rust",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T21:31:09Z",
+      "pushed_at": "2026-11-05T21:15:48Z",
       "repository": "ast-grep/ast-grep",
       "root_code_signals": [
         ".github",
@@ -27,8 +27,8 @@
         "pyproject.toml",
         "schemas"
       ],
-      "size_kb": 11023,
-      "stars": 16452,
+      "size_kb": 11070,
+      "stars": 16459,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ast",
@@ -80,7 +80,7 @@
         "test"
       ],
       "size_kb": 22479,
-      "stars": 1324,
+      "stars": 1327,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "compliance",
@@ -119,17 +119,17 @@
       "default_branch": "master",
       "description": "\ud83c\udfa8 Vibe Design System - Official monday.com UI resources for application development in React.js",
       "discovery_query": "typescript codemod",
-      "exact_revision": "f39a2f6e2d950adced82e9e975255399ac4f1541",
+      "exact_revision": "3b9e85b6bf473b8635fa7c8f70ebce745d2d2fa6",
       "forks": 367,
       "primary_language": "TypeScript",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-03T23:27:32Z",
+      "pushed_at": "2026-11-05T12:45:20Z",
       "repository": "mondaycom/vibe",
       "root_code_signals": [
         ".github",
         "package.json"
       ],
-      "size_kb": 299046,
+      "size_kb": 299126,
       "stars": 693,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -173,11 +173,11 @@
       "default_branch": "trunk",
       "description": "TypeScript geospatial SDK: one protocol-neutral contract over GeoServices REST, OGC API, STAC, WMS/WMTS/WFS, and OData \u2014 MapLibre-first runtime, GIS widget-migration codemod, and a platform-free MCP server.",
       "discovery_query": "typescript codemod",
-      "exact_revision": "8646347b958eba54e635726b0afd096a5aec6789",
+      "exact_revision": "d8a326c0f6b9997020db459fb8cca3f9f3b0d425",
       "forks": 1,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-05T09:56:50Z",
+      "pushed_at": "2026-11-05T20:45:38Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -186,7 +186,7 @@
         "src",
         "test"
       ],
-      "size_kb": 1785206,
+      "size_kb": 1791240,
       "stars": 5,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -233,6 +233,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T09:10:51Z",
       "repository": "IronAdamant/Chisel",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -277,6 +278,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-02T14:28:48Z",
       "repository": "ijlee2/ignore-lint-errors",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -309,6 +311,55 @@
       },
       "triage_score": 52,
       "url": "https://github.com/ijlee2/ignore-lint-errors"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Convert Cypress and Selenium (Java/Python) tests to Playwright TypeScript, with a report on what converted and what needs review.",
+      "discovery_query": "typescript codemod",
+      "exact_revision": "ea2f9e9835939955858be0fb4a6299095b1f52b5",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-05T13:27:41Z",
+      "repository": "sprintsynergyhq/playwright-migrate",
+      "root_code_signals": [
+        ".github",
+        "package.json",
+        "schemas",
+        "src",
+        "tests"
+      ],
+      "size_kb": 508,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "agentic-ai",
+        "ai-agent",
+        "ai-testing",
+        "cli",
+        "codemod",
+        "e2e-testing",
+        "playwright",
+        "playwright-automation",
+        "playwright-tests",
+        "playwright-typescript",
+        "test-migration",
+        "typescript"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 14,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 52,
+      "url": "https://github.com/sprintsynergyhq/playwright-migrate"
     },
     {
       "archived": false,
@@ -355,13 +406,58 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Explainable Python test impact analysis: select affected pytest tests from Git changes, audit dependencies, and plan faster CI.",
+      "discovery_query": "test impact analysis",
+      "exact_revision": "a7427bf6f550789a835a38f3326b8a971bef114f",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "Apache-2.0",
+      "pushed_at": "2026-11-05T15:17:16Z",
+      "repository": "gigaverse-app/pytest-selective",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 1460,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "continuous-integration",
+        "developer-tools",
+        "github-actions",
+        "incremental-testing",
+        "pytest",
+        "python",
+        "test-impact-analysis",
+        "test-selection",
+        "testing"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 50,
+      "url": "https://github.com/gigaverse-app/pytest-selective"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Open-source test-impact analysis for faster CI, with conservative fallbacks and reproducible evidence",
       "discovery_query": "test impact analysis",
-      "exact_revision": "a5f1c26963846cb4cd9df1f9d495e3c99373a64b",
+      "exact_revision": "ec4d9c7d7d59c1c5628d1477411d0809af724730",
       "forks": 4,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T10:22:09Z",
+      "pushed_at": "2026-11-05T18:22:54Z",
       "repository": "DiffCI/core",
       "root_code_signals": [
         ".github",
@@ -369,7 +465,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 1774,
+      "size_kb": 1937,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -398,6 +494,61 @@
       },
       "triage_score": 50,
       "url": "https://github.com/DiffCI/core"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Stop Claude Code, Cursor & Codex from faking \"done\" in Laravel. ai:verify runs only the tests, Larastan, Pint & Laravel checks your diff needs, fails on deleted/skipped tests and stamps verified commits for CI. ai:graph: a code graph of routes, controllers, models & tests with impact analysis.",
+      "discovery_query": "test impact analysis",
+      "exact_revision": "06623e90b7373244e6b2a1932f19aa54cd1b6a9b",
+      "forks": 0,
+      "primary_language": "PHP",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-05T18:09:54Z",
+      "repository": "semitexa/laravel-ai-verify",
+      "root_code_signals": [
+        ".github",
+        "src",
+        "tests"
+      ],
+      "size_kb": 530,
+      "stars": 3,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "agents-md",
+        "ai-agents",
+        "ai-code-review",
+        "claude-code",
+        "claude-md",
+        "code-graph",
+        "code-verification",
+        "codex",
+        "cursor",
+        "impact-analysis",
+        "larastan",
+        "laravel",
+        "laravel-package",
+        "pest",
+        "phpstan",
+        "phpunit",
+        "semitexa",
+        "test-impact-analysis",
+        "testing",
+        "vibe-coding"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 9,
+        "stars": 2,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 49,
+      "url": "https://github.com/semitexa/laravel-ai-verify"
     },
     {
       "archived": false,
@@ -448,11 +599,11 @@
       "default_branch": "main",
       "description": "Upgrade agent for TypeScript apps: when an API changes, Shim opens one tested pull request. First up: Vercel AI SDK 6 to 7",
       "discovery_query": "typescript codemod",
-      "exact_revision": "02656d65af61b2abd4289b2f0c513942c968cf2b",
+      "exact_revision": "fd8f54971308bab140ca1c8e26d3bb23cf97fe75",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T12:10:09Z",
+      "pushed_at": "2026-11-05T19:20:52Z",
       "repository": "JayanthMalladi/shim",
       "root_code_signals": [
         ".github",
@@ -460,7 +611,7 @@
         "src",
         "test"
       ],
-      "size_kb": 9702,
+      "size_kb": 9529,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -504,11 +655,11 @@
       "default_branch": "main",
       "description": "Deterministic, local-first change-impact analysis for Python, JavaScript, and TypeScript\u2014trace blast radius, suggest tests, and gate risky PRs.",
       "discovery_query": "test impact analysis",
-      "exact_revision": "6a7c33f20b7f78d9da2107c5df4ec55f7503880d",
+      "exact_revision": "d8606977f6d6c2a94b246ecc3da6bc343eafa422",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T23:37:02Z",
+      "pushed_at": "2026-11-05T17:51:58Z",
       "repository": "adiarora06/RepoRipple",
       "root_code_signals": [
         ".github",
@@ -516,7 +667,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 881,
+      "size_kb": 2007,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -656,132 +807,11 @@
       },
       "triage_score": 47,
       "url": "https://github.com/thrillhouse34/licenseproof"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Prototype that turns written bug reports into automated browser reproductions, with screenshots, a clear verdict, and a ready-to-use regression test. Runs against an included demo store.",
-      "discovery_query": "automated bug reproduction",
-      "exact_revision": "f8a6645dc475ccb0e4ff909964a4a89ffb97720d",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-27T10:07:51Z",
-      "repository": "justseiji/ReproLab",
-      "root_code_signals": [
-        "docker-compose.yml",
-        "package.json",
-        "test"
-      ],
-      "size_kb": 245,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai-agents",
-        "bug-reproduction",
-        "playwright",
-        "qa",
-        "test-automation"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 7,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/justseiji/ReproLab"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Audit a repository's shipping readiness \u2014 README, license, tests, CI, secrets and package hygiene. Zero-dependency Node CLI.",
-      "discovery_query": "dependency license audit",
-      "exact_revision": "f9878b0a113d02add2cc5125abdd14a37aac576d",
-      "forks": 0,
-      "primary_language": "JavaScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-26T22:52:00Z",
-      "repository": "pkaycodes/shipcheck",
-      "root_code_signals": [
-        ".github",
-        "package.json",
-        "src",
-        "test"
-      ],
-      "size_kb": 39,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "audit",
-        "ci",
-        "cli",
-        "developer-tools",
-        "github-actions",
-        "nodejs",
-        "readme",
-        "repository",
-        "security",
-        "zero-dependency"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 10,
-        "stars": 0,
-        "substantive_size": 2,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/pkaycodes/shipcheck"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Automated bug reproduction for mobile apps \u2014 send a bug report, get back a verified reproduction.",
-      "discovery_query": "automated bug reproduction",
-      "exact_revision": "0b47fa4a3a570baf73036b8f969ac641812d4d9f",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-10-29T17:02:05Z",
-      "repository": "datum-router/nimo",
-      "root_code_signals": [
-        ".github",
-        "pyproject.toml",
-        "src",
-        "tests"
-      ],
-      "size_kb": 2950,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 11,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 45,
-      "url": "https://github.com/datum-router/nimo"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-05T10:24:09.022253+00:00",
+  "generated_at": "2026-11-05T21:23:53.503387+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
