@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -21,6 +21,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-05T09:09:32Z",
       "repository": "pulseai-labs/pulse-trader",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -67,7 +68,7 @@
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T00:14:38Z",
+      "pushed_at": "2026-11-05T16:01:33Z",
       "repository": "0xArchiveIO/sdk-typescript",
       "root_code_signals": [
         ".github",
@@ -75,7 +76,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 1403,
+      "size_kb": 1539,
       "stars": 9,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -249,11 +250,11 @@
       "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "be4e0edf88c1c6a4b7008e792b67f31c9e934d36",
+      "exact_revision": "fea6b62b444725557489f6503d51f786991d7239",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-05T09:21:06Z",
+      "pushed_at": "2026-11-05T15:55:34Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -263,7 +264,7 @@
         "src",
         "test"
       ],
-      "size_kb": 81362,
+      "size_kb": 75510,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -373,6 +374,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-05T07:38:40Z",
       "repository": "JonJonz7/sports-betting-analytics",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
@@ -411,6 +413,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T08:01:18Z",
       "repository": "liuxing5/openclaw-quant-system",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
@@ -446,6 +449,7 @@
       "published_license_spdx": "MPL-2.0",
       "pushed_at": "2026-11-05T07:32:09Z",
       "repository": "WayneSHC/trendpoint",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "tests"
@@ -594,6 +598,43 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Python market-data pipeline with PostgreSQL persistence, deterministic risk controls, replay tests, and paper/demo execution.",
+      "discovery_query": "market data replay",
+      "exact_revision": "01d5213231a6511241048f4f7013f0e7883392e1",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-05T15:59:48Z",
+      "repository": "dorovladcodex/bybot",
+      "root_code_signals": [
+        ".github",
+        "app",
+        "docker-compose.yml",
+        "dockerfile",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 724,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 14,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 43,
+      "url": "https://github.com/dorovladcodex/bybot"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Low-latency C++20 Polymarket market-data feed and order-book engine: live WebSocket, flat-array books, lock-free SPSC queue, record/replay, honest latency benchmarks",
       "discovery_query": "market data replay",
       "exact_revision": "102b156195b25008d9f1e0cba509e2f877fc334b",
@@ -626,50 +667,11 @@
       },
       "triage_score": 43,
       "url": "https://github.com/rishanshah0811-dev/pmbook"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Safe to Send Ep04: 28 agent calls across 8 EU markets, replayed through a gate. Synthetic data.",
-      "discovery_query": "market data replay",
-      "exact_revision": "e5e76567656f2ec52ca3bcb9da01d73a4add2233",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-02T10:48:40Z",
-      "repository": "sghatge/safe-to-send-04-black-friday-replay",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "tests"
-      ],
-      "size_kb": 119,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "adobe-campaign",
-        "ai-governance",
-        "marketing-ops",
-        "safe-to-send"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 4
-      },
-      "triage_score": 43,
-      "url": "https://github.com/sghatge/safe-to-send-04-black-friday-replay"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-05T09:22:37.837739+00:00",
+  "generated_at": "2026-11-05T16:06:12.712930+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
