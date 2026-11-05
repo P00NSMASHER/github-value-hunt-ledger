@@ -75,6 +75,8 @@ jobs:
         run: python -m unittest discover -s tests -p "test_ti_*.py" -v
       - name: Verify public repo scout idempotency and safety
         run: python -m unittest tests.test_public_repo_scout -v
+      - name: Require independent Hunter inspection and delivery-acceptance regressions
+        run: python -m unittest tests.test_hunter_source_inspection tests.test_hunter_delivery_acceptance -v
       - name: Validate canonical intelligence ledgers
         run: python tools/ti_validate.py
       - name: Check committed text integrity
