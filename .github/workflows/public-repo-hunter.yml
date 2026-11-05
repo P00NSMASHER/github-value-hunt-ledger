@@ -264,7 +264,10 @@ jobs:
     if: >-
       needs.scout.result == 'success' &&
       needs.scout.outputs.worker != 'INTEGRATOR' &&
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push' ||
+       (github.event_name == 'repository_dispatch' &&
+        github.actor == 'portfolio-brain-v8-runtime[bot]' &&
+        github.event.client_payload.expected_main == github.sha))
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     permissions:
