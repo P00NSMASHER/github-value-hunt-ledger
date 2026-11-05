@@ -1,0 +1,109 @@
+name: Hunter Source Inspection
+
+# Independent read-only worker path. Existing 15 research cron entries are unchanged.
+on:
+  workflow_run:
+    workflows: ["Active Project Technology Scouts"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      worker:
+        description: One worker or AUTO rotated selection
+        required: true
+        default: AUTO
+        type: choice
+        options:
+          - AUTO
+          - HUNTER-01
+          - HUNTER-02
+          - HUNTER-03
+          - HUNTER-04
+          - HUNTER-05
+          - HUNTER-06
+          - HUNTER-07
+          - HUNTER-08
+          - HUNTER-09
+          - HUNTER-10
+          - HUNTER-11
+          - HUNTER-12
+          - HUNTER-13
+          - HUNTER-14
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/hunter-source-inspection.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hunter-source-inspection-${{ github.event.workflow_run.id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    if: >-
+      github.repository == 'P00NSMASHER/github-value-hunt-ledger' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.event == 'schedule' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout governed current source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Prove no action can promote scouting into completed work
+        run: python -m unittest tests.test_hunter_execution_lane -v
+      - name: Independently check any submitted completed-integration receipts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >-
+          python -m tools.hunter_completion_evidence
+          --directory intelligence/hunter_completion_receipts
+          --output hunter-completion-validation.json
+      - name: Inspect immutable public source and test bytes without execution
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKER: ${{ inputs.worker || 'AUTO' }}
+          SEED: ${{ github.event.workflow_run.run_number || github.run_number }}
+          UPSTREAM_SCOUT_RUN: ${{ github.event.workflow_run.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tools.hunter_source_inspection \
+            --worker "$WORKER" --seed "$SEED" \
+            --output hunter-source-inspection.json
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          row=json.loads(Path("hunter-source-inspection.json").read_text())
+          print("## Read-only Hunter execution")
+          print("Worker:", row.get("worker_id", "UNAVAILABLE"))
+          print("Pinned source inspected:", row.get("source_inspected", False))
+          print("Completion:", row.get("completion_status", "NOT_ACCEPTED"))
+          print("Claim/activation issued:", row.get("claim_issued", False))
+          print("External writes:", row.get("external_writes", False))
+          for attempt in row.get("attempts", []):
+              print("Source:", attempt["repository"], attempt["exact_revision"], attempt["status"])
+          print("This workflow never claims target integration or real-world outcomes.")
+          PY
+      - name: Preserve independent inspection and acceptance receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hunter-readonly-inspection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            hunter-source-inspection.json
+            hunter-completion-validation.json
+          retention-days: 30
+          if-no-files-found: warn
