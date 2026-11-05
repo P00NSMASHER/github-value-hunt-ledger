@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: repository-release-gate-${{ github.event.pull_request.number || github.ref }}
@@ -75,6 +77,12 @@ jobs:
         run: python -m unittest discover -s tests -p "test_ti_*.py" -v
       - name: Verify public repo scout idempotency and safety
         run: python -m unittest tests.test_public_repo_scout -v
+      - name: Require independent Hunter inspection and delivery-acceptance regressions
+        run: python -m unittest tests.test_hunter_source_inspection tests.test_hunter_delivery_acceptance -v
+      - name: Fail closed on unverified Hunter completion receipts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m tools.hunter_delivery_acceptance --output /tmp/hunter-delivery-acceptance-ci.json
       - name: Validate canonical intelligence ledgers
         run: python tools/ti_validate.py
       - name: Check committed text integrity
