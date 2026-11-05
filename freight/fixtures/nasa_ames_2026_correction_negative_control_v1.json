@@ -29,6 +29,8 @@
   "correction": {
     "prior_justification_published_date": "2026-09-29",
     "official_correction_date": "2026-10-20",
+    "correction_references_solicitation": "80ARC026R0008",
+    "correction_references_award": "80ARC026C0006",
     "earlier_claim_capability_statements_received": 0,
     "corrected_capability_statements_received": 1,
     "capability_statement_received_date": "2026-06-30",
