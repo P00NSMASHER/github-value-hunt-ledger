@@ -81,7 +81,7 @@ jobs:
         run: python -m unittest tests.test_hunter_source_inspection tests.test_hunter_delivery_acceptance -v
       - name: Fail closed on unverified Hunter completion receipts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: python -m tools.hunter_delivery_acceptance --output /tmp/hunter-delivery-acceptance-ci.json
       - name: Validate canonical intelligence ledgers
         run: python tools/ti_validate.py
