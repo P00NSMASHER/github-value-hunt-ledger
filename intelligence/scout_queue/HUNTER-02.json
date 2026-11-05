@@ -15,11 +15,11 @@
       "default_branch": "main",
       "description": "Open-source, self-hosted CRM: leads, deals, tickets, tasks and lead-capture forms. Go + React, SQLite or MySQL.",
       "discovery_query": "crm lead capture",
-      "exact_revision": "aa87d0e0ee0ce263fce42163c92cee12ee1ccb02",
+      "exact_revision": "6907353058891baa6419fca8a116c7d2623aca57",
       "forks": 10,
       "primary_language": "Go",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T12:20:01Z",
+      "pushed_at": "2026-11-05T20:50:47Z",
       "repository": "florinel-chis/GopherCRM",
       "root_code_signals": [
         ".github",
@@ -31,7 +31,7 @@
         "test",
         "tests"
       ],
-      "size_kb": 29974,
+      "size_kb": 30383,
       "stars": 26,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -67,6 +67,62 @@
       },
       "triage_score": 64,
       "url": "https://github.com/florinel-chis/GopherCRM"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "AI-powered B2B lead finder: discovery on licensed lead data, LLM fit qualification with the reason written out, CSV out. The finder core, extracted from OpenOutreach.",
+      "discovery_query": "B2B lead qualification",
+      "exact_revision": "af44514b6f0cc50ad5eb169a3d756b2ee1f3c37f",
+      "forks": 18,
+      "primary_language": "Python",
+      "published_license_spdx": "GPL-3.0",
+      "pushed_at": "2026-11-05T17:08:33Z",
+      "repository": "eracle/OpenOutFind",
+      "root_code_signals": [
+        ".github",
+        "makefile",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 6563,
+      "stars": 31,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "active-learning",
+        "agentic-ai",
+        "ai-agents",
+        "ai-sdr",
+        "b2b",
+        "b2b-sales",
+        "cli",
+        "data-enrichment",
+        "gtm",
+        "icp",
+        "lead-generation",
+        "lead-qualification",
+        "lead-scoring",
+        "llm",
+        "prospecting",
+        "python",
+        "sales-automation",
+        "sales-intelligence",
+        "sdr",
+        "self-hosted"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 3,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 9,
+        "stars": 6,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 56,
+      "url": "https://github.com/eracle/OpenOutFind"
     },
     {
       "archived": false,
@@ -112,6 +168,52 @@
       },
       "triage_score": 53,
       "url": "https://github.com/Renan-Maciel-Santos/b2b-lead-qualifier"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Open-source TypeScript payments SDK \u2014 idempotent payments (at-most-once per key within a documented window), fail-closed HMAC webhooks, reconciliation, and rule-based fraud scoring. Stripe adapter and in-memory mock provider.",
+      "discovery_query": "stripe webhook reconciliation",
+      "exact_revision": "99e00d11a4cc4d0e3848d940acae7b11210cbf52",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-05T16:22:05Z",
+      "repository": "ROROK20/PayKit",
+      "root_code_signals": [
+        ".github",
+        "docker-compose.yml",
+        "makefile",
+        "package.json",
+        "src",
+        "tests"
+      ],
+      "size_kb": 1345,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "fintech",
+        "idempotency",
+        "nextjs",
+        "payments",
+        "reconciliation",
+        "stripe",
+        "typescript",
+        "webhooks"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 14,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 52,
+      "url": "https://github.com/ROROK20/PayKit"
     },
     {
       "archived": false,
@@ -209,6 +311,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-10-31T15:57:57Z",
       "repository": "Taan1el/craftfunnel",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
@@ -555,14 +658,14 @@
       "forks": 0,
       "primary_language": "Java",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-05T11:15:52Z",
+      "pushed_at": "2026-11-05T20:47:44Z",
       "repository": "itsChihyeh/LedgerLab",
       "root_code_signals": [
         ".github",
         "pom.xml",
         "src"
       ],
-      "size_kb": 24794,
+      "size_kb": 24911,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -625,84 +728,11 @@
       },
       "triage_score": 41,
       "url": "https://github.com/Tb3bhargav/teaplee"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "LeadEngine is an open-source, AI-powered business intelligence and lead automation platform. Discover businesses, enrich publicly available data, analyze websites with AI, score leads, automate workflows, integrate with CRMs, and export insights. Built with a modular, plugin-based architecture for developers and businesses.",
-      "discovery_query": "open data business leads",
-      "exact_revision": "14e63e9b143312c9dff881d753d8fdfb29162e52",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-08-04T10:23:03Z",
-      "repository": "SarmadSalee/FlowEngine",
-      "root_code_signals": [
-        ".github",
-        "docker-compose.yml",
-        "dockerfile",
-        "package.json"
-      ],
-      "size_kb": 1652,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 8,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 39,
-      "url": "https://github.com/SarmadSalee/FlowEngine"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Website + CRM + lead capture for a customer-experience consultancy",
-      "discovery_query": "crm lead capture",
-      "exact_revision": "a16524df07519b75980582adc183cc053a7e5aa6",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-03T20:09:25Z",
-      "repository": "AlejandroAlvarez-srdev/escala-cx",
-      "root_code_signals": [
-        "package.json",
-        "src"
-      ],
-      "size_kb": 26347,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "crm",
-        "nextjs",
-        "postgres",
-        "typescript"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 5,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 4
-      },
-      "triage_score": 38,
-      "url": "https://github.com/AlejandroAlvarez-srdev/escala-cx"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Success requires independently verified customer action or actual collected payment; a lead, mock purchase, generated invoice or GitHub candidate is not revenue.",
-  "generated_at": "2026-11-05T12:24:23.734192+00:00",
+  "generated_at": "2026-11-05T21:04:37.171299+00:00",
   "mission": "Revenue hunt: find reusable B2B prospect discovery, customer conversion, billing/reconciliation and measured funnel tools that could help active RETALLY businesses achieve a first independently verified collected dollar.",
   "project": "revenue-hunt",
   "risk_review": [],
