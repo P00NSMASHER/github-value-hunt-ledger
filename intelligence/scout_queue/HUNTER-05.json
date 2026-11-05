@@ -15,11 +15,11 @@
       "default_branch": "main",
       "description": "\u26a1A CLI tool for code structural search, lint and rewriting. Written in Rust",
       "discovery_query": "typescript codemod",
-      "exact_revision": "e83806463b5fb5c34dd7808e82f4c8ae52333f52",
-      "forks": 490,
+      "exact_revision": "12ffa2f56bab275efd8dcad115e3cc50ae1cee55",
+      "forks": 493,
       "primary_language": "Rust",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T04:53:57Z",
+      "pushed_at": "2026-11-04T21:31:09Z",
       "repository": "ast-grep/ast-grep",
       "root_code_signals": [
         ".github",
@@ -27,8 +27,8 @@
         "pyproject.toml",
         "schemas"
       ],
-      "size_kb": 11017,
-      "stars": 16440,
+      "size_kb": 11023,
+      "stars": 16452,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ast",
@@ -120,7 +120,7 @@
       "description": "\ud83c\udfa8 Vibe Design System - Official monday.com UI resources for application development in React.js",
       "discovery_query": "typescript codemod",
       "exact_revision": "f39a2f6e2d950adced82e9e975255399ac4f1541",
-      "forks": 366,
+      "forks": 367,
       "primary_language": "TypeScript",
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-03T23:27:32Z",
@@ -130,7 +130,7 @@
         "package.json"
       ],
       "size_kb": 299046,
-      "stars": 691,
+      "stars": 693,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "codemod",
@@ -173,11 +173,11 @@
       "default_branch": "trunk",
       "description": "TypeScript geospatial SDK: one protocol-neutral contract over GeoServices REST, OGC API, STAC, WMS/WMTS/WFS, and OData \u2014 MapLibre-first runtime, GIS widget-migration codemod, and a platform-free MCP server.",
       "discovery_query": "typescript codemod",
-      "exact_revision": "9cdc1bf1386ee0c051ad3054cc6340bb4b3791fe",
+      "exact_revision": "8646347b958eba54e635726b0afd096a5aec6789",
       "forks": 1,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-04T12:34:33Z",
+      "pushed_at": "2026-11-05T09:56:50Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -186,7 +186,7 @@
         "src",
         "test"
       ],
-      "size_kb": 1777829,
+      "size_kb": 1785206,
       "stars": 5,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -221,6 +221,50 @@
       },
       "triage_score": 53,
       "url": "https://github.com/honua-io/honua-sdk-js"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Test impact analysis and code intelligence for LLM agents. Zero dependencies. 15 MCP tools.",
+      "discovery_query": "test impact analysis",
+      "exact_revision": "66e335fee973bd77e6a19e6d07df399fd56be3eb",
+      "forks": 1,
+      "primary_language": "Rust",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-05T09:10:51Z",
+      "repository": "IronAdamant/Chisel",
+      "root_code_signals": [
+        ".github",
+        "cargo.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 1629,
+      "stars": 5,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "ai-agents",
+        "claude-code",
+        "code-intelligence",
+        "git-analysis",
+        "llm",
+        "mcp",
+        "python",
+        "test-impact-analysis"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 3,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 53,
+      "url": "https://github.com/IronAdamant/Chisel"
     },
     {
       "archived": false,
@@ -313,11 +357,11 @@
       "default_branch": "main",
       "description": "Open-source test-impact analysis for faster CI, with conservative fallbacks and reproducible evidence",
       "discovery_query": "test impact analysis",
-      "exact_revision": "7fe80905e10a59dca840a1551269f471eaf2973e",
+      "exact_revision": "a5f1c26963846cb4cd9df1f9d495e3c99373a64b",
       "forks": 4,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T14:54:58Z",
+      "pushed_at": "2026-11-05T10:22:09Z",
       "repository": "DiffCI/core",
       "root_code_signals": [
         ".github",
@@ -325,7 +369,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 1584,
+      "size_kb": 1774,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -454,6 +498,59 @@
       },
       "triage_score": 49,
       "url": "https://github.com/JayanthMalladi/shim"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Deterministic, local-first change-impact analysis for Python, JavaScript, and TypeScript\u2014trace blast radius, suggest tests, and gate risky PRs.",
+      "discovery_query": "test impact analysis",
+      "exact_revision": "6a7c33f20b7f78d9da2107c5df4ec55f7503880d",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-04T23:37:02Z",
+      "repository": "adiarora06/RepoRipple",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 881,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "ai-agents",
+        "change-impact-analysis",
+        "ci-cd",
+        "cli",
+        "code-review",
+        "dependency-graph",
+        "developer-tools",
+        "git",
+        "github-actions",
+        "javascript",
+        "mcp",
+        "mcp-server",
+        "openrouter",
+        "python",
+        "static-analysis",
+        "test-selection",
+        "typescript"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 49,
+      "url": "https://github.com/adiarora06/RepoRipple"
     },
     {
       "archived": false,
@@ -680,86 +777,11 @@
       },
       "triage_score": 45,
       "url": "https://github.com/datum-router/nimo"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Static license inventory for DSH plugin packages and installed dependencies; flags strong copyleft and unknown licenses.",
-      "discovery_query": "dependency license audit",
-      "exact_revision": "5f1a97739dc97e8d9d02a806a5ce972318671d44",
-      "forks": 0,
-      "primary_language": "JavaScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-01T00:46:39Z",
-      "repository": "lengrufeng2008/dsh-license-audit",
-      "root_code_signals": [
-        "package.json",
-        "src",
-        "test"
-      ],
-      "size_kb": 11,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "audit",
-        "compliance",
-        "deepseek-harness",
-        "dsh-plugin",
-        "license"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 8,
-        "stars": 0,
-        "substantive_size": 2,
-        "topics": 5
-      },
-      "triage_score": 44,
-      "url": "https://github.com/lengrufeng2008/dsh-license-audit"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Explainable Python change-impact analysis and test slection. Live on Vercel.",
-      "discovery_query": "test impact analysis",
-      "exact_revision": "8f0f16dd8cbe21a2475d5393bc2b7ed9738f5547",
-      "forks": 0,
-      "primary_language": "JavaScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T13:46:04Z",
-      "repository": "CodeWith-Pranav/ChangeScope",
-      "root_code_signals": [
-        ".github",
-        "dockerfile",
-        "package.json",
-        "tests"
-      ],
-      "size_kb": 85,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 10,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 43,
-      "url": "https://github.com/CodeWith-Pranav/ChangeScope"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-04T14:58:07.416801+00:00",
+  "generated_at": "2026-11-05T10:24:09.022253+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
