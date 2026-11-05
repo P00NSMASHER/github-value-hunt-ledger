@@ -35,6 +35,7 @@ def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
     recent = [r for r in runs if (now - dt.datetime.fromisoformat(
         r["created_at"].replace("Z", "+00:00"))).total_seconds() <= 18 * 3600]
     scheduled = [r for r in recent if r.get("event") == "schedule"]
+    latest_cycle = sorted(scheduled, key=lambda r: r["created_at"], reverse=True)[:15]
     recovery = [r for r in recent if r.get("event") == "repository_dispatch"]
     digest_queues = re.search(r"Queue snapshots read: (\d+)", digest)
     digest_candidates = re.search(r"Unique exact-revision candidates: (\d+)", digest)
@@ -44,7 +45,8 @@ def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
     checks = {
         "assignments": set(queues).issubset(set(WORKERS)),
         "scheduled_recent": len(scheduled) >= 15,
-        "scheduled_success": bool(scheduled) and all(r.get("conclusion") == "success" for r in scheduled),
+        "scheduled_success": len(latest_cycle) == 15 and all(
+            r.get("conclusion") == "success" for r in latest_cycle),
         "recovery_demonstrated": any(r.get("conclusion") == "success" for r in recovery),
         "queues_current": current == set(WORKERS),
         "integrator_complete": bool(digest_queues) and int(digest_queues.group(1)) == 14,
