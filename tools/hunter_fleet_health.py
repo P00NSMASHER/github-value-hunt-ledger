@@ -125,12 +125,8 @@ def governed_runtime_truth(root: Path) -> dict:
         "current_generated_activations": activations,
         "source_inspection_not_equivalent_to_completed_work": True,
         "chatgpt_task_health": "NOT_OBSERVABLE_FROM_GITHUB",
-        "full_worker_runtime_verified": (
-            mode == "measurement_canary"
-            and active and activations > 0
-            and readiness.get("state") == "AWAITING_EXPLICIT_USER_APPROVAL"
-            and readiness_count == scored_count
-        ),
+        "full_worker_runtime_verified": "NOT_ESTABLISHED",
+        "worker_claim_and_delivery_proof": "NOT_EVALUATED_BY_THIS_HEALTH_PROBE",
     }
 
 
