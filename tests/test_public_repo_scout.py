@@ -16,6 +16,9 @@ class ScoutTests(unittest.TestCase):
         self.assertIn("github.event.client_payload.expected_main == github.sha",workflow)
         self.assertIn('test "$RECOVERY_MAIN" = "$EVENT_SHA"',workflow)
         self.assertIn('^HUNTER-(0[1-9]|1[0-4])$',workflow)
+        proposal=Path("tools/retally_automated_pr_proposal.py").read_text(encoding="utf-8")
+        self.assertIn('"repository_dispatch"',proposal)
+        self.assertIn('verify_event_authority(str(event), base)',proposal)
 
     def test_exact_revision_dedupe(self):
         c="example/project abcdef123456"

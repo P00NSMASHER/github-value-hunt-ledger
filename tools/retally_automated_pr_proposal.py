@@ -20,7 +20,27 @@ from tools.retally_writer_proposal_policy import (
 )
 
 REPO = "P00NSMASHER/github-value-hunt-ledger"
-ALLOWED_EVENTS = frozenset({"schedule", "workflow_dispatch", "push"})
+ALLOWED_EVENTS = frozenset({"schedule", "workflow_dispatch", "push",
+                            "repository_dispatch"})
+
+
+def verify_event_authority(event: str, base: str) -> None:
+    """Keep recovery admission identical to the workflow's fail-closed route."""
+    if event != "repository_dispatch":
+        return
+    if os.environ.get("GITHUB_ACTOR") != "portfolio-brain-v8-runtime[bot]":
+        raise ProposalHold("Unauthorized recovery actor")
+    event_path = os.environ.get("GITHUB_EVENT_PATH")
+    try:
+        payload = json.loads(Path(event_path or "").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise ProposalHold("Recovery event evidence unavailable") from None
+    client = payload.get("client_payload") if isinstance(payload, dict) else None
+    worker = client.get("worker") if isinstance(client, dict) else None
+    expected_main = client.get("expected_main") if isinstance(client, dict) else None
+    if (not re.fullmatch(r"HUNTER-(0[1-9]|1[0-4])", str(worker or "")) or
+            expected_main != base or os.environ.get("GITHUB_SHA") != base):
+        raise ProposalHold("Recovery event is not exact-main worker authority")
 
 
 def merge_denial(stdout: str, stderr: str) -> str:
@@ -75,8 +95,10 @@ def gh(method: str, path: str, payload: dict | None = None):
 def checked_proposal_state(lane: str, branch: str, base: str, head: str):
     if os.environ.get("GITHUB_REPOSITORY") != REPO:
         raise ProposalHold("Wrong GitHub repository")
-    if os.environ.get("GITHUB_EVENT_NAME") not in ALLOWED_EVENTS:
+    event = os.environ.get("GITHUB_EVENT_NAME")
+    if event not in ALLOWED_EVENTS:
         raise ProposalHold("Unsupported automation trigger")
+    verify_event_authority(str(event), base)
     if not os.environ.get("GH_TOKEN"):
         raise ProposalHold("GitHub Actions token not available")
     expected = branch_for_run(
