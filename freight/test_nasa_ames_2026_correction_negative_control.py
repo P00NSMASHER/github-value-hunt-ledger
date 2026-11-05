@@ -33,6 +33,14 @@ def corrected_capability_status(case):
     fix = case["correction"]
     if src["raw_notice_bytes_retained"] or src["raw_notice_sha256"] is not None:
         return "INVALID_SOURCE_CUSTODY_CLAIM"
+    identity = case["identity"]
+    # Internal provenance guard, NOT independent authentication of source bytes.
+    # A correction for an unrelated notice must not falsify this case.
+    if (fix.get("correction_references_solicitation")
+            != identity["solicitation_identifier_referenced"]
+            or fix.get("correction_references_award")
+            != identity["contract_award_identifier"]):
+        return "CORRECTION_SOURCE_IDENTITY_MISMATCH"
     if fix["official_correction_date"] < fix["prior_justification_published_date"]:
         return "INVALID_REVISION_CHRONOLOGY"
     if (fix["earlier_claim_capability_statements_received"] == 0
@@ -55,6 +63,25 @@ class NasaAmes2026CorrectionNegativeControlTests(unittest.TestCase):
         changed["correction"]["corrected_capability_statements_received"] = 0
         self.assertNotEqual(
             corrected_capability_status(changed), "FALSIFIED_EARLIER_ZERO_STATEMENTS"
+        )
+        # Reject unrelated corrections and absent join provenance.
+        wrong_intent = copy.deepcopy(c)
+        wrong_intent["correction"]["correction_references_solicitation"] = "80ARC026R9999"
+        self.assertEqual(
+            corrected_capability_status(wrong_intent),
+            "CORRECTION_SOURCE_IDENTITY_MISMATCH",
+        )
+        wrong_award = copy.deepcopy(c)
+        wrong_award["correction"]["correction_references_award"] = "80ARC026C9999"
+        self.assertEqual(
+            corrected_capability_status(wrong_award),
+            "CORRECTION_SOURCE_IDENTITY_MISMATCH",
+        )
+        missing_link = copy.deepcopy(c)
+        missing_link["correction"].pop("correction_references_solicitation")
+        self.assertEqual(
+            corrected_capability_status(missing_link),
+            "CORRECTION_SOURCE_IDENTITY_MISMATCH",
         )
         backdated = copy.deepcopy(c)
         backdated["correction"]["official_correction_date"] = "2026-09-01"
