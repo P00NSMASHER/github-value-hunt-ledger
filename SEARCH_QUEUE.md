@@ -25,6 +25,14 @@ Integrator-owned search and validation direction. Operator references updated 20
 - Do not inspect or retain credentials, private/personal/confidential data, accidental secrets or unauthorized-access material.
 - No padding. A no-new-finding run is preferable to another dominated repository.
 
+## Current scout-integration checkpoint — 2026-11-05
+
+- The active scout inventory contains **14/14 project queues and 108 pre-verification candidates**. These are discovery snapshots only: verified integration and measured outcomes remain **UNKNOWN**.
+- Generated activation is currently paused by runtime policy, with zero active activations. Pending dispatch tickets therefore establish neither worker failure nor completed work.
+- A completed technical delivery now requires live readback of an exact assigned repository/main SHA, a merged PR for that SHA, a named passing acceptance-test step, and a separate successful exact-head verifier workflow. Duplicate receipts, stale/non-main SHAs, shared test/verifier workflows, unnamed setup-only steps and unsupported outcome metrics fail closed.
+- Even an accepted receipt proves only **CI-verified target source change**. Source reuse, production deployment, revenue, trading edge, scientific novelty, customer conversion and engineering time saved remain UNKNOWN without independent external evidence.
+- **Do next:** stop optimizing candidate count. When activation is authorized, consume the existing queues through source/test/schema/history inspection and one bounded delivery-acceptance packet per selected target. Keep every unreviewed candidate out of MASTER, capability maturity, opportunity ranking and realized-outcome totals until the applicable evidence gate passes.
+
 ## 1. Freight Recovery — P0 / EXP-001
 **Bottleneck:** commercialization and deployment evidence, not another freight component.
 
