@@ -8,6 +8,9 @@ on:
       - 'automation/HUNTER_EFFECTIVENESS.md'
       - 'tools/hunter_effectiveness.py'
       - 'tests/test_hunter_effectiveness.py'
+      - 'tools/hunter_fleet_health.py'
+      - 'tests/test_hunter_fleet_health.py'
+      - '.github/workflows/hunter-fleet-health.yml'
       - 'tools/retally_scout_pr_dedupe.py'
       - 'tools/retally_writer_proposal_policy.py'
       - 'tools/public_repo_scout.py'
@@ -22,6 +25,9 @@ on:
       - 'automation/HUNTER_EFFECTIVENESS.md'
       - 'tools/hunter_effectiveness.py'
       - 'tests/test_hunter_effectiveness.py'
+      - 'tools/hunter_fleet_health.py'
+      - 'tests/test_hunter_fleet_health.py'
+      - '.github/workflows/hunter-fleet-health.yml'
       - 'tools/retally_scout_pr_dedupe.py'
       - 'tools/retally_writer_proposal_policy.py'
       - 'tools/public_repo_scout.py'
@@ -48,7 +54,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify scope, safety and existing queue invariants
-        run: python -m unittest tests.test_public_repo_scout tests.test_ti_scout_noop tests.test_hunter_effectiveness -v
+        run: python -m unittest tests.test_public_repo_scout tests.test_ti_scout_noop tests.test_hunter_effectiveness tests.test_hunter_fleet_health -v
       - name: Prove historical discoveries cannot enter the current digest
         shell: bash
         run: |
