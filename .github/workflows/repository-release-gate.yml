@@ -75,6 +75,12 @@ jobs:
         run: python -m unittest discover -s tests -p "test_ti_*.py" -v
       - name: Verify public repo scout idempotency and safety
         run: python -m unittest tests.test_public_repo_scout -v
+      - name: Validate Hunter execution and adversarial acceptance requirements
+        run: python -m unittest tests.test_hunter_execution_lane -v
+      - name: Independently verify every declared completed Hunter integration
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m tools.hunter_completion_evidence --directory intelligence/hunter_completion_receipts
       - name: Validate canonical intelligence ledgers
         run: python tools/ti_validate.py
       - name: Check committed text integrity
