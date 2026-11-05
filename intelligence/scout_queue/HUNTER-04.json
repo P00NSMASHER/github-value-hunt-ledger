@@ -167,11 +167,11 @@
       "default_branch": "main",
       "description": "Symbolic regression tool in C++",
       "discovery_query": "symbolic regression",
-      "exact_revision": "dfaedd081e03896f70c892ce20b4e5047de6613d",
+      "exact_revision": "e366e77d2f416eee5f2dcc48ee8f4a056b3a81fa",
       "forks": 2,
       "primary_language": "C++",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-05T10:57:50Z",
+      "pushed_at": "2026-11-05T18:28:16Z",
       "repository": "Julien-Livet/SymReg",
       "root_code_signals": [
         ".github",
@@ -179,7 +179,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 197,
+      "size_kb": 203,
       "stars": 3,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -209,17 +209,17 @@
       "default_branch": "main",
       "description": "Scalable, high-performance C++23 framework for evolutionary algorithms, including genetic programming, genetic algorithms, and differential evolution. Ideal for classification, symbolic regression, and mathematical optimisation tasks.",
       "discovery_query": "symbolic regression",
-      "exact_revision": "592c2e5c064ed2f96416da74ef2c48ee792b1ddd",
+      "exact_revision": "db34d6eab09fdf18c93e1b58cbeba76de0306737",
       "forks": 4,
       "primary_language": "C++",
       "published_license_spdx": "MPL-2.0",
-      "pushed_at": "2026-11-05T09:48:01Z",
+      "pushed_at": "2026-11-05T12:40:36Z",
       "repository": "morinim/ultra",
       "root_code_signals": [
         ".github",
         "src"
       ],
-      "size_kb": 5722,
+      "size_kb": 5726,
       "stars": 20,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -262,6 +262,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T06:38:27Z",
       "repository": "GongJr0/SymbolicDSGE",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -380,6 +381,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T09:02:47Z",
       "repository": "WenHZhang/PS3R-Progressive-Spatial-Stratified-Symbolic-Regression",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -418,7 +420,7 @@
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 903,
+      "size_kb": 907,
       "stars": 13,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -450,11 +452,11 @@
       "default_branch": "main",
       "description": "srbf: Symbolic Regression Benchmark Framework. Evaluate symbolic-regression models on shared benchmarks with shared metrics; interactive results at psaegert.github.io/srbf",
       "discovery_query": "symbolic regression",
-      "exact_revision": "a2a3aeea4315113e021848422dfe246ef30b350c",
+      "exact_revision": "83b237de5ced5d8d260550e5cacaec1e20d9549e",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T10:04:17Z",
+      "pushed_at": "2026-11-05T22:25:02Z",
       "repository": "psaegert/srbf",
       "root_code_signals": [
         ".github",
@@ -462,7 +464,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 2770152,
+      "size_kb": 2775924,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -485,18 +487,18 @@
       "default_branch": "main",
       "description": "Auditable symbolic regression and scientific hypothesis discovery with LLM-guided refinement, real-only data-role isolation, acquisition-driven active discovery, and a validated reusable structure library.",
       "discovery_query": "symbolic regression",
-      "exact_revision": "6d546c933cf90f99ebcc7f2f6aabcd001cf65630",
+      "exact_revision": "f6095bafff5946c2a56d225d4955718240e176c7",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-04T19:40:12Z",
+      "pushed_at": "2026-11-05T17:15:10Z",
       "repository": "grocksdf/symbolic-regression-llm-scientific-discovery-active-learning-machine-learning",
       "root_code_signals": [
         "pyproject.toml",
         "schemas",
         "tests"
       ],
-      "size_kb": 5138,
+      "size_kb": 5187,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -519,16 +521,16 @@
       "default_branch": "main",
       "description": "Emergentia is a neural-symbolic discovery engine that extracts parsimonious physical laws from noisy particle trajectory data. It combines deep learning to model complex forces with symbolic regression to rediscover human-readable, mathematically interpretable equations of motion.",
       "discovery_query": "symbolic regression",
-      "exact_revision": "213ab3783e289aef22617e125811753c3c07efe1",
+      "exact_revision": "6f7aee45e72a452c049a37c885539e74d8c32fbb",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T19:49:39Z",
+      "pushed_at": "2026-11-05T19:04:14Z",
       "repository": "tomwolfe/Emergentia",
       "root_code_signals": [
         "tests"
       ],
-      "size_kb": 53903,
+      "size_kb": 53946,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -568,7 +570,7 @@
       "forks": 0,
       "primary_language": "Jupyter Notebook",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-04T13:51:32Z",
+      "pushed_at": "2026-11-05T21:29:26Z",
       "repository": "saeed92m/ztf-classifier",
       "root_code_signals": [
         ".github",
@@ -576,7 +578,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 5417,
+      "size_kb": 5289,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -666,7 +668,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists.",
-  "generated_at": "2026-11-05T11:24:29.142249+00:00",
+  "generated_at": "2026-11-05T22:44:02.662982+00:00",
   "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
   "project": "novel-discovery",
   "risk_review": [],
