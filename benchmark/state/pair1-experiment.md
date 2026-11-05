@@ -89,3 +89,18 @@
 - Negative knowledge: finding-code lists are not next-evidence recommendations; a router trace is not routing; DataHub screenshots/search are not proof live data drives scoring; self-authored status benchmarks can pass while the repairability requirement is completely absent.
 - Unresolved candidate test: given multiple blockers, can an engine rank exact evidence repairs by deterministic predicted decision delta and prove via one-change replay that its first recommendation flips or maximally advances the claim outcome?
 
+## Task 06 checkpoint — 2026-11-05
+
+- Completed: 06. Result commit on the task branch: 525db1af23b43ed08dcb679d1a378bba6f05cf52. Next lowest unfinished assigned task: 07. Process only one task per run.
+- Candidate: phax/phive-rules @ 9ce8f8ca508468b7d937125c6aa0278f93b828c9 with released phive 12.2.0 @ 6df39cb01e7fb11a2353c424c7ef50561ea3c513. STRONG, 25/30; independent verifier agreed. Public source/rules/tests/provenance/history/CI inspected; local Maven execution was attempted but dependency DNS failed.
+- Capability evidence: ordered versioned XSD/Schematron chains across EN 16931, Peppol and many national European profiles; fatal parse/schema outcomes; explicit retained SKIPPED results for every later layer; serialized per-layer validity and aggregate interruption.
+- Calibration boundary: the engine validates the selected VES coordinate. It does not universally choose the legally correct jurisdiction/profile/version. Multiple current-looking profiles can coexist without complete validity dates, and Factur-X/ZUGFeRD coverage is XML-only rather than full PDF/A-3 validation.
+- Standards boundary: EN 16931 1.3.17 source Schematrons matched the official sources and XRechnung used then-current KoSIT 2.6.0. Locally compiled EN 16931 XSLTs were not byte-identical to official XSLTs; differential behavioral parity remains unverified.
+- Rights/deployment boundary: Java is Apache-2.0, but official rule artifacts retain per-version EUPL, Apache, LGPL and other/unclear authority terms documented in module NOTICE files. External routing, update monitoring and per-version rights review remain operator work.
+- Build evidence: exact core passed Java 17/21/25. Exact rules pin skipped CI only for a Maven development-version bump; its Java tree is identical to green commit 63c3f0dd2234d0dd75a474f4aae3deada799593e.
+- Discovery result: direct metadata/domain queries were weak; rare execution/result signatures plus dependency and authority graphs found and qualified the stack. Scoped alternatives did not show the same independently verified combination of breadth and explicit fatal/skipped semantics.
+- Prior-lesson impact: nested authority/version audit forced inspection beyond the VES selector into base standards, effective dates, compiled artifacts and per-module provenance. Task 06 adds a fourth distinct supporting task to that already validated procedure.
+- New one-task candidate skill: terminal-state completeness audit. For a staged validator, enumerate declared layers; trace a stopping failure; require every later layer to retain artifact identity and explicit skipped/not-evaluated state; verify serialization and aggregate interruption. Evidence set {06}; do not promote yet.
+- Negative knowledge: a broad rule registry is not an authority router; explicit skipped is not passed; matching Schematron source is not compiled-validator parity; XML validation is not whole hybrid-container validation.
+- Unresolved candidate tests: differential-run official reference validators against phive compiled artifacts on adversarial vectors; add one fatal-first-layer integration test asserting all remaining concrete layers are skipped; build date/jurisdiction/profile routing with fail-closed ambiguity.
+
