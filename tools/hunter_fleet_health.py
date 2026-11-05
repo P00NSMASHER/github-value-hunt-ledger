@@ -66,9 +66,73 @@ def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
     }
 
 
+
+def governed_runtime_truth(root: Path) -> dict:
+    """Do not let green source scouting imply enabled/adopted V16 workers.
+
+    Uses only publicly inspectable non-gold benchmark and runtime data.
+    Does not read ChatGPT task state or authorize an activation.
+    """
+    from tools.ti_benchmark_receipt_guard import (
+        SCORE_ROW, RESULT_ROW, validate_benchmark_receipts,
+    )
+
+    text = (root / "benchmark/SCOREBOARD.md").read_text(encoding="utf-8")
+    benchmark = validate_benchmark_receipts(root, text)
+    scored = {(task, arm.upper()) for task, arm in SCORE_ROW.findall(text)}
+    source_results = set()
+    for number in range(1, 8):
+        for arm in ("CONTROL", "EXPERIMENT"):
+            path = root / "benchmark/results" / f"pair{number}-{arm.lower()}.md"
+            for task in RESULT_ROW.findall(path.read_text(encoding="utf-8")):
+                source_results.add((task, arm))
+    pending_score = sorted(
+        f"{task}/{arm}" for task, arm in (source_results - scored)
+    )
+    readiness = json.loads(
+        (root / "intelligence/HUNTER_RESTART_READINESS.json")
+        .read_text(encoding="utf-8")
+    )
+    policy = json.loads(
+        (root / "intelligence/hunter_runtime_policy.json")
+        .read_text(encoding="utf-8")
+    )
+    activation = json.loads(
+        (root / "intelligence/activation_metrics.json")
+        .read_text(encoding="utf-8")
+    )
+    scored_count = benchmark["matched_scored_tasks"]
+    readiness_count = (readiness.get("evidence") or {}).get(
+        "matched_benchmark_tasks"
+    )
+    mode = policy.get("mode", "UNKNOWN")
+    active = bool(activation.get("runtime_activation_enabled"))
+    activations = int(activation.get("current_activations") or 0)
+    return {
+        "evidence_scope": "SOURCE_SNAPSHOT_NOT_CHATGPT_TASK_STATUS",
+        "scored_matched_tasks": scored_count,
+        "required_matched_tasks": benchmark["frozen_task_count"],
+        "raw_result_arms_unscored": pending_score,
+        "benchmark_snapshot_consistent": readiness_count == scored_count,
+        "readiness_state": readiness.get("state", "UNKNOWN"),
+        "readiness_blockers": [
+            item.get("code")
+            for item in readiness.get("blockers") or []
+            if isinstance(item, dict)
+        ],
+        "adaptive_runtime_mode": mode,
+        "generated_activation_enabled": active,
+        "current_generated_activations": activations,
+        "source_inspection_not_equivalent_to_completed_work": True,
+        "chatgpt_task_health": "NOT_OBSERVABLE_FROM_GITHUB",
+        "full_worker_runtime_verified": "NOT_ESTABLISHED",
+        "worker_claim_and_delivery_proof": "NOT_EVALUATED_BY_THIS_HEALTH_PROBE",
+    }
+
+
 def render(report: dict) -> str:
     rows = ["# Hunter fleet health", "", f"Observed: {report['observed_at']}",
-            f"Operational gates: {report['health_percent']}%", "",
+            f"Scouting operational gates: {report['health_percent']}%", "",
             "| Gate | Result |", "|---|---|"]
     rows += [f"| {name} | {'PASS' if value else 'FAIL'} |"
              for name, value in report["checks"].items()]
@@ -76,6 +140,27 @@ def render(report: dict) -> str:
              f"Recent scheduled runs: {report['recent_scheduled']}",
              f"Recent recovery successes: {report['recent_recovery_success']}/{report['recent_recovery']}",
              "", "A candidate or green run is not a verified real-world outcome.", ""]
+    runtime = report.get("governed_runtime")
+    if runtime:
+        rows += [
+            "## Adaptive-worker readiness (separate from healthy scouting)",
+            "",
+            f"Matched benchmark scored: **{runtime['scored_matched_tasks']}/{runtime['required_matched_tasks']}**",
+            "Raw experiment results awaiting independent scoring: " +
+                (", ".join(runtime['raw_result_arms_unscored']) or "none"),
+            f"Readiness report: **{runtime['readiness_state']}**",
+            f"Activation policy: **{runtime['adaptive_runtime_mode']}**",
+            f"Current generated activations: **{runtime['current_generated_activations']}**",
+            "Current runtime activation verified: **" +
+                str(runtime['full_worker_runtime_verified']).lower() + "**",
+            "Readiness snapshot consistent with scoreboard: **" +
+                str(runtime['benchmark_snapshot_consistent']).lower() + "**",
+            "ChatGPT automation enabled/failed status: NOT OBSERVABLE from GitHub alone.",
+            "",
+            "The operational percentage above measures scouting only, not full Hunter autonomy.",
+            "Completion, revenue, trading performance and scientific novelty require separate evidence.",
+            "",
+        ]
     return "\n".join(rows)
 
 
@@ -93,6 +178,7 @@ def main() -> int:
     digest = Path("automation/SCOUT_DIGEST.md").read_text(encoding="utf-8")
     report = evaluate(runs, queues, digest, dt.datetime.now(dt.timezone.utc), prs,
                       args.inject_failure)
+    report["governed_runtime"] = governed_runtime_truth(Path.cwd())
     Path(args.output_json).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     Path(args.output_md).write_text(render(report), encoding="utf-8")
     print(json.dumps(report, sort_keys=True))
