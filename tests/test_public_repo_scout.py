@@ -16,6 +16,9 @@ class ScoutTests(unittest.TestCase):
         self.assertIn("github.event.client_payload.expected_main == github.sha",workflow)
         self.assertIn('test "$RECOVERY_MAIN" = "$EVENT_SHA"',workflow)
         self.assertIn('^HUNTER-(0[1-9]|1[0-4])$',workflow)
+        proposal=Path("tools/retally_automated_pr_proposal.py").read_text(encoding="utf-8")
+        self.assertIn('"repository_dispatch"',proposal)
+        self.assertIn('verify_event_authority(str(event), base)',proposal)
 
     def test_exact_revision_dedupe(self):
         c="example/project abcdef123456"
@@ -94,6 +97,31 @@ class ScoutTests(unittest.TestCase):
         self.assertEqual(summary["fresh_candidate_count"], 1)
         self.assertEqual(summary["retained_unreviewed_count"], 1)
         self.assertEqual(summary["candidate_count"], len(saved["candidates"]))
+
+    def test_all_worker_run_preserves_successes_when_one_source_fails(self):
+        from tools import public_repo_scout as scout
+        manifest_path = Path(__file__).resolve().parents[1] / "automation/hunter_schedule.json"
+        manifest = json.loads(manifest_path.read_text())
+        def result(worker, *_args, **_kwargs):
+            diagnostics = ([{"query": "q", "error": "synthetic provider limit"}]
+                           if worker["id"] == "HUNTER-13" else
+                           [{"query": "q", "returned": 0}])
+            return {**worker, "worker_id": worker["id"],
+                    "scope_version": manifest["scope_version"],
+                    "schema_version": 2, "generated_at": "2026-11-05T00:00:00+00:00",
+                    "candidate_count": 0, "candidates": [], "risk_review_count": 0,
+                    "risk_review": [], "api_metrics": {},
+                    "search_diagnostics": diagnostics}
+        with tempfile.TemporaryDirectory() as tmp:
+            argv = ["scout", "--worker", "ALL", "--manifest", str(manifest_path),
+                    "--queue-root", tmp]
+            with patch("sys.argv", argv), patch.object(scout, "GH"), patch.object(
+                    scout, "corpus_text", return_value=""), patch.object(
+                    scout, "worker_run", side_effect=result):
+                scout.main()
+            self.assertTrue((Path(tmp) / "HUNTER-12.json").exists())
+            self.assertFalse((Path(tmp) / "HUNTER-13.json").exists())
+            self.assertTrue((Path(tmp) / "HUNTER-14.json").exists())
 
     def test_persisted_queue_pairs_are_loaded(self):
         with tempfile.TemporaryDirectory() as tmp:

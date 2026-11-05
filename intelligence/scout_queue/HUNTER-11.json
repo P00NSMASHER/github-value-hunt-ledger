@@ -13,74 +13,69 @@
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Roblox tycoon in Luau: Rojo live-sync, selene + StyLua, Lune offline tests enforced by a pre-commit hook, and a headless Blender asset pipeline.",
-      "discovery_query": "Roblox asset pipeline Blender Rojo",
-      "exact_revision": "800a7a3c897fe4b1a71ea1ac2aa09dc1cb66e304",
-      "forks": 1,
-      "primary_language": "Lua",
+      "description": "A Python-based multi-agent AI system that performs source-grounded research and executive summarization using autonomous agents. The system retrieves real-time web evidence, validates it, and generates a structured executive summary with citations.",
+      "discovery_query": "web evidence citation validation pipeline",
+      "exact_revision": "7f6524fbeaa839cd318b4a7b66164b714d899dd3",
+      "forks": 0,
+      "primary_language": "Python",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-03T14:11:35Z",
-      "repository": "itwillystyle/build-a-startup",
+      "pushed_at": "2025-12-30T17:50:54Z",
+      "repository": "Saathvik-Krishnan/CrewAI-Powered-Multi-Agent-Research-Pipeline-with-LLM-Based-Summarization",
       "root_code_signals": [
-        ".github",
-        "src",
-        "tests"
+        "src"
       ],
-      "size_kb": 3896,
+      "size_kb": 26,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "blender",
-        "game-development",
-        "luau",
-        "lune",
-        "roblox",
-        "rojo",
-        "selene",
-        "tycoon"
-      ],
+      "topics": [],
       "triage_components": {
-        "activity": 15,
+        "activity": 8,
         "description": 4,
-        "forks": 1,
+        "forks": 0,
         "license_metadata": 1,
         "not_archived": 5,
-        "root_code_signals": 9,
+        "root_code_signals": 3,
         "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
+        "substantive_size": 2,
+        "topics": 0
       },
-      "triage_score": 44,
-      "url": "https://github.com/itwillystyle/build-a-startup"
+      "triage_score": 23,
+      "url": "https://github.com/Saathvik-Krishnan/CrewAI-Powered-Multi-Agent-Research-Pipeline-with-LLM-Based-Summarization"
     }
   ],
-  "catalogs": [
-    19,
-    39,
-    40
-  ],
-  "generated_at": "2026-11-03T21:11:00.242500+00:00",
-  "mission": "Game-asset pipelines, provenance, 3D/2D processing, optimization and content factories for StarBlox",
+  "catalogs": [],
+  "evidence_gate": null,
+  "generated_at": "2026-11-05T03:01:44.311800+00:00",
+  "mission": "CaptureBrief verified business research, grounded evidence briefs, ingestion accuracy and customer-facing report QA",
+  "project": "capturebrief",
   "risk_review": [],
   "risk_review_count": 0,
   "schema_version": 2,
+  "scope_version": "active-projects-2026-11-v2",
   "search_diagnostics": [
     {
-      "query": "Roblox asset pipeline Blender Rojo",
+      "query": "evidence backed research report generator",
+      "returned": 0
+    },
+    {
+      "query": "business intelligence source provenance open source",
+      "returned": 0
+    },
+    {
+      "query": "automated research brief report Python",
+      "returned": 0
+    },
+    {
+      "query": "web evidence citation validation pipeline",
       "returned": 1
-    },
-    {
-      "query": "game asset provenance pipeline open source",
-      "returned": 0
-    },
-    {
-      "query": "Roblox mesh optimization pipeline",
-      "returned": 0
-    },
-    {
-      "query": "sprite icon batch generation game assets",
-      "returned": 0
     }
   ],
+  "search_queries": [
+    "evidence backed research report generator",
+    "business intelligence source provenance open source",
+    "automated research brief report Python",
+    "web evidence citation validation pipeline"
+  ],
+  "target_repository": "P00NSMASHER/capturebrief",
   "worker_id": "HUNTER-11"
 }

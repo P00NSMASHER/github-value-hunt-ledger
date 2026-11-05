@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
+import os
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 import unittest
@@ -234,6 +237,28 @@ class GeneratedBotControllerTests(unittest.TestCase):
                 proposal.checked_proposal_state(
                     "scout", "automation/retally-scout-9999999999-1", BASE, HEAD)
             gh.assert_not_called()
+
+    def test_recovery_proposal_requires_app_exact_main_and_worker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            event = Path(tmp) / "event.json"
+            event.write_text(json.dumps({"client_payload": {
+                "worker": "HUNTER-12", "expected_main": BASE}}))
+            env = {"GITHUB_ACTOR": "portfolio-brain-v8-runtime[bot]",
+                   "GITHUB_SHA": BASE, "GITHUB_EVENT_PATH": str(event)}
+            with patch.dict(os.environ, env, clear=True):
+                proposal.verify_event_authority("repository_dispatch", BASE)
+            for bad in (
+                {**env, "GITHUB_ACTOR": "github-actions[bot]"},
+                {**env, "GITHUB_SHA": HEAD},
+            ):
+                with patch.dict(os.environ, bad, clear=True):
+                    with self.assertRaises(ProposalHold):
+                        proposal.verify_event_authority("repository_dispatch", BASE)
+            event.write_text(json.dumps({"client_payload": {
+                "worker": "INTEGRATOR", "expected_main": BASE}}))
+            with patch.dict(os.environ, env, clear=True):
+                with self.assertRaises(ProposalHold):
+                    proposal.verify_event_authority("repository_dispatch", BASE)
 
     def test_untrusted_manual_dispatch_cannot_invoke_bot_merge(self):
         env = {"GITHUB_REPOSITORY": proposal.REPO,
