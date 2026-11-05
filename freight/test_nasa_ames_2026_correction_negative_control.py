@@ -105,6 +105,49 @@ class NasaAmes2026CorrectionNegativeControlTests(unittest.TestCase):
             ), "ISSUER_CONFLICT"
         )
 
+    def test_synthetic_preaward_capture_is_candidate_only_and_late_capture_stays_blocked(self):
+        """A negative-only gate can pass vacuously by rejecting every input.
+
+        Counterfactual control: this case was NOT captured on July 1, 2026.
+        Only an independently authenticated earlier capture could support the
+        positive path; even then it would be a candidate, not award truth.
+        """
+        p = fixture()["identity"]
+        notice = {
+            "solicitation_number": p["solicitation_identifier_referenced"],
+            "agency_code": "NASA",
+            "office": p["office"],
+            "posted_date": "2026-06-16",
+        }
+        award = {
+            "solicitation_identifier": p["solicitation_identifier_referenced"],
+            "matched_issuer_agency_code": "NASA",
+            "matched_issuer_office": p["office"],
+            "award_date_signed": p["award_date"],
+        }
+        hypothetical_preaward_capture = datetime(2026, 7, 1, tzinfo=timezone.utc)
+        self.assertEqual(
+            assess_cross_source_chronology(
+                notice, award, source_observed_at=hypothetical_preaward_capture
+            ),
+            "PREAWARD_CHRONOLOGY_CANDIDATE_ONLY",
+        )
+        # Actual evidence available to this lab is the later correction,
+        # not a contemporaneous June original. It must still fail as-of.
+        self.assertEqual(
+            assess_cross_source_chronology(
+                notice, award, source_observed_at=AS_OBSERVED
+            ),
+            "ARCHIVE_OBSERVED_AFTER_AWARD_NOT_ASOF",
+        )
+        award["matched_issuer_office"] = ""
+        self.assertEqual(
+            assess_cross_source_chronology(
+                notice, award, source_observed_at=hypothetical_preaward_capture
+            ),
+            "ISSUER_NOT_INDEPENDENTLY_MATCHED",
+        )
+
     def test_notice_revision_is_not_award_modification_or_recovered_cash(self):
         c = fixture()
         p = c["identity"]
