@@ -258,3 +258,60 @@ VALUE HANDOFF:
 - COMMERCIAL IMPACT: retain only an analyst-assisted audit-readiness wedge until live inputs, authoritative mappings and evidence-specific remediation are implemented.
 - NEGATIVE KNOWLEDGE: finding-code lists are not next-evidence recommendations; question traces are not routing; DataHub search/screenshots are not proof that live data drives scoring; passing self-authored status cases do not test repairability.
 
+---
+
+TASK: 06 — Multi-jurisdiction structured e-invoice validation with fatal/not-evaluated semantics
+CONDITION: EXPERIMENT
+STARTING HYPOTHESIS: The strongest candidate will expose a versioned registry mapping jurisdiction/profile/version to an ordered XSD/Schematron chain, and preserve not-evaluated state when an earlier fatal stage prevents later rules. A long supported-format list without those execution/reporting semantics will not qualify.
+DISCOVERY METHODS:
+- Direct domain/repository search: seven searches across multi-jurisdiction e-invoice validator, EN 16931, XRechnung, Peppol, Factur-X/FatturaPA and Schematron-registry terms. These found narrower/shallow candidates but did not prove the required semantics.
+- Code-signature search: eight searches for IValidationExecutorSetRegistry, ValidationExecutorSetStatus, FATAL_ERROR, SKIPPED/not evaluated, XRechnung, CIUS-RO and PINT signatures. This surfaced phive/phive-rules without private-ledger answer discovery.
+- Dependency/module graph: followed phive-rules into phive core, phive-rules-foundations, legacy packs and the phorm REST wrapper; traced aggregator order and released dependency pins.
+- Standards/authority and analog graph: compared rule provenance/current versions against ConnectingEurope EN 16931 and KoSIT XRechnung; scoped KoSIT validator, invoice4j/euinvoice-style candidates and phorm.
+- History/package graph: inspected Maven coordinates, releases, exact-SHA checks, NOTICE files and rule-addition commits.
+- Reused SEARCH_SKILLS nested-authority/version audit: verified the outer VES coordinate/status, underlying XSD/Schematron chain, authority version/provenance and serialized result semantics. Did not read BENCHMARK_GOLD.md.
+CANDIDATE: phive + phive-rules validation stack
+CANONICAL URL: https://github.com/phax/phive-rules
+EXACT REVISION: phive-rules 9ce8f8ca508468b7d937125c6aa0278f93b828c9; released engine dependency phive 12.2.0 at tag commit 6df39cb01e7fb11a2353c424c7ef50561ea3c513. Supplementary core-source inspection used phive a5c86937d602f626a228004521101e40bd81004a; decisive execution/result files are unchanged from 12.2.0 to that pin.
+VERDICT: STRONG
+A-F SCORE: A 4 / B 5 / C 5 / D 4 / E 4 / F 3 = 25/30. STRONG reflects verified breadth, explicit layer-state semantics and build compression; it does not imply automatic legal profile selection, authority certification or universal reference-validator parity.
+EVIDENCE INSPECTED:
+- Code inspector: [ValidationExecutionManager.java](https://github.com/phax/phive/blob/a5c86937d602f626a228004521101e40bd81004a/phive-api/src/main/java/com/helger/phive/api/execute/ValidationExecutionManager.java), [ValidationResult.java](https://github.com/phax/phive/blob/a5c86937d602f626a228004521101e40bd81004a/phive-api/src/main/java/com/helger/phive/api/result/ValidationResult.java), EExtendedValidity, XSD/Schematron executors, ValidationSummary, and JSON/XML/HTML serializers.
+- Registry/rules: [PhiveRulesValidation.java](https://github.com/phax/phive-rules/blob/9ce8f8ca508468b7d937125c6aa0278f93b828c9/phive-rules-all/src/main/java/com/helger/phive/rules/all/PhiveRulesValidation.java), EN16931Validation, XRechnungValidation, Peppol registries, CIUS-RO, module POMs/resources. Coverage includes EN 16931, Peppol, XRechnung, ZUGFeRD/Factur-X, France, Danish CIUS/OIOUBL, Portuguese/Romanian CIUS, Norwegian EHF, Croatia, Czechia, Belgium, Italy, Sweden, Serbia, Turkey and foundational FatturaPA/Facturae/Finvoice/KSeF/UBL/CII.
+- Scale: 27 rule modules plus aggregator, 80 Java test classes, thousands of XML fixtures and hundreds of compiled XSLTs. Representative fixture counts: 608 EN 16931, 1,201 XRechnung, 344 Peppol and 331 ZUGFeRD XML files.
+- Tests source-inspected: skipped-result, interrupted-summary, fatal severity, XSD stop-on-error, HTML skipped-layer rendering, registry/resource-integrity, compiled-Schematron and good/bad functional fixture tests.
+- Build/CI: exact phive pin passed Java 17/21/25. Exact rules pin is a [skip ci] version commit; its diff from green 63c3f0dd2234d0dd75a474f4aae3deada799593e is only 28 POM version changes and no Java changes. That commit passed Java 17/21/25.
+- History: rules 4.6.4 was tagged immediately before the inspected snapshot on 2026-10-29; recent substantive history added EN 16931 1.3.17 and Peppol Logistics. Version statuses, deprecations and some effective-date windows exist.
+- Standards/provenance: per-module NOTICE files identify authority/version/license. EN 16931 1.3.17 Schematron sources matched official sources; XRechnung used then-current KoSIT 2.6.0. Java is Apache-2.0; rule artifacts retain EUPL, Apache, LGPL and other/unclear upstream terms.
+- Commercial/ecosystem pass: Maven publication, long history and phorm REST packaging support a short integration path. Value must come from routing, updates, evidence, correction guidance, connectors and SLA.
+- Independent RED-TEAM/VERIFIER: separate agent benchmark06_verifier inspected public pinned source/tests/rules/history without benchmark-answer/private-ledger access and returned STRONG, 25/30, independently confirming fatal-to-skipped propagation and the caveats below.
+CLAIMS VERIFIED:
+- IMPLEMENTED: malformed/non-XML SAX failures become FATAL_ERROR; XSD stops on error by default.
+- IMPLEMENTED: after a stopping invalid layer, every remaining executor receives createSkippedResult rather than being omitted. Artifact identity remains, validity=SKIPPED, error list empty, duration zero.
+- IMPLEMENTED: summaries expose interruption; JSON/XML serialize valid/invalid/skipped/unclear per layer; HTML renders skipped layers.
+- IMPLEMENTED: versioned VES coordinates compose XSD and Schematron/XSLT in order. EN 16931 1.3.17 has CII, UBL Invoice and UBL Credit Note chains; older versions are deprecated. National profiles layer on base syntax/EN 16931 dependencies.
+- IMPLEMENTED: one aggregator registers current modules in dependency order; foundations and optional legacy rules are separately versioned.
+- TEST SOURCE EVIDENCE: tests cover skipped states, interruption, fatal severity, resource existence, Schematron integrity and jurisdiction fixtures. Public CI passed at the core pin and at rules code identical to the exact rules pin.
+- HISTORY/PROVENANCE: active release maintenance and authority/version/license notices are present. This verifies traceability scaffolding, not certification or perpetual freshness.
+CLAIMS NOT VERIFIED:
+- Local Maven tests were attempted after bootstrapping Maven 3.9.11, but dependency resolution failed when repo.maven.apache.org DNS access failed. Tests were source-inspected and external CI verified, not locally executed.
+- No single inspected integration test causes a fatal first layer and asserts all later concrete layers are skipped; behavior is direct in source and covered by separate unit tests.
+- The stack does not universally infer the correct jurisdiction/profile/version. Multiple XRechnung 3.0.x coordinates remain non-deprecated without validity dates, so operators need legal/effective-date routing.
+- Hybrid ZUGFeRD/Factur-X coverage validates XML, not the complete PDF/A-3 container.
+- Matching authority Schematron sources does not prove reference-validator behavior. Locally compiled EN 16931 XSLTs were not byte-identical to official release XSLTs and contained expression differences; behavioral equivalence was not executed.
+- Continuous legal freshness, regulator acceptance, production scale, realized rejection reduction and live buyer adoption were not verified. Mixed third-party artifact rights require per-version review.
+STRONGEST OBJECTION: The engine proves which selected chain ran, failed or was skipped, but cannot by itself prove the selected jurisdiction/profile/version was legally correct for the document/date. Uneven effective-date metadata and unverified compiled-XSLT parity require external authority routing and differential conformance.
+COMMERCIAL WEDGE: Managed pre-submission validation for an ERP, Peppol access point or AP/AR platform, initially XRechnung + Peppol BIS + Factur-X: resolve profile/version, execute pinned rules, return signed/versioned fatal/skipped evidence and corrections, and guarantee update latency. Existing modules/phorm could compress a pilot to roughly 4–8 weeks; moat comes from update operations, connectors, historical replay, conformance and SLA.
+SEARCH EFFORT: 15 explicit queries across direct-domain and code-signature modes; one two-repository stack deep inspection plus dependency/standards/history graphs; three scoped comparator/packaging checks; four specialist roles (code, standards/provenance, commercial/ecosystem, independent red-team).
+FALSE-PROMOTION RISK: Low-medium for core task fit. Risk becomes high if breadth is mistaken for automatic profile selection, current-law certification, PDF-container validation, authority-reference parity or clean universal redistribution rights.
+LESSON: For staged validators, audit terminal-state completeness: enumerate layers, trace a stopping failure, require every later layer to retain identity with explicit skipped/not-evaluated state, and verify serialization plus interruption. Separately audit outer profile/date authority through every artifact and compiled form. Evidence set {06}; one task only for terminal-state completeness, so do not promote to SEARCH_SKILLS.md. Task 06 further supports the already validated nested-authority/version audit.
+COMPLETED_AT: 2026-11-05T18:16:12Z
+
+VALUE HANDOFF:
+- CAPABILITY DELTA: reusable multi-country e-invoice validation with explicit fatal, invalid, skipped and unclear outcomes plus versioned rule identities.
+- GRAPH EDGE: structured invoice + jurisdiction/profile/version → ordered syntax/business-rule validation → machine-readable evidence. No central CAP/OPP/EXP IDs asserted because benchmark answer discovery remained isolated.
+- RADAR SIGNAL: broad maintained convergence around EN 16931/Peppol and national CIUS formats; one stack alone does not prove acceleration.
+- EXPERIMENT IMPACT: start from deterministic execution/evidence and focus experiments on authority routing, differential conformance and signed replay.
+- COMMERCIAL IMPACT: managed validation/update operations embedded in ERP/access-point flows are the shortest paid path; raw validation is not the moat.
+- NEGATIVE KNOWLEDGE: skipped semantics do not establish correct rule selection; matching Schematron sources do not prove compiled parity; XML validation does not validate a hybrid PDF container.
+
