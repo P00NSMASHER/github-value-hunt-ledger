@@ -8,10 +8,10 @@
         "known_nyc_community_derivative_views_review_only": 0,
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 2,
-        "third_party_path_topic_hints_only": 23,
+        "third_party_path_topic_hints_only": 24,
         "unclassified_third_party_catalogs_only": 160
       },
-      "catalog_source_associations": 185,
+      "catalog_source_associations": 186,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -160,7 +160,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 185,
+      "unverified_candidates_after_url_screen": 186,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "freightrecovery": {
@@ -169,9 +169,9 @@
         "official_publisher_host_url_only": 28,
         "pinned_public_anchor_url_only": 5,
         "third_party_path_topic_hints_only": 29,
-        "unclassified_third_party_catalogs_only": 194
+        "unclassified_third_party_catalogs_only": 195
       },
-      "catalog_source_associations": 256,
+      "catalog_source_associations": 257,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -321,7 +321,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 256,
+      "unverified_candidates_after_url_screen": 257,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "permitplate": {
@@ -649,12 +649,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "c69b333f780977f6326e91954b37b9ab1f6aab21d7b2bf350fb6193d1f45a40a",
+  "queue_sha256": "cf2ef06b325b1a9e22cc3c09410be3d7dfc59fddfbc1dfa43aac09485093de89",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "fbbffc98fd59ee9a5a2239d45d0028e729dd265fe6497365334d1ceb5532740c",
-  "unique_public_source_references": 823,
+  "source_ledger_entries_sha256": "2d724cbd1974e3bca61b19226b4ce526bf5ed8e409bdd4d0116e9721e647da8d",
+  "unique_public_source_references": 825,
   "verified_recovered_cash_cents": 0
 }
