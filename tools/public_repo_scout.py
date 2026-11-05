@@ -358,13 +358,21 @@ def main():
     if a.worker!="ALL": ws=[w for w in ws if w.get("id")==a.worker]
     if not ws: raise SystemExit(f"Unknown worker {a.worker}")
     gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root)
+    failures=[]
     for w in ws:
         # A worker's own pending candidates must NOT be treated as already
         # handled; doing so falsely withdraws unreviewed evidence next run.
         prior_pairs=queued_pairs(qr,exclude_worker=w["id"],scope_version=scope_version)
         d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)),prior_pairs,scope_version=scope_version)
         if any("error" in diagnostic for diagnostic in d["search_diagnostics"]):
-            raise RuntimeError(f"Incomplete source discovery for {w['id']}; existing queue preserved")
+            message=f"Incomplete source discovery for {w['id']}; existing queue preserved"
+            if a.worker != "ALL":
+                raise RuntimeError(message)
+            failures.append(w["id"])
+            print(json.dumps({"worker":w["id"], "status":"SOURCE_ERROR",
+                              "existing_queue_preserved":True,
+                              "search_diagnostics":d["search_diagnostics"]},sort_keys=True))
+            continue
         p=qr/f"{w['id']}.json"
         if p.exists():
             previous=json.loads(p.read_text(encoding="utf-8"))
@@ -377,5 +385,10 @@ def main():
                           "evidence_changed":changed,
                           "api_metrics":d["api_metrics"],
                           "search_diagnostics":d["search_diagnostics"]},sort_keys=True))
+    if failures:
+        print(json.dumps({"partial_worker_failures":failures,
+                          "successful_workers":len(ws)-len(failures)},sort_keys=True))
+        if len(failures)==len(ws):
+            raise RuntimeError("All multi-worker source discovery failed; queues preserved")
 
 if __name__=="__main__": main()

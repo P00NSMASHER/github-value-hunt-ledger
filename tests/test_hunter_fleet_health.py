@@ -16,6 +16,8 @@ class HunterFleetHealthTests(unittest.TestCase):
 
     def test_all_gates_and_failure_injection(self):
         now, runs, queues = self.fixture()
+        runs.append({"event": "schedule", "conclusion": "failure",
+                     "created_at": "2026-11-04T05:00:00Z"})
         report = evaluate(runs, queues,
                           "Queue snapshots read: 14\nUnique exact-revision candidates: 81",
                           now, [], False)
