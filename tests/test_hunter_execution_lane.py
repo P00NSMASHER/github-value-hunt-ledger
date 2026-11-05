@@ -22,8 +22,8 @@ def blob(data):
 class FakeAPI:
     def __init__(self):
         self.requests = []
-        self.src = b"def verified_function():\n    return 1\n"
-        self.test = b"def test_verified_function():\n    assert True\n"
+        self.src = b"def verified_function():\n    # The source must have enough bytes to qualify for inspection.\n    return 1\n"
+        self.test = b"def test_verified_function():\n    # This deterministic test has an observable assertion.\n    assert True\n"
         self.license = b"MIT License\nCopyright 2026 Test Team\n"
         self.blobs = {
             blob(self.src): self.src, blob(self.test): self.test,
@@ -114,7 +114,7 @@ class ReadOnlyWorkerTests(unittest.TestCase):
         self.assertFalse(r["external_writes"])
         self.assertEqual("UNKNOWN", r["measured_outcome"])
         files = r["attempts"][0]["inspected_files"]
-        self.assertEqual(2, len(files))  # tiny fixture license falls below size floor
+        self.assertEqual(3, len(files))  # source, test, and exact pinned license
         self.assertTrue(all(x["verified_git_blob"] for x in files))
         self.assertEqual(len(files), len([x for x in api.requests if "/git/blobs/" in x]))
         self.assertTrue(all(x.startswith("/repos/") for x in api.requests))
