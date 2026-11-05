@@ -258,3 +258,111 @@ VALUE HANDOFF:
 - COMMERCIAL IMPACT: retain only an analyst-assisted audit-readiness wedge until live inputs, authoritative mappings and evidence-specific remediation are implemented.
 - NEGATIVE KNOWLEDGE: finding-code lists are not next-evidence recommendations; question traces are not routing; DataHub search/screenshots are not proof that live data drives scoring; passing self-authored status cases do not test repairability.
 
+---
+
+TASK: 06 — Multi-jurisdiction structured e-invoice validation with fatal/not-evaluated semantics
+CONDITION: EXPERIMENT
+STARTING HYPOTHESIS: The strongest candidate will expose a versioned registry mapping jurisdiction/profile/version to an ordered XSD/Schematron chain, and preserve not-evaluated state when an earlier fatal stage prevents later rules. A long supported-format list without those execution/reporting semantics will not qualify.
+DISCOVERY METHODS:
+- Direct domain/repository search: seven searches across multi-jurisdiction e-invoice validator, EN 16931, XRechnung, Peppol, Factur-X/FatturaPA and Schematron-registry terms. These found narrower/shallow candidates but did not prove the required semantics.
+- Code-signature search: eight searches for IValidationExecutorSetRegistry, ValidationExecutorSetStatus, FATAL_ERROR, SKIPPED/not evaluated, XRechnung, CIUS-RO and PINT signatures. This surfaced phive/phive-rules without private-ledger answer discovery.
+- Dependency/module graph: followed phive-rules into phive core, phive-rules-foundations, legacy packs and the phorm REST wrapper; traced aggregator order and released dependency pins.
+- Standards/authority and analog graph: compared rule provenance/current versions against ConnectingEurope EN 16931 and KoSIT XRechnung; scoped KoSIT validator, invoice4j/euinvoice-style candidates and phorm.
+- History/package graph: inspected Maven coordinates, releases, exact-SHA checks, NOTICE files and rule-addition commits.
+- Reused SEARCH_SKILLS nested-authority/version audit: verified the outer VES coordinate/status, underlying XSD/Schematron chain, authority version/provenance and serialized result semantics. Did not read BENCHMARK_GOLD.md.
+CANDIDATE: phive + phive-rules validation stack
+CANONICAL URL: https://github.com/phax/phive-rules
+EXACT REVISION: phive-rules 9ce8f8ca508468b7d937125c6aa0278f93b828c9; released engine dependency phive 12.2.0 at tag commit 6df39cb01e7fb11a2353c424c7ef50561ea3c513. Supplementary core-source inspection used phive a5c86937d602f626a228004521101e40bd81004a; decisive execution/result files are unchanged from 12.2.0 to that pin.
+VERDICT: STRONG
+A-F SCORE: A 4 / B 5 / C 5 / D 4 / E 4 / F 3 = 25/30. STRONG reflects verified breadth, explicit layer-state semantics and build compression; it does not imply automatic legal profile selection, authority certification or universal reference-validator parity.
+EVIDENCE INSPECTED:
+- Code inspector: [ValidationExecutionManager.java](https://github.com/phax/phive/blob/a5c86937d602f626a228004521101e40bd81004a/phive-api/src/main/java/com/helger/phive/api/execute/ValidationExecutionManager.java), [ValidationResult.java](https://github.com/phax/phive/blob/a5c86937d602f626a228004521101e40bd81004a/phive-api/src/main/java/com/helger/phive/api/result/ValidationResult.java), EExtendedValidity, XSD/Schematron executors, ValidationSummary, and JSON/XML/HTML serializers.
+- Registry/rules: [PhiveRulesValidation.java](https://github.com/phax/phive-rules/blob/9ce8f8ca508468b7d937125c6aa0278f93b828c9/phive-rules-all/src/main/java/com/helger/phive/rules/all/PhiveRulesValidation.java), EN16931Validation, XRechnungValidation, Peppol registries, CIUS-RO, module POMs/resources. Coverage includes EN 16931, Peppol, XRechnung, ZUGFeRD/Factur-X, France, Danish CIUS/OIOUBL, Portuguese/Romanian CIUS, Norwegian EHF, Croatia, Czechia, Belgium, Italy, Sweden, Serbia, Turkey and foundational FatturaPA/Facturae/Finvoice/KSeF/UBL/CII.
+- Scale: 27 rule modules plus aggregator, 80 Java test classes, thousands of XML fixtures and hundreds of compiled XSLTs. Representative fixture counts: 608 EN 16931, 1,201 XRechnung, 344 Peppol and 331 ZUGFeRD XML files.
+- Tests source-inspected: skipped-result, interrupted-summary, fatal severity, XSD stop-on-error, HTML skipped-layer rendering, registry/resource-integrity, compiled-Schematron and good/bad functional fixture tests.
+- Build/CI: exact phive pin passed Java 17/21/25. Exact rules pin is a [skip ci] version commit; its diff from green 63c3f0dd2234d0dd75a474f4aae3deada799593e is only 28 POM version changes and no Java changes. That commit passed Java 17/21/25.
+- History: rules 4.6.4 was tagged immediately before the inspected snapshot on 2026-10-29; recent substantive history added EN 16931 1.3.17 and Peppol Logistics. Version statuses, deprecations and some effective-date windows exist.
+- Standards/provenance: per-module NOTICE files identify authority/version/license. EN 16931 1.3.17 Schematron sources matched official sources; XRechnung used then-current KoSIT 2.6.0. Java is Apache-2.0; rule artifacts retain EUPL, Apache, LGPL and other/unclear upstream terms.
+- Commercial/ecosystem pass: Maven publication, long history and phorm REST packaging support a short integration path. Value must come from routing, updates, evidence, correction guidance, connectors and SLA.
+- Independent RED-TEAM/VERIFIER: separate agent benchmark06_verifier inspected public pinned source/tests/rules/history without benchmark-answer/private-ledger access and returned STRONG, 25/30, independently confirming fatal-to-skipped propagation and the caveats below.
+CLAIMS VERIFIED:
+- IMPLEMENTED: malformed/non-XML SAX failures become FATAL_ERROR; XSD stops on error by default.
+- IMPLEMENTED: after a stopping invalid layer, every remaining executor receives createSkippedResult rather than being omitted. Artifact identity remains, validity=SKIPPED, error list empty, duration zero.
+- IMPLEMENTED: summaries expose interruption; JSON/XML serialize valid/invalid/skipped/unclear per layer; HTML renders skipped layers.
+- IMPLEMENTED: versioned VES coordinates compose XSD and Schematron/XSLT in order. EN 16931 1.3.17 has CII, UBL Invoice and UBL Credit Note chains; older versions are deprecated. National profiles layer on base syntax/EN 16931 dependencies.
+- IMPLEMENTED: one aggregator registers current modules in dependency order; foundations and optional legacy rules are separately versioned.
+- TEST SOURCE EVIDENCE: tests cover skipped states, interruption, fatal severity, resource existence, Schematron integrity and jurisdiction fixtures. Public CI passed at the core pin and at rules code identical to the exact rules pin.
+- HISTORY/PROVENANCE: active release maintenance and authority/version/license notices are present. This verifies traceability scaffolding, not certification or perpetual freshness.
+CLAIMS NOT VERIFIED:
+- Local Maven tests were attempted after bootstrapping Maven 3.9.11, but dependency resolution failed when repo.maven.apache.org DNS access failed. Tests were source-inspected and external CI verified, not locally executed.
+- No single inspected integration test causes a fatal first layer and asserts all later concrete layers are skipped; behavior is direct in source and covered by separate unit tests.
+- The stack does not universally infer the correct jurisdiction/profile/version. Multiple XRechnung 3.0.x coordinates remain non-deprecated without validity dates, so operators need legal/effective-date routing.
+- Hybrid ZUGFeRD/Factur-X coverage validates XML, not the complete PDF/A-3 container.
+- Matching authority Schematron sources does not prove reference-validator behavior. Locally compiled EN 16931 XSLTs were not byte-identical to official release XSLTs and contained expression differences; behavioral equivalence was not executed.
+- Continuous legal freshness, regulator acceptance, production scale, realized rejection reduction and live buyer adoption were not verified. Mixed third-party artifact rights require per-version review.
+STRONGEST OBJECTION: The engine proves which selected chain ran, failed or was skipped, but cannot by itself prove the selected jurisdiction/profile/version was legally correct for the document/date. Uneven effective-date metadata and unverified compiled-XSLT parity require external authority routing and differential conformance.
+COMMERCIAL WEDGE: Managed pre-submission validation for an ERP, Peppol access point or AP/AR platform, initially XRechnung + Peppol BIS + Factur-X: resolve profile/version, execute pinned rules, return signed/versioned fatal/skipped evidence and corrections, and guarantee update latency. Existing modules/phorm could compress a pilot to roughly 4–8 weeks; moat comes from update operations, connectors, historical replay, conformance and SLA.
+SEARCH EFFORT: 15 explicit queries across direct-domain and code-signature modes; one two-repository stack deep inspection plus dependency/standards/history graphs; three scoped comparator/packaging checks; four specialist roles (code, standards/provenance, commercial/ecosystem, independent red-team).
+FALSE-PROMOTION RISK: Low-medium for core task fit. Risk becomes high if breadth is mistaken for automatic profile selection, current-law certification, PDF-container validation, authority-reference parity or clean universal redistribution rights.
+LESSON: For staged validators, audit terminal-state completeness: enumerate layers, trace a stopping failure, require every later layer to retain identity with explicit skipped/not-evaluated state, and verify serialization plus interruption. Separately audit outer profile/date authority through every artifact and compiled form. Evidence set {06}; one task only for terminal-state completeness, so do not promote to SEARCH_SKILLS.md. Task 06 further supports the already validated nested-authority/version audit.
+COMPLETED_AT: 2026-11-05T18:16:12Z
+
+VALUE HANDOFF:
+- CAPABILITY DELTA: reusable multi-country e-invoice validation with explicit fatal, invalid, skipped and unclear outcomes plus versioned rule identities.
+- GRAPH EDGE: structured invoice + jurisdiction/profile/version → ordered syntax/business-rule validation → machine-readable evidence. No central CAP/OPP/EXP IDs asserted because benchmark answer discovery remained isolated.
+- RADAR SIGNAL: broad maintained convergence around EN 16931/Peppol and national CIUS formats; one stack alone does not prove acceleration.
+- EXPERIMENT IMPACT: start from deterministic execution/evidence and focus experiments on authority routing, differential conformance and signed replay.
+- COMMERCIAL IMPACT: managed validation/update operations embedded in ERP/access-point flows are the shortest paid path; raw validation is not the moat.
+- NEGATIVE KNOWLEDGE: skipped semantics do not establish correct rule selection; matching Schematron sources do not prove compiled parity; XML validation does not validate a hybrid PDF container.
+
+---
+
+TASK: 07 — Construction drawing revision registration and changed-region detection
+CONDITION: EXPERIMENT
+STARTING HYPOTHESIS: The qualifying system will estimate a geometric transform between revisions from drawing structure or features, warp both revisions into a common coordinate system, tolerate rendering residuals, and then segment changed regions. A tool that merely rasterizes PDFs and subtracts pixels will fail under translation, rotation, scale drift or moved views.
+DISCOVERY METHODS:
+- Direct domain search: construction drawing revision alignment/homography/change-region and blueprint compare/registration queries.
+- Code-signature search: estimateAffinePartial2D, RANSAC, homography, ECC and changed-region signatures scoped to architectural/CAD drawing comparison.
+- Low-attention repository and comparator graph: inspected a small engineering-drawing desktop tool, a one-commit architectural-drawing prototype, and a mature DXF-native revision engine.
+- Exact-fit invariant comparison: required arbitrary scale estimation, confidence/failure behavior and changed-region output, rather than accepting generic overlay or unit conversion claims. SEARCH_SKILLS procedures were used without private-ledger answer discovery; BENCHMARK_GOLD.md and sibling-arm answers were not read.
+CANDIDATE: DrawingContrast
+CANONICAL URL: https://github.com/ayumilove/DrawingContrast
+EXACT REVISION: 2d7112dfb61d91806fc37e60a0dd1f0873202209; tag v0.5.1; commit dated 2026-08-10T12:52:14+08:00.
+VERDICT: WATCH
+A-F SCORE: A 3 / B 4 / C 4 / D 4 / E 2 / F 3 = 20/30. The source implements the defining geometry and region pipeline, but absent tests and fail-open paths prevent STRONG.
+EVIDENCE INSPECTED:
+- Code inspector: [generate_diff_layers.py](https://github.com/ayumilove/DrawingContrast/blob/2d7112dfb61d91806fc37e60a0dd1f0873202209/src/drawing_contrast/core/generate_diff_layers.py), [view_blocks.py](https://github.com/ayumilove/DrawingContrast/blob/2d7112dfb61d91806fc37e60a0dd1f0873202209/src/drawing_contrast/core/view_blocks.py), and [vlm_analyzer.py](https://github.com/ayumilove/DrawingContrast/blob/2d7112dfb61d91806fc37e60a0dd1f0873202209/src/drawing_contrast/core/vlm_analyzer.py).
+- Registration source: global feature mode uses AKAZE descriptors, Lowe-ratio matches, RANSAC estimateAffinePartial2D, explicit translation/rotation/scale diagnostics and transform bounds; ECC mode also uses an affine model. The production run_comparison path selects feature mode.
+- Change source: aligned linework is compared with distance-transform tolerance, morphological cleanup and a focus mask; added/removed masks are clustered into connected changed-region bounding boxes. Per-view block matching performs additional affine registration and records moved views.
+- Schema/output: meta.json records focus area, added/removed pixel counts, different_drawings, bounded regions, moved_views, view statistics, low_confidence, summary and analysis status. This is a file schema rather than a versioned database schema.
+- Tests/history: no tests directory or CI test workflow exists at the exact revision. The repository is tagged v0.5.1 and has a short four-commit public history; the inspected head commit is a desktop-server shutdown fix, so history does not independently validate comparison accuracy.
+- Provenance/deployment: MIT license; Python 3.11 desktop application using OpenCV, PyMuPDF and optional external VLM calls. No construction deployment, dataset, benchmark, release adoption or customer evidence was found.
+- Deep comparators: Mirdula18/AI-Based-Image-Difference-Detection at d8818d79788c72dd9c0df824872cd0caa9d58b59 implements border/SIFT/ORB homography and fail-closed pipeline behavior, but 2 of 9 focused local tests failed, including its own 1.03x scale-plus-offset registration case. jeremylongshore/cad-ai-agent at 3215dc0b0b706e5b280798e00bf8b512dbb9cfbc is mature and DXF-native but only estimates rigid translation/rotation plus known-unit normalization.
+- Independent RED-TEAM/VERIFIER: a separate skeptical agent inspected and executed the strongest mature comparator at its exact revision. It returned WATCH after 75 focused tests passed, then falsified general scale correction with a same-unit 1.10x adversarial grid: alignment confidence was 0.0, comparison continued, and all 12 entities were classified MODIFIED. This pass independently guarded against promoting unit normalization or rigid alignment as arbitrary scale-drift correction.
+CLAIMS VERIFIED:
+- IMPLEMENTED: global affine registration estimates translation, rotation and uniform scale from drawing features; it is not a naive PDF pixel overlay.
+- IMPLEMENTED: RANSAC inlier count/ratio, translation and scale bounds reject some implausible feature transforms; view-block alignment uses similar affine matching and scale bounds.
+- IMPLEMENTED: distance-tolerant linework differencing suppresses small registration/rendering jitter, creates separate added/removed overlays and clusters differences into up to 20 bounding-box regions.
+- IMPLEMENTED: view-block segmentation/matching can align moved drawing views separately and report them as movements instead of treating every displaced pixel as a change.
+- TESTED COUNTEREVIDENCE: the architectural homography comparator's own focused suite produced 7 passed / 2 failed. Its defining scale-plus-offset fixture was rejected at 0.754 confidence, and the blank-image test expected a returned failure object while source now raises RegistrationError.
+- INDEPENDENTLY TESTED COUNTEREVIDENCE: the mature DXF comparator does not estimate arbitrary scale and can continue after failed alignment, producing sheet-wide false changes.
+CLAIMS NOT VERIFIED:
+- DrawingContrast has no automated tests. Affine recovery accuracy, changed-region precision/recall, moved-view correctness and performance were source-inspected only; the desktop/VLM application was not run end to end.
+- Global feature alignment can return the original unregistered image when features are insufficient or matching fails. run_comparison may continue to difference it; ECC failure likewise falls back to translation. A failed registration is therefore not consistently quarantined.
+- The default focus rectangle can exclude legitimate title-block, note or lower-sheet changes. Optional AI focus and VLM descriptions depend on external model behavior and do not establish deterministic recall.
+- Sheet pairing/version provenance, multipage matching, raster/vector fidelity, construction-standard semantics, reviewer sign-off, immutable evidence, production deployment and realized savings are unverified.
+STRONGEST OBJECTION: The best task-fit code has no tests and can continue into region extraction after unsuccessful registration. On repetitive or low-feature drawings, a scale/registration failure could become an authoritative-looking field of changed regions; the most explicitly architectural alternative fails its own scale-drift example.
+COMMERCIAL WEDGE: Analyst-assisted revision review for subcontractor estimators, fabrication/detailing teams and document controllers: compare issued drawing revisions, surface registered added/removed/moved regions, and require a reviewer to confirm scope before pricing or release. The money path is faster addendum/change-order review and fewer missed-scope or rework events. A paid pilot needs a real paired-revision corpus, sheet/version matching, measured recall and a fail-closed review queue.
+SEARCH EFFORT: 8 distinct queries across direct-domain and code-signature modes, plus low-attention repository/comparator and history graphs; exactly 3 deep inspections; specialist code, commercial/comparator and independent skeptical-verifier passes. No BENCHMARK_GOLD, sibling CONTROL answer, SCOREBOARD scoring or private-ledger answer discovery.
+FALSE-PROMOTION RISK: High if affine code presence, an AI summary, or red/blue overlays are mistaken for validated construction revision recall. WATCH retained; no SEARCH_SKILLS promotion.
+LESSON: Task 07 adds one-task evidence for a registration-first search signature: require an estimated transform with explicit scale, warp into common coordinates, tolerant differencing and region extraction. It also adds a concrete promotion gate: registration failure must suppress or quarantine downstream change claims, and a synthetic scale-plus-offset fixture must pass. Evidence set {07}; do not promote centrally.
+COMPLETED_AT: 2026-11-05T20:09:07Z
+
+VALUE HANDOFF:
+- CAPABILITY DELTA: reusable affine registration, tolerant engineering-linework differencing, moved-view handling and changed-region extraction, qualified by missing tests and fail-open paths.
+- GRAPH EDGE: old/new drawing revisions → geometric registration → added/removed/moved regions → analyst review. No central CAP/OPP/EXP identifiers asserted because benchmark discovery remained isolated.
+- RADAR SIGNAL: three independent implementations converge on registration-aware drawing revision comparison, but evidence is too thin to establish commercial acceleration.
+- EXPERIMENT IMPACT: the next falsifiable experiment is a labeled construction corpus with translation/rotation/scale perturbations, sheet pairing and required quarantine below registration confidence.
+- COMMERCIAL IMPACT: a human-reviewed change-order/addendum triage product is plausible; unattended scope determination is not supported.
+- NEGATIVE KNOWLEDGE: known-unit conversion is not arbitrary scale correction; affine code without an executed fixture is weak evidence; a changed-region overlay is unsafe when registration failure does not halt the pipeline.
+

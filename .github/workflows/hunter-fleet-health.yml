@@ -3,6 +3,14 @@ name: Hunter Fleet Health
 on:
   schedule:
     - cron: "37 * * * *"
+  # Re-check the live inspection pipeline after this monitor is released.
+  # This is event-driven, not an additional recurring scout schedule.
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/hunter-fleet-health.yml"
+      - "tools/hunter_fleet_health.py"
+      - "tests/test_hunter_fleet_health.py"
   workflow_dispatch:
     inputs:
       inject_failure:

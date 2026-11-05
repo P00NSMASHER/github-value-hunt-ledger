@@ -20,6 +20,25 @@ class ScoutTests(unittest.TestCase):
         self.assertIn('"repository_dispatch"',proposal)
         self.assertIn('verify_event_authority(str(event), base)',proposal)
 
+    def test_recovery_dispatch_performs_separate_inspection_only_with_exact_app_authority(self):
+        workflow = Path(".github/workflows/public-repo-hunter.yml").read_text(encoding="utf-8")
+        self.assertEqual(workflow.count("- cron:"), 15)
+        scout = workflow.split("\n  scout:\n", 1)[1].split("\n  submit-pr:\n", 1)[0]
+        inspect = workflow.split("\n  candidate-inspection:\n", 1)[1]
+        for section in (scout, inspect):
+            self.assertIn("github.actor == 'portfolio-brain-v8-runtime[bot]'", section)
+            self.assertIn("github.event.client_payload.expected_main == github.sha", section)
+        self.assertIn("github.event_name == 'repository_dispatch'", inspect)
+        self.assertIn("needs.scout.result == 'success'", inspect)
+        self.assertIn("needs.scout.outputs.worker != 'INTEGRATOR'", inspect)
+        self.assertIn("permissions:\n      contents: read", inspect)
+        self.assertNotIn("contents: write", inspect)
+        self.assertIn("hunter-inspection-", inspect)
+        self.assertIn("python -m tools.hunter_delivery_acceptance", inspect)
+        # Recovery source inspection does not add another timer or authorize V16 activation.
+        self.assertNotIn("schedule:", inspect)
+        self.assertNotIn("ti_worker_claim.py", inspect)
+
     def test_exact_revision_dedupe(self):
         c="example/project abcdef123456"
         self.assertTrue(known(c,"example/project","abcdef123456"))

@@ -5,32 +5,12 @@
     {
       "action": "Finish the remaining frozen benchmark experiment conditions in clean contexts before using adaptive measurement packets.",
       "code": "frozen_benchmark_incomplete",
-      "matched_tasks": 47,
+      "matched_tasks": 49,
       "required_matched_tasks": 50,
       "unmatched_task_ids": [
-        "06",
-        "07",
         "08"
       ],
       "unmatched_tasks": [
-        {
-          "completed_arms": [
-            "CONTROL"
-          ],
-          "missing_arms": [
-            "EXPERIMENT"
-          ],
-          "task_id": "06"
-        },
-        {
-          "completed_arms": [
-            "CONTROL"
-          ],
-          "missing_arms": [
-            "EXPERIMENT"
-          ],
-          "task_id": "07"
-        },
         {
           "completed_arms": [
             "CONTROL"
@@ -56,7 +36,7 @@
     "active_generated_claim_count": 0,
     "active_generated_claim_ids": [],
     "current_activations": 0,
-    "matched_benchmark_tasks": 47,
+    "matched_benchmark_tasks": 49,
     "pending_split_claims": 0,
     "required_matched_benchmark_tasks": 50,
     "required_shadow_runs": 15,
@@ -70,29 +50,9 @@
     "split_receipts": 3,
     "split_secret_available": true,
     "unmatched_benchmark_task_ids": [
-      "06",
-      "07",
       "08"
     ],
     "unmatched_benchmark_tasks": [
-      {
-        "completed_arms": [
-          "CONTROL"
-        ],
-        "missing_arms": [
-          "EXPERIMENT"
-        ],
-        "task_id": "06"
-      },
-      {
-        "completed_arms": [
-          "CONTROL"
-        ],
-        "missing_arms": [
-          "EXPERIMENT"
-        ],
-        "task_id": "07"
-      },
       {
         "completed_arms": [
           "CONTROL"
