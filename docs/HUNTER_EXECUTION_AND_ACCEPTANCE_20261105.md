@@ -31,7 +31,13 @@ CLI for code checks: python -m unittest tests.test_hunter_source_inspection test
 
 CLI for proof readback: python -m tools.hunter_delivery_acceptance --output hunter-delivery-acceptance.json
 
-## Existing governed adaptive-learning runtime
-This change intentionally leaves intelligence/hunter_runtime_policy.json and the V16 benchmark/activation system untouched. Its restart readiness file still records frozen benchmark task gaps (06, 07 and 08). No generated READY/activation/CLAIM is forged. Those original workers remain governed by existing policy; this additional GitHub source-inspection job is not a replacement for the benchmark-gated human/AI worker runtime.
+## Schedule/recovery identity delivery boundary
 
-To verify real execution, inspect the post-merge workflow run and independently retrieve its candidate-inspection job/artifact. Green CI or local tests alone are not sufficient evidence.
+PR #1059 merged schedule/recovery slot labeling and the integrator-receipt path at commit `30212c153d0d4329802ed9cdba44ea8d33e964e0`. Its exact-head Active Scout Scope Guard, main-only policy and repository release jobs passed. Post-merge run `42154864214` then exercised the `SOURCE_PUSH` path on that exact main revision: scout, tests, candidate inspection and delivery-acceptance checks succeeded, and artifacts `hunter-evidence-HUNTER-01-42154864214-1` plus `hunter-inspection-42154864214-1` were retained.
+
+This proves the merged source-push smoke path and its source-inspection receipt. It does **not** yet prove a native schedule-event invocation using the new provider-visible slot label, a recovery-dispatch invocation carrying `scheduled_slot`, or creation of the integrator-specific artifact; that integrator step was correctly skipped in the HUNTER-01 source-push run. Those three observations remain pending and must not be inferred from green CI or the merged workflow definition.
+
+## Existing governed adaptive-learning runtime
+Protected-main `benchmark/SCOREBOARD.md` now freezes all **50/50 matched tasks and 100 independently scored arms** with the final 50-task conclusion. The benchmark has no remaining task gaps. Completion grants no activation authority: the adaptive Hunter runtime remains **PAUSED / AWAITING_EXPLICIT_USER_APPROVAL**, and no generated READY, activation or CLAIM may be forged. This GitHub source-inspection path is not a replacement for the separately governed worker runtime.
+
+To verify real execution, inspect the applicable post-merge workflow run and independently retrieve its job/artifact. Green CI or local tests alone are not sufficient evidence.
