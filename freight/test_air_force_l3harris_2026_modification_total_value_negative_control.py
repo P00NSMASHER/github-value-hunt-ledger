@@ -30,6 +30,8 @@ OFFICIAL = {
     "notice_id": "FA8538-25-D-0003-P00002",
     "source_notice_uuid": "77acd7b42a5541e899acbea386182fb8",
     "related_solicitation": "FA8538-24-R-0014",
+    "original_solicitation_in_description": "FA8538-24-R-0014-0001",
+    "contract_award_line_solicitation_in_description": "FA8538-24-R-0014-001",
     "contractor": "L3HARRIS TECHNOLOGIES, INC.",
     "contractor_uei": "PMH3MAVQGE44",
     "award_date_header": "2026-09-22",
@@ -66,6 +68,19 @@ def assess_claim(source: dict, claim: dict) -> str:
     if (source["prior_total_usd_cents"] + source["modification_action_usd_cents"]
             != source["new_total_usd_cents"]):
         return "UNKNOWN_INCONSISTENT_ISSUER_AMOUNTS"
+    # Official header and two description fields name three DIFFERENT
+    # solicitation strings. A claim of a verified exact original-solicitation
+    # join cannot inherit the notice-level modification consistency result.
+    if "claimed_original_solicitation" in claim:
+        refs = {
+            source["related_solicitation"],
+            source["original_solicitation_in_description"],
+            source["contract_award_line_solicitation_in_description"],
+        }
+        if len(refs) != 1:
+            return "UNKNOWN_CONFLICTING_ISSUER_SOLICITATION_REFERENCES"
+        if claim["claimed_original_solicitation"] not in refs:
+            return "UNKNOWN_UNMATCHED_ISSUER_SOLICITATION"
     if claim.get("award_date") == source["award_date_in_description"]:
         return "UNKNOWN_CONFLICTING_ISSUER_AWARD_YEAR"
     if claim.get("claimed_new_base_award_usd_cents") == source["new_total_usd_cents"]:
@@ -143,6 +158,32 @@ class AirForceL3HarrisSourceBoundNegativeControl(unittest.TestCase):
             notice, award, source_observed_at=datetime(
                 2026, 11, 6, tzinfo=timezone.utc)),
             "FUTURE_POSTED_NOTICE_NOT_PREAWARD")
+
+    def test_three_official_solicitation_strings_cannot_be_joined_as_exact(self):
+        # SAM.gov related-notice header and description items (8) and (11)
+        # disagree; the agency's notice is NOT a validated exact-source join.
+        refs = {
+            OFFICIAL["related_solicitation"],
+            OFFICIAL["original_solicitation_in_description"],
+            OFFICIAL["contract_award_line_solicitation_in_description"],
+        }
+        self.assertEqual(len(refs), 3)
+        for claimed in (*sorted(refs), "FA8538-24-R-0014-9999"):
+            with self.subTest(claimed=claimed):
+                wrong = candidate()
+                wrong["claimed_original_solicitation"] = claimed
+                self.assertEqual(
+                    assess_claim(OFFICIAL, wrong),
+                    "UNKNOWN_CONFLICTING_ISSUER_SOLICITATION_REFERENCES",
+                )
+        # The source itself must not be rewritten to a unified identity.
+        forged = copy.deepcopy(OFFICIAL)
+        forged["original_solicitation_in_description"] = (
+            forged["related_solicitation"])
+        self.assertEqual(
+            assess_claim(forged, candidate()),
+            "UNKNOWN_SOURCE_NOT_AUTHENTICATED",
+        )
 
     def test_original_notice_is_not_obligation_payment_or_rights_evidence(self):
         self.assertIsNone(OFFICIAL["original_bytes_sha256"])
