@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 67,
+    "api_requests": 66,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -28,7 +28,7 @@
         "schemas"
       ],
       "size_kb": 10969,
-      "stars": 16461,
+      "stars": 16466,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ast",
@@ -123,7 +123,7 @@
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T04:00:14Z",
+      "pushed_at": "2026-11-06T09:44:23Z",
       "repository": "PramodBasavarajMenasi/siftwise",
       "root_code_signals": [
         ".github",
@@ -167,7 +167,7 @@
       "description": "\ud83c\udfa8 Vibe Design System - Official monday.com UI resources for application development in React.js",
       "discovery_query": "typescript codemod",
       "exact_revision": "3b9e85b6bf473b8635fa7c8f70ebce745d2d2fa6",
-      "forks": 367,
+      "forks": 366,
       "primary_language": "TypeScript",
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-05T23:47:18Z",
@@ -220,11 +220,11 @@
       "default_branch": "trunk",
       "description": "TypeScript geospatial SDK: one protocol-neutral contract over GeoServices REST, OGC API, STAC, WMS/WMTS/WFS, and OData \u2014 MapLibre-first runtime, GIS widget-migration codemod, and a platform-free MCP server.",
       "discovery_query": "typescript codemod",
-      "exact_revision": "66072e13d0c5493add8d2c65bfe3eb4f6b38eeab",
+      "exact_revision": "96d232ec0fede17c303a4327d70b264598d48d13",
       "forks": 1,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T02:53:06Z",
+      "pushed_at": "2026-11-06T09:32:52Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -233,7 +233,7 @@
         "src",
         "test"
       ],
-      "size_kb": 1790827,
+      "size_kb": 1795079,
       "stars": 5,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -501,11 +501,11 @@
       "default_branch": "main",
       "description": "Open-source test-impact analysis for faster CI, with conservative fallbacks and reproducible evidence",
       "discovery_query": "test impact analysis",
-      "exact_revision": "8b7ffa59a35ad5ee8a7c0efbcd76cb12497d0c40",
+      "exact_revision": "71f3bc621738d9c020cbf6fced56e2fd27e4f51c",
       "forks": 4,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T04:05:58Z",
+      "pushed_at": "2026-11-06T09:41:40Z",
       "repository": "DiffCI/core",
       "root_code_signals": [
         ".github",
@@ -513,7 +513,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 1411,
+      "size_kb": 1430,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -554,6 +554,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T18:09:54Z",
       "repository": "semitexa/laravel-ai-verify",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "src",
@@ -647,11 +648,11 @@
       "default_branch": "main",
       "description": "Upgrade agent for TypeScript apps: when an API changes, Shim opens one tested pull request. First up: Vercel AI SDK 6 to 7",
       "discovery_query": "typescript codemod",
-      "exact_revision": "fd8f54971308bab140ca1c8e26d3bb23cf97fe75",
+      "exact_revision": "63b8d7b07d5e66ef677cdae8ebdb5c05cf57480c",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T05:17:31Z",
+      "pushed_at": "2026-11-06T08:58:26Z",
       "repository": "JayanthMalladi/shim",
       "root_code_signals": [
         ".github",
@@ -659,7 +660,7 @@
         "src",
         "test"
       ],
-      "size_kb": 9529,
+      "size_kb": 9542,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -709,6 +710,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T17:51:58Z",
       "repository": "adiarora06/RepoRipple",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -810,7 +812,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-06T05:24:44.879278+00:00",
+  "generated_at": "2026-11-06T09:46:44.294839+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
