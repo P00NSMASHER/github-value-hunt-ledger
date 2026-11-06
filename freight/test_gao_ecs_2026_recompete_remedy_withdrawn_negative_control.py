@@ -80,8 +80,13 @@ def decide(source_original: dict, source_modified: dict, claim: dict) -> str:
     """Only adjudicate *what these GAO decisions establish*, not award truth."""
     if any(type(x) is not dict for x in (source_original, source_modified, claim)):
         return "UNKNOWN_MALFORMED_EVIDENCE"
-    if (any(source_original.get(k) != v for k, v in ORIGINAL_ANCHOR)
-            or any(source_modified.get(k) != v for k, v in MODIFIED_ANCHOR)):
+    # Exact key membership is critical: dict.get() alone treats a missing
+    # formerly UNKNOWN/None key as indistinguishable from original None,
+    # and would silently permit extra invented paid-cash fields.
+    if (set(source_original) != {k for k, _ in ORIGINAL_ANCHOR}
+            or set(source_modified) != {k for k, _ in MODIFIED_ANCHOR}
+            or any(source_original[k] != v for k, v in ORIGINAL_ANCHOR)
+            or any(source_modified[k] != v for k, v in MODIFIED_ANCHOR)):
         return "UNKNOWN_TAMPERED_TRANSCRIPTION"
     if (source_original["issuer"] != source_modified["issuer"]
             or source_original["office"] != source_modified["office"]
@@ -219,6 +224,26 @@ class GAOECS2026WithdrawnRecompetitionNegativeControl(unittest.TestCase):
             with self.subTest(target=target, field=field):
                 original, modified = copy.deepcopy(ORIGINAL), copy.deepcopy(MODIFIED)
                 (original if target == "original" else modified)[field] = forged_value
+                self.assertEqual(
+                    decide(original, modified,
+                           claim("GAO_MAY_REAWARD_OR_RECOMPETE_ORDER")),
+                    "UNKNOWN_TAMPERED_TRANSCRIPTION",
+                )
+
+    def test_removed_unknown_field_or_extra_cash_field_fails_closed(self):
+        for target, mutation, field in (
+            ("original", "remove", "verified_army_award_contract_id"),
+            ("modified", "remove", "reimbursement_paid_usd"),
+            ("original", "extra", "settled_customer_cash_usd"),
+            ("modified", "extra", "settled_customer_cash_usd"),
+        ):
+            with self.subTest(target=target, mutation=mutation, field=field):
+                original, modified = copy.deepcopy(ORIGINAL), copy.deepcopy(MODIFIED)
+                record = original if target == "original" else modified
+                if mutation == "remove":
+                    record.pop(field)
+                else:
+                    record[field] = "9999.99"
                 self.assertEqual(
                     decide(original, modified,
                            claim("GAO_MAY_REAWARD_OR_RECOMPETE_ORDER")),
