@@ -111,6 +111,30 @@ class VA2026AwardNoticeNegativeControls(unittest.TestCase):
             "PREAWARD_CHRONOLOGY_CANDIDATE_ONLY",
         )
 
+    def test_updated_solicitation_cannot_be_observed_before_publication(self):
+        """Independent VA notice timing control; neither capture is evidence.
+
+        The agency's Apr 13 amendment cannot appear in an Apr 12 snapshot.
+        An Apr 14 snapshot is only a counterfactual candidate, not proof
+        that this lab captured the updated source then.
+        """
+        notice, award = chronology_inputs()
+        notice["posted_date"] = SOURCE["solicitation_updated_publication_date"]
+        self.assertEqual(
+            assess_cross_source_chronology(
+                notice, award,
+                source_observed_at=datetime(2026, 4, 12, tzinfo=timezone.utc),
+            ),
+            "SOURCE_OBSERVED_BEFORE_NOTICE_POSTED_NOT_ASOF",
+        )
+        self.assertEqual(
+            assess_cross_source_chronology(
+                notice, award,
+                source_observed_at=HYPOTHETICAL_APRIL_CAPTURE,
+            ),
+            "PREAWARD_CHRONOLOGY_CANDIDATE_ONLY",
+        )
+
     def test_solicitation_id_not_award_id_and_issuer_must_match(self):
         notice, award = chronology_inputs()
         notice["solicitation_number"] = SOURCE["award_contract_id"]

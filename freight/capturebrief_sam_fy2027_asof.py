@@ -319,6 +319,10 @@ def assess_cross_source_chronology(
         return "SOURCE_DATE_UNKNOWN"
     if posted >= signed:
         return "FUTURE_POSTED_NOTICE_NOT_PREAWARD"
+    if source_day < posted:
+        # A specific notice revision cannot be present before its publication.
+        # A later archive copy cannot backfill an earlier as-of observation.
+        return "SOURCE_OBSERVED_BEFORE_NOTICE_POSTED_NOT_ASOF"
     if source_day >= signed:
         # Crucial anti-leakage guard: PostedDate is not proof the specific
         # archived source was captured before the award happened.
