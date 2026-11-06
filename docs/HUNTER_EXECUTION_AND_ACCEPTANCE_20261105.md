@@ -31,7 +31,15 @@ CLI for code checks: python -m unittest tests.test_hunter_source_inspection test
 
 CLI for proof readback: python -m tools.hunter_delivery_acceptance --output hunter-delivery-acceptance.json
 
-## Existing governed adaptive-learning runtime
-This change intentionally leaves intelligence/hunter_runtime_policy.json and the V16 benchmark/activation system untouched. Its restart readiness file still records frozen benchmark task gaps (06, 07 and 08). No generated READY/activation/CLAIM is forged. Those original workers remain governed by existing policy; this additional GitHub source-inspection job is not a replacement for the benchmark-gated human/AI worker runtime.
+## Schedule/recovery identity delivery boundary
 
-To verify real execution, inspect the post-merge workflow run and independently retrieve its candidate-inspection job/artifact. Green CI or local tests alone are not sufficient evidence.
+PR #1059 merged schedule/recovery slot labeling and the integrator-receipt path at commit `30212c153d0d4329802ed9cdba44ea8d33e964e0`. Its exact-head Active Scout Scope Guard, main-only policy and repository release jobs passed. Post-merge run `42154864214` then exercised the `SOURCE_PUSH` path on that exact main revision: scout, tests, candidate inspection and delivery-acceptance checks succeeded, and artifacts `hunter-evidence-HUNTER-01-42154864214-1` plus `hunter-inspection-42154864214-1` were retained.
+
+Recovery-dispatch run `42168125358` subsequently exercised the provider-visible identity `HUNTER-01 slot=2026-11-06T02:07:00Z` against protected-main commit `cc5a48f5f80d36f14a53817435e545a3d42e0ed4`. Its scout, candidate-inspection and proposal-submission jobs succeeded. Artifact `13480012090` (`hunter-evidence-HUNTER-01-42168125358-1`, SHA-256 `32b6d31ea8eb53224c90bf38667c9ce4e8b69af41358e256cad9b79de51947f3`) and artifact `13479364209` (`hunter-inspection-42168125358-1`, SHA-256 `4c51bd6dd3297ca56112331f0f774e9c56b459b0f1bfd944fb8de93e3b4e5264`) were retained. This closes the recovery-dispatch `scheduled_slot` observation for that worker/slot only.
+
+A native schedule-event invocation using the new provider-visible slot label and creation of the integrator-specific artifact remain unverified. The integrator step was correctly skipped in both HUNTER-01 runs. Cancelled sibling recovery runs receive no execution or delivery credit. These remaining observations must not be inferred from green CI, successful runs for other identities or the merged workflow definition.
+
+## Existing governed adaptive-learning runtime
+Protected-main `benchmark/SCOREBOARD.md` now freezes all **50/50 matched tasks and 100 independently scored arms** with the final 50-task conclusion. The benchmark has no remaining task gaps. Completion grants no activation authority: the adaptive Hunter runtime remains **PAUSED / AWAITING_EXPLICIT_USER_APPROVAL**, and no generated READY, activation or CLAIM may be forged. This GitHub source-inspection path is not a replacement for the separately governed worker runtime.
+
+To verify real execution, inspect the applicable post-merge workflow run and independently retrieve its job/artifact. Green CI or local tests alone are not sufficient evidence.
