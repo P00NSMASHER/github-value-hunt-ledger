@@ -50,6 +50,24 @@ SOURCE = {
 }
 OBSERVED = datetime(2026, 11, 6, tzinfo=timezone.utc)
 
+# Independent immutable transcription check from GAO B-424390 (2026-07-07).
+# This detects a corrupted/spoofed fixture, not tampering with GAO or a
+# cryptographically authenticated source. No award transaction is established.
+_GAO_PRIMARY_DECISION_ANCHOR = (
+    ("gao_case", "B-424390"),
+    ("decision_date", "2026-07-07"),
+    ("decision_result", "DENIED"),
+    ("issuer", "Department of the Navy"),
+    ("office", "Naval Supply Systems Command"),
+    ("rfp", "N00383-25-R-001D"),
+    ("rfp_issued", "2025-02-24"),
+    ("reported_awardee", "Vertex Modernization and Sustainment LLC"),
+    ("losing_protester", "The NORDAM Group, LLC"),
+    ("evaluated_vertex_proposal_usd", 50_821_834),
+    ("evaluated_nordam_proposal_usd", 37_927_951),
+    ("protester_alleged_excess_usd", 19_205_784),
+)
+
 
 def adjudicate_gao_awardee_claim(source: dict, candidate: dict) -> str:
     """Adjudicate GAO's named awardee only, never validate award transactions."""
@@ -64,6 +82,8 @@ def adjudicate_gao_awardee_claim(source: dict, candidate: dict) -> str:
         or not source.get("office")
         or not source.get("rfp")
     ):
+        return "UNKNOWN_UNAUTHENTICATED_ADJUDICATION"
+    if any(source.get(key) != official_value for key, official_value in _GAO_PRIMARY_DECISION_ANCHOR):
         return "UNKNOWN_UNAUTHENTICATED_ADJUDICATION"
     if (
         candidate.get("issuer") != source["issuer"]
@@ -177,6 +197,36 @@ class GAO2026NordamAwardeeAndPriceNegativeControls(unittest.TestCase):
         self.assertIsNone(SOURCE["customer_recovery_usd"])
         self.assertIsNone(SOURCE["source_document_bytes_sha256"])
         self.assertFalse(SOURCE["reuse_rights_verified"])
+
+    def test_mutated_primary_transcription_cannot_make_loser_an_awardee(self):
+        # Pre-fix counterexample: swapping GAO's source awardee to the losing
+        # protester caused an internally consistent, but FALSE supported join.
+        mutated = copy.deepcopy(SOURCE)
+        mutated["reported_awardee"] = SOURCE["losing_protester"]
+        self.assertEqual(
+            adjudicate_gao_awardee_claim(
+                mutated, candidate_for(SOURCE["losing_protester"])
+            ),
+            "UNKNOWN_UNAUTHENTICATED_ADJUDICATION",
+        )
+        # Source fields with different numeric provenance must fail closed,
+        # rather than being silently treated as the original GAO decision.
+        for field, wrong in (
+            ("evaluated_vertex_proposal_usd", 0),
+            ("evaluated_nordam_proposal_usd", 0),
+            ("protester_alleged_excess_usd", 0),
+            ("rfp_issued", "2026-02-24"),
+            ("decision_date", "2025-07-07"),
+        ):
+            with self.subTest(field=field):
+                damaged = copy.deepcopy(SOURCE)
+                damaged[field] = wrong
+                self.assertEqual(
+                    adjudicate_gao_awardee_claim(
+                        damaged, candidate_for(SOURCE["reported_awardee"])
+                    ),
+                    "UNKNOWN_UNAUTHENTICATED_ADJUDICATION",
+                )
 
     def test_original_gao_decision_date_is_not_navy_award_date(self):
         # The original GAO decision is dated July 7, 2026. It is NOT
