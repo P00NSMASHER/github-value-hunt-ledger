@@ -18,6 +18,9 @@ import copy
 import unittest
 
 SOURCE = {
+    "gao_primary_decision_url": "https://www.gao.gov/products/b-423992,b-423992.2",
+    "gao_case": "B-423992;B-423992.2",
+    "gao_decision_date": "2026-02-09",
     "issuer": "DEFENSE LOGISTICS AGENCY DISPOSITION SERVICES",
     "solicitation": "33-4012",
     "buyer_awardee": "GEM SOUTHWEST LLC",
@@ -39,11 +42,33 @@ SOURCE = {
 }
 
 
+# Immutable human-transcribed anchors from GAO B-423992/B-423992.2.
+# These protect against a claim and its local SOURCE being altered together;
+# matching them is NOT an independent hash of GAO's original document.
+GAO_SOURCE_ANCHORS = {
+    "gao_primary_decision_url": "https://www.gao.gov/products/b-423992,b-423992.2",
+    "gao_case": "B-423992;B-423992.2",
+    "gao_decision_date": "2026-02-09",
+    "issuer": "DEFENSE LOGISTICS AGENCY DISPOSITION SERVICES",
+    "solicitation": "33-4012",
+    "buyer_awardee": "GEM SOUTHWEST LLC",
+    "protester_runner_up": "REGENCY PARTNERS LLC",
+    "sale_commodity": "ELECTRONIC SCRAP PROPERTY",
+    "contract_type": "SALES_CONTRACT",
+    "award_notice_date": "2025-09-22",
+    "winning_evaluated_bid_usd": 152_124_000,
+    "runner_up_evaluated_bid_usd": 133_002_800,
+    "issuer_direction": "CONTRACTOR_PAYS_GOVERNMENT_FOR_PROPERTY",
+}
+
+
 def judge_claim(src: dict, claim: dict) -> str:
     """Fail closed on identity; reject cash-flow inversion without claiming cash."""
     if type(src) is not dict or type(claim) is not dict:
         return "UNKNOWN_MALFORMED"
-    required = ("issuer", "solicitation", "buyer_awardee", "contract_type",
+    if any(src.get(key) != anchor for key, anchor in GAO_SOURCE_ANCHORS.items()):
+        return "UNKNOWN_TAMPERED_TRANSCRIPTION"
+    required = ("gao_case", "issuer", "solicitation", "buyer_awardee", "contract_type",
                 "winning_evaluated_bid_usd")
     if any(not isinstance(src.get(k), str) or not src[k]
            for k in required[:-1]):
@@ -68,7 +93,7 @@ def judge_claim(src: dict, claim: dict) -> str:
 class DlaSaleBidNotGovernmentSpend(unittest.TestCase):
     def setUp(self):
         self.claim = {k: SOURCE[k] for k in (
-            "issuer", "solicitation", "buyer_awardee", "contract_type",
+            "gao_case", "issuer", "solicitation", "buyer_awardee", "contract_type",
             "winning_evaluated_bid_usd")}
 
     def test_exact_gao_case_falsifies_152m_spend_attribution(self):
@@ -108,6 +133,36 @@ class DlaSaleBidNotGovernmentSpend(unittest.TestCase):
                 claim["cash_flow_direction"] = "GOVERNMENT_PAYS_CONTRACTOR"
                 self.assertEqual(judge_claim(SOURCE, claim),
                                  "UNKNOWN_UNMATCHED_SOURCE_IDENTITY_OR_BID")
+
+    def test_mutated_source_and_matching_claim_cannot_relabel_another_bid(self):
+        # Prior judge trusted the in-memory SOURCE as its own oracle: replacing
+        # buyer, solicitation or winning bid *together* with the claim still
+        # returned FALSIFIED_GOVERNMENT_SPENDING_CLASSIFICATION. Fail closed.
+        for field, replacement in (
+            ("issuer", "ANOTHER GOVERNMENT ISSUER"),
+            ("solicitation", "33-4013"),
+            ("buyer_awardee", "UNRELATED COMPANY"),
+            ("winning_evaluated_bid_usd", 152_124_001),
+            ("contract_type", "PURCHASE_CONTRACT"),
+            ("gao_case", "B-OTHER"),
+            ("award_notice_date", "2024-01-01"),
+            ("protester_runner_up", "UNRELATED RUNNER UP"),
+        ):
+            with self.subTest(field=field):
+                mutated = copy.deepcopy(SOURCE)
+                mutated[field] = replacement
+                claim = {k: mutated[k] for k in self.claim}
+                claim["cash_flow_direction"] = "GOVERNMENT_PAYS_CONTRACTOR"
+                self.assertEqual(judge_claim(mutated, claim),
+                                 "UNKNOWN_TAMPERED_TRANSCRIPTION")
+
+    def test_missing_or_wrong_gao_case_cannot_inherit_source_conclusion(self):
+        claim = {**self.claim, "cash_flow_direction": "GOVERNMENT_PAYS_CONTRACTOR"}
+        del claim["gao_case"]
+        self.assertEqual(judge_claim(SOURCE, claim), "UNKNOWN_INCOMPLETE_CLAIM")
+        claim["gao_case"] = "B-423993;B-423993.2"
+        self.assertEqual(judge_claim(SOURCE, claim),
+                         "UNKNOWN_UNMATCHED_SOURCE_IDENTITY_OR_BID")
 
     def test_original_issuer_award_modifications_cash_and_rights_unknown(self):
         self.assertIsNone(SOURCE["award_contract_number"])
