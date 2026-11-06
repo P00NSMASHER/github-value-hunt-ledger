@@ -116,3 +116,15 @@
 - New one-task candidate skill: registration-first drawing revision audit. Require explicit scale estimation, common-coordinate warping, tolerant differencing, region extraction and quarantine below registration confidence; execute a synthetic scale-plus-offset fixture. Evidence set {07}; do not promote to SEARCH_SKILLS.md.
 - Negative knowledge: known-unit conversion is not arbitrary scale correction; affine implementation without an executed fixture is weak evidence; red/blue change overlays are unsafe when failed registration does not halt downstream claims.
 - Unresolved candidate test: on a labeled construction revision corpus, does the engine recover translation/rotation/scale and preserve changed-region recall while producing zero downstream regions whenever registration confidence is below threshold?
+
+## Task 08 checkpoint — 2026-11-05
+
+- Completed: 08. Candidate VsevaTech/deadline-extractor @ fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197. WATCH, 22/30; independent verifier agreed after an exact-revision 73-pass/2-skip run.
+- Capability evidence: verbatim-quote admission, typed timing descriptors, deterministic arithmetic, NEEDS_INPUT for unknown anchors, explicit confirmation and context-rich ICS export.
+- Provenance boundary: quote and sentence survive, but PDF page boundaries are discarded and records lack document hash/version, clause number, page, bounding box and character span.
+- Adversarial result: five working days excluding public holidays from 2026-12-21 was marked COMPUTED as 2026-12-28 with no warning; contract-aware Christmas exclusion yields 2026-12-29. Unsupported holiday semantics therefore fail open.
+- Additional negative evidence: clear-days/forthwith language can disappear instead of becoming review work; known-anchor exceptions can compute without representing the condition; generic MVP has no construction-form/amendment hierarchy.
+- Discovery result: direct contract-deadline search found the candidate; code-signature searches qualified quote admission and fail-closed gaps; adjacent-system comparison separated provenance, arithmetic and downstream construction-record components.
+- New one-task candidate skill: deadline-semantics support contract. Require stable executed-clause provenance and explicit trigger, calendar, inclusion, receipt, cut-off and roll semantics on every computed date; unsupported dimensions and extraction coverage gaps must surface as review work. Evidence set {08}; do not promote to SEARCH_SKILLS.md.
+- Negative knowledge: deterministic exact dates may be precisely wrong; a verbatim quote without stable location/version is incomplete provenance; silent omission is not a safe unsupported state.
+- Assigned Pair 1 EXPERIMENT tasks 01-08 are now complete once the result/state commit is merged and read back. Do not perform live node work in this bounded benchmark run.

@@ -366,3 +366,54 @@ VALUE HANDOFF:
 - COMMERCIAL IMPACT: a human-reviewed change-order/addendum triage product is plausible; unattended scope determination is not supported.
 - NEGATIVE KNOWLEDGE: known-unit conversion is not arbitrary scale correction; affine code without an executed fixture is weak evidence; a changed-region overlay is unsafe when registration failure does not halt the pipeline.
 
+---
+
+TASK: 08 — Construction/commercial contract deadlines with clause provenance and fail-closed timing
+CONDITION: EXPERIMENT
+STARTING HYPOTHESIS: The strongest candidate will separate clause interpretation from deterministic calendar arithmetic, retain an exact clause/source locator, and emit NEEDS_INPUT or UNSUPPORTED whenever the trigger, business-day calendar, inclusion rule, deemed-receipt rule, cut-off or roll convention is not modeled. Human confirmation alone does not make an invented precise date safe.
+DISCOVERY METHODS:
+- Direct domain search for construction/commercial contract deadline and notice software with clause provenance.
+- Code-signature search for source_quote/source span, business_days, unknown anchors, unsupported timing and deterministic deadline guards.
+- Adjacent-system graph across contract-obligation extraction, legal claim verification and construction project-record monitoring.
+- Low-attention repository/history inspection and exact-invariant comparison against systems with stronger provenance but weaker arithmetic, or stronger arithmetic but no clause provenance. SEARCH_SKILLS was used; BENCHMARK_GOLD.md, CONTROL results, SCOREBOARD and private-ledger answers were not read.
+CANDIDATE: Deadline Extractor
+CANONICAL URL: https://github.com/VsevaTech/deadline-extractor
+EXACT REVISION: fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197; commit dated 2026-09-14, "Update default Gemini model to gemini-3.8-flash".
+VERDICT: WATCH
+A-F SCORE: A 4 / B 3 / C 4 / D 3 / E 4 / F 4 = 22/30. The review-first extraction/calculation chain is real and well tested, but the benchmark's provenance and unsupported-semantics requirements are only partially satisfied.
+EVIDENCE INSPECTED:
+- Source: [rules.py](https://github.com/VsevaTech/deadline-extractor/blob/fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197/app/extraction/rules.py), [llm.py](https://github.com/VsevaTech/deadline-extractor/blob/fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197/app/extraction/llm.py), [date_engine.py](https://github.com/VsevaTech/deadline-extractor/blob/fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197/app/date_engine.py), [models.py](https://github.com/VsevaTech/deadline-extractor/blob/fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197/app/models.py), [parsers](https://github.com/VsevaTech/deadline-extractor/blob/fcdad9c3f6f2e6abb61512f1c3ad21733a9a8197/app/parsers/__init__.py), API/UI and ICS exporter.
+- Schema: typed Pydantic Deadline/ExtractionResult models retain action, exact source quote, surrounding sentence, kind, offset, unit, direction, canonical anchor, computed date, status, note, engine and confirmation.
+- Tests: extraction, date engine, LLM quote admission/fallback, API, parser and ICS tests. Independent clean exact-revision run passed 73 tests with 2 optional live tests skipped. The host run initially produced 72 passed / 1 environment-only SOCKS-proxy dependency failure / 2 skipped; clearing unsupported proxy variables yielded the clean run.
+- History/CI: seven coherent commits from one author on 2026-09-14; CI covers Python 3.11/3.12, Ruff, pytest, Docker build and API deadline smoke test. MIT license. Shallow history and no adoption/deployment evidence constrain maturity.
+- Adversarial execution: unknown event triggers such as Engineer certification remained NEEDS_INPUT with no computed date; hallucinated LLM quotes were dropped. A clause requiring five working days while excluding public holidays, anchored 2026-12-21, was marked COMPUTED as 2026-12-28 with no warning even though a Christmas-excluding calendar yields 2026-12-29.
+- Comparators: constructelligence-lab/construction-project-records @ 7e0e2ac4ed7e5c54c34ff24bd19506f0316ca7ac correctly audits user-entered notice dates but disclaims contract interpretation; portable-genai/contract-obligation-extraction @ d70f17fedd0f1f016c10356282227a4c04010970 has stronger clause anchors but accepts model-proposed due dates/default notice timing; QWED-AI/qwed-legal has stronger structured deadline rejection but no source clause/page/span provenance.
+- Specialist decomposition: separate code, commercial/comparator and independent RED-TEAM/VERIFIER passes independently selected this candidate. The verifier executed the exact revision and returned WATCH, 22/30.
+CLAIMS VERIFIED:
+- IMPLEMENTED: rule and schema-constrained LLM extractors identify absolute, relative, before/after, notice, calendar-day, business/working-day, week, month and year descriptors.
+- IMPLEMENTED: dates are computed by deterministic code, not accepted from LLM arithmetic. Missing/unknown anchors, offsets or malformed dates remain NEEDS_INPUT without a date.
+- IMPLEMENTED: LLM source quotes must resolve to verbatim document text; invented quotes are dropped. Records retain that quote and its surrounding sentence.
+- IMPLEMENTED: normal calendar export requires explicit user confirmation and carries the quote, interpreted rule, context and notes.
+- TESTED: 73 exact-revision tests passed independently; focused adversarial unknown-anchor cases failed closed.
+- TESTED COUNTEREVIDENCE: business/working-day arithmetic skips weekends only and still returns COMPUTED when public-holiday or contract-defined calendar semantics are stated but unsupported.
+CLAIMS NOT VERIFIED:
+- Stable clause provenance is incomplete: PDF pages are joined and normalized, losing page boundaries; records lack document hash/version, clause number, page, bounding box and character span. Repeated identical text can be ambiguous.
+- Unsupported timing is not comprehensively surfaced. "Clear days" and "forthwith" can disappear instead of becoming review items; known-anchor clauses with exceptions can compute while dropping the exception; weekend dates remain COMPUTED with only a note.
+- LLM values can be coerced: fractional offsets may truncate and unknown direction can default to after. Input truncation at 60,000 characters is not surfaced to the user.
+- No FIDIC, NEC, JCT, AIA, deemed-receipt, condition-precedent, amendment hierarchy or Particular Conditions rule packs exist. The tool is a generic MVP, not construction-specific contract administration.
+- Production use, recall/precision, independent users, legal acceptance, trigger-evidence linkage and realized avoided losses are unverified.
+STRONGEST OBJECTION: The interface can present a precise COMPUTED date while the controlling holiday calendar, contract-defined Business Day, clear-day inclusion, deemed-receipt, cut-off or roll rule is unknown. Repeatable arithmetic is not contractually correct timing, and quote-plus-sentence is not stable executed-clause provenance.
+COMMERCIAL WEDGE: Human-reviewed claim-notice, payment, submittal and renewal intake for subcontractor/GC contract administrators: upload a subcontract/addendum, review the exact excerpt, supply evidenced trigger dates, confirm supported calculations and export a calendar. The money path is fewer missed time bars and less manual clause-to-calendar work. A credible pilot requires page/section provenance, event-record linkage and fail-closed timing semantics before unattended alerts.
+SEARCH EFFORT: 7 distinct public queries across direct-domain and code-signature modes; adjacent-system and low-attention/history graphs; 2 primary deep inspections plus 3 scoped comparators; separate code, commercial and independent verifier passes. No prohibited benchmark/private material accessed.
+FALSE-PROMOTION RISK: High if "deterministic exact date," verbatim quote or human confirmation is mistaken for proven contract timing. WATCH retained; no SEARCH_SKILLS promotion.
+LESSON: Task 08 supplies one-task evidence for a deadline-semantics support contract: every computed date should carry stable executed-clause provenance plus explicit trigger, calendar, inclusion, receipt, cut-off and roll semantics; any unsupported dimension must yield NEEDS_REVIEW/UNSUPPORTED, and silent omissions require document-level coverage warnings. Evidence set {08}; do not promote centrally.
+COMPLETED_AT: 2026-11-05T23:09:34Z
+
+VALUE HANDOFF:
+- CAPABILITY DELTA: a tested review-first quote-to-typed-rule-to-deterministic-date pipeline with confirmation/export, qualified by incomplete provenance and semantic coverage.
+- GRAPH EDGE: executed clause → typed timing rule → evidenced trigger → deterministic date → reviewed calendar. The clause/evidence and full timing-semantics edges remain incomplete.
+- RADAR SIGNAL: independent projects separately implement provenance, timing guards and construction notice registers; convergence is visible but no production acceleration was established.
+- EXPERIMENT IMPACT: build one adversarial corpus covering holidays, clear days, deemed receipt, cut-offs, exceptions, amendments and unsupported triggers; require zero precise dates outside declared semantic coverage.
+- COMMERCIAL IMPACT: assisted deadline intake is plausible now; autonomous time-bar alerts are not supported.
+- NEGATIVE KNOWLEDGE: exact quotes are not stable clause provenance; deterministic arithmetic is not legal-semantic validation; silent non-extraction is not fail-closed review.
+
