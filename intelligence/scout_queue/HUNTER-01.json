@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 68,
+    "api_requests": 66,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 0,
-    "root_cache_hits": 0
+    "revision_cache_hits": 1,
+    "root_cache_hits": 1
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -64,11 +64,11 @@
       "default_branch": "master",
       "description": "TypeScript SDK for 0xArchive: granular market data infrastructure for Hyperliquid and Lighter. REST, WebSocket, replay, and orderbook reconstruction.",
       "discovery_query": "market data replay",
-      "exact_revision": "336261b84326542a0573676c4b796d98efb6b14b",
+      "exact_revision": "cbb79e3eedf9be8c4bc3413a4fdaeeaa2848f843",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T17:53:08Z",
+      "pushed_at": "2026-11-06T06:27:19Z",
       "repository": "0xArchiveIO/sdk-typescript",
       "root_code_signals": [
         ".github",
@@ -76,7 +76,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 1406,
+      "size_kb": 1407,
       "stars": 9,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -670,20 +670,19 @@
       "default_branch": "master",
       "description": "Professional quant trading system with dual data sources (Baostock+AKShare), walk-forward backtesting, multi-factor regression, and self-evolution capability",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "f1f30e526607ae8af87ace554bb39d4b29677435",
+      "exact_revision": "6d991fe76b4ba704df9b51885c9d8655482e3c86",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T08:01:18Z",
+      "pushed_at": "2026-11-06T07:56:24Z",
       "repository": "liuxing5/openclaw-quant-system",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
         "dockerfile",
         "tests"
       ],
-      "size_kb": 381999,
+      "size_kb": 381853,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -704,7 +703,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-06T06:13:52.690521+00:00",
+  "generated_at": "2026-11-06T09:17:24.156525+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
