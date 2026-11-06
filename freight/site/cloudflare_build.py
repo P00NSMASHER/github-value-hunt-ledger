@@ -33,7 +33,9 @@ def allow_verified_pages_inquiry(bundle: Path) -> None:
 
     The original GitHub Pages bundle retains its BubblaV-only connections
     and prepares email drafts. The Cloudflare build also permits the existing
-    same-origin inquiry API and managed Turnstile challenge.
+    same-origin inquiry API and managed Turnstile challenge, plus the precise
+    Cloudflare Web Analytics beacon URL for the already-enabled automatic RUM.
+    Its ingestion URL remains same-origin and is covered by connect-src 'self'.
     """
     for name in ("index.html", "_headers"):
         path = bundle / name
@@ -46,7 +48,7 @@ def allow_verified_pages_inquiry(bundle: Path) -> None:
         if any(content.count(item) != 1 for item in (script, connect, frame)):
             raise RuntimeError(f"Cloudflare CSP source changed unexpectedly: {name}")
         content = content.replace(
-            script, "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"
+            script, "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com https://static.cloudflareinsights.com/beacon.min.js;"
         )
         content = content.replace(
             connect, "connect-src 'self' https://www.bubblav.com https://bubblav.com "
