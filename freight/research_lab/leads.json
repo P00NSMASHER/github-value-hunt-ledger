@@ -2966,6 +2966,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-06",
+      "id": "35958840e58ffa24379a5d797eade638483cb60cf195845a68b014a3d1068b99",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/8420181"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -13225,6 +13241,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "1000d27e94122220e322499566bbb4c3ba227537ca952166d807e8362825db94",
+  "entries_sha256": "38343bd62c2bd5219a99229ccdabb92446d08892cf40b9bb2f3765cebe3b1e7d",
   "schema_version": 1
 }
