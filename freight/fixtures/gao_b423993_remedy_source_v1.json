@@ -37,7 +37,7 @@
     "reason": "RECOMPETITION_NO_LONGER_FEASIBLE_AS_CONTRACT_SUBSTANTIALLY_PERFORMED",
     "agency_delivery_progress_report": "ABOUT_75_TO_80_PERCENT_ITEMS_DELIVERED",
     "verified_costs_paid_usd": null,
-    "verified_reaward_to_protester": false
+    "verified_reaward_to_protester": null
   },
   "prohibited_conclusions": [
     "PROTEST_SUSTAINED_IMPLIES_ORIGINAL_AWARD_TERMINATED",
