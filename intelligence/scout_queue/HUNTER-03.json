@@ -13,13 +13,61 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Marketing skills for AI agents \u2014 paid ads, social media, SEO, competitor research, creative generation, email, analytics, and more. Powered by Hyper MCP.",
+      "discovery_query": "social media analytics",
+      "exact_revision": "ba0b7c77d78d2e18dbb4996df42f666944d9093b",
+      "forks": 21,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-06T12:15:43Z",
+      "repository": "hyperfx-ai/marketing-skills",
+      "root_code_signals": [
+        ".github",
+        "tests"
+      ],
+      "size_kb": 3616,
+      "stars": 112,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "agent-skills",
+        "ai-agent",
+        "claude",
+        "claude-code",
+        "claude-skills",
+        "codex",
+        "cursor",
+        "google-ads",
+        "hermes",
+        "marketing",
+        "mcp",
+        "meta-ads",
+        "openclaw",
+        "seo"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 3,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 6,
+        "stars": 8,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 55,
+      "url": "https://github.com/hyperfx-ai/marketing-skills"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Open-source, AI-native social media management, design & scheduling platform for 45+ channels. BYOK AI across 30+ providers with governance guardrails & spend caps, AI Designer + 46 media tools, persisted analytics, cross-channel comment inbox, campaigns, RBAC teams, public API & SDK. Self-hosted: Next.js + NestJS + PostgreSQL, jobs on Inngest.",
       "discovery_query": "social media analytics",
-      "exact_revision": "3abe2b68e1cca5b459209dbdaec8f4f041e5b64c",
+      "exact_revision": "1fd918843e07d8175e12335ca55710aefe651219",
       "forks": 14,
       "primary_language": "TypeScript",
       "published_license_spdx": "AGPL-3.0",
-      "pushed_at": "2026-11-06T11:20:59Z",
+      "pushed_at": "2026-11-06T16:03:51Z",
       "repository": "postmill-ai/postmill-app",
       "root_code_signals": [
         ".github",
@@ -27,7 +75,7 @@
         "dockerfile",
         "package.json"
       ],
-      "size_kb": 70381,
+      "size_kb": 70440,
       "stars": 41,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -556,6 +604,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-06T04:55:28Z",
       "repository": "Ivancho1253/Zentra",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "dockerfile",
@@ -591,6 +640,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-06T04:32:51Z",
       "repository": "keanu-stitch8/mkk-dashboard",
+      "retained_unreviewed": true,
       "root_code_signals": [
         "package.json",
         "src",
@@ -654,58 +704,11 @@
       },
       "triage_score": 38,
       "url": "https://github.com/Myousefi-ir/social-campaign-calendar"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "AI Social Media Curator & Approval Workflow Automation Tool 2026",
-      "discovery_query": "social media approval workflow",
-      "exact_revision": "bfd5b0d6b7b57101a3a6dedbbe66ebc7d4e88960",
-      "forks": 0,
-      "primary_language": "HTML",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-05T15:47:50Z",
-      "repository": "honeygame786/link-rewrite-pipeline",
-      "root_code_signals": [
-        ".github"
-      ],
-      "size_kb": 692,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai-agent",
-        "approval-workflow",
-        "content-curation",
-        "editorial-automation",
-        "gemini-api",
-        "github-actions",
-        "instagram",
-        "media-downloader",
-        "python",
-        "review-workflow",
-        "slack-bot",
-        "social-media",
-        "telegram-bot",
-        "twitter"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 36,
-      "url": "https://github.com/honeygame786/link-rewrite-pipeline"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify lawful platform support, owner-controlled approval, attributable real engagement or inbound leads, and actual conversion; publishing requires separate authorization.",
-  "generated_at": "2026-11-06T12:03:59.402487+00:00",
+  "generated_at": "2026-11-06T16:23:22.471837+00:00",
   "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
   "project": "retally-social-media",
   "risk_review": [],
