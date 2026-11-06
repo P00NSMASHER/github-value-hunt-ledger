@@ -13,7 +13,7 @@ Current-scope queues: 14/14; unreviewed candidates: 108
 |---|---|---|---:|---|---|---|
 | HUNTER-01 | trading | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-01.json) | 16 | 2026-11-06T14:44:09.677640+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-02 | revenue-hunt | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-02.json) | 16 | 2026-11-06T18:54:18.370296+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-03 | retally-social-media | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-03.json) | 16 | 2026-11-06T16:53:21.482493+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-03 | retally-social-media | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-03.json) | 16 | 2026-11-06T20:29:27.231051+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-04 | novel-discovery | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-04.json) | 16 | 2026-11-06T17:53:18.030800+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-05 | engineering-acceleration | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-05.json) | 16 | 2026-11-06T15:54:08.998387+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-06 | abvm | [NO_NEW_CANDIDATES](../intelligence/scout_queue/HUNTER-06.json) | 0 | 2026-11-05T03:01:37.591532+00:00 | UNKNOWN | UNKNOWN |
