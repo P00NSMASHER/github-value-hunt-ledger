@@ -1,28 +1,7 @@
 {
   "activates_work": false,
   "activation_contract": "This artifact never activates a hunter. If all machine gates become true, remain AWAITING_EXPLICIT_USER_APPROVAL. Only a separate explicit user instruction may change scheduled-task state or begin the canary.",
-  "blockers": [
-    {
-      "action": "Finish the remaining frozen benchmark experiment conditions in clean contexts before using adaptive measurement packets.",
-      "code": "frozen_benchmark_incomplete",
-      "matched_tasks": 49,
-      "required_matched_tasks": 50,
-      "unmatched_task_ids": [
-        "08"
-      ],
-      "unmatched_tasks": [
-        {
-          "completed_arms": [
-            "CONTROL"
-          ],
-          "missing_arms": [
-            "EXPERIMENT"
-          ],
-          "task_id": "08"
-        }
-      ]
-    }
-  ],
+  "blockers": [],
   "canary": {
     "manual_completion_forbidden": true,
     "maximum_initial_packet_runs": 3,
@@ -36,7 +15,7 @@
     "active_generated_claim_count": 0,
     "active_generated_claim_ids": [],
     "current_activations": 0,
-    "matched_benchmark_tasks": 49,
+    "matched_benchmark_tasks": 50,
     "pending_split_claims": 0,
     "required_matched_benchmark_tasks": 50,
     "required_shadow_runs": 15,
@@ -49,24 +28,12 @@
     "split_key_commitment_active": true,
     "split_receipts": 3,
     "split_secret_available": true,
-    "unmatched_benchmark_task_ids": [
-      "08"
-    ],
-    "unmatched_benchmark_tasks": [
-      {
-        "completed_arms": [
-          "CONTROL"
-        ],
-        "missing_arms": [
-          "EXPERIMENT"
-        ],
-        "task_id": "08"
-      }
-    ]
+    "unmatched_benchmark_task_ids": [],
+    "unmatched_benchmark_tasks": []
   },
   "explicit_user_approval_required": true,
   "gates": {
-    "benchmark_complete": false,
+    "benchmark_complete": true,
     "measurement_packets_ready": true,
     "no_active_generated_claims": true,
     "no_current_activations": true,
@@ -75,5 +42,5 @@
   },
   "mode": "restart_readiness_only",
   "schema_version": 1,
-  "state": "BLOCKED"
+  "state": "AWAITING_EXPLICIT_USER_APPROVAL"
 }
