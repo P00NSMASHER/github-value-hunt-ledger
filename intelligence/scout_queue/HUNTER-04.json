@@ -173,6 +173,7 @@
       "published_license_spdx": "Apache-2.0",
       "pushed_at": "2026-11-05T18:28:16Z",
       "repository": "Julien-Livet/SymReg",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -207,19 +208,55 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Pure-Python symbolic regression (GP + LM)",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "8d3d777206dc41d410ef054862a77d9de1c09552",
+      "forks": 2,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-06T17:52:19Z",
+      "repository": "ariel95500-create/gp-elite",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 7950,
+      "stars": 42,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "symbolic-regression-genetic-programming-python"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 7,
+        "substantive_size": 4,
+        "topics": 1
+      },
+      "triage_score": 50,
+      "url": "https://github.com/ariel95500-create/gp-elite"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Scalable, high-performance C++23 framework for evolutionary algorithms, including genetic programming, genetic algorithms, and differential evolution. Ideal for classification, symbolic regression, and mathematical optimisation tasks.",
       "discovery_query": "symbolic regression",
-      "exact_revision": "f5ca90c78fd34cdff366416c3fee1d7e73aa0c26",
+      "exact_revision": "8f7f6321bf83bf9c80232dd8f755e13b1ea11e8f",
       "forks": 4,
       "primary_language": "C++",
       "published_license_spdx": "MPL-2.0",
-      "pushed_at": "2026-11-06T09:37:18Z",
+      "pushed_at": "2026-11-06T16:20:14Z",
       "repository": "morinim/ultra",
       "root_code_signals": [
         ".github",
         "src"
       ],
-      "size_kb": 5726,
+      "size_kb": 5740,
       "stars": 20,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -256,19 +293,18 @@
       "default_branch": "main",
       "description": "A first and second-order DSGE engine with a fully symbolic and modifiable model backend. Includes estimation, monte carlo pipeline costruction, and regression-based equation augmentation capabilities",
       "discovery_query": "symbolic regression",
-      "exact_revision": "3abf22a684bdf2479e52fceefa67c45e1bdcbe1d",
+      "exact_revision": "ff01e2990f257bb86783cc92c382c7700da8c4f0",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T06:38:27Z",
+      "pushed_at": "2026-11-06T16:45:10Z",
       "repository": "GongJr0/SymbolicDSGE",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
         "tests"
       ],
-      "size_kb": 78353,
+      "size_kb": 79267,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -410,16 +446,16 @@
       "default_branch": "main",
       "description": "A curated list of awesome projects using AI to automate scientific research \u2014 AI Scientist, autonomous research agents, paper writing, hypothesis generation, and more.",
       "discovery_query": "scientific hypothesis generation",
-      "exact_revision": "48780d3e97c06c86e011ab4cd74bfdfd29a7f3c4",
+      "exact_revision": "edb826554046d8be1e2106b326a688af9ee92178",
       "forks": 9,
       "primary_language": "Python",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-05T10:46:29Z",
+      "pushed_at": "2026-11-06T10:47:53Z",
       "repository": "yenanjing/awesome-ai-for-science",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 907,
+      "size_kb": 911,
       "stars": 13,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -451,11 +487,11 @@
       "default_branch": "main",
       "description": "srbf: Symbolic Regression Benchmark Framework. Evaluate symbolic-regression models on shared benchmarks with shared metrics; interactive results at psaegert.github.io/srbf",
       "discovery_query": "symbolic regression",
-      "exact_revision": "2b882a2fd160de32b78e7d140fb4063ba36e99e0",
+      "exact_revision": "7525d4e05f0e0009fd5809e668dfd8c62bab27e3",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T10:25:55Z",
+      "pushed_at": "2026-11-06T16:25:22Z",
       "repository": "psaegert/srbf",
       "root_code_signals": [
         ".github",
@@ -463,7 +499,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 2773801,
+      "size_kb": 2777990,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -492,6 +528,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-05T17:15:10Z",
       "repository": "grocksdf/symbolic-regression-llm-scientific-discovery-active-learning-machine-learning",
+      "retained_unreviewed": true,
       "root_code_signals": [
         "pyproject.toml",
         "schemas",
@@ -569,7 +606,7 @@
       "forks": 0,
       "primary_language": "Jupyter Notebook",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-05T21:29:26Z",
+      "pushed_at": "2026-11-06T14:41:05Z",
       "repository": "saeed92m/ztf-classifier",
       "root_code_signals": [
         ".github",
@@ -577,7 +614,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 5289,
+      "size_kb": 5551,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -629,45 +666,11 @@
       },
       "triage_score": 41,
       "url": "https://github.com/Qazi-pk/physics-engine"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "QuantumOS is a topology-governed agentic research architecture for quantum-gravity discovery, combining hypothesis generation, mathematical formalization, adversarial criticism, simulation, verification, and scientific memory to pursue verified explanatory knowledge.",
-      "discovery_query": "scientific hypothesis generation",
-      "exact_revision": "9091df583ef704dca2179ab564258425ec1364ec",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-02T19:18:33Z",
-      "repository": "tltmgnt/QuantumOS",
-      "root_code_signals": [
-        ".github",
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 412,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 8,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 41,
-      "url": "https://github.com/tltmgnt/QuantumOS"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists.",
-  "generated_at": "2026-11-06T10:33:42.788951+00:00",
+  "generated_at": "2026-11-06T17:53:18.030800+00:00",
   "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
   "project": "novel-discovery",
   "risk_review": [],
