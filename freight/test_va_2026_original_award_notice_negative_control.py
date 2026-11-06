@@ -71,8 +71,9 @@ def chronology_inputs():
 def official_notice_identity_gate(candidate):
     """Test-only record-consistency guard, NOT an award-transaction validator."""
     fields = (
-        "solicitation_id", "award_contract_id", "office", "contractor",
-        "contractor_uei", "agency_noticed_base_and_all_options_usd",
+        "issuer", "agency_code", "solicitation_id", "award_contract_id",
+        "office", "contractor", "contractor_uei",
+        "agency_noticed_base_and_all_options_usd",
     )
     if not isinstance(candidate, dict) or any(
         k not in candidate or candidate[k] is None or candidate[k] == ""
@@ -166,6 +167,8 @@ class VA2026AwardNoticeNegativeControls(unittest.TestCase):
             "OFFICIAL_NOTICE_CONSISTENT_TRANSACTION_UNVERIFIED",
         )
         for field, wrong_value in (
+            ("issuer", "UNRELATED FEDERAL ISSUER"),
+            ("agency_code", "NASA"),
             ("contractor", "UNRELATED COMPANY"),
             ("contractor_uei", "INVALID-UEI"),
             ("award_contract_id", "36C25026C9999"),
