@@ -116,6 +116,16 @@ class HunterFleetHealthTests(unittest.TestCase):
         self.assertEqual(truth["chatgpt_task_health"], "NOT_OBSERVABLE_FROM_GITHUB")
         flow = (root / ".github/workflows/public-repo-hunter.yml").read_text()
         self.assertEqual(flow.count("- cron:"), 15)
+        health_flow = (root / ".github/workflows/hunter-fleet-health.yml").read_text()
+        self.assertIn('workflow_run:', health_flow)
+        self.assertIn('workflows: ["Active Project Technology Scouts"]', health_flow)
+        self.assertIn('types: [completed]', health_flow)
+        self.assertIn("github.event.workflow_run.event == 'repository_dispatch'", health_flow)
+        self.assertIn("github.event.workflow_run.head_branch == 'main'", health_flow)
+        self.assertIn("github.event.workflow_run.head_repository.full_name == github.repository", health_flow)
+        self.assertEqual(health_flow.count("- cron:"), 1)
+        self.assertIn("actions: read", health_flow)
+        self.assertNotIn("actions: write", health_flow)
 
 
     def test_real_inspection_requires_job_and_nonexpired_artifact(self):

@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 67,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -254,7 +254,7 @@
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-05T18:59:32Z",
+      "pushed_at": "2026-11-06T01:19:22Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -264,7 +264,7 @@
         "src",
         "test"
       ],
-      "size_kb": 75510,
+      "size_kb": 77463,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -293,6 +293,7 @@
       "published_license_spdx": "Apache-2.0",
       "pushed_at": "2026-11-05T19:16:04Z",
       "repository": "darblinko/llm-trading-lab",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -338,6 +339,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T19:29:52Z",
       "repository": "AlgorithmicMind/regimelab",
+      "retained_unreviewed": true,
       "root_code_signals": [
         "pyproject.toml",
         "src",
@@ -375,6 +377,48 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Historical market-data replay lab using Kafka, Spark, PostgreSQL, and Next.js to inspect late, duplicate, and failed deliveries.",
+      "discovery_query": "market data replay",
+      "exact_revision": "3fb9eba180dbf496480ea887f0410d868a90f4d5",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "NOASSERTION",
+      "pushed_at": "2026-11-05T22:31:05Z",
+      "repository": "anusharama100/marketpulse",
+      "root_code_signals": [
+        ".github",
+        "makefile",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 1226,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "data-engineering",
+        "kafka",
+        "nextjs",
+        "postgresql",
+        "spark",
+        "stream-processing"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 9,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 47,
+      "url": "https://github.com/anusharama100/marketpulse"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Forecasting hourly MISO grid demand and benchmarking it against the grid operator's own day ahead forecast. EIA API, Open-Meteo, walk forward backtest.",
       "discovery_query": "walk forward backtesting",
       "exact_revision": "d50197c95dc61022eef74077f1c3c749531b43c4",
@@ -383,6 +427,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T19:11:13Z",
       "repository": "austi20/miso-demand-forecaster",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "src",
@@ -657,46 +702,11 @@
       },
       "triage_score": 44,
       "url": "https://github.com/ArkaKhorchidian/Market-Data-Multicast-Analyzer"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Event-driven quant backtesting framework with realistic costs, slippage, and walk-forward out-of-sample validation. A backtester that tells you when your strategy is overfit.",
-      "discovery_query": "slippage backtest",
-      "exact_revision": "ff34ee1e8f708c087615304279304f65faaa2d01",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T16:34:34Z",
-      "repository": "a0merr/axiom-backtest",
-      "root_code_signals": [
-        ".github",
-        "pyproject.toml",
-        "src",
-        "tests"
-      ],
-      "size_kb": 97,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 11,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 44,
-      "url": "https://github.com/a0merr/axiom-backtest"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-05T19:38:33.791065+00:00",
+  "generated_at": "2026-11-06T01:44:23.676818+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
