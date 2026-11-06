@@ -92,6 +92,36 @@ def adjudicate_decision_provenance(decisions, asserted_awardee=None):
     return "SOURCE_CONSISTENT_NOT_AIR_FORCE_AWARD_VERIFIED"
 
 
+# Two *different* GAO first-party pages contain a second, independent
+# cross-reference contradiction, distinct from the RFQ year typo above:
+# https://www.gao.gov/products/b-423980.2,b-423980.4 -- Apr 1, 2026
+# https://www.gao.gov/products/b-423980.5,b-423980.6 -- cites Mar 31,
+# B-420983.4, even though the earlier docket is B-423980.4.
+# These are human-transcribed published TEXT, not signed Air Force award data.
+APRIL_GAO_DECISION = {
+    "source_url": "https://www.gao.gov/products/b-423980.2,b-423980.4",
+    "date": "2026-04-01",
+    "case_ids": ("B-423980.2", "B-423980.4"),
+}
+MAY_GAO_CITATION_AS_WRITTEN = {
+    "source_url": "https://www.gao.gov/products/b-423980.5,b-423980.6",
+    "cites_date": "2026-03-31",
+    "cites_case_ids": ("B-423980.2", "B-420983.4"),
+}
+
+
+def assess_exact_gao_reconsideration_citation(april, may):
+    """Fail closed on altered transcriptions; never invent a separate award."""
+    if (type(april) is not dict or type(may) is not dict
+            or april != APRIL_GAO_DECISION
+            or may != MAY_GAO_CITATION_AS_WRITTEN):
+        return "UNKNOWN_ALTERED_PRIMARY_TRANSCRIPTION"
+    if (april["date"] != may["cites_date"]
+            or april["case_ids"] != may["cites_case_ids"]):
+        return "FALSIFIED_EXACT_GAO_RECONSIDERATION_CROSS_REFERENCE"
+    return "GAO_REFERENCE_MATCH_ONLY_NOT_AWARD_TRANSACTION"
+
+
 class GAOPrimaryDecisionSolicitationConflict(unittest.TestCase):
     def test_original_decisions_disagree_on_identical_procurement_rfq(self):
         self.assertEqual(
@@ -166,6 +196,35 @@ class GAOPrimaryDecisionSolicitationConflict(unittest.TestCase):
         self.assertEqual(adjudicate_decision_provenance(DECISIONS[:2]),
                          "UNKNOWN_INCOMPLETE_PRIMARY_CHAIN")
         self.assertIsNone(INDEPENDENT_AWARD_TRANSACTION)
+
+
+    def test_may_reconsideration_cites_different_docket_and_date(self):
+        # Same-publisher inconsistent cross-reference must not be joined as
+        # a second procurement, a verified April date, or an Air Force award.
+        self.assertEqual(
+            assess_exact_gao_reconsideration_citation(
+                APRIL_GAO_DECISION, MAY_GAO_CITATION_AS_WRITTEN),
+            "FALSIFIED_EXACT_GAO_RECONSIDERATION_CROSS_REFERENCE",
+        )
+        self.assertNotEqual(APRIL_GAO_DECISION["case_ids"],
+                            MAY_GAO_CITATION_AS_WRITTEN["cites_case_ids"])
+        self.assertNotEqual(APRIL_GAO_DECISION["date"],
+                            MAY_GAO_CITATION_AS_WRITTEN["cites_date"])
+        corrected = copy.deepcopy(MAY_GAO_CITATION_AS_WRITTEN)
+        corrected["cites_case_ids"] = APRIL_GAO_DECISION["case_ids"]
+        corrected["cites_date"] = APRIL_GAO_DECISION["date"]
+        self.assertEqual(
+            assess_exact_gao_reconsideration_citation(
+                APRIL_GAO_DECISION, corrected),
+            "UNKNOWN_ALTERED_PRIMARY_TRANSCRIPTION",
+        )
+        altered = copy.deepcopy(APRIL_GAO_DECISION)
+        altered["case_ids"] = MAY_GAO_CITATION_AS_WRITTEN["cites_case_ids"]
+        self.assertEqual(
+            assess_exact_gao_reconsideration_citation(
+                altered, MAY_GAO_CITATION_AS_WRITTEN),
+            "UNKNOWN_ALTERED_PRIMARY_TRANSCRIPTION",
+        )
 
 
 if __name__ == "__main__":
