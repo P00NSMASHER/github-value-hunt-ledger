@@ -19,6 +19,7 @@ from freight.capturebrief_sam_fy2027_asof import (
     build_receipt, fetch_original, parse_archive, run, validate_receipt,
 )
 from freight.unified_research_lab import ResearchError, digest
+from freight.test_air_force_boeing_vc25b_2026_award_date_correction_negative_control import BoeingVc25bAwardDateCorrection
 
 NOW=datetime(2026,10,24,7,0,0,tzinfo=timezone.utc)
 
