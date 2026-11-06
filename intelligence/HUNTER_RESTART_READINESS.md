@@ -2,11 +2,11 @@
 
 Repository-side readiness for a future adaptive-learning hunter canary. **This report never activates work or changes scheduled tasks.**
 
-- State: **BLOCKED**
+- State: **AWAITING_EXPLICIT_USER_APPROVAL**
 - Explicit user approval required: **yes**
 - Precommitted measurement packets: **3**
-- Frozen benchmark matched: **49/50**
-- Unmatched benchmark tasks: **08**
+- Frozen benchmark matched: **50/50**
+- Unmatched benchmark tasks: **none**
 - Shadow runs: **55** (required 15)
 - Split key commitment active: **true**
 - Split secret available to workflow: **true**
@@ -20,14 +20,14 @@ Repository-side readiness for a future adaptive-learning hunter canary. **This r
 |---|---|
 | measurement_packets_ready | PASS |
 | split_receipt_system_ready | PASS |
-| benchmark_complete | BLOCKED |
+| benchmark_complete | PASS |
 | shadow_run_gate_complete | PASS |
 | no_current_activations | PASS |
 | no_active_generated_claims | PASS |
 
 ## Blockers
 
-- **frozen_benchmark_incomplete** — Finish the remaining frozen benchmark experiment conditions in clean contexts before using adaptive measurement packets.
+- No machine blocker. Remain paused until the user explicitly approves canary activation.
 
 ## Canary contract after explicit approval
 
