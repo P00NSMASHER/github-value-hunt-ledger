@@ -1,4 +1,7 @@
 name: Active Project Technology Scouts
+# Provider-visible worker/slot identity permits exact missed-run reconciliation.
+run-name: >-
+  Hunter ${{ github.event.schedule || github.event.client_payload.worker || inputs.worker || 'SOURCE_PUSH' }} slot=${{ github.event.client_payload.scheduled_slot || 'native' }}
 
 on:
   # One bounded source-run when this workflow/manifest is changed on main.
@@ -88,6 +91,7 @@ jobs:
           MANUAL: ${{ inputs.worker }}
           EVENT_NAME: ${{ github.event_name }}
           RECOVERY_WORKER: ${{ github.event.client_payload.worker }}
+          RECOVERY_SLOT: ${{ github.event.client_payload.scheduled_slot }}
           RECOVERY_MAIN: ${{ github.event.client_payload.expected_main }}
           EVENT_SHA: ${{ github.sha }}
           EVENT_ACTOR: ${{ github.actor }}
@@ -97,7 +101,10 @@ jobs:
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then
             test "$EVENT_ACTOR" = "portfolio-brain-v8-runtime[bot]" || { echo "Unauthorized recovery actor" >&2; exit 1; }
             test "$RECOVERY_MAIN" = "$EVENT_SHA" || { echo "Recovery main moved" >&2; exit 1; }
-            [[ "$RECOVERY_WORKER" =~ ^HUNTER-(0[1-9]|1[0-4])$ ]] || { echo "Invalid recovery worker" >&2; exit 1; }
+            [[ "$RECOVERY_WORKER" =~ ^(HUNTER-(0[1-9]|1[0-4])|INTEGRATOR)$ ]] || { echo "Invalid recovery worker" >&2; exit 1; }
+            if [ -n "$RECOVERY_SLOT" ]; then
+              [[ "$RECOVERY_SLOT" =~ ^20[0-9]{2}-[01][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:00Z$ ]] || { echo "Invalid recovery slot format" >&2; exit 1; }
+            fi
             worker="$RECOVERY_WORKER"
           fi
           case "$SCHEDULE" in
@@ -173,6 +180,19 @@ jobs:
           name: hunter-evidence-${{ steps.route.outputs.worker }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             intelligence/scout_queue/${{ steps.route.outputs.worker }}.json
+            automation/HUNTER_EFFECTIVENESS.md
+          retention-days: 7
+          if-no-files-found: error
+
+      # The Integrator intentionally has no source-inspection job. Keep an
+      # independently inspectable receipt so it is still counted as executed.
+      - name: Preserve integrator execution receipt
+        if: ${{ steps.route.outputs.worker == 'INTEGRATOR' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hunter-integrator-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            automation/SCOUT_DIGEST.md
             automation/HUNTER_EFFECTIVENESS.md
           retention-days: 7
           if-no-files-found: error
