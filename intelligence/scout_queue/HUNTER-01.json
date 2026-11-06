@@ -1,15 +1,63 @@
 {
   "api_metrics": {
-    "api_requests": 67,
+    "api_requests": 66,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 0,
-    "root_cache_hits": 0
+    "revision_cache_hits": 1,
+    "root_cache_hits": 1
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
   "candidates": [
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Walk-forward volatility forecasting (GARCH, HAR, LightGBM) and VaR / Expected Shortfall backtesting for Nifty 50 stocks, with an API, dashboard and a grounded Q&A assistant",
+      "discovery_query": "walk forward backtesting",
+      "exact_revision": "ec57c0dd337457dba35ffe3599f8d4439a49f581",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-06T19:43:25Z",
+      "repository": "tarubee19/vol-var-india",
+      "root_code_signals": [
+        ".github",
+        "app",
+        "docker-compose.yml",
+        "dockerfile",
+        "makefile",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 6562,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "garch",
+        "lightgbm",
+        "nifty50",
+        "quantitative-finance",
+        "risk-management",
+        "time-series",
+        "value-at-risk",
+        "volatility-forecasting"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 18,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 56,
+      "url": "https://github.com/tarubee19/vol-var-india"
+    },
     {
       "archived": false,
       "default_branch": "main",
@@ -112,6 +160,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-04T15:05:48Z",
       "repository": "Kobflish1/pumpquant",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "makefile",
@@ -302,6 +351,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T12:42:09Z",
       "repository": "arhancanli/alphac",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -352,11 +402,11 @@
       "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "7766c5f2ddb7a6d2644d8a43a7b04fad3457fbeb",
+      "exact_revision": "cd53712925ffaaa472ec7e6f744938dcb67cf592",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T10:45:48Z",
+      "pushed_at": "2026-11-06T17:23:41Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -366,7 +416,7 @@
         "src",
         "test"
       ],
-      "size_kb": 77577,
+      "size_kb": 77700,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -441,6 +491,7 @@
       "published_license_spdx": "Apache-2.0",
       "pushed_at": "2026-11-06T13:40:23Z",
       "repository": "DogInfantry/Signals-Before-Storms",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "pyproject.toml",
@@ -519,6 +570,52 @@
       },
       "triage_score": 48,
       "url": "https://github.com/AndrewFSee/auto_researcher"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Hypothesis-killing framework for quant finance: preregistration, spec curves, walk-forward, deflated Sharpe, Monte Carlo. Deterministic verdicts, documented tombstones.",
+      "discovery_query": "walk forward backtesting",
+      "exact_revision": "396bf690f4ce6dfb48102a7bb14b9bff83265970",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-06T18:22:09Z",
+      "repository": "Pavel14701/atropos",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 4045,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "algorithmic-trading-quantitative",
+        "backtesting",
+        "deflated-sharpe",
+        "falsification",
+        "hypothesis-testing",
+        "overfitting",
+        "preregistration",
+        "quantitative-finance",
+        "research-tooling",
+        "trading-strategies",
+        "walk-forward"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 47,
+      "url": "https://github.com/Pavel14701/atropos"
     },
     {
       "archived": false,
@@ -613,19 +710,18 @@
       "default_branch": "main",
       "description": "Forecasting hourly MISO grid demand and benchmarking it against the grid operator's own day ahead forecast. EIA API, Open-Meteo, walk forward backtest.",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "d50197c95dc61022eef74077f1c3c749531b43c4",
+      "exact_revision": "99bdb913e1086f4218c39e35fac8bacb201a0f4d",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T19:11:13Z",
+      "pushed_at": "2026-11-06T18:38:31Z",
       "repository": "austi20/miso-demand-forecaster",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "src",
         "tests"
       ],
-      "size_kb": 354,
+      "size_kb": 366,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -652,92 +748,11 @@
       },
       "triage_score": 47,
       "url": "https://github.com/austi20/miso-demand-forecaster"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Open-source Python toolkit for quantitative research on Borsa Istanbul (BIST): data, features, walk-forward backtesting, risk/portfolio, backtest robustness (CPCV/PBO), diagnostics, reports, paper-trading bridge.",
-      "discovery_query": "walk forward trading backtest python open source",
-      "exact_revision": "27a690bb1073c43bf1145eae82c1545567a00482",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T13:45:42Z",
-      "repository": "HaasEnjoyer/quanttro",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 260,
-      "stars": 2,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "algorithmic-trading",
-        "backtesting",
-        "bist",
-        "overfitting",
-        "portfolio-optimization",
-        "prop-firm",
-        "python",
-        "quantitative-finance",
-        "risk-management"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 2,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/HaasEnjoyer/quanttro"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Research prototype for sports fact provenance, settlement replay and market-rule checks using synthetic data.",
-      "discovery_query": "market data replay",
-      "exact_revision": "d729c695cae47f0075564f5f206f938096726c02",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-03T07:40:13Z",
-      "repository": "Albertito-AI/tallystick",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "pyproject.toml",
-        "spec",
-        "src",
-        "tests"
-      ],
-      "size_kb": 554,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 13,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 46,
-      "url": "https://github.com/Albertito-AI/tallystick"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-06T14:44:09.677640+00:00",
+  "generated_at": "2026-11-06T20:24:55.663869+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
