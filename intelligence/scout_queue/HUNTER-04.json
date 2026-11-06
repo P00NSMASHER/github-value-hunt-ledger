@@ -214,14 +214,14 @@
       "forks": 2,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T17:52:19Z",
+      "pushed_at": "2026-11-06T20:02:04Z",
       "repository": "ariel95500-create/gp-elite",
       "root_code_signals": [
         ".github",
         "pyproject.toml",
         "tests"
       ],
-      "size_kb": 7950,
+      "size_kb": 7982,
       "stars": 42,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -328,6 +328,47 @@
       },
       "triage_score": 48,
       "url": "https://github.com/GongJr0/SymbolicDSGE"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Learn symbolic regression: expression trees, complexity versus error, and a real formula search in plain numpy.",
+      "discovery_query": "symbolic regression",
+      "exact_revision": "ed3ef0c5009dcc6e393c5d6abda887641fc9948f",
+      "forks": 1,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-06T18:24:21Z",
+      "repository": "KrunalPanchal1995/opensymbolic",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 956,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "beginner-friendly",
+        "education",
+        "hello-foss",
+        "machine-learning",
+        "pan-iit-oss",
+        "python"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 48,
+      "url": "https://github.com/KrunalPanchal1995/opensymbolic"
     },
     {
       "archived": false,
@@ -487,11 +528,11 @@
       "default_branch": "main",
       "description": "srbf: Symbolic Regression Benchmark Framework. Evaluate symbolic-regression models on shared benchmarks with shared metrics; interactive results at psaegert.github.io/srbf",
       "discovery_query": "symbolic regression",
-      "exact_revision": "7525d4e05f0e0009fd5809e668dfd8c62bab27e3",
+      "exact_revision": "c6bb0a1163fe8a41fe494422f90c6a9ef2e17aae",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T16:25:22Z",
+      "pushed_at": "2026-11-06T19:24:43Z",
       "repository": "psaegert/srbf",
       "root_code_signals": [
         ".github",
@@ -499,7 +540,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 2777990,
+      "size_kb": 2779386,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -563,6 +604,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T19:04:14Z",
       "repository": "tomwolfe/Emergentia",
+      "retained_unreviewed": true,
       "root_code_signals": [
         "tests"
       ],
@@ -606,7 +648,7 @@
       "forks": 0,
       "primary_language": "Jupyter Notebook",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-06T14:41:05Z",
+      "pushed_at": "2026-11-06T19:08:49Z",
       "repository": "saeed92m/ztf-classifier",
       "root_code_signals": [
         ".github",
@@ -614,7 +656,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 5551,
+      "size_kb": 5569,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -631,46 +673,11 @@
       },
       "triage_score": 41,
       "url": "https://github.com/saeed92m/ztf-classifier"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Classical PIR (Physics Intermediate Representation) symbolic regression engine",
-      "discovery_query": "symbolic regression",
-      "exact_revision": "e57f4bdf288619836693b72c3a4f1326b5fe7670",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-03T18:05:00Z",
-      "repository": "Qazi-pk/physics-engine",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 711,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 8,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 41,
-      "url": "https://github.com/Qazi-pk/physics-engine"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists.",
-  "generated_at": "2026-11-06T17:53:18.030800+00:00",
+  "generated_at": "2026-11-06T20:30:49.532066+00:00",
   "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
   "project": "novel-discovery",
   "risk_review": [],
