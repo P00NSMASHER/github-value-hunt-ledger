@@ -72,6 +72,16 @@ def norm_contract(v: object) -> str:
     return v.replace("-", "").upper() if isinstance(v, str) else ""
 
 
+def norm_contractor(value: object) -> str:
+    """Normalize punctuation and Corp./Corporation, not unrelated recipients."""
+    if not isinstance(value, str):
+        return ""
+    candidate = " ".join(value.upper().replace(".", "").split())
+    if candidate.endswith(" CORP"):
+        candidate = candidate[:-5] + " CORPORATION"
+    return candidate
+
+
 def adjudicate_original_award_claim(base: dict, action: dict, sam: dict) -> str:
     """Fail-closed research negative control; NOT an award-transaction validator."""
     if not all(isinstance(x, dict) for x in (base, action, sam)):
@@ -84,8 +94,9 @@ def adjudicate_original_award_claim(base: dict, action: dict, sam: dict) -> str:
         or action.get("issuer") != sam.get("issuer")
         or not base.get("issuer")
         or base.get("contracting_office") != action.get("contracting_office")
-        or base.get("contractor") != action.get("contractor")
-        or not base.get("contractor")
+        or not norm_contractor(base.get("contractor"))
+        or norm_contractor(base.get("contractor")) != norm_contractor(action.get("contractor"))
+        or norm_contractor(action.get("contractor")) != norm_contractor(sam.get("contractor"))
     ):
         return "UNKNOWN_OR_UNMATCHED_SOURCE_IDENTITY"
     if (
@@ -146,6 +157,26 @@ class ArmyPrsmOriginalContractVsModificationNegativeControl(unittest.TestCase):
         self.assertEqual(
             adjudicate_original_award_claim(missing, ARMY_2026, SAM_2026),
             "UNKNOWN_MISSING_ORIGINAL_SOURCE_CHRONOLOGY",
+        )
+
+    def test_substituted_or_missing_sam_awardee_must_remain_unknown(self):
+        # Negative-control against silently joining an unrelated SAM recipient
+        # to matching Army contract-number and dollar strings.
+        for recipient in ("UNRELATED DEFENSE CONTRACTOR LLC", "", None):
+            with self.subTest(sam_recipient=recipient):
+                altered = copy.deepcopy(SAM_2026)
+                altered["contractor"] = recipient
+                self.assertEqual(
+                    adjudicate_original_award_claim(BASE_2025, ARMY_2026, altered),
+                    "UNKNOWN_OR_UNMATCHED_SOURCE_IDENTITY",
+                )
+        # The two original issuers use Corp. vs Corporation for this recipient.
+        # A faithful spelling variant still passes the narrowly scoped check.
+        alias = copy.deepcopy(SAM_2026)
+        alias["contractor"] = "Lockheed Martin Corp."
+        self.assertEqual(
+            adjudicate_original_award_claim(BASE_2025, ARMY_2026, alias),
+            "FALSIFIED_NEW_2026_BASE_AWARD_LABEL",
         )
 
     def test_ceiling_mutation_or_missing_modification_cannot_verify(self):
