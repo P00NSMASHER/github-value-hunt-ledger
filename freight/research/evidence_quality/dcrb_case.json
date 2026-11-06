@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "scope": "RESEARCH_ONLY_INDEPENDENT_ISSUER_SOURCE_IDENTITY_NEGATIVE_CONTROL",
+  "observed_date_utc": "2026-11-06",
+  "award_publisher_page": {
+    "url": "https://dcrb.dc.gov/publication/dcrb-2025-rfp-0500-dcrb-benefits-administration-pension-system",
+    "source_capture": "SEARCH_INDEX_OF_ORIGINAL_DCRB_PAGE; DIRECT_WEBPAGE_BODY_NOT_CUSTODIED",
+    "issuer": "District of Columbia Retirement Board",
+    "raw_solicitation_field": "D CR B-2025-RFP-0500",
+    "contract_number": "DCRB-2026-C-0100",
+    "contractor_display_name": "Majesco",
+    "total_contract_value_including_options_usd": "17744541",
+    "award_date": "2026-05-26",
+    "listed_rfp_amendments": ["A0001", "A0002"],
+    "post_award_contract_modification_history": null,
+    "cash_paid": null
+  },
+  "original_solicitation": {
+    "url": "https://dcrb.dc.gov/sites/default/files/dc/sites/dcrb/publication/attachments/REQUEST%20FOR%20PROPOSAL%20-%20DCRB-2025-RFP-0500_DCRB%20BAPS_RFP_Final%202025.08.01.pdf",
+    "capture": "OFFICIAL_PUBLISHER_PDF_PARSED_BY_WEB; RAW_PDF_BYTES_NOT_CUSTODIED",
+    "issuer": "District of Columbia Retirement Board",
+    "original_solicitation_number": "DCRB-2025-RFP-0500",
+    "contract_number_on_original_unawarded_rfp": "TBD",
+    "original_issue_date": "2025-08-01"
+  },
+  "historical_repository_fixture": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "repository_tree_sha_at_read": "ed5bb9c5c885a32d57c34c1b5315a79403c652f2",
+    "path": "freight/fixtures/usaspending_reported_award_cross_source_boundary_v1.json",
+    "git_blob_sha": "505db1826b41ae4f04d10e473b4cfc07baecac0f",
+    "scope": "PUBLISHER_INDEXED_REPORTED_FEDERAL_AWARDS_NOT_FIRST_PARTY_SOLICITATION_RECORDS",
+    "existing_award_piids": ["89703026FAR000022", "6973GH24F00956"]
+  },
+  "derived_conclusions": {
+    "raw_identifier_is_exact_match": false,
+    "canonical_alias_supported_by_separate_first_party_rfp": true,
+    "contract_number_is_solicitation_number": false,
+    "listed_amendments_are_post_award_modifications": false,
+    "contract_value_is_cash_received": false,
+    "independent_award_outcome_adjudication": false,
+    "validated_benchmark": false,
+    "rights_cleared_for_commercial_automated_reuse": false
+  }
+}
