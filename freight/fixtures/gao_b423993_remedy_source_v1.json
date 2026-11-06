@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "record_type": "HUMAN_TRANSCRIBED_OFFICIAL_GAO_DECISION_TIMELINE_NOT_CONTRACT_OR_AWARD_RECORD",
+  "case_id": "B-423993_PROTEST_REMEDY_SUPERSESSION_2026",
+  "source_issuer": "U.S. Government Accountability Office",
+  "procurement_issuer": "U.S. Army Corps of Engineers",
+  "solicitation": "W912DY-25-Q-A101",
+  "award_date_reported": "2025-09-30",
+  "awardee_name_reported": "Export 220Volt, Inc.",
+  "awardee_uei": null,
+  "award_contract_piid": null,
+  "independently_verified_contract_award_amount_usd": null,
+  "solicitation_amendment_count_reported": 10,
+  "independently_verified_contract_modifications": null,
+  "original_gao_decision": {
+    "url": "https://www.gao.gov/products/b-423993,b-423993.2",
+    "numbers": [
+      "B-423993",
+      "B-423993.2"
+    ],
+    "date": "2026-02-18",
+    "protest_merits": "SUSTAINED",
+    "recommendation": "REOPEN_REVISE_EVALUATE_AND_MAKE_NEW_AWARD_DECISION",
+    "awardee_final_quotation_usd": "2039912.11",
+    "actual_award_payment_usd": null
+  },
+  "later_gao_decision": {
+    "url": "https://www.gao.gov/products/b-423993.4,b-423993.5",
+    "numbers": [
+      "B-423993.4",
+      "B-423993.5"
+    ],
+    "date": "2026-05-13",
+    "protest_merits": "SUSTAINED_UNCHANGED",
+    "replaces_reopen_recommendation": true,
+    "recommendation": "REIMBURSE_QUOTATION_PREPARATION_AND_PROTEST_COSTS",
+    "reason": "RECOMPETITION_NO_LONGER_FEASIBLE_AS_CONTRACT_SUBSTANTIALLY_PERFORMED",
+    "agency_delivery_progress_report": "ABOUT_75_TO_80_PERCENT_ITEMS_DELIVERED",
+    "verified_costs_paid_usd": null,
+    "verified_reaward_to_protester": false
+  },
+  "prohibited_conclusions": [
+    "PROTEST_SUSTAINED_IMPLIES_ORIGINAL_AWARD_TERMINATED",
+    "PROTEST_SUSTAINED_IMPLIES_PROTESTER_WON_CONTRACT",
+    "EARLIER_GAO_RECOMPETE_RECOMMENDATION_IS_STILL_CURRENT",
+    "QUOTATION_PRICE_IS_CONFIRMED_AWARD_CONTRACT_VALUE",
+    "RECOMMENDED_COST_REIMBURSEMENT_IS_VERIFIED_PAYMENT"
+  ],
+  "custody": {
+    "official_html_pages_read_as_publisher_text": true,
+    "original_http_response_bytes_retained": false,
+    "original_source_sha256": null,
+    "signed_original_award_instrument_available": false,
+    "original_solicitation_amendment_bytes_available": false,
+    "independent_award_transaction_row_available": false,
+    "customer_recovery_receipt_available": false,
+    "commercial_reuse_permission_independently_confirmed": false
+  },
+  "bench_status": "DECISION_LEVEL_NEGATIVE_CONTROL_NOT_A_VALIDATED_NOTICE_AWARD_BENCHMARK"
+}
