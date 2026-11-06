@@ -3,8 +3,12 @@ name: Hunter Fleet Health
 on:
   schedule:
     - cron: "37 * * * *"
-  # Re-check the live inspection pipeline after this monitor is released.
-  # This is event-driven, not an additional recurring scout schedule.
+  # Event-driven fallback: verify every completed authenticated recovery
+  # scout, including a failed worker; do not rely solely on cron delivery.
+  # This is not another recurring scout timer or a modification to its crons.
+  workflow_run:
+    workflows: ["Active Project Technology Scouts"]
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -30,6 +34,13 @@ concurrency:
 
 jobs:
   audit:
+    # This workflow also observes scheduled scouts; avoid noisy duplicate
+    # audits on those events while retaining the existing hourly timer.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.event == 'repository_dispatch' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
