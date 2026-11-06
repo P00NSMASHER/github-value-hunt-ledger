@@ -9,6 +9,8 @@ to $12,810,705.65. The structured Award Details header instead prints
 $12,810,705.65 as Base and All Options Value. It ALSO prints award date
 2026-09-22 while description item (14) says 2016-09-22. Keep that date
 conflict UNKNOWN; neither field authenticates the underlying transaction.
+The structured PSC is J016 (aircraft parts repair), but the narrative's
+item (5) says J066. Neither code independently verifies an exact PSC join.
 
 This is a human-transcribed, PUBLIC issuer-source negative control, not
 raw original-byte custody or an independently reconciled award/obligation.
@@ -38,6 +40,8 @@ OFFICIAL = {
     "award_date_in_description": "2016-09-22",
     "notice_original_published": "2026-09-25",
     "modification": "P00002",
+    "psc_header": "J016",
+    "psc_description_item_5": "J066",
     "prior_total_usd_cents": 1045272665,
     "modification_action_usd_cents": 235797900,
     "new_total_usd_cents": 1281070565,
@@ -68,6 +72,13 @@ def assess_claim(source: dict, claim: dict) -> str:
     if (source["prior_total_usd_cents"] + source["modification_action_usd_cents"]
             != source["new_total_usd_cents"]):
         return "UNKNOWN_INCONSISTENT_ISSUER_AMOUNTS"
+    # Official structured PSC and narrative PSC disagree. A claim of exact
+    # product/service classification must not resolve the conflict by fiat.
+    if "claimed_exact_psc" in claim:
+        if source["psc_header"] != source["psc_description_item_5"]:
+            return "UNKNOWN_CONFLICTING_ISSUER_PSC"
+        if claim["claimed_exact_psc"] != source["psc_header"]:
+            return "UNKNOWN_UNMATCHED_ISSUER_PSC"
     # Official header and two description fields name three DIFFERENT
     # solicitation strings. A claim of a verified exact original-solicitation
     # join cannot inherit the notice-level modification consistency result.
@@ -184,6 +195,22 @@ class AirForceL3HarrisSourceBoundNegativeControl(unittest.TestCase):
             assess_claim(forged, candidate()),
             "UNKNOWN_SOURCE_NOT_AUTHENTICATED",
         )
+
+    def test_official_psc_conflict_must_not_be_promoted_to_exact_join(self):
+        # First-party SAM structured PSC J016 versus description (5) J066.
+        self.assertEqual(OFFICIAL["psc_header"], "J016")
+        self.assertEqual(OFFICIAL["psc_description_item_5"], "J066")
+        for code in ("J016", "J066", "J999"):
+            with self.subTest(claimed_exact_psc=code):
+                wrong = candidate()
+                wrong["claimed_exact_psc"] = code
+                self.assertEqual(assess_claim(OFFICIAL, wrong),
+                                 "UNKNOWN_CONFLICTING_ISSUER_PSC")
+        # Altering the transcribed original to erase the discrepancy is not proof.
+        forged = copy.deepcopy(OFFICIAL)
+        forged["psc_description_item_5"] = "J016"
+        self.assertEqual(assess_claim(forged, candidate()),
+                         "UNKNOWN_SOURCE_NOT_AUTHENTICATED")
 
     def test_original_notice_is_not_obligation_payment_or_rights_evidence(self):
         self.assertIsNone(OFFICIAL["original_bytes_sha256"])
