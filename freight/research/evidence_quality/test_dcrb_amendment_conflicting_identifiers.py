@@ -9,7 +9,7 @@ Award notice: https://dcrb.dc.gov/publication/dcrb-2025-rfp-0500-dcrb-benefits-a
 Both amendment PDFs show 2025-RFP-0500 in p1 blocks 1 and 9A but
 2024-RFP-0500 in p1 item 14 and 2024-RFP-0300 on p2. The source is
 internally inconsistent. This test proves a counterexample to naive
-first/last/majority ID extraction; it does NOT adjudicate a transaction,
+unscoped narrative or last-occurrence ID extraction; it does NOT adjudicate a transaction,
 verify raw source bytes, establish source rights or validate a benchmark.
 No network, Cloudflare, customer data, production code or release effects.
 """
