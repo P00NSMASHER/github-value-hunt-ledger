@@ -50,6 +50,34 @@ AWARDS = (
 )
 OBSERVED = datetime(2026, 11, 6, 9, 47, tzinfo=timezone.utc)
 
+# Publisher-indexed primary-notice transcription anchors, independently
+# checked against the three official SAM.gov pages on 2026-11-06.
+# This prevents a claimant from changing BOTH the test source and the claim
+# to invent two matching awards. Not a hash or source-rights clearance.
+SOL_SOURCE_ANCHORS = {
+    "notice": "W912DR26QA051", "issuer": "DEPT OF THE ARMY",
+    "office": "W2SD ENDIST BALTIMORE", "posted": "2026-06-29",
+    "updated": "2026-07-08",
+}
+AWARD_SOURCE_ANCHORS = {
+    "W912DR26AA003": {
+        "notice": "W912DR26AA003", "award": "W912DR26AA003",
+        "related": "W912DR26QA051", "issuer": "DEPT OF THE ARMY",
+        "office": "W2SD ENDIST BALTIMORE", "uei": "F839PKJPFLZ4",
+        "contractor": "GREENFIELD INTERNATIONAL CORP.",
+        "ceiling_usd": 4_979_445, "signed": "2026-09-16",
+        "published": "2026-09-17",
+    },
+    "W912DR26AA004": {
+        "notice": "W912DR26AA004", "award": "W912DR26AA004",
+        "related": "W912DR26QA051", "issuer": "DEPT OF THE ARMY",
+        "office": "W2SD ENDIST BALTIMORE", "uei": "S64BBMTMJTB5",
+        "contractor": "Integrity Core Alliance LLC",
+        "ceiling_usd": 2_853_298, "signed": "2026-09-17",
+        "published": "2026-09-17",
+    },
+}
+
 def source_bound_candidates(sol, awards):
     """Count issuer/office/related-ID-consistent issuer notices, not transactions."""
     if not isinstance(sol, dict) or not isinstance(awards, (list, tuple)):
@@ -57,9 +85,19 @@ def source_bound_candidates(sol, awards):
     if not all(isinstance(sol.get(k), str) and sol[k] for k in
                ("notice", "issuer", "office", "posted")):
         return None
+    # A coordinated source+claim substitution must not inherit the verified
+    # notice-bound conclusion. Only these two checked public award notices are
+    # admissible in this fixture; the reported third award stays UNKNOWN.
+    if any(sol.get(k) != v for k, v in SOL_SOURCE_ANCHORS.items()):
+        return None
+    if len(awards) != len(AWARD_SOURCE_ANCHORS):
+        return None
     result = []
     for a in awards:
         if not isinstance(a, dict):
+            return None
+        expected = AWARD_SOURCE_ANCHORS.get(a.get("award"))
+        if expected is None or any(a.get(k) != v for k, v in expected.items()):
             return None
         if any(not isinstance(a.get(k), str) or not a[k] for k in
                ("notice", "award", "related", "issuer", "office",
@@ -127,6 +165,40 @@ class UsaceMultipleBpaOriginalSourceNegativeControl(unittest.TestCase):
         altered = [copy.deepcopy(a) for a in AWARDS]
         altered[1]["office"] = "UNRELATED CONTRACTING OFFICE"
         self.assertEqual(adjudicate_claim(SOL, altered),
+                         "UNKNOWN_OR_CONFLICTING_ORIGINAL")
+
+    def test_coordinated_source_and_claim_mutations_fail_closed(self):
+        # Before this guard, changing BOTH a local award source and its
+        # proposed recipient or amount left FALSIFIED_UNIQUE_AWARDEE_JOIN
+        # unchanged, even though those bytes were never original evidence.
+        for field, fake in (
+            ("contractor", "FABRICATED COMPANY INC."),
+            ("uei", "FAKEENTITY000"),
+            ("ceiling_usd", 9_999_999),
+            ("award", "W912DR26AA005"),
+            ("related", "W912DR26QA052"),
+            ("signed", "2026-09-18"),
+        ):
+            with self.subTest(field=field):
+                changed = [copy.deepcopy(a) for a in AWARDS]
+                changed[0][field] = fake
+                if field == "award":
+                    changed[0]["notice"] = fake
+                self.assertEqual(adjudicate_claim(SOL, changed),
+                                 "UNKNOWN_OR_CONFLICTING_ORIGINAL")
+        changed_sol = copy.deepcopy(SOL)
+        changed_sol["notice"] = "W912DR26QA052"
+        changed = [copy.deepcopy(a) for a in AWARDS]
+        for a in changed:
+            a["related"] = changed_sol["notice"]
+        self.assertEqual(adjudicate_claim(changed_sol, changed),
+                         "UNKNOWN_OR_CONFLICTING_ORIGINAL")
+
+    def test_unverified_third_award_cannot_inherit_original_source_label(self):
+        third = copy.deepcopy(AWARDS[0])
+        third["award"] = third["notice"] = "W912DR26AA005"
+        third["uei"] = "UNVERIFIED"
+        self.assertEqual(adjudicate_claim(SOL, (*AWARDS, third)),
                          "UNKNOWN_OR_CONFLICTING_ORIGINAL")
 
     def test_real_observation_after_award_not_historical_preaward_capture(self):
