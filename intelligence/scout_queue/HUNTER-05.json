@@ -19,7 +19,7 @@
       "forks": 494,
       "primary_language": "Rust",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T00:44:29Z",
+      "pushed_at": "2026-11-06T16:25:51Z",
       "repository": "ast-grep/ast-grep",
       "root_code_signals": [
         ".github",
@@ -27,7 +27,7 @@
         "pyproject.toml",
         "schemas"
       ],
-      "size_kb": 10969,
+      "size_kb": 10973,
       "stars": 16467,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -125,6 +125,7 @@
       "published_license_spdx": "Apache-2.0",
       "pushed_at": "2026-11-06T13:49:55Z",
       "repository": "PramodBasavarajMenasi/siftwise",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
@@ -224,7 +225,7 @@
       "forks": 1,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T09:32:52Z",
+      "pushed_at": "2026-11-06T21:18:42Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -461,6 +462,54 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Test impact analysis for .NET - run only the tests your diff can actually affect.",
+      "discovery_query": "test impact analysis",
+      "exact_revision": "7411d5eaca634f4442794c844c81412960972d77",
+      "forks": 2,
+      "primary_language": "C#",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-06T20:46:16Z",
+      "repository": "SebHenn/dotnet-tia",
+      "root_code_signals": [
+        ".github",
+        "src",
+        "tests"
+      ],
+      "size_kb": 2315,
+      "stars": 6,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "continuous-integration",
+        "csharp",
+        "developer-tools",
+        "dotnet",
+        "dotnet-tool",
+        "msbuild",
+        "mstest",
+        "nunit",
+        "roslyn",
+        "test-impact-analysis",
+        "testing",
+        "tunit",
+        "xunit"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 9,
+        "stars": 3,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 51,
+      "url": "https://github.com/SebHenn/dotnet-tia"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Rewrites OpenTelemetry JS SDK 2.x code to 3.0: npx otel-js-upgrade 3",
       "discovery_query": "typescript codemod",
       "exact_revision": "6d86985f26923685d2b8bb49e39b2ad69d4545ff",
@@ -558,6 +607,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T15:50:44Z",
       "repository": "DiffCI/core",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -700,11 +750,11 @@
       "default_branch": "main",
       "description": "Upgrade agent for TypeScript apps: when an API changes, Shim opens one tested pull request. First up: Vercel AI SDK 6 to 7",
       "discovery_query": "typescript codemod",
-      "exact_revision": "d44acc90e0fef5e594ad5b0613e404691816c37d",
+      "exact_revision": "1021511a22f1a17cbe4259d18a9713fc1aba4fb3",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T13:38:06Z",
+      "pushed_at": "2026-11-06T20:17:47Z",
       "repository": "JayanthMalladi/shim",
       "root_code_signals": [
         ".github",
@@ -712,7 +762,7 @@
         "src",
         "test"
       ],
-      "size_kb": 9547,
+      "size_kb": 9562,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -750,65 +800,11 @@
       },
       "triage_score": 49,
       "url": "https://github.com/JayanthMalladi/shim"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Deterministic, local-first change-impact analysis for Python, JavaScript, and TypeScript\u2014trace blast radius, suggest tests, and gate risky PRs.",
-      "discovery_query": "test impact analysis",
-      "exact_revision": "d8606977f6d6c2a94b246ecc3da6bc343eafa422",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T17:51:58Z",
-      "repository": "adiarora06/RepoRipple",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "pyproject.toml",
-        "src",
-        "tests"
-      ],
-      "size_kb": 2007,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai-agents",
-        "change-impact-analysis",
-        "ci-cd",
-        "cli",
-        "code-review",
-        "dependency-graph",
-        "developer-tools",
-        "git",
-        "github-actions",
-        "javascript",
-        "mcp",
-        "mcp-server",
-        "openrouter",
-        "python",
-        "static-analysis",
-        "test-selection",
-        "typescript"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 11,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 49,
-      "url": "https://github.com/adiarora06/RepoRipple"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-06T15:54:08.998387+00:00",
+  "generated_at": "2026-11-06T21:23:26.162912+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
