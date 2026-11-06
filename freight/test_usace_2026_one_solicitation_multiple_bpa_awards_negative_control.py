@@ -134,7 +134,8 @@ def adjudicate_claim(sol, awards, proposed=None):
         "claimed_obligated_usd", "obligated_usd",
         "claimed_paid_usd", "paid_usd",
         "claimed_customer_recovery_usd", "customer_recovery_usd",
-        "claimed_modification", "modification_id", "cash_recovered_usd",
+        "claimed_modification", "modification", "modification_id",
+        "cash_recovered_usd",
     )
     if any(proposed.get(k) is not None for k in unsupported_claims):
         return "REJECT_UNVERIFIED_TRANSACTION_OR_CASH_CLAIM"
@@ -222,7 +223,7 @@ class UsaceMultipleBpaOriginalSourceNegativeControl(unittest.TestCase):
         for field in ("claimed_obligated_usd", "obligated_usd",
                       "claimed_paid_usd", "paid_usd",
                       "claimed_customer_recovery_usd", "customer_recovery_usd",
-                      "claimed_modification", "modification_id",
+                      "claimed_modification", "modification", "modification_id",
                       "cash_recovered_usd"):
             for value in (0, 4_979_445):
                 with self.subTest(field=field, value=value):
