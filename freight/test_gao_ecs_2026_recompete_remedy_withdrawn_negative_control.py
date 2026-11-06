@@ -68,15 +68,12 @@ MODIFIED = {
 }
 # Independent fixed transcription anchors resist mutating the very local
 # source under test; they are NOT authentication of GAO's original bytes.
-ORIGINAL_ANCHOR = tuple((k, ORIGINAL[k]) for k in (
-    "official_source", "gao_case", "decision_date", "disposition",
-    "issuer", "office", "rfq", "rfq_issued",
-    "original_award_date_reported", "awardee_reported", "protester",
-    "awardee_evaluated_final_quote_usd", "reopen_competition_recommended"))
-MODIFIED_ANCHOR = tuple((k, MODIFIED[k]) for k in (
-    "official_source", "gao_case", "decision_date", "disposition",
-    "issuer", "office", "rfq", "reported_original_awardee",
-    "reopen_competition_recommended", "replacement_recommendation", "reason"))
+# Freeze EVERY transcribed field, including UNKNOWN cash, award and rights states.
+# A checksum or local fixed anchor is still not original-file authentication.
+# This boundary prevents a later claimed payment/award from passing simply
+# because the fixture only pinned decision identity and dates.
+ORIGINAL_ANCHOR = tuple(ORIGINAL.items())
+MODIFIED_ANCHOR = tuple(MODIFIED.items())
 
 
 def decide(source_original: dict, source_modified: dict, claim: dict) -> str:
@@ -97,6 +94,10 @@ def decide(source_original: dict, source_modified: dict, claim: dict) -> str:
             or claim.get("rfq") != source_original["rfq"]):
         return "UNKNOWN_MISMATCHED_ISSUER_OR_RFQ"
     if claim.get("kind") == "GAO_MAY_REAWARD_OR_RECOMPETE_ORDER":
+        # Only falsify an attempted reaward attribution for the actual
+        # originally reported contractor, never a different or absent entity.
+        if claim.get("contractor") != source_original["awardee_reported"]:
+            return "UNKNOWN_MISMATCHED_REPORTED_AWARDEE"
         return "FALSIFIED_GAO_RECOMPETE_RECOMMENDATION_REPLACED"
     if claim.get("kind") == "ORIGINAL_2025_AWARDEE":
         if claim.get("contractor") != source_original["awardee_reported"]:
@@ -200,6 +201,38 @@ class GAOECS2026WithdrawnRecompetitionNegativeControl(unittest.TestCase):
                 self.assertEqual(
                     decide(before, after, claim("GAO_MAY_REAWARD_OR_RECOMPETE_ORDER")),
                     "UNKNOWN_TAMPERED_TRANSCRIPTION",
+                )
+
+    def test_forged_original_source_payment_award_or_rights_is_quarantined(self):
+        # Negative controls: source-matching identity/date fields cannot
+        # make an invented verified award, amendment, payment or rights true.
+        # Previously these fields were outside the fixture's anchor set.
+        cases = (
+            ("original", "verified_army_award_contract_id", "FAKE-CONTRACT"),
+            ("original", "verified_army_transaction_obligation_usd", "2039912.11"),
+            ("modified", "actual_reaward_verified", True),
+            ("modified", "reimbursement_paid_usd", "2039912.11"),
+            ("modified", "verified_contract_modification", "P0001"),
+            ("modified", "source_specific_reuse_rights_verified", True),
+        )
+        for target, field, forged_value in cases:
+            with self.subTest(target=target, field=field):
+                original, modified = copy.deepcopy(ORIGINAL), copy.deepcopy(MODIFIED)
+                (original if target == "original" else modified)[field] = forged_value
+                self.assertEqual(
+                    decide(original, modified,
+                           claim("GAO_MAY_REAWARD_OR_RECOMPETE_ORDER")),
+                    "UNKNOWN_TAMPERED_TRANSCRIPTION",
+                )
+
+    def test_unrelated_or_missing_awardee_cannot_inherit_gao_falsification(self):
+        for incorrect in ("UNRELATED CONTRACTOR", None):
+            with self.subTest(contractor=incorrect):
+                self.assertEqual(
+                    decide(ORIGINAL, MODIFIED,
+                           claim("GAO_MAY_REAWARD_OR_RECOMPETE_ORDER",
+                                 contractor=incorrect)),
+                    "UNKNOWN_MISMATCHED_REPORTED_AWARDEE",
                 )
 
     def test_late_observation_cannot_backfill_preaward_capture(self):
