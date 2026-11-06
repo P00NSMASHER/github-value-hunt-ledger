@@ -127,6 +127,17 @@ def adjudicate_claim(sol, awards, proposed=None):
     required = ("award", "uei", "contractor", "ceiling_usd", "signed")
     if not isinstance(proposed, dict) or any(k not in proposed for k in required):
         return "UNKNOWN_INCOMPLETE_PROPOSED_IDENTITY"
+    # An official BPA award notice supports an agreement's identity/ceiling,
+    # not order-level obligations, modifications, disbursements or recoveries.
+    # Even 0 is a factual cash claim and must not be inferred from no data.
+    unsupported_claims = (
+        "claimed_obligated_usd", "obligated_usd",
+        "claimed_paid_usd", "paid_usd",
+        "claimed_customer_recovery_usd", "customer_recovery_usd",
+        "claimed_modification", "modification_id", "cash_recovered_usd",
+    )
+    if any(proposed.get(k) is not None for k in unsupported_claims):
+        return "REJECT_UNVERIFIED_TRANSACTION_OR_CASH_CLAIM"
     matches = [a for a in matches
                if all(type(proposed[k]) is type(a[k]) and proposed[k] == a[k]
                       for k in required)]
@@ -195,11 +206,37 @@ class UsaceMultipleBpaOriginalSourceNegativeControl(unittest.TestCase):
                          "UNKNOWN_OR_CONFLICTING_ORIGINAL")
 
     def test_unverified_third_award_cannot_inherit_original_source_label(self):
+        # Secondary indexes point to a third record, W912DR26AA002 /
+        # Crystal Cleanz LLC, but the first-party record body/UEI has not
+        # been inspected in this fixture. Do not promote it as authenticated.
         third = copy.deepcopy(AWARDS[0])
-        third["award"] = third["notice"] = "W912DR26AA005"
+        third["award"] = third["notice"] = "W912DR26AA002"
+        third["contractor"] = "CRYSTAL CLEANZ LLC"
         third["uei"] = "UNVERIFIED"
         self.assertEqual(adjudicate_claim(SOL, (*AWARDS, third)),
                          "UNKNOWN_OR_CONFLICTING_ORIGINAL")
+
+    def test_unverified_cash_and_modification_claims_fail_even_if_award_identity_matches(self):
+        # Previously, correct award/UEI/ceiling with invented paid cash
+        # was mistakenly labeled issuer-notice-consistent.
+        for field in ("claimed_obligated_usd", "obligated_usd",
+                      "claimed_paid_usd", "paid_usd",
+                      "claimed_customer_recovery_usd", "customer_recovery_usd",
+                      "claimed_modification", "modification_id",
+                      "cash_recovered_usd"):
+            for value in (0, 4_979_445):
+                with self.subTest(field=field, value=value):
+                    bad = copy.deepcopy(AWARDS[0])
+                    bad[field] = value
+                    self.assertEqual(
+                        adjudicate_claim(SOL, AWARDS, bad),
+                        "REJECT_UNVERIFIED_TRANSACTION_OR_CASH_CLAIM",
+                    )
+        # A missing value stays UNKNOWN rather than becoming zero.
+        permitted = copy.deepcopy(AWARDS[0])
+        permitted["claimed_paid_usd"] = None
+        self.assertEqual(adjudicate_claim(SOL, AWARDS, permitted),
+                         "ISSUER_NOTICE_CONSISTENT_TRANSACTION_UNKNOWN")
 
     def test_real_observation_after_award_not_historical_preaward_capture(self):
         notice = {"solicitation_number": SOL["notice"], "agency_code": "DOD",
