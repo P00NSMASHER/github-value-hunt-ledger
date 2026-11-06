@@ -105,6 +105,11 @@ def decide(source_original: dict, source_modified: dict, claim: dict) -> str:
     if claim.get("kind") == "GAO_COSTS_REIMBURSEMENT":
         return "UNKNOWN_RECOMMENDED_COSTS_NOT_PROOF_OF_PAYMENT"
     if claim.get("kind") == "GAO_FINAL_QUOTE_AS_DISBURSEMENT":
+        # A GAO quote can only falsify a claim for that exact evaluated amount.
+        # An unrelated/missing price is UNKNOWN, not a source-proven failure.
+        if (not isinstance(claim.get("amount_usd"), str)
+                or claim["amount_usd"] != source_original["awardee_evaluated_final_quote_usd"]):
+            return "UNKNOWN_UNMATCHED_EVALUATED_QUOTE_AMOUNT"
         return "FALSIFIED_EVALUATED_QUOTE_AS_OBLIGATION_OR_CASH"
     return "UNKNOWN_OUTSIDE_ORIGINAL_ADJUDICATION"
 
@@ -115,6 +120,8 @@ def claim(kind: str, **overrides: object) -> dict:
         "office": ORIGINAL["office"], "rfq": ORIGINAL["rfq"],
         "contractor": ORIGINAL["awardee_reported"],
     }
+    if kind == "GAO_FINAL_QUOTE_AS_DISBURSEMENT":
+        result["amount_usd"] = ORIGINAL["awardee_evaluated_final_quote_usd"]
     result.update(overrides)
     return result
 
@@ -154,6 +161,14 @@ class GAOECS2026WithdrawnRecompetitionNegativeControl(unittest.TestCase):
             decide(ORIGINAL, MODIFIED, claim("GAO_FINAL_QUOTE_AS_DISBURSEMENT")),
             "FALSIFIED_EVALUATED_QUOTE_AS_OBLIGATION_OR_CASH",
         )
+        # Negative controls: unrelated, absent, or numeric candidate prices
+        # must not inherit the official evaluated-quote falsification.
+        for wrong in ("9999999.99", None, 2039912.11):
+            with self.subTest(candidate_amount=wrong):
+                self.assertEqual(
+                    decide(ORIGINAL, MODIFIED, claim("GAO_FINAL_QUOTE_AS_DISBURSEMENT", amount_usd=wrong)),
+                    "UNKNOWN_UNMATCHED_EVALUATED_QUOTE_AMOUNT",
+                )
         self.assertEqual(Decimal(ORIGINAL["awardee_evaluated_final_quote_usd"]),
                          Decimal("2039912.11"))
         self.assertIsNone(MODIFIED["reimbursement_paid_usd"])
