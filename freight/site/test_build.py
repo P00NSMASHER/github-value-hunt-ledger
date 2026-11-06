@@ -725,10 +725,14 @@ class PublicChatbotTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
+            # The separate legacy GitHub Pages artifact must stay unchanged.
+            self.assertNotIn("https://static.cloudflareinsights.com",
+                             (output / "_headers").read_text())
             allow_verified_pages_inquiry(output)
             for name in ("index.html", "_headers"):
                 content = (output / name).read_text()
-                self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;", content)
+                self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com https://static.cloudflareinsights.com/beacon.min.js;", content)
+                self.assertEqual(content.count("https://static.cloudflareinsights.com/beacon.min.js"), 1)
                 self.assertIn("connect-src 'self' https://www.bubblav.com", content)
                 self.assertIn("frame-src https://www.bubblav.com", content)
                 self.assertIn("https://challenges.cloudflare.com;", content)
