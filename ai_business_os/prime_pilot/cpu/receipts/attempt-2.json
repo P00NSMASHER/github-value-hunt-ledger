@@ -1,0 +1,41 @@
+{
+  "id": "local-001",
+  "model": "qwen2.5-coder-0.5b",
+  "ack": true,
+  "prompt": "Fix this SQLite insert in create_lead.sql. The table leads(external_id TEXT NOT NULL) has no unique index. Retrying the same reference must produce one row; different references must be preserved. Use INSERT ... SELECT with a NOT EXISTS predicate. Do not use ON CONFLICT or change the schema. Use SQLite set subtraction (EXCEPT) between a singleton candidate and stored external IDs. Return exactly the proposed SQL, no prose. Current file:\nINSERT INTO leads (external_id) VALUES (:reference);\n",
+  "usage": {
+    "input": 126,
+    "output": 24,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "totalTokens": 150,
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "total": 0
+    }
+  },
+  "answer": "INSERT INTO leads (external_id) SELECT :reference EXCEPT SELECT external_id FROM leads WHERE external_id = :reference",
+  "elapsed_seconds": 4.07,
+  "status": "verified",
+  "verifier": {
+    "fixture_base_sha": "75b32959e630c606fd20086b08d59dc30b645905",
+    "verified_tree": "daf021a5b6987b53e5eb3f9358606f6f7f0eca7c",
+    "changed_paths": [
+      "create_lead.sql"
+    ],
+    "diff_sha256": "846f1fd387f5cca7db91ad2c7ea942a85c946d38dfbc086f2b6e726714a505e5",
+    "base_counts": {
+      "fixture-A": 2,
+      "fixture-B": 1
+    },
+    "patched_counts": {
+      "fixture-A": 1,
+      "fixture-B": 1
+    },
+    "test_command": "python3 verify.py"
+  },
+  "environment": "synthetic Prime CPU worker | no network | local weights"
+}
