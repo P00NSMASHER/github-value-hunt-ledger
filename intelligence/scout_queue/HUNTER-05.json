@@ -19,7 +19,7 @@
       "forks": 494,
       "primary_language": "Rust",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T16:25:51Z",
+      "pushed_at": "2026-11-06T23:31:51Z",
       "repository": "ast-grep/ast-grep",
       "root_code_signals": [
         ".github",
@@ -27,8 +27,8 @@
         "pyproject.toml",
         "schemas"
       ],
-      "size_kb": 10973,
-      "stars": 16467,
+      "size_kb": 10978,
+      "stars": 16470,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ast",
@@ -221,11 +221,11 @@
       "default_branch": "trunk",
       "description": "TypeScript geospatial SDK: one protocol-neutral contract over GeoServices REST, OGC API, STAC, WMS/WMTS/WFS, and OData \u2014 MapLibre-first runtime, GIS widget-migration codemod, and a platform-free MCP server.",
       "discovery_query": "typescript codemod",
-      "exact_revision": "96d232ec0fede17c303a4327d70b264598d48d13",
+      "exact_revision": "7346a0b9c8da5673b9b15a2e88f092476b97f993",
       "forks": 1,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T21:18:42Z",
+      "pushed_at": "2026-11-07T04:28:14Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -234,7 +234,7 @@
         "src",
         "test"
       ],
-      "size_kb": 1795502,
+      "size_kb": 1795521,
       "stars": 5,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -750,11 +750,11 @@
       "default_branch": "main",
       "description": "Upgrade agent for TypeScript apps: when an API changes, Shim opens one tested pull request. First up: Vercel AI SDK 6 to 7",
       "discovery_query": "typescript codemod",
-      "exact_revision": "1021511a22f1a17cbe4259d18a9713fc1aba4fb3",
+      "exact_revision": "d524fe0eb0ddb01fc875b366f80950b4200c4f0b",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T20:17:47Z",
+      "pushed_at": "2026-11-07T04:14:51Z",
       "repository": "JayanthMalladi/shim",
       "root_code_signals": [
         ".github",
@@ -762,7 +762,7 @@
         "src",
         "test"
       ],
-      "size_kb": 9562,
+      "size_kb": 9564,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -804,7 +804,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-06T21:23:26.162912+00:00",
+  "generated_at": "2026-11-07T04:55:01.651525+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
