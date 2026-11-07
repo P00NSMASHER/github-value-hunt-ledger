@@ -214,14 +214,14 @@
       "forks": 2,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T20:02:04Z",
+      "pushed_at": "2026-11-07T04:06:05Z",
       "repository": "ariel95500-create/gp-elite",
       "root_code_signals": [
         ".github",
         "pyproject.toml",
         "tests"
       ],
-      "size_kb": 7982,
+      "size_kb": 7216,
       "stars": 42,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -293,18 +293,18 @@
       "default_branch": "main",
       "description": "A first and second-order DSGE engine with a fully symbolic and modifiable model backend. Includes estimation, monte carlo pipeline costruction, and regression-based equation augmentation capabilities",
       "discovery_query": "symbolic regression",
-      "exact_revision": "ff01e2990f257bb86783cc92c382c7700da8c4f0",
+      "exact_revision": "6e20e415af8daccbad9c3fc04dee7de3bbdca6dd",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T16:45:10Z",
+      "pushed_at": "2026-11-07T00:45:03Z",
       "repository": "GongJr0/SymbolicDSGE",
       "root_code_signals": [
         ".github",
         "pyproject.toml",
         "tests"
       ],
-      "size_kb": 79267,
+      "size_kb": 78232,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -528,11 +528,11 @@
       "default_branch": "main",
       "description": "srbf: Symbolic Regression Benchmark Framework. Evaluate symbolic-regression models on shared benchmarks with shared metrics; interactive results at psaegert.github.io/srbf",
       "discovery_query": "symbolic regression",
-      "exact_revision": "c6bb0a1163fe8a41fe494422f90c6a9ef2e17aae",
+      "exact_revision": "8709fa88b0bda2e483bae7ef9a046372859eb6ed",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T19:24:43Z",
+      "pushed_at": "2026-11-07T04:23:15Z",
       "repository": "psaegert/srbf",
       "root_code_signals": [
         ".github",
@@ -540,7 +540,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 2779386,
+      "size_kb": 2816056,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -648,7 +648,7 @@
       "forks": 0,
       "primary_language": "Jupyter Notebook",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-06T19:08:49Z",
+      "pushed_at": "2026-11-07T01:24:53Z",
       "repository": "saeed92m/ztf-classifier",
       "root_code_signals": [
         ".github",
@@ -656,7 +656,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 5569,
+      "size_kb": 5801,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -677,7 +677,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Unprecedented discovery is UNKNOWN unless reproducible independent evidence and substantive human/AI prior-art review support it; never promise that a new discovery exists.",
-  "generated_at": "2026-11-06T20:30:49.532066+00:00",
+  "generated_at": "2026-11-07T04:23:59.133389+00:00",
   "mission": "High-risk original discovery research: search open scientific datasets, falsifiable hypothesis-generation and symbolic-discovery techniques; propose testable candidate findings and aggressively check prior literature and existing AI work before any novelty claim.",
   "project": "novel-discovery",
   "risk_review": [],
