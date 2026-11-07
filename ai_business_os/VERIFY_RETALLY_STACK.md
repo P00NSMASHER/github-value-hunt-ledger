@@ -1,6 +1,6 @@
 # End-to-end private acceptance
 
-Run the following command from the RETALLY checkout after preparing the pinned dependencies. The destination must be a new private directory outside this checkout.
+Run the following command from the RETALLY checkout after preparing the pinned dependencies. The destination must be a new private directory outside any Git checkout or Git-marked parent directory.
 
 ```sh
 bash ai_business_os/verify_retally_stack.sh /private/new-stack

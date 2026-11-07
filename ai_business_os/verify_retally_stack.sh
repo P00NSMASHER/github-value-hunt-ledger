@@ -5,6 +5,11 @@ umask 077
 repo=$(cd "$(dirname "$0")/.." && pwd)
 work=$(realpath -m "${1:?Supply a NEW private directory outside the RETALLY checkout}")
 case "$work/" in "$repo/"*) echo "Choose a private directory outside the checkout" >&2; exit 2;; esac
+ancestor="$work"
+while [[ "$ancestor" != "/" ]]; do
+    [[ ! -e "$ancestor/.git" ]] || { echo "CaptureBrief requires private state outside any Git ancestor." >&2; exit 2; }
+    ancestor=$(dirname "$ancestor")
+done
 cache=$(realpath "${RETALLY_PILOT_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/retally-pilot}")
 sources=$(realpath "${RETALLY_UPSTREAM_ROOT:?Set RETALLY_UPSTREAM_ROOT to the directory containing postmill/ and prime/}")
 python="$cache/venv/bin/python"
