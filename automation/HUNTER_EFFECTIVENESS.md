@@ -19,7 +19,7 @@ Current-scope queues: 14/14; unreviewed candidates: 108
 | HUNTER-06 | abvm | [NO_NEW_CANDIDATES](../intelligence/scout_queue/HUNTER-06.json) | 0 | 2026-11-05T03:01:37.591532+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-07 | abvm | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-07.json) | 0 | 2026-11-05T03:01:39.474631+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-08 | abvm | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-08.json) | 0 | 2026-11-05T03:01:41.569631+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-09 | abvm | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-09.json) | 11 | 2026-11-04T10:51:05.288131+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-09 | abvm | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-09.json) | 11 | 2026-11-07T18:53:55.327020+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-10 | permitplate | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-10.json) | 0 | 2026-11-04T21:21:46.045115+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-11 | capturebrief | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-11.json) | 1 | 2026-11-05T03:01:44.311800+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-12 | portfolio-brain | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-12.json) | 5 | 2026-11-05T02:22:53.089108+00:00 | UNKNOWN | UNKNOWN |
