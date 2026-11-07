@@ -1,10 +1,12 @@
 import base64
 import hashlib
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
 from tools.hunter_source_inspection import (
-    InspectionError, eligible_path, inspect_candidate, inspect_worker,
+    InspectionError, eligible_path, inspect_candidate, inspect_worker, run,
 )
 
 REV = "a" * 40
@@ -87,6 +89,40 @@ class InspectTests(unittest.TestCase):
         self.assertEqual(inspect_worker(worker, q, self.api())["state"], "NO_CANDIDATES")
         self.assertEqual(inspect_worker(worker, {**q, "mission": "changed"},
                                         self.api())["state"], "INVALID_QUEUE_BINDING")
+
+    def test_same_run_artifact_is_inspected_not_stale_checkout(self):
+        workflow = Path(".github/workflows/public-repo-hunter.yml").read_text()
+        inspection = workflow.split("\n  candidate-inspection:\n", 1)[1]
+        self.assertIn("uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093", inspection)
+        self.assertIn(
+            "name: hunter-evidence-${{ needs.scout.outputs.worker }}-${{ github.run_id }}-${{ github.run_attempt }}",
+            inspection)
+        self.assertIn("path: ${{ runner.temp }}/hunter-scout-fresh", inspection)
+        self.assertIn(
+            '--queue-root "$RUNNER_TEMP/hunter-scout-fresh/intelligence/scout_queue"',
+            inspection)
+
+    def test_inspection_receipt_binds_exact_queue_contents(self):
+        manifest = json.loads(Path("automation/hunter_schedule.json").read_text())
+        worker = next(x for x in manifest["workers"] if x["id"] == "HUNTER-02")
+        queue = {
+            "scope_version": manifest["scope_version"],
+            "candidate_count": 0, "candidates": [],
+            "generated_at": "2026-11-07T00:23:48Z",
+            **{k: worker[k] for k in ("id", "project", "target_repository",
+                                     "mission", "evidence_gate") if k != "id"},
+            "worker_id": worker["id"],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            queue_path = Path(tmp) / "HUNTER-02.json"
+            queue_path.write_text(json.dumps(queue))
+            receipt = run(manifest, Path(tmp), "HUNTER-02", FakeAPI({}))
+            record = receipt["workers"][0]
+            self.assertEqual(record["state"], "NO_CANDIDATES")
+            self.assertEqual(record["queue_sha256"],
+                             hashlib.sha256(queue_path.read_bytes()).hexdigest())
+            self.assertEqual(record["queue_generated_at"], queue["generated_at"])
+            self.assertEqual(record["queue_candidate_count"], 0)
 
     def test_all_fifteen_original_cron_expressions_unchanged(self):
         import re
