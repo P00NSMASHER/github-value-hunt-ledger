@@ -11,11 +11,11 @@ Current-scope queues: 14/14; unreviewed candidates: 108
 
 | Hunter | Project | Latest recorded source state | Candidates | Last material snapshot (UTC) | Verified integration | Measured outcome |
 |---|---|---|---:|---|---|---|
-| HUNTER-01 | trading | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-01.json) | 16 | 2026-11-06T22:24:13.032816+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-02 | revenue-hunt | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-02.json) | 16 | 2026-11-07T00:23:48.646672+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-03 | retally-social-media | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-03.json) | 16 | 2026-11-06T23:24:19.060762+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-04 | novel-discovery | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-04.json) | 16 | 2026-11-06T20:30:49.532066+00:00 | UNKNOWN | UNKNOWN |
-| HUNTER-05 | engineering-acceleration | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-05.json) | 16 | 2026-11-06T21:23:26.162912+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-01 | trading | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-01.json) | 16 | 2026-11-07T08:21:22.655317+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-02 | revenue-hunt | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-02.json) | 16 | 2026-11-07T03:53:33.642744+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-03 | retally-social-media | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-03.json) | 16 | 2026-11-07T06:53:32.057179+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-04 | novel-discovery | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-04.json) | 16 | 2026-11-07T05:53:13.508899+00:00 | UNKNOWN | UNKNOWN |
+| HUNTER-05 | engineering-acceleration | [UNREVIEWED_CANDIDATES](../intelligence/scout_queue/HUNTER-05.json) | 16 | 2026-11-07T04:55:01.651525+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-06 | abvm | [NO_NEW_CANDIDATES](../intelligence/scout_queue/HUNTER-06.json) | 0 | 2026-11-05T03:01:37.591532+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-07 | abvm | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-07.json) | 0 | 2026-11-05T03:01:39.474631+00:00 | UNKNOWN | UNKNOWN |
 | HUNTER-08 | abvm | [NO_SEARCH_MATCHES](../intelligence/scout_queue/HUNTER-08.json) | 0 | 2026-11-05T03:01:41.569631+00:00 | UNKNOWN | UNKNOWN |
