@@ -1,0 +1,9 @@
+{
+  "path_includes": [
+    "*"
+  ],
+  "path_excludes": [
+    "automation/HUNTER_EFFECTIVENESS.md",
+    "intelligence/scout_queue/*"
+  ]
+}
