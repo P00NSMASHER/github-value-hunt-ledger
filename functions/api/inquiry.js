@@ -165,8 +165,11 @@ async function limitRequest(env, ip) {
     const key = await digest(env.INQUIRY_RATE_SECRET + ":" + period + ":" + bucket + ":" + ip);
     const result = await env.INQUIRY_DB.prepare(
       "INSERT INTO inquiry_limits(bucket,hits,expires_at) VALUES(?,1,?) " +
-      "ON CONFLICT(bucket) DO UPDATE SET hits=hits+1,expires_at=excluded.expires_at RETURNING hits"
-    ).bind(key, expire).first();
+      // Once this bucket is full, an atomic conditional upsert must write 0 rows.
+      // Do not update expires_at (fixed to the UTC bucket) on retries.
+      "ON CONFLICT(bucket) DO UPDATE SET hits=inquiry_limits.hits+1 " +
+      "WHERE inquiry_limits.hits < ? RETURNING hits"
+    ).bind(key, expire, max).first();
     if (!result || result.hits > max) return false;
   }
   return true;
