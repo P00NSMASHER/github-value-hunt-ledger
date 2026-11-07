@@ -227,5 +227,94 @@ class GAOPrimaryDecisionSolicitationConflict(unittest.TestCase):
         )
 
 
+# Separate Sep 2026 primary GAO case, verified against both live GAO HTML
+# publications 2026-11-07 (NOT independent issuing-agency contract records).
+# https://www.gao.gov/products/b-424631
+# https://www.gao.gov/docket/b-424631.1
+# GAO decision B-424631 twice prints HC101925R007; GAO docket
+# B-424631.1 prints HC101925R0007. Never invent a zero-padded join.
+GAO_DISA_DECISION = {
+    "source_url": "https://www.gao.gov/products/b-424631",
+    "decision_date": "2026-09-30",
+    "case_id": "B-424631",
+    "issuing_agency": "Defense Information Systems Agency",
+    "solicitation_as_published": "HC101925R007",
+    "reported_awardee": "Modtech Solutions LLC",
+    "original_contract_award_number": None,
+    "original_award_amount": None,
+    "contract_modification_number": None,
+    "original_source_bytes_sha256": None,
+}
+GAO_DISA_DOCKET = {
+    "source_url": "https://www.gao.gov/docket/b-424631.1",
+    "decision_date": "2026-09-30",
+    "case_id": "B-424631.1",
+    "issuing_agency": "Defense Information Systems Agency",
+    "solicitation_as_published": "HC101925R0007",
+    "reported_awardee": None,
+    "original_contract_award_number": None,
+    "original_award_amount": None,
+    "contract_modification_number": None,
+    "original_source_bytes_sha256": None,
+}
+
+
+def adjudicate_gao_disa_identifier_conflict(decision, docket, *, asserted_solicitation):
+    """One source-bound falsification; not an issuer award or money benchmark."""
+    if (type(decision) is not dict or type(docket) is not dict
+            or decision != GAO_DISA_DECISION or docket != GAO_DISA_DOCKET):
+        return "UNKNOWN_CHANGED_OR_UNREAD_PRIMARY_TRANSCRIPTION"
+    if (type(asserted_solicitation) is not str
+            or asserted_solicitation not in
+            (decision["solicitation_as_published"], docket["solicitation_as_published"])):
+        return "REJECT_IDENTIFIER_NOT_FOUND_IN_GAO_PAGES"
+    if decision["issuing_agency"] != docket["issuing_agency"]:
+        return "UNKNOWN_UNMATCHED_ISSUER"
+    if decision["solicitation_as_published"] != docket["solicitation_as_published"]:
+        return "FALSIFIED_UNANIMOUS_GAO_EXACT_SOLICITATION_ID"
+    return "SAME_GAO_ID_NOT_INDEPENDENT_ISSUER_AWARD"
+
+
+class GAODisaSeptember2026SolicitationNegativeControl(unittest.TestCase):
+    def test_two_original_gao_publications_disagree_exact_identifier(self):
+        self.assertEqual(GAO_DISA_DECISION["solicitation_as_published"],
+                         "HC101925R007")
+        self.assertEqual(GAO_DISA_DOCKET["solicitation_as_published"],
+                         "HC101925R0007")
+        self.assertEqual(
+            adjudicate_gao_disa_identifier_conflict(
+                GAO_DISA_DECISION, GAO_DISA_DOCKET,
+                asserted_solicitation="HC101925R0007"),
+            "FALSIFIED_UNANIMOUS_GAO_EXACT_SOLICITATION_ID")
+        self.assertEqual(
+            adjudicate_gao_disa_identifier_conflict(
+                GAO_DISA_DECISION, GAO_DISA_DOCKET,
+                asserted_solicitation="HC101925R007"),
+            "FALSIFIED_UNANIMOUS_GAO_EXACT_SOLICITATION_ID")
+
+    def test_dont_pad_identifiers_or_silently_rewrite_source_evidence(self):
+        harmonized = copy.deepcopy(GAO_DISA_DECISION)
+        harmonized["solicitation_as_published"] = "HC101925R0007"
+        self.assertEqual(
+            adjudicate_gao_disa_identifier_conflict(
+                harmonized, GAO_DISA_DOCKET,
+                asserted_solicitation="HC101925R0007"),
+            "UNKNOWN_CHANGED_OR_UNREAD_PRIMARY_TRANSCRIPTION")
+        self.assertEqual(
+            adjudicate_gao_disa_identifier_conflict(
+                GAO_DISA_DECISION, GAO_DISA_DOCKET,
+                asserted_solicitation="HC101925R0008"),
+            "REJECT_IDENTIFIER_NOT_FOUND_IN_GAO_PAGES")
+
+    def test_issuer_award_amount_modifications_and_cash_remain_unknown(self):
+        for source in (GAO_DISA_DECISION, GAO_DISA_DOCKET):
+            for field in ("original_contract_award_number", "original_award_amount",
+                          "contract_modification_number", "original_source_bytes_sha256"):
+                self.assertIsNone(source[field])
+        self.assertEqual(GAO_DISA_DECISION["reported_awardee"], "Modtech Solutions LLC")
+        self.assertEqual(GAO_DISA_DECISION["issuing_agency"],
+                         GAO_DISA_DOCKET["issuing_agency"])
+
+
 if __name__ == "__main__":
     unittest.main()
