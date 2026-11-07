@@ -20,8 +20,9 @@ from freight.capturebrief_sam_fy2027_asof import (
 )
 from freight.unified_research_lab import ResearchError, digest
 from freight.test_air_force_boeing_vc25b_2026_award_date_correction_negative_control import BoeingVc25bAwardDateCorrection
-# Make the imported suite an explicit test-module export (not a dead import).
-__all__ = ["BoeingVc25bAwardDateCorrection"]
+from freight.test_gao_mission_analytics_2026_conflicting_solicitation_primary_decisions import GAODisaSeptember2026SolicitationNegativeControl
+# Ensure these source-bound regressions run in the actual CI-listed test module.
+__all__ = ["BoeingVc25bAwardDateCorrection", "GAODisaSeptember2026SolicitationNegativeControl"]
 
 NOW=datetime(2026,10,24,7,0,0,tzinfo=timezone.utc)
 
