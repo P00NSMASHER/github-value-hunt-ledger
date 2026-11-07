@@ -10,16 +10,18 @@ import copy
 import json
 import unittest
 from pathlib import Path
-from urllib.parse import urlsplit
 
 FIXTURE = Path(__file__).with_name("dcrb_case.json")
+EXPECTED_AWARD_SOURCE_URL = "https://dcrb.dc.gov/publication/dcrb-2025-rfp-0500-dcrb-benefits-administration-pension-system"
+EXPECTED_RFP_SOURCE_URL = "https://dcrb.dc.gov/sites/default/files/dc/sites/dcrb/publication/attachments/REQUEST%20FOR%20PROPOSAL%20-%20DCRB-2025-RFP-0500_DCRB%20BAPS_RFP_Final%202025.08.01.pdf"
 
 
 def decide(record):
     """Fail closed; explicit RFP alias supports provenance, not award truth."""
     award, rfp = record["award_publisher_page"], record["original_solicitation"]
-    if not all(urlsplit(x["url"]).hostname == "dcrb.dc.gov" for x in (award, rfp)):
-        return "REJECT_NOT_SAME_OFFICIAL_ISSUER", False
+    if (award.get("url") != EXPECTED_AWARD_SOURCE_URL
+            or rfp.get("url") != EXPECTED_RFP_SOURCE_URL):
+        return "REJECT_UNPINNED_SOURCE_URL", False
     if award["issuer"] != rfp["issuer"]:
         return "REJECT_ISSUER_DISAGREEMENT", False
     original = rfp["original_solicitation_number"]
@@ -55,6 +57,22 @@ class DCRBOriginalCaseNegativeControls(unittest.TestCase):
             case = copy.deepcopy(self.case)
             case["award_publisher_page"][field] = value
             self.assertTrue(decide(case)[0].startswith("REJECT_"))
+
+    def test_same_host_wrong_scheme_path_or_query_is_not_an_original_source(self):
+        award_url = self.case["award_publisher_page"]["url"]
+        rfp_url = self.case["original_solicitation"]["url"]
+        mutations = (
+            ("award_publisher_page", award_url.replace("https://", "http://", 1)),
+            ("award_publisher_page", award_url.replace("/publication/", "/other/", 1)),
+            ("award_publisher_page", award_url + "?version=unverified"),
+            ("original_solicitation", rfp_url.replace("https://", "ftp://", 1)),
+            ("original_solicitation", rfp_url + "?revision=unverified"),
+        )
+        for location, mutant_url in mutations:
+            with self.subTest(location=location, mutant_url=mutant_url):
+                record = copy.deepcopy(self.case)
+                record[location]["url"] = mutant_url
+                self.assertEqual(decide(record), ("REJECT_UNPINNED_SOURCE_URL", False))
 
     def test_unrelated_authorized_federal_fixture_cannot_link_to_dc_award(self):
         federal = self.case["historical_repository_fixture"]
