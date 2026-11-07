@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS delivery (
   phase TEXT NOT NULL DEFAULT 'lead', lead_id INTEGER, task_id INTEGER,
   reason TEXT, checked_at TEXT, external_id TEXT
 );
+CREATE TABLE IF NOT EXISTS source_cursor (singleton INTEGER PRIMARY KEY CHECK(singleton=1), last_seq INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS identity (singleton INTEGER PRIMARY KEY CHECK(singleton=1),
   namespace TEXT NOT NULL, source_id TEXT NOT NULL, destination TEXT NOT NULL, owner INTEGER NOT NULL);
 """
@@ -40,10 +41,11 @@ def private_db(path, *, readonly=False):
 
 def source_page(source, after, limit):
     return source.execute("""
-        SELECT f.seq,i.reference,i.fingerprint,i.details_json,i.accepted_at
-        FROM retally_inquiry_feed f JOIN inquiries i ON i.reference=f.reference
+        SELECT f.seq,f.reference,i.fingerprint,i.details_json,i.accepted_at,q.reference IS NOT NULL AS excluded
+        FROM retally_inquiry_feed f
         LEFT JOIN inquiry_qa_registry q ON q.reference=f.reference
-        WHERE f.seq>? AND q.reference IS NULL ORDER BY f.seq LIMIT ?
+        LEFT JOIN inquiries i ON i.reference=f.reference AND q.reference IS NULL
+        WHERE f.seq>? ORDER BY f.seq LIMIT ?
     """, (after, limit)).fetchall()
 
 
@@ -54,9 +56,13 @@ def external_reference(source_id, reference):
 
 
 def collect(db, source, limit, source_id):
-    last = db.execute("SELECT COALESCE(MAX(seq),0) FROM delivery").fetchone()[0]
+    last = db.execute("SELECT COALESCE((SELECT last_seq FROM source_cursor WHERE singleton=1),"
+                      "(SELECT MAX(seq) FROM delivery),0)").fetchone()[0]
+    page = source_page(source, last, limit)
     with db:
-        for row in source_page(source, last, limit):
+        for row in page:
+            if row["excluded"]:
+                continue
             details = json.loads(row["details_json"])
             group = details.get("inquiryKind") == "group_contact"
             if group and details.get("consent") is not True:
@@ -66,6 +72,8 @@ def collect(db, source, limit, source_id):
             db.execute("""INSERT INTO delivery(seq,reference,fingerprint,service,campaign,accepted_at,external_id)
                           VALUES(?,?,?,?,?,?,?)""", (row["seq"], row["reference"], row["fingerprint"],
                           service, campaign, row["accepted_at"], external_reference(source_id, row["reference"])))
+        if page:
+            db.execute("INSERT OR REPLACE INTO source_cursor(singleton,last_seq) VALUES(1,?)", (page[-1]["seq"],))
 
 
 def mark(db, reference, **values):

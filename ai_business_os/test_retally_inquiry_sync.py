@@ -156,6 +156,23 @@ class InquirySyncTests(unittest.TestCase):
             self.run_sync()
         self.assertEqual(self.crm.posts, {"lead": 1, "task": 1})
 
+    def test_qa_only_page_advances_cursor_and_never_creates_a_delivery(self):
+        with sqlite3.connect(self.source) as db:
+            db.execute("INSERT INTO inquiry_qa_registry VALUES('same-ref')")
+            db.execute("INSERT INTO inquiries SELECT 'next-ref',fingerprint,details_json,accepted_at,"
+                       "full_name,work_email,company_name FROM inquiries WHERE reference='same-ref'")
+        def page():
+            return sync(self.source, self.state, self.crm, namespace="synthetic",
+                        destination=self.crm.base_url, owner=7, limit=1)
+        self.assertEqual(page(), {})
+        with sqlite3.connect(self.state) as db:
+            self.assertEqual(db.execute("SELECT last_seq FROM source_cursor").fetchone(), (1,))
+        self.assertEqual(page(), {"done": 1})
+        self.assertEqual(page(), {"done": 1})
+        with sqlite3.connect(self.state) as db:
+            self.assertEqual(db.execute("SELECT last_seq FROM source_cursor").fetchone(), (2,))
+            self.assertEqual(db.execute("SELECT reference FROM delivery").fetchall(), [("next-ref",)])
+
     def test_source_hardlink_cannot_be_opened_as_writable_state(self):
         os.link(self.source, self.state)
         with self.assertRaises(ValueError):

@@ -1,4 +1,5 @@
 """Private synthetic case desk. Operational events never publish or contact customers."""
+
 from __future__ import annotations
 
 import hashlib
@@ -9,9 +10,12 @@ from ai_business_os.retally_group import WORKFLOW_IDS
 from ai_business_os.retally_customer_register import validate_customer_register
 
 REQUIRED = {
-    "qualified": ("fit",), "scoped": ("agreement", "authorization"),
-    "ready": ("manifest", "release"), "fulfillment": ("work_record",),
-    "quality-reviewed": ("quality", "deliverable"), "delivered": ("delivery_receipt",),
+    "qualified": ("fit",),
+    "scoped": ("agreement", "authorization"),
+    "ready": ("manifest", "release"),
+    "fulfillment": ("work_record",),
+    "quality-reviewed": ("quality", "deliverable"),
+    "delivered": ("delivery_receipt",),
     "closed": ("reconciliation",),
 }
 SCHEMA = """
@@ -37,8 +41,10 @@ def now():
 
 
 def record(db, ref, action, detail):
-    db.execute("INSERT INTO case_events(reference,occurred_at,action,detail) VALUES(?,?,?,?)",
-               (ref, now(), action, detail))
+    db.execute(
+        "INSERT INTO case_events(reference,occurred_at,action,detail) VALUES(?,?,?,?)",
+        (ref, now(), action, detail),
+    )
 
 
 def open_case(db, ref, account_ref, owner, due):
@@ -55,87 +61,164 @@ def open_case(db, ref, account_ref, owner, due):
             if existing[0] != account_ref:
                 raise ValueError("conflicting account binding")
             return
-        db.execute("INSERT INTO pilot_cases(reference,account_ref,owner,due_date,created_at) VALUES(?,?,?,?,?)",
-                   (ref, account_ref, owner, due, now()))
+        db.execute(
+            "INSERT INTO pilot_cases(reference,account_ref,owner,due_date,created_at) VALUES(?,?,?,?,?)",
+            (ref, account_ref, owner, due, now()),
+        )
         record(db, ref, "opened", owner)
 
 
 def update_task(db, ref, owner, due, hold):
-    if not owner.strip() or len(owner)>80 or len(hold)>200:
+    if not owner.strip() or len(owner) > 80 or len(hold) > 200:
         raise ValueError("invalid owner or hold reason")
     date.fromisoformat(due)
     with db:
-        result=db.execute("UPDATE pilot_cases SET owner=?,due_date=?,hold=? WHERE reference=?",
-                          (owner.strip(),due,hold.strip() or None,ref))
+        result = db.execute(
+            "UPDATE pilot_cases SET owner=?,due_date=?,hold=? WHERE reference=?",
+            (owner.strip(), due, hold.strip() or None, ref),
+        )
         if not result.rowcount:
             raise ValueError("unknown case")
-        record(db,ref,"triage",json.dumps({"owner":owner,"due":due,"hold":hold}))
+        record(db, ref, "triage", json.dumps({"owner": owner, "due": due, "hold": hold}))
 
 
-def add_artifact(db, ref, kind, content):
+def collected_fee_cents(content):
+    """There is no payment evidence adapter in this pilot."""
+    if (
+        not isinstance(content, dict)
+        or type(content.get("collected_cents")) is not int
+        or content["collected_cents"] != 0
+        or content.get("currency") != "USD"
+        or content.get("receipts") != []
+    ):
+        raise ValueError("unsupported fee collection evidence")
+    return 0
+
+
+def _validate_artifact(ref, kind, content):
     allowed = {name for names in REQUIRED.values() for name in names} | {"recovery_ledger", "fee_receipts"}
     if kind not in allowed or not isinstance(content, dict) or content.get("fixture") is not True:
         raise ValueError("evidence must be a labeled fixture")
     if content.get("reference") != ref:
         raise ValueError("case evidence does not match the inquiry")
-    raw=json.dumps(content,sort_keys=True,separators=(",",":"),allow_nan=False)
-    if len(raw.encode())>2_000_000:
+    if kind in {"delivery_receipt", "reconciliation"}:
+        raise ValueError("the preview pilot cannot attest customer delivery or close an engagement")
+    if kind == "fee_receipts":
+        collected_fee_cents(content)
+
+
+def add_artifact(db, ref, kind, content):
+    _validate_artifact(ref, kind, content)
+    raw = json.dumps(content, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    if len(raw.encode()) > 2_000_000:
         raise ValueError("fixture evidence exceeds limit")
-    digest=hashlib.sha256(raw.encode()).hexdigest()
+    digest = hashlib.sha256(raw.encode()).hexdigest()
     with db:
         if db.execute("SELECT 1 FROM pilot_cases WHERE reference=?", (ref,)).fetchone() is None:
             raise ValueError("unknown case")
-        db.execute("INSERT OR IGNORE INTO case_artifacts VALUES(?,?,?,?)",(ref,kind,digest,raw))
+        db.execute("INSERT OR IGNORE INTO case_artifacts VALUES(?,?,?,?)", (ref, kind, digest, raw))
     return digest
 
 
-def case_artifact(db, account_ref, ref, kind, digest):
-    row=db.execute("""SELECT a.content FROM case_artifacts a JOIN pilot_cases c USING(reference)
-        WHERE c.account_ref=? AND a.reference=? AND a.kind=? AND a.digest=?""",(account_ref,ref,kind,digest)).fetchone()
-    if row is None or hashlib.sha256(row[0].encode()).hexdigest()!=digest:
+def _verified_content(ref, kind, row):
+    digest, raw = row
+    if hashlib.sha256(raw.encode()).hexdigest() != digest:
         raise ValueError("evidence unavailable")
-    return json.loads(row[0])
+    content = json.loads(raw)
+    _validate_artifact(ref, kind, content)
+    return content
+
+
+def case_artifact(db, account_ref, ref, kind, digest):
+    row = db.execute(
+        """SELECT a.digest,a.content FROM case_artifacts a JOIN pilot_cases c USING(reference)
+        WHERE c.account_ref=? AND a.reference=? AND a.kind=? AND a.digest=?""",
+        (account_ref, ref, kind, digest),
+    ).fetchone()
+    if row is None:
+        raise ValueError("evidence unavailable")
+    return _verified_content(ref, kind, row)
+
+
+def case_evidence(db, account_ref, ref, kind):
+    """Resolve an unversioned reference only when a single verified version exists."""
+    rows = db.execute(
+        """SELECT a.digest,a.content FROM case_artifacts a JOIN pilot_cases c USING(reference)
+        WHERE c.account_ref=? AND a.reference=? AND a.kind=? LIMIT 2""",
+        (account_ref, ref, kind),
+    ).fetchall()
+    if len(rows) != 1:
+        raise ValueError("missing or conflicting " + kind)
+    return rows[0][0], _verified_content(ref, kind, rows[0])
 
 
 def advance(db, ref, target):
     with db:
         db.execute("BEGIN IMMEDIATE")
-        c=db.execute("SELECT * FROM pilot_cases WHERE reference=?", (ref,)).fetchone()
-        if not c or c["hold"] or target not in REQUIRED or WORKFLOW_IDS.index(target) != WORKFLOW_IDS.index(c["stage"])+1:
+        c = db.execute("SELECT * FROM pilot_cases WHERE reference=?", (ref,)).fetchone()
+        if (
+            not c
+            or c["hold"]
+            or target in {"delivered", "closed"}
+            or target not in REQUIRED
+            or WORKFLOW_IDS.index(target) != WORKFLOW_IDS.index(c["stage"]) + 1
+        ):
             raise ValueError("case progression blocked")
-        proofs={}
+        proofs = {}
         for kind in REQUIRED[target]:
-            versions=db.execute("SELECT digest FROM case_artifacts WHERE reference=? AND kind=?", (ref,kind)).fetchall()
-            if len(versions)!=1:
-                raise ValueError("missing or conflicting "+kind)
-            digest=versions[0][0]
-            case_artifact(db,c["account_ref"],ref,kind,digest)
-            proofs[kind]=digest
-        db.execute("UPDATE pilot_cases SET stage=? WHERE reference=?", (target,ref))
-        record(db,ref,target,json.dumps(proofs,sort_keys=True))
+            proofs[kind], _ = case_evidence(db, c["account_ref"], ref, kind)
+        db.execute("UPDATE pilot_cases SET stage=? WHERE reference=?", (target, ref))
+        record(db, ref, target, json.dumps(proofs, sort_keys=True))
 
 
 def customer_register(db):
-    data={"schema_version":1,"storage_authority":"ai_business_os_prod_and_approved_private_service_stores",
-          "accounts":[],"engagements":[],"referrals":[]}
+    data = {
+        "schema_version": 1,
+        "storage_authority": "ai_business_os_prod_and_approved_private_service_stores",
+        "accounts": [],
+        "engagements": [],
+        "referrals": [],
+    }
     for row in db.execute("SELECT account_ref,MIN(created_at) FROM pilot_cases GROUP BY account_ref"):
-        data["accounts"].append({"account_ref":row[0],"private_contact_ref":None,"created_at":row[1]})
-    for row in db.execute("SELECT c.*,d.service FROM pilot_cases c JOIN delivery d USING(reference) ORDER BY c.reference"):
-        if row["service"] not in {"freight","capturebrief"}:
+        data["accounts"].append({"account_ref": row[0], "private_contact_ref": None, "created_at": row[1]})
+    for row in db.execute(
+        "SELECT c.*,d.service FROM pilot_cases c JOIN delivery d USING(reference) ORDER BY c.reference"
+    ):
+        if row["stage"] in {"delivered", "closed"}:
+            raise ValueError("stored terminal stage requires independent delivery evidence")
+        if row["service"] not in {"freight", "capturebrief"}:
             raise ValueError("unmapped service")
-        freight=row["service"]=="freight"
-        engagement={"engagement_ref":"engagement:"+row["reference"],"account_ref":row["account_ref"],
-                    "catalog_entry_id":"retally-recovery" if freight else "capturebrief",
-                    "service_ref":"freight" if freight else None,"owner_role":row["owner"],
-                    "stage":row["stage"],"payment_status":"UNKNOWN","currency":"USD" if freight else None,
-                    "updated_at":db.execute("SELECT MAX(occurred_at) FROM case_events WHERE reference=?",
-                                           (row["reference"],)).fetchone()[0]}
-        for field,kind in (("agreement_ref","agreement"),("customer_authorization_ref","authorization"),
-                           ("release_approval_ref","release"),("input_manifest_ref","manifest"),
-                           ("quality_review_ref","quality"),("delivery_receipt_ref","delivery_receipt"),
-                           ("financial_reconciliation_ref","reconciliation"),("retention_policy_ref",None)):
-            rows=db.execute("SELECT digest FROM case_artifacts WHERE reference=? AND kind=?", (row["reference"],kind)).fetchall()
-            engagement[field]="private:"+rows[0][0] if len(rows)==1 else None
+        freight = row["service"] == "freight"
+        engagement = {
+            "engagement_ref": "engagement:" + row["reference"],
+            "account_ref": row["account_ref"],
+            "catalog_entry_id": "retally-recovery" if freight else "capturebrief",
+            "service_ref": "freight" if freight else None,
+            "owner_role": row["owner"],
+            "stage": row["stage"],
+            "payment_status": "UNKNOWN",
+            "currency": "USD" if freight else None,
+            "updated_at": db.execute(
+                "SELECT MAX(occurred_at) FROM case_events WHERE reference=?", (row["reference"],)
+            ).fetchone()[0],
+        }
+        for field, kind in (
+            ("agreement_ref", "agreement"),
+            ("customer_authorization_ref", "authorization"),
+            ("release_approval_ref", "release"),
+            ("input_manifest_ref", "manifest"),
+            ("quality_review_ref", "quality"),
+            ("delivery_receipt_ref", "delivery_receipt"),
+            ("financial_reconciliation_ref", "reconciliation"),
+            ("retention_policy_ref", None),
+        ):
+            present = db.execute(
+                "SELECT 1 FROM case_artifacts WHERE reference=? AND kind=? LIMIT 1", (row["reference"], kind)
+            ).fetchone()
+            engagement[field] = None
+            if present:
+                digest, _ = case_evidence(db, row["account_ref"], row["reference"], kind)
+                engagement[field] = "private:" + digest
         data["engagements"].append(engagement)
     validate_customer_register(data, observed_at=datetime.now(timezone.utc))
     return data
