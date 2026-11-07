@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -64,11 +64,11 @@
       "default_branch": "main",
       "description": "Honest-by-construction AI strategy lab for crypto futures: describe a target, an agent writes the strategy, a Rust engine backtests it, and walk-forward plus a fenced holdout decide if it counts. macOS app + MCP server.",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "38142022a73a2c901eadb3eea317ee687c4cd4ab",
+      "exact_revision": "ea47e1920cfa8beb6b0fff3700005a8d9630e23b",
       "forks": 0,
       "primary_language": "Rust",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-07T06:41:41Z",
+      "pushed_at": "2026-11-07T14:42:35Z",
       "repository": "pulseai-labs/pulse-trader",
       "root_code_signals": [
         ".github",
@@ -78,7 +78,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 8634,
+      "size_kb": 8653,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -406,7 +406,7 @@
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T06:36:04Z",
+      "pushed_at": "2026-11-07T14:04:41Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -574,6 +574,52 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Hypothesis-killing framework for quant finance: preregistration, spec curves, walk-forward, deflated Sharpe, Monte Carlo. Deterministic verdicts, documented tombstones.",
+      "discovery_query": "walk forward backtesting",
+      "exact_revision": "cd5de329df61bfd630d2a161e51c5a8cbed01ed4",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-07T14:21:31Z",
+      "repository": "Pavel14701/atropos",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 4811,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "algorithmic-trading-quantitative",
+        "backtesting",
+        "deflated-sharpe",
+        "falsification",
+        "hypothesis-testing",
+        "overfitting",
+        "preregistration",
+        "quantitative-finance",
+        "research-tooling",
+        "trading-strategies",
+        "walk-forward"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 47,
+      "url": "https://github.com/Pavel14701/atropos"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Institutional-grade market regime detection, systemic risk telemetry, and walk-forward backtesting engine in Python.",
       "discovery_query": "walk forward backtesting",
       "exact_revision": "1ecfc8a79b49c0a697950bb4c4b6217f6de54b99",
@@ -704,55 +750,11 @@
       },
       "triage_score": 47,
       "url": "https://github.com/austi20/miso-demand-forecaster"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Open-source Python toolkit for quantitative research on Borsa Istanbul (BIST): data, features, walk-forward backtesting, risk/portfolio, backtest robustness (CPCV/PBO), diagnostics, reports, paper-trading bridge.",
-      "discovery_query": "walk forward trading backtest python open source",
-      "exact_revision": "27a690bb1073c43bf1145eae82c1545567a00482",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T13:45:42Z",
-      "repository": "HaasEnjoyer/quanttro",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 260,
-      "stars": 2,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "algorithmic-trading",
-        "backtesting",
-        "bist",
-        "overfitting",
-        "portfolio-optimization",
-        "prop-firm",
-        "python",
-        "quantitative-finance",
-        "risk-management"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 2,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/HaasEnjoyer/quanttro"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T08:21:22.655317+00:00",
+  "generated_at": "2026-11-07T14:53:22.036521+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
