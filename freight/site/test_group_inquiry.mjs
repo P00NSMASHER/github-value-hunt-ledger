@@ -18,14 +18,16 @@ function env(db) {return {
   INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_DB:db
 };}
 function mockDb({failInsert=false,failNotificationUpdate=false}={}) {
-  const inquiries=new Map(),limits=new Map(),sqlCalls=[],inserts=[];
-  return {inquiries,limits,sqlCalls,inserts,
+  const inquiries=new Map(),limits=new Map(),sqlCalls=[],inserts=[],limitWrites=[];
+  return {inquiries,limits,sqlCalls,limitWrites,inserts,
     prepare(sql) {sqlCalls.push(sql);return { bind(...params) {return {
       async first() {
         if(sql.startsWith("SELECT reference")) return inquiries.get(params[0]) || null;
         if(sql.startsWith("INSERT INTO inquiry_limits")) {
           const hits=(limits.get(params[0]) || 0)+1;
+          if (hits > params[2]) return null; // no SQLite RETURNING row, no write on cap
           limits.set(params[0],hits);
+          limitWrites.push({bucket:params[0],hits});
           return {hits};
         }
         throw Error("Unexpected first SQL: "+sql);
