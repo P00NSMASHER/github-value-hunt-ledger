@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 68,
+    "api_requests": 66,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 0,
-    "root_cache_hits": 0
+    "revision_cache_hits": 1,
+    "root_cache_hits": 1
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -64,13 +64,12 @@
       "default_branch": "main",
       "description": "Honest-by-construction AI strategy lab for crypto futures: describe a target, an agent writes the strategy, a Rust engine backtests it, and walk-forward plus a fenced holdout decide if it counts. macOS app + MCP server.",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "03acea92dbbc984bc20a02bb00240bcb5ec9fda5",
+      "exact_revision": "38142022a73a2c901eadb3eea317ee687c4cd4ab",
       "forks": 0,
       "primary_language": "Rust",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-05T09:09:32Z",
+      "pushed_at": "2026-11-07T06:41:41Z",
       "repository": "pulseai-labs/pulse-trader",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -79,7 +78,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 6518,
+      "size_kb": 8634,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -306,6 +305,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-07T02:19:14Z",
       "repository": "Jareedd/qr-alpha-lab",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
@@ -406,7 +406,7 @@
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T02:05:43Z",
+      "pushed_at": "2026-11-07T06:36:04Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -416,7 +416,7 @@
         "src",
         "test"
       ],
-      "size_kb": 76962,
+      "size_kb": 77006,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -628,6 +628,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-05T22:31:05Z",
       "repository": "anusharama100/marketpulse",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "makefile",
@@ -751,7 +752,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T02:54:21.953790+00:00",
+  "generated_at": "2026-11-07T08:21:22.655317+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
