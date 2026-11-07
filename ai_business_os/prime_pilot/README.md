@@ -1,5 +1,7 @@
 # Prime Agent engineering pilot
 
+The [CPU engineering acceptance](cpu/README.md) runs a real open-weight model and verifies its generated patch. The separate lease-recovery replay below uses a deterministic fixture provider.
+
 This local acceptance fixture runs the pinned Prime binary twice. It records a real JSONL prompt acknowledgment, kills the first worker, waits for the actual 30-second lease to expire, and starts a second worker. A deterministic upstream faux model supplies a prepared SQL diff. The independent verifier initializes a clean synthetic repository, clones it, reproduces a duplicate after a lost response, applies the candidate to the Git index, and runs the retry again against a new local SQLite database. The verified object and patch hashes are in [receipt.json](receipt.json).
 
 ## Reproduce
@@ -19,7 +21,7 @@ Run the verifier alone with `cd ai_business_os/prime_pilot && python3 verify.py 
 
 ## Environment and authority
 
-On November 7, 2026, the pinned source installed 432 packages using its lockfile. Node 24.22.1 built its bundled CLI. Running the absolute source launcher with `--mode rpc --session-dir` from a disposable fixture worktree failed at the tsx Unix socket with `listen EPERM`. Running the launcher's supported `--dist` option reached the default daemon and encountered the same host restriction on `daemon.sock`. The passing test uses `--dist` with the pin's internal legacy owned-worker frontend, which supports parent/child IPC in this host. A separate run with the faux provider omitted returned a correlated unsuccessful prompt response and the error `No API key found for the selected model.` A real model-generated change requires an authorized zero-cost connection.
+On November 7, 2026, the pinned source installed 432 packages using its lockfile. Node 24.22.1 built its bundled CLI. Running the absolute source launcher with `--mode rpc --session-dir` from a disposable fixture worktree failed at the tsx Unix socket with `listen EPERM`. Running the launcher's supported `--dist` option reached the default daemon and encountered the same host restriction on `daemon.sock`. The passing test uses `--dist` with the pin's internal legacy owned-worker frontend, which supports parent/child IPC in this host. A separate run with the faux provider omitted returned a correlated unsuccessful prompt response and the error `No API key found for the selected model.` The separate CPU acceptance uses local weights without an API key.
 
 The sandbox includes only a synthetic read-only worktree, explicitly mounted runtime dependencies, local fixture data, and 128 MiB of private writable tmpfs. It clears inherited environment variables, separates network and process namespaces, drops capabilities, disables nested user namespaces and disables model tools. The worker returns a proposed patch over stdout. It cannot edit the trusted checkout, run model-issued commands, spawn model subagents, push code, or reach a provider. The supervisor enforces a 25-second deadline, a capped response stream and process limits. The test cancels the first worker with SIGKILL, observes process exit, and reclaims only after its persisted lease expires. The 25-second hard deadline also bounds process lifetime below the 30-second lease. Global persistent refinement is unavailable because the worker's home expires with the sandbox.
 

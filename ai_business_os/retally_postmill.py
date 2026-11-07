@@ -288,18 +288,27 @@ def checkpoint_drafts(db):
     return result
 
 
-def import_readback(db):
-    """Import the bundled synthetic readback into a fresh owner desk. Performs no network I/O."""
-    path = Path(__file__).with_name("postmill-draft-readback.json")
-    proof = json.loads(path.read_text())
-    if (proof["sha"] != PIN or proof["integration"] != ACCOUNT or not proof["disabled"] or
+def import_readback(db, path=None):
+    """Import a pinned synthetic harness receipt before seeding a fresh private desk."""
+    path = Path(path) if path is not None else Path(__file__).with_name("postmill-draft-readback.json")
+    with path.open("rb") as stream:
+        raw = stream.read(64_001)
+    if len(raw) > 64_000:
+        raise ValueError("Postmill receipt exceeds pilot limit")
+    proof = json.loads(raw)
+    if (proof["sha"] != PIN or proof["integration"] != ACCOUNT or proof["disabled"] is not True or
+            proof["environment"] != "local pinned Postmill" or proof["publish_credentials"] is not False or
+            len(set(proof["draft_ids_after_restart"].values())) != len(CATALOG) or
+            set(proof["draft_ids_after_restart"]) != set(CATALOG) or
+            proof["redis_outage_and_empty_restart"] is not True or proof["revoked_approval_publish_attempts"] != 0 or
             proof["draft_writes_after_restart"] != 0 or proof["database_state_counts"] != "DRAFT|3" or
             {r["slug"] for r in proof["drafts"]} != set(CATALOG) or len(proof["drafts"]) != len(CATALOG)):
         raise ValueError("Unexpected pinned synthetic readback")
     with db:
         for row in proof["drafts"]:
             slug, post_id, seal = row["slug"], row["remote_id"], row["binding"]
-            if (not 1 <= row["version"] <= len(CATALOG[slug].versions) or
+            if (not isinstance(post_id, str) or not post_id.isascii() or not post_id.isalnum() or len(post_id) > 80 or
+                    type(row["version"]) is not int or not 1 <= row["version"] <= len(CATALOG[slug].versions) or
                     digest(snapshot(row)) != seal or post_id != proof["draft_ids_after_restart"][slug]):
                 raise ValueError("Readback does not match the current catalog")
             existing = db.execute("SELECT * FROM social_calendar WHERE slug=?", (slug,)).fetchone()

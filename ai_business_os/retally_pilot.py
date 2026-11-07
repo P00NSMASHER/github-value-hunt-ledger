@@ -302,7 +302,7 @@ def run(args):
 
     calendar = open_calendar(state)
     try:
-        import_readback(calendar)
+        import_readback(calendar, args.postmill_receipt)
     finally:
         calendar.close()
     with private_db(state) as db:
@@ -362,6 +362,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("workspace", "gopher", "admin", "capturebrief"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument(
+        "--postmill-receipt",
+        type=Path,
+        help="verified fresh synthetic draft readback from Postmill acceptance",
+    )
     parser.add_argument("--source-pdf", type=Path, help="optional cached, hash-checked official public PDF")
     parser.add_argument("--port", type=int, default=19823)
     run(parser.parse_args())

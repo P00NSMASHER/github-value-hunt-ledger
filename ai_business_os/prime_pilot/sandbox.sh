@@ -13,6 +13,23 @@ mounts=()
 for path in LICENSE package.json prime-agent.sh node_modules packages/{agent,ai,tui,coding-agent}/{package.json,dist}; do
     mounts+=(--ro-bind "$root/$path" "/prime/$path")
 done
+case ${3:-replay} in
+    replay)
+        model=retally-replay/faux-1
+        mounts+=(--ro-bind "$here/replay-provider.ts" /fixture/provider.ts
+                 --ro-bind "$here/replay.patch" /fixture/replay.patch)
+        ;;
+    cpu)
+        model=retally-cpu/qwen2.5-coder-0.5b
+        weights=$(realpath "$4")
+        [[ $(sha256sum < "$weights") == "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32  -" ]]
+        mounts+=(--ro-bind "$here/cpu/provider.ts" /fixture/provider.ts
+                 --ro-bind "$weights" /local/model.gguf
+                 --ro-bind "$here/cpu/infer.mjs" /local/infer.mjs
+                 --ro-bind "$here/cpu/node_modules" /local/node_modules)
+        ;;
+    *) exit 2 ;;
+esac
 # A fresh network namespace has no routes. Keep the host home, Docker socket, /etc, and
 # ambient environment outside. All app state expires with the PID namespace and tmpfs.
 exec unshare --map-current-user --net bwrap --unshare-user --disable-userns --unshare-pid \
@@ -21,11 +38,10 @@ exec unshare --map-current-user --net bwrap --unshare-user --disable-userns --un
     --ro-bind /lib /lib --ro-bind /lib64 /lib64 --dev /dev --proc /proc \
     --size 134217728 --tmpfs /tmp --dir /tmp/home --perms 0700 --dir /tmp/home/sessions \
     --ro-bind "$(command -v node)" /node-bin/node "${mounts[@]}" --ro-bind "$work" /work \
-    --ro-bind "$here/replay-provider.ts" /fixture/provider.ts --ro-bind "$here/replay.patch" /fixture/replay.patch \
     --chdir /work --setenv HOME /tmp/home --setenv PATH /node-bin:/usr/bin:/bin --setenv PI_OFFLINE 1 \
     --setenv PRIME_AGENT_INTERNAL_LEGACY_OWNED_WORKER_FRONTEND 1 --setenv TMPDIR /tmp \
     --setenv NODE_OPTIONS '--max-old-space-size=384 --disable-wasm-trap-handler' \
     -- /usr/bin/prlimit --cpu=20 --fsize=8388608 --nproc=128 --nofile=128 --as=8589934592 -- \
     /prime/prime-agent.sh --dist --mode rpc --session-dir /tmp/home/sessions --offline --no-tools \
     --no-skills --no-extensions --no-context-files --no-prompt-templates \
-    --extension /fixture/provider.ts --model retally-replay/faux-1
+    --extension /fixture/provider.ts --model "$model"

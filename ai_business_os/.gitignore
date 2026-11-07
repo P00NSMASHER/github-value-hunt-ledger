@@ -1,0 +1,3 @@
+# Disposable dependency trees for local integration acceptance.
+node_modules/
+*.gguf

@@ -152,6 +152,22 @@ class DraftProof(unittest.TestCase):
             edited = next(r for r in social.growth_rows(db) if r["slug"] == self.slug)
             self.assertIsNone(edited["remote_id"])
 
+    def test_fresh_receipt_path(self):
+        saved = json.loads(Path(social.__file__).with_name("postmill-draft-readback.json").read_text())
+        receipt = self.root/"fresh-receipt.json"
+        for row in saved["drafts"]:
+            row["remote_id"] = "fresh" + row["remote_id"]
+            saved["draft_ids_after_restart"][row["slug"]] = row["remote_id"]
+        receipt.write_text(json.dumps(saved))
+        db = social.open_calendar(":memory:")
+        self.addCleanup(db.close)
+        self.assertEqual(social.import_readback(db, receipt), 3)
+        self.assertTrue(all(r["remote_id"].startswith("fresh") for r in social.growth_rows(db)))
+        saved["publish_credentials"] = True
+        receipt.write_text(json.dumps(saved))
+        with self.assertRaisesRegex(ValueError, "Unexpected pinned"):
+            social.import_readback(db, receipt)
+
     def test_seed_source_and_tracking(self):
         rows=social.growth_rows(self.db)
         self.assertEqual(len(rows),3)

@@ -1,0 +1,5 @@
+--- a/create_lead.sql
++++ b/create_lead.sql
+@@ -1 +1 @@
+-INSERT INTO leads (external_id) VALUES (:reference);
++INSERT INTO leads (external_id) SELECT :reference EXCEPT SELECT external_id FROM leads WHERE external_id = :reference

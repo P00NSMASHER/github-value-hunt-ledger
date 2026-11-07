@@ -25,6 +25,50 @@ class CaseEvidenceTests(unittest.TestCase):
         )
         desk.open_case(self.db, self.ref, self.account, "Pilot owner", "2026-11-07")
 
+    def test_dispositions_record_actor_and_preserve_stage_hold_and_evidence(self):
+        with self.db:
+            self.db.execute("INSERT INTO identity VALUES(1,'synthetic','fixture','local',2)")
+        desk.update_task(self.db, self.ref, "Case owner", "2026-11-07", "Await agreement")
+        for action, outcome in (("decline", "declined"), ("cancel", "canceled"), ("dispute", "disputed")):
+            with self.subTest(action=action):
+                self.assertEqual(desk.case_disposition(self.db, self.ref), "active")
+                self.assertEqual(desk.set_disposition(self.db, self.ref, action, "Synthetic review",
+                                 actor="Operator", expected="active"), outcome)
+                with self.assertRaises(ValueError):
+                    desk.set_disposition(self.db, self.ref, action, "Repeated request", actor="Operator", expected="active")
+                self.assertIn("reopening", desk.next_action("inquiry", "Await agreement", outcome))
+                self.assertEqual(desk.set_disposition(self.db, self.ref, "reopen", "Reviewed",
+                                 actor="Second operator", expected=outcome), "active")
+        case = self.db.execute("SELECT stage,hold,owner FROM pilot_cases").fetchone()
+        self.assertEqual(tuple(case), ("inquiry", "Await agreement", "Case owner"))
+        self.assertIn("Await agreement", desk.next_action(case["stage"], case["hold"]))
+        trail = self.db.execute("SELECT action,detail FROM case_events WHERE action IN "
+                                "('decline','cancel','dispute','reopen') ORDER BY seq").fetchall()
+        self.assertEqual([row[0] for row in trail], ["decline","reopen","cancel","reopen","dispute","reopen"])
+        self.assertEqual(json.loads(trail[0][1]), {"actor":"Operator","reason":"Synthetic review",
+                                                   "from":"active","to":"declined","stage":"inquiry"})
+        self.assertEqual(json.loads(trail[-1][1])["actor"], "Second operator")
+        # Reopening neither clears an independent hold nor supplies missing evidence.
+        with self.assertRaises(ValueError):
+            desk.advance(self.db, self.ref, "qualified")
+        desk.update_task(self.db, self.ref, "Case owner", "2026-11-07", "")
+        with self.assertRaises(ValueError):
+            desk.advance(self.db, self.ref, "qualified")
+        desk.add_artifact(self.db, self.ref, "fit", self.label)
+        desk.set_disposition(self.db, self.ref, "dispute", "Open dispute", actor="Operator", expected="active")
+        with self.assertRaises(ValueError):
+            desk.advance(self.db, self.ref, "qualified")
+
+    def test_dispositions_require_synthetic_binding_and_operator_reason(self):
+        with self.assertRaises(ValueError):
+            desk.set_disposition(self.db, self.ref, "dispute", "Test", actor="Operator", expected="active")
+        with self.db:
+            self.db.execute("INSERT INTO identity VALUES(1,'synthetic','fixture','local',2)")
+        for action, reason, actor in (("dispute", "", "Operator"), ("dispute", "Test", ""), ("reopen", "Test", "Op")):
+            with self.subTest(action=action), self.assertRaises(ValueError):
+                desk.set_disposition(self.db, self.ref, action, reason, actor=actor, expected="active")
+        self.assertEqual(desk.case_disposition(self.db, self.ref), "active")
+
     def legacy_row(self, kind, content):
         raw = json.dumps(content)
         digest = hashlib.sha256(raw.encode()).hexdigest()

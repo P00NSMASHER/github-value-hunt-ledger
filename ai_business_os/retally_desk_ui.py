@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 from ai_business_os.retally_inquiry_sync import private_db
-from ai_business_os.retally_case_desk import case_evidence, collected_fee_cents
+from ai_business_os.retally_case_desk import case_evidence, collected_fee_cents, case_disposition, next_action
 from ai_business_os.retally_postmill import digest, growth_rows, snapshot
 from recoveryworks import DurableRecoveryLedger
 
@@ -34,7 +34,9 @@ def money(cents):
     return f"${cents / 100:,.2f}"
 
 
-def render(state, *, csrf=None, selected=None, portable=False):
+def render(state, *, csrf=None, selected=None, search="", portable=False):
+    if len(search) > 100:
+        raise ValueError("search is too long")
     with private_db(state, readonly=True) as db:
         identity = db.execute("SELECT namespace FROM identity").fetchone()
         if not identity or identity[0] != "synthetic":
@@ -66,7 +68,15 @@ def render(state, *, csrf=None, selected=None, portable=False):
                 if quality.get("quality", {}).get("customer_report_creation_blocked") is True:
                     source_hold = "Source conflict · delivery blocked"
             state_name = source_hold or r["hold"] or r["reason"] or r["stage"] or r["phase"]
-            blocked += int(bool(source_hold or r["hold"] or r["reason"]))
+            disposition = case_disposition(db, ref) if r["stage"] else "active"
+            action_text = (
+                next_action(r["stage"], source_hold or r["hold"], disposition)
+                if r["stage"]
+                else "Reconcile the CRM delivery."
+            )
+            if disposition != "active":
+                state_name = disposition
+            blocked += int(bool(source_hold or r["hold"] or r["reason"] or disposition == "disputed"))
             campaign = None
             if r["campaign"]:
                 campaign = campaigns.setdefault(
@@ -75,9 +85,17 @@ def render(state, *, csrf=None, selected=None, portable=False):
                 campaign["inquiries"] += 1
                 campaign["qualified"] += int(bool(r["stage"]) and r["stage"] != "inquiry")
             target = "#" + ref if portable else "?case=" + ref
-            cards.append(
-                f'<article><small>{e(svc)}</small><h3><a href="{e(target)}">{e(ref)}</a></h3><span class="tag">{e(state_name)}</span><p>{e(r["owner"] or "Awaiting CRM")} · {e(r["due_date"] or "No due date")}</p><small>CRM lead {e(r["lead_id"] or "pending")} · task {e(r["task_id"] or "pending")}</small></article>'
+            card_matches = (
+                not search
+                or search.casefold()
+                in " ".join(
+                    str(v or "") for v in (ref, r["account_ref"], svc, r["owner"], state_name, r["campaign"])
+                ).casefold()
             )
+            if card_matches:
+                cards.append(
+                    f'<article><small>{e(svc)}</small><h3><a href="{e(target)}">{e(ref)}</a></h3><span class="tag">{e(state_name)}</span><p>{e(r["owner"] or "Awaiting CRM")} · {e(r["due_date"] or "No due date")}</p><small>CRM lead {e(r["lead_id"] or "pending")} · task {e(r["task_id"] or "pending")}</small><p>{e(action_text)}</p></article>'
+                )
             if not r["stage"]:
                 continue
             hashes = {
@@ -126,6 +144,9 @@ def render(state, *, csrf=None, selected=None, portable=False):
             form = ""
             if csrf:
                 form = f'<form method="post" action="/ui/retally/triage"><input type="hidden" name="csrf" value="{e(csrf)}"><input type="hidden" name="ref" value="{e(ref)}"><label>Owner<input required maxlength="80" name="owner" value="{e(r["owner"])}"></label><label>Due date<input required type="date" name="due" value="{e(r["due_date"])}"></label><label>Hold reason<input maxlength="200" name="hold" value="{e(r["hold"] or "")}"></label><button>Save case update</button></form>'
+                options = ("decline", "cancel", "dispute") if disposition == "active" else ("reopen",)
+                choices = "".join(f'<option value="{a}">{a.title()}</option>' for a in options)
+                form += f'<details><summary>Change case disposition</summary><form method="post" action="/ui/retally/disposition"><input type="hidden" name="csrf" value="{e(csrf)}"><input type="hidden" name="ref" value="{e(ref)}"><input type="hidden" name="expected" value="{e(disposition)}"><label>Change<select aria-label="Change" name="action">{choices}</select></label><label>Reason<input required maxlength="200" name="reason"></label><button>Record disposition</button></form></details>'
             details.append(
                 f'<article id="{e(ref)}"><small>{e(r["account_ref"])} · {e(svc)}</small><h3>{e(ref)}</h3><p>{e(r["stage"])} · Private preview</p>{form}{preview}<details><summary>Case history</summary>{trail}</details><details><summary>Evidence versions</summary>{sources}</details></article>'
             )
@@ -165,7 +186,21 @@ def render(state, *, csrf=None, selected=None, portable=False):
         for k, v in campaigns.items()
     )
     prime = json.loads((Path(__file__).parent / "prime_pilot" / "receipt.json").read_text())
-    worker = f"<p>Prime Agent rehearsal · {e(prime['goal_state'])} · {e(prime['elapsed_seconds'])}s. Fixture model. Independent patch readback <code>{e(prime['diff_sha256'][:16])}</code>.</p>"
+    model_dir = Path(__file__).parent / "prime_pilot" / "cpu" / "receipts"
+    attempt = json.loads((model_dir / "attempt-2.json").read_text())
+    worker = (
+        f"<p>Prime Agent · local CPU coding test. Model {e(attempt['model'])}. "
+        f"An independent verifier rejected the first patch and accepted the second in {e(attempt['elapsed_seconds'])}s. "
+        f"Patch <code>{e(attempt['verifier']['diff_sha256'][:16])}</code>.</p>"
+        f"<p>Separate worker restart test · {e(prime['elapsed_seconds'])}s · lease state {e(prime['goal_state'])}.</p>"
+    )
+    search_box = (
+        ""
+        if portable
+        else f'<form method="get" action="/ui/retally"><label>Find an account, case or owner<input type="search" name="q" maxlength="100" value="{e(search)}"></label><button>Search cases</button></form>'
+    )
+    if not cards:
+        cards.append("<p>No matching cases.</p>")
     logout = (
         (
             f'<form method="post" action="/ui/logout"><input type="hidden" name="csrf" value="{e(csrf)}"><button>Sign out</button></form>'
@@ -183,7 +218,7 @@ def render(state, *, csrf=None, selected=None, portable=False):
         '<nav><a href="#today">Today</a><a href="#cases">Customers &amp; cases</a><a href="#growth">Growth</a><a href="#finance">Financials</a><a href="#ops">Operations</a></nav>'
         '<h2 id="today">Today</h2><div class="grid">'
         + tiles
-        + '</div><h2 id="cases">Customers &amp; cases</h2><div class="cases">'
+        + f'</div><h2 id="cases">Customers &amp; cases</h2>{search_box}<div class="cases">'
         + "".join(cards + details)
         + '</div><h2 id="growth">Growth</h2><article>'
         + (social or "Social calendar unavailable.")

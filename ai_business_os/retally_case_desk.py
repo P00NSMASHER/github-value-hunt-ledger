@@ -18,6 +18,17 @@ REQUIRED = {
     "delivered": ("delivery_receipt",),
     "closed": ("reconciliation",),
 }
+DISPOSITIONS = {"decline": "declined", "cancel": "canceled", "dispute": "disputed", "reopen": "active"}
+NEXT_ACTIONS = {
+    "inquiry": "Review the inquiry and record its fit for the service.",
+    "qualified": "Document scope, agreement and authorization.",
+    "scoped": "Verify the evidence manifest and release requirements.",
+    "ready": "Start the scoped work and record its evidence.",
+    "fulfillment": "Review the findings and private deliverable.",
+    "quality-reviewed": "Inspect the private preview and outstanding delivery requirements.",
+    "delivered": "Reconcile delivery, outstanding corrections and financial evidence.",
+    "closed": "Review the completed engagement record.",
+}
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS revoked_desk_sessions (digest TEXT PRIMARY KEY, expires INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS pilot_cases (
@@ -33,6 +44,7 @@ CREATE TABLE IF NOT EXISTS case_events (
  seq INTEGER PRIMARY KEY, reference TEXT NOT NULL REFERENCES pilot_cases(reference),
  occurred_at TEXT NOT NULL, action TEXT NOT NULL, detail TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS case_events_reference_seq ON case_events(reference, seq);
 """
 
 
@@ -80,6 +92,54 @@ def update_task(db, ref, owner, due, hold):
         if not result.rowcount:
             raise ValueError("unknown case")
         record(db, ref, "triage", json.dumps({"owner": owner, "due": due, "hold": hold}))
+
+
+def case_disposition(db, ref):
+    row = db.execute(
+        """SELECT action FROM case_events WHERE reference=? AND action IN ('decline','cancel','dispute','reopen')
+           ORDER BY seq DESC LIMIT 1""",
+        (ref,),
+    ).fetchone()
+    return DISPOSITIONS[row[0]] if row else "active"
+
+
+def set_disposition(db, ref, action, reason, *, actor, expected):
+    if action not in DISPOSITIONS or not isinstance(reason, str) or not isinstance(actor, str):
+        raise ValueError("invalid operator disposition")
+    reason, actor = reason.strip(), actor.strip()
+    if not 1 <= len(reason) <= 200 or not 1 <= len(actor) <= 80:
+        raise ValueError("an operator and bounded reason are required")
+    with db:
+        db.execute("BEGIN IMMEDIATE")
+        case = db.execute(
+            """SELECT c.stage FROM pilot_cases c JOIN identity i ON i.singleton=1
+               WHERE c.reference=? AND i.namespace='synthetic'""", (ref,)
+        ).fetchone()
+        if not case or case[0] not in NEXT_ACTIONS or case[0] in {"delivered", "closed"}:
+            raise ValueError("a current synthetic case is required")
+        before = case_disposition(db, ref)
+        if before != expected or (action == "reopen") != (before != "active"):
+            raise ValueError("disposition changed or action unavailable")
+        after = DISPOSITIONS[action]
+        record(db, ref, action, json.dumps({"actor": actor, "reason": reason, "from": before,
+                                            "to": after, "stage": case[0]}, sort_keys=True))
+    return after
+
+
+def next_action(stage, hold=None, disposition="active"):
+    if disposition == "disputed":
+        return "Review the dispute and record its resolution before reopening."
+    if disposition in {"declined", "canceled"}:
+        return "Review the disposition history before reopening."
+    if disposition != "active":
+        raise ValueError("unknown operator disposition")
+    if hold:
+        return "Resolve the recorded hold. " + hold
+    if stage is None:
+        return "Reconcile the CRM lead and qualification task."
+    if stage not in NEXT_ACTIONS:
+        raise ValueError("unknown case stage")
+    return NEXT_ACTIONS[stage]
 
 
 def collected_fee_cents(content):
@@ -159,6 +219,7 @@ def advance(db, ref, target):
         if (
             not c
             or c["hold"]
+            or case_disposition(db, ref) != "active"
             or target in {"delivered", "closed"}
             or target not in REQUIRED
             or WORKFLOW_IDS.index(target) != WORKFLOW_IDS.index(c["stage"]) + 1

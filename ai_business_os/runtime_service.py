@@ -557,7 +557,7 @@ def build_server(*, pilot_only: bool = False) -> ThreadingHTTPServer:
                 try:
                     query = parse_qs(urlsplit(self.path).query, max_num_fields=1)
                     selected = query.get("case", [None])[0]
-                    self._html(200, render(retally_pilot_db, selected=selected,
+                    self._html(200, render(retally_pilot_db, selected=selected, search=query.get("q", [""])[0],
                                           csrf=csrf_token(token, ui_session_secret)))
                 except ValueError:
                     self._json(404, {"ok": False, "error": "case_unavailable"})
@@ -591,7 +591,7 @@ def build_server(*, pilot_only: bool = False) -> ThreadingHTTPServer:
         def do_POST(self) -> None:
             path = self.path.split("?", 1)[0]
 
-            if pilot_only and path not in {"/ui/login", "/ui/logout", "/ui/retally/triage", "/ui/retally/editorial"}:
+            if pilot_only and path not in {"/ui/login", "/ui/logout", "/ui/retally/triage", "/ui/retally/editorial", "/ui/retally/disposition"}:
                 self._json(404, {"ok": False, "error": "not_found"})
                 return
             if path == "/ui/login":
@@ -628,7 +628,7 @@ def build_server(*, pilot_only: bool = False) -> ThreadingHTTPServer:
                                            (hashlib.sha256(token.encode()).hexdigest(), session["exp"]))
                         self._redirect("/ui", set_cookie=clear_session_cookie())
                         return
-                    if path in {"/ui/retally/triage", "/ui/retally/editorial"}:
+                    if path in {"/ui/retally/triage", "/ui/retally/editorial", "/ui/retally/disposition"}:
                         if not retally_pilot_db:
                             self._json(404, {"ok": False, "error": "desk_disabled"})
                             return
@@ -642,6 +642,11 @@ def build_server(*, pilot_only: bool = False) -> ThreadingHTTPServer:
                                 if path == "/ui/retally/triage":
                                     update_task(db, form.get("ref",""), form.get("owner",""),
                                                 form.get("due",""), form.get("hold",""))
+                                elif path == "/ui/retally/disposition":
+                                    from ai_business_os.retally_case_desk import set_disposition
+                                    set_disposition(db, form.get("ref",""), form.get("action",""),
+                                                    form.get("reason",""), actor=ui_principal,
+                                                    expected=form.get("expected",""))
                                 else:
                                     from ai_business_os.retally_postmill import current, digest, review, snapshot
                                     slug, action = form.get("slug", ""), form.get("action", "")
