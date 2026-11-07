@@ -183,11 +183,16 @@ def run(manifest: dict, root: Path, worker_id: str, api) -> dict:
         if not path.is_file():
             results.append({"worker_id": worker["id"], "state": "MISSING_QUEUE"})
             continue
-        queue = json.loads(path.read_text(encoding="utf-8"))
+        queue_bytes = path.read_bytes()
+        queue = json.loads(queue_bytes.decode("utf-8"))
         if queue.get("scope_version") != scope:
             results.append({"worker_id": worker["id"], "state": "STALE_QUEUE_SCOPE"})
             continue
-        results.append(inspect_worker(worker, queue, api))
+        inspected = inspect_worker(worker, queue, api)
+        inspected["queue_sha256"] = hashlib.sha256(queue_bytes).hexdigest()
+        inspected["queue_generated_at"] = queue.get("generated_at")
+        inspected["queue_candidate_count"] = queue.get("candidate_count")
+        results.append(inspected)
     return {
         "schema_version": 1,
         "authority": "READ_ONLY_INSPECTION_NOT_V16_CLAIM",
