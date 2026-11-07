@@ -1,0 +1,50 @@
+{
+  "environment": "local pinned Postmill",
+  "sha": "b59d7ca3656836a8a8c8144dc3cde6a93070d083",
+  "draft_ids_after_restart": {
+    "liftgate_evidence": "cmw688hdb0000rw2yrqfhtu73",
+    "rate_version": "cmw688heu0001rw2ym4p3tdt6",
+    "prior_credits": "cmw688hg50002rw2y4ro7ictm"
+  },
+  "database_state_counts": "DRAFT|3",
+  "integration": "retally-synthetic-instagram",
+  "disabled": true,
+  "publish_credentials": false,
+  "actual_platform_metrics": null,
+  "postmill_calls_other_than_draft_writes_and_reads": 0,
+  "redis_outage_and_empty_restart": true,
+  "draft_writes_after_restart": 0,
+  "revoked_approval_publish_attempts": 0,
+  "committed_response_loss_injected": true,
+  "updated_draft_id_preserved": true,
+  "draft_write_attempts": 4,
+  "drafts": [
+    {
+      "slug": "liftgate_evidence",
+      "version": 2,
+      "review_date": "2026-11-07T09:54:25.316+00:00",
+      "binding": "87d1c025a1bd08ff9ec6197d546aed5553fa57c6914c939b7ee83d848249c611",
+      "remote_id": "cmw688hdb0000rw2yrqfhtu73",
+      "read_at": "2026-11-07T09:54:47.893+00:00",
+      "draft_attempts": 1
+    },
+    {
+      "slug": "rate_version",
+      "version": 1,
+      "review_date": "2026-11-07T09:54:25.316+00:00",
+      "binding": "a9ab2682a96b8cae95f91679dc0049ef15aa67ac0ea13289a6b915c478915232",
+      "remote_id": "cmw688heu0001rw2ym4p3tdt6",
+      "read_at": "2026-11-07T09:54:47.912+00:00",
+      "draft_attempts": 1
+    },
+    {
+      "slug": "prior_credits",
+      "version": 1,
+      "review_date": "2026-11-07T09:54:25.316+00:00",
+      "binding": "0ae9f8aba27ec76b232d1e38e859b1c43525d53dfaf656c30f06a45deaf96acd",
+      "remote_id": "cmw688hg50002rw2y4ro7ictm",
+      "read_at": "2026-11-07T09:54:47.935+00:00",
+      "draft_attempts": 1
+    }
+  ]
+}

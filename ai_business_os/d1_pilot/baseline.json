@@ -1,0 +1,80 @@
+{
+  "environment": "local Miniflare 4.20260730.0 / workerd 2026-07-30",
+  "feed_enabled": false,
+  "measured": {
+    "freight_invalid": {
+      "statements": 0,
+      "rows_read": 0,
+      "rows_written": 0
+    },
+    "freight_rejected_turnstile": {
+      "statements": 3,
+      "rows_read": 2,
+      "rows_written": 6
+    },
+    "freight_accepted": {
+      "statements": 6,
+      "rows_read": 8,
+      "rows_written": 9
+    },
+    "freight_replay": {
+      "statements": 1,
+      "rows_read": 1,
+      "rows_written": 0
+    },
+    "freight_key_conflict": {
+      "statements": 1,
+      "rows_read": 1,
+      "rows_written": 0
+    },
+    "group_invalid": {
+      "statements": 0,
+      "rows_read": 0,
+      "rows_written": 0
+    },
+    "group_rejected_turnstile": {
+      "statements": 3,
+      "rows_read": 2,
+      "rows_written": 6
+    },
+    "group_accepted": {
+      "statements": 6,
+      "rows_read": 8,
+      "rows_written": 9
+    },
+    "group_replay": {
+      "statements": 1,
+      "rows_read": 1,
+      "rows_written": 0
+    },
+    "group_key_conflict": {
+      "statements": 1,
+      "rows_read": 1,
+      "rows_written": 0
+    },
+    "concurrent_freight_pair": {
+      "statements": 11,
+      "rows_read": 12,
+      "rows_written": 15
+    },
+    "rate_first_rejected": {
+      "statements": 3,
+      "rows_read": 2,
+      "rows_written": 6
+    },
+    "rate_second_rejected": {
+      "statements": 3,
+      "rows_read": 4,
+      "rows_written": 2
+    },
+    "freight_rate_limited": {
+      "statements": 2,
+      "rows_read": 2,
+      "rows_written": 0
+    }
+  },
+  "query_plan": [],
+  "mail_captured": 3,
+  "external_sends": 0,
+  "production_billing_measured": false
+}

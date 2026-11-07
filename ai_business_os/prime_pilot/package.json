@@ -1,0 +1,6 @@
+{
+  "name": "retally-prime-local-pilot",
+  "private": true,
+  "type": "module",
+  "dependencies": {"@electric-sql/pglite": "0.3.14"}
+}

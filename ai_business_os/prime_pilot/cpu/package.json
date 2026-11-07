@@ -1,0 +1,9 @@
+{
+  "name": "retally-prime-cpu-pilot",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@node-llama-cpp/linux-x64": "3.22.3",
+    "node-llama-cpp": "3.22.3"
+  }
+}

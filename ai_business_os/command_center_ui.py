@@ -192,6 +192,7 @@ def render_dashboard(
     principal: str,
     session_token: str,
     session_secret: str,
+    retally_desk_enabled: bool = False,
     proposal: Mapping[str, Any] | None = None,
     notice: str | None = None,
     error: str | None = None,
@@ -368,6 +369,7 @@ def render_dashboard(
       <h1>CEO Command Center</h1>
     </div>
     <div class="top-actions">
+      {'<a href="/ui/retally">RETALLY pilot desk</a>' if retally_desk_enabled else ""}
       <div class="identity"><span class="dot"></span>{_e(principal)}</div>
       <form method="post" action="/ui/logout">
         <input type="hidden" name="csrf" value="{_e(csrf)}">
