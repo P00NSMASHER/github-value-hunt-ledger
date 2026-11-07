@@ -110,7 +110,8 @@ jobs:
                      "https://challenges.cloudflare.com;")
           frame = ("frame-src https://www.bubblav.com https://bubblav.com "
                    "https://*.bubblav.com https://challenges.cloudflare.com;")
-          script = "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"
+          script = ("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com "
+                    "https://static.cloudflareinsights.com/beacon.min.js;")
           for published in (home, recovery, headers):
               assert connect in published
               assert frame in published

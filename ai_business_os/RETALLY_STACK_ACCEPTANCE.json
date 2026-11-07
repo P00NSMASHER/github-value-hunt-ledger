@@ -1,0 +1,174 @@
+{
+  "commercial_activity": {
+    "collected_fees_usd": 0,
+    "customer_recovery_usd": 0,
+    "external_sends": 0,
+    "real_customers": 0
+  },
+  "crm_and_business_cases": {
+    "capturebrief": {
+      "case_id": "CB-7C02AEBC1D",
+      "external_send_authorized": false,
+      "golden_preview_files": 8,
+      "preview_sha256": "bca73be58b190d0ec066f80c68588cebdd502022728dcd497f3ad0ff8460e736",
+      "pricing": {
+        "amount_due_cents": 0,
+        "automatic_upgrade_authorized": false,
+        "collected_cents": 0,
+        "currency": "USD",
+        "separate_founding_offer_cents": 14900,
+        "watch_included": false
+      },
+      "quality": {
+        "blockers": [
+          "ASSUMPTION_UNSOURCED",
+          "DELIVERY_CASE_AUDIT_FAILED",
+          "DELIVERY_TRACE_INCOMPLETE",
+          "FAMILY_AUTHORITY_UNKNOWN",
+          "HISTORY_SET_EMPTY",
+          "HISTORY_UNRESOLVED",
+          "MANIFEST_UNRESOLVED",
+          "REFERENCE_CLOSURE_UNRESOLVED",
+          "REFERENCE_SCAN_UNRESOLVED",
+          "TRACE_MISSING"
+        ],
+        "customer_report_creation_blocked": true,
+        "fulfillment_state": "HUMAN_REVIEW_REQUIRED",
+        "original_bytes": 290590,
+        "original_pages": 35,
+        "original_sha256": "557bceeec58e625376d43678260075d1f96a831afe295035941addf77ae214e4",
+        "release_state": "FAIL_CLOSED",
+        "reservation_state": "BLOCKED_NO_RESERVATION",
+        "source_conflict": {
+          "code": "DEADLINE_CONFLICT",
+          "finding": "The original RFQ states two incompatible response deadlines.",
+          "human_review_verified": false,
+          "original_pdf_pages": [
+            1,
+            3
+          ],
+          "severity": "MATERIAL",
+          "source_text_matched": true
+        }
+      },
+      "source_matrix_passed": true,
+      "source_pin": "01520d46a90cd0b07fad1850a2873cb30374bfce"
+    },
+    "crm_offline_recovered": true,
+    "crm_readback": {
+      "RA-20261107-48D2FD94": [
+        2,
+        2
+      ],
+      "RA-20261107-804E0F8C": [
+        1,
+        1
+      ]
+    },
+    "environment": "local synthetic",
+    "external_sends": 0,
+    "fee_cash_collected_cents": 0,
+    "freight": {
+      "currency": "USD",
+      "fee_cents": 9000,
+      "fee_sequence": [
+        0,
+        12000,
+        9000
+      ],
+      "finding_id": "rw:freight:76937e7a5cf25b45bc3d83df5198aba86ee7707b3441ab3114206bddb2379bfa",
+      "flagged_cents": 100000,
+      "ledger_head": "9185d032cfd2876d120d18b16f4a54387e252e7bff8f41685ffe2f9b6dbe880a",
+      "recovery_cents": 30000
+    },
+    "intake": {
+      "accepted": 2,
+      "capturebrief_reference": "RA-20261107-48D2FD94",
+      "external_sends": 0,
+      "fixture": true,
+      "freight_reference": "RA-20261107-804E0F8C",
+      "mail_intercepted": 2,
+      "sqlite_row_mutations_including_triggers": {
+        "concurrent_freight_pair": 7,
+        "group": 5,
+        "invalid": 0,
+        "rejected_turnstile": 2,
+        "replay": 0
+      },
+      "unique_freight_leads_expected": 1
+    },
+    "real_customers": 0,
+    "real_recovered_cents": 0,
+    "restore_readback": true,
+    "restored_key_rotated": true
+  },
+  "manifest": {
+    "cpu_model": "verified",
+    "environment": "local synthetic",
+    "receipts": {
+      "desk/acceptance.json": "0be55a19c6c4a9656c4995b93faa3bfb95bc84b36846f04c761c36f48a9366da",
+      "postmill/receipt.json": "84800dc37842686af71a23729c501aecb24d36a98d78fb0e63a95e737ff55d39",
+      "prime-cpu/attempt-1.json": "6faf4306f37672a03192be1c00e0387e2c58fd86d611317a0c89d40768b2934d",
+      "prime-cpu/attempt-1.patch": "6612554eaae06993eaaa4842e020a2c74d0777687e84c170c7eb06a35df148e2",
+      "prime-cpu/attempt-2.json": "48a2dc24dc3cc0dc78fb788c29075d4a160f2c6e33894b4b6ca02dcbe2bcd213",
+      "prime-cpu/attempt-2.patch": "846f1fd387f5cca7db91ad2c7ea942a85c946d38dfbc086f2b6e726714a505e5",
+      "prime-replay.json": "b1bcba911e85bc44c4d863c4f042b9400549bfdc77e2be4ed28034d845670ad1"
+    },
+    "same_drafts_in_fresh_and_restored_desk": true
+  },
+  "postmill": {
+    "actual_platform_metrics": null,
+    "committed_response_loss_injected": true,
+    "database_state_counts": "DRAFT|3",
+    "disabled": true,
+    "draft_ids_after_restart": {
+      "liftgate_evidence": "cmw68ux910001rw3lyk9fb9m0",
+      "prior_credits": "cmw68uxbs000nrw3l677ftvvr",
+      "rate_version": "cmw68uxag0006rw3lu0ar962v"
+    },
+    "draft_write_attempts": 4,
+    "draft_writes_after_restart": 0,
+    "environment": "local pinned Postmill",
+    "integration": "retally-synthetic-instagram",
+    "postmill_calls_other_than_draft_writes_and_reads": 0,
+    "publish_credentials": false,
+    "redis_outage_and_empty_restart": true,
+    "revoked_approval_publish_attempts": 0,
+    "sha": "b59d7ca3656836a8a8c8144dc3cde6a93070d083",
+    "updated_draft_id_preserved": true
+  },
+  "prime_cpu": {
+    "first_attempt": "rejected",
+    "model": "qwen2.5-coder-0.5b",
+    "second_attempt": "verified",
+    "technique_hint": "SQLite set subtraction",
+    "verifier": {
+      "base_counts": {
+        "fixture-A": 2,
+        "fixture-B": 1
+      },
+      "changed_paths": [
+        "create_lead.sql"
+      ],
+      "diff_sha256": "846f1fd387f5cca7db91ad2c7ea942a85c946d38dfbc086f2b6e726714a505e5",
+      "fixture_base_sha": "75b32959e630c606fd20086b08d59dc30b645905",
+      "patched_counts": {
+        "fixture-A": 1,
+        "fixture-B": 1
+      },
+      "test_command": "python3 verify.py",
+      "verified_tree": "daf021a5b6987b53e5eb3f9358606f6f7f0eca7c"
+    }
+  },
+  "prime_lease": {
+    "current_lease_required": true,
+    "goal_state": "VERIFYING",
+    "interrupted": {
+      "accepted": true,
+      "id": "fixture-1",
+      "killed_after_ack": true
+    }
+  },
+  "recorded_at": "2026-11-07T10:13:35.010821+00:00",
+  "scope": "synthetic full-stack acceptance; fresh isolated processes and a clean restore"
+}

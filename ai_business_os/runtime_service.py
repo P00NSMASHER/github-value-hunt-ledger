@@ -7,6 +7,7 @@ Railway environment variables.
 
 from __future__ import annotations
 
+import hashlib
 import hmac
 import json
 import os
@@ -15,7 +16,7 @@ import time
 import urllib.error
 import urllib.request
 from http import HTTPStatus
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlsplit
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Mapping
 
@@ -27,6 +28,7 @@ from ai_business_os.command_center_ui import (
     access_code_matches,
     clear_session_cookie,
     csrf_matches,
+    csrf_token,
     issue_session,
     parse_session_cookie,
     render_dashboard,
@@ -345,42 +347,48 @@ def _probe_loop(state: RuntimeState) -> None:
         time.sleep(30)
 
 
-def build_server() -> ThreadingHTTPServer:
-    gateway = GatewayClient(
-        _required_env("AIBOS_GATEWAY_URL"),
-        _required_env("AIBOS_RUNTIME_TOKEN"),
-    )
-    operator_token = _required_env("AIBOS_OPERATOR_TOKEN")
-    expected_fingerprint = _required_env("AIBOS_SCHEMA_FINGERPRINT")
-    ui_enabled = os.environ.get("AIBOS_UI_ENABLED", "0") == "1"
+def build_server(*, pilot_only: bool = False) -> ThreadingHTTPServer:
+    ui_enabled = pilot_only or os.environ.get("AIBOS_UI_ENABLED", "0") == "1"
     ui_access_sha256 = _required_env("AIBOS_UI_ACCESS_SHA256") if ui_enabled else ""
     ui_session_secret = _required_env("AIBOS_UI_SESSION_SECRET") if ui_enabled else ""
     ui_principal = _required_env("AIBOS_UI_PRINCIPAL") if ui_enabled else ""
     port = int(os.environ.get("PORT", "8080"))
+    retally_pilot_db = os.environ.get("AIBOS_RETALLY_SYNTHETIC_DESK") if ui_enabled else None
 
-    bridge = GatewayProductionBridge(gateway)
-    operator = CommandCenterOperator(
-        bridge,
-        expected_schema_fingerprint=expected_fingerprint,
-    )
-    read_execute = GatewayReadExecutor(gateway)
-    write_execute = GatewayWriteExecutor(gateway)
-    state = RuntimeState(gateway, expected_fingerprint)
-    state.probe()
-    worker = PersistentGoalWorker(
-        gateway,
-        worker_instance_id=default_worker_instance_id(),
-        executors={"SYSTEM_HEALTH_CHECK": system_health_executor(gateway)},
-        lease_seconds=int(os.environ.get("AIBOS_WORKER_LEASE_SECONDS", "180")),
-        heartbeat_seconds=int(os.environ.get("AIBOS_WORKER_HEARTBEAT_SECONDS", "45")),
-        poll_seconds=float(os.environ.get("AIBOS_WORKER_POLL_SECONDS", "15")),
-    )
+    if pilot_only and not retally_pilot_db:
+        raise RuntimeConfigError("synthetic desk path is required")
+    if not pilot_only:
+        gateway = GatewayClient(
+            _required_env("AIBOS_GATEWAY_URL"),
+            _required_env("AIBOS_RUNTIME_TOKEN"),
+        )
+        operator_token = _required_env("AIBOS_OPERATOR_TOKEN")
+        expected_fingerprint = _required_env("AIBOS_SCHEMA_FINGERPRINT")
+        bridge = GatewayProductionBridge(gateway)
+        operator = CommandCenterOperator(
+            bridge,
+            expected_schema_fingerprint=expected_fingerprint,
+        )
+        read_execute = GatewayReadExecutor(gateway)
+        write_execute = GatewayWriteExecutor(gateway)
+        state = RuntimeState(gateway, expected_fingerprint)
+        state.probe()
+        worker = PersistentGoalWorker(
+            gateway,
+            worker_instance_id=default_worker_instance_id(),
+            executors={"SYSTEM_HEALTH_CHECK": system_health_executor(gateway)},
+            lease_seconds=int(os.environ.get("AIBOS_WORKER_LEASE_SECONDS", "180")),
+            heartbeat_seconds=int(os.environ.get("AIBOS_WORKER_HEARTBEAT_SECONDS", "45")),
+            poll_seconds=float(os.environ.get("AIBOS_WORKER_POLL_SECONDS", "15")),
+        )
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "AIBusinessOSRuntime/1.0"
 
         def log_message(self, fmt: str, *args: Any) -> None:
-            print(json.dumps({"event": "http", "message": fmt % args}), flush=True)
+            # Request targets and query strings may contain private inquiry references.
+            print(json.dumps({"event": "http", "method": self.command if self.command in {"GET","POST"} else "other",
+                              "status": args[1] if fmt == '"%s" %s %s' and len(args)>1 else None}), flush=True)
 
         def _common_security_headers(self) -> None:
             self.send_header("Cache-Control", "no-store")
@@ -457,7 +465,17 @@ def build_server() -> ThreadingHTTPServer:
             token = parse_session_cookie(self.headers.get("Cookie", ""))
             if not token or not ui_enabled:
                 return token, None
-            return token, validate_session(token, ui_session_secret, ui_principal)
+            session = validate_session(token, ui_session_secret, ui_principal)
+            if session and retally_pilot_db and (pilot_only or self.path.startswith("/ui/retally") or self.path == "/ui/logout"):
+                from ai_business_os.retally_inquiry_sync import private_db
+                try:
+                    with private_db(retally_pilot_db, readonly=True) as db:
+                        if db.execute("SELECT 1 FROM revoked_desk_sessions WHERE digest=?",
+                                      (hashlib.sha256(token.encode()).hexdigest(),)).fetchone():
+                            session = None
+                except Exception:
+                    session = None
+            return token, session
 
         def _ui_data(self) -> dict[str, Any]:
             runtime = state.snapshot()
@@ -484,6 +502,7 @@ def build_server() -> ThreadingHTTPServer:
                 session_token=session_token_value,
                 session_secret=ui_session_secret,
                 proposal=proposal,
+                retally_desk_enabled=bool(retally_pilot_db),
                 notice=notice,
                 error=error,
             )
@@ -504,6 +523,17 @@ def build_server() -> ThreadingHTTPServer:
 
         def do_GET(self) -> None:
             path = self.path.split("?", 1)[0]
+            if pilot_only:
+                if path in {"/", "/ui"}:
+                    token, session = self._ui_session()
+                    if session:
+                        self._redirect("/ui/retally")
+                    else:
+                        self._html(200, render_login())
+                    return
+                if path not in {"/ui/assets/app.css", "/ui/retally", "/ui/retally/style.css"}:
+                    self._json(404, {"ok": False, "error": "not_found"})
+                    return
             if path == "/health":
                 snapshot = state.snapshot()
                 snapshot["worker"] = worker.snapshot()
@@ -511,6 +541,28 @@ def build_server() -> ThreadingHTTPServer:
                 return
             if path == "/ui/assets/app.css":
                 self._css(APP_CSS)
+                return
+            if path in {"/ui/retally", "/ui/retally/style.css"}:
+                if not retally_pilot_db:
+                    self._json(404, {"ok": False, "error": "desk_disabled"})
+                    return
+                token, session = self._ui_session()
+                if session is None:
+                    self._html(401, render_login())
+                    return
+                from ai_business_os.retally_desk_ui import CSS, render
+                if path.endswith(".css"):
+                    self._css(CSS)
+                    return
+                try:
+                    query = parse_qs(urlsplit(self.path).query, max_num_fields=1)
+                    selected = query.get("case", [None])[0]
+                    self._html(200, render(retally_pilot_db, selected=selected, search=query.get("q", [""])[0],
+                                          csrf=csrf_token(token, ui_session_secret)))
+                except ValueError:
+                    self._json(404, {"ok": False, "error": "case_unavailable"})
+                except Exception:
+                    self._json(503, {"ok": False, "error": "private_desk_unavailable"})
                 return
             if path in {"/", "/ui"}:
                 if not ui_enabled:
@@ -539,6 +591,9 @@ def build_server() -> ThreadingHTTPServer:
         def do_POST(self) -> None:
             path = self.path.split("?", 1)[0]
 
+            if pilot_only and path not in {"/ui/login", "/ui/logout", "/ui/retally/triage", "/ui/retally/editorial", "/ui/retally/disposition"}:
+                self._json(404, {"ok": False, "error": "not_found"})
+                return
             if path == "/ui/login":
                 if not ui_enabled:
                     self._json(404, {"ok": False, "error": "ui_disabled"})
@@ -550,7 +605,7 @@ def build_server() -> ThreadingHTTPServer:
                         self._html(401, render_login(error="Invalid access code."))
                         return
                     token = issue_session(ui_session_secret, ui_principal)
-                    self._redirect("/ui", set_cookie=session_cookie(token))
+                    self._redirect("/ui/retally" if pilot_only else "/ui", set_cookie=session_cookie(token))
                 except Exception:
                     self._html(400, render_login(error="Unable to start a secure session."))
                 return
@@ -565,7 +620,44 @@ def build_server() -> ThreadingHTTPServer:
                     if not csrf_matches(token, ui_session_secret, form.get("csrf", "")):
                         raise ValueError("invalid CSRF token")
                     if path == "/ui/logout":
+                        if retally_pilot_db:
+                            from ai_business_os.retally_inquiry_sync import private_db
+                            with private_db(retally_pilot_db) as db, db:
+                                db.execute("DELETE FROM revoked_desk_sessions WHERE expires<=?", (int(time.time()),))
+                                db.execute("INSERT OR IGNORE INTO revoked_desk_sessions VALUES(?,?)",
+                                           (hashlib.sha256(token.encode()).hexdigest(), session["exp"]))
                         self._redirect("/ui", set_cookie=clear_session_cookie())
+                        return
+                    if path in {"/ui/retally/triage", "/ui/retally/editorial", "/ui/retally/disposition"}:
+                        if not retally_pilot_db:
+                            self._json(404, {"ok": False, "error": "desk_disabled"})
+                            return
+                        from ai_business_os.retally_inquiry_sync import private_db
+                        from ai_business_os.retally_case_desk import update_task
+                        try:
+                            with private_db(retally_pilot_db) as db:
+                                binding = db.execute("SELECT namespace FROM identity").fetchone()
+                                if not binding or binding[0] != "synthetic":
+                                    raise ValueError("synthetic workspace required")
+                                if path == "/ui/retally/triage":
+                                    update_task(db, form.get("ref",""), form.get("owner",""),
+                                                form.get("due",""), form.get("hold",""))
+                                elif path == "/ui/retally/disposition":
+                                    from ai_business_os.retally_case_desk import set_disposition
+                                    set_disposition(db, form.get("ref",""), form.get("action",""),
+                                                    form.get("reason",""), actor=ui_principal,
+                                                    expected=form.get("expected",""))
+                                else:
+                                    from ai_business_os.retally_postmill import current, digest, review, snapshot
+                                    slug, action = form.get("slug", ""), form.get("action", "")
+                                    db.execute("BEGIN IMMEDIATE")
+                                    if action not in {"review", "approve"} or form.get("version_hash") != digest(snapshot(current(db,slug))):
+                                        raise ValueError("draft changed; review the current version")
+                                    review(db, slug, approve=action == "approve")
+                        except (ValueError, KeyError):
+                            self._json(400, {"ok": False, "error": "case_update_rejected"})
+                            return
+                        self._redirect("/ui/retally")
                         return
                     if path == "/ui/objective/propose":
                         proposal = operator.propose_objective(
@@ -595,6 +687,9 @@ def build_server() -> ThreadingHTTPServer:
                         return
                     self._json(404, {"ok": False, "error": "not_found"})
                 except Exception as exc:
+                    if pilot_only:
+                        self._json(400, {"ok": False, "error": "request_rejected"})
+                        return
                     try:
                         self._render_ui(token, error=str(exc), status=400)
                     except Exception:
@@ -638,6 +733,8 @@ def build_server() -> ThreadingHTTPServer:
             except Exception as exc:
                 self._json(400, {"ok": False, "error": str(exc)})
 
+    if pilot_only:
+        return ThreadingHTTPServer(("127.0.0.1", port), Handler)
     threading.Thread(target=_probe_loop, args=(state,), daemon=True).start()
     if os.environ.get("AIBOS_WORKER_ENABLED", "1") == "1":
         threading.Thread(target=worker.run_forever, daemon=True, name="aibos-worker").start()

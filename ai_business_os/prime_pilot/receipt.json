@@ -1,0 +1,43 @@
+{
+  "environment": "local synthetic",
+  "provider": "pinned upstream faux replay",
+  "upstream_sha": "e311d6495124cf0bdc629c813fc97a39a9a3054d",
+  "real_model_job": false,
+  "interrupted": {
+    "id": "fixture-1",
+    "accepted": true,
+    "killed_after_ack": true
+  },
+  "restarted": "fixture-2",
+  "history": [
+    {
+      "lease_generation": 1,
+      "status": "LEASE_EXPIRED"
+    },
+    {
+      "lease_generation": 2,
+      "status": "SUBMITTED_FOR_VERIFICATION"
+    }
+  ],
+  "goal_state": "VERIFYING",
+  "current_lease_required": true,
+  "unverifiable_result_rejected": true,
+  "out_of_scope_rejected": true,
+  "ineffective_patch_rejected": true,
+  "elapsed_seconds": 33,
+  "fixture_base_sha": "75b32959e630c606fd20086b08d59dc30b645905",
+  "verified_tree": "9d8765f4ac73bc402c9f40e10c23a9a6fcbe7b83",
+  "changed_paths": [
+    "create_lead.sql"
+  ],
+  "diff_sha256": "82b0db665b464b4612a2262ff462e0d75e24267df1a3a91949a53ae17f6082b0",
+  "base_counts": {
+    "fixture-A": 2,
+    "fixture-B": 1
+  },
+  "patched_counts": {
+    "fixture-A": 1,
+    "fixture-B": 1
+  },
+  "test_command": "python3 verify.py"
+}

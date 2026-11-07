@@ -1,0 +1,25 @@
+{
+  "id": "local-001",
+  "model": "qwen2.5-coder-0.5b",
+  "ack": true,
+  "prompt": "Fix this SQLite insert in create_lead.sql. The table leads(external_id TEXT NOT NULL) has no unique index. Retrying the same reference must produce one row; different references must be preserved. Do not change the schema. Return exactly the proposed SQL, no prose. Current file:\nINSERT INTO leads (external_id) VALUES (:reference);\n",
+  "usage": {
+    "input": 94,
+    "output": 26,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "totalTokens": 120,
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "total": 0
+    }
+  },
+  "answer": "```sql\nINSERT INTO leads (external_id) VALUES (:reference)\nON CONFLICT (external_id) DO NOTHING;\n```",
+  "elapsed_seconds": 4.04,
+  "status": "rejected",
+  "verifier": "sqlite3.OperationalError: ON CONFLICT clause does not match any PRIMARY KEY or UNIQUE constraint",
+  "environment": "synthetic Prime CPU worker | no network | local weights"
+}

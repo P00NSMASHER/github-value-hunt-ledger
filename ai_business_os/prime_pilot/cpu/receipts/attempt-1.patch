@@ -1,0 +1,6 @@
+--- a/create_lead.sql
++++ b/create_lead.sql
+@@ -1 +1,2 @@
+-INSERT INTO leads (external_id) VALUES (:reference);
++INSERT INTO leads (external_id) VALUES (:reference)
++ON CONFLICT (external_id) DO NOTHING;

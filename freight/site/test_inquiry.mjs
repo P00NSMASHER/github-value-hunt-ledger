@@ -19,14 +19,16 @@ function env(db) {return {
   INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_DB:db
 };}
 function mockDb({failInsert=false,failNotificationUpdate=false}={}) {
-  const inquiries=new Map(),limits=new Map(),sqlCalls=[];
-  return {inquiries,limits,sqlCalls,
+  const inquiries=new Map(),limits=new Map(),sqlCalls=[],limitWrites=[];
+  return {inquiries,limits,sqlCalls,limitWrites,
     prepare(sql) {sqlCalls.push(sql);return { bind(...params) {return {
       async first() {
         if(sql.startsWith("SELECT reference")) return inquiries.get(params[0]) || null;
         if(sql.startsWith("INSERT INTO inquiry_limits")) {
           const hits=(limits.get(params[0]) || 0)+1;
+          if (hits > params[2]) return null; // no SQLite RETURNING row, no write on cap
           limits.set(params[0],hits);
+          limitWrites.push({bucket:params[0],hits});
           return {hits};
         }
         throw Error("Unexpected first SQL: "+sql);
@@ -389,4 +391,20 @@ test("online form waits for sequential Turnstile and Resend before declaring the
   assert.match(front, /pendingRequestKey \|\|= window\.crypto\?\.randomUUID\?\.\(\)/);
   assert.match(backend,/SELECT reference, fingerprint, notification_status FROM inquiries WHERE idempotency_key=\?/);
   assert.match(backend,/notificationPending/);
+});
+
+test("exhausted per-IP buckets stop writing without permitting further requests", async () => {
+  const db=mockDb(),remote=mockRemote({captcha:false});
+  try {
+    for (let i=0; i<50; i++) {
+      const result=await onRequestPost({request:request(),env:env(db)});
+      assert.equal(result.status,i<5?400:429);
+    }
+    assert.equal(remote.verifications,5,"only five attempts reach Turnstile");
+    assert.equal(remote.notifications,0);
+    assert.equal(db.inquiries.size,0);
+    assert.equal(db.limits.size,2,"hour and day buckets persist");
+    assert.equal(db.limitWrites.length,10,"no additional writes after the fifth attempt");
+    assert.deepEqual([...db.limits.values()].sort((a,b)=>a-b),[5,5]);
+  } finally {remote.restore();}
 });

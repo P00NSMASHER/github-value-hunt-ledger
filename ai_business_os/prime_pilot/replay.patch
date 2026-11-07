@@ -1,0 +1,8 @@
+diff --git a/create_lead.sql b/create_lead.sql
+--- a/create_lead.sql
++++ b/create_lead.sql
+@@ -1 +1,3 @@
+-INSERT INTO leads (external_id) VALUES (:reference);
++INSERT INTO leads (external_id)
++SELECT :reference
++WHERE NOT EXISTS (SELECT 1 FROM leads WHERE external_id = :reference);
