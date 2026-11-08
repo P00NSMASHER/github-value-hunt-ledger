@@ -2,6 +2,8 @@
 
 Status (2026-11-08): the source route is deployed on production retally-web and all retally_os_* D1 objects were independently observed in the live database. Authenticated owner-browser acceptance and preview-host denial are not independently verified in this session. On 2026-11-08, independent anonymous browser checks of the canonical route and `?view=data` both redirected to Cloudflare Access login without rendering dashboard HTML or customer JSON. **The pilot's GopherCRM, Postmill and Prime Agent are not live production services.** Do not describe this as a deployed GopherCRM/Postmill integration, verified customer, paid revenue, social publication or customer deliverable.
 
+Source/deployment receipt (2026-11-08): [PR #1100](https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/1100) merged a navigation-only link from the private social workspace to the existing Metricool planner at main commit `3eadc813867bda240ae9804821238f9eef51e5ad`, and the exact-commit [Cloudflare Pages: retally-web check](https://github.com/P00NSMASHER/github-value-hunt-ledger/runs/128879195445) completed successfully. This proves source inclusion and a successful provider deployment check only; authenticated owner-browser visibility, provider-side planner access or scheduled-post state, and any Metricool API integration remain unverified.
+
 ## Production URL and protection
 - Owner URL: https://retallyrecovery.com/api/internal/retally-os (never use a Pages preview URL).
 - Cloudflare Access: self-hosted application "RETALLY OS — private owner dashboard" for exactly retallyrecovery.com/api/internal/retally-os; identity rule allows only the owner email, with 1-hour sessions.
