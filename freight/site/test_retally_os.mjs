@@ -59,7 +59,7 @@ test('Owner GET reads live source, labels QA, excludes it from true customer cla
  const d=db();const r=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?view=data'}),d),auth);
  assert.equal(r.status,200);const data=await r.json();assert.equal(data.cases.length,2);assert.equal(data.cases[0].company,'Sample Freight LLC');assert.equal(data.cases[0].synthetic,false);assert.equal(data.cases[1].synthetic,true);assert.equal(data.cases[0].campaign.utm_source,'linkedin');assert.equal(data.drafts.length,0);
  const html=await handleRetallyOs(context(req(),d),auth);assert.equal(html.status,200);
- assert.match(html.headers.get('Content-Security-Policy'),/script-src 'nonce-/);const htmlText=await html.text();assert.match(htmlText,/RETALLY OS/);assert.match(htmlText,/app\\.metricool\\.com\\/planner\\/calendar\\?blogId=7322512/);assert.doesNotMatch(htmlText,/real@example\.com/);assert.doesNotMatch(htmlText,/qa@example\.invalid/);
+ assert.match(html.headers.get('Content-Security-Policy'),/script-src 'nonce-/);const htmlText=await html.text();assert.match(htmlText,/RETALLY OS/);assert.ok(htmlText.includes('https://app.metricool.com/planner/calendar?blogId=7322512'));assert.doesNotMatch(htmlText,/real@example\.com/);assert.doesNotMatch(htmlText,/qa@example\.invalid/);
 });
 test('Private task saves use optimistic versions and append atomic audit triggers',async()=>{
  const d=db();const v={action:'save_case',reference:'RA-20261108-ABCDEF12',expectedVersion:0,owner:'Owner',dueOn:'2026-11-19',status:'reviewing',note:'Review intake evidence'};
