@@ -9,6 +9,7 @@ on:
       - "freight/site/retally_os_auth.mjs"
       - "freight/site/retally_os_ui.mjs"
       - "freight/site/test_retally_os.mjs"
+      - "freight/site/verify_retally_os_access.py"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
       - "freight/site/test_inquiry_case.mjs"
@@ -18,7 +19,6 @@ on:
       - "freight/site/index.html"
       - "freight/site/_headers"
       - "freight/site/test_inquiry.mjs"
-      - "freight/site/test_retally_os.mjs"
       - "freight/site/test_group_inquiry.mjs"
       - "freight/site/test_group_inquiry_cors.mjs"
       - "freight/site/group/**"
@@ -33,6 +33,7 @@ on:
       - "freight/site/retally_os_auth.mjs"
       - "freight/site/retally_os_ui.mjs"
       - "freight/site/test_retally_os.mjs"
+      - "freight/site/verify_retally_os_access.py"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
       - "freight/site/test_inquiry_case.mjs"
@@ -42,7 +43,6 @@ on:
       - "freight/site/index.html"
       - "freight/site/_headers"
       - "freight/site/test_inquiry.mjs"
-      - "freight/site/test_retally_os.mjs"
       - "freight/site/test_group_inquiry.mjs"
       - "freight/site/test_group_inquiry_cors.mjs"
       - "freight/site/group/**"
@@ -92,11 +92,10 @@ jobs:
           node --check freight/site/retally_os_auth.mjs
           node --check freight/site/retally_os_ui.mjs
           node --experimental-default-type=module --experimental-sqlite --test freight/site/test_retally_os.mjs
+      - name: Verify production and preview routes block anonymous access
+        run: python -m freight.site.verify_retally_os_access
           node --experimental-sqlite --test freight/site/test_inquiry_case.mjs freight/inquiry_ops/test_reconcile.mjs
           python -m unittest freight.site.test_inquiry_retention
-      - name: Verify RETALLY OS owner-only D1 case and draft functionality
-        run: |
-          node --experimental-default-type=module --experimental-sqlite --test freight/site/test_retally_os.mjs
       - name: Verify restored freight and independent Group Content Security Policy
         env:
           FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
