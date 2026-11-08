@@ -4,20 +4,20 @@ V11 derives execution state from append-only per-slot events. Missing event logs
 
 | Slot | Role | Assignment | State | Worker | Claim | Telemetry |
 |---|---|---|---|---|---|---|
-| SLOT-01 | experiment | ASSIGN:c64dffb52caa:slot-01 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-02 | experiment | ASSIGN:c64dffb52caa:slot-02 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-03 | experiment | ASSIGN:c64dffb52caa:slot-03 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-04 | experiment | ASSIGN:c64dffb52caa:slot-04 | **EXPIRED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-05 | experiment | ASSIGN:c64dffb52caa:slot-05 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-06 | experiment | ASSIGN:c64dffb52caa:slot-06 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-07 | coverage | ASSIGN:c64dffb52caa:slot-07 | **EXPIRED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-08 | coverage | ASSIGN:c64dffb52caa:slot-08 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-09 | coverage | ASSIGN:c64dffb52caa:slot-09 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-10 | adjacency | ASSIGN:c64dffb52caa:slot-10 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-11 | measurement | ASSIGN:c64dffb52caa:slot-11 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-12 | measurement | ASSIGN:c64dffb52caa:slot-12 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-13 | verification | ASSIGN:c64dffb52caa:slot-13 | **AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-14 | wildcard | ASSIGN:c64dffb52caa:slot-14 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-01 | experiment | ASSIGN:239cc4494b13:slot-01 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-02 | experiment | ASSIGN:239cc4494b13:slot-02 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-03 | experiment | ASSIGN:239cc4494b13:slot-03 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-04 | experiment | ASSIGN:239cc4494b13:slot-04 | **EXPIRED_AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-05 | experiment | ASSIGN:239cc4494b13:slot-05 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-06 | experiment | ASSIGN:239cc4494b13:slot-06 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-07 | coverage | ASSIGN:239cc4494b13:slot-07 | **EXPIRED_AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-08 | coverage | ASSIGN:239cc4494b13:slot-08 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-09 | coverage | ASSIGN:239cc4494b13:slot-09 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-10 | adjacency | ASSIGN:239cc4494b13:slot-10 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-11 | measurement | ASSIGN:239cc4494b13:slot-11 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-12 | measurement | ASSIGN:239cc4494b13:slot-12 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-13 | verification | ASSIGN:239cc4494b13:slot-13 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-14 | wildcard | ASSIGN:239cc4494b13:slot-14 | **AVAILABLE** | — | — | NOT_APPLICABLE |
 
 ## Claim protocol
 

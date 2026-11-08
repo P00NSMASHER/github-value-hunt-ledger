@@ -1,8 +1,8 @@
 # CONTROLLED ROUTING EXPLORATION
 
-Generation: **ROUTEEXP:69e09c258c99**
-Routing generation: **ROUTING:2d9e12dcc50e**
-Gate: **0.6205 / 0.2500**
+Generation: **ROUTEEXP:76a6ad784ab5**
+Routing generation: **ROUTING:513c98b0c24f**
+Gate: **0.3734 / 0.2500**
 Applied: **False**
 Reason: **gate_closed**
 
