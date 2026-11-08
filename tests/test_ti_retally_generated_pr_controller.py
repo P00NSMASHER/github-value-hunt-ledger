@@ -257,7 +257,13 @@ class GeneratedBotControllerTests(unittest.TestCase):
             event.write_text(json.dumps({"client_payload": {
                 "worker": "INTEGRATOR", "expected_main": BASE}}))
             with patch.dict(os.environ, env, clear=True):
-                with self.assertRaises(ProposalHold):
+                proposal.verify_event_authority("repository_dispatch", BASE)
+            # INTEGRATOR is a trusted Scout role; ALL, malformed and
+            # out-of-range recovery roles remain explicitly unauthorized.
+            for role in ("ALL", "HUNTER-00", "HUNTER-15", "INTEGRATOR-1"):
+                event.write_text(json.dumps({"client_payload": {
+                    "worker": role, "expected_main": BASE}}))
+                with patch.dict(os.environ, env, clear=True), self.assertRaises(ProposalHold):
                     proposal.verify_event_authority("repository_dispatch", BASE)
 
     def test_untrusted_manual_dispatch_cannot_invoke_bot_merge(self):

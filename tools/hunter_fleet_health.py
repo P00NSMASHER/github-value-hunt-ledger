@@ -87,6 +87,66 @@ def inspect_workflow_receipt(run: dict, read_api=api) -> dict:
     return evidence
 
 
+
+def is_integrator_run(run: dict) -> bool:
+    """Only an exact first-party integrator run can omit source inspection."""
+    name = run.get("display_title") or run.get("name")
+    event = run.get("event")
+    if not isinstance(name, str) or run.get("head_branch") != "main":
+        return False
+    if (run.get("head_repository") or {}).get("full_name") != REPO:
+        return False
+    if event == "schedule":
+        return name == "Hunter 7 4,16 * * * slot=native"
+    return (event == "repository_dispatch"
+            and (run.get("actor") or {}).get("login") == "portfolio-brain-v8-runtime[bot]"
+            and re.fullmatch(
+                r"Hunter INTEGRATOR slot=20[0-9]{2}-[01][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:00Z",
+                name,
+            ) is not None)
+
+
+def inspect_integrator_receipt(run: dict, read_api=api) -> dict:
+    """Validate a real Integrator execution receipt, never a source-inspection pass."""
+    run_id = run.get("id")
+    proof = {"run_id": run_id, "status": "INTEGRATOR_RECEIPT_UNVERIFIED",
+             "scout_receipt_verified": False, "delivery_verified": False,
+             "parent_conclusion": run.get("conclusion")}
+    if not is_integrator_run(run) or type(run_id) is not int or run_id <= 0:
+        return proof
+    try:
+        jobs = read_api(
+            f"/repos/{REPO}/actions/runs/{run_id}/jobs?per_page=100").get("jobs")
+        if not isinstance(jobs, list):
+            return proof
+        scout = [j for j in jobs if j.get("name") == "scout"]
+        inspector = [j for j in jobs if j.get("name") == "candidate-inspection"]
+        if (len(scout) != 1 or len(inspector) != 1
+                or scout[0].get("conclusion") != "success"
+                or inspector[0].get("conclusion") != "skipped"
+                or run.get("status") != "completed"):
+            return proof
+        artifacts = read_api(
+            f"/repos/{REPO}/actions/runs/{run_id}/artifacts?per_page=100").get("artifacts")
+        if not isinstance(artifacts, list):
+            return proof
+        attempt = run.get("run_attempt") or 1
+        label = f"hunter-integrator-{run_id}-{attempt}"
+        valid = [a for a in artifacts if a.get("name") == label
+                 and a.get("expired") is False
+                 and type(a.get("size_in_bytes")) is int and a["size_in_bytes"] > 0]
+        if len(valid) != 1:
+            return proof
+        proof.update(status="INTEGRATOR_SCOUT_RECEIPT_VERIFIED",
+                     scout_receipt_verified=True,
+                     delivery_verified=(run.get("conclusion") == "success"),
+                     artifact_id=valid[0].get("id"))
+    except Exception:
+        # Missing provider evidence must not masquerade as an eligible skip.
+        return proof
+    return proof
+
+
 def inspect_recent_scout_delivery(runs: list[dict], now: dt.datetime,
                                   read_api=api) -> dict:
     """Sample 2 scheduled workers and the latest recovery, with bounded API reads.
@@ -112,14 +172,19 @@ def inspect_recent_scout_delivery(runs: list[dict], now: dt.datetime,
         ("repository_dispatch", 1, 4),
     ):
         receipts = []
+        integrators = []
         scanned = 0
         for run in recent:
             if run.get("event") != event or scanned >= max_review:
                 continue
             scanned += 1
             proof = inspect_workflow_receipt(run, read_api)
-            if event == "schedule" and proof["status"] == "INSPECTION_SKIPPED":
-                continue  # Integrator is intentionally not a source inspector.
+            if proof["status"] == "INSPECTION_SKIPPED" and is_integrator_run(run):
+                integrator = inspect_integrator_receipt(run, read_api)
+                integrators.append(integrator)
+                if integrator["scout_receipt_verified"]:
+                    continue  # A proven integrator is NOT a candidate inspector.
+                proof = {**proof, "status": "INTEGRATOR_RECEIPT_UNVERIFIED"}
             receipts.append(proof)
             if len(receipts) >= required:
                 break
@@ -127,6 +192,7 @@ def inspect_recent_scout_delivery(runs: list[dict], now: dt.datetime,
             "required": required,
             "scanned": scanned,
             "proofs": receipts,
+            "integrators": integrators,
             "verified": len(receipts) == required and all(
                 proof["verified"] for proof in receipts),
         }
@@ -164,6 +230,11 @@ def evaluate(runs: list[dict], queues: dict[str, dict], digest: str,
             (inspections.get("schedule") or {}).get("verified"))
         checks["recovery_inspection_delivery"] = bool(
             (inspections.get("repository_dispatch") or {}).get("verified"))
+    # A completed integrator scout can still fail its PR handoff; make that
+    # independently visible instead of laundering it into green inspection.
+    integrators = (inspections or {}).get("repository_dispatch", {}).get("integrators", [])
+    if integrators:
+        checks["integrator_recovery_delivery"] = bool(integrators[0]["delivery_verified"])
     if inject_failure:
         checks["injected_failure_detected"] = False
     return {
@@ -268,6 +339,12 @@ def render(report: dict) -> str:
                 rows.append(
                     f"  - Run {proof.get('run_id')}: {proof.get('status')}; "
                     f"artifact {proof.get('artifact_id', 'none')}"
+                )
+            for integrator in item.get("integrators") or []:
+                rows.append(
+                    f"  - Integrator {integrator.get('run_id')}: {integrator.get('status')}; "
+                    f"proposal delivery {integrator.get('parent_conclusion')}; "
+                    f"artifact {integrator.get('artifact_id', 'none')}"
                 )
         rows += ["", "Sampled proof is not comprehensive coverage or a target integration.", ""]
     runtime = report.get("governed_runtime")

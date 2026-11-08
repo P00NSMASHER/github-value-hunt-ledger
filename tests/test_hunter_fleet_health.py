@@ -4,8 +4,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.hunter_fleet_health import (WORKERS, evaluate, governed_runtime_truth,
-                                       render, inspect_recent_scout_delivery)
+from tools.hunter_fleet_health import (WORKERS, REPO, evaluate, governed_runtime_truth,
+                                       render, inspect_recent_scout_delivery,
+                                       inspect_integrator_receipt, is_integrator_run)
 
 
 class HunterFleetHealthTests(unittest.TestCase):
@@ -133,7 +134,11 @@ class HunterFleetHealthTests(unittest.TestCase):
         def run(run_id, event, minute):
             return {"id": run_id, "event": event, "status": "completed",
                     "conclusion": "success", "run_attempt": 1,
-                    "created_at": f"2026-11-05T12:{minute:02d}:00Z"}
+                    "created_at": f"2026-11-05T12:{minute:02d}:00Z",
+                    "name": "Hunter 7 4,16 * * * slot=native" if run_id == 11
+                            else "Hunter HUNTER-01 slot=native",
+                    "head_branch": "main", "head_repository": {"full_name": REPO},
+                    "actor": {"login": "P00NSMASHER"}}
         runs = [run(11, "schedule", 59),  # Integrator: intentionally skipped.
                 run(12, "schedule", 58),
                 run(13, "schedule", 57),
@@ -141,11 +146,16 @@ class HunterFleetHealthTests(unittest.TestCase):
         def fake_api(path):
             num = int(path.split("/runs/")[1].split("/")[0])
             if path.endswith("/jobs?per_page=100"):
-                return {"jobs": [{"id": num + 100, "name": "candidate-inspection",
-                                  "conclusion": "skipped" if num == 11 else "success"}]}
+                jobs = [{"id": num + 100, "name": "candidate-inspection",
+                         "conclusion": "skipped" if num == 11 else "success"}]
+                if num == 11:
+                    jobs.append({"id": num + 200, "name": "scout", "conclusion": "success"})
+                return {"jobs": jobs}
             if path.endswith("/artifacts?per_page=100"):
+                name = (f"hunter-integrator-{num}-1" if num == 11
+                        else f"hunter-inspection-{num}-1")
                 return {"artifacts": [{"id": num + 1000,
-                                      "name": f"hunter-inspection-{num}-1",
+                                      "name": name,
                                       "expired": False, "size_in_bytes": 500}]}
             raise AssertionError("Unexpected API route: " + path)
         proof = inspect_recent_scout_delivery(runs, now, fake_api)
@@ -172,6 +182,70 @@ class HunterFleetHealthTests(unittest.TestCase):
                           old_now, [], inspections=broken)
         self.assertFalse(report["checks"]["recovery_inspection_delivery"])
         self.assertFalse(report["healthy"])
+
+    def test_integrator_recovery_failure_does_not_poison_actual_inspector_sample(self):
+        now = dt.datetime(2026, 11, 8, 12, tzinfo=dt.timezone.utc)
+        common = {"status": "completed", "run_attempt": 1,
+                  "head_branch": "main", "head_repository": {"full_name": REPO},
+                  "actor": {"login": "portfolio-brain-v8-runtime[bot]"},
+                  "event": "repository_dispatch"}
+        integrator = {**common, "id": 30, "conclusion": "failure",
+                      "created_at": "2026-11-08T11:53:00Z",
+                      "name": "Hunter INTEGRATOR slot=2026-11-08T04:07:00Z"}
+        hunter = {**common, "id": 20, "conclusion": "success",
+                  "created_at": "2026-11-08T11:20:00Z",
+                  "name": "Hunter HUNTER-14 slot=2026-11-08T03:51:00Z"}
+        def fake_api(path):
+            num = int(path.split("/runs/")[1].split("/")[0])
+            if path.endswith("/jobs?per_page=100"):
+                return {"jobs": [
+                    {"name": "scout", "conclusion": "success"},
+                    {"name": "candidate-inspection",
+                     "conclusion": "skipped" if num == 30 else "success"},
+                    {"name": "submit-pr",
+                     "conclusion": "failure" if num == 30 else "skipped"},
+                ]}
+            if path.endswith("/artifacts?per_page=100"):
+                prefix = "hunter-integrator" if num == 30 else "hunter-inspection"
+                return {"artifacts": [{"id": num + 1000,
+                    "name": f"{prefix}-{num}-1", "expired": False, "size_in_bytes": 500}]}
+            raise AssertionError("Unexpected API: " + path)
+        proof = inspect_recent_scout_delivery([integrator, hunter], now, fake_api)
+        recovery = proof["repository_dispatch"]
+        self.assertTrue(recovery["verified"])
+        self.assertEqual([p["run_id"] for p in recovery["proofs"]], [20])
+        self.assertEqual(recovery["scanned"], 2)
+        self.assertTrue(recovery["integrators"][0]["scout_receipt_verified"])
+        self.assertFalse(recovery["integrators"][0]["delivery_verified"])
+        old_now, runs, queues = self.fixture()
+        report = evaluate(runs, queues,
+                          "Queue snapshots read: 14\\nUnique exact-revision candidates: 81",
+                          old_now, [], inspections=proof)
+        self.assertTrue(report["checks"]["recovery_inspection_delivery"])
+        self.assertFalse(report["checks"]["integrator_recovery_delivery"])
+        self.assertFalse(report["healthy"])
+        self.assertIn("proposal delivery failure", render(report))
+
+        # Missing integrator artifact is not an eligible bypass.
+        def missing_integrator_artifact(path):
+            result = fake_api(path)
+            if "/runs/30/artifacts?" in path:
+                result["artifacts"] = []
+            return result
+        bad = inspect_recent_scout_delivery([integrator, hunter], now,
+                                             missing_integrator_artifact)
+        self.assertFalse(bad["repository_dispatch"]["verified"])
+        self.assertEqual(bad["repository_dispatch"]["proofs"][0]["status"],
+                         "INTEGRATOR_RECEIPT_UNVERIFIED")
+
+        # A forged role/name or unexpected actor cannot evade inspection.
+        for changed in ({"name": "Hunter HUNTER-14 slot=native"},
+                        {"actor": {"login": "not-the-integrator[bot]"}},
+                        {"head_branch": "untrusted"}):
+            self.assertFalse(is_integrator_run({**integrator, **changed}))
+        self.assertFalse(inspect_integrator_receipt(
+            {**integrator, "head_branch": "untrusted"}, fake_api
+        )["scout_receipt_verified"])
 
     def test_green_parent_and_missing_inspection_job_is_not_success(self):
         now = dt.datetime(2026, 11, 5, 13, tzinfo=dt.timezone.utc)

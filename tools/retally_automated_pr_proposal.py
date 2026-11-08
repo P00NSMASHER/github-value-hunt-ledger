@@ -38,7 +38,7 @@ def verify_event_authority(event: str, base: str) -> None:
     client = payload.get("client_payload") if isinstance(payload, dict) else None
     worker = client.get("worker") if isinstance(client, dict) else None
     expected_main = client.get("expected_main") if isinstance(client, dict) else None
-    if (not re.fullmatch(r"HUNTER-(0[1-9]|1[0-4])", str(worker or "")) or
+    if (not re.fullmatch(r"(?:HUNTER-(0[1-9]|1[0-4])|INTEGRATOR)", str(worker or "")) or
             expected_main != base or os.environ.get("GITHUB_SHA") != base):
         raise ProposalHold("Recovery event is not exact-main worker authority")
 
