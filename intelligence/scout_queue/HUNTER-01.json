@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -70,6 +70,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-07T06:41:41Z",
       "repository": "pulseai-labs/pulse-trader",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -118,6 +119,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T06:27:19Z",
       "repository": "0xArchiveIO/sdk-typescript",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -205,7 +207,7 @@
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-03T04:12:25Z",
+      "pushed_at": "2026-11-08T04:45:29Z",
       "repository": "open-meridian/plugin-tradier",
       "root_code_signals": [
         ".github",
@@ -402,11 +404,11 @@
       "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "d8ad3c7de741b5384a837c42b683b1c561183212",
+      "exact_revision": "30c883f7e53a7f0eab00d6df9ba31e3a1bc4d210",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T06:36:04Z",
+      "pushed_at": "2026-11-08T17:33:06Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -416,7 +418,7 @@
         "src",
         "test"
       ],
-      "size_kb": 77006,
+      "size_kb": 77213,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -574,6 +576,52 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Hypothesis-killing framework for quant finance: preregistration, spec curves, walk-forward, deflated Sharpe, Monte Carlo. Deterministic verdicts, documented tombstones.",
+      "discovery_query": "walk forward backtesting",
+      "exact_revision": "c4673c52f07365744a6dc8b5b1a981b3128989ba",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-08T18:38:28Z",
+      "repository": "Pavel14701/atropos",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 5316,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "algorithmic-trading-quantitative",
+        "backtesting",
+        "deflated-sharpe",
+        "falsification",
+        "hypothesis-testing",
+        "overfitting",
+        "preregistration",
+        "quantitative-finance",
+        "research-tooling",
+        "trading-strategies",
+        "walk-forward"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 47,
+      "url": "https://github.com/Pavel14701/atropos"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Institutional-grade market regime detection, systemic risk telemetry, and walk-forward backtesting engine in Python.",
       "discovery_query": "walk forward backtesting",
       "exact_revision": "1ecfc8a79b49c0a697950bb4c4b6217f6de54b99",
@@ -665,19 +713,18 @@
       "default_branch": "main",
       "description": "Forecasting hourly MISO grid demand and benchmarking it against the grid operator's own day ahead forecast. EIA API, Open-Meteo, walk forward backtest.",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "d50197c95dc61022eef74077f1c3c749531b43c4",
+      "exact_revision": "672c5dec1f1056978c335d3be98203d20caa5d66",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T19:11:13Z",
+      "pushed_at": "2026-11-08T17:20:47Z",
       "repository": "austi20/miso-demand-forecaster",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "src",
         "tests"
       ],
-      "size_kb": 354,
+      "size_kb": 379,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -704,55 +751,11 @@
       },
       "triage_score": 47,
       "url": "https://github.com/austi20/miso-demand-forecaster"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Open-source Python toolkit for quantitative research on Borsa Istanbul (BIST): data, features, walk-forward backtesting, risk/portfolio, backtest robustness (CPCV/PBO), diagnostics, reports, paper-trading bridge.",
-      "discovery_query": "walk forward trading backtest python open source",
-      "exact_revision": "27a690bb1073c43bf1145eae82c1545567a00482",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T13:45:42Z",
-      "repository": "HaasEnjoyer/quanttro",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 260,
-      "stars": 2,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "algorithmic-trading",
-        "backtesting",
-        "bist",
-        "overfitting",
-        "portfolio-optimization",
-        "prop-firm",
-        "python",
-        "quantitative-finance",
-        "risk-management"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 2,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/HaasEnjoyer/quanttro"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T08:21:22.655317+00:00",
+  "generated_at": "2026-11-08T18:47:28.420125+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
