@@ -4,8 +4,12 @@ from __future__ import annotations
 from pathlib import Path
 import tempfile
 import unittest
+import json
+import os
+from unittest.mock import patch
 
 from tools import retally_writer_proposal_policy as p
+from tools import retally_automated_pr_proposal as handoff
 
 BASE = "a" * 40
 HEAD = "b" * 40
@@ -26,6 +30,37 @@ class WriterProposalPolicyTests(unittest.TestCase):
         branch = branch or p.branch_for_run(lane, "39603064849", "1")
         return p.verify_proposal(lane, branch, base, head, parent, files,
                                  manifest=manifest or self.manifest)
+
+    def test_integrator_recovery_actor_and_source_are_bound_to_exact_main(self):
+        # The Scout workflow admits INTEGRATOR alongside HUNTER-01..14,
+        # but the PR handoff previously rejected every integrator dispatch.
+        with tempfile.TemporaryDirectory() as folder:
+            event_path = Path(folder) / "recovery.json"
+            def run(worker, *, actor="portfolio-brain-v8-runtime[bot]",
+                    expected=BASE, event_sha=BASE):
+                event_path.write_text(json.dumps({"client_payload": {
+                    "worker": worker, "expected_main": expected,
+                    "scheduled_slot": "2026-11-08T04:07:00Z"
+                }}), encoding="utf-8")
+                with patch.dict(os.environ, {
+                    "GITHUB_ACTOR": actor,
+                    "GITHUB_EVENT_PATH": str(event_path),
+                    "GITHUB_SHA": event_sha,
+                }):
+                    handoff.verify_event_authority("repository_dispatch", BASE)
+            run("INTEGRATOR")
+            run("HUNTER-01")
+            run("HUNTER-14")
+            for bad in ("ALL", "HUNTER-15", "HUNTER-00",
+                        "INTEGRATOR-", "../INTEGRATOR", ""):
+                with self.subTest(worker=bad), self.assertRaises(p.ProposalHold):
+                    run(bad)
+            for kwargs in ({"actor": "untrusted[bot]"},
+                           {"expected": HEAD}, {"event_sha": HEAD}):
+                with self.subTest(kwargs=kwargs), self.assertRaises(p.ProposalHold):
+                    run("INTEGRATOR", **kwargs)
+            # Non-recovery events remain unmodified.
+            handoff.verify_event_authority("schedule", BASE)
 
     def test_run_branch_is_bounded_and_lane_specific(self):
         for lane in p.LANES:
