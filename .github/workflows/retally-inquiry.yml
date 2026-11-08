@@ -9,6 +9,7 @@ on:
       - "freight/site/retally_os_auth.mjs"
       - "freight/site/retally_os_ui.mjs"
       - "freight/site/test_retally_os.mjs"
+      - "freight/site/verify_retally_os_access.py"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
       - "freight/site/test_inquiry_case.mjs"
@@ -32,6 +33,7 @@ on:
       - "freight/site/retally_os_auth.mjs"
       - "freight/site/retally_os_ui.mjs"
       - "freight/site/test_retally_os.mjs"
+      - "freight/site/verify_retally_os_access.py"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
       - "freight/site/test_inquiry_case.mjs"
@@ -92,6 +94,8 @@ jobs:
           node --experimental-default-type=module --experimental-sqlite --test freight/site/test_retally_os.mjs
           node --experimental-sqlite --test freight/site/test_inquiry_case.mjs freight/inquiry_ops/test_reconcile.mjs
           python -m unittest freight.site.test_inquiry_retention
+      - name: Verify production and preview routes block anonymous access
+        run: python -m freight.site.verify_retally_os_access
       - name: Verify restored freight and independent Group Content Security Policy
         env:
           FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
