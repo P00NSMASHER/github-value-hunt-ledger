@@ -15,11 +15,11 @@
       "default_branch": "main",
       "description": "Open-source, self-hosted CRM: leads, deals, tickets, tasks and lead-capture forms. Go + React, SQLite or MySQL.",
       "discovery_query": "crm lead capture",
-      "exact_revision": "ae53d6dbb251e33484207756cc9699bd316834a7",
-      "forks": 10,
+      "exact_revision": "37380868968c3a30a9eea09160aee813e9851a1b",
+      "forks": 11,
       "primary_language": "Go",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-07T01:47:21Z",
+      "pushed_at": "2026-11-08T14:08:25Z",
       "repository": "florinel-chis/GopherCRM",
       "root_code_signals": [
         ".github",
@@ -31,7 +31,7 @@
         "test",
         "tests"
       ],
-      "size_kb": 29878,
+      "size_kb": 30259,
       "stars": 26,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -73,11 +73,11 @@
       "default_branch": "main",
       "description": "AI-powered B2B lead finder: discovery on licensed lead data, LLM fit qualification with the reason written out, CSV out. The finder core, extracted from OpenOutreach.",
       "discovery_query": "B2B lead qualification",
-      "exact_revision": "2098586a969dcb529a5c6bb9ed234304a67d4fd8",
+      "exact_revision": "cd01f430549359cbf4f7de7e89eca1367f8cfd67",
       "forks": 18,
       "primary_language": "Python",
       "published_license_spdx": "GPL-3.0",
-      "pushed_at": "2026-11-07T04:37:16Z",
+      "pushed_at": "2026-11-07T19:21:42Z",
       "repository": "eracle/OpenOutFind",
       "root_code_signals": [
         ".github",
@@ -85,7 +85,7 @@
         "pyproject.toml",
         "tests"
       ],
-      "size_kb": 7107,
+      "size_kb": 7306,
       "stars": 33,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -268,6 +268,50 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Reference core for a two-sided marketplace payments backend (TypeScript, PostgreSQL): Connect onboarding state machine, double-entry ledger, idempotent webhooks in any order, refunds and disputes, reconciliation, row-level isolation. Fake Stripe, not verified against the real API",
+      "discovery_query": "stripe webhook reconciliation",
+      "exact_revision": "960cab302052019f400c4b2844bfd583dd68c37d",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-07T10:12:37Z",
+      "repository": "kienpt91/stripe-connect-marketplace-core",
+      "root_code_signals": [
+        ".github",
+        "migrations",
+        "package.json",
+        "src",
+        "test"
+      ],
+      "size_kb": 253,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "ledger",
+        "marketplace",
+        "postgresql",
+        "stripe",
+        "stripe-connect",
+        "typescript",
+        "webhooks"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 13,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 51,
+      "url": "https://github.com/kienpt91/stripe-connect-marketplace-core"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "Whatever you sell to local businesses, your AI agent finds the ones that need it. Open-data local-business lead engine: CLI-first, MCP + REST, reactive live map. MIT.",
       "discovery_query": "open data business leads",
       "exact_revision": "00121e4c8a76ee681716f974878df26f4d47b685",
@@ -407,6 +451,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-03T21:52:37Z",
       "repository": "vladosskins178/payments-ledger-review-kit",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -540,18 +585,18 @@
       "default_branch": "main",
       "description": "Payment settlement and reconciliation sandbox: signed webhooks, refunds and payouts on an append-only double-entry ledger in PostgreSQL. Synthetic data and Stripe test mode only.",
       "discovery_query": "stripe webhook reconciliation",
-      "exact_revision": "754a9772b56c2f2bfcd6427dffb69155f71a2f8f",
+      "exact_revision": "ffacd36ac74f3ad6ca3bea16747cbf2d9c28500b",
       "forks": 0,
       "primary_language": "Java",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-07T04:09:32Z",
+      "pushed_at": "2026-11-08T07:52:48Z",
       "repository": "itsChihyeh/LedgerLab",
       "root_code_signals": [
         ".github",
         "pom.xml",
         "src"
       ],
-      "size_kb": 36103,
+      "size_kb": 36089,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -701,55 +746,11 @@
       },
       "triage_score": 43,
       "url": "https://github.com/kabxxr7-jpg/stripe-kit"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Open-source prospecting for agencies: local businesses from Google Maps, website gap audit, verified emails. Next.js, Supabase Auth, looot data. Vercel-ready.",
-      "discovery_query": "open data business leads",
-      "exact_revision": "51d2b4198b08e954284a905608f3b58426b8ae3e",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-14T00:17:33Z",
-      "repository": "loootai/looot-local-leads",
-      "root_code_signals": [
-        "package.json",
-        "src"
-      ],
-      "size_kb": 4980,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "agency",
-        "google-maps",
-        "gtm",
-        "lead-generation",
-        "local-business",
-        "looot",
-        "nextjs",
-        "prospecting",
-        "supabase",
-        "vercel"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 5,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 43,
-      "url": "https://github.com/loootai/looot-local-leads"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Success requires independently verified customer action or actual collected payment; a lead, mock purchase, generated invoice or GitHub candidate is not revenue.",
-  "generated_at": "2026-11-07T08:44:51.422338+00:00",
+  "generated_at": "2026-11-08T15:24:07.393353+00:00",
   "mission": "Revenue hunt: find reusable B2B prospect discovery, customer conversion, billing/reconciliation and measured funnel tools that could help active RETALLY businesses achieve a first independently verified collected dollar.",
   "project": "revenue-hunt",
   "risk_review": [],
