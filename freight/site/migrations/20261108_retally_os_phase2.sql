@@ -17,16 +17,16 @@ CREATE TABLE IF NOT EXISTS retally_os_case_events (
   actor TEXT NOT NULL,
   status TEXT NOT NULL,
   occurred_at INTEGER NOT NULL,
-  record_digest TEXT NOT NULL
+  record_tag TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS retally_os_case_events_ref_idx ON retally_os_case_events(reference,event_id);
 CREATE TRIGGER IF NOT EXISTS retally_os_case_insert AFTER INSERT ON retally_os_cases BEGIN
-  INSERT INTO retally_os_case_events(reference,version,actor,status,occurred_at,record_digest)
+  INSERT INTO retally_os_case_events(reference,version,actor,status,occurred_at,record_tag)
   VALUES(NEW.reference,NEW.version,NEW.updated_by,NEW.status,NEW.updated_at,
     hex(NEW.reference||':'||NEW.version||':'||NEW.status||':'||NEW.updated_by));
 END;
 CREATE TRIGGER IF NOT EXISTS retally_os_case_update AFTER UPDATE ON retally_os_cases BEGIN
-  INSERT INTO retally_os_case_events(reference,version,actor,status,occurred_at,record_digest)
+  INSERT INTO retally_os_case_events(reference,version,actor,status,occurred_at,record_tag)
   VALUES(NEW.reference,NEW.version,NEW.updated_by,NEW.status,NEW.updated_at,
     hex(NEW.reference||':'||NEW.version||':'||NEW.status||':'||NEW.updated_by));
 END;

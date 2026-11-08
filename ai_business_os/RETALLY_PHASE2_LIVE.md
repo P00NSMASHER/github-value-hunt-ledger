@@ -1,6 +1,6 @@
 # RETALLY OS Phase 2 — private Cloudflare owner desk
 
-Status: source and integration tests ready for controlled activation. **The pilot's GopherCRM, Postmill and Prime Agent are not live production services.** Do not describe this as a deployed GopherCRM/Postmill integration, verified customer, paid revenue, social publication or customer deliverable.
+Status (2026-11-08): the source route is deployed on production retally-web and all retally_os_* D1 objects were independently observed in the live database. Authenticated owner-browser acceptance is not independently verified in this session; unauthenticated negative testing remains required. **The pilot's GopherCRM, Postmill and Prime Agent are not live production services.** Do not describe this as a deployed GopherCRM/Postmill integration, verified customer, paid revenue, social publication or customer deliverable.
 
 ## Production URL and protection
 - Owner URL: https://retallyrecovery.com/api/internal/retally-os (never use a Pages preview URL).
@@ -21,7 +21,7 @@ Status: source and integration tests ready for controlled activation. **The pilo
 1. Check Cloudflare Pages retally-web production source, its binding name INQUIRY_DB and existing intake availability; do not remove or switch the binding.
 2. Verify the Access application path, exact owner allow rule, and JWT audience. Confirm the selected team issuer matches the pinned `retally_os_auth.mjs` issuer.
 3. From a separate staging D1, apply the migration and run `node --experimental-default-type=module --experimental-sqlite --test freight/site/test_retally_os.mjs`. Confirm the suite passes before applying production DDL.
-4. Before production DDL, read-only query `sqlite_master` to reject name collisions and verify no `retally_os_*` table exists unexpectedly. Apply the migration only after source backups and an explicit schema check. Requery `sqlite_master` to confirm all expected objects. No customer rows need to be copied.
+4. The migration was already applied to production on 2026-11-08. For any new environment or rerun, first read-only query `sqlite_master` to reject name collisions and verify no `retally_os_*` table exists unexpectedly. Apply the migration to a new environment only after source backups and an explicit schema check. Live production uses record_tag in the case-event schema. Requery `sqlite_master` to confirm all expected objects. No customer rows need to be copied.
 5. Deploy through a protected GitHub PR with exact-head CI, then verify the resolved production deployment commit.
 
 ## Acceptance
