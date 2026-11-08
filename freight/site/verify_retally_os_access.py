@@ -36,6 +36,7 @@ def _require_denial(url: str, *, is_production: bool) -> None:
         raise AssertionError("owner-only response included protected dashboard content")
     if status in {301, 302, 303, 307, 308}:
         target = urllib.parse.urlparse(redirect)
+        print(f"Anonymous redirect: HTTP {status}, host={target.hostname}, path={target.path[:80]}")
         if target.scheme != "https" or not (
             "cloudflareaccess.com" in target.hostname if target.hostname else False
         ) and "/cdn-cgi/access/" not in target.path:

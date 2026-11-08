@@ -42,3 +42,15 @@ Status (2026-11-08): the source route is deployed on production retally-web and 
 - GopherCRM and Postmill passed isolated synthetic pilots but have outstanding upstream dependency advisories, require durable private hosting and credentials, and lack production authorization. Do not expose either service to the internet before a separate patch/retest and operator-only Access gate.
 - Prime Agent's completed local CPU experiment does not grant it production credentials or autonomous mutation rights.
 - This limited owner workbench supplies an immediate zero-new-host-cost bridge to real D1 inquiries, case tasks and editorial drafts. It is **not** full production GopherCRM or Postmill.
+
+## Canonical hostname redirect repair (2026-11-08)
+
+The zone originally redirected **all** apex-host requests to www, including the exact protected RETALLY OS path. That returned an unrelated 301 instead of the protected dashboard and made the existing owner-only route unusable. A dry-run followed by an applied Cloudflare Rulesets PATCH modified ONLY the existing redirect expression to:
+
+```text
+http.host eq "retallyrecovery.com" and http.request.uri.path ne "/api/internal/retally-os"
+```
+
+The original rule remains enabled for all other apex paths. Its 301 destination (`concat("https://www.retallyrecovery.com", http.request.uri.path)`) and query-string preservation are unchanged. No www-based owner dashboard was activated; access remains restricted to the Access application on the apex path. The original expression for rollback is `http.host eq "retallyrecovery.com"`. Rolling back this exception would break the owner dashboard, so test Access denial and owner sign-in first.
+
+The new read-only CI smoke check `freight/site/verify_retally_os_access.py` must reject anonymous production data access and any preview-host exposure. It deliberately makes GET requests only and does not submit a login or access customer records.
