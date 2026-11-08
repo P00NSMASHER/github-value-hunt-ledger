@@ -25,8 +25,9 @@ function req(method='GET',body,opts={}){
  return new Request(url,{method,headers,body:body===undefined?undefined:JSON.stringify(body)});
 }
 function db(){
- const db=new DatabaseSync(':memory:');db.exec(`CREATE TABLE inquiries(reference TEXT PRIMARY KEY, full_name TEXT NOT NULL,work_email TEXT NOT NULL,company_name TEXT NOT NULL,annual_spend TEXT,details_json TEXT NOT NULL,accepted_at INTEGER NOT NULL,notification_status TEXT NOT NULL);CREATE TABLE inquiry_qa_registry(reference TEXT PRIMARY KEY);`);
+ const db=new DatabaseSync(':memory:');db.exec('PRAGMA foreign_keys=ON');db.exec(`CREATE TABLE inquiries(reference TEXT PRIMARY KEY, full_name TEXT NOT NULL,work_email TEXT NOT NULL,company_name TEXT NOT NULL,annual_spend TEXT,details_json TEXT NOT NULL,accepted_at INTEGER NOT NULL,notification_status TEXT NOT NULL);CREATE TABLE inquiry_qa_registry(reference TEXT PRIMARY KEY);`);
  db.exec(readFileSync(new URL('./migrations/20261108_retally_os_phase2.sql',import.meta.url),'utf8'));
+ db.exec(readFileSync(new URL('./migrations/20261108_retally_os_crm_followups.sql',import.meta.url),'utf8'));
  const now=Math.floor(Date.now()/1000);
  const insert=db.prepare('INSERT INTO inquiries VALUES(?,?,?,?,?,?,?,?)');
  insert.run('RA-20261108-AABBCCDD','Synthetic QA','qa@example.invalid','Test Carrier','Under $250k',JSON.stringify({inquiryKind:'freight',campaign:{utm_source:'test'}}),now-1,'delivery_verified');
@@ -57,9 +58,9 @@ test('Production entry denies missing Access token and nonproduction host before
 });
 test('Owner GET reads live source, labels QA, excludes it from true customer claims',async()=>{
  const d=db();const r=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?view=data'}),d),auth);
- assert.equal(r.status,200);const data=await r.json();assert.equal(data.cases.length,2);assert.equal(data.cases[0].company,'Sample Freight LLC');assert.equal(data.cases[0].synthetic,false);assert.equal(data.cases[1].synthetic,true);assert.equal(data.cases[0].campaign.utm_source,'linkedin');assert.equal(data.drafts.length,0);
+ assert.equal(r.status,200);const data=await r.json();assert.equal(data.cases.length,2);assert.equal(data.cases[0].company,'Sample Freight LLC');assert.equal(data.cases[0].synthetic,false);assert.equal(data.cases[1].synthetic,true);assert.equal(data.cases[0].campaign.utm_source,'linkedin');assert.equal(data.drafts.length,0);assert.deepEqual(data.tasks,[]);
  const html=await handleRetallyOs(context(req(),d),auth);assert.equal(html.status,200);
- assert.match(html.headers.get('Content-Security-Policy'),/script-src 'nonce-/);const htmlText=await html.text();assert.match(htmlText,/RETALLY OS/);assert.doesNotMatch(htmlText,/real@example\.com/);assert.doesNotMatch(htmlText,/qa@example\.invalid/);
+ assert.match(html.headers.get('Content-Security-Policy'),/script-src 'nonce-/);const htmlText=await html.text();assert.match(htmlText,/RETALLY OS/);assert.ok(htmlText.includes('https://app.metricool.com/planner/calendar?blogId=7322512'));assert.ok(htmlText.includes('Follow-ups &amp; owner tasks'));assert.doesNotMatch(htmlText,/real@example\.com/);assert.doesNotMatch(htmlText,/qa@example\.invalid/);
 });
 test('Private task saves use optimistic versions and append atomic audit triggers',async()=>{
  const d=db();const v={action:'save_case',reference:'RA-20261108-ABCDEF12',expectedVersion:0,owner:'Owner',dueOn:'2026-11-19',status:'reviewing',note:'Review intake evidence'};
@@ -86,4 +87,53 @@ test('Draft save, edit and review persist but have no publishing path',async()=>
  assert.equal(d.raw.prepare('SELECT status FROM retally_os_social_drafts').get().status,'draft');
  assert.equal(d.raw.prepare('SELECT COUNT(*) AS n FROM retally_os_social_events').get().n,3);
  r=await handleRetallyOs(context(req('POST',{action:'review_draft',draftId:id,expectedVersion:2}),d),auth);assert.equal(r.status,409);
+});
+
+
+test('CRM follow-up persists across independent GETs with source identity intact and append-only events',async()=>{
+ const d=db();const taskId='11111111-2222-4333-8444-555555555555';
+ const input={action:'save_task',taskId,reference:'RA-20261108-ABCDEF12',expectedVersion:0,
+  title:'Review credit history',owner:'Owner',dueOn:'2026-11-19',status:'open',note:'Read signed terms first'};
+ let r=await handleRetallyOs(context(req('POST',input),d),auth);
+ assert.equal(r.status,200);assert.deepEqual(await r.json(),{ok:true,taskId,reference:input.reference,version:1,externalSends:0});
+ const start=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?view=data'}),d),auth);
+ const v=await start.json();assert.equal(v.tasks.length,1);assert.equal(v.tasks[0].title,'Review credit history');
+ assert.equal(v.tasks[0].synthetic,false);assert.equal(v.tasks[0].status,'open');
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM inquiries').get().n,2);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_task_events').get().n,1);
+ r=await handleRetallyOs(context(req('POST',{...input,expectedVersion:1,status:'done',note:'Checked credit notes; no claim created'}),d),auth);
+ assert.equal(r.status,200);assert.equal((await r.json()).version,2);
+ assert.deepEqual({...d.raw.prepare('SELECT version,status FROM retally_os_tasks WHERE task_id=?').get(taskId)},{version:2,status:'done'});
+ assert.deepEqual(d.raw.prepare('SELECT version,status FROM retally_os_task_events ORDER BY event_id').all().map(x=>({...x})),[{version:1,status:'open'},{version:2,status:'done'}]);
+});
+
+test('CRM follow-ups fail closed for replay, wrong source, stale version and forged customer',async()=>{
+ const d=db();const taskId='aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+ const input={action:'save_task',taskId,reference:'RA-20261108-ABCDEF12',expectedVersion:0,title:'Resolve case',owner:'Owner',dueOn:'',status:'open',note:''};
+ const yes=await handleRetallyOs(context(req('POST',input),d),auth);assert.equal(yes.status,200);
+ const replay=await handleRetallyOs(context(req('POST',input),d),auth);assert.equal(replay.status,409);
+ const cross=await handleRetallyOs(context(req('POST',{...input,reference:'RA-20261108-AABBCCDD',expectedVersion:1}),d),auth);assert.equal(cross.status,409);
+ const nonexistent=await handleRetallyOs(context(req('POST',{...input,taskId:'ffffffff-bbbb-4ccc-8ddd-eeeeeeeeeeee',reference:'RA-20261109-FFFFFFFF'}),d),auth);assert.equal(nonexistent.status,404);
+ for(const invalid of [
+  {...input,taskId:'bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee',status:'paid'},
+  {...input,taskId:'bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee',paymentCents:500},
+  {...input,taskId:'bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee',dueOn:'2026-02-31'},
+  {...input,taskId:'bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee',owner:''},
+  {...input,taskId:'bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee',status:'done',note:'ok'},
+  {...input,taskId:'bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee',title:' '},
+ ]) {const result=await handleRetallyOs(context(req('POST',invalid),d),auth);assert.equal(result.status,400,JSON.stringify(invalid));}
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_tasks').get().n,1);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_task_events').get().n,1);
+});
+
+test('CRM follow-up audit cascades when original inquiry is purged by reviewed retention',async()=>{
+ const d=db();const taskId='aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+ const input={action:'save_task',taskId,reference:'RA-20261108-AABBCCDD',expectedVersion:0,title:'Synthetic follow-up',owner:'QA Owner',dueOn:'',status:'open',note:'QA only'};
+ assert.equal((await handleRetallyOs(context(req('POST',input),d),auth)).status,200);
+ const r=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?view=data'}),d),auth);
+ const v=await r.json();assert.equal(v.tasks.length,1);assert.equal(v.tasks[0].synthetic,true);
+ d.raw.prepare('DELETE FROM inquiries WHERE reference=?').run(input.reference);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_tasks').get().n,0);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_task_events').get().n,0);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM inquiries').get().n,1);
 });
