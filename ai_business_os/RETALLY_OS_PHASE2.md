@@ -38,3 +38,7 @@ node --experimental-default-type=module --check functions/api/internal/retally-o
 GopherCRM and Postmill Phase 1 pilots ran on disposable Linux hosts with persistent-test storage. They are **not** deployed to live RETALLY: the former's frontend had six high dependency advisories and the latter's pinned production dependency audit had four high (plus moderate/low). Their native Go/Node/PostgreSQL/Redis services require a private persistent host, patched dependencies, provider credentials and platform-specific tests. The Cloudflare-native desk provides real inquiry management and private social preparation without requiring a paid host or switching production sources.
 
 The Phase 2 owner desk has no positive evidence of a real customer, verified recovered money, external platform publication, or a signed contract. Keep those outcome fields unknown until source records prove them.
+
+## Existing social platform integration
+
+The RETALLY Metricool brand ID `7322512` was verified from the connected Metricool account. Its Facebook/Instagram publishing connections already exist and it has separately scheduled posts. The operator desk links to that existing planner but does not create, publish, modify, duplicate, cancel or synchronize provider posts. The three new RETALLY OS drafts are separate unpublished internal editorial records; their IDs are native D1 IDs, not Metricool or Postmill IDs. A verified provider API integration is a distinct future deliverable.
