@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 65,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -64,11 +64,11 @@
       "default_branch": "main",
       "description": "Open-source, AI-native social media management, design & scheduling platform for 45+ channels. BYOK AI across 30+ providers with governance guardrails & spend caps, AI Designer + 46 media tools, persisted analytics, cross-channel comment inbox, campaigns, RBAC teams, public API & SDK. Self-hosted: Next.js + NestJS + PostgreSQL, jobs on Inngest.",
       "discovery_query": "social media analytics",
-      "exact_revision": "b59d7ca3656836a8a8c8144dc3cde6a93070d083",
+      "exact_revision": "f4f3a84ac03cff928389ae340e60ccce731a3ad0",
       "forks": 14,
       "primary_language": "TypeScript",
       "published_license_spdx": "AGPL-3.0",
-      "pushed_at": "2026-11-07T04:49:32Z",
+      "pushed_at": "2026-11-08T18:31:20Z",
       "repository": "postmill-ai/postmill-app",
       "root_code_signals": [
         ".github",
@@ -76,8 +76,8 @@
         "dockerfile",
         "package.json"
       ],
-      "size_kb": 65892,
-      "stars": 42,
+      "size_kb": 68360,
+      "stars": 43,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ai",
@@ -126,6 +126,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-03T21:34:32Z",
       "repository": "jntegz/shorthop",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "migrations",
@@ -333,6 +334,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-07T05:18:25Z",
       "repository": "alfredang/socialmediapost",
+      "retained_unreviewed": true,
       "root_code_signals": [
         "dockerfile",
         "package.json",
@@ -462,7 +464,7 @@
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-06T17:30:06Z",
+      "pushed_at": "2026-11-08T03:57:55Z",
       "repository": "ABharadwaj-cell/marketing-ops-mcp",
       "root_code_signals": [
         ".github",
@@ -470,7 +472,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 61,
+      "size_kb": 65,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -732,7 +734,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Verify lawful platform support, owner-controlled approval, attributable real engagement or inbound leads, and actual conversion; publishing requires separate authorization.",
-  "generated_at": "2026-11-07T06:53:32.057179+00:00",
+  "generated_at": "2026-11-08T18:55:00.102065+00:00",
   "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
   "project": "retally-social-media",
   "risk_review": [],
