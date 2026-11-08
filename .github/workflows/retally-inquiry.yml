@@ -6,6 +6,9 @@ on:
       - "functions/api/inquiry.js"
       - "functions/api/group-inquiry.js"
       - "functions/api/internal/**"
+      - "freight/site/retally_os_auth.mjs"
+      - "freight/site/retally_os_ui.mjs"
+      - "freight/site/test_retally_os.mjs"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
       - "freight/site/test_inquiry_case.mjs"
@@ -26,6 +29,9 @@ on:
       - "functions/api/inquiry.js"
       - "functions/api/group-inquiry.js"
       - "functions/api/internal/**"
+      - "freight/site/retally_os_auth.mjs"
+      - "freight/site/retally_os_ui.mjs"
+      - "freight/site/test_retally_os.mjs"
       - "freight/site/operator_access_auth.js"
       - "freight/inquiry_ops/**"
       - "freight/site/test_inquiry_case.mjs"
@@ -80,6 +86,10 @@ jobs:
           node --check functions/api/internal/inquiry-case.js
           node --check functions/api/internal/inquiry-response.js
           node --check freight/site/operator_access_auth.js
+          node --experimental-default-type=module --check functions/api/internal/retally-os.js
+          node --check freight/site/retally_os_auth.mjs
+          node --check freight/site/retally_os_ui.mjs
+          node --experimental-default-type=module --experimental-sqlite --test freight/site/test_retally_os.mjs
           node --experimental-sqlite --test freight/site/test_inquiry_case.mjs freight/inquiry_ops/test_reconcile.mjs
           python -m unittest freight.site.test_inquiry_retention
       - name: Verify restored freight and independent Group Content Security Policy
