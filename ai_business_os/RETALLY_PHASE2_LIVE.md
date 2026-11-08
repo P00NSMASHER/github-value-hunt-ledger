@@ -1,6 +1,6 @@
 # RETALLY OS Phase 2 — private Cloudflare owner desk
 
-Status (2026-11-08): the source route is deployed on production retally-web and all retally_os_* D1 objects were independently observed in the live database. Authenticated owner-browser acceptance is not independently verified in this session; unauthenticated negative testing remains required. **The pilot's GopherCRM, Postmill and Prime Agent are not live production services.** Do not describe this as a deployed GopherCRM/Postmill integration, verified customer, paid revenue, social publication or customer deliverable.
+Status (2026-11-08): the source route is deployed on production retally-web and all retally_os_* D1 objects were independently observed in the live database. Authenticated owner-browser acceptance and preview-host denial are not independently verified in this session. On 2026-11-08, independent anonymous browser checks of the canonical route and `?view=data` both redirected to Cloudflare Access login without rendering dashboard HTML or customer JSON. **The pilot's GopherCRM, Postmill and Prime Agent are not live production services.** Do not describe this as a deployed GopherCRM/Postmill integration, verified customer, paid revenue, social publication or customer deliverable.
 
 ## Production URL and protection
 - Owner URL: https://retallyrecovery.com/api/internal/retally-os (never use a Pages preview URL).
