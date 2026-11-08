@@ -6345,6 +6345,22 @@
       "engines": [
         "recoveryos"
       ],
+      "first_seen": "2026-11-08",
+      "id": "7a641df6bf76baa9df149f18708474d47311ba41610899aa8c9eb57cc4eb2303",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/blessingokpala/paypatrol"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "recoveryos"
+      ],
       "first_seen": "2026-10-23",
       "id": "7ae8f0a3a9ba61e71acef6d7d75fc1dd52b202176cbcd87ed204476aa0b18007",
       "independent_ground_truth": false,
@@ -13241,6 +13257,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "38343bd62c2bd5219a99229ccdabb92446d08892cf40b9bb2f3765cebe3b1e7d",
+  "entries_sha256": "31b5b59bb419d2a38b0a2fbd8a71577664362db25a6794599156f2ae06df339c",
   "schema_version": 1
 }
