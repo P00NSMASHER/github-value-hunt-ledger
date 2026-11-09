@@ -58,3 +58,32 @@ http.host eq "retallyrecovery.com" and http.request.uri.path ne "/api/internal/r
 The original rule remains enabled for all other apex paths. Its 301 destination (`concat("https://www.retallyrecovery.com", http.request.uri.path)`) and query-string preservation are unchanged. No www-based owner dashboard was activated; access remains restricted to the Access application on the apex path. The original expression for rollback is `http.host eq "retallyrecovery.com"`. Rolling back this exception would break the owner dashboard, so test Access denial and owner sign-in first.
 
 The new read-only CI smoke check `freight/site/verify_retally_os_access.py` must reject anonymous production data access and any preview-host exposure. It deliberately makes GET requests only and does not submit a login or access customer records.
+
+## Cloudflare Access passkey callback route repair (2026-11-09)
+
+The owner reported **Invalid nonce** immediately after Face ID passkey authentication. The first-party Cloudflare Access audit recorded an allowed passkey login on 2026-11-09 at 17:05:41 UTC, so successful identity verification did not establish a completed browser callback.
+
+Cloudflare's request simulator proved that the previous apex-to-www rule (version 2) returned HTTP 301 for both `/cdn-cgi/access/callback` and `/cdn-cgi/access/login`. The rule had exempted only the dashboard path, not the Access callback paths, and it preserved query strings while moving the host to `www`. This hostname change can invalidate an in-flight Access nonce. **It was an actual routing defect.**
+
+A preview-validated, narrowly scoped Cloudflare Rulesets PATCH changed that existing Single Redirect rule to version 3. The full current expression is:
+
+```text
+http.host eq "retallyrecovery.com" and http.request.uri.path ne "/api/internal/retally-os" and not starts_with(http.request.uri.path, "/cdn-cgi/access/")
+```
+
+The rule is still enabled for normal apex-host pages and still issues a 301 to `https://www.retallyrecovery.com` while preserving query strings. The owner dashboard path and Cloudflare-managed `/cdn-cgi/access/*` paths keep their original hostname. No new unauthenticated application route, identity-provider change, token bypass, or D1 mutation was introduced.
+
+**Independent post-change Cloudflare Trace results:**
+
+- Apex `/` and `/contact` → HTTP 301 (canonical www redirect retained).
+- `/api/internal/retally-os` and its `?view=data` query → HTTP 302 Access login; no www redirect.
+- `/cdn-cgi/access/callback?state=synthetic` → HTTP 400 for the deliberately invalid callback; **no www redirect**.
+- `/cdn-cgi/access/login` → HTTP 404 for a bare probe, `/cdn-cgi/access/certs` and `/cdn-cgi/access/logout` → HTTP 200; none redirected to www.
+- Unrelated `/cdn-cgi/accessory` still redirects to www, confirming the exception is prefix-specific rather than all of `/cdn-cgi`.
+
+The live deployment of RETALLY OS, its Cloudflare Access passkey-only identity provider, 720-hour application session, and owner-email-only Allow policy were read back unchanged. This establishes corrected routing and intact protection, **not** a completed authenticated Face ID session on the owner's iPhone.
+
+The bounded anonymous CI check `python -m freight.site.verify_retally_os_access` now checks that Cloudflare callback and certificate paths cannot be redirected to `www`. The deterministic unit tests in `freight/site/test_verify_retally_os_access.py` reject the old behavior without initiating a real login. Do not replay stale callback URLs; begin a new login from the application URL in the same persistent Safari context.
+
+Rollback of just this callback exemption would recreate the known authentication defect. If routing needs further adjustment, preserve both the dashboard path and the Cloudflare-managed Access callback prefix.
+
