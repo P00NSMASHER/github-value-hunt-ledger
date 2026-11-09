@@ -46,9 +46,25 @@ def _require_denial(url: str, *, is_production: bool) -> None:
     print(f"{'production' if is_production else 'preview'} anonymous request denied: HTTP {status}")
 
 
+def _require_access_callback_keeps_apex() -> None:
+    """Cloudflare-managed login/callback paths must not be rewritten to www.
+
+    A 301 across application hostnames invalidates the Access login nonce.
+    Neither request attempts to log in or supplies a session credential.
+    """
+    for path in ("/cdn-cgi/access/callback", "/cdn-cgi/access/certs"):
+        status, redirect, _ = _anonymous_get("https://retallyrecovery.com" + path)
+        if status in {301, 302, 303, 307, 308} and (
+            urllib.parse.urlparse(redirect).hostname == "www.retallyrecovery.com"
+        ):
+            raise AssertionError("Cloudflare Access callback path was canonicalized to www")
+        print(f"Access reserved path stays on apex: {path}, HTTP {status}")
+
+
 def main() -> None:
     _require_denial("https://retallyrecovery.com/api/internal/retally-os?view=data", is_production=True)
     _require_denial("https://retally-web.pages.dev/api/internal/retally-os?view=data", is_production=False)
+    _require_access_callback_keeps_apex()
 
 
 if __name__ == "__main__":
