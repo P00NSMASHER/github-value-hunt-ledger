@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import {generateKeyPairSync,createSign,createHash,webcrypto} from 'node:crypto';
-import {verifyRetallyOwner,ACCESS_AUD,ACCESS_ISSUER} from './retally_os_auth.mjs';
+import {verifyRetallyOwner,RetallyOwnerAuthDenied,ACCESS_AUD,ACCESS_ISSUER} from './retally_os_auth.mjs';
 import {handleRetallyOs,onRequest} from '../../functions/api/internal/retally-os.js';
 
 if(!globalThis.crypto)globalThis.crypto=webcrypto;
@@ -82,7 +82,35 @@ test('Browser cookie token is accepted only after full owner, audience and RSA v
  assert.match(await page.text(),/RETALLY OS/);
  const forbidden=await handleRetallyOs(context(onlyCookie(badCookies[0]),local),ownerOnly);
  assert.equal(forbidden.status,403);
- assert.deepEqual(await forbidden.json(),{error:'owner_access_denied'});
+ assert.deepEqual(await forbidden.json(),{error:'owner_access_denied',check:'token_claims'});
+});
+test('Owner auth denies safely with exact check codes, without leaking credentials',async()=>{
+ const ownerHash=digest(syntheticEmail);
+ const scenarios=[
+  {name:'no token',request:req(),fetch:certFetcher,check:'credential_missing'},
+  {name:'malformed token',request:req('GET',undefined,{jwt:'invalid'}),fetch:certFetcher,check:'credential_format'},
+  {name:'unsupported audience',request:req('GET',undefined,{jwt:token({aud:['invalid-aud']})}),fetch:certFetcher,check:'token_claims'},
+  {name:'different owner',request:req('GET',undefined,{jwt:token({email:'other@example.invalid'})}),fetch:certFetcher,check:'identity_mismatch'},
+  {name:'identity key server outage',request:req('GET',undefined,{jwt:token()}),fetch:async()=>{throw Error('provider offline')},check:'cert_fetch'},
+  {name:'missing signing key',request:req('GET',undefined,{jwt:token()}),fetch:async()=>Response.json({keys:[]}),check:'cert_key'},
+  {name:'bad signature',request:req('GET',undefined,{jwt:token()}),fetch:async()=>Response.json({keys:[{...jwk,kid:'nonmatching'}]}),check:'cert_key'},
+ ];
+ for(const scenario of scenarios){
+  await assert.rejects(
+   ()=>verifyRetallyOwner(scenario.request,scenario.fetch,ownerHash),
+   error=>error instanceof RetallyOwnerAuthDenied && error.message==='owner_access_denied' && error.check===scenario.check,
+   scenario.name
+  );
+ }
+ const d=db(), own=async request=>verifyRetallyOwner(request,certFetcher,ownerHash);
+ const response=await handleRetallyOs(context(req(),d),own);
+ assert.equal(response.status,403);
+ assert.equal(response.headers.get('Cache-Control'),'private, no-store, max-age=0');
+ const body=await response.json();
+ assert.deepEqual(body,{error:'owner_access_denied',check:'credential_missing'});
+ assert.ok(!JSON.stringify(body).includes(syntheticEmail));
+ assert.ok(!JSON.stringify(body).includes(ACCESS_AUD));
+ assert.equal(d.raw.prepare('SELECT COUNT(*) as n FROM retally_os_case_events').get().n,0);
 });
 test('Production entry denies missing Access token and nonproduction host before touching data',async()=>{
  const d=db();const missing=await onRequest(context(req(),d));assert.equal(missing.status,403);
