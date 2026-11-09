@@ -2728,6 +2728,22 @@
       "engines": [
         "capturebrief"
       ],
+      "first_seen": "2026-11-09",
+      "id": "31f1dfe3a8377abfea2d2500d975cfe12d3b22c9368fd19554d6ac98236c0987",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-ror"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
       "first_seen": "2026-10-23",
       "id": "323f2eab8ac9f27da2cfe320cd43c7916e1e94041e97c80b64688e158a15d1b5",
       "independent_ground_truth": false,
@@ -3121,6 +3137,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/17852587"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-09",
+      "id": "38cb4ea4f7506629be42fc48bd0d6057840c8e78198a3cf756f198079353665b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-node"
     },
     {
       "commercial_reuse_authorized": false,
@@ -8696,6 +8728,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-09",
+      "id": "aa8f812bdb59cf62bb233dc6c34dcb2b3a2d553ab216807e8e40b3d85f7bb66b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-py"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -9368,6 +9416,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-09",
+      "id": "b7eefd99c2fd251213f605d4d55cdc1479d9405744a5e2637f277b2ea82908ac",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-cli"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -9555,6 +9619,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://github.com/youngyoony/NYC-Permit-Clustering-MPI"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-09",
+      "id": "bb5f616efcbfc3f433e874e5b0dc19e5ab54e6f652eff57be8c7aef24f778ae8",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-kotlin"
     },
     {
       "commercial_reuse_authorized": false,
@@ -9908,6 +9988,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/10381405"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-09",
+      "id": "c4cc2f6b65661f1940e3c65e448a84dd3f3f1577bb0c52b1c2d3d1a41ed6f823",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-api-reference"
     },
     {
       "commercial_reuse_authorized": false,
@@ -11803,6 +11899,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-09",
+      "id": "e57f0e1119e9ce474d4ffeb41263f64b546f32399fba964ec7dda7169976a446",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-mcp"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-23",
@@ -13257,6 +13369,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "31b5b59bb419d2a38b0a2fbd8a71577664362db25a6794599156f2ae06df339c",
+  "entries_sha256": "3ab135aa54ac4323f765466754e46a7fc624f116c9cdf097dc344dbb473e5425",
   "schema_version": 1
 }

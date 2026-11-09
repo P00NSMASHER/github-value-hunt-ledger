@@ -9,9 +9,9 @@
         "official_publisher_host_url_only": 0,
         "pinned_public_anchor_url_only": 2,
         "third_party_path_topic_hints_only": 24,
-        "unclassified_third_party_catalogs_only": 162
+        "unclassified_third_party_catalogs_only": 169
       },
-      "catalog_source_associations": 188,
+      "catalog_source_associations": 195,
       "commercial_use_approved": false,
       "independent_benchmark_truth_cases_from_queue": 0,
       "missing_benchmark_evidence": [
@@ -160,7 +160,7 @@
       ],
       "ranked_for_manual_evidence_review": 8,
       "readiness": "URL_POINTERS_ONLY_NO_EVIDENCE_PROMOTION",
-      "unverified_candidates_after_url_screen": 188,
+      "unverified_candidates_after_url_screen": 195,
       "url_only_topic_exclusions_not_deleted": 0
     },
     "freightrecovery": {
@@ -649,12 +649,12 @@
   "independent_outcome_labels_promoted": 0,
   "max_review_candidates_per_engine": 8,
   "production_changes": 0,
-  "queue_sha256": "2fc7dc72423edb953ca54ee1f7281b16f8f66f9837fe9c42197c7f8a89d223a3",
+  "queue_sha256": "243a02c7fd9024e29a49ce37e56011b3a625f2598cf0b1c2399e7144cb9a6b12",
   "ranking_scope_warning": "Public URL host and path rankings are not evidence of publisher authenticity, record relevance, source rights or accuracy.",
   "real_customer_cases_promoted": 0,
   "schema_version": 1,
   "scope": "PUBLIC_URL_REVIEW_ONLY_NEITHER_RIGHTS_NOR_TRUTH_APPROVED",
-  "source_ledger_entries_sha256": "31b5b59bb419d2a38b0a2fbd8a71577664362db25a6794599156f2ae06df339c",
-  "unique_public_source_references": 828,
+  "source_ledger_entries_sha256": "3ab135aa54ac4323f765466754e46a7fc624f116c9cdf097dc344dbb473e5425",
+  "unique_public_source_references": 835,
   "verified_recovered_cash_cents": 0
 }
