@@ -2,6 +2,9 @@
 // A public, immutable audience ID is NOT an authentication secret.
 export const ACCESS_AUD = '395437add099194675ac88c69a590bf6eefb587e54710ec436b99f50a4281594';
 export const ACCESS_ISSUER = 'https://shy-surf-d83b.cloudflareaccess.com';
+// Keep signed JWT lifetimes bounded to the Cloudflare Access app's 30-day session.
+// The token still requires a matching issuer, audience, verified signature, and owner email.
+const MAX_ACCESS_TOKEN_AGE_SECONDS = 30 * 24 * 60 * 60;
 const OWNER_EMAIL_SHA256 = 'f5c62b72a196aec61d9e20ac302d5212b0eb407a433f1aa85d0f1ffd649df40a';
 const fail = () => { throw new Error('owner_access_denied'); };
 function decode(segment, limit=9000) {
@@ -28,7 +31,7 @@ export async function verifyRetallyOwner(request,fetcher=fetch,ownerDigest=OWNER
   if (!payload || payload.iss!==ACCESS_ISSUER || !Array.isArray(payload.aud) ||
       !payload.aud.includes(ACCESS_AUD) || !Number.isSafeInteger(payload.iat) ||
       !Number.isSafeInteger(payload.exp) || payload.exp<=now ||
-      payload.iat>now+60 || payload.exp-payload.iat>43200 ||
+      payload.iat>now+60 || payload.exp-payload.iat>MAX_ACCESS_TOKEN_AGE_SECONDS ||
       typeof payload.sub!=='string' || payload.sub.length<3 || payload.sub.length>128 ||
       typeof payload.email!=='string' || payload.email!==payload.email.trim().toLowerCase() ||
       payload.email.length>160 || !payload.email.includes('@') ||
