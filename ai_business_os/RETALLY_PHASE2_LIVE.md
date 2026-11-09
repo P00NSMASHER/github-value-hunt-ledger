@@ -87,3 +87,14 @@ The bounded anonymous CI check `python -m freight.site.verify_retally_os_access`
 
 Rollback of just this callback exemption would recreate the known authentication defect. If routing needs further adjustment, preserve both the dashboard path and the Cloudflare-managed Access callback prefix.
 
+## Cloudflare Access browser-cookie compatibility repair (2026-11-09)
+
+At 18:32:29 UTC and 18:32:38 UTC, first-party Cloudflare Access authentication logs recorded allowed passkey events for the exact RETALLY OS application. The application nevertheless returned `403 {"error":"owner_access_denied"}` after authentication. Those events prove that the identity provider and edge Allow decision succeeded; they do not prove that the protected dashboard rendered or that a customer-data request completed.
+
+[PR #1108](https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/1108) added a narrowly bounded compatibility path at head commit `2ef511e42350e580ddd22f3dc240dc472e997bbe`. The Pages Function still prefers `Cf-Access-Jwt-Assertion`. Only when that header is absent may it read exactly one `CF_Authorization` cookie, and the cookie token must pass the same RS256 signature, issuer, exact application audience, owner-email SHA-256, expiration and signed-token checks. Duplicate, malformed, wrong-owner, wrong-audience and forged-header cases are rejected by deterministic tests. No raw token or owner address is recorded here.
+
+The source also raises the maximum accepted signed-token lifetime from 30 to 31 days so that a still-valid legacy 730-hour Cloudflare token can complete, while the current Access application remains configured for `720h`. Read-only provider verification found the same self-hosted application, pinned audience and one owner-only Allow policy unchanged. This is compatibility for an already issued signed session, not an Access-policy expansion.
+
+The exact-head [Repository Release Gate](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/42676030026) passed. `P00NSMASHER` merged the change—not this integrator—at protected-main commit `a2ea0e5fca5fae5096091ea2bd111985062441fc`; the [Cloudflare Pages deployment check](https://github.com/P00NSMASHER/github-value-hunt-ledger/runs/129360223966) reports that exact commit deployed successfully. This establishes source inclusion, regression coverage, provider authentication events, current Access configuration and successful deployment only.
+
+**Remaining acceptance boundary:** the original device failure was not independently isolated to a missing assertion header versus a legacy 730-hour token, and a completed authenticated iPhone dashboard session remains unverified. Do not credit successful owner-browser acceptance, customer delivery, measurable value or revenue until independent target evidence shows the protected dashboard rendered after a fresh login.
