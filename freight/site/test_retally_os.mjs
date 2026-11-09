@@ -50,6 +50,14 @@ test('Owner requires valid RS256 signature, exact audience, issuer, expiration a
  await assert.rejects(()=>verifyRetallyOwner(req('GET',undefined,{jwt:valid}),async()=>Response.json({keys:[]} ),hash));
  await assert.rejects(()=>verifyRetallyOwner(req('GET'),certFetcher,hash));
 });
+test('Thirty-day signed owner session is accepted, beyond limit is denied',async()=>{
+ const emailDigest=digest(syntheticEmail);
+ const issuedAt=now()-30;
+ const longestAllowed=token({iat:issuedAt,exp:issuedAt+30*24*60*60});
+ assert.deepEqual(await verifyRetallyOwner(req('GET',undefined,{jwt:longestAllowed}),certFetcher,emailDigest),{sub:'owner-fixture'});
+ const beyondLimit=token({iat:issuedAt,exp:issuedAt+30*24*60*60+1});
+ await assert.rejects(()=>verifyRetallyOwner(req('GET',undefined,{jwt:beyondLimit}),certFetcher,emailDigest),/owner_access_denied/);
+});
 test('Production entry denies missing Access token and nonproduction host before touching data',async()=>{
  const d=db();const missing=await onRequest(context(req(),d));assert.equal(missing.status,403);
  const wrong=await onRequest(context(req('GET',undefined,{url:'https://staging.pages.dev/api/internal/retally-os'}),d));assert.equal(wrong.status,404);
