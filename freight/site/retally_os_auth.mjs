@@ -4,7 +4,9 @@ export const ACCESS_AUD = '395437add099194675ac88c69a590bf6eefb587e54710ec436b99
 export const ACCESS_ISSUER = 'https://shy-surf-d83b.cloudflareaccess.com';
 // Keep signed JWT lifetimes bounded to the Cloudflare Access app's 30-day session.
 // The token still requires a matching issuer, audience, verified signature, and owner email.
-const MAX_ACCESS_TOKEN_AGE_SECONDS = 30 * 24 * 60 * 60;
+// Cloudflare accepted 730-hour cookies before the owner reduced the app to 720 hours.
+// Permit an already-issued, still-valid signed token within a strict 31-day cap.
+const MAX_ACCESS_TOKEN_AGE_SECONDS = 31 * 24 * 60 * 60;
 const OWNER_EMAIL_SHA256 = 'f5c62b72a196aec61d9e20ac302d5212b0eb407a433f1aa85d0f1ffd649df40a';
 const fail = () => { throw new Error('owner_access_denied'); };
 function decode(segment, limit=9000) {
@@ -21,7 +23,18 @@ async function sha256(value) {
   return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 export async function verifyRetallyOwner(request,fetcher=fetch,ownerDigest=OWNER_EMAIL_SHA256) {
-  const token=request.headers.get('Cf-Access-Jwt-Assertion');
+  // Some browser-originated Pages requests may carry the signed Access application
+  // token only as CF_Authorization. Prefer the origin assertion when present.
+  // The cookie does not authorize anything by itself: it is fully verified below.
+  const assertion=request.headers.get('Cf-Access-Jwt-Assertion');
+  let token=assertion;
+  if (token===null) {
+    const raw=request.headers.get('Cookie');
+    if (typeof raw!=='string' || raw.length>16384) fail();
+    const matches=raw.split(';').map(x=>x.trim()).filter(x=>x.startsWith('CF_Authorization='));
+    if (matches.length!==1) fail();
+    token=matches[0].slice('CF_Authorization='.length);
+  }
   if (!token || token.length > 12000) fail();
   const parts=token.split('.'); if (parts.length!==3) fail();
   const header=json(parts[0]),payload=json(parts[1]);
