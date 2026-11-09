@@ -58,3 +58,54 @@ http.host eq "retallyrecovery.com" and http.request.uri.path ne "/api/internal/r
 The original rule remains enabled for all other apex paths. Its 301 destination (`concat("https://www.retallyrecovery.com", http.request.uri.path)`) and query-string preservation are unchanged. No www-based owner dashboard was activated; access remains restricted to the Access application on the apex path. The original expression for rollback is `http.host eq "retallyrecovery.com"`. Rolling back this exception would break the owner dashboard, so test Access denial and owner sign-in first.
 
 The new read-only CI smoke check `freight/site/verify_retally_os_access.py` must reject anonymous production data access and any preview-host exposure. It deliberately makes GET requests only and does not submit a login or access customer records.
+
+## Cloudflare Access passkey callback route repair (2026-11-09)
+
+The owner reported **Invalid nonce** immediately after Face ID passkey authentication. The first-party Cloudflare Access audit recorded an allowed passkey login on 2026-11-09 at 17:05:41 UTC, so successful identity verification did not establish a completed browser callback.
+
+Cloudflare's request simulator proved that the previous apex-to-www rule (version 2) returned HTTP 301 for both `/cdn-cgi/access/callback` and `/cdn-cgi/access/login`. The rule had exempted only the dashboard path, not the Access callback paths, and it preserved query strings while moving the host to `www`. This hostname change can invalidate an in-flight Access nonce. **It was an actual routing defect.**
+
+A preview-validated, narrowly scoped Cloudflare Rulesets PATCH changed that existing Single Redirect rule to version 3. The full current expression is:
+
+```text
+http.host eq "retallyrecovery.com" and http.request.uri.path ne "/api/internal/retally-os" and not starts_with(http.request.uri.path, "/cdn-cgi/access/")
+```
+
+The rule is still enabled for normal apex-host pages and still issues a 301 to `https://www.retallyrecovery.com` while preserving query strings. The owner dashboard path and Cloudflare-managed `/cdn-cgi/access/*` paths keep their original hostname. No new unauthenticated application route, identity-provider change, token bypass, or D1 mutation was introduced.
+
+**Independent post-change Cloudflare Trace results:**
+
+- Apex `/` and `/contact` → HTTP 301 (canonical www redirect retained).
+- `/api/internal/retally-os` and its `?view=data` query → HTTP 302 Access login; no www redirect.
+- `/cdn-cgi/access/callback?state=synthetic` → HTTP 400 for the deliberately invalid callback; **no www redirect**.
+- `/cdn-cgi/access/login` → HTTP 404 for a bare probe, `/cdn-cgi/access/certs` and `/cdn-cgi/access/logout` → HTTP 200; none redirected to www.
+- Unrelated `/cdn-cgi/accessory` still redirects to www, confirming the exception is prefix-specific rather than all of `/cdn-cgi`.
+
+The live deployment of RETALLY OS, its Cloudflare Access passkey-only identity provider, 720-hour application session, and owner-email-only Allow policy were read back unchanged. This establishes corrected routing and intact protection, **not** a completed authenticated Face ID session on the owner's iPhone.
+
+The bounded anonymous CI check `python -m freight.site.verify_retally_os_access` now checks that Cloudflare callback and certificate paths cannot be redirected to `www`. The deterministic unit tests in `freight/site/test_verify_retally_os_access.py` reject the old behavior without initiating a real login. Do not replay stale callback URLs; begin a new login from the application URL in the same persistent Safari context.
+
+Rollback of just this callback exemption would recreate the known authentication defect. If routing needs further adjustment, preserve both the dashboard path and the Cloudflare-managed Access callback prefix.
+
+## Cloudflare Access browser-cookie compatibility repair (2026-11-09)
+
+At 18:32:29 UTC and 18:32:38 UTC, first-party Cloudflare Access authentication logs recorded allowed passkey events for the exact RETALLY OS application. The application nevertheless returned `403 {"error":"owner_access_denied"}` after authentication. Those events prove that the identity provider and edge Allow decision succeeded; they do not prove that the protected dashboard rendered or that a customer-data request completed.
+
+[PR #1108](https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/1108) added a narrowly bounded compatibility path at head commit `2ef511e42350e580ddd22f3dc240dc472e997bbe`. The Pages Function still prefers `Cf-Access-Jwt-Assertion`. Only when that header is absent may it read exactly one `CF_Authorization` cookie, and the cookie token must pass the same RS256 signature, issuer, exact application audience, owner-email SHA-256, expiration and signed-token checks. Duplicate, malformed, wrong-owner, wrong-audience and forged-header cases are rejected by deterministic tests. No raw token or owner address is recorded here.
+
+The source also raises the maximum accepted signed-token lifetime from 30 to 31 days so that a still-valid legacy 730-hour Cloudflare token can complete, while the current Access application remains configured for `720h`. Read-only provider verification found the same self-hosted application, pinned audience and one owner-only Allow policy unchanged. This is compatibility for an already issued signed session, not an Access-policy expansion.
+
+The exact-head [Repository Release Gate](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/42676030026) passed. `P00NSMASHER` merged the change—not this integrator—at protected-main commit `a2ea0e5fca5fae5096091ea2bd111985062441fc`; the [Cloudflare Pages deployment check](https://github.com/P00NSMASHER/github-value-hunt-ledger/runs/129360223966) reports that exact commit deployed successfully. This establishes source inclusion, regression coverage, provider authentication events, current Access configuration and successful deployment only.
+
+**Remaining acceptance boundary:** the original device failure was not independently isolated to a missing assertion header versus a legacy 730-hour token, and a completed authenticated iPhone dashboard session remains unverified. Do not credit successful owner-browser acceptance, customer delivery, measurable value or revenue until independent target evidence shows the protected dashboard rendered after a fresh login.
+
+## Authentication incident: Workers unsupported redirect mode (2026-11-09)
+
+An owner iPhone request reached the live Pages Function with Cloudflare Access credentials, then returned `403 {"error":"owner_access_denied","check":"cert_fetch"}`. The Access login logs had already shown a successful owner passkey check, and an independent GitHub Actions probe successfully read the Access public signing keys.
+
+The specific implementation defect is `freight/site/retally_os_auth.mjs` using `redirect: 'error'` in its `fetch()` of the Access team's public JWKS. **Cloudflare Workers' Fetch/Request runtime supports only `redirect: 'manual'` and `redirect: 'follow'`, and constructing a request with `redirect: 'error'` throws a `TypeError` before performing the network request.** The existing broad catch disguised that deterministic runtime error as `cert_fetch`. Cloudflare Pages production compatibility date is `2026-10-08`, so the existing `cache: 'no-store'` option is supported.
+
+The minimal fix uses `redirect: 'manual'` while retaining `if (!res.ok) fail('cert_fetch')`, thereby rejecting HTTP 3xx responses rather than following them. The returned signing key remains subject to the existing exact `kid`, RSA key-shape, signed JWT verification, audience, issuer, expiry, and hashed-owner requirements. No credential, Cloudflare policy, D1 record, identity provider, or client-facing route changes are involved.
+
+The regression test `Live Access JWKS fetch uses a Workers-supported redirect mode and rejects redirect responses` simulates the Workerd `TypeError` and confirms that a valid synthetic owner signature succeeds while a 302 certificate response still fails closed. The known owner device remains the final end-to-end acceptance: a green synthetic test or production deployment alone cannot prove iPhone access.
+
