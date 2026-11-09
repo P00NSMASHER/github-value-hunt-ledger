@@ -50,13 +50,39 @@ test('Owner requires valid RS256 signature, exact audience, issuer, expiration a
  await assert.rejects(()=>verifyRetallyOwner(req('GET',undefined,{jwt:valid}),async()=>Response.json({keys:[]} ),hash));
  await assert.rejects(()=>verifyRetallyOwner(req('GET'),certFetcher,hash));
 });
-test('Thirty-day signed owner session is accepted, beyond limit is denied',async()=>{
+test('Existing 730h signed owner session is accepted, beyond 31 days is denied',async()=>{
  const emailDigest=digest(syntheticEmail);
  const issuedAt=now()-30;
- const longestAllowed=token({iat:issuedAt,exp:issuedAt+30*24*60*60});
- assert.deepEqual(await verifyRetallyOwner(req('GET',undefined,{jwt:longestAllowed}),certFetcher,emailDigest),{sub:'owner-fixture'});
- const beyondLimit=token({iat:issuedAt,exp:issuedAt+30*24*60*60+1});
+ const oldCloudflareSession=token({iat:issuedAt,exp:issuedAt+730*60*60});
+ assert.deepEqual(await verifyRetallyOwner(req('GET',undefined,{jwt:oldCloudflareSession}),certFetcher,emailDigest),{sub:'owner-fixture'});
+ const beyondLimit=token({iat:issuedAt,exp:issuedAt+31*24*60*60+1});
  await assert.rejects(()=>verifyRetallyOwner(req('GET',undefined,{jwt:beyondLimit}),certFetcher,emailDigest),/owner_access_denied/);
+});
+test('Browser cookie token is accepted only after full owner, audience and RSA verification',async()=>{
+ const hash=digest(syntheticEmail),jwt=token();
+ const onlyCookie=(raw)=>req('GET',undefined,{headers:{Cookie:raw}});
+ const good=onlyCookie('theme=dark; CF_Authorization='+jwt+'; layout=compact');
+ assert.deepEqual(await verifyRetallyOwner(good,certFetcher,hash),{sub:'owner-fixture'});
+ const badCookies=[
+  'CF_Authorization='+token({aud:['not-retally']}),
+  'CF_Authorization='+token({email:'intruder@example.invalid'}),
+  'CF_Authorization='+jwt+'; CF_Authorization='+jwt,
+  'Other_Authorization='+jwt,
+  'CF_Authorization=invalid',
+ ];
+ for(const c of badCookies)await assert.rejects(
+  ()=>verifyRetallyOwner(onlyCookie(c),certFetcher,hash),/owner_access_denied/
+ );
+ const invalidHeaderWithValidCookie=req('GET',undefined,{jwt:'bad.header.signature',headers:{Cookie:'CF_Authorization='+jwt}});
+ await assert.rejects(()=>verifyRetallyOwner(invalidHeaderWithValidCookie,certFetcher,hash),/owner_access_denied/);
+ const ownerOnly=async request=>verifyRetallyOwner(request,certFetcher,hash);
+ const local=db();
+ const page=await handleRetallyOs(context(good,local),ownerOnly);
+ assert.equal(page.status,200);
+ assert.match(await page.text(),/RETALLY OS/);
+ const forbidden=await handleRetallyOs(context(onlyCookie(badCookies[0]),local),ownerOnly);
+ assert.equal(forbidden.status,403);
+ assert.deepEqual(await forbidden.json(),{error:'owner_access_denied'});
 });
 test('Production entry denies missing Access token and nonproduction host before touching data',async()=>{
  const d=db();const missing=await onRequest(context(req(),d));assert.equal(missing.status,403);
