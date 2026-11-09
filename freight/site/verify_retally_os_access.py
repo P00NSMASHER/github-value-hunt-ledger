@@ -5,6 +5,7 @@ Run as an explicit CI smoke check, not as a scheduled crawler.
 """
 from __future__ import annotations
 
+import json
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -61,10 +62,47 @@ def _require_access_callback_keeps_apex() -> None:
         print(f"Access reserved path stays on apex: {path}, HTTP {status}")
 
 
+def _require_live_access_key_shape() -> None:
+    """Check the public Access signing-key endpoint against RETALLY's key verifier.
+
+    No access tokens, cookie values, identities or private customer data are read.
+    Do not print the signing keys, their identifiers, or the response body.
+    """
+    req = urllib.request.Request(
+        "https://shy-surf-d83b.cloudflareaccess.com/cdn-cgi/access/certs",
+        headers={"Accept": "application/json",
+                 "User-Agent": "RETALLY-OS-public-jwks-compatibility/1.0"},
+    )
+    with urllib.request.urlopen(req, timeout=15) as response:
+        if response.status != 200:
+            raise AssertionError("public Access JWKS endpoint unavailable")
+        data = response.read(65537)
+    if len(data) > 65536:
+        raise AssertionError("Access JWKS exceeded expected size")
+    try:
+        obj = json.loads(data)
+    except (ValueError, UnicodeError) as exc:
+        raise AssertionError("Access JWKS is not valid JSON") from exc
+    keys = obj.get("keys") if isinstance(obj, dict) else None
+    if not isinstance(keys, list) or not 1 <= len(keys) <= 20:
+        raise AssertionError("Access JWKS missing bounded keys array")
+    matches = [k for k in keys if isinstance(k, dict)
+               and k.get("kty") == "RSA"
+               and k.get("e") == "AQAB"
+               and isinstance(k.get("n"), str) and len(k["n"]) >= 340
+               and isinstance(k.get("kid"), str)
+               and (not k.get("alg") or k["alg"] == "RS256")
+               and (not k.get("use") or k["use"] == "sig")]
+    if not matches:
+        raise AssertionError("Access public signing keys incompatible with owner's JWT verifier")
+    print("Live Access public signing keys match expected verifier shape; no keys disclosed")
+
+
 def main() -> None:
     _require_denial("https://retallyrecovery.com/api/internal/retally-os?view=data", is_production=True)
     _require_denial("https://retally-web.pages.dev/api/internal/retally-os?view=data", is_production=False)
     _require_access_callback_keeps_apex()
+    _require_live_access_key_shape()
 
 
 if __name__ == "__main__":
