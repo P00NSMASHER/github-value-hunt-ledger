@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 67,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -70,6 +70,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-07T06:41:41Z",
       "repository": "pulseai-labs/pulse-trader",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -118,6 +119,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T06:27:19Z",
       "repository": "0xArchiveIO/sdk-typescript",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -205,7 +207,7 @@
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-03T04:12:25Z",
+      "pushed_at": "2026-11-08T04:45:29Z",
       "repository": "open-meridian/plugin-tradier",
       "root_code_signals": [
         ".github",
@@ -402,11 +404,11 @@
       "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "d8ad3c7de741b5384a837c42b683b1c561183212",
+      "exact_revision": "ece6c51ac1e9e6bc180e78032c060a9b2ecab23a",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T06:36:04Z",
+      "pushed_at": "2026-11-09T02:15:35Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -416,7 +418,7 @@
         "src",
         "test"
       ],
-      "size_kb": 77006,
+      "size_kb": 77443,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -622,20 +624,19 @@
       "default_branch": "main",
       "description": "Historical market-data replay lab using Kafka, Spark, PostgreSQL, and Next.js to inspect late, duplicate, and failed deliveries.",
       "discovery_query": "market data replay",
-      "exact_revision": "3fb9eba180dbf496480ea887f0410d868a90f4d5",
+      "exact_revision": "e6b4e8c9806938e9593c691d128dc0c9257d7057",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-05T22:31:05Z",
+      "pushed_at": "2026-11-08T22:19:22Z",
       "repository": "anusharama100/marketpulse",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "makefile",
         "pyproject.toml",
         "tests"
       ],
-      "size_kb": 1226,
+      "size_kb": 1229,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -752,7 +753,7 @@
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T08:21:22.655317+00:00",
+  "generated_at": "2026-11-09T02:54:37.036094+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
