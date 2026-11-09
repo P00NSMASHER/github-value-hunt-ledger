@@ -98,3 +98,14 @@ The source also raises the maximum accepted signed-token lifetime from 30 to 31 
 The exact-head [Repository Release Gate](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/42676030026) passed. `P00NSMASHER` merged the change—not this integrator—at protected-main commit `a2ea0e5fca5fae5096091ea2bd111985062441fc`; the [Cloudflare Pages deployment check](https://github.com/P00NSMASHER/github-value-hunt-ledger/runs/129360223966) reports that exact commit deployed successfully. This establishes source inclusion, regression coverage, provider authentication events, current Access configuration and successful deployment only.
 
 **Remaining acceptance boundary:** the original device failure was not independently isolated to a missing assertion header versus a legacy 730-hour token, and a completed authenticated iPhone dashboard session remains unverified. Do not credit successful owner-browser acceptance, customer delivery, measurable value or revenue until independent target evidence shows the protected dashboard rendered after a fresh login.
+
+## Authentication incident: Workers unsupported redirect mode (2026-11-09)
+
+An owner iPhone request reached the live Pages Function with Cloudflare Access credentials, then returned `403 {"error":"owner_access_denied","check":"cert_fetch"}`. The Access login logs had already shown a successful owner passkey check, and an independent GitHub Actions probe successfully read the Access public signing keys.
+
+The specific implementation defect is `freight/site/retally_os_auth.mjs` using `redirect: 'error'` in its `fetch()` of the Access team's public JWKS. **Cloudflare Workers' Fetch/Request runtime supports only `redirect: 'manual'` and `redirect: 'follow'`, and constructing a request with `redirect: 'error'` throws a `TypeError` before performing the network request.** The existing broad catch disguised that deterministic runtime error as `cert_fetch`. Cloudflare Pages production compatibility date is `2026-10-08`, so the existing `cache: 'no-store'` option is supported.
+
+The minimal fix uses `redirect: 'manual'` while retaining `if (!res.ok) fail('cert_fetch')`, thereby rejecting HTTP 3xx responses rather than following them. The returned signing key remains subject to the existing exact `kid`, RSA key-shape, signed JWT verification, audience, issuer, expiry, and hashed-owner requirements. No credential, Cloudflare policy, D1 record, identity provider, or client-facing route changes are involved.
+
+The regression test `Live Access JWKS fetch uses a Workers-supported redirect mode and rejects redirect responses` simulates the Workerd `TypeError` and confirms that a valid synthetic owner signature succeeds while a 302 certificate response still fails closed. The known owner device remains the final end-to-end acceptance: a green synthetic test or production deployment alone cannot prove iPhone access.
+

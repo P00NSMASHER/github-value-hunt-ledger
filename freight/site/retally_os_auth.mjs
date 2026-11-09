@@ -60,7 +60,10 @@ export async function verifyRetallyOwner(request,fetcher=fetch,ownerDigest=OWNER
   try {
     res=await fetcher(ACCESS_ISSUER+'/cdn-cgi/access/certs',{
       method:'GET',headers:{Accept:'application/json'},
-      signal:AbortSignal.timeout(7000),redirect:'error',cache:'no-store'
+      // Workers only support redirect: 'follow' or 'manual'. 'error' throws
+      // before the public-key request is sent, causing owner_access_denied.
+      // Keep redirects rejected: a 3xx has res.ok === false below.
+      signal:AbortSignal.timeout(7000),redirect:'manual',cache:'no-store'
     });
     if (!res.ok) fail('cert_fetch');
     const data=await res.json();
