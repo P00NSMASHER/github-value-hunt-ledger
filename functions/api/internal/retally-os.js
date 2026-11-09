@@ -1,4 +1,4 @@
-import {verifyRetallyOwner} from '../../../freight/site/retally_os_auth.mjs';
+import {verifyRetallyOwner,RetallyOwnerAuthDenied} from '../../../freight/site/retally_os_auth.mjs';
 import {renderRetallyOsPage} from '../../../freight/site/retally_os_ui.mjs';
 
 const PATH='/api/internal/retally-os';
@@ -127,7 +127,12 @@ async function reviewDraft(db,actor,v){
 export async function handleRetallyOs({request,env},authenticate=verifyRetallyOwner){
  if(!routeOk(request))return reply(404,{error:'not_found'});
  if(request.method!=='GET'&&request.method!=='POST')return reply(405,{error:'method_not_allowed'});
- let actor;try{actor=await authenticate(request)}catch{return reply(403,{error:'owner_access_denied'})}
+ let actor;try{actor=await authenticate(request)}catch(error){
+  // Coarse, non-sensitive denial classification. Never return a token, email, or JWT claim.
+  // Authentication remains fail-closed; Cloudflare Access is independently required at the edge.
+  const check=error instanceof RetallyOwnerAuthDenied?error.check:'unexpected';
+  return reply(403,{error:'owner_access_denied',check});
+ }
  if(!env?.INQUIRY_DB?.prepare)return reply(503,{error:'private_store_unavailable'});
  const u=new URL(request.url);
  if(request.method==='GET'){
