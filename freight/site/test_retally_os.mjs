@@ -50,6 +50,30 @@ test('Owner requires valid RS256 signature, exact audience, issuer, expiration a
  await assert.rejects(()=>verifyRetallyOwner(req('GET',undefined,{jwt:valid}),async()=>Response.json({keys:[]} ),hash));
  await assert.rejects(()=>verifyRetallyOwner(req('GET'),certFetcher,hash));
 });
+test('Live Access JWKS fetch uses a Workers-supported redirect mode and rejects redirect responses',async()=>{
+ const ownerDigest=digest(syntheticEmail),r=req('GET',undefined,{jwt:token()});
+ let called=0;
+ const workersCompatible=async (url,options)=>{
+  called++;
+  assert.equal(url,ACCESS_ISSUER+'/cdn-cgi/access/certs');
+  // Workerd throws on redirect:'error'; older mock fetchers did not model that.
+  if(options.redirect==='error')throw new TypeError('Workers does not support redirect: error');
+  assert.equal(options.redirect,'manual');
+  assert.equal(options.cache,'no-store');
+  assert.equal(options.method,'GET');
+  return Response.json({keys:[jwk]});
+ };
+ assert.deepEqual(await verifyRetallyOwner(r,workersCompatible,ownerDigest),{sub:'owner-fixture'});
+ assert.equal(called,1);
+ const redirected=async (_url,options)=>{
+  assert.equal(options.redirect,'manual');
+  return Response.redirect('https://untrusted.example/jwks',302);
+ };
+ await assert.rejects(
+  ()=>verifyRetallyOwner(r,redirected,ownerDigest),
+  e=>e instanceof RetallyOwnerAuthDenied && e.check==='cert_fetch'
+ );
+});
 test('Existing 730h signed owner session is accepted, beyond 31 days is denied',async()=>{
  const emailDigest=digest(syntheticEmail);
  const issuedAt=now()-30;
