@@ -8,6 +8,9 @@ on:
       - "functions/api/internal/**"
       - "freight/site/retally_os_auth.mjs"
       - "freight/site/retally_os_ui.mjs"
+      - "freight/site/retally_os_visual.mjs"
+      - "freight/site/retally_os_ux.mjs"
+      - "freight/site/retally_os_visual_qa.py"
       - "freight/site/test_retally_os.mjs"
       - "freight/site/verify_retally_os_access.py"
       - "freight/site/operator_access_auth.js"
@@ -32,6 +35,9 @@ on:
       - "functions/api/internal/**"
       - "freight/site/retally_os_auth.mjs"
       - "freight/site/retally_os_ui.mjs"
+      - "freight/site/retally_os_visual.mjs"
+      - "freight/site/retally_os_ux.mjs"
+      - "freight/site/retally_os_visual_qa.py"
       - "freight/site/test_retally_os.mjs"
       - "freight/site/verify_retally_os_access.py"
       - "freight/site/operator_access_auth.js"
@@ -91,6 +97,8 @@ jobs:
           node --experimental-default-type=module --check functions/api/internal/retally-os.js
           node --check freight/site/retally_os_auth.mjs
           node --check freight/site/retally_os_ui.mjs
+          node --check freight/site/retally_os_visual.mjs
+          node --check freight/site/retally_os_ux.mjs
           node --experimental-default-type=module --experimental-sqlite --test freight/site/test_retally_os.mjs
           node --experimental-sqlite --test freight/site/test_inquiry_case.mjs freight/inquiry_ops/test_reconcile.mjs
           python -m unittest freight.site.test_inquiry_retention
