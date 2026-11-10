@@ -4951,6 +4951,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-10",
+      "id": "5d9ade5a1e75c8f8d877e0600142ac8eca0ddf4d2378ea32615ae3099989263b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/wholetherapi/freight-reconciliation"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -13369,6 +13385,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "3ab135aa54ac4323f765466754e46a7fc624f116c9cdf097dc344dbb473e5425",
+  "entries_sha256": "86d5e7c30d0dfa5a78b0f48d5e9d53d196ca8985620ba864c6461f762b2c6960",
   "schema_version": 1
 }
