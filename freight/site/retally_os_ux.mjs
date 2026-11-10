@@ -116,7 +116,7 @@ function applyCaseFilters(){
   if(visible)shown++;
  }
  root.querySelectorAll('.no-filter-results').forEach(x=>x.remove());
- if(!shown)root.append(emptyMessage(activeCaseFilter==='test'?'No QA records match':'Nothing to show yet',activeCaseFilter==='test'?'Try clearing the search.':'Only accepted genuine inquiries appear in this view. Change the filter to see QA records.',null,null)).classList.add('no-filter-results');
+ if(!shown){const empty=emptyMessage(activeCaseFilter==='test'?'No QA records match':'Nothing to show yet',activeCaseFilter==='test'?'Try clearing the search.':'Only accepted genuine inquiries appear in this view. Change the filter to see QA records.',null,null);empty.classList.add('no-filter-results');root.append(empty);}
  byId('case-count').textContent=shown+' shown · latest '+current.cases.length+' of up to 100';
  setFilterButtons('case-filters',activeCaseFilter);
 }
@@ -133,7 +133,7 @@ taskCard=function(t){
  const overdue=t.status==='open'&&due&&due<todayDate();
  if(overdue)card.classList.add('is-overdue');
  const heading=card.querySelector('h3');
- const badge=el('span',overdue?'Overdue':t.status==='done'?'Completed':t.status==='cancelled'?'Cancelled':t.synthetic?'QA test':due===''+''?'No due date':due===todayDate()?'Due today':'Open',overdue?'tag danger':t.status==='done'?'tag verified':'tag neutral');
+ const badge=el('span',overdue?'Overdue':t.status==='done'?'Completed':t.status==='cancelled'?'Cancelled':t.synthetic?'QA test':!due?'No due date':due===todayDate()?'Due today':'Open',overdue?'tag danger':t.status==='done'?'tag verified':'tag neutral');
  if(heading){
   const top=el('div',undefined,'case-head');
   card.insertBefore(top,heading);
@@ -166,7 +166,7 @@ function applyTaskFilters(){
   if(yes)count++;
  }
  list.querySelectorAll('.no-filter-results').forEach(x=>x.remove());
- if(!count)list.append(emptyMessage('Your queue is clear','No follow-ups match this filter. Create one from an existing inquiry or switch views.',null,null)).classList.add('no-filter-results');
+ if(!count){const empty=emptyMessage('Your queue is clear','No follow-ups match this filter. Create one from an existing inquiry or switch views.',null,null);empty.classList.add('no-filter-results');list.append(empty);}
  byId('task-count').textContent=count+' shown · '+(current.tasks||[]).length+' returned (maximum 200)';
  setFilterButtons('task-filters',activeTaskFilter);
 }
