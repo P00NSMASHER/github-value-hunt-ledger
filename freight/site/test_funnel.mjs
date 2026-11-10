@@ -26,7 +26,7 @@ test("stores only aggregate dimensions and no personal data",async()=>{
   calls.length=0;
   assert.equal((await onRequestPost({request:req(valid),env})).status,204);
   assert.equal(calls.length,1);
-  assert.match(calls[0].sql,/marketing_funnel_daily/);
+  assert.match(calls[0].sql,/marketing_funnel_daily_v2/);
   assert.equal(calls[0].args.length,4);
   assert.deepEqual(calls[0].args.slice(1),[valid.event,valid.channel,valid.offer]);
 });
@@ -44,7 +44,7 @@ test("denies cross-origin, forged sec-fetch and arbitrary events",async()=>{
 test("bounds aggregate write amplification without creating identities",async()=>{
   calls.length=0;
   assert.equal((await onRequestPost({request:req(valid),env})).status,204);
-  assert.match(calls[0].sql,/marketing_funnel_daily\\.interactions < 250/);
+  assert.match(calls[0].sql,/marketing_funnel_daily_v2\\.interactions < 250/);
   assert.ok(!/ip|email|user_agent/i.test(calls[0].sql));
 });
 test("does not count known audits, automation or bad bot scores",async()=>{
