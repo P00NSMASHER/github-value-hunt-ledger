@@ -52,6 +52,20 @@ jobs:
         run: |
           python -m pip install 'playwright==1.56.0'
           python -m playwright install --with-deps chromium
+      - name: Verify synthetic-only RETALLY OS phone, tablet, desktop and interactions
+        run: |
+          python after/freight/site/retally_os_visual_qa.py evidence/retally-private-os
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("evidence/retally-private-os/report.json").read_text())
+          assert report["passed"] is True
+          assert report["syntheticOnly"] is True and report["realCustomerData"] is False
+          assert report["externalProviderCalls"] == 0
+          assert len(report["viewports"]) == 3
+          assert all(not x["horizontalOverflow"] and x["consoleErrors"] == 0 for x in report["viewports"])
+          print("RETALLY OS private mobile/desktop acceptance passed with synthetic inputs only")
+          PY
       - name: Build isolated public-only before bundle
         working-directory: before
         run: |
