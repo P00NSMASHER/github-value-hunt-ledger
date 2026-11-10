@@ -3,6 +3,7 @@
 // The authoritative inquiry/QA registry remains the ONLY confirmed-lead source.
 const HOSTS = new Set(["www.retallyrecovery.com", "retallyrecovery.com"]);
 const EVENTS = new Set([
+  "freight_landing_viewed",
   "freight_free_audit_cta_clicked",
   "freight_audit_form_started",
   "freight_audit_request_prepared"
@@ -63,7 +64,7 @@ export async function onRequestPost({request, env}) {
     const saved=await env.INQUIRY_DB.prepare(
       "INSERT INTO marketing_funnel_daily(day_utc,event,channel,offer,interactions) VALUES(?,?,?,?,1) " +
       // Bound daily D1 *row writes* even if a client spoofs browser headers.
-      // 3 events × 4 channels × 3 offers × 250 = at most 9,000 writes/day.
+      // 4 events × 4 channels × 3 offers × 250 = at most 12,000 writes/day.
       "ON CONFLICT(day_utc,event,channel,offer) DO UPDATE SET interactions=interactions+1 " +
       "WHERE marketing_funnel_daily.interactions < 250"
     ).bind(day,p.event,p.channel,p.offer).run();
