@@ -165,7 +165,33 @@ test('Production entry denies missing Access token and nonproduction host before
  const d=db();const missing=await onRequest(context(req(),d));assert.equal(missing.status,403);
  const wrong=await onRequest(context(req('GET',undefined,{url:'https://staging.pages.dev/api/internal/retally-os'}),d));assert.equal(wrong.status,404);
  const method=await handleRetallyOs(context(req('DELETE'),d),auth);assert.equal(method.status,405);
- const query=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?debug=true'}),d),auth);assert.equal(query.status,400);
+ const query=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?debug=true'}),d),auth);assert.equal(query.status,303);assert.equal(query.headers.get('Location'),'https://retallyrecovery.com/api/internal/retally-os');
+});
+test('Authenticated iPhone entry safely strips transient query without exposing private data',async()=>{
+ const d=db(),canonical='https://retallyrecovery.com/api/internal/retally-os';
+ const params=['?code=synthetic&state=synthetic','?utm_source=app&fbclid=example',
+  '?view=data&unexpected=1','?next=https%3A%2F%2Fevil.example%2Fsteal',
+  '?view=admin','?returnTo=%2Fapi%2Finternal%2Fretally-os'];
+ for(const extra of params){
+  const request=req('GET',undefined,{url:canonical+extra});
+  const result=await handleRetallyOs(context(request,d),auth);
+  assert.equal(result.status,303,extra);
+  assert.equal(result.headers.get('Location'),canonical,extra);
+  assert.equal(result.headers.get('Cache-Control'),'private, no-store, max-age=0',extra);
+  assert.equal(result.headers.get('Referrer-Policy'),'no-referrer',extra);
+  assert.equal(await result.text(),'',extra);
+ }
+ const data=await handleRetallyOs(context(req('GET',undefined,{url:canonical+'?view=data'}),d),auth);
+ assert.equal(data.status,200);assert.equal((await data.json()).cases.length,2);
+ const denied=await onRequest(context(req('GET',undefined,{url:canonical+'?state=synthetic'}),d));
+ assert.equal(denied.status,403);assert.equal(denied.headers.get('Location'),null);
+ const wrongHost=await handleRetallyOs(context(req('GET',undefined,{url:'https://retally-web.pages.dev/api/internal/retally-os?state=synthetic'}),d),auth);
+ assert.equal(wrongHost.status,404);
+ const post=await handleRetallyOs(context(req('POST',{action:'invalid_action'},{url:canonical+'?state=synthetic'}),d),auth);
+ assert.equal(post.status,400);assert.deepEqual(await post.json(),{error:'invalid_query'});
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_case_events').get().n,0);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM retally_os_task_events').get().n,0);
+ assert.equal(d.raw.prepare('SELECT COUNT(*) n FROM inquiries').get().n,2);
 });
 test('Owner GET reads live source, labels QA, excludes it from true customer claims',async()=>{
  const d=db();const r=await handleRetallyOs(context(req('GET',undefined,{url:'https://retallyrecovery.com/api/internal/retally-os?view=data'}),d),auth);
