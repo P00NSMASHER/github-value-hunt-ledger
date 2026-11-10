@@ -53,7 +53,7 @@
   const intentAlreadySent = new Set();
   const reportIntent = (eventName) => {
     if (!reportingHost || navigator.webdriver === true) return;
-    if (!["freight_free_audit_cta_clicked", "freight_audit_form_started", "freight_audit_request_prepared"].includes(eventName)) return;
+    if (!["freight_landing_viewed", "freight_free_audit_cta_clicked", "freight_audit_form_started", "freight_audit_request_prepared"].includes(eventName)) return;
     // At most one client-reported event per tab and type, even across pages.
     const storageKey = "retally_funnel_20261110_" + eventName;
     if (intentAlreadySent.has(storageKey)) return;
@@ -65,6 +65,13 @@
       body, credentials:"same-origin", cache:"no-store", keepalive:true})
       .catch(() => { /* No impact on audit form availability or completion. */ });
   };
+
+  // Browser-reported landing session, NOT a unique verified human or a lead.
+  // Track only the main marketing homepage, not unrelated project hosts or docs.
+  if (!document.body.classList.contains("document-page") &&
+      ["/", "/index.html"].includes(window.location.pathname)) {
+    reportIntent("freight_landing_viewed");
+  }
 
   // Preserve acquisition attribution when a visitor follows a first-party
   // educational-page link to the free-audit form. Never tag offsite links or
