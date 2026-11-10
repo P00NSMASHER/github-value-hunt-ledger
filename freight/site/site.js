@@ -32,34 +32,24 @@
   const intentOffer = /founding/.test(campaignName) ? "founding"
     : /second[-_ ]?look/.test(campaignName) ? "second_look" : "general";
   // Internal navigation UTMs identify the offer but must not masquerade as
-  // external acquisition. Keep only a broad initial category within this tab.
+  // external acquisition. Keep only a broad category for this page view.
   const internalTraffic = ["site", "retally_site", "internal"].includes(
     (nonEmptyCampaignContext.utm_source || "").toLowerCase()
   );
   const externalReferrer = Boolean(referrerHost) &&
     referrerHost !== "retallyrecovery.com" && !referrerHost.endsWith(".retallyrecovery.com");
   const measuredChannel = Object.keys(nonEmptyCampaignContext).length && !internalTraffic ? "campaign"
-    : /(^|\\.)(google|bing|yahoo|duckduckgo|ecosia|brave)\\./.test(referrerHost) ? "organic_search"
+    : /(^|\.)(google|bing|yahoo|duckduckgo|ecosia|brave)\./.test(referrerHost) ? "organic_search"
     : externalReferrer ? "referral" : "direct";
-  const intentChannel = (() => {
-    try {
-      const key = "retally_funnel_entry_channel";
-      const previous = sessionStorage.getItem(key);
-      if (["direct", "organic_search", "referral", "campaign"].includes(previous)) return previous;
-      sessionStorage.setItem(key, measuredChannel);
-    } catch (_error) { /* Browser storage is optional. */ }
-    return measuredChannel;
-  })();
+  // Attribution on this document only; no browser storage or tracking ID.
+  const intentChannel = measuredChannel;
   const intentAlreadySent = new Set();
   const reportIntent = (eventName) => {
     if (!reportingHost || navigator.webdriver === true) return;
     if (!["freight_landing_viewed", "freight_free_audit_cta_clicked", "freight_audit_form_started", "freight_audit_request_prepared"].includes(eventName)) return;
-    // At most one client-reported event per tab and type, even across pages.
-    const storageKey = "retally_funnel_20261110_" + eventName;
-    if (intentAlreadySent.has(storageKey)) return;
-    try { if (sessionStorage.getItem(storageKey)) return; sessionStorage.setItem(storageKey, "1"); }
-    catch (_error) { /* In-memory deduplication is retained when storage is blocked. */ }
-    intentAlreadySent.add(storageKey);
+    // At most one event of each type per page load, in memory only.
+    if (intentAlreadySent.has(eventName)) return;
+    intentAlreadySent.add(eventName);
     const body = JSON.stringify({event:eventName, channel:intentChannel, offer:intentOffer});
     fetch("/api/funnel", {method:"POST", headers:{"Content-Type":"application/json"},
       body, credentials:"same-origin", cache:"no-store", keepalive:true})
