@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/funnel.js"
       - "functions/api/group-inquiry.js"
       - "functions/api/internal/**"
       - "freight/site/retally_os_auth.mjs"
@@ -22,6 +23,7 @@ on:
       - "freight/site/index.html"
       - "freight/site/_headers"
       - "freight/site/test_inquiry.mjs"
+      - "freight/site/test_funnel.mjs"
       - "freight/site/test_group_inquiry.mjs"
       - "freight/site/test_group_inquiry_cors.mjs"
       - "freight/site/group/**"
@@ -31,6 +33,7 @@ on:
   pull_request:
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/funnel.js"
       - "functions/api/group-inquiry.js"
       - "functions/api/internal/**"
       - "freight/site/retally_os_auth.mjs"
@@ -49,6 +52,7 @@ on:
       - "freight/site/index.html"
       - "freight/site/_headers"
       - "freight/site/test_inquiry.mjs"
+      - "freight/site/test_funnel.mjs"
       - "freight/site/test_group_inquiry.mjs"
       - "freight/site/test_group_inquiry_cors.mjs"
       - "freight/site/group/**"
@@ -84,10 +88,12 @@ jobs:
       - name: Pages API JavaScript syntax
         run: |
           node --experimental-default-type=module --check functions/api/inquiry.js
+          node --experimental-default-type=module --check functions/api/funnel.js
           node --experimental-default-type=module --check functions/api/group-inquiry.js
       - name: Secure inquiry unit and mocked integration tests
         run: |
           node --experimental-default-type=module --test freight/site/test_inquiry.mjs freight/site/test_group_inquiry.mjs freight/site/test_group_inquiry_cors.mjs
+          node --experimental-default-type=module --test freight/site/test_funnel.mjs
           node --test company_sites/test_group_client.mjs
       - name: Signed human response, privacy and retention policy tests
         run: |
