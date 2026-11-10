@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {Script} from 'node:vm';
 import {DatabaseSync} from 'node:sqlite';
 import {generateKeyPairSync,createSign,createHash,webcrypto} from 'node:crypto';
 import {verifyRetallyOwner,RetallyOwnerAuthDenied,ACCESS_AUD,ACCESS_ISSUER} from './retally_os_auth.mjs';
 import {handleRetallyOs,onRequest} from '../../functions/api/internal/retally-os.js';
+import {renderRetallyOsPage} from './retally_os_ui.mjs';
 
 if(!globalThis.crypto)globalThis.crypto=webcrypto;
 const syntheticEmail='owner@local.example';
@@ -39,6 +41,29 @@ function db(){
 const auth=async()=>({sub:'owner-fixture'});
 const context=(r,d)=>({request:r,env:{INQUIRY_DB:d.adapter}});
 
+test('Private command-center HTML contains seven accessible views, mobile navigation and syntactically valid browser code',()=>{
+ const html=renderRetallyOsPage('csp-test-nonce');
+ assert.match(html,/<nav aria-label="Workspace tabs">/);
+ assert.match(html,/id="mobile-dock"/);
+ assert.match(html,/id="more-sheet"/);
+ assert.match(html,/id="case-filters"/);
+ assert.match(html,/id="task-filters"/);
+ assert.match(html,/id="sync-time"/);
+ assert.match(html,/id="view-title"/);
+ assert.match(html,/Follow-ups &amp; owner tasks/);
+ assert.match(html,/https:\/\/app\.metricool\.com\/planner\/calendar\?blogId=7322512/);
+ assert.match(html,/Cash.*Unknown|Verified cash received/);
+ assert.equal((html.match(/class="panel(?: active)?"/g)||[]).length,7);
+ assert.doesNotMatch(html,/\sonclick=/i);
+ assert.doesNotMatch(html,/__STYLE__|__SCRIPT__|__NONCE__/);
+ assert.doesNotMatch(html,/<script[^>]+src=/);
+ const match=html.match(/<script nonce="csp-test-nonce">([\s\S]*?)<\/script>/);
+ assert.ok(match,'One CSP-nonced inline script should be present');
+ new Script(match[1],{filename:'retally-os-private-ui.js'});
+ assert.match(html,/\.mobile-dock\{/);
+ assert.match(html,/prefers-reduced-motion/);
+ assert.doesNotMatch(html,/<link[^>]*href="https?:\/\//);
+});
 // Every auth negative should reject before JWKS key lookup if possible.
 test('Owner requires valid RS256 signature, exact audience, issuer, expiration and exact identity',async()=>{
  const hash=digest(syntheticEmail);

@@ -1,4 +1,6 @@
 // Static private owner UI; no customer data is inserted into HTML or a public asset.
+import {visualStyle} from './retally_os_visual.mjs';
+import {visualScript} from './retally_os_ux.mjs';
 // All dynamic values are assigned via textContent or form.value, never innerHTML.
 const style=String.raw`
 :root{color-scheme:dark;--bg:#071321;--card:#102238;--edge:#294059;--text:#eaf2f8;--muted:#91a9bc;--teal:#64d2bc;--gold:#e7ba71;--red:#ff959e;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
@@ -94,16 +96,104 @@ refresh();
 `;
 export function renderRetallyOsPage(nonce) {
   const html=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#071321"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="RETALLY OS"><title>RETALLY OS | Private</title><style nonce="__NONCE__">__STYLE__</style></head><body>
-<header><div class="brand">RETALLY<small>OPERATING SYSTEM</small></div><div class="right"><span>PRIVATE · OWNER ONLY</span><button id="refresh">Refresh</button><a href="/cdn-cgi/access/logout">Sign out</a></div></header>
-<main><div id="flash" role="status"></div><div class="eyebrow">REAL-TIME PRIVATE WORKBENCH</div><h1>Business operations</h1><p class="lead">Live intake, case follow-ups and internal editorial review. No customer messages, public posts or financial transactions are initiated by this desk.</p>
-<nav aria-label="Workspace tabs"><button class="active" data-tab="today">Overview</button><button data-tab="cases">Customers &amp; cases</button><button data-tab="tasks">Follow-ups</button><button data-tab="social">Social drafts</button><button data-tab="growth">Growth</button><button data-tab="finance">Financials</button><button data-tab="ops">System health</button></nav>
-<section class="panel active" data-tab="today"><div class="eyebrow">TODAY</div><div id="metrics" class="grid"></div><div class="two"><div><h2>Incoming inquiries</h2><div class="stack" id="recent"></div></div><div class="box"><h2>Priority</h2><p>Review non-test inbound requests, qualify fit, assign follow-ups, and record evidence before advancing. Every real outbound action requires a separate decision.</p><div id="urgent"></div><div class="banner">Test records are excluded from genuine customer metrics. A CRM entry alone is not a verified paying customer.</div></div></div></section>
-<section class="panel" data-tab="cases"><div class="eyebrow">CUSTOMER RECORDS</div><h2>Inquiries &amp; case work</h2><p class="muted">Reads directly from the authoritative intake. Case notes and tasks are stored in dedicated RETALLY OS tables; they never mutate the original receipt.</p><div class="toolline"><input type="search" id="search" placeholder="Search company, reference, owner…" maxlength="100"><small id="case-count"></small></div><div id="case-list" class="stack"></div></section>
-<section class="panel" data-tab="tasks"><div class="eyebrow">PRIVATE CRM</div><h2>Follow-ups &amp; owner tasks</h2><p class="muted">Each task is linked to an existing inquiry, retained in private D1 with version history, and never sends a customer message. Completed and cancelled tasks require a written note.</p><div class="two"><article class="box"><h3>Create follow-up</h3><div class="stack"><label class="field">Accepted inquiry<select id="task-reference"></select></label><label class="field">Task title<input id="task-title" maxlength="140" placeholder="Review invoice sample…"></label><label class="field">Responsible<input id="task-owner" maxlength="80" value="Owner"></label><label class="field">Due date<input id="task-due" type="date"></label><label class="field">Internal note<textarea id="task-note" maxlength="1000" placeholder="No customer information is sent…"></textarea></label><button id="new-task" class="primary">Create private follow-up</button></div></article><article class="box"><h3>Work queue</h3><p>No outbound emails, social posts or payment actions. This is internal case management, not a deployed GopherCRM server.</p><p id="task-count" class="muted"></p><p>Version conflicts require refreshing before saving. Original inquiry receipts remain read-only.</p></article></div><h2>Saved follow-ups</h2><div id="task-list" class="stack"></div></section>
-<section class="panel" data-tab="social"><div class="eyebrow">CONTENT OPERATIONS</div><h2>Private social calendar</h2><div class="banner">Postmill delivery is not connected. These RETALLY OS entries are internal drafts only; “Reviewed” does not schedule or publish. RETALLY also has an existing, separate Metricool planner with scheduled posts.</div><p><a href="https://app.metricool.com/planner/calendar?blogId=7322512" target="_blank" rel="noreferrer noopener">Open the connected RETALLY Metricool planner</a></p><div class="two"><article class="box"><h3>New draft</h3><div class="stack"><input id="draft-title" placeholder="Campaign headline" maxlength="100"><select id="draft-channel"><option value="linkedin">LinkedIn</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="x">X</option></select><textarea id="draft-body" maxlength="1800" placeholder="Draft a RETALLY post for review…"></textarea><button id="new-draft" class="primary">Save private draft</button></div></article><div class="box"><h3>Publication gate</h3><p>A reviewed draft remains private. External platform authentication, content clearance, account restrictions, and per-post authorization must pass before a separate publisher is connected.</p></div></div><h2>Saved drafts</h2><div id="drafts" class="stack"></div></section>
-<section class="panel" data-tab="growth"><div class="eyebrow">ACQUISITION</div><h2>Inquiry sources</h2><div id="channels" class="stack"></div><p class="muted">Campaign tags are self-reported form data. Reach, clicks and social-platform conversions are unavailable until provider authorization.</p></section>
-<section class="panel" data-tab="finance"><div class="eyebrow">FINANCIAL INTEGRITY</div><h2>Verified money</h2><div class="grid"><div class="tile"><span class="label">Cash actually collected</span><strong>Unknown</strong></div><div class="tile"><span class="label">Verified paying customers</span><strong>Unknown</strong></div></div><p class="banner">No financial or payment processor is connected to this desk. Do not infer collected fees from CRM notes or estimated recovery values. Synthetic example amounts from the pilot are excluded.</p></section>
-<section class="panel" data-tab="ops"><div class="eyebrow">INTEGRATION HEALTH</div><h2>Operating boundaries</h2><div class="box"><p id="latest"></p><p id="ops-read"></p><p>Protected by Cloudflare Access plus independent signed JWT verification. A new deployment, branch preview or public DNS route without the correct verified identity returns no customer data.</p><p>GopherCRM, Postmill and Prime Agent were verified as local upstream pilots. They are not running here as production services.</p><p id="updated" class="muted"></p></div></section>
-<footer>RETALLY · Find it. Prove it. Recover it. · Owner-only · No automatic outbound actions</footer></main><script nonce="__NONCE__">__SCRIPT__</script></body></html>`;
-  return html.replaceAll('__NONCE__',nonce).replace('__STYLE__',style).replace('__SCRIPT__',script);
+<header><div class="brand"><span class="brand-emblem" aria-hidden="true">R</span><span class="brand-copy">RETALLY<small>OPERATING SYSTEM</small></span></div><div class="right"><span class="secure-label">PRIVATE WORKSPACE</span><button id="refresh" type="button">↻ Refresh</button><a class="header-link" href="/cdn-cgi/access/logout">Sign out</a></div></header>
+<main>
+<div id="flash" role="status" aria-live="polite"></div>
+<div class="page-heading">
+ <div><div class="eyebrow" id="view-kicker">OPERATIONS / TODAY</div><h1 id="view-title">Your business at a glance</h1><p class="lead" id="view-description">A clear view of inquiries, priorities and work that needs attention.</p></div>
+ <div class="sync-indicator" aria-live="polite"><span class="sync-dot" id="sync-dot" aria-hidden="true"></span><span id="sync-time">Connecting to private data…</span></div>
+</div>
+<nav aria-label="Workspace tabs">
+<div class="sidebar-section">WORKSPACE</div>
+<button class="active" data-tab="today" aria-current="page" type="button"><span class="nav-icon" aria-hidden="true">01</span> Overview</button>
+<button data-tab="cases" type="button"><span class="nav-icon" aria-hidden="true">02</span> Customers &amp; cases</button>
+<button data-tab="tasks" type="button"><span class="nav-icon" aria-hidden="true">03</span> Follow-ups</button>
+<button data-tab="social" type="button"><span class="nav-icon" aria-hidden="true">04</span> Social drafts</button>
+<div class="sidebar-section">INTELLIGENCE</div>
+<button data-tab="growth" type="button"><span class="nav-icon" aria-hidden="true">05</span> Growth</button>
+<button data-tab="finance" type="button"><span class="nav-icon" aria-hidden="true">06</span> Financials</button>
+<button data-tab="ops" type="button"><span class="nav-icon" aria-hidden="true">07</span> System status</button>
+<div class="sidebar-footer">● Owner-only workspace<br>Private D1 records · No automated outbound actions</div>
+</nav>
+<section class="panel active" data-tab="today">
+<div class="section-head"><h2>Today's overview</h2><span class="section-overline">REAL SIGNALS · NO TEST INFLATION</span></div>
+<div id="metrics" class="grid" aria-label="Business metrics"></div>
+<div class="two">
+ <div><div class="section-head"><h2>Recent real inquiries</h2><button type="button" class="mini-link" id="see-cases">View pipeline →</button></div><div class="stack" id="recent"></div></div>
+ <div><div class="section-head"><h2>Recommended next actions</h2></div><article class="box"><div id="urgent"></div><div class="banner">Customer and revenue figures exclude QA records. Actions here are private; no messages or posts are sent.</div></article></div>
+</div>
+</section>
+<section class="panel" data-tab="cases">
+<div class="section-head"><h2>Case pipeline</h2><span class="section-overline">ORIGINAL INQUIRY RECEIPTS · READ-ONLY</span></div>
+<p class="muted">Work each accepted inquiry, keep private notes and track ownership. Original submission records are never edited.</p>
+<div class="toolline"><input type="search" id="search" aria-label="Search cases" placeholder="Search company, reference, contact…" maxlength="100"><small id="case-count"></small></div>
+<div id="case-filters" class="filter-strip" aria-label="Filter cases">
+<button type="button" class="active" data-filter="live" aria-pressed="true">Genuine inquiries</button><button type="button" data-filter="review" aria-pressed="false">Needs review</button><button type="button" data-filter="test" aria-pressed="false">QA records</button><button type="button" data-filter="all" aria-pressed="false">All records</button>
+</div><div id="case-list" class="stack"></div>
+</section>
+<section class="panel" data-tab="tasks">
+<div class="section-head"><h2>Follow-ups &amp; owner tasks</h2><span class="section-overline">PRIVATE WORK QUEUE</span></div>
+<p class="muted">Tasks are linked to accepted inquiries and kept in your private records. Completing or cancelling requires a written note.</p>
+<div class="two">
+ <article class="box"><h3>Create a follow-up</h3><p class="muted">Assign one clear next action with a due date.</p>
+  <div class="stack">
+   <label class="field">Accepted inquiry<select id="task-reference"></select></label>
+   <label class="field">What needs doing?<input id="task-title" maxlength="140" placeholder="Review invoice documents"></label>
+   <div class="controls"><label class="field">Owner<input id="task-owner" maxlength="80" value="Owner"></label><label class="field">Due date<input id="task-due" type="date"></label></div>
+   <label class="field">Internal note<textarea id="task-note" maxlength="1000" placeholder="Context for your next step (private)"></textarea></label>
+   <button type="button" id="new-task" class="primary">Create follow-up</button>
+  </div>
+ </article>
+ <article class="box"><h3>How this queue works</h3>
+  <div class="priority-row"><span class="priority-number" aria-hidden="true">01</span><div><strong>Track a clear action</strong><small>Choose the case, owner and due date.</small></div></div>
+  <div class="priority-row"><span class="priority-number" aria-hidden="true">02</span><div><strong>Update the record</strong><small>Mark work done or cancelled with a reason.</small></div></div>
+  <div class="priority-row"><span class="priority-number" aria-hidden="true">03</span><div><strong>Keep work private</strong><small>No customer email, social post or payment is triggered.</small></div></div>
+  <p id="task-count" class="muted"></p>
+ </article>
+</div>
+<div class="section-head"><h2>Saved follow-ups</h2><span class="section-overline">SAVED VERSIONS · CONFLICT SAFE</span></div>
+<div id="task-filters" class="filter-strip" aria-label="Filter follow-ups">
+<button type="button" class="active" data-filter="open" aria-pressed="true">Open</button><button type="button" data-filter="overdue" aria-pressed="false">Overdue</button><button type="button" data-filter="done" aria-pressed="false">Completed</button><button type="button" data-filter="test" aria-pressed="false">QA tasks</button><button type="button" data-filter="all" aria-pressed="false">All</button>
+</div>
+<div id="task-list" class="stack"></div>
+</section>
+<section class="panel" data-tab="social">
+<div class="section-head"><h2>Content studio</h2><span class="section-overline">EDITORIAL / PRIVATE ONLY</span></div>
+<div class="banner"><strong>Private drafts, not scheduled posts.</strong> Review does not publish. Postmill is an isolated pilot; the existing Metricool planner is separate.</div>
+<p><a href="https://app.metricool.com/planner/calendar?blogId=7322512" target="_blank" rel="noreferrer noopener">Open the connected RETALLY Metricool planner →</a></p>
+<div class="two"><article class="box"><h3>New private draft</h3><p class="muted">Prepare an idea and review the language before any separate publishing decision.</p>
+ <div class="stack"><label class="field">Title<input id="draft-title" maxlength="100" placeholder="Audit opportunity explained"></label>
+ <label class="field">Channel<select id="draft-channel"><option value="linkedin">LinkedIn</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="x">X</option></select></label>
+ <label class="field">Draft copy<textarea id="draft-body" maxlength="1800" placeholder="Write the post for internal review…"></textarea></label>
+ <button type="button" id="new-draft" class="primary">Save private draft</button></div></article>
+ <article class="box"><h3>Editorial workflow</h3><div class="priority-row"><span class="priority-number" aria-hidden="true">01</span><div><strong>Draft</strong><small>Save content to private RETALLY D1.</small></div></div><div class="priority-row"><span class="priority-number" aria-hidden="true">02</span><div><strong>Review</strong><small>Mark a version reviewed; editing clears review.</small></div></div><div class="priority-row"><span class="priority-number" aria-hidden="true">03</span><div><strong>Publish separately</strong><small>No publish action is available in this dashboard.</small></div></div></article>
+</div>
+<div class="section-head"><h2>Saved drafts</h2></div><div id="drafts" class="stack"></div>
+</section>
+<section class="panel" data-tab="growth">
+<div class="section-head"><h2>Where inquiries come from</h2><span class="section-overline">ACTUAL FORM ATTRIBUTION</span></div>
+<p class="muted">Only genuine submissions are counted. These source tags do not measure reach, revenue or conversions.</p>
+<div id="channels" class="stack"></div>
+</section>
+<section class="panel" data-tab="finance">
+<div class="section-head"><h2>Money, with evidence</h2><span class="section-overline">NO ESTIMATES AS REVENUE</span></div>
+<div class="grid finance-grid"><div class="tile"><span class="label">Verified cash received</span><strong>Unknown</strong><span class="kpi-detail">No payments source connected</span></div><div class="tile"><span class="label">Verified paying customers</span><strong>Unknown</strong><span class="kpi-detail">No verified payment evidence</span></div></div>
+<div class="banner">This view does not infer payments from case status, projected recovery, CRM notes or pilot amounts. Cash remains unknown until an independent receipt is connected.</div>
+</section>
+<section class="panel" data-tab="ops">
+<div class="section-head"><h2>Connection &amp; security</h2><span class="section-overline">OPERATOR READOUT</span></div>
+<div class="box system-lines">
+<p id="latest"></p><p id="ops-read"></p><p><strong>Identity:</strong> Cloudflare Access with independently checked owner JWT. Preview hosts cannot access customer records.</p><p><strong>Not connected:</strong> GopherCRM, Postmill and Prime Agent are private tested pilots, not deployed production services.</p><p><strong>Publish and payments:</strong> Disabled from RETALLY OS.</p><p id="updated" class="muted"></p>
+</div></section>
+<footer>RETALLY · Find it. Prove it. Recover it. · Owner-only · No automatic outbound actions</footer></main><div id="more-sheet" class="more-sheet" aria-label="More sections"><h3>More sections</h3><button type="button" data-more-tab="growth">05 · Growth insights</button><button type="button" data-more-tab="finance">06 · Financials</button><button type="button" data-more-tab="ops">07 · System status</button><a class="header-link" href="/cdn-cgi/access/logout">Sign out</a></div>
+<div id="mobile-dock" class="mobile-dock" role="navigation" aria-label="Mobile navigation">
+ <button type="button" data-tab="today" class="active" aria-current="page"><span class="dock-icon" aria-hidden="true">⌂</span>Overview</button>
+ <button type="button" data-tab="cases"><span class="dock-icon" aria-hidden="true">▤</span>Cases</button>
+ <button type="button" data-tab="tasks"><span class="dock-icon" aria-hidden="true">✓</span>Tasks</button>
+ <button type="button" data-tab="social"><span class="dock-icon" aria-hidden="true">✎</span>Content</button>
+ <button type="button" id="more-toggle" aria-expanded="false" aria-controls="more-sheet"><span class="dock-icon" aria-hidden="true">···</span>More</button>
+</div><script nonce="__NONCE__">__SCRIPT__</script></body></html>`;
+  const upgradedScript=script.replace(/\nrefresh\(\);\n$/, '\n'+visualScript+'\nrefresh();\n');
+  if (upgradedScript===script) throw new Error('RETALLY UI startup hook unavailable');
+  return html.replaceAll('__NONCE__',nonce).replace('__STYLE__',style+'\n'+visualStyle).replace('__SCRIPT__',upgradedScript);
 }
