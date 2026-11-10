@@ -15,6 +15,13 @@ function req(data, options={}) {
   });
 }
 const valid={event:"freight_audit_form_started",channel:"organic_search",offer:"founding"};
+test("counts main-home landing signals without claiming unique people",async()=>{
+  calls.length=0;
+  const status=await onRequestPost({request:req({event:"freight_landing_viewed",channel:"direct",offer:"general"}),env});
+  assert.equal(status.status,204);
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].args[1],"freight_landing_viewed");
+});
 test("stores only aggregate dimensions and no personal data",async()=>{
   calls.length=0;
   assert.equal((await onRequestPost({request:req(valid),env})).status,204);
