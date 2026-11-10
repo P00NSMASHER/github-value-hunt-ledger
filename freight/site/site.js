@@ -31,9 +31,25 @@
   const campaignName = (nonEmptyCampaignContext.utm_campaign || "").toLowerCase();
   const intentOffer = /founding/.test(campaignName) ? "founding"
     : /second[-_ ]?look/.test(campaignName) ? "second_look" : "general";
-  const intentChannel = Object.keys(nonEmptyCampaignContext).length ? "campaign"
+  // Internal navigation UTMs identify the offer but must not masquerade as
+  // external acquisition. Keep only a broad initial category within this tab.
+  const internalTraffic = ["site", "retally_site", "internal"].includes(
+    (nonEmptyCampaignContext.utm_source || "").toLowerCase()
+  );
+  const externalReferrer = Boolean(referrerHost) &&
+    referrerHost !== "retallyrecovery.com" && !referrerHost.endsWith(".retallyrecovery.com");
+  const measuredChannel = Object.keys(nonEmptyCampaignContext).length && !internalTraffic ? "campaign"
     : /(^|\\.)(google|bing|yahoo|duckduckgo|ecosia|brave)\\./.test(referrerHost) ? "organic_search"
-    : referrerHost && referrerHost !== window.location.hostname ? "referral" : "direct";
+    : externalReferrer ? "referral" : "direct";
+  const intentChannel = (() => {
+    try {
+      const key = "retally_funnel_entry_channel";
+      const previous = sessionStorage.getItem(key);
+      if (["direct", "organic_search", "referral", "campaign"].includes(previous)) return previous;
+      sessionStorage.setItem(key, measuredChannel);
+    } catch (_error) { /* Browser storage is optional. */ }
+    return measuredChannel;
+  })();
   const intentAlreadySent = new Set();
   const reportIntent = (eventName) => {
     if (!reportingHost || navigator.webdriver === true) return;
