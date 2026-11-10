@@ -377,13 +377,17 @@ test("retally campaign navigation leaves direct and untagged traffic unchanged",
 test("online form waits for sequential Turnstile and Resend before declaring the receipt uncertain", () => {
   const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
   const backend = readFileSync(new URL("../../functions/api/inquiry.js", import.meta.url), "utf8");
-  const clientTimeout = front.match(/window\.setTimeout\(\(\) => controller\.abort\(\), (\d+)\)/);
-  assert.ok(clientTimeout, "The online form must have a bounded fetch deadline");
+  const clientTimeouts = [...front.matchAll(/window\.setTimeout\(\(\) => controller\.abort\(\), (\d+)\)/g)]
+    .map(match => Number(match[1]));
+  assert.ok(clientTimeouts.length >= 2, "Both online-availability and POST requests need bounded deadlines");
+  assert.ok(clientTimeouts.some(value => value <= 5000),
+    "The GET availability probe must not block the visitor for the full submission budget");
+  const submissionTimeout = Math.max(...clientTimeouts);
   const providerTimeouts = [...backend.matchAll(/AbortSignal\.timeout\((\d+)\)/g)]
     .map(x => Number(x[1]));
   assert.deepEqual(providerTimeouts.sort((a,b) => a-b), [7000,9000],
     "Review the client budget if upstream deadlines change");
-  assert.ok(Number(clientTimeout[1]) >= providerTimeouts.reduce((x,y) => x+y,0)+8000,
+  assert.ok(submissionTimeout >= providerTimeouts.reduce((x,y) => x+y,0)+8000,
     "Wait for sequential provider deadlines plus database and transport margin");
   assert.match(front, /error\?\.name === "AbortError"/);
   assert.match(front, /Your request may already be saved/);
