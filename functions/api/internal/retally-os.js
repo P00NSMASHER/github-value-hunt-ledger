@@ -136,7 +136,12 @@ export async function handleRetallyOs({request,env},authenticate=verifyRetallyOw
  if(!env?.INQUIRY_DB?.prepare)return reply(503,{error:'private_store_unavailable'});
  const u=new URL(request.url);
  if(request.method==='GET'){
-  if(u.search&&u.search!=='?view=data')return reply(400,{error:'invalid_query'});
+  // Some authenticated iPhone entry points return with transient URL parameters.
+  // Drop them from browser history with a fixed same-origin destination.
+  // Never echo or forward query values, and never change the strict data route.
+  if(u.search&&u.search!=='?view=data')return new Response(null,{status:303,headers:{
+   ...head,Location:'https://retallyrecovery.com'+PATH
+  }});
   if(u.search==='?view=data'){
     try{return reply(200,{observedAt:new Date().toISOString(),cases:await cases(env.INQUIRY_DB),tasks:await tasks(env.INQUIRY_DB),drafts:await drafts(env.INQUIRY_DB)})}
     catch{return reply(503,{error:'private_store_unavailable'})}
