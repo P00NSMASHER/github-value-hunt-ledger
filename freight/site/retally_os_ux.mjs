@@ -55,7 +55,7 @@ show=function(tab){
  const target=document.querySelector('.panel[data-tab="'+tab+'"]');
  if(!target)return;
  originalShow(tab);
- for(const b of document.querySelectorAll('[data-tab]')){
+ for(const b of document.querySelectorAll('nav button[data-tab], .mobile-dock button[data-tab]')){
   const on=b.dataset.tab===tab;
   b.classList.toggle('active',on);
   if(on)b.setAttribute('aria-current','page');
@@ -269,5 +269,6 @@ document.addEventListener('keydown',event=>{
   event.preventDefault();show('cases');byId('search').focus();
  }
 });
+byId('see-cases').addEventListener('click',()=>show('cases'));
 show('today');
 `;
