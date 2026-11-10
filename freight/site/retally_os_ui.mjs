@@ -119,7 +119,7 @@ export function renderRetallyOsPage(nonce) {
 <div class="section-head"><h2>Today's overview</h2><span class="section-overline">REAL SIGNALS · NO TEST INFLATION</span></div>
 <div id="metrics" class="grid" aria-label="Business metrics"></div>
 <div class="two">
- <div><div class="section-head"><h2>Recent real inquiries</h2><button type="button" class="mini-link" id="see-cases" onclick="document.querySelector('nav button[data-tab=cases]').click()">View pipeline →</button></div><div class="stack" id="recent"></div></div>
+ <div><div class="section-head"><h2>Recent real inquiries</h2><button type="button" class="mini-link" id="see-cases">View pipeline →</button></div><div class="stack" id="recent"></div></div>
  <div><div class="section-head"><h2>Recommended next actions</h2></div><article class="box"><div id="urgent"></div><div class="banner">Customer and revenue figures exclude QA records. Actions here are private; no messages or posts are sent.</div></article></div>
 </div>
 </section>
