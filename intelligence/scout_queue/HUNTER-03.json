@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 65,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -64,11 +64,11 @@
       "default_branch": "main",
       "description": "Open-source, AI-native social media management, design & scheduling platform for 45+ channels. BYOK AI across 30+ providers with governance guardrails & spend caps, AI Designer + 46 media tools, persisted analytics, cross-channel comment inbox, campaigns, RBAC teams, public API & SDK. Self-hosted: Next.js + NestJS + PostgreSQL, jobs on Inngest.",
       "discovery_query": "social media analytics",
-      "exact_revision": "b59d7ca3656836a8a8c8144dc3cde6a93070d083",
-      "forks": 14,
+      "exact_revision": "87c212e53a483f2641a60ed8e67033bd24b5742e",
+      "forks": 15,
       "primary_language": "TypeScript",
       "published_license_spdx": "AGPL-3.0",
-      "pushed_at": "2026-11-07T04:49:32Z",
+      "pushed_at": "2026-11-10T03:21:48Z",
       "repository": "postmill-ai/postmill-app",
       "root_code_signals": [
         ".github",
@@ -76,8 +76,8 @@
         "dockerfile",
         "package.json"
       ],
-      "size_kb": 65892,
-      "stars": 42,
+      "size_kb": 69131,
+      "stars": 48,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ai",
@@ -126,6 +126,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-03T21:34:32Z",
       "repository": "jntegz/shorthop",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "migrations",
@@ -183,6 +184,7 @@
       "published_license_spdx": "Apache-2.0",
       "pushed_at": "2026-10-22T01:35:16Z",
       "repository": "MSKazemi/reachweaver",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "makefile",
@@ -235,6 +237,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-05T06:40:28Z",
       "repository": "huloglobal/vendure-plugin-visitor-analytics",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -333,6 +336,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-07T05:18:25Z",
       "repository": "alfredang/socialmediapost",
+      "retained_unreviewed": true,
       "root_code_signals": [
         "dockerfile",
         "package.json",
@@ -421,6 +425,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-04T17:46:17Z",
       "repository": "web-frank/utm-keeper",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -462,7 +467,7 @@
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-06T17:30:06Z",
+      "pushed_at": "2026-11-08T03:57:55Z",
       "repository": "ABharadwaj-cell/marketing-ops-mcp",
       "root_code_signals": [
         ".github",
@@ -470,7 +475,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 61,
+      "size_kb": 65,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -493,11 +498,11 @@
       "default_branch": "main",
       "description": "Helping AI labs improve attribution on outbound links (referrer + UTM).",
       "discovery_query": "utm attribution",
-      "exact_revision": "c5c2e337a363c3ed8eb5c94e2811352e087e3966",
+      "exact_revision": "f48dc6e1fd83bf609c561ce7fb2735b745579ed8",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T22:44:27Z",
+      "pushed_at": "2026-11-09T08:08:29Z",
       "repository": "keepthebyte/attribution-now",
       "root_code_signals": [
         ".github",
@@ -505,7 +510,7 @@
         "package.json",
         "test"
       ],
-      "size_kb": 1739,
+      "size_kb": 1700,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -522,6 +527,91 @@
       },
       "triage_score": 43,
       "url": "https://github.com/keepthebyte/attribution-now"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "\ud83d\udcca Ad attribution dashboard: links every WhatsApp lead to the Meta ad creative that brought it and syncs source/UTM to amoCRM. Zero-dependency Python, demo mode.",
+      "discovery_query": "utm attribution",
+      "exact_revision": "01276e31f434b8316dc20d06a811ed3cc4f00608",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-07T12:56:35Z",
+      "repository": "diasayazbai06/crm-ads-analytics-dashboard",
+      "root_code_signals": [
+        "docker-compose.yml",
+        "dockerfile",
+        "tests"
+      ],
+      "size_kb": 205,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "amocrm",
+        "analytics",
+        "crm",
+        "dashboard",
+        "docker",
+        "meta-ads",
+        "python",
+        "sqlite",
+        "webhooks",
+        "whatsapp-api"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 42,
+      "url": "https://github.com/diasayazbai06/crm-ads-analytics-dashboard"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Automate your social media with Handled Agent Skills: guided Facebook onboarding, posting rhythm, approvals, and Social Connect workflows. More platforms coming soon.",
+      "discovery_query": "social media approval workflow",
+      "exact_revision": "b8be6600a9875fa768309d0ea46abf03af0c5ce1",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-10T01:48:00Z",
+      "repository": "lniass/social-skills",
+      "root_code_signals": [
+        "tests"
+      ],
+      "size_kb": 472,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "agent-skills",
+        "ai-agents",
+        "facebook",
+        "marketing-automation",
+        "skills",
+        "social-media",
+        "social-media-automation"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 4,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 42,
+      "url": "https://github.com/lniass/social-skills"
     },
     {
       "archived": false,
@@ -571,6 +661,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T21:11:13Z",
       "repository": "Insightful-Pipe/analytics-cro-skills",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github"
       ],
@@ -646,93 +737,11 @@
       },
       "triage_score": 39,
       "url": "https://github.com/ahsenez/trendboost-ai"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Wix app: HubSpot OAuth, field mapping, two-way contact sync, and Wix Forms lead capture with UTM attribution",
-      "discovery_query": "utm attribution",
-      "exact_revision": "99df2faea8154f28dd6c407428dfdc2ab389dabf",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-11-02T08:04:36Z",
-      "repository": "archiluna04/wix-hubspot-integration",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        "dockerfile",
-        "package.json",
-        "src",
-        "test"
-      ],
-      "size_kb": 109,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 10,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 39,
-      "url": "https://github.com/archiluna04/wix-hubspot-integration"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "AdCopilot for Google Analytics (GA4): traffic and key events by channel, source and campaign, conversion and attribution checks, funnel, retention and realtime reports from your AI client, through the AdCopilot connector. Changes are proposed first and made only on your yes. Made by Atromx Intelligence, not by Google.",
-      "discovery_query": "utm attribution",
-      "exact_revision": "7f0f8a7b6714f63f6386237c33678862293de083",
-      "forks": 0,
-      "primary_language": null,
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T16:38:49Z",
-      "repository": "AtromxIntelligence/adcopilot-google-analytics-plugin",
-      "root_code_signals": [],
-      "size_kb": 63,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "adcopilot",
-        "analytics",
-        "attribution",
-        "conversion-tracking",
-        "conversions",
-        "funnel-analysis",
-        "ga4",
-        "google-analytics",
-        "key-events",
-        "mcp",
-        "realtime",
-        "reports",
-        "retention",
-        "traffic-sources",
-        "utm"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 38,
-      "url": "https://github.com/AtromxIntelligence/adcopilot-google-analytics-plugin"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify lawful platform support, owner-controlled approval, attributable real engagement or inbound leads, and actual conversion; publishing requires separate authorization.",
-  "generated_at": "2026-11-07T06:53:32.057179+00:00",
+  "generated_at": "2026-11-10T04:04:13.156244+00:00",
   "mission": "RETALLY social media: research rights-compliant campaign planning, content QA, platform APIs, audience conversion attribution and credible metrics; no unsolicited posting, scraping, account access or automated engagement.",
   "project": "retally-social-media",
   "risk_review": [],
