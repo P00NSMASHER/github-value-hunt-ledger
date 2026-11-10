@@ -99,7 +99,12 @@ def run(out: Path) -> dict:
                     route.abort()
                     return
                 if req.method == "GET" and url.query == "":
-                    route.fulfill(status=200, content_type="text/html; charset=utf-8", body=html)
+                    route.fulfill(status=200, content_type="text/html; charset=utf-8", body=html,
+                                  headers={"Content-Security-Policy":
+                                   "default-src 'none'; script-src 'nonce-visual-synthetic-nonce'; "
+                                   "style-src 'nonce-visual-synthetic-nonce'; connect-src 'self'; "
+                                   "form-action 'none'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'; "
+                                   "upgrade-insecure-requests"})
                     return
                 if req.method == "GET" and url.query == "view=data":
                     route.fulfill(status=200, content_type="application/json",
@@ -154,9 +159,11 @@ def run(out: Path) -> dict:
             page.on("pageerror", lambda err: problems.append(str(err)))
             page.on("console", lambda msg: problems.append(msg.text) if msg.type == "error" else None)
             page.goto(URL, wait_until="domcontentloaded")
-            page.locator("#sync-time").get_by_text("Synced").wait_for()
+            page.wait_for_function("document.getElementById('sync-time').textContent.startsWith('Synced')")
             assert page.locator("#metrics .tile").count() == 4
-            assert page.locator("#metrics .tile").first.inner_text().find("2") >= 0
+            assert '2' in page.locator('#metrics .tile').first.inner_text()
+            assert '1' in page.locator('#metrics .tile').nth(2).inner_text()
+            assert '1' in page.locator('#metrics .tile').nth(3).inner_text()
             assert page.locator("#recent article").count() == 2, "QA fixture must be excluded from real summary"
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+1")
             assert page.locator("#mobile-dock").is_visible() == (width <= 760)
@@ -178,6 +185,9 @@ def run(out: Path) -> dict:
                 page.locator("#mobile-dock button[data-tab=tasks]").click()
                 assert page.locator("#task-list article[data-task-id]:visible").count() == 1
                 page.screenshot(path=str(out / "iphone-followups.png"), full_page=True)
+                page.locator('#task-filters button[data-filter=test]').click()
+                assert page.locator('#task-list article[data-task-id]:visible').count() == 1
+                page.locator('#task-filters button[data-filter=open]').click()
             if width == 1440:
                 page.locator('nav button[data-tab=cases]').click()
                 assert page.locator("#case-list article[data-ref]:visible").count() == 2
@@ -196,6 +206,8 @@ def run(out: Path) -> dict:
                 page.locator("#draft-body").fill("This is a synthetic draft kept private.")
                 page.locator("#new-draft").click()
                 assert any(x["action"] == "save_draft" for x in posts)
+                page.locator('#drafts .draft').first.get_by_role('button',name='Mark reviewed').click()
+                assert any(x['action'] == 'review_draft' for x in posts)
                 assert all(x["action"] in {"save_task","save_case","save_draft","review_draft"} for x in posts)
                 page.screenshot(path=str(out / "desktop-content.png"), full_page=True)
             results.append({"width": width, "tabs": 7, "kpis": 4,
