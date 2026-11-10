@@ -20,6 +20,36 @@
     Object.fromEntries(Object.entries(campaignContext).filter(([, value]) => value))
   );
 
+  // Non-identifying intent signals. These are browser-reported interactions,
+  // never verified human visitors, qualified leads, email sends, or revenue.
+  // Durable inquiries are counted independently in the protected D1 ledger.
+  const reportingHost = ["www.retallyrecovery.com", "retallyrecovery.com"].includes(window.location.hostname);
+  const referrerHost = (() => {
+    try { return new URL(document.referrer).hostname.toLowerCase(); }
+    catch (_error) { return ""; }
+  })();
+  const campaignName = (nonEmptyCampaignContext.utm_campaign || "").toLowerCase();
+  const intentOffer = /founding/.test(campaignName) ? "founding"
+    : /second[-_ ]?look/.test(campaignName) ? "second_look" : "general";
+  const intentChannel = Object.keys(nonEmptyCampaignContext).length ? "campaign"
+    : /(^|\\.)(google|bing|yahoo|duckduckgo|ecosia|brave)\\./.test(referrerHost) ? "organic_search"
+    : referrerHost && referrerHost !== window.location.hostname ? "referral" : "direct";
+  const intentAlreadySent = new Set();
+  const reportIntent = (eventName) => {
+    if (!reportingHost || navigator.webdriver === true) return;
+    if (!["freight_free_audit_cta_clicked", "freight_audit_form_started", "freight_audit_request_prepared"].includes(eventName)) return;
+    // At most one client-reported event per tab and type, even across pages.
+    const storageKey = "retally_funnel_20261110_" + eventName;
+    if (intentAlreadySent.has(storageKey)) return;
+    try { if (sessionStorage.getItem(storageKey)) return; sessionStorage.setItem(storageKey, "1"); }
+    catch (_error) { /* In-memory deduplication is retained when storage is blocked. */ }
+    intentAlreadySent.add(storageKey);
+    const body = JSON.stringify({event:eventName, channel:intentChannel, offer:intentOffer});
+    fetch("/api/funnel", {method:"POST", headers:{"Content-Type":"application/json"},
+      body, credentials:"same-origin", cache:"no-store", keepalive:true})
+      .catch(() => { /* No impact on audit form availability or completion. */ });
+  };
+
   // Preserve acquisition attribution when a visitor follows a first-party
   // educational-page link to the free-audit form. Never tag offsite links or
   // downloads, and never overwrite a destination's existing campaign value.
@@ -86,9 +116,10 @@
     controlled_demo_downloaded: EVENTS.controlledDemoDownloaded
   });
   for (const item of all("[data-track]")) {
-    item.addEventListener("click", () => {
+    item.addEventListener("click", (event) => {
       const eventName = eventForTrackName[item.dataset.track];
       if (eventName) track(eventName, { placement: item.closest("section")?.id || "header" });
+      if (event.isTrusted && eventName === EVENTS.freeAuditCtaClicked) reportIntent(eventName);
     });
   }
 
@@ -157,10 +188,23 @@
     // Default remains the established email fallback. Only the verified backend
     // can opt a client into direct submission, and disabling it rolls clients back.
     if (["www.retallyrecovery.com", "retallyrecovery.com"].includes(window.location.hostname)) {
-      fetch("/api/inquiry", { cache: "no-store", credentials: "same-origin" })
-        .then(async (response) => response.ok ? response.json() : null)
-        .then((status) => {
-          if (!status?.online || !/^[a-zA-Z0-9_-]{10,}$/.test(status.siteKey)) return;
+      const checkSecureIntake = async (attempt = 0) => {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 4500);
+        let status = null;
+        try {
+          const response = await fetch("/api/inquiry", {
+            cache: "no-store", credentials: "same-origin", signal: controller.signal
+          });
+          if (response.ok) status = await response.json();
+        } catch (_error) { /* A probe failure must never create a false receipt. */ }
+        finally { window.clearTimeout(timeout); }
+        if (!status?.online || !/^[a-zA-Z0-9_-]{10,}$/.test(status.siteKey)) {
+          if (attempt === 0) window.setTimeout(() => checkSecureIntake(1), 350);
+          else if (submitHint) submitHint.textContent =
+            "Online receipt is not confirmed. The email option opens a draft; review it and press Send.";
+          return;
+        }
           serverReady = true;
           if (fallbackLink) fallbackLink.hidden = false;
           if (submitButton) submitButton.textContent = "Submit My Free Audit Request";
@@ -182,8 +226,8 @@
             if (submitHint) submitHint.textContent = "Opens an email draft. Review it and press Send.";
           });
           document.head.appendChild(script);
-        })
-        .catch(() => { /* Offline/unconfigured: preserve working mailto method. */ });
+      };
+      checkSecureIntake();
     }
 
     const markStarted = () => {
@@ -191,7 +235,10 @@
       formStarted = true;
       track(EVENTS.auditFormStarted);
     };
-    auditForm.addEventListener("input", markStarted, { once: true });
+    auditForm.addEventListener("input", (event) => {
+      markStarted();
+      if (event.isTrusted) reportIntent(EVENTS.auditFormStarted);
+    }, { once: true });
 
     const valuesFor = (name) => all(`input[name='${name}']:checked`, auditForm).map((field) => field.value);
     const fieldValue = (id) => byId(id)?.value.trim() || "";
@@ -292,6 +339,7 @@
       // An email draft is not a received lead. Only durable D1 acceptance may
       // emit the form-completed conversion event.
       track(EVENTS.auditRequestPrepared, { reference, deliveryConfirmed: false });
+      reportIntent(EVENTS.auditRequestPrepared);
       // Keep the mail app handoff inside the visitor's click/submit gesture.
       // Mobile browsers may suppress deferred mailto navigation.
       window.location.href = sendLink.href;
