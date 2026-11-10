@@ -34,6 +34,12 @@ test("denies cross-origin, forged sec-fetch and arbitrary events",async()=>{
   ]) assert.notEqual((await onRequestPost({request,env})).status,204);
   assert.equal(calls.length,0);
 });
+test("bounds aggregate write amplification without creating identities",async()=>{
+  calls.length=0;
+  assert.equal((await onRequestPost({request:req(valid),env})).status,204);
+  assert.match(calls[0].sql,/marketing_funnel_daily\\.interactions < 250/);
+  assert.ok(!/ip|email|user_agent/i.test(calls[0].sql));
+});
 test("does not count known audits, automation or bad bot scores",async()=>{
   calls.length=0;
   for(const ua of ["RETALLY-Public-Release-Audit/1.0","HeadlessChrome/143","CaptureBrief-release-readonly/1.0"])
