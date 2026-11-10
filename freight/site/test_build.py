@@ -358,7 +358,7 @@ class PublicBuildTests(unittest.TestCase):
                 "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem-approved.png",
             )
             self.assertIn("Freight Invoice Audit &amp; Overcharge Recovery | RETALLY", index)
-            self.assertIn("Freight invoice audit and overcharge recovery for U.S. businesses.", index)
+            self.assertIn("Freight invoice audit for U.S. distributors and multi-location shippers.", index)
             self.assertNotIn("address", org)
             self.assertEqual(service["provider"]["@id"], org["@id"])
             self.assertEqual(service["areaServed"]["name"], "United States")
@@ -460,7 +460,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             self.assertIn('site.css?v=free-audit-contingency-v5', page)
             self.assertIn('commercial-config.js?v=free-audit-contingency-v5', page)
-            self.assertIn('site.js?v=free-audit-contingency-v5', page)
+            self.assertIn('site.js?v=qualified-funnel-20261110', page)
             self.assertIn('id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000"', page)
             self.assertIn('<dd id="actualRecoveredDisplay">$100,000</dd>', page)
             self.assertNotIn('value="50000"', page)
