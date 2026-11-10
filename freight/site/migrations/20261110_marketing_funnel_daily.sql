@@ -1,6 +1,7 @@
+-- v2 adds browser landing events. Original empty prototype table is preserved in production.
 -- Browser-intent COUNTS ONLY. Never store IPs, contact fields, URLs, user-agent strings or raw UTM values.
 -- Events are self-reported browser interactions, NOT verified people, qualified leads, or revenue.
-CREATE TABLE IF NOT EXISTS marketing_funnel_daily (
+CREATE TABLE IF NOT EXISTS marketing_funnel_daily_v2 (
   day_utc TEXT NOT NULL CHECK (length(day_utc)=10),
   event TEXT NOT NULL CHECK (event IN ('freight_landing_viewed','freight_free_audit_cta_clicked','freight_audit_form_started','freight_audit_request_prepared')),
   channel TEXT NOT NULL CHECK (channel IN ('direct','organic_search','referral','campaign')),
