@@ -62,11 +62,11 @@ export async function onRequestPost({request, env}) {
   try {
     const day=new Date().toISOString().slice(0,10);
     const saved=await env.INQUIRY_DB.prepare(
-      "INSERT INTO marketing_funnel_daily(day_utc,event,channel,offer,interactions) VALUES(?,?,?,?,1) " +
+      "INSERT INTO marketing_funnel_daily_v2(day_utc,event,channel,offer,interactions) VALUES(?,?,?,?,1) " +
       // Bound daily D1 *row writes* even if a client spoofs browser headers.
       // 4 events × 4 channels × 3 offers × 250 = at most 12,000 writes/day.
       "ON CONFLICT(day_utc,event,channel,offer) DO UPDATE SET interactions=interactions+1 " +
-      "WHERE marketing_funnel_daily.interactions < 250"
+      "WHERE marketing_funnel_daily_v2.interactions < 250"
     ).bind(day,p.event,p.channel,p.offer).run();
     return saved?.success === true ? respond(204, null) : respond(503, {ok:false});
   } catch {return respond(503, {ok:false});}
