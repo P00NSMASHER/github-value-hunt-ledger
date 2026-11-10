@@ -144,6 +144,7 @@ footer{margin-top:46px;padding-top:20px;border-top:1px solid #284155;color:#819a
  .more-sheet.open{display:grid;gap:7px}
  .more-sheet button{width:100%;text-align:left;background:#1b3248;border-radius:12px;padding:13px}
  .more-sheet h3{padding:8px 9px 4px}
+ .more-sheet .header-link{display:block;text-align:center;color:#bdeee5;border:1px solid #3a5566;border-radius:11px;margin:3px 0 0;padding:12px;text-decoration:none;font-weight:650}
  .page-heading{margin-bottom:18px;display:block}
  .sync-indicator{display:inline-flex;margin-top:15px}
  .grid{gap:10px}
