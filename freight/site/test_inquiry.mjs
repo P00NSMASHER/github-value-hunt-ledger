@@ -377,13 +377,17 @@ test("retally campaign navigation leaves direct and untagged traffic unchanged",
 test("online form waits for sequential Turnstile and Resend before declaring the receipt uncertain", () => {
   const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
   const backend = readFileSync(new URL("../../functions/api/inquiry.js", import.meta.url), "utf8");
-  const clientTimeout = front.match(/window\.setTimeout\(\(\) => controller\.abort\(\), (\d+)\)/);
-  assert.ok(clientTimeout, "The online form must have a bounded fetch deadline");
+  const clientTimeouts = [...front.matchAll(/window\.setTimeout\(\(\) => controller\.abort\(\), (\d+)\)/g)]
+    .map(match => Number(match[1]));
+  assert.ok(clientTimeouts.length >= 2, "Both online-availability and POST requests need bounded deadlines");
+  assert.ok(clientTimeouts.some(value => value <= 5000),
+    "The GET availability probe must not block the visitor for the full submission budget");
+  const submissionTimeout = Math.max(...clientTimeouts);
   const providerTimeouts = [...backend.matchAll(/AbortSignal\.timeout\((\d+)\)/g)]
     .map(x => Number(x[1]));
   assert.deepEqual(providerTimeouts.sort((a,b) => a-b), [7000,9000],
     "Review the client budget if upstream deadlines change");
-  assert.ok(Number(clientTimeout[1]) >= providerTimeouts.reduce((x,y) => x+y,0)+8000,
+  assert.ok(submissionTimeout >= providerTimeouts.reduce((x,y) => x+y,0)+8000,
     "Wait for sequential provider deadlines plus database and transport margin");
   assert.match(front, /error\?\.name === "AbortError"/);
   assert.match(front, /Your request may already be saved/);
@@ -407,4 +411,40 @@ test("exhausted per-IP buckets stop writing without permitting further requests"
     assert.equal(db.limitWrites.length,10,"no additional writes after the fifth attempt");
     assert.deepEqual([...db.limits.values()].sort((a,b)=>a-b),[5,5]);
   } finally {remote.restore();}
+});
+
+// Browser-source contract: an availability GET is not a customer submission.
+test("secure-intake availability GET never displays a submission receipt", async () => {
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const start = front.indexOf("const checkSecureIntake = async");
+  const finish = front.indexOf("      checkSecureIntake();", start);
+  assert.ok(start >= 0 && finish > start, "Availability probe must exist");
+  const hint = {textContent: "Opens an email draft. Review it and press Send."};
+  const submitButton = {textContent: "Open My Free Audit Request"};
+  const calls = [];
+  const context = {
+    window: {setTimeout: () => 1, clearTimeout() {}},
+    document: {
+      createElement: () => ({dataset: {}, addEventListener() {}}),
+      head: {appendChild() {}}
+    },
+    fetch: async (url, options = {}) => {
+      calls.push({url, method: options.method || "GET"});
+      return {ok: true, json: async () => ({online: true, siteKey: "syntheticSiteKey12345"})};
+    },
+    AbortController, serverReady: false,
+    fallbackLink: {hidden: true}, submitButton, submitHint: hint,
+    formError: {before() {}}
+  };
+  const probe = front.slice(start, finish);
+  const ready = await runInNewContext(
+    "(async () => {" + probe + "\nawait checkSecureIntake(); return serverReady;})()",
+    context, {timeout: 2000}
+  );
+  assert.equal(ready, true);
+  assert.deepEqual(calls, [{url: "/api/inquiry", method: "GET"}]);
+  assert.equal(submitButton.textContent, "Submit My Free Audit Request");
+  assert.match(hint.textContent, /form available/i);
+  assert.match(hint.textContent, /nothing has been sent yet/i);
+  assert.doesNotMatch(hint.textContent, /submitted securely|request received|receipt confirmed/i);
 });
