@@ -412,3 +412,39 @@ test("exhausted per-IP buckets stop writing without permitting further requests"
     assert.deepEqual([...db.limits.values()].sort((a,b)=>a-b),[5,5]);
   } finally {remote.restore();}
 });
+
+// Browser-source contract: an availability GET is not a customer submission.
+test("secure-intake availability GET never displays a submission receipt", async () => {
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const start = front.indexOf("const checkSecureIntake = async");
+  const finish = front.indexOf("      checkSecureIntake();", start);
+  assert.ok(start >= 0 && finish > start, "Availability probe must exist");
+  const hint = {textContent: "Opens an email draft. Review it and press Send."};
+  const submitButton = {textContent: "Open My Free Audit Request"};
+  const calls = [];
+  const context = {
+    window: {setTimeout: () => 1, clearTimeout() {}},
+    document: {
+      createElement: () => ({dataset: {}, addEventListener() {}}),
+      head: {appendChild() {}}
+    },
+    fetch: async (url, options = {}) => {
+      calls.push({url, method: options.method || "GET"});
+      return {ok: true, json: async () => ({online: true, siteKey: "syntheticSiteKey12345"})};
+    },
+    AbortController, serverReady: false,
+    fallbackLink: {hidden: true}, submitButton, submitHint: hint,
+    formError: {before() {}}
+  };
+  const probe = front.slice(start, finish);
+  const ready = await runInNewContext(
+    "(async () => {" + probe + "\nawait checkSecureIntake(); return serverReady;})()",
+    context, {timeout: 2000}
+  );
+  assert.equal(ready, true);
+  assert.deepEqual(calls, [{url: "/api/inquiry", method: "GET"}]);
+  assert.equal(submitButton.textContent, "Submit My Free Audit Request");
+  assert.match(hint.textContent, /form available/i);
+  assert.match(hint.textContent, /nothing has been sent yet/i);
+  assert.doesNotMatch(hint.textContent, /submitted securely|request received|receipt confirmed/i);
+});

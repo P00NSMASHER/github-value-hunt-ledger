@@ -221,7 +221,7 @@
           serverReady = true;
           if (fallbackLink) fallbackLink.hidden = false;
           if (submitButton) submitButton.textContent = "Submit My Free Audit Request";
-          if (submitHint) submitHint.textContent = "Submitted securely to RETALLY. No freight files or credentials, please.";
+          if (submitHint) submitHint.textContent = "Secure form available. Complete the form and press Submit My Free Audit Request; nothing has been sent yet.";
           const widget = document.createElement("div");
           widget.id = "auditTurnstile";
           widget.className = "cf-turnstile";
