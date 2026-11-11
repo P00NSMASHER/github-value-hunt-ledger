@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 17,
+    "api_requests": 19,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -8,7 +8,7 @@
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 5,
+  "candidate_count": 6,
   "candidates": [
     {
       "archived": false,
@@ -59,6 +59,62 @@
       },
       "triage_score": 52,
       "url": "https://github.com/hugo-kte/secure-mlops-pipeline"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Layered, DANE/TLSA-inspired trust model for CI supply-chain (GitHub Actions) pinning: trust-anchor + provenance/key + leaf-exact layers, vs flat recursive SHA-pinning.",
+      "discovery_query": "CI supply chain provenance attestation",
+      "exact_revision": "85118a8c854d4a3460d658b0bd2d3de47241f0dc",
+      "forks": 0,
+      "primary_language": "Just",
+      "published_license_spdx": "MPL-2.0",
+      "pushed_at": "2026-10-31T18:40:41Z",
+      "repository": "hyperpolymath/action-trust-layers",
+      "root_code_signals": [
+        ".github",
+        "cargo.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 240,
+      "stars": 3,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "attestation",
+        "ci-security",
+        "compliance-automation",
+        "dane",
+        "dependency-pinning",
+        "epistemic-computing",
+        "epistemic-infrastructure",
+        "equivalence-aware-computing",
+        "explicit-trust",
+        "github-actions",
+        "hyperpolymath",
+        "open-source",
+        "policy-as-code",
+        "provable-governance",
+        "rust",
+        "slsa",
+        "supply-chain-security",
+        "tlsa",
+        "typed-provenance",
+        "veridical-computing"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 2,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 51,
+      "url": "https://github.com/hyperpolymath/action-trust-layers"
     },
     {
       "archived": false,
@@ -156,7 +212,7 @@
         "tests"
       ],
       "size_kb": 90,
-      "stars": 8,
+      "stars": 7,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
       "triage_components": {
@@ -186,7 +242,7 @@
       "repository": "Cashcoin123/Cashcoin123",
       "root_code_signals": [],
       "size_kb": 3,
-      "stars": 4,
+      "stars": 6,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "config",
@@ -209,7 +265,7 @@
   ],
   "catalogs": [],
   "evidence_gate": null,
-  "generated_at": "2026-11-05T02:22:53.089108+00:00",
+  "generated_at": "2026-11-11T21:05:45.241408+00:00",
   "mission": "Portfolio Brain autonomous repair reliability, protected PR execution, exact-head trust and independent release evidence",
   "project": "portfolio-brain",
   "risk_review": [],
@@ -227,7 +283,7 @@
     },
     {
       "query": "CI supply chain provenance attestation",
-      "returned": 3
+      "returned": 4
     },
     {
       "query": "github PR merge gate security automation",
