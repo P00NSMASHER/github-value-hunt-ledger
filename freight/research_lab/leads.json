@@ -12685,6 +12685,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-11-11",
+      "id": "f357b96e1e84f3675b8c8968478f6d25f058cde675b09c5725a4a68e94bc73b0",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/karyateja/freight_invoice_audit"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "f3927d4044077c86716e0f96d39bc580b7565cf75a3e2a4b0fdf3cd3ddc7b2a4",
       "independent_ground_truth": false,
@@ -13401,6 +13417,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "442b7a15f5d7f919ef7ce82397a571c8d1eb16a2be58865575fc596934855e73",
+  "entries_sha256": "8491e758305522110be1d65905acb5f515011ef8463a4b0202010d46dfa027db",
   "schema_version": 1
 }

@@ -179,6 +179,31 @@
       "case_id": null,
       "commercial_reuse_authorized": false,
       "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-11-11",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "f357b96e1e84f3675b8c8968478f6d25f058cde675b09c5725a4a68e94bc73b0",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/karyateja/freight_invoice_audit",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
       "first_seen": "2026-11-10",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -6634,7 +6659,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "9b96e448ad31114b955fbb1f2868e957992452300938ad27edd5cfc9e0e7a536",
+  "feed_sha256": "24cc9e16647a3690459bc7768c1fec67557004c7057ffb447c51dac4993e357f",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -6646,12 +6671,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 265,
-  "source_pointers_total": 265,
+  "selected_for_synthetic_proof_gate": 266,
+  "source_pointers_total": 266,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
     "lab15_evidence_metadata_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4f7543e5d3edaa8cb038bf8",
-    "unified_entries_sha256": "442b7a15f5d7f919ef7ce82397a571c8d1eb16a2be58865575fc596934855e73"
+    "unified_entries_sha256": "8491e758305522110be1d65905acb5f515011ef8463a4b0202010d46dfa027db"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 11,
   "verified_recovered_cash_cents": 0
