@@ -9080,6 +9080,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-11-11",
+      "id": "af5241c2e8f6df7d13d9fe2379e8e267dbfc7fcf30a11724ee8a8fdc5e295c21",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/rcbowlin1/invoice-recon-evals"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "freightrecovery"
       ],
       "first_seen": "2026-10-24",
@@ -13385,6 +13401,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "86d5e7c30d0dfa5a78b0f48d5e9d53d196ca8985620ba864c6461f762b2c6960",
+  "entries_sha256": "442b7a15f5d7f919ef7ce82397a571c8d1eb16a2be58865575fc596934855e73",
   "schema_version": 1
 }
