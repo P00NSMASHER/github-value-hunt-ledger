@@ -5639,6 +5639,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-12",
+      "id": "696b6fb30b3505ef8df49288843e928a20faeb7736fb50d5e784afcacbc7135e",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/getbeton/selltostate-ts"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -13433,6 +13449,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "a33a4a2a7b90c1ba85bd647eef2f6b58ddba513fadc2b4fcee110f08a1bbf669",
+  "entries_sha256": "7a8507cf24e36c72715f5b5a49acc2c4c62a4ca3df2a9c97fc3a24d72678faf2",
   "schema_version": 1
 }
