@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-11",
+  "as_of_utc_date": "2026-11-12",
   "buyer_opportunity_ground_truth": false,
   "external_customer_contacts": 0,
   "independent_issuance_outcome_labels": 0,
@@ -20,18 +20,16 @@
   "readback_exact_match": 3,
   "readback_missing": 0,
   "readback_unavailable": 0,
-  "receipt_sha256": "276c2662ce94f55159a00a8bd3972382cc4b9df7fdbf983b40c527f23b0e0922",
-  "sample_canonical_sha256": "5d758ea727d5f73826e76db25527ac03db518ac6f30671cef738f3e3af4233f7",
+  "receipt_sha256": "286884a26d2908ec00c01ad694d9205459b2d451a802c2a707d631ce3ab7e60b",
+  "sample_canonical_sha256": "9e3bde7f9160e64b9ab24273a1af03f24ce0096cae42ec404a961ce9f0773b1d",
   "sample_count": 20,
   "sample_original_rows_stored": 0,
-  "sample_repeated_source_rows": 4,
-  "sample_unique_source_identities": 16,
+  "sample_repeated_source_rows": 0,
+  "sample_unique_source_identities": 20,
   "schema_version": 1,
   "scope": "ORIGINAL_NYC_PERMIT_SOURCE_READBACK_NOT_INDEPENDENT_OUTCOME",
-  "source_errors": [
-    "DUPLICATE_SOURCE_IDENTITIES"
-  ],
+  "source_errors": [],
   "source_specific_commercial_license_verified": false,
-  "status": "PUBLISHER_REPLAY_DEGRADED",
+  "status": "PUBLISHER_REPLAY_OK",
   "user_commercial_reuse_attestation": "OWNER_ATTESTED_NOT_SOURCE_VERIFIED"
 }
