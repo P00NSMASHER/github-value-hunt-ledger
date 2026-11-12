@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 67,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -15,13 +15,12 @@
       "default_branch": "main",
       "description": "Walk-forward volatility forecasting (GARCH, HAR, LightGBM) and VaR / Expected Shortfall backtesting for Nifty 50 stocks, with an API, dashboard and a grounded Q&A assistant",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "ec57c0dd337457dba35ffe3599f8d4439a49f581",
+      "exact_revision": "5f0cb526c28632ae0f3fec473c272b0df5bc7420",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T19:43:25Z",
+      "pushed_at": "2026-11-12T20:28:36Z",
       "repository": "tarubee19/vol-var-india",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "app",
@@ -32,7 +31,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 7433,
+      "size_kb": 7620,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -61,6 +60,52 @@
     },
     {
       "archived": false,
+      "default_branch": "master",
+      "description": "Algorithmic trading research and execution platform for futures \u2014 test a strategy against real market data bar by bar, replay the tape as it happened, and follow it live.",
+      "discovery_query": "market data replay",
+      "exact_revision": "7c55381699ac9f9f2fc417d151fc7c5b5c74f681",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "NOASSERTION",
+      "pushed_at": "2026-11-12T18:46:55Z",
+      "repository": "wealthwise-advisors/trading-platform",
+      "root_code_signals": [
+        ".github",
+        "docker-compose.yml",
+        "dockerfile",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 13071,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "algorithmic-trading",
+        "backtesting-engine",
+        "market-data-analysis",
+        "quantitative-finance-",
+        "rithmic",
+        "schwab-api",
+        "technical-analysis",
+        "trading-strategies"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 15,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 54,
+      "url": "https://github.com/wealthwise-advisors/trading-platform"
+    },
+    {
+      "archived": false,
       "default_branch": "main",
       "description": "Honest-by-construction AI strategy lab for crypto futures: describe a target, an agent writes the strategy, a Rust engine backtests it, and walk-forward plus a fenced holdout decide if it counts. macOS app + MCP server.",
       "discovery_query": "walk forward backtesting",
@@ -70,6 +115,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-07T06:41:41Z",
       "repository": "pulseai-labs/pulse-trader",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -118,6 +164,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T06:27:19Z",
       "repository": "0xArchiveIO/sdk-typescript",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -205,7 +252,7 @@
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-03T04:12:25Z",
+      "pushed_at": "2026-11-08T04:45:29Z",
       "repository": "open-meridian/plugin-tradier",
       "root_code_signals": [
         ".github",
@@ -400,13 +447,51 @@
     {
       "archived": false,
       "default_branch": "main",
+      "description": "Zero-cost quantitative research & risk workstation in Python/Streamlit (14 modules): zero-lookahead features, econometrics (ARIMA/GARCH/VAR/Kalman), ML & PyTorch forecasting, HMM regimes, Black-Litterman/Risk Parity/CVaR optimization, walk-forward backtesting with slippage & transaction costs, and Monte Carlo stress testing.",
+      "discovery_query": "slippage backtest",
+      "exact_revision": "059eb74eab5537bdb3dfc1a5224ba7bca94ad4e0",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-11T13:57:39Z",
+      "repository": "yashi-2004/quantedge",
+      "root_code_signals": [
+        ".github",
+        "app",
+        "docker-compose.yml",
+        "dockerfile",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 572,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 17,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 0
+      },
+      "triage_score": 50,
+      "url": "https://github.com/yashi-2004/quantedge"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "d8ad3c7de741b5384a837c42b683b1c561183212",
+      "exact_revision": "832ce824e709d4ebae09654affad0b42fbde9ed0",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T06:36:04Z",
+      "pushed_at": "2026-11-12T21:20:45Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -416,7 +501,7 @@
         "src",
         "test"
       ],
-      "size_kb": 77006,
+      "size_kb": 83154,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -659,100 +744,11 @@
       },
       "triage_score": 47,
       "url": "https://github.com/anusharama100/marketpulse"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Forecasting hourly MISO grid demand and benchmarking it against the grid operator's own day ahead forecast. EIA API, Open-Meteo, walk forward backtest.",
-      "discovery_query": "walk forward backtesting",
-      "exact_revision": "d50197c95dc61022eef74077f1c3c749531b43c4",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T19:11:13Z",
-      "repository": "austi20/miso-demand-forecaster",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "src",
-        "tests"
-      ],
-      "size_kb": 354,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "data-science",
-        "eia",
-        "electricity",
-        "energy",
-        "forecasting",
-        "mlops",
-        "pandas",
-        "python",
-        "time-series"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 9,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 47,
-      "url": "https://github.com/austi20/miso-demand-forecaster"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Open-source Python toolkit for quantitative research on Borsa Istanbul (BIST): data, features, walk-forward backtesting, risk/portfolio, backtest robustness (CPCV/PBO), diagnostics, reports, paper-trading bridge.",
-      "discovery_query": "walk forward trading backtest python open source",
-      "exact_revision": "27a690bb1073c43bf1145eae82c1545567a00482",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T13:45:42Z",
-      "repository": "HaasEnjoyer/quanttro",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 260,
-      "stars": 2,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "algorithmic-trading",
-        "backtesting",
-        "bist",
-        "overfitting",
-        "portfolio-optimization",
-        "prop-firm",
-        "python",
-        "quantitative-finance",
-        "risk-management"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 2,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/HaasEnjoyer/quanttro"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T08:21:22.655317+00:00",
+  "generated_at": "2026-11-12T21:26:41.971186+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
