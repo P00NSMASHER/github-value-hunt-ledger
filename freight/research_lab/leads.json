@@ -2040,6 +2040,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-11-12",
+      "id": "240003eb245803f9ef01bba4d263e2631e217f61a6908d460d007423d5d84818",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/wholetherapi/nw612-audit-mirror"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-24",
       "id": "24420a8823047136a72dc00285b40dbc717f8e33d2b8cf1fa04aa1bfc8763024",
       "independent_ground_truth": false,
@@ -13417,6 +13433,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "8491e758305522110be1d65905acb5f515011ef8463a4b0202010d46dfa027db",
+  "entries_sha256": "a33a4a2a7b90c1ba85bd647eef2f6b58ddba513fadc2b4fcee110f08a1bbf669",
   "schema_version": 1
 }
