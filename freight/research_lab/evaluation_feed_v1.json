@@ -182,6 +182,31 @@
       "first_seen": "2026-11-13",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
+      "lead_id": "7c60279af214314c373c0dcf9e87a1abb7455d68dbb42647b0c147fc4b67af95",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "github.com",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://github.com/knobbyintens/freight-reconciliation",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-11-13",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
       "lead_id": "97e31222fba241e51af4b4d9fc2614e7f14238c68cab03acec48eb8c1698fd31",
       "model": {
         "evidence_status": "REVIEW_REQUIRED",
@@ -6709,7 +6734,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "ba7943a071efe7cb22073140b8ab412e52e1d825619b76c263ce0f969669347d",
+  "feed_sha256": "bf66e808855f71b9881dc638aa65603462308fadec9cc03cd7b84bfe894e8e2f",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -6721,12 +6746,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 268,
-  "source_pointers_total": 268,
+  "selected_for_synthetic_proof_gate": 269,
+  "source_pointers_total": 269,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
     "lab15_evidence_metadata_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4f7543e5d3edaa8cb038bf8",
-    "unified_entries_sha256": "c0698afa478d15277faaba0ed30425ab6c6c25abf5e39c47cf64c2452f063e52"
+    "unified_entries_sha256": "2f54a319a66e7d015c75d709d3aa0e883204459b052f29662f3c00348ff9d8b5"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 11,
   "verified_recovered_cash_cents": 0
