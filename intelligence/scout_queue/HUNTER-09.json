@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 28,
+    "api_requests": 30,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -8,7 +8,7 @@
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 11,
+  "candidate_count": 12,
   "candidates": [
     {
       "archived": false,
@@ -62,20 +62,72 @@
     {
       "archived": false,
       "default_branch": "main",
-      "description": "PG Arcade \u2014 jogos web em React/TypeScript, modos solo e local, acessibilidade, PWA e progresso no navegador.",
+      "description": "Mobile-first weather app that answers questions: when to run or dry the laundry, how sure the forecast is, and whether today is normal. SvelteKit, Svelte 5, Tailwind CSS 4, Open-Meteo, five languages.",
       "discovery_query": "playwright mobile accessibility PWA",
-      "exact_revision": "39b787a1a3ea2296001791caa49a0fea1a4c21c5",
+      "exact_revision": "5f1502014eaaa3578b2dfe5c62151ef42697d883",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-03T04:45:05Z",
+      "pushed_at": "2026-11-13T10:45:55Z",
+      "repository": "AkosKappel/SkySense",
+      "root_code_signals": [
+        ".github",
+        "package.json",
+        "src"
+      ],
+      "size_kb": 3987,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "accessibility",
+        "i18n",
+        "leaflet",
+        "open-meteo",
+        "paraglide",
+        "playwright",
+        "portfolio",
+        "pwa",
+        "svelte",
+        "svelte5",
+        "sveltekit",
+        "tailwindcss",
+        "typescript",
+        "vercel",
+        "vitest",
+        "weather",
+        "weather-app"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 7,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 45,
+      "url": "https://github.com/AkosKappel/SkySense"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "PG Arcade \u2014 jogos web em React/TypeScript, modos solo e local, acessibilidade, PWA e progresso no navegador.",
+      "discovery_query": "playwright mobile accessibility PWA",
+      "exact_revision": "b17fa1531ab0cf326cd01fc52f16c060ac7d1cb9",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-09T10:11:01Z",
       "repository": "pabloguilherme1121/PG-Arcade",
       "root_code_signals": [
         ".github",
         "package.json",
         "src"
       ],
-      "size_kb": 3662,
+      "size_kb": 3788,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -112,13 +164,13 @@
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-02T15:08:47Z",
+      "pushed_at": "2026-11-12T22:06:43Z",
       "repository": "jf1shh/agentic-app-harness",
       "root_code_signals": [
         ".github",
         "package.json"
       ],
-      "size_kb": 20184,
+      "size_kb": 20904,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -258,7 +310,7 @@
       "repository": "jettbrains/-L-",
       "root_code_signals": [],
       "size_kb": 31,
-      "stars": 169,
+      "stars": 170,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
       "triage_components": {
@@ -441,7 +493,7 @@
   ],
   "catalogs": [],
   "evidence_gate": null,
-  "generated_at": "2026-11-04T10:51:05.288131+00:00",
+  "generated_at": "2026-11-13T10:54:16.998384+00:00",
   "mission": "ABVM offline-first PWA reliability, accessibility, iOS layout and real browser regression tests",
   "project": "abvm",
   "risk_review": [],
@@ -459,7 +511,7 @@
     },
     {
       "query": "playwright mobile accessibility PWA",
-      "returned": 4
+      "returned": 5
     },
     {
       "query": "javascript offline education app test",
