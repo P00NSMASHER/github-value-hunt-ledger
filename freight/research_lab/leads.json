@@ -1428,6 +1428,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-14",
+      "id": "194ef7cef08080edde89dfc2c5274f8de9110510620c345fb49e244c055be8fb",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/Usman245/forreghtp-demo"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -13529,6 +13545,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "2f54a319a66e7d015c75d709d3aa0e883204459b052f29662f3c00348ff9d8b5",
+  "entries_sha256": "f4c1e65511924eb2ab51493dc27ef67e8fca8a1ffb14df909a00682c4cc24471",
   "schema_version": 1
 }
