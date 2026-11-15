@@ -8778,6 +8778,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-11-14",
+      "id": "a8f20348f7fb19e6050715ce653b19ae390ae52d7fd5a9bbaffe5603c835532b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/marwanmharbi/freight-invoice-audit"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-30",
       "id": "a92f065067f8078f2dc32567dd69f1160367c0b02117fe6ff325e91e6de4622a",
       "independent_ground_truth": false,
@@ -13545,6 +13561,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "f4c1e65511924eb2ab51493dc27ef67e8fca8a1ffb14df909a00682c4cc24471",
+  "entries_sha256": "d9ab896dae8ee925ea82ea7c5ed67c08c291dd136766d0bc781d786916904796",
   "schema_version": 1
 }

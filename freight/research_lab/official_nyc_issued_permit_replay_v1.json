@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-14",
+  "as_of_utc_date": "2026-11-15",
   "buyer_opportunity_ground_truth": false,
   "external_customer_contacts": 0,
   "independent_issuance_outcome_labels": 0,
@@ -20,8 +20,8 @@
   "readback_exact_match": 3,
   "readback_missing": 0,
   "readback_unavailable": 0,
-  "receipt_sha256": "654b5310b96e1168717470200e7c7f2ba1f1bb5750d571129948540df0f8490b",
-  "sample_canonical_sha256": "fd66683c58cee722d1a135180ef3f15c3f94e8798f0acdd0e79bb7ffba1fe93e",
+  "receipt_sha256": "f366a1d46f89b4ea3ff80d644e57dc4bf7257c89aa2600892823ebeb60a0cb84",
+  "sample_canonical_sha256": "90d16a10b158b412cc289e989e7ac5ead40ab0467856196998e7b783e784830e",
   "sample_count": 20,
   "sample_original_rows_stored": 0,
   "sample_repeated_source_rows": 1,
