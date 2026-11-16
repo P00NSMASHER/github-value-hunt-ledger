@@ -372,6 +372,10 @@
       }
       const copyStatus = byId("copyStatus");
       if (copyStatus) copyStatus.textContent = "";
+      const fallback = byId("auditCopyFallback");
+      if (fallback) fallback.hidden = true;
+      const manual = byId("auditManualSummary");
+      if (manual) manual.value = "";
       setError("");
       byId("fullName")?.focus({ preventScroll: true });
       auditForm.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -508,11 +512,24 @@
 
     byId("copyAuditSummary")?.addEventListener("click", async () => {
       const output = byId("copyStatus");
+      if (!preparedSummary || !output) return;
       try {
         await navigator.clipboard.writeText(preparedSummary);
         output.textContent = "Request details copied.";
       } catch (_error) {
-        output.textContent = "Copy was unavailable. Use the prepared email instead.";
+        // Preserve the actual prepared request when the mail app AND clipboard
+        // are unavailable. The visitor must copy and send it themselves.
+        const fallback = byId("auditCopyFallback");
+        const manual = byId("auditManualSummary");
+        if (fallback && manual) {
+          manual.value = preparedSummary;
+          fallback.hidden = false;
+          manual.focus({preventScroll: true});
+          manual.select();
+          output.textContent = "Clipboard unavailable. Select and copy the request below; this does not send an email.";
+        } else {
+          output.textContent = "Copy unavailable. Open the prepared email again.";
+        }
       }
     });
 

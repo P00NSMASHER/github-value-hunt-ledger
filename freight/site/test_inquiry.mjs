@@ -448,3 +448,56 @@ test("secure-intake availability GET never displays a submission receipt", async
   assert.match(hint.textContent, /nothing has been sent yet/i);
   assert.doesNotMatch(hint.textContent, /submitted securely|request received|receipt confirmed/i);
 });
+
+test("email-draft copy fallback preserves prepared text when clipboard is denied or absent", async () => {
+  const js = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  assert.match(html, /id="auditCopyFallback"[^>]*hidden/);
+  assert.match(html, /<textarea id="auditManualSummary"[^>]*readonly/);
+  const start = js.indexOf('    byId("copyAuditSummary")?.addEventListener("click",');
+  const end = js.indexOf('    byId("copyAuditEmail")?.addEventListener("click",', start);
+  assert.ok(start >= 0 && end > start, "Actual copy handler must be available");
+  const prepared = "Synthetic private request only — reference QA-123";
+  const run = async (clipboard) => {
+    let click;
+    let focused = 0;
+    let selected = 0;
+    let writes = 0;
+    const elements = {
+      copyAuditSummary: {addEventListener(type, cb) {assert.equal(type, "click"); click = cb;}},
+      copyStatus: {textContent: ""},
+      auditCopyFallback: {hidden: true},
+      auditManualSummary: {
+        value: "",
+        focus() {focused++;},
+        select() {selected++;}
+      }
+    };
+    runInNewContext(js.slice(start, end), {
+      byId: (id) => elements[id] || null,
+      navigator: {clipboard: clipboard && {writeText: async (value) => {
+        writes++;
+        assert.equal(value, prepared);
+        if (clipboard === "denied") throw Error("Synthetic clipboard denied");
+      }}},
+      preparedSummary: prepared
+    }, {filename: "site.js:copyAuditSummary", timeout: 2000});
+    assert.equal(typeof click, "function");
+    await click();
+    return {elements, focused, selected, writes};
+  };
+  const success = await run("allowed");
+  assert.equal(success.elements.copyStatus.textContent, "Request details copied.");
+  assert.equal(success.elements.auditCopyFallback.hidden, true);
+  assert.equal(success.writes, 1);
+  for (const mode of ["denied", null]) {
+    const fail = await run(mode);
+    assert.equal(fail.elements.auditCopyFallback.hidden, false);
+    assert.equal(fail.elements.auditManualSummary.value, prepared);
+    assert.equal(fail.focused, 1);
+    assert.equal(fail.selected, 1);
+    assert.match(fail.elements.copyStatus.textContent, /does not send an email/i);
+  }
+  assert.match(js, /if \(manual\) manual\.value = "";/, "Edit must clear stale personal text");
+  assert.match(js, /if \(fallback\) fallback\.hidden = true;/, "Edit must hide stale text");
+});

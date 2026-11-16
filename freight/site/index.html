@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="v16-evidence-preflight.css?v=1">
   <link rel="stylesheet" href="foundry.css?v=retally-type-20261008">
   <script src="commercial-config.js?v=free-audit-contingency-v5" defer></script>
-  <script src="site.js?v=qualified-funnel-20261110" defer></script>
+  <script src="site.js?v=qualified-funnel-manual-copy-20261115" defer></script>
   <script src="v16-evidence-preflight.js?v=1" defer></script>
   <script type="application/ld+json">
   {
@@ -263,7 +263,12 @@
           </fieldset>
         </form>
 
-        <div class="audit-ready" id="auditReady" hidden tabindex="-1"><span class="ready-mark" aria-hidden="true">&#10003;</span><p class="eyebrow">Email prepared — not sent</p><h3>Review it, then press Send.</h3><p>No freight files are attached.</p><a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Prepared Email Again</a><button class="text-button" id="editAuditRequest" type="button">Edit request details</button><button class="text-button" id="copyAuditSummary" type="button">Copy request details instead</button><p class="audit-manual-fallback">If no email draft opens, copy the request details and send them to <a id="auditRecipient" href="#contact-pending">RETALLY business email</a>. Your request has not been sent yet.</p><button class="text-button" id="copyAuditEmail" type="button">Copy recipient email address</button><span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span></div>
+        <div class="audit-ready" id="auditReady" hidden tabindex="-1"><span class="ready-mark" aria-hidden="true">&#10003;</span><p class="eyebrow">Email prepared — not sent</p><h3>Review it, then press Send.</h3><p>No freight files are attached.</p><a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Prepared Email Again</a><button class="text-button" id="editAuditRequest" type="button">Edit request details</button><button class="text-button" id="copyAuditSummary" type="button">Copy request details instead</button><p class="audit-manual-fallback">If no email draft opens, copy the request details and send them to <a id="auditRecipient" href="#contact-pending">RETALLY business email</a>. Your request has not been sent yet.</p><button class="text-button" id="copyAuditEmail" type="button">Copy recipient email address</button><span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span>
+          <div id="auditCopyFallback" class="audit-copy-fallback" hidden>
+            <label class="field-wide" for="auditManualSummary"><span>Request details for manual copying</span></label>
+            <textarea id="auditManualSummary" rows="10" readonly spellcheck="false" aria-describedby="auditCopyHelp"></textarea>
+            <p id="auditCopyHelp">Select and copy this prepared request into your own email. Nothing is sent automatically. Do not add invoices or credentials.</p>
+          </div></div>
       </div>
     </div>
   </section>
