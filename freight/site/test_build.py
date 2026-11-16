@@ -221,10 +221,40 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('<noscript><p class="audit-nojs">JavaScript is off', page)
             self.assertIn("Nothing has been submitted.", page)
             self.assertIn("href=\"about.html#location\">see RETALLY's business contact details</a>", page)
-            self.assertEqual(page.count('data-contact-link href="mailto:'), 1)
+            self.assertEqual(page.count('data-contact-link href="mailto:'), 2)
             self.assertIn("do not send invoices, rate agreements, credentials or payment data", page)
             self.assertIn("form-action 'none'", page)
             self.assertIn("if (submitButton) submitButton.disabled = false;", script)
+
+    def test_script_load_failure_keeps_verified_contact_fallback_visible(self):
+        """JavaScript can be enabled while site.js fails to load; contact must still work."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            html = (output / "index.html").read_text(encoding="utf-8")
+            site_script = re.compile(r'<script src="site\.js\?[^"]+" defer></script>')
+            self.assertEqual(len(site_script.findall(html)), 1)
+            # Simulate script fetch/load failure in a JS-enabled browser:
+            # the page does not execute site.js and the <noscript> block is not shown.
+            script_failed = site_script.sub("", html, count=1)
+            visible_html = re.sub(r"<noscript>.*?</noscript>", "", script_failed, flags=re.S)
+            form = visible_html.split('<form id="auditForm" novalidate>', 1)[1].split("</form>", 1)[0]
+            self.assertIn('disabled type="submit"', form)
+            contact = re.search(
+                r'<p id="auditStaticFallback"(?P<attrs>[^>]*)>(?P<body>.*?)</p>',
+                form, flags=re.S,
+            )
+            self.assertIsNotNone(contact, "Form must have an always-visible static contact path")
+            self.assertNotRegex(contact.group("attrs"), r"\b(?:hidden|aria-hidden|inert)\b")
+            self.assertIn(
+                '<a data-contact-link href="mailto:sales@freightfixture.com?subject=RETALLY%20question">Email RETALLY directly</a>',
+                contact.group("body"),
+            )
+            self.assertIn("press Send", contact.group("body"))
+            self.assertIn("Nothing has been submitted automatically.", contact.group("body"))
+            self.assertIn("Do not attach freight records, contracts, or credentials.", contact.group("body"))
+            # Negative control: without this fallback, the blocked form has no usable
+            # direct contact link within the form itself.
+            self.assertNotIn("mailto:", form.replace(contact.group(0), ""))
 
     def test_private_repository_cannot_be_the_output(self):
         for output in (
