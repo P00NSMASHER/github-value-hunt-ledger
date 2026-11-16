@@ -246,7 +246,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIsNotNone(contact, "Form must have an always-visible static contact path")
             self.assertNotRegex(contact.group("attrs"), r"\b(?:hidden|aria-hidden|inert)\b")
             self.assertIn(
-                '<a data-contact-link href="mailto:sales@freightfixture.com?subject=RETALLY%20question">Email RETALLY directly</a>',
+                '<a data-contact-link href="mailto:sales@freightfixture.com?subject=RETALLY%20question">Email our team directly</a>',
                 contact.group("body"),
             )
             self.assertIn("press Send", contact.group("body"))
@@ -847,7 +847,8 @@ class PremiumFinishV2Tests(unittest.TestCase):
             html = (output / "index.html").read_text()
             visual = Path(__file__).with_name("visual_acceptance.py").read_text()
 
-            self.assertEqual(html.count('data-contact-link href="mailto:'), 1)
+            self.assertEqual(html.count('data-contact-link href="mailto:'), 2)
+            self.assertEqual(html.split("<footer", 1)[1].count('data-contact-link href="mailto:'), 1)
             self.assertIn("RETALLY Premium Finish V2: customer contact clarity", css)
             self.assertIn(".home-simple .simple-footer > div:first-child{", css)
             self.assertIn("flex-direction:column;", css[css.index("RETALLY Premium Finish V2:"):])
