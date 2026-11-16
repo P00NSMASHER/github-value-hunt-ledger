@@ -4247,6 +4247,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "permitplate"
+      ],
+      "first_seen": "2026-11-16",
+      "id": "4e55ae5d45959138847f2a94d8f5df2b5d58a7cead05b9c1535aac2496ac756b",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/andersonjames38phd-cpu/building-permit-leads"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "recoveryos"
       ],
       "first_seen": "2026-10-23",
@@ -8083,6 +8099,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/16361536"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-16",
+      "id": "9b7a0d15b5f98a90797b0270a4a64ff97cbe5dcb68388d5b53d81caf991f2121",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "zenodo.org",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://zenodo.org/records/24284042"
     },
     {
       "commercial_reuse_authorized": false,
@@ -13577,6 +13609,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "e0a9b2696619ff237ae5b47e2d1c6f0830bcedd3ed907cc2156ce907ed24034b",
+  "entries_sha256": "640886053d743d92a2ba3949434498c525024c3ac506b45afb7cbe5353faa202",
   "schema_version": 1
 }
