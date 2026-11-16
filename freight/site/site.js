@@ -196,6 +196,8 @@
     let sending = false;
     const fallbackLink = byId("auditEmailFallback");
     const submitButton = auditForm.querySelector("button[type='submit']");
+    // The static form is intentionally disabled if scripts fail to load.
+    if (submitButton) submitButton.disabled = false;
     const submitHint = auditForm.querySelector(".form-actions small");
 
     // Default remains the established email fallback. Only the verified backend

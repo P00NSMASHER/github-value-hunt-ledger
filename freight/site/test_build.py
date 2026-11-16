@@ -212,6 +212,19 @@ class PublicBuildTests(unittest.TestCase):
                 self.assertNotIn("Rate confirmed before engagement", homepage)
                 self.assertNotIn("Rate confirmed in writing", terms)
 
+    def test_no_javascript_audit_fails_closed_with_a_manual_contact_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            self.assertIn('<button class="button button-signal" disabled type="submit">Open My Free Audit Request</button>', page)
+            self.assertIn('<noscript><p class="audit-nojs">JavaScript is off', page)
+            self.assertIn("Nothing has been submitted.", page)
+            self.assertIn('data-contact-link href="mailto:sales@freightfixture.com?subject=RETALLY%20question"', page)
+            self.assertIn("do not send invoices, rate agreements, credentials or payment data", page)
+            self.assertIn("form-action 'none'", page)
+            self.assertIn("if (submitButton) submitButton.disabled = false;", script)
+
     def test_private_repository_cannot_be_the_output(self):
         for output in (
             builder.REPOSITORY,
