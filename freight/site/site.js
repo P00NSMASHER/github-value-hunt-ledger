@@ -282,7 +282,11 @@
       }
       if (!auditForm.querySelector("input[name='modes']:checked")) {
         setError("Choose at least one freight type.");
-        byId("modesGroup")?.scrollIntoView({ block: "center", behavior: "smooth" });
+        // A scrolling-only error strands keyboard focus on Submit.
+        // Focus the first freight choice so the required correction is actionable.
+        const firstMode = byId("modesGroup")?.querySelector("input[name='modes']");
+        if (firstMode) firstMode.focus();
+        else byId("modesGroup")?.scrollIntoView({ block: "center", behavior: "smooth" });
         return false;
       }
       return true;

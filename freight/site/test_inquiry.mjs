@@ -501,3 +501,41 @@ test("email-draft copy fallback preserves prepared text when clipboard is denied
   assert.match(js, /if \(manual\) manual\.value = "";/, "Edit must clear stale personal text");
   assert.match(js, /if \(fallback\) fallback\.hidden = true;/, "Edit must hide stale text");
 });
+
+test("required freight mode validation moves keyboard focus to the first choice", () => {
+  const js = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  assert.match(html, /Freight types used <span>Choose at least one<\/span>/);
+  const start = js.indexOf("    const validate = () => {");
+  const finish = js.indexOf('    for (const field of all("input,select,textarea", auditForm))', start);
+  assert.ok(start >= 0 && finish > start, "Exercise the real client validator");
+  const validator = js.slice(start, finish);
+  const check = (modeSelected) => {
+    let focusCount = 0, error = "", scrollCount = 0;
+    const firstMode = {focus() {focusCount++;}};
+    const modesGroup = {
+      querySelector: () => firstMode,
+      scrollIntoView() {scrollCount++;}
+    };
+    const requiredField = {removeAttribute() {}, checkValidity: () => true};
+    const accepted = runInNewContext(
+      "(() => {" + validator + "\nreturn validate();})()",
+      {
+        auditForm: {querySelector: () => modeSelected ? firstMode : null},
+        all: () => [requiredField],
+        setError(message) {error = message;},
+        byId: (id) => id === "modesGroup" ? modesGroup : null
+      },
+      {filename: "site.js:validate-modes", timeout: 2000}
+    );
+    return {accepted, focusCount, error, scrollCount};
+  };
+  const missing = check(false);
+  assert.equal(missing.accepted, false);
+  assert.equal(missing.focusCount, 1, "A missing required mode must receive keyboard focus");
+  assert.match(missing.error, /choose at least one freight type/i);
+  const valid = check(true);
+  assert.equal(valid.accepted, true);
+  assert.equal(valid.focusCount, 0, "Valid mode choices must not steal focus");
+  assert.equal(valid.error, "");
+});
