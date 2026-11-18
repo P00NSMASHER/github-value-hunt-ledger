@@ -196,6 +196,7 @@
     let sending = false;
     const fallbackLink = byId("auditEmailFallback");
     const submitButton = auditForm.querySelector("button[type='submit']");
+    const entryFieldset = auditForm.querySelector('fieldset[data-form-step="1"]');
     // The static form is intentionally disabled if scripts fail to load.
     if (submitButton) submitButton.disabled = false;
     const submitHint = auditForm.querySelector(".form-actions small");
@@ -295,7 +296,7 @@
     for (const field of all("input,select,textarea", auditForm)) {
       field.addEventListener("input", () => {
         if (field.checkValidity()) field.removeAttribute("aria-invalid");
-        pendingRequestKey = null;
+        if (!sending) pendingRequestKey = null;
         setError("");
       });
     }
@@ -423,6 +424,7 @@
         idempotencyKey: pendingRequestKey, turnstileToken
       };
       sending = true;
+      if (entryFieldset) entryFieldset.disabled = true;
       if (submitButton) {
         submitButton.disabled = true;
         submitButton.textContent = "Submitting securely…";
@@ -506,6 +508,7 @@
       } finally {
         window.clearTimeout(timeout);
         sending = false;
+        if (entryFieldset) entryFieldset.disabled = false;
         if (submitButton) {
           submitButton.disabled = false;
           submitButton.textContent = "Submit My Free Audit Request";

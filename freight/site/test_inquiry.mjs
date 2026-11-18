@@ -566,3 +566,50 @@ test("email fallback cannot prepare a second request while secure intake is pend
   assert.deepEqual(run(true), {prevented:1, validated:0, prepared:0},
     "An in-flight POST must not also prepare an email draft");
 });
+
+test("in-flight POST freezes request edits and retains its retry identity", () => {
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  assert.match(html, /<fieldset class="form-step form-step-simple" data-form-step="1">/);
+  assert.match(front, /const entryFieldset = auditForm\.querySelector\('fieldset\[data-form-step="1"\]'\)/);
+  const begin = front.indexOf('    for (const field of all("input,select,textarea", auditForm))');
+  const end = front.indexOf('    const issueNotes = byId("issueNotes");', begin);
+  assert.ok(begin >= 0 && end > begin);
+  const fieldHandler = front.slice(begin, end);
+  const edit = (sending) => {
+    let listener;
+    const field = {
+      addEventListener(type, fn) { assert.equal(type, "input"); listener = fn; },
+      checkValidity() { return true; },
+      removeAttribute() {}
+    };
+    return runInNewContext(
+      "(() => { let pendingRequestKey = 'synthetic-stable-key';" + fieldHandler +
+      "\nfireInput(); return pendingRequestKey; })()",
+      {
+        sending, auditForm: {}, all: () => [field], setError() {},
+        fireInput() { assert.equal(typeof listener, "function"); listener(); }
+      }, {filename:"site.js:pending-input", timeout:2000}
+    );
+  };
+  assert.equal(edit(true), "synthetic-stable-key");
+  assert.equal(edit(false), null);
+  const start = front.indexOf("      sending = true;", end);
+  const afterLock = front.indexOf("      const controller = new AbortController();", start);
+  const cleanup = front.indexOf("        window.clearTimeout(timeout);", afterLock);
+  const afterCleanup = front.indexOf("      }\n    });", cleanup);
+  assert.ok(start > end && afterLock > start && cleanup > afterLock && afterCleanup > cleanup);
+  const state = runInNewContext(
+    "(() => { let sending = false;\n" + front.slice(start, afterLock) +
+    "\nconst locked = entryFieldset.disabled && submitButton.disabled && sending;\n" +
+    front.slice(cleanup, afterCleanup) +
+    "\nreturn {locked, released: !entryFieldset.disabled && !submitButton.disabled && !sending}; })()",
+    {
+      entryFieldset: {disabled: false},
+      submitButton: {disabled: false, textContent: "Submit"},
+      window: {clearTimeout() {}}, timeout: 1
+    }, {filename:"site.js:pending-lock", timeout:2000}
+  );
+  assert.equal(state.locked, true);
+  assert.equal(state.released, true);
+});
