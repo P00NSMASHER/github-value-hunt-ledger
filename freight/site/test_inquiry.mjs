@@ -567,6 +567,33 @@ test("email fallback cannot prepare a second request while secure intake is pend
     "An in-flight POST must not also prepare an email draft");
 });
 
+test("static direct-email escape cannot start a duplicate request during secure POST", () => {
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  assert.match(html, /id="auditStaticFallback"[^>]*>[\\s\\S]*?data-contact-link/);
+  const start = front.indexOf('    const staticEmailLink = byId("auditStaticFallback")?.querySelector("a[data-contact-link]");');
+  const finish = front.indexOf('    auditForm.addEventListener("submit"', start);
+  assert.ok(start >= 0 && finish > start, "The static direct-email anchor needs its own click guard");
+  const listener = front.slice(start, finish);
+  const exercise = (sending) => {
+    let click;
+    const link = {addEventListener(type, fn) {assert.equal(type, "click"); click = fn;}};
+    runInNewContext(listener, {sending, byId(id) {
+      assert.equal(id, "auditStaticFallback");
+      return {querySelector(selector) {
+        assert.equal(selector, "a[data-contact-link]");
+        return link;
+      }};
+    }}, {filename: "site.js:static-email-fallback", timeout: 2000});
+    assert.equal(typeof click, "function");
+    let prevented = 0;
+    click({preventDefault() {prevented++;}});
+    return prevented;
+  };
+  assert.equal(exercise(false), 0, "Email must remain usable when no POST is active");
+  assert.equal(exercise(true), 1, "A pending secure POST must block concurrent email handoff");
+});
+
 test("in-flight POST freezes request edits and retains its retry identity", () => {
   const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");

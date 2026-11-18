@@ -395,6 +395,13 @@
       if (validate()) prepareEmailDraft();
     });
 
+    // An anchor inside a disabled fieldset is still clickable. Keep the
+    // static contact escape available unless an online request is in flight.
+    const staticEmailLink = byId("auditStaticFallback")?.querySelector("a[data-contact-link]");
+    staticEmailLink?.addEventListener("click", (event) => {
+      if (sending) event.preventDefault();
+    });
+
     auditForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (sending || !validate()) return;
