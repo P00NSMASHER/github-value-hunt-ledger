@@ -539,3 +539,30 @@ test("required freight mode validation moves keyboard focus to the first choice"
   assert.equal(valid.focusCount, 0, "Valid mode choices must not steal focus");
   assert.equal(valid.error, "");
 });
+
+test("email fallback cannot prepare a second request while secure intake is pending", () => {
+  const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const start = front.indexOf('    fallbackLink?.addEventListener("click",');
+  const end = front.indexOf('    auditForm.addEventListener("submit",', start);
+  assert.ok(start >= 0 && end > start, "Run the actual fallback click handler");
+  const handlerSource = front.slice(start, end);
+  const run = (sending) => {
+    let listener, prevented = 0, validated = 0, prepared = 0;
+    runInNewContext(handlerSource, {
+      sending,
+      fallbackLink: {addEventListener(type, fn) {
+        assert.equal(type, "click");
+        listener = fn;
+      }},
+      validate() {validated++; return true;},
+      prepareEmailDraft() {prepared++;}
+    }, {filename:"site.js:email-fallback", timeout:2000});
+    assert.equal(typeof listener, "function");
+    listener({preventDefault() {prevented++;}});
+    return {prevented, validated, prepared};
+  };
+  assert.deepEqual(run(false), {prevented:1, validated:1, prepared:1},
+    "The manual email option must remain usable while no POST is active");
+  assert.deepEqual(run(true), {prevented:1, validated:0, prepared:0},
+    "An in-flight POST must not also prepare an email draft");
+});

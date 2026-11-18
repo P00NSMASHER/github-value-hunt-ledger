@@ -389,6 +389,8 @@
 
     fallbackLink?.addEventListener("click", (event) => {
       event.preventDefault();
+      // Do not prepare a duplicate email while secure submission is in flight.
+      if (sending) return;
       if (validate()) prepareEmailDraft();
     });
 
