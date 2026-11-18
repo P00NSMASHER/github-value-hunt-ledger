@@ -543,7 +543,7 @@ test("required freight mode validation moves keyboard focus to the first choice"
 test("email fallback cannot prepare a second request while secure intake is pending", () => {
   const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
   const start = front.indexOf('    fallbackLink?.addEventListener("click",');
-  const end = front.indexOf('    auditForm.addEventListener("submit",', start);
+  const end = front.indexOf('    const staticEmailLink = byId("auditStaticFallback")?.querySelector("a[data-contact-link]");', start);
   assert.ok(start >= 0 && end > start, "Run the actual fallback click handler");
   const handlerSource = front.slice(start, end);
   const run = (sending) => {
