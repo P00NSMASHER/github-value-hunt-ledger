@@ -8472,6 +8472,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-17",
+      "id": "a22a24bc3616406b60094e08d6950b3a403bc20d422610b9caa5ff9e3215d2a3",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/wenayy/nova-invoice-audit"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -13625,6 +13641,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "55dbaa50f969001dc4601410c325e8f58aaddab5643e7db989e32f07a9385918",
+  "entries_sha256": "a2ea32adc7da38da57843ab10b42e224932ec3128bd111d3043f870227a5e800",
   "schema_version": 1
 }
