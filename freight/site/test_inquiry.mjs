@@ -570,7 +570,7 @@ test("email fallback cannot prepare a second request while secure intake is pend
 test("static direct-email escape cannot start a duplicate request during secure POST", () => {
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const front = readFileSync(new URL("./site.js", import.meta.url), "utf8");
-  assert.match(html, /id="auditStaticFallback"[^>]*>[\\s\\S]*?data-contact-link/);
+  assert.match(html, /id="auditStaticFallback"[^>]*>[\s\S]*?data-contact-link/);
   const start = front.indexOf('    const staticEmailLink = byId("auditStaticFallback")?.querySelector("a[data-contact-link]");');
   const finish = front.indexOf('    auditForm.addEventListener("submit"', start);
   assert.ok(start >= 0 && finish > start, "The static direct-email anchor needs its own click guard");
