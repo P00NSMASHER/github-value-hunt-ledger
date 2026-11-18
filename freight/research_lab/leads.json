@@ -7674,6 +7674,22 @@
       "engines": [
         "freightrecovery"
       ],
+      "first_seen": "2026-11-18",
+      "id": "94d980b5cb830e5b797eb89ad311ee834708aa76899a7d9b8cc9b300bf3f6f21",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/danielmchristian/dcmai-freight-recovery"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
       "first_seen": "2026-10-23",
       "id": "953ef4285dd24be5143d64bd6bc7c05765eb86ce9a8bfb1d06c0899da6c7b636",
       "independent_ground_truth": false,
@@ -9491,6 +9507,22 @@
       "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
       "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
       "url": "https://zenodo.org/records/10220027"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-18",
+      "id": "b4aa2ec72afb9574c45d96e274c5c6006f15c85122dae8cf582b44cc08ede190",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/shamin1412/freight-invoice-recon"
     },
     {
       "commercial_reuse_authorized": false,
@@ -13641,6 +13673,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "a2ea32adc7da38da57843ab10b42e224932ec3128bd111d3043f870227a5e800",
+  "entries_sha256": "c9c004a61378f3755967d190c30ae914be24a725598badfee7180e24889f4fc5",
   "schema_version": 1
 }
