@@ -781,7 +781,7 @@ class PublicChatbotTests(unittest.TestCase):
                 self.assertEqual(content.count("https://static.cloudflareinsights.com/beacon.min.js"), 1)
                 self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", content)
                 self.assertIn("frame-src https://challenges.cloudflare.com https://www.bubblav.com", content)
-                self.assertIn("https://challenges.cloudflare.com;", content)
+                self.assertEqual(content.count("https://challenges.cloudflare.com"), 3)
                 self.assertNotIn("connect-src 'none'", content)
 
 
