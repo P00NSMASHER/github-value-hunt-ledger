@@ -465,9 +465,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
-            self.assertIn("connect-src https://www.bubblav.com", index)
+            self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", index)
             self.assertIn("form-action 'none'", index)
-            self.assertNotIn("connect-src 'self'", index)
+            self.assertNotIn("connect-src 'none'", index)
 
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -733,9 +733,9 @@ class PublicChatbotTests(unittest.TestCase):
                 with self.subTest(page=name):
                     html = (output / name).read_text()
                     self.assertEqual(html.count(expected_script), 1)
-                    self.assertIn("script-src 'self' https://www.bubblav.com;", html)
-                    self.assertIn("connect-src https://www.bubblav.com", html)
-                    self.assertIn("frame-src https://www.bubblav.com", html)
+                    self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;", html)
+                    self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", html)
+                    self.assertIn("frame-src https://challenges.cloudflare.com https://www.bubblav.com", html)
             for name in ("404.html", "recovery-status-example.html"):
                 self.assertNotIn(expected_script, (output / name).read_text())
             self.assertIn("Optional AI chat assistant", (output / "privacy.html").read_text())
@@ -779,8 +779,8 @@ class PublicChatbotTests(unittest.TestCase):
                 content = (output / name).read_text()
                 self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com https://static.cloudflareinsights.com/beacon.min.js;", content)
                 self.assertEqual(content.count("https://static.cloudflareinsights.com/beacon.min.js"), 1)
-                self.assertIn("connect-src 'self' https://www.bubblav.com", content)
-                self.assertIn("frame-src https://www.bubblav.com", content)
+                self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", content)
+                self.assertIn("frame-src https://challenges.cloudflare.com https://www.bubblav.com", content)
                 self.assertIn("https://challenges.cloudflare.com;", content)
                 self.assertNotIn("connect-src 'none'", content)
 
