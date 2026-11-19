@@ -38,7 +38,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 8,
-      "public_source_fingerprint": "935f8caeb734c857a93c2312156107ccad97949232f6f89713bc0cb8e323656b",
+      "public_source_fingerprint": "8f326b37c6a872b545c8349eaf0a64da14218570d9840d8aa1c5e1b0cd666ca7",
       "real_cash_recovery_verified": false,
       "reported_evidence": [
         "independent_adjudicated_decision",
@@ -62,7 +62,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 8,
-      "public_source_fingerprint": "325b1c9a244cbd75467f80baa2d50ca8208a7ac72ab2131311948acc8c207080",
+      "public_source_fingerprint": "6eba6a09b8060a075a86dcfa65c03d89b1dd1eade50c0c7a50d197b1b2f70758",
       "real_cash_recovery_verified": false,
       "reported_evidence": [
         "independent_adjudicated_decision",
@@ -86,7 +86,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 8,
-      "public_source_fingerprint": "d8f3e7e84512de13821460a89f0f7324166137279237e01c249624ec37986b14",
+      "public_source_fingerprint": "6908fce61f438cd7d1172b05603e43535c5f99c8dd556d3c11da9b220246f211",
       "real_cash_recovery_verified": false,
       "reported_evidence": [
         "independent_adjudicated_decision",
@@ -183,7 +183,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 4,
-      "public_source_fingerprint": "e1c514dbfcb5dd9cbfeb6d12651db57907720163cb0146afa851049185945a5d",
+      "public_source_fingerprint": "8c1e618d685c8162f9d45ef713b694f6283e86d15cbb728ca101742a83de2d25",
       "real_cash_recovery_verified": false,
       "reported_evidence": [
         "independent_adjudicated_decision"
@@ -231,7 +231,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 0,
-      "public_source_fingerprint": "4a2b98d77e226eda18eacfb2cf62feb786495498e7bc886efed76728888a118a",
+      "public_source_fingerprint": "2f61a8946d7c9c66d8246c32306038c9f75d3272d0459f73453bdcac2ed3f80f",
       "real_cash_recovery_verified": false,
       "reported_evidence": [],
       "reuse_rights_cleared": false,
@@ -254,7 +254,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 0,
-      "public_source_fingerprint": "147f56ec911cbb741b6fd12c0b7be59ab810804a9c1b4c9d5dbacf29ef9f86b5",
+      "public_source_fingerprint": "d7b4637f598cb345f54b770b37cbbbd85a6ea4025e4c50771fcadd8aab51c5be",
       "real_cash_recovery_verified": false,
       "reported_evidence": [],
       "reuse_rights_cleared": false,
@@ -277,7 +277,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 0,
-      "public_source_fingerprint": "04d66382fae05ae79a270d5558ad7b73255546a5de61fad5bfa59b265220e25b",
+      "public_source_fingerprint": "659bb0b7bbd63c4a2e6d03cafed19e1480f82823ea1becfe25210640c90fd158",
       "real_cash_recovery_verified": false,
       "reported_evidence": [],
       "reuse_rights_cleared": false,
@@ -300,7 +300,7 @@
       "first_seen": "2026-10-17T15:38:43Z",
       "invoice_error_independently_verified": false,
       "manual_review_priority_points": 0,
-      "public_source_fingerprint": "78948ab3b6e5d36ef1fa69696b19b3cdc0f867cfefb3f7763eb9eab8abdf7ffb",
+      "public_source_fingerprint": "79729eafe798d8cdd57d85f4f68afacab4079805a667b1028e332d1adbb59d9c",
       "real_cash_recovery_verified": false,
       "reported_evidence": [],
       "reuse_rights_cleared": false,
@@ -313,7 +313,7 @@
   "schema_version": 1,
   "scope": "PUBLIC_METADATA_TRIAGE_ONLY_NO_AUDIT_TRUTH",
   "source_count": 13,
-  "source_ledger_sha256": "1cfa6f31e8fbdfb5f7ac5bcb07d2518368f89383d4f7543e5d3edaa8cb038bf8",
+  "source_ledger_sha256": "6ce379ed15d3b0aa79250620c0ecd417a9afd01ed87b9569441cb911b6ce78e2",
   "sources_pending_rights_and_independent_review": 13,
   "sources_with_complete_approved_real_case": 0
 }
