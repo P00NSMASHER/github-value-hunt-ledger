@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 16,
+    "api_requests": 18,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -8,8 +8,58 @@
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 6,
+  "candidate_count": 7,
   "candidates": [
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "CycloneDX and SPDX Software Bill of Materials (SBOM) compliance and supply-chain auditor verifying cryptographic component hashes, PURL identifiers, copyleft license risks, and NTIA minimum elements.",
+      "discovery_query": "software bill materials license audit python",
+      "exact_revision": "7d9cf9f409393042d5ede129cd481fc9867ab32b",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "Apache-2.0",
+      "pushed_at": "2026-11-16T16:06:09Z",
+      "repository": "Logihertz-Systems-OPC-Pvt-Ltd/lh-sbom-auditor",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 113,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "apache-2-0",
+        "cybersecurity",
+        "cyclonedx",
+        "devsecops",
+        "license-compliance",
+        "logihertz",
+        "ntia",
+        "python",
+        "sarif",
+        "sbom",
+        "spdx",
+        "struct-os",
+        "supply-chain",
+        "zero-dependency"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 11,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 49,
+      "url": "https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-sbom-auditor"
+    },
     {
       "archived": false,
       "default_branch": "main",
@@ -156,7 +206,7 @@
       "forks": 0,
       "primary_language": null,
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T00:32:27Z",
+      "pushed_at": "2026-11-06T23:54:13Z",
       "repository": "victor-lis-bronzo/tag-release-template",
       "root_code_signals": [
         ".github"
@@ -266,7 +316,7 @@
   ],
   "catalogs": [],
   "evidence_gate": null,
-  "generated_at": "2026-11-04T11:36:08.652803+00:00",
+  "generated_at": "2026-11-19T12:11:42.076225+00:00",
   "mission": "Reusable security, deterministic testing, deployment verification and rights-safe source inspection for active projects",
   "project": "shared-infra",
   "risk_review": [],
@@ -280,7 +330,7 @@
     },
     {
       "query": "software bill materials license audit python",
-      "returned": 0
+      "returned": 1
     },
     {
       "query": "reproducible build artifact verification github",
