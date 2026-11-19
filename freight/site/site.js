@@ -477,6 +477,19 @@
           // Delayed/failed mail must not strand an otherwise durable lead.
           // Preserve the SAME reference so staff can reconcile any email.
           const contactEmail = document.querySelector('meta[name="freight-contact-email"]')?.content.trim() || "";
+          const recipient = byId("auditRecipient");
+          if (contactEmail && recipient && fallbackInstructions) {
+            recipient.href = "mailto:" + contactEmail;
+            recipient.textContent = contactEmail;
+            fallbackInstructions.replaceChildren(
+              "If your email draft does not open, send the saved request details to ",
+              recipient,
+              ". The online request is already saved; do not submit it again."
+            );
+            fallbackInstructions.hidden = false;
+            const copyRecipient = byId("copyAuditEmail");
+            if (copyRecipient) copyRecipient.hidden = false;
+          }
           preparedSummary = buildSummary(result.reference);
           const sendLink = byId("sendAuditRequest");
           if (contactEmail && sendLink) {

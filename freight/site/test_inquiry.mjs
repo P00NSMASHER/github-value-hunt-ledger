@@ -640,3 +640,83 @@ test("in-flight POST freezes request edits and retains its retry identity", () =
   assert.equal(state.locked, true);
   assert.equal(state.released, true);
 });
+
+test("saved audit receipt with pending notification exposes recipient and accurate manual fallback", async () => {
+  const js = readFileSync(new URL("./site.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  assert.match(html, /id="auditRecipient"/);
+  assert.match(html, /id="copyAuditEmail"/);
+  const start = js.indexOf('    auditForm.addEventListener("submit", async (event) => {');
+  const end = js.indexOf('    byId("sendAuditRequest")?.addEventListener("click",', start);
+  assert.ok(start >= 0 && end > start, "Execute the actual secure-intake submit handler");
+  const exercise = async (notificationPending) => {
+    let onSubmit;
+    const recipient = {href: "#contact-pending", textContent: "RETALLY business email"};
+    const instructions = {
+      hidden: false, textContent: "Your request has not been sent yet.", children: [recipient],
+      replaceChildren(...nodes) {
+        this.children = nodes;
+        this.textContent = nodes.map(node => typeof node === "string" ? node : node.textContent).join("");
+      }
+    };
+    const elements = {
+      auditRecipient: recipient,
+      sendAuditRequest: {hidden: false, href: "#contact-pending", removeAttribute() {}},
+      editAuditRequest: {hidden: false},
+      copyAuditSummary: {hidden: false},
+      copyAuditEmail: {hidden: false},
+      copyStatus: {hidden: false}
+    };
+    const labels = {
+      ".eyebrow": {textContent: ""},
+      "h3": {textContent: ""},
+      "p:not(.eyebrow)": {textContent: ""}
+    };
+    elements.auditReady = {
+      hidden: true,
+      querySelector(selector) {return selector === ".audit-manual-fallback" ? instructions : labels[selector];},
+      focus() {}, scrollIntoView() {}
+    };
+    const auditForm = {
+      hidden: false,
+      addEventListener(type, handler) {assert.equal(type, "submit"); onSubmit = handler;},
+      querySelector() {return {value: "synthetic-turnstile-token"};}
+    };
+    const context = {
+      auditForm, byId: id => elements[id] || null, validate: () => true,
+      serverReady: true, sending: false, pendingRequestKey: null,
+      entryFieldset: {disabled: false}, submitButton: {disabled: false, textContent: ""},
+      setError() {}, fieldValue: () => "Synthetic", valuesFor: () => [],
+      nonEmptyCampaignContext: {}, preparedSummary: "",
+      window: {crypto: {randomUUID: () => "synthetic-uuid"}, setTimeout: () => 1, clearTimeout() {}},
+      AbortController,
+      document: {querySelector: () => ({content: "qa@example.org"})},
+      buildSummary: () => "Synthetic request details", track() {},
+      EVENTS: {auditFormCompleted: "synthetic"},
+      fetch: async () => ({ok: true, json: async () => ({
+        received: true, reference: "RA-20261119-ABCDEF12", notificationPending
+      })})
+    };
+    runInNewContext(js.slice(start, end), context,
+      {filename: "site.js:saved-notification-fallback", timeout: 2000});
+    assert.equal(typeof onSubmit, "function");
+    await onSubmit({preventDefault() {}});
+    assert.equal(auditForm.hidden, true);
+    assert.equal(elements.auditReady.hidden, false);
+    return {elements, instructions, labels};
+  };
+  const pending = await exercise(true);
+  assert.match(pending.labels.h3.textContent, /saved/i);
+  assert.equal(pending.instructions.hidden, false, "Pending notification must display manual recipient");
+  assert.equal(pending.elements.copyAuditEmail.hidden, false, "Copy-recipient control must be usable");
+  assert.equal(pending.elements.auditRecipient.href, "mailto:qa@example.org");
+  assert.ok(pending.instructions.children.includes(pending.elements.auditRecipient));
+  assert.match(pending.instructions.textContent, /already saved/i);
+  assert.doesNotMatch(pending.instructions.textContent, /has not been sent yet/i);
+  assert.equal(pending.elements.sendAuditRequest.hidden, false);
+  assert.equal(pending.elements.copyAuditSummary.hidden, false);
+  const delivered = await exercise(false);
+  assert.equal(delivered.instructions.hidden, true, "Delivered alert must not show fallback");
+  assert.equal(delivered.elements.copyAuditEmail.hidden, true);
+  assert.equal(delivered.elements.sendAuditRequest.hidden, true);
+});
